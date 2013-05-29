@@ -121,7 +121,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 
 			M4UConfigUtils.initUrbanSimParameter(matsim4urbansimConfigPart2, matsim4urbansimConfigPart3, config);
 			M4UConfigUtils.initMATSim4UrbanSimControler(matsim4urbansimConfigPart2, matsim4urbansimConfigPart3, config);
-			M4UConfigUtils.initAccessibilityParameters(matsim4urbansimConfigPart2, matsim4urbansimConfigPart3, config);
+			M4UConfigUtils.initAccessibilityParameters(matsim4urbansimConfigPart2, config);
 			
 //<<<<<<< HEAD
 //			MATSim4UrbanSimConfigUtils.initNetwork(matsim4urbansimConfigPart1, config);
@@ -158,7 +158,11 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 			// (these are not visible in the matsim config dump :-( :-( and thus need to be done separately. kai, apr'13)
 			M4UConfigUtils.printUrbanSimParameterSettings( M4UConfigUtils.getUrbanSimParameterConfigAndPossiblyConvert(config) );
 			M4UConfigUtils.printMATSim4UrbanSimControlerSettings( M4UConfigUtils.getMATSim4UrbaSimControlerConfigAndPossiblyConvert(config) );
-//			M4UAccessibilityConfigUtils.printAccessibilityParameterSettings( M4UAccessibilityConfigUtils.getAccessibilityParameterConfigPossiblyEmpty(config) );
+//<<<<<<< HEAD
+////			M4UAccessibilityConfigUtils.printAccessibilityParameterSettings( M4UAccessibilityConfigUtils.getAccessibilityParameterConfigPossiblyEmpty(config) );
+//=======
+//			M4UAccessibilityConfigUtils.printAccessibilityParameterSettings( M4UAccessibilityConfigUtils.getAccessibilityConfigModuleAndPossiblyConvert(config) );
+//>>>>>>> accessibility config somewhat complete ... but modes should be configurable
 			
 			config.addConfigConsistencyChecker( new VspConfigConsistencyCheckerImpl() ) ;
 			config.addConfigConsistencyChecker( new M4UConfigConsistencyChecker() ) ;

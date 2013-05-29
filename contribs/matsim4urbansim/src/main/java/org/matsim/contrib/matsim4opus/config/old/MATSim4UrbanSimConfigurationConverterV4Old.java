@@ -631,9 +631,9 @@ public class MATSim4UrbanSimConfigurationConverterV4Old {
 		module.setAccessibilityDestinationSamplingRate(accessibilityDestinationSamplingRate);
 		module.setUsingLogitScaleParameterFromMATSim(useMATSimLogitScaleParameter);
 		module.setUsingRawSumsWithoutLn(useRawSum);
-		module.setUsingCarParameterFromMATSim(useMATSimCarParameter);
+		module.setUsingCarParametersFromMATSim(useMATSimCarParameter);
 		module.setUsingBikeParameterFromMATSim(useMATSimBikeParameter);
-		module.setUsingWalkParameterFromMATSim(useMATSimWalkParameter);
+		module.setUsingWalkParametersFromMATSim(useMATSimWalkParameter);
 		module.setLogitScaleParameter(logitScaleParameter);
 		module.setBetaCarTravelTime(betaCarTT);
 		module.setBetaCarTravelTimePower2(betaCarTTPower);
@@ -677,8 +677,8 @@ public class MATSim4UrbanSimConfigurationConverterV4Old {
 		log.info("AccessibilityParameter settings:");
 		
 		log.info("AccessibilityDestinationSamplingRate: " + module.getAccessibilityDestinationSamplingRate());
-		log.info("Compute raw sum (not logsum): " + module.usingRawSumsWithoutLn() );
-		log.info("Logit Scale Parameter: " + module.usingLogitScaleParameterFromMATSim() ); 
+		log.info("Compute raw sum (not logsum): " + module.isUsingRawSumsWithoutLn() );
+		log.info("Logit Scale Parameter: " + module.isUsingLogitScaleParameterFromMATSim() ); 
 		
 		log.info("BETA_CAR_TRAVEL_TIMES: " + module.getBetaCarTravelTime() );
 		log.info("BETA_CAR_TRAVEL_TIMES_POWER: " + module.getBetaCarTravelTimePower2() );

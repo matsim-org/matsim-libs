@@ -166,16 +166,16 @@ public class AccessibilityControlerListenerImpl{
 		
 		AccessibilityConfigModule moduleAPCM = ConfigurationUtils.getAccessibilityParameterConfigModule(scenario);
 		
-		useRawSum			= moduleAPCM.usingRawSumsWithoutLn();
+		useRawSum			= moduleAPCM.isUsingRawSumsWithoutLn();
 		logitScaleParameter = moduleAPCM.getLogitScaleParameter();
 		inverseOfLogitScaleParameter = 1/(logitScaleParameter); // logitScaleParameter = same as brainExpBeta on 2-aug-12. kai
 		walkSpeedMeterPerHour = scenario.getConfig().plansCalcRoute().getWalkSpeed() * 3600.;
 		bikeSpeedMeterPerHour = scenario.getConfig().plansCalcRoute().getBikeSpeed() * 3600.; // should be something like 15000
 		
-		usingCarParameterFromMATSim = moduleAPCM.usingCarParameterFromMATSim();
-		usingBikeParameterFromMATSim= moduleAPCM.usingBikeParameterFromMATSim();
-		usingWalkParameterFromMATSim= moduleAPCM.usingWalkParameterFromMATSim();
-		usingPtParameterFromMATSim	= moduleAPCM.usingPtParameterFromMATSim();
+		usingCarParameterFromMATSim = moduleAPCM.isUsingCarParametersFromMATSim();
+		usingBikeParameterFromMATSim= moduleAPCM.isUsingBikeParametersFromMATSim();
+		usingWalkParameterFromMATSim= moduleAPCM.isUsingWalkParametersFromMATSim();
+		usingPtParameterFromMATSim	= moduleAPCM.isUsingPtParametersFromMATSim();
 		
 		betaCarTT 	   	= moduleAPCM.getBetaCarTravelTime();
 		betaCarTTPower	= moduleAPCM.getBetaCarTravelTimePower2();

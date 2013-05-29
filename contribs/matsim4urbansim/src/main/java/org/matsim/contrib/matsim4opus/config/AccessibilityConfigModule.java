@@ -26,80 +26,114 @@ import org.apache.log4j.Logger;
 import org.matsim.core.config.experimental.ReflectiveModule;
 
 public class AccessibilityConfigModule extends ReflectiveModule{
+	// yyyy todo: change in similar way as with other modes ("_mode") 
+	
+	@SuppressWarnings("unused")
 	private static Logger log = Logger.getLogger( AccessibilityConfigModule.class ) ;
 
 	public static final String GROUP_NAME = "accessibility";
 	
+	private static final String LOGIT_SCALE_PARAMETER = "logitScaleParameter";
+	private static final String USING_RAW_SUMS_WITHOUT_LN = "usingRawSumsWithoutLn";
+	private static final String USING_PT_PARAMETERS_FROM_MATSIM = "usingPtParametersFromMATSim";
+	private static final String USING_WALK_PARAMETERS_FROM_MATSIM = "usingWalkParametersFromMATSim";
+	private static final String USING_BIKE_PARAMETERS_FROM_MATSIM = "usingBikeParametersFromMATSim";
+	private static final String USING_CAR_PARAMETERS_FROM_MATSIM = "usingCarParametersFromMATSim";
+
+	private static final String ACCESSIBILITY_DESTINATION_SAMPLING_RATE = "accessibilityDestinationSamplingRate";
+
+	private static final String BETA_BIKE_LN_MONETARY_TRAVEL_COST = "betaBikeLnMonetaryTravelCost";
+	private static final String BETA_WALK_LN_MONETARY_TRAVEL_COST = "betaWalkLnMonetaryTravelCost";
+	private static final String BETA_PT_LN_MONETARY_TRAVEL_COST = "betaPtLnMonetaryTravelCost";
+	private static final String BETA_CAR_LN_MONETARY_TRAVEL_COST = "betaCarLnMonetaryTravelCost";
+
 	// ===
 	
-	private double accessibilityDestinationSamplingRate;
+	private Double accessibilityDestinationSamplingRate;
 	
 	private static final String USING_LOGIT_SCALE_PARAMETER_FROM_MATSIM = "usingScaleParameterFromMATSim" ;
-	private boolean usingLogitScaleParameterFromMATSim;
+	private Boolean usingLogitScaleParameterFromMATSim;
 	
-	private boolean usingCarParameterFromMATSim;
-	private boolean usingBikeParameterFromMATSim;
-	private boolean usingWalkParameterFromMATSim;
-	private boolean usingPtParameterFromMATSim;
+	private Boolean usingCarParameterFromMATSim;
+	private Boolean usingBikeParameterFromMATSim;
+	private Boolean usingWalkParameterFromMATSim;
+	private Boolean usingPtParameterFromMATSim;
     
-	private boolean usingRawSumsWithoutLn;
+	private Boolean usingRawSumsWithoutLn;
     
-	private double logitScaleParameter;
+	private Double logitScaleParameter;
     
-	private double betaCarTravelTime;
-	private double betaCarTravelTimePower2;
-	private double betaCarLnTravelTime;
-	private double betaCarTravelDistance;
-	private double betaCarTravelDistancePower2;
-	private double betaCarLnTravelDistance;
-	private double betaCarTravelMonetaryCost;
-	private double betaCarTravelMonetaryCostPower2;
-	private double betaCarLnTravelMonetaryCost;
+	private Double betaCarTravelTime;
+	private Double betaCarTravelTimePower2;
+	private Double betaCarLnTravelTime;
+	private Double betaCarTravelDistance;
+	private Double betaCarTravelDistancePower2;
+	private Double betaCarLnTravelDistance;
+	private Double betaCarTravelMonetaryCost;
+	private Double betaCarTravelMonetaryCostPower2;
+	private Double betaCarLnTravelMonetaryCost;
 	
-	private double betaBikeTravelTime;
-	private double betaBikeTravelTimePower2;
-	private double betaBikeLnTravelTime;
-	private double betaBikeTravelDistance;
-	private double betaBikeTravelDistancePower2;
-	private double betaBikeLnTravelDistance;
-	private double betaBikeTravelMonetaryCost;
-	private double betaBikeTravelMonetaryCostPower2;
-	private double betaBikeLnTravelMonetrayCost;
+	private Double betaBikeTravelTime;
+	private Double betaBikeTravelTimePower2;
+	private Double betaBikeLnTravelTime;
+	private Double betaBikeTravelDistance;
+	private Double betaBikeTravelDistancePower2;
+	private Double betaBikeLnTravelDistance;
+	private Double betaBikeTravelMonetaryCost;
+	private Double betaBikeTravelMonetaryCostPower2;
+	private Double betaBikeLnTravelMonetrayCost;
 
-	private double betaWalkTravelTime;
-	private double betaWalkTravelTimePower2;
-	private double betaWalkLnTravelTime;
-	private double betaWalkTravelDistance;
-	private double betaWalkTravelDistancePower2;
-	private double betaWalkLnTravelDistance;
-	private double betaWalkTravelMonetaryCost;
-	private double betaWalkTravelMonetrayCostPower2;
-	private double betaWalkLnTravelMonetrayCost;
+	private Double betaWalkTravelTime;
+	private Double betaWalkTravelTimePower2;
+	private Double betaWalkLnTravelTime;
+	private Double betaWalkTravelDistance;
+	private Double betaWalkTravelDistancePower2;
+	private Double betaWalkLnTravelDistance;
+	private Double betaWalkTravelMonetaryCost;
+	private Double betaWalkTravelMonetrayCostPower2;
+	private Double betaWalkLnTravelMonetrayCost;
 	
-	private double betaPtTravelTime;
-	private double betaPtTravelTimePower2;
-	private double betaPtLnTravelTime;
-	private double betaPtTravelDistance;
-	private double betaPtTravelDistancePower2;
-	private double betaPtLnTravelDistance;
-	private double betaPtTravelMonetrayCost;
-	private double betaPtTravelMonetrayCostPower2;
-	private double betaPtLnTravelMonetrayCost;
+	private Double betaPtTravelTime;
+	private Double betaPtTravelTimePower2;
+	private Double betaPtLnTravelTime;
+	private Double betaPtTravelDistance;
+	private Double betaPtTravelDistancePower2;
+	private Double betaPtLnTravelDistance;
+	private Double betaPtTravelMonetrayCost;
+	private Double betaPtTravelMonetrayCostPower2;
+	private Double betaPtLnTravelMonetrayCost;
 
-	// parameter names in matsim4urbansimParameter module
 	public static final String TIME_OF_DAY = "timeOfDay";
+	private Double timeOfDay;
 
 	public AccessibilityConfigModule() {
 		super(GROUP_NAME);
-		// yyyyyy this class feels quite dangerous to me; one can have inconsistent entries between the Map and the typed values. kai, apr'13 
+		// this class feels quite dangerous to me; one can have inconsistent entries between the Map and the typed values. kai, apr'13
+		// no longer.  kai, may'13
 	}
 	
 	@Override
 	public Map<String,String> getComments() {
 		Map<String,String> map = new TreeMap<String,String>() ;
 		
-		map.put("betaBikeLnMonetaryTravelCost","bicycle parameters") ;
-		map.put("betaCarLnMonetaryTravelCost","car parameters") ;
+		map.put(TIME_OF_DAY, "time of day at which trips for accessibility computations are assumed to start") ;
+		
+		map.put(ACCESSIBILITY_DESTINATION_SAMPLING_RATE, "if only a sample of destinations should be used " +
+				"(reduces accuracy -- not recommended except when necessary for computational speed reasons)" ) ;
+		
+		map.put(USING_LOGIT_SCALE_PARAMETER_FROM_MATSIM, "if you want the logit model scale parameter in the " +
+				"accessibility computation different from the one in the travel model.  May be useful if you know what you are doing") ;
+		
+		map.put(USING_BIKE_PARAMETERS_FROM_MATSIM, "set to false if you want to enable using other parameters for the " +
+				"accessibility computation than for the travel model.  not recommended" ) ;
+		
+		map.put(BETA_CAR_LN_MONETARY_TRAVEL_COST,"car parameters for accessibility computation. separate from parameters for travel model") ;
+		map.put(BETA_PT_LN_MONETARY_TRAVEL_COST,"public transit parameters for accessibility. separate from parameters for travel model") ;
+		map.put(BETA_WALK_LN_MONETARY_TRAVEL_COST,"walk parameters for accessibility computation. separate from parameters for travel model") ;
+		map.put(BETA_BIKE_LN_MONETARY_TRAVEL_COST,"bicycle parameters for accessibility computation.  separate from parameters for travel model") ;
+		
+		map.put(USING_RAW_SUMS_WITHOUT_LN, "econometric accessibility usually returns the logsum. " +
+				"Set to true if you just want the sum (without the ln)") ;
 		
 		return map ;
 	}
@@ -107,359 +141,370 @@ public class AccessibilityConfigModule extends ReflectiveModule{
 	// NOTE: It seems ok to have the string constants immediately here since having them separately really does not help
 	// keeping the code compact
 	
-	public double getAccessibilityDestinationSamplingRate(){
-		return this.accessibilityDestinationSamplingRate;
+	@StringGetter(TIME_OF_DAY)
+	public Double getTimeOfDay() {
+		return this.timeOfDay ;
+	}
+	@StringSetter(TIME_OF_DAY)
+	public void setTimeOfDay( Double val ) {
+		this.timeOfDay = val ;
 	}
 	
-	public void setAccessibilityDestinationSamplingRate(double sampleRate){
+	@StringGetter(ACCESSIBILITY_DESTINATION_SAMPLING_RATE)
+	public Double getAccessibilityDestinationSamplingRate(){
+		return this.accessibilityDestinationSamplingRate;
+	}
+	@StringSetter(ACCESSIBILITY_DESTINATION_SAMPLING_RATE)
+	public void setAccessibilityDestinationSamplingRate(Double sampleRate){
 		this.accessibilityDestinationSamplingRate = sampleRate;
 	}
-
-    public boolean usingLogitScaleParameterFromMATSim() {
+    @StringGetter(USING_LOGIT_SCALE_PARAMETER_FROM_MATSIM)
+    public Boolean isUsingLogitScaleParameterFromMATSim() {
         return usingLogitScaleParameterFromMATSim;
     }
-
-    public void setUsingLogitScaleParameterFromMATSim(boolean value) {
+    @StringSetter(USING_LOGIT_SCALE_PARAMETER_FROM_MATSIM)
+    public void setUsingLogitScaleParameterFromMATSim(Boolean value) {
         this.usingLogitScaleParameterFromMATSim = value;
     }
-
-    public boolean usingCarParameterFromMATSim() {
+    @StringGetter(USING_CAR_PARAMETERS_FROM_MATSIM)
+    public Boolean isUsingCarParametersFromMATSim() {
         return usingCarParameterFromMATSim;
     }
-
-    public void setUsingCarParameterFromMATSim(boolean value) {
+    @StringSetter(USING_CAR_PARAMETERS_FROM_MATSIM)
+    public void setUsingCarParametersFromMATSim(Boolean value) {
         this.usingCarParameterFromMATSim = value;
     }
-    
-    public boolean usingBikeParameterFromMATSim() {
+    @StringGetter(USING_BIKE_PARAMETERS_FROM_MATSIM)
+    public Boolean isUsingBikeParametersFromMATSim() {
         return usingBikeParameterFromMATSim;
     }
-
-    public void setUsingBikeParameterFromMATSim(boolean value) {
+    @StringSetter(USING_BIKE_PARAMETERS_FROM_MATSIM)
+    public void setUsingBikeParameterFromMATSim(Boolean value) {
         this.usingBikeParameterFromMATSim = value;
     }
-    
-    public boolean usingWalkParameterFromMATSim() {
+    @StringGetter(USING_WALK_PARAMETERS_FROM_MATSIM)
+    public Boolean isUsingWalkParametersFromMATSim() {
         return usingWalkParameterFromMATSim;
     }
-
-    public void setUsingWalkParameterFromMATSim(boolean value) {
+    @StringSetter(USING_WALK_PARAMETERS_FROM_MATSIM)
+    public void setUsingWalkParametersFromMATSim(Boolean value) {
         this.usingWalkParameterFromMATSim = value;
     }
-    
-    public boolean usingPtParameterFromMATSim() {
+    @StringGetter(USING_PT_PARAMETERS_FROM_MATSIM)    
+    public Boolean isUsingPtParametersFromMATSim() {
         return usingPtParameterFromMATSim;
     }
-
-    public void setUsingPtParameterFromMATSim(boolean value) {
+    @StringSetter(USING_PT_PARAMETERS_FROM_MATSIM)
+    public void setUsingPtParametersFromMATSim(Boolean value) {
         this.usingPtParameterFromMATSim = value;
     }
-
-    public boolean usingRawSumsWithoutLn() {
+    @StringGetter(USING_RAW_SUMS_WITHOUT_LN)
+    public Boolean isUsingRawSumsWithoutLn() {
         return usingRawSumsWithoutLn;
     }
-
-    public void setUsingRawSumsWithoutLn(boolean value) {
+    @StringSetter(USING_RAW_SUMS_WITHOUT_LN)
+    public void setUsingRawSumsWithoutLn(Boolean value) {
         this.usingRawSumsWithoutLn = value;
     }
-
-    public double getLogitScaleParameter() {
+    @StringGetter(LOGIT_SCALE_PARAMETER)
+    public Double getLogitScaleParameter() {
         return logitScaleParameter;
     }
-
-    public void setLogitScaleParameter(double value) {
+    @StringSetter(LOGIT_SCALE_PARAMETER)
+    public void setLogitScaleParameter(Double value) {
         this.logitScaleParameter = value;
     }
     // === 
     // only betas below this line
     @StringGetter("betaCarTravelTime")
-    public double getBetaCarTravelTime() {
+    public Double getBetaCarTravelTime() {
         return betaCarTravelTime;
     }
     @StringSetter("betaCarTravelTime")
-    public void setBetaCarTravelTime(double value) {
+    public void setBetaCarTravelTime(Double value) {
         this.betaCarTravelTime = value;
     }
     @StringGetter("betaCarTravelTimePower2")
-    public double getBetaCarTravelTimePower2() {
+    public Double getBetaCarTravelTimePower2() {
         return betaCarTravelTimePower2;
     }
     @StringSetter("betaCarTravelTimePower2")
-    public void setBetaCarTravelTimePower2(double value) {
+    public void setBetaCarTravelTimePower2(Double value) {
         this.betaCarTravelTimePower2 = value;
     }
     @StringGetter("betaCarLnTravelTime")
-    public double getBetaCarLnTravelTime() {
+    public Double getBetaCarLnTravelTime() {
         return betaCarLnTravelTime;
     }
     @StringSetter("betaCarLnTravelTime")
-    public void setBetaCarLnTravelTime(double value) {
+    public void setBetaCarLnTravelTime(Double value) {
         this.betaCarLnTravelTime = value;
     }
     @StringGetter("betaCarTravelDistance")
-    public double getBetaCarTravelDistance() {
+    public Double getBetaCarTravelDistance() {
         return betaCarTravelDistance;
     }
     @StringSetter("betaCarTravelDistance")
-    public void setBetaCarTravelDistance(double value) {
+    public void setBetaCarTravelDistance(Double value) {
         this.betaCarTravelDistance = value;
     }
     @StringGetter("betaCarTravelDistancePower2")
-    public double getBetaCarTravelDistancePower2() {
+    public Double getBetaCarTravelDistancePower2() {
         return betaCarTravelDistancePower2;
     }
     @StringSetter("betaCarTravelDistancePower2")
-    public void setBetaCarTravelDistancePower2(double value) {
+    public void setBetaCarTravelDistancePower2(Double value) {
         this.betaCarTravelDistancePower2 = value;
     }
     @StringGetter("betaCarLnTravelDistance")
-    public double getBetaCarLnTravelDistance() {
+    public Double getBetaCarLnTravelDistance() {
         return betaCarLnTravelDistance;
     }
     @StringSetter("betaCarLnTravelDistance")
-    public void setBetaCarLnTravelDistance(double value) {
+    public void setBetaCarLnTravelDistance(Double value) {
         this.betaCarLnTravelDistance = value;
     }
     @StringGetter("betaCarMonetaryTravelCost")
-    public double getBetaCarTravelMonetaryCost() {
+    public Double getBetaCarTravelMonetaryCost() {
         return betaCarTravelMonetaryCost;
     }
     @StringSetter("betaCarMonetaryTravelCost")
-    public void setBetaCarTravelMonetaryCost(double value) {
+    public void setBetaCarTravelMonetaryCost(Double value) {
         this.betaCarTravelMonetaryCost = value;
     }
     @StringGetter("betaCarMonetaryTravelCostPower2")
-    public double getBetaCarTravelMonetaryCostPower2() {
+    public Double getBetaCarTravelMonetaryCostPower2() {
         return betaCarTravelMonetaryCostPower2;
     }
     @StringSetter("betaCarMonetaryTravelCostPower2")
-    public void setBetaCarTravelMonetaryCostPower2(double value) {
+    public void setBetaCarTravelMonetaryCostPower2(Double value) {
         this.betaCarTravelMonetaryCostPower2 = value;
     }
-    @StringGetter("betaCarLnMonetaryTravelCost")
-    public double getBetaCarLnTravelMonetaryCost() {
+    @StringGetter(BETA_CAR_LN_MONETARY_TRAVEL_COST)
+    public Double getBetaCarLnTravelMonetaryCost() {
         return betaCarLnTravelMonetaryCost;
     }
-    @StringSetter("betaCarLnMonetaryTravelCost")
-    public void setBetaCarLnTravelMonetaryCost(double value) {
+    @StringSetter(BETA_CAR_LN_MONETARY_TRAVEL_COST)
+    public void setBetaCarLnTravelMonetaryCost(Double value) {
         this.betaCarLnTravelMonetaryCost = value;
     }
     // ===
     @StringGetter("betaBikeTravelTime")
-    public double getBetaBikeTravelTime() {
+    public Double getBetaBikeTravelTime() {
         return betaBikeTravelTime;
     }
     @StringSetter("betaBikeTravelTime")
-    public void setBetaBikeTravelTime(double value) {
+    public void setBetaBikeTravelTime(Double value) {
         this.betaBikeTravelTime = value;
     }
     @StringGetter("betaBikeTravelTimePower2")
-    public double getBetaBikeTravelTimePower2() {
+    public Double getBetaBikeTravelTimePower2() {
         return betaBikeTravelTimePower2;
     }
     @StringSetter("betaBikeTravelTimePower2")
-    public void setBetaBikeTravelTimePower2(double value) {
+    public void setBetaBikeTravelTimePower2(Double value) {
         this.betaBikeTravelTimePower2 = value;
     }
     @StringGetter("betaBikeLnTravelTime")
-    public double getBetaBikeLnTravelTime() {
+    public Double getBetaBikeLnTravelTime() {
         return betaBikeLnTravelTime;
     }
     @StringSetter("betaBikeLnTravelTime")
-    public void setBetaBikeLnTravelTime(double value) {
+    public void setBetaBikeLnTravelTime(Double value) {
         this.betaBikeLnTravelTime = value;
     }
     @StringGetter("betaBikeTravelDistance")
-    public double getBetaBikeTravelDistance() {
+    public Double getBetaBikeTravelDistance() {
         return betaBikeTravelDistance;
     }
     @StringSetter("betaBikeTravelDistance")
-    public void setBetaBikeTravelDistance(double value) {
+    public void setBetaBikeTravelDistance(Double value) {
         this.betaBikeTravelDistance = value;
     }
     @StringGetter("betaBikeTravelDistancePower2")
-    public double getBetaBikeTravelDistancePower2() {
+    public Double getBetaBikeTravelDistancePower2() {
         return betaBikeTravelDistancePower2;
     }
     @StringSetter("betaBikeTravelDistancePower2")
-    public void setBetaBikeTravelDistancePower2(double value) {
+    public void setBetaBikeTravelDistancePower2(Double value) {
         this.betaBikeTravelDistancePower2 = value;
     }
     @StringGetter("betaBikeLnTravelDistance")
-    public double getBetaBikeLnTravelDistance() {
+    public Double getBetaBikeLnTravelDistance() {
         return betaBikeLnTravelDistance;
     }
     @StringSetter("betaBikeLnTravelDistance")
-    public void setBetaBikeLnTravelDistance(double value) {
+    public void setBetaBikeLnTravelDistance(Double value) {
         this.betaBikeLnTravelDistance = value;
     }
     @StringGetter("betaBikeMonetaryTravelCost")
-    public double getBetaBikeTravelMonetaryCost() {
+    public Double getBetaBikeTravelMonetaryCost() {
         return betaBikeTravelMonetaryCost;
     }
     @StringSetter("betaBikeMonetaryTravelCost")
-    public void setBetaBikeTravelMonetaryCost(double value) {
+    public void setBetaBikeTravelMonetaryCost(Double value) {
         this.betaBikeTravelMonetaryCost = value;
     }
     @StringGetter("betaBikeMonetaryTravelCostPower2")
-    public double getBetaBikeTravelMonetaryCostPower2() {
+    public Double getBetaBikeTravelMonetaryCostPower2() {
         return betaBikeTravelMonetaryCostPower2;
     }
     @StringSetter("betaBikeMonetaryTravelCostPower2")
-    public void setBetaBikeTravelMonetaryCostPower2(double value) {
+    public void setBetaBikeTravelMonetaryCostPower2(Double value) {
         this.betaBikeTravelMonetaryCostPower2 = value;
     }
-    @StringGetter("betaBikeLnMonetaryTravelCost")
-    public double getBetaBikeLnTravelMonetaryCost() {
+    @StringGetter(BETA_BIKE_LN_MONETARY_TRAVEL_COST)
+    public Double getBetaBikeLnTravelMonetaryCost() {
         return betaBikeLnTravelMonetrayCost;
     }
-    @StringSetter("betaBikeLnMonetaryTravelCost")
-    public void setBetaBikeLnTravelMonetaryCost(double value) {
+    @StringSetter(BETA_BIKE_LN_MONETARY_TRAVEL_COST)
+    public void setBetaBikeLnTravelMonetaryCost(Double value) {
         this.betaBikeLnTravelMonetrayCost = value;
     }
     // ===
-    public double getBetaWalkTravelTime() {
+    @StringGetter("betaWalkTravelTime")
+    public Double getBetaWalkTravelTime() {
         return betaWalkTravelTime;
     }
-
-    public void setBetaWalkTravelTime(double value) {
+    @StringSetter("betaWalkTravelTime")
+    public void setBetaWalkTravelTime(Double value) {
         this.betaWalkTravelTime = value;
     }
-
-    public double getBetaWalkTravelTimePower2() {
+    @StringGetter("betaWalkTravelTimePower2")
+    public Double getBetaWalkTravelTimePower2() {
         return betaWalkTravelTimePower2;
     }
-
-    public void setBetaWalkTravelTimePower2(double value) {
+    @StringSetter("betaWalkTravelTimePower2")
+    public void setBetaWalkTravelTimePower2(Double value) {
         this.betaWalkTravelTimePower2 = value;
     }
-
-    public double getBetaWalkLnTravelTime() {
+    @StringGetter("betaWalkLnTravelTime")
+    public Double getBetaWalkLnTravelTime() {
         return betaWalkLnTravelTime;
     }
-
-    public void setBetaWalkLnTravelTime(double value) {
+    @StringSetter("betaWalkLnTravelTime")
+    public void setBetaWalkLnTravelTime(Double value) {
         this.betaWalkLnTravelTime = value;
     }
-
-    public double getBetaWalkTravelDistance() {
+    @StringGetter("betaWalkTravelDistance")
+    public Double getBetaWalkTravelDistance() {
         return betaWalkTravelDistance;
     }
-
-    public void setBetaWalkTravelDistance(double value) {
+    @StringSetter("betaWalkTravelDistance")
+    public void setBetaWalkTravelDistance(Double value) {
         this.betaWalkTravelDistance = value;
     }
-
-    public double getBetaWalkTravelDistancePower2() {
+    @StringGetter("betaWalkTravelDistancePower2")
+    public Double getBetaWalkTravelDistancePower2() {
         return betaWalkTravelDistancePower2;
     }
-
-    public void setBetaWalkTravelDistancePower2(double value) {
+    @StringSetter("betaWalkTravelDistancePower2")
+    public void setBetaWalkTravelDistancePower2(Double value) {
         this.betaWalkTravelDistancePower2 = value;
     }
-
-    public double getBetaWalkLnTravelDistance() {
+    @StringGetter("betaWalkLnTravelDistance")
+    public Double getBetaWalkLnTravelDistance() {
         return betaWalkLnTravelDistance;
     }
-
-    public void setBetaWalkLnTravelDistance(double value) {
+    @StringSetter("betaWalkLnTravelDistance")
+    public void setBetaWalkLnTravelDistance(Double value) {
         this.betaWalkLnTravelDistance = value;
     }
-
-    public double getBetaWalkTravelMonetaryCost() {
+    @StringGetter("betaWalkMonetaryTravelCost")
+    public Double getBetaWalkTravelMonetaryCost() {
         return betaWalkTravelMonetaryCost;
     }
-
-    public void setBetaWalkTravelMonetaryCost(double value) {
+    @StringSetter("betaWalkMonetaryTravelCost")
+    public void setBetaWalkTravelMonetaryCost(Double value) {
         this.betaWalkTravelMonetaryCost = value;
     }
-
-    public double getBetaWalkTravelMonetaryCostPower2() {
+    @StringGetter("betaWalkMonetaryTravelCostPower2")
+    public Double getBetaWalkTravelMonetaryCostPower2() {
         return betaWalkTravelMonetrayCostPower2;
     }
-
-    public void setBetaWalkTravelMonetaryCostPower2(double value) {
+    @StringSetter("betaWalkMonetaryTravelCostPower2")
+    public void setBetaWalkTravelMonetaryCostPower2(Double value) {
         this.betaWalkTravelMonetrayCostPower2 = value;
     }
-
-    public double getBetaWalkLnTravelMonetaryCost() {
+    @StringGetter(BETA_WALK_LN_MONETARY_TRAVEL_COST)
+    public Double getBetaWalkLnTravelMonetaryCost() {
         return betaWalkLnTravelMonetrayCost;
     }
-
-    public void setBetaWalkLnTravelMonetaryCost(double value) {
+    @StringSetter(BETA_WALK_LN_MONETARY_TRAVEL_COST)
+    public void setBetaWalkLnTravelMonetaryCost(Double value) {
         this.betaWalkLnTravelMonetrayCost = value;
     }
     // ---
     @StringGetter( "betaPtTravelTime" )
-    public double getBetaPtTravelTime() {
+    public Double getBetaPtTravelTime() {
         return betaPtTravelTime;
     }
     @StringSetter( "betaPtTravelTime" )
-    public void setBetaPtTravelTime(double value) {
+    public void setBetaPtTravelTime(Double value) {
         this.betaPtTravelTime = value;
     }
     @StringGetter( "betaPtTravelTimePower2" )
-    public double getBetaPtTravelTimePower2() {
+    public Double getBetaPtTravelTimePower2() {
         return betaPtTravelTimePower2;
     }
     @StringSetter( "betaPtTravelTimePower2" )
-    public void setBetaPtTravelTimePower2(double value) {
+    public void setBetaPtTravelTimePower2(Double value) {
         this.betaPtTravelTimePower2 = value;
     }
     @StringGetter( "betaPtLnTravelTime" )
-    public double getBetaPtLnTravelTime() {
+    public Double getBetaPtLnTravelTime() {
         return betaPtLnTravelTime;
     }
     @StringSetter( "betaPtLnTravelTime" )
-    public void setBetaPtLnTravelTime(double value) {
+    public void setBetaPtLnTravelTime(Double value) {
         this.betaPtLnTravelTime = value;
     }
     @StringGetter( "betaPtTravelDistance" )
-    public double getBetaPtTravelDistance() {
+    public Double getBetaPtTravelDistance() {
         return betaPtTravelDistance;
     }
     @StringSetter( "betaPtTravelDistance" )
-    public void setBetaPtTravelDistance(double value) {
+    public void setBetaPtTravelDistance(Double value) {
         this.betaPtTravelDistance = value;
     }
     @StringGetter( "betaPtTravelDistancePower2" )
-    public double getBetaPtTravelDistancePower2() {
+    public Double getBetaPtTravelDistancePower2() {
         return betaPtTravelDistancePower2;
     }
     @StringSetter( "betaPtTravelDistancePower2" )
-    public void setBetaPtTravelDistancePower2(double value) {
+    public void setBetaPtTravelDistancePower2(Double value) {
         this.betaPtTravelDistancePower2 = value;
     }
     @StringGetter( "betaPtLnTravelDistance" )
-    public double getBetaPtLnTravelDistance() {
+    public Double getBetaPtLnTravelDistance() {
         return betaPtLnTravelDistance;
     }
     @StringSetter( "betaPtLnTravelDistance" )
-    public void setBetaPtLnTravelDistance(double value) {
+    public void setBetaPtLnTravelDistance(Double value) {
         this.betaPtLnTravelDistance = value;
     }
-    @StringGetter( "betaPtTravelCost" )
-    public double getBetaPtTravelMonetaryCost() {
+    @StringGetter( "betaPtMonetaryTravelCost" )
+    public Double getBetaPtTravelMonetaryCost() {
         return betaPtTravelMonetrayCost;
     }
-    @StringSetter( "betaPtTravelCost" )
-    public void setBetaPtTravelMonetaryCost(double value) {
+    @StringSetter( "betaPtMonetaryTravelCost" )
+    public void setBetaPtTravelMonetaryCost(Double value) {
         this.betaPtTravelMonetrayCost = value;
     }
-    @StringGetter( "betaPtTravelCostPower2" )
-    public double getBetaPtTravelMonetaryCostPower2() {
+    @StringGetter( "betaPtMonetaryTravelCostPower2" )
+    public Double getBetaPtTravelMonetaryCostPower2() {
         return betaPtTravelMonetrayCostPower2;
     }
-    @StringSetter( "betaPtTravelCostPower2" )
-    public void setBetaPtTravelMonetaryCostPower2(double value) {
+    @StringSetter( "betaPtMonetaryTravelCostPower2" )
+    public void setBetaPtTravelMonetaryCostPower2(Double value) {
         this.betaPtTravelMonetrayCostPower2 = value;
     }
-    @StringGetter( "betaPtLnTravelCost" )
-    public double getBetaPtLnTravelMonetaryCost() {
+    @StringGetter( BETA_PT_LN_MONETARY_TRAVEL_COST )
+    public Double getBetaPtLnTravelMonetaryCost() {
         return betaPtLnTravelMonetrayCost;
     }
-    @StringSetter( "betaPtLnTravelCost" )
-    public void setBetaPtLnTravelMonetaryCost(double value) {
+    @StringSetter( BETA_PT_LN_MONETARY_TRAVEL_COST )
+    public void setBetaPtLnTravelMonetaryCost(Double value) {
         this.betaPtLnTravelMonetrayCost = value;
     }
     

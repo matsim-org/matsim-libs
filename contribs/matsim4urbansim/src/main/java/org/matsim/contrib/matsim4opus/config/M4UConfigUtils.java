@@ -55,7 +55,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
  *
  */
 public class M4UConfigUtils {
-	
+
 	private static final Logger log = Logger.getLogger(M4UConfigUtils.class);
 	// module and param names for matsim4urbansim settings stored in an external MATSim config file
 	public static final String MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG = "matsim4urbansimParameter";// module
@@ -75,13 +75,13 @@ public class M4UConfigUtils {
 	 */
 	static void initMATSim4UrbanSimControler(Matsim4UrbansimType matsim4UrbanSimParameter, 
 			Module matsim4urbansimModule, Config config){
-		
+
 		boolean computeCellBasedAccessibility	= matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isCellBasedAccessibility();
 		boolean computeCellBasedAccessibilityNetwork   = false;
 		boolean computeCellbasedAccessibilityShapeFile = false;
-		
+
 		String shapeFile						= matsim4UrbanSimParameter.getMatsim4UrbansimContoler().getShapeFileCellBasedAccessibility().getInputFile();
-	
+
 		// if cell-based accessibility is enabled, check whether a shapefile is given 
 		if(computeCellBasedAccessibility){ 
 			if(!Paths.pathExsits(shapeFile)){ // since no shape file found, accessibility computation is applied on the area covering the network
@@ -94,9 +94,9 @@ public class M4UConfigUtils {
 				computeCellbasedAccessibilityShapeFile = true;
 			}
 		}
-		
+
 		// ===
-		
+
 		double timeOfDay						= 8 * 3600.; // default value
 		String ptStops							= null;
 		String ptTravelTimes					= null;
@@ -114,28 +114,28 @@ public class M4UConfigUtils {
 				log.info("<param name=\"timeOfDay\" value=\"28800\" />");
 				log.info("</module>");
 			}
-			
+
 			// check if pseudo pt should be used
 			if( matsim4urbansimModule.getValue( PT_STOPS_SWITCH ) != null && 
-				matsim4urbansimModule.getValue( PT_STOPS_SWITCH ).equalsIgnoreCase("TRUE")){
-				
+					matsim4urbansimModule.getValue( PT_STOPS_SWITCH ).equalsIgnoreCase("TRUE")){
+
 				// check if pt stops input file is given and existing
 				ptStops = matsim4urbansimModule.getValue(PT_STOPS);
 				if( ptStops != null && Paths.pathExsits(ptStops))
 					log.info("Found pt stop input file: " + ptStops);
 				else
 					throw new RuntimeException("The parameter 'usePtStop' is set TRUE, but no pt stop input file found!!! Given input file for 'ptStop' = " + ptStops);
-				
-				
+
+
 				// check if input files for pt travel times and distances are set
 				if( matsim4urbansimModule.getValue( PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH ) != null &&
-					matsim4urbansimModule.getValue( PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH ).equalsIgnoreCase( "TRUE" )){
-					
+						matsim4urbansimModule.getValue( PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH ).equalsIgnoreCase( "TRUE" )){
+
 					ptTravelTimes = matsim4urbansimModule.getValue(PT_TRAVEL_TIMES);
 					ptTravelDistances =  matsim4urbansimModule.getValue(PT_TRAVEL_DISTANCES);
-					
+
 					if( ptTravelTimes != null && Paths.pathExsits(ptTravelTimes) && 
-						ptTravelDistances != null && Paths.pathExsits(ptTravelDistances)){
+							ptTravelDistances != null && Paths.pathExsits(ptTravelDistances)){
 						log.info("Found pt travel time input file: " + ptTravelTimes);
 						log.info("Found pt travel distance input file: " + ptTravelDistances);
 					}
@@ -150,9 +150,9 @@ public class M4UConfigUtils {
 				}
 			}
 		}
-		
+
 		// ===
-		
+
 		// set parameter in module 
 		MATSim4UrbanSimControlerConfigModuleV3 module = getMATSim4UrbaSimControlerConfigAndPossiblyConvert(config);
 		module.setAgentPerformance(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isAgentPerformance());
@@ -182,16 +182,16 @@ public class M4UConfigUtils {
 	 * @param config TODO
 	 */
 	static void initUrbanSimParameter(Matsim4UrbansimType matsim4UrbanSimParameter, Module matsim4urbansimModule, Config config){
-		
+
 		// get every single matsim4urbansim/urbansimParameter
 		String projectName 		= ""; // not needed anymore dec'12
 		double populationSamplingRate = matsim4UrbanSimParameter.getUrbansimParameter().getPopulationSamplingRate();
 		int year 				= matsim4UrbanSimParameter.getUrbansimParameter().getYear().intValue();
-		
+
 		boolean useShapefileLocationDistribution = false;
 		String urbanSimZoneShapefileLocationDistribution = null;
 		double randomLocationDistributionRadiusForUrbanSimZone = matsim4UrbanSimParameter.getUrbansimParameter().getRandomLocationDistributionRadiusForUrbanSimZone();
-		
+
 		if(matsim4urbansimModule != null)
 			urbanSimZoneShapefileLocationDistribution = matsim4urbansimModule.getValue(URBANSIM_ZONE_SHAPEFILE_LOCATION_DISTRIBUTION);
 		log.info("This message affects UrbanSim ZONE applications only:");
@@ -207,7 +207,7 @@ public class M4UConfigUtils {
 			log.info("<param name=\"urbanSimZoneShapefileLocationDistribution\" value=\"/path/to/shapeFile\" />");
 			log.info("</module>");
 		}
-	
+
 		String opusHome 		= Paths.checkPathEnding( matsim4UrbanSimParameter.getUrbansimParameter().getOpusHome() );
 		String opusDataPath 	= Paths.checkPathEnding( matsim4UrbanSimParameter.getUrbansimParameter().getOpusDataPath() );
 		String matsim4Opus 		= Paths.checkPathEnding( matsim4UrbanSimParameter.getUrbansimParameter().getMatsim4Opus() );
@@ -218,7 +218,7 @@ public class M4UConfigUtils {
 		boolean isTestRun 		= matsim4UrbanSimParameter.getUrbansimParameter().isIsTestRun();
 		boolean backupRunData 	= matsim4UrbanSimParameter.getUrbansimParameter().isBackupRunData();
 		String testParameter 	= matsim4UrbanSimParameter.getUrbansimParameter().getTestParameter();
-		
+
 		// // set parameter in module 
 		UrbanSimParameterConfigModuleV3 module = getUrbanSimParameterConfigAndPossiblyConvert(config);
 		module.setProjectName(projectName);
@@ -238,7 +238,7 @@ public class M4UConfigUtils {
 		module.setUrbanSimZoneRadiusLocationDistribution(randomLocationDistributionRadiusForUrbanSimZone);
 		module.setBackup(backupRunData);
 		module.setTestRun(isTestRun);	
-		
+
 		// setting paths into constants structure
 		InternalConstants.setOPUS_HOME(module.getOpusHome());
 		InternalConstants.OPUS_DATA_PATH = module.getOpusDataPath();
@@ -250,24 +250,24 @@ public class M4UConfigUtils {
 	}
 
 	/**
-		 * @param matsim4urbansimConfigPart1
-		 * @throws UncheckedIOException
-		 */
-		static Module getM4UModuleFromExternalConfig(String externalMATSimConfigFilename) throws UncheckedIOException {
-			
-			if(externalMATSimConfigFilename != null && Paths.pathExsits(externalMATSimConfigFilename)){
-				Config tempConfig = ConfigUtils.loadConfig( externalMATSimConfigFilename.trim() );
-				
-				// loading additional matsim4urbansim parameter settings from external config file
-				Module module = tempConfig.getModule(MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG);
-				if(module == null)
-					log.info("No \""+ MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG + "\" settings found in " + externalMATSimConfigFilename);
-				else
-					log.info("Found \""+ MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG + "\" settings in " + externalMATSimConfigFilename);
-				return module ;
-			}
-			return null ;
+	 * @param matsim4urbansimConfigPart1
+	 * @throws UncheckedIOException
+	 */
+	static Module getM4UModuleFromExternalConfig(String externalMATSimConfigFilename) throws UncheckedIOException {
+
+		if(externalMATSimConfigFilename != null && Paths.pathExsits(externalMATSimConfigFilename)){
+			Config tempConfig = ConfigUtils.loadConfig( externalMATSimConfigFilename.trim() );
+
+			// loading additional matsim4urbansim parameter settings from external config file
+			Module module = tempConfig.getModule(MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG);
+			if(module == null)
+				log.info("No \""+ MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG + "\" settings found in " + externalMATSimConfigFilename);
+			else
+				log.info("Found \""+ MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG + "\" settings in " + externalMATSimConfigFilename);
+			return module ;
 		}
+		return null ;
+	}
 
 	/**
 	 * setting MATSim network
@@ -307,12 +307,12 @@ public class M4UConfigUtils {
 		String hotStart = matsimParameter.getHotStartPlansFile().getInputFile();
 		// get plans file for warm start 
 		String warmStart = matsimParameter.getInputPlansFile().getInputFile();
-		
+
 		MATSim4UrbanSimControlerConfigModuleV3 module = getMATSim4UrbaSimControlerConfigAndPossiblyConvert(config);
-		
+
 		// setting plans file as input
 		if( !hotStart.equals("") &&
-		  (new File(hotStart)).exists() ){
+				(new File(hotStart)).exists() ){
 			log.info("Hot Start detcted!");
 			setPlansFile( hotStart, config );
 			module.setHotStart(true);
@@ -326,7 +326,7 @@ public class M4UConfigUtils {
 			log.info("Cold Start (no plans file) detected!");
 			module.setColdStart(true);
 		}
-		
+
 		// setting target location for hot start plans file
 		if(!hotStart.equals("")){
 			log.info("The resulting plans file after this MATSim run is stored at a specified place to enable hot start for the following MATSim run.");
@@ -342,7 +342,7 @@ public class M4UConfigUtils {
 	 * @param config TODO
 	 */
 	static void setPlansFile(String plansFile, Config config) {
-		
+
 		log.info("Setting PlansConfigGroup to config...");
 		PlansConfigGroup plansCG = (PlansConfigGroup) config.getModule(PlansConfigGroup.GROUP_NAME);
 		// set input plans file
@@ -366,10 +366,10 @@ public class M4UConfigUtils {
 		controlerCG.setFirstIteration( firstIteration );
 		controlerCG.setLastIteration( lastIteration);
 		controlerCG.setOutputDirectory( InternalConstants.MATSIM_4_OPUS_OUTPUT );
-		
+
 		controlerCG.setSnapshotFormat(Arrays.asList("otfvis"));
 		controlerCG.setWriteSnapshotsInterval( 0 ); // disabling snapshots
-		
+
 		// set Qsim
 		controlerCG.setMobsim(QSimConfigGroup.GROUP_NAME);
 
@@ -386,10 +386,10 @@ public class M4UConfigUtils {
 		log.info("Setting PlanCalcScore to config...");
 		String activityType_0 = matsimParameter.getPlanCalcScore().getActivityType0();
 		String activityType_1 = matsimParameter.getPlanCalcScore().getActivityType1();
-		
+
 		ActivityParams homeActivity = new ActivityParams(activityType_0);
 		homeActivity.setTypicalDuration( matsimParameter.getPlanCalcScore().getHomeActivityTypicalDuration().intValue() ); 	// should be something like 12*60*60
-		
+
 		ActivityParams workActivity = new ActivityParams(activityType_1);
 		workActivity.setTypicalDuration( matsimParameter.getPlanCalcScore().getWorkActivityTypicalDuration().intValue() );	// should be something like 8*60*60
 		workActivity.setOpeningTime( matsimParameter.getPlanCalcScore().getWorkActivityOpeningTime().intValue() );			// should be something like 7*60*60
@@ -423,24 +423,24 @@ public class M4UConfigUtils {
 	 */
 	static void initQSim(MatsimConfigType matsim4urbansimConfig, Config config){
 		log.info("Setting QSimConfigGroup to config...");
-		
+
 		QSimConfigGroup qsimCG = config.getQSimConfigGroup();
 		if( qsimCG == null){		
 			qsimCG = new QSimConfigGroup();
 			config.addQSimConfigGroup( qsimCG );
 		}
-		
+
 		// setting number of threads
-//		qsimCG.setNumberOfThreads(Runtime.getRuntime().availableProcessors());
+		//		qsimCG.setNumberOfThreads(Runtime.getRuntime().availableProcessors());
 		// log.error("setting qsim number of threads automagically; this is almost certainly not good; fix") ;
 		// just changed this, setting it to one:  kai, apr'13
 		qsimCG.setNumberOfThreads(1);
-		
+
 		double popSampling = matsim4urbansimConfig.getMatsim4Urbansim().getUrbansimParameter().getPopulationSamplingRate();
 		log.info("FlowCapFactor and StorageCapFactor are adapted to the population sampling rate (sampling rate = " + popSampling + ").");
 		// setting FlowCapFactor == population sampling rate (no correction factor needed here)
 		qsimCG.setFlowCapFactor( popSampling );	
-		
+
 		// Adapting the storageCapFactor has the following reason:
 		// Too low SorageCapacities especially with small sampling 
 		// rates can (eg 1%) lead to strong backlogs on the traffic network. 
@@ -462,7 +462,7 @@ public class M4UConfigUtils {
 		double storageCapCorrectionFactor = Math.pow(popSampling, -0.25);	// same as: / Math.sqrt(Math.sqrt(sample))
 		// setting StorageCapFactor
 		qsimCG.setStorageCapFactor( popSampling * storageCapCorrectionFactor );	
-		
+
 		boolean removeStuckVehicles = false;
 		qsimCG.setRemoveStuckVehicles( removeStuckVehicles );
 		qsimCG.setStuckTime(10.);
@@ -477,14 +477,14 @@ public class M4UConfigUtils {
 	 */
 	static void initPlanCalcRoute(Config config){
 		log.info("Setting PlanCalcRouteGroup to config...");
-		
+
 		double defaultWalkSpeed = 1.38888889; 	// 1.38888889m/s corresponds to 5km/h -- alternatively: use 0.833333333333333m/s corresponds to 3km/h
 		double defaultBicycleSpeed = 4.16666666;// 4.16666666m/s corresponds to 15 km/h
 		double defaultPtSpeed 	= 6.94444444;	// 6.94444444m/s corresponds to 25 km/h
-		
+
 		//  log.error( "ignoring any external default speeds for walk/bicycle/pt and using internal values.  fix!!" ) ;
 		//  this is not a problem since the complete config is overwritten by the external config at the very end.
-		
+
 		/*
 		 * To me this seems to be a problem. PlansCalcRoute is intialized with some defaults. Using the direct setters will NOT clear
 		 * the defaults, but only add the new values. E.g. the for pt the default is FreespeedFactor. Daniel, May '13
@@ -503,14 +503,14 @@ public class M4UConfigUtils {
 	 */
 	static void initStrategy(ConfigType matsim4urbansimConfig, Config config){
 		log.info("Setting StrategyConfigGroup to config...");
-		
+
 		// some modules are disables after 80% of overall iterations, 
 		// last iteration for them determined here tnicolai feb'12
 		int disableStrategyAfterIteration = (int) Math.ceil(config.controler().getLastIteration() * 0.8);
-		
+
 		// configure strategies for re-planning (should be something like 5)
 		config.strategy().setMaxAgentPlanMemorySize( matsim4urbansimConfig.getStrategy().getMaxAgentPlanMemorySize().intValue() );
-		
+
 		StrategyConfigGroup.StrategySettings timeAlocationMutator = new StrategyConfigGroup.StrategySettings(IdFactory.get(1));
 		timeAlocationMutator.setModuleName("TimeAllocationMutator"); 	// module name given in org.matsim.core.replanning.StrategyManagerConfigLoader
 		timeAlocationMutator.setProbability( matsim4urbansimConfig.getStrategy().getTimeAllocationMutatorProbability() ); // should be something like 0.1
@@ -518,24 +518,24 @@ public class M4UConfigUtils {
 		config.strategy().addStrategySettings(timeAlocationMutator);
 		// change mutation range to 2h. tnicolai feb'12
 		config.setParam("TimeAllocationMutator", "mutationRange", "7200"); 
-		
+
 		StrategyConfigGroup.StrategySettings changeExpBeta = new StrategyConfigGroup.StrategySettings(IdFactory.get(2));
 		changeExpBeta.setModuleName("ChangeExpBeta");					// module name given in org.matsim.core.replanning.StrategyManagerConfigLoader
 		changeExpBeta.setProbability( matsim4urbansimConfig.getStrategy().getChangeExpBetaProbability() ); // should be something like 0.9
 		config.strategy().addStrategySettings(changeExpBeta);
-		
+
 		StrategyConfigGroup.StrategySettings reroute = new StrategyConfigGroup.StrategySettings(IdFactory.get(3));
 		reroute.setModuleName("ReRoute");  // old name "ReRoute_Dijkstra"						// module name given in org.matsim.core.replanning.StrategyManagerConfigLoader
 		reroute.setProbability( matsim4urbansimConfig.getStrategy().getReRouteDijkstraProbability() ); 	// should be something like 0.1
 		reroute.setDisableAfter(disableStrategyAfterIteration);
 		config.strategy().addStrategySettings(reroute);
-		
+
 		// check if a 4th module is given in the external MATSim config
 		// the external config is not loaded at this point. Thus, a possible 4th module is only load with the settings from the external config...
 		StrategyConfigGroup.StrategySettings changeLegMode = getChangeLegModeStrategySettings(config);
 		boolean set4thStrategyModule = ( changeLegMode != null && 
-									   ( changeLegMode.getModuleName().equalsIgnoreCase("ChangeLegMode") || changeLegMode.getModuleName().equalsIgnoreCase("ChangeSingleLegMode")) && 
-									     changeLegMode.getProbability() > 0.);
+				( changeLegMode.getModuleName().equalsIgnoreCase("ChangeLegMode") || changeLegMode.getModuleName().equalsIgnoreCase("ChangeSingleLegMode")) && 
+				changeLegMode.getProbability() > 0.);
 		if(set4thStrategyModule){
 			// to be consistent, setting the same iteration number as in the strategies above 
 			changeLegMode.setDisableAfter(disableStrategyAfterIteration);
@@ -561,7 +561,7 @@ public class M4UConfigUtils {
 		// check if external MATsim config is given
 		String externalMATSimConfig = matsimParameter.getMatsimConfig().getInputFile();
 		if(externalMATSimConfig != null && Paths.pathExsits(externalMATSimConfig)){
-			
+
 			log.info("Loading settings from external MATSim config: " + externalMATSimConfig);
 			log.warn("NOTE: MATSim4UrbanSim settings will be overwritten by settings in the external config! Make sure that this is what you intended!");
 			new MatsimConfigReader(config).parse(externalMATSimConfig);
@@ -575,7 +575,7 @@ public class M4UConfigUtils {
 	static Config createEmptyConfigWithSomeDefaults() {
 		log.info("Creating an empty MATSim scenario.");
 		Config config = ConfigUtils.createConfig();
-		
+
 		//"materialize" the local config groups:
 		config.addModule(UrbanSimParameterConfigModuleV3.GROUP_NAME, 
 				new UrbanSimParameterConfigModuleV3(UrbanSimParameterConfigModuleV3.GROUP_NAME) ) ;
@@ -583,13 +583,13 @@ public class M4UConfigUtils {
 				new MATSim4UrbanSimControlerConfigModuleV3(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME));
 		config.addModule(AccessibilityConfigModule.GROUP_NAME,
 				new AccessibilityConfigModule()) ;
-		
+
 		// set some defaults:
 		VspExperimentalConfigGroup vsp = config.vspExperimental();
 		vsp.addParam(VspExperimentalConfigKey.vspDefaultsCheckingLevel, VspExperimentalConfigGroup.ABORT ) ;
 		vsp.setActivityDurationInterpretation(VspExperimentalConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration) ;
 		vsp.setRemovingUnneccessaryPlanAttributes(true) ;
-		
+
 		return config ;
 	}
 
@@ -597,14 +597,14 @@ public class M4UConfigUtils {
 	 * loading, validating and initializing MATSim config.
 	 */
 	static MatsimConfigType unmarschal(String matsim4urbansimConfigFilename){
-		
+
 		// JAXBUnmaschal reads the UrbanSim generated MATSim config, validates it against
 		// the current xsd (checks e.g. the presents and data type of parameter) and generates
 		// an Java object representing the config file.
 		JAXBUnmaschalV2 unmarschal = new JAXBUnmaschalV2( matsim4urbansimConfigFilename );
-		
+
 		MatsimConfigType matsim4urbansimConfig = null;
-		
+
 		// binding the parameter from the MATSim Config into the JAXB data structure
 		if( (matsim4urbansimConfig = unmarschal.unmaschalMATSimConfig()) == null){
 			log.error("Unmarschalling failed. SHUTDOWN MATSim!");
@@ -613,148 +613,106 @@ public class M4UConfigUtils {
 		return matsim4urbansimConfig;
 	}
 
-	static void initAccessibilityParameters(Matsim4UrbansimType matsim4UrbanSimParameters, Module matsim4UrbanSimModule, Config config){
-			
-			// these are all parameter for the accessibility computation
-			double logitScaleParameter;	
-			
-			double betaWalkTT = 0.;		// Walk
-			double betaWalkTTPower = 0.; // Walk
-			double betaWalkLnTT = 0.;	// Walk
-			double betaWalkTD = 0.; 	// Walk
-			double betaWalkTDPower = 0.;// Walk
-			double betaWalkLnTD = 0.;	// Walk
-			double betaWalkTMC = 0.;	// Walk
-			double betaWalkTMCPower = 0.;// Walk 
-			double betaWalkLnTMC = 0.;	// Walk
-	
-			double betaPtTT = 0.;		// Pt
-			double betaPtTTPower = 0.; 	// Pt
-			double betaPtLnTT = 0.;		// Pt
-			double betaPtTD = 0.; 		// Pt
-			double betaPtTDPower = 0.;	// Pt
-			double betaPtLnTD = 0.;		// Pt
-			double betaPtTMC = 0.;		// Pt
-			double betaPtTMCPower = 0.;	// Pt 
-			double betaPtLnTMC = 0.;	// Pt
-			
-			PlanCalcScoreConfigGroup planCalcScoreConfigGroup = config.planCalcScore();
-			
-			double accessibilityDestinationSamplingRate = matsim4UrbanSimParameters.getAccessibilityParameter().getAccessibilityDestinationSamplingRate();
-			// these parameter define if the beta or logit_scale parameter are taken from MATSim or the config file
-			boolean useMATSimLogitScaleParameter 	= matsim4UrbanSimParameters.getAccessibilityParameter().isUseLogitScaleParameterFromMATSim();
-			boolean useMATSimCarParameter			= matsim4UrbanSimParameters.getAccessibilityParameter().isUseCarParameterFromMATSim();
-			boolean useMATSimBikeParameter			= true ;
-//			!M4UAccessibilityConfigUtils.useCustomMarginalUtilitiesBike( matsim4UrbanSimModule ); // true if relevant settings in the external MATSim config are found
-			boolean useMATSimWalkParameter			= matsim4UrbanSimParameters.getAccessibilityParameter().isUseWalkParameterFromMATSim();
-			boolean useMATSimPtParameter			= true ;
-//			!M4UAccessibilityConfigUtils.useCustomMarginalUtilitiesPt( matsim4UrbanSimModule );	 // true if relevant settings in the external MATSim config are found
-			boolean useRawSum						= matsim4UrbanSimParameters.getAccessibilityParameter().isUseRawSumsWithoutLn();
-			
-			if(useMATSimLogitScaleParameter) {
-				logitScaleParameter = planCalcScoreConfigGroup.getBrainExpBeta();
-	//			if ( config.planCalcScore().getBrainExpBeta() != 1. ) {
-	//				throw new RuntimeException("the code claims that it uses the matsim logit scale parameter, but in fact it sets it silently to one.  aborting ...") ;
-	//			}
-				// yyyyyy I don't know any more how to fix the above without increasing the confusion.  kai, apr'13
-				//
-			} else {
-				logitScaleParameter = matsim4UrbanSimParameters.getAccessibilityParameter().getLogitScaleParameter();
-			}
-			// tnicolai nov'12: decided with Kai that beta_brain (the accessibility scale parameter) should be 1 because of the pre-factor of the logsum term
-			if(logitScaleParameter != 1.0){
-				log.error("You are using a logit scale parameter != 1! The default is 1.");
-				log.error("The accessibility calulation proceeds with a logit scale parameter = " + logitScaleParameter);
-				log.error("This is ok for the sustaincity case studies but needs to be changed afterwards.") ;
-			}
-	
-			log.info("The logit scale parameter used for the accessibility computation is now set to " + logitScaleParameter );
-			log.info("The logit scale parameter used inside the behavioral model for the traffic simulation is now set to " + config.planCalcScore().getBrainExpBeta() ) ;
-			if ( logitScaleParameter != 1.0 || config.planCalcScore().getBrainExpBeta()!= 1.0 ) {
-				log.info("It is best to have both of them at 1.0, but changing them means that you have to re-estimate urbansim models.") ;
-			}
-			
-			final String noSeparateBetasMessage = "This MATSim4UrbanSim version does not support custom beta parameters such as \"betaBikeTravelTime\" etc. anymore (both in the UrbanSim GUI (car and walk) and the external MATSim config file (bike and pt)). Please let us know if this causes serious problems." +
-					"To avoid the error message please : 1) select \"use_car_parameter_from_MATSim\" and \"use_walk_parameter_from_MATSim\" in the UrbanSim GUI and 2) remove all beta parameters for bike and pt (such as \"<param name=\"betaBikeTravelTime\" value=\"-12.\" />\") from your external MATSim config file.";
+	static void initAccessibilityParameters(Matsim4UrbansimType matsim4UrbanSimParamsFromU, Config config){
 
-			AccessibilityConfigModule module = M4UAccessibilityConfigUtils.getAccessibilityParameterConfigPossiblyEmpty(config);
+		AccessibilityConfigModule module = M4UAccessibilityConfigUtils.getAccessibilityConfigModuleAndPossiblyConvert(config);
+		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = config.planCalcScore();
 
-			// usually travelling_utils are negative
-
-			if(useMATSimCarParameter){
-				module.setBetaCarTravelTime(planCalcScoreConfigGroup.getTraveling_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr() ); // [utils/h]
-				module.setBetaCarTravelDistance( planCalcScoreConfigGroup.getMarginalUtilityOfMoney() * planCalcScoreConfigGroup.getMonetaryDistanceCostRateCar() ); 
-				module.setBetaCarTravelMonetaryCost( - planCalcScoreConfigGroup.getMarginalUtilityOfMoney() ); // [utils/money]
-			} else{
-				throw new RuntimeException(noSeparateBetasMessage);
-			}
-			
-			if(useMATSimBikeParameter){
-				module.setBetaBikeTravelTime( planCalcScoreConfigGroup.getTravelingBike_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr() ) ;
-				module.setBetaBikeTravelDistance( planCalcScoreConfigGroup.getMarginalUtlOfDistanceOther() ) ; // [utils/meter]
-				module.setBetaBikeTravelMonetaryCost( - planCalcScoreConfigGroup.getMarginalUtilityOfMoney() ) ; // [utils/money]
-			} else{
-				throw new RuntimeException(noSeparateBetasMessage);
-			}
-			
-			if(useMATSimWalkParameter){
-				betaWalkTT		= planCalcScoreConfigGroup.getTravelingWalk_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr(); // [utils/h]
-				betaWalkTTPower	= 0.;
-				betaWalkLnTT	= 0.;
-				betaWalkTD		= planCalcScoreConfigGroup.getMarginalUtlOfDistanceWalk(); // [utils/meter]
-				betaWalkTDPower	= 0.;												
-				betaWalkLnTD	= 0.;
-				betaWalkTMC		= - planCalcScoreConfigGroup.getMarginalUtilityOfMoney(); // [utils/money]
-				betaWalkTMCPower= 0.;
-				betaWalkLnTMC	= 0.;
-			}
-			else{
-				throw new RuntimeException(noSeparateBetasMessage);
-			}
-			
-			if(useMATSimPtParameter){
-				betaPtTT		= planCalcScoreConfigGroup.getTravelingPt_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr(); // [utils/h]
-				betaPtTTPower	= 0.;
-				betaPtLnTT		= 0.;
-				betaPtTD		= planCalcScoreConfigGroup.getMarginalUtilityOfMoney() * planCalcScoreConfigGroup.getMonetaryDistanceCostRatePt(); // [utils/meter]
-				betaPtTDPower	= 0.;												
-				betaPtLnTD		= 0.;
-				betaPtTMC		= - planCalcScoreConfigGroup.getMarginalUtilityOfMoney(); // [utils/money]
-				betaPtTMCPower	= 0.;
-				betaPtLnTMC		= 0.;
-			}
-			else{
-				throw new RuntimeException(noSeparateBetasMessage);
-			}
-			
-			// set parameter in module 
-			module.setAccessibilityDestinationSamplingRate(accessibilityDestinationSamplingRate);
-			module.setUsingLogitScaleParameterFromMATSim(useMATSimLogitScaleParameter);
-			module.setUsingRawSumsWithoutLn(useRawSum);
-			module.setUsingCarParameterFromMATSim(useMATSimCarParameter);
-			module.setUsingBikeParameterFromMATSim(useMATSimBikeParameter);
-			module.setUsingWalkParameterFromMATSim(useMATSimWalkParameter);
-			module.setUsingPtParameterFromMATSim(useMATSimPtParameter);
-			module.setLogitScaleParameter(logitScaleParameter);
-			module.setBetaWalkTravelTime(betaWalkTT);
-			module.setBetaWalkTravelTimePower2(betaWalkTTPower);
-			module.setBetaWalkLnTravelTime(betaWalkLnTT);
-			module.setBetaWalkTravelDistance(betaWalkTD);
-			module.setBetaWalkTravelDistancePower2(betaWalkTDPower);
-			module.setBetaWalkLnTravelDistance(betaWalkLnTD);
-			module.setBetaWalkTravelMonetaryCost(betaWalkTMC);
-			module.setBetaWalkTravelMonetaryCostPower2(betaWalkTMCPower);
-			module.setBetaWalkLnTravelMonetaryCost(betaWalkLnTMC);
-			module.setBetaPtTravelTime(betaPtTT);
-			module.setBetaPtTravelTimePower2(betaPtTTPower);
-			module.setBetaPtLnTravelTime(betaPtLnTT);
-			module.setBetaPtTravelDistance(betaPtTD);
-			module.setBetaPtTravelDistancePower2(betaPtTDPower);
-			module.setBetaPtLnTravelDistance(betaPtLnTD);
-			module.setBetaPtTravelMonetaryCost(betaPtTMC);
-			module.setBetaPtTravelMonetaryCostPower2(betaPtTMCPower);
-			module.setBetaPtLnTravelMonetaryCost(betaPtLnTMC);
+		// logit scale parameter:
+		boolean useMATSimLogitScaleParameter 	= matsim4UrbanSimParamsFromU.getAccessibilityParameter().isUseLogitScaleParameterFromMATSim();
+		// (yyyy remove from UrbanSim)
+		if ( module.isUsingLogitScaleParameterFromMATSim() != null ) {
+			useMATSimLogitScaleParameter = module.isUsingLogitScaleParameterFromMATSim() ;
 		}
+		module.setUsingLogitScaleParameterFromMATSim(useMATSimLogitScaleParameter);
+
+		double logitScaleParameter;	
+		if ( useMATSimLogitScaleParameter ) {
+			logitScaleParameter = planCalcScoreConfigGroup.getBrainExpBeta();
+		} else {
+			logitScaleParameter = matsim4UrbanSimParamsFromU.getAccessibilityParameter().getLogitScaleParameter();
+			// (yyyy remove from UrbanSim)
+			if ( module.getLogitScaleParameter() != null ) {
+				logitScaleParameter = module.getLogitScaleParameter();
+			}
+		}
+		module.setLogitScaleParameter(logitScaleParameter);
+
+		// accessibility destination sampling rate:
+		double accessibilityDestinationSamplingRate = matsim4UrbanSimParamsFromU.getAccessibilityParameter().getAccessibilityDestinationSamplingRate();
+		// (maybe leave in UrbanSim)
+		if ( module.getAccessibilityDestinationSamplingRate() != null ) {
+			accessibilityDestinationSamplingRate = module.getAccessibilityDestinationSamplingRate() ;
+		}
+		module.setAccessibilityDestinationSamplingRate(accessibilityDestinationSamplingRate);
+		
+		// which betas?
+		// car:
+		boolean useMATSimCarParameter			= matsim4UrbanSimParamsFromU.getAccessibilityParameter().isUseCarParameterFromMATSim();
+		// (yyyy remove from UrbanSim)
+		if ( module.isUsingCarParametersFromMATSim() != null ) {
+			useMATSimCarParameter = module.isUsingCarParametersFromMATSim() ;
+		}
+		module.setUsingCarParametersFromMATSim(useMATSimCarParameter);
+		// walk:
+		boolean useMATSimWalkParameter			= matsim4UrbanSimParamsFromU.getAccessibilityParameter().isUseWalkParameterFromMATSim();
+		// (yyyy remove from UrbanSim)
+		if ( module.isUsingWalkParametersFromMATSim() != null ) {
+			useMATSimWalkParameter = module.isUsingWalkParametersFromMATSim() ;
+		}
+		module.setUsingWalkParametersFromMATSim(useMATSimWalkParameter);
+		// pt & bicycle not in UrbanSim...
+
+		// raw sums?
+		// (leave in urbansim)
+		boolean useRawSum						= matsim4UrbanSimParamsFromU.getAccessibilityParameter().isUseRawSumsWithoutLn();
+		if ( module.isUsingRawSumsWithoutLn() != null ) {
+			useRawSum = module.isUsingRawSumsWithoutLn() ;
+		}
+		module.setUsingRawSumsWithoutLn(useRawSum);
+
+		final String noSeparateBetasMessage = "This MATSim4UrbanSim version does not support custom beta parameters such " +
+				"as \"betaBikeTravelTime\" etc. anymore (both in the UrbanSim GUI (car and walk) and the external MATSim config " +
+				"file (bike and pt)). Please let us know if this causes serious problems." +
+				"To avoid the error message please : 1) select \"use_car_parameter_from_MATSim\" " +
+				"and \"use_walk_parameter_from_MATSim\" in the UrbanSim GUI and 2) remove all beta parameters for bike and pt " +
+				"(such as \"<param name=\"betaBikeTravelTime\" value=\"-12.\" />\") from your external MATSim config file.";
+
+		if(useMATSimCarParameter){
+			module.setBetaCarTravelTime(planCalcScoreConfigGroup.getTraveling_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr() ); // [utils/h]
+			module.setBetaCarTravelDistance( planCalcScoreConfigGroup.getMarginalUtilityOfMoney() * planCalcScoreConfigGroup.getMonetaryDistanceCostRateCar() ); 
+			module.setBetaCarTravelMonetaryCost( - planCalcScoreConfigGroup.getMarginalUtilityOfMoney() ); // [utils/money]
+		} else{
+			throw new RuntimeException(noSeparateBetasMessage);
+		}
+
+		if( module.isUsingBikeParametersFromMATSim() ) {
+			module.setBetaBikeTravelTime( planCalcScoreConfigGroup.getTravelingBike_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr() ) ;
+			module.setBetaBikeTravelDistance( planCalcScoreConfigGroup.getMarginalUtlOfDistanceOther() ) ; // [utils/meter]
+			module.setBetaBikeTravelMonetaryCost( - planCalcScoreConfigGroup.getMarginalUtilityOfMoney() ) ; // [utils/money]
+		} else{
+			throw new RuntimeException(noSeparateBetasMessage);
+		}
+
+		if(useMATSimWalkParameter){
+			module.setBetaWalkTravelTime( planCalcScoreConfigGroup.getTravelingWalk_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr() ) ; // [utils/h]
+			module.setBetaWalkTravelDistance( planCalcScoreConfigGroup.getMarginalUtlOfDistanceWalk() ); // [utils/meter]
+			module.setBetaWalkTravelMonetaryCost( - planCalcScoreConfigGroup.getMarginalUtilityOfMoney() ) ; // [utils/money]
+		}
+		else{
+			throw new RuntimeException(noSeparateBetasMessage);
+		}
+
+		if( module.isUsingPtParametersFromMATSim() ) {
+			module.setBetaPtTravelTime( planCalcScoreConfigGroup.getTravelingPt_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr() ) ; // [utils/h]
+			module.setBetaPtTravelDistance( planCalcScoreConfigGroup.getMarginalUtilityOfMoney() * planCalcScoreConfigGroup.getMonetaryDistanceCostRatePt() ); // [utils/meter]
+			module.setBetaPtTravelMonetaryCost( - planCalcScoreConfigGroup.getMarginalUtilityOfMoney() ) ; // [utils/money]
+		}
+		else{
+			throw new RuntimeException(noSeparateBetasMessage);
+		}
+
+	}
 
 	static UrbanSimParameterConfigModuleV3 getUrbanSimParameterConfigAndPossiblyConvert(Config config) {
 		Module m = config.getModule(UrbanSimParameterConfigModuleV3.GROUP_NAME);
@@ -762,7 +720,7 @@ public class M4UConfigUtils {
 			return (UrbanSimParameterConfigModuleV3) m;
 		}
 		UrbanSimParameterConfigModuleV3 upcm = new UrbanSimParameterConfigModuleV3(UrbanSimParameterConfigModuleV3.GROUP_NAME);
-//		config.getModules().put(UrbanSimParameterConfigModuleV3.GROUP_NAME, upcm);
+		//		config.getModules().put(UrbanSimParameterConfigModuleV3.GROUP_NAME, upcm);
 		// yyyyyy the above code does NOT convert but throws the config entries away.
 		// In contrast, config.addModule(...) would convert.  kai, may'13 
 		// I just changed that:
@@ -776,7 +734,7 @@ public class M4UConfigUtils {
 			return (MATSim4UrbanSimControlerConfigModuleV3) m;
 		}
 		MATSim4UrbanSimControlerConfigModuleV3 mccm = new MATSim4UrbanSimControlerConfigModuleV3(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME);
-//		config.getModules().put(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME, mccm);
+		//		config.getModules().put(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME, mccm);
 		// yyyyyy the above code does NOT convert but throws the config entries away.
 		// In contrast, config.addModule(...) would convert.  kai, may'13
 		// I just changed that:
@@ -802,57 +760,57 @@ public class M4UConfigUtils {
 	}
 
 	/**
-		 * printing UrbanSimParameterSettings
-		 */
-		static void printUrbanSimParameterSettings( UrbanSimParameterConfigModuleV3 module) {
-			
-	//		UrbanSimParameterConfigModuleV3 module = this.getUrbanSimParameterConfig();
-			
-			log.info("UrbanSimParameter settings:");
-			log.info("ProjectName: " + module.getProjectName() );
-			log.info("PopulationSamplingRate: " + module.getPopulationSampleRate() );
-			log.info("Year: " + module.getYear() ); 
-			log.info("OPUS_HOME: " + InternalConstants.getOPUS_HOME() );
-			log.info("OPUS_DATA_PATH: " + InternalConstants.OPUS_DATA_PATH );
-			log.info("MATSIM_4_OPUS: " + InternalConstants.MATSIM_4_OPUS );
-			log.info("MATSIM_4_OPUS_CONIG: " + InternalConstants.MATSIM_4_OPUS_CONFIG );
-			log.info("MATSIM_4_OPUS_OUTPUT: " + InternalConstants.MATSIM_4_OPUS_OUTPUT );
-			log.info("MATSIM_4_OPUS_TEMP: " + InternalConstants.MATSIM_4_OPUS_TEMP ); 
-			log.info("MATSIM_4_OPUS_BACKUP: " + InternalConstants.MATSIM_4_OPUS_BACKUP );
-			log.info("(Custom) Test Parameter: " + module.getTestParameter() );
-			log.info("UsingShapefileLocationDistribution:" + module.isUsingShapefileLocationDistribution());
-			log.info("UrbanSimZoneShapefileLocationDistribution:" + module.getUrbanSimZoneShapefileLocationDistribution());
-			log.info("RandomLocationDistributionRadiusForUrbanSimZone:" + module.getUrbanSimZoneRadiusLocationDistribution());
-			log.info("Backing Up Run Data: " + module.isBackup() );
-			log.info("Is Test Run: " + module.isTestRun() );
-		}
+	 * printing UrbanSimParameterSettings
+	 */
+	static void printUrbanSimParameterSettings( UrbanSimParameterConfigModuleV3 module) {
+
+		//		UrbanSimParameterConfigModuleV3 module = this.getUrbanSimParameterConfig();
+
+		log.info("UrbanSimParameter settings:");
+		log.info("ProjectName: " + module.getProjectName() );
+		log.info("PopulationSamplingRate: " + module.getPopulationSampleRate() );
+		log.info("Year: " + module.getYear() ); 
+		log.info("OPUS_HOME: " + InternalConstants.getOPUS_HOME() );
+		log.info("OPUS_DATA_PATH: " + InternalConstants.OPUS_DATA_PATH );
+		log.info("MATSIM_4_OPUS: " + InternalConstants.MATSIM_4_OPUS );
+		log.info("MATSIM_4_OPUS_CONIG: " + InternalConstants.MATSIM_4_OPUS_CONFIG );
+		log.info("MATSIM_4_OPUS_OUTPUT: " + InternalConstants.MATSIM_4_OPUS_OUTPUT );
+		log.info("MATSIM_4_OPUS_TEMP: " + InternalConstants.MATSIM_4_OPUS_TEMP ); 
+		log.info("MATSIM_4_OPUS_BACKUP: " + InternalConstants.MATSIM_4_OPUS_BACKUP );
+		log.info("(Custom) Test Parameter: " + module.getTestParameter() );
+		log.info("UsingShapefileLocationDistribution:" + module.isUsingShapefileLocationDistribution());
+		log.info("UrbanSimZoneShapefileLocationDistribution:" + module.getUrbanSimZoneShapefileLocationDistribution());
+		log.info("RandomLocationDistributionRadiusForUrbanSimZone:" + module.getUrbanSimZoneRadiusLocationDistribution());
+		log.info("Backing Up Run Data: " + module.isBackup() );
+		log.info("Is Test Run: " + module.isTestRun() );
+	}
 
 	/**
-		 * printing MATSim4UrbanSimControlerSettings
-		 */
-		static void printMATSim4UrbanSimControlerSettings( MATSim4UrbanSimControlerConfigModuleV3 module ) {
-			
-	//		MATSim4UrbanSimControlerConfigModuleV3 module = getMATSim4UrbaSimControlerConfig();
-			
-			// view results
-			log.info("MATSim4UrbanSimControler settings:");
-			log.info("Compute Agent-performance: " + module.isAgentPerformance() );
-			log.info("Compute Zone2Zone Impedance Matrix: " + module.isZone2ZoneImpedance() ); 
-			log.info("Compute Zone-Based Accessibilities: " + module.isZoneBasedAccessibility() );
-			log.info("Compute Parcel/Cell-Based Accessibilities (using ShapeFile): " + module.isCellBasedAccessibilityShapeFile() ); 
-			log.info("Compute Parcel/Cell-Based Accessibilities (using Network Boundaries): " + module.isCellBasedAccessibilityNetwork() );
-			log.info("Cell Size: " + module.getCellSizeCellBasedAccessibility() );
-			log.info("Using (Custom) Network Boundaries: " + module.usingCustomBoundingBox() );
-			log.info("Network Boundary (Top): " + module.getBoundingBoxTop() ); 
-			log.info("Network Boundary (Left): " + module.getBoundingBoxLeft() ); 
-			log.info("Network Boundary (Right): " + module.getBoundingBoxRight() ); 
-			log.info("Network Boundary (Bottom): " + module.getBoundingBoxBottom() ); 
-			log.info("Shape File: " + module.getShapeFileCellBasedAccessibility() );
-			log.info("Time of day: " + module.getTimeOfDay() );
-			log.info("Pt Stops Input File: " + module.getPtStopsInputFile());
-			log.info("Pt Travel Times Input File: " + module.getPtTravelTimesInputFile());
-			log.info("Pt travel Distances Input File: " + module.getPtTravelDistancesInputFile());
-		}
+	 * printing MATSim4UrbanSimControlerSettings
+	 */
+	static void printMATSim4UrbanSimControlerSettings( MATSim4UrbanSimControlerConfigModuleV3 module ) {
+
+		//		MATSim4UrbanSimControlerConfigModuleV3 module = getMATSim4UrbaSimControlerConfig();
+
+		// view results
+		log.info("MATSim4UrbanSimControler settings:");
+		log.info("Compute Agent-performance: " + module.isAgentPerformance() );
+		log.info("Compute Zone2Zone Impedance Matrix: " + module.isZone2ZoneImpedance() ); 
+		log.info("Compute Zone-Based Accessibilities: " + module.isZoneBasedAccessibility() );
+		log.info("Compute Parcel/Cell-Based Accessibilities (using ShapeFile): " + module.isCellBasedAccessibilityShapeFile() ); 
+		log.info("Compute Parcel/Cell-Based Accessibilities (using Network Boundaries): " + module.isCellBasedAccessibilityNetwork() );
+		log.info("Cell Size: " + module.getCellSizeCellBasedAccessibility() );
+		log.info("Using (Custom) Network Boundaries: " + module.usingCustomBoundingBox() );
+		log.info("Network Boundary (Top): " + module.getBoundingBoxTop() ); 
+		log.info("Network Boundary (Left): " + module.getBoundingBoxLeft() ); 
+		log.info("Network Boundary (Right): " + module.getBoundingBoxRight() ); 
+		log.info("Network Boundary (Bottom): " + module.getBoundingBoxBottom() ); 
+		log.info("Shape File: " + module.getShapeFileCellBasedAccessibility() );
+		log.info("Time of day: " + module.getTimeOfDay() );
+		log.info("Pt Stops Input File: " + module.getPtStopsInputFile());
+		log.info("Pt Travel Times Input File: " + module.getPtTravelTimesInputFile());
+		log.info("Pt travel Distances Input File: " + module.getPtTravelDistancesInputFile());
+	}
 
 	static final void checkConfigConsistencyAndWriteToLog(Config config, final String message) {
 		String newline = System.getProperty("line.separator");// use native line endings for logfile

@@ -41,19 +41,22 @@ public class M4UConfigConsistencyChecker implements ConfigConsistencyChecker {
 		UrbanSimParameterConfigModuleV3 urbansimParameterModule = (UrbanSimParameterConfigModuleV3) config.getModule(UrbanSimParameterConfigModuleV3.GROUP_NAME ) ;
 		AccessibilityConfigModule accessibilityConfigModule = (AccessibilityConfigModule) config.getModule(AccessibilityConfigModule.GROUP_NAME) ;
 		
-		if ( !accessibilityConfigModule.usingCarParameterFromMATSim() ) {
+		if ( accessibilityConfigModule.getLogitScaleParameter() != 1. ) {
+			log.warn("using a logit scale parameter != 1. for accessibility computation.  Not recommended; will make interpretation of results more indirect") ;
+		}
+		if ( !accessibilityConfigModule.isUsingCarParametersFromMATSim() ) {
 			problem = true ;
 			log.error("using car beta parameters not from matsim currently not allowed since interpretation not fully clear") ;
 		}
-		if ( !accessibilityConfigModule.usingPtParameterFromMATSim() ) {
+		if ( !accessibilityConfigModule.isUsingPtParametersFromMATSim() ) {
 			problem = true ;
 			log.error("using pt beta parameters not from matsim currently not allowed since interpretation not fully clear") ;
 		}
-		if ( !accessibilityConfigModule.usingWalkParameterFromMATSim() ) {
+		if ( !accessibilityConfigModule.isUsingWalkParametersFromMATSim() ) {
 			problem = true ;
 			log.error("using walk beta parameters not from matsim currently not allowed since interpretation not fully clear") ;
 		}
-		if ( !accessibilityConfigModule.usingBikeParameterFromMATSim() ) {
+		if ( !accessibilityConfigModule.isUsingBikeParametersFromMATSim() ) {
 			problem = true ;
 			log.error("using bike beta parameters not from matsim currently not allowed since interpretation not fully clear") ;
 		}
