@@ -23,8 +23,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 
-import playground.vsptelematics.common.IncidentGenerator;
-
 
 /**
  * @author dgrether
@@ -51,12 +49,6 @@ public class Controller {
 				final RouteTTObserver observer = new RouteTTObserver(con.getControlerIO().getOutputFilename("routeTravelTimes.txt"));
 				con.addControlerListener(observer);
 				con.getEvents().addHandler(observer);
-				
-				if (con.getScenario().getConfig().network().isTimeVariantNetwork()){
-					IncidentGenerator generator = new IncidentGenerator(con.getScenario().getConfig().getParam("telematics", "incidentsFile"), con.getScenario().getNetwork());
-					con.addControlerListener(generator);
-				}
-				
 			}});
 	}
 
