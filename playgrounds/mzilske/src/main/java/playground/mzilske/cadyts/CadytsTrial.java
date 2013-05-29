@@ -3,7 +3,6 @@ package playground.mzilske.cadyts;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.junit.Rule;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.car.CadytsPlanChanger;
@@ -20,18 +19,15 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.testcases.MatsimTestUtils;
 
 public class CadytsTrial {
 	
-	@Rule
-	public MatsimTestUtils utils = new MatsimTestUtils();
 
 	public static void main(String[] args) {	
 		Config config = ConfigUtils.createConfig() ;
 		config.global().setRandomSeed(4711) ;
-		config.network().setInputFile("../../matsim/examples/equil/network.xml") ;
-		config.plans().setInputFile("../../matsim/examples/equil/plans100.xml") ;
+		config.network().setInputFile("input/equil-cadyts/network.xml") ;
+		config.plans().setInputFile("input/equil-cadyts//plans100.xml") ;
 		
 		config.controler().setLastIteration(50) ;
 		config.controler().setOutputDirectory("output") ;
@@ -58,7 +54,7 @@ public class CadytsTrial {
 			params.setTypicalDuration(8*60*60.) ;
 		}
 		
-		config.counts().setCountsFileName("../../matsim/examples/equil/counts100.xml");
+		config.counts().setCountsFileName("input/equil-cadyts/counts100.xml");
 
 		StrategySettings stratSets = new StrategySettings(new IdImpl(1));
 		stratSets.setModuleName("ccc") ;
