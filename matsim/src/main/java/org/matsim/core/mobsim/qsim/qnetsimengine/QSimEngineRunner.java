@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
-import java.util.Random;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CyclicBarrier;
@@ -32,6 +31,12 @@ import java.util.concurrent.CyclicBarrier;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.Gbl;
 
+/**
+ * These are the "threads" of the {@link ParallelQNetsimEngine}.  The "run()" method is implicitly called by starting the thread.  
+ * 
+ * @author (of this documentation) nagel
+ *
+ */
 public class QSimEngineRunner extends NetElementActivator implements Runnable {
 
 	private double time = 0.0;
