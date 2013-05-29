@@ -301,6 +301,7 @@ public class Controler extends AbstractController {
 		PlanStrategyRegistrar planStrategyFactoryRegistrar = new PlanStrategyRegistrar();
 		this.planStrategyFactoryRegister = planStrategyFactoryRegistrar.getFactoryRegister();
 		this.events = EventsUtils.createEventsManager(this.config);
+		
 		if (this.config.multiModal().isMultiModalSimulationEnabled()) {
 			// Actually, this is not so much about multi-modal but about within-day replanning.
 			// It provides last iteration's travel times to be used during the current interation.
@@ -309,6 +310,8 @@ public class Controler extends AbstractController {
 		} else {
 			this.travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
 		}
+		// yy is it really so practical to do this in this way?  People might (re)set this factory between constructor and run()--???  kai, may'13
+		
 		this.config.parallelEventHandling().makeLocked();
 	}
 
