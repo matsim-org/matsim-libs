@@ -608,7 +608,7 @@ public class Controler extends AbstractController {
 						network,
 						population.getFactory(),
 						getLeastCostPathCalculatorFactory(),
-						createTravelCostCalculator(),
+						createTravelDisutilityCalculator(),
 						multiModalTravelTimes,
 						config.multiModal(),
 						tripRouterFactory);
@@ -782,7 +782,7 @@ public class Controler extends AbstractController {
 		this.dumpDataAtEnd = dumpData;
 	}
 
-	public final TravelDisutility createTravelCostCalculator() {
+	public final TravelDisutility createTravelDisutilityCalculator() {
 		return this.travelCostCalculatorFactory.createTravelDisutility(
 				this.travelTimeCalculator.getLinkTravelTimes(), this.config.planCalcScore());
 	}
@@ -847,20 +847,13 @@ public class Controler extends AbstractController {
 	 *  one location to another.  Wrapping this into a PlanAlgorithm is useful as a strategy, but nowhere else.  In summary, there
 	 *  is neither a good reason (any more) to override this method nor to call it.  kai, apr'13
 	 */
-	@Deprecated
+	@Deprecated // use getTripRouterFactory() instead.  You probably want a trip router instead of a plan router anyway.  kai, may'13
 	public final PlanAlgorithm createRoutingAlgorithm() {
-		
-		return 
-//		useTripRouting ?
-			new PlanRouter(
+		// yy public use at about 10 locations.  kai, may'13
+		return new PlanRouter(
 				getTripRouterFactory().instantiateAndConfigureTripRouter(),
-				((ScenarioImpl)getScenario()).getActivityFacilities()) 
-//		:
-//			createOldRoutingAlgorithm(
-//				this.createTravelCostCalculator(),
-//				travelTimeCalculator.getLinkTravelTimes(),
-//				travelTimeCalculator.getLinkToLinkTravelTimes())
-			;
+				((ScenarioImpl)getScenario()).getActivityFacilities()
+				) ; 
 	}
 
 
@@ -959,11 +952,13 @@ public class Controler extends AbstractController {
 	 * bypassing all the interfaces.
 	 */
 	public final PlansScoring getPlansScoring() {
+		// yy public use at about 6 places.  kai, may'13
 		return this.plansScoring;
 	}
 
 	@Deprecated
 	public final TravelTimeCalculatorFactory getTravelTimeCalculatorFactory() {
+		// does it really make sense to give people not even the factory?  kai, may'13
 		return this.travelTimeCalculatorFactory;
 	}
 
@@ -980,14 +975,6 @@ public class Controler extends AbstractController {
 			final TravelDisutilityFactory travelCostCalculatorFactory) {
 		this.travelCostCalculatorFactory = travelCostCalculatorFactory;
 	}
-
-//	/**
-//	 * yyyy Christoph Dobler overrides this method at some point. --???  
-//	 */
-//	public OutputDirectoryHierarchy getControlerIO() {
-//		return this.controlerIO;
-//	}
-	// now in AbstractController
 
 	/**
 	 * @return The result of this function is not reliable. It is the iteration number, but it is only set  

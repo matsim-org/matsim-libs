@@ -49,7 +49,7 @@ public abstract class ChoiceSetExtractor {
 	
 	protected void computeChoiceSets() {
 
-		SpanningTree spanningTree = new SpanningTree(this.controler.getLinkTravelTimes(), this.controler.createTravelCostCalculator());
+		SpanningTree spanningTree = new SpanningTree(this.controler.getLinkTravelTimes(), this.controler.createTravelDisutilityCalculator());
 		String type ="s";
 		
 		int index = 0;

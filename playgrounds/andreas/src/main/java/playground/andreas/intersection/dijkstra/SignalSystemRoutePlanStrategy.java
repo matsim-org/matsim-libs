@@ -41,7 +41,7 @@ public class SignalSystemRoutePlanStrategy implements PlanStrategy {
 	public SignalSystemRoutePlanStrategy(Controler controler) {
 		this.psDelegate = new PlanStrategyImpl( new RandomPlanSelector());
 		this.addStrategyModule(new ReRouteDijkstraTurningMoves(controler.getConfig(), controler.getNetwork(),
-				controler.createTravelCostCalculator(), controler.getLinkTravelTimes(), ((PopulationFactoryImpl) controler.getPopulation().getFactory()).getModeRouteFactory()));
+				controler.createTravelDisutilityCalculator(), controler.getLinkTravelTimes(), ((PopulationFactoryImpl) controler.getPopulation().getFactory()).getModeRouteFactory()));
 	}
 
 	public void addStrategyModule(PlanStrategyModule module) {

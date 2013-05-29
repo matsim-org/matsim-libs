@@ -128,7 +128,7 @@ public class WithinDayParkingController extends WithinDayController implements R
 
 		// Use a the TravelTimeCollector here for within-day routes replanning!
 		ParkingRouterFactory parkingRouterFactory = new ParkingRouterFactory(this.scenarioData, times, 
-				this.createTravelCostCalculator(), this.getTripRouterFactory(), nodesToCheck);
+				this.createTravelDisutilityCalculator(), this.getTripRouterFactory(), nodesToCheck);
 		
 		this.randomSearchReplannerFactory = new ParkingSearchReplannerFactory(this.getWithinDayEngine(), router, 1.0, this.scenarioData, 
 				parkingAgentsTracker, parkingInfrastructure, parkingRouterFactory);
@@ -166,7 +166,7 @@ public class WithinDayParkingController extends WithinDayController implements R
 		this.getEvents().addHandler(this.parkingAgentsTracker);
 		
 		ParkingRouterFactory parkingRouterFactory = new ParkingRouterFactory(this.scenarioData, times, 
-				this.createTravelCostCalculator(), this.getTripRouterFactory(), nodesToCheck);
+				this.createTravelDisutilityCalculator(), this.getTripRouterFactory(), nodesToCheck);
 		
 		MobsimFactory mobsimFactory = new ParkingQSimFactory(parkingInfrastructure, parkingRouterFactory, this.getWithinDayEngine(),
 				this.parkingAgentsTracker);
