@@ -40,7 +40,7 @@ import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 
 import playground.vsptelematics.common.IncidentGenerator;
-import playground.vsptelematics.ub6.RouteTTObserver;
+import playground.vsptelematics.ha1.RouteTTObserver;
 
 
 /**
