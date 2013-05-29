@@ -35,10 +35,10 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.contrib.matsim4opus.config.AccessibilityConfigModule;
 import org.matsim.contrib.matsim4opus.config.M4USimConfigurationConverterV4;
-import org.matsim.contrib.matsim4opus.config.M4UControlerConfigModuleV3;
-import org.matsim.contrib.matsim4opus.config.UrbanSimParameterConfigModuleV3;
+import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigModule;
+import org.matsim.contrib.matsim4opus.config.modules.M4UControlerConfigModuleV3;
+import org.matsim.contrib.matsim4opus.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4opus.gis.GridUtils;
 import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
 import org.matsim.contrib.matsim4opus.gis.ZoneLayer;
@@ -404,7 +404,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 																						this.scenario));
 		}
 		
-		if(computeParcelBasedAccessibility || MATSim4UrbanSimZone.BRUSSELS_SCENARIO_CALCULATE_GRID_ACCESSIBILITIES ){
+		if(computeParcelBasedAccessibility  ){
 			SpatialGrid freeSpeedGrid;				// matrix for free speed car related accessibility measure. based on the boundary (above) and grid size
 			SpatialGrid carGrid;					// matrix for congested car related accessibility measure. based on the boundary (above) and grid size
 			SpatialGrid bikeGrid;					// matrix for bike related accessibility measure. based on the boundary (above) and grid size
@@ -414,8 +414,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 			ZoneLayer<Id>  measuringPoints;
 
 			if(computeParcelBasedAccessibilitiesNetwork){
-				measuringPoints = GridUtils.createGridLayerByGridSizeByNetwork(cellSizeInMeter, 
-																			   nwBoundaryBox.getBoundingBox());
+				measuringPoints = GridUtils.createGridLayerByGridSizeByNetwork(cellSizeInMeter, nwBoundaryBox.getBoundingBox());
 				freeSpeedGrid= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
 				carGrid 	= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
 				bikeGrid 	= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
@@ -424,8 +423,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 			}
 			else{
 				Geometry boundary = GridUtils.getBoundary(shapeFile);
-				measuringPoints   = GridUtils.createGridLayerByGridSizeByShapeFile(cellSizeInMeter, 
-																				   boundary);
+				measuringPoints   = GridUtils.createGridLayerByGridSizeByShapeFile(cellSizeInMeter, boundary);
 				freeSpeedGrid= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
 				carGrid		= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
 				bikeGrid	= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
@@ -498,30 +496,30 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 		this.computeZone2ZoneImpedance	= moduleMATSim4UrbanSim.isZone2ZoneImpedance();
 		this.computeZoneBasedAccessibilities = moduleMATSim4UrbanSim.isZoneBasedAccessibility();
 		this.computeParcelBasedAccessibility	= moduleMATSim4UrbanSim.isCellBasedAccessibility();
-		this.computeParcelBasedAccessibilitiesShapeFile = moduleMATSim4UrbanSim.isCellBasedAccessibilityShapeFile();
-		this.computeParcelBasedAccessibilitiesNetwork = moduleMATSim4UrbanSim.isCellBasedAccessibilityNetwork();
+		this.computeParcelBasedAccessibilitiesShapeFile = moduleAccessibility.isCellBasedAccessibilityShapeFile();
+		this.computeParcelBasedAccessibilitiesNetwork = moduleAccessibility.isCellBasedAccessibilityNetwork();
 		this.dumpPopulationData 		= false;
 		this.dumpAggegatedWorkplaceData = true;
 		
-		this.cellSizeInMeter 			= moduleMATSim4UrbanSim.getCellSizeCellBasedAccessibility();
-		this.shapeFile					= moduleMATSim4UrbanSim.getShapeFileCellBasedAccessibility();
+		this.cellSizeInMeter 			= moduleAccessibility.getCellSizeCellBasedAccessibility();
+		this.shapeFile					= moduleAccessibility.getShapeFileCellBasedAccessibility();
 		// using custom bounding box, defining the study area for accessibility computation
 		this.nwBoundaryBox 				= new NetworkBoundaryBox();
 		if(Paths.pathExsits(this.shapeFile))						// using shape file for accessibility computation
 			log.info("Using shape file for accessibility computation.");		
-		else if(moduleMATSim4UrbanSim.usingCustomBoundingBox()){	// using custom boundary box for accessibility computation
+		else if(moduleAccessibility.usingCustomBoundingBox()){	// using custom boundary box for accessibility computation
 			log.info("Using custon boundig box for accessibility computation.");
-			nwBoundaryBox.setCustomBoundaryBox(moduleMATSim4UrbanSim.getBoundingBoxLeft(), 
-													moduleMATSim4UrbanSim.getBoundingBoxBottom(), 
-													moduleMATSim4UrbanSim.getBoundingBoxRight(), 
-													moduleMATSim4UrbanSim.getBoundingBoxTop());
+			nwBoundaryBox.setCustomBoundaryBox(moduleAccessibility.getBoundingBoxLeft(), 
+													moduleAccessibility.getBoundingBoxBottom(), 
+													moduleAccessibility.getBoundingBoxRight(), 
+													moduleAccessibility.getBoundingBoxTop());
 		}
 		else{														// using boundary of hole network for accessibility computation
 			log.warn("Using the boundary of the network file for accessibility computation. This could lead to memory issues when the network is large and/or the cell size is too fine.");
 			nwBoundaryBox.setDefaultBoundaryBox(scenario.getNetwork());
 		}
 		
-		this.timeOfDay					= moduleMATSim4UrbanSim.getTimeOfDay();
+		this.timeOfDay					= moduleAccessibility.getTimeOfDay();
 	}
 	
 	/**
@@ -601,7 +599,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 		if (m instanceof M4UControlerConfigModuleV3) {
 			return (M4UControlerConfigModuleV3) m;
 		}
-		M4UControlerConfigModuleV3 mccm = new M4UControlerConfigModuleV3(M4UControlerConfigModuleV3.GROUP_NAME);
+		M4UControlerConfigModuleV3 mccm = new M4UControlerConfigModuleV3();
 		this.scenario.getConfig().getModules().put(M4UControlerConfigModuleV3.GROUP_NAME, mccm);
 		return mccm;
 	}

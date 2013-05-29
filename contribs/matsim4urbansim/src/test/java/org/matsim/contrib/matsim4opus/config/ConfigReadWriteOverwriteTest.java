@@ -33,6 +33,9 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
+import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigModule;
+import org.matsim.contrib.matsim4opus.config.modules.M4UControlerConfigModuleV3;
+import org.matsim.contrib.matsim4opus.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4opus.utils.CreateTestExternalMATSimConfig;
 import org.matsim.contrib.matsim4opus.utils.CreateTestMATSimConfig;
 import org.matsim.contrib.matsim4opus.utils.io.Paths;
@@ -44,9 +47,9 @@ import org.matsim.core.config.Module;
 import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.NetworkConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
@@ -249,7 +252,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 	 * @param testConfig contains all parameter from the MATSim4UrbanSim config
 	 * @param config is the merged config in standard MATSim format.
 	 */
-	void checkCoreModulesAndExternalConfigSettings(
+	private void checkCoreModulesAndExternalConfigSettings(
 			CreateTestExternalMATSimConfig testExternalConfig,
 			CreateTestMATSimConfig testConfig, Config config) {
 		
@@ -294,9 +297,11 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 		///////////////////////////////////////////////////
 		// MATSim4UrbanSim Controler Config Module Settings
 		///////////////////////////////////////////////////
-		M4UControlerConfigModuleV3 matsim4UrbanSimControlerModule = testExternalConfig.getMATSim4UrbaSimControlerConfig(config);
+		M4UControlerConfigModuleV3 matsim4UrbanSimControlerModule = M4UConfigUtils.getMATSim4UrbaSimControlerConfigAndPossiblyConvert(config) ;
+		AccessibilityConfigModule acm = M4UAccessibilityConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
+		
 		// time of day
-		Assert.assertTrue( matsim4UrbanSimControlerModule.getTimeOfDay() == testExternalConfig.timeOfDay );
+		Assert.assertTrue( acm.getTimeOfDay() == testExternalConfig.timeOfDay );
 		// use pt stops flag
 		boolean usePtStopsFlagFromConfig = matsim4UrbanSimModule.getValue( M4UConfigUtils.PT_STOPS_SWITCH ) != null && matsim4UrbanSimModule.getValue( M4UConfigUtils.PT_STOPS_SWITCH ).equalsIgnoreCase("TRUE");
 		Assert.assertTrue( usePtStopsFlagFromConfig == testExternalConfig.usePtStops.equalsIgnoreCase("TRUE") );

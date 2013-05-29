@@ -22,6 +22,8 @@
  */
 package org.matsim.contrib.matsim4opus.config;
 
+import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigModule;
+import org.matsim.contrib.matsim4opus.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.jaxbconfig2.Matsim4UrbansimType;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
@@ -103,6 +105,12 @@ public class M4UAccessibilityConfigUtils {
 			module.setBetaCarTravelTime(planCalcScoreConfigGroup.getTraveling_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr() ); // [utils/h]
 			module.setBetaCarTravelDistance( planCalcScoreConfigGroup.getMarginalUtilityOfMoney() * planCalcScoreConfigGroup.getMonetaryDistanceCostRateCar() ); 
 			module.setBetaCarTravelMonetaryCost( - planCalcScoreConfigGroup.getMarginalUtilityOfMoney() ); // [utils/money]
+			module.setBetaCarLnTravelDistance(0.) ;
+			module.setBetaCarLnTravelMonetaryCost(0.) ;
+			module.setBetaCarLnTravelTime(0.) ;
+			module.setBetaCarTravelTimePower2(0.) ;
+			module.setBetaCarTravelMonetaryCostPower2(0.) ;
+			module.setBetaCarTravelDistancePower2(0.) ;
 		} else{
 			throw new RuntimeException(noSeparateBetasMessage);
 		}
@@ -111,6 +119,12 @@ public class M4UAccessibilityConfigUtils {
 			module.setBetaBikeTravelTime( planCalcScoreConfigGroup.getTravelingBike_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr() ) ;
 			module.setBetaBikeTravelDistance( planCalcScoreConfigGroup.getMarginalUtlOfDistanceOther() ) ; // [utils/meter]
 			module.setBetaBikeTravelMonetaryCost( - planCalcScoreConfigGroup.getMarginalUtilityOfMoney() ) ; // [utils/money]
+			module.setBetaBikeLnTravelDistance(0.) ;
+			module.setBetaBikeLnTravelMonetaryCost(0.) ;
+			module.setBetaBikeLnTravelTime(0.) ;
+			module.setBetaBikeTravelTimePower2(0.) ;
+			module.setBetaBikeTravelMonetaryCostPower2(0.) ;
+			module.setBetaBikeTravelDistancePower2(0.) ;
 		} else{
 			throw new RuntimeException(noSeparateBetasMessage);
 		}
@@ -119,6 +133,12 @@ public class M4UAccessibilityConfigUtils {
 			module.setBetaWalkTravelTime( planCalcScoreConfigGroup.getTravelingWalk_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr() ) ; // [utils/h]
 			module.setBetaWalkTravelDistance( planCalcScoreConfigGroup.getMarginalUtlOfDistanceWalk() ); // [utils/meter]
 			module.setBetaWalkTravelMonetaryCost( - planCalcScoreConfigGroup.getMarginalUtilityOfMoney() ) ; // [utils/money]
+			module.setBetaWalkLnTravelDistance(0.) ;
+			module.setBetaWalkLnTravelMonetaryCost(0.) ;
+			module.setBetaWalkLnTravelTime(0.) ;
+			module.setBetaWalkTravelTimePower2(0.) ;
+			module.setBetaWalkTravelMonetaryCostPower2(0.) ;
+			module.setBetaWalkTravelDistancePower2(0.) ;
 		}
 		else{
 			throw new RuntimeException(noSeparateBetasMessage);
@@ -128,6 +148,12 @@ public class M4UAccessibilityConfigUtils {
 			module.setBetaPtTravelTime( planCalcScoreConfigGroup.getTravelingPt_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr() ) ; // [utils/h]
 			module.setBetaPtTravelDistance( planCalcScoreConfigGroup.getMarginalUtilityOfMoney() * planCalcScoreConfigGroup.getMonetaryDistanceCostRatePt() ); // [utils/meter]
 			module.setBetaPtTravelMonetaryCost( - planCalcScoreConfigGroup.getMarginalUtilityOfMoney() ) ; // [utils/money]
+			module.setBetaPtLnTravelDistance(0.) ;
+			module.setBetaPtLnTravelMonetaryCost(0.) ;
+			module.setBetaPtLnTravelTime(0.) ;
+			module.setBetaPtTravelTimePower2(0.) ;
+			module.setBetaPtTravelMonetaryCostPower2(0.) ;
+			module.setBetaPtTravelDistancePower2(0.) ;
 		}
 		else{
 			throw new RuntimeException(noSeparateBetasMessage);
@@ -137,7 +163,7 @@ public class M4UAccessibilityConfigUtils {
 
 	public static AccessibilityConfigModule getConfigModuleAndPossiblyConvert(Config config) {
 		Module m = config.getModule(AccessibilityConfigModule.GROUP_NAME);
-		if (m instanceof M4UControlerConfigModuleV3) {
+		if (m instanceof AccessibilityConfigModule) {
 			return (AccessibilityConfigModule) m;
 		}
 		AccessibilityConfigModule module = new AccessibilityConfigModule();

@@ -25,7 +25,6 @@ package org.matsim.contrib.matsim4opus.config;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
-import org.matsim.contrib.matsim4opus.config.M4USimConfigurationConverterV4;
 import org.matsim.contrib.matsim4opus.utils.CreateTestExternalMATSimConfig;
 import org.matsim.contrib.matsim4opus.utils.CreateTestMATSimConfig;
 import org.matsim.contrib.matsim4opus.utils.io.TempDirectoryUtil;

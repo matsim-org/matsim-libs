@@ -23,6 +23,9 @@
 package org.matsim.contrib.matsim4opus.config;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigModule;
+import org.matsim.contrib.matsim4opus.config.modules.M4UControlerConfigModuleV3;
+import org.matsim.contrib.matsim4opus.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.consistency.ConfigConsistencyChecker;
 
@@ -40,6 +43,12 @@ public class M4UConfigConsistencyChecker implements ConfigConsistencyChecker {
 		M4UControlerConfigModuleV3 matsim4urbansimModule = (M4UControlerConfigModuleV3) config.getModule(M4UControlerConfigModuleV3.GROUP_NAME) ;
 		UrbanSimParameterConfigModuleV3 urbansimParameterModule = (UrbanSimParameterConfigModuleV3) config.getModule(UrbanSimParameterConfigModuleV3.GROUP_NAME ) ;
 		AccessibilityConfigModule accessibilityConfigModule = (AccessibilityConfigModule) config.getModule(AccessibilityConfigModule.GROUP_NAME) ;
+		
+		if ( config.network().getInputFile().isEmpty() ) {
+			problem = true ;
+			log.error("Missing MATSim network! The network must be specified either directly in the " +
+					"MATSim4UrbanSim configuration or in an external MATSim configuration.");
+		}
 		
 		if ( accessibilityConfigModule.getLogitScaleParameter() != 1. ) {
 			log.warn("using a logit scale parameter != 1. for accessibility computation.  Not recommended; will make interpretation of results more indirect") ;

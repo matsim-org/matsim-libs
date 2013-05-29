@@ -24,10 +24,10 @@ package org.matsim.contrib.matsim4opus.utils;
 
 import java.math.BigInteger;
 
-import org.matsim.contrib.matsim4opus.config.AccessibilityConfigModule;
 import org.matsim.contrib.matsim4opus.config.M4UConfigUtils;
-import org.matsim.contrib.matsim4opus.config.M4UControlerConfigModuleV3;
-import org.matsim.contrib.matsim4opus.config.UrbanSimParameterConfigModuleV3;
+import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigModule;
+import org.matsim.contrib.matsim4opus.config.modules.M4UControlerConfigModuleV3;
+import org.matsim.contrib.matsim4opus.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4opus.utils.io.TempDirectoryUtil;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
@@ -146,7 +146,6 @@ public class CreateTestExternalMATSimConfig extends CreateTestMATSimConfig{
 		
 		// matsim4urbansimParameter module
 		Module matsim4UrbanSimModule = config.createModule( M4UConfigUtils.MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG);
-		matsim4UrbanSimModule.addParam(AccessibilityConfigModule.TIME_OF_DAY, this.timeOfDay + "");
 		matsim4UrbanSimModule.addParam(M4UConfigUtils.URBANSIM_ZONE_SHAPEFILE_LOCATION_DISTRIBUTION, this.urbanSimZoneShapefileLocationDistribution);
 		matsim4UrbanSimModule.addParam(M4UConfigUtils.PT_STOPS, this.ptStops);
 		matsim4UrbanSimModule.addParam(M4UConfigUtils.PT_STOPS_SWITCH, this.usePtStops);
@@ -172,6 +171,10 @@ public class CreateTestExternalMATSimConfig extends CreateTestMATSimConfig{
 //		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_PT_TRAVEL_MONETARY_COST, this.betaPtTravelCost + "");
 //		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_PT_TRAVEL_MONETARY_COST_POWER2, this.betaPtTravelCostPower2+ "");
 //		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_PT_LN_TRAVEL_MONETARY_COST, this.betaPtLnTravelCost + "");
+		
+		Module acm = config.createModule( AccessibilityConfigModule.GROUP_NAME ) ;
+		acm.addParam(AccessibilityConfigModule.TIME_OF_DAY, this.timeOfDay + "");
+		
 		
 		// changeLegMode module
 		Module changeLegModeModule = config.createModule(changeLegModeModuleName);
@@ -288,7 +291,7 @@ public class CreateTestExternalMATSimConfig extends CreateTestMATSimConfig{
 		if (m instanceof M4UControlerConfigModuleV3) {
 			return (M4UControlerConfigModuleV3) m;
 		}
-		M4UControlerConfigModuleV3 mccm = new M4UControlerConfigModuleV3(M4UControlerConfigModuleV3.GROUP_NAME);
+		M4UControlerConfigModuleV3 mccm = new M4UControlerConfigModuleV3();
 		config.getModules().put(M4UControlerConfigModuleV3.GROUP_NAME, mccm);
 		return mccm;
 	}

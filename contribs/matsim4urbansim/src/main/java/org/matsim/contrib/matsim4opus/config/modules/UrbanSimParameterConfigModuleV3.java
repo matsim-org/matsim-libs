@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.matsim4opus.config;
+package org.matsim.contrib.matsim4opus.config.modules;
 
 import java.util.LinkedHashMap;
 import java.util.Map;

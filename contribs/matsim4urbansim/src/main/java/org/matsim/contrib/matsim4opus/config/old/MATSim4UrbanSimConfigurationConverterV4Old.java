@@ -28,10 +28,10 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.matsim4opus.config.AccessibilityConfigModule;
 import org.matsim.contrib.matsim4opus.config.JAXBUnmaschalV2;
-import org.matsim.contrib.matsim4opus.config.M4UControlerConfigModuleV3;
-import org.matsim.contrib.matsim4opus.config.UrbanSimParameterConfigModuleV3;
+import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigModule;
+import org.matsim.contrib.matsim4opus.config.modules.M4UControlerConfigModuleV3;
+import org.matsim.contrib.matsim4opus.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4opus.constants.InternalConstants;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.jaxbconfig2.ConfigType;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.jaxbconfig2.Matsim4UrbansimType;
@@ -485,7 +485,7 @@ public class MATSim4UrbanSimConfigurationConverterV4Old {
 		log.info("Network Boundary (Right): " + module.getBoundingBoxRight() ); 
 		log.info("Network Boundary (Bottom): " + module.getBoundingBoxBottom() ); 
 		log.info("Shape File: " + module.getShapeFileCellBasedAccessibility() );
-		log.info("Time of day: " + module.getTimeOfDay() );
+//		log.info("Time of day: " + module.getTimeOfDay() );
 		log.info("Pt Stops Input File: " + module.getPtStopsInputFile());
 		log.info("Pt Travel Times Input File: " + module.getPtTravelTimesInputFile());
 		log.info("Pt travel Distances Input File: " + module.getPtTravelDistancesInputFile());
@@ -1089,7 +1089,7 @@ public class MATSim4UrbanSimConfigurationConverterV4Old {
 		if (m instanceof M4UControlerConfigModuleV3) {
 			return (M4UControlerConfigModuleV3) m;
 		}
-		M4UControlerConfigModuleV3 mccm = new M4UControlerConfigModuleV3(M4UControlerConfigModuleV3.GROUP_NAME);
+		M4UControlerConfigModuleV3 mccm = new M4UControlerConfigModuleV3();
 		this.config.getModules().put(M4UControlerConfigModuleV3.GROUP_NAME, mccm);
 		return mccm;
 	}

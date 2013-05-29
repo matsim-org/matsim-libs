@@ -7,8 +7,11 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.matsim4opus.config.ConfigurationUtils;
-import org.matsim.contrib.matsim4opus.config.M4UControlerConfigModuleV3;
-import org.matsim.contrib.matsim4opus.config.UrbanSimParameterConfigModuleV3;
+import org.matsim.contrib.matsim4opus.config.M4UAccessibilityConfigUtils;
+import org.matsim.contrib.matsim4opus.config.M4UConfigUtils;
+import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigModule;
+import org.matsim.contrib.matsim4opus.config.modules.M4UControlerConfigModuleV3;
+import org.matsim.contrib.matsim4opus.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4opus.constants.InternalConstants;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.AccessibilityControlerListenerImpl;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.Zone2ZoneImpedancesControlerListener;
@@ -42,8 +45,11 @@ public class BackupMATSimOutput {
 	private static void saveRunOutputs(ScenarioImpl scenario) {
 		log.info("Saving UrbanSim and MATSim outputs ...");
 
-		M4UControlerConfigModuleV3 m4ucModule = ConfigurationUtils.getMATSim4UrbaSimControlerConfigModule(scenario);
-		UrbanSimParameterConfigModuleV3 uspModule = ConfigurationUtils.getUrbanSimParameterConfigModule(scenario);
+//		M4UControlerConfigModuleV3 m4ucModule = ConfigurationUtils.getMATSim4UrbaSimControlerConfigModule(scenario);
+		M4UControlerConfigModuleV3 m4ucModule = M4UConfigUtils.getMATSim4UrbaSimControlerConfigAndPossiblyConvert(scenario.getConfig()) ;
+//		UrbanSimParameterConfigModuleV3 uspModule = ConfigurationUtils.getUrbanSimParameterConfigModule(scenario);
+		UrbanSimParameterConfigModuleV3 uspModule = M4UConfigUtils.getUrbanSimParameterConfigAndPossiblyConvert(scenario.getConfig()) ;
+		AccessibilityConfigModule acm = M4UAccessibilityConfigUtils.getConfigModuleAndPossiblyConvert(scenario.getConfig()) ;
 		int currentYear = uspModule.getYear();
 		
 		String saveDirectory = "run" + currentYear;
@@ -85,19 +91,19 @@ public class BackupMATSimOutput {
 				FileCopy.fileCopy(new File(InternalConstants.MATSIM_4_OPUS_TEMP + Zone2ZoneImpedancesControlerListener.FILE_NAME), new File(savePath + Zone2ZoneImpedancesControlerListener.FILE_NAME) );
 			
 			// backup plotting files free speed
-			String fileName = AccessibilityControlerListenerImpl.FREESEED_FILENAME + (double)m4ucModule.getCellSizeCellBasedAccessibility() + InternalConstants.FILE_TYPE_TXT;
+			String fileName = AccessibilityControlerListenerImpl.FREESEED_FILENAME + (double)acm.getCellSizeCellBasedAccessibility() + InternalConstants.FILE_TYPE_TXT;
 			if( new File(InternalConstants.MATSIM_4_OPUS_TEMP + fileName).exists() )
 				FileCopy.fileCopy(new File(InternalConstants.MATSIM_4_OPUS_TEMP + fileName), new File(savePath + fileName) );
 			// backup plotting files for car
-			fileName = AccessibilityControlerListenerImpl.CAR_FILENAME + (double)m4ucModule.getCellSizeCellBasedAccessibility() + InternalConstants.FILE_TYPE_TXT;
+			fileName = AccessibilityControlerListenerImpl.CAR_FILENAME + (double)acm.getCellSizeCellBasedAccessibility() + InternalConstants.FILE_TYPE_TXT;
 			if( new File(InternalConstants.MATSIM_4_OPUS_TEMP + fileName).exists() )
 				FileCopy.fileCopy(new File(InternalConstants.MATSIM_4_OPUS_TEMP + fileName), new File(savePath + fileName) );
 			// backup plotting files for bike
-			fileName = AccessibilityControlerListenerImpl.BIKE_FILENAME + (double)m4ucModule.getCellSizeCellBasedAccessibility() + InternalConstants.FILE_TYPE_TXT;
+			fileName = AccessibilityControlerListenerImpl.BIKE_FILENAME + (double)acm.getCellSizeCellBasedAccessibility() + InternalConstants.FILE_TYPE_TXT;
 			if( new File(InternalConstants.MATSIM_4_OPUS_TEMP + fileName).exists() )
 				FileCopy.fileCopy(new File(InternalConstants.MATSIM_4_OPUS_TEMP + fileName), new File(savePath + fileName) );
 			// backup plotting files for walk
-			fileName = AccessibilityControlerListenerImpl.WALK_FILENAME + (double)m4ucModule.getCellSizeCellBasedAccessibility() + InternalConstants.FILE_TYPE_TXT;
+			fileName = AccessibilityControlerListenerImpl.WALK_FILENAME + (double)acm.getCellSizeCellBasedAccessibility() + InternalConstants.FILE_TYPE_TXT;
 			if( new File(InternalConstants.MATSIM_4_OPUS_TEMP + fileName).exists() )
 				FileCopy.fileCopy(new File(InternalConstants.MATSIM_4_OPUS_TEMP + fileName), new File(savePath + fileName) );
 		} catch (Exception e) {

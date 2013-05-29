@@ -82,9 +82,6 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 	static final boolean BRUSSELS_SCENARIO_MODIFY_NETWORK = true ;
 	static final boolean BRUSSELS_SCENARIO_CALCULATE_ZONE2ZONE_MATRIX = false ;
 
-	static final boolean BRUSSELS_SCENARIO_CALCULATE_GRID_ACCESSIBILITIES = false ;
-	// I don't think this is working (although it should, IMO). kai, may'13
-
 	/**
 	 * constructor
 	 * 

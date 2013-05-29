@@ -108,7 +108,21 @@ public class M4USimConfigurationConverterV4 {
 	 */
 	public boolean init(){
 		
+		// I currently (may'13) think that the sequence should be as follows:
+		// * create empty config with matsim defaults and possibly some additional m4u defaults
+		// * read and insert config from urbansim
+		// * read and insert config from matsim
+		// * interpret the config at this point (e.g. "useBetasFromMATSim")
+		// * config consistency checking
+		// Currently, they are all mixed.
+		//
+		// yyyy Stellt sich heraus, dass das so nicht geht: Z.B. flowCap, storCap basierend auf sample rate will man _vor_ und
+		// nicht _nach_ der external config automagisch setzen.
+		
 		try{
+			// creates an empty config to be filled by settings from the MATSim4UrbanSim and external config files
+			this.config = M4UConfigUtils.createEmptyConfigWithSomeDefaults();
+
 			// get root elements from JAXB matsim4urbansim config object
 			ConfigType matsim4urbansimConfigPart1 = matsim4urbansimConfig.getConfig();
 			Matsim4UrbansimType matsim4urbansimConfigPart2 = matsim4urbansimConfig.getMatsim4Urbansim();
@@ -116,13 +130,11 @@ public class M4USimConfigurationConverterV4 {
 			// loads the external MATSim config separately (to get additional MATSim4UrbanSim parameters)
 			Module matsim4urbansimConfigPart3 = M4UConfigUtils.getM4UModuleFromExternalConfig(matsim4urbansimConfigPart1.getMatsimConfig().getInputFile());
 
-			// creates an empty config to be filled by settings from the MATSim4UrbanSim and external config files
-			this.config = M4UConfigUtils.createEmptyConfigWithSomeDefaults();
-
 			M4UConfigUtils.initUrbanSimParameter(matsim4urbansimConfigPart2, matsim4urbansimConfigPart3, config);
 			M4UConfigUtils.initMATSim4UrbanSimControler(matsim4urbansimConfigPart2, matsim4urbansimConfigPart3, config);
 			M4UAccessibilityConfigUtils.initAccessibilityParameters(matsim4urbansimConfigPart2, config);
 			
+//<<<<<<< HEAD
 //<<<<<<< HEAD
 //			MATSim4UrbanSimConfigUtils.initNetwork(matsim4urbansimConfigPart1, config);
 //			MATSim4UrbanSimConfigUtils.initInputPlansFile(matsim4urbansimConfigPart1, config);
@@ -139,13 +151,21 @@ public class M4USimConfigurationConverterV4 {
 ////			MATSim4UrbanSimConfigUtils.initPlanCalcRoute(config);
 //			MATSim4UrbanSimConfigUtils.initQSim(matsim4urbansimConfig, config);
 //=======
-			M4UConfigUtils.initNetwork(matsim4urbansimConfigPart1, config);
-			M4UConfigUtils.initInputPlansFile(matsim4urbansimConfigPart1, config);
-			M4UConfigUtils.initControler(matsim4urbansimConfigPart1, config);
-			M4UConfigUtils.initPlanCalcScore(matsim4urbansimConfigPart1, config);
-			M4UConfigUtils.initStrategy(matsim4urbansimConfigPart1, config);
+//			M4UConfigUtils.initNetwork(matsim4urbansimConfigPart1, config);
+//			M4UConfigUtils.initInputPlansFile(matsim4urbansimConfigPart1, config);
+//			M4UConfigUtils.initControler(matsim4urbansimConfigPart1, config);
+//			M4UConfigUtils.initPlanCalcScore(matsim4urbansimConfigPart1, config);
+//			M4UConfigUtils.initStrategy(matsim4urbansimConfigPart1, config);
+//=======
+			M4UConfigUtils.insertNetworkParams(matsim4urbansimConfigPart1, config); // ok (on moving info from m4uPart1 to config). kai, may'13
+			M4UConfigUtils.insertPlansParams(matsim4urbansimConfigPart1, config); // yyyy can't fix (don't understand). kai, may'13
+			M4UConfigUtils.initControler(matsim4urbansimConfigPart1, config); // yyyy can't fix since it is using static variables.  kai, may'13 
+			M4UConfigUtils.insertPlanCalcScoreParams(matsim4urbansimConfigPart1, config); // ok.  kai, may'13
+			M4UConfigUtils.insertStrategyParams(matsim4urbansimConfigPart1, config); // yyyy can't fix: It is trying to do something to a possible 
+			// 4th strategy although that is not yet there at this point in time.
+//>>>>>>> some intermediate state
 
-			M4UConfigUtils.initPlanCalcRoute(config);
+//			M4UConfigUtils.initPlanCalcRoute(config);
 			M4UConfigUtils.initQSim(matsim4urbansimConfig, config);
 //>>>>>>> bringing accessibility config closer to matsim standards
 			
@@ -153,9 +173,10 @@ public class M4USimConfigurationConverterV4 {
 			// overlapping parameter settings (in MATSim4UrbanSim and external MATSim config)
 			// are overwritten by the external MATSim settings
 			
-			log.error("yyyyyy this will now load a lot of _null_ into the accessibility config") ;
-			
 			M4UConfigUtils.loadExternalConfigAndOverwriteMATSim4UrbanSimSettings(matsim4urbansimConfigPart1, config);
+			// (by the design of the matsim xml config reader, this over-writes only entries which are explicitly mentioned
+			// in the external config)
+			// yyyyyy Funktioniert allerdings nicht mit den "nicht ausprogrammierten" config groups!!!! kai, may'13
 			
 //			// show final settings
 			// (these are not visible in the matsim config dump :-( :-( and thus need to be done separately. kai, apr'13)

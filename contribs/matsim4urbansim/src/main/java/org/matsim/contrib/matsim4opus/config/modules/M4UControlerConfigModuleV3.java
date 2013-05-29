@@ -20,7 +20,7 @@
 /**
  * 
  */
-package org.matsim.contrib.matsim4opus.config;
+package org.matsim.contrib.matsim4opus.config.modules;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -38,16 +38,6 @@ public class M4UControlerConfigModuleV3 extends Module{
 	private boolean agentPerformance;
 	private boolean zoneBasedAccessibility;
 	private boolean cellBasedAccessibility;
-	private int cellSizeCellBasedAccessibility;
-	private boolean isCellBasedAccessibilityNetwork;
-	private boolean isCellbasedAccessibilityShapeFile;
-	private String shapeFileCellBasedAccessibility;
-	private boolean usingCustomBoundingBox;
-	private double boundingBoxTop;
-	private double boundingBoxLeft;
-    private double boundingBoxRight;
-    private double boundingBoxBottom;
-    private double timeOfDay;
     private String ptStopsInputFile;
     private String ptTravelTimesInputFile;
     private String ptTravelDistancesInputFile;
@@ -55,9 +45,9 @@ public class M4UControlerConfigModuleV3 extends Module{
     private boolean isWarmStart;
     private Boolean isHotStart;
     private String hotStartTargetLocation;
-
-	public M4UControlerConfigModuleV3(String name) {
-		super(name);
+    
+	public M4UControlerConfigModuleV3() {
+		super(GROUP_NAME);
 		this.isColdStart = false;
 		this.isWarmStart = false;
 		this.isHotStart	 = false;
@@ -117,86 +107,6 @@ public class M4UControlerConfigModuleV3 extends Module{
 
     public void setCellBasedAccessibility(boolean value) {
         this.cellBasedAccessibility = value;
-    }
-    
-    public boolean isCellBasedAccessibilityShapeFile() {
-        return this.isCellbasedAccessibilityShapeFile;
-    }
-
-    public void setCellBasedAccessibilityShapeFile(boolean value) {
-        this.isCellbasedAccessibilityShapeFile = value;
-    }
-
-    public boolean isCellBasedAccessibilityNetwork() {
-        return this.isCellBasedAccessibilityNetwork;
-    }
-
-    public void setCellBasedAccessibilityNetwork(boolean value) {
-        this.isCellBasedAccessibilityNetwork = value;
-    }
-
-    public int getCellSizeCellBasedAccessibility() {
-        return this.cellSizeCellBasedAccessibility;
-    }
-
-    public void setCellSizeCellBasedAccessibility(int value) {
-        this.cellSizeCellBasedAccessibility = value;
-    }
-
-    public String getShapeFileCellBasedAccessibility() {
-        return this.shapeFileCellBasedAccessibility;
-    }
-
-    public void setShapeFileCellBasedAccessibility(String value) {
-        this.shapeFileCellBasedAccessibility = value;
-    }
-
-    public boolean usingCustomBoundingBox() {
-        return this.usingCustomBoundingBox;
-    }
-
-    public void setUsingCustomBoundingBox(boolean value) {
-        this.usingCustomBoundingBox = value;
-    }
-
-    public double getBoundingBoxTop() {
-        return this.boundingBoxTop;
-    }
-
-    public void setBoundingBoxTop(double value) {
-        this.boundingBoxTop = value;
-    }
-
-    public double getBoundingBoxLeft() {
-        return this.boundingBoxLeft;
-    }
-
-    public void setBoundingBoxLeft(double value) {
-        this.boundingBoxLeft = value;
-    }
-
-    public double getBoundingBoxRight() {
-        return this.boundingBoxRight;
-    }
-
-    public void setBoundingBoxRight(double value) {
-        this.boundingBoxRight = value;
-    }
-
-    public double getBoundingBoxBottom() {
-        return this.boundingBoxBottom;
-    }
-
-    public void setBoundingBoxBottom(double value) {
-        this.boundingBoxBottom = value;
-    }
-    
-    public void setTimeOfDay(double time){
-    	this.timeOfDay = time;
-    }
-    
-    public double getTimeOfDay(){
-    	return this.timeOfDay;
     }
     
     public void setPtStopsInputFile(String ptStops){

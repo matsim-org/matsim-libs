@@ -29,6 +29,9 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigModule;
+import org.matsim.contrib.matsim4opus.config.modules.M4UControlerConfigModuleV3;
+import org.matsim.contrib.matsim4opus.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4opus.constants.InternalConstants;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.jaxbconfig2.ConfigType;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.jaxbconfig2.Matsim4UrbansimType;
@@ -96,23 +99,23 @@ public class M4UConfigUtils {
 
 		// ===
 
-		double timeOfDay						= 8 * 3600.; // default value
+//		double timeOfDay						= 8 * 3600.; // default value
 		String ptStops							= null;
 		String ptTravelTimes					= null;
 		String ptTravelDistances				= null;
 		if(matsim4urbansimModule != null){
-			try{
-				double tmp = Double.parseDouble( matsim4urbansimModule.getValue(AccessibilityConfigModule.TIME_OF_DAY) );
-				log.info("Found custom time of day for accessibility calculation: " + tmp );
-				timeOfDay = tmp;
-			} catch(Exception e){
-				log.info("No time of day for accessibility calulation given or given time has wrong format.");
-				log.info("By default, MATSim calulates accessibilities for the following time of day: " + timeOfDay );
-				log.info("In order to use another time of day enter it in the external MATSim config file as follows:");
-				log.info("<module name=\"matsim4urbansimParameter\" >");
-				log.info("<param name=\"timeOfDay\" value=\"28800\" />");
-				log.info("</module>");
-			}
+//			try{
+//				double tmp = Double.parseDouble( matsim4urbansimModule.getValue(M4UControlerConfigModuleV3.TIME_OF_DAY) );
+//				log.info("Found custom time of day for accessibility calculation: " + tmp );
+//				timeOfDay = tmp;
+//			} catch(Exception e){
+//				log.info("No time of day for accessibility calulation given or given time has wrong format.");
+//				log.info("By default, MATSim calulates accessibilities for the following time of day: " + timeOfDay );
+//				log.info("In order to use another time of day enter it in the external MATSim config file as follows:");
+//				log.info("<module name=\"matsim4urbansimParameter\" >");
+//				log.info("<param name=\"timeOfDay\" value=\"28800\" />");
+//				log.info("</module>");
+//			}
 
 			// check if pseudo pt should be used
 			if( matsim4urbansimModule.getValue( PT_STOPS_SWITCH ) != null && 
@@ -158,19 +161,22 @@ public class M4UConfigUtils {
 		module.setZone2ZoneImpedance(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isZone2ZoneImpedance());
 		module.setZoneBasedAccessibility(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isZoneBasedAccessibility());
 		module.setCellBasedAccessibility(computeCellBasedAccessibility);
-		module.setCellSizeCellBasedAccessibility(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().getCellSizeCellBasedAccessibility().intValue());
-		module.setCellBasedAccessibilityShapeFile(computeCellbasedAccessibilityShapeFile);
-		module.setCellBasedAccessibilityNetwork(computeCellBasedAccessibilityNetwork);
-		module.setShapeFileCellBasedAccessibility(shapeFile);
-		module.setUsingCustomBoundingBox(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isUseCustomBoundingBox());
-		module.setBoundingBoxLeft(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().getBoundingBoxLeft());
-		module.setBoundingBoxBottom(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().getBoundingBoxBottom());
-		module.setBoundingBoxRight(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().getBoundingBoxRight());
-		module.setBoundingBoxTop(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().getBoundingBoxTop());
-		module.setTimeOfDay(timeOfDay);
+
 		module.setPtStopsInputFile(ptStops);
 		module.setPtTravelTimesInputFile(ptTravelTimes);
 		module.setPtTravelDistancesInputFile(ptTravelDistances);
+		
+		AccessibilityConfigModule acm = M4UAccessibilityConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
+//		acm.setTimeOfDay(timeOfDay) ;
+		acm.setUsingCustomBoundingBox(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isUseCustomBoundingBox());
+		acm.setBoundingBoxLeft(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().getBoundingBoxLeft());
+		acm.setBoundingBoxBottom(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().getBoundingBoxBottom());
+		acm.setBoundingBoxRight(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().getBoundingBoxRight());
+		acm.setBoundingBoxTop(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().getBoundingBoxTop());
+		acm.setCellSizeCellBasedAccessibility(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().getCellSizeCellBasedAccessibility().intValue());
+		acm.setCellBasedAccessibilityShapeFile(computeCellbasedAccessibilityShapeFile);
+		acm.setCellBasedAccessibilityNetwork(computeCellBasedAccessibilityNetwork);
+		acm.setShapeFileCellBasedAccessibility(shapeFile);
 	}
 
 	/**
@@ -252,7 +258,7 @@ public class M4UConfigUtils {
 	 * @param matsim4urbansimConfigPart1
 	 * @throws UncheckedIOException
 	 */
-	static Module getM4UModuleFromExternalConfig(String externalMATSimConfigFilename) throws UncheckedIOException {
+	 static Module getM4UModuleFromExternalConfig(String externalMATSimConfigFilename) throws UncheckedIOException {
 
 		if(externalMATSimConfigFilename != null && Paths.pathExsits(externalMATSimConfigFilename)){
 			Config tempConfig = ConfigUtils.loadConfig( externalMATSimConfigFilename.trim() );
@@ -280,16 +286,17 @@ public class M4UConfigUtils {
 	 * @param matsimParameter
 	 * @param config TODO
 	 */
-	static void initNetwork(ConfigType matsimParameter, Config config){
+	static void insertNetworkParams(ConfigType matsimParameter, Config config){
 		log.info("Setting NetworkConfigGroup to config...");
 		String networkFile = matsimParameter.getNetwork().getInputFile();
 		if( !networkFile.isEmpty() )  // the MATSim4UrbanSim config contains a network file
 			config.network().setInputFile( networkFile );
-		else
-			throw new RuntimeException("Missing MATSim network! The network must be specified either directly in the " +
-					"MATSim4UrbanSim configuration or in an external MATSim configuration.");
-
-		// yyyyyy ???  Aber es gibt die exception doch auch, wenn es in der external matsim config gesetzt ist? kai, apr'13
+//		else
+//			throw new RuntimeException("Missing MATSim network! The network must be specified either directly in the " +
+//					"MATSim4UrbanSim configuration or in an external MATSim configuration.");
+//
+//		// yyyyyy ???  Aber es gibt die exception doch auch, wenn es in der external matsim config gesetzt ist? kai, apr'13
+		// moved to consistency checker. kai, may'13
 
 		log.info("...done!");
 	}
@@ -300,7 +307,7 @@ public class M4UConfigUtils {
 	 * @param matsimParameter
 	 * @param config TODO
 	 */
-	static void initInputPlansFile(ConfigType matsimParameter, Config config){
+	static void insertPlansParams(ConfigType matsimParameter, Config config){
 		log.info("Checking for warm or hot start...");
 		// get plans file for hot start
 		String hotStart = matsimParameter.getHotStartPlansFile().getInputFile();
@@ -360,17 +367,19 @@ public class M4UConfigUtils {
 		log.info("Setting ControlerConfigGroup to config...");
 		int firstIteration = matsimParameter.getControler().getFirstIteration().intValue();
 		int lastIteration = matsimParameter.getControler().getLastIteration().intValue();
-		ControlerConfigGroup controlerCG = (ControlerConfigGroup) config.getModule(ControlerConfigGroup.GROUP_NAME);
+		ControlerConfigGroup controlerCG = config.controler() ;
 		// set values
 		controlerCG.setFirstIteration( firstIteration );
 		controlerCG.setLastIteration( lastIteration);
 		controlerCG.setOutputDirectory( InternalConstants.MATSIM_4_OPUS_OUTPUT );
+		// yyyy don't use static variables (this is a variable albeit it claims to be a constant).  kai, may'13
 
-		controlerCG.setSnapshotFormat(Arrays.asList("otfvis"));
+//		controlerCG.setSnapshotFormat(Arrays.asList("otfvis")); // I don't think that this is necessary.  kai, may'13
 		controlerCG.setWriteSnapshotsInterval( 0 ); // disabling snapshots
 
 		// set Qsim
 		controlerCG.setMobsim(QSimConfigGroup.GROUP_NAME);
+		// yyyy if we do this, do we not get a warning that we should also put in a corresponding config group?  Maybe done later ...
 
 		log.info("...done!");
 	}
@@ -381,7 +390,7 @@ public class M4UConfigUtils {
 	 * @param matsimParameter
 	 * @param config TODO
 	 */
-	static void initPlanCalcScore(ConfigType matsimParameter, Config config){
+	static void insertPlanCalcScoreParams(ConfigType matsimParameter, Config config){
 		log.info("Setting PlanCalcScore to config...");
 		String activityType_0 = matsimParameter.getPlanCalcScore().getActivityType0();
 		String activityType_1 = matsimParameter.getPlanCalcScore().getActivityType1();
@@ -462,45 +471,46 @@ public class M4UConfigUtils {
 		// setting StorageCapFactor
 		qsimCG.setStorageCapFactor( popSampling * storageCapCorrectionFactor );	
 
-		boolean removeStuckVehicles = false;
-		qsimCG.setRemoveStuckVehicles( removeStuckVehicles );
+		qsimCG.setRemoveStuckVehicles( false );
 		qsimCG.setStuckTime(10.);
 		qsimCG.setEndTime(30.*3600.); // 30h
 
 		log.info("...done!");
 	}
 
-	/**
-	 * setting walk speed in plancalcroute
-	 * @param config TODO
-	 */
-	static void initPlanCalcRoute(Config config){
-		log.info("Setting PlanCalcRouteGroup to config...");
-
-		double defaultWalkSpeed = 1.38888889; 	// 1.38888889m/s corresponds to 5km/h -- alternatively: use 0.833333333333333m/s corresponds to 3km/h
-		double defaultBicycleSpeed = 4.16666666;// 4.16666666m/s corresponds to 15 km/h
-		double defaultPtSpeed 	= 6.94444444;	// 6.94444444m/s corresponds to 25 km/h
-
-		//  log.error( "ignoring any external default speeds for walk/bicycle/pt and using internal values.  fix!!" ) ;
-		//  this is not a problem since the complete config is overwritten by the external config at the very end.
-
-		/*
-		 * To me this seems to be a problem. PlansCalcRoute is intialized with some defaults. Using the direct setters will NOT clear
-		 * the defaults, but only add the new values. E.g. the for pt the default is FreespeedFactor. Daniel, May '13
-		 */
-		// setting teleportation speeds in router
-		config.plansCalcRoute().setWalkSpeed( defaultWalkSpeed ); 
-		config.plansCalcRoute().setBikeSpeed( defaultBicycleSpeed );
-		config.plansCalcRoute().setPtSpeed( defaultPtSpeed );
-
-		log.info("...done!");
-	}
+//	/**
+//	 * setting walk speed in plancalcroute
+//	 * @param config TODO
+//	 */
+//	static void initPlanCalcRoute(Config config){
+//		log.info("Setting PlanCalcRouteGroup to config...");
+//
+//		double defaultWalkSpeed = 1.38888889; 	// 1.38888889m/s corresponds to 5km/h -- alternatively: use 0.833333333333333m/s corresponds to 3km/h
+//		double defaultBicycleSpeed = 4.16666666;// 4.16666666m/s corresponds to 15 km/h
+//		double defaultPtSpeed 	= 6.94444444;	// 6.94444444m/s corresponds to 25 km/h
+//
+//		//  log.error( "ignoring any external default speeds for walk/bicycle/pt and using internal values.  fix!!" ) ;
+//		//  this is not a problem since the complete config is overwritten by the external config at the very end.
+//
+//		/*
+//		 * To me this seems to be a problem. PlansCalcRoute is intialized with some defaults. Using the direct setters will NOT clear
+//		 * the defaults, but only add the new values. E.g. the for pt the default is FreespeedFactor. Daniel, May '13
+//		 * yyyyyy This silently does something to the matsim default values.  "silently" is not good.  Do we need this at all
+//		 * (except maybe for backwards compatability)?  Kai, may'13
+//		 */
+//		// setting teleportation speeds in router
+//		config.plansCalcRoute().setWalkSpeed( defaultWalkSpeed ); 
+//		config.plansCalcRoute().setBikeSpeed( defaultBicycleSpeed );
+//		config.plansCalcRoute().setPtSpeed( defaultPtSpeed );
+//
+//		log.info("...done!");
+//	}
 
 	/**
 	 * setting strategy
 	 * @param config TODO
 	 */
-	static void initStrategy(ConfigType matsim4urbansimConfig, Config config){
+	static void insertStrategyParams(ConfigType matsim4urbansimConfig, Config config){
 		log.info("Setting StrategyConfigGroup to config...");
 
 		// some modules are disables after 80% of overall iterations, 
@@ -579,7 +589,7 @@ public class M4UConfigUtils {
 		config.addModule(UrbanSimParameterConfigModuleV3.GROUP_NAME, 
 				new UrbanSimParameterConfigModuleV3(UrbanSimParameterConfigModuleV3.GROUP_NAME) ) ;
 		config.addModule(M4UControlerConfigModuleV3.GROUP_NAME,
-				new M4UControlerConfigModuleV3(M4UControlerConfigModuleV3.GROUP_NAME));
+				new M4UControlerConfigModuleV3());
 		config.addModule(AccessibilityConfigModule.GROUP_NAME,
 				new AccessibilityConfigModule()) ;
 
@@ -612,7 +622,7 @@ public class M4UConfigUtils {
 		return matsim4urbansimConfig;
 	}
 
-	static UrbanSimParameterConfigModuleV3 getUrbanSimParameterConfigAndPossiblyConvert(Config config) {
+	public static UrbanSimParameterConfigModuleV3 getUrbanSimParameterConfigAndPossiblyConvert(Config config) {
 		Module m = config.getModule(UrbanSimParameterConfigModuleV3.GROUP_NAME);
 		if (m instanceof UrbanSimParameterConfigModuleV3) {
 			return (UrbanSimParameterConfigModuleV3) m;
@@ -626,12 +636,12 @@ public class M4UConfigUtils {
 		return upcm;
 	}
 
-	static M4UControlerConfigModuleV3 getMATSim4UrbaSimControlerConfigAndPossiblyConvert(Config config) {
+	public static M4UControlerConfigModuleV3 getMATSim4UrbaSimControlerConfigAndPossiblyConvert(Config config) {
 		Module m = config.getModule(M4UControlerConfigModuleV3.GROUP_NAME);
 		if (m instanceof M4UControlerConfigModuleV3) {
 			return (M4UControlerConfigModuleV3) m;
 		}
-		M4UControlerConfigModuleV3 mccm = new M4UControlerConfigModuleV3(M4UControlerConfigModuleV3.GROUP_NAME);
+		M4UControlerConfigModuleV3 mccm = new M4UControlerConfigModuleV3();
 		//		config.getModules().put(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME, mccm);
 		// yyyyyy the above code does NOT convert but throws the config entries away.
 		// In contrast, config.addModule(...) would convert.  kai, may'13
@@ -695,16 +705,16 @@ public class M4UConfigUtils {
 		log.info("Compute Agent-performance: " + module.isAgentPerformance() );
 		log.info("Compute Zone2Zone Impedance Matrix: " + module.isZone2ZoneImpedance() ); 
 		log.info("Compute Zone-Based Accessibilities: " + module.isZoneBasedAccessibility() );
-		log.info("Compute Parcel/Cell-Based Accessibilities (using ShapeFile): " + module.isCellBasedAccessibilityShapeFile() ); 
-		log.info("Compute Parcel/Cell-Based Accessibilities (using Network Boundaries): " + module.isCellBasedAccessibilityNetwork() );
-		log.info("Cell Size: " + module.getCellSizeCellBasedAccessibility() );
-		log.info("Using (Custom) Network Boundaries: " + module.usingCustomBoundingBox() );
-		log.info("Network Boundary (Top): " + module.getBoundingBoxTop() ); 
-		log.info("Network Boundary (Left): " + module.getBoundingBoxLeft() ); 
-		log.info("Network Boundary (Right): " + module.getBoundingBoxRight() ); 
-		log.info("Network Boundary (Bottom): " + module.getBoundingBoxBottom() ); 
-		log.info("Shape File: " + module.getShapeFileCellBasedAccessibility() );
-		log.info("Time of day: " + module.getTimeOfDay() );
+//		log.info("Compute Parcel/Cell-Based Accessibilities (using ShapeFile): " + module.isCellBasedAccessibilityShapeFile() ); 
+//		log.info("Compute Parcel/Cell-Based Accessibilities (using Network Boundaries): " + module.isCellBasedAccessibilityNetwork() );
+//		log.info("Cell Size: " + module.getCellSizeCellBasedAccessibility() );
+//		log.info("Using (Custom) Network Boundaries: " + module.usingCustomBoundingBox() );
+//		log.info("Network Boundary (Top): " + module.getBoundingBoxTop() ); 
+//		log.info("Network Boundary (Left): " + module.getBoundingBoxLeft() ); 
+//		log.info("Network Boundary (Right): " + module.getBoundingBoxRight() ); 
+//		log.info("Network Boundary (Bottom): " + module.getBoundingBoxBottom() ); 
+//		log.info("Shape File: " + module.getShapeFileCellBasedAccessibility() );
+//		log.info("Time of day: " + module.getTimeOfDay() );
 		log.info("Pt Stops Input File: " + module.getPtStopsInputFile());
 		log.info("Pt Travel Times Input File: " + module.getPtTravelTimesInputFile());
 		log.info("Pt travel Distances Input File: " + module.getPtTravelDistancesInputFile());

@@ -20,7 +20,7 @@
 /**
  * 
  */
-package org.matsim.contrib.matsim4opus.config;
+package org.matsim.contrib.matsim4opus.config.modules;
 
 import org.matsim.core.config.experimental.ReflectiveModule;
 

@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.matsim4opus.config;
+package org.matsim.contrib.matsim4opus.config.modules;
 
 import java.util.Map;
 import java.util.TreeMap;
@@ -28,6 +28,10 @@ import org.matsim.core.config.experimental.ReflectiveModule;
 public class AccessibilityConfigModule extends ReflectiveModule{
 	// yyyy todo: change in similar way as with other modes ("_mode") 
 	
+	private static final String USING_CUSTOM_BOUNDING_BOX = "usingCustomBoundingBox";
+
+	private static final String BOUNDING_BOX_BOTTOM = "boundingBoxBottom";
+
 	@SuppressWarnings("unused")
 	private static Logger log = Logger.getLogger( AccessibilityConfigModule.class ) ;
 
@@ -54,14 +58,27 @@ public class AccessibilityConfigModule extends ReflectiveModule{
 	private static final String USING_LOGIT_SCALE_PARAMETER_FROM_MATSIM = "usingScaleParameterFromMATSim" ;
 	private Boolean usingLogitScaleParameterFromMATSim;
 	
-	private Boolean usingCarParameterFromMATSim;
-	private Boolean usingBikeParameterFromMATSim;
-	private Boolean usingWalkParameterFromMATSim;
-	private Boolean usingPtParameterFromMATSim;
+	private Boolean usingCarParameterFromMATSim = true ;
+	private Boolean usingBikeParameterFromMATSim = true ;
+	private Boolean usingWalkParameterFromMATSim = true ;
+	private Boolean usingPtParameterFromMATSim = true ;
     
-	private Boolean usingRawSumsWithoutLn;
+	private Boolean usingRawSumsWithoutLn = false ;
     
 	private Double logitScaleParameter;
+	
+	private boolean usingCustomBoundingBox;
+	private double boundingBoxTop;
+	private double boundingBoxLeft;
+    private double boundingBoxRight;
+    private double boundingBoxBottom;
+	
+	private int cellSizeCellBasedAccessibility;
+	private boolean isCellBasedAccessibilityNetwork;
+	private boolean isCellbasedAccessibilityShapeFile;
+	private String shapeFileCellBasedAccessibility;
+
+	// ===
     
 	private Double betaCarTravelTime;
 	private Double betaCarTravelTimePower2;
@@ -104,7 +121,7 @@ public class AccessibilityConfigModule extends ReflectiveModule{
 	private Double betaPtLnTravelMonetrayCost;
 
 	public static final String TIME_OF_DAY = "timeOfDay";
-	private Double timeOfDay;
+	private Double timeOfDay = 8.*3600 ;
 
 	public AccessibilityConfigModule() {
 		super(GROUP_NAME);
@@ -121,10 +138,17 @@ public class AccessibilityConfigModule extends ReflectiveModule{
 		map.put(ACCESSIBILITY_DESTINATION_SAMPLING_RATE, "if only a sample of destinations should be used " +
 				"(reduces accuracy -- not recommended except when necessary for computational speed reasons)" ) ;
 		
-		map.put(USING_LOGIT_SCALE_PARAMETER_FROM_MATSIM, "if you want the logit model scale parameter in the " +
+		map.put(USING_LOGIT_SCALE_PARAMETER_FROM_MATSIM, "false if you want the logit model scale parameter in the " +
 				"accessibility computation different from the one in the travel model.  May be useful if you know what you are doing") ;
-		
+		map.put(LOGIT_SCALE_PARAMETER, "logit scale parameter for accessibility computation (if enabled)") ;
+
 		map.put(USING_BIKE_PARAMETERS_FROM_MATSIM, "set to false if you want to enable using other parameters for the " +
+				"accessibility computation than for the travel model.  not recommended" ) ;
+		map.put(USING_CAR_PARAMETERS_FROM_MATSIM, "set to false if you want to enable using other parameters for the " +
+				"accessibility computation than for the travel model.  not recommended" ) ;
+		map.put(USING_PT_PARAMETERS_FROM_MATSIM, "set to false if you want to enable using other parameters for the " +
+				"accessibility computation than for the travel model.  not recommended" ) ;
+		map.put(USING_WALK_PARAMETERS_FROM_MATSIM, "set to false if you want to enable using other parameters for the " +
 				"accessibility computation than for the travel model.  not recommended" ) ;
 		
 		map.put(BETA_CAR_LN_MONETARY_TRAVEL_COST,"car parameters for accessibility computation. separate from parameters for travel model") ;
@@ -135,12 +159,49 @@ public class AccessibilityConfigModule extends ReflectiveModule{
 		map.put(USING_RAW_SUMS_WITHOUT_LN, "econometric accessibility usually returns the logsum. " +
 				"Set to true if you just want the sum (without the ln)") ;
 		
+		map.put(USING_CUSTOM_BOUNDING_BOX, "true if custom bounding box should be used for accessibility computation (otherwise e.g. extent of network will be used)") ;
+		map.put(BOUNDING_BOX_BOTTOM,"custom bounding box parameters for accessibility computation (if enabled)") ;
+		
+		
 		return map ;
 	}
 	
 	// NOTE: It seems ok to have the string constants immediately here since having them separately really does not help
 	// keeping the code compact
 	
+	@StringGetter("usingShapeFileForExtentOfAccessibilityComputation")
+    public boolean isCellBasedAccessibilityShapeFile() {
+        return this.isCellbasedAccessibilityShapeFile;
+    }
+	@StringSetter("usingShapeFileForExtentOfAccessibilityComputation")
+    public void setCellBasedAccessibilityShapeFile(boolean value) {
+        this.isCellbasedAccessibilityShapeFile = value;
+    }
+	@StringGetter("usingNetworkForExtentOfAccessibilityComputation")
+    public boolean isCellBasedAccessibilityNetwork() {
+        return this.isCellBasedAccessibilityNetwork;
+    }
+	@StringSetter("usingNetworkForExtentOfAccessibilityComputation")
+    public void setCellBasedAccessibilityNetwork(boolean value) {
+        this.isCellBasedAccessibilityNetwork = value;
+    }
+	@StringGetter("cellSizeForCellBasedAccessibility") 
+    public int getCellSizeCellBasedAccessibility() {
+        return this.cellSizeCellBasedAccessibility;
+    }
+	@StringSetter("cellSizeForCellBasedAccessibility")  // size in meters (whatever that is since the coord system does not know about meters)
+    public void setCellSizeCellBasedAccessibility(int value) {
+        this.cellSizeCellBasedAccessibility = value;
+    }
+	@StringGetter("extentOfAccessibilityComputationShapeFile")
+    public String getShapeFileCellBasedAccessibility() {
+        return this.shapeFileCellBasedAccessibility;
+    }
+	@StringSetter("extentOfAccessibilityComputationShapeFile")
+    public void setShapeFileCellBasedAccessibility(String value) {
+        this.shapeFileCellBasedAccessibility = value;
+    }
+
 	@StringGetter(TIME_OF_DAY)
 	public Double getTimeOfDay() {
 		return this.timeOfDay ;
@@ -215,6 +276,47 @@ public class AccessibilityConfigModule extends ReflectiveModule{
         this.logitScaleParameter = value;
     }
     // === 
+    @StringGetter(USING_CUSTOM_BOUNDING_BOX)
+    public boolean usingCustomBoundingBox() {
+        return this.usingCustomBoundingBox;
+    }
+    @StringSetter(USING_CUSTOM_BOUNDING_BOX)
+    public void setUsingCustomBoundingBox(boolean value) {
+        this.usingCustomBoundingBox = value;
+    }
+    @StringGetter("boundingBoxTop")
+    public double getBoundingBoxTop() {
+        return this.boundingBoxTop;
+    }
+    @StringSetter("boundingBoxTop")
+    public void setBoundingBoxTop(double value) {
+        this.boundingBoxTop = value;
+    }
+    @StringGetter("boundingBoxLeft")
+    public double getBoundingBoxLeft() {
+        return this.boundingBoxLeft;
+    }
+    @StringSetter("boundingBoxLeft")
+    public void setBoundingBoxLeft(double value) {
+        this.boundingBoxLeft = value;
+    }
+    @StringGetter("boundingBoxRight")
+    public double getBoundingBoxRight() {
+        return this.boundingBoxRight;
+    }
+    @StringSetter("boundingBoxRight")
+    public void setBoundingBoxRight(double value) {
+        this.boundingBoxRight = value;
+    }
+    @StringGetter(BOUNDING_BOX_BOTTOM)
+    public double getBoundingBoxBottom() {
+        return this.boundingBoxBottom;
+    }
+    @StringSetter(BOUNDING_BOX_BOTTOM)
+    public void setBoundingBoxBottom(double value) {
+        this.boundingBoxBottom = value;
+    }
+    // ===
     // only betas below this line
     @StringGetter("betaCarTravelTime")
     public Double getBetaCarTravelTime() {
