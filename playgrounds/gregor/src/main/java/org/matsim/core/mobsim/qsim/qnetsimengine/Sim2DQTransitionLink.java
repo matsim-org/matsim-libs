@@ -31,9 +31,19 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.vis.snapshotwriters.VisData;
 
+import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.Segment;
+
 public class Sim2DQTransitionLink extends QLinkInternalI{
 	
 	private final QLinkImpl ql;
+	private double qx0;
+	private double qy0;
+	private double qx1;
+	private double qy1;
+	private double qDx;
+	private double qDy;
+	private int veh = 0;
+	private Segment queueLine;
 
 	Sim2DQTransitionLink(QLinkImpl qLinkImpl) {
 		this.ql = qLinkImpl;
@@ -164,6 +174,20 @@ public class Sim2DQTransitionLink extends QLinkInternalI{
 
 	@Override
 	public void addFromIntersection(QVehicle veh) {
+		//hook 1
+		this.veh++;
+		double sp = this.ql.getSpaceCap();
+		double l = this.ql.link.getLength();
+		double vl = l/sp;
+		double ql = vl*this.veh;
+		if (ql > l) {
+			ql = l;
+		}
+		this.queueLine.x0 = this.qx0 + ql*this.qDx;
+		this.queueLine.y0 = this.qy0 + ql*this.qDy;
+		this.queueLine.x1 = this.qx1 + ql*this.qDx;
+		this.queueLine.y1 = this.qy1 + ql*this.qDy;
+		
 		this.ql.addFromIntersection(veh);
 	}
 
@@ -174,6 +198,21 @@ public class Sim2DQTransitionLink extends QLinkInternalI{
 
 	@Override
 	QVehicle popFirstVehicle() {
+		//hook2
+		this.veh--;
+		double sp = this.ql.getSpaceCap();
+		double l = this.ql.link.getLength();
+		double vl = l/sp;
+		double ql = vl*this.veh;
+		if (ql > l) {
+			ql = l;
+		}
+		this.queueLine.x0 = this.qx0 + ql*this.qDx;
+		this.queueLine.y0 = this.qy0 + ql*this.qDy;
+		this.queueLine.x1 = this.qx1 + ql*this.qDx;
+		this.queueLine.y1 = this.qy1 + ql*this.qDy;
+		
+		
 		return this.ql.popFirstVehicle();
 	}
 
@@ -196,5 +235,24 @@ public class Sim2DQTransitionLink extends QLinkInternalI{
 	public boolean hasSpace() {
 		return this.ql.hasSpace();
 	}
+
+	public void setEndOfQueueLine(Segment o3) {
+		this.qx0 = o3.x0;
+		this.qy0 = o3.y0;
+		this.qx1 = o3.x1;
+		this.qy1 = o3.y1;
+		this.qDx = o3.dy;
+		this.qDy = -o3.dx;
+		this.queueLine = o3;
+		
+		
+	}
+	
+	
+//	public void debug(){
+//		LineEvent e = new LineEvent(0, this.queueLine, false);
+//		this.ql.network.simEngine.getMobsim().getEventsManager().processEvent(e);
+//		
+//	}
 
 }

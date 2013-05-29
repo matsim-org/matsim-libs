@@ -24,10 +24,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
@@ -37,6 +39,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.Sim2DQTransitionLink;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.scenario.Sim2DEnvironment;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
+import playground.gregor.sim2d_v4.scenario.TransportMode;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DEnvironment;
 //import org.matsim.core.mobsim.qsim.qnetsimengine.QSim
 
@@ -108,8 +111,21 @@ public class Sim2DEngine implements MobsimEngine {
 		for (QSim2DTransitionLink hiResLink : this.hiResLinks) {
 			Id id = this.sim2dsc.getSim2DEnvironment(hiResLink.getLink()).getId();
 			PhysicalSim2DEnvironment penv = this.penvs.get(id);
-			penv.createAndAddPhysicalTransitionSections(hiResLink);
+			penv.createAndAddPhysicalTransitionSection(hiResLink);
 		}
+		for (Entry<Id, Sim2DQTransitionLink> e : this.lowResLinks.entrySet()) {
+			PhysicalSim2DEnvironment penv = null;
+			for (Link l : e.getValue().getLink().getFromNode().getInLinks().values()) {
+				if (l.getAllowedModes().contains(TransportMode.walk2d)) {
+					Sim2DEnvironment env = this.sim2dsc.getSim2DEnvironment(l);
+					Id id = env.getId();
+					penv = this.penvs.get(id);
+					penv.createAndAddPhysicalTransitionSection(e.getValue(),env.getSection(l),l);
+					break;
+				}
+			}
+		}
+		
 		for (PhysicalSim2DEnvironment penv : this.penvs.values()) {
 			penv.registerLowResLinks(this.lowResLinks);
 		}

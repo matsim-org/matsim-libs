@@ -115,29 +115,36 @@ public class PhysicalSim2DSection {
 			double dx = v[0] * this.timeStepSize;
 			double dy = v[1] * this.timeStepSize;
 			double [] oldPos = agent.getPos();
+			double oldX = oldPos[0];
+			double oldY = oldPos[1];
 			double newXPosX = oldPos[0] + dx;
 			double newXPosY = oldPos[1] + dy;
 
-			agent.move(dx, dy,time);
+			boolean mv = agent.move(dx, dy,time);
 			if (agent.hasLeft2DSim()) {
 				it.remove();
 				this.penv.getEventsManager().processEvent(new Sim2DAgentDestructEvent(time, agent));
-			} else {
+			} else if (mv) {
 				for (int i = 0; i < this.numOpenings; i++) {
 					Segment opening = this.openings[i];
 					double leftOfOpening = CGAL.isLeftOfLine(newXPosX, newXPosY, opening.x0, opening.y0, opening.x1, opening.y1);
 					if (leftOfOpening >= 0) {
-						PhysicalSim2DSection nextSection = this.neighbors.get(opening);
-						if (nextSection == null) {
-							break; //agent was pushed out of the sim2d environment
+
+						double l0 = CGAL.isLeftOfLine(opening.x0, opening.y0,oldX,oldY,newXPosX,newXPosY);
+						double l1 = CGAL.isLeftOfLine(opening.x1, opening.y1,oldX,oldY,newXPosX,newXPosY);
+						if (l0*l1 < - CGAL.EPSILON) {
+							PhysicalSim2DSection nextSection = this.neighbors.get(opening);
+							if (nextSection == null) {
+								break; //agent was pushed out of the sim2d environment
+							}
+							it.remove();
+							nextSection.addAgentToInBuffer(agent);
+							break;
 						}
-						it.remove();
-						nextSection.addAgentToInBuffer(agent);
-						break;
 					}
 				}
 			}
-			
+
 		}
 	}
 

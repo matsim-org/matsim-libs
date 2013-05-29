@@ -56,13 +56,14 @@ public class Sim2DRunner implements IterationStartsListener{
 		Sim2DConfig sim2dc = Sim2DConfigUtils.loadConfig(sim2DConf);
 		Sim2DScenario sim2dsc = Sim2DScenarioUtils.loadSim2DScenario(sim2dc);
 		Config c = ConfigUtils.loadConfig(qsimConf);
-		c.controler().setWriteEventsInterval(0);
-//		c.controler().setLastIteration(0);
+		c.controler().setWriteEventsInterval(1);
+//		c.controler().setLastIteration(300);
 		Scenario sc = ScenarioUtils.loadScenario(c);
 		sc.addScenarioElement(sim2dsc);
 		sim2dsc.connect(sc);
 		
-//		c.getQSimConfigGroup().setEndTime(8*3600+40*60);
+//		c.getQSimConfigGroup().setEndTime(30*3600+40*60);
+		c.getQSimConfigGroup().setEndTime(5*60);
 
 		//offsets needed to convert to doubles later in program
 		double minX = Double.POSITIVE_INFINITY;
@@ -112,6 +113,7 @@ public class Sim2DRunner implements IterationStartsListener{
 			dbg.addAdditionalDrawer(new GregorsOffice());
 			controller.getEvents().addHandler(dbg);
 			controller.getEvents().addHandler(qDbg);
+			
 		}
 
 		

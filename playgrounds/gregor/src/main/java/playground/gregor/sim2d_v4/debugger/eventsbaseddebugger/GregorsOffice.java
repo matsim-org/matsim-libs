@@ -40,4 +40,10 @@ public class GregorsOffice implements VisDebuggerAdditionalDrawer {
 		p.text("Gregor's office", fx+3, fy+3);
 	}
 
+	@Override
+	public void drawText(EventsBasedVisDebugger eventsBasedVisDebugger) {
+		// TODO Auto-generated method stub
+		
+	}
+
 }

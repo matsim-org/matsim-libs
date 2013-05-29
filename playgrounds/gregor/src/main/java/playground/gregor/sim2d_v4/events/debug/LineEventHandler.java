@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * VisDebuggerAdditionalDrawer.java
+ * LineEventHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,12 +18,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.sim2d_v4.debugger.eventsbaseddebugger;
+package playground.gregor.sim2d_v4.events.debug;
 
+import org.matsim.core.events.handler.EventHandler;
 
-public interface VisDebuggerAdditionalDrawer {
+public interface LineEventHandler extends EventHandler {
 
-	public void draw(EventsBasedVisDebugger p);
-
-	public void drawText(EventsBasedVisDebugger eventsBasedVisDebugger);
+	public void handleEvent(LineEvent e);
+	
 }

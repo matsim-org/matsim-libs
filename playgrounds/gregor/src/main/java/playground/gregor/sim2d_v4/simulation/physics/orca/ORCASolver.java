@@ -136,6 +136,7 @@ public class ORCASolver {
 			//				constraints.get(i).debug(this.debugger, 0, 255, 0);
 			//				this.debugger.addAll();
 			//			}
+		
 		}
 
 		return constraints.size();

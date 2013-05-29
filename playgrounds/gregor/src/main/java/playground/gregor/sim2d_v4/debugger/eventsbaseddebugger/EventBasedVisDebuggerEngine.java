@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.gregor.sim2d_v4.events.Sim2DAgentConstructEvent;
@@ -40,6 +41,8 @@ import playground.gregor.sim2d_v4.events.Sim2DAgentDestructEvent;
 import playground.gregor.sim2d_v4.events.Sim2DAgentDestructEventHandler;
 import playground.gregor.sim2d_v4.events.XYVxVyEventImpl;
 import playground.gregor.sim2d_v4.events.XYVxVyEventsHandler;
+import playground.gregor.sim2d_v4.events.debug.LineEvent;
+import playground.gregor.sim2d_v4.events.debug.LineEventHandler;
 import playground.gregor.sim2d_v4.events.debug.NeighborsEvent;
 import playground.gregor.sim2d_v4.events.debug.NeighborsEventHandler;
 import playground.gregor.sim2d_v4.scenario.Section;
@@ -50,7 +53,7 @@ import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAgentConstructEventHandler, Sim2DAgentDestructEventHandler, NeighborsEventHandler{
+public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAgentConstructEventHandler, Sim2DAgentDestructEventHandler, NeighborsEventHandler, LineEventHandler{
 
 	double time;
 	private final EventsBasedVisDebugger vis;
@@ -67,14 +70,14 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 		this.dT = sc.getScenarioElement(Sim2DScenario.class).getSim2DConfig().getTimeStepSize();
 		this.vis = new EventsBasedVisDebugger(sc);
 		this.keyControl = new KeyControl(this.vis.zoomer);
-		this.vis.addKeyListener(this.keyControl);
+		this.vis.addKeyControl(this.keyControl);
 		init();
 	}
-	
+
 	public void addAdditionalDrawer(VisDebuggerAdditionalDrawer drawer) {
 		this.vis.addAdditionalDrawer(drawer);
 	}
-	
+
 	private void init() {
 
 		//Links
@@ -99,6 +102,7 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 				Coord c0 = l.getFromNode().getCoord();
 				Coord c1 = l.getToNode().getCoord();
 //				this.vis.addDashedLineStatic(c0.getX(), c0.getY(), c1.getX(), c1.getY(), lp.r,lp.g,lp.b,lp.a, lp.minScale,.1,.9);
+//				this.vis.addLineStatic(c0.getX(), c0.getY(), c1.getX(), c1.getY(), lp.r,lp.g,lp.b,lp.a, lp.minScale);
 
 			}
 		}
@@ -113,9 +117,9 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 						Coordinate c0 = sec.getPolygon().getExteriorRing().getCoordinateN(i);
 						Coordinate c1 = sec.getPolygon().getExteriorRing().getCoordinateN(i+1);
 						if (c0.x < c1.x) {
-							this.vis.addDashedLineStatic(c0.x, c0.y, c1.x, c1.y, lp.r,lp.g,lp.b,lp.a, 20,.5,.2);
+							this.vis.addDashedLineStatic(c0.x, c0.y, c1.x, c1.y, lp.r,lp.g,lp.b,lp.a, 20,.25,.1);
 						} else {
-							this.vis.addDashedLineStatic(c1.x, c1.y, c0.x, c0.y, lp.r,lp.g,lp.b,lp.a, 20,.5,.2);
+							this.vis.addDashedLineStatic(c1.x, c1.y, c0.x, c0.y, lp.r,lp.g,lp.b,lp.a, 20,.25,.1);
 						}
 						if (oct < open.length-1) {
 							oct++;
@@ -135,7 +139,13 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 					x[i] = coords[i].x;
 					y[i] = coords[i].y;
 				}
-				this.vis.addPolygonStatic(x, y, 255, 255, 255, 255, 0);
+				if (p.getCentroid() != null) {
+					MatsimRandom.getRandom().setSeed((int)(100*x[0])+coords.length);
+					int offset = MatsimRandom.getRandom().nextInt(10)*15;
+					this.vis.addPolygonStatic(x, y, 255-offset, 255-offset, 255-offset, 128, 0);
+
+//					this.vis.addTextStatic(p.getCentroid().getX(), p.getCentroid().getY(), sec.getId().toString(), 100);
+				}
 			}
 		}
 
@@ -155,11 +165,12 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 		}
 		CircleProperty cp = this.circleProperties.get(event.getPersonId());
 		this.vis.addCircle(event.getX(),event.getY(),cp.rr,cp.r,cp.g,cp.b,cp.a,cp.minScale,cp.fill);
-		this.vis.addText(event.getX(),event.getY(), event.getPersonId().toString(), 100);
+		this.vis.addText(event.getX(),event.getY(), event.getPersonId().toString(), 200);
 	}
 
 	private void update(double time2) {
 		this.keyControl.awaitPause();
+		this.keyControl.awaitScreenshot();
 		long timel = System.currentTimeMillis();
 
 		long last = this.lastUpdate ;
@@ -192,7 +203,7 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 		Sim2DAgent a = event.getSim2DAgent();
 		CircleProperty cp = new CircleProperty();
 		cp.rr = (float) a.getRadius();
-		int nr = a.hashCode()%3*255;
+		int nr = a.getId().toString().hashCode()%100+100;
 		int r,g,b;
 		if (nr > 2*255) {
 			r= nr-2*255;
@@ -207,16 +218,19 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 			g=0;
 			b=nr;
 		}
-		cp.r = r;
-		cp.g = g;
-		cp.b = b;
-		cp.a = 222;
-
-//		cp.fill = false;
-//		cp.r = 0;
-//		cp.g = 0;
-//		cp.b = 0;
-//		cp.a = 255;
+//		cp.r = r;
+//		cp.g = g;
+//		cp.b = b;
+//		cp.a = 222;
+		cp.r = nr;
+		cp.g = nr;
+		cp.b = nr;
+		cp.a = 255;
+		//		cp.fill = false;
+		//		cp.r = 0;
+		//		cp.g = 0;
+		//		cp.b = 0;
+		//		cp.a = 255;
 		this.circleProperties.put(a.getId(), cp);
 	}
 
@@ -240,7 +254,7 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 			double l = Math.sqrt(dx*dx+dy*dy);
 			dx /= l;
 			dy /= l;
-			
+
 			this.vis.addLine(x0+dx*a.getRadius(), y0+dy*a.getRadius(), x1-dx*neighbor.getRadius(), y1-dy*neighbor.getRadius(), 0, 0, 0, 128, 0);
 			double tan = dx/dy;
 			double atan = Math.atan(tan);
@@ -249,22 +263,33 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 			} else {
 				atan += Math.PI/2;
 			}
-			
+
 			double offsetX = dy * .075;
 			double offsetY = -dx * .075;
 			if (dx > 0) {
 				offsetX *= -1;
 				offsetY *= -1;
 			}
-			
+
 			double dist =l;
 			int tmp = (int)dist;
 			int tmp2 = (int)((dist-tmp)*100+.5);
 			String fill = tmp2 < 10 ? "0" : "";
 			this.vis.addText((x0+x1)/2+offsetX, (y0+y1)/2+offsetY, tmp+"."+fill+tmp2+" m", 100,(float)atan);
-			
-			
+
+
 		}
+	}
+
+	@Override
+	public void handleEvent(LineEvent e) {
+
+		if (e.isStatic()) {
+			this.vis.addLineStatic(e.getSegment().x0, e.getSegment().y0, e.getSegment().x1, e.getSegment().y1, 0, 255, 0, 255, 0);
+		} else {
+			this.vis.addLine(e.getSegment().x0, e.getSegment().y0, e.getSegment().x1, e.getSegment().y1, 255, 0, 0, 255, 0);
+		}
+
 	}
 
 

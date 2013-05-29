@@ -46,8 +46,8 @@ public class SocialForceSim2DAgentFactory implements Sim2DAgentFactory {
 		LinkSwitcher ls = new LinkSwitcher(this.sc, pEnv);
 		Sim2DAgent agent = new Sim2DAgent(this.sc,veh, spawnX, spawnY, ls, pEnv);
 		Neighbors nn = new Neighbors(agent, this.conf);
-		nn.setRangeAndMaxNrOfNeighbors(10, 5);
-		nn.setUpdateInterval(.5);
+		nn.setRangeAndMaxNrOfNeighbors(10, 8);
+//		nn.setUpdateInterval(.8);
 		SocialForceVelocityUpdater vu = new SocialForceVelocityUpdater(new NearestPointAtTargetLine(agent, ls), nn, this.conf, agent);
 		agent.setVelocityUpdater(vu);
 		return agent;

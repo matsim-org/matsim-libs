@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -38,15 +39,19 @@ import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.network.NetworkImpl;
 
-import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventsBasedVisDebugger.Text;
 import processing.core.PConstants;
+import processing.core.PVector;
 
 
 
 public class QSimDensityDrawer implements VisDebuggerAdditionalDrawer, AgentDepartureEventHandler, AgentArrivalEventHandler, LinkLeaveEventHandler, LinkEnterEventHandler{
 
+	private static final Logger log = Logger.getLogger(QSimDensityDrawer.class);
+	
 	List<LinkInfo> links = new ArrayList<LinkInfo>();
 	Map<Id,LinkInfo> map = new HashMap<Id,LinkInfo>();
+
+	private final double minScale = 10;
 	
 	public QSimDensityDrawer(Scenario sc) {
 		for (Link l : sc.getNetwork().getLinks().values()) {
@@ -62,6 +67,7 @@ public class QSimDensityDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 		dx /= length;
 		dy /= length;
 		LinkInfo info = new LinkInfo();
+		info.id = l.getId();
 		info.cap = (l.getLength()/((NetworkImpl)sc.getNetwork()).getEffectiveCellSize())*l.getNumberOfLanes();
 
 		double x0 = l.getFromNode().getCoord().getX();
@@ -81,7 +87,25 @@ public class QSimDensityDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 		info.y0 = y0;
 		info.y1 = y1;
 		
-		info.t = new Text();
+		double tan = dx/dy;
+		double atan = Math.atan(tan);
+		if (atan >0) {
+			atan -= Math.PI/2;
+		} else {
+			atan += Math.PI/2;
+		}
+		
+		double offsetX = dy * .075;
+		double offsetY = -dx * .075;
+		if (dx > 0) {
+			offsetX *= -1;
+			offsetY *= -1;
+		}
+		
+		info.tx = (x0+x1)/2+offsetX;
+		info.ty = (y0+y1)/2+offsetY;
+		info.text = "0";
+		info.atan = atan;
 		
 		this.links.add(info);
 		this.map.put(l.getId(), info);
@@ -102,11 +126,35 @@ public class QSimDensityDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 	}
 
 
+	@Override
+	public void drawText(EventsBasedVisDebugger p) {
+		
+		if (p.zoomer.getZoomScale() < this.minScale ) {
+			return;
+		}
+		for (LinkInfo li : this.links) {
+		
+			float ts = (float) (10*p.zoomer.getZoomScale()/this.minScale);
+			p.textSize(ts);	
+			PVector cv = p.zoomer.getCoordToDisp(new PVector((float)(li.tx+p.offsetX),(float)-(li.ty+p.offsetY)));
+			p.fill(0,0,0,255);
+			float w = p.textWidth(li.text);
+			p.textAlign(PConstants.LEFT);
+			p.text(li.text, cv.x-w/2, cv.y+ts/2);
+		}
+	}
+
+
+
 
 	private void updateColor(LinkInfo l) {
 //		if (l.onLink > l.cap) {
 //			l.cap = l.onLink;
 //		}
+		if (l.onLink > l.cap) {
+			log.warn("Assumed storage capacity is smaler than actual storage capacity.");
+			l.cap = l.onLink;
+		}
 		double density =5.4*l.onLink/l.cap;
 		if (density == 0) {
 			l.r = 0;
@@ -139,6 +187,11 @@ public class QSimDensityDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 //
 //
 	private static final class LinkInfo {
+		public Id id;
+		public double atan;
+		public String text;
+		public double tx;
+		public double ty;
 		public int r;
 		public int b;
 		public int g;
@@ -150,7 +203,6 @@ public class QSimDensityDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 		double y0;
 		double y1;
 		int onLink;
-		Text t;
 	}
 
 
@@ -174,7 +226,7 @@ public class QSimDensityDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 		}
 		synchronized(info) {
 			info.onLink--;
-			info.t.text = Integer.toString(info.onLink);
+			info.text = Integer.toString(info.onLink);
 			updateColor(info);
 		}
 
@@ -189,7 +241,7 @@ public class QSimDensityDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 		}
 		synchronized(info) {
 			info.onLink++;
-			info.t.text = Integer.toString(info.onLink);
+			info.text = Integer.toString(info.onLink);
 			updateColor(info);
 		}		
 	}
@@ -203,7 +255,7 @@ public class QSimDensityDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 		}
 		synchronized(info) {
 			info.onLink++;
-			info.t.text = Integer.toString(info.onLink);
+			info.text = Integer.toString(info.onLink);
 			updateColor(info);
 		}		
 	}
@@ -216,10 +268,18 @@ public class QSimDensityDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 		}
 		synchronized(info) {
 			info.onLink--;
-			info.t.text = Integer.toString(info.onLink);
+			info.text = Integer.toString(info.onLink);
 			updateColor(info);
 		}
 	}
+
+
+
+
+
+
+
+
 
 
 }

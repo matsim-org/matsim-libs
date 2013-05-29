@@ -33,6 +33,7 @@ import javax.swing.OverlayLayout;
 
 import org.gicentre.utils.move.ZoomPan;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Node;
 
 import processing.core.PApplet;
 import processing.core.PImage;
@@ -45,23 +46,30 @@ public class EventsBasedVisDebugger extends PApplet {
 
 	private List<Object> elements = Collections.synchronizedList(new ArrayList<Object>());
 	private List<Text> elementsText = Collections.synchronizedList(new ArrayList<Text>());
+	private final List<Text> elementsTextStatic = Collections.synchronizedList(new ArrayList<Text>());
 	private final List<Object> newElements = new ArrayList<Object>();
 	private final List<Text> newElementsText = new ArrayList<Text>();
 	private final List<Object> elementsStatic = Collections.synchronizedList(new ArrayList<Object>());
-	
+
 	private final List<VisDebuggerAdditionalDrawer> additionalDrawers = new ArrayList<VisDebuggerAdditionalDrawer>();
 
 	//	private final List<VisDebuggerAdditionalDrawer> additionalDrawers = new ArrayList<VisDebuggerAdditionalDrawer>();
 
-	//TODO make this dynamic!!
-	final double offsetX = -1113948;
-	final double offsetY = -7041222;
+	double offsetX = -1113948;
+	double offsetY = -7041222;
 
 	ZoomPan zoomer;
-	private final TileMap tileMap;	
+//	ZoomPan zoomer;
+	private final TileMap tileMap;
+
+	private KeyControl keyControl;
+
+	private double time;	
 	public EventsBasedVisDebugger(Scenario sc) {
+		computeOffsets(sc);
 		this.fr = new JFrame();
-		this.fr.setSize(1024,788);
+//		this.fr.setSize(1024,788);
+		this.fr.setSize(1920,1100);
 		JPanel compositePanel = new JPanel();
 		compositePanel.setLayout(new OverlayLayout(compositePanel));
 
@@ -70,12 +78,13 @@ public class EventsBasedVisDebugger extends PApplet {
 		compositePanel.add(this);
 		compositePanel.setEnabled(true);
 		compositePanel.setVisible(true);
-
-		this.zoomer = new ZoomPan(this);  // Initialise the zoomer.
+		
+		this.zoomer = new ZoomPan(this);//,this.recorder);  // Initialise the zoomer.
 		this.tileMap = new TileMap(this.zoomer,this, this.offsetX, this.offsetY, sc.getConfig().global().getCoordinateSystem());
 		this.zoomer.addZoomPanListener(this.tileMap);
 
 		this.init();
+//		size(1024, 768);
 		this.fr.setVisible(true);
 
 
@@ -83,22 +92,65 @@ public class EventsBasedVisDebugger extends PApplet {
 
 	}
 
+	private void computeOffsets(Scenario sc) {
+		double minX = Double.POSITIVE_INFINITY;
+		double minY = Double.POSITIVE_INFINITY;
+		double maxX = Double.NEGATIVE_INFINITY;
+		double maxY = Double.NEGATIVE_INFINITY;
+		for (Node node : sc.getNetwork().getNodes().values()) {
+			double x = node.getCoord().getX();
+			double y = node.getCoord().getY();
+			if (x < minX) {
+				minX = x;
+			}
+			if (x > maxX) {
+				maxX = x;
+			}
+			if (y < minY) {
+				minY = y;
+			}
+			if (y > maxY) {
+				maxY = y;
+			}
+
+		}
+		this.offsetX = -(maxX+minX)/2;
+		this.offsetY = -(maxY+minY)/2;
+
+	}
+
 	@Override
 	public void setup() {
-		size(1024,768);
+//		size(1024,768);
+		size(1920,1080);
 		background(255);
 	}
 
 	@Override
 	public void draw() {
+		
+		boolean recording = false;
+		ZoomPan old = null; 
+		if (this.keyControl != null && this.keyControl.isScreenshotRequested() && this.keyControl.isOneObjectWaitingAtScreenshotBarrier()) {
+			beginRecord(PDF, "/Users/laemmel/Desktop/" + "sim2d_screenshot_at_" + this.time + ".pdf");
+			recording = true;
+			old = this.zoomer;
+			this.zoomer = new ZoomPan(this, this.recorder);
+			this.zoomer.setZoomScale(old.getZoomScale());
+			this.zoomer.setPanOffset(old.getPanOffset().x, old.getPanOffset().y);
+			
+		}
 
+		
 		pushMatrix();
-
+		if (recording) {
+			this.recorder.pushMatrix();
+		}
 		// This enables zooming/panning and should be in the draw method.
 		this.zoomer.transform();
 		background(255);	
-		
-		
+
+
 
 		List<PVector> coords = new ArrayList<PVector>();
 		for (int x = 0; x <= this.width; x += 128) {
@@ -114,11 +166,11 @@ public class EventsBasedVisDebugger extends PApplet {
 		for (VisDebuggerAdditionalDrawer d : this.additionalDrawers) {
 			d.draw(this);
 		}
-		
-	
+
+
 		strokeWeight((float) (2/this.zoomer.getZoomScale()));
 		strokeCap(ROUND);
-	
+
 		synchronized(this.elementsStatic) {
 			Iterator<Object> it = this.elementsStatic.iterator();
 			while (it.hasNext()) {
@@ -129,8 +181,6 @@ public class EventsBasedVisDebugger extends PApplet {
 					drawCircle((Circle) el);
 				} else if (el instanceof Polygon) {
 					drawPolygon((Polygon)el);
-				}else if (el instanceof Text) {
-					drawText((Text)el);
 				}
 			}
 		}
@@ -142,39 +192,53 @@ public class EventsBasedVisDebugger extends PApplet {
 				drawLine((Line) obj);
 			}
 		}
-		
+
 
 
 		//		System.out.println(this.zoomer.getDispToCoord(new PVector(this.width/2, this.height/2)));
+		//		popMatrix();
+		//draw non transformable stuff here ...
+//		popMatrix();
+		
 		popMatrix();
+		if (recording) {
+			this.recorder.popMatrix();
+		}
 		strokeWeight(1);
 		stroke(1);
+		synchronized(this.elementsTextStatic) {
+			for (Text t : this.elementsTextStatic) {
+				if (this.zoomer.getZoomScale() < t.minScale) {
+					continue;
+				}
+				drawText(t);
+			}
+		}
 		for (Text t : this.elementsText) {
 			if (this.zoomer.getZoomScale() < t.minScale) {
 				continue;
 			}
-			float ts = (float) (10*this.zoomer.getZoomScale()/t.minScale);
-			textSize(ts);	
-			PVector cv = this.zoomer.getCoordToDisp(new PVector(t.x,t.y));
-			fill(t.r,t.g,t.b,t.a);
-			float w = textWidth(t.text);
-			if (t.theta != 0) {
-				pushMatrix();
-				translate(cv.x, cv.y);
-				rotate(t.theta);
-				textAlign(CENTER) ;
-				text(t.text, 0,0);
-				popMatrix();
-			} else {
-				textAlign(LEFT);
-				text(t.text, cv.x-w/2, cv.y+ts/2);
-			}
-
-
+			drawText(t);
 		}
-		//		popMatrix();
-		//draw non transformable stuff here ...
+		for (VisDebuggerAdditionalDrawer d : this.additionalDrawers) {
+			d.drawText(this);
+		}
+
+		
+		if (recording) {
+			endRecord();
+			this.zoomer = old;
+			this.keyControl.awaitScreenshot();
+			this.keyControl.informScreenshotPerformed();
+		}
+		
+		
+
 	}
+
+	//	private void drawText(Text text) {
+	//		
+	//	}
 
 
 	private void drawTile(Tile tile) {
@@ -197,16 +261,23 @@ public class EventsBasedVisDebugger extends PApplet {
 		}
 	}
 
-	void drawText(Text el) {
-		stroke(el.r,el.g,el.b,el.a);
-		fill(el.r,el.g,el.b,el.a);
-		//		text(el.text,el.x,el.y);
-		//		double fs = Math.max(1, 14/this.zoomer.getZoomScale());
-		//		System.out.println(fs);
-		//		textSize((float) fs);
-		text(el.text, el.x, el.y);
-		//		this.zoomer.
-		//		this.zoomer.text(el.text, POSTERIZE, POSTERIZE)
+	private void drawText(Text t) {
+		float ts = (float) (18*this.zoomer.getZoomScale()/t.minScale);
+		textSize(ts);	
+		PVector cv = this.zoomer.getCoordToDisp(new PVector(t.x,t.y));
+		fill(t.r,t.g,t.b,t.a);
+		float w = textWidth(t.text);
+		if (t.theta != 0) {
+			pushMatrix();
+			translate(cv.x, cv.y);
+			rotate(t.theta);
+			textAlign(CENTER) ;
+			text(t.text, 0,0);
+			popMatrix();
+		} else {
+			textAlign(LEFT);
+			text(t.text, cv.x-w/2, cv.y+ts/2);
+		}
 	}
 
 	private void drawCircle(Circle c) {
@@ -218,7 +289,8 @@ public class EventsBasedVisDebugger extends PApplet {
 		} else {
 			fill(255);
 		}
-		stroke(c.r,c.g,c.b,c.a);
+//		stroke(c.r,c.g,c.b,c.a);
+		stroke(0,0,0,255);;
 		ellipseMode(RADIUS);
 		ellipse(c.x,c.y,c.rr,c.rr);
 	}
@@ -355,7 +427,7 @@ public class EventsBasedVisDebugger extends PApplet {
 			fx[i] = (float) (x[i] + this.offsetX);
 			fy[i] = (float) -(y[i] + this.offsetY);
 		}
-		
+
 		p.x = fx;
 		p.y = fy;
 		p.r = r;
@@ -376,7 +448,11 @@ public class EventsBasedVisDebugger extends PApplet {
 
 	private void addElementStatic(Object o) {
 		synchronized(this.elementsStatic){
-			this.elementsStatic.add(o);
+			if (o instanceof Text) {
+				this.elementsTextStatic.add((Text) o);
+			} else {
+				this.elementsStatic.add(o);
+			}
 		}
 	}
 
@@ -399,13 +475,14 @@ public class EventsBasedVisDebugger extends PApplet {
 
 	static final class Text {
 		float x,y, theta = 0;
-		String text;
+		String text = "";
 		int r = 0, g = 0, b = 0, a = 255; 
 		int minScale = 0;
 	}
 
 
 	/*package*/ void update(double time) {
+		this.time = time;
 		synchronized(this.elements) {
 			//			this.elements.clear();
 			this.elements = Collections.synchronizedList(new ArrayList<Object>(this.newElements));
@@ -448,6 +525,13 @@ public class EventsBasedVisDebugger extends PApplet {
 	void addAdditionalDrawer(VisDebuggerAdditionalDrawer drawer) {
 		this.additionalDrawers.add(drawer);
 	}
+
+	public void addKeyControl(KeyControl keyControl) {
+		this.addKeyListener(keyControl);
+		this.keyControl = keyControl;
+	}
+
+
 
 
 

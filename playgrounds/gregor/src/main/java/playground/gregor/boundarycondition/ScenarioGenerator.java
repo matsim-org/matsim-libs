@@ -189,11 +189,11 @@ public class ScenarioGenerator {
 		
 		int[] open = {0,2};
 		GeometryFactory geofac = new GeometryFactory();
-		Coordinate c0 = new Coordinate(5,-2);
-		Coordinate c1 = new Coordinate(5,2);
+		Coordinate c0 = new Coordinate(5,-4);
+		Coordinate c1 = new Coordinate(5,4);
 		Coordinate c2 = new Coordinate(35,2);
 		Coordinate c3 = new Coordinate(35,-2);
-		Coordinate c4 = new Coordinate(5,-2);
+		Coordinate c4 = new Coordinate(5,-4);
 		env.setEnvelope(new Envelope(c0,c2));
 		try {
 			env.setCRS(CRS.decode("EPSG:3395"));
@@ -261,8 +261,8 @@ public class ScenarioGenerator {
 		l1.setFreespeed(1.34);
 		l2.setFreespeed(1.34);
 		l3.setFreespeed(1.34);
-		l0.setCapacity(flow);
-		l1.setCapacity(flow);
+		l0.setCapacity(2*flow);
+		l1.setCapacity(2*flow);
 		l2.setCapacity(flow);
 		l3.setCapacity(flow);
 		double lanes = 4/0.71;

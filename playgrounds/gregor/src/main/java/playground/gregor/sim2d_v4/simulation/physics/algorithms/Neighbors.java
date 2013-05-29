@@ -93,6 +93,12 @@ public class Neighbors {
 	}
 
 	public List<Tuple<Double,Sim2DAgent>> getNeighbors(double time) {//TODO consider adding time as attribute [gl April '13] ... done [gl April '13]
+		
+//		//DEBUG!!!!
+//		if (this.agent.getId().equals(new IdImpl("b129"))) {
+//			System.out.println(this.agent);
+//		}
+		
 		this.timeAfterLastUpdate += this.dT;
 		if (this.timeAfterLastUpdate >= this.updateIntervall) {
 			computeNeighbors();
@@ -100,7 +106,7 @@ public class Neighbors {
 		} 
 		
 		//DEBUG!!!!
-		if (this.agent.getId().equals(new IdImpl("b982"))) {
+		if (this.agent.getId().equals(new IdImpl("b111"))) {
 			this.agent.getPSec().getPhysicalEnvironment().getEventsManager().processEvent(new NeighborsEvent(time, this.agent.getId(), this.cachedNeighbors, this.agent));
 		}
 		

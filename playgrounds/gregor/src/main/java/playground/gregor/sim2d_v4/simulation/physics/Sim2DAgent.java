@@ -38,7 +38,7 @@ public class Sim2DAgent implements TwoDObject {
 	
 	//testing only
 	@Deprecated
-	private final double vCoeff =  1+MatsimRandom.getRandom().nextGaussian()*.1;;
+	private final double vCoeff = 1+MatsimRandom.getRandom().nextGaussian()*.1;;
 	
 	private double v0 = 1.34*this.vCoeff;
 	
@@ -51,7 +51,7 @@ public class Sim2DAgent implements TwoDObject {
 	private final MobsimDriverAgent driver;
 	private PhysicalSim2DSection currentPSec;
 
-	private final double r = 0.19 ; //MatsimRandom.getRandom().nextDouble()*.1 + 0.15; //radius
+	private final double r = .25; //0.19; //MatsimRandom.getRandom().nextDouble()*.1 + 0.25; //radius
 	
 	private final double height = 1.72 + MatsimRandom.getRandom().nextGaussian()*0.1; //TODO find a meaningful value here [gl April '13]
 	
@@ -112,13 +112,16 @@ public class Sim2DAgent implements TwoDObject {
 					veh.setCurrentLink(loResLink.getLink());
 					loResLink.addFromIntersection(veh);
 					this.hasLeft2DSim = true;
+					this.pEnv.getEventsManager().processEvent(new LinkLeaveEvent(time, getId(), this.getCurrentLinkId(), this.veh.getId()));
+					this.notifyMoveOverNode(nextLinkId);
 				} else {
 					return false;
 				}
+			} else {
+				this.pEnv.getEventsManager().processEvent(new LinkLeaveEvent(time, getId(), this.getCurrentLinkId(), this.veh.getId()));
+				this.notifyMoveOverNode(nextLinkId);
+				this.pEnv.getEventsManager().processEvent(new LinkEnterEvent(time, getId(), nextLinkId, this.veh.getId()));
 			}
-			this.pEnv.getEventsManager().processEvent(new LinkLeaveEvent(time, getId(), this.getCurrentLinkId(), this.veh.getId()));
-			this.notifyMoveOverNode(nextLinkId);
-			this.pEnv.getEventsManager().processEvent(new LinkEnterEvent(time, getId(), nextLinkId, this.veh.getId()));
 		}
 		
 		
@@ -154,7 +157,8 @@ public class Sim2DAgent implements TwoDObject {
 
 	public void notifyMoveOverNode(Id nextLinkId) {
 		this.driver.notifyMoveOverNode(nextLinkId);
-		this.v0 = this.sc.getNetwork().getLinks().get(nextLinkId).getFreespeed()+(MatsimRandom.getRandom().nextDouble()*.1)-.05;
+//		this.v0 = this.sc.getNetwork().getLinks().get(nextLinkId).getFreespeed()+(MatsimRandom.getRandom().nextDouble()*.1)-.05;
+		this.setDesiredSpeed(this.sc.getNetwork().getLinks().get(nextLinkId).getFreespeed());
 	}
 
 
@@ -203,5 +207,10 @@ public class Sim2DAgent implements TwoDObject {
 	
 	public void setFocusOnAgent(boolean focus) {
 		this.emitPosEvents = focus;
+	}
+	
+	@Override
+	public String toString() {
+		return "id: " + this.driver.getId() + " sec:" + this.currentPSec.getId() + " link:" + this.getCurrentLinkId();
 	}
 }

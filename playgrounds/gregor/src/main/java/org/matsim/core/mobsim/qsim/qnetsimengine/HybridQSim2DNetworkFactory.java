@@ -47,19 +47,22 @@ public final class HybridQSim2DNetworkFactory implements NetsimNetworkFactory<QN
 		this.hybridEngine = e;
 		this.agentBuilder = builder;
 		this.s2dsc = sc.getScenarioElement(Sim2DScenario.class);
-		
+
 	}
 
 	@Override
 	public QLinkInternalI createNetsimLink(final Link link, final QNetwork network, final QNode toQueueNode) {
 		boolean sim2DQTransitionLink = false;
 		boolean qSim2DTransitionLink = link.getAllowedModes().contains(TransportMode.walk2d);
+
 		if (qSim2DTransitionLink){
-			qSim2DTransitionLink = false;
-			for (Link l : link.getFromNode().getInLinks().values()) {
-				if (!l.getAllowedModes().contains(TransportMode.walk2d)) {
-					qSim2DTransitionLink = true;
-					break;
+			if (link.getFromNode().getOutLinks().size() > 1) {
+				qSim2DTransitionLink = false;
+				for (Link l : link.getFromNode().getInLinks().values()) {
+					if (!l.getAllowedModes().contains(TransportMode.walk2d)) {
+						qSim2DTransitionLink = true;
+						break;
+					}
 				}
 			}
 		} else {
@@ -70,20 +73,20 @@ public final class HybridQSim2DNetworkFactory implements NetsimNetworkFactory<QN
 				}
 			}
 		}
-		
+
 		if (qSim2DTransitionLink) {
 			Sim2DEnvironment env = this.s2dsc.getSim2DEnvironment(link);
 			QSim2DTransitionLink hiResLink = new QSim2DTransitionLink(link, network, toQueueNode, this.hybridEngine, new QLinkImpl(link, network, toQueueNode), env, this.agentBuilder) ;
 			this.hybridEngine.registerHiResLink(hiResLink);
 			return hiResLink ;
 		} 
-//		QLinkImpl ql = 
+		//		QLinkImpl ql = 
 		if (sim2DQTransitionLink) {
 			Sim2DQTransitionLink lowResLink = new Sim2DQTransitionLink(new QLinkImpl(link,network,toQueueNode));
 			this.hybridEngine.registerLowResLink(lowResLink);
 			return lowResLink;
 		}
-		
+
 		return new QLinkImpl(link, network, toQueueNode);
 	}
 

@@ -20,10 +20,7 @@
 
 package playground.gregor.burgdorf;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -37,46 +34,63 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
-import playground.gregor.sim2d_v4.scenario.Sim2DConfigUtils;
-import playground.gregor.sim2d_v4.scenario.Sim2DEnvironment;
-import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
-import playground.gregor.sim2d_v4.scenario.Sim2DScenarioUtils;
-
-public class SimplePopulationGenerator {
+public class SimplePopulationGenerator_ {
 	public static void main(String [] args) {
-		Config c = ConfigUtils.loadConfig("/Users/laemmel/devel/burgdorf2d/input/config.xml");
+		Config c = ConfigUtils.loadConfig("/Users/laemmel/devel/burgdorf2d2/input/config.xml");
 		Scenario sc = ScenarioUtils.loadScenario(c);
 		
-		Sim2DConfig s2dc = Sim2DConfigUtils.loadConfig("/Users/laemmel/devel/burgdorf2d/input/s2d_config.xml");
-		Sim2DScenario s2dsc = Sim2DScenarioUtils.loadSim2DScenario(s2dc);
-		
-		Id target = new IdImpl("sim2d_0_174673140");
+		int nrAgents = 48000;
 		Population pop = sc.getPopulation();
 		pop.getPersons().clear();
 		PopulationFactory fac = pop.getFactory();
-		int a = 0;
-		for (Sim2DEnvironment env : s2dsc.getSim2DEnvironments()) {
-			Network net = env.getEnvironmentNetwork();
-			for ( Link l : net.getLinks().values()) {
-				
-				if (l.getToNode().getOutLinks().size() == 1) {
-					if (MatsimRandom.getRandom().nextBoolean()) {
-						continue;
-					}
-					Person pers = fac.createPerson(new IdImpl("b"+a++));
-					Plan plan = fac.createPlan();
-					pers.addPlan(plan);
-					Activity act0;
-					act0 = fac.createActivityFromLinkId("origin", l.getId());
-					act0.setEndTime(0);
-					plan.addActivity(act0);
-					Leg leg = fac.createLeg("car");
-					plan.addLeg(leg);
-					Activity act1 = fac.createActivityFromLinkId("destination", target);
-					plan.addActivity(act1);
-					pop.addPerson(pers);
-				}
+		double t = 5*3600+30*60;
+		for (int i = 0; i < nrAgents/2; i++) {
+			Person pers = fac.createPerson(new IdImpl("b"+i));
+			Plan plan = fac.createPlan();
+			pers.addPlan(plan);
+			Activity act0;
+			int mod = i % 11;
+			String rev = MatsimRandom.getRandom().nextBoolean() ? "rev_" : "";
+			act0 = fac.createActivityFromLinkId("origin", new IdImpl("sim2d_"+ mod + "_" + rev + "-11014"));
+			act0.setEndTime(t);
+			plan.addActivity(act0);
+			Leg leg = fac.createLeg("car");
+			plan.addLeg(leg);
+			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("sim2d_0_rev_-11026"));
+			plan.addActivity(act1);
+			pop.addPerson(pers);
+//			t += .5;
+			if ((i+1)%(960) == 0) {
+//				t += 3*60+12;
+				t += 5*60;
+			}
+		}
+		t = 5*3600+32*60+30;
+		for (int i = nrAgents/2; i < nrAgents; i++) {
+			Person pers = fac.createPerson(new IdImpl("b"+i));
+			Plan plan = fac.createPlan();
+			pers.addPlan(plan);
+			Activity act0;
+			
+			int mod = i % 11;
+			String rev = MatsimRandom.getRandom().nextBoolean() ? "rev_" : "";
+//			if (mod <= 5) {
+				act0 = fac.createActivityFromLinkId("origin", new IdImpl("sim2d_"+ mod + "_" + rev + "-11012"));
+//			} else {
+//				mod -= 6;
+//				act0 = fac.createActivityFromLinkId("origin", new IdImpl("sim2d_"+ mod + "_" + rev + "-51481"));
+//			}
+			act0.setEndTime(t);
+			plan.addActivity(act0);
+			Leg leg = fac.createLeg("car");
+			plan.addLeg(leg);
+			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("sim2d_0_rev_-11026"));
+			plan.addActivity(act1);
+			pop.addPerson(pers);
+//			t += .5;
+			if ((i+1)%(960) == 0) {
+//				t += 3*60+12;
+				t += 5*60;
 			}
 		}
 		new PopulationWriter(pop, sc.getNetwork()).write(c.plans().getInputFile());

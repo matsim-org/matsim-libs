@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * VisDebuggerAdditionalDrawer.java
+ * LineEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,12 +18,36 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.sim2d_v4.debugger.eventsbaseddebugger;
+package playground.gregor.sim2d_v4.events.debug;
 
+import org.matsim.core.api.experimental.events.Event;
 
-public interface VisDebuggerAdditionalDrawer {
+import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.Segment;
 
-	public void draw(EventsBasedVisDebugger p);
+public class LineEvent extends Event {
 
-	public void drawText(EventsBasedVisDebugger eventsBasedVisDebugger);
+	private static final String TYPE = "LINE_EVENT";
+	
+	private final boolean isStatic;
+	private final Segment s;
+
+	public LineEvent(double time,Segment s, boolean isStatic) {
+		super(time);
+		this.s = s;
+		this.isStatic = isStatic;
+	}
+
+	@Override
+	public String getEventType() {
+		return TYPE;
+	}
+	
+	public Segment getSegment() {
+		return this.s;
+	}
+	
+	public boolean isStatic() {
+		return this.isStatic;
+	}
+
 }

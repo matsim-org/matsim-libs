@@ -71,7 +71,7 @@ public class ORCAVelocityUpdater implements VelocityUpdater {
 	public ORCAVelocityUpdater(DesiredDirectionCalculator dd, Neighbors ncalc, Sim2DConfig conf, Sim2DAgent agent) {
 		this.ncalc = ncalc;
 		this.dT = conf.getTimeStepSize();
-		this.maxDelta =.25;// * dT;
+		this.maxDelta =5 * this.dT;
 		this.dd = dd;
 		this.agent = agent;
 	}
@@ -125,25 +125,30 @@ public class ORCAVelocityUpdater implements VelocityUpdater {
 		double tmp = (perceivedSpace*this.alpha)/(this.agent.getHeight()/this.normHeightDenom *(1+this.beta));
 		double freeSpeed = tmp * tmp;
 		
-		double vS = StrictMath.min(v0, freeSpeed);
+		if (freeSpeed > v0) {
+			freeSpeed = v0;
+		}
+		
+		double vS = freeSpeed;
+//		vS = v0;
 		
 		dir[0] *= vS;
 		dir[1] *= vS;
-		double dx = dir[0] - v[0];
-		double dy = dir[1] - v[1];
-		double sqrDelta = (dx*dx+dy*dy);
-		if (sqrDelta > this.maxDelta*this.maxDelta){
-			double delta = Math.sqrt(sqrDelta);
-			dx /= delta;
-			dx *= this.maxDelta;
-			dy /= delta;
-			dy *= this.maxDelta;
-			dir[0] = v[0] + dx;
-			dir[1] = v[1] + dy;
-		}
+//		double dx = dir[0] - v[0];
+//		double dy = dir[1] - v[1];
+//		double sqrDelta = (dx*dx+dy*dy);
+//		if (sqrDelta > this.maxDelta*this.maxDelta){
+//			double delta = Math.sqrt(sqrDelta);
+//			dx /= delta;
+//			dx *= this.maxDelta;
+//			dy /= delta;
+//			dy *= this.maxDelta;
+//			dir[0] = v[0] + dx;
+//			dir[1] = v[1] + dy;
+//		}
 		
 		
-		this.solver.run(constr, dir, vS, new double []{0.,0.});
+		this.solver.run(constr, dir, vS, new double []{v[0],v[1]});
 		
 		
 
@@ -167,16 +172,25 @@ public class ORCAVelocityUpdater implements VelocityUpdater {
 	private double computePerceivedSpace(double[] dir,
 			List<Tuple<Double, Sim2DAgent>> neighbors) {
 		double s = Double.POSITIVE_INFINITY;
+//		if (this.agent.getId().toString().equals("b939")) {
+//			System.out.println("got you!");
+//		}
 		
 		for (Tuple<Double, Sim2DAgent> n : neighbors) {
-			final Sim2DAgent nA = n.getSecond();
 			
-			final double dist = StrictMath.sqrt(n.getFirst());
+			final Sim2DAgent nA = n.getSecond();
+//			if (this.agent.getId().toString().equals("b884") && nA.getId().toString().equals("b939")) {
+//				System.out.println("got you!");
+//			}
+			
+			
+			double dx = (nA.getPos()[0] - this.agent.getPos()[0]);
+			double dy = (nA.getPos()[1] - this.agent.getPos()[1]);
+			
+			final double dist = StrictMath.sqrt(dx*dx+dy*dy);
 			double effectiveDist = dist;
 			
 			double normHeight = this.agent.getHeight()/this.normHeightDenom;
-			double dx = nA.getPos()[0] - this.agent.getPos()[0];
-			double dy = nA.getPos()[1] - this.agent.getPos()[1];
 			dx /= dist;
 			dy /= dist;
 
@@ -184,13 +198,14 @@ public class ORCAVelocityUpdater implements VelocityUpdater {
 			double delta = (1 + this.beta)*normHeight*this.vmaxSqrt/(2*this.alpha);
 			
 			double dotProd = CGAL.dot(dir[0], dir[1], dx, dy);
-			double directionalPenalty = .15*delta*(1-dotProd);
+//			double directionalPenalty = .15*delta*(1-dotProd);
+			double directionalPenalty = delta*(1-dotProd);
 			effectiveDist += directionalPenalty;
 			
 			//orientation penalty
 			double sqrSpeedNA = nA.getVelocity()[0]*nA.getVelocity()[0]+nA.getVelocity()[1]*nA.getVelocity()[1];
 			double sqrtSpeedNA = StrictMath.sqrt(StrictMath.sqrt(sqrSpeedNA));
-			double tmp = (normHeight*sqrtSpeedNA*(1+this.beta)*StrictMath.abs(CGAL.dot(dir[0], dir[1], -dx, -dy)))/(2*this.alpha);
+			double tmp = (normHeight*sqrtSpeedNA*(1+this.beta)*StrictMath.abs(CGAL.dot(this.agent.getVelocity()[0], this.agent.getVelocity()[1], -dx, -dy)))/(2*this.alpha);
 			double orientationPenalty = StrictMath.max(nA.getRadius(), tmp); //TODO check whether r_j denotes really the radius [gl April '13]
 			effectiveDist -= orientationPenalty;
 			

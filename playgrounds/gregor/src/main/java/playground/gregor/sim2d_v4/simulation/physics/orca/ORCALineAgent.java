@@ -49,7 +49,8 @@ public class ORCALineAgent implements ORCALine {
 
 
 
-		final double sqrDist = neighbor.getFirst();
+//		final double sqrDist = neighbor.getFirst();
+//		final double sqrDist = 
 		Sim2DAgent b = neighbor.getSecond();
 
 
@@ -65,6 +66,7 @@ public class ORCALineAgent implements ORCALine {
 		// 1. construct VO_{A|B}^\tau
 		double xpBpA = bPos[0]-aPos[0];
 		double ypBpA = bPos[1]-aPos[1];
+		double sqrDist = xpBpA*xpBpA +ypBpA*ypBpA;
 		double rAB = a.getRadius()+b.getRadius();
 
 		//				if (this.debug) {
@@ -77,6 +79,7 @@ public class ORCALineAgent implements ORCALine {
 		if (sqrDist <= (rAB*rAB+EPSILON)) {//collision! construct ORCA Line so, that the collision is resolved in the next time step  
 			double norm = Math.sqrt(sqrDist);
 			
+			// this is the weight of 0.5 ? then this is the right place to introduce right of way!
 			double moveHalfe = (SQRT_EPSILON+rAB-norm);// * (a.getRadius()/rAB);
 			
 //			if (norm > rAB) {
