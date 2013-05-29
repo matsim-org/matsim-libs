@@ -21,7 +21,7 @@
 /**
  *
  */
-package playground.vsptelematics.ha0;
+package playground.vsptelematics.ub6;
 
 
 
