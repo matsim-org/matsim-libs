@@ -41,7 +41,6 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.ControlerConfigGroup;
-import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -60,8 +59,6 @@ public class MATSim4UrbanSimConfigUtils {
 	static final Logger log = Logger.getLogger(MATSim4UrbanSimConfigUtils.class);
 	// module and param names for matsim4urbansim settings stored in an external MATSim config file
 	public static final String MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG = "matsim4urbansimParameter";// module
-	// parameter names in matsim4urbansimParameter module
-	public static final String TIME_OF_DAY = "timeOfDay";
 	public static final String URBANSIM_ZONE_SHAPEFILE_LOCATION_DISTRIBUTION = "urbanSimZoneShapefileLocationDistribution";
 	public static final String PT_STOPS = "ptStops";
 	public static final String PT_STOPS_SWITCH = "usePtStops";
@@ -106,7 +103,7 @@ public class MATSim4UrbanSimConfigUtils {
 		String ptTravelDistances				= null;
 		if(matsim4urbansimModule != null){
 			try{
-				double tmp = Double.parseDouble( matsim4urbansimModule.getValue(TIME_OF_DAY) );
+				double tmp = Double.parseDouble( matsim4urbansimModule.getValue(AccessibilityParameterConfigModule.TIME_OF_DAY) );
 				log.info("Found custom time of day for accessibility calculation: " + tmp );
 				timeOfDay = tmp;
 			} catch(Exception e){
@@ -157,7 +154,7 @@ public class MATSim4UrbanSimConfigUtils {
 		// ===
 		
 		// set parameter in module 
-		MATSim4UrbanSimControlerConfigModuleV3 module = getMATSim4UrbaSimControlerConfigAndPossiblyConvert(config);
+		MATSim4UrbanSimControlerConfigModuleV3 module = getMATSim4UrbaSimControlerConfigPossiblyEmpty(config);
 		module.setAgentPerformance(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isAgentPerformance());
 		module.setZone2ZoneImpedance(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isZone2ZoneImpedance());
 		module.setZoneBasedAccessibility(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isZoneBasedAccessibility());
@@ -223,7 +220,7 @@ public class MATSim4UrbanSimConfigUtils {
 		String testParameter 	= matsim4UrbanSimParameter.getUrbansimParameter().getTestParameter();
 		
 		// // set parameter in module 
-		UrbanSimParameterConfigModuleV3 module = getUrbanSimParameterConfigAndPossiblyConvert(config);
+		UrbanSimParameterConfigModuleV3 module = getUrbanSimParameterConfigPossiblyEmpty(config);
 		module.setProjectName(projectName);
 		// module.setSpatialUnitFlag(spatialUnit); // tnicolai not needed anymore dec'12
 		module.setPopulationSampleRate(populationSamplingRate);
@@ -311,7 +308,7 @@ public class MATSim4UrbanSimConfigUtils {
 		// get plans file for warm start 
 		String warmStart = matsimParameter.getInputPlansFile().getInputFile();
 		
-		MATSim4UrbanSimControlerConfigModuleV3 module = getMATSim4UrbaSimControlerConfigAndPossiblyConvert(config);
+		MATSim4UrbanSimControlerConfigModuleV3 module = getMATSim4UrbaSimControlerConfigPossiblyEmpty(config);
 		
 		// setting plans file as input
 		if( !hotStart.equals("") &&
@@ -585,7 +582,7 @@ public class MATSim4UrbanSimConfigUtils {
 		config.addModule(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME,
 				new MATSim4UrbanSimControlerConfigModuleV3(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME));
 		config.addModule(AccessibilityParameterConfigModule.GROUP_NAME,
-				new AccessibilityParameterConfigModule(AccessibilityParameterConfigModule.GROUP_NAME)) ;
+				new AccessibilityParameterConfigModule()) ;
 		
 		// set some defaults:
 		VspExperimentalConfigGroup vsp = config.vspExperimental();
@@ -620,26 +617,7 @@ public class MATSim4UrbanSimConfigUtils {
 			
 			// these are all parameter for the accessibility computation
 			double logitScaleParameter;	
-			double betaCarTT = 0.;		// Car
-			double betaCarTTPower = 0.; // Car
-			double betaCarLnTT = 0.;	// Car
-			double betaCarTD = 0.; 		// Car
-			double betaCarTDPower = 0.;	// Car
-			double betaCarLnTD = 0.;	// Car
-			double betaCarTMC = 0.;		// Car
-			double betaCarTMCPower = 0.;// Car 
-			double betaCarLnTMC = 0.;	// Car
 			
-			double betaBikeTT = 0.;		// Bike
-			double betaBikeTTPower = 0.; // Bike
-			double betaBikeLnTT = 0.;	// Bike
-			double betaBikeTD = 0.; 	// Bike
-			double betaBikeTDPower = 0.;// Bike
-			double betaBikeLnTD = 0.;	// Bike
-			double betaBikeTMC = 0.;	// Bike
-			double betaBikeTMCPower = 0.;// Bike 
-			double betaBikeLnTMC = 0.;	// Bike
-	
 			double betaWalkTT = 0.;		// Walk
 			double betaWalkTTPower = 0.; // Walk
 			double betaWalkLnTT = 0.;	// Walk
@@ -696,35 +674,24 @@ public class MATSim4UrbanSimConfigUtils {
 			
 			final String noSeparateBetasMessage = "This MATSim4UrbanSim version does not support custom beta parameters such as \"betaBikeTravelTime\" etc. anymore (both in the UrbanSim GUI (car and walk) and the external MATSim config file (bike and pt)). Please let us know if this causes serious problems." +
 					"To avoid the error message please : 1) select \"use_car_parameter_from_MATSim\" and \"use_walk_parameter_from_MATSim\" in the UrbanSim GUI and 2) remove all beta parameters for bike and pt (such as \"<param name=\"betaBikeTravelTime\" value=\"-12.\" />\") from your external MATSim config file.";
+
+			AccessibilityParameterConfigModule module = getAccessibilityParameterConfigPossiblyEmpty(config);
+
+			// usually travelling_utils are negative
+
 			if(useMATSimCarParameter){
-				// usually travelling_utils are negative
-				betaCarTT 	   	= planCalcScoreConfigGroup.getTraveling_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr(); // [utils/h]
-				betaCarTTPower	= 0.;
-				betaCarLnTT		= 0.;
-				betaCarTD		= planCalcScoreConfigGroup.getMarginalUtilityOfMoney() * planCalcScoreConfigGroup.getMonetaryDistanceCostRateCar(); 	// this is [utils/money * money/meter] = [utils/meter]
-				betaCarTDPower	= 0.;																														// useful setting for MonetaryDistanceCostRateCar: 10cent/km (only fuel) or 
-				betaCarLnTD		= 0.;																														// 80cent/km (including taxes, insurance ...)
-				betaCarTMC		= - planCalcScoreConfigGroup.getMarginalUtilityOfMoney(); // [utils/money]
-				betaCarTMCPower	= 0.;
-				betaCarLnTMC	= 0.;
-			}
-			else{
+				module.setBetaCarTravelTime(planCalcScoreConfigGroup.getTraveling_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr() ); // [utils/h]
+				module.setBetaCarTravelDistance( planCalcScoreConfigGroup.getMarginalUtilityOfMoney() * planCalcScoreConfigGroup.getMonetaryDistanceCostRateCar() ); 
+				module.setBetaCarTravelMonetaryCost( - planCalcScoreConfigGroup.getMarginalUtilityOfMoney() ); // [utils/money]
+			} else{
 				throw new RuntimeException(noSeparateBetasMessage);
 			}
 			
 			if(useMATSimBikeParameter){
-				// usually travelling_utils are negative
-				betaBikeTT		= planCalcScoreConfigGroup.getTravelingBike_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr(); // [utils/h]
-				betaBikeTTPower	= 0.;
-				betaBikeLnTT	= 0.;
-				betaBikeTD		= planCalcScoreConfigGroup.getMarginalUtlOfDistanceOther(); // [utils/meter]
-				betaBikeTDPower	= 0.;												
-				betaBikeLnTD	= 0.;
-				betaBikeTMC		= - planCalcScoreConfigGroup.getMarginalUtilityOfMoney(); // [utils/money]
-				betaBikeTMCPower= 0.;
-				betaBikeLnTMC	= 0.;
-			}
-			else{
+				module.setBetaBikeTravelTime( planCalcScoreConfigGroup.getTravelingBike_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr() ) ;
+				module.setBetaBikeTravelDistance( planCalcScoreConfigGroup.getMarginalUtlOfDistanceOther() ) ; // [utils/meter]
+				module.setBetaBikeTravelMonetaryCost( - planCalcScoreConfigGroup.getMarginalUtilityOfMoney() ) ; // [utils/money]
+			} else{
 				throw new RuntimeException(noSeparateBetasMessage);
 			}
 			
@@ -761,7 +728,6 @@ public class MATSim4UrbanSimConfigUtils {
 			}
 			
 			// set parameter in module 
-			AccessibilityParameterConfigModule module = getAccessibilityParameterConfigAndPossiblyConvert(config);
 			module.setAccessibilityDestinationSamplingRate(accessibilityDestinationSamplingRate);
 			module.setUsingLogitScaleParameterFromMATSim(useMATSimLogitScaleParameter);
 			module.setUsingRawSumsWithoutLn(useRawSum);
@@ -770,24 +736,6 @@ public class MATSim4UrbanSimConfigUtils {
 			module.setUsingWalkParameterFromMATSim(useMATSimWalkParameter);
 			module.setUsingPtParameterFromMATSim(useMATSimPtParameter);
 			module.setLogitScaleParameter(logitScaleParameter);
-			module.setBetaCarTravelTime(betaCarTT);
-			module.setBetaCarTravelTimePower2(betaCarTTPower);
-			module.setBetaCarLnTravelTime(betaCarLnTT);
-			module.setBetaCarTravelDistance(betaCarTD);
-			module.setBetaCarTravelDistancePower2(betaCarTDPower);
-			module.setBetaCarLnTravelDistance(betaCarLnTD);
-			module.setBetaCarTravelMonetaryCost(betaCarTMC);
-			module.setBetaCarTravelMonetaryCostPower2(betaCarTMCPower);
-			module.setBetaCarLnTravelMonetaryCost(betaCarLnTMC);
-			module.setBetaBikeTravelTime(betaBikeTT);
-			module.setBetaBikeTravelTimePower2(betaBikeTTPower);
-			module.setBetaBikeLnTravelTime(betaBikeLnTT);
-			module.setBetaBikeTravelDistance(betaBikeTD);
-			module.setBetaBikeTravelDistancePower2(betaBikeTDPower);
-			module.setBetaBikeLnTravelDistance(betaBikeLnTD);
-			module.setBetaBikeTravelMonetaryCost(betaBikeTMC);
-			module.setBetaBikeTravelMonetaryCostPower2(betaBikeTMCPower);
-			module.setBetaBikeLnTravelMonetaryCost(betaBikeLnTMC);
 			module.setBetaWalkTravelTime(betaWalkTT);
 			module.setBetaWalkTravelTimePower2(betaWalkTTPower);
 			module.setBetaWalkLnTravelTime(betaWalkLnTT);
@@ -808,33 +756,40 @@ public class MATSim4UrbanSimConfigUtils {
 			module.setBetaPtLnTravelMonetaryCost(betaPtLnTMC);
 		}
 
-	static UrbanSimParameterConfigModuleV3 getUrbanSimParameterConfigAndPossiblyConvert(Config config) {
+	static UrbanSimParameterConfigModuleV3 getUrbanSimParameterConfigPossiblyEmpty(Config config) {
 		Module m = config.getModule(UrbanSimParameterConfigModuleV3.GROUP_NAME);
 		if (m instanceof UrbanSimParameterConfigModuleV3) {
 			return (UrbanSimParameterConfigModuleV3) m;
 		}
 		UrbanSimParameterConfigModuleV3 upcm = new UrbanSimParameterConfigModuleV3(UrbanSimParameterConfigModuleV3.GROUP_NAME);
 		config.getModules().put(UrbanSimParameterConfigModuleV3.GROUP_NAME, upcm);
+		// yyyyyy the above code does NOT convert but throws the config entries away.
+		// In contrast, config.addModule(...) would convert.  kai, may'13 
 		return upcm;
 	}
 
-	static MATSim4UrbanSimControlerConfigModuleV3 getMATSim4UrbaSimControlerConfigAndPossiblyConvert(Config config) {
+	static MATSim4UrbanSimControlerConfigModuleV3 getMATSim4UrbaSimControlerConfigPossiblyEmpty(Config config) {
 		Module m = config.getModule(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME);
 		if (m instanceof MATSim4UrbanSimControlerConfigModuleV3) {
 			return (MATSim4UrbanSimControlerConfigModuleV3) m;
 		}
 		MATSim4UrbanSimControlerConfigModuleV3 mccm = new MATSim4UrbanSimControlerConfigModuleV3(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME);
 		config.getModules().put(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME, mccm);
+		// yyyyyy the above code does NOT convert but throws the config entries away.
+		// In contrast, config.addModule(...) would convert.  kai, may'13 
 		return mccm;
 	}
 
-	static AccessibilityParameterConfigModule getAccessibilityParameterConfigAndPossiblyConvert(Config config) {
+	static AccessibilityParameterConfigModule getAccessibilityParameterConfigPossiblyEmpty(Config config) {
 		Module m = config.getModule(AccessibilityParameterConfigModule.GROUP_NAME);
 		if (m instanceof AccessibilityParameterConfigModule) {
 			return (AccessibilityParameterConfigModule) m;
 		}
-		AccessibilityParameterConfigModule apcm = new AccessibilityParameterConfigModule(AccessibilityParameterConfigModule.GROUP_NAME);
+		AccessibilityParameterConfigModule apcm = new AccessibilityParameterConfigModule();
 		config.getModules().put(AccessibilityParameterConfigModule.GROUP_NAME, apcm);
+		// yyyyyy the above code does NOT convert but throws the config entries away.
+		// In contrast, config.addModule(...) would convert.  kai, may'13 
+		
 		return apcm;
 	}
 
@@ -846,15 +801,15 @@ public class MATSim4UrbanSimConfigUtils {
 	 */
 	static boolean useCustomMarginalUtilitiesBike( Module matsim4UrbanSimModule ){
 		if(matsim4UrbanSimModule != null) {
-			boolean used = (matsim4UrbanSimModule.getValue("betaBikeTravelTime") != null ||
-					matsim4UrbanSimModule.getValue("betaBikeTravelTimePower2") != null ||
-					matsim4UrbanSimModule.getValue("betaBikeLnTravelTime") != null ||
-					matsim4UrbanSimModule.getValue("betaBikeTravelDistance") != null ||
-					matsim4UrbanSimModule.getValue("betaBikeTravelDistancePower2") != null ||
-					matsim4UrbanSimModule.getValue("betaBikeLnTravelDistance") != null ||
-					matsim4UrbanSimModule.getValue("betaBikeTravelCost") != null ||
-					matsim4UrbanSimModule.getValue("betaBikeTravelCostPower2") != null ||
-					matsim4UrbanSimModule.getValue("betaBikeLnTravelCost") != null);
+			boolean used = (matsim4UrbanSimModule.getValue(AccessibilityParameterConfigModule.BETA_BIKE_TRAVEL_TIME) != null ||
+					matsim4UrbanSimModule.getValue(AccessibilityParameterConfigModule.BETA_BIKE_TRAVEL_TIME_POWER2) != null ||
+					matsim4UrbanSimModule.getValue(AccessibilityParameterConfigModule.BETA_BIKE_LN_TRAVEL_TIME) != null ||
+					matsim4UrbanSimModule.getValue(AccessibilityParameterConfigModule.BETA_BIKE_TRAVEL_DISTANCE) != null ||
+					matsim4UrbanSimModule.getValue(AccessibilityParameterConfigModule.BETA_BIKE_TRAVEL_DISTANCE_POWER2) != null ||
+					matsim4UrbanSimModule.getValue(AccessibilityParameterConfigModule.BETA_BIKE_LN_TRAVEL_DISTANCE) != null ||
+					matsim4UrbanSimModule.getValue(AccessibilityParameterConfigModule.BETA_BIKE_TRAVEL_COST) != null ||
+					matsim4UrbanSimModule.getValue(AccessibilityParameterConfigModule.BETA_BIKE_TRAVEL_COST_POWER2) != null ||
+					matsim4UrbanSimModule.getValue(AccessibilityParameterConfigModule.BETA_BIKE_LN_TRAVEL_COST) != null);
 			if ( used ) {
 				log.warn( "At least one of tyour betaBike parameters (matsim4urbansim section in external matsim config) is different from zero; this will probably fail later.") ;
 				log.warn( "The current recommendation is to remove all betaBike parameters.") ;
@@ -907,16 +862,6 @@ public class MATSim4UrbanSimConfigUtils {
 		return false;
 	}
 
-//	/**
-//	 * printing GlobalConfigGroupSettings
-//	 * @param config TODO
-//	 */
-//	static void printGlobalConfigGroupSettings(Config config) {
-//		GlobalConfigGroup globalCG = (GlobalConfigGroup) config.getModule(GlobalConfigGroup.GROUP_NAME);
-//		
-//		log.info("GlobalConfigGroup settings:");
-//		log.info("Number of Threads: " + globalCG.getNumberOfThreads() + " ...");
-//	}
 
 	/**
 		 * printing UrbanSimParameterSettings

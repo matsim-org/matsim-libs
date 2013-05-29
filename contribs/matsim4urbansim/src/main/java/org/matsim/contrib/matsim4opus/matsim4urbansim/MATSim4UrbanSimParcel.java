@@ -587,7 +587,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 		if (m instanceof AccessibilityParameterConfigModule) {
 			return (AccessibilityParameterConfigModule) m;
 		}
-		AccessibilityParameterConfigModule apcm = new AccessibilityParameterConfigModule(AccessibilityParameterConfigModule.GROUP_NAME);
+		AccessibilityParameterConfigModule apcm = new AccessibilityParameterConfigModule();
 		this.scenario.getConfig().getModules().put(AccessibilityParameterConfigModule.GROUP_NAME, apcm);
 		return apcm;
 	}

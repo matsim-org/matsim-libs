@@ -1079,7 +1079,7 @@ public class MATSim4UrbanSimConfigurationConverterV4Old {
 		if (m instanceof AccessibilityParameterConfigModule) {
 			return (AccessibilityParameterConfigModule) m;
 		}
-		AccessibilityParameterConfigModule apcm = new AccessibilityParameterConfigModule(AccessibilityParameterConfigModule.GROUP_NAME);
+		AccessibilityParameterConfigModule apcm = new AccessibilityParameterConfigModule();
 		this.config.getModules().put(AccessibilityParameterConfigModule.GROUP_NAME, apcm);
 		return apcm;
 	}

@@ -146,7 +146,7 @@ public class CreateTestExternalMATSimConfig extends CreateTestMATSimConfig{
 		
 		// matsim4urbansimParameter module
 		Module matsim4UrbanSimModule = config.createModule( MATSim4UrbanSimConfigUtils.MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG);
-		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigUtils.TIME_OF_DAY, this.timeOfDay + "");
+		matsim4UrbanSimModule.addParam(AccessibilityParameterConfigModule.TIME_OF_DAY, this.timeOfDay + "");
 		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigUtils.URBANSIM_ZONE_SHAPEFILE_LOCATION_DISTRIBUTION, this.urbanSimZoneShapefileLocationDistribution);
 		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigUtils.PT_STOPS, this.ptStops);
 		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigUtils.PT_STOPS_SWITCH, this.usePtStops);
@@ -278,7 +278,7 @@ public class CreateTestExternalMATSimConfig extends CreateTestMATSimConfig{
 		if (m instanceof AccessibilityParameterConfigModule) {
 			return (AccessibilityParameterConfigModule) m;
 		}
-		AccessibilityParameterConfigModule apcm = new AccessibilityParameterConfigModule(AccessibilityParameterConfigModule.GROUP_NAME);
+		AccessibilityParameterConfigModule apcm = new AccessibilityParameterConfigModule();
 		config.getModules().put(AccessibilityParameterConfigModule.GROUP_NAME, apcm);
 		return apcm;
 	}
