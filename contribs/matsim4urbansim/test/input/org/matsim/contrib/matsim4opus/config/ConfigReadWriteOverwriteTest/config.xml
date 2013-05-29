@@ -12,7 +12,98 @@
 
 <!-- ====================================================================== -->
 
-	<module name="accessibilityParameter" >
+	<module name="accessibility" >
+
+		<!-- if only a sample of destinations should be used (reduces accuracy -- not recommended except when necessary for computational speed reasons) -->
+		<param name="accessibilityDestinationSamplingRate" value="1.0" />
+
+		<!-- bicycle parameters for accessibility computation.  separate from parameters for travel model -->
+		<param name="betaBikeLnMonetaryTravelCost" value="0.0" />
+
+		<param name="betaBikeLnTravelDistance" value="0.0" />
+		<param name="betaBikeLnTravelTime" value="0.0" />
+		<param name="betaBikeMonetaryTravelCost" value="-1.0" />
+		<param name="betaBikeMonetaryTravelCostPower2" value="0.0" />
+		<param name="betaBikeTravelDistance" value="0.0" />
+		<param name="betaBikeTravelDistancePower2" value="0.0" />
+		<param name="betaBikeTravelTime" value="-12.0" />
+		<param name="betaBikeTravelTimePower2" value="0.0" />
+
+		<!-- car parameters for accessibility computation. separate from parameters for travel model -->
+		<param name="betaCarLnMonetaryTravelCost" value="0.0" />
+
+		<param name="betaCarLnTravelDistance" value="0.0" />
+		<param name="betaCarLnTravelTime" value="0.0" />
+		<param name="betaCarMonetaryTravelCost" value="-1.0" />
+		<param name="betaCarMonetaryTravelCostPower2" value="0.0" />
+		<param name="betaCarTravelDistance" value="0.0" />
+		<param name="betaCarTravelDistancePower2" value="0.0" />
+		<param name="betaCarTravelTime" value="-12.0" />
+		<param name="betaCarTravelTimePower2" value="0.0" />
+
+		<!-- public transit parameters for accessibility. separate from parameters for travel model -->
+		<param name="betaPtLnMonetaryTravelCost" value="0.0" />
+
+		<param name="betaPtLnTravelDistance" value="0.0" />
+		<param name="betaPtLnTravelTime" value="0.0" />
+		<param name="betaPtMonetaryTravelCost" value="-1.0" />
+		<param name="betaPtMonetaryTravelCostPower2" value="0.0" />
+		<param name="betaPtTravelDistance" value="0.0" />
+		<param name="betaPtTravelDistancePower2" value="0.0" />
+		<param name="betaPtTravelTime" value="-12.0" />
+		<param name="betaPtTravelTimePower2" value="0.0" />
+
+		<!-- walk parameters for accessibility computation. separate from parameters for travel model -->
+		<param name="betaWalkLnMonetaryTravelCost" value="0.0" />
+
+		<param name="betaWalkLnTravelDistance" value="0.0" />
+		<param name="betaWalkLnTravelTime" value="0.0" />
+		<param name="betaWalkMonetaryTravelCost" value="-1.0" />
+		<param name="betaWalkMonetaryTravelCostPower2" value="0.0" />
+		<param name="betaWalkTravelDistance" value="0.0" />
+		<param name="betaWalkTravelDistancePower2" value="0.0" />
+		<param name="betaWalkTravelTime" value="-12.0" />
+		<param name="betaWalkTravelTimePower2" value="0.0" />
+
+		<!-- custom bounding box parameters for accessibility computation (if enabled) -->
+		<param name="boundingBoxBottom" value="0.0" />
+
+		<param name="boundingBoxLeft" value="0.0" />
+		<param name="boundingBoxRight" value="0.0" />
+		<param name="boundingBoxTop" value="0.0" />
+		<param name="cellSizeForCellBasedAccessibility" value="100" />
+		<param name="extentOfAccessibilityComputationShapeFile" value="" />
+
+		<!-- logit scale parameter for accessibility computation (if enabled) -->
+		<param name="logitScaleParameter" value="2.0" />
+
+		<!-- time of day at which trips for accessibility computations are assumed to start -->
+		<param name="timeOfDay" value="10000.0" />
+
+		<!-- set to false if you want to enable using other parameters for the accessibility computation than for the travel model.  not recommended -->
+		<param name="usingBikeParametersFromMATSim" value="true" />
+
+		<!-- set to false if you want to enable using other parameters for the accessibility computation than for the travel model.  not recommended -->
+		<param name="usingCarParametersFromMATSim" value="true" />
+
+		<!-- true if custom bounding box should be used for accessibility computation (otherwise e.g. extent of network will be used) -->
+		<param name="usingCustomBoundingBox" value="false" />
+
+		<param name="usingNetworkForExtentOfAccessibilityComputation" value="true" />
+
+		<!-- set to false if you want to enable using other parameters for the accessibility computation than for the travel model.  not recommended -->
+		<param name="usingPtParametersFromMATSim" value="true" />
+
+		<!-- econometric accessibility usually returns the logsum. Set to true if you just want the sum (without the ln) -->
+		<param name="usingRawSumsWithoutLn" value="false" />
+
+		<!-- false if you want the logit model scale parameter in the accessibility computation different from the one in the travel model.  May be useful if you know what you are doing -->
+		<param name="usingScaleParameterFromMATSim" value="true" />
+
+		<param name="usingShapeFileForExtentOfAccessibilityComputation" value="false" />
+
+		<!-- set to false if you want to enable using other parameters for the accessibility computation than for the travel model.  not recommended -->
+		<param name="usingWalkParametersFromMATSim" value="true" />
 	</module>
 
 <!-- ====================================================================== -->
@@ -47,7 +138,7 @@ For 'queueSimulation', add a module 'simulation' to the config. -->
 		<param name="runId" value="null" />
 
 		<!-- Comma-separated list of visualizer output file formats. `transims', `googleearth', and `otfvis'. -->
-		<param name="snapshotFormat" value="otfvis" />
+		<param name="snapshotFormat" value="" />
 
 		<!-- iterationNumber % writeEventsInterval == 0 defines in which iterations events are written to a file. `0' disables events writing completely. -->
 		<param name="writeEventsInterval" value="10" />
@@ -160,7 +251,6 @@ For 'queueSimulation', add a module 'simulation' to the config. -->
 		<param name="ptStops" value="test/output/org/matsim/contrib/matsim4opus/config/ConfigReadWriteOverwriteTest/testExternalMATSimConfig//tmp/dummy2.xml" />
 		<param name="ptTravelDistances" value="test/output/org/matsim/contrib/matsim4opus/config/ConfigReadWriteOverwriteTest/testExternalMATSimConfig//tmp/dummy2.xml" />
 		<param name="ptTravelTimes" value="test/output/org/matsim/contrib/matsim4opus/config/ConfigReadWriteOverwriteTest/testExternalMATSimConfig//tmp/dummy2.xml" />
-		<param name="timeOfDay" value="10000" />
 		<param name="urbanSimZoneShapefileLocationDistribution" value="test/output/org/matsim/contrib/matsim4opus/config/ConfigReadWriteOverwriteTest/testExternalMATSimConfig//tmp/dummy2.xml" />
 		<param name="usePtStops" value="FALSE" />
 		<param name="useTravelTimesAndDistances" value="FALSE" />
