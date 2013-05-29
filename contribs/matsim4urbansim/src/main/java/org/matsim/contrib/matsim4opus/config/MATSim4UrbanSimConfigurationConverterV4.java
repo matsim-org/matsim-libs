@@ -121,7 +121,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 
 			M4UConfigUtils.initUrbanSimParameter(matsim4urbansimConfigPart2, matsim4urbansimConfigPart3, config);
 			M4UConfigUtils.initMATSim4UrbanSimControler(matsim4urbansimConfigPart2, matsim4urbansimConfigPart3, config);
-			M4UConfigUtils.initAccessibilityParameters(matsim4urbansimConfigPart2, config);
+			M4UAccessibilityConfigUtils.initAccessibilityParameters(matsim4urbansimConfigPart2, config);
 			
 //<<<<<<< HEAD
 //			MATSim4UrbanSimConfigUtils.initNetwork(matsim4urbansimConfigPart1, config);
@@ -152,6 +152,9 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 			// loading the external MATSim config in to the initialized config
 			// overlapping parameter settings (in MATSim4UrbanSim and external MATSim config)
 			// are overwritten by the external MATSim settings
+			
+			log.error("yyyyyy this will now load a lot of _null_ into the accessibility config") ;
+			
 			M4UConfigUtils.loadExternalConfigAndOverwriteMATSim4UrbanSimSettings(matsim4urbansimConfigPart1, config);
 			
 //			// show final settings
@@ -159,10 +162,14 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 			M4UConfigUtils.printUrbanSimParameterSettings( M4UConfigUtils.getUrbanSimParameterConfigAndPossiblyConvert(config) );
 			M4UConfigUtils.printMATSim4UrbanSimControlerSettings( M4UConfigUtils.getMATSim4UrbaSimControlerConfigAndPossiblyConvert(config) );
 //<<<<<<< HEAD
-////			M4UAccessibilityConfigUtils.printAccessibilityParameterSettings( M4UAccessibilityConfigUtils.getAccessibilityParameterConfigPossiblyEmpty(config) );
+////<<<<<<< HEAD
+//////			M4UAccessibilityConfigUtils.printAccessibilityParameterSettings( M4UAccessibilityConfigUtils.getAccessibilityParameterConfigPossiblyEmpty(config) );
+////=======
+////			M4UAccessibilityConfigUtils.printAccessibilityParameterSettings( M4UAccessibilityConfigUtils.getAccessibilityConfigModuleAndPossiblyConvert(config) );
+////>>>>>>> accessibility config somewhat complete ... but modes should be configurable
 //=======
-//			M4UAccessibilityConfigUtils.printAccessibilityParameterSettings( M4UAccessibilityConfigUtils.getAccessibilityConfigModuleAndPossiblyConvert(config) );
-//>>>>>>> accessibility config somewhat complete ... but modes should be configurable
+////			M4UAccessibilityConfigUtils.printAccessibilityParameterSettings( M4UAccessibilityConfigUtils.getAccessibilityConfigModuleAndPossiblyConvert(config) );
+//>>>>>>> some more rearrangements concerning accessibiity computation configuration
 			
 			config.addConfigConsistencyChecker( new VspConfigConsistencyCheckerImpl() ) ;
 			config.addConfigConsistencyChecker( new M4UConfigConsistencyChecker() ) ;
