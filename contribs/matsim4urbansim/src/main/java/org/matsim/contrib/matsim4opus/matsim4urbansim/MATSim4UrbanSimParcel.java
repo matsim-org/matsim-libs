@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.contrib.matsim4opus.config.AccessibilityParameterConfigModule;
+import org.matsim.contrib.matsim4opus.config.AccessibilityConfigModule;
 import org.matsim.contrib.matsim4opus.config.MATSim4UrbanSimConfigurationConverterV4;
 import org.matsim.contrib.matsim4opus.config.MATSim4UrbanSimControlerConfigModuleV3;
 import org.matsim.contrib.matsim4opus.config.UrbanSimParameterConfigModuleV3;
@@ -489,7 +489,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 	 */
 	void setControlerSettings(String[] args) {
 
-		AccessibilityParameterConfigModule moduleAccessibility = getAccessibilityParameterConfig();
+		AccessibilityConfigModule moduleAccessibility = getAccessibilityParameterConfig();
 		MATSim4UrbanSimControlerConfigModuleV3 moduleMATSim4UrbanSim = getMATSim4UrbanSimControlerConfig();
 		
 		this.opportunitySampleRate 		= moduleAccessibility.getAccessibilityDestinationSamplingRate();
@@ -582,13 +582,13 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 	 * access to AccessibilityParameterConfigModule and related parameter settings
 	 * @return AccessibilityParameterConfigModule
 	 */
-	AccessibilityParameterConfigModule getAccessibilityParameterConfig() {
-		Module m = this.scenario.getConfig().getModule(AccessibilityParameterConfigModule.GROUP_NAME);
-		if (m instanceof AccessibilityParameterConfigModule) {
-			return (AccessibilityParameterConfigModule) m;
+	AccessibilityConfigModule getAccessibilityParameterConfig() {
+		Module m = this.scenario.getConfig().getModule(AccessibilityConfigModule.GROUP_NAME);
+		if (m instanceof AccessibilityConfigModule) {
+			return (AccessibilityConfigModule) m;
 		}
-		AccessibilityParameterConfigModule apcm = new AccessibilityParameterConfigModule();
-		this.scenario.getConfig().getModules().put(AccessibilityParameterConfigModule.GROUP_NAME, apcm);
+		AccessibilityConfigModule apcm = new AccessibilityConfigModule();
+		this.scenario.getConfig().getModules().put(AccessibilityConfigModule.GROUP_NAME, apcm);
 		return apcm;
 	}
 	

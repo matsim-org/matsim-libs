@@ -99,7 +99,7 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 	 * @param matsim4urbansimConfigFilename path to matsim config file
 	 */
 	public MATSim4UrbanSimConfigurationConverterV4(final String matsim4urbansimConfigFilename){
-		this.matsim4urbansimConfig = MATSim4UrbanSimConfigUtils.unmarschal(matsim4urbansimConfigFilename); // loading and initializing MATSim config		
+		this.matsim4urbansimConfig = M4UConfigUtils.unmarschal(matsim4urbansimConfigFilename); // loading and initializing MATSim config		
 	}
 	
 	/**
@@ -114,46 +114,56 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 			Matsim4UrbansimType matsim4urbansimConfigPart2 = matsim4urbansimConfig.getMatsim4Urbansim();
 			
 			// loads the external MATSim config separately (to get additional MATSim4UrbanSim parameters)
-			String externalMATSimConfigFilename = matsim4urbansimConfigPart1.getMatsimConfig().getInputFile();
-			Module matsim4urbansimConfigPart3 = MATSim4UrbanSimConfigUtils.initMATSim4UrbanSimModule(externalMATSimConfigFilename);
+			Module matsim4urbansimConfigPart3 = M4UConfigUtils.getM4UModuleFromExternalConfig(matsim4urbansimConfigPart1.getMatsimConfig().getInputFile());
 
 			// creates an empty config to be filled by settings from the MATSim4UrbanSim and external config files
-			this.config = MATSim4UrbanSimConfigUtils.createEmptyConfigWithSomeDefaults();
+			this.config = M4UConfigUtils.createEmptyConfigWithSomeDefaults();
 
-			MATSim4UrbanSimConfigUtils.initUrbanSimParameter(matsim4urbansimConfigPart2, matsim4urbansimConfigPart3, config);
-			MATSim4UrbanSimConfigUtils.initMATSim4UrbanSimControler(matsim4urbansimConfigPart2, matsim4urbansimConfigPart3, config);
-			MATSim4UrbanSimConfigUtils.initAccessibilityParameter(matsim4urbansimConfigPart2, matsim4urbansimConfigPart3, config);
+			M4UConfigUtils.initUrbanSimParameter(matsim4urbansimConfigPart2, matsim4urbansimConfigPart3, config);
+			M4UConfigUtils.initMATSim4UrbanSimControler(matsim4urbansimConfigPart2, matsim4urbansimConfigPart3, config);
+			M4UConfigUtils.initAccessibilityParameters(matsim4urbansimConfigPart2, matsim4urbansimConfigPart3, config);
 			
-			MATSim4UrbanSimConfigUtils.initNetwork(matsim4urbansimConfigPart1, config);
-			MATSim4UrbanSimConfigUtils.initInputPlansFile(matsim4urbansimConfigPart1, config);
-			MATSim4UrbanSimConfigUtils.initControler(matsim4urbansimConfigPart1, config);
-			MATSim4UrbanSimConfigUtils.initPlanCalcScore(matsim4urbansimConfigPart1, config);
-			MATSim4UrbanSimConfigUtils.initStrategy(matsim4urbansimConfigPart1, config);
-			
-			/*
-			 *  why is it necessary to set some other defaults than the defaults from MATSim?
-			 *  With the newest TripRouterFactory (r24248) this will lead to to a runtime-error
-			 *  when for any of the intialized modes a different behavior (e.g. freespeedfactor 
-			 *  instead of freespeed) is set. Daniel, May '13
-			 */
-//			MATSim4UrbanSimConfigUtils.initPlanCalcRoute(config);
-			MATSim4UrbanSimConfigUtils.initQSim(matsim4urbansimConfig, config);
+//<<<<<<< HEAD
+//			MATSim4UrbanSimConfigUtils.initNetwork(matsim4urbansimConfigPart1, config);
+//			MATSim4UrbanSimConfigUtils.initInputPlansFile(matsim4urbansimConfigPart1, config);
+//			MATSim4UrbanSimConfigUtils.initControler(matsim4urbansimConfigPart1, config);
+//			MATSim4UrbanSimConfigUtils.initPlanCalcScore(matsim4urbansimConfigPart1, config);
+//			MATSim4UrbanSimConfigUtils.initStrategy(matsim4urbansimConfigPart1, config);
+//			
+//			/*
+//			 *  why is it necessary to set some other defaults than the defaults from MATSim?
+//			 *  With the newest TripRouterFactory (r24248) this will lead to to a runtime-error
+//			 *  when for any of the intialized modes a different behavior (e.g. freespeedfactor 
+//			 *  instead of freespeed) is set. Daniel, May '13
+//			 */
+////			MATSim4UrbanSimConfigUtils.initPlanCalcRoute(config);
+//			MATSim4UrbanSimConfigUtils.initQSim(matsim4urbansimConfig, config);
+//=======
+			M4UConfigUtils.initNetwork(matsim4urbansimConfigPart1, config);
+			M4UConfigUtils.initInputPlansFile(matsim4urbansimConfigPart1, config);
+			M4UConfigUtils.initControler(matsim4urbansimConfigPart1, config);
+			M4UConfigUtils.initPlanCalcScore(matsim4urbansimConfigPart1, config);
+			M4UConfigUtils.initStrategy(matsim4urbansimConfigPart1, config);
+
+			M4UConfigUtils.initPlanCalcRoute(config);
+			M4UConfigUtils.initQSim(matsim4urbansimConfig, config);
+//>>>>>>> bringing accessibility config closer to matsim standards
 			
 			// loading the external MATSim config in to the initialized config
 			// overlapping parameter settings (in MATSim4UrbanSim and external MATSim config)
 			// are overwritten by the external MATSim settings
-			MATSim4UrbanSimConfigUtils.loadExternalConfigAndOverwriteMATSim4UrbanSimSettings(matsim4urbansimConfigPart1, config);
+			M4UConfigUtils.loadExternalConfigAndOverwriteMATSim4UrbanSimSettings(matsim4urbansimConfigPart1, config);
 			
 //			// show final settings
 			// (these are not visible in the matsim config dump :-( :-( and thus need to be done separately. kai, apr'13)
-			MATSim4UrbanSimConfigUtils.printUrbanSimParameterSettings( MATSim4UrbanSimConfigUtils.getUrbanSimParameterConfigAndPossiblyConvert(config) );
-			MATSim4UrbanSimConfigUtils.printMATSim4UrbanSimControlerSettings( MATSim4UrbanSimConfigUtils.getMATSim4UrbaSimControlerConfigAndPossiblyConvert(config) );
-			MATSim4UrbanSimConfigUtils.printAccessibilityParameterSettings( MATSim4UrbanSimConfigUtils.getAccessibilityParameterConfigPossiblyEmpty(config) );
+			M4UConfigUtils.printUrbanSimParameterSettings( M4UConfigUtils.getUrbanSimParameterConfigAndPossiblyConvert(config) );
+			M4UConfigUtils.printMATSim4UrbanSimControlerSettings( M4UConfigUtils.getMATSim4UrbaSimControlerConfigAndPossiblyConvert(config) );
+//			M4UAccessibilityConfigUtils.printAccessibilityParameterSettings( M4UAccessibilityConfigUtils.getAccessibilityParameterConfigPossiblyEmpty(config) );
 			
 			config.addConfigConsistencyChecker( new VspConfigConsistencyCheckerImpl() ) ;
-			config.addConfigConsistencyChecker( new MATSim4UrbanSimConfigConsistencyChecker() ) ;
+			config.addConfigConsistencyChecker( new M4UConfigConsistencyChecker() ) ;
 			
-			MATSim4UrbanSimConfigUtils.checkConfigConsistencyAndWriteToLog(config, "at the end of the matsim4urbansim config converter") ;
+			M4UConfigUtils.checkConfigConsistencyAndWriteToLog(config, "at the end of the matsim4urbansim config converter") ;
 			
 		}catch(Exception e){
 			e.printStackTrace();

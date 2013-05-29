@@ -24,10 +24,10 @@ import org.matsim.core.config.Module;
 
 public class ConfigurationUtils {
 	
-	public static AccessibilityParameterConfigModule getAccessibilityParameterConfigModule(Scenario scenario){
-		Module m = scenario.getConfig().getModule(AccessibilityParameterConfigModule.GROUP_NAME);
-		if (m instanceof AccessibilityParameterConfigModule) {
-			return (AccessibilityParameterConfigModule) m;
+	public static AccessibilityConfigModule getAccessibilityParameterConfigModule(Scenario scenario){
+		Module m = scenario.getConfig().getModule(AccessibilityConfigModule.GROUP_NAME);
+		if (m instanceof AccessibilityConfigModule) {
+			return (AccessibilityConfigModule) m;
 		}
 		return null;
 	}

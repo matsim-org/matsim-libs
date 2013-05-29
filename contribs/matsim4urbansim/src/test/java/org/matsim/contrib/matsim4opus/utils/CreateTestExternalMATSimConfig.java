@@ -24,8 +24,8 @@ package org.matsim.contrib.matsim4opus.utils;
 
 import java.math.BigInteger;
 
-import org.matsim.contrib.matsim4opus.config.AccessibilityParameterConfigModule;
-import org.matsim.contrib.matsim4opus.config.MATSim4UrbanSimConfigUtils;
+import org.matsim.contrib.matsim4opus.config.AccessibilityConfigModule;
+import org.matsim.contrib.matsim4opus.config.M4UConfigUtils;
 import org.matsim.contrib.matsim4opus.config.MATSim4UrbanSimControlerConfigModuleV3;
 import org.matsim.contrib.matsim4opus.config.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4opus.utils.io.TempDirectoryUtil;
@@ -145,14 +145,14 @@ public class CreateTestExternalMATSimConfig extends CreateTestMATSimConfig{
 		Config config = new Config();
 		
 		// matsim4urbansimParameter module
-		Module matsim4UrbanSimModule = config.createModule( MATSim4UrbanSimConfigUtils.MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG);
-		matsim4UrbanSimModule.addParam(AccessibilityParameterConfigModule.TIME_OF_DAY, this.timeOfDay + "");
-		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigUtils.URBANSIM_ZONE_SHAPEFILE_LOCATION_DISTRIBUTION, this.urbanSimZoneShapefileLocationDistribution);
-		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigUtils.PT_STOPS, this.ptStops);
-		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigUtils.PT_STOPS_SWITCH, this.usePtStops);
-		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigUtils.PT_TRAVEL_TIMES, this.ptTravelTimes);
-		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigUtils.PT_TRAVEL_DISTANCES, this.ptTravelDistances);
-		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigUtils.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH, this.useTravelTimesAndDistances);
+		Module matsim4UrbanSimModule = config.createModule( M4UConfigUtils.MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG);
+		matsim4UrbanSimModule.addParam(AccessibilityConfigModule.TIME_OF_DAY, this.timeOfDay + "");
+		matsim4UrbanSimModule.addParam(M4UConfigUtils.URBANSIM_ZONE_SHAPEFILE_LOCATION_DISTRIBUTION, this.urbanSimZoneShapefileLocationDistribution);
+		matsim4UrbanSimModule.addParam(M4UConfigUtils.PT_STOPS, this.ptStops);
+		matsim4UrbanSimModule.addParam(M4UConfigUtils.PT_STOPS_SWITCH, this.usePtStops);
+		matsim4UrbanSimModule.addParam(M4UConfigUtils.PT_TRAVEL_TIMES, this.ptTravelTimes);
+		matsim4UrbanSimModule.addParam(M4UConfigUtils.PT_TRAVEL_DISTANCES, this.ptTravelDistances);
+		matsim4UrbanSimModule.addParam(M4UConfigUtils.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH, this.useTravelTimesAndDistances);
 		// tnicolai: this are no default parameters anymore.
 //		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_BIKE_TRAVEL_TIME, this.betaBikeTravelTime + "");
 //		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_BIKE_TRAVEL_TIME_POWER2, this.betaBikeTravelTimePower2 + "");
@@ -234,10 +234,10 @@ public class CreateTestExternalMATSimConfig extends CreateTestMATSimConfig{
 		Config config = new Config();
 		
 		// matsim4urbansimParameter module
-		Module matsim4UrbanSimModule = config.createModule( MATSim4UrbanSimConfigUtils.MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG);
-		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigUtils.PT_STOPS_SWITCH, "True");
-		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigUtils.PT_STOPS, this.ptStops);
-		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigUtils.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH, this.useTravelTimesAndDistances);
+		Module matsim4UrbanSimModule = config.createModule( M4UConfigUtils.MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG);
+		matsim4UrbanSimModule.addParam(M4UConfigUtils.PT_STOPS_SWITCH, "True");
+		matsim4UrbanSimModule.addParam(M4UConfigUtils.PT_STOPS, this.ptStops);
+		matsim4UrbanSimModule.addParam(M4UConfigUtils.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH, this.useTravelTimesAndDistances);
 		
 		// changeLegMode module
 		Module changeLegModeModule = config.createModule(changeLegModeModuleName);
@@ -273,13 +273,13 @@ public class CreateTestExternalMATSimConfig extends CreateTestMATSimConfig{
 	}
 	
 	
-	public AccessibilityParameterConfigModule getAccessibilityParameterConfig(Config config) {
-		Module m = config.getModule(AccessibilityParameterConfigModule.GROUP_NAME);
-		if (m instanceof AccessibilityParameterConfigModule) {
-			return (AccessibilityParameterConfigModule) m;
+	public AccessibilityConfigModule getAccessibilityParameterConfig(Config config) {
+		Module m = config.getModule(AccessibilityConfigModule.GROUP_NAME);
+		if (m instanceof AccessibilityConfigModule) {
+			return (AccessibilityConfigModule) m;
 		}
-		AccessibilityParameterConfigModule apcm = new AccessibilityParameterConfigModule();
-		config.getModules().put(AccessibilityParameterConfigModule.GROUP_NAME, apcm);
+		AccessibilityConfigModule apcm = new AccessibilityConfigModule();
+		config.getModules().put(AccessibilityConfigModule.GROUP_NAME, apcm);
 		return apcm;
 	}
 	

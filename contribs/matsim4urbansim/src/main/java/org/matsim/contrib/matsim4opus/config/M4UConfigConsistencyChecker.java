@@ -22,6 +22,7 @@
  */
 package org.matsim.contrib.matsim4opus.config;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.consistency.ConfigConsistencyChecker;
 
@@ -29,7 +30,8 @@ import org.matsim.core.config.consistency.ConfigConsistencyChecker;
  * @author nagel
  *
  */
-public class MATSim4UrbanSimConfigConsistencyChecker implements ConfigConsistencyChecker {
+public class M4UConfigConsistencyChecker implements ConfigConsistencyChecker {
+	private static final Logger log = Logger.getLogger(M4UConfigConsistencyChecker.class);
 
 	@Override
 	public void checkConsistency(Config config) {
@@ -37,7 +39,24 @@ public class MATSim4UrbanSimConfigConsistencyChecker implements ConfigConsistenc
 		
 		MATSim4UrbanSimControlerConfigModuleV3 matsim4urbansimModule = (MATSim4UrbanSimControlerConfigModuleV3) config.getModule(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME) ;
 		UrbanSimParameterConfigModuleV3 urbansimParameterModule = (UrbanSimParameterConfigModuleV3) config.getModule(UrbanSimParameterConfigModuleV3.GROUP_NAME ) ;
-		AccessibilityParameterConfigModule accessibilityParameterModule = (AccessibilityParameterConfigModule) config.getModule(AccessibilityParameterConfigModule.GROUP_NAME) ;
+		AccessibilityConfigModule accessibilityConfigModule = (AccessibilityConfigModule) config.getModule(AccessibilityConfigModule.GROUP_NAME) ;
+		
+		if ( !accessibilityConfigModule.usingCarParameterFromMATSim() ) {
+			problem = true ;
+			log.error("using car beta parameters not from matsim currently not allowed since interpretation not fully clear") ;
+		}
+		if ( !accessibilityConfigModule.usingPtParameterFromMATSim() ) {
+			problem = true ;
+			log.error("using pt beta parameters not from matsim currently not allowed since interpretation not fully clear") ;
+		}
+		if ( !accessibilityConfigModule.usingWalkParameterFromMATSim() ) {
+			problem = true ;
+			log.error("using walk beta parameters not from matsim currently not allowed since interpretation not fully clear") ;
+		}
+		if ( !accessibilityConfigModule.usingBikeParameterFromMATSim() ) {
+			problem = true ;
+			log.error("using bike beta parameters not from matsim currently not allowed since interpretation not fully clear") ;
+		}
 		
 		if ( problem ) {
 			throw new RuntimeException("serious problem in MATSim4UrbanSimConfigConsistencyChecker; aborting ...") ;

@@ -1,5 +1,6 @@
 package org.matsim.contrib.matsim4opus.accessibility;
 
+import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -91,6 +92,7 @@ public class AccessibilityTest implements MATSim4UrbanSimInterface, LinkEnterEve
 		MATSim4UrbanSimConfigurationConverterV4 connector = new MATSim4UrbanSimConfigurationConverterV4(configLocation);
 		connector.init();
 		Config config = connector.getConfig();
+		Assert.assertTrue(config!=null) ;
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 

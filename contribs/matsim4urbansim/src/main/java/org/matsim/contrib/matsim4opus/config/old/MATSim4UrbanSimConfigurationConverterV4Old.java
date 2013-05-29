@@ -28,7 +28,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.matsim4opus.config.AccessibilityParameterConfigModule;
+import org.matsim.contrib.matsim4opus.config.AccessibilityConfigModule;
 import org.matsim.contrib.matsim4opus.config.JAXBUnmaschalV2;
 import org.matsim.contrib.matsim4opus.config.MATSim4UrbanSimControlerConfigModuleV3;
 import org.matsim.contrib.matsim4opus.config.UrbanSimParameterConfigModuleV3;
@@ -627,7 +627,7 @@ public class MATSim4UrbanSimConfigurationConverterV4Old {
 		}
 		
 		// set parameter in module 
-		AccessibilityParameterConfigModule module = getAccessibilityParameterConfig();
+		AccessibilityConfigModule module = getAccessibilityParameterConfig();
 		module.setAccessibilityDestinationSamplingRate(accessibilityDestinationSamplingRate);
 		module.setUsingLogitScaleParameterFromMATSim(useMATSimLogitScaleParameter);
 		module.setUsingRawSumsWithoutLn(useRawSum);
@@ -1074,13 +1074,13 @@ public class MATSim4UrbanSimConfigurationConverterV4Old {
 			return this.config;
 	}
 	
-	public AccessibilityParameterConfigModule getAccessibilityParameterConfig() {
-		Module m = this.config.getModule(AccessibilityParameterConfigModule.GROUP_NAME);
-		if (m instanceof AccessibilityParameterConfigModule) {
-			return (AccessibilityParameterConfigModule) m;
+	public AccessibilityConfigModule getAccessibilityParameterConfig() {
+		Module m = this.config.getModule(AccessibilityConfigModule.GROUP_NAME);
+		if (m instanceof AccessibilityConfigModule) {
+			return (AccessibilityConfigModule) m;
 		}
-		AccessibilityParameterConfigModule apcm = new AccessibilityParameterConfigModule();
-		this.config.getModules().put(AccessibilityParameterConfigModule.GROUP_NAME, apcm);
+		AccessibilityConfigModule apcm = new AccessibilityConfigModule();
+		this.config.getModules().put(AccessibilityConfigModule.GROUP_NAME, apcm);
 		return apcm;
 	}
 	
