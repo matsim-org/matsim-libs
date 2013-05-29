@@ -23,6 +23,7 @@ import air.demand.CtPopulationGenerator;
 
 
 /**
+ * Main used to create the population for the german flight sceanario
  * @author dgrether
  *
  */

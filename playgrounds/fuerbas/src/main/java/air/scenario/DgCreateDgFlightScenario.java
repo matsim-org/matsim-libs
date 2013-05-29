@@ -39,6 +39,7 @@ import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import air.analysis.DgNet2Shape;
+import air.scenario.countryfilter.DgEuropeCountryFilter;
 import air.scenario.countryfilter.DgGermanyCountryFilter;
 import air.scenario.oag.DgOagFlightsData;
 import air.scenario.oag.DgOagLine;
@@ -71,7 +72,7 @@ public class DgCreateDgFlightScenario {
 	private String flightScenarioDirectoryName = "dg_oag_tuesday_flight_model_2_runways_3600vph_storage_restriction/";
 	private CoordinateTransformation transform = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:3395");
 	private DgFlightScenarioData flightScenarioData = new DgFlightScenarioData(CAPACITY_PERIOD);
-	private boolean useAirportCapacities = false;
+	private boolean useAirportCapacities = true;
 	public static final boolean useSingleDayOfOperation = true;
 	private String airportCapacityFile = dataBaseDirectory + "shared-svn/projects/throughFlightData/airportCapacityData/2012-08-14_airport_capacity_from_www.csv";
 	
@@ -149,8 +150,8 @@ public class DgCreateDgFlightScenario {
 
 		
 		SfAirScheduleBuilder airScheduleBuilder = new SfAirScheduleBuilder();
-//		airScheduleBuilder.setCountryFilter(new DgEuropeCountryFilter(true));
-		airScheduleBuilder.setCountryFilter(new SfEuropeCountryFilter());
+		airScheduleBuilder.setCountryFilter(new DgEuropeCountryFilter(false));
+//		airScheduleBuilder.setCountryFilter(new SfEuropeCountryFilter());
 		DgOagFlightsData flightsData = airScheduleBuilder.readDataAndFilter(inputOsmFilename, flightData, baseDirectory,
 				 utcOffsetfile, oagFlightsFilename);
 		Map<String, Coord> airports = airScheduleBuilder.getAirportCoordMap();

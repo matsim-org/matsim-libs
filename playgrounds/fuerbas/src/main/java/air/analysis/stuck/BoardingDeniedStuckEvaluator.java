@@ -57,10 +57,10 @@ public class BoardingDeniedStuckEvaluator {
 	public BoardingDeniedStuckEvaluator(Map<Id, PersonEvents> map, Population pop) {
 		this.personStats = map;
 		this.population = pop;
+		this.evalutateStuckStats();
 	}
 
-	public void evaluateAndWrite(String outputFilePrefix) {
-		this.evalutateStuckStats();
+	public void writeToFiles(String outputFilePrefix) {
 		String odStuckStats = outputFilePrefix + "stucked_by_od_pair.csv";
 		this.writeOdStuckStats(odStuckStats);
 		String airportStuckStats = outputFilePrefix + "stucked_by_airport.csv";
@@ -122,9 +122,18 @@ public class BoardingDeniedStuckEvaluator {
 		}
 	}
 
-	private static final class BoardingDeniedStuck {
+	public static final class BoardingDeniedStuck {
 		int stuckAndBoardingDenied = 0;
 		int stuckNoBoardingDenied = 0;
+		
+		public int getStuckAndBoardingDenied() {
+			return stuckAndBoardingDenied;
+		}
+		
+		public int getStuckNoBoardingDenied() {
+			return stuckNoBoardingDenied;
+		}
+		
 	}
 
 	private void evalutateStuckStats(){
@@ -157,7 +166,10 @@ public class BoardingDeniedStuckEvaluator {
 		Person person = this.population.getPersons().get(personId);
 		Plan plan = person.getPlans().get(0);
 		Id fromLinkId = ((Activity)plan.getPlanElements().get(0)).getLinkId();
-		Id toLinkId = ((Activity)plan.getPlanElements().get(2)).getLinkId();
+		Id toLinkId = ((Activity)plan.getPlanElements().get(plan.getPlanElements().size() - 1)).getLinkId();
+		if (fromLinkId.equals(toLinkId)){
+			log.warn("person id "+ personId.toString() + " has same from and to link " + toLinkId);
+		}
 		Tuple<Id, Id> t = new Tuple<Id, Id>(fromLinkId, toLinkId);
 		return t;
 	}
@@ -178,6 +190,13 @@ public class BoardingDeniedStuckEvaluator {
 			odStuckCountMap.put(odTuple, odCount);
 		}
 		return odCount;
+	}
+
+
+
+	
+	public Map<Tuple<Id, Id>, BoardingDeniedStuck> getOdStuckCountMap() {
+		return odStuckCountMap;
 	}
 	
 	

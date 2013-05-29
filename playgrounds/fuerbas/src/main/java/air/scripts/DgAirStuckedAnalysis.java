@@ -42,7 +42,7 @@ public class DgAirStuckedAnalysis {
 	public static void main(String[] args) {
 		String populationFile = "/home/dgrether/data/work/repos/shared-svn/studies/countries/de/flight/demand/destatis/2011_september/population_september_2011_tabelle_2.2.2.xml.gz";
 		String[] runNumbers ={
-				"1836", 
+//				"1836", 
 //				"1837",
 //				"1838",
 //				"1839",
@@ -55,6 +55,19 @@ public class DgAirStuckedAnalysis {
 //				"1851",
 //				"1852",
 //				"1853"
+				
+				"1854",
+//				"1855",
+//				"1856",
+//				"1857",
+//				"1858",
+//				"1859",
+//				
+//				"1860",
+//				"1861",
+//				"1862",
+//				"1863",
+//				"1864"
 		};
 		String iteration = "600";
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -69,7 +82,7 @@ public class DgAirStuckedAnalysis {
 			eventsManager.addHandler(handler);
 			MatsimEventsReader reader = new MatsimEventsReader(eventsManager);
 			reader.readFile(events);
-			new BoardingDeniedStuckEvaluator(handler.getBoardingDeniedStuckEventsByPersonId(), sc.getPopulation()).evaluateAndWrite(outputFilePrefix);
+			new BoardingDeniedStuckEvaluator(handler.getBoardingDeniedStuckEventsByPersonId(), sc.getPopulation()).writeToFiles(outputFilePrefix);
 		}
 	}
 

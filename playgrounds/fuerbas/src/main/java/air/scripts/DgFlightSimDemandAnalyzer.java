@@ -20,6 +20,9 @@
 package air.scripts;
 
 import java.io.IOException;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.SortedMap;
@@ -79,27 +82,43 @@ public class DgFlightSimDemandAnalyzer {
 	
 	double populationVariance = variance.getFirst() / (double)variance.getSecond();
 	double meanRelError = relErrorSum.getFirst()/(double)relErrorSum.getSecond();
-	String result = "2.2.2 - 2.2.1" + " &  " + "-" + " & " + getStringFromDouble(populationVariance, -1)  + ", " + Integer.toString(variance.getSecond())+ " & " 
-	+ getStringFromDouble(Math.sqrt(populationVariance), -1) + " & " + getStringFromDouble(meanRelError, 4) 
-	+ ", " + Integer.toString(relErrorSum.getSecond()) + " & " + "-" + " & " + "-" + " \\\\";
+	String result = "2.2.2 - 2.2.1" + " &  " + "-" + " & " + getStringFromDouble(populationVariance, -1)  
+//			+ ", " + Integer.toString(variance.getSecond())
+			+ " & " 
+	+ getStringFromDouble(Math.sqrt(populationVariance), -1) + " & " + getStringFromDouble(meanRelError, 2) 
+//	+ ", " + Integer.toString(relErrorSum.getSecond()) 
+	+ " & " + "-" + " & " + "-" + " \\\\";
 	System.out.println(result);
 	results.add(result);
 
 	
 	String[] runNumbers ={
-//			"1836", 
-//			"1837",
-//			"1838",
-//			"1839",
-//			"1840",
-//			"1841"	
-			"1848",
-			"1849",
-			"1850",
-			"1851",
-			"1852",
-			"1853"
-	};
+//		"1836", 
+//		"1837",
+//		"1838",
+//		"1839",
+//		"1840",
+//		"1841"	
+//		"1848",
+//		"1849",
+//		"1850",
+//		"1851",
+//		"1852",
+//		"1853",
+		
+	"1854",
+	"1855",
+	"1856",
+	"1857",
+	"1858",
+	"1859",
+//	
+//	"1860",
+//	"1861",
+//	"1862",
+//	"1863",
+//	"1864"
+};
 	String iteration = "600";
 	
 	for (String runNumber : runNumbers) {
@@ -131,14 +150,16 @@ public class DgFlightSimDemandAnalyzer {
 		populationVariance = variance.getFirst() / (double)variance.getSecond();
 		meanRelError = relErrorSum.getFirst()/(double)relErrorSum.getSecond();
 		
-		result = runNumber + " & " + iteration + " & " + getStringFromDouble(populationVariance, -1) + ", " + Integer.toString(variance.getSecond()) + " & " 
-		+ getStringFromDouble(Math.sqrt(populationVariance), -1) + " & " + getStringFromDouble(meanRelError, 4) 
-		+ ", " + Integer.toString(relErrorSum.getSecond()) + " & " + getStringFromDouble(boardingDenied, -1) + " & " + getStringFromDouble(stucked, -1) + " \\\\";
+		result = runNumber + " & " + iteration + " & " + getStringFromDouble(populationVariance, -1) //+ ", " + Integer.toString(variance.getSecond()) 
+		+ " & " 
+		+ getStringFromDouble(Math.sqrt(populationVariance), -1) + " & " + getStringFromDouble(meanRelError, 2) 
+//		+ ", " + Integer.toString(relErrorSum.getSecond()) 
+		+ " & " + getStringFromDouble(boardingDenied, -1) + " & " + getStringFromDouble(stucked, -1) + " \\\\";
 		System.out.println(result);
 		results.add(result);
 	}
 	
-	System.out.println("runNumber & iteration & variance  &  standard deviation & rel error  & boarding denied & stucked \\\\");
+	System.out.println("runNumber & iteration & variance  &  standard deviation & rel error  & boarding denied & stuck \\\\");
 	for (String s : results){
 		System.out.println(s);
 	}
@@ -147,8 +168,16 @@ public class DgFlightSimDemandAnalyzer {
 
 
 private static String getStringFromDouble(double d, int decimalPlaces){
-	String res = Double.toString(d);
-	return res.substring(0, res.lastIndexOf(".") + decimalPlaces + 1);
-}
+		String pattern = "#0";
+		if (decimalPlaces > 0)
+			pattern += ".";
+		for (int i = 0; i  < decimalPlaces; i++) pattern+= "0";
+		NumberFormat f = NumberFormat.getInstance();
+		 if (f instanceof DecimalFormat) {
+		     ((DecimalFormat) f).setRoundingMode(RoundingMode.HALF_UP);
+		     ((DecimalFormat) f).applyPattern(pattern);
+		 }
+		 return f.format(d);
+	}
 	
 }

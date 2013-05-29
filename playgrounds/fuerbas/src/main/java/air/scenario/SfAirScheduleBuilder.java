@@ -309,7 +309,7 @@ public class SfAirScheduleBuilder {
 			}
 			//the filters below are relevant for detection of data accuracy for data that is not provided by oag
 			//--> skipLine instead of continue
-			if (!airportCoordinatesAvailable(l.getOriginAirport(), l.getDestinationAirport(),
+			if (! airportCoordinatesAvailable(l.getOriginAirport(), l.getDestinationAirport(),
 					availableAirportCoordinates)) {
 				skipLine = true;
 			}
