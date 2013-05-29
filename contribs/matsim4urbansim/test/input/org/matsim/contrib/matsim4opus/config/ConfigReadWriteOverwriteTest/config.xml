@@ -170,7 +170,7 @@ For 'queueSimulation', add a module 'simulation' to the config. -->
 		<param name="inputCountsFile" value="null" />
 
 		<!-- possible values: `html', `kml', `txt', `all' -->
-		<param name="outputformat" value="null" />
+		<param name="outputformat" value="txt" />
 
 		<!-- Specifies how often the counts comparison should be calculated and written. -->
 		<param name="writeCountsInterval" value="10" />
