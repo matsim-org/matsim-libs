@@ -37,7 +37,7 @@ public class M4UConfigConsistencyChecker implements ConfigConsistencyChecker {
 	public void checkConsistency(Config config) {
 		boolean problem = false ;
 		
-		MATSim4UrbanSimControlerConfigModuleV3 matsim4urbansimModule = (MATSim4UrbanSimControlerConfigModuleV3) config.getModule(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME) ;
+		M4UControlerConfigModuleV3 matsim4urbansimModule = (M4UControlerConfigModuleV3) config.getModule(M4UControlerConfigModuleV3.GROUP_NAME) ;
 		UrbanSimParameterConfigModuleV3 urbansimParameterModule = (UrbanSimParameterConfigModuleV3) config.getModule(UrbanSimParameterConfigModuleV3.GROUP_NAME ) ;
 		AccessibilityConfigModule accessibilityConfigModule = (AccessibilityConfigModule) config.getModule(AccessibilityConfigModule.GROUP_NAME) ;
 		

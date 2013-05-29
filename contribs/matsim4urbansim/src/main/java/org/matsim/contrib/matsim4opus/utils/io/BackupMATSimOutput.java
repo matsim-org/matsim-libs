@@ -7,7 +7,7 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.matsim4opus.config.ConfigurationUtils;
-import org.matsim.contrib.matsim4opus.config.MATSim4UrbanSimControlerConfigModuleV3;
+import org.matsim.contrib.matsim4opus.config.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4opus.config.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4opus.constants.InternalConstants;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.AccessibilityControlerListenerImpl;
@@ -42,7 +42,7 @@ public class BackupMATSimOutput {
 	private static void saveRunOutputs(ScenarioImpl scenario) {
 		log.info("Saving UrbanSim and MATSim outputs ...");
 
-		MATSim4UrbanSimControlerConfigModuleV3 m4ucModule = ConfigurationUtils.getMATSim4UrbaSimControlerConfigModule(scenario);
+		M4UControlerConfigModuleV3 m4ucModule = ConfigurationUtils.getMATSim4UrbaSimControlerConfigModule(scenario);
 		UrbanSimParameterConfigModuleV3 uspModule = ConfigurationUtils.getUrbanSimParameterConfigModule(scenario);
 		int currentYear = uspModule.getYear();
 		
@@ -112,7 +112,7 @@ public class BackupMATSimOutput {
 	 */
 	public static void prepareHotStart(ScenarioImpl scenario){
 		
-		MATSim4UrbanSimControlerConfigModuleV3 module = ConfigurationUtils.getMATSim4UrbaSimControlerConfigModule(scenario);
+		M4UControlerConfigModuleV3 module = ConfigurationUtils.getMATSim4UrbaSimControlerConfigModule(scenario);
 		
 		if(!module.getHotStartTargetLocation().equals("")){
 			

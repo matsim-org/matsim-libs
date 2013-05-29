@@ -153,7 +153,7 @@ public class M4UConfigUtils {
 		// ===
 
 		// set parameter in module 
-		MATSim4UrbanSimControlerConfigModuleV3 module = getMATSim4UrbaSimControlerConfigAndPossiblyConvert(config);
+		M4UControlerConfigModuleV3 module = getMATSim4UrbaSimControlerConfigAndPossiblyConvert(config);
 		module.setAgentPerformance(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isAgentPerformance());
 		module.setZone2ZoneImpedance(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isZone2ZoneImpedance());
 		module.setZoneBasedAccessibility(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isZoneBasedAccessibility());
@@ -307,7 +307,7 @@ public class M4UConfigUtils {
 		// get plans file for warm start 
 		String warmStart = matsimParameter.getInputPlansFile().getInputFile();
 
-		MATSim4UrbanSimControlerConfigModuleV3 module = getMATSim4UrbaSimControlerConfigAndPossiblyConvert(config);
+		M4UControlerConfigModuleV3 module = getMATSim4UrbaSimControlerConfigAndPossiblyConvert(config);
 
 		// setting plans file as input
 		if( !hotStart.equals("") &&
@@ -578,8 +578,8 @@ public class M4UConfigUtils {
 		//"materialize" the local config groups:
 		config.addModule(UrbanSimParameterConfigModuleV3.GROUP_NAME, 
 				new UrbanSimParameterConfigModuleV3(UrbanSimParameterConfigModuleV3.GROUP_NAME) ) ;
-		config.addModule(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME,
-				new MATSim4UrbanSimControlerConfigModuleV3(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME));
+		config.addModule(M4UControlerConfigModuleV3.GROUP_NAME,
+				new M4UControlerConfigModuleV3(M4UControlerConfigModuleV3.GROUP_NAME));
 		config.addModule(AccessibilityConfigModule.GROUP_NAME,
 				new AccessibilityConfigModule()) ;
 
@@ -626,17 +626,17 @@ public class M4UConfigUtils {
 		return upcm;
 	}
 
-	static MATSim4UrbanSimControlerConfigModuleV3 getMATSim4UrbaSimControlerConfigAndPossiblyConvert(Config config) {
-		Module m = config.getModule(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME);
-		if (m instanceof MATSim4UrbanSimControlerConfigModuleV3) {
-			return (MATSim4UrbanSimControlerConfigModuleV3) m;
+	static M4UControlerConfigModuleV3 getMATSim4UrbaSimControlerConfigAndPossiblyConvert(Config config) {
+		Module m = config.getModule(M4UControlerConfigModuleV3.GROUP_NAME);
+		if (m instanceof M4UControlerConfigModuleV3) {
+			return (M4UControlerConfigModuleV3) m;
 		}
-		MATSim4UrbanSimControlerConfigModuleV3 mccm = new MATSim4UrbanSimControlerConfigModuleV3(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME);
+		M4UControlerConfigModuleV3 mccm = new M4UControlerConfigModuleV3(M4UControlerConfigModuleV3.GROUP_NAME);
 		//		config.getModules().put(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME, mccm);
 		// yyyyyy the above code does NOT convert but throws the config entries away.
 		// In contrast, config.addModule(...) would convert.  kai, may'13
 		// I just changed that:
-		config.addModule(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME, mccm ) ;
+		config.addModule(M4UControlerConfigModuleV3.GROUP_NAME, mccm ) ;
 		return mccm;
 	}
 
@@ -686,7 +686,7 @@ public class M4UConfigUtils {
 	/**
 	 * printing MATSim4UrbanSimControlerSettings
 	 */
-	static void printMATSim4UrbanSimControlerSettings( MATSim4UrbanSimControlerConfigModuleV3 module ) {
+	static void printMATSim4UrbanSimControlerSettings( M4UControlerConfigModuleV3 module ) {
 
 		//		MATSim4UrbanSimControlerConfigModuleV3 module = getMATSim4UrbaSimControlerConfig();
 

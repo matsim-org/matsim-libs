@@ -39,7 +39,7 @@ import javax.xml.validation.SchemaFactory;
 import org.apache.log4j.Logger;
 import org.jfree.util.Log;
 import org.junit.Assert;
-import org.matsim.contrib.matsim4opus.config.MATSim4UrbanSimConfigurationConverterV4;
+import org.matsim.contrib.matsim4opus.config.M4USimConfigurationConverterV4;
 import org.matsim.contrib.matsim4opus.constants.InternalConstants;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.jaxbconfig2.AccessibilityParameterType;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.jaxbconfig2.ConfigType;
@@ -504,7 +504,7 @@ public class CreateTestMATSimConfig {
 		CreateTestMATSimConfig config = new CreateTestMATSimConfig(COLD_START, path);
 		String matsimConfiFile = config.generate();
 		
-		MATSim4UrbanSimConfigurationConverterV4 connector = new MATSim4UrbanSimConfigurationConverterV4( matsimConfiFile );
+		M4USimConfigurationConverterV4 connector = new M4USimConfigurationConverterV4( matsimConfiFile );
 		connector.init();
 		
 		TempDirectoryUtil.cleaningUpCustomTempDirectories();

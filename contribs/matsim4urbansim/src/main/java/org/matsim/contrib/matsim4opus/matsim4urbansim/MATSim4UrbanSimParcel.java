@@ -36,8 +36,8 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.matsim4opus.config.AccessibilityConfigModule;
-import org.matsim.contrib.matsim4opus.config.MATSim4UrbanSimConfigurationConverterV4;
-import org.matsim.contrib.matsim4opus.config.MATSim4UrbanSimControlerConfigModuleV3;
+import org.matsim.contrib.matsim4opus.config.M4USimConfigurationConverterV4;
+import org.matsim.contrib.matsim4opus.config.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4opus.config.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4opus.gis.GridUtils;
 import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
@@ -100,7 +100,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 	// MATSim scenario
 	ScenarioImpl scenario = null;
 	// MATSim4UrbanSim configuration converter
-	MATSim4UrbanSimConfigurationConverterV4 connector = null;
+	M4USimConfigurationConverterV4 connector = null;
 	// Reads UrbanSim Parcel output files
 	ReadFromUrbanSimModel readFromUrbansim = null;
 	// Benchmarking computation times and hard disc space ... 
@@ -152,7 +152,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 		// checks if args parameter contains a valid path
 		Paths.isValidPath(matsimConfiFile);
 		
-		connector = new MATSim4UrbanSimConfigurationConverterV4( matsimConfiFile );
+		connector = new M4USimConfigurationConverterV4( matsimConfiFile );
 		if( !(connector.init()) ){
 			log.error("An error occured while initializing MATSim scenario ...");
 			System.exit(-1);
@@ -249,7 +249,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 		// read UrbanSim population (these are simply those entities that have the person, home and work ID)
 		Population oldPopulation = null;
 		
-		MATSim4UrbanSimControlerConfigModuleV3 m4uModule = getMATSim4UrbanSimControlerConfig();
+		M4UControlerConfigModuleV3 m4uModule = getMATSim4UrbanSimControlerConfig();
 		UrbanSimParameterConfigModuleV3 uspModule		 = getUrbanSimParameterConfig();
 		
 		
@@ -490,7 +490,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 	void setControlerSettings(String[] args) {
 
 		AccessibilityConfigModule moduleAccessibility = getAccessibilityParameterConfig();
-		MATSim4UrbanSimControlerConfigModuleV3 moduleMATSim4UrbanSim = getMATSim4UrbanSimControlerConfig();
+		M4UControlerConfigModuleV3 moduleMATSim4UrbanSim = getMATSim4UrbanSimControlerConfig();
 		
 		this.opportunitySampleRate 		= moduleAccessibility.getAccessibilityDestinationSamplingRate();
 
@@ -596,13 +596,13 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 	 * access to MATSim4UrbanSimControlerConfigModuleV3 and related parameter settings
 	 * @return MATSim4UrbanSimControlerConfigModuleV3
 	 */
-	MATSim4UrbanSimControlerConfigModuleV3 getMATSim4UrbanSimControlerConfig() {
-		Module m = this.scenario.getConfig().getModule(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME);
-		if (m instanceof MATSim4UrbanSimControlerConfigModuleV3) {
-			return (MATSim4UrbanSimControlerConfigModuleV3) m;
+	M4UControlerConfigModuleV3 getMATSim4UrbanSimControlerConfig() {
+		Module m = this.scenario.getConfig().getModule(M4UControlerConfigModuleV3.GROUP_NAME);
+		if (m instanceof M4UControlerConfigModuleV3) {
+			return (M4UControlerConfigModuleV3) m;
 		}
-		MATSim4UrbanSimControlerConfigModuleV3 mccm = new MATSim4UrbanSimControlerConfigModuleV3(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME);
-		this.scenario.getConfig().getModules().put(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME, mccm);
+		M4UControlerConfigModuleV3 mccm = new M4UControlerConfigModuleV3(M4UControlerConfigModuleV3.GROUP_NAME);
+		this.scenario.getConfig().getModules().put(M4UControlerConfigModuleV3.GROUP_NAME, mccm);
 		return mccm;
 	}
 	

@@ -30,7 +30,7 @@ import java.util.Iterator;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.matsim4opus.config.AccessibilityConfigModule;
 import org.matsim.contrib.matsim4opus.config.JAXBUnmaschalV2;
-import org.matsim.contrib.matsim4opus.config.MATSim4UrbanSimControlerConfigModuleV3;
+import org.matsim.contrib.matsim4opus.config.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4opus.config.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4opus.constants.InternalConstants;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.jaxbconfig2.ConfigType;
@@ -452,7 +452,7 @@ public class MATSim4UrbanSimConfigurationConverterV4Old {
 		}
 		
 		// set parameter in module 
-		MATSim4UrbanSimControlerConfigModuleV3 module = getMATSim4UrbaSimControlerConfig();
+		M4UControlerConfigModuleV3 module = getMATSim4UrbaSimControlerConfig();
 		module.setAgentPerformance(computeAgentPerformanceFeedback);
 		module.setZone2ZoneImpedance(computeZone2ZoneImpedance);
 		module.setZoneBasedAccessibility(computeZoneBasedAccessibility);
@@ -756,7 +756,7 @@ public class MATSim4UrbanSimConfigurationConverterV4Old {
 		// get plans file for warm start 
 		String warmStart = matsimParameter.getInputPlansFile().getInputFile();
 		
-		MATSim4UrbanSimControlerConfigModuleV3 module = getMATSim4UrbaSimControlerConfig();
+		M4UControlerConfigModuleV3 module = getMATSim4UrbaSimControlerConfig();
 		
 		// setting plans file as input
 		if( !hotStart.equals("") &&
@@ -1084,13 +1084,13 @@ public class MATSim4UrbanSimConfigurationConverterV4Old {
 		return apcm;
 	}
 	
-	public MATSim4UrbanSimControlerConfigModuleV3 getMATSim4UrbaSimControlerConfig() {
-		Module m = this.config.getModule(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME);
-		if (m instanceof MATSim4UrbanSimControlerConfigModuleV3) {
-			return (MATSim4UrbanSimControlerConfigModuleV3) m;
+	public M4UControlerConfigModuleV3 getMATSim4UrbaSimControlerConfig() {
+		Module m = this.config.getModule(M4UControlerConfigModuleV3.GROUP_NAME);
+		if (m instanceof M4UControlerConfigModuleV3) {
+			return (M4UControlerConfigModuleV3) m;
 		}
-		MATSim4UrbanSimControlerConfigModuleV3 mccm = new MATSim4UrbanSimControlerConfigModuleV3(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME);
-		this.config.getModules().put(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME, mccm);
+		M4UControlerConfigModuleV3 mccm = new M4UControlerConfigModuleV3(M4UControlerConfigModuleV3.GROUP_NAME);
+		this.config.getModules().put(M4UControlerConfigModuleV3.GROUP_NAME, mccm);
 		return mccm;
 	}
 	

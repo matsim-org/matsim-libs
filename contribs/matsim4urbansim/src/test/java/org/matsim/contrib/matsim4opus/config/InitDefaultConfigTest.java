@@ -25,7 +25,7 @@ package org.matsim.contrib.matsim4opus.config;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
-import org.matsim.contrib.matsim4opus.config.MATSim4UrbanSimConfigurationConverterV4;
+import org.matsim.contrib.matsim4opus.config.M4USimConfigurationConverterV4;
 import org.matsim.contrib.matsim4opus.utils.CreateTestExternalMATSimConfig;
 import org.matsim.contrib.matsim4opus.utils.CreateTestMATSimConfig;
 import org.matsim.contrib.matsim4opus.utils.io.TempDirectoryUtil;
@@ -48,7 +48,7 @@ public class InitDefaultConfigTest extends MatsimTestCase{
 	public void testLoadDefaultMATSim4UrbanSimWithExternalConfigFile(){
 		
 		// MATSim4UrbanSim configuration converter
-		MATSim4UrbanSimConfigurationConverterV4 connector = null;
+		M4USimConfigurationConverterV4 connector = null;
 		
 		try{
 			String path = TempDirectoryUtil.createCustomTempDirectory("tmp");
@@ -64,7 +64,7 @@ public class InitDefaultConfigTest extends MatsimTestCase{
 			String configLocation = testConfig.generate();
 			
 			log.info("Reading the matsim4urbansim config file ("+configLocation+") and converting it into matsim format");
-			if( !(connector = new MATSim4UrbanSimConfigurationConverterV4( configLocation )).init() ){
+			if( !(connector = new M4USimConfigurationConverterV4( configLocation )).init() ){
 				log.error("An error occured while initializing MATSim scenario ...");
 				Assert.assertFalse(true);
 			}

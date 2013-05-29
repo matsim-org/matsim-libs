@@ -6,7 +6,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.matsim4opus.config.MATSim4UrbanSimConfigurationConverterV4;
+import org.matsim.contrib.matsim4opus.config.M4USimConfigurationConverterV4;
 import org.matsim.contrib.matsim4opus.constants.InternalConstants;
 import org.matsim.contrib.matsim4opus.gis.GridUtils;
 import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
@@ -89,7 +89,7 @@ public class AccessibilityTest implements MATSim4UrbanSimInterface, LinkEnterEve
 
 		CreateTestUrbansimPopulation.createUrbanSimTestPopulation(path, nPersons);
 
-		MATSim4UrbanSimConfigurationConverterV4 connector = new MATSim4UrbanSimConfigurationConverterV4(configLocation);
+		M4USimConfigurationConverterV4 connector = new M4USimConfigurationConverterV4(configLocation);
 		connector.init();
 		Config config = connector.getConfig();
 		Assert.assertTrue(config!=null) ;

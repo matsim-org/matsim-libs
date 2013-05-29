@@ -32,10 +32,10 @@ public class ConfigurationUtils {
 		return null;
 	}
 
-	public static MATSim4UrbanSimControlerConfigModuleV3 getMATSim4UrbaSimControlerConfigModule(Scenario scenario){
-		Module m = scenario.getConfig().getModule(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME);
-		if (m instanceof MATSim4UrbanSimControlerConfigModuleV3) {
-			return (MATSim4UrbanSimControlerConfigModuleV3) m;
+	public static M4UControlerConfigModuleV3 getMATSim4UrbaSimControlerConfigModule(Scenario scenario){
+		Module m = scenario.getConfig().getModule(M4UControlerConfigModuleV3.GROUP_NAME);
+		if (m instanceof M4UControlerConfigModuleV3) {
+			return (M4UControlerConfigModuleV3) m;
 		}
 		return null;
 	}

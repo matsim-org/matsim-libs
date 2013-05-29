@@ -30,7 +30,7 @@ import org.matsim.core.config.Module;
 /**
  * @author thomas
  */
-public class MATSim4UrbanSimControlerConfigModuleV3 extends Module{
+public class M4UControlerConfigModuleV3 extends Module{
 	
 	public static final String GROUP_NAME = "matsim4urbansimControler";
 	
@@ -56,7 +56,7 @@ public class MATSim4UrbanSimControlerConfigModuleV3 extends Module{
     private Boolean isHotStart;
     private String hotStartTargetLocation;
 
-	public MATSim4UrbanSimControlerConfigModuleV3(String name) {
+	public M4UControlerConfigModuleV3(String name) {
 		super(name);
 		this.isColdStart = false;
 		this.isWarmStart = false;

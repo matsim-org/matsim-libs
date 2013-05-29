@@ -26,7 +26,7 @@ import java.math.BigInteger;
 
 import org.matsim.contrib.matsim4opus.config.AccessibilityConfigModule;
 import org.matsim.contrib.matsim4opus.config.M4UConfigUtils;
-import org.matsim.contrib.matsim4opus.config.MATSim4UrbanSimControlerConfigModuleV3;
+import org.matsim.contrib.matsim4opus.config.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4opus.config.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4opus.utils.io.TempDirectoryUtil;
 import org.matsim.core.config.Config;
@@ -283,13 +283,13 @@ public class CreateTestExternalMATSimConfig extends CreateTestMATSimConfig{
 		return apcm;
 	}
 	
-	public MATSim4UrbanSimControlerConfigModuleV3 getMATSim4UrbaSimControlerConfig(Config config) {
-		Module m = config.getModule(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME);
-		if (m instanceof MATSim4UrbanSimControlerConfigModuleV3) {
-			return (MATSim4UrbanSimControlerConfigModuleV3) m;
+	public M4UControlerConfigModuleV3 getMATSim4UrbaSimControlerConfig(Config config) {
+		Module m = config.getModule(M4UControlerConfigModuleV3.GROUP_NAME);
+		if (m instanceof M4UControlerConfigModuleV3) {
+			return (M4UControlerConfigModuleV3) m;
 		}
-		MATSim4UrbanSimControlerConfigModuleV3 mccm = new MATSim4UrbanSimControlerConfigModuleV3(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME);
-		config.getModules().put(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME, mccm);
+		M4UControlerConfigModuleV3 mccm = new M4UControlerConfigModuleV3(M4UControlerConfigModuleV3.GROUP_NAME);
+		config.getModules().put(M4UControlerConfigModuleV3.GROUP_NAME, mccm);
 		return mccm;
 	}
 	
