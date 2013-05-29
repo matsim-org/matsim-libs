@@ -25,12 +25,12 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.controler.events.ScoringEvent;
-import org.matsim.core.controler.listener.ScoringListener;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 
-public class Scorer implements  ScoringListener {
+public class Scorer implements  IterationEndsListener {
 
 	private static final Logger log = Logger.getLogger(Scorer.class);
 
@@ -41,7 +41,7 @@ public class Scorer implements  ScoringListener {
 	}
 
 	@Override
-	public void notifyScoring(ScoringEvent event) {
+	public void notifyIterationEnds(IterationEndsEvent event) {
 		double alpha = event.getControler().getConfig().planCalcScore().getLearningRate();
 		Population pop = event.getControler().getScenario().getPopulation();
 		for (Person person : pop.getPersons().values()){

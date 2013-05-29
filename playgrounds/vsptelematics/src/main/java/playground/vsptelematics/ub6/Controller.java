@@ -26,9 +26,6 @@ package playground.vsptelematics.ub6;
 
 
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.corelisteners.EventsHandling;
-import org.matsim.core.controler.corelisteners.PlansDumping;
-import org.matsim.core.controler.corelisteners.PlansReplanning;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 
@@ -36,6 +33,7 @@ import playground.vsptelematics.common.IncidentGenerator;
 
 /**
  * @author illenberger
+ * @author dgrether
  *
  */
 public class Controller extends Controler {
@@ -48,17 +46,15 @@ public class Controller extends Controler {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-//		String[] args2 = {"/media/data/work/repos/lehre-svn/lehrveranstaltungen/L058_methoden_telematik/2012_ss/uebungen/data/ha1/scenario/config.xml"};
-//		args = args2;
 		Controller c = new Controller(args);
 		c.setOverwriteFiles(true);
 		c.setCreateGraphs(false);
 		addListener(c);
-		throw new RuntimeException("I removed the overriding of loadCoreListeners() below since that method should become " +
-				"final in Controler.  I am not sure why this was needed; it looks like it was supposed to be a less heavyweight version of the" +
-				" full Controler core listeners.  Thus, it should also work now.  Otherwise, it needs to be derived from AbstractController instead" +
-				" of from Controler.  kai, feb'13 ") ;
-//		c.run(); // put back into code when runtime exception is removed.
+//		throw new RuntimeException("I removed the overriding of loadCoreListeners() below since that method should become " +
+//				"final in Controler.  I am not sure why this was needed; it looks like it was supposed to be a less heavyweight version of the" +
+//				" full Controler core listeners.  Thus, it should also work now.  Otherwise, it needs to be derived from AbstractController instead" +
+//				" of from Controler.  kai, feb'13 ") ;
+		c.run(); // put back into code when runtime exception is removed.
 	}
 	
 	
