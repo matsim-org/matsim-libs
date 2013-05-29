@@ -154,7 +154,7 @@ public class MATSim4UrbanSimConfigUtils {
 		// ===
 		
 		// set parameter in module 
-		MATSim4UrbanSimControlerConfigModuleV3 module = getMATSim4UrbaSimControlerConfigPossiblyEmpty(config);
+		MATSim4UrbanSimControlerConfigModuleV3 module = getMATSim4UrbaSimControlerConfigAndPossiblyConvert(config);
 		module.setAgentPerformance(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isAgentPerformance());
 		module.setZone2ZoneImpedance(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isZone2ZoneImpedance());
 		module.setZoneBasedAccessibility(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isZoneBasedAccessibility());
@@ -220,7 +220,7 @@ public class MATSim4UrbanSimConfigUtils {
 		String testParameter 	= matsim4UrbanSimParameter.getUrbansimParameter().getTestParameter();
 		
 		// // set parameter in module 
-		UrbanSimParameterConfigModuleV3 module = getUrbanSimParameterConfigPossiblyEmpty(config);
+		UrbanSimParameterConfigModuleV3 module = getUrbanSimParameterConfigAndPossiblyConvert(config);
 		module.setProjectName(projectName);
 		// module.setSpatialUnitFlag(spatialUnit); // tnicolai not needed anymore dec'12
 		module.setPopulationSampleRate(populationSamplingRate);
@@ -308,7 +308,7 @@ public class MATSim4UrbanSimConfigUtils {
 		// get plans file for warm start 
 		String warmStart = matsimParameter.getInputPlansFile().getInputFile();
 		
-		MATSim4UrbanSimControlerConfigModuleV3 module = getMATSim4UrbaSimControlerConfigPossiblyEmpty(config);
+		MATSim4UrbanSimControlerConfigModuleV3 module = getMATSim4UrbaSimControlerConfigAndPossiblyConvert(config);
 		
 		// setting plans file as input
 		if( !hotStart.equals("") &&
@@ -696,7 +696,6 @@ public class MATSim4UrbanSimConfigUtils {
 			}
 			
 			if(useMATSimWalkParameter){
-				// usually travelling_utils are negative
 				betaWalkTT		= planCalcScoreConfigGroup.getTravelingWalk_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr(); // [utils/h]
 				betaWalkTTPower	= 0.;
 				betaWalkLnTT	= 0.;
@@ -712,7 +711,6 @@ public class MATSim4UrbanSimConfigUtils {
 			}
 			
 			if(useMATSimPtParameter){
-				// usually travelling_utils are negative
 				betaPtTT		= planCalcScoreConfigGroup.getTravelingPt_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr(); // [utils/h]
 				betaPtTTPower	= 0.;
 				betaPtLnTT		= 0.;
@@ -756,27 +754,31 @@ public class MATSim4UrbanSimConfigUtils {
 			module.setBetaPtLnTravelMonetaryCost(betaPtLnTMC);
 		}
 
-	static UrbanSimParameterConfigModuleV3 getUrbanSimParameterConfigPossiblyEmpty(Config config) {
+	static UrbanSimParameterConfigModuleV3 getUrbanSimParameterConfigAndPossiblyConvert(Config config) {
 		Module m = config.getModule(UrbanSimParameterConfigModuleV3.GROUP_NAME);
 		if (m instanceof UrbanSimParameterConfigModuleV3) {
 			return (UrbanSimParameterConfigModuleV3) m;
 		}
 		UrbanSimParameterConfigModuleV3 upcm = new UrbanSimParameterConfigModuleV3(UrbanSimParameterConfigModuleV3.GROUP_NAME);
-		config.getModules().put(UrbanSimParameterConfigModuleV3.GROUP_NAME, upcm);
+//		config.getModules().put(UrbanSimParameterConfigModuleV3.GROUP_NAME, upcm);
 		// yyyyyy the above code does NOT convert but throws the config entries away.
 		// In contrast, config.addModule(...) would convert.  kai, may'13 
+		// I just changed that:
+		config.addModule( UrbanSimParameterConfigModuleV3.GROUP_NAME, upcm ) ;
 		return upcm;
 	}
 
-	static MATSim4UrbanSimControlerConfigModuleV3 getMATSim4UrbaSimControlerConfigPossiblyEmpty(Config config) {
+	static MATSim4UrbanSimControlerConfigModuleV3 getMATSim4UrbaSimControlerConfigAndPossiblyConvert(Config config) {
 		Module m = config.getModule(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME);
 		if (m instanceof MATSim4UrbanSimControlerConfigModuleV3) {
 			return (MATSim4UrbanSimControlerConfigModuleV3) m;
 		}
 		MATSim4UrbanSimControlerConfigModuleV3 mccm = new MATSim4UrbanSimControlerConfigModuleV3(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME);
-		config.getModules().put(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME, mccm);
+//		config.getModules().put(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME, mccm);
 		// yyyyyy the above code does NOT convert but throws the config entries away.
-		// In contrast, config.addModule(...) would convert.  kai, may'13 
+		// In contrast, config.addModule(...) would convert.  kai, may'13
+		// I just changed that:
+		config.addModule(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME, mccm ) ;
 		return mccm;
 	}
 
@@ -786,10 +788,11 @@ public class MATSim4UrbanSimConfigUtils {
 			return (AccessibilityParameterConfigModule) m;
 		}
 		AccessibilityParameterConfigModule apcm = new AccessibilityParameterConfigModule();
-		config.getModules().put(AccessibilityParameterConfigModule.GROUP_NAME, apcm);
+//		config.getModules().put(AccessibilityParameterConfigModule.GROUP_NAME, apcm);
 		// yyyyyy the above code does NOT convert but throws the config entries away.
 		// In contrast, config.addModule(...) would convert.  kai, may'13 
-		
+		// I just changed that:
+		config.addModule( AccessibilityParameterConfigModule.GROUP_NAME, apcm ) ;
 		return apcm;
 	}
 
@@ -980,91 +983,6 @@ public class MATSim4UrbanSimConfigUtils {
 			log.info("BETA_WALK_LN_TRAVEL_MONETARY_COSTS: " + module.getBetaWalkLnTravelMonetaryCost() );
 		}
 
-//	/**
-//	 * printing NetworkConfigGroupSettings
-//	 * @param config TODO
-//	 */
-//	static void printNetworkConfigGroupSettings(Config config) {
-//		NetworkConfigGroup networkCG = (NetworkConfigGroup) config.getModule(NetworkConfigGroup.GROUP_NAME);
-//
-//		log.info("Some NetworkConfigGroup settings:");
-//		log.info("Network: " + networkCG.getInputFile());
-//	}
-//
-//	/**
-//	 * printing PlansConfigGroupSettings
-//	 * @param config TODO
-//	 */
-//	static void printPlansConfigGroupSettings(Config config) {
-//		PlansConfigGroup plansCG = (PlansConfigGroup) config.getModule(PlansConfigGroup.GROUP_NAME);
-//		
-//		log.info("Some PlansConfigGroup setting:");
-//		log.info("Input plans file set to: " + plansCG.getInputFile());
-//	}
-//
-//	/**
-//	 * printing StrategyConfigGroupSettings
-//	 * @param config TODO
-//	 */
-//	static void printStrategyConfigGroupSettings(Config config) {
-//		
-//		StrategyConfigGroup strategyCG = (StrategyConfigGroup) config.getModule(StrategyConfigGroup.GROUP_NAME);
-//		
-//		log.info("Some StrategyConfigGroup settings:");
-//		Iterator<StrategySettings> iteratorStrategyCG = strategyCG.getStrategySettings().iterator();
-//		while(iteratorStrategyCG.hasNext()){
-//			StrategySettings strategySettings = iteratorStrategyCG.next();
-//			log.info("Strategy_"+strategySettings.getId()+ ":" + strategySettings.getModuleName() + " Probability: " + strategySettings.getProbability() + " Disable After Itereation: " + strategySettings.getDisableAfter() ); 
-//		}
-//		log.info("Max agent plan memory size: " + strategyCG.getMaxAgentPlanMemorySize());
-//	}
-//
-//	/**
-//	 * printing ControlerConfigGroupSetting
-//	 * @param config TODO
-//	 */
-//	static void printControlerConfigGroupSetting(Config config) {
-//		ControlerConfigGroup controlerCG = (ControlerConfigGroup) config.getModule(ControlerConfigGroup.GROUP_NAME);
-//		
-//		log.info("Some ControlerConfigGroup settings:");
-//		log.info("FirstIteration: " + controlerCG.getFirstIteration());
-//		log.info("LastIteration: " + controlerCG.getLastIteration());
-//		log.info("MATSim output directory: " +  controlerCG.getOutputDirectory());
-//		log.info("Mobsim: " + controlerCG.getMobsim());
-//	}
-//
-//	/**
-//	 * printing PlanCalcScoreSettings
-//	 * @param config TODO
-//	 */
-//	static void printPlanCalcScoreSettings(Config config) {
-//		
-//		ActivityParams homeActivity = config.planCalcScore().getActivityParams("home");
-//		ActivityParams workActivity = config.planCalcScore().getActivityParams("work");
-//		
-//		log.info("Some PlanCalcScore settings:");
-//		log.info("Activity_Type_0: " + homeActivity.getType() + " Typical Duration Activity_Type_0: " + homeActivity.getTypicalDuration());
-//		log.info("Activity_Type_1: " + workActivity.getType() + " Typical Duration Activity_Type_1: " + workActivity.getTypicalDuration());
-//		log.info("Opening Time Activity_Type_1: " + workActivity.getOpeningTime()); 
-//		log.info("Latest Start Time Activity_Type_1: " + workActivity.getLatestStartTime());
-//	}
-//
-//	/**
-//	 * printing QSimConfigGroupSettings
-//	 * @param config TODO
-//	 */
-//	static void printQSimConfigGroupSettings(Config config) {
-//		QSimConfigGroup qsimCG = config.getQSimConfigGroup();
-//		
-//		log.info("QSimConfigGroup settings:");
-//		log.info("Number of Threads: " + qsimCG.getNumberOfThreads());
-//		log.info("FlowCapFactor (= population sampling rate): "+ config.getQSimConfigGroup().getFlowCapFactor());
-//		log.info("StorageCapFactor: " + config.getQSimConfigGroup().getStorageCapFactor() );//+ " (with correction factor = " + storageCapCorrectionFactor + ")" );
-//		// log.info("RemoveStuckVehicles: " + (removeStuckVehicles?"True":"False") );
-//		log.info("StuckTime: " + config.getQSimConfigGroup().getStuckTime());
-//		log.info("End Time: " + qsimCG.getEndTime());
-//	}
-//
 	static final void checkConfigConsistencyAndWriteToLog(Config config, final String message) {
 		String newline = System.getProperty("line.separator");// use native line endings for logfile
 		log.info(newline + newline + message + ":");
@@ -1077,17 +995,5 @@ public class MATSim4UrbanSimConfigUtils {
 		log.info("Checking consistency of config done.");
 		log.info("("+message+")" + newline + newline ) ;
 	}
-//
-//	/**
-//	 * printing PlanCalcRouteGroupSettings
-//	 * @param config TODO
-//	 */
-//	static void printPlanCalcRouteGroupSettings(Config config) {
-//		log.info("PlanCalcRouteGroup settings:");							 
-//		log.info("Walk Speed: " + config.plansCalcRoute().getWalkSpeed() );
-//		log.info("Bike Speed: " + config.plansCalcRoute().getBikeSpeed() );
-//		log.info("Pt Speed: " + config.plansCalcRoute().getPtSpeed() );
-//		log.info("Beeline Distance Factor: " + config.plansCalcRoute().getBeelineDistanceFactor() );
-//	}
 
 }

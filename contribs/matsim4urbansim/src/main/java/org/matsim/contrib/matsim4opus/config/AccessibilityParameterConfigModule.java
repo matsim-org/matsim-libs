@@ -19,6 +19,9 @@
 
 package org.matsim.contrib.matsim4opus.config;
 
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.core.config.experimental.ReflectiveModule;
 
@@ -27,8 +30,11 @@ public class AccessibilityParameterConfigModule extends ReflectiveModule{
 
 	public static final String GROUP_NAME = "accessibilityParameter";
 	
+	// ===
+	
 	private double accessibilityDestinationSamplingRate;
 	
+	private static final String USING_LOGIT_SCALE_PARAMETER_FROM_MATSIM = "usingScaleParameterFromMATSim" ;
 	private boolean usingLogitScaleParameterFromMATSim;
 	
 	private boolean usingCarParameterFromMATSim;
@@ -40,6 +46,18 @@ public class AccessibilityParameterConfigModule extends ReflectiveModule{
     
 	private double logitScaleParameter;
     
+	// ===
+	
+	static final String BETA_CAR_TRAVEL_TIME = "betaCarTravelTime";
+	static final String BETA_CAR_TRAVEL_TIME_POWER2 = "betaCarTravelTimePower2";
+	static final String BETA_CAR_LN_TRAVEL_TIME = "betaCarLnTravelTime";
+	static final String BETA_CAR_TRAVEL_DISTANCE = "betaCarTravelDistance";
+	static final String BETA_CAR_TRAVEL_DISTANCE_POWER2 = "betaCarTravelDistancePower2";
+	static final String BETA_CAR_LN_TRAVEL_DISTANCE = "betaCarLnTravelDistance";
+	static final String BETA_CAR_TRAVEL_COST = "betaCarTravelCost";
+	static final String BETA_CAR_TRAVEL_COST_POWER2 = "betaCarTravelCostPower2";
+	static final String BETA_CAR_LN_TRAVEL_COST = "betaCarLnTravelCost";
+	
 	private double betaCarTravelTime;
 	private double betaCarTravelTimePower2;
 	private double betaCarLnTravelTime;
@@ -49,6 +67,8 @@ public class AccessibilityParameterConfigModule extends ReflectiveModule{
 	private double betaCarTravelMonetaryCost;
 	private double betaCarTravelMonetaryCostPower2;
 	private double betaCarLnTravelMonetaryCost;
+	
+	// ---
 	
 	private double betaBikeTravelTime;
 	private double betaBikeTravelTimePower2;
@@ -83,16 +103,6 @@ public class AccessibilityParameterConfigModule extends ReflectiveModule{
 	// parameter names in matsim4urbansimParameter module
 	public static final String TIME_OF_DAY = "timeOfDay";
 
-	static final String BETA_CAR_TRAVEL_TIME = "betaCarTravelTime";
-	static final String BETA_CAR_TRAVEL_TIME_POWER2 = "betaCarTravelTimePower2";
-	static final String BETA_CAR_LN_TRAVEL_TIME = "betaCarLnTravelTime";
-	static final String BETA_CAR_TRAVEL_DISTANCE = "betaCarTravelDistance";
-	static final String BETA_CAR_TRAVEL_DISTANCE_POWER2 = "betaCarTravelDistancePower2";
-	static final String BETA_CAR_LN_TRAVEL_DISTANCE = "betaCarLnTravelDistance";
-	static final String BETA_CAR_TRAVEL_COST = "betaCarTravelCost";
-	static final String BETA_CAR_TRAVEL_COST_POWER2 = "betaCarTravelCostPower2";
-	static final String BETA_CAR_LN_TRAVEL_COST = "betaCarLnTravelCost";
-	
 	static final String BETA_BIKE_TRAVEL_TIME = "betaBikeTravelTime";
 	static final String BETA_BIKE_TRAVEL_TIME_POWER2 = "betaBikeTravelTimePower2";
 	static final String BETA_BIKE_LN_TRAVEL_TIME = "betaBikeLnTravelTime";
@@ -106,6 +116,15 @@ public class AccessibilityParameterConfigModule extends ReflectiveModule{
 	public AccessibilityParameterConfigModule() {
 		super(GROUP_NAME);
 		// yyyyyy this class feels quite dangerous to me; one can have inconsistent entries between the Map and the typed values. kai, apr'13 
+	}
+	
+	@Override
+	public Map<String,String> getComments() {
+		Map<String,String> map = new TreeMap<String,String>() ;
+		
+		// map.put(key,comment) ;
+		
+		return map ;
 	}
 	
 	public double getAccessibilityDestinationSamplingRate(){
