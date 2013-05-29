@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.vsptelematics.ha1;
+package playground.vsptelematics.ub6;
 
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
