@@ -41,7 +41,7 @@ public class CountsConfigGroup extends Module {
 	private static final String WRITECOUNTSINTERVAL = "writeCountsInterval";
 	private static final String AVERAGECOUNTSOVERITERATIONS = "averageCountsOverIterations";
 
-	private String outputFormat;
+	private String outputFormat = "txt";
 
 	/**
 	 * the distance filter in [length unit defined by coordinates] 
