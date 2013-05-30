@@ -306,6 +306,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 		controler.setOverwriteFiles(true);	// sets whether output files are overwritten
 		controler.setCreateGraphs(true);	// sets whether output graphs are created
 		
+		PtMatrix ptMatrix = null ;
 		ImprovedPseudoPtConfigModule ippcm = M4UImprovedPseudoPtConfigUtils.getConfigModuleAndPossiblyConvert(scenario.getConfig()) ;
 		if(ippcm.getPtStopsInputFile() != null){
 			log.info("Initializing MATSim4UrbanSim pseudo pt router ...");
@@ -326,7 +327,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 			
 			// if ptStops etc are given in config
 			PlansCalcRouteConfigGroup plansCalcRoute = controler.getScenario().getConfig().plansCalcRoute();
-			PtMatrix ptMatrix = new PtMatrix(controler.getScenario().getNetwork(),
+			ptMatrix = new PtMatrix(controler.getScenario().getNetwork(),
 									plansCalcRoute.getTeleportedModeSpeeds().get(TransportMode.walk),
 									plansCalcRoute.getTeleportedModeSpeeds().get(TransportMode.pt),
 									plansCalcRoute.getBeelineDistanceFactor(),
