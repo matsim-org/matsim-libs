@@ -46,7 +46,6 @@ import org.matsim.testcases.MatsimTestUtils;
 
 import playground.vsp.emissions.types.ColdPollutant;
 import playground.vsp.emissions.types.WarmPollutant;
-import playground.vsp.emissions.utils.EmissionUtils;
 
 /*
  * test for playground.vsp.emissions.utils.EmissionUtils
@@ -773,15 +772,16 @@ public class TestEmissionUtils {
 		//not put into totalEmissionsMap - link 34
 		Id link34id = new IdImpl("link34");
 		
-		eu.setNonCalculatedEmissionsForNetwork(network, totalEmissions);
+		Map<Id, SortedMap<String, Double>> totalEmissionsFilled = eu.setNonCalculatedEmissionsForNetwork(network, totalEmissions);
 		//each link of the network and each type of emission
 		for(Link link: network.getLinks().values()){
 			
 			Id linkId = sc.createId(link.getId().toString());
 
-				Assert.assertTrue(totalEmissions.containsKey(linkId));
-				SortedMap<String, Double> emissionMapForLink = totalEmissions.get(linkId);
+				Assert.assertTrue(totalEmissionsFilled.containsKey(linkId));
+				SortedMap<String, Double> emissionMapForLink = totalEmissionsFilled.get(linkId);
 				for(String pollutant: pollsFromEU){
+					System.out.println("pollutant: " + pollutant + "; linkId: " + linkId);
 					Assert.assertTrue(pollutant + "not found for link " +linkId.toString(), 
 							emissionMapForLink.containsKey(pollutant));
 					Assert.assertEquals(Double.class, emissionMapForLink.get(pollutant).getClass());
@@ -790,52 +790,52 @@ public class TestEmissionUtils {
 		}
 		//check values
 		//link 12 and 13
-		Assert.assertEquals(totalEmissions.get(link12id).get(c2), c2link12v, MatsimTestUtils.EPSILON);
-		Assert.assertEquals(totalEmissions.get(link12id).get(co), colink12v,  MatsimTestUtils.EPSILON);
-		Assert.assertEquals(totalEmissions.get(link12id).get(fc), fclink12v,  MatsimTestUtils.EPSILON);
-		Assert.assertEquals(totalEmissions.get(link12id).get(hc), hclink12v,  MatsimTestUtils.EPSILON);
-		Assert.assertEquals(totalEmissions.get(link12id).get(nm), nmlink12v,  MatsimTestUtils.EPSILON);
-		Assert.assertEquals(totalEmissions.get(link12id).get(n2), n2link12v,  MatsimTestUtils.EPSILON);
-		Assert.assertEquals(totalEmissions.get(link12id).get(nx), nxlink12v,  MatsimTestUtils.EPSILON);
-		Assert.assertEquals(totalEmissions.get(link12id).get(pm), pmlink12v,  MatsimTestUtils.EPSILON);
-		Assert.assertEquals(totalEmissions.get(link12id).get(so), solink12v,  MatsimTestUtils.EPSILON);
-		Assert.assertEquals(totalEmissions.get(link13id).get(c2), c2link13v, MatsimTestUtils.EPSILON);
-		Assert.assertEquals(totalEmissions.get(link13id).get(co), colink13v,  MatsimTestUtils.EPSILON);
-		Assert.assertEquals(totalEmissions.get(link13id).get(fc), fclink13v,  MatsimTestUtils.EPSILON);
-		Assert.assertEquals(totalEmissions.get(link13id).get(hc), hclink13v,  MatsimTestUtils.EPSILON);
-		Assert.assertEquals(totalEmissions.get(link13id).get(nm), nmlink13v,  MatsimTestUtils.EPSILON);
-		Assert.assertEquals(totalEmissions.get(link13id).get(n2), n2link13v,  MatsimTestUtils.EPSILON);
-		Assert.assertEquals(totalEmissions.get(link13id).get(nx), nxlink13v,  MatsimTestUtils.EPSILON);
-		Assert.assertEquals(totalEmissions.get(link13id).get(pm), pmlink13v,  MatsimTestUtils.EPSILON);
-		Assert.assertEquals(totalEmissions.get(link13id).get(so), solink13v,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissionsFilled.get(link12id).get(c2), c2link12v, MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissionsFilled.get(link12id).get(co), colink12v,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissionsFilled.get(link12id).get(fc), fclink12v,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissionsFilled.get(link12id).get(hc), hclink12v,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissionsFilled.get(link12id).get(nm), nmlink12v,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissionsFilled.get(link12id).get(n2), n2link12v,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissionsFilled.get(link12id).get(nx), nxlink12v,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissionsFilled.get(link12id).get(pm), pmlink12v,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissionsFilled.get(link12id).get(so), solink12v,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissionsFilled.get(link13id).get(c2), c2link13v, MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissionsFilled.get(link13id).get(co), colink13v,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissionsFilled.get(link13id).get(fc), fclink13v,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissionsFilled.get(link13id).get(hc), hclink13v,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissionsFilled.get(link13id).get(nm), nmlink13v,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissionsFilled.get(link13id).get(n2), n2link13v,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissionsFilled.get(link13id).get(nx), nxlink13v,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissionsFilled.get(link13id).get(pm), pmlink13v,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissionsFilled.get(link13id).get(so), solink13v,  MatsimTestUtils.EPSILON);
 		
 		//link 14 and 34
 		for(String pollutant: pollsFromEU){
-			Assert.assertEquals(totalEmissions.get(link14id).get(pollutant), .0, MatsimTestUtils.EPSILON);
-			Assert.assertEquals(totalEmissions.get(link34id).get(pollutant), .0, MatsimTestUtils.EPSILON);
+			Assert.assertEquals(totalEmissionsFilled.get(link14id).get(pollutant), .0, MatsimTestUtils.EPSILON);
+			Assert.assertEquals(totalEmissionsFilled.get(link34id).get(pollutant), .0, MatsimTestUtils.EPSILON);
 		}
 		
 		//link 23 - partial
-		Assert.assertEquals(totalEmissions.get(link23id).get(c2), .0, MatsimTestUtils.EPSILON);
-		Assert.assertEquals(totalEmissions.get(link23id).get(co), .0,  MatsimTestUtils.EPSILON);
-		Assert.assertEquals(totalEmissions.get(link23id).get(fc), .0,  MatsimTestUtils.EPSILON);
-		Assert.assertEquals(totalEmissions.get(link23id).get(hc), .0,  MatsimTestUtils.EPSILON);
-		Assert.assertEquals(totalEmissions.get(link23id).get(nm), .0,  MatsimTestUtils.EPSILON);
-		Assert.assertEquals(totalEmissions.get(link23id).get(n2), .0,  MatsimTestUtils.EPSILON);
-		Assert.assertEquals(totalEmissions.get(link23id).get(nx), nxlink23v,  MatsimTestUtils.EPSILON);
-		Assert.assertEquals(totalEmissions.get(link23id).get(pm), pmlink23v,  MatsimTestUtils.EPSILON);
-		Assert.assertEquals(totalEmissions.get(link23id).get(so), solink23v,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissionsFilled.get(link23id).get(c2), .0, MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissionsFilled.get(link23id).get(co), .0,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissionsFilled.get(link23id).get(fc), .0,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissionsFilled.get(link23id).get(hc), .0,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissionsFilled.get(link23id).get(nm), .0,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissionsFilled.get(link23id).get(n2), .0,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissionsFilled.get(link23id).get(nx), nxlink23v,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissionsFilled.get(link23id).get(pm), pmlink23v,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissionsFilled.get(link23id).get(so), solink23v,  MatsimTestUtils.EPSILON);
 		
 		//link 24 - empty
-		Assert.assertEquals(totalEmissions.get(link24id).get(c2), .0, MatsimTestUtils.EPSILON);
-		Assert.assertEquals(totalEmissions.get(link24id).get(co), .0,  MatsimTestUtils.EPSILON);
-		Assert.assertEquals(totalEmissions.get(link24id).get(fc), .0,  MatsimTestUtils.EPSILON);
-		Assert.assertEquals(totalEmissions.get(link24id).get(hc), .0,  MatsimTestUtils.EPSILON);
-		Assert.assertEquals(totalEmissions.get(link24id).get(nm), .0,  MatsimTestUtils.EPSILON);
-		Assert.assertEquals(totalEmissions.get(link24id).get(n2), .0,  MatsimTestUtils.EPSILON);
-		Assert.assertEquals(totalEmissions.get(link24id).get(nx), .0,  MatsimTestUtils.EPSILON);
-		Assert.assertEquals(totalEmissions.get(link24id).get(pm), .0,  MatsimTestUtils.EPSILON);
-		Assert.assertEquals(totalEmissions.get(link24id).get(so), .0,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissionsFilled.get(link24id).get(c2), .0, MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissionsFilled.get(link24id).get(co), .0,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissionsFilled.get(link24id).get(fc), .0,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissionsFilled.get(link24id).get(hc), .0,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissionsFilled.get(link24id).get(nm), .0,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissionsFilled.get(link24id).get(n2), .0,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissionsFilled.get(link24id).get(nx), .0,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissionsFilled.get(link24id).get(pm), .0,  MatsimTestUtils.EPSILON);
+		Assert.assertEquals(totalEmissionsFilled.get(link24id).get(so), .0,  MatsimTestUtils.EPSILON);
 		
 	}
 	
