@@ -37,23 +37,14 @@ public class LinkCongestionInfo {
 	
 	private Id linkId;
 	private double freeTravelTime;
-
 	private double marginalDelayPerLeavingVehicle_sec;
 	private int storageCapacity_cars;
 	
-	private Map<Id, Double> personId2linkEnterTime = new HashMap<Id, Double>();
 	private Map<Id, Double> personId2linkLeaveTime = new HashMap<Id, Double>();
 	private List<Id> leavingAgents = new ArrayList<Id>();
-
-	private List<MarginalCongestionEvent> congestionEvents_FlowCapacity = new ArrayList<MarginalCongestionEvent>();
-	private List<LinkEnterLeaveInfo> personEnterLeaveInfos = new ArrayList<LinkEnterLeaveInfo>();
 	
-	public Map<Id, Double> getPersonId2linkEnterTime() {
-		return personId2linkEnterTime;
-	}
-	public void setPersonId2linkEnterTime(Map<Id, Double> personId2linkEnterTime) {
-		this.personId2linkEnterTime = personId2linkEnterTime;
-	}
+	private List<Id> agentsOnLink = new ArrayList<Id>();
+	private Map<Id, Double> personId2freeSpeedLeaveTime = new HashMap<Id, Double>();
 	
 	public Id getLinkId() {
 		return linkId;
@@ -62,7 +53,7 @@ public class LinkCongestionInfo {
 		this.linkId = linkId;
 	}
 	public void setMarginalDelayPerLeavingVehicle(double flowCapacity_hour) {
-		this.marginalDelayPerLeavingVehicle_sec = (1 / (flowCapacity_hour / 3600.) );
+		this.marginalDelayPerLeavingVehicle_sec = Math.floor((1 / (flowCapacity_hour / 3600.) ) );
 	}
 	public int getStorageCapacity_cars() {
 		return storageCapacity_cars;
@@ -82,26 +73,17 @@ public class LinkCongestionInfo {
 	public Map<Id, Double> getPersonId2linkLeaveTime() {
 		return personId2linkLeaveTime;
 	}
-	public void setPersonId2linkLeaveTime(Map<Id, Double> personId2linkLeaveTime) {
-		this.personId2linkLeaveTime = personId2linkLeaveTime;
-	}
 	public List<Id> getLeavingAgents() {
 		return leavingAgents;
 	}
-	public void setLeavingAgents(List<Id> leavingAgents) {
-		this.leavingAgents = leavingAgents;
+	public List<Id> getAgentsOnLink() {
+		return agentsOnLink;
 	}
-	public List<LinkEnterLeaveInfo> getPersonEnterLeaveInfos() {
-		return personEnterLeaveInfos;
+	public Map<Id, Double> getPersonId2freeSpeedLeaveTime() {
+		return personId2freeSpeedLeaveTime;
 	}
-	public void setPersonEnterLeaveInfos(List<LinkEnterLeaveInfo> personEnterLeaveInfos) {
-		this.personEnterLeaveInfos = personEnterLeaveInfos;
-	}
-	public List<MarginalCongestionEvent> getCongestionEvents_FlowCapacity() {
-		return congestionEvents_FlowCapacity;
-	}
-	public void setCongestionEvents_FlowCapacity(
-			List<MarginalCongestionEvent> congestionEvents_FlowCapacity) {
-		this.congestionEvents_FlowCapacity = congestionEvents_FlowCapacity;
+	public void setPersonId2freeSpeedLeaveTime(
+			Map<Id, Double> personId2freeSpeedLeaveTime) {
+		this.personId2freeSpeedLeaveTime = personId2freeSpeedLeaveTime;
 	}
 }

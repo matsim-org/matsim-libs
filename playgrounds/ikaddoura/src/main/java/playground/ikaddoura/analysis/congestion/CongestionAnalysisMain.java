@@ -52,14 +52,20 @@ public class CongestionAnalysisMain {
 		CarCongestionHandlerAdvanced handler2 = new CarCongestionHandlerAdvanced(scenario.getNetwork());
 		events.addHandler(handler2);
 		
+		LinkFlowHandler handler3 = new LinkFlowHandler(scenario.getNetwork());
+		events.addHandler(handler3);
+		
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventsFile);
 		
 		MarginalCongestionEventsReader congestionEventsReader = new MarginalCongestionEventsReader(events);		
 		congestionEventsReader.parse(eventsFile);
 
-		System.out.println("Summing up all marginal delay effects gives: " + handler1.getDelaySum());
-		System.out.println("Summing up all agent delays for each trip gives: " + handler2.getTActMinusT0Sum());
+		System.out.println("Summing up all marginal delay effects gives: " + handler1.getDelaySum() + " hours");
+		System.out.println("Summing up all agent delays for each trip gives: " + handler2.getTActMinusT0Sum() + " hours");
+		
+		handler3.printResults();
+	
 
 	}
 			 
