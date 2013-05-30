@@ -134,45 +134,19 @@ public class M4USimConfigurationConverterV4 {
 			M4UConfigUtils.initMATSim4UrbanSimControler(matsim4urbansimConfigPart2, matsim4urbansimConfigPart3, config);
 			M4UAccessibilityConfigUtils.initAccessibilityParameters(matsim4urbansimConfigPart2, config);
 			
-//<<<<<<< HEAD
-//<<<<<<< HEAD
-//			MATSim4UrbanSimConfigUtils.initNetwork(matsim4urbansimConfigPart1, config);
-//			MATSim4UrbanSimConfigUtils.initInputPlansFile(matsim4urbansimConfigPart1, config);
-//			MATSim4UrbanSimConfigUtils.initControler(matsim4urbansimConfigPart1, config);
-//			MATSim4UrbanSimConfigUtils.initPlanCalcScore(matsim4urbansimConfigPart1, config);
-//			MATSim4UrbanSimConfigUtils.initStrategy(matsim4urbansimConfigPart1, config);
-//			
-//			/*
-//			 *  why is it necessary to set some other defaults than the defaults from MATSim?
-//			 *  With the newest TripRouterFactory (r24248) this will lead to to a runtime-error
-//			 *  when for any of the intialized modes a different behavior (e.g. freespeedfactor 
-//			 *  instead of freespeed) is set. Daniel, May '13
-//			 */
-////			MATSim4UrbanSimConfigUtils.initPlanCalcRoute(config);
-//			MATSim4UrbanSimConfigUtils.initQSim(matsim4urbansimConfig, config);
-//=======
-//			M4UConfigUtils.initNetwork(matsim4urbansimConfigPart1, config);
-//			M4UConfigUtils.initInputPlansFile(matsim4urbansimConfigPart1, config);
-//			M4UConfigUtils.initControler(matsim4urbansimConfigPart1, config);
-//			M4UConfigUtils.initPlanCalcScore(matsim4urbansimConfigPart1, config);
-//			M4UConfigUtils.initStrategy(matsim4urbansimConfigPart1, config);
-//=======
 			M4UConfigUtils.insertNetworkParams(matsim4urbansimConfigPart1, config); // ok (on moving info from m4uPart1 to config). kai, may'13
-			M4UConfigUtils.insertPlansParams(matsim4urbansimConfigPart1, config); // yyyy can't fix (don't understand). kai, may'13
+			M4UConfigUtils.insertPlansParamsAndConfigureWarmOrHotStart(matsim4urbansimConfigPart1, config); // yyyy can't fix (don't understand). kai, may'13
 			M4UConfigUtils.initControler(matsim4urbansimConfigPart1, config); // yyyy can't fix since it is using static variables.  kai, may'13 
 			M4UConfigUtils.insertPlanCalcScoreParams(matsim4urbansimConfigPart1, config); // ok.  kai, may'13
 			M4UConfigUtils.insertStrategyParams(matsim4urbansimConfigPart1, config); // yyyy can't fix: It is trying to do something to a possible 
 			// 4th strategy although that is not yet there at this point in time.
-//>>>>>>> some intermediate state
 
 //			M4UConfigUtils.initPlanCalcRoute(config);
 			M4UConfigUtils.initQSim(matsim4urbansimConfig, config);
-//>>>>>>> bringing accessibility config closer to matsim standards
 			
 			// loading the external MATSim config in to the initialized config
 			// overlapping parameter settings (in MATSim4UrbanSim and external MATSim config)
-			// are overwritten by the external MATSim settings
-			
+			// are overwritten by the external MATSim settings:
 			M4UConfigUtils.loadExternalConfigAndOverwriteMATSim4UrbanSimSettings(matsim4urbansimConfigPart1, config);
 			// (by the design of the matsim xml config reader, this over-writes only entries which are explicitly mentioned
 			// in the external config)
@@ -182,15 +156,6 @@ public class M4USimConfigurationConverterV4 {
 			// (these are not visible in the matsim config dump :-( :-( and thus need to be done separately. kai, apr'13)
 			M4UConfigUtils.printUrbanSimParameterSettings( M4UConfigUtils.getUrbanSimParameterConfigAndPossiblyConvert(config) );
 			M4UConfigUtils.printMATSim4UrbanSimControlerSettings( M4UConfigUtils.getMATSim4UrbaSimControlerConfigAndPossiblyConvert(config) );
-//<<<<<<< HEAD
-////<<<<<<< HEAD
-//////			M4UAccessibilityConfigUtils.printAccessibilityParameterSettings( M4UAccessibilityConfigUtils.getAccessibilityParameterConfigPossiblyEmpty(config) );
-////=======
-////			M4UAccessibilityConfigUtils.printAccessibilityParameterSettings( M4UAccessibilityConfigUtils.getAccessibilityConfigModuleAndPossiblyConvert(config) );
-////>>>>>>> accessibility config somewhat complete ... but modes should be configurable
-//=======
-////			M4UAccessibilityConfigUtils.printAccessibilityParameterSettings( M4UAccessibilityConfigUtils.getAccessibilityConfigModuleAndPossiblyConvert(config) );
-//>>>>>>> some more rearrangements concerning accessibiity computation configuration
 			
 			config.addConfigConsistencyChecker( new VspConfigConsistencyCheckerImpl() ) ;
 			config.addConfigConsistencyChecker( new M4UConfigConsistencyChecker() ) ;

@@ -34,6 +34,7 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigModule;
+import org.matsim.contrib.matsim4opus.config.modules.ImprovedPseudoPtConfigModule;
 import org.matsim.contrib.matsim4opus.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4opus.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4opus.utils.CreateTestExternalMATSimConfig;
@@ -168,7 +169,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 			log.info("Creating a matsim4urbansim config file and writing it on hard disk");
 			
 			// this creates an external configuration file, some parameters overlap with the MATSim4UrbanSim configuration
-			CreateTestExternalMATSimConfig testExternalConfig = new CreateTestExternalMATSimConfig(CreateTestExternalMATSimConfig.COLD_START, path);
+			CreateTestExternalMATSimConfig testExternalConfig = new CreateTestExternalMATSimConfig(CreateTestMATSimConfig.COLD_START, path);
 			String externalConfigLocation = testExternalConfig.generate();
 			
 			// this creates a MATSim4UrbanSim configuration
@@ -262,7 +263,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 		
 		Assert.assertTrue( Paths.checkPathEnding( config.network().getInputFile() ).equalsIgnoreCase( Paths.checkPathEnding( testExternalConfig.networkInputFile ) ));
 		
-		if(testConfig.getStartMode() != testExternalConfig.COLD_START){
+		if(testConfig.getStartMode() != CreateTestMATSimConfig.COLD_START){
 			Assert.assertTrue( Paths.checkPathEnding( config.plans().getInputFile() ).equalsIgnoreCase( Paths.checkPathEnding( testExternalConfig.inputPlansFile ) ));
 		}
 		
@@ -299,6 +300,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 		///////////////////////////////////////////////////
 		M4UControlerConfigModuleV3 matsim4UrbanSimControlerModule = M4UConfigUtils.getMATSim4UrbaSimControlerConfigAndPossiblyConvert(config) ;
 		AccessibilityConfigModule acm = M4UAccessibilityConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
+		ImprovedPseudoPtConfigModule ippcm = M4UImprovedPseudoPtConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
 		
 		// time of day
 		Assert.assertTrue( acm.getTimeOfDay() == testExternalConfig.timeOfDay );
@@ -307,16 +309,16 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 		Assert.assertTrue( usePtStopsFlagFromConfig == testExternalConfig.usePtStops.equalsIgnoreCase("TRUE") );
 		// pt stops
 		if(testExternalConfig.usePtStops.equalsIgnoreCase("TRUE"))
-			Assert.assertTrue( Paths.checkPathEnding( matsim4UrbanSimControlerModule.getPtStopsInputFile()  ).equalsIgnoreCase( Paths.checkPathEnding( testExternalConfig.ptStops ) ));
+			Assert.assertTrue( Paths.checkPathEnding( ippcm.getPtStopsInputFile()  ).equalsIgnoreCase( Paths.checkPathEnding( testExternalConfig.ptStops ) ));
 		// use pt travel times and distances
 		boolean usePtTimesAndDiastances = matsim4UrbanSimModule.getValue( M4UConfigUtils.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH ) != null && matsim4UrbanSimModule.getValue( M4UConfigUtils.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH ).equalsIgnoreCase("TRUE");
 		Assert.assertTrue( usePtTimesAndDiastances == testExternalConfig.useTravelTimesAndDistances.equalsIgnoreCase("TRUE") );
 		
 		if( testExternalConfig.useTravelTimesAndDistances.equalsIgnoreCase("TRUE") ){
 			// pt travel times
-			Assert.assertTrue( Paths.checkPathEnding( matsim4UrbanSimControlerModule.getPtTravelTimesInputFile() ).equalsIgnoreCase( testExternalConfig.ptTravelTimes ));
+			Assert.assertTrue( Paths.checkPathEnding( ippcm.getPtTravelTimesInputFile() ).equalsIgnoreCase( testExternalConfig.ptTravelTimes ));
 			// pt travel distances
-			Assert.assertTrue(Paths.checkPathEnding( matsim4UrbanSimControlerModule.getPtTravelDistancesInputFile() ).equalsIgnoreCase( testExternalConfig.ptTravelDistances ));
+			Assert.assertTrue(Paths.checkPathEnding( ippcm.getPtTravelDistancesInputFile() ).equalsIgnoreCase( testExternalConfig.ptTravelDistances ));
 		
 		}
 		

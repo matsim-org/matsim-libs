@@ -30,6 +30,7 @@ import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigModule;
+import org.matsim.contrib.matsim4opus.config.modules.ImprovedPseudoPtConfigModule;
 import org.matsim.contrib.matsim4opus.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4opus.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4opus.constants.InternalConstants;
@@ -161,10 +162,11 @@ public class M4UConfigUtils {
 		module.setZone2ZoneImpedance(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isZone2ZoneImpedance());
 		module.setZoneBasedAccessibility(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isZoneBasedAccessibility());
 		module.setCellBasedAccessibility(computeCellBasedAccessibility);
-
-		module.setPtStopsInputFile(ptStops);
-		module.setPtTravelTimesInputFile(ptTravelTimes);
-		module.setPtTravelDistancesInputFile(ptTravelDistances);
+		
+		ImprovedPseudoPtConfigModule ippcm = M4UImprovedPseudoPtConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
+		ippcm.setPtStopsInputFile(ptStops);
+		ippcm.setPtTravelTimesInputFile(ptTravelTimes);
+		ippcm.setPtTravelDistancesInputFile(ptTravelDistances);
 		
 		AccessibilityConfigModule acm = M4UAccessibilityConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
 //		acm.setTimeOfDay(timeOfDay) ;
@@ -307,7 +309,7 @@ public class M4UConfigUtils {
 	 * @param matsimParameter
 	 * @param config TODO
 	 */
-	static void insertPlansParams(ConfigType matsimParameter, Config config){
+	static void insertPlansParamsAndConfigureWarmOrHotStart(ConfigType matsimParameter, Config config){
 		log.info("Checking for warm or hot start...");
 		// get plans file for hot start
 		String hotStart = matsimParameter.getHotStartPlansFile().getInputFile();
@@ -715,9 +717,9 @@ public class M4UConfigUtils {
 //		log.info("Network Boundary (Bottom): " + module.getBoundingBoxBottom() ); 
 //		log.info("Shape File: " + module.getShapeFileCellBasedAccessibility() );
 //		log.info("Time of day: " + module.getTimeOfDay() );
-		log.info("Pt Stops Input File: " + module.getPtStopsInputFile());
-		log.info("Pt Travel Times Input File: " + module.getPtTravelTimesInputFile());
-		log.info("Pt travel Distances Input File: " + module.getPtTravelDistancesInputFile());
+//		log.info("Pt Stops Input File: " + module.getPtStopsInputFile());
+//		log.info("Pt Travel Times Input File: " + module.getPtTravelTimesInputFile());
+//		log.info("Pt travel Distances Input File: " + module.getPtTravelDistancesInputFile());
 	}
 
 	static final void checkConfigConsistencyAndWriteToLog(Config config, final String message) {

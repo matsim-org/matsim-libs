@@ -35,8 +35,10 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.contrib.matsim4opus.config.M4UImprovedPseudoPtConfigUtils;
 import org.matsim.contrib.matsim4opus.config.M4USimConfigurationConverterV4;
 import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigModule;
+import org.matsim.contrib.matsim4opus.config.modules.ImprovedPseudoPtConfigModule;
 import org.matsim.contrib.matsim4opus.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4opus.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4opus.gis.GridUtils;
@@ -302,17 +304,16 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 			// to be able to configure externally written "scripts" (such as this one) in a simple way.  kai & michael z, feb'13
 		}
 		controler.setOverwriteFiles(true);	// sets whether output files are overwritten
-		controler.setCreateGraphs(true);	// sets whether output Graphs are created
+		controler.setCreateGraphs(true);	// sets whether output graphs are created
 		
-		PtMatrix ptMatrix = null;
-		if(getMATSim4UrbanSimControlerConfig().getPtStopsInputFile() != null){
+		ImprovedPseudoPtConfigModule ippcm = M4UImprovedPseudoPtConfigUtils.getConfigModuleAndPossiblyConvert(scenario.getConfig()) ;
+		if(ippcm.getPtStopsInputFile() != null){
 			log.info("Initializing MATSim4UrbanSim pseudo pt router ...");
 			// will lead to a null pointer anyway, but since the 
 			// routerFactory has changed an initialization of plansCalcRoute
 			// as it was done before is no longer possible. Thus, I think a 
 			// more meaningful message seems to be helpful. Daniel, May '13
-			if(getMATSim4UrbanSimControlerConfig().getPtTravelDistancesInputFile() == null || 
-					getMATSim4UrbanSimControlerConfig().getPtTravelTimesInputFile() == null){
+			if(ippcm.getPtTravelDistancesInputFile() == null || ippcm.getPtTravelTimesInputFile() == null){
 				if(controler.getScenario().getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.pt) == null){
 					throw new RuntimeException("you try to run the pseudo-pt-router without distances and/or traveltimes, " +
 							"but without a teleportedModeSpeed for pt as well. Default is teleportedModeFreespeedFactor...");
@@ -325,11 +326,11 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 			
 			// if ptStops etc are given in config
 			PlansCalcRouteConfigGroup plansCalcRoute = controler.getScenario().getConfig().plansCalcRoute();
-			ptMatrix = new PtMatrix(controler.getScenario().getNetwork(),
+			PtMatrix ptMatrix = new PtMatrix(controler.getScenario().getNetwork(),
 									plansCalcRoute.getTeleportedModeSpeeds().get(TransportMode.walk),
 									plansCalcRoute.getTeleportedModeSpeeds().get(TransportMode.pt),
 									plansCalcRoute.getBeelineDistanceFactor(),
-									getMATSim4UrbanSimControlerConfig());	
+									M4UImprovedPseudoPtConfigUtils.getConfigModuleAndPossiblyConvert(controler.getScenario().getConfig()));	
 			controler.setTripRouterFactory( new MATSim4UrbanSimRouterFactoryImpl(controler, ptMatrix) ); // the car and pt router
 			
 			log.error("reconstructing pt route distances; not tested ...") ;

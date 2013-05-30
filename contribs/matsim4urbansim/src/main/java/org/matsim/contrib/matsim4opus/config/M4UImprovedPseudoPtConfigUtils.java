@@ -22,11 +22,25 @@
  */
 package org.matsim.contrib.matsim4opus.config;
 
+import org.matsim.contrib.matsim4opus.config.modules.ImprovedPseudoPtConfigModule;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.Module;
+
 /**
  * @author nagel
  *
  */
 public class M4UImprovedPseudoPtConfigUtils {
 	private M4UImprovedPseudoPtConfigUtils() {} // container for static methods; do not instantiate
-	
+
+	public static ImprovedPseudoPtConfigModule getConfigModuleAndPossiblyConvert(Config config) {
+		Module m = config.getModule(ImprovedPseudoPtConfigModule.GROUP_NAME);
+		if (m instanceof ImprovedPseudoPtConfigModule) {
+			return (ImprovedPseudoPtConfigModule) m;
+		}
+		
+		ImprovedPseudoPtConfigModule ippcm = new ImprovedPseudoPtConfigModule();
+		config.addModule( ImprovedPseudoPtConfigModule.GROUP_NAME, ippcm ) ;
+		return ippcm;
+	}	
 }

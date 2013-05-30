@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.matsim4opus.config.modules.ImprovedPseudoPtConfigModule;
 import org.matsim.contrib.matsim4opus.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4opus.utils.io.HeaderParser;
 import org.matsim.contrib.matsim4opus.utils.io.TempDirectoryUtil;
@@ -73,16 +74,12 @@ public class PtMatrix {
 	private long wrnCntSkip = 0;
 	private long wrnCntParse = 0;
 	
-//<<<<<<< HEAD
-//	public PtMatrix(Network network, Double meterPerSecWalkSpeed, Double meterPerSecPtSpeed, Double beelineDistanceFactor, MATSim4UrbanSimControlerConfigModuleV3 m4uccm){
-//=======
-	public PtMatrix(Network network, double meterPerSecWalkSpeed, double meterPerSecPtSpeed, double beelineDistanceFactor, M4UControlerConfigModuleV3 m4uccm){
-//>>>>>>> some class renamings (making class names a bit shorter)
+	public PtMatrix(Network network, Double meterPerSecWalkSpeed, Double meterPerSecPtSpeed, Double beelineDistanceFactor, ImprovedPseudoPtConfigModule ippcm){
 
 		// get the locations for ptStops, travel times and distances from controler
-		String ptStopInputFile = m4uccm.getPtStopsInputFile();
-		String ptTravelTimeInputFile = m4uccm.getPtTravelTimesInputFile();
-		String ptTravelDistanceInputFile= m4uccm.getPtTravelDistancesInputFile();
+		String ptStopInputFile = ippcm.getPtStopsInputFile();
+		String ptTravelTimeInputFile = ippcm.getPtTravelTimesInputFile();
+		String ptTravelDistanceInputFile= ippcm.getPtTravelDistancesInputFile();
 		
 		this.meterPerSecWalkSpeed = meterPerSecWalkSpeed;
 		
@@ -601,13 +598,13 @@ public class PtMatrix {
 		Network network = scenario.getNetwork() ;
 		// TravelTime ttc = new TravelTimeCalculator(network,60,30*3600, scenario.getConfig().travelTimeCalculator()).getLinkTravelTimes();
 		
-		M4UControlerConfigModuleV3 m4uccm = new M4UControlerConfigModuleV3();
+		ImprovedPseudoPtConfigModule module = new ImprovedPseudoPtConfigModule();
 		// m4uccm.setPtStopsInputFile("/Users/thomas/Development/opus_home/data/brussels_zone/data/transit_csvs_from_Dimitris_20121002/underground.csv"); 	// for Brussels
-		m4uccm.setPtStopsInputFile("/Users/thomas/Development/opus_home/data/zurich_parcel/data/Matrizen__OeV/Zones_Attributes.csv");					  	// for Zurich
-		m4uccm.setPtTravelTimesInputFile("/Users/thomas/Development/opus_home/data/zurich_parcel/data/Matrizen__OeV/OeV_2007_7_8.JRT");						// for Zurich
-		m4uccm.setPtTravelDistancesInputFile("/Users/thomas/Development/opus_home/data/zurich_parcel/data/Matrizen__OeV/OeV_2007_7_8.JRD");					// for Zurich
+		module.setPtStopsInputFile("/Users/thomas/Development/opus_home/data/zurich_parcel/data/Matrizen__OeV/Zones_Attributes.csv");					  	// for Zurich
+		module.setPtTravelTimesInputFile("/Users/thomas/Development/opus_home/data/zurich_parcel/data/Matrizen__OeV/OeV_2007_7_8.JRT");						// for Zurich
+		module.setPtTravelDistancesInputFile("/Users/thomas/Development/opus_home/data/zurich_parcel/data/Matrizen__OeV/OeV_2007_7_8.JRD");					// for Zurich
 
-		PtMatrix ptm = new PtMatrix(network, defaultWalkSpeed, defaultPtSpeed, beelineDistanceFactor, m4uccm);
+		PtMatrix ptm = new PtMatrix(network, defaultWalkSpeed, defaultPtSpeed, beelineDistanceFactor, module);
 		
 		// get QuadTree
 		QuadTree<PtStop> qTreeTest = ptm.getQuadTree();
