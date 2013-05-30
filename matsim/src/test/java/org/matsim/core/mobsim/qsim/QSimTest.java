@@ -434,22 +434,10 @@ public class QSimTest {
 	public void testFlowCapacityDriving() {
 		Fixture f = new Fixture();
 
-		// add a first person with leg from link1 to link3, let it start early, so the simulation can accumulate buffer capacity
-		PersonImpl person = new PersonImpl(new IdImpl(0));
-		PlanImpl plan = person.createAndAddPlan(true);
-		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
-		a1.setEndTime(6*3600 - 500);
-		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
-		NetworkRoute route = (NetworkRoute) ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
-		route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
-		leg.setRoute(route);
-		plan.createAndAddActivity("w", f.link3.getId());
-		f.plans.addPerson(person);
-
-		// add a lot of other persons with legs from link1 to link3, starting at 6:30
+		// add a lot of persons with legs from link1 to link3, starting at 6:30
 		for (int i = 1; i <= 10000; i++) {
-			person = new PersonImpl(new IdImpl(i));
-			plan = person.createAndAddPlan(true);
+			PersonImpl person = new PersonImpl(new IdImpl(i));
+			PlanImpl plan = person.createAndAddPlan(true);
 			/* exact dep. time: 6:29:48. The agents needs:
 			 * - at the specified time, the agent goes into the waiting list, and if space is available, into
 			 * the buffer of link 1.
@@ -462,8 +450,8 @@ public class QSimTest {
 			 */
 			ActivityImpl a = plan.createAndAddActivity("h", f.link1.getId());
 			a.setEndTime(7*3600 - 1812);
-			leg = plan.createAndAddLeg(TransportMode.car);
-			route = (NetworkRoute) ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
+			LegImpl leg = plan.createAndAddLeg(TransportMode.car);
+			NetworkRoute route = (NetworkRoute) ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
 			route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
 			leg.setRoute(route);
 			plan.createAndAddActivity("w", f.link3.getId());
@@ -490,6 +478,59 @@ public class QSimTest {
 		Assert.assertEquals(1000, volume[8]); // all the rest
 	}
 
+	
+	/**
+	 * Tests that on a link with a flow capacity of 0.25 vehicles per time step, after the first vehicle
+	 * at time step t, the second vehicle may pass in time step t + 4 and the third in time step t+8.
+	 *
+	 * @author michaz
+	 */
+	@Test
+	public void testFlowCapacityDrivingFraction() {
+		Fixture f = new Fixture();
+		f.link2.setCapacity(900.0); // One vehicle every 4 seconds
+		
+		// add a lot of persons with legs from link1 to link3, starting at 6:30
+		for (int i = 1; i <= 3; i++) {
+			PersonImpl person = new PersonImpl(new IdImpl(i));
+			PlanImpl plan = person.createAndAddPlan(true);
+			/* exact dep. time: 6:29:48. The agents needs:
+			 * - at the specified time, the agent goes into the waiting list, and if space is available, into
+			 * the buffer of link 1.
+			 * - 1 sec later, it leaves the buffer on link 1 and enters link 2
+			 * - the agent takes 10 sec. to travel along link 2, after which it gets placed in the buffer of link 2
+			 * - 1 sec later, the agent leaves the buffer on link 2 (if flow-cap allows this) and enters link 3
+			 * - as we measure the vehicles leaving link 2, and the first veh should leave at exactly 6:30, it has
+			 * to start 1 + 10 + 1 = 12 secs earlier.
+			 * So, the start time is 7*3600 - 1800 - 12 = 7*3600 - 1812
+			 */
+			ActivityImpl a = plan.createAndAddActivity("h", f.link1.getId());
+			a.setEndTime(7*3600 - 1812);
+			LegImpl leg = plan.createAndAddLeg(TransportMode.car);
+			NetworkRoute route = (NetworkRoute) ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
+			route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
+			leg.setRoute(route);
+			plan.createAndAddActivity("w", f.link3.getId());
+			f.plans.addPerson(person);
+		}
+
+		/* build events */
+		EventsManager events = EventsUtils.createEventsManager();
+		VolumesAnalyzer vAnalyzer = new VolumesAnalyzer(1, 7*3600, f.network);
+		events.addHandler(vAnalyzer);
+
+		/* run sim */
+		QSim sim = createQSim(f, events);
+		sim.run();
+
+		/* finish */
+		int[] volume = vAnalyzer.getVolumesForLink(f.link2.getId());
+
+		Assert.assertEquals(1, volume[7*3600 - 1800]); // First vehicle
+		Assert.assertEquals(1, volume[7*3600 - 1800 + 4]); // Second vehicle
+		Assert.assertEquals(1, volume[7*3600 - 1800 + 8]); // Third vehicle
+	}
+	
 	/**
 	 * Tests that the flow capacity can be reached (but not exceeded) by
 	 * agents starting on a link. Due to the different handling of these
@@ -502,26 +543,14 @@ public class QSimTest {
 	public void testFlowCapacityStarting() {
 		Fixture f = new Fixture();
 
-		// add a first person with leg from link1 to link3, let it start early, so the simulation can accumulate buffer capacity
-		PersonImpl person = new PersonImpl(new IdImpl(0));
-		PlanImpl plan = person.createAndAddPlan(true);
-		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
-		a1.setEndTime(6*3600 - 500);
-		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
-		NetworkRoute route = (NetworkRoute) ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
-		route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
-		leg.setRoute(route);
-		plan.createAndAddActivity("w", f.link3.getId());
-		f.plans.addPerson(person);
-
 		// add a lot of persons with legs from link2 to link3
 		for (int i = 1; i <= 10000; i++) {
-			person = new PersonImpl(new IdImpl(i));
-			plan = person.createAndAddPlan(true);
+			PersonImpl person = new PersonImpl(new IdImpl(i));
+			PlanImpl plan = person.createAndAddPlan(true);
 			ActivityImpl a2 = plan.createAndAddActivity("h", f.link2.getId());
 			a2.setEndTime(7*3600 - 1801);
-			leg = plan.createAndAddLeg(TransportMode.car);
-			route = (NetworkRoute) ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, f.link2.getId(), f.link3.getId());
+			LegImpl leg = plan.createAndAddLeg(TransportMode.car);
+			NetworkRoute route = (NetworkRoute) ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, f.link2.getId(), f.link3.getId());
 			route.setLinkIds(f.link2.getId(), f.linkIdsNone, f.link3.getId());
 			leg.setRoute(route);
 			plan.createAndAddActivity("w", f.link3.getId());
@@ -559,26 +588,14 @@ public class QSimTest {
 	public void testFlowCapacityMixed() {
 		Fixture f = new Fixture();
 
-		// add a first person with leg from link1 to link3, let it start early, so the simulation can accumulate buffer capacity
-		PersonImpl person = new PersonImpl(new IdImpl(0));
-		PlanImpl plan = person.createAndAddPlan(true);
-		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
-		a1.setEndTime(6*3600 - 500);
-		LegImpl leg = plan.createAndAddLeg(TransportMode.car);
-		NetworkRoute route = (NetworkRoute) ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, f.link1.getId(), f.link3.getId());
-		route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
-		leg.setRoute(route);
-		plan.createAndAddActivity("w", f.link3.getId());
-		f.plans.addPerson(person);
-
 		// add a lot of persons with legs from link2 to link3
 		for (int i = 1; i <= 5000; i++) {
-			person = new PersonImpl(new IdImpl(i));
-			plan = person.createAndAddPlan(true);
+			PersonImpl person = new PersonImpl(new IdImpl(i));
+			PlanImpl plan = person.createAndAddPlan(true);
 			ActivityImpl a2 = plan.createAndAddActivity("h", f.link2.getId());
 			a2.setEndTime(7*3600 - 1801);
-			leg = plan.createAndAddLeg(TransportMode.car);
-			route = (NetworkRoute) ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, f.link2.getId(), f.link3.getId());
+			LegImpl leg = plan.createAndAddLeg(TransportMode.car);
+			NetworkRoute route = (NetworkRoute) ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, f.link2.getId(), f.link3.getId());
 			route.setLinkIds(f.link2.getId(), f.linkIdsNone, f.link3.getId());
 			leg.setRoute(route);
 			plan.createAndAddActivity("w", f.link3.getId());
@@ -586,12 +603,12 @@ public class QSimTest {
 		}
 		// add a lot of persons with legs from link1 to link3
 		for (int i = 5001; i <= 10000; i++) {
-			person = new PersonImpl(new IdImpl(i));
-			plan = person.createAndAddPlan(true);
+			PersonImpl person = new PersonImpl(new IdImpl(i));
+			PlanImpl plan = person.createAndAddPlan(true);
 			ActivityImpl a2 = plan.createAndAddActivity("h", f.link1.getId());
 			a2.setEndTime(7*3600 - 1812);
-			leg = plan.createAndAddLeg(TransportMode.car);
-			route = (NetworkRoute) ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, f.link2.getId(), f.link3.getId());
+			LegImpl leg = plan.createAndAddLeg(TransportMode.car);
+			NetworkRoute route = (NetworkRoute) ((PopulationFactoryImpl) f.scenario.getPopulation().getFactory()).createRoute(TransportMode.car, f.link2.getId(), f.link3.getId());
 			route.setLinkIds(f.link1.getId(), f.linkIds2, f.link3.getId());
 			leg.setRoute(route);
 			plan.createAndAddActivity("w", f.link3.getId());

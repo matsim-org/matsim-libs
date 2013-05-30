@@ -84,9 +84,9 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 
 	private boolean active = false;
 
-	/*package*/ VisData visdata = null ;
+	private final VisData visdata;
 
-	private double length = Double.NaN;
+	private final double length;
 
 	private double freespeedTravelTime = Double.NaN;
 
@@ -112,22 +112,23 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	/**
 	 * Holds all vehicles that are ready to cross the outgoing intersection
 	 */
-	/*package*/ final Queue<QVehicle> buffer = new LinkedList<QVehicle>();
+	private final Queue<QVehicle> buffer = new LinkedList<QVehicle>();
 	
-	private int bufferStorageCapacity; // optimization, cache Math.ceil(simulatedFlowCap)
+	
 	
 	private double usedBufferStorageCapacity = 0.0;
 
 	/**
 	 * The number of vehicles able to leave the buffer in one time step (usually 1s).
 	 */
-	private double flowCapacityPerTimeStep; // previously called timeCap
+	private double flowCapacityPerTimeStep; 
 
-	/*package*/ double inverseSimulatedFlowCapacityCache; // optimization, cache 1.0 / simulatedFlowCapacity
+	private double inverseFlowCapacityPerTimeStep; // optimization, cache 1.0 / flowCapacityPerTimeStep
 
+	private double flowCapacityPerTimeStepFractionalPart; // optimization, cache flowCapacityPerTimeStep - (int) flowCapacityPerTimeStep
 
-	private double flowCapFractionCache; // optimization, cache simulatedFlowCap - (int)simulatedFlowCap
-
+	private int bufferStorageCapacity; // optimization, cache Math.ceil(flowCapacityPerTimeStep)
+	
 	/**
 	 * The remaining integer part of the flow capacity available in one time step to move vehicles into the
 	 * buffer. This value is updated each time step by a call to
@@ -278,7 +279,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	private void updateBufferCapacity() {
 		this.remainingflowCap = this.flowCapacityPerTimeStep;
 		if (this.thisTimeStepGreen && this.flowcap_accumulate < 1.0) {
-			this.flowcap_accumulate += this.flowCapFractionCache;
+			this.flowcap_accumulate += this.flowCapacityPerTimeStepFractionalPart;
 		}
 	}
 
@@ -524,7 +525,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	private void calculateCapacities() {
 		calculateFlowCapacity(Time.UNDEFINED_TIME);
 		calculateStorageCapacity(Time.UNDEFINED_TIME);
-		this.flowcap_accumulate = (this.flowCapFractionCache == 0.0 ? 0.0 : 1.0);
+		this.flowcap_accumulate = (this.flowCapacityPerTimeStepFractionalPart == 0.0 ? 0.0 : 1.0);
 	}
 
 	private void calculateFlowCapacity(final double time) {
@@ -533,8 +534,8 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		this.flowCapacityPerTimeStep = this.flowCapacityPerTimeStep
 				* network.simEngine.getMobsim().getSimTimer().getSimTimestepSize()
 				* network.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().getFlowCapFactor();
-		this.inverseSimulatedFlowCapacityCache = 1.0 / this.flowCapacityPerTimeStep;
-		this.flowCapFractionCache = this.flowCapacityPerTimeStep - (int) this.flowCapacityPerTimeStep;
+		this.inverseFlowCapacityPerTimeStep = 1.0 / this.flowCapacityPerTimeStep;
+		this.flowCapacityPerTimeStepFractionalPart = this.flowCapacityPerTimeStep - (int) this.flowCapacityPerTimeStep;
 	}
 
 	private void calculateStorageCapacity(final double time) {
@@ -876,8 +877,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 					lastDistanceFromFromNode, now, freespeedTraveltime, travelTime);
 			Integer lane = snapshotInfoBuilder.guessLane(veh, NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
 			double speedValue = snapshotInfoBuilder.calcSpeedValueBetweenZeroAndOne(veh, 
-					QLinkImpl.this.getInverseSimulatedFlowCapacity(), now, link.getFreespeed());
-			//					log.error("speed: " + speedValue + " distance: " + lastDistanceFromFromNode + " lane " + lane);
+					QLinkImpl.this.inverseFlowCapacityPerTimeStep, now, link.getFreespeed());
 			if (this.otfLink != null){
 				snapshotInfoBuilder.createAndAddVehiclePosition(positions, this.otfLink.getLinkStartCoord(), this.otfLink.getLinkEndCoord(), 
 						QLinkImpl.this.length, this.otfLink.getEuklideanDistance(), veh, 
@@ -903,10 +903,6 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		public void setEarliestLinkExitTime(double earliestLinkEndTime) {
 			this.earliestLinkEndTime = earliestLinkEndTime;
 		}
-	}
-
-	double getInverseSimulatedFlowCapacity() {
-		return this.inverseSimulatedFlowCapacityCache ;
 	}
 
 }
