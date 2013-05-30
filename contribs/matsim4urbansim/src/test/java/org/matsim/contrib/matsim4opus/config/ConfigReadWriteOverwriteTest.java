@@ -78,7 +78,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 	public void testLoadMATSim4UrbanSimMinimalConfig(){
 		
 		// MATSim4UrbanSim configuration converter
-		M4USimConfigurationConverterV4 connector = null;
+		M4UConfigurationConverterV4 connector = null;
 		
 		try{
 			String path = TempDirectoryUtil.createCustomTempDirectory("tmp");
@@ -89,7 +89,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 			String configLocation = testConfig.generateMinimalConfig();
 			
 			log.info("Reading the matsim4urbansim config file ("+configLocation+") and converting it into matsim format");
-			if( !(connector = new M4USimConfigurationConverterV4( configLocation )).init() ){
+			if( !(connector = new M4UConfigurationConverterV4( configLocation )).init() ){
 				log.error("An error occured while initializing MATSim scenario ...");
 				Assert.assertTrue(false);
 			}
@@ -115,7 +115,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 	public void testLoadMATSim4UrbanSimConfigOnly(){
 		
 		// MATSim4UrbanSim configuration converter
-		M4USimConfigurationConverterV4 connector = null;
+		M4UConfigurationConverterV4 connector = null;
 		
 		try{
 			String path = TempDirectoryUtil.createCustomTempDirectory("tmp");
@@ -126,7 +126,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 			String configLocation = testConfig.generate();
 			
 			log.info("Reading the matsim4urbansim config file ("+configLocation+") and converting it into matsim format");
-			if( !(connector = new M4USimConfigurationConverterV4( configLocation )).init() ){
+			if( !(connector = new M4UConfigurationConverterV4( configLocation )).init() ){
 				log.error("An error occured while initializing MATSim scenario ...");
 				Assert.assertTrue(false);
 			}
@@ -159,7 +159,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 	public void testExternalMATSimConfig(){
 		
 		// MATSim4UrbanSim configuration converter
-		M4USimConfigurationConverterV4 converter = null;
+		M4UConfigurationConverterV4 converter = null;
 		
 		try{
 //			String path = TempDirectoryUtil.createCustomTempDirectory("tmp");
@@ -180,7 +180,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 			// i.e. puts the settings into the MATSim config groups or adds new MATSim modules
 			// An important task is that settings from the external config file are overwriting the settings from MATSim4UrbanSim
 			log.info("Reading the matsim4urbansim config file ("+configLocation+") and converting it into matsim format");
-			if( !(converter = new M4USimConfigurationConverterV4( configLocation )).init() ){
+			if( !(converter = new M4UConfigurationConverterV4( configLocation )).init() ){
 				log.error("An error occured while initializing MATSim scenario ...");
 				Assert.assertTrue(false);
 			}

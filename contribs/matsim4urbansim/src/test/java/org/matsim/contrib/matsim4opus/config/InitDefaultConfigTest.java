@@ -47,7 +47,7 @@ public class InitDefaultConfigTest extends MatsimTestCase{
 	public void testLoadDefaultMATSim4UrbanSimWithExternalConfigFile(){
 		
 		// MATSim4UrbanSim configuration converter
-		M4USimConfigurationConverterV4 connector = null;
+		M4UConfigurationConverterV4 connector = null;
 		
 		try{
 			String path = TempDirectoryUtil.createCustomTempDirectory("tmp");
@@ -63,7 +63,7 @@ public class InitDefaultConfigTest extends MatsimTestCase{
 			String configLocation = testConfig.generate();
 			
 			log.info("Reading the matsim4urbansim config file ("+configLocation+") and converting it into matsim format");
-			if( !(connector = new M4USimConfigurationConverterV4( configLocation )).init() ){
+			if( !(connector = new M4UConfigurationConverterV4( configLocation )).init() ){
 				log.error("An error occured while initializing MATSim scenario ...");
 				Assert.assertFalse(true);
 			}

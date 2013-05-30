@@ -319,10 +319,7 @@ public class M4UConfigUtils {
 		M4UControlerConfigModuleV3 module = getMATSim4UrbaSimControlerConfigAndPossiblyConvert(config);
 
 		// setting plans file as input
-		if( !hotStartFileName.equals("")  ){
-			if ( !(new File(hotStartFileName)).exists() ) ) {
-				throw new RuntimeException("error, see code") ;
-			}
+		if( !hotStartFileName.equals("")  && (new File(hotStartFileName)).exists() ) {
 			log.info("Hot Start detcted!");
 			setPlansFile( hotStartFileName, config );
 			module.setHotStart(true);

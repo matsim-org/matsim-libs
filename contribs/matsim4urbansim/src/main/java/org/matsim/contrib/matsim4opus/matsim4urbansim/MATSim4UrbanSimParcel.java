@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.matsim4opus.config.M4UImprovedPseudoPtConfigUtils;
-import org.matsim.contrib.matsim4opus.config.M4USimConfigurationConverterV4;
+import org.matsim.contrib.matsim4opus.config.M4UConfigurationConverterV4;
 import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigModule;
 import org.matsim.contrib.matsim4opus.config.modules.ImprovedPseudoPtConfigModule;
 import org.matsim.contrib.matsim4opus.config.modules.M4UControlerConfigModuleV3;
@@ -102,7 +102,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 	// MATSim scenario
 	ScenarioImpl scenario = null;
 	// MATSim4UrbanSim configuration converter
-	M4USimConfigurationConverterV4 connector = null;
+	M4UConfigurationConverterV4 connector = null;
 	// Reads UrbanSim Parcel output files
 	ReadFromUrbanSimModel readFromUrbansim = null;
 	// Benchmarking computation times and hard disc space ... 
@@ -154,7 +154,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 		// checks if args parameter contains a valid path
 		Paths.isValidPath(matsimConfiFile);
 		
-		connector = new M4USimConfigurationConverterV4( matsimConfiFile );
+		connector = new M4UConfigurationConverterV4( matsimConfiFile );
 		if( !(connector.init()) ){
 			log.error("An error occured while initializing MATSim scenario ...");
 			System.exit(-1);
