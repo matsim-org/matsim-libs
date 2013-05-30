@@ -253,6 +253,18 @@ public class Config {
 		this.modules.put(name, m);
 		return m;
 	}
+	
+	/**
+	 * Convenience method to addModule( name, module) that takes the name directly out of the module (since it should be there).
+	 * 
+	 * @param specializedConfigModule
+	 */
+	public final void addModule( final Module specializedConfigModule ) {
+		if ( specializedConfigModule.getName().isEmpty() ) {
+			throw new RuntimeException("cannot insert module with empty name") ;
+		}
+		addModule( specializedConfigModule.getName(), specializedConfigModule ) ;
+	}
 
 	/**
 	 * Adds the specified module / config-group with the specified name to the
