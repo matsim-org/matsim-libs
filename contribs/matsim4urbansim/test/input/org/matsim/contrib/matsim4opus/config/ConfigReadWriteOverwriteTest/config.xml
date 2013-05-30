@@ -198,6 +198,16 @@ For 'queueSimulation', add a module 'simulation' to the config. -->
 
 <!-- ====================================================================== -->
 
+	<module name="improvedPseudoPt" >
+		<param name="ptStopsFile" value="null" />
+		<param name="ptTravelDistancesFile" value="null" />
+		<param name="ptTravelTimesFile" value="null" />
+		<param name="usingPtStops" value="null" />
+		<param name="usingTravelTimesAndDistances" value="null" />
+	</module>
+
+<!-- ====================================================================== -->
+
 	<module name="linkStats" >
 
 		<!-- Specifies over how many iterations the link volumes should be averaged that are used for the link statistics. Use 1 or 0 to only use the link volumes of a single iteration. This values cannot be larger than the value specified for writeLinkStatsInterval -->
