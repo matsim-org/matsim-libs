@@ -50,6 +50,7 @@ public class Controller extends Controler {
 		c.setOverwriteFiles(true);
 		c.setCreateGraphs(false);
 		addListener(c);
+		c.setScoringFunctionFactory(new NoScoringFunctionFactory());
 //		throw new RuntimeException("I removed the overriding of loadCoreListeners() below since that method should become " +
 //				"final in Controler.  I am not sure why this was needed; it looks like it was supposed to be a less heavyweight version of the" +
 //				" full Controler core listeners.  Thus, it should also work now.  Otherwise, it needs to be derived from AbstractController instead" +
