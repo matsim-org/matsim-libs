@@ -46,7 +46,10 @@ public class KtiToSimiliKtiConfig {
 		final PlanCalcScoreConfigGroup planCalcScore = new PlanCalcScoreConfigGroup();
 		outputConfig.addModule( PlanCalcScoreConfigGroup.GROUP_NAME , planCalcScore );
 		MyConfigUtils.transmitParams( inputConfig.planCalcScore() , planCalcScore );
-		planCalcScore.setConstantCar( ktiConfigGroup.getConstCar() );
+		// XXX KTI defines a constant for car in the config group,
+		// BUT IT IS NOT USED IN THE SCORING FUNCTION!!!!!!!
+		//planCalcScore.setConstantCar( ktiConfigGroup.getConstCar() );
+		planCalcScore.setConstantCar( 0 );
 		planCalcScore.setConstantBike( ktiConfigGroup.getConstBike() );
 		planCalcScore.setTravelingBike_utils_hr( ktiConfigGroup.getTravelingBike() );
 		planCalcScore.setMonetaryDistanceCostRatePt(
