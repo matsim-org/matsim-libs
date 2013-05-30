@@ -80,7 +80,16 @@ public class Controller extends Controler {
 				con.addControlerListener(observer);
 				con.getEvents().addHandler(observer);
 				
-				con.addControlerListener(new Scorer(observer));
+				boolean useHomogeneousTravelTimes = false;
+				
+				String param = con.getScenario().getConfig().getParam("telematics", "useHomogeneousTravelTimes");
+				if (param != null) {
+					useHomogeneousTravelTimes = Boolean.parseBoolean(param);
+				}
+				
+				if (useHomogeneousTravelTimes) {
+					con.addControlerListener(new Scorer(observer));
+				}
 				
 				if (con.getScenario().getConfig().network().isTimeVariantNetwork()){
 					IncidentGenerator generator = new IncidentGenerator(con.getScenario().getConfig().getParam("telematics", "incidentsFile"), con.getScenario().getNetwork());
