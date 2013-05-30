@@ -20,9 +20,15 @@
 
 package playground.dziemke.cadyts;
 
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.HashSet;
+import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.cadyts.car.CadytsCarConfigGroup;
 import org.matsim.contrib.cadyts.car.CadytsCarScoring;
 import org.matsim.contrib.cadyts.car.CadytsContext;
 import org.matsim.contrib.cadyts.car.CadytsPlanChanger;
@@ -30,6 +36,9 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
@@ -43,21 +52,100 @@ import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
-public class CadytsControllerWithScoring {
-	private final static Logger log = Logger.getLogger(CadytsControllerWithScoring.class);
+public class CadytsControllerWithScoring42 {
+	private final static Logger log = Logger.getLogger(CadytsControllerWithScoring42.class);
 	
 	public static void main(String[] args) {
-		final Config config = ConfigUtils.loadConfig(args[0]) ;
+		final Config config = ConfigUtils.createConfig();
 		
-		StrategySettings stratSets = new StrategySettings(new IdImpl(2));
-		stratSets.setModuleName("ccc");
-		stratSets.setProbability(1.0);
-		config.strategy().addStrategySettings(stratSets);
+		// global
+		config.global().setCoordinateSystem("GK4");
 		
+		// network
+		String inputNetworkFile = "D:/Workspace/berlin/counts/iv_counts/network.xml";
+		config.network().setInputFile(inputNetworkFile);
+				
+		// plans
+		String inputPlansFile = "D:/Workspace/container/demand/input/cemdap2matsim/10/plans.xml.gz";
+		config.plans().setInputFile(inputPlansFile);
+						
+		// cadytsCar
+		CadytsCarConfigGroup cadytsCarConfigGroup = new CadytsCarConfigGroup();
+		cadytsCarConfigGroup.setEndTime(24*60*60);
+		cadytsCarConfigGroup.setUseBruteForce(false);
+		config.addModule("ccc", cadytsCarConfigGroup);
+		
+		// simulation
+		config.addSimulationConfigGroup(new SimulationConfigGroup());
+		config.simulation().setFlowCapFactor(0.01);
+		config.simulation().setStorageCapFactor(0.02);
+						
+		// counts
+		String countsFileName = "D:/Workspace/berlin/counts/iv_counts/vmz_di-do.xml";
+		config.counts().setCountsFileName(countsFileName);
+		config.counts().setCountsScaleFactor(100);
+		config.counts().setOutputFormat("all");
+				
+		// controller
+		String runId = "run_42";
+		String outputDirectory = "D:/Workspace/container/demand/output/run_42";
+		config.controler().setRunId(runId);
+		config.controler().setOutputDirectory(outputDirectory);
+		config.controler().setFirstIteration(0);
+		config.controler().setLastIteration(150);
+		Set<EventsFileFormat> eventsFileFormats = Collections.unmodifiableSet(EnumSet.of(EventsFileFormat.xml));
+		config.controler().setEventsFileFormats(eventsFileFormats);
+		config.controler().setMobsim("queueSimulation");
+		config.controler().setWritePlansInterval(50);
+		config.controler().setWriteEventsInterval(50);
+			
+		
+		// strategy
+		StrategySettings strategySettings = new StrategySettings(new IdImpl(1));
+		strategySettings.setModuleName("ReRoute");
+		strategySettings.setProbability(0.1);
+		config.strategy().addStrategySettings(strategySettings);
+		
+//		StrategySettings strategySettings2 = new StrategySettings(new IdImpl(2));
+//		strategySettings2.setModuleName("ccc");
+//		strategySettings2.setProbability(1.0);
+//		config.strategy().addStrategySettings(strategySettings2);
+		
+		// new for testing run 42
+//		StrategySettings strategySettings3 = new StrategySettings(new IdImpl());
+//		strategySettings3.setModuleName("TimeAllocationMutator");
+//		strategySettings3.setProbability(0.1);
+//		config.strategy().addStrategySettings(strategySettings3);
+		//
+		
+		config.strategy().setMaxAgentPlanMemorySize(5);
+		
+		// planCalcScore
+		ActivityParams homeActivity = new ActivityParams("home");
+		homeActivity.setTypicalDuration(12*60*60);
+		config.planCalcScore().addActivityParams(homeActivity);
+		
+		ActivityParams workActivity = new ActivityParams("work");
+		workActivity.setTypicalDuration(9*60*60);
+		config.planCalcScore().addActivityParams(workActivity);
+		
+		ActivityParams leisureActivity = new ActivityParams("leis");
+		leisureActivity.setTypicalDuration(2*60*60);
+		config.planCalcScore().addActivityParams(leisureActivity);
+		
+		ActivityParams shopActivity = new ActivityParams("shop");
+		shopActivity.setTypicalDuration(1*60*60);
+		config.planCalcScore().addActivityParams(shopActivity);
+		
+		ActivityParams otherActivity = new ActivityParams("other");
+		otherActivity.setTypicalDuration(0.5*60*60);
+		config.planCalcScore().addActivityParams(otherActivity);
+		
+		
+		// start controller
 		final Controler controler = new Controler(config);
 		
 		final CadytsContext cContext = new CadytsContext(controler.getConfig());
-		
 		controler.addControlerListener(cContext);
 		
 		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
