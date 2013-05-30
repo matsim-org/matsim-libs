@@ -14,10 +14,5 @@
 			<artifactId>yu</artifactId>
 			<version>0.6.0-SNAPSHOT</version>
 		</dependency>
-		<dependency>
-			<groupId>playground</groupId>
-			<artifactId>mzilske</artifactId>
-			<version>0.6.0-SNAPSHOT</version>
-		</dependency>
   </dependencies>
 </project>

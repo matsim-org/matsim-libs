@@ -32,8 +32,6 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.visum.VisumNetwork;
 import org.matsim.visum.VisumNetwork.EdgeType;
 
-import playground.mzilske.bvg09.VisumNetworkRowHandler;
-
 public class VisumLinksRowHandler implements VisumNetworkRowHandler {
 
 	private final NetworkImpl network;

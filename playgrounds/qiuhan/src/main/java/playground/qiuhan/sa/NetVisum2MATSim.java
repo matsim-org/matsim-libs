@@ -12,9 +12,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.visum.VisumNetwork;
 import org.matsim.visum.VisumNetworkReader;
 
-import playground.mzilske.bvg09.StreamingVisumNetworkReader;
-import playground.mzilske.bvg09.VisumNetworkRowHandler;
-
 /**
  * @author Q. SUN
  * 
