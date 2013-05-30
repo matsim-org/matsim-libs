@@ -312,22 +312,24 @@ public class M4UConfigUtils {
 	static void insertPlansParamsAndConfigureWarmOrHotStart(ConfigType matsimParameter, Config config){
 		log.info("Checking for warm or hot start...");
 		// get plans file for hot start
-		String hotStart = matsimParameter.getHotStartPlansFile().getInputFile();
+		String hotStartFileName = matsimParameter.getHotStartPlansFile().getInputFile();
 		// get plans file for warm start 
-		String warmStart = matsimParameter.getInputPlansFile().getInputFile();
+		String warmStartFileName = matsimParameter.getInputPlansFile().getInputFile();
 
 		M4UControlerConfigModuleV3 module = getMATSim4UrbaSimControlerConfigAndPossiblyConvert(config);
 
 		// setting plans file as input
-		if( !hotStart.equals("") &&
-				(new File(hotStart)).exists() ){
+		if( !hotStartFileName.equals("")  ){
+			if ( !(new File(hotStartFileName)).exists() ) ) {
+				throw new RuntimeException("error, see code") ;
+			}
 			log.info("Hot Start detcted!");
-			setPlansFile( hotStart, config );
+			setPlansFile( hotStartFileName, config );
 			module.setHotStart(true);
 		}
-		else if( !warmStart.equals("") ){
+		else if( !warmStartFileName.equals("") ){
 			log.info("Warm Start detcted!");
-			setPlansFile( warmStart, config );
+			setPlansFile( warmStartFileName, config );
 			module.setWarmStart(true);
 		}
 		else{
@@ -336,10 +338,10 @@ public class M4UConfigUtils {
 		}
 
 		// setting target location for hot start plans file
-		if(!hotStart.equals("")){
+		if(!hotStartFileName.equals("")){
 			log.info("The resulting plans file after this MATSim run is stored at a specified place to enable hot start for the following MATSim run.");
-			log.info("The specified place is : " + hotStart);
-			module.setHotStartTargetLocation(hotStart);
+			log.info("The specified place is : " + hotStartFileName);
+			module.setHotStartTargetLocation(hotStartFileName);
 		}
 		else
 			module.setHotStartTargetLocation("");
