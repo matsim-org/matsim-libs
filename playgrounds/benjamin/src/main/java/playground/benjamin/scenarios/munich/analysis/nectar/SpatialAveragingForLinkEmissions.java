@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.benjamin.scenarios.munich.analysis.nectar;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -66,19 +68,33 @@ import com.vividsolutions.jts.util.Assert;
 public class SpatialAveragingForLinkEmissions {
 	private static final Logger logger = Logger.getLogger(SpatialAveragingForLinkEmissions.class);
 
-	private final static String runNumber1 = "981";
-	private final static String runNumber2 = "983";
-	private final static String runDirectory1 = "../../runs-svn/run" + runNumber1 + "/";
-	private final static String runDirectory2 = "../../runs-svn/run" + runNumber2 + "/";
-	private final String netFile1 = runDirectory1 + runNumber1 + ".output_network.xml.gz";
+	private final static String runNumber1 = "baseCase";
+	private final static String runNumber2 = "zone30";
+	private final static String runDirectory1 = "../../runs-svn/detEval/latsis/output/output_baseCase_ctd_newCode/";
+	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_zone30/";
+	private final String netFile1 = runDirectory1 + "output_network.xml.gz";
 	private final String munichShapeFile = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
 
-	private static String configFile1 = runDirectory1 + runNumber1 + ".output_config.xml.gz";
+	private static String configFile1 = runDirectory1 + "output_config.xml.gz";
 	private final static Integer lastIteration1 = getLastIteration(configFile1);
-	private static String configFile2 = runDirectory1 + runNumber1 + ".output_config.xml.gz";
+	private static String configFile2 = runDirectory1 + "output_config.xml.gz";
 	private final static Integer lastIteration2 = getLastIteration(configFile2);
-	private final String emissionFile1 = runDirectory1 + "ITERS/it." + lastIteration1 + "/" + runNumber1 + "." + lastIteration1 + ".emission.events.xml.gz";
-	private final String emissionFile2 = runDirectory2 + "ITERS/it." + lastIteration2 + "/" + runNumber2 + "." + lastIteration2 + ".emission.events.xml.gz";
+	private final String emissionFile1 = runDirectory1 + "ITERS/it." + lastIteration1 + "/" + lastIteration1 + ".emission.events.xml.gz";
+	private final String emissionFile2 = runDirectory2 + "ITERS/it." + lastIteration2 + "/" + lastIteration2 + ".emission.events.xml.gz";
+	
+//	private final static String runNumber1 = "981";
+//	private final static String runNumber2 = "983";
+//	private final static String runDirectory1 = "../../runs-svn/run" + runNumber1 + "/";
+//	private final static String runDirectory2 = "../../runs-svn/run" + runNumber2 + "/";
+//	private final String netFile1 = runDirectory1 + runNumber1 + ".output_network.xml.gz";
+//	private final String munichShapeFile = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
+//
+//	private static String configFile1 = runDirectory1 + runNumber1 + ".output_config.xml.gz";
+//	private final static Integer lastIteration1 = getLastIteration(configFile1);
+//	private static String configFile2 = runDirectory1 + runNumber1 + ".output_config.xml.gz";
+//	private final static Integer lastIteration2 = getLastIteration(configFile2);
+//	private final String emissionFile1 = runDirectory1 + "ITERS/it." + lastIteration1 + "/" + runNumber1 + "." + lastIteration1 + ".emission.events.xml.gz";
+//	private final String emissionFile2 = runDirectory2 + "ITERS/it." + lastIteration2 + "/" + runNumber2 + "." + lastIteration2 + ".emission.events.xml.gz";
 
 	Network network;
 	Collection<SimpleFeature> featuresInMunich;
@@ -89,9 +105,6 @@ public class SpatialAveragingForLinkEmissions {
 	double simulationEndTime;
 	String outPathStub;
 
-	Map<Double, Map<Id, Double>> time2CountsPerLink1;
-	Map<Double, Map<Id, Double>> time2CountsPerLink2;
-
 	final CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:20004");
 	static double xMin = 4452550.25;
 	static double xMax = 4479483.33;
@@ -99,13 +112,13 @@ public class SpatialAveragingForLinkEmissions {
 	static double yMax = 5345696.81;
 
 	// define all relevant parameters
-	final int noOfTimeBins = 60;
+	final int noOfTimeBins = 1;
 	final int noOfXbins = 160;
 	final int noOfYbins = 120;
 	final int minimumNoOfLinksInCell = 0;
 	final double smoothingRadius_m = 500.; 
 	final String pollutant2analyze = WarmPollutant.NO2.toString();
-	final boolean baseCaseOnly = true;
+	final boolean baseCaseOnly = false;
 	final boolean calculateRelativeChange = false;
 
 
@@ -113,7 +126,7 @@ public class SpatialAveragingForLinkEmissions {
 		this.simulationEndTime = getEndTime(configFile1);
 		this.listOfPollutants = emissionUtils.getListOfPollutants();
 		Scenario scenario = loadScenario(netFile1);
-		this.network = scenario.getNetwork();
+		this.network = scenario.getNetwork();		
 		this.featuresInMunich = ShapeFileReader.getAllFeatures(munichShapeFile);
 
 		PointFeatureFactory factory = new PointFeatureFactory.Builder()
@@ -124,43 +137,88 @@ public class SpatialAveragingForLinkEmissions {
 				.create();
 		
 		Map<Double, Map<Id, Map<String, Double>>> time2EmissionMapToAnalyze;
+		Map<Double, Map<Id, Double>> time2linkId2Pkm;
 
 		processEmissions(emissionFile1);
 		Map<Double, Map<Id, Map<WarmPollutant, Double>>> time2warmEmissionsTotal1 = this.warmHandler.getWarmEmissionsPerLinkAndTimeInterval();
 		Map<Double, Map<Id, Map<ColdPollutant, Double>>> time2coldEmissionsTotal1 = this.coldHandler.getColdEmissionsPerLinkAndTimeInterval();
-		time2CountsPerLink1 = this.warmHandler.getTime2linkIdLeaveCount();
+		Map<Double, Map<Id, Double>> time2CountsPerLink1 = this.warmHandler.getTime2linkIdLeaveCount();
 
 		Map<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotal1 = sumUpEmissionsPerTimeInterval(time2warmEmissionsTotal1, time2coldEmissionsTotal1);
 		Map<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotalFilled1 = setNonCalculatedEmissions(time2EmissionsTotal1);
 		Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFilledAndFiltered1 = filterLinks(time2EmissionsTotalFilled1);
-		time2CountsPerLink1 = setNonCalculatedCountsAndFilter(time2CountsPerLink1);
+		Map<Double, Map<Id, Double>> time2CountsPerLinkFilledAndFiltered1 = setNonCalculatedCountsAndFilter(time2CountsPerLink1);
 
 		this.warmHandler.reset(0);
 		this.coldHandler.reset(0);
 
 		if(baseCaseOnly){
 			time2EmissionMapToAnalyze = time2EmissionsTotalFilledAndFiltered1;
-			outPathStub = runDirectory1 + runNumber1 + "." + lastIteration1;
+			outPathStub = runDirectory1 + "analysis/spatialAveraging/" + runNumber1 + "." + lastIteration1;
 		} else {
 			processEmissions(emissionFile2);
 			Map<Double, Map<Id, Map<WarmPollutant, Double>>> time2warmEmissionsTotal2 = this.warmHandler.getWarmEmissionsPerLinkAndTimeInterval();
 			Map<Double, Map<Id, Map<ColdPollutant, Double>>> time2coldEmissionsTotal2 = this.coldHandler.getColdEmissionsPerLinkAndTimeInterval();
-			time2CountsPerLink2 = this.warmHandler.getTime2linkIdLeaveCount();
+			Map<Double, Map<Id, Double>> time2CountsPerLink2 = this.warmHandler.getTime2linkIdLeaveCount();
 			
 			Map<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotal2 = sumUpEmissionsPerTimeInterval(time2warmEmissionsTotal2, time2coldEmissionsTotal2);
-			Map<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotalFilled2 = setNonCalculatedEmissions(time2EmissionsTotal1);
+			Map<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotalFilled2 = setNonCalculatedEmissions(time2EmissionsTotal2);
 			Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFilledAndFiltered2 = filterLinks(time2EmissionsTotalFilled2);
-			time2CountsPerLink2 = setNonCalculatedCountsAndFilter(time2CountsPerLink2);
+			Map<Double, Map<Id, Double>> time2CountsPerLinkFilledAndFiltered2 = setNonCalculatedCountsAndFilter(time2CountsPerLink2);
 
 			if(calculateRelativeChange){
 				time2EmissionMapToAnalyze = calcualateRelativeEmissionDifferences(time2EmissionsTotalFilledAndFiltered1, time2EmissionsTotalFilledAndFiltered2);
-				outPathStub = runDirectory1 + runNumber2 + "." + lastIteration2 + "-" + runNumber1 + "." + lastIteration1 + ".relativeDelta";
+				outPathStub = runDirectory1 + "analysis/spatialAveraging/" + runNumber2 + "." + lastIteration2 + "-" + runNumber1 + "." + lastIteration1 + ".relativeDelta";
 			} else {
-				time2EmissionMapToAnalyze = calcualateAbsoluteEmissionDifferences(time2EmissionsTotalFilledAndFiltered1, time2EmissionsTotalFilledAndFiltered2);;
-				outPathStub = runDirectory1 + runNumber2 + "." + lastIteration2 + "-" + runNumber1 + "." + lastIteration1 + ".absoluteDelta";
+				time2EmissionMapToAnalyze = calcualateAbsoluteEmissionDifferences(time2EmissionsTotalFilledAndFiltered1, time2EmissionsTotalFilledAndFiltered2, time2CountsPerLinkFilledAndFiltered1, time2CountsPerLinkFilledAndFiltered2);
+				outPathStub = runDirectory1 + "analysis/spatialAveraging/" + runNumber2 + "." + lastIteration2 + "-" + runNumber1 + "." + lastIteration1 + ".absoluteDelta";
+			
+				time2linkId2Pkm = calculateAbsolutePkmDifference(time2CountsPerLinkFilledAndFiltered1, time2CountsPerLinkFilledAndFiltered2);
 			}
 		}
 
+		for(double endOfTimeInterval : time2linkId2Pkm.keySet()){
+			Map<Id, Double> demandMapToAnalyze = time2linkId2Pkm.get(endOfTimeInterval);
+
+			int[][] noOfLinksInCell = new int[noOfXbins][noOfYbins];
+			double[][] sumOfweightsForCell = new double[noOfXbins][noOfYbins];
+			double[][] sumOfweightedValuesForCell = new double[noOfXbins][noOfYbins];
+			
+			for(Link link : network.getLinks().values()){
+				
+				if (demandMapToAnalyze.containsKey(link.getId())){
+					
+					Id linkId = link.getId();
+					Coord linkCoord = link.getCoord();
+					double xLink = linkCoord.getX();
+					double yLink = linkCoord.getY();
+
+					Integer xbin = mapXCoordToBin(xLink);
+					Integer ybin = mapYCoordToBin(yLink);
+					if ( xbin != null && ybin != null ){
+
+						noOfLinksInCell[xbin][ybin] ++;
+					
+						for(int xIndex = 0; xIndex < noOfXbins; xIndex++){
+							for(int yIndex = 0; yIndex < noOfYbins; yIndex++){
+								Coord cellCentroid = findCellCentroid(xIndex, yIndex);
+
+//								if(isInMunichShape(cellCentroid)){
+									double value = demandMapToAnalyze.get(linkId);
+									double weightOfLinkForCell = calculateWeightOfLinkForCell(xLink, yLink, cellCentroid.getX(), cellCentroid.getY());
+									sumOfweightsForCell[xIndex][yIndex] += weightOfLinkForCell;
+									sumOfweightedValuesForCell[xIndex][yIndex] += weightOfLinkForCell * value;
+//								}
+							}
+						}
+					}
+				}
+			}
+			String outputPathForR = new String(outPathStub + ".Routput.Demand" + "." + endOfTimeInterval + ".txt");
+			// TODO: not use averageValue instead?!?
+			writeRoutput(sumOfweightedValuesForCell, outputPathForR);
+		}
+		
 // 		EmissionWriter eWriter = new EmissionWriter();
 //		BufferedWriter writer = IOUtils.getBufferedWriter(outPathStub + "." + pollutant + ".smoothed.txt");
 //		writer.append("xCentroid\tyCentroid\t" + pollutant + "\tTIME\n");
@@ -191,10 +249,16 @@ public class SpatialAveragingForLinkEmissions {
 					for(int xIndex = 0; xIndex < noOfXbins; xIndex++){
 						for(int yIndex = 0; yIndex < noOfYbins; yIndex++){
 							Coord cellCentroid = findCellCentroid(xIndex, yIndex);
-							double value = emissionMapToAnalyze.get(linkId).get(pollutant2analyze);
-							double weightOfLinkForCell = calculateWeightOfLinkForCell(xLink, yLink, cellCentroid.getX(), cellCentroid.getY());
-							sumOfweightsForCell[xIndex][yIndex] += weightOfLinkForCell;
-							sumOfweightedValuesForCell[xIndex][yIndex] += weightOfLinkForCell * value;
+							
+//							if(isInMunichShape(cellCentroid)){
+
+								double value = emissionMapToAnalyze.get(linkId).get(pollutant2analyze);
+								double weightOfLinkForCell = calculateWeightOfLinkForCell(xLink, yLink, cellCentroid.getX(), cellCentroid.getY());
+								
+								sumOfweightsForCell[xIndex][yIndex] += weightOfLinkForCell;
+								sumOfweightedValuesForCell[xIndex][yIndex] += weightOfLinkForCell * value;
+								//averageValuesOfCell[xIndex][yIndex] = 
+//							}
 						}
 					}
 				}
@@ -204,7 +268,7 @@ public class SpatialAveragingForLinkEmissions {
 					Coord cellCentroid = findCellCentroid(xIndex, yIndex);
 					if(noOfLinksInCell[xIndex][yIndex] >= minimumNoOfLinksInCell){
 						if(isInMunichShape(cellCentroid)){
-							if(endOfTimeInterval < Time.MIDNIGHT){ // time manager in QGIS does not accept time beyond midnight...
+//							if(endOfTimeInterval < Time.MIDNIGHT){ // time manager in QGIS does not accept time beyond midnight...
 
 								// double averageValue = sumOfweightedValuesForCell[xIndex][yIndex] / sumOfweightsForCell[xIndex][yIndex]; // average of emissions per cell
 
@@ -222,21 +286,93 @@ public class SpatialAveragingForLinkEmissions {
 								} catch (IllegalArgumentException e1) {
 									throw new RuntimeException(e1);
 								}
-							}
+//							}
 						}
 					}
 				}
 			}
+			String outputPathForR = new String(outPathStub + ".Routput." + pollutant2analyze.toString() + "." + endOfTimeInterval + ".txt");
+			// TODO: not use averageValue instead?!?
+			writeRoutput(sumOfweightedValuesForCell, outputPathForR);
 		}
 //		writer.close();
 //		logger.info("Finished writing output to " + outPathStub + "." + pollutant2analyze + ".smoothed.txt");
 
 		ShapeFileWriter.writeGeometries(features, outPathStub +  "." + pollutant2analyze + "perKmSquare.movie.emissionsPerLinkSmoothed.shp");
-		logger.info("Finished writing output to " + outPathStub +  "." + pollutant2analyze + ".perKmSquare.movie.emissionsPerLinkSmoothed.shp");
+		logger.info("Finished writing output for GIS to " + outPathStub +  "." + pollutant2analyze + ".perKmSquare.movie.emissionsPerLinkSmoothed.shp");
 //		ShapeFileWriter.writeGeometries(features, outPathStub +  "." + pollutant2analyze + ".movie.emissionsPerLinkSmoothed.shp");
 //		logger.info("Finished writing output to " + outPathStub +  "." + pollutant2analyze + ".movie.emissionsPerLinkSmoothed.shp");
 	}
 
+	private Map<Double, Map<Id, Double>> calculateAbsolutePkmDifference(
+			Map<Double, Map<Id, Double>> time2CountsPerLinkFilledAndFiltered1,
+			Map<Double, Map<Id, Double>> time2CountsPerLinkFilledAndFiltered2) {
+		Map<Double, Map<Id, Double>> time2absolutePkmDifference = new HashMap<Double, Map<Id,Double>>();
+		
+		for(Double endOfTimeInterval : time2CountsPerLinkFilledAndFiltered1.keySet()){
+			Map<Id, Double> absolutePkmDifference = new HashMap<Id, Double>();
+			Map<Id, Double> countsPerLinkId = time2CountsPerLinkFilledAndFiltered1.get(endOfTimeInterval);
+			for(Id linkId : countsPerLinkId.keySet()){
+				double countBefore = countsPerLinkId.get(linkId);
+				double countAfter = time2CountsPerLinkFilledAndFiltered2.get(endOfTimeInterval).get(linkId);
+				
+				double pkmBefore = countBefore * this.network.getLinks().get(linkId).getLength() / 1000.;
+				double pkmAfter = countAfter * this.network.getLinks().get(linkId).getLength() / 1000.;
+				
+				double pkmDifference = pkmAfter - pkmBefore;
+				absolutePkmDifference.put(linkId, pkmDifference);
+			}
+			time2absolutePkmDifference.put(endOfTimeInterval, absolutePkmDifference);
+		}
+		return time2absolutePkmDifference;
+	}
+
+	private void writeRoutput(double[][] sumOfweightedValuesForCell, String outputPathForR) {
+		try {
+			BufferedWriter buffW = new BufferedWriter(new FileWriter(outputPathForR));
+			String valueString = new String();
+			valueString = "\t";
+			
+			//step size between coordinates
+			//double xDist=(xMax-xMin)/noOfXbins;
+			//double yDist=(yMax-yMin)/noOfYbins;
+			
+			//x-coordinates as first row
+			for(int xIndex=0; xIndex<sumOfweightedValuesForCell.length; xIndex++){
+				valueString += findBinCenterX(xIndex) + "\t";
+//						Double.toString(yMin+i*yDist)+"\t";
+			}
+			buffW.write(valueString);
+			buffW.newLine();
+			valueString = new String();
+			
+			for(int yIndex=0; yIndex<sumOfweightedValuesForCell[0].length; yIndex++){
+				//y-coordinates as first column
+				valueString += findBinCenterY(yIndex) + "\t";
+//						Double.toString(xMin+i*xDist)+"\t";
+				
+				//table contents
+				for(int xIndex=0; xIndex<sumOfweightedValuesForCell.length; xIndex++){ 
+						
+						Coord cellCentroid = findCellCentroid(xIndex, yIndex);
+						
+						if(isInMunichShape(cellCentroid)){
+							valueString += Double.toString(sumOfweightedValuesForCell[xIndex][yIndex]) + "\t"; 
+						} else {
+							valueString += "NA" + "\t";
+						}
+				}
+				buffW.write(valueString);
+				buffW.newLine();
+				valueString = new String();
+			}
+		buffW.close();	
+		} catch (IOException e) {
+			logger.warn("Failed to write output file for R.");
+		}	
+		logger.info("Finished writing output for R to " + outputPathForR);
+	}
+	
 	private boolean isInMunichShape(Coord cellCentroid) {
 		boolean isInMunichShape = false;
 		GeometryFactory factory = new GeometryFactory();
@@ -294,11 +430,13 @@ public class SpatialAveragingForLinkEmissions {
 	}
 
 	private Map<Double, Map<Id, Map<String, Double>>> calcualateAbsoluteEmissionDifferences(
-			Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotal1,
-			Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotal2) {
+			Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFilledAndFiltered1,
+			Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFilledAndFiltered2,
+			Map<Double, Map<Id, Double>> time2CountsPerLinkFilledAndFiltered1,
+			Map<Double, Map<Id, Double>> time2CountsPerLinkFilledAndFiltered2) {
 
 		Map<Double, Map<Id, Map<String, Double>>> time2AbsoluteDelta = new HashMap<Double, Map<Id, Map<String, Double>>>();
-		for(Entry<Double, Map<Id, Map<String, Double>>> entry0 : time2EmissionsTotal1.entrySet()){
+		for(Entry<Double, Map<Id, Map<String, Double>>> entry0 : time2EmissionsTotalFilledAndFiltered1.entrySet()){
 			double endOfTimeInterval = entry0.getKey();
 			Map<Id, Map<String, Double>> linkId2Emissions = entry0.getValue();
 			Map<Id, Map<String, Double>> absoluteDelta = new HashMap<Id, Map<String, Double>>();
@@ -308,13 +446,13 @@ public class SpatialAveragingForLinkEmissions {
 				Map<String, Double> emissionDifferenceMap = new HashMap<String, Double>();
 				for(String pollutant : entry1.getValue().keySet()){
 					Double emissionsBefore = entry1.getValue().get(pollutant);
-					Double emissionsAfter = time2EmissionsTotal2.get(endOfTimeInterval).get(linkId).get(pollutant);
+					Double emissionsAfter = time2EmissionsTotalFilledAndFiltered2.get(endOfTimeInterval).get(linkId).get(pollutant);
 					
 					
 					double linkLength_km = this.network.getLinks().get(linkId).getLength() / 1000.;
 					
 					double emissionsPerVehicleKmBefore; 
-					double countBefore = this.time2CountsPerLink1.get(endOfTimeInterval).get(linkId);
+					double countBefore = time2CountsPerLinkFilledAndFiltered1.get(endOfTimeInterval).get(linkId);
 					if(countBefore != 0.0){
 						emissionsPerVehicleKmBefore = emissionsBefore / (countBefore * linkLength_km);
 					} else {
@@ -322,7 +460,7 @@ public class SpatialAveragingForLinkEmissions {
 					}
 					
 					double emissionsPerVehicleKmAfter;
-					double countAfter = this.time2CountsPerLink2.get(endOfTimeInterval).get(linkId);
+					double countAfter = time2CountsPerLinkFilledAndFiltered2.get(endOfTimeInterval).get(linkId);
 					if(countAfter != 0.0){
 						emissionsPerVehicleKmAfter = emissionsAfter / (countAfter * linkLength_km);
 					} else {
@@ -330,9 +468,7 @@ public class SpatialAveragingForLinkEmissions {
 					}
 
 					double emissionsPerVehicleKmDifference = emissionsPerVehicleKmAfter - emissionsPerVehicleKmBefore;
-//					double emissionsPerVehicleKmDifference = (emissionsPerVehicleKmAfter - emissionsPerVehicleKmBefore) / emissionsPerVehicleKmBefore;
 					emissionDifferenceMap.put(pollutant, emissionsPerVehicleKmDifference);
-					
 					
 //					Double emissionDifference = emissionsAfter - emissionsBefore;
 //					emissionDifferenceMap.put(pollutant, emissionDifference);
@@ -345,11 +481,11 @@ public class SpatialAveragingForLinkEmissions {
 	}
 
 	private Map<Double, Map<Id, Map<String, Double>>> calcualateRelativeEmissionDifferences(
-			Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotal1,
-			Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotal2) {
+			Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFilledAndFiltered1,
+			Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFilledAndFiltered2) {
 
 		Map<Double, Map<Id, Map<String, Double>>> time2RelativeDelta = new HashMap<Double, Map<Id, Map<String, Double>>>();
-		for(Entry<Double, Map<Id, Map<String, Double>>> entry0 : time2EmissionsTotal1.entrySet()){
+		for(Entry<Double, Map<Id, Map<String, Double>>> entry0 : time2EmissionsTotalFilledAndFiltered1.entrySet()){
 			double endOfTimeInterval = entry0.getKey();
 			Map<Id, Map<String, Double>> linkId2emissions = entry0.getValue();
 			Map<Id, Map<String, Double>> relativeDelta = new HashMap<Id, Map<String, Double>>();
@@ -359,7 +495,7 @@ public class SpatialAveragingForLinkEmissions {
 				Map<String, Double> emissionDifferenceMap = new HashMap<String, Double>();
 				for(String pollutant : entry1.getValue().keySet()){
 					double emissionsBefore = entry1.getValue().get(pollutant);
-					double emissionsAfter = time2EmissionsTotal2.get(endOfTimeInterval).get(linkId).get(pollutant);
+					double emissionsAfter = time2EmissionsTotalFilledAndFiltered2.get(endOfTimeInterval).get(linkId).get(pollutant);
 					if (emissionsBefore == 0.0){ // cannot calculate relative change if "before" value is 0.0 ...
 						emissionsBefore = 1.0;   // ...therefore setting "before" value to a small value.
 					} else {
@@ -387,7 +523,7 @@ public class SpatialAveragingForLinkEmissions {
 
 	private Map<Double, Map<Id, Map<String, Double>>> filterLinks(Map<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotal) {
 		Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFiltered = new HashMap<Double, Map<Id, Map<String, Double>>>();
-
+		
 		for(Double endOfTimeInterval : time2EmissionsTotal.keySet()){
 			Map<Id, SortedMap<String, Double>> emissionsTotal = time2EmissionsTotal.get(endOfTimeInterval);
 			Map<Id, Map<String, Double>> emissionsTotalFiltered = new HashMap<Id, Map<String, Double>>();
@@ -396,10 +532,11 @@ public class SpatialAveragingForLinkEmissions {
 				Coord linkCoord = link.getCoord();
 				Double xLink = linkCoord.getX();
 				Double yLink = linkCoord.getY();
-
+				
 				if(xLink > xMin && xLink < xMax){
 					if(yLink > yMin && yLink < yMax){
-						emissionsTotalFiltered.put(link.getId(), emissionsTotal.get(link.getId()));
+						Id linkId = link.getId();
+						emissionsTotalFiltered.put(linkId, emissionsTotal.get(linkId));
 					}
 				}					
 			}
@@ -414,6 +551,7 @@ public class SpatialAveragingForLinkEmissions {
 		for(Double endOfTimeInterval : time2CountsPerLink.keySet()){
 			Map<Id, Double> linkId2Count = time2CountsPerLink.get(endOfTimeInterval);
 			Map<Id, Double> linkId2CountFiltered = new HashMap<Id, Double>();
+		
 			for(Link link : network.getLinks().values()){
 				Coord linkCoord = link.getCoord();
 				Double xLink = linkCoord.getX();
@@ -422,10 +560,11 @@ public class SpatialAveragingForLinkEmissions {
 				if(xLink > xMin && xLink < xMax){
 					if(yLink > yMin && yLink < yMax){
 						Id linkId = link.getId();
+						
 						if(linkId2Count.get(linkId) == null){
 							linkId2CountFiltered.put(linkId, 0.);
 						} else {
-							linkId2CountFiltered = linkId2Count;
+							linkId2CountFiltered.put(linkId, linkId2Count.get(linkId));
 						}
 					}
 				}
@@ -477,8 +616,7 @@ public class SpatialAveragingForLinkEmissions {
 	}
 
 	private Double getEndTime(String configfile) {
-		Config config = new Config();
-		config.addCoreModules();
+		Config config = ConfigUtils.createConfig();
 		MatsimConfigReader configReader = new MatsimConfigReader(config);
 		configReader.readFile(configfile);
 		Double endTime = config.getQSimConfigGroup().getEndTime();
@@ -488,8 +626,7 @@ public class SpatialAveragingForLinkEmissions {
 	}
 
 	private static Integer getLastIteration(String configFile) {
-		Config config = new Config();
-		config.addCoreModules();
+		Config config = ConfigUtils.createConfig();
 		MatsimConfigReader configReader = new MatsimConfigReader(config);
 		configReader.readFile(configFile);
 		Integer lastIteration = config.controler().getLastIteration();
