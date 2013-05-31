@@ -80,7 +80,7 @@ public class MyController extends AbstractController {
 	
 	private TravelTimeCalculator travelTime;
 	private Map<Id, List<Sighting>> sightings;
-	private RunScenario scenarioReader;
+	private CreatePopulation scenarioReader;
 	private ScoreStats scoreStats;
 	private AgentLocator agentLocator;
 
@@ -381,7 +381,7 @@ public class MyController extends AbstractController {
 		altPopulationReaderMatsimV5.readFile("/Users/zilske/d4d/output/population.xml");
 
 
-		scenarioReader = new RunScenario();
+		scenarioReader = new CreatePopulation();
 		sightings = scenarioReader.readNetworkAndSightings(config);
 
 		

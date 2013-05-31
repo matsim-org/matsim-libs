@@ -134,6 +134,12 @@ public class SimplifyTask implements SinkSource, EntityProcessor {
 				visitedNodes.set(nodeId);
 			}
 
+			
+			// This is currently wrong: must go into 'complete' because only then
+			// do we know about 'required nodes'.
+			// (But perhaps we want to simplify on network level anyway. This seems
+			// too much fuss, because it is restricted to way level (which is arbitrary
+			// as fat as the network is concerned).
 			int prevRealNodeIndex = 0;
 			WayNode prevRealNode = wayNodes.get(prevRealNodeIndex);
 			for (int i = 1; i < wayNodes.size(); i++) {

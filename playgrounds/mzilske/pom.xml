@@ -105,6 +105,11 @@
 			<version>0.43-RELEASE</version>
 		</dependency>
 		<dependency>
+			<groupId>org.openstreetmap.osmosis</groupId>
+			<artifactId>osmosis-pbf</artifactId>
+			<version>0.43-RELEASE</version>
+		</dependency>
+		<dependency>
 			<groupId>org.swinglabs</groupId>
 			<artifactId>swingx-ws</artifactId>
 			<version>1.0</version>

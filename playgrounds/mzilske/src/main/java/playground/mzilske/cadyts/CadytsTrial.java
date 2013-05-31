@@ -29,7 +29,7 @@ public class CadytsTrial {
 		config.network().setInputFile("input/equil-cadyts/network.xml") ;
 		config.plans().setInputFile("input/equil-cadyts//plans100.xml") ;
 		
-		config.controler().setLastIteration(50) ;
+		config.controler().setLastIteration(200) ;
 		config.controler().setOutputDirectory("output") ;
 		config.controler().setWriteEventsInterval(1) ;
 		config.controler().setMobsim(MobsimType.qsim.toString()) ;

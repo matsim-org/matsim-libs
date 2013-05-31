@@ -54,9 +54,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
@@ -70,27 +68,24 @@ import playground.mzilske.cdr.CellTowers;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
-public class RunScenario {
+public class CreatePopulation {
 
 	private static final int POP_REAL = 22000000;
 
+	private double minLong = -4.265;
+	private double maxLong = -3.671;
+	private double minLat = 5.175;
+	private double maxLat = 5.53;
 
-	double minLong = -4.265;
-	public CellTowers getCellTowers() {
-		return cellTowers;
-	}
+	private Random rnd = new Random();
 
-	double maxLong = -3.671;
-	double minLat = 5.175;
-	double maxLat = 5.53;
-
-	Random rnd = new Random();
-
-	boolean filter = true;
-	
-	CellTowers cellTowers;
+	private CellTowers cellTowers;
 
 	private ScenarioImpl scenario;
+
+
+	private Coord min = D4DConsts.ct.transform(new CoordImpl(minLong, minLat));
+	private Coord max = D4DConsts.ct.transform(new CoordImpl(maxLong, maxLat));
 
 
 	public Scenario readScenario(Config config) throws FileNotFoundException  {
@@ -227,32 +222,25 @@ public class RunScenario {
 	private Map<Id, List<Sighting>> readAllSightings() throws FileNotFoundException {
 		final Map<Id, List<Sighting>> allSightings = new HashMap<Id, List<Sighting>>();
 
-		allSightings.putAll(readSightings("2011-12-07 00:00:00", "/Users/zilske/d4d/POS_SAMPLE_0.TSV", 0));
-		allSightings.putAll(readSightings("2011-12-19 00:00:00", "/Users/zilske/d4d/POS_SAMPLE_1.TSV", 1));
-		allSightings.putAll(readSightings("2012-01-02 00:00:00", "/Users/zilske/d4d/POS_SAMPLE_2.TSV", 2));
-		allSightings.putAll(readSightings("2012-01-16 00:00:00", "/Users/zilske/d4d/POS_SAMPLE_3.TSV", 3));
+		allSightings.putAll(readSightings("2011-12-07 00:00:00", D4DConsts.D4D_DIR + "SET2TSV/POS_SAMPLE_0.TSV", 0));
+		allSightings.putAll(readSightings("2011-12-19 00:00:00", D4DConsts.D4D_DIR + "SET2TSV/POS_SAMPLE_1.TSV", 1));
+		allSightings.putAll(readSightings("2012-01-02 00:00:00", D4DConsts.D4D_DIR + "SET2TSV/POS_SAMPLE_2.TSV", 2));
+		allSightings.putAll(readSightings("2012-01-16 00:00:00", D4DConsts.D4D_DIR + "SET2TSV/POS_SAMPLE_3.TSV", 3));
 		return allSightings;
 	}
 
-	private CoordinateTransformation ct = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:3395");
-
-
-	Coord min = ct.transform(new CoordImpl(minLong, minLat));
-	Coord max = ct.transform(new CoordImpl(minLat, maxLat));
-
-	
 	void readPosts() {
 		final Map<String, CellTower> cellTowerMap = new HashMap<String, CellTower>();
 		TabularFileParser tfp = new TabularFileParser();
 		TabularFileParserConfig tabularFileParserConfig = new TabularFileParserConfig();
-		tabularFileParserConfig.setFileName("/Users/zilske/d4d/ANT_POS.TSV");
+		tabularFileParserConfig.setFileName(D4DConsts.D4D_DIR + "ANT_POS.TSV");
 		tabularFileParserConfig.setDelimiterRegex("\t");
 		tfp.parse(tabularFileParserConfig, new TabularFileHandler() {
 
 			@Override
 			public void startRow(String[] row) {
 				CoordImpl longLat = new CoordImpl(Double.parseDouble(row[1]), Double.parseDouble(row[2]));
-				Coord coord = ct.transform(longLat);
+				Coord coord = D4DConsts.ct.transform(longLat);
 				if (Double.isNaN(coord.getX()) || Double.isNaN(coord.getY())) {
 					throw new RuntimeException("Bad latlong: " + coord);
 				}
@@ -270,7 +258,8 @@ public class RunScenario {
 
 
 	private void readNetwork() {
-		new MatsimNetworkReader(scenario).readFile("/Users/zilske/d4d/output/network.xml");
+		String filename = D4DConsts.WORK_DIR + "network-simplified.xml";
+		new MatsimNetworkReader(scenario).readFile(filename);
 	}
 
 	private void readSampleWithOneRandomPointForEachSightingInNewCell(final Map<Id, List<Sighting>> sightings) throws FileNotFoundException {
@@ -391,10 +380,10 @@ public class RunScenario {
 		}
 		System.out.println(cityPopulation.getPersons().size());
 		new InitialStatistics("-capital-only").run(cityPopulation);
-		new PopulationWriter(cityPopulation, null).write("/Users/zilske/d4d/output/population-capital-only.xml");
+		new PopulationWriter(cityPopulation, null).write(D4DConsts.WORK_DIR + "population-capital-only.xml");
 		System.out.println(nonCityPopulation.getPersons().size());
 		new InitialStatistics("-countryside-only").run(nonCityPopulation);
-		new PopulationWriter(nonCityPopulation, null).write("/Users/zilske/d4d/output/population-countryside-only.xml");
+		new PopulationWriter(nonCityPopulation, null).write(D4DConsts.WORK_DIR + "population-countryside-only.xml");
 	}
 
 
@@ -413,13 +402,16 @@ public class RunScenario {
 
 	public static void main(String[] args) throws FileNotFoundException {
 		Config config = ConfigUtils.createConfig();
-		RunScenario scenarioReader = new RunScenario();
+		CreatePopulation scenarioReader = new CreatePopulation();
 		Scenario scenario = scenarioReader.readScenario(config);
-		new PopulationWriter(scenario.getPopulation(), null).write("/Users/zilske/d4d/output/population.xml");
+		new PopulationWriter(scenario.getPopulation(), null).write(D4DConsts.WORK_DIR + "population.xml");
 		int sampleSize = scenario.getPopulation().getPersons().size();
 		System.out.println("Created " + sampleSize + " people. That's a " + ((double) sampleSize) / POP_REAL  + " sample.");
 	}
 
+	public CellTowers getCellTowers() {
+		return cellTowers;
+	}
 
-
+	
 }

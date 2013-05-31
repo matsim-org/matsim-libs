@@ -39,7 +39,7 @@ import com.vividsolutions.jts.geom.prep.PreparedGeometryFactory;
 import com.vividsolutions.jts.operation.distance.DistanceOp;
 import com.vividsolutions.jts.triangulate.VoronoiDiagramBuilder;
 
-import d4d.RunScenario;
+import d4d.CreatePopulation;
 
 public class CellTowers {
 	
