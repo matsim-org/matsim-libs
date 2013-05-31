@@ -310,11 +310,12 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 		// For simplifying reasons: Find the agent who is in front of me right now. (For a corridor this should be ok!) 
 		
 		Id causingAgent = null;
-		causingAgent = getCausingAgentSameLink(linkId, affectedAgent);
+		
+		// in case it makes sense to consider agents on the same link to be the reason not to leave a link due to storage capacity constraints
+//		causingAgent = getCausingAgentSameLink(linkId, affectedAgent);
 
 		if (causingAgent == null){
-			// no agent on this link identified, get last agent in queue of next link
-//			System.out.println("No agent in queue in front of me on this link. Looking on next link...");
+			// Get the last agent blocking the next link
 			Id nextLinkId = getNextLinkId(affectedAgent, linkId, time);
 //			System.out.println("Next link Id: " + nextLinkId);
 			causingAgent = getCausingAgentNextLink(nextLinkId);
@@ -337,6 +338,9 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 		double causingAgentFreeSpeedLeaveTime = Double.NEGATIVE_INFINITY;
 		
 //		System.out.println("Agents on next link: " + linkInfo.getAgentsOnLink().toString());
+		if ( (linkInfo.getAgentsOnLink().size() + 1) < linkInfo.getStorageCapacity_cars() ){
+			log.warn("Number of agents on next link: " + linkInfo.getAgentsOnLink().size() + " /// storage capacity: " + linkInfo.getStorageCapacity_cars());
+		}
 		// Get all agents who are currently on that link
 		for (Id id : linkInfo.getAgentsOnLink()){
 
@@ -350,30 +354,31 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 		return causingAgent;
 	}
 
-	private Id getCausingAgentSameLink(Id linkId, Id affectedAgent) {
-		Id causingAgent = null;
-		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(linkId);
-		
-		double affectedAgentFreeSpeedLeaveTime = linkInfo.getPersonId2freeSpeedLeaveTime().get(affectedAgent);
-		double causingAgentFreeSpeedLeaveTime = Double.POSITIVE_INFINITY;
-		
-		// Get all agents who are currently on that link
-		for (Id id : linkInfo.getAgentsOnLink()){
-			// See if this agent is supposed to leave the link before me
-			if (linkInfo.getPersonId2freeSpeedLeaveTime().get(id) > affectedAgentFreeSpeedLeaveTime) {
-				// agent behind affected agent
-			} else {
-				// agent before affected agent
-				if (linkInfo.getPersonId2freeSpeedLeaveTime().get(id) < causingAgentFreeSpeedLeaveTime) {
-					// closer in queue
-					causingAgentFreeSpeedLeaveTime = linkInfo.getPersonId2freeSpeedLeaveTime().get(id);
-					causingAgent = id;
-				}
-			}
-		}
-
-		return causingAgent;
-	}
+//	private Id getCausingAgentSameLink(Id linkId, Id affectedAgent) {
+//		Id causingAgent = null;
+//		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(linkId);
+//		System.out.println("Agents on the same link: " + linkInfo.getAgentsOnLink().toString());
+//
+//		double affectedAgentFreeSpeedLeaveTime = linkInfo.getPersonId2freeSpeedLeaveTime().get(affectedAgent);
+//		double causingAgentFreeSpeedLeaveTime = Double.POSITIVE_INFINITY;
+//		
+//		// Get all agents who are currently on that link
+//		for (Id id : linkInfo.getAgentsOnLink()){
+//			// See if this agent is supposed to leave the link before me
+//			if (linkInfo.getPersonId2freeSpeedLeaveTime().get(id) > affectedAgentFreeSpeedLeaveTime) {
+//				// agent behind affected agent
+//			} else {
+//				// agent before affected agent
+//				if (linkInfo.getPersonId2freeSpeedLeaveTime().get(id) < causingAgentFreeSpeedLeaveTime) {
+//					// closer in queue
+//					causingAgentFreeSpeedLeaveTime = linkInfo.getPersonId2freeSpeedLeaveTime().get(id);
+//					causingAgent = id;
+//				}
+//			}
+//		}
+//
+//		return causingAgent;
+//	}
 
 	private Id getNextLinkId(Id affectedAgent, Id linkId, double time) {
 		Id nextLinkId = null;
