@@ -157,6 +157,8 @@ public class AccessibilityControlerListenerImpl{
 	Benchmark benchmark;
 	
 	RoadPricingSchemeImpl scheme;
+	
+	private double[][] grids;
 
 	
 	/**
@@ -380,6 +382,8 @@ public class AccessibilityControlerListenerImpl{
 											int mode,
 											Controler contorler) {
 
+		grids = new double[numberOfMeasuringPoints][4];
+		
 		GeneralizedCostSum gcs = new GeneralizedCostSum();
 		
 //			// tnicolai: only for testing, disable afterwards
@@ -611,6 +615,11 @@ public class AccessibilityControlerListenerImpl{
 					walkGrid.setValue(walkAccessibility , measurePoint.getGeometry().getCentroid());
 					ptGrid.setValue(ptAccessibility, measurePoint.getGeometry().getCentroid());
 				}
+				
+				grids[Integer.parseInt(measurePoint.getAttribute().toString())][0] = freeSpeedAccessibility;
+				grids[Integer.parseInt(measurePoint.getAttribute().toString())][1] = carAccessibility;
+				grids[Integer.parseInt(measurePoint.getAttribute().toString())][2] = bikeAccessibility;
+				grids[Integer.parseInt(measurePoint.getAttribute().toString())][3] = walkAccessibility;
 				
 				writeCSVData(measurePoint, coordFromZone, fromNode, 
 						freeSpeedAccessibility, carAccessibility,
