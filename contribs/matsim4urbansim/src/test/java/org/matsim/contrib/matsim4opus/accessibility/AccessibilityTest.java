@@ -100,7 +100,24 @@ public class AccessibilityTest implements MATSim4UrbanSimInterface, LinkEnterEve
 		ctrl.setOverwriteFiles(true);
 		
 		NetworkBoundaryBox bbox = new NetworkBoundaryBox();
-		bbox.setCustomBoundaryBox(-50,-50,250,250);
+		double[] boundary = NetworkUtils.getBoundingBox(net.getNodes().values());
+		
+		double minX = boundary[0]-resolution/2;
+		double minY = boundary[1]-resolution/2;
+		double maxX = boundary[2]+resolution/2;
+		double maxY = boundary[3]+resolution/2;
+
+		if(resolution>100){
+			
+			minX = boundary[0] - 150*(2*resolution/200-1);
+			minY = boundary[1] - 150*(2*resolution/200-1);
+			maxX = boundary[2] + 150*(2*resolution/200+1);
+			maxY = boundary[3] + 150*(2*resolution/200+1);
+			
+		}
+		
+		bbox.setCustomBoundaryBox(minX,minY,maxX,maxY);
+		
 		ZoneLayer<Id> startZones = GridUtils.createGridLayerByGridSizeByNetwork(resolution, bbox.getBoundingBox());
 
 		SpatialGrid freeSpeedGrid = new SpatialGrid(bbox.getBoundingBox(), resolution);
@@ -120,22 +137,43 @@ public class AccessibilityTest implements MATSim4UrbanSimInterface, LinkEnterEve
 
 		ControlerListener listener = null;
 		
-		if(this.isParcelMode())
+		if(this.isParcelMode()){
 			listener = new ParcelBasedAccessibilityControlerListenerV3(this, startZones, parcels, freeSpeedGrid, carGrid, bikeGrid, walkGrid,
 					ptGrid, ptMatrix, benchmark, scenario);
-		else
-			listener = new ZoneBasedAccessibilityControlerListenerV3(this, startZones, zones, ptMatrix, benchmark, scenario);
-
+			ctrl.addControlerListener(listener);
+			testParcelBasedAccessibility(ctrl,listener, freeSpeedGrid);
+		}
 		
-		ctrl.addControlerListener(listener);
-		
-		ctrl.run();
+//		if(this.isParcelMode())
+//			listener = new ParcelBasedAccessibilityControlerListenerV3(this, startZones, parcels, freeSpeedGrid, carGrid, bikeGrid, walkGrid,
+//					ptGrid, ptMatrix, benchmark, scenario);
+//		else
+//			listener = new ZoneBasedAccessibilityControlerListenerV3(this, startZones, zones, ptMatrix, benchmark, scenario);
+//
+//		
+//		ctrl.addControlerListener(listener);
+//		
+//		ctrl.run();
 		
 		//Assert.assertTrue(sth.);
 		
 		//new AccessibilityTest().postProcessTest();
 		
 		TempDirectoryUtil.cleaningUpCustomTempDirectories();
+		
+	}
+	
+	private void testParcelBasedAccessibility(Controler ctrl,
+			ControlerListener listener, SpatialGrid freeSpeedGrid) {
+		ctrl.run();
+		
+		double maxVal = freeSpeedGrid.getValue(200, 100);
+		for(double x=freeSpeedGrid.getXmin();x<freeSpeedGrid.getXmax();x+=resolution){
+			for(double y=freeSpeedGrid.getYmin();y<freeSpeedGrid.getYmax();y++){
+				if(x!=200||y!=100)
+					Assert.assertTrue(freeSpeedGrid.getValue(x, y)<=maxVal);
+			}
+		}
 		
 	}
 
