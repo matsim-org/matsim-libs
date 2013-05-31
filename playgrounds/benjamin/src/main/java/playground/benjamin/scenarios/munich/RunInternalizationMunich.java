@@ -21,6 +21,7 @@ package playground.benjamin.scenarios.munich;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.controler.Controler;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
@@ -53,7 +54,7 @@ public class RunInternalizationMunich {
 		emissionEfficiencyFactor = args[2];
 		considerCO2Costs = args[3];
 
-		Config config = new Config();
+		Config config = ConfigUtils.createConfig();
 		config.addCoreModules();
 		MatsimConfigReader confReader = new MatsimConfigReader(config);
 		confReader.readFile(configFile);
