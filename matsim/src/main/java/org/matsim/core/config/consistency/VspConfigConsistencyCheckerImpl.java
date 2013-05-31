@@ -51,16 +51,19 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 
 		if ( config.planCalcScore().getMonetaryDistanceCostRatePt() > 0 ) {
 			problem = true ;
+			System.out.flush() ;
 			log.error("found monetary distance cost rate pt > 0.  You probably want a value < 0 here.  " +
 					"This is a bug and may be changed eventually.  kai, jun'11") ;
 		}
 		if ( config.planCalcScore().getMarginalUtilityOfMoney() < 0. ) {
 			problem = true ;
+			System.out.flush() ;
 			log.error("found marginal utility of money < 0.  You almost certainly want a value > 0 here. " ) ;
 		}
 		
 		if ( config.getQSimConfigGroup()!=null && config.getQSimConfigGroup().isRemoveStuckVehicles() ) {
 			problem = true ;
+			System.out.flush() ;
 			log.warn("found that the qsim is removing stuck vehicles.  vsp default is setting this to false.");
 		}
 		
@@ -73,18 +76,21 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 		}
 		if ( !found ) {
 			problem = true ;
+			System.out.flush() ;
 			log.warn("found no strategy ChangeExpBeta. vsp default is using ChangeExpBeta.");
 		}
 		
 		Set<EventsFileFormat> formats = config.controler().getEventsFileFormats();
 		if ( !formats.contains(EventsFileFormat.xml) ) {
 			problem = true ;
+			System.out.flush() ;
 			log.warn("did not find xml as one of the events file formats. vsp default is using xml events.");
 		}
 		
 		// added before nov'12
 		if ( config.timeAllocationMutator().getMutationRange() < 7200 ) {
 //			problem = true ;
+			System.out.flush() ;
 			log.warn("timeAllocationMutator mutationRange < 7200; vsp default is 7200.  This will be more strictly" +
 					" enforced in the future. This means you have to add the following lines to your config file: ") ;
 			log.warn("<module name=\"TimeAllocationMutator\">");
@@ -95,6 +101,7 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 		// added before nov'12
 		if ( !config.vspExperimental().isRemovingUnneccessaryPlanAttributes() ) {
 //			problem = true ;
+			System.out.flush() ;
 			log.warn("You are not removing unnecessary plan attributes; vsp default is to do that.  This will be more strictly" +
 					" enforced in the future.") ;
 		}
@@ -106,6 +113,7 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 			// added before nov'12
 			if( config.scenario().isUseTransit()) {
 				problem = true;
+				System.out.flush() ;
 				log.error("You are using " + config.vspExperimental().getActivityDurationInterpretation() + " as activityDurationInterpretation in " +
 						"conjunction with the matsim transit module. This is not working at all as pt interaction activities never have an end time and " +
 				"thus will never end!");
@@ -115,6 +123,7 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 		// added jan'13
 		if ( ActivityDurationInterpretation.minOfDurationAndEndTime.equals(vspConfig.getActivityDurationInterpretation() ) ) {
 			// problem = true ;
+			System.out.flush() ;
 			log.warn("You are using ActivityDurationInterpretation " + vspConfig.getActivityDurationInterpretation() + " ; vsp default is to use " +
 					ActivityDurationInterpretation.tryEndTimeThenDuration + " .  This will be more strictly enforced in the future.  " +
 							"This means you have to add the following lines into the vspExperimental section of your config file: ") ;
@@ -128,6 +137,7 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 		// use beta_brain=1 // added as of nov'12
 		if ( config.planCalcScore().getBrainExpBeta() != 1. ) {
 //			problem = true ;
+			System.out.flush() ;
 			log.warn("You are using a brainExpBeta != 1; vsp default is 1.  (Different values may cause conceptual " +
 					"problems during paper writing.) This will be more strictly "
 					+ " enforced in the future. This means you have to add the following lines to your config file: ") ;
@@ -146,6 +156,7 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 		if ( usingLocationChoice ) {
 			if ( !config.locationchoice().getDestinationSamplePercent().equals("100.") ) {
 				//			problem = true ;
+				System.out.flush() ;
 				log.error("vsp will not accept location choice destination sample percent other than 100 until the corresponding warning in " +
 				"DestinationSampler is resolved.  kai, jan'13") ;
 			}
@@ -156,6 +167,7 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 //			}
 			if ( !Boolean.parseBoolean( config.vspExperimental().getValue( VspExperimentalConfigKey.isUsingOpportunityCostOfTimeForLocationChoice) ) ) {
 				// problem = true ;
+				System.out.flush() ;
 				log.error("vsp will not accept location choice without including opportunity cost of time into the approximation. kai,jan'13") ;
 			}
 		}
@@ -163,6 +175,7 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 		if ( problem && config.vspExperimental().getValue(VspExperimentalConfigKey.vspDefaultsCheckingLevel)
 				.equals( VspExperimentalConfigGroup.ABORT ) ) {
 			String str = "found a situation that leads to vsp-abort.  aborting ..." ; 
+			System.out.flush() ;
 			log.fatal( str ) ; 
 			throw new RuntimeException( str ) ;
 		}

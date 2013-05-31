@@ -26,6 +26,7 @@ import java.math.BigInteger;
 
 import org.matsim.contrib.matsim4opus.config.M4UConfigUtils;
 import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigModule;
+import org.matsim.contrib.matsim4opus.config.modules.ImprovedPseudoPtConfigModule;
 import org.matsim.contrib.matsim4opus.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4opus.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4opus.utils.io.TempDirectoryUtil;
@@ -144,14 +145,19 @@ public class CreateTestExternalMATSimConfig extends CreateTestMATSimConfig{
 		// creating an empty MASim config
 		Config config = new Config();
 		
+		// !! note that the modules are deliberately anonymous (i.e. not typed) since we test the effect of incomplete entries !!
+		
 		// matsim4urbansimParameter module
 		Module matsim4UrbanSimModule = config.createModule( M4UConfigUtils.MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG);
 		matsim4UrbanSimModule.addParam(M4UConfigUtils.URBANSIM_ZONE_SHAPEFILE_LOCATION_DISTRIBUTION, this.urbanSimZoneShapefileLocationDistribution);
-		matsim4UrbanSimModule.addParam(M4UConfigUtils.PT_STOPS, this.ptStops);
-		matsim4UrbanSimModule.addParam(M4UConfigUtils.PT_STOPS_SWITCH, this.usePtStops);
-		matsim4UrbanSimModule.addParam(M4UConfigUtils.PT_TRAVEL_TIMES, this.ptTravelTimes);
-		matsim4UrbanSimModule.addParam(M4UConfigUtils.PT_TRAVEL_DISTANCES, this.ptTravelDistances);
-		matsim4UrbanSimModule.addParam(M4UConfigUtils.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH, this.useTravelTimesAndDistances);
+
+		Module ippcm = config.createModule( ImprovedPseudoPtConfigModule.GROUP_NAME ) ;
+		ippcm.addParam(ImprovedPseudoPtConfigModule.PT_STOPS, this.ptStops);
+		ippcm.addParam(ImprovedPseudoPtConfigModule.PT_STOPS_SWITCH, this.usePtStops);
+		ippcm.addParam(ImprovedPseudoPtConfigModule.PT_TRAVEL_TIMES, this.ptTravelTimes);
+		ippcm.addParam(ImprovedPseudoPtConfigModule.PT_TRAVEL_DISTANCES, this.ptTravelDistances);
+		ippcm.addParam(ImprovedPseudoPtConfigModule.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH, this.useTravelTimesAndDistances);
+
 		// tnicolai: this are no default parameters anymore.
 //		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_BIKE_TRAVEL_TIME, this.betaBikeTravelTime + "");
 //		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_BIKE_TRAVEL_TIME_POWER2, this.betaBikeTravelTimePower2 + "");
@@ -236,12 +242,13 @@ public class CreateTestExternalMATSimConfig extends CreateTestMATSimConfig{
 		// creating an empty MASim config
 		Config config = new Config();
 		
-		// matsim4urbansimParameter module
-		Module matsim4UrbanSimModule = config.createModule( M4UConfigUtils.MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG);
-		matsim4UrbanSimModule.addParam(M4UConfigUtils.PT_STOPS_SWITCH, "True");
-		matsim4UrbanSimModule.addParam(M4UConfigUtils.PT_STOPS, this.ptStops);
-		matsim4UrbanSimModule.addParam(M4UConfigUtils.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH, this.useTravelTimesAndDistances);
-		
+
+		// improved pseudo pt:
+		Module ippcm = config.createModule( ImprovedPseudoPtConfigModule.GROUP_NAME ) ;
+		ippcm.addParam(ImprovedPseudoPtConfigModule.PT_STOPS, this.ptStops);
+		ippcm.addParam(ImprovedPseudoPtConfigModule.PT_STOPS_SWITCH, "tRue" );
+		ippcm.addParam(ImprovedPseudoPtConfigModule.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH, this.useTravelTimesAndDistances);
+
 		// changeLegMode module
 		Module changeLegModeModule = config.createModule(changeLegModeModuleName);
 		changeLegModeModule.addParam(changeLegModeParamName, changeLegModeValue);

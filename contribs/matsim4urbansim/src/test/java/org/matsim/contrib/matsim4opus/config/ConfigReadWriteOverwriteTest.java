@@ -249,22 +249,22 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 	 * Settings that are overlapping in the MATSim4UrbanSimConfig and the external config 
 	 * should be overwritten by parameter settings from the external config.
 	 * 
-	 * @param testExternalConfig contains all parameter settings from the external config 
+	 * @param externalTestConfig contains all parameter settings from the external config 
 	 * @param testConfig contains all parameter from the MATSim4UrbanSim config
 	 * @param config is the merged config in standard MATSim format.
 	 */
 	private void checkCoreModulesAndExternalConfigSettings(
-			CreateTestExternalMATSimConfig testExternalConfig,
+			CreateTestExternalMATSimConfig externalTestConfig,
 			CreateTestMATSimConfig testConfig, Config config) {
 		
-		Assert.assertTrue(config.controler().getFirstIteration() == testExternalConfig.firstIteration.intValue());
-		Assert.assertTrue(config.controler().getLastIteration() == testExternalConfig.lastIteration.intValue());
-		Assert.assertTrue( Paths.checkPathEnding( config.controler().getOutputDirectory() ).equalsIgnoreCase( Paths.checkPathEnding( testExternalConfig.matsim4opusOutput ) ));
+		Assert.assertTrue(config.controler().getFirstIteration() == externalTestConfig.firstIteration.intValue());
+		Assert.assertTrue(config.controler().getLastIteration() == externalTestConfig.lastIteration.intValue());
+		Assert.assertTrue( Paths.checkPathEnding( config.controler().getOutputDirectory() ).equalsIgnoreCase( Paths.checkPathEnding( externalTestConfig.matsim4opusOutput ) ));
 		
-		Assert.assertTrue( Paths.checkPathEnding( config.network().getInputFile() ).equalsIgnoreCase( Paths.checkPathEnding( testExternalConfig.networkInputFile ) ));
+		Assert.assertTrue( Paths.checkPathEnding( config.network().getInputFile() ).equalsIgnoreCase( Paths.checkPathEnding( externalTestConfig.networkInputFile ) ));
 		
 		if(testConfig.getStartMode() != CreateTestMATSimConfig.COLD_START){
-			Assert.assertTrue( Paths.checkPathEnding( config.plans().getInputFile() ).equalsIgnoreCase( Paths.checkPathEnding( testExternalConfig.inputPlansFile ) ));
+			Assert.assertTrue( Paths.checkPathEnding( config.plans().getInputFile() ).equalsIgnoreCase( Paths.checkPathEnding( externalTestConfig.inputPlansFile ) ));
 		}
 		
 		Iterator<StrategySettings> iteratorStrategyCG = config.strategy().getStrategySettings().iterator();
@@ -272,19 +272,19 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 			StrategySettings strategySettings = iteratorStrategyCG.next();
 			
 			if(strategySettings.getId() == new IdImpl(1))
-				Assert.assertTrue(strategySettings.getProbability() == testExternalConfig.timeAllocationMutatorProbability);
+				Assert.assertTrue(strategySettings.getProbability() == externalTestConfig.timeAllocationMutatorProbability);
 			else if(strategySettings.getId() == new IdImpl(2))
-				Assert.assertTrue(strategySettings.getProbability() == testExternalConfig.changeExpBetaProbability);
+				Assert.assertTrue(strategySettings.getProbability() == externalTestConfig.changeExpBetaProbability);
 			else if(strategySettings.getId() == new IdImpl(3))
-				Assert.assertTrue(strategySettings.getProbability() == testExternalConfig.reRouteDijkstraProbability);
+				Assert.assertTrue(strategySettings.getProbability() == externalTestConfig.reRouteDijkstraProbability);
 		}
 		
 		// tnicolai: times and durations in testExternalConfig are given as String, so they are not comparable with double values
-		ActivityParams homeActivity = config.planCalcScore().getActivityParams(testExternalConfig.activityType_0);
-		ActivityParams workActivity = config.planCalcScore().getActivityParams(testExternalConfig.activityType_1);
-		Assert.assertTrue(homeActivity.getType().equalsIgnoreCase( testExternalConfig.activityType_0 ));
+		ActivityParams homeActivity = config.planCalcScore().getActivityParams(externalTestConfig.activityType_0);
+		ActivityParams workActivity = config.planCalcScore().getActivityParams(externalTestConfig.activityType_1);
+		Assert.assertTrue(homeActivity.getType().equalsIgnoreCase( externalTestConfig.activityType_0 ));
 		// Assert.assertTrue(homeActivity.getTypicalDuration() == testExternalConfig.homeActivityTypicalDuration.intValue());
-		Assert.assertTrue(workActivity.getType().equalsIgnoreCase( testExternalConfig.activityType_1 ));
+		Assert.assertTrue(workActivity.getType().equalsIgnoreCase( externalTestConfig.activityType_1 ));
 		// Assert.assertTrue(workActivity.getOpeningTime() == testExternalConfig.workActivityOpeningTime.intValue());
 		// Assert.assertTrue(workActivity.getLatestStartTime() == testExternalConfig.workActivityLatestStartTime.intValue());
 		
@@ -303,31 +303,33 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 		ImprovedPseudoPtConfigModule ippcm = M4UImprovedPseudoPtConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
 		
 		// time of day
-		Assert.assertTrue( acm.getTimeOfDay() == testExternalConfig.timeOfDay );
+		Assert.assertTrue( acm.getTimeOfDay() == externalTestConfig.timeOfDay );
 		// use pt stops flag
-		boolean usePtStopsFlagFromConfig = matsim4UrbanSimModule.getValue( M4UConfigUtils.PT_STOPS_SWITCH ) != null && matsim4UrbanSimModule.getValue( M4UConfigUtils.PT_STOPS_SWITCH ).equalsIgnoreCase("TRUE");
-		Assert.assertTrue( usePtStopsFlagFromConfig == testExternalConfig.usePtStops.equalsIgnoreCase("TRUE") );
+//		boolean usePtStopsFlagFromConfig = matsim4UrbanSimModule.getValue( M4UConfigUtils.PT_STOPS_SWITCH ) != null && matsim4UrbanSimModule.getValue( M4UConfigUtils.PT_STOPS_SWITCH ).equalsIgnoreCase("TRUE");
+		boolean usePtStopsFlagFromConfig = ippcm.isUsingPtStops() ;
+		Assert.assertTrue( usePtStopsFlagFromConfig == externalTestConfig.usePtStops.equalsIgnoreCase("TRUE") );
 		// pt stops
-		if(testExternalConfig.usePtStops.equalsIgnoreCase("TRUE"))
-			Assert.assertTrue( Paths.checkPathEnding( ippcm.getPtStopsInputFile()  ).equalsIgnoreCase( Paths.checkPathEnding( testExternalConfig.ptStops ) ));
+		if(externalTestConfig.usePtStops.equalsIgnoreCase("TRUE"))
+			Assert.assertTrue( Paths.checkPathEnding( ippcm.getPtStopsInputFile()  ).equalsIgnoreCase( Paths.checkPathEnding( externalTestConfig.ptStops ) ));
 		// use pt travel times and distances
-		boolean usePtTimesAndDiastances = matsim4UrbanSimModule.getValue( M4UConfigUtils.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH ) != null && matsim4UrbanSimModule.getValue( M4UConfigUtils.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH ).equalsIgnoreCase("TRUE");
-		Assert.assertTrue( usePtTimesAndDiastances == testExternalConfig.useTravelTimesAndDistances.equalsIgnoreCase("TRUE") );
+//		boolean usePtTimesAndDiastances = matsim4UrbanSimModule.getValue( M4UConfigUtils.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH ) != null && matsim4UrbanSimModule.getValue( M4UConfigUtils.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH ).equalsIgnoreCase("TRUE");
+		boolean usePtTimesAndDiastances = ippcm.isUsingTravelTimesAndDistances() ;
+		Assert.assertTrue( usePtTimesAndDiastances == externalTestConfig.useTravelTimesAndDistances.equalsIgnoreCase("TRUE") );
 		
-		if( testExternalConfig.useTravelTimesAndDistances.equalsIgnoreCase("TRUE") ){
+		if( externalTestConfig.useTravelTimesAndDistances.equalsIgnoreCase("TRUE") ){
 			// pt travel times
-			Assert.assertTrue( Paths.checkPathEnding( ippcm.getPtTravelTimesInputFile() ).equalsIgnoreCase( testExternalConfig.ptTravelTimes ));
+			Assert.assertTrue( Paths.checkPathEnding( ippcm.getPtTravelTimesInputFile() ).equalsIgnoreCase( externalTestConfig.ptTravelTimes ));
 			// pt travel distances
-			Assert.assertTrue(Paths.checkPathEnding( ippcm.getPtTravelDistancesInputFile() ).equalsIgnoreCase( testExternalConfig.ptTravelDistances ));
+			Assert.assertTrue(Paths.checkPathEnding( ippcm.getPtTravelDistancesInputFile() ).equalsIgnoreCase( externalTestConfig.ptTravelDistances ));
 		
 		}
 		
 		///////////////////////////////////////////////////
 		// UrbanSim Parameter Config Module Settings
 		///////////////////////////////////////////////////
-		UrbanSimParameterConfigModuleV3 urbansimParameterConfigModule = testExternalConfig.getUrbanSimParameterConfig(config);
+		UrbanSimParameterConfigModuleV3 urbansimParameterConfigModule = externalTestConfig.getUrbanSimParameterConfig(config);
 		// shape file for population distribution (zone)
-		Assert.assertTrue( Paths.checkPathEnding( urbansimParameterConfigModule.getUrbanSimZoneShapefileLocationDistribution() ).equalsIgnoreCase( Paths.checkPathEnding( testExternalConfig.urbanSimZoneShapefileLocationDistribution )));
+		Assert.assertTrue( Paths.checkPathEnding( urbansimParameterConfigModule.getUrbanSimZoneShapefileLocationDistribution() ).equalsIgnoreCase( Paths.checkPathEnding( externalTestConfig.urbanSimZoneShapefileLocationDistribution )));
 		
 //		// Accessibility Parameter Config Module settings
 //		AccessibilityParameterConfigModule accessibilityParameterModule = testExternalConfig.getAccessibilityParameterConfig(config);

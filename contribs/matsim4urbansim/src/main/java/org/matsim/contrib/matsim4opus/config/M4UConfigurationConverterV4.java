@@ -119,7 +119,7 @@ public class M4UConfigurationConverterV4 {
 		// yyyy Stellt sich heraus, dass das so nicht geht: Z.B. flowCap, storCap basierend auf sample rate will man _vor_ und
 		// nicht _nach_ der external config automagisch setzen.
 		
-		try{
+//		try{
 			// creates an empty config to be filled by settings from the MATSim4UrbanSim and external config files
 			this.config = M4UConfigUtils.createEmptyConfigWithSomeDefaults();
 
@@ -162,10 +162,10 @@ public class M4UConfigurationConverterV4 {
 			
 			M4UConfigUtils.checkConfigConsistencyAndWriteToLog(config, "at the end of the matsim4urbansim config converter") ;
 			
-		}catch(Exception e){
-			e.printStackTrace();
-			return false;
-		}
+//		}catch(Exception e){
+//			e.printStackTrace();
+//			return false;
+//		}
 		return true;
 	}
 

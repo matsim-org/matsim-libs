@@ -29,8 +29,9 @@ import org.matsim.core.config.experimental.ReflectiveModule;
  *
  */
 public class ImprovedPseudoPtConfigModule extends ReflectiveModule {
+	public static final String GROUP_NAME="improvedPseudoPt" ;
+
 	private static final String USING_PT_STOPS = "usingPtStops";
-	public static String GROUP_NAME="improvedPseudoPt" ;
 	public static final String PT_STOPS = "ptStopsFile";
 	public static final String PT_STOPS_SWITCH = "usePtStops";
 	public static final String PT_TRAVEL_TIMES = "ptTravelTimesFile";
@@ -39,8 +40,8 @@ public class ImprovedPseudoPtConfigModule extends ReflectiveModule {
 	private String ptStopsInputFile;
 	private String ptTravelTimesInputFile;
 	private String ptTravelDistancesInputFile;
-	private Boolean usingTravelTimesAndDistances ;
-	private Boolean usingPtStops ;
+	private boolean usingTravelTimesAndDistances = false ;
+	private boolean usingPtStops = false ;
 	
 	public ImprovedPseudoPtConfigModule() {
 		super(GROUP_NAME);
@@ -71,19 +72,19 @@ public class ImprovedPseudoPtConfigModule extends ReflectiveModule {
     	return this.ptTravelDistancesInputFile;
     }
     @StringSetter(PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH)
-    public void setUsingTravelTimesAndDistances( Boolean val ) {
+    public void setUsingTravelTimesAndDistances( boolean val ) {
     	this.usingTravelTimesAndDistances = val ;
     }
     @StringGetter(PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH)
-    public Boolean isUsingTravelTimesAndDistances() {
+    public boolean isUsingTravelTimesAndDistances() {
     	return this.usingTravelTimesAndDistances ;
     }
     @StringGetter(USING_PT_STOPS)
-	public Boolean isUsingPtStops() {
+	public boolean isUsingPtStops() {
 		return usingPtStops;
 	}
     @StringSetter(USING_PT_STOPS)
-	public void setUsingPtStops(Boolean usingPtStops) {
+	public void setUsingPtStops(boolean usingPtStops) {
 		this.usingPtStops = usingPtStops;
 	}
 

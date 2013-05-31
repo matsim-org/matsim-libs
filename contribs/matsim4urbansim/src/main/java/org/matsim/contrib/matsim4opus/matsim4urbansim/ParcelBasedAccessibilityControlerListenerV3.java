@@ -230,7 +230,7 @@ public class ParcelBasedAccessibilityControlerListenerV3 extends AccessibilityCo
 		
 		try{
 			log.info("Computing and writing cell based accessibility measures ...");
-			printParameterSettings();
+//			printParameterSettings(); // use only for debugging (settings are printed as part of config dump)
 			
 			Iterator<Zone<Id>> measuringPointIterator = measuringPointsCell.getZones().iterator();
 			log.info(measuringPointsCell.getZones().size() + " measurement points are now processing ...");

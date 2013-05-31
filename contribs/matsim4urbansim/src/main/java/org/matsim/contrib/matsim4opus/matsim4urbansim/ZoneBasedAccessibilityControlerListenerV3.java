@@ -170,7 +170,7 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 		
 		try{
 			log.info("Computing and writing zone based accessibility measures ..." );
-			printParameterSettings();
+//			printParameterSettings(); // use only for debugging (settings are printed as part of config dump)
 			
 			Iterator<Zone<Id>> measuringPointIterator = measuringPointsZone.getZones().iterator();
 			log.info(measuringPointsZone.getZones().size() + "  measurement points are now processing ...");

@@ -63,11 +63,11 @@ public class M4UConfigUtils {
 	// module and param names for matsim4urbansim settings stored in an external MATSim config file
 	public static final String MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG = "matsim4urbansimParameter";// module
 	public static final String URBANSIM_ZONE_SHAPEFILE_LOCATION_DISTRIBUTION = "urbanSimZoneShapefileLocationDistribution";
-	public static final String PT_STOPS = "ptStops";
-	public static final String PT_STOPS_SWITCH = "usePtStops";
-	public static final String PT_TRAVEL_TIMES = "ptTravelTimes";
-	public static final String PT_TRAVEL_DISTANCES = "ptTravelDistances";
-	public static final String PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH = "useTravelTimesAndDistances";
+//	public static final String PT_STOPS = "ptStops";
+//	public static final String PT_STOPS_SWITCH = "usePtStops";
+//	public static final String PT_TRAVEL_TIMES = "ptTravelTimes";
+//	public static final String PT_TRAVEL_DISTANCES = "ptTravelDistances";
+//	public static final String PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH = "useTravelTimesAndDistances";
 
 	/**
 	 * Setting 
@@ -100,62 +100,6 @@ public class M4UConfigUtils {
 
 		// ===
 
-//		double timeOfDay						= 8 * 3600.; // default value
-		String ptStops							= null;
-		String ptTravelTimes					= null;
-		String ptTravelDistances				= null;
-		if(matsim4urbansimModule != null){
-//			try{
-//				double tmp = Double.parseDouble( matsim4urbansimModule.getValue(M4UControlerConfigModuleV3.TIME_OF_DAY) );
-//				log.info("Found custom time of day for accessibility calculation: " + tmp );
-//				timeOfDay = tmp;
-//			} catch(Exception e){
-//				log.info("No time of day for accessibility calulation given or given time has wrong format.");
-//				log.info("By default, MATSim calulates accessibilities for the following time of day: " + timeOfDay );
-//				log.info("In order to use another time of day enter it in the external MATSim config file as follows:");
-//				log.info("<module name=\"matsim4urbansimParameter\" >");
-//				log.info("<param name=\"timeOfDay\" value=\"28800\" />");
-//				log.info("</module>");
-//			}
-
-			// check if pseudo pt should be used
-			if( matsim4urbansimModule.getValue( PT_STOPS_SWITCH ) != null && 
-					matsim4urbansimModule.getValue( PT_STOPS_SWITCH ).equalsIgnoreCase("TRUE")){
-
-				// check if pt stops input file is given and existing
-				ptStops = matsim4urbansimModule.getValue(PT_STOPS);
-				if( ptStops != null && Paths.pathExsits(ptStops))
-					log.info("Found pt stop input file: " + ptStops);
-				else
-					throw new RuntimeException("The parameter 'usePtStop' is set TRUE, but no pt stop input file found!!! Given input file for 'ptStop' = " + ptStops);
-
-
-				// check if input files for pt travel times and distances are set
-				if( matsim4urbansimModule.getValue( PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH ) != null &&
-						matsim4urbansimModule.getValue( PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH ).equalsIgnoreCase( "TRUE" )){
-
-					ptTravelTimes = matsim4urbansimModule.getValue(PT_TRAVEL_TIMES);
-					ptTravelDistances =  matsim4urbansimModule.getValue(PT_TRAVEL_DISTANCES);
-
-					if( ptTravelTimes != null && Paths.pathExsits(ptTravelTimes) && 
-							ptTravelDistances != null && Paths.pathExsits(ptTravelDistances)){
-						log.info("Found pt travel time input file: " + ptTravelTimes);
-						log.info("Found pt travel distance input file: " + ptTravelDistances);
-					}
-					else{
-						log.error("The parameter 'useTravelTimesAndDistances' is set TRUE but either no pt travel time or distance input file found! " +
-								"Both files needs to be set to use precomputed pt times and distances.");
-						log.error("Given input file name for 'ptTravelTimes' = " + ptTravelTimes);
-						log.error("Given input file name for 'ptTravelDistances' = " + ptTravelDistances);
-						log.error("At least one of these two files was not found.  Aborting ...") ;
-						throw new RuntimeException("Parameter not found!");
-					}
-				}
-			}
-		}
-
-		// ===
-
 		// set parameter in module 
 		M4UControlerConfigModuleV3 module = getMATSim4UrbaSimControlerConfigAndPossiblyConvert(config);
 		module.setAgentPerformance(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isAgentPerformance());
@@ -164,9 +108,9 @@ public class M4UConfigUtils {
 		module.setCellBasedAccessibility(computeCellBasedAccessibility);
 		
 		ImprovedPseudoPtConfigModule ippcm = M4UImprovedPseudoPtConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
-		ippcm.setPtStopsInputFile(ptStops);
-		ippcm.setPtTravelTimesInputFile(ptTravelTimes);
-		ippcm.setPtTravelDistancesInputFile(ptTravelDistances);
+//		ippcm.setPtStopsInputFile(ptStops);
+//		ippcm.setPtTravelTimesInputFile(ptTravelTimes);
+//		ippcm.setPtTravelDistancesInputFile(ptTravelDistances);
 		
 		AccessibilityConfigModule acm = M4UAccessibilityConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
 //		acm.setTimeOfDay(timeOfDay) ;

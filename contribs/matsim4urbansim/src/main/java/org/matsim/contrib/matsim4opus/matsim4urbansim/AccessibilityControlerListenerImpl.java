@@ -224,7 +224,8 @@ public class AccessibilityControlerListenerImpl{
 		constPt			= scenario.getConfig().planCalcScore().getConstantPt();
 		
 		depatureTime 	= this.main.getTimeOfDay(); // 8.*3600;	
-		printParameterSettings();
+//		printParameterSettings(); // use only for debugging since otherwise it clutters the logfile (settings are printed as part of 
+		// config dump)
 	}
 	
 	/**
