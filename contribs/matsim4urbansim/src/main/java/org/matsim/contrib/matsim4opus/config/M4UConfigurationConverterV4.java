@@ -134,14 +134,13 @@ public class M4UConfigurationConverterV4 {
 			M4UConfigUtils.initMATSim4UrbanSimControler(matsim4urbansimConfigPart2, config);
 			M4UAccessibilityConfigUtils.initAccessibilityParameters(matsim4urbansimConfigPart2, config);
 			
-			M4UConfigUtils.insertNetworkParams(matsim4urbansimConfigPart1, config); // ok (on moving info from m4uPart1 to config). kai, may'13
+			M4UConfigUtils.insertNetworkParams(matsim4urbansimConfigPart1, config); // ok
 			M4UConfigUtils.insertPlansParamsAndConfigureWarmOrHotStart(matsim4urbansimConfigPart1, config); // yyyy can't fix (don't understand). kai, may'13
 			M4UConfigUtils.initControler(matsim4urbansimConfigPart1, config); // yyyy can't fix since it is using static variables.  kai, may'13 
-			M4UConfigUtils.insertPlanCalcScoreParams(matsim4urbansimConfigPart1, config); // ok.  kai, may'13
+			M4UConfigUtils.insertPlanCalcScoreParams(matsim4urbansimConfigPart1, config); // ok
 			M4UConfigUtils.insertStrategyParams(matsim4urbansimConfigPart1, config); // yyyy can't fix: It is trying to do something to a possible 
 			// 4th strategy although that is not yet there at this point in time.
 
-//			M4UConfigUtils.initPlanCalcRoute(config);
 			M4UConfigUtils.initQSim(matsim4urbansimConfig, config);
 			
 			// loading the external MATSim config in to the initialized config
@@ -173,29 +172,5 @@ public class M4UConfigurationConverterV4 {
 			return this.config;
 	}
 	
-
-	public static void main(String[] args) {
-	
-//		MatsimConfigType mct = new MatsimConfigType();
-//		
-//		MATSim4UrbanSimConfigurationConverterV4 m = new MATSim4UrbanSimConfigurationConverterV4(mct);
-//		m.stopMATSimForMixedAccessibilities(0, 0, 0, 0, 0, 0, 0, 0, 0);
-//		m.stopMATSimForMixedAccessibilities(1, 1, 1, 0, 0, 0, 0, 0, 0);
-//		m.stopMATSimForMixedAccessibilities(0, 0, 0, 1, 1, 0, 0, 0, 0);
-//		m.stopMATSimForMixedAccessibilities(0, 0, 0, 0, 0, 0, 0, 1, 0);
-//		m.stopMATSimForMixedAccessibilities(0, 1, 0, 0, 0, 0, 0, 1, 0);
-		// testing calculation of storage capacity fetch factor
-		for(double sample = 0.01; sample <=1.; sample += 0.01){
-			
-			double factor = Math.pow(sample, -0.25); // same as: 1. / Math.sqrt(Math.sqrt(sample))
-			double storageCap = sample * factor;
-			
-			System.out.println("Sample rate " + sample + " leads to a fetch fector of: " + factor + " and a StroraceCapacity of: " + storageCap );
-		}
-		
-		for(int i = 0; i <= 100; i++){
-			System.out.println("i = " + i + " disable int = " + (int) Math.ceil(i * 0.8)+ " disable double = " + i * 0.8);			
-		}
-	}
 }
 
