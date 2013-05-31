@@ -32,6 +32,7 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class AccessibilityTest implements MATSim4UrbanSimInterface, LinkEnterEventHandler, LinkLeaveEventHandler {
