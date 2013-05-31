@@ -129,7 +129,7 @@ public class CarCongestionHandlerAdvanced implements LinkLeaveEventHandler, Link
 	}
 
 	public double getTActMinusT0Sum() {
-		return this.delay / 3600.;
+		return this.delay;
 	}
 
 	@Override

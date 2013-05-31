@@ -50,15 +50,12 @@ import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
  * @author Ihab
  *
  */
-public class LinkFlowHandler implements LinkLeaveEventHandler, AgentDepartureEventHandler, AgentArrivalEventHandler, AgentStuckEventHandler {
+public class LinkFlowHandler implements LinkLeaveEventHandler {
 
 	private final static Logger log = Logger.getLogger(LinkFlowHandler.class);
 	private final Network network;
 	
 	private Map<Id, Double> linkId2previousLinkLeaveTime = new HashMap<Id, Double>();
-	private List<Id> weirdAgents = new ArrayList<Id>();
-	private Map<Id, Id> agentId2departureLinkId = new HashMap<Id, Id>();
-	private Map<Id, Id> agentId2arrivalLinkId = new HashMap<Id, Id>();
 
 	private int counterNoCong = 0;
 	private int counterCong = 0;
@@ -100,9 +97,7 @@ public class LinkFlowHandler implements LinkLeaveEventHandler, AgentDepartureEve
 					counterCong++;
 					// expected if congested
 				} else {
-					
-					this.weirdAgents.add(event.getPersonId());
-					
+										
 					System.out.println("----------------------------");
 					System.out.println("personId: " + event.getPersonId() + " // linkId: " + event.getLinkId() + " // flowDelay: " + flowDelay + " // gap: " + gap);
 					System.out.println(event.toString());
@@ -115,33 +110,8 @@ public class LinkFlowHandler implements LinkLeaveEventHandler, AgentDepartureEve
 	}
 
 	public void printResults() {
-		
 		System.out.println("noCong: " + counterNoCong);
 		System.out.println("cong: " +  counterCong);
 	}
 
-	@Override
-	public void handleEvent(AgentDepartureEvent event) {
-		this.agentId2departureLinkId.put(event.getPersonId(), event.getLinkId());
-	}
-
-
-	@Override
-	public void handleEvent(AgentArrivalEvent event) {
-		this.agentId2arrivalLinkId.put(event.getPersonId(), event.getLinkId());	
-		
-//		if (this.weirdAgents.contains(event.getPersonId())){
-//			System.out.println("----------------------------");
-//			Id id = event.getPersonId();
-//			System.out.println("Agent Id: " +  id);
-//			System.out.println("Departure link: " + this.agentId2departureLinkId.get(id));
-//			System.out.println("Arrival link: " + this.agentId2arrivalLinkId.get(id));
-//		}
-	}
-
-	@Override
-	public void handleEvent(AgentStuckEvent event) {
-//		System.out.println("+++++++++++++++++++++++++++++++++++++++++++++++++++++++ stuck event: " + event.toString());
-	}
-	
 }

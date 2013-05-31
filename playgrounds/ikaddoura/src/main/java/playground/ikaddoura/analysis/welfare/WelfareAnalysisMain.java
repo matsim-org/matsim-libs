@@ -18,7 +18,7 @@
 * *
 * *********************************************************************** */ 
 
-package playground.ikaddoura.analysis.congestion;
+package playground.ikaddoura.analysis.welfare;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -33,18 +33,17 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.ikaddoura.internalizationCar.MarginalCongestionEventsReader;
 
-public class CongestionAnalysisMain {
-
+public class WelfareAnalysisMain {
+	
 //	static String configkFile = "/Users/Ihab/Desktop/internalization_output/output_config.xml.gz";
 	static String configFile = "/Users/Ihab/Desktop/no_internalization_output/output_config.xml.gz";
-
+	
 	private int iteration;
 	private String outputDir;
 	
 	public static void main(String[] args) {
-		CongestionAnalysisMain anaMain = new CongestionAnalysisMain();
+		WelfareAnalysisMain anaMain = new WelfareAnalysisMain();
 		anaMain.run();
 	}
 
@@ -54,7 +53,7 @@ public class CongestionAnalysisMain {
 		
 		this.iteration = config.controler().getLastIteration();
 		this.outputDir = config.controler().getOutputDirectory();
-
+		
 		String populationFile = outputDir + "/output_plans.xml.gz";
 		String networkFile = outputDir + "/output_network.xml.gz";
 		String eventsFile = outputDir + "/ITERS/it." + iteration + "/" + iteration + ".events.xml.gz";
@@ -64,40 +63,39 @@ public class CongestionAnalysisMain {
 		
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
 		EventsManager events = EventsUtils.createEventsManager();
-						
-		MarginalCongestionAnalyzer handler1 = new MarginalCongestionAnalyzer();
+		
+		UserBenefitsCalculator users = new UserBenefitsCalculator(config);
+		users.reset();
+		
+		MoneyEventHandler handler1 = new MoneyEventHandler();
 		events.addHandler(handler1);
-		
-		CarCongestionHandlerAdvanced handler2 = new CarCongestionHandlerAdvanced(scenario.getNetwork());
-		events.addHandler(handler2);
-		
-		LinkFlowHandler handler3 = new LinkFlowHandler(scenario.getNetwork());
-		events.addHandler(handler3);
 		
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(eventsFile);
-		
-		MarginalCongestionEventsReader congestionEventsReader = new MarginalCongestionEventsReader(events);		
-		congestionEventsReader.parse(eventsFile);
 
-		System.out.println("Delay sum from marginal congestion effects: " + handler1.getDelaySum() );
-		System.out.println("Delay sum from each link leave event: " + handler2.getTActMinusT0Sum() );
+		double userPayments = handler1.getPaymentsSum();
+		double userBenefits = users.getLogsum(scenario.getPopulation());
+		double welfare = userBenefits + userPayments;
 		
-		writeResults(handler1.getDelaySum(), handler2.getTActMinusT0Sum());
+		System.out.println("User payments: " + userPayments);
+		System.out.println("User benefits: " + userBenefits);	
+		System.out.println("Welfare: " + welfare);
+		
+		writeResults(welfare, userPayments, userBenefits);
 	}
 
-	private void writeResults(double marginalCongestionDelaySum, double delaySum) {
+	private void writeResults(double welfare, double userPayments, double userBenefits) {
 
-		String fileName = outputDir + "_congestion_it" + iteration + ".txt";
+		String fileName = outputDir + "_welfare_it" + iteration + ".txt";
 		File file = new File(fileName);
 			
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
-			bw.write("Delay sum from marginal congestion effects: " + marginalCongestionDelaySum + " sec /// " + (marginalCongestionDelaySum / 3600.) + " hours");
+			bw.write("userBenefits: " + userBenefits);
 			bw.newLine();
-			bw.write("Delay sum from each link leave event: " + delaySum +  " sec /// " + (delaySum / 3600.) + " hours");
+			bw.write("userPayments: " + userPayments);
 			bw.newLine();
-			bw.write("Difference: " + (delaySum - marginalCongestionDelaySum) +  " sec");
+			bw.write("welfare: " + welfare);
 			bw.newLine();
 			
 			bw.close();

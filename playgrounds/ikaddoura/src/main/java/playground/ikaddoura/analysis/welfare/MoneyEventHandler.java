@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LinksEventHandler.java
+ * Trb09Analysis
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2009 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,35 +17,55 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.ikaddoura.analysis.welfare;
+
+import java.util.Collections;
+import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.AgentMoneyEvent;
+import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
 
 /**
- * 
- */
-package playground.ikaddoura.analysis.congestion;
-
-import playground.ikaddoura.internalizationCar.MarginalCongestionEvent;
-import playground.ikaddoura.internalizationCar.MarginalCongestionEventHandler;
-
-/**
- * @author Ihab
+ * @author ikaddoura
  *
  */
-public class MarginalCongestionAnalyzer implements  MarginalCongestionEventHandler {
+public class MoneyEventHandler implements AgentMoneyEventHandler{
+	private SortedMap<Id, Double> id2amount = new TreeMap<Id, Double>();
 
-	private double delaySum = 0;
+	@Override
+	public void handleEvent(AgentMoneyEvent event) {
+
+		Id id = event.getPersonId();
+		Double amountByEvent = event.getAmount();
+		Double amountSoFar = id2amount.get(id);
+		
+		if(amountSoFar == null){
+			id2amount.put(id, amountByEvent);
+		}
+		else{
+			amountSoFar += amountByEvent;
+			id2amount.put(id, amountSoFar);
+		}	
+	}
+
+	public Map<Id, Double> getPersonId2amount() {
+		return Collections.unmodifiableMap(id2amount);
+	}
+	
+	public Double getPaymentsSum() {
+		double amountSum = 0.;
+		for (Double amount : id2amount.values()){
+			amountSum = amountSum + amount;
+		}
+		return (-1 * amountSum);
+	}
 	
 	@Override
 	public void reset(int iteration) {
-		this.delaySum = 0.;
+		// TODO Auto-generated method stub	
 	}
-
-	@Override
-	public void handleEvent(MarginalCongestionEvent event) {
-		delaySum = delaySum + event.getDelay();
-	}
-
-	public double getDelaySum() {
-		return delaySum;
-	}
-
+	
 }
