@@ -36,7 +36,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 public class WelfareAnalysisMain {
 	
-//	static String configkFile = "/Users/Ihab/Desktop/internalization_output/output_config.xml.gz";
+//	static String configFile = "/Users/Ihab/Desktop/internalization_output/output_config.xml.gz";
 	static String configFile = "/Users/Ihab/Desktop/no_internalization_output/output_config.xml.gz";
 	
 	private int iteration;
@@ -86,11 +86,15 @@ public class WelfareAnalysisMain {
 
 	private void writeResults(double welfare, double userPayments, double userBenefits) {
 
-		String fileName = outputDir + "_welfare_it" + iteration + ".txt";
+		String fileName = outputDir + "/welfare_it" + iteration + ".txt";
 		File file = new File(fileName);
 			
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+			bw.write(fileName);
+			bw.newLine();
+			bw.write("____________________________________________________________________________");
+			bw.newLine();
 			bw.write("userBenefits: " + userBenefits);
 			bw.newLine();
 			bw.write("userPayments: " + userPayments);

@@ -37,7 +37,7 @@ import playground.ikaddoura.internalizationCar.MarginalCongestionEventsReader;
 
 public class CongestionAnalysisMain {
 
-//	static String configkFile = "/Users/Ihab/Desktop/internalization_output/output_config.xml.gz";
+//	static String configFile = "/Users/Ihab/Desktop/internalization_output/output_config.xml.gz";
 	static String configFile = "/Users/Ihab/Desktop/no_internalization_output/output_config.xml.gz";
 
 	private int iteration;
@@ -88,11 +88,15 @@ public class CongestionAnalysisMain {
 
 	private void writeResults(double marginalCongestionDelaySum, double delaySum) {
 
-		String fileName = outputDir + "_congestion_it" + iteration + ".txt";
+		String fileName = outputDir + "/congestion_it" + iteration + ".txt";
 		File file = new File(fileName);
 			
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
+			bw.write(fileName);
+			bw.newLine();
+			bw.write("____________________________________________________________________________");
+			bw.newLine();
 			bw.write("Delay sum from marginal congestion effects: " + marginalCongestionDelaySum + " sec /// " + (marginalCongestionDelaySum / 3600.) + " hours");
 			bw.newLine();
 			bw.write("Delay sum from each link leave event: " + delaySum +  " sec /// " + (delaySum / 3600.) + " hours");
