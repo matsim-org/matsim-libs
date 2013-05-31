@@ -73,11 +73,10 @@ public class M4UConfigUtils {
 	 * Setting 
 	 * 
 	 * @param matsim4UrbanSimParameter
-	 * @param matsim4urbansimModule TODO
 	 * @param config TODO
 	 */
 	static void initMATSim4UrbanSimControler(Matsim4UrbansimType matsim4UrbanSimParameter, 
-			Module matsim4urbansimModule, Config config){
+			Config config){
 
 		boolean computeCellBasedAccessibility	= matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isCellBasedAccessibility();
 		boolean computeCellBasedAccessibilityNetwork   = false;

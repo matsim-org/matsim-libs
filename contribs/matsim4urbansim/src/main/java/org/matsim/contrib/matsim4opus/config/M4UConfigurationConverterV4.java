@@ -131,7 +131,7 @@ public class M4UConfigurationConverterV4 {
 			Module matsim4urbansimConfigPart3 = M4UConfigUtils.getM4UModuleFromExternalConfig(matsim4urbansimConfigPart1.getMatsimConfig().getInputFile());
 
 			M4UConfigUtils.initUrbanSimParameter(matsim4urbansimConfigPart2, matsim4urbansimConfigPart3, config);
-			M4UConfigUtils.initMATSim4UrbanSimControler(matsim4urbansimConfigPart2, matsim4urbansimConfigPart3, config);
+			M4UConfigUtils.initMATSim4UrbanSimControler(matsim4urbansimConfigPart2, config);
 			M4UAccessibilityConfigUtils.initAccessibilityParameters(matsim4urbansimConfigPart2, config);
 			
 			M4UConfigUtils.insertNetworkParams(matsim4urbansimConfigPart1, config); // ok (on moving info from m4uPart1 to config). kai, may'13
