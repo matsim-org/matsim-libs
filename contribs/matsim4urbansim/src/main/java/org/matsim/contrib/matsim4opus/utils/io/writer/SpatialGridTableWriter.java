@@ -28,37 +28,12 @@ import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
 
 /**
  * @author illenberger
- *
+ * @author thomas
  */
 public class SpatialGridTableWriter {
 	
 	public static final String separator = "\t";
 
-//	public void write(SpatialGrid grid, String file) throws IOException {
-//		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-//		
-//		for(int j = 0; j < grid.getNumCols(0); j++) {
-//			writer.write(SpatialGridTableWriter.separator);
-//			writer.write(String.valueOf(grid.getXmin() + j * grid.getResolution()));
-//		}
-//		writer.newLine();
-//		
-//		for(int i = grid.getNumRows() - 1; i >=0 ; i--) {
-//			writer.write(String.valueOf(grid.getYmax() - i * grid.getResolution()));
-//			for(int j = 0; j < grid.getNumCols(i); j++) {
-//				writer.write(SpatialGridTableWriter.separator);
-//				Double val = grid.getMirroredValue(i, j);
-//				if(!Double.isNaN(val))
-//					writer.write(String.valueOf(val));
-//				else
-//					writer.write("NA");
-//			}
-//			writer.newLine();
-//		}
-//		writer.flush();
-//		writer.close();
-//	}
-	
 	public void write(SpatialGrid grid, String file) throws IOException {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 		

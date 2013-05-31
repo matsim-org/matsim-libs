@@ -118,8 +118,8 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 	
 	// run selected controler
 	boolean computeParcelBasedAccessibility			 = false;
-	boolean computeParcelBasedAccessibilitiesShapeFile= false;
-	boolean computeParcelBasedAccessibilitiesNetwork = false; // may lead to "out of memory" error when either one/some of this is true: high resolution, huge network, less memory
+	boolean computeParcelBasedAccessibilitiesOnShapeFileBoundaries= false;
+	boolean computeParcelBasedAccessibilitiesOnNetworkOrCustomBoundaryBoxBoundaries = false; // may lead to "out of memory" error when either one/some of this is true: high resolution, huge network, less memory
 	boolean computeZoneBasedAccessibilities			 = false;
 	boolean computeZone2ZoneImpedance		   		 = false;
 	boolean computeAgentPerformance					 = false;
@@ -406,7 +406,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 																						this.scenario));
 		}
 		
-		if(computeParcelBasedAccessibility  ){
+		if(computeParcelBasedAccessibility){
 			SpatialGrid freeSpeedGrid;				// matrix for free speed car related accessibility measure. based on the boundary (above) and grid size
 			SpatialGrid carGrid;					// matrix for congested car related accessibility measure. based on the boundary (above) and grid size
 			SpatialGrid bikeGrid;					// matrix for bike related accessibility measure. based on the boundary (above) and grid size
@@ -414,8 +414,8 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 			SpatialGrid ptGrid;						// matrix for pt related accessibility measure. based on the boundary (above) and grid size
 			
 			ZoneLayer<Id>  measuringPoints;
-
-			if(computeParcelBasedAccessibilitiesNetwork){
+			
+			if(computeParcelBasedAccessibilitiesOnNetworkOrCustomBoundaryBoxBoundaries){
 				measuringPoints = GridUtils.createGridLayerByGridSizeByNetwork(cellSizeInMeter, nwBoundaryBox.getBoundingBox());
 				freeSpeedGrid= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
 				carGrid 	= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
@@ -460,15 +460,14 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 		}
 		
 		// From here output writer for debugging purposes only
-		
-		if(dumpPopulationData){
-			if(isParcelMode)
-				readFromUrbansim.readAndDumpPersons2CSV(parcels, 
-												 	controler.getNetwork());
-			else
-				readFromUrbansim.readAndDumpPersons2CSV(zones, 
-					 								controler.getNetwork());
-		}
+		// if(dumpPopulationData){
+		//	if(isParcelMode)
+		//		readFromUrbansim.readAndDumpPersons2CSV(parcels, 
+		//										 	controler.getNetwork());
+		//	else
+		//		readFromUrbansim.readAndDumpPersons2CSV(zones, 
+		//			 								controler.getNetwork());
+		//}
 	}
 	
 	/**
@@ -498,8 +497,8 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 		this.computeZone2ZoneImpedance	= moduleMATSim4UrbanSim.isZone2ZoneImpedance();
 		this.computeZoneBasedAccessibilities = moduleMATSim4UrbanSim.isZoneBasedAccessibility();
 		this.computeParcelBasedAccessibility	= moduleMATSim4UrbanSim.isCellBasedAccessibility();
-		this.computeParcelBasedAccessibilitiesShapeFile = moduleAccessibility.isCellBasedAccessibilityShapeFile();
-		this.computeParcelBasedAccessibilitiesNetwork = moduleAccessibility.isCellBasedAccessibilityNetwork();
+		this.computeParcelBasedAccessibilitiesOnShapeFileBoundaries = moduleAccessibility.isCellBasedAccessibilityShapeFile();
+		this.computeParcelBasedAccessibilitiesOnNetworkOrCustomBoundaryBoxBoundaries = moduleAccessibility.isCellBasedAccessibilityNetwork();
 		this.dumpPopulationData 		= false;
 		this.dumpAggegatedWorkplaceData = true;
 		

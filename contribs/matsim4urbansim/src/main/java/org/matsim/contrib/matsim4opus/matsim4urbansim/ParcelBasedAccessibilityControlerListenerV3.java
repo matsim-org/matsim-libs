@@ -110,6 +110,9 @@ import org.matsim.utils.LeastCostPathTree;
  * - taking disutilites directly from MATSim (controler.createTravelCostCalculator()), this 
  * also activates road pricing ...
  * 
+ * improvements may'13
+ * - grid based accessibility data is written into matsim output folder
+ * 
  * @author thomas
  * 
  */
@@ -191,46 +194,10 @@ public class ParcelBasedAccessibilityControlerListenerV3 extends AccessibilityCo
 		LeastCostPathTree lcptTravelDistance		 = new LeastCostPathTree( ttf, new TravelDistanceCalculator());
 		
 		this.scheme = controler.getScenario().getScenarioElement(RoadPricingSchemeImpl.class);
-		
-//		// get road pricing scheme
-//		this.scheme = controler.getScenario().getScenarioElement(RoadPricingSchemeImpl.class);
-//
-//		// init extended Least Cost Path Tree for car (free speed and congested) mode
-//		if(usingCarParameterFromMATSim){
-//
-//			lcptExtCongestedCarTravelTime = new LeastCostPathTreeExtended( ttc, controler.createTravelCostCalculator(), controler);
-//			
-//			if(scheme == null)	// no road pricing
-//				lcptExtFreeSpeedCarTrvelTime = new LeastCostPathTreeExtended( ttc, new FreespeedTravelTimeAndDisutility(controler.getConfig().planCalcScore()), controler );
-//			else{				// if road pricing is activated
-//				TravelDisutility costCalculatorFreeSpeed = new FreespeedTravelTimeAndDisutility(controler.getConfig().planCalcScore());
-//				lcptExtFreeSpeedCarTrvelTime  = new LeastCostPathTreeExtended( ttc, new TravelDisutilityIncludingToll(costCalculatorFreeSpeed, scheme), controler );
-//			}
-//		}
-//		else{ // this can be removed when external parameters are not considered anymore
-//			TravelDisutilityFactory tdFactory = controler.getTravelDisutilityFactory();
-//			PlanCalcScoreConfigGroup cnScoringGroup = new PlanCalcScoreConfigGroup();
-//			cnScoringGroup.setMarginalUtilityOfMoney( this.betaCarTMC );
-//			cnScoringGroup.setTraveling_utils_hr( this.betaCarTT );	
-//			cnScoringGroup.setMonetaryDistanceCostRateCar( this.betaCarTD );
-//			cnScoringGroup.setConstantCar(controler.getConfig().planCalcScore().getConstantCar());
-//			
-//			if(scheme == null){// no road pricing
-//				lcptExtCongestedCarTravelTime = new LeastCostPathTreeExtended( ttc, tdFactory.createTravelDisutility(ttc, cnScoringGroup), controler);
-//				lcptExtFreeSpeedCarTrvelTime  = new LeastCostPathTreeExtended( ttc, new FreespeedTravelTimeAndDisutility(cnScoringGroup), controler);
-//			}
-//			else{ 				// if road pricing is activated
-//				TravelDisutility costCalculatorCongested = tdFactory.createTravelDisutility(ttc, cnScoringGroup); 
-//				TravelDisutility costCalculatorFreeSpeed = new FreespeedTravelTimeAndDisutility(controler.getConfig().planCalcScore());
-//				
-//				lcptExtCongestedCarTravelTime = new LeastCostPathTreeExtended( ttc, new TravelDisutilityIncludingToll(costCalculatorCongested, scheme), controler);
-//				lcptExtFreeSpeedCarTrvelTime  = new LeastCostPathTreeExtended( ttc, new TravelDisutilityIncludingToll(costCalculatorFreeSpeed, scheme), controler );
-//			}
-//		}
-		
+
 		try{
 			log.info("Computing and writing cell based accessibility measures ...");
-//			printParameterSettings(); // use only for debugging (settings are printed as part of config dump)
+			// printParameterSettings(); // use only for debugging (settings are printed as part of config dump)
 			
 			Iterator<Zone<Id>> measuringPointIterator = measuringPointsCell.getZones().iterator();
 			log.info(measuringPointsCell.getZones().size() + " measurement points are now processing ...");
@@ -246,6 +213,7 @@ public class ParcelBasedAccessibilityControlerListenerV3 extends AccessibilityCo
 									 PARCEL_BASED,
 									 controler);
 			
+			
 			System.out.println();
 
 			if (this.benchmark != null && benchmarkID > 0) {
@@ -260,9 +228,11 @@ public class ParcelBasedAccessibilityControlerListenerV3 extends AccessibilityCo
 						+ this.benchmark.getDurationInSeconds(benchmarkID)
 						/ 60. + " minutes).");
 			}
-
+			
+			String matsimOutputDirectory = event.getControler().getScenario().getConfig().controler().getOutputDirectory();
+			
 			AnalysisCellBasedAccessibilityCSVWriterV2.close(); 
-			writePlottingData();						// plotting data for visual analysis via R
+			writePlottingData(matsimOutputDirectory);	// plotting data for visual analysis via R
 			writeInterpolatedParcelAccessibilities();	// UrbanSim input file with interpolated accessibilities on parcel level
 		
 		} catch (FileNotFoundException e) {
@@ -295,32 +265,31 @@ public class ParcelBasedAccessibilityControlerListenerV3 extends AccessibilityCo
 	}
 
 	// This needs to be executed only once at the end of the accessibility computation
-	// A synchronization is may be not needed
-	private void writePlottingData() throws IOException{
-		
-		log.info("Writing plotting files ...");
+	private void writePlottingData(String matsimOutputDirectory) throws IOException{
+
+		log.info("Writing plotting files for R into " + matsimOutputDirectory + " ...");
 		// tnicolai: can be disabled for final release
-		GridUtils.writeSpatialGridTable(freeSpeedGrid, InternalConstants.MATSIM_4_OPUS_TEMP	// freespeed results for plotting in R
+		GridUtils.writeSpatialGridTable(freeSpeedGrid, matsimOutputDirectory
 				+ FREESEED_FILENAME + freeSpeedGrid.getResolution()
 				+ InternalConstants.FILE_TYPE_TXT);
 		// tnicolai: can be disabled for final release
-		GridUtils.writeSpatialGridTable(carGrid, InternalConstants.MATSIM_4_OPUS_TEMP	// car results for plotting in R
+		GridUtils.writeSpatialGridTable(carGrid, matsimOutputDirectory
 				+ CAR_FILENAME + carGrid.getResolution()
 				+ InternalConstants.FILE_TYPE_TXT);
 		// tnicolai: can be disabled for final release
-		GridUtils.writeSpatialGridTable(bikeGrid, InternalConstants.MATSIM_4_OPUS_TEMP	// car results for plotting in R
+		GridUtils.writeSpatialGridTable(bikeGrid, matsimOutputDirectory
 				+ BIKE_FILENAME + bikeGrid.getResolution()
 				+ InternalConstants.FILE_TYPE_TXT);
 		// tnicolai: can be disabled for final release
-		GridUtils.writeSpatialGridTable(walkGrid, InternalConstants.MATSIM_4_OPUS_TEMP	// walk results for plotting in R
+		GridUtils.writeSpatialGridTable(walkGrid, matsimOutputDirectory
 				+ WALK_FILENAME + walkGrid.getResolution()
 				+ InternalConstants.FILE_TYPE_TXT);
 		// tnicolai: can be disabled for final release
-		GridUtils.writeSpatialGridTable(ptGrid, InternalConstants.MATSIM_4_OPUS_TEMP	// walk results for plotting in R
+		GridUtils.writeSpatialGridTable(ptGrid, matsimOutputDirectory
 				+ PT_FILENAME + ptGrid.getResolution()
 				+ InternalConstants.FILE_TYPE_TXT);
 
-		log.info("Writing plotting files done!");
+		log.info("Writing plotting files for R done!");
 	}
 	
 	/**

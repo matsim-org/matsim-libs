@@ -14,7 +14,6 @@ import org.matsim.contrib.matsim4opus.interfaces.MATSim4UrbanSimInterface;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators.TravelDistanceCalculator;
 import org.matsim.contrib.matsim4opus.utils.LeastCostPathTreeExtended;
 import org.matsim.contrib.matsim4opus.utils.helperObjects.Benchmark;
-import org.matsim.contrib.matsim4opus.utils.io.writer.AnalysisZoneCSVWriterV2;
 import org.matsim.contrib.matsim4opus.utils.io.writer.UrbanSimZoneCSVWriterV2;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -90,9 +89,6 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 		// files is given by the UrbanSim convention importing a csv file into a identically named 
 		// data set table. THIS PRODUCES URBANSIM INPUT
 		UrbanSimZoneCSVWriterV2.initUrbanSimZoneWriter();
-		// in contrast to the file above this contains all information about
-		// zones but is not dedicated as input for UrbanSim, use for analysis
-		AnalysisZoneCSVWriterV2.initAccessiblityWriter();
 		
 		initAccessibilityParameter(scenario);
 		log.info(".. done initializing ZoneBasedAccessibilityControlerListenerV3");
@@ -126,51 +122,9 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 		
 		this.scheme = controler.getScenario().getScenarioElement(RoadPricingSchemeImpl.class);
 
-		// some ideas about how to use a more correct approach:
-//		LeastCostPathTree lcptCar ;
-//		
-//		boolean usingMatsimParams = true ;
-//		if ( usingMatsimParams ) {
-//			lcptCar = new LeastCostPathTree( ttc, controler.createTravelCostCalculator() ) ; 
-//			System.exit(-1) ;
-//		} else {
-//			// After some thinking, I am (again) of the opinion that also here we need to take the s.p. tree from the simulation.
-//			// Reason: Assume the simulation equilibrates according to travel time (as usual).  A short _distance_ path may be
-//			// available, but not have enough capacity.  If we run the accessibility on a distance-based s.p. tree, we get travel
-//			// disutilities which are unrealistic since they are not congested.
-//			// (However, need to be careful since someone may want walk accessibilities.  Those are not obtained by using the car s.p. tree
-//			// and then using distance.)
-//			// kai, apr'13
-//			
-//			TravelDisutilityFactory factory = controler.getTravelDisutilityFactory();
-//			
-//			// faking a scoring group with the urbansim params:
-//			PlanCalcScoreConfigGroup cnScoringGroup = new PlanCalcScoreConfigGroup() ;
-//
-//			// marginal utility of money (should usually be positive):
-//			final double margUtlOfMoney = this.betaCarTC;
-//			cnScoringGroup.setMarginalUtilityOfMoney( margUtlOfMoney ) ; // (!!)
-//			log.error("is the sign correct??") ; System.exit(-1) ;
-//
-//			// marginal utility (should usually be negative):
-//			cnScoringGroup.setTraveling_utils_hr( this.betaCarTT ) ; 
-//			log.error("units of betaCarTT = ??") ; System.exit(-1) ;
-//			log.error("need to add utl of perf?  probably not since this is matsim-indep (may be confusing??)") ;
-//			
-//			// monetaryDistanceCostRateCar (should usually be positive??? negative???):
-//			double monetaryDistanceCostRateCar /* money/meter */ = this.betaCarTD /* utl/meter*/ / margUtlOfMoney /* utl/money */ ;
-//			log.error("is the sign correct??") ; System.exit(-1) ;
-//			cnScoringGroup.setMonetaryDistanceCostRateCar(monetaryDistanceCostRateCar) ;
-//			
-//			cnScoringGroup.setConstantCar(0.) ; // no information; not a problem as long as we compute mode-based accessibilities 
-//			// separately
-//			
-//			lcptCar = new LeastCostPathTree( ttc, factory.createTravelDisutility(ttc, cnScoringGroup) ) ;
-//		}
-		
 		try{
 			log.info("Computing and writing zone based accessibility measures ..." );
-//			printParameterSettings(); // use only for debugging (settings are printed as part of config dump)
+			// printParameterSettings(); // use only for debugging (settings are printed as part of config dump)
 			
 			Iterator<Zone<Id>> measuringPointIterator = measuringPointsZone.getZones().iterator();
 			log.info(measuringPointsZone.getZones().size() + "  measurement points are now processing ...");
@@ -189,7 +143,6 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 			System.out.println();
 			// finalizing/closing csv file containing accessibility measures
 			UrbanSimZoneCSVWriterV2.close();
-			AnalysisZoneCSVWriterV2.close();
 			
 			if (this.benchmark != null && benchmarkID > 0) {
 				this.benchmark.stoppMeasurement(benchmarkID);
@@ -222,14 +175,5 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 									  bikeAccessibility,
 									  walkAccessibility, 
 									  ptAccessibility);
-		// writing complete zones information for further analysis
-		AnalysisZoneCSVWriterV2.write(measurePoint,
-									coordFromZone, 
-									fromNode.getCoord(), 
-									freeSpeedAccessibility,
-									carAccessibility,
-									bikeAccessibility,
-									walkAccessibility,
-									ptAccessibility);
 	}
 }
