@@ -213,12 +213,12 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 		
 		double totalDelay = event.getTime() - linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getPersonId());
 		
-		System.out.println("************** leaving link event ******************");
-		System.out.println(event.toString());
-		System.out.println("free travel time: " + linkInfo.getFreeTravelTime() + " // marginal flow delay: " + linkInfo.getMarginalDelayPerLeavingVehicle_sec());
-		System.out.println("agents previously leaving the link: " + linkInfo.getLeavingAgents());
-		System.out.println("total delay: " + totalDelay);
-		
+//		System.out.println("************** leaving link event ******************");
+//		System.out.println(event.toString());
+//		System.out.println("free travel time: " + linkInfo.getFreeTravelTime() + " // marginal flow delay: " + linkInfo.getMarginalDelayPerLeavingVehicle_sec());
+//		System.out.println("agents previously leaving the link: " + linkInfo.getLeavingAgents());
+//		System.out.println("total delay: " + totalDelay);
+//		
 		if (totalDelay == 0.) {
 			// person was leaving that link without delay
 		
@@ -238,8 +238,8 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 			double flowDelay = earliestLinkLeaveTime - linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getPersonId());			
 			double storageDelay = totalDelay - flowDelay;
 			
-			System.out.println("flow delay: " + flowDelay);
-			System.out.println("storage delay: " + storageDelay);
+//			System.out.println("flow delay: " + flowDelay);
+//			System.out.println("storage delay: " + storageDelay);
 			
 			calculateFlowCongestion(flowDelay, event);
 			
