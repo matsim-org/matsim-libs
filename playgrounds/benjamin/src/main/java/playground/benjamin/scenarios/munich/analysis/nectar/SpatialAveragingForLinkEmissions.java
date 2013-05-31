@@ -291,9 +291,26 @@ public class SpatialAveragingForLinkEmissions {
 					}
 				}
 			}
+			
+			final double area_in_cell_sqkm = (xMax-xMin)/noOfXbins * (yMax-yMin)/noOfYbins / 1000. / 1000. ;
+			// yy make sure coordinate system is metric!!
+			
+			double[][] results = new double[noOfXbins][noOfYbins];
+			for(int xIndex = 0; xIndex < noOfXbins; xIndex++){
+				for(int yIndex = 0; yIndex < noOfYbins; yIndex++){
+					// average value in cell:
+					results[xIndex][yIndex] = sumOfweightedValuesForCell[xIndex][yIndex] / sumOfweightsForCell[xIndex][yIndex] ;
+					
+//					// sum over values in cell: // not really useful
+//					results[xIndex][yIndex] = sumOfweightedValuesForCell[xIndex][yIndex] ;
+
+//					// sum over values in cell normalized to "per sqkm":
+//					results[xIndex][yIndex] = sumOfweightedValuesForCell[xIndex][yIndex] / area_in_cell_sqkm  ;
+				}
+			}
 			String outputPathForR = new String(outPathStub + ".Routput." + pollutant2analyze.toString() + "." + endOfTimeInterval + ".txt");
 			// TODO: not use averageValue instead?!?
-			writeRoutput(sumOfweightedValuesForCell, outputPathForR);
+			writeRoutput(results, outputPathForR);
 		}
 //		writer.close();
 //		logger.info("Finished writing output to " + outPathStub + "." + pollutant2analyze + ".smoothed.txt");
@@ -393,10 +410,20 @@ public class SpatialAveragingForLinkEmissions {
 		return dateTimeString;
 	}
 
+//	private double calculateWeightOfLinkForCell(double x1, double y1, double x2, double y2) {
+//		double distance = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
+//		return Math.exp((-distance * distance) / (smoothingRadius_m * smoothingRadius_m));
+//	}
 	private double calculateWeightOfLinkForCell(double x1, double y1, double x2, double y2) {
-		double distance = Math.sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1));
-		return Math.exp((-distance * distance) / (smoothingRadius_m * smoothingRadius_m));
+		// check if they are in the same cell:
+		if ( mapXCoordToBin(x1) == mapXCoordToBin(x2) ) {
+			if ( mapYCoordToBin(y1) == mapYCoordToBin(y2) ) {
+				return 1. ;
+			}
+		}
+		return 0. ;
 	}
+	
 
 	private double findBinCenterY(int yIndex) {
 		double yBinCenter = yMin + ((yIndex + .5) / noOfYbins) * (yMax - yMin);
