@@ -5,7 +5,7 @@ import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.handler.EventHandler;
 
-public class dummyHandler implements EventsManager {
+public class HandlerToTestEmissionAnalysisModules implements EventsManager {
 	static Double sumOverAll=0.0;
 
 	@Override
