@@ -233,16 +233,7 @@ public class M4UConfigUtils {
 	 */
 	static void insertNetworkParams(ConfigType matsimParameter, Config config){
 		log.info("Setting NetworkConfigGroup to config...");
-		String networkFile = matsimParameter.getNetwork().getInputFile();
-		if( !networkFile.isEmpty() )  // the MATSim4UrbanSim config contains a network file
-			config.network().setInputFile( networkFile );
-//		else
-//			throw new RuntimeException("Missing MATSim network! The network must be specified either directly in the " +
-//					"MATSim4UrbanSim configuration or in an external MATSim configuration.");
-//
-//		// yyyyyy ???  Aber es gibt die exception doch auch, wenn es in der external matsim config gesetzt ist? kai, apr'13
-		// moved to consistency checker. kai, may'13
-
+		config.network().setInputFile( matsimParameter.getNetwork().getInputFile() );
 		log.info("...done!");
 	}
 
@@ -386,7 +377,8 @@ public class M4UConfigUtils {
 		//		qsimCG.setNumberOfThreads(Runtime.getRuntime().availableProcessors());
 		// log.error("setting qsim number of threads automagically; this is almost certainly not good; fix") ;
 		// just changed this, setting it to one:  kai, apr'13
-		qsimCG.setNumberOfThreads(1);
+//		qsimCG.setNumberOfThreads(1);
+		// should leave it to matsim defaults
 
 		double popSampling = matsim4urbansimConfig.getMatsim4Urbansim().getUrbansimParameter().getPopulationSamplingRate();
 		log.info("FlowCapFactor and StorageCapFactor are adapted to the population sampling rate (sampling rate = " + popSampling + ").");
@@ -422,33 +414,6 @@ public class M4UConfigUtils {
 		log.info("...done!");
 	}
 
-//	/**
-//	 * setting walk speed in plancalcroute
-//	 * @param config TODO
-//	 */
-//	static void initPlanCalcRoute(Config config){
-//		log.info("Setting PlanCalcRouteGroup to config...");
-//
-//		double defaultWalkSpeed = 1.38888889; 	// 1.38888889m/s corresponds to 5km/h -- alternatively: use 0.833333333333333m/s corresponds to 3km/h
-//		double defaultBicycleSpeed = 4.16666666;// 4.16666666m/s corresponds to 15 km/h
-//		double defaultPtSpeed 	= 6.94444444;	// 6.94444444m/s corresponds to 25 km/h
-//
-//		//  log.error( "ignoring any external default speeds for walk/bicycle/pt and using internal values.  fix!!" ) ;
-//		//  this is not a problem since the complete config is overwritten by the external config at the very end.
-//
-//		/*
-//		 * To me this seems to be a problem. PlansCalcRoute is intialized with some defaults. Using the direct setters will NOT clear
-//		 * the defaults, but only add the new values. E.g. the for pt the default is FreespeedFactor. Daniel, May '13
-//		 * yyyyyy This silently does something to the matsim default values.  "silently" is not good.  Do we need this at all
-//		 * (except maybe for backwards compatability)?  Kai, may'13
-//		 */
-//		// setting teleportation speeds in router
-//		config.plansCalcRoute().setWalkSpeed( defaultWalkSpeed ); 
-//		config.plansCalcRoute().setBikeSpeed( defaultBicycleSpeed );
-//		config.plansCalcRoute().setPtSpeed( defaultPtSpeed );
-//
-//		log.info("...done!");
-//	}
 
 	/**
 	 * setting strategy
@@ -530,12 +495,9 @@ public class M4UConfigUtils {
 		Config config = ConfigUtils.createConfig();
 
 		//"materialize" the local config groups:
-		config.addModule(UrbanSimParameterConfigModuleV3.GROUP_NAME, 
-				new UrbanSimParameterConfigModuleV3(UrbanSimParameterConfigModuleV3.GROUP_NAME) ) ;
-		config.addModule(M4UControlerConfigModuleV3.GROUP_NAME,
-				new M4UControlerConfigModuleV3());
-		config.addModule(AccessibilityConfigModule.GROUP_NAME,
-				new AccessibilityConfigModule()) ;
+		config.addModule(	new UrbanSimParameterConfigModuleV3() ) ;
+		config.addModule( new M4UControlerConfigModuleV3() );
+		config.addModule(	new AccessibilityConfigModule() ) ;
 
 		// set some defaults:
 		VspExperimentalConfigGroup vsp = config.vspExperimental();
@@ -571,11 +533,7 @@ public class M4UConfigUtils {
 		if (m instanceof UrbanSimParameterConfigModuleV3) {
 			return (UrbanSimParameterConfigModuleV3) m;
 		}
-		UrbanSimParameterConfigModuleV3 upcm = new UrbanSimParameterConfigModuleV3(UrbanSimParameterConfigModuleV3.GROUP_NAME);
-		//		config.getModules().put(UrbanSimParameterConfigModuleV3.GROUP_NAME, upcm);
-		// yyyyyy the above code does NOT convert but throws the config entries away.
-		// In contrast, config.addModule(...) would convert.  kai, may'13 
-		// I just changed that:
+		UrbanSimParameterConfigModuleV3 upcm = new UrbanSimParameterConfigModuleV3();
 		config.addModule( UrbanSimParameterConfigModuleV3.GROUP_NAME, upcm ) ;
 		return upcm;
 	}
@@ -586,29 +544,8 @@ public class M4UConfigUtils {
 			return (M4UControlerConfigModuleV3) m;
 		}
 		M4UControlerConfigModuleV3 mccm = new M4UControlerConfigModuleV3();
-		//		config.getModules().put(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME, mccm);
-		// yyyyyy the above code does NOT convert but throws the config entries away.
-		// In contrast, config.addModule(...) would convert.  kai, may'13
-		// I just changed that:
 		config.addModule(M4UControlerConfigModuleV3.GROUP_NAME, mccm ) ;
 		return mccm;
-	}
-
-	/**
-	 * returns a matsim4urbansim parameter as double or zero in case of conversion errors.
-	 * 
-	 * @param paramName
-	 * @return matsim4urbansim parameter as double
-	 */
-	private static double getValueAsDouble(Module module, String paramName){
-		if(module != null){
-			try{
-				double tmp = Double.parseDouble(module.getValue(paramName));
-				return tmp;
-			} catch(Exception e){}
-			return 0.;
-		}
-		return 0.;
 	}
 
 	/**
@@ -642,26 +579,11 @@ public class M4UConfigUtils {
 	 */
 	static void printMATSim4UrbanSimControlerSettings( M4UControlerConfigModuleV3 module ) {
 
-		//		MATSim4UrbanSimControlerConfigModuleV3 module = getMATSim4UrbaSimControlerConfig();
-
 		// view results
 		log.info("MATSim4UrbanSimControler settings:");
 		log.info("Compute Agent-performance: " + module.isAgentPerformance() );
 		log.info("Compute Zone2Zone Impedance Matrix: " + module.isZone2ZoneImpedance() ); 
 		log.info("Compute Zone-Based Accessibilities: " + module.isZoneBasedAccessibility() );
-//		log.info("Compute Parcel/Cell-Based Accessibilities (using ShapeFile): " + module.isCellBasedAccessibilityShapeFile() ); 
-//		log.info("Compute Parcel/Cell-Based Accessibilities (using Network Boundaries): " + module.isCellBasedAccessibilityNetwork() );
-//		log.info("Cell Size: " + module.getCellSizeCellBasedAccessibility() );
-//		log.info("Using (Custom) Network Boundaries: " + module.usingCustomBoundingBox() );
-//		log.info("Network Boundary (Top): " + module.getBoundingBoxTop() ); 
-//		log.info("Network Boundary (Left): " + module.getBoundingBoxLeft() ); 
-//		log.info("Network Boundary (Right): " + module.getBoundingBoxRight() ); 
-//		log.info("Network Boundary (Bottom): " + module.getBoundingBoxBottom() ); 
-//		log.info("Shape File: " + module.getShapeFileCellBasedAccessibility() );
-//		log.info("Time of day: " + module.getTimeOfDay() );
-//		log.info("Pt Stops Input File: " + module.getPtStopsInputFile());
-//		log.info("Pt Travel Times Input File: " + module.getPtTravelTimesInputFile());
-//		log.info("Pt travel Distances Input File: " + module.getPtTravelDistancesInputFile());
 	}
 
 	static final void checkConfigConsistencyAndWriteToLog(Config config, final String message) {

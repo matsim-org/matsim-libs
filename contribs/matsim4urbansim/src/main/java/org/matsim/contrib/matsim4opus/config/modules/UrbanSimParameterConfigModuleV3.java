@@ -62,8 +62,8 @@ public class UrbanSimParameterConfigModuleV3 extends Module{
 	private String testParameter;
 	private boolean isBackup;
 	
-	public UrbanSimParameterConfigModuleV3(String name){
-		super(name);
+	public UrbanSimParameterConfigModuleV3(){
+		super(GROUP_NAME);
 		// This class feels quite dangerous to me; one can have inconsistent entries between the Map and the typed values. kai, apr'13
 		// The way it (hopefully) works now: as long as the config group is not "materialized", one has to use addParam/getValue.
 		// Once the class is materialized, one can only use the direct getters/setters.  kai, may'13

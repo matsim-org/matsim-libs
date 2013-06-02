@@ -144,15 +144,11 @@ public class M4UConfigurationConverterV4 {
 			M4UConfigUtils.initQSim(matsim4urbansimConfig, config);
 			
 			// loading the external MATSim config in to the initialized config
-			// overlapping parameter settings (in MATSim4UrbanSim and external MATSim config)
-			// are overwritten by the external MATSim settings:
 			M4UConfigUtils.loadExternalConfigAndOverwriteMATSim4UrbanSimSettings(matsim4urbansimConfigPart1, config);
 			// (by the design of the matsim xml config reader, this over-writes only entries which are explicitly mentioned
 			// in the external config)
-			// yyyyyy Funktioniert allerdings nicht mit den "nicht ausprogrammierten" config groups!!!! kai, may'13
 			
-//			// show final settings
-			// (these are not visible in the matsim config dump :-( :-( and thus need to be done separately. kai, apr'13)
+			// show final settings
 			M4UConfigUtils.printUrbanSimParameterSettings( M4UConfigUtils.getUrbanSimParameterConfigAndPossiblyConvert(config) );
 			M4UConfigUtils.printMATSim4UrbanSimControlerSettings( M4UConfigUtils.getMATSim4UrbaSimControlerConfigAndPossiblyConvert(config) );
 			

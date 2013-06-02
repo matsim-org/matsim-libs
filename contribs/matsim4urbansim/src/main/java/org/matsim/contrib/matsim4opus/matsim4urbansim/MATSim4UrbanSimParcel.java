@@ -614,7 +614,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 		if (m instanceof UrbanSimParameterConfigModuleV3) {
 			return (UrbanSimParameterConfigModuleV3) m;
 		}
-		UrbanSimParameterConfigModuleV3 upcm = new UrbanSimParameterConfigModuleV3(UrbanSimParameterConfigModuleV3.GROUP_NAME);
+		UrbanSimParameterConfigModuleV3 upcm = new UrbanSimParameterConfigModuleV3();
 		this.scenario.getConfig().getModules().put(UrbanSimParameterConfigModuleV3.GROUP_NAME, upcm);
 		return upcm;
 	}

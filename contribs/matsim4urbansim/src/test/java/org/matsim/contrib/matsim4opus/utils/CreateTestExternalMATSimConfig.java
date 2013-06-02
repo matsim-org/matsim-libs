@@ -308,7 +308,7 @@ public class CreateTestExternalMATSimConfig extends CreateTestMATSimConfig{
 		if (m instanceof UrbanSimParameterConfigModuleV3) {
 			return (UrbanSimParameterConfigModuleV3) m;
 		}
-		UrbanSimParameterConfigModuleV3 upcm = new UrbanSimParameterConfigModuleV3(UrbanSimParameterConfigModuleV3.GROUP_NAME);
+		UrbanSimParameterConfigModuleV3 upcm = new UrbanSimParameterConfigModuleV3();
 		config.getModules().put(UrbanSimParameterConfigModuleV3.GROUP_NAME, upcm);
 		return upcm;
 	}
