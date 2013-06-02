@@ -130,7 +130,7 @@ public class M4UConfigurationConverterV4 {
 			// loads the external MATSim config separately (to get additional MATSim4UrbanSim parameters)
 			Module matsim4urbansimConfigPart3 = M4UConfigUtils.getM4UModuleFromExternalConfig(matsim4urbansimConfigPart1.getMatsimConfig().getInputFile());
 
-			M4UConfigUtils.initUrbanSimParameter(matsim4urbansimConfigPart2, matsim4urbansimConfigPart3, config);
+			M4UConfigUtils.initUrbanSimParameters(matsim4urbansimConfigPart2, matsim4urbansimConfigPart3, config);
 			M4UConfigUtils.initMATSim4UrbanSimControler(matsim4urbansimConfigPart2, config);
 			M4UAccessibilityConfigUtils.initAccessibilityParameters(matsim4urbansimConfigPart2, config);
 			

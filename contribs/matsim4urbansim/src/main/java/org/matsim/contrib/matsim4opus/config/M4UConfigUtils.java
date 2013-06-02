@@ -25,7 +25,6 @@ package org.matsim.contrib.matsim4opus.config;
 import java.io.File;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Arrays;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
@@ -45,11 +44,11 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
 import org.matsim.core.utils.io.UncheckedIOException;
 
@@ -63,11 +62,6 @@ public class M4UConfigUtils {
 	// module and param names for matsim4urbansim settings stored in an external MATSim config file
 	public static final String MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG = "matsim4urbansimParameter";// module
 	public static final String URBANSIM_ZONE_SHAPEFILE_LOCATION_DISTRIBUTION = "urbanSimZoneShapefileLocationDistribution";
-//	public static final String PT_STOPS = "ptStops";
-//	public static final String PT_STOPS_SWITCH = "usePtStops";
-//	public static final String PT_TRAVEL_TIMES = "ptTravelTimes";
-//	public static final String PT_TRAVEL_DISTANCES = "ptTravelDistances";
-//	public static final String PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH = "useTravelTimesAndDistances";
 
 	/**
 	 * Setting 
@@ -75,8 +69,7 @@ public class M4UConfigUtils {
 	 * @param matsim4UrbanSimParameter
 	 * @param config TODO
 	 */
-	static void initMATSim4UrbanSimControler(Matsim4UrbansimType matsim4UrbanSimParameter, 
-			Config config){
+	static void initMATSim4UrbanSimControler(Matsim4UrbansimType matsim4UrbanSimParameter, Config config){
 
 		boolean computeCellBasedAccessibility	= matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isCellBasedAccessibility();
 		boolean computeCellBasedAccessibilityNetwork   = false;
@@ -106,10 +99,7 @@ public class M4UConfigUtils {
 		module.setZoneBasedAccessibility(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isZoneBasedAccessibility());
 		module.setCellBasedAccessibility(computeCellBasedAccessibility);
 		
-		ImprovedPseudoPtConfigModule ippcm = M4UImprovedPseudoPtConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
-//		ippcm.setPtStopsInputFile(ptStops);
-//		ippcm.setPtTravelTimesInputFile(ptTravelTimes);
-//		ippcm.setPtTravelDistancesInputFile(ptTravelDistances);
+		M4UImprovedPseudoPtConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
 		
 		AccessibilityConfigModule acm = M4UAccessibilityConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
 //		acm.setTimeOfDay(timeOfDay) ;
@@ -131,7 +121,7 @@ public class M4UConfigUtils {
 	 * @param matsim4urbansimModule TODO
 	 * @param config TODO
 	 */
-	static void initUrbanSimParameter(Matsim4UrbansimType matsim4UrbanSimParameter, Module matsim4urbansimModule, Config config){
+	static void initUrbanSimParameters(Matsim4UrbansimType matsim4UrbanSimParameter, Module matsim4urbansimModule, Config config){
 
 		// get every single matsim4urbansim/urbansimParameter
 		String projectName 		= ""; // not needed anymore dec'12
@@ -282,7 +272,7 @@ public class M4UConfigUtils {
 	 * sets (either a "warm" or "hot" start) a plans file, see above.
 	 * @param config TODO
 	 */
-	static void setPlansFile(String plansFile, Config config) {
+	private static void setPlansFile(String plansFile, Config config) {
 
 		log.info("Setting PlansConfigGroup to config...");
 		PlansConfigGroup plansCG = (PlansConfigGroup) config.getModule(PlansConfigGroup.GROUP_NAME);

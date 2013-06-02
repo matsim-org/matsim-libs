@@ -31,7 +31,8 @@ import org.matsim.core.config.Module;
  * @author thomas
  */
 public class M4UControlerConfigModuleV3 extends Module{
-	
+	// IMPORTANT: This is just a container for matsim4urbansim config data.  It is _not_ a matsim config group.
+
 	public static final String GROUP_NAME = "matsim4urbansimControler";
 	
 	private boolean zone2ZoneImpedance;
