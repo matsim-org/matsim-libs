@@ -1,7 +1,5 @@
 package playground.mzilske.cdr;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -9,13 +7,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.geotools.data.shapefile.ShpFiles;
-import org.geotools.data.shapefile.shp.ShapeType;
 import org.geotools.data.shapefile.shp.ShapefileException;
 import org.geotools.data.shapefile.shp.ShapefileReader;
-import org.geotools.data.shapefile.shp.ShapefileWriter;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.network.Link;
@@ -39,26 +36,23 @@ import com.vividsolutions.jts.geom.prep.PreparedGeometryFactory;
 import com.vividsolutions.jts.operation.distance.DistanceOp;
 import com.vividsolutions.jts.triangulate.VoronoiDiagramBuilder;
 
-import d4d.CreatePopulation;
+public class Zones {
 
-public class CellTowers {
-	
-
-	Map<String,CellTower> cellTowers = new HashMap<String, CellTower>();
+	public Map<String, CellTower> cellTowers = new HashMap<String, CellTower>();
 	
 	private Map<Coordinate, Geometry> siteToCell;
 
-	private GeometryCollection clippedCells;
 
 	private MultiPoint sites;
-	
+
 
 	GeometryFactory gf = new GeometryFactory();
 
+	private List<Polygon> unrolledCells;
 
-	public CellTowers(Map<String, CellTower> cellTowerMap) {
+
+	public Zones(Map<String, CellTower> cellTowerMap) {
 		this.cellTowers.putAll(cellTowerMap);
-		buildCells();
 	}
 
 	private void voronoiStatistics() {
@@ -70,17 +64,17 @@ public class CellTowers {
 		}
 
 	}
-	
+
 	private Coordinate coordinate(CellTower cellTower) {
 		return new Coordinate(cellTower.coord.getX(), cellTower.coord.getY());
 	}
-	
 
-	
+
+
 	public Geometry getCell(String cellTowerId) {
 		return siteToCell.get(coordinate(cellTowers.get(cellTowerId)));
 	}
-	
+
 
 	private Geometry getIvoryCoast() {
 		try {
@@ -100,8 +94,10 @@ public class CellTowers {
 			throw new RuntimeException(e);
 		}
 	}
-	
+
 	private void getLinksCrossingCells(Network network) {
+
+		GeometryCollection clippedCells = new MultiPolygon(unrolledCells.toArray(new Polygon[]{}),gf);
 		Set<Link> linksCrossingCells = new HashSet<Link>();
 		PreparedGeometry preparedCells = PreparedGeometryFactory.prepare(clippedCells.getBoundary());
 		for (Link link : network.getLinks().values()) {
@@ -114,25 +110,32 @@ public class CellTowers {
 			System.out.println("Links crossing cells: " + linksCrossingCells.size() + " of " + network.getLinks().size());
 		}
 	}
-	
-	private void buildCells() {
-		List<Polygon> unrolledCells = new ArrayList<Polygon>();
+
+	public void buildCells() {
+		
+		contractCells();
+
+		unrolledCells = new ArrayList<Polygon>();
 
 		VoronoiDiagramBuilder vdb = new VoronoiDiagramBuilder();
 		Collection<Point> coords = new ArrayList<Point>();
 		for (CellTower cellTower : cellTowers.values()) {
+			if (cellTower.nSightings == 0) {
+				throw new RuntimeException();
+			}
 			coords.add(gf.createPoint(coordinate(cellTower)));
 		}
 		sites = new MultiPoint(coords.toArray(new Point[]{}), gf);
 		vdb.setSites(sites);
-		Geometry ivoryCoast = getIvoryCoast();
-		vdb.setClipEnvelope(ivoryCoast.getEnvelopeInternal());
+		// Geometry ivoryCoast = getIvoryCoast();
+		// vdb.setClipEnvelope(ivoryCoast.getEnvelopeInternal());
 		GeometryCollection diagram = (GeometryCollection) vdb.getDiagram(gf);
 		siteToCell = new HashMap<Coordinate, Geometry>();
 		for (int i=0; i<diagram.getNumGeometries(); i++) {
 			Polygon cell = (Polygon) diagram.getGeometryN(i);
 			Coordinate siteCoordinate = (Coordinate) cell.getUserData();
-			Geometry clippedCell = cell.intersection(ivoryCoast);
+			// Geometry clippedCell = cell.intersection(ivoryCoast);
+			Geometry clippedCell = cell; // don't need to clip right now.
 			siteToCell.put(siteCoordinate, clippedCell); // user data of the cell is set to the Coordinate of the site by VoronoiDiagramBuilder
 			if (clippedCell instanceof GeometryCollection) {
 				GeometryCollection multiCell = (GeometryCollection) clippedCell;
@@ -145,38 +148,32 @@ public class CellTowers {
 				unrolledCells.add((Polygon) clippedCell);
 			}
 		}
-		clippedCells = new MultiPolygon(unrolledCells.toArray(new Polygon[]{}),gf);
-		writeToShapefile(clippedCells, "clipped");
-		writeToShapefile(diagram, "unclipped");
+		for (CellTower cellTower : cellTowers.values()) {
+			cellTower.cell = getCell(cellTower.id);
+		}
+		//		writeToShapefile(clippedCells, D4DConsts.WORK_DIR + "clipped");
+		//		writeToShapefile(diagram, D4DConsts.WORK_DIR + "unclipped");
+		// writeToShapefile();
 		voronoiStatistics();
 	}
 
-
-	private void writeToShapefile(GeometryCollection clippedSites, String baseFilename) {
-		FileOutputStream shp = null;
-		FileOutputStream shx = null;
-		try {
-			shp = new FileOutputStream(baseFilename+".shp");
-			shx = new FileOutputStream(baseFilename+".shx");
-			ShapefileWriter writer = new ShapefileWriter( shp.getChannel(),shx.getChannel());
-			writer.write(clippedSites, ShapeType.POLYGON);
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} finally {
-			try {
-				shp.close();
-				shx.close();
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+	private void contractCells() {
+		//This is just a shortcut which only works because of nSightings == 0
+		// might want to contract by another criterion, in which case we would have to
+		// "remap" the deleted cellTower to its nearest neighbor (and possibly move it)
+		// --> delaunay contraction
+		List<String> cellsWithoutCalls  = new ArrayList<String>();
+		for (Entry<String, CellTower> entry : cellTowers.entrySet()) {
+			if (entry.getValue().nSightings == 0) {
+				cellsWithoutCalls.add(entry.getKey());
 			}
+		}
+		for(String cellWithoutCalls : cellsWithoutCalls) {
+			cellTowers.remove(cellWithoutCalls);
 		}
 	}
 
 
-	
 }
+
+

@@ -91,9 +91,9 @@ public class RunSimulation {
 	}
 
 	public static void main(String[] args) {
-		Config config = createConfig("./0213-capital-only-025freespeed-beginning-disutility-travel-qs", 4);
+		Config config = createConfig(D4DConsts.WORK_DIR + "/0213-capital-only-025freespeed-beginning-disutility-travel-qs", 4);
 		run(config);
-		config = createConfig("./0213-capital-only-05freespeed-beginning-disutility-travel-qs", 2);
+		config = createConfig(D4DConsts.WORK_DIR + "/0213-capital-only-05freespeed-beginning-disutility-travel-qs", 2);
 		run(config);
 //		config = createConfig("./0211-capital-only-0125freespeed-beginning-disutility-travel", 8);
 //		run(config);
@@ -105,10 +105,10 @@ public class RunSimulation {
 
 	private static void run(Config config) {
 		final Scenario scenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(scenario).readFile("/Users/zilske/d4d/output/network.xml");
+		new MatsimNetworkReader(scenario).readFile(D4DConsts.WORK_DIR + "network-simplified.xml");
 		AltPopulationReaderMatsimV5 altPopulationReaderMatsimV5 = new AltPopulationReaderMatsimV5(scenario);
 		//	altPopulationReaderMatsimV5.readFile("/Users/zilske/d4d/output/population.xml");
-		altPopulationReaderMatsimV5.readFile("/Users/zilske/d4d/output/population-capital-only.xml");
+		altPopulationReaderMatsimV5.readFile(D4DConsts.WORK_DIR + "population-capital-only.xml");
 		ParallelPersonAlgorithmRunner.run(scenario.getPopulation(), 8, new PersonAlgorithm() {
 
 			@Override

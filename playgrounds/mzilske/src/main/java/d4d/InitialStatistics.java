@@ -14,8 +14,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 public class InitialStatistics {
@@ -35,14 +33,12 @@ public class InitialStatistics {
 	
 	class BetweenSightings extends AbstractPersonAlgorithm {
 		
-		private CoordinateTransformation back = TransformationFactory.getCoordinateTransformation("EPSG:3395",TransformationFactory.WGS84);
-		
 		public BetweenSightings() {
 
 			try {
-				minutes = new PrintWriter("/Users/zilske/d4d/output/minutes" + suffix + ".txt");
-				personAverageWriter = new PrintWriter("/Users/zilske/d4d/output/person-average" + suffix + ".txt");
-				distancesBetweenMeasurements = new PrintWriter("/Users/zilske/d4d/output/distances" + suffix + ".txt");
+				minutes = new PrintWriter(D4DConsts.WORK_DIR + "minutes" + suffix + ".txt");
+				personAverageWriter = new PrintWriter(D4DConsts.WORK_DIR + "person-average" + suffix + ".txt");
+				distancesBetweenMeasurements = new PrintWriter(D4DConsts.WORK_DIR + "distances" + suffix + ".txt");
 			} catch (FileNotFoundException e) {
 				throw new RuntimeException(e);
 			}
@@ -84,8 +80,8 @@ public class InitialStatistics {
 						countPerPerson++;
 						
 						GeodeticCalculator geodeticCalculator = new GeodeticCalculator();
-						Coord longLat = back.transform(act.getCoord());
-						Coord previous = back.transform(lastActivity.getCoord());
+						Coord longLat = D4DConsts.backCt.transform(act.getCoord());
+						Coord previous = D4DConsts.backCt.transform(lastActivity.getCoord());
 						geodeticCalculator.setStartingGeographicPoint(previous.getX(), previous.getY());
 						geodeticCalculator.setDestinationGeographicPoint(longLat.getX(), longLat.getY());
 						

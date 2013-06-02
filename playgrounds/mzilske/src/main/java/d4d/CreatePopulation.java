@@ -21,12 +21,16 @@ package d4d;
 
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 
+import org.geotools.data.DataUtilities;
+import org.geotools.feature.SchemaException;
+import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
@@ -55,21 +59,28 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner.PersonAlgorithmProvider;
 import org.matsim.population.algorithms.PersonAlgorithm;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.mzilske.cdr.CellTower;
-import playground.mzilske.cdr.CellTowers;
+import playground.mzilske.cdr.Zones;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
 public class CreatePopulation {
 
+	
+	Zones zones;
+	
 	private static final int POP_REAL = 22000000;
 
 	private double minLong = -4.265;
@@ -79,18 +90,20 @@ public class CreatePopulation {
 
 	private Random rnd = new Random();
 
-	private CellTowers cellTowers;
-
 	private ScenarioImpl scenario;
 
 
 	private Coord min = D4DConsts.ct.transform(new CoordImpl(minLong, minLat));
 	private Coord max = D4DConsts.ct.transform(new CoordImpl(maxLong, maxLat));
 
+	private Map<Activity, CellTower> cellsOfSightings;
+
 
 	public Scenario readScenario(Config config) throws FileNotFoundException  {
 		final Map<Id, List<Sighting>> readAllSightings = readNetworkAndSightings(config);
 		
+		
+		zones.buildCells();
 		readSampleWithOneRandomPointForEachSightingInNewCell(readAllSightings);
 
 
@@ -122,9 +135,9 @@ public class CreatePopulation {
 
 		});
 		
-		Population unfeasiblePeople = null;
+		Population unfeasiblePeople = new PopulationImpl(scenario);
 		
-		for (int i=0; i<20; i++) {
+		for (int i=0; i<0; i++) {
 			unfeasiblePeople = new PopulationImpl(scenario);
 			for (Person person : scenario.getPopulation().getPersons().values()) {
 				Plan plan = person.getSelectedPlan();
@@ -144,7 +157,7 @@ public class CreatePopulation {
 							Sighting sighting = sightingsForThisAgent.sightings.next();
 							ActivityImpl activity = (ActivityImpl) planElement;
 							activity.setLinkId(null);
-							Geometry cell = cellTowers.getCell(sighting.getCellTowerId());
+							Geometry cell = zones.getCell(sighting.getCellTowerId());
 							Point p = getRandomPointInFeature(cell);
 							Coord newCoord = new CoordImpl(p.getX(), p.getY());
 							activity.setCoord(newCoord);
@@ -249,7 +262,7 @@ public class CreatePopulation {
 			}
 		});
 		
-		cellTowers = new CellTowers(cellTowerMap);
+		zones = new Zones(cellTowerMap);
 		// getLinksCrossingCells();
 	}
 
@@ -263,14 +276,15 @@ public class CreatePopulation {
 	}
 
 	private void readSampleWithOneRandomPointForEachSightingInNewCell(final Map<Id, List<Sighting>> sightings) throws FileNotFoundException {
-		final Map<Activity, Geometry> cellsOfSightings = new HashMap<Activity, Geometry>();
+		cellsOfSightings = new HashMap<Activity, CellTower>();
 		for (Entry<Id, List<Sighting>> sightingsPerPerson : sightings.entrySet()) {
 			for (Sighting sighting : sightingsPerPerson.getValue()) {
-				Geometry cell = cellTowers.getCell(sighting.getCellTowerId());
+				CellTower cellTower = zones.cellTowers.get(sighting.getCellTowerId());
+				Geometry cell = cellTower.cell;
 				Point p = getRandomPointInFeature(cell);
 				Coord coord = new CoordImpl(p.getX(), p.getY());
 				Activity activity = scenario.getPopulation().getFactory().createActivityFromCoord("sighting", coord);
-				cellsOfSightings.put(activity, cell);
+				cellsOfSightings.put(activity, cellTower);
 				activity.setEndTime(sighting.getDateTime());
 				Id personId = sightingsPerPerson.getKey();
 				Person person = scenario.getPopulation().getPersons().get(personId);
@@ -281,7 +295,7 @@ public class CreatePopulation {
 					scenario.getPopulation().addPerson(person);
 				} else {
 					Activity lastActivity = (Activity) person.getSelectedPlan().getPlanElements().get(person.getSelectedPlan().getPlanElements().size()-1);
-					if (cell != cellsOfSightings.get(lastActivity)) {
+					if (cellTower != cellsOfSightings.get(lastActivity)) {
 						Leg leg = scenario.getPopulation().getFactory().createLeg("unknown");
 						person.getSelectedPlan().addLeg(leg);
 						person.getSelectedPlan().addActivity(activity);
@@ -289,7 +303,6 @@ public class CreatePopulation {
 				}
 			}
 		}
-
 	}
 
 	private Map<Id, List<Sighting>> readSightings(String startDate, String filename, final int populationIdSuffix) {
@@ -317,8 +330,8 @@ public class CreatePopulation {
 
 
 				if (!cellTowerId.equals("-1")) {
-					Geometry cell = cellTowers.getCell(cellTowerId);
-					if (cell.getNumGeometries() != 0) {
+					CellTower cellTower = zones.cellTowers.get(cellTowerId);
+					if (cellTower != null) {
 						if (interestedInTime(timeInSeconds)) {
 							List<Sighting> sightingsOfPerson = sightings.get(personId);
 							if (sightingsOfPerson == null) {
@@ -328,12 +341,10 @@ public class CreatePopulation {
 
 							Sighting sighting = new Sighting(personId, timeInSeconds, cellTowerId);
 							sightingsOfPerson.add(sighting);
+							cellTower.nSightings++;
 						}
 					}
 				}
-
-
-
 
 			}
 
@@ -407,10 +418,41 @@ public class CreatePopulation {
 		new PopulationWriter(scenario.getPopulation(), null).write(D4DConsts.WORK_DIR + "population.xml");
 		int sampleSize = scenario.getPopulation().getPersons().size();
 		System.out.println("Created " + sampleSize + " people. That's a " + ((double) sampleSize) / POP_REAL  + " sample.");
+		scenarioReader.writeToShapefile();
 	}
 
-	public CellTowers getCellTowers() {
-		return cellTowers;
+	public Zones getCellTowers() {
+		return zones;
+	}
+	
+
+	private void writeToShapefile() {
+		String baseFilename = D4DConsts.WORK_DIR + "cells.shp";
+
+		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
+		SimpleFeatureType type;
+
+		try {
+			type = DataUtilities.createType("Antenna",
+					"ant:Polygon, ID:String, nSightings:Integer" 
+					);
+
+			CoordinateReferenceSystem crs = MGC.getCRS(D4DConsts.TARGET_CRS);
+			type = DataUtilities.createSubType( type, null, crs );
+			for (CellTower cellTower : zones.cellTowers.values()) {
+				String cellTowerIdString = cellTower.id;
+				SimpleFeatureBuilder featureBuilder = new SimpleFeatureBuilder(type);
+				featureBuilder.add(zones.getCell(cellTowerIdString));
+				featureBuilder.add(cellTowerIdString);
+				featureBuilder.add(cellTower.nSightings);
+				features.add(featureBuilder.buildFeature(cellTowerIdString));
+			}
+		} catch (SchemaException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		ShapeFileWriter.writeGeometries(features, baseFilename);
+
 	}
 
 	
