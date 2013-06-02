@@ -2,10 +2,16 @@ package playground.mzilske.cdr;
 
 import org.matsim.api.core.v01.Coord;
 
+import com.vividsolutions.jts.geom.Geometry;
+
 public class CellTower {
 	
-	final String id;
-	final Coord coord;
+	public final String id;
+	public final Coord coord;
+	public Geometry cell;
+	
+	
+	public int nSightings = 0;
 	
 	public CellTower(String id, Coord coord) {
 		super();
