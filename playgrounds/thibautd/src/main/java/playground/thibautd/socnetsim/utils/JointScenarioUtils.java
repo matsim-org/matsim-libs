@@ -19,15 +19,21 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.utils;
 
+import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.population.Desires;
+import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 import playground.thibautd.socnetsim.cliques.config.CliquesConfigGroup;
 import playground.thibautd.socnetsim.cliques.config.JointTimeModeChooserConfigGroup;
@@ -39,6 +45,7 @@ import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.population.JointPlansConfigGroup;
 import playground.thibautd.socnetsim.population.JointPlansXmlReader;
 import playground.thibautd.socnetsim.population.PassengerRoute;
+import playground.thibautd.utils.DesiresConverter;
 
 /**
  *
@@ -101,6 +108,31 @@ public class JointScenarioUtils {
 		}
 		else {
 			scenario.addScenarioElement( new JointPlans() );
+		}
+
+		if ( config.plans().getInputPersonAttributeFile() != null ) {
+			final ObjectAttributesXmlReader reader =
+				new ObjectAttributesXmlReader(
+						scenario.getPopulation().getPersonAttributes());
+			reader.putAttributeConverter( Desires.class , new DesiresConverter() );
+			reader.parse(
+				config.plans().getInputPersonAttributeFile() );
+
+			// put desires (if any) in persons for backward compatibility
+			for ( Person person : scenario.getPopulation().getPersons().values() ) {
+				final Desires desires = (Desires)
+					scenario.getPopulation().getPersonAttributes().getAttribute(
+							person.getId().toString(),
+							"desires" );
+				if ( desires != null ) {
+					((PersonImpl) person).createDesires( desires.getDesc() );
+					for ( Map.Entry<String, Double> entry : desires.getActivityDurations().entrySet() ) {
+						((PersonImpl) person).getDesires().putActivityDuration(
+							entry.getKey(),
+							entry.getValue() );
+					}
+				}
+			}
 		}
 
 		return scenario;
