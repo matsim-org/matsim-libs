@@ -111,16 +111,15 @@ public class M4UConfigurationConverterV4 {
 		// I currently (may'13) think that the sequence should be as follows:
 		// * create empty config with matsim defaults and possibly some additional m4u defaults
 		// * read and insert config from urbansim
+		// * interpret the config at this point part 1 (e.g. set flow capacities according to sampling rate)
 		// * read and insert config from matsim
-		// * interpret the config at this point (e.g. "useBetasFromMATSim")
+		// * interpret the config at this point part 2 (e.g. set the accessibility betas based on "useBetasFromMatsim)
 		// * config consistency checking
-		// Currently, they are all mixed.
-		//
-		// yyyy Stellt sich heraus, dass das so nicht geht: Z.B. flowCap, storCap basierend auf sample rate will man _vor_ und
-		// nicht _nach_ der external config automagisch setzen.
+
 		
 //		try{
-			// creates an empty config to be filled by settings from the MATSim4UrbanSim and external config files
+
+		// creates an empty config to be filled by settings from the MATSim4UrbanSim and external config files
 			this.config = M4UConfigUtils.createEmptyConfigWithSomeDefaults();
 
 			// get root elements from JAXB matsim4urbansim config object
@@ -134,19 +133,20 @@ public class M4UConfigurationConverterV4 {
 			M4UConfigUtils.initMATSim4UrbanSimControler(matsim4urbansimConfigPart2, config);
 			M4UAccessibilityConfigUtils.initAccessibilityParameters(matsim4urbansimConfigPart2, config);
 			
-			M4UConfigUtils.insertNetworkParams(matsim4urbansimConfigPart1, config); // ok
-			M4UConfigUtils.insertPlansParamsAndConfigureWarmOrHotStart(matsim4urbansimConfigPart1, config); // yyyy can't fix (don't understand). kai, may'13
+			M4UConfigUtils.initNetwork(matsim4urbansimConfigPart1, config); // ok
+			M4UConfigUtils.insertPlansParamsAndConfigureWarmOrHotStart(matsim4urbansimConfigPart1, config); // ok
 			M4UConfigUtils.initControler(matsim4urbansimConfigPart1, config); // yyyy can't fix since it is using static variables.  kai, may'13 
-			M4UConfigUtils.insertPlanCalcScoreParams(matsim4urbansimConfigPart1, config); // ok
-			M4UConfigUtils.insertStrategyParams(matsim4urbansimConfigPart1, config); // yyyy can't fix: It is trying to do something to a possible 
+			M4UConfigUtils.initPlanCalcScore(matsim4urbansimConfigPart1, config); // ok
+			M4UConfigUtils.initStrategyPart1(matsim4urbansimConfigPart1, config); // yyyy can't fix: It is trying to do something to a possible 
 			// 4th strategy although that is not yet there at this point in time.
 
 			M4UConfigUtils.initQSim(matsim4urbansimConfig, config);
 			
 			// loading the external MATSim config in to the initialized config
 			M4UConfigUtils.loadExternalConfigAndOverwriteMATSim4UrbanSimSettings(matsim4urbansimConfigPart1, config);
-			// (by the design of the matsim xml config reader, this over-writes only entries which are explicitly mentioned
-			// in the external config)
+			// (by the design, the matsim xml config reader over-writes only entries which are explicitly mentioned in the external config)
+			
+//			M4UConfigUtils.initStrategyPart2(config) ;
 			
 			// show final settings
 			M4UConfigUtils.printUrbanSimParameterSettings( M4UConfigUtils.getUrbanSimParameterConfigAndPossiblyConvert(config) );
@@ -161,6 +161,7 @@ public class M4UConfigurationConverterV4 {
 //			e.printStackTrace();
 //			return false;
 //		}
+			// (the above try catch block would write the stack trace and then continue anyway.  disabled that.  kai, may/jun'13)
 		return true;
 	}
 

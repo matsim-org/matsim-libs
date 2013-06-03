@@ -221,7 +221,7 @@ public class M4UConfigUtils {
 	 * @param matsimParameter
 	 * @param config TODO
 	 */
-	static void insertNetworkParams(ConfigType matsimParameter, Config config){
+	static void initNetwork(ConfigType matsimParameter, Config config){
 		log.info("Setting NetworkConfigGroup to config...");
 		config.network().setInputFile( matsimParameter.getNetwork().getInputFile() );
 		log.info("...done!");
@@ -241,45 +241,38 @@ public class M4UConfigUtils {
 		String warmStartFileName = matsimParameter.getInputPlansFile().getInputFile();
 
 		M4UControlerConfigModuleV3 module = getMATSim4UrbaSimControlerConfigAndPossiblyConvert(config);
-
-		// setting plans file as input
-		if( !hotStartFileName.equals("")  && (new File(hotStartFileName)).exists() ) {
-			log.info("Hot Start detcted!");
-			setPlansFile( hotStartFileName, config );
+		
+		if ( !hotStartFileName.equals("") ) {
+			log.info("Hot start detected.  Will use plans file from last matsim run, or warm start plans file if this is the first matsim call within this urbansim run.") ;
 			module.setHotStart(true);
-		}
-		else if( !warmStartFileName.equals("") ){
-			log.info("Warm Start detcted!");
-			setPlansFile( warmStartFileName, config );
+		} else if ( !warmStartFileName.equals("") ) {
+			log.info("Warm start detected.  Will use warm start plans file with name " + warmStartFileName ) ;
 			module.setWarmStart(true);
-		}
-		else{
+		} else{
+			// else it is a cold start:
 			log.info("Cold Start (no plans file) detected!");
 			module.setColdStart(true);
 		}
 
-		// setting target location for hot start plans file
+		if( !hotStartFileName.equals("")  && (new File(hotStartFileName)).exists() ) {
+			// if the hot start file name is given, and the file exists, then it is used:
+			log.info("Using hot start plans file from last matsim run: " + hotStartFileName );
+			config.plans().setInputFile( hotStartFileName ) ;
+		}
+		else if( !warmStartFileName.equals("") ){
+			// else if the warm start file name is given, then it is used:
+			config.plans().setInputFile( warmStartFileName ) ;
+		}
+
 		if(!hotStartFileName.equals("")){
-			log.info("The resulting plans file after this MATSim run is stored at a specified place to enable hot start for the following MATSim run.");
+			log.info("Hot start: The resulting plans file after this MATSim run is stored at a specified place for the following MATSim run.");
 			log.info("The specified place is : " + hotStartFileName);
 			module.setHotStartTargetLocation(hotStartFileName);
 		}
-		else
+		else { 
 			module.setHotStartTargetLocation("");
-	}
+		}
 
-	/**
-	 * sets (either a "warm" or "hot" start) a plans file, see above.
-	 * @param config TODO
-	 */
-	private static void setPlansFile(String plansFile, Config config) {
-
-		log.info("Setting PlansConfigGroup to config...");
-		PlansConfigGroup plansCG = (PlansConfigGroup) config.getModule(PlansConfigGroup.GROUP_NAME);
-		// set input plans file
-		plansCG.setInputFile( plansFile );
-
-		log.info("...done!");
 	}
 
 	/**
@@ -315,7 +308,7 @@ public class M4UConfigUtils {
 	 * @param matsimParameter
 	 * @param config TODO
 	 */
-	static void insertPlanCalcScoreParams(ConfigType matsimParameter, Config config){
+	static void initPlanCalcScore(ConfigType matsimParameter, Config config){
 		log.info("Setting PlanCalcScore to config...");
 		String activityType_0 = matsimParameter.getPlanCalcScore().getActivityType0();
 		String activityType_1 = matsimParameter.getPlanCalcScore().getActivityType1();
@@ -409,20 +402,18 @@ public class M4UConfigUtils {
 	 * setting strategy
 	 * @param config TODO
 	 */
-	static void insertStrategyParams(ConfigType matsim4urbansimConfig, Config config){
+	static void initStrategyPart1(ConfigType matsim4urbansimConfig, Config config){
 		log.info("Setting StrategyConfigGroup to config...");
 
 		// some modules are disables after 80% of overall iterations, 
 		// last iteration for them determined here tnicolai feb'12
-		int disableStrategyAfterIteration = (int) Math.ceil(config.controler().getLastIteration() * 0.8);
-
 		// configure strategies for re-planning (should be something like 5)
 		config.strategy().setMaxAgentPlanMemorySize( matsim4urbansimConfig.getStrategy().getMaxAgentPlanMemorySize().intValue() );
 
 		StrategyConfigGroup.StrategySettings timeAlocationMutator = new StrategyConfigGroup.StrategySettings(IdFactory.get(1));
 		timeAlocationMutator.setModuleName("TimeAllocationMutator"); 	// module name given in org.matsim.core.replanning.StrategyManagerConfigLoader
 		timeAlocationMutator.setProbability( matsim4urbansimConfig.getStrategy().getTimeAllocationMutatorProbability() ); // should be something like 0.1
-		timeAlocationMutator.setDisableAfter(disableStrategyAfterIteration);
+		timeAlocationMutator.setDisableAfter(disableStrategyAfterIteration(config));
 		config.strategy().addStrategySettings(timeAlocationMutator);
 		// change mutation range to 2h. tnicolai feb'12
 		config.setParam("TimeAllocationMutator", "mutationRange", "7200"); 
@@ -435,9 +426,20 @@ public class M4UConfigUtils {
 		StrategyConfigGroup.StrategySettings reroute = new StrategyConfigGroup.StrategySettings(IdFactory.get(3));
 		reroute.setModuleName("ReRoute");  // old name "ReRoute_Dijkstra"						// module name given in org.matsim.core.replanning.StrategyManagerConfigLoader
 		reroute.setProbability( matsim4urbansimConfig.getStrategy().getReRouteDijkstraProbability() ); 	// should be something like 0.1
-		reroute.setDisableAfter(disableStrategyAfterIteration);
+		reroute.setDisableAfter(disableStrategyAfterIteration(config));
 		config.strategy().addStrategySettings(reroute);
 
+		log.info("...done!");
+	}
+
+	private static int disableStrategyAfterIteration(Config config) {
+		return (int) Math.ceil(config.controler().getLastIteration() * 0.8);
+	}
+
+	private static void initStrategyPart2(Config config){
+		// yyyy My intuition would be to set everything to zero after 80% of iterations (???).
+		// yyyyyy not yet sorted out
+		
 		// check if a 4th module is given in the external MATSim config
 		// the external config is not loaded at this point. Thus, a possible 4th module is only load with the settings from the external config...
 		StrategyConfigGroup.StrategySettings changeLegMode = getChangeLegModeStrategySettings(config);
@@ -446,16 +448,15 @@ public class M4UConfigUtils {
 				changeLegMode.getProbability() > 0.);
 		if(set4thStrategyModule){
 			// to be consistent, setting the same iteration number as in the strategies above 
-			changeLegMode.setDisableAfter(disableStrategyAfterIteration);
-			log.warn("setting disableStrategyAfterIteration for ChangeLegMode to " + disableStrategyAfterIteration + "; possibly overriding config settings!");
+			changeLegMode.setDisableAfter(disableStrategyAfterIteration(config));
+			log.warn("setting disableStrategyAfterIteration for ChangeLegMode to " + disableStrategyAfterIteration(config) + "; possibly overriding config settings!");
 			// check if other modes are set
 			Module changelegMode = config.getModule("changeLegMode");
 			if(changelegMode != null && changelegMode.getValue("modes") != null)
 				log.info("Following modes are found: " + changelegMode.getValue("modes"));
 		}
-		log.info("...done!");
 	}
-
+	
 	/**
 	 * loads the external config into a temporary structure
 	 * this is done to initialize MATSim4UrbanSim settings that are defined
