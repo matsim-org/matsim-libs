@@ -77,9 +77,9 @@
 //	private Id linkId3 = new IdImpl("link3");
 //	private Id linkId4 = new IdImpl("link4");
 //	
-//	// 2 agenten mit 10 sec Verzögerung
+//	// 2 agenten mit 5 sec Verzögerung
 //	@Test
-//	public final void testFlowCongestion1(){
+//	public final void testFlowCongestion(){
 //		
 //		loadScenario();
 //		setLinks_noStorageCapacityConstraints();
@@ -101,12 +101,63 @@
 //						
 //		MarginalCongestionHandler congestionHandler = new MarginalCongestionHandler(this.events, this.scenario);
 //
-//		// starte agent 1 und agent 2 mit 10 sec Verzögerung
-//		// erst agent 1...
+//		// start agent 1...
 //		congestionHandler.handleEvent(ef.createAgentDepartureEvent(0, testAgent1, linkId1, "car"));
 //		congestionHandler.handleEvent(ef.createLinkLeaveEvent(1, testAgent1, linkId1, testAgent1));
 //		congestionHandler.handleEvent(ef.createLinkEnterEvent(1, testAgent1, linkId2, testAgent1));
-//		// dann agent 2...
+//		// start agent 2...
+//		congestionHandler.handleEvent(ef.createAgentDepartureEvent(5, testAgent2, linkId1, "car"));
+//		congestionHandler.handleEvent(ef.createLinkLeaveEvent(6, testAgent2, linkId1, testAgent2));
+//		congestionHandler.handleEvent(ef.createLinkEnterEvent(6, testAgent2, linkId2, testAgent2));
+//		
+//		// agent 1 kann ohne Probleme link 2 verlassen...
+//		congestionHandler.handleEvent(ef.createLinkLeaveEvent(51, testAgent1, linkId2, testAgent1));
+//		congestionHandler.handleEvent(ef.createLinkEnterEvent(51, testAgent1, linkId3, testAgent1));
+//		
+//		// agent 2 muss allerdings durch die flow capacity warten.
+//		congestionHandler.handleEvent(ef.createLinkLeaveEvent(51 + 10, testAgent2, linkId2, testAgent2));
+//		congestionHandler.handleEvent(ef.createLinkEnterEvent(51 + 10, testAgent2, linkId3, testAgent2));
+//		
+//		// *****************
+//		
+//		Assert.assertEquals("number of congestion events", 1, congestionEvents.size());
+//
+//		MarginalCongestionEvent congEvent = congestionEvents.get(0);
+//		Assert.assertEquals("external delay", 5, congEvent.getDelay(), MatsimTestUtils.EPSILON);
+//		Assert.assertEquals("congested link", linkId2.toString(), congEvent.getLinkId().toString());
+//		Assert.assertEquals("causing Agent", testAgent1.toString(), congEvent.getCausingAgentId().toString());
+//		Assert.assertEquals("affected Agent", testAgent2.toString(), congEvent.getAffectedAgentId().toString());
+//	}
+//	
+//	// 2 agenten mit 10 sec Verzögerung
+//	@Test
+//	public final void testNoCongestion(){
+//		
+//		loadScenario();
+//		setLinks_noStorageCapacityConstraints();
+//		setPopulation();
+//		final List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
+//							
+//		events.addHandler( new MarginalCongestionEventHandler() {
+//
+//			@Override
+//			public void reset(int iteration) {				
+//			}
+//
+//			@Override
+//			public void handleEvent(MarginalCongestionEvent event) {
+//				congestionEvents.add(event);
+//			}
+//			
+//		});
+//						
+//		MarginalCongestionHandler congestionHandler = new MarginalCongestionHandler(this.events, this.scenario);
+//
+//		// start agent 1...
+//		congestionHandler.handleEvent(ef.createAgentDepartureEvent(0, testAgent1, linkId1, "car"));
+//		congestionHandler.handleEvent(ef.createLinkLeaveEvent(1, testAgent1, linkId1, testAgent1));
+//		congestionHandler.handleEvent(ef.createLinkEnterEvent(1, testAgent1, linkId2, testAgent1));
+//		// start agent 2...
 //		congestionHandler.handleEvent(ef.createAgentDepartureEvent(10, testAgent2, linkId1, "car"));
 //		congestionHandler.handleEvent(ef.createLinkLeaveEvent(11, testAgent2, linkId1, testAgent2));
 //		congestionHandler.handleEvent(ef.createLinkEnterEvent(11, testAgent2, linkId2, testAgent2));
@@ -115,25 +166,18 @@
 //		congestionHandler.handleEvent(ef.createLinkLeaveEvent(51, testAgent1, linkId2, testAgent1));
 //		congestionHandler.handleEvent(ef.createLinkEnterEvent(51, testAgent1, linkId3, testAgent1));
 //		
-//		// agent 2 muss allerdings durch die flow capacity warten (flow capacity: 1car/60sec)
-//		// freeFlowLeaveTime + flowCapacityDelay + 1sec = linkEnterTime + freeTravelTime + flowCapacityDelay + 1sec
-//		congestionHandler.handleEvent(ef.createLinkLeaveEvent(11 + 50 + 50 + 1, testAgent2, linkId2, testAgent2));
-//		congestionHandler.handleEvent(ef.createLinkEnterEvent(11 + 50 + 50 + 1, testAgent2, linkId3, testAgent2));
+//		// agent 2 muss allerdings durch die flow capacity warten.
+//		congestionHandler.handleEvent(ef.createLinkLeaveEvent(51 + 10, testAgent2, linkId2, testAgent2));
+//		congestionHandler.handleEvent(ef.createLinkEnterEvent(51 + 10, testAgent2, linkId3, testAgent2));
 //		
 //		// *****************
 //		
-//		Assert.assertEquals("number of congestion events", 1, congestionEvents.size());
-//
-//		MarginalCongestionEvent congEvent = congestionEvents.get(0);
-//		Assert.assertEquals("external delay", 50, congEvent.getDelay(), MatsimTestUtils.EPSILON);
-//		Assert.assertEquals("congested link", linkId2.toString(), congEvent.getLinkId().toString());
-//		Assert.assertEquals("causing Agent", testAgent1.toString(), congEvent.getCausingAgentId().toString());
-//		Assert.assertEquals("affected Agent", testAgent2.toString(), congEvent.getAffectedAgentId().toString());
+//		Assert.assertEquals("number of congestion events", 0, congestionEvents.size());
 //	}
 //	
-//	// 2 agenten mit 59 sec Verzögerung
+//	// 2 agenten mit 5 sec Verzögerung, active Storage Capacity
 //	@Test
-//	public final void testFlowCongestion2(){
+//	public final void testFlowStorageCongestion(){
 //		
 //		loadScenario();
 //		setLinks_noStorageCapacityConstraints();
@@ -154,40 +198,48 @@
 //		});
 //						
 //		MarginalCongestionHandler congestionHandler = new MarginalCongestionHandler(this.events, this.scenario);
-//		
-//		// starte agent 1 und agent 2 mit 59 sec Verzögerung
-//		// erst agent 1...
+//
+//		// start agent 1...
 //		congestionHandler.handleEvent(ef.createAgentDepartureEvent(0, testAgent1, linkId1, "car"));
 //		congestionHandler.handleEvent(ef.createLinkLeaveEvent(1, testAgent1, linkId1, testAgent1));
 //		congestionHandler.handleEvent(ef.createLinkEnterEvent(1, testAgent1, linkId2, testAgent1));
-//		// dann agent 2...
-//		congestionHandler.handleEvent(ef.createAgentDepartureEvent(59, testAgent2, linkId1, "car"));
-//		congestionHandler.handleEvent(ef.createLinkLeaveEvent(60, testAgent2, linkId1, testAgent2));
-//		congestionHandler.handleEvent(ef.createLinkEnterEvent(60, testAgent2, linkId2, testAgent2));
+//		// start agent 2...
+//		congestionHandler.handleEvent(ef.createAgentDepartureEvent(5, testAgent2, linkId1, "car"));
+//		congestionHandler.handleEvent(ef.createLinkLeaveEvent(6, testAgent2, linkId1, testAgent2));
+//		congestionHandler.handleEvent(ef.createLinkEnterEvent(6, testAgent2, linkId2, testAgent2));
 //		
 //		// agent 1 kann ohne Probleme link 2 verlassen...
 //		congestionHandler.handleEvent(ef.createLinkLeaveEvent(51, testAgent1, linkId2, testAgent1));
 //		congestionHandler.handleEvent(ef.createLinkEnterEvent(51, testAgent1, linkId3, testAgent1));
 //		
-//		// agent 2 muss allerdings durch die flow capacity warten (flow capacity: 1car/60sec)
-//		// freeFlowLeaveTime + flowCapacityDelay + 1sec = enterTime + freeTravelTime + flowCapacityDelay + 1sec
-//		congestionHandler.handleEvent(ef.createLinkLeaveEvent(60 + 50 + 1 + 1, testAgent2, linkId2, testAgent2));
-//		congestionHandler.handleEvent(ef.createLinkEnterEvent(60 + 50 + 1 + 1, testAgent2, linkId3, testAgent2));
+//		// agent 2 muss allerdings durch die flow capacity warten (51 + 10) plus durch die storage capacity (35)
+//		congestionHandler.handleEvent(ef.createLinkLeaveEvent(51 + 10 + 35, testAgent2, linkId2, testAgent2));
+//		congestionHandler.handleEvent(ef.createLinkEnterEvent(51 + 10 + 35, testAgent2, linkId3, testAgent2));
 //		
 //		// *****************
 //		
-//		Assert.assertEquals("number of congestion events", 1, congestionEvents.size());
+//		for (MarginalCongestionEvent event : congestionEvents){
+//			System.out.println(event.toString());
+//		}
 //
-//		MarginalCongestionEvent congEvent = congestionEvents.get(0);
-//		Assert.assertEquals("external delay", 1, congEvent.getDelay(), MatsimTestUtils.EPSILON);
-//		Assert.assertEquals("congested link", linkId2.toString(), congEvent.getLinkId().toString());
-//		Assert.assertEquals("causing Agent", testAgent1.toString(), congEvent.getCausingAgentId().toString());
-//		Assert.assertEquals("affected Agent", testAgent2.toString(), congEvent.getAffectedAgentId().toString());
-//	}	
+//		Assert.assertEquals("number of congestion events", 2, congestionEvents.size());
 //
-//		// 2 agenten mit 60 sec Verzögerung
+//		MarginalCongestionEvent congEvent1 = congestionEvents.get(0);
+//		Assert.assertEquals("external delay", 5, congEvent1.getDelay(), MatsimTestUtils.EPSILON);
+//		Assert.assertEquals("congested link", linkId2.toString(), congEvent1.getLinkId().toString());
+//		Assert.assertEquals("causing Agent", testAgent1.toString(), congEvent1.getCausingAgentId().toString());
+//		Assert.assertEquals("affected Agent", testAgent2.toString(), congEvent1.getAffectedAgentId().toString());
+//		
+//		MarginalCongestionEvent congEvent2 = congestionEvents.get(1);
+//		Assert.assertEquals("external delay", 35, congEvent2.getDelay(), MatsimTestUtils.EPSILON);
+//		Assert.assertEquals("congested link", linkId2.toString(), congEvent2.getLinkId().toString());
+//		Assert.assertEquals("causing Agent", testAgent1.toString(), congEvent2.getCausingAgentId().toString());
+//		Assert.assertEquals("affected Agent", testAgent2.toString(), congEvent2.getAffectedAgentId().toString());
+//	}
+//	
+//	// 2 agenten mit 5 sec Verzögerung, active Storage Capacity durch 2
 //		@Test
-//		public final void testFlowCongestion3(){
+//		public final void testFlowStorageCongestion2(){
 //			
 //			loadScenario();
 //			setLinks_noStorageCapacityConstraints();
@@ -208,34 +260,55 @@
 //			});
 //							
 //			MarginalCongestionHandler congestionHandler = new MarginalCongestionHandler(this.events, this.scenario);
-//			
-//			// starte agent 1 und agent 2 mit 60 sec Verzögerung
-//			// erst agent 1...
+//
+//			// agent 3 blockiert link3
+//			congestionHandler.handleEvent(ef.createAgentDepartureEvent(0, testAgent3, linkId2, "car"));
+//			congestionHandler.handleEvent(ef.createLinkLeaveEvent(1, testAgent3, linkId2, testAgent3));
+//			congestionHandler.handleEvent(ef.createLinkEnterEvent(1, testAgent3, linkId3, testAgent3));
+//
+//			// start agent 1...
 //			congestionHandler.handleEvent(ef.createAgentDepartureEvent(0, testAgent1, linkId1, "car"));
 //			congestionHandler.handleEvent(ef.createLinkLeaveEvent(1, testAgent1, linkId1, testAgent1));
 //			congestionHandler.handleEvent(ef.createLinkEnterEvent(1, testAgent1, linkId2, testAgent1));
-//			// dann agent 2...
-//			congestionHandler.handleEvent(ef.createAgentDepartureEvent(60, testAgent2, linkId1, "car"));
-//			congestionHandler.handleEvent(ef.createLinkLeaveEvent(61, testAgent2, linkId1, testAgent2));
-//			congestionHandler.handleEvent(ef.createLinkEnterEvent(61, testAgent2, linkId2, testAgent2));
+//			// start agent 2...
+//			congestionHandler.handleEvent(ef.createAgentDepartureEvent(5, testAgent2, linkId1, "car"));
+//			congestionHandler.handleEvent(ef.createLinkLeaveEvent(6, testAgent2, linkId1, testAgent2));
+//			congestionHandler.handleEvent(ef.createLinkEnterEvent(6, testAgent2, linkId2, testAgent2));
 //			
 //			// agent 1 kann ohne Probleme link 2 verlassen...
 //			congestionHandler.handleEvent(ef.createLinkLeaveEvent(51, testAgent1, linkId2, testAgent1));
 //			congestionHandler.handleEvent(ef.createLinkEnterEvent(51, testAgent1, linkId3, testAgent1));
 //			
-//			// agent 2 muss allerdings durch die flow capacity warten (flow capacity: 1car/60sec)
-//			// freeFlowLeaveTime + flowCapacityDelay + 1sec = enterTime + freeTravelTime + flowCapacityDelay + 1sec
-//			congestionHandler.handleEvent(ef.createLinkLeaveEvent(61 + 50 + 0 + 1, testAgent2, linkId2, testAgent2));
-//			congestionHandler.handleEvent(ef.createLinkEnterEvent(61 + 50 + 0 + 1, testAgent2, linkId3, testAgent2));
+//			// agent 2 muss allerdings durch die flow capacity warten (51 + 10) plus durch die storage capacity (35)
+//			congestionHandler.handleEvent(ef.createLinkLeaveEvent(51 + 10 + 35, testAgent2, linkId2, testAgent2));
+//			congestionHandler.handleEvent(ef.createLinkEnterEvent(51 + 10 + 35, testAgent2, linkId3, testAgent2));
 //			
 //			// *****************
 //			
-//			Assert.assertEquals("number of congestion events", 0, congestionEvents.size());
+//			for (MarginalCongestionEvent event : congestionEvents){
+//				System.out.println(event.toString());
+//			}
+//						
+//			Assert.assertEquals("number of congestion events", 2, congestionEvents.size());
+//
+//			MarginalCongestionEvent congEvent1 = congestionEvents.get(0);
+//			Assert.assertEquals("external delay", 5, congEvent1.getDelay(), MatsimTestUtils.EPSILON);
+//			Assert.assertEquals("congested link", linkId2.toString(), congEvent1.getLinkId().toString());
+//			Assert.assertEquals("causing Agent", testAgent1.toString(), congEvent1.getCausingAgentId().toString());
+//			Assert.assertEquals("affected Agent", testAgent2.toString(), congEvent1.getAffectedAgentId().toString());
+//			Assert.assertEquals("capacity constraint", "flowCapacity", congEvent1.getCapacityConstraint());
+//			
+//			MarginalCongestionEvent congEvent2 = congestionEvents.get(1);
+//			Assert.assertEquals("external delay", 35, congEvent2.getDelay(), MatsimTestUtils.EPSILON);
+//			Assert.assertEquals("congested link", linkId2.toString(), congEvent2.getLinkId().toString());
+//			Assert.assertEquals("causing Agent", testAgent1.toString(), congEvent2.getCausingAgentId().toString());
+//			Assert.assertEquals("affected Agent", testAgent2.toString(), congEvent2.getAffectedAgentId().toString());
+//			Assert.assertEquals("capacity constraint", "storageCapacity", congEvent2.getCapacityConstraint());
 //		}
 //		
-//		// 3 agenten mit je 10 sec Verzögerung
+//		// 3 agenten
 //		@Test
-//		public final void testFlowCongestion4(){
+//		public final void testFlowCongestion3agents(){
 //			
 //			loadScenario();
 //			setLinks_noStorageCapacityConstraints();
@@ -256,704 +329,58 @@
 //			});
 //							
 //			MarginalCongestionHandler congestionHandler = new MarginalCongestionHandler(this.events, this.scenario);
-//			
-//			// starte agent 1
+//
+//			// start agent 1...
 //			congestionHandler.handleEvent(ef.createAgentDepartureEvent(0, testAgent1, linkId1, "car"));
 //			congestionHandler.handleEvent(ef.createLinkLeaveEvent(1, testAgent1, linkId1, testAgent1));
 //			congestionHandler.handleEvent(ef.createLinkEnterEvent(1, testAgent1, linkId2, testAgent1));
+//			// start agent 2...
+//			congestionHandler.handleEvent(ef.createAgentDepartureEvent(4, testAgent2, linkId1, "car"));
+//			congestionHandler.handleEvent(ef.createLinkLeaveEvent(5, testAgent2, linkId1, testAgent2));
+//			congestionHandler.handleEvent(ef.createLinkEnterEvent(5, testAgent2, linkId2, testAgent2));
+//			// start agent 3...
+//			congestionHandler.handleEvent(ef.createAgentDepartureEvent(8, testAgent3, linkId1, "car"));
+//			congestionHandler.handleEvent(ef.createLinkLeaveEvent(9, testAgent3, linkId1, testAgent3));
+//			congestionHandler.handleEvent(ef.createLinkEnterEvent(9, testAgent3, linkId2, testAgent3));
 //			
-//			// starte agent 2 mit 10 sec Verzögerung
-//			congestionHandler.handleEvent(ef.createAgentDepartureEvent(10, testAgent2, linkId1, "car"));
-//			congestionHandler.handleEvent(ef.createLinkLeaveEvent(11, testAgent2, linkId1, testAgent2));
-//			congestionHandler.handleEvent(ef.createLinkEnterEvent(11, testAgent2, linkId2, testAgent2));
-//			
-//			// starte agent 3 mit nochmal 10 sec Verzögerung
-//			congestionHandler.handleEvent(ef.createAgentDepartureEvent(20, testAgent3, linkId1, "car"));
-//			congestionHandler.handleEvent(ef.createLinkLeaveEvent(21, testAgent3, linkId1, testAgent3));
-//			congestionHandler.handleEvent(ef.createLinkEnterEvent(21, testAgent3, linkId2, testAgent3));
-//			
-//			// agent 1 kann problemlos link 2 verlassen
+//			// agent 1 kann ohne Probleme link 2 verlassen...
 //			congestionHandler.handleEvent(ef.createLinkLeaveEvent(51, testAgent1, linkId2, testAgent1));
 //			congestionHandler.handleEvent(ef.createLinkEnterEvent(51, testAgent1, linkId3, testAgent1));
 //			
-//			// agent 2 muss warten
-//			// freeFlowLeaveTime + flowCapacityDelay + 1sec = enterTime + freeTravelTime + flowCapacityDelay + 1sec
-//			congestionHandler.handleEvent(ef.createLinkLeaveEvent(11 + 50 + 50 + 1, testAgent2, linkId2, testAgent2));
-//			congestionHandler.handleEvent(ef.createLinkEnterEvent(11 + 50 + 50 + 1, testAgent2, linkId3, testAgent2));
+//			// agent 2 muss allerdings durch die flow capacity warten.
+//			congestionHandler.handleEvent(ef.createLinkLeaveEvent(51 + 10, testAgent2, linkId2, testAgent2));
+//			congestionHandler.handleEvent(ef.createLinkEnterEvent(51 + 10, testAgent2, linkId3, testAgent2));
 //			
-//			// agent 3 muss noch mehr warten
-//			// freeFlowLeaveTime + flowCapacityDelay + 1sec = enterTime + freeTravelTime + flowCapacityDelay + 1sec
-//			congestionHandler.handleEvent(ef.createLinkLeaveEvent(21 + 50 + 100 + 1, testAgent3, linkId2, testAgent3));
-//			congestionHandler.handleEvent(ef.createLinkEnterEvent(21 + 50 + 100 + 1, testAgent3, linkId3, testAgent3));
-//
+//			// auch agent 3 muss durch die flow capacity warten.
+//			congestionHandler.handleEvent(ef.createLinkLeaveEvent(51 + 20, testAgent3, linkId2, testAgent3));
+//			congestionHandler.handleEvent(ef.createLinkEnterEvent(51 + 20, testAgent3, linkId3, testAgent3));
 //			
 //			// *****************
-//						
-//			for (MarginalCongestionEvent event : congestionEvents){
-//				
-//				if (event.getCausingAgentId().toString().equals(testAgent1.toString())){
-//
-//					if (event.getAffectedAgentId().toString().equals(testAgent1.toString())){
-//						throw new RuntimeException();
-//
-//					} else if (event.getAffectedAgentId().toString().equals(testAgent2.toString())){
-//						Assert.assertEquals("external delay", 50, event.getDelay(), MatsimTestUtils.EPSILON);
-//						Assert.assertEquals("congested link", linkId2.toString(), event.getLinkId().toString());
-//						
-//					} else if (event.getAffectedAgentId().toString().equals(testAgent3.toString())){
-//						Assert.assertEquals("external delay", 40, event.getDelay(), MatsimTestUtils.EPSILON);
-//						Assert.assertEquals("congested link", linkId2.toString(), event.getLinkId().toString());
-//						
-//					} else {
-//						throw new RuntimeException();
-//					}
-//					
-//				} else if (event.getCausingAgentId().toString().equals(testAgent2.toString())) {
-//					if (event.getAffectedAgentId().toString().equals(testAgent1.toString())){
-//						throw new RuntimeException();
-//						
-//					} else if (event.getAffectedAgentId().toString().equals(testAgent2.toString())){
-//						throw new RuntimeException();
-//										
-//					} else if (event.getAffectedAgentId().toString().equals(testAgent3.toString())){
-//						Assert.assertEquals("external delay", 60, event.getDelay(), MatsimTestUtils.EPSILON);
-//						Assert.assertEquals("congested link", linkId2.toString(), event.getLinkId().toString());
-//						
-//					} else {
-//						throw new RuntimeException();
-//					}	
-//				
-//				} else {
-//					throw new RuntimeException();
-//				}
-//			}
+//			
+//			Assert.assertEquals("number of congestion events", 3, congestionEvents.size());
+//			
+//			MarginalCongestionEvent congEvent1 = congestionEvents.get(0);
+//			Assert.assertEquals("external delay", 6, congEvent1.getDelay(), MatsimTestUtils.EPSILON);
+//			Assert.assertEquals("congested link", linkId2.toString(), congEvent1.getLinkId().toString());
+//			Assert.assertEquals("causing Agent", testAgent1.toString(), congEvent1.getCausingAgentId().toString());
+//			Assert.assertEquals("affected Agent", testAgent2.toString(), congEvent1.getAffectedAgentId().toString());
+//			Assert.assertEquals("capacity constraint", "flowCapacity", congEvent1.getCapacityConstraint());
+//			
+//			MarginalCongestionEvent congEvent2 = congestionEvents.get(1);
+//			Assert.assertEquals("external delay", 10, congEvent2.getDelay(), MatsimTestUtils.EPSILON);
+//			Assert.assertEquals("congested link", linkId2.toString(), congEvent2.getLinkId().toString());
+//			Assert.assertEquals("causing Agent", testAgent2.toString(), congEvent2.getCausingAgentId().toString());
+//			Assert.assertEquals("affected Agent", testAgent3.toString(), congEvent2.getAffectedAgentId().toString());
+//			Assert.assertEquals("capacity constraint", "flowCapacity", congEvent2.getCapacityConstraint());
+//			
+//			MarginalCongestionEvent congEvent3 = congestionEvents.get(2);
+//			Assert.assertEquals("external delay", 2, congEvent3.getDelay(), MatsimTestUtils.EPSILON);
+//			Assert.assertEquals("congested link", linkId2.toString(), congEvent3.getLinkId().toString());
+//			Assert.assertEquals("causing Agent", testAgent1.toString(), congEvent3.getCausingAgentId().toString());
+//			Assert.assertEquals("affected Agent", testAgent3.toString(), congEvent3.getAffectedAgentId().toString());
+//			Assert.assertEquals("capacity constraint", "flowCapacity", congEvent3.getCapacityConstraint());
 //		}
-//		
-//		// 3 agenten, agent 2 mit 5 sec, agent 3 mit 120 sec Verzögerung
-//		@Test
-//		public final void testFlowCongestion5(){
 //			
-//			loadScenario();
-//			setLinks_noStorageCapacityConstraints();
-//			setPopulation();
-//			final List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
-//								
-//			events.addHandler( new MarginalCongestionEventHandler() {
-//
-//				@Override
-//				public void reset(int iteration) {				
-//				}
-//
-//				@Override
-//				public void handleEvent(MarginalCongestionEvent event) {
-//					congestionEvents.add(event);
-//				}
-//				
-//			});
-//							
-//			MarginalCongestionHandler congestionHandler = new MarginalCongestionHandler(this.events, this.scenario);
-//			
-//			// starte agent 1
-//			congestionHandler.handleEvent(ef.createAgentDepartureEvent(0, testAgent1, linkId1, "car"));
-//			congestionHandler.handleEvent(ef.createLinkLeaveEvent(1, testAgent1, linkId1, testAgent1));
-//			congestionHandler.handleEvent(ef.createLinkEnterEvent(1, testAgent1, linkId2, testAgent1));
-//			
-//			// starte agent 2 mit 5 sec Verzögerung
-//			congestionHandler.handleEvent(ef.createAgentDepartureEvent(5, testAgent2, linkId1, "car"));
-//			congestionHandler.handleEvent(ef.createLinkLeaveEvent(6, testAgent2, linkId1, testAgent2));
-//			congestionHandler.handleEvent(ef.createLinkEnterEvent(6, testAgent2, linkId2, testAgent2));
-//			
-//			// starte agent 3 mit 120 sec Verzögerung
-//			congestionHandler.handleEvent(ef.createAgentDepartureEvent(120, testAgent3, linkId1, "car"));
-//			congestionHandler.handleEvent(ef.createLinkLeaveEvent(121, testAgent3, linkId1, testAgent3));
-//			congestionHandler.handleEvent(ef.createLinkEnterEvent(121, testAgent3, linkId2, testAgent3));
-//			
-//			// agent 1 kann problemlos link 2 verlassen
-//			congestionHandler.handleEvent(ef.createLinkLeaveEvent(51, testAgent1, linkId2, testAgent1));
-//			congestionHandler.handleEvent(ef.createLinkEnterEvent(51, testAgent1, linkId3, testAgent1));
-//			
-//			// agent 2 muss warten
-//			// freeFlowLeaveTime + flowCapacityDelay + 1sec = enterTime + freeTravelTime + flowCapacityDelay + 1sec
-//			congestionHandler.handleEvent(ef.createLinkLeaveEvent(6 + 50 + 55 + 1, testAgent2, linkId2, testAgent2));
-//			congestionHandler.handleEvent(ef.createLinkEnterEvent(6 + 50 + 55 + 1, testAgent2, linkId3, testAgent2));
-//			
-//			// agent 3 kann problemlos link 2 verlassen (der Stau hat sich bereits aufgelöst)
-//			// freeFlowLeaveTime + flowCapacityDelay + 1sec = enterTime + freeTravelTime + flowCapacityDelay + 1sec
-//			congestionHandler.handleEvent(ef.createLinkLeaveEvent(121 + 50 + 0 + 1, testAgent3, linkId2, testAgent3));
-//			congestionHandler.handleEvent(ef.createLinkEnterEvent(121 + 50 + 0 + 1, testAgent3, linkId3, testAgent3));
-//			
-//			// *****************
-//						
-//			for (MarginalCongestionEvent event : congestionEvents){
-//				
-//				if (event.getCausingAgentId().toString().equals(testAgent1.toString())){
-//
-//					if (event.getAffectedAgentId().toString().equals(testAgent1.toString())){
-//						throw new RuntimeException();
-//
-//					} else if (event.getAffectedAgentId().toString().equals(testAgent2.toString())){
-//						Assert.assertEquals("external delay", 55, event.getDelay(), MatsimTestUtils.EPSILON);
-//						Assert.assertEquals("congested link", linkId2.toString(), event.getLinkId().toString());
-//						
-//					} else if (event.getAffectedAgentId().toString().equals(testAgent3.toString())){
-//						throw new RuntimeException();
-//						
-//					} else {
-//						throw new RuntimeException();
-//					}
-//					
-//				} else if (event.getCausingAgentId().toString().equals(testAgent2.toString())) {
-//					if (event.getAffectedAgentId().toString().equals(testAgent1.toString())){
-//						throw new RuntimeException();
-//						
-//					} else if (event.getAffectedAgentId().toString().equals(testAgent2.toString())){
-//						throw new RuntimeException();
-//										
-//					} else if (event.getAffectedAgentId().toString().equals(testAgent3.toString())){
-//						throw new RuntimeException();
-//						
-//					} else {
-//						throw new RuntimeException();
-//					}	
-//				
-//				} else {
-//					throw new RuntimeException();
-//				}
-//			}
-//		}
-//		
-//		// 3 agenten, agent 2 mit 5 sec, agent 3 mit 120 sec Verzögerung
-//				@Test
-//				public final void testFlowCongestion5b(){
-//					
-//					loadScenario();
-//					setLinks_noStorageCapacityConstraints();
-//					setPopulation();
-//					final List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
-//										
-//					events.addHandler( new MarginalCongestionEventHandler() {
-//
-//						@Override
-//						public void reset(int iteration) {				
-//						}
-//
-//						@Override
-//						public void handleEvent(MarginalCongestionEvent event) {
-//							congestionEvents.add(event);
-//						}
-//						
-//					});
-//									
-//					MarginalCongestionHandler congestionHandler = new MarginalCongestionHandler(this.events, this.scenario);
-//					
-//					// starte agent 1
-//					congestionHandler.handleEvent(ef.createAgentDepartureEvent(0, testAgent1, linkId1, "car"));
-//					congestionHandler.handleEvent(ef.createLinkLeaveEvent(1, testAgent1, linkId1, testAgent1));
-//					congestionHandler.handleEvent(ef.createLinkEnterEvent(1, testAgent1, linkId2, testAgent1));
-//					
-//					// starte agent 2 mit 5 sec Verzögerung
-//					congestionHandler.handleEvent(ef.createAgentDepartureEvent(5, testAgent2, linkId1, "car"));
-//					congestionHandler.handleEvent(ef.createLinkLeaveEvent(6, testAgent2, linkId1, testAgent2));
-//					congestionHandler.handleEvent(ef.createLinkEnterEvent(6, testAgent2, linkId2, testAgent2));
-//					
-//					// starte agent 3 mit 120 sec Verzögerung
-//					congestionHandler.handleEvent(ef.createAgentDepartureEvent(120, testAgent3, linkId1, "car"));
-//					congestionHandler.handleEvent(ef.createLinkLeaveEvent(121, testAgent3, linkId1, testAgent3));
-//					congestionHandler.handleEvent(ef.createLinkEnterEvent(121, testAgent3, linkId2, testAgent3));
-//					
-//					// agent 1 kann problemlos link 2 verlassen
-//					congestionHandler.handleEvent(ef.createLinkLeaveEvent(51, testAgent1, linkId2, testAgent1));
-//					congestionHandler.handleEvent(ef.createLinkEnterEvent(51, testAgent1, linkId3, testAgent1));
-//					
-//					// agent 2 muss warten
-//					// freeFlowLeaveTime + flowCapacityDelay + 1sec = enterTime + freeTravelTime + flowCapacityDelay + 1sec
-//					congestionHandler.handleEvent(ef.createLinkLeaveEvent(6 + 50 + 55 + 1, testAgent2, linkId2, testAgent2));
-//					congestionHandler.handleEvent(ef.createLinkEnterEvent(6 + 50 + 55 + 1, testAgent2, linkId3, testAgent2));
-//					
-//					// agent 3 kann problemlos link 2 verlassen (der Stau hat sich bereits aufgelöst)
-//					// freeFlowLeaveTime + flowCapacityDelay + 1sec = enterTime + freeTravelTime + flowCapacityDelay + 1sec
-//					congestionHandler.handleEvent(ef.createLinkLeaveEvent(121 + 50 + 0 + 1, testAgent3, linkId2, testAgent3));
-//					congestionHandler.handleEvent(ef.createLinkEnterEvent(121 + 50 + 0 + 1, testAgent3, linkId3, testAgent3));
-//					
-//					// *****************
-//								
-//					for (MarginalCongestionEvent event : congestionEvents){
-//						
-//						if (event.getCausingAgentId().toString().equals(testAgent1.toString())){
-//
-//							if (event.getAffectedAgentId().toString().equals(testAgent1.toString())){
-//								throw new RuntimeException();
-//
-//							} else if (event.getAffectedAgentId().toString().equals(testAgent2.toString())){
-//								Assert.assertEquals("external delay", 55, event.getDelay(), MatsimTestUtils.EPSILON);
-//								Assert.assertEquals("congested link", linkId2.toString(), event.getLinkId().toString());
-//								
-//							} else if (event.getAffectedAgentId().toString().equals(testAgent3.toString())){
-//								throw new RuntimeException();
-//								
-//							} else {
-//								throw new RuntimeException();
-//							}
-//							
-//						} else if (event.getCausingAgentId().toString().equals(testAgent2.toString())) {
-//							if (event.getAffectedAgentId().toString().equals(testAgent1.toString())){
-//								throw new RuntimeException();
-//								
-//							} else if (event.getAffectedAgentId().toString().equals(testAgent2.toString())){
-//								throw new RuntimeException();
-//												
-//							} else if (event.getAffectedAgentId().toString().equals(testAgent3.toString())){
-//								throw new RuntimeException();
-//								
-//							} else {
-//								throw new RuntimeException();
-//							}	
-//						
-//						} else {
-//							throw new RuntimeException();
-//						}
-//					}
-//				}
-//		
-//		// 2 agenten, agent 2 20 sec nach agent 1, agent 2 zusätzlich um 100 sec verzögert
-//		@Test
-//		public final void testStorageCongestion1(){
-//			
-//			loadScenario();
-//			setPopulation();
-//			setLinks_storageCapacityConstraints_link3_link4();
-//			
-//			final List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
-//								
-//			events.addHandler( new MarginalCongestionEventHandler() {
-//
-//				@Override
-//				public void reset(int iteration) {				
-//				}
-//
-//				@Override
-//				public void handleEvent(MarginalCongestionEvent event) {
-//					congestionEvents.add(event);
-//				}
-//				
-//			});
-//							
-//			MarginalCongestionHandler congestionHandler = new MarginalCongestionHandler(this.events, this.scenario);
-//			
-//			// starte agent 1
-//			congestionHandler.handleEvent(ef.createAgentDepartureEvent(0, testAgent1, linkId1, "car"));
-//			congestionHandler.handleEvent(ef.createLinkLeaveEvent(1, testAgent1, linkId1, testAgent1));
-//			congestionHandler.handleEvent(ef.createLinkEnterEvent(1, testAgent1, linkId2, testAgent1));
-//			
-//			// starte agent 2 mit 20 sec Verzögerung
-//			congestionHandler.handleEvent(ef.createAgentDepartureEvent(20, testAgent2, linkId1, "car"));
-//			congestionHandler.handleEvent(ef.createLinkLeaveEvent(21, testAgent2, linkId1, testAgent2));
-//			congestionHandler.handleEvent(ef.createLinkEnterEvent(21, testAgent2, linkId2, testAgent2));
-//			
-//			// agent 1 kann link 2 problemlos verlassen
-//			congestionHandler.handleEvent(ef.createLinkLeaveEvent(51, testAgent1, linkId2, testAgent1));
-//			congestionHandler.handleEvent(ef.createLinkEnterEvent(51, testAgent1, linkId3, testAgent1));
-//			
-//			// agent 2 muss durch die flowCapacity 40 sec warten und wird dann nochmal zusätzlich um 100 sec verzögert
-//			// freeFlowLeaveTime + flowCapacityDelay + storageCapacityDelay + 1sec = enterTime + freeTravelTime + flowCapacityDelay + storageCapacityDelay + 1sec
-//			congestionHandler.handleEvent(ef.createLinkLeaveEvent(21 + 50 + 40 + 100 + 1, testAgent2, linkId2, testAgent2));
-//			congestionHandler.handleEvent(ef.createLinkEnterEvent(21 + 50 + 40 + 100 + 1, testAgent2, linkId3, testAgent2));
-//
-//			// *****************
-//			
-//			Assert.assertEquals("number of congestion events", 1, congestionEvents.size());
-//
-//			MarginalCongestionEvent congEvent = congestionEvents.get(0);
-//			Assert.assertEquals("capacity constraint", "storageCapacity", congEvent.getCapacityConstraint());
-//			Assert.assertEquals("external delay", 100, congEvent.getDelay(), MatsimTestUtils.EPSILON);
-//			Assert.assertEquals("congested link", linkId2.toString(), congEvent.getLinkId().toString());
-//			Assert.assertEquals("causing Agent", testAgent1.toString(), congEvent.getCausingAgentId().toString());
-//			Assert.assertEquals("affected Agent", testAgent2.toString(), congEvent.getAffectedAgentId().toString());
-//		}	
-//			
-//		// 3 agenten, agent 2 20 sec nach agent 1, agent 2 zusätzlich um 100 sec verzögert, agent 3 nach agent 2 auf link 2
-//		@Test
-//		public final void testStorageCongestion2(){
-//			
-//			loadScenario();
-//			setPopulation();
-//			setLinks_storageCapacityConstraints_link3_link4();
-//			
-//			final List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
-//								
-//			events.addHandler( new MarginalCongestionEventHandler() {
-//
-//				@Override
-//				public void reset(int iteration) {				
-//				}
-//
-//				@Override
-//				public void handleEvent(MarginalCongestionEvent event) {
-//					congestionEvents.add(event);
-//				}
-//				
-//			});
-//							
-//			MarginalCongestionHandler congestionHandler = new MarginalCongestionHandler(this.events, this.scenario);
-//			
-//			// starte agent 1
-//			congestionHandler.handleEvent(ef.createAgentDepartureEvent(0, testAgent1, linkId1, "car"));
-//			congestionHandler.handleEvent(ef.createLinkLeaveEvent(1, testAgent1, linkId1, testAgent1));
-//			congestionHandler.handleEvent(ef.createLinkEnterEvent(1, testAgent1, linkId2, testAgent1));
-//			
-//			// starte agent 2 mit 20 sec Verzögerung
-//			congestionHandler.handleEvent(ef.createAgentDepartureEvent(20, testAgent2, linkId1, "car"));
-//			congestionHandler.handleEvent(ef.createLinkLeaveEvent(21, testAgent2, linkId1, testAgent2));
-//			congestionHandler.handleEvent(ef.createLinkEnterEvent(21, testAgent2, linkId2, testAgent2));
-//			
-//			// agent 3 fährt nach agent 2 auf link2, dort bleibt er die ganze Zeit über
-//			congestionHandler.handleEvent(ef.createLinkEnterEvent(30, testAgent3, linkId2, testAgent3));
-//			
-//			// agent 1 kann link 2 problemlos verlassen
-//			congestionHandler.handleEvent(ef.createLinkLeaveEvent(51, testAgent1, linkId2, testAgent1));
-//			congestionHandler.handleEvent(ef.createLinkEnterEvent(51, testAgent1, linkId3, testAgent1));
-//			
-//			// agent 2 muss durch die flowCapacity 40 sec warten und wird dann nochmal zusätzlich um 100 sec verzögert
-//			// freeFlowLeaveTime + flowCapacityDelay + storageCapacityDelay + 1sec = enterTime + freeTravelTime + flowCapacityDelay + storageCapacityDelay + 1sec
-//			congestionHandler.handleEvent(ef.createLinkLeaveEvent(21 + 50 + 40 + 100 + 1, testAgent2, linkId2, testAgent2));
-//			congestionHandler.handleEvent(ef.createLinkEnterEvent(21 + 50 + 40 + 100 + 1, testAgent2, linkId3, testAgent2));
-//
-//			// *****************
-//			
-//			Assert.assertEquals("number of congestion events", 1, congestionEvents.size());
-//
-//			for (MarginalCongestionEvent congEvent : congestionEvents) {
-//				
-//				if (congEvent.getCausingAgentId().toString().equals(testAgent1.toString())){
-//					Assert.assertEquals("capacity constraint", "storageCapacity", congEvent.getCapacityConstraint());
-//					Assert.assertEquals("external delay", 100, congEvent.getDelay(), MatsimTestUtils.EPSILON);
-//					Assert.assertEquals("congested link", linkId2.toString(), congEvent.getLinkId().toString());
-//					Assert.assertEquals("affected Agent", testAgent2.toString(), congEvent.getAffectedAgentId().toString());
-//				
-//				} else {
-//					throw new RuntimeException();
-//				}
-//			}
-//		}	
-//		
-//		// 3 agenten, agent 2 20 sec nach agent 1, agent 2 zusätzlich um 100 sec verzögert, agent 3 vor agent 1 und 2 auf link 2
-//		@Test
-//		public final void testStorageCongestion3(){
-//			
-//			loadScenario();
-//			setPopulation();
-//			setLinks_storageCapacityConstraints_link3_link4();
-//			
-//			final List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
-//								
-//			events.addHandler( new MarginalCongestionEventHandler() {
-//
-//				@Override
-//				public void reset(int iteration) {				
-//				}
-//
-//				@Override
-//				public void handleEvent(MarginalCongestionEvent event) {
-//					congestionEvents.add(event);
-//				}
-//				
-//			});
-//							
-//			MarginalCongestionHandler congestionHandler = new MarginalCongestionHandler(this.events, this.scenario);
-//			
-//			// agent 3 fährt vor agent 2 und 1 auf link 2 und bleibt dort die ganze Zeit über
-//			congestionHandler.handleEvent(ef.createLinkEnterEvent(0, testAgent3, linkId2, testAgent3));
-//			
-//			// starte agent 1
-//			congestionHandler.handleEvent(ef.createAgentDepartureEvent(100, testAgent1, linkId1, "car"));
-//			congestionHandler.handleEvent(ef.createLinkLeaveEvent(101, testAgent1, linkId1, testAgent1));
-//			congestionHandler.handleEvent(ef.createLinkEnterEvent(101, testAgent1, linkId2, testAgent1));
-//						
-//			// starte agent 2 mit 20 sec Verzögerung
-//			congestionHandler.handleEvent(ef.createAgentDepartureEvent(120, testAgent2, linkId1, "car"));
-//			congestionHandler.handleEvent(ef.createLinkLeaveEvent(121, testAgent2, linkId1, testAgent2));
-//			congestionHandler.handleEvent(ef.createLinkEnterEvent(121, testAgent2, linkId2, testAgent2));
-//			
-//			// agent 1 kann link 2 problemlos verlassen
-//			congestionHandler.handleEvent(ef.createLinkLeaveEvent(151, testAgent1, linkId2, testAgent1));
-//			congestionHandler.handleEvent(ef.createLinkEnterEvent(151, testAgent1, linkId3, testAgent1));
-//			
-//			// agent 2 muss durch die flowCapacity 40 sec warten und wird dann nochmal zusätzlich um 100 sec verzögert
-//			// freeFlowLeaveTime + flowCapacityDelay + storageCapacityDelay + 1sec = enterTime + freeTravelTime + flowCapacityDelay + storageCapacityDelay + 1sec
-//			congestionHandler.handleEvent(ef.createLinkLeaveEvent(121 + 50 + 40 + 100 + 1, testAgent2, linkId2, testAgent2));
-//			congestionHandler.handleEvent(ef.createLinkEnterEvent(121 + 50 + 40 + 100 + 1, testAgent2, linkId3, testAgent2));
-//
-//			// *****************
-//			
-//			Assert.assertEquals("number of congestion events", 2, congestionEvents.size());
-//
-//			for (MarginalCongestionEvent congEvent : congestionEvents) {
-//				
-//				if (congEvent.getCausingAgentId().toString().equals(testAgent1.toString())){
-//					Assert.assertEquals("capacity constraint", "storageCapacity", congEvent.getCapacityConstraint());
-//					Assert.assertEquals("external delay", 50, congEvent.getDelay(), MatsimTestUtils.EPSILON);
-//					Assert.assertEquals("congested link", linkId2.toString(), congEvent.getLinkId().toString());
-//					Assert.assertEquals("affected Agent", testAgent2.toString(), congEvent.getAffectedAgentId().toString());
-//				
-//				} else if (congEvent.getCausingAgentId().toString().equals(testAgent3.toString())){
-//					Assert.assertEquals("capacity constraint", "storageCapacity", congEvent.getCapacityConstraint());
-//					Assert.assertEquals("external delay", 50, congEvent.getDelay(), MatsimTestUtils.EPSILON);
-//					Assert.assertEquals("congested link", linkId2.toString(), congEvent.getLinkId().toString());
-//					Assert.assertEquals("affected Agent", testAgent2.toString(), congEvent.getAffectedAgentId().toString());
-//				
-//				} else {
-//					throw new RuntimeException();
-//				}
-//			}
-//		}
-//		
-//		// 3 agenten, agent 2 20 sec nach agent 1, agent 2 zusätzlich um 100 sec verzögert, agent 3 vor agent 1 und 2 auf link 4, storage capacity auf link 4 erreicht
-//		@Test
-//		public final void testStorageCongestion4(){
-//			
-//			loadScenario();
-//			setPopulation();
-//			setLinks_storageCapacityConstraints_link3_link4();
-//			
-//			final List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
-//								
-//			events.addHandler( new MarginalCongestionEventHandler() {
-//
-//				@Override
-//				public void reset(int iteration) {				
-//				}
-//
-//				@Override
-//				public void handleEvent(MarginalCongestionEvent event) {
-//					congestionEvents.add(event);
-//				}
-//				
-//			});
-//							
-//			MarginalCongestionHandler congestionHandler = new MarginalCongestionHandler(this.events, this.scenario);
-//			
-//			// agent 3 fährt vor agent 2 und 1 auf link 4 und bleibt dort die ganze Zeit über
-//			// storage capacity auf link 4 erreicht
-//			congestionHandler.handleEvent(ef.createLinkEnterEvent(0, testAgent3, linkId4, testAgent3));
-//			
-//			// starte agent 1
-//			congestionHandler.handleEvent(ef.createAgentDepartureEvent(100, testAgent1, linkId1, "car"));
-//			congestionHandler.handleEvent(ef.createLinkLeaveEvent(101, testAgent1, linkId1, testAgent1));
-//			congestionHandler.handleEvent(ef.createLinkEnterEvent(101, testAgent1, linkId2, testAgent1));
-//						
-//			// starte agent 2 mit 20 sec Verzögerung
-//			congestionHandler.handleEvent(ef.createAgentDepartureEvent(120, testAgent2, linkId1, "car"));
-//			congestionHandler.handleEvent(ef.createLinkLeaveEvent(121, testAgent2, linkId1, testAgent2));
-//			congestionHandler.handleEvent(ef.createLinkEnterEvent(121, testAgent2, linkId2, testAgent2));
-//			
-//			// agent 1 kann link 2 problemlos verlassen
-//			congestionHandler.handleEvent(ef.createLinkLeaveEvent(151, testAgent1, linkId2, testAgent1));
-//			congestionHandler.handleEvent(ef.createLinkEnterEvent(151, testAgent1, linkId3, testAgent1));
-//			
-//			// agent 2 muss durch die flowCapacity 40 sec warten und wird dann nochmal zusätzlich um 100 sec verzögert
-//			// freeFlowLeaveTime + flowCapacityDelay + storageCapacityDelay + 1sec = enterTime + freeTravelTime + flowCapacityDelay + storageCapacityDelay + 1sec
-//			congestionHandler.handleEvent(ef.createLinkLeaveEvent(121 + 50 + 40 + 100 + 1, testAgent2, linkId2, testAgent2));
-//			congestionHandler.handleEvent(ef.createLinkEnterEvent(121 + 50 + 40 + 100 + 1, testAgent2, linkId3, testAgent2));
-//
-//			// *****************
-//			
-//			Assert.assertEquals("number of congestion events", 2, congestionEvents.size());
-//
-//			for (MarginalCongestionEvent congEvent : congestionEvents) {
-//				
-//				if (congEvent.getCausingAgentId().toString().equals(testAgent1.toString())){
-//					Assert.assertEquals("capacity constraint", "storageCapacity", congEvent.getCapacityConstraint());
-//					Assert.assertEquals("external delay", 50, congEvent.getDelay(), MatsimTestUtils.EPSILON);
-//					Assert.assertEquals("congested link", linkId2.toString(), congEvent.getLinkId().toString());
-//					Assert.assertEquals("affected Agent", testAgent2.toString(), congEvent.getAffectedAgentId().toString());
-//				
-//				} else if (congEvent.getCausingAgentId().toString().equals(testAgent3.toString())){
-//					Assert.assertEquals("capacity constraint", "storageCapacity", congEvent.getCapacityConstraint());
-//					Assert.assertEquals("external delay", 50, congEvent.getDelay(), MatsimTestUtils.EPSILON);
-//					Assert.assertEquals("congested link", linkId2.toString(), congEvent.getLinkId().toString());
-//					Assert.assertEquals("affected Agent", testAgent2.toString(), congEvent.getAffectedAgentId().toString());
-//				
-//				} else {
-//					throw new RuntimeException();
-//				}
-//			}
-//		}
-//		
-//		// 3 agenten, agent 2 20 sec nach agent 1, agent 2 zusätzlich um 100 sec verzögert, agent 3 vor agent 1 und 2 auf link 4, link 4 ist nicht voll
-//		@Test
-//		public final void testStorageCongestion5(){
-//			
-//			loadScenario();
-//			setPopulation();
-//			setLinks_storageCapacityConstraints_link3();
-//			
-//			final List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
-//								
-//			events.addHandler( new MarginalCongestionEventHandler() {
-//
-//				@Override
-//				public void reset(int iteration) {				
-//				}
-//
-//				@Override
-//				public void handleEvent(MarginalCongestionEvent event) {
-//					congestionEvents.add(event);
-//				}
-//				
-//			});
-//							
-//			MarginalCongestionHandler congestionHandler = new MarginalCongestionHandler(this.events, this.scenario);
-//			
-//			// agent 3 fährt vor agent 2 und 1 auf link 4 und bleibt dort die ganze Zeit über
-//			// storage capacity auf link 4 nicht erreicht
-//			congestionHandler.handleEvent(ef.createLinkEnterEvent(0, testAgent3, linkId4, testAgent3));
-//			
-//			// starte agent 1
-//			congestionHandler.handleEvent(ef.createAgentDepartureEvent(100, testAgent1, linkId1, "car"));
-//			congestionHandler.handleEvent(ef.createLinkLeaveEvent(101, testAgent1, linkId1, testAgent1));
-//			congestionHandler.handleEvent(ef.createLinkEnterEvent(101, testAgent1, linkId2, testAgent1));
-//						
-//			// starte agent 2 mit 20 sec Verzögerung
-//			congestionHandler.handleEvent(ef.createAgentDepartureEvent(120, testAgent2, linkId1, "car"));
-//			congestionHandler.handleEvent(ef.createLinkLeaveEvent(121, testAgent2, linkId1, testAgent2));
-//			congestionHandler.handleEvent(ef.createLinkEnterEvent(121, testAgent2, linkId2, testAgent2));
-//			
-//			// agent 1 kann link 2 problemlos verlassen
-//			congestionHandler.handleEvent(ef.createLinkLeaveEvent(151, testAgent1, linkId2, testAgent1));
-//			congestionHandler.handleEvent(ef.createLinkEnterEvent(151, testAgent1, linkId3, testAgent1));
-//			
-//			// agent 2 muss durch die flowCapacity 40 sec warten und wird dann nochmal zusätzlich um 100 sec verzögert
-//			// freeFlowLeaveTime + flowCapacityDelay + storageCapacityDelay + 1sec = enterTime + freeTravelTime + flowCapacityDelay + storageCapacityDelay + 1sec
-//			congestionHandler.handleEvent(ef.createLinkLeaveEvent(121 + 50 + 40 + 100 + 1, testAgent2, linkId2, testAgent2));
-//			congestionHandler.handleEvent(ef.createLinkEnterEvent(121 + 50 + 40 + 100 + 1, testAgent2, linkId3, testAgent2));
-//
-//			// *****************
-//			
-//			Assert.assertEquals("number of congestion events", 1, congestionEvents.size());
-//
-//			for (MarginalCongestionEvent congEvent : congestionEvents) {
-//				
-//				if (congEvent.getCausingAgentId().toString().equals(testAgent1.toString())){
-//					Assert.assertEquals("capacity constraint", "storageCapacity", congEvent.getCapacityConstraint());
-//					Assert.assertEquals("external delay", 100, congEvent.getDelay(), MatsimTestUtils.EPSILON);
-//					Assert.assertEquals("congested link", linkId2.toString(), congEvent.getLinkId().toString());
-//					Assert.assertEquals("affected Agent", testAgent2.toString(), congEvent.getAffectedAgentId().toString());
-//				
-//				} else {
-//					throw new RuntimeException();
-//				}
-//			}
-//		}
-//		
-//		@Test
-//		public final void testStorageCongestion6(){
-//			
-//			loadScenario();
-//			setPopulation();
-//			setLinks_storageCapacityConstraints_link3_link4();
-//			
-//			final List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
-//								
-//			events.addHandler( new MarginalCongestionEventHandler() {
-//
-//				@Override
-//				public void reset(int iteration) {				
-//				}
-//
-//				@Override
-//				public void handleEvent(MarginalCongestionEvent event) {
-//					congestionEvents.add(event);
-//				}
-//				
-//			});
-//							
-//			MarginalCongestionHandler congestionHandler = new MarginalCongestionHandler(this.events, this.scenario);
-//			
-//			// agent 2 fährt in der 51. sec auf link 2, leave time = 102 
-//			congestionHandler.handleEvent(ef.createLinkEnterEvent(51, testAgent2, linkId2, testAgent2));
-//			
-//			// agent 1 fährt auf link 3 und blockiert diesen link
-//			congestionHandler.handleEvent(ef.createLinkEnterEvent(101, testAgent1, linkId3, testAgent1));
-//			// agent 1 verlässt link 3 und gibt den blockierten link wieder frei
-//			congestionHandler.handleEvent(ef.createLinkLeaveEvent(103, testAgent1, linkId3, testAgent1));
-//			
-//			// da agent 1 link 3 verlassen hat, kann agent 2 auf link 3 fahren, statt zur 102. sec zur 104. --> 2 sec Verspätung
-//			congestionHandler.handleEvent(ef.createLinkLeaveEvent(104, testAgent2, linkId2, testAgent2));
-//			congestionHandler.handleEvent(ef.createLinkEnterEvent(104, testAgent2, linkId3, testAgent2));
-//
-//			// *****************
-//			
-//			Assert.assertEquals("number of congestion events", 1, congestionEvents.size());
-//
-//			for (MarginalCongestionEvent congEvent : congestionEvents) {
-//				
-//				if (congEvent.getCausingAgentId().toString().equals(testAgent1.toString())){
-//					Assert.assertEquals("capacity constraint", "storageCapacity", congEvent.getCapacityConstraint());
-//					Assert.assertEquals("external delay", 2., congEvent.getDelay(), MatsimTestUtils.EPSILON);
-//					Assert.assertEquals("congested link", linkId2.toString(), congEvent.getLinkId().toString());
-//					Assert.assertEquals("affected Agent", testAgent2.toString(), congEvent.getAffectedAgentId().toString());
-//				
-//				} else {
-//					throw new RuntimeException();
-//				}
-//			}
-//		}
-//
-//		@Test
-//		public final void testStorageCongestion7(){
-//			
-//			loadScenario();
-//			setPopulation();
-//			setLinks_storageCapacityConstraints_link3_link4();
-//			
-//			final List<MarginalCongestionEvent> congestionEvents = new ArrayList<MarginalCongestionEvent>();
-//								
-//			events.addHandler( new MarginalCongestionEventHandler() {
-//
-//				@Override
-//				public void reset(int iteration) {				
-//				}
-//
-//				@Override
-//				public void handleEvent(MarginalCongestionEvent event) {
-//					congestionEvents.add(event);
-//				}
-//				
-//			});
-//							
-//			MarginalCongestionHandler congestionHandler = new MarginalCongestionHandler(this.events, this.scenario);
-//			
-//			// agent 2 fährt in der 51. sec auf link 2, leave time = 102 
-//			congestionHandler.handleEvent(ef.createLinkEnterEvent(51, testAgent2, linkId2, testAgent2));
-//			
-//			// agent 1 fährt auf link 3 und blockiert diesen link
-//			congestionHandler.handleEvent(ef.createLinkEnterEvent(101, testAgent1, linkId3, testAgent1));
-//			// agent 1 beginnt auf link 3 mit einer Aktivität, der blockierte link wird wieder frei
-//			congestionHandler.handleEvent(ef.createAgentArrivalEvent(103, testAgent1, linkId3, "car"));
-//			
-//			// da agent 1 link 3 verlassen hat, kann agent 2 auf link 3 fahren, statt zur 102. sec zur 104. --> 2 sec Verspätung
-//			congestionHandler.handleEvent(ef.createLinkLeaveEvent(104, testAgent2, linkId2, testAgent2));
-//			congestionHandler.handleEvent(ef.createLinkEnterEvent(104, testAgent2, linkId3, testAgent2));
-//
-//			// *****************
-//			
-//			Assert.assertEquals("number of congestion events", 1, congestionEvents.size());
-//
-//			for (MarginalCongestionEvent congEvent : congestionEvents) {
-//				
-//				if (congEvent.getCausingAgentId().toString().equals(testAgent1.toString())){
-//					Assert.assertEquals("capacity constraint", "storageCapacity", congEvent.getCapacityConstraint());
-//					Assert.assertEquals("external delay", 2., congEvent.getDelay(), MatsimTestUtils.EPSILON);
-//					Assert.assertEquals("congested link", linkId2.toString(), congEvent.getLinkId().toString());
-//					Assert.assertEquals("affected Agent", testAgent2.toString(), congEvent.getAffectedAgentId().toString());
-//				
-//				} else {
-//					throw new RuntimeException();
-//				}
-//			}
-//		}
-//	
-//	
 //	// *************************************************************************************************************************
 //
 //		private void setPopulation() {
@@ -1047,7 +474,7 @@
 //		
 //		Link link2 = this.scenario.getNetwork().getLinks().get(linkId2);
 //		link2.setAllowedModes(modes);
-//		link2.setCapacity(60); // 60 --> 1 car/min // 3600 --> 1 car/sec 
+//		link2.setCapacity(360); // 360 --> every 10 sec one car
 //		link2.setFreespeed(10); // 10 --> 36 km/h // 50 sec pro 500 m
 //		link2.setNumberOfLanes(1);
 //		link2.setLength(500);
@@ -1057,7 +484,7 @@
 //		link3.setCapacity(7200); // 7200 --> 2 cars/sec 
 //		link3.setFreespeed(10); // 10 --> 36 km/h // 50 sec pro 500 m
 //		link3.setNumberOfLanes(1);
-//		link3.setLength(500);
+//		link3.setLength(15);
 //		
 //		Link link4 = this.scenario.getNetwork().getLinks().get(linkId4);
 //		link4.setAllowedModes(modes);
@@ -1066,72 +493,5 @@
 //		link4.setNumberOfLanes(1);
 //		link4.setLength(500);
 //	}
-//	
-//	private void setLinks_storageCapacityConstraints_link3_link4() {
-//		Set<String> modes = new HashSet<String>();
-//		modes.add("car");
-//		
-//		Link link1 = this.scenario.getNetwork().getLinks().get(linkId1);
-//		link1.setAllowedModes(modes);
-//		link1.setCapacity(7200); // 7200 --> 2 cars/sec 
-//		link1.setFreespeed(10); // 10 --> 36 km/h // 50 sec pro 500 m
-//		link1.setNumberOfLanes(1);
-//		link1.setLength(500);
-//		
-//		Link link2 = this.scenario.getNetwork().getLinks().get(linkId2);
-//		link2.setAllowedModes(modes);
-//		link2.setCapacity(60); // 60 --> 1 car/min // 3600 --> 1 car/sec 
-//		link2.setFreespeed(10); // 10 --> 36 km/h // 50 sec pro 500 m
-//		link2.setNumberOfLanes(1);
-//		link2.setLength(500);
-//		
-//		Link link3 = this.scenario.getNetwork().getLinks().get(linkId3);
-//		link3.setAllowedModes(modes);
-//		link3.setCapacity(7200); // 7200 --> 2 cars/sec 
-//		link3.setFreespeed(10);
-//		link3.setNumberOfLanes(1);
-//		link3.setLength(10);
-//		
-//		Link link4 = this.scenario.getNetwork().getLinks().get(linkId4);
-//		link4.setAllowedModes(modes);
-//		link4.setCapacity(7200); // 7200 --> 2 cars/sec 
-//		link4.setFreespeed(10); // 10 --> 36 km/h // 50 sec pro 500 m
-//		link4.setNumberOfLanes(1);
-//		link4.setLength(10);
-//	}
-//	
-//	private void setLinks_storageCapacityConstraints_link3() {
-//		Set<String> modes = new HashSet<String>();
-//		modes.add("car");
-//		
-//		Link link1 = this.scenario.getNetwork().getLinks().get(linkId1);
-//		link1.setAllowedModes(modes);
-//		link1.setCapacity(7200); // 7200 --> 2 cars/sec 
-//		link1.setFreespeed(10); // 10 --> 36 km/h // 50 sec pro 500 m
-//		link1.setNumberOfLanes(1);
-//		link1.setLength(500);
-//		
-//		Link link2 = this.scenario.getNetwork().getLinks().get(linkId2);
-//		link2.setAllowedModes(modes);
-//		link2.setCapacity(60); // 60 --> 1 car/min // 3600 --> 1 car/sec 
-//		link2.setFreespeed(10); // 10 --> 36 km/h // 50 sec pro 500 m
-//		link2.setNumberOfLanes(1);
-//		link2.setLength(500);
-//		
-//		Link link3 = this.scenario.getNetwork().getLinks().get(linkId3);
-//		link3.setAllowedModes(modes);
-//		link3.setCapacity(7200); // 7200 --> 2 cars/sec 
-//		link3.setFreespeed(10);
-//		link3.setNumberOfLanes(1);
-//		link3.setLength(7.5);
-//		
-//		Link link4 = this.scenario.getNetwork().getLinks().get(linkId4);
-//		link4.setAllowedModes(modes);
-//		link4.setCapacity(7200); // 7200 --> 2 cars/sec 
-//		link4.setFreespeed(10); // 10 --> 36 km/h // 50 sec pro 500 m
-//		link4.setNumberOfLanes(1);
-//		link4.setLength(500);	
-//	}
-//
 //	
 //}
