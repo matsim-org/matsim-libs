@@ -52,8 +52,8 @@ public class LinkCongestionInfo {
 	public void setLinkId(Id linkId) {
 		this.linkId = linkId;
 	}
-	public void setMarginalDelayPerLeavingVehicle(double flowCapacity_hour) {
-		this.marginalDelayPerLeavingVehicle_sec = Math.floor((1 / (flowCapacity_hour / 3600.) ) );
+	public void setMarginalDelayPerLeavingVehicle(double marginalDelay_sec) {
+		this.marginalDelayPerLeavingVehicle_sec = marginalDelay_sec;
 	}
 	public int getStorageCapacity_cars() {
 		return storageCapacity_cars;
