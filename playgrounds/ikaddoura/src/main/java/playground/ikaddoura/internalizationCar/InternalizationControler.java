@@ -47,8 +47,8 @@ public class InternalizationControler {
 			log.info("configFile: "+ configFile);
 			
 		} else {
-//			configFile = "/Users/Ihab/Desktop/internalization_input/config_internalization.xml";
-			configFile = "/Users/Ihab/Desktop/internalization_input/config_noInternalization.xml";
+			configFile = "/Users/Ihab/Desktop/internalization_input/config_internalization.xml";
+//			configFile = "/Users/Ihab/Desktop/internalization_input/config_noInternalization.xml";
 		}
 		
 		InternalizationControler main = new InternalizationControler();
@@ -59,7 +59,7 @@ public class InternalizationControler {
 		
 		Controler controler = new Controler(configFile);
 		controler.setOverwriteFiles(true);
-//		controler.addControlerListener(new InternalizationControlerListener( (ScenarioImpl) controler.getScenario()));
+		controler.addControlerListener(new InternalizationControlerListener( (ScenarioImpl) controler.getScenario()));
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());	
 		controler.run();
 		
