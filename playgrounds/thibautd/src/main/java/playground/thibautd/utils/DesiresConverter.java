@@ -44,7 +44,9 @@ public class DesiresConverter implements AttributeConverter<Desires> {
 	public Desires convert(final String value) {
 		try {
 			final Document doc = new SAXBuilder().build( new ByteArrayInputStream( value.getBytes() ) );
-			final Desires desires = new Desires( doc.getRootElement().getAttribute( "desc" ).getValue() );
+			final Desires desires = new Desires(
+					doc.getRootElement().getAttribute( "desc" ) == null ? null :
+					doc.getRootElement().getAttribute( "desc" ).getValue() );
 
 			for ( Object option : doc.getRootElement().getChildren( "actDur" ) ) {
 				final Element optionElem = (Element) option;
