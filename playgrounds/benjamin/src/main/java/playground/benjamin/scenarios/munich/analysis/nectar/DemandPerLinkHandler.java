@@ -30,37 +30,17 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.utils.collections.Tuple;
 
-public class DemandPerLinkHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandler,AgentDepartureEventHandler {
+public class DemandPerLinkHandler implements LinkLeaveEventHandler {
 	private static final Logger logger = Logger.getLogger(DemandPerLinkHandler.class);
 
-	Map<Id, Tuple<Id, Double>> linkenter = new HashMap<Id, Tuple<Id, Double>>();
-	Map<Id, Tuple<Id, Double>> agentarrival = new HashMap<Id, Tuple<Id, Double>>();
-	Map<Id, Tuple<Id, Double>> agentdeparture = new HashMap<Id, Tuple<Id, Double>>();
-	
-	Map<Double, Map<Id, Integer>> time2LinkIdAndDemand = new HashMap<Double, Map<Id, Integer>>();
-	Map<Double, Map<Id, Double>> time2LinkIdAndCongestionTime = new HashMap<Double, Map<Id,Double>>();
-	private final Network network;
+	Map<Double, Map<Id, Double>> time2LinkIdAndDemand = new HashMap<Double, Map<Id, Double>>();
 	private final int noOfTimeBins;
 	private final double timeBinSize;
 
-	int linkLeaveCnt = 0;
-	int linkLeaveWarnCnt = 0;
-	final int maxLinkLeaveWarnCnt = 3;
-
-	public DemandPerLinkHandler(Network network, double simulationEndTime, int noOfTimeBins) {
-		this.network = network;
+	public DemandPerLinkHandler(double simulationEndTime, int noOfTimeBins) {
 		this.noOfTimeBins = noOfTimeBins;
 		this.timeBinSize = simulationEndTime / noOfTimeBins;
 	}
@@ -68,24 +48,9 @@ public class DemandPerLinkHandler implements LinkEnterEventHandler, LinkLeaveEve
 	@Override
 	public void reset(final int iteration) {
 		this.time2LinkIdAndDemand.clear();
-		logger.info("Resetting travel demand aggregation to " + this.time2LinkIdAndDemand);
-		this.time2LinkIdAndCongestionTime.clear();
-		logger.info("Resetting congestion time aggregation to " + this.time2LinkIdAndCongestionTime);
-		
-		linkenter.clear();
-		agentarrival.clear();
-		agentdeparture.clear();
-		
-		linkLeaveCnt = 0;
-		linkLeaveWarnCnt = 0;
+		logger.info("Resetting travel demand aggregation per link to " + this.time2LinkIdAndDemand);
 	}
 
-	@Override
-	public void handleEvent(LinkEnterEvent event) {
-		Tuple<Id, Double> linkId2Time = new Tuple<Id, Double>(event.getLinkId(), event.getTime());
-		this.linkenter.put(event.getPersonId(), linkId2Time);
-	}
-	
 	@Override
 	public void handleEvent(final LinkLeaveEvent event) {
 		Id linkId = event.getLinkId();
@@ -95,108 +60,28 @@ public class DemandPerLinkHandler implements LinkEnterEventHandler, LinkLeaveEve
 		for(int i = 0; i < noOfTimeBins; i++){
 			if(linkLeaveTime > i * timeBinSize && linkLeaveTime <= (i + 1) * timeBinSize){
 				endOfTimeInterval = (i + 1) * timeBinSize;
-				Map<Id, Integer> linkId2Counts = new HashMap<Id, Integer>();
-
+				Map<Id, Double> linkId2Counts = new HashMap<Id, Double>();
+				double count = 1.;
+				
 				if(time2LinkIdAndDemand.get(endOfTimeInterval) == null){
-					linkId2Counts.put(linkId, 1);
+					linkId2Counts.put(linkId, count);
 				} else {
 					linkId2Counts = time2LinkIdAndDemand.get(endOfTimeInterval);
 					if(linkId2Counts.get(linkId) == null){
-						linkId2Counts.put(linkId, 1);
+						linkId2Counts.put(linkId, count);
 					} else {
-						int countsSoFar = linkId2Counts.get(linkId);
-						int newValue = countsSoFar + 1;
-						linkId2Counts.put(linkId, newValue);
+						double countsSoFar = linkId2Counts.get(linkId);
+						double countsAfter = countsSoFar + count;
+						linkId2Counts.put(linkId, countsAfter);
 					}
 				}
 				time2LinkIdAndDemand.put(endOfTimeInterval, linkId2Counts);
 			}
 		}
-		
-		
-		Id personId = event.getPersonId();
-		if(!this.linkenter.containsKey(event.getPersonId())){
-			if(linkLeaveWarnCnt < maxLinkLeaveWarnCnt){
-				logger.warn("Person " + personId + " is leaving link " + linkId + " without having entered. " +
-				"Thus, no emissions are calculated for this link leave event.");
-				if (linkLeaveWarnCnt == maxLinkLeaveWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED);
-			}
-			linkLeaveWarnCnt++;
-			return;
-		}
-		double enterTime = this.linkenter.get(personId).getSecond();
-		double travelTime;
-		if(!this.agentarrival.containsKey(personId) || !this.agentdeparture.containsKey(personId)){
-			travelTime = linkLeaveTime - enterTime;
-		}
-		else if(!this.agentarrival.get(personId).getFirst().equals(event.getLinkId())
-				|| !this.agentdeparture.get(personId).getFirst().equals(event.getLinkId())){
-
-			travelTime = linkLeaveTime - enterTime;
-		} else {
-		double arrivalTime = this.agentarrival.get(personId).getSecond();		
-		double departureTime = this.agentdeparture.get(personId).getSecond();	
-		travelTime = linkLeaveTime - enterTime - departureTime + arrivalTime;	
-		}
-		
-		double freeFlowSpeed = this.network.getLinks().get(linkId).getFreespeed();
-		double linkLength = this.network.getLinks().get(linkId).getLength();
-		double freeFlowTravelTime = linkLength / freeFlowSpeed;
-		
-		double timeSpentInCongestion;
-		if(travelTime <= freeFlowTravelTime){
-			timeSpentInCongestion = 0.0;
-		} else {
-			timeSpentInCongestion = travelTime - freeFlowTravelTime;
-		}
-		
-		for(int i = 0; i < noOfTimeBins; i++){
-			if(linkLeaveTime > i * timeBinSize && linkLeaveTime <= (i + 1) * timeBinSize){
-				endOfTimeInterval = (i + 1) * timeBinSize;
-				Map<Id, Double> linkId2CongestionTime = new HashMap<Id, Double>();
-
-				if(time2LinkIdAndCongestionTime.get(endOfTimeInterval) == null){
-					linkId2CongestionTime.put(linkId, timeSpentInCongestion);
-				} else {
-					linkId2CongestionTime = time2LinkIdAndCongestionTime.get(endOfTimeInterval);
-					if(linkId2CongestionTime.get(linkId) == null){
-						linkId2CongestionTime.put(linkId, timeSpentInCongestion);
-					} else {
-						double delaySoFar = linkId2CongestionTime.get(linkId);
-						double newValue = delaySoFar + timeSpentInCongestion;
-						linkId2CongestionTime.put(linkId, newValue);
-					}
-				}
-				time2LinkIdAndCongestionTime.put(endOfTimeInterval, linkId2CongestionTime);
-			}
-		}
-		
 	}
 
-	@Override
-	public void handleEvent(AgentArrivalEvent event) {
-		if(!event.getLegMode().equals("car")){ // link travel time calculation not neccessary for other modes
-			return;
-		}
-		Tuple<Id, Double> linkId2Time = new Tuple<Id, Double>(event.getLinkId(), event.getTime());
-		this.agentarrival.put(event.getPersonId(), linkId2Time);
-	}
-	
-	@Override
-	public void handleEvent(AgentDepartureEvent event) {
-		if(!event.getLegMode().equals("car")){ // link travel time calculation not neccessary for other modes
-			return;
-		}
-		Tuple<Id, Double> linkId2Time = new Tuple<Id, Double>(event.getLinkId(), event.getTime());
-		this.agentdeparture.put(event.getPersonId(), linkId2Time);
-	}
-	
-	public Map<Double, Map<Id, Integer>> getDemandPerLinkAndTimeInterval() {
+	public Map<Double, Map<Id, Double>> getDemandPerLinkAndTimeInterval() {
 		return this.time2LinkIdAndDemand;
-	}
-
-	public Map<Double, Map<Id, Double>> getCongestionTimePerLinkAndTimeInterval() {
-		return this.time2LinkIdAndCongestionTime;
 	}
 
 }
