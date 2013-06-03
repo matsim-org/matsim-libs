@@ -116,6 +116,7 @@ public class SpatialAveraging {
 	final int noOfYbins = 120;
 	final double smoothingRadius_m = 500.; 
 	final String pollutant2analyze = WarmPollutant.NO2.toString();
+	final AveragingMethod avm = AveragingMethod.AVERAGE;
 	final boolean baseCaseOnly = false;
 	final boolean calculateRelativeChange = false;
 
@@ -172,10 +173,10 @@ public class SpatialAveraging {
 		Map<Double, double[][]> time2Demand = new HashMap<Double, double[][]>();
 		Map<Double, double[][]> time2Emissions = new HashMap<Double, double[][]>();
 		for(double endOfTimeInterval : time2DemandMapToAnalyze.keySet()){
-			double[][] demand = performSpatialAveragingForDemand(time2DemandMapToAnalyze, endOfTimeInterval, AveragingMethod.AVERAGE);
+			double[][] demand = performSpatialAveragingForDemand(time2DemandMapToAnalyze, endOfTimeInterval);
 			writeRoutput(demand, outPathStub + ".Routput.Demand" + "." + endOfTimeInterval + ".txt");
 			time2Demand.put(endOfTimeInterval, demand);
-			double[][] emissions = performSpatialAveragingForEmissions(time2EmissionMapToAnalyze, endOfTimeInterval, AveragingMethod.AVERAGE);
+			double[][] emissions = performSpatialAveragingForEmissions(time2EmissionMapToAnalyze, endOfTimeInterval);
 			writeRoutput(emissions, outPathStub + ".Routput." + pollutant2analyze.toString() + "." + endOfTimeInterval + ".txt");
 			time2Emissions.put(endOfTimeInterval, emissions);
 		}
@@ -256,8 +257,7 @@ public class SpatialAveraging {
 
 	private double[][] getResults(
 				double[][] sumOfweightedValuesForCell,
-				double[][] sumOfweightsForCell,
-				AveragingMethod avm) {
+				double[][] sumOfweightsForCell) {
 			
 			double[][] results = new double[noOfXbins][noOfYbins];
 			final double area_in_smoothing_circle_sqkm = (Math.PI * this.smoothingRadius_m * this.smoothingRadius_m) * 1000. * 1000.;
@@ -280,8 +280,7 @@ public class SpatialAveraging {
 
 	private double[][] performSpatialAveragingForEmissions(
 			Map<Double, Map<Id, Map<String, Double>>> time2EmissionMapToAnalyze,
-			double endOfTimeInterval,
-			AveragingMethod avm) {
+			double endOfTimeInterval) {
 		
 		Map<Id, Map<String, Double>> emissionMapToAnalyze = time2EmissionMapToAnalyze.get(endOfTimeInterval);
 		double[][] sumOfweightsForCell = new double[noOfXbins][noOfYbins];
@@ -303,14 +302,13 @@ public class SpatialAveraging {
 				}
 			}
 		}
-		double[][] results = getResults(sumOfweightedValuesForCell, sumOfweightsForCell, avm);
+		double[][] results = getResults(sumOfweightedValuesForCell, sumOfweightsForCell);
 		return results;
 	}
 
 	private double[][] performSpatialAveragingForDemand(
 			Map<Double, Map<Id, Double>> time2DemandMapToAnalyze,
-			double endOfTimeInterval,
-			AveragingMethod avm) {
+			double endOfTimeInterval) {
 		
 		Map<Id, Double> demandMapToAnalyze = time2DemandMapToAnalyze.get(endOfTimeInterval);
 		double[][] sumOfweightsForCell = new double[noOfXbins][noOfYbins];
@@ -331,7 +329,7 @@ public class SpatialAveraging {
 				}
 			}
 		}
-		double[][] results = getResults(sumOfweightedValuesForCell, sumOfweightsForCell, avm);
+		double[][] results = getResults(sumOfweightedValuesForCell, sumOfweightsForCell);
 		return results;
 	}
 
