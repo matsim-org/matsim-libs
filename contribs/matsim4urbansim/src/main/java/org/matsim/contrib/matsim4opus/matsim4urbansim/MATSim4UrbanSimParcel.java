@@ -35,8 +35,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.contrib.matsim4opus.config.M4UImprovedPseudoPtConfigUtils;
 import org.matsim.contrib.matsim4opus.config.M4UConfigurationConverterV4;
+import org.matsim.contrib.matsim4opus.config.M4UImprovedPseudoPtConfigUtils;
 import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigModule;
 import org.matsim.contrib.matsim4opus.config.modules.ImprovedPseudoPtConfigModule;
 import org.matsim.contrib.matsim4opus.config.modules.M4UControlerConfigModuleV3;
@@ -56,7 +56,6 @@ import org.matsim.contrib.matsim4opus.utils.network.NetworkBoundaryBox;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.controler.AbstractController;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -117,14 +116,13 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 	double timeOfDay	 = -1.;
 	
 	// run selected controler
-	boolean computeParcelBasedAccessibility			 = false;
-	boolean computeParcelBasedAccessibilitiesOnShapeFileBoundaries= false;
-	boolean computeParcelBasedAccessibilitiesOnNetworkOrCustomBoundaryBoxBoundaries = false; // may lead to "out of memory" error when either one/some of this is true: high resolution, huge network, less memory
-	boolean computeZoneBasedAccessibilities			 = false;
-	boolean computeZone2ZoneImpedance		   		 = false;
-	boolean computeAgentPerformance					 = false;
-	boolean dumpPopulationData 						 = false;
-	boolean dumpAggegatedWorkplaceData 			  	 = false;
+	boolean computeGridBasedAccessibility			 = false;	// determines whether grid based accessibilities should be calculated
+	boolean computeGridBasedAccessibilitiesUsingShapeFile= false;// determines whether to use a shape file boundary defining the area for grid based accessibilities 
+	boolean computeGridBasedAccessibilityUsingBoundingBox = false; // determines whether to use a customized bounding box
+	// boolean computeGridBasedAccessibilitiesUsingNetworkBoundary = false; // may lead to "out of memory" error when either one/some of this is true: high resolution, huge network, less memory
+	boolean computeZoneBasedAccessibilities			 = false;	// determines whether zone based accessibilities should be calculated
+	boolean computeZone2ZoneImpedance		   		 = false;	// determines whether zone o zone impedances should be calculated
+	boolean computeAgentPerformance					 = false;	// determines whether agent performances should be calculated
 	String shapeFile 						 		 = null;
 	double cellSizeInMeter 							 = -1;
 	double opportunitySampleRate 					 = 1.;
@@ -406,7 +404,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 																						this.scenario));
 		}
 		
-		if(computeParcelBasedAccessibility){
+		if(computeGridBasedAccessibility){
 			SpatialGrid freeSpeedGrid;				// matrix for free speed car related accessibility measure. based on the boundary (above) and grid size
 			SpatialGrid carGrid;					// matrix for congested car related accessibility measure. based on the boundary (above) and grid size
 			SpatialGrid bikeGrid;					// matrix for bike related accessibility measure. based on the boundary (above) and grid size
@@ -415,15 +413,12 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 			
 			ZoneLayer<Id>  measuringPoints;
 			
-			if(computeParcelBasedAccessibilitiesOnNetworkOrCustomBoundaryBoxBoundaries){
-				measuringPoints = GridUtils.createGridLayerByGridSizeByNetwork(cellSizeInMeter, nwBoundaryBox.getBoundingBox());
-				freeSpeedGrid= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
-				carGrid 	= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
-				bikeGrid 	= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
-				walkGrid	= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
-				ptGrid		= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
-			}
-			else{
+			// this only applies for (i) UrbanSim parcel application with (ii) a provided shape file 
+			// that defines the boundary of the study area (without any subdivisions like zones or fazes)
+			if(computeGridBasedAccessibilitiesUsingShapeFile){
+				if(Paths.pathExsits(this.shapeFile))	// using shape file for accessibility computation
+					log.info("Using shape file for accessibility computation.");	
+				
 				Geometry boundary = GridUtils.getBoundary(shapeFile);
 				measuringPoints   = GridUtils.createGridLayerByGridSizeByShapeFile(cellSizeInMeter, boundary);
 				freeSpeedGrid= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
@@ -432,11 +427,26 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 				walkGrid	= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
 				ptGrid		= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
 			}
+			// this normally applies for UrbanSim zone applications. The reason is the provided shape
+			// file including subdivisions like zones. This prevents to determine the boundary of the study area.
+			else{
+				if(this.computeGridBasedAccessibilityUsingBoundingBox)
+					log.info("Using custom bounding box for accessibility computation.");
+				else
+					log.warn("Using the boundary of the network file for accessibility computation. This could lead to memory issues when the network is large and/or the cell size is too fine!");
+				
+				measuringPoints = GridUtils.createGridLayerByGridSizeByNetwork(cellSizeInMeter, nwBoundaryBox.getBoundingBox());
+				freeSpeedGrid= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
+				carGrid 	= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
+				bikeGrid 	= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
+				walkGrid	= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
+				ptGrid		= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
+			}
 			
 			if(isParcelMode)
 				controler.addControlerListener(new ParcelBasedAccessibilityControlerListenerV3( this,
 																							 measuringPoints, 
-																							 parcels,
+																							 parcels,	// takes parcel coordinates
 																							 freeSpeedGrid,
 																							 carGrid,
 																							 bikeGrid,
@@ -448,7 +458,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 			else
 				controler.addControlerListener(new ParcelBasedAccessibilityControlerListenerV3( this,
 																							 measuringPoints, 
-																							 zones,
+																							 zones,		// takes zone centroids
 																							 freeSpeedGrid,
 																							 carGrid,
 																							 bikeGrid,
@@ -458,22 +468,12 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 																							 benchmark, 
 																							 this.scenario));
 		}
-		
-		// From here output writer for debugging purposes only
-		// if(dumpPopulationData){
-		//	if(isParcelMode)
-		//		readFromUrbansim.readAndDumpPersons2CSV(parcels, 
-		//										 	controler.getNetwork());
-		//	else
-		//		readFromUrbansim.readAndDumpPersons2CSV(zones, 
-		//			 								controler.getNetwork());
-		//}
 	}
 	
 	/**
 	 * This method allows to add additional listener
 	 * This needs to be implemented by another class
-	 * @param zones TODO
+	 * @param zones
 	 * @param parcels 
 	 * @param controler 
 	 */
@@ -496,30 +496,40 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 		this.computeAgentPerformance	= moduleMATSim4UrbanSim.isAgentPerformance();
 		this.computeZone2ZoneImpedance	= moduleMATSim4UrbanSim.isZone2ZoneImpedance();
 		this.computeZoneBasedAccessibilities = moduleMATSim4UrbanSim.isZoneBasedAccessibility();
-		this.computeParcelBasedAccessibility	= moduleMATSim4UrbanSim.isCellBasedAccessibility();
-		this.computeParcelBasedAccessibilitiesOnShapeFileBoundaries = moduleAccessibility.isCellBasedAccessibilityShapeFile();
-		this.computeParcelBasedAccessibilitiesOnNetworkOrCustomBoundaryBoxBoundaries = moduleAccessibility.isCellBasedAccessibilityNetwork();
-		this.dumpPopulationData 		= false;
-		this.dumpAggegatedWorkplaceData = true;
-		
+		this.computeGridBasedAccessibility	= moduleMATSim4UrbanSim.isCellBasedAccessibility();
+		this.computeGridBasedAccessibilitiesUsingShapeFile = moduleAccessibility.isCellBasedAccessibilityShapeFile();
+		this.computeGridBasedAccessibilityUsingBoundingBox = moduleAccessibility.usingCustomBoundingBox();
+		// this.computeGridBasedAccessibilitiesUsingNetworkBoundary = moduleAccessibility.isCellBasedAccessibilityNetwork();
 		this.cellSizeInMeter 			= moduleAccessibility.getCellSizeCellBasedAccessibility();
 		this.shapeFile					= moduleAccessibility.getShapeFileCellBasedAccessibility();
-		// using custom bounding box, defining the study area for accessibility computation
+		
+		// the boundary box defines the study area for accessibility calculations if no shape file is provided or a zone based UrbanSim application is used
+		// the boundary is either defined by a user defined boundary box or if not applicable by the extend of the road network
 		this.nwBoundaryBox 				= new NetworkBoundaryBox();
-		if(Paths.pathExsits(this.shapeFile))						// using shape file for accessibility computation
-			log.info("Using shape file for accessibility computation.");		
-		else if(moduleAccessibility.usingCustomBoundingBox()){	// using custom boundary box for accessibility computation
-			log.info("Using custon boundig box for accessibility computation.");
+		if(this.computeGridBasedAccessibilityUsingBoundingBox){	// check if a boundary box is defined
+			// log.info("Using custom bounding box for accessibility computation.");
 			nwBoundaryBox.setCustomBoundaryBox(moduleAccessibility.getBoundingBoxLeft(), 
 													moduleAccessibility.getBoundingBoxBottom(), 
 													moduleAccessibility.getBoundingBoxRight(), 
 													moduleAccessibility.getBoundingBoxTop());
 		}
-		else{														// using boundary of hole network for accessibility computation
-			log.warn("Using the boundary of the network file for accessibility computation. This could lead to memory issues when the network is large and/or the cell size is too fine.");
+		else{	// no boundary box defined using boundary of hole network for accessibility computation
+			// log.warn("Using the boundary of the network file for accessibility computation. This could lead to memory issues when the network is large and/or the cell size is too fine.");
 			nwBoundaryBox.setDefaultBoundaryBox(scenario.getNetwork());
 		}
-		
+//		if(Paths.pathExsits(this.shapeFile))						// using shape file for accessibility computation
+//			log.info("Using shape file for accessibility computation.");		
+//		else if(moduleAccessibility.usingCustomBoundingBox()){	// using custom boundary box for accessibility computation
+//			log.info("Using custom bounding box for accessibility computation.");
+//			nwBoundaryBox.setCustomBoundaryBox(moduleAccessibility.getBoundingBoxLeft(), 
+//													moduleAccessibility.getBoundingBoxBottom(), 
+//													moduleAccessibility.getBoundingBoxRight(), 
+//													moduleAccessibility.getBoundingBoxTop());
+//		}
+//		else{														// using boundary of hole network for accessibility computation
+//			log.warn("Using the boundary of the network file for accessibility computation. This could lead to memory issues when the network is large and/or the cell size is too fine.");
+//			nwBoundaryBox.setDefaultBoundaryBox(scenario.getNetwork());
+//		}
 		this.timeOfDay					= moduleAccessibility.getTimeOfDay();
 	}
 	

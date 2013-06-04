@@ -74,7 +74,7 @@ public class FeatureSHP {
 		} else {
 			addFeatures(dataStore.getFeatureSource(type), features);
 		}
-		
+
 		return features;
 		
 	}

@@ -44,10 +44,14 @@ public class GridUtils {
 			Set<SimpleFeature> featureSet = FeatureSHP.readFeatures(shapeFile);
 			log.info("Extracting boundary of the shape file ...");
 			Geometry boundary = (Geometry) featureSet.iterator().next().getDefaultGeometry();
-			// boundary.setSRID( srid ); // tnicolai: this is not needed to match the grid layer with locations / facilities from UrbanSim
-			// log.warn("Using SRID: " + srid);
 			log.info("Done extracting boundary ...");
 			
+			if(featureSet.size() > 1){
+				log.warn("The given shape file is not suitable for accessibility calculations.");
+				log.warn("This means you have to provide a shape file that only contains the border of the study area without any further features, i.e. zones or fazes, are allowed!");
+				log.warn("Replace the shape file in your UrbanSim configuration provided at \"travel_model_configuration/matsim4urbansim/controler_parameter/shape_file\"");
+				log.warn("If the shape file contains features accessibilities will be computes for only feature, i.e. for one zone or faz.");
+			}
 			return boundary;
 		} catch (IOException io){
 			io.printStackTrace();
