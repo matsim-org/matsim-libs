@@ -86,7 +86,7 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 		
 	}
 
-	public void estOnePercent10sQSim() {
+	public void testOnePercent10sQSim() {
 		Config config = loadConfig(null);
 		String netFileName = "test/scenarios/berlin/network.xml";
 		String popFileName = "test/scenarios/berlin/plans_hwh_1pct.xml.gz";

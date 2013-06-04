@@ -31,6 +31,7 @@ import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.lanes.run.LaneDefinitonsV11ToV20Converter;
 import org.matsim.signalsystems.data.SignalsScenarioWriter;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
 
 
 /**
@@ -80,10 +81,11 @@ public class SignalSystemsIntegrationTest {
 		//iteration 10 
 		iterationOutput = controlerOutputDir + "ITERS/it.10/";
 		
-		Assert.assertEquals("different events files after iteration 10 ", 
-				CRCChecksum.getCRCFromFile(inputDirectory + "10.events.xml.gz"), 
-				CRCChecksum.getCRCFromFile(iterationOutput + "10.events.xml.gz"));
+		Assert.assertTrue("different event files after iteration 10", 
+				EventsFileComparator.compare(inputDirectory + "10.events.xml.gz", iterationOutput + "10.events.xml.gz") == 
+				EventsFileComparator.CODE_FILES_ARE_EQUAL);
 
+		
 		Assert.assertEquals("different population files after iteration 10 ", 
 				CRCChecksum.getCRCFromFile(testUtils.getInputDirectory() + "10.plans.xml.gz"), 
 				CRCChecksum.getCRCFromFile(iterationOutput + "10.plans.xml.gz"));
