@@ -116,15 +116,15 @@ import org.matsim.utils.LeastCostPathTree;
  * @author thomas
  * 
  */
-public class ParcelBasedAccessibilityControlerListenerV3 extends AccessibilityControlerListenerImpl implements ShutdownListener{ // implements ShutdownListener
+public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityControlerListenerImpl implements ShutdownListener{ // implements ShutdownListener
 	
-	private static final Logger log = Logger.getLogger(ParcelBasedAccessibilityControlerListenerV3.class);
+	private static final Logger log = Logger.getLogger(GridBasedAccessibilityControlerListenerV3.class);
 	
 	// ////////////////////////////////////////////////////////////////////
 	// constructors
 	// ////////////////////////////////////////////////////////////////////
 	
-	public ParcelBasedAccessibilityControlerListenerV3(MATSim4UrbanSimInterface main,	
+	public GridBasedAccessibilityControlerListenerV3(MATSim4UrbanSimInterface main,	
 													 ZoneLayer<Id> startZones, 									// needed for google earth plots
 													 // AggregateObject2NearestNode[] aggregatedOpportunities, 	// destinations (like workplaces)
 													 ActivityFacilitiesImpl parcels,							// parcel coordinates for accessibility feedback

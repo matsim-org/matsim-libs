@@ -444,7 +444,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 			}
 			
 			if(isParcelMode)
-				controler.addControlerListener(new ParcelBasedAccessibilityControlerListenerV3( this,
+				controler.addControlerListener(new GridBasedAccessibilityControlerListenerV3( this,
 																							 measuringPoints, 
 																							 parcels,	// takes parcel coordinates
 																							 freeSpeedGrid,
@@ -456,7 +456,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 																							 benchmark, 
 																							 this.scenario));
 			else
-				controler.addControlerListener(new ParcelBasedAccessibilityControlerListenerV3( this,
+				controler.addControlerListener(new GridBasedAccessibilityControlerListenerV3( this,
 																							 measuringPoints, 
 																							 zones,		// takes zone centroids
 																							 freeSpeedGrid,
