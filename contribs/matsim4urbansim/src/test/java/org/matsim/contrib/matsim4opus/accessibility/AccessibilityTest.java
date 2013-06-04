@@ -13,8 +13,7 @@ import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
 import org.matsim.contrib.matsim4opus.gis.ZoneLayer;
 import org.matsim.contrib.matsim4opus.improvedpseudopt.PtMatrix;
 import org.matsim.contrib.matsim4opus.interfaces.MATSim4UrbanSimInterface;
-import org.matsim.contrib.matsim4opus.matsim4urbansim.ParcelBasedAccessibilityControlerListenerV3;
-import org.matsim.contrib.matsim4opus.matsim4urbansim.ZoneBasedAccessibilityControlerListenerV3;
+import org.matsim.contrib.matsim4opus.matsim4urbansim.GridBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.matsim4opus.utils.CreateTestMATSimConfig;
 import org.matsim.contrib.matsim4opus.utils.CreateTestNetwork;
 import org.matsim.contrib.matsim4opus.utils.CreateTestUrbansimPopulation;
@@ -139,7 +138,7 @@ public class AccessibilityTest implements MATSim4UrbanSimInterface, LinkEnterEve
 		ControlerListener listener = null;
 		
 		if(this.isParcelMode()){
-			listener = new ParcelBasedAccessibilityControlerListenerV3(this, startZones, parcels, freeSpeedGrid, carGrid, bikeGrid, walkGrid,
+			listener = new GridBasedAccessibilityControlerListenerV3(this, startZones, parcels, freeSpeedGrid, carGrid, bikeGrid, walkGrid,
 					ptGrid, ptMatrix, benchmark, scenario);
 			ctrl.addControlerListener(listener);
 			testParcelBasedAccessibility(ctrl,listener, freeSpeedGrid);
