@@ -20,14 +20,17 @@
 
 package playground.sergioo.singapore2012;
 
+import java.util.HashSet;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
-import org.matsim.pt.router.TransitRouterConfig;
 
-import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterWWImplFactory2;
-import playground.sergioo.singapore2012.transitRouterVariable.WaitTimeCalculator2;
+//import playground.artemc.calibration.CalibrationStatsListener;
+import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterWWImplFactory;
+import playground.sergioo.singapore2012.transitRouterVariable.WaitTimeStuckCalculator;
 
 
 /**
@@ -42,12 +45,9 @@ public class ControlerWW {
 		Controler controler = new Controler(ScenarioUtils.loadScenario(ConfigUtils.loadConfig(args[0])));
 		controler.setOverwriteFiles(true);
 		//controler.addControlerListener(new CalibrationStatsListener(controler.getEvents(), new String[]{args[1], args[2]}, 1, "Travel Survey (Benchmark)", "Red_Scheme", new HashSet<Id>()));
-		WaitTimeCalculator2 waitTimeCalculator = new WaitTimeCalculator2(controler.getPopulation(), controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().getQSimConfigGroup().getEndTime()-controler.getConfig().getQSimConfigGroup().getStartTime()));
+		WaitTimeStuckCalculator waitTimeCalculator = new WaitTimeStuckCalculator(controler.getPopulation(), controler.getScenario().getTransitSchedule(), controler.getConfig());
 		controler.getEvents().addHandler(waitTimeCalculator);
-		TransitRouterConfig transitRouterConfig = new TransitRouterConfig(controler.getScenario().getConfig().planCalcScore(),
-				controler.getScenario().getConfig().plansCalcRoute(), controler.getScenario().getConfig().transitRouter(),
-				controler.getScenario().getConfig().vspExperimental());
-		TransitRouterWWImplFactory2 factory = new TransitRouterWWImplFactory2(transitRouterConfig, controler, waitTimeCalculator.getWaitTimes());
+		TransitRouterWWImplFactory factory = new TransitRouterWWImplFactory(controler, waitTimeCalculator.getWaitTimes());
 		controler.addControlerListener(factory);
 		controler.setTransitRouterFactory(factory);
 		controler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getScenario()));
