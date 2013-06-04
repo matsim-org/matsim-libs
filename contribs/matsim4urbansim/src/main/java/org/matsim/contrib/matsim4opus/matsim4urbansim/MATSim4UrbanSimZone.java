@@ -39,7 +39,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.network.algorithms.NetworkScenarioCut;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.io.IOUtils;
 
 
 

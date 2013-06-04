@@ -2,12 +2,10 @@ package org.matsim.contrib.matsim4opus.matsim4urbansim;
 
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
-import org.junit.Assert;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -15,20 +13,17 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.matsim4opus.config.ConfigurationUtils;
 import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigModule;
-import org.matsim.contrib.matsim4opus.constants.InternalConstants;
 import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
 import org.matsim.contrib.matsim4opus.gis.Zone;
 import org.matsim.contrib.matsim4opus.gis.ZoneLayer;
 import org.matsim.contrib.matsim4opus.improvedpseudopt.PtMatrix;
-import org.matsim.contrib.matsim4opus.interfaces.MATSim4UrbanSimInterface;
 import org.matsim.contrib.matsim4opus.utils.LeastCostPathTreeExtended;
 import org.matsim.contrib.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import org.matsim.contrib.matsim4opus.utils.helperObjects.Benchmark;
 import org.matsim.contrib.matsim4opus.utils.helperObjects.Distances;
-import org.matsim.contrib.matsim4opus.utils.helperObjects.SpatialReferenceObject;
-import org.matsim.contrib.matsim4opus.utils.io.writer.AnalysisWorkplaceCSVWriter;
 import org.matsim.contrib.matsim4opus.utils.misc.ProgressBar;
 import org.matsim.contrib.matsim4opus.utils.network.NetworkUtil;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.LinkImpl;
@@ -55,6 +50,12 @@ import com.vividsolutions.jts.geom.Point;
  * 
  * improvements jan'13
  * - added pt for accessibility calculation
+ * 
+ * improvements june'13
+ * - take "main" (reference to matsim4urbansim) out
+ * - aggregation of opportunities adjusted to handle facilities
+ * - zones are taken out
+ * 
  *     
  * @author thomas
  *
@@ -69,8 +70,6 @@ public class AccessibilityControlerListenerImpl{
 	public static final String WALK_FILENAME 	= "walkAccessibility_cellsize_";
 	public static final String PT_FILENAME 		= "ptAccessibility_cellsize_";
 	
-	protected MATSim4UrbanSimInterface main = null;
-	
 	protected static int ZONE_BASED 	= 0;
 	protected static int PARCEL_BASED 	= 1;
 	
@@ -78,11 +77,10 @@ public class AccessibilityControlerListenerImpl{
 	protected ZoneLayer<Id> measuringPointsCell;
 	// start points, measuring accessibility (zone based approach)
 	protected ZoneLayer<Id> measuringPointsZone;
-	protected ActivityFacilitiesImpl zones; // tnicolai: this is old! replace!!!
 	// containing parcel coordinates for accessibility feedback
 	protected ActivityFacilitiesImpl parcels; 
 	// destinations, opportunities like jobs etc ...
-	protected AggregateObject2NearestNode[] aggregatedOpportunities;
+	protected AggregateObject2NearestNode[] aggregatedFacilities;
 	
 	// storing the accessibility results
 	protected SpatialGrid freeSpeedGrid;
@@ -225,9 +223,8 @@ public class AccessibilityControlerListenerImpl{
 		constWalk		= scenario.getConfig().planCalcScore().getConstantWalk();
 		constPt			= scenario.getConfig().planCalcScore().getConstantPt();
 		
-		depatureTime 	= this.main.getTimeOfDay(); // 8.*3600;	
-//		printParameterSettings(); // use only for debugging since otherwise it clutters the logfile (settings are printed as part of 
-		// config dump)
+		depatureTime 	= moduleAPCM.getTimeOfDay(); // by default = 8.*3600;	
+		// printParameterSettings(); // use only for debugging since otherwise it clutters the logfile (settings are printed as part of config dump)
 	}
 	
 	/**
@@ -282,38 +279,28 @@ public class AccessibilityControlerListenerImpl{
 	 *     |\
 	 *     | \
 	 *     k2 k3
-	 *     
-	 * @param parcelsOrZones opportunities like work places either given at a parcel- or zone level
-	 * @param jobSample allows to reduce the sample size of opportunities
-	 * @param network the road network
+	 * 
+	 * @param opportunities such as workplaces, either given at a parcel- or zone-level
+	 * @param network giving the road network
 	 * @return the sum of disutilities Vjk, i.e. the disutilities to reach all opportunities k that are assigned to j from node j 
 	 */
-	protected final AggregateObject2NearestNode[] aggregatedOpportunities(final ActivityFacilitiesImpl parcelsOrZones, final double jobSample, final NetworkImpl network, final boolean isParcelMode){
-		
-		// readJobs creates a hash map of job with key = job id
-		// this hash map includes jobs according to job sample size
-		List<SpatialReferenceObject> jobSampleList = this.main.getReadFromUrbanSimModel().readJobs(parcelsOrZones, jobSample, isParcelMode);
-		assert( jobSampleList != null );
-		
-		// Since the aggregated opportunities in jobClusterArray does contain coordinates of their nearest node 
-		// this result is dumped out here    tnicolai dec'12
-		AnalysisWorkplaceCSVWriter.writeWorkplaceData2CSV(jobSampleList);
-		
-		log.info("Aggregating workplaces with identical nearest node ...");
+	protected final AggregateObject2NearestNode[] aggregatedOpportunities(final ActivityFacilitiesImpl opportunities, NetworkImpl network){
+	
+		log.info("Aggregating " + opportunities.getFacilities().size() + " opportunities with identical nearest node ...");
 		Map<Id, AggregateObject2NearestNode> opportunityClusterMap = new ConcurrentHashMap<Id, AggregateObject2NearestNode>();
+		ProgressBar bar = new ProgressBar( opportunities.getFacilities().size() );
+	
+		Iterator<ActivityFacility> oppIterator = opportunities.getFacilities().values().iterator();
 		
-		ProgressBar bar = new ProgressBar( jobSampleList.size() );
-
-		for(int i = 0; i < jobSampleList.size(); i++){
+		while(oppIterator.hasNext()){
+			
 			bar.update();
 			
-			SpatialReferenceObject sro = jobSampleList.get( i );
-			assert( sro.getCoord() != null );
-			Node nearestNode = network.getNearestNode( sro.getCoord() );
-			assert( nearestNode != null );
-
-			// get euclidian distance to nearest node
-			double distance_meter 	= NetworkUtil.getEuclidianDistance(sro.getCoord(), nearestNode.getCoord());
+			ActivityFacility opprotunity = oppIterator.next();
+			Node nearestNode = network.getNearestNode( opprotunity.getCoord() );
+			
+			// get Euclidian distance to nearest node
+			double distance_meter 	= NetworkUtil.getEuclidianDistance(opprotunity.getCoord(), nearestNode.getCoord());
 			double walkTravelTime_h = distance_meter / this.walkSpeedMeterPerHour;
 			
 			double VjkWalkTravelTime	= this.betaWalkTT * walkTravelTime_h;
@@ -324,30 +311,28 @@ public class AccessibilityControlerListenerImpl{
 			double VjkWalkPowerDistnace	= 0.; //this.betaWalkTDPower * (distance_meter * distance_meter);
 			double VjkWalkLnDistance 	= 0.; //this.betaWalkLnTD * Math.log(distance_meter);
 			
-			double VjkWalkMoney			= this.betaWalkTMC * 0.; 		// no monetary costs for walking
+			double VjkWalkMoney			= this.betaWalkTMC * 0.; 			// no monetary costs for walking
 			double VjkWalkPowerMoney	= 0.; //this.betaWalkTDPower * 0.; 	// no monetary costs for walking
-			double VjkWalkLnMoney		= 0.; //this.betaWalkLnTMC *0.; 		// no monetary costs for walking
-
+			double VjkWalkLnMoney		= 0.; //this.betaWalkLnTMC *0.; 	// no monetary costs for walking
+			
 			double Vjk					= Math.exp(this.logitScaleParameter * (VjkWalkTravelTime + VjkWalkPowerTravelTime + VjkWalkLnTravelTime +
-																			   VjkWalkDistance   + VjkWalkPowerDistnace   + VjkWalkLnDistance +
-																			   VjkWalkMoney      + VjkWalkPowerMoney      + VjkWalkLnMoney) );
+					   														   VjkWalkDistance   + VjkWalkPowerDistnace   + VjkWalkLnDistance +
+					   														   VjkWalkMoney      + VjkWalkPowerMoney      + VjkWalkLnMoney) );
 			// add Vjk to sum
 			if( opportunityClusterMap.containsKey( nearestNode.getId() ) ){
 				AggregateObject2NearestNode jco = opportunityClusterMap.get( nearestNode.getId() );
-				jco.addObject( sro.getObjectID(), Vjk);
+				jco.addObject( opprotunity.getId(), Vjk);
 			}
-			// assign Vjk to given network node
-			else
+			else // assign Vjk to given network node
 				opportunityClusterMap.put(
 						nearestNode.getId(),
-						new AggregateObject2NearestNode(sro.getObjectID(), 
-														sro.getParcelID(), 
-														sro.getZoneID(), 
+						new AggregateObject2NearestNode(opprotunity.getId(), 
+														null,
+														null,
 														nearestNode.getCoord(), 
 														nearestNode, 
 														Vjk));
 		}
-		
 		// convert map to array
 		AggregateObject2NearestNode jobClusterArray []  = new AggregateObject2NearestNode[ opportunityClusterMap.size() ];
 		Iterator<AggregateObject2NearestNode> jobClusterIterator = opportunityClusterMap.values().iterator();
@@ -355,11 +340,10 @@ public class AccessibilityControlerListenerImpl{
 		for(int i = 0; jobClusterIterator.hasNext(); i++)
 			jobClusterArray[i] = jobClusterIterator.next();
 		
-		log.info("Aggregated " + jobSampleList.size() + " number of workplaces (sampling rate: " + jobSample + ") to " + jobClusterArray.length + " nodes.");
+		log.info("Aggregated " + opportunities.getFacilities().size() + " number of opportunities to " + jobClusterArray.length + " nodes.");
 		
 		return jobClusterArray;
 	}
-	
 	
 	/**
 	 * @param ttc
@@ -385,10 +369,6 @@ public class AccessibilityControlerListenerImpl{
 //		grids = new double[numberOfMeasuringPoints][4];
 		
 		GeneralizedCostSum gcs = new GeneralizedCostSum();
-		
-//			// tnicolai: only for testing, disable afterwards
-//			ZoneLayer<Id> testSet = createTestPoints();
-//			measuringPointIterator = testSet.getZones().iterator();
 
 		// this data structure condense measuring points (origins) that have the same nearest node on the network ...
 		Map<Id,ArrayList<Zone<Id>>> aggregatedMeasurementPoints = new ConcurrentHashMap<Id, ArrayList<Zone<Id>>>();
@@ -485,10 +465,10 @@ public class AccessibilityControlerListenerImpl{
 				gcs.reset();
 
 				// goes through all opportunities, e.g. jobs, (nearest network node) and calculate the accessibility
-				for ( int i = 0; i < this.aggregatedOpportunities.length; i++ ) {
+				for ( int i = 0; i < this.aggregatedFacilities.length; i++ ) {
 					
 					// get stored network node (this is the nearest node next to an aggregated work place)
-					Node destinationNode = this.aggregatedOpportunities[i].getNearestNode();
+					Node destinationNode = this.aggregatedFacilities[i].getNearestNode();
 					Id nodeID = destinationNode.getId();
 					
 					// disutilities on the road network
@@ -513,7 +493,7 @@ public class AccessibilityControlerListenerImpl{
 					// disutilities to get on or off the network
 					double walkDisutilityMeasuringPoint2Road = (walkTravelTimeMeasuringPoint2Road_h * betaWalkTT) + (distanceMeasuringPoint2Road_meter * betaWalkTD);
 					double expVhiWalk = Math.exp(this.logitScaleParameter * walkDisutilityMeasuringPoint2Road);
-					double sumExpVjkWalk = aggregatedOpportunities[i].getSumVjk();
+					double sumExpVjkWalk = aggregatedFacilities[i].getSumVjk();
 					
 					// total disutility congested car
 					double congestedCarDisutilityRoad2Node = (road2NodeCongestedCarTime_h * betaCarTT) + (distanceRoad2Node_meter * betaCarTD) + (toll_money * betaCarTMC); 
@@ -595,242 +575,7 @@ public class AccessibilityControlerListenerImpl{
 		}
 		return 0.;
 	}
-	
-//	/**
-//	 * This calculates the logsum for a given origin i over all opportunities k attached to node j
-//	 * 
-//	 * i ----------j---k1
-//	 *             | \
-//	 * 			   k2 k3
-//	 * 
-//	 * This caluclation is done in 2 steps:
-//	 * 
-//	 * 1) The disutilities Vjk to get from node j to all opportunities k are attached to j.
-//	 *    This is already done above in "aggregatedOpportunities" method and the result is 
-//	 *    stored in "aggregatedOpportunities" object:
-//	 * 
-//	 * S_j = sum_k_in_j (exp(Vjk)) = exp(Vjk1) + exp(Vjk2) + exp(Vjk3)
-//	 * 
-//	 * 2) The disutility Vij to get from origin location i to destination node j is calculated in this method.
-//	 *    Finally the following logsum is taken:   
-//	 * 
-//	 * A_i = 1/beatascale * ln (sum_j (exp(Vij) * S_j ) )
-//	 * 
-//	 * @param gcs stores the value for the term "exp(Vik)"
-//	 * @param distanceMeasuringPoint2Road_meter distance [meter] from origin i to the network
-//	 * @param distanceRoad2Node_meter if the mapping of i on the network is on a link, this is the distance [meter] from this mapping to the nearest node on the network
-//	 * @param travelDistance_meter travel distances [meter] on the network to get to destination node j
-//	 * @param walkTravelTimePoint2Road_h walk travel time [hour] to get from origin i to the network
-//	 * @param freeSpeedTravelTime_h free speed travel times [hour] on the network to get to destination node j
-//	 * @param freeSpeedCarTravelDistance_meter free speed travel distance [meter] on the network to get to destination node j
-//	 * @param freeSpeedCarToll_money monetary travel costs [money unit] on the network to get to destination node j
-//	 * @param congestedCarTravelTime_h congested car travel times [hour] on the network to get to destination node j
-//	 * @param congestedCarTravelDistance_meter congested car travel distance [meter] on the network to get to destination node j
-//	 * @param congestedCarToll_money monetary travel costs [money unit] on the network to get to destination node j
-//	 * @param bikeTravelTime_h bike travel times [hour] on the network to get to destination node j
-//	 * @param walkTravelTime_h walk travel times [hour] on the network to get to destination node j
-//	 * 
-//	 */
-//	protected final void sumDisutilityOfTravel(GeneralizedCostSum gcs,
-//									   AggregateObject2NearestNode aggregatedOpportunities,
-//									   double distanceMeasuringPoint2Road_meter,
-//									   double distanceRoad2Node_meter, 
-//									   double travelDistance_meter, 
-//									   double walkTravelTimePoint2Road_h,
-//									   double freeSpeedTravelTime_h,
-//									   double freeSpeedCarTravelDistance_meter,
-//									   double freeSpeedCarToll_money,
-//									   double congestedCarTravelTime_h,
-//									   double congestedCarTravelDistance_meter,
-//									   double congestedCarToll_money,
-//									   double bikeTravelTime_h,
-//									   double walkTravelTime_h,
-//									   double ptTravelTime_h,
-//									   double ptTotalWalkTime_h,
-//									   double ptTravelDistance_meter,
-//									   double ptTotalWalkDistance_meter) {
-//		
-//		// for debugging free speed accessibility
-//		VijFreeTT 	= getAsUtil(betaCarTT, freeSpeedTravelTime_h, betaWalkTT, walkTravelTimePoint2Road_h);
-//		VijFreeTTPower= getAsUtil(betaCarTTPower, freeSpeedTravelTime_h * freeSpeedTravelTime_h, betaWalkTTPower, walkTravelTimePoint2Road_h * walkTravelTimePoint2Road_h);
-//		VijFreeLnTT = getAsUtil(betaCarLnTT, Math.log(freeSpeedTravelTime_h), betaWalkLnTT, Math.log(walkTravelTimePoint2Road_h));
-//		
-//		VijFreeTD 	= getAsUtil(betaCarTD, travelDistance_meter + distanceRoad2Node_meter, betaWalkTD, distanceMeasuringPoint2Road_meter);
-//		VijFreeTDPower= getAsUtil(betaCarTDPower, Math.pow(travelDistance_meter + distanceRoad2Node_meter, 2), betaWalkTDPower, distanceMeasuringPoint2Road_meter * distanceMeasuringPoint2Road_meter);
-//		VijFreeLnTD = getAsUtil(betaCarLnTD, Math.log(travelDistance_meter + distanceRoad2Node_meter), betaWalkLnTD, Math.log(distanceMeasuringPoint2Road_meter));
-//		
-//		VijFreeTC 	= getAsUtil(betaCarTMC, freeSpeedCarToll_money, betaWalkTMC, 0);
-//		VijFreeTCPower= getAsUtil(betaCarTDPower, Math.pow( freeSpeedCarToll_money , 2), betaWalkTDPower, 0);
-//		VijFreeLnTC = getAsUtil(betaCarLnTMC, Math.log( freeSpeedCarToll_money ), betaWalkLnTMC, 0);
-//		
-//		double expFreeSpeedVij = Math.exp(logitScaleParameter *
-//										 (constCar
-//										+ VijFreeTT + VijFreeTTPower + VijFreeLnTT
-//			     					    + VijFreeTD + VijFreeTDPower + VijFreeLnTD
-//										+ VijFreeTC + VijFreeTCPower + VijFreeLnTC) );
-//	
-//		// sum free speed travel times
-//		gcs.addFreeSpeedCost( expFreeSpeedVij * aggregatedOpportunities.getSumVjk());
-//		
-//		// for debugging car accessibility
-//		VijCarTT 	= getAsUtil(betaCarTT, congestedCarTravelTime_h, betaWalkTT, walkTravelTimePoint2Road_h);
-//		VijCarTTPower= getAsUtil(betaCarTTPower, congestedCarTravelTime_h * congestedCarTravelTime_h, betaWalkTTPower, walkTravelTimePoint2Road_h * walkTravelTimePoint2Road_h);
-//		VijCarLnTT	= getAsUtil(betaCarLnTT, Math.log(congestedCarTravelTime_h), betaWalkLnTT, Math.log(walkTravelTimePoint2Road_h));
-//		
-//		VijCarTD 	= getAsUtil(betaCarTD, travelDistance_meter + distanceRoad2Node_meter, betaWalkTD, distanceMeasuringPoint2Road_meter); // carOffsetWalkTime2NearestLink_meter
-//		VijCarTDPower= getAsUtil(betaCarTDPower, Math.pow(travelDistance_meter + distanceRoad2Node_meter, 2), betaWalkTDPower, distanceMeasuringPoint2Road_meter * distanceMeasuringPoint2Road_meter);
-//		VijCarLnTD 	= getAsUtil(betaCarLnTD, Math.log(travelDistance_meter + distanceRoad2Node_meter), betaWalkLnTD, Math.log(distanceMeasuringPoint2Road_meter));
-//		
-//		VijCarTMC 	= getAsUtil(betaCarTMC, congestedCarToll_money, betaWalkTMC, 0);
-//		VijCarTMCPower= getAsUtil(betaCarTMCPower, Math.pow( congestedCarToll_money, 2), betaWalkTMCPower, 0);
-//		VijCarLnTMC	= getAsUtil(betaCarLnTMC, Math.log(congestedCarToll_money), betaWalkLnTMC, 0);
-//		
-//		double expCongestedCarVij = Math.exp(logitScaleParameter *
-//											(constCar
-//										   + VijCarTT + VijCarTTPower + VijCarLnTT 
-//										   + VijCarTD + VijCarTDPower + VijCarLnTD 
-//										   + VijCarTMC + VijCarTMCPower + VijCarLnTMC));
-//		
-//		// sum congested travel times
-//		gcs.addCongestedCarCost( expCongestedCarVij * aggregatedOpportunities.getSumVjk());
-//		
-//		// for debugging bike accessibility
-//		VijBikeTT 	= getAsUtil(betaBikeTT, bikeTravelTime_h, betaWalkTT, walkTravelTimePoint2Road_h);
-//		VijBikeTTPower= getAsUtil(betaBikeTTPower, bikeTravelTime_h * bikeTravelTime_h, betaWalkTTPower, walkTravelTimePoint2Road_h * walkTravelTimePoint2Road_h);
-//		VijBikeLnTT	= getAsUtil(betaBikeLnTT, Math.log(bikeTravelTime_h), betaWalkLnTT, Math.log(walkTravelTimePoint2Road_h));
-//		
-//		VijBikeTD 	= getAsUtil(betaBikeTD, travelDistance_meter + distanceRoad2Node_meter, betaWalkTD, distanceMeasuringPoint2Road_meter); 
-//		VijBikeTDPower= getAsUtil(betaBikeTDPower, Math.pow(travelDistance_meter + distanceRoad2Node_meter, 2), betaWalkTDPower, distanceMeasuringPoint2Road_meter * distanceMeasuringPoint2Road_meter);
-//		VijBikeLnTD = getAsUtil(betaBikeLnTD, Math.log(travelDistance_meter + distanceRoad2Node_meter), betaWalkLnTD, Math.log(distanceMeasuringPoint2Road_meter));
-//		
-//		VijBikeTMC 	= 0.; 	// since MATSim doesn't gives monetary costs (toll)
-//		VijBikeTMCPower= 0.;// since MATSim doesn't gives monetary costs (toll) 
-//		VijBikeLnTMC = 0.;	// since MATSim doesn't gives monetary costs (toll) 
-//		
-//		double expBikeVij = Math.exp(logitScaleParameter *
-//								    (constBike
-//								   + VijBikeTT + VijBikeTTPower + VijBikeLnTT 
-//								   + VijBikeTD + VijBikeTDPower + VijBikeLnTD 
-//								   + VijBikeTMC + VijBikeTMCPower + VijBikeLnTMC));
-//		
-//		// sum congested travel times
-//		gcs.addBikeCost( expBikeVij * aggregatedOpportunities.getSumVjk());
-//		
-//		// for debugging walk accessibility
-//		double totalWalkTravelTime = walkTravelTime_h + ((distanceMeasuringPoint2Road_meter + distanceRoad2Node_meter)/this.walkSpeedMeterPerHour);
-//		double totalTravelDistance = travelDistance_meter + distanceMeasuringPoint2Road_meter + distanceRoad2Node_meter;
-//		
-//		VijWalkTT = getAsUtil(betaWalkTT, totalWalkTravelTime,0, 0);
-//		VijWalkTTPower = getAsUtil(betaWalkTTPower, totalWalkTravelTime * totalWalkTravelTime, 0 ,0);
-//		VijWalkLnTT = getAsUtil(betaWalkLnTT, Math.log(totalWalkTravelTime), 0, 0);
-//		
-//		VijWalkTD = getAsUtil(betaWalkTD, totalTravelDistance, 0, 0);
-//		VijWalkTDPower = getAsUtil(betaWalkTDPower, totalTravelDistance * totalTravelDistance, 0, 0);
-//		VijWalkLnTD = getAsUtil(betaWalkLnTD, Math.log(totalTravelDistance), 0, 0);
-//
-//		VijWalkTMC 	= 0.;	// since MATSim doesn't gives monetary costs (toll) 
-//		VijWalkTMCPower= 0.;// since MATSim doesn't gives monetary costs (toll) 
-//		VijWalkLnTMC = 0.;	// since MATSim doesn't gives monetary costs (toll) 
-//		
-//		double expWalkVij = Math.exp(logitScaleParameter *
-//									(constWalk
-//								   + VijWalkTT + VijWalkTTPower + VijWalkLnTT 
-//				                   + VijWalkTD + VijWalkTDPower + VijWalkLnTD 
-//								   + VijWalkTMC + VijWalkTMCPower + VijWalkLnTMC));
-//
-//		// sum walk travel times (substitute for distances)
-//		gcs.addWalkCost(expWalkVij * aggregatedOpportunities.getSumVjk());
-//		
-//		// for debugging pt accessibility
-//		VijPtTT 	= getAsUtil(betaPtTT, ptTravelTime_h, betaWalkTT, (walkTravelTimePoint2Road_h + ptTotalWalkTime_h));
-//		VijPtTTPower= getAsUtil(betaPtTTPower, ptTravelTime_h * ptTravelTime_h, betaWalkTTPower, (walkTravelTimePoint2Road_h + ptTotalWalkTime_h) * (walkTravelTimePoint2Road_h + ptTotalWalkTime_h));
-//		VijPtLnTT	= getAsUtil(betaPtLnTT, Math.log(ptTravelTime_h), betaWalkLnTT, Math.log(walkTravelTimePoint2Road_h + ptTotalWalkTime_h));
-//		
-//		VijPtTD 	= getAsUtil(betaPtTD, ptTravelDistance_meter + distanceRoad2Node_meter, betaWalkTD, (distanceMeasuringPoint2Road_meter + ptTotalWalkDistance_meter)); 
-//		VijPtTDPower= getAsUtil(betaPtTDPower, Math.pow(ptTravelDistance_meter + distanceRoad2Node_meter, 2), betaWalkTDPower, (distanceMeasuringPoint2Road_meter + ptTotalWalkDistance_meter) * (distanceMeasuringPoint2Road_meter + ptTotalWalkDistance_meter));
-//		VijPtLnTD 	= getAsUtil(betaPtLnTD, Math.log(ptTravelDistance_meter + distanceRoad2Node_meter), betaWalkLnTD, Math.log(distanceMeasuringPoint2Road_meter + ptTotalWalkDistance_meter));
-//		
-//		VijPtTMC 	= 0.; 	// since MATSim doesn't gives monetary costs (toll) 
-//		VijPtTMCPower= 0.;	// since MATSim doesn't gives monetary costs (toll) 
-//		VijPtLnTMC 	= 0.;	// since MATSim doesn't gives monetary costs (toll) 
-//		
-//		double expPtVij = Math.exp(logitScaleParameter *
-//								  (constPt
-//								 + VijPtTT + VijPtTTPower + VijPtLnTT 
-//								 + VijPtTD + VijPtTDPower + VijPtLnTD 
-//								 + VijPtTMC + VijPtTMCPower + VijPtLnTMC));
-//		
-//		gcs.addPtCost(expPtVij * aggregatedOpportunities.getSumVjk());
-//	}
-//	
-//	/**
-//	 * converts travel costs (e.g. travel times or distances) into utils by 
-//	 * using the corresponding marginal utilities
-//	 * 
-//	 * @param betaModeX marginal utility for a travel mode other than walk
-//	 * @param ModeTravelCostX travel costs like travel times or distances
-//	 * @param betaWalkX marginal utility for traveling on foot
-//	 * @param walkOrigin2NetworkX travel costs like travel times or distances for traveling on foot
-//	 * @return disutility of traveling
-//	 */
-//	protected final double getAsUtil(final double betaModeX, final double ModeTravelCostX, final double betaWalkX, final double walkOrigin2NetworkX){
-//		if(betaModeX != 0.)
-//			return (betaModeX * ModeTravelCostX + betaWalkX * walkOrigin2NetworkX);
-//		return 0.;
-//	}
-	
-//	
-//	protected ZoneLayer<Id> createTestPoints(){
-//		
-//		GeometryFactory factory = new GeometryFactory();
-//		Set<Zone<Id>> zones = new HashSet<Zone<Id>>();
-//		int setPoints = 1;
-//		int srid = InternalConstants.SRID_SWITZERLAND;
-//		int gridSize = 10;
-//		
-//		Point point1 = factory.createPoint(new Coordinate(680699.1, 250976.0)); // oben links
-//		Point point2 = factory.createPoint(new Coordinate(681410.0, 250670.0)); // oben mitte
-//		Point point3 = factory.createPoint(new Coordinate(682419.0, 250232.0)); // oben rechts
-//		Point point4 = factory.createPoint(new Coordinate(680602.2, 250934.2)); // unten links
-//		
-//		createCell(factory, zones, point1, setPoints++, srid, gridSize);
-//		createCell(factory, zones, point2, setPoints++, srid, gridSize);
-//		createCell(factory, zones, point3, setPoints++, srid, gridSize);
-//		createCell(factory, zones, point4, setPoints++, srid, gridSize);
-//		
-//		ZoneLayer<Id> layer = new ZoneLayer<Id>(zones);
-//		return layer;
-//	}
-//
-//	/**
-//	 * This is for testing purposes only
-//	 * 
-//	 * @param factory
-//	 * @param zones
-//	 * @param setPoints
-//	 * @param srid
-//	 */
-//	private void createCell(GeometryFactory factory, Set<Zone<Id>> zones, Point point, int setPoints, int srid, int gridSize) {
-//		
-//		double x = point.getCoordinate().x;
-//		double y = point.getCoordinate().y;
-//		
-//		Coordinate[] coords = new Coordinate[5];
-//		coords[0] = new Coordinate(x-gridSize, y-gridSize); 	// links unten
-//		coords[1] = new Coordinate(x-gridSize, y + gridSize);	// links oben
-//		coords[2] = new Coordinate(x + gridSize, y + gridSize);	// rechts oben
-//		coords[3] = new Coordinate(x + gridSize, y-gridSize);	// rechts unten
-//		coords[4] = new Coordinate(x-gridSize, y-gridSize); 	// links unten
-//		// Linear Ring defines an artificial zone
-//		LinearRing linearRing = factory.createLinearRing(coords);
-//		Polygon polygon = factory.createPolygon(linearRing, null);
-//		polygon.setSRID( srid ); 
-//		
-//		Zone<Id> zone = new Zone<Id>(polygon);
-//		zone.setAttribute( new Id( setPoints ) );
-//		zones.add(zone);
-//	}
-	
+
 	/**
 	 * Writes measured accessibilities as csv format to disc
 	 * 

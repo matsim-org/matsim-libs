@@ -15,7 +15,6 @@ import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
 import org.matsim.contrib.matsim4opus.gis.Zone;
 import org.matsim.contrib.matsim4opus.gis.ZoneLayer;
 import org.matsim.contrib.matsim4opus.improvedpseudopt.PtMatrix;
-import org.matsim.contrib.matsim4opus.interfaces.MATSim4UrbanSimInterface;
 import org.matsim.contrib.matsim4opus.interpolation.Interpolation;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators.TravelDistanceCalculator;
 import org.matsim.contrib.matsim4opus.utils.LeastCostPathTreeExtended;
@@ -115,6 +114,7 @@ import org.matsim.utils.LeastCostPathTree;
  * 
  * changes june'13
  * - changed class name from ParcelBasedAccessibilityControlerListenerV3 into GridBasedAccessibilityControlerListenerV3
+ * - providing opportunity facilities (e.g. workplaces)
  * 
  * @author thomas
  * 
@@ -127,10 +127,9 @@ public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 	// constructors
 	// ////////////////////////////////////////////////////////////////////
 	
-	public GridBasedAccessibilityControlerListenerV3(MATSim4UrbanSimInterface main,	
-													 ZoneLayer<Id> startZones, 									// needed for google earth plots
-													 // AggregateObject2NearestNode[] aggregatedOpportunities, 	// destinations (like workplaces)
+	public GridBasedAccessibilityControlerListenerV3(ZoneLayer<Id> startZones, 									// needed for google earth plots
 													 ActivityFacilitiesImpl parcels,							// parcel coordinates for accessibility feedback
+													 ActivityFacilitiesImpl opportunities,
 													 SpatialGrid freeSpeedGrid,									// table for free speed car travel times in accessibility computation
 													 SpatialGrid carGrid, 										// table for congested car travel times in accessibility computation
 													 SpatialGrid bikeGrid,										// table for bike travel times in accessibility computation
@@ -142,8 +141,6 @@ public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 								
 		log.info("Initializing ParcelBasedAccessibilityControlerListenerV3 ...");
 		
-		assert (main != null);
-		this.main = main;
 		assert (startZones != null);
 		this.measuringPointsCell = startZones;
 		assert (parcels != null);
@@ -165,8 +162,10 @@ public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 		// writing accessibility measures continuously into a csv file, which is not 
 		// dedicated for as input for UrbanSim, but for analysis purposes
 		AnalysisCellBasedAccessibilityCSVWriterV2.initAnalysisCellBasedAccessibilityCSVWriterV2();
-		
 		initAccessibilityParameter(scenario);
+		// aggregating facilities to their nearest node on the road network
+		this.aggregatedFacilities = aggregatedOpportunities(opportunities, (NetworkImpl)scenario.getNetwork());
+		
 		log.info(".. done initializing CellBasedAccessibilityControlerListenerV3");
 	}
 	
@@ -178,10 +177,7 @@ public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 		Controler controler = event.getControler();
 		NetworkImpl network = (NetworkImpl) controler.getNetwork();
 		
-		this.aggregatedOpportunities = this.aggregatedOpportunities(this.parcels, this.main.getOpportunitySampleRate(), network, this.main.isParcelMode());
-		
 		int benchmarkID = this.benchmark.addMeasure("cell-based accessibility computation");
-		
 
 		// get the free-speed car travel times (in seconds)
 		TravelTime ttf = new FreeSpeedTravelTime() ;
@@ -224,7 +220,7 @@ public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 				log.info("Accessibility computation with "
 						+ measuringPointsCell.getZones().size()
 						+ " starting points (origins) and "
-						+ this.aggregatedOpportunities.length
+						+ this.aggregatedFacilities.length
 						+ " destinations (opportunities) took "
 						+ this.benchmark.getDurationInSeconds(benchmarkID)
 						+ " seconds ("

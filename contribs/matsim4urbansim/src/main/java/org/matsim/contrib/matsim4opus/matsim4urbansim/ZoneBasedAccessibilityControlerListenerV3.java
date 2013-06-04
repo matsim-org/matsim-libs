@@ -53,6 +53,10 @@ import org.matsim.utils.LeastCostPathTree;
  * - taking disutilites directly from MATSim (controler.createTravelCostCalculator()), this 
  * also activates road pricing ...
  * 
+ * improvements june'13
+ * - removed zones as argument to ZoneBasedAccessibilityControlerListenerV3
+ * - providing opportunity facilities (e.g. workplaces)
+ * 
  * @author thomas
  *
  */
@@ -65,21 +69,16 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 	// constructors
 	// ////////////////////////////////////////////////////////////////////
 	
-	public ZoneBasedAccessibilityControlerListenerV3(MATSim4UrbanSimInterface main,
-												   ZoneLayer<Id>  startZones, 
-												   ActivityFacilitiesImpl zones,
+	public ZoneBasedAccessibilityControlerListenerV3(ZoneLayer<Id>  startZones,
+												   ActivityFacilitiesImpl opportunities,
 												   PtMatrix ptMatrix,
 												   Benchmark benchmark,
 												   Scenario scenario){
 		
 		log.info("Initializing ZoneBasedAccessibilityControlerListenerV3 ...");
 		
-		assert (main != null);
-		this.main = main;
 		assert(startZones != null);
 		this.measuringPointsZone = startZones;
-		assert(zones != null);
-		this.zones = zones;
 		this.ptMatrix = ptMatrix; // this could be zero of no input files for pseudo pt are given ...
 		assert(benchmark != null);
 		this.benchmark = benchmark;
@@ -89,8 +88,10 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 		// files is given by the UrbanSim convention importing a csv file into a identically named 
 		// data set table. THIS PRODUCES URBANSIM INPUT
 		UrbanSimZoneCSVWriterV2.initUrbanSimZoneWriter();
-		
 		initAccessibilityParameter(scenario);
+		// aggregating facilities to their nearest node on the road network
+		this.aggregatedFacilities = aggregatedOpportunities(opportunities, (NetworkImpl)scenario.getNetwork());
+		
 		log.info(".. done initializing ZoneBasedAccessibilityControlerListenerV3");
 	}
 	
@@ -101,9 +102,7 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 		// get the controller and scenario
 		Controler controler = event.getControler();
 		NetworkImpl network = (NetworkImpl) controler.getNetwork();
-		
-		this.aggregatedOpportunities = this.aggregatedOpportunities(this.zones, this.main.getOpportunitySampleRate(), network, this.main.isParcelMode());
-		
+
 		int benchmarkID = this.benchmark.addMeasure("zone-based accessibility computation");
 
 		
@@ -149,7 +148,7 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 				log.info("Accessibility computation with " 
 						+ measuringPointsZone.getZones().size()
 						+ " zones (origins) and "
-						+ this.aggregatedOpportunities.length
+						+ this.aggregatedFacilities.length
 						+ " destinations (opportunities) took "
 						+ this.benchmark.getDurationInSeconds(benchmarkID)
 						+ " seconds ("
@@ -160,7 +159,6 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 			e.printStackTrace();
 		}
 	}
-
 
 	@Override
 	protected void writeCSVData(

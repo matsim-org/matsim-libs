@@ -782,6 +782,54 @@ public class ReadFromUrbanSimModel {
 	}
 
 	/**
+	 * reading jobs and creating activity facilities
+	 * @param opportunities
+	 * @param parcelsOrZones
+	 * @param isParcel
+	 */
+	public void readJobs(ActivityFacilitiesImpl opportunities, final ActivityFacilitiesImpl parcelsOrZones, final boolean isParcel){
+		
+		String filename = InternalConstants.MATSIM_4_OPUS_TEMP + InternalConstants.URBANSIM_JOB_DATASET_TABLE + this.year + InternalConstants.FILE_TYPE_TAB;
+		
+		Map<Id, ActivityFacility> facilityMap = parcelsOrZones.getFacilities();
+		
+		try{
+			BufferedReader reader = IOUtils.getBufferedReader( filename );
+			// reading header
+			String line = reader.readLine();
+			// get columns for job, parcel and zone id
+			Map<String,Integer> idxFromKey = HeaderParser.createIdxFromKey( line, InternalConstants.TAB );
+			int indexJobID = idxFromKey.get( InternalConstants.JOB_ID );
+			int indexParcelID = -1; // see below
+			int indexZoneID = idxFromKey.get( InternalConstants.ZONE_ID_WORK );
+			if(isParcel)
+				indexParcelID = idxFromKey.get( InternalConstants.PARCEL_ID_WORK );
+			
+			while ( (line=reader.readLine()) != null ) {
+				
+				String[] parts = line.split( InternalConstants.TAB );
+				IdImpl jobId = new IdImpl(parts[indexJobID]);
+				
+				if(isParcel){
+					
+					IdImpl parcelId = new IdImpl(parts[indexParcelID]);
+					ActivityFacility parcel = facilityMap.get(parcelId);
+					opportunities.createAndAddFacility(jobId, parcel.getCoord());
+				}
+				else{// zones
+					
+					IdImpl zoneId = new IdImpl(parts[indexZoneID]);
+					ActivityFacility zone = facilityMap.get(zoneId);
+					opportunities.createAndAddFacility(jobId, zone.getCoord());
+				}
+			}
+			
+		} catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+	
+	/**
 	 * reads jobs from UrbanSim output and return a list of jobs according
 	 * to the specified sample size 
 	 * 
@@ -789,6 +837,7 @@ public class ReadFromUrbanSimModel {
 	 * @param jobSample
 	 * @return
 	 */
+	@Deprecated
 	public List<SpatialReferenceObject> readJobs(final ActivityFacilitiesImpl parcelsOrZones, final double jobSample, final boolean isParcel) {
 		
 		JobCounter cnt = new JobCounter();

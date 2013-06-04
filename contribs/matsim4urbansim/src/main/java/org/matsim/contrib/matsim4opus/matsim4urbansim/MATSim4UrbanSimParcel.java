@@ -193,6 +193,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 		// read UrbanSim facilities (these are simply those entities that have the coordinates!)
 		ActivityFacilitiesImpl parcels = null; // new ActivityFacilitiesImpl("urbansim locations (gridcells _or_ parcels _or_ ...)");
 		ActivityFacilitiesImpl zones   = new ActivityFacilitiesImpl("urbansim zones");
+		ActivityFacilitiesImpl opportunities = new ActivityFacilitiesImpl("opportunity locations (e.g. workplaces) for zones or parcels");
 		
 		// initializing parcels and zones from UrbanSim input
 		//readUrbansimParcelModel(parcels, zones);
@@ -200,10 +201,15 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 			parcels = new ActivityFacilitiesImpl("urbansim locations (gridcells _or_ parcels _or_ ...)");
 			// initializing parcels and zones from UrbanSim input
 			readFromUrbansim.readFacilitiesParcel(parcels, zones);
+			// initializing opportunity facilities (like work places) on parcel level
+			readFromUrbansim.readJobs(opportunities, parcels, this.isParcelMode);
 		}
-		else
+		else{
 			// initializing zones only from UrbanSim input
 			readFromUrbansim.readFacilitiesZones(zones);
+			// initializing opportunity facilities (like work places) on zone level
+			readFromUrbansim.readJobs(opportunities, zones, this.isParcelMode);
+		}
 		
 		// population generation
 		int pc = benchmark.addMeasure("Population construction");
@@ -218,7 +224,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 		scenario.setPopulation(newPopulation);
 
 		// running mobsim and assigned controller listener
-		runControler(zones, parcels);
+		runControler(zones, parcels, opportunities);
 	}
 	
 	/**
@@ -290,9 +296,8 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 	
 	/**
 	 * run simulation
-	 * @param zones
 	 */
-	void runControler( ActivityFacilitiesImpl zones, ActivityFacilitiesImpl parcels){
+	void runControler( ActivityFacilitiesImpl zones, ActivityFacilitiesImpl parcels,ActivityFacilitiesImpl opportunities){
 		
 		Controler controler = new Controler(scenario);
 		if (scenario.getConfig().scenario().isUseRoadpricing()) {
@@ -352,7 +357,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 		}
 			
 		log.info("Adding controler listener ...");
-		addControlerListener(zones, parcels, controler, ptMatrix);
+		addControlerListener(zones, parcels, opportunities, controler, ptMatrix);
 		addFurtherControlerListener(zones, parcels, controler);
 		log.info("Adding controler listener done!");
 	
@@ -367,7 +372,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 	 * @param parcels
 	 * @param controler
 	 */
-	final void addControlerListener(ActivityFacilitiesImpl zones, ActivityFacilitiesImpl parcels, Controler controler, PtMatrix ptMatrix) {
+	final void addControlerListener(ActivityFacilitiesImpl zones, ActivityFacilitiesImpl parcels, ActivityFacilitiesImpl opportunities, Controler controler, PtMatrix ptMatrix) {
 
 		// The following lines register what should be done _after_ the iterations are done:
 		if(computeZone2ZoneImpedance || MATSim4UrbanSimZone.BRUSSELS_SCENARIO_CALCULATE_ZONE2ZONE_MATRIX) {
@@ -388,17 +393,10 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 		if(computeZoneBasedAccessibilities){
 			
 			ZoneLayer<Id>  measuringPoints = GridUtils.convertActivityFacilities2ZoneLayer(zones);
-			
-			ActivityFacilitiesImpl zonesOrParcels;
-			if(this.isParcelMode)
-				zonesOrParcels = parcels;
-			else
-				zonesOrParcels = zones;
 
 			// creates zone based table of log sums
-			controler.addControlerListener( new ZoneBasedAccessibilityControlerListenerV3( this,
-																						measuringPoints, 				
-																						zonesOrParcels,
+			controler.addControlerListener( new ZoneBasedAccessibilityControlerListenerV3(measuringPoints,
+																						opportunities,
 																						ptMatrix,
 																						benchmark,
 																						this.scenario));
@@ -443,32 +441,29 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 				ptGrid		= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
 			}
 			
-			// aggregate opportunities (facilities) on their nearest node on the road network
-			
-			
 			if(isParcelMode)
-				controler.addControlerListener(new GridBasedAccessibilityControlerListenerV3( this,
-																							 measuringPoints, 
-																							 parcels,	// takes parcel coordinates
+				controler.addControlerListener(new GridBasedAccessibilityControlerListenerV3(measuringPoints, 
+																							 parcels,	// takes parcel coordinates, TODO take out
+																							 opportunities,
 																							 freeSpeedGrid,
 																							 carGrid,
 																							 bikeGrid,
 																							 walkGrid,
 																							 ptGrid,
 																							 ptMatrix,
-																							 benchmark, 
+																							 benchmark,
 																							 this.scenario));
 			else
-				controler.addControlerListener(new GridBasedAccessibilityControlerListenerV3( this,
-																							 measuringPoints, 
-																							 zones,		// takes zone centroids
+				controler.addControlerListener(new GridBasedAccessibilityControlerListenerV3(measuringPoints, 
+																							 zones,		// takes zone centroids, TODO take out
+																							 opportunities,
 																							 freeSpeedGrid,
 																							 carGrid,
 																							 bikeGrid,
 																							 walkGrid, 
 																							 ptGrid,
 																							 ptMatrix,
-																							 benchmark, 
+																							 benchmark,
 																							 this.scenario));
 		}
 		
