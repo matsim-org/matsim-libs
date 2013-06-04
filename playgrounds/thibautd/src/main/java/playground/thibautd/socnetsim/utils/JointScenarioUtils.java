@@ -52,6 +52,7 @@ import playground.thibautd.utils.DesiresConverter;
  * @author thibautd
  */
 public class JointScenarioUtils {
+	private static final String UNKOWN_TRAVEL_CARD = "unknown";
 	private JointScenarioUtils() {}
 
 	/**
@@ -118,8 +119,8 @@ public class JointScenarioUtils {
 			reader.parse(
 				config.plans().getInputPersonAttributeFile() );
 
-			// put desires (if any) in persons for backward compatibility
 			for ( Person person : scenario.getPopulation().getPersons().values() ) {
+				// put desires (if any) in persons for backward compatibility
 				final Desires desires = (Desires)
 					scenario.getPopulation().getPersonAttributes().getAttribute(
 							person.getId().toString(),
@@ -131,6 +132,15 @@ public class JointScenarioUtils {
 							entry.getKey(),
 							entry.getValue() );
 					}
+				}
+
+				// travel card
+				final Boolean hasCard = (Boolean)
+					scenario.getPopulation().getPersonAttributes().getAttribute(
+							person.getId().toString(),
+							"hasTravelcard" );
+				if ( hasCard != null && hasCard ) {
+					((PersonImpl) person).addTravelcard( UNKOWN_TRAVEL_CARD );
 				}
 			}
 		}
