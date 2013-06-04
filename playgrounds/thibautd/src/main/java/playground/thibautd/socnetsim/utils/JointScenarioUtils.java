@@ -21,6 +21,8 @@ package playground.thibautd.socnetsim.utils;
 
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.Scenario;
@@ -52,6 +54,9 @@ import playground.thibautd.utils.DesiresConverter;
  * @author thibautd
  */
 public class JointScenarioUtils {
+	private static final Logger log =
+		Logger.getLogger(JointScenarioUtils.class);
+
 	private static final String UNKOWN_TRAVEL_CARD = "unknown";
 	private JointScenarioUtils() {}
 
@@ -112,6 +117,7 @@ public class JointScenarioUtils {
 		}
 
 		if ( config.plans().getInputPersonAttributeFile() != null ) {
+			log.info( "re-reading attributes, this time using a converter for Desires." );
 			final ObjectAttributesXmlReader reader =
 				new ObjectAttributesXmlReader(
 						scenario.getPopulation().getPersonAttributes());
