@@ -35,6 +35,7 @@ import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.utils.misc.Time;
@@ -50,7 +51,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
  * @author sergioo
  */
 
-public class WaitTimeCalculator2 implements AgentDepartureEventHandler, PersonEntersVehicleEventHandler, AgentStuckEventHandler {
+public class WaitTimeStuckCalculator implements AgentDepartureEventHandler, PersonEntersVehicleEventHandler, AgentStuckEventHandler {
 	
 	//Constants
 	private final static String SEPARATOR = "===";
@@ -65,7 +66,10 @@ public class WaitTimeCalculator2 implements AgentDepartureEventHandler, PersonEn
 	private TransitSchedule transitSchedule;
 
 	//Constructors
-	public WaitTimeCalculator2(final Population population, final TransitSchedule transitSchedule, final int timeSlot, final int totalTime) {
+	public WaitTimeStuckCalculator(final Population population, final TransitSchedule transitSchedule, final Config config) {
+		this(population, transitSchedule, config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config.getQSimConfigGroup().getEndTime()-config.getQSimConfigGroup().getStartTime()));
+	}
+	public WaitTimeStuckCalculator(final Population population, final TransitSchedule transitSchedule, final int timeSlot, final int totalTime) {
 		this.population = population;
 		this.transitSchedule = transitSchedule;
 		this.timeSlot = timeSlot;
@@ -105,12 +109,12 @@ public class WaitTimeCalculator2 implements AgentDepartureEventHandler, PersonEn
 	}
 
 	//Methods
-	public WaitTime2 getWaitTimes() {
-		return new WaitTime2() {
+	public WaitTime getWaitTimes() {
+		return new WaitTime() {
 			
 			@Override
 			public double getRouteStopWaitTime(TransitLine line, TransitRoute route, Id stopId, double time) {
-				return WaitTimeCalculator2.this.getRouteStopWaitTime(line, route, stopId, time);
+				return WaitTimeStuckCalculator.this.getRouteStopWaitTime(line, route, stopId, time);
 			}
 		
 		};
@@ -158,8 +162,7 @@ public class WaitTimeCalculator2 implements AgentDepartureEventHandler, PersonEn
 					if(currentLeg==legs) {
 						String[] leg = ((GenericRoute)((Leg)planElement).getRoute()).getRouteDescription().split(SEPARATOR);
 						WaitTimeData data = waitTimes.get(transitSchedule.getTransitLines().get(new IdImpl(leg[2])).getRoutes().get(new IdImpl(leg[3]))).get(new IdImpl(leg[1]));
-						if(data!=null)
-							data.addWaitTime((int) (startWaitingTime/timeSlot), event.getTime()-startWaitingTime);
+						data.addWaitTime((int) (startWaitingTime/timeSlot), event.getTime()-startWaitingTime);
 						agentsWaitingData.remove(event.getPersonId());
 						break PLAN_ELEMENTS;
 					}
@@ -168,27 +171,6 @@ public class WaitTimeCalculator2 implements AgentDepartureEventHandler, PersonEn
 				}
 		}
 	}
-	
-	/*@Override
-	public void handleEvent(AdditionalTeleportationDepartureEvent event) {
-		Double startWaitingTime = agentsWaitingData.get(event.getAgentId());
-		if(startWaitingTime!=null) {
-			int legs = 0, currentLeg = agentsCurrentLeg.get(event.getAgentId());
-			PLAN_ELEMENTS:
-			for(PlanElement planElement:population.getPersons().get(event.getAgentId()).getSelectedPlan().getPlanElements())
-				if(planElement instanceof Leg) {
-					if(currentLeg==legs) {
-						String[] leg = ((GenericRoute)((Leg)planElement).getRoute()).getRouteDescription().split(SEPARATOR);
-						String key = "("+leg[2]+")["+leg[3]+"]"+leg[1];
-						waitTimes.get(key).addWaitTime((int) (startWaitingTime/timeSlot), event.getTime()-startWaitingTime);
-						agentsWaitingData.remove(event.getAgentId());
-						break PLAN_ELEMENTS;
-					}
-					else
-						legs++;
-				}
-		}
-	}*/
 	
 	@Override
 	public void handleEvent(AgentStuckEvent event) {

@@ -42,8 +42,10 @@ public class TransitRouterWWImplFactory implements TransitRouterFactory, AfterMo
 	private Controler controler;
 	private final WaitTime waitTime;
 	
-	public TransitRouterWWImplFactory(final TransitRouterConfig config, final Controler controler, final WaitTime waitTime) {
-		this.config = config;
+	public TransitRouterWWImplFactory(final Controler controler, final WaitTime waitTime) {
+		this.config = new TransitRouterConfig(controler.getScenario().getConfig().planCalcScore(),
+				controler.getScenario().getConfig().plansCalcRoute(), controler.getScenario().getConfig().transitRouter(),
+				controler.getScenario().getConfig().vspExperimental());
 		this.network = controler.getNetwork();
 		this.controler = controler;
 		this.waitTime = waitTime;

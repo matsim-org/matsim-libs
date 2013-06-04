@@ -89,13 +89,12 @@ public class TransitRouterNetworkTravelTimeAndDisutilityWW extends TransitRouter
 		previousLink = link;
 		previousTime = time;
 		TransitRouterNetworkLink wrapped = (TransitRouterNetworkLink) link;
-		if (wrapped.route != null) {
+		if (wrapped.route != null)
 			//in line link
 			cachedTravelTime = linkTravelTimes.get(wrapped.getId())[time/timeSlot<numSlots?(int)(time/timeSlot):(numSlots-1)];
-		}
 		else if(wrapped.toNode.route!=null)
 			//wait link
-			cachedTravelTime = waitTime.getRouteStopWaitTime(wrapped.toNode.line.getId(), wrapped.toNode.route.getId(), wrapped.fromNode.stop.getStopFacility().getId(), time);
+			cachedTravelTime = waitTime.getRouteStopWaitTime(wrapped.toNode.line, wrapped.toNode.route, wrapped.fromNode.stop.getStopFacility().getId(), time);
 		else if(wrapped.fromNode.route==null)
 			//walking link
 			cachedTravelTime = wrapped.getLength()/this.config.getBeelineWalkSpeed();
@@ -111,11 +110,11 @@ public class TransitRouterNetworkTravelTimeAndDisutilityWW extends TransitRouter
 			cachedTravelDisutility = true;
 		TransitRouterNetworkLink wrapped = (TransitRouterNetworkLink) link;
 		if (wrapped.route != null)
-			return -(cachedTravelDisutility?cachedTravelTime:linkTravelTimes.get(wrapped.getId())[time/timeSlot<numSlots?(int)(time/timeSlot):(numSlots-1)])*this.config.getMarginalUtilityOfTravelTimePt_utl_s() 
+			return -(cachedTravelDisutility?cachedTravelTime:linkTravelTimes.get(wrapped.getId())[time/timeSlot<numSlots?(int)(time/timeSlot):(numSlots-1)]) * this.config.getMarginalUtilityOfTravelTimePt_utl_s() 
 				       - link.getLength() * (this.config.getMarginalUtilityOfTravelDistancePt_utl_m()-2.7726/100000);
 		else if (wrapped.toNode.route!=null)
 			// it's a wait link
-			return -(cachedTravelDisutility?cachedTravelTime:waitTime.getRouteStopWaitTime(wrapped.toNode.line.getId(), wrapped.toNode.route.getId(), wrapped.fromNode.stop.getStopFacility().getId(), time))*this.config.getMarginalUtilityOfWaitingPt_utl_s()
+			return -(cachedTravelDisutility?cachedTravelTime:waitTime.getRouteStopWaitTime(wrapped.toNode.line, wrapped.toNode.route, wrapped.fromNode.stop.getStopFacility().getId(), time)) * this.config.getMarginalUtilityOfWaitingPt_utl_s()
 					- this.config.getUtilityOfLineSwitch_utl();
 		else if(wrapped.fromNode.route==null)
 			// it's a transfer link (walk)
@@ -132,7 +131,7 @@ public class TransitRouterNetworkTravelTimeAndDisutilityWW extends TransitRouter
 				       - link.getLength() * (this.config.getMarginalUtilityOfTravelDistancePt_utl_m()-2.7726/100000);
 		else if (wrapped.toNode.route!=null)
 			// it's a wait link
-			return - waitTime.getRouteStopWaitTime(wrapped.toNode.line.getId(), wrapped.toNode.route.getId(), wrapped.fromNode.stop.getStopFacility().getId(), time) * this.config.getMarginalUtilityOfWaitingPt_utl_s()
+			return - waitTime.getRouteStopWaitTime(wrapped.toNode.line, wrapped.toNode.route, wrapped.fromNode.stop.getStopFacility().getId(), time) * this.config.getMarginalUtilityOfWaitingPt_utl_s()
 					- this.config.getUtilityOfLineSwitch_utl();
 		else if(wrapped.fromNode.route==null)
 			// it's a transfer link (walk)

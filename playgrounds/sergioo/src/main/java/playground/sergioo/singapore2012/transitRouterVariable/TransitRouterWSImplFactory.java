@@ -36,13 +36,15 @@ public class TransitRouterWSImplFactory implements TransitRouterFactory {
 	private final TransitRouterConfig config;
 	private final TransitRouterNetworkWW routerNetwork;
 	private final Network network;
-	private TransitRouterNetworkTravelTimeAndDisutilityWS2 transitRouterNetworkTravelTimeAndDisutilityWS;
+	private TransitRouterNetworkTravelTimeAndDisutilityWS transitRouterNetworkTravelTimeAndDisutilityWS;
 	
-	public TransitRouterWSImplFactory(final TransitRouterConfig config, final Scenario scenario, final WaitTime2 waitTime, final StopStopTime stopStopTime) {
-		this.config = config;
+	public TransitRouterWSImplFactory(final Scenario scenario, final WaitTime waitTime, final StopStopTime stopStopTime) {
+		this.config = new TransitRouterConfig(scenario.getConfig().planCalcScore(),
+				scenario.getConfig().plansCalcRoute(), scenario.getConfig().transitRouter(),
+				scenario.getConfig().vspExperimental());
 		this.network = scenario.getNetwork();
 		routerNetwork = TransitRouterNetworkWW.createFromSchedule(network, scenario.getTransitSchedule(), this.config.beelineWalkConnectionDistance);
-		transitRouterNetworkTravelTimeAndDisutilityWS = new TransitRouterNetworkTravelTimeAndDisutilityWS2(config, network, routerNetwork, waitTime, stopStopTime, scenario.getConfig().travelTimeCalculator(), scenario.getConfig().getQSimConfigGroup(), new PreparedTransitSchedule(scenario.getTransitSchedule()));
+		transitRouterNetworkTravelTimeAndDisutilityWS = new TransitRouterNetworkTravelTimeAndDisutilityWS(config, network, routerNetwork, waitTime, stopStopTime, scenario.getConfig().travelTimeCalculator(), scenario.getConfig().getQSimConfigGroup(), new PreparedTransitSchedule(scenario.getTransitSchedule()));
 	}
 	@Override
 	public TransitRouter createTransitRouter() {

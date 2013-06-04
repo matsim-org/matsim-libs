@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.sergioo.singapore2012.transitRouterVariable;
+package playground.sergioo.singapore2012.transitRouterVariable.old;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -37,18 +37,18 @@ import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.vehicles.Vehicle;
 
-import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkWW.TransitRouterNetworkLink;
+import playground.sergioo.singapore2012.transitRouterVariable.old.TransitRouterNetworkWW.TransitRouterNetworkLink;
 
 /**
  * TravelTime and TravelDisutility calculator to be used with the transit network used for transit routing.
  *
  * @author sergioo
  */
-public class TransitRouterNetworkTravelTimeAndDisutilityWW2 extends TransitRouterNetworkTravelTimeAndDisutility implements TravelDisutility {
+public class TransitRouterNetworkTravelTimeAndDisutilityWWOld extends TransitRouterNetworkTravelTimeAndDisutility implements TravelDisutility {
 	
 	private Network network;
 	private final TravelTime travelTime;
-	private final WaitTime2 waitTime;
+	private final WaitTimeOld waitTime;
 	private final Map<Id, double[]> linkTravelTimes = new HashMap<Id, double[]>();
 	private final double timeSlot;
 	private final int numSlots;
@@ -58,10 +58,10 @@ public class TransitRouterNetworkTravelTimeAndDisutilityWW2 extends TransitRoute
 	private double previousTime;
 	private double cachedTravelTime;
 	
-	public TransitRouterNetworkTravelTimeAndDisutilityWW2(final TransitRouterConfig config, Network network, TransitRouterNetworkWW routerNetwork, TravelTime travelTime, WaitTime2 waitTime, TravelTimeCalculatorConfigGroup tTConfigGroup, QSimConfigGroup qSimConfigGroup, PreparedTransitSchedule preparedTransitSchedule) {
+	public TransitRouterNetworkTravelTimeAndDisutilityWWOld(final TransitRouterConfig config, Network network, TransitRouterNetworkWW routerNetwork, TravelTime travelTime, WaitTimeOld waitTime, TravelTimeCalculatorConfigGroup tTConfigGroup, QSimConfigGroup qSimConfigGroup, PreparedTransitSchedule preparedTransitSchedule) {
 		this(config, network, routerNetwork, travelTime, waitTime, tTConfigGroup, qSimConfigGroup.getStartTime(), qSimConfigGroup.getEndTime(), preparedTransitSchedule);
 	}
-	public TransitRouterNetworkTravelTimeAndDisutilityWW2(final TransitRouterConfig config, Network network, TransitRouterNetworkWW routerNetwork, TravelTime travelTime, WaitTime2 waitTime, TravelTimeCalculatorConfigGroup tTConfigGroup, double startTime, double endTime, PreparedTransitSchedule preparedTransitSchedule) {
+	public TransitRouterNetworkTravelTimeAndDisutilityWWOld(final TransitRouterConfig config, Network network, TransitRouterNetworkWW routerNetwork, TravelTime travelTime, WaitTimeOld waitTime, TravelTimeCalculatorConfigGroup tTConfigGroup, double startTime, double endTime, PreparedTransitSchedule preparedTransitSchedule) {
 		super(config, preparedTransitSchedule);
 		this.network = network;
 		this.travelTime = travelTime;
@@ -89,12 +89,13 @@ public class TransitRouterNetworkTravelTimeAndDisutilityWW2 extends TransitRoute
 		previousLink = link;
 		previousTime = time;
 		TransitRouterNetworkLink wrapped = (TransitRouterNetworkLink) link;
-		if (wrapped.route != null)
+		if (wrapped.route != null) {
 			//in line link
 			cachedTravelTime = linkTravelTimes.get(wrapped.getId())[time/timeSlot<numSlots?(int)(time/timeSlot):(numSlots-1)];
+		}
 		else if(wrapped.toNode.route!=null)
 			//wait link
-			cachedTravelTime = waitTime.getRouteStopWaitTime(wrapped.toNode.line, wrapped.toNode.route, wrapped.fromNode.stop.getStopFacility().getId(), time);
+			cachedTravelTime = waitTime.getRouteStopWaitTime(wrapped.toNode.line.getId(), wrapped.toNode.route.getId(), wrapped.fromNode.stop.getStopFacility().getId(), time);
 		else if(wrapped.fromNode.route==null)
 			//walking link
 			cachedTravelTime = wrapped.getLength()/this.config.getBeelineWalkSpeed();
@@ -110,11 +111,11 @@ public class TransitRouterNetworkTravelTimeAndDisutilityWW2 extends TransitRoute
 			cachedTravelDisutility = true;
 		TransitRouterNetworkLink wrapped = (TransitRouterNetworkLink) link;
 		if (wrapped.route != null)
-			return -(cachedTravelDisutility?cachedTravelTime:linkTravelTimes.get(wrapped.getId())[time/timeSlot<numSlots?(int)(time/timeSlot):(numSlots-1)]) * this.config.getMarginalUtilityOfTravelTimePt_utl_s() 
+			return -(cachedTravelDisutility?cachedTravelTime:linkTravelTimes.get(wrapped.getId())[time/timeSlot<numSlots?(int)(time/timeSlot):(numSlots-1)])*this.config.getMarginalUtilityOfTravelTimePt_utl_s() 
 				       - link.getLength() * (this.config.getMarginalUtilityOfTravelDistancePt_utl_m()-2.7726/100000);
 		else if (wrapped.toNode.route!=null)
 			// it's a wait link
-			return -(cachedTravelDisutility?cachedTravelTime:waitTime.getRouteStopWaitTime(wrapped.toNode.line, wrapped.toNode.route, wrapped.fromNode.stop.getStopFacility().getId(), time)) * this.config.getMarginalUtilityOfWaitingPt_utl_s()
+			return -(cachedTravelDisutility?cachedTravelTime:waitTime.getRouteStopWaitTime(wrapped.toNode.line.getId(), wrapped.toNode.route.getId(), wrapped.fromNode.stop.getStopFacility().getId(), time))*this.config.getMarginalUtilityOfWaitingPt_utl_s()
 					- this.config.getUtilityOfLineSwitch_utl();
 		else if(wrapped.fromNode.route==null)
 			// it's a transfer link (walk)
@@ -131,7 +132,7 @@ public class TransitRouterNetworkTravelTimeAndDisutilityWW2 extends TransitRoute
 				       - link.getLength() * (this.config.getMarginalUtilityOfTravelDistancePt_utl_m()-2.7726/100000);
 		else if (wrapped.toNode.route!=null)
 			// it's a wait link
-			return - waitTime.getRouteStopWaitTime(wrapped.toNode.line, wrapped.toNode.route, wrapped.fromNode.stop.getStopFacility().getId(), time) * this.config.getMarginalUtilityOfWaitingPt_utl_s()
+			return - waitTime.getRouteStopWaitTime(wrapped.toNode.line.getId(), wrapped.toNode.route.getId(), wrapped.fromNode.stop.getStopFacility().getId(), time) * this.config.getMarginalUtilityOfWaitingPt_utl_s()
 					- this.config.getUtilityOfLineSwitch_utl();
 		else if(wrapped.fromNode.route==null)
 			// it's a transfer link (walk)

@@ -18,11 +18,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.sergioo.singapore2012.transitRouterVariable;
+package playground.sergioo.singapore2012.transitRouterVariable.old;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
 
 /**
  * Gives an average of the wait time of people for a line, route, stop and in a time of the day 
@@ -30,9 +28,9 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
  * @author sergioo
  */
 
-public interface WaitTime2 {
+public interface WaitTimeOld {
 
 	//Methods
-	public double getRouteStopWaitTime(TransitLine line, TransitRoute route, Id stopId, double time);
+	public double getRouteStopWaitTime(Id lineId, Id routeId, Id stopId, double time);
 
 }

@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.sergioo.singapore2012.transitRouterVariable;
+package playground.sergioo.singapore2012.transitRouterVariable.old;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.Controler;
@@ -33,16 +33,16 @@ import org.matsim.pt.router.TransitRouterFactory;
  * 
  * @author sergioo
  */
-public class TransitRouterWWImplFactory2 implements TransitRouterFactory, AfterMobsimListener {
+public class TransitRouterWWImplFactoryOld implements TransitRouterFactory, AfterMobsimListener {
 
 	private final TransitRouterConfig config;
 	private final TransitRouterNetworkWW routerNetwork;
 	private final Network network;
-	private TransitRouterNetworkTravelTimeAndDisutilityWW2 transitRouterNetworkTravelTimeAndDisutilityWW;
+	private TransitRouterNetworkTravelTimeAndDisutilityWWOld transitRouterNetworkTravelTimeAndDisutilityWW;
 	private Controler controler;
-	private final WaitTime2 waitTime;
+	private final WaitTimeOld waitTime;
 	
-	public TransitRouterWWImplFactory2(final TransitRouterConfig config, final Controler controler, final WaitTime2 waitTime) {
+	public TransitRouterWWImplFactoryOld(final TransitRouterConfig config, final Controler controler, final WaitTimeOld waitTime) {
 		this.config = config;
 		this.network = controler.getNetwork();
 		this.controler = controler;
@@ -51,7 +51,7 @@ public class TransitRouterWWImplFactory2 implements TransitRouterFactory, AfterM
 	}
 	@Override
 	public TransitRouter createTransitRouter() {
-		transitRouterNetworkTravelTimeAndDisutilityWW = new TransitRouterNetworkTravelTimeAndDisutilityWW2(config, network, routerNetwork, controler.getLinkTravelTimes(), waitTime, controler.getConfig().travelTimeCalculator(), controler.getConfig().getQSimConfigGroup(), new PreparedTransitSchedule(controler.getScenario().getTransitSchedule()));
+		transitRouterNetworkTravelTimeAndDisutilityWW = new TransitRouterNetworkTravelTimeAndDisutilityWWOld(config, network, routerNetwork, controler.getLinkTravelTimes(), waitTime, controler.getConfig().travelTimeCalculator(), controler.getConfig().getQSimConfigGroup(), new PreparedTransitSchedule(controler.getScenario().getTransitSchedule()));
 		return new TransitRouterVariableImpl(config, transitRouterNetworkTravelTimeAndDisutilityWW, routerNetwork, network);
 	}
 	@Override
