@@ -36,10 +36,6 @@ public class AggregateObject2NearestNode {
 	}
 	
 	@Deprecated
-	public AggregateObject2NearestNode(double distance, Id objectID, Id parcelId, Id zoneId, Coord coordinate){
-		this(distance, objectID, parcelId, zoneId, coordinate, null);
-	}
-	@Deprecated
 	public AggregateObject2NearestNode(double distance, Id objectID, Id parcelId, Id zoneId, Coord coordinate, Node nearestNode){
 		if(this.objectIdList == null)
 			this.objectIdList = new ArrayList<Id>();
@@ -93,48 +89,12 @@ public class AggregateObject2NearestNode {
 	public double getSumVjk(){
 		return this.sumVjk;
 	}
-	
-//	public double getSumWalkDistanceCost(){
-//		return this.sumWalkDistanceCost;		
+//
+//	@Deprecated
+//	public double getAverageDistance(){
+//		if(this.objectIdList != null &&
+//		   this.objectIdList.size() > 0)
+//			return this.distanceSum / this.objectIdList.size();
+//		return 0.;			
 //	}
-//	
-//	public double getSumWalkPowerDistanceCost(){
-//		return this.sumWalkPowerDistanceCost;
-//	}
-//	
-//	public double getSumWalkLnDistanceCost(){
-//		return this.sumWalkLnDistanceCost;
-//	}
-//	
-//	public double getSumWalkTravelTimeCost(){
-//		return this.sumWalkTravelTimeCost;
-//	}
-//	
-//	public double getSumWalkPowerTravelTimeCost(){
-//		return this.sumWalkPowerTravelTimeCost;
-//	}
-//	
-//	public double getSumWalkLnTravelTimeCost(){
-//		return this.sumWalkLnTravelTimeCost;
-//	}
-//	
-//	public double getSumWalkMonetaryTravelCost(){
-//		return this.sumWalkMonetaryTravelCost;
-//	}
-//	
-//	public double getSumWalkPowerMonetaryTravelCost(){
-//		return this.sumWalkPowerMonetaryTravelCost;
-//	}
-//	
-//	public double getSumWalkLnMonetaryTravelCost(){
-//		return this.sumWalkLnMonetaryTravelCost;
-//	}
-	
-	@Deprecated
-	public double getAverageDistance(){
-		if(this.objectIdList != null &&
-		   this.objectIdList.size() > 0)
-			return this.distanceSum / this.objectIdList.size();
-		return 0.;			
-	}
 }

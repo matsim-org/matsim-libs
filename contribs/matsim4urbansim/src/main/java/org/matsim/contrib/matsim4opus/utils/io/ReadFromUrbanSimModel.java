@@ -740,46 +740,6 @@ public class ReadFromUrbanSimModel {
 			break ;
 		}
 	}
-	
-
-	/**
-	 * Aggregates jobs with the same parcel ID 
-	 * 
-	 * @param jobObjectMap
-	 */
-	@Deprecated
-	public AggregateObject2NearestNode[] aggregateJobsWithSameParcelID(List<SpatialReferenceObject> jobSampleList) {
-		
-		log.info("Aggregating Job with identical parcel ID ...");
-		Map<Id, AggregateObject2NearestNode> jobClusterMap = new ConcurrentHashMap<Id, AggregateObject2NearestNode>();
-		
-		ProgressBar bar = new ProgressBar( jobSampleList.size() );
-		
-		for(int i = 0; i < jobSampleList.size(); i++){
-			bar.update();
-			SpatialReferenceObject jo = jobSampleList.get( i );
-			
-			if( jobClusterMap.containsKey( jo.getParcelID() ) ){
-				AggregateObject2NearestNode jco = jobClusterMap.get( jo.getParcelID() );
-				jco.addObjectOld( jo.getObjectID(), 0.);
-			}
-			else
-				jobClusterMap.put(
-						jo.getParcelID(),
-						new AggregateObject2NearestNode(0., jo.getObjectID(), jo.getParcelID(), jo.getZoneID(),
-								jo.getCoord()));
-		}
-		
-		AggregateObject2NearestNode jobClusterArray []  = new AggregateObject2NearestNode[ jobClusterMap.size() ];
-		Iterator<AggregateObject2NearestNode> jobClusterIterator = jobClusterMap.values().iterator();
-
-		for(int i = 0; jobClusterIterator.hasNext(); i++)
-			jobClusterArray[i] = jobClusterIterator.next();
-		
-		log.info("Aggregated number of jobs from " + jobSampleList.size() + " to " + jobClusterArray.length);
-		
-		return jobClusterArray;
-	}
 
 	/**
 	 * reading jobs and creating activity facilities
@@ -828,195 +788,120 @@ public class ReadFromUrbanSimModel {
 			e.printStackTrace();
 		}
 	}
-	
-	/**
-	 * reads jobs from UrbanSim output and return a list of jobs according
-	 * to the specified sample size 
-	 * 
-	 * @param parcelsOrZones
-	 * @param jobSample
-	 * @return
-	 */
-	@Deprecated
-	public List<SpatialReferenceObject> readJobs(final ActivityFacilitiesImpl parcelsOrZones, final double jobSample, final boolean isParcel) {
-		
-		JobCounter cnt = new JobCounter();
-		
- 		List<SpatialReferenceObject> jobSampleList = new ArrayList<SpatialReferenceObject>();
-		List<SpatialReferenceObject> backupList = new ArrayList<SpatialReferenceObject>();
-		
-		
-		String filename = InternalConstants.MATSIM_4_OPUS_TEMP + InternalConstants.URBANSIM_JOB_DATASET_TABLE + this.year + InternalConstants.FILE_TYPE_TAB;
-		
-		if(parcelsOrZones != null){
-			
-			log.info( "Starting to read jobs table from " + filename );
-			
-			Map<Id, ActivityFacility> facilityMap = parcelsOrZones.getFacilities();
-			
-			try{
-				BufferedReader reader = IOUtils.getBufferedReader( filename );
-				
-				// reading header
-				String line = reader.readLine();
-				// get columns for job, parcel and zone id
-				Map<String,Integer> idxFromKey = HeaderParser.createIdxFromKey( line, InternalConstants.TAB );
-				int indexJobID = idxFromKey.get( InternalConstants.JOB_ID );
-				int indexParcelID = -1; // see below
-				int indexZoneID = idxFromKey.get( InternalConstants.ZONE_ID_WORK );
-				if(isParcel)
-					indexParcelID = idxFromKey.get( InternalConstants.PARCEL_ID_WORK );
 
-				boolean isBackup = false;
-				
-				while ( (line=reader.readLine()) != null ) {
-					cnt.numberOfUrbanSimJobs++;
-					isBackup = false;
-					
-					if(MatsimRandom.getRandom().nextDouble() > jobSample)
-						isBackup = true;
-					
-					String[] parts = line.split( InternalConstants.TAB );
-					
-					if(isParcel) 	// parcel based approach
-						createJobParcel(cnt, jobSampleList, backupList,
-								facilityMap, indexJobID, indexParcelID, indexZoneID, isBackup,
-								parts);
-					else			// zone based approach
-						createJobZone(cnt, jobSampleList, backupList,
-								facilityMap, indexJobID, indexZoneID, isBackup, 
-								parts);
-				}
-				
-				reader.close();
-				
-			} catch (FileNotFoundException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		
-		log.info("Reading Jobs done!");
-		
-		checkAndAdjustJobSampleSize(jobSample, cnt, jobSampleList, backupList);
-		
-		return jobSampleList;
-	}
-
-	private void createJobParcel(final JobCounter cnt,
-			final List<SpatialReferenceObject> jobSampleList,
-			final List<SpatialReferenceObject> backupList,
-			final Map<Id, ActivityFacility> facilityMap, 
-			final int indexJobID,
-			final int indexParcelID, 
-			final int indexZoneID,
-			final boolean isBackup, 
-			final String[] parts) {
-		
-		Id jobID;
-		Id parcelID;
-		Id zoneID;
-		Coord coord;
-		if( Integer.parseInt( parts[indexParcelID] ) >= 0 ){
-			
-			jobID = new IdImpl( parts[indexJobID] );
-			assert( jobID != null);
-			parcelID = new IdImpl( parts[indexParcelID] );
-			assert( parcelID != null );
-			zoneID = new IdImpl( parts[indexZoneID] );
-			assert( zoneID != null );
-			coord = facilityMap.get( parcelID ).getCoord();
-			assert( coord != null );
-			
-			if(isBackup){
-				backupList.add( new SpatialReferenceObject(jobID, parcelID, zoneID, coord) );
-				cnt.backupJobs++;
-			}
-			else
-				jobSampleList.add( new SpatialReferenceObject(jobID, parcelID, zoneID, coord) );
-		}
-		else
-			cnt.skippedJobs++;	// counting number of skipped jobs ...
-	}
-	
-	private void createJobZone(final JobCounter cnt,
-			final List<SpatialReferenceObject> jobSampleList,
-			final List<SpatialReferenceObject> backupList,
-			final Map<Id, ActivityFacility> facilityMap, 
-			final int indexJobID,
-			final int indexZoneID,
-			final boolean isBackup, 
-			final String[] parts) {
-		
-		Id jobID;
-		Id zoneID;
-		Coord coord;
-		if( Integer.parseInt( parts[indexZoneID] ) >= 0 ){
-		
-			jobID = new IdImpl( parts[indexJobID] );
-			assert( jobID != null);
-			zoneID = new IdImpl( parts[indexZoneID] );
-			assert( zoneID != null );
-			coord = facilityMap.get( zoneID ).getCoord();
-			assert( coord != null );
-			
-			if(isBackup){
-				backupList.add( new SpatialReferenceObject(jobID, new IdImpl(-1), zoneID, coord) );
-				cnt.backupJobs++;
-			}
-			else
-				jobSampleList.add( new SpatialReferenceObject(jobID, new IdImpl(-1), zoneID, coord) );
-		}
-		else
-			cnt.skippedJobs++;	// counting number of skipped jobs ...
-	}
-
-	/**
-	 * @param jobSample
-	 * @param cnt
-	 * @param jobObjectMap
-	 * @param backupList
-	 */
-	private void checkAndAdjustJobSampleSize(double jobSample, JobCounter cnt, List<SpatialReferenceObject> jobSampleList, List<SpatialReferenceObject> backupList) {
-		
-		cnt.allowedJobs = Math.round( jobSample*cnt.numberOfUrbanSimJobs );
-		
-		log.info(" samplingRate: " + jobSample + "; total number of jobs: " + cnt.numberOfUrbanSimJobs + "; number jobs should count: " + cnt.allowedJobs +
-				 "; actual number jobs: " + jobSampleList.size() + "; number of jobs in backupList: " +cnt.backupJobs + "; skipped jobs (without parcel id):" + cnt.skippedJobs);
-		
-		// if job sample size is too low add jobs from backup list
-		if(cnt.allowedJobs > jobSampleList.size()){
-			log.info("Size of actual added jobs (" + jobSampleList.size() + ") is smaller than samplingRate*NumberUrbansimJobs (" + cnt.allowedJobs + "). Adding jobs, stored in backupList ... ");
-			Collections.shuffle( backupList );
-			
-			for(SpatialReferenceObject jObject : backupList){
-				if(cnt.allowedJobs > jobSampleList.size()){
-					jobSampleList.add( jObject );
-					cnt.addedJobsFromBackup++;
-				}
-				else break;
-			}
-			log.info("... done!");
-		}
-		// otherwise if too many jobs were added remove jobs
-		else if(cnt.allowedJobs < jobSampleList.size()){
-			log.info("Actual size of jobs (" + jobSampleList.size() + ") is larger than samplingRate*NumberUrbansimJobs (" + cnt.allowedJobs + "). Removing jobs... ");
-			
-			Random randomGenerator = MatsimRandom.getRandom();
-			
-			// removes jobs randomly
-			while(cnt.allowedJobs < jobSampleList.size()){
-				
-				int index = randomGenerator.nextInt( jobSampleList.size() );
-				jobSampleList.remove( index );
-			}
-		}
-		
-		log.info(" samplingRate: " + jobSample + "; total number of jobs: " + cnt.numberOfUrbanSimJobs + "; number jobs should count: " + cnt.allowedJobs +
-				 "; actual number jobs: " + jobSampleList.size() + "; number of jobs in backupList: " +cnt.backupJobs + "; skipped jobs (without parcel id):" + cnt.skippedJobs +
-				 "; number of jobs added from backupList: " + cnt.addedJobsFromBackup);
-	}
+//	private void createJobParcel(final JobCounter cnt,
+//			final List<SpatialReferenceObject> jobSampleList,
+//			final List<SpatialReferenceObject> backupList,
+//			final Map<Id, ActivityFacility> facilityMap, 
+//			final int indexJobID,
+//			final int indexParcelID, 
+//			final int indexZoneID,
+//			final boolean isBackup, 
+//			final String[] parts) {
+//		
+//		Id jobID;
+//		Id parcelID;
+//		Id zoneID;
+//		Coord coord;
+//		if( Integer.parseInt( parts[indexParcelID] ) >= 0 ){
+//			
+//			jobID = new IdImpl( parts[indexJobID] );
+//			assert( jobID != null);
+//			parcelID = new IdImpl( parts[indexParcelID] );
+//			assert( parcelID != null );
+//			zoneID = new IdImpl( parts[indexZoneID] );
+//			assert( zoneID != null );
+//			coord = facilityMap.get( parcelID ).getCoord();
+//			assert( coord != null );
+//			
+//			if(isBackup){
+//				backupList.add( new SpatialReferenceObject(jobID, parcelID, zoneID, coord) );
+//				cnt.backupJobs++;
+//			}
+//			else
+//				jobSampleList.add( new SpatialReferenceObject(jobID, parcelID, zoneID, coord) );
+//		}
+//		else
+//			cnt.skippedJobs++;	// counting number of skipped jobs ...
+//	}
+//	
+//	private void createJobZone(final JobCounter cnt,
+//			final List<SpatialReferenceObject> jobSampleList,
+//			final List<SpatialReferenceObject> backupList,
+//			final Map<Id, ActivityFacility> facilityMap, 
+//			final int indexJobID,
+//			final int indexZoneID,
+//			final boolean isBackup, 
+//			final String[] parts) {
+//		
+//		Id jobID;
+//		Id zoneID;
+//		Coord coord;
+//		if( Integer.parseInt( parts[indexZoneID] ) >= 0 ){
+//		
+//			jobID = new IdImpl( parts[indexJobID] );
+//			assert( jobID != null);
+//			zoneID = new IdImpl( parts[indexZoneID] );
+//			assert( zoneID != null );
+//			coord = facilityMap.get( zoneID ).getCoord();
+//			assert( coord != null );
+//			
+//			if(isBackup){
+//				backupList.add( new SpatialReferenceObject(jobID, new IdImpl(-1), zoneID, coord) );
+//				cnt.backupJobs++;
+//			}
+//			else
+//				jobSampleList.add( new SpatialReferenceObject(jobID, new IdImpl(-1), zoneID, coord) );
+//		}
+//		else
+//			cnt.skippedJobs++;	// counting number of skipped jobs ...
+//	}
+//
+//	/**
+//	 * @param jobSample
+//	 * @param cnt
+//	 * @param jobObjectMap
+//	 * @param backupList
+//	 */
+//	private void checkAndAdjustJobSampleSize(double jobSample, JobCounter cnt, List<SpatialReferenceObject> jobSampleList, List<SpatialReferenceObject> backupList) {
+//		
+//		cnt.allowedJobs = Math.round( jobSample*cnt.numberOfUrbanSimJobs );
+//		
+//		log.info(" samplingRate: " + jobSample + "; total number of jobs: " + cnt.numberOfUrbanSimJobs + "; number jobs should count: " + cnt.allowedJobs +
+//				 "; actual number jobs: " + jobSampleList.size() + "; number of jobs in backupList: " +cnt.backupJobs + "; skipped jobs (without parcel id):" + cnt.skippedJobs);
+//		
+//		// if job sample size is too low add jobs from backup list
+//		if(cnt.allowedJobs > jobSampleList.size()){
+//			log.info("Size of actual added jobs (" + jobSampleList.size() + ") is smaller than samplingRate*NumberUrbansimJobs (" + cnt.allowedJobs + "). Adding jobs, stored in backupList ... ");
+//			Collections.shuffle( backupList );
+//			
+//			for(SpatialReferenceObject jObject : backupList){
+//				if(cnt.allowedJobs > jobSampleList.size()){
+//					jobSampleList.add( jObject );
+//					cnt.addedJobsFromBackup++;
+//				}
+//				else break;
+//			}
+//			log.info("... done!");
+//		}
+//		// otherwise if too many jobs were added remove jobs
+//		else if(cnt.allowedJobs < jobSampleList.size()){
+//			log.info("Actual size of jobs (" + jobSampleList.size() + ") is larger than samplingRate*NumberUrbansimJobs (" + cnt.allowedJobs + "). Removing jobs... ");
+//			
+//			Random randomGenerator = MatsimRandom.getRandom();
+//			
+//			// removes jobs randomly
+//			while(cnt.allowedJobs < jobSampleList.size()){
+//				
+//				int index = randomGenerator.nextInt( jobSampleList.size() );
+//				jobSampleList.remove( index );
+//			}
+//		}
+//		
+//		log.info(" samplingRate: " + jobSample + "; total number of jobs: " + cnt.numberOfUrbanSimJobs + "; number jobs should count: " + cnt.allowedJobs +
+//				 "; actual number jobs: " + jobSampleList.size() + "; number of jobs in backupList: " +cnt.backupJobs + "; skipped jobs (without parcel id):" + cnt.skippedJobs +
+//				 "; number of jobs added from backupList: " + cnt.addedJobsFromBackup);
+//	}
 
 	/**
 	 * determine if a person already exists
