@@ -468,6 +468,14 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 																							 benchmark, 
 																							 this.scenario));
 		}
+		
+		// From here outputs are for analysis/debugging purposes only
+		{ // dump population in csv format
+		if(isParcelMode)
+			readFromUrbansim.readAndDumpPersons2CSV(parcels, controler.getNetwork());
+		else
+			readFromUrbansim.readAndDumpPersons2CSV(zones, controler.getNetwork());
+		}
 	}
 	
 	/**

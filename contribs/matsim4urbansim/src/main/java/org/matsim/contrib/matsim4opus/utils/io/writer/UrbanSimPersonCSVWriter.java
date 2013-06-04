@@ -1,6 +1,7 @@
 package org.matsim.contrib.matsim4opus.utils.io.writer;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
@@ -72,6 +73,11 @@ public class UrbanSimPersonCSVWriter {
 			assert(UrbanSimPersonCSVWriter.personWriter != null);
 			personWriter.flush();
 			personWriter.close();
+			
+			// copy the zones file to the outputfolder...
+			log.info("Copying " + InternalConstants.MATSIM_4_OPUS_TEMP + FILE_NAME + " to " + InternalConstants.MATSIM_4_OPUS_OUTPUT + FILE_NAME);
+			IOUtils.copyFile(new File( InternalConstants.MATSIM_4_OPUS_TEMP + FILE_NAME),	new File( InternalConstants.MATSIM_4_OPUS_OUTPUT + FILE_NAME));
+			
 			log.info("... done!");
 		} catch (IOException e) {
 			e.printStackTrace();

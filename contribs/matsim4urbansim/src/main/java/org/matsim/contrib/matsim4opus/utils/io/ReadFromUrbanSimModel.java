@@ -1080,9 +1080,9 @@ public class ReadFromUrbanSimModel {
 				}
 			}
 			// dump population data
-			AnalysisPopulationCSVWriter.writePopulationData2CSV( personLocations);
+			AnalysisPopulationCSVWriter.writePopulationData2CSV( personLocations );
 			// dump aggregated population data
-			AnalysisPopulationCSVWriter.writeAggregatedPopulationData2CSV(InternalConstants.MATSIM_4_OPUS_TEMP + "aggregated_population.csv", personClusterMap);
+			AnalysisPopulationCSVWriter.writeAggregatedPopulationData2CSV(personClusterMap);
 			
 		} catch (Exception e) {e.printStackTrace();}
 	}

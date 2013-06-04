@@ -158,7 +158,7 @@ public class AccessibilityControlerListenerImpl{
 	
 	RoadPricingSchemeImpl scheme;
 	
-	private double[][] grids;
+//	private double[][] grids;
 
 	
 	/**
@@ -382,7 +382,7 @@ public class AccessibilityControlerListenerImpl{
 											int mode,
 											Controler contorler) {
 
-		grids = new double[numberOfMeasuringPoints][4];
+//		grids = new double[numberOfMeasuringPoints][4];
 		
 		GeneralizedCostSum gcs = new GeneralizedCostSum();
 		
@@ -572,10 +572,10 @@ public class AccessibilityControlerListenerImpl{
 					ptGrid.setValue(ptAccessibility, measurePoint.getGeometry().getCentroid());
 				}
 				
-				grids[Integer.parseInt(measurePoint.getAttribute().toString())][0] = freeSpeedAccessibility;
-				grids[Integer.parseInt(measurePoint.getAttribute().toString())][1] = carAccessibility;
-				grids[Integer.parseInt(measurePoint.getAttribute().toString())][2] = bikeAccessibility;
-				grids[Integer.parseInt(measurePoint.getAttribute().toString())][3] = walkAccessibility;
+//				grids[Integer.parseInt(measurePoint.getAttribute().toString())][0] = freeSpeedAccessibility;
+//				grids[Integer.parseInt(measurePoint.getAttribute().toString())][1] = carAccessibility;
+//				grids[Integer.parseInt(measurePoint.getAttribute().toString())][2] = bikeAccessibility;
+//				grids[Integer.parseInt(measurePoint.getAttribute().toString())][3] = walkAccessibility;
 				
 				writeCSVData(measurePoint, coordFromZone, fromNode, 
 						freeSpeedAccessibility, carAccessibility,

@@ -113,6 +113,9 @@ import org.matsim.utils.LeastCostPathTree;
  * improvements may'13
  * - grid based accessibility data is written into matsim output folder
  * 
+ * changes june'13
+ * - changed class name from ParcelBasedAccessibilityControlerListenerV3 into GridBasedAccessibilityControlerListenerV3
+ * 
  * @author thomas
  * 
  */

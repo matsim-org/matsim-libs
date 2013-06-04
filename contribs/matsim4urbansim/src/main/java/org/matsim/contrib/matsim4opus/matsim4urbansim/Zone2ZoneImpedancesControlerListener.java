@@ -20,6 +20,7 @@
 package org.matsim.contrib.matsim4opus.matsim4urbansim;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
@@ -92,7 +93,6 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 	private MATSim4UrbanSimInterface main;
 	private ActivityFacilitiesImpl zones;
 	private ActivityFacilitiesImpl parcels;
-	private String travelDataPath;
 	private PtMatrix ptMatrix;		// this could be zero of no input files for pseudo pt are given ...
 	private Benchmark benchmark;
 
@@ -109,7 +109,6 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 		this.zones = zones;
 		assert(parcels != null);
 		this.parcels = parcels;
-		this.travelDataPath = InternalConstants.MATSIM_4_OPUS_TEMP + FILE_NAME;
 		this.ptMatrix = ptMatrix;
 		assert(benchmark != null);
 		this.benchmark = benchmark;
@@ -214,7 +213,8 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 		Matrix originDestinationMatrix = new Matrix("tripMatrix", "Zone to Zone origin destination trip matrix");
 		
 		try {
-			BufferedWriter travelDataWriter = initZone2ZoneImpedaceWriter(); // creating zone-to-zone impedance matrix with header
+			// creating zone-to-zone impedance matrix with header
+			BufferedWriter travelDataWriter = initZone2ZoneImpedaceWriter(InternalConstants.MATSIM_4_OPUS_TEMP + FILE_NAME); 
 			
 			computeZoneToZoneTrips(sc, originDestinationMatrix, depatureTime);
 
@@ -321,6 +321,11 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 			// flush and close writers
 			travelDataWriter.flush();
 			travelDataWriter.close();
+			
+			// copy the zones file to the outputfolder...
+			log.info("Copying " + InternalConstants.MATSIM_4_OPUS_TEMP + FILE_NAME + " to " + InternalConstants.MATSIM_4_OPUS_OUTPUT + FILE_NAME);
+			IOUtils.copyFile(new File( InternalConstants.MATSIM_4_OPUS_TEMP + FILE_NAME),	new File( InternalConstants.MATSIM_4_OPUS_OUTPUT + FILE_NAME));
+			
 			log.info("... done with writing travel_data.csv" );
 			
 			if (this.benchmark != null && benchmarkID > 0) {
@@ -348,7 +353,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	private BufferedWriter initZone2ZoneImpedaceWriter()
+	private BufferedWriter initZone2ZoneImpedaceWriter(String travelDataPath)
 			throws FileNotFoundException, IOException {
 		BufferedWriter travelDataWriter = IOUtils.getBufferedWriter( travelDataPath );
 		

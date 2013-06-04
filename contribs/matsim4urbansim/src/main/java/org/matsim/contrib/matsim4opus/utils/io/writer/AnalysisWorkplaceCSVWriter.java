@@ -25,8 +25,8 @@ public class AnalysisWorkplaceCSVWriter {
 		
 		try{
 			log.info("Initializing AnalysisWorkplaceCSVWriter ...");
-			BufferedWriter bwAggregatedWP = IOUtils.getBufferedWriter( InternalConstants.MATSIM_4_OPUS_TEMP + FILE_NAME );
-			log.info("Writing (aggregated workplace) data into " + InternalConstants.MATSIM_4_OPUS_TEMP + FILE_NAME + " ...");
+			BufferedWriter bwAggregatedWP = IOUtils.getBufferedWriter( InternalConstants.MATSIM_4_OPUS_OUTPUT + FILE_NAME );
+			log.info("Writing (aggregated workplace) data into " + InternalConstants.MATSIM_4_OPUS_OUTPUT + FILE_NAME + " ...");
 			
 			// create header
 			bwAggregatedWP.write(InternalConstants.ZONE_ID +","+ 

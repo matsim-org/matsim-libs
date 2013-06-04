@@ -17,6 +17,7 @@ public class AnalysisPopulationCSVWriter {
 	private static final Logger log = Logger.getLogger(AnalysisPopulationCSVWriter.class);
 	
 	public static final String FILE_NAME= "population.csv";
+	public static final String FILE_NAME_AGGREGATED= "aggregated_population.csv";
 	/**
 	 * writing raw population data to disc
 	 * @param file
@@ -26,8 +27,8 @@ public class AnalysisPopulationCSVWriter {
 		
 		try{
 			log.info("Initializing AnalysisPopulationCSVWriter ...");
-			BufferedWriter bwPopulation = IOUtils.getBufferedWriter( InternalConstants.MATSIM_4_OPUS_TEMP + FILE_NAME );
-			log.info("Writing (population) data into " + InternalConstants.MATSIM_4_OPUS_TEMP + FILE_NAME + " ...");
+			BufferedWriter bwPopulation = IOUtils.getBufferedWriter( InternalConstants.MATSIM_4_OPUS_OUTPUT + FILE_NAME );
+			log.info("Writing (population) data into " + InternalConstants.MATSIM_4_OPUS_OUTPUT + FILE_NAME + " ...");
 			
 			// create header
 			bwPopulation.write(InternalConstants.PERSON_ID +","+ 
@@ -60,14 +61,14 @@ public class AnalysisPopulationCSVWriter {
 	
 	/**
 	 * writing aggregated population data to disc
-	 * @param file
 	 * @param personClusterMap
 	 */
-	public static void writeAggregatedPopulationData2CSV(final String file, final Map<Id, AggregateObject2NearestNode> personClusterMap){
+	public static void writeAggregatedPopulationData2CSV(final Map<Id, AggregateObject2NearestNode> personClusterMap){
 		
 		try{
-			log.info("Dumping aggregated person information as csv to " + file + " ...");
-			BufferedWriter bwAggregatedPopulation = IOUtils.getBufferedWriter( file );
+			log.info("Initializing AnalysisPopulationCSVWriter ...");
+			BufferedWriter bwAggregatedPopulation = IOUtils.getBufferedWriter( InternalConstants.MATSIM_4_OPUS_OUTPUT + FILE_NAME_AGGREGATED );
+			log.info("Writing (population) data into " + InternalConstants.MATSIM_4_OPUS_OUTPUT + FILE_NAME_AGGREGATED + " ...");
 			
 			// create header
 			bwAggregatedPopulation.write(InternalConstants.PARCEL_ID +","+ 
@@ -99,5 +100,4 @@ public class AnalysisPopulationCSVWriter {
 			e.printStackTrace(); 
 		}
 	}
-
 }
