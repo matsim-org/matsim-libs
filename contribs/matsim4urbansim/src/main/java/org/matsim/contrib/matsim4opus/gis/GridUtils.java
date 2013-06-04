@@ -53,6 +53,8 @@ public class GridUtils {
 				log.warn("If the shape file contains features accessibilities will be computes for only feature, i.e. for one zone or faz.");
 			}
 			return boundary;
+		} catch (NullPointerException npe){
+			npe.printStackTrace();
 		} catch (IOException io){
 			io.printStackTrace();
 			log.error("Geometry object containing the study area boundary shape is null !");
