@@ -23,9 +23,9 @@ import org.matsim.api.core.v01.Id;
 
 
 /**
- * Interface representing the buffer functionality common for all Queue-Logic Links and Lanes, i.e.
- * providing selected, decorated methods for Buffer access and additional methods needed for
- * the buffer logic implemented.
+ * Abstract class representing the functionality common for all Queue-Logic Links and Lanes, i.e.
+ * providing selected, decorated methods for access and additional methods needed for
+ * the logic implemented.
  * <p/>
  * Thoughts/comments:<ul>
  * <li> There is the "lane" functionality (e.g. "addToLane", "popFirst"), and the "link" 
@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.Id;
  * This has led to a lot of code replication, and some of the code has diverged 
  * (QLinkImpl is more modern with respect to pt and with respect to vehicle conservation).
  * kai, nov'11
+ * <li> Triggered by a recent bug fix, I started moving some of the joint material up to the present class. kai, jun'13
  * </ul>
  * Please read the docu of QBufferItem, QLane, QLinkInternalI (arguably to be renamed
  * into something like AbstractQLink) and QLinkImpl jointly. kai, nov'11
@@ -42,6 +43,31 @@ import org.matsim.api.core.v01.Id;
  */
 abstract class AbstractQLane {
 	
+	/**
+	 * The remaining integer part of the flow capacity available in one time step to move vehicles into the
+	 * buffer. This value is updated each time step by a call to
+	 * {@link #updateBufferCapacity(double)}.
+	 */
+	protected double remainingflowCap = 0.0;
+	/**
+	 * Stores the accumulated fractional parts of the flow capacity. See also
+	 * flowCapFraction.
+	 */
+	protected double flowcap_accumulate = 1.0;
+	/**
+	 * true, i.e. green, if the link is not signalized
+	 */
+	protected boolean thisTimeStepGreen = true;
+	protected double inverseFlowCapacityPerTimeStep;
+	protected double flowCapacityPerTimeStepFractionalPart;
+	/**
+	 * The number of vehicles able to leave the buffer in one time step (usually 1s).
+	 */
+	protected double flowCapacityPerTimeStep;
+	protected int bufferStorageCapacity;
+	protected double usedBufferStorageCapacity = 0.0;
+
+
 	/**
 	 * upstream add
 	 */
@@ -67,5 +93,27 @@ abstract class AbstractQLane {
 	abstract boolean hasGreenForToLink(Id toLinkId);
 	
 	abstract boolean hasSpace();
+
+
+	protected final void updateBufferCapacity() {
+		this.remainingflowCap = this.flowCapacityPerTimeStep;
+		if (this.thisTimeStepGreen && this.flowcap_accumulate < 1.0 && this.hasBufferSpaceLeft()) {
+			this.flowcap_accumulate += this.flowCapacityPerTimeStepFractionalPart;
+		}
+	}
+
+
+	protected final boolean hasFlowCapacityLeftAndBufferSpace() {
+		return (
+				hasBufferSpaceLeft() 
+				&& 
+				((this.remainingflowCap >= 1.0) || (this.flowcap_accumulate >= 1.0))
+				);
+	}
+
+
+	private boolean hasBufferSpaceLeft() {
+		return usedBufferStorageCapacity < this.bufferStorageCapacity;
+	}
 	
 }

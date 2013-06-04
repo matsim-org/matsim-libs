@@ -104,8 +104,6 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 
 	/*package*/ double inverseSimulatedFlowCapacity; // optimization, cache 1.0 / simulatedFlowCapacity
 
-	private int bufferStorageCapacity; // optimization, cache Math.ceil(simulatedFlowCap)
-
 	private double flowCapFraction; // optimization, cache simulatedFlowCap - (int)simulatedFlowCap
 
 	/**
@@ -152,7 +150,6 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 
 	private final LaneData20 laneData;
 
-	private boolean thisTimeStepGreen = true;
 	/**
 	 * LaneEvents should only be fired if there is more than one QueueLane on a QueueLink
 	 * because the LaneEvents are identical with LinkEnter/LeaveEvents otherwise.
@@ -510,14 +507,6 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 		} // end while
 		return movedAtLeastOne;
 	}
-
-	private void updateBufferCapacity() {
-		this.bufferCap = this.simulatedFlowCapacity;
-		if (this.thisTimeStepGreen  && (this.buffercap_accumulate < 1.0) && this.isNotOfferingVehicle()) {
-			this.buffercap_accumulate += this.flowCapFraction;
-		}
-	}
-
 
 	@Override
 	/*package*/ void addFromIntersection(final QVehicle veh ){

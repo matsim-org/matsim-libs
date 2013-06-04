@@ -116,40 +116,10 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	
 	
 	
-	private double usedBufferStorageCapacity = 0.0;
-
-	/**
-	 * The number of vehicles able to leave the buffer in one time step (usually 1s).
-	 */
-	private double flowCapacityPerTimeStep; 
-
-	private double inverseFlowCapacityPerTimeStep; // optimization, cache 1.0 / flowCapacityPerTimeStep
-
-	private double flowCapacityPerTimeStepFractionalPart; // optimization, cache flowCapacityPerTimeStep - (int) flowCapacityPerTimeStep
-
-	private int bufferStorageCapacity; // optimization, cache Math.ceil(flowCapacityPerTimeStep)
-	
-	/**
-	 * The remaining integer part of the flow capacity available in one time step to move vehicles into the
-	 * buffer. This value is updated each time step by a call to
-	 * {@link #updateBufferCapacity(double)}.
-	 */
-	private double remainingflowCap = 0.0;
-
-	/**
-	 * Stores the accumulated fractional parts of the flow capacity. See also
-	 * flowCapFraction.
-	 */
-	private double flowcap_accumulate = 1.0;
-
 	/**
 	 * null if the link is not signalized
 	 */
 	private DefaultSignalizeableItem qSignalizedItem = null;
-	/**
-	 * true, i.e. green, if the link is not signalized
-	 */
-	private boolean thisTimeStepGreen = true;
 	private double congestedDensity_veh_m;
 	private int nHolesMax;
 
@@ -275,13 +245,6 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		return active;
 	}
 
-
-	private void updateBufferCapacity() {
-		this.remainingflowCap = this.flowCapacityPerTimeStep;
-		if (this.thisTimeStepGreen && this.flowcap_accumulate < 1.0 && this.isNotOfferingVehicle()) {
-			this.flowcap_accumulate += this.flowCapacityPerTimeStepFractionalPart;
-		}
-	}
 
 	/**
 	 * Move vehicles from link to buffer, according to buffer capacity and
@@ -703,14 +666,6 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		boolean active = (this.flowcap_accumulate < 1.0) || (!this.vehQueue.isEmpty()) 
 				|| (!this.waitingList.isEmpty() || (!this.transitVehicleStopQueue.isEmpty()));
 		return active;
-	}
-
-	private boolean hasFlowCapacityLeftAndBufferSpace() {
-		return (
-				(usedBufferStorageCapacity < this.bufferStorageCapacity) 
-				&& 
-				((this.remainingflowCap >= 1.0) || (this.flowcap_accumulate >= 1.0))
-				);
 	}
 
 	private double effectiveVehicleFlowConsumptionInPCU( QVehicle veh ) {
