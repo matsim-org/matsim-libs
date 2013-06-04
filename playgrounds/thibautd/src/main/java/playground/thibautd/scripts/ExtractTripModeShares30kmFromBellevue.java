@@ -104,6 +104,7 @@ public class ExtractTripModeShares30kmFromBellevue {
 
 		final Map<String, Integer> counts = new TreeMap<String, Integer>();
 
+		int total = 0;
 		for ( Person person : scenario.getPopulation().getPersons().values() ) {
 			final Plan plan = person.getSelectedPlan();
 			final Activity act = getHomeActivity( plan );
@@ -112,14 +113,15 @@ public class ExtractTripModeShares30kmFromBellevue {
 				final String mode = MODE_IDENTIFIER.identifyMainMode( trip.getTripElements() );
 				final Integer count = counts.get( mode );
 				counts.put( mode , count == null ? 1 : count + 1 );
+				total++;
 			}
 		}
 
 		final BufferedWriter writer = IOUtils.getBufferedWriter( outputFile );
-		writer.write( "mode\tcount" );
+		writer.write( "mode\tcount\tshare" );
 		for ( Map.Entry<String, Integer> count : counts.entrySet() ) {
 			writer.newLine();
-			writer.write( count.getKey()+"\t"+count.getValue() );
+			writer.write( count.getKey()+"\t"+count.getValue()+"\t"+( count.getValue().doubleValue() / total ) );
 		}
 		writer.close();
 	}
