@@ -7,13 +7,13 @@ import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
 import pl.poznan.put.vrp.dynamic.data.schedule.Task.TaskType;
-import pl.poznan.put.vrp.dynamic.optimizer.taxi.immediaterequest.IdleVehicleFinder;
+import playground.jbischoff.energy.charging.DepotArrivalDepartureCharger;
 
 
 public class NOSRankTaxiOptimizer
     extends RankTaxiOptimizer
 {
-    private final IdleRankVehicleFinder idleVehicleFinder;
+    private IdleRankVehicleFinder idleVehicleFinder;
 
 
     public NOSRankTaxiOptimizer(VrpData data, boolean destinationKnown, boolean straightLineDistance)
@@ -23,12 +23,19 @@ public class NOSRankTaxiOptimizer
     }
 
 
+    public void addDepotArrivalCharger(DepotArrivalDepartureCharger depotArrivalDepartureCharger){
+    	
+    	this.idleVehicleFinder.addDepotArrivalCharger(depotArrivalDepartureCharger);
+    }
+
     @Override
     protected VehicleDrive findBestVehicle(Request req, List<Vehicle> vehicles)
     {
+    	
         Vehicle veh = idleVehicleFinder.findClosestVehicle(req);
 
         if (veh == null) {
+//        	System.out.println("No car found");
             return VehicleDrive.NO_VEHICLE_DRIVE_FOUND;
         }
 
@@ -57,4 +64,7 @@ public class NOSRankTaxiOptimizer
 
         return vehicleAvailable && requestsInQueue;
     }
+
+
+
 }

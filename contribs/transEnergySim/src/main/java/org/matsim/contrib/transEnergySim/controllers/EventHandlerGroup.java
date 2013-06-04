@@ -26,15 +26,19 @@ import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
+import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 
 public class EventHandlerGroup implements ActivityStartEventHandler, AgentArrivalEventHandler,
-AgentDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler {
+AgentDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
 
 	protected LinkedList<EventHandler> handler = new LinkedList<EventHandler>();
 
@@ -92,6 +96,25 @@ AgentDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler {
 				((ActivityStartEventHandler) h).handleEvent(event);
 			}
 		}
+	}
+
+	@Override
+	public void handleEvent(PersonLeavesVehicleEvent event) {
+		for (EventHandler h : handler) {
+			if (h instanceof PersonLeavesVehicleEventHandler) {
+				((PersonLeavesVehicleEventHandler) h).handleEvent(event);
+			}
+		}
+	}
+
+	@Override
+	public void handleEvent(PersonEntersVehicleEvent event) {
+		for (EventHandler h : handler) {
+			if (h instanceof PersonEntersVehicleEventHandler) {
+				((PersonEntersVehicleEventHandler) h).handleEvent(event);
+			}
+		}
+		
 	}
 
 

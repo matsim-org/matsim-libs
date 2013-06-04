@@ -73,7 +73,7 @@ public abstract class AbstractVehicleWithBattery extends AbstractVehicle {
 
 		if (!MathLib.equals(socInJoules, getUsableBatteryCapacityInJoules(), GeneralLib.EPSILON * 100)
 				&& socInJoules > getUsableBatteryCapacityInJoules()) {
-			DebugLib.stopSystemAndReportInconsistency("the car has been overcharged");
+			DebugLib.stopSystemAndReportInconsistency("the car has been overcharged" + socInJoules + " but MC" + getUsableBatteryCapacityInJoules());
 		}
 	}
 

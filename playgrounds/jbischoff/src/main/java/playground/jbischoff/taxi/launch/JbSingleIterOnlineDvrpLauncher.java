@@ -31,11 +31,11 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.vis.otfvis.*;
 
 import pl.poznan.put.util.jfreechart.ChartUtils;
-import pl.poznan.put.vrp.dynamic.chart.ScheduleChartUtils;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.model.Request.ReqStatus;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
-import playground.jbischoff.taxi.optimizer.rank.RankTaxiOptimizer;
+import playground.jbischoff.taxi.evaluation.ScheduleChartUtils;
+import playground.jbischoff.taxi.optimizer.rank.NOSRankTaxiOptimizer;
 import playground.michalm.util.gis.Schedules2GIS;
 import playground.michalm.vrp.RunningVehicleRegister;
 import playground.michalm.vrp.data.MatsimVrpData;
@@ -183,7 +183,7 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
         data = olutils.initMatsimVrpData(scenario, algorithmConfig.ttimeSource,
                 algorithmConfig.tcostSource, eventsFileName, depotsFileName);
 
-        RankTaxiOptimizer optimizer = algorithmConfig.createTaxiOptimizer(data
+        NOSRankTaxiOptimizer optimizer = algorithmConfig.createTaxiOptimizer(data
                 .getVrpData(),true);
 //        optimizer.setDelaySpeedupStats(delaySpeedupStats);
         

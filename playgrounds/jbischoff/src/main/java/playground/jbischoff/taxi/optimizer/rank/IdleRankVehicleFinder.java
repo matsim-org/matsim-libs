@@ -1,44 +1,78 @@
 package playground.jbischoff.taxi.optimizer.rank;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiUtils;
+import playground.jbischoff.energy.charging.DepotArrivalDepartureCharger;
 
 
 public class IdleRankVehicleFinder
 {
     private final VrpData data;
     private final boolean straightLineDistance;
+	private DepotArrivalDepartureCharger depotarrivaldeparturecharger;
+	private boolean IsElectric;
 
 
     public IdleRankVehicleFinder(VrpData data, boolean straightLineDistance)
     {
         this.data = data;
         this.straightLineDistance = straightLineDistance;
+        this.IsElectric = false;
+    }
+    public void addDepotArrivalCharger(DepotArrivalDepartureCharger depotArrivalDepartureCharger){
+    	this.depotarrivaldeparturecharger = depotArrivalDepartureCharger;
+    	this.IsElectric = true;
     }
 
-
+    private boolean hasEnoughCapacityForTask(Vehicle veh){
+    		Id vid = new IdImpl(veh.getName());
+    		return this.depotarrivaldeparturecharger.isChargedForTask(vid);
+    		
+    	
+    }
+    
     public Vehicle findClosestVehicle(Request req)
     {
+    	
         Vehicle bestVeh = null;
-        double bestDistance = Double.MAX_VALUE;
-        Collections.shuffle(data.getVehicles());
+        double bestDistance = 1e9;
         for (Vehicle veh : data.getVehicles()) {
+        	if (this.IsElectric)
+        		if (!this.hasEnoughCapacityForTask(veh)) continue;
+        	
             double distance = calculateDistance(req, veh);
-
-            if (distance < bestDistance) {
-                bestVeh = veh;
+            
+            if (distance < bestDistance) {	
                 bestDistance = distance;
+                bestVeh = veh;
+            }
+            else if (distance == bestDistance){
+          	         
+            	if (bestVeh == null)
+            		{
+            		bestVeh= veh;
+            		continue;           		
+            		}
+            		if (veh.getSchedule().getCurrentTask().getBeginTime() < bestVeh.getSchedule().getCurrentTask().getBeginTime())
+            		bestVeh= veh;
+            	           	
             }
         }
 
         return bestVeh;
     }
 
+  
 
     private double calculateDistance(Request req, Vehicle veh)
     {
@@ -81,4 +115,5 @@ public class IdleRankVehicleFinder
             return data.getVrpGraph().getArc(fromVertex, toVertex).getCostOnDeparture(departTime);
         }
     }
+
 }

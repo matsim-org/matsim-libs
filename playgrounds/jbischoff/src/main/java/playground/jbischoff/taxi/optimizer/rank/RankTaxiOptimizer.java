@@ -2,6 +2,8 @@ package playground.jbischoff.taxi.optimizer.rank;
 
 import java.util.List;
 
+import org.jfree.util.Log;
+
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.network.*;
@@ -22,7 +24,7 @@ import playground.jbischoff.taxi.rank.BackToRankTask;
  * <li>vehicle selection set (only idle, idle+delivering, all)
  * <li>rescheduling on/off (a reaction t changes in a schedule after updating it)
  * 
- * @author michalm
+ * @author michalm, jbischoff
  */
 public abstract class RankTaxiOptimizer
     extends AbstractTaxiOptimizer
@@ -260,7 +262,9 @@ public abstract class RankTaxiOptimizer
         	Arc darc = data.getVrpGraph().getArc(reqToVertex,schedule.getVehicle().getDepot().getVertex());
   		    startWaiting = startIdling + darc.getTimeOnDeparture(startIdling);
   		    schedule.addTask(new BackToRankTask(startIdling,startWaiting,darc));
+//  		    System.out.println("scheduled wait task Id"+ schedule.getVehicle().getName()+" start "+startWaiting + " end "+tEnd);
   		    schedule.addTask(new WaitTaskImpl(startWaiting, tEnd, schedule.getVehicle().getDepot().getVertex()));
+  		
         	
         }
         else{

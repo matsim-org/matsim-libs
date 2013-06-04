@@ -34,6 +34,8 @@ import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiOptimizer;
 import playground.jbischoff.energy.charging.ChargeUponDepotArrival;
 import playground.jbischoff.energy.charging.DepotArrivalDepartureCharger;
 import playground.jbischoff.energy.vehicles.BatteryElectricVehicleImpl;
+import playground.jbischoff.taxi.evaluation.TravelDistanceTimeEvaluator;
+import playground.jbischoff.taxi.optimizer.rank.NOSRankTaxiOptimizer;
 import playground.jbischoff.taxi.sim.ElectricTaxiSimEngine;
 import playground.michalm.demand.ODDemandGenerator;
 import playground.michalm.vrp.data.MatsimVrpData;
@@ -74,6 +76,7 @@ public class ElectroCabLaunchUtils
 //    private ChargeUponDepotArrival chargeUponDepotArrival;
     private DepotReader depotReader;
     private DepotArrivalDepartureCharger depotArrivalDepartureCharger;
+    private TravelDistanceTimeEvaluator travelDistanceEvaluator;
 
     /**
      * Mandatory
@@ -173,8 +176,9 @@ public class ElectroCabLaunchUtils
     /**
      * Mandatory
      */
-    public  QSim initQSim(MatsimVrpData data, TaxiOptimizer optimizer)
+    public  QSim initQSim(MatsimVrpData data, NOSRankTaxiOptimizer optimizer)
     {
+    	boolean ALLCARSELECTRIC = true;
         Scenario scenario = data.getScenario();
         EventsManager events = EventsUtils.createEventsManager();
 		EventHandlerGroup handlerGroup = new EventHandlerGroup();
@@ -183,14 +187,20 @@ public class ElectroCabLaunchUtils
 
 		HashMap<Id, org.matsim.contrib.transEnergySim.vehicles.api.Vehicle> elvehicles=new HashMap<Id, org.matsim.contrib.transEnergySim.vehicles.api.Vehicle>();
 		
+		travelDistanceEvaluator = new TravelDistanceTimeEvaluator(scenario.getNetwork());
+
+		if (ALLCARSELECTRIC){
 		for (Vehicle v : data.getVrpData().getVehicles()){
-			elvehicles.put(new IdImpl(v.getName()), new BatteryElectricVehicleImpl(ecm,20*1000*3600));
-			
+			Id aid = new IdImpl(v.getName());
+			elvehicles.put(aid, new BatteryElectricVehicleImpl(ecm,20*1000*3600));
+			travelDistanceEvaluator.addAgent(aid);
+		}
 		}
 		
 		energyConsumptionTracker = new EnergyConsumptionTracker(elvehicles, scenario.getNetwork());
 		depotArrivalDepartureCharger =new DepotArrivalDepartureCharger(elvehicles);
 		
+		handlerGroup.addHandler(travelDistanceEvaluator);
 		handlerGroup.addHandler(energyConsumptionTracker);
 		handlerGroup.addHandler(depotArrivalDepartureCharger);
 		depotArrivalDepartureCharger.setDepotLocations(this.depotReader.getDepotLinks());
@@ -207,7 +217,8 @@ public class ElectroCabLaunchUtils
 
         TeleportationEngine teleportationEngine = new TeleportationEngine();
         qSim.addMobsimEngine(teleportationEngine);
-
+        optimizer.addDepotArrivalCharger(depotArrivalDepartureCharger);
+        
         TaxiSimEngine taxiSimEngine = new ElectricTaxiSimEngine(qSim, data, optimizer,depotArrivalDepartureCharger);
         qSim.addMobsimEngine(taxiSimEngine);
 
@@ -252,7 +263,7 @@ public class ElectroCabLaunchUtils
 		System.out.println("writing energy consumption stats to "+ filename);
 		depotArrivalDepartureCharger.getSoCLog().writeToFile(filename);
 		System.out.println("...done");
-
+		travelDistanceEvaluator.printTravelDistanceStatistics();
 	
 	}
 	

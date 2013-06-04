@@ -179,7 +179,7 @@ import playground.jbischoff.taxi.optimizer.rank.RankTaxiOptimizer;
     }
 
 
-    /*package*/RankTaxiOptimizer createTaxiOptimizer(VrpData data, boolean destinationKnown)
+    /*package*/NOSRankTaxiOptimizer createTaxiOptimizer(VrpData data, boolean destinationKnown)
     {
         switch (algorithmType) {
             case NO_SCHEDULING:

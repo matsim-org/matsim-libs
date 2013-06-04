@@ -29,6 +29,8 @@ import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.transEnergySim.analysis.energyConsumption.EnergyConsumptionLogRow;
 import org.matsim.contrib.transEnergySim.analysis.energyConsumption.EnergyConsumptionOutputLog;
+import org.matsim.contrib.transEnergySim.vehicles.api.AbstractVehicleWithBattery;
+import org.matsim.contrib.transEnergySim.vehicles.api.BatteryElectricVehicle;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
@@ -77,6 +79,7 @@ public class EnergyConsumptionTracker implements LinkEnterEventHandler, LinkLeav
 		this.vehicles = vehicles;
 		this.network = network;
 		enableLogging();
+		reset(-1);
 	}
 
 	@Override
@@ -101,8 +104,11 @@ public class EnergyConsumptionTracker implements LinkEnterEventHandler, LinkLeav
 	public void handleEvent(AgentDepartureEvent event) {
 		if (event.getLegMode().equals(TransportMode.car)) {
 			Id personId = event.getPersonId();
+			
 			linkEnterTime.put(personId, event.getTime());
-		}
+			
+		
+			}
 	}
 
 	@Override
@@ -135,10 +141,19 @@ public class EnergyConsumptionTracker implements LinkEnterEventHandler, LinkLeav
 		 
 
 		if (loggingEnabled) {
+			
+			double soc = 0;
+			double loc = 0;
+			if (vehicle instanceof AbstractVehicleWithBattery){
+				AbstractVehicleWithBattery a = (AbstractVehicleWithBattery)vehicle;
+				soc = a.getSocInJoules();
+				loc = soc / a.getUsableBatteryCapacityInJoules();
+			}
+				
 //			Id ll = new IdImpl(Math.round(link.getLength()));
 //			getLog().add(new EnergyConsumptionLogRow(personId, ll, energyConsumptionInJoule));
 
-			getLog().add(new EnergyConsumptionLogRow(personId, linkId, energyConsumptionInJoule));
+			getLog().add(new EnergyConsumptionLogRow(personId, linkId, energyConsumptionInJoule, linkLeaveTime, soc, loc));
 		}
 		}
 	}
