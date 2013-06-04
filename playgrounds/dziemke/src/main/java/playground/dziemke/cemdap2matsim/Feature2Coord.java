@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.dziemke.cemdap2matsim.multiple;
+package playground.dziemke.cemdap2matsim;
 
 import java.util.Map;
 

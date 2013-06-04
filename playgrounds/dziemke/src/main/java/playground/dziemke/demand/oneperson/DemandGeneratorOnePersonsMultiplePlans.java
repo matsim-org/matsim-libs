@@ -20,25 +20,26 @@ import playground.dziemke.demand.PendlerMatrixReader;
 
 public class DemandGeneratorOnePersonsMultiplePlans implements Runnable{
   
-	private double scalingFactor = 0.01;
-	// private double carMarketShare = 0.67;
-	private double carMarketShare = 1.0;
-	// private double fullyEmployedShare = 1.29;
-	private double fullyEmployedShare = 1.0;
+	// private double scalingFactor = 0.01;
+	private double scalingFactor = 2.0 * 0.01;
+	private double carMarketShare = 0.67;
+	// private double carMarketShare = 1.0;
+	private double fullyEmployedShare = 1.29;
+	//private double fullyEmployedShare = 1.0;
 	
 	private String commuterFileIn = "D:/Workspace/container/demand/input/B2009Ge.csv";
 	private String commuterFileOut = "D:/Workspace/container/demand/input/B2009Ga.csv";
 	private String shapeFileMunicipalities = "D:/Workspace/container/demand/input/shapefiles/gemeindenBerlin.shp";
 	private String shapeFileLors = "D:/Workspace/container/demand/input/shapefiles/Bezirksregion_EPSG_25833.shp";
 	
-	private String outputFilePersons = new String("D:/Workspace/container/demand/input/cemdap_berlin/07/persons.dat");
+	private String outputFilePersons = new String("D:/Workspace/container/demand/input/cemdap_berlin/10/persons.dat");
 	
 	// new
-	private String outputFilePersons2 = new String("D:/Workspace/container/demand/input/cemdap_berlin/08/persons.dat");
-	private String outputFilePersons3 = new String("D:/Workspace/container/demand/input/cemdap_berlin/09/persons.dat");
+	private String outputFilePersons2 = new String("D:/Workspace/container/demand/input/cemdap_berlin/11/persons.dat");
+	private String outputFilePersons3 = new String("D:/Workspace/container/demand/input/cemdap_berlin/12/persons.dat");
 	//
 	
-	private String outputFileHouseholds = new String("D:/Workspace/container/demand/input/cemdap_berlin/07/households.dat");
+	private String outputFileHouseholds = new String("D:/Workspace/container/demand/input/cemdap_berlin/10/households.dat");
 	
 	private PendlerMatrixReader pendlerMatrixReader = new PendlerMatrixReader(shapeFileMunicipalities, commuterFileIn, 
 			commuterFileOut, scalingFactor, carMarketShare, fullyEmployedShare);

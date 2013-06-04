@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.dziemke.cemdap2matsim.multiple;
+package playground.dziemke.cemdap2matsim;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -49,6 +49,8 @@ import org.opengis.feature.simple.SimpleFeature;
 public class CemdapStops2MatsimPlansConverter {
 
 	private final static Logger log = Logger.getLogger(CemdapStops2MatsimPlansConverter.class);
+	private static boolean multiplePlans = true;
+	private static boolean addStayHomePlan = true;
 
 	/**
 	 * @param args
@@ -58,12 +60,12 @@ public class CemdapStops2MatsimPlansConverter {
 		String cemdapStopsFile = "D:/Workspace/CEMDAP_Test_Version/Output/30/stops.out1";
 		String cemdapStopsFile2 = "D:/Workspace/CEMDAP_Test_Version/Output/31/stops.out1";
 		String cemdapStopsFile3 = "D:/Workspace/CEMDAP_Test_Version/Output/32/stops.out1";
-		
+				
 		String tazShapeFile = "D:/Workspace/container/demand/input/shapefiles/gemeindenLOR_DHDN_GK4.shp";
 		String networkFile = "D:/Workspace/berlin/counts/iv_counts/network-base_ext.xml";
 		
 		Double popFraction = 1.0;
-		String outputBase = "D:/Workspace/container/demand/input/cemdap2matsim/11";
+		String outputBase = "D:/Workspace/container/demand/input/cemdap2matsim/13";
 
 		
 		// print input parameters
@@ -81,7 +83,7 @@ public class CemdapStops2MatsimPlansConverter {
 		ObjectAttributes personObjectAttributes = new ObjectAttributes();
 		ObjectAttributes personObjectAttributes2 = new ObjectAttributes();
 		ObjectAttributes personObjectAttributes3 = new ObjectAttributes();
-		
+				
 		
 		log.info("parsing network data...");
 		new NetworkReaderMatsimV1(scenario).parse(networkFile);
@@ -111,45 +113,62 @@ public class CemdapStops2MatsimPlansConverter {
 		// ----------- END FIRST PLAN ---------------
 		
 		
-		// ----------- START Second PLAN ---------------
-		log.info("parsing "+cemdapStopsFile2+" file...");
-		planNumber = 1;
-		new CemdapStopsParser().parse(cemdapStopsFile2, planNumber, scenario, personObjectAttributes2, popFraction);
-		log.info("done. (parsing)");
-
-		log.info("assigning coordinates to activities...");
-		new Feature2Coord().assignCoords(scenario, planNumber, personObjectAttributes2, cemdapTazFeatures);
-		log.info("done. (assigning)");
-		// ----------- END SECOND PLAN ---------------
+		if (multiplePlans == true) {
+			// ----------- START Second PLAN ---------------
+			log.info("parsing "+cemdapStopsFile2+" file...");
+			planNumber = 1;
+			new CemdapStopsParser().parse(cemdapStopsFile2, planNumber, scenario, personObjectAttributes2, popFraction);
+			log.info("done. (parsing)");
+	
+			log.info("assigning coordinates to activities...");
+			new Feature2Coord().assignCoords(scenario, planNumber, personObjectAttributes2, cemdapTazFeatures);
+			log.info("done. (assigning)");
+			// ----------- END SECOND PLAN ---------------
+			
+			
+			// ----------- START THIRD PLAN ---------------
+			log.info("parsing "+cemdapStopsFile3+" file...");
+			planNumber = 2;
+			new CemdapStopsParser().parse(cemdapStopsFile3, planNumber, scenario, personObjectAttributes3, popFraction);
+			log.info("done. (parsing)");
+	
+			log.info("assigning coordinates to activities...");
+			new Feature2Coord().assignCoords(scenario, planNumber, personObjectAttributes3, cemdapTazFeatures);
+			log.info("done. (assigning)");
+			// ----------- END THIRD PLAN ---------------
+		}
 		
 		
-		// ----------- START THIRD PLAN ---------------
-		log.info("parsing "+cemdapStopsFile3+" file...");
-		planNumber = 2;
-		new CemdapStopsParser().parse(cemdapStopsFile3, planNumber, scenario, personObjectAttributes3, popFraction);
-		log.info("done. (parsing)");
-
-		log.info("assigning coordinates to activities...");
-		new Feature2Coord().assignCoords(scenario, planNumber, personObjectAttributes3, cemdapTazFeatures);
-		log.info("done. (assigning)");
-		// ----------- END THIRD PLAN ---------------
-		
+		if (addStayHomePlan == true) {
+			// ----------- START STAY HOME PLAN ---------------
+			log.info("parsing "+cemdapStopsFile+" file...");
+			// for now planNumber is hard-coded... should be changed later to provide more flexibility
+			planNumber = 3;
+			new CreateStayHomePlan().create(cemdapStopsFile, planNumber, scenario, personObjectAttributes, popFraction);
+			log.info("done. (creating stay-home plan)");
+	
+			log.info("assigning coordinates to activities...");
+			new Feature2Coord().assignCoords(scenario, planNumber, personObjectAttributes, cemdapTazFeatures);
+			log.info("done. (assigning)");
+			// ----------- END STAY HOME PLAN ---------------
+		}
+			
 		
 		// new
 		log.info("checking number of plans...");
 		int counter = 0;
 		for (Person person : scenario.getPopulation().getPersons().values()) {
-			if (person.getPlans().size() < 3) {
-				log.warn("Person with ID=" + person.getId() + " has less than three plans");
+			if (person.getPlans().size() < 4) {
+				log.warn("Person with ID=" + person.getId() + " has less than 4 plans");
 			}
-			if (person.getPlans().size() > 3) {
-				log.warn("Person with ID=" + person.getId() + " has more than three plans");
+			if (person.getPlans().size() > 4) {
+				log.warn("Person with ID=" + person.getId() + " has more than 4 plans");
 				}
-			if (person.getPlans().size() == 3) {
+			if (person.getPlans().size() == 4) {
 				counter++;
 			}
 		}
-		log.info(counter + "persons have three plans.");
+		log.info(counter + "persons have 4 plans.");
 		//
 		
 		

@@ -18,12 +18,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.dziemke.cemdap2matsim.single;
+package playground.dziemke.cemdap2matsim;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.Random;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -37,7 +36,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -51,14 +49,14 @@ public class CemdapStopsParser {
 
 	private final static Logger log = Logger.getLogger(CemdapStopsParser.class);
 
-	private final Random r = MatsimRandom.getRandom();
+//	private final Random r = MatsimRandom.getRandom();
 	private final Coord DEFAULT_COORD = new CoordImpl(-1.0,-1.0);
 
 	private static final int HID = 0;
 	private static final int PID = 1;
 	private static final int ACT_TYPE = 4;
 	private static final int START_TT = 5;
-	// private static final int TT = 6;
+//	private static final int TT = 6;
 	private static final int STOP_DUR = 7;
 	private static final int STOP_ID = 8;
 	private static final int ORIG_ID = 9;
@@ -103,20 +101,27 @@ public class CemdapStopsParser {
 	}
 	
 	
-	// not used so far
-	private final void cleanUp(Population population) {
+	// called at the very end
+	// private final void cleanUp(Population population) {
+	private final void cleanUp(Population population, int planNumber) {
 		Set<Id> pidsToRemove = new HashSet<Id>();
 		for (Person person : population.getPersons().values()) {
-			Activity firstActivity = (Activity)person.getSelectedPlan().getPlanElements().get(0);
-			if (firstActivity.getEndTime() < 0.0) {
+			// Activity firstActivity = (Activity)person.getSelectedPlan().getPlanElements().get(0);
+			if (person.getPlans().size() > planNumber) {
+				Activity firstActivity = (Activity)person.getPlans().get(planNumber).getPlanElements().get(0);
+				if (firstActivity.getEndTime() < 0.0) {
+					pidsToRemove.add(person.getId());
+					log.info("pid="+person.getId()+": first departure before 00:00:00. Will be removed from the population");
+				}
+			} else {
+				log.warn("Person with ID=" + person.getId() + " has " + person.getPlans().size() + " plans.");
 				pidsToRemove.add(person.getId());
-				log.info("pid="+person.getId()+": first departure before 00:00:00. Will be removed from the population");
 			}
 		}
 		for (Id pid : pidsToRemove) {
 			population.getPersons().remove(pid);
 		}
-		log.info("in totoal "+pidsToRemove.size()+" removed from the population.");
+		log.info("in total "+pidsToRemove.size()+" removed from the population.");
 	}
 	
 	
@@ -130,8 +135,8 @@ public class CemdapStopsParser {
 			BufferedReader br = IOUtils.getBufferedReader(cemdapStopsFile);
 			String currentLine = br.readLine();
 			
-			Id currPid = null;
-			boolean storePerson = false;
+//			Id currentPid = null;
+//			boolean storePerson = false;
 
 			// data
 			while ((currentLine = br.readLine()) != null) {
@@ -149,20 +154,21 @@ public class CemdapStopsParser {
 				Id pid = scenario.createId(hid+"_"+id);
 				
 				
-				if (!pid.equals(currPid)) {
-					currPid = pid;
-					if (r.nextDouble() < fraction) {
-						storePerson = true;
-					} else {
-						storePerson = false;
-					}
-				}
-				if (!storePerson) {
-					continue;
-				}
+				// what is this method actually doing?
+//				if (!pid.equals(currentPid)) {
+//					currentPid = pid;
+//					if (r.nextDouble() < fraction) {
+//						storePerson = true;
+//					} else {
+//						storePerson = false;
+//					}
+//				}
+//				if (!storePerson) {
+//					continue;
+//				}
 				
 				
-				// creates a person with a plan if a person with id pid does not already exist
+				// creates a person with a plan if a person with that pid does not already exist
 				Person person = population.getPersons().get(pid);
 				if (person == null) {
 					person = population.getFactory().createPerson(pid);
@@ -171,12 +177,16 @@ public class CemdapStopsParser {
 				}
 
 				
-				// Plan plan = person.getSelectedPlan();
-				// get SELECTED plan??
-				if (planNumber != 0) {
+				// new
+				if (planNumber != 0 && person.getPlans().size() <= planNumber ) {
 					person.addPlan(population.getFactory().createPlan());
 				}
+				//
+				
+				
+//				Plan plan = person.getSelectedPlan();
 				Plan plan = person.getPlans().get(planNumber);
+				
 				
 				int depTime = Integer.parseInt(entries[START_TT])*60 + TIME_OFFSET;
 				// int arrTime = Integer.parseInt(entries[TT])*60 + TIME_OFFSET;
@@ -187,8 +197,8 @@ public class CemdapStopsParser {
 					// String zoneId = entries[STOP_ID].trim();
 					
 					// new
-					// SimpleFeature zone = features.get(zoneId);
-					// Coord coord = UCSBUtils.getRandomCoordinate(zone);
+//					SimpleFeature zone = features.get(zoneId);
+//					Coord coordFirst = UCSBUtils.getRandomCoordinate(zone);
 					//
 					
 					personObjectAttributes.putAttribute(pid.toString(),ZONE+"0",zoneId);
@@ -196,7 +206,7 @@ public class CemdapStopsParser {
 					String actType = transformActType(Integer.parseInt(entries[ACT_TYPE_PREV]));
 					
 					Activity firstActivity = population.getFactory().createActivityFromCoord(actType,DEFAULT_COORD);
-					// Activity firstActivity = population.getFactory().createActivityFromCoord(actType,coord);
+//					Activity firstActivity = population.getFactory().createActivityFromCoord(actType,coordFirst);
 					
 					// kai: only end time // firstActivity.setStartTime(0);
 					firstActivity.setEndTime(depTime);
@@ -211,12 +221,21 @@ public class CemdapStopsParser {
 				plan.addLeg(leg);
 				
 				String zoneId = entries[STOP_ID];
-				
+			
 				int actIndex = plan.getPlanElements().size()/2;
 				personObjectAttributes.putAttribute(pid.toString(),ZONE+actIndex,zoneId);
 				
+				
+				// new
+//				String zoneId = entries[STOP_ID].trim();
+//				SimpleFeature zone = features.get(zoneId);
+//				Coord coord = UCSBUtils.getRandomCoordinate(zone);
+				//
+				
+				
 				String actType = transformActType(Integer.parseInt(entries[ACT_TYPE]));
 				Activity activity = population.getFactory().createActivityFromCoord(actType,DEFAULT_COORD);
+//				Activity activity = population.getFactory().createActivityFromCoord(actType,coord);
 				int actDur = Integer.parseInt(entries[STOP_DUR])*60;
 				
 				// kai: only end time // activity.setStartTime(depTime);
@@ -231,7 +250,8 @@ public class CemdapStopsParser {
 		}
 		log.info(lineCount+" lines parsed.");
 		log.info(population.getPersons().size()+" persons stored.");
-		cleanUp(population);
+		// cleanUp(population);
+		cleanUp(population, planNumber);
 		log.info(population.getPersons().size()+" persons remaining.");
 	}
 }

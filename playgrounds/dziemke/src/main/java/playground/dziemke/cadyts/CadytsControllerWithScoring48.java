@@ -52,8 +52,8 @@ import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
-public class CadytsControllerWithScoring43 {
-	private final static Logger log = Logger.getLogger(CadytsControllerWithScoring43.class);
+public class CadytsControllerWithScoring48 {
+	private final static Logger log = Logger.getLogger(CadytsControllerWithScoring44.class);
 	
 	public static void main(String[] args) {
 		final Config config = ConfigUtils.createConfig();
@@ -66,7 +66,7 @@ public class CadytsControllerWithScoring43 {
 		config.network().setInputFile(inputNetworkFile);
 				
 		// plans
-		String inputPlansFile = "D:/Workspace/container/demand/input/cemdap2matsim/10/plans.xml.gz";
+		String inputPlansFile = "D:/Workspace/container/demand/input/cemdap2matsim/13/plans.xml.gz";
 		config.plans().setInputFile(inputPlansFile);
 						
 		// cadytsCar
@@ -77,18 +77,18 @@ public class CadytsControllerWithScoring43 {
 		
 		// simulation
 		config.addSimulationConfigGroup(new SimulationConfigGroup());
-		config.simulation().setFlowCapFactor(0.01);
-		config.simulation().setStorageCapFactor(0.02);
+		config.simulation().setFlowCapFactor(0.001);
+		config.simulation().setStorageCapFactor(0.002);
 						
 		// counts
 		String countsFileName = "D:/Workspace/berlin/counts/iv_counts/vmz_di-do.xml";
 		config.counts().setCountsFileName(countsFileName);
-		config.counts().setCountsScaleFactor(100);
+		config.counts().setCountsScaleFactor(1000);
 		config.counts().setOutputFormat("all");
 				
 		// controller
-		String runId = "run_43";
-		String outputDirectory = "D:/Workspace/container/demand/output/run_43";
+		String runId = "run_48";
+		String outputDirectory = "D:/Workspace/container/demand/output/run_48";
 		config.controler().setRunId(runId);
 		config.controler().setOutputDirectory(outputDirectory);
 		config.controler().setFirstIteration(0);
@@ -98,8 +98,7 @@ public class CadytsControllerWithScoring43 {
 		config.controler().setMobsim("queueSimulation");
 		config.controler().setWritePlansInterval(50);
 		config.controler().setWriteEventsInterval(50);
-			
-		
+				
 		// strategy
 		StrategySettings strategySettings = new StrategySettings(new IdImpl(1));
 		strategySettings.setModuleName("ReRoute");
@@ -110,11 +109,6 @@ public class CadytsControllerWithScoring43 {
 		strategySettings2.setModuleName("ccc");
 		strategySettings2.setProbability(1.0);
 		config.strategy().addStrategySettings(strategySettings2);
-		
-//		StrategySettings strategySettings3 = new StrategySettings(new IdImpl(3));
-//		strategySettings3.setModuleName("TimeAllocationMutator");
-//		strategySettings3.setProbability(0.1);
-//		config.strategy().addStrategySettings(strategySettings3);
 		
 		config.strategy().setMaxAgentPlanMemorySize(5);
 		
@@ -159,35 +153,36 @@ public class CadytsControllerWithScoring43 {
 		});
 		
 		
-//		final CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(config.planCalcScore());
-//		
-//		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
-//			@Override
-//			public ScoringFunction createNewScoringFunction(Plan plan) {
-//				
-//				ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
-//				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
-//				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
-//				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
-//
-//				final CadytsCarScoring scoringFunction = new CadytsCarScoring(plan, config, cContext);
-//				final double cadytsScoringWeight = 1.0;
-//				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight);
-//				scoringFunctionAccumulator.addScoringFunction(scoringFunction);
-//
-//				return scoringFunctionAccumulator;
-//			}
-//		}) ;
-				
+		final CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(config.planCalcScore());
 		
-		// same as using my ZeroScoringFunctionFactroy
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			@Override
 			public ScoringFunction createNewScoringFunction(Plan plan) {
+				
 				ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
+				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
+				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
+				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
+
+				final CadytsCarScoring scoringFunction = new CadytsCarScoring(plan, config, cContext);
+				final double cadytsScoringWeight = 1.0;
+				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight) ;
+				scoringFunctionAccumulator.addScoringFunction(scoringFunction );
+
 				return scoringFunctionAccumulator;
 			}
-		});
+		}) ;
+		
+		
+		// same as using my ZeroScoringFunctionFactroy
+//		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
+//			@Override
+//			public ScoringFunction createNewScoringFunction(Plan plan) {
+//				ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
+//				return scoringFunctionAccumulator;
+//			}
+//		});
+		
 		
 //		controler.addControlerListener(new KaiAnalysisListener());
 		
