@@ -246,10 +246,10 @@ public class QLinkLanesImpl extends AbstractQLink {
 	 *          the vehicle
 	 */
 	@Override
-	void addFromIntersection(final QVehicle veh) {
+	void addFromUpstream(final QVehicle veh) {
 		double now = this.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 		activateLink();
-		this.firstLane.addFromIntersection(veh );
+		this.firstLane.addFromUpstream(veh );
 		veh.setCurrentLink(this.getLink());
 		this.network.simEngine.getMobsim().getEventsManager().processEvent(
 				new LinkEnterEvent(now, veh.getDriver().getId(),

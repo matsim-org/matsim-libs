@@ -286,7 +286,10 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 
 	private void updateBufferCapacity() {
 		this.bufferCap = this.simulatedFlowCapacity;
-		if (this.buffercap_accumulate < 1.0 && this.hasBufferSpace()) {
+		if (this.buffercap_accumulate < 1.0 && this.bufferIsEmpty()) {
+			// (for some reason, the second condition cannot be this.hasBufferSpace(), although that would make more sense
+			// (testRouteFactoryIntegration will fail with a non-terminating QueueSim). kai, jun'13)
+
 			this.buffercap_accumulate += this.flowCapFraction;
 		}
 	}

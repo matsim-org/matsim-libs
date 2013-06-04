@@ -50,7 +50,7 @@ class KaiHiResLink extends QLinkInternalI {
 	}
 
 	@Override
-	void addFromIntersection(QVehicle veh) {
+	void addFromUpstream(QVehicle veh) {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException() ;
 	}

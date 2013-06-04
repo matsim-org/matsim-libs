@@ -97,28 +97,6 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 
 	private double usedStorageCapacity;
 
-	/**
-	 * The number of vehicles able to leave the buffer in one time step (usually 1s).
-	 */
-	private double simulatedFlowCapacity; // previously called timeCap
-
-	/*package*/ double inverseSimulatedFlowCapacity; // optimization, cache 1.0 / simulatedFlowCapacity
-
-	private double flowCapFraction; // optimization, cache simulatedFlowCap - (int)simulatedFlowCap
-
-	/**
-	 * The (flow) capacity available in one time step to move vehicles into the
-	 * buffer. This value is updated each time step by a call to
-	 * {@link #updateBufferCapacity(double)}.
-	 */
-	private double bufferCap = 0.0;
-
-	/**
-	 * Stores the accumulated fractional parts of the flow capacity. See also
-	 * flowCapFraction.
-	 */
-	private double buffercap_accumulate = 1.0;
-
 	/** the last timestep the front-most vehicle in the buffer was moved. Used for detecting dead-locks. */
 	private double bufferLastMovedTime = Time.UNDEFINED_TIME;
 
@@ -199,7 +177,7 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 //	}
 
 	private void calculateFlowCapacity(final double time) {
-		this.simulatedFlowCapacity = ((LinkImpl)this.qLink.getLink()).getFlowCapacity(time);
+		this.flowCapacityPerTimeStep = ((LinkImpl)this.qLink.getLink()).getFlowCapacity(time);
 		if (this.laneData != null) {
 			/*
 			 * Without lanes a Link has a flow capacity that describes the flow on a certain number of
@@ -214,19 +192,19 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 //			double queueLinksNumberOfRepresentedLanes = this.qLink.getLink().getNumberOfLanes(time);
 //			this.simulatedFlowCapacity = this.simulatedFlowCapacity/queueLinksNumberOfRepresentedLanes
 //			* this.laneData.getNumberOfRepresentedLanes();
-			this.simulatedFlowCapacity = this.laneData.getCapacityVehiclesPerHour() /  3600.0;
+			this.flowCapacityPerTimeStep = this.laneData.getCapacityVehiclesPerHour() /  3600.0;
 		}
 		// we need the flow capcity per sim-tick and multiplied with flowCapFactor
-		this.simulatedFlowCapacity = this.simulatedFlowCapacity * this.getQLink().network.simEngine.getMobsim().getSimTimer().getSimTimestepSize()
+		this.flowCapacityPerTimeStep = this.flowCapacityPerTimeStep * this.getQLink().network.simEngine.getMobsim().getSimTimer().getSimTimestepSize()
 		* this.getQLink().network.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().getFlowCapFactor();
-		this.inverseSimulatedFlowCapacity = 1.0 / this.simulatedFlowCapacity;
-		this.flowCapFraction = this.simulatedFlowCapacity - (int) this.simulatedFlowCapacity;
+		this.inverseFlowCapacityPerTimeStep = 1.0 / this.flowCapacityPerTimeStep;
+		this.flowCapacityPerTimeStepFractionalPart = this.flowCapacityPerTimeStep - (int) this.flowCapacityPerTimeStep;
 	}
 
 
 	private void calculateStorageCapacity(final double time) {
 		double storageCapFactor = this.getQLink().network.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().getStorageCapFactor();
-		this.bufferStorageCapacity = (int) Math.ceil(this.simulatedFlowCapacity);
+		this.bufferStorageCapacity = (int) Math.ceil(this.flowCapacityPerTimeStep);
 
 		double numberOfLanes = this.qLink.getLink().getNumberOfLanes(time);
 		if (this.laneData != null) {
@@ -245,7 +223,7 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 		 * (aka freeTravelDuration) is 2 seconds. Than I need the spaceCap TWO times
 		 * the flowCap to handle the flowCap.
 		 */
-		double tempStorageCapacity = this.freespeedTravelTime * this.simulatedFlowCapacity;
+		double tempStorageCapacity = this.freespeedTravelTime * this.flowCapacityPerTimeStep;
 		if (this.storageCapacity < tempStorageCapacity) {
 			if (spaceCapWarningCount <= 10) {
 				log.warn("Lane " + this.getId() + " on Link " + this.qLink.getLink().getId() + " too small: enlarge storage capcity from: " + this.storageCapacity + " Vehicles to: " + tempStorageCapacity + " Vehicles.  This is not fatal, but modifies the traffic flow dynamics.");
@@ -276,7 +254,7 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 	void calculateCapacities() {
 		calculateFlowCapacity(Time.UNDEFINED_TIME);
 		calculateStorageCapacity(Time.UNDEFINED_TIME);
-		this.buffercap_accumulate = (this.flowCapFraction == 0.0 ? 0.0 : 1.0);
+		this.flowcap_accumulate = (this.flowCapacityPerTimeStepFractionalPart == 0.0 ? 0.0 : 1.0);
 	}
 
 	void setEndsAtMetersFromLinkEnd(final double meters) {
@@ -431,7 +409,7 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 
 
 	boolean isActive() {
-		boolean active = (this.buffercap_accumulate < 1.0) || (!this.vehQueue.isEmpty())
+		boolean active = (this.flowcap_accumulate < 1.0) || (!this.vehQueue.isEmpty())
 		|| (!this.isNotOfferingVehicle()) || (!this.transitVehicleStopQueue.isEmpty());
 		return active;
 	}
@@ -509,7 +487,7 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 	}
 
 	@Override
-	/*package*/ void addFromIntersection(final QVehicle veh ){
+	/*package*/ void addFromUpstream(final QVehicle veh ){
 		double now = this.qLink.network.simEngine.internalInterface.getMobsim().getSimTimer().getTimeOfDay() ;
 		/* It's the first lane,
 		 * so we need to start with a 'clean' freeSpeedTravelTime */
@@ -554,11 +532,11 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 	}
 	
 	 private void addToBuffer(final QVehicle veh, final double now) {
-		if (this.bufferCap >= 1.0) {
-			this.bufferCap--;
+		if (this.remainingflowCap >= 1.0) {
+			this.remainingflowCap--;
 		}
-		else if (this.buffercap_accumulate >= 1.0) {
-			this.buffercap_accumulate--;
+		else if (this.flowcap_accumulate >= 1.0) {
+			this.flowcap_accumulate--;
 		}
 		else {
 			throw new IllegalStateException("Buffer of link " + this.qLink.getLink().getId() + " has no space left!");
@@ -574,8 +552,8 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 	 * @return <code>true</code> if there are less vehicles in buffer than the flowCapacity's ceil
 	 */
 	 boolean hasBufferSpace() {
-		return ((this.buffer.size() < this.bufferStorageCapacity) && ((this.bufferCap >= 1.0)
-				|| (this.buffercap_accumulate >= 1.0)));
+		return ((this.buffer.size() < this.bufferStorageCapacity) && ((this.remainingflowCap >= 1.0)
+				|| (this.flowcap_accumulate >= 1.0)));
 	}
 
 	@Override
@@ -604,7 +582,7 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 	 *         values and in relation to the SimulationTimer's simticktime.
 	 */
 	double getSimulatedFlowCapacity() {
-		return this.simulatedFlowCapacity;
+		return this.flowCapacityPerTimeStep;
 	}
 
 	@Override
@@ -844,7 +822,7 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 	}
 
 	double getInverseSimulatedFlowCapacity() {
-		return this.inverseSimulatedFlowCapacity ;
+		return this.inverseFlowCapacityPerTimeStep ;
 	}
 
 //	@Override

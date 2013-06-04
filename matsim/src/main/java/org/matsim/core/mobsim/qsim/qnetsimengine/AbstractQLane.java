@@ -48,30 +48,30 @@ abstract class AbstractQLane {
 	 * buffer. This value is updated each time step by a call to
 	 * {@link #updateBufferCapacity(double)}.
 	 */
-	protected double remainingflowCap = 0.0;
+	double remainingflowCap = 0.0;
 	/**
 	 * Stores the accumulated fractional parts of the flow capacity. See also
 	 * flowCapFraction.
 	 */
-	protected double flowcap_accumulate = 1.0;
+	double flowcap_accumulate = 1.0;
 	/**
 	 * true, i.e. green, if the link is not signalized
 	 */
-	protected boolean thisTimeStepGreen = true;
-	protected double inverseFlowCapacityPerTimeStep;
-	protected double flowCapacityPerTimeStepFractionalPart;
+	boolean thisTimeStepGreen = true;
+	double inverseFlowCapacityPerTimeStep;
+	double flowCapacityPerTimeStepFractionalPart;
 	/**
 	 * The number of vehicles able to leave the buffer in one time step (usually 1s).
 	 */
-	protected double flowCapacityPerTimeStep;
-	protected int bufferStorageCapacity;
-	protected double usedBufferStorageCapacity = 0.0;
+	double flowCapacityPerTimeStep;
+	int bufferStorageCapacity;
+	double usedBufferStorageCapacity = 0.0;
 
 
 	/**
 	 * upstream add
 	 */
-	abstract void addFromIntersection(final QVehicle veh);
+	abstract void addFromUpstream(final QVehicle veh);
 	
 
 	/**
@@ -95,15 +95,16 @@ abstract class AbstractQLane {
 	abstract boolean hasSpace();
 
 
-	protected final void updateBufferCapacity() {
+	final void updateBufferCapacity() {
 		this.remainingflowCap = this.flowCapacityPerTimeStep;
-		if (this.thisTimeStepGreen && this.flowcap_accumulate < 1.0 && this.hasBufferSpaceLeft()) {
+//		if (this.thisTimeStepGreen && this.flowcap_accumulate < 1.0 && this.hasBufferSpaceLeft()) {
+			if (this.thisTimeStepGreen && this.flowcap_accumulate < 1.0 && this.isNotOfferingVehicle() ) {
 			this.flowcap_accumulate += this.flowCapacityPerTimeStepFractionalPart;
 		}
 	}
 
 
-	protected final boolean hasFlowCapacityLeftAndBufferSpace() {
+	final boolean hasFlowCapacityLeftAndBufferSpace() {
 		return (
 				hasBufferSpaceLeft() 
 				&& 

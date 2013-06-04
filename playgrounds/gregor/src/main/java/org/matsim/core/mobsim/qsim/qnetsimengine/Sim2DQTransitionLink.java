@@ -173,7 +173,7 @@ public class Sim2DQTransitionLink extends QLinkInternalI{
 	}
 
 	@Override
-	public void addFromIntersection(QVehicle veh) {
+	public void addFromUpstream(QVehicle veh) {
 		//hook 1
 		this.veh++;
 		double sp = this.ql.getSpaceCap();
@@ -188,7 +188,7 @@ public class Sim2DQTransitionLink extends QLinkInternalI{
 		this.queueLine.x1 = this.qx1 + ql*this.qDx;
 		this.queueLine.y1 = this.qy1 + ql*this.qDy;
 		
-		this.ql.addFromIntersection(veh);
+		this.ql.addFromUpstream(veh);
 	}
 
 	@Override

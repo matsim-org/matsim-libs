@@ -180,7 +180,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	 *          the vehicle
 	 */
 	@Override
-	final void addFromIntersection(final QVehicle veh) {
+	final void addFromUpstream(final QVehicle veh) {
 		double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 		activateLink();
 		this.linkEnterTimeMap.put(veh, now);

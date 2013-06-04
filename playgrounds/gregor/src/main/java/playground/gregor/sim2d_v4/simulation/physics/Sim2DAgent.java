@@ -110,7 +110,7 @@ public class Sim2DAgent implements TwoDObject {
 				if (loResLink.hasSpace()) {
 					QVehicle veh = this.getQVehicle();
 					veh.setCurrentLink(loResLink.getLink());
-					loResLink.addFromIntersection(veh);
+					loResLink.addFromUpstream(veh);
 					this.hasLeft2DSim = true;
 					this.pEnv.getEventsManager().processEvent(new LinkLeaveEvent(time, getId(), this.getCurrentLinkId(), this.veh.getId()));
 					this.notifyMoveOverNode(nextLinkId);

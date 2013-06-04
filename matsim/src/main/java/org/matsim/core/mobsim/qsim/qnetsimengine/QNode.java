@@ -276,7 +276,7 @@ public class QNode implements NetsimNode {
 	private void moveVehicleFromInlinkToOutlink(final QVehicle veh, final AbstractQLane fromLane, QLinkInternalI nextQueueLink) {
 		fromLane.popFirstVehicle();
 		veh.getDriver().notifyMoveOverNode(nextQueueLink.getLink().getId());
-		nextQueueLink.addFromIntersection(veh);
+		nextQueueLink.addFromUpstream(veh);
 	}
 
 	private boolean vehicleIsStuck(final AbstractQLane fromLaneBuffer, final double now) {

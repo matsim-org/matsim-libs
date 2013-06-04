@@ -87,9 +87,9 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 	}
 
 	@Override
-	void addFromIntersection(QVehicle veh) {
+	void addFromUpstream(QVehicle veh) {
 		if (!this.transferToSim2D) {
-			this.qLinkDelegate.addFromIntersection(veh);
+			this.qLinkDelegate.addFromUpstream(veh);
 		} else {
 			DepartureBox dbox = this.dBoxes.get(0);
 			PhysicalSim2DSection psecBox = dbox.psecBox;
