@@ -34,7 +34,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -47,9 +46,16 @@ public class AccessibilityIntegrationTest {
 
 	@Test
 	@Ignore
-	public void testIntegration() {
+	public void testWithBoundingBox() {
 		Config config = ConfigUtils.createConfig() ;
-		config.addModule( new AccessibilityConfigModule() ) ;
+
+		final AccessibilityConfigModule acm = new AccessibilityConfigModule();
+		config.addModule( acm ) ;
+		acm.setUsingCustomBoundingBox(true) ;
+		acm.setBoundingBoxBottom(0.) ;// yyyyyy todo
+		acm.setBoundingBoxTop(10.) ;// yyyyyy todo
+		acm.setBoundingBoxLeft(0.) ;// yyyyyy todo
+		acm.setBoundingBoxRight(10.) ;// yyyyyy todo
 		
 		// modify config according to needs
 		// ...
@@ -58,6 +64,7 @@ public class AccessibilityIntegrationTest {
 		Controler controler = new Controler(config) ;
 		
 		final ScenarioImpl sc = (ScenarioImpl)controler.getScenario();
+
 		ActivityFacilitiesImpl facilities = sc.getActivityFacilities() ;
 		for ( Link link : sc.getNetwork().getLinks().values() ) {
 			Id id = sc.createId( link.getId().toString() ) ;
@@ -76,4 +83,81 @@ public class AccessibilityIntegrationTest {
 		// ...
 		
 	}
+	
+	@Test
+	@Ignore
+	public void testWithExtentDeterminedByNetwork() {
+		Config config = ConfigUtils.createConfig() ;
+
+		final AccessibilityConfigModule acm = new AccessibilityConfigModule();
+		config.addModule( acm ) ;
+		acm.setCellBasedAccessibilityNetwork(true) ;
+		
+		// modify config according to needs
+		// ...
+		
+		
+		Controler controler = new Controler(config) ;
+		
+		final ScenarioImpl sc = (ScenarioImpl)controler.getScenario();
+
+		ActivityFacilitiesImpl facilities = sc.getActivityFacilities() ;
+		for ( Link link : sc.getNetwork().getLinks().values() ) {
+			Id id = sc.createId( link.getId().toString() ) ;
+			Coord coord = link.getCoord() ;
+			ActivityFacilityImpl fac = facilities.createAndAddFacility(id, coord) ;
+//			ActivityOptionImpl actOpt = fac.createActivityOption("work") ;
+//			actOpt.setCapacity(1000.) ; // 1000 jobs at same facility
+		}
+		
+//		controler.addControlerListener(new GridBasedAccessibilityControlerListener(...)); 
+		// (purely grid based controler listener does not yet exist)
+		
+		controler.run();
+		
+		// compare some results
+		// ...
+		
+	}
+	
+	
+	@Test
+	@Ignore
+	public void testWithExtentDeterminedShapeFile() {
+		Config config = ConfigUtils.createConfig() ;
+
+		final AccessibilityConfigModule acm = new AccessibilityConfigModule();
+		config.addModule( acm ) ;
+		acm.setCellBasedAccessibilityShapeFile(true);
+		acm.setShapeFileCellBasedAccessibility("") ; // yyyyyy todo
+		
+		// modify config according to needs
+		// ...
+		
+		
+		Controler controler = new Controler(config) ;
+		
+		final ScenarioImpl sc = (ScenarioImpl)controler.getScenario();
+
+		ActivityFacilitiesImpl facilities = sc.getActivityFacilities() ;
+		for ( Link link : sc.getNetwork().getLinks().values() ) {
+			Id id = sc.createId( link.getId().toString() ) ;
+			Coord coord = link.getCoord() ;
+			ActivityFacilityImpl fac = facilities.createAndAddFacility(id, coord) ;
+//			ActivityOptionImpl actOpt = fac.createActivityOption("work") ;
+//			actOpt.setCapacity(1000.) ; // 1000 jobs at same facility
+		}
+		
+//		controler.addControlerListener(new GridBasedAccessibilityControlerListener(...)); 
+		// (purely grid based controler listener does not yet exist)
+		
+		controler.run();
+		
+		// compare some results
+		// ...
+		
+	}
+	
+	
+	
 }
