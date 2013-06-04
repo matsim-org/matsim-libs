@@ -46,7 +46,6 @@ public class HITSHousehold implements Serializable{
 	}
 	public HITSHousehold(ResultSet hrs, Connection sqlConn, DateFormat dfm) {
 
-		// TODO Auto-generated constructor stub
 		try {
 			this.h1_hhid = hrs.getString("h1_hhid");
 			this.h1_pcode = hrs.getInt("h1_pcode");
@@ -74,7 +73,6 @@ public class HITSHousehold implements Serializable{
 			this.h8_bikeqty = hrs.getInt("h8_bikeqty");
 			setPersons(sqlConn, dfm);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		getTripsFromPersons();
@@ -131,7 +129,6 @@ public class HITSHousehold implements Serializable{
 			prs.close();
 			ps.close();
 		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 			System.exit(1);
 		}

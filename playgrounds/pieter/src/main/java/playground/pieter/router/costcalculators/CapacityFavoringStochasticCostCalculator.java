@@ -14,7 +14,6 @@ public class CapacityFavoringStochasticCostCalculator extends
 	public CapacityFavoringStochasticCostCalculator(TravelTime timeCalculator,
 			PlanCalcScoreConfigGroup cnScoringGroup) {
 		super(timeCalculator, cnScoringGroup);
-		// TODO Auto-generated constructor stub
 	}
 	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
 		double travelTime = this.timeCalculator.getLinkTravelTime(link, time, person, vehicle);

@@ -170,7 +170,6 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				System.out.println(indexStatement);
 				new DataBaseAdmin(properties).executeStatement(indexStatement);
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -220,19 +219,15 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 					"m_calibration.matsim_link_traffic" + suffix,
 					new DataBaseAdmin(connectionProperties), 100000, columns);
 		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
+
 			e.printStackTrace();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -264,22 +259,16 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 			}
 			
 		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (NoConnectionException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		

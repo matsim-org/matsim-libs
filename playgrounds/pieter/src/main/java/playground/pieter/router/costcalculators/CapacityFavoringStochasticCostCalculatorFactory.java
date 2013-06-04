@@ -12,7 +12,6 @@ public class CapacityFavoringStochasticCostCalculatorFactory implements
 	public TravelDisutility createTravelDisutility(
 			TravelTime timeCalculator,
 			PlanCalcScoreConfigGroup cnScoringGroup) {
-		// TODO Auto-generated method stub
 		return new CapacityFavoringStochasticCostCalculator(timeCalculator, cnScoringGroup);
 	}
 

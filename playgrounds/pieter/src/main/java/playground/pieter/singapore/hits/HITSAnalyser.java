@@ -85,6 +85,7 @@ import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetwo
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkWW;
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkWW.TransitRouterNetworkLink;
 import playground.sergioo.singapore2012.transitRouterVariable.WaitTimeCalculator;
+import playground.sergioo.singapore2012.transitRouterVariable.WaitTimeStuckCalculator;
 
 public class HITSAnalyser {
 
@@ -141,7 +142,7 @@ public class HITSAnalyser {
 		(new TransitScheduleReader(scenario)).readFile(args[3]);
 		double startTime = new Double(args[5]), endTime = new Double(args[6]), binSize = new Double(
 				args[7]);
-		WaitTimeCalculator waitTimeCalculator = new WaitTimeCalculator(
+		WaitTimeStuckCalculator waitTimeCalculator = new WaitTimeStuckCalculator(
 				scenario.getPopulation(), scenario.getTransitSchedule(),
 				(int) binSize, (int) (endTime - startTime));
 		TravelTimeCalculator travelTimeCalculator = new TravelTimeCalculatorFactoryImpl()

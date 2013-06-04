@@ -26,7 +26,6 @@ public class LocationSampler implements Serializable {
 	}
 
 	private void removeZeroes() {
-		// TODO Auto-generated method stub
 		double min = 100000000000000000000d;
 		// double cumTotal[] = new double[facilityCaps.length];
 		double total = 0d;

@@ -35,7 +35,7 @@ public class ExpensiveSimScoreWriter implements IterationEndsListener,
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		ArrayList<Integer> expensiveIters = MobSimSwitcher.getExpensiveIters();
 		int index = expensiveIters.size();
-		if (!MobSimSwitcher.expensiveIter || event.getIteration()==controler.getLastIteration()) {
+		if (!MobSimSwitcher.isMobSimIteration || event.getIteration()==controler.getLastIteration()) {
 			return;
 		}
 		double[][] history = controler.getScoreStats().getHistory();

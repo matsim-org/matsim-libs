@@ -35,7 +35,7 @@ import playground.pieter.pseudosim.mobsim.PseudoSimFactory;
 
 public class MobSimSwitcher implements ControlerListener,
 		IterationStartsListener {
-	public static boolean expensiveIter = true;
+	public static boolean isMobSimIteration = true;
 	final static String START_RATE = "startRate";
 	final static String END_RATE = "endRate";
 	final static String SWITCH_TYPE = "switchType";
@@ -135,8 +135,8 @@ public class MobSimSwitcher implements ControlerListener,
 	public boolean checkExpensiveIter(int iteration) {
 
 		if (iteration == controler.getLastIteration()) {
-			MobSimSwitcher.expensiveIter = true;
-			return expensiveIter;
+			MobSimSwitcher.isMobSimIteration = true;
+			return isMobSimIteration;
 		}
 		if (iteration < endIter && expensiveIterCount > 0) {
 //			log.error("controler.getIterationNumber() < endIter && expensiveIterCount > 0");
@@ -154,27 +154,27 @@ public class MobSimSwitcher implements ControlerListener,
 				expensiveIterCount = 0;
 			}
 		}
-		if (expensiveIter && cheapIterCount == 0
+		if (isMobSimIteration && cheapIterCount == 0
 				&& iteration > startIter) {
-			expensiveIter = false;
+			isMobSimIteration = false;
 			cheapIterCount++;
-			return expensiveIter;
+			return isMobSimIteration;
 		}
 		if (cheapIterCount >= currentRate - 1) {
-			expensiveIter = true;
+			isMobSimIteration = true;
 			this.expensiveIters.add(iteration);
 			cheapIterCount = 0;
 			expensiveIterCount++;
-			return expensiveIter;
+			return isMobSimIteration;
 		}
-		if (expensiveIter) {
+		if (isMobSimIteration) {
 			this.expensiveIters.add(iteration);
 			expensiveIterCount++;
 		} else {
 			cheapIterCount++;
 
 		}
-		return expensiveIter;
+		return isMobSimIteration;
 	}
 
 }

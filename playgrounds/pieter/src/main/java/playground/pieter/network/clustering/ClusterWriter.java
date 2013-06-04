@@ -70,7 +70,6 @@ public class ClusterWriter {
 			bw.write(sb.toString());
 			bw.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 

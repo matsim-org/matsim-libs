@@ -50,7 +50,7 @@ public class PseudoSimSubSetSimulationListener implements ControlerListener,
 		if(!this.controler.isSimulateSubsetPersonsOnly())
 			return;
 		
-		if (!MobSimSwitcher.expensiveIter && !fakePopulationActive) {
+		if (!MobSimSwitcher.isMobSimIteration && !fakePopulationActive) {
 			controler.markSubsetAgents(SimpleAnnealer.currentProportion);
 			String offLinePlanSizeString = controler.getConfig().getParam(
 					CONFIG_MODULE_NAME, OFFLINE_PLAN_SIZE);
@@ -66,7 +66,7 @@ public class PseudoSimSubSetSimulationListener implements ControlerListener,
 			return;
 		}
 
-		if (fakePopulationActive && MobSimSwitcher.expensiveIter) {
+		if (fakePopulationActive && MobSimSwitcher.isMobSimIteration) {
 			controler
 					.stripOutMentalSimPlansExceptSelected(this.planselector);
 			controler.getStrategyManager().setMaxPlansPerAgent(
@@ -75,7 +75,7 @@ public class PseudoSimSubSetSimulationListener implements ControlerListener,
 			fakePopulationActive = false;
 			return;
 		}
-		if(fakePopulationActive && !MobSimSwitcher.expensiveIter){
+		if(fakePopulationActive && !MobSimSwitcher.isMobSimIteration){
 			SimpleAnnealer.anneal(event, 0.9999999);
 		}
 

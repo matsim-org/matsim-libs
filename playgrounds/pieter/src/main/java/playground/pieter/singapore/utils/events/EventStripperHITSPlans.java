@@ -45,7 +45,6 @@ public class EventStripperHITSPlans {
 			this.origIds.trimToSize();
 			System.out.println("loaded all pax_idxs.");
 		} catch (NoConnectionException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -70,7 +69,6 @@ public class EventStripperHITSPlans {
 
 	
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 		System.out.println(new java.util.Date());
 
 		DataBaseAdmin dba;
@@ -79,19 +77,14 @@ public class EventStripperHITSPlans {
 			EventStripperHITSPlans es = new EventStripperHITSPlans(dba);
 			es.stripEvents("data/0.events.xml.gz", "data/0.events_stripped.xml.gz");
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InstantiationException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IllegalAccessException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 

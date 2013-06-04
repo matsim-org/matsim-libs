@@ -172,20 +172,17 @@ public class StochasticRouter implements LeastCostPathCalculator {
 					@Override
 					public double getLinkTravelDisutility(Link link,
 							double time, Person person, Vehicle vehicle) {
-						// TODO Auto-generated method stub
 						return link.getLength() / link.getFreespeed();
 					}
 
 					@Override
 					public double getLinkMinimumTravelDisutility(Link link) {
-						// TODO Auto-generated method stub
 						return link.getLength() / link.getFreespeed();
 					}
 				}, new TravelTime() {
 
 					@Override
 					public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-						// TODO Auto-generated method stub
 						return link.getLength() / link.getFreespeed();
 					}
 				}, 0.0001);

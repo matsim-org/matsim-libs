@@ -47,7 +47,6 @@ public class HITSTrip implements Serializable{
 		
 	}
 	public HITSTrip(ResultSet trs, Connection conn, DateFormat dfm, HITSPerson person) {
-		// TODO Auto-generated constructor stub
 		try {
 			this.person = person;
 			this.h1_hhid = trs.getString("h1_hhid");
@@ -76,7 +75,6 @@ public class HITSTrip implements Serializable{
 			this.tripfactorsstgfinal = trs.getDouble("tripfactorsstgfinal");
 			this.dfm = dfm;
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -138,7 +136,6 @@ public class HITSTrip implements Serializable{
 			srs.close();
 			ss.close();
 		} catch (SQLException e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
 		s.trimToSize();

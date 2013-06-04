@@ -16,20 +16,17 @@ public class PseudoSimPlanMarkerModule implements PlanStrategyModule {
 
 	@Override
 	public void prepareReplanning(ReplanningContext replanningContext) {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void handlePlan(Plan plan) {
-		// TODO Auto-generated method stub
 		plan.setScore(0.0);
 		controler.addPlanForMentalSimulation(plan);
 	}
 
 	@Override
 	public void finishReplanning() {
-		// TODO Auto-generated method stub
 
 	}
 

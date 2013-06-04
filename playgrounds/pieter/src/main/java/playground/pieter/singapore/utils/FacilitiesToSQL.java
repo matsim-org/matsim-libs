@@ -76,10 +76,8 @@ public class FacilitiesToSQL {
 					// "description VARCHAR(255)" +
 					")", tableName));
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (NoConnectionException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		System.out.println("Filling the table");
@@ -124,10 +122,8 @@ public class FacilitiesToSQL {
 			sb.delete(0, sb.length());
 			System.out.println("Processed facility no " + counter);
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -274,7 +270,6 @@ public class FacilitiesToSQL {
 							cpManager.copyIn("COPY "+tableName+"_sh"+" FROM STDIN WITH CSV", reader2 );
 							sb2.delete(0,sb2.length());
 						} catch (IOException e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 					}
@@ -296,7 +291,6 @@ public class FacilitiesToSQL {
 			cpManager.copyIn("COPY "+tableName+"_sh"+" FROM STDIN WITH CSV", reader2 );
 			sb2.delete(0,sb2.length());
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		System.out.println("Processed facility no "+counter);

@@ -20,7 +20,7 @@ public class BeforePseudoSimSelectedPlanNullifier implements
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		//if we don't set the selected plan for persons to null before a mentalsim iter
 		//then the selected plans of unsimulated persons get a score of zero
-		if(MobSimSwitcher.expensiveIter){
+		if(MobSimSwitcher.isMobSimIteration){
 			for(Person p :controler.getPopulation().getPersons().values()){
 				if(!controler.getAgentsForMentalSimulation().contains(p.getId())){
 					((PersonImpl)p).setSelectedPlan(null);

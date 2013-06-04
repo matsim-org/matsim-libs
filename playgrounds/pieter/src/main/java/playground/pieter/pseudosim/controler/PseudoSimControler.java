@@ -27,6 +27,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.pieter.pseudosim.replanning.PseudoSimSubSetSimulationStrategyManager;
+import playground.pieter.pseudosim.trafficinfo.PseudoSimStopStopTimeCalculator;
+import playground.pieter.pseudosim.trafficinfo.PseudoSimWaitTimeCalculator2;
+import playground.sergioo.singapore2012.transitRouterVariable.StopStopTimeCalculator;
+import playground.sergioo.singapore2012.transitRouterVariable.WaitTimeStuckCalculator;
 
 /**
  * @author fouriep
@@ -40,6 +44,8 @@ public class PseudoSimControler extends Controler{
 	private HashMap<IdImpl,Double> nonSimulatedAgentSelectedPlanScores = new HashMap<IdImpl, Double>(); 
 	public static String AGENT_ATT = "mentalsimAgent";
 	boolean simulateSubsetPersonsOnly = false;
+	private WaitTimeStuckCalculator waitTimeCalculator;
+	private StopStopTimeCalculator stopStopTimeCalculator;
 	public boolean isSimulateSubsetPersonsOnly() {
 		return simulateSubsetPersonsOnly;
 	}
@@ -97,8 +103,26 @@ public class PseudoSimControler extends Controler{
 
 
 	public PseudoSimControler(String[] args) {
-		super(args);
-//		initializeObjectAttributes();
+		super(ScenarioUtils.loadScenario(ConfigUtils.loadConfig(args[0])));
+
+		if (this.getConfig().scenario().isUseTransit()) {
+			this.waitTimeCalculator = new PseudoSimWaitTimeCalculator2(
+					this.getPopulation(),
+					this.getScenario().getTransitSchedule(),
+					this.getConfig().travelTimeCalculator()
+							.getTraveltimeBinSize(),
+					(int) (this.getConfig().getQSimConfigGroup().getEndTime() - this
+							.getConfig().getQSimConfigGroup().getStartTime()));
+			this.getEvents().addHandler(waitTimeCalculator);
+			this.stopStopTimeCalculator = new PseudoSimStopStopTimeCalculator(
+					this.getScenario().getTransitSchedule(),
+					((ScenarioImpl) this.getScenario()).getVehicles(), this
+							.getConfig().travelTimeCalculator()
+							.getTraveltimeBinSize(), (int) (this.getConfig()
+							.getQSimConfigGroup().getEndTime() - this
+							.getConfig().getQSimConfigGroup().getStartTime()));
+			this.getEvents().addHandler(stopStopTimeCalculator);
+		}
 	}
 
 
@@ -177,6 +201,18 @@ public class PseudoSimControler extends Controler{
 
 	public HashMap<IdImpl,Double> getNonSimulatedAgentSelectedPlanScores() {
 		return nonSimulatedAgentSelectedPlanScores;
+	}
+
+
+
+	public WaitTimeStuckCalculator getWaitTimeCalculator() {
+		return waitTimeCalculator;
+	}
+
+
+
+	public StopStopTimeCalculator getStopStopTimeCalculator() {
+		return stopStopTimeCalculator;
 	}
 
 

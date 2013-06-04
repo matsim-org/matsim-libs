@@ -13,12 +13,11 @@ public class ControlTotal {
 		checkIfRecordQualifies(r);
 	}
 	private void checkIfRecordQualifies(Record r) {
-		// TODO Auto-generated method stub
+
 		
 	}
 	
 	public boolean equals(ControlTotal o) {
-		// TODO Auto-generated method stub
 		return true;
 	}
 }

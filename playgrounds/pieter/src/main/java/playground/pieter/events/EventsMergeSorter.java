@@ -80,7 +80,7 @@ public class EventsMergeSorter {
 
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+		
 		
 		EventsMergeSorter eventMergeSorter = new EventsMergeSorter(args[0],args[1]);
 		eventMergeSorter.run();

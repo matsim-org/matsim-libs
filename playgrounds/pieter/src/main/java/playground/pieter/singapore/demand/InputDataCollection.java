@@ -534,10 +534,8 @@ public class InputDataCollection implements Serializable {
 			try {
 				dumpFacilitiesToSQL();
 			} catch (SQLException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			} catch (NoConnectionException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

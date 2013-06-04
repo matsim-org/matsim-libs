@@ -25,7 +25,7 @@ public class PseudoSimSubSetSimulationStrategyManager extends StrategyManager {
 	}
 
 	public PlanStrategy chooseStrategy(final Person person) {
-		if(!MobSimSwitcher.expensiveIter){
+		if(!MobSimSwitcher.isMobSimIteration){
 			
 			if(controler.getAgentPlansMarkedForSubsetMentalSim().getAttribute(person.getId().toString(), controler.AGENT_ATT)==null){
 				return selectorStrategy;

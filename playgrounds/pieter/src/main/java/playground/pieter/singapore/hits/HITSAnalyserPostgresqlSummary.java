@@ -95,10 +95,10 @@ import playground.pieter.singapore.utils.postgresql.travelcomponents.Wait;
 import playground.pieter.singapore.utils.postgresql.travelcomponents.Walk;
 import playground.sergioo.hitsRouter2013.MultiNodeDijkstra;
 import playground.sergioo.hitsRouter2013.TransitRouterVariableImpl;
-import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkTravelTimeAndDisutilityWW2;
+import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkTravelTimeAndDisutilityWW;
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkWW;
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkWW.TransitRouterNetworkLink;
-import playground.sergioo.singapore2012.transitRouterVariable.WaitTimeCalculator2;
+import playground.sergioo.singapore2012.transitRouterVariable.WaitTimeStuckCalculator;
 
 public class HITSAnalyserPostgresqlSummary {
 
@@ -135,7 +135,7 @@ public class HITSAnalyserPostgresqlSummary {
 	private static TransitRouterVariableImpl transitRouter;
 	private static TransitRouterImpl transitScheduleRouter;
 	private static Scenario scenario;
-	private static TransitRouterNetworkTravelTimeAndDisutilityWW2 transitTravelFunction;
+	private static TransitRouterNetworkTravelTimeAndDisutilityWW transitTravelFunction;
 	private static TransitRouterNetworkWW transitRouterNetwork;
 	private static MyTransitRouterConfig transitRouterConfig;
 	private static HashSet<TransitLine> mrtLines;
@@ -160,7 +160,7 @@ public class HITSAnalyserPostgresqlSummary {
 		(new TransitScheduleReader(scenario)).readFile(args[3]);
 		double startTime = new Double(args[5]), endTime = new Double(args[6]), binSize = new Double(
 				args[7]);
-		WaitTimeCalculator2 waitTimeCalculator = new WaitTimeCalculator2(
+		WaitTimeStuckCalculator waitTimeCalculator = new WaitTimeStuckCalculator(
 				scenario.getPopulation(), scenario.getTransitSchedule(),
 				(int) binSize, (int) (endTime - startTime));
 		TravelTimeCalculator travelTimeCalculator = new TravelTimeCalculatorFactoryImpl()
@@ -187,7 +187,7 @@ public class HITSAnalyserPostgresqlSummary {
 						transitRouterConfig.beelineWalkConnectionDistance);
 		PreparedTransitSchedule preparedTransitSchedule = new PreparedTransitSchedule(
 				scenario.getTransitSchedule());
-		transitTravelFunction = new TransitRouterNetworkTravelTimeAndDisutilityWW2(
+		transitTravelFunction = new TransitRouterNetworkTravelTimeAndDisutilityWW(
 				transitRouterConfig, scenario.getNetwork(),
 				transitRouterNetwork,
 				travelTimeCalculator.getLinkTravelTimes(),

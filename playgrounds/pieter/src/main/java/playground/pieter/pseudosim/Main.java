@@ -26,7 +26,7 @@ public class Main {
 	public static void main(String[] args) {
 		PseudoSimControler c = new PseudoSimControler(args);
 		c.setOverwriteFiles(true);
-		c.setSimulateSubsetPersonsOnly(true);
+		c.setSimulateSubsetPersonsOnly(false);
 		c.setTravelTimeCalculatorFactory(new MyTTCalcFactory());
 //		execution order of these iteration start listeners is in reverse order of adding them to the controler
 //		PlanSelector mentalPlanSelector = new ExpBetaPlanSelector(new PlanCalcScoreConfigGroup());

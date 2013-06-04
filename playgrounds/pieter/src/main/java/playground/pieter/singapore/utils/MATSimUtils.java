@@ -94,18 +94,15 @@ public class MATSimUtils {
 
 
 	public MATSimUtils(String plans, String network) {
-		// TODO Auto-generated constructor stub
 		this.plansFile = plans;
 		this.networkFile = network;
 	}
 
 	public MATSimUtils(String networkFile) {
-		// TODO Auto-generated constructor stub
 		this.networkFile = networkFile;
 	}
 	
 	public MATSimUtils(String networkFile, DataBaseAdmin dba) {
-		// TODO Auto-generated constructor stub
 		this.networkFile = networkFile;
 		this.dba = dba;
 	}

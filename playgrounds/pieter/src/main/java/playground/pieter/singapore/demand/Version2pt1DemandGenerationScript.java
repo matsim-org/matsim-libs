@@ -261,7 +261,6 @@ public class Version2pt1DemandGenerationScript {
 	}
 
 	private Coord getFacilityCoordById(String mainActFacility) {
-		// TODO Auto-generated method stub
 		return scenario.getActivityFacilities().getFacilities().get(new IdImpl(mainActFacility)).getCoord();
 	}
 
@@ -561,7 +560,6 @@ public class Version2pt1DemandGenerationScript {
 						cpManager.copyIn("COPY u_fouriep.main_act_locations_new FROM STDIN WITH CSV", reader );
 						sb.delete(0,sb.length());
 					} catch (IOException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
 				}
@@ -576,7 +574,6 @@ public class Version2pt1DemandGenerationScript {
 				sb.delete(0,sb.length());
 				scriptLog.info(("Person main acts written to db = "+lineCounter));
 			} catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		} catch (SQLException e1) {
