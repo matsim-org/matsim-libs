@@ -513,7 +513,7 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 
 	private void updateBufferCapacity() {
 		this.bufferCap = this.simulatedFlowCapacity;
-		if (this.thisTimeStepGreen  && (this.buffercap_accumulate < 1.0)) {
+		if (this.thisTimeStepGreen  && (this.buffercap_accumulate < 1.0) && this.isNotOfferingVehicle()) {
 			this.buffercap_accumulate += this.flowCapFraction;
 		}
 	}

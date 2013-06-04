@@ -278,7 +278,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 
 	private void updateBufferCapacity() {
 		this.remainingflowCap = this.flowCapacityPerTimeStep;
-		if (this.thisTimeStepGreen && this.flowcap_accumulate < 1.0) {
+		if (this.thisTimeStepGreen && this.flowcap_accumulate < 1.0 && this.isNotOfferingVehicle()) {
 			this.flowcap_accumulate += this.flowCapacityPerTimeStepFractionalPart;
 		}
 	}
