@@ -114,7 +114,8 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 	
 	@Override
 	public void handleEvent(AgentStuckEvent event) {
-		throw new RuntimeException("Marginal congestion calculation can't (yet) handle AgentStuckEvents. Aborting...");
+		log.warn("Agent stuck event. No garantee for right calculation of marginal congestion effects: " + event.toString());
+		throw new RuntimeException();
 	}
 
 	@Override
@@ -207,7 +208,8 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 			// expected			
 			
 		} else {
-			log.warn("Agent leaves link earlier than flow capacity would allow! Agent: " + event.getPersonId() + " // Link: " + event.getLinkId() + " // Time: " + event.getTime() + " // EarliestLeaveTime: " + earliestLeaveTime );
+			Id nextLinkId = getNextLinkId(event.getPersonId(), event.getLinkId(), event.getTime());
+			log.warn("Agent leaves link earlier than flow capacity would allow! Agent: " + event.getPersonId() + " // Link: " + event.getLinkId() + " // NextLink: " + nextLinkId + " // LeaveTime: " + event.getTime() + " // LastLeaveTime: " + lastLeavingFromThatLink + " // EarliestLeaveTime: " + earliestLeaveTime );
 		}
 	}
 
