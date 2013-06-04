@@ -55,14 +55,13 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
- * Tests the flow capacity for two leaving agents
- * when the storage capacity on the next link is reached.
+ * Tests the flow capacity for two vehicles that are leaving a link
+ * when the storage capacity on the next link (downstream) is reached.
  * 
  * @author ikaddoura
  *
@@ -229,7 +228,7 @@ public class FlowStorageSpillbackTest {
 		Config config = testUtils.loadConfig(null);
 		QSimConfigGroup qSimConfigGroup = new QSimConfigGroup();
 		config.addQSimConfigGroup(qSimConfigGroup);
-		Scenario scenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
+		Scenario scenario = (ScenarioUtils.createScenario(config));
 	
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		network.setEffectiveCellSize(7.5);
