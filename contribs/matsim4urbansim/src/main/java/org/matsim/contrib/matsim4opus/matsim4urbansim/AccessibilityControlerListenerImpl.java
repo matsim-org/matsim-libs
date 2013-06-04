@@ -297,7 +297,7 @@ public class AccessibilityControlerListenerImpl{
 		
 		// Since the aggregated opportunities in jobClusterArray does contain coordinates of their nearest node 
 		// this result is dumped out here    tnicolai dec'12
-		AnalysisWorkplaceCSVWriter.writeWorkplaceData2CSV(InternalConstants.MATSIM_4_OPUS_TEMP + "workplaces.csv", jobSampleList);
+		AnalysisWorkplaceCSVWriter.writeWorkplaceData2CSV(jobSampleList);
 		
 		log.info("Aggregating workplaces with identical nearest node ...");
 		Map<Id, AggregateObject2NearestNode> opportunityClusterMap = new ConcurrentHashMap<Id, AggregateObject2NearestNode>();

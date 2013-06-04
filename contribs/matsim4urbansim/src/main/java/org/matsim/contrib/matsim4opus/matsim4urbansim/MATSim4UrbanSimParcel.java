@@ -443,6 +443,9 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 				ptGrid		= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
 			}
 			
+			// aggregate opportunities (facilities) on their nearest node on the road network
+			
+			
 			if(isParcelMode)
 				controler.addControlerListener(new GridBasedAccessibilityControlerListenerV3( this,
 																							 measuringPoints, 

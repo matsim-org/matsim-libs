@@ -15,7 +15,8 @@ public class AnalysisWorkplaceCSVWriter {
 	
 	private static final Logger log = Logger.getLogger(AnalysisWorkplaceCSVWriter.class);
 	
-	public static final String FILE_NAME= "aggregated_workplaces.csv";
+	public static final String FILE_NAME= "workplaces.csv";
+	public static final String FILE_NAME_AGGREGATED= "aggregated_workplaces.csv";
 	/**
 	 * Writing aggregated workplace data to disc
 	 * @param file
@@ -25,8 +26,8 @@ public class AnalysisWorkplaceCSVWriter {
 		
 		try{
 			log.info("Initializing AnalysisWorkplaceCSVWriter ...");
-			BufferedWriter bwAggregatedWP = IOUtils.getBufferedWriter( InternalConstants.MATSIM_4_OPUS_OUTPUT + FILE_NAME );
-			log.info("Writing (aggregated workplace) data into " + InternalConstants.MATSIM_4_OPUS_OUTPUT + FILE_NAME + " ...");
+			BufferedWriter bwAggregatedWP = IOUtils.getBufferedWriter( InternalConstants.MATSIM_4_OPUS_OUTPUT + FILE_NAME_AGGREGATED );
+			log.info("Writing (aggregated workplace) data into " + InternalConstants.MATSIM_4_OPUS_OUTPUT + FILE_NAME_AGGREGATED + " ...");
 			
 			// create header
 			bwAggregatedWP.write(InternalConstants.ZONE_ID +","+ 
@@ -61,11 +62,13 @@ public class AnalysisWorkplaceCSVWriter {
 	 * @param file
 	 * @param jobSampleList
 	 */
-	public static void writeWorkplaceData2CSV(final String file, final List<SpatialReferenceObject> jobSampleList){
+	public static void writeWorkplaceData2CSV(final List<SpatialReferenceObject> jobSampleList){
 		
 		try{
-			log.info("Dumping workplace information as csv to " + file + " ...");
-			BufferedWriter bwWorkplaces = IOUtils.getBufferedWriter( file );
+			log.info("Initializing AnalysisWorkplaceCSVWriter ...");
+			BufferedWriter bwWorkplaces = IOUtils.getBufferedWriter( InternalConstants.MATSIM_4_OPUS_OUTPUT + FILE_NAME );
+			log.info("Writing data into " + InternalConstants.MATSIM_4_OPUS_OUTPUT + FILE_NAME + " ...");
+			
 			
 			// create header
 			bwWorkplaces.write(InternalConstants.JOB_ID +","+ 
