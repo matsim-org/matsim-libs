@@ -24,6 +24,7 @@ import org.matsim.contrib.matsim4opus.utils.helperObjects.Distances;
 import org.matsim.contrib.matsim4opus.utils.misc.ProgressBar;
 import org.matsim.contrib.matsim4opus.utils.network.NetworkUtil;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.LinkImpl;
@@ -62,7 +63,7 @@ import com.vividsolutions.jts.geom.Point;
  */
 public class AccessibilityControlerListenerImpl{
 	
-	protected static final Logger log = Logger.getLogger(AccessibilityControlerListenerImpl.class);
+	static final Logger log = Logger.getLogger(AccessibilityControlerListenerImpl.class);
 	
 	public static final String FREESEED_FILENAME= "freeSpeedAccessibility_cellsize_";
 	public static final String CAR_FILENAME 	= "carAccessibility_cellsize_";
@@ -70,153 +71,128 @@ public class AccessibilityControlerListenerImpl{
 	public static final String WALK_FILENAME 	= "walkAccessibility_cellsize_";
 	public static final String PT_FILENAME 		= "ptAccessibility_cellsize_";
 	
-	protected static int ZONE_BASED 	= 0;
-	protected static int PARCEL_BASED 	= 1;
+	static int ZONE_BASED 	= 0;
+	static int PARCEL_BASED 	= 1;
 	
 	// start points, measuring accessibility (cell based approach)
-	protected ZoneLayer<Id> measuringPointsCell;
+	ZoneLayer<Id> measuringPointsCell;
 	// start points, measuring accessibility (zone based approach)
-	protected ZoneLayer<Id> measuringPointsZone;
+	ZoneLayer<Id> measuringPointsZone;
 	// containing parcel coordinates for accessibility feedback
-	protected ActivityFacilitiesImpl parcels; 
+	ActivityFacilitiesImpl parcels; 
 	// destinations, opportunities like jobs etc ...
-	protected AggregateObject2NearestNode[] aggregatedFacilities;
+	AggregateObject2NearestNode[] aggregatedFacilities;
 	
 	// storing the accessibility results
-	protected SpatialGrid freeSpeedGrid;
-	protected SpatialGrid carGrid;
-	protected SpatialGrid bikeGrid;
-	protected SpatialGrid walkGrid;
-	protected SpatialGrid ptGrid;
+	SpatialGrid freeSpeedGrid;
+	SpatialGrid carGrid;
+	SpatialGrid bikeGrid;
+	SpatialGrid walkGrid;
+	SpatialGrid ptGrid;
 	
 	// storing pt matrix
-	protected PtMatrix ptMatrix;
+	PtMatrix ptMatrix;
 	
 	// accessibility parameter
-	protected boolean useRawSum	= false;
-	protected double logitScaleParameter;
-	protected double inverseOfLogitScaleParameter;
-	protected double betaCarTT;		// in MATSim this is [utils/h]: cnScoringGroup.getTraveling_utils_hr() - cnScoringGroup.getPerforming_utils_hr() 
-	protected double betaCarTTPower;
-	protected double betaCarLnTT;
-	protected double betaCarTD;		// in MATSim this is [utils/money * money/meter] = [utils/meter]: cnScoringGroup.getMarginalUtilityOfMoney() * cnScoringGroup.getMonetaryDistanceCostRateCar()
-	protected double betaCarTDPower;
-	protected double betaCarLnTD;
-	protected double betaCarTMC;		// in MATSim this is [utils/money]: cnScoringGroup.getMarginalUtilityOfMoney()
-	protected double betaCarTMCPower;
-	protected double betaCarLnTMC;
-	protected double betaBikeTT;	// in MATSim this is [utils/h]: cnScoringGroup.getTravelingBike_utils_hr() - cnScoringGroup.getPerforming_utils_hr()
-	protected double betaBikeTTPower;
-	protected double betaBikeLnTT;
-	protected double betaBikeTD;	// in MATSim this is 0 !!! since getMonetaryDistanceCostRateBike doesn't exist: 
-	protected double betaBikeTDPower;
-	protected double betaBikeLnTD;
-	protected double betaBikeTMC;	// in MATSim this is [utils/money]: cnScoringGroup.getMarginalUtilityOfMoney()
-	protected double betaBikeTMCPower;
-	protected double betaBikeLnTMC;
-	protected double betaWalkTT;	// in MATSim this is [utils/h]: cnScoringGroup.getTravelingWalk_utils_hr() - cnScoringGroup.getPerforming_utils_hr()
-	protected double betaWalkTTPower;
-	protected double betaWalkLnTT;
-	protected double betaWalkTD;	// in MATSim this is 0 !!! since getMonetaryDistanceCostRateWalk doesn't exist: 
-	protected double betaWalkTDPower;
-	protected double betaWalkLnTD;
-	protected double betaWalkTMC;	// in MATSim this is [utils/money]: cnScoringGroup.getMarginalUtilityOfMoney()
-	protected double betaWalkTMCPower;
-	protected double betaWalkLnTMC;
-	protected double betaPtTT;		// in MATSim this is [utils/h]: cnScoringGroup.getTraveling_utils_hr() - cnScoringGroup.getPerforming_utils_hr() 
-	protected double betaPtTTPower;
-	protected double betaPtLnTT;
-	protected double betaPtTD;		// in MATSim this is [utils/money * money/meter] = [utils/meter]: cnScoringGroup.getMarginalUtilityOfMoney() * cnScoringGroup.getMonetaryDistanceCostRateCar()
-	protected double betaPtTDPower;
-	protected double betaPtLnTD;
-	protected double betaPtTMC;		// in MATSim this is [utils/money]: cnScoringGroup.getMarginalUtilityOfMoney()
-	protected double betaPtTMCPower;
-	protected double betaPtLnTMC;
+	boolean useRawSum	= false;
+	double logitScaleParameter;
+	double inverseOfLogitScaleParameter;
+	double betaCarTT;		// in MATSim this is [utils/h]: cnScoringGroup.getTraveling_utils_hr() - cnScoringGroup.getPerforming_utils_hr() 
+	double betaCarTTPower;
+	double betaCarLnTT;
+	double betaCarTD;		// in MATSim this is [utils/money * money/meter] = [utils/meter]: cnScoringGroup.getMarginalUtilityOfMoney() * cnScoringGroup.getMonetaryDistanceCostRateCar()
+	double betaCarTDPower;
+	double betaCarLnTD;
+	double betaCarTMC;		// in MATSim this is [utils/money]: cnScoringGroup.getMarginalUtilityOfMoney()
+	double betaCarTMCPower;
+	double betaCarLnTMC;
+	double betaBikeTT;	// in MATSim this is [utils/h]: cnScoringGroup.getTravelingBike_utils_hr() - cnScoringGroup.getPerforming_utils_hr()
+	double betaBikeTTPower;
+	double betaBikeLnTT;
+	double betaBikeTD;	// in MATSim this is 0 !!! since getMonetaryDistanceCostRateBike doesn't exist: 
+	double betaBikeTDPower;
+	double betaBikeLnTD;
+	double betaBikeTMC;	// in MATSim this is [utils/money]: cnScoringGroup.getMarginalUtilityOfMoney()
+	double betaBikeTMCPower;
+	double betaBikeLnTMC;
+	double betaWalkTT;	// in MATSim this is [utils/h]: cnScoringGroup.getTravelingWalk_utils_hr() - cnScoringGroup.getPerforming_utils_hr()
+	double betaWalkTTPower;
+	double betaWalkLnTT;
+	double betaWalkTD;	// in MATSim this is 0 !!! since getMonetaryDistanceCostRateWalk doesn't exist: 
+	double betaWalkTDPower;
+	double betaWalkLnTD;
+	double betaWalkTMC;	// in MATSim this is [utils/money]: cnScoringGroup.getMarginalUtilityOfMoney()
+	double betaWalkTMCPower;
+	double betaWalkLnTMC;
+	double betaPtTT;		// in MATSim this is [utils/h]: cnScoringGroup.getTraveling_utils_hr() - cnScoringGroup.getPerforming_utils_hr() 
+	double betaPtTTPower;
+	double betaPtLnTT;
+	double betaPtTD;		// in MATSim this is [utils/money * money/meter] = [utils/meter]: cnScoringGroup.getMarginalUtilityOfMoney() * cnScoringGroup.getMonetaryDistanceCostRateCar()
+	double betaPtTDPower;
+	double betaPtLnTD;
+	double betaPtTMC;		// in MATSim this is [utils/money]: cnScoringGroup.getMarginalUtilityOfMoney()
+	double betaPtTMCPower;
+	double betaPtLnTMC;
 	
-	protected double constCar;
-	protected double constBike;
-	protected double constWalk;
-	protected double constPt;
+	double constCar;
+	double constBike;
+	double constWalk;
+	double constPt;
 	
-	protected boolean usingCarParameterFromMATSim;	// free speed and congested car
-	protected boolean usingBikeParameterFromMATSim;	// bicycle
-	protected boolean usingWalkParameterFromMATSim;	// traveling on foot
-	protected boolean usingPtParameterFromMATSim;	// public transport
+//	boolean usingCarParameterFromMATSim;	// free speed and congested car
+//	boolean usingBikeParameterFromMATSim;	// bicycle
+//	boolean usingWalkParameterFromMATSim;	// traveling on foot
+//	boolean usingPtParameterFromMATSim;	// public transport
 	
-	protected double VijCarTT, VijCarTTPower, VijCarLnTT, VijCarTD, VijCarTDPower, VijCarLnTD, VijCarTMC, VijCarTMCPower, VijCarLnTMC,
+	double VijCarTT, VijCarTTPower, VijCarLnTT, VijCarTD, VijCarTDPower, VijCarLnTD, VijCarTMC, VijCarTMCPower, VijCarLnTMC,
 		   VijWalkTT, VijWalkTTPower, VijWalkLnTT, VijWalkTD, VijWalkTDPower, VijWalkLnTD, VijWalkTMC, VijWalkTMCPower, VijWalkLnTMC,
 		   VijBikeTT, VijBikeTTPower, VijBikeLnTT, VijBikeTD, VijBikeTDPower, VijBikeLnTD, VijBikeTMC, VijBikeTMCPower, VijBikeLnTMC,
 		   VijFreeTT, VijFreeTTPower, VijFreeLnTT, VijFreeTD, VijFreeTDPower, VijFreeLnTD, VijFreeTC, VijFreeTCPower, VijFreeLnTC,
 		   VijPtTT, VijPtTTPower, VijPtLnTT, VijPtTD, VijPtTDPower, VijPtLnTD, VijPtTMC, VijPtTMCPower, VijPtLnTMC;
 	
-	protected double depatureTime;
-	protected double bikeSpeedMeterPerHour = -1;
-	protected double walkSpeedMeterPerHour = -1;
+	double depatureTime;
+	double bikeSpeedMeterPerHour = -1;
+	double walkSpeedMeterPerHour = -1;
 	Benchmark benchmark;
 	
 	RoadPricingSchemeImpl scheme;
-	
-//	private double[][] grids;
-
 	
 	/**
 	 * setting parameter for accessibility calculation
 	 * @param scenario
 	 */
-	protected final void initAccessibilityParameter(Scenario scenario){
+	final void initAccessibilityParameter(Scenario scenario){
 		
 		AccessibilityConfigModule moduleAPCM = ConfigurationUtils.getAccessibilityParameterConfigModule(scenario);
 		
+		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = scenario.getConfig().planCalcScore() ;
+		
 		useRawSum			= moduleAPCM.isUsingRawSumsWithoutLn();
-		logitScaleParameter = moduleAPCM.getLogitScaleParameter();
+		logitScaleParameter = planCalcScoreConfigGroup.getBrainExpBeta() ;
 		inverseOfLogitScaleParameter = 1/(logitScaleParameter); // logitScaleParameter = same as brainExpBeta on 2-aug-12. kai
 		walkSpeedMeterPerHour = scenario.getConfig().plansCalcRoute().getWalkSpeed() * 3600.;
 		bikeSpeedMeterPerHour = scenario.getConfig().plansCalcRoute().getBikeSpeed() * 3600.; // should be something like 15000
 		
-		usingCarParameterFromMATSim = moduleAPCM.isUsingCarParametersFromMATSim();
-		usingBikeParameterFromMATSim= moduleAPCM.isUsingBikeParametersFromMATSim();
-		usingWalkParameterFromMATSim= moduleAPCM.isUsingWalkParametersFromMATSim();
-		usingPtParameterFromMATSim	= moduleAPCM.isUsingPtParametersFromMATSim();
+//		usingCarParameterFromMATSim = moduleAPCM.isUsingCarParametersFromMATSim();
+//		usingBikeParameterFromMATSim= moduleAPCM.isUsingBikeParametersFromMATSim();
+//		usingWalkParameterFromMATSim= moduleAPCM.isUsingWalkParametersFromMATSim();
+//		usingPtParameterFromMATSim	= moduleAPCM.isUsingPtParametersFromMATSim();
 		
-		betaCarTT 	   	= moduleAPCM.getBetaCarTravelTime();
-		betaCarTTPower	= moduleAPCM.getBetaCarTravelTimePower2();
-		betaCarLnTT		= moduleAPCM.getBetaCarLnTravelTime();
-		betaCarTD		= moduleAPCM.getBetaCarTravelDistance();
-		betaCarTDPower	= moduleAPCM.getBetaCarTravelDistancePower2();
-		betaCarLnTD		= moduleAPCM.getBetaCarLnTravelDistance();
-		betaCarTMC		= moduleAPCM.getBetaCarTravelMonetaryCost();
-		betaCarTMCPower	= moduleAPCM.getBetaCarTravelMonetaryCostPower2();
-		betaCarLnTMC	= moduleAPCM.getBetaCarLnTravelMonetaryCost();
+		betaCarTT 	   	= planCalcScoreConfigGroup.getPerforming_utils_hr() - planCalcScoreConfigGroup.getTraveling_utils_hr() ;
+		betaCarTD		= planCalcScoreConfigGroup.getMarginalUtilityOfMoney() * planCalcScoreConfigGroup.getMonetaryDistanceCostRateCar();
+		betaCarTMC		= - planCalcScoreConfigGroup.getMarginalUtilityOfMoney() ;
 		
-		betaBikeTT		= moduleAPCM.getBetaBikeTravelTime();
-		betaBikeTTPower	= moduleAPCM.getBetaBikeTravelTimePower2();
-		betaBikeLnTT	= moduleAPCM.getBetaBikeLnTravelTime();
-		betaBikeTD		= moduleAPCM.getBetaBikeTravelDistance();
-		betaBikeTDPower	= moduleAPCM.getBetaBikeTravelDistancePower2();
-		betaBikeLnTD	= moduleAPCM.getBetaBikeLnTravelDistance();
-		betaBikeTMC		= moduleAPCM.getBetaBikeTravelMonetaryCost();
-		betaBikeTMCPower= moduleAPCM.getBetaBikeTravelMonetaryCostPower2();
-		betaBikeLnTMC	= moduleAPCM.getBetaBikeLnTravelMonetaryCost();
+		betaBikeTT		= planCalcScoreConfigGroup.getTravelingBike_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr();
+		betaBikeTD		= planCalcScoreConfigGroup.getMarginalUtlOfDistanceOther();
+		betaBikeTMC		= - planCalcScoreConfigGroup.getMarginalUtilityOfMoney();
 		
-		betaWalkTT		= moduleAPCM.getBetaWalkTravelTime();
-		betaWalkTTPower	= moduleAPCM.getBetaWalkTravelTimePower2();
-		betaWalkLnTT	= moduleAPCM.getBetaWalkLnTravelTime();
-		betaWalkTD		= moduleAPCM.getBetaWalkTravelDistance();
-		betaWalkTDPower	= moduleAPCM.getBetaWalkTravelDistancePower2();
-		betaWalkLnTD	= moduleAPCM.getBetaWalkLnTravelDistance();
-		betaWalkTMC		= moduleAPCM.getBetaWalkTravelMonetaryCost();
-		betaWalkTMCPower= moduleAPCM.getBetaWalkTravelMonetaryCostPower2();
-		betaWalkLnTMC	= moduleAPCM.getBetaWalkLnTravelMonetaryCost();
+		betaWalkTT		= planCalcScoreConfigGroup.getTravelingWalk_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr();
+		betaWalkTD		= planCalcScoreConfigGroup.getMarginalUtlOfDistanceWalk();
+		betaWalkTMC		= - planCalcScoreConfigGroup.getMarginalUtilityOfMoney();
 		
-		betaPtTT		= moduleAPCM.getBetaPtTravelTime();
-		betaPtTTPower	= moduleAPCM.getBetaPtTravelTimePower2();
-		betaPtLnTT		= moduleAPCM.getBetaPtLnTravelTime();
-		betaPtTD		= moduleAPCM.getBetaPtTravelDistance();
-		betaPtTDPower	= moduleAPCM.getBetaPtTravelDistancePower2();
-		betaPtLnTD		= moduleAPCM.getBetaPtLnTravelDistance();
-		betaPtTMC		= moduleAPCM.getBetaPtTravelMonetaryCost();
-		betaPtTMCPower	= moduleAPCM.getBetaPtTravelMonetaryCostPower2();
-		betaPtLnTMC		= moduleAPCM.getBetaPtLnTravelMonetaryCost();
+		betaPtTT		= planCalcScoreConfigGroup.getTravelingPt_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr();
+		betaPtTD		= planCalcScoreConfigGroup.getMarginalUtilityOfMoney() * planCalcScoreConfigGroup.getMonetaryDistanceCostRatePt();
+		betaPtTMC		= - planCalcScoreConfigGroup.getMarginalUtilityOfMoney() ;
 		
 		constCar		= scenario.getConfig().planCalcScore().getConstantCar();
 		constBike		= scenario.getConfig().planCalcScore().getConstantBike();
@@ -230,17 +206,17 @@ public class AccessibilityControlerListenerImpl{
 	/**
 	 * displays settings
 	 */
-	protected final void printParameterSettings(){
+	final void printParameterSettings(){
 		log.info("Computing and writing grid based accessibility measures with following settings:" );
 		log.info("Returning raw sum (not logsum): " + useRawSum);
 		log.info("Logit Scale Parameter: " + logitScaleParameter);
 		log.info("Inverse of logit Scale Parameter: " + inverseOfLogitScaleParameter);
 		log.info("Walk speed (meter/h): " + this.walkSpeedMeterPerHour + " ("+this.walkSpeedMeterPerHour/3600. +" meter/s)");
 		log.info("Bike speed (meter/h): " + this.bikeSpeedMeterPerHour + " ("+this.bikeSpeedMeterPerHour/3600. +" meter/s)");
-		log.info("Using Car (congested and free speed) Parameter from MATSim: " + usingCarParameterFromMATSim);
-		log.info("Using Bicycle Parameter from MATSim: " + usingBikeParameterFromMATSim);
-		log.info("Using Walk Parameter from MATSim: " + usingWalkParameterFromMATSim);
-		log.info("Using Pt Parameter from MATSim: " + usingPtParameterFromMATSim);
+//		log.info("Using Car (congested and free speed) Parameter from MATSim: " + usingCarParameterFromMATSim);
+//		log.info("Using Bicycle Parameter from MATSim: " + usingBikeParameterFromMATSim);
+//		log.info("Using Walk Parameter from MATSim: " + usingWalkParameterFromMATSim);
+//		log.info("Using Pt Parameter from MATSim: " + usingPtParameterFromMATSim);
 		log.info("Depature time (in seconds): " + depatureTime);
 		log.info("Beta Car Travel Time: " + betaCarTT );
 		log.info("Beta Car Travel Time Power2: " + betaCarTTPower );
@@ -284,7 +260,7 @@ public class AccessibilityControlerListenerImpl{
 	 * @param network giving the road network
 	 * @return the sum of disutilities Vjk, i.e. the disutilities to reach all opportunities k that are assigned to j from node j 
 	 */
-	protected final AggregateObject2NearestNode[] aggregatedOpportunities(final ActivityFacilitiesImpl opportunities, NetworkImpl network){
+	final AggregateObject2NearestNode[] aggregatedOpportunities(final ActivityFacilitiesImpl opportunities, NetworkImpl network){
 	
 		log.info("Aggregating " + opportunities.getFacilities().size() + " opportunities with identical nearest node ...");
 		Map<Id, AggregateObject2NearestNode> opportunityClusterMap = new ConcurrentHashMap<Id, AggregateObject2NearestNode>();
@@ -355,7 +331,7 @@ public class AccessibilityControlerListenerImpl{
 	 * @param accCsvWriter
 	 * @param measuringPointIterator
 	 */
-	protected final void accessibilityComputation(TravelTime ttc,
+	final void accessibilityComputation(TravelTime ttc,
 											LeastCostPathTreeExtended lcptExtFreeSpeedCarTravelTime,
 											LeastCostPathTreeExtended lcptExtCongestedCarTravelTime,
 											LeastCostPathTree lcptTravelDistance, 
@@ -567,7 +543,7 @@ public class AccessibilityControlerListenerImpl{
 	/**
 	 * @param nearestLink
 	 */
-	protected double getToll(Link nearestLink) {
+	double getToll(Link nearestLink) {
 		if(scheme != null){
 			Cost cost = scheme.getLinkCostInfo(nearestLink.getId(), depatureTime, null);
 			if(cost != null)
@@ -587,7 +563,7 @@ public class AccessibilityControlerListenerImpl{
 	 * @param bikeAccessibility
 	 * @param walkAccessibility
 	 */
-	protected void writeCSVData(
+	void writeCSVData(
 			Zone<Id> measurePoint, Coord coordFromZone,
 			Node fromNode, double freeSpeedAccessibility,
 			double carAccessibility, double bikeAccessibility,

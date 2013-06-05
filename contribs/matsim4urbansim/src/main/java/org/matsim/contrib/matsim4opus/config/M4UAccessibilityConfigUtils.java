@@ -41,25 +41,25 @@ public class M4UAccessibilityConfigUtils {
 		AccessibilityConfigModule module = getConfigModuleAndPossiblyConvert(config);
 		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = config.planCalcScore();
 	
-		// logit scale parameter:
-		boolean useMATSimLogitScaleParameter 	= matsim4UrbanSimParamsFromU.getAccessibilityParameter().isUseLogitScaleParameterFromMATSim();
-		// (yyyy remove from UrbanSim)
-		if ( module.isUsingLogitScaleParameterFromMATSim() != null ) {
-			useMATSimLogitScaleParameter = module.isUsingLogitScaleParameterFromMATSim() ;
-		}
-		module.setUsingLogitScaleParameterFromMATSim(useMATSimLogitScaleParameter);
-	
-		double logitScaleParameter;	
-		if ( useMATSimLogitScaleParameter ) {
-			logitScaleParameter = planCalcScoreConfigGroup.getBrainExpBeta();
-		} else {
-			logitScaleParameter = matsim4UrbanSimParamsFromU.getAccessibilityParameter().getLogitScaleParameter();
-			// (yyyy remove from UrbanSim)
-			if ( module.getLogitScaleParameter() != null ) {
-				logitScaleParameter = module.getLogitScaleParameter();
-			}
-		}
-		module.setLogitScaleParameter(logitScaleParameter);
+//		// logit scale parameter:
+//		boolean useMATSimLogitScaleParameter 	= matsim4UrbanSimParamsFromU.getAccessibilityParameter().isUseLogitScaleParameterFromMATSim();
+//		// (yyyy remove from UrbanSim)
+//		if ( module.isUsingLogitScaleParameterFromMATSim() != null ) {
+//			useMATSimLogitScaleParameter = module.isUsingLogitScaleParameterFromMATSim() ;
+//		}
+//		module.setUsingLogitScaleParameterFromMATSim(useMATSimLogitScaleParameter);
+//	
+//		double logitScaleParameter;	
+//		if ( useMATSimLogitScaleParameter ) {
+//			logitScaleParameter = planCalcScoreConfigGroup.getBrainExpBeta();
+//		} else {
+//			logitScaleParameter = matsim4UrbanSimParamsFromU.getAccessibilityParameter().getLogitScaleParameter();
+//			// (yyyy remove from UrbanSim)
+//			if ( module.getLogitScaleParameter() != null ) {
+//				logitScaleParameter = module.getLogitScaleParameter();
+//			}
+//		}
+//		module.setLogitScaleParameter(logitScaleParameter);
 	
 		// accessibility destination sampling rate:
 		double accessibilityDestinationSamplingRate = matsim4UrbanSimParamsFromU.getAccessibilityParameter().getAccessibilityDestinationSamplingRate();
@@ -69,22 +69,22 @@ public class M4UAccessibilityConfigUtils {
 		}
 		module.setAccessibilityDestinationSamplingRate(accessibilityDestinationSamplingRate);
 		
-		// which betas?
-		// car:
-		boolean useMATSimCarParameter			= matsim4UrbanSimParamsFromU.getAccessibilityParameter().isUseCarParameterFromMATSim();
-		// (yyyy remove from UrbanSim)
-		if ( module.isUsingCarParametersFromMATSim() != null ) {
-			useMATSimCarParameter = module.isUsingCarParametersFromMATSim() ;
-		}
-		module.setUsingCarParametersFromMATSim(useMATSimCarParameter);
-		// walk:
-		boolean useMATSimWalkParameter			= matsim4UrbanSimParamsFromU.getAccessibilityParameter().isUseWalkParameterFromMATSim();
-		// (yyyy remove from UrbanSim)
-		if ( module.isUsingWalkParametersFromMATSim() != null ) {
-			useMATSimWalkParameter = module.isUsingWalkParametersFromMATSim() ;
-		}
-		module.setUsingWalkParametersFromMATSim(useMATSimWalkParameter);
-		// pt & bicycle not in UrbanSim...
+//		// which betas?
+//		// car:
+//		boolean useMATSimCarParameter			= matsim4UrbanSimParamsFromU.getAccessibilityParameter().isUseCarParameterFromMATSim();
+//		// (yyyy remove from UrbanSim)
+//		if ( module.isUsingCarParametersFromMATSim() != null ) {
+//			useMATSimCarParameter = module.isUsingCarParametersFromMATSim() ;
+//		}
+//		module.setUsingCarParametersFromMATSim(useMATSimCarParameter);
+//		// walk:
+//		boolean useMATSimWalkParameter			= matsim4UrbanSimParamsFromU.getAccessibilityParameter().isUseWalkParameterFromMATSim();
+//		// (yyyy remove from UrbanSim)
+//		if ( module.isUsingWalkParametersFromMATSim() != null ) {
+//			useMATSimWalkParameter = module.isUsingWalkParametersFromMATSim() ;
+//		}
+//		module.setUsingWalkParametersFromMATSim(useMATSimWalkParameter);
+//		// pt & bicycle not in UrbanSim...
 	
 		// raw sums?
 		// (leave in urbansim)
@@ -94,70 +94,70 @@ public class M4UAccessibilityConfigUtils {
 		}
 		module.setUsingRawSumsWithoutLn(useRawSum);
 	
-		final String noSeparateBetasMessage = "This MATSim4UrbanSim version does not support custom beta parameters such " +
-				"as \"betaBikeTravelTime\" etc. anymore (both in the UrbanSim GUI (car and walk) and the external MATSim config " +
-				"file (bike and pt)). Please let us know if this causes serious problems." +
-				"To avoid the error message please : 1) select \"use_car_parameter_from_MATSim\" " +
-				"and \"use_walk_parameter_from_MATSim\" in the UrbanSim GUI and 2) remove all beta parameters for bike and pt " +
-				"(such as \"<param name=\"betaBikeTravelTime\" value=\"-12.\" />\") from your external MATSim config file.";
-	
-		if(useMATSimCarParameter){
-			module.setBetaCarTravelTime(planCalcScoreConfigGroup.getTraveling_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr() ); // [utils/h]
-			module.setBetaCarTravelDistance( planCalcScoreConfigGroup.getMarginalUtilityOfMoney() * planCalcScoreConfigGroup.getMonetaryDistanceCostRateCar() ); 
-			module.setBetaCarTravelMonetaryCost( - planCalcScoreConfigGroup.getMarginalUtilityOfMoney() ); // [utils/money]
-			module.setBetaCarLnTravelDistance(0.) ;
-			module.setBetaCarLnTravelMonetaryCost(0.) ;
-			module.setBetaCarLnTravelTime(0.) ;
-			module.setBetaCarTravelTimePower2(0.) ;
-			module.setBetaCarTravelMonetaryCostPower2(0.) ;
-			module.setBetaCarTravelDistancePower2(0.) ;
-		} else{
-			throw new RuntimeException(noSeparateBetasMessage);
-		}
-	
-		if( module.isUsingBikeParametersFromMATSim() ) {
-			module.setBetaBikeTravelTime( planCalcScoreConfigGroup.getTravelingBike_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr() ) ;
-			module.setBetaBikeTravelDistance( planCalcScoreConfigGroup.getMarginalUtlOfDistanceOther() ) ; // [utils/meter]
-			module.setBetaBikeTravelMonetaryCost( - planCalcScoreConfigGroup.getMarginalUtilityOfMoney() ) ; // [utils/money]
-			module.setBetaBikeLnTravelDistance(0.) ;
-			module.setBetaBikeLnTravelMonetaryCost(0.) ;
-			module.setBetaBikeLnTravelTime(0.) ;
-			module.setBetaBikeTravelTimePower2(0.) ;
-			module.setBetaBikeTravelMonetaryCostPower2(0.) ;
-			module.setBetaBikeTravelDistancePower2(0.) ;
-		} else{
-			throw new RuntimeException(noSeparateBetasMessage);
-		}
-	
-		if(useMATSimWalkParameter){
-			module.setBetaWalkTravelTime( planCalcScoreConfigGroup.getTravelingWalk_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr() ) ; // [utils/h]
-			module.setBetaWalkTravelDistance( planCalcScoreConfigGroup.getMarginalUtlOfDistanceWalk() ); // [utils/meter]
-			module.setBetaWalkTravelMonetaryCost( - planCalcScoreConfigGroup.getMarginalUtilityOfMoney() ) ; // [utils/money]
-			module.setBetaWalkLnTravelDistance(0.) ;
-			module.setBetaWalkLnTravelMonetaryCost(0.) ;
-			module.setBetaWalkLnTravelTime(0.) ;
-			module.setBetaWalkTravelTimePower2(0.) ;
-			module.setBetaWalkTravelMonetaryCostPower2(0.) ;
-			module.setBetaWalkTravelDistancePower2(0.) ;
-		}
-		else{
-			throw new RuntimeException(noSeparateBetasMessage);
-		}
-	
-		if( module.isUsingPtParametersFromMATSim() ) {
-			module.setBetaPtTravelTime( planCalcScoreConfigGroup.getTravelingPt_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr() ) ; // [utils/h]
-			module.setBetaPtTravelDistance( planCalcScoreConfigGroup.getMarginalUtilityOfMoney() * planCalcScoreConfigGroup.getMonetaryDistanceCostRatePt() ); // [utils/meter]
-			module.setBetaPtTravelMonetaryCost( - planCalcScoreConfigGroup.getMarginalUtilityOfMoney() ) ; // [utils/money]
-			module.setBetaPtLnTravelDistance(0.) ;
-			module.setBetaPtLnTravelMonetaryCost(0.) ;
-			module.setBetaPtLnTravelTime(0.) ;
-			module.setBetaPtTravelTimePower2(0.) ;
-			module.setBetaPtTravelMonetaryCostPower2(0.) ;
-			module.setBetaPtTravelDistancePower2(0.) ;
-		}
-		else{
-			throw new RuntimeException(noSeparateBetasMessage);
-		}
+//		final String noSeparateBetasMessage = "This MATSim4UrbanSim version does not support custom beta parameters such " +
+//				"as \"betaBikeTravelTime\" etc. anymore (both in the UrbanSim GUI (car and walk) and the external MATSim config " +
+//				"file (bike and pt)). Please let us know if this causes serious problems." +
+//				"To avoid the error message please : 1) select \"use_car_parameter_from_MATSim\" " +
+//				"and \"use_walk_parameter_from_MATSim\" in the UrbanSim GUI and 2) remove all beta parameters for bike and pt " +
+//				"(such as \"<param name=\"betaBikeTravelTime\" value=\"-12.\" />\") from your external MATSim config file.";
+//	
+//		if(useMATSimCarParameter){
+//			module.setBetaCarTravelTime(planCalcScoreConfigGroup.getTraveling_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr() ); // [utils/h]
+//			module.setBetaCarTravelDistance( planCalcScoreConfigGroup.getMarginalUtilityOfMoney() * planCalcScoreConfigGroup.getMonetaryDistanceCostRateCar() ); 
+//			module.setBetaCarTravelMonetaryCost( - planCalcScoreConfigGroup.getMarginalUtilityOfMoney() ); // [utils/money]
+//			module.setBetaCarLnTravelDistance(0.) ;
+//			module.setBetaCarLnTravelMonetaryCost(0.) ;
+//			module.setBetaCarLnTravelTime(0.) ;
+//			module.setBetaCarTravelTimePower2(0.) ;
+//			module.setBetaCarTravelMonetaryCostPower2(0.) ;
+//			module.setBetaCarTravelDistancePower2(0.) ;
+//		} else{
+//			throw new RuntimeException(noSeparateBetasMessage);
+//		}
+//	
+//		if( module.isUsingBikeParametersFromMATSim() ) {
+//			module.setBetaBikeTravelTime( planCalcScoreConfigGroup.getTravelingBike_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr() ) ;
+//			module.setBetaBikeTravelDistance( planCalcScoreConfigGroup.getMarginalUtlOfDistanceOther() ) ; // [utils/meter]
+//			module.setBetaBikeTravelMonetaryCost( - planCalcScoreConfigGroup.getMarginalUtilityOfMoney() ) ; // [utils/money]
+//			module.setBetaBikeLnTravelDistance(0.) ;
+//			module.setBetaBikeLnTravelMonetaryCost(0.) ;
+//			module.setBetaBikeLnTravelTime(0.) ;
+//			module.setBetaBikeTravelTimePower2(0.) ;
+//			module.setBetaBikeTravelMonetaryCostPower2(0.) ;
+//			module.setBetaBikeTravelDistancePower2(0.) ;
+//		} else{
+//			throw new RuntimeException(noSeparateBetasMessage);
+//		}
+//	
+//		if(useMATSimWalkParameter){
+//			module.setBetaWalkTravelTime( planCalcScoreConfigGroup.getTravelingWalk_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr() ) ; // [utils/h]
+//			module.setBetaWalkTravelDistance( planCalcScoreConfigGroup.getMarginalUtlOfDistanceWalk() ); // [utils/meter]
+//			module.setBetaWalkTravelMonetaryCost( - planCalcScoreConfigGroup.getMarginalUtilityOfMoney() ) ; // [utils/money]
+//			module.setBetaWalkLnTravelDistance(0.) ;
+//			module.setBetaWalkLnTravelMonetaryCost(0.) ;
+//			module.setBetaWalkLnTravelTime(0.) ;
+//			module.setBetaWalkTravelTimePower2(0.) ;
+//			module.setBetaWalkTravelMonetaryCostPower2(0.) ;
+//			module.setBetaWalkTravelDistancePower2(0.) ;
+//		}
+//		else{
+//			throw new RuntimeException(noSeparateBetasMessage);
+//		}
+//	
+//		if( module.isUsingPtParametersFromMATSim() ) {
+//			module.setBetaPtTravelTime( planCalcScoreConfigGroup.getTravelingPt_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr() ) ; // [utils/h]
+//			module.setBetaPtTravelDistance( planCalcScoreConfigGroup.getMarginalUtilityOfMoney() * planCalcScoreConfigGroup.getMonetaryDistanceCostRatePt() ); // [utils/meter]
+//			module.setBetaPtTravelMonetaryCost( - planCalcScoreConfigGroup.getMarginalUtilityOfMoney() ) ; // [utils/money]
+//			module.setBetaPtLnTravelDistance(0.) ;
+//			module.setBetaPtLnTravelMonetaryCost(0.) ;
+//			module.setBetaPtLnTravelTime(0.) ;
+//			module.setBetaPtTravelTimePower2(0.) ;
+//			module.setBetaPtTravelMonetaryCostPower2(0.) ;
+//			module.setBetaPtTravelDistancePower2(0.) ;
+//		}
+//		else{
+//			throw new RuntimeException(noSeparateBetasMessage);
+//		}
 	
 	}
 

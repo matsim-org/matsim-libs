@@ -42,8 +42,11 @@ public class M4UConfigConsistencyChecker implements ConfigConsistencyChecker {
 	public void checkConsistency(Config config) {
 		boolean problem = false ;
 		
+		@SuppressWarnings("unused")
 		M4UControlerConfigModuleV3 matsim4urbansimModule = (M4UControlerConfigModuleV3) config.getModule(M4UControlerConfigModuleV3.GROUP_NAME) ;
+		@SuppressWarnings("unused")
 		UrbanSimParameterConfigModuleV3 urbansimParameterModule = (UrbanSimParameterConfigModuleV3) config.getModule(UrbanSimParameterConfigModuleV3.GROUP_NAME ) ;
+		@SuppressWarnings("unused")
 		AccessibilityConfigModule accessibilityConfigModule = M4UAccessibilityConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
 		ImprovedPseudoPtConfigModule ippcm = M4UImprovedPseudoPtConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
 		
@@ -81,25 +84,25 @@ public class M4UConfigConsistencyChecker implements ConfigConsistencyChecker {
 					"MATSim4UrbanSim configuration or in an external MATSim configuration.");
 		}
 		
-		if ( accessibilityConfigModule.getLogitScaleParameter() != 1. ) {
-			log.warn("using a logit scale parameter != 1. for accessibility computation.  Not recommended; will make interpretation of results more indirect") ;
-		}
-		if ( !accessibilityConfigModule.isUsingCarParametersFromMATSim() ) {
-			problem = true ;
-			log.error("using car beta parameters not from matsim currently not allowed since interpretation not fully clear") ;
-		}
-		if ( !accessibilityConfigModule.isUsingPtParametersFromMATSim() ) {
-			problem = true ;
-			log.error("using pt beta parameters not from matsim currently not allowed since interpretation not fully clear") ;
-		}
-		if ( !accessibilityConfigModule.isUsingWalkParametersFromMATSim() ) {
-			problem = true ;
-			log.error("using walk beta parameters not from matsim currently not allowed since interpretation not fully clear") ;
-		}
-		if ( !accessibilityConfigModule.isUsingBikeParametersFromMATSim() ) {
-			problem = true ;
-			log.error("using bike beta parameters not from matsim currently not allowed since interpretation not fully clear") ;
-		}
+//		if ( accessibilityConfigModule.getLogitScaleParameter() != 1. ) {
+//			log.warn("using a logit scale parameter != 1. for accessibility computation.  Not recommended; will make interpretation of results more indirect") ;
+//		}
+//		if ( !accessibilityConfigModule.isUsingCarParametersFromMATSim() ) {
+//			problem = true ;
+//			log.error("using car beta parameters not from matsim currently not allowed since interpretation not fully clear") ;
+//		}
+//		if ( !accessibilityConfigModule.isUsingPtParametersFromMATSim() ) {
+//			problem = true ;
+//			log.error("using pt beta parameters not from matsim currently not allowed since interpretation not fully clear") ;
+//		}
+//		if ( !accessibilityConfigModule.isUsingWalkParametersFromMATSim() ) {
+//			problem = true ;
+//			log.error("using walk beta parameters not from matsim currently not allowed since interpretation not fully clear") ;
+//		}
+//		if ( !accessibilityConfigModule.isUsingBikeParametersFromMATSim() ) {
+//			problem = true ;
+//			log.error("using bike beta parameters not from matsim currently not allowed since interpretation not fully clear") ;
+//		}
 		
 		if ( problem ) {
 			throw new RuntimeException("serious problem in MATSim4UrbanSimConfigConsistencyChecker; aborting ...") ;
