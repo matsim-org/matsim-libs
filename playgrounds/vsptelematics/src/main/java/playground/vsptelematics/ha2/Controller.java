@@ -31,32 +31,6 @@ import org.matsim.core.controler.listener.StartupListener;
  *
  */
 public class Controller {
-
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		Config config = ConfigUtils.loadConfig(args[0]);
-		run(config);
-//		computeSolution(args[0]);
-	}
-	
-	private static void computeSolution(String c){
-		for (int i = 0; i <= 10; i = i + 1){
-			Config config = ConfigUtils.loadConfig(c);
-			String rate;
-			if ( i < 10)
-				rate = "0." + Integer.toString(i);
-			else 
-				rate = "1.0";
-			config.getModule("telematics").addParam("equipmentRate", rate);
-			String outdir = config.controler().getOutputDirectory();
-			outdir = outdir + "rate_" + rate + "/";
-			config.controler().setOutputDirectory(outdir);
-			run(config);
-		}
-		
-	}
 	
 	public static void run(Config config){
 		Controler c = new Controler(config);
@@ -80,6 +54,11 @@ public class Controller {
 				event.getControler().addControlerListener(mobsimFactory);
 				event.getControler().setMobsimFactory(mobsimFactory);
 			}});
+	}
+
+	public static void main(String[] args) {
+		Config config = ConfigUtils.loadConfig(args[0]);
+		run(config);
 	}
 
 	
