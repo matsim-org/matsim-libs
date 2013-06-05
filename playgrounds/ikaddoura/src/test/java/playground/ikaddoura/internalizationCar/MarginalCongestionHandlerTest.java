@@ -67,8 +67,6 @@ public class MarginalCongestionHandlerTest {
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 	
-	private final static Logger log = Logger.getLogger(MarginalCongestionHandlerTest.class);
-
 	private EventsManager events;
 	private ScenarioImpl scenario;
 	private EventsFactory ef = new EventsFactory();
@@ -429,7 +427,6 @@ public class MarginalCongestionHandlerTest {
 	
 		this.scenario = null;
 		this.events = null;
-		log.info("************** Loading scenario **************");
 		
 		// (0)-----link1-----(1)-----link2-----(2)-----link3-----(3)-----link4-----(4)
 		
