@@ -38,8 +38,8 @@ public class SimpleAnnealer implements IterationStartsListener,
 	static boolean isExponential;
 	static boolean annealSwitch = true;
 	Logger log = Logger.getLogger(getClass());
-	Controler controler;
-	Config config;
+	private Controler controler;
+	private Config config;
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {

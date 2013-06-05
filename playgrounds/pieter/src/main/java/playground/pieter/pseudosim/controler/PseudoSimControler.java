@@ -11,6 +11,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.GlobalConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -18,6 +19,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
+import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
@@ -26,9 +28,15 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
+import playground.pieter.pseudosim.controler.listeners.ExpensiveSimScoreWriter;
+import playground.pieter.pseudosim.controler.listeners.MobSimSwitcher;
+import playground.pieter.pseudosim.controler.listeners.PseudoSimPlanMarkerModuleAppender;
+import playground.pieter.pseudosim.controler.listeners.PseudoSimSubSetSimulationListener;
+import playground.pieter.pseudosim.controler.listeners.SimpleAnnealer;
 import playground.pieter.pseudosim.replanning.PseudoSimSubSetSimulationStrategyManager;
+import playground.pieter.pseudosim.trafficinfo.PseudoSimTravelTimeCalculator;
 import playground.pieter.pseudosim.trafficinfo.PseudoSimStopStopTimeCalculator;
-import playground.pieter.pseudosim.trafficinfo.PseudoSimWaitTimeCalculator2;
+import playground.pieter.pseudosim.trafficinfo.PseudoSimWaitTimeCalculator;
 import playground.sergioo.singapore2012.transitRouterVariable.StopStopTimeCalculator;
 import playground.sergioo.singapore2012.transitRouterVariable.WaitTimeStuckCalculator;
 
@@ -38,14 +46,15 @@ import playground.sergioo.singapore2012.transitRouterVariable.WaitTimeStuckCalcu
  */
 public class PseudoSimControler extends Controler{
 	
-	private ObjectAttributes agentPlansMarkedForSubsetMentalSim = new ObjectAttributes();
-	private LinkedHashSet<Plan> plansForMentalSimulation = new LinkedHashSet<Plan>();
-	private LinkedHashSet<IdImpl> agentsForMentalSimulation = new LinkedHashSet<IdImpl>();
+	private ObjectAttributes agentPlansMarkedForSubsetPseudoSim = new ObjectAttributes();
+	private LinkedHashSet<Plan> plansForPseudoSimulation = new LinkedHashSet<Plan>();
+	private LinkedHashSet<IdImpl> agentsForPseudoSimulation = new LinkedHashSet<IdImpl>();
 	private HashMap<IdImpl,Double> nonSimulatedAgentSelectedPlanScores = new HashMap<IdImpl, Double>(); 
-	public static String AGENT_ATT = "mentalsimAgent";
+	public static String AGENT_ATT = "PseudoSimAgent";
 	boolean simulateSubsetPersonsOnly = false;
 	private WaitTimeStuckCalculator waitTimeCalculator;
 	private StopStopTimeCalculator stopStopTimeCalculator;
+	private PseudoSimTravelTimeCalculator carTravelTimeCalculator;
 	public boolean isSimulateSubsetPersonsOnly() {
 		return simulateSubsetPersonsOnly;
 	}
@@ -59,10 +68,11 @@ public class PseudoSimControler extends Controler{
 	@Override
 	protected StrategyManager loadStrategyManager() {
 		StrategyManager manager = null;
+		
 		if(simulateSubsetPersonsOnly){
 			manager = new PseudoSimSubSetSimulationStrategyManager(this);
 		}else{
-			manager = new StrategyManager();
+			return super.loadStrategyManager();
 		}
 		
 		StrategyManagerConfigLoader.load(this, manager);
@@ -70,8 +80,8 @@ public class PseudoSimControler extends Controler{
 	}
 
 
-	public ObjectAttributes getAgentPlansMarkedForSubsetMentalSim() {
-		return agentPlansMarkedForSubsetMentalSim;
+	public ObjectAttributes getAgentPlansMarkedForSubsetPseudoSim() {
+		return agentPlansMarkedForSubsetPseudoSim;
 	}
 
 
@@ -84,7 +94,7 @@ public class PseudoSimControler extends Controler{
 	 */
 	public void markSubsetAgents(
 			double samplingProbability) {
-		agentPlansMarkedForSubsetMentalSim.clear();
+		agentPlansMarkedForSubsetPseudoSim.clear();
 		for (Person p : this.getPopulation().getPersons().values()) {
 			PersonImpl pax = (PersonImpl) p;
 			// remember the person's original plans
@@ -93,7 +103,7 @@ public class PseudoSimControler extends Controler{
 				for(Plan plan:p.getPlans()){
 					originalPlans.add(plan);
 				}
-				agentPlansMarkedForSubsetMentalSim.putAttribute(p.getId().toString(), AGENT_ATT,originalPlans);
+				agentPlansMarkedForSubsetPseudoSim.putAttribute(p.getId().toString(), AGENT_ATT,originalPlans);
 			}
 
 		}
@@ -104,9 +114,17 @@ public class PseudoSimControler extends Controler{
 
 	public PseudoSimControler(String[] args) {
 		super(ScenarioUtils.loadScenario(ConfigUtils.loadConfig(args[0])));
-
+		PlanSelector pSimPlanSelector = new ExpBetaPlanSelector(new PlanCalcScoreConfigGroup());
+		this.addControlerListener(new PseudoSimSubSetSimulationListener(this,pSimPlanSelector));
+		this.addControlerListener(new SimpleAnnealer());
+		this.addControlerListener(new MobSimSwitcher(this));
+		this.addControlerListener(new PseudoSimPlanMarkerModuleAppender(this));
+		this.addControlerListener(new ExpensiveSimScoreWriter(this));
+		this.carTravelTimeCalculator = new PseudoSimTravelTimeCalculator(getNetwork(),
+				getConfig().travelTimeCalculator());
+		this.getEvents().addHandler(carTravelTimeCalculator);
 		if (this.getConfig().scenario().isUseTransit()) {
-			this.waitTimeCalculator = new PseudoSimWaitTimeCalculator2(
+			this.waitTimeCalculator = new PseudoSimWaitTimeCalculator(
 					this.getPopulation(),
 					this.getScenario().getTransitSchedule(),
 					this.getConfig().travelTimeCalculator()
@@ -126,9 +144,9 @@ public class PseudoSimControler extends Controler{
 	}
 
 
-	public void addPlanForMentalSimulation(Plan p){
-		plansForMentalSimulation.add(p);
-		agentsForMentalSimulation.add((IdImpl) p.getPerson().getId());
+	public void addPlanForPseudoSimulation(Plan p){
+		plansForPseudoSimulation.add(p);
+		agentsForPseudoSimulation.add((IdImpl) p.getPerson().getId());
 	}
 
 
@@ -136,26 +154,26 @@ public class PseudoSimControler extends Controler{
 	 * @param planSelector
 	 * <p> 
 	 * checks the plans for this person against the ones stored in the objectattributes list.
-	 * creates a fake person, then maps the mentalsim plans to the fake person.
-	 * performs selection according to the plan selection scheme, then passes the original set of plans back to the person, along with the selected mentalsim plan
+	 * creates a fake person, then maps the PseudoSim plans to the fake person.
+	 * performs selection according to the plan selection scheme, then passes the original set of plans back to the person, along with the selected PseudoSim plan
 	 * 
 	 */
-	public void stripOutMentalSimPlansExceptSelected(
+	public void stripOutPseudoSimPlansExceptSelected(
 			PlanSelector planSelector) {
 		for (Person pax : this.getPopulation().getPersons().values()) {
 			PersonImpl p = (PersonImpl) pax;
-			ArrayList<Plan> originalPlans = (ArrayList<Plan>) agentPlansMarkedForSubsetMentalSim.getAttribute(p.getId().toString(), AGENT_ATT);
+			ArrayList<Plan> originalPlans = (ArrayList<Plan>) agentPlansMarkedForSubsetPseudoSim.getAttribute(p.getId().toString(), AGENT_ATT);
 			if(originalPlans==null){
 				//skip this person
 				continue;
 			}
 			
 			Person fakePerson = this.getPopulation().getFactory().createPerson(new IdImpl(p.getId().toString()+"FFF"));
-//			ArrayList<Plan> mentalSimPlans = new ArrayList<Plan>();
+//			ArrayList<Plan> PseudoSimPlans = new ArrayList<Plan>();
 			for(Plan plan:p.getPlans()){
 				if(!originalPlans.contains(plan)){
 					fakePerson.addPlan(plan);
-//					mentalSimPlans.add(plan);
+//					PseudoSimPlans.add(plan);
 				}
 			}
 			
@@ -180,21 +198,21 @@ public class PseudoSimControler extends Controler{
 
 
 
-	public LinkedHashSet<Plan> getPlansForMentalSimulation() {
-		return plansForMentalSimulation;
+	public LinkedHashSet<Plan> getPlansForPseudoSimulation() {
+		return plansForPseudoSimulation;
 	}
 
 
-	public void clearPlansForMentalSimulation(){
-		plansForMentalSimulation = new LinkedHashSet<Plan>();
-		agentsForMentalSimulation = new LinkedHashSet<IdImpl>();
+	public void clearPlansForPseudoSimulation(){
+		plansForPseudoSimulation = new LinkedHashSet<Plan>();
+		agentsForPseudoSimulation = new LinkedHashSet<IdImpl>();
 		nonSimulatedAgentSelectedPlanScores = new HashMap<IdImpl, Double>();
 	}
 
 
 
-	public LinkedHashSet<IdImpl> getAgentsForMentalSimulation() {
-		return agentsForMentalSimulation;
+	public LinkedHashSet<IdImpl> getAgentsForPseudoSimulation() {
+		return agentsForPseudoSimulation;
 	}
 
 
@@ -213,6 +231,12 @@ public class PseudoSimControler extends Controler{
 
 	public StopStopTimeCalculator getStopStopTimeCalculator() {
 		return stopStopTimeCalculator;
+	}
+
+
+
+	public PseudoSimTravelTimeCalculator getCarTravelTimeCalculator() {
+		return carTravelTimeCalculator;
 	}
 
 

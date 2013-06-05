@@ -21,8 +21,8 @@ public class PseudoSimPlanMarkerModule implements PlanStrategyModule {
 
 	@Override
 	public void handlePlan(Plan plan) {
-		plan.setScore(0.0);
-		controler.addPlanForMentalSimulation(plan);
+//		plan.setScore(0.0);
+		controler.addPlanForPseudoSimulation(plan);
 	}
 
 	@Override

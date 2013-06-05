@@ -25,11 +25,11 @@ import playground.pieter.pseudosim.controler.PseudoSimControler;
  */
 public class PseudoSimSubSetSimulationListener implements ControlerListener,
 		IterationStartsListener {
-	final static String CONFIG_MODULE_NAME = "MentalSim";
+	final static String CONFIG_MODULE_NAME = "PseudoSim";
 	final static String POP_SWAP_ITERS = "populationSwapIters";
 	final static String OFFLINE_PLAN_SIZE = "maxOfflineAgentPlanMemorySize";
-	PseudoSimControler controler;
-	boolean fakePopulationActive = false;
+	private PseudoSimControler controler;
+	private boolean fakePopulationActive = false;
 	private PlanSelector planselector;
 
 
@@ -68,7 +68,7 @@ public class PseudoSimSubSetSimulationListener implements ControlerListener,
 
 		if (fakePopulationActive && MobSimSwitcher.isMobSimIteration) {
 			controler
-					.stripOutMentalSimPlansExceptSelected(this.planselector);
+					.stripOutPseudoSimPlansExceptSelected(this.planselector);
 			controler.getStrategyManager().setMaxPlansPerAgent(
 					Integer.parseInt(controler.getConfig().getParam("strategy",
 							"maxAgentPlanMemorySize")));

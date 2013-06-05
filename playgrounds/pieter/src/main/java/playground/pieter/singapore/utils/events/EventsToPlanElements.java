@@ -144,25 +144,25 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 
 	public void indexLinkRecords(File properties, String suffix) {
 		String[] indexStatements = {
-				"DROP INDEX IF EXISTS m_calibration.matsim_link_traffic"
+				"DROP INDEX IF EXISTS " + schemaName + ".matsim_link_traffic"
 						+ suffix + "_link_id;",
-				"DROP INDEX IF EXISTS m_calibration.matsim_link_traffic"
+				"DROP INDEX IF EXISTS " + schemaName + ".matsim_link_traffic"
 						+ suffix + "_person_id;",
-				"DROP INDEX IF EXISTS m_calibration.matsim_link_traffic"
+				"DROP INDEX IF EXISTS " + schemaName + ".matsim_link_traffic"
 						+ suffix + "_mode;",
-				"DROP INDEX IF EXISTS m_calibration.matsim_link_traffic"
+				"DROP INDEX IF EXISTS " + schemaName + ".matsim_link_traffic"
 						+ suffix + "_line;",
 				"CREATE INDEX matsim_link_traffic" + suffix
-						+ "_link_id ON m_calibration.matsim_link_traffic"
+						+ "_link_id ON " + schemaName + ".matsim_link_traffic"
 						+ suffix + "(link_id);",
 				"CREATE INDEX matsim_link_traffic" + suffix
-						+ "_person_id ON m_calibration.matsim_link_traffic"
+						+ "_person_id ON " + schemaName + ".matsim_link_traffic"
 						+ suffix + "(person_id);",
 				"CREATE INDEX matsim_link_traffic" + suffix
-						+ "_mode ON m_calibration.matsim_link_traffic" + suffix
+						+ "_mode ON " + schemaName + ".matsim_link_traffic" + suffix
 						+ "(mode);",
 				"CREATE INDEX matsim_link_traffic" + suffix
-						+ "_line ON m_calibration.matsim_link_traffic" + suffix
+						+ "_line ON " + schemaName + ".matsim_link_traffic" + suffix
 						+ "(line);" };
 		for (String indexStatement : indexStatements) {
 
@@ -190,6 +190,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 	private final double walkSpeed;
 	private boolean writeIdsForLinks = false;
 	private HashSet<Id> personIdsForLinks;
+	private String schemaName;
 
 	public EventsToPlanElements(TransitSchedule transitSchedule,
 			Network network, Config config, String suffix) {
@@ -216,7 +217,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				PostgresType.INT));
 		try {
 			linkWriter = new PostgresqlCSVWriter("LINKWRITER",
-					"m_calibration.matsim_link_traffic" + suffix,
+					"" + schemaName + ".matsim_link_traffic" + suffix,
 					new DataBaseAdmin(connectionProperties), 100000, columns);
 		} catch (InstantiationException e) {
 			e.printStackTrace();
@@ -251,7 +252,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 	private void samplePersonIdsForLinkWriting(File connectionProperties) {
 		try {
 			DataBaseAdmin dba = new DataBaseAdmin(connectionProperties);
-			String idSelectionStatement = "SELECT person_id FROM m_calibration.matsim_persons where sample_selector <= 0.01";
+			String idSelectionStatement = "SELECT person_id FROM " + schemaName + ".matsim_persons where sample_selector <= 0.01";
 			ResultSet rs = dba.executeQuery(idSelectionStatement);
 			this.personIdsForLinks = new HashSet<Id>();
 			while(rs.next()){
@@ -663,7 +664,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		DateFormat df = new SimpleDateFormat("yyyy_MM_dd");
 		String formattedDate = df.format(new Date());
 		// start with activities
-		String actTableName = "m_calibration.matsim_activities" + suffix;
+		String actTableName = "" + schemaName + ".matsim_activities" + suffix;
 		List<PostgresqlColumnDefinition> columns = new ArrayList<PostgresqlColumnDefinition>();
 		columns.add(new PostgresqlColumnDefinition("activity_id",
 				PostgresType.INT, "primary key"));
@@ -684,7 +685,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				"MATSim activities from events file %s, created on %s.",
 				eventsFileName, formattedDate));
 
-		String journeyTableName = "m_calibration.matsim_journeys" + suffix;
+		String journeyTableName = "" + schemaName + ".matsim_journeys" + suffix;
 		columns = new ArrayList<PostgresqlColumnDefinition>();
 		columns.add(new PostgresqlColumnDefinition("journey_id",
 				PostgresType.INT, "primary key"));
@@ -732,7 +733,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				"MATSim journeys from events file %s, created on %s.",
 				eventsFileName, formattedDate));
 
-		String tripTableName = "m_calibration.matsim_trips" + suffix;
+		String tripTableName = "" + schemaName + ".matsim_trips" + suffix;
 		columns = new ArrayList<PostgresqlColumnDefinition>();
 		columns.add(new PostgresqlColumnDefinition("trip_id", PostgresType.INT));
 		columns.add(new PostgresqlColumnDefinition("journey_id",
@@ -758,7 +759,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				"MATSim trips (stages) from events file %s, created on %s.",
 				eventsFileName, formattedDate));
 
-		String transferTableName = "m_calibration.matsim_transfers" + suffix;
+		String transferTableName = "" + schemaName + ".matsim_transfers" + suffix;
 		columns = new ArrayList<PostgresqlColumnDefinition>();
 		columns.add(new PostgresqlColumnDefinition("transfer_id",
 				PostgresType.INT, "primary key"));
@@ -876,24 +877,24 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		// list
 		String update = "		UPDATE " + tripTableName
 				+ " SET boarding_stop = matsim_to_transitstops_lookup.stop_id "
-				+ " FROM m_calibration.matsim_to_transitstops_lookup "
+				+ " FROM " + schemaName + ".matsim_to_transitstops_lookup "
 				+ " WHERE boarding_stop = matsim_stop ";
 		dba.executeUpdate(update);
 		update = "		UPDATE "
 				+ tripTableName
 				+ " SET alighting_stop = matsim_to_transitstops_lookup.stop_id "
-				+ " FROM m_calibration.matsim_to_transitstops_lookup "
+				+ " FROM " + schemaName + ".matsim_to_transitstops_lookup "
 				+ " WHERE alighting_stop = matsim_stop ";
 		dba.executeUpdate(update);
 		update = "		UPDATE " + journeyTableName
 				+ " SET first_boarding_stop = matsim_to_transitstops_lookup.stop_id "
-				+ " FROM m_calibration.matsim_to_transitstops_lookup "
+				+ " FROM " + schemaName + ".matsim_to_transitstops_lookup "
 				+ " WHERE first_boarding_stop = matsim_stop ";
 		dba.executeUpdate(update);
 		update = "		UPDATE "
 				+ journeyTableName
 				+ " SET last_alighting_stop = matsim_to_transitstops_lookup.stop_id "
-				+ " FROM m_calibration.matsim_to_transitstops_lookup "
+				+ " FROM " + schemaName + ".matsim_to_transitstops_lookup "
 				+ " WHERE last_alighting_stop = matsim_stop ";
 		dba.executeUpdate(update);
 

@@ -8,7 +8,6 @@ import playground.pieter.pseudosim.controler.listeners.PseudoSimPlanMarkerModule
 import playground.pieter.pseudosim.controler.listeners.PseudoSimSubSetSimulationListener;
 import playground.pieter.pseudosim.controler.listeners.MobSimSwitcher;
 import playground.pieter.pseudosim.controler.listeners.SimpleAnnealer;
-import playground.pieter.pseudosim.trafficinfo.MyTTCalcFactory;
 import playground.pieter.router.costcalculators.CapacityFavoringStochasticCostCalculator;
 import playground.pieter.router.costcalculators.CapacityFavoringStochasticCostCalculatorFactory;
 import playground.pieter.router.util.StochasticRouterFactory;

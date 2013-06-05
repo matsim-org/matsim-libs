@@ -19,7 +19,7 @@ public class BeforeMentalSimSelectedPlanScoreRecorder implements
 	}
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-		LinkedHashSet<IdImpl> agentsForMentalSimulation = c.getAgentsForMentalSimulation();
+		LinkedHashSet<IdImpl> agentsForMentalSimulation = c.getAgentsForPseudoSimulation();
 		for(Person p:c.getPopulation().getPersons().values()){
 			if(!agentsForMentalSimulation.contains((IdImpl)p.getId())){
 				c.getNonSimulatedAgentSelectedPlanScores().put((IdImpl) p.getId(), p.getSelectedPlan().getScore());

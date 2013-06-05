@@ -22,7 +22,7 @@ public class BeforePseudoSimSelectedPlanNullifier implements
 		//then the selected plans of unsimulated persons get a score of zero
 		if(MobSimSwitcher.isMobSimIteration){
 			for(Person p :controler.getPopulation().getPersons().values()){
-				if(!controler.getAgentsForMentalSimulation().contains(p.getId())){
+				if(!controler.getAgentsForPseudoSimulation().contains(p.getId())){
 					((PersonImpl)p).setSelectedPlan(null);
 					
 				}

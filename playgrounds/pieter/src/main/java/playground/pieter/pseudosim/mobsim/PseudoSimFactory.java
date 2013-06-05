@@ -26,8 +26,9 @@ public class PseudoSimFactory implements MobsimFactory {
 	@Override
 	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
 		
-		return new PseudoSim(sc, eventsManager, ttcalc,controler);
+		return new PseudoSim(sc, eventsManager, controler);
 	}
+	
 
 
 }

@@ -109,7 +109,7 @@ public class MobSimSwitcher implements ControlerListener,
 		TravelTime ttcalc = controler.getLinkTravelTimes();
 
 		if (checkExpensiveIter(event.getIteration())) {
-			log.warn("Running an expensive iteration with full queue simulation");
+			log.warn("Running full queue simulation");
 			String mobsim = controler.getConfig().controler().getMobsim();
 
 			if (mobsim != null) {
@@ -125,9 +125,9 @@ public class MobSimSwitcher implements ControlerListener,
 				controler.setMobsimFactory(new QueueSimulationFactory());
 			}
 		} else {
-			log.info("Running a cheap iteration with mental simulation");
+			log.info("Running PSim");
 			controler.setMobsimFactory(new PseudoSimFactory(ttcalc, controler));
-			controler.clearPlansForMentalSimulation();
+			controler.clearPlansForPseudoSimulation();
 
 		}
 	}

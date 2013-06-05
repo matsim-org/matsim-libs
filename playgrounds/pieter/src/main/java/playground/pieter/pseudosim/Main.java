@@ -15,7 +15,6 @@ import playground.pieter.pseudosim.controler.listeners.PseudoSimPlanMarkerModule
 import playground.pieter.pseudosim.controler.listeners.PseudoSimSubSetSimulationListener;
 import playground.pieter.pseudosim.controler.listeners.MobSimSwitcher;
 import playground.pieter.pseudosim.controler.listeners.SimpleAnnealer;
-import playground.pieter.pseudosim.trafficinfo.MyTTCalcFactory;
 
 
 public class Main {
@@ -27,18 +26,6 @@ public class Main {
 		PseudoSimControler c = new PseudoSimControler(args);
 		c.setOverwriteFiles(true);
 		c.setSimulateSubsetPersonsOnly(false);
-		c.setTravelTimeCalculatorFactory(new MyTTCalcFactory());
-//		execution order of these iteration start listeners is in reverse order of adding them to the controler
-//		PlanSelector mentalPlanSelector = new ExpBetaPlanSelector(new PlanCalcScoreConfigGroup());
-		PlanSelector mentalPlanSelector = new BestPlanSelector();
-		c.addControlerListener(new PseudoSimSubSetSimulationListener(c,mentalPlanSelector));
-		c.addControlerListener(new SimpleAnnealer());
-		c.addControlerListener(new MobSimSwitcher(c));
-		c.addControlerListener(new PseudoSimPlanMarkerModuleAppender(c));
-		c.addControlerListener(new ExpensiveSimScoreWriter(c));
-//		c.addControlerListener(new BeforeMentalSimSelectedPlanNullifier(c));
-//		c.addControlerListener(new BeforeMentalSimSelectedPlanScoreRecorder(c));
-//		c.addControlerListener(new IterationEndsSelectedPlanScoreRestoreListener(c));
 		c.run();
 		System.exit(0);
 		
