@@ -29,6 +29,7 @@ public class DepotArrivalDepartureCharger implements AgentArrivalEventHandler,
 	private HashMap<Id, Double> socUponArrival;
 	private final double MINIMUMCHARGETIME = 120.;
 	private final double POWERINKW = 50.0; //max charge for Nissan Leaf
+	private final double MINIMUMSOCFORDEPARTURE = 4.;
 	private static final Logger log = Logger.getLogger(DepotArrivalDepartureCharger.class);
 	private SoCLog soCLog;
 
@@ -64,7 +65,7 @@ public class DepotArrivalDepartureCharger implements AgentArrivalEventHandler,
 		
 		double chargetime = event.getTime() - this.arrivalTimes.get(event.getPersonId())-MINIMUMCHARGETIME;
 		if (chargetime>0)
-		log.info("Charged v: "+event.getPersonId()+" for "+chargetime+" old Soc: " + (this.socUponArrival.get(event.getPersonId())/3600/1000)+ " new SoC: " + (((BatteryElectricVehicle)this.vehicles.get(event.getPersonId())).getSocInJoules()/3600/1000)  );
+//		log.info("Charged v: "+event.getPersonId()+" for "+chargetime+" old Soc: " + (this.socUponArrival.get(event.getPersonId())/3600/1000)+ " new SoC: " + (((BatteryElectricVehicle)this.vehicles.get(event.getPersonId())).getSocInJoules()/3600/1000)  );
 		
 		this.arrivalTimes.remove(event.getPersonId());
 		this.socUponArrival.remove(event.getPersonId());
@@ -127,6 +128,17 @@ public class DepotArrivalDepartureCharger implements AgentArrivalEventHandler,
 	}
 	public SoCLog getSoCLog() {
 		return soCLog;
+	}
+	
+	public boolean isChargedForTask(Id carId){
+		boolean charged = true; //default is true, e.g. for petrol-based cars
+	
+		if (this.vehicles.containsKey(carId))
+			if (isBatteryElectricVehicle(carId))			
+				if (((BatteryElectricVehicle)this.vehicles.get(carId)).getSocInJoules() < this.MINIMUMSOCFORDEPARTURE*3600*1000) 
+					charged= false;
+		
+		return charged;
 	}
 
 }
