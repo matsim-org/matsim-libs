@@ -125,9 +125,10 @@ public class AccessibilityTest implements MATSim4UrbanSimInterface, LinkEnterEve
 		SpatialGrid bikeGrid = new SpatialGrid(freeSpeedGrid);
 		SpatialGrid walkGrid = new SpatialGrid(freeSpeedGrid);
 		SpatialGrid ptGrid = new SpatialGrid(freeSpeedGrid);
-		
+
 		ActivityFacilitiesImpl parcels = new ActivityFacilitiesImpl("parcels");
 		ActivityFacilitiesImpl zones = new ActivityFacilitiesImpl("zones");
+		ActivityFacilitiesImpl opportunities = new ActivityFacilitiesImpl("opportunities");
 		
 		this.getReadFromUrbanSimModel().readFacilitiesParcel(parcels, zones);
 		
@@ -138,7 +139,7 @@ public class AccessibilityTest implements MATSim4UrbanSimInterface, LinkEnterEve
 		ControlerListener listener = null;
 		
 		if(this.isParcelMode()){
-			listener = new GridBasedAccessibilityControlerListenerV3(this, startZones, parcels, freeSpeedGrid, carGrid, bikeGrid, walkGrid,
+			listener = new GridBasedAccessibilityControlerListenerV3(startZones, parcels, opportunities, freeSpeedGrid, carGrid, bikeGrid, walkGrid,
 					ptGrid, ptMatrix, benchmark, scenario);
 			ctrl.addControlerListener(listener);
 			testParcelBasedAccessibility(ctrl,listener, freeSpeedGrid);
