@@ -151,9 +151,9 @@ public class EnergyConsumptionTracker implements LinkEnterEventHandler, LinkLeav
 			}
 				
 //			Id ll = new IdImpl(Math.round(link.getLength()));
-//			getLog().add(new EnergyConsumptionLogRow(personId, ll, energyConsumptionInJoule));
+//			 getLog().add(new EnergyConsumptionLogRow(personId, ll, energyConsumptionInJoule));
 
-			getLog().add(new EnergyConsumptionLogRow(personId, linkId, energyConsumptionInJoule, linkLeaveTime, soc, loc));
+			getLog().add(new EnergyConsumptionLogRow(personId, linkId, energyConsumptionInJoule));
 		}
 		}
 	}
