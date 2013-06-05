@@ -36,8 +36,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 public class WelfareAnalysisMain {
 	
-//	static String configFile = "/Users/Ihab/Desktop/internalization_output/output_config.xml.gz";
-	static String configFile = "/Users/Ihab/Desktop/noInternalization_output/output_config.xml.gz";
+	static String configFile = "/Users/Ihab/Desktop/internalization_output/output_config.xml.gz";
+//	static String configFile = "/Users/Ihab/Desktop/noInternalization_output/output_config.xml.gz";
 	
 	private int iteration;
 	private String outputDir;

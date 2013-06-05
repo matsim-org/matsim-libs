@@ -37,8 +37,8 @@ import playground.ikaddoura.internalizationCar.MarginalCongestionEventsReader;
 
 public class CongestionAnalysisMain {
 
-//	static String configFile = "/Users/Ihab/Desktop/internalization_output/output_config.xml.gz";
-	static String configFile = "/Users/Ihab/Desktop/noInternalization_output/output_config.xml.gz";
+	static String configFile = "/Users/Ihab/Desktop/internalization_output/output_config.xml.gz";
+//	static String configFile = "/Users/Ihab/Desktop/noInternalization_output/output_config.xml.gz";
 
 	private int iteration;
 	private String outputDir;

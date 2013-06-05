@@ -114,8 +114,8 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 	
 	@Override
 	public void handleEvent(AgentStuckEvent event) {
-		log.warn("Agent stuck event. No garantee for right calculation of marginal congestion effects: " + event.toString());
-		throw new RuntimeException();
+//		log.warn("Agent stuck event. No garantee for right calculation of marginal congestion effects: " + event.toString());
+		throw new RuntimeException("Agent stuck event. No garantee for right calculation of marginal congestion effects: " + event.toString());
 	}
 
 	@Override
@@ -127,9 +127,10 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 				// no one entered or left this link before
 				collectLinkInfos(event.getLinkId());
 			}
-			
+						
 			LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 			linkInfo.getAgentsOnLink().add(event.getPersonId());
+			updateLinkInfo_agentEntersLink(event.getTime(), event.getPersonId(), event.getLinkId());
 			linkInfo.getPersonId2freeSpeedLeaveTime().put(event.getPersonId(), event.getTime() + 1);
 
 		} else {			
@@ -149,10 +150,11 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 				// no one entered or left this link before
 				collectLinkInfos(event.getLinkId());
 			}
-			
+						
 			LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 			linkInfo.getAgentsOnLink().add(event.getPersonId());
-			linkInfo.getPersonId2freeSpeedLeaveTime().put(event.getPersonId(), event.getTime() + linkInfo.getFreeTravelTime());
+			updateLinkInfo_agentEntersLink(event.getTime(), event.getPersonId(), event.getLinkId());
+			linkInfo.getPersonId2freeSpeedLeaveTime().put(event.getPersonId(), event.getTime() + linkInfo.getFreeTravelTime() + 1.0);
 		}	
 	}
 	
@@ -161,7 +163,9 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 		if (event.getLegMode().toString().equals(TransportMode.car.toString())){
 			// car!
 			LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
+			
 			linkInfo.getAgentsOnLink().remove(event.getPersonId());
+			updateLinkInfo_agentLeavesLink(event.getTime(), event.getPersonId(), event.getLinkId());
 
 		} else {			
 			log.warn("Not tested for other modes than car.");
@@ -185,10 +189,12 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 			LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 			
 			linkInfo.getAgentsOnLink().remove(event.getPersonId());
+			updateLinkInfo_agentLeavesLink(event.getTime(), event.getPersonId(), event.getLinkId());
 			
-			checkQSimBehavior(event);
-			clearTrackingMarginalDelays(event);
+//			checkQSimBehavior(event);
+			clearTrackingMarginalDelays1(event);
 			calculateCongestion(event);
+			clearTrackingMarginalDelays2(event);
 			trackMarginalDelay(event);
 			
 			linkInfo.getPersonId2freeSpeedLeaveTime().remove(event.getPersonId());
@@ -198,83 +204,84 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 	// --------------------------------------------------------------------------------------------------------------------------------------------
 	// --------------------------------------------------------------------------------------------------------------------------------------------
 	
-	private void checkQSimBehavior(LinkLeaveEvent event) {
+//	private void checkQSimBehavior(LinkLeaveEvent event) {
+//		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
+//		
+//		double lastLeavingFromThatLink = getLastLeavingTime(linkInfo.getPersonId2linkLeaveTime());
+//		double earliestLeaveTime = lastLeavingFromThatLink + linkInfo.getMarginalDelayPerLeavingVehicle_sec();
+//			
+//		if (event.getTime() >= earliestLeaveTime){
+//			// expected			
+//			
+//		} else {
+//			throw new RuntimeException("Agent leaves link earlier than flow capacity would allow. Aborting...");
+//		}
+//	}
+
+	private void clearTrackingMarginalDelays2(LinkLeaveEvent event) {
 		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 		
-		double lastLeavingFromThatLink = getLastLeavingTime(linkInfo.getPersonId2linkLeaveTime());
-		double earliestLeaveTime = lastLeavingFromThatLink + linkInfo.getMarginalDelayPerLeavingVehicle_sec();
-			
-		if (event.getTime() >= earliestLeaveTime){
-			// expected			
+		if (linkInfo.getLeavingAgents().size() == 0) {
+			// no agent is being tracked for that link
 			
 		} else {
-			Id nextLinkId = getNextLinkId(event.getPersonId(), event.getLinkId(), event.getTime());
-			log.warn("Agent leaves link earlier than flow capacity would allow! Agent: " + event.getPersonId() + " // Link: " + event.getLinkId() + " // NextLink: " + nextLinkId + " // LeaveTime: " + event.getTime() + " // LastLeaveTime: " + lastLeavingFromThatLink + " // EarliestLeaveTime: " + earliestLeaveTime );
+			// clear trackings of persons leaving that link previously
+			double lastLeavingFromThatLink = getLastLeavingTime(linkInfo.getPersonId2linkLeaveTime());
+			double earliestLeaveTime = lastLeavingFromThatLink + linkInfo.getMarginalDelayPerLeavingVehicle_sec();
+
+			if (event.getTime() > earliestLeaveTime + 1.0){
+//				System.out.println("Flow congestion has disappeared on link " + event.getLinkId() + ". Delete agents leaving previously that link: " + linkInfo.getLeavingAgents().toString());
+				linkInfo.getLeavingAgents().clear();
+				linkInfo.getPersonId2linkLeaveTime().clear();
+				
+			}
 		}
+		
 	}
 
 	private void calculateCongestion(LinkLeaveEvent event) {
 		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 		
 		double totalDelay = event.getTime() - linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getPersonId());
-
+		
 //		System.out.println(event.toString());
 //		System.out.println("free travel time: " + linkInfo.getFreeTravelTime() + " // marginal flow delay: " + linkInfo.getMarginalDelayPerLeavingVehicle_sec());
 //		System.out.println("relevant agents (previously leaving the link): " + linkInfo.getLeavingAgents());
 //		System.out.println("total delay: " + totalDelay);
-		
-		if (totalDelay == 0.) {
+//		
+		if (totalDelay <= 0.) {
 			// person was leaving that link without delay
 		
 		} else {
-
-			double flowDelay = 0.;
 			
-			if (linkInfo.getLeavingAgents().size() == 0) {
-				// no one leaving this link before
-			} else {
-				
-				double lastLeavingFromThatLink = getLastLeavingTime(linkInfo.getPersonId2linkLeaveTime());
-				double earliestLeaveTime = lastLeavingFromThatLink + linkInfo.getMarginalDelayPerLeavingVehicle_sec();
-				double freeSpeedLeaveTime = linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getPersonId());
-				
-//				System.out.println("earliestLeaveTime: " + earliestLeaveTime);
-//				System.out.println("freeSpeedLeaveTime: " + freeSpeedLeaveTime);
-				
-				flowDelay =  earliestLeaveTime - freeSpeedLeaveTime;
-		
-			}
+			double remainingDelay = calculateFlowCongestion(totalDelay, event);
 			
-			double storageDelay = totalDelay - flowDelay;
+			if (remainingDelay == 0) {
+				// no storage delay
 			
-//			System.out.println("flow delay: " + flowDelay);
-//			System.out.println("storage delay: " + storageDelay);
-			
-			calculateFlowCongestion(flowDelay, event);
+			} else if (remainingDelay > 0) {
 				
-			if (storageDelay > 1.0) {
-				// Allow for 1 sec difference due to rounding errors.
-
 				if (this.allowForStorageCapacityConstraint) {
 					if (this.calculateStorageCapacityConstraints) {
 						// look who has to pay additionally for the left over delay due to the storage capacity constraint.
-						calculateStorageCongestion(event.getTime(), event.getPersonId(), event.getLinkId(), storageDelay);
+						calculateStorageCongestion(event, remainingDelay);
 					} else {
-						this.delayNotInternalized = this.delayNotInternalized + storageDelay;
+						this.delayNotInternalized = this.delayNotInternalized + remainingDelay;
 						log.warn("Delay which is not internalized: " + this.delayNotInternalized);
 					}
 					
 				} else {
-					throw new RuntimeException("Delay due to storage capacity on link " + event.getLinkId() + ": " + storageDelay + ". Aborting...");
+					throw new RuntimeException("Delay due to storage capacity on link " + event.getLinkId() + ": " + remainingDelay + ". Aborting...");
 				}
-					
+			
 			} else {
-				// No delay resulting from storage capacity constraint.
+				log.warn("Oups, storage delay: " + remainingDelay);
 			}
+			
 		}
 	}
 	
-	private void calculateFlowCongestion(double flowDelay, LinkLeaveEvent event) {
+	private double calculateFlowCongestion(double totalDelay, LinkLeaveEvent event) {
 		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 
 		// Search for agents causing the delay on that link and throw delayEffects for the causing agents.
@@ -282,12 +289,11 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 		reverseList.addAll(linkInfo.getLeavingAgents());
 		Collections.reverse(reverseList);
 		
-		double delayToPayFor = flowDelay;
+		double delayToPayFor = totalDelay;
 		for (Id id : reverseList){
 			if (delayToPayFor > linkInfo.getMarginalDelayPerLeavingVehicle_sec()) {
 				
 //				System.out.println("	Person " + id.toString() + " --> Marginal delay: " + linkInfo.getMarginalDelayPerLeavingVehicle_sec() + " linkLeaveTime: " + linkInfo.getPersonId2linkLeaveTime().get(id));
-				
 				MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "flowCapacity", id, event.getPersonId(), linkInfo.getMarginalDelayPerLeavingVehicle_sec(), event.getLinkId());
 				this.events.processEvent(congestionEvent);	
 				
@@ -297,7 +303,6 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 				if (delayToPayFor > 0) {
 					
 //					System.out.println("	Person " + id + " --> Marginal delay: " + delayToPayFor + " linkLeaveTime: " + linkInfo.getPersonId2linkLeaveTime().get(id));
-					
 					MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "flowCapacity", id, event.getPersonId(), delayToPayFor, event.getLinkId());
 					this.events.processEvent(congestionEvent);
 					
@@ -306,51 +311,77 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 			}
 		}
 		
-		if (delayToPayFor > 1.) {
-			// Allow for 1 sec difference due to rounding errors.
-			log.warn("More flow delay than causing agents identified and charged for (remaining delay: " + delayToPayFor + " // agent: " + event.getPersonId() + " // time: " + event.getTime() + " // link: " + event.getLinkId() + ").");
+		if (delayToPayFor == 1.) {
+			log.warn("Remaining delay of 1.0 sec may result from rounding errors. Setting the remaining delay to 0.0 sec.");
+			delayToPayFor = 0.;
 		}
-		
+		return delayToPayFor;
 	}
 
-	private void calculateStorageCongestion(double time, Id affectedAgent, Id linkId, double delay) {
+	private void calculateStorageCongestion(LinkLeaveEvent event, double remainingDelay) {
 			
-		// For simplifying reasons: Find the agent who is in front of me right now (time) instead of (time - delay)
+		// Find the last agent blocking the next link at the relevant time step.
+		// Relevant time step: The free flow travel time.
+			
+		double relevantTimeStep = this.linkId2congestionInfo.get(event.getLinkId()).getPersonId2freeSpeedLeaveTime().get(event.getPersonId());
 		
 		Id causingAgent = null;
 		
-		if (causingAgent == null){
-			// Get the last agent blocking the next link
-			Id nextLinkId = getNextLinkId(affectedAgent, linkId, time);
-			causingAgent = getCausingAgentNextLink(nextLinkId);
-		}
+		// Get the last agent blocking the next link
+		Id nextLinkId = getNextLinkId(event.getPersonId(), event.getLinkId(), event.getTime());
+		causingAgent = getCausingAgentNextLink(nextLinkId, relevantTimeStep);
+		
 		if (causingAgent == null){
 			throw new RuntimeException("No agent identified who is causing the delay due to storage capacity. Aborting...");
 		}
 		
-		MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(time, "storageCapacity", causingAgent, affectedAgent, delay, linkId);
+		MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "storageCapacity", causingAgent, event.getPersonId(), remainingDelay, event.getLinkId());
 		this.events.processEvent(congestionEvent);
 	}
 	
-	private Id getCausingAgentNextLink(Id nextLinkId) {
+	private Id getCausingAgentNextLink(Id nextLinkId, double relevantTimeStep) {
 		Id causingAgent = null;
 		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(nextLinkId);
+			
+		int agentsOnNextLink = 0;
+		double lastLinkEnterTime = Double.NEGATIVE_INFINITY;
 		
-		double causingAgentFreeSpeedLeaveTime = Double.NEGATIVE_INFINITY;
-		
-		if ( (linkInfo.getAgentsOnLink().size() + 1) < linkInfo.getStorageCapacity_cars() ){
-			log.warn("Number of agents on next link: " + linkInfo.getAgentsOnLink().size() + " /// storage capacity: " + linkInfo.getStorageCapacity_cars());
-		}
-
-		// all agents who are currently on that link
-		for (Id id : linkInfo.getAgentsOnLink()){
-
-			// get last agent in queue
-			if (linkInfo.getPersonId2freeSpeedLeaveTime().get(id) > causingAgentFreeSpeedLeaveTime) {
-				causingAgentFreeSpeedLeaveTime = linkInfo.getPersonId2freeSpeedLeaveTime().get(id);
-				causingAgent = id;
+		for (LinkEnterLeaveInfo info : linkInfo.getPersonEnterLeaveInfos()) {
+			
+			if ((info.getLinkEnterTime() <= relevantTimeStep && info.getLinkLeaveTime() > relevantTimeStep) || (info.getLinkEnterTime() <= relevantTimeStep && info.getLinkLeaveTime() == 0)){
+				// person at relevant time (flowLeaveTime) on next link
+				agentsOnNextLink++;
+				
+				if (info.getLinkEnterTime() > lastLinkEnterTime) {
+					// person entering this link after previously identified agents
+					causingAgent = info.getPersonId();
+					lastLinkEnterTime = info.getLinkEnterTime();
+				} else {
+					// person entering the link earlier, thus not relevant
+				}
+				
+			} else {
+				// person was not on the link at the linkLeaveTime
 			}
 		}
+
+		if (agentsOnNextLink < linkInfo.getStorageCapacity_cars()){
+			log.warn("Number of agents on next link (" + nextLinkId + "): " + agentsOnNextLink + " at time step " + relevantTimeStep + ". But: storage capacity: " + linkInfo.getStorageCapacity_cars());
+		}
+		
+//		if only looking at the current time step:
+//		double causingAgentFreeSpeedLeaveTime = Double.NEGATIVE_INFINITY;
+//
+//		// all agents who are currently on that link
+//		for (Id id : linkInfo.getAgentsOnLink()){
+//
+//			// get last agent in queue
+//			if (linkInfo.getPersonId2freeSpeedLeaveTime().get(id) > causingAgentFreeSpeedLeaveTime) {
+//				causingAgentFreeSpeedLeaveTime = linkInfo.getPersonId2freeSpeedLeaveTime().get(id);
+//				causingAgent = id;
+//			}
+//		}
+		
 		return causingAgent;
 	}
 
@@ -365,7 +396,6 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 				Activity act = (Activity) pE;
 				if (act.getEndTime() < 0.) {
 					// act has no endtime
-					log.warn("Activity without endtime.");
 					
 				} else if (time >= act.getEndTime()) {
 					int nextLegIndex = selectedPlan.getPlanElements().indexOf(pE) + 1;
@@ -408,7 +438,7 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 		return nextLinkId;
 	}
 	
-	private void clearTrackingMarginalDelays(LinkLeaveEvent event) {
+	private void clearTrackingMarginalDelays1(LinkLeaveEvent event) {
 		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 		
 		if (linkInfo.getLeavingAgents().size() == 0) {
@@ -421,13 +451,14 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 			double freeSpeedLeaveTime = linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getPersonId());
 //			System.out.println("earliestLeaveTime: " + earliestLeaveTime);
 //			System.out.println("freeSpeedLeaveTime: " + freeSpeedLeaveTime);
-						
+
 			if (freeSpeedLeaveTime > earliestLeaveTime + 1.0){
 //				System.out.println("Flow congestion has disappeared on link " + event.getLinkId() + ". Delete agents leaving previously that link: " + linkInfo.getLeavingAgents().toString());
 				linkInfo.getLeavingAgents().clear();
 				linkInfo.getPersonId2linkLeaveTime().clear();
 				
 			}  else {
+
 				
 			}
 		}
@@ -463,6 +494,54 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 		linkInfo.setStorageCapacity_cars(storageCapacity_cars);
 		
 		this.linkId2congestionInfo.put(link.getId(), linkInfo);
+	}
+	
+	private void updateLinkInfo_agentEntersLink(double time, Id personId, Id linkId) {
+		if (this.linkId2congestionInfo.get(linkId).getPersonEnterLeaveInfos() == null) {
+			List<LinkEnterLeaveInfo> enterLeaveInfos = new ArrayList<LinkEnterLeaveInfo>();
+			LinkEnterLeaveInfo linkEnterLeaveInfo = new LinkEnterLeaveInfo();
+			linkEnterLeaveInfo.setPersonId(personId);
+			linkEnterLeaveInfo.setLinkEnterTime(time);
+			linkEnterLeaveInfo.setLinkLeaveTime(0.);
+			
+			enterLeaveInfos.add(linkEnterLeaveInfo);
+			linkId2congestionInfo.get(linkId).setPersonEnterLeaveInfos(enterLeaveInfos);
+		} else {
+			List<LinkEnterLeaveInfo> enterLeaveInfos = this.linkId2congestionInfo.get(linkId).getPersonEnterLeaveInfos();			
+			LinkEnterLeaveInfo linkEnterLeaveInfo = new LinkEnterLeaveInfo();
+			linkEnterLeaveInfo.setPersonId(personId);
+			linkEnterLeaveInfo.setLinkEnterTime(time);
+			linkEnterLeaveInfo.setLinkLeaveTime(0.);
+			
+			enterLeaveInfos.add(linkEnterLeaveInfo);
+			linkId2congestionInfo.get(linkId).setPersonEnterLeaveInfos(enterLeaveInfos);
+		}
+	}
+
+	private void updateLinkInfo_agentLeavesLink(double time, Id personId, Id linkId) {
+		
+		if (this.linkId2congestionInfo.get(linkId).getPersonEnterLeaveInfos() == null) {
+			List<LinkEnterLeaveInfo> personId2enterLeaveInfo = new ArrayList<LinkEnterLeaveInfo>();
+			LinkEnterLeaveInfo linkEnterLeaveInfo = new LinkEnterLeaveInfo();
+			linkEnterLeaveInfo.setPersonId(personId);
+			linkEnterLeaveInfo.setLinkLeaveTime(time);
+			
+			personId2enterLeaveInfo.add(linkEnterLeaveInfo);
+			linkId2congestionInfo.get(linkId).setPersonEnterLeaveInfos(personId2enterLeaveInfo);
+		
+		} else {
+			List<LinkEnterLeaveInfo> personId2enterLeaveInfo = this.linkId2congestionInfo.get(linkId).getPersonEnterLeaveInfos();
+			for (LinkEnterLeaveInfo info : personId2enterLeaveInfo) {
+				if (info.getPersonId().toString().equals(personId.toString())){
+					if (info.getLinkLeaveTime() == 0.){
+						// EnterLeaveInfo with not yet set leaving time
+						info.setLinkLeaveTime(time);
+					} else {
+						// completed EnterLeaveInfo
+					}
+				}
+			}
+		}
 	}
 	
 	private double getLastLeavingTime(Map<Id, Double> personId2LinkLeaveTime) {
