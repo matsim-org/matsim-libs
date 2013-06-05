@@ -60,13 +60,11 @@ import playground.pieter.pseudosim.util.CollectionUtils;
 import playground.sergioo.singapore2012.transitRouterVariable.StopStopTimeCalculator;
 import playground.sergioo.singapore2012.transitRouterVariable.WaitTimeStuckCalculator;
 /**
- * @author illenberger, fouriep
+ * @author illenberger, fouriep, sergioo
  *         <p>
- *         Original code by Johannes Illenberger for his social network
+ *         Original car mode code by Johannes Illenberger for his social network
  *         research, extended to produce link events, making it compatible with
- *         road pricing. Currently, transit will only generate activity start
- *         and end events, with travel times taken from the generic route
- *         object.
+ *         road pricing. Extended for transit simulation.
  * 
  */
 public class PseudoSim implements Mobsim {
@@ -353,20 +351,23 @@ public class PseudoSim implements Mobsim {
 			TransitRouteStop orig = transitRoute.getStop(stopFacilities.get(route.getAccessStopId()));
 			TransitRouteStop dest = transitRoute.getStop(stopFacilities.get(route.getEgressStopId()));
 			int i = transitRoute.getStops().indexOf(orig);
-			int j = transitRoute.getStops().indexOf(dest);
-			if(i>=j){
-				throw new RuntimeException(String.format("Cannot route from origin stop %s to destination stop %s on route %s.",
-						orig.getStopFacility().getId().toString()
-						,dest.getStopFacility().getId().toString()
-						,route.getRouteId().toString()
-						));
-				
-			}
-			while(i<j){
+//			int j = transitRoute.getStops().indexOf(dest);
+//			if(i>=j){
+//				throw new RuntimeException(String.format("Cannot route from origin stop %s to destination stop %s on route %s.",
+//						orig.getStopFacility().getId().toString()
+//						,dest.getStopFacility().getId().toString()
+//						,route.getRouteId().toString()
+//						));
+//				
+//			}
+			while(i<transitRoute.getStops().size()){
 				Id fromId = transitRoute.getStops().get(i).getStopFacility().getId();
-				Id toId = transitRoute.getStops().get(i+1).getStopFacility().getId();
+				TransitRouteStop toStop = transitRoute.getStops().get(i+1);
+				Id toId = toStop.getStopFacility().getId();
 				travelTime += transitStopToStopTimeCalculator.getStopStopTimes().getStopStopTime(fromId, toId, prevEndTime);
 				prevEndTime += travelTime;
+				if(toStop.equals(dest))
+					break;
 				i++;
 			}
 			return travelTime;
