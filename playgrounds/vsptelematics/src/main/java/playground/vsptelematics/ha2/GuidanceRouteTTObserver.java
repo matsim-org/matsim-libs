@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.vsptelematics.ha3;
+package playground.vsptelematics.ha2;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SimpleWithindayAgent
+ * ReactiveGuidanceFactory
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,40 +17,53 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.vsptelematics.ha3;
+package playground.vsptelematics.ha2;
 
-import org.matsim.api.core.v01.Id;
+import java.util.Random;
+
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.qsim.agents.AgentFactory;
+import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
+import org.matsim.core.utils.misc.PopulationUtils;
 
 
 /**
  * @author dgrether
  *
  */
-public class SimpleWithindayAgent extends ExperimentalBasicWithindayAgent{
+public class GuidanceAgentFactory implements AgentFactory {
 
-	
-	protected SimpleWithindayAgent(Person p, Netsim simulation) {
-		super(p, simulation);
+	private final Netsim simulation;
+	private double equipmentFraction;
+	private Random random;
+	private Guidance guidance;
+	private GuidanceRouteTTObserver ttObserver;
+
+	public GuidanceAgentFactory(final Netsim simulation, double equipmentFraction, Guidance guidance, GuidanceRouteTTObserver ttObserver) {
+		this.simulation = simulation;
+		this.equipmentFraction = equipmentFraction;
+		this.random = MatsimRandom.getLocalInstance();
+		this.guidance = guidance;
+		this.ttObserver = ttObserver;
 	}
-
+	
 	@Override
-	public Id chooseNextLinkId(){
-		Id currentLinkId  = this.getCurrentLinkId();
-		Id nextLink = null;
-		if (currentLinkId.equals(new IdImpl("1"))){
-			nextLink = new IdImpl("2");
+	public MobsimAgent createMobsimAgentFromPerson(Person p) {
+		double r = random.nextDouble();
+		MobsimDriverAgent agent = null;
+		if (r < equipmentFraction){
+			agent = new GuidanceWithindayAgent(p, this.simulation, this.guidance);
+			this.ttObserver.addGuidedAgentId(p.getId());
 		}
-		else if (currentLinkId.equals(new IdImpl("2"))){
-			nextLink = new IdImpl("4");
+		else {
+			agent = new PersonDriverAgentImpl(p, PopulationUtils.unmodifiablePlan(p.getSelectedPlan()), this.simulation); 
+			this.ttObserver.addUnGuidedAgentId(p.getId());
 		}
-		else if (currentLinkId.equals(new IdImpl("4"))){
-			nextLink = new IdImpl("6");
-		}
-		return nextLink;
+		return agent;
 	}
 
 }

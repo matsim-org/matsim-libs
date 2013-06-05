@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Guidance
+ * SimpleWithindayAgent
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,22 +17,40 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.vsptelematics.ha3;
+package playground.vsptelematics.ha2;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
 
 /**
  * @author dgrether
  *
  */
-public interface Guidance extends LinkEnterEventHandler, LinkLeaveEventHandler, MobsimAfterSimStepListener {
+public class SimpleWithindayAgent extends ExperimentalBasicWithindayAgent{
 
-	Id getNextLink(double time);
+	
+	protected SimpleWithindayAgent(Person p, Netsim simulation) {
+		super(p, simulation);
+	}
 
-	void notifyShutdown();
+	@Override
+	public Id chooseNextLinkId(){
+		Id currentLinkId  = this.getCurrentLinkId();
+		Id nextLink = null;
+		if (currentLinkId.equals(new IdImpl("1"))){
+			nextLink = new IdImpl("2");
+		}
+		else if (currentLinkId.equals(new IdImpl("2"))){
+			nextLink = new IdImpl("4");
+		}
+		else if (currentLinkId.equals(new IdImpl("4"))){
+			nextLink = new IdImpl("6");
+		}
+		return nextLink;
+	}
 
 }
