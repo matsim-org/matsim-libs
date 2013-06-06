@@ -7,9 +7,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.freight.carrier.CarrierShipment;
-import org.matsim.contrib.freight.carrier.FreightConstants;
-import org.matsim.contrib.freight.carrier.TimeWindow;
+import org.matsim.contrib.freight.carrier.Tour.Start;
 import org.matsim.contrib.freight.carrier.Tour.TourActivity;
 import org.matsim.contrib.freight.mobsim.CarrierAgent.CarrierDriverAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -76,12 +74,19 @@ class WithinDayActivityReScheduling implements MobsimListener, MobsimBeforeSimSt
 			}
 			CarrierDriverAgent driver = carrierAgentTracker.getDriver(withindayAgent.getId());
 			TourActivity plannedActivity = (TourActivity) driver.getPlannedTourElement(withindayAgent.getCurrentPlanElementIndex());
-			double newEndTime = Math.max(time, plannedActivity.getTimeWindow().getStart()) + plannedActivity.getDuration();
-			if(act.getEndTime() != newEndTime) logger.info(withindayAgent.getId() + " changed actEndTime (" + act.getEndTime() +","+newEndTime+")");
-			act.setEndTime(newEndTime);
-			withindayAgent.calculateAndSetDepartureTime(act);
-			internalInterface.rescheduleActivityEnd(withindayAgent);
-			encounteredActivities.add(act);
+			if(plannedActivity instanceof Start){
+				encounteredActivities.add(act);
+				return false;
+			}
+			else {
+				double newEndTime = Math.max(time, plannedActivity.getTimeWindow().getStart()) + plannedActivity.getDuration();
+				logger.info("[agentId="+ withindayAgent.getId() + "][currentTime="+time+"][actDuration="+plannedActivity.getDuration()+
+						"[plannedActEnd="+ act.getEndTime() + "][newActEnd="+newEndTime+"]");
+				act.setEndTime(newEndTime);
+				withindayAgent.calculateAndSetDepartureTime(act);
+				internalInterface.rescheduleActivityEnd(withindayAgent);
+				encounteredActivities.add(act);
+			}
 		} 	
 		return true;
 	}

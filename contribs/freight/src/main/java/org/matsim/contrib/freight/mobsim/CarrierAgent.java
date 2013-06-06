@@ -249,12 +249,10 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 			Id driverId = createDriverId(scheduledTour.getVehicle());
 			Person driverPerson = createDriverPerson(driverId);
 			CarrierDriverAgent carrierDriverAgent = new CarrierDriverAgent(this, driverId, scheduledTour, scoringFunction);
-			int countPlanElements = 0;
 			Plan plan = new PlanImpl();
 			Activity startActivity = new ActivityImpl(FreightConstants.START,scheduledTour.getVehicle().getLocation());
 			startActivity.setEndTime(scheduledTour.getDeparture());
 			plan.addActivity(startActivity);
-			countPlanElements++;
 			for (TourElement tourElement : scheduledTour.getTour().getTourElements()) {				
 				if (tourElement instanceof org.matsim.contrib.freight.carrier.Tour.Leg) {
 					org.matsim.contrib.freight.carrier.Tour.Leg tourLeg = (org.matsim.contrib.freight.carrier.Tour.Leg) tourElement;
@@ -266,19 +264,16 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 					leg.setTravelTime(tourLeg.getExpectedTransportTime());
 					leg.setArrivalTime(tourLeg.getDepartureTime() + tourLeg.getExpectedTransportTime());
 					plan.addLeg(leg);
-					countPlanElements++;
 				} else if (tourElement instanceof TourActivity) {
 					TourActivity act = (TourActivity) tourElement;
 					Activity tourElementActivity = new ActivityImpl(act.getActivityType(), act.getLocation());
 					double endTime = act.getExpectedActEnd();
 					tourElementActivity.setEndTime(endTime);
 					plan.addActivity(tourElementActivity);
-					countPlanElements++;
 				}
 			}
 			Activity endActivity = new ActivityImpl(FreightConstants.END,scheduledTour.getVehicle().getLocation());
 			plan.addActivity(endActivity);
-			countPlanElements++;
 			driverPerson.addPlan(plan);
 			plan.setPerson(driverPerson);
 			plans.add(plan);
