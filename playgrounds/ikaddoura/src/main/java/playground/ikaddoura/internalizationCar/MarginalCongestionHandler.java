@@ -98,6 +98,7 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 		this.linkId2congestionInfo.clear();
 		this.ptDriverIDs.clear();
 		this.ptVehicleIDs.clear();
+		this.delayNotInternalized = 0.;
 	}
 
 	@Override
@@ -253,7 +254,7 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 			// person was leaving that link without delay
 		
 		} else {
-			
+						
 			double remainingDelay = calculateFlowCongestion(totalDelay, event);
 			
 			if (remainingDelay == 0) {
@@ -275,7 +276,7 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 				}
 			
 			} else {
-				log.warn("Oups, storage delay: " + remainingDelay);
+				log.warn("Oups, negative storage delay: " + remainingDelay);
 			}
 			
 		}
@@ -327,115 +328,75 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 		
 		Id causingAgent = null;
 		
-		// Get the last agent blocking the next link
-		Id nextLinkId = getNextLinkId(event.getPersonId(), event.getLinkId(), event.getTime());
-		causingAgent = getCausingAgentNextLink(nextLinkId, relevantTimeStep);
+		List<Id> downstreamLinks = getDownStreamLinks(event.getLinkId());
+		causingAgent = getCausingAgentFromDownstreamLinks(relevantTimeStep, downstreamLinks);
 		
 		if (causingAgent == null){
-			throw new RuntimeException("No agent identified who is causing the delay due to storage capacity. Aborting...");
+			throw new RuntimeException("No agent identified who is causing the delay due to storage capacity. Check downstream links with reached storage capacity. Aborting...");
 		}
 		
 		MarginalCongestionEvent congestionEvent = new MarginalCongestionEvent(event.getTime(), "storageCapacity", causingAgent, event.getPersonId(), remainingDelay, event.getLinkId());
 		this.events.processEvent(congestionEvent);
 	}
 	
-	private Id getCausingAgentNextLink(Id nextLinkId, double relevantTimeStep) {
+	private Id getCausingAgentFromDownstreamLinks(double relevantTimeStep, List<Id> downstreamLinks) {
 		Id causingAgent = null;
-		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(nextLinkId);
-			
-		int agentsOnNextLink = 0;
 		double lastLinkEnterTime = Double.NEGATIVE_INFINITY;
-		
-		for (LinkEnterLeaveInfo info : linkInfo.getPersonEnterLeaveInfos()) {
+
+		for (Id linkId : downstreamLinks){
+			LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(linkId);
 			
-			if ((info.getLinkEnterTime() <= relevantTimeStep && info.getLinkLeaveTime() > relevantTimeStep) || (info.getLinkEnterTime() <= relevantTimeStep && info.getLinkLeaveTime() == 0)){
-				// person at relevant time (flowLeaveTime) on next link
-				agentsOnNextLink++;
+			int agentsOnNextLink = 0;
+			for (LinkEnterLeaveInfo info : linkInfo.getPersonEnterLeaveInfos()) {
 				
-				if (info.getLinkEnterTime() > lastLinkEnterTime) {
-					// person entering this link after previously identified agents
-					causingAgent = info.getPersonId();
-					lastLinkEnterTime = info.getLinkEnterTime();
+				if ((info.getLinkEnterTime() <= relevantTimeStep && info.getLinkLeaveTime() > relevantTimeStep) || (info.getLinkEnterTime() <= relevantTimeStep && info.getLinkLeaveTime() == 0)){
+					// person at relevant time (flowLeaveTime) on next link
+					agentsOnNextLink++;
+					
 				} else {
-					// person entering the link earlier, thus not relevant
+					// person was not on the link at the linkLeaveTime
+				}
+			}
+						
+			if (agentsOnNextLink == linkInfo.getStorageCapacity_cars()){
+				// storage capacity on link reached
+				
+				for (LinkEnterLeaveInfo info : linkInfo.getPersonEnterLeaveInfos()) {
+					
+					if ((info.getLinkEnterTime() <= relevantTimeStep && info.getLinkLeaveTime() > relevantTimeStep) || (info.getLinkEnterTime() <= relevantTimeStep && info.getLinkLeaveTime() == 0)){
+						// person at relevant time (flowLeaveTime) on next link
+						
+						if (info.getLinkEnterTime() > lastLinkEnterTime) {
+							// person entering this link after previously identified agents
+							causingAgent = info.getPersonId();
+							lastLinkEnterTime = info.getLinkEnterTime();
+						} else {
+							// person entering the link earlier, thus not relevant
+						}
+						
+					} else {
+						// person was not on the link at the linkLeaveTime
+					}
 				}
 				
 			} else {
-				// person was not on the link at the linkLeaveTime
+				// storage capacity on link not reached, link not relevant
 			}
 		}
-
-		if (agentsOnNextLink < linkInfo.getStorageCapacity_cars()){
-			log.warn("Number of agents on next link (" + nextLinkId + "): " + agentsOnNextLink + " at time step " + relevantTimeStep + ". But: storage capacity: " + linkInfo.getStorageCapacity_cars());
-		}
-		
-//		if only looking at the current time step:
-//		double causingAgentFreeSpeedLeaveTime = Double.NEGATIVE_INFINITY;
-//
-//		// all agents who are currently on that link
-//		for (Id id : linkInfo.getAgentsOnLink()){
-//
-//			// get last agent in queue
-//			if (linkInfo.getPersonId2freeSpeedLeaveTime().get(id) > causingAgentFreeSpeedLeaveTime) {
-//				causingAgentFreeSpeedLeaveTime = linkInfo.getPersonId2freeSpeedLeaveTime().get(id);
-//				causingAgent = id;
-//			}
-//		}
 		
 		return causingAgent;
 	}
 
-	private Id getNextLinkId(Id affectedAgent, Id linkId, double time) {
-		Id nextLinkId = null;
-		
-		List<Id> currentRouteLinkIDs = null;
-		
-		Plan selectedPlan = this.scenario.getPopulation().getPersons().get(affectedAgent).getSelectedPlan();
-		for (PlanElement pE : selectedPlan.getPlanElements()) {
-			if (pE instanceof Activity){
-				Activity act = (Activity) pE;
-				if (act.getEndTime() < 0.) {
-					// act has no endtime
-					
-				} else if (time >= act.getEndTime()) {
-					int nextLegIndex = selectedPlan.getPlanElements().indexOf(pE) + 1;
-					if (selectedPlan.getPlanElements().size() <= nextLegIndex) {
-						// last activity
-					} else {
-						if (selectedPlan.getPlanElements().get(nextLegIndex) instanceof Leg) {
-							Leg leg = (Leg) selectedPlan.getPlanElements().get(nextLegIndex);
-							List<Id> linkIDs = new ArrayList<Id>();
-							NetworkRoute route = (NetworkRoute) leg.getRoute();
-							linkIDs.add(route.getStartLinkId());
-							linkIDs.addAll(route.getLinkIds());
-							linkIDs.add(route.getEndLinkId()); // assuming this link to be the last link where the storage capacity plays a role.
-							if (linkIDs.contains(linkId)){
-								// probably current route
-								currentRouteLinkIDs = linkIDs;
-							}
-							
-						} else {
-							throw new RuntimeException("Plan element behind activity not instance of Leg. Aborting...");
-						}
-					}
-				}
+	private List<Id> getDownStreamLinks(Id linkId) {
+		List<Id> downstreamLinks = new ArrayList<Id>();
+		Link currentLink = this.scenario.getNetwork().getLinks().get(linkId);
+		Id toNodeId = currentLink.getToNode().getId();
+		for (Link link : this.scenario.getNetwork().getLinks().values()) {
+			if (link.getFromNode().getId().toString().equals(toNodeId.toString())) {
+				downstreamLinks.add(link.getId());
 			}
 		}
-		
-		// get all following linkIDs
-		boolean linkAfterCurrentLink = false;
-		List<Id> linkIDsAfterCurrentLink = new ArrayList<Id>();
-		for (Id id : currentRouteLinkIDs){
-			if (linkAfterCurrentLink){
-				linkIDsAfterCurrentLink.add(id);
-			}
-			if (linkId.toString().equals(id.toString())){
-				linkAfterCurrentLink = true;
-			}
-		}
-		
-		nextLinkId = linkIDsAfterCurrentLink.get(0);
-		return nextLinkId;
+		return downstreamLinks;
 	}
 	
 	private void clearTrackingMarginalDelays1(LinkLeaveEvent event) {
