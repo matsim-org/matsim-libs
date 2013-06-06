@@ -116,7 +116,6 @@ public class SpatialAveraging {
 	final int noOfYbins = 120;
 	final double smoothingRadius_m = 500.; 
 	final String pollutant2analyze = WarmPollutant.NO2.toString();
-	final AveragingMethod avm = AveragingMethod.AVERAGE;
 	final boolean baseCaseOnly = false;
 	final boolean calculateRelativeChange = false;
 
@@ -180,8 +179,8 @@ public class SpatialAveraging {
 			writeRoutput(emissions, outPathStub + ".Routput." + pollutant2analyze.toString() + "." + endOfTimeInterval + ".txt");
 			time2Emissions.put(endOfTimeInterval, emissions);
 		}
-		writeGISoutput(time2Demand, outPathStub + ".GISoutput.Demand" + ".movie.shp");
-		writeGISoutput(time2Emissions, outPathStub +  ".GISoutput." + pollutant2analyze.toString() + ".movie.shp");
+//		writeGISoutput(time2Demand, outPathStub + ".GISoutput.Demand" + ".movie.shp");
+//		writeGISoutput(time2Emissions, outPathStub +  ".GISoutput." + pollutant2analyze.toString() + ".movie.shp");
 	}
 
 	private void writeGISoutput(
@@ -257,19 +256,24 @@ public class SpatialAveraging {
 
 	private double[][] getResults(
 				double[][] sumOfweightedValuesForCell,
-				double[][] sumOfweightsForCell) {
+				double[][] sumOfweightsForCell,
+				AveragingMethod avm) {
 			
 			double[][] results = new double[noOfXbins][noOfYbins];
-			final double area_in_smoothing_circle_sqkm = (Math.PI * this.smoothingRadius_m * this.smoothingRadius_m) * 1000. * 1000.;
+			final double area_in_smoothing_circle_sqkm = (Math.PI * this.smoothingRadius_m * this.smoothingRadius_m) / (1000. * 1000.);
 	//		final double area_in_cell_sqkm = (xMax-xMin)/noOfXbins * (yMax-yMin)/noOfYbins / 1000. / 1000. ;
 			for(int xIndex = 0; xIndex < noOfXbins; xIndex++){
 				for(int yIndex = 0; yIndex < noOfYbins; yIndex++){
 					
 					if(avm.equals(AveragingMethod.AVERAGE)){
-						// average value in cell:
+						/* Average value for cell
+						 * Values NEED to be non-additive (e.g. g/vkm, ...)  */
 						results[xIndex][yIndex] = sumOfweightedValuesForCell[xIndex][yIndex] / sumOfweightsForCell[xIndex][yIndex] ;
 					} else if(avm.equals(AveragingMethod.PERSQKM)){
-						// sum over values in cell normalized to "per sqkm" (dependent on calcluateWeightOfLinkForCell): // make sure coordinate system is metric
+						/* Sum over values for cell normalized to "per sqkm" (dependent on calcluateWeightOfLinkForCell)
+						 * Values NEED to be additive (e.g. vkm, g, counts, ...)
+						 * Make sure coordinate system is metric */
+						
 	//					results[xIndex][yIndex] = sumOfweightedValuesForCell[xIndex][yIndex] / area_in_cell_sqkm  ;
 						results[xIndex][yIndex] = sumOfweightedValuesForCell[xIndex][yIndex] / area_in_smoothing_circle_sqkm;
 					}
@@ -302,7 +306,7 @@ public class SpatialAveraging {
 				}
 			}
 		}
-		double[][] results = getResults(sumOfweightedValuesForCell, sumOfweightsForCell);
+		double[][] results = getResults(sumOfweightedValuesForCell, sumOfweightsForCell, AveragingMethod.AVERAGE);
 		return results;
 	}
 
@@ -329,7 +333,7 @@ public class SpatialAveraging {
 				}
 			}
 		}
-		double[][] results = getResults(sumOfweightedValuesForCell, sumOfweightsForCell);
+		double[][] results = getResults(sumOfweightedValuesForCell, sumOfweightsForCell, AveragingMethod.PERSQKM);
 		return results;
 	}
 
