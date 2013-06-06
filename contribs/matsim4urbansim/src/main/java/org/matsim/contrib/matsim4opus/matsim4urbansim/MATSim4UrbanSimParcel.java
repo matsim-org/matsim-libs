@@ -453,7 +453,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 																												 ptGrid,
 																												 ptMatrix,
 																												 benchmark,
-																												 this.scenario);
+																												 scenario);
 				// accessibility calculations will be triggered when mobsim finished
 				controler.addControlerListener(gbacl);
 				// creating a writer listener that writes out accessibility results in UrbanSim format for parcels
@@ -473,7 +473,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 																							 ptGrid,
 																							 ptMatrix,
 																							 benchmark,
-																							 this.scenario));
+																							 scenario));
 		}
 		
 		// From here outputs are for analysis/debugging purposes only
