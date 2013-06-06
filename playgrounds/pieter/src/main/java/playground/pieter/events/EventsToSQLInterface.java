@@ -1,4 +1,4 @@
-package playground.pieter.singapore.utils.events;
+package playground.pieter.events;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
@@ -380,21 +380,20 @@ public class EventsToSQLInterface extends JFrame {
 				.getText());
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
-		EventsToPlanElementsSingapore test;
+		EventsToPlanElements test;
 		// if(linkTrafficComponent.isSelected()){
 		// test = new EventsToPlanElements(
 		// scenario.getTransitSchedule(), scenario.getNetwork(),
 		// scenario.getConfig(),new File(postgresPropertiesComponent.getText())
 		// ,tableSuffixComponent.getText());
 		// }else{
-		test = new EventsToPlanElementsSingapore(scenario.getTransitSchedule(),
+		test = new EventsToPlanElements(scenario.getTransitSchedule(),
 				scenario.getNetwork(), scenario.getConfig(), tableSuffix, schemaNameComponent.getText());
 		// }
 		eventsManager.addHandler(test);
 		new MatsimEventsReader(eventsManager).readFile(eventsFileComponent
 				.getText());
-		if (test.isWriteIdsForLinks())
-			test.getLinkWriter().finish();
+
 
 		try {
 			test.writeSimulationResultsToSQL(new File(
@@ -420,10 +419,7 @@ public class EventsToSQLInterface extends JFrame {
 			e.printStackTrace();
 		}
 		System.out.println(test.getStuck());
-		if (test.isWriteIdsForLinks())
-			test.indexLinkRecords(
-					new File(postgresPropertiesComponent.getText()),
-					tableSuffixComponent.getText());
+
 	}
 
 	public void loadDefaultProperties(File defaultPropertiesFile) {

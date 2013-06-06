@@ -6,7 +6,7 @@ import java.util.NoSuchElementException;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 
-import playground.pieter.singapore.utils.events.EventsToPlanElements;
+import playground.pieter.singapore.utils.events.EventsToPlanElementsSingapore;
 
 public class TravelComponent {
 
