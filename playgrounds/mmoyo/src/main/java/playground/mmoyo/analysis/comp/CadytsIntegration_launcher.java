@@ -51,7 +51,7 @@ import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
-import playground.kai.usecases.randomizedptrouter.RandomizedTransitRouterTravelTimeAndDisutility3;
+import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterTravelTimeAndDisutility3;
 
 /**
  * this class uses also randomized router, in the same way as the class CadytsScoringFunctionAndRndRouterLauncher,
