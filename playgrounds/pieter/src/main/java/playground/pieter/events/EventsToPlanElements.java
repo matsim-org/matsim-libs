@@ -841,6 +841,8 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 			String suffix) throws InstantiationException,
 			IllegalAccessException, ClassNotFoundException, IOException,
 			SQLException, NoConnectionException {
+		eventsFileName = eventsFileName.replaceAll("\\\\", "/");
+		eventsFileName = eventsFileName.replaceAll(":", "");
 		this.eventsFileName = eventsFileName;
 		writeSimulationResultsToSQL(properties, suffix);
 	}

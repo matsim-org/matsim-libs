@@ -42,7 +42,7 @@ import java.lang.reflect.Field;
 import java.sql.SQLException;
 import java.util.Properties;
 
-public class EventsToSQLInterface extends JFrame {
+public class EventsToSQLInterfaceSingapore extends JFrame {
 
 	private JPanel contentPane;
 	private JTextField schemaNameComponent;
@@ -61,7 +61,7 @@ public class EventsToSQLInterface extends JFrame {
 	private String tableSuffix = "_ezlinksim";
 	private String schemaName = "u_fouriep";
 	private String postgresProperties = "data/matsim2postgres.properties";
-	private EventsToSQLInterface self = this;
+	private EventsToSQLInterfaceSingapore self = this;
 
 	/**
 	 * Launch the application.
@@ -70,7 +70,7 @@ public class EventsToSQLInterface extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					EventsToSQLInterface frame = new EventsToSQLInterface();
+					EventsToSQLInterfaceSingapore frame = new EventsToSQLInterfaceSingapore();
 					frame.setVisible(true);
 					frame.loadDefaultProperties(new File(
 							"data/eventsToSQL.properties"));
@@ -84,7 +84,7 @@ public class EventsToSQLInterface extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public EventsToSQLInterface() {
+	public EventsToSQLInterfaceSingapore() {
 		setTitle("Events to PostgreSQL tables");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 764, 300);

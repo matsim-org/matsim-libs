@@ -954,6 +954,8 @@ public class EventsToPlanElementsSingapore implements TransitDriverStartsEventHa
 			String suffix) throws InstantiationException,
 			IllegalAccessException, ClassNotFoundException, IOException,
 			SQLException, NoConnectionException {
+		eventsFileName = eventsFileName.replaceAll("\\\\", "/");
+		eventsFileName = eventsFileName.replaceAll(":", "");
 		this.eventsFileName = eventsFileName;
 		writeSimulationResultsToSQL(properties, suffix);
 	}
