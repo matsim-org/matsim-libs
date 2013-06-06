@@ -443,6 +443,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 			}
 			
 			if(isParcelMode){
+				// initializing grid based accessibility controler listener
 				GridBasedAccessibilityControlerListenerV3 gbacl = new GridBasedAccessibilityControlerListenerV3(measuringPoints, 
 																												 opportunities,
 																												 freeSpeedGrid,
@@ -453,8 +454,12 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 																												 ptMatrix,
 																												 benchmark,
 																												 this.scenario);
+				// accessibility calculations will be triggered when mobsim finished
 				controler.addControlerListener(gbacl);
+				// creating a writer listener that writes out accessibility results in UrbanSim format for parcels
 				UrbanSimParcelCSVWriterListener csvParcelWiterListener = new UrbanSimParcelCSVWriterListener(parcels);
+				// the writer listener is added to grid based accessibility controler listener and will be triggered when accessibility calculations are done.
+				// (adding such a listener is optional, here its done to be compatible with UrbanSim)
 				gbacl.addSpatialGridDataExchangeListener(csvParcelWiterListener);
 			}
 			else
