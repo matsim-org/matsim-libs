@@ -35,6 +35,7 @@ import org.matsim.core.config.ConfigUtils;
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
 import playground.vsp.analysis.modules.userBenefits.UserBenefitsCalculator;
+import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
 import playground.vsp.emissions.utils.EmissionUtils;
 
 /**
@@ -62,7 +63,7 @@ public class MultiAnalyzerWriter {
 		File file = new File(fileName);
 		
 		Config config = ConfigUtils.loadConfig(configFile);
-		UserBenefitsCalculator userBenefitsCalculator = new UserBenefitsCalculator(config);
+		UserBenefitsCalculator userBenefitsCalculator = new UserBenefitsCalculator(config, WelfareMeasure.LOGSUM);
 		
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(file));
@@ -75,7 +76,7 @@ public class MultiAnalyzerWriter {
 				
 				Population userGroupPop = personFilter.getPopulation(pop, userGroup);
 
-				double userWelfareOfGroup = userBenefitsCalculator.calculateLogsum(userGroupPop);
+				double userWelfareOfGroup = userBenefitsCalculator.calculateUtility_money(userGroupPop);
 				int personWithNoValidPlanCnt = userBenefitsCalculator.getNoValidPlanCnt();
 				logger.warn(runName + ": users with no valid plan (all scores ``== null'' or ``<= 0.0'') in group " + userGroup + " : " + personWithNoValidPlanCnt);
 				

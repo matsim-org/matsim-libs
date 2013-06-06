@@ -62,7 +62,7 @@ public class UserBenefitsAnalyzer extends AbstractAnalyisModule{
 	public void init(ScenarioImpl scenario) {
 		this.scenario = scenario;
 		
-		this.userWelfareCalculator = new UserBenefitsCalculator(this.scenario.getConfig());
+		this.userWelfareCalculator = new UserBenefitsCalculator(this.scenario.getConfig(), WelfareMeasure.LOGSUM);
 		this.userWelfareCalculator.reset();
 	}
 	
@@ -74,10 +74,10 @@ public class UserBenefitsAnalyzer extends AbstractAnalyisModule{
 
 	@Override
 	public void preProcessData() {
-		this.allUsersLogSum = this.userWelfareCalculator.calculateLogsum(this.scenario.getPopulation());
+		this.allUsersLogSum = this.userWelfareCalculator.calculateUtility_money(this.scenario.getPopulation());
 		this.personWithNoValidPlanCnt = this.userWelfareCalculator.getNoValidPlanCnt();
 		log.warn("users with no valid plan (all scores ``== null'' or ``<= 0.0''): " + personWithNoValidPlanCnt);
-		this.personId2Logsum = this.userWelfareCalculator.getPersonId2Logsum();
+		this.personId2Logsum = this.userWelfareCalculator.getPersonId2MonetizedUtility();
 	}
 
 	@Override

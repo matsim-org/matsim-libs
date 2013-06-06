@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 
 import playground.vsp.analysis.modules.userBenefits.UserBenefitsCalculator;
+import playground.vsp.analysis.modules.userBenefits.WelfareMeasure;
 
 /**
  * @author benjamin
@@ -105,11 +106,11 @@ public class UserGroupUtils {
 		Map<UserGroup, Double> userGroup2Logsum = new HashMap<UserGroup, Double>();
 
 		Config config = scenario.getConfig();
-		UserBenefitsCalculator ubc = new UserBenefitsCalculator(config);
+		UserBenefitsCalculator ubc = new UserBenefitsCalculator(config, WelfareMeasure.LOGSUM);
 		
 		for(UserGroup userGroup : UserGroup.values()){
 			Population userGroupPop = personFilter.getPopulation(scenario.getPopulation(), userGroup);
-			double userWelfareOfGroup = ubc.calculateLogsum(userGroupPop);
+			double userWelfareOfGroup = ubc.calculateUtility_money(userGroupPop);
 			int personWithNoValidPlanCnt = ubc.getNoValidPlanCnt();
 			logger.warn("users with no valid plan (all scores ``== null'' or ``<= 0.0'') in group " + userGroup + " : " + personWithNoValidPlanCnt);
 			userGroup2Logsum.put(userGroup, userWelfareOfGroup);

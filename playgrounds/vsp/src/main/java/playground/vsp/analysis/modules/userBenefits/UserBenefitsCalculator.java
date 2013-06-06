@@ -40,16 +40,20 @@ public class UserBenefitsCalculator {
 
 	private final double betaLogit;
 	private final double marginalUtlOfMoney;
+	private final WelfareMeasure welfareMeasure;
 	private int nullScore = 0;
 	private int minusScore = 0;
 	private int noValidPlanScore = 0;
 	private final int maxWarnCnt = 3;
-	private Map<Id, Double> personId2Logsum = new HashMap<Id, Double>();
+	private final Map<Id, Double> personId2Utility = new HashMap<Id, Double>();
+	private final Map<Id, Double> personId2MonetizedUtility = new HashMap<Id, Double>();
 
-	public UserBenefitsCalculator(Config config) {
+
+	public UserBenefitsCalculator(Config config, WelfareMeasure wm) {
 		PlanCalcScoreConfigGroup pcs = config.planCalcScore();
 		this.betaLogit = pcs.getBrainExpBeta();
 		this.marginalUtlOfMoney = pcs.getMarginalUtilityOfMoney();
+		this.welfareMeasure = wm;
 	}
 
 	public void reset() {
@@ -58,73 +62,107 @@ public class UserBenefitsCalculator {
 		noValidPlanScore = 0;
 	}
 
-	public double calculateLogsum(Population pop) {
-		double logsum = 0.0;
+	public double calculateUtility_utils(Population pop){
+		double utility_utils = 0.0;
+		
+		for(Person person : pop.getPersons().values()){
+			double utilityOfPerson_utils = calculateUtilityOfPerson_utils(person);
+			this.personId2Utility.put(person.getId(), utilityOfPerson_utils);
+			utility_utils += utilityOfPerson_utils;
+		}
+		return utility_utils;
+		
+	}
+	
+	public double calculateUtility_money(Population pop) {
+		double utility_money = 0.0;
 
 		for(Person person : pop.getPersons().values()){
-			double logsumOfPerson = calculateLogsumOfPerson(person);
-			this.personId2Logsum.put(person.getId(), logsumOfPerson);
-			logsum += logsumOfPerson;
+			double utilityOfPerson_utils = calculateUtilityOfPerson_utils(person);
+			this.personId2Utility.put(person.getId(), utilityOfPerson_utils);
+			double utilityOfPerson_money = convertToMoney(utilityOfPerson_utils);
+			this.personId2MonetizedUtility.put(person.getId(), utilityOfPerson_money);
+			utility_money += utilityOfPerson_money;
 		}
-		return logsum;
+		return utility_money;
 	}
 
-	public double calculateLogsumOfPerson(Person person) {
-		double logsumOfPerson = 0.0;
+	public double calculateUtilityOfPerson_utils(Person person) {
+		double utilityOfPerson_utils = 0.0;
 		double sumOfExpScore = 0.0;
-
 		double bestScore = Double.NEGATIVE_INFINITY;
 		
-		for(Plan plan : person.getPlans()){
-			if(plan.getScore() == null){
-				nullScore++;
-				if(nullScore <= maxWarnCnt) {
-					logger.warn("Score for person " + person.getId() + " is " + plan.getScore() 
-							+ ". The score cannot be used for utility calculation.");
-					if(nullScore == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED + "\n");
+		if(this.welfareMeasure.equals(WelfareMeasure.LOGSUM)){
+			for(Plan plan : person.getPlans()){
+				boolean shouldBeConsidered = testScore(plan, person.getId());
+				if(shouldBeConsidered){
+					/* Benjamins version: */
+//					double expScoreOfPlan = Math.exp(betaLogit * plan.getScore());
+					/* Kais version: */
+					bestScore = getBestScore(person);
+					double expScoreOfPlan = Math.exp(betaLogit * (plan.getScore() - bestScore));
+					
+					sumOfExpScore += expScoreOfPlan;
+				} else{
+					// plan is not considered
 				}
-			} else if(plan.getScore() <= 0.0){
-				minusScore++;
-				if(minusScore <= maxWarnCnt) {
-					logger.warn("Score for person " + person.getId() + " is " + plan.getScore() 
-							+ ". The score cannot be used for utility calculation.");
-					if(minusScore == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED + "\n");
+			}
+			if(sumOfExpScore == 0.0){
+				noValidPlanScore++;
+				if(noValidPlanScore <= maxWarnCnt) {
+					logger.warn("Person " + person.getId() + " has no valid plans. " +
+							"This person's utility is set to " + utilityOfPerson_utils);
+					if(noValidPlanScore == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED + "\n");
 				}
 			} else{
 				/* Benjamins version: */
-//				double expScoreOfPlan = Math.exp(betaLogit * plan.getScore());
+				// utilityOfPerson_utils = (1. / (betaLogit)) * Math.log(sumOfExpScore);
 				/* Kais version: */
-				bestScore = getBestScore(person);
-				double expScoreOfPlan = Math.exp(betaLogit * (plan.getScore() - bestScore));
-				
-				sumOfExpScore += expScoreOfPlan;
+				utilityOfPerson_utils = (bestScore + (1. / betaLogit ) * Math.log(sumOfExpScore));
+			}
+
+		} else if(this.welfareMeasure.equals(WelfareMeasure.SELECTED)){
+			Plan selectedPlan = person.getSelectedPlan();
+			boolean shouldBeConsidered = testScore(selectedPlan, person.getId());
+			if(shouldBeConsidered){
+				utilityOfPerson_utils = selectedPlan.getScore();
+			} else {
+				noValidPlanScore++;
+				if(noValidPlanScore <= maxWarnCnt) {
+					logger.warn("Person " + person.getId() + " has no valid selected plan. " +
+							"This person's utility is set to " + utilityOfPerson_utils);
+					if(noValidPlanScore == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED + "\n");
+				}
 			}
 		}
-		if(sumOfExpScore == 0.0){
-			noValidPlanScore++;
-			if(noValidPlanScore <= maxWarnCnt) {
-				logger.warn("Person " + person.getId() + " has no valid plans. " +
-						"This person is not considered for utility calculations.");
-				if(noValidPlanScore == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED + "\n");
+		return utilityOfPerson_utils;
+	}
+
+	private boolean testScore(Plan plan, Id personId) {
+		if(plan.getScore() == null){
+			nullScore++;
+			if(nullScore <= maxWarnCnt) {
+				logger.warn("Score for person " + personId + " is " + plan.getScore() 
+						+ ". The score cannot be used for utility calculation.");
+				if(nullScore == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED + "\n");
 			}
-		} else{
-			/* Benjamins version: */
-//			logsumOfPerson = (1. / (betaLogit * marginalUtlOfMoney)) * Math.log(sumOfExpScore);
-			/* Kais version: */
-			logsumOfPerson = (bestScore + (1. / betaLogit ) * Math.log(sumOfExpScore)) / marginalUtlOfMoney;
-		}
-		return logsumOfPerson;
+			return false;
+		} else if(plan.getScore() <= 0.0){
+			minusScore++;
+			if(minusScore <= maxWarnCnt) {
+				logger.warn("Score for person " + personId + " is " + plan.getScore() 
+						+ ". The score cannot be used for utility calculation.");
+				if(minusScore == maxWarnCnt) logger.warn(Gbl.FUTURE_SUPPRESSED + "\n");
+			}
+			return false;
+		} else return true;
 	}
 
-	public int getNoValidPlanCnt() {
-		return noValidPlanScore;
-	}
-	
-	public Map<Id, Double> getPersonId2Logsum() {
-		return personId2Logsum;
+	private double convertToMoney(double logsumOfPerson) {
+		return logsumOfPerson / marginalUtlOfMoney;
 	}
 
-	private static double getBestScore(Person person) {
+	private double getBestScore(Person person) {
 		double bestScore = Double.NEGATIVE_INFINITY ;
 		for ( Plan plan : person.getPlans() ) {
 			if ( plan.getScore() > bestScore ) {
@@ -132,5 +170,17 @@ public class UserBenefitsCalculator {
 			}
 		}
 		return bestScore ;
+	}
+
+	public int getNoValidPlanCnt() {
+		return noValidPlanScore;
+	}
+	
+	public Map<Id, Double> getPersonId2Utility() {
+		return personId2Utility;
+	}
+	
+	public Map<Id, Double> getPersonId2MonetizedUtility() {
+		return personId2MonetizedUtility;
 	}
 }

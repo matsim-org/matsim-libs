@@ -48,7 +48,8 @@ public class SetLinkAttributesControlerListener implements StartupListener {
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		Network network = event.getControler().getNetwork();		
+		Network network = event.getControler().getNetwork();
+		
 		for(Link link : network.getLinks().values()){
 			Id linkId = link.getId();
 			LinkImpl ll = (LinkImpl) network.getLinks().get(linkId);
