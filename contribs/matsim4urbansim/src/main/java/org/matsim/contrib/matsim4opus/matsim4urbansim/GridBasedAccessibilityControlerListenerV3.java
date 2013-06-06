@@ -15,14 +15,10 @@ import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
 import org.matsim.contrib.matsim4opus.gis.Zone;
 import org.matsim.contrib.matsim4opus.gis.ZoneLayer;
 import org.matsim.contrib.matsim4opus.improvedpseudopt.PtMatrix;
-import org.matsim.contrib.matsim4opus.interpolation.Interpolation;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators.TravelDistanceCalculator;
 import org.matsim.contrib.matsim4opus.utils.LeastCostPathTreeExtended;
 import org.matsim.contrib.matsim4opus.utils.helperObjects.Benchmark;
 import org.matsim.contrib.matsim4opus.utils.io.writer.AnalysisCellBasedAccessibilityCSVWriterV2;
-import org.matsim.contrib.matsim4opus.utils.io.writer.UrbanSimParcelCSVWriter;
-import org.matsim.contrib.matsim4opus.utils.misc.ProgressBar;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
@@ -128,7 +124,6 @@ public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 	// ////////////////////////////////////////////////////////////////////
 	
 	public GridBasedAccessibilityControlerListenerV3(ZoneLayer<Id> startZones, 									// needed for google earth plots
-													 ActivityFacilitiesImpl parcels,							// parcel coordinates for accessibility feedback
 													 ActivityFacilitiesImpl opportunities,
 													 SpatialGrid freeSpeedGrid,									// table for free speed car travel times in accessibility computation
 													 SpatialGrid carGrid, 										// table for congested car travel times in accessibility computation
@@ -143,8 +138,6 @@ public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 		
 		assert (startZones != null);
 		this.measuringPointsCell = startZones;
-		assert (parcels != null);
-		this.parcels = parcels;
 		assert (freeSpeedGrid != null);
 		this.freeSpeedGrid = freeSpeedGrid;
 		assert (carGrid != null);
@@ -232,8 +225,14 @@ public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 			
 			AnalysisCellBasedAccessibilityCSVWriterV2.close(); 
 			writePlottingData(matsimOutputDirectory);	// plotting data for visual analysis via R
-			writeInterpolatedParcelAccessibilities();	// UrbanSim input file with interpolated accessibilities on parcel level
-		
+			// writeInterpolatedParcelAccessibilities();	// UrbanSim input file with interpolated accessibilities on parcel level
+			
+			if(this.spatialGridDataExchangeListenerList != null){
+				log.info("Triggering " + this.spatialGridDataExchangeListenerList.size() + " SpatialGridDataExchangeListener(s) ...");
+				for(int i = 0; i < this.spatialGridDataExchangeListenerList.size(); i++)
+					this.spatialGridDataExchangeListenerList.get(i).getAndProcessSpatialGrids(freeSpeedGrid, carGrid, bikeGrid, walkGrid, ptGrid);
+			}
+			
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -263,7 +262,12 @@ public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 				carAccessibility, bikeAccessibility, walkAccessibility, ptAccessibility);
 	}
 
-	// This needs to be executed only once at the end of the accessibility computation
+	/**
+	 * This writes the accessibility grid data into the MATSim output directory
+	 * 
+	 * @param matsimOutputDirectory
+	 * @throws IOException
+	 */
 	private void writePlottingData(String matsimOutputDirectory) throws IOException{
 
 		log.info("Writing plotting files for R into " + matsimOutputDirectory + " ...");
@@ -289,55 +293,5 @@ public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 				+ InternalConstants.FILE_TYPE_TXT);
 
 		log.info("Writing plotting files for R done!");
-	}
-	
-	/**
-	 * writing out accessibilities values per parcel. These values are interpolated from the grid.
-	 */
-	private void writeInterpolatedParcelAccessibilities() {
-		// from here accessibility feedback for each parcel
-		UrbanSimParcelCSVWriter.initUrbanSimZoneWriter();
-		
-		Interpolation freeSpeedGridInterpolation = new Interpolation(freeSpeedGrid, Interpolation.BILINEAR);
-		Interpolation carGridInterpolation = new Interpolation(carGrid, Interpolation.BILINEAR);
-		Interpolation bikeGridInterpolation= new Interpolation(bikeGrid, Interpolation.BILINEAR);
-		Interpolation walkGridInterpolation= new Interpolation(walkGrid, Interpolation.BILINEAR);
-		Interpolation ptGridInterpolation  = new Interpolation(ptGrid, Interpolation.BILINEAR);
-		
-		if(this.parcels != null){
-			
-			int numberOfParcels = this.parcels.getFacilities().size();
-			double freeSpeedAccessibility = Double.NaN;
-			double carAccessibility = Double.NaN;
-			double bikeAccessibility= Double.NaN;
-			double walkAccessibility= Double.NaN;
-			double ptAccessibility  = Double.NaN;
-			
-			log.info(numberOfParcels + " parcels are now processing ...");
-			
-			Iterator<ActivityFacility> parcelIterator = this.parcels.getFacilities().values().iterator();
-			ProgressBar bar = new ProgressBar( numberOfParcels );
-			
-			while(parcelIterator.hasNext()){
-				
-				bar.update();
-				
-				ActivityFacility parcel = parcelIterator.next();
-				
-				// for testing
-				// double car = carGrid.getValue(parcel.getCoord().getX(), parcel.getCoord().getY());
-				// double walk= walkGrid.getValue(parcel.getCoord().getX(), parcel.getCoord().getY());
-				
-				freeSpeedAccessibility = freeSpeedGridInterpolation.interpolate( parcel.getCoord() );
-				carAccessibility = carGridInterpolation.interpolate( parcel.getCoord() );
-				bikeAccessibility= bikeGridInterpolation.interpolate( parcel.getCoord() );
-				walkAccessibility= walkGridInterpolation.interpolate( parcel.getCoord() );
-				ptAccessibility  = ptGridInterpolation.interpolate( parcel.getCoord() );
-				
-				UrbanSimParcelCSVWriter.write(parcel.getId(), freeSpeedAccessibility, carAccessibility, bikeAccessibility, walkAccessibility, ptAccessibility);
-			}
-			log.info("... done!");
-			UrbanSimParcelCSVWriter.close();
-		}
 	}
 }

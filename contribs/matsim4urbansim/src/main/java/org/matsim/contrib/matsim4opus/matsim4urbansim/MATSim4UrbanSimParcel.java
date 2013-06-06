@@ -52,6 +52,7 @@ import org.matsim.contrib.matsim4opus.utils.helperObjects.Benchmark;
 import org.matsim.contrib.matsim4opus.utils.io.BackupMATSimOutput;
 import org.matsim.contrib.matsim4opus.utils.io.Paths;
 import org.matsim.contrib.matsim4opus.utils.io.ReadFromUrbanSimModel;
+import org.matsim.contrib.matsim4opus.utils.io.writer.UrbanSimParcelCSVWriterListener;
 import org.matsim.contrib.matsim4opus.utils.network.NetworkBoundaryBox;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Module;
@@ -441,21 +442,24 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 				ptGrid		= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
 			}
 			
-			if(isParcelMode)
-				controler.addControlerListener(new GridBasedAccessibilityControlerListenerV3(measuringPoints, 
-																							 parcels,	// takes parcel coordinates, TODO take out
-																							 opportunities,
-																							 freeSpeedGrid,
-																							 carGrid,
-																							 bikeGrid,
-																							 walkGrid,
-																							 ptGrid,
-																							 ptMatrix,
-																							 benchmark,
-																							 this.scenario));
+			if(isParcelMode){
+				GridBasedAccessibilityControlerListenerV3 gbacl = new GridBasedAccessibilityControlerListenerV3(measuringPoints, 
+																												 opportunities,
+																												 freeSpeedGrid,
+																												 carGrid,
+																												 bikeGrid,
+																												 walkGrid,
+																												 ptGrid,
+																												 ptMatrix,
+																												 benchmark,
+																												 this.scenario);
+				controler.addControlerListener(gbacl);
+				UrbanSimParcelCSVWriterListener csvParcelWiterListener = new UrbanSimParcelCSVWriterListener(parcels);
+				gbacl.addSpatialGridDataExchangeListener(csvParcelWiterListener);
+			}
 			else
 				controler.addControlerListener(new GridBasedAccessibilityControlerListenerV3(measuringPoints, 
-																							 zones,		// takes zone centroids, TODO take out
+																							 // zones,	// zone centroids; this was taken out
 																							 opportunities,
 																							 freeSpeedGrid,
 																							 carGrid,

@@ -139,8 +139,7 @@ public class AccessibilityTest implements MATSim4UrbanSimInterface, LinkEnterEve
 		ControlerListener listener = null;
 		
 		if(this.isParcelMode()){
-			listener = new GridBasedAccessibilityControlerListenerV3(startZones, parcels, opportunities, freeSpeedGrid, carGrid, bikeGrid, walkGrid,
-					ptGrid, ptMatrix, benchmark, scenario);
+			listener = new GridBasedAccessibilityControlerListenerV3(startZones, opportunities, freeSpeedGrid, carGrid, bikeGrid, walkGrid, ptGrid, ptMatrix, benchmark, scenario);
 			ctrl.addControlerListener(listener);
 			testParcelBasedAccessibility(ctrl,listener, freeSpeedGrid);
 		}

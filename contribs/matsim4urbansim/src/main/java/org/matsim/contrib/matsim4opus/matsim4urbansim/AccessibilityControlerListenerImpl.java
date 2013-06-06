@@ -17,6 +17,7 @@ import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
 import org.matsim.contrib.matsim4opus.gis.Zone;
 import org.matsim.contrib.matsim4opus.gis.ZoneLayer;
 import org.matsim.contrib.matsim4opus.improvedpseudopt.PtMatrix;
+import org.matsim.contrib.matsim4opus.interfaces.SpatialGridDataExchangeInterface;
 import org.matsim.contrib.matsim4opus.utils.LeastCostPathTreeExtended;
 import org.matsim.contrib.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import org.matsim.contrib.matsim4opus.utils.helperObjects.Benchmark;
@@ -92,6 +93,8 @@ public class AccessibilityControlerListenerImpl{
 	
 	// storing pt matrix
 	PtMatrix ptMatrix;
+	
+	ArrayList<SpatialGridDataExchangeInterface> spatialGridDataExchangeListenerList = null;
 	
 	// accessibility parameter
 	boolean useRawSum	= false;
@@ -550,6 +553,19 @@ public class AccessibilityControlerListenerImpl{
 				return cost.amount;
 		}
 		return 0.;
+	}
+	
+	/**
+	 * This adds listeners to write out accessibility results for parcels in UrbanSim format
+	 * @param l
+	 */
+	public void addSpatialGridDataExchangeListener(SpatialGridDataExchangeInterface l){
+		if(this.spatialGridDataExchangeListenerList == null)
+			this.spatialGridDataExchangeListenerList = new ArrayList<SpatialGridDataExchangeInterface>();
+		
+		log.info("Adding new SpatialGridDataExchange listener...");
+		this.spatialGridDataExchangeListenerList.add(l);
+		log.info("... done!");
 	}
 
 	/**
