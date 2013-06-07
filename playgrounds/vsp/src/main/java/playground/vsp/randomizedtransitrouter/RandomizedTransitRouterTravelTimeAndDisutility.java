@@ -182,7 +182,7 @@ public class RandomizedTransitRouterTravelTimeAndDisutility  extends TransitRout
 			}
 			
 			if ( this.dataCollectionConfig.get(DataCollection.randomizedParameters) ) {
-				StringBuffer strb = this.dataCollectionStrings.get(DataCollection.randomizedParameters) ;
+//				StringBuffer strb = this.dataCollectionStrings.get(DataCollection.randomizedParameters) ;
 //				strb.append
 				System.out.println("personId: " + person.getId() +
 						"; margUtlOfTimeWlk_h: " + this.localMarginalUtilityOfTravelTimeWalk_utl_s*3600. +

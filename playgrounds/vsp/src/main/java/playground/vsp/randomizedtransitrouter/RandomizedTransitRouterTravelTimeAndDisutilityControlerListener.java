@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * package-info
+ * RandomizedTransitRouterTravelTimeAndDisutilityControlerListener
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,10 +17,25 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.vsp.randomizedtransitrouter;
+
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.StartupListener;
+
+
 /**
- * Package providing functionality for transit routing with randomized utility parameters. 
+ * Sets a TransitRouteFactory that enables routing with randomized routing parameters. 
  * 
  * @author dgrether
  *
  */
-package playground.vsp.randomizedtransitrouter;
+public class RandomizedTransitRouterTravelTimeAndDisutilityControlerListener implements StartupListener {
+
+	@Override
+	public void notifyStartup(StartupEvent e) {
+		RandomizedTransitRouterTravelTimeAndDisutilityFactory routerFactory = 
+				new RandomizedTransitRouterTravelTimeAndDisutilityFactory(e.getControler().getConfig(), e.getControler().getScenario().getTransitSchedule());
+		e.getControler().setTransitRouterFactory(routerFactory);
+	}
+
+}
