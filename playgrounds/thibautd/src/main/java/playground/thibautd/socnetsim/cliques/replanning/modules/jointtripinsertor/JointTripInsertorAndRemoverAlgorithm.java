@@ -109,7 +109,7 @@ public class JointTripInsertorAndRemoverAlgorithm implements GenericPlanAlgorith
 			// trips by the router!
 			for ( Trip trip : TripStructureUtils.getTrips( indivPlan , stageTypes ) ) {
 				if ( tripContainsOneOfThoseModes( trip , Collections.singleton( JointActingTypes.PASSENGER ) ) ) countPassengers++;
-				if ( tripContainsOneOfThoseModes( trip , JointActingTypes.JOINT_MODES ) ) countEgoists++;
+				if ( !tripContainsOneOfThoseModes( trip , JointActingTypes.JOINT_MODES ) ) countEgoists++;
 			}
 		}
 
