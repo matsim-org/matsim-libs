@@ -21,24 +21,12 @@ package playground.benjamin.scenarios.munich;
 
 import java.util.Collection;
 
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.utils.gis.matsim2esri.network.Links2ESRIShape;
 import org.opengis.feature.simple.SimpleFeature;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
 
 /**
  * @author benjamin
@@ -47,7 +35,9 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 public class RunMunich {
 	
 	static String configFile = "../../runs-svn/detEval/test/input/config.xml";
-	static String zone30Shape = "../../detailedEval/policies/mobilTUM/zone30.shp";
+	static String zone30Path = "../../detailedEval/policies/mobilTUM/";
+	static String zone30Shape = zone30Path + "zone30.shp";
+	static String zone30Links = zone30Path + "zone30Links.shp";
 	static boolean considerZone30 = true;
 	static Collection<SimpleFeature> featuresInZone30;
 	
@@ -60,69 +50,11 @@ public class RunMunich {
 		controler.setCreateGraphs(true);
 
 		if(considerZone30){
-			featuresInZone30 = ShapeFileReader.getAllFeatures(zone30Shape);
-
-			Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-			NetworkImpl zone30Links = (NetworkImpl) sc.getNetwork();
-
-			for(Link link : scenario.getNetwork().getLinks().values()){
-				Id linkId = link.getId();
-				LinkImpl ll = (LinkImpl) scenario.getNetwork().getLinks().get(linkId);
-				if(isLinkInShape(ll)){
-					Id fromId = ll.getFromNode().getId();
-					Id toId = ll.getToNode().getId();
-					Node from = null;
-					Node to = null;
-					Node nn;
-					//check if from node already exists
-					if (! zone30Links.getNodes().containsKey(fromId)) {
-						nn = scenario.getNetwork().getNodes().get(fromId);
-						from = addNode(zone30Links, nn);
-					}
-					else {
-						from = zone30Links.getNodes().get(fromId);
-					}
-					//check if to node already exists
-					if (! zone30Links.getNodes().containsKey(toId)){
-						nn = scenario.getNetwork().getNodes().get(toId);
-						to = addNode(zone30Links, nn);
-					}
-					else {
-						to = zone30Links.getNodes().get(toId);
-					}
-					Link lll = zone30Links.getFactory().createLink(ll.getId(), from, to);
-					lll.setAllowedModes(ll.getAllowedModes());
-					lll.setCapacity(ll.getCapacity());
-					lll.setFreespeed(ll.getFreespeed());
-					lll.setLength(ll.getLength());
-					lll.setNumberOfLanes(ll.getNumberOfLanes());
-					zone30Links.addLink(lll);
-				}
-			}
-			new Links2ESRIShape(zone30Links, "../../detailedEval/policies/mobilTUM/zone30Links.shp", "DHDN_GK4").write();
-//			controler.addControlerListener(new SetLinkAttributesControlerListener (featuresInZone30));
+			ShapeFileReader shapeFileReader = new ShapeFileReader();
+			shapeFileReader.readFileAndInitialize(zone30Shape);
+			featuresInZone30 = shapeFileReader.getFeatureSet();
+			controler.addControlerListener(new SetLinkAttributesControlerListener (featuresInZone30, zone30Links));
 		}
-//		controler.run();
+		controler.run();
 	}
-
-	private static Node addNode(Network net, Node n){
-		Node newNode = net.getFactory().createNode(n.getId(), n.getCoord());
-		net.addNode(newNode);
-		return newNode;
-	}
-
-	private static boolean isLinkInShape(Link link) {
-		boolean isInShape = false;
-		Coord coord = link.getCoord();
-		GeometryFactory factory = new GeometryFactory();
-		Geometry geo = factory.createPoint(new Coordinate(coord.getX(), coord.getY()));
-		for(SimpleFeature feature : featuresInZone30){
-			if(((Geometry) feature.getDefaultGeometry()).contains(geo)){
-				isInShape = true;
-				break;
-			}
-		}
-		return isInShape;
-	}
-
 }
