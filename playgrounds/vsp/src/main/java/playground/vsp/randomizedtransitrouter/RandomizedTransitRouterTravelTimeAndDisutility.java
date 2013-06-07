@@ -25,33 +25,14 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.contrib.otfvis.OTFVis;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.router.CustomDataManager;
-import org.matsim.pt.router.PreparedTransitSchedule;
-import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterFactory;
-import org.matsim.pt.router.TransitRouterImpl;
-import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.vis.otfvis.OTFClientLive;
-import org.matsim.vis.otfvis.OnTheFlyServer;
 
 
 /**
@@ -59,7 +40,7 @@ import org.matsim.vis.otfvis.OnTheFlyServer;
  * @author dgrether
  *
  */
-public class RandomizedTransitRouterTravelTimeAndDisutility3  extends TransitRouterNetworkTravelTimeAndDisutility {
+public class RandomizedTransitRouterTravelTimeAndDisutility  extends TransitRouterNetworkTravelTimeAndDisutility {
 
 	public enum DataCollection {randomizedParameters, additionalInformation}
 	private Id cachedPersonId = null ;
@@ -74,7 +55,7 @@ public class RandomizedTransitRouterTravelTimeAndDisutility3  extends TransitRou
 	private Map<DataCollection,Boolean> dataCollectionConfig = new HashMap<DataCollection,Boolean>() ;
 	private Map<DataCollection,StringBuffer> dataCollectionStrings = new HashMap<DataCollection,StringBuffer>() ;
 	
-	public RandomizedTransitRouterTravelTimeAndDisutility3(TransitRouterConfig routerConfig) {
+	public RandomizedTransitRouterTravelTimeAndDisutility(TransitRouterConfig routerConfig) {
 		super(routerConfig);
 		
 		prepareDataCollection();
@@ -210,58 +191,6 @@ public class RandomizedTransitRouterTravelTimeAndDisutility3  extends TransitRou
 						"; margUtlOfTimePt_h: " + this.localMarginalUtilityOfTravelTimePt_utl_s*3600. ) ;
 			}
 		}
-	}
-
-	public static void main(String[] args) {
-		final Config config = ConfigUtils.loadConfig(args[0]) ;
-
-		boolean doVisualization = true;
-
-		config.planCalcScore().setWriteExperiencedPlans(true) ;
-
-		config.otfVis().setDrawTransitFacilities(true) ; // this DOES work
-		config.otfVis().setDrawTransitFacilityIds(false);
-		config.otfVis().setShowTeleportedAgents(true) ;
-		config.otfVis().setDrawNonMovingItems(true);
-		config.otfVis().setScaleQuadTreeRect(true);
-
-		final Scenario scenario = ScenarioUtils.loadScenario(config) ;
-		
-		final Controler ctrl = new Controler(scenario) ;
-		
-		ctrl.setOverwriteFiles(true) ;
-		
-		final TransitSchedule schedule = ctrl.getScenario().getTransitSchedule() ;
-		
-		final TransitRouterConfig trConfig = new TransitRouterConfig( ctrl.getScenario().getConfig() ) ; 
-		
-		final TransitRouterNetwork routerNetwork = TransitRouterNetwork.createFromSchedule(schedule, trConfig.beelineWalkConnectionDistance);
-		
-		ctrl.setTransitRouterFactory( new TransitRouterFactory() {
-			@Override
-			public TransitRouter createTransitRouter() {
-				RandomizedTransitRouterTravelTimeAndDisutility3 ttCalculator = new RandomizedTransitRouterTravelTimeAndDisutility3(trConfig);
-				ttCalculator.setDataCollection(DataCollection.randomizedParameters, true) ;
-				ttCalculator.setDataCollection(DataCollection.additionalInformation, false) ;
-				return new TransitRouterImpl(trConfig, new PreparedTransitSchedule(schedule), routerNetwork, ttCalculator, ttCalculator);
-			}
-		}) ;
-		
-		if (doVisualization){
-		ctrl.setMobsimFactory(new MobsimFactory(){
-
-			@Override
-			public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-				QSim qSim = (QSim) new QSimFactory().createMobsim(sc, eventsManager) ;
-				
-				OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, eventsManager, qSim);
-				OTFClientLive.run(sc.getConfig(), server);
-				
-				return qSim ;
-			}}) ;
-		}
-		ctrl.run() ;
-		
 	}
 	
 }
