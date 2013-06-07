@@ -114,8 +114,13 @@ class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, Pa
 			}
 			passengersToBoard.clear();
 
-			final DriverRoute dr = (DriverRoute) ((Leg) getCurrentPlanElement()).getRoute();
-			assert vehicle.getPassengers().size() == dr.getPassengersIds().size() : vehicle.getPassengers()+" != "+dr.getPassengersIds()+" for driver "+getId();
+			try {
+				final DriverRoute dr = (DriverRoute) ((Leg) getCurrentPlanElement()).getRoute();
+				assert vehicle.getPassengers().size() == dr.getPassengersIds().size() : vehicle.getPassengers()+" != "+dr.getPassengersIds()+" for driver "+getId();
+			}
+			catch (ClassCastException e) {
+				throw new RuntimeException( "incorrect route in "+getCurrentPlanElement()+" for person "+getId() , e );
+			}
 		}
 		delegate.notifyMoveOverNode(newLinkId);
 	}
