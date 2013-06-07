@@ -39,7 +39,8 @@ import org.matsim.core.replanning.modules.TripTimeAllocationMutatorStrategyFacto
 
 
 public class PlanStrategyRegistrar {
-	public static enum Names { ChangeLegMode } ;
+	public static enum Selector { KeepLastSelected, BestScore, ChangeExpBeta, SelectExpBeta, SelectRandom, SelectPathSizeLogit } 
+	public static enum Names { ReRoute, TimeAllocationMutator, ChangeLegMode } 
 	// (1) I think there should be constants rather than Strings, because these Strings are used elsewhere in the code. kai, may'13
 	// (2) I think enums are better than Strings, since it allows to iterate through the registry.  kai, may'13
 	// (3) "Names" could be refactored into something else if appropriate. kai, may'13
@@ -48,17 +49,17 @@ public class PlanStrategyRegistrar {
 
 	public PlanStrategyRegistrar() {
 		// strategy packages that only select:
-		register.register("KeepLastSelected", new KeepLastSelectedPlanStrategyFactory());
-		register.register("BestScore", new SelectBestPlanStrategyFactory());
-		register.register("SelectExpBeta", new SelectExpBetaPlanStrategyFactory());		
-		register.register("ChangeExpBeta", new ChangeExpBetaPlanStrategyFactory());
-		register.register("SelectRandom", new SelectRandomStrategyFactory());
-		register.register("SelectPathSizeLogit", new SelectPathSizeLogitStrategyFactory());
+		register.register(Selector.KeepLastSelected.toString(), new KeepLastSelectedPlanStrategyFactory());
+		register.register(Selector.BestScore.toString(), new SelectBestPlanStrategyFactory());
+		register.register(Selector.SelectExpBeta.toString(), new SelectExpBetaPlanStrategyFactory());		
+		register.register(Selector.ChangeExpBeta.toString(), new ChangeExpBetaPlanStrategyFactory());
+		register.register(Selector.SelectRandom.toString(), new SelectRandomStrategyFactory());
+		register.register(Selector.SelectPathSizeLogit.toString(), new SelectPathSizeLogitStrategyFactory());
 
 		// strategy packages that select, copy, and modify.  (The copying is done implicitly as soon as "addStrategyModule" is called
 		// at least once).
-		register.register("ReRoute", new ReRoutePlanStrategyFactory());		
-		register.register("TimeAllocationMutator", new TimeAllocationMutatorPlanStrategyFactory());
+		register.register(Names.ReRoute.toString(), new ReRoutePlanStrategyFactory());		
+		register.register(Names.TimeAllocationMutator.toString(), new TimeAllocationMutatorPlanStrategyFactory());
 		register.register(Names.ChangeLegMode.toString(), new ChangeLegModeStrategyFactory());
 		register.register("ChangeSingleLegMode", new ChangeSingleLegModeStrategyFactory());
 		register.register("ChangeSingleTripMode", new ChangeSingleTripModeStrategyFactory());

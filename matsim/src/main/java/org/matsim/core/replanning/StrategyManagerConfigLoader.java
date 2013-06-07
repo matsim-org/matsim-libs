@@ -30,11 +30,13 @@ import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.PlanStrategyFactoryRegister;
 import org.matsim.core.controler.PlanStrategyRegistrar;
+import org.matsim.core.controler.PlanStrategyRegistrar.Selector;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.replanning.modules.ExternalModule;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
+import org.matsim.core.replanning.selectors.KeepSelected;
 import org.matsim.core.replanning.selectors.PathSizeLogitSelector;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
@@ -64,29 +66,48 @@ public final class StrategyManagerConfigLoader {
 	public static void load(final Controler controler, final StrategyManager manager, PlanStrategyFactoryRegister planStrategyFactoryRegister) {
 		Config config = controler.getConfig();
 		manager.setMaxPlansPerAgent(config.strategy().getMaxAgentPlanMemorySize());
+		
+		int globalInnovationDisableAfter = (int) ( (config.controler().getLastIteration() - config.controler().getFirstIteration()) 
+				* config.strategy().getFractionOfIterationsToDisableInnovation() + config.controler().getFirstIteration() ) ;
+		Logger.getLogger("blabla").info( "global innovation switch of after iteration: " + globalInnovationDisableAfter ) ;
 
 		for (StrategyConfigGroup.StrategySettings settings : config.strategy().getStrategySettings()) {
 			double rate = settings.getProbability();
 			if (rate == 0.0) {
 				continue;
 			}
-			String classname = settings.getModuleName();
+			String moduleName = settings.getModuleName();
 
-			if (classname.startsWith("org.matsim.demandmodeling.plans.strategies.")) {
-				classname = classname.replace("org.matsim.demandmodeling.plans.strategies.", "");
+			if (moduleName.startsWith("org.matsim.demandmodeling.plans.strategies.")) {
+				moduleName = moduleName.replace("org.matsim.demandmodeling.plans.strategies.", "");
 			}
 
-			PlanStrategy strategy = loadStrategy(controler, classname, settings, planStrategyFactoryRegister);
+			PlanStrategy strategy = loadStrategy(controler, moduleName, settings, planStrategyFactoryRegister);
 
 			if (strategy == null) {
-				Gbl.errorMsg("Could not initialize strategy named " + classname);
+				Gbl.errorMsg("Could not initialize strategy named " + moduleName);
 			}
 
 			manager.addStrategy(strategy, rate);
 
 			// now check if this modules should be disabled after some iterations
-			if (settings.getDisableAfter() >= 0) {
-				int maxIter = settings.getDisableAfter();
+			int maxIter = settings.getDisableAfter();
+			// --- begin new ---
+			if ( maxIter > globalInnovationDisableAfter || maxIter==-1 ) {
+				boolean innovative = true ;
+				for ( Selector sel : Selector.values() ) {
+					System.out.flush();
+					if ( moduleName.equals( sel.toString() ) ) {
+						innovative = false ;
+						break ;
+					}
+				}
+				if ( innovative ) {
+					maxIter = globalInnovationDisableAfter ;
+				}
+			}
+			// --- end new ---
+			if (maxIter >= 0) {
 				if (maxIter >= config.controler().getFirstIteration()) {
 					manager.addChangeRequest(maxIter + 1, strategy, 0.0);
 				} else {

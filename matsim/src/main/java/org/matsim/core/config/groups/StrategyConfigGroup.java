@@ -58,6 +58,11 @@ public class StrategyConfigGroup extends Module {
 	private static final String PLAN_SELECTOR_FOR_REMOVAL = "planSelectorForRemoval" ;
 	private String planSelectorForRemoval = null ; 
 	// default is configured in StrategyManager; one may wish to change where the default is defined.  kai, feb'12
+	
+	//---
+	private static final String ITERATION_FRACTION_TO_DISABLE_INNOVATION = "fractionOfIterationsToDisableInnovation" ;
+	private double fraction = Double.POSITIVE_INFINITY ;
+	//---
 
 	public StrategyConfigGroup() {
 		super(GROUP_NAME);
@@ -105,7 +110,9 @@ public class StrategyConfigGroup extends Module {
 		if (EXTERNAL_EXE_TIME_OUT.equals(key)) {
 			return Long.toString(getExternalExeTimeOut());
 		}
-		if ( PLAN_SELECTOR_FOR_REMOVAL.equals(key)) {
+		if ( PLAN_SELECTOR_FOR_REMOVAL.equals(key)
+				|| ITERATION_FRACTION_TO_DISABLE_INNOVATION.equals(key)
+				) {
 			throw new RuntimeException("please use direct getter") ;
 		}
 		throw new IllegalArgumentException(key);
@@ -135,6 +142,8 @@ public class StrategyConfigGroup extends Module {
 			setExternalExeTimeOut(Long.parseLong(value));
 		} else if (PLAN_SELECTOR_FOR_REMOVAL.equals(key)) {
 			setPlanSelectorForRemoval(value) ;
+		} else if ( ITERATION_FRACTION_TO_DISABLE_INNOVATION.equals(key) ) {
+			setFractionOfIterationsToDisableInnovation( Double.parseDouble(value) ) ;
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -158,12 +167,14 @@ public class StrategyConfigGroup extends Module {
 		this.addParameterToMap(map, EXTERNAL_EXE_TMP_FILE_ROOT_DIR);
 		this.addParameterToMap(map, EXTERNAL_EXE_TIME_OUT);
 		map.put(PLAN_SELECTOR_FOR_REMOVAL, this.getPlanSelectorForRemoval() ) ;
+		map.put(ITERATION_FRACTION_TO_DISABLE_INNOVATION,  Double.toString(this.getFractionOfIterationsToDisableInnovation()) ) ;
 		return map;
 	}
 
 	@Override
 	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
+		map.put(ITERATION_FRACTION_TO_DISABLE_INNOVATION, "fraction of iterations where innovative strategies are switched off.  Something link 0.8 should be good.  E.g. if you run from iteration 400 to iteration 500, innovation is switched off at iteration 480" ) ;
 		map.put(MAX_AGENT_PLAN_MEMORY_SIZE, "maximum number of plans per agent.  ``0'' means ``infinity''.  Currently (2010), ``5'' is a good number");
 		int cnt = 0 ;
 		for (Map.Entry<Id, StrategySettings>  entry : this.settings.entrySet()) {
@@ -326,5 +337,13 @@ public class StrategyConfigGroup extends Module {
 
 	public void setPlanSelectorForRemoval(String planSelectorForRemoval) {
 		this.planSelectorForRemoval = planSelectorForRemoval;
+	}
+
+	public double getFractionOfIterationsToDisableInnovation() {
+		return fraction;
+	}
+
+	public void setFractionOfIterationsToDisableInnovation(double fraction) {
+		this.fraction = fraction;
 	}
 }
