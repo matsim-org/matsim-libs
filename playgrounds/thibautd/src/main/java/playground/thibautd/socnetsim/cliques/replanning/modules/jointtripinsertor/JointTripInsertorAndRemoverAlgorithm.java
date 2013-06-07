@@ -68,7 +68,7 @@ public class JointTripInsertorAndRemoverAlgorithm implements GenericPlanAlgorith
 				random,
 				(JointTripInsertorConfigGroup) config.getModule( JointTripInsertorConfigGroup.GROUP_NAME ),
 				tripRouter);
-		this.remover = new JointTripRemoverAlgorithm( random );
+		this.remover = new JointTripRemoverAlgorithm( random , tripRouter.getStageActivityTypes() );
 		this.iterative = iterative;
 	}
 

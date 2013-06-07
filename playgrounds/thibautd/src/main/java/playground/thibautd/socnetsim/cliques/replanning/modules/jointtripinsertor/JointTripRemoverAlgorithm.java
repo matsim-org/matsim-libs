@@ -19,6 +19,12 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.cliques.replanning.modules.jointtripinsertor;
 
+import org.matsim.core.router.CompositeStageActivityTypes;
+import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.TripStructureUtils.Trip;
+
 import playground.thibautd.socnetsim.utils.JointPlanUtils;
 
 import java.util.ArrayList;
@@ -55,9 +61,16 @@ public class JointTripRemoverAlgorithm implements GenericPlanAlgorithm<JointPlan
 		Logger.getLogger(JointTripRemoverAlgorithm.class);
 
 	private final Random random;
+	private final StageActivityTypes stages;
 
-	public JointTripRemoverAlgorithm(final Random random) {
+	public JointTripRemoverAlgorithm(
+			final Random random,
+			final StageActivityTypes stagesFromTripRouter) {
 		this.random = random;
+		final CompositeStageActivityTypes compositeStages = new CompositeStageActivityTypes();
+		compositeStages.addActivityTypes( stagesFromTripRouter );
+		compositeStages.addActivityTypes( JointActingTypes.JOINT_STAGE_ACTS );
+		this.stages = compositeStages;
 	}
 
 	@Override
@@ -79,7 +92,7 @@ public class JointTripRemoverAlgorithm implements GenericPlanAlgorithm<JointPlan
 
 		final JointTrip toRemove = choiceSet.get( random.nextInt( choiceSet.size() ) );
 
-		removePassengerTrip( toRemove , plan );
+		removePassengerTrip( toRemove , plan , stages );
 		removeDriverTrip( toRemove , plan );
 		return new ActedUponInformation(
 				toRemove.getDriverId(),
@@ -105,16 +118,30 @@ public class JointTripRemoverAlgorithm implements GenericPlanAlgorithm<JointPlan
 	// package protected for tests
 	final static void removePassengerTrip(
 			final JointTrip toRemove,
-			final JointPlan jointPlan) {
+			final JointPlan jointPlan,
+			final StageActivityTypes stages) {
 		final Plan passengerPlan = jointPlan.getIndividualPlan( toRemove.getPassengerId() );
-		final List<PlanElement> pes = passengerPlan.getPlanElements();
-		final int index = pes.indexOf( toRemove.getPassengerLeg() ) - 2;
+		final Trip tripWithLeg =
+			getTripWithLeg(
+					passengerPlan,
+					toRemove.getPassengerLeg(),
+					stages);
 
-		for (int i=0; i < 5; i++) {
-			pes.remove( index );
+		TripRouter.insertTrip(
+				passengerPlan , 
+				tripWithLeg.getOriginActivity(),
+				Collections.singletonList( new LegImpl( TransportMode.pt ) ),
+				tripWithLeg.getDestinationActivity() );
+	}
+
+	private static Trip getTripWithLeg(
+			final Plan plan,
+			final Leg leg,
+			final StageActivityTypes stages) {
+		for ( Trip t : TripStructureUtils.getTrips( plan , stages ) ) {
+			if ( t.getTripElements().contains( leg ) ) return t;
 		}
-		// TODO: verify mode of subtour?
-		pes.add( index , new LegImpl( TransportMode.pt ) );
+		throw new RuntimeException( plan.getPlanElements() +" doesn't contain "+leg );
 	}
 
 	// package protected for tests

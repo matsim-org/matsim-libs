@@ -45,6 +45,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.router.EmptyStageActivityTypes;
 
 import playground.thibautd.socnetsim.cliques.replanning.modules.jointtripinsertor.JointTripRemoverAlgorithm;
 import playground.thibautd.socnetsim.population.DriverRoute;
@@ -430,7 +431,7 @@ public class JointTripRemoverAlgorithmTest {
 		// TODO: test driver and passenger removal separately
 		for ( Fixture f : fixtures ) {
 			log.info( "testing removal on fixture "+f.name );
-			JointTripRemoverAlgorithm.removePassengerTrip( f.toRemove , f.jointPlan );
+			JointTripRemoverAlgorithm.removePassengerTrip( f.toRemove , f.jointPlan , EmptyStageActivityTypes.INSTANCE );
 			JointTripRemoverAlgorithm.removeDriverTrip( f.toRemove , f.jointPlan );
 
 			for ( Plan p : f.jointPlan.getIndividualPlans().values() ) {
