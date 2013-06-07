@@ -33,20 +33,11 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.router.PreparedTransitSchedule;
-import org.matsim.pt.router.TransitRouter;
-import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterFactory;
-import org.matsim.pt.router.TransitRouterImpl;
-import org.matsim.pt.router.TransitRouterNetwork;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
-import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterTravelTimeAndDisutility;
-import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterTravelTimeAndDisutility.DataCollection;
+import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterTravelTimeAndDisutilityControlerListener;
 
 public class TransitControler {
 	
@@ -72,30 +63,12 @@ public class TransitControler {
 		
 		config.otfVis().setShowTeleportedAgents(true) ;
 		
-		Scenario sc = ScenarioUtils.loadScenario(config) ;
-
-		final TransitSchedule schedule = sc.getTransitSchedule() ;
-		final TransitRouterConfig trConfig = new TransitRouterConfig( sc.getConfig() ) ; 
-		final TransitRouterNetwork routerNetwork = TransitRouterNetwork.createFromSchedule(schedule, trConfig.beelineWalkConnectionDistance);
 
 		Controler tc = new Controler(config) ;
 		tc.setOverwriteFiles(true);
 		
 		Logger.getLogger("main").warn("warning: using randomized pt router!!!!") ;
-		
-		tc.setTransitRouterFactory( new TransitRouterFactory() {
-			@Override
-			public TransitRouter createTransitRouter() {
-				RandomizedTransitRouterTravelTimeAndDisutility ttCalculator = new RandomizedTransitRouterTravelTimeAndDisutility(trConfig);
-				ttCalculator.setDataCollection(DataCollection.randomizedParameters, true) ;
-				ttCalculator.setDataCollection(DataCollection.additionalInformation, false) ;
-
-//				TransitRouterNetworkTravelTimeAndDisutility ttCalculator = new TransitRouterNetworkTravelTimeAndDisutility(trConfig) ;
-
-				return new TransitRouterImpl(trConfig, new PreparedTransitSchedule(schedule), routerNetwork, ttCalculator, ttCalculator);
-			}
-		}) ;
-
+		tc.addControlerListener(new RandomizedTransitRouterTravelTimeAndDisutilityControlerListener());
 
 		tc.setMobsimFactory(new MyMobsimFactory()) ;
 		tc.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
