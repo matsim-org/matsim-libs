@@ -81,7 +81,11 @@
 	</reporting>
 
 	<modules>
+<<<<<<< HEAD
 		<module>analysis</module>		
+=======
+		<module>analysis</module>
+>>>>>>> adding an _analysis_ contrib module
 		<module>cadytsIntegration</module>
 		<module>evacuation</module>
 		<module>freight</module>
