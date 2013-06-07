@@ -81,10 +81,11 @@
 	</reporting>
 
 	<modules>
+		<module>analysis</module>		
 		<module>cadytsIntegration</module>
 		<module>evacuation</module>
-		<module>gtfs2matsimtransitschedule</module>
 		<module>freight</module>
+		<module>gtfs2matsimtransitschedule</module>
 		<module>grips</module>
 		<module>locationchoice</module>
 		<module>matsim4urbansim</module>
