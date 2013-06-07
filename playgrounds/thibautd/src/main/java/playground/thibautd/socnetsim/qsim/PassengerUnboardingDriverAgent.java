@@ -116,7 +116,7 @@ class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, Pa
 		final MobsimVehicle vehicle = netsimEngine.getVehicles().get( delegate.getPlannedVehicleId() );
 		final EventsManager events = internalInterface.getMobsim().getEventsManager();
 		for ( PassengerAgent passenger : passengersToBoard ) {
-			assert passenger.getCurrentLinkId().equals( getCurrentLinkId() );
+			assert passenger.getCurrentLinkId().equals( getCurrentLinkId() ) : passenger+" is not at "+passenger.getCurrentLinkId()+"instead of "+getCurrentLinkId()+" for driver "+this;
 			vehicle.addPassenger( passenger );
 			events.processEvent(
 					events.getFactory().createPersonEntersVehicleEvent(
@@ -224,7 +224,7 @@ class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, Pa
 
 	@Override
 	public String toString() {
-		return "["+getClass().getSimpleName()+": id="+getId()+"]";
+		return "["+getClass().getSimpleName()+": id="+getId()+"; currentElement="+getCurrentPlanElement()+"; currentLinkId="+getCurrentLinkId()+"]";
 	}
 
 	@Override
