@@ -58,6 +58,7 @@ public class DgEuropeCountryFilter implements DgCountryFilter {
 		"SE",
 		"SI",
 		"SK",
+		"UK",
 		"CR", //candidates
 		"ME",
 		"IS",
