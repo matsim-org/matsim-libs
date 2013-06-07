@@ -42,8 +42,8 @@ import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import playground.mmoyo.analysis.stopZoneOccupancyAnalysis.CtrlListener4configurableOcuppAnalysis;
-import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterTravelTimeAndDisutility3;
-import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterTravelTimeAndDisutility3.DataCollection;
+import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterTravelTimeAndDisutility;
+import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterTravelTimeAndDisutility.DataCollection;
 
 public class RndPtRouterLauncher {
 
@@ -52,8 +52,8 @@ public class RndPtRouterLauncher {
 		new TransitRouterFactory() {
 			@Override
 			public TransitRouter createTransitRouter() {
-				RandomizedTransitRouterTravelTimeAndDisutility3 ttCalculator = 
-					new RandomizedTransitRouterTravelTimeAndDisutility3(trConfig);
+				RandomizedTransitRouterTravelTimeAndDisutility ttCalculator = 
+					new RandomizedTransitRouterTravelTimeAndDisutility(trConfig);
 				ttCalculator.setDataCollection(DataCollection.randomizedParameters, false) ;
 				ttCalculator.setDataCollection(DataCollection.additionalInformation, false) ;
 				return new TransitRouterImpl(trConfig, new PreparedTransitSchedule(schedule), routerNetwork, ttCalculator, ttCalculator);

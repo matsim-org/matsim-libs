@@ -27,7 +27,7 @@ import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
-import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterTravelTimeAndDisutility3;
+import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterTravelTimeAndDisutility;
 
 public class RndPtRouterFactory {
 
@@ -36,7 +36,7 @@ public class RndPtRouterFactory {
 		new TransitRouterFactory() {
 			@Override
 			public TransitRouter createTransitRouter() {
-				RandomizedTransitRouterTravelTimeAndDisutility3 ttCalculator = new RandomizedTransitRouterTravelTimeAndDisutility3(trConfig);
+				RandomizedTransitRouterTravelTimeAndDisutility ttCalculator = new RandomizedTransitRouterTravelTimeAndDisutility(trConfig);
 //				ttCalculator.setDataCollection(DataCollection.randomizedParameters, rndParams) ;
 //				ttCalculator.setDataCollection(DataCollection.additionalInformation, addInfo) ;
 				return new TransitRouterImpl(trConfig, new PreparedTransitSchedule(schedule), routerNetwork, ttCalculator, ttCalculator);
@@ -52,7 +52,7 @@ public class RndPtRouterFactory {
 		new TransitRouterFactory() {
 			@Override
 			public TransitRouter createTransitRouter() {
-				RandomizedTransitRouterTravelTimeAndDisutility3 ttCalculator = new RandomizedTransitRouterTravelTimeAndDisutility3(trConfig);
+				RandomizedTransitRouterTravelTimeAndDisutility ttCalculator = new RandomizedTransitRouterTravelTimeAndDisutility(trConfig);
 				//ttCalculator.setDataCollection(DataCollection.randomizedParameters, false) ;
 				//ttCalculator.setDataCollection(DataCollection.additionInformation, false) ;
 				return new TransitRouterImpl(trConfig, preparedSchedule, routerNetwork, ttCalculator, ttCalculator);

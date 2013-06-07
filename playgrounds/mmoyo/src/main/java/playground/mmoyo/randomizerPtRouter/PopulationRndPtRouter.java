@@ -42,7 +42,7 @@ import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import playground.mmoyo.utils.DataLoader;
-import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterTravelTimeAndDisutility3;
+import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterTravelTimeAndDisutility;
 
 class PopulationRndPtRouter{ 
 	
@@ -64,7 +64,7 @@ class PopulationRndPtRouter{
 			Population population = scn.getPopulation();
 			
 			//create randomizedPtRouter and PlansCalcTransitRoute
-			TransitRouterNetworkTravelTimeAndDisutility ttCalculator = new RandomizedTransitRouterTravelTimeAndDisutility3(trConfig);
+			TransitRouterNetworkTravelTimeAndDisutility ttCalculator = new RandomizedTransitRouterTravelTimeAndDisutility(trConfig);
 			TransitRouter randomizedPtRouter = new TransitRouterImpl(trConfig, new PreparedTransitSchedule(schedule), routerNetwork, ttCalculator, ttCalculator);
 			final PlansCalcRouteConfigGroup config = scn.getConfig().plansCalcRoute();
 			final Network network = scn.getNetwork();
@@ -74,7 +74,7 @@ class PopulationRndPtRouter{
 			final LeastCostPathCalculatorFactory factory = new DijkstraFactory();
 			final ModeRouteFactory routeFactory =((PopulationFactoryImpl)population.getFactory()).getModeRouteFactory();
 			final TransitConfigGroup transitConfigGroup = scn.getConfig().transit(); 
-			PlansCalcTransitRoute plansCalcTransitRoute = new PlansCalcTransitRoute(config, network, (TravelDisutility)costCalculator, timeCalculator, factory, routeFactory, transitConfigGroup, randomizedPtRouter, schedule);
+			PlansCalcTransitRoute plansCalcTransitRoute = new PlansCalcTransitRoute(config, network, costCalculator, timeCalculator, factory, routeFactory, transitConfigGroup, randomizedPtRouter, schedule);
 			
 			//route population
 			plansCalcTransitRoute.run(population);
