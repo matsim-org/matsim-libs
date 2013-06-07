@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.cliques.replanning.modules.jointtripinsertor;
 
-import static playground.thibautd.socnetsim.utils.JointPlanUtils.analyseJointTravel;
+import playground.thibautd.socnetsim.utils.JointPlanUtils;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -62,11 +62,11 @@ public class JointTripRemoverAlgorithm implements GenericPlanAlgorithm<JointPlan
 
 	@Override
 	public void run(final JointPlan plan) {
-		run( plan , Collections.EMPTY_LIST );
+		run( plan , Collections.<Id>emptyList() );
 	}
 
 	public ActedUponInformation run( final JointPlan plan , final Collection<Id> agentsToIgnore ) {
-		JointTravelStructure structure = analyseJointTravel( plan );
+		final JointTravelStructure structure = JointPlanUtils.analyseJointTravel( plan );
 
 		if (structure.getJointTrips().size() == 0) {
 			log.warn( getClass().getSimpleName()+" was called on a plan with no joint trips."
@@ -74,11 +74,10 @@ public class JointTripRemoverAlgorithm implements GenericPlanAlgorithm<JointPlan
 			return null;
 		}
 
-		// TODO: remove joint trips with agents to ignore before selection
 		final List<JointTrip> choiceSet = getChoiceSet( structure , agentsToIgnore );
 		if (choiceSet.isEmpty()) return null;
 
-		JointTrip toRemove = choiceSet.get( random.nextInt( choiceSet.size() ) );
+		final JointTrip toRemove = choiceSet.get( random.nextInt( choiceSet.size() ) );
 
 		removePassengerTrip( toRemove , plan );
 		removeDriverTrip( toRemove , plan );
@@ -107,9 +106,10 @@ public class JointTripRemoverAlgorithm implements GenericPlanAlgorithm<JointPlan
 	final static void removePassengerTrip(
 			final JointTrip toRemove,
 			final JointPlan jointPlan) {
-		Plan passengerPlan = jointPlan.getIndividualPlan( toRemove.getPassengerId() );
-		List<PlanElement> pes = passengerPlan.getPlanElements();
-		int index = pes.indexOf( toRemove.getPassengerLeg() ) - 2;
+		final Plan passengerPlan = jointPlan.getIndividualPlan( toRemove.getPassengerId() );
+		final List<PlanElement> pes = passengerPlan.getPlanElements();
+		final int index = pes.indexOf( toRemove.getPassengerLeg() ) - 2;
+
 		for (int i=0; i < 5; i++) {
 			pes.remove( index );
 		}
@@ -128,14 +128,20 @@ public class JointTripRemoverAlgorithm implements GenericPlanAlgorithm<JointPlan
 	private static void repareDriverTrips(
 			final JointTrip toRemove,
 			final JointPlan plan) {
-		List<PlanElement> allPes = plan.getIndividualPlan( toRemove.getDriverId() ).getPlanElements();
-		List<PlanElement> trip = getDriverTrip( toRemove , plan.getIndividualPlan( toRemove.getDriverId() ) );
-		List<PlanElement> newTrip = new ArrayList<PlanElement>();
+		final List<PlanElement> allPes = plan.getIndividualPlan( toRemove.getDriverId() ).getPlanElements();
+		final List<PlanElement> trip = getDriverTrip( toRemove , plan.getIndividualPlan( toRemove.getDriverId() ) );
+		final List<PlanElement> newTrip = new ArrayList<PlanElement>();
 		newTrip.add( new LegImpl( TransportMode.car ) );
 
-		int start = allPes.indexOf( trip.get( 0 ) ) - 1;
+		final int start = allPes.indexOf( trip.get( 0 ) ) - 1;
+
+		// "state" variables, changed in the loop:
+		// - keeps track of the passengers currently in the vehicle.
+		//   Pick-up or drop-offs are created at each change
+		Set<Id> currentPassengers = Collections.<Id>emptySet();
+		// - stores the Id of the last activity, in case we cannot get this info
+		//   from the Route
 		Id lastActLinkId = ((Activity) allPes.get( start )).getLinkId();
-		Set<Id> currentPassengers = Collections.EMPTY_SET;
 		for (PlanElement pe : trip ) {
 			if ( !(pe instanceof Leg) ) {
 				// this is collected just in case some legs have no route
@@ -143,12 +149,12 @@ public class JointTripRemoverAlgorithm implements GenericPlanAlgorithm<JointPlan
 				lastActLinkId = ((Activity) pe).getLinkId();
 				continue;
 			}
-			Leg leg = (Leg) pe;
-			Route route = leg.getRoute();
+			final Leg leg = (Leg) pe;
+			final Route route = leg.getRoute();
 
-			Set<Id> newPassengers = route instanceof DriverRoute ?
+			final Set<Id> newPassengers = route instanceof DriverRoute ?
 				new TreeSet<Id>( ((DriverRoute) route).getPassengersIds() ) :
-				Collections.EMPTY_SET;
+				Collections.<Id>emptySet();
 			// note that no check of the mode is done...
 			if ( !newPassengers.equals( currentPassengers ) ) {
 				// note that this allows passengers to be pick-up at drop offs
@@ -219,9 +225,9 @@ public class JointTripRemoverAlgorithm implements GenericPlanAlgorithm<JointPlan
 	private static void unregisterPassengerFromDriverRoutes(
 			final JointTrip toRemove) {
 		for (Leg driverLeg : toRemove.getDriverLegs()) {
-			DriverRoute route = (DriverRoute) driverLeg.getRoute();
+			final DriverRoute route = (DriverRoute) driverLeg.getRoute();
 			route.removePassenger( toRemove.getPassengerId() );
-			if (route.getPassengersIds().size() == 0) {
+			if ( route.getPassengersIds().isEmpty() ) {
 				driverLeg.setMode( TransportMode.car );
 				driverLeg.setRoute( null );
 			}

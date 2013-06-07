@@ -52,11 +52,11 @@ public class JointPlanUtils {
 		// legs to drive one passenger to destination, e.g.:
 		//                    p={1,2}       p={1}
 		// driver ...-----|############|#############|------...
-		// pass 1 ...-----|############|---------------------...
+		// pass 1 ...-----|############|--------------------...
 		// pass 2 ...-----|##########################|------...
 		// (TD, sept. 2012)
-		List<DriverTrip> driverTrips = parseDriverTrips( plan );
-		List<JointTrip> jointTrips = reconstructJointTrips( driverTrips , plan );
+		final List<DriverTrip> driverTrips = parseDriverTrips( plan );
+		final List<JointTrip> jointTrips = reconstructJointTrips( driverTrips , plan );
 
 		return new JointTravelStructure( jointTrips );
 	}
@@ -64,21 +64,21 @@ public class JointPlanUtils {
 	private static List<JointTrip> reconstructJointTrips(
 			final List<DriverTrip> driverTrips,
 			final JointPlan plan) {
-		List<JointTrip> jointTrips = new ArrayList<JointTrip>();
-		Map<Id, Iterator<PlanElement>> iterators = extractIterators( plan );
+		final List<JointTrip> jointTrips = new ArrayList<JointTrip>();
+		final Map<Id, Iterator<PlanElement>> iterators = extractIterators( plan );
 
 		for ( DriverTrip driverTrip : driverTrips ) {
 			for (Map.Entry<Id, Id> e : driverTrip.passengerOrigins.entrySet()) {
-				Id passengerId = e.getKey();
-				Id originId = e.getValue();
-				Id destinationId = driverTrip.passengerDestinations.get( passengerId );
+				final Id passengerId = e.getKey();
+				final Id originId = e.getValue();
+				final Id destinationId = driverTrip.passengerDestinations.get( passengerId );
 
-				Iterator<PlanElement> it = iterators.get( passengerId );
+				final Iterator<PlanElement> it = iterators.get( passengerId );
 				while ( it.hasNext() ) {
-					PlanElement pe = it.next();
+					final PlanElement pe = it.next();
 					if (pe instanceof Leg &&
 							((Leg) pe).getMode().equals( JointActingTypes.PASSENGER )) {
-						PassengerRoute route = (PassengerRoute) ((Leg) pe).getRoute();
+						final PassengerRoute route = (PassengerRoute) ((Leg) pe).getRoute();
 						if (route.getStartLinkId().equals( originId ) &&
 								route.getEndLinkId().equals( destinationId )) {
 							jointTrips.add(
@@ -94,8 +94,6 @@ public class JointPlanUtils {
 						}
 					}
 				}
-
-
 			}
 		}
 
@@ -135,11 +133,13 @@ public class JointPlanUtils {
 	 * Package protected to be callable from tests
 	 */
 	final static List<DriverTrip> parseDriverTrips( final JointPlan plan ) {
-		List<DriverTrip> driverTrips = new ArrayList<DriverTrip>();
+		final List<DriverTrip> driverTrips = new ArrayList<DriverTrip>();
 
 		for ( Plan indivPlan : plan.getIndividualPlans().values() ) {
-			Id driverId = indivPlan.getPerson().getId();
-			List<Id> currentPassengers = new ArrayList<Id>();
+			final Id driverId = indivPlan.getPerson().getId();
+			final List<Id> currentPassengers = new ArrayList<Id>();
+
+			// store the driver trips we are in, if any
 			DriverTrip currentDriverTrip = null;
 			for ( PlanElement pe : indivPlan.getPlanElements() ) {
 				if ( pe instanceof Leg &&
@@ -151,10 +151,10 @@ public class JointPlanUtils {
 					}
 					currentDriverTrip.driverTrip.add( (Leg) pe );
 
-					DriverRoute dRoute = (DriverRoute) ((Leg) pe).getRoute();
-					Id origin = dRoute.getStartLinkId();
-					Id destination = dRoute.getEndLinkId();
-					Collection<Id> passengerIds = dRoute.getPassengersIds();
+					final DriverRoute dRoute = (DriverRoute) ((Leg) pe).getRoute();
+					final Id origin = dRoute.getStartLinkId();
+					final Id destination = dRoute.getEndLinkId();
+					final Collection<Id> passengerIds = dRoute.getPassengersIds();
 
 					for ( Id passengerId : passengerIds ) {
 						if ( !currentPassengers.contains( passengerId ) ) {
@@ -165,9 +165,9 @@ public class JointPlanUtils {
 						}
 					}
 
-					Iterator<Id> currPassengersIter = currentPassengers.iterator();
+					final Iterator<Id> currPassengersIter = currentPassengers.iterator();
 					while ( currPassengersIter.hasNext() ) {
-						Id p = currPassengersIter.next();
+						final Id p = currPassengersIter.next();
 						if ( !passengerIds.contains( p ) ) {
 							// passenger is arrived
 							currPassengersIter.remove();
