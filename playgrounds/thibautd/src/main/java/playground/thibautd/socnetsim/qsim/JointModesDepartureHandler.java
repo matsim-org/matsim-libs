@@ -24,6 +24,7 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
@@ -98,10 +99,13 @@ public class JointModesDepartureHandler implements DepartureHandler , MobsimEngi
 			// or waiting. Board waiting passengers and depart.
 			for (Id passengerId : passengerIds) {
 				final PassengerAgent passenger = passengersWaiting.remove( passengerId );
-				// say to the driver to board the passenger before leaving the first
-				// link. We cannot add the passengers to the vehicle here, as the driver
-				// may have to wait for the vehicle to come before departing.
-				((PassengerUnboardingDriverAgent) agent).addPassengerToBoard( passenger );
+				if ( passenger != null ) {
+					// say to the driver to board the passenger before leaving the first
+					// link. We cannot add the passengers to the vehicle here, as the driver
+					// may have to wait for the vehicle to come before departing.
+					((PassengerUnboardingDriverAgent) agent).addPassengerToBoard( passenger );
+				}
+				else assert contains( vehicle.getPassengers(), passengerId );
 			}
 
 			final boolean handled =
@@ -119,6 +123,15 @@ public class JointModesDepartureHandler implements DepartureHandler , MobsimEngi
 		else {
 			waitingDrivers.put( driverId , new WaitingDriver( agent , linkId ) );
 		}
+	}
+
+	private static boolean contains(
+			final Collection<? extends Identifiable> list,
+			final Id passengerId) {
+		for ( Identifiable e : list ) {
+			if ( e.getId().equals( passengerId ) ) return true;
+		}
+		return false;
 	}
 
 	private static void addAll(
