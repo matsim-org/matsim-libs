@@ -28,17 +28,20 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.StageActivityTypes;
@@ -50,6 +53,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.pt.PtConstants;
 
 import playground.thibautd.socnetsim.population.JointActingTypes;
@@ -90,18 +94,78 @@ public class ExtractTripModeShares30kmFromBellevue {
 			}
 		};
 
+	private static final double CROW_FLY_FACTOR = 1.2;
+
+	private static enum OutputType { COUNT, DETAILED; }
+	private static final OutputType OUTPUT_TYPE = OutputType.DETAILED;
+
 	public static void main(final String[] args) throws IOException {
 		final String plansFile = args[ 0 ];
 		final String outputFile = args[ 1 ];
+		// for V4 or distance computation
+		final String networkFile = args.length > 2 ? args[ 2 ] : null;
 		// useful for V4 only
-		final String facilitiesFile = args.length > 2 ? args[ 2 ] : null;
-		final String networkFile = args.length > 3 ? args[ 3 ] : null;
+		final String facilitiesFile = args.length > 3 ? args[ 3 ] : null;
 
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		if ( facilitiesFile != null ) new MatsimFacilitiesReader( (ScenarioImpl) scenario ).parse( facilitiesFile );
 		if ( networkFile != null ) new MatsimNetworkReader( scenario ).parse( networkFile );
 		new MatsimPopulationReader( scenario ).parse( plansFile );
 
+		switch ( OUTPUT_TYPE ) {
+			case COUNT:
+				count( scenario , outputFile );
+				break;
+			case DETAILED:
+				detailed( scenario , outputFile );
+				break;
+		}
+	}
+
+	private static void detailed(
+			final Scenario scenario,
+			final String outputFile) throws IOException {
+		final BufferedWriter writer = IOUtils.getBufferedWriter( outputFile );
+		writer.write( "agentId\tmain_mode\ttotal_dist" );
+
+		for ( Person person : scenario.getPopulation().getPersons().values() ) {
+			final Plan plan = person.getSelectedPlan();
+			final Activity act = getHomeActivity( plan );
+			if ( CoordUtils.calcDistance( act.getCoord() , BELLEVUE_COORD ) > radius ) continue;
+			for ( Trip trip : TripStructureUtils.getTrips( plan , STAGES ) ) {
+				final String mode = MODE_IDENTIFIER.identifyMainMode( trip.getTripElements() );
+				writer.newLine();
+				writer.write( person.getId()+"\t"+mode+"\t"+calcDist( trip , scenario.getNetwork() ) );
+			}
+		}
+
+		writer.close();
+	}
+
+	private static double calcDist(final Trip trip, final Network network) {
+		double dist = 0;
+
+		for ( Leg l : trip.getLegsOnly() ) {
+			final Route r = l.getRoute();
+			if ( r instanceof NetworkRoute )  {
+				dist += RouteUtils.calcDistance( (NetworkRoute) r , network );
+			}
+			else {
+				// TODO: make configurable?
+				dist += CROW_FLY_FACTOR *
+					// TODO: use coord of activities
+					CoordUtils.calcDistance(
+							network.getLinks().get( r.getStartLinkId() ).getFromNode().getCoord(),
+							network.getLinks().get( r.getEndLinkId() ).getToNode().getCoord() );
+			}
+		}
+
+		return dist;
+	}
+
+	private static void count(
+			final Scenario scenario,
+			final String outputFile) throws IOException {
 		final Map<String, Integer> counts = new TreeMap<String, Integer>();
 
 		int total = 0;
