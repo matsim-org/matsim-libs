@@ -59,6 +59,13 @@ public class SpatialGrid{
 	
 	private final double resolution;
 	
+	/**
+	 * @param xmin
+	 * @param ymin
+	 * @param xmax
+	 * @param ymax
+	 * @param resolution cell size. E.g. (xmax-xmin)/resolution = number of cells in x direction
+	 */
 	public SpatialGrid(double xmin, double ymin, double xmax, double ymax, double resolution) {
 		minX = xmin;
 		minY = ymin;
@@ -76,6 +83,10 @@ public class SpatialGrid{
 				matrix[y][x] = Double.NaN;
 	}
 	
+	/**
+	 * @param boundingBox
+	 * @param resolution cell size. E.g. (xmax-xmin)/resolution = number of cells in x direction
+	 */
 	public SpatialGrid(double [] boundingBox, double resolution) {
 		this(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3], resolution);
 	}
