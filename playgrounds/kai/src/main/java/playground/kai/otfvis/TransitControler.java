@@ -45,8 +45,8 @@ import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
-import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterTravelTimeAndDisutility3;
-import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterTravelTimeAndDisutility3.DataCollection;
+import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterTravelTimeAndDisutility;
+import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterTravelTimeAndDisutility.DataCollection;
 
 public class TransitControler {
 	
@@ -86,7 +86,7 @@ public class TransitControler {
 		tc.setTransitRouterFactory( new TransitRouterFactory() {
 			@Override
 			public TransitRouter createTransitRouter() {
-				RandomizedTransitRouterTravelTimeAndDisutility3 ttCalculator = new RandomizedTransitRouterTravelTimeAndDisutility3(trConfig);
+				RandomizedTransitRouterTravelTimeAndDisutility ttCalculator = new RandomizedTransitRouterTravelTimeAndDisutility(trConfig);
 				ttCalculator.setDataCollection(DataCollection.randomizedParameters, true) ;
 				ttCalculator.setDataCollection(DataCollection.additionalInformation, false) ;
 
