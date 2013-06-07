@@ -56,7 +56,7 @@ public class DefaultPlanLinkIdentifier implements PlanLinkIdentifier {
 			final Plan p1,
 			final Plan p2) {
 		final boolean areLinked = containsCoTraveler( p1 , p2.getPerson().getId() );
-		assert areLinked == containsCoTraveler( p2 , p1.getPerson().getId() ) : "inconsistent plans";
+		assert areLinked == containsCoTraveler( p2 , p1.getPerson().getId() ) : "inconsistent plans "+p1+" and "+p2;
 		return areLinked;
 	}
 
