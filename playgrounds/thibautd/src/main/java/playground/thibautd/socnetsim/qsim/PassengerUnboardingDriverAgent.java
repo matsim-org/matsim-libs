@@ -37,6 +37,7 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.PTPassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -71,6 +72,11 @@ class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, Pa
 	@Override
 	public void endLegAndComputeNextState(final double now) {
 		if ( delegate.getMode().equals( JointActingTypes.DRIVER ) ) {
+			if ( !passengersToBoard.isEmpty() ) {
+				assert ((NetworkRoute) ((Leg) getCurrentPlanElement()).getRoute()).getLinkIds().isEmpty();
+				boardPassengers();
+			}
+
 			final MobsimVehicle vehicle = netsimEngine.getVehicles().get( delegate.getPlannedVehicleId() );
 			final Id linkId = delegate.getCurrentLinkId();
 			final Collection<PassengerAgent> passengersToUnboard = new ArrayList<PassengerAgent>();
@@ -101,28 +107,27 @@ class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, Pa
 	@Override
 	public void notifyMoveOverNode(final Id newLinkId) {
 		if ( !passengersToBoard.isEmpty() ) {
-			final MobsimVehicle vehicle = netsimEngine.getVehicles().get( delegate.getPlannedVehicleId() );
-			final EventsManager events = internalInterface.getMobsim().getEventsManager();
-			for ( PassengerAgent passenger : passengersToBoard ) {
-				assert passenger.getCurrentLinkId().equals( getCurrentLinkId() );
-				vehicle.addPassenger( passenger );
-				events.processEvent(
-						events.getFactory().createPersonEntersVehicleEvent(
-							internalInterface.getMobsim().getSimTimer().getTimeOfDay(),
-							passenger.getId(),
-							vehicle.getId()));
-			}
-			passengersToBoard.clear();
-
-			try {
-				final DriverRoute dr = (DriverRoute) ((Leg) getCurrentPlanElement()).getRoute();
-				assert vehicle.getPassengers().size() == dr.getPassengersIds().size() : vehicle.getPassengers()+" != "+dr.getPassengersIds()+" for driver "+getId();
-			}
-			catch (ClassCastException e) {
-				throw new RuntimeException( "incorrect route in "+getCurrentPlanElement()+" for person "+getId() , e );
-			}
+			boardPassengers();
 		}
 		delegate.notifyMoveOverNode(newLinkId);
+	}
+
+	private void boardPassengers() {
+		final MobsimVehicle vehicle = netsimEngine.getVehicles().get( delegate.getPlannedVehicleId() );
+		final EventsManager events = internalInterface.getMobsim().getEventsManager();
+		for ( PassengerAgent passenger : passengersToBoard ) {
+			assert passenger.getCurrentLinkId().equals( getCurrentLinkId() );
+			vehicle.addPassenger( passenger );
+			events.processEvent(
+					events.getFactory().createPersonEntersVehicleEvent(
+						internalInterface.getMobsim().getSimTimer().getTimeOfDay(),
+						passenger.getId(),
+						vehicle.getId()));
+		}
+		passengersToBoard.clear();
+
+		final DriverRoute dr = (DriverRoute) ((Leg) getCurrentPlanElement()).getRoute();
+		assert vehicle.getPassengers().size() == dr.getPassengersIds().size() : vehicle.getPassengers()+" != "+dr.getPassengersIds()+" for driver "+getId();
 	}
 
 	public void addPassengerToBoard(final PassengerAgent passenger) {
