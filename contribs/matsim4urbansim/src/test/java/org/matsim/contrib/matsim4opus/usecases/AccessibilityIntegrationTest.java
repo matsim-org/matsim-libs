@@ -74,8 +74,10 @@ public class AccessibilityIntegrationTest {
 //			actOpt.setCapacity(1000.) ; // 1000 jobs at same facility
 		}
 		
-//		controler.addControlerListener(new GridBasedAccessibilityControlerListener(...)); 
+//		controler.addControlerListener(new GridBasedAccessibilityControlerListener()); 
 		// (purely grid based controler listener does not yet exist)
+		
+		// yyyy the correct test is essentially already in AccessibilityTest.testAccessibilityMeasure().  kai, jun'13
 		
 		controler.run();
 		

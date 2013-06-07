@@ -87,9 +87,9 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 		// files is given by the UrbanSim convention importing a csv file into a identically named 
 		// data set table. THIS PRODUCES URBANSIM INPUT
 		UrbanSimZoneCSVWriterV2.initUrbanSimZoneWriter();
-		initAccessibilityParameter(scenario);
+		initAccessibilityParameters(scenario.getConfig());
 		// aggregating facilities to their nearest node on the road network
-		this.aggregatedFacilities = aggregatedOpportunities(opportunities, (NetworkImpl)scenario.getNetwork());
+		this.aggregatedFacilities = aggregatedOpportunities(opportunities, scenario.getNetwork());
 		
 		log.info(".. done initializing ZoneBasedAccessibilityControlerListenerV3");
 	}

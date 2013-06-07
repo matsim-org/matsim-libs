@@ -7,7 +7,7 @@ import java.util.Iterator;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.matsim4opus.constants.InternalConstants;
 import org.matsim.contrib.matsim4opus.gis.GridUtils;
@@ -19,6 +19,7 @@ import org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators.TravelDist
 import org.matsim.contrib.matsim4opus.utils.LeastCostPathTreeExtended;
 import org.matsim.contrib.matsim4opus.utils.helperObjects.Benchmark;
 import org.matsim.contrib.matsim4opus.utils.io.writer.AnalysisCellBasedAccessibilityCSVWriterV2;
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
@@ -132,7 +133,7 @@ public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 													 SpatialGrid ptGrid,
 													 PtMatrix ptMatrix,
 													 Benchmark benchmark,										// adds an extension to output files whether a shape-file or network boundaries are used for calculation
-													 Scenario scenario){
+													 Config config, Network network){
 								
 		log.info("Initializing ParcelBasedAccessibilityControlerListenerV3 ...");
 		
@@ -155,9 +156,9 @@ public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 		// writing accessibility measures continuously into a csv file, which is not 
 		// dedicated for as input for UrbanSim, but for analysis purposes
 		AnalysisCellBasedAccessibilityCSVWriterV2.initAnalysisCellBasedAccessibilityCSVWriterV2();
-		initAccessibilityParameter(scenario);
+		initAccessibilityParameters(config);
 		// aggregating facilities to their nearest node on the road network
-		this.aggregatedFacilities = aggregatedOpportunities(opportunities, (NetworkImpl)scenario.getNetwork());
+		this.aggregatedFacilities = aggregatedOpportunities(opportunities, network);
 		
 		log.info(".. done initializing CellBasedAccessibilityControlerListenerV3");
 	}

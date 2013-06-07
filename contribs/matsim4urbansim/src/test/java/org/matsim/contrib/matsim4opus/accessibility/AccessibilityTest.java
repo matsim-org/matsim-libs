@@ -120,17 +120,17 @@ public class AccessibilityTest implements MATSim4UrbanSimInterface, LinkEnterEve
 		
 		ZoneLayer<Id> startZones = GridUtils.createGridLayerByGridSizeByNetwork(resolution, bbox.getBoundingBox());
 
-		SpatialGrid freeSpeedGrid = new SpatialGrid(bbox.getBoundingBox(), resolution);
-		SpatialGrid carGrid = new SpatialGrid(freeSpeedGrid);
-		SpatialGrid bikeGrid = new SpatialGrid(freeSpeedGrid);
-		SpatialGrid walkGrid = new SpatialGrid(freeSpeedGrid);
-		SpatialGrid ptGrid = new SpatialGrid(freeSpeedGrid);
+		SpatialGrid gridForFreeSpeedResults = new SpatialGrid(bbox.getBoundingBox(), resolution);
+		SpatialGrid gridForCarResults = new SpatialGrid(gridForFreeSpeedResults);
+		SpatialGrid gridForBikeResults = new SpatialGrid(gridForFreeSpeedResults);
+		SpatialGrid gridForWalkResults = new SpatialGrid(gridForFreeSpeedResults);
+		SpatialGrid gridForPtResults = new SpatialGrid(gridForFreeSpeedResults);
 
-		ActivityFacilitiesImpl parcels = new ActivityFacilitiesImpl("parcels");
-		ActivityFacilitiesImpl zones = new ActivityFacilitiesImpl("zones");
+//		ActivityFacilitiesImpl parcels = new ActivityFacilitiesImpl("parcels");
+//		ActivityFacilitiesImpl zones = new ActivityFacilitiesImpl("zones");
 		ActivityFacilitiesImpl opportunities = new ActivityFacilitiesImpl("opportunities");
 		
-		this.getReadFromUrbanSimModel().readFacilitiesParcel(parcels, zones);
+//		this.getReadFromUrbanSimModel().readFacilitiesParcel(parcels, zones);
 		
 		Benchmark benchmark = new Benchmark();
 
@@ -139,9 +139,19 @@ public class AccessibilityTest implements MATSim4UrbanSimInterface, LinkEnterEve
 		ControlerListener listener = null;
 		
 		if(this.isParcelMode()){
-			listener = new GridBasedAccessibilityControlerListenerV3(startZones, opportunities, freeSpeedGrid, carGrid, bikeGrid, walkGrid, ptGrid, ptMatrix, benchmark, scenario);
+			listener = new GridBasedAccessibilityControlerListenerV3(startZones, opportunities, 
+					gridForFreeSpeedResults, gridForCarResults, gridForBikeResults, gridForWalkResults, gridForPtResults, 
+					ptMatrix, benchmark, config, net);
 			ctrl.addControlerListener(listener);
-			testParcelBasedAccessibility(ctrl,listener, freeSpeedGrid);
+			ctrl.run();
+			
+			double maxVal = gridForFreeSpeedResults.getValue(200, 100);
+			for(double x=gridForFreeSpeedResults.getXmin();x<gridForFreeSpeedResults.getXmax();x+=resolution){
+				for(double y=gridForFreeSpeedResults.getYmin();y<gridForFreeSpeedResults.getYmax();y++){
+					if(x!=200||y!=100)
+						Assert.assertTrue(gridForFreeSpeedResults.getValue(x, y)<=maxVal);
+				}
+			}
 		}
 		
 //		if(this.isParcelMode())
@@ -163,20 +173,6 @@ public class AccessibilityTest implements MATSim4UrbanSimInterface, LinkEnterEve
 		
 	}
 	
-	private void testParcelBasedAccessibility(Controler ctrl,
-			ControlerListener listener, SpatialGrid freeSpeedGrid) {
-		ctrl.run();
-		
-		double maxVal = freeSpeedGrid.getValue(200, 100);
-		for(double x=freeSpeedGrid.getXmin();x<freeSpeedGrid.getXmax();x+=resolution){
-			for(double y=freeSpeedGrid.getYmin();y<freeSpeedGrid.getYmax();y++){
-				if(x!=200||y!=100)
-					Assert.assertTrue(freeSpeedGrid.getValue(x, y)<=maxVal);
-			}
-		}
-		
-	}
-
 	@Override
 	public double getOpportunitySampleRate() {
 		return 1.;

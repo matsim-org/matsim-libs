@@ -8,10 +8,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.matsim4opus.config.ConfigurationUtils;
+import org.matsim.contrib.matsim4opus.config.M4UAccessibilityConfigUtils;
 import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigGroup;
 import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
 import org.matsim.contrib.matsim4opus.gis.Zone;
@@ -25,6 +25,7 @@ import org.matsim.contrib.matsim4opus.utils.helperObjects.Distances;
 import org.matsim.contrib.matsim4opus.utils.misc.ProgressBar;
 import org.matsim.contrib.matsim4opus.utils.network.NetworkUtil;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -162,19 +163,19 @@ public class AccessibilityControlerListenerImpl{
 	
 	/**
 	 * setting parameter for accessibility calculation
-	 * @param scenario
+	 * @param config TODO
 	 */
-	final void initAccessibilityParameter(Scenario scenario){
+	final void initAccessibilityParameters(Config config){
 		
-		AccessibilityConfigGroup moduleAPCM = ConfigurationUtils.getAccessibilityParameterConfigModule(scenario);
+		AccessibilityConfigGroup moduleAPCM = M4UAccessibilityConfigUtils.getConfigModuleAndPossiblyConvert(config);
 		
-		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = scenario.getConfig().planCalcScore() ;
+		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = config.planCalcScore() ;
 		
 		useRawSum			= moduleAPCM.isUsingRawSumsWithoutLn();
 		logitScaleParameter = planCalcScoreConfigGroup.getBrainExpBeta() ;
 		inverseOfLogitScaleParameter = 1/(logitScaleParameter); // logitScaleParameter = same as brainExpBeta on 2-aug-12. kai
-		walkSpeedMeterPerHour = scenario.getConfig().plansCalcRoute().getWalkSpeed() * 3600.;
-		bikeSpeedMeterPerHour = scenario.getConfig().plansCalcRoute().getBikeSpeed() * 3600.; // should be something like 15000
+		walkSpeedMeterPerHour = config.plansCalcRoute().getWalkSpeed() * 3600.;
+		bikeSpeedMeterPerHour = config.plansCalcRoute().getBikeSpeed() * 3600.; // should be something like 15000
 		
 //		usingCarParameterFromMATSim = moduleAPCM.isUsingCarParametersFromMATSim();
 //		usingBikeParameterFromMATSim= moduleAPCM.isUsingBikeParametersFromMATSim();
@@ -197,10 +198,10 @@ public class AccessibilityControlerListenerImpl{
 		betaPtTD		= planCalcScoreConfigGroup.getMarginalUtilityOfMoney() * planCalcScoreConfigGroup.getMonetaryDistanceCostRatePt();
 		betaPtTMC		= - planCalcScoreConfigGroup.getMarginalUtilityOfMoney() ;
 		
-		constCar		= scenario.getConfig().planCalcScore().getConstantCar();
-		constBike		= scenario.getConfig().planCalcScore().getConstantBike();
-		constWalk		= scenario.getConfig().planCalcScore().getConstantWalk();
-		constPt			= scenario.getConfig().planCalcScore().getConstantPt();
+		constCar		= config.planCalcScore().getConstantCar();
+		constBike		= config.planCalcScore().getConstantBike();
+		constWalk		= config.planCalcScore().getConstantWalk();
+		constPt			= config.planCalcScore().getConstantPt();
 		
 		depatureTime 	= moduleAPCM.getTimeOfDay(); // by default = 8.*3600;	
 		// printParameterSettings(); // use only for debugging since otherwise it clutters the logfile (settings are printed as part of config dump)
@@ -263,7 +264,7 @@ public class AccessibilityControlerListenerImpl{
 	 * @param network giving the road network
 	 * @return the sum of disutilities Vjk, i.e. the disutilities to reach all opportunities k that are assigned to j from node j 
 	 */
-	final AggregateObject2NearestNode[] aggregatedOpportunities(final ActivityFacilitiesImpl opportunities, NetworkImpl network){
+	final AggregateObject2NearestNode[] aggregatedOpportunities(final ActivityFacilitiesImpl opportunities, Network network){
 	
 		log.info("Aggregating " + opportunities.getFacilities().size() + " opportunities with identical nearest node ...");
 		Map<Id, AggregateObject2NearestNode> opportunityClusterMap = new ConcurrentHashMap<Id, AggregateObject2NearestNode>();
@@ -276,7 +277,7 @@ public class AccessibilityControlerListenerImpl{
 			bar.update();
 			
 			ActivityFacility opprotunity = oppIterator.next();
-			Node nearestNode = network.getNearestNode( opprotunity.getCoord() );
+			Node nearestNode = ((NetworkImpl)network).getNearestNode( opprotunity.getCoord() );
 			
 			// get Euclidian distance to nearest node
 			double distance_meter 	= NetworkUtil.getEuclidianDistance(opprotunity.getCoord(), nearestNode.getCoord());
