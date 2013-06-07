@@ -76,7 +76,7 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 
 	@Override
 	public void run(final JointPlan plan) {
-		run( plan , Collections.EMPTY_LIST );
+		run( plan , Collections.<Id>emptyList() );
 	}
 
 	public ActedUponInformation run(
