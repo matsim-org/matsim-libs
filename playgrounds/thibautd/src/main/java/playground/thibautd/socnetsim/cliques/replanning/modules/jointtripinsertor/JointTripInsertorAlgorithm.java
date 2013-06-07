@@ -82,10 +82,11 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 	public ActedUponInformation run(
 			final JointPlan jointPlan,
 			final Collection<Id> agentsToIgnore) {
-		ClassifiedTrips trips = extractClassifiedTrips( jointPlan , agentsToIgnore );
-		List<Match> matches = extractMatches( trips );
+		final ClassifiedTrips trips = extractClassifiedTrips( jointPlan , agentsToIgnore );
+		final List<Match> matches = extractMatches( trips );
 		if (matches.size() == 0) return null;
-		Match match = chooseMatch( matches );
+
+		final Match match = chooseMatch( matches );
 		insertMatch( jointPlan , match );
 		return match.toInformation();
 	}
@@ -93,25 +94,25 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 	private ClassifiedTrips extractClassifiedTrips(
 			final JointPlan jointPlan,
 			final Collection<Id> agentsToIgnore) {
-		ClassifiedTrips trips = new ClassifiedTrips();
+		final ClassifiedTrips trips = new ClassifiedTrips();
 
 		for (Map.Entry<Id, Plan> entry : jointPlan.getIndividualPlans().entrySet()) {
-			Id id = entry.getKey();
+			final Id id = entry.getKey();
 			if ( agentsToIgnore.contains( id ) ) continue;
-			Plan plan = entry.getValue();
+			final Plan plan = entry.getValue();
 
-			Iterator<PlanElement> structure =
+			final Iterator<PlanElement> structure =
 					RoutingUtils.tripsToLegs(
 							plan,
 							router.getStageActivityTypes(),
 							mainModeIdentifier).iterator();
-			double now = 0;
-			Activity origin = (Activity) structure.next();
-			now = TripRouter.calcEndOfPlanElement( now , origin );
 
+			// variables modified during the iteration
+			Activity origin = (Activity) structure.next();
+			double now = TripRouter.calcEndOfPlanElement( 0 , origin );
 			while (structure.hasNext()) {
-				Leg leg = (Leg) structure.next();
-				Activity destination = (Activity) structure.next();
+				final Leg leg = (Leg) structure.next();
+				final Activity destination = (Activity) structure.next();
 
 				if ( isElectableTrip( origin , leg , destination ) ) {
 					if (leg.getMode().equals( TransportMode.car )) {
@@ -159,10 +160,10 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 	}
 
 	private List<Match> extractMatches(final ClassifiedTrips trips) {
-		List<Match> matches = new ArrayList<Match>();
+		final List<Match> matches = new ArrayList<Match>();
 
 		for (Trip driverTrip : trips.carTrips) {
-			Id driverId = driverTrip.agentId;
+			final Id driverId = driverTrip.agentId;
 			for (Trip passengerTrip : trips.nonChainBasedModeTrips) {
 				if ( !driverId.equals( passengerTrip.agentId ) ) {
 					matches.add(
@@ -182,8 +183,8 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 	private double calcMatchCost(
 			final Trip driverTrip,
 			final Trip passengerTrip) {
-		double timeDiff = Math.abs( driverTrip.departureTime - passengerTrip.departureTime );
-		double detourDist = 
+		final double timeDiff = Math.abs( driverTrip.departureTime - passengerTrip.departureTime );
+		final double detourDist = 
 			CoordUtils.calcDistance( driverTrip.departure.getCoord() , passengerTrip.departure.getCoord() ) +
 			CoordUtils.calcDistance( driverTrip.arrival.getCoord() , passengerTrip.arrival.getCoord() ) +
 			passengerTrip.length - driverTrip.length;
@@ -192,9 +193,9 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 	}
 
 	private Match chooseMatch(final List<Match> matches) {
-		double[] thresholds = new double[ matches.size() ];
-		double sum = 0;
+		final double[] thresholds = new double[ matches.size() ];
 
+		double sum = 0;
 		int i=0;
 		for (Match match : matches) {
 			sum += Math.exp( -match.cost );
@@ -202,7 +203,7 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 			i++;
 		}
 
-		double choice = random.nextDouble() * sum;
+		final double choice = random.nextDouble() * sum;
 
 		for (i=0; i < thresholds.length; i++) {
 			if (choice <= thresholds[i]) {
@@ -216,9 +217,10 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 	private static void insertMatch(
 			final JointPlan jointPlan,
 			final Match match) {
-		Plan driverPlan = jointPlan.getIndividualPlans().get( match.tripDriver.agentId );
-		Plan passengerPlan = jointPlan.getIndividualPlans().get( match.tripPassenger.agentId );
+		final Plan driverPlan = jointPlan.getIndividualPlans().get( match.tripDriver.agentId );
+		final Plan passengerPlan = jointPlan.getIndividualPlans().get( match.tripPassenger.agentId );
 
+		// insert in driver plan
 		List<PlanElement> driverTrip = new ArrayList<PlanElement>();
 		driverTrip.add( new LegImpl( TransportMode.car ) );
 		Activity act = new ActivityImpl(
@@ -242,6 +244,7 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 		driverTrip.add( act );
 		driverTrip.add( new LegImpl( TransportMode.car ) );
 
+		// insert in passenger plan
 		List<PlanElement> passengerTrip = new ArrayList<PlanElement>();
 		passengerTrip.add( new LegImpl( match.tripPassenger.initialMode ) );
 		act = new ActivityImpl(
