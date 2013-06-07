@@ -22,7 +22,7 @@
  */
 package org.matsim.contrib.matsim4opus.config;
 
-import org.matsim.contrib.matsim4opus.config.modules.ImprovedPseudoPtConfigModule;
+import org.matsim.contrib.matsim4opus.config.modules.ImprovedPseudoPtConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
 
@@ -33,14 +33,14 @@ import org.matsim.core.config.Module;
 public class M4UImprovedPseudoPtConfigUtils {
 	private M4UImprovedPseudoPtConfigUtils() {} // container for static methods; do not instantiate
 
-	public static ImprovedPseudoPtConfigModule getConfigModuleAndPossiblyConvert(Config config) {
-		Module m = config.getModule(ImprovedPseudoPtConfigModule.GROUP_NAME);
-		if (m instanceof ImprovedPseudoPtConfigModule) {
-			return (ImprovedPseudoPtConfigModule) m;
+	public static ImprovedPseudoPtConfigGroup getConfigModuleAndPossiblyConvert(Config config) {
+		Module m = config.getModule(ImprovedPseudoPtConfigGroup.GROUP_NAME);
+		if (m instanceof ImprovedPseudoPtConfigGroup) {
+			return (ImprovedPseudoPtConfigGroup) m;
 		}
 		
-		ImprovedPseudoPtConfigModule ippcm = new ImprovedPseudoPtConfigModule();
-		config.addModule( ImprovedPseudoPtConfigModule.GROUP_NAME, ippcm ) ;
+		ImprovedPseudoPtConfigGroup ippcm = new ImprovedPseudoPtConfigGroup();
+		config.addModule( ImprovedPseudoPtConfigGroup.GROUP_NAME, ippcm ) ;
 		return ippcm;
 	}	
 }

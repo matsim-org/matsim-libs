@@ -22,7 +22,7 @@
  */
 package org.matsim.contrib.matsim4opus.config;
 
-import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigModule;
+import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigGroup;
 import org.matsim.contrib.matsim4opus.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.jaxbconfig2.Matsim4UrbansimType;
 import org.matsim.core.config.Config;
@@ -38,7 +38,7 @@ public class M4UAccessibilityConfigUtils {
 	
 	static void initAccessibilityParameters(Matsim4UrbansimType matsim4UrbanSimParamsFromU, Config config){
 	
-		AccessibilityConfigModule module = getConfigModuleAndPossiblyConvert(config);
+		AccessibilityConfigGroup module = getConfigModuleAndPossiblyConvert(config);
 		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = config.planCalcScore();
 	
 //		// logit scale parameter:
@@ -161,17 +161,17 @@ public class M4UAccessibilityConfigUtils {
 	
 	}
 
-	public static AccessibilityConfigModule getConfigModuleAndPossiblyConvert(Config config) {
-		Module m = config.getModule(AccessibilityConfigModule.GROUP_NAME);
-		if (m instanceof AccessibilityConfigModule) {
-			return (AccessibilityConfigModule) m;
+	public static AccessibilityConfigGroup getConfigModuleAndPossiblyConvert(Config config) {
+		Module m = config.getModule(AccessibilityConfigGroup.GROUP_NAME);
+		if (m instanceof AccessibilityConfigGroup) {
+			return (AccessibilityConfigGroup) m;
 		}
-		AccessibilityConfigModule module = new AccessibilityConfigModule();
+		AccessibilityConfigGroup module = new AccessibilityConfigGroup();
 		//		config.getModules().put(MATSim4UrbanSimControlerConfigModuleV3.GROUP_NAME, mccm);
 		// yyyyyy the above code does NOT convert but throws the config entries away.
 		// In contrast, config.addModule(...) would convert.  kai, may'13
 		// I just changed that:
-		config.addModule(AccessibilityConfigModule.GROUP_NAME, module ) ;
+		config.addModule(AccessibilityConfigGroup.GROUP_NAME, module ) ;
 		return module;
 	}
 

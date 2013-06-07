@@ -37,8 +37,8 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.matsim4opus.config.M4UConfigurationConverterV4;
 import org.matsim.contrib.matsim4opus.config.M4UImprovedPseudoPtConfigUtils;
-import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigModule;
-import org.matsim.contrib.matsim4opus.config.modules.ImprovedPseudoPtConfigModule;
+import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigGroup;
+import org.matsim.contrib.matsim4opus.config.modules.ImprovedPseudoPtConfigGroup;
 import org.matsim.contrib.matsim4opus.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4opus.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4opus.gis.GridUtils;
@@ -311,7 +311,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 		controler.setCreateGraphs(true);	// sets whether output graphs are created
 		
 		PtMatrix ptMatrix = null ;
-		ImprovedPseudoPtConfigModule ippcm = M4UImprovedPseudoPtConfigUtils.getConfigModuleAndPossiblyConvert(scenario.getConfig()) ;
+		ImprovedPseudoPtConfigGroup ippcm = M4UImprovedPseudoPtConfigUtils.getConfigModuleAndPossiblyConvert(scenario.getConfig()) ;
 		if(ippcm.getPtStopsInputFile() != null){
 			log.info("Initializing MATSim4UrbanSim pseudo pt router ...");
 			// will lead to a null pointer anyway, but since the 
@@ -503,7 +503,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 	 */
 	void setControlerSettings(String[] args) {
 
-		AccessibilityConfigModule moduleAccessibility = getAccessibilityParameterConfig();
+		AccessibilityConfigGroup moduleAccessibility = getAccessibilityParameterConfig();
 		M4UControlerConfigModuleV3 moduleMATSim4UrbanSim = getMATSim4UrbanSimControlerConfig();
 		
 		this.opportunitySampleRate 		= moduleAccessibility.getAccessibilityDestinationSamplingRate();
@@ -606,13 +606,13 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 	 * access to AccessibilityParameterConfigModule and related parameter settings
 	 * @return AccessibilityParameterConfigModule
 	 */
-	AccessibilityConfigModule getAccessibilityParameterConfig() {
-		Module m = this.scenario.getConfig().getModule(AccessibilityConfigModule.GROUP_NAME);
-		if (m instanceof AccessibilityConfigModule) {
-			return (AccessibilityConfigModule) m;
+	AccessibilityConfigGroup getAccessibilityParameterConfig() {
+		Module m = this.scenario.getConfig().getModule(AccessibilityConfigGroup.GROUP_NAME);
+		if (m instanceof AccessibilityConfigGroup) {
+			return (AccessibilityConfigGroup) m;
 		}
-		AccessibilityConfigModule apcm = new AccessibilityConfigModule();
-		this.scenario.getConfig().getModules().put(AccessibilityConfigModule.GROUP_NAME, apcm);
+		AccessibilityConfigGroup apcm = new AccessibilityConfigGroup();
+		this.scenario.getConfig().getModules().put(AccessibilityConfigGroup.GROUP_NAME, apcm);
 		return apcm;
 	}
 	

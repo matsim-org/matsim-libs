@@ -23,8 +23,8 @@
 package org.matsim.contrib.matsim4opus.config;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigModule;
-import org.matsim.contrib.matsim4opus.config.modules.ImprovedPseudoPtConfigModule;
+import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigGroup;
+import org.matsim.contrib.matsim4opus.config.modules.ImprovedPseudoPtConfigGroup;
 import org.matsim.contrib.matsim4opus.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4opus.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4opus.utils.io.Paths;
@@ -47,33 +47,33 @@ public class M4UConfigConsistencyChecker implements ConfigConsistencyChecker {
 		@SuppressWarnings("unused")
 		UrbanSimParameterConfigModuleV3 urbansimParameterModule = (UrbanSimParameterConfigModuleV3) config.getModule(UrbanSimParameterConfigModuleV3.GROUP_NAME ) ;
 		@SuppressWarnings("unused")
-		AccessibilityConfigModule accessibilityConfigModule = M4UAccessibilityConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
-		ImprovedPseudoPtConfigModule ippcm = M4UImprovedPseudoPtConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
+		AccessibilityConfigGroup accessibilityConfigModule = M4UAccessibilityConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
+		ImprovedPseudoPtConfigGroup ippcm = M4UImprovedPseudoPtConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
 		
 		if ( ippcm.isUsingTravelTimesAndDistances() ) {
 			if ( !ippcm.isUsingPtStops() ) {
 			problem = true ;
 			log.error("As far as I understand, improved pseudo pt will not work when pt stops are switched off.  There is no obvious conceptual " +
 					"reason for this; it is just how it is currently implemented.  Either switch off " 
-					+ ImprovedPseudoPtConfigModule.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH + " or switch on " 
-					+ ImprovedPseudoPtConfigModule.PT_STOPS + " plus provide a pt stops file.  Aborting ...") ;
+					+ ImprovedPseudoPtConfigGroup.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH + " or switch on " 
+					+ ImprovedPseudoPtConfigGroup.PT_STOPS + " plus provide a pt stops file.  Aborting ...") ;
 			}
 		}
 		
 		if ( ippcm.isUsingPtStops() ) {
 			if ( !ippcm.getPtStopsInputFile().isEmpty() && !Paths.pathExsits( ippcm.getPtStopsInputFile() )) {
 				problem = true ;
-				log.error( ImprovedPseudoPtConfigModule.PT_STOPS_SWITCH + " is set to true but pt stops file not found.  Aborting ... ") ;
+				log.error( ImprovedPseudoPtConfigGroup.PT_STOPS_SWITCH + " is set to true but pt stops file not found.  Aborting ... ") ;
 			}
 			
 			if ( ippcm.isUsingTravelTimesAndDistances() ) {
 				if ( !ippcm.getPtTravelTimesInputFile().isEmpty() && !Paths.pathExsits( ippcm.getPtTravelTimesInputFile() )) {
 					problem = true ;
-					log.error( ImprovedPseudoPtConfigModule.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH + " is set to true but pt travel times file not found.  Aborting ... ") ;
+					log.error( ImprovedPseudoPtConfigGroup.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH + " is set to true but pt travel times file not found.  Aborting ... ") ;
 				}
 				if ( !ippcm.getPtTravelDistancesInputFile().isEmpty() && !Paths.pathExsits( ippcm.getPtTravelDistancesInputFile() )) {
 					problem = true ;
-					log.error( ImprovedPseudoPtConfigModule.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH + " is set to true but pt distances file not found.  Aborting ... ") ;
+					log.error( ImprovedPseudoPtConfigGroup.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH + " is set to true but pt distances file not found.  Aborting ... ") ;
 				}
 			}
 		}

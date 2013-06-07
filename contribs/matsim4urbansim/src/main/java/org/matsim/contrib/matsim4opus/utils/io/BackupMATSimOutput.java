@@ -9,7 +9,7 @@ import org.apache.log4j.Logger;
 import org.matsim.contrib.matsim4opus.config.ConfigurationUtils;
 import org.matsim.contrib.matsim4opus.config.M4UAccessibilityConfigUtils;
 import org.matsim.contrib.matsim4opus.config.M4UConfigUtils;
-import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigModule;
+import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigGroup;
 import org.matsim.contrib.matsim4opus.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4opus.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4opus.constants.InternalConstants;
@@ -49,7 +49,7 @@ public class BackupMATSimOutput {
 		M4UControlerConfigModuleV3 m4ucModule = M4UConfigUtils.getMATSim4UrbaSimControlerConfigAndPossiblyConvert(scenario.getConfig()) ;
 //		UrbanSimParameterConfigModuleV3 uspModule = ConfigurationUtils.getUrbanSimParameterConfigModule(scenario);
 		UrbanSimParameterConfigModuleV3 uspModule = M4UConfigUtils.getUrbanSimParameterConfigAndPossiblyConvert(scenario.getConfig()) ;
-		AccessibilityConfigModule acm = M4UAccessibilityConfigUtils.getConfigModuleAndPossiblyConvert(scenario.getConfig()) ;
+		AccessibilityConfigGroup acm = M4UAccessibilityConfigUtils.getConfigModuleAndPossiblyConvert(scenario.getConfig()) ;
 		int currentYear = uspModule.getYear();
 		
 		String saveDirectory = "run" + currentYear;

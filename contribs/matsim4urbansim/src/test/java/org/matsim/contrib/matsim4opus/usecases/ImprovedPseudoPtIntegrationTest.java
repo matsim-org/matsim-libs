@@ -27,7 +27,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.matsim4opus.config.M4UImprovedPseudoPtConfigUtils;
-import org.matsim.contrib.matsim4opus.config.modules.ImprovedPseudoPtConfigModule;
+import org.matsim.contrib.matsim4opus.config.modules.ImprovedPseudoPtConfigGroup;
 import org.matsim.contrib.matsim4opus.improvedpseudopt.MATSim4UrbanSimRouterFactoryImpl;
 import org.matsim.contrib.matsim4opus.improvedpseudopt.PtMatrix;
 import org.matsim.core.config.Config;
@@ -47,7 +47,7 @@ public class ImprovedPseudoPtIntegrationTest {
 	@Ignore
 	public void testIntegration() {
 		Config config = ConfigUtils.createConfig() ;
-		config.addModule( new ImprovedPseudoPtConfigModule() ) ;
+		config.addModule( new ImprovedPseudoPtConfigGroup() ) ;
 		
 		// modify config according to needs
 		// ...

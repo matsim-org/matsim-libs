@@ -28,8 +28,8 @@ import java.io.StringWriter;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigModule;
-import org.matsim.contrib.matsim4opus.config.modules.ImprovedPseudoPtConfigModule;
+import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigGroup;
+import org.matsim.contrib.matsim4opus.config.modules.ImprovedPseudoPtConfigGroup;
 import org.matsim.contrib.matsim4opus.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4opus.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4opus.constants.InternalConstants;
@@ -101,7 +101,7 @@ public class M4UConfigUtils {
 		
 		M4UImprovedPseudoPtConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
 		
-		AccessibilityConfigModule acm = M4UAccessibilityConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
+		AccessibilityConfigGroup acm = M4UAccessibilityConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
 //		acm.setTimeOfDay(timeOfDay) ;
 		acm.setUsingCustomBoundingBox(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isUseCustomBoundingBox());
 		acm.setBoundingBoxLeft(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().getBoundingBoxLeft());
@@ -488,7 +488,7 @@ public class M4UConfigUtils {
 		//"materialize" the local config groups:
 		config.addModule(	new UrbanSimParameterConfigModuleV3() ) ;
 		config.addModule( new M4UControlerConfigModuleV3() );
-		config.addModule(	new AccessibilityConfigModule() ) ;
+		config.addModule(	new AccessibilityConfigGroup() ) ;
 
 		// set some defaults:
 		VspExperimentalConfigGroup vsp = config.vspExperimental();

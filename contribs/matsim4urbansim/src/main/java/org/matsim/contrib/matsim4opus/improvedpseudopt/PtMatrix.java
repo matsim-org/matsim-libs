@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.matsim4opus.config.modules.ImprovedPseudoPtConfigModule;
+import org.matsim.contrib.matsim4opus.config.modules.ImprovedPseudoPtConfigGroup;
 import org.matsim.contrib.matsim4opus.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4opus.utils.io.HeaderParser;
 import org.matsim.contrib.matsim4opus.utils.io.TempDirectoryUtil;
@@ -74,7 +74,7 @@ public class PtMatrix {
 	private long wrnCntSkip = 0;
 	private long wrnCntParse = 0;
 	
-	public PtMatrix(Network network, Double meterPerSecWalkSpeed, Double meterPerSecPtSpeed, Double beelineDistanceFactor, ImprovedPseudoPtConfigModule ippcm){
+	public PtMatrix(Network network, Double meterPerSecWalkSpeed, Double meterPerSecPtSpeed, Double beelineDistanceFactor, ImprovedPseudoPtConfigGroup ippcm){
 
 		// get the locations for ptStops, travel times and distances from controler
 		String ptStopInputFile = ippcm.getPtStopsInputFile();
@@ -598,7 +598,7 @@ public class PtMatrix {
 		Network network = scenario.getNetwork() ;
 		// TravelTime ttc = new TravelTimeCalculator(network,60,30*3600, scenario.getConfig().travelTimeCalculator()).getLinkTravelTimes();
 		
-		ImprovedPseudoPtConfigModule module = new ImprovedPseudoPtConfigModule();
+		ImprovedPseudoPtConfigGroup module = new ImprovedPseudoPtConfigGroup();
 		// m4uccm.setPtStopsInputFile("/Users/thomas/Development/opus_home/data/brussels_zone/data/transit_csvs_from_Dimitris_20121002/underground.csv"); 	// for Brussels
 		module.setPtStopsInputFile("/Users/thomas/Development/opus_home/data/zurich_parcel/data/Matrizen__OeV/Zones_Attributes.csv");					  	// for Zurich
 		module.setPtTravelTimesInputFile("/Users/thomas/Development/opus_home/data/zurich_parcel/data/Matrizen__OeV/OeV_2007_7_8.JRT");						// for Zurich

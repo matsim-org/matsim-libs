@@ -25,7 +25,7 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.experimental.ReflectiveModule;
 
-public class AccessibilityConfigModule extends ReflectiveModule{
+public class AccessibilityConfigGroup extends ReflectiveModule{
 	// yyyy todo: change in similar way as with other modes ("_mode") 
 	
 	private static final String USING_CUSTOM_BOUNDING_BOX = "usingCustomBoundingBox";
@@ -33,7 +33,7 @@ public class AccessibilityConfigModule extends ReflectiveModule{
 	private static final String BOUNDING_BOX_BOTTOM = "boundingBoxBottom";
 
 	@SuppressWarnings("unused")
-	private static Logger log = Logger.getLogger( AccessibilityConfigModule.class ) ;
+	private static Logger log = Logger.getLogger( AccessibilityConfigGroup.class ) ;
 
 	public static final String GROUP_NAME = "accessibility";
 	
@@ -123,7 +123,7 @@ public class AccessibilityConfigModule extends ReflectiveModule{
 	public static final String TIME_OF_DAY = "timeOfDay";
 	private Double timeOfDay = 8.*3600 ;
 
-	public AccessibilityConfigModule() {
+	public AccessibilityConfigGroup() {
 		super(GROUP_NAME);
 		// this class feels quite dangerous to me; one can have inconsistent entries between the Map and the typed values. kai, apr'13
 		// no longer.  kai, may'13

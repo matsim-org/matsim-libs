@@ -28,7 +28,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigModule;
+import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -49,7 +49,7 @@ public class AccessibilityIntegrationTest {
 	public void testWithBoundingBox() {
 		Config config = ConfigUtils.createConfig() ;
 
-		final AccessibilityConfigModule acm = new AccessibilityConfigModule();
+		final AccessibilityConfigGroup acm = new AccessibilityConfigGroup();
 		config.addModule( acm ) ;
 		acm.setUsingCustomBoundingBox(true) ;
 		acm.setBoundingBoxBottom(0.) ;// yyyyyy todo
@@ -89,7 +89,7 @@ public class AccessibilityIntegrationTest {
 	public void testWithExtentDeterminedByNetwork() {
 		Config config = ConfigUtils.createConfig() ;
 
-		final AccessibilityConfigModule acm = new AccessibilityConfigModule();
+		final AccessibilityConfigGroup acm = new AccessibilityConfigGroup();
 		config.addModule( acm ) ;
 		acm.setCellBasedAccessibilityNetwork(true) ;
 		
@@ -126,7 +126,7 @@ public class AccessibilityIntegrationTest {
 	public void testWithExtentDeterminedShapeFile() {
 		Config config = ConfigUtils.createConfig() ;
 
-		final AccessibilityConfigModule acm = new AccessibilityConfigModule();
+		final AccessibilityConfigGroup acm = new AccessibilityConfigGroup();
 		config.addModule( acm ) ;
 		acm.setCellBasedAccessibilityShapeFile(true);
 		acm.setShapeFileCellBasedAccessibility("") ; // yyyyyy todo

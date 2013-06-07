@@ -30,7 +30,7 @@ import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.matsim4opus.config.modules.ImprovedPseudoPtConfigModule;
+import org.matsim.contrib.matsim4opus.config.modules.ImprovedPseudoPtConfigGroup;
 import org.matsim.contrib.matsim4opus.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4opus.improvedpseudopt.PtMatrix;
 import org.matsim.contrib.matsim4opus.utils.CreateTestNetwork;
@@ -85,7 +85,7 @@ public class PtMatrixTest extends MatsimTestCase{
 		Network network = CreateTestNetwork.createTestNetwork();			// creates a dummy network
 		String location = CreateTestNetwork.createTestPtStationCSVFile();	// creates a dummy csv file with pt stops fitting into the dummy network
 		
-		ImprovedPseudoPtConfigModule module = new ImprovedPseudoPtConfigModule();
+		ImprovedPseudoPtConfigGroup module = new ImprovedPseudoPtConfigGroup();
 		module.setPtStopsInputFile(location);								// this is to be compatible with real code
 
 		// call and init the pt matrix
@@ -184,7 +184,7 @@ public class PtMatrixTest extends MatsimTestCase{
 		String timesLocation = CreateTestNetwork.createTestPtTravelTimesAndDistancesCSVFile();	// creates a dummy csv file with pt travel times fitting into the dummy network
 		String distancesLocation = CreateTestNetwork.createTestPtTravelTimesAndDistancesCSVFile();	// creates a dummy csv file with pt travel distances fitting into the dummy network
 		
-		ImprovedPseudoPtConfigModule module = new ImprovedPseudoPtConfigModule();
+		ImprovedPseudoPtConfigGroup module = new ImprovedPseudoPtConfigGroup();
 		module.setPtStopsInputFile(stopsLocation);								// this is to be compatible with real code
 		module.setPtTravelTimesInputFile(timesLocation);						// this is to be compatible with real code
 		module.setPtTravelDistancesInputFile(distancesLocation);				// this is to be compatible with real code

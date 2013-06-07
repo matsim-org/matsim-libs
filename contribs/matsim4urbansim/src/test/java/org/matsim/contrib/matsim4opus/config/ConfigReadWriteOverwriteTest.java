@@ -33,8 +33,8 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigModule;
-import org.matsim.contrib.matsim4opus.config.modules.ImprovedPseudoPtConfigModule;
+import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigGroup;
+import org.matsim.contrib.matsim4opus.config.modules.ImprovedPseudoPtConfigGroup;
 import org.matsim.contrib.matsim4opus.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4opus.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4opus.utils.CreateTestExternalMATSimConfig;
@@ -299,8 +299,8 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 		// MATSim4UrbanSim Controler Config Module Settings
 		///////////////////////////////////////////////////
 		M4UControlerConfigModuleV3 matsim4UrbanSimControlerModule = M4UConfigUtils.getMATSim4UrbaSimControlerConfigAndPossiblyConvert(config) ;
-		AccessibilityConfigModule acm = M4UAccessibilityConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
-		ImprovedPseudoPtConfigModule ippcm = M4UImprovedPseudoPtConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
+		AccessibilityConfigGroup acm = M4UAccessibilityConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
+		ImprovedPseudoPtConfigGroup ippcm = M4UImprovedPseudoPtConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
 		
 		// time of day
 		Assert.assertTrue( acm.getTimeOfDay() == externalTestConfig.timeOfDay );

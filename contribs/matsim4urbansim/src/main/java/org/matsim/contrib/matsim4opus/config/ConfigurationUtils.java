@@ -20,17 +20,17 @@
 package org.matsim.contrib.matsim4opus.config;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigModule;
+import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigGroup;
 import org.matsim.contrib.matsim4opus.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4opus.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.core.config.Module;
 
 public class ConfigurationUtils {
 	
-	public static AccessibilityConfigModule getAccessibilityParameterConfigModule(Scenario scenario){
-		Module m = scenario.getConfig().getModule(AccessibilityConfigModule.GROUP_NAME);
-		if (m instanceof AccessibilityConfigModule) {
-			return (AccessibilityConfigModule) m;
+	public static AccessibilityConfigGroup getAccessibilityParameterConfigModule(Scenario scenario){
+		Module m = scenario.getConfig().getModule(AccessibilityConfigGroup.GROUP_NAME);
+		if (m instanceof AccessibilityConfigGroup) {
+			return (AccessibilityConfigGroup) m;
 		}
 		return null;
 	}

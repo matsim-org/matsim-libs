@@ -12,7 +12,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.matsim4opus.config.ConfigurationUtils;
-import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigModule;
+import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigGroup;
 import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
 import org.matsim.contrib.matsim4opus.gis.Zone;
 import org.matsim.contrib.matsim4opus.gis.ZoneLayer;
@@ -166,7 +166,7 @@ public class AccessibilityControlerListenerImpl{
 	 */
 	final void initAccessibilityParameter(Scenario scenario){
 		
-		AccessibilityConfigModule moduleAPCM = ConfigurationUtils.getAccessibilityParameterConfigModule(scenario);
+		AccessibilityConfigGroup moduleAPCM = ConfigurationUtils.getAccessibilityParameterConfigModule(scenario);
 		
 		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = scenario.getConfig().planCalcScore() ;
 		
