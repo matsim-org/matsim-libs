@@ -21,23 +21,23 @@ package playground.thibautd.socnetsim.cliques.replanning.modules.jointtripinsert
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
-import org.matsim.core.router.MainModeIdentifierImpl;
+import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.TripStructureUtils.Trip;
 
 import playground.thibautd.socnetsim.cliques.config.JointTripInsertorConfigGroup;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
-import playground.thibautd.utils.RoutingUtils;
 
 /**
  * @author thibautd
@@ -96,49 +96,31 @@ public class JointTripInsertorAndRemoverAlgorithm implements GenericPlanAlgorith
 			final Collection<Id> agentsToIgnore) {
 		int countPassengers = 0;
 		int countEgoists = 0;
+
+		final CompositeStageActivityTypes stageTypes = new CompositeStageActivityTypes();
+		stageTypes.addActivityTypes( tripRouter.getStageActivityTypes() );
+		stageTypes.addActivityTypes( JointActingTypes.JOINT_STAGE_ACTS );
+
 		for (Plan indivPlan : plan.getIndividualPlans().values()) {
 			if ( agentsToIgnore.contains( indivPlan.getPerson().getId() ) ) continue;
-			List<PlanElement> struct =
-					RoutingUtils.tripsToLegs(
-							indivPlan,
-							tripRouter.getStageActivityTypes(),
-							new MainModeIdentifierImpl());
+
 			// parse trips, and count "egoists" (non-driver non-passenger) and
 			// passengers. Some care is needed: joint trips are not identified as
 			// trips by the router!
-			boolean first = true;
-			boolean isPassenger = false;
-			boolean isDriver = false;
-			for (PlanElement pe : struct) {
-				if (first) {
-					first = false;
-				}
-				else if (pe instanceof Activity) {
-					if (JointActingTypes.JOINT_STAGE_ACTS.isStageActivity( ((Activity) pe).getType() )) {
-						// skip
-					}
-					else if (isPassenger) {
-						countPassengers++;
-						isPassenger = false;
-					}
-					else if (isDriver) {
-						isDriver = false;
-					}
-					else {
-						countEgoists++;
-					}
-				}
-				else if ( ((Leg) pe).getMode().equals( JointActingTypes.PASSENGER ) ) {
-					isPassenger = true;
-				}
-				else if ( ((Leg) pe).getMode().equals( JointActingTypes.DRIVER ) ) {
-					isDriver = true;
-				}
+			for ( Trip trip : TripStructureUtils.getTrips( indivPlan , stageTypes ) ) {
+				if ( tripContainsOneOfThoseModes( trip , Collections.singleton( JointActingTypes.PASSENGER ) ) ) countPassengers++;
+				if ( tripContainsOneOfThoseModes( trip , JointActingTypes.JOINT_MODES ) ) countEgoists++;
 			}
 		}
 
 		return ((double) countPassengers) / (countEgoists + countPassengers);
 	}
 
+	private static boolean tripContainsOneOfThoseModes(final Trip trip, final Collection<String> modes) {
+		for ( Leg leg : trip.getLegsOnly() ) {
+			if ( modes.contains( leg.getMode() ) ) return true;
+		}
+		return false;
+	}
 }
 
