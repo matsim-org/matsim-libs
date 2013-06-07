@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -44,9 +43,6 @@ import playground.thibautd.utils.RoutingUtils;
  * @author thibautd
  */
 public class JointTripInsertorAndRemoverAlgorithm implements GenericPlanAlgorithm<JointPlan> {
-	private static final Logger log =
-		Logger.getLogger(JointTripInsertorAndRemoverAlgorithm.class);
-
 	private final TripRouter tripRouter;
 	private final Random random;
 	private final JointTripInsertorAlgorithm insertor;
@@ -60,6 +56,7 @@ public class JointTripInsertorAndRemoverAlgorithm implements GenericPlanAlgorith
 			final Random random) {
 		this( config , tripRouter , random , false );
 	}
+
 	public JointTripInsertorAndRemoverAlgorithm(
 			final Config config,
 			final TripRouter tripRouter,
@@ -77,22 +74,19 @@ public class JointTripInsertorAndRemoverAlgorithm implements GenericPlanAlgorith
 
 	@Override
 	public void run(final JointPlan plan) {
-		if (log.isTraceEnabled()) log.trace( "handling plan "+plan );
 		final List<Id> agentsToIgnore = new ArrayList<Id>();
-		ActedUponInformation actedUpon = null;
 
 		do {
-			if ( random.nextDouble() < getProbRemoval( plan , agentsToIgnore )) {
-				actedUpon = remover.run( plan , agentsToIgnore );
-				if (log.isTraceEnabled()) log.trace( "removal: "+actedUpon );
-			}
-			else {
-				actedUpon = insertor.run( plan , agentsToIgnore );
-				if (log.isTraceEnabled()) log.trace( "insertion: "+actedUpon );
-			}
+			final ActedUponInformation actedUpon =
+					random.nextDouble() < getProbRemoval( plan , agentsToIgnore ) ?
+						remover.run( plan , agentsToIgnore ) :
+						insertor.run( plan , agentsToIgnore );
 
 			if (actedUpon == null) return;
+			assert !agentsToIgnore.contains( actedUpon.getDriverId() ) : actedUpon+" <- "+agentsToIgnore;
 			agentsToIgnore.add( actedUpon.getDriverId() );
+
+			assert !agentsToIgnore.contains( actedUpon.getPassengerId() ) : actedUpon+" <- "+agentsToIgnore;
 			agentsToIgnore.add( actedUpon.getPassengerId() );
 		} while ( iterative );
 	}
