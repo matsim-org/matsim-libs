@@ -21,25 +21,18 @@
 package playground.mmoyo.utils.calibration;
 
 import java.io.File;
-import org.matsim.api.core.v01.Coord;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.Time;
-import org.matsim.core.config.ConfigUtils;
 
 import playground.mmoyo.Validators.PlanValidator;
 import playground.mmoyo.algorithms.PersonClonner;
@@ -116,10 +109,10 @@ public class OverDemandPlanCreator {
 			networkFile = args[1];
 		}else{
 			String[] popFilePathArray = new String[0];
-			popFilePathArray[0]= "../../input/ro/routedPlan_walk6.0_dist0.0_tran1200.0.xml.gz";
-			popFilePathArray[1]= "../../input/ro/routedPlan_walk8.0_dist0.5_tran720.0.xml.gz";
-			popFilePathArray[2]= "../../input/ro/routedPlan_walk10.0_dist0.0_tran240.0.xml.gz";
-			networkFile = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
+			popFilePathArray[0]= "../../";
+			popFilePathArray[1]= "../../";
+			popFilePathArray[2]= "../../";
+			networkFile = "../../";
 		}
 		
 		DataLoader dataLoader = new DataLoader();

@@ -38,12 +38,15 @@ public class AnalysisLauncher {
 	public static void main(String[] args) {
 		String configFile;
 		String eventFileName;
+		boolean doStopZoneConversion;
 		if (args.length>0){
 			configFile=args[0];
 			eventFileName=args[1];
+			doStopZoneConversion = Boolean.parseBoolean(args[2]);
 		}else{
 			configFile= "";
 			eventFileName = "";	
+			doStopZoneConversion= false;
 		}
 		
 		//load calibrated lines and TimeBinSize from config
@@ -66,7 +69,7 @@ public class AnalysisLauncher {
 		//write kml file 
 		Controler controler = new Controler(config);
 		KMZPtCountSimComparisonWriter kmzPtCountSimComparisonWritter = new KMZPtCountSimComparisonWriter (controler);
-		kmzPtCountSimComparisonWritter.write(occupancyAnalyzerAllDay.getOccuAnalyzer(), itNum);
+		kmzPtCountSimComparisonWritter.write(occupancyAnalyzerAllDay.getOccuAnalyzer(), itNum, doStopZoneConversion);
 	}
 
 }

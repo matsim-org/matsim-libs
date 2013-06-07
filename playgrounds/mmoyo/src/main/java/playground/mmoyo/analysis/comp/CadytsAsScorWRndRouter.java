@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mmoyo.randomizerPtRouter;
+package playground.mmoyo.analysis.comp;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
@@ -50,11 +50,10 @@ import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
-
-import playground.mmoyo.analysis.stopZoneOccupancyAnalysis.CtrlListener4configurableOcuppAnalysis;
 import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterTravelTimeAndDisutility3;
 
-public class CadytsScoringFunctionAndRndRouterLauncher {
+
+public class CadytsAsScorWRndRouter {
 
 	private static TransitRouterFactory createRandomizedTransitRouterFactory (final PreparedTransitSchedule preparedSchedule, final TransitRouterConfig trConfig, final TransitRouterNetwork routerNetwork){
 		return 
@@ -113,7 +112,7 @@ public class CadytsScoringFunctionAndRndRouterLauncher {
 		final Scenario scn = ScenarioUtils.loadScenario(config);
 		final Controler controler = new Controler(scn);
 		controler.setOverwriteFiles(true) ;
-		
+
 		//create cadyts context
 		CadytsPtConfigGroup ccc = new CadytsPtConfigGroup() ;
 		config.addModule(CadytsPtConfigGroup.GROUP_NAME, ccc) ;
@@ -125,7 +124,7 @@ public class CadytsScoringFunctionAndRndRouterLauncher {
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
 				final CadytsPtPlanChanger planSelector = new CadytsPtPlanChanger(scenario2, cContext);
-//				planSelector.setCadytsWeight(0.0) ;
+				//planSelector.setCadytsWeight(0.0) ;   // <-set it to zero if only cadyts scores
 				return new PlanStrategyImpl(planSelector);
 			}
 		} ) ;
@@ -145,8 +144,7 @@ public class CadytsScoringFunctionAndRndRouterLauncher {
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
-				//scoringFunctionAccumulator.setId(plan.getPerson().getId().toString());
-				
+
 				final CadytsPtScoring scoringFunction = new CadytsPtScoring(plan,config, cContext);
 				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight) ;
 				scoringFunctionAccumulator.addScoringFunction(scoringFunction );
@@ -154,7 +152,6 @@ public class CadytsScoringFunctionAndRndRouterLauncher {
 				return scoringFunctionAccumulator;
 			}
 		}) ;
-		
 		
 		//create and set the factory for rndizedRouter 
 		final TransitSchedule routerSchedule = controler.getScenario().getTransitSchedule();
@@ -165,13 +162,36 @@ public class CadytsScoringFunctionAndRndRouterLauncher {
 		TransitRouterFactory randomizedTransitRouterFactory = createRandomizedTransitRouterFactory (preparedSchedule, trConfig, routerNetwork);
 		controler.setTransitRouterFactory(randomizedTransitRouterFactory);
 		
-		//add analyzer for specific bus line and stop Zone conversion
-		CtrlListener4configurableOcuppAnalysis ctrlListener4configurableOcuppAnalysis = new CtrlListener4configurableOcuppAnalysis(controler);
-		ctrlListener4configurableOcuppAnalysis.setStopZoneConversion(true); 
-		controler.addControlerListener(ctrlListener4configurableOcuppAnalysis);  
 		
-	
+		///controler listener to write object attributes each 10 iterations.  They are obtained from plan's custom attributes
+//		controler.addControlerListener(new IterationEndsListener() {
+//			final String strPlan = "plan";
+//			
+//			@Override
+//			public void notifyIterationEnds(IterationEndsEvent event) {
+//				if ( event.getIteration()%10==0  && event.getIteration()>0){
+//					ObjectAttributes attrs = new ObjectAttributes() ;
+//					
+//					Population pop = event.getControler().getPopulation() ;
+//					for ( Person person : pop.getPersons().values() ) {
+//						int cnt = 0 ;
+//						for ( Plan plan : person.getPlans() ) {
+//							Double cadytsCorrection = 0. ;
+//							if ( plan.getCustomAttributes() != null ) {
+//								cadytsCorrection = (Double) plan.getCustomAttributes().get(CadytsPtPlanChanger.CADYTS_CORRECTION) ;
+//								attrs.putAttribute( person.getId().toString() , strPlan  + Integer.toString(cnt) , cadytsCorrection) ;
+//							}
+//							//System.err.println( " personId: " + person.getId() + " planScore: " + plan.getScore()  + " cadytsCorrection: " + cadytsCorrection ) ; 
+//							cnt++ ;
+//						}
+//					}
+//					OutputDirectoryHierarchy hhh = event.getControler().getControlerIO() ;
+//					new ObjectAttributesXmlWriter(attrs).writeFile(hhh.getIterationFilename(event.getIteration(), "cadytsCorrections.xml") ) ;					
+//				}
+//			}
+//		}) ;
+
 		controler.run();
-	}
+	} 
 
 }

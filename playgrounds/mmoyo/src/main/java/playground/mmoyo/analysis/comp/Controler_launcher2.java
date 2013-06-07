@@ -21,7 +21,11 @@
 package playground.mmoyo.analysis.comp;
 
 import org.matsim.api.core.v01.Scenario;
-//import org.matsim.contrib.cadyts.pt.CadytsPtPlanStrategy;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.cadyts.pt.CadytsContext;
+import org.matsim.contrib.cadyts.pt.CadytsPtConfigGroup;
+import org.matsim.contrib.cadyts.pt.CadytsPtPlanChanger;
+import org.matsim.contrib.cadyts.pt.CadytsPtScoring;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -31,49 +35,109 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionAccumulator;
+import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
+import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
+import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
-import playground.mmoyo.utils.calibration.NullifyingScoringFunctionFactory;
+import playground.mmoyo.analysis.stopZoneOccupancyAnalysis.CtrlListener4configurableOcuppAnalysis;
 
+/**
+ * launches Cadyts as scoring function, no more 
+ */
 public class Controler_launcher2 {
 	
 	public static void main(String[] args) {
-		String configFile; 
-		if (args.length>0){
-			configFile = args[0];
+		String configFile ;
+		final double cadytsScoringWeight;
+		String strDoStzopZoneConversion;
+		
+		if(args.length==0){
+			configFile = "../../";
+			cadytsScoringWeight = 0.0;
+			strDoStzopZoneConversion = "false";
 		}else{
-			configFile = "../../ptManuel/calibration/my_config.xml";
+			configFile = args[0];
+			cadytsScoringWeight = Double.parseDouble(args[1]);
+			strDoStzopZoneConversion = args[2];
 		}
-
-		Config config = null;
-		config = ConfigUtils.loadConfig(configFile);
+		
+		final Config config = ConfigUtils.loadConfig(configFile) ;
+		
+		configFile= null; //M
+		
+		//final double beta=30. ;
+		//config.planCalcScore().setBrainExpBeta(beta) ;
 		
 		int lastStrategyIdx = config.strategy().getStrategySettings().size() ;
+		if ( lastStrategyIdx >= 1 ) {
+			throw new RuntimeException("remove all strategy settings from config; should be done here") ;
+		}
 		
+		//strategies settings
+		{ //cadyts
 		StrategySettings stratSets = new StrategySettings(new IdImpl(lastStrategyIdx+1));
 		stratSets.setModuleName("myCadyts");
 		stratSets.setProbability(1.0);
 		config.strategy().addStrategySettings(stratSets);
-		
-		
-		final Controler controler = new Controler(config);
-		controler.setOverwriteFiles(true);
-		
-
-//		 controler.addPlanStrategyFactory("myCadyts", new PlanStrategyFactory()
-//		    {
-//		      public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
-//		        CadytsPtPlanStrategy cadytsPlanStrategy = new CadytsPtPlanStrategy(scenario, eventsManager);
-//		        controler.addControlerListener(cadytsPlanStrategy);
-//		        return cadytsPlanStrategy;
-//		      }
-//		    });
-		
-		
-		//add nullifying scoring for effective brute force
-		if (Boolean.parseBoolean(config.getParam("cadytsPt", "useBruteForce"))){
-			controler.setScoringFunctionFactory(new NullifyingScoringFunctionFactory());
 		}
 		
+		//set the controler
+		final Scenario scn = ScenarioUtils.loadScenario(config);
+		final Controler controler = new Controler(scn);
+		controler.setOverwriteFiles(true) ;
+
+		//create cadyts context
+		CadytsPtConfigGroup ccc = new CadytsPtConfigGroup() ;
+		config.addModule(CadytsPtConfigGroup.GROUP_NAME, ccc) ;
+		final CadytsContext cContext = new CadytsContext( config ) ;
+		controler.addControlerListener(cContext) ;
+		
+		//set cadyts as strategy for plan selector
+		controler.addPlanStrategyFactory("myCadyts", new PlanStrategyFactory() {
+			@Override
+			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
+				final CadytsPtPlanChanger planSelector = new CadytsPtPlanChanger(scenario2, cContext);
+				// planSelector.setCadytsWeight(0.0) ;   // <-set it to zero if only cadyts scores are desired
+				return new PlanStrategyImpl(planSelector);
+			}
+		} ) ;
+		
+
+		//set scoring functions
+		final CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(config.planCalcScore()); //M
+		
+		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
+			@Override
+			public ScoringFunction createNewScoringFunction(Plan plan) {
+				//if (params == null) {																			//<- see comment about performance improvement in 
+				//	params = new CharyparNagelScoringParameters(config.planCalcScore()); //org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.createNewScoringFunction
+				//}
+
+				ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
+//				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
+//				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
+				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
+
+				final CadytsPtScoring scoringFunction = new CadytsPtScoring(plan,config, cContext);
+				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight) ;
+				scoringFunctionAccumulator.addScoringFunction(scoringFunction );
+ 
+				return scoringFunctionAccumulator;
+			}
+		}) ;
+		
+		//add analyzer for specific bus line
+		CtrlListener4configurableOcuppAnalysis ctrlListener4configurableOcuppAnalysis = new CtrlListener4configurableOcuppAnalysis(controler);
+		final boolean doStopZoneConversion = Boolean.parseBoolean(strDoStzopZoneConversion);
+		strDoStzopZoneConversion= null;
+		ctrlListener4configurableOcuppAnalysis.setStopZoneConversion(doStopZoneConversion);
+		controler.addControlerListener(ctrlListener4configurableOcuppAnalysis);
+
 		controler.run();
 	} 
 }

@@ -17,32 +17,30 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mmoyo.taste_variations;
+package playground.mmoyo.utils.calibration;
 
-import java.util.Map;
+import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-
-public class SVDScoringfunctionFactory implements ScoringFunctionFactory {
-	private final Map <Id, SVDvalues> svdValuesMap;
-	private final Network net;
-	private final TransitSchedule schedule;
+public class NullifyingBasicScoringFunction implements BasicScoring {
+	protected double score;
+	protected double startTime;
 	
-	public SVDScoringfunctionFactory(final Map <Id, SVDvalues> svdValuesMap, final Network net, final TransitSchedule schedule) {
-		this.svdValuesMap = svdValuesMap;
-		this.net = net; 
-		this.schedule = schedule;
-	}
-	
+	public NullifyingBasicScoringFunction() {}
+
 	@Override
-	public ScoringFunction createNewScoringFunction(final Plan plan) {
-		final SVDvalues svdValues = svdValuesMap.get(plan.getPerson().getId());
-		ScoringFunction svdScoringFunction = new SVDscoring(plan, svdValues, net, schedule);
-		return svdScoringFunction;
+	public void finish() {
+		score=0.0;
 	}
+
+	@Override
+	public double getScore() {
+		return 0.0;
+	}
+
+	@Override
+	public void reset() {
+		score= 0.0;
+	}
+	
+	
 }

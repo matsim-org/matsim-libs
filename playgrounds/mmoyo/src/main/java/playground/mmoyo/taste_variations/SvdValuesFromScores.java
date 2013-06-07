@@ -32,57 +32,54 @@ import playground.mmoyo.io.PopSecReader;
 import playground.mmoyo.utils.DataLoader;
 
 /**
- * This class avoids manual works by automatically: 
- * 	-reading txt file with utlcorrection, 
+ * 	-reads txt file with utl correction, 
  * -assign it to persons, 
  * -svd calculation of travel parameters
- * -launch the svd scoring based simualtion 
- *
+ * 
+ * -if you want to calculate svd values directly from scores use class MySVDCalculatior
  */
 
-public class SvdValuesFromUtlTxtFile {
+public class SvdValuesFromScores {
 
 	public static void main(String[] args) {
 		String inputUtlCorrectionsFile;
-		String configFile;		
+		String configFile;
 		if (args.length>0){
 			configFile = args[0];
 			inputUtlCorrectionsFile = args[1];
 		}else{
-			configFile = "../../ptManuel/calibration/my_config2.xml";
-			//inputUtlCorrectionsFile = "../../input/choiceM44/10plans/10corrections.txt";
+			configFile = "../../";
+			inputUtlCorrectionsFile = "../../";
 		}
 
-		//read utilities corrections from txt  //commented out if the plans already contain the score as utility
-		//UtilCorrectonReader2 reader= new UtilCorrectonReader2();
-		//try {
-		//	reader.readFile(inputUtlCorrectionsFile);
-		//} catch (IOException e) {
-		//	e.printStackTrace();
-		//}
-		
 		//load config
 		DataLoader loader = new DataLoader(); 
 		final Config config = loader.readConfig(configFile);
 		String popFile = config.plans().getInputFile();
 		String netFile = config.network().getInputFile();
 		
-		//Set utCorr to plans  
-		//SetUtl2pop setUtl2pop = new SetUtl2pop();
-		//String popWutlCorr = setUtl2pop.setUtCorrections(popFile, reader.getCorrecMap() , netFile);
-
-		//if the plans already have the correction as score
-		String popWutlCorr = popFile; 
+		//read utilities corrections from txt file and set them to plans   //comment out if the plans already contain the score as utility
+		UtilCorrectonReader2 reader= new UtilCorrectonReader2( config.strategy().getMaxAgentPlanMemorySize() );
+		try {
+			reader.readFile(inputUtlCorrectionsFile);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		SetUtl2pop setUtl2pop = new SetUtl2pop();
+		String popWutlCorr = setUtl2pop.setUtCorrections(popFile, reader.getCorrecMap() , netFile);
 		
-		//svd calculation of travel parameters and write solutions file 
+		//svd calculation of travel parameters 
 		ScenarioImpl scnWOpop = (ScenarioImpl) loader.createScenario();
 		MatsimNetworkReader matsimNetReader = new MatsimNetworkReader(scnWOpop);
 		matsimNetReader.readFile(netFile);
-		Network net = scnWOpop.getNetwork(); 		
+		Network net = scnWOpop.getNetwork();
+		matsimNetReader = null;
 		TransitSchedule schedule = loader.readTransitSchedule(config.transit().getTransitScheduleFile());
 		MySVDcalculator solver = new MySVDcalculator(net, schedule);
-		new PopSecReader(scnWOpop, solver).readFile(popWutlCorr);    //sequencial calculation
-		final String path = new File(popWutlCorr).getPath();
+		new PopSecReader(scnWOpop, solver).readFile(popWutlCorr);    //Sequential calculation
+		
+		//write solutions file in the folder where the Corrections File is
+		final String path = new File(popFile).getPath();
 		solver.writeSolutionTXT(path + "SVDSolutions.txt");   //write solutions txt file
 		final String svdSolutionXML = path + "SVDSolutions.xml.gz";
 		solver.writeSolutionObjAttr(svdSolutionXML);

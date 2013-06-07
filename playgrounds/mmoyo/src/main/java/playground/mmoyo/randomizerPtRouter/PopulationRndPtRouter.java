@@ -41,8 +41,8 @@ import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
-import playground.kai.usecases.randomizedptrouter.RandomizedTransitRouterNetworkTravelTimeAndDisutility;
 import playground.mmoyo.utils.DataLoader;
+import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterTravelTimeAndDisutility3;
 
 class PopulationRndPtRouter{ 
 	
@@ -64,7 +64,7 @@ class PopulationRndPtRouter{
 			Population population = scn.getPopulation();
 			
 			//create randomizedPtRouter and PlansCalcTransitRoute
-			TransitRouterNetworkTravelTimeAndDisutility ttCalculator = new RandomizedTransitRouterNetworkTravelTimeAndDisutility(trConfig);
+			TransitRouterNetworkTravelTimeAndDisutility ttCalculator = new RandomizedTransitRouterTravelTimeAndDisutility3(trConfig);
 			TransitRouter randomizedPtRouter = new TransitRouterImpl(trConfig, new PreparedTransitSchedule(schedule), routerNetwork, ttCalculator, ttCalculator);
 			final PlansCalcRouteConfigGroup config = scn.getConfig().plansCalcRoute();
 			final Network network = scn.getNetwork();

@@ -29,14 +29,22 @@ public class PopulationSecFilter extends AbstractPersonAlgorithm {
 		}
 	}
 
+	public List<Id> getStrIdList() {
+		return strIdList;
+	}
+	
+	public Population getNewPop() {
+		return newPop;
+	}
+	
 	public static void main(String[] args) {
-		String netFilePath = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
-		String popFilePath = "../../input/newDemand/bvg.run190.25pct.100.plans.selected.cleanedXYlinks.xml.gzNoCarPlans.xml.gzplansWtPtLegs.xml.gz";
+		String netFilePath = "../../";
+		String popFilePath = "../../";
 	
 		DataLoader dataLoader = new DataLoader();
 		ScenarioImpl scn = (ScenarioImpl) dataLoader.createScenario();
 		PopulationSecFilter populationSecFilter = new PopulationSecFilter(); 
-		populationSecFilter.strIdList.add(new IdImpl("b1050213"));
+		populationSecFilter.strIdList.add(new IdImpl("11140292"));
 		
 		PopSecReader popSecReader = new PopSecReader (scn, populationSecFilter);
 		popSecReader.readFile(popFilePath);
@@ -45,5 +53,6 @@ public class PopulationSecFilter extends AbstractPersonAlgorithm {
 		File file = new File(popFilePath);
 		PopulationWriter popWriter = new PopulationWriter(populationSecFilter.newPop, net);
 		popWriter.write(file.getParent() + "/" + file.getName() + "SecFilteredPlan.xml.gz");
-	}	
+	}
+	
 }

@@ -36,7 +36,11 @@ public class CtrlListener4configurableOcuppAnalysis implements IterationEndsList
 	
 	public CtrlListener4configurableOcuppAnalysis(final Controler controler){
 		
-		//create occupancy analyzer based on CadytsPtConfigGroup();
+		//create occupancy analyzer based on CadytsPtConfigGroup();		
+		if (!(controler.getConfig().getModule(CadytsPtConfigGroup.GROUP_NAME) instanceof org.matsim.contrib.cadyts.pt.CadytsPtConfigGroup)){
+			CadytsPtConfigGroup ccc = new CadytsPtConfigGroup() ;
+			controler.getConfig().addModule(CadytsPtConfigGroup.GROUP_NAME, ccc) ;
+		}
 		CadytsPtConfigGroup cptcg = (CadytsPtConfigGroup) controler.getConfig().getModule(CadytsPtConfigGroup.GROUP_NAME);
 		configurableOccupAnalyzer = new ConfigurableOccupancyAnalyzer( cptcg.getCalibratedLines() ,  cptcg.getTimeBinSize());
 		controler.getEvents().addHandler(configurableOccupAnalyzer);
@@ -47,7 +51,7 @@ public class CtrlListener4configurableOcuppAnalysis implements IterationEndsList
 	@Override
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
 		configurableOccupAnalyzer.reset(event.getIteration());
-		//configurableOccupAnalyzer.setStopZoneConversion(stopZoneConversion);
+		configurableOccupAnalyzer.setStopZoneConversion(stopZoneConversion);
 	}
 
 	@Override
@@ -55,7 +59,7 @@ public class CtrlListener4configurableOcuppAnalysis implements IterationEndsList
 		int it = event.getIteration();
 		Controler controler = event.getControler();
 		if (isActiveInThisIteration(it,  controler)) {
-			kmzPtCountSimComparisonWritter.write( configurableOccupAnalyzer.getOccuAnalyzer(), it);
+			kmzPtCountSimComparisonWritter.write( configurableOccupAnalyzer.getOccuAnalyzer(), it, stopZoneConversion);
 		}
 	}
 	

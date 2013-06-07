@@ -30,6 +30,7 @@ import org.apache.commons.math.linear.SingularValueDecompositionImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.PersonAlgorithm;
@@ -91,6 +92,12 @@ public class MySVDcalculator implements PersonAlgorithm{
 		return new SVDvalues (person.getId(), solution.getEntry(0), solution.getEntry(1), solution.getEntry(2), solution.getEntry(3));
 	}
 	
+	
+	final String strWwalk = "wWalk";
+	final String strWtime = "wTime";
+	final String strWdist = "wDista";
+	final String strWchng = "wChng";
+	
 	@Override
 	public void run(final Person person) {   //it assumes that the score is the utility correction!
 		double[] scores = new double[person.getPlans().size()];
@@ -99,10 +106,16 @@ public class MySVDcalculator implements PersonAlgorithm{
 		}
 		SVDvalues svdValues = this.getSVDvalues(person, scores );
 		sBuff.append(NL + svdValues.getIdAgent() + TB + svdValues.getWeight_trWalkTime() + TB + svdValues.getWeight_trTime() + TB + svdValues.getWeight_trDistance() + TB + svdValues.getWeight_changes());
-		attrs.putAttribute( person.getId().toString() , "wWalk"  , svdValues.getWeight_trWalkTime()) ;
-		attrs.putAttribute( person.getId().toString() , "wTime"  , svdValues.getWeight_trTime()) ;
-		attrs.putAttribute( person.getId().toString() , "wDista"  , svdValues.getWeight_trDistance()) ;
-		attrs.putAttribute( person.getId().toString() , "wChng"  , svdValues.getWeight_changes()) ;
+		attrs.putAttribute( person.getId().toString() , strWwalk  , svdValues.getWeight_trWalkTime()) ;
+		attrs.putAttribute( person.getId().toString() , strWtime  , svdValues.getWeight_trTime()) ;
+		attrs.putAttribute( person.getId().toString() , strWdist  , svdValues.getWeight_trDistance()) ;
+		attrs.putAttribute( person.getId().toString() , strWchng  , svdValues.getWeight_changes()) ;
+	}
+	
+	protected void run (final Population pop){
+		for(Person person: pop.getPersons().values()){
+			run(person);	
+		}
 	}
 
 	protected void writeSolutionTXT(final String outFile){
@@ -123,9 +136,9 @@ public class MySVDcalculator implements PersonAlgorithm{
 			netFilePath = args[1];
 			schdFilePath = args[2];
 		}else{
-			popFilePath = "../../runs_manuel/CalibLineM44/automCalib10xTimeMutated/10xrun/it.500/500.plans.xml.gz";
-			netFilePath = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/pt_network.xml.gz";
-			schdFilePath = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/pt_transitSchedule.xml.gz";
+			popFilePath = "../../";   //assumes that the scores are the utility correction
+			netFilePath = "../../";
+			schdFilePath = "../../";
 		}
 
 		DataLoader dataLoader = new DataLoader ();
@@ -140,7 +153,7 @@ public class MySVDcalculator implements PersonAlgorithm{
 		
 		//write solutions file
 		File file = new File(popFilePath);
-		solver.writeSolutionTXT(file.getPath() + "SVDSolutions.xls");
+		solver.writeSolutionObjAttr(file.getPath() + "SVDSolutions.xml.gz");
 	}
 
 }

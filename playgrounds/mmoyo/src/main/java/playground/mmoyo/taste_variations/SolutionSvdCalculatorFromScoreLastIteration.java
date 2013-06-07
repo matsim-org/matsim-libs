@@ -19,30 +19,33 @@
 
 package playground.mmoyo.taste_variations;
 
-import java.util.Map;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-
-public class SVDScoringfunctionFactory implements ScoringFunctionFactory {
-	private final Map <Id, SVDvalues> svdValuesMap;
-	private final Network net;
-	private final TransitSchedule schedule;
+/**
+  * Calculates and stores svd values from plans at the end of a iteration
+  */
+public class SolutionSvdCalculatorFromScoreLastIteration implements IterationEndsListener{
 	
-	public SVDScoringfunctionFactory(final Map <Id, SVDvalues> svdValuesMap, final Network net, final TransitSchedule schedule) {
-		this.svdValuesMap = svdValuesMap;
-		this.net = net; 
-		this.schedule = schedule;
+	public SolutionSvdCalculatorFromScoreLastIteration(){
+	
 	}
-	
+
 	@Override
-	public ScoringFunction createNewScoringFunction(final Plan plan) {
-		final SVDvalues svdValues = svdValuesMap.get(plan.getPerson().getId());
-		ScoringFunction svdScoringFunction = new SVDscoring(plan, svdValues, net, schedule);
-		return svdScoringFunction;
+	public void notifyIterationEnds(IterationEndsEvent event) {
+	
+		//calculate svd from scores from last iteration and iteration number 10 
+		if (   event.getIteration() == event.getControler().getConfig().controler().getLastIteration() ||  event.getIteration() ==10) {
+			System.err.println("calculating svd values.........");
+			MySVDcalculator svd = new MySVDcalculator(event.getControler().getScenario().getNetwork(), event.getControler().getScenario().getTransitSchedule() );
+			svd.run(event.getControler().getPopulation());
+			String STR_Solutions = "SVDSolutions.xml.gz";
+			String filename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), STR_Solutions);
+			svd.writeSolutionObjAttr(filename);
+			STR_Solutions = null;
+			filename = null;
+			svd = null;
+		}
 	}
+	
 }

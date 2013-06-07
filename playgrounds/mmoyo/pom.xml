@@ -19,9 +19,16 @@
   		<artifactId>cadytsIntegration</artifactId>
   		<version>0.6.0-SNAPSHOT</version>
   	</dependency>
+  	 	<dependency>
+  		<groupId>playground</groupId>
+  		<artifactId>mrieser</artifactId>
+  		<version>0.6.0-SNAPSHOT</version>
+  		<type>jar</type>
+  		<scope>compile</scope>
+  	</dependency>
   	<dependency>
   		<groupId>playground</groupId>
-  		<artifactId>kai</artifactId>
+  		<artifactId>vsp</artifactId>
   		<version>0.6.0-SNAPSHOT</version>
   		<type>jar</type>
   		<scope>compile</scope>

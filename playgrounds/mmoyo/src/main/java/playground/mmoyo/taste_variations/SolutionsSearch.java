@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mmoyo.randomizerPtRouter;
+package playground.mmoyo.taste_variations;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
@@ -34,143 +34,129 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
-import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
-import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
-import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.pt.router.PreparedTransitSchedule;
-import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
-import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.router.TransitRouterNetwork;
+import org.matsim.pt.transitSchedule.TransitScheduleImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
-
 import playground.mmoyo.analysis.stopZoneOccupancyAnalysis.CtrlListener4configurableOcuppAnalysis;
-import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterTravelTimeAndDisutility3;
+import playground.mmoyo.randomizerPtRouter.RndPtRouterFactory;
 
-public class CadytsScoringFunctionAndRndRouterLauncher {
+/**
+ * Another launcher for svd values search
+ * 1) It invokes randomized router from iteration 0 to n
+ * 2) It launches BRUTE FORCE calibration from iteration n until last iteration
+ * 3) It calculates svd values from last iteration output plan  
+ *      preferably nullify scores in config file!  for optimal brute force
+ */ 
+public class SolutionsSearch {
 
-	private static TransitRouterFactory createRandomizedTransitRouterFactory (final PreparedTransitSchedule preparedSchedule, final TransitRouterConfig trConfig, final TransitRouterNetwork routerNetwork){
-		return 
-		new TransitRouterFactory() {
-			@Override
-			public TransitRouter createTransitRouter() {
-				RandomizedTransitRouterTravelTimeAndDisutility3 ttCalculator = 
-					new RandomizedTransitRouterTravelTimeAndDisutility3(trConfig);
-				//ttCalculator.setDataCollection(DataCollection.randomizedParameters, false) ;
-				//ttCalculator.setDataCollection(DataCollection.additionInformation, false) ;
-				return new TransitRouterImpl(trConfig, preparedSchedule, routerNetwork, ttCalculator, ttCalculator);
-			}
-		};
-	}
-
+	
 	public static void main(String[] args) {
-		String configFile ;
+		String configFile;
+		final Integer rndRouterIterations;
 		final double cadytsScoringWeight;
-		if(args.length==0){
-			configFile = "../../";
-			cadytsScoringWeight = 0.0;
-		}else{
+		String strDoStzopZoneConversion;
+		
+		if (args.length > 0){
 			configFile = args[0];
-			cadytsScoringWeight = Double.parseDouble(args[1]);
+			rndRouterIterations = Integer.valueOf (args[1]);
+			cadytsScoringWeight = Double.parseDouble(args[2]);
+			strDoStzopZoneConversion = args[3];
+		}else {
+			configFile = "../../ptManuel/calibration/my_config.xml";
+			rndRouterIterations =20;
+			cadytsScoringWeight = 1.0;
+			strDoStzopZoneConversion = "false";
 		}
-		
-		final Config config = ConfigUtils.loadConfig(configFile) ;
-		final double beta=30. ;
-		
-		configFile= null; //M
-		
-		config.planCalcScore().setBrainExpBeta(beta) ;
-		
+
+		final Config config = ConfigUtils.loadConfig(configFile);
+		Scenario scn = ScenarioUtils.loadScenario(config);
+		Controler controler = new Controler(scn);
+		controler.setOverwriteFiles(true);
+		final TransitSchedule schedule = scn.getTransitSchedule();
+		final boolean doStopZoneConversion = Boolean.parseBoolean(strDoStzopZoneConversion);
+		strDoStzopZoneConversion= null;
+		configFile = null;
+
+		/////CONFIGURE STRATEGIES//////////////////////////////////////////////////////////////////////////////
 		int lastStrategyIdx = config.strategy().getStrategySettings().size() ;
 		if ( lastStrategyIdx >= 1 ) {
 			throw new RuntimeException("remove all strategy settings from config; should be done here") ;
 		}
-		
-		//strategies settings
-		{ //cadyts
-		StrategySettings stratSets = new StrategySettings(new IdImpl(lastStrategyIdx+1));
-		stratSets.setModuleName("myCadyts");
-		stratSets.setProbability(0.9);
+	
+		////////  Randomized router ///
+		{//////  set randomized router strategy/////////// 
+		StrategySettings stratSets = new StrategySettings(new IdImpl(++lastStrategyIdx));
+		stratSets.setModuleName("ReRoute");
+		stratSets.setProbability(1.0);
+		stratSets.setDisableAfter(20);
 		config.strategy().addStrategySettings(stratSets);
 		}
+		//create and set randomized router factory
+		final TransitRouterConfig trConfig = new TransitRouterConfig( config ) ;
+		final TransitRouterNetwork routerNetwork = TransitRouterNetwork.createFromSchedule(schedule, trConfig.beelineWalkConnectionDistance);
+		final PreparedTransitSchedule preparedSchedule = new PreparedTransitSchedule(schedule);
+		RndPtRouterFactory rndPtRouterFactory = new RndPtRouterFactory();
+		TransitRouterFactory randomizedTransitRouterFactory = rndPtRouterFactory.createFactory (preparedSchedule, trConfig, routerNetwork, false, false);
+		controler.setTransitRouterFactory(randomizedTransitRouterFactory);
 		
-		{ //rnd router
-		StrategySettings stratSets2 = new StrategySettings(new IdImpl(lastStrategyIdx+2));
-		stratSets2.setModuleName("ReRoute"); // 
-		stratSets2.setProbability(0.1);
-		stratSets2.setDisableAfter(400) ;
+		
+		{//////  Cadyts as plan selector//////////////// 
+		StrategySettings stratSets2 = new StrategySettings(new IdImpl(++lastStrategyIdx));
+		stratSets2.setModuleName("myCadyts");
+		stratSets2.setProbability(1.0);
 		config.strategy().addStrategySettings(stratSets2);
-		}		
-
-		//set the controler
-		final Scenario scn = ScenarioUtils.loadScenario(config);
-		final Controler controler = new Controler(scn);
-		controler.setOverwriteFiles(true) ;
-		
+		}
 		//create cadyts context
 		CadytsPtConfigGroup ccc = new CadytsPtConfigGroup() ;
 		config.addModule(CadytsPtConfigGroup.GROUP_NAME, ccc) ;
+		ccc.setPreparatoryIterations(rndRouterIterations);
+		ccc.setUseBruteForce(true);
 		final CadytsContext cContext = new CadytsContext( config ) ;
 		controler.addControlerListener(cContext) ;
-		
+
 		//set cadyts as strategy for plan selector
 		controler.addPlanStrategyFactory("myCadyts", new PlanStrategyFactory() {
-			@Override
+			
+			@Override   
 			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
 				final CadytsPtPlanChanger planSelector = new CadytsPtPlanChanger(scenario2, cContext);
-//				planSelector.setCadytsWeight(0.0) ;
+				// planSelector.setCadytsWeight(0.0) ;    // <-set it to zero if only cadyts scores are desired
 				return new PlanStrategyImpl(planSelector);
 			}
 		} ) ;
 		
 
-		//set scoring functions
-		final CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(config.planCalcScore()); //M
-		
+		//Cadyts as scoring function
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
+			
 			@Override
 			public ScoringFunction createNewScoringFunction(Plan plan) {
-				//if (params == null) {																			//<- see comment about performance improvement in 
-				//	params = new CharyparNagelScoringParameters(config.planCalcScore()); //org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.createNewScoringFunction
-				//}
-
 				ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
-				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
-				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
-				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
-				//scoringFunctionAccumulator.setId(plan.getPerson().getId().toString());
-				
 				final CadytsPtScoring scoringFunction = new CadytsPtScoring(plan,config, cContext);
 				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight) ;
 				scoringFunctionAccumulator.addScoringFunction(scoringFunction );
- 
 				return scoringFunctionAccumulator;
 			}
 		}) ;
 		
-		
-		//create and set the factory for rndizedRouter 
-		final TransitSchedule routerSchedule = controler.getScenario().getTransitSchedule();
-		final TransitRouterConfig trConfig = new TransitRouterConfig( config );
-		
-		final TransitRouterNetwork routerNetwork = TransitRouterNetwork.createFromSchedule(routerSchedule, trConfig.beelineWalkConnectionDistance);
-		final PreparedTransitSchedule preparedSchedule = new PreparedTransitSchedule(routerSchedule);
-		TransitRouterFactory randomizedTransitRouterFactory = createRandomizedTransitRouterFactory (preparedSchedule, trConfig, routerNetwork);
-		controler.setTransitRouterFactory(randomizedTransitRouterFactory);
-		
-		//add analyzer for specific bus line and stop Zone conversion
+		//add analyzer for specific bus line
 		CtrlListener4configurableOcuppAnalysis ctrlListener4configurableOcuppAnalysis = new CtrlListener4configurableOcuppAnalysis(controler);
-		ctrlListener4configurableOcuppAnalysis.setStopZoneConversion(true); 
-		controler.addControlerListener(ctrlListener4configurableOcuppAnalysis);  
+		ctrlListener4configurableOcuppAnalysis.setStopZoneConversion(doStopZoneConversion);
+		controler.addControlerListener(ctrlListener4configurableOcuppAnalysis);
+
+		//add a svd calculator as control listener to get svd values from final outputplans
+		SolutionSvdCalculatorFromScoreLastIteration svdCalculatorListener = new SolutionSvdCalculatorFromScoreLastIteration();
+		controler.addControlerListener(svdCalculatorListener);
 		
-	
 		controler.run();
 	}
 

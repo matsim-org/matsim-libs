@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * PlanCounter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,33 +17,49 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
-package playground.mmoyo.taste_variations;
-
-import java.util.Map;
+package playground.mmoyo.utils;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.scoring.ScoringFunction;
-import org.matsim.core.scoring.ScoringFunctionFactory;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.population.algorithms.PersonAlgorithm;
 
-public class SVDScoringfunctionFactory implements ScoringFunctionFactory {
-	private final Map <Id, SVDvalues> svdValuesMap;
-	private final Network net;
-	private final TransitSchedule schedule;
+import playground.mmoyo.io.PopSecReader;
+
+public class PlanCounter2 implements PersonAlgorithm {
+	private final String SEP = " ";
+	private final Id personId;
 	
-	public SVDScoringfunctionFactory(final Map <Id, SVDvalues> svdValuesMap, final Network net, final TransitSchedule schedule) {
-		this.svdValuesMap = svdValuesMap;
-		this.net = net; 
-		this.schedule = schedule;
+	public PlanCounter2(Id personId){
+		this.personId = personId;
 	}
 	
 	@Override
-	public ScoringFunction createNewScoringFunction(final Plan plan) {
-		final SVDvalues svdValues = svdValuesMap.get(plan.getPerson().getId());
-		ScoringFunction svdScoringFunction = new SVDscoring(plan, svdValues, net, schedule);
-		return svdScoringFunction;
+	public void run(Person person) {
+		if (person.getPlans().size() != 20){
+			System.out.println(person.getId() + SEP + person.getPlans().size());
+		}
 	}
+	
+	public static void main(String[] args) {
+		String popFilePath;
+		if(args.length==0){
+			popFilePath = "../../input/deleteme2/output_plans.xml.gz";
+		}else{
+			popFilePath = args[0];
+		}
+			
+		DataLoader dataLoader = new DataLoader();
+		ScenarioImpl scn = (ScenarioImpl) dataLoader.createScenario();
+		
+		Id personId = new IdImpl("11140292");
+		PlanCounter2 planCounter2 = new PlanCounter2(personId);
+		PopSecReader popSecReader = new PopSecReader (scn, planCounter2);
+		popSecReader.readFile(popFilePath);
+
+	}
+
+
+
 }

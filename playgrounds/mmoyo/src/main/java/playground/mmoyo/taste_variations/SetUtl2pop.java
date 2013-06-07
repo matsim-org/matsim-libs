@@ -29,8 +29,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.population.PersonImpl;
-
 import playground.mmoyo.utils.DataLoader;
 
 /**
@@ -38,28 +36,31 @@ import playground.mmoyo.utils.DataLoader;
   */
 
 public class SetUtl2pop {
-
+	
 	protected String setUtCorrections(String popFile, Map <Id, double[]> correcMap, String netFile){
 		//load population
 		DataLoader loader = new DataLoader();
 		Scenario sn = loader.readNetwork_Population(netFile, popFile);
 		Population pop = sn.getPopulation();
 	
-		
 		for (Person person : pop.getPersons().values()){
-			double[] correctArray = correcMap.get(person.getId());
-			int utlsNum = correctArray.length;
+			//((PersonImpl)person).setSelectedPlan(person.getPlans().get(0));
 			
-			//validation
-			if(person.getPlans().size() != utlsNum){
-				System.out.println("the number of available utilities is different to the number of plans: " + person.getId() );
-			}
-
- 			for (int i=0;i<utlsNum;i++){
-				Plan plan = person.getPlans().get(i);
-				plan.setScore(correctArray[i]); // correcMap [utl0, utl1, utl2,... utln] 
-				if(i== (int)correctArray[0]){
-					((PersonImpl)person).setSelectedPlan(plan);
+			double[] correctArray = correcMap.get(person.getId());
+			if(correctArray!=null){
+				int utlsNum = correctArray.length;
+				
+				//validation
+				if(person.getPlans().size() != utlsNum){
+					throw new RuntimeException("the number of available utilities is different to the number of plans: " + person.getId() ) ;
+				}
+				for (int i=0;i<utlsNum;i++){
+					person.getPlans().get(i).setScore(correctArray[i]);  // correcMap [utl0, utl1, utl2,... utln] 
+				}
+	 			
+			}else{
+				for(Plan plan: person.getPlans()){
+					plan.setScore(0.0);
 				}
 			}
 		}

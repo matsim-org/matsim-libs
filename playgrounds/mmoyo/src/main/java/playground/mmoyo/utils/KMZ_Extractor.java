@@ -97,7 +97,7 @@ public class KMZ_Extractor {
             outputDir = "../pruebas/src/pruebas/output/";
     	}
 
-		new KMZ_Extractor(kmzFile,outputDir).extractGraphs();
+		new KMZ_Extractor(kmzFile,outputDir).extractFile("errorGraphErrorBiasOccupancy.png");
     }
 
 }

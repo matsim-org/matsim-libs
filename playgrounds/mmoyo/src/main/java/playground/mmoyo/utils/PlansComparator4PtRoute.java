@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -12,6 +13,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -134,24 +136,27 @@ public class PlansComparator4PtRoute {
 
 	
 	public static void main(String[] args) {
-		String scheduleFilePath = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/pt_transitSchedule.xml.gz";
-		String netFilepath  = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
-		String plan1Filepath = "../../input/sep/bvgDemand/1000.plans.xml.gz";
-		String plan2Filepath = "../../input/sep/bvgDemand/1000.plans.xml.gz";
+		String scheduleFilePath = "../../";
+		String netFilepath  = "../../";
+		String planPath = "../../";
 		
 		DataLoader dataloader = new DataLoader();
 		TransitSchedule schedule = dataloader.readTransitSchedule(scheduleFilePath);
 		PlansComparator4PtRoute plansComparator4PtRoute = new PlansComparator4PtRoute(schedule);
 		
-		Population pop1 = dataloader.readNetwork_Population(netFilepath, plan1Filepath).getPopulation();
-		Population pop2 = dataloader.readNetwork_Population(netFilepath, plan2Filepath).getPopulation();
+		Population pop = dataloader.readNetwork_Population(netFilepath, planPath).getPopulation();
 		
-		final String space = " ";
-		for (Person person1 : pop1.getPersons().values()){
-			Person person2 = pop2.getPersons().get(person1.getId());
-			double similarity = plansComparator4PtRoute.getPtRouteSimilarity(person1.getSelectedPlan(), person2.getSelectedPlan());
-			if (similarity==0){
-				System.out.println (person1.getId() + space + similarity);	
+		final String tab = "\t";
+		final String strIdAgent= "M";
+		final String strPlan = "plan";
+		final Id idAgent= new IdImpl(strIdAgent);
+		Person person = pop.getPersons().get(idAgent);
+		for (int i=0; i< person.getPlans().size(); i++){
+			Plan plan_i=   person.getPlans().get(i);
+			for (int y=i+1; y< person.getPlans().size(); y++){
+				Plan plan_y=   person.getPlans().get(y);
+				double similarity = plansComparator4PtRoute.getPtRouteSimilarity(plan_i, plan_y);
+				System.out.println (strPlan + tab + i + tab +  y + tab + similarity);
 			}
 		}
 		

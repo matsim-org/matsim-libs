@@ -19,25 +19,21 @@
 
 package playground.mmoyo.analysis.stopZoneOccupancyAnalysis;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.counts.CountSimComparison;
 import org.matsim.counts.Counts;
 import org.matsim.counts.MatsimCountsReader;
 import org.matsim.pt.counts.OccupancyAnalyzer;
 import org.matsim.pt.counts.PtCountSimComparisonKMLWriter;
 
+import playground.mmoyo.utils.KMZ_Extractor;
+
 public class KMZPtCountSimComparisonWriter {
 	private static final Logger log = Logger.getLogger(KMZPtCountSimComparisonWriter.class);
 	private Counts occupCounts = new Counts();
-	private final Counts dummyCounts = new Counts();
-	private final List<CountSimComparison> dummyComparison = new ArrayList<CountSimComparison>();
 	private final Controler controler;
 	private Network net;
 	private double scalefactor;
@@ -47,6 +43,9 @@ public class KMZPtCountSimComparisonWriter {
 	final String SL = "/.";
 	final String PNT = ".";
 	final String strDONE = " done.";
+	final String S = "/";
+	final String STR_ERRPLOT = "errorGraphErrorBiasOccupancy.png";
+	final String STR_HOUROCCUPPLOT = "Occupancy-countsSimRealPerHour_1.png";
 	
 	public KMZPtCountSimComparisonWriter (final Controler controler){
 		this.controler = controler;
@@ -61,43 +60,47 @@ public class KMZPtCountSimComparisonWriter {
 	}
 
 	
-	protected void write (final OccupancyAnalyzer ocupAnalizer,  final int itNum){
+	protected void write (final OccupancyAnalyzer ocupAnalizer,  final int itNum, final boolean stopZoneConversion){
 		
 		PtCountComparisonAlgorithm4confTimeBinSize ccaOccupancy = new PtCountComparisonAlgorithm4confTimeBinSize (ocupAnalizer, occupCounts, net, scalefactor);
 		ccaOccupancy.calculateComparison(); 
 		
 		//set and use kml writter
 		Config config = controler.getConfig();
-		PtCountSimComparisonKMLWriter kmlWriter = 
-			new PtCountSimComparisonKMLWriter(dummyComparison, //no boarding
-																dummyComparison, //no alighting
-																ccaOccupancy.getComparison(), 
-																TransformationFactory.getCoordinateTransformation(config	.global().getCoordinateSystem(), TransformationFactory.WGS84), 
-																dummyCounts,   //no boarding
-																dummyCounts,  //no alighting
-																occupCounts);
+		PtCountSimComparisonKMLWriter kmlWriter = new PtCountSimComparisonKMLWriter(ccaOccupancy.getComparison(),
+				ccaOccupancy.getComparison(), ccaOccupancy.getComparison(), TransformationFactory.getCoordinateTransformation(config
+						.global().getCoordinateSystem(), TransformationFactory.WGS84), occupCounts, occupCounts,
+						occupCounts);
 		kmlWriter.setIterationNumber(itNum);
 
 		//write counts comparison
 		String kmlFile;
 		String ocuppCompTxtFile;
+		String outDir;
 		if(controler.getControlerIO()!=null){
 			kmlFile = controler.getControlerIO().getIterationFilename(itNum, kmzFile);
 			ocuppCompTxtFile = controler.getControlerIO().getIterationFilename(itNum, txtCompFile);
+			outDir = controler.getControlerIO().getIterationPath(itNum) + S; 
 		}else{  //<-it happens when this method is invoked outside a simulation run
-			String outDir = controler.getConfig().controler().getOutputDirectory() + ITERS + itNum + SL + itNum + PNT;
+			outDir = controler.getConfig().controler().getOutputDirectory() + ITERS + itNum + SL + itNum + PNT;
 			kmlFile = outDir + kmzFile;
 			ocuppCompTxtFile =  outDir + txtCompFile;
-			outDir = null;
 		}
 		kmlWriter.writeFile(kmlFile);
 		ccaOccupancy.write(ocuppCompTxtFile);
+		
+		////extract the specific plot in the iteration folder
+		String plotName=  (stopZoneConversion) ?  STR_HOUROCCUPPLOT: STR_ERRPLOT ;
+		KMZ_Extractor extractor = new KMZ_Extractor(kmlFile,outDir);
+		extractor.extractFile(plotName);   
 		log.info(kmlFile + strDONE);
 		
+		plotName= null;
+		extractor= null;
+		outDir = null;
 		kmlFile = null;
 		ccaOccupancy= null;
 		kmlWriter = null;
-		
 	}
 	
 }

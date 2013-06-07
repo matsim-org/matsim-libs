@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,41 +19,25 @@
 
 package playground.mmoyo.analysis.comp;
 
-import org.matsim.contrib.cadyts.pt.CadytsPtConfigGroup;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.otfvis.OTFVis;
 
-import playground.mmoyo.analysis.stopZoneOccupancyAnalysis.CtrlListener4configurableOcuppAnalysis;
+import playground.mmoyo.utils.DataLoader;
 
-/**
- * invokes a standard MATSim transit simulation, pt occupancy analysis is done with configurable time bin size, selected lines, per stop zone 
- */
-public class ControlerLauncher {
-	
+public class otfvis_launcher {
+
 	public static void main(String[] args) {
-		String configFile; 
-		if (args.length==1){
-			configFile = args[0];
+		String strConfigFile = "";
+		if (args.length>0){
+			strConfigFile = args[0];
 		}else{
-			configFile = "../../";
+			strConfigFile = "../../";
 		}
-
-		Config config = null;
-		config = ConfigUtils.loadConfig(configFile);
-
-		final Controler controler = new Controler(config);
-		controler.setOverwriteFiles(true);
 		
-		//add analyzer for specific bus line and stop Zone conversion
-		CadytsPtConfigGroup ccc = new CadytsPtConfigGroup() ;
-		controler.getConfig().addModule(CadytsPtConfigGroup.GROUP_NAME, ccc) ;
-		CtrlListener4configurableOcuppAnalysis ctrlListener4configurableOcuppAnalysis = new CtrlListener4configurableOcuppAnalysis(controler);
-		ctrlListener4configurableOcuppAnalysis.setStopZoneConversion(false); 
-		controler.addControlerListener(ctrlListener4configurableOcuppAnalysis);  
+		DataLoader dloader= new DataLoader();
+		Scenario scn= dloader.loadScenario(strConfigFile);
 		
-		controler.run();
-		
-	} 
+		OTFVis.playScenario(scn);
+	}
 
 }

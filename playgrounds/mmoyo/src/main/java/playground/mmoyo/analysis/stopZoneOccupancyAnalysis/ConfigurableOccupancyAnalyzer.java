@@ -72,9 +72,11 @@ class ConfigurableOccupancyAnalyzer implements 	PersonEntersVehicleEventHandler,
 			Id stopId =FacilityUtils.convertFacilitytoZoneId(event.getFacilityId());	
 			VehicleDepartsAtFacilityEvent localEvent = new VehicleDepartsAtFacilityEvent(event.getTime(), event.getVehicleId(), stopId, event.getDelay());
 			delegOccuAnalyzer.handleEvent(localEvent);
+			localEvent = null;  //try this for optimization
 		}else{
 			delegOccuAnalyzer.handleEvent(event);
 		}
+		
 	}
 
 	@Override

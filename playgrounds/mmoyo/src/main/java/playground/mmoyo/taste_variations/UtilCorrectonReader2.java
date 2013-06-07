@@ -30,22 +30,32 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileHandler;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 
-import playground.mmoyo.analysis.counts.reader.TabularCountReader;
 
 /**
- * Reads an tabular text with cadyts utility corrections per agent
+ * Reads an tabular text with Cadyts utility corrections per agent. Look at the header structure before using it!
  */
 public class UtilCorrectonReader2 implements TabularFileHandler {
-		private static final Logger log = Logger.getLogger(TabularCountReader.class);
-		private static final String[] HEADER = {"ID", "CORR1", "CORR2", "CORR3", "CORR4", "CORR5", "CORR6", "CORR7", "CORR8", "CORR9", "CORR10"};
+		private static final Logger log = Logger.getLogger(UtilCorrectonReader2.class);
+		private String[] HEADER;//  This is an example of header:{"ID", "SELIIDX", "CORR1", "CORR2", "CORR3", "CORR4", "CORR5"};
 		private final TabularFileParserConfig tabFileParserConfig;
 		private int rowNum=0;
 		final static String TB = "\t";
 		private Map <Id, double[]> correcMap = new TreeMap <Id, double[]>();  
 		
-		public UtilCorrectonReader2(){
+		public UtilCorrectonReader2(int numCorr){
 			this.tabFileParserConfig = new TabularFileParserConfig();
 			this.tabFileParserConfig.setDelimiterTags(new String[] {TB});
+			
+			//create flexible header
+			final String strCORR= "CORR";
+			int numCols= 2+ numCorr;
+			HEADER = new String[numCols];
+			HEADER[0]= "ID";
+			HEADER[1]= "SELIIDX";
+			for (int i=2; i<numCols; i++){
+				HEADER[i]= strCORR + (i-1);
+			}
+			
 		}
 		
 		public void readFile(final String tabCountFile) throws IOException {
@@ -63,7 +73,6 @@ public class UtilCorrectonReader2 implements TabularFileHandler {
 					correcArray[i]= Double.parseDouble(row[i+2]);    
 				}
 				correcMap.put(agentId, correcArray);
-				
 			}else{
 				boolean equalsHeader = true;
 				int i = 0;
@@ -94,16 +103,26 @@ public class UtilCorrectonReader2 implements TabularFileHandler {
 			if(args.length>0){
 				uiCorrectionsFile= args[0];
 			}else{
-				uiCorrectionsFile= "../../input/choiceM44/10plans/10corrections.txt"; 	
+				uiCorrectionsFile= "../../"; 	
 			}
 
 			//read utilities corrections
-			UtilCorrectonReader2 reader= new UtilCorrectonReader2();
+			UtilCorrectonReader2 reader= new UtilCorrectonReader2(5);
 			try {
 				reader.readFile(uiCorrectionsFile);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+		
+			for(Map.Entry <Id,double[]> entry: reader.getCorrecMap().entrySet() ){
+				Id key = entry.getKey();
+				double[] value = entry.getValue();
+				System.out.print("\n" + key);
+				for (int i =0;i<value.length; i++){
+					System.out.print("   " + value[i]);
+				}
+			}
+		
 		}
 		
 	}

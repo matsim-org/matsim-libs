@@ -17,9 +17,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mmoyo.randomizerPtRouter;
+package playground.mmoyo.taste_variations.oldCode;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.cadyts.pt.CadytsContext;
 import org.matsim.contrib.cadyts.pt.CadytsPtConfigGroup;
@@ -34,7 +35,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -42,136 +42,104 @@ import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
-import org.matsim.pt.router.PreparedTransitSchedule;
-import org.matsim.pt.router.TransitRouter;
-import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterFactory;
-import org.matsim.pt.router.TransitRouterImpl;
-import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
-
 import playground.mmoyo.analysis.stopZoneOccupancyAnalysis.CtrlListener4configurableOcuppAnalysis;
-import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterTravelTimeAndDisutility3;
+import playground.mmoyo.taste_variations.CadytsUtlCorrectionsCollecter;
 
-public class CadytsScoringFunctionAndRndRouterLauncher {
+public class Controler_launcher {
+	static final String TB = "\t";
+	static final String NL = "\n";
 
-	private static TransitRouterFactory createRandomizedTransitRouterFactory (final PreparedTransitSchedule preparedSchedule, final TransitRouterConfig trConfig, final TransitRouterNetwork routerNetwork){
-		return 
-		new TransitRouterFactory() {
-			@Override
-			public TransitRouter createTransitRouter() {
-				RandomizedTransitRouterTravelTimeAndDisutility3 ttCalculator = 
-					new RandomizedTransitRouterTravelTimeAndDisutility3(trConfig);
-				//ttCalculator.setDataCollection(DataCollection.randomizedParameters, false) ;
-				//ttCalculator.setDataCollection(DataCollection.additionInformation, false) ;
-				return new TransitRouterImpl(trConfig, preparedSchedule, routerNetwork, ttCalculator, ttCalculator);
-			}
-		};
-	}
-
-	public static void main(String[] args) {
-		String configFile ;
+	public static void main(String[] args)  {
+		String configFile;
 		final double cadytsScoringWeight;
-		if(args.length==0){
-			configFile = "../../";
-			cadytsScoringWeight = 0.0;
-		}else{
+		String strDoStzopZoneConversion;
+		
+		if (args.length > 0){
 			configFile = args[0];
 			cadytsScoringWeight = Double.parseDouble(args[1]);
+			strDoStzopZoneConversion = args[2];
+		}else {
+			configFile = "../../ptManuel/calibration/my_config.xml";
+			cadytsScoringWeight = 1.0;
+			strDoStzopZoneConversion = "false";
 		}
-		
-		final Config config = ConfigUtils.loadConfig(configFile) ;
-		final double beta=30. ;
-		
-		configFile= null; //M
-		
-		config.planCalcScore().setBrainExpBeta(beta) ;
-		
+
+		final Config config = ConfigUtils.loadConfig(configFile);
+		Controler controler = new Controler(config);
+		controler.setOverwriteFiles(true);
+		final Network net = controler.getNetwork();
+		final TransitSchedule schedule = controler.getScenario().getTransitSchedule();
+		final boolean doStopZoneConversion = Boolean.parseBoolean(strDoStzopZoneConversion);
+		strDoStzopZoneConversion= null;
+		configFile = null;
+
+		//////  CONFIGURE CADYTS//////////////////////////////////////////////////////
 		int lastStrategyIdx = config.strategy().getStrategySettings().size() ;
 		if ( lastStrategyIdx >= 1 ) {
 			throw new RuntimeException("remove all strategy settings from config; should be done here") ;
 		}
-		
-		//strategies settings
-		{ //cadyts
+		{ 
 		StrategySettings stratSets = new StrategySettings(new IdImpl(lastStrategyIdx+1));
 		stratSets.setModuleName("myCadyts");
-		stratSets.setProbability(0.9);
+		stratSets.setProbability(1.0);
 		config.strategy().addStrategySettings(stratSets);
 		}
-		
-		{ //rnd router
-		StrategySettings stratSets2 = new StrategySettings(new IdImpl(lastStrategyIdx+2));
-		stratSets2.setModuleName("ReRoute"); // 
-		stratSets2.setProbability(0.1);
-		stratSets2.setDisableAfter(400) ;
-		config.strategy().addStrategySettings(stratSets2);
-		}		
-
-		//set the controler
-		final Scenario scn = ScenarioUtils.loadScenario(config);
-		final Controler controler = new Controler(scn);
-		controler.setOverwriteFiles(true) ;
-		
 		//create cadyts context
 		CadytsPtConfigGroup ccc = new CadytsPtConfigGroup() ;
 		config.addModule(CadytsPtConfigGroup.GROUP_NAME, ccc) ;
 		final CadytsContext cContext = new CadytsContext( config ) ;
-		controler.addControlerListener(cContext) ;
 		
+		controler.addControlerListener(cContext) ;
 		//set cadyts as strategy for plan selector
 		controler.addPlanStrategyFactory("myCadyts", new PlanStrategyFactory() {
+			
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
 				final CadytsPtPlanChanger planSelector = new CadytsPtPlanChanger(scenario2, cContext);
-//				planSelector.setCadytsWeight(0.0) ;
+				//planSelector.setCadytsWeight(0.0) ;
 				return new PlanStrategyImpl(planSelector);
 			}
+			
 		} ) ;
 		
-
 		//set scoring functions
 		final CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(config.planCalcScore()); //M
+		//final boolean useBruteForce =Boolean.parseBoolean(config.getParam("cadytsPt", "useBruteForce")); 
+		CadytsPtConfigGroup cptcg = (CadytsPtConfigGroup) controler.getConfig().getModule(CadytsPtConfigGroup.GROUP_NAME);
+		final boolean useBruteForce = Boolean.parseBoolean(cptcg.getParams().get("useBruteForce"));
 		
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
+
 			@Override
 			public ScoringFunction createNewScoringFunction(Plan plan) {
-				//if (params == null) {																			//<- see comment about performance improvement in 
-				//	params = new CharyparNagelScoringParameters(config.planCalcScore()); //org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory.createNewScoringFunction
-				//}
-
 				ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
-				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
-				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
-				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
-				//scoringFunctionAccumulator.setId(plan.getPerson().getId().toString());
+				
+				if (!useBruteForce){
+					scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, net));
+					scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
+					scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));	
+				}
 				
 				final CadytsPtScoring scoringFunction = new CadytsPtScoring(plan,config, cContext);
 				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight) ;
 				scoringFunctionAccumulator.addScoringFunction(scoringFunction );
- 
+	 
 				return scoringFunctionAccumulator;
 			}
+			
 		}) ;
 		
+		//add svd calculator as control listener
+		CadytsUtlCorrectionsCollecter utilCollecter = new CadytsUtlCorrectionsCollecter(net, schedule);
+		controler.addControlerListener(utilCollecter);
 		
-		//create and set the factory for rndizedRouter 
-		final TransitSchedule routerSchedule = controler.getScenario().getTransitSchedule();
-		final TransitRouterConfig trConfig = new TransitRouterConfig( config );
-		
-		final TransitRouterNetwork routerNetwork = TransitRouterNetwork.createFromSchedule(routerSchedule, trConfig.beelineWalkConnectionDistance);
-		final PreparedTransitSchedule preparedSchedule = new PreparedTransitSchedule(routerSchedule);
-		TransitRouterFactory randomizedTransitRouterFactory = createRandomizedTransitRouterFactory (preparedSchedule, trConfig, routerNetwork);
-		controler.setTransitRouterFactory(randomizedTransitRouterFactory);
-		
-		//add analyzer for specific bus line and stop Zone conversion
+		//add analyzer for specific bus line
 		CtrlListener4configurableOcuppAnalysis ctrlListener4configurableOcuppAnalysis = new CtrlListener4configurableOcuppAnalysis(controler);
-		ctrlListener4configurableOcuppAnalysis.setStopZoneConversion(true); 
-		controler.addControlerListener(ctrlListener4configurableOcuppAnalysis);  
-		
-	
+		ctrlListener4configurableOcuppAnalysis.setStopZoneConversion(doStopZoneConversion);
+		controler.addControlerListener(ctrlListener4configurableOcuppAnalysis);
+
 		controler.run();
 	}
-
 }

@@ -27,6 +27,7 @@ import org.matsim.pt.PtConstants;
 public class PlanFragmenter {
 	private static final Logger log = Logger.getLogger(PlanFragmenter.class);
 	final String SEP = "_";
+	final String STRTRIP = "_trip_";
 	
 	public Population run(Population population){
 		ScenarioImpl tempScenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -71,10 +72,10 @@ public class PlanFragmenter {
 						}
 						//start new plan
 						numOfLegs=0;
-						clonPerson = new PersonImpl(new IdImpl(person.getId().toString() + SEP));
+						clonPerson = new PersonImpl(new IdImpl(person.getId().toString() + STRTRIP));
 						newPlan = new PlanImpl(clonPerson);
 						clonPerson.addPlan(newPlan);
-					}						
+					}
 					newPlan.addActivity(act);
 				}else{
 					leg = (Leg)pe;
@@ -91,7 +92,7 @@ public class PlanFragmenter {
 	*/
 	public Population plans2Persons (Population population){
 		PopulationImpl outputPopulation = new PopulationImpl((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()));
-		final String SEP = "_";
+		final String SEP = "_plan";
 		for (Person person : population.getPersons().values() ){
 			int suffix = 1;
 			for (Plan plan : person.getPlans()){
@@ -109,14 +110,13 @@ public class PlanFragmenter {
 	
 	
 	public static void main(String[] args) {
-		String populationFile = "../../runs_manuel/CalibLineM44/automCalib10xTimeMutated/10xrun/it.500/500.plans.xml.gz";
-		populationFile = "../../runs_manuel/CalibLineM44/automCalib10xTimeMutated/10xrun/it.500/500.plans.xml.gz";
-		String networkFile = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/network_multimodal.xml.gz";
-		String outputFile = "../mmoyo/output/tmp/fragmentedPlan.xml";
+		String populationFile = "../../";
+		String networkFile = "../../";
+		String outputFile = "../../";
 		
 		Scenario scenario = new DataLoader().readNetwork_Population(networkFile, populationFile );
 		
-		Population fragmPopulation = new PlanFragmenter().run(scenario.getPopulation());
+		Population fragmPopulation = new PlanFragmenter().plans2Persons(scenario.getPopulation());
 		System.out.println("writing output plan file..." + outputFile);
 		new PopulationWriter(fragmPopulation, scenario.getNetwork()).write(outputFile);
 		System.out.println("done");

@@ -17,43 +17,57 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.mmoyo.analysis.comp;
+package playground.mmoyo.randomizerPtRouter;
 
-import org.matsim.contrib.cadyts.pt.CadytsPtConfigGroup;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.router.PreparedTransitSchedule;
+import org.matsim.pt.router.TransitRouterConfig;
+import org.matsim.pt.router.TransitRouterFactory;
+import org.matsim.pt.router.TransitRouterNetwork;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import playground.mmoyo.analysis.stopZoneOccupancyAnalysis.CtrlListener4configurableOcuppAnalysis;
 
-/**
- * invokes a standard MATSim transit simulation, pt occupancy analysis is done with configurable time bin size, selected lines, per stop zone 
- */
-public class ControlerLauncher {
+public class RndPtRouterLauncher2 {
+
 	
-	public static void main(String[] args) {
-		String configFile; 
-		if (args.length==1){
-			configFile = args[0];
-		}else{
+	public static void main(final String[] args) {
+		String configFile ;
+		String srtStopZoneConversion;
+		if(args.length==0){
 			configFile = "../../";
+			srtStopZoneConversion = "";
+		}else{
+			configFile = args[0];
+			srtStopZoneConversion = "false";
 		}
-
-		Config config = null;
-		config = ConfigUtils.loadConfig(configFile);
-
-		final Controler controler = new Controler(config);
+		
+		//load data
+		Config config = ConfigUtils.loadConfig(configFile) ;
+		final Scenario scn = ScenarioUtils.loadScenario(config);
+		boolean isStopZoneConversion = Boolean.parseBoolean(srtStopZoneConversion);
+		
+		//set the controler
+		final Controler controler = new Controler(scn);
 		controler.setOverwriteFiles(true);
+
+		//create and set the factory for rndizedRouter 
+		final TransitSchedule routerSchedule = scn.getTransitSchedule();
+		final TransitRouterConfig trConfig = new TransitRouterConfig( config ) ;
+		final TransitRouterNetwork routerNetwork = TransitRouterNetwork.createFromSchedule(routerSchedule, trConfig.beelineWalkConnectionDistance);
+		final PreparedTransitSchedule preparedSchedule = new PreparedTransitSchedule(routerSchedule);
+		TransitRouterFactory rndTrRouterFactory = new RndPtRouterFactory().createFactory (preparedSchedule, trConfig, routerNetwork, true, true);
+		controler.setTransitRouterFactory(rndTrRouterFactory);
 		
 		//add analyzer for specific bus line and stop Zone conversion
-		CadytsPtConfigGroup ccc = new CadytsPtConfigGroup() ;
-		controler.getConfig().addModule(CadytsPtConfigGroup.GROUP_NAME, ccc) ;
 		CtrlListener4configurableOcuppAnalysis ctrlListener4configurableOcuppAnalysis = new CtrlListener4configurableOcuppAnalysis(controler);
-		ctrlListener4configurableOcuppAnalysis.setStopZoneConversion(false); 
+		ctrlListener4configurableOcuppAnalysis.setStopZoneConversion(isStopZoneConversion); 
 		controler.addControlerListener(ctrlListener4configurableOcuppAnalysis);  
-		
+	
 		controler.run();
-		
-	} 
+	}
 
 }
