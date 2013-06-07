@@ -50,6 +50,8 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
+import org.matsim.core.controler.PlanStrategyRegistrar.Names;
+import org.matsim.core.controler.PlanStrategyRegistrar.Selector;
 import org.matsim.core.utils.io.UncheckedIOException;
 
 /**
@@ -327,22 +329,6 @@ public class M4UConfigUtils {
 	}
 
 	/**
-	 * @param config TODO
-	 * 
-	 */
-	static StrategyConfigGroup.StrategySettings getChangeLegModeStrategySettings(Config config) {
-		Iterator<StrategyConfigGroup.StrategySettings> iter = config.strategy().getStrategySettings().iterator();
-		StrategyConfigGroup.StrategySettings setting = null;
-		while(iter.hasNext()){
-			setting = iter.next();
-			if(setting.getModuleName().equalsIgnoreCase("ChangeLegMode") || setting.getModuleName().equalsIgnoreCase("ChangeSingleLegMode"))
-				break;
-			setting = null;
-		}
-		return setting;
-	}
-
-	/**
 	 * setting qsim
 	 * @param matsim4urbansimConfig TODO
 	 * @param config TODO
@@ -402,29 +388,25 @@ public class M4UConfigUtils {
 	 * setting strategy
 	 * @param config TODO
 	 */
-	static void initStrategyPart1(ConfigType matsim4urbansimConfig, Config config){
+	static void initStrategy(ConfigType matsim4urbansimConfig, Config config){
 		log.info("Setting StrategyConfigGroup to config...");
 
-		// some modules are disables after 80% of overall iterations, 
-		// last iteration for them determined here tnicolai feb'12
-		// configure strategies for re-planning (should be something like 5)
 		config.strategy().setMaxAgentPlanMemorySize( matsim4urbansimConfig.getStrategy().getMaxAgentPlanMemorySize().intValue() );
 
-		StrategyConfigGroup.StrategySettings timeAlocationMutator = new StrategyConfigGroup.StrategySettings(IdFactory.get(1));
-		timeAlocationMutator.setModuleName("TimeAllocationMutator"); 	// module name given in org.matsim.core.replanning.StrategyManagerConfigLoader
-		timeAlocationMutator.setProbability( matsim4urbansimConfig.getStrategy().getTimeAllocationMutatorProbability() ); // should be something like 0.1
-		timeAlocationMutator.setDisableAfter(disableStrategyAfterIteration(config));
-		config.strategy().addStrategySettings(timeAlocationMutator);
-		// change mutation range to 2h. tnicolai feb'12
-		config.setParam("TimeAllocationMutator", "mutationRange", "7200"); 
-
-		StrategyConfigGroup.StrategySettings changeExpBeta = new StrategyConfigGroup.StrategySettings(IdFactory.get(2));
-		changeExpBeta.setModuleName("ChangeExpBeta");					// module name given in org.matsim.core.replanning.StrategyManagerConfigLoader
+		StrategyConfigGroup.StrategySettings changeExpBeta = new StrategyConfigGroup.StrategySettings(IdFactory.get(1));
+		changeExpBeta.setModuleName(Selector.ChangeExpBeta.toString());
 		changeExpBeta.setProbability( matsim4urbansimConfig.getStrategy().getChangeExpBetaProbability() ); // should be something like 0.9
 		config.strategy().addStrategySettings(changeExpBeta);
 
+		StrategyConfigGroup.StrategySettings timeAlocationMutator = new StrategyConfigGroup.StrategySettings(IdFactory.get(2));
+		timeAlocationMutator.setModuleName(Names.TimeAllocationMutator.toString()); 
+		timeAlocationMutator.setProbability( matsim4urbansimConfig.getStrategy().getTimeAllocationMutatorProbability() ); // should be something like 0.1
+		timeAlocationMutator.setDisableAfter(disableStrategyAfterIteration(config)); // just to be sure
+		config.strategy().addStrategySettings(timeAlocationMutator);
+		config.timeAllocationMutator().setMutationRange(7200.) ;
+
 		StrategyConfigGroup.StrategySettings reroute = new StrategyConfigGroup.StrategySettings(IdFactory.get(3));
-		reroute.setModuleName("ReRoute");  // old name "ReRoute_Dijkstra"						// module name given in org.matsim.core.replanning.StrategyManagerConfigLoader
+		reroute.setModuleName(Names.ReRoute.toString());  
 		reroute.setProbability( matsim4urbansimConfig.getStrategy().getReRouteDijkstraProbability() ); 	// should be something like 0.1
 		reroute.setDisableAfter(disableStrategyAfterIteration(config));
 		config.strategy().addStrategySettings(reroute);
@@ -434,27 +416,6 @@ public class M4UConfigUtils {
 
 	private static int disableStrategyAfterIteration(Config config) {
 		return (int) Math.ceil(config.controler().getLastIteration() * 0.8);
-	}
-
-	private static void initStrategyPart2(Config config){
-		// yyyy My intuition would be to set everything to zero after 80% of iterations (???).
-		// yyyyyy not yet sorted out
-		
-		// check if a 4th module is given in the external MATSim config
-		// the external config is not loaded at this point. Thus, a possible 4th module is only load with the settings from the external config...
-		StrategyConfigGroup.StrategySettings changeLegMode = getChangeLegModeStrategySettings(config);
-		boolean set4thStrategyModule = ( changeLegMode != null && 
-				( changeLegMode.getModuleName().equalsIgnoreCase("ChangeLegMode") || changeLegMode.getModuleName().equalsIgnoreCase("ChangeSingleLegMode")) && 
-				changeLegMode.getProbability() > 0.);
-		if(set4thStrategyModule){
-			// to be consistent, setting the same iteration number as in the strategies above 
-			changeLegMode.setDisableAfter(disableStrategyAfterIteration(config));
-			log.warn("setting disableStrategyAfterIteration for ChangeLegMode to " + disableStrategyAfterIteration(config) + "; possibly overriding config settings!");
-			// check if other modes are set
-			Module changelegMode = config.getModule("changeLegMode");
-			if(changelegMode != null && changelegMode.getValue("modes") != null)
-				log.info("Following modes are found: " + changelegMode.getValue("modes"));
-		}
 	}
 	
 	/**
@@ -495,6 +456,8 @@ public class M4UConfigUtils {
 		vsp.addParam(VspExperimentalConfigKey.vspDefaultsCheckingLevel, VspExperimentalConfigGroup.ABORT ) ;
 		vsp.setActivityDurationInterpretation(VspExperimentalConfigGroup.ActivityDurationInterpretation.tryEndTimeThenDuration) ;
 		vsp.setRemovingUnneccessaryPlanAttributes(true) ;
+		
+		config.strategy().setFractionOfIterationsToDisableInnovation(0.8) ;
 
 		return config ;
 	}

@@ -107,61 +107,42 @@ public class M4UConfigurationConverterV4 {
 	 * @return boolean true if initialization successful
 	 */
 	public boolean init(){
-		
-		// I currently (may'13) think that the sequence should be as follows:
-		// * create empty config with matsim defaults and possibly some additional m4u defaults
-		// * read and insert config from urbansim
-		// * interpret the config at this point part 1 (e.g. set flow capacities according to sampling rate)
-		// * read and insert config from matsim
-		// * interpret the config at this point part 2 (e.g. set the accessibility betas based on "useBetasFromMatsim)
-		// * config consistency checking
-
-		
-//		try{
 
 		// creates an empty config to be filled by settings from the MATSim4UrbanSim and external config files
-			this.config = M4UConfigUtils.createEmptyConfigWithSomeDefaults();
+		this.config = M4UConfigUtils.createEmptyConfigWithSomeDefaults();
 
-			// get root elements from JAXB matsim4urbansim config object
-			ConfigType matsim4urbansimConfigPart1 = matsim4urbansimConfig.getConfig();
-			Matsim4UrbansimType matsim4urbansimConfigPart2 = matsim4urbansimConfig.getMatsim4Urbansim();
-			
-			// loads the external MATSim config separately (to get additional MATSim4UrbanSim parameters)
-			Module matsim4urbansimConfigPart3 = M4UConfigUtils.getM4UModuleFromExternalConfig(matsim4urbansimConfigPart1.getMatsimConfig().getInputFile());
+		// get root elements from JAXB matsim4urbansim config object
+		ConfigType matsim4urbansimConfigPart1 = matsim4urbansimConfig.getConfig();
+		Matsim4UrbansimType matsim4urbansimConfigPart2 = matsim4urbansimConfig.getMatsim4Urbansim();
 
-			M4UConfigUtils.initUrbanSimParameters(matsim4urbansimConfigPart2, matsim4urbansimConfigPart3, config);
-			M4UConfigUtils.initMATSim4UrbanSimControler(matsim4urbansimConfigPart2, config);
-			M4UAccessibilityConfigUtils.initAccessibilityParameters(matsim4urbansimConfigPart2, config);
-			
-			M4UConfigUtils.initNetwork(matsim4urbansimConfigPart1, config); // ok
-			M4UConfigUtils.insertPlansParamsAndConfigureWarmOrHotStart(matsim4urbansimConfigPart1, config); // ok
-			M4UConfigUtils.initControler(matsim4urbansimConfigPart1, config); // yyyy can't fix since it is using static variables.  kai, may'13 
-			M4UConfigUtils.initPlanCalcScore(matsim4urbansimConfigPart1, config); // ok
-			M4UConfigUtils.initStrategyPart1(matsim4urbansimConfigPart1, config); // yyyy can't fix: It is trying to do something to a possible 
-			// 4th strategy although that is not yet there at this point in time.
+		// loads the external MATSim config separately (to get additional MATSim4UrbanSim parameters)
+		Module matsim4urbansimConfigPart3 = M4UConfigUtils.getM4UModuleFromExternalConfig(matsim4urbansimConfigPart1.getMatsimConfig().getInputFile());
 
-			M4UConfigUtils.initQSim(matsim4urbansimConfig, config);
-			
-			// loading the external MATSim config in to the initialized config
-			M4UConfigUtils.loadExternalConfigAndOverwriteMATSim4UrbanSimSettings(matsim4urbansimConfigPart1, config);
-			// (by the design, the matsim xml config reader over-writes only entries which are explicitly mentioned in the external config)
-			
-//			M4UConfigUtils.initStrategyPart2(config) ;
-			
-			// show final settings
-			M4UConfigUtils.printUrbanSimParameterSettings( M4UConfigUtils.getUrbanSimParameterConfigAndPossiblyConvert(config) );
-			M4UConfigUtils.printMATSim4UrbanSimControlerSettings( M4UConfigUtils.getMATSim4UrbaSimControlerConfigAndPossiblyConvert(config) );
-			
-			config.addConfigConsistencyChecker( new VspConfigConsistencyCheckerImpl() ) ;
-			config.addConfigConsistencyChecker( new M4UConfigConsistencyChecker() ) ;
-			
-			M4UConfigUtils.checkConfigConsistencyAndWriteToLog(config, "at the end of the matsim4urbansim config converter") ;
-			
-//		}catch(Exception e){
-//			e.printStackTrace();
-//			return false;
-//		}
-			// (the above try catch block would write the stack trace and then continue anyway.  disabled that.  kai, may/jun'13)
+		M4UConfigUtils.initUrbanSimParameters(matsim4urbansimConfigPart2, matsim4urbansimConfigPart3, config);
+		M4UConfigUtils.initMATSim4UrbanSimControler(matsim4urbansimConfigPart2, config);
+		M4UAccessibilityConfigUtils.initAccessibilityParameters(matsim4urbansimConfigPart2, config);
+		M4UConfigUtils.initNetwork(matsim4urbansimConfigPart1, config); // ok
+		M4UConfigUtils.insertPlansParamsAndConfigureWarmOrHotStart(matsim4urbansimConfigPart1, config); // ok
+		M4UConfigUtils.initControler(matsim4urbansimConfigPart1, config); // yyyy can't fix since it is using static variables.  kai, may'13 
+		M4UConfigUtils.initPlanCalcScore(matsim4urbansimConfigPart1, config); // ok
+		M4UConfigUtils.initStrategy(matsim4urbansimConfigPart1, config); // ok
+		M4UConfigUtils.initQSim(matsim4urbansimConfig, config);
+
+		// note: ending innovation after 80% of iterations is now switched on in "createEmptyConfigWithSomeDefaults" above.
+
+		// loading the external MATSim config in to the initialized config
+		M4UConfigUtils.loadExternalConfigAndOverwriteMATSim4UrbanSimSettings(matsim4urbansimConfigPart1, config);
+		// (by the design, the matsim xml config reader over-writes only entries which are explicitly mentioned in the external config)
+
+		// show final settings
+		M4UConfigUtils.printUrbanSimParameterSettings( M4UConfigUtils.getUrbanSimParameterConfigAndPossiblyConvert(config) );
+		M4UConfigUtils.printMATSim4UrbanSimControlerSettings( M4UConfigUtils.getMATSim4UrbaSimControlerConfigAndPossiblyConvert(config) );
+
+		config.addConfigConsistencyChecker( new VspConfigConsistencyCheckerImpl() ) ;
+		config.addConfigConsistencyChecker( new M4UConfigConsistencyChecker() ) ;
+
+		M4UConfigUtils.checkConfigConsistencyAndWriteToLog(config, "at the end of the matsim4urbansim config converter") ;
+
 		return true;
 	}
 

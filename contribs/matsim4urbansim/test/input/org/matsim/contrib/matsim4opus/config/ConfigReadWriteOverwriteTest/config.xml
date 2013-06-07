@@ -525,22 +525,22 @@ For 'queueSimulation', add a module 'simulation' to the config. -->
 		<param name="maxAgentPlanMemorySize" value="5" />
 
 		<!-- name of strategy (if not full class name, resolved in StrategyManagerConfigLoader) -->
-		<param name="Module_1" value="TimeAllocationMutator" />
+		<param name="Module_1" value="ChangeExpBeta" />
 
 		<!-- probability that a strategy is applied to a given a person.  despite its name, this really is a ``weight'' -->
-		<param name="ModuleProbability_1" value="0.1" />
+		<param name="ModuleProbability_1" value="0.9" />
 
 		<!-- iteration after which module will be disabled.  most useful for ``innovative'' strategies (new routes, new times, ...) -->
-		<param name="ModuleDisableAfterIteration_1" value="1" />
+		<param name="ModuleDisableAfterIteration_1" value="null" />
 
 		<!-- path to external executable (if applicable) -->
 		<param name="ModuleExePath_1" value="null" />
 
 		<!-- **************************** -->
-		<param name="Module_2" value="ChangeExpBeta" />
+		<param name="Module_2" value="TimeAllocationMutator" />
 
-		<param name="ModuleProbability_2" value="0.9" />
-		<param name="ModuleDisableAfterIteration_2" value="null" />
+		<param name="ModuleProbability_2" value="0.1" />
+		<param name="ModuleDisableAfterIteration_2" value="1" />
 		<param name="ModuleExePath_2" value="null" />
 
 		<!-- **************************** -->
@@ -562,6 +562,9 @@ For 'queueSimulation', add a module 'simulation' to the config. -->
 
 		<!-- name of PlanSelector for plans removal.  If not full class name, resolved in StrategyManagerConfigLoader.  default is `null', which eventually calls SelectWorstPlan. This is not a good choice from a discrete choice theoretical perspective. Alternatives, however, have not been systematically tested. kai, feb'12 -->
 		<param name="planSelectorForRemoval" value="null" />
+
+		<!-- fraction of iterations where innovative strategies are switched off.  Something link 0.8 should be good.  E.g. if you run from iteration 400 to iteration 500, innovation is switched off at iteration 480 -->
+		<param name="fractionOfIterationsToDisableInnovation" value="0.8" />
 	</module>
 
 <!-- ====================================================================== -->
