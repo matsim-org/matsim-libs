@@ -19,17 +19,27 @@
 
 package playground.southafrica.population.utilities;
 
+import java.util.Map;
+import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.misc.Counter;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
 import org.matsim.households.HouseholdsImpl;
 import org.matsim.households.HouseholdsReaderV10;
+
+import playground.southafrica.utilities.Header;
 
 public class PopulationUtils {
 	private final static Logger LOG = Logger.getLogger(PopulationUtils.class);
@@ -81,9 +91,55 @@ public class PopulationUtils {
 	
 	
 	/**
+	 * Check the population for unique activity types, and number of occurrences
+	 * for each type.
+	 * @param populationFilename
+	 */
+	public static void printActivityStatistics(String populationFilename){
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		MatsimPopulationReader pr = new MatsimPopulationReader(sc);
+		pr.readFile(populationFilename);
+		
+		LOG.info("Population parsed. Analysing activity types...");
+		Counter counter = new Counter(" person # ");
+		Map<String, Integer> map = new TreeMap<String, Integer>();
+		for(Id id : sc.getPopulation().getPersons().keySet()){
+			Plan plan = sc.getPopulation().getPersons().get(id).getSelectedPlan();
+			for(PlanElement pe : plan.getPlanElements()){
+				if(pe instanceof Activity){
+					Activity act = (Activity) pe;
+					if(!map.containsKey(act.getType())){
+						map.put(act.getType(), new Integer(1));
+					} else{
+						map.put(act.getType(), map.get(act.getType()) + 1 );
+					}
+				}
+			}
+			counter.incCounter();
+		}
+		counter.printCounter();
+		
+		/* Print the statistics to the console. */
+		LOG.info("--------------------------------------------");
+		LOG.info("Activity statistics:");
+		LOG.info("--------------------------------------------");
+		for(String s : map.keySet()){
+			String gap = "";
+			for(int i = 0; i < 6-s.length(); i++){
+				gap += " ";
+			}
+			LOG.info(String.format("%s%s: %d", gap, s, map.get(s)));			
+		}
+		LOG.info("--------------------------------------------");
+	}
+	
+	
+	/**
 	 * An implementation to quickly use to print statistics.
 	 */
 	public static void main(String[] args){
+		Header.printHeader(PopulationUtils.class.toString(), args);
+		
 		int option = Integer.parseInt(args[0]);
 		switch (option) {
 		case 1:
@@ -91,10 +147,16 @@ public class PopulationUtils {
 			break;
 		case 2:
 			printPopulationStatistics(args[1]);
+			break;
+		case 3:
+			printActivityStatistics(args[1]);
+			break;
 		default:
 			LOG.warn("Cannot print any statistics for option `" + option + "'");
 			break;
 		}
+		
+		Header.printFooter();
 	}
 	
 	

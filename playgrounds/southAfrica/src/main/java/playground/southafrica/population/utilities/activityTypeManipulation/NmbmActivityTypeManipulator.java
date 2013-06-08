@@ -67,33 +67,51 @@ public class NmbmActivityTypeManipulator extends ActivityTypeManipulator {
 			if(pe instanceof ActivityImpl){
 				ActivityImpl act = (ActivityImpl) pe;
 				double estimatedDuration = 0.0;
-				if(act.getType().equalsIgnoreCase("h")){
-					if(i == 0){
-						/* It is the first activity, and it is assumed it 
-						 * started at 00:00:00. */
+
+				if(i == 0){
+					/* It is the first activity, 
+					 * and it is assumed it started at 00:00:00. */
+					estimatedDuration = act.getEndTime();
+
+					if(act.getType().equalsIgnoreCase("h")){
 						act.setType("h1"); /* First activity of the chain. */
-						estimatedDuration = act.getEndTime();
-					} else if(i == plan.getPlanElements().size() - 1){
-						/* Since the method getStartTime is deprecated,
-						 * estimate the start time as the end time of the
-						 * previous activity plus the duration of the trip. */
-						double previousEndTime = ((ActivityImpl)plan.getPlanElements().get(i-2)).getEndTime();
-						double tripDuration = ((Leg)plan.getPlanElements().get(i-1)).getTravelTime();
+					}
+				} else if(i == plan.getPlanElements().size() - 1){
+					/* Since the method getStartTime is deprecated,
+					 * estimate the start time as the end time of the
+					 * previous activity plus the duration of the trip. */
+					double previousEndTime = ((ActivityImpl)plan.getPlanElements().get(i-2)).getEndTime();
+					double tripDuration = ((Leg)plan.getPlanElements().get(i-1)).getTravelTime();
+					estimatedDuration = Math.max(24*60*60, (previousEndTime + tripDuration) ) - (previousEndTime + tripDuration);
+
+					if(act.getType().equalsIgnoreCase("h")){
 						act.setType("h2"); /* Final activity of the chain. */
-						estimatedDuration = Math.max(24*60*60, (previousEndTime + tripDuration) ) - (previousEndTime + tripDuration);
-					} else{
-						/* Since the method getStartTime is deprecated,
-						 * estimate the start time as the end time of the
-						 * previous activity plus the duration of the trip. */
-						double previousEndTime = ((ActivityImpl)plan.getPlanElements().get(i-2)).getEndTime();
-						double tripDuration = ((Leg)plan.getPlanElements().get(i-1)).getTravelTime();
+					}
+				} else{
+					/* Since the method getStartTime is deprecated,
+					 * estimate the start time as the end time of the
+					 * previous activity plus the duration of the trip. */
+					double previousEndTime = ((ActivityImpl)plan.getPlanElements().get(i-2)).getEndTime();
+					double tripDuration = ((Leg)plan.getPlanElements().get(i-1)).getTravelTime();
+					estimatedDuration = act.getEndTime() - (previousEndTime + tripDuration);
+
+					if(act.getType().equalsIgnoreCase("h")){
 						act.setType("h3"); /* Intermediate activity. */
-						estimatedDuration = act.getEndTime() - (previousEndTime + tripDuration);
 					}
 				}
-					
+				
+				if(estimatedDuration == Double.NEGATIVE_INFINITY){
+					LOG.error("Found -Infinity");
+				}
+
+				while(estimatedDuration < 0){
+					LOG.warn("Updated duration: " + act.getType() + " (" + estimatedDuration + ")");
+					estimatedDuration += (24*60*60);
+				}
+				
 				act.setType( getNewActivityType(act.getType(), estimatedDuration) );
 			}
+			
 		}
 	}
 	
@@ -107,6 +125,16 @@ public class NmbmActivityTypeManipulator extends ActivityTypeManipulator {
 					s = deciles.get(s).get(ss).getFirst();
 					break;
 				}
+			}
+			
+			/* It is possible that the actual activity's duration is still 
+			 * longer than the upper limit of the longest decile... is this
+			 * indeed possible?! Maybe due to rounding errors?! How do we handle
+			 * those? Because unless they're handled, they'll remain, for 
+			 * example, `s' in the case of shopping facilities.  
+			 */
+			if(s.equalsIgnoreCase(activityType)){
+				LOG.warn("Could not change activity type for `" + s + "' - duration: " + activityDuration);
 			}
 		}
 		return s;
