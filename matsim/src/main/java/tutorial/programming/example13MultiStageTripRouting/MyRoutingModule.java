@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
@@ -35,6 +36,7 @@ import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
+import org.matsim.core.router.TripRouter;
 
 /**
  * {@link RoutingModule} for a mode consisting in going to a teleportation
@@ -46,28 +48,28 @@ public class MyRoutingModule implements RoutingModule {
 	public static final String STAGE = "teleportationInteraction";
 	public static final String TELEPORTATION_LEG_MODE = "teleportationLeg";
 
-	private final RoutingModule ptDelegate;
+	private final TripRouter routingDelegate;
 	private final PopulationFactory populationFactory;
 	private final ModeRouteFactory modeRouteFactory;
 	private final Facility station;
 
 	/**
 	 * Creates a new instance.
-	 * @param ptDelegate the routing module to use to compute the PT subtrips
+	 * @param routingDelegate the {@link TripRouter} to use to compute the PT subtrips
 	 * @param populationFactory used to create legs, activities and routes
 	 * @param station {@link Facility} representing the teleport station
 	 */
 	public MyRoutingModule(
 			// I do not know what is best here: RoutingModule or TripRouter.
-			// RoutingModule is what you actually need, and you do not need
-			// to know the main mode for PT.
-			// Getting the TripRouter allows to be consistent with modifications
-			// of the TripRouter done later in the initialization process (delegation),
-			// but using this pattern too much leads to risk of infinite loops.
-			final RoutingModule ptDelegate,
+			// RoutingModule is the level we actually need, but
+			// getting the TripRouter allows to be consistent with modifications
+			// of the TripRouter done later in the initialization process (delegation).
+			// Using TripRouter may also lead to infinite loops, if two  modes
+			// calling each other (though I cannot think in any actual mode with this risk).
+			final TripRouter routingDelegate,
 			final PopulationFactory populationFactory,
 			final Facility station) {
-		this.ptDelegate = ptDelegate;
+		this.routingDelegate = routingDelegate;
 		this.populationFactory = populationFactory;
 		this.modeRouteFactory = ((PopulationFactoryImpl) populationFactory).getModeRouteFactory();
 		this.station = station;
@@ -83,7 +85,8 @@ public class MyRoutingModule implements RoutingModule {
 
 		// route the access trip
 		trip.addAll(
-				ptDelegate.calcRoute(
+				routingDelegate.calcRoute(
+					TransportMode.pt,
 					fromFacility,
 					station,
 					departureTime,
@@ -119,7 +122,7 @@ public class MyRoutingModule implements RoutingModule {
 
 		// trips for this mode contain the ones we create, plus the ones of the
 		// pt router we use.
-		stageTypes.addActivityTypes( ptDelegate.getStageActivityTypes() );
+		stageTypes.addActivityTypes( routingDelegate.getRoutingModule( TransportMode.pt ).getStageActivityTypes() );
 		stageTypes.addActivityTypes( new StageActivityTypesImpl( STAGE ) );
 
 		return stageTypes;

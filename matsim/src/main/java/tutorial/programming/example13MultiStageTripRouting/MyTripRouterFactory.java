@@ -20,7 +20,6 @@
 package tutorial.programming.example13MultiStageTripRouting;
 
 
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.TripRouter;
@@ -63,11 +62,11 @@ public class MyTripRouterFactory implements TripRouterFactory {
 		router.setRoutingModule(
 			TELEPORTATION_MAIN_MODE,
 			new MyRoutingModule(
-				// use the default routing module for the
-				// public transport sub-part.
-				// It will adapt to the configuration (teleported,
-				// simulated, user implementation...)
-				router.getRoutingModule( TransportMode.pt ),
+				// the module uses the trip router for the PT part.
+				// This allows to automatically adapt to user settings,
+				// including if they are specified at a later stage
+				// in the initialisation process.
+				router,
 				controler.getScenario().getPopulation().getFactory(),
 				teleport));
 
