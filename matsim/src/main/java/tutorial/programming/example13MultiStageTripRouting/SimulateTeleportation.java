@@ -19,43 +19,28 @@
  * *********************************************************************** */
 package tutorial.programming.example13MultiStageTripRouting;
 
-import java.util.List;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.Module;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryLogging;
-import org.matsim.core.router.MainModeIdentifier;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.TripRouterFactoryImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.pt.PtConstants;
 
 /**
  * @author thibautd
  */
 public class SimulateTeleportation {
-	private static final Logger log =
-		Logger.getLogger(SimulateTeleportation.class);
-
 	// this assumes the script is launched from matsim/trunk/
 	private static final String configFile = "examples/pt-tutorial/config.xml";
-	private static final String MAIN_MODE = "myTeleportationMainMode"; 
+	static final String MAIN_MODE = "myTeleportationMainMode"; 
 
 	public static void main(final String[] args) {
 		// make sure we get all the log messages in the logfile
@@ -83,61 +68,10 @@ public class SimulateTeleportation {
 
 		// now, plug our stuff in
 		controler.setTripRouterFactory(
-				new TripRouterFactory() {
-					@Override
-					public TripRouter instantiateAndConfigureTripRouter() {
-						// this factory initializes a TripRouter with default modules,
-						// taking into account what is asked for in the config
-						// (for instance, detailled or teleported pt).
-						// This allows us to just add our module and go.
-						final TripRouterFactory delegate =
-							new TripRouterFactoryImpl(
-								controler.getScenario(),
-								controler.getTravelDisutilityFactory(),
-								controler.getLinkTravelTimes(),
-								controler.getLeastCostPathCalculatorFactory(),
-								controler.getTransitRouterFactory() );
-
-						final TripRouter router = delegate.instantiateAndConfigureTripRouter();
-
-						// add our module to the instance
-						router.setRoutingModule(
-							MAIN_MODE,
-							new MyRoutingModule(
-								// use the default routing module for the
-								// public transport sub-part.
-								// It will adapt to the configuration (teleported,
-								// simulated, user implementation...)
-								router.getRoutingModule( TransportMode.pt ),
-								controler.getScenario().getPopulation().getFactory(),
-								teleport1,
-								teleport2));
-
-						// we still need to provide a way to identify our trips
-						// as being teleportation trips.
-						// This is for instance used at re-routing.
-						final MainModeIdentifier defaultModeIdentifier =
-							router.getMainModeIdentifier();
-						router.setMainModeIdentifier(
-								new MainModeIdentifier() {
-									@Override
-									public String identifyMainMode(
-											final List<PlanElement> tripElements) {
-										for ( PlanElement pe : tripElements ) {
-											if ( pe instanceof Leg && ((Leg) pe).getMode().equals( MyRoutingModule.TELEPORTATION_LEG_MODE ) ) {
-												return MAIN_MODE;
-											}
-										}
-										// if the trip doesn't contain a teleportation leg,
-										// fall back to the default identification method.
-										return defaultModeIdentifier.identifyMainMode( tripElements );
-									}
-								});
-
-						// we're done!
-						return router;
-					}
-				});
+				new MyTripRouterFactory(
+						controler,
+						teleport1,
+						teleport2));
 		controler.run();
 	}
 
