@@ -28,6 +28,8 @@ import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryImpl;
 
 public class MyTripRouterFactory implements TripRouterFactory {
+	public static final String TELEPORTATION_MAIN_MODE = "myTeleportationMainMode";
+
 	private final Controler controler;
 	private final Facility teleport1;
 	private final Facility teleport2;
@@ -59,7 +61,7 @@ public class MyTripRouterFactory implements TripRouterFactory {
 
 		// add our module to the instance
 		router.setRoutingModule(
-			SimulateTeleportation.MAIN_MODE,
+			TELEPORTATION_MAIN_MODE,
 			new MyRoutingModule(
 				// use the default routing module for the
 				// public transport sub-part.

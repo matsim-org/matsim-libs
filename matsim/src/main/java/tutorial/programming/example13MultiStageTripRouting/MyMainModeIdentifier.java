@@ -37,7 +37,7 @@ public class MyMainModeIdentifier implements MainModeIdentifier {
 			final List<PlanElement> tripElements) {
 		for ( PlanElement pe : tripElements ) {
 			if ( pe instanceof Leg && ((Leg) pe).getMode().equals( MyRoutingModule.TELEPORTATION_LEG_MODE ) ) {
-				return SimulateTeleportation.MAIN_MODE;
+				return MyTripRouterFactory.TELEPORTATION_MAIN_MODE;
 			}
 		}
 		// if the trip doesn't contain a teleportation leg,

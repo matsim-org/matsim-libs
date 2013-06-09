@@ -40,7 +40,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class SimulateTeleportation {
 	// this assumes the script is launched from matsim/trunk/
 	private static final String configFile = "examples/pt-tutorial/config.xml";
-	static final String MAIN_MODE = "myTeleportationMainMode"; 
 
 	public static void main(final String[] args) {
 		// make sure we get all the log messages in the logfile
@@ -76,7 +75,7 @@ public class SimulateTeleportation {
 	}
 
 	private static void tuneConfig(final Config config) {
-		config.getModule( "changeLegMode" ).addParam( "modes" , "car,pt,"+MAIN_MODE );
+		config.getModule( "changeLegMode" ).addParam( "modes" , "car,pt,"+MyTripRouterFactory.TELEPORTATION_MAIN_MODE );
 
 		final ActivityParams scoreTelepInteract = new ActivityParams( MyRoutingModule.STAGE );
 		scoreTelepInteract.setTypicalDuration( 2 * 60 );
