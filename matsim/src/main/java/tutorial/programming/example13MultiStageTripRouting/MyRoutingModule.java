@@ -58,6 +58,12 @@ public class MyRoutingModule implements RoutingModule {
 	 * @param station {@link Facility} representing the teleport station
 	 */
 	public MyRoutingModule(
+			// I do not know what is best here: RoutingModule or TripRouter.
+			// RoutingModule is what you actually need, and you do not need
+			// to know the main mode for PT.
+			// Getting the TripRouter allows to be consistent with modifications
+			// of the TripRouter done later in the initialization process (delegation),
+			// but using this pattern too much leads to risk of infinite loops.
 			final RoutingModule ptDelegate,
 			final PopulationFactory populationFactory,
 			final Facility station) {
