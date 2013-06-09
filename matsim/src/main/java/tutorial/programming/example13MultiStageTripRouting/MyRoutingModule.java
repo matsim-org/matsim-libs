@@ -35,12 +35,11 @@ import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
-import org.matsim.core.utils.geometry.CoordUtils;
 
 /**
  * {@link RoutingModule} for a mode consisting in going to a teleportation
- * station by public transport, being instantly teleported to a second station
- * and going to the final destination by public transport.
+ * station by public transport, and being instantly teleported to destination
+ * 
  * @author thibautd
  */
 public class MyRoutingModule implements RoutingModule {
@@ -50,25 +49,22 @@ public class MyRoutingModule implements RoutingModule {
 	private final RoutingModule ptDelegate;
 	private final PopulationFactory populationFactory;
 	private final ModeRouteFactory modeRouteFactory;
-	private final Facility station1, station2;
+	private final Facility station;
 
 	/**
 	 * Creates a new instance.
 	 * @param ptDelegate the routing module to use to compute the PT subtrips
 	 * @param populationFactory used to create legs, activities and routes
-	 * @param station1 {@link Facility} representing the first teleport station
-	 * @param station2 {@link Facility} representing the second teleport station
+	 * @param station {@link Facility} representing the teleport station
 	 */
 	public MyRoutingModule(
 			final RoutingModule ptDelegate,
 			final PopulationFactory populationFactory,
-			final Facility station1,
-			final Facility station2) {
+			final Facility station) {
 		this.ptDelegate = ptDelegate;
 		this.populationFactory = populationFactory;
 		this.modeRouteFactory = ((PopulationFactoryImpl) populationFactory).getModeRouteFactory();
-		this.station1 = station1;
-		this.station2 = station2;
+		this.station = station;
 	}
 
 	@Override
@@ -79,31 +75,21 @@ public class MyRoutingModule implements RoutingModule {
 			final Person person) {
 		final List<PlanElement> trip = new ArrayList<PlanElement>();
 
-		// choose the direction which minimizes pt distance.
-		final boolean from1to2 =
-			CoordUtils.calcDistance( fromFacility.getCoord() , station1.getCoord() )
-			+ CoordUtils.calcDistance( station2.getCoord() , toFacility.getCoord() ) <
-			CoordUtils.calcDistance( fromFacility.getCoord() , station2.getCoord() )
-			+ CoordUtils.calcDistance( station1.getCoord() , toFacility.getCoord() );
-
-		final Facility originStation = from1to2 ? station1 : station2;
-		final Facility destinationStation = from1to2 ? station2 : station1;
-
 		// route the access trip
 		trip.addAll(
 				ptDelegate.calcRoute(
 					fromFacility,
-					originStation,
+					station,
 					departureTime,
 					person ) );
 
 		// create a dummy activity at the teleportation origin
-		final Activity firstInteraction =
+		final Activity interaction =
 			populationFactory.createActivityFromLinkId(
 					STAGE,
-					originStation.getLinkId());
-		firstInteraction.setMaximumDuration( 0 );
-		trip.add( firstInteraction );
+					station.getLinkId());
+		interaction.setMaximumDuration( 0 );
+		trip.add( interaction );
 
 		// create the teleportation leg
 		final Leg teleportationLeg =
@@ -112,35 +98,13 @@ public class MyRoutingModule implements RoutingModule {
 		final Route teleportationRoute =
 			modeRouteFactory.createRoute(
 					TELEPORTATION_LEG_MODE,
-					originStation.getLinkId(),
-					destinationStation.getLinkId());
+					station.getLinkId(),
+					toFacility.getLinkId());
 		teleportationRoute.setTravelTime( 0 );
 		teleportationLeg.setRoute( teleportationRoute );
 		trip.add( teleportationLeg );
 
-		// create a dummy activity at the teleportation destination
-		final Activity secondInteraction =
-			populationFactory.createActivityFromLinkId(
-					STAGE,
-					destinationStation.getLinkId());
-		secondInteraction.setMaximumDuration( 0 );
-		trip.add( secondInteraction );
-
-		// route the egress trip
-		trip.addAll(
-				ptDelegate.calcRoute(
-					destinationStation,
-					toFacility,
-					departureTime + calcDuration( trip ),
-					person ) );
-
 		return trip;
-	}
-
-	private static double calcDuration(final List<PlanElement> trip) {
-		double dur = 0;
-		// assume there's code computing trip duration here.
-		return dur;
 	}
 
 	@Override

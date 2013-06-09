@@ -31,16 +31,13 @@ public class MyTripRouterFactory implements TripRouterFactory {
 	public static final String TELEPORTATION_MAIN_MODE = "myTeleportationMainMode";
 
 	private final Controler controler;
-	private final Facility teleport1;
-	private final Facility teleport2;
+	private final Facility teleport;
 
 	public MyTripRouterFactory(
 			final Controler controler,
-			final Facility teleport1,
-			final Facility teleport2) {
+			final Facility teleport ) {
 		this.controler = controler;
-		this.teleport1 = teleport1;
-		this.teleport2 = teleport2;
+		this.teleport = teleport;
 	}
 
 	@Override
@@ -69,8 +66,7 @@ public class MyTripRouterFactory implements TripRouterFactory {
 				// simulated, user implementation...)
 				router.getRoutingModule( TransportMode.pt ),
 				controler.getScenario().getPopulation().getFactory(),
-				teleport1,
-				teleport2));
+				teleport));
 
 		// we still need to provide a way to identify our trips
 		// as being teleportation trips.

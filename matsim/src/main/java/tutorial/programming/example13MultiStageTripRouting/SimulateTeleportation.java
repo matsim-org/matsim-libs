@@ -53,24 +53,17 @@ public class SimulateTeleportation {
 		final Scenario scenario = ScenarioUtils.loadScenario( config );
 		final Controler controler = new Controler( scenario );
 
-		// create the two teleportation station:
-		// - south west
-		final Facility teleport1 =
+		// create the teleportation station on a central link
+		final Facility teleport =
 			createFacility(
-					new IdImpl( "teleport1" ), 
-					controler.getScenario().getNetwork().getLinks().get( new IdImpl( "1121" ) ));
-		// - north east
-		final Facility teleport2 =
-			createFacility(
-					new IdImpl( "teleport2" ), 
-					controler.getScenario().getNetwork().getLinks().get( new IdImpl( "4434" ) ));
+					new IdImpl( "teleport" ),
+					controler.getScenario().getNetwork().getLinks().get( new IdImpl( "2333" ) ));
 
 		// now, plug our stuff in
 		controler.setTripRouterFactory(
 				new MyTripRouterFactory(
 						controler,
-						teleport1,
-						teleport2));
+						teleport));
 		controler.run();
 	}
 
