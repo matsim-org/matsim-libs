@@ -27,6 +27,9 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryImpl;
 
+/**
+ * @author thibautd
+ */
 public class MyTripRouterFactory implements TripRouterFactory {
 	public static final String TELEPORTATION_MAIN_MODE = "myTeleportationMainMode";
 

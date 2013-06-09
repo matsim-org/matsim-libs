@@ -25,6 +25,9 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.router.MainModeIdentifier;
 
+/**
+ * @author thibautd
+ */
 public class MyMainModeIdentifier implements MainModeIdentifier {
 	private final MainModeIdentifier defaultModeIdentifier;
 
