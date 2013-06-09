@@ -431,7 +431,8 @@ public class JointTripRemoverAlgorithmTest {
 		// TODO: test driver and passenger removal separately
 		for ( Fixture f : fixtures ) {
 			log.info( "testing removal on fixture "+f.name );
-			JointTripRemoverAlgorithm.removePassengerTrip( f.toRemove , f.jointPlan , EmptyStageActivityTypes.INSTANCE );
+			final JointTripRemoverAlgorithm algo = new JointTripRemoverAlgorithm( null ,  EmptyStageActivityTypes.INSTANCE );
+			algo.removePassengerTrip( f.toRemove , f.jointPlan );
 			JointTripRemoverAlgorithm.removeDriverTrip( f.toRemove , f.jointPlan );
 
 			for ( Plan p : f.jointPlan.getIndividualPlans().values() ) {

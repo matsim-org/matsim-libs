@@ -92,7 +92,7 @@ public class JointTripRemoverAlgorithm implements GenericPlanAlgorithm<JointPlan
 
 		final JointTrip toRemove = choiceSet.get( random.nextInt( choiceSet.size() ) );
 
-		removePassengerTrip( toRemove , plan , stages );
+		removePassengerTrip( toRemove , plan );
 		removeDriverTrip( toRemove , plan );
 		return new ActedUponInformation(
 				toRemove.getDriverId(),
@@ -116,10 +116,9 @@ public class JointTripRemoverAlgorithm implements GenericPlanAlgorithm<JointPlan
 	}
 
 	// package protected for tests
-	final static void removePassengerTrip(
+	final void removePassengerTrip(
 			final JointTrip toRemove,
-			final JointPlan jointPlan,
-			final StageActivityTypes stages) {
+			final JointPlan jointPlan) {
 		final Plan passengerPlan = jointPlan.getIndividualPlan( toRemove.getPassengerId() );
 		final Trip tripWithLeg =
 			getTripWithLeg(
