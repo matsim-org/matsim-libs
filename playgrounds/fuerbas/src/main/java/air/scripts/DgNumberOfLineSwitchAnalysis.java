@@ -29,7 +29,7 @@ import air.analysis.DgFlightLineSwitchEventHandler;
 public class DgNumberOfLineSwitchAnalysis {
 
 	public static void main(String[] args) {
-		String events = "/home/dgrether/data/work/repos/runs-svn/run1835/ITERS/it.500/1835.500.events.xml.gz";
+		String events = "/home/dgrether/data/work/repos/runs-svn/run1854/ITERS/it.600/1854.600.events.xml.gz";
 		new DgFlightLineSwitchEventHandler().calcLineswitch(events);
 	}
 

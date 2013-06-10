@@ -32,12 +32,20 @@ public class FlightConfigModule {
 
 	public static final String MODULE_NAME = "flight";
 	public static final String DO_REROUTE_STUCKED = "rerouteStuckedPersons";
+	public static final String DO_RANDOMIZED_ROUTING = "randomizedTransitTTAndDisutilityRouting";
 	private Module flightModule;
 	
 	public FlightConfigModule(Config config) {
 		this.flightModule = config.getModule(MODULE_NAME);
 	}
 
+	public boolean doRandomizedTTAndDisutilityRouting(){
+		if (this.flightModule != null){
+			return Boolean.parseBoolean(this.flightModule.getParams().get(DO_RANDOMIZED_ROUTING));
+		}
+		return false;
+	}
+	
 	public boolean doRerouteStuckedPersons() {
 		if (this.flightModule != null){
 			return Boolean.parseBoolean(this.flightModule.getParams().get(DO_REROUTE_STUCKED));

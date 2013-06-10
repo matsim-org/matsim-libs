@@ -20,9 +20,15 @@
 package air.run;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.listener.ControlerListener;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
+
+import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterTravelTimeAndDisutilityControlerListener;
 
 /**
  * @author dgrether
@@ -32,20 +38,33 @@ public class DgFlightControllerStucked {
 	
 	private static final Logger log = Logger.getLogger(DgFlightControllerStucked.class);
 	
-	public static void main(String[] args) {
-//		String[] args2 = {"/media/data/work/repos/shared-svn/studies/countries/eu/flight/dg_oag_flight_model_2_runways_3600vph_one_line/air_config.xml"};
-		Controler controler = new Controler(args);
+	public void run(Scenario scenario) {
+		Controler controler = new Controler(scenario);
 		FlightConfigModule flightConfig = new FlightConfigModule(controler.getConfig());
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 		controler.setOverwriteFiles(true);
 		ControlerListener lis = new SfFlightTimeControlerListener();
 		controler.addControlerListener(lis);
+		if (flightConfig.doRandomizedTTAndDisutilityRouting()) {
+			controler.addControlerListener(new RandomizedTransitRouterTravelTimeAndDisutilityControlerListener());
+			log.info("Enabled RandomizedTravelTimeAndDisutilityRouting...");
+		}
 		if (flightConfig.doRerouteStuckedPersons()){
 			controler.addControlerListener(new FlightStuckedReplanning());
-			log.info("Switched on flight stucked replanning");
+			log.info("Switched on flight stucked replanning...");
 		}
 		controler.run();
-
+		
+	}
+	
+	
+	public static void main(String[] args) {
+//		String configFilePath  = "/media/data/work/repos/shared-svn/studies/countries/eu/flight/dg_oag_flight_model_2_runways_3600vph_one_line/air_config.xml";
+//		String configFilePath = args[0];
+		String configFilePath = "/media/data/work/repos/shared-svn/studies/countries/eu/flight/flight_one_line_mode_choice/air_config_mode_choice.xml";
+		Config config = ConfigUtils.loadConfig(configFilePath);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		new DgFlightControllerStucked().run(scenario);
 	}
 
 }

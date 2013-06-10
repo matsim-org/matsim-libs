@@ -63,13 +63,13 @@ public class DgAirStuckedAnalysis {
 //				"1858",
 //				"1859",
 //				
-//				"1860",
+				"1860",
 //				"1861",
 //				"1862",
 //				"1863",
 //				"1864"
 		};
-		String iteration = "600";
+		String iteration = "500";
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimPopulationReader popReader = new MatsimPopulationReader(sc);
 		popReader.readFile(populationFile);

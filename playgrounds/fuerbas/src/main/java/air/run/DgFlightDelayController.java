@@ -26,8 +26,6 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -37,7 +35,6 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
-import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 /**
  * @author dgrether
@@ -89,12 +86,8 @@ public class DgFlightDelayController {
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		modifySchedule(schedule, 0.371); 
 //		modifySchedule(schedule, 1.0); 
-		Controler controler = new DgFlightController(scenario);
-		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
-		controler.setOverwriteFiles(true);
-		ControlerListener lis = new SfFlightTimeControlerListener();
-		controler.addControlerListener(lis);
-		controler.run();
+		DgFlightControllerStucked controler = new DgFlightControllerStucked();
+		controler.run(scenario);
 
 	}
 
