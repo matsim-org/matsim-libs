@@ -3,7 +3,6 @@ package org.matsim.contrib.matsim4opus.accessibility;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.improvedPseudoPt.PtMatrix;
@@ -11,7 +10,6 @@ import org.matsim.contrib.matsim4opus.config.M4UConfigurationConverterV4;
 import org.matsim.contrib.matsim4opus.constants.InternalConstants;
 import org.matsim.contrib.matsim4opus.gis.GridUtils;
 import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
-import org.matsim.contrib.matsim4opus.gis.ZoneLayer;
 import org.matsim.contrib.matsim4opus.interfaces.MATSim4UrbanSimInterface;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.GridBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.matsim4opus.utils.CreateTestMATSimConfig;
@@ -118,8 +116,10 @@ public class AccessibilityTest implements MATSim4UrbanSimInterface, LinkEnterEve
 		
 		bbox.setCustomBoundaryBox(minX,minY,maxX,maxY);
 		
-		ZoneLayer<Id> startZones = GridUtils.createGridLayerByGridSizeByNetwork(resolution, bbox.getBoundingBox());
-
+		
+		// ZoneLayer<Id> startZones = GridUtils.createGridLayerByGridSizeByNetwork(resolution, bbox.getBoundingBox());
+		ActivityFacilitiesImpl startZones = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(resolution, bbox.getXMin(), bbox.getYMin(), bbox.getYMax(), bbox.getYMax());
+		
 		SpatialGrid gridForFreeSpeedResults = new SpatialGrid(bbox.getBoundingBox(), resolution);
 		SpatialGrid gridForCarResults = new SpatialGrid(gridForFreeSpeedResults);
 		SpatialGrid gridForBikeResults = new SpatialGrid(gridForFreeSpeedResults);

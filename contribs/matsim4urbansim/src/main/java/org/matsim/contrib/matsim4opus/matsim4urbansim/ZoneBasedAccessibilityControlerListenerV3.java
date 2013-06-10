@@ -1,19 +1,15 @@
 package org.matsim.contrib.matsim4opus.matsim4urbansim;
 
-import java.util.Iterator;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.improvedPseudoPt.PtMatrix;
-import org.matsim.contrib.matsim4opus.gis.Zone;
-import org.matsim.contrib.matsim4opus.gis.ZoneLayer;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators.TravelDistanceCalculator;
 import org.matsim.contrib.matsim4opus.utils.LeastCostPathTreeExtended;
 import org.matsim.contrib.matsim4opus.utils.helperObjects.Benchmark;
 import org.matsim.contrib.matsim4opus.utils.io.writer.UrbanSimZoneCSVWriterV2;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
@@ -55,6 +51,7 @@ import org.matsim.utils.LeastCostPathTree;
  * improvements june'13
  * - removed zones as argument to ZoneBasedAccessibilityControlerListenerV3
  * - providing opportunity facilities (e.g. workplaces)
+ * - reduced dependencies to MATSim4UrbanSim contrib: replaced ZoneLayer<Id> and Zone by standard MATSim ActivityFacilities
  * 
  * @author thomas
  *
@@ -68,7 +65,7 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 	// constructors
 	// ////////////////////////////////////////////////////////////////////
 	
-	public ZoneBasedAccessibilityControlerListenerV3(ZoneLayer<Id>  startZones,
+	public ZoneBasedAccessibilityControlerListenerV3(ActivityFacilitiesImpl mp,
 												   ActivityFacilitiesImpl opportunities,
 												   PtMatrix ptMatrix,
 												   Benchmark benchmark,
@@ -76,8 +73,8 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 		
 		log.info("Initializing ZoneBasedAccessibilityControlerListenerV3 ...");
 		
-		assert(startZones != null);
-		this.measuringPointsZone = startZones;
+		assert(mp != null);
+		this.measuringPoints = mp;
 		this.ptMatrix = ptMatrix; // this could be zero of no input files for pseudo pt are given ...
 		assert(benchmark != null);
 		this.benchmark = benchmark;
@@ -123,9 +120,7 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 		try{
 			log.info("Computing and writing zone based accessibility measures ..." );
 			// printParameterSettings(); // use only for debugging (settings are printed as part of config dump)
-			
-			Iterator<Zone<Id>> measuringPointIterator = measuringPointsZone.getZones().iterator();
-			log.info(measuringPointsZone.getZones().size() + "  measurement points are now processing ...");
+			log.info(measuringPoints.getFacilities().values().size() + " measurement points are now processing ...");
 			
 			accessibilityComputation(ttc, 
 					lcptExtFreeSpeedCarTrvelTime,
@@ -133,8 +128,7 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 					lcptTravelDistance, 
 					ptMatrix, 
 					network,
-					measuringPointIterator, 
-					measuringPointsZone.getZones().size(),
+					measuringPoints,
 					ZONE_BASED,
 					controler);
 			
@@ -145,7 +139,7 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 			if (this.benchmark != null && benchmarkID > 0) {
 				this.benchmark.stoppMeasurement(benchmarkID);
 				log.info("Accessibility computation with " 
-						+ measuringPointsZone.getZones().size()
+						+ measuringPoints.getFacilities().size()
 						+ " zones (origins) and "
 						+ this.aggregatedFacilities.length
 						+ " destinations (opportunities) took "
@@ -161,7 +155,7 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 
 	@Override
 	protected void writeCSVData(
-			Zone<Id> measurePoint, Coord coordFromZone,
+			ActivityFacility measurePoint, Coord coordFromZone,
 			Node fromNode, double freeSpeedAccessibility,
 			double carAccessibility, double bikeAccessibility,
 			double walkAccessibility, double ptAccessibility) {

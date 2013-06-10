@@ -15,8 +15,6 @@ import org.matsim.contrib.improvedPseudoPt.PtMatrix;
 import org.matsim.contrib.matsim4opus.config.M4UAccessibilityConfigUtils;
 import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigGroup;
 import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
-import org.matsim.contrib.matsim4opus.gis.Zone;
-import org.matsim.contrib.matsim4opus.gis.ZoneLayer;
 import org.matsim.contrib.matsim4opus.interfaces.SpatialGridDataExchangeInterface;
 import org.matsim.contrib.matsim4opus.utils.LeastCostPathTreeExtended;
 import org.matsim.contrib.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
@@ -32,13 +30,10 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.utils.LeastCostPathTree;
-
-import com.vividsolutions.jts.geom.Point;
 
 /**
  * improvements aug'12
@@ -76,10 +71,8 @@ public class AccessibilityControlerListenerImpl{
 	static int ZONE_BASED 	= 0;
 	static int PARCEL_BASED 	= 1;
 	
-	// start points, measuring accessibility (cell based approach)
-	ZoneLayer<Id> measuringPointsCell;
-	// start points, measuring accessibility (zone based approach)
-	ZoneLayer<Id> measuringPointsZone;
+	// measuring points (origins) for accessibility calculation
+	ActivityFacilitiesImpl measuringPoints;
 	// containing parcel coordinates for accessibility feedback
 	ActivityFacilitiesImpl parcels; 
 	// destinations, opportunities like jobs etc ...
@@ -142,12 +135,7 @@ public class AccessibilityControlerListenerImpl{
 	double constBike;
 	double constWalk;
 	double constPt;
-	
-//	boolean usingCarParameterFromMATSim;	// free speed and congested car
-//	boolean usingBikeParameterFromMATSim;	// bicycle
-//	boolean usingWalkParameterFromMATSim;	// traveling on foot
-//	boolean usingPtParameterFromMATSim;	// public transport
-	
+
 	double VijCarTT, VijCarTTPower, VijCarLnTT, VijCarTD, VijCarTDPower, VijCarLnTD, VijCarTMC, VijCarTMCPower, VijCarLnTMC,
 		   VijWalkTT, VijWalkTTPower, VijWalkLnTT, VijWalkTD, VijWalkTDPower, VijWalkLnTD, VijWalkTMC, VijWalkTMCPower, VijWalkLnTMC,
 		   VijBikeTT, VijBikeTTPower, VijBikeLnTT, VijBikeTD, VijBikeTDPower, VijBikeLnTD, VijBikeTMC, VijBikeTMCPower, VijBikeLnTMC,
@@ -176,12 +164,7 @@ public class AccessibilityControlerListenerImpl{
 		inverseOfLogitScaleParameter = 1/(logitScaleParameter); // logitScaleParameter = same as brainExpBeta on 2-aug-12. kai
 		walkSpeedMeterPerHour = config.plansCalcRoute().getWalkSpeed() * 3600.;
 		bikeSpeedMeterPerHour = config.plansCalcRoute().getBikeSpeed() * 3600.; // should be something like 15000
-		
-//		usingCarParameterFromMATSim = moduleAPCM.isUsingCarParametersFromMATSim();
-//		usingBikeParameterFromMATSim= moduleAPCM.isUsingBikeParametersFromMATSim();
-//		usingWalkParameterFromMATSim= moduleAPCM.isUsingWalkParametersFromMATSim();
-//		usingPtParameterFromMATSim	= moduleAPCM.isUsingPtParametersFromMATSim();
-		
+
 		betaCarTT 	   	= planCalcScoreConfigGroup.getTraveling_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr();
 		betaCarTD		= planCalcScoreConfigGroup.getMarginalUtilityOfMoney() * planCalcScoreConfigGroup.getMonetaryDistanceCostRateCar();
 		betaCarTMC		= - planCalcScoreConfigGroup.getMarginalUtilityOfMoney() ;
@@ -217,10 +200,6 @@ public class AccessibilityControlerListenerImpl{
 		log.info("Inverse of logit Scale Parameter: " + inverseOfLogitScaleParameter);
 		log.info("Walk speed (meter/h): " + this.walkSpeedMeterPerHour + " ("+this.walkSpeedMeterPerHour/3600. +" meter/s)");
 		log.info("Bike speed (meter/h): " + this.bikeSpeedMeterPerHour + " ("+this.bikeSpeedMeterPerHour/3600. +" meter/s)");
-//		log.info("Using Car (congested and free speed) Parameter from MATSim: " + usingCarParameterFromMATSim);
-//		log.info("Using Bicycle Parameter from MATSim: " + usingBikeParameterFromMATSim);
-//		log.info("Using Walk Parameter from MATSim: " + usingWalkParameterFromMATSim);
-//		log.info("Using Pt Parameter from MATSim: " + usingPtParameterFromMATSim);
 		log.info("Depature time (in seconds): " + depatureTime);
 		log.info("Beta Car Travel Time: " + betaCarTT );
 		log.info("Beta Car Travel Time Power2: " + betaCarTTPower );
@@ -341,48 +320,47 @@ public class AccessibilityControlerListenerImpl{
 											LeastCostPathTree lcptTravelDistance, 
 											PtMatrix ptMatrix,
 											NetworkImpl network,
-											Iterator<Zone<Id>> measuringPointIterator,
-											int numberOfMeasuringPoints, 
+											ActivityFacilitiesImpl mp,
 											int mode,
 											Controler contorler) {
 
 		GeneralizedCostSum gcs = new GeneralizedCostSum();
-
+		
+		Iterator<ActivityFacility> mpIterator = mp.getFacilities().values().iterator();
+		
 		// this data structure condense measuring points (origins) that have the same nearest node on the network ...
-		Map<Id,ArrayList<Zone<Id>>> aggregatedMeasurementPoints = new ConcurrentHashMap<Id, ArrayList<Zone<Id>>>();
+		Map<Id,ArrayList<ActivityFacility>> aggregatedMeasurementPointsV2 = new ConcurrentHashMap<Id, ArrayList<ActivityFacility>>();
 
 		// go through all measuring points ...
-		while( measuringPointIterator.hasNext() ){
+		while( mpIterator.hasNext() ){
 
-			Zone<Id> measurePoint = measuringPointIterator.next();
-			Point point = measurePoint.getGeometry().getCentroid();
-			// get coordinate from origin (start point)
-			Coord coordFromZone = new CoordImpl( point.getX(), point.getY());
+			ActivityFacility aFac = mpIterator.next();
+
 			// captures the distance (as walk time) between a cell centroid and the road network
-			Link nearestLink = network.getNearestLinkExactly(coordFromZone);
+			Link nearestLink = network.getNearestLinkExactly(aFac.getCoord());
 			// determine nearest network node (from- or toNode) based on the link 
-			Node fromNode = NetworkUtil.getNearestNode(coordFromZone, nearestLink);
+			Node fromNode = NetworkUtil.getNearestNode(aFac.getCoord(), nearestLink);
 			
 			// this is used as a key for hash map lookups
 			Id id = fromNode.getId();
 			
 			// create new entry if key does not exist!
-			if(!aggregatedMeasurementPoints.containsKey(id))
-				aggregatedMeasurementPoints.put(id, new ArrayList<Zone<Id>>());
+			if(!aggregatedMeasurementPointsV2.containsKey(id))
+				aggregatedMeasurementPointsV2.put(id, new ArrayList<ActivityFacility>());
 			// assign measure point (origin) to it's nearest node
-			aggregatedMeasurementPoints.get(id).add(measurePoint);
+			aggregatedMeasurementPointsV2.get(id).add(aFac);
 		}
 		
 		log.info("");
-		log.info("Number of measure points: " + numberOfMeasuringPoints);
-		log.info("Number of aggregated measure points: " + aggregatedMeasurementPoints.size());
+		log.info("Number of measure points: " + mp.getFacilities().values().size());
+		log.info("Number of aggregated measure points: " + aggregatedMeasurementPointsV2.size());
 		log.info("");
 		
 
-		ProgressBar bar = new ProgressBar( aggregatedMeasurementPoints.size() );
+		ProgressBar bar = new ProgressBar( aggregatedMeasurementPointsV2.size() );
 		
 		// contains all nodes that have a measuring point (origin) assigned
-		Iterator<Id> keyIterator = aggregatedMeasurementPoints.keySet().iterator();
+		Iterator<Id> keyIterator = aggregatedMeasurementPointsV2.keySet().iterator();
 		// contains all network nodes
 		Map<Id, Node> networkNodesMap = network.getNodes();
 		
@@ -401,21 +379,18 @@ public class AccessibilityControlerListenerImpl{
 			lcptTravelDistance.calculate(network, fromNode, depatureTime);
 			
 			// get list with origins that are assigned to "fromNode"
-			ArrayList<Zone<Id>> origins = aggregatedMeasurementPoints.get( nodeId );
-			Iterator<Zone<Id>> originsIterator = origins.iterator();
+			ArrayList<ActivityFacility> origins = aggregatedMeasurementPointsV2.get( nodeId );
+			Iterator<ActivityFacility> originsIterator = origins.iterator();
 			
 			while( originsIterator.hasNext() ){
 				
-				Zone<Id> measurePoint = originsIterator.next();
-				Point point = measurePoint.getGeometry().getCentroid();
-				// get coordinate from origin (start point)
-				Coord coordFromZone = new CoordImpl( point.getX(), point.getY());
-				assert( coordFromZone!=null );
+				ActivityFacility aFac = originsIterator.next();
+				assert( aFac.getCoord() != null );
 				// captures the distance (as walk time) between a cell centroid and the road network
-				LinkImpl nearestLink = (LinkImpl)network.getNearestLinkExactly(coordFromZone);
+				LinkImpl nearestLink = (LinkImpl)network.getNearestLinkExactly(aFac.getCoord());
 				
 				// captures the distance (as walk time) between a zone centroid and its nearest node
-				Distances distance = NetworkUtil.getDistance2Node(nearestLink, point, fromNode);
+				Distances distance = NetworkUtil.getDistance2Node(nearestLink, aFac.getCoord(), fromNode);
 				
 				double distanceMeasuringPoint2Road_meter 	= distance.getDistancePoint2Road(); // distance measuring point 2 road (link or node)
 				double distanceRoad2Node_meter 				= distance.getDistanceRoad2Node();	// distance intersection 2 node (only for orthogonal distance), this is zero if projection is on a node 
@@ -523,14 +498,14 @@ public class AccessibilityControlerListenerImpl{
 
 				if(mode == PARCEL_BASED){ // only for cell-based accessibility computation
 					// assign log sums to current starZone object and spatial grid
-					freeSpeedGrid.setValue(freeSpeedAccessibility, measurePoint.getGeometry().getCentroid());
-					carGrid.setValue(carAccessibility , measurePoint.getGeometry().getCentroid());
-					bikeGrid.setValue(bikeAccessibility , measurePoint.getGeometry().getCentroid());
-					walkGrid.setValue(walkAccessibility , measurePoint.getGeometry().getCentroid());
-					ptGrid.setValue(ptAccessibility, measurePoint.getGeometry().getCentroid());
+					freeSpeedGrid.setValue(freeSpeedAccessibility, aFac.getCoord().getX(), aFac.getCoord().getY());
+					carGrid.setValue(carAccessibility ,aFac.getCoord().getX(), aFac.getCoord().getY());
+					bikeGrid.setValue(bikeAccessibility , aFac.getCoord().getX(), aFac.getCoord().getY());
+					walkGrid.setValue(walkAccessibility , aFac.getCoord().getX(), aFac.getCoord().getY());
+					ptGrid.setValue(ptAccessibility, aFac.getCoord().getX(), aFac.getCoord().getY());
 				}
 
-				writeCSVData(measurePoint, coordFromZone, fromNode, 
+				writeCSVData(aFac, aFac.getCoord(), fromNode, 
 						freeSpeedAccessibility, carAccessibility,
 						bikeAccessibility, walkAccessibility, ptAccessibility);
 			}
@@ -574,7 +549,7 @@ public class AccessibilityControlerListenerImpl{
 	 * @param walkAccessibility
 	 */
 	void writeCSVData(
-			Zone<Id> measurePoint, Coord coordFromZone,
+			ActivityFacility measurePoint, Coord coordFromZone,
 			Node fromNode, double freeSpeedAccessibility,
 			double carAccessibility, double bikeAccessibility,
 			double walkAccessibility, double ptAccessibility) {

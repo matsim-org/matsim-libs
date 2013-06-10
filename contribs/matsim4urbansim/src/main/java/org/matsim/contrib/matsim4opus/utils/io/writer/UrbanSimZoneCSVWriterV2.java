@@ -5,9 +5,8 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.matsim4opus.constants.InternalConstants;
-import org.matsim.contrib.matsim4opus.gis.Zone;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.io.IOUtils;
 
 
@@ -58,16 +57,16 @@ public class UrbanSimZoneCSVWriterV2 {
 	 * @param bikeAccessibility
 	 * @param walkAccessibility
 	 */
-	public static synchronized void write(Zone<Id> startZone,
-							 double freeSpeedAccessibility,
-							 double carAccessibility, 
-							 double bikeAccessibility,
-							 double walkAccessibility,
-							 double ptAccessibility){
+	public static synchronized void write( ActivityFacility startZone,
+										 double freeSpeedAccessibility,
+										 double carAccessibility, 
+										 double bikeAccessibility,
+										 double walkAccessibility,
+										 double ptAccessibility){
 		
 		try{
 			assert(UrbanSimZoneCSVWriterV2.zoneWriter != null);
-			zoneWriter.write( ((Id)startZone.getAttribute()).toString() + "," + 
+			zoneWriter.write( startZone.getId().toString() + "," + 
 							  freeSpeedAccessibility + "," + 
 							  carAccessibility + "," + 
 							  bikeAccessibility + "," +

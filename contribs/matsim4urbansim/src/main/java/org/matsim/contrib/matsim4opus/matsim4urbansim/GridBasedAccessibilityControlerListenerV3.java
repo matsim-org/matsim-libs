@@ -2,22 +2,19 @@ package org.matsim.contrib.matsim4opus.matsim4urbansim;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.improvedPseudoPt.PtMatrix;
 import org.matsim.contrib.matsim4opus.gis.GridUtils;
 import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
-import org.matsim.contrib.matsim4opus.gis.Zone;
-import org.matsim.contrib.matsim4opus.gis.ZoneLayer;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.costcalculators.TravelDistanceCalculator;
 import org.matsim.contrib.matsim4opus.utils.LeastCostPathTreeExtended;
 import org.matsim.contrib.matsim4opus.utils.helperObjects.Benchmark;
 import org.matsim.contrib.matsim4opus.utils.io.writer.AnalysisCellBasedAccessibilityCSVWriterV2;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -111,6 +108,7 @@ import org.matsim.utils.LeastCostPathTree;
  * changes june'13
  * - changed class name from ParcelBasedAccessibilityControlerListenerV3 into GridBasedAccessibilityControlerListenerV3
  * - providing opportunity facilities (e.g. workplaces)
+ * - reduced dependencies to MATSim4UrbanSim contrib: replaced ZoneLayer<Id> and Zone by standard MATSim ActivityFacilities
  * 
  * @author thomas
  * 
@@ -123,7 +121,7 @@ public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 	// constructors
 	// ////////////////////////////////////////////////////////////////////
 	
-	public GridBasedAccessibilityControlerListenerV3(ZoneLayer<Id> startZones, 									// needed for google earth plots
+	public GridBasedAccessibilityControlerListenerV3(ActivityFacilitiesImpl measuringPoints,
 													 ActivityFacilitiesImpl opportunities,
 													 SpatialGrid freeSpeedGrid,									// table for free speed car travel times in accessibility computation
 													 SpatialGrid carGrid, 										// table for congested car travel times in accessibility computation
@@ -136,9 +134,9 @@ public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 													 Network network){
 								
 		log.info("Initializing ParcelBasedAccessibilityControlerListenerV3 ...");
-		
-		assert (startZones != null);
-		this.measuringPointsCell = startZones;
+
+		assert (measuringPoints != null);
+		this.measuringPoints = measuringPoints;
 		assert (freeSpeedGrid != null);
 		this.freeSpeedGrid = freeSpeedGrid;
 		assert (carGrid != null);
@@ -193,9 +191,7 @@ public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 		try{
 			log.info("Computing and writing cell based accessibility measures ...");
 			// printParameterSettings(); // use only for debugging (settings are printed as part of config dump)
-			
-			Iterator<Zone<Id>> measuringPointIterator = measuringPointsCell.getZones().iterator();
-			log.info(measuringPointsCell.getZones().size() + " measurement points are now processing ...");
+			log.info(measuringPoints.getFacilities().values().size() + " measurement points are now processing ...");
 			
 			accessibilityComputation(ttc, 
 									 lcptExtFreeSpeedCarTrvelTime,
@@ -203,8 +199,7 @@ public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 									 lcptTravelDistance, 
 									 ptMatrix,
 									 network,
-									 measuringPointIterator, 
-									 measuringPointsCell.getZones().size(),
+									 measuringPoints,
 									 PARCEL_BASED,
 									 controler);
 			
@@ -214,7 +209,7 @@ public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 			if (this.benchmark != null && benchmarkID > 0) {
 				this.benchmark.stoppMeasurement(benchmarkID);
 				log.info("Accessibility computation with "
-						+ measuringPointsCell.getZones().size()
+						+ measuringPoints.getFacilities().size()
 						+ " starting points (origins) and "
 						+ this.aggregatedFacilities.length
 						+ " destinations (opportunities) took "
@@ -227,8 +222,7 @@ public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 			String matsimOutputDirectory = event.getControler().getScenario().getConfig().controler().getOutputDirectory();
 			
 			AnalysisCellBasedAccessibilityCSVWriterV2.close(); 
-			writePlottingData(matsimOutputDirectory);	// plotting data for visual analysis via R
-			// writeInterpolatedParcelAccessibilities();	// UrbanSim input file with interpolated accessibilities on parcel level
+			writePlottingData(matsimOutputDirectory);			
 			
 			if(this.spatialGridDataExchangeListenerList != null){
 				log.info("Triggering " + this.spatialGridDataExchangeListenerList.size() + " SpatialGridDataExchangeListener(s) ...");
@@ -255,7 +249,7 @@ public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 	 */
 	@Override
 	protected void writeCSVData(
-			Zone<Id> measurePoint, Coord coordFromZone,
+			ActivityFacility measurePoint, Coord coordFromZone,
 			Node fromNode, double freeSpeedAccessibility,
 			double carAccessibility, double bikeAccessibility,
 			double walkAccessibility, double ptAccessibility) {
@@ -275,7 +269,7 @@ public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 		
 		final String FILE_TYPE_TXT = ".txt";
 
-		log.info("Writing plotting files for R into " + matsimOutputDirectory + " ...");
+		log.info("Writing plotting data for R analyis into " + matsimOutputDirectory + " ...");
 		// tnicolai: can be disabled for final release
 		GridUtils.writeSpatialGridTable(freeSpeedGrid, matsimOutputDirectory
 				+ FREESEED_FILENAME + freeSpeedGrid.getResolution()
@@ -297,6 +291,6 @@ public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 				+ PT_FILENAME + ptGrid.getResolution()
 				+ FILE_TYPE_TXT);
 
-		log.info("Writing plotting files for R done!");
+		log.info("Writing plotting data for R done!");
 	}
 }

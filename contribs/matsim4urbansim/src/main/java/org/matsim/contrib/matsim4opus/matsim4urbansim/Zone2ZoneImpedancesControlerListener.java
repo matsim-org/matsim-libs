@@ -130,12 +130,6 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 		Controler controler = event.getControler();
 		Scenario sc = controler.getScenario();
 		
-//		AccessibilityParameterConfigModule moduleAPCM = ConfigurationModule.getAccessibilityParameterConfigModule((ScenarioImpl)sc);
-//		boolean usingCarParameterFromMATSim = moduleAPCM.usingCarParameterFromMATSim();
-//		double betaCarTT 	   	= moduleAPCM.getBetaCarTravelTime();
-//		double betaCarTD		= moduleAPCM.getBetaCarTravelDistance();
-//		double betaCarTMC		= moduleAPCM.getBetaCarTravelMonetaryCost();
-		
 		double samplingRate = ConfigurationUtils.getUrbanSimParameterConfigModule((ScenarioImpl)sc).getPopulationSampleRate();
 		double inverseOfSamplingRate = 1/samplingRate;
 		
