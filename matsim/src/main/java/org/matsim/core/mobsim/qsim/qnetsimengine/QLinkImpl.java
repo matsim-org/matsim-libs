@@ -227,7 +227,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 
 	@Override
 	boolean doSimStep(double now) {
-		updateBufferCapacity();
+		updateRemainingFlowCapacity();
 
 		if ( this.insertingWaitingVehiclesBeforeDrivingVehicles ) {
 			moveWaitToBuffer(now);

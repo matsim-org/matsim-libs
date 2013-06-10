@@ -95,10 +95,10 @@ abstract class AbstractQLane {
 	abstract boolean hasSpace();
 
 
-	final void updateBufferCapacity() {
+	final void updateRemainingFlowCapacity() {
 		this.remainingflowCap = this.flowCapacityPerTimeStep;
-//		if (this.thisTimeStepGreen && this.flowcap_accumulate < 1.0 && this.hasBufferSpaceLeft()) {
-			if (this.thisTimeStepGreen && this.flowcap_accumulate < 1.0 && this.isNotOfferingVehicle() ) {
+//				if (this.thisTimeStepGreen && this.flowcap_accumulate < 1.0 && this.hasBufferSpaceLeft()) {
+		if (this.thisTimeStepGreen && this.flowcap_accumulate < 1.0 && this.isNotOfferingVehicle() ) {
 			this.flowcap_accumulate += this.flowCapacityPerTimeStepFractionalPart;
 		}
 	}

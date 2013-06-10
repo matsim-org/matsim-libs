@@ -421,7 +421,7 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 	 * @return true if there is at least one vehicle moved to another lane
 	 */
 	boolean moveLane(final double now) {
-		updateBufferCapacity();
+		updateRemainingFlowCapacity();
 
 		moveLaneToBuffer(now);
 
