@@ -24,9 +24,9 @@ package org.matsim.contrib.matsim4opus.utils;
 
 import java.math.BigInteger;
 
+import org.matsim.contrib.improvedPseudoPt.config.ImprovedPseudoPtConfigGroup;
 import org.matsim.contrib.matsim4opus.config.M4UConfigUtils;
 import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigGroup;
-import org.matsim.contrib.matsim4opus.config.modules.ImprovedPseudoPtConfigGroup;
 import org.matsim.contrib.matsim4opus.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4opus.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4opus.utils.io.TempDirectoryUtil;

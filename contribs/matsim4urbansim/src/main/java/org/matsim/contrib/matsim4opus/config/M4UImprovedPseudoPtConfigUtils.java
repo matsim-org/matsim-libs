@@ -22,7 +22,7 @@
  */
 package org.matsim.contrib.matsim4opus.config;
 
-import org.matsim.contrib.matsim4opus.config.modules.ImprovedPseudoPtConfigGroup;
+import org.matsim.contrib.improvedPseudoPt.config.ImprovedPseudoPtConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
 
