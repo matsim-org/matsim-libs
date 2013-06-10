@@ -81,7 +81,7 @@
 	</reporting>
 
 	<modules>
-		<module>analysis</module>
+		<module>accessibility</module>
 		<module>cadytsIntegration</module>
 		<module>evacuation</module>
 		<module>freight</module>
