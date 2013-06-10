@@ -797,7 +797,7 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 			return lastDistanceFromFromNode;
 		}
 		
-	};
+	}
 
 	static class FromLinkEndComparator implements Comparator<QLane>, Serializable, MatsimComparator {
 		private static final long serialVersionUID = 1L;
@@ -816,11 +816,6 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 	double getInverseSimulatedFlowCapacity() {
 		return this.inverseFlowCapacityPerTimeStep ;
 	}
-
-//	@Override
-//	int getBufferStorage() {
-//		return this.bufferStorageCapacity ;
-//	}
 
 	void setOTFLane(VisLane otfLane) {
 		this.visdata.visLane = otfLane;
