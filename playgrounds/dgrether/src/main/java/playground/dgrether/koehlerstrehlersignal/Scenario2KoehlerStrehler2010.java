@@ -74,6 +74,16 @@ import playground.dgrether.utils.zones.DgZoneUtils;
 import com.vividsolutions.jts.geom.Envelope;
 
 /**
+ * Converts a MATSim Scenario to the traffic signal optimization model published in 
+ * <ul>
+ * <li>K&ouml;hler, E. &amp; Strehler, M.</li>
+ * <li><i>Traffic Signal Optimization Using Cyclically Expanded Networks</i></li>
+ * <li>Erlebach, T. &amp; L&uuml;bbecke, M. <i>(ed.)</i></li>
+ * <li>Proc. 10th Workshop Algorithmic Approaches for Transportation Modelling, Optimization, and Systems</li>
+ * <li><b>2010</b>(14), pp. 114-129</li>
+ * </ul>
+ * 
+ * 
  * @author dgrether
  * @author tthunig
  */
