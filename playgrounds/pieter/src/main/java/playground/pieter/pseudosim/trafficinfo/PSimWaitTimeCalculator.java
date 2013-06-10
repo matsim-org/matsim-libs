@@ -10,9 +10,9 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import playground.pieter.pseudosim.controler.listeners.MobSimSwitcher;
 import playground.sergioo.singapore2012.transitRouterVariable.WaitTimeStuckCalculator;
 
-public class PseudoSimWaitTimeCalculator extends WaitTimeStuckCalculator {
+public class PSimWaitTimeCalculator extends WaitTimeStuckCalculator {
 
-	public PseudoSimWaitTimeCalculator(Population population,
+	public PSimWaitTimeCalculator(Population population,
 			TransitSchedule transitSchedule, int timeSlot, int totalTime) {
 		super(population, transitSchedule, timeSlot, totalTime);
 

@@ -106,7 +106,7 @@ public class MobSimSwitcher implements ControlerListener,
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		TravelTime ttcalc = controler.getLinkTravelTimes();
+		
 
 		if (checkExpensiveIter(event.getIteration())) {
 			log.warn("Running full queue simulation");
@@ -126,7 +126,7 @@ public class MobSimSwitcher implements ControlerListener,
 			}
 		} else {
 			log.info("Running PSim");
-			controler.setMobsimFactory(new PseudoSimFactory(ttcalc, controler));
+			controler.setMobsimFactory(new PseudoSimFactory( controler));
 			controler.clearPlansForPseudoSimulation();
 
 		}

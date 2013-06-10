@@ -5,7 +5,6 @@ import org.matsim.core.controler.Controler;
 import playground.pieter.pseudosim.controler.PseudoSimControler;
 import playground.pieter.pseudosim.controler.listeners.ExpensiveSimScoreWriter;
 import playground.pieter.pseudosim.controler.listeners.PseudoSimPlanMarkerModuleAppender;
-import playground.pieter.pseudosim.controler.listeners.PseudoSimSubSetSimulationListener;
 import playground.pieter.pseudosim.controler.listeners.MobSimSwitcher;
 import playground.pieter.pseudosim.controler.listeners.SimpleAnnealer;
 import playground.pieter.router.costcalculators.CapacityFavoringStochasticCostCalculator;

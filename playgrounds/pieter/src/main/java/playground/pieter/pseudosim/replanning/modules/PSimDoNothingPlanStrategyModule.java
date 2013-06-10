@@ -1,15 +1,15 @@
-package playground.pieter.pseudosim.replanning;
+package playground.pieter.pseudosim.replanning.modules;
 
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.ReplanningContext;
 
-public class MyDoNothingPlanStrategyModule implements PlanStrategyModule {
+public class PSimDoNothingPlanStrategyModule implements PlanStrategyModule {
 
 
 
-	public MyDoNothingPlanStrategyModule(Controler controler) {
+	public PSimDoNothingPlanStrategyModule(Controler controler) {
 		// TODO Auto-generated constructor stub
 	}
 

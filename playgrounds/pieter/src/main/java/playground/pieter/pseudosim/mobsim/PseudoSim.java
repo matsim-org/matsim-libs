@@ -56,7 +56,7 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.pieter.pseudosim.controler.PseudoSimControler;
-import playground.pieter.pseudosim.trafficinfo.PseudoSimTravelTimeCalculator;
+import playground.pieter.pseudosim.trafficinfo.PSimTravelTimeCalculator;
 import playground.pieter.pseudosim.util.CollectionUtils;
 import playground.sergioo.singapore2012.transitRouterVariable.StopStopTimeCalculator;
 import playground.sergioo.singapore2012.transitRouterVariable.WaitTimeStuckCalculator;
@@ -82,7 +82,7 @@ public class PseudoSim implements Mobsim {
 	private Future<?>[] futures;
 
 	private final ExecutorService executor;
-	private PseudoSimTravelTimeCalculator carLinkTravelTimeCalculator;
+	private PSimTravelTimeCalculator carLinkTravelTimeCalculator;
 	private PseudoSimControler controler;
 	private double beelineWalkSpeed;
 	private StopStopTimeCalculator transitStopToStopTimeCalculator;
@@ -123,18 +123,10 @@ public class PseudoSim implements Mobsim {
 
 		Collection<Plan> plans = new LinkedHashSet<Plan>();
 
-		if (controler.isSimulateSubsetPersonsOnly()) {
-			for (Person p : scenario.getPopulation().getPersons().values()) {
-				if (controler.getAgentPlansMarkedForSubsetPseudoSim().getAttribute(
-						p.getId().toString(), PseudoSimControler.AGENT_ATT) != null) {
-					plans.add(p.getSelectedPlan());
-				}
-			}
-		} else {
 
 			plans.addAll(controler.getPlansForPseudoSimulation());
 			
-		}
+		
 
 		Logger.getLogger(this.getClass()).error(
 				"Executing " + plans.size() + " plans in mental simulation.");

@@ -1,4 +1,4 @@
-package playground.pieter.pseudosim.replanning;
+package playground.pieter.pseudosim.replanning.modules;
 
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
@@ -6,11 +6,11 @@ import org.matsim.core.replanning.ReplanningContext;
 
 import playground.pieter.pseudosim.controler.PseudoSimControler;
 
-public class PseudoSimPlanMarkerModule implements PlanStrategyModule {
+public class PSimPlanMarkerModule implements PlanStrategyModule {
 
 	private PseudoSimControler controler;
 
-	public PseudoSimPlanMarkerModule(PseudoSimControler controler) {
+	public PSimPlanMarkerModule(PseudoSimControler controler) {
 		this.controler = controler;
 	}
 
@@ -21,7 +21,6 @@ public class PseudoSimPlanMarkerModule implements PlanStrategyModule {
 
 	@Override
 	public void handlePlan(Plan plan) {
-//		plan.setScore(0.0);
 		controler.addPlanForPseudoSimulation(plan);
 	}
 

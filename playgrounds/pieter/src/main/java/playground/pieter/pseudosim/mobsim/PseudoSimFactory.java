@@ -16,10 +16,8 @@ import playground.pieter.pseudosim.controler.PseudoSimControler;
  *
  */
 public class PseudoSimFactory implements MobsimFactory {
-	TravelTime ttcalc;
 	PseudoSimControler controler;
-	public PseudoSimFactory(TravelTime ttcalc, PseudoSimControler controler) {
-		this.ttcalc = ttcalc;
+	public PseudoSimFactory( PseudoSimControler controler) {
 		this.controler = controler;
 	}
 

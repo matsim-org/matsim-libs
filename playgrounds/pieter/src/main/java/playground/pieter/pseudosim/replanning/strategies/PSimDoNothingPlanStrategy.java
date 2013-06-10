@@ -1,4 +1,4 @@
-package playground.pieter.pseudosim.replanning;
+package playground.pieter.pseudosim.replanning.strategies;
 
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
@@ -9,12 +9,14 @@ import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
-public class MyDoNothingPlanStrategy implements PlanStrategy {
+import playground.pieter.pseudosim.replanning.modules.PSimDoNothingPlanStrategyModule;
+
+public class PSimDoNothingPlanStrategy implements PlanStrategy {
 	PlanStrategyImpl planStrategyDelegate = null;
 	
-	public MyDoNothingPlanStrategy(Controler controler) {
+	public PSimDoNothingPlanStrategy(Controler controler) {
 	    planStrategyDelegate = new PlanStrategyImpl( new RandomPlanSelector() );
-	    MyDoNothingPlanStrategyModule mod = new MyDoNothingPlanStrategyModule(controler) ;
+	    PSimDoNothingPlanStrategyModule mod = new PSimDoNothingPlanStrategyModule(controler) ;
 	    addStrategyModule(mod) ;
 	}
 

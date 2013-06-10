@@ -9,9 +9,9 @@ import org.matsim.vehicles.Vehicles;
 import playground.pieter.pseudosim.controler.listeners.MobSimSwitcher;
 import playground.sergioo.singapore2012.transitRouterVariable.StopStopTimeCalculator;
 
-public class PseudoSimStopStopTimeCalculator extends StopStopTimeCalculator {
+public class PSimStopStopTimeCalculator extends StopStopTimeCalculator {
 
-	public PseudoSimStopStopTimeCalculator(TransitSchedule transitSchedule,
+	public PSimStopStopTimeCalculator(TransitSchedule transitSchedule,
 			Vehicles vehicles, int timeSlot, int totalTime) {
 		super(transitSchedule, vehicles, timeSlot, totalTime);
 	}

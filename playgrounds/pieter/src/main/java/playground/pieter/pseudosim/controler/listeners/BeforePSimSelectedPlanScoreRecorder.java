@@ -10,10 +10,10 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 
 import playground.pieter.pseudosim.controler.PseudoSimControler;
 
-public class BeforeMentalSimSelectedPlanScoreRecorder implements
+public class BeforePSimSelectedPlanScoreRecorder implements
 		BeforeMobsimListener {
 	private PseudoSimControler c;
-	public BeforeMentalSimSelectedPlanScoreRecorder(PseudoSimControler c) {
+	public BeforePSimSelectedPlanScoreRecorder(PseudoSimControler c) {
 		super();
 		this.c = c;
 	}

@@ -21,8 +21,8 @@ import playground.pieter.pseudosim.controler.listeners.MobSimSwitcher;
  * @author fouriep
  * 
  */
-public class PseudoSimTravelTimeCalculator extends TravelTimeCalculator {
-	public PseudoSimTravelTimeCalculator(Network network,
+public class PSimTravelTimeCalculator extends TravelTimeCalculator {
+	public PSimTravelTimeCalculator(Network network,
 			TravelTimeCalculatorConfigGroup ttconfigGroup) {
 		super(network, ttconfigGroup.getTraveltimeBinSize(), 50 * 3600,
 				ttconfigGroup);

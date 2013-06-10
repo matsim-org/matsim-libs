@@ -8,11 +8,10 @@ import org.matsim.core.replanning.selectors.PlanSelector;
 
 import playground.pieter.pseudosim.controler.PseudoSimControler;
 import playground.pieter.pseudosim.controler.listeners.BeforePseudoSimSelectedPlanNullifier;
-import playground.pieter.pseudosim.controler.listeners.BeforeMentalSimSelectedPlanScoreRecorder;
+import playground.pieter.pseudosim.controler.listeners.BeforePSimSelectedPlanScoreRecorder;
 import playground.pieter.pseudosim.controler.listeners.ExpensiveSimScoreWriter;
 import playground.pieter.pseudosim.controler.listeners.IterationEndsSelectedPlanScoreRestoreListener;
 import playground.pieter.pseudosim.controler.listeners.PseudoSimPlanMarkerModuleAppender;
-import playground.pieter.pseudosim.controler.listeners.PseudoSimSubSetSimulationListener;
 import playground.pieter.pseudosim.controler.listeners.MobSimSwitcher;
 import playground.pieter.pseudosim.controler.listeners.SimpleAnnealer;
 
@@ -25,7 +24,6 @@ public class Main {
 	public static void main(String[] args) {
 		PseudoSimControler c = new PseudoSimControler(args);
 		c.setOverwriteFiles(true);
-		c.setSimulateSubsetPersonsOnly(false);
 		c.run();
 		System.exit(0);
 		
