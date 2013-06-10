@@ -182,7 +182,7 @@ public class AccessibilityControlerListenerImpl{
 //		usingWalkParameterFromMATSim= moduleAPCM.isUsingWalkParametersFromMATSim();
 //		usingPtParameterFromMATSim	= moduleAPCM.isUsingPtParametersFromMATSim();
 		
-		betaCarTT 	   	= planCalcScoreConfigGroup.getPerforming_utils_hr() - planCalcScoreConfigGroup.getTraveling_utils_hr() ;
+		betaCarTT 	   	= planCalcScoreConfigGroup.getTraveling_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr();
 		betaCarTD		= planCalcScoreConfigGroup.getMarginalUtilityOfMoney() * planCalcScoreConfigGroup.getMonetaryDistanceCostRateCar();
 		betaCarTMC		= - planCalcScoreConfigGroup.getMarginalUtilityOfMoney() ;
 		
@@ -346,8 +346,6 @@ public class AccessibilityControlerListenerImpl{
 											int mode,
 											Controler contorler) {
 
-//		grids = new double[numberOfMeasuringPoints][4];
-		
 		GeneralizedCostSum gcs = new GeneralizedCostSum();
 
 		// this data structure condense measuring points (origins) that have the same nearest node on the network ...
@@ -531,12 +529,7 @@ public class AccessibilityControlerListenerImpl{
 					walkGrid.setValue(walkAccessibility , measurePoint.getGeometry().getCentroid());
 					ptGrid.setValue(ptAccessibility, measurePoint.getGeometry().getCentroid());
 				}
-				
-//				grids[Integer.parseInt(measurePoint.getAttribute().toString())][0] = freeSpeedAccessibility;
-//				grids[Integer.parseInt(measurePoint.getAttribute().toString())][1] = carAccessibility;
-//				grids[Integer.parseInt(measurePoint.getAttribute().toString())][2] = bikeAccessibility;
-//				grids[Integer.parseInt(measurePoint.getAttribute().toString())][3] = walkAccessibility;
-				
+
 				writeCSVData(measurePoint, coordFromZone, fromNode, 
 						freeSpeedAccessibility, carAccessibility,
 						bikeAccessibility, walkAccessibility, ptAccessibility);
