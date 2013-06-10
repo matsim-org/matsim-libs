@@ -6,9 +6,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -21,8 +23,11 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.matsim4opus.gis.GridUtils;
 import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
+import org.matsim.contrib.matsim4opus.gis.Zone;
 import org.matsim.contrib.matsim4opus.gis.ZoneLayer;
+import org.matsim.contrib.matsim4opus.utils.misc.ProgressBar;
 import org.matsim.contrib.matsim4opus.utils.network.NetworkBoundaryBox;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
@@ -37,6 +42,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.impl.CoordinateArraySequence;
@@ -311,8 +317,9 @@ public class NetworkInspector {//TODO pfade ändern
 		NetworkBoundaryBox bbox = new NetworkBoundaryBox();
 		bbox.setDefaultBoundaryBox(NetworkInspector.scenario.getNetwork());
 		
+		ZoneLayer<Id> measuringPoints = NetworkInspector.createGridLayerByGridSizeByNetwork(50, bbox.getBoundingBox());
 		// tnicolai: ich habe die GridUtils auskommentiert, da es sonst nicht mehr kompiliert.
-		ZoneLayer<Id> measuringPoints = null;// GridUtils.createGridLayerByGridSizeByNetwork(50, bbox.getBoundingBox());
+
 		SpatialGrid freeSpeedGrid = new SpatialGrid(bbox.getBoundingBox(), 50);
 		ScenarioImpl sc = (ScenarioImpl) NetworkInspector.scenario;
 		
@@ -573,6 +580,70 @@ public class NetworkInspector {//TODO pfade ändern
 
 	public void setArea(Geometry area) {
 		this.envelope = area;
+	}
+	
+	public static ZoneLayer<Id> createGridLayerByGridSizeByNetwork(double gridSize, double [] boundingBox) {
+		
+//		log.info("Setting statring points for accessibility measure ...");
+
+		int skippedPoints = 0;
+		int setPoints = 0;
+		
+		GeometryFactory factory = new GeometryFactory();
+		
+		Set<Zone<Id>> zones = new HashSet<Zone<Id>>();
+
+		double xmin = boundingBox[0];
+		double ymin = boundingBox[1];
+		double xmax = boundingBox[2];
+		double ymax = boundingBox[3];
+		
+		
+		ProgressBar bar = new ProgressBar( (xmax-xmin)/gridSize );
+		
+		// goes step by step from the min x and y coordinate to max x and y coordinate
+		for(double x = xmin; x <xmax; x += gridSize) {
+			
+			bar.update();
+						
+			for(double y = ymin; y < ymax; y += gridSize) {
+				
+				// check first if cell centroid is within study area
+				double center_X = x + (gridSize/2);
+				double center_Y = y + (gridSize/2);
+				
+				// check if x, y is within network boundary
+				if (center_X <= xmax && center_X >= xmin && 
+					center_Y <= ymax && center_Y >= ymin) {
+				
+					Point point = factory.createPoint(new Coordinate(x, y));
+					
+					Coordinate[] coords = new Coordinate[5];
+					coords[0] = point.getCoordinate();
+					coords[1] = new Coordinate(x, y + gridSize);
+					coords[2] = new Coordinate(x + gridSize, y + gridSize);
+					coords[3] = new Coordinate(x + gridSize, y);
+					coords[4] = point.getCoordinate();
+					// Linear Ring defines an artificial zone
+					LinearRing linearRing = factory.createLinearRing(coords);
+					Polygon polygon = factory.createPolygon(linearRing, null);
+					// polygon.setSRID( srid ); // tnicolai: this is not needed to match the grid layer with locations / facilities from UrbanSim
+					
+					Zone<Id> zone = new Zone<Id>(polygon);
+					zone.setAttribute( new IdImpl( setPoints ) );
+					zones.add(zone);
+					
+					setPoints++;
+				}
+				else skippedPoints++;
+			}
+		}
+
+//		log.info("Having " + setPoints + " inside the shape file boundary (and " + skippedPoints + " outside).");
+//		log.info("Done with setting starting points!");
+		
+		ZoneLayer<Id> layer = new ZoneLayer<Id>(zones);
+		return layer;
 	}
 
 }
