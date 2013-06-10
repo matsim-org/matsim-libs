@@ -32,11 +32,11 @@ public class ImprovedPseudoPtConfigGroup extends ReflectiveModule {
 	public static final String GROUP_NAME="improvedPseudoPt" ;
 
 	private static final String USING_PT_STOPS = "usingPtStops";
-	public static final String PT_STOPS = "ptStopsFile";
+	public static final String PT_STOPS = "ptStopsFile"; // tnicolai: originally, this was named "ptStops" in the matsim config. old config files need to be adjusted
 	public static final String PT_STOPS_SWITCH = "usePtStops";
-	public static final String PT_TRAVEL_TIMES = "ptTravelTimesFile";
-	public static final String PT_TRAVEL_DISTANCES = "ptTravelDistancesFile";
-	public static final String PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH = "usingTravelTimesAndDistances";
+	public static final String PT_TRAVEL_TIMES = "ptTravelTimesFile"; // tnicolai: originally, this was named "ptTravelTimes" in the matsim config. old config files need to be adjusted
+	public static final String PT_TRAVEL_DISTANCES = "ptTravelDistancesFile"; // tnicolai: originally, this was named "ptTravelDistances" in the matsim config. old config files need to be adjusted
+	public static final String PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH = "usingTravelTimesAndDistances"; // tnicolai: originally, this was named "useTravelTimesAndDistances" in the matsim config. old config files need to be adjusted
 	private String ptStopsInputFile;
 	private String ptTravelTimesInputFile;
 	private String ptTravelDistancesInputFile;

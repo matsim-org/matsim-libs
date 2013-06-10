@@ -26,7 +26,6 @@ package org.matsim.contrib.matsim4opus.gis;
 import java.io.BufferedReader;
 import java.io.IOException;
 
-import org.apache.log4j.Logger;
 import org.matsim.contrib.matsim4opus.utils.io.writer.SpatialGridTableWriter;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -45,8 +44,6 @@ import com.vividsolutions.jts.geom.Point;
  */
 public class SpatialGrid{
 	
-	private static final Logger log = Logger.getLogger(SpatialGrid.class);
-
 	private double[][] matrix;
 	
 	private final double minX;
@@ -194,18 +191,6 @@ public class SpatialGrid{
 	
 	public boolean isInBounds(double x, double y){
 		return (x >= minX && x <= maxX && y >= minY && y <= maxY);
-	}
-	
-	/**
-	 * returns the value at matrix[row][col] so the mirrored intern representation 
-	 * 
-	 * @param row the row number
-	 * @param col the column number
-	 * @return the value at matrix[row][col]
-	 */
-	@Deprecated
-	private double getMirroredValue(int row, int col) {
-		return matrix[row][col];
 	}
 	
 	/**

@@ -23,7 +23,6 @@
 package org.matsim.contrib.matsim4opus.config;
 
 import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigGroup;
-import org.matsim.contrib.matsim4opus.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.jaxbconfig2.Matsim4UrbansimType;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;

@@ -331,10 +331,14 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 			
 			// if ptStops etc are given in config
 			PlansCalcRouteConfigGroup plansCalcRoute = controler.getScenario().getConfig().plansCalcRoute();
+			// determining the bounds minX/minY -- maxX/maxY. For optimal performance of the QuadTree. All pt stops should be evenly distributed within this rectangle.
+			NetworkBoundaryBox nbb = new NetworkBoundaryBox();
+			nbb.setDefaultBoundaryBox(controler.getScenario().getNetwork());
 			ptMatrix = new PtMatrix(controler.getScenario().getNetwork(),
 									plansCalcRoute.getTeleportedModeSpeeds().get(TransportMode.walk),
 									plansCalcRoute.getTeleportedModeSpeeds().get(TransportMode.pt),
 									plansCalcRoute.getBeelineDistanceFactor(),
+									nbb.getXMin(), nbb.getYMin(), nbb.getXMax(), nbb.getYMax(),
 									M4UImprovedPseudoPtConfigUtils.getConfigModuleAndPossiblyConvert(controler.getScenario().getConfig()));	
 			controler.setTripRouterFactory( new MATSim4UrbanSimRouterFactoryImpl(controler, ptMatrix) ); // the car and pt router
 			

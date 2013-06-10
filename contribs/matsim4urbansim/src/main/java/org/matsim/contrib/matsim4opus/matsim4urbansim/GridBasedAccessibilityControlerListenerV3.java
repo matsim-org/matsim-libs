@@ -9,7 +9,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.matsim4opus.constants.InternalConstants;
 import org.matsim.contrib.matsim4opus.gis.GridUtils;
 import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
 import org.matsim.contrib.matsim4opus.gis.Zone;
@@ -133,7 +132,8 @@ public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 													 SpatialGrid ptGrid,
 													 PtMatrix ptMatrix,
 													 Benchmark benchmark,										// adds an extension to output files whether a shape-file or network boundaries are used for calculation
-													 Config config, Network network){
+													 Config config, 
+													 Network network){
 								
 		log.info("Initializing ParcelBasedAccessibilityControlerListenerV3 ...");
 		
@@ -149,9 +149,11 @@ public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 		this.walkGrid = walkGrid;
 		assert (ptGrid != null);
 		this.ptGrid = ptGrid;
+		this.ptMatrix = ptMatrix;	// this could be zero of no input files for pseudo pt are given ...
 		assert (benchmark != null);
 		this.benchmark = benchmark;
-		this.ptMatrix = ptMatrix;	// this could be zero of no input files for pseudo pt are given ...
+		assert (config != null);
+		assert (network != null);
 
 		// writing accessibility measures continuously into a csv file, which is not 
 		// dedicated for as input for UrbanSim, but for analysis purposes
@@ -270,28 +272,30 @@ public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 	 * @throws IOException
 	 */
 	private void writePlottingData(String matsimOutputDirectory) throws IOException{
+		
+		final String FILE_TYPE_TXT = ".txt";
 
 		log.info("Writing plotting files for R into " + matsimOutputDirectory + " ...");
 		// tnicolai: can be disabled for final release
 		GridUtils.writeSpatialGridTable(freeSpeedGrid, matsimOutputDirectory
 				+ FREESEED_FILENAME + freeSpeedGrid.getResolution()
-				+ InternalConstants.FILE_TYPE_TXT);
+				+ FILE_TYPE_TXT);
 		// tnicolai: can be disabled for final release
 		GridUtils.writeSpatialGridTable(carGrid, matsimOutputDirectory
 				+ CAR_FILENAME + carGrid.getResolution()
-				+ InternalConstants.FILE_TYPE_TXT);
+				+ FILE_TYPE_TXT);
 		// tnicolai: can be disabled for final release
 		GridUtils.writeSpatialGridTable(bikeGrid, matsimOutputDirectory
 				+ BIKE_FILENAME + bikeGrid.getResolution()
-				+ InternalConstants.FILE_TYPE_TXT);
+				+ FILE_TYPE_TXT);
 		// tnicolai: can be disabled for final release
 		GridUtils.writeSpatialGridTable(walkGrid, matsimOutputDirectory
 				+ WALK_FILENAME + walkGrid.getResolution()
-				+ InternalConstants.FILE_TYPE_TXT);
+				+ FILE_TYPE_TXT);
 		// tnicolai: can be disabled for final release
 		GridUtils.writeSpatialGridTable(ptGrid, matsimOutputDirectory
 				+ PT_FILENAME + ptGrid.getResolution()
-				+ InternalConstants.FILE_TYPE_TXT);
+				+ FILE_TYPE_TXT);
 
 		log.info("Writing plotting files for R done!");
 	}

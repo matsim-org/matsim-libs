@@ -28,6 +28,7 @@ import java.io.StringWriter;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigGroup;
+import org.matsim.contrib.matsim4opus.config.modules.ImprovedPseudoPtConfigGroup;
 import org.matsim.contrib.matsim4opus.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4opus.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4opus.constants.InternalConstants;
@@ -98,10 +99,7 @@ public class M4UConfigUtils {
 		module.setZoneBasedAccessibility(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isZoneBasedAccessibility());
 		module.setCellBasedAccessibility(computeCellBasedAccessibility);
 		
-		M4UImprovedPseudoPtConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
-		
 		AccessibilityConfigGroup acm = M4UAccessibilityConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
-//		acm.setTimeOfDay(timeOfDay) ;
 		acm.setUsingCustomBoundingBox(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isUseCustomBoundingBox());
 		acm.setBoundingBoxLeft(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().getBoundingBoxLeft());
 		acm.setBoundingBoxBottom(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().getBoundingBoxBottom());
@@ -123,7 +121,6 @@ public class M4UConfigUtils {
 	static void initUrbanSimParameters(Matsim4UrbansimType matsim4UrbanSimParameter, Module matsim4urbansimModule, Config config){
 
 		// get every single matsim4urbansim/urbansimParameter
-		String projectName 		= ""; // not needed anymore dec'12
 		double populationSamplingRate = matsim4UrbanSimParameter.getUrbansimParameter().getPopulationSamplingRate();
 		int year 				= matsim4UrbanSimParameter.getUrbansimParameter().getYear().intValue();
 
@@ -146,7 +143,7 @@ public class M4UConfigUtils {
 			log.info("<param name=\"urbanSimZoneShapefileLocationDistribution\" value=\"/path/to/shapeFile\" />");
 			log.info("</module>");
 		}
-
+		
 		String opusHome 		= Paths.checkPathEnding( matsim4UrbanSimParameter.getUrbansimParameter().getOpusHome() );
 		String opusDataPath 	= Paths.checkPathEnding( matsim4UrbanSimParameter.getUrbansimParameter().getOpusDataPath() );
 		String matsim4Opus 		= Paths.checkPathEnding( matsim4UrbanSimParameter.getUrbansimParameter().getMatsim4Opus() );
@@ -160,7 +157,7 @@ public class M4UConfigUtils {
 
 		// // set parameter in module 
 		UrbanSimParameterConfigModuleV3 module = getUrbanSimParameterConfigAndPossiblyConvert(config);
-		module.setProjectName(projectName);
+		// module.setProjectName(""); // not needed anymore dec'12
 		// module.setSpatialUnitFlag(spatialUnit); // tnicolai not needed anymore dec'12
 		module.setPopulationSampleRate(populationSamplingRate);
 		module.setYear(year);
@@ -186,6 +183,68 @@ public class M4UConfigUtils {
 		InternalConstants.MATSIM_4_OPUS_OUTPUT = module.getMATSim4OpusOutput();
 		InternalConstants.MATSIM_4_OPUS_TEMP = module.getMATSim4OpusTemp();
 		InternalConstants.MATSIM_4_OPUS_BACKUP = module.getMATSim4OpusBackup();
+	}
+	
+	static void initImprovedPseudoPtParameter(Module matsim4urbansimModule, Config config){
+		
+		log.info("Checking improved pseudo pt settings ...");
+		ImprovedPseudoPtConfigGroup ippcm = M4UImprovedPseudoPtConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
+		
+		if(matsim4urbansimModule != null){
+			String usePtStops = matsim4urbansimModule.getValue(ippcm.PT_STOPS_SWITCH);
+			String ptStops = matsim4urbansimModule.getValue(ippcm.PT_STOPS);
+			String useTravelTimesAndDistances =  matsim4urbansimModule.getValue(ippcm.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH);
+			String ptTravelTimes =  matsim4urbansimModule.getValue(ippcm.PT_TRAVEL_TIMES);
+			String ptTravelDistances =  matsim4urbansimModule.getValue(ippcm.PT_TRAVEL_DISTANCES);
+
+			if(usePtStops != null &&  usePtStops.equalsIgnoreCase("true")){
+				log.info(ippcm.PT_STOPS_SWITCH + " switch is set to true. Trying to find pt stops file ...");
+				// checking for pt stops
+				if(ptStops != null){
+					File ptStopsFile = new File(ptStops);
+					if(ptStopsFile.exists()){
+						log.info("Found pt stops file " + ptStops);
+						ippcm.setUsingPtStops(true);
+						ippcm.setPtStopsInputFile(ptStops);
+					}
+					else{
+						log.warn("Pt stops file " + ptStops + " not found! Improved pseudo pt will not be initialized!");
+						ippcm.setUsingPtStops(false);
+					}
+					
+					// checking for other input files
+					if(useTravelTimesAndDistances != null && useTravelTimesAndDistances.equalsIgnoreCase("true")){
+						log.info(ippcm.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH + " switch is set to true. Trying to find travel times and distances files ...");
+						
+						File ptTravelTimesFile = new File(ptTravelTimes);
+						File ptTravelDistancesFile = new File(ptTravelDistances); 
+						
+						if(ptTravelTimesFile.exists() && ptTravelDistancesFile.exists()){
+							log.info("Found travel times and travel distances input files:");
+							log.info("Travel times input file: " + ptTravelTimes);
+							log.info("Travel distances input file: " + ptTravelDistances);
+							ippcm.setUsingTravelTimesAndDistances(true);
+							ippcm.setPtTravelTimesInputFile(ptTravelTimes);
+							ippcm.setPtTravelDistancesInputFile(ptTravelDistances);
+							
+						}
+						else{
+							log.warn("Travel times and travel distances input files not found!");
+							log.warn("Travel times input file: " + ptTravelTimes);
+							log.warn("Travel distances input file: " + ptTravelDistances);
+							ippcm.setUsingTravelTimesAndDistances(false);
+						}
+					}
+					else
+						log.info(ippcm.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH + " switch is set to false. Additional travel times and distances files will not be read!");
+					
+				}
+				else
+					log.warn("No pt stops file given. Improved pseudo pt will not be initialized!");
+			}
+			else
+				log.info(ippcm.PT_STOPS_SWITCH + " switch is set to false. Improved pseudo pt will not be initialized.");
+		}
 	}
 
 	/**
