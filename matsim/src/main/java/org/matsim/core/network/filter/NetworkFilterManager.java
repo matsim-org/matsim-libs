@@ -34,6 +34,9 @@ import org.matsim.core.network.NetworkImpl;
  * network containing only the links and nodes that passed
  * the filters.
  *
+ * Note that the Network instance created is connected, i.e. in- and outlink references are set 
+ * to links of the filtered network.
+ * 
  * @author dgrether
  */
 public class NetworkFilterManager {
