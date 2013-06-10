@@ -48,6 +48,9 @@ public class DgConfigCleaner {
 			else if (line.contains("walkSpeedFactor")) {
 				line = line.replaceAll("walkSpeedFactor", "walkSpeed");
 			}
+			else if (line.contains("recursionTravelSpeed")){
+				line = line.replaceAll("recursionTravelSpeed", "travelSpeed_car");
+			}
 			//skip line without replacement
 			else if (line.contains("ptScaleFactor") ||
 					line.contains("localDTDBase") ||
@@ -58,7 +61,8 @@ public class DgConfigCleaner {
 					line.contains("offsetWalk") ||
 					line.contains("outputTimeFormat") ||
 					line.contains("constrained") ||
-					line.contains("simple_tg")
+					line.contains("simple_tg") ||
+					line.contains("travelSpeed_carChange")
 				) {
 				line = reader.readLine();
 				continue;
