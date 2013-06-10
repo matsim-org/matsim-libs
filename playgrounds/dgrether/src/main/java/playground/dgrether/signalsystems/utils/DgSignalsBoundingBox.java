@@ -21,14 +21,12 @@ package playground.dgrether.signalsystems.utils;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.utils.gis.PolygonFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
@@ -41,7 +39,7 @@ import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * 
- * 
+ * Provides functionality to create a bounding box around all nodes that are controlled by Traffic Signals.
  * @author dgrether
  *
  */
@@ -59,34 +57,30 @@ public class DgSignalsBoundingBox {
 	
 	public SimpleFeature calculateBoundingBoxForSignals(Network net, SignalSystemsData signalSystemsData, double offset){
 		//get all signalized link ids
-		Map<Id, Set<Id>> signalizedLinkIdsBySystemIdMap = DgSignalsUtils.calculateSignalizedLinksPerSystem(signalSystemsData); 
-		Set<Id> signalizedLinkIds = new HashSet<Id>();
-		for (Set<Id> set : signalizedLinkIdsBySystemIdMap.values()){
-			signalizedLinkIds.addAll(set);
-		}
-		SimpleFeature boundingboxFeature = calcBoundingBox(net, signalizedLinkIds, offset);
+		Set<Id> signalizedNodeIds = DgSignalsUtils.calculateSignalizedNodes(signalSystemsData, net);
+		SimpleFeature boundingboxFeature = calcBoundingBox(net, signalizedNodeIds, offset);
 		return boundingboxFeature;
 	}
 	
-	private SimpleFeature calcBoundingBox(Network net, Set<Id> signalizedLinkIds, double offset) {
-		Link l = null;
+	private SimpleFeature calcBoundingBox(Network net, Set<Id> signalizedNodeIds, double offset) {
+		Node n = null;
 		double minX = Double.POSITIVE_INFINITY;
 		double minY = Double.POSITIVE_INFINITY;
 		double maxX = Double.NEGATIVE_INFINITY;
 		double maxY = Double.NEGATIVE_INFINITY;
-		for (Id linkId : signalizedLinkIds){
-			l = net.getLinks().get(linkId);
-			if (l.getCoord().getX() < minX) {
-				minX = l.getCoord().getX();
+		for (Id nodeId : signalizedNodeIds){
+			n = net.getNodes().get(nodeId);
+			if (n.getCoord().getX() < minX) {
+				minX = n.getCoord().getX();
 			}
-			if (l.getCoord().getX() > maxX) {
-				maxX = l.getCoord().getX();
+			if (n.getCoord().getX() > maxX) {
+				maxX = n.getCoord().getX();
 			}
-			if (l.getCoord().getY() > maxY) {
-				maxY = l.getCoord().getY();
+			if (n.getCoord().getY() > maxY) {
+				maxY = n.getCoord().getY();
 			}
-			if (l.getCoord().getY() < minY) {
-				minY = l.getCoord().getY();
+			if (n.getCoord().getY() < minY) {
+				minY = n.getCoord().getY();
 			}
 		}
 

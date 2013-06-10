@@ -1,6 +1,11 @@
+package playground.dgrether;
+import org.matsim.core.controler.Controler;
+import org.matsim.vis.otfvis.OTFFileWriterFactory;
+
+
 /* *********************************************************************** *
  * project: org.matsim.*
- * SignalizedLinkSpeedFilter
+ * DgOtfVisController
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,38 +22,19 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.utils;
-
-import java.util.Set;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.filter.NetworkLinkFilter;
-
 
 /**
+ * Runs the MATSim default controler with the OTFVis snapshot writing attached. 
  * @author dgrether
  *
  */
-public class SignalizedNodesSpeedFilter implements NetworkLinkFilter {
+public class DgOtfVisController {
 
-	private Set<Id> signalizedNodes;
-
-	public SignalizedNodesSpeedFilter(Set<Id> signalizedNodes) {
-		this.signalizedNodes = signalizedNodes;
-	}
-
-	@Override
-	public boolean judgeLink(Link l) {
-		Id fromNodeId = l.getFromNode().getId();
-		Id toNodeId = l.getToNode().getId();
-		if (this.signalizedNodes.contains(fromNodeId) || this.signalizedNodes.contains(toNodeId)) {
-			return true;
-		}
-		if (l.getFreespeed() > 10.0) {
-			return true;
-		}
-		return false;
+	public static void main(String[] args) {
+		Controler c = new Controler(args);
+		c.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
+		c.setOverwriteFiles(true);
+		c.run();
 	}
 
 }

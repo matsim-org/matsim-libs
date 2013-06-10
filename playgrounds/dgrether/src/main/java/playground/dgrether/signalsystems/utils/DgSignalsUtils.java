@@ -66,7 +66,6 @@ public class DgSignalsUtils {
 
 	
 	/**
-	 * @param signalSystemsData 
 	 * @return Map with the signal system Id as key and a List with Node Ids as values
 	 */
 	public static Map<Id, Set<Id>>calculateSignalizedNodesPerSystem(SignalSystemsData signalSystemsData, Network net){
@@ -85,6 +84,17 @@ public class DgSignalsUtils {
 			}
 		}
 		return signalizedNodesPerSystem;
+	}
+	
+	/**
+	 * @return a Set containing the Ids of all signalized Nodes in the network
+	 */
+	public static Set<Id> calculateSignalizedNodes(SignalSystemsData signalSystemsData, Network net) {
+		Set<Id> signalizedNodeIds = new HashSet<Id>();
+		for (Set<Id> set : DgSignalsUtils.calculateSignalizedNodesPerSystem(signalSystemsData, net).values()){
+			signalizedNodeIds.addAll(set);
+		}
+		return signalizedNodeIds;
 	}
 
 	/**

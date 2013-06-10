@@ -34,13 +34,10 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.network.NetworkWriter;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.algorithms.NetworkCleaner;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -59,7 +56,6 @@ import playground.dgrether.koehlerstrehlersignal.data.DgKSNetwork;
 import playground.dgrether.koehlerstrehlersignal.gexf.DgKSNetwork2Gexf;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdConverter;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdPool;
-import playground.dgrether.signalsystems.utils.DgNetworkShrinker;
 import playground.dgrether.signalsystems.utils.DgSignalsBoundingBox;
 import playground.dgrether.signalsystems.utils.DgSignalsUtils;
 import playground.dgrether.utils.DgGrid;
@@ -93,12 +89,12 @@ public class Scenario2KoehlerStrehler2010 {
 	
 	private static final String smallNetworkFilename = "network_small.xml.gz";
 	private static final String modelOutfile = "koehler_strehler_model.xml";
+	
 	private double matsimPopSampleSize = 1.0;
 	private double ksModelCommoditySampleSize = 1.0;
 	private String shapeFileDirectory = "shapes/";
 
 	private Scenario fullScenario;
-
 	private CoordinateReferenceSystem crs;
 	
 	
@@ -107,6 +103,7 @@ public class Scenario2KoehlerStrehler2010 {
 		this.crs = crs;
 	}
 
+	
 	public void convert(String outputDirectory, String name, double boundingBoxOffset, int cellsX, int cellsY, double startTimeSec, double endTimeSec) throws IOException{
 		OutputDirectoryLogging.initLoggingWithOutputDirectory(outputDirectory);
 		String shapeFileDirectory = this.createShapeFileDirectory(outputDirectory);
@@ -124,45 +121,10 @@ public class Scenario2KoehlerStrehler2010 {
 		netShrinker.setSignalizedNodes(signalizedNodes);
 		Network smallNetwork = netShrinker.createSmallNetwork(fullScenario.getNetwork(), bb, crs);
 		
-			
-		//create commodities between all signal-pairs
-		DgCommodities signalCommodities = new DgCommodities();
-		for (Id fromSignalId : signalizedNodes){
-			for (Id toSignalId : signalizedNodes){
-				if (!fromSignalId.equals(toSignalId)){
-					DgCommodity signalCom = new DgCommodity(new IdImpl("signalCommodity_" + fromSignalId + "-" + toSignalId));
-					signalCom.setSourceNode(fromSignalId, 1.0);
-					signalCom.setDrainNode(toSignalId);
-					signalCommodities.addCommodity(signalCom);	
-				}
-			}
-		}
-
-		//calculate shortest paths between all signal-pairs with dijkstra
-		TtDgKoehlerStrehler2010Router ttDgKoehlerStrehler2010Router = new TtDgKoehlerStrehler2010Router();
-		List<Id> invalidSignalCommodities = ttDgKoehlerStrehler2010Router.routeCommodities(fullScenario.getNetwork(), signalCommodities);
-		List<Path> shortestPaths = ttDgKoehlerStrehler2010Router.getShortestPaths();
-		if (invalidSignalCommodities.size() != 0) 
-			log.warn("There is no valid path between some signals.");
-		//add all these shortest paths to the small network
-		for (Path path : shortestPaths){
-			//add missing nodes to the small network
-			for (Node node : path.nodes){
-				if (!smallNetwork.getNodes().containsKey(node.getId())){
-					addNode(smallNetwork, node);				
-				}
-			}
-			//add missing links to the small network
-			for (Link link : path.links){
-				if (!smallNetwork.getLinks().containsKey(link.getId())){
-					addLink(smallNetwork, link);
-				}
-			}
-		}
-				
-		NetworkCleaner cleaner = new NetworkCleaner();
-		cleaner.run(smallNetwork);
-		
+		//"clean" the small network
+//		DgNetworkCleaner cleaner = new DgNetworkCleaner();
+//		cleaner.run(smallNetwork);
+//		
 		//run a network simplifier to merge links with same attributes
 		Set<Integer> nodeTypesToMerge = new TreeSet<Integer>();
 		nodeTypesToMerge.add(new Integer(4));

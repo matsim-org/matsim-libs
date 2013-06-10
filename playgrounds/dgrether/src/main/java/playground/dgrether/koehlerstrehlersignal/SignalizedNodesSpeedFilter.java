@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CottbusSmallNetworkGenerator
+ * SignalizedLinkSpeedFilter
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,35 +17,43 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.utils;
+package playground.dgrether.koehlerstrehlersignal;
 
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.network.filter.NetworkFilterManager;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-import playground.dgrether.analysis.FeatureNetworkLinkStartEndCoordFilter;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.network.filter.NetworkLinkFilter;
 
 
-public class DgNetworkShrinker {
-
+/**
+ * @author dgrether
+ *
+ */
+public class SignalizedNodesSpeedFilter implements NetworkLinkFilter {
 
 	private Set<Id> signalizedNodes;
+	private Set<Id> shortestPathLinkIds;
 
-	public Network createSmallNetwork(Network net, SimpleFeature boundingBoxFeature, CoordinateReferenceSystem networkCrs) {
-		NetworkFilterManager filterManager = new NetworkFilterManager(net);
-		filterManager.addLinkFilter(new FeatureNetworkLinkStartEndCoordFilter(networkCrs, boundingBoxFeature, networkCrs));
-		filterManager.addLinkFilter(new SignalizedNodesSpeedFilter(this.signalizedNodes));
-		Network newNetwork = filterManager.applyFilters();
-		return newNetwork;		
+	public SignalizedNodesSpeedFilter(Set<Id> signalizedNodes, Set<Id> shortestPathLinkIds) {
+		this.signalizedNodes = signalizedNodes;
+		this.shortestPathLinkIds = shortestPathLinkIds;
 	}
 
-	public void setSignalizedNodes(Set<Id> signalizedNodes) {
-		this.signalizedNodes = signalizedNodes;
+	@Override
+	public boolean judgeLink(Link l) {
+		if (this.shortestPathLinkIds.contains(l.getId())){
+			return true;
+		}
+		Id fromNodeId = l.getFromNode().getId();
+		Id toNodeId = l.getToNode().getId();
+		if (this.signalizedNodes.contains(fromNodeId) || this.signalizedNodes.contains(toNodeId)) {
+			return true;
+		}
+		if (l.getFreespeed() > 10.0) {
+			return true;
+		}
+		return false;
 	}
 
 }
-

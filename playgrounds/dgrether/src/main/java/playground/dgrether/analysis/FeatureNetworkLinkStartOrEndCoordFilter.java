@@ -38,12 +38,12 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author dgrether
  *
  */
-public class FeatureNetworkLinkStartEndCoordFilter implements NetworkLinkFilter {
+public class FeatureNetworkLinkStartOrEndCoordFilter implements NetworkLinkFilter {
 
 	private MathTransform transform;
 	private SimpleFeature feature;
 	
-	public FeatureNetworkLinkStartEndCoordFilter(CoordinateReferenceSystem networkSrs,
+	public FeatureNetworkLinkStartOrEndCoordFilter(CoordinateReferenceSystem networkSrs,
 			SimpleFeature feature, CoordinateReferenceSystem featureSrs) {
 		this.feature = feature;
 		try {
