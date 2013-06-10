@@ -5,17 +5,16 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
+import org.matsim.contrib.accessibility.gis.GridUtils;
+import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.improvedPseudoPt.PtMatrix;
 import org.matsim.contrib.matsim4opus.config.M4UConfigurationConverterV4;
 import org.matsim.contrib.matsim4opus.constants.InternalConstants;
-import org.matsim.contrib.matsim4opus.gis.GridUtils;
-import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
 import org.matsim.contrib.matsim4opus.interfaces.MATSim4UrbanSimInterface;
-import org.matsim.contrib.matsim4opus.matsim4urbansim.GridBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.matsim4opus.utils.CreateTestMATSimConfig;
 import org.matsim.contrib.matsim4opus.utils.CreateTestNetwork;
 import org.matsim.contrib.matsim4opus.utils.CreateTestUrbansimPopulation;
-import org.matsim.contrib.matsim4opus.utils.helperObjects.Benchmark;
 import org.matsim.contrib.matsim4opus.utils.io.ReadFromUrbanSimModel;
 import org.matsim.contrib.matsim4opus.utils.io.TempDirectoryUtil;
 import org.matsim.contrib.matsim4opus.utils.network.NetworkBoundaryBox;
@@ -131,8 +130,6 @@ public class AccessibilityTest implements MATSim4UrbanSimInterface, LinkEnterEve
 		ActivityFacilitiesImpl opportunities = new ActivityFacilitiesImpl("opportunities");
 		
 //		this.getReadFromUrbanSimModel().readFacilitiesParcel(parcels, zones);
-		
-		Benchmark benchmark = new Benchmark();
 
 		PtMatrix ptMatrix = null;
 
@@ -141,7 +138,7 @@ public class AccessibilityTest implements MATSim4UrbanSimInterface, LinkEnterEve
 		if(this.isParcelMode()){
 			listener = new GridBasedAccessibilityControlerListenerV3(startZones, opportunities, 
 					gridForFreeSpeedResults, gridForCarResults, gridForBikeResults, gridForWalkResults, gridForPtResults, 
-					ptMatrix, benchmark, config, net);
+					ptMatrix, config, net);
 			ctrl.addControlerListener(listener);
 			ctrl.run();
 			

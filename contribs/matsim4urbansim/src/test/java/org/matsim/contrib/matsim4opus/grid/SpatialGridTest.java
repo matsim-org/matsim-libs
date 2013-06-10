@@ -2,7 +2,7 @@ package org.matsim.contrib.matsim4opus.grid;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
+import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.matsim4opus.utils.CreateTestNetwork;
 import org.matsim.contrib.matsim4opus.utils.network.NetworkBoundaryBox;
 import org.matsim.core.network.NetworkImpl;

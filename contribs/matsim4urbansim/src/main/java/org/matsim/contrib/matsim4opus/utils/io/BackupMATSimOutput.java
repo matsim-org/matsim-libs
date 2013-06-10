@@ -6,18 +6,18 @@ import java.util.ArrayList;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.accessibility.AccessibilityControlerListenerImpl;
+import org.matsim.contrib.accessibility.config.AccessibilityConfigGroup;
+import org.matsim.contrib.accessibility.config.M4UAccessibilityConfigUtils;
+import org.matsim.contrib.accessibility.utils.io.writer.UrbanSimZoneCSVWriterV2;
 import org.matsim.contrib.matsim4opus.config.ConfigurationUtils;
-import org.matsim.contrib.matsim4opus.config.M4UAccessibilityConfigUtils;
 import org.matsim.contrib.matsim4opus.config.M4UConfigUtils;
-import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigGroup;
 import org.matsim.contrib.matsim4opus.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4opus.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4opus.constants.InternalConstants;
-import org.matsim.contrib.matsim4opus.matsim4urbansim.AccessibilityControlerListenerImpl;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.Zone2ZoneImpedancesControlerListener;
 import org.matsim.contrib.matsim4opus.utils.io.writer.UrbanSimParcelCSVWriter;
 import org.matsim.contrib.matsim4opus.utils.io.writer.UrbanSimPersonCSVWriter;
-import org.matsim.contrib.matsim4opus.utils.io.writer.UrbanSimZoneCSVWriterV2;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.scenario.ScenarioImpl;
 

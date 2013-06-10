@@ -24,6 +24,7 @@
 package org.matsim.contrib.matsim4opus.config;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.accessibility.config.M4UAccessibilityConfigUtils;
 import org.matsim.contrib.improvedPseudoPt.config.ImprovedPseudoPtConfigUtils;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.jaxbconfig2.ConfigType;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.jaxbconfig2.Matsim4UrbansimType;
@@ -123,7 +124,7 @@ public class M4UConfigurationConverterV4 {
 		// M4UConfigUtils.initImprovedPseudoPtParameter(matsim4urbansimConfigPart3, config);
 		ImprovedPseudoPtConfigUtils.initImprovedPseudoPtParameter(matsim4urbansimConfigPart3, config);
 		M4UConfigUtils.initMATSim4UrbanSimControler(matsim4urbansimConfigPart2, config);
-		M4UAccessibilityConfigUtils.initAccessibilityParameters(matsim4urbansimConfigPart2, config);
+		M4UAccessibilityConfigUtils.initAccessibilityParameters(config);
 		M4UConfigUtils.initNetwork(matsim4urbansimConfigPart1, config); // ok
 		M4UConfigUtils.insertPlansParamsAndConfigureWarmOrHotStart(matsim4urbansimConfigPart1, config); // ok
 		M4UConfigUtils.initControler(matsim4urbansimConfigPart1, config); // yyyy can't fix since it is using static variables.  kai, may'13 

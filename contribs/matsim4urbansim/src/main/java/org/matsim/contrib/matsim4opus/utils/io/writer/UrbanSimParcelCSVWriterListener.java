@@ -3,8 +3,8 @@ package org.matsim.contrib.matsim4opus.utils.io.writer;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
-import org.matsim.contrib.matsim4opus.interfaces.SpatialGridDataExchangeInterface;
+import org.matsim.contrib.accessibility.gis.SpatialGrid;
+import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
 import org.matsim.contrib.matsim4opus.interpolation.Interpolation;
 import org.matsim.contrib.matsim4opus.utils.misc.ProgressBar;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;

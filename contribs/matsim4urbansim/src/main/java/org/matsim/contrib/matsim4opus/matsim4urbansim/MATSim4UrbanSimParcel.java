@@ -34,18 +34,21 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
+import org.matsim.contrib.accessibility.ZoneBasedAccessibilityControlerListenerV3;
+import org.matsim.contrib.accessibility.config.AccessibilityConfigGroup;
+import org.matsim.contrib.accessibility.gis.GridUtils;
+import org.matsim.contrib.accessibility.gis.SpatialGrid;
+import org.matsim.contrib.accessibility.utils.AggregateObject2NearestNode;
 import org.matsim.contrib.improvedPseudoPt.MATSim4UrbanSimRouterFactoryImpl;
 import org.matsim.contrib.improvedPseudoPt.PtMatrix;
 import org.matsim.contrib.improvedPseudoPt.config.ImprovedPseudoPtConfigGroup;
 import org.matsim.contrib.improvedPseudoPt.config.ImprovedPseudoPtConfigUtils;
 import org.matsim.contrib.matsim4opus.config.M4UConfigurationConverterV4;
-import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigGroup;
 import org.matsim.contrib.matsim4opus.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4opus.config.modules.UrbanSimParameterConfigModuleV3;
-import org.matsim.contrib.matsim4opus.gis.GridUtils;
-import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
+import org.matsim.contrib.matsim4opus.constants.InternalConstants;
 import org.matsim.contrib.matsim4opus.interfaces.MATSim4UrbanSimInterface;
-import org.matsim.contrib.matsim4opus.utils.helperObjects.AggregateObject2NearestNode;
 import org.matsim.contrib.matsim4opus.utils.helperObjects.Benchmark;
 import org.matsim.contrib.matsim4opus.utils.io.BackupMATSimOutput;
 import org.matsim.contrib.matsim4opus.utils.io.Paths;
@@ -387,7 +390,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 																					  zones, 
 																					  parcels,
 																					  ptMatrix,
-																					  benchmark) );
+																					  this.benchmark) );
 		}
 		if(computeAgentPerformance)
 			// creates a persons.csv output for UrbanSim
@@ -398,7 +401,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 			controler.addControlerListener( new ZoneBasedAccessibilityControlerListenerV3(zones,
 																						opportunities,
 																						ptMatrix,
-																						benchmark,
+																						InternalConstants.MATSIM_4_OPUS_TEMP,
 																						this.scenario));
 		}
 		
@@ -451,8 +454,8 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 																												 walkGrid,
 																												 ptGrid,
 																												 ptMatrix,
-																												 benchmark,
-																												 scenario.getConfig(), scenario.getNetwork() );
+																												 scenario.getConfig(), 
+																												 scenario.getNetwork() );
 				// accessibility calculations will be triggered when mobsim finished
 				controler.addControlerListener(gbacl);
 				// creating a writer listener that writes out accessibility results in UrbanSim format for parcels
@@ -470,8 +473,8 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 																							 walkGrid, 
 																							 ptGrid,
 																							 ptMatrix,
-																							 benchmark,
-																							 scenario.getConfig(), scenario.getNetwork() ));
+																							 scenario.getConfig(), 
+																							 scenario.getNetwork() ));
 		}
 		
 		// From here outputs are for analysis/debugging purposes only

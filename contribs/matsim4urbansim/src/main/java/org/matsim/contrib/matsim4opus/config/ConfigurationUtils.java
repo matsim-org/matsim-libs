@@ -20,7 +20,7 @@
 package org.matsim.contrib.matsim4opus.config;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigGroup;
+import org.matsim.contrib.accessibility.config.AccessibilityConfigGroup;
 import org.matsim.contrib.matsim4opus.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4opus.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.core.config.Module;
