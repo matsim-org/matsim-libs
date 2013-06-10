@@ -5,7 +5,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.matsim4opus.gis.SpatialGrid;
+import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.matsim4opus.interpolation.Interpolation;
 
 /**
