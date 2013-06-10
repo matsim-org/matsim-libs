@@ -35,6 +35,7 @@ import org.matsim.contrib.matsim4opus.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4opus.improvedpseudopt.PtMatrix;
 import org.matsim.contrib.matsim4opus.utils.CreateTestNetwork;
 import org.matsim.contrib.matsim4opus.utils.io.TempDirectoryUtil;
+import org.matsim.contrib.matsim4opus.utils.network.NetworkBoundaryBox;
 import org.matsim.contrib.matsim4opus.utils.network.NetworkUtil;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -88,8 +89,11 @@ public class PtMatrixTest extends MatsimTestCase{
 		ImprovedPseudoPtConfigGroup module = new ImprovedPseudoPtConfigGroup();
 		module.setPtStopsInputFile(location);								// this is to be compatible with real code
 
+		// determining the bounds minX/minY -- maxX/maxY. For optimal performance of the QuadTree. All pt stops should be evenly distributed within this rectangle.
+		NetworkBoundaryBox nbb = new NetworkBoundaryBox();
+		nbb.setDefaultBoundaryBox(network);
 		// call and init the pt matrix
-		PtMatrix ptm = new PtMatrix(network, defaultWalkSpeed, defaultPtSpeed, beelineDistanceFactor, module);
+		PtMatrix ptm = new PtMatrix(network, defaultWalkSpeed, defaultPtSpeed, beelineDistanceFactor, nbb.getXMin(), nbb.getYMin(), nbb.getXMax(), nbb.getYMax(), module);
 
 		// test the matrix
 		List<Coord> facilityList = CreateTestNetwork.getTestFacilityLocations();
@@ -189,8 +193,11 @@ public class PtMatrixTest extends MatsimTestCase{
 		module.setPtTravelTimesInputFile(timesLocation);						// this is to be compatible with real code
 		module.setPtTravelDistancesInputFile(distancesLocation);				// this is to be compatible with real code
 
+		// determining the bounds minX/minY -- maxX/maxY. For optimal performance of the QuadTree. All pt stops should be evenly distributed within this rectangle.
+		NetworkBoundaryBox nbb = new NetworkBoundaryBox();
+		nbb.setDefaultBoundaryBox(network);
 		// call and init the pt matrix
-		PtMatrix ptm = new PtMatrix(network, defaultWalkSpeed, defaultPtSpeed, beelineDistanceFactor, module);
+		PtMatrix ptm = new PtMatrix(network, defaultWalkSpeed, defaultPtSpeed, beelineDistanceFactor, nbb.getXMin(), nbb.getYMin(), nbb.getXMax(), nbb.getYMax(), module);
 
 		// test the matrix
 		List<Coord> facilityList = CreateTestNetwork.getTestFacilityLocations();
