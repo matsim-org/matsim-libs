@@ -34,6 +34,7 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.contrib.improvedPseudoPt.config.ImprovedPseudoPtConfigGroup;
+import org.matsim.contrib.improvedPseudoPt.config.ImprovedPseudoPtConfigUtils;
 import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigGroup;
 import org.matsim.contrib.matsim4opus.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4opus.config.modules.UrbanSimParameterConfigModuleV3;
@@ -300,7 +301,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 		///////////////////////////////////////////////////
 		M4UControlerConfigModuleV3 matsim4UrbanSimControlerModule = M4UConfigUtils.getMATSim4UrbaSimControlerConfigAndPossiblyConvert(config) ;
 		AccessibilityConfigGroup acm = M4UAccessibilityConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
-		ImprovedPseudoPtConfigGroup ippcm = M4UImprovedPseudoPtConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
+		ImprovedPseudoPtConfigGroup ippcm = ImprovedPseudoPtConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
 		
 		// time of day
 		Assert.assertTrue( acm.getTimeOfDay() == externalTestConfig.timeOfDay );

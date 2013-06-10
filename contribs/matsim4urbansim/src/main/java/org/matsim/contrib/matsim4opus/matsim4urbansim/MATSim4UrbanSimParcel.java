@@ -38,8 +38,8 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.improvedPseudoPt.MATSim4UrbanSimRouterFactoryImpl;
 import org.matsim.contrib.improvedPseudoPt.PtMatrix;
 import org.matsim.contrib.improvedPseudoPt.config.ImprovedPseudoPtConfigGroup;
+import org.matsim.contrib.improvedPseudoPt.config.ImprovedPseudoPtConfigUtils;
 import org.matsim.contrib.matsim4opus.config.M4UConfigurationConverterV4;
-import org.matsim.contrib.matsim4opus.config.M4UImprovedPseudoPtConfigUtils;
 import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigGroup;
 import org.matsim.contrib.matsim4opus.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4opus.config.modules.UrbanSimParameterConfigModuleV3;
@@ -311,7 +311,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 		controler.setCreateGraphs(true);	// sets whether output graphs are created
 		
 		PtMatrix ptMatrix = null ;
-		ImprovedPseudoPtConfigGroup ippcm = M4UImprovedPseudoPtConfigUtils.getConfigModuleAndPossiblyConvert(scenario.getConfig()) ;
+		ImprovedPseudoPtConfigGroup ippcm = ImprovedPseudoPtConfigUtils.getConfigModuleAndPossiblyConvert(scenario.getConfig()) ;
 		if(ippcm.getPtStopsInputFile() != null){
 			log.info("Initializing MATSim4UrbanSim pseudo pt router ...");
 			// will lead to a null pointer anyway, but since the 
@@ -339,7 +339,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 									plansCalcRoute.getTeleportedModeSpeeds().get(TransportMode.pt),
 									plansCalcRoute.getBeelineDistanceFactor(),
 									nbb.getXMin(), nbb.getYMin(), nbb.getXMax(), nbb.getYMax(),
-									M4UImprovedPseudoPtConfigUtils.getConfigModuleAndPossiblyConvert(controler.getScenario().getConfig()));	
+									ImprovedPseudoPtConfigUtils.getConfigModuleAndPossiblyConvert(controler.getScenario().getConfig()));	
 			controler.setTripRouterFactory( new MATSim4UrbanSimRouterFactoryImpl(controler, ptMatrix) ); // the car and pt router
 			
 			log.error("reconstructing pt route distances; not tested ...") ;

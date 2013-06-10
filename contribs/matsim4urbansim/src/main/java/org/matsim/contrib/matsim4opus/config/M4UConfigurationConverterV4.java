@@ -24,6 +24,7 @@
 package org.matsim.contrib.matsim4opus.config;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.improvedPseudoPt.config.ImprovedPseudoPtConfigUtils;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.jaxbconfig2.ConfigType;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.jaxbconfig2.Matsim4UrbansimType;
 import org.matsim.contrib.matsim4opus.matsim4urbansim.jaxbconfig2.MatsimConfigType;
@@ -119,7 +120,8 @@ public class M4UConfigurationConverterV4 {
 		Module matsim4urbansimConfigPart3 = M4UConfigUtils.getM4UModuleFromExternalConfig(matsim4urbansimConfigPart1.getMatsimConfig().getInputFile());
 
 		M4UConfigUtils.initUrbanSimParameters(matsim4urbansimConfigPart2, matsim4urbansimConfigPart3, config);
-		M4UConfigUtils.initImprovedPseudoPtParameter(matsim4urbansimConfigPart3, config);
+		// M4UConfigUtils.initImprovedPseudoPtParameter(matsim4urbansimConfigPart3, config);
+		ImprovedPseudoPtConfigUtils.initImprovedPseudoPtParameter(matsim4urbansimConfigPart3, config);
 		M4UConfigUtils.initMATSim4UrbanSimControler(matsim4urbansimConfigPart2, config);
 		M4UAccessibilityConfigUtils.initAccessibilityParameters(matsim4urbansimConfigPart2, config);
 		M4UConfigUtils.initNetwork(matsim4urbansimConfigPart1, config); // ok

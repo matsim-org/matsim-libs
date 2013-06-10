@@ -28,6 +28,7 @@ import java.io.StringWriter;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.improvedPseudoPt.config.ImprovedPseudoPtConfigGroup;
+import org.matsim.contrib.improvedPseudoPt.config.ImprovedPseudoPtConfigUtils;
 import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigGroup;
 import org.matsim.contrib.matsim4opus.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4opus.config.modules.UrbanSimParameterConfigModuleV3;
@@ -188,17 +189,17 @@ public class M4UConfigUtils {
 	static void initImprovedPseudoPtParameter(Module matsim4urbansimModule, Config config){
 		
 		log.info("Checking improved pseudo pt settings ...");
-		ImprovedPseudoPtConfigGroup ippcm = M4UImprovedPseudoPtConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
+		ImprovedPseudoPtConfigGroup ippcm = ImprovedPseudoPtConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
 		
 		if(matsim4urbansimModule != null){
-			String usePtStops = matsim4urbansimModule.getValue(ippcm.PT_STOPS_SWITCH);
-			String ptStops = matsim4urbansimModule.getValue(ippcm.PT_STOPS);
-			String useTravelTimesAndDistances =  matsim4urbansimModule.getValue(ippcm.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH);
-			String ptTravelTimes =  matsim4urbansimModule.getValue(ippcm.PT_TRAVEL_TIMES);
-			String ptTravelDistances =  matsim4urbansimModule.getValue(ippcm.PT_TRAVEL_DISTANCES);
+			String usePtStops = matsim4urbansimModule.getValue(ImprovedPseudoPtConfigGroup.PT_STOPS_SWITCH);
+			String ptStops = matsim4urbansimModule.getValue(ImprovedPseudoPtConfigGroup.PT_STOPS);
+			String useTravelTimesAndDistances =  matsim4urbansimModule.getValue(ImprovedPseudoPtConfigGroup.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH);
+			String ptTravelTimes =  matsim4urbansimModule.getValue(ImprovedPseudoPtConfigGroup.PT_TRAVEL_TIMES);
+			String ptTravelDistances =  matsim4urbansimModule.getValue(ImprovedPseudoPtConfigGroup.PT_TRAVEL_DISTANCES);
 
 			if(usePtStops != null &&  usePtStops.equalsIgnoreCase("true")){
-				log.info(ippcm.PT_STOPS_SWITCH + " switch is set to true. Trying to find pt stops file ...");
+				log.info(ImprovedPseudoPtConfigGroup.PT_STOPS_SWITCH + " switch is set to true. Trying to find pt stops file ...");
 				// checking for pt stops
 				if(ptStops != null){
 					File ptStopsFile = new File(ptStops);
@@ -214,7 +215,7 @@ public class M4UConfigUtils {
 					
 					// checking for other input files
 					if(useTravelTimesAndDistances != null && useTravelTimesAndDistances.equalsIgnoreCase("true")){
-						log.info(ippcm.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH + " switch is set to true. Trying to find travel times and distances files ...");
+						log.info(ImprovedPseudoPtConfigGroup.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH + " switch is set to true. Trying to find travel times and distances files ...");
 						
 						File ptTravelTimesFile = new File(ptTravelTimes);
 						File ptTravelDistancesFile = new File(ptTravelDistances); 
@@ -236,14 +237,14 @@ public class M4UConfigUtils {
 						}
 					}
 					else
-						log.info(ippcm.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH + " switch is set to false. Additional travel times and distances files will not be read!");
+						log.info(ImprovedPseudoPtConfigGroup.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH + " switch is set to false. Additional travel times and distances files will not be read!");
 					
 				}
 				else
 					log.warn("No pt stops file given. Improved pseudo pt will not be initialized!");
 			}
 			else
-				log.info(ippcm.PT_STOPS_SWITCH + " switch is set to false. Improved pseudo pt will not be initialized.");
+				log.info(ImprovedPseudoPtConfigGroup.PT_STOPS_SWITCH + " switch is set to false. Improved pseudo pt will not be initialized.");
 		}
 	}
 

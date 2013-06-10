@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.improvedPseudoPt.MATSim4UrbanSimRouterFactoryImpl;
 import org.matsim.contrib.improvedPseudoPt.PtMatrix;
 import org.matsim.contrib.improvedPseudoPt.config.ImprovedPseudoPtConfigGroup;
-import org.matsim.contrib.matsim4opus.config.M4UImprovedPseudoPtConfigUtils;
+import org.matsim.contrib.improvedPseudoPt.config.ImprovedPseudoPtConfigUtils;
 import org.matsim.contrib.matsim4opus.utils.network.NetworkBoundaryBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -67,7 +67,7 @@ public class ImprovedPseudoPtIntegrationTest {
 								plansCalcRoute.getTeleportedModeSpeeds().get(TransportMode.pt),
 								plansCalcRoute.getBeelineDistanceFactor(),
 								nbb.getXMin(), nbb.getYMin(), nbb.getXMax(), nbb.getYMax(),
-								M4UImprovedPseudoPtConfigUtils.getConfigModuleAndPossiblyConvert(controler.getScenario().getConfig()));	
+								ImprovedPseudoPtConfigUtils.getConfigModuleAndPossiblyConvert(controler.getScenario().getConfig()));	
 		controler.setTripRouterFactory( new MATSim4UrbanSimRouterFactoryImpl(controler, ptMatrix) ); // the car and pt router
 
 		

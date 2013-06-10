@@ -24,6 +24,7 @@ package org.matsim.contrib.matsim4opus.config;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.improvedPseudoPt.config.ImprovedPseudoPtConfigGroup;
+import org.matsim.contrib.improvedPseudoPt.config.ImprovedPseudoPtConfigUtils;
 import org.matsim.contrib.matsim4opus.config.modules.AccessibilityConfigGroup;
 import org.matsim.contrib.matsim4opus.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4opus.config.modules.UrbanSimParameterConfigModuleV3;
@@ -48,7 +49,7 @@ public class M4UConfigConsistencyChecker implements ConfigConsistencyChecker {
 		UrbanSimParameterConfigModuleV3 urbansimParameterModule = (UrbanSimParameterConfigModuleV3) config.getModule(UrbanSimParameterConfigModuleV3.GROUP_NAME ) ;
 		@SuppressWarnings("unused")
 		AccessibilityConfigGroup accessibilityConfigModule = M4UAccessibilityConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
-		ImprovedPseudoPtConfigGroup ippcm = M4UImprovedPseudoPtConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
+		ImprovedPseudoPtConfigGroup ippcm = ImprovedPseudoPtConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
 		
 		if ( ippcm.isUsingTravelTimesAndDistances() ) {
 			if ( !ippcm.isUsingPtStops() ) {
