@@ -360,7 +360,7 @@ EXTRACT_PRIVATE        = NO
 # If the EXTRACT_PACKAGE tag is set to YES all members with package or internal 
 # scope will be included in the documentation.
 
-EXTRACT_PACKAGE        = NO
+EXTRACT_PACKAGE        = YES
 
 # If the EXTRACT_STATIC tag is set to YES all static members of a file 
 # will be included in the documentation.
@@ -653,10 +653,7 @@ WARN_LOGFILE           =
 # with spaces.
 
 INPUT                  = org/matsim/core \
-                         org/matsim/api \
-                         ../../../../../contrib/trunk/transEnergySim/src/main/java \
-                         ../../../../../contrib/trunk/freight/src/main/java \
-                         ../../../../../playgrounds/trunk/kai/src/main/java
+                         org/matsim/api
 
 # This tag can be used to specify the character encoding of the source files 
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding, which is 
