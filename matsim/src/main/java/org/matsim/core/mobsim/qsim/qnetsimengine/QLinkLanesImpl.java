@@ -176,7 +176,7 @@ public class QLinkLanesImpl extends AbstractQLink {
 		while (!laneList.isEmpty()){
 			QLane lastQLane = laneList.remove(0);
 			laneStack.push(lastQLane);
-			lastQLane.setFireLaneEvents(true);
+			lastQLane.setGeneratingEvents(true);
 			this.queueLanes.add(lastQLane);
 
 			//if existing create the subsequent lanes

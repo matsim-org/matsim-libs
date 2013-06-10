@@ -132,7 +132,7 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 	 * LaneEvents should only be fired if there is more than one QueueLane on a QueueLink
 	 * because the LaneEvents are identical with LinkEnter/LeaveEvents otherwise.
 	 */
-	private boolean fireLaneEvents = false;
+	private boolean generatingEvents = false;
 
 	private DefaultSignalizeableItem qSignalizedItem;
 
@@ -513,7 +513,7 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 		this.vehQueue.add(veh);
 		this.laneEnterTimeMap.put(veh, now);
 		this.usedStorageCapacity += veh.getSizeInEquivalents();
-		if (this.isFireLaneEvents()) {
+		if (this.generatingEvents) {
 			this.qLink.network.simEngine.getMobsim().getEventsManager()
 			.processEvent(new LaneEnterEvent(now, veh.getDriver().getId(), this.qLink.getLink().getId(), this.getId()));
 		}
@@ -558,7 +558,7 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 		QVehicle veh = this.buffer.poll();
 		this.bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
 		this.laneEnterTimeMap.remove(veh);
-		if (this.isFireLaneEvents()) {
+		if (this.generatingEvents) {
 			this.getQLink().network.simEngine.getMobsim().getEventsManager().processEvent(new LaneLeaveEvent(
 					now, veh.getDriver().getId(), this.qLink.getLink().getId(), this.getId()
 			));
@@ -665,12 +665,8 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 
 
 
-	 boolean isFireLaneEvents() {
-		return this.fireLaneEvents;
-	}
-
-	 void setFireLaneEvents(final boolean fireLaneEvents) {
-		this.fireLaneEvents = fireLaneEvents;
+	 void setGeneratingEvents(final boolean fireLaneEvents) {
+		this.generatingEvents = fireLaneEvents;
 	}
 
 	 void addToLane(final QLane lane) {
