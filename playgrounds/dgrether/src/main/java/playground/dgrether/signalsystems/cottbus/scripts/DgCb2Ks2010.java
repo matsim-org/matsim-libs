@@ -24,7 +24,7 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
 import playground.dgrether.DgPaths;
-import playground.dgrether.koehlerstrehlersignal.DgMATSimScenario2KoehlerStrehler2010;
+import playground.dgrether.koehlerstrehlersignal.Scenario2KoehlerStrehler2010;
 import playground.dgrether.signalsystems.cottbus.DgCottbusScenarioPaths;
 
 
@@ -37,14 +37,14 @@ public class DgCb2Ks2010 {
 	public static void main(String[] args) throws Exception {
 		int cellsX = 5;
 		int cellsY = 5;
-		double boundingBoxOffset = 450.0;
+		double boundingBoxOffset = 50.0;
 		double startTime = 5.5 * 3600.0;
 		double endTime = 9.5 * 3600.0;
 	//private static double startTime = 13.5 * 3600.0;
 	//private static double endTime = 18.5 * 3600.0;
 		double matsimPopSampleSize = 1.0;
 		double ksModelCommoditySampleSize = 0.01;
-		final String outputDirectory = DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/test/";
+		final String outputDirectory = DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/test_tt/";
 
 		String networkFilename = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network_wgs84_utm33n.xml.gz";
 		String lanesFilename = DgCottbusScenarioPaths.LANES_FILENAME;
@@ -54,11 +54,11 @@ public class DgCb2Ks2010 {
 		//TODO change to run1712 when finished
 		String populationFilename = DgPaths.REPOS + "runs-svn/run1292/1292.output_plans_sample.xml";
 //		String populationFile = DgPaths.REPOS + "runs-svn/run1292/1292.output_plans.xml.gz";
-		Scenario fullScenario = DgMATSimScenario2KoehlerStrehler2010.loadScenario(networkFilename, populationFilename, lanesFilename, signalSystemsFilename, signalGroupsFilename, signalControlFilename);
+		Scenario fullScenario = Scenario2KoehlerStrehler2010.loadScenario(networkFilename, populationFilename, lanesFilename, signalSystemsFilename, signalGroupsFilename, signalControlFilename);
 		
 		String name = "run 1292 output plans between 05:30 and 09:30";
 
-		DgMATSimScenario2KoehlerStrehler2010 matsim2KsConverter = new DgMATSimScenario2KoehlerStrehler2010(fullScenario,  MGC.getCRS(TransformationFactory.WGS84_UTM33N));
+		Scenario2KoehlerStrehler2010 matsim2KsConverter = new Scenario2KoehlerStrehler2010(fullScenario,  MGC.getCRS(TransformationFactory.WGS84_UTM33N));
 		matsim2KsConverter.setMatsimPopSampleSize(matsimPopSampleSize);
 		matsim2KsConverter.setKsModelCommoditySampleSize(ksModelCommoditySampleSize);
 		matsim2KsConverter.convert(outputDirectory, name, boundingBoxOffset, cellsX, cellsY, startTime, endTime);
