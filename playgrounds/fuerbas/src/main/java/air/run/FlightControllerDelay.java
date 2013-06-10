@@ -40,9 +40,9 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
  * @author dgrether
  * 
  */
-public class DgFlightDelayController {
+public class FlightControllerDelay {
 	
-	private static final Logger log = Logger.getLogger(DgFlightDelayController.class);
+	private static final Logger log = Logger.getLogger(FlightControllerDelay.class);
 	
 	
 	
@@ -86,7 +86,7 @@ public class DgFlightDelayController {
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		modifySchedule(schedule, 0.371); 
 //		modifySchedule(schedule, 1.0); 
-		DgFlightControllerStucked controler = new DgFlightControllerStucked();
+		FlightController controler = new FlightController();
 		controler.run(scenario);
 
 	}

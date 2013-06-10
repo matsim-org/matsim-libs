@@ -34,9 +34,9 @@ import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterTravelTimeA
  * @author dgrether
  * 
  */
-public class DgFlightControllerStucked {
+public class FlightController {
 	
-	private static final Logger log = Logger.getLogger(DgFlightControllerStucked.class);
+	private static final Logger log = Logger.getLogger(FlightController.class);
 	
 	public void run(Scenario scenario) {
 		Controler controler = new Controler(scenario);
@@ -64,7 +64,7 @@ public class DgFlightControllerStucked {
 		String configFilePath = "/media/data/work/repos/shared-svn/studies/countries/eu/flight/flight_one_line_mode_choice/air_config_mode_choice.xml";
 		Config config = ConfigUtils.loadConfig(configFilePath);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		new DgFlightControllerStucked().run(scenario);
+		new FlightController().run(scenario);
 	}
 
 }
