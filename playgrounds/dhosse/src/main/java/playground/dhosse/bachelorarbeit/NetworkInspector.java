@@ -311,7 +311,8 @@ public class NetworkInspector {//TODO pfade ändern
 		NetworkBoundaryBox bbox = new NetworkBoundaryBox();
 		bbox.setDefaultBoundaryBox(NetworkInspector.scenario.getNetwork());
 		
-		ZoneLayer<Id> measuringPoints = GridUtils.createGridLayerByGridSizeByNetwork(50, bbox.getBoundingBox());
+		// tnicolai: ich habe die GridUtils auskommentiert, da es sonst nicht mehr kompiliert.
+		ZoneLayer<Id> measuringPoints = null;// GridUtils.createGridLayerByGridSizeByNetwork(50, bbox.getBoundingBox());
 		SpatialGrid freeSpeedGrid = new SpatialGrid(bbox.getBoundingBox(), 50);
 		ScenarioImpl sc = (ScenarioImpl) NetworkInspector.scenario;
 		
