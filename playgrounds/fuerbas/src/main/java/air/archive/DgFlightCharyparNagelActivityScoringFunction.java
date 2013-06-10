@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package air.run;
+package air.archive;
 
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
@@ -27,8 +27,9 @@ import org.matsim.pt.PtConstants;
 
 /**
  * @author dgrether
- *
+ * @deprecated not needed anymore, functionality is now core matsim
  */
+@Deprecated
 public class DgFlightCharyparNagelActivityScoringFunction extends CharyparNagelActivityScoring {
 	
 	private static final String PT_INTERACTION_ACTIVITY_TYPE = PtConstants.TRANSIT_ACTIVITY_TYPE;
