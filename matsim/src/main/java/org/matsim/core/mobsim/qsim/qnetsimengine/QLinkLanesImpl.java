@@ -393,7 +393,7 @@ public class QLinkLanesImpl extends AbstractQLink {
 	int vehOnLinkCount() {
 		int count = 0;
 		for (QLane ql : this.queueLanes){
-			count += ql.vehOnLinkCount();
+			count += ql.getNrOfVehsInQueue();
 		}
 		return count;
 	}

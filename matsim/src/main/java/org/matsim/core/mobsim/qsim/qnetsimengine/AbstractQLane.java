@@ -93,8 +93,7 @@ abstract class AbstractQLane {
 	abstract boolean hasGreenForToLink(Id toLinkId);
 	
 	abstract boolean hasSpace();
-
-
+	
 	final void updateRemainingFlowCapacity() {
 		this.remainingflowCap = this.flowCapacityPerTimeStep;
 //				if (this.thisTimeStepGreen && this.flowcap_accumulate < 1.0 && this.hasBufferSpaceLeft()) {

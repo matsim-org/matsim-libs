@@ -22,6 +22,7 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
@@ -36,6 +37,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.LaneEnterEvent;
@@ -70,7 +72,7 @@ import org.matsim.vis.snapshotwriters.VisData;
  * @author aneumann
  * @author mrieser
  */
-public final class QLane extends AbstractQLane implements SignalizeableItem {
+public final class QLane extends AbstractQLane implements Identifiable, SignalizeableItem {
 	// this has public material without any kind of interface since it is accessed via qLink.get*Lane*() (in some not-yet-finalized
 	// syntax).  kai, aug'10
 
@@ -167,14 +169,12 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 	}
 
 
+	@Override
 	public Id getId(){
 		// same as getLane().getId().  kai, aug'10
+		// lane has its own id.  kai, jun'13
 		return this.laneData.getId();
 	}
-
-//	public Lane getLane(){
-//		return this.laneData;
-//	}
 
 	private void calculateFlowCapacity(final double time) {
 		this.flowCapacityPerTimeStep = ((LinkImpl)this.qLink.getLink()).getFlowCapacity(time);
@@ -195,15 +195,15 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 			this.flowCapacityPerTimeStep = this.laneData.getCapacityVehiclesPerHour() /  3600.0;
 		}
 		// we need the flow capcity per sim-tick and multiplied with flowCapFactor
-		this.flowCapacityPerTimeStep = this.flowCapacityPerTimeStep * this.getQLink().network.simEngine.getMobsim().getSimTimer().getSimTimestepSize()
-		* this.getQLink().network.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().getFlowCapFactor();
+		this.flowCapacityPerTimeStep = this.flowCapacityPerTimeStep * this.qLink.network.simEngine.getMobsim().getSimTimer().getSimTimestepSize()
+		* this.qLink.network.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().getFlowCapFactor();
 		this.inverseFlowCapacityPerTimeStep = 1.0 / this.flowCapacityPerTimeStep;
 		this.flowCapacityPerTimeStepFractionalPart = this.flowCapacityPerTimeStep - (int) this.flowCapacityPerTimeStep;
 	}
 
 
 	private void calculateStorageCapacity(final double time) {
-		double storageCapFactor = this.getQLink().network.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().getStorageCapFactor();
+		double storageCapFactor = this.qLink.network.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().getStorageCapFactor();
 		this.bufferStorageCapacity = (int) Math.ceil(this.flowCapacityPerTimeStep);
 
 		double numberOfLanes = this.qLink.getLink().getNumberOfLanes(time);
@@ -361,7 +361,7 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 					// (if the vehicle is not removed from the queue in the following lines, then this will effectively block the lane
 
 					if (!stop.getIsBlockingLane()) {
-						getVehQueue().poll(); // remove the bus from the queue
+						this.vehQueue.poll(); // remove the bus from the queue
 						transitVehicleStopQueue.add(veh); // and add it to the stop queue
 					}
 				}
@@ -398,7 +398,7 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 			// add all departing transit vehicles at the front of the vehQueue
 			ListIterator<QVehicle> iter = departingTransitVehicles.listIterator(departingTransitVehicles.size());
 			while (iter.hasPrevious()) {
-				getVehQueue().addFirst(iter.previous());
+				this.vehQueue.addFirst(iter.previous());
 			}
 		}
 	}
@@ -455,7 +455,7 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 			if (toQueueLane != null) {
 				if (toQueueLane.hasSpace()) {
 					this.buffer.poll();
-					this.getQLink().network.simEngine.getMobsim().getEventsManager().processEvent(
+					this.qLink.network.simEngine.getMobsim().getEventsManager().processEvent(
 							new LaneLeaveEvent(now, veh.getDriver().getId(), this.qLink.getLink().getId(), this.getId()));
 					toQueueLane.addFromPreviousLane(veh, now);
 					movedAtLeastOne = true;
@@ -554,16 +554,16 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 
 	@Override
 	QVehicle popFirstVehicle() {
-		double now = this.getQLink().network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
+		double now = this.qLink.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 		QVehicle veh = this.buffer.poll();
 		this.bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
 		this.laneEnterTimeMap.remove(veh);
 		if (this.generatingEvents) {
-			this.getQLink().network.simEngine.getMobsim().getEventsManager().processEvent(new LaneLeaveEvent(
+			this.qLink.network.simEngine.getMobsim().getEventsManager().processEvent(new LaneLeaveEvent(
 					now, veh.getDriver().getId(), this.qLink.getLink().getId(), this.getId()
 			));
 		}
-		this.getQLink().network.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEvent(
+		this.qLink.network.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEvent(
 				now, veh.getDriver().getId(), this.qLink.getLink().getId(), veh.getId()
 		));
 		return veh;
@@ -586,10 +586,6 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 		return this.buffer.peek();
 	}
 
-	Queue<QVehicle> getVehiclesInBuffer() {
-		return this.buffer;
-	}
-
 	boolean isFirstLaneOnLink() {
 		return this.isFirstLane;
 	}
@@ -603,7 +599,7 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 		return this.usedStorageCapacity < getStorageCapacity();
 	}
 
-	int vehOnLinkCount() {
+	int getNrOfVehsInQueue() {
 		return this.vehQueue.size();
 	}
 
@@ -613,10 +609,10 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 	}
 
 	void clearVehicles() {
-		double now = this.getQLink().network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
+		double now = this.qLink.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 
 		for (QVehicle veh : this.vehQueue) {
-			this.getQLink().network.simEngine.getMobsim().getEventsManager().processEvent(
+			this.qLink.network.simEngine.getMobsim().getEventsManager().processEvent(
 					new AgentStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
 			this.qLink.network.simEngine.getMobsim().getAgentCounter().incLost();
 			this.qLink.network.simEngine.getMobsim().getAgentCounter().decLiving();
@@ -627,7 +623,7 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 		this.laneEnterTimeMap.clear();
 		
 		for (QVehicle veh : this.buffer) {
-			this.getQLink().network.simEngine.getMobsim().getEventsManager().processEvent(
+			this.qLink.network.simEngine.getMobsim().getEventsManager().processEvent(
 					new AgentStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
 			this.qLink.network.simEngine.getMobsim().getAgentCounter().incLost();
 			this.qLink.network.simEngine.getMobsim().getAgentCounter().decLiving();
@@ -685,15 +681,7 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 	}
 
 	Set<Id> getDestinationLinkIds(){
-		return this.destinationLinkIds;
-	}
-
-	LinkedList<QVehicle> getVehQueue() {
-		return this.vehQueue;
-	}
-
-	AbstractQLink getQLink() {
-		return this.qLink;
+		return Collections.unmodifiableSet(destinationLinkIds);
 	}
 
 	public double getLength(){
@@ -726,8 +714,8 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 
 	@Override
 	public void setSignalStateForTurningMove(SignalGroupState state, Id toLinkId) {
-		if (!this.getQLink().getToNode().getNode().getOutLinks().containsKey(toLinkId)){
-			throw new IllegalArgumentException("ToLink " + toLinkId + " is not reachable from QLane Id " + this.getId() + " on QLink " + this.getQLink().getLink().getId());
+		if (!this.qLink.getToNode().getNode().getOutLinks().containsKey(toLinkId)){
+			throw new IllegalArgumentException("ToLink " + toLinkId + " is not reachable from QLane Id " + this.getId() + " on QLink " + this.qLink.getLink().getId());
 		}
 		this.qSignalizedItem.setSignalStateForTurningMove(state, toLinkId);
 		this.thisTimeStepGreen = this.qSignalizedItem.isLinkGreen();
