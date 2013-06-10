@@ -274,10 +274,6 @@ public final class QLane extends AbstractQLane implements SignalizeableItem {
 		return this.thisTimeStepGreen ;
 	}
 
-	void setThisTimeStepGreen(final boolean b) {
-		this.thisTimeStepGreen = b;
-	}
-
 	 boolean addTransitToBuffer(final double now, final QVehicle veh) {
 		if (veh.getDriver() instanceof TransitDriverAgent) {
 			TransitDriverAgent driver = (TransitDriverAgent) veh.getDriver();
