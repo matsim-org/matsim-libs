@@ -185,68 +185,6 @@ public class M4UConfigUtils {
 		InternalConstants.MATSIM_4_OPUS_TEMP = module.getMATSim4OpusTemp();
 		InternalConstants.MATSIM_4_OPUS_BACKUP = module.getMATSim4OpusBackup();
 	}
-	
-	static void initImprovedPseudoPtParameter(Module matsim4urbansimModule, Config config){
-		
-		log.info("Checking improved pseudo pt settings ...");
-		ImprovedPseudoPtConfigGroup ippcm = ImprovedPseudoPtConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
-		
-		if(matsim4urbansimModule != null){
-			String usePtStops = matsim4urbansimModule.getValue(ImprovedPseudoPtConfigGroup.PT_STOPS_SWITCH);
-			String ptStops = matsim4urbansimModule.getValue(ImprovedPseudoPtConfigGroup.PT_STOPS);
-			String useTravelTimesAndDistances =  matsim4urbansimModule.getValue(ImprovedPseudoPtConfigGroup.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH);
-			String ptTravelTimes =  matsim4urbansimModule.getValue(ImprovedPseudoPtConfigGroup.PT_TRAVEL_TIMES);
-			String ptTravelDistances =  matsim4urbansimModule.getValue(ImprovedPseudoPtConfigGroup.PT_TRAVEL_DISTANCES);
-
-			if(usePtStops != null &&  usePtStops.equalsIgnoreCase("true")){
-				log.info(ImprovedPseudoPtConfigGroup.PT_STOPS_SWITCH + " switch is set to true. Trying to find pt stops file ...");
-				// checking for pt stops
-				if(ptStops != null){
-					File ptStopsFile = new File(ptStops);
-					if(ptStopsFile.exists()){
-						log.info("Found pt stops file " + ptStops);
-						ippcm.setUsingPtStops(true);
-						ippcm.setPtStopsInputFile(ptStops);
-					}
-					else{
-						log.warn("Pt stops file " + ptStops + " not found! Improved pseudo pt will not be initialized!");
-						ippcm.setUsingPtStops(false);
-					}
-					
-					// checking for other input files
-					if(useTravelTimesAndDistances != null && useTravelTimesAndDistances.equalsIgnoreCase("true")){
-						log.info(ImprovedPseudoPtConfigGroup.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH + " switch is set to true. Trying to find travel times and distances files ...");
-						
-						File ptTravelTimesFile = new File(ptTravelTimes);
-						File ptTravelDistancesFile = new File(ptTravelDistances); 
-						
-						if(ptTravelTimesFile.exists() && ptTravelDistancesFile.exists()){
-							log.info("Found travel times and travel distances input files:");
-							log.info("Travel times input file: " + ptTravelTimes);
-							log.info("Travel distances input file: " + ptTravelDistances);
-							ippcm.setUsingTravelTimesAndDistances(true);
-							ippcm.setPtTravelTimesInputFile(ptTravelTimes);
-							ippcm.setPtTravelDistancesInputFile(ptTravelDistances);
-							
-						}
-						else{
-							log.warn("Travel times and travel distances input files not found!");
-							log.warn("Travel times input file: " + ptTravelTimes);
-							log.warn("Travel distances input file: " + ptTravelDistances);
-							ippcm.setUsingTravelTimesAndDistances(false);
-						}
-					}
-					else
-						log.info(ImprovedPseudoPtConfigGroup.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH + " switch is set to false. Additional travel times and distances files will not be read!");
-					
-				}
-				else
-					log.warn("No pt stops file given. Improved pseudo pt will not be initialized!");
-			}
-			else
-				log.info(ImprovedPseudoPtConfigGroup.PT_STOPS_SWITCH + " switch is set to false. Improved pseudo pt will not be initialized.");
-		}
-	}
 
 	/**
 	 * @param matsim4urbansimConfigPart1
