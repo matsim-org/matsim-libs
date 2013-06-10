@@ -3,24 +3,21 @@ package playground.pieter.pseudosim.replanning.factories;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.modules.ReRoute;
-import org.matsim.core.replanning.modules.SubtourModeChoice;
-import org.matsim.core.replanning.modules.SubtourModeChoiceStrategyFactory;
-import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.replanning.modules.TripTimeAllocationMutatorStrategyFactory;
 
 import playground.pieter.pseudosim.controler.PseudoSimControler;
 import playground.pieter.pseudosim.replanning.modules.PSimPlanMarkerModule;
 
-public class PSimSubtourModeChoiceStrategyFactory extends
-SubtourModeChoiceStrategyFactory {
+public class PSimTripTimeAllocationMutatorStrategyFactory extends
+		TripTimeAllocationMutatorStrategyFactory {
 
 	private PseudoSimControler controler;
 
-	public PSimSubtourModeChoiceStrategyFactory(PseudoSimControler controler) {
+	public PSimTripTimeAllocationMutatorStrategyFactory(
+			PseudoSimControler controler) {
 		super();
-		this.controler=controler;
+		this.controler = controler;
 	}
 
 	@Override
@@ -30,5 +27,7 @@ SubtourModeChoiceStrategyFactory {
 		strategy.addStrategyModule(new PSimPlanMarkerModule(controler));
 		return strategy;
 	}
+	
+	
 
 }

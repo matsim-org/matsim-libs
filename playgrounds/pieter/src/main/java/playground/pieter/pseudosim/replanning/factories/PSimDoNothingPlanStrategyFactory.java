@@ -6,27 +6,23 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.modules.ReRoute;
-import org.matsim.core.replanning.modules.SubtourModeChoice;
-import org.matsim.core.replanning.modules.SubtourModeChoiceStrategyFactory;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 import playground.pieter.pseudosim.controler.PseudoSimControler;
 import playground.pieter.pseudosim.replanning.modules.PSimPlanMarkerModule;
 
-public class PSimSubtourModeChoiceStrategyFactory extends
-SubtourModeChoiceStrategyFactory {
+public class PSimDoNothingPlanStrategyFactory implements PlanStrategyFactory {
 
 	private PseudoSimControler controler;
 
-	public PSimSubtourModeChoiceStrategyFactory(PseudoSimControler controler) {
-		super();
-		this.controler=controler;
+	public PSimDoNothingPlanStrategyFactory(PseudoSimControler controler) {
+		this.controler = controler;
 	}
 
 	@Override
 	public PlanStrategy createPlanStrategy(Scenario scenario,
 			EventsManager eventsManager) {
-		PlanStrategyImpl strategy = (PlanStrategyImpl) super.createPlanStrategy(scenario, eventsManager) ;
+		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
 		strategy.addStrategyModule(new PSimPlanMarkerModule(controler));
 		return strategy;
 	}

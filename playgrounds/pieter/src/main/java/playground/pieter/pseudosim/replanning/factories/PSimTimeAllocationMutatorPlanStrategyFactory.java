@@ -6,27 +6,27 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.modules.TimeAllocationMutator;
+import org.matsim.core.replanning.modules.TimeAllocationMutatorPlanStrategyFactory;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
 import playground.pieter.pseudosim.controler.PseudoSimControler;
 import playground.pieter.pseudosim.replanning.modules.PSimPlanMarkerModule;
 
-public class PSimTimeAllocationMutatorPlanStrategyFactory implements
-		PlanStrategyFactory {
+public class PSimTimeAllocationMutatorPlanStrategyFactory extends
+TimeAllocationMutatorPlanStrategyFactory {
 
 	private PseudoSimControler controler;
 
 	public PSimTimeAllocationMutatorPlanStrategyFactory(
 			PseudoSimControler controler) {
+		super();
 		this.controler = controler;
 	}
 
 	@Override
 	public PlanStrategy createPlanStrategy(Scenario scenario,
 			EventsManager eventsManager) {
-		PlanStrategyImpl strategy = new PlanStrategyImpl(new RandomPlanSelector());
-		TimeAllocationMutator tam = new TimeAllocationMutator(scenario.getConfig());
-		strategy.addStrategyModule(tam);
+		PlanStrategyImpl strategy = (PlanStrategyImpl) super.createPlanStrategy(scenario, eventsManager) ;
 		strategy.addStrategyModule(new PSimPlanMarkerModule(controler));
 		return strategy;
 	}

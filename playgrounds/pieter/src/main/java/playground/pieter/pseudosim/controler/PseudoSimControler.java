@@ -5,43 +5,31 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.analysis.ScoreStats;
+import org.matsim.analysis.TravelDistanceStats;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.GlobalConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.PlanStrategyFactoryRegister;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.population.PersonImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.core.replanning.StrategyManager;
-import org.matsim.core.replanning.StrategyManagerConfigLoader;
-import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
-import org.matsim.core.replanning.selectors.PlanSelector;
+import org.matsim.core.controler.PlanStrategyRegistrar;
+import org.matsim.core.controler.corelisteners.LegHistogramListener;
+import org.matsim.core.controler.corelisteners.LinkStatsControlerListener;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.utils.objectattributes.ObjectAttributes;
+import org.matsim.counts.CountControlerListener;
+import org.matsim.population.VspPlansCleaner;
+import org.matsim.pt.counts.PtCountControlerListener;
 
+import playground.pieter.annealing.SimpleAnnealer;
 import playground.pieter.pseudosim.controler.listeners.BeforePSimSelectedPlanScoreRecorder;
 import playground.pieter.pseudosim.controler.listeners.ExpensiveSimScoreWriter;
 import playground.pieter.pseudosim.controler.listeners.IterationEndsSelectedPlanScoreRestoreListener;
 import playground.pieter.pseudosim.controler.listeners.MobSimSwitcher;
-import playground.pieter.pseudosim.controler.listeners.PseudoSimPlanMarkerModuleAppender;
-import playground.pieter.pseudosim.controler.listeners.SimpleAnnealer;
 import playground.pieter.pseudosim.replanning.PSimPlanStrategyRegistrar;
-import playground.pieter.pseudosim.trafficinfo.PSimTravelTimeCalculator;
 import playground.pieter.pseudosim.trafficinfo.PSimStopStopTimeCalculator;
+import playground.pieter.pseudosim.trafficinfo.PSimTravelTimeCalculator;
 import playground.pieter.pseudosim.trafficinfo.PSimWaitTimeCalculator;
 import playground.sergioo.singapore2012.transitRouterVariable.StopStopTimeCalculator;
 import playground.sergioo.singapore2012.transitRouterVariable.WaitTimeStuckCalculator;
@@ -69,7 +57,7 @@ public class PseudoSimControler extends Controler{
 		super(ScenarioUtils.loadScenario(ConfigUtils.loadConfig(args[0])));
 		this.psimStrategies = new PSimPlanStrategyRegistrar(this);
 		this.substituteStrategies();
-		this.addControlerListener(new SimpleAnnealer());
+//		this.addControlerListener(new SimpleAnnealer());
 		this.addControlerListener(new MobSimSwitcher(this));
 //		this.addControlerListener(new PseudoSimPlanMarkerModuleAppender(this));
 		this.addControlerListener(new ExpensiveSimScoreWriter(this));
@@ -103,12 +91,15 @@ public class PseudoSimControler extends Controler{
 	 * Goes through the list of plan strategies and substitutes qualifying strategies with their PSim equivalents
 	 */
 	private void substituteStrategies() {
-		String[] nonMutatingStrategyModules = this.getConfig()
-				.getParam("PseudoSim", "nonMutatingStrategies").split(",");
+//		String[] nonMutatingStrategyModules = this.getConfig()
+//				.getParam("PseudoSim", "nonMutatingStrategies").split(",");
 		ArrayList<String> nonMutatingStrategies = new ArrayList<String>();
-		for (String strat : nonMutatingStrategyModules) {
-			nonMutatingStrategies.add(this.getConfig().strategy().getParams()
-					.get(strat.trim()));
+//		for (String strat : nonMutatingStrategyModules) {
+//			nonMutatingStrategies.add(this.getConfig().strategy().getParams()
+//					.get(strat.trim()));
+//		}
+		for(PlanStrategyRegistrar.Selector selector:PlanStrategyRegistrar.Selector.values()){
+			nonMutatingStrategies.add(selector.toString());
 		}
 		for (StrategyConfigGroup.StrategySettings settings : config.strategy().getStrategySettings()) {
 
@@ -179,7 +170,53 @@ public class PseudoSimControler extends Controler{
 		return carTravelTimeCalculator;
 	}
 
-
+//	protected void loadControlerListeners() {
+//		// Cannot make this method final since is is overridden about 13 times.  kai, jan'13
+//		// Yet it looks like this will remain non-final since it makes some sense to override these (with or without super....).
+//		// The core controler listeners are separate, after all.  kai, feb'13
+//		// yy On the other hand, we could write a method clearControlerListeners() and one would have a similar flexibility without
+//		// inheritance.  kai, may'13
+//		// zz vote for clearControlerListeners(). dg, may'13
+//
+//		// optional: LegHistogram
+//		this.addControlerListener(new LegHistogramListener(this.events, this.getCreateGraphs()));
+//	
+//		// optional: score stats
+//		this.scoreStats = new ScoreStats(this.population,
+//				this.getControlerIO().getOutputFilename(FILENAME_SCORESTATS), this.getCreateGraphs());
+//		this.addControlerListener(this.getScoreStats());
+//	
+//		// optional: travel distance stats
+//		this.travelDistanceStats = new TravelDistanceStats(this.population, this.network,
+//				this.getControlerIO() .getOutputFilename(FILENAME_TRAVELDISTANCESTATS), this.this.getCreateGraphs());
+//		this.addControlerListener(this.travelDistanceStats);
+//		this.controlerListenerManager.removeControlerListener(LegHistogramListener.class);
+//	
+//		// load counts, if requested
+//		if (this.config.counts().getCountsFileName() != null) {
+//			CountControlerListener ccl = new CountControlerListener(this.config.counts());
+//			this.addControlerListener(ccl);
+//			this.counts = ccl.getCounts();
+//		}
+//	
+//		if (this.config.linkStats().getWriteLinkStatsInterval() > 0) {
+//			this.addControlerListener(new LinkStatsControlerListener(this.config.linkStats()));
+//		}
+//	
+//		if (this.config.scenario().isUseTransit()) {
+//			if (this.config.ptCounts().getAlightCountsFileName() != null) {
+//				// only works when all three files are defined! kai, oct'10
+//				addControlerListener(new PtCountControlerListener(this.config));
+//			}
+//		}
+//	
+//	
+//		if ( !this.config.vspExperimental().getActivityDurationInterpretation().equals(ActivityDurationInterpretation.minOfDurationAndEndTime)
+//				|| this.config.vspExperimental().isRemovingUnneccessaryPlanAttributes() ) {
+//			addControlerListener(new VspPlansCleaner());
+//		}
+//	
+//	}
 
 
 }

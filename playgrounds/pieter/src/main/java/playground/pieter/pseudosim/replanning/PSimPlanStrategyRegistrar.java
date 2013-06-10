@@ -6,10 +6,13 @@ import org.matsim.core.controler.PlanStrategyFactoryRegister;
 import org.matsim.core.replanning.modules.ReRoutePlanStrategyFactory;
 
 import playground.pieter.pseudosim.controler.PseudoSimControler;
+import playground.pieter.pseudosim.replanning.factories.PSimChangeTripModeStrategyFactory;
+import playground.pieter.pseudosim.replanning.factories.PSimDoNothingPlanStrategyFactory;
 import playground.pieter.pseudosim.replanning.factories.PSimLocationChoicePlanStrategyFactory;
 import playground.pieter.pseudosim.replanning.factories.PSimReRoutePlanStrategyFactory;
 import playground.pieter.pseudosim.replanning.factories.PSimSubtourModeChoiceStrategyFactory;
 import playground.pieter.pseudosim.replanning.factories.PSimTimeAllocationMutatorPlanStrategyFactory;
+import playground.pieter.pseudosim.replanning.factories.PSimTripTimeAllocationMutatorStrategyFactory;
 
 public class PSimPlanStrategyRegistrar {
 
@@ -34,6 +37,12 @@ public class PSimPlanStrategyRegistrar {
 			controler.addPlanStrategyFactory("TimeAllocationMutatorPSim", new PSimTimeAllocationMutatorPlanStrategyFactory(controler));
 			compatibleStrategies.add("SubtourModeChoice");
 			controler.addPlanStrategyFactory("SubtourModeChoicePSim", new PSimSubtourModeChoiceStrategyFactory(controler));
+			compatibleStrategies.add("DoNothing");
+			controler.addPlanStrategyFactory("DoNothingPSim", new PSimDoNothingPlanStrategyFactory(controler));
+			compatibleStrategies.add("TransitTimeAllocationMutator");
+			controler.addPlanStrategyFactory("TransitTimeAllocationMutatorPSim", new PSimTripTimeAllocationMutatorStrategyFactory(controler));
+			compatibleStrategies.add("TransitChangeLegMode");
+			controler.addPlanStrategyFactory("TransitChangeLegModePSim", new PSimChangeTripModeStrategyFactory(controler));
 //			register.register("SubtourModeChoice", new SubtourModeChoiceStrategyFactory());
 //			register.register(Names.ChangeLegMode.toString(), new ChangeLegModeStrategyFactory());
 //			register.register("ChangeSingleLegMode", new ChangeSingleLegModeStrategyFactory());

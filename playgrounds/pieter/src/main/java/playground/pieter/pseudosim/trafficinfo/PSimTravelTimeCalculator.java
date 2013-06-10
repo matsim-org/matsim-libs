@@ -34,6 +34,9 @@ public class PSimTravelTimeCalculator extends TravelTimeCalculator {
 			Logger.getLogger(this.getClass()).error(
 					"Calling reset on traveltimecalc");
 			super.reset(iteration);
+		}else{
+			Logger.getLogger(this.getClass()).error(
+					"Not resetting travel times as this is a PSim iteration");
 		}
 	}
 

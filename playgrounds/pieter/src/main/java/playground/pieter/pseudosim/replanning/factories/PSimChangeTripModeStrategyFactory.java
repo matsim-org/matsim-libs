@@ -3,19 +3,16 @@ package playground.pieter.pseudosim.replanning.factories;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.replanning.PlanStrategy;
-import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.modules.ReRoute;
-import org.matsim.core.replanning.modules.ReRoutePlanStrategyFactory;
-import org.matsim.core.replanning.selectors.RandomPlanSelector;
+import org.matsim.core.replanning.modules.ChangeTripModeStrategyFactory;
 
 import playground.pieter.pseudosim.controler.PseudoSimControler;
 import playground.pieter.pseudosim.replanning.modules.PSimPlanMarkerModule;
 
-public class PSimReRoutePlanStrategyFactory extends ReRoutePlanStrategyFactory {
+public class PSimChangeTripModeStrategyFactory extends
+		ChangeTripModeStrategyFactory {
 
-	public PSimReRoutePlanStrategyFactory(PseudoSimControler controler) {
-		super();
+	public PSimChangeTripModeStrategyFactory(PseudoSimControler controler) {
 		this.controler = controler;
 	}
 
