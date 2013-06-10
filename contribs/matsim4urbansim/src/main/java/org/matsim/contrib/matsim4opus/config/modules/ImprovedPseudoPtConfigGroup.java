@@ -31,7 +31,7 @@ import org.matsim.core.config.experimental.ReflectiveModule;
 public class ImprovedPseudoPtConfigGroup extends ReflectiveModule {
 	public static final String GROUP_NAME="improvedPseudoPt" ;
 
-	private static final String USING_PT_STOPS = "usingPtStops";
+	public static final String USING_PT_STOPS = "usingPtStops";
 	public static final String PT_STOPS = "ptStopsFile";
 	public static final String PT_STOPS_SWITCH = "usePtStops";
 	public static final String PT_TRAVEL_TIMES = "ptTravelTimesFile";
