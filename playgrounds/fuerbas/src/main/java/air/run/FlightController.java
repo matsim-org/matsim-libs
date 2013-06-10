@@ -31,6 +31,7 @@ import org.matsim.vis.otfvis.OTFFileWriterFactory;
 import playground.vsp.randomizedtransitrouter.RandomizedTransitRouterTravelTimeAndDisutilityControlerListener;
 
 /**
+ * Runs the MATSim Controler with some additions for the flight model.
  * @author dgrether
  * 
  */
@@ -60,8 +61,8 @@ public class FlightController {
 	
 	public static void main(String[] args) {
 //		String configFilePath  = "/media/data/work/repos/shared-svn/studies/countries/eu/flight/dg_oag_flight_model_2_runways_3600vph_one_line/air_config.xml";
-//		String configFilePath = args[0];
-		String configFilePath = "/media/data/work/repos/shared-svn/studies/countries/eu/flight/flight_one_line_mode_choice/air_config_mode_choice.xml";
+//		String configFilePath = "/media/data/work/repos/shared-svn/studies/countries/eu/flight/flight_one_line_mode_choice/air_config_mode_choice.xml";
+		String configFilePath = args[0];
 		Config config = ConfigUtils.loadConfig(configFilePath);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		new FlightController().run(scenario);
