@@ -87,11 +87,11 @@
 		<module>freight</module>
 		<module>gtfs2matsimtransitschedule</module>
 		<module>grips</module>
-		<module>improvedPseudoPt</module>
 		<module>locationchoice</module>
 		<module>matsim4urbansim</module>
 		<module>networkEditor</module>
 		<module>otfvis</module>
+		<module>pt</module>
 		<module>parking</module>
 		<module>transEnergySim</module>
 		<module>roadpricing</module>

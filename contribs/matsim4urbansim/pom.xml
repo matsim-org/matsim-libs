@@ -96,7 +96,7 @@
 		</dependency>
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>
-			<artifactId>improvedPseudoPt</artifactId>
+			<artifactId>pt</artifactId>
 			<version>0.6.0-SNAPSHOT</version>
 		</dependency>
 		<dependency>
