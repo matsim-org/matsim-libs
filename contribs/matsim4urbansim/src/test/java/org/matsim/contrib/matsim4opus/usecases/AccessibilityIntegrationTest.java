@@ -28,13 +28,19 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.config.AccessibilityConfigGroup;
+import org.matsim.contrib.accessibility.gis.GridUtils;
+import org.matsim.contrib.accessibility.gis.SpatialGrid;
+import org.matsim.contrib.improvedPseudoPt.PtMatrix;
+import org.matsim.contrib.matsim4opus.utils.network.NetworkBoundaryBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -65,19 +71,52 @@ public class AccessibilityIntegrationTest {
 		
 		final ScenarioImpl sc = (ScenarioImpl)controler.getScenario();
 
-		ActivityFacilitiesImpl facilities = sc.getActivityFacilities() ;
+		ActivityFacilitiesImpl opportunities = sc.getActivityFacilities() ;
 		for ( Link link : sc.getNetwork().getLinks().values() ) {
 			Id id = sc.createId( link.getId().toString() ) ;
 			Coord coord = link.getCoord() ;
-			ActivityFacilityImpl fac = facilities.createAndAddFacility(id, coord) ;
+			ActivityFacilityImpl fac = opportunities.createAndAddFacility(id, coord) ;
 //			ActivityOptionImpl actOpt = fac.createActivityOption("work") ;
 //			actOpt.setCapacity(1000.) ; // 1000 jobs at same facility
 		}
 		
-//		controler.addControlerListener(new GridBasedAccessibilityControlerListener()); 
-		// (purely grid based controler listener does not yet exist)
+		PtMatrix ptMatrix = null ;
 		
-		// yyyy the correct test is essentially already in AccessibilityTest.testAccessibilityMeasure().  kai, jun'13
+		// yyyy the following is taken from AccessibilityTest without any consideration of a good design.
+		double resolution = 100. ;
+		
+		NetworkBoundaryBox bbox = new NetworkBoundaryBox();
+		double[] boundary = NetworkUtils.getBoundingBox(sc.getNetwork().getNodes().values());
+		
+		double minX = boundary[0]-resolution/2;
+		double minY = boundary[1]-resolution/2;
+		double maxX = boundary[2]+resolution/2;
+		double maxY = boundary[3]+resolution/2;
+
+		if(resolution>100){
+			
+			minX = boundary[0] - 150*(2*resolution/200-1);
+			minY = boundary[1] - 150*(2*resolution/200-1);
+			maxX = boundary[2] + 150*(2*resolution/200+1);
+			maxY = boundary[3] + 150*(2*resolution/200+1);
+			
+		}
+		
+		bbox.setCustomBoundaryBox(minX,minY,maxX,maxY);
+		ActivityFacilitiesImpl measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(resolution, bbox.getXMin(), bbox.getYMin(), bbox.getYMax(), bbox.getYMax());
+		
+		SpatialGrid gridForFreeSpeedResults = new SpatialGrid(bbox.getBoundingBox(), resolution);
+		SpatialGrid gridForCarResults = new SpatialGrid(gridForFreeSpeedResults);
+		SpatialGrid gridForBikeResults = new SpatialGrid(gridForFreeSpeedResults);
+		SpatialGrid gridForWalkResults = new SpatialGrid(gridForFreeSpeedResults);
+		SpatialGrid gridForPtResults = new SpatialGrid(gridForFreeSpeedResults);
+
+		
+		controler.addControlerListener(new GridBasedAccessibilityControlerListenerV3(measuringPoints, opportunities, gridForFreeSpeedResults, 
+				gridForCarResults,	gridForBikeResults, gridForWalkResults, gridForPtResults, ptMatrix, config, sc.getNetwork())); 
+		
+		// yy the correct test is essentially already in AccessibilityTest.testAccessibilityMeasure().  kai, jun'13
+		// But that test uses the matsim4urbansim setup, which we don't want to use in the present test.
 		
 		controler.run();
 		
