@@ -65,6 +65,15 @@ public class AccessibilityIntegrationTest {
 		
 		// modify config according to needs
 		// ...
+//		Network network = CreateTestNetwork.createTestNetwork();
+//		new NetworkWriter(network).write(path+"network.xml");
+//		
+//		CreateTestMATSimConfig ctmc = new CreateTestMATSimConfig(path, path+"network.xml");
+//		String configLocation = ctmc.generate();
+//		
+//		M4UConfigurationConverterV4 connector = new M4UConfigurationConverterV4(configLocation);
+//		connector.init();
+//		config = connector.getConfig();
 		
 		
 		Controler controler = new Controler(config) ;
