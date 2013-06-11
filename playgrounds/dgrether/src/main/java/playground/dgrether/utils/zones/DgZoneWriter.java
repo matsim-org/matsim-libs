@@ -20,8 +20,10 @@
 package playground.dgrether.utils.zones;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -31,23 +33,54 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Polygon;
 
 /**
  * @author dgrether
  * 
  */
-public class DgZoneODShapefileWriter {
+public class DgZoneWriter {
 
+	
+	private static final Logger log = Logger.getLogger(DgZoneWriter.class);
+	
 	private CoordinateReferenceSystem crs;
 	private DgZones zones;
 	private GeometryFactory geoFac;
 
-	public DgZoneODShapefileWriter(DgZones cells, CoordinateReferenceSystem crs) {
+	public DgZoneWriter(DgZones cells, CoordinateReferenceSystem crs) {
 		this.zones = cells;
 		this.crs = crs;
 		this.geoFac = new GeometryFactory();
 	}
 
+	public void writePolygonZones2Shapefile(String shapeFilename){
+		Collection<SimpleFeature> featureCollection = new ArrayList<SimpleFeature>();
+		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
+		b.setCRS(crs);
+		b.setName("grid_cell");
+		b.add("location", Polygon.class);
+		b.add("zone_id", String.class);
+		SimpleFeatureBuilder builder = new SimpleFeatureBuilder(b.buildFeatureType());
+		try {
+			for (DgZone cell : zones.values()){
+				log.info("writing cell: " + cell.getId());
+				List<Object> attributes = new ArrayList<Object> ();
+				Polygon p = cell.getPolygon();
+				attributes.add(p);
+				attributes.add(cell.getId());
+				Object[] atts = attributes.toArray();
+				SimpleFeature feature = builder.buildFeature(cell.getId().toString(), atts);
+				attributes.clear();
+				featureCollection.add(feature);
+			}		
+			ShapeFileWriter.writeGeometries(featureCollection, shapeFilename);
+		} catch (Exception  e) {
+			e.printStackTrace();
+			throw new RuntimeException(e);
+		} 
+	}
+	
 	public void writeLineStringZone2ZoneOdPairsFromZones2Shapefile(String shapeFilename) {
 		List<SimpleFeature> featureCollection = new ArrayList<SimpleFeature>();
 		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();

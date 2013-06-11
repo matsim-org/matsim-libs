@@ -20,7 +20,6 @@
 package playground.dgrether.utils.zones;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -80,32 +79,7 @@ public class DgZoneUtils {
 	}
 
 
-	public static void writePolygonZones2Shapefile(DgZones cells, CoordinateReferenceSystem crs, String shapeFilename){
-		Collection<SimpleFeature> featureCollection = new ArrayList<SimpleFeature>();
-		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
-		b.setCRS(crs);
-		b.setName("grid_cell");
-		b.add("location", Polygon.class);
-		b.add("zone_id", String.class);
-		SimpleFeatureBuilder builder = new SimpleFeatureBuilder(b.buildFeatureType());
-		try {
-			for (DgZone cell : cells.values()){
-				log.info("writing cell: " + cell.getId());
-				List<Object> attributes = new ArrayList<Object> ();
-				Polygon p = cell.getPolygon();
-				attributes.add(p);
-				attributes.add(cell.getId());
-				Object[] atts = attributes.toArray();
-				SimpleFeature feature = builder.buildFeature(cell.getId().toString(), atts);
-				attributes.clear();
-				featureCollection.add(feature);
-			}		
-			ShapeFileWriter.writeGeometries(featureCollection, shapeFilename);
-		} catch (Exception  e) {
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		} 
-	}
+	
 
 	public static void writeLinksOfZones2Shapefile(DgZones cells, Map<DgZone, Link> zones2LinkMap, 
 			CoordinateReferenceSystem crs, String shapeFilename){

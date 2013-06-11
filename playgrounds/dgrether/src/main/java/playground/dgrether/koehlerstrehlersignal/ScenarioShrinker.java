@@ -46,8 +46,8 @@ import playground.dgrether.utils.DgGrid;
 import playground.dgrether.utils.DgGridUtils;
 import playground.dgrether.utils.DgPopulationSampler;
 import playground.dgrether.utils.zones.DgMatsimPopulation2Zones;
-import playground.dgrether.utils.zones.DgZoneODShapefileWriter;
 import playground.dgrether.utils.zones.DgZoneUtils;
+import playground.dgrether.utils.zones.DgZoneWriter;
 import playground.dgrether.utils.zones.DgZones;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -121,11 +121,11 @@ public class ScenarioShrinker {
 				this.fullScenario.getPopulation(), zones, signalsBoundingBox.getBoundingBox(), startTimeSec, endTimeSec);
 		
 		//write	 the matching to some files
-		DgZoneUtils.writePolygonZones2Shapefile(zones, crs, shapeFileDirectory + "zones.shp");
-		DgZoneODShapefileWriter zoneOdWriter = new DgZoneODShapefileWriter(zones, crs);
+		//TODO write zones to file
+		DgZoneWriter zoneOdWriter = new DgZoneWriter(zones, crs);
+		zoneOdWriter.writePolygonZones2Shapefile(shapeFileDirectory + "zones.shp");
 		zoneOdWriter.writeLineStringZone2ZoneOdPairsFromZones2Shapefile(shapeFileDirectory + "zone2dest_od_pairs.shp");
 		zoneOdWriter.writeLineStringLink2LinkOdPairsFromZones2Shapefile(shapeFileDirectory + "link2dest_od_pairs.shp");
-		//TODO write zones to file
 
 		
 		//run a network simplifier to merge links with same attributes

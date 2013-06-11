@@ -30,6 +30,12 @@ import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Polygon;
 
 /**
+ * Implementation of a Zone as an origin of transport demand. 
+ * 
+ * Yes, indeed I should have protected my boundaries when writing this by wrapping Polygon (Martin Clean Code). 
+ * But as geotools is very central within MATSim, I skipped this step, simply relying on the fact that 
+ * something as Polygon should be stable over a long time. 
+ * 
  * @author dgrether
  */
 public class DgZone extends DgOriginImpl implements DgOrigin{
