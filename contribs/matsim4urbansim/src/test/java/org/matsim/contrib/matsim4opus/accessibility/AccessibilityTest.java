@@ -16,7 +16,6 @@ import org.matsim.contrib.matsim4opus.utils.CreateTestMATSimConfig;
 import org.matsim.contrib.matsim4opus.utils.CreateTestNetwork;
 import org.matsim.contrib.matsim4opus.utils.CreateTestUrbansimPopulation;
 import org.matsim.contrib.matsim4opus.utils.io.ReadFromUrbanSimModel;
-import org.matsim.contrib.matsim4opus.utils.io.TempDirectoryUtil;
 import org.matsim.contrib.matsim4opus.utils.network.NetworkBoundaryBox;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
@@ -25,7 +24,6 @@ import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.listener.ControlerListener;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -132,12 +130,16 @@ public class AccessibilityTest implements MATSim4UrbanSimInterface, LinkEnterEve
 
 		PtMatrix ptMatrix = null;
 
-		ControlerListener listener = null;
+		GridBasedAccessibilityControlerListenerV3 listener = null;
 		
 		if(this.isParcelMode()){
 			listener = new GridBasedAccessibilityControlerListenerV3(startZones, opportunities, 
-					gridForFreeSpeedResults, gridForCarResults, gridForBikeResults, gridForWalkResults, gridForPtResults, 
-					ptMatrix, config, net);
+																	 ptMatrix, config, net);
+			listener.setFreeSpeedCarGrid(gridForFreeSpeedResults);
+			listener.setCarGrid(gridForCarResults);
+			listener.setBikeGrid(gridForBikeResults);
+			listener.setWalkGrid(gridForWalkResults);
+			listener.setPTGrid(gridForPtResults);
 			ctrl.addControlerListener(listener);
 			ctrl.run();
 			
