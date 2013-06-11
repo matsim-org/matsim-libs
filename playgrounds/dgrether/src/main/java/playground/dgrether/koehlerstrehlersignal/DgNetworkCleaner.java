@@ -73,7 +73,6 @@ public class DgNetworkCleaner  {
 		pendingForward.add(startNode);
 
 		while (pendingForward.size() > 0) {
-			log.debug("size pending forward nodes: "  + pendingForward.size());
 			Node currNode = pendingForward.remove(0); 
 			visitedNodes.add(currNode);
 			if (currNode.getOutLinks() != null || ! currNode.getOutLinks().isEmpty()) {

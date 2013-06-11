@@ -20,11 +20,16 @@
 package playground.dgrether.signalsystems.cottbus.scripts;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.koehlerstrehlersignal.Scenario2KoehlerStrehler2010;
+import playground.dgrether.koehlerstrehlersignal.ScenarioShrinker;
 import playground.dgrether.signalsystems.cottbus.DgCottbusScenarioPaths;
 
 
@@ -54,14 +59,34 @@ public class DgCb2Ks2010 {
 		//TODO change to run1712 when finished
 		String populationFilename = DgPaths.REPOS + "runs-svn/run1292/1292.output_plans_sample.xml";
 //		String populationFile = DgPaths.REPOS + "runs-svn/run1292/1292.output_plans.xml.gz";
-		Scenario fullScenario = Scenario2KoehlerStrehler2010.loadScenario(networkFilename, populationFilename, lanesFilename, signalSystemsFilename, signalGroupsFilename, signalControlFilename);
+		Scenario fullScenario = DgCb2Ks2010.loadScenario(networkFilename, populationFilename, lanesFilename, signalSystemsFilename, signalGroupsFilename, signalControlFilename);
 		
 		String name = "run 1292 output plans between 05:30 and 09:30";
-
-		Scenario2KoehlerStrehler2010 matsim2KsConverter = new Scenario2KoehlerStrehler2010(fullScenario,  MGC.getCRS(TransformationFactory.WGS84_UTM33N));
+		CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84_UTM33N);
+		ScenarioShrinker matsim2KsConverter = new ScenarioShrinker(fullScenario,  crs);
 		matsim2KsConverter.setMatsimPopSampleSize(matsimPopSampleSize);
-		matsim2KsConverter.setKsModelCommoditySampleSize(ksModelCommoditySampleSize);
-		matsim2KsConverter.convert(outputDirectory, name, boundingBoxOffset, cellsX, cellsY, startTime, endTime);
+		matsim2KsConverter.shrinkScenario(outputDirectory, name, boundingBoxOffset, cellsX, cellsY, startTime, endTime);
+		
+		System.exit(0);
+		
+		Scenario scenario = null;
+		Scenario2KoehlerStrehler2010 converter = new Scenario2KoehlerStrehler2010(scenario, crs);
+		converter.setKsModelCommoditySampleSize(ksModelCommoditySampleSize);
 	}
 
+	public static Scenario loadScenario(String net, String pop, String lanesFilename, String signalsFilename,
+			String signalGroupsFilename, String signalControlFilename){
+		Config c2 = ConfigUtils.createConfig();
+		c2.scenario().setUseLanes(true);
+		c2.scenario().setUseSignalSystems(true);
+		c2.network().setInputFile(net);
+		c2.plans().setInputFile(pop);
+		c2.network().setLaneDefinitionsFile(lanesFilename);
+		c2.signalSystems().setSignalSystemFile(signalsFilename);
+		c2.signalSystems().setSignalGroupsFile(signalGroupsFilename);
+		c2.signalSystems().setSignalControlFile(signalControlFilename);
+		Scenario scenario = ScenarioUtils.loadScenario(c2);
+		return scenario;
+	}
+	
 }

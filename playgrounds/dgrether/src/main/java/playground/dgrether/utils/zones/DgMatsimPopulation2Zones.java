@@ -42,6 +42,10 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.Point;
 
 /**
+ * 
+ * Maps a demand given as MATSim Population to zones that are not covering the area of the population's activity locations completely.
+ * Therefore, a small network is needed that should only contain links within the area covered by zones. 
+ *  
  * @author dgrether
  * 
  */
@@ -49,7 +53,7 @@ public class DgMatsimPopulation2Zones {
 
 	private static final Logger log = Logger.getLogger(DgMatsimPopulation2Zones.class);
 
-	private List<DgZone> cells = null;
+	private List<DgZone> zones = null;
 	
 	private GeometryFactory geoFac = new GeometryFactory();
 
@@ -57,14 +61,16 @@ public class DgMatsimPopulation2Zones {
 
 	private Network smallNetwork;
 
-	public List<DgZone> convert2Zones(Network network, Network smallNetwork, Population pop, List<DgZone> cells, Envelope networkBoundingBox, double startTime, double endTime) {
+	private boolean useLinkMappings = true;
+	
+	public List<DgZone> convert2Zones(Network network, Network smallNetwork, Population pop, List<DgZone> cells, 
+			Envelope networkBoundingBox, double startTime, double endTime) {
 		this.fullNetwork = network;
 		this.smallNetwork = smallNetwork; 
-		this.cells = cells;
+		this.zones = cells;
 		this.convertPopulation2OD(pop, networkBoundingBox, startTime, endTime);
 		return cells;
 	}
-	
 
 	private void convertPopulation2OD(Population pop, Envelope networkBoundingBox, double startTime, double endTime) {
 		for (Person person : pop.getPersons().values()) {
@@ -96,48 +102,70 @@ public class DgMatsimPopulation2Zones {
 	private void addFromZoneToZoneRelationshipToGrid(Coordinate startCoordinate, Coordinate endCoordinate){
 		DgZone startCell = this.searchGridCell(startCoordinate);
 		DgZone endCell = this.searchGridCell(endCoordinate);
-//		log.debug("  created od pair from cell " + startCell.getId() + " to " + endCell.getId());
 		startCell.addToZoneRelation(endCell);
 	}
 
 	private void addFromLinkToLinkRelationshipToGrid(Link startLink, Link endLink){
-		Coordinate startCoordinate = MGC.coord2Coordinate(startLink.getToNode().getCoord());
-		DgZone startCell = this.searchGridCell(startCoordinate);
-		Coordinate endCoordinate = MGC.coord2Coordinate(endLink.getFromNode().getCoord());
-		DgZone endCell = this.searchGridCell(endCoordinate);
-		startCell.getFromLink(startLink).addToLinkRelation(endLink);
-//		log.debug("  created od pair from cell " + startCell.getId() + " to " + endCell.getId());
+		DgZone startCell = this.searchZone4Link(startLink);
+		if (this.useLinkMappings) {
+			startCell.getFromLink(startLink).addToLinkRelation(endLink);
+		}
+		else {
+			DgZone endCell = this.searchZone4Link(endLink);
+			startCell.addToZoneRelation(endCell);
+		}
 	}
 
 	private void addFromZoneToLinkRelationshipToGrid(Coordinate startCoordinate, Link endLink){
 		DgZone startCell = this.searchGridCell(startCoordinate);
-		Coordinate endCoordinate = MGC.coord2Coordinate(endLink.getFromNode().getCoord());
-		DgZone endCell = this.searchGridCell(endCoordinate);
-		startCell.addToLinkRelation(endLink);
-//		log.debug("  created od pair from cell " + startCell.getId() + " to " + endCell.getId());
+		if (this.useLinkMappings) {
+			startCell.addToLinkRelation(endLink);
+		}
+		else {
+			DgZone endZone = this.searchZone4Link(endLink);
+			startCell.addToZoneRelation(endZone);
+		}
 	}
 
 	private void addFromLinkToZoneRelationshipToGrid(Link startLink, Coordinate endCoordinate){
-		Coordinate startCoordinate = MGC.coord2Coordinate(startLink.getToNode().getCoord());
-		DgZone startCell = this.searchGridCell(startCoordinate);
+		DgZone startCell = this.searchZone4Link(startLink);
 		DgZone endCell = this.searchGridCell(endCoordinate);
-		startCell.getFromLink(startLink).addToZoneRelation(endCell);
-//		log.info("  created od pair from cell " + startCell.getId() + " to " + endCell.getId());
-
+		if (this.useLinkMappings) {
+			startCell.getFromLink(startLink).addToZoneRelation(endCell);
+		}
+		else {
+			startCell.addToZoneRelation(endCell);
+		}
 	}
 
 	
 	private DgZone searchGridCell(Coordinate coordinate){
 		Point p = this.geoFac.createPoint(coordinate);
-		for (DgZone cell : this.cells){
+		for (DgZone cell : this.zones){
 			if (cell.getPolygon().covers(p)){
-//				log.debug("  found cell " + cell.getId() + " for Coordinate: " + coordinate);
 				return cell;
 			}
 		}
 		log.warn("No cell found for Coordinate: " + coordinate);
 		return null;
 	}
+	
+	private DgZone searchZone4Link(Link link) {
+		Coordinate coordinate = MGC.coord2Coordinate(link.getToNode().getCoord());
+		DgZone zone = this.searchGridCell(coordinate);
+		if (zone == null) { // the toNode is not within the grid
+			coordinate = MGC.coord2Coordinate(link.getCoord()); // try with the center of the link
+			zone = this.searchGridCell(coordinate);
+		}
+		
+		if (zone == null) { //also the center is not within the grid
+			coordinate = MGC.coord2Coordinate(link.getFromNode().getCoord()); // try the from node
+			zone = this.searchGridCell(coordinate);
+		}
+		if (zone == null) throw new IllegalStateException("No zone can be found for link id: " + link.getId() + " this should not happen.");
+		return zone;
+	}
+
 
 	private void processLeg(Activity startAct, Leg leg, Activity targetAct,
 			Envelope networkBoundingBox) {
@@ -259,6 +287,13 @@ public class DgMatsimPopulation2Zones {
 			return new Tuple<Link, Link>(routeStartLink, routeEndLink);
 		}
 		return null;
+	}
+	
+	/**
+	 * 
+	 */
+	public void setUseLinkMappings(boolean b) {
+		this.useLinkMappings = b;
 	}
 	
 }

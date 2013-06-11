@@ -100,7 +100,9 @@ public class DgZoneODShapefileWriter {
 					featureCollection.add(feature);
 				}
 			}
-			ShapeFileWriter.writeGeometries(featureCollection, shapeFilename);
+			if (! featureCollection.isEmpty()) {
+				ShapeFileWriter.writeGeometries(featureCollection, shapeFilename);
+			}
 		}
 	}
 }

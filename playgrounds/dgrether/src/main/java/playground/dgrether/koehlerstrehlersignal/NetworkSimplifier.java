@@ -21,25 +21,22 @@
 package playground.dgrether.koehlerstrehlersignal;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
 
 /**
  * Simplifies a given network, by merging links.
@@ -52,7 +49,35 @@ public class NetworkSimplifier {
 	private static final Logger log = Logger.getLogger(NetworkSimplifier.class);
 	private boolean mergeLinkStats = false;
 	private Set<Integer> nodeTopoToMerge = new TreeSet<Integer>();
-
+	
+	private Map<Id, Id> originalToSimplifiedLinkIdMatching = new HashMap<Id, Id>();
+	private Map<Id, Id> simplifiedToOriginalLinkIdMatching = new HashMap<Id, Id>();
+	
+	private Id createId(Link inLink, Link outLink) {
+		Id id = new IdImpl(inLink.getId() + "-" + outLink.getId());
+		if (simplifiedToOriginalLinkIdMatching.containsKey(inLink.getId())) { // the inlink was already simplified before
+			Id originalLinkId = this.simplifiedToOriginalLinkIdMatching.get(inLink.getId());
+			this.originalToSimplifiedLinkIdMatching.put(originalLinkId, id);
+			this.simplifiedToOriginalLinkIdMatching.put(id, originalLinkId);
+		}
+		else {
+			this.originalToSimplifiedLinkIdMatching.put(inLink.getId(), id);
+			this.simplifiedToOriginalLinkIdMatching.put(id, inLink.getId());
+		}
+		
+		if (originalToSimplifiedLinkIdMatching.containsKey(outLink.getId())) { // the outlink was already simplified before
+			Id originalLinkId = this.simplifiedToOriginalLinkIdMatching.get(outLink.getId());
+			this.originalToSimplifiedLinkIdMatching.put(originalLinkId, id);
+			this.simplifiedToOriginalLinkIdMatching.put(id, originalLinkId);
+		}
+		else {
+			this.originalToSimplifiedLinkIdMatching.put(outLink.getId(), id);
+			this.simplifiedToOriginalLinkIdMatching.put(id, outLink.getId());
+		}
+		return id;
+	}
+	
+	
 	public void run(final Network network) {
 
 		if(this.nodeTopoToMerge.size() == 0){
@@ -67,6 +92,8 @@ public class NetworkSimplifier {
 		NetworkCalcTopoType nodeTopo = new NetworkCalcTopoType();
 		nodeTopo.run(network);
 
+		List<Id> nodesToRemove = new ArrayList<Id>();
+		
 		for (Node node : network.getNodes().values()) {
 
 			if(this.nodeTopoToMerge.contains(Integer.valueOf(nodeTopo.getTopoType(node)))){
@@ -87,8 +114,7 @@ public class NetworkSimplifier {
 								if(this.mergeLinkStats){
 
 									// Try to merge both links by guessing the resulting links attributes
-									Link link = network.getFactory().createLink(new IdImpl(inLink.getId() + "-"
-											+ outLink.getId()), inLink.getFromNode(), outLink.getToNode());
+									Link link = network.getFactory().createLink(this.createId(inLink, outLink), inLink.getFromNode(), outLink.getToNode());
 //											.createLink(new IdImpl(inLink.getId() + "-" + outLink.getId()),
 //											inLink.getFromNode().getId(), outLink.getToNode().getId());
 
@@ -120,20 +146,21 @@ public class NetworkSimplifier {
 									// Only merge links with same attributes
 									if(bothLinksHaveSameLinkStats(inLink, outLink)){
 										LinkImpl newLink = ((NetworkImpl) network).createAndAddLink(
-												new IdImpl(inLink.getId() + "-" + outLink.getId()), 
+												this.createId(inLink, outLink), 
 												inLink.getFromNode(),
 												outLink.getToNode(),
 												inLink.getLength() + outLink.getLength(),
 												inLink.getFreespeed(),
 												inLink.getCapacity(),
 												inLink.getNumberOfLanes(),
-												inLink.getOrigId() + "-" + outLink.getOrigId(),
+												null,
 												null);
 
 										newLink.setAllowedModes(inLink.getAllowedModes());
 
 										network.removeLink(inLink.getId());
 										network.removeLink(outLink.getId());
+										nodesToRemove.add(outLink.getFromNode().getId());
 									}
 
 								}
@@ -142,11 +169,11 @@ public class NetworkSimplifier {
 					}
 				}
 			}
-
 		}
-
-		org.matsim.core.network.algorithms.NetworkCleaner nc = new org.matsim.core.network.algorithms.NetworkCleaner();
-		nc.run(network);
+		
+		for (Id nodeId : nodesToRemove) {
+			network.removeNode(nodeId);
+		}
 
 		nodeTopo = new NetworkCalcTopoType();
 		nodeTopo.run(network);
@@ -181,7 +208,6 @@ public class NetworkSimplifier {
 		this.mergeLinkStats = mergeLinkStats;
 	}
 
-	// helper
 
 	/**
 	 * Compare link attributes. Return whether they are the same or not.
@@ -209,25 +235,4 @@ public class NetworkSimplifier {
 		return bothLinksHaveSameLinkStats;
 	}
 
-	public static void main(String[] args) {
-
-		Set<Integer> nodeTypesToMerge = new TreeSet<Integer>();
-		nodeTypesToMerge.add(new Integer(4));
-		nodeTypesToMerge.add(new Integer(5));
-
-		Scenario scenario = (ScenarioImpl) ScenarioUtils
-				.createScenario(ConfigUtils.createConfig());
-		final Network network = scenario.getNetwork();
-		new MatsimNetworkReader(scenario)
-				.readFile("input/brandenburg-potsdam-merged-DHDN_GKZ4.xml");
-
-		NetworkSimplifier nsimply = new NetworkSimplifier();
-		nsimply.setNodesToMerge(nodeTypesToMerge);
-		// nsimply.setMergeLinkStats(true);
-		nsimply.run(network);
-
-		new NetworkWriter(network)
-				.write("input/brandenburg-potsdam-merged-DHDN_GKZ4-simplified.xml");
-
-	}
 }

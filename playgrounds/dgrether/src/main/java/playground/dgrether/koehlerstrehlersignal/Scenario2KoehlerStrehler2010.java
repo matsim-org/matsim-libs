@@ -19,32 +19,22 @@
  * *********************************************************************** */
 package playground.dgrether.koehlerstrehlersignal;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.network.NetworkWriter;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
-import org.matsim.utils.gis.matsim2esri.network.Nodes2ESRIShape;
-import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodities;
@@ -55,18 +45,9 @@ import playground.dgrether.koehlerstrehlersignal.data.DgKSNetwork;
 import playground.dgrether.koehlerstrehlersignal.gexf.DgKSNetwork2Gexf;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdConverter;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdPool;
-import playground.dgrether.signalsystems.utils.DgSignalsBoundingBox;
 import playground.dgrether.signalsystems.utils.DgSignalsUtils;
-import playground.dgrether.utils.DgGrid;
-import playground.dgrether.utils.DgGridUtils;
-import playground.dgrether.utils.DgNet2Shape;
-import playground.dgrether.utils.DgPopulationSampler;
-import playground.dgrether.utils.zones.DgMatsimPopulation2Zones;
 import playground.dgrether.utils.zones.DgZone;
-import playground.dgrether.utils.zones.DgZoneODShapefileWriter;
 import playground.dgrether.utils.zones.DgZoneUtils;
-
-import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * Converts a MATSim Scenario to the traffic signal optimization model published in 
@@ -86,7 +67,6 @@ public class Scenario2KoehlerStrehler2010 {
 	
 	public static final Logger log = Logger.getLogger(Scenario2KoehlerStrehler2010.class);
 	
-	private static final String smallNetworkFilename = "network_small.xml.gz";
 	private static final String modelOutfile = "koehler_strehler_model.xml";
 	
 	private double matsimPopSampleSize = 1.0;
@@ -94,6 +74,7 @@ public class Scenario2KoehlerStrehler2010 {
 	private String shapeFileDirectory = "shapes/";
 
 	private Scenario fullScenario;
+
 	private CoordinateReferenceSystem crs;
 	
 	
@@ -103,81 +84,26 @@ public class Scenario2KoehlerStrehler2010 {
 	}
 
 	
-	public void convert(String outputDirectory, String name, double boundingBoxOffset, int cellsX, int cellsY, double startTimeSec, double endTimeSec) throws IOException{
+	public void convert(String outputDirectory, String name, List<DgZone> zones, double boundingBoxOffset, int cellsX, int cellsY, double startTimeSec, double endTimeSec) throws IOException{
 		OutputDirectoryLogging.initLoggingWithOutputDirectory(outputDirectory);
-		String shapeFileDirectory = this.createShapeFileDirectory(outputDirectory);
+
+		Map<DgZone, Link> zones2LinkMap = DgZoneUtils.createZoneCenter2LinkMapping(zones, (NetworkImpl) fullScenario.getNetwork());
+		DgZoneUtils.writeLinksOfZones2Shapefile(zones, zones2LinkMap, crs, shapeFileDirectory + "links_for_zones.shp");
+
+		//create koehler strehler network
 		DgIdPool idPool = new DgIdPool();
 		DgIdConverter idConverter = new DgIdConverter(idPool);
+		
 		Set<Id> signalizedLinks = this.getSignalizedLinkIds(this.fullScenario.getScenarioElement(SignalsData.class).getSignalSystemsData());
-		Set<Id> signalizedNodes = this.getSignalizedNodeIds(this.fullScenario.getScenarioElement(SignalsData.class).getSignalSystemsData(), this.fullScenario.getNetwork());
-		
-		DgSignalsBoundingBox signalsBoundingBox = new DgSignalsBoundingBox(crs);
-		SimpleFeature bb = signalsBoundingBox.calculateBoundingBoxForSignals(fullScenario.getNetwork(), fullScenario.getScenarioElement(SignalsData.class).getSignalSystemsData(), boundingBoxOffset);
-		signalsBoundingBox.writeBoundingBox(bb, shapeFileDirectory);
-		
-		String smallNetworkFile = outputDirectory +  smallNetworkFilename;
-		DgNetworkShrinker netShrinker = new DgNetworkShrinker();
-		netShrinker.setSignalizedNodes(signalizedNodes);
-		Network smallNetwork = netShrinker.createSmallNetwork(fullScenario.getNetwork(), bb, crs);
-		
-		//"clean" the small network
-		DgNetworkCleaner cleaner = new DgNetworkCleaner();
-		cleaner.cleanNetwork(smallNetwork);
-//		
-		//run a network simplifier to merge links with same attributes
-		Set<Integer> nodeTypesToMerge = new TreeSet<Integer>();
-		nodeTypesToMerge.add(new Integer(4)); //PASS1WAY: 1 in- and 1 outgoing link
-		nodeTypesToMerge.add(new Integer(5)); //PASS2WAY: 2 in- and 2 outgoing links
-		NetworkSimplifier nsimply = new NetworkSimplifier();
-		nsimply.setNodesToMerge(nodeTypesToMerge);
-//		nsimply.run(smallNetwork);
-		
-		this.writeNetwork(smallNetwork, smallNetworkFile);
-		this.writeNetwork2Shape(fullScenario.getNetwork(), shapeFileDirectory + "network_full");
-		this.writeNetwork2Shape(smallNetwork, shapeFileDirectory + "network_small");
-		System.exit(0);
-		
-//		String smallNetworkClean = outputDirectory + "network_small_clean.xml.gz";
-//		this.writeNetwork(smallNetwork, smallNetworkClean);
-//		this.writeNetwork2Shape(smallNetwork, shapeFileDirectory + "network_small_clean");
-//		System.exit(0);
-		DgGrid grid = createGrid(signalsBoundingBox.getBoundingBox(),  crs, cellsX, cellsY);
-		DgGridUtils.writeGrid2Shapefile(grid, crs, shapeFileDirectory + "grid.shp");
-
-		//create some zones and map demand on the zones
-		if (matsimPopSampleSize != 1.0){
-			new DgPopulationSampler().samplePopulation(fullScenario.getPopulation(), matsimPopSampleSize);
-		}
-		List<DgZone> cells = DgZoneUtils.createZonesFromGrid(grid);
-		cells = new DgMatsimPopulation2Zones().convert2Zones(this.fullScenario.getNetwork(), smallNetwork, this.fullScenario.getPopulation(), cells,
-				signalsBoundingBox.getBoundingBox(), startTimeSec, endTimeSec);
-		DgZoneUtils.writePolygonZones2Shapefile(cells, crs, shapeFileDirectory + "zones.shp");
-		
-		DgZoneODShapefileWriter zoneOdWriter = new DgZoneODShapefileWriter(cells, crs);
-		zoneOdWriter.writeLineStringZone2ZoneOdPairsFromZones2Shapefile(shapeFileDirectory + "zone2dest_od_pairs.shp");
-		zoneOdWriter.writeLineStringLink2LinkOdPairsFromZones2Shapefile(shapeFileDirectory + "link2dest_od_pairs.shp");
-		
-		
-		Map<DgZone, Link> zones2LinkMap = DgZoneUtils.createZoneCenter2LinkMapping(cells, (NetworkImpl) smallNetwork);
-		DgZoneUtils.writeLinksOfZones2Shapefile(cells, zones2LinkMap, crs, shapeFileDirectory + "links_for_zones.shp");
-		
-		
-		//create koehler strehler network
-		Config smallNetConfig = ConfigUtils.createConfig();
-		smallNetConfig.network().setInputFile(smallNetworkFile);
-		smallNetConfig.scenario().setUseLanes(true);
-		smallNetConfig.network().setLaneDefinitionsFile(fullScenario.getConfig().network().getLaneDefinitionsFile());
-		Scenario smallScenario = ScenarioUtils.loadScenario(smallNetConfig);
-		smallScenario.addScenarioElement(this.fullScenario.getScenarioElement(SignalsData.class));
-		
 		DgMatsim2KoehlerStrehler2010NetworkConverter netConverter = new DgMatsim2KoehlerStrehler2010NetworkConverter(idConverter);
 		netConverter.setSignalizedLinks(signalizedLinks);
-		DgKSNetwork ksNet = netConverter.convertNetworkLanesAndSignals(smallScenario, startTimeSec, endTimeSec);
+		DgKSNetwork ksNet = netConverter.convertNetworkLanesAndSignals(fullScenario, startTimeSec, endTimeSec);
 		DgKSNetwork2Gexf converter = new DgKSNetwork2Gexf();
 		converter.convertAndWrite(ksNet, outputDirectory + "network_small.gexf");
 		
+		
 		DgMatsim2KoehlerStrehler2010DemandConverter demandConverter = new DgMatsim2KoehlerStrehler2010Zones2Commodities(zones2LinkMap, idConverter);
-		DgCommodities commodities = demandConverter.convert(smallScenario, ksNet);
+		DgCommodities commodities = demandConverter.convert(fullScenario, ksNet);
 		
 		if (ksModelCommoditySampleSize != 1.0){
 			for (DgCommodity com : commodities.getCommodities().values()) {
@@ -198,8 +124,8 @@ public class Scenario2KoehlerStrehler2010 {
 		log.info("testing routing again...");
 		router.routeCommodities(newMatsimNetwork, commodities);
 		
-		this.writeNetwork(newMatsimNetwork, outputDirectory + "matsimNetworkKsModel.xml.gz");
-		this.writeNetwork2Shape(newMatsimNetwork, shapeFileDirectory + "matsimNetworkKsModel.shp");
+		DgNetworkUtils.writeNetwork(newMatsimNetwork, outputDirectory + "matsimNetworkKsModel.xml.gz");
+		DgNetworkUtils.writeNetwork2Shape(newMatsimNetwork, shapeFileDirectory + "matsimNetworkKsModel.shp");
 		
 		new DgKoehlerStrehler2010ModelWriter().write(ksNet, commodities, name, description, outputDirectory + modelOutfile);
 		writeStats(cellsX, cellsY, boundingBoxOffset, startTimeSec, endTimeSec, ksNet, commodities);
@@ -209,11 +135,13 @@ public class Scenario2KoehlerStrehler2010 {
 		OutputDirectoryLogging.closeOutputDirLogging();		
 	}
 
-	private String createShapeFileDirectory(String outputDirectory) {
-		String shapeDir = outputDirectory + shapeFileDirectory;
-		File outdir = new File(shapeDir);
-		outdir.mkdir();
-		return shapeDir;
+	private Set<Id> getSignalizedLinkIds(SignalSystemsData signals){
+		Map<Id, Set<Id>> signalizedLinksPerSystem = DgSignalsUtils.calculateSignalizedLinksPerSystem(signals);
+		Set<Id> signalizedLinks = new HashSet<Id>();
+		for (Set<Id> signalizedLinksOfSystem : signalizedLinksPerSystem.values()){
+			signalizedLinks.addAll(signalizedLinksOfSystem);
+		}
+		return signalizedLinks;
 	}
 
 	public void writeStats(int cellsX, int cellsY, double boundingBoxOffset, double startTime, double endTime, DgKSNetwork ksNet, DgCommodities commodities){
@@ -241,70 +169,7 @@ public class Scenario2KoehlerStrehler2010 {
 	
 
 	
-	public static Scenario loadScenario(String net, String pop, String lanesFilename, String signalsFilename,
-			String signalGroupsFilename, String signalControlFilename){
-		Config c2 = ConfigUtils.createConfig();
-		c2.scenario().setUseLanes(true);
-		c2.scenario().setUseSignalSystems(true);
-		c2.network().setInputFile(net);
-		c2.plans().setInputFile(pop);
-		c2.network().setLaneDefinitionsFile(lanesFilename);
-		c2.signalSystems().setSignalSystemFile(signalsFilename);
-		c2.signalSystems().setSignalGroupsFile(signalGroupsFilename);
-		c2.signalSystems().setSignalControlFile(signalControlFilename);
-		Scenario scenario = ScenarioUtils.loadScenario(c2);
-		return scenario;
-	}
 	
-	private Set<Id> getSignalizedLinkIds(SignalSystemsData signals){
-		Map<Id, Set<Id>> signalizedLinksPerSystem = DgSignalsUtils.calculateSignalizedLinksPerSystem(signals);
-		Set<Id> signalizedLinks = new HashSet<Id>();
-		for (Set<Id> signalizedLinksOfSystem : signalizedLinksPerSystem.values()){
-			signalizedLinks.addAll(signalizedLinksOfSystem);
-		}
-		return signalizedLinks;
-	}
-
-	private Set<Id> getSignalizedNodeIds(SignalSystemsData signals, Network network){
-		Map<Id, Set<Id>> signalizedNodesPerSystem = DgSignalsUtils.calculateSignalizedNodesPerSystem(signals, network);
-		Set<Id> signalizedNodes = new HashSet<Id>();
-		for (Set<Id> signalizedNodesOfSystem : signalizedNodesPerSystem.values()){
-			signalizedNodes.addAll(signalizedNodesOfSystem);
-		}
-		return signalizedNodes;
-	}
-	
-	
-	public DgGrid createGrid(Envelope boundingBox, CoordinateReferenceSystem crs, int xCells, int yCells){
-		Envelope gridBoundingBox = new Envelope(boundingBox);
-		//expand the grid size to avoid rounding errors 
-		gridBoundingBox.expandBy(0.1);
-		DgGrid grid = new DgGrid(xCells, yCells, gridBoundingBox);
-		return grid;
-	}
-	
-	public void writeNetwork(Network net, String outputFile){
-		NetworkWriter netWriter = new NetworkWriter(net);
-		netWriter.write(outputFile);
-	}
-	
-
-	private void writeNetwork2Shape(Network net, String outputFilename){
-		CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84_UTM33N);
-		new DgNet2Shape().write(net, outputFilename + "_links.shp", crs);
-		new Nodes2ESRIShape(net, outputFilename + "_nodes.shp", crs).write();
-	}
-
-	
-	public double getMatsimPopSampleSize() {
-		return matsimPopSampleSize;
-	}
-
-	
-	public void setMatsimPopSampleSize(double matsimPopSampleSize) {
-		this.matsimPopSampleSize = matsimPopSampleSize;
-	}
-
 	
 	public double getKsModelCommoditySampleSize() {
 		return ksModelCommoditySampleSize;
