@@ -131,7 +131,10 @@ public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 													 PtMatrix ptMatrix,
 													 Config config, 
 													 Network network){
-								
+		
+		// yyyy some other way to pass the different grids needs to be found; the danger of exchanging two of them seems too large.
+		// kai, jun'13
+		
 		log.info("Initializing ParcelBasedAccessibilityControlerListenerV3 ...");
 
 		assert (measuringPoints != null);
