@@ -69,7 +69,7 @@ public class AccessibilityControlerListenerImpl{
 	public static final String PT_FILENAME 		= "ptAccessibility_cellsize_";
 	
 	static int ZONE_BASED 	= 0;
-	static int PARCEL_BASED 	= 1;
+	static int PARCEL_BASED = 1;
 	
 	// measuring points (origins) for accessibility calculation
 	ActivityFacilitiesImpl measuringPoints;
@@ -505,7 +505,7 @@ public class AccessibilityControlerListenerImpl{
 					if(this.bikeGrid != null)
 						bikeGrid.setValue(bikeAccessibility , aFac.getCoord().getX(), aFac.getCoord().getY());
 					if(this.walkGrid != null)
-					walkGrid.setValue(walkAccessibility , aFac.getCoord().getX(), aFac.getCoord().getY());
+						walkGrid.setValue(walkAccessibility , aFac.getCoord().getX(), aFac.getCoord().getY());
 					if(this.ptGrid != null)
 						ptGrid.setValue(ptAccessibility, aFac.getCoord().getX(), aFac.getCoord().getY());
 				}

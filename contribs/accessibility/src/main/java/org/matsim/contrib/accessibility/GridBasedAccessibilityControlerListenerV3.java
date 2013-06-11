@@ -9,7 +9,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.accessibility.costcalculator.TravelDistanceCalculator;
 import org.matsim.contrib.accessibility.gis.GridUtils;
-import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.utils.Benchmark;
 import org.matsim.contrib.accessibility.utils.LeastCostPathTreeExtended;
 import org.matsim.contrib.accessibility.utils.io.writer.AnalysisCellBasedAccessibilityCSVWriterV2;
@@ -248,10 +247,10 @@ public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 			Node fromNode, double freeSpeedAccessibility,
 			double carAccessibility, double bikeAccessibility,
 			double walkAccessibility, double ptAccessibility) {
+		
 		// writing accessibility values (stored in startZone object) in csv format ...
 		AnalysisCellBasedAccessibilityCSVWriterV2.write(measurePoint, coordFromZone, fromNode, freeSpeedAccessibility,
 														carAccessibility, bikeAccessibility, walkAccessibility, ptAccessibility);
-//		log.info(measurePoint + " " + coordFromZone + " " + fromNode);
 	}
 
 	/**
@@ -265,24 +264,24 @@ public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 		final String FILE_TYPE_TXT = ".txt";
 
 		log.info("Writing plotting data for R analyis into " + matsimOutputDirectory + " ...");
-		// tnicolai: can be disabled for final release
-		GridUtils.writeSpatialGridTable(freeSpeedGrid, matsimOutputDirectory
+		if(freeSpeedGrid != null)
+			GridUtils.writeSpatialGridTable(freeSpeedGrid, matsimOutputDirectory
 				+ FREESEED_FILENAME + freeSpeedGrid.getResolution()
 				+ FILE_TYPE_TXT);
-		// tnicolai: can be disabled for final release
-		GridUtils.writeSpatialGridTable(carGrid, matsimOutputDirectory
+		if(carGrid != null)
+			GridUtils.writeSpatialGridTable(carGrid, matsimOutputDirectory
 				+ CAR_FILENAME + carGrid.getResolution()
 				+ FILE_TYPE_TXT);
-		// tnicolai: can be disabled for final release
-		GridUtils.writeSpatialGridTable(bikeGrid, matsimOutputDirectory
+		if(bikeGrid != null)
+			GridUtils.writeSpatialGridTable(bikeGrid, matsimOutputDirectory
 				+ BIKE_FILENAME + bikeGrid.getResolution()
 				+ FILE_TYPE_TXT);
-		// tnicolai: can be disabled for final release
-		GridUtils.writeSpatialGridTable(walkGrid, matsimOutputDirectory
+		if(walkGrid != null)
+			GridUtils.writeSpatialGridTable(walkGrid, matsimOutputDirectory
 				+ WALK_FILENAME + walkGrid.getResolution()
 				+ FILE_TYPE_TXT);
-		// tnicolai: can be disabled for final release
-		GridUtils.writeSpatialGridTable(ptGrid, matsimOutputDirectory
+		if(ptGrid != null)
+			GridUtils.writeSpatialGridTable(ptGrid, matsimOutputDirectory
 				+ PT_FILENAME + ptGrid.getResolution()
 				+ FILE_TYPE_TXT);
 
