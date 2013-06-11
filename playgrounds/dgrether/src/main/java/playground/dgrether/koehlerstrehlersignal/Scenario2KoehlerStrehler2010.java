@@ -121,8 +121,8 @@ public class Scenario2KoehlerStrehler2010 {
 		Network smallNetwork = netShrinker.createSmallNetwork(fullScenario.getNetwork(), bb, crs);
 		
 		//"clean" the small network
-//		DgNetworkCleaner cleaner = new DgNetworkCleaner();
-//		cleaner.run(smallNetwork);
+		DgNetworkCleaner cleaner = new DgNetworkCleaner();
+		cleaner.cleanNetwork(smallNetwork);
 //		
 		//run a network simplifier to merge links with same attributes
 		Set<Integer> nodeTypesToMerge = new TreeSet<Integer>();
@@ -130,7 +130,7 @@ public class Scenario2KoehlerStrehler2010 {
 		nodeTypesToMerge.add(new Integer(5)); //PASS2WAY: 2 in- and 2 outgoing links
 		NetworkSimplifier nsimply = new NetworkSimplifier();
 		nsimply.setNodesToMerge(nodeTypesToMerge);
-		nsimply.run(smallNetwork);
+//		nsimply.run(smallNetwork);
 		
 		this.writeNetwork(smallNetwork, smallNetworkFile);
 		this.writeNetwork2Shape(fullScenario.getNetwork(), shapeFileDirectory + "network_full");
