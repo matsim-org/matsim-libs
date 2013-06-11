@@ -121,13 +121,17 @@ public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 	// constructors
 	// ////////////////////////////////////////////////////////////////////
 	
+	/**
+	 * constructor
+	 * 
+	 * @param measuringPoints represented by coordinates of ActivityFacilitiesImpl 
+	 * @param opportunities represented by ActivityFacilitiesImpl 
+	 * @param ptMatrix matrix with travel times and distances for any pair of pt stops
+	 * @param config MATSim Config object
+	 * @param network MATSim road network
+	 */
 	public GridBasedAccessibilityControlerListenerV3(ActivityFacilitiesImpl measuringPoints,
 													 ActivityFacilitiesImpl opportunities,
-													 SpatialGrid freeSpeedGrid,									// table for free speed car travel times in accessibility computation
-													 SpatialGrid carGrid, 										// table for congested car travel times in accessibility computation
-													 SpatialGrid bikeGrid,										// table for bike travel times in accessibility computation
-													 SpatialGrid walkGrid, 										// table for walk travel times in accessibility computation
-													 SpatialGrid ptGrid,
 													 PtMatrix ptMatrix,
 													 Config config, 
 													 Network network){
@@ -139,16 +143,6 @@ public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 
 		assert (measuringPoints != null);
 		this.measuringPoints = measuringPoints;
-		assert (freeSpeedGrid != null);
-		this.freeSpeedGrid = freeSpeedGrid;
-		assert (carGrid != null);
-		this.carGrid = carGrid;
-		assert (bikeGrid != null);
-		this.bikeGrid = bikeGrid;
-		assert (walkGrid != null);
-		this.walkGrid = walkGrid;
-		assert (ptGrid != null);
-		this.ptGrid = ptGrid;
 		this.ptMatrix = ptMatrix;	// this could be zero of no input files for pseudo pt are given ...
 		assert (config != null);
 		assert (network != null);
@@ -205,8 +199,6 @@ public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 									 measuringPoints,
 									 PARCEL_BASED,
 									 controler);
-			
-			
 			System.out.println();
 
 			if (this.benchmark != null && benchmarkID > 0) {

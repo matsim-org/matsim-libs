@@ -406,22 +406,36 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 		}
 		
 		if(computeGridBasedAccessibility){
+			// "measuringPoints" incorporate the coordinates for which the accessibility will be calculated.
+			// Accessibilities can be computed for several transport modes such as free speed and congested car,
+			// bicycle, walk or public transport. For each mode the same measuring point (or origin) is used. 
+			// The measured values are stored separately in containers called SpatialGrid (see below). Those 
+			// SpratialGrids are 2d arrays that are consistent with the measuring points, i.e. they have the 
+			// same shape and number of bins as the measuring points.
+			// The reasons to establish two similar structures measuring points and spatial grids are based on
+			// the fact that SpatialGrids are optional and can be provided for the transport modes of interest, 
+			// i.e. there is no default structure where to get the measuring points from. Another aspect is that
+			// SpatialGrids were originally designed to store values only. It would be possible to provide the 
+			// centroids of its array bins as measuring points either by storing this additional information 
+			// internally or by computing the centroid by demand.
+			ActivityFacilitiesImpl measuringPoints;
+			
+			// Spatial grids are 2d arrays that are storing the measured accessibility values for the given measuring points. 
 			SpatialGrid freeSpeedGrid;				// matrix for free speed car related accessibility measure. based on the boundary (above) and grid size
 			SpatialGrid carGrid;					// matrix for congested car related accessibility measure. based on the boundary (above) and grid size
 			SpatialGrid bikeGrid;					// matrix for bike related accessibility measure. based on the boundary (above) and grid size
 			SpatialGrid walkGrid;					// matrix for walk related accessibility measure. based on the boundary (above) and grid size
 			SpatialGrid ptGrid;						// matrix for pt related accessibility measure. based on the boundary (above) and grid size
 
-			ActivityFacilitiesImpl measuringPoitns;
-			
 			// this only applies for (i) UrbanSim parcel application with (ii) a provided shape file 
 			// that defines the boundary of the study area (without any subdivisions like zones or fazes)
 			if(computeGridBasedAccessibilitiesUsingShapeFile){
 				if(Paths.pathExsits(this.shapeFile))	// using shape file for accessibility computation
-					log.info("Using shape file for accessibility computation.");	
+					log.info("Using shape file to determine the area for accessibility computation.");	
 				
 				Geometry boundary = GridUtils.getBoundary(shapeFile);
-				measuringPoitns = GridUtils.createGridLayerByGridSizeByShapeFileV2(cellSizeInMeter, boundary);
+
+				measuringPoints = GridUtils.createGridLayerByGridSizeByShapeFileV2(cellSizeInMeter, boundary);
 				freeSpeedGrid= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
 				carGrid		= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
 				bikeGrid	= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
@@ -432,11 +446,11 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 			// file including subdivisions like zones. This prevents to determine the boundary of the study area.
 			else{
 				if(this.computeGridBasedAccessibilityUsingBoundingBox)
-					log.info("Using custom bounding box for accessibility computation.");
+					log.info("Using custom bounding box to determine the area for accessibility computation.");
 				else
-					log.warn("Using the boundary of the network file for accessibility computation. This could lead to memory issues when the network is large and/or the cell size is too fine!");
+					log.warn("Using the boundary of the network file to determine the area for accessibility computation. This could lead to memory issues when the network is large and/or the cell size is too fine!");
 				
-				measuringPoitns = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(cellSizeInMeter, nwBoundaryBox.getXMin(), nwBoundaryBox.getYMin(), nwBoundaryBox.getXMax(), nwBoundaryBox.getYMax() );
+				measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(cellSizeInMeter, nwBoundaryBox.getXMin(), nwBoundaryBox.getYMin(), nwBoundaryBox.getXMax(), nwBoundaryBox.getYMax() );
 				freeSpeedGrid= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
 				carGrid 	= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
 				bikeGrid 	= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
@@ -446,16 +460,17 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 			
 			if(isParcelMode){
 				// initializing grid based accessibility controler listener
-				GridBasedAccessibilityControlerListenerV3 gbacl = new GridBasedAccessibilityControlerListenerV3( measuringPoitns,
+				GridBasedAccessibilityControlerListenerV3 gbacl = new GridBasedAccessibilityControlerListenerV3( measuringPoints,
 																												 opportunities,
-																												 freeSpeedGrid,
-																												 carGrid,
-																												 bikeGrid,
-																												 walkGrid,
-																												 ptGrid,
 																												 ptMatrix,
 																												 scenario.getConfig(), 
 																												 scenario.getNetwork() );
+				// setting SpatialGrids
+				gbacl.setFreeSpeedCarGrid(freeSpeedGrid);
+				gbacl.setCarGrid(carGrid);
+				gbacl.setBikeGrid(bikeGrid);
+				gbacl.setWalkGrid(walkGrid);
+				gbacl.setPTGrid(ptGrid);
 				// accessibility calculations will be triggered when mobsim finished
 				controler.addControlerListener(gbacl);
 				// creating a writer listener that writes out accessibility results in UrbanSim format for parcels
@@ -465,13 +480,8 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 				gbacl.addSpatialGridDataExchangeListener(csvParcelWiterListener);
 			}
 			else
-				controler.addControlerListener(new GridBasedAccessibilityControlerListenerV3(measuringPoitns,
+				controler.addControlerListener(new GridBasedAccessibilityControlerListenerV3(measuringPoints,
 																							 opportunities,
-																							 freeSpeedGrid,
-																							 carGrid,
-																							 bikeGrid,
-																							 walkGrid, 
-																							 ptGrid,
 																							 ptMatrix,
 																							 scenario.getConfig(), 
 																							 scenario.getNetwork() ));

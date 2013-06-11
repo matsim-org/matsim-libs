@@ -35,12 +35,23 @@ public class UrbanSimParcelCSVWriterListener implements SpatialGridDataExchangeI
 
 		// from here accessibility feedback for each parcel
 		UrbanSimParcelCSVWriter.initUrbanSimZoneWriter();
-
-		Interpolation freeSpeedGridInterpolation = new Interpolation(freeSpeedGrid, Interpolation.BILINEAR);
-		Interpolation carGridInterpolation = new Interpolation(carGrid,	Interpolation.BILINEAR);
-		Interpolation bikeGridInterpolation = new Interpolation(bikeGrid, Interpolation.BILINEAR);
-		Interpolation walkGridInterpolation = new Interpolation(walkGrid, Interpolation.BILINEAR);
-		Interpolation ptGridInterpolation = new Interpolation(ptGrid, Interpolation.BILINEAR);
+		
+		Interpolation freeSpeedGridInterpolation = null;
+		Interpolation carGridInterpolation = null;
+		Interpolation bikeGridInterpolation = null;
+		Interpolation walkGridInterpolation = null;
+		Interpolation ptGridInterpolation = null;
+		
+		if(freeSpeedGrid != null)
+			freeSpeedGridInterpolation = new Interpolation(freeSpeedGrid, Interpolation.BILINEAR);
+		if(carGrid != null)
+			carGridInterpolation  = new Interpolation(carGrid,	Interpolation.BILINEAR);
+		if(bikeGrid != null)
+			bikeGridInterpolation = new Interpolation(bikeGrid, Interpolation.BILINEAR);
+		if(walkGrid != null)
+			walkGridInterpolation = new Interpolation(walkGrid, Interpolation.BILINEAR);
+		if(ptGrid != null)
+			ptGridInterpolation   = new Interpolation(ptGrid, Interpolation.BILINEAR);
 
 		if (this.parcels != null) {
 
@@ -64,16 +75,20 @@ public class UrbanSimParcelCSVWriterListener implements SpatialGridDataExchangeI
 				ActivityFacility parcel = parcelIterator.next();
 				
 				// accessibilities are interpolated from the SpatialGrid for the given parcel coordinate
-				freeSpeedAccessibility = freeSpeedGridInterpolation.interpolate(parcel.getCoord());
-				carAccessibility = carGridInterpolation.interpolate(parcel.getCoord());
-				bikeAccessibility = bikeGridInterpolation.interpolate(parcel.getCoord());
-				walkAccessibility = walkGridInterpolation.interpolate(parcel.getCoord());
-				ptAccessibility = ptGridInterpolation.interpolate(parcel.getCoord());
+				if(freeSpeedGrid != null)
+					freeSpeedAccessibility = freeSpeedGridInterpolation.interpolate(parcel.getCoord());
+				if(carGrid != null)
+					carAccessibility = carGridInterpolation.interpolate(parcel.getCoord());
+				if(bikeGrid != null)
+					bikeAccessibility = bikeGridInterpolation.interpolate(parcel.getCoord());
+				if(walkGrid != null)
+					walkAccessibility = walkGridInterpolation.interpolate(parcel.getCoord());
+				if(ptGrid != null)
+					ptAccessibility = ptGridInterpolation.interpolate(parcel.getCoord());
 				
 				// interpolated accessibility for each parcel is written out in UrbanSim format
-				UrbanSimParcelCSVWriter.write(parcel.getId(),
-						freeSpeedAccessibility, carAccessibility,
-						bikeAccessibility, walkAccessibility, ptAccessibility);
+				UrbanSimParcelCSVWriter.write(parcel.getId(), freeSpeedAccessibility, carAccessibility,
+											  bikeAccessibility, walkAccessibility, ptAccessibility);
 			}
 			log.info("... done!");
 			UrbanSimParcelCSVWriter.close();

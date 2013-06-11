@@ -120,9 +120,14 @@ public class AccessibilityIntegrationTest {
 		SpatialGrid gridForWalkResults = new SpatialGrid(gridForFreeSpeedResults);
 		SpatialGrid gridForPtResults = new SpatialGrid(gridForFreeSpeedResults);
 
+		GridBasedAccessibilityControlerListenerV3 gacl = new GridBasedAccessibilityControlerListenerV3(measuringPoints, opportunities, ptMatrix, config, sc.getNetwork());
+		gacl.setFreeSpeedCarGrid(gridForFreeSpeedResults);
+		gacl.setCarGrid(gridForCarResults);
+		gacl.setBikeGrid(gridForBikeResults);
+		gacl.setWalkGrid(gridForWalkResults);
+		gacl.setPTGrid(gridForPtResults);
 		
-		controler.addControlerListener(new GridBasedAccessibilityControlerListenerV3(measuringPoints, opportunities, gridForFreeSpeedResults, 
-				gridForCarResults,	gridForBikeResults, gridForWalkResults, gridForPtResults, ptMatrix, config, sc.getNetwork())); 
+		controler.addControlerListener(gacl); 
 		
 		// yy the correct test is essentially already in AccessibilityTest.testAccessibilityMeasure().  kai, jun'13
 		// But that test uses the matsim4urbansim setup, which we don't want to use in the present test.

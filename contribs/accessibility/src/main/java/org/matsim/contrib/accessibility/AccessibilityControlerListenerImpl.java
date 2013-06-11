@@ -53,7 +53,7 @@ import org.matsim.utils.LeastCostPathTree;
  * - take "main" (reference to matsim4urbansim) out
  * - aggregation of opportunities adjusted to handle facilities
  * - zones are taken out
- * 
+ * - replaced 
  *     
  * @author thomas
  *
@@ -79,11 +79,11 @@ public class AccessibilityControlerListenerImpl{
 	AggregateObject2NearestNode[] aggregatedFacilities;
 	
 	// storing the accessibility results
-	SpatialGrid freeSpeedGrid;
-	SpatialGrid carGrid;
-	SpatialGrid bikeGrid;
-	SpatialGrid walkGrid;
-	SpatialGrid ptGrid;
+	SpatialGrid freeSpeedGrid 	= null;
+	SpatialGrid carGrid			= null;
+	SpatialGrid bikeGrid		= null;
+	SpatialGrid walkGrid		= null;
+	SpatialGrid ptGrid			= null;
 	
 	// storing pt matrix
 	PtMatrix ptMatrix;
@@ -423,7 +423,7 @@ public class AccessibilityControlerListenerImpl{
 					// get stored network node (this is the nearest node next to an aggregated work place)
 					Node destinationNode = this.aggregatedFacilities[i].getNearestNode();
 					Id nodeID = destinationNode.getId();
-					
+
 					// disutilities on the road network
 					double congestedCarDisutility = - lcptExtCongestedCarTravelTime.getTree().get( nodeID ).getCost();	// travel disutility congested car on road network (including toll)
 					double freeSpeedCarDisutility = - lcptExtFreeSpeedCarTravelTime.getTree().get( nodeID ).getCost();	// travel disutility free speed car on road network (including toll)
@@ -498,11 +498,16 @@ public class AccessibilityControlerListenerImpl{
 
 				if(mode == PARCEL_BASED){ // only for cell-based accessibility computation
 					// assign log sums to current starZone object and spatial grid
-					freeSpeedGrid.setValue(freeSpeedAccessibility, aFac.getCoord().getX(), aFac.getCoord().getY());
-					carGrid.setValue(carAccessibility ,aFac.getCoord().getX(), aFac.getCoord().getY());
-					bikeGrid.setValue(bikeAccessibility , aFac.getCoord().getX(), aFac.getCoord().getY());
+					if(this.freeSpeedGrid != null)
+						freeSpeedGrid.setValue(freeSpeedAccessibility, aFac.getCoord().getX(), aFac.getCoord().getY());
+					if(this.carGrid != null)
+						carGrid.setValue(carAccessibility ,aFac.getCoord().getX(), aFac.getCoord().getY());
+					if(this.bikeGrid != null)
+						bikeGrid.setValue(bikeAccessibility , aFac.getCoord().getX(), aFac.getCoord().getY());
+					if(this.walkGrid != null)
 					walkGrid.setValue(walkAccessibility , aFac.getCoord().getX(), aFac.getCoord().getY());
-					ptGrid.setValue(ptAccessibility, aFac.getCoord().getX(), aFac.getCoord().getY());
+					if(this.ptGrid != null)
+						ptGrid.setValue(ptAccessibility, aFac.getCoord().getX(), aFac.getCoord().getY());
 				}
 
 				writeCSVData(aFac, aFac.getCoord(), fromNode, 
@@ -522,6 +527,46 @@ public class AccessibilityControlerListenerImpl{
 				return cost.amount;
 		}
 		return 0.;
+	}
+
+	/**
+	 * setter for free speed car grid
+	 * @param freeSpeedGrid
+	 */
+	public void setFreeSpeedCarGrid(SpatialGrid freeSpeedGrid){
+		this.freeSpeedGrid = freeSpeedGrid;
+	}
+	
+	/**
+	 * setter for congested car grid
+	 * @param carGrid
+	 */
+	public void setCarGrid(SpatialGrid carGrid){
+		this.carGrid = carGrid;
+	}
+	
+	/**
+	 * setter for bike (bicycle) grid
+	 * @param bikeGrid
+	 */
+	public void setBikeGrid(SpatialGrid bikeGrid){
+		this.bikeGrid = bikeGrid;
+	}
+	
+	/**
+	 * setter for walk grid
+	 * @param walkGrid
+	 */
+	public void setWalkGrid(SpatialGrid walkGrid){
+		this.walkGrid = walkGrid;
+	}
+	
+	/**
+	 * setter for pt grid
+	 * @param ptGrid
+	 */
+	public void setPTGrid(SpatialGrid ptGrid){
+		this.ptGrid = ptGrid;
 	}
 	
 	/**
