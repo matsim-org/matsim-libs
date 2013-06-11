@@ -48,7 +48,6 @@ import org.matsim.contrib.matsim4opus.config.M4UConfigurationConverterV4;
 import org.matsim.contrib.matsim4opus.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4opus.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4opus.constants.InternalConstants;
-import org.matsim.contrib.matsim4opus.interfaces.MATSim4UrbanSimInterface;
 import org.matsim.contrib.matsim4opus.utils.helperObjects.Benchmark;
 import org.matsim.contrib.matsim4opus.utils.io.BackupMATSimOutput;
 import org.matsim.contrib.matsim4opus.utils.io.Paths;
@@ -95,7 +94,7 @@ import com.vividsolutions.jts.geom.Geometry;
  * - Other improvements:
  * 	For a better readability of code some functionality is outsourced into helper classes
  */
-public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
+public class MATSim4UrbanSimParcel{
 
 	// logger
 	private static final Logger log = Logger.getLogger(MATSim4UrbanSimParcel.class);
@@ -127,7 +126,6 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 	boolean computeAgentPerformance					 = false;	// determines whether agent performances should be calculated
 	String shapeFile 						 		 = null;
 	double cellSizeInMeter 							 = -1;
-	double opportunitySampleRate 					 = 1.;
 	NetworkBoundaryBox nwBoundaryBox				 = null;
 	
 	/**
@@ -386,10 +384,10 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 			// comparisons. kai, apr'13)
 			
 			// creates zone2zone impedance matrix
-			controler.addControlerListener( new Zone2ZoneImpedancesControlerListener( this,
-																					  zones, 
+			controler.addControlerListener( new Zone2ZoneImpedancesControlerListener( zones, 
 																					  parcels,
 																					  ptMatrix,
+																					  this.timeOfDay,
 																					  this.benchmark) );
 		}
 		if(computeAgentPerformance)
@@ -509,6 +507,7 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 	}
 	
 	/**
+	 * Getting parameter  
 	 * 
 	 * @param args
 	 */
@@ -516,8 +515,6 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 
 		AccessibilityConfigGroup moduleAccessibility = getAccessibilityParameterConfig();
 		M4UControlerConfigModuleV3 moduleMATSim4UrbanSim = getMATSim4UrbanSimControlerConfig();
-		
-		this.opportunitySampleRate 		= moduleAccessibility.getAccessibilityDestinationSamplingRate();
 
 		this.computeAgentPerformance	= moduleMATSim4UrbanSim.isAgentPerformance();
 		this.computeZone2ZoneImpedance	= moduleMATSim4UrbanSim.isZone2ZoneImpedance();
@@ -669,26 +666,6 @@ public class MATSim4UrbanSimParcel implements MATSim4UrbanSimInterface{
 		MATSim4UrbanSimParcel.isSuccessfulMATSimRun = Boolean.TRUE;
 		
 		log.info("Computation took " + ((System.currentTimeMillis() - start)/60000) + " minutes. Computation done!");
-	}
-	
-	/**
-	 * this method is only called/needed by "matsim4opus.matsim.MATSim4UrbanSimTest"
-	 * @return true if run was successful
-	 */
-	public static boolean getRunStatus(){
-		return MATSim4UrbanSimParcel.isSuccessfulMATSimRun;
-	}
-	
-	public ReadFromUrbanSimModel getReadFromUrbanSimModel(){
-		return this.readFromUrbansim;
-	}
-	
-	public boolean isParcelMode(){
-		return this.isParcelMode;
-	}
-	
-	public double getOpportunitySampleRate(){
-		return this.opportunitySampleRate;
 	}
 	
 	public double getTimeOfDay(){

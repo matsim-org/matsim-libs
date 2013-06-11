@@ -11,11 +11,9 @@ import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.improvedPseudoPt.PtMatrix;
 import org.matsim.contrib.matsim4opus.config.M4UConfigurationConverterV4;
 import org.matsim.contrib.matsim4opus.constants.InternalConstants;
-import org.matsim.contrib.matsim4opus.interfaces.MATSim4UrbanSimInterface;
 import org.matsim.contrib.matsim4opus.utils.CreateTestMATSimConfig;
 import org.matsim.contrib.matsim4opus.utils.CreateTestNetwork;
 import org.matsim.contrib.matsim4opus.utils.CreateTestUrbansimPopulation;
-import org.matsim.contrib.matsim4opus.utils.io.ReadFromUrbanSimModel;
 import org.matsim.contrib.matsim4opus.utils.network.NetworkBoundaryBox;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
@@ -29,7 +27,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-public class AccessibilityTest implements MATSim4UrbanSimInterface, LinkEnterEventHandler, LinkLeaveEventHandler {
+public class AccessibilityTest implements LinkEnterEventHandler, LinkLeaveEventHandler {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	private double resolution = 100.;
@@ -72,6 +70,8 @@ public class AccessibilityTest implements MATSim4UrbanSimInterface, LinkEnterEve
 	public void testAccessibilityMeasure(){
 
 		String path = utils.getOutputDirectory();
+		
+		boolean isParcelMode = true;
 		
 		Network net = CreateTestNetwork.createTestNetwork();
 		new NetworkWriter(net).write(path+"network.xml");
@@ -132,7 +132,7 @@ public class AccessibilityTest implements MATSim4UrbanSimInterface, LinkEnterEve
 
 		GridBasedAccessibilityControlerListenerV3 listener = null;
 		
-		if(this.isParcelMode()){
+		if(isParcelMode){
 			listener = new GridBasedAccessibilityControlerListenerV3(startZones, opportunities, 
 																	 ptMatrix, config, net);
 			listener.setFreeSpeedCarGrid(gridForFreeSpeedResults);
@@ -167,27 +167,6 @@ public class AccessibilityTest implements MATSim4UrbanSimInterface, LinkEnterEve
 		
 		//new AccessibilityTest().postProcessTest();
 	}
-	
-	@Override
-	public double getOpportunitySampleRate() {
-		return 1.;
-	}
-
-	@Override
-	public ReadFromUrbanSimModel getReadFromUrbanSimModel() {
-		return new ReadFromUrbanSimModel(2010);
-	}
-
-	@Override
-	public boolean isParcelMode() {
-		return true;
-	}
-
-	@Override
-	public double getTimeOfDay() {
-		return 0.;
-	}
-	
 	
 //	plan b
 //	public void postProcessTest(){
