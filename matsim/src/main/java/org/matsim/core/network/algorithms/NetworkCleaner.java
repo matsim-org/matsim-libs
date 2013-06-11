@@ -145,7 +145,7 @@ public class NetworkCleaner implements NetworkRunnable {
 	 * Reducing the network so it only contains nodes included in the biggest Cluster.
 	 * Loop over all nodes and check if they are in the cluster, if not, remove them from the network
 	 */
-	private void reduceToBiggestCluster(Network network, Map<Id, Node> biggestCluster) {
+	public void reduceToBiggestCluster(Network network, Map<Id, Node> biggestCluster) {
 		List<Node> allNodes2 = new ArrayList<Node>(network.getNodes().values());
 		for (Node node : allNodes2) {
 			if (!biggestCluster.containsKey(node.getId())) {
