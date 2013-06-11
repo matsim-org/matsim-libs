@@ -108,8 +108,10 @@ public class NetworkCleaner implements NetworkRunnable {
 		return clusterNodes;
 	}
 
-	@Override
-	public void run(final Network network) {
+	/**
+	 * Searches the biggest cluster in the given Network. The Network is not modified.
+	 */
+	public Map<Id, Node> searchBiggestCluster(Network network) {
 		final Map<Id, Node> visitedNodes = new TreeMap<Id, Node>();
 		Map<Id, Node> biggestCluster = new TreeMap<Id, Node>();
 
@@ -136,10 +138,14 @@ public class NetworkCleaner implements NetworkRunnable {
 		}
 		log.info("    The biggest cluster consists of " + biggestCluster.size() + " nodes.");
 		log.info("  done.");
+		return biggestCluster;
+	}
 
-		/* Reducing the network so it only contains nodes included in the biggest Cluster.
-		 * Loop over all nodes and check if they are in the cluster, if not, remove them from the network
-		 */
+	/** 
+	 * Reducing the network so it only contains nodes included in the biggest Cluster.
+	 * Loop over all nodes and check if they are in the cluster, if not, remove them from the network
+	 */
+	private void reduceToBiggestCluster(Network network, Map<Id, Node> biggestCluster) {
 		List<Node> allNodes2 = new ArrayList<Node>(network.getNodes().values());
 		for (Node node : allNodes2) {
 			if (!biggestCluster.containsKey(node.getId())) {
@@ -149,6 +155,12 @@ public class NetworkCleaner implements NetworkRunnable {
 		log.info("  resulting network contains " + network.getNodes().size() + " nodes and " +
 				network.getLinks().size() + " links.");
 		log.info("done.");
+	}
+	
+	@Override
+	public void run(final Network network) {
+		Map<Id, Node> biggestCluster = this.searchBiggestCluster(network);
+		this.reduceToBiggestCluster(network, biggestCluster);
 	}
 
 	private static DoubleFlagRole getDoubleFlag(final Node n, final Map<Node, DoubleFlagRole> nodeRoles) {
