@@ -23,17 +23,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
@@ -42,7 +39,6 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.router.CompositeStageActivityTypes;
-import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 
@@ -66,6 +62,7 @@ import playground.thibautd.socnetsim.replanning.RankOfRemovedPlanListener;
 import playground.thibautd.socnetsim.router.JointPlanRouterFactory;
 import playground.thibautd.socnetsim.sharedvehicles.PlanRouterWithVehicleRessourcesFactory;
 import playground.thibautd.socnetsim.sharedvehicles.SharedVehicleUtils;
+import playground.thibautd.socnetsim.utils.JointMainModeIdentifier;
 import playground.thibautd.utils.DistanceFillerAlgorithm;
 
 /**
@@ -189,24 +186,7 @@ public class RunUtils {
 					graphWriteInterval,
 					controller.getControlerIO(),
 					controller.getRegistry().getScenario(),
-					new MainModeIdentifier() {
-						private final MainModeIdentifier d = new MainModeIdentifierImpl();
-
-						@Override
-						public String identifyMainMode(
-								final List<PlanElement> tripElements) {
-							for (PlanElement pe : tripElements) {
-								if ( !(pe instanceof Leg) ) continue;
-								final String mode = ((Leg) pe).getMode();
-
-								if (mode.equals( JointActingTypes.DRIVER ) ||
-										mode.equals( JointActingTypes.PASSENGER ) ) {
-									return mode;
-								}
-							}
-							return d.identifyMainMode( tripElements );
-						}
-					},
+					new JointMainModeIdentifier( new MainModeIdentifierImpl() ),
 					actTypesForAnalysis));
 
 		final RankOfRemovedPlanListener removalListener =

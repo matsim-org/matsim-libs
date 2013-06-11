@@ -23,7 +23,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -33,10 +32,8 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -57,6 +54,7 @@ import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.pt.PtConstants;
 
 import playground.thibautd.socnetsim.population.JointActingTypes;
+import playground.thibautd.socnetsim.utils.JointMainModeIdentifier;
 
 /**
  * @author thibautd
@@ -70,29 +68,7 @@ public class ExtractTripModeShares30kmFromBellevue {
 					PtConstants.TRANSIT_ACTIVITY_TYPE,
 					JointActingTypes.PICK_UP,
 					JointActingTypes.DROP_OFF ) );
-	private static final MainModeIdentifier MODE_IDENTIFIER =
-		new MainModeIdentifier() {
-			private final MainModeIdentifier d = new MainModeIdentifierImpl();
-
-			@Override
-			public String identifyMainMode(
-					final List<PlanElement> tripElements) {
-				for (PlanElement pe : tripElements) {
-					if ( pe instanceof Activity ) {
-						if ( ((Activity) pe).getType().equals( PtConstants.TRANSIT_ACTIVITY_TYPE ) ) return TransportMode.pt;
-					}
-					else {
-						final String mode = ((Leg) pe).getMode();
-
-						if (mode.equals( JointActingTypes.DRIVER ) ||
-								mode.equals( JointActingTypes.PASSENGER ) ) {
-							return mode;
-						}
-					}
-				}
-				return d.identifyMainMode( tripElements );
-			}
-		};
+	private static final MainModeIdentifier MODE_IDENTIFIER = new JointMainModeIdentifier( new MainModeIdentifierImpl() );
 
 	private static final double CROW_FLY_FACTOR = 1.2;
 
