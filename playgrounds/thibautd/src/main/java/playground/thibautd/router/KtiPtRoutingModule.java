@@ -132,12 +132,12 @@ public class KtiPtRoutingModule implements RoutingModule {
 				stop2.getCoord() );
 		final double ptTravelTime =
 			Double.isNaN( ptTravelTimeEntry.getValue() ) ?
-			ptDistance / info.intrazonalSpeed :
-			// A value of NaN in the travel time matrix indicates that the matrix
-			// contains no valid value for this entry.
-			// In this case, the travel time is calculated with the distance of
-			// the relation and an average speed.
-			ptTravelTimeEntry.getValue() * 60;
+				// A value of NaN in the travel time matrix indicates that the matrix
+				// contains no valid value for this entry.
+				// In this case, the travel time is calculated with the distance of
+				// the relation and an average speed.
+				ptDistance / info.intrazonalSpeed :
+				ptTravelTimeEntry.getValue() * 60;
 
 		ptRoute.setTravelTime( ptTravelTime );
 		ptRoute.setDistance( ptDistance );
