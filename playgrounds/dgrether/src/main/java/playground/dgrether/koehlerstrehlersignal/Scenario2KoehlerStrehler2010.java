@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -127,8 +126,8 @@ public class Scenario2KoehlerStrehler2010 {
 //		
 		//run a network simplifier to merge links with same attributes
 		Set<Integer> nodeTypesToMerge = new TreeSet<Integer>();
-		nodeTypesToMerge.add(new Integer(4));
-		nodeTypesToMerge.add(new Integer(5));
+		nodeTypesToMerge.add(new Integer(4)); //PASS1WAY: 1 in- and 1 outgoing link
+		nodeTypesToMerge.add(new Integer(5)); //PASS2WAY: 2 in- and 2 outgoing links
 		NetworkSimplifier nsimply = new NetworkSimplifier();
 		nsimply.setNodesToMerge(nodeTypesToMerge);
 		nsimply.run(smallNetwork);
@@ -161,6 +160,7 @@ public class Scenario2KoehlerStrehler2010 {
 		
 		Map<DgZone, Link> zones2LinkMap = DgZoneUtils.createZoneCenter2LinkMapping(cells, (NetworkImpl) smallNetwork);
 		DgZoneUtils.writeLinksOfZones2Shapefile(cells, zones2LinkMap, crs, shapeFileDirectory + "links_for_zones.shp");
+		
 		
 		//create koehler strehler network
 		Config smallNetConfig = ConfigUtils.createConfig();
@@ -207,26 +207,6 @@ public class Scenario2KoehlerStrehler2010 {
 		idPool.writeToFile(outputDirectory + "id_conversions.txt");
 		
 		OutputDirectoryLogging.closeOutputDirLogging();		
-	}
-	
-	
-	private void addLink(Network smallNetwork, Link link) {
-		Id fromId = link.getFromNode().getId();
-		Id toId = link.getToNode().getId();
-		Node from = smallNetwork.getNodes().get(fromId);
-		Node to = smallNetwork.getNodes().get(toId);
-		Link newLink = smallNetwork.getFactory().createLink(link.getId(), from, to);
-		newLink.setAllowedModes(link.getAllowedModes());
-		newLink.setCapacity(link.getCapacity());
-		newLink.setFreespeed(link.getFreespeed());
-		newLink.setLength(link.getLength());
-		newLink.setNumberOfLanes(link.getNumberOfLanes());
-		smallNetwork.addLink(newLink);
-	}
-
-	private void addNode(Network smallNetwork, Node node) {
-		Node newNode = smallNetwork.getFactory().createNode(node.getId(), node.getCoord());
-		smallNetwork.addNode(newNode);
 	}
 
 	private String createShapeFileDirectory(String outputDirectory) {

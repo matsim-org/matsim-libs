@@ -50,24 +50,23 @@ public class TtDgKoehlerStrehler2010Router {
 
 	private static final class SimpleTravelTimeDisutility implements TravelTime, TravelDisutility {
 
-		private double calcTravelTime(Link link) {
-//			return link.getLength() / link.getFreespeed();
+		private double calcTravelDistance(Link link) {
 			return link.getLength();
 		}
 		
 		@Override
 		public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
-			return this.calcTravelTime(link);
+			return this.calcTravelDistance(link);
 		}
 
 		@Override
 		public double getLinkMinimumTravelDisutility(Link link) {
-			return this.calcTravelTime(link);
+			return this.calcTravelDistance(link);
 		}
 
 		@Override
 		public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-			return this.calcTravelTime(link);
+			return this.calcTravelDistance(link);
 		}
 		
 	};
@@ -127,7 +126,8 @@ public class TtDgKoehlerStrehler2010Router {
 			Node fromNode = network.getNodes().get(commodity.getSourceNode());
 			Node toNode = network.getNodes().get(commodity.getDrainNodeId());
 			log.info("Searching path from,to node " + fromNode.getId() + "," + toNode.getId());
-			Path path = dijkstra.calcLeastCostPath(fromNode, toNode, 1.0, fakePerson, fakeVehicle); //call for dijkstra
+			//calculate shortest distance path with dijkstra
+			Path path = dijkstra.calcLeastCostPath(fromNode, toNode, 1.0, fakePerson, fakeVehicle);
 			log.info("Found path for commodity id " + commodity.getId() + " " + path);
 			if (path == null) {
 				invalidCommodities.add(commodity.getId());

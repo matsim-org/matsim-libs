@@ -52,7 +52,7 @@ public class TtSignalizedNodeShortestPath {
 			}
 		}
 
-		//calculate shortest paths between all signal-pairs with dijkstra
+		//calculate shortest distance paths between all signal-pairs with dijkstra
 		TtDgKoehlerStrehler2010Router ttDgKoehlerStrehler2010Router = new TtDgKoehlerStrehler2010Router();
 		List<Id> invalidSignalCommodities = ttDgKoehlerStrehler2010Router.routeCommodities(network, signalCommodities);
 		List<Path> shortestPaths = ttDgKoehlerStrehler2010Router.getShortestPaths();
