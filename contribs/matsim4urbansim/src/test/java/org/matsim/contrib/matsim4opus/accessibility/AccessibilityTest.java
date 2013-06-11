@@ -72,9 +72,8 @@ public class AccessibilityTest implements MATSim4UrbanSimInterface, LinkEnterEve
 	
 	@Test
 	public void testAccessibilityMeasure(){
-		
-//		String path = TempDirectoryUtil.createCustomTempDirectory("tmp");
-		String path = utils.getOutputDirectory() ;
+
+		String path = utils.getOutputDirectory();
 		
 		Network net = CreateTestNetwork.createTestNetwork();
 		new NetworkWriter(net).write(path+"network.xml");
@@ -165,9 +164,6 @@ public class AccessibilityTest implements MATSim4UrbanSimInterface, LinkEnterEve
 		//Assert.assertTrue(sth.);
 		
 		//new AccessibilityTest().postProcessTest();
-		
-		TempDirectoryUtil.cleaningUpCustomTempDirectories();
-		
 	}
 	
 	@Override
