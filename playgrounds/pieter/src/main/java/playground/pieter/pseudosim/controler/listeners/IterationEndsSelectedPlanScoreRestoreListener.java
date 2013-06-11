@@ -20,6 +20,8 @@ public class IterationEndsSelectedPlanScoreRestoreListener implements IterationE
 	}
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
+		if(MobSimSwitcher.isMobSimIteration)
+			return;
 		HashMap<IdImpl,Double> nSASS = c.getNonSimulatedAgentSelectedPlanScores();
 		Map<Id, ? extends Person> persons = c.getPopulation().getPersons();
 		for(IdImpl id : nSASS.keySet()){

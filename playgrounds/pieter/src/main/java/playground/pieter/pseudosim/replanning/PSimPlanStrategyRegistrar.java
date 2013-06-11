@@ -12,6 +12,7 @@ import playground.pieter.pseudosim.replanning.factories.PSimLocationChoicePlanSt
 import playground.pieter.pseudosim.replanning.factories.PSimReRoutePlanStrategyFactory;
 import playground.pieter.pseudosim.replanning.factories.PSimSubtourModeChoiceStrategyFactory;
 import playground.pieter.pseudosim.replanning.factories.PSimTimeAllocationMutatorPlanStrategyFactory;
+import playground.pieter.pseudosim.replanning.factories.PSimTripSubtourModeChoiceStrategyFactory;
 import playground.pieter.pseudosim.replanning.factories.PSimTripTimeAllocationMutatorStrategyFactory;
 
 public class PSimPlanStrategyRegistrar {
@@ -43,6 +44,8 @@ public class PSimPlanStrategyRegistrar {
 			controler.addPlanStrategyFactory("TransitTimeAllocationMutatorPSim", new PSimTripTimeAllocationMutatorStrategyFactory(controler));
 			compatibleStrategies.add("TransitChangeLegMode");
 			controler.addPlanStrategyFactory("TransitChangeLegModePSim", new PSimChangeTripModeStrategyFactory(controler));
+			compatibleStrategies.add("TransitSubtourModeChoice");
+			controler.addPlanStrategyFactory("TransitSubtourModeChoicePSim", new PSimTripSubtourModeChoiceStrategyFactory(controler));
 //			register.register("SubtourModeChoice", new SubtourModeChoiceStrategyFactory());
 //			register.register(Names.ChangeLegMode.toString(), new ChangeLegModeStrategyFactory());
 //			register.register("ChangeSingleLegMode", new ChangeSingleLegModeStrategyFactory());

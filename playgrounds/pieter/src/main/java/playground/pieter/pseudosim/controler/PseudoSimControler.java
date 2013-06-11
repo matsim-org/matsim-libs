@@ -57,9 +57,7 @@ public class PseudoSimControler extends Controler{
 		super(ScenarioUtils.loadScenario(ConfigUtils.loadConfig(args[0])));
 		this.psimStrategies = new PSimPlanStrategyRegistrar(this);
 		this.substituteStrategies();
-//		this.addControlerListener(new SimpleAnnealer());
 		this.addControlerListener(new MobSimSwitcher(this));
-//		this.addControlerListener(new PseudoSimPlanMarkerModuleAppender(this));
 		this.addControlerListener(new ExpensiveSimScoreWriter(this));
 		this.addControlerListener(new BeforePSimSelectedPlanScoreRecorder(this));
 		this.addControlerListener(new IterationEndsSelectedPlanScoreRestoreListener(this));

@@ -19,6 +19,8 @@ public class BeforePSimSelectedPlanScoreRecorder implements
 	}
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+		if(MobSimSwitcher.isMobSimIteration)
+			return;
 		LinkedHashSet<IdImpl> agentsForMentalSimulation = c.getAgentsForPseudoSimulation();
 		for(Person p:c.getPopulation().getPersons().values()){
 			if(!agentsForMentalSimulation.contains((IdImpl)p.getId())){
