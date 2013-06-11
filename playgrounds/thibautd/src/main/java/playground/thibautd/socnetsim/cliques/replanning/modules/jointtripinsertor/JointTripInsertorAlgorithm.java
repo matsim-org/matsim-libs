@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -36,10 +35,13 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.router.CompositeStageActivityTypes;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.core.utils.misc.Time;
 
 import playground.thibautd.socnetsim.cliques.config.JointTripInsertorConfigGroup;
 import playground.thibautd.socnetsim.population.DriverRoute;
@@ -47,7 +49,7 @@ import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.PassengerRoute;
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
-import playground.thibautd.utils.RoutingUtils;
+import playground.thibautd.socnetsim.utils.JointMainModeIdentifier;
 
 /**
  * An algorithm which creates joint trips from nothing,
@@ -60,7 +62,6 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 	private final double betaDetour;
 	private final double scale;
 	private final Random random;
-	private final MainModeIdentifier mainModeIdentifier;
 
 	public JointTripInsertorAlgorithm(
 			final Random random,
@@ -71,7 +72,6 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 		betaDetour = config.getBetaDetour();
 		scale = config.getScale();
 		this.random = random;
-		this.mainModeIdentifier = new MainModeIdentifierImpl();
 	}
 
 	@Override
@@ -101,43 +101,42 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 			if ( agentsToIgnore.contains( id ) ) continue;
 			final Plan plan = entry.getValue();
 
-			final Iterator<PlanElement> structure =
-					RoutingUtils.tripsToLegs(
-							plan,
-							router.getStageActivityTypes(),
-							mainModeIdentifier).iterator();
+			final CompositeStageActivityTypes types = new CompositeStageActivityTypes();
+			types.addActivityTypes( router.getStageActivityTypes() );
+			types.addActivityTypes( JointActingTypes.JOINT_STAGE_ACTS );
 
-			// variables modified during the iteration
-			Activity origin = (Activity) structure.next();
-			double now = TripRouter.calcEndOfPlanElement( 0 , origin );
-			while (structure.hasNext()) {
-				final Leg leg = (Leg) structure.next();
-				final Activity destination = (Activity) structure.next();
+			// identify the joint trips as one single trips.
+			// Otherwise, the process will insert joint trips to access pick-ups
+			// or go from drop offs...
+			final MainModeIdentifier mainModeIdentifier =
+				new JointMainModeIdentifier(
+						router.getMainModeIdentifier() );
 
-				if ( isElectableTrip( origin , leg , destination ) ) {
-					if (leg.getMode().equals( TransportMode.car )) {
+			for ( TripStructureUtils.Trip trip : TripStructureUtils.getTrips( plan , types ) ) {
+				final String mode = mainModeIdentifier.identifyMainMode( trip.getTripElements() );
+				if ( isElectableTrip(
+							trip.getOriginActivity(),
+							mode,
+							trip.getDestinationActivity() ) ) {
+					if ( mode.equals( TransportMode.car ) ) {
 						trips.carTrips.add(
 								new Trip(
-									origin,
-									destination,
-									now,
+									trip.getOriginActivity(),
+									trip.getDestinationActivity(),
+									calcEndOfActivity( trip.getOriginActivity() , plan ),
 									id,
 									TransportMode.car) );
 					}
-					else if ( !chainBasedModes.contains( leg.getMode() ) ) {
+					else if ( !chainBasedModes.contains( mode ) ) {
 						trips.nonChainBasedModeTrips.add(
 								new Trip(
-									origin,
-									destination,
-									now,
+									trip.getOriginActivity(),
+									trip.getDestinationActivity(),
+									calcEndOfActivity( trip.getOriginActivity() , plan ),
 									id,
-									leg.getMode()) );
+									mode) );
 					}
 				}
-
-				now = TripRouter.calcEndOfPlanElement( now , leg );
-				now = TripRouter.calcEndOfPlanElement( now , destination );
-				origin = destination;
 			}
 		}
 
@@ -146,11 +145,10 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 
 	private static boolean isElectableTrip(
 			final Activity origin,
-			final Leg leg,
+			final String mode,
 			final Activity destination) {
 		final String orType = origin.getType();
 		final String destType = destination.getType();
-		final String mode = leg.getMode();
 		final boolean isPartOfJointTrip = 
 			mode.equals( JointActingTypes.PASSENGER ) ||
 			mode.equals( JointActingTypes.DRIVER ) ||
@@ -271,6 +269,54 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 		TripRouter.insertTrip( driverPlan , match.tripDriver.departure , driverTrip , match.tripDriver.arrival );
 		TripRouter.insertTrip( passengerPlan , match.tripPassenger.departure , passengerTrip , match.tripPassenger.arrival );
 	}
+
+	private static double calcEndOfActivity(
+			final Activity activity,
+			final Plan plan) {
+		if (activity.getEndTime() != Time.UNDEFINED_TIME) return activity.getEndTime();
+
+		// no sufficient information in the activity...
+		// do it the long way.
+		// XXX This is inefficient! Using a cache for each plan may be an option
+		// (knowing that plan elements are iterated in proper sequence,
+		// no need to re-examine the parts of the plan already known)
+		double now = 0;
+
+		for (PlanElement pe : plan.getPlanElements()) {
+			now = updateNow( now , pe );
+			if (pe == activity) return now;
+		}
+
+		throw new RuntimeException( "activity "+activity+" not found in "+plan.getPlanElements() );
+	}
+
+	private static double updateNow(
+			final double now,
+			final PlanElement pe) {
+		if (pe instanceof Activity) {
+			Activity act = (Activity) pe;
+			double endTime = act.getEndTime();
+			double startTime = act.getStartTime();
+			double dur = (act instanceof ActivityImpl ? ((ActivityImpl) act).getMaximumDuration() : Time.UNDEFINED_TIME);
+			if (endTime != Time.UNDEFINED_TIME) {
+				// use fromAct.endTime as time for routing
+				return endTime;
+			}
+			else if ((startTime != Time.UNDEFINED_TIME) && (dur != Time.UNDEFINED_TIME)) {
+				// use fromAct.startTime + fromAct.duration as time for routing
+				return startTime + dur;
+			}
+			else if (dur != Time.UNDEFINED_TIME) {
+				// use last used time + fromAct.duration as time for routing
+				return now + dur;
+			}
+			else {
+				throw new RuntimeException("activity has neither end-time nor duration." + act);
+			}
+		}
+		double tt = ((Leg) pe).getTravelTime();
+		return now + (tt != Time.UNDEFINED_TIME ? tt : 0);
+	}	
 
 	// /////////////////////////////////////////////////////////////////////////
 	// helper classes
