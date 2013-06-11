@@ -48,6 +48,7 @@ import playground.dgrether.koehlerstrehlersignal.ids.DgIdPool;
 import playground.dgrether.signalsystems.utils.DgSignalsUtils;
 import playground.dgrether.utils.zones.DgZone;
 import playground.dgrether.utils.zones.DgZoneUtils;
+import playground.dgrether.utils.zones.DgZones;
 
 /**
  * Converts a MATSim Scenario to the traffic signal optimization model published in 
@@ -84,7 +85,7 @@ public class Scenario2KoehlerStrehler2010 {
 	}
 
 	
-	public void convert(String outputDirectory, String name, List<DgZone> zones, double boundingBoxOffset, int cellsX, int cellsY, double startTimeSec, double endTimeSec) throws IOException{
+	public void convert(String outputDirectory, String name, DgZones zones, double boundingBoxOffset, int cellsX, int cellsY, double startTimeSec, double endTimeSec) throws IOException{
 		OutputDirectoryLogging.initLoggingWithOutputDirectory(outputDirectory);
 
 		Map<DgZone, Link> zones2LinkMap = DgZoneUtils.createZoneCenter2LinkMapping(zones, (NetworkImpl) scenario.getNetwork());
@@ -100,7 +101,6 @@ public class Scenario2KoehlerStrehler2010 {
 		DgKSNetwork ksNet = netConverter.convertNetworkLanesAndSignals(scenario, startTimeSec, endTimeSec);
 		DgKSNetwork2Gexf converter = new DgKSNetwork2Gexf();
 		converter.convertAndWrite(ksNet, outputDirectory + "network_small.gexf");
-		
 		
 		DgMatsim2KoehlerStrehler2010DemandConverter demandConverter = new DgMatsim2KoehlerStrehler2010Zones2Commodities(zones2LinkMap, idConverter);
 		DgCommodities commodities = demandConverter.convert(scenario, ksNet);

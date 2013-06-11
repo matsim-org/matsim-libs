@@ -22,7 +22,6 @@ package playground.dgrether.koehlerstrehlersignal;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -47,9 +46,9 @@ import playground.dgrether.utils.DgGrid;
 import playground.dgrether.utils.DgGridUtils;
 import playground.dgrether.utils.DgPopulationSampler;
 import playground.dgrether.utils.zones.DgMatsimPopulation2Zones;
-import playground.dgrether.utils.zones.DgZone;
 import playground.dgrether.utils.zones.DgZoneODShapefileWriter;
 import playground.dgrether.utils.zones.DgZoneUtils;
+import playground.dgrether.utils.zones.DgZones;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -115,7 +114,7 @@ public class ScenarioShrinker {
 		}
 		
 		//create some zones and match the population to them
-		List<DgZone> zones = DgZoneUtils.createZonesFromGrid(grid);
+		DgZones zones = DgZoneUtils.createZonesFromGrid(grid);
 		DgMatsimPopulation2Zones pop2zones = new DgMatsimPopulation2Zones();
 		pop2zones.setUseLinkMappings(false);
 		zones = pop2zones.convert2Zones(this.fullScenario.getNetwork(), smallNetwork, 

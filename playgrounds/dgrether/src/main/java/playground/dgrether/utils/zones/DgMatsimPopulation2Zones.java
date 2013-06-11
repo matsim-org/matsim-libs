@@ -53,7 +53,7 @@ public class DgMatsimPopulation2Zones {
 
 	private static final Logger log = Logger.getLogger(DgMatsimPopulation2Zones.class);
 
-	private List<DgZone> zones = null;
+	private DgZones zones = null;
 	
 	private GeometryFactory geoFac = new GeometryFactory();
 
@@ -63,7 +63,7 @@ public class DgMatsimPopulation2Zones {
 
 	private boolean useLinkMappings = true;
 	
-	public List<DgZone> convert2Zones(Network network, Network smallNetwork, Population pop, List<DgZone> cells, 
+	public DgZones convert2Zones(Network network, Network smallNetwork, Population pop, DgZones cells, 
 			Envelope networkBoundingBox, double startTime, double endTime) {
 		this.fullNetwork = network;
 		this.smallNetwork = smallNetwork; 
@@ -141,7 +141,7 @@ public class DgMatsimPopulation2Zones {
 	
 	private DgZone searchGridCell(Coordinate coordinate){
 		Point p = this.geoFac.createPoint(coordinate);
-		for (DgZone cell : this.zones){
+		for (DgZone cell : this.zones.values()){
 			if (cell.getPolygon().covers(p)){
 				return cell;
 			}

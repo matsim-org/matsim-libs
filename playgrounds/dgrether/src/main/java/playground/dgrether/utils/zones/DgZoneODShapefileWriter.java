@@ -39,10 +39,10 @@ import com.vividsolutions.jts.geom.LineString;
 public class DgZoneODShapefileWriter {
 
 	private CoordinateReferenceSystem crs;
-	private List<DgZone> zones;
+	private DgZones zones;
 	private GeometryFactory geoFac;
 
-	public DgZoneODShapefileWriter(List<DgZone> cells, CoordinateReferenceSystem crs) {
+	public DgZoneODShapefileWriter(DgZones cells, CoordinateReferenceSystem crs) {
 		this.zones = cells;
 		this.crs = crs;
 		this.geoFac = new GeometryFactory();
@@ -59,7 +59,7 @@ public class DgZoneODShapefileWriter {
 		b.add("no trips", Double.class);
 		SimpleFeatureBuilder builder = new SimpleFeatureBuilder(b.buildFeatureType());
 		int featureId = 1;
-		for (DgZone zone : this.zones) {
+		for (DgZone zone : this.zones.values()) {
 			for (DgDestination destination : zone.getDestinations()) {
 				Coordinate startCoordinate = zone.getCoordinate();
 				Coordinate endCoordinate = destination.getCoordinate();
@@ -86,7 +86,7 @@ public class DgZoneODShapefileWriter {
 		b.add("no trips", Double.class);
 		SimpleFeatureBuilder builder = new SimpleFeatureBuilder(b.buildFeatureType());
 		int featureId = 1;
-		for (DgZone zone : this.zones) {
+		for (DgZone zone : this.zones.values()) {
 			for (DgZoneFromLink fromLink : zone.getFromLinks().values()) {
 				for (DgDestination destination : fromLink.getDestinations()) {
 					Coordinate startCoordinate = fromLink.getCoordinate();

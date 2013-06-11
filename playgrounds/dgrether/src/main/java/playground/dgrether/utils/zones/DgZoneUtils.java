@@ -29,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
@@ -53,22 +54,23 @@ public class DgZoneUtils {
 	
 	private static final Logger log = Logger.getLogger(DgZoneUtils.class);
 	
-	public static List<DgZone> createZonesFromGrid(DgGrid grid){
-		int id = 1000;
-		List<DgZone> cells = new ArrayList<DgZone>();
+	public static DgZones createZonesFromGrid(DgGrid grid){
+		int idint = 1000;
+		DgZones zones= new DgZones();
 		for (Polygon p : grid){
-			id++;
-			DgZone cell = new DgZone(new IdImpl(Integer.toString(id)), p);
-			cells.add(cell);
+			idint++;
+			Id  id = new IdImpl(Integer.toString(idint));
+			DgZone cell = new DgZone(id, p);
+			zones.put(id, cell);
 			log.info("Envelope of cell " + id + " is " + cell.getEnvelope());
 		}
-		return cells;
+		return zones;
 	}
 
 	
-	public static Map<DgZone, Link> createZoneCenter2LinkMapping(List<DgZone> zones, NetworkImpl network){
+	public static Map<DgZone, Link> createZoneCenter2LinkMapping(DgZones zones, NetworkImpl network){
 		Map<DgZone, Link> map = new HashMap<DgZone, Link>();
-		for (DgZone zone : zones){
+		for (DgZone zone : zones.values()){
 			Coord coord = MGC.coordinate2Coord(zone.getCoordinate());
 			Link link = network.getNearestLinkExactly(coord);
 			if (link == null) throw new IllegalStateException("No nearest link found");
@@ -78,7 +80,7 @@ public class DgZoneUtils {
 	}
 
 
-	public static void writePolygonZones2Shapefile(List<DgZone> cells, CoordinateReferenceSystem crs, String shapeFilename){
+	public static void writePolygonZones2Shapefile(DgZones cells, CoordinateReferenceSystem crs, String shapeFilename){
 		Collection<SimpleFeature> featureCollection = new ArrayList<SimpleFeature>();
 		SimpleFeatureTypeBuilder b = new SimpleFeatureTypeBuilder();
 		b.setCRS(crs);
@@ -87,7 +89,7 @@ public class DgZoneUtils {
 		b.add("zone_id", String.class);
 		SimpleFeatureBuilder builder = new SimpleFeatureBuilder(b.buildFeatureType());
 		try {
-			for (DgZone cell : cells){
+			for (DgZone cell : cells.values()){
 				log.info("writing cell: " + cell.getId());
 				List<Object> attributes = new ArrayList<Object> ();
 				Polygon p = cell.getPolygon();
@@ -105,7 +107,7 @@ public class DgZoneUtils {
 		} 
 	}
 
-	public static void writeLinksOfZones2Shapefile(List<DgZone> cells, Map<DgZone, Link> zones2LinkMap, 
+	public static void writeLinksOfZones2Shapefile(DgZones cells, Map<DgZone, Link> zones2LinkMap, 
 			CoordinateReferenceSystem crs, String shapeFilename){
 		List<SimpleFeature> featureCollection = new ArrayList<SimpleFeature>();
 		GeometryFactory geoFac = new GeometryFactory();
@@ -118,7 +120,7 @@ public class DgZoneUtils {
 		SimpleFeatureBuilder linkBuilder = new SimpleFeatureBuilder(linkFeatureTypeBuilder.buildFeatureType());
 		int featureId = 1;
 		try {
-			for (DgZone zone : cells){
+			for (DgZone zone : cells.values()){
 				for (DgZoneFromLink link : zone.getFromLinks().values()){
 					Link l = link.getLink();
 					Coordinate startCoordinate = MGC.coord2Coordinate(l.getFromNode().getCoord());
