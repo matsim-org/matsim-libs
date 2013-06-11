@@ -37,7 +37,6 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 import org.junit.Assert;
 import org.matsim.contrib.matsim4opus.config.M4UConfigurationConverterV4;
 import org.matsim.contrib.matsim4opus.constants.InternalConstants;
@@ -193,8 +192,8 @@ public class CreateTestMATSimConfig {
 	/**
 	 * constructor
 	 * 
-	 * this is makes parameter settings for ConfigLoadTest, 
-	 * create another constructor for another test#
+	 * this determines the parameter settings for ConfigLoadTest, 
+	 * create another constructor for another test
 	 * 
 	 * @param startMode distinguishes between cold, warm and hot start
 	 * @param path gives the path, were the generated config (and other files) should be stored
@@ -203,9 +202,9 @@ public class CreateTestMATSimConfig {
 	public CreateTestMATSimConfig(final int startMode, String path, String externalConfig){
 		this.startMode = startMode;
 		this.dummyPath = path;
-		this.networkInputFile 	= path + "/dummy.xml";
-		this.inputPlansFile		= path + "/dummy.xml";
-		this.hotstartPlansFile	= path + "/dummy.xml";
+		this.networkInputFile 	= path + DUMMY_FILE;
+		this.inputPlansFile		= path + DUMMY_FILE;
+		this.hotstartPlansFile	= path + DUMMY_FILE;
 		this.opusHome			= path;
 		this.opusDataPath		= path;
 		this.matsim4opus		= path;
@@ -215,11 +214,19 @@ public class CreateTestMATSimConfig {
 		this.matsimConfigInputFile = externalConfig;
 	}
 	
+	/**
+	 * constructor
+	 * 
+	 * this determines the parameter settings for Accessibility tests.
+	 * 
+	 * @param path
+	 * @param inputNetworkFile
+	 */
 	public CreateTestMATSimConfig(String path, String inputNetworkFile){
 		this.dummyPath = path;
 		this.networkInputFile = inputNetworkFile;
-		this.inputPlansFile		= path + "/dummy.xml";
-		this.hotstartPlansFile	= path + "/dummy.xml";
+		this.inputPlansFile		= "";
+		this.hotstartPlansFile	= "";
 		this.opusHome			= path;
 		this.opusDataPath		= path;
 		this.matsim4opus		= path;
