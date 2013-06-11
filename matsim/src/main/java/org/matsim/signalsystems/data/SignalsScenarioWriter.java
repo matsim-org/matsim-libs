@@ -61,6 +61,15 @@ public class SignalsScenarioWriter {
 	public SignalsScenarioWriter(){
 	}
 	
+	public SignalsScenarioWriter(String outputDirectoryPath){
+		this.pathToSignalSystemsOutputFilename = outputDirectoryPath + FILENAME_SIGNAL_SYSTEMS;
+		this.pathToSignalGroupsOutputFilename = outputDirectoryPath + FILENAME_SIGNAL_GROUPS;
+		this.pathToSignalControlOutputFilename = outputDirectoryPath + FILENAME_SIGNAL_CONTROL;
+		this.pathToAmberTimesOutputFilename = outputDirectoryPath + FILENAME_AMBER_TIMES;
+		this.pathToIntergreenTimesOutputFilename =  outputDirectoryPath + FILENAME_INTERGREEN_TIMES;
+	}
+	
+	
 	public SignalsScenarioWriter(final OutputDirectoryHierarchy controlerIo){
 		this.pathToSignalSystemsOutputFilename = controlerIo.getOutputFilename(FILENAME_SIGNAL_SYSTEMS);
 		this.pathToSignalGroupsOutputFilename = controlerIo.getOutputFilename(FILENAME_SIGNAL_GROUPS);
