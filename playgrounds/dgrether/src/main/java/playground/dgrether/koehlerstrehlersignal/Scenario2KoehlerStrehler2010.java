@@ -73,13 +73,13 @@ public class Scenario2KoehlerStrehler2010 {
 	private double ksModelCommoditySampleSize = 1.0;
 	private String shapeFileDirectory = "shapes/";
 
-	private Scenario fullScenario;
+	private Scenario scenario;
 
 	private CoordinateReferenceSystem crs;
 	
 	
 	public Scenario2KoehlerStrehler2010(Scenario scenario, CoordinateReferenceSystem crs) {
-		this.fullScenario = scenario;
+		this.scenario = scenario;
 		this.crs = crs;
 	}
 
@@ -87,23 +87,23 @@ public class Scenario2KoehlerStrehler2010 {
 	public void convert(String outputDirectory, String name, List<DgZone> zones, double boundingBoxOffset, int cellsX, int cellsY, double startTimeSec, double endTimeSec) throws IOException{
 		OutputDirectoryLogging.initLoggingWithOutputDirectory(outputDirectory);
 
-		Map<DgZone, Link> zones2LinkMap = DgZoneUtils.createZoneCenter2LinkMapping(zones, (NetworkImpl) fullScenario.getNetwork());
+		Map<DgZone, Link> zones2LinkMap = DgZoneUtils.createZoneCenter2LinkMapping(zones, (NetworkImpl) scenario.getNetwork());
 		DgZoneUtils.writeLinksOfZones2Shapefile(zones, zones2LinkMap, crs, shapeFileDirectory + "links_for_zones.shp");
 
 		//create koehler strehler network
 		DgIdPool idPool = new DgIdPool();
 		DgIdConverter idConverter = new DgIdConverter(idPool);
 		
-		Set<Id> signalizedLinks = this.getSignalizedLinkIds(this.fullScenario.getScenarioElement(SignalsData.class).getSignalSystemsData());
+		Set<Id> signalizedLinks = this.getSignalizedLinkIds(this.scenario.getScenarioElement(SignalsData.class).getSignalSystemsData());
 		DgMatsim2KoehlerStrehler2010NetworkConverter netConverter = new DgMatsim2KoehlerStrehler2010NetworkConverter(idConverter);
 		netConverter.setSignalizedLinks(signalizedLinks);
-		DgKSNetwork ksNet = netConverter.convertNetworkLanesAndSignals(fullScenario, startTimeSec, endTimeSec);
+		DgKSNetwork ksNet = netConverter.convertNetworkLanesAndSignals(scenario, startTimeSec, endTimeSec);
 		DgKSNetwork2Gexf converter = new DgKSNetwork2Gexf();
 		converter.convertAndWrite(ksNet, outputDirectory + "network_small.gexf");
 		
 		
 		DgMatsim2KoehlerStrehler2010DemandConverter demandConverter = new DgMatsim2KoehlerStrehler2010Zones2Commodities(zones2LinkMap, idConverter);
-		DgCommodities commodities = demandConverter.convert(fullScenario, ksNet);
+		DgCommodities commodities = demandConverter.convert(scenario, ksNet);
 		
 		if (ksModelCommoditySampleSize != 1.0){
 			for (DgCommodity com : commodities.getCommodities().values()) {

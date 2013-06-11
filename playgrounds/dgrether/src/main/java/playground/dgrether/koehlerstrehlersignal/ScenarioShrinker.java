@@ -33,7 +33,10 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
+import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 import org.matsim.signalsystems.data.SignalsData;
+import org.matsim.signalsystems.data.SignalsScenarioWriter;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -61,7 +64,9 @@ public class ScenarioShrinker {
 	
 	private static final String smallNetworkFilename = "network_small.xml.gz";
 	private static final String simplifiedNetworkFilename = "network_small_simplified.xml.gz";
+	private static final String simplifiedLanesFilename = "lanes_network_small.xml.gz";
 
+	
 	private double matsimPopSampleSize = 1.0;
 	private String shapeFileDirectory = "shapes/";
 
@@ -121,6 +126,7 @@ public class ScenarioShrinker {
 		DgZoneODShapefileWriter zoneOdWriter = new DgZoneODShapefileWriter(zones, crs);
 		zoneOdWriter.writeLineStringZone2ZoneOdPairsFromZones2Shapefile(shapeFileDirectory + "zone2dest_od_pairs.shp");
 		zoneOdWriter.writeLineStringLink2LinkOdPairsFromZones2Shapefile(shapeFileDirectory + "link2dest_od_pairs.shp");
+		//TODO write zones to file
 		
 		//run a network simplifier to merge links with same attributes
 		Set<Integer> nodeTypesToMerge = new TreeSet<Integer>();
@@ -128,11 +134,18 @@ public class ScenarioShrinker {
 		nodeTypesToMerge.add(NetworkCalcTopoType.PASS2WAY); //PASS2WAY: 2 in- and 2 outgoing links
 		NetworkSimplifier nsimply = new NetworkSimplifier();
 		nsimply.setNodesToMerge(nodeTypesToMerge);
-		nsimply.run(smallNetwork);
+		nsimply.simplifyNetworkLanesAndSignals(smallNetwork, this.fullScenario.getScenarioElement(LaneDefinitions20.class), this.fullScenario.getScenarioElement(SignalsData.class));
 
+		
 		String simplifiedNetworkFile = outputDirectory + simplifiedNetworkFilename;
 		DgNetworkUtils.writeNetwork(smallNetwork, simplifiedNetworkFile);
 		DgNetworkUtils.writeNetwork2Shape(smallNetwork, shapeFileDirectory + "network_small_simplified");
+
+		LaneDefinitionsWriter20 lanesWriter = new LaneDefinitionsWriter20(this.fullScenario.getScenarioElement(LaneDefinitions20.class));
+		lanesWriter.write(outputDirectory + simplifiedLanesFilename);
+		
+		SignalsScenarioWriter signalsWriter = new SignalsScenarioWriter(outputDirectory);
+		signalsWriter.writeSignalsData(this.fullScenario.getScenarioElement(SignalsData.class));
 		
 		OutputDirectoryLogging.closeOutputDirLogging();		
 	}
