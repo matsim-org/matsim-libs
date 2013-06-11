@@ -45,7 +45,7 @@ public class TtCb2Ks2010 {
 	//private static double endTime = 18.5 * 3600.0;
 		double matsimPopSampleSize = 1.0;
 		double ksModelCommoditySampleSize = 0.01;
-		final String outputDirectory = pathToSVNDirectory + "projects_cottbus/cb2ks2010/test/";
+		final String outputDirectory = pathToSVNDirectory + "projects_cottbus/cb2ks2010/testlauf/";
 
 		String networkFilename = pathToSVNDirectory + "studies_cottbus/cottbus_feb_fix/network_wgs84_utm33n.xml.gz";
 		String lanesFilename = pathToSVNDirectory + "studies_cottbus/cottbus_feb_fix/lanes.xml";
