@@ -30,6 +30,7 @@ import org.geotools.feature.simple.SimpleFeatureBuilder;
 import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -57,7 +58,7 @@ public class DgZoneUtils {
 		List<DgZone> cells = new ArrayList<DgZone>();
 		for (Polygon p : grid){
 			id++;
-			DgZone cell = new DgZone(Integer.toString(id), p);
+			DgZone cell = new DgZone(new IdImpl(Integer.toString(id)), p);
 			cells.add(cell);
 			log.info("Envelope of cell " + id + " is " + cell.getEnvelope());
 		}
@@ -147,7 +148,6 @@ public class DgZoneUtils {
 		} 
 
 	}
-	
 
 
 

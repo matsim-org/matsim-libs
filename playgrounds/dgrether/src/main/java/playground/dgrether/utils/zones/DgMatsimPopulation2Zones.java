@@ -102,28 +102,28 @@ public class DgMatsimPopulation2Zones {
 	private void addFromZoneToZoneRelationshipToGrid(Coordinate startCoordinate, Coordinate endCoordinate){
 		DgZone startCell = this.searchGridCell(startCoordinate);
 		DgZone endCell = this.searchGridCell(endCoordinate);
-		startCell.addToZoneRelation(endCell);
+		startCell.incrementDestinationZoneTrips(endCell);
 	}
 
 	private void addFromLinkToLinkRelationshipToGrid(Link startLink, Link endLink){
 		DgZone startCell = this.searchZone4Link(startLink);
 		if (this.useLinkMappings) {
-			startCell.getFromLink(startLink).addToLinkRelation(endLink);
+			startCell.getFromLink(startLink).incrementDestinationLinkTrips(endLink);
 		}
 		else {
 			DgZone endCell = this.searchZone4Link(endLink);
-			startCell.addToZoneRelation(endCell);
+			startCell.incrementDestinationZoneTrips(endCell);
 		}
 	}
 
 	private void addFromZoneToLinkRelationshipToGrid(Coordinate startCoordinate, Link endLink){
 		DgZone startCell = this.searchGridCell(startCoordinate);
 		if (this.useLinkMappings) {
-			startCell.addToLinkRelation(endLink);
+			startCell.incrementDestinationLinkTrips(endLink);
 		}
 		else {
 			DgZone endZone = this.searchZone4Link(endLink);
-			startCell.addToZoneRelation(endZone);
+			startCell.incrementDestinationZoneTrips(endZone);
 		}
 	}
 
@@ -131,10 +131,10 @@ public class DgMatsimPopulation2Zones {
 		DgZone startCell = this.searchZone4Link(startLink);
 		DgZone endCell = this.searchGridCell(endCoordinate);
 		if (this.useLinkMappings) {
-			startCell.getFromLink(startLink).addToZoneRelation(endCell);
+			startCell.getFromLink(startLink).incrementDestinationZoneTrips(endCell);
 		}
 		else {
-			startCell.addToZoneRelation(endCell);
+			startCell.incrementDestinationZoneTrips(endCell);
 		}
 	}
 

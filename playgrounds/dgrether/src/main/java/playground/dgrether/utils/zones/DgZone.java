@@ -25,7 +25,6 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 
-
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Polygon;
@@ -36,15 +35,15 @@ import com.vividsolutions.jts.geom.Polygon;
 public class DgZone extends DgOriginImpl implements DgOrigin{
 
 	private Polygon polygon;
-	private String id;
+	private Id id;
 	private Map<Id, DgZoneFromLink> fromLinks = new HashMap<Id, DgZoneFromLink>();
 	
-	public DgZone(String id, Polygon p) {
+	public DgZone(Id id, Polygon p) {
 		this.id = id;
 		polygon = p;
 	}
 	
-	public String getId(){
+	public Id getId(){
 		return this.id;
 	}
 

@@ -43,7 +43,7 @@ public abstract class DgOriginImpl implements DgOrigin {
 
 
 	@Override
-	public void addToZoneRelation(DgZone toZone) {
+	public void incrementDestinationZoneTrips(DgZone toZone) {
 		if (! toZoneRelations.containsKey(toZone)){
 			this.toZoneRelations.put(toZone, 0.0);
 		}
@@ -52,7 +52,7 @@ public abstract class DgOriginImpl implements DgOrigin {
 	}
 	
 	@Override
-	public void addToLinkRelation(Link endLink) {
+	public void incrementDestinationLinkTrips(Link endLink) {
 		if (! toLinkRelations.containsKey(endLink)){
 			this.toLinkRelations.put(endLink, 0.0);
 		}
@@ -73,12 +73,12 @@ public abstract class DgOriginImpl implements DgOrigin {
 	}
 	
 	@Override
-	public Map<DgZone, Double> getToZoneRelations(){
+	public Map<DgZone, Double> getDestinationZoneTrips(){
 		return this.toZoneRelations;
 	}
 
 	@Override
-	public Map<Link, Double> getToLinkRelations(){
+	public Map<Link, Double> getDestinationLinkTrips(){
 		return this.toLinkRelations;
 	}
 	

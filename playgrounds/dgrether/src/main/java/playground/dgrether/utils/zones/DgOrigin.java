@@ -33,14 +33,14 @@ import com.vividsolutions.jts.geom.Coordinate;
  */
 public interface DgOrigin {
 
-	public void addToZoneRelation(DgZone toZone);
+	public void incrementDestinationZoneTrips(DgZone destinationZone);
 
-	public void addToLinkRelation(Link endLink);
+	public void incrementDestinationLinkTrips(Link endLink);
 	
 	public Coordinate getCoordinate();
 	
-	public Map<DgZone, Double> getToZoneRelations();
+	public Map<DgZone, Double> getDestinationZoneTrips();
 	
-	public Map<Link, Double> getToLinkRelations();
+	public Map<Link, Double> getDestinationLinkTrips();
 	
 }

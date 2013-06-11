@@ -127,6 +127,7 @@ public class ScenarioShrinker {
 		zoneOdWriter.writeLineStringZone2ZoneOdPairsFromZones2Shapefile(shapeFileDirectory + "zone2dest_od_pairs.shp");
 		zoneOdWriter.writeLineStringLink2LinkOdPairsFromZones2Shapefile(shapeFileDirectory + "link2dest_od_pairs.shp");
 		//TODO write zones to file
+
 		
 		//run a network simplifier to merge links with same attributes
 		Set<Integer> nodeTypesToMerge = new TreeSet<Integer>();

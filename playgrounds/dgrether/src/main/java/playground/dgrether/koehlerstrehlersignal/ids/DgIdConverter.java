@@ -67,17 +67,17 @@ public class DgIdConverter {
 		return idPool.createId(idString);
 	}
 
-	public Id createFromZone2ToZoneId(String from, String to){
+	public Id createFromZone2ToZoneId(Id from, Id to){
 		String idString = from + "22" + to;
 		return idPool.createId(idString);
 	}
 
-	public Id createFromLink2ToLinkId(String from, String to){
+	public Id createFromLink2ToLinkId(Id from, Id to){
 		String idString = from + "33" + to;
 		return idPool.createId(idString);
 	}
 	
-	public Id createFrom2ToId(String from, String to){
+	public Id createFrom2ToId(Id from, Id to){
 		String idString = from + "44" + to;
 		return idPool.createId(idString);
 	}

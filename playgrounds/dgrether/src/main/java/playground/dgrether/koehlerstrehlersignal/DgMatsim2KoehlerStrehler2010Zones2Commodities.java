@@ -87,31 +87,31 @@ public class DgMatsim2KoehlerStrehler2010Zones2Commodities implements
 			Id fromNodeId = this.idConverter.convertLinkId2ToCrossingNodeId(fromZoneLink.getId());
 			
 			//zone 2 zone
-			for (Entry<DgZone, Double> entry : fromZone.getToZoneRelations().entrySet()){
+			for (Entry<DgZone, Double> entry : fromZone.getDestinationZoneTrips().entrySet()){
 				Id id = this.idConverter.createFromZone2ToZoneId(fromZone.getId(), entry.getKey().getId());
 				Link toZoneLink = this.zones2LinkMap.get(entry.getKey());
 				Id toNodeId = this.idConverter.convertLinkId2FromCrossingNodeId(toZoneLink.getId());
 				this.addCommodity(coms, id, fromNodeId, toNodeId, entry.getValue(), network);
 			}
 			//zone 2 link
-			for (Entry<Link, Double> entry : fromZone.getToLinkRelations().entrySet()){
+			for (Entry<Link, Double> entry : fromZone.getDestinationLinkTrips().entrySet()){
 				Id toNodeId = this.idConverter.convertLinkId2FromCrossingNodeId(entry.getKey().getId());
-				Id id = this.idConverter.createFrom2ToId(fromZone.getId(), entry.getKey().getId().toString());
+				Id id = this.idConverter.createFrom2ToId(fromZone.getId(), entry.getKey().getId());
 				this.addCommodity(coms, id, fromNodeId, toNodeId, entry.getValue(), network);
 			}
 			//link 2 x
 			for (DgZoneFromLink fromLink : fromZone.getFromLinks().values()){
 				Id fromNodeId2 = this.idConverter.convertLinkId2ToCrossingNodeId(fromLink.getLink().getId());
 				//link 2 zone
-				for (Entry<DgZone, Double> entry : fromLink.getToZoneRelations().entrySet()){
-					Id id = this.idConverter.createFrom2ToId(fromLink.getLink().getId().toString(), entry.getKey().getId());
+				for (Entry<DgZone, Double> entry : fromLink.getDestinationZoneTrips().entrySet()){
+					Id id = this.idConverter.createFrom2ToId(fromLink.getLink().getId(), entry.getKey().getId());
 					Link toZoneLink = this.zones2LinkMap.get(entry.getKey());
 					Id toNodeId = this.idConverter.convertLinkId2FromCrossingNodeId(toZoneLink.getId());
 					this.addCommodity(coms, id, fromNodeId2, toNodeId, entry.getValue(), network);
 				}
 				//link 2 link
-				for (Entry<Link, Double> entry : fromLink.getToLinkRelations().entrySet()){
-					Id id = this.idConverter.createFromLink2ToLinkId(fromLink.getLink().getId().toString(), entry.getKey().getId().toString());
+				for (Entry<Link, Double> entry : fromLink.getDestinationLinkTrips().entrySet()){
+					Id id = this.idConverter.createFromLink2ToLinkId(fromLink.getLink().getId(), entry.getKey().getId());
 					Id toNodeId = this.idConverter.convertLinkId2FromCrossingNodeId(entry.getKey().getId());
 					this.addCommodity(coms, id, fromNodeId2, toNodeId, entry.getValue(), network);
 				}
