@@ -9,7 +9,7 @@ import org.geotools.feature.simple.SimpleFeatureTypeBuilder;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.matsim4opus.utils.network.NetworkBoundaryBox;
+import org.matsim.contrib.accessibility.utils.BoundingBox;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -46,7 +46,7 @@ public class MinimumEnvelope {
 		
 		log.info("creating minimum envelope for given network...");
 		
-		NetworkBoundaryBox bbox = new NetworkBoundaryBox();
+		BoundingBox bbox = new BoundingBox();
 		bbox.setDefaultBoundaryBox(this.net);
 		
 		List<Coord> coordinates = new ArrayList<Coord>();

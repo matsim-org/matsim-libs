@@ -24,8 +24,8 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.gis.Zone;
 import org.matsim.contrib.accessibility.gis.ZoneLayer;
+import org.matsim.contrib.accessibility.utils.BoundingBox;
 import org.matsim.contrib.matsim4opus.utils.misc.ProgressBar;
-import org.matsim.contrib.matsim4opus.utils.network.NetworkBoundaryBox;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -313,13 +313,13 @@ public class NetworkInspector {//TODO pfade ändern
 		if(!(this.nodeTypes.size()<1))
 			exportNodesToShape();
 		
-		NetworkBoundaryBox bbox = new NetworkBoundaryBox();
+		BoundingBox bbox = new BoundingBox();
 		bbox.setDefaultBoundaryBox(NetworkInspector.scenario.getNetwork());
 		
 		ZoneLayer<Id> measuringPoints = NetworkInspector.createGridLayerByGridSizeByNetwork(50, bbox.getBoundingBox());
 		// tnicolai: ich habe die GridUtils auskommentiert, da es sonst nicht mehr kompiliert.
 
-		SpatialGrid freeSpeedGrid = new SpatialGrid(bbox.getBoundingBox(), 50);
+		SpatialGrid freeSpeedGrid = new SpatialGrid(bbox.getXMin(),bbox.getYMin(),bbox.getXMax(),bbox.getYMax(), 50);
 		ScenarioImpl sc = (ScenarioImpl) NetworkInspector.scenario;
 		
 		new AccessibilityCalcV2(measuringPoints, freeSpeedGrid, sc, this.outputFolder).runAccessibilityComputation();
