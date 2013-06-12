@@ -123,12 +123,12 @@ public class GridUtils {
 	
 	/**
 	 * creates measuring points for accessibility computation
-	 * 
-	 * @param gridSize
 	 * @param boundary
+	 * @param gridSize
+	 * 
 	 * @return ActivityFacilitiesImpl containing the coordinates for the measuring points 
 	 */
-	public static ActivityFacilitiesImpl createGridLayerByGridSizeByShapeFileV2(double gridSize, Geometry boundary) {
+	public static ActivityFacilitiesImpl createGridLayerByGridSizeByShapeFileV2(Geometry boundary, double gridSize) {
 		
 		log.info("Setting statring points for accessibility measure ...");
 
@@ -240,15 +240,15 @@ public class GridUtils {
 	
 	/**
 	 * creates measuring points for accessibility computation
-	 * 
-	 * @param gridSize
 	 * @param minX The smallest x coordinate (easting, longitude) expected
 	 * @param minY The smallest y coordinate (northing, latitude) expected
 	 * @param maxX The largest x coordinate (easting, longitude) expected
 	 * @param maxY The largest y coordinate (northing, latitude) expected
+	 * @param gridSize
+	 * 
 	 * @return ActivityFacilitiesImpl containing the coordinates for the measuring points 
 	 */
-	public static ActivityFacilitiesImpl createGridLayerByGridSizeByBoundingBoxV2(double gridSize, double minX, double minY, double maxX, double maxY) {
+	public static ActivityFacilitiesImpl createGridLayerByGridSizeByBoundingBoxV2(double minX, double minY, double maxX, double maxY, double gridSize) {
 		
 		log.info("Setting statring points for accessibility measure ...");
 
@@ -328,12 +328,12 @@ public class GridUtils {
 	
 	/**
 	 * returns a spatial grid for a given geometry (e.g. shape file) with a given grid size
-	 * 
-	 * @param gridSize side length of the grid
 	 * @param boundary a boundary, e.g. from a shape file
+	 * @param gridSize side length of the grid
+	 * 
 	 * @return SpatialGrid storing accessibility values
 	 */
-	public static SpatialGrid createSpatialGridByShapeBoundary(double gridSize, Geometry boundary) {
+	public static SpatialGrid createSpatialGridByShapeBoundary(Geometry boundary, double gridSize) {
 		Envelope env = boundary.getEnvelopeInternal();
 		double xMin = env.getMinX();
 		double xMax = env.getMaxX();

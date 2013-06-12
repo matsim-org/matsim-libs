@@ -81,10 +81,10 @@ public class SpatialGrid{
 	}
 	
 	/**
-	 * @param boundingBox
 	 * @param resolution cell size. E.g. (xmax-xmin)/resolution = number of cells in x direction
+	 * @param boundingBox
 	 */
-	public SpatialGrid(double [] boundingBox, double resolution) {
+	public SpatialGrid(double resolution, double [] boundingBox) {
 		this(boundingBox[0], boundingBox[1], boundingBox[2], boundingBox[3], resolution);
 	}
 	
