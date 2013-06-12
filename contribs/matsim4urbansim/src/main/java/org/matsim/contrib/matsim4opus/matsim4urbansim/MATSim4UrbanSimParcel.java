@@ -37,9 +37,8 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.ZoneBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.config.AccessibilityConfigGroup;
-import org.matsim.contrib.accessibility.gis.GridUtils;
-import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.utils.AggregateObject2NearestNode;
+import org.matsim.contrib.accessibility.utils.BoundingBox;
 import org.matsim.contrib.improvedPseudoPt.MATSim4UrbanSimRouterFactoryImpl;
 import org.matsim.contrib.improvedPseudoPt.PtMatrix;
 import org.matsim.contrib.improvedPseudoPt.config.ImprovedPseudoPtConfigGroup;
@@ -53,7 +52,6 @@ import org.matsim.contrib.matsim4opus.utils.io.BackupMATSimOutput;
 import org.matsim.contrib.matsim4opus.utils.io.Paths;
 import org.matsim.contrib.matsim4opus.utils.io.ReadFromUrbanSimModel;
 import org.matsim.contrib.matsim4opus.utils.io.writer.UrbanSimParcelCSVWriterListener;
-import org.matsim.contrib.matsim4opus.utils.network.NetworkBoundaryBox;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
@@ -66,8 +64,6 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.RoadPricing;
-
-import com.vividsolutions.jts.geom.Geometry;
 
 
 /**
@@ -126,7 +122,7 @@ public class MATSim4UrbanSimParcel{
 	boolean computeAgentPerformance					 = false;	// determines whether agent performances should be calculated
 	String shapeFile 						 		 = null;
 	double cellSizeInMeter 							 = -1;
-	NetworkBoundaryBox nwBoundaryBox				 = null;
+	BoundingBox nwBoundaryBox				 = null;
 	
 	/**
 	 * constructor
@@ -331,7 +327,7 @@ public class MATSim4UrbanSimParcel{
 			// if ptStops etc are given in config
 			PlansCalcRouteConfigGroup plansCalcRoute = controler.getScenario().getConfig().plansCalcRoute();
 			// determining the bounds minX/minY -- maxX/maxY. For optimal performance of the QuadTree. All pt stops should be evenly distributed within this rectangle.
-			NetworkBoundaryBox nbb = new NetworkBoundaryBox();
+			BoundingBox nbb = new BoundingBox();
 			nbb.setDefaultBoundaryBox(controler.getScenario().getNetwork());
 			ptMatrix = new PtMatrix(controler.getScenario().getNetwork(),
 									plansCalcRoute.getTeleportedModeSpeeds().get(TransportMode.walk),
@@ -390,99 +386,57 @@ public class MATSim4UrbanSimParcel{
 																					  this.timeOfDay,
 																					  this.benchmark) );
 		}
+		
 		if(computeAgentPerformance)
 			// creates a persons.csv output for UrbanSim
 			controler.addControlerListener(new AgentPerformanceControlerListener(benchmark, ptMatrix));
 		
 		if(computeZoneBasedAccessibilities){
 			// creates zone based table of log sums
-			controler.addControlerListener( new ZoneBasedAccessibilityControlerListenerV3(zones,
-																						opportunities,
-																						ptMatrix,
-																						InternalConstants.MATSIM_4_OPUS_TEMP,
-																						this.scenario));
+			ZoneBasedAccessibilityControlerListenerV3 zbacl = new ZoneBasedAccessibilityControlerListenerV3( zones,
+																											 opportunities,
+																											 ptMatrix,
+																											 InternalConstants.MATSIM_4_OPUS_TEMP,
+																											 this.scenario);
+			zbacl.useFreeSpeedGrid();
+			zbacl.useCarGrid();
+			zbacl.useBikeGrid();
+			zbacl.useWalkGrid();
+			zbacl.usePtGrid();
+			controler.addControlerListener( zbacl );
 		}
 		
 		if(computeGridBasedAccessibility){
-			// "measuringPoints" incorporate the coordinates for which the accessibility will be calculated.
-			// Accessibilities can be computed for several transport modes such as free speed and congested car,
-			// bicycle, walk or public transport. For each mode the same measuring point (or origin) is used. 
-			// The measured values are stored separately in containers called SpatialGrid (see below). Those 
-			// SpratialGrids are 2d arrays that are consistent with the measuring points, i.e. they have the 
-			// same shape and number of bins as the measuring points.
-			// The reasons to establish two similar structures measuring points and spatial grids are based on
-			// the fact that SpatialGrids are optional and can be provided for the transport modes of interest, 
-			// i.e. there is no default structure where to get the measuring points from. Another aspect is that
-			// SpatialGrids were originally designed to store values only. It would be possible to provide the 
-			// centroids of its array bins as measuring points either by storing this additional information 
-			// internally or by computing the centroid by demand.
-			ActivityFacilitiesImpl measuringPoints;
+			// initializing grid based accessibility controler listener
+			GridBasedAccessibilityControlerListenerV3 gbacl = new GridBasedAccessibilityControlerListenerV3( opportunities,
+																											 ptMatrix,
+																											 scenario.getConfig(), 
+																											 scenario.getNetwork() );
+			// activating needed SpatialGrids
+			gbacl.useFreeSpeedGrid();
+			gbacl.useCarGrid();
+			gbacl.useBikeGrid();
+			gbacl.useWalkGrid();
+			gbacl.usePtGrid();
 			
-			// Spatial grids are 2d arrays that are storing the measured accessibility values for the given measuring points. 
-			SpatialGrid freeSpeedGrid;				// matrix for free speed car related accessibility measure. based on the boundary (above) and grid size
-			SpatialGrid carGrid;					// matrix for congested car related accessibility measure. based on the boundary (above) and grid size
-			SpatialGrid bikeGrid;					// matrix for bike related accessibility measure. based on the boundary (above) and grid size
-			SpatialGrid walkGrid;					// matrix for walk related accessibility measure. based on the boundary (above) and grid size
-			SpatialGrid ptGrid;						// matrix for pt related accessibility measure. based on the boundary (above) and grid size
-
-			// this only applies for (i) UrbanSim parcel application with (ii) a provided shape file 
-			// that defines the boundary of the study area (without any subdivisions like zones or fazes)
-			if(computeGridBasedAccessibilitiesUsingShapeFile){
-				if(Paths.pathExsits(this.shapeFile))	// using shape file for accessibility computation
-					log.info("Using shape file to determine the area for accessibility computation.");	
-				
-				Geometry boundary = GridUtils.getBoundary(shapeFile);
-
-				measuringPoints = GridUtils.createGridLayerByGridSizeByShapeFileV2(cellSizeInMeter, boundary);
-				freeSpeedGrid= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
-				carGrid		= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
-				bikeGrid	= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
-				walkGrid	= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
-				ptGrid		= GridUtils.createSpatialGridByShapeBoundary(cellSizeInMeter, boundary);
-			}
-			// this normally applies for UrbanSim zone applications. The reason is the provided shape
-			// file including subdivisions like zones. This prevents to determine the boundary of the study area.
-			else{
-				if(this.computeGridBasedAccessibilityUsingBoundingBox)
-					log.info("Using custom bounding box to determine the area for accessibility computation.");
-				else
-					log.warn("Using the boundary of the network file to determine the area for accessibility computation. This could lead to memory issues when the network is large and/or the cell size is too fine!");
-				
-				measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(cellSizeInMeter, nwBoundaryBox.getXMin(), nwBoundaryBox.getYMin(), nwBoundaryBox.getXMax(), nwBoundaryBox.getYMax() );
-				freeSpeedGrid= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
-				carGrid 	= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
-				bikeGrid 	= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
-				walkGrid	= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
-				ptGrid		= new SpatialGrid(nwBoundaryBox.getBoundingBox(), cellSizeInMeter);
-			}
+			if(computeGridBasedAccessibilitiesUsingShapeFile)
+				gbacl.generateGridsAndMeasuringPointsByShapeFile(shapeFile, cellSizeInMeter);
+			else if(computeGridBasedAccessibilityUsingBoundingBox)
+				gbacl.generateGridsAndMeasuringPointsByCustomBoundary(nwBoundaryBox.getXMin(), nwBoundaryBox.getYMin(), nwBoundaryBox.getXMax(), nwBoundaryBox.getYMax(), cellSizeInMeter);
+			else
+				gbacl.generateGridsAndMeasuringPointsByNetwork(controler.getNetwork(), cellSizeInMeter);
+			
+			// accessibility calculations will be triggered when mobsim finished
+			controler.addControlerListener( gbacl );
 			
 			if(isParcelMode){
-				// initializing grid based accessibility controler listener
-				GridBasedAccessibilityControlerListenerV3 gbacl = new GridBasedAccessibilityControlerListenerV3( measuringPoints,
-																												 opportunities,
-																												 ptMatrix,
-																												 scenario.getConfig(), 
-																												 scenario.getNetwork() );
-				// setting SpatialGrids
-				gbacl.setFreeSpeedCarGrid(freeSpeedGrid);
-				gbacl.setCarGrid(carGrid);
-				gbacl.setBikeGrid(bikeGrid);
-				gbacl.setWalkGrid(walkGrid);
-				gbacl.setPTGrid(ptGrid);
-				// accessibility calculations will be triggered when mobsim finished
-				controler.addControlerListener(gbacl);
 				// creating a writer listener that writes out accessibility results in UrbanSim format for parcels
 				UrbanSimParcelCSVWriterListener csvParcelWiterListener = new UrbanSimParcelCSVWriterListener(parcels);
 				// the writer listener is added to grid based accessibility controler listener and will be triggered when accessibility calculations are done.
 				// (adding such a listener is optional, here its done to be compatible with UrbanSim)
 				gbacl.addSpatialGridDataExchangeListener(csvParcelWiterListener);
 			}
-			else
-				controler.addControlerListener(new GridBasedAccessibilityControlerListenerV3(measuringPoints,
-																							 opportunities,
-																							 ptMatrix,
-																							 scenario.getConfig(), 
-																							 scenario.getNetwork() ));
+
 		}
 		
 		// From here outputs are for analysis/debugging purposes only
@@ -528,7 +482,7 @@ public class MATSim4UrbanSimParcel{
 		
 		// the boundary box defines the study area for accessibility calculations if no shape file is provided or a zone based UrbanSim application is used
 		// the boundary is either defined by a user defined boundary box or if not applicable by the extend of the road network
-		this.nwBoundaryBox 				= new NetworkBoundaryBox();
+		this.nwBoundaryBox 				= new BoundingBox();
 		if(this.computeGridBasedAccessibilityUsingBoundingBox){	// check if a boundary box is defined
 			// log.info("Using custom bounding box for accessibility computation.");
 			nwBoundaryBox.setCustomBoundaryBox(moduleAccessibility.getBoundingBoxLeft(), 
@@ -540,19 +494,6 @@ public class MATSim4UrbanSimParcel{
 			// log.warn("Using the boundary of the network file for accessibility computation. This could lead to memory issues when the network is large and/or the cell size is too fine.");
 			nwBoundaryBox.setDefaultBoundaryBox(scenario.getNetwork());
 		}
-//		if(Paths.pathExsits(this.shapeFile))						// using shape file for accessibility computation
-//			log.info("Using shape file for accessibility computation.");		
-//		else if(moduleAccessibility.usingCustomBoundingBox()){	// using custom boundary box for accessibility computation
-//			log.info("Using custom bounding box for accessibility computation.");
-//			nwBoundaryBox.setCustomBoundaryBox(moduleAccessibility.getBoundingBoxLeft(), 
-//													moduleAccessibility.getBoundingBoxBottom(), 
-//													moduleAccessibility.getBoundingBoxRight(), 
-//													moduleAccessibility.getBoundingBoxTop());
-//		}
-//		else{														// using boundary of hole network for accessibility computation
-//			log.warn("Using the boundary of the network file for accessibility computation. This could lead to memory issues when the network is large and/or the cell size is too fine.");
-//			nwBoundaryBox.setDefaultBoundaryBox(scenario.getNetwork());
-//		}
 		this.timeOfDay					= moduleAccessibility.getTimeOfDay();
 	}
 	
@@ -667,9 +608,4 @@ public class MATSim4UrbanSimParcel{
 		
 		log.info("Computation took " + ((System.currentTimeMillis() - start)/60000) + " minutes. Computation done!");
 	}
-	
-	public double getTimeOfDay(){
-		return this.timeOfDay;
-	}
-	
 }
