@@ -4,13 +4,15 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.accessibility.costcalculator.TravelDistanceCalculator;
 import org.matsim.contrib.accessibility.gis.GridUtils;
+import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.utils.Benchmark;
+import org.matsim.contrib.accessibility.utils.BoundingBox;
 import org.matsim.contrib.accessibility.utils.LeastCostPathTreeExtended;
+import org.matsim.contrib.accessibility.utils.TempDirectoryUtil;
 import org.matsim.contrib.accessibility.utils.io.writer.AnalysisCellBasedAccessibilityCSVWriterV2;
 import org.matsim.contrib.improvedPseudoPt.PtMatrix;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
@@ -25,6 +27,8 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.utils.LeastCostPathTree;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * improvements sep'11:
@@ -108,6 +112,8 @@ import org.matsim.utils.LeastCostPathTree;
  * - changed class name from ParcelBasedAccessibilityControlerListenerV3 into GridBasedAccessibilityControlerListenerV3
  * - providing opportunity facilities (e.g. workplaces)
  * - reduced dependencies to MATSim4UrbanSim contrib: replaced ZoneLayer<Id> and Zone by standard MATSim ActivityFacilities
+ * - relevant transport modes for which to calculate the accessibility are now configurable. with this accessibilities
+ *   are not calculated for unselected transport modes to improve computing times
  * 
  * @author thomas
  * 
@@ -123,14 +129,12 @@ public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 	/**
 	 * constructor
 	 * 
-	 * @param measuringPoints represented by coordinates of ActivityFacilitiesImpl 
 	 * @param opportunities represented by ActivityFacilitiesImpl 
 	 * @param ptMatrix matrix with travel times and distances for any pair of pt stops
 	 * @param config MATSim Config object
 	 * @param network MATSim road network
 	 */
-	public GridBasedAccessibilityControlerListenerV3(ActivityFacilitiesImpl measuringPoints,
-													 ActivityFacilitiesImpl opportunities,
+	public GridBasedAccessibilityControlerListenerV3(ActivityFacilitiesImpl opportunities,
 													 PtMatrix ptMatrix,
 													 Config config, 
 													 Network network){
@@ -140,8 +144,6 @@ public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 		
 		log.info("Initializing ParcelBasedAccessibilityControlerListenerV3 ...");
 
-		assert (measuringPoints != null);
-		this.measuringPoints = measuringPoints;
 		this.ptMatrix = ptMatrix;	// this could be zero of no input files for pseudo pt are given ...
 		assert (config != null);
 		assert (network != null);
@@ -162,6 +164,17 @@ public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 	@Override
 	public void notifyShutdown(ShutdownEvent event){
 		log.info("Entering notifyShutdown ..." );
+		
+		// make sure that measuring points are set.
+		if(this.measuringPoints == null){
+			log.error("No measuring points found! For this reason no accessibilities can be calculated!");
+			log.info("Please use one of the following methods when initializing the accessibility listener to fix this problem:");
+			log.info("1) generateGridsAndMeasuringPointsByShapeFile(String shapeFile, double cellSize)");
+			log.info("2) ggenerateGridsAndMeasuringPointsByCustomBoundary(double minX, double minY, double maxX, double maxY, double cellSize)");
+			log.info("3) generateGridsAndMeasuringPointsByNetwork(Network network, double cellSize)");
+			return;
+		}
+			
 		
 		// get the controller and scenario
 		Controler controler = event.getControler();
@@ -232,27 +245,29 @@ public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 	}
 
 	/**
-	 * @param accCsvWriter
+	 * Writes the measured accessibility for the current measurePoint instantly
+	 * to disc in csv format.
+	 * 
 	 * @param measurePoint
-	 * @param coordFromZone
 	 * @param fromNode
 	 * @param freeSpeedAccessibility
 	 * @param carAccessibility
 	 * @param bikeAccessibility
 	 * @param walkAccessibility
+	 * @param accCsvWriter
 	 */
 	@Override
 	protected void writeCSVData(
-			ActivityFacility measurePoint, Coord coordFromZone,
-			Node fromNode, double freeSpeedAccessibility,
-			double carAccessibility, double bikeAccessibility,
-			double walkAccessibility, double ptAccessibility) {
+			ActivityFacility measurePoint, Node fromNode,
+			double freeSpeedAccessibility, double carAccessibility,
+			double bikeAccessibility, double walkAccessibility,
+			double ptAccessibility) {
 		
-		// writing accessibility values (stored in startZone object) in csv format ...
-		AnalysisCellBasedAccessibilityCSVWriterV2.write(measurePoint, coordFromZone, fromNode, freeSpeedAccessibility,
+		// writing accessibility measures of current measurePoint in csv format
+		AnalysisCellBasedAccessibilityCSVWriterV2.write(measurePoint, fromNode, freeSpeedAccessibility,
 														carAccessibility, bikeAccessibility, walkAccessibility, ptAccessibility);
 	}
-
+	
 	/**
 	 * This writes the accessibility grid data into the MATSim output directory
 	 * 
@@ -286,5 +301,101 @@ public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 				+ FILE_TYPE_TXT);
 
 		log.info("Writing plotting data for R done!");
+	}
+	
+	
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// GridBasedAccessibilityControlerListenerV3 specific methods that do not apply to zone-based accessibility measures
+	//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+	
+	/**
+	 * Generates the activated SpatialGrids and measuring points for accessibility calculation.
+	 * The given ShapeFile determines the area for which to compute/measure accessibilities.
+	 * 
+	 * @param shapeFile String giving the path to the shape file
+	 * @param cellSize double value giving the the side length of the cell in meter
+	 */
+	public void generateGridsAndMeasuringPointsByShapeFile(String shapeFile, double cellSize){
+		
+		if(TempDirectoryUtil.pathExsits(shapeFile))
+			log.info("Using shape file to determine the area for accessibility computation.");
+		else
+			throw new RuntimeException("ShapeFile for accessibility computation not found: " + shapeFile);
+		
+		Geometry boundary = GridUtils.getBoundary(shapeFile);
+		
+		measuringPoints = GridUtils.createGridLayerByGridSizeByShapeFileV2(boundary, cellSize);
+		if(useFreeSpeedGrid)
+			freeSpeedGrid = GridUtils.createSpatialGridByShapeBoundary(boundary, cellSize);
+		if(useCarGrid)
+			carGrid	= GridUtils.createSpatialGridByShapeBoundary(boundary, cellSize);
+		if(useBikeGrid)
+			bikeGrid = GridUtils.createSpatialGridByShapeBoundary(boundary, cellSize);
+		if(useWalkGrid)
+			walkGrid = GridUtils.createSpatialGridByShapeBoundary(boundary, cellSize);
+		if(usePtGrid)
+			ptGrid = GridUtils.createSpatialGridByShapeBoundary(boundary, cellSize);
+	}
+	
+	/**
+	 * Generates the activated SpatialGrids and measuring points for accessibility calculation.
+	 * The given custom boundary determines the area for which to compute/measure accessibilities.
+	 * 
+	 * @param minX double value giving the left x coordinate of the area
+	 * @param minY double value giving the bottom y coordinate of the area
+	 * @param maxX double value giving the right x coordinate of the area
+	 * @param maxY double value giving the top y coordinate of the area
+	 * @param cellSize double value giving the the side length of the cell in meter
+	 */
+	public void generateGridsAndMeasuringPointsByCustomBoundary(double minX, double minY, double maxX, double maxY, double cellSize){
+		
+		log.info("Using custom bounding box to determine the area for accessibility computation.");
+		
+		generateGridsAndMeasuringPoints(minX, minY, maxX, maxY, cellSize);
+	}
+	
+	/**
+	 * Generates the activated SpatialGrids and measuring points for accessibility calculation.
+	 * The given road network determines the area for which to compute/measure accessibilities.
+	 * 
+	 * @param network MATSim road network
+	 * @param cellSize double value giving the the side length of the cell in meter
+	 */
+	public void generateGridsAndMeasuringPointsByNetwork(Network network, double cellSize){
+		
+		log.info("Using the boundary of the network file to determine the area for accessibility computation.");
+		log.warn("This could lead to memory issues when the network is large and/or the cell size is too fine!");
+		
+		BoundingBox bb = new BoundingBox();
+		bb.setDefaultBoundaryBox(network);
+		
+		generateGridsAndMeasuringPoints(bb.getXMin(), bb.getYMin(), bb.getXMax(), bb.getYMax(), cellSize);
+	}
+	
+	/**
+	 * Common method for generateGridsAndMeasuringPointsByCustomBoundary and 
+	 * generateGridsAndMeasuringPointsByNetwork to generate SpatialGrids and 
+	 * measuring points for accessibility calculation.
+	 * 
+	 * @param minX double value giving the left x coordinate of the area
+	 * @param minY double value giving the bottom y coordinate of the area
+	 * @param maxX double value giving the right x coordinate of the area
+	 * @param maxY double value giving the top y coordinate of the area
+	 * @param cellSize double value giving the the side length of the cell in meter
+	 */
+	private void generateGridsAndMeasuringPoints(double minX, double minY,
+			double maxX, double maxY, double cellSize) {
+		measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(minX, minY, maxX, maxY, cellSize);
+		if(useFreeSpeedGrid)
+			freeSpeedGrid = new SpatialGrid(minX, minY, maxX, maxY, cellSize);
+		if(useCarGrid)
+			carGrid = new SpatialGrid(minX, minY, maxX, maxY, cellSize);
+		if(useBikeGrid)
+			bikeGrid = new SpatialGrid(minX, minY, maxX, maxY, cellSize);
+		if(useWalkGrid)
+			walkGrid = new SpatialGrid(minX, minY, maxX, maxY, cellSize);
+		if(usePtGrid)
+			ptGrid = new SpatialGrid(minX, minY, maxX, maxY, cellSize);
 	}
 }
