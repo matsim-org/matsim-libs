@@ -36,12 +36,12 @@ public class UrbanSimZoneCSVWriterV2 {
 			log.info("Writing data into " + matsim4opusTempDirectory + FILE_NAME + " ...");
 			
 			// create header
-			zoneWriter.write( Labels.ZONE_ID + "," +
-							Labels.ACCESSIBILITY_BY_FREESPEED + "," +
-							Labels.ACCESSIBILITY_BY_CAR + "," +
-							Labels.ACCESSIBILITY_BY_BIKE + "," +
-							Labels.ACCESSIBILITY_BY_WALK + "," +
-							Labels.ACCESSIBILITY_BY_PT);
+			zoneWriter.write(Labels.ZONE_ID + "," +
+							 Labels.ACCESSIBILITY_BY_FREESPEED + "," +
+							 Labels.ACCESSIBILITY_BY_CAR + "," +
+							 Labels.ACCESSIBILITY_BY_BIKE + "," +
+							 Labels.ACCESSIBILITY_BY_WALK + "," +
+							 Labels.ACCESSIBILITY_BY_PT);
 			zoneWriter.newLine();
 			
 			log.info("... done!");

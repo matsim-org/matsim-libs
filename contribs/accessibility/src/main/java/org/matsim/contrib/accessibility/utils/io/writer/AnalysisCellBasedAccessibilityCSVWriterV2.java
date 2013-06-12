@@ -4,7 +4,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.utils.io.IOUtils;
@@ -49,7 +48,6 @@ public class AnalysisCellBasedAccessibilityCSVWriterV2 {
 	 * writing the accessibility measures into csv file
 	 * 
 	 * @param startZone
-	 * @param coordFromZone
 	 * @param node
 	 * @param freeSpeedAccessibility
 	 * @param carAccessibility
@@ -57,7 +55,6 @@ public class AnalysisCellBasedAccessibilityCSVWriterV2 {
 	 * @param walkAccessibility
 	 */
 	public static void write(ActivityFacility startZone, 
-							 Coord coordFromZone,
 							 Node node, 
 							 double freeSpeedAccessibility,
 							 double carAccessibility, 
@@ -68,8 +65,8 @@ public class AnalysisCellBasedAccessibilityCSVWriterV2 {
 		try{
 			assert(AnalysisCellBasedAccessibilityCSVWriterV2.accessibilityDataWriter != null);
 			accessibilityDataWriter.write( startZone.getId().toString() + "," +
-										   coordFromZone.getX() + "," +
-										   coordFromZone.getY() + "," +
+										   startZone.getCoord().getX() + "," +
+										   startZone.getCoord().getY() + "," +
 										   node.getId() + "," + 
 										   node.getCoord().getX() + "," +  
 										   node.getCoord().getY() + "," + 
