@@ -66,7 +66,7 @@
 	<module name="controler">
 		<param name="outputDirectory" value="../../matsim/output/psim_pt_tutorial" />
 		<param name="firstIteration" value="0" />
-		<param name="lastIteration" value="2500" />
+		<param name="lastIteration" value="500" />
 		<param name="eventsFileFormat" value="xml" />
 		<param name="mobsim" value="qsim" />
 		<param name="writeEventsInterval" value="250" />

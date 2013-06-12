@@ -1,6 +1,6 @@
 package playground.pieter.pseudosimulation;
 
-import playground.pieter.pseudosim.controler.PSimControler;
+import playground.pieter.pseudosimulation.controler.PSimControler;
 
 
 public class Main {
