@@ -1,7 +1,6 @@
 package org.matsim.contrib.accessibility;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.accessibility.costcalculator.TravelDistanceCalculator;
@@ -65,7 +64,7 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 	// constructors
 	// ////////////////////////////////////////////////////////////////////
 	
-	public ZoneBasedAccessibilityControlerListenerV3(ActivityFacilitiesImpl mp,
+	public ZoneBasedAccessibilityControlerListenerV3(ActivityFacilitiesImpl measuringPoints,
 												   ActivityFacilitiesImpl opportunities,
 												   PtMatrix ptMatrix,
 												   String matsim4opusTempDirectory,
@@ -73,8 +72,8 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 		
 		log.info("Initializing ZoneBasedAccessibilityControlerListenerV3 ...");
 		
-		assert(mp != null);
-		this.measuringPoints = mp;
+		assert(measuringPoints != null);
+		this.measuringPoints = measuringPoints;
 		assert(matsim4opusTempDirectory != null);
 		this.ptMatrix = ptMatrix; // this could be zero of no input files for pseudo pt are given ...
 		assert(scenario != null);
@@ -95,6 +94,19 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
 		log.info("Entering notifyShutdown ..." );
+		
+		// make sure that that at least one tranport mode is selected
+		if( !(this.useFreeSpeedGrid || this.useCarGrid || this.useBikeGrid || this.useWalkGrid || this.usePtGrid) ){
+			log.error("No transport mode for accessibility calculation is activated! For this reason no accessibilities can be calculated!");
+			log.info("Please activate at least one transport mode by using the corresponding method when initializing the accessibility listener to fix this problem:");
+			log.info("- useFreeSpeedGrid()");
+			log.info("- useCarGrid()");
+			log.info("- useBikeGrid()");
+			log.info("- useWalkGrid()");
+			log.info("- usePtGrid()");
+			return;
+		}
+		
 		
 		// get the controller and scenario
 		Controler controler = event.getControler();
@@ -155,13 +167,27 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 		}
 	}
 
+	/**
+	 * Writes the measured accessibility for the current measurePoint instantly
+	 * to disc in csv format.
+	 * 
+	 * @param measurePoint
+	 * @param fromNode
+	 * @param freeSpeedAccessibility
+	 * @param carAccessibility
+	 * @param bikeAccessibility
+	 * @param walkAccessibility
+	 * @param accCsvWriter
+	 */
 	@Override
 	protected void writeCSVData(
-			ActivityFacility measurePoint, Coord coordFromZone,
-			Node fromNode, double freeSpeedAccessibility,
-			double carAccessibility, double bikeAccessibility,
-			double walkAccessibility, double ptAccessibility) {
-		// writing accessibility measures of current node in csv format (UrbanSim input)
+			ActivityFacility measurePoint, Node fromNode,
+			double freeSpeedAccessibility, double carAccessibility,
+			double bikeAccessibility, double walkAccessibility,
+			double ptAccessibility) {
+		
+		// writing accessibility measures of current measurePoint in csv format
+		// The UrbanSimZoneCSVWriterV2 writer produces URBANSIM INPUT
 		UrbanSimZoneCSVWriterV2.write(measurePoint,
 									  freeSpeedAccessibility,
 									  carAccessibility,
