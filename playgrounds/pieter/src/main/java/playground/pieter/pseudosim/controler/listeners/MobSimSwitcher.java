@@ -43,7 +43,7 @@ public class MobSimSwitcher implements ControlerListener,
 	final static String END_ITER = "endIter";
 	final static String INCREASE_EVERY_N = "increaseEveryNExpensiveIters";
 	private int increaseEveryNExpensiveIters = 1;
-	private static int expensiveIterCount = 0;
+	private static int qsimIterCount = 0;
 	private int cheapIterCount = 0;
 	private int currentRate = 0;
 	private int startRate = 0;
@@ -138,11 +138,10 @@ public class MobSimSwitcher implements ControlerListener,
 			MobSimSwitcher.isQSimIteration = true;
 			return isQSimIteration;
 		}
-		if (iteration < endIter && expensiveIterCount > 0) {
-//			log.error("controler.getIterationNumber() < endIter && expensiveIterCount > 0");
-			if (expensiveIterCount >= increaseEveryNExpensiveIters
+		if (iteration < endIter && qsimIterCount > 0) {
+			if (qsimIterCount >= increaseEveryNExpensiveIters
 					&& iteration > startIter) {
-				log.error("increase rate");
+				log.warn("Increasing rate of switching between QSim and PSim");
 				if (currentRate < endRate) {
 					if (switchType.equals(SwitchType.doubling)) {
 						currentRate *= 2;
@@ -151,7 +150,7 @@ public class MobSimSwitcher implements ControlerListener,
 						currentRate++;
 					}
 				}
-				expensiveIterCount = 0;
+				qsimIterCount = 0;
 			}
 		}
 		if (isQSimIteration && cheapIterCount == 0
@@ -164,12 +163,12 @@ public class MobSimSwitcher implements ControlerListener,
 			isQSimIteration = true;
 			this.expensiveIters.add(iteration);
 			cheapIterCount = 0;
-			expensiveIterCount++;
+			qsimIterCount++;
 			return isQSimIteration;
 		}
 		if (isQSimIteration) {
 			this.expensiveIters.add(iteration);
-			expensiveIterCount++;
+			qsimIterCount++;
 		} else {
 			cheapIterCount++;
 
