@@ -76,6 +76,7 @@ public class DgCb2Ks2010 {
 		
 		ScenarioShrinker scenarioShrinker = new ScenarioShrinker(fullScenario,  crs);
 		Network shrinkedNetwork = scenarioShrinker.shrinkScenario(outputDirectory, shapeFileDirectory, boundingBoxOffset);
+		//TODO read link mappings
 		
 		PopulationToOd pop2od = new PopulationToOd();
 		pop2od.setMatsimPopSampleSize(matsimPopSampleSize);

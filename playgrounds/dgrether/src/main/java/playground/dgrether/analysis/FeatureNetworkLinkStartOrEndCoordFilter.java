@@ -25,13 +25,13 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.filter.NetworkLinkFilter;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**
@@ -41,11 +41,11 @@ import com.vividsolutions.jts.geom.Geometry;
 public class FeatureNetworkLinkStartOrEndCoordFilter implements NetworkLinkFilter {
 
 	private MathTransform transform;
-	private SimpleFeature feature;
+	private Envelope boundingBox;
 	
 	public FeatureNetworkLinkStartOrEndCoordFilter(CoordinateReferenceSystem networkSrs,
-			SimpleFeature feature, CoordinateReferenceSystem featureSrs) {
-		this.feature = feature;
+			Envelope envelope, CoordinateReferenceSystem featureSrs) {
+		this.boundingBox = envelope;
 		try {
 			this.transform = CRS.findMathTransform(networkSrs, featureSrs, true);
 		} catch (FactoryException e) {
@@ -58,11 +58,11 @@ public class FeatureNetworkLinkStartOrEndCoordFilter implements NetworkLinkFilte
 	public boolean judgeLink(Link l) {
 		Coord linkStartCoord = l.getFromNode().getCoord();
 		Coord linkEndCoord = l.getToNode().getCoord();
-		Geometry linkStartPoint, linkEndPoint = null;
+		Coordinate linkStartPoint, linkEndPoint = null;
 		try {
-			linkStartPoint = JTS.transform(MGC.coord2Point(linkStartCoord), this.transform);
-			linkEndPoint = JTS.transform(MGC.coord2Point(linkEndCoord), this.transform);
-			if (((Geometry) this.feature.getDefaultGeometry()).contains(linkStartPoint) || ((Geometry) this.feature.getDefaultGeometry()).contains(linkEndPoint)) {
+			linkStartPoint = JTS.transform(MGC.coord2Point(linkStartCoord), this.transform).getCoordinate();
+			linkEndPoint = JTS.transform(MGC.coord2Point(linkEndCoord), this.transform).getCoordinate();
+			if (this.boundingBox.contains(linkStartPoint) || this.boundingBox.contains(linkEndPoint)) {
 				return true;
 			}
 		} catch (TransformException e) {

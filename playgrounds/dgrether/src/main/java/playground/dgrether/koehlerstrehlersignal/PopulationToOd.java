@@ -76,7 +76,7 @@ public class PopulationToOd {
 	public DgGrid createGrid(Envelope boundingBox, CoordinateReferenceSystem crs, int xCells, int yCells){
 		Envelope gridBoundingBox = new Envelope(boundingBox);
 		//expand the grid size to avoid rounding errors 
-		gridBoundingBox.expandBy(0.1);
+		gridBoundingBox.expandBy(350.0);
 		DgGrid grid = new DgGrid(xCells, yCells, gridBoundingBox);
 		return grid;
 	}

@@ -51,18 +51,20 @@ public class DgSignalsBoundingBox {
 
 	private CoordinateReferenceSystem networkSrs;
 
+	private Coordinate[] coordinates;
+
 	public DgSignalsBoundingBox(CoordinateReferenceSystem crs){
 		this.networkSrs = crs;
 	}
 	
-	public SimpleFeature calculateBoundingBoxForSignals(Network net, SignalSystemsData signalSystemsData, double offset){
+	public Envelope calculateBoundingBoxForSignals(Network net, SignalSystemsData signalSystemsData, double offset){
 		//get all signalized link ids
 		Set<Id> signalizedNodeIds = DgSignalsUtils.calculateSignalizedNodes(signalSystemsData, net);
-		SimpleFeature boundingboxFeature = calcBoundingBox(net, signalizedNodeIds, offset);
-		return boundingboxFeature;
+		calcBoundingBox(net, signalizedNodeIds, offset);
+		return this.boundingBox;
 	}
 	
-	private SimpleFeature calcBoundingBox(Network net, Set<Id> signalizedNodeIds, double offset) {
+	private void calcBoundingBox(Network net, Set<Id> signalizedNodeIds, double offset) {
 		Node n = null;
 		double minX = Double.POSITIVE_INFINITY;
 		double minY = Double.POSITIVE_INFINITY;
@@ -92,7 +94,7 @@ public class DgSignalsBoundingBox {
 		maxY = maxY + offset;
 		log.info("Found bounding box: "  + minX + " " + minY + " " + maxX + " " + maxY + " offset used: " + offset);
 
-		Coordinate[] coordinates = new Coordinate[5];
+		this.coordinates = new Coordinate[5];
 		coordinates[0] = new Coordinate(minX, minY);
 		coordinates[1] = new Coordinate(minX, maxY);
 		coordinates[2] = new Coordinate(maxX, maxY);
@@ -102,14 +104,14 @@ public class DgSignalsBoundingBox {
 
 		this.boundingBox = new Envelope(coordinates[0], coordinates[2]);
 		
-		PolygonFeatureFactory factory = new PolygonFeatureFactory.Builder().
-				setCrs(networkSrs).
-				setName("link").
-				create();
-		return factory.createPolygon(coordinates);
 	}
 	
-	public void writeBoundingBox(SimpleFeature ft, String outputDirectory){
+	public void writeBoundingBox(String outputDirectory){
+		PolygonFeatureFactory factory = new PolygonFeatureFactory.Builder().
+				setCrs(networkSrs).
+				setName("boundingbox").
+				create();
+		SimpleFeature ft = factory.createPolygon(coordinates);
 		Collection<SimpleFeature> boundingBoxCollection = new ArrayList<SimpleFeature>();
 		boundingBoxCollection.add(ft);
 		ShapeFileWriter.writeGeometries(boundingBoxCollection, outputDirectory + "bounding_box.shp");

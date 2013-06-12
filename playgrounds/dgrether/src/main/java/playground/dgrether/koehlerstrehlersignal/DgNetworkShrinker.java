@@ -24,10 +24,11 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.filter.NetworkFilterManager;
-import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.dgrether.analysis.FeatureNetworkLinkStartOrEndCoordFilter;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 public class DgNetworkShrinker {
@@ -35,10 +36,10 @@ public class DgNetworkShrinker {
 
 	private Set<Id> signalizedNodes;
 
-	public Network createSmallNetwork(Network net, SimpleFeature boundingBoxFeature, CoordinateReferenceSystem networkCrs) {
+	public Network createSmallNetwork(Network net, Envelope envelope, CoordinateReferenceSystem networkCrs) {
 		
 		NetworkFilterManager filterManager = new NetworkFilterManager(net);
-		filterManager.addLinkFilter(new FeatureNetworkLinkStartOrEndCoordFilter(networkCrs, boundingBoxFeature, networkCrs));
+		filterManager.addLinkFilter(new FeatureNetworkLinkStartOrEndCoordFilter(networkCrs, envelope, networkCrs));
 		Set<Id> shortestPathLinkIds = new TtSignalizedNodeShortestPath().calcShortestPathLinkIdsBetweenSignalizedNodes(net, signalizedNodes);
 		filterManager.addLinkFilter(new SignalizedNodesSpeedFilter(this.signalizedNodes, shortestPathLinkIds));
 		Network newNetwork = filterManager.applyFilters();

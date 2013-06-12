@@ -35,11 +35,12 @@ import org.matsim.lanes.data.v20.LaneDefinitionsWriter20;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.SignalsScenarioWriter;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
-import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.dgrether.signalsystems.utils.DgSignalsBoundingBox;
 import playground.dgrether.signalsystems.utils.DgSignalsUtils;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**
@@ -71,13 +72,13 @@ public class ScenarioShrinker {
 		
 		//create the bounding box
 		this.signalsBoundingBox = new DgSignalsBoundingBox(crs);
-		SimpleFeature bb = signalsBoundingBox.calculateBoundingBoxForSignals(fullScenario.getNetwork(), fullScenario.getScenarioElement(SignalsData.class).getSignalSystemsData(), boundingBoxOffset);
-		signalsBoundingBox.writeBoundingBox(bb, shapeFileDirectory);
+		Envelope boundingBox = signalsBoundingBox.calculateBoundingBoxForSignals(fullScenario.getNetwork(), fullScenario.getScenarioElement(SignalsData.class).getSignalSystemsData(), boundingBoxOffset);
+		signalsBoundingBox.writeBoundingBox(shapeFileDirectory);
 		
 		//Reduce the network size to the bounding box
 		DgNetworkShrinker netShrinker = new DgNetworkShrinker();
 		netShrinker.setSignalizedNodes(signalizedNodes);
-		Network smallNetwork = netShrinker.createSmallNetwork(fullScenario.getNetwork(), bb, crs);
+		Network smallNetwork = netShrinker.createSmallNetwork(fullScenario.getNetwork(), boundingBox, crs);
 		
 		DgNetworkUtils.writeNetwork(smallNetwork, outputDirectory +  smallNetworkFilename);
 		DgNetworkUtils.writeNetwork2Shape(smallNetwork, shapeFileDirectory + "network_small");
