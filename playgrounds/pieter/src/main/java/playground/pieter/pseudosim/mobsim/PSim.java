@@ -55,7 +55,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import playground.pieter.pseudosim.controler.PseudoSimControler;
+import playground.pieter.pseudosim.controler.PSimControler;
 import playground.pieter.pseudosim.trafficinfo.PSimTravelTimeCalculator;
 import playground.pieter.pseudosim.util.CollectionUtils;
 import playground.sergioo.singapore2012.transitRouterVariable.StopStopTimeCalculator;
@@ -68,7 +68,7 @@ import playground.sergioo.singapore2012.transitRouterVariable.WaitTimeStuckCalcu
  *         road pricing. Extended for transit simulation.
  * 
  */
-public class PseudoSim implements Mobsim {
+public class PSim implements Mobsim {
 
 	Scenario scenario;
 	EventsManager eventManager;
@@ -83,14 +83,14 @@ public class PseudoSim implements Mobsim {
 
 	private final ExecutorService executor;
 	private PSimTravelTimeCalculator carLinkTravelTimeCalculator;
-	private PseudoSimControler controler;
+	private PSimControler controler;
 	private double beelineWalkSpeed;
 	private StopStopTimeCalculator transitStopToStopTimeCalculator;
 	private WaitTimeStuckCalculator transitWaitTimeCalculator;
 	private Map<Id, TransitLine> transitLines;
 	private Map<Id, TransitStopFacility> stopFacilities;
 
-	public PseudoSim(Scenario sc, EventsManager eventsManager) {
+	public PSim(Scenario sc, EventsManager eventsManager) {
 		this.scenario = sc;
 		this.eventManager = eventsManager;
 		int numThreads = Integer.parseInt(sc.getConfig().getParam("global",
@@ -107,7 +107,7 @@ public class PseudoSim implements Mobsim {
 				/ pcrConfig.getBeelineDistanceFactor();
 	}
 
-	public PseudoSim(Scenario sc2, EventsManager eventsManager, PseudoSimControler c) {
+	public PSim(Scenario sc2, EventsManager eventsManager, PSimControler c) {
 		this(sc2, eventsManager);
 		this.controler = c;
 		this.carLinkTravelTimeCalculator = controler.getCarTravelTimeCalculator();
@@ -323,8 +323,10 @@ public class PseudoSim implements Mobsim {
 				double prevEndTime) {
 			double travelTime = 0;
 			TransitRouteImpl transitRoute =  (TransitRouteImpl) transitLines.get(route.getLineId()).getRoutes().get(route.getRouteId());
+			// cannot just get the indices of the two transitstops, because sometimes routes visit the same stop facility more than once
+			// and the transitroutestop is different for each time it stops at the same facility 
 			TransitRouteStop orig = transitRoute.getStop(stopFacilities.get(route.getAccessStopId()));
-			TransitRouteStop dest = transitRoute.getStop(stopFacilities.get(route.getEgressStopId()));
+			Id dest = route.getEgressStopId();
 			int i = transitRoute.getStops().indexOf(orig);
 //			int j = transitRoute.getStops().indexOf(dest);
 //			if(i>=j){
@@ -335,17 +337,25 @@ public class PseudoSim implements Mobsim {
 //						));
 //				
 //			}
-			while(i<transitRoute.getStops().size()){
+			boolean destinationFound=false;
+			while(i<transitRoute.getStops().size()-1){
 				Id fromId = transitRoute.getStops().get(i).getStopFacility().getId();
 				TransitRouteStop toStop = transitRoute.getStops().get(i+1);
 				Id toId = toStop.getStopFacility().getId();
 				travelTime += transitStopToStopTimeCalculator.getStopStopTimes().getStopStopTime(fromId, toId, prevEndTime);
 				prevEndTime += travelTime;
-				if(toStop.equals(dest))
+				if(toStop.getStopFacility().getId().equals(dest)){
+					destinationFound=true;
 					break;
+				}
 				i++;
 			}
-			return travelTime;
+			if( destinationFound){
+				return travelTime;
+			}else{
+				
+				return Double.NEGATIVE_INFINITY;
+			}
 		}
 
 		private double calcRouteTravelTime(NetworkRoute route,

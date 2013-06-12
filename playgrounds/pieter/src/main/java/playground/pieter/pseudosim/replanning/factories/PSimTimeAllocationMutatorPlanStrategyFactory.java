@@ -9,16 +9,16 @@ import org.matsim.core.replanning.modules.TimeAllocationMutator;
 import org.matsim.core.replanning.modules.TimeAllocationMutatorPlanStrategyFactory;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
-import playground.pieter.pseudosim.controler.PseudoSimControler;
+import playground.pieter.pseudosim.controler.PSimControler;
 import playground.pieter.pseudosim.replanning.modules.PSimPlanMarkerModule;
 
 public class PSimTimeAllocationMutatorPlanStrategyFactory extends
 TimeAllocationMutatorPlanStrategyFactory {
 
-	private PseudoSimControler controler;
+	private PSimControler controler;
 
 	public PSimTimeAllocationMutatorPlanStrategyFactory(
-			PseudoSimControler controler) {
+			PSimControler controler) {
 		super();
 		this.controler = controler;
 	}

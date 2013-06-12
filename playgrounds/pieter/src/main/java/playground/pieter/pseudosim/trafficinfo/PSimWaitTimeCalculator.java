@@ -20,7 +20,7 @@ public class PSimWaitTimeCalculator extends WaitTimeStuckCalculator {
 
 	@Override
 	public void reset(int iteration) {
-		if (MobSimSwitcher.isMobSimIteration) {
+		if (MobSimSwitcher.isQSimIteration) {
 			Logger.getLogger(this.getClass()).error(
 					"Calling reset on traveltimecalc");
 			super.reset(iteration);
@@ -29,19 +29,19 @@ public class PSimWaitTimeCalculator extends WaitTimeStuckCalculator {
 
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
-		if (MobSimSwitcher.isMobSimIteration)
+		if (MobSimSwitcher.isQSimIteration)
 			super.handleEvent(event);
 	}
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
-		if (MobSimSwitcher.isMobSimIteration)
+		if (MobSimSwitcher.isQSimIteration)
 			super.handleEvent(event);
 	}
 
 	@Override
 	public void handleEvent(AgentStuckEvent event) {
-		if (MobSimSwitcher.isMobSimIteration)
+		if (MobSimSwitcher.isQSimIteration)
 			super.handleEvent(event);
 	}
 

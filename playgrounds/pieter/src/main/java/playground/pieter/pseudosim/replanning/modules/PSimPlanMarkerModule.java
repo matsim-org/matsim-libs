@@ -4,13 +4,13 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.replanning.ReplanningContext;
 
-import playground.pieter.pseudosim.controler.PseudoSimControler;
+import playground.pieter.pseudosim.controler.PSimControler;
 
 public class PSimPlanMarkerModule implements PlanStrategyModule {
 
-	private PseudoSimControler controler;
+	private PSimControler controler;
 
-	public PSimPlanMarkerModule(PseudoSimControler controler) {
+	public PSimPlanMarkerModule(PSimControler controler) {
 		this.controler = controler;
 	}
 

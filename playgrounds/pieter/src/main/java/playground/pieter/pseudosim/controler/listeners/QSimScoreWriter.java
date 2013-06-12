@@ -14,18 +14,18 @@ import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 
-import playground.pieter.pseudosim.controler.PseudoSimControler;
+import playground.pieter.pseudosim.controler.PSimControler;
 
-public class ExpensiveSimScoreWriter implements IterationEndsListener,
+public class QSimScoreWriter implements IterationEndsListener,
 		ShutdownListener, StartupListener {
-	PseudoSimControler controler;
+	PSimControler controler;
 	private BufferedWriter out;
 	final private static int INDEX_WORST = 0;
 	final private static int INDEX_BEST = 1;
 	final private static int INDEX_AVERAGE = 2;
 	final private static int INDEX_EXECUTED = 3;
 
-	public ExpensiveSimScoreWriter(PseudoSimControler controler) {
+	public QSimScoreWriter(PSimControler controler) {
 		super();
 		this.controler = controler;
 
@@ -33,11 +33,11 @@ public class ExpensiveSimScoreWriter implements IterationEndsListener,
 
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
-		ArrayList<Integer> expensiveIters = MobSimSwitcher.getExpensiveIters();
-		int index = expensiveIters.size();
-		if (!MobSimSwitcher.isMobSimIteration || event.getIteration()==controler.getLastIteration()) {
+		if (!MobSimSwitcher.isQSimIteration || event.getIteration()==controler.getLastIteration()) {
 			return;
 		}
+		ArrayList<Integer> expensiveIters = MobSimSwitcher.getExpensiveIters();
+		int index = expensiveIters.size();
 		double[][] history = controler.getScoreStats().getHistory();
 		int idx = event.getIteration() - controler.getFirstIteration();
 		try {

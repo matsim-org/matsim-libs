@@ -14,7 +14,7 @@ import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
-import playground.pieter.pseudosim.controler.PseudoSimControler;
+import playground.pieter.pseudosim.controler.PSimControler;
 import playground.pieter.pseudosim.replanning.modules.PSimPlanMarkerModule;
 
 public class PSimLocationChoicePlanStrategy implements PlanStrategy {
@@ -23,7 +23,7 @@ public class PSimLocationChoicePlanStrategy implements PlanStrategy {
 	
 //	private static int locachoiceWrnCnt;
 	
-	public PSimLocationChoicePlanStrategy(Scenario scenario, PseudoSimControler controler) {
+	public PSimLocationChoicePlanStrategy(Scenario scenario, PSimControler controler) {
 		if ( LocationChoiceConfigGroup.Algotype.bestResponse==scenario.getConfig().locationchoice().getAlgorithm() ) {
 			throw new RuntimeException("best response location choice not supported as part of LocationChoicePlanStrategy. " +
 					"Use BestReplyLocationChoicePlanStrategy instead, but be aware that as of now some Java coding is necessary to do that. kai, feb'13") ;

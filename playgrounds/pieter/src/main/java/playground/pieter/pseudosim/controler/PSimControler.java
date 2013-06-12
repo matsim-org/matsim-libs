@@ -24,8 +24,8 @@ import org.matsim.pt.counts.PtCountControlerListener;
 
 import playground.pieter.annealing.SimpleAnnealer;
 import playground.pieter.pseudosim.controler.listeners.BeforePSimSelectedPlanScoreRecorder;
-import playground.pieter.pseudosim.controler.listeners.ExpensiveSimScoreWriter;
-import playground.pieter.pseudosim.controler.listeners.IterationEndsSelectedPlanScoreRestoreListener;
+import playground.pieter.pseudosim.controler.listeners.QSimScoreWriter;
+import playground.pieter.pseudosim.controler.listeners.AfterQSimSimSelectedPlanScoreRestoreListener;
 import playground.pieter.pseudosim.controler.listeners.MobSimSwitcher;
 import playground.pieter.pseudosim.replanning.PSimPlanStrategyRegistrar;
 import playground.pieter.pseudosim.trafficinfo.PSimStopStopTimeCalculator;
@@ -38,7 +38,7 @@ import playground.sergioo.singapore2012.transitRouterVariable.WaitTimeStuckCalcu
  * @author fouriep
  * 
  */
-public class PseudoSimControler extends Controler{
+public class PSimControler extends Controler{
 	
 	
 	private LinkedHashSet<Plan> plansForPseudoSimulation = new LinkedHashSet<Plan>();
@@ -53,14 +53,15 @@ public class PseudoSimControler extends Controler{
 
 
 	
-	public PseudoSimControler(String[] args) {
+	public PSimControler(String[] args) {
 		super(ScenarioUtils.loadScenario(ConfigUtils.loadConfig(args[0])));
 		this.psimStrategies = new PSimPlanStrategyRegistrar(this);
+		//substitute qualifying plan strategies with their PSim equivalents
 		this.substituteStrategies();
 		this.addControlerListener(new MobSimSwitcher(this));
-		this.addControlerListener(new ExpensiveSimScoreWriter(this));
+		this.addControlerListener(new QSimScoreWriter(this));
 		this.addControlerListener(new BeforePSimSelectedPlanScoreRecorder(this));
-		this.addControlerListener(new IterationEndsSelectedPlanScoreRestoreListener(this));
+		this.addControlerListener(new AfterQSimSimSelectedPlanScoreRestoreListener(this));
 		this.carTravelTimeCalculator = new PSimTravelTimeCalculator(getNetwork(),
 				getConfig().travelTimeCalculator());
 		this.getEvents().addHandler(carTravelTimeCalculator);
@@ -89,16 +90,10 @@ public class PseudoSimControler extends Controler{
 	 * Goes through the list of plan strategies and substitutes qualifying strategies with their PSim equivalents
 	 */
 	private void substituteStrategies() {
-//		String[] nonMutatingStrategyModules = this.getConfig()
-//				.getParam("PseudoSim", "nonMutatingStrategies").split(",");
-		ArrayList<String> nonMutatingStrategies = new ArrayList<String>();
-//		for (String strat : nonMutatingStrategyModules) {
-//			nonMutatingStrategies.add(this.getConfig().strategy().getParams()
-//					.get(strat.trim()));
+//		ArrayList<String> nonMutatingStrategies = new ArrayList<String>();
+//		for(PlanStrategyRegistrar.Selector selector:PlanStrategyRegistrar.Selector.values()){
+//			nonMutatingStrategies.add(selector.toString());
 //		}
-		for(PlanStrategyRegistrar.Selector selector:PlanStrategyRegistrar.Selector.values()){
-			nonMutatingStrategies.add(selector.toString());
-		}
 		for (StrategyConfigGroup.StrategySettings settings : config.strategy().getStrategySettings()) {
 
 			String classname = settings.getModuleName();
@@ -107,8 +102,8 @@ public class PseudoSimControler extends Controler{
 				classname = classname.replace("org.matsim.demandmodeling.plans.strategies.", "");
 				settings.setModuleName(classname);
 			}
-			if(nonMutatingStrategies.contains(classname))
-				continue;
+//			if(nonMutatingStrategies.contains(classname))
+//				continue;
 			if(!psimStrategies.getCompatibleStrategies().contains(classname)){
 				throw new RuntimeException("Strategy "+classname+"not known to be compatible with PseudoSim. Exiting.");
 			}else{

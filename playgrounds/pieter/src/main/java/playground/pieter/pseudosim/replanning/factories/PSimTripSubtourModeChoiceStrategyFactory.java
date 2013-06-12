@@ -6,15 +6,15 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.modules.TripSubtourModeChoiceStrategyFactory;
 
-import playground.pieter.pseudosim.controler.PseudoSimControler;
+import playground.pieter.pseudosim.controler.PSimControler;
 import playground.pieter.pseudosim.replanning.modules.PSimPlanMarkerModule;
 
 public class PSimTripSubtourModeChoiceStrategyFactory extends
 		TripSubtourModeChoiceStrategyFactory {
 
-	private PseudoSimControler controler;
+	private PSimControler controler;
 
-	public PSimTripSubtourModeChoiceStrategyFactory(PseudoSimControler controler) {
+	public PSimTripSubtourModeChoiceStrategyFactory(PSimControler controler) {
 		super();
 		this.controler = controler;
 	}

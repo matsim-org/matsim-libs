@@ -18,7 +18,7 @@ public class PSimStopStopTimeCalculator extends StopStopTimeCalculator {
 
 	@Override
 	public void reset(int iteration) {
-		if (MobSimSwitcher.isMobSimIteration) {
+		if (MobSimSwitcher.isQSimIteration) {
 			Logger.getLogger(this.getClass()).error(
 					"Calling reset on traveltimecalc");
 			super.reset(iteration);
@@ -27,13 +27,13 @@ public class PSimStopStopTimeCalculator extends StopStopTimeCalculator {
 
 	@Override
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
-		if (MobSimSwitcher.isMobSimIteration)
+		if (MobSimSwitcher.isQSimIteration)
 			super.handleEvent(event);
 	}
 
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
-		if (MobSimSwitcher.isMobSimIteration)
+		if (MobSimSwitcher.isQSimIteration)
 			super.handleEvent(event);
 	}
 

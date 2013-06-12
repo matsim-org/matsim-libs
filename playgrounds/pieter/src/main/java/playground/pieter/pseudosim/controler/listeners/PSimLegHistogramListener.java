@@ -14,7 +14,7 @@ public class PSimLegHistogramListener extends LegHistogramListener {
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		if (!MobSimSwitcher.isMobSimIteration) {
+		if (!MobSimSwitcher.isQSimIteration) {
 			super.notifyIterationStarts(event);
 		}else{
 			return;
@@ -25,7 +25,7 @@ public class PSimLegHistogramListener extends LegHistogramListener {
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		// TODO Auto-generated method stub
-		if (!MobSimSwitcher.isMobSimIteration) {
+		if (!MobSimSwitcher.isQSimIteration) {
 			super.notifyIterationEnds(event);
 		}else{
 			return;

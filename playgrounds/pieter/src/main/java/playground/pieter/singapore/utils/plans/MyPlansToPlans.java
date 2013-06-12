@@ -57,18 +57,18 @@ public class MyPlansToPlans {
 	public void run(final String[] args) throws InstantiationException, IllegalAccessException, ClassNotFoundException, IOException, SQLException, NoConnectionException  {
 		Scenario scenario;
 		MatsimRandom.reset(123);
-//		scenario = ScenarioUtils.createScenario(ConfigUtils.loadConfig(args[0]));
-		scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(args[0]));
-//		new MatsimNetworkReader(scenario).readFile(args[2]);
-//		new MatsimPopulationReader(scenario)
-//				.readFile(args[0]);
+		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+//		scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(args[0]));
+		new MatsimNetworkReader(scenario).readFile(args[0]);
+		new MatsimPopulationReader(scenario)
+		.readFile(args[1]);
 		System.out.println(scenario.getPopulation().getPersons().size());
 //		new MatsimFacilitiesReader((ScenarioImpl) scenario).readFile(args[1]);
 //		DataBaseAdmin dba = new DataBaseAdmin(new File("data/hitsdb.properties"));
 		PopulationImpl pop = (PopulationImpl) scenario.getPopulation();
 
-//		PlansFilterNoRoute pf = new PlansFilterNoRoute();
-//		pf.run(pop,args[3],scenario.getNetwork());
+		PlansFilterNoRoute pf = new PlansFilterNoRoute();
+		pf.run(pop,args[2],scenario.getNetwork());
 
 //		PlansAddCarAvailability pca = new PlansAddCarAvailability();
 //		pca.run(pop);
@@ -79,10 +79,10 @@ public class MyPlansToPlans {
 //				scenario.getNetwork());
 //		popwriter.write(args[1]);
 		
-		new PlanRouteStripper().run(pop);
-		PopulationWriter popwriter = new PopulationWriter(pop,
-				scenario.getNetwork());
-		popwriter.write(args[1]);
+//		new PlanRouteStripper().run(pop);
+//		PopulationWriter popwriter = new PopulationWriter(pop,
+//				scenario.getNetwork());
+//		popwriter.write(args[1]);
 		
 //		new PlansSubsampler().run(scenario, args[1], 0.04);
 //		System.out.println("done.");

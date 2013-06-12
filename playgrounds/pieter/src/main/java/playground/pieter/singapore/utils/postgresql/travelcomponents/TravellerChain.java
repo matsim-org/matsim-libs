@@ -50,7 +50,7 @@ public 	 class TravellerChain {
 	private boolean inPT = false;
 	public boolean inCar;
 	public boolean traveledVehicle;
-	public boolean traveling;
+	public boolean traveling=false;
 	private double linkEnterTime;
 
 	public double getLinkEnterTime() {

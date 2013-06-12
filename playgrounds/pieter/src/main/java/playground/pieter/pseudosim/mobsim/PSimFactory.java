@@ -9,22 +9,22 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.router.util.TravelTime;
 
-import playground.pieter.pseudosim.controler.PseudoSimControler;
+import playground.pieter.pseudosim.controler.PSimControler;
 
 /**
  * @author fouriep
  *
  */
-public class PseudoSimFactory implements MobsimFactory {
-	PseudoSimControler controler;
-	public PseudoSimFactory( PseudoSimControler controler) {
+public class PSimFactory implements MobsimFactory {
+	PSimControler controler;
+	public PSimFactory( PSimControler controler) {
 		this.controler = controler;
 	}
 
 	@Override
 	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
 		
-		return new PseudoSim(sc, eventsManager, controler);
+		return new PSim(sc, eventsManager, controler);
 	}
 	
 

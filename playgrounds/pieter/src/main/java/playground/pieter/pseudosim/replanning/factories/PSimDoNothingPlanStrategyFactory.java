@@ -8,14 +8,14 @@ import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
-import playground.pieter.pseudosim.controler.PseudoSimControler;
+import playground.pieter.pseudosim.controler.PSimControler;
 import playground.pieter.pseudosim.replanning.modules.PSimPlanMarkerModule;
 
 public class PSimDoNothingPlanStrategyFactory implements PlanStrategyFactory {
 
-	private PseudoSimControler controler;
+	private PSimControler controler;
 
-	public PSimDoNothingPlanStrategyFactory(PseudoSimControler controler) {
+	public PSimDoNothingPlanStrategyFactory(PSimControler controler) {
 		this.controler = controler;
 	}
 

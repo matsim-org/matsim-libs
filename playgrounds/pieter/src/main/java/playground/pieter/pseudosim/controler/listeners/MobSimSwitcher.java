@@ -15,8 +15,8 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 
-import playground.pieter.pseudosim.controler.PseudoSimControler;
-import playground.pieter.pseudosim.mobsim.PseudoSimFactory;
+import playground.pieter.pseudosim.controler.PSimControler;
+import playground.pieter.pseudosim.mobsim.PSimFactory;
 
 /**
  * @author fouriep
@@ -35,7 +35,7 @@ import playground.pieter.pseudosim.mobsim.PseudoSimFactory;
 
 public class MobSimSwitcher implements ControlerListener,
 		IterationStartsListener {
-	public static boolean isMobSimIteration = true;
+	public static boolean isQSimIteration = true;
 	final static String START_RATE = "startRate";
 	final static String END_RATE = "endRate";
 	final static String SWITCH_TYPE = "switchType";
@@ -51,7 +51,7 @@ public class MobSimSwitcher implements ControlerListener,
 	private int startIter;
 	private int endIter;
 	static ArrayList<Integer> expensiveIters = new ArrayList<Integer>();
-	private PseudoSimControler controler;
+	private PSimControler controler;
 
 	private enum SwitchType {
 		incrementing, doubling
@@ -60,7 +60,7 @@ public class MobSimSwitcher implements ControlerListener,
 	private SwitchType switchType = SwitchType.incrementing;
 	Logger log = Logger.getLogger(this.getClass());
 
-	public MobSimSwitcher(PseudoSimControler c) {
+	public MobSimSwitcher(PSimControler c) {
 		this.controler = c;
 		if (c.getConfig().getParam("MobSimSwitcher", START_RATE) != null)
 			startRate = Math.max(
@@ -126,7 +126,7 @@ public class MobSimSwitcher implements ControlerListener,
 			}
 		} else {
 			log.info("Running PSim");
-			controler.setMobsimFactory(new PseudoSimFactory( controler));
+			controler.setMobsimFactory(new PSimFactory( controler));
 			controler.clearPlansForPseudoSimulation();
 
 		}
@@ -135,8 +135,8 @@ public class MobSimSwitcher implements ControlerListener,
 	public boolean checkExpensiveIter(int iteration) {
 
 		if (iteration == controler.getLastIteration()) {
-			MobSimSwitcher.isMobSimIteration = true;
-			return isMobSimIteration;
+			MobSimSwitcher.isQSimIteration = true;
+			return isQSimIteration;
 		}
 		if (iteration < endIter && expensiveIterCount > 0) {
 //			log.error("controler.getIterationNumber() < endIter && expensiveIterCount > 0");
@@ -154,27 +154,27 @@ public class MobSimSwitcher implements ControlerListener,
 				expensiveIterCount = 0;
 			}
 		}
-		if (isMobSimIteration && cheapIterCount == 0
+		if (isQSimIteration && cheapIterCount == 0
 				&& iteration > startIter) {
-			isMobSimIteration = false;
+			isQSimIteration = false;
 			cheapIterCount++;
-			return isMobSimIteration;
+			return isQSimIteration;
 		}
 		if (cheapIterCount >= currentRate - 1) {
-			isMobSimIteration = true;
+			isQSimIteration = true;
 			this.expensiveIters.add(iteration);
 			cheapIterCount = 0;
 			expensiveIterCount++;
-			return isMobSimIteration;
+			return isQSimIteration;
 		}
-		if (isMobSimIteration) {
+		if (isQSimIteration) {
 			this.expensiveIters.add(iteration);
 			expensiveIterCount++;
 		} else {
 			cheapIterCount++;
 
 		}
-		return isMobSimIteration;
+		return isQSimIteration;
 	}
 
 }

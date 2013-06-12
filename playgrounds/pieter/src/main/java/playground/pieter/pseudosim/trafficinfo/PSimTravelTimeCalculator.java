@@ -30,7 +30,7 @@ public class PSimTravelTimeCalculator extends TravelTimeCalculator {
 
 	@Override
 	public void reset(int iteration) {
-		if (MobSimSwitcher.isMobSimIteration) {
+		if (MobSimSwitcher.isQSimIteration) {
 			Logger.getLogger(this.getClass()).error(
 					"Calling reset on traveltimecalc");
 			super.reset(iteration);
@@ -42,43 +42,43 @@ public class PSimTravelTimeCalculator extends TravelTimeCalculator {
 
 	@Override
 	public void handleEvent(LinkEnterEvent e) {
-		if (MobSimSwitcher.isMobSimIteration)
+		if (MobSimSwitcher.isQSimIteration)
 			super.handleEvent(e);
 	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent e) {
-		if (MobSimSwitcher.isMobSimIteration)
+		if (MobSimSwitcher.isQSimIteration)
 			super.handleEvent(e);
 	}
 
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
-		if (MobSimSwitcher.isMobSimIteration)
+		if (MobSimSwitcher.isQSimIteration)
 			super.handleEvent(event);
 	}
 
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
-		if (MobSimSwitcher.isMobSimIteration)
+		if (MobSimSwitcher.isQSimIteration)
 			super.handleEvent(event);
 	}
 
 	@Override
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
-		if (MobSimSwitcher.isMobSimIteration)
+		if (MobSimSwitcher.isQSimIteration)
 			super.handleEvent(event);
 	}
 
 	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
-		if (MobSimSwitcher.isMobSimIteration)
+		if (MobSimSwitcher.isQSimIteration)
 			super.handleEvent(event);
 	}
 
 	@Override
 	public void handleEvent(AgentStuckEvent event) {
-		if (MobSimSwitcher.isMobSimIteration)
+		if (MobSimSwitcher.isQSimIteration)
 			super.handleEvent(event);
 	}
 

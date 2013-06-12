@@ -6,17 +6,17 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.modules.ChangeTripModeStrategyFactory;
 
-import playground.pieter.pseudosim.controler.PseudoSimControler;
+import playground.pieter.pseudosim.controler.PSimControler;
 import playground.pieter.pseudosim.replanning.modules.PSimPlanMarkerModule;
 
 public class PSimChangeTripModeStrategyFactory extends
 		ChangeTripModeStrategyFactory {
 
-	public PSimChangeTripModeStrategyFactory(PseudoSimControler controler) {
+	public PSimChangeTripModeStrategyFactory(PSimControler controler) {
 		this.controler = controler;
 	}
 
-	private PseudoSimControler controler;
+	private PSimControler controler;
 
 	@Override
 	public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager ) {

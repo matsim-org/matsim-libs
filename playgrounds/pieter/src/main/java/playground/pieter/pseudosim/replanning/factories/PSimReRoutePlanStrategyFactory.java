@@ -9,17 +9,17 @@ import org.matsim.core.replanning.modules.ReRoute;
 import org.matsim.core.replanning.modules.ReRoutePlanStrategyFactory;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
-import playground.pieter.pseudosim.controler.PseudoSimControler;
+import playground.pieter.pseudosim.controler.PSimControler;
 import playground.pieter.pseudosim.replanning.modules.PSimPlanMarkerModule;
 
 public class PSimReRoutePlanStrategyFactory extends ReRoutePlanStrategyFactory {
 
-	public PSimReRoutePlanStrategyFactory(PseudoSimControler controler) {
+	public PSimReRoutePlanStrategyFactory(PSimControler controler) {
 		super();
 		this.controler = controler;
 	}
 
-	private PseudoSimControler controler;
+	private PSimControler controler;
 
 	@Override
 	public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager ) {
