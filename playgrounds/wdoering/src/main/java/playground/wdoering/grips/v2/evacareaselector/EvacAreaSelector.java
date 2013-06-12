@@ -17,8 +17,16 @@ import playground.wdoering.grips.scenariomanager.model.AbstractModule;
 import playground.wdoering.grips.scenariomanager.model.AbstractToolBox;
 import playground.wdoering.grips.scenariomanager.model.Constants;
 import playground.wdoering.grips.scenariomanager.model.imagecontainer.BufferedImageContainer;
-import playground.wdoering.grips.scenariomanager.model.process.AbstractProcess;
+import playground.wdoering.grips.scenariomanager.model.process.BasicProcess;
+import playground.wdoering.grips.scenariomanager.model.process.CommonProcesses;
+import playground.wdoering.grips.scenariomanager.model.process.DisableLayersProcess;
+import playground.wdoering.grips.scenariomanager.model.process.EnableLayersProcess;
+import playground.wdoering.grips.scenariomanager.model.process.InitGripsConfigProcess;
+import playground.wdoering.grips.scenariomanager.model.process.InitMainPanelProcess;
+import playground.wdoering.grips.scenariomanager.model.process.InitMapLayerProcess;
+import playground.wdoering.grips.scenariomanager.model.process.InitShapeLayerProcess;
 import playground.wdoering.grips.scenariomanager.model.process.ProcessInterface;
+import playground.wdoering.grips.scenariomanager.model.process.SetModuleListenerProcess;
 import playground.wdoering.grips.scenariomanager.model.shape.BoxShape;
 import playground.wdoering.grips.scenariomanager.model.shape.CircleShape;
 import playground.wdoering.grips.scenariomanager.model.shape.ShapeStyle;
@@ -31,7 +39,7 @@ import playground.wdoering.grips.scenariomanager.view.renderer.ShapeRenderer;
  * 
  * <code>InitProcess</code> <code>InnerEvacAreaListener</code>
  *  
- * @author vvvvv
+ * @author wdoering
  * 
  */
 public class EvacAreaSelector extends AbstractModule
@@ -40,10 +48,8 @@ public class EvacAreaSelector extends AbstractModule
 	public static void main(String[] args)
 	{
 		// set up controller and image interface
-		final Controller controller = new Controller();
-		BufferedImage image = new BufferedImage(width - border * 2, height - border * 2, BufferedImage.TYPE_INT_ARGB);
-		BufferedImageContainer imageContainer = new BufferedImageContainer(image, border);
-		controller.setImageContainer(imageContainer);
+		final Controller controller = new Controller(args);
+		controller.setImageContainer(BufferedImageContainer.getImageContainer(width, height, border));
 
 		// inform controller that this module is running stand alone
 		controller.setStandAlone(true);
@@ -67,6 +73,51 @@ public class EvacAreaSelector extends AbstractModule
 	public EvacAreaSelector(Controller controller)
 	{
 		super(controller.getLocale().moduleEvacAreaSelector(), Constants.ModuleType.EVACUATION, controller);
+		
+		
+//		//disable all layers
+		this.processList.add(new DisableLayersProcess(controller));
+		
+		//initialize GRIPS config
+		this.processList.add(new InitGripsConfigProcess(controller));
+
+//		//check if the default render panel is set
+		this.processList.add(new InitMainPanelProcess(controller));
+		
+//		// check if there is already a map viewer running, or just (re)set center position
+		this.processList.add(new InitMapLayerProcess(controller));
+		
+		//set module listeners		
+		this.processList.add(new SetModuleListenerProcess(controller, new EvacEventListener(controller)));
+		
+		// check if there is already a primary shape layer
+		this.processList.add(new InitShapeLayerProcess(controller));
+		
+		//add bounding box
+		this.processList.add(new BasicProcess(controller)
+		{
+			@Override
+			public void start()
+			{
+				int shapeRendererId = controller.getVisualizer().getPrimaryShapeRenderLayer().getId();
+				Rectangle2D bbRect = controller.getBoundingBox();
+				controller.addShape(ShapeFactory.getNetBoxShape(shapeRendererId, bbRect, false));
+				
+				System.out.println("active toolbox: " + controller.getActiveToolBox());
+				//set tool box
+				if ((controller.getActiveToolBox()==null) || (!(controller.getActiveToolBox() instanceof EvacToolBox)))
+					addToolBox(new EvacToolBox(this.module, controller));
+			}
+
+		});
+		
+		//enable all layers
+		this.processList.add(new EnableLayersProcess(controller));
+		
+		System.out.println("processes queued:" + processList.size());
+		for (ProcessInterface process : processList)
+			System.out.println(process.toString());
+		
 	}
 	
 	@Override
@@ -81,74 +132,10 @@ public class EvacAreaSelector extends AbstractModule
 	@Override
 	public ProcessInterface getInitProcess()
 	{
-		return new InitProcess(this, this.controller);
+		return null;
+//		return new InitProcess(this, this.controller);
 	}
 
-	/**
-	 * Initializing process
-	 * 
-	 * - check if grips config / osm xml network is loaded; if not, load it -
-	 * check if a slippy map viewer has been initialized
-	 * 
-	 * 
-	 * @author vvvvv
-	 * 
-	 */
-	private class InitProcess extends AbstractProcess
-	{
-		public InitProcess(AbstractModule module, Controller controller)
-		{
-			super(module, controller);
-		}
-
-		@Override
-		public void start()
-		{
-			//in case this is only part of something bigger
-			controller.disableAllRenderLayers();
-			
-			// check if Grips config (including the OSM network) has been loaded
-			if (!controller.isGripsConfigOpenend())
-				if (!controller.openGripsConfig())
-					exit(locale.msgOpenGripsConfigFailed());
-
-			//check if the default render panel is set
-			if (!controller.hasDefaultRenderPanel())
-				controller.setMainPanel(new DefaultRenderPanel(this.controller), true);
-			
-			// check if there is already a map viewer running, or just (re)set center position
-			if (!controller.hasMapRenderer())
-				addMapViewer();
-			else
-				controller.getVisualizer().getActiveMapRenderLayer().setPosition(controller.getCenterPosition());
-			
-			//set module listeners
-			if ((controller.getListener()==null) || (!(controller.getListener() instanceof EvacEventListener)) )
-				setListeners(new EvacEventListener(controller));
-
-			// check if there is already a primary shape layer
-			if (!controller.hasShapeRenderer())
-				addShapeRenderer(new ShapeRenderer(controller, controller.getImageContainer()));
-			
-			//validate render layers
-			this.controller.validateRenderLayers();
-
-			//add network bounding box shape
-			int shapeRendererId = controller.getVisualizer().getPrimaryShapeRenderLayer().getId();
-			Rectangle2D bbRect = controller.getBoundingBox();
-			controller.addShape(ShapeFactory.getNetBoxShape(shapeRendererId, bbRect, false));
-			
-			System.out.println("active toolbox: " + controller.getActiveToolBox());
-			//set tool box
-			if ((controller.getActiveToolBox()==null) || (!(controller.getActiveToolBox() instanceof EvacToolBox)))
-				addToolBox(new EvacToolBox(this.module, controller));
-			
-			
-			//finally: enable all layers
-			controller.enableAllRenderLayers();
-		}
-
-	}
 	
 	public Point getGeoPoint(Point mousePoint)
 	{

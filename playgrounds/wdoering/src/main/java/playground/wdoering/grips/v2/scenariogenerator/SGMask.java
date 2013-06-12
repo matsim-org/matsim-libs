@@ -48,8 +48,8 @@ public class SGMask extends JPanel
 		
 		this.setLayout(new BorderLayout());
 		this.textOutput = new JTextArea();
-		this.textOutput.setPreferredSize(new Dimension(width,(int)(height/1.5)));
-		this.textOutput.setMinimumSize(new Dimension(height,(int)(height/1.5)));
+		this.textOutput.setPreferredSize(new Dimension(width - 20,(int)(height/1.5)));
+//		this.textOutput.setMinimumSize(new Dimension(width - 20,(int)(height/1.5)));
 		this.btRun = new JButton(this.controller.getLocale().btRun());
 		this.btRun.setEnabled(false);
 

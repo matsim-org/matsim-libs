@@ -5,8 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import playground.wdoering.grips.scenariomanager.control.Controller;
+import playground.wdoering.grips.scenariomanager.control.eventlistener.AbstractListener;
 import playground.wdoering.grips.scenariomanager.model.Constants.ModuleType;
-import playground.wdoering.grips.scenariomanager.model.process.AbstractProcess;
+import playground.wdoering.grips.scenariomanager.model.process.BasicProcess;
 import playground.wdoering.grips.scenariomanager.model.process.ProcessInterface;
 
 public abstract class AbstractModule
@@ -29,6 +30,7 @@ public abstract class AbstractModule
 	private boolean enabled = false;
 	
 	protected AbstractToolBox toolBox;
+	protected AbstractListener listener;
 	
 	protected int offsetX;
 	protected int offsetY;
@@ -53,7 +55,7 @@ public abstract class AbstractModule
 		}
 
 		// add processes
-		processList.add(getInitProcess());
+		//processList.add(getInitProcess());
 		
 		this.controller.setActiveModuleType(this.moduleType);
 		
@@ -104,8 +106,12 @@ public abstract class AbstractModule
 	
 	public void start()
 	{
+		
 		if (this.processList.size() > 0)
-			this.processList.get(0).start();
+		{
+			for (ProcessInterface process : this.processList)
+				process.start();
+		}
 	}
 	
 	public void sleep(int millis)
@@ -167,9 +173,17 @@ public abstract class AbstractModule
 		return enabled;
 	}
 	
-	public List<AbstractProcess> getProcessChain()
+	public List<BasicProcess> getProcessChain()
 	{
 		return null;
+	}
+	
+	public AbstractListener getListener() {
+		return listener;
+	}
+	
+	public void setListener(AbstractListener listener) {
+		this.listener = listener;
 	}
 	
 	

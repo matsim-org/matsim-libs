@@ -31,7 +31,7 @@ public class JXMapRenderer extends AbstractSlippyMapRenderLayer
 		super(controller);
 		
 //		wms = "http://localhost:8080/geoserver/wms?service=WMS&";
-//		layer = "berlingrouplayer";
+//		layer = "hh";
 		
 		
 		//create a new JXMapviewer frame

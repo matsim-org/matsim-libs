@@ -172,6 +172,9 @@ public class Controller
 	private EventHandler eventHandler;
 	private Thread readerThread;
 	private double gridSize;
+	
+	private String wms;
+	private String layer;
 
 	public Controller()
 	{
@@ -183,6 +186,23 @@ public class Controller
 		this.mousePosition = new Point(-1, -1);
 		EventQueue.invokeLater(new Runner(this));
 
+	}
+
+	public Controller(String[] args)
+	{
+		this();
+		this.wms = null;
+		this.layer = null;
+		if (args.length == 4) {
+			for (int i = 0; i < 4; i += 2) {
+				if (args[i].equalsIgnoreCase("-wms")) {
+					this.wms = args[i+1];
+				}
+				if (args[i].equalsIgnoreCase("-layer")) {
+					this.layer = args[i+1];
+				}
+			}
+		}		
 	}
 
 	public String getMatsimConfigFile()
@@ -840,14 +860,11 @@ public class Controller
 
 	public void setMainPanel(JPanel mainPanel, boolean updatePanelBounds)
 	{
-		System.out.println("pc:" + (this.getParentComponent() != null));
-		System.out.println("instance: " + (!(this.getParentComponent() instanceof DefaultWindow)));
+//		System.out.println("pc:" + (this.getParentComponent() != null));
+//		System.out.println("instance: " + (!(this.getParentComponent() instanceof DefaultWindow)));
 
 		if ((this.getParentComponent() != null))
-		{
-			System.out.println("setting");
 			((DefaultWindow) this.getParentComponent()).setMainPanel(mainPanel);
-		}
 
 		this.mainPanel = mainPanel;
 
@@ -1307,6 +1324,23 @@ public class Controller
 	{
 		return this.scenario.getConfig().getModule("controler").getValue("outputDirectory");
 	}
+	
+	public void exit(String exitString)
+	{
+		System.out.println(exitString);
+		System.exit(0);
+	}
+
+	public String getWMS()
+	{
+		return this.wms;
+	}
+
+	public String getWMSLayer()
+	{
+		return this.layer;
+	}
+	
 
 
 }

@@ -71,10 +71,8 @@ public class ScenarioManager extends DefaultWindow
 
 	public static void main(String[] args)
 	{
-		final Controller controller = new Controller();
-		BufferedImage image = new BufferedImage(width - border * 2, height - border * 2, BufferedImage.TYPE_INT_ARGB);
-		BufferedImageContainer imageContainer = new BufferedImageContainer(image, border);
-		controller.setImageContainer(imageContainer);
+		final Controller controller = new Controller(args);
+		controller.setImageContainer(BufferedImageContainer.getImageContainer(width, height, border));
 		controller.setMainFrameUndecorated(false);
 		
 		controller.setStandAlone(false);

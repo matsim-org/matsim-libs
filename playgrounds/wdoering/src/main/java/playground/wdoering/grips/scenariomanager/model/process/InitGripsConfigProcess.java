@@ -18,12 +18,29 @@
  *                                                                         *
  * *********************************************************************** */
 
-
 package playground.wdoering.grips.scenariomanager.model.process;
 
+import playground.wdoering.grips.scenariomanager.control.Controller;
 
-
-public interface ProcessInterface
+public class InitGripsConfigProcess extends BasicProcess
 {
-	public void start();
+
+	
+	public InitGripsConfigProcess(Controller controller)
+	{
+		super(controller);
+	}
+	
+	@Override
+	public void start()
+	{
+		// check if Grips config (including the OSM network) has been loaded
+		if (!controller.isGripsConfigOpenend())
+			if (!controller.openGripsConfig())
+				controller.exit(locale.msgOpenGripsConfigFailed());
+	}
+	
+	
+	
+
 }

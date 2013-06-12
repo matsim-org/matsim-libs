@@ -40,7 +40,9 @@ import playground.wdoering.grips.scenariomanager.model.AbstractToolBox;
 import playground.wdoering.grips.scenariomanager.model.Constants;
 import playground.wdoering.grips.scenariomanager.model.Constants.Mode;
 import playground.wdoering.grips.scenariomanager.model.imagecontainer.BufferedImageContainer;
-import playground.wdoering.grips.scenariomanager.model.process.AbstractProcess;
+import playground.wdoering.grips.scenariomanager.model.process.BasicProcess;
+import playground.wdoering.grips.scenariomanager.model.process.InitMainPanelProcess;
+import playground.wdoering.grips.scenariomanager.model.process.InitMapLayerProcess;
 import playground.wdoering.grips.scenariomanager.model.process.ProcessInterface;
 import playground.wdoering.grips.scenariomanager.view.DefaultRenderPanel;
 import playground.wdoering.grips.scenariomanager.view.DefaultWindow;
@@ -105,6 +107,7 @@ public class EvacuationAnalysis extends AbstractModule
 	public EvacuationAnalysis(Controller controller)
 	{
 		super(controller.getLocale().moduleEvacuationAnalysis(), Constants.ModuleType.ANALYSIS, controller);
+		this.processList.add(getInitProcess());
 		
 	}
 	
@@ -133,7 +136,7 @@ public class EvacuationAnalysis extends AbstractModule
 	 * @author vvvvv
 	 * 
 	 */
-	private class InitProcess extends AbstractProcess
+	private class InitProcess extends BasicProcess
 	{
 
 		private EvacuationAnalysis module;
@@ -159,11 +162,12 @@ public class EvacuationAnalysis extends AbstractModule
 			if (!controller.hasDefaultRenderPanel())
 				controller.setMainPanel(new DefaultRenderPanel(this.controller), true);
 			
-			// check if there is already a map viewer running, or just (re)set center position
-			if (!controller.hasMapRenderer())
-				addMapViewer();
-			else
-				controller.getVisualizer().getActiveMapRenderLayer().setPosition(controller.getCenterPosition());
+//			// check if there is already a map viewer running, or just (re)set center position
+//			if (!controller.hasMapRenderer())
+//				addMapViewer();
+//			else
+//				controller.getVisualizer().getActiveMapRenderLayer().setPosition(controller.getCenterPosition());
+			new InitMapLayerProcess(controller).start();
 			
 			// set module listeners
 			if ((controller.getListener()==null) || (!(controller.getListener() instanceof EAEventListener)) )

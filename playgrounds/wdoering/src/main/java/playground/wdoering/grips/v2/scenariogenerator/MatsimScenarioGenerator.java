@@ -7,7 +7,7 @@ import playground.wdoering.grips.scenariomanager.model.AbstractModule;
 import playground.wdoering.grips.scenariomanager.model.AbstractToolBox;
 import playground.wdoering.grips.scenariomanager.model.Constants;
 import playground.wdoering.grips.scenariomanager.model.imagecontainer.BufferedImageContainer;
-import playground.wdoering.grips.scenariomanager.model.process.AbstractProcess;
+import playground.wdoering.grips.scenariomanager.model.process.BasicProcess;
 import playground.wdoering.grips.scenariomanager.model.process.ProcessInterface;
 import playground.wdoering.grips.scenariomanager.view.DefaultWindow;
 
@@ -52,6 +52,7 @@ public class MatsimScenarioGenerator extends AbstractModule
 	public MatsimScenarioGenerator(Controller controller)
 	{
 		super(controller.getLocale().moduleMatsimScenarioGenerator(), Constants.ModuleType.MATSIMSCENARIO, controller);
+		this.processList.add(getInitProcess());
 	}
 	
 	@Override
@@ -66,7 +67,7 @@ public class MatsimScenarioGenerator extends AbstractModule
 		return null;
 	}
 	
-	private class InitProcess extends AbstractProcess
+	private class InitProcess extends BasicProcess
 	{
 
 		private MSGMask msgMask;

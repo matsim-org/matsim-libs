@@ -13,7 +13,7 @@ import playground.wdoering.grips.scenariomanager.model.AbstractModule;
 import playground.wdoering.grips.scenariomanager.model.AbstractToolBox;
 import playground.wdoering.grips.scenariomanager.model.Constants;
 import playground.wdoering.grips.scenariomanager.model.imagecontainer.BufferedImageContainer;
-import playground.wdoering.grips.scenariomanager.model.process.AbstractProcess;
+import playground.wdoering.grips.scenariomanager.model.process.BasicProcess;
 import playground.wdoering.grips.scenariomanager.model.process.ProcessInterface;
 import playground.wdoering.grips.scenariomanager.view.DefaultWindow;
 import playground.wdoering.grips.scenariomanager.view.renderer.ShapeRenderer;
@@ -51,6 +51,7 @@ public class ScenarioGenerator extends AbstractModule
 	public ScenarioGenerator(Controller controller)
 	{
 		super(controller.getLocale().moduleScenarioGenerator(), Constants.ModuleType.GRIPSSCENARIO, controller);
+		this.processList.add(getInitProcess());
 	}
 	
 	@Override
@@ -65,7 +66,7 @@ public class ScenarioGenerator extends AbstractModule
 		return null;
 	}
 	
-	private class InitProcess extends AbstractProcess
+	private class InitProcess extends BasicProcess
 	{
 
 		public InitProcess(AbstractModule module, Controller controller)
@@ -79,15 +80,11 @@ public class ScenarioGenerator extends AbstractModule
 			//in case this is only part of something bigger
 			controller.disableAllRenderLayers();
 			
-			DefaultWindow pc = (DefaultWindow)controller.getParentComponent();
-			
+			//create scenario generator mask, disable toolbox
 			SGMask mask = new SGMask(ScenarioGenerator.this, controller);
 			this.controller.setMainPanel(mask, false);
 			this.controller.setToolBoxVisible(false);
 			
-//			pc.setMainPanel(mask);
-			
-//			this.controller.readOSM(false);
 			// check if Grips config (including the OSM network) has been loaded
 			if (!controller.isGripsConfigOpenend())
 				if (!controller.openGripsConfig())

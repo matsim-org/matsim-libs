@@ -9,7 +9,8 @@ import playground.wdoering.grips.scenariomanager.model.AbstractModule;
 import playground.wdoering.grips.scenariomanager.model.AbstractToolBox;
 import playground.wdoering.grips.scenariomanager.model.Constants;
 import playground.wdoering.grips.scenariomanager.model.imagecontainer.BufferedImageContainer;
-import playground.wdoering.grips.scenariomanager.model.process.AbstractProcess;
+import playground.wdoering.grips.scenariomanager.model.process.BasicProcess;
+import playground.wdoering.grips.scenariomanager.model.process.InitMapLayerProcess;
 import playground.wdoering.grips.scenariomanager.model.process.ProcessInterface;
 import playground.wdoering.grips.scenariomanager.view.DefaultRenderPanel;
 import playground.wdoering.grips.scenariomanager.view.DefaultWindow;
@@ -49,6 +50,8 @@ public class RoadClosureEditor extends AbstractModule
 	public RoadClosureEditor(Controller controller)
 	{
 		super(controller.getLocale().moduleRoadClosureEditor(), Constants.ModuleType.ROADCLOSURE, controller);
+		this.processList.add(getInitProcess());
+
 	}
 	
 	@Override
@@ -63,7 +66,7 @@ public class RoadClosureEditor extends AbstractModule
 		return new RCEInitProcess(this, this.controller);
 	}
 	
-	private class RCEInitProcess extends AbstractProcess
+	private class RCEInitProcess extends BasicProcess
 	{
 
 		public RCEInitProcess(AbstractModule module, Controller controller)
@@ -87,19 +90,20 @@ public class RoadClosureEditor extends AbstractModule
 			if (!controller.hasDefaultRenderPanel())
 				controller.setMainPanel(new DefaultRenderPanel(this.controller), true);
 
-			// check if there is already a map viewer running, or just (re)set center position
-			if (!controller.hasMapRenderer())
-				addMapViewer();
-			else
-				controller.getVisualizer().getActiveMapRenderLayer().setPosition(controller.getCenterPosition());
+//			// check if there is already a map viewer running, or just (re)set center position
+//			if (!controller.hasMapRenderer())
+//				addMapViewer();
+//			else
+//				controller.getVisualizer().getActiveMapRenderLayer().setPosition(controller.getCenterPosition());
+			new InitMapLayerProcess(controller).start();
 			
-			// check if there is already a primary shape layer
-			if (!controller.hasShapeRenderer())
-				addShapeRenderer(new ShapeRenderer(controller, controller.getImageContainer()));
-			
-			// check if there is already a secondary shape layer
-			if (!controller.hasSecondaryShapeRenderer())
-				addShapeRenderer(new ShapeRenderer(controller, controller.getImageContainer()));
+//			// check if there is already a primary shape layer
+//			if (!controller.hasShapeRenderer())
+//				addShapeRenderer(new ShapeRenderer(controller, controller.getImageContainer()));
+//			
+//			// check if there is already a secondary shape layer
+//			if (!controller.hasSecondaryShapeRenderer())
+//				addShapeRenderer(new ShapeRenderer(controller, controller.getImageContainer()));
 			
 			//set module listeners
 			if ((controller.getListener()==null) || (!(controller.getListener() instanceof RCEEventListener)) )

@@ -9,7 +9,9 @@ import playground.wdoering.grips.scenariomanager.model.AbstractModule;
 import playground.wdoering.grips.scenariomanager.model.AbstractToolBox;
 import playground.wdoering.grips.scenariomanager.model.Constants;
 import playground.wdoering.grips.scenariomanager.model.imagecontainer.BufferedImageContainer;
-import playground.wdoering.grips.scenariomanager.model.process.AbstractProcess;
+import playground.wdoering.grips.scenariomanager.model.process.BasicProcess;
+import playground.wdoering.grips.scenariomanager.model.process.InitMapLayerProcess;
+import playground.wdoering.grips.scenariomanager.model.process.InitShapeLayerProcess;
 import playground.wdoering.grips.scenariomanager.model.process.ProcessInterface;
 import playground.wdoering.grips.scenariomanager.view.DefaultRenderPanel;
 import playground.wdoering.grips.scenariomanager.view.DefaultWindow;
@@ -47,6 +49,7 @@ public class PTLEditor extends AbstractModule
 	public PTLEditor(Controller controller)
 	{
 		super(controller.getLocale().modulePTLEditor(), Constants.ModuleType.BUSSTOPS, controller);
+		this.processList.add(getInitProcess());
 	}
 	
 	@Override
@@ -61,7 +64,7 @@ public class PTLEditor extends AbstractModule
 		return new PTLInitProcess(this, this.controller);
 	}
 	
-	private class PTLInitProcess extends AbstractProcess
+	private class PTLInitProcess extends BasicProcess
 	{
 
 		public PTLInitProcess(AbstractModule module, Controller controller)
@@ -85,19 +88,21 @@ public class PTLEditor extends AbstractModule
 			if (!controller.hasDefaultRenderPanel())
 				controller.setMainPanel(new DefaultRenderPanel(this.controller), true);
 
-			// check if there is already a map viewer running, or just (re)set center position
-			if (!controller.hasMapRenderer())
-				addMapViewer();
-			else
-				controller.getVisualizer().getActiveMapRenderLayer().setPosition(controller.getCenterPosition());
+//			// check if there is already a map viewer running, or just (re)set center position
+//			if (!controller.hasMapRenderer())
+//				addMapViewer();
+//			else
+//				controller.getVisualizer().getActiveMapRenderLayer().setPosition(controller.getCenterPosition());
 			
+			new InitMapLayerProcess(controller).start();
+
 			// check if there is already a primary shape layer
 			if (!controller.hasShapeRenderer())
-				addShapeRenderer(new ShapeRenderer(controller, controller.getImageContainer()));
+				this.controller.addRenderLayer(new ShapeRenderer(controller, controller.getImageContainer()));
 			
 			// check if there is already a secondary shape layer
 			if (!controller.hasSecondaryShapeRenderer())
-				addShapeRenderer(new ShapeRenderer(controller, controller.getImageContainer()));
+				this.controller.addRenderLayer(new ShapeRenderer(controller, controller.getImageContainer()));
 			
 			//set module listeners
 			if ((controller.getListener()==null) || (!(controller.getListener() instanceof PTLEventListener)) )
@@ -108,16 +113,9 @@ public class PTLEditor extends AbstractModule
 				exit(locale.msgOpenEvacShapeFailed());
 			
 			if (!controller.isPopulationFileOpened())
-			{
 				controller.openPopulationFile();
-				System.out.println("its not ?");
-			}
 			
 			controller.openNetworkChangeEvents();
-			
-//			// check if there is a network layer
-//			if (!controller.hasNetworkRenderer())
-//				addNetworkRenderer(new NetworkRenderer(controller));
 			
 			//validate render layers
 			this.controller.validateRenderLayers();

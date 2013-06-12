@@ -6,14 +6,12 @@ import java.awt.event.ActionListener;
 import javax.swing.JPanel;
 
 import playground.wdoering.grips.scenariomanager.control.Controller;
-import playground.wdoering.grips.scenariomanager.model.action.AbstractAction;
 import playground.wdoering.grips.scenariomanager.model.locale.Locale;
 
 public class AbstractToolBox extends JPanel implements ActionListener
 {
 	protected Controller controller;
 	protected Locale locale;
-	protected AbstractAction saveAction;
 	protected boolean goalAchieved;
 	protected AbstractModule module;
 	
@@ -50,10 +48,6 @@ public class AbstractToolBox extends JPanel implements ActionListener
 		this.goalAchieved = goalAchieved;
 	}
 	
-	public void setSaveAction(AbstractAction saveAction)
-	{
-		this.saveAction = saveAction;
-	}
 	
 	public void fireSaveEvent()
 	{

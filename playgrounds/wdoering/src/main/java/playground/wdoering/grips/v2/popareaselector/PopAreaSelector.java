@@ -9,7 +9,9 @@ import playground.wdoering.grips.scenariomanager.model.AbstractModule;
 import playground.wdoering.grips.scenariomanager.model.AbstractToolBox;
 import playground.wdoering.grips.scenariomanager.model.Constants;
 import playground.wdoering.grips.scenariomanager.model.imagecontainer.BufferedImageContainer;
-import playground.wdoering.grips.scenariomanager.model.process.AbstractProcess;
+import playground.wdoering.grips.scenariomanager.model.process.BasicProcess;
+import playground.wdoering.grips.scenariomanager.model.process.InitMapLayerProcess;
+import playground.wdoering.grips.scenariomanager.model.process.InitShapeLayerProcess;
 import playground.wdoering.grips.scenariomanager.model.process.ProcessInterface;
 import playground.wdoering.grips.scenariomanager.model.shape.Shape;
 import playground.wdoering.grips.scenariomanager.view.DefaultRenderPanel;
@@ -51,6 +53,7 @@ public class PopAreaSelector extends AbstractModule
 	public PopAreaSelector(Controller controller)
 	{
 		super(controller.getLocale().modulePopAreaSelector(), Constants.ModuleType.POPULATION, controller);
+		this.processList.add(getInitProcess());
 	}
 	
 	@Override
@@ -78,7 +81,7 @@ public class PopAreaSelector extends AbstractModule
 	 * @author vvvvv
 	 * 
 	 */
-	private class PopInitProcess extends AbstractProcess
+	private class PopInitProcess extends BasicProcess
 	{
 		public PopInitProcess(AbstractModule module, Controller controller)
 		{
@@ -110,26 +113,28 @@ public class PopAreaSelector extends AbstractModule
 			if (!controller.hasDefaultRenderPanel())
 				controller.setMainPanel(new DefaultRenderPanel(this.controller), true);
 
-			// check if there is already a map viewer running, or just (re)set center position
-			if (!controller.hasMapRenderer())
-				addMapViewer();
-			else
-				controller.getVisualizer().getActiveMapRenderLayer().setPosition(controller.getCenterPosition());
+//			// check if there is already a map viewer running, or just (re)set center position
+//			if (!controller.hasMapRenderer())
+//				addMapViewer();
+//			else
+//				controller.getVisualizer().getActiveMapRenderLayer().setPosition(controller.getCenterPosition());
+			new InitMapLayerProcess(controller).start();
 			
 			//set module listeners
 			if ((controller.getListener()==null) || (!(controller.getListener() instanceof PopEventListener)) )
 				setListeners(new PopEventListener(controller));
 
-			// check if there is already a primary shape layer
-			if (!controller.hasShapeRenderer())
-				addShapeRenderer(new ShapeRenderer(controller, controller.getImageContainer()));
+//			// check if there is already a primary shape layer
+//			if (!controller.hasShapeRenderer())
+//				addShapeRenderer(new ShapeRenderer(controller, controller.getImageContainer()));
+			new InitShapeLayerProcess(controller).start();
 			
 			// check if Grips config (including the OSM network) has been loaded
 			if (!controller.openEvacuationShape(Constants.ID_EVACAREAPOLY))
 				exit(locale.msgOpenEvacShapeFailed());
 			
-			//validate render layers
-			this.controller.validateRenderLayers();
+//			//validate render layers
+//			this.controller.validateRenderLayers();
 
 //			//add network bounding box shape
 			int shapeRendererId = controller.getVisualizer().getPrimaryShapeRenderLayer().getId();

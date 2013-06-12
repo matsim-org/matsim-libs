@@ -189,6 +189,12 @@ public class BufferedImageContainer implements ImageContainerInterface
 		this.imageGraphics = (Graphics2D)this.image.getGraphics();
 	}
 	
+	public static BufferedImageContainer getImageContainer(int width, int height, int border)
+	{
+		BufferedImage image = new BufferedImage(width - border * 2, height - border * 2, BufferedImage.TYPE_INT_ARGB);
+		return new BufferedImageContainer(image, border);
+	}
+	
 	
 
 }
