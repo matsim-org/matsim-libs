@@ -24,9 +24,13 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import playground.pieter.pseudosimulation.mobsim.PSim;
+
 /**
  * @author illenberger
- *
+ *         <P>
+ *         Used to divide tasks between threads in {@link PSim}. Copied here to
+ *         avoid dependence.
  */
 public class CollectionUtils {
 

@@ -10,6 +10,12 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import playground.pieter.pseudosimulation.controler.listeners.MobSimSwitcher;
 import playground.sergioo.singapore2012.transitRouterVariable.WaitTimeStuckCalculator;
 
+/**
+ * @author fouriep
+ *         <P>
+ *         Extends Ordonez's {@link WaitTimeStuckCalculator} to only handle
+ *         events during QSim iterations.
+ */
 public class PSimWaitTimeCalculator extends WaitTimeStuckCalculator {
 
 	public PSimWaitTimeCalculator(Population population,

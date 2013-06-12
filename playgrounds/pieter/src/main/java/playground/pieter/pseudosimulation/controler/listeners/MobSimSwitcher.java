@@ -50,7 +50,7 @@ public class MobSimSwitcher implements ControlerListener,
 	private int endRate = 0;
 	private int startIter;
 	private int endIter;
-	static ArrayList<Integer> expensiveIters = new ArrayList<Integer>();
+	static ArrayList<Integer> qsimIters = new ArrayList<Integer>();
 	private PSimControler controler;
 
 	private enum SwitchType {
@@ -100,8 +100,8 @@ public class MobSimSwitcher implements ControlerListener,
 
 	}
 
-	public static ArrayList<Integer> getExpensiveIters() {
-		return expensiveIters;
+	protected static ArrayList<Integer> getQSimIters() {
+		return qsimIters;
 	}
 
 	@Override
@@ -132,7 +132,7 @@ public class MobSimSwitcher implements ControlerListener,
 		}
 	}
 
-	public boolean checkExpensiveIter(int iteration) {
+	private boolean checkExpensiveIter(int iteration) {
 
 		if (iteration == controler.getLastIteration()) {
 			MobSimSwitcher.isQSimIteration = true;
@@ -161,13 +161,13 @@ public class MobSimSwitcher implements ControlerListener,
 		}
 		if (cheapIterCount >= currentRate - 1) {
 			isQSimIteration = true;
-			this.expensiveIters.add(iteration);
+			this.qsimIters.add(iteration);
 			cheapIterCount = 0;
 			qsimIterCount++;
 			return isQSimIteration;
 		}
 		if (isQSimIteration) {
-			this.expensiveIters.add(iteration);
+			this.qsimIters.add(iteration);
 			qsimIterCount++;
 		} else {
 			cheapIterCount++;

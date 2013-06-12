@@ -36,7 +36,7 @@ public class QSimScoreWriter implements IterationEndsListener,
 		if (!MobSimSwitcher.isQSimIteration || event.getIteration()==controler.getLastIteration()) {
 			return;
 		}
-		ArrayList<Integer> expensiveIters = MobSimSwitcher.getExpensiveIters();
+		ArrayList<Integer> expensiveIters = MobSimSwitcher.getQSimIters();
 		int index = expensiveIters.size();
 		double[][] history = controler.getScoreStats().getHistory();
 		int idx = event.getIteration() - controler.getFirstIteration();

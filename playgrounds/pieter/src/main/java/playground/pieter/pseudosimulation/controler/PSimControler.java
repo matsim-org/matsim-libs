@@ -36,7 +36,13 @@ import playground.sergioo.singapore2012.transitRouterVariable.WaitTimeStuckCalcu
 
 /**
  * @author fouriep
+ *         <P>
+ *         This controler registers listeners necessary for pseudo-simulation,
+ *         and replaces config strategies with their psim equivalents.
  * 
+ *         <P>
+ *         It also keeps track of agents for psim, and stores the scores of
+ *         agents not being simulated.
  */
 public class PSimControler extends Controler{
 	
