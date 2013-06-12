@@ -1,4 +1,4 @@
-package playground.pieter.pseudosim;
+package playground.pieter.pseudosimulation;
 
 import playground.pieter.pseudosim.controler.PSimControler;
 

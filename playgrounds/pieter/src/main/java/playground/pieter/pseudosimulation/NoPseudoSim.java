@@ -1,4 +1,4 @@
-package playground.pieter.pseudosim;
+package playground.pieter.pseudosimulation;
 
 import org.matsim.core.controler.Controler;
 
