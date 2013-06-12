@@ -22,25 +22,31 @@
  */
 package org.matsim.contrib.matsim4opus.usecases;
 
+import junit.framework.Assert;
+
+import org.apache.log4j.Logger;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.config.AccessibilityConfigGroup;
-import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
+import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
 import org.matsim.contrib.improvedPseudoPt.PtMatrix;
-import org.matsim.contrib.matsim4opus.utils.network.NetworkBoundaryBox;
+import org.matsim.contrib.matsim4opus.utils.CreateTestNetwork;
+import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.utils.misc.NetworkUtils;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -48,10 +54,13 @@ import org.matsim.testcases.MatsimTestUtils;
  *
  */
 public class AccessibilityIntegrationTest {
+	
+	// logger
+	private static final Logger log = Logger.getLogger(AccessibilityIntegrationTest.class);
+	
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	@Test
-	@Ignore
 	public void testWithBoundingBox() {
 		Config config = ConfigUtils.createConfig() ;
 
@@ -59,84 +68,67 @@ public class AccessibilityIntegrationTest {
 		config.addModule( acm ) ;
 		acm.setUsingCustomBoundingBox(true) ;
 		acm.setBoundingBoxBottom(0.) ;// yyyyyy todo
-		acm.setBoundingBoxTop(10.) ;// yyyyyy todo
+		acm.setBoundingBoxTop(100.) ;// yyyyyy todo
 		acm.setBoundingBoxLeft(0.) ;// yyyyyy todo
-		acm.setBoundingBoxRight(10.) ;// yyyyyy todo
+		acm.setBoundingBoxRight(100.) ;// yyyyyy todo
 		
 		// modify config according to needs
-		// ...
-//		Network network = CreateTestNetwork.createTestNetwork();
-//		new NetworkWriter(network).write(path+"network.xml");
-//		
-//		CreateTestMATSimConfig ctmc = new CreateTestMATSimConfig(path, path+"network.xml");
-//		String configLocation = ctmc.generate();
-//		
-//		M4UConfigurationConverterV4 connector = new M4UConfigurationConverterV4(configLocation);
-//		connector.init();
-//		config = connector.getConfig();
-		
-		
-		Controler controler = new Controler(config) ;
-		
-		final ScenarioImpl sc = (ScenarioImpl)controler.getScenario();
+		Network network = CreateTestNetwork.createTestNetwork();
+		String networkFile = utils.getOutputDirectory() +"network.xml";
+		new NetworkWriter(network).write(networkFile);
+		config.network().setInputFile( networkFile );
 
+		Controler controler = new Controler(config) ;
+		ControlerConfigGroup controlerCG = config.controler() ;
+		controlerCG.setLastIteration( 10 );
+		controlerCG.setOutputDirectory(utils.getOutputDirectory());
+		
+		final ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario( config );
+		// final ScenarioImpl sc = (ScenarioImpl)controler.getScenario();
+		// sc.setNetwork(network);
+		ScenarioUtils.loadScenario(sc);
+
+		
+		
+		// creating test opportunities (facilities)
 		ActivityFacilitiesImpl opportunities = sc.getActivityFacilities() ;
 		for ( Link link : sc.getNetwork().getLinks().values() ) {
 			Id id = sc.createId( link.getId().toString() ) ;
 			Coord coord = link.getCoord() ;
-			ActivityFacilityImpl fac = opportunities.createAndAddFacility(id, coord) ;
-//			ActivityOptionImpl actOpt = fac.createActivityOption("work") ;
-//			actOpt.setCapacity(1000.) ; // 1000 jobs at same facility
+			opportunities.createAndAddFacility(id, coord) ;
 		}
 		
 		PtMatrix ptMatrix = null ;
-		
 		// yyyy the following is taken from AccessibilityTest without any consideration of a good design.
-		double resolution = 100. ;
-		
-		NetworkBoundaryBox bbox = new NetworkBoundaryBox();
-		double[] boundary = NetworkUtils.getBoundingBox(sc.getNetwork().getNodes().values());
-		
-		double minX = boundary[0]-resolution/2;
-		double minY = boundary[1]-resolution/2;
-		double maxX = boundary[2]+resolution/2;
-		double maxY = boundary[3]+resolution/2;
+		double cellSize = 100. ;
 
-		if(resolution>100){
-			
-			minX = boundary[0] - 150*(2*resolution/200-1);
-			minY = boundary[1] - 150*(2*resolution/200-1);
-			maxX = boundary[2] + 150*(2*resolution/200+1);
-			maxY = boundary[3] + 150*(2*resolution/200+1);
-			
-		}
+		GridBasedAccessibilityControlerListenerV3 gacl = new GridBasedAccessibilityControlerListenerV3(opportunities, ptMatrix, config, sc.getNetwork());
+		// activating transport modes of interest
+		// possible modes are: free speed and congested car,
+		// 					   bicycle, walk and pt
+		gacl.useFreeSpeedGrid();
+		gacl.useCarGrid();
+		gacl.useBikeGrid();
+		gacl.useWalkGrid();
+//		gacl.usePtGrid();
 		
-		bbox.setCustomBoundaryBox(minX,minY,maxX,maxY);
-		ActivityFacilitiesImpl measuringPoints = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(resolution, bbox.getXMin(), bbox.getYMin(), bbox.getYMax(), bbox.getYMax());
+		// this will be called by the accessibility listener
+		EvaluateTestResults etr = new EvaluateTestResults(true, true, true, true, false);
+		gacl.addSpatialGridDataExchangeListener(etr);
 		
-		SpatialGrid gridForFreeSpeedResults = new SpatialGrid(bbox.getBoundingBox(), resolution);
-		SpatialGrid gridForCarResults = new SpatialGrid(gridForFreeSpeedResults);
-		SpatialGrid gridForBikeResults = new SpatialGrid(gridForFreeSpeedResults);
-		SpatialGrid gridForWalkResults = new SpatialGrid(gridForFreeSpeedResults);
-		SpatialGrid gridForPtResults = new SpatialGrid(gridForFreeSpeedResults);
-
-		GridBasedAccessibilityControlerListenerV3 gacl = new GridBasedAccessibilityControlerListenerV3(measuringPoints, opportunities, ptMatrix, config, sc.getNetwork());
-		gacl.setFreeSpeedCarGrid(gridForFreeSpeedResults);
-		gacl.setCarGrid(gridForCarResults);
-		gacl.setBikeGrid(gridForBikeResults);
-		gacl.setWalkGrid(gridForWalkResults);
-		gacl.setPTGrid(gridForPtResults);
+		// generating measuring points and SpatialGrids by using the bounding box
+		gacl.generateGridsAndMeasuringPointsByCustomBoundary(acm.getBoundingBoxLeft(), acm.getBoundingBoxBottom(), acm.getBoundingBoxRight(), acm.getBoundingBoxTop(), cellSize);
 		
 		controler.addControlerListener(gacl); 
 		
 		// yy the correct test is essentially already in AccessibilityTest.testAccessibilityMeasure().  kai, jun'13
 		// But that test uses the matsim4urbansim setup, which we don't want to use in the present test.
 		
+		controler.setOverwriteFiles(true);
+		controler.setCreateGraphs(false);
 		controler.run();
 		
-		// compare some results
-		// ...
-		
+		// compare some results -> done in EvaluateTestResults (see above)
 	}
 	
 	@Test
@@ -213,6 +205,48 @@ public class AccessibilityIntegrationTest {
 		
 	}
 	
-	
-	
+	public class EvaluateTestResults implements SpatialGridDataExchangeInterface{
+		
+		private boolean usingFreeSpeedGrid, usingCarGrid, usingBikeGrid, usingWalkGrid, usingPtGrid;
+		
+		public EvaluateTestResults(boolean usingFreeSpeedGrid, boolean usingCarGrid, boolean usingBikeGrid, boolean usingWalkGrid, boolean usingPtGrid){
+			this.usingFreeSpeedGrid = usingFreeSpeedGrid;
+			this.usingCarGrid = usingCarGrid;
+			this.usingBikeGrid = usingBikeGrid;
+			this.usingWalkGrid = usingWalkGrid;
+			this.usingPtGrid = usingPtGrid;
+		}
+		
+		public void getAndProcessSpatialGrids(SpatialGrid freeSpeedGrid, SpatialGrid carGrid, SpatialGrid bikeGrid, SpatialGrid walkGrid, SpatialGrid ptGrid){
+			
+			log.info("Evaluating resuts ...");
+			
+			if(this.usingFreeSpeedGrid)
+				Assert.assertTrue( freeSpeedGrid != null );
+			else
+				Assert.assertTrue( freeSpeedGrid == null );
+			
+			if(this.usingCarGrid)
+				Assert.assertTrue( carGrid != null );
+			else
+				Assert.assertTrue( carGrid == null );
+			
+			if(this.usingBikeGrid)
+				Assert.assertTrue( bikeGrid != null );
+			else
+				Assert.assertTrue( bikeGrid == null );
+			
+			if(this.usingWalkGrid)
+				Assert.assertTrue( walkGrid != null );
+			else
+				Assert.assertTrue( walkGrid == null );
+			
+			if(this.usingPtGrid)
+				Assert.assertTrue( ptGrid != null );
+			else
+				Assert.assertTrue( ptGrid == null );
+			
+			log.info("... done!");
+		}
+	}
 }

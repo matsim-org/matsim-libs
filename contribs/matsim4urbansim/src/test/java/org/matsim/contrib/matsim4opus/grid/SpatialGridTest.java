@@ -3,8 +3,8 @@ package org.matsim.contrib.matsim4opus.grid;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
+import org.matsim.contrib.accessibility.utils.BoundingBox;
 import org.matsim.contrib.matsim4opus.utils.CreateTestNetwork;
-import org.matsim.contrib.matsim4opus.utils.network.NetworkBoundaryBox;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -19,11 +19,11 @@ public class SpatialGridTest extends MatsimTestCase{
 		NetworkImpl network = CreateTestNetwork.createTestNetwork();
 		
 		// get boundaries of network, i.e. x and y coordinates
-		NetworkBoundaryBox nbb = new NetworkBoundaryBox();
+		BoundingBox nbb = new BoundingBox();
 		nbb.setDefaultBoundaryBox(network);		
 		
 		// create spatial grid		
-		SpatialGrid testGrid = new SpatialGrid(nbb.getBoundingBox(), cellSize);
+		SpatialGrid testGrid = new SpatialGrid(cellSize, nbb.getBoundingBox());
 		
 		// get number of rows
 		int rows = testGrid.getNumRows();

@@ -26,11 +26,11 @@ import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.accessibility.utils.BoundingBox;
 import org.matsim.contrib.improvedPseudoPt.MATSim4UrbanSimRouterFactoryImpl;
 import org.matsim.contrib.improvedPseudoPt.PtMatrix;
 import org.matsim.contrib.improvedPseudoPt.config.ImprovedPseudoPtConfigGroup;
 import org.matsim.contrib.improvedPseudoPt.config.ImprovedPseudoPtConfigUtils;
-import org.matsim.contrib.matsim4opus.utils.network.NetworkBoundaryBox;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
@@ -59,7 +59,7 @@ public class ImprovedPseudoPtIntegrationTest {
 		PlansCalcRouteConfigGroup plansCalcRoute = controler.getScenario().getConfig().plansCalcRoute();
 		
 		// determining the bounds minX/minY -- maxX/maxY. For optimal performance of the QuadTree. All pt stops should be evenly distributed within this rectangle.
-		NetworkBoundaryBox nbb = new NetworkBoundaryBox();
+		BoundingBox nbb = new BoundingBox();
 		nbb.setDefaultBoundaryBox(controler.getNetwork());
 		
 		PtMatrix ptMatrix = new PtMatrix(controler.getScenario().getNetwork(),

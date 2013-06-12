@@ -30,12 +30,12 @@ import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.accessibility.utils.BoundingBox;
 import org.matsim.contrib.improvedPseudoPt.PtMatrix;
 import org.matsim.contrib.improvedPseudoPt.config.ImprovedPseudoPtConfigGroup;
 import org.matsim.contrib.matsim4opus.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4opus.utils.CreateTestNetwork;
 import org.matsim.contrib.matsim4opus.utils.io.TempDirectoryUtil;
-import org.matsim.contrib.matsim4opus.utils.network.NetworkBoundaryBox;
 import org.matsim.contrib.matsim4opus.utils.network.NetworkUtil;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -90,7 +90,7 @@ public class PtMatrixTest extends MatsimTestCase{
 		module.setPtStopsInputFile(location);								// this is to be compatible with real code
 
 		// determining the bounds minX/minY -- maxX/maxY. For optimal performance of the QuadTree. All pt stops should be evenly distributed within this rectangle.
-		NetworkBoundaryBox nbb = new NetworkBoundaryBox();
+		BoundingBox nbb = new BoundingBox();
 		nbb.setDefaultBoundaryBox(network);
 		// call and init the pt matrix
 		PtMatrix ptm = new PtMatrix(network, defaultWalkSpeed, defaultPtSpeed, beelineDistanceFactor, nbb.getXMin(), nbb.getYMin(), nbb.getXMax(), nbb.getYMax(), module);
@@ -194,7 +194,7 @@ public class PtMatrixTest extends MatsimTestCase{
 		module.setPtTravelDistancesInputFile(distancesLocation);				// this is to be compatible with real code
 
 		// determining the bounds minX/minY -- maxX/maxY. For optimal performance of the QuadTree. All pt stops should be evenly distributed within this rectangle.
-		NetworkBoundaryBox nbb = new NetworkBoundaryBox();
+		BoundingBox nbb = new BoundingBox();
 		nbb.setDefaultBoundaryBox(network);
 		// call and init the pt matrix
 		PtMatrix ptm = new PtMatrix(network, defaultWalkSpeed, defaultPtSpeed, beelineDistanceFactor, nbb.getXMin(), nbb.getYMin(), nbb.getXMax(), nbb.getYMax(), module);
