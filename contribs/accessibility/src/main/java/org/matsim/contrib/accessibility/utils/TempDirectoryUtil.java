@@ -159,5 +159,14 @@ public class TempDirectoryUtil {
 		else
 			return path + "/";
 	}
+	
+	/**
+	 * Checks if a given path exists
+	 * @param arg path
+	 * @return true if the given file exists
+	 */
+	public static boolean pathExsits(String path){
+		return( (new File(path)).exists() );
+	}
 }
 

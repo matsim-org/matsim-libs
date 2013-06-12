@@ -23,7 +23,6 @@
  */
 package org.matsim.contrib.accessibility.utils;
 
-import java.io.File;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
@@ -61,18 +60,6 @@ public class Benchmark {
 		return measureID-1;
 	}
 	
-	public int addMeasure(String name, String filePath, boolean readingFile){
-		
-		long startTime = System.currentTimeMillis();
-		
-		log.info("Added new measurement item (id=" + measureID + ").");
-		MeasurementObject mo = new MeasurementObject(name, startTime, new File(filePath), readingFile, measureID);
-		measurements.add(mo);
-		measureID++;
-		
-		return measureID-1;
-	}
-	
 	public void stoppMeasurement(int id){
 		
 		long endTime = System.currentTimeMillis();
@@ -96,57 +83,20 @@ public class Benchmark {
 	
 	private class MeasurementObject {
 		
-		private String name;
 		private long startTime, endtime, duration;	// in milliseconds
-		private File file;
-		private long fileSize;					// in bytes
-		private boolean readingFile;				// false if a file is written ...
-		private int id;
 		
 		public MeasurementObject(String name, long startTime, int id){
-			this.name = name;
 			this.startTime = startTime;
-			this.file = null;
-			this.fileSize = -1;
-			this.id = id;
-		}
-		
-		public MeasurementObject(String name, long startTime, File file, boolean readingFile, int id){
-			this.name = name;
-			this.startTime = startTime;
-			this.file = file;
-			this.readingFile = readingFile;
-			this.id = id;
 		}
 		
 		public void stopMeasurement(long endTime){
 			this.endtime = endTime;
 			this.duration = this.endtime - this.startTime;
-			
-
-			if(file != null && file.exists()){
-				this.fileSize = file.length();
-			}
 		}
 		
 		// getter methods
 		public long getDuration(){
 			return this.duration;
-		}
-		public String getName(){
-			return this.name;
-		}
-		public File getFile(){
-			return this.file;
-		}
-		public long getFileSize(){
-			return this.fileSize;
-		}
-		public boolean isReading(){
-			return this.readingFile;
-		}
-		public int getID(){
-			return this.id;
 		}
 	}
 }
