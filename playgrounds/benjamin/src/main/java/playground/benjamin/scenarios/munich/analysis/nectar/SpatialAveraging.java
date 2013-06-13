@@ -111,6 +111,7 @@ public class SpatialAveraging {
 	static double yMin = 5324955.00;
 	static double yMax = 5345696.81;
 
+	final double scalingFactor = 100.;
 	final int noOfTimeBins = 1;
 	final int noOfXbins = 160;
 	final int noOfYbins = 120;
@@ -231,12 +232,9 @@ public class SpatialAveraging {
 			for(int yIndex = 0; yIndex < results[0].length; yIndex++){
 				//y-coordinates as first column
 				valueString += findBinCenterY(yIndex) + "\t";
-				
 				//table contents
 				for(int xIndex = 0; xIndex < results.length; xIndex++){ 
-						
 						Coord cellCentroid = findCellCentroid(xIndex, yIndex);
-						
 						if(isInMunich(cellCentroid)){
 							valueString += Double.toString(results[xIndex][yIndex]) + "\t"; 
 						} else {
@@ -306,7 +304,8 @@ public class SpatialAveraging {
 				}
 			}
 		}
-		double[][] results = getResults(sumOfweightedValuesForCell, sumOfweightsForCell, AveragingMethod.AVERAGE);
+//		double[][] results = getResults(sumOfweightedValuesForCell, sumOfweightsForCell, AveragingMethod.AVERAGE);
+		double[][] results = getResults(sumOfweightedValuesForCell, sumOfweightsForCell, AveragingMethod.PERSQKM);
 		return results;
 	}
 
@@ -424,8 +423,8 @@ public class SpatialAveraging {
 			Map<Id, Double> absoluteDemandDifference = new HashMap<Id, Double>();
 			Map<Id, Double> linkId2Counts = time2CountsPerLinkFilledAndFiltered1.get(endOfTimeInterval);
 			for(Id linkId : linkId2Counts.keySet()){
-				double countBefore = linkId2Counts.get(linkId);
-				double countAfter = time2CountsPerLinkFilledAndFiltered2.get(endOfTimeInterval).get(linkId);
+				double countBefore = this.scalingFactor * linkId2Counts.get(linkId);
+				double countAfter = this.scalingFactor * time2CountsPerLinkFilledAndFiltered2.get(endOfTimeInterval).get(linkId);
 				
 				double vkmBefore = countBefore * this.network.getLinks().get(linkId).getLength() / 1000.;
 				double vkmAfter = countAfter * this.network.getLinks().get(linkId).getLength() / 1000.;
@@ -457,13 +456,13 @@ public class SpatialAveraging {
 				Id linkId = entry1.getKey();
 				Map<String, Double> absoluteEmissionDifferencePerLink = new HashMap<String, Double>();
 				for(String pollutant : entry1.getValue().keySet()){
-					Double emissionsBefore = entry1.getValue().get(pollutant);
-					Double emissionsAfter = time2EmissionsTotalFilledAndFiltered2.get(endOfTimeInterval).get(linkId).get(pollutant);
+					Double emissionsBefore = this.scalingFactor * entry1.getValue().get(pollutant);
+					Double emissionsAfter = this.scalingFactor * time2EmissionsTotalFilledAndFiltered2.get(endOfTimeInterval).get(linkId).get(pollutant);
 					
 					double linkLength_km = this.network.getLinks().get(linkId).getLength() / 1000.;
 					
 					double emissionsPerVehicleKmBefore; 
-					double countBefore = time2CountsPerLinkFilledAndFiltered1.get(endOfTimeInterval).get(linkId);
+					double countBefore = this.scalingFactor * time2CountsPerLinkFilledAndFiltered1.get(endOfTimeInterval).get(linkId);
 					if(countBefore != 0.0){
 						emissionsPerVehicleKmBefore = emissionsBefore / (countBefore * linkLength_km);
 					} else {
@@ -471,18 +470,18 @@ public class SpatialAveraging {
 					}
 					
 					double emissionsPerVehicleKmAfter;
-					double countAfter = time2CountsPerLinkFilledAndFiltered2.get(endOfTimeInterval).get(linkId);
+					double countAfter = this.scalingFactor * time2CountsPerLinkFilledAndFiltered2.get(endOfTimeInterval).get(linkId);
 					if(countAfter != 0.0){
 						emissionsPerVehicleKmAfter = emissionsAfter / (countAfter * linkLength_km);
 					} else {
 						emissionsPerVehicleKmAfter = 0.0;
 					}
 
-					double emissionsPerVehicleKmDifference = emissionsPerVehicleKmAfter - emissionsPerVehicleKmBefore;
-					absoluteEmissionDifferencePerLink.put(pollutant, emissionsPerVehicleKmDifference);
+//					double emissionsPerVehicleKmDifference = emissionsPerVehicleKmAfter - emissionsPerVehicleKmBefore;
+//					absoluteEmissionDifferencePerLink.put(pollutant, emissionsPerVehicleKmDifference);
 					
-//					double absoluteEmissionDifference = emissionsAfter - emissionsBefore;
-//					absoluteEmissionDifferencePerLink.put(pollutant, absoluteEmissionDifference);
+					double absoluteEmissionDifferenceOfLink = emissionsAfter - emissionsBefore;
+					absoluteEmissionDifferencePerLink.put(pollutant, absoluteEmissionDifferenceOfLink);
 				}
 				absoluteEmissionDifference.put(linkId, absoluteEmissionDifferencePerLink);
 			}
