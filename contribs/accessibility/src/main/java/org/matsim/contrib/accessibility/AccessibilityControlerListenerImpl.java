@@ -566,11 +566,6 @@ public class AccessibilityControlerListenerImpl{
 			}
 		}
 		
-		if(this.zoneDataExchangeListenerList != null){
-			for(int i = 0; i < this.zoneDataExchangeListenerList.size(); i++)
-				this.zoneDataExchangeListenerList.get(i).endReached();
-		}
-		
 	}
 
 	/**
