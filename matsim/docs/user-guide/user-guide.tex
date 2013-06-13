@@ -36,7 +36,7 @@
 
 \renewcommand{\sectionmark}[1]{%
 %
-\markright{\subsection.\ #1}
+\markright{\thesection.\ #1}
 %
 }
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -241,19 +241,20 @@ The  high numbers for free disk space result from the fact that the  simulation 
 Currently,  we simulate most of our scenarios on machines with 8 or 16 GB RAM,  having 2 dual-core processors. The amount of memory allows us to run 2  scenarios at the same time on the machines. A\href{http://en.wikipedia.org/wiki/RAID}{RAID}  array is used as storage backend, offering about 4 TB of hard disk  space. This huge disk space is able to store the results of hundreds of  simulations and will suit us for the next few years. Computers and RAID  are regular components used in data centers, usually available at  moderate prices.
 
 \chapter{Terminology}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/509%23comment-form}{Log in} to post comments
-\end{itemize}
+%% \begin{itemize}
+%% 	\item \href{http://www.matsim.org/user/login?destination=comment/reply/509%23comment-form}{Log in} to post comments
+%% \end{itemize}
 
 In  many cases, MATSim uses a terminology that is different from the  mainstream terminology. In most cases, the reason is that the  concepts are only similar, but not identic, and we wanted to avoid the  confusion of using the same term for aspects that are similar but not  identical. The following attempts some commented approximate  "translations" from more standard teminology to MATSim terminology.
 
 \vfill\eject
 \section{Choice set $\to$ ``plan set'' of an agent}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/539%23comment-form}{Log in} to post comments
-\end{itemize}
 
-\subsubsection{Choice set --$>$ "plan set" of an agent}
+%% \begin{itemize}
+%% 	\item \href{http://www.matsim.org/user/login?destination=comment/reply/539%23comment-form}{Log in} to post comments
+%% \end{itemize}
+
+%% \subsubsection{Choice set --$>$ "plan set" of an agent}
 
 \textbf{Comments:} During MATSim iterations, agent accumulate   plans. This can be  interpreted as building a choice set over  time. A  problem is that the  process that generates the choice  set at this  point is not systematic.
 
@@ -261,41 +262,45 @@ In  many cases, MATSim uses a terminology that is different from the  mainstream
 
 \vfill\eject
 \section{Choice set generation --$>$ Time mutation/re-route/... ; "innovation"}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/540%23comment-form}{Log in} to post comments
-\end{itemize}
 
-\subsubsection{Choice set generation --$>$ Time mutation/re-route/... ; "innovation"}
+%% \begin{itemize}
+%% 	\item \href{http://www.matsim.org/user/login?destination=comment/reply/540%23comment-form}{Log in} to post comments
+%% \end{itemize}
+
+%% \subsubsection{Choice set generation --$>$ Time mutation/re-route/... ; "innovation"}
 
 \textbf{Comments:} As said above, the set of MATSim plans can   be seen as this agent's choice set. MATSim generates new plans   "on-the-fly", i.e. while the simulation is running. We sometimes  call  this "innovation", since agents create new plans (= add entries to  the  choice set), rather than choosing between existing plans.
 
 \vfill\eject
 \section{Choice set generation, choice --$>$ replanning}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/546%23comment-form}{Log in} to post comments
-\end{itemize}
 
-\subsubsection{choice set generation, choice --$>$ replanning}
+%% \begin{itemize}
+%% 	\item \href{http://www.matsim.org/user/login?destination=comment/reply/546%23comment-form}{Log in} to post comments
+%% \end{itemize}
+
+%% \subsubsection{choice set generation, choice --$>$ replanning}
 
 In MATSim, there is no strict separation between "choice set  generation" and "choice": at the replanning step, for each agent, a  replanning strategy is randomly choosen. This strategy may consist in  selecting a random plan to use to generate a new plan by mutation  ("choice set generation" part), or just to select a past plan based on  the experienced score ("choice" part).
 
 \vfill\eject
 \section{Convergence --$>$ learning rate}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/547%23comment-form}{Log in} to post comments
-\end{itemize}
 
-\subsubsection{Convergence --$>$ learning rate}
+%% \begin{itemize}
+%% 	\item \href{http://www.matsim.org/user/login?destination=comment/reply/547%23comment-form}{Log in} to post comments
+%% \end{itemize}
+
+%% \subsubsection{Convergence --$>$ learning rate}
 
 Scores in matsim are computed as score\_new = (1-alpha) * score\_old +   alpha * score\_sim, where score\_sim is the score that is obtained from   the execution of the plans (= network loading).
 
 \vfill\eject
 \section{Mu (logit model scaling factor) --$>$ beta\_brain}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/545%23comment-form}{Log in} to post comments
-\end{itemize}
 
-\subsubsection{mu (logit model scaling factor) --$>$ beta\_brain}
+%% \begin{itemize}
+%% 	\item \href{http://www.matsim.org/user/login?destination=comment/reply/545%23comment-form}{Log in} to post comments
+%% \end{itemize}
+
+%% \subsubsection{mu (logit model scaling factor) --$>$ beta\_brain}
 
 Matsim scoring function = BrainExpBeta * $\backslash$sum\_i beta\_i * attribute\_i
 
@@ -305,11 +310,12 @@ Note that for estimation, $\backslash$mu and the $\backslash$beta\_i are not ind
 
 \vfill\eject
 \section{Multinomial logit --$>$ ExpBetaPlanSelector}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/541%23comment-form}{Log in} to post comments
-\end{itemize}
 
-\subsubsection{Multinomial logit --$>$ ExpBetaPlanSelector}
+%% \begin{itemize}
+%% 	\item \href{http://www.matsim.org/user/login?destination=comment/reply/541%23comment-form}{Log in} to post comments
+%% \end{itemize}
+
+%% \subsubsection{Multinomial logit --$>$ ExpBetaPlanSelector}
 
 \textbf{Comments:}
 \begin{itemize}
@@ -321,11 +327,12 @@ Note that for estimation, $\backslash$mu and the $\backslash$beta\_i are not ind
 
 \vfill\eject
 \section{Network loading --$>$ mobsim, mobility simulation, physical simulation}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/543%23comment-form}{Log in} to post comments
-\end{itemize}
 
-\subsubsection{network loading --$>$ mobsim, mobility simulation, physical simulation}
+%% \begin{itemize}
+%% 	\item \href{http://www.matsim.org/user/login?destination=comment/reply/543%23comment-form}{Log in} to post comments
+%% \end{itemize}
+
+%% \subsubsection{network loading --$>$ mobsim, mobility simulation, physical simulation}
 
 \textbf{Comments:} The standard terminology has the "network   loading" on the "supply  side". In my (KN's) view, the  "simulation of  the physical system" is  not the supply side, but what  in economics is  called "technology". This  can for example be  seen in the fact that  "lane changing" is part of the  mobsim, but this  is, in my view, not a  "supply side" aspect.
 
@@ -333,11 +340,11 @@ Note that for estimation, $\backslash$mu and the $\backslash$beta\_i are not ind
 
 \vfill\eject
 \section{Stationary --$>$ relaxed}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/542%23comment-form}{Log in} to post comments
-\end{itemize}
+%% \begin{itemize}
+%% 	\item \href{http://www.matsim.org/user/login?destination=comment/reply/542%23comment-form}{Log in} to post comments
+%% \end{itemize}
 
-\subsubsection{stationary --$>$ relaxed}
+%% \subsubsection{stationary --$>$ relaxed}
 
 \textbf{Comments:} "stationary" means that the probability   distribution does not shift any  more. However, as long as  "innovation"  is still switched in on MATSim  (new routes, new times,  ...), the  result is not truly stationary. Thus  we avoid the  word. If innovation  is switched off, the result is indeed a   statinary process, but limited  to the set of plans that every agent has   at that point in time.
 
@@ -372,11 +379,12 @@ The above means:
 
 \vfill\eject
 \section{Utility $<$--$>$ score}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/544%23comment-form}{Log in} to post comments
-\end{itemize}
 
-\subsubsection{utility $<$--$>$ score}
+%% \begin{itemize}
+%% 	\item \href{http://www.matsim.org/user/login?destination=comment/reply/544%23comment-form}{Log in} to post comments
+%% \end{itemize}
+
+%% \subsubsection{utility $<$--$>$ score}
 
 At least when using random utility models (such as multinomial logit   aka ExpBeta...), the score has the same function as the deterministic   utility.
 
