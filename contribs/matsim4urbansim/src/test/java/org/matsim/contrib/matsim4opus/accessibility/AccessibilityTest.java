@@ -5,81 +5,69 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.gis.GridUtils;
+import org.matsim.contrib.accessibility.gis.SpatialGrid;
+import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
 import org.matsim.contrib.accessibility.utils.BoundingBox;
 import org.matsim.contrib.improvedPseudoPt.PtMatrix;
 import org.matsim.contrib.matsim4opus.config.M4UConfigurationConverterV4;
-import org.matsim.contrib.matsim4opus.constants.InternalConstants;
 import org.matsim.contrib.matsim4opus.utils.CreateTestMATSimConfig;
 import org.matsim.contrib.matsim4opus.utils.CreateTestNetwork;
-import org.matsim.contrib.matsim4opus.utils.CreateTestUrbansimPopulation;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.contrib.matsim4opus.utils.CreateTestPopulation;
 import org.matsim.core.api.experimental.network.NetworkWriter;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
-public class AccessibilityTest implements LinkEnterEventHandler, LinkLeaveEventHandler {
+public class AccessibilityTest implements SpatialGridDataExchangeInterface {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	private double resolution = 100.;
 	private int nPersons = 3;
+	double[][] accessibilities;
 
-	/*
-	 *	used network looks sth. like:
-	 *
-	 * (2)      (5)------(8)
-	 *	|        |
-	 *	|        |
-	 * (1)------(4)------(7)
-	 *	|        |
-	 *	|	 	 |
-	 * (3)      (6)------(9)
-	 * 
-	 * the test population contains n persons with home and work places
-	 * home activities are at (0,100; node 1), work activities are at (250,100; node 7)
-	 * 
-	 * there are 9 measuring points (one per node). by that, the accessibility of mp 7 should be higher than the other's
-	 * 
-	 * (2)      (5)------(8)
-	 * 	|        |
-	 * 	|        |
-	 * (1)------(4)------(7)
-	 *  |        |
-	 *  |        |
-	 * (0)      (3)------(6)
-	 * 
-	 * no MATSim run
-	 */	
-	
 	public static void main(String[] args) {
 		
-		new AccessibilityTest().testAccessibilityMeasure();
+		new AccessibilityTest().testGridBasedAccessibilityMeasure();
 
 	}
 	
+	/**
+	 * This method tests the grid based accessibility computation.
+	 * The test scenario contains a small network with 9 nodes at (0,0),(100,0),(200,0),(0,100),(100,100),(200,100),(0,200),(100,200),(200,200)
+	 *  and a population of n (to be specified in variable <code>nPersons</code>. There is also a measuring point for the accessibility computation
+	 *  on each node.
+	 * All home activities are placed at one node (0,100) and so are all work activities (here: opportunities, (200,100)).
+	 * The test result should produce that the accessibility of the measuring point at (200,100) is higher than the accessibility at
+	 * any other measuring point.
+	 */
+	
 	@Test
-	public void testAccessibilityMeasure(){
+	public void testGridBasedAccessibilityMeasure(){
 
+		//create local temp directory
 		String path = utils.getOutputDirectory();
 
+		//create test network with 9 nodes and 8 links and write it into the temp directory
 		Network net = CreateTestNetwork.createTestNetwork();
 		new NetworkWriter(net).write(path+"network.xml");
 		
+		//create matsim config file and write it into the temp director<
 		CreateTestMATSimConfig ctmc = new CreateTestMATSimConfig(path, path+"network.xml");
 		String configLocation = ctmc.generate();
-		
-		InternalConstants.setOpusHomeDirectory(path);
 
-		CreateTestUrbansimPopulation.createUrbanSimTestPopulation(path, nPersons);
+		//create a test population of n persons
+		Population population = CreateTestPopulation.createTestPopulation(nPersons);
 
+		//get the config file and initialize it
 		M4UConfigurationConverterV4 connector = new M4UConfigurationConverterV4(configLocation);
 		connector.init();
 		Config config = connector.getConfig();
@@ -87,9 +75,14 @@ public class AccessibilityTest implements LinkEnterEventHandler, LinkLeaveEventH
 
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
+		//add the generated test population to the scenario
+		((ScenarioImpl)scenario).setPopulation(population);
+
+		//create a new controler for the simulation
 		Controler ctrl = new Controler(scenario);
 		ctrl.setOverwriteFiles(true);
 		
+		//create a bounding box with 9 measuring points (one for each node)
 		BoundingBox bbox = new BoundingBox();
 		double[] boundary = NetworkUtils.getBoundingBox(net.getNodes().values());
 		
@@ -97,151 +90,82 @@ public class AccessibilityTest implements LinkEnterEventHandler, LinkLeaveEventH
 		double minY = boundary[1]-resolution/2;
 		double maxX = boundary[2]+resolution/2;
 		double maxY = boundary[3]+resolution/2;
-
-		if(resolution>100){
-			
-			minX = boundary[0] - 150*(2*resolution/200-1);
-			minY = boundary[1] - 150*(2*resolution/200-1);
-			maxX = boundary[2] + 150*(2*resolution/200+1);
-			maxY = boundary[3] + 150*(2*resolution/200+1);
-			
-		}
 		
 		bbox.setCustomBoundaryBox(minX,minY,maxX,maxY);
 		
-		
-		// ZoneLayer<Id> startZones = GridUtils.createGridLayerByGridSizeByNetwork(resolution, bbox.getBoundingBox());
 		ActivityFacilitiesImpl startZones = GridUtils.createGridLayerByGridSizeByBoundingBoxV2(bbox.getXMin(), bbox.getYMin(), bbox.getYMax(), bbox.getYMax(), resolution);
-//		
-//		SpatialGrid gridForFreeSpeedResults = new SpatialGrid(resolution, bbox.getBoundingBox());
-//		SpatialGrid gridForCarResults = new SpatialGrid(gridForFreeSpeedResults);
-//		SpatialGrid gridForBikeResults = new SpatialGrid(gridForFreeSpeedResults);
-//		SpatialGrid gridForWalkResults = new SpatialGrid(gridForFreeSpeedResults);
-//		SpatialGrid gridForPtResults = new SpatialGrid(gridForFreeSpeedResults);
-
-//		ActivityFacilitiesImpl parcels = new ActivityFacilitiesImpl("parcels");
-//		ActivityFacilitiesImpl zones = new ActivityFacilitiesImpl("zones");
-		ActivityFacilitiesImpl opportunities = new ActivityFacilitiesImpl("opportunities");
 		
-//		this.getReadFromUrbanSimModel().readFacilitiesParcel(parcels, zones);
-
+		//initialize opportunities for accessibility computation
+		ActivityFacilitiesImpl opportunities = new ActivityFacilitiesImpl("opportunities");
+		opportunities.createAndAddFacility(new IdImpl("opp"), new CoordImpl(200, 100));
+		
+		//pt not used in this test
 		PtMatrix ptMatrix = null;
 
+		//initialize new grid based accessibility controler listener and grids for the modes we want to analyze here
 		GridBasedAccessibilityControlerListenerV3 listener = new GridBasedAccessibilityControlerListenerV3(opportunities, ptMatrix, config, net);
 		listener.useFreeSpeedGrid();
 		listener.useCarGrid();
 		listener.useBikeGrid();
 		listener.useWalkGrid();
 		listener.generateGridsAndMeasuringPointsByCustomBoundary(minX, minY, maxX, maxY, resolution);
+		listener.addSpatialGridDataExchangeListener(this);
 		
+		//add grid based accessibility controler listener to the controler and run the simulation
 		ctrl.addControlerListener(listener);
 		ctrl.run();
-			
-//		double maxVal = gridForFreeSpeedResults.getValue(200, 100);
-//		for(double x=gridForFreeSpeedResults.getXmin();x<gridForFreeSpeedResults.getXmax();x+=resolution){
-//			for(double y=gridForFreeSpeedResults.getYmin();y<gridForFreeSpeedResults.getYmax();y++){
-//				if(x!=200||y!=100)
-//					Assert.assertTrue(gridForFreeSpeedResults.getValue(x, y)<=maxVal);
-//			}
-//		}
-
-//		if(this.isParcelMode())
-//			listener = new ParcelBasedAccessibilityControlerListenerV3(this, startZones, parcels, freeSpeedGrid, carGrid, bikeGrid, walkGrid,
-//					ptGrid, ptMatrix, benchmark, scenario);
-//		else
-//			listener = new ZoneBasedAccessibilityControlerListenerV3(this, startZones, zones, ptMatrix, benchmark, scenario);
-//
-//		
-//		ctrl.addControlerListener(listener);
-//		
-//		ctrl.run();
-		
-		//Assert.assertTrue(sth.);
-		
-		//new AccessibilityTest().postProcessTest();
-	}
 	
-//	plan b
-//	public void postProcessTest(){
-//		
-//		Config config = ConfigUtils.loadConfig("C:/Users/Daniel/Desktop/AccessibilityTest/out/run0.output_config.xml");
-//		
-//		Scenario scenario = ScenarioUtils.loadScenario(config);
-//		
-//		AccessibilityParameterConfigModule APCM = new AccessibilityParameterConfigModule(AccessibilityParameterConfigModule.GROUP_NAME);
-//		APCM.setUsingRawSumsWithoutLn(false);
-//		APCM.setLogitScaleParameter(1.);
-//		APCM.setUsingCarParameterFromMATSim(true);
-//		APCM.setUsingBikeParameterFromMATSim(true);
-//		APCM.setUsingWalkParameterFromMATSim(true);
-//		APCM.setUsingPtParameterFromMATSim(true);
-//		
-//		APCM.setBetaCarTravelTime(-12.);
-//		APCM.setBetaBikeTravelTime(-12.);
-//		APCM.setBetaWalkTravelTime(-12.);
-//		APCM.setBetaPtTravelTime(-12.);
-//		
-//		config.addModule(AccessibilityParameterConfigModule.GROUP_NAME, APCM);
-//		
-//		Controler ctrl = new Controler(scenario);
-//		ctrl.setOverwriteFiles(true);
-//		
-//		TravelTimeCalculator travelTimeCalculator = ctrl.getTravelTimeCalculatorFactory().createTravelTimeCalculator(scenario.getNetwork(), config.travelTimeCalculator());
-//		
-//		EventsManager em = EventsUtils.createEventsManager();
-//		MatsimEventsReader er = new MatsimEventsReader(em);
-//		em.addHandler(travelTimeCalculator);
-//		
-//		er.readFile("C:/Users/Daniel/Desktop/AccessibilityTest/out/ITERS/it.0/run0.0.events.xml.gz");
-//		
-//		NetworkBoundaryBox bbox = new NetworkBoundaryBox();
-//		bbox.setCustomBoundaryBox(100-resolution,100-(resolution/2),100+resolution,100+(resolution/2));
-//		ZoneLayer<Id> startZones = GridUtils.createGridLayerByGridSizeByNetwork(resolution, bbox.getBoundingBox());
-//		SpatialGrid freeSpeedGrid = new SpatialGrid(bbox.getBoundingBox(), resolution);
-//		SpatialGrid carGrid = new SpatialGrid(freeSpeedGrid);
-//		SpatialGrid bikeGrid = new SpatialGrid(freeSpeedGrid);
-//		SpatialGrid walkGrid = new SpatialGrid(freeSpeedGrid);
-//		SpatialGrid ptGrid = new SpatialGrid(freeSpeedGrid);
-//		
-//		ActivityFacilitiesImpl parcels = new ActivityFacilitiesImpl();
-//		int i = 1;
-//		for(Person p : scenario.getPopulation().getPersons().values()){
-//			for(PlanElement pe : p.getSelectedPlan().getPlanElements()){
-//				if(pe instanceof Activity){
-//					if(((Activity)pe).getType().equalsIgnoreCase("work")){
-//						parcels.createAndAddFacility(new IdImpl(i), ((Activity)pe).getCoord());
-//						i++;
-//					}
-//				}
-//			}
-//		}
-//		
-//		InternalConstants.setOpusHomeDirectory("C:/Users/Daniel/Desktop/AccessibilityTest");
-//		Benchmark benchmark = new Benchmark();
-//
-//		PtMatrix ptMatrix = null;
-//		
-//		ParcelBasedAccessibilityControlerListenerV3 listener = new ParcelBasedAccessibilityControlerListenerV3(this, startZones, parcels,
-//				freeSpeedGrid, carGrid, bikeGrid, walkGrid, ptGrid, ptMatrix, benchmark, (ScenarioImpl)scenario);
-//		
-//		ctrl.addControlerListener(listener);
-//		
-//		new ShutdownEvent(ctrl, false);
-//		
-//	}
+		//test case: verify that accessibility of measuring point 7 (200,100) is higher than all other's
+		for(int i=0;i<4;i++){
+			for(int j=0;j<accessibilities.length;j++){
+				Assert.assertTrue(accessibilities[j][i]<=accessibilities[7][i]);
+			}
+		}
 
-	@Override
-	public void reset(int iteration) {
-		
 	}
 
 	@Override
-	public void handleEvent(LinkLeaveEvent event) {
+	public void getAndProcessSpatialGrids(SpatialGrid freeSpeedGrid,
+			SpatialGrid carGrid, SpatialGrid bikeGrid, SpatialGrid walkGrid,
+			SpatialGrid ptGrid) {
+		
+		int nModes = 0;
+		
+		//check, which modes have been analyzed and increment number of modes
+		if(freeSpeedGrid != null)
+			nModes++;
+		if(carGrid != null)
+			nModes++;
+		if(bikeGrid != null)
+			nModes++;
+		if(walkGrid != null)
+			nModes++;
+		if(ptGrid != null)
+			nModes++;
+
+		//initialize double array to store accessibilities
+		accessibilities = new double[9][nModes];
+
+		//get accessibilities from the grids
+		getAccessibilities(freeSpeedGrid,0);
+		getAccessibilities(carGrid,1);
+		getAccessibilities(bikeGrid,2);
+		getAccessibilities(walkGrid,3);
 		
 	}
 
-	@Override
-	public void handleEvent(LinkEnterEvent event) {
+	private void getAccessibilities(SpatialGrid grid,int index) {
+		
+		int i=0;
+		
+		for(double x=grid.getXmin()+resolution/2;x<=grid.getXmax()-resolution/2;x+=grid.getResolution()){
+			for(double y=grid.getYmin()+resolution/2;y<=grid.getYmax()-resolution/2;y+=grid.getResolution()){
+				accessibilities[i][index] = grid.getValue(x, y);
+				if(index==1)
+				System.out.println(x+","+y+":"+accessibilities[i][index]);
+				i++;
+			}
+		}
 		
 	}
 
