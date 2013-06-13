@@ -23,7 +23,7 @@ import playground.pieter.pseudosimulation.controler.PSimControler;
  *         not selected for psim in a map in the {@link PSimControler} when
  *         a psim iteration starts (this class's job), then restore the scores
  *         after scoring is run with
- *         {@link AfterQSimSimSelectedPlanScoreRestoreListener} (to get an idea
+ *         {@link AfterScoringSelectedPlanScoreRestoreListener} (to get an idea
  *         of the impact of the psim iteration on the score).
  *         <P>
  *         The class only needs to record scores before a psim iteration is run.

@@ -34,33 +34,24 @@ import playground.pieter.pseudosimulation.controler.PSimControler;
  *         {@link BeforePSimSelectedPlanScoreRecorder}), then restore the scores
  *         after scoring is run (to get an idea of the impact of the psim
  *         iteration on the score).
- * 
- *         <P>
- *         Before a new full QSim is run, the restoreScores() method is called
- *         again for plan selectors to work.
+
  */
-public class AfterQSimSimSelectedPlanScoreRestoreListener implements
-		ScoringListener, IterationStartsListener {
+public class AfterScoringSelectedPlanScoreRestoreListener implements
+		ScoringListener {
 	PSimControler c;
 
-	public AfterQSimSimSelectedPlanScoreRestoreListener(PSimControler c) {
+	public AfterScoringSelectedPlanScoreRestoreListener(PSimControler c) {
 		super();
 		this.c = c;
 	}
 
 	@Override
 	public void notifyScoring(ScoringEvent event) {
-		// Logger.getLogger(getClass()).error("ScoringEvent score:");
-		restoreScores();
-	}
-
-	@Override
-	public void notifyIterationStarts(IterationStartsEvent event) {
-		if (!MobSimSwitcher.isQSimIteration)
+		if (MobSimSwitcher.isQSimIteration)
 			return;
 		restoreScores();
-
 	}
+
 
 	private void restoreScores() {
 		HashMap<IdImpl, Double> nSASS = c

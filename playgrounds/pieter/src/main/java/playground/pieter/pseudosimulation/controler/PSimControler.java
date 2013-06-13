@@ -23,7 +23,7 @@ import org.matsim.population.VspPlansCleaner;
 import org.matsim.pt.counts.PtCountControlerListener;
 
 import playground.pieter.annealing.SimpleAnnealer;
-import playground.pieter.pseudosimulation.controler.listeners.AfterQSimSimSelectedPlanScoreRestoreListener;
+import playground.pieter.pseudosimulation.controler.listeners.AfterScoringSelectedPlanScoreRestoreListener;
 import playground.pieter.pseudosimulation.controler.listeners.BeforePSimSelectedPlanScoreRecorder;
 import playground.pieter.pseudosimulation.controler.listeners.MobSimSwitcher;
 import playground.pieter.pseudosimulation.controler.listeners.QSimScoreWriter;
@@ -67,7 +67,7 @@ public class PSimControler extends Controler{
 		this.addControlerListener(new MobSimSwitcher(this));
 		this.addControlerListener(new QSimScoreWriter(this));
 		this.addControlerListener(new BeforePSimSelectedPlanScoreRecorder(this));
-		this.addControlerListener(new AfterQSimSimSelectedPlanScoreRestoreListener(this));
+		this.addControlerListener(new AfterScoringSelectedPlanScoreRestoreListener(this));
 		this.carTravelTimeCalculator = new PSimTravelTimeCalculator(getNetwork(),
 				getConfig().travelTimeCalculator());
 		this.getEvents().addHandler(carTravelTimeCalculator);
