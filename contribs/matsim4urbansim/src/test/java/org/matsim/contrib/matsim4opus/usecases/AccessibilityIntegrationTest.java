@@ -22,6 +22,9 @@
  */
 package org.matsim.contrib.matsim4opus.usecases;
 
+import java.io.File;
+import java.net.URL;
+
 import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
@@ -44,7 +47,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -63,14 +65,19 @@ public class AccessibilityIntegrationTest {
 	@Test
 	public void testWithBoundingBox() {
 		Config config = ConfigUtils.createConfig() ;
+		
+		// test values to define bounding box.
+		// these values usually come from a config file
+		double min = 0.;
+		double max = 100.;
 
 		final AccessibilityConfigGroup acm = new AccessibilityConfigGroup();
 		config.addModule( acm ) ;
 		acm.setUsingCustomBoundingBox(true) ;
-		acm.setBoundingBoxBottom(0.) ;// yyyyyy todo
-		acm.setBoundingBoxTop(100.) ;// yyyyyy todo
-		acm.setBoundingBoxLeft(0.) ;// yyyyyy todo
-		acm.setBoundingBoxRight(100.) ;// yyyyyy todo
+		acm.setBoundingBoxBottom(min) ;// yyyyyy todo
+		acm.setBoundingBoxTop(max) ;// yyyyyy todo
+		acm.setBoundingBoxLeft(min) ;// yyyyyy todo
+		acm.setBoundingBoxRight(max) ;// yyyyyy todo
 		
 		// modify config according to needs
 		Network network = CreateTestNetwork.createTestNetwork();
@@ -84,8 +91,6 @@ public class AccessibilityIntegrationTest {
 		controlerCG.setOutputDirectory(utils.getOutputDirectory());
 		
 		final ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario( config );
-		// final ScenarioImpl sc = (ScenarioImpl)controler.getScenario();
-		// sc.setNetwork(network);
 		ScenarioUtils.loadScenario(sc);
 
 		
@@ -112,7 +117,8 @@ public class AccessibilityIntegrationTest {
 		gacl.useWalkGrid();
 //		gacl.usePtGrid();
 		
-		// this will be called by the accessibility listener
+		// this will be called by the accessibility listener after the accessibility calculations are finished
+		// It checks if the SpatialGrid for activated (true) transport modes are instantiated or null if not (false)
 		EvaluateTestResults etr = new EvaluateTestResults(true, true, true, true, false);
 		gacl.addSpatialGridDataExchangeListener(etr);
 		
@@ -128,11 +134,10 @@ public class AccessibilityIntegrationTest {
 		controler.setCreateGraphs(false);
 		controler.run();
 		
-		// compare some results -> done in EvaluateTestResults (see above)
+		// compare some results -> done in EvaluateTestResults
 	}
 	
 	@Test
-	@Ignore
 	public void testWithExtentDeterminedByNetwork() {
 		Config config = ConfigUtils.createConfig() ;
 
@@ -141,29 +146,57 @@ public class AccessibilityIntegrationTest {
 		acm.setCellBasedAccessibilityNetwork(true) ;
 		
 		// modify config according to needs
-		// ...
-		
-		
-		Controler controler = new Controler(config) ;
-		
-		final ScenarioImpl sc = (ScenarioImpl)controler.getScenario();
+		Network network = CreateTestNetwork.createTestNetwork();
+		String networkFile = utils.getOutputDirectory() +"network.xml";
+		new NetworkWriter(network).write(networkFile);
+		config.network().setInputFile( networkFile );
 
-		ActivityFacilitiesImpl facilities = sc.getActivityFacilities() ;
+		Controler controler = new Controler(config) ;
+		ControlerConfigGroup controlerCG = config.controler() ;
+		controlerCG.setLastIteration( 10 );
+		controlerCG.setOutputDirectory(utils.getOutputDirectory());
+		
+		final ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario( config );
+		ScenarioUtils.loadScenario(sc);
+		
+
+		// creating test opportunities (facilities)
+		ActivityFacilitiesImpl opportunities = sc.getActivityFacilities() ;
 		for ( Link link : sc.getNetwork().getLinks().values() ) {
 			Id id = sc.createId( link.getId().toString() ) ;
 			Coord coord = link.getCoord() ;
-			ActivityFacilityImpl fac = facilities.createAndAddFacility(id, coord) ;
-//			ActivityOptionImpl actOpt = fac.createActivityOption("work") ;
-//			actOpt.setCapacity(1000.) ; // 1000 jobs at same facility
+			opportunities.createAndAddFacility(id, coord) ;
 		}
 		
 //		controler.addControlerListener(new GridBasedAccessibilityControlerListener(...)); 
 		// (purely grid based controler listener does not yet exist)
+		PtMatrix ptMatrix = null ;
+		// yyyy the following is taken from AccessibilityTest without any consideration of a good design.
+		double cellSize = 100. ;
+
+		GridBasedAccessibilityControlerListenerV3 gacl = new GridBasedAccessibilityControlerListenerV3(opportunities, ptMatrix, config, sc.getNetwork());
+		// activating transport modes of interest
+		// possible modes are: free speed and congested car,
+		// 					   bicycle, walk and pt
+		gacl.useFreeSpeedGrid();
+		gacl.useCarGrid();
+		gacl.useBikeGrid();
+		gacl.useWalkGrid();
+//		gacl.usePtGrid();
 		
+		// this will be called by the accessibility listener after the accessibility calculations are finished
+		// It checks if the SpatialGrid for activated (true) transport modes are instantiated or null if not (false)
+		EvaluateTestResults etr = new EvaluateTestResults(true, true, true, true, false);
+		gacl.addSpatialGridDataExchangeListener(etr);
+		
+		// generating measuring points and SpatialGrids by using the bounding box
+		gacl.generateGridsAndMeasuringPointsByNetwork(network, cellSize);
+
+		controler.setOverwriteFiles(true);
+		controler.setCreateGraphs(false);
 		controler.run();
 		
-		// compare some results
-		// ...
+		// compare some results -> done in EvaluateTestResults 
 		
 	}
 	
@@ -173,42 +206,105 @@ public class AccessibilityIntegrationTest {
 	public void testWithExtentDeterminedShapeFile() {
 		Config config = ConfigUtils.createConfig() ;
 
+		URL url = AccessibilityIntegrationTest.class.getClassLoader().getResource(this.utils.getInputDirectory() + "shapeFile.shp");
+		
+		System.out.println(this.utils.getInputDirectory() + "shapeFile.shp") ;
+		File f = new File(this.utils.getInputDirectory() + "shapeFile.shp");
+		System.out.println(f.getAbsolutePath());
+		System.out.println(f.exists());
+		// System.out.println(url.getPath() ) ;
+		
+		if(url == null){
+			log.error("Shape file not found! testWithExtentDeterminedShapeFile could not be tested...");
+			Assert.assertTrue(url == null);
+		}
+
 		final AccessibilityConfigGroup acm = new AccessibilityConfigGroup();
 		config.addModule( acm ) ;
 		acm.setCellBasedAccessibilityShapeFile(true);
-		acm.setShapeFileCellBasedAccessibility("") ; // yyyyyy todo
+		acm.setShapeFileCellBasedAccessibility(url.getPath()) ; // yyyyyy todo
 		
 		// modify config according to needs
-		// ...
-		
-		
-		Controler controler = new Controler(config) ;
-		
-		final ScenarioImpl sc = (ScenarioImpl)controler.getScenario();
+		Network network = CreateTestNetwork.createTestNetwork();
+		String networkFile = utils.getOutputDirectory() +"network.xml";
+		new NetworkWriter(network).write(networkFile);
+		config.network().setInputFile( networkFile );
 
-		ActivityFacilitiesImpl facilities = sc.getActivityFacilities() ;
+		Controler controler = new Controler(config) ;
+		ControlerConfigGroup controlerCG = config.controler() ;
+		controlerCG.setLastIteration( 10 );
+		controlerCG.setOutputDirectory(utils.getOutputDirectory());
+		
+		final ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario( config );
+		ScenarioUtils.loadScenario(sc);
+		
+
+		// creating test opportunities (facilities)
+		ActivityFacilitiesImpl opportunities = sc.getActivityFacilities() ;
 		for ( Link link : sc.getNetwork().getLinks().values() ) {
 			Id id = sc.createId( link.getId().toString() ) ;
 			Coord coord = link.getCoord() ;
-			ActivityFacilityImpl fac = facilities.createAndAddFacility(id, coord) ;
-//			ActivityOptionImpl actOpt = fac.createActivityOption("work") ;
-//			actOpt.setCapacity(1000.) ; // 1000 jobs at same facility
+			opportunities.createAndAddFacility(id, coord) ;
 		}
 		
 //		controler.addControlerListener(new GridBasedAccessibilityControlerListener(...)); 
 		// (purely grid based controler listener does not yet exist)
+		PtMatrix ptMatrix = null ;
+		// yyyy the following is taken from AccessibilityTest without any consideration of a good design.
+		double cellSize = 100. ;
+
+		GridBasedAccessibilityControlerListenerV3 gacl = new GridBasedAccessibilityControlerListenerV3(opportunities, ptMatrix, config, sc.getNetwork());
+		// activating transport modes of interest
+		// possible modes are: free speed and congested car,
+		// 					   bicycle, walk and pt
+		gacl.useFreeSpeedGrid();
+		gacl.useCarGrid();
+		gacl.useBikeGrid();
+		gacl.useWalkGrid();
+//		gacl.usePtGrid();
 		
+		// this will be called by the accessibility listener after the accessibility calculations are finished
+		// It checks if the SpatialGrid for activated (true) transport modes are instantiated or null if not (false)
+		EvaluateTestResults etr = new EvaluateTestResults(true, true, true, true, false);
+		gacl.addSpatialGridDataExchangeListener(etr);
+		
+		// generating measuring points and SpatialGrids by using the bounding box
+		gacl.generateGridsAndMeasuringPointsByShapeFile(acm.getShapeFileCellBasedAccessibility(), cellSize);
+
+		controler.setOverwriteFiles(true);
+		controler.setCreateGraphs(false);
 		controler.run();
 		
-		// compare some results
-		// ...
-		
+		// compare some results -> done in EvaluateTestResults 
 	}
 	
+	/**
+	 * This is called by the GridBasedAccessibilityListener and 
+	 * gets the resulting SpatialGrids. This test checks if the 
+	 * SpatialGrids for activated transport modes (see above) are 
+	 * instantiated or null if the specific transport mode is not 
+	 * activated.
+	 * 
+	 * @author thomas
+	 *
+	 */
 	public class EvaluateTestResults implements SpatialGridDataExchangeInterface{
 		
 		private boolean usingFreeSpeedGrid, usingCarGrid, usingBikeGrid, usingWalkGrid, usingPtGrid;
 		
+		/**
+		 * constructor
+		 * 
+		 * Determines for each transport mode if its activated (true) or not (false):
+		 * - For transport modes with "useXXXGrid=false" the SpatialGrid must be null
+		 * - For transport modes with "useXXXGrid=true" the SpatialGrid must not be null
+		 * 
+		 * @param usingFreeSpeedGrid
+		 * @param usingCarGrid
+		 * @param usingBikeGrid
+		 * @param usingWalkGrid
+		 * @param usingPtGrid
+		 */
 		public EvaluateTestResults(boolean usingFreeSpeedGrid, boolean usingCarGrid, boolean usingBikeGrid, boolean usingWalkGrid, boolean usingPtGrid){
 			this.usingFreeSpeedGrid = usingFreeSpeedGrid;
 			this.usingCarGrid = usingCarGrid;
@@ -217,6 +313,12 @@ public class AccessibilityIntegrationTest {
 			this.usingPtGrid = usingPtGrid;
 		}
 		
+		/**
+		 * This gets the resulting SpatialGrids from the GridBasedAccessibilityListener.
+		 * - SpatialGrids for transport modes with "useXXXGrid=false"must be null
+		 * - SpatialGrids for transport modes with "useXXXGrid=true"must not be null
+		 * 
+		 */
 		public void getAndProcessSpatialGrids(SpatialGrid freeSpeedGrid, SpatialGrid carGrid, SpatialGrid bikeGrid, SpatialGrid walkGrid, SpatialGrid ptGrid){
 			
 			log.info("Evaluating resuts ...");
