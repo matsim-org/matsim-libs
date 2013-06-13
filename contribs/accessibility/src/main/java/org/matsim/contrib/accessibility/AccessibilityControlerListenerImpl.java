@@ -14,6 +14,7 @@ import org.matsim.contrib.accessibility.config.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.config.M4UAccessibilityConfigUtils;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
+import org.matsim.contrib.accessibility.interfaces.ZoneDataExchangeInterface;
 import org.matsim.contrib.accessibility.utils.AggregateObject2NearestNode;
 import org.matsim.contrib.accessibility.utils.Benchmark;
 import org.matsim.contrib.accessibility.utils.Distances;
@@ -94,6 +95,7 @@ public class AccessibilityControlerListenerImpl{
 	PtMatrix ptMatrix;
 	
 	ArrayList<SpatialGridDataExchangeInterface> spatialGridDataExchangeListenerList = null;
+	ArrayList<ZoneDataExchangeInterface> zoneDataExchangeListenerList = null;
 	
 	// accessibility parameter
 	boolean useRawSum	= false;
@@ -554,8 +556,21 @@ public class AccessibilityControlerListenerImpl{
 							 bikeAccessibility,
 							 walkAccessibility, 
 							 ptAccessibility);
+				
+				if(this.zoneDataExchangeListenerList != null){
+					for(int i = 0; i < this.zoneDataExchangeListenerList.size(); i++)
+						this.zoneDataExchangeListenerList.get(i).getZoneAccessibilities(aFac, freeSpeedAccessibility, carAccessibility,
+								bikeAccessibility, walkAccessibility, ptAccessibility);
+				}
+				
 			}
 		}
+		
+		if(this.zoneDataExchangeListenerList != null){
+			for(int i = 0; i < this.zoneDataExchangeListenerList.size(); i++)
+				this.zoneDataExchangeListenerList.get(i).endReached();
+		}
+		
 	}
 
 	/**
@@ -615,6 +630,19 @@ public class AccessibilityControlerListenerImpl{
 		
 		log.info("Adding new SpatialGridDataExchange listener...");
 		this.spatialGridDataExchangeListenerList.add(l);
+		log.info("... done!");
+	}
+	
+	/**
+	 * This adds listeners to write out accessibility results for parcels in UrbanSim format
+	 * @param l
+	 */
+	public void addZoneDataExchangeListener(ZoneDataExchangeInterface l){
+		if(this.zoneDataExchangeListenerList == null)
+			this.zoneDataExchangeListenerList = new ArrayList<ZoneDataExchangeInterface>();
+		
+		log.info("Adding new SpatialGridDataExchange listener...");
+		this.zoneDataExchangeListenerList.add(l);
 		log.info("... done!");
 	}
 
