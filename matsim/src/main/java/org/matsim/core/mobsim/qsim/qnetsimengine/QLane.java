@@ -46,6 +46,7 @@ import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.internal.MatsimComparator;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.comparators.QVehicleEarliestLinkExitTimeComparator;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
@@ -416,7 +417,8 @@ public final class QLane extends AbstractQLane implements Identifiable, Signaliz
 	 * @param now current time step
 	 * @return true if there is at least one vehicle moved to another lane
 	 */
-	boolean moveLane(final double now) {
+	@Override
+	boolean doSimStep(final double now) {
 		updateRemainingFlowCapacity();
 
 		moveLaneToBuffer(now);
@@ -586,10 +588,6 @@ public final class QLane extends AbstractQLane implements Identifiable, Signaliz
 		return this.buffer.peek();
 	}
 
-	boolean isFirstLaneOnLink() {
-		return this.isFirstLane;
-	}
-
 	/**
 	 * @return <code>true</code> if there are less vehicles in buffer + vehQueue (=
 	 *         the whole link), than there is space for vehicles.
@@ -599,15 +597,12 @@ public final class QLane extends AbstractQLane implements Identifiable, Signaliz
 		return this.usedStorageCapacity < getStorageCapacity();
 	}
 
-	int getNrOfVehsInQueue() {
-		return this.vehQueue.size();
-	}
-
 	/*package*/ double getStorageCapacity() {
 		// only for tests
 		return this.storageCapacity;
 	}
 
+	@Override
 	void clearVehicles() {
 		double now = this.qLink.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 
@@ -617,8 +612,6 @@ public final class QLane extends AbstractQLane implements Identifiable, Signaliz
 			this.qLink.network.simEngine.getMobsim().getAgentCounter().incLost();
 			this.qLink.network.simEngine.getMobsim().getAgentCounter().decLiving();
 		}
-//		this.qLink.network.simEngine.getMobsim().getAgentCounter().decLiving(this.vehQueue.size());
-//		this.qLink.network.simEngine.getMobsim().getAgentCounter().incLost(this.vehQueue.size());
 		this.vehQueue.clear();
 		this.laneEnterTimeMap.clear();
 		
@@ -628,8 +621,6 @@ public final class QLane extends AbstractQLane implements Identifiable, Signaliz
 			this.qLink.network.simEngine.getMobsim().getAgentCounter().incLost();
 			this.qLink.network.simEngine.getMobsim().getAgentCounter().decLiving();
 		}
-//		this.qLink.network.simEngine.getMobsim().getAgentCounter().decLiving(this.buffer.size());
-//		this.qLink.network.simEngine.getMobsim().getAgentCounter().incLost(this.buffer.size());
 		this.buffer.clear();
 
 	}
@@ -651,8 +642,9 @@ public final class QLane extends AbstractQLane implements Identifiable, Signaliz
 	 * @return Returns a collection of all vehicles (driving, parking, in buffer,
 	 *         ...) on the link.
 	 */
-	Collection<QVehicle> getAllVehicles() {
-		Collection<QVehicle> vehicles = new ArrayList<QVehicle>();
+	@Override
+	Collection<MobsimVehicle> getAllVehicles() {
+		Collection<MobsimVehicle> vehicles = new ArrayList<MobsimVehicle>();
 		vehicles.addAll(this.transitVehicleStopQueue);
 		vehicles.addAll(this.vehQueue);
 		vehicles.addAll(this.buffer);

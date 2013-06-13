@@ -19,7 +19,10 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.util.Collection;
+
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 
 
 /**
@@ -68,6 +71,12 @@ abstract class AbstractQLane {
 	double usedBufferStorageCapacity = 0.0;
 
 
+	abstract boolean doSimStep(double now) ;
+	
+	abstract void clearVehicles() ;
+	
+	abstract Collection<MobsimVehicle> getAllVehicles() ;
+	
 	/**
 	 * upstream add
 	 */

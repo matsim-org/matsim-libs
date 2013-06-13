@@ -284,7 +284,7 @@ public class QLinkLanesImpl extends AbstractQLink {
 	private boolean moveLanes(double now){
 		boolean lanesActive = false;
 		for (QLane lane : this.queueLanes){
-			if (lane.moveLane(now)){
+			if (lane.doSimStep(now)){
 				lanesActive = true;
 			}
 			if (lane.isActive()){
@@ -383,19 +383,6 @@ public class QLinkLanesImpl extends AbstractQLink {
 			total += ql.getStorageCapacity();
 		}
 		return total;
-	}
-
-	/**
-	 * One should think about the need for this method
-	 * because it is only called by one testcase
-	 * @return
-	 */
-	int vehOnLinkCount() {
-		int count = 0;
-		for (QLane ql : this.queueLanes){
-			count += ql.getNrOfVehsInQueue();
-		}
-		return count;
 	}
 
 	@Override
