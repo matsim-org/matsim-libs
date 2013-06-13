@@ -371,11 +371,16 @@ public class EventsToSQLInterface extends JFrame {
 	}
 
 	public void runEventsProcessing() {
+		boolean isTransit=false;
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
 				.createScenario(ConfigUtils.loadConfig(configFile));
 		scenario.getConfig().scenario().setUseTransit(true);
-		new TransitScheduleReader(scenario)
-				.readFile(transitScheduleFileComponent.getText());
+		if (!transitScheduleFileComponent.getText().equals("NA")
+				&& !transitScheduleFileComponent.getText().equals("")) {
+			new TransitScheduleReader(scenario)
+					.readFile(transitScheduleFileComponent.getText());
+			isTransit = true;
+		}
 		new MatsimNetworkReader(scenario).readFile(networkFileComponent
 				.getText());
 
@@ -387,8 +392,14 @@ public class EventsToSQLInterface extends JFrame {
 		// scenario.getConfig(),new File(postgresPropertiesComponent.getText())
 		// ,tableSuffixComponent.getText());
 		// }else{
-		test = new EventsToPlanElements(scenario.getTransitSchedule(),
-				scenario.getNetwork(), scenario.getConfig(), tableSuffix, schemaNameComponent.getText());
+		if(isTransit){
+			test = new EventsToPlanElements(scenario.getTransitSchedule(),
+					scenario.getNetwork(), scenario.getConfig(), tableSuffix, schemaNameComponent.getText());
+			
+		}else{
+			test = new EventsToPlanElements(
+					scenario.getNetwork(), scenario.getConfig(), tableSuffix, schemaNameComponent.getText());
+		}
 		// }
 		eventsManager.addHandler(test);
 		new MatsimEventsReader(eventsManager).readFile(eventsFileComponent

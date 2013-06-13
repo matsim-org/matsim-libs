@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.bcel.generic.ISUB;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -68,7 +69,11 @@ import playground.pieter.singapore.utils.postgresql.travelcomponents.*;
 /**
  * 
  * @author sergioo, pieterfourie
- * 
+ *         <P>
+ *         Converts events into journeys, trips/stages, transfers and activities
+ *         tables. Originally designed for transit scenarios with full transit
+ *         simulation, it needs some work for general scenarios with teleported
+ *         modes.
  */
 
 public class EventsToPlanElements implements TransitDriverStartsEventHandler,
@@ -137,10 +142,12 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 	private HashSet<Id> personIdsForLinks;
 	private String schemaName;
 	private HashSet<Id> transitDriverIds = new HashSet<Id>();
+	private boolean isTransitScenario = false;
 
 	public EventsToPlanElements(TransitSchedule transitSchedule,
 			Network network, Config config, String suffix, String schemaName) {
 		this.transitSchedule = transitSchedule;
+		this.isTransitScenario = true;
 		this.network = network;
 		this.walkSpeed = new TransitRouterConfig(config).getBeelineWalkSpeed();
 		this.schemaName = schemaName;
@@ -148,7 +155,14 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 //		new VehicleReaderV1(vehicles).readFile(transitVehiclesfile);
 //		transitVehicleIds.addAll(vehicles.getVehicles().keySet());
 	}
+	public EventsToPlanElements(
+			Network network, Config config, String suffix, String schemaName) {
+		this.network = network;
+		this.walkSpeed = new TransitRouterConfig(config).getBeelineWalkSpeed();
+		this.schemaName = schemaName;
+	}
 
+	
 	public EventsToPlanElements(TransitSchedule transitSchedule,
 			Network network, Config config, File connectionProperties,
 			String suffix, String schemaName) {
@@ -183,21 +197,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 		}
 	}
 
-	private String getMode(String transportMode, Id line) {
-		if (transportMode.toLowerCase().contains("bus"))
-			return "bus";
-		else if (transportMode.toLowerCase().contains("rail"))
-			return "lrt";
-		else if (transportMode.toLowerCase().contains("subway"))
-			if (line.toString().contains("PE")
-					|| line.toString().contains("SE")
-					|| line.toString().contains("SW"))
-				return "lrt";
-			else
-				return "mrt";
-		else
-			return "other";
-	}
+
 
 	private void samplePersonIdsForLinkWriting(File connectionProperties) {
 		try {
@@ -233,8 +233,10 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
 		try {
-			if (event.getPersonId().toString().startsWith("pt_tr"))
-				return;
+			if(isTransitScenario){
+				if (transitDriverIds.contains(event.getPersonId()))
+					return;				
+			}
 			TravellerChain chain = chains.get(event.getPersonId());
 			locations.put(event.getPersonId(),
 					network.getLinks().get(event.getLinkId()).getCoord());
@@ -265,8 +267,10 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
 		try {
-			if (event.getPersonId().toString().startsWith("pt_tr"))
-				return;
+			if(isTransitScenario){
+				if (transitDriverIds.contains(event.getPersonId()))
+					return;				
+			}
 			TravellerChain chain = chains.get(event.getPersonId());
 			boolean beforeInPT = chain.isInPT();
 			if (event.getActType().equals(PtConstants.TRANSIT_ACTIVITY_TYPE)) {
@@ -300,8 +304,10 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
 		try {
-			if (event.getPersonId().toString().startsWith("pt_tr"))
-				return;
+			if(isTransitScenario){
+				if (transitDriverIds.contains(event.getPersonId()))
+					return;				
+			}
 			TravellerChain chain = chains.get(event.getPersonId());
 			if (event.getLegMode().equals("car")) {
 				Journey journey = chain.getJourneys().getLast();
@@ -317,14 +323,23 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				walk.setEndTime(event.getTime());
 				walk.setDistance(walk.getDuration() * walkSpeed);
 			} else if (event.getLegMode().equals("pt")) {
-				Journey journey = chain.getJourneys().getLast();
-				Trip trip = journey.getTrips().getLast();
-				trip.setDest(network.getLinks().get(event.getLinkId())
-						.getCoord());
-				trip.setEndTime(event.getTime());
-				journey.setPossibleTransfer(new Transfer());
-				journey.getPossibleTransfer().setStartTime(event.getTime());
-				journey.getPossibleTransfer().setFromTrip(trip);
+				if(isTransitScenario){
+					Journey journey = chain.getJourneys().getLast();
+					Trip trip = journey.getTrips().getLast();
+					trip.setDest(network.getLinks().get(event.getLinkId())
+							.getCoord());
+					trip.setEndTime(event.getTime());
+					journey.setPossibleTransfer(new Transfer());
+					journey.getPossibleTransfer().setStartTime(event.getTime());
+					journey.getPossibleTransfer().setFromTrip(trip);
+				}else{
+					Journey journey = chain.getJourneys().getLast();
+					journey.setEndTime(event.getTime());
+					journey.setDest(network.getLinks().get(event.getLinkId())
+							.getCoord());
+					journey.setEndTime(event.getTime());
+					chain.inCar = false;
+				}
 			}
 		} catch (Exception e) {
 			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils
@@ -337,7 +352,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
 		try {
-			if (event.getPersonId().toString().startsWith("pt_tr"))
+			if (transitDriverIds.contains(event.getPersonId()))
 				return;
 			TravellerChain chain = chains.get(event.getPersonId());
 			Journey journey;
@@ -373,16 +388,30 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				trip.setMode("car");
 				trip.setStartTime(event.getTime());
 			} else if (event.getLegMode().equals("pt")) {
-				// person waits till they enter the vehicle
-				journey = chain.getJourneys().getLast();
-				Wait wait = journey.addWait();
-				if (journey.getWaits().size() == 1)
-					wait.setAccessWait(true);
-				wait.setStartTime(event.getTime());
-				wait.setCoord(network.getLinks().get(event.getLinkId())
-						.getCoord());
-				if (!wait.isAccessWait()) {
-					journey.getPossibleTransfer().getWaits().add(wait);
+				if(isTransitScenario){
+					// person waits till they enter the vehicle
+					journey = chain.getJourneys().getLast();
+					Wait wait = journey.addWait();
+					if (journey.getWaits().size() == 1)
+						wait.setAccessWait(true);
+					wait.setStartTime(event.getTime());
+					wait.setCoord(network.getLinks().get(event.getLinkId())
+							.getCoord());
+					if (!wait.isAccessWait()) {
+						journey.getPossibleTransfer().getWaits().add(wait);
+					}
+				}else{
+					chain.inCar = true;
+					journey = chain.addJourney();
+					journey.setCarJourney(true);
+					journey.setOrig(network.getLinks().get(event.getLinkId())
+							.getCoord());
+					journey.setFromAct(chain.getActs().getLast());
+					journey.setStartTime(event.getTime());
+					journey.setMainmode("pt");
+					Trip trip = journey.addTrip();
+					trip.setMode("pt");
+					trip.setStartTime(event.getTime());
 				}
 			}
 		} catch (Exception e) {
@@ -396,7 +425,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 	@Override
 	public void handleEvent(AgentStuckEvent event) {
 		try {
-			if (!event.getPersonId().toString().startsWith("pt_tr")) {
+			if (!transitDriverIds.contains(event.getPersonId())) {
 				TravellerChain chain = chains.get(event.getPersonId());
 				setStuck(getStuck() + 1);
 				if (chain.getJourneys().size() > 0)
@@ -412,6 +441,8 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
+		if (!isTransitScenario)
+			return;
 		try {
 			if (transitDriverIds.contains(event.getPersonId()))
 				return;
@@ -426,11 +457,10 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 				Trip trip = journey.addTrip();
 				PTVehicle vehicle = ptVehicles.get(event.getVehicleId());
 				trip.setLine(vehicle.transitLineId);
-				trip.setMode(getMode(
+				trip.setMode(
 						transitSchedule.getTransitLines()
 								.get(vehicle.transitLineId).getRoutes()
-								.get(vehicle.transitRouteId).getTransportMode(),
-						vehicle.transitLineId));
+								.get(vehicle.transitRouteId).getTransportMode());
 				trip.setBoardingStop(vehicle.lastStop);
 				trip.setOrig(journey.getWaits().getLast().getCoord());
 				trip.setRoute(ptVehicles.get(event.getVehicleId()).transitRouteId);
@@ -545,7 +575,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 	@Override
 	public void handleEvent(TravelledEvent event) {
 		try {
-			if (event.getPersonId().toString().startsWith("pt_tr"))
+			if (transitDriverIds.contains(event.getPersonId()))
 				return;
 			TravellerChain chain = chains.get(event.getPersonId());
 			if (chain.traveledVehicle)
@@ -787,10 +817,12 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 			}
 
 		}
-		activityWriter.finish();
-		journeyWriter.finish();
-		tripWriter.finish();
-		transferWriter.finish();
+		
+			activityWriter.finish();
+			journeyWriter.finish();
+			tripWriter.finish();
+			transferWriter.finish();
+			
 
 		DataBaseAdmin dba = new DataBaseAdmin(connectionProperties);
 		// need to update the transit stop ids so they are consistent with LTA
