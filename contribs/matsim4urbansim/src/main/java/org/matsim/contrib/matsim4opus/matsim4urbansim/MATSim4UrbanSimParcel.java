@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.ZoneBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.config.AccessibilityConfigGroup;
+import org.matsim.contrib.accessibility.config.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
 import org.matsim.contrib.accessibility.utils.AggregateObject2NearestNode;
 import org.matsim.contrib.accessibility.utils.BoundingBox;
 import org.matsim.contrib.improvedPseudoPt.MATSim4UrbanSimRouterFactoryImpl;
@@ -474,8 +475,15 @@ public class MATSim4UrbanSimParcel{
 		this.computeZone2ZoneImpedance	= moduleMATSim4UrbanSim.isZone2ZoneImpedance();
 		this.computeZoneBasedAccessibilities = moduleMATSim4UrbanSim.isZoneBasedAccessibility();
 		this.computeGridBasedAccessibility	= moduleMATSim4UrbanSim.isCellBasedAccessibility();
-		this.computeGridBasedAccessibilitiesUsingShapeFile = moduleAccessibility.isCellBasedAccessibilityShapeFile();
-		this.computeGridBasedAccessibilityUsingBoundingBox = moduleAccessibility.usingCustomBoundingBox();
+		
+		if ( moduleAccessibility.getAreaOfAccessibilityComputation().equals( AreaOfAccesssibilityComputation.fromBoundingBox.toString() ) ) {
+			this.computeGridBasedAccessibilityUsingBoundingBox = true ;
+		} else if ( moduleAccessibility.getAreaOfAccessibilityComputation().equals( AreaOfAccesssibilityComputation.fromShapeFile.toString() ) ) {
+			this.computeGridBasedAccessibilitiesUsingShapeFile = true ;
+		} 
+		// if the other two are false, then network is used.
+
+		
 		// this.computeGridBasedAccessibilitiesUsingNetworkBoundary = moduleAccessibility.isCellBasedAccessibilityNetwork();
 		this.cellSizeInMeter 			= moduleAccessibility.getCellSizeCellBasedAccessibility();
 		this.shapeFile					= moduleAccessibility.getShapeFileCellBasedAccessibility();

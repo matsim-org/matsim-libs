@@ -23,12 +23,10 @@
 package org.matsim.contrib.matsim4opus.usecases;
 
 import java.io.File;
-import java.net.URL;
 
 import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -37,6 +35,7 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.accessibility.GridBasedAccessibilityControlerListenerV3;
 import org.matsim.contrib.accessibility.config.AccessibilityConfigGroup;
+import org.matsim.contrib.accessibility.config.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
 import org.matsim.contrib.improvedPseudoPt.PtMatrix;
@@ -73,7 +72,8 @@ public class AccessibilityIntegrationTest {
 
 		final AccessibilityConfigGroup acm = new AccessibilityConfigGroup();
 		config.addModule( acm ) ;
-		acm.setUsingCustomBoundingBox(true) ;
+//		acm.setUsingCustomBoundingBox(true) ;
+		acm.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBox.toString()) ;
 		acm.setBoundingBoxBottom(min) ;// yyyyyy todo
 		acm.setBoundingBoxTop(max) ;// yyyyyy todo
 		acm.setBoundingBoxLeft(min) ;// yyyyyy todo
@@ -143,7 +143,8 @@ public class AccessibilityIntegrationTest {
 
 		final AccessibilityConfigGroup acm = new AccessibilityConfigGroup();
 		config.addModule( acm ) ;
-		acm.setCellBasedAccessibilityNetwork(true) ;
+//		acm.setCellBasedAccessibilityNetwork(true) ;
+		// is now default
 		
 		// modify config according to needs
 		Network network = CreateTestNetwork.createTestNetwork();
@@ -216,9 +217,9 @@ public class AccessibilityIntegrationTest {
 
 		final AccessibilityConfigGroup acm = new AccessibilityConfigGroup();
 		config.addModule( acm ) ;
-		acm.setCellBasedAccessibilityShapeFile(true);
-		acm.setShapeFileCellBasedAccessibility(f.getAbsolutePath()) ;// yyyyyy todo
-		
+		acm.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromShapeFile.toString()) ;
+//		 acm.setShapeFileCellBasedAccessibility(url.getPath()) ; // yyyyyy todo
+		acm.setShapeFileCellBasedAccessibility(f.getAbsolutePath()) ;
 		
 		// modify config according to needs
 		Network network = CreateTestNetwork.createTestNetwork();

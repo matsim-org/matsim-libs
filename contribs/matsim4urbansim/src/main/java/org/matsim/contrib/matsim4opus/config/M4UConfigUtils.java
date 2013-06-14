@@ -29,6 +29,7 @@ import java.io.StringWriter;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.accessibility.config.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.config.M4UAccessibilityConfigUtils;
+import org.matsim.contrib.accessibility.config.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
 import org.matsim.contrib.matsim4opus.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4opus.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4opus.constants.InternalConstants;
@@ -100,15 +101,19 @@ public class M4UConfigUtils {
 		module.setCellBasedAccessibility(computeCellBasedAccessibility);
 		
 		AccessibilityConfigGroup acm = M4UAccessibilityConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
-		acm.setUsingCustomBoundingBox(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isUseCustomBoundingBox());
 		acm.setBoundingBoxLeft(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().getBoundingBoxLeft());
 		acm.setBoundingBoxBottom(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().getBoundingBoxBottom());
 		acm.setBoundingBoxRight(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().getBoundingBoxRight());
 		acm.setBoundingBoxTop(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().getBoundingBoxTop());
 		acm.setCellSizeCellBasedAccessibility(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().getCellSizeCellBasedAccessibility().intValue());
-		acm.setCellBasedAccessibilityShapeFile(computeCellbasedAccessibilityShapeFile);
-		acm.setCellBasedAccessibilityNetwork(computeCellBasedAccessibilityNetwork);
 		acm.setShapeFileCellBasedAccessibility(shapeFile);
+		if (matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isUseCustomBoundingBox() ) {
+			acm.setAreaOfAccessibilityComputation( AreaOfAccesssibilityComputation.fromBoundingBox.toString() ) ;
+		} else if (computeCellbasedAccessibilityShapeFile ) {
+			acm.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromShapeFile.toString() ) ;
+		} else if ( computeCellBasedAccessibilityNetwork ) {
+			acm.setAreaOfAccessibilityComputation( AreaOfAccesssibilityComputation.fromNetwork.toString() ) ;
+		}
 	}
 
 	/**

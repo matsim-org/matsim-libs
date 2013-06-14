@@ -17,6 +17,9 @@
 		<!-- if only a sample of destinations should be used (reduces accuracy -- not recommended except when necessary for computational speed reasons) -->
 		<param name="accessibilityDestinationSamplingRate" value="1.0" />
 
+		<!-- method to determine the area for which the accessibility will be computed; possible values: fromNetwork fromBoundingBox fromShapeFile  -->
+		<param name="areaOfAccessibilityComputation" value="fromNetwork" />
+
 		<!-- custom bounding box parameters for accessibility computation (if enabled) -->
 		<param name="boundingBoxBottom" value="0.0" />
 
@@ -29,15 +32,8 @@
 		<!-- time of day at which trips for accessibility computations are assumed to start -->
 		<param name="timeOfDay" value="10000.0" />
 
-		<!-- true if custom bounding box should be used for accessibility computation (otherwise e.g. extent of network will be used) -->
-		<param name="usingCustomBoundingBox" value="false" />
-
-		<param name="usingNetworkForExtentOfAccessibilityComputation" value="true" />
-
 		<!-- econometric accessibility usually returns the logsum. Set to true if you just want the sum (without the ln) -->
 		<param name="usingRawSumsWithoutLn" value="false" />
-
-		<param name="usingShapeFileForExtentOfAccessibilityComputation" value="false" />
 	</module>
 
 <!-- ====================================================================== -->
