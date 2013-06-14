@@ -50,6 +50,9 @@ public class MultimodalNetworkCleaner {
 	private final static Logger log = Logger.getLogger(MultimodalNetworkCleaner.class);
 
 	private final Network network;
+	
+	private Set<Id> removedLinks = new HashSet<Id>();
+	private Set<Id> modifiedLinks = new HashSet<Id>();
 
 	public MultimodalNetworkCleaner(final Network network) {
 		this.network = network;
@@ -152,7 +155,9 @@ public class MultimodalNetworkCleaner {
 					if ((link.getToNode().getInLinks().size() + link.getToNode().getOutLinks().size()) == 0) {
 						this.network.removeNode(link.getToNode().getId());
 					}
+					this.removedLinks.add(link.getId());
 				}
+				if(!removedLinks.contains(link.getId())) modifiedLinks.add(link.getId());
 			}
 		}
 		log.info("  resulting network contains " + this.network.getNodes().size() + " nodes and " +
@@ -216,6 +221,20 @@ public class MultimodalNetworkCleaner {
 		}
 
 		return clusterLinks;
+	}
+
+	/**
+	 * @return the removedLinks
+	 */
+	public final Set<Id> getRemovedLinkIds() {
+		return removedLinks;
+	}
+
+	/**
+	 * @return the modifiedLinks
+	 */
+	public final Set<Id> getModifiedLinkIds() {
+		return modifiedLinks;
 	}
 
 	/**
