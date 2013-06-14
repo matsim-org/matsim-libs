@@ -207,27 +207,18 @@ public class AccessibilityIntegrationTest {
 		Config config = ConfigUtils.createConfig() ;
 
 //		URL url = AccessibilityIntegrationTest.class.getClassLoader().getResource(new File(this.utils.getInputDirectory()).getAbsolutePath() + "shapeFile2.shp");
-		
-		System.out.println(this.utils.getInputDirectory() + "shapeFile2.shp") ; // tnicolai: shapefile does not work correctly, must be replaced ... dhosse: done.
-		File f = new File(this.utils.getInputDirectory() + "shapeFile2.shp");
-		System.out.println(f.getAbsolutePath());
-		System.out.println(f.exists());
-//		 System.out.println(url.getPath()) ;
-		
-//		if(url == null){
-//			log.error("Shape file not found! testWithExtentDeterminedShapeFile could not be tested...");
-//			Assert.assertTrue(url == null);
-//		}
-//		if(!f.exists()){
-//			log.error("Shape file not found! testWithExtentDeterminedShapeFile could not be tested...");
-//			Assert.assertTrue(f.exists());
-//		}
+		File f = new File(this.utils.getInputDirectory() + "shapeFile2.shp"); // shape file completely covers the road network
+
+		if(!f.exists()){
+			log.error("Shape file not found! testWithExtentDeterminedShapeFile could not be tested...");
+			Assert.assertTrue(f.exists());
+		}
 
 		final AccessibilityConfigGroup acm = new AccessibilityConfigGroup();
 		config.addModule( acm ) ;
 		acm.setCellBasedAccessibilityShapeFile(true);
-//		 acm.setShapeFileCellBasedAccessibility(url.getPath()) ; // yyyyyy todo
-		acm.setShapeFileCellBasedAccessibility(f.getAbsolutePath()) ;
+		acm.setShapeFileCellBasedAccessibility(f.getAbsolutePath()) ;// yyyyyy todo
+		
 		
 		// modify config according to needs
 		Network network = CreateTestNetwork.createTestNetwork();
