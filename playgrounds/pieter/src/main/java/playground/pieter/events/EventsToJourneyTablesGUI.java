@@ -42,7 +42,7 @@ import java.lang.reflect.Field;
 import java.sql.SQLException;
 import java.util.Properties;
 
-public class EventsToSQLInterface extends JFrame {
+public class EventsToJourneyTablesGUI extends JFrame {
 
 	private JPanel contentPane;
 	private JTextField schemaNameComponent;
@@ -61,7 +61,8 @@ public class EventsToSQLInterface extends JFrame {
 	private String tableSuffix = "_ezlinksim";
 	private String schemaName = "u_fouriep";
 	private String postgresProperties = "data/matsim2postgres.properties";
-	private EventsToSQLInterface self = this;
+	private EventsToJourneyTablesGUI self = this;
+	private String defaultpath = "";
 
 	/**
 	 * Launch the application.
@@ -70,10 +71,10 @@ public class EventsToSQLInterface extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					EventsToSQLInterface frame = new EventsToSQLInterface();
+					EventsToJourneyTablesGUI frame = new EventsToJourneyTablesGUI();
 					frame.setVisible(true);
 					frame.loadDefaultProperties(new File(
-							"data/eventsToSQL.properties"));
+							"eventsToSQL.properties"));
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -84,7 +85,7 @@ public class EventsToSQLInterface extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public EventsToSQLInterface() {
+	public EventsToJourneyTablesGUI() {
 		setTitle("Events to PostgreSQL tables");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 764, 300);
@@ -121,8 +122,7 @@ public class EventsToSQLInterface extends JFrame {
 				loadDefaultProperties(defaultPropertiesFile);
 			}
 		});
-		eventsToSQLPropertiesFileComponent
-				.setText("data/eventsToSQL.properties");
+		eventsToSQLPropertiesFileComponent.setText("eventsToSQL.properties");
 		GridBagConstraints gbc_txtDataeventstosqlproperties = new GridBagConstraints();
 		gbc_txtDataeventstosqlproperties.anchor = GridBagConstraints.NORTH;
 		gbc_txtDataeventstosqlproperties.fill = GridBagConstraints.HORIZONTAL;
@@ -133,7 +133,8 @@ public class EventsToSQLInterface extends JFrame {
 				gbc_txtDataeventstosqlproperties);
 		eventsToSQLPropertiesFileComponent.setColumns(10);
 
-		JLabel lblSchemaName = new JLabel("Schema Name for output");
+		JLabel lblSchemaName = new JLabel(
+				"Schema name for SQL/output path for CSVs");
 		lblSchemaName.setHorizontalAlignment(SwingConstants.LEFT);
 		GridBagConstraints gbc_lblSchemaName = new GridBagConstraints();
 		gbc_lblSchemaName.anchor = GridBagConstraints.WEST;
@@ -195,7 +196,8 @@ public class EventsToSQLInterface extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				networkFileComponent.setText(fileSelect(
-						networkFileComponent.getText(),"select network file").getPath());
+						networkFileComponent.getText(), "select network file")
+						.getPath());
 			}
 		});
 		networkFileComponent.setText("network.xml");
@@ -221,7 +223,8 @@ public class EventsToSQLInterface extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				configFileComponent.setText(fileSelect(
-						configFileComponent.getText(),"select config file").getPath());
+						configFileComponent.getText(), "select config file")
+						.getPath());
 			}
 		});
 		configFileComponent.setText("config.xml");
@@ -235,7 +238,7 @@ public class EventsToSQLInterface extends JFrame {
 		configFileComponent.setColumns(10);
 
 		JLabel lblpropertiesForPostgresql = new JLabel(
-				".properties for postgresql");
+				".properties for postgresql (leave empty for CSV)");
 		GridBagConstraints gbc_lblpropertiesForPostgresql = new GridBagConstraints();
 		gbc_lblpropertiesForPostgresql.anchor = GridBagConstraints.WEST;
 		gbc_lblpropertiesForPostgresql.insets = new Insets(0, 0, 5, 5);
@@ -249,7 +252,9 @@ public class EventsToSQLInterface extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				postgresPropertiesComponent.setText(fileSelect(
-						postgresPropertiesComponent.getText(),"select PostgreSQL connection properties file").getPath());
+						postgresPropertiesComponent.getText(),
+						"select PostgreSQL connection properties file")
+						.getPath());
 
 			}
 		});
@@ -276,7 +281,8 @@ public class EventsToSQLInterface extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				eventsFileComponent.setText(fileSelect(
-						eventsFileComponent.getText(),"select events file").getPath());
+						eventsFileComponent.getText(), "select events file")
+						.getPath());
 			}
 		});
 		eventsFileComponent.setText("events.xml");
@@ -329,7 +335,12 @@ public class EventsToSQLInterface extends JFrame {
 			@Override
 			public void mouseClicked(MouseEvent e) {
 				self.setVisible(false);
-				runEventsProcessing();
+				try {
+					runEventsProcessing();
+				} catch (Exception ex) {
+					ex.printStackTrace();
+					System.exit(ABORT);
+				}
 				System.exit(0);
 			}
 		});
@@ -363,7 +374,8 @@ public class EventsToSQLInterface extends JFrame {
 					eventsToSQLPropertiesFileComponent.getText())), "");
 		} catch (FileNotFoundException e) {
 
-			fileSelect(eventsToSQLPropertiesFileComponent.getText(),"Path not found. Enter proerties filename.");
+			fileSelect(eventsToSQLPropertiesFileComponent.getText(),
+					"Path not found. Enter proerties filename.");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -371,9 +383,10 @@ public class EventsToSQLInterface extends JFrame {
 	}
 
 	public void runEventsProcessing() {
-		boolean isTransit=false;
+		boolean isTransit = false;
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
-				.createScenario(ConfigUtils.loadConfig(configFile));
+				.createScenario(ConfigUtils.loadConfig(configFileComponent
+						.getText()));
 		scenario.getConfig().scenario().setUseTransit(true);
 		if (!transitScheduleFileComponent.getText().equals("NA")
 				&& !transitScheduleFileComponent.getText().equals("")) {
@@ -392,24 +405,33 @@ public class EventsToSQLInterface extends JFrame {
 		// scenario.getConfig(),new File(postgresPropertiesComponent.getText())
 		// ,tableSuffixComponent.getText());
 		// }else{
-		if(isTransit){
+		if (isTransit) {
 			test = new EventsToPlanElements(scenario.getTransitSchedule(),
-					scenario.getNetwork(), scenario.getConfig(), tableSuffix, schemaNameComponent.getText());
-			
-		}else{
-			test = new EventsToPlanElements(
-					scenario.getNetwork(), scenario.getConfig(), tableSuffix, schemaNameComponent.getText());
+					scenario.getNetwork(), scenario.getConfig(), tableSuffix,
+					schemaNameComponent.getText());
+
+		} else {
+			test = new EventsToPlanElements(scenario.getNetwork(),
+					scenario.getConfig(), tableSuffix,
+					schemaNameComponent.getText());
 		}
 		// }
 		eventsManager.addHandler(test);
 		new MatsimEventsReader(eventsManager).readFile(eventsFileComponent
 				.getText());
 
-
 		try {
-			test.writeSimulationResultsToSQL(new File(
-					postgresPropertiesComponent.getText()), eventsFileComponent
-					.getText(), tableSuffixComponent.getText());
+			if (postgresPropertiesComponent.getText().equals("")) {
+				test.writeSimulationResultsToCSV(schemaNameComponent.getText(),
+						tableSuffixComponent.getText());
+
+			} else {
+
+				test.writeSimulationResultsToSQL(new File(
+						postgresPropertiesComponent.getText()),
+						eventsFileComponent.getText(), tableSuffixComponent
+								.getText());
+			}
 		} catch (InstantiationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -439,8 +461,8 @@ public class EventsToSQLInterface extends JFrame {
 			this.defaultProperties.load(new FileInputStream(
 					defaultPropertiesFile));
 			String[] properties = { "transitScheduleFile", "networkFile",
-					"eventsFile", "configFile",  "tableSuffix",
-					"schemaName", "postgresProperties" };
+					"eventsFile", "configFile", "tableSuffix", "schemaName",
+					"postgresProperties" };
 			for (String property : properties) {
 				try {
 					String propertyValue = this.defaultProperties
@@ -480,11 +502,22 @@ public class EventsToSQLInterface extends JFrame {
 		// linkTrafficComponent.setSelected(Boolean.parseBoolean(linkTraffic));
 	}
 
-	public File fileSelect(String defaultPath, String title) {
-		JFileChooser chooser = new JFileChooser(defaultPath);
+	public File fileSelect(String path, String title) {
+		boolean validPath = false;
+		File file = null;
+		try {
+			file = new File(path);
+			validPath = file.isFile();
+			if (validPath)
+				this.defaultpath = file.getPath();
+		} catch (Exception e) {
+
+		}
+		JFileChooser chooser = new JFileChooser(defaultpath);
 		chooser.setToolTipText(title);
 		chooser.setDialogTitle(title);
 		chooser.showOpenDialog(new JPanel());
+		defaultpath = chooser.getSelectedFile().getPath();
 		return chooser.getSelectedFile();
 	}
 }
