@@ -202,31 +202,31 @@ public class AccessibilityIntegrationTest {
 	
 	
 	@Test
-	@Ignore
 	public void testWithExtentDeterminedShapeFile() {
+		
 		Config config = ConfigUtils.createConfig() ;
 
-		// URL url = AccessibilityIntegrationTest.class.getClassLoader().getResource(this.utils.getInputDirectory() + "shapeFile.shp");
+//		URL url = AccessibilityIntegrationTest.class.getClassLoader().getResource(new File(this.utils.getInputDirectory()).getAbsolutePath() + "shapeFile2.shp");
 		
-		System.out.println(this.utils.getInputDirectory() + "shapeFile.shp") ; // tnicolai: shapefile does not work correctly, must be replaced ...
-		File f = new File(this.utils.getInputDirectory() + "shapeFile.shp");
+		System.out.println(this.utils.getInputDirectory() + "shapeFile2.shp") ; // tnicolai: shapefile does not work correctly, must be replaced ... dhosse: done.
+		File f = new File(this.utils.getInputDirectory() + "shapeFile2.shp");
 		System.out.println(f.getAbsolutePath());
 		System.out.println(f.exists());
-		// System.out.println(url.getPath() ) ;
+//		 System.out.println(url.getPath()) ;
 		
 //		if(url == null){
 //			log.error("Shape file not found! testWithExtentDeterminedShapeFile could not be tested...");
 //			Assert.assertTrue(url == null);
 //		}
-		if(!f.exists()){
-			log.error("Shape file not found! testWithExtentDeterminedShapeFile could not be tested...");
-			Assert.assertTrue(f.exists());
-		}
+//		if(!f.exists()){
+//			log.error("Shape file not found! testWithExtentDeterminedShapeFile could not be tested...");
+//			Assert.assertTrue(f.exists());
+//		}
 
 		final AccessibilityConfigGroup acm = new AccessibilityConfigGroup();
 		config.addModule( acm ) ;
 		acm.setCellBasedAccessibilityShapeFile(true);
-		// acm.setShapeFileCellBasedAccessibility(url.getPath()) ; // yyyyyy todo
+//		 acm.setShapeFileCellBasedAccessibility(url.getPath()) ; // yyyyyy todo
 		acm.setShapeFileCellBasedAccessibility(f.getAbsolutePath()) ;
 		
 		// modify config according to needs
