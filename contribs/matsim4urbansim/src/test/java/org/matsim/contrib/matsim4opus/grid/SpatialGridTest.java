@@ -4,7 +4,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.utils.BoundingBox;
-import org.matsim.contrib.matsim4opus.utils.CreateTestNetwork;
+import org.matsim.contrib.accessibility.utils.CreateTestNetwork;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.testcases.MatsimTestCase;
 
