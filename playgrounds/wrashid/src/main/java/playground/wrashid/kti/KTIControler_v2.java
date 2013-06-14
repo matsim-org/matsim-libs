@@ -90,14 +90,14 @@ public class KTIControler_v2 extends Controler {
 		this.addControlerListener(new KtiPopulationPreparation(this.ktiConfigGroup));
 	}
 
-	@Override
-	public PlanAlgorithm createRoutingAlgorithm() {
-		return this.ktiConfigGroup.isUsePlansCalcRouteKti() ?
-				createKtiRoutingAlgorithm(
-						this.createTravelCostCalculator(),
-						this.getLinkTravelTimes()) :
-				super.createRoutingAlgorithm();
-	}
+//	@Override
+//	public PlanAlgorithm createRoutingAlgorithm() {
+//		return this.ktiConfigGroup.isUsePlansCalcRouteKti() ?
+//				createKtiRoutingAlgorithm(
+//						this.createTravelCostCalculator(),
+//						this.getLinkTravelTimes()) :
+//				super.createRoutingAlgorithm();
+//	}
 
 	public PlanAlgorithm createKtiRoutingAlgorithm(final TravelDisutility travelCosts, final TravelTime travelTimes) {
 		return new PlansCalcRouteKti(
