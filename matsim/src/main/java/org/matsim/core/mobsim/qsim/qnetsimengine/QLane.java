@@ -459,7 +459,8 @@ public final class QLane extends AbstractQLane implements Identifiable, Signaliz
 					this.buffer.poll();
 					this.qLink.network.simEngine.getMobsim().getEventsManager().processEvent(
 							new LaneLeaveEvent(now, veh.getDriver().getId(), this.qLink.getLink().getId(), this.getId()));
-					toQueueLane.addFromPreviousLane(veh, now);
+//					toQueueLane.addFromPreviousLane(veh);
+					toQueueLane.addFromUpstream(veh);
 					movedAtLeastOne = true;
 				}
 				else {
@@ -490,23 +491,29 @@ public final class QLane extends AbstractQLane implements Identifiable, Signaliz
 		/* It's the first lane,
 		 * so we need to start with a 'clean' freeSpeedTravelTime */
 		double earliestExitTime = (now + this.freespeedTravelTime);
-		veh.setEarliestLinkExitTime(earliestExitTime);
-		this.add(veh, now);
-	}
-	
-	private void addFromPreviousLane(final QVehicle veh, final double now){
-		/* It's not the first lane,
-		 * so there is a fractional rest from the previous lane that we add to the freeSpeedTravelTime  
-		 * of the current lane*/
-		double earliestExitTime = now + this.freespeedTravelTime
-		+ veh.getEarliestLinkExitTime() - Math.floor(veh.getEarliestLinkExitTime());
-
-		if (this.meterFromLinkEnd == 0.0) {
-			/* It's a QLane that is directly connected to a QNode,
-			 * so we have to floor the freeLinkTravelTime in order the get the same
-			 * results compared to the old mobSim */
-			earliestExitTime = Math.floor(earliestExitTime);
+//		veh.setEarliestLinkExitTime(earliestExitTime);
+//		this.add(veh, now);
+//	}
+//	
+//	private void addFromPreviousLane(final QVehicle veh){
+//		double now = this.qLink.network.simEngine.internalInterface.getMobsim().getSimTimer().getTimeOfDay() ;
+//		/* It's not the first lane,
+//		 * so there is a fractional rest from the previous lane that we add to the freeSpeedTravelTime  
+//		 * of the current lane*/
+//		double earliestExitTime = now + this.freespeedTravelTime
+		if ( this.meterFromLinkEnd > 0.0 ) {
+			/* It's not the first lane,
+			 * so there is a fractional rest from the previous lane that we add to the freeSpeedTravelTime  
+			 * of the current lane*/
+			earliestExitTime +=  veh.getEarliestLinkExitTime() - Math.floor(veh.getEarliestLinkExitTime());
 		}
+
+//		if (this.meterFromLinkEnd == 0.0) {
+//			/* It's a QLane that is directly connected to a QNode,
+//			 * so we have to floor the freeLinkTravelTime in order the get the same
+//			 * results compared to the old mobSim */
+//			earliestExitTime = Math.floor(earliestExitTime);
+//		}
 		veh.setEarliestLinkExitTime(earliestExitTime);
 		this.add(veh, now);
 	}

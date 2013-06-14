@@ -378,6 +378,7 @@ public class QLinkLanesImpl extends AbstractQLink {
 	 * @return the total space capacity available on that link (includes the space on lanes if available)
 	 */
 	double getSpaceCap() {
+		// (only for tests)
 		double total = 0.0;
 		for (QLane ql : this.getQueueLanes()) {
 			total += ql.getStorageCapacity();
