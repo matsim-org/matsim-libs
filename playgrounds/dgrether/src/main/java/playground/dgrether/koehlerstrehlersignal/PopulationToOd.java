@@ -19,6 +19,9 @@
  * *********************************************************************** */
 package playground.dgrether.koehlerstrehlersignal;
 
+import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -42,6 +45,7 @@ import com.vividsolutions.jts.geom.Envelope;
 public class PopulationToOd {
 
 	private double matsimPopSampleSize = 1.0;
+	private Map<Id, Id> originalToSimplifiedLinkIdMatching;
 	
 	
 	
@@ -60,8 +64,9 @@ public class PopulationToOd {
 		//create some zones and match the population to them
 		DgZones zones = DgZoneUtils.createZonesFromGrid(grid);
 		DgMatsimPopulation2Zones pop2zones = new DgMatsimPopulation2Zones();
-		pop2zones.setUseLinkMappings(false);
-		zones = pop2zones.convert2Zones(fullScenario.getNetwork(), smallNetwork, 
+		pop2zones.setUseLinkMappings(true);
+		
+		zones = pop2zones.convert2Zones(fullScenario.getNetwork(), smallNetwork, this.originalToSimplifiedLinkIdMatching,
 				fullScenario.getPopulation(), zones, signalsBoundingBox.getBoundingBox(), startTimeSec, endTimeSec);
 		
 		//write	 the matching to some files
@@ -88,6 +93,10 @@ public class PopulationToOd {
 	
 	public void setMatsimPopSampleSize(double matsimPopSampleSize) {
 		this.matsimPopSampleSize = matsimPopSampleSize;
+	}
+
+	public void setOriginalToSimplifiedLinkMapping(Map<Id, Id> originalToSimplifiedLinkIdMatching) {
+		this.originalToSimplifiedLinkIdMatching = originalToSimplifiedLinkIdMatching;
 	}
 	
 }

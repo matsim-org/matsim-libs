@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.signalsystems.data.SignalsData;
@@ -86,7 +85,6 @@ public class Scenario2KoehlerStrehler2010 {
 
 	
 	public void convert(String outputDirectory, String name, DgZones zones, double boundingBoxOffset, int cellsX, int cellsY, double startTimeSec, double endTimeSec) throws IOException{
-		OutputDirectoryLogging.initLoggingWithOutputDirectory(outputDirectory);
 
 		Map<DgZone, Link> zones2LinkMap = DgZoneUtils.createZoneCenter2LinkMapping(zones, (NetworkImpl) scenario.getNetwork());
 		DgZoneUtils.writeLinksOfZones2Shapefile(zones, zones2LinkMap, crs, shapeFileDirectory + "links_for_zones.shp");
@@ -132,7 +130,6 @@ public class Scenario2KoehlerStrehler2010 {
 		
 		idPool.writeToFile(outputDirectory + "id_conversions.txt");
 		
-		OutputDirectoryLogging.closeOutputDirLogging();		
 	}
 
 	private Set<Id> getSignalizedLinkIds(SignalSystemsData signals){

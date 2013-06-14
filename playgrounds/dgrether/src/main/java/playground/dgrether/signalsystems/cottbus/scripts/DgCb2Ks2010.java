@@ -74,12 +74,15 @@ public class DgCb2Ks2010 {
 		String name = "run 1292 output plans between 05:30 and 09:30";
 		CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84_UTM33N);
 		
+		
+		
 		ScenarioShrinker scenarioShrinker = new ScenarioShrinker(fullScenario,  crs);
 		Network shrinkedNetwork = scenarioShrinker.shrinkScenario(outputDirectory, shapeFileDirectory, boundingBoxOffset);
 		//TODO read link mappings
 		
 		PopulationToOd pop2od = new PopulationToOd();
 		pop2od.setMatsimPopSampleSize(matsimPopSampleSize);
+		pop2od.setOriginalToSimplifiedLinkMapping(scenarioShrinker.getOriginalToSimplifiedLinkIdMatching());
 		pop2od.matchPopulationToGrid(fullScenario, crs, shrinkedNetwork, scenarioShrinker.getSignalsBoundingBox(), 
 				cellsX, cellsY, startTime, endTime, shapeFileDirectory);
 		

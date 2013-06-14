@@ -56,34 +56,33 @@ public class NetworkSimplifier {
 	private Set<Integer> nodeTopoToMerge = new TreeSet<Integer>();
 
 	private Map<Id, Id> originalToSimplifiedLinkIdMatching = new HashMap<Id, Id>();
-	private Map<Id, Id> simplifiedToOriginalLinkIdMatching = new HashMap<Id, Id>();
+	private Map<Id, List<Id>> simplifiedToOriginalLinkIdMatching = new HashMap<Id, List<Id>>();
 
 	private Set<Id> nodeIdsToRemove = new HashSet<Id>();
 
-	private Id createId(Link inLink, Link outLink) {
-		Id id = new IdImpl(inLink.getId() + "-" + outLink.getId());
-		if (simplifiedToOriginalLinkIdMatching.containsKey(inLink.getId())) { // the inlink was already simplified before
-			Id originalLinkId = this.simplifiedToOriginalLinkIdMatching.get(inLink.getId());
-			this.originalToSimplifiedLinkIdMatching.put(originalLinkId, id);
-			this.simplifiedToOriginalLinkIdMatching.put(id, originalLinkId);
-		}
-		else {
-			this.originalToSimplifiedLinkIdMatching.put(inLink.getId(), id);
-			this.simplifiedToOriginalLinkIdMatching.put(id, inLink.getId());
-		}
-
-		if (originalToSimplifiedLinkIdMatching.containsKey(outLink.getId())) { // the outlink was already simplified before
-			Id originalLinkId = this.simplifiedToOriginalLinkIdMatching.get(outLink.getId());
-			this.originalToSimplifiedLinkIdMatching.put(originalLinkId, id);
-			this.simplifiedToOriginalLinkIdMatching.put(id, originalLinkId);
-		}
-		else {
-			this.originalToSimplifiedLinkIdMatching.put(outLink.getId(), id);
-			this.simplifiedToOriginalLinkIdMatching.put(id, outLink.getId());
+	private Id createId(Id inLink, Id outLink) {
+		Id id = new IdImpl(inLink + "-" + outLink);
+//		log.error("created id mapping: " + id.toString());
+		this.simplifiedToOriginalLinkIdMatching.put(id, new ArrayList<Id>());
+		List<Id> ids = new ArrayList<Id>();
+		ids.add(inLink);
+		ids.add(outLink);
+		for (Id idOld : ids) {
+			if (simplifiedToOriginalLinkIdMatching.containsKey(idOld)) { // the old Id was already simplified before
+				List<Id> originalLinkIds = this.simplifiedToOriginalLinkIdMatching.remove(idOld);
+				this.simplifiedToOriginalLinkIdMatching.get(id).addAll(originalLinkIds);
+				
+				for (Id originalId : originalLinkIds)
+					this.originalToSimplifiedLinkIdMatching.put(originalId, id);		
+			}
+			else {
+				this.originalToSimplifiedLinkIdMatching.put(idOld, id);
+				this.simplifiedToOriginalLinkIdMatching.get(id).add(idOld);
+			}
 		}
 		return id;
 	}
-
+	
 	public void simplifyNetworkLanesAndSignals(final Network network, LaneDefinitions20 lanes,
 			SignalsData signalsData) {
 		Map<Id, Set<Id>> signalizedNodesBySystem = DgSignalsUtils.calculateSignalizedNodesPerSystem(signalsData.getSignalSystemsData(), network);
@@ -118,7 +117,7 @@ public class NetworkSimplifier {
 								if (bothLinksHaveSameLinkStats(inLink, outLink)) {
 									Node removedNode = outLink.getFromNode();
 									LinkImpl newLink = ((NetworkImpl) network).createAndAddLink(
-											this.createId(inLink, outLink), inLink.getFromNode(), outLink.getToNode(),
+											this.createId(inLink.getId(), outLink.getId()), inLink.getFromNode(), outLink.getToNode(),
 											inLink.getLength() + outLink.getLength(), inLink.getFreespeed(),
 											inLink.getCapacity(), inLink.getNumberOfLanes(), null, null);
 
@@ -140,10 +139,7 @@ public class NetworkSimplifier {
 											signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().remove(signalSystemId);
 										}
 									}
-										
-									
 								}
-
 							}
 						}
 					}
@@ -165,6 +161,10 @@ public class NetworkSimplifier {
 
 	public Set<Id> getRemovedNodeIds() {
 		return this.nodeIdsToRemove;
+	}
+	
+	public Map<Id, Id> getOriginalToSimplifiedLinkIdMatching(){
+		return this.originalToSimplifiedLinkIdMatching;
 	}
 
 	/**
@@ -204,4 +204,31 @@ public class NetworkSimplifier {
 		return bothLinksHaveSameLinkStats;
 	}
 
+	public static void main(String[] args){
+		//some kind of unit test for id matchings ;-)
+		NetworkSimplifier ns = new NetworkSimplifier();
+		Id id1 = new IdImpl("1");
+		Id id2 = new IdImpl("2");
+		Id id12 = ns.createId(id1, id2);
+		log.error(ns.simplifiedToOriginalLinkIdMatching);
+		log.error(ns.originalToSimplifiedLinkIdMatching);
+		Id id3 = new IdImpl("3");
+		Id id123 = ns.createId(id12, id3);
+		log.error(ns.simplifiedToOriginalLinkIdMatching);
+		log.error(ns.originalToSimplifiedLinkIdMatching);
+		Id id4 = new IdImpl("4");
+		Id id5 = new IdImpl("5");
+		Id id45 = ns.createId(id4, id5);
+		log.error(ns.simplifiedToOriginalLinkIdMatching);
+		log.error(ns.originalToSimplifiedLinkIdMatching);
+		log.error("");
+		ns.createId(id45, id123);
+		log.error(ns.simplifiedToOriginalLinkIdMatching);
+		log.error(ns.originalToSimplifiedLinkIdMatching);
+		
+		
+	}
+
+	
+	
 }

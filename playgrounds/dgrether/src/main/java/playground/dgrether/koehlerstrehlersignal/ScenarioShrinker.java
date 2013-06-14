@@ -60,6 +60,8 @@ public class ScenarioShrinker {
 
 	private DgSignalsBoundingBox signalsBoundingBox;
 
+	private Map<Id, Id> originalToSimplifiedLinkIdMatching;
+
 	public ScenarioShrinker(Scenario scenario, CoordinateReferenceSystem crs){
 		this.fullScenario = scenario;
 		this.crs = crs;
@@ -72,7 +74,8 @@ public class ScenarioShrinker {
 		
 		//create the bounding box
 		this.signalsBoundingBox = new DgSignalsBoundingBox(crs);
-		Envelope boundingBox = signalsBoundingBox.calculateBoundingBoxForSignals(fullScenario.getNetwork(), fullScenario.getScenarioElement(SignalsData.class).getSignalSystemsData(), boundingBoxOffset);
+		Envelope boundingBox = signalsBoundingBox.calculateBoundingBoxForSignals(fullScenario.getNetwork(), 
+				fullScenario.getScenarioElement(SignalsData.class).getSignalSystemsData(), boundingBoxOffset);
 		signalsBoundingBox.writeBoundingBox(shapeFileDirectory);
 		
 		//Reduce the network size to the bounding box
@@ -98,7 +101,7 @@ public class ScenarioShrinker {
 		NetworkSimplifier nsimply = new NetworkSimplifier();
 		nsimply.setNodesToMerge(nodeTypesToMerge);
 		nsimply.simplifyNetworkLanesAndSignals(smallNetwork, this.fullScenario.getScenarioElement(LaneDefinitions20.class), this.fullScenario.getScenarioElement(SignalsData.class));
-
+		this.originalToSimplifiedLinkIdMatching = nsimply.getOriginalToSimplifiedLinkIdMatching();
 		
 		String simplifiedNetworkFile = outputDirectory + simplifiedNetworkFilename;
 		DgNetworkUtils.writeNetwork(smallNetwork, simplifiedNetworkFile);
@@ -118,7 +121,9 @@ public class ScenarioShrinker {
 		return this.signalsBoundingBox;
 	}
 	
-
+	public Map<Id, Id> getOriginalToSimplifiedLinkIdMatching(){
+		return this.originalToSimplifiedLinkIdMatching;
+	}
 	
 
 	private Set<Id> getSignalizedNodeIds(SignalSystemsData signals, Network network){

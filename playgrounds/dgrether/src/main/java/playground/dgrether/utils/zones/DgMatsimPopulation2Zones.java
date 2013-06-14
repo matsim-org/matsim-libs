@@ -21,6 +21,7 @@ package playground.dgrether.utils.zones;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -62,11 +63,14 @@ public class DgMatsimPopulation2Zones {
 	private Network smallNetwork;
 
 	private boolean useLinkMappings = true;
+
+	private Map<Id, Id> originalToSimplifiedLinkIdMatching;
 	
-	public DgZones convert2Zones(Network network, Network smallNetwork, Population pop, DgZones cells, 
+	public DgZones convert2Zones(Network network, Network smallNetwork, Map<Id, Id> originalToSimplifiedLinkIdMatching, Population pop, DgZones cells, 
 			Envelope networkBoundingBox, double startTime, double endTime) {
 		this.fullNetwork = network;
 		this.smallNetwork = smallNetwork; 
+		this.originalToSimplifiedLinkIdMatching = originalToSimplifiedLinkIdMatching;
 		this.zones = cells;
 		this.convertPopulation2OD(pop, networkBoundingBox, startTime, endTime);
 		return cells;
@@ -186,6 +190,11 @@ public class DgMatsimPopulation2Zones {
 			Coordinate coordinate = null;
 			for (int i = route.size() - 1; i >= 0; i--){
 				Link link = route.get(i);
+				Id linkId = link.getId();
+				if (this.originalToSimplifiedLinkIdMatching.containsKey(linkId)) {
+					linkId = this.originalToSimplifiedLinkIdMatching.get(linkId);
+					link = smallNetwork.getLinks().get(linkId);
+				}
 				if (this.smallNetwork.getLinks().containsKey(link.getId())){
 					lastLink = link;
 					break;
@@ -205,6 +214,11 @@ public class DgMatsimPopulation2Zones {
 			Link firstLink = null;
 			Coordinate coordinate = null;
 			for (Link link : route){
+				Id linkId = link.getId();
+				if (this.originalToSimplifiedLinkIdMatching.containsKey(linkId)) {
+					linkId = this.originalToSimplifiedLinkIdMatching.get(linkId);
+					link = smallNetwork.getLinks().get(linkId);
+				}
 				if (this.smallNetwork.getLinks().containsKey(link.getId())){
 					firstLink = link;
 					break;
@@ -259,6 +273,11 @@ public class DgMatsimPopulation2Zones {
 //		Coordinate currentCoordinate = null;
 		while (! route.isEmpty()){
 			currentLink = route.remove(0);
+			Id linkId = currentLink.getId();
+			if (this.originalToSimplifiedLinkIdMatching.containsKey(linkId)) {
+				linkId = this.originalToSimplifiedLinkIdMatching.get(linkId);
+				currentLink = smallNetwork.getLinks().get(linkId);
+			}
 			if (this.smallNetwork.getLinks().containsKey(currentLink.getId())){
 				routeStartLink = currentLink;
 				break;
@@ -272,6 +291,12 @@ public class DgMatsimPopulation2Zones {
 		//search last link that is contained in grid
 		while (! route.isEmpty()){
 			currentLink = route.remove(0);
+			Id linkId = currentLink.getId();
+			if (this.originalToSimplifiedLinkIdMatching.containsKey(linkId)) {
+				linkId = this.originalToSimplifiedLinkIdMatching.get(linkId);
+				currentLink = smallNetwork.getLinks().get(linkId);
+				if (currentLink == null) throw new IllegalStateException("Link Id " + linkId  + " not found in small network");
+			}
 			if (this.smallNetwork.getLinks().containsKey(currentLink.getId())){
 				routeEndLink = currentLink;
 			}
