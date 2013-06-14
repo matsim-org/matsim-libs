@@ -119,6 +119,10 @@ public class SpatialAveraging {
 	final String pollutant2analyze = WarmPollutant.NO2.toString();
 	final boolean baseCaseOnly = false;
 	final boolean calculateRelativeChange = false;
+	
+	Map<Double, Map<Id, Map<String, Double>>> time2EmissionMapToAnalyze_g = new HashMap<Double, Map<Id,Map<String,Double>>>();
+	Map<Double, Map<Id, Map<String, Double>>> time2EmissionMapToAnalyze_gPerVkm = new HashMap<Double, Map<Id,Map<String,Double>>>();;
+	Map<Double, Map<Id, Double>> time2DemandMapToAnalyze_vkm = new HashMap<Double, Map<Id,Double>>();
 
 	private void run() throws IOException{
 		this.simulationEndTime = getEndTime(configFile1);
@@ -126,9 +130,6 @@ public class SpatialAveraging {
 		Scenario scenario = loadScenario(netFile1);
 		this.network = scenario.getNetwork();		
 		this.featuresInMunich = ShapeFileReader.getAllFeatures(munichShapeFile);
-
-		Map<Double, Map<Id, Map<String, Double>>> time2EmissionMapToAnalyze;
-		Map<Double, Map<Id, Double>> time2DemandMapToAnalyze;
 
 		processEmissions(emissionFile1);
 		Map<Double, Map<Id, Map<WarmPollutant, Double>>> time2WarmEmissionsTotal1 = this.warmHandler.getWarmEmissionsPerLinkAndTimeInterval();
@@ -144,8 +145,11 @@ public class SpatialAveraging {
 		this.coldHandler.reset(0);
 
 		if(baseCaseOnly){
-			time2EmissionMapToAnalyze = time2EmissionsTotalFilledAndFiltered1;
-			time2DemandMapToAnalyze = time2CountsPerLinkFilledAndFiltered1;
+			time2EmissionMapToAnalyze_g = time2EmissionsTotalFilledAndFiltered1;
+			// TODO: the following is not correct...its not g per vkm
+			time2EmissionMapToAnalyze_gPerVkm = time2EmissionsTotalFilledAndFiltered1;
+			// TODO: the following is not correct...its not vkm
+			time2DemandMapToAnalyze_vkm = time2CountsPerLinkFilledAndFiltered1;
 			outPathStub = runDirectory1 + "analysis/spatialAveraging/" + runNumber1 + "." + lastIteration1;
 		} else {
 			processEmissions(emissionFile2);
@@ -164,24 +168,32 @@ public class SpatialAveraging {
 //				time2DemandMapToAnalyze = calculateRelativeDemandDifferences(time2CountsPerLinkFilledAndFiltered1, time2CountsPerLinkFilledAndFiltered2);
 				outPathStub = runDirectory1 + "analysis/spatialAveraging/" + runNumber2 + "." + lastIteration2 + "-" + runNumber1 + "." + lastIteration1 + ".relativeDelta";
 			} else {
-				time2EmissionMapToAnalyze = calcualateAbsoluteEmissionDifferences(time2EmissionsTotalFilledAndFiltered1, time2EmissionsTotalFilledAndFiltered2, time2CountsPerLinkFilledAndFiltered1, time2CountsPerLinkFilledAndFiltered2);
-				time2DemandMapToAnalyze = calculateAbsoluteDemandDifferences(time2CountsPerLinkFilledAndFiltered1, time2CountsPerLinkFilledAndFiltered2);
+				calcualateAbsoluteEmissionDifferences(time2EmissionsTotalFilledAndFiltered1, time2EmissionsTotalFilledAndFiltered2, time2CountsPerLinkFilledAndFiltered1, time2CountsPerLinkFilledAndFiltered2);
+				calculateAbsoluteDemandDifferences(time2CountsPerLinkFilledAndFiltered1, time2CountsPerLinkFilledAndFiltered2);
 				outPathStub = runDirectory1 + "analysis/spatialAveraging/" + runNumber2 + "." + lastIteration2 + "-" + runNumber1 + "." + lastIteration1 + ".absoluteDelta";
 			}
 		}
 
-		Map<Double, double[][]> time2Demand = new HashMap<Double, double[][]>();
-		Map<Double, double[][]> time2Emissions = new HashMap<Double, double[][]>();
-		for(double endOfTimeInterval : time2DemandMapToAnalyze.keySet()){
-			double[][] demand = performSpatialAveragingForDemand(time2DemandMapToAnalyze, endOfTimeInterval);
-			writeRoutput(demand, outPathStub + ".Routput.Demand" + "." + endOfTimeInterval + ".txt");
-			time2Demand.put(endOfTimeInterval, demand);
-			double[][] emissions = performSpatialAveragingForEmissions(time2EmissionMapToAnalyze, endOfTimeInterval);
-			writeRoutput(emissions, outPathStub + ".Routput." + pollutant2analyze.toString() + "." + endOfTimeInterval + ".txt");
-			time2Emissions.put(endOfTimeInterval, emissions);
+		Map<Double, double[][]> time2Emissions_g = new HashMap<Double, double[][]>();
+		Map<Double, double[][]> time2Emissions_gPerVkm = new HashMap<Double, double[][]>();
+		Map<Double, double[][]> time2Demand_vkm = new HashMap<Double, double[][]>();
+		for(double endOfTimeInterval : time2DemandMapToAnalyze_vkm.keySet()){
+			double[][] emissions_g = performSpatialAveragingForEmissions(time2EmissionMapToAnalyze_g, endOfTimeInterval, AveragingMethod.PERSQKM);
+			writeRoutput(emissions_g, outPathStub + ".Routput." + pollutant2analyze.toString() + ".g." + endOfTimeInterval + ".txt");
+			
+			double[][] emissions_gPerVkm = performSpatialAveragingForEmissions(time2EmissionMapToAnalyze_gPerVkm, endOfTimeInterval, AveragingMethod.AVERAGE);
+			writeRoutput(emissions_gPerVkm, outPathStub + ".Routput." + pollutant2analyze.toString() + ".gPerVkm." + endOfTimeInterval + ".txt");
+			
+			double[][] demand_vkm = performSpatialAveragingForDemand(time2DemandMapToAnalyze_vkm, endOfTimeInterval);
+			writeRoutput(demand_vkm, outPathStub + ".Routput.Demand.vkm" + "." + endOfTimeInterval + ".txt");
+			
+			time2Emissions_g.put(endOfTimeInterval, emissions_g);
+			time2Emissions_gPerVkm.put(endOfTimeInterval, emissions_gPerVkm);
+			time2Demand_vkm.put(endOfTimeInterval, demand_vkm);
 		}
-//		writeGISoutput(time2Demand, outPathStub + ".GISoutput.Demand" + ".movie.shp");
-//		writeGISoutput(time2Emissions, outPathStub +  ".GISoutput." + pollutant2analyze.toString() + ".movie.shp");
+//		writeGISoutput(time2Demand_vkm, outPathStub + ".GISoutput.Demand.vkm.movie.shp");
+//		writeGISoutput(time2Emissions_g, outPathStub +  ".GISoutput." + pollutant2analyze.toString() + ".g.movie.shp");
+//		writeGISoutput(time2Emissions_gPerVkm, outPathStub +  ".GISoutput." + pollutant2analyze.toString() + ".gPerVkm.movie.shp");
 	}
 
 	private void writeGISoutput(
@@ -208,8 +220,8 @@ public class SpatialAveraging {
 							features.add(feature);
 						}
 					}
-//				}
-			}
+				}
+//			}
 		}
 		ShapeFileWriter.writeGeometries(features, outputPathForGIS);
 		logger.info("Finished writing output for GIS to " + outputPathForGIS);
@@ -282,7 +294,7 @@ public class SpatialAveraging {
 
 	private double[][] performSpatialAveragingForEmissions(
 			Map<Double, Map<Id, Map<String, Double>>> time2EmissionMapToAnalyze,
-			double endOfTimeInterval) {
+			double endOfTimeInterval, AveragingMethod avm) {
 		
 		Map<Id, Map<String, Double>> emissionMapToAnalyze = time2EmissionMapToAnalyze.get(endOfTimeInterval);
 		double[][] sumOfweightsForCell = new double[noOfXbins][noOfYbins];
@@ -304,8 +316,12 @@ public class SpatialAveraging {
 				}
 			}
 		}
-//		double[][] results = getResults(sumOfweightedValuesForCell, sumOfweightsForCell, AveragingMethod.AVERAGE);
-		double[][] results = getResults(sumOfweightedValuesForCell, sumOfweightsForCell, AveragingMethod.PERSQKM);
+		double[][] results; 
+		if(avm.equals(AveragingMethod.AVERAGE)){
+		results = getResults(sumOfweightedValuesForCell, sumOfweightsForCell, AveragingMethod.AVERAGE);
+		} else {
+			results = getResults(sumOfweightedValuesForCell, sumOfweightsForCell, AveragingMethod.PERSQKM);
+		}
 		return results;
 	}
 
@@ -414,11 +430,10 @@ public class SpatialAveraging {
 		return (int) relativePositionX; // returns the number of the bin [0..n-1]
 	}
 
-	private Map<Double, Map<Id, Double>> calculateAbsoluteDemandDifferences(
+	private void calculateAbsoluteDemandDifferences(
 			Map<Double, Map<Id, Double>> time2CountsPerLinkFilledAndFiltered1,
 			Map<Double, Map<Id, Double>> time2CountsPerLinkFilledAndFiltered2) {
 		
-		Map<Double, Map<Id, Double>> time2AbsoluteDemandDifference = new HashMap<Double, Map<Id,Double>>();
 		for(Double endOfTimeInterval : time2CountsPerLinkFilledAndFiltered1.keySet()){
 			Map<Id, Double> absoluteDemandDifference = new HashMap<Id, Double>();
 			Map<Id, Double> linkId2Counts = time2CountsPerLinkFilledAndFiltered1.get(endOfTimeInterval);
@@ -435,26 +450,26 @@ public class SpatialAveraging {
 //				double countDifference = countAfter - countBefore;
 //				absoluteDemandDifference.put(linkId, countDifference);
 			}
-			time2AbsoluteDemandDifference.put(endOfTimeInterval, absoluteDemandDifference);
+			this.time2DemandMapToAnalyze_vkm.put(endOfTimeInterval, absoluteDemandDifference);
 		}
-		return time2AbsoluteDemandDifference;
 	}
 
-	private Map<Double, Map<Id, Map<String, Double>>> calcualateAbsoluteEmissionDifferences(
+	private void calcualateAbsoluteEmissionDifferences(
 			Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFilledAndFiltered1,
 			Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFilledAndFiltered2,
 			Map<Double, Map<Id, Double>> time2CountsPerLinkFilledAndFiltered1,
 			Map<Double, Map<Id, Double>> time2CountsPerLinkFilledAndFiltered2) {
 
-		Map<Double, Map<Id, Map<String, Double>>> time2AbsoluteEmissionDifference = new HashMap<Double, Map<Id, Map<String, Double>>>();
 		for(Entry<Double, Map<Id, Map<String, Double>>> entry0 : time2EmissionsTotalFilledAndFiltered1.entrySet()){
 			double endOfTimeInterval = entry0.getKey();
-			Map<Id, Map<String, Double>> absoluteEmissionDifference = new HashMap<Id, Map<String, Double>>();
+			Map<Id, Map<String, Double>> absoluteEmissionDifference_g = new HashMap<Id, Map<String, Double>>();
+			Map<Id, Map<String, Double>> absoluteEmissionDifference_gPerVkm = new HashMap<Id, Map<String, Double>>();
 			Map<Id, Map<String, Double>> linkId2Emissions = entry0.getValue();
 
 			for(Entry<Id, Map<String, Double>> entry1 : linkId2Emissions.entrySet()){
 				Id linkId = entry1.getKey();
-				Map<String, Double> absoluteEmissionDifferencePerLink = new HashMap<String, Double>();
+				Map<String, Double> absoluteEmissionDifferencePerLink_g = new HashMap<String, Double>();
+				Map<String, Double> absoluteEmissionDifferencePerLink_gPerVkm = new HashMap<String, Double>();
 				for(String pollutant : entry1.getValue().keySet()){
 					Double emissionsBefore = this.scalingFactor * entry1.getValue().get(pollutant);
 					Double emissionsAfter = this.scalingFactor * time2EmissionsTotalFilledAndFiltered2.get(endOfTimeInterval).get(linkId).get(pollutant);
@@ -477,17 +492,18 @@ public class SpatialAveraging {
 						emissionsPerVehicleKmAfter = 0.0;
 					}
 
-//					double emissionsPerVehicleKmDifference = emissionsPerVehicleKmAfter - emissionsPerVehicleKmBefore;
-//					absoluteEmissionDifferencePerLink.put(pollutant, emissionsPerVehicleKmDifference);
+					double absoluteEmissionDifferenceOfLink_g = emissionsAfter - emissionsBefore;
+					double absoluteEmissionDifferenceOfLink_gPerVkm = emissionsPerVehicleKmAfter - emissionsPerVehicleKmBefore;
 					
-					double absoluteEmissionDifferenceOfLink = emissionsAfter - emissionsBefore;
-					absoluteEmissionDifferencePerLink.put(pollutant, absoluteEmissionDifferenceOfLink);
+					absoluteEmissionDifferencePerLink_g.put(pollutant, absoluteEmissionDifferenceOfLink_g);
+					absoluteEmissionDifferencePerLink_gPerVkm.put(pollutant, absoluteEmissionDifferenceOfLink_gPerVkm);
 				}
-				absoluteEmissionDifference.put(linkId, absoluteEmissionDifferencePerLink);
+				absoluteEmissionDifference_g.put(linkId, absoluteEmissionDifferencePerLink_g);
+				absoluteEmissionDifference_gPerVkm.put(linkId, absoluteEmissionDifferencePerLink_gPerVkm);
 			}
-			time2AbsoluteEmissionDifference.put(endOfTimeInterval, absoluteEmissionDifference);
+			this.time2EmissionMapToAnalyze_g.put(endOfTimeInterval, absoluteEmissionDifference_g);
+			this.time2EmissionMapToAnalyze_gPerVkm.put(endOfTimeInterval, absoluteEmissionDifference_gPerVkm);
 		}
-		return time2AbsoluteEmissionDifference;
 	}
 
 	private Map<Double, Map<Id, Double>> calculateRelativeDemandDifferences(
