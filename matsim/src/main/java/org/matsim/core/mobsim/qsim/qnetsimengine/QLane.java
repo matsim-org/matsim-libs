@@ -488,32 +488,18 @@ public final class QLane extends AbstractQLane implements Identifiable, Signaliz
 	@Override
 	/*package*/ void addFromUpstream(final QVehicle veh ){
 		double now = this.qLink.network.simEngine.internalInterface.getMobsim().getSimTimer().getTimeOfDay() ;
-		/* It's the first lane,
-		 * so we need to start with a 'clean' freeSpeedTravelTime */
-		double earliestExitTime = (now + this.freespeedTravelTime);
-//		veh.setEarliestLinkExitTime(earliestExitTime);
-//		this.add(veh, now);
-//	}
-//	
-//	private void addFromPreviousLane(final QVehicle veh){
-//		double now = this.qLink.network.simEngine.internalInterface.getMobsim().getSimTimer().getTimeOfDay() ;
-//		/* It's not the first lane,
-//		 * so there is a fractional rest from the previous lane that we add to the freeSpeedTravelTime  
-//		 * of the current lane*/
-//		double earliestExitTime = now + this.freespeedTravelTime
-		if ( this.meterFromLinkEnd > 0.0 ) {
-			/* It's not the first lane,
-			 * so there is a fractional rest from the previous lane that we add to the freeSpeedTravelTime  
-			 * of the current lane*/
-			earliestExitTime +=  veh.getEarliestLinkExitTime() - Math.floor(veh.getEarliestLinkExitTime());
-		}
 
-//		if (this.meterFromLinkEnd == 0.0) {
+		double earliestExitTime = (now + this.freespeedTravelTime);
+
+		earliestExitTime +=  veh.getEarliestLinkExitTime() - Math.floor(veh.getEarliestLinkExitTime());
+		// (yy this is what makes it pass the tests but I don't see why this is correct. kai, jun'13)
+		
+		if ( this.meterFromLinkEnd == 0.0 ) {
 //			/* It's a QLane that is directly connected to a QNode,
 //			 * so we have to floor the freeLinkTravelTime in order the get the same
 //			 * results compared to the old mobSim */
-//			earliestExitTime = Math.floor(earliestExitTime);
-//		}
+			earliestExitTime = Math.floor(earliestExitTime);
+		}
 		veh.setEarliestLinkExitTime(earliestExitTime);
 		this.add(veh, now);
 	}
