@@ -232,8 +232,8 @@ public class Sim2DQTransitionLink extends QLinkInternalI{
 	}
 
 	@Override
-	public boolean hasSpace() {
-		return this.ql.hasSpace();
+	public boolean isAcceptingFromUpstream() {
+		return this.ql.isAcceptingFromUpstream();
 	}
 
 	public void setEndOfQueueLine(Segment o3) {

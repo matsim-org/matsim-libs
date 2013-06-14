@@ -92,7 +92,7 @@ public class QLinkTest extends MatsimTestCase {
 
 		f.qlink1.addFromUpstream(v);
 		assertEquals(1, f.qlink1.vehOnLinkCount());
-		assertFalse(f.qlink1.hasSpace());
+		assertFalse(f.qlink1.isAcceptingFromUpstream());
 		assertTrue(f.qlink1.isNotOfferingVehicle());
 	}
 
@@ -337,30 +337,30 @@ public class QLinkTest extends MatsimTestCase {
 
 		assertEquals("wrong initial storage capacity.", 10.0, f.qlink2.getSpaceCap(), EPSILON);
 		f.qlink2.addFromUpstream(veh5);  // used vehicle equivalents: 5
-		assertTrue(f.qlink2.hasSpace());
+		assertTrue(f.qlink2.isAcceptingFromUpstream());
 		f.qlink2.addFromUpstream(veh5);  // used vehicle equivalents: 10
-		assertFalse(f.qlink2.hasSpace());
+		assertFalse(f.qlink2.isAcceptingFromUpstream());
 
 		assertTrue(f.qlink2.isNotOfferingVehicle());
 		f.qlink2.doSimStep(5.0); // first veh moves to buffer, used vehicle equivalents: 5
-		assertTrue(f.qlink2.hasSpace());
+		assertTrue(f.qlink2.isAcceptingFromUpstream());
 		assertFalse(f.qlink2.isNotOfferingVehicle());
 		f.qlink2.popFirstVehicle();  // first veh leaves buffer
-		assertTrue(f.qlink2.hasSpace());
+		assertTrue(f.qlink2.isAcceptingFromUpstream());
 
 		f.qlink2.addFromUpstream(veh25); // used vehicle equivalents: 7.5
 		f.qlink2.addFromUpstream(veh1);  // used vehicle equivalents: 8.5
 		f.qlink2.addFromUpstream(veh1);  // used vehicle equivalents: 9.5
-		assertTrue(f.qlink2.hasSpace());
+		assertTrue(f.qlink2.isAcceptingFromUpstream());
 		f.qlink2.addFromUpstream(veh1);  // used vehicle equivalents: 10.5
-		assertFalse(f.qlink2.hasSpace());
+		assertFalse(f.qlink2.isAcceptingFromUpstream());
 
 		f.qlink2.doSimStep(6.0); // first veh moves to buffer, used vehicle equivalents: 5.5
-		assertTrue(f.qlink2.hasSpace());
+		assertTrue(f.qlink2.isAcceptingFromUpstream());
 		f.qlink2.addFromUpstream(veh1);  // used vehicle equivalents: 6.5
 		f.qlink2.addFromUpstream(veh25); // used vehicle equivalents: 9.0
 		f.qlink2.addFromUpstream(veh1);  // used vehicle equivalents: 10.0
-		assertFalse(f.qlink2.hasSpace());
+		assertFalse(f.qlink2.isAcceptingFromUpstream());
 	}
 
 	public void testStuckEvents() {

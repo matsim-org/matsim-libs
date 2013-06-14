@@ -107,7 +107,7 @@ public class Sim2DAgent implements TwoDObject {
 			Sim2DQTransitionLink loResLink = this.pEnv.getLowResLink(nextLinkId);
 			if (loResLink != null) { //HACK? we are in the agent's mental model but perform a physical sim2D --> qSim transition 
 				// this should be handled in the link's corresponding PhysicalSim2DSection [gl April '13]
-				if (loResLink.hasSpace()) {
+				if (loResLink.isAcceptingFromUpstream()) {
 					QVehicle veh = this.getQVehicle();
 					veh.setCurrentLink(loResLink.getLink());
 					loResLink.addFromUpstream(veh);

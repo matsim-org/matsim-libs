@@ -258,9 +258,9 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 	}
 
 	@Override
-	boolean hasSpace() {
+	boolean isAcceptingFromUpstream() {
 		if (!this.transferToSim2D) {
-			return this.qLinkDelegate.hasSpace();
+			return this.qLinkDelegate.isAcceptingFromUpstream();
 		} else {
 			Collections.sort(this.dBoxes);
 			return this.dBoxes.get(0).psecBox.getNumberOfAllAgents() == 0;

@@ -146,7 +146,7 @@ class KaiHiResLink extends QLinkInternalI {
 	}
 
 	@Override
-	boolean hasSpace() {
+	boolean isAcceptingFromUpstream() {
 		// TODO Auto-generated method stub
 		throw new UnsupportedOperationException() ;
 	}

@@ -242,7 +242,7 @@ public class QNode implements NetsimNode {
 		QLinkInternalI nextQueueLink = network.getNetsimLinks().get(nextLinkId);
 		this.checkNextLinkSemantics(currentLink, nextLinkId, nextQueueLink, veh);
 
-		if (nextQueueLink.hasSpace()) {
+		if (nextQueueLink.isAcceptingFromUpstream()) {
 			moveVehicleFromInlinkToOutlink(veh, fromLaneBuffer, nextQueueLink);
 			return true;
 		}

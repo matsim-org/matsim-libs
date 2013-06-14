@@ -101,7 +101,7 @@ abstract class AbstractQLane {
 
 	abstract boolean hasGreenForToLink(Id toLinkId);
 	
-	abstract boolean hasSpace();
+	abstract boolean isAcceptingFromUpstream();
 	
 	final void updateRemainingFlowCapacity() {
 		this.remainingflowCap = this.flowCapacityPerTimeStep;

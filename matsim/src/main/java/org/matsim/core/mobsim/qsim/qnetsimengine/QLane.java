@@ -275,7 +275,7 @@ public final class QLane extends AbstractQLane implements Identifiable, Signaliz
 		return this.thisTimeStepGreen ;
 	}
 
-	 boolean addTransitToBuffer(final double now, final QVehicle veh) {
+	 boolean addTransit(final double now, final QVehicle veh) {
 		if (veh.getDriver() instanceof TransitDriverAgent) {
 			TransitDriverAgent driver = (TransitDriverAgent) veh.getDriver();
 			while (true) {
@@ -336,7 +336,7 @@ public final class QLane extends AbstractQLane implements Identifiable, Signaliz
 
 				/* is there still room left in the buffer, or is it overcrowded from the
 				 * last time steps? */
-				if (!hasBufferSpace()) {
+				if (!isAcceptingFromWait()) {
 					return;
 				}
 
@@ -455,7 +455,7 @@ public final class QLane extends AbstractQLane implements Identifiable, Signaliz
 			QLane toQueueLane = null;
 			toQueueLane = this.chooseNextLane(nextLinkId);
 			if (toQueueLane != null) {
-				if (toQueueLane.hasSpace()) {
+				if (toQueueLane.isAcceptingFromUpstream()) {
 					this.buffer.poll();
 					this.qLink.network.simEngine.getMobsim().getEventsManager().processEvent(
 							new LaneLeaveEvent(now, veh.getDriver().getId(), this.qLink.getLink().getId(), this.getId()));
@@ -556,7 +556,7 @@ public final class QLane extends AbstractQLane implements Identifiable, Signaliz
 	/**
 	 * @return <code>true</code> if there are less vehicles in buffer than the flowCapacity's ceil
 	 */
-	 boolean hasBufferSpace() {
+	 boolean isAcceptingFromWait() {
 		return ((this.buffer.size() < this.bufferStorageCapacity) && ((this.remainingflowCap >= 1.0)
 				|| (this.flowcap_accumulate >= 1.0)));
 	}
@@ -600,7 +600,7 @@ public final class QLane extends AbstractQLane implements Identifiable, Signaliz
 	 *         the whole link), than there is space for vehicles.
 	 */
 	@Override
-	boolean hasSpace() {
+	boolean isAcceptingFromUpstream() {
 		return this.usedStorageCapacity < getStorageCapacity();
 	}
 

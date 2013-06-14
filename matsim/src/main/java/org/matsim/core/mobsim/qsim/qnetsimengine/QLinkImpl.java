@@ -453,7 +453,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	}
 
 	@Override
-	boolean hasSpace() {
+	boolean isAcceptingFromUpstream() {
 		double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
 
 		boolean storageOk = this.usedStorageCapacity < this.storageCapacity ;

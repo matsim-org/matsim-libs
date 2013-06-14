@@ -303,7 +303,7 @@ public class QLinkLanesImpl extends AbstractQLink {
 	 */
 	private boolean moveWaitToBuffer(final double now) {
 		boolean movedAtLeastOne = false;
-		while (this.firstLane.hasBufferSpace()) {
+		while (this.firstLane.isAcceptingFromWait()) {
 			QVehicle veh = this.waitingList.poll();
 			if (veh == null) {
 				return movedAtLeastOne;
@@ -311,7 +311,7 @@ public class QLinkLanesImpl extends AbstractQLink {
 			movedAtLeastOne = true;
 			this.network.simEngine.getMobsim().getEventsManager().processEvent(
 					new AgentWait2LinkEvent(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId()));
-			boolean handled = this.firstLane.addTransitToBuffer(now, veh);
+			boolean handled = this.firstLane.addTransit(now, veh);
 			if (!handled) {
 				this.firstLane.addWaitToBuffer(veh, now);
 			}
@@ -335,8 +335,8 @@ public class QLinkLanesImpl extends AbstractQLink {
 	}
 
 	@Override
-	boolean hasSpace() {
-		return this.firstLane.hasSpace();
+	boolean isAcceptingFromUpstream() {
+		return this.firstLane.isAcceptingFromUpstream();
 	}
 
 	@Override
