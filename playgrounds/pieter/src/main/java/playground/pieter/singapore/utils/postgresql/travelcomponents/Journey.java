@@ -12,6 +12,7 @@ public class Journey extends TravelComponent {
 	private Activity fromAct;
 	private Activity toAct;
 	private boolean carJourney = false;
+	private boolean teleportJourney = false;
 	private LinkedList<Trip> trips = new LinkedList<Trip>();
 	private LinkedList<Transfer> transfers = new LinkedList<Transfer>();
 	private LinkedList<Wait> waits = new LinkedList<Wait>();
@@ -343,5 +344,13 @@ public class Journey extends TravelComponent {
 			return this.getTrips().getLast().getAlightingStop();
 		}
 		return null;
+	}
+
+	public boolean isTeleportJourney() {
+		return teleportJourney;
+	}
+
+	public void setTeleportJourney(boolean teleportJourney) {
+		this.teleportJourney = teleportJourney;
 	}
 }
