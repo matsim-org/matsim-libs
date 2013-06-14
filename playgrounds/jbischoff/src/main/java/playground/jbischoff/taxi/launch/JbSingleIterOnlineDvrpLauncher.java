@@ -62,6 +62,7 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
     /*package*/final String eventsFileName;
 
     /*package*/final Scenario scenario;
+    
 
     /*package*/MatsimVrpData data;
     /*package*/AlgorithmConfig algorithmConfig;
@@ -74,17 +75,18 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
 
     /*package*/JbSingleIterOnlineDvrpLauncher()
     {
-    	dirName = "Z:\\WinHome\\Docs\\maciejewski\\jbtest\\";
+//    	dirName = "Z:\\WinHome\\Docs\\maciejewski\\jbtest\\";
+    	dirName = "Z:\\WinHome\\Docs\\svn-checkouts\\jbischoff\\jbmielec\\";
         netFileName = dirName + "network.xml";
         electricStatsFilename = dirName + "elstats.txt";
-        electricStatsDir = dirName +"elstatsoutput";
+        electricStatsDir = dirName +"electric_depots\\";
         plansFileName = dirName + "20.plans.xml.gz";
 
         taxiCustomersFileName = dirName + "taxiCustomers_05_pc.txt";
         // taxiCustomersFileName = dirName + "taxiCustomers_10_pc.txt";
 
         depotsFileName = dirName + "depots-5_taxis-50.xml";
-        // depotsFileName = dirName + "depots-5_taxis-150.xml";
+//         depotsFileName = dirName + "depots-5_taxis-100.xml";
 
         // reqIdToVehIdFileName = dirName + "reqIdToVehId";
 
@@ -113,7 +115,7 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
         vrpOutFiles = !true;
         vrpOutDirName = dirName + "vrp_output";
 
-        outHistogram = true;
+        outHistogram = false;
         histogramOutDirName = dirName + "histograms";
 
         writeSimEvents = true;
@@ -142,6 +144,8 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
         }
 
         dirName = params.get("dirName") + '\\';
+        
+        
         netFileName = dirName + params.get("netFileName");
 
         plansFileName = dirName + params.get("plansFileName");
@@ -174,6 +178,10 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
      */
     /*package*/void go()
     {
+
+    	File f = new File(electricStatsDir);
+    	f.mkdirs();
+    	
     	ElectroCabLaunchUtils olutils = new ElectroCabLaunchUtils();
     	if (scenario == null) System.out.println("scen");
     	if (algorithmConfig.ttimeSource == null) System.out.println("ttsource");
@@ -194,7 +202,7 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
 
         EventWriter eventWriter = null;
         if (writeSimEvents) {
-            eventWriter = new EventWriterXML(dirName + "events.xml.gz");
+            eventWriter = new EventWriterXML(electricStatsDir + "events.xml.gz");
             events.addHandler(eventWriter);
         }
 
@@ -220,7 +228,6 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
             eventWriter.closeFile();
         }
 //        olutils.printStatisticsToConsole();
-        olutils.writeStatisticsToFile(electricStatsFilename);
         olutils.writeStatisticsToFiles(electricStatsDir);
         
         // check if all reqs have been served

@@ -237,40 +237,8 @@ public abstract class RankTaxiOptimizer
     }
 
 
-    protected void appendDeliveryAndWaitTasksAfterServeTask(Schedule schedule)
-    {
-        ServeTask serveTask = (ServeTask)Schedules.getLastTask(schedule);
-
-        // add DELIVERY after SERVE
-        Request req = ((ServeTask)serveTask).getRequest();
-        Vertex reqFromVertex = req.getFromVertex();
-        Vertex reqToVertex = req.getToVertex();
-        int t3 = serveTask.getEndTime();
-
-        if (reqFromVertex == reqToVertex) {
-            // Delivery cannot be skipped otherwise the passenger will never exit the taxi
-            throw new IllegalStateException("Unsupported!!!!!!");
-        }
-
-        Arc arc = data.getVrpGraph().getArc(reqFromVertex, reqToVertex);
-        int startIdling = t3 + arc.getTimeOnDeparture(t3);
-        schedule.addTask(new TaxiDriveTask(t3, startIdling, arc, req));
-         // addWaitTime at the end (even 0-second WAIT)
-        int tEnd = Math.max(startIdling, Schedules.getActualT1(schedule));
-        int startWaiting = startIdling;
-        if (reqToVertex != schedule.getVehicle().getDepot().getVertex()){
-        	Arc darc = data.getVrpGraph().getArc(reqToVertex,schedule.getVehicle().getDepot().getVertex());
-  		    startWaiting = startIdling + darc.getTimeOnDeparture(startIdling);
-  		    schedule.addTask(new BackToRankTask(startIdling,startWaiting,darc));
-//  		    System.out.println("scheduled wait task Id"+ schedule.getVehicle().getName()+" start "+startWaiting + " end "+tEnd);
-  		    schedule.addTask(new WaitTaskImpl(startWaiting, tEnd, schedule.getVehicle().getDepot().getVertex()));
-  		
-        	
-        }
-        else{
-        schedule.addTask(new WaitTaskImpl(startIdling, tEnd, reqToVertex));
-        }
-    }
+    abstract protected void appendDeliveryAndWaitTasksAfterServeTask(Schedule schedule);
+    
 
 
     /**

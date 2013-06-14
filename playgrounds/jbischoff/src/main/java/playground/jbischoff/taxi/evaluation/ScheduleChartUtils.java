@@ -104,15 +104,30 @@ public class ScheduleChartUtils
         {
             ChartTask t = getTask(row, column);
 
+            ChartTask tt;
+            TaskType lastType = TaskType.WAIT;
+            if (column > 0){
+            	tt = getTask(row,column-1);
+            	 lastType = tt.vrpTask.getType();
+            }
+            
             switch (t.vrpTask.getType()) {
                 case WAIT:
                     return Color.DARK_GRAY;
                 case DRIVE:
-                    return DARK_BLUE;
+                	if (column > 0){
+                		if (lastType.equals(t.vrpTask.getType())){
+                			return Color.MAGENTA;
+                		}
+                		else return DARK_BLUE;
+                		
+                	}
+                	else  return DARK_BLUE;
                 case SERVE:
                     if ( ((ServeTask)t.vrpTask).getRequest().getFixedVehicle()) {
                         return Color.ORANGE;
                     }
+                    
                     return DARK_RED;
                 default:
                     throw new IllegalStateException("only 3 task types are supported");

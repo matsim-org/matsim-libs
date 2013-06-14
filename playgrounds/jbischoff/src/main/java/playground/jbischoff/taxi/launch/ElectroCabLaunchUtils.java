@@ -30,10 +30,9 @@ import pl.poznan.put.util.lang.TimeDiscretizer;
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.network.ArcFactory;
-import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiOptimizer;
-import playground.jbischoff.energy.charging.ChargeUponDepotArrival;
 import playground.jbischoff.energy.charging.DepotArrivalDepartureCharger;
 import playground.jbischoff.energy.vehicles.BatteryElectricVehicleImpl;
+import playground.jbischoff.taxi.evaluation.TaxiCustomerWaitTimeAnalyser;
 import playground.jbischoff.taxi.evaluation.TravelDistanceTimeEvaluator;
 import playground.jbischoff.taxi.optimizer.rank.NOSRankTaxiOptimizer;
 import playground.jbischoff.taxi.sim.ElectricTaxiSimEngine;
@@ -77,6 +76,7 @@ public class ElectroCabLaunchUtils
     private DepotReader depotReader;
     private DepotArrivalDepartureCharger depotArrivalDepartureCharger;
     private TravelDistanceTimeEvaluator travelDistanceEvaluator;
+    private TaxiCustomerWaitTimeAnalyser taxiCustomerWaitTimeAnalyser;
 
     /**
      * Mandatory
@@ -178,8 +178,10 @@ public class ElectroCabLaunchUtils
      */
     public  QSim initQSim(MatsimVrpData data, NOSRankTaxiOptimizer optimizer)
     {
+    	optimizer.setRankMode(true);
     	boolean ALLCARSELECTRIC = true;
-        Scenario scenario = data.getScenario();
+        
+    	Scenario scenario = data.getScenario();
         EventsManager events = EventsUtils.createEventsManager();
 		EventHandlerGroup handlerGroup = new EventHandlerGroup();
 		
@@ -188,8 +190,9 @@ public class ElectroCabLaunchUtils
 		HashMap<Id, org.matsim.contrib.transEnergySim.vehicles.api.Vehicle> elvehicles=new HashMap<Id, org.matsim.contrib.transEnergySim.vehicles.api.Vehicle>();
 		
 		travelDistanceEvaluator = new TravelDistanceTimeEvaluator(scenario.getNetwork());
-
+		
 		if (ALLCARSELECTRIC){
+
 		for (Vehicle v : data.getVrpData().getVehicles()){
 			Id aid = new IdImpl(v.getName());
 			elvehicles.put(aid, new BatteryElectricVehicleImpl(ecm,20*1000*3600));
@@ -197,12 +200,19 @@ public class ElectroCabLaunchUtils
 		}
 		}
 		
+		for (Vehicle v : data.getVrpData().getVehicles()){
+			Id aid = new IdImpl(v.getName());
+			travelDistanceEvaluator.addAgent(aid);
+		}
+		
 		energyConsumptionTracker = new EnergyConsumptionTracker(elvehicles, scenario.getNetwork());
 		depotArrivalDepartureCharger =new DepotArrivalDepartureCharger(elvehicles);
+		taxiCustomerWaitTimeAnalyser = new TaxiCustomerWaitTimeAnalyser();
 		
 		handlerGroup.addHandler(travelDistanceEvaluator);
 		handlerGroup.addHandler(energyConsumptionTracker);
 		handlerGroup.addHandler(depotArrivalDepartureCharger);
+		handlerGroup.addHandler(taxiCustomerWaitTimeAnalyser);
 		depotArrivalDepartureCharger.setDepotLocations(this.depotReader.getDepotLinks());
 		events.addHandler(handlerGroup);
 		
@@ -217,6 +227,8 @@ public class ElectroCabLaunchUtils
 
         TeleportationEngine teleportationEngine = new TeleportationEngine();
         qSim.addMobsimEngine(teleportationEngine);
+        
+        
         optimizer.addDepotArrivalCharger(depotArrivalDepartureCharger);
         
         TaxiSimEngine taxiSimEngine = new ElectricTaxiSimEngine(qSim, data, optimizer,depotArrivalDepartureCharger);
@@ -259,18 +271,16 @@ public class ElectroCabLaunchUtils
 		System.out.println("===");
 
 	}
-	public void writeStatisticsToFile(String filename) {
-		System.out.println("writing energy consumption stats to "+ filename);
-		depotArrivalDepartureCharger.getSoCLog().writeToFile(filename);
-		System.out.println("...done");
-		travelDistanceEvaluator.printTravelDistanceStatistics();
-	
-	}
+
 	
 	public void writeStatisticsToFiles(String dirname) {
 		System.out.println("writing energy consumption stats directory to "+ dirname);
 		depotArrivalDepartureCharger.getSoCLog().writeToFiles(dirname);
+		travelDistanceEvaluator.writeTravelDistanceStatsToFiles(dirname + "travelDistanceStats.txt");
+		taxiCustomerWaitTimeAnalyser.writeCustomerWaitStats(dirname+"customerWaitStatistic.txt");
 		System.out.println("...done");
+		travelDistanceEvaluator.printTravelDistanceStatistics();
+		taxiCustomerWaitTimeAnalyser.printTaxiCustomerWaitStatistics();
 
 	
 	}

@@ -1,5 +1,7 @@
 package playground.jbischoff.energy.charging;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
@@ -12,6 +14,7 @@ import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
 
@@ -31,6 +34,7 @@ public class DepotArrivalDepartureCharger implements AgentArrivalEventHandler,
 	private final double POWERINKW = 50.0; //max charge for Nissan Leaf
 	private final double MINIMUMSOCFORDEPARTURE = 4.;
 	private static final Logger log = Logger.getLogger(DepotArrivalDepartureCharger.class);
+	private  final double NEEDSTORETURNTORANKSOC = 8.;
 	private SoCLog soCLog;
 
 	
@@ -93,13 +97,25 @@ public class DepotArrivalDepartureCharger implements AgentArrivalEventHandler,
 	}
 	
 	public void refreshLog(double time){
+		List<Double> currentSoc = new ArrayList<Double>();
+		
 		for (Entry<Id,Vehicle> e : this.vehicles.entrySet() ){
 			if (!isBatteryElectricVehicle(e.getKey())) continue;
 			double soc = ((BatteryElectricVehicle)e.getValue()).getSocInJoules();
 			double rsoc = soc / ((BatteryElectricVehicle)e.getValue()).getUsableBatteryCapacityInJoules();
 			this.soCLog.add(new SocLogRow(e.getKey(),time,soc,rsoc));
+			currentSoc.add(soc);
 		}
-		
+		if (currentSoc.size() > 0){
+		this.soCLog.add(new SocLogRow(new IdImpl("max"),time,Collections.max(currentSoc),0));
+		this.soCLog.add(new SocLogRow(new IdImpl("min"),time,Collections.min(currentSoc),0));
+		double socs=0;
+		for (Double d: currentSoc){
+			socs += d;
+		}
+		double average=socs/currentSoc.size();
+		this.soCLog.add(new SocLogRow(new IdImpl("ave"),time,average,0));
+		}
 	}
 	
 	@Override
@@ -131,7 +147,7 @@ public class DepotArrivalDepartureCharger implements AgentArrivalEventHandler,
 	}
 	
 	public boolean isChargedForTask(Id carId){
-		boolean charged = true; //default is true, e.g. for petrol-based cars
+		boolean charged = true; //default is true, e.g. for petrol-based cars in mixed taxi fleets
 	
 		if (this.vehicles.containsKey(carId))
 			if (isBatteryElectricVehicle(carId))			
@@ -141,4 +157,15 @@ public class DepotArrivalDepartureCharger implements AgentArrivalEventHandler,
 		return charged;
 	}
 
+	public boolean needsToReturnToRank(Id carId){
+		boolean lackOfSoc = false;
+		//e.g if using mixed fleets
+		
+		if (this.vehicles.containsKey(carId))
+			if (isBatteryElectricVehicle(carId))			
+				if (((BatteryElectricVehicle)this.vehicles.get(carId)).getSocInJoules() < this.NEEDSTORETURNTORANKSOC*3600*1000) 
+					lackOfSoc= true;
+		
+		return lackOfSoc;
+	}
 }

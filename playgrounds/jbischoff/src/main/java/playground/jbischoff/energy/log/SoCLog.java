@@ -104,6 +104,8 @@ public class SoCLog {
 public void writeToFiles(String outputFileDir)  {
 	
 	try {
+		if (log.isEmpty()) return;
+		
 		Collections.sort(log);
 		Id last = log.get(0).getAgentId();
 		String filename = (outputFileDir+"/"+last.toString()+".txt");

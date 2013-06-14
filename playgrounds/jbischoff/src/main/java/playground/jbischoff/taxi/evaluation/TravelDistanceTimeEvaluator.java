@@ -1,10 +1,16 @@
 package playground.jbischoff.taxi.evaluation;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
@@ -14,6 +20,8 @@ import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
+
+import playground.jbischoff.energy.log.SocLogRow;
 
 public class TravelDistanceTimeEvaluator implements LinkLeaveEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
 
@@ -29,13 +37,13 @@ public class TravelDistanceTimeEvaluator implements LinkLeaveEventHandler, Perso
 	
 	
 	public TravelDistanceTimeEvaluator(Network network) {
-		this.taxiTravelDistance= new HashMap<Id,Double>();
+		this.taxiTravelDistance= new TreeMap<Id,Double>();
 		this.taxiTravelDistancesWithPassenger= new HashMap<Id,Double>();
 		this.taxiTravelDurationwithPassenger= new HashMap<Id,Double>();
 		this.lastDepartureWithPassenger= new HashMap<Id,Double>();
 		this.lastDeparture = new HashMap<Id,Double>();
 		this.taxiTravelDuration = new HashMap<Id,Double>();
-		this.isOccupied = new ArrayList();
+		this.isOccupied = new ArrayList<Id>();
 		this.network = network;
 	}
 
@@ -69,17 +77,65 @@ public class TravelDistanceTimeEvaluator implements LinkLeaveEventHandler, Perso
 	}
 	
 	public void printTravelDistanceStatistics(){
+		double tkm = 0.;
+		double tpkm = 0.;
 		System.out.println("Agent ID\tdistanceTravelled\tdistanceTravelledWithPax\tOccupanceOverDistance\tTravelTime\tTravelTimeWithPax\tOccupanceOverTime");
 		for (Entry<Id,Double> e: this.taxiTravelDistance.entrySet()){
 			double relativeOccupanceDist = this.taxiTravelDistancesWithPassenger.get(e.getKey()) /e.getValue();
+			tpkm += this.taxiTravelDistancesWithPassenger.get(e.getKey());
 			double relativeOccpanceTime = this.taxiTravelDurationwithPassenger.get(e.getKey()) / this.taxiTravelDuration.get(e.getKey());
+			tkm += e.getValue();
 			System.out.println(e.getKey()+"\t"+(e.getValue()/1000)+"\t"+(this.taxiTravelDistancesWithPassenger.get(e.getKey())/1000)+"\t"+relativeOccupanceDist+"\t"+this.taxiTravelDuration.get(e.getKey())+"\t"+this.taxiTravelDurationwithPassenger.get(e.getKey())+"\t"+relativeOccpanceTime);
 		}
+		tkm = tkm / 1000;
+		tpkm = tpkm /1000;
+		
+		System.out.println("Average Taxi km travelled:" +tkm/this.taxiTravelDistance.size());
+		System.out.println("Average Taxi pkm travelled:" +tpkm/this.taxiTravelDistance.size());
+
 	}
+	public void writeTravelDistanceStatsToFiles(String distanceFile){
+		
+		try {
+			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(distanceFile)));
+			double tkm = 0.;
+			double tpkm = 0.;
+			double s = 0.;
+			double ps = 0.;
+			bw.write("Agent ID\tdistanceTravelled\tdistanceTravelledWithPax\tOccupanceOverDistance\tTravelTime\tTravelTimeWithPax\tOccupanceOverTime");
+			for (Entry<Id,Double> e: this.taxiTravelDistance.entrySet()){
+				tpkm += this.taxiTravelDistancesWithPassenger.get(e.getKey());
+				tkm += e.getValue();
+				s +=  this.taxiTravelDuration.get(e.getKey());
+				ps += this.taxiTravelDurationwithPassenger.get(e.getKey());
+				
+				bw.newLine();
+				double relativeOccupanceDist = this.taxiTravelDistancesWithPassenger.get(e.getKey()) /e.getValue();
+				double relativeOccpanceTime = this.taxiTravelDurationwithPassenger.get(e.getKey()) / this.taxiTravelDuration.get(e.getKey());
+				bw.write(e.getKey()+"\t"+(e.getValue()/1000)+"\t"+(this.taxiTravelDistancesWithPassenger.get(e.getKey())/1000)+"\t"+relativeOccupanceDist+"\t"+this.taxiTravelDuration.get(e.getKey())+"\t"+this.taxiTravelDurationwithPassenger.get(e.getKey())+"\t"+relativeOccpanceTime);
+				
+			}
+			tkm = tkm / 1000;
+			tkm = tkm / this.taxiTravelDistance.size();
+			tpkm = tpkm /1000;
+			tpkm = tpkm / this.taxiTravelDistance.size();
+			s /= this.taxiTravelDistance.size();
+			ps /=this.taxiTravelDistance.size();
+			
+			bw.newLine();
+			bw.write("average\t"+tkm+"\t"+tpkm+"\t"+(tpkm/tkm)+"\t"+s+"\t"+ps+"\t"+(ps/s));
+			
+			bw.flush();
+			bw.close();
+		} catch (IOException e) {
+			System.err.println("Could not create File" + distanceFile);
+			e.printStackTrace();
+		}
+	}
+	
 
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
-		// TODO Auto-generated method stub
 		if (isMonitoredVehicle(event.getPersonId())) handleTaxiDriverLeavesEvent(event);
 		if (event.getPersonId().equals(event.getVehicleId())) return;
 		double travelTimeWithPax = event.getTime() - this.lastDepartureWithPassenger.get(event.getVehicleId());
@@ -97,7 +153,6 @@ public class TravelDistanceTimeEvaluator implements LinkLeaveEventHandler, Perso
 		if (isMonitoredVehicle(event.getPersonId())) handleTaxiDriverEntersEvent(event);
 
 		if (event.getPersonId().equals(event.getVehicleId())) return;
-//		System.out.println(event.getVehicleId() + "dep");
 		this.lastDepartureWithPassenger.put(event.getVehicleId(), event.getTime());
 		this.isOccupied.add(event.getVehicleId());
 	}
