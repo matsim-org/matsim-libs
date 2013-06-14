@@ -61,14 +61,14 @@ public class TransitControler {
 
 		config.getQSimConfigGroup().setVehicleBehavior( QSimConfigGroup.VEHICLE_BEHAVIOR_TELEPORT ) ;
 		
-		config.otfVis().setShowTeleportedAgents(true) ;
+//		config.otfVis().setShowTeleportedAgents(true) ;
 		
 
 		Controler tc = new Controler(config) ;
 		tc.setOverwriteFiles(true);
 		
-		Logger.getLogger("main").warn("warning: using randomized pt router!!!!") ;
-		tc.addControlerListener(new RandomizedTransitRouterTravelTimeAndDisutilityControlerListener());
+//		Logger.getLogger("main").warn("warning: using randomized pt router!!!!") ;
+//		tc.addControlerListener(new RandomizedTransitRouterTravelTimeAndDisutilityControlerListener());
 
 		tc.setMobsimFactory(new MyMobsimFactory()) ;
 		tc.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
@@ -90,7 +90,7 @@ public class TransitControler {
 				otfVisConfig.setDrawTransitFacilities(false) ; // this DOES work
 				//				otfVisConfig.setShowParking(true) ; // this does not really work
 				otfVisConfig.setColoringScheme(OTFVisConfigGroup.ColoringScheme.bvg) ;
-				otfVisConfig.setShowTeleportedAgents(false) ;
+//				otfVisConfig.setShowTeleportedAgents(false) ;
 
 				OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, eventsManager, qSim);
 				OTFClientLive.run(sc.getConfig(), server);
