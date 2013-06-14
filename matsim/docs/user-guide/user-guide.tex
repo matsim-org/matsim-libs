@@ -170,18 +170,12 @@ Generated 2013-06-12T12:13:34+02:00
 
 
 \chapter{Introduction}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/139%23comment-form}{Log in} to post comments
-\end{itemize}
 
 The "tutorial" section contains "reduced" information about how to find your way into matsim.
 
 This "user's guide" section contains additional information,  concentrating on features and details that are not explained in the  tutorials. Clearly, there may be overlap.
 
 \chapter{Features}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/140%23comment-form}{Log in} to post comments
-\end{itemize}
 
 The following list shows the key features of MATSim:
 
@@ -208,9 +202,6 @@ The following list shows the key features of MATSim:
 
 
 \chapter{System Requirements}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/141%23comment-form}{Log in} to post comments
-\end{itemize}
 
 \subsubsection{Software}
 
@@ -241,20 +232,11 @@ The  high numbers for free disk space result from the fact that the  simulation 
 Currently,  we simulate most of our scenarios on machines with 8 or 16 GB RAM,  having 2 dual-core processors. The amount of memory allows us to run 2  scenarios at the same time on the machines. A\href{http://en.wikipedia.org/wiki/RAID}{RAID}  array is used as storage backend, offering about 4 TB of hard disk  space. This huge disk space is able to store the results of hundreds of  simulations and will suit us for the next few years. Computers and RAID  are regular components used in data centers, usually available at  moderate prices.
 
 \chapter{Terminology}
-%% \begin{itemize}
-%% 	\item \href{http://www.matsim.org/user/login?destination=comment/reply/509%23comment-form}{Log in} to post comments
-%% \end{itemize}
 
 In  many cases, MATSim uses a terminology that is different from the  mainstream terminology. In most cases, the reason is that the  concepts are only similar, but not identic, and we wanted to avoid the  confusion of using the same term for aspects that are similar but not  identical. The following attempts some commented approximate  "translations" from more standard teminology to MATSim terminology.
 
 \vfill\eject
 \section{Choice set $\to$ ``plan set'' of an agent}
-
-%% \begin{itemize}
-%% 	\item \href{http://www.matsim.org/user/login?destination=comment/reply/539%23comment-form}{Log in} to post comments
-%% \end{itemize}
-
-%% \subsubsection{Choice set --$>$ "plan set" of an agent}
 
 \textbf{Comments:} During MATSim iterations, agent accumulate   plans. This can be  interpreted as building a choice set over  time. A  problem is that the  process that generates the choice  set at this  point is not systematic.
 
@@ -263,44 +245,21 @@ In  many cases, MATSim uses a terminology that is different from the  mainstream
 \vfill\eject
 \section{Choice set generation --$>$ Time mutation/re-route/... ; "innovation"}
 
-%% \begin{itemize}
-%% 	\item \href{http://www.matsim.org/user/login?destination=comment/reply/540%23comment-form}{Log in} to post comments
-%% \end{itemize}
-
-%% \subsubsection{Choice set generation --$>$ Time mutation/re-route/... ; "innovation"}
-
 \textbf{Comments:} As said above, the set of MATSim plans can   be seen as this agent's choice set. MATSim generates new plans   "on-the-fly", i.e. while the simulation is running. We sometimes  call  this "innovation", since agents create new plans (= add entries to  the  choice set), rather than choosing between existing plans.
 
 \vfill\eject
 \section{Choice set generation, choice --$>$ replanning}
-
-%% \begin{itemize}
-%% 	\item \href{http://www.matsim.org/user/login?destination=comment/reply/546%23comment-form}{Log in} to post comments
-%% \end{itemize}
-
-%% \subsubsection{choice set generation, choice --$>$ replanning}
 
 In MATSim, there is no strict separation between "choice set  generation" and "choice": at the replanning step, for each agent, a  replanning strategy is randomly choosen. This strategy may consist in  selecting a random plan to use to generate a new plan by mutation  ("choice set generation" part), or just to select a past plan based on  the experienced score ("choice" part).
 
 \vfill\eject
 \section{Convergence --$>$ learning rate}
 
-%% \begin{itemize}
-%% 	\item \href{http://www.matsim.org/user/login?destination=comment/reply/547%23comment-form}{Log in} to post comments
-%% \end{itemize}
-
-%% \subsubsection{Convergence --$>$ learning rate}
-
 Scores in matsim are computed as score\_new = (1-alpha) * score\_old +   alpha * score\_sim, where score\_sim is the score that is obtained from   the execution of the plans (= network loading).
 
 \vfill\eject
 \section{Mu (logit model scaling factor) --$>$ beta\_brain}
 
-%% \begin{itemize}
-%% 	\item \href{http://www.matsim.org/user/login?destination=comment/reply/545%23comment-form}{Log in} to post comments
-%% \end{itemize}
-
-%% \subsubsection{mu (logit model scaling factor) --$>$ beta\_brain}
 
 Matsim scoring function = BrainExpBeta * $\backslash$sum\_i beta\_i * attribute\_i
 
@@ -311,11 +270,6 @@ Note that for estimation, $\backslash$mu and the $\backslash$beta\_i are not ind
 \vfill\eject
 \section{Multinomial logit --$>$ ExpBetaPlanSelector}
 
-%% \begin{itemize}
-%% 	\item \href{http://www.matsim.org/user/login?destination=comment/reply/541%23comment-form}{Log in} to post comments
-%% \end{itemize}
-
-%% \subsubsection{Multinomial logit --$>$ ExpBetaPlanSelector}
 
 \textbf{Comments:}
 \begin{itemize}
@@ -328,11 +282,6 @@ Note that for estimation, $\backslash$mu and the $\backslash$beta\_i are not ind
 \vfill\eject
 \section{Network loading --$>$ mobsim, mobility simulation, physical simulation}
 
-%% \begin{itemize}
-%% 	\item \href{http://www.matsim.org/user/login?destination=comment/reply/543%23comment-form}{Log in} to post comments
-%% \end{itemize}
-
-%% \subsubsection{network loading --$>$ mobsim, mobility simulation, physical simulation}
 
 \textbf{Comments:} The standard terminology has the "network   loading" on the "supply  side". In my (KN's) view, the  "simulation of  the physical system" is  not the supply side, but what  in economics is  called "technology". This  can for example be  seen in the fact that  "lane changing" is part of the  mobsim, but this  is, in my view, not a  "supply side" aspect.
 
@@ -340,11 +289,6 @@ Note that for estimation, $\backslash$mu and the $\backslash$beta\_i are not ind
 
 \vfill\eject
 \section{Stationary --$>$ relaxed}
-%% \begin{itemize}
-%% 	\item \href{http://www.matsim.org/user/login?destination=comment/reply/542%23comment-form}{Log in} to post comments
-%% \end{itemize}
-
-%% \subsubsection{stationary --$>$ relaxed}
 
 \textbf{Comments:} "stationary" means that the probability   distribution does not shift any  more. However, as long as  "innovation"  is still switched in on MATSim  (new routes, new times,  ...), the  result is not truly stationary. Thus  we avoid the  word. If innovation  is switched off, the result is indeed a   statinary process, but limited  to the set of plans that every agent has   at that point in time.
 
@@ -380,18 +324,10 @@ The above means:
 \vfill\eject
 \section{Utility $<$--$>$ score}
 
-%% \begin{itemize}
-%% 	\item \href{http://www.matsim.org/user/login?destination=comment/reply/544%23comment-form}{Log in} to post comments
-%% \end{itemize}
-
-%% \subsubsection{utility $<$--$>$ score}
 
 At least when using random utility models (such as multinomial logit   aka ExpBeta...), the score has the same function as the deterministic   utility.
 
 \chapter{Building new scenarios}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/144%23comment-form}{Log in} to post comments
-\end{itemize}
 
 Starting  a new scenario (our term for the application of MATSim to a  region/area) can appear quite cumbersome at the first glace, as a lot of  data preparation may be required.In any case required for a new  scenario are:
 \begin{itemize}
@@ -419,9 +355,6 @@ The following sections contains various information for building a scenario that
 
 \vfill\eject
 \section{Coordinate Systems in MATSim}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/405%23comment-form}{Log in} to post comments
-\end{itemize}
 
 For  some operations, MATSim must know about the coordinate system your data  is in. For example, If you want to generate kml-Output for  Counts-Validation, MATSim has to convert the coordinates in your network  to WGS84, the coordinate system used by Google Earth.
 
@@ -449,9 +382,6 @@ As the distance calculation in WGS84-coordinates (or any spherical coordinates) 
 
 \vfill\eject
 \section{Using MATSim for Switzerland}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/580%23comment-form}{Log in} to post comments
-\end{itemize}
 
 \subsubsection{General remarks}
 
@@ -471,9 +401,6 @@ A. Horni: Shortly, there will be a working paper describing the usage of MATSim 
 
 \vfill\eject
 \section{Using MATSim from Urbansim (for the PSRC region)}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/309%23comment-form}{Log in} to post comments
-\end{itemize}
 
 Deprecated (and soon to be removed). See \href{http://matsim.org/extensions/matsim4urbansim}{here} instead.
 
@@ -488,15 +415,6 @@ Deprecated (and soon to be removed). See \href{http://matsim.org/extensions/mats
 
 \chapter{Strategy Modules}
 
-%%\begin{itemize}
-%%	\item \href{http://www.matsim.org/user/login?destination=comment/reply/740%23comment-form}{Log in} to post comments
-%%\end{itemize}
-
-%%This  section describes possible settings of config.xml, the MATSim  configuration file. The section is probably incomplete since  documentation always lags behind the actual code; please also look at  the config dumps including their internal comments in the log files.
-
-%%\begin{itemize}
-%%	\item \href{http://www.matsim.org/user/login?destination=comment/reply/478%23comment-form}{Log in} to post comments
-%%\end{itemize}
 
 These are modules that can be used via the syntax
 \begin{verbatim}
@@ -533,9 +451,6 @@ It is not clear which combinations of these modules can be used  together. Depen
 \section{Selectors}
 
 \subsection{BestScore.  Status: works}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/698%23comment-form}{Log in} to post comments
-\end{itemize}
 
 Pure plan selecting (i.e. non-innovative) strategy module.
 
@@ -544,19 +459,10 @@ Will select the plan with the highest score. The score will be updated after exe
 Disadvantage: Will never try again plans that obtained a bad score  from a fluctuation (e.g. a rare traffic jam). It is therefore  recommended to either use this in conjunction with a small probability  for RandomPlanSelector, or to use ChangeExpBeta.
 
 \subsection{ChangeExpBeta. Status: works. RECOMMENDED!}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/700%23comment-form}{Log in} to post comments
-\end{itemize}
 
 \subsection{KeepLastSelected. Status: works}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/702%23comment-form}{Log in} to post comments
-\end{itemize}
 
 \subsection{SelectExpBeta. Status: works}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/699%23comment-form}{Log in} to post comments
-\end{itemize}
 
 Multinomial logit model choice between plans.
 
@@ -566,23 +472,14 @@ p_i = exp( beta_brain * score_i) / sum_j exp( beta_brain * score_j )
 \end{verbatim}
 
 \subsection{SelectRandom}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/701%23comment-form}{Log in} to post comments
-\end{itemize}
 
 \vfill\eject
 \section{Innovative modules}
 
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/697%23comment-form}{Log in} to post comments
-\end{itemize}
 
 Divider: Pure plan selectors above, innovative strategy modules below.
 
 \subsection{ReRoute.  Status: nearly indispensable}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/573%23comment-form}{Log in} to post comments
-\end{itemize}
 
 \textbf{Maintainer:} Marcel Rieser
 
@@ -622,9 +519,6 @@ It is possible to route such legs on the network, by using a different router.
 It is \emph{not} possible to "physically" execute a leg in the  mobsim if it has not been routed before. That is, the capability  of the router needs to be $>$= the capability of the mobsim.  (Makes sense, if one thinks about it.)
 
 \subsection{TimeAllocationMutator.  Status: works for vsp and ivt}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/388%23comment-form}{Log in} to post comments
-\end{itemize}
 
 Simple  module that shifts activity end times randomly. ("Good" time  shifts will be selected through the matsim plans selection mechanism.)
 
@@ -633,9 +527,6 @@ The maximum extent of the shifts can be configured; see the config  section of t
 The usage of the module is configured in the "strategy" section.
 
 \subsection{ ChangeSingleLegMode. Status: works}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/736%23comment-form}{Log in} to post comments
-\end{itemize}
 
 \textbf{Maintainer:} Marcel Rieser
 
@@ -662,9 +553,6 @@ By default, the simulation will handle legs with modes different from  "car" by 
 
 
 \subsection{ChangeLegMode. Status: works}
-%%\begin{itemize}
-%%	\item \href{http://www.matsim.org/user/login?destination=comment/reply/387%23comment-form}{Log in} to post comments
-%%\end{itemize}
 
 
 \textbf{Maintainer:} Michael Zilske
@@ -702,9 +590,6 @@ $<$param name="Module\_X" value="TransitChangeLegMode" /$>$
 M. Rieser, D. Grether, K. Nagel;\textbf{Adding mode choice to a multi-agent transport simulation}; TRB'09
 
 \subsection{LocationChoice. Status: ready}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/218%23comment-form}{Log in} to post comments
-\end{itemize}
 
 \subsubsection{\textbf{Maintenance and Questions}}
 
@@ -828,9 +713,6 @@ The parameters \emph{restraintFcnFactor}and \emph{restraintFcnExp }are explained
 
 
 \subsection{SubtourModeChoice. Status: probably works}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/477%23comment-form}{Log in} to post comments
-\end{itemize}
 
 \textbf{Maintainer:} Michael Zilske
 
@@ -862,9 +744,6 @@ For modes other than car, travel time and travel distance are  computed accordin
 
 \vfill\eject
 \section{Combination of strategy modules}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/690%23comment-form}{Log in} to post comments
-\end{itemize}
 
 It  is not clear which combinations of these modules can be used together.  Depending on required features, special variants sometimes need to be  used. This has not yet been sorted out.
 
@@ -906,9 +785,6 @@ Legend:
 \end{itemize}
 
 \chapter{Other configurable modules}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/377%23comment-form}{Log in} to post comments
-\end{itemize}
 
 Modules are loosely defined by their corresponding entry in the config file.
 
@@ -922,9 +798,6 @@ Maintainers are mentioned as far as possible, but they are \emph{not} responsibl
 
 \vfill\eject
 \section{"JDEQSim".  Status: works for ivt}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/249%23comment-form}{Log in} to post comments
-\end{itemize}
 
 \textbf{Maintainer:} Rashid Waraich
 
@@ -1015,9 +888,6 @@ Waraich,  R., D. Charypar, M. Balmer and K.W. Axhausen (2009) Performance  impro
 
 \vfill\eject
 \section{"controler". Status: indispensable}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/389%23comment-form}{Log in} to post comments
-\end{itemize}
 
 \subsubsection{\textbf{Maintenance and Questions}}
 
@@ -1046,9 +916,6 @@ See \href{http://matsim.org/node/398}{here} for some instructions how to use an 
 
 \vfill\eject
 \section{"counts". Status: works for vsp and ivt}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/404%23comment-form}{Log in} to post comments
-\end{itemize}
 
 \subsubsection{\textbf{Maintenance and Questions:}}
 
@@ -1131,9 +998,6 @@ The counts-module offers the following config-parameters:
 
 \vfill\eject
 \section{"evacuation"(-ivt). Status: ??}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/525%23comment-form}{Log in} to post comments
-\end{itemize}
 
 Evacuation code used by IVT; please note that IVT and VSP use different evacuation codes.
 
@@ -1143,9 +1007,6 @@ I (kn) don't know how this works
 
 \vfill\eject
 \section{"evacuation"(-vsp). Status: works if you know what you are doing}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/391%23comment-form}{Log in} to post comments
-\end{itemize}
 
 (Note that VSP and IVT use different evacuation packages.)
 
@@ -1168,9 +1029,6 @@ I (kn) can't say how this works. There is, at this point, neither documentation 
 
 \vfill\eject
 \section{"facilities". Status: "user" version work in progress}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/393%23comment-form}{Log in} to post comments
-\end{itemize}
 
 \textbf{Maintainer:} Andreas Horni
 
@@ -1180,9 +1038,6 @@ The prototype for this is fairly old. But the final design is  somewhat differen
 
 \vfill\eject
 \section{"global". Status: indispensable}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/392%23comment-form}{Log in} to post comments
-\end{itemize}
 
 \textbf{"Maintainer":} Marcel Rieser
 
@@ -1190,9 +1045,6 @@ The prototype for this is fairly old. But the final design is  somewhat differen
 
 \vfill\eject
 \section{"households". Status: probably ready but nowhere used}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/394%23comment-form}{Log in} to post comments
-\end{itemize}
 
 \textbf{Maintainer:} Christoph Dobler
 
@@ -1202,9 +1054,6 @@ I (kn) don't know the exact status.
 
 \vfill\eject
 \section{"network" (time dependent). Status: works for vsp}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/222%23comment-form}{Log in} to post comments
-\end{itemize}
 
 \textbf{Maintenance:} G. Lämmel, VSP
 
@@ -1257,9 +1106,6 @@ It  seems that the ``absolute'' version of this module was never tested (and  ma
 
 \vfill\eject
 \section{"parallelEventHandling". Status: works for ivt and vsp}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/460%23comment-form}{Log in} to post comments
-\end{itemize}
 
 \textbf{Maintainer:} Rashid Waraich
 
@@ -1269,9 +1115,6 @@ see details \href{http://matsim.org/node/238}{here}.
 
 \vfill\eject
 \section{"planCalcScore". Status: nearly indispensible}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/396%23comment-form}{Log in} to post comments
-\end{itemize}
 
 \textbf{Maintainer:} Marcel Rieser
 
@@ -1283,9 +1126,6 @@ There is also some description in the "scoring function" section of the document
 
 \vfill\eject
 \section{"qsim" (parallel version). Status: looks promising}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/378%23comment-form}{Log in} to post comments
-\end{itemize}
 
 Responsible: C. Dobler, IVT
 
@@ -1317,9 +1157,6 @@ Any number of threads larger than one triggers the use of the parallel version. 
 
 \vfill\eject
 \section{"qsim". Status: works but is not very transparent}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/397%23comment-form}{Log in} to post comments
-\end{itemize}
 
 \sout{If you do \textbf{\emph{not}} put a "qsim" section into the config file, the system will use the default "simulation" (look there).}
 
@@ -1383,9 +1220,6 @@ The effective lane width might be used by the visualization (unclear if this is 
 
 \vfill\eject
 \section{"roadpricing".  Status: works for vsp}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/383%23comment-form}{Log in} to post comments
-\end{itemize}
 
 \textbf{Maintainer:} Michael Zilske
 
@@ -1438,20 +1272,12 @@ Publications using this module:
 \end{itemize}This documentation is missing an  explanation of the "lanes" option. Please ask if you need this  (separate "lanes" for separate turning movements).
 
 
-%%\begin{itemize}
-%%	\item %%\href{http://www.matsim.org/user/login?destination=comment/reply/384%23comment-form}{Log in} to post comments
-%%\end{itemize}
-%%\begin{tabular}
-%%\textbf{Attachment} & \textbf{Size} \\ 
 
 %%%\includegraphics{User%27s%20Guide_files/application-pdf.png}\href{http://www.matsim.org/uploads/384/signals_tutorial_0.pdf}{signals\_tutorial.pdf} & 77.72 KB
 %%\end{tabular}
 
 \vfill\eject
 \section{"simulation". Status: should work}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/398%23comment-form}{Log in} to post comments
-\end{itemize}
 
 This  was essentially the production of the queue simulation until Nov/2010.  The "qsim" was then forked out for further development. Unfortunately,  this fork was done somewhat too late, so "simulation" is not exactly the  stable version that was used over many years, but something that is  already somewhat modified, and was not used very much after that.  (Please let us know if you have problems.)
 
@@ -1474,9 +1300,6 @@ I.e. you need to specify that you are \emph{not} using the (queue)Simulation, bu
 
 \vfill\eject
 \section{"strategy". Status: indispensable}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/400%23comment-form}{Log in} to post comments
-\end{itemize}
 
 \textbf{Maintainer:} Marcel Rieser ("core")
 
@@ -1484,9 +1307,6 @@ See \href{http://matsim.org/node/478}{here}.
 
 \vfill\eject
 \section{"transit" (public transport).  Status: works}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/385%23comment-form}{Log in} to post comments
-\end{itemize}
 
 A  public transport system is simulated and integrated on a fine scale  with both the traffic simulation and the behavior of the artificial  population.
 
@@ -1502,9 +1322,6 @@ M. Rieser, K. Nagel;\textbf{Combined agent-based simulation of private car traff
 
 \vfill\eject
 \section{"travelTimeCalculator". Status: nearly indispensable}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/401%23comment-form}{Log in} to post comments
-\end{itemize}
 
 \textbf{Maintainer:} Marcel Rieser ("core")
 
@@ -1512,17 +1329,11 @@ M. Rieser, K. Nagel;\textbf{Combined agent-based simulation of private car traff
 
 \vfill\eject
 \section{"vehicles". Status: probably reads the file correctly, but does nothing else}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/515%23comment-form}{Log in} to post comments
-\end{itemize}
 
 \textbf{Maintainer:} Michael Zilske (within limits of DFG/MUC project; possibly pt project)
 
 \vfill\eject
 \section{"vspExperimental". Status: used by VSP}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/630%23comment-form}{Log in} to post comments
-\end{itemize}
 
 This  section defines switches that are used at VSP or when collaborating  with VSP. There are experimental and may we withdrawn without  notice.
 
@@ -1551,17 +1362,11 @@ Since those settings involve all aspects of matsim, they may often be irrelevant
 
 \vfill\eject
 \section{0 deprecated modules}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/508%23comment-form}{Log in} to post comments
-\end{itemize}
 
 \subsubsection{Deprecated Modules}
 
 \vfill\eject
 \section{"world"}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/403%23comment-form}{Log in} to post comments
-\end{itemize}
 
 \textbf{Dismantler:} Michael Zilske
 
@@ -1572,17 +1377,11 @@ Has been superceeded by calls to geotools. Please use geotools  functionality. L
 World also provides datastructures to assign facilities to links, and  links to zones, etc. This functionality is mostly used in initial  demand modelling, but is not very straight-forwardly implemented. Should  be replaced in the future with some kind of "mappig manager" to manage  the mappings between different MATSim objects, like facilities, links,  etc.
 
 \chapter{The MATSim default scoring function (= utility function)}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/325%23comment-form}{Log in} to post comments
-\end{itemize}
 
 This section contains information that pertains to the so-called "Charypar-Nagel scoring function".
 
 \vfill\eject
 \section{Calibration of the scoring function}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/650%23comment-form}{Log in} to post comments
-\end{itemize}
 
 \subsubsection{Simplified version}
 
@@ -1667,9 +1466,6 @@ Both of these interpretations make sense (in my view) and should  be investigate
 
 \vfill\eject
 \section{Default values for the Charypar-Nagel scoring function}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/708%23comment-form}{Log in} to post comments
-\end{itemize}
 
 As explained \href{http://matsim.org/node/650}{here},  the MATSim scoring function has, under some circumstances (actual  durations near "typical" durations"), some similarity to the Vickrey  scenario.
 
@@ -1689,9 +1485,6 @@ As a next step, an infrastructure to compare MATSim simulations with  real world
 
 \vfill\eject
 \section{Interpretation of the logarithmic "utility of performing"}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/651%23comment-form}{Log in} to post comments
-\end{itemize}
 
 The  so-called "Charypar-Nagel scoring function" is used in many  MATSim  studies. It is called that way because there is an ancient paper   where this scoring function was introduced.
 
@@ -1816,9 +1609,6 @@ beta = U'(x=t_x) = - 2 a t_x + prio, i.e. a = (prio - beta)/2t_x
 There is other work (e.g. by Joh) that should be looked at.
 
 \chapter{Visualization and analysis}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/741%23comment-form}{Log in} to post comments
-\end{itemize}
 
 There are two visualizers available for MATSim. The original, open source visualizer is \href{http://matsim.org/docs/extensions/otfvis}{OTFVis},  which is a MATSim extension. It requires current OpenGL drivers. The  source code is available, so you can add your own information  visualization code. On the other hand, there is little support for it  from our part.
 
@@ -1828,9 +1618,6 @@ The supported way of programming your own data anylsis or  visualization code is
 
 \vfill\eject
 \section{Using senozon via}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/742%23comment-form}{Log in} to post comments
-\end{itemize}
 
 
 
@@ -1848,16 +1635,10 @@ On the relation between senozon (commercial), senzon via (commercial), MATSim (o
 
 \vfill\eject
 \section{Events analysis}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/743%23comment-form}{Log in} to post comments
-\end{itemize}
 
 In  order to write MATSim events handlers, some amount of Java programming  is necessary. Material can thus found in the api-users section of  the documentation, see \href{http://www.matsim.org/node/17}{here}.
 
 \chapter{Using MATSim Extensions}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/658%23comment-form}{Log in} to post comments
-\end{itemize}
 
 \subsubsection{Introduction}
 
@@ -1914,9 +1695,6 @@ Extensions are developed and documented by their maintainers. Not all extensions
 
 \vfill\eject
 \section{GTFS2TransitSchedule}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/681%23comment-form}{Log in} to post comments
-\end{itemize}
 
 This guide whill show you how to convert GTFS data to a MATSim Transit Schedule
 
@@ -1981,9 +1759,6 @@ Finally, after the semi-automatic process, the Transit Schedule  object is retur
 
 \vfill\eject
 \section{MATSim4UrbanSim}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/680%23comment-form}{Log in} to post comments
-\end{itemize}
 
 \subsection{Guide on UrbanSim usage of the travel model plug-in}
 
@@ -2338,9 +2113,6 @@ The Java virtual machine (VM) can't allocate more than 1.5 GB on  32bit Windows 
 
 %%\vfill\eject
 %%\subsection{MATSim4UrbanSim (Frist Release)}
-%%\begin{itemize}
-%%	\item \href{http://www.matsim.org/user/login?destination=comment/reply/733%23comment-form}{Log in} to post comments
-%%\end{itemize}
 
 %%\subsubsection{The current user guide can be found \href{http://matsim.org/docs/extensions/matism4urbansim}{here} !!!}
 
@@ -2516,9 +2288,6 @@ The Java virtual machine (VM) can't allocate more than 1.5 GB on  32bit Windows 
 
 %%\vfill\eject
 \subsection{The MATSim network for the Brussels application}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/724%23comment-form}{Log in} to post comments
-\end{itemize}
 
 \subsubsection{Note:}
 
@@ -2620,9 +2389,6 @@ new NetworkWriter(network).write(OUTFILE.split(".xml")[0] + "_clean_simple.xml.g
 
 \vfill\eject
 \section{OTFVis}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/693%23comment-form}{Log in} to post comments
-\end{itemize}
 
 OTFVis  is a visualizer for MATSim. It can be used to replay snapshots of  simulations, or run a simulation and interact with it. The visualizer  makes use of hardware acceleration (OpenGL) and is thus also suitable  for visualizing large scenarios. If you have problems running OTFVis,  make sure to \href{http://www.matsim.org/docs/extensions/otfvis/opengl}{check your Graphics Card is able to support OTFVis}.
 
@@ -2734,9 +2500,6 @@ Move  the shortcut to your SendTo folder and rename it to something like  OTFVis
 
 \vfill\eject
 \section{OpenGL Requirements}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/694%23comment-form}{Log in} to post comments
-\end{itemize}
 
 For  the hardware acceleration to work, (i) the OpenGL graphic card driver  installed on your machine must be at least of version 2.0 and (ii)  native libraries are required, which must be correctly set up.
 
@@ -2749,9 +2512,6 @@ Either you use check and update mechanims / software already  installed (e.g. NV
 
 \vfill\eject
 \section{Transportation Energy Simulation Framework (transEnergySim)}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/711%23comment-form}{Log in} to post comments
-\end{itemize}
 
 \subsubsection{[module is still under construction]}
 
@@ -2786,9 +2546,6 @@ If you want to contribute with a new module to the framework  (e.g. for charging
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Applications}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/720%23comment-form}{Log in} to post comments
-\end{itemize}
 
 TODO: Describe ARTEMIS and THELMA project here with figures and references.
 
@@ -2798,17 +2555,11 @@ TODO: also add work of stella, zain, raffaela, marina, etc. here.
 
 \vfill\eject
 \section{Emissions}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/719%23comment-form}{Log in} to post comments
-\end{itemize}
 
 Modules for green house gas and other emissions coming soon here.
 
 \vfill\eject
 \section{Hints and Pitfalls}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/718%23comment-form}{Log in} to post comments
-\end{itemize}
 
 ParallelEventHandling
 
@@ -2818,9 +2569,6 @@ At the moment, the it does not seem to be a performance issue, to  group several
 
 \vfill\eject
 \section{Inductive Charging}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/715%23comment-form}{Log in} to post comments
-\end{itemize}
 
 Charging along Roads
 
@@ -2836,9 +2584,6 @@ This is currently not distinguished separatly from stationary charging with a pl
 
 \vfill\eject
 \section{Stationary Charging}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/717%23comment-form}{Log in} to post comments
-\end{itemize}
 
 For stationary charing, at the moment the following modules are available:
 
@@ -2846,9 +2591,6 @@ ChargingUponArrival: Vehicles with a state of charge (SOC) smaller  than the "us
 
 \vfill\eject
 \section{Vehicle Energy Consumption Models}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/716%23comment-form}{Log in} to post comments
-\end{itemize}
 
 Each  vehicle in the vehicle has an Energy consumption model attached to it,  based on which vehicle energy consumption is logged for each street.  Furthermore for electric and plug-in hybrid electric vehicles (EV/PHEV),  this module also updates the state of charge (SOC) of the vehicles.
 
@@ -2874,17 +2616,11 @@ Conventional Vehicle
 
 \vfill\eject
 \section{Visualizations}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/721%23comment-form}{Log in} to post comments
-\end{itemize}
 
 TODO: emissions map, charging acts, power load per link, etc.
 
 \vfill\eject
 \section{networkEditor}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/676%23comment-form}{Log in} to post comments
-\end{itemize}
 
 \subsubsection{Starting the network editor}
 
@@ -2955,9 +2691,6 @@ After you're done with the counts editing, save the counts to a file by clicking
 
 
 \chapter{Policy Measures}
-\begin{itemize}
-	\item \href{http://www.matsim.org/user/login?destination=comment/reply/563%23comment-form}{Log in} to post comments
-\end{itemize}
 
 A discussion of policy measures that can be investigated with matsim is under \href{http://matsim.org/policy-measures}{matsim.org/policy-measures}  . It is not in the user section but in the developer section of  the documentation since, at this point, many of those measures need  additional coding. Clearly, something like adding or removing lanes or  links can be investigated without any coding.
 
