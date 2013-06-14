@@ -29,7 +29,6 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -80,17 +79,18 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 		this.idConverter = idConverter;
 	}
 	
-	public DgKSNetwork convertNetworkLanesAndSignals(Scenario sc, double startTime, double endTime) {
+	public DgKSNetwork convertNetworkLanesAndSignals(Network network, LaneDefinitions20 lanes,
+			SignalsData signals, double startTime, double endTime) {
 		log.info("Checking cycle time...");
-		this.cycle = readCycle(sc.getScenarioElement(SignalsData.class));
+		this.cycle = readCycle(signals);
 		log.info("cycle set to " + this.cycle);
 		log.info("Converting network ...");
-		Network net = sc.getNetwork();
 		this.timeInterval = endTime - startTime;
-		this.dgNetwork = this.convertNetwork(net, sc.getScenarioElement(LaneDefinitions20.class), sc.getScenarioElement(SignalsData.class));
+		this.dgNetwork = this.convertNetwork(network, lanes, signals);
 		log.info("Network converted.");
 		return this.dgNetwork ;
 	}
+
 
 	private int readCycle(SignalsData signalsData){
 		Integer c = null;
@@ -456,5 +456,6 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 	public void setSignalizedLinks(Set<Id> signalizedLinks) {
 		this.signalizedLinks = signalizedLinks;
 	}
+
 	
 }

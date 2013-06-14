@@ -25,11 +25,12 @@ import javax.xml.transform.TransformerConfigurationException;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.signalsystems.data.SignalsData;
 import org.xml.sax.SAXException;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.koehlerstrehlersignal.DgKoehlerStrehler2010ModelWriter;
-import playground.dgrether.koehlerstrehlersignal.DgMatsim2KoehlerStrehler2010DemandConverter;
 import playground.dgrether.koehlerstrehlersignal.DgMatsim2KoehlerStrehler2010NetworkConverter;
 import playground.dgrether.koehlerstrehlersignal.DgMatsim2KoehlerStrehler2010SimpleDemandConverter;
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodities;
@@ -56,9 +57,10 @@ public class DgFigure9ToKoehlerStrehler2010ModelConverter {
 
 		DgMatsim2KoehlerStrehler2010NetworkConverter converter = new DgMatsim2KoehlerStrehler2010NetworkConverter(idConverter);
 		log.warn("Check times of demand!");
-		DgKSNetwork net = converter.convertNetworkLanesAndSignals(sc, 0.0, 3600.0);
+		DgKSNetwork net = converter.convertNetworkLanesAndSignals(sc.getNetwork(), sc.getScenarioElement(LaneDefinitions20.class), 
+				sc.getScenarioElement(SignalsData.class), 0.0, 3600.0);
 		
-		DgMatsim2KoehlerStrehler2010DemandConverter demandConverter = new DgMatsim2KoehlerStrehler2010SimpleDemandConverter();
+		DgMatsim2KoehlerStrehler2010SimpleDemandConverter demandConverter = new DgMatsim2KoehlerStrehler2010SimpleDemandConverter();
 		DgCommodities coms = demandConverter.convert(sc, net);
 		
 		DgKoehlerStrehler2010ModelWriter writer = new DgKoehlerStrehler2010ModelWriter();

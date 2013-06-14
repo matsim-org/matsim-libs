@@ -22,15 +22,15 @@ package playground.dgrether.koehlerstrehlersignal;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.population.Population;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.dgrether.signalsystems.utils.DgSignalsBoundingBox;
 import playground.dgrether.utils.DgGrid;
 import playground.dgrether.utils.DgGridUtils;
 import playground.dgrether.utils.DgPopulationSampler;
-import playground.dgrether.utils.zones.DgMatsimPopulation2Zones;
+import playground.dgrether.utils.zones.DgMatsimPopulation2Links;
 import playground.dgrether.utils.zones.DgZoneUtils;
 import playground.dgrether.utils.zones.DgZoneWriter;
 import playground.dgrether.utils.zones.DgZones;
@@ -46,10 +46,11 @@ public class PopulationToOd {
 
 	private double matsimPopSampleSize = 1.0;
 	private Map<Id, Id> originalToSimplifiedLinkIdMatching;
+	private DgZones zones;
 	
 	
 	
-	public void matchPopulationToGrid(Scenario fullScenario, CoordinateReferenceSystem crs, 
+	public void matchPopulationToGrid(Network fullNetwork, Population population, CoordinateReferenceSystem crs, 
 			Network smallNetwork, DgSignalsBoundingBox signalsBoundingBox, int cellsX, int cellsY,
 			double startTimeSec, double endTimeSec, String shapeFileDirectory){
 		//create a grid
@@ -58,24 +59,25 @@ public class PopulationToOd {
 
 		//create some zones and map demand on the zones
 		if (matsimPopSampleSize != 1.0){
-			new DgPopulationSampler().samplePopulation(fullScenario.getPopulation(), matsimPopSampleSize);
+			new DgPopulationSampler().samplePopulation(population, matsimPopSampleSize);
 		}
 		
 		//create some zones and match the population to them
-		DgZones zones = DgZoneUtils.createZonesFromGrid(grid);
-		DgMatsimPopulation2Zones pop2zones = new DgMatsimPopulation2Zones();
-		pop2zones.setUseLinkMappings(true);
+		this.zones = DgZoneUtils.createZonesFromGrid(grid);
+		DgMatsimPopulation2Links pop2zones = new DgMatsimPopulation2Links();
 		
-		zones = pop2zones.convert2Zones(fullScenario.getNetwork(), smallNetwork, this.originalToSimplifiedLinkIdMatching,
-				fullScenario.getPopulation(), zones, signalsBoundingBox.getBoundingBox(), startTimeSec, endTimeSec);
+		pop2zones.convert2Zones(fullNetwork, smallNetwork, this.originalToSimplifiedLinkIdMatching,
+				population, zones, signalsBoundingBox.getBoundingBox(), startTimeSec, endTimeSec);
 		
 		//write	 the matching to some files
-		//TODO write zones to file
 		DgZoneWriter zoneOdWriter = new DgZoneWriter(zones, crs);
 		zoneOdWriter.writePolygonZones2Shapefile(shapeFileDirectory + "zones.shp");
-		zoneOdWriter.writeLineStringZone2ZoneOdPairsFromZones2Shapefile(shapeFileDirectory + "zone2dest_od_pairs.shp");
+//		zoneOdWriter.writeLineStringZone2ZoneOdPairsFromZones2Shapefile(shapeFileDirectory + "zone2dest_od_pairs.shp");
 		zoneOdWriter.writeLineStringLink2LinkOdPairsFromZones2Shapefile(shapeFileDirectory + "link2dest_od_pairs.shp");
-		
+	}
+	
+	public DgZones getZones(){
+		return zones;
 	}
 	
 	public DgGrid createGrid(Envelope boundingBox, CoordinateReferenceSystem crs, int xCells, int yCells){

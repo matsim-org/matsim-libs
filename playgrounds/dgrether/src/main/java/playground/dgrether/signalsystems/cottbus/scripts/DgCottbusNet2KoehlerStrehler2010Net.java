@@ -20,6 +20,8 @@
 package playground.dgrether.signalsystems.cottbus.scripts;
 
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.signalsystems.data.SignalsData;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.koehlerstrehlersignal.DgKoehlerStrehler2010ModelWriter;
@@ -48,7 +50,7 @@ public class DgCottbusNet2KoehlerStrehler2010Net {
 		DgIdConverter idConverter = new DgIdConverter(idPool);
 		
 		DgMatsim2KoehlerStrehler2010NetworkConverter netConverter = new DgMatsim2KoehlerStrehler2010NetworkConverter(idConverter);
-		DgKSNetwork dgNet = netConverter.convertNetworkLanesAndSignals(sc, 0.0, 3600.0);
+		DgKSNetwork dgNet = netConverter.convertNetworkLanesAndSignals(sc.getNetwork(), sc.getScenarioElement(LaneDefinitions20.class), sc.getScenarioElement(SignalsData.class), 0.0, 3600.0);
 		new DgKoehlerStrehler2010ModelWriter().write(dgNet, outputNetwork);
 
 	}

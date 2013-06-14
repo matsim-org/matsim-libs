@@ -27,11 +27,11 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -73,35 +73,43 @@ public class Scenario2KoehlerStrehler2010 {
 	private double ksModelCommoditySampleSize = 1.0;
 	private String shapeFileDirectory = "shapes/";
 
-	private Scenario scenario;
 
 	private CoordinateReferenceSystem crs;
+
+	private Network network;
+
+	private LaneDefinitions20 lanes;
+
+	private SignalsData signals;
+
 	
-	
-	public Scenario2KoehlerStrehler2010(Scenario scenario, CoordinateReferenceSystem crs) {
-		this.scenario = scenario;
+	public Scenario2KoehlerStrehler2010(Network network, LaneDefinitions20 lanes,
+			SignalsData signals, CoordinateReferenceSystem crs) {
+		this.network = network;
+		this.lanes = lanes;
+		this.signals = signals;
 		this.crs = crs;
 	}
 
-	
+
 	public void convert(String outputDirectory, String name, DgZones zones, double boundingBoxOffset, int cellsX, int cellsY, double startTimeSec, double endTimeSec) throws IOException{
 
-		Map<DgZone, Link> zones2LinkMap = DgZoneUtils.createZoneCenter2LinkMapping(zones, (NetworkImpl) scenario.getNetwork());
+		Map<DgZone, Link> zones2LinkMap = DgZoneUtils.createZoneCenter2LinkMapping(zones, (NetworkImpl) network);
 		DgZoneUtils.writeLinksOfZones2Shapefile(zones, zones2LinkMap, crs, shapeFileDirectory + "links_for_zones.shp");
 
 		//create koehler strehler network
 		DgIdPool idPool = new DgIdPool();
 		DgIdConverter idConverter = new DgIdConverter(idPool);
 		
-		Set<Id> signalizedLinks = this.getSignalizedLinkIds(this.scenario.getScenarioElement(SignalsData.class).getSignalSystemsData());
+		Set<Id> signalizedLinks = this.getSignalizedLinkIds(this.signals.getSignalSystemsData());
 		DgMatsim2KoehlerStrehler2010NetworkConverter netConverter = new DgMatsim2KoehlerStrehler2010NetworkConverter(idConverter);
 		netConverter.setSignalizedLinks(signalizedLinks);
-		DgKSNetwork ksNet = netConverter.convertNetworkLanesAndSignals(scenario, startTimeSec, endTimeSec);
+		DgKSNetwork ksNet = netConverter.convertNetworkLanesAndSignals(this.network, this.lanes, this.signals, startTimeSec, endTimeSec);
 		DgKSNetwork2Gexf converter = new DgKSNetwork2Gexf();
 		converter.convertAndWrite(ksNet, outputDirectory + "network_small.gexf");
 		
-		DgMatsim2KoehlerStrehler2010DemandConverter demandConverter = new DgMatsim2KoehlerStrehler2010Zones2Commodities(zones2LinkMap, idConverter);
-		DgCommodities commodities = demandConverter.convert(scenario, ksNet);
+		DgMatsim2KoehlerStrehler2010Zones2Commodities demandConverter = new DgMatsim2KoehlerStrehler2010Zones2Commodities(zones2LinkMap, idConverter);
+		DgCommodities commodities = demandConverter.convert(ksNet);
 		
 		if (ksModelCommoditySampleSize != 1.0){
 			for (DgCommodity com : commodities.getCommodities().values()) {
@@ -176,4 +184,6 @@ public class Scenario2KoehlerStrehler2010 {
 	public void setKsModelCommoditySampleSize(double ksModelCommoditySampleSize) {
 		this.ksModelCommoditySampleSize = ksModelCommoditySampleSize;
 	}
+
+
 }

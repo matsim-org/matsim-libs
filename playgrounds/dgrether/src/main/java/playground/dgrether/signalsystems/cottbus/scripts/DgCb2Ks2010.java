@@ -22,7 +22,6 @@ package playground.dgrether.signalsystems.cottbus.scripts;
 import java.io.File;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryLogging;
@@ -36,6 +35,7 @@ import playground.dgrether.koehlerstrehlersignal.PopulationToOd;
 import playground.dgrether.koehlerstrehlersignal.Scenario2KoehlerStrehler2010;
 import playground.dgrether.koehlerstrehlersignal.ScenarioShrinker;
 import playground.dgrether.signalsystems.cottbus.DgCottbusScenarioPaths;
+import playground.dgrether.utils.zones.DgZones;
 
 
 /**
@@ -67,30 +67,29 @@ public class DgCb2Ks2010 {
 		String signalGroupsFilename = DgCottbusScenarioPaths.SIGNAL_GROUPS_FILENAME;
 		String signalControlFilename = DgCottbusScenarioPaths.SIGNAL_CONTROL_FIXEDTIME_FILENAME;
 		//TODO change to run1712 when finished
-		String populationFilename = DgPaths.REPOS + "runs-svn/run1292/1292.output_plans_sample.xml";
-//		String populationFile = DgPaths.REPOS + "runs-svn/run1292/1292.output_plans.xml.gz";
+//		String populationFilename = DgPaths.REPOS + "runs-svn/run1292/1292.output_plans_sample.xml";
+		String populationFilename = DgPaths.REPOS + "runs-svn/run1292/1292.output_plans.xml.gz";
 		Scenario fullScenario = DgCb2Ks2010.loadScenario(networkFilename, populationFilename, lanesFilename, signalSystemsFilename, signalGroupsFilename, signalControlFilename);
-		
 		String name = "run 1292 output plans between 05:30 and 09:30";
 		CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84_UTM33N);
 		
 		
-		
 		ScenarioShrinker scenarioShrinker = new ScenarioShrinker(fullScenario,  crs);
-		Network shrinkedNetwork = scenarioShrinker.shrinkScenario(outputDirectory, shapeFileDirectory, boundingBoxOffset);
-		//TODO read link mappings
+		scenarioShrinker.shrinkScenario(outputDirectory, shapeFileDirectory, boundingBoxOffset);
 		
 		PopulationToOd pop2od = new PopulationToOd();
 		pop2od.setMatsimPopSampleSize(matsimPopSampleSize);
 		pop2od.setOriginalToSimplifiedLinkMapping(scenarioShrinker.getOriginalToSimplifiedLinkIdMatching());
-		pop2od.matchPopulationToGrid(fullScenario, crs, shrinkedNetwork, scenarioShrinker.getSignalsBoundingBox(), 
+		pop2od.matchPopulationToGrid(fullScenario.getNetwork(), fullScenario.getPopulation(), crs, scenarioShrinker.getShrinkedNetwork(), scenarioShrinker.getSignalsBoundingBox(), 
 				cellsX, cellsY, startTime, endTime, shapeFileDirectory);
+		DgZones zones = pop2od.getZones();
 		
 		System.exit(0);
-		
-		Scenario scenario = null;
-		Scenario2KoehlerStrehler2010 converter = new Scenario2KoehlerStrehler2010(scenario, crs);
+		Scenario2KoehlerStrehler2010 converter = new Scenario2KoehlerStrehler2010(scenarioShrinker.getShrinkedNetwork(), 
+				scenarioShrinker.getShrinkedLanes(), scenarioShrinker.getShrinkedSignals(), crs);
 		converter.setKsModelCommoditySampleSize(ksModelCommoditySampleSize);
+		converter.convert(outputDirectory, name, zones, boundingBoxOffset, cellsX, cellsY, startTime, endTime);
+		
 		OutputDirectoryLogging.closeOutputDirLogging();		
 	}
 

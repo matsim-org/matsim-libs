@@ -40,12 +40,11 @@ import playground.dgrether.koehlerstrehlersignal.data.DgStreet;
 /**
  * @author dgrether
  */
-public class DgMatsim2KoehlerStrehler2010SimpleDemandConverter implements DgMatsim2KoehlerStrehler2010DemandConverter {
+public class DgMatsim2KoehlerStrehler2010SimpleDemandConverter {
 
 	
 	private DgCommodities commodities;
 
-	@Override
 	public DgCommodities convert(Scenario sc,  DgKSNetwork dgNetwork) {
 		this.commodities = this.createCommodities(dgNetwork, sc.getPopulation());
 		return this.commodities;

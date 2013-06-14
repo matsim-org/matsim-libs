@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodities;
@@ -39,8 +38,7 @@ import playground.dgrether.utils.zones.DgZoneFromLink;
  * @author dgrether
  *
  */
-public class DgMatsim2KoehlerStrehler2010Zones2Commodities implements
-		DgMatsim2KoehlerStrehler2010DemandConverter {
+public class DgMatsim2KoehlerStrehler2010Zones2Commodities  {
 
 	private Map<DgZone, Link> zones2LinkMap;
 	private DgIdConverter idConverter;
@@ -76,11 +74,8 @@ public class DgMatsim2KoehlerStrehler2010Zones2Commodities implements
 			throw new IllegalStateException("To  Node Id " + toNode + " not found in Network. ");
 		}
 	}
-
 	
-	
-	@Override
-	public DgCommodities convert(Scenario sc, DgKSNetwork network) {
+	public DgCommodities convert(DgKSNetwork network) {
 		DgCommodities coms = new DgCommodities();
 		for (DgZone fromZone : this.zones2LinkMap.keySet()){
 			Link fromZoneLink = this.zones2LinkMap.get(fromZone);

@@ -62,12 +62,18 @@ public class ScenarioShrinker {
 
 	private Map<Id, Id> originalToSimplifiedLinkIdMatching;
 
+	private Network shrinkedNetwork;
+
+	private LaneDefinitions20 shrinkedLanes;
+
+	private SignalsData shrinkedSignals;
+
 	public ScenarioShrinker(Scenario scenario, CoordinateReferenceSystem crs){
 		this.fullScenario = scenario;
 		this.crs = crs;
 	}
 	
-	public Network shrinkScenario(String outputDirectory, String shapeFileDirectory, double boundingBoxOffset) throws IOException{
+	public void shrinkScenario(String outputDirectory, String shapeFileDirectory, double boundingBoxOffset) throws IOException{
 		//Some initialization
 		Set<Id> signalizedNodes = this.getSignalizedNodeIds(this.fullScenario.getScenarioElement(SignalsData.class).getSignalSystemsData(), this.fullScenario.getNetwork());
 		DgNetworkUtils.writeNetwork2Shape(fullScenario.getNetwork(), shapeFileDirectory + "network_full");
@@ -113,8 +119,9 @@ public class ScenarioShrinker {
 		SignalsScenarioWriter signalsWriter = new SignalsScenarioWriter(outputDirectory);
 		signalsWriter.writeSignalsData(this.fullScenario.getScenarioElement(SignalsData.class));
 		
-		
-		return smallNetwork;
+		this.shrinkedNetwork =  smallNetwork;
+		this.shrinkedLanes = this.fullScenario.getScenarioElement(LaneDefinitions20.class);
+		this.shrinkedSignals = this.fullScenario.getScenarioElement(SignalsData.class);
 	}
 		
 	public DgSignalsBoundingBox getSignalsBoundingBox() {
@@ -133,6 +140,21 @@ public class ScenarioShrinker {
 			signalizedNodes.addAll(signalizedNodesOfSystem);
 		}
 		return signalizedNodes;
+	}
+
+	
+	public Network getShrinkedNetwork() {
+		return shrinkedNetwork;
+	}
+
+	
+	public LaneDefinitions20 getShrinkedLanes() {
+		return shrinkedLanes;
+	}
+
+	
+	public SignalsData getShrinkedSignals() {
+		return shrinkedSignals;
 	}
 	
 	
