@@ -8,7 +8,7 @@ import org.matsim.api.core.v01.Id;
 
 public class Journey extends TravelComponent {
 	private String trip_idx;
-	private String mainmode;
+	private String mainmode=null;
 	private Activity fromAct;
 	private Activity toAct;
 	private boolean carJourney = false;
@@ -121,6 +121,9 @@ public class Journey extends TravelComponent {
 	}
 
 	public String getMainMode() {
+		if(!(mainmode==null)){
+			return mainmode;
+		}
 		if (isCarJourney()) {
 			return "car";
 		}
@@ -274,9 +277,6 @@ public class Journey extends TravelComponent {
 		this.waits = waits;
 	}
 
-	public String getMainmode() {
-		return mainmode;
-	}
 
 	public void setMainmode(String mainmode) {
 		this.mainmode = mainmode;
