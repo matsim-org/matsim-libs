@@ -146,9 +146,9 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 
 		// yyyyyy I am quite sceptic if the following should stay since it does not work.  kai, feb'11
 		if ( "queue".equals( sim.getScenario().getConfig().getQSimConfigGroup().getTrafficDynamics() ) ) {
-			QLinkImpl.HOLES=false ;
+			QueueWithBuffer.HOLES=false ;
 		} else if ( "withHolesExperimental".equals( sim.getScenario().getConfig().getQSimConfigGroup().getTrafficDynamics() ) ) {
-			QLinkImpl.HOLES = true ;
+			QueueWithBuffer.HOLES = true ;
 		} else {
 			throw new RuntimeException("trafficDynamics defined in config that does not exist: "
 					+ sim.getScenario().getConfig().getQSimConfigGroup().getTrafficDynamics() ) ;
