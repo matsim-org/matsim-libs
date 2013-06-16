@@ -131,9 +131,7 @@ public class Bins {
 	private double median(Double [] values) {
 		List<Double> list = new Vector<Double>();
 
-		for (int i = 0; i < values.length; i++) {
-			list.add(values[i]);
-		}
+        Collections.addAll(list, values);
 		return median(list);
 	}
 	

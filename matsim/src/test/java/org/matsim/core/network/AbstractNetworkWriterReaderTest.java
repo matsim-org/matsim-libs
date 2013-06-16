@@ -21,6 +21,7 @@
 package org.matsim.core.network;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -101,9 +102,7 @@ public abstract class AbstractNetworkWriterReaderTest extends MatsimTestCase {
 
 	private static <T> Set<T> createHashSet(T... mode) {
 		HashSet<T> set = new HashSet<T>();
-		for (T t : mode) {
-			set.add(t);
-		}
+        Collections.addAll(set, mode);
 		return set;
 	}
 }

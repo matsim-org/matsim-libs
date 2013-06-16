@@ -52,9 +52,7 @@ public abstract class AbstractRoutingNetworkNode implements RoutingNetworkNode {
 
 	@Override
 	public void setOutLinksArray(RoutingNetworkLink[] outLinks) {
-		for (int i = 0; i < outLinks.length; i++) {
-			this.outLinks[i] = outLinks[i];
-		}
+        System.arraycopy(outLinks, 0, this.outLinks, 0, outLinks.length);
 	}
 	
 	@Override

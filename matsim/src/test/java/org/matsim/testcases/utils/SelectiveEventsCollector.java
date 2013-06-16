@@ -20,10 +20,7 @@
 
 package org.matsim.testcases.utils;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.Event;
@@ -42,9 +39,7 @@ public class SelectiveEventsCollector implements BasicEventHandler {
 	private final Set<Class<?>> classes = new HashSet<Class<?>>();
 
 	public SelectiveEventsCollector(final Class<?>... classes) {
-		for (Class<?> klass : classes) {
-			this.classes.add(klass);
-		}
+        Collections.addAll(this.classes, classes);
 	}
 
 	@Override

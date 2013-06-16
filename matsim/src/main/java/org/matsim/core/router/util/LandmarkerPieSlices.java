@@ -125,9 +125,7 @@ import org.matsim.core.utils.misc.NetworkUtils;
 				nodeList[0] = node;
 			} else {
 				Node[] nodeList2 = new Node[nodeList.length + 1];
-				for (int i = 0; i < nodeList.length; i++) {
-					nodeList2[i] = nodeList[i];
-				}
+                System.arraycopy(nodeList, 0, nodeList2, 0, nodeList.length);
 				nodeList2[nodeList.length] = node;
 				nodeList = nodeList2;
 			}

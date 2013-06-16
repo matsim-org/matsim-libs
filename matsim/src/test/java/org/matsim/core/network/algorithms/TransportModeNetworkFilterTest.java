@@ -19,6 +19,7 @@
 
 package org.matsim.core.network.algorithms;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -388,9 +389,7 @@ public class TransportModeNetworkFilterTest {
 
 	public static Set<String> createHashSet(String... modes) {
 		Set<String> set = new HashSet<String>();
-		for (String m : modes) {
-			set.add(m);
-		}
+        Collections.addAll(set, modes);
 		return set;
 	}
 

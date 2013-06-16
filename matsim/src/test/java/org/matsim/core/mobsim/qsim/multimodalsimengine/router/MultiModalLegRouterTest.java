@@ -20,10 +20,7 @@
 
 package org.matsim.core.mobsim.qsim.multimodalsimengine.router;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -266,7 +263,7 @@ public class MultiModalLegRouterTest extends MatsimTestCase {
 	
 	private Set<String> createSet(String[] entries) {
 		Set<String> set = new HashSet<String>();
-		for (String entry : entries) set.add(entry);
+        Collections.addAll(set, entries);
 		return set;
 	}
 	

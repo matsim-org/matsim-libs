@@ -21,6 +21,7 @@
 package org.matsim.core.router;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -362,9 +363,7 @@ public abstract class AbstractLeastCostPathCalculatorTest extends MatsimTestCase
 
 	public static final Set<String> createHashSet(String... modes) {
 		Set<String> set = new HashSet<String>();
-		for (String m : modes) {
-			set.add(m);
-		}
+        Collections.addAll(set, modes);
 		return set;
 	}
 

@@ -50,9 +50,7 @@ public class LinkNetworkRouteImpl extends AbstractRoute implements NetworkRoute,
 	
 	public LinkNetworkRouteImpl(final Id startLinkId, final Id[] linkIds, final Id endLinkId) {
 		super(startLinkId, endLinkId);
-		for (Id id : linkIds) {
-			this.route.add(id);
-		}
+        Collections.addAll(this.route, linkIds);
 		this.route.trimToSize();
 	}
 

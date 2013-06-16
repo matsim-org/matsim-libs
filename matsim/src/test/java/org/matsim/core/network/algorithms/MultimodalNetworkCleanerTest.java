@@ -879,9 +879,7 @@ public class MultimodalNetworkCleanerTest {
 
 	private static Set<String> createHashSet(String... mode) {
 		HashSet<String> set = new HashSet<String>();
-		for (String m : mode) {
-			set.add(m);
-		}
+        Collections.addAll(set, mode);
 		return set;
 	}
 }

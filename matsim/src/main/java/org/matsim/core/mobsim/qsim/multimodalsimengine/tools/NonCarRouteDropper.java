@@ -20,6 +20,7 @@
 
 package org.matsim.core.mobsim.qsim.multimodalsimengine.tools;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -50,9 +51,7 @@ public class NonCarRouteDropper extends AbstractPersonAlgorithm implements PlanA
 			return;
 		}
 
-		for (String mode : CollectionUtils.stringToArray(multiModalConfigGroup.getSimulatedModes())) {
-			this.modesToDrop.add(mode);
-		}
+        Collections.addAll(this.modesToDrop, CollectionUtils.stringToArray(multiModalConfigGroup.getSimulatedModes()));
 	}
 
 	@Override
