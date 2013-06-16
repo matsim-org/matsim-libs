@@ -233,7 +233,7 @@ public class VspExperimentalConfigGroup extends org.matsim.core.config.Module {
 
 		StringBuilder str = new StringBuilder() ;
 		for ( ActivityDurationInterpretation itp : ActivityDurationInterpretation.values() ) {
-			str.append( " " + itp.toString() ) ;
+			str.append(" ").append(itp.toString());
 		}
 		map.put(ACTIVITY_DURATION_INTERPRETATION, "String:" + str + ". Anything besides " 
 				+ ActivityDurationInterpretation.minOfDurationAndEndTime + " will internally use a different " +

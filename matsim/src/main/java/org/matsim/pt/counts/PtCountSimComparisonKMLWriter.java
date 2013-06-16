@@ -524,7 +524,7 @@ public class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 		// buffer.append(ENDH1);
 		buffer.append(NetworkFeatureFactory.STARTH2);
 		buffer.append(STOP);
-		buffer.append(stopid + "\t" + type + "ing");
+		buffer.append(stopid).append("\t").append(type).append("ing");
 		buffer.append(NetworkFeatureFactory.ENDH2);
 		buffer.append(NetworkFeatureFactory.STARTH3);
 		buffer.append(H24OVERVIEW);

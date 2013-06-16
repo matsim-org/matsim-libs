@@ -194,7 +194,7 @@ public class ConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
 		ActivityParams ptAct = c.planCalcScore().getActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE) ;
 		if ( ptAct != null ) {
 			if ( ptAct.getClosingTime()!=0. ) {
-				if ( !c.vspExperimental().getValue(VspExperimentalConfigKey.isAbleToOverwritePtInteractionParams).toString().equalsIgnoreCase("true") ) {
+				if ( !c.vspExperimental().getValue(VspExperimentalConfigKey.isAbleToOverwritePtInteractionParams).equalsIgnoreCase("true") ) {
 					throw new RuntimeException("setting the pt interaction activity closing time away from 0 is not allowed because it breaks pt scoring." +
 					" If you need this anyway (for backwards compatibility reasons), you can allow this by a parameter in VspExperimentalConfigGroup.") ;
 				}

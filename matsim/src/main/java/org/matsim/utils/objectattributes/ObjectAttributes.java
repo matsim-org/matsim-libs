@@ -45,12 +45,12 @@ public class ObjectAttributes {
 		StringBuilder stb = new StringBuilder() ;
 		for ( Entry<String, Map<String,Object>> entry : attributes.entrySet() ) {
 			String key = entry.getKey() ;
-			stb.append( "key=" + key ) ;
+			stb.append("key=").append(key);
 			Map<String,Object> map = entry.getValue() ;
 			for ( Entry<String,Object> ee : map.entrySet() ) {
 				String subkey = ee.getKey();
-				stb.append("; subkey="+subkey ) ;
-				stb.append("; object="+ee.getValue().toString() ) ;
+				stb.append("; subkey=").append(subkey);
+				stb.append("; object=").append(ee.getValue().toString());
 			}
 			stb.append("\n") ;
 		}

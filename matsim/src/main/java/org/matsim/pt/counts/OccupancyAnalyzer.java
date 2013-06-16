@@ -128,10 +128,7 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler, Perso
 		// ------------------------veh_passenger---------------------------
 		Integer nPassengers = this.vehPassengers.get(vehId);
 		this.vehPassengers.put(vehId, (nPassengers != null) ? (nPassengers + 1) : 1);
-		this.occupancyRecord.append("time :\t" + time + " veh :\t" + vehId
-				+ " has Passenger\t" + this.vehPassengers.get(vehId)
-				+ " \tat stop :\t" + stopId + " ENTERING PERSON :\t"
-				+ event.getPersonId() + "\n");
+		this.occupancyRecord.append("time :\t").append(time).append(" veh :\t").append(vehId).append(" has Passenger\t").append(this.vehPassengers.get(vehId)).append(" \tat stop :\t").append(stopId).append(" ENTERING PERSON :\t").append(event.getPersonId()).append("\n");
 	}
 
 	@Override
@@ -162,9 +159,7 @@ public class OccupancyAnalyzer implements PersonEntersVehicleEventHandler, Perso
 		}
 
 		Integer passengers = this.vehPassengers.get(vehId);
-		this.occupancyRecord.append("time :\t" + time + " veh :\t" + vehId
-				+ " has Passenger\t" + ((passengers != null) ? passengers : 0)
-				+ "\n");
+		this.occupancyRecord.append("time :\t").append(time).append(" veh :\t").append(vehId).append(" has Passenger\t").append((passengers != null) ? passengers : 0).append("\n");
 	}
 
 	@Override
