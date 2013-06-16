@@ -82,7 +82,7 @@ import org.matsim.core.utils.misc.Time;
 
 		if (network instanceof NetworkImpl) {
 			out.write(" effectivecellsize=\"" + ((NetworkImpl) network).getEffectiveCellSize() + "\"");
-			out.write(" effectivelanewidth=\"" + ((NetworkImpl) network).getEffectiveLaneWidth() + "\"");
+			out.write(" effectivelanewidth=\"" + network.getEffectiveLaneWidth() + "\"");
 		}
 
 		out.write(">\n");

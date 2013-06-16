@@ -32,6 +32,6 @@ public class BooleanConverter implements AttributeConverter<Boolean> {
 
 	@Override
 	public String convertToString(Object b) {
-		return ((Boolean) b).toString();
+		return b.toString();
 	}
 }

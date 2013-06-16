@@ -83,13 +83,13 @@ public class DemandGenerator {
 		while (it.hasNext()) {
 			SimpleFeature ft = it.next(); //A feature contains a geometry (in this case a polygon) and an arbitrary number
 			//of other attributes
-			if (((String)ft.getAttribute("type")).equals("commercial")) {
+			if (ft.getAttribute("type").equals("commercial")) {
 				commercial = ft;
 			}
-			else if (((String)ft.getAttribute("type")).equals("recreation")) {
+			else if (ft.getAttribute("type").equals("recreation")) {
 				recreation = ft;
 			}
-			else if (((String)ft.getAttribute("type")).equals("housing")) {
+			else if (ft.getAttribute("type").equals("housing")) {
 				long l = ((Long)ft.getAttribute("inhabitant"));
 				createPersons(scenario, ft, rnd, (int) l); //creates l new persons and chooses for each person a random link
 				//within the corresponding polygon. after this method call every new generated person has one plan and one home activity

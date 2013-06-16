@@ -85,8 +85,8 @@ public class EquilTwoAgentsTest extends MatsimTestCase {
 		config.plans().setInputFile(this.getClassInputDirectory() + "plans2.xml");
 
 		PlanCalcScoreConfigGroup pcsConfig = config.planCalcScore() ;
-		ActivityParams params = new ActivityParams("h") ; ;
-		params.setTypicalDuration(123456789.0) ; // probably dummy
+		ActivityParams params = new ActivityParams("h") ;
+        params.setTypicalDuration(123456789.0) ; // probably dummy
 		params.setOpeningTime(0.) ;
 		params.setClosingTime(0.) ; // cannot access "setScoreAtAll" at this level.
 		pcsConfig.addActivityParams(params) ;

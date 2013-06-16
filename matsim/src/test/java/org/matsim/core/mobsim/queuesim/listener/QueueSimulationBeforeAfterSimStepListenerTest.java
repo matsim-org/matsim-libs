@@ -39,7 +39,7 @@ public class QueueSimulationBeforeAfterSimStepListenerTest extends MatsimTestCas
 		config.simulation().setStartTime(6.0 * 3600);
 		config.simulation().setEndTime(6.0 * 3600 + 10);
 		Scenario scenario = new ScenarioLoaderImpl(config).loadScenario();
-		ObservableMobsim qsim = new QueueSimulation(scenario, ((EventsManager) EventsUtils.createEventsManager()));
+		ObservableMobsim qsim = new QueueSimulation(scenario, EventsUtils.createEventsManager());
 
 		MockQueueSimStepListener mockListener = new MockQueueSimStepListener(1.0);
 		qsim.addQueueSimulationListeners(mockListener);

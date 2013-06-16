@@ -38,7 +38,7 @@ public class EventsManagerImplTest {
 	 */
 	@Test
 	public void testProcessEvent_CustomEventHandler() {
-		EventsManager manager = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager manager = EventsUtils.createEventsManager();
 		CountingMyEventHandler handler = new CountingMyEventHandler();
 		manager.addHandler(handler);
 		manager.processEvent(new MyEvent(123.45));
@@ -50,7 +50,7 @@ public class EventsManagerImplTest {
 	 */
 	@Test
 	public void testProcessEvent_ExceptionInEventHandler() {
-		EventsManager manager = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager manager = EventsUtils.createEventsManager();
 		CrashingMyEventHandler handler = new CrashingMyEventHandler();
 		manager.addHandler(handler);
 		try {

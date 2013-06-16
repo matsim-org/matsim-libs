@@ -64,7 +64,7 @@ public class NetworkCleaner {
 	 * @param outputNetworkFile filename where to write the cleaned network to
 	 */
 	public void run(final String inputNetworkFile, final String outputNetworkFile) {
-		final Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		final Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(inputNetworkFile);
 

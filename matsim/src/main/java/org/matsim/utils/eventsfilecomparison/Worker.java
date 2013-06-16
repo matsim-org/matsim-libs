@@ -53,7 +53,7 @@ public class Worker extends Thread implements BasicEventHandler{
 		this.eFile = eFile1;
 		this.doComparison = doComparison;
 
-		this.e = (EventsManager) EventsUtils.createEventsManager();
+		this.e = EventsUtils.createEventsManager();
 		this.e.addHandler(this);
 	}
 

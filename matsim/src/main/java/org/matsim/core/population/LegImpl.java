@@ -49,7 +49,7 @@ public class LegImpl implements Leg {
 		this.setTravelTime(leg.getTravelTime());
 		this.setArrivalTime(leg.getArrivalTime());
 		if (leg.getRoute() != null) {
-			this.setRoute(((Route) leg.getRoute()).clone());
+			this.setRoute(leg.getRoute().clone());
 		}
 	}
 

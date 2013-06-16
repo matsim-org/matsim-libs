@@ -32,8 +32,9 @@ import org.matsim.core.utils.geometry.CoordUtils;
 
 public class NetworkScenarioCut implements NetworkRunnable {
 
-	private enum CutType {RECTANGLE, CIRCLE};
-	private final CutType cutType;
+	private enum CutType {RECTANGLE, CIRCLE}
+
+    private final CutType cutType;
 	
 	private final double minX;
 	private final double maxX;

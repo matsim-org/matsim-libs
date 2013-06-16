@@ -79,7 +79,7 @@ public class CalculateAngleTest {
 		double twicePi = Math.PI * 2;
 		double piStep = Math.PI / 180.0;
 		for (double angle = 0.0; angle < twicePi; angle = angle + piStep){
-			scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+			scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			createNetwork(scenario, angle, ids);
 			Network net = scenario.getNetwork();
 			TreeMap<Double, Link> m = CalculateAngle.getOutLinksSortedByAngle(net.getLinks().get(ids.get(1)));

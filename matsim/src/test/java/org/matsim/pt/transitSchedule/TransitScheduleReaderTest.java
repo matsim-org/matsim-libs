@@ -57,7 +57,7 @@ public class TransitScheduleReaderTest extends MatsimTestCase {
 	public void testReadFileV1() throws SAXException, ParserConfigurationException, IOException {
 		final String inputDir = getClassInputDirectory();
 
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(inputDir + INPUT_TEST_FILE_NETWORK);
 

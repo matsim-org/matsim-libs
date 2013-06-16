@@ -95,7 +95,7 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		TestTravelTimeCalculator ttcalc = new TestTravelTimeCalculator(person1, person2, link2.getId());
 		events.addHandler(ttcalc);
 		
-		Mobsim qsim = (QSim) new QSimFactory().createMobsim(scenario, events);
+		Mobsim qsim = new QSimFactory().createMobsim(scenario, events);
 		qsim.run();
 
 		// check that we get the expected result
@@ -158,8 +158,8 @@ public class QSimIntegrationTest extends MatsimTestCase {
 		EventsManager events = EventsUtils.createEventsManager();
 		TestTravelTimeCalculator ttcalc = new TestTravelTimeCalculator(person1, person2, link2.getId());
 		events.addHandler(ttcalc);
-		Mobsim qsim = (QSim) new QSimFactory().createMobsim(scenario, events);;
-		qsim.run();
+		Mobsim qsim = new QSimFactory().createMobsim(scenario, events);
+        qsim.run();
 		/*
 		 * The last person of the first wave should have taken 20 s to travel
 		 * link 3 (because of the spill-back). The last person of the second

@@ -32,6 +32,6 @@ public class LongConverter implements AttributeConverter<Long> {
 
 @Override
 	public String convertToString(Object o) {
-		return ((Long) o).toString();
+		return o.toString();
 	}
 }

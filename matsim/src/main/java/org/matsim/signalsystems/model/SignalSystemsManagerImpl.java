@@ -40,9 +40,9 @@ public class SignalSystemsManagerImpl implements SignalSystemsManager {
 
 	private SignalsData signalData = null;
 
-	private IntergreensLogic intergreensLogic = null;;
-	
-	public SignalSystemsManagerImpl(){
+	private IntergreensLogic intergreensLogic = null;
+
+    public SignalSystemsManagerImpl(){
 		
 	}
 	

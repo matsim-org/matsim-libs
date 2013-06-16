@@ -56,7 +56,7 @@ public class EventsHandlerHierarchyTest extends MatsimTestCase {
 	class C extends A implements BasicEventHandler, LinkLeaveEventHandler {}
 
 	public final void testHandlerHierarchy() {
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		Id dummy = new IdImpl("");
 		EventHandler cc = new B();
 		events.processEvent(new LinkLeaveEvent(0., dummy, dummy, dummy));

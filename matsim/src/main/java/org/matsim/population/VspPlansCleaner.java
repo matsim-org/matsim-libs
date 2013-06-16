@@ -71,7 +71,7 @@ public class VspPlansCleaner implements BeforeMobsimListener {
 						
 						// set duration to undefined if there is an activity end time:
 						if ( act.getEndTime() != Time.UNDEFINED_TIME ) {
-							((ActivityImpl)act).setMaximumDuration( Time.UNDEFINED_TIME ) ;
+							act.setMaximumDuration(Time.UNDEFINED_TIME) ;
 						}
 						
 					} else {

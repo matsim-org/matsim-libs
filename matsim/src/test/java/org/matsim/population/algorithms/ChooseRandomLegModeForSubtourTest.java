@@ -131,7 +131,7 @@ public class ChooseRandomLegModeForSubtourTest {
 	@Test
 	public void testSubTourMutationNetworkBased() {
 		Config config = utils.loadConfig(CONFIGFILE);
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		Scenario scenario = ScenarioUtils.createScenario(config);
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 		TripStructureAnalysisLayerOption tripStructureAnalysisLayer = TripStructureAnalysisLayerOption.link;
@@ -155,7 +155,7 @@ public class ChooseRandomLegModeForSubtourTest {
 	@Test
 	public void testCarDoesntTeleportFromHome() {
 		Config config = utils.loadConfig(CONFIGFILE);
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		Scenario scenario = ScenarioUtils.createScenario(config);
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
 		testCarDoesntTeleport((NetworkImpl) network, TripStructureAnalysisLayerOption.link, TransportMode.car, TransportMode.pt);
@@ -324,7 +324,7 @@ public class ChooseRandomLegModeForSubtourTest {
 				Leg nextLeg = (Leg) peIterator.next();
 				Activity nextActivity = (Activity) peIterator.next();
 				Id nextLocation = nextActivity.getLinkId();
-				if (nextLeg.getMode() == TransportMode.car) {
+				if (nextLeg.getMode().equals(TransportMode.car)) {
 					assertEquals(
 							"wrong car location at leg "+legCount+" in "+plan.getPlanElements(),
 							currentLocation,

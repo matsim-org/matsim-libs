@@ -52,7 +52,7 @@ import org.xml.sax.SAXException;
  */
 public class ObjectAttributesXmlReader extends MatsimXmlParser {
 	private final static Logger log = Logger.getLogger(ObjectAttributesXmlReader.class);
-	private final Map<String, AttributeConverter<? extends Object>> converters = new HashMap<String, AttributeConverter<? extends Object>>();
+	private final Map<String, AttributeConverter<?>> converters = new HashMap<String, AttributeConverter<?>>();
 	private final ObjectAttributes attributes;
 	private boolean readCharacters = false;
 	private String currentObject = null;
@@ -133,7 +133,7 @@ public class ObjectAttributesXmlReader extends MatsimXmlParser {
 	 * @param converter
 	 * @return the previously registered converter for this class, or <code>null</code> if none was set before.
 	 */
-	public AttributeConverter<? extends Object> putAttributeConverter(final Class<?> clazz, final AttributeConverter<? extends Object> converter) {
+	public AttributeConverter<?> putAttributeConverter(final Class<?> clazz, final AttributeConverter<?> converter) {
 		return this.converters.put(clazz.getCanonicalName(), converter);
 	}
 
@@ -143,7 +143,7 @@ public class ObjectAttributesXmlReader extends MatsimXmlParser {
 	 * @param clazz
 	 * @return the previously registered converter for this class, of <code>null</code> if none was set.
 	 */
-	public AttributeConverter<? extends Object> removeAttributeConverter(final Class<?> clazz) {
+	public AttributeConverter<?> removeAttributeConverter(final Class<?> clazz) {
 		return this.converters.remove(clazz.getCanonicalName());
 	}
 

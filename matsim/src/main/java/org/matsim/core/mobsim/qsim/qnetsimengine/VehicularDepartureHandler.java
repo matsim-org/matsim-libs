@@ -35,9 +35,9 @@ class VehicularDepartureHandler implements DepartureHandler {
 	 * Either teleport it to the agent's location (no matter what!), or have the agent wait
 	 * for the car to arrive, or throw an exception.
 	 */
-	public static enum VehicleBehavior { TELEPORT, WAIT_UNTIL_IT_COMES_ALONG, EXCEPTION };
+	public static enum VehicleBehavior { TELEPORT, WAIT_UNTIL_IT_COMES_ALONG, EXCEPTION }
 
-	private static Logger log = Logger.getLogger(VehicularDepartureHandler.class);
+    private static Logger log = Logger.getLogger(VehicularDepartureHandler.class);
 
 	private int cntTeleportVehicle = 0;
 

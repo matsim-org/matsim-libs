@@ -43,7 +43,7 @@ public class AgentMoneyEventIntegrationTest extends MatsimTestCase {
 
 		final String eventsFilename = getOutputDirectory() + "events.txt";
 
-		EventsManager writeEvents = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager writeEvents = EventsUtils.createEventsManager();
 		EventWriterTXT writer = new EventWriterTXT(eventsFilename);
 		writeEvents.addHandler(writer);
 
@@ -54,7 +54,7 @@ public class AgentMoneyEventIntegrationTest extends MatsimTestCase {
 
 		// read the events from file
 
-		EventsManager readEvents = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager readEvents = EventsUtils.createEventsManager();
 		EventsCollector collector = new EventsCollector();
 		readEvents.addHandler(collector);
 		MatsimEventsReader reader = new MatsimEventsReader(readEvents);
@@ -85,7 +85,7 @@ public class AgentMoneyEventIntegrationTest extends MatsimTestCase {
 
 		final String eventsFilename = getOutputDirectory() + "events.xml";
 
-		EventsManager writeEvents = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager writeEvents = EventsUtils.createEventsManager();
 		EventWriterXML writer = new EventWriterXML(eventsFilename);
 		writeEvents.addHandler(writer);
 
@@ -96,7 +96,7 @@ public class AgentMoneyEventIntegrationTest extends MatsimTestCase {
 
 		// read the events from file
 
-		EventsManager readEvents = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager readEvents = EventsUtils.createEventsManager();
 		EventsCollector collector = new EventsCollector();
 		readEvents.addHandler(collector);
 		MatsimEventsReader reader = new MatsimEventsReader(readEvents);

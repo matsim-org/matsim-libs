@@ -32,6 +32,6 @@ public class FloatConverter implements AttributeConverter<Float> {
 
 	@Override
 	public String convertToString(Object o) {
-		return ((Float) o).toString();
+		return o.toString();
 	}
 }

@@ -178,7 +178,7 @@ public class TravelTimeOneWayTest {
 		events = EventsUtils.createEventsManager();
 		eventHandler = new StubLinkEnterEventHandler();
 		events.addHandler(eventHandler);
-		((QSim) new QSimFactory().createMobsim(scenario, events)).run();
+		new QSimFactory().createMobsim(scenario, events).run();
 		if (eventHandler.beginningOfLink2 != null) {
 			log.debug("tF = 60s, " + eventHandler.beginningOfLink2.numberOfVehPassedDuringTimeToMeasure
 					+ ", " + eventHandler.beginningOfLink2.numberOfVehPassed + ", "

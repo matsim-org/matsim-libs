@@ -32,6 +32,6 @@ public class IntegerConverter implements AttributeConverter<Integer> {
 
 @Override
 	public String convertToString(Object o) {
-		return ((Integer) o).toString();
+		return o.toString();
 	}
 }

@@ -119,7 +119,7 @@ public class MultiModalQNodeExtension {
 	   */
 	protected boolean moveAgentOverNode(final MobsimAgent personAgent, final double now) {
 		
-		Id currentLinkId = ((MobsimDriverAgent)personAgent).getCurrentLinkId();
+		Id currentLinkId = personAgent.getCurrentLinkId();
 		Id nextLinkId = ((MobsimDriverAgent)personAgent).chooseNextLinkId();
 		
 		NetsimLink currentQLink = this.simEngine.getMobsim().getNetsimNetwork().getNetsimLinks().get(currentLinkId);

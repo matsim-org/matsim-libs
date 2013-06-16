@@ -137,8 +137,8 @@ public abstract class ReflectiveModule extends Module {
 			Arrays.<Class<?>>asList(
 					String.class,
 					Float.class, Double.class, Integer.class, Long.class, Boolean.class, Character.class, Byte.class, Short.class,
-					Float.TYPE, Double.TYPE, Integer.TYPE, Long.TYPE, Boolean.TYPE, Character.TYPE, Byte.TYPE, Short.TYPE);;
-		if ( !allowedParameterTypes.contains( params[ 0 ] ) ) {
+					Float.TYPE, Double.TYPE, Integer.TYPE, Long.TYPE, Boolean.TYPE, Character.TYPE, Byte.TYPE, Short.TYPE);
+        if ( !allowedParameterTypes.contains( params[ 0 ] ) ) {
 			throw new InconsistentModuleException( "setter "+m+" gets a "+params[ 0 ]+". Valid types are String, primitive types and their wrapper classes." );
 		}
 	}

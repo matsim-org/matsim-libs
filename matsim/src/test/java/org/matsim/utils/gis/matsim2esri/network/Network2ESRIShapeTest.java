@@ -46,7 +46,7 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		String netFileName = "test/scenarios/equil/network.xml";
 		String outputFileP = getOutputDirectory() + "./network.shp";
 
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
 
 		final Network network = scenario.getNetwork();
@@ -69,7 +69,7 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		String netFileName = "test/scenarios/equil/network.xml";
 		String outputFileP = getOutputDirectory() + "./network.shp";
 
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
 
 		final Network network = scenario.getNetwork();
@@ -92,7 +92,7 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		String netFileName = "test/scenarios/equil/network.xml";
 		String outputFileP = getOutputDirectory() + "./network.shp";
 
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
 
 		final Network network = scenario.getNetwork();
@@ -115,7 +115,7 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		String netFileName = "test/scenarios/equil/network.xml";
 		String outputFileShp = getOutputDirectory() + "./network.shp";
 
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().global().setCoordinateSystem("DHDN_GK4");
 
 		final Network network = scenario.getNetwork();
@@ -138,7 +138,7 @@ public class Network2ESRIShapeTest extends MatsimTestCase  {
 		String netFileName = "test/scenarios/equil/network.xml";
 		String outputFileShp = getOutputDirectory() + "./network.shp";
 
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		final Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile(netFileName);

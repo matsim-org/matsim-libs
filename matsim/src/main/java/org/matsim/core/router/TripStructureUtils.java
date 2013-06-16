@@ -52,9 +52,9 @@ public class TripStructureUtils {
 	private static final Logger log =
 		Logger.getLogger(TripStructureUtils.class);
 
-	private TripStructureUtils() {};
+	private TripStructureUtils() {}
 
-	public static List<Activity> getActivities(
+    public static List<Activity> getActivities(
 			final Plan plan,
 			final StageActivityTypes stageActivities) {
 		return getActivities(

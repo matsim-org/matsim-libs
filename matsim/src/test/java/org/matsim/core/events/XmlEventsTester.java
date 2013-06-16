@@ -54,7 +54,7 @@ public abstract class XmlEventsTester extends TestCase {
 		writer.closeFile();
 		assertTrue(new File(eventsFile).exists());
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
 		new MatsimEventsReader(events).readFile(eventsFile);
@@ -64,7 +64,7 @@ public abstract class XmlEventsTester extends TestCase {
 		assertEquals("event has wrong class.", event.getClass(), readEvent.getClass());
 
 		Map<String, String> writtenAttributes = event.getAttributes();
-		Map<String, String> readAttributes = ((T)readEvent).getAttributes();
+		Map<String, String> readAttributes = readEvent.getAttributes();
 		for (Map.Entry<String, String> attribute : writtenAttributes.entrySet()) {
 			assertEquals("attribute '" + attribute.getKey() + "' is different after reading the event.",
 					attribute.getValue(), readAttributes.get(attribute.getKey()));

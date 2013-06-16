@@ -60,7 +60,7 @@ public class ObjectAttributesXmlWriter extends MatsimXmlWriter {
 	private static final LongConverter LONG_Converter = new LongConverter();
 
 	private final ObjectAttributes attributes;
-	private final Map<String, AttributeConverter<? extends Object>> converters = new HashMap<String, AttributeConverter<? extends Object>>();
+	private final Map<String, AttributeConverter<?>> converters = new HashMap<String, AttributeConverter<?>>();
 	private final Set<Class<?>> missingConverters = new HashSet<Class<?>>();
 
 	public ObjectAttributesXmlWriter(final ObjectAttributes attributes) {
@@ -89,7 +89,7 @@ public class ObjectAttributesXmlWriter extends MatsimXmlWriter {
 			}
 			// write attributes
 			for (Map.Entry<String, Object> objAttribute : objAttributes.entrySet()) {
-				Class<? extends Object> clazz = objAttribute.getValue().getClass();
+				Class<?> clazz = objAttribute.getValue().getClass();
 				AttributeConverter<?> conv = this.converters.get(clazz.getCanonicalName());
 				if (conv != null) {
 					xmlAttributes.add(super.createTuple(ATTR_ATTRIBUTENAME, objAttribute.getKey()));

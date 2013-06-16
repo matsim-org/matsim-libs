@@ -141,7 +141,7 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 			out.close() ;
 		} catch (IOException e) {
 			e.printStackTrace();
-		} ;
-	}
+		}
+    }
 
 }

@@ -144,7 +144,7 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 	/**
 	 * Adds the QueueSimulationListener instance  given as parameters as
 	 * listener to this QueueSimulation instance.
-	 * @param listeners
+	 * @param listener
 	 */
 	@Override
 	public void addQueueSimulationListeners(final MobsimListener listener){
@@ -178,12 +178,10 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 			throw new RuntimeException("No valid Population found (plans == null)");
 		}
 		VehicleType defaultVehicleType = new VehicleTypeImpl(new IdImpl("defaultVehicleType"));
-		Collection<MobsimAgent> agents = new ArrayList<MobsimAgent>();
 
 		for (Person p : this.population.getPersons().values()) {
 			MobsimDriverAgent agent = (MobsimDriverAgent) this.agentFactory.createMobsimAgentFromPerson(p);
 			insertAgentIntoMobsim(agent);
-			agents.add( agent ) ;
 			QueueVehicle veh = new QueueVehicle(new VehicleImpl(agent.getId(), defaultVehicleType));
 			veh.setDriver(agent);
 			agent.setVehicle(veh);
@@ -381,7 +379,6 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 	 * Informs the simulation that the specified agent wants to depart from its current activity.
 	 * The simulation can then put the agent onto its vehicle on a link or teleport it to its destination.
 	 * @param agent
-	 * @param link the link where the agent departs
 	 */
 	private void arrangeAgentDeparture(final MobsimAgent agent) {
 		double now = this.getSimTimer().getTimeOfDay() ;

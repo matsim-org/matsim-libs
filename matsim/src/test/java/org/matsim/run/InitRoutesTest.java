@@ -65,7 +65,7 @@ public class InitRoutesTest extends MatsimTestCase {
 		new MatsimNetworkReader(scenario).parse(NETWORK_FILE);
 
 		// create one person with missing link in act
-		Population population = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
+		Population population = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
 		PersonImpl person = new PersonImpl(new IdImpl("1"));
 		population.addPerson(person);
 		PlanImpl plan = person.createAndAddPlan(true);

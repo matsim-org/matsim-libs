@@ -56,10 +56,10 @@ public class TravelTimeTest {
 
 		sl.loadScenario();
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(new EventTestHandler(agentTravelTimes));
 
-		((QSim) new QSimFactory().createMobsim(data, events)).run();
+		new QSimFactory().createMobsim(data, events).run();
 
 		Map<Id, Double> travelTimes = agentTravelTimes.get(new IdImpl("1"));
 		Assert.assertEquals(360.0, travelTimes.get(new IdImpl(6)).intValue(), MatsimTestUtils.EPSILON);
@@ -83,10 +83,10 @@ public class TravelTimeTest {
 
 		sl.loadScenario();
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(new EventTestHandler(agentTravelTimes));
 
-		((QSim) new QSimFactory().createMobsim(data, events)).run();
+		new QSimFactory().createMobsim(data, events).run();
 
 		Map<Id, Double> travelTimes = agentTravelTimes.get(new IdImpl("1"));
 		Assert.assertEquals(360.0, travelTimes.get(new IdImpl(6)).intValue(), MatsimTestUtils.EPSILON);

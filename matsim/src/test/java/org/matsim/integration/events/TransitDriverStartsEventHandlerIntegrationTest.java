@@ -37,7 +37,7 @@ public class TransitDriverStartsEventHandlerIntegrationTest {
 
 	@Test
 	public void testProcessEventIntegration() {
-		EventsManager em = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager em = EventsUtils.createEventsManager();
 		TransitDriverStartsEvent e1 = new TransitDriverStartsEvent(12345, new IdImpl("driver"),
 				new IdImpl("veh"), new IdImpl("line"), new IdImpl("route"), new IdImpl("dep"));
 		TransitDriverStartsTestEventHandler eh = new TransitDriverStartsTestEventHandler();

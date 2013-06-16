@@ -37,9 +37,9 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 @Deprecated
 public final class ModularPlanRouter implements PlanAlgorithm {
 	
-	private final Map<String, LegRouter> legHandlers = new HashMap<String, LegRouter>();;
+	private final Map<String, LegRouter> legHandlers = new HashMap<String, LegRouter>();
 
-	public ModularPlanRouter() {
+    public ModularPlanRouter() {
 	}
 
 	public void addLegHandler(String transportMode, LegRouter legHandler) {
@@ -71,7 +71,7 @@ public final class ModularPlanRouter implements PlanAlgorithm {
 	
 					double endTime = fromAct.getEndTime();
 					double startTime = fromAct.getStartTime();
-					double dur = (fromAct instanceof ActivityImpl ? ((ActivityImpl) fromAct).getMaximumDuration() : Time.UNDEFINED_TIME);
+					double dur = (fromAct instanceof ActivityImpl ? fromAct.getMaximumDuration() : Time.UNDEFINED_TIME);
 					if (endTime != Time.UNDEFINED_TIME) {
 						// use fromAct.endTime as time for routing
 						now = endTime;

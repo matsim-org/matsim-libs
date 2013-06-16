@@ -58,7 +58,7 @@ public class StrategyManagerTest {
 	public void testChangeRequests() {
 		MatsimRandom.reset(4711);
 		
-		Population population = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
+		Population population = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
 		for (int i = 0; i < 1000; i++) {
 			PersonImpl p = new PersonImpl(new IdImpl(i));
 			population.addPerson(p);
@@ -140,7 +140,7 @@ public class StrategyManagerTest {
 	public void testRemoveStrategy() {
 		MatsimRandom.reset(4711);
 		
-		Population population = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
+		Population population = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
 		for (int i = 0; i < 100; i++) {
 			PersonImpl p = new PersonImpl(new IdImpl(i));
 			population.addPerson(p);
@@ -198,7 +198,7 @@ public class StrategyManagerTest {
 	@Test
 	public void testOptimisticBehavior() {
 
-		Population population = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
+		Population population = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
 		PersonImpl person = null;
 		PlanImpl[] plans = new PlanImpl[10];
 		// create a person with 4 unscored plans
@@ -258,7 +258,7 @@ public class StrategyManagerTest {
 			plans[i] = p.createAndAddPlan(false);
 			plans[i].setScore(Double.valueOf(i*10));
 		}
-		Population pop = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
+		Population pop = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
 		pop.addPerson(p);
 
 		// run with default settings
@@ -338,7 +338,7 @@ public class StrategyManagerTest {
 		manager.addChangeRequest(5, str2, 3.0);
 		manager.addChangeRequest(10, str3, 1.0);
 
-		Population pop = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
+		Population pop = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
 	
 		manager.run(pop, 1, null);
 		

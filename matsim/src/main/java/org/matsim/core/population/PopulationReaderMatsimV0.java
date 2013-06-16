@@ -105,7 +105,7 @@ import org.xml.sax.Attributes;
 	public void endTag(final String name, final String content, final Stack<String> context) {
 		if (PERSON.equals(name)) {
 			if (this.plans instanceof PopulationImpl) {
-				((PopulationImpl) this.plans).addPerson(this.currperson);
+				this.plans.addPerson(this.currperson);
 			} else {
 				this.plans.addPerson(this.currperson);
 			}

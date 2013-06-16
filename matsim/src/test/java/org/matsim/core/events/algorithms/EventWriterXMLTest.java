@@ -54,7 +54,7 @@ public class EventWriterXMLTest {
 		writer.closeFile();
 		Assert.assertTrue(new File(filename).exists());
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
 		// this is already a test: is the XML valid so it can be parsed again?
@@ -84,7 +84,7 @@ public class EventWriterXMLTest {
 		writer.closeFile();
 		Assert.assertTrue(new File(filename).exists());
 		
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
 		// this is already a test: is the XML valid so it can be parsed again?

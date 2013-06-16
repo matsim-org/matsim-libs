@@ -96,7 +96,7 @@ public class CalcLegTimesTest extends MatsimTestCase {
 
 		CalcLegTimes testee = new CalcLegTimes();
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(testee);
 
 		// add events to handle here
@@ -108,7 +108,7 @@ public class CalcLegTimesTest extends MatsimTestCase {
 
 		CalcLegTimes testee = new CalcLegTimes();
 
-		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
+		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(testee);
 
 

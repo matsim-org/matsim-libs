@@ -91,6 +91,6 @@ public class DeprecatedStaticMethod {
 			else {
 				return act.getEndTime() - act.getStartTime();
 			}
-		} ; // do not instantiate
+		}  // do not instantiate
 
 }

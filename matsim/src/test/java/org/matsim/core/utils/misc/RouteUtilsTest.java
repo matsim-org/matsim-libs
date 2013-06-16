@@ -275,7 +275,7 @@ public class RouteUtilsTest {
 		protected final Id[] ids;
 
 		protected Fixture() {
-			this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+			this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			this.network = this.scenario.getNetwork();
 			NetworkFactory nf = this.network.getFactory();
 

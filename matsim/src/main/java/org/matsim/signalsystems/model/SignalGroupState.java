@@ -26,5 +26,5 @@ package org.matsim.signalsystems.model;
  *
  */
 public enum SignalGroupState {
-	REDYELLOW, GREEN, YELLOW, RED, OFF;
+	REDYELLOW, GREEN, YELLOW, RED, OFF
 }

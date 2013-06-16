@@ -70,7 +70,7 @@ public class FeatureGeneratorBuilderImpl implements FeatureGeneratorBuilder {
 		FeatureGenerator ret;
 		Exception ex;
 		try {
-			ret = this.featureGeneratorPrototypeContructor.newInstance(new Object[]{widthCalc, this.crs});
+			ret = this.featureGeneratorPrototypeContructor.newInstance(widthCalc, this.crs);
 			return ret;
 		} catch (IllegalArgumentException e) {
 			ex = e;
@@ -90,7 +90,7 @@ public class FeatureGeneratorBuilderImpl implements FeatureGeneratorBuilder {
 		WidthCalculator ret;
 		Exception ex;
 		try {
-			ret = this.widthCalculatorPrototypeContructor.newInstance(new Object[] {this.network, this.widthCoefficient});
+			ret = this.widthCalculatorPrototypeContructor.newInstance(this.network, this.widthCoefficient);
 			return ret;
 		} catch (IllegalArgumentException e) {
 			ex = e;

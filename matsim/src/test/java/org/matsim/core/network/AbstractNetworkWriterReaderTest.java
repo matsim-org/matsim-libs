@@ -87,7 +87,7 @@ public abstract class AbstractNetworkWriterReaderTest extends MatsimTestCase {
 		assertTrue("written network file doesn't exist.", networkFile.exists());
 		assertTrue("written network file seems to be empty.", networkFile.length() > 0);
 
-		Scenario scenario2 = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network2 = scenario2.getNetwork();
 		readNetwork(scenario2, filename);
 

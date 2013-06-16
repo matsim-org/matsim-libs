@@ -49,11 +49,11 @@ public class PreparedTransitSchedule {
 	 * read only.
 	 * cdobler, nov'12
 	 */
-	private final Map<TransitRoute, double[]> sortedDepartureCache = new ConcurrentHashMap<TransitRoute, double[]>();;
+	private final Map<TransitRoute, double[]> sortedDepartureCache = new ConcurrentHashMap<TransitRoute, double[]>();
 
-	/*
-	 * Conceptually, an instance of this class wraps a TransitSchedule to optimize a function of it.
-	 */
+    /*
+     * Conceptually, an instance of this class wraps a TransitSchedule to optimize a function of it.
+     */
 	public PreparedTransitSchedule(TransitSchedule schedule) {
 		
 	}

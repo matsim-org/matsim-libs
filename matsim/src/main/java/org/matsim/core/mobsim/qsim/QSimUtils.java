@@ -44,6 +44,6 @@ public class QSimUtils {
 		VehicleType basicVehicleType = new VehicleTypeImpl(new IdImpl("basicVehicleType")) ; 
 		MobsimVehicle veh = new QVehicle(new VehicleImpl(idImpl, basicVehicleType));
 		return veh ;
-	} ;
-	
+	}
+
 }

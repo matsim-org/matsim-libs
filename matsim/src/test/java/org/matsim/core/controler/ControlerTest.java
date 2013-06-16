@@ -643,7 +643,7 @@ public class ControlerTest {
 		assertNotNull(r.controler);
 		assertNotNull(r.controler.uncaughtException);
 		assertTrue(r.controler.uncaughtException instanceof NullPointerException);
-		assertEquals("Just for testing...", ((NullPointerException) r.controler.uncaughtException).getMessage());
+		assertEquals("Just for testing...", r.controler.uncaughtException.getMessage());
 	}
 
 	private class ControlerRunnable implements Runnable {

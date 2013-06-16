@@ -65,11 +65,11 @@ public class PseudoTransitLegRouterTest {
 		Assert.assertEquals(400.0, tt, 1e-8);
 		Assert.assertEquals(400.0, leg.getTravelTime(), 1e-8);
 		Assert.assertTrue(leg.getRoute() instanceof GenericRoute);
-		Assert.assertEquals(3000.0, ((GenericRoute) leg.getRoute()).getDistance(), 1e-8);
+		Assert.assertEquals(3000.0, leg.getRoute().getDistance(), 1e-8);
 		tt = new PseudoTransitLegRouter(f.s.getNetwork(), routeAlgo, 3.0, 2.0, routeFactory).routeLeg(person, leg, fromAct, toAct, 7.0*3600);
 		Assert.assertEquals(600.0, tt, 1e-8);
 		Assert.assertEquals(600.0, leg.getTravelTime(), 1e-8);
-		Assert.assertEquals(6000.0, ((GenericRoute) leg.getRoute()).getDistance(), 1e-8);
+		Assert.assertEquals(6000.0, leg.getRoute().getDistance(), 1e-8);
 	}
 
 	private static class Fixture {

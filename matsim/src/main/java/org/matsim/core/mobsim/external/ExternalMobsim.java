@@ -126,7 +126,7 @@ public class ExternalMobsim implements Mobsim {
 
 	protected void writePlans(final String iterationPlansFile) throws FileNotFoundException, IOException {
 		log.info("writing plans for external mobsim");
-		PopulationImpl pop = (PopulationImpl) ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
+		PopulationImpl pop = (PopulationImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
 		pop.setIsStreaming(true);
 		PopulationWriter plansWriter = new PopulationWriter(pop, this.scenario.getNetwork());
 		AbstractPopulationWriterHandler handler = new PopulationWriterHandlerImplV4(this.scenario.getNetwork());

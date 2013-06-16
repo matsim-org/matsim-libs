@@ -27,7 +27,7 @@ public class CalcAverageTripLengthTest {
 
 	@Test
 	public void testWithRoute() {
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		Population population = scenario.getPopulation();
 
@@ -91,7 +91,7 @@ public class CalcAverageTripLengthTest {
 
 	@Test
 	public void testWithRoute_OneLinkRoute() {
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		Population population = scenario.getPopulation();
 
@@ -127,7 +127,7 @@ public class CalcAverageTripLengthTest {
 
 	@Test
 	public void testWithRoute_StartEndOnSameLink() {
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		Population population = scenario.getPopulation();
 

@@ -836,7 +836,7 @@ public class TransitQueueSimulationTest {
         EventsManager events = EventsUtils.createEventsManager();
         EventsCollector collector = new EventsCollector();
         events.addHandler(collector);
-        ((QSim) new QSimFactory().createMobsim(scenario, events)).run();
+        new QSimFactory().createMobsim(scenario, events).run();
         List<Event> allEvents = collector.getEvents();
 
         for (Event event : allEvents) {

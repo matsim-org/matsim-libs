@@ -33,7 +33,7 @@ public class ScenarioImplTest {
 
 	@Test
 	public void testAddGetScenarioElement_simple() {
-		Scenario s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Assert.assertNull(s.getScenarioElement(A.class));
 		Assert.assertNull(s.getScenarioElement(AImpl.class));
 		A a = new AImpl();
@@ -44,7 +44,7 @@ public class ScenarioImplTest {
 
 	@Test
 	public void testAddGetScenarioElement_complex() {
-		Scenario s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		B b = new BImpl();
 		C c = new CImpl();
@@ -66,7 +66,7 @@ public class ScenarioImplTest {
 
 	@Test
 	public void testRemoveScenarioElement_simple() {
-		Scenario s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		A a = new AImpl();
 		s.addScenarioElement(a);
 		Assert.assertEquals(a, s.getScenarioElement(A.class));
@@ -80,7 +80,7 @@ public class ScenarioImplTest {
 
 	@Test
 	public void testRemoveScenarioElement_complex() {
-		Scenario s = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario s = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		B b = new BImpl();
 		C c = new CImpl();

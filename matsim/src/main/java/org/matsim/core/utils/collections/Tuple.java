@@ -33,7 +33,7 @@ import java.io.Serializable;
  * @param <A>
  * @param <B>
  */
-public class Tuple<A extends Object, B extends Object> implements Serializable{
+public class Tuple<A, B> implements Serializable{
 	private static final long serialVersionUID = 1L;
 	/**
 	 * First entry of the tuple

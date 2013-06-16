@@ -99,7 +99,7 @@ public class NetworkReaderMatsimV1Test extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	private Link prepareTestAllowedModes(final String modes) {
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		network.addNode(network.getFactory().createNode(new IdImpl("1"), new CoordImpl(0, 0)));
 		network.addNode(network.getFactory().createNode(new IdImpl("2"), new CoordImpl(1000, 0)));

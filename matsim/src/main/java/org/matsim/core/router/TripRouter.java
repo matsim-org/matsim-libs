@@ -184,7 +184,7 @@ public final class TripRouter {
 			Activity act = (Activity) pe;
 			double endTime = act.getEndTime();
 			double startTime = act.getStartTime();
-			double dur = (act instanceof ActivityImpl ? ((ActivityImpl) act).getMaximumDuration() : Time.UNDEFINED_TIME);
+			double dur = act.getMaximumDuration();
 			if (endTime != Time.UNDEFINED_TIME) {
 				// use fromAct.endTime as time for routing
 				return endTime;

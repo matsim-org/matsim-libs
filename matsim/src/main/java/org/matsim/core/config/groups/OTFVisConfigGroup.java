@@ -98,9 +98,9 @@ public class OTFVisConfigGroup extends Module {
 
 	private static final String COLORING="coloringScheme" ;
 
-	public static enum ColoringScheme { standard, bvg, bvg2, byId, gtfs } ;
-	
-	private ColoringScheme coloring = ColoringScheme.standard ;
+	public static enum ColoringScheme { standard, bvg, bvg2, byId, gtfs }
+
+    private ColoringScheme coloring = ColoringScheme.standard ;
 
 	// ---
 	

@@ -116,7 +116,7 @@ public class TransitScheduleFormatV1Test extends MatsimTestCase {
 		new TransitScheduleWriterV1(schedule1).write(filename);
 		TransitScheduleFactory builder2 = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule2 = builder2.createTransitSchedule();
-		new TransitScheduleReaderV1(schedule2, network, ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()))).readFile(filename);
+		new TransitScheduleReaderV1(schedule2, network, ScenarioUtils.createScenario(ConfigUtils.createConfig())).readFile(filename);
 
 		// first test, without network-route
 		assertEquals(schedule1, schedule2);
@@ -136,7 +136,7 @@ public class TransitScheduleFormatV1Test extends MatsimTestCase {
 		new TransitScheduleWriterV1(schedule1).write(filename);
 		TransitScheduleFactory builder3 = new TransitScheduleFactoryImpl();
 		TransitSchedule schedule3 = builder3.createTransitSchedule();
-		new TransitScheduleReaderV1(schedule3, network, ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()))).readFile(filename);
+		new TransitScheduleReaderV1(schedule3, network, ScenarioUtils.createScenario(ConfigUtils.createConfig())).readFile(filename);
 
 		assertEquals(schedule1, schedule3);
 	}

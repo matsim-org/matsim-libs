@@ -541,7 +541,7 @@ public class MultimodalNetworkCleanerTest {
 
 	@Test
 	public void testRun_singleLinkNetwork() {
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		NetworkFactory factory = network.getFactory();
 

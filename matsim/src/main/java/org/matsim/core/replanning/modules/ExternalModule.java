@@ -107,7 +107,7 @@ public class ExternalModule implements PlanStrategyModule {
 	public void prepareReplanning(ReplanningContext replanningContext) {
 		this.currentIteration = replanningContext.getIteration();
 		String filename = this.outFileRoot + this.moduleId + ExternalInFileName;
-		PopulationImpl pop = (PopulationImpl) ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
+		PopulationImpl pop = (PopulationImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
 		pop.setIsStreaming(true);
 		this.plansWriter = new PopulationWriter(pop, scenario.getNetwork());
 
@@ -206,7 +206,7 @@ public class ExternalModule implements PlanStrategyModule {
 	}
 
 	private void reReadPlans() {
-		Population plans = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())).getPopulation();
+		Population plans = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation();
 		PopulationReader plansReader = getPlansReader(plans);
 		plansReader.readFile(this.outFileRoot + this.moduleId + ExternalOutFileName);
 		new PersonCalcTimes().run(plans);

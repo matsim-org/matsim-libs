@@ -50,7 +50,7 @@ public class KmlNetworkWriterTest extends MatsimTestCase {
 	public void testWrite() throws IOException {
 		final String kmzFilename = getOutputDirectory() + "network.kmz";
 		
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network network = scenario.getNetwork();
 		new MatsimNetworkReader(scenario).readFile("test/scenarios/equil/network.xml");
 		

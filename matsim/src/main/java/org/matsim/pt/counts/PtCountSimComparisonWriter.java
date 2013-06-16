@@ -32,9 +32,9 @@ import org.matsim.counts.algorithms.CountSimComparisonTimeFilter;
 public abstract class PtCountSimComparisonWriter implements MatsimSomeWriter {
 	public enum PtCountsType {
 		Boarding, Alighting, Occupancy
-	};
+	}
 
-	protected int iter;
+    protected int iter;
 
 	protected CountSimComparisonTimeFilter boardCountComparisonFilter, alightCountComparisonFilter, occupancyCountComparisonFilter;
 

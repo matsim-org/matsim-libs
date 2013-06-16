@@ -360,16 +360,16 @@ public class TransitRouterImplTest {
 		assertEquals(TransportMode.pt, legs.get(1).getMode());
 		assertEquals(f.stop1.getId(), ((ExperimentalTransitRoute) legs.get(1).getRoute()).getAccessStopId());
 		assertEquals(f.stop2.getId(), ((ExperimentalTransitRoute) legs.get(1).getRoute()).getEgressStopId());
-		assertEquals(f.stop1.getLinkId(), ((ExperimentalTransitRoute) legs.get(1).getRoute()).getStartLinkId());
-		assertEquals(f.stop2.getLinkId(), ((ExperimentalTransitRoute) legs.get(1).getRoute()).getEndLinkId());
+		assertEquals(f.stop1.getLinkId(), legs.get(1).getRoute().getStartLinkId());
+		assertEquals(f.stop2.getLinkId(), legs.get(1).getRoute().getEndLinkId());
 		assertEquals(TransportMode.transit_walk, legs.get(2).getMode());
 		assertEquals(TransportMode.pt, legs.get(3).getMode());
 		assertEquals(f.stop2.getLinkId(), legs.get(2).getRoute().getStartLinkId());
 		assertEquals(f.stop6.getLinkId(), legs.get(2).getRoute().getEndLinkId());
 		assertEquals(f.stop6.getId(), ((ExperimentalTransitRoute) legs.get(3).getRoute()).getAccessStopId());
 		assertEquals(f.stop7.getId(), ((ExperimentalTransitRoute) legs.get(3).getRoute()).getEgressStopId());
-		assertEquals(f.stop6.getLinkId(), ((ExperimentalTransitRoute) legs.get(3).getRoute()).getStartLinkId());
-		assertEquals(f.stop7.getLinkId(), ((ExperimentalTransitRoute) legs.get(3).getRoute()).getEndLinkId());
+		assertEquals(f.stop6.getLinkId(), legs.get(3).getRoute().getStartLinkId());
+		assertEquals(f.stop7.getLinkId(), legs.get(3).getRoute().getEndLinkId());
 		assertEquals(TransportMode.transit_walk, legs.get(4).getMode());
 	}
 
