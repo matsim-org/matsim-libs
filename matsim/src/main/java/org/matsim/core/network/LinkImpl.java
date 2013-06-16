@@ -77,11 +77,11 @@ public class LinkImpl implements Link {
 	private static int plWarnCnt = 0 ;
 	private static int lengthWarnCnt = 0;
 	private static int loopWarnCnt = 0 ;
-	private static int maxFsWarnCnt = 1;
-	private static int maxCpWarnCnt = 1;
-	private static int maxPlWarnCnt = 1;
-	private static int maxLengthWarnCnt = 1;
-	private static int maxLoopWarnCnt = 1;
+	private static final int maxFsWarnCnt = 1;
+	private static final int maxCpWarnCnt = 1;
+	private static final int maxPlWarnCnt = 1;
+	private static final int maxLengthWarnCnt = 1;
+	private static final int maxLoopWarnCnt = 1;
 
 	private static final Set<String> DEFAULT_ALLOWED_MODES;
 	static {

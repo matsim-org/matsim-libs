@@ -66,7 +66,7 @@ public class MatsimFileTypeGuesser extends DefaultHandler {
 			// I think the following would also be useful for the API, but with which name?
 			String shortSystemId = null;
 			if (this.xmlSystemId != null) {
-				 shortSystemId = this.xmlSystemId.substring(this.xmlSystemId.replace('\\', '/').lastIndexOf("/") + 1);
+				 shortSystemId = this.xmlSystemId.substring(this.xmlSystemId.replace('\\', '/').lastIndexOf('/') + 1);
 			}
 			if (shortSystemId != null) {
 				if (shortSystemId.startsWith("network_")) {

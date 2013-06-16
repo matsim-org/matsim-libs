@@ -158,7 +158,7 @@ public class NetworkReaderMatsimV1 extends MatsimXmlParser {
 		}
 		if (atts.getValue("modes") != null) {
 			String[] strModes = StringUtils.explode(atts.getValue("modes"), ',');
-			if ((strModes.length == 1) && strModes[0].equals("")) {
+			if ((strModes.length == 1) && strModes[0].isEmpty()) {
 				l.setAllowedModes(new HashSet<String>());
 			} else {
 				Set<String> modes = new HashSet<String>();

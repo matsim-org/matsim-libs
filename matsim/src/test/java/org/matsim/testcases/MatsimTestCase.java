@@ -63,7 +63,7 @@ public class MatsimTestCase extends TestCase {
 
 		this.outputDirectory = "test/output/" + this.getClass().getCanonicalName().replace('.', '/') + "/" + getName() + "/";
 		this.classInputDirectory = "test/input/" + this.getClass().getCanonicalName().replace('.', '/');
-		this.packageInputDirectory = this.classInputDirectory.substring(0, this.classInputDirectory.lastIndexOf("/") + 1);
+		this.packageInputDirectory = this.classInputDirectory.substring(0, this.classInputDirectory.lastIndexOf('/') + 1);
 		this.classInputDirectory = this.classInputDirectory + "/";
 		this.inputDirectory = this.classInputDirectory + getName() + "/";
 		MatsimRandom.reset();

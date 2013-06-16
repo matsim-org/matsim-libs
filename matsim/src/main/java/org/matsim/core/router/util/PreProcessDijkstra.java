@@ -149,7 +149,7 @@ public class PreProcessDijkstra {
 	 * Contains information whether the associated node is in a dead end.
 	 * @author lnicolas
 	 */
-	public class DeadEndData {
+	public static class DeadEndData {
 		private Node deadEndEntryNode = null;
 
 		private int inDeadEndCount = 0;

@@ -297,7 +297,7 @@ public class ParallelPopulationReaderMatsimV4 extends PopulationReaderMatsimV4 {
 		}
 	}
 	
-	public abstract class Tag {
+	public abstract static class Tag {
 		String name;
 		Stack<String> context = null;	// not used by the PopulationReader
 	}

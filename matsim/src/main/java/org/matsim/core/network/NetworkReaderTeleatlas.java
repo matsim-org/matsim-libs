@@ -401,7 +401,7 @@ public class NetworkReaderTeleatlas implements MatsimSomeReader {
 			// links with type < 7 also contains ONEWAY = N but should be open anyway....
 			if (this.ignoreFrcType7onewayN && ((linksType == 7) && oneway.equals("N"))) {
 				log.trace("  linkId=" + id.toString() + ": ignoring " + LINK_FRCTYP_NAME + "=" + linksType + " with " + LINK_ONEWAY_NAME
-						+ "=" + oneway + "");
+						+ "=" + oneway);
 				ignore = true;
 			}
 

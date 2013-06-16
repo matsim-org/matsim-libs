@@ -124,7 +124,7 @@ public class MatsimConfigReader extends MatsimXmlParser implements MatsimSomeRea
 			}
 		}
 		// hmm, didn't find the local one either... maybe inside a jar somewhere?
-		int index = systemId.replace('\\', '/').lastIndexOf("/");
+		int index = systemId.replace('\\', '/').lastIndexOf('/');
 		String shortSystemId = systemId.substring(index + 1);
 		InputStream stream = this.getClass().getResourceAsStream("/dtd/" + shortSystemId);
 		if (stream != null) {

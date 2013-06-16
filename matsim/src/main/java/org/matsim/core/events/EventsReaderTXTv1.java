@@ -36,8 +36,7 @@ import org.matsim.core.utils.misc.StringUtils;
 
 public class EventsReaderTXTv1 implements MatsimSomeReader {
 
-	private BufferedReader infile = null;
-	private final EventsManager events;
+    private final EventsManager events;
 	private EventsFactory builder;
 
 	public EventsReaderTXTv1(final EventsManager events) {
@@ -48,18 +47,18 @@ public class EventsReaderTXTv1 implements MatsimSomeReader {
 
 	public void readFile(final String filename) {
 		try {
-			this.infile = IOUtils.getBufferedReader(filename);
-			String line = this.infile.readLine();
+            BufferedReader infile = IOUtils.getBufferedReader(filename);
+			String line = infile.readLine();
 			if ((line != null) && (line.charAt(0) >= '0') && (line.charAt(0) <= '9')) {
 				/* The line starts with a number, so assume it's an event and parse it.
 				 * Otherwise it is likely the header.  */
 				parseLine(line);
 			}
 			// now all other lines should contain events
-			while ( (line = this.infile.readLine()) != null) {
+			while ( (line = infile.readLine()) != null) {
 				parseLine(line);
 			}
-			this.infile.close();
+			infile.close();
 
 		} catch (IOException e) {
 			e.printStackTrace();

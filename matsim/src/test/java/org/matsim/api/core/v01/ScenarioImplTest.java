@@ -108,11 +108,11 @@ public class ScenarioImplTest {
 		Assert.assertNull(s.getScenarioElement(A.class));
 	}
 
-	/*package*/ interface A { }
-	/*package*/ class AImpl implements A { }
-	/*package*/ interface B { }
-	/*package*/ class BImpl extends AImpl implements B { }
-	/*package*/ interface C extends B { }
-	/*package*/ class CImpl implements C { }
+	/*package*/ static interface A { }
+	/*package*/ static class AImpl implements A { }
+	/*package*/ static interface B { }
+	/*package*/ static class BImpl extends AImpl implements B { }
+	/*package*/ static interface C extends B { }
+	/*package*/ static class CImpl implements C { }
 
 }

@@ -17,15 +17,13 @@ import org.matsim.core.utils.misc.NetworkUtils;
 public class UmlaufInterpolator {
 
 	private final Network network;
-	private final PlanCalcScoreConfigGroup config;
-	private final FreespeedTravelTimeAndDisutility travelTimes;
+    private final FreespeedTravelTimeAndDisutility travelTimes;
 	private final LeastCostPathCalculator routingAlgo;
 
 	public UmlaufInterpolator(Network network, final PlanCalcScoreConfigGroup config) {
 		super();
 		this.network = network;
-		this.config = config;
-		this.travelTimes = new FreespeedTravelTimeAndDisutility(this.config);
+		this.travelTimes = new FreespeedTravelTimeAndDisutility(config);
 		this.routingAlgo = new Dijkstra(network, travelTimes, travelTimes);
 	}
 

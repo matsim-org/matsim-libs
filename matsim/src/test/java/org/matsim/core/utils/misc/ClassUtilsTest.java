@@ -143,14 +143,14 @@ public class ClassUtilsTest {
 	/*package*/ interface AB extends A, B { }
 	/*package*/ interface C extends B { }
 
-	/*package*/ class Aimpl implements A { }
-	/*package*/ class Bimpl implements B { }
-	/*package*/ class ABimpl implements A, B { }
+	/*package*/ static class Aimpl implements A { }
+	/*package*/ static class Bimpl implements B { }
+	/*package*/ static class ABimpl implements A, B { }
 
-	/*package*/ class Dimpl extends Bimpl { }
-	/*package*/ @SuppressWarnings("unused") class BCDimpl extends Bimpl implements B, C { }
+	/*package*/ static class Dimpl extends Bimpl { }
+	/*package*/ @SuppressWarnings("unused") static class BCDimpl extends Bimpl implements B, C { }
 
-	/*package*/ class Z { }
-	/*package*/ class Y extends Z { }
-	/*package*/ class X extends Y { }
+	/*package*/ static class Z { }
+	/*package*/ static class Y extends Z { }
+	/*package*/ static class X extends Y { }
 }

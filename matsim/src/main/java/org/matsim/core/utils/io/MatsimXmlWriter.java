@@ -55,7 +55,7 @@ public abstract class MatsimXmlWriter extends AbstractMatsimWriter {
 	/**
 	 * The String used for indentation
 	 */
-	private String indentationString = "\t".intern();
+	private String indentationString = "\t";
 	/**
 	 * Set this flag to true for pretty print xml output, set it to false if
 	 * no indentation, whitespaces and newlines shall be printed.
