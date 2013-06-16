@@ -75,6 +75,29 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	private static int congDensWarnCnt2 = 0;
 
 	// instance variables (problem with memory)
+	/**
+	 * The remaining integer part of the flow capacity available in one time step to move vehicles into the
+	 * buffer. This value is updated each time step by a call to
+	 * {@link #updateBufferCapacity(double)}.
+	 */
+	double remainingflowCap = 0.0;
+	/**
+	 * Stores the accumulated fractional parts of the flow capacity. See also
+	 * flowCapFraction.
+	 */
+	double flowcap_accumulate = 1.0;
+	/**
+	 * true, i.e. green, if the link is not signalized
+	 */
+	boolean thisTimeStepGreen = true;
+	double inverseFlowCapacityPerTimeStep;
+	double flowCapacityPerTimeStepFractionalPart;
+	/**
+	 * The number of vehicles able to leave the buffer in one time step (usually 1s).
+	 */
+	double flowCapacityPerTimeStep;
+	int bufferStorageCapacity;
+	double usedBufferStorageCapacity = 0.0;
 	private final Queue<Hole> holes = new LinkedList<Hole>() ;
 
 	/**
@@ -108,14 +131,14 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	private double storageCapacity;
 
 	private double usedStorageCapacity;
-	
+
 	/**
 	 * Holds all vehicles that are ready to cross the outgoing intersection
 	 */
 	private final Queue<QVehicle> buffer = new LinkedList<QVehicle>();
-	
-	
-	
+
+
+
 	/**
 	 * null if the link is not signalized
 	 */
@@ -148,7 +171,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		}
 		this.calculateCapacities();
 		this.visdata = this.new VisDataImpl() ; // instantiating this here so we can cache some things
-		
+
 		if ( HOLES ) {
 			for ( int ii=0 ; ii<this.storageCapacity; ii++ ) {
 				Hole hole = new Hole() ;	
@@ -157,7 +180,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 			}
 			// yyyyyy this does, once more, not work with variable vehicle sizes.  kai, may'13
 		}
-		
+
 	}
 
 	/* 
@@ -238,7 +261,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		}
 		// moveLaneToBuffer moves vehicles from lane to buffer.  Includes possible vehicle arrival.  Which, I think, would only be triggered
 		// if this is the original lane.
-		
+
 		// moveWaitToBuffer moves waiting (i.e. just departed) vehicles into the buffer.
 
 		this.active = this.isActive();
@@ -302,12 +325,12 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 						// so allow them to return some non-null link id in chooseNextLink() in order to be
 						// placed on the link, and here we'll remove them again if needed...
 						// ugly hack, but I didn't find a nicer solution sadly... mrieser, 5mar2011
-						
+
 						// Beispiel: Kanzler-Ubahn in Berlin.  Im Visum-Netz mit nur 1 Kante, mit Haltestelle am Anfang und
 						// am Ende der Kante.  Zweite Haltestelle wird nur bedient, wenn das Fahrzeug im matsim-Sinne zum 
 						// zweiten Mal auf die Kante gesetzt wird (oder so ähnlich, aber wir brauchen "nextLink==currentLink").
 						// kai & marcel, mar'12
-						
+
 						network.simEngine.letVehicleArrive(veh);
 						this.addParkedVehicle(veh);
 						makeVehicleAvailableToNextDriver(veh, now);
@@ -534,7 +557,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 			}
 			this.storageCapacity = tempStorageCapacity;
 		}
-		
+
 		if ( HOLES ) {
 			// yyyy number of initial holes (= max number of vehicles on link given bottleneck spillback) is, in fact, dicated
 			// by the bottleneck flow capacity, together with the fundamental diagram. :-(  kai, ???'10
@@ -669,7 +692,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	}
 
 	private double effectiveVehicleFlowConsumptionInPCU( QVehicle veh ) {
-//		return Math.min(1.0, veh.getSizeInEquivalents() ) ;
+		//		return Math.min(1.0, veh.getSizeInEquivalents() ) ;
 		return veh.getSizeInEquivalents();
 	}
 
@@ -677,10 +700,10 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		// We are trying to modify this so it also works for vehicles different from size one.  The idea is that vehicles
 		// _larger_ than size one can move as soon as at least one unit of flow or storage capacity is available.  
 		// kai/mz/amit, mar'12
-		
+
 		// yy might make sense to just accumulate to "zero" and go into negative when something is used up.
 		// kai/mz/amit, mar'12
-		
+
 		if (this.remainingflowCap >= 1.0) {
 			this.remainingflowCap -= this.effectiveVehicleFlowConsumptionInPCU(veh); 
 		}
@@ -733,7 +756,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	@Override
 	public void setSignalStateAllTurningMoves(SignalGroupState state) {
 		this.qSignalizedItem.setSignalStateAllTurningMoves(state);
-		
+
 		this.thisTimeStepGreen  = this.qSignalizedItem.isLinkGreen();
 		// (this is only for capacity accumulation)
 	}
@@ -845,6 +868,28 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 			return lastDistanceFromFromNode;
 		}
 	}
+
+	final void updateRemainingFlowCapacity() {
+		this.remainingflowCap = this.flowCapacityPerTimeStep;
+		//				if (this.thisTimeStepGreen && this.flowcap_accumulate < 1.0 && this.hasBufferSpaceLeft()) {
+		if (this.thisTimeStepGreen && this.flowcap_accumulate < 1.0 && this.isNotOfferingVehicle() ) {
+			this.flowcap_accumulate += this.flowCapacityPerTimeStepFractionalPart;
+		}
+	}
+
+	final boolean hasFlowCapacityLeftAndBufferSpace() {
+		return (
+				hasBufferSpaceLeft() 
+				&& 
+				((this.remainingflowCap >= 1.0) || (this.flowcap_accumulate >= 1.0))
+				);
+	}
+
+	private boolean hasBufferSpaceLeft() {
+		return usedBufferStorageCapacity < this.bufferStorageCapacity;
+	}
+
+
 
 	static class Hole extends QItem {
 		private double earliestLinkEndTime ;

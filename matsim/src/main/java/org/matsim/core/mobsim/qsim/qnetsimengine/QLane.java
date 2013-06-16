@@ -147,6 +147,37 @@ public final class QLane extends AbstractQLane implements Identifiable, Signaliz
 	 */
 	private final Queue<QVehicle> transitVehicleStopQueue = new PriorityQueue<QVehicle>(5, VEHICLE_EXIT_COMPARATOR);
 
+	/**
+	 * The remaining integer part of the flow capacity available in one time step to move vehicles into the
+	 * buffer. This value is updated each time step by a call to
+	 * {@link #updateBufferCapacity(double)}.
+	 */
+	double remainingflowCap = 0.0;
+
+	/**
+	 * Stores the accumulated fractional parts of the flow capacity. See also
+	 * flowCapFraction.
+	 */
+	double flowcap_accumulate = 1.0;
+
+	/**
+	 * true, i.e. green, if the link is not signalized
+	 */
+	boolean thisTimeStepGreen = true;
+
+	double inverseFlowCapacityPerTimeStep;
+
+	double flowCapacityPerTimeStepFractionalPart;
+
+	/**
+	 * The number of vehicles able to leave the buffer in one time step (usually 1s).
+	 */
+	double flowCapacityPerTimeStep;
+
+	int bufferStorageCapacity;
+
+	double usedBufferStorageCapacity = 0.0;
+
 	/*package*/ QLane(final NetsimLink ql, LaneData20 laneData, boolean isFirstLaneOnLink) {
 		this.qLink = (AbstractQLink) ql; // yyyy needs to be of correct, but should be made typesafe.  kai, aug'10
 		this.isFirstLane = isFirstLaneOnLink;
@@ -799,6 +830,26 @@ public final class QLane extends AbstractQLane implements Identifiable, Signaliz
 
 	void setOTFLane(VisLane otfLane) {
 		this.visdata.visLane = otfLane;
+	}
+
+	final void updateRemainingFlowCapacity() {
+			this.remainingflowCap = this.flowCapacityPerTimeStep;
+	//				if (this.thisTimeStepGreen && this.flowcap_accumulate < 1.0 && this.hasBufferSpaceLeft()) {
+			if (this.thisTimeStepGreen && this.flowcap_accumulate < 1.0 && this.isNotOfferingVehicle() ) {
+				this.flowcap_accumulate += this.flowCapacityPerTimeStepFractionalPart;
+			}
+		}
+
+	final boolean hasFlowCapacityLeftAndBufferSpace() {
+		return (
+				hasBufferSpaceLeft() 
+				&& 
+				((this.remainingflowCap >= 1.0) || (this.flowcap_accumulate >= 1.0))
+				);
+	}
+
+	private boolean hasBufferSpaceLeft() {
+		return usedBufferStorageCapacity < this.bufferStorageCapacity;
 	}
 
 }

@@ -46,31 +46,6 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
  */
 abstract class AbstractQLane {
 	
-	/**
-	 * The remaining integer part of the flow capacity available in one time step to move vehicles into the
-	 * buffer. This value is updated each time step by a call to
-	 * {@link #updateBufferCapacity(double)}.
-	 */
-	double remainingflowCap = 0.0;
-	/**
-	 * Stores the accumulated fractional parts of the flow capacity. See also
-	 * flowCapFraction.
-	 */
-	double flowcap_accumulate = 1.0;
-	/**
-	 * true, i.e. green, if the link is not signalized
-	 */
-	boolean thisTimeStepGreen = true;
-	double inverseFlowCapacityPerTimeStep;
-	double flowCapacityPerTimeStepFractionalPart;
-	/**
-	 * The number of vehicles able to leave the buffer in one time step (usually 1s).
-	 */
-	double flowCapacityPerTimeStep;
-	int bufferStorageCapacity;
-	double usedBufferStorageCapacity = 0.0;
-
-
 	abstract boolean doSimStep(double now) ;
 	
 	abstract void clearVehicles() ;
@@ -102,27 +77,5 @@ abstract class AbstractQLane {
 	abstract boolean hasGreenForToLink(Id toLinkId);
 	
 	abstract boolean isAcceptingFromUpstream();
-	
-	final void updateRemainingFlowCapacity() {
-		this.remainingflowCap = this.flowCapacityPerTimeStep;
-//				if (this.thisTimeStepGreen && this.flowcap_accumulate < 1.0 && this.hasBufferSpaceLeft()) {
-		if (this.thisTimeStepGreen && this.flowcap_accumulate < 1.0 && this.isNotOfferingVehicle() ) {
-			this.flowcap_accumulate += this.flowCapacityPerTimeStepFractionalPart;
-		}
-	}
-
-
-	final boolean hasFlowCapacityLeftAndBufferSpace() {
-		return (
-				hasBufferSpaceLeft() 
-				&& 
-				((this.remainingflowCap >= 1.0) || (this.flowcap_accumulate >= 1.0))
-				);
-	}
-
-
-	private boolean hasBufferSpaceLeft() {
-		return usedBufferStorageCapacity < this.bufferStorageCapacity;
-	}
 	
 }

@@ -37,7 +37,6 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
  */
 abstract class QLinkInternalI extends AbstractQLane implements NetsimLink {
 	
-	abstract boolean doSimStep(double now);
 
 	abstract QNode getToNode() ;
 
@@ -74,11 +73,6 @@ abstract class QLinkInternalI extends AbstractQLane implements NetsimLink {
 	abstract Collection<MobsimAgent> getAdditionalAgentsOnLink() ;
 	
 	/**
-	 * at simulation end for shutdown.
-	 */
-	abstract void clearVehicles() ;
-
-	/**
 	 * Agent that ends a leg or an activity is computationally passed to the QSim.  If the next PlanElement is a leg,
 	 * and the leg is treated by _this_ NetsimEngine, then the QSim passes it to the NetsimEngine, which inserts it here.
 	 */
@@ -107,5 +101,5 @@ abstract class QLinkInternalI extends AbstractQLane implements NetsimLink {
 	abstract void registerPassengerAgentWaitingForCar(MobsimAgent agent, Id vehicleId) ;
 	abstract MobsimAgent unregisterPassengerAgentWaitingForCar(MobsimAgent agent, Id vehicleId) ;
 	abstract Set<MobsimAgent> getAgentsWaitingForCar(Id vehicleId) ;
-	
+
 }
