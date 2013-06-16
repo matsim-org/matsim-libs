@@ -133,7 +133,7 @@ public final class PlanStrategyImpl implements PlanStrategy {
 
 	@Override
 	public String toString() {
-		StringBuffer name = new StringBuffer(20);
+		StringBuilder name = new StringBuilder(20);
 		name.append(this.planSelector.getClass().getSimpleName());
 		if (this.firstModule != null) {
 			name.append('_');

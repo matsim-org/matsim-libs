@@ -347,7 +347,7 @@ public class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 	 * @return a timestep specific standard string
 	 */
 	private String createFolderName(final int timestep) {
-		StringBuffer buffer = new StringBuffer(30);
+		StringBuilder buffer = new StringBuilder(30);
 		buffer.append("Traffic from ");
 		buffer.append(this.timestepToString(timestep - 1));
 		buffer.append(" to ");
@@ -401,7 +401,7 @@ public class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 	private PlacemarkType createPlacemark(final String stopid,
 			final CountSimComparison csc, final double relativeError,
 			final int timestep, PtCountsType type) {
-		StringBuffer stringBuffer = new StringBuffer();
+		StringBuilder stringBuffer = new StringBuilder();
 		PlacemarkType placemark = kmlObjectFactory.createPlacemarkType();
 		stringBuffer.delete(0, stringBuffer.length());
 		stringBuffer.append(STOP);
@@ -516,7 +516,7 @@ public class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 	private String createPlacemarkDescription(final String stopid,
 			final CountSimComparison csc, final double relativeError,
 			final int timestep, PtCountsType type) {
-		StringBuffer buffer = new StringBuffer(100);
+		StringBuilder buffer = new StringBuilder(100);
 		// buffer.append(NetworkFeatureFactory.STARTCDATA);
 		// buffer.append(STARTH1);
 		// buffer.append(LINK);
@@ -575,7 +575,7 @@ public class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 	 */
 	private String timestepToString(final int timestep) {
 		if (timestep < 10) {
-			StringBuffer buffer = new StringBuffer();
+			StringBuilder buffer = new StringBuilder();
 			buffer.append(ZERO);
 			buffer.append(Integer.toString(timestep));
 			return buffer.toString();
@@ -584,7 +584,7 @@ public class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 	}
 
 	private String getSimRealGraphName(PtCountsType type, int timestep) {
-		StringBuffer filename = new StringBuffer(type.toString());
+		StringBuilder filename = new StringBuilder(type.toString());
 		filename.append('-');
 		filename.append(SIMREALGRAPHNAME);
 		filename.append(timestep);
@@ -808,7 +808,7 @@ public class PtCountSimComparisonKMLWriter extends PtCountSimComparisonWriter {
 		log.info("writing chart data to " + new File(file).getAbsolutePath());
 		try {
 			BufferedWriter bwriter = IOUtils.getBufferedWriter(file);
-			StringBuffer buffer = new StringBuffer(100);
+			StringBuilder buffer = new StringBuilder(100);
 			buffer.append("hour \t mean relative error \t mean absolute bias");
 			bwriter.write(buffer.toString());
 			bwriter.newLine();

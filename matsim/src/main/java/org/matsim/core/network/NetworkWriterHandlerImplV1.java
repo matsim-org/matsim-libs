@@ -141,7 +141,7 @@ import org.matsim.core.utils.misc.Time;
 		Set<String> modes = link.getAllowedModes();
 		if (modes != null) {
 			if (modes != this.lastSet) { // default LinkImpl internally caches the modes-set, thus the != operator works indeed
-				StringBuffer buffer = new StringBuffer();
+				StringBuilder buffer = new StringBuilder();
 				int counter = 0;
 				for (String mode : modes) {
 					if (counter > 0) {

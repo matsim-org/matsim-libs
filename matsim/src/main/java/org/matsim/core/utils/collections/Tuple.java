@@ -97,7 +97,7 @@ public class Tuple<A, B> implements Serializable{
 	 */
 	@Override
 	public String toString() {
-		StringBuffer buffer = new StringBuffer(50);
+		StringBuilder buffer = new StringBuilder(50);
 		buffer.append("[Tuple: [First: " );
 		buffer.append(this.first.toString());
 		buffer.append("], [Second: ");

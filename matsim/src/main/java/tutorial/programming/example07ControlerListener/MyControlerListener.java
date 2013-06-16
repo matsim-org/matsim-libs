@@ -67,7 +67,7 @@ public class MyControlerListener implements StartupListener, IterationEndsListen
 		}
 		//write to file doing this not in the loop above is cause we
 		//would like to have a sorted output.
-		StringBuffer buffer = new StringBuffer();
+		StringBuilder buffer = new StringBuilder();
 		for (int i = 0; i < iters.length; i++) {
 			buffer.append(iters[i]);
 			buffer.append("\t");

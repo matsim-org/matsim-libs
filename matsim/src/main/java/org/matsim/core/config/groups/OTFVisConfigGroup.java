@@ -280,7 +280,7 @@ public class OTFVisConfigGroup extends Module {
 		map.put(LINK_WIDTH, "The (initial) width of the links of the network. Use positive floating point values.");
 		map.put(LINK_WIDTH_IS_PROPORTIONAL_TO, "Link width is proportional to `"+NUMBER_OF_LANES+"' or to `"+CAPACITY+"'.");
 		
-		StringBuffer allowedColorings = new StringBuffer();
+		StringBuilder allowedColorings = new StringBuilder();
 		for (ColoringScheme scheme : ColoringScheme.values()) {
 			allowedColorings.append(' ');
 			allowedColorings.append(scheme.toString());
