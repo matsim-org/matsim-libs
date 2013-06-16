@@ -651,6 +651,7 @@ public final class QLane extends AbstractQLane implements Identifiable, Signaliz
 	}
 
 	 void addToLane(final QLane lane) {
+		 // this is needed since the movement from one lane to the next is done internally. kai, jun'13
 		if (this.toLanes == null) {
 			this.toLanes = new LinkedList<QLane>();
 		}
@@ -658,14 +659,20 @@ public final class QLane extends AbstractQLane implements Identifiable, Signaliz
 	}
 
 	 List<QLane> getToLanes(){
+		 // this is needed to that QLinkLanesImpl can figure out the destination link ... but should be possible to do this
+		 // internally inside QLane. kai, jun'13
 		return this.toLanes;
 	}
 
 	 void addDestinationLink(final Id linkId) {
+		 // in middle of link, need to know which turning lane to take.  Need to know this from only knowing the next
+		 // link in the route.  thus need to know which lane leads to which link.
+		 // yy might want to have this knowledge in the wrapper, rather than here. kai, jun'13
 		this.destinationLinkIds.add(linkId);
 	}
 
 	Set<Id> getDestinationLinkIds(){
+		// see above (somehow, we seem to be getting link ids from lanes and then lanes from link ids--???)
 		return Collections.unmodifiableSet(destinationLinkIds);
 	}
 
