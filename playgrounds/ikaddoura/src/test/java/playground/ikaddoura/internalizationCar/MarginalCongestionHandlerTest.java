@@ -56,7 +56,7 @@ import org.matsim.testcases.MatsimTestUtils;
 
 import playground.ikaddoura.internalizationCar.MarginalCongestionEvent;
 import playground.ikaddoura.internalizationCar.MarginalCongestionEventHandler;
-import playground.ikaddoura.internalizationCar.MarginalCongestionHandler;
+import playground.ikaddoura.internalizationCar.MarginalCongestionHandlerV1;
 
 /**
  * @author ikaddoura
@@ -102,7 +102,7 @@ public class MarginalCongestionHandlerTest {
 			
 		});
 						
-		MarginalCongestionHandler congestionHandler = new MarginalCongestionHandler(this.events, this.scenario);
+		MarginalCongestionHandlerV1 congestionHandler = new MarginalCongestionHandlerV1(this.events, this.scenario);
 
 		// start agent 1...
 		congestionHandler.handleEvent(ef.createAgentDepartureEvent(0, testAgent1, linkId1, "car"));
@@ -154,7 +154,7 @@ public class MarginalCongestionHandlerTest {
 			
 		});
 						
-		MarginalCongestionHandler congestionHandler = new MarginalCongestionHandler(this.events, this.scenario);
+		MarginalCongestionHandlerV1 congestionHandler = new MarginalCongestionHandlerV1(this.events, this.scenario);
 
 		// start agent 1...
 		congestionHandler.handleEvent(ef.createAgentDepartureEvent(0, testAgent1, linkId1, "car"));
@@ -260,7 +260,7 @@ public class MarginalCongestionHandlerTest {
 			
 		});
 						
-		MarginalCongestionHandler congestionHandler = new MarginalCongestionHandler(this.events, this.scenario);
+		MarginalCongestionHandlerV1 congestionHandler = new MarginalCongestionHandlerV1(this.events, this.scenario);
 
 		// agent 3 blockiert link3
 		congestionHandler.handleEvent(ef.createAgentDepartureEvent(0, testAgent3, linkId2, "car"));
@@ -327,7 +327,7 @@ public class MarginalCongestionHandlerTest {
 			
 		});
 						
-		MarginalCongestionHandler congestionHandler = new MarginalCongestionHandler(this.events, this.scenario);
+		MarginalCongestionHandlerV1 congestionHandler = new MarginalCongestionHandlerV1(this.events, this.scenario);
 
 		// start agent 1...
 		congestionHandler.handleEvent(ef.createAgentDepartureEvent(0, testAgent1, linkId1, "car"));

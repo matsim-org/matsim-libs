@@ -31,7 +31,7 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioImpl;
 
-import playground.ikaddoura.internalizationCar.MarginalCongestionHandler;
+import playground.ikaddoura.internalizationCar.MarginalCongestionHandlerV1;
 
 /**
  * @author Ihab
@@ -50,7 +50,7 @@ public class IKControlerListener implements StartupListener {
 	public void notifyStartup(StartupEvent event) {
 		
 		EventsManager eventsManager = event.getControler().getEvents();
-		event.getControler().getEvents().addHandler(new MarginalCongestionHandler(eventsManager, scenario));		
+		event.getControler().getEvents().addHandler(new MarginalCongestionHandlerV1(eventsManager, scenario));		
 	}
 
 }
