@@ -49,7 +49,9 @@ public class InternalizationControlerListener implements StartupListener {
 	public void notifyStartup(StartupEvent event) {
 		
 		EventsManager eventsManager = event.getControler().getEvents();
-		event.getControler().getEvents().addHandler(new MarginalCongestionHandler(eventsManager, scenario));
+		
+//		event.getControler().getEvents().addHandler(new MarginalCongestionHandler(eventsManager, scenario));
+		event.getControler().getEvents().addHandler(new MarginalCongestionHandlerV2(eventsManager, scenario));
 		event.getControler().getEvents().addHandler(new MarginalCostPricingCarHandler(eventsManager, scenario));
 	}
 
