@@ -59,9 +59,9 @@ import playground.thibautd.socnetsim.utils.JointMainModeIdentifier;
 /**
  * @author thibautd
  */
-public class ExtractTripModeShares30kmFromBellevue {
+public class ExtractTripModeShares20kmFromBellevue {
 	private static final Coord BELLEVUE_COORD = new CoordImpl( 683518 , 246836 );
-	private static final double radius = 30000;
+	private static final double radius = 20000;
 	private static final StageActivityTypes STAGES =
 		new StageActivityTypesImpl(
 				Arrays.asList(
