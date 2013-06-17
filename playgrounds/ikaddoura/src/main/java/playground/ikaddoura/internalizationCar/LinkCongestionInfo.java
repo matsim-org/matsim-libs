@@ -30,6 +30,8 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 
 /**
+ * Collects all link specific informations which are required for the calculation of external congestion effects.
+ * 
  * @author ikaddoura
  *
  */
@@ -43,9 +45,11 @@ public class LinkCongestionInfo {
 	private Map<Id, Double> personId2linkLeaveTime = new HashMap<Id, Double>();
 	private List<Id> leavingAgents = new ArrayList<Id>();
 	
-	private List<Id> agentsOnLink = new ArrayList<Id>();
 	private List<LinkEnterLeaveInfo> personEnterLeaveInfos = new ArrayList<LinkEnterLeaveInfo>();
 	private Map<Id, Double> personId2freeSpeedLeaveTime = new HashMap<Id, Double>();
+	
+	private Id lastLeavingAgent;
+	private Id lastEnteringAgent;
 	
 	public Id getLinkId() {
 		return linkId;
@@ -77,9 +81,6 @@ public class LinkCongestionInfo {
 	public List<Id> getLeavingAgents() {
 		return leavingAgents;
 	}
-	public List<Id> getAgentsOnLink() {
-		return agentsOnLink;
-	}
 	public Map<Id, Double> getPersonId2freeSpeedLeaveTime() {
 		return personId2freeSpeedLeaveTime;
 	}
@@ -93,4 +94,17 @@ public class LinkCongestionInfo {
 	public void setPersonEnterLeaveInfos(List<LinkEnterLeaveInfo> personEnterLeaveInfos) {
 		this.personEnterLeaveInfos = personEnterLeaveInfos;
 	}
+	public Id getLastLeavingAgent() {
+		return lastLeavingAgent;
+	}
+	public void setLastLeavingAgent(Id lastLeavingAgent) {
+		this.lastLeavingAgent = lastLeavingAgent;
+	}
+	public Id getLastEnteringAgent() {
+		return lastEnteringAgent;
+	}
+	public void setLastEnteringAgent(Id lastEnteringAgent) {
+		this.lastEnteringAgent = lastEnteringAgent;
+	}
+	
 }

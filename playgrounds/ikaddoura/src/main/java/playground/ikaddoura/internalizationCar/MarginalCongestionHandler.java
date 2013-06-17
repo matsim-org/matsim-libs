@@ -132,10 +132,9 @@ public class MarginalCongestionHandler implements
 			}
 						
 			LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
-			linkInfo.getAgentsOnLink().add(event.getPersonId());
-			updateLinkInfo_agentEntersLink(event.getTime(), event.getPersonId(), event.getLinkId());
 			linkInfo.getPersonId2freeSpeedLeaveTime().put(event.getPersonId(), event.getTime() + 1);
-
+			updateLinkInfo_agentEntersLink(event.getTime(), event.getPersonId(), event.getLinkId());
+			
 		} else {			
 			log.warn("Not tested for other modes than car.");
 		}
@@ -155,9 +154,8 @@ public class MarginalCongestionHandler implements
 			}
 						
 			LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
-			linkInfo.getAgentsOnLink().add(event.getPersonId());
-			updateLinkInfo_agentEntersLink(event.getTime(), event.getPersonId(), event.getLinkId());
 			linkInfo.getPersonId2freeSpeedLeaveTime().put(event.getPersonId(), event.getTime() + linkInfo.getFreeTravelTime() + 1.0);
+			updateLinkInfo_agentEntersLink(event.getTime(), event.getPersonId(), event.getLinkId());
 		}	
 	}
 	
@@ -165,9 +163,6 @@ public class MarginalCongestionHandler implements
 	public void handleEvent(AgentArrivalEvent event) {
 		if (event.getLegMode().toString().equals(TransportMode.car.toString())){
 			// car!
-			LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
-			
-			linkInfo.getAgentsOnLink().remove(event.getPersonId());
 			updateLinkInfo_agentLeavesLink(event.getTime(), event.getPersonId(), event.getLinkId());
 
 		} else {			
@@ -188,10 +183,7 @@ public class MarginalCongestionHandler implements
 				// no one left this link before
 				collectLinkInfos(event.getLinkId());
 			}
-			
-			LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
-			
-			linkInfo.getAgentsOnLink().remove(event.getPersonId());
+						
 			updateLinkInfo_agentLeavesLink(event.getTime(), event.getPersonId(), event.getLinkId());
 			
 			updateTrackingMarginalDelays1(event);
@@ -199,12 +191,12 @@ public class MarginalCongestionHandler implements
 			updateTrackingMarginalDelays2(event);
 			trackMarginalDelay(event);
 			
+			LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 			linkInfo.getPersonId2freeSpeedLeaveTime().remove(event.getPersonId());
 		}
 	}
 	
-	// --------------------------------------------------------------------------------------------------------------------------------------------
-	// --------------------------------------------------------------------------------------------------------------------------------------------
+	// ################################################################################################################################################################################
 
 	private void updateTrackingMarginalDelays2(LinkLeaveEvent event) {
 		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
