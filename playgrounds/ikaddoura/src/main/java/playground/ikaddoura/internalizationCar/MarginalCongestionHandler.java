@@ -32,10 +32,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
@@ -50,7 +46,6 @@ import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 
 /**
@@ -59,7 +54,14 @@ import org.matsim.core.scenario.ScenarioImpl;
  * @author ikaddoura
  *
  */
-public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, TransitDriverStartsEventHandler, AgentDepartureEventHandler, AgentArrivalEventHandler, AgentStuckEventHandler {
+public class MarginalCongestionHandler implements
+	LinkEnterEventHandler,
+	LinkLeaveEventHandler,
+	TransitDriverStartsEventHandler,
+	AgentDepartureEventHandler, 
+	AgentArrivalEventHandler,
+	AgentStuckEventHandler {
+	
 	private final static Logger log = Logger.getLogger(MarginalCongestionHandler.class);
 	
 	private final boolean allowForStorageCapacityConstraint = true; // Runtime Exception if storage capacity active
@@ -192,10 +194,9 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 			linkInfo.getAgentsOnLink().remove(event.getPersonId());
 			updateLinkInfo_agentLeavesLink(event.getTime(), event.getPersonId(), event.getLinkId());
 			
-//			checkQSimBehavior(event);
-			clearTrackingMarginalDelays1(event);
+			updateTrackingMarginalDelays1(event);
 			calculateCongestion(event);
-			clearTrackingMarginalDelays2(event);
+			updateTrackingMarginalDelays2(event);
 			trackMarginalDelay(event);
 			
 			linkInfo.getPersonId2freeSpeedLeaveTime().remove(event.getPersonId());
@@ -204,22 +205,8 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 	
 	// --------------------------------------------------------------------------------------------------------------------------------------------
 	// --------------------------------------------------------------------------------------------------------------------------------------------
-	
-//	private void checkQSimBehavior(LinkLeaveEvent event) {
-//		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
-//		
-//		double lastLeavingFromThatLink = getLastLeavingTime(linkInfo.getPersonId2linkLeaveTime());
-//		double earliestLeaveTime = lastLeavingFromThatLink + linkInfo.getMarginalDelayPerLeavingVehicle_sec();
-//			
-//		if (event.getTime() >= earliestLeaveTime){
-//			// expected			
-//			
-//		} else {
-//			throw new RuntimeException("Agent leaves link earlier than flow capacity would allow. Aborting...");
-//		}
-//	}
 
-	private void clearTrackingMarginalDelays2(LinkLeaveEvent event) {
+	private void updateTrackingMarginalDelays2(LinkLeaveEvent event) {
 		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 		
 		if (linkInfo.getLeavingAgents().size() == 0) {
@@ -250,39 +237,43 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 //		System.out.println("relevant agents (previously leaving the link): " + linkInfo.getLeavingAgents());
 //		System.out.println("total delay: " + totalDelay);
 //		
-		if (totalDelay <= 0.) {
-			// person was leaving that link without delay
 		
+		if (totalDelay < -1.0) {
+			throw new RuntimeException("Delay below -1.0 sec. Aborting...");
+			
+		} else if (totalDelay <= 0.) {
+			// person was leaving that link without delay
+			
 		} else {
 						
-			double remainingDelay = calculateFlowCongestion(totalDelay, event);
+			double storageDelay = throwFlowCongestionEventsAndReturnStorageDelay(totalDelay, event);
 			
-			if (remainingDelay == 0) {
+			if (storageDelay == 0.) {
 				// no storage delay
 			
-			} else if (remainingDelay > 0) {
+			} else if (storageDelay > 0.) {
 				
 				if (this.allowForStorageCapacityConstraint) {
 					if (this.calculateStorageCapacityConstraints) {
 						// look who has to pay additionally for the left over delay due to the storage capacity constraint.
-						calculateStorageCongestion(event, remainingDelay);
+						calculateStorageCongestion(event, storageDelay);
 					} else {
-						this.delayNotInternalized = this.delayNotInternalized + remainingDelay;
+						this.delayNotInternalized = this.delayNotInternalized + storageDelay;
 						log.warn("Delay which is not internalized: " + this.delayNotInternalized);
 					}
 					
 				} else {
-					throw new RuntimeException("Delay due to storage capacity on link " + event.getLinkId() + ": " + remainingDelay + ". Aborting...");
+					throw new RuntimeException("Delay due to storage capacity on link " + event.getLinkId() + ": " + storageDelay + ". Aborting...");
 				}
 			
 			} else {
-				log.warn("Oups, negative storage delay: " + remainingDelay);
+				log.warn("Oups, negative storage delay: " + storageDelay);
 			}
 			
 		}
 	}
 	
-	private double calculateFlowCongestion(double totalDelay, LinkLeaveEvent event) {
+	private double throwFlowCongestionEventsAndReturnStorageDelay(double totalDelay, LinkLeaveEvent event) {
 		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 
 		// Search for agents causing the delay on that link and throw delayEffects for the causing agents.
@@ -312,7 +303,7 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 			}
 		}
 		
-		if (delayToPayFor == 1.) {
+		if (delayToPayFor == 1.) { // Maybe check if "< 1.0" is necessary
 			log.warn("Remaining delay of 1.0 sec may result from rounding errors. Setting the remaining delay to 0.0 sec.");
 			delayToPayFor = 0.;
 		}
@@ -399,7 +390,7 @@ public class MarginalCongestionHandler implements LinkEnterEventHandler, LinkLea
 		return downstreamLinks;
 	}
 	
-	private void clearTrackingMarginalDelays1(LinkLeaveEvent event) {
+	private void updateTrackingMarginalDelays1(LinkLeaveEvent event) {
 		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 		
 		if (linkInfo.getLeavingAgents().size() == 0) {
