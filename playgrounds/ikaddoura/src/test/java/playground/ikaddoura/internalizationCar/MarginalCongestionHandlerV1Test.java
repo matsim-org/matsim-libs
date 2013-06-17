@@ -27,7 +27,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
@@ -62,7 +61,7 @@ import playground.ikaddoura.internalizationCar.MarginalCongestionHandlerV1;
  * @author ikaddoura
  *
  */
-public class MarginalCongestionHandlerTest {
+public class MarginalCongestionHandlerV1Test {
 	
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();

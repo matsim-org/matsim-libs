@@ -65,7 +65,7 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author ikaddoura
  *
  */
-public class MarginalCongestionQsimTest {
+public class MarginalCongestionHandlerV1QsimTest {
 	
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
@@ -162,7 +162,7 @@ public class MarginalCongestionQsimTest {
 	@Test
 	public final void testFlowCongestion_3agents_sameTime(){
 		
-		testUtils.starting(new FrameworkMethod(MarginalCongestionQsimTest.class.getMethods()[0]));
+		testUtils.starting(new FrameworkMethod(MarginalCongestionHandlerV1QsimTest.class.getMethods()[0]));
 		Scenario sc = loadScenario2();
 		setPopulation2(sc);
 		
@@ -207,7 +207,7 @@ public class MarginalCongestionQsimTest {
 	@Test
 	public final void testFlowCongestion_2agents_differentTimes(){
 		
-		testUtils.starting(new FrameworkMethod(MarginalCongestionQsimTest.class.getMethods()[0]));
+		testUtils.starting(new FrameworkMethod(MarginalCongestionHandlerV1QsimTest.class.getMethods()[0]));
 		Scenario sc = loadScenario2();
 		setPopulation3(sc);
 		
