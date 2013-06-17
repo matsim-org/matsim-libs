@@ -27,6 +27,7 @@ import java.io.File;
 import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -203,6 +204,7 @@ public class AccessibilityIntegrationTest {
 	
 	
 	@Test
+	@Ignore
 	public void testWithExtentDeterminedShapeFile() {
 		
 		Config config = ConfigUtils.createConfig() ;
