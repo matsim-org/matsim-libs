@@ -82,6 +82,8 @@ public class JointTripRemoverAlgorithmTest {
 		fixtures.add( createMultiDriverStageFixture() );
 		fixtures.add( createTwoPassengersInDifferentTripsRemoveFirstFixture() );
 		fixtures.add( createTwoPassengersInDifferentTripsRemoveSecondFixture() );
+		fixtures.add( createTwoDriversFixture( true ) );
+		fixtures.add( createTwoDriversFixture( false ) );
 	}
 
 	private Fixture createSimplisticFixture() {
@@ -753,6 +755,132 @@ public class JointTripRemoverAlgorithmTest {
 					passenger2.getId(),
 					jointPassengerLeg2),
 				EmptyStageActivityTypes.INSTANCE);
+	}
+
+	private Fixture createTwoDriversFixture(final boolean removeFirst) {
+		final Person driver1 = new PersonImpl( new IdImpl( "Alonso" ) );
+		final Person driver2 = new PersonImpl( new IdImpl( "Schumacher" ) );
+		final Person passenger = new PersonImpl( new IdImpl( "Rantanplan" ) );
+
+		final Id link1 = new IdImpl( 1 );
+		final Id link2 = new IdImpl( 2 );
+		final Id link3 = new IdImpl( 3 );
+
+		final Map<Id, Plan> plans = new HashMap<Id, Plan>();
+		final Map<Id, List<PlanElement>> expectedAfterRemoval = new HashMap<Id, List<PlanElement>>();
+
+		final PlanImpl driverPlan1 = new PlanImpl( driver1 );
+		plans.put( driver1.getId() , driverPlan1 );
+
+		final Activity d1Act1 = driverPlan1.createAndAddActivity( "home" , link1 );
+		driverPlan1.createAndAddLeg( "skateboard" );
+		driverPlan1.createAndAddActivity( JointActingTypes.PICK_UP , link2 );
+		final Leg jointDriverLeg1 = driverPlan1.createAndAddLeg( JointActingTypes.DRIVER );
+		driverPlan1.createAndAddActivity( JointActingTypes.DROP_OFF , link3 );
+		driverPlan1.createAndAddLeg( "elevator" );
+		final Activity d1Act2 = driverPlan1.createAndAddActivity( "home" , link1 );
+		final Leg d1Leg = driverPlan1.createAndAddLeg( "skateboard" );
+		final Activity d1Act3 = driverPlan1.createAndAddActivity( "home" , link1 );
+
+		final PlanImpl driverPlan2 = new PlanImpl( driver2 );
+		plans.put( driver2.getId() , driverPlan2 );
+
+		final Activity d2Act1 = driverPlan2.createAndAddActivity( "home" , link1 );
+		final Leg d2Leg = driverPlan2.createAndAddLeg( "skateboard" );
+		final Activity d2Act2 = driverPlan2.createAndAddActivity( "home" , link1 );
+		driverPlan2.createAndAddLeg( "skateboard" );
+		driverPlan2.createAndAddActivity( JointActingTypes.PICK_UP , link2 );
+		final Leg jointDriverLeg2 = driverPlan2.createAndAddLeg( JointActingTypes.DRIVER );
+		driverPlan2.createAndAddActivity( JointActingTypes.DROP_OFF , link3 );
+		driverPlan2.createAndAddLeg( "elevator" );
+		final Activity d2Act3 = driverPlan2.createAndAddActivity( "home" , link1 );
+
+		final PlanImpl passengerPlan = new PlanImpl( passenger );
+		plans.put( passenger.getId() , passengerPlan );
+
+		final Activity pAct1 = passengerPlan.createAndAddActivity( "home" , link1 );
+		final Leg pAccess1 = passengerPlan.createAndAddLeg( "jetpack" );
+		final Activity pPu1 = passengerPlan.createAndAddActivity( JointActingTypes.PICK_UP , link2 );
+		final Leg jointPassengerLeg1 = passengerPlan.createAndAddLeg( JointActingTypes.PASSENGER );
+		final Activity pDo1 = passengerPlan.createAndAddActivity( JointActingTypes.DROP_OFF , link3 );
+		final Leg pEgress1 = passengerPlan.createAndAddLeg( "paraglider" );
+		final Activity pAct2 = passengerPlan.createAndAddActivity( "home" , link1 );
+		final Leg pAccess2 = passengerPlan.createAndAddLeg( "jetpack" );
+		final Activity pPu2 = passengerPlan.createAndAddActivity( JointActingTypes.PICK_UP , link2 );
+		final Leg jointPassengerLeg2 = passengerPlan.createAndAddLeg( JointActingTypes.PASSENGER );
+		final Activity pDo2 = passengerPlan.createAndAddActivity( JointActingTypes.DROP_OFF , link3 );
+		final Leg pEgress2 = passengerPlan.createAndAddLeg( "paraglider" );
+		final Activity pAct3 = passengerPlan.createAndAddActivity( "home" , link1 );
+
+		final DriverRoute dRoute1 = new DriverRoute( link2 , link3 );
+		dRoute1.addPassenger( passenger.getId() );
+		jointDriverLeg1.setRoute( dRoute1 );
+
+		final DriverRoute dRoute2 = new DriverRoute( link2 , link3 );
+		dRoute2.addPassenger( passenger.getId() );
+		jointDriverLeg2.setRoute( dRoute2 );
+
+		final PassengerRoute pRoute1 = new PassengerRoute( link2 , link3 );
+		pRoute1.setDriverId( driver1.getId() );
+		jointPassengerLeg1.setRoute( pRoute1 );
+
+		final PassengerRoute pRoute2 = new PassengerRoute( link2 , link3 );
+		pRoute2.setDriverId( driver2.getId() );
+		jointPassengerLeg2.setRoute( pRoute2 );
+
+		if ( removeFirst ) {
+			expectedAfterRemoval.put(
+					driver1.getId(),
+					Arrays.asList( d1Act1 , new LegImpl( TransportMode.car ) , d1Act2 ,
+						d1Leg , d1Act3 ));
+
+			expectedAfterRemoval.put(
+					driver2.getId(),
+					new ArrayList<PlanElement>( driverPlan2.getPlanElements() ) );
+
+			expectedAfterRemoval.put(
+					passenger.getId(),
+					Arrays.asList( pAct1 , new LegImpl( TransportMode.pt ) , pAct2 ,
+						pAccess2 , pPu2 , jointPassengerLeg2 , pDo2 , pEgress2 , pAct3 ));
+
+			return new Fixture(
+					"two drivers remove first",
+					new JointPlanFactory().createJointPlan( plans ),
+					expectedAfterRemoval,
+					new JointTrip(
+						driver1.getId(),
+						Arrays.asList( jointDriverLeg1 ),
+						passenger.getId(),
+						jointPassengerLeg1),
+					EmptyStageActivityTypes.INSTANCE);
+		}
+
+		assert !removeFirst;
+		expectedAfterRemoval.put(
+				driver1.getId(),
+				new ArrayList<PlanElement>( driverPlan1.getPlanElements() ) );
+
+		expectedAfterRemoval.put(
+				driver2.getId(),
+				Arrays.asList( d2Act1 , d2Leg , d2Act2 ,
+					new LegImpl( TransportMode.car ) , d2Act3 ));
+
+		expectedAfterRemoval.put(
+				passenger.getId(),
+				Arrays.asList( pAct1 , pAccess1 , pPu1 , jointPassengerLeg1 , pDo1 , pEgress1 ,
+					pAct2 , new LegImpl( TransportMode.pt ) , pAct3 ));
+
+		return new Fixture(
+				"two drivers remove second",
+				new JointPlanFactory().createJointPlan( plans ),
+				expectedAfterRemoval,
+				new JointTrip(
+					driver2.getId(),
+					Arrays.asList( jointDriverLeg2 ),
+					passenger.getId(),
+					jointPassengerLeg2),
+				EmptyStageActivityTypes.INSTANCE);
+
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
