@@ -29,6 +29,10 @@ import org.matsim.core.scenario.ScenarioImpl;
 
 
 /**
+ * This handler calculates agent money events based on marginal congestion events.
+ * The causing agent has to pay a toll depending on the number of affected agents and the external delay in sec.
+ * The delay is monetized using the behavioral parameters from the scenario.
+ * 
  * @author ikaddoura
  *
  */
