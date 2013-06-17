@@ -80,6 +80,8 @@ public class JointTripRemoverAlgorithmTest {
 		fixtures.add( createTwoPassengersFixtureWithExternOverlap() );
 		fixtures.add( createMultiPassengerStageFixture() );
 		fixtures.add( createMultiDriverStageFixture() );
+		fixtures.add( createTwoPassengersInDifferentTripsRemoveFirstFixture() );
+		fixtures.add( createTwoPassengersInDifferentTripsRemoveSecondFixture() );
 	}
 
 	private Fixture createSimplisticFixture() {
@@ -574,6 +576,185 @@ public class JointTripRemoverAlgorithmTest {
 				new StageActivityTypesImpl( stageType ));
 	}
 
+	private Fixture createTwoPassengersInDifferentTripsRemoveFirstFixture() {
+		final Person driver = new PersonImpl( new IdImpl( "Alonso" ) );
+		final Person passenger1 = new PersonImpl( new IdImpl( "Boule" ) );
+		final Person passenger2 = new PersonImpl( new IdImpl( "Bill" ) );
+
+		final Id link1 = new IdImpl( 1 );
+		final Id link2 = new IdImpl( 2 );
+		final Id link3 = new IdImpl( 3 );
+
+		final Map<Id, Plan> plans = new HashMap<Id, Plan>();
+		final Map<Id, List<PlanElement>> expectedAfterRemoval = new HashMap<Id, List<PlanElement>>();
+
+		final PlanImpl driverPlan = new PlanImpl( driver );
+		plans.put( driver.getId() , driverPlan );
+
+		final Activity dAct1 = driverPlan.createAndAddActivity( "home" , link1 );
+		driverPlan.createAndAddLeg( "skateboard" );
+		/*final Activity dPu =*/ driverPlan.createAndAddActivity( JointActingTypes.PICK_UP , link2 );
+		final Leg jointDriverLeg = driverPlan.createAndAddLeg( JointActingTypes.DRIVER );
+		/*final Activity dDo =*/ driverPlan.createAndAddActivity( JointActingTypes.DROP_OFF , link3 );
+		driverPlan.createAndAddLeg( "elevator" );
+		final Activity dAct2 = driverPlan.createAndAddActivity( "home" , link1 );
+		final Leg dAccess2 = driverPlan.createAndAddLeg( "skateboard" );
+		final Activity dPu2 = driverPlan.createAndAddActivity( JointActingTypes.PICK_UP , link2 );
+		final Leg jointDriverLeg2 = driverPlan.createAndAddLeg( JointActingTypes.DRIVER );
+		final Activity dDo2 = driverPlan.createAndAddActivity( JointActingTypes.DROP_OFF , link3 );
+		final Leg dEgress2 = driverPlan.createAndAddLeg( "elevator" );
+		final Activity dAct3 = driverPlan.createAndAddActivity( "home" , link1 );
+
+		final PlanImpl passengerPlan1 = new PlanImpl( passenger1 );
+		plans.put( passenger1.getId() , passengerPlan1 );
+
+		final Activity p1Act1 = passengerPlan1.createAndAddActivity( "home" , link1 );
+		passengerPlan1.createAndAddLeg( "jetpack" );
+		passengerPlan1.createAndAddActivity( JointActingTypes.PICK_UP , link2 );
+		final Leg jointPassengerLeg1 = passengerPlan1.createAndAddLeg( JointActingTypes.PASSENGER );
+		passengerPlan1.createAndAddActivity( JointActingTypes.DROP_OFF , link3 );
+		passengerPlan1.createAndAddLeg( "paraglider" );
+		final Activity p1Act2 = passengerPlan1.createAndAddActivity( "home" , link1 );
+
+		final PlanImpl passengerPlan2 = new PlanImpl( passenger2 );
+		plans.put( passenger2.getId() , passengerPlan2 );
+
+		passengerPlan2.createAndAddActivity( "home" , link1 );
+		passengerPlan2.createAndAddLeg( "jetpack" );
+		passengerPlan2.createAndAddActivity( JointActingTypes.PICK_UP , link2 );
+		final Leg jointPassengerLeg2 = passengerPlan2.createAndAddLeg( JointActingTypes.PASSENGER );
+		passengerPlan2.createAndAddActivity( JointActingTypes.DROP_OFF , link3 );
+		passengerPlan2.createAndAddLeg( "paraglider" );
+		passengerPlan2.createAndAddActivity( "home" , link1 );
+
+		final DriverRoute dRoute = new DriverRoute( link2 , link3 );
+		dRoute.addPassenger( passenger1.getId() );
+		jointDriverLeg.setRoute( dRoute );
+
+		final DriverRoute dRoute2 = new DriverRoute( link2 , link3 );
+		dRoute2.addPassenger( passenger2.getId() );
+		jointDriverLeg2.setRoute( dRoute2 );
+
+		final PassengerRoute pRoute = new PassengerRoute( link2 , link3 );
+		pRoute.setDriverId( driver.getId() );
+		jointPassengerLeg1.setRoute( pRoute );
+		jointPassengerLeg2.setRoute( pRoute.clone()	);
+
+		expectedAfterRemoval.put(
+				driver.getId(),
+				Arrays.asList( dAct1 , new LegImpl( TransportMode.car ) , dAct2 ,
+					dAccess2 , dPu2 , jointDriverLeg2 , dDo2 , dEgress2 , dAct3 ));
+
+		expectedAfterRemoval.put(
+				passenger1.getId(),
+				Arrays.asList( p1Act1 , new LegImpl( TransportMode.pt ) , p1Act2 ));
+
+		expectedAfterRemoval.put(
+				passenger2.getId(),
+				new ArrayList<PlanElement>( passengerPlan2.getPlanElements() ));
+
+		return new Fixture(
+				"two passengers different trips remove first",
+				new JointPlanFactory().createJointPlan( plans ),
+				expectedAfterRemoval,
+				new JointTrip(
+					driver.getId(),
+					Arrays.asList( jointDriverLeg ),
+					passenger1.getId(),
+					jointPassengerLeg1),
+				EmptyStageActivityTypes.INSTANCE);
+	}
+
+	private Fixture createTwoPassengersInDifferentTripsRemoveSecondFixture() {
+		final Person driver = new PersonImpl( new IdImpl( "Alonso" ) );
+		final Person passenger1 = new PersonImpl( new IdImpl( "Boule" ) );
+		final Person passenger2 = new PersonImpl( new IdImpl( "Bill" ) );
+
+		final Id link1 = new IdImpl( 1 );
+		final Id link2 = new IdImpl( 2 );
+		final Id link3 = new IdImpl( 3 );
+
+		final Map<Id, Plan> plans = new HashMap<Id, Plan>();
+		final Map<Id, List<PlanElement>> expectedAfterRemoval = new HashMap<Id, List<PlanElement>>();
+
+		final PlanImpl driverPlan = new PlanImpl( driver );
+		plans.put( driver.getId() , driverPlan );
+
+		final Activity dAct1 = driverPlan.createAndAddActivity( "home" , link1 );
+		final Leg dAccess = driverPlan.createAndAddLeg( "skateboard" );
+		final Activity dPu = driverPlan.createAndAddActivity( JointActingTypes.PICK_UP , link2 );
+		final Leg jointDriverLeg = driverPlan.createAndAddLeg( JointActingTypes.DRIVER );
+		final Activity dDo = driverPlan.createAndAddActivity( JointActingTypes.DROP_OFF , link3 );
+		final Leg dEgress = driverPlan.createAndAddLeg( "elevator" );
+		final Activity dAct2 = driverPlan.createAndAddActivity( "home" , link1 );
+		driverPlan.createAndAddLeg( "skateboard" );
+		driverPlan.createAndAddActivity( JointActingTypes.PICK_UP , link2 );
+		final Leg jointDriverLeg2 = driverPlan.createAndAddLeg( JointActingTypes.DRIVER );
+		driverPlan.createAndAddActivity( JointActingTypes.DROP_OFF , link3 );
+		driverPlan.createAndAddLeg( "elevator" );
+		final Activity dAct3 = driverPlan.createAndAddActivity( "home" , link1 );
+
+		final PlanImpl passengerPlan1 = new PlanImpl( passenger1 );
+		plans.put( passenger1.getId() , passengerPlan1 );
+
+		passengerPlan1.createAndAddActivity( "home" , link1 );
+		passengerPlan1.createAndAddLeg( "jetpack" );
+		passengerPlan1.createAndAddActivity( JointActingTypes.PICK_UP , link2 );
+		final Leg jointPassengerLeg1 = passengerPlan1.createAndAddLeg( JointActingTypes.PASSENGER );
+		passengerPlan1.createAndAddActivity( JointActingTypes.DROP_OFF , link3 );
+		passengerPlan1.createAndAddLeg( "paraglider" );
+		passengerPlan1.createAndAddActivity( "home" , link1 );
+
+		final PlanImpl passengerPlan2 = new PlanImpl( passenger2 );
+		plans.put( passenger2.getId() , passengerPlan2 );
+
+		final Activity p2Act1 = passengerPlan2.createAndAddActivity( "home" , link1 );
+		passengerPlan2.createAndAddLeg( "jetpack" );
+		passengerPlan2.createAndAddActivity( JointActingTypes.PICK_UP , link2 );
+		final Leg jointPassengerLeg2 = passengerPlan2.createAndAddLeg( JointActingTypes.PASSENGER );
+		passengerPlan2.createAndAddActivity( JointActingTypes.DROP_OFF , link3 );
+		passengerPlan2.createAndAddLeg( "paraglider" );
+		final Activity p2Act2 = passengerPlan2.createAndAddActivity( "home" , link1 );
+
+		final DriverRoute dRoute = new DriverRoute( link2 , link3 );
+		dRoute.addPassenger( passenger1.getId() );
+		jointDriverLeg.setRoute( dRoute );
+
+		final DriverRoute dRoute2 = new DriverRoute( link2 , link3 );
+		dRoute2.addPassenger( passenger2.getId() );
+		jointDriverLeg2.setRoute( dRoute2 );
+
+		final PassengerRoute pRoute = new PassengerRoute( link2 , link3 );
+		pRoute.setDriverId( driver.getId() );
+		jointPassengerLeg1.setRoute( pRoute );
+		jointPassengerLeg2.setRoute( pRoute.clone()	);
+
+		expectedAfterRemoval.put(
+				driver.getId(),
+				Arrays.asList( dAct1 ,
+					dAccess , dPu , jointDriverLeg , dDo , dEgress , dAct2 ,
+					new LegImpl( TransportMode.car ) , dAct3 ));
+
+		expectedAfterRemoval.put(
+				passenger1.getId(),
+				new ArrayList<PlanElement>( passengerPlan1.getPlanElements() ));
+
+		expectedAfterRemoval.put(
+				passenger2.getId(),
+				Arrays.asList( p2Act1 , new LegImpl( TransportMode.pt ) , p2Act2 ));
+
+		return new Fixture(
+				"two passengers different trips remove second",
+				new JointPlanFactory().createJointPlan( plans ),
+				expectedAfterRemoval,
+				new JointTrip(
+					driver.getId(),
+					Arrays.asList( jointDriverLeg2 ),
+					passenger2.getId(),
+					jointPassengerLeg2),
+				EmptyStageActivityTypes.INSTANCE);
+	}
+
 	// /////////////////////////////////////////////////////////////////////////
 	// tests
 	// /////////////////////////////////////////////////////////////////////////
@@ -693,6 +874,9 @@ public class JointTripRemoverAlgorithmTest {
 				final Map<Id, List<PlanElement>> expectedPlanAfterRemoval,
 				final JointTrip toRemove,
 				final StageActivityTypes stageActivities) {
+			if ( expectedPlanAfterRemoval.size() != jointPlan.getIndividualPlans().size() ) {
+				throw new IllegalArgumentException( expectedPlanAfterRemoval.size()+" != "+jointPlan.getIndividualPlans().size() );
+			}
 			this.name = name;
 			this.jointPlan = jointPlan;
 			this.expectedPlanAfterRemoval = expectedPlanAfterRemoval;
