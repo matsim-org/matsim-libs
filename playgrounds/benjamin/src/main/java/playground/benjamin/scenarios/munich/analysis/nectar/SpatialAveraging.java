@@ -68,33 +68,35 @@ import com.vividsolutions.jts.util.Assert;
 public class SpatialAveraging {
 	private static final Logger logger = Logger.getLogger(SpatialAveraging.class);
 
-	private final static String runNumber1 = "baseCase";
-	private final static String runNumber2 = "zone30";
-	private final static String runDirectory1 = "../../runs-svn/detEval/latsis/output/output_baseCase_ctd_newCode/";
-	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_zone30/";
-	private final String netFile1 = runDirectory1 + "output_network.xml.gz";
-	private final String munichShapeFile = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
-
-	private static String configFile1 = runDirectory1 + "output_config.xml.gz";
-	private final static Integer lastIteration1 = getLastIteration(configFile1);
-	private static String configFile2 = runDirectory1 + "output_config.xml.gz";
-	private final static Integer lastIteration2 = getLastIteration(configFile2);
-	private final String emissionFile1 = runDirectory1 + "ITERS/it." + lastIteration1 + "/" + lastIteration1 + ".emission.events.xml.gz";
-	private final String emissionFile2 = runDirectory2 + "ITERS/it." + lastIteration2 + "/" + lastIteration2 + ".emission.events.xml.gz";
-	
-//	private final static String runNumber1 = "981";
-//	private final static String runNumber2 = "983";
-//	private final static String runDirectory1 = "../../runs-svn/run" + runNumber1 + "/";
-//	private final static String runDirectory2 = "../../runs-svn/run" + runNumber2 + "/";
-//	private final String netFile1 = runDirectory1 + runNumber1 + ".output_network.xml.gz";
+//	final double scalingFactor = 100.;
+//	private final static String runNumber1 = "baseCase";
+//	private final static String runNumber2 = "zone30";
+//	private final static String runDirectory1 = "../../runs-svn/detEval/latsis/output/output_baseCase_ctd_newCode/";
+//	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_zone30/";
+//	private final String netFile1 = runDirectory1 + "output_network.xml.gz";
 //	private final String munichShapeFile = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
 //
-//	private static String configFile1 = runDirectory1 + runNumber1 + ".output_config.xml.gz";
+//	private static String configFile1 = runDirectory1 + "output_config.xml.gz";
 //	private final static Integer lastIteration1 = getLastIteration(configFile1);
-//	private static String configFile2 = runDirectory1 + runNumber1 + ".output_config.xml.gz";
+//	private static String configFile2 = runDirectory1 + "output_config.xml.gz";
 //	private final static Integer lastIteration2 = getLastIteration(configFile2);
-//	private final String emissionFile1 = runDirectory1 + "ITERS/it." + lastIteration1 + "/" + runNumber1 + "." + lastIteration1 + ".emission.events.xml.gz";
-//	private final String emissionFile2 = runDirectory2 + "ITERS/it." + lastIteration2 + "/" + runNumber2 + "." + lastIteration2 + ".emission.events.xml.gz";
+//	private final String emissionFile1 = runDirectory1 + "ITERS/it." + lastIteration1 + "/" + lastIteration1 + ".emission.events.xml.gz";
+//	private final String emissionFile2 = runDirectory2 + "ITERS/it." + lastIteration2 + "/" + lastIteration2 + ".emission.events.xml.gz";
+	
+	final double scalingFactor = 10.;
+	private final static String runNumber1 = "981";
+	private final static String runNumber2 = "983";
+	private final static String runDirectory1 = "../../runs-svn/run" + runNumber1 + "/";
+	private final static String runDirectory2 = "../../runs-svn/run" + runNumber2 + "/";
+	private final String netFile1 = runDirectory1 + runNumber1 + ".output_network.xml.gz";
+	private final String munichShapeFile = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
+
+	private static String configFile1 = runDirectory1 + runNumber1 + ".output_config.xml.gz";
+	private final static Integer lastIteration1 = getLastIteration(configFile1);
+	private static String configFile2 = runDirectory1 + runNumber1 + ".output_config.xml.gz";
+	private final static Integer lastIteration2 = getLastIteration(configFile2);
+	private final String emissionFile1 = runDirectory1 + "ITERS/it." + lastIteration1 + "/" + runNumber1 + "." + lastIteration1 + ".emission.events.xml.gz";
+	private final String emissionFile2 = runDirectory2 + "ITERS/it." + lastIteration2 + "/" + runNumber2 + "." + lastIteration2 + ".emission.events.xml.gz";
 
 	Network network;
 	Collection<SimpleFeature> featuresInMunich;
@@ -111,13 +113,12 @@ public class SpatialAveraging {
 	static double yMin = 5324955.00;
 	static double yMax = 5345696.81;
 
-	final double scalingFactor = 100.;
 	final int noOfTimeBins = 1;
 	final int noOfXbins = 160;
 	final int noOfYbins = 120;
 	final double smoothingRadius_m = 500.; 
 	final String pollutant2analyze = WarmPollutant.NO2.toString();
-	final boolean baseCaseOnly = false;
+	final boolean baseCaseOnly = true;
 	final boolean calculateRelativeChange = false;
 	
 	Map<Double, Map<Id, Map<String, Double>>> time2EmissionMapToAnalyze_g = new HashMap<Double, Map<Id,Map<String,Double>>>();
@@ -145,11 +146,9 @@ public class SpatialAveraging {
 		this.coldHandler.reset(0);
 
 		if(baseCaseOnly){
-			time2EmissionMapToAnalyze_g = time2EmissionsTotalFilledAndFiltered1;
-			// TODO: the following is not correct...its not g per vkm
-			time2EmissionMapToAnalyze_gPerVkm = time2EmissionsTotalFilledAndFiltered1;
-			// TODO: the following is not correct...its not vkm
-			time2DemandMapToAnalyze_vkm = time2CountsPerLinkFilledAndFiltered1;
+			time2EmissionMapToAnalyze_g = scaleToFullSample(time2EmissionsTotalFilledAndFiltered1);
+			time2EmissionMapToAnalyze_gPerVkm = calculateGPerVkm(time2EmissionsTotalFilledAndFiltered1, time2CountsPerLinkFilledAndFiltered1);
+			time2DemandMapToAnalyze_vkm = calculateVkm(time2CountsPerLinkFilledAndFiltered1);
 			outPathStub = runDirectory1 + "analysis/spatialAveraging/" + runNumber1 + "." + lastIteration1;
 		} else {
 			processEmissions(emissionFile2);
@@ -194,6 +193,76 @@ public class SpatialAveraging {
 //		writeGISoutput(time2Demand_vkm, outPathStub + ".GISoutput.Demand.vkm.movie.shp");
 //		writeGISoutput(time2Emissions_g, outPathStub +  ".GISoutput." + pollutant2analyze.toString() + ".g.movie.shp");
 //		writeGISoutput(time2Emissions_gPerVkm, outPathStub +  ".GISoutput." + pollutant2analyze.toString() + ".gPerVkm.movie.shp");
+	}
+
+	private Map<Double, Map<Id, Map<String, Double>>> scaleToFullSample(
+			Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFilledAndFiltered) {
+		Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFilledAndFilteredScaled = new HashMap<Double, Map<Id,Map<String,Double>>>();
+		for(Double endOfTimeInterval : time2EmissionsTotalFilledAndFiltered.keySet()){
+			Map<Id, Map<String, Double>> absoluteEmissions_gPerVkm = new HashMap<Id, Map<String, Double>>();
+			Map<Id, Map<String, Double>> linkId2Emissions = time2EmissionsTotalFilledAndFiltered.get(endOfTimeInterval);
+
+			for(Entry<Id, Map<String, Double>> entry1 : linkId2Emissions.entrySet()){
+				Id linkId = entry1.getKey();
+				Map<String, Double> absoluteEmissionsPerLink_gPerVkm = new HashMap<String, Double>();
+				for(String pollutant : entry1.getValue().keySet()){
+					double emissionsOfPollutant = this.scalingFactor * entry1.getValue().get(pollutant);
+					absoluteEmissionsPerLink_gPerVkm.put(pollutant, emissionsOfPollutant);
+				}
+				absoluteEmissions_gPerVkm.put(linkId, absoluteEmissionsPerLink_gPerVkm);
+			}
+			time2EmissionsTotalFilledAndFilteredScaled.put(endOfTimeInterval, absoluteEmissions_gPerVkm);
+		}
+		return time2EmissionsTotalFilledAndFilteredScaled;
+	}
+
+	private Map<Double, Map<Id, Double>> calculateVkm(
+			Map<Double, Map<Id, Double>> time2CountsPerLinkFilledAndFiltered) {
+		Map<Double, Map<Id, Double>> time2VkmPerLinkFilledAndFiltered = new HashMap<Double, Map<Id,Double>>();
+		for(Double endOfTimeInterval : time2CountsPerLinkFilledAndFiltered.keySet()){
+			Map<Id, Double> linkId2Vkm = new HashMap<Id, Double>();
+			Map<Id, Double> linkId2Counts = time2CountsPerLinkFilledAndFiltered.get(endOfTimeInterval);
+			for(Id linkId : linkId2Counts.keySet()){
+				double count = this.scalingFactor * linkId2Counts.get(linkId);
+				double vkm = count * this.network.getLinks().get(linkId).getLength() / 1000.;
+				linkId2Vkm.put(linkId, vkm);
+			}
+			time2VkmPerLinkFilledAndFiltered.put(endOfTimeInterval, linkId2Vkm);
+		}
+		return time2VkmPerLinkFilledAndFiltered;
+	}
+
+	private Map<Double, Map<Id, Map<String, Double>>> calculateGPerVkm(
+			Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFilledAndFiltered,
+			Map<Double, Map<Id, Double>> time2CountsPerLinkFilledAndFiltered) {
+		
+		Map<Double, Map<Id, Map<String, Double>>> time2GPerVkmPerLinkFilledAndFiltered = new HashMap<Double, Map<Id,Map<String,Double>>>();
+		for(Double endOfTimeInterval : time2EmissionsTotalFilledAndFiltered.keySet()){
+			Map<Id, Map<String, Double>> absoluteEmissions_gPerVkm = new HashMap<Id, Map<String, Double>>();
+			Map<Id, Map<String, Double>> linkId2Emissions = time2EmissionsTotalFilledAndFiltered.get(endOfTimeInterval);
+
+			for(Entry<Id, Map<String, Double>> entry1 : linkId2Emissions.entrySet()){
+				Id linkId = entry1.getKey();
+				Map<String, Double> absoluteEmissionsPerLink_gPerVkm = new HashMap<String, Double>();
+				for(String pollutant : entry1.getValue().keySet()){
+					double emissionsOfPollutant = this.scalingFactor * entry1.getValue().get(pollutant);
+					double linkLength_km = this.network.getLinks().get(linkId).getLength() / 1000.;
+
+					double emissionsPerVehicleKm; 
+					double count = this.scalingFactor * time2CountsPerLinkFilledAndFiltered.get(endOfTimeInterval).get(linkId);
+					if(count != 0.0){
+						emissionsPerVehicleKm = emissionsOfPollutant / (count * linkLength_km);
+					} else {
+						emissionsPerVehicleKm = 0.0;
+					}
+
+					absoluteEmissionsPerLink_gPerVkm.put(pollutant, emissionsPerVehicleKm);
+				}
+				absoluteEmissions_gPerVkm.put(linkId, absoluteEmissionsPerLink_gPerVkm);
+			}
+			time2GPerVkmPerLinkFilledAndFiltered.put(endOfTimeInterval, absoluteEmissions_gPerVkm);
+		}
+		return time2GPerVkmPerLinkFilledAndFiltered;
 	}
 
 	private void writeGISoutput(
@@ -460,11 +529,10 @@ public class SpatialAveraging {
 			Map<Double, Map<Id, Double>> time2CountsPerLinkFilledAndFiltered1,
 			Map<Double, Map<Id, Double>> time2CountsPerLinkFilledAndFiltered2) {
 
-		for(Entry<Double, Map<Id, Map<String, Double>>> entry0 : time2EmissionsTotalFilledAndFiltered1.entrySet()){
-			double endOfTimeInterval = entry0.getKey();
+		for(Double endOfTimeInterval : time2EmissionsTotalFilledAndFiltered1.keySet()){
 			Map<Id, Map<String, Double>> absoluteEmissionDifference_g = new HashMap<Id, Map<String, Double>>();
 			Map<Id, Map<String, Double>> absoluteEmissionDifference_gPerVkm = new HashMap<Id, Map<String, Double>>();
-			Map<Id, Map<String, Double>> linkId2Emissions = entry0.getValue();
+			Map<Id, Map<String, Double>> linkId2Emissions = time2EmissionsTotalFilledAndFiltered1.get(endOfTimeInterval);
 
 			for(Entry<Id, Map<String, Double>> entry1 : linkId2Emissions.entrySet()){
 				Id linkId = entry1.getKey();
