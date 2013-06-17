@@ -39,6 +39,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.EmptyStageActivityTypes;
+import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.TripRouter;
 
 import playground.thibautd.socnetsim.cliques.config.JointTripInsertorConfigGroup;
@@ -74,7 +75,7 @@ public class IgnoranceBehaviorTest {
 
 	@Test
 	public void testRemoverIgnorance() throws Exception {
-		final JointTripRemoverAlgorithm algo = new JointTripRemoverAlgorithm( random , EmptyStageActivityTypes.INSTANCE );
+		final JointTripRemoverAlgorithm algo = new JointTripRemoverAlgorithm( random , EmptyStageActivityTypes.INSTANCE , new MainModeIdentifierImpl() );
 		
 		JointPlan jointPlan = createPlanWithJointTrips();
 

@@ -19,7 +19,10 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.cliques.replanning.modules.jointtripinsertor;
 
+import java.util.HashSet;
+
 import org.matsim.core.router.CompositeStageActivityTypes;
+import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
@@ -33,12 +36,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
-import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -62,15 +63,21 @@ public class JointTripRemoverAlgorithm implements GenericPlanAlgorithm<JointPlan
 
 	private final Random random;
 	private final StageActivityTypes stages;
+	private final StageActivityTypes stagesWithJointTypes;
+	private final MainModeIdentifier mainModeIdentifier;
 
 	public JointTripRemoverAlgorithm(
 			final Random random,
-			final StageActivityTypes stagesFromTripRouter) {
+			final StageActivityTypes stages,
+			final MainModeIdentifier mainModeIdentifier) {
 		this.random = random;
+		this.stages = stages;
+
 		final CompositeStageActivityTypes compositeStages = new CompositeStageActivityTypes();
-		compositeStages.addActivityTypes( stagesFromTripRouter );
+		compositeStages.addActivityTypes( stages );
 		compositeStages.addActivityTypes( JointActingTypes.JOINT_STAGE_ACTS );
-		this.stages = compositeStages;
+		this.stagesWithJointTypes = compositeStages;
+		this.mainModeIdentifier = mainModeIdentifier;
 	}
 
 	@Override
@@ -120,11 +127,12 @@ public class JointTripRemoverAlgorithm implements GenericPlanAlgorithm<JointPlan
 			final JointTrip toRemove,
 			final JointPlan jointPlan) {
 		final Plan passengerPlan = jointPlan.getIndividualPlan( toRemove.getPassengerId() );
+
 		final Trip tripWithLeg =
 			getTripWithLeg(
 					passengerPlan,
 					toRemove.getPassengerLeg(),
-					stages);
+					stagesWithJointTypes );
 
 		TripRouter.insertTrip(
 				passengerPlan , 
@@ -144,42 +152,30 @@ public class JointTripRemoverAlgorithm implements GenericPlanAlgorithm<JointPlan
 	}
 
 	// package protected for tests
-	final static void removeDriverTrip(
+	final void removeDriverTrip(
 			final JointTrip toRemove,
 			final JointPlan plan) {
 		unregisterPassengerFromDriverRoutes( toRemove );
 		repareDriverTrips( toRemove , plan );
 	}
 
-	private static void repareDriverTrips(
+	private void repareDriverTrips(
 			final JointTrip toRemove,
 			final JointPlan plan) {
-		final List<PlanElement> allPes = plan.getIndividualPlan( toRemove.getDriverId() ).getPlanElements();
-		final List<PlanElement> trip = getDriverTrip( toRemove , plan.getIndividualPlan( toRemove.getDriverId() ) );
+		final List<TripStructureUtils.Trip> subtrips = getDriverTrip( toRemove , plan.getIndividualPlan( toRemove.getDriverId() ) );
 		final List<PlanElement> newTrip = new ArrayList<PlanElement>();
 		newTrip.add( new LegImpl( TransportMode.car ) );
-
-		final int start = allPes.indexOf( trip.get( 0 ) ) - 1;
 
 		// "state" variables, changed in the loop:
 		// - keeps track of the passengers currently in the vehicle.
 		//   Pick-up or drop-offs are created at each change
 		Set<Id> currentPassengers = Collections.<Id>emptySet();
-		// - stores the Id of the last activity, in case we cannot get this info
-		//   from the Route
-		Id lastActLinkId = ((Activity) allPes.get( start )).getLinkId();
-		for (PlanElement pe : trip ) {
-			if ( !(pe instanceof Leg) ) {
-				// this is collected just in case some legs have no route
-				// XXX: This will fail without crash without a strict Act/leg alternance!
-				lastActLinkId = ((Activity) pe).getLinkId();
-				continue;
-			}
-			final Leg leg = (Leg) pe;
-			final Route route = leg.getRoute();
+		for ( TripStructureUtils.Trip subtrip : subtrips ) {
+			final Leg leg = getDriverLegIfItIs( subtrip );
+			final Route route = leg == null ? null : leg.getRoute();
 
-			final Set<Id> newPassengers = route instanceof DriverRoute ?
-				new TreeSet<Id>( ((DriverRoute) route).getPassengersIds() ) :
+			final Set<Id> newPassengers = route != null ?
+				new HashSet<Id>( ((DriverRoute) route).getPassengersIds() ) :
 				Collections.<Id>emptySet();
 			// note that no check of the mode is done...
 			if ( !newPassengers.equals( currentPassengers ) ) {
@@ -192,7 +188,7 @@ public class JointTripRemoverAlgorithm implements GenericPlanAlgorithm<JointPlan
 								JointActingTypes.PICK_UP,
 								route != null ?
 									route.getStartLinkId() :
-									lastActLinkId ) );
+									subtrip.getOriginActivity().getLinkId() ) );
 				}
 				else {
 					newTrip.add(
@@ -200,7 +196,7 @@ public class JointTripRemoverAlgorithm implements GenericPlanAlgorithm<JointPlan
 								JointActingTypes.DROP_OFF,
 								route != null ?
 									route.getStartLinkId() :
-									lastActLinkId ) );
+									subtrip.getOriginActivity().getLinkId() ) );
 				}
 				// as the spatial structure of the trip is modified, it is possible
 				// that some pre-existing subtours are removed. Thus, a driver that may
@@ -211,41 +207,35 @@ public class JointTripRemoverAlgorithm implements GenericPlanAlgorithm<JointPlan
 				// XXX It could be done in a smarter way, so that if no subtour is removed, no modification is done
 				// For instance, when removing an "intern" trip, first PU and last DO are
 				// left untouched, and thus access and egress leg need not be touched.
-				newTrip.add(
-						leg.getMode().equals( JointActingTypes.DRIVER ) ?
-							leg :
-							new LegImpl( TransportMode.car ));
+				newTrip.add( leg != null ? leg : new LegImpl( TransportMode.car ) );
 				currentPassengers = newPassengers;
 			}
 		}
 
-		trip.clear();
-		trip.addAll( newTrip );
+		TripRouter.insertTrip(
+				plan.getIndividualPlan( toRemove.getDriverId() ),
+				subtrips.get( 0 ).getOriginActivity(),
+				newTrip,
+				subtrips.get( subtrips.size() - 1 ).getDestinationActivity() );
 	}
 
-	private static List<PlanElement> getDriverTrip(
+	private Leg getDriverLegIfItIs(final Trip subtrip) {
+		if ( !mainModeIdentifier.identifyMainMode( subtrip.getTripElements() ).equals( JointActingTypes.DRIVER ) ) return null;
+		if ( subtrip.getLegsOnly().size() != 1 ) throw new RuntimeException( "unexpected driver subtrip length: "+subtrip );
+		return subtrip.getLegsOnly().get( 0 );
+	}
+
+	private List<TripStructureUtils.Trip> getDriverTrip(
 			final JointTrip toRemove,
 			final Plan driverPlan) {
-		boolean isTheTrip = false;
+		final TripStructureUtils.Trip driverTrip = getTripWithLeg( driverPlan , toRemove.getDriverLegs().get( 0 ) , stagesWithJointTypes );
+		assert driverTrip.getTripElements().containsAll( toRemove.getDriverLegs() );
 
-		int i = 0;
-		int startTrip = 0;
-		for (PlanElement pe : driverPlan.getPlanElements()) {
-			if (pe instanceof Leg ||
-					JointActingTypes.JOINT_STAGE_ACTS.isStageActivity( ((Activity) pe).getType() )) {
-				if (toRemove.getDriverLegs().contains( pe )) {
-					isTheTrip = true;
-				}
-			}
-			else {
-				if (isTheTrip) return driverPlan.getPlanElements().subList( startTrip , i );
-				startTrip = i + 1;
-			}
-			i++;
-		}
-		if (isTheTrip) return driverPlan.getPlanElements().subList( startTrip , i );
-
-		throw new RuntimeException( "this part of the code should be unreachable" );
+		final List<PlanElement> elements = new ArrayList<PlanElement>();
+		elements.add( driverTrip.getOriginActivity() );
+		elements.addAll( driverTrip.getTripElements() );
+		elements.add( driverTrip.getDestinationActivity() );
+		return TripStructureUtils.getTrips( elements , stages );
 	}
 
 	private static void unregisterPassengerFromDriverRoutes(

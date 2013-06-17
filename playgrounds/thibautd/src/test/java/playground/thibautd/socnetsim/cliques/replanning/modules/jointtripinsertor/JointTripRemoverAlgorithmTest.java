@@ -46,6 +46,9 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.EmptyStageActivityTypes;
+import org.matsim.core.router.MainModeIdentifierImpl;
+import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.StageActivityTypesImpl;
 
 import playground.thibautd.socnetsim.cliques.replanning.modules.jointtripinsertor.JointTripRemoverAlgorithm;
 import playground.thibautd.socnetsim.population.DriverRoute;
@@ -75,6 +78,8 @@ public class JointTripRemoverAlgorithmTest {
 		fixtures.add( createTwoPassengersFixture() );
 		fixtures.add( createTwoPassengersFixtureWithInternOverlap() );
 		fixtures.add( createTwoPassengersFixtureWithExternOverlap() );
+		fixtures.add( createMultiPassengerStageFixture() );
+		fixtures.add( createMultiDriverStageFixture() );
 	}
 
 	private Fixture createSimplisticFixture() {
@@ -138,7 +143,8 @@ public class JointTripRemoverAlgorithmTest {
 					driver.getId(),
 					Arrays.asList( jointDriverLeg ),
 					passenger.getId(),
-					jointPassengerLeg));
+					jointPassengerLeg),
+				EmptyStageActivityTypes.INSTANCE);
 	}
 
 	private Fixture createTwoPassengersFixture() {
@@ -222,7 +228,8 @@ public class JointTripRemoverAlgorithmTest {
 					driver.getId(),
 					Arrays.asList( jointDriverLeg ),
 					passenger1.getId(),
-					jointPassengerLeg1));
+					jointPassengerLeg1),
+				EmptyStageActivityTypes.INSTANCE);
 	}
 
 	private Fixture createTwoPassengersFixtureWithInternOverlap() {
@@ -321,7 +328,8 @@ public class JointTripRemoverAlgorithmTest {
 					driver.getId(),
 					Arrays.asList( jointDriverLeg2 ),
 					passenger1.getId(),
-					jointPassengerLeg1));
+					jointPassengerLeg1),
+				EmptyStageActivityTypes.INSTANCE);
 	}
 
 	private Fixture createTwoPassengersFixtureWithExternOverlap() {
@@ -420,7 +428,150 @@ public class JointTripRemoverAlgorithmTest {
 					driver.getId(),
 					Arrays.asList( jointDriverLeg1 , jointDriverLeg2 , jointDriverLeg3 ),
 					passenger1.getId(),
-					jointPassengerLeg1));
+					jointPassengerLeg1),
+				EmptyStageActivityTypes.INSTANCE);
+	}
+
+	private Fixture createMultiDriverStageFixture() {
+		final Person driver = new PersonImpl( new IdImpl( "Schumacher" ) );
+		final Person passenger = new PersonImpl( new IdImpl( "Asterix" ) );
+		final String stageType = "drinkACoffee";
+
+		final Id link1 = new IdImpl( 1 );
+		final Id link2 = new IdImpl( 2 );
+		final Id link3 = new IdImpl( 3 );
+
+		final Map<Id, Plan> plans = new HashMap<Id, Plan>();
+		final Map<Id, List<PlanElement>> expectedAfterRemoval = new HashMap<Id, List<PlanElement>>();
+
+		final PlanImpl driverPlan = new PlanImpl( driver );
+		plans.put( driver.getId() , driverPlan );
+
+		// the fantaisist modes are not (only) for fun: they allow to check from
+		// where the mode of the replacement comes. This can be important due
+		// to the possibility that access/egress legs constitute subtours and thus
+		// break the mode chain.
+		final Activity dAct1 = driverPlan.createAndAddActivity( "home" , link1 );
+		driverPlan.createAndAddLeg( "horse" );
+		driverPlan.createAndAddActivity( stageType , link1 );
+		driverPlan.createAndAddLeg( "horse" );
+		driverPlan.createAndAddActivity( JointActingTypes.PICK_UP , link2 );
+		final Leg jointDriverLeg = driverPlan.createAndAddLeg( JointActingTypes.DRIVER );
+		driverPlan.createAndAddActivity( JointActingTypes.DROP_OFF , link3 );
+		driverPlan.createAndAddLeg( "unicycle" );
+		driverPlan.createAndAddLeg( "unicycle" );
+		driverPlan.createAndAddActivity( stageType , link1 );
+		driverPlan.createAndAddLeg( "unicycle" );
+		final Activity dAct2 = driverPlan.createAndAddActivity( "home" , link1 );
+
+		final PlanImpl passengerPlan = new PlanImpl( passenger );
+		plans.put( passenger.getId() , passengerPlan );
+
+		final Activity pAct1 = passengerPlan.createAndAddActivity( "home" , link1 );
+		passengerPlan.createAndAddLeg( "jetpack" );
+		passengerPlan.createAndAddActivity( JointActingTypes.PICK_UP , link2 );
+		final Leg jointPassengerLeg = passengerPlan.createAndAddLeg( JointActingTypes.PASSENGER );
+		passengerPlan.createAndAddActivity( JointActingTypes.DROP_OFF , link3 );
+		passengerPlan.createAndAddLeg( "paraglider" );
+		final Activity pAct2 = passengerPlan.createAndAddActivity( "home" , link1 );
+
+		final DriverRoute dRoute = new DriverRoute( link2 , link3 );
+		dRoute.addPassenger( passenger.getId() );
+		jointDriverLeg.setRoute( dRoute );
+
+		final PassengerRoute pRoute = new PassengerRoute( link2 , link3 );
+		pRoute.setDriverId( driver.getId() );
+		jointPassengerLeg.setRoute( pRoute );
+
+		expectedAfterRemoval.put(
+				driver.getId(),
+				Arrays.asList( dAct1 , new LegImpl( TransportMode.car ) , dAct2 ));
+
+		expectedAfterRemoval.put(
+				passenger.getId(),
+				Arrays.asList( pAct1 , new LegImpl( TransportMode.pt ) , pAct2 ));
+
+		return new Fixture(
+				"complex access trip driver",
+				new JointPlanFactory().createJointPlan( plans ),
+				expectedAfterRemoval,
+				new JointTrip(
+					driver.getId(),
+					Arrays.asList( jointDriverLeg ),
+					passenger.getId(),
+					jointPassengerLeg),
+				new StageActivityTypesImpl( stageType ));
+	}
+
+	private Fixture createMultiPassengerStageFixture() {
+		final Person driver = new PersonImpl( new IdImpl( "Schumacher" ) );
+		final Person passenger = new PersonImpl( new IdImpl( "Asterix" ) );
+		final String stageType = "drinkACoffee";
+
+		final Id link1 = new IdImpl( 1 );
+		final Id link2 = new IdImpl( 2 );
+		final Id link3 = new IdImpl( 3 );
+
+		final Map<Id, Plan> plans = new HashMap<Id, Plan>();
+		final Map<Id, List<PlanElement>> expectedAfterRemoval = new HashMap<Id, List<PlanElement>>();
+
+		final PlanImpl driverPlan = new PlanImpl( driver );
+		plans.put( driver.getId() , driverPlan );
+
+		// the fantaisist modes are not (only) for fun: they allow to check from
+		// where the mode of the replacement comes. This can be important due
+		// to the possibility that access/egress legs constitute subtours and thus
+		// break the mode chain.
+		final Activity dAct1 = driverPlan.createAndAddActivity( "home" , link1 );
+		driverPlan.createAndAddLeg( "horse" );
+		driverPlan.createAndAddActivity( JointActingTypes.PICK_UP , link2 );
+		final Leg jointDriverLeg = driverPlan.createAndAddLeg( JointActingTypes.DRIVER );
+		driverPlan.createAndAddActivity( JointActingTypes.DROP_OFF , link3 );
+		driverPlan.createAndAddLeg( "unicycle" );
+		final Activity dAct2 = driverPlan.createAndAddActivity( "home" , link1 );
+
+		final PlanImpl passengerPlan = new PlanImpl( passenger );
+		plans.put( passenger.getId() , passengerPlan );
+
+		final Activity pAct1 = passengerPlan.createAndAddActivity( "home" , link1 );
+		passengerPlan.createAndAddLeg( "jetpack" );
+		passengerPlan.createAndAddActivity( stageType , link1 );
+		passengerPlan.createAndAddLeg( "jetpack" );
+		passengerPlan.createAndAddActivity( JointActingTypes.PICK_UP , link2 );
+		final Leg jointPassengerLeg = passengerPlan.createAndAddLeg( JointActingTypes.PASSENGER );
+		passengerPlan.createAndAddActivity( JointActingTypes.DROP_OFF , link3 );
+		passengerPlan.createAndAddLeg( "paraglider" );
+		passengerPlan.createAndAddActivity( stageType , link1 );
+		passengerPlan.createAndAddLeg( "paraglider" );
+		passengerPlan.createAndAddLeg( "paraglider" );
+		final Activity pAct2 = passengerPlan.createAndAddActivity( "home" , link1 );
+
+		final DriverRoute dRoute = new DriverRoute( link2 , link3 );
+		dRoute.addPassenger( passenger.getId() );
+		jointDriverLeg.setRoute( dRoute );
+
+		final PassengerRoute pRoute = new PassengerRoute( link2 , link3 );
+		pRoute.setDriverId( driver.getId() );
+		jointPassengerLeg.setRoute( pRoute );
+
+		expectedAfterRemoval.put(
+				driver.getId(),
+				Arrays.asList( dAct1 , new LegImpl( TransportMode.car ) , dAct2 ));
+
+		expectedAfterRemoval.put(
+				passenger.getId(),
+				Arrays.asList( pAct1 , new LegImpl( TransportMode.pt ) , pAct2 ));
+
+		return new Fixture(
+				"complex access trip passenger",
+				new JointPlanFactory().createJointPlan( plans ),
+				expectedAfterRemoval,
+				new JointTrip(
+					driver.getId(),
+					Arrays.asList( jointDriverLeg ),
+					passenger.getId(),
+					jointPassengerLeg),
+				new StageActivityTypesImpl( stageType ));
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -431,12 +582,13 @@ public class JointTripRemoverAlgorithmTest {
 		// TODO: test driver and passenger removal separately
 		for ( Fixture f : fixtures ) {
 			log.info( "testing removal on fixture "+f.name );
-			final JointTripRemoverAlgorithm algo = new JointTripRemoverAlgorithm( null ,  EmptyStageActivityTypes.INSTANCE );
+			final JointTripRemoverAlgorithm algo = new JointTripRemoverAlgorithm( null ,  f.stageActivities , new MainModeIdentifierImpl() );
 			algo.removePassengerTrip( f.toRemove , f.jointPlan );
-			JointTripRemoverAlgorithm.removeDriverTrip( f.toRemove , f.jointPlan );
+			algo.removeDriverTrip( f.toRemove , f.jointPlan );
 
 			for ( Plan p : f.jointPlan.getIndividualPlans().values() ) {
 				assertChainsMatch(
+						f.name,
 						f.expectedPlanAfterRemoval.get( p.getPerson().getId() ),
 						p.getPlanElements() );
 			}
@@ -444,10 +596,11 @@ public class JointTripRemoverAlgorithmTest {
 	}
 
 	private void assertChainsMatch(
+			final String fixtureName,
 			final List<PlanElement> expected,
 			final List<PlanElement> actual) {
 		assertEquals(
-				"sizes do not match "+expected+" and "+actual,
+				fixtureName+": sizes do not match "+expected+" and "+actual,
 				expected.size(),
 				actual.size());
 
@@ -465,7 +618,7 @@ public class JointTripRemoverAlgorithmTest {
 					act = (Activity) actElement;
 				}
 				catch (ClassCastException e) {
-					fail( "expected activity, got leg: "+exp+", "+actElement );
+					fail( fixtureName+": expected activity, got leg: "+exp+", "+actElement );
 				}
 				assertActivitiesMatch( exp , act );
 			}
@@ -476,7 +629,7 @@ public class JointTripRemoverAlgorithmTest {
 					act = (Leg) actElement;
 				}
 				catch (ClassCastException e) {
-					fail( "expected leg, got activity: "+exp+", "+actElement );
+					fail( fixtureName+": expected leg, got activity: "+exp+", "+actElement );
 				}
 				assertLegsMatch( exp , act );
 			}
@@ -532,16 +685,19 @@ public class JointTripRemoverAlgorithmTest {
 		public final JointPlan jointPlan;
 		public final Map<Id, List<PlanElement>> expectedPlanAfterRemoval;
 		public final JointTrip toRemove;
+		public final StageActivityTypes stageActivities;
 
 		public Fixture(
 				final String name,
 				final JointPlan jointPlan,
 				final Map<Id, List<PlanElement>> expectedPlanAfterRemoval,
-				final JointTrip toRemove) {
+				final JointTrip toRemove,
+				final StageActivityTypes stageActivities) {
 			this.name = name;
 			this.jointPlan = jointPlan;
 			this.expectedPlanAfterRemoval = expectedPlanAfterRemoval;
 			this.toRemove = toRemove;
+			this.stageActivities = stageActivities;
 		}
 	}
 }
