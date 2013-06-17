@@ -37,6 +37,7 @@ import playground.thibautd.socnetsim.population.DriverRoute;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.PassengerRoute;
+import playground.thibautd.utils.MapUtils;
 
 /**
  * @author thibautd
@@ -65,7 +66,7 @@ public class JointPlanUtils {
 			final List<DriverTrip> driverTrips,
 			final JointPlan plan) {
 		final List<JointTrip> jointTrips = new ArrayList<JointTrip>();
-		final Map<Id, Iterator<PlanElement>> iterators = extractIterators( plan );
+		final PlanElementIterators iterators = new PlanElementIterators( plan );
 
 		for ( DriverTrip driverTrip : driverTrips ) {
 			for (Map.Entry<Id, Id> e : driverTrip.passengerOrigins.entrySet()) {
@@ -73,13 +74,14 @@ public class JointPlanUtils {
 				final Id originId = e.getValue();
 				final Id destinationId = driverTrip.passengerDestinations.get( passengerId );
 
-				final Iterator<PlanElement> it = iterators.get( passengerId );
+				final Iterator<PlanElement> it = iterators.getIterator( driverTrip.driverId , passengerId );
 				while ( it.hasNext() ) {
 					final PlanElement pe = it.next();
 					if (pe instanceof Leg &&
 							((Leg) pe).getMode().equals( JointActingTypes.PASSENGER )) {
 						final PassengerRoute route = (PassengerRoute) ((Leg) pe).getRoute();
-						if (route.getStartLinkId().equals( originId ) &&
+						if ( route.getDriverId().equals( driverTrip.driverId ) &&
+								route.getStartLinkId().equals( originId ) &&
 								route.getEndLinkId().equals( destinationId )) {
 							jointTrips.add(
 									new JointTrip(
@@ -114,17 +116,6 @@ public class JointPlanUtils {
 		}
 
 		return subTrip;
-	}
-
-	private static Map<Id, Iterator<PlanElement>> extractIterators(
-			final JointPlan plan) {
-		Map<Id, Iterator<PlanElement>> its = new HashMap<Id, Iterator<PlanElement>>();
-
-		for (Plan p : plan.getIndividualPlans().values()) {
-			its.put( p.getPerson().getId() , p.getPlanElements().iterator() );
-		}
-
-		return its;
 	}
 
 	/**
@@ -344,6 +335,28 @@ public class JointPlanUtils {
 				+", driverTrip="+getDriverLegs()
 				+", passenger="+getPassengerId()
 				+", passengerLeg="+getPassengerLeg()+"]";
+		}
+	}
+
+	private static class PlanElementIterators {
+		private final JointPlan jointPlan;
+		private final Map<Id, Map<Id, Iterator<PlanElement>>> driver2IteratorPerPassenger = new HashMap<Id, Map<Id, Iterator<PlanElement>>>();
+
+		public PlanElementIterators(final JointPlan jointPlan) {
+			this.jointPlan = jointPlan;
+		}
+
+		public Iterator<PlanElement> getIterator(final Id driver, final Id passenger) {
+			final Map<Id, Iterator<PlanElement>> itPerPassenger = MapUtils.getMap( driver , driver2IteratorPerPassenger );
+			
+			Iterator<PlanElement> it = itPerPassenger.get( passenger );
+
+			if ( it == null ) {
+				it = jointPlan.getIndividualPlan( passenger ).getPlanElements().iterator();
+				itPerPassenger.put( passenger , it );
+			}
+
+			return it;
 		}
 	}
 }
