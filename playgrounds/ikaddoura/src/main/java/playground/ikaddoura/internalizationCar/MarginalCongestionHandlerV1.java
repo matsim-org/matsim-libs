@@ -63,7 +63,7 @@ import org.matsim.core.scenario.ScenarioImpl;
  * @author ikaddoura
  *
  */
-public class MarginalCongestionHandler implements
+public class MarginalCongestionHandlerV1 implements
 	LinkEnterEventHandler,
 	LinkLeaveEventHandler,
 	TransitDriverStartsEventHandler,
@@ -71,7 +71,7 @@ public class MarginalCongestionHandler implements
 	AgentArrivalEventHandler,
 	AgentStuckEventHandler {
 	
-	private final static Logger log = Logger.getLogger(MarginalCongestionHandler.class);
+	private final static Logger log = Logger.getLogger(MarginalCongestionHandlerV1.class);
 	
 	private final boolean allowForStorageCapacityConstraint = true; // Runtime Exception if storage capacity active
 	private final boolean calculateStorageCapacityConstraints = true;
@@ -83,7 +83,7 @@ public class MarginalCongestionHandler implements
 	private final List<Id> ptDriverIDs = new ArrayList<Id>();
 	private final Map<Id, LinkCongestionInfo> linkId2congestionInfo = new HashMap<Id, LinkCongestionInfo>();
 	
-	public MarginalCongestionHandler(EventsManager events, ScenarioImpl scenario) {
+	public MarginalCongestionHandlerV1(EventsManager events, ScenarioImpl scenario) {
 		this.events = events;
 		this.scenario = scenario;
 				
