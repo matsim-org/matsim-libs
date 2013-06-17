@@ -95,6 +95,8 @@ public class ExtractTripModeShares20kmFromBellevue {
 			case DETAILED:
 				detailed( scenario , outputFile );
 				break;
+		default:
+			throw new RuntimeException( ""+OUTPUT_TYPE );
 		}
 	}
 
