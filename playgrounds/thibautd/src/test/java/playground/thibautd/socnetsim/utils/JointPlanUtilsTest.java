@@ -711,6 +711,101 @@ public class JointPlanUtilsTest {
 					new JointPlanFactory().createJointPlan( plans )));
 	}
 
+	/**
+	 * Link the first trip of the driver with the second of the passenger,
+	 * and vice-versa. This is obbviously infeasible, but may be considered as valid,
+	 * the same way going to the bus station when no bus is running is a valid, though stupid,
+	 * plan.
+	 */
+	@Before
+	public void initOnePassengerTwoTripsInconsistentSequenceFixture() {
+		final Person driver = new PersonImpl( new IdImpl( "Alain Prost" ) );
+		final Person passenger1 = new PersonImpl( new IdImpl( "Tintin" ) );
+
+		final Id link1 = new IdImpl( 1 );
+		final Id link2 = new IdImpl( 2 );
+		final Id link3 = new IdImpl( 3 );
+
+		final Map<Id, Plan> plans = new HashMap<Id, Plan>();
+
+		final PlanImpl dPlan = new PlanImpl( driver );
+		dPlan.createAndAddActivity( "home" , link1 );
+		dPlan.createAndAddLeg( TransportMode.walk );
+		dPlan.createAndAddActivity( JointActingTypes.PICK_UP , link2 );
+		final Leg driverLeg1 = dPlan.createAndAddLeg( JointActingTypes.DRIVER );
+		driverLeg1.setRoute( new DriverRoute(
+					new LinkNetworkRouteImpl( link2 , link3 ),
+					Arrays.asList( passenger1.getId() )));
+		dPlan.createAndAddActivity( JointActingTypes.DROP_OFF , link3 );
+		dPlan.createAndAddLeg( TransportMode.walk );
+		dPlan.createAndAddActivity( "home" , link1 );
+		dPlan.createAndAddLeg( TransportMode.walk );
+		dPlan.createAndAddActivity( JointActingTypes.PICK_UP , link3 );
+		final Leg driverLeg2 = dPlan.createAndAddLeg( JointActingTypes.DRIVER );
+		driverLeg2.setRoute( new DriverRoute(
+					new LinkNetworkRouteImpl( link3 , link2 ),
+					Arrays.asList( passenger1.getId() )));
+		dPlan.createAndAddActivity( JointActingTypes.DROP_OFF , link2 );
+		dPlan.createAndAddLeg( TransportMode.walk );
+		dPlan.createAndAddActivity( "home" , link1 );
+
+		plans.put( driver.getId() , dPlan );
+
+		final PlanImpl pPlan = new PlanImpl( passenger1 );
+		pPlan.createAndAddActivity( "home" , link1 );
+		pPlan.createAndAddLeg( TransportMode.walk );
+		pPlan.createAndAddActivity( JointActingTypes.PICK_UP , link3 );
+		final Leg passengerLeg1 = pPlan.createAndAddLeg( JointActingTypes.PASSENGER );
+		final PassengerRoute passengerRoute1 = new PassengerRoute( link3 , link2 );
+		passengerRoute1.setDriverId( driver.getId() );
+		passengerLeg1.setRoute( passengerRoute1 );
+		pPlan.createAndAddActivity( JointActingTypes.DROP_OFF , link2 );
+		pPlan.createAndAddLeg( TransportMode.walk );
+		pPlan.createAndAddActivity( "home" , link1);
+		pPlan.createAndAddLeg( TransportMode.walk );
+		pPlan.createAndAddActivity( JointActingTypes.PICK_UP , link2 );
+		final Leg passengerLeg2 = pPlan.createAndAddLeg( JointActingTypes.PASSENGER );
+		final PassengerRoute passengerRoute2 = new PassengerRoute( link2 , link3 );
+		passengerRoute2.setDriverId( driver.getId() );
+		passengerLeg2.setRoute( passengerRoute2 );
+		pPlan.createAndAddActivity( JointActingTypes.DROP_OFF , link3 );
+		pPlan.createAndAddLeg( TransportMode.walk );
+		pPlan.createAndAddActivity( "home" , link1);
+
+
+		plans.put( passenger1.getId() , pPlan );
+
+		final DriverTrip driverTrip1 = new DriverTrip( driver.getId() );
+		driverTrip1.driverTrip.add( driverLeg1 );
+		driverTrip1.passengerOrigins.put( passenger1.getId() , link2 );
+		driverTrip1.passengerDestinations.put( passenger1.getId() , link3 );
+
+		final DriverTrip driverTrip2 = new DriverTrip( driver.getId() );
+		driverTrip2.driverTrip.add( driverLeg2 );
+		driverTrip2.passengerOrigins.put( passenger1.getId() , link3 );
+		driverTrip2.passengerDestinations.put( passenger1.getId() , link2 );
+
+
+		fixtures.add(
+				new Fixture(
+					"one passenger, two trips with incorrect sequence",
+					Arrays.asList( driverTrip1 , driverTrip2 ),
+					new JointTravelStructure(
+						Arrays.asList(
+							new JointTrip(
+								driver.getId(),
+								Arrays.asList( driverLeg1 ),
+								passenger1.getId(),
+								passengerLeg2),
+							new JointTrip(
+								driver.getId(),
+								Arrays.asList( driverLeg2 ),
+								passenger1.getId(),
+								passengerLeg1)
+							)),
+					new JointPlanFactory().createJointPlan( plans )));
+	}
+
 	@Test
 	public void testExtractJointTrips() throws Exception {
 		for ( Fixture f : fixtures ) {
