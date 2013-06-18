@@ -120,6 +120,9 @@ class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, Pa
 		final EventsManager events = internalInterface.getMobsim().getEventsManager();
 		for ( PassengerAgent passenger : passengersToBoard ) {
 			assert passenger.getCurrentLinkId().equals( getCurrentLinkId() ) : passenger+" is at "+passenger.getCurrentLinkId()+" instead of "+getCurrentLinkId()+" for driver "+this;
+			assert ((Leg) getCurrentPlanElement()).getMode().equals( JointActingTypes.DRIVER ) : getCurrentPlanElement();
+			assert ((DriverRoute) ((Leg) getCurrentPlanElement()).getRoute()).getPassengersIds().contains( passenger.getId() ) :
+				passenger+" not in "+((DriverRoute) ((Leg) getCurrentPlanElement()).getRoute()).getPassengersIds()+" for driver "+this;
 			vehicle.addPassenger( passenger );
 			events.processEvent(
 					events.getFactory().createPersonEntersVehicleEvent(
