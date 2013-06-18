@@ -25,7 +25,7 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 
-import static org.junit.Assert.*;
+import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Node;
@@ -113,13 +113,13 @@ public class JointTravelingSimulationTest {
 						}
 
 						arrCount.incrementAndGet();
-						assertEquals(
+						Assert.assertEquals(
 							"unexpected joint arrival time",
 							departure,
 							event.getTime(),
 							MatsimTestUtils.EPSILON);
 
-						assertEquals(
+						Assert.assertEquals(
 								"unexpected arrival location for mode "+mode,
 								doLink,
 								event.getLinkId() );
@@ -134,12 +134,12 @@ public class JointTravelingSimulationTest {
 			final JointQSimFactory factory = new JointQSimFactory( );
 			factory.createMobsim( sc , events ).run();
 
-			assertEquals(
+			Assert.assertEquals(
 					"unexpected number of joint arrivals",
 					3,
 					arrCount.get());
 
-			assertEquals(
+			Assert.assertEquals(
 					"unexpected number of agents arriving at destination",
 					sc.getPopulation().getPersons().size(),
 					atDestCount.get());
@@ -180,7 +180,7 @@ public class JointTravelingSimulationTest {
 			final JointQSimFactory factory = new JointQSimFactory( );
 			factory.createMobsim( sc , events ).run();
 
-			assertEquals(
+			Assert.assertEquals(
 					"not as many leave events as enter events",
 					enterCount.get(),
 					leaveCount.get());
