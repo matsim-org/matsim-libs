@@ -108,6 +108,11 @@ public class JointModesDepartureHandler implements DepartureHandler , MobsimEngi
 				else assert contains( vehicle.getPassengers(), passengerId );
 			}
 
+			// it is possible that not all passengers boarded yet,
+			// but the car mustn't contain passengers that are not
+			// identified as such.
+			assert containsAll( passengerIds , vehicle.getPassengers() ) :
+				passengerIds+" does not contains all of "+vehicle.getPassengers()+" with present passengers "+presentPassengers;
 			final boolean handled =
 				netsimEngine.getDepartureHandler().handleDeparture(
 						now,
@@ -123,6 +128,15 @@ public class JointModesDepartureHandler implements DepartureHandler , MobsimEngi
 		else {
 			waitingDrivers.put( driverId , new WaitingDriver( agent , linkId ) );
 		}
+	}
+
+	private boolean containsAll(
+			final Collection<Id> list,
+			final Collection<? extends Identifiable> contained) {
+		for ( Identifiable id : contained ) {
+			if ( !list.contains( id.getId() ) ) return false;
+		}
+		return true;
 	}
 
 	private static boolean contains(
