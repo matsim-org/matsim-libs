@@ -59,7 +59,7 @@ For 'qsim', add a module 'qsim' to the config.
 For 'queueSimulation', add a module 'simulation' to the config. -->
 		<param name="mobsim" value="qsim" />
 
-		<param name="outputDirectory" value="test/output/org/matsim/contrib/matsim4urbansim/config/ConfigReadWriteOverwriteTest/testExternalMATSimConfig/tmp/" />
+		<param name="outputDirectory" value="test/output/org/matsim/contrib/matsim4opus/config/ConfigReadWriteOverwriteTest/testExternalMATSimConfig//tmp/" />
 
 		<!-- The type of routing (least cost path) algorithm used, may have the values: Dijkstra, FastDijkstra, AStarLandmarks or FastAStarLandmarks -->
 		<param name="routingAlgorithmType" value="Dijkstra" />
@@ -129,9 +129,9 @@ For 'queueSimulation', add a module 'simulation' to the config. -->
 <!-- ====================================================================== -->
 
 	<module name="improvedPseudoPt" >
-		<param name="ptStopsFile" value="test/output/org/matsim/contrib/matsim4urbansim/config/ConfigReadWriteOverwriteTest/testExternalMATSimConfig/tmp/dummy2.xml" />
-		<param name="ptTravelDistancesFile" value="test/output/org/matsim/contrib/matsim4urbansim/config/ConfigReadWriteOverwriteTest/testExternalMATSimConfig/tmp/dummy2.xml" />
-		<param name="ptTravelTimesFile" value="test/output/org/matsim/contrib/matsim4urbansim/config/ConfigReadWriteOverwriteTest/testExternalMATSimConfig/tmp/dummy2.xml" />
+		<param name="ptStopsFile" value="test/output/org/matsim/contrib/matsim4opus/config/ConfigReadWriteOverwriteTest/testExternalMATSimConfig//tmp/dummy2.xml" />
+		<param name="ptTravelDistancesFile" value="test/output/org/matsim/contrib/matsim4opus/config/ConfigReadWriteOverwriteTest/testExternalMATSimConfig//tmp/dummy2.xml" />
+		<param name="ptTravelTimesFile" value="test/output/org/matsim/contrib/matsim4opus/config/ConfigReadWriteOverwriteTest/testExternalMATSimConfig//tmp/dummy2.xml" />
 		<param name="usePtStops" value="FALSE" />
 		<param name="usingPtStops" value="false" />
 		<param name="usingTravelTimesAndDistances" value="false" />
@@ -189,7 +189,7 @@ For 'queueSimulation', add a module 'simulation' to the config. -->
 <!-- ====================================================================== -->
 
 	<module name="matsim4urbansimParameter" >
-		<param name="urbanSimZoneShapefileLocationDistribution" value="test/output/org/matsim/contrib/matsim4urbansim/config/ConfigReadWriteOverwriteTest/testExternalMATSimConfig/tmp/dummy2.xml" />
+		<param name="urbanSimZoneShapefileLocationDistribution" value="test/output/org/matsim/contrib/matsim4opus/config/ConfigReadWriteOverwriteTest/testExternalMATSimConfig//tmp/dummy2.xml" />
 	</module>
 
 <!-- ====================================================================== -->
@@ -215,7 +215,7 @@ For 'queueSimulation', add a module 'simulation' to the config. -->
 
 	<module name="network" >
 		<param name="inputChangeEventsFile" value="null" />
-		<param name="inputNetworkFile" value="test/output/org/matsim/contrib/matsim4urbansim/config/ConfigReadWriteOverwriteTest/testExternalMATSimConfig/tmp/dummy2.xml" />
+		<param name="inputNetworkFile" value="test/output/org/matsim/contrib/matsim4opus/config/ConfigReadWriteOverwriteTest/testExternalMATSimConfig//tmp/dummy2.xml" />
 		<param name="laneDefinitionsFile" value="null" />
 		<param name="timeVariantNetwork" value="false" />
 	</module>
@@ -375,7 +375,7 @@ For 'queueSimulation', add a module 'simulation' to the config. -->
 		<!-- Path to a file containing person attributes (required file format: ObjectAttributes). -->
 		<param name="inputPersonAttributesFile" value="null" />
 
-		<param name="inputPlansFile" value="test/output/org/matsim/contrib/matsim4urbansim/config/ConfigReadWriteOverwriteTest/testExternalMATSimConfig/tmp/dummy2.xml" />
+		<param name="inputPlansFile" value="test/output/org/matsim/contrib/matsim4opus/config/ConfigReadWriteOverwriteTest/testExternalMATSimConfig//tmp/dummy2.xml" />
 
 		<!-- Defines how routes are stored in memory. Currently supported: LinkNetworkRoute, CompressedNetworkRoute. -->
 		<param name="networkRouteType" value="LinkNetworkRoute" />
