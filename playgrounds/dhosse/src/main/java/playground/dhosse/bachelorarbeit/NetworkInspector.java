@@ -25,7 +25,7 @@ import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.gis.Zone;
 import org.matsim.contrib.accessibility.gis.ZoneLayer;
 import org.matsim.contrib.accessibility.utils.BoundingBox;
-import org.matsim.contrib.matsim4opus.utils.misc.ProgressBar;
+import org.matsim.contrib.matsim4urbansim.utils.io.misc.ProgressBar;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
