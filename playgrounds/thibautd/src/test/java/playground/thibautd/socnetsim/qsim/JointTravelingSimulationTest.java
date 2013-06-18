@@ -97,7 +97,7 @@ public class JointTravelingSimulationTest {
 			final AtomicInteger arrCount = new AtomicInteger( 0 );
 			final AtomicInteger atDestCount = new AtomicInteger( 0 );
 			events.addHandler( new AgentArrivalEventHandler() {
-				private double departure = -100;
+				private double arrival = -100;
 				@Override
 				public void reset(final int iteration) {}
 
@@ -107,15 +107,15 @@ public class JointTravelingSimulationTest {
 					log.info( mode+" arrival at "+event.getTime() );
 					if ( mode.equals( JointActingTypes.DRIVER ) ||
 							mode.equals( JointActingTypes.PASSENGER ) ) {
-						if ( departure < 0 ) {
-							departure = event.getTime();
-							assert departure > 0;
+						if ( arrival < 0 ) {
+							arrival = event.getTime();
+							assert arrival > 0;
 						}
 
 						arrCount.incrementAndGet();
 						Assert.assertEquals(
 							"unexpected joint arrival time",
-							departure,
+							arrival,
 							event.getTime(),
 							MatsimTestUtils.EPSILON);
 
