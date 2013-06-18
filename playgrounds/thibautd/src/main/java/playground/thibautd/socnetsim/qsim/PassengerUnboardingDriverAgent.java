@@ -45,6 +45,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.thibautd.socnetsim.population.DriverRoute;
 import playground.thibautd.socnetsim.population.JointActingTypes;
+import playground.thibautd.utils.IdentifiableCollectionsUtils;
 
 class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, PassengerAgent, PTPassengerAgent {
 	private final MobsimDriverAgent delegate;
@@ -129,7 +130,9 @@ class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, Pa
 		passengersToBoard.clear();
 
 		final DriverRoute dr = (DriverRoute) ((Leg) getCurrentPlanElement()).getRoute();
-		assert vehicle.getPassengers().size() == dr.getPassengersIds().size() : vehicle.getPassengers()+" != "+dr.getPassengersIds()+" for driver "+this;
+		assert vehicle.getPassengers().size() == dr.getPassengersIds().size() &&
+			IdentifiableCollectionsUtils.containsAll( dr.getPassengersIds() , vehicle.getPassengers() ) :
+				vehicle.getPassengers()+" != "+dr.getPassengersIds()+" for driver "+this;
 	}
 
 	public void addPassengerToBoard(final PassengerAgent passenger) {
