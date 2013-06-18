@@ -41,7 +41,6 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import playground.ivt.scoring.BlackListedActivityScoringFunction;
 import playground.ivt.scoring.ElementalCharyparNagelLegScoringFunction;
 import playground.ivt.scoring.ElementalCharyparNagelLegScoringFunction.LegScoringParameters;
-import playground.thibautd.socnetsim.population.JointActingTypes;
 
 /**
  * This factory creates "CharyparNagel" scoring functions, but with
@@ -130,23 +129,6 @@ public class KtiLikeActivitiesScoringFunctionFactory implements ScoringFunctionF
 					TransportMode.transit_walk,
 					LegScoringParameters.createForWalk(
 						params ),
-					scenario.getNetwork()));
-
-		// joint modes
-		scoringFunctionAccumulator.addScoringFunction(
-				new ElementalCharyparNagelLegScoringFunction(
-					JointActingTypes.DRIVER,
-					LegScoringParameters.createForCar(
-						params ),
-					scenario.getNetwork()));
-		scoringFunctionAccumulator.addScoringFunction(
-				new ElementalCharyparNagelLegScoringFunction(
-					JointActingTypes.DRIVER,
-					new LegScoringParameters(
-						params.constantCar,
-						params.marginalUtilityOfTraveling_s,
-						// passenger doesn't pay gasoline
-						0 ),
 					scenario.getNetwork()));
 
 		// other standard stuff

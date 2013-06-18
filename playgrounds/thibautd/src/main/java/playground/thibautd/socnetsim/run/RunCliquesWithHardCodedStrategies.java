@@ -45,10 +45,10 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.pt.PtConstants;
 
-import playground.ivt.kticompatibility.KtiLikeActivitiesScoringFunctionFactory;
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
 import playground.ivt.kticompatibility.KtiPtRoutingModule;
 import playground.ivt.kticompatibility.KtiPtRoutingModule.KtiPtRoutingModuleInfo;
+import playground.thibautd.scoring.KtiScoringFunctionFactoryWithJointModes;
 import playground.thibautd.socnetsim.cliques.config.CliquesConfigGroup;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.controller.ControllerRegistryBuilder;
@@ -180,7 +180,7 @@ public class RunCliquesWithHardCodedStrategies {
 							new EmptyIncompatiblePlansIdentifierFactory() )
 					.withScoringFunctionFactory(
 							scoringFunctionConf.isUseKtiScoring() ?
-							new KtiLikeActivitiesScoringFunctionFactory(
+							new KtiScoringFunctionFactoryWithJointModes(
 								new StageActivityTypesImpl(
 										Arrays.asList(
 												PtConstants.TRANSIT_ACTIVITY_TYPE,
