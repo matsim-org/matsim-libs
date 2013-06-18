@@ -26,9 +26,10 @@ import java.io.BufferedWriter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Rule;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.matsim4opus.constants.InternalConstants;
+import org.matsim.contrib.matsim4opus.utils.io.TempDirectoryUtil;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.NetworkImpl;
@@ -36,7 +37,6 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.testcases.MatsimTestUtils;
 
 /**
  * This class creates a simple test network to test for example the pt simulation in MATSim.
@@ -45,10 +45,6 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author tthunig
  */
 public class CreateTestNetwork {
-	
-	@Rule public static MatsimTestUtils utils = new MatsimTestUtils();
-	
-	private static final String NEW_LINE	= "\r\n";
 	
 	/**
 	 * This method creates a test network. It is used for example in PtMatrixTest.java to test the pt simulation in MATSim.
@@ -126,15 +122,15 @@ public class CreateTestNetwork {
 		 * (3)      (6)------(9)
 		 */
 		
-		String location = utils.getOutputDirectory()  + "/ptStops.csv";
+		String location = TempDirectoryUtil.createCustomTempDirectory("ptStopFileDir")  + "/ptStops.csv";
 		BufferedWriter bw = IOUtils.getBufferedWriter(location);
 		
 		try{
-			bw.write("id,x,y" + NEW_LINE); 	// header
-			bw.write("1,10,10" + NEW_LINE);	// pt stop next to node (3)
-			bw.write("2,10, 190" + NEW_LINE); // pt stop next to node (2)
-			bw.write("3,190,190" + NEW_LINE); // pt stop next to node (8)
-			bw.write("4,190,10" + NEW_LINE);  // pt stop next to node (9)
+			bw.write("id,x,y" + InternalConstants.NEW_LINE); 	// header
+			bw.write("1,10,10" + InternalConstants.NEW_LINE);	// pt stop next to node (3)
+			bw.write("2,10, 190" + InternalConstants.NEW_LINE); // pt stop next to node (2)
+			bw.write("3,190,190" + InternalConstants.NEW_LINE); // pt stop next to node (8)
+			bw.write("4,190,10" + InternalConstants.NEW_LINE);  // pt stop next to node (9)
 			bw.flush();
 			bw.close();
 		}
@@ -156,7 +152,7 @@ public class CreateTestNetwork {
 		
 		// set dummy travel times or distances to all possible pairs of pt stops
 		
-		String location = utils.getOutputDirectory()  + "/ptTravelInfo.csv";
+		String location = TempDirectoryUtil.createCustomTempDirectory("ptStopFileDir")  + "/ptTravelInfo.csv";
 		BufferedWriter bw = IOUtils.getBufferedWriter(location);
 		
 		try{
@@ -164,10 +160,10 @@ public class CreateTestNetwork {
 				for (int destination = 1; destination <= 4; destination++){
 					if (origin == destination)
 						// set a travel time/distance of 0s or 0m between same origin and destination pt stops
-						bw.write(origin + " " + destination + " 0" + NEW_LINE);
+						bw.write(origin + " " + destination + " 0" + InternalConstants.NEW_LINE);
 					else
 						// set a dummy travel time/distance of 100s or 100m between different origin and destination pt stops
-						bw.write(origin + " " + destination + " 100" + NEW_LINE); 
+						bw.write(origin + " " + destination + " 100" + InternalConstants.NEW_LINE); 
 				}
 			}
 			bw.flush();
