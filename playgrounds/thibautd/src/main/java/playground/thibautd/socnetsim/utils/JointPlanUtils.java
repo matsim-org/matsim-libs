@@ -37,7 +37,6 @@ import playground.thibautd.socnetsim.population.DriverRoute;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.PassengerRoute;
-import playground.thibautd.utils.MapUtils;
 
 /**
  * @author thibautd
@@ -74,10 +73,9 @@ public class JointPlanUtils {
 				final Id originId = e.getValue();
 				final Id destinationId = driverTrip.passengerDestinations.get( passengerId );
 
-				final Iterator<PlanElement> it = iterators.getIterator( driverTrip.driverId , passengerId );
 				jointTrips.add(
 						getNextPassengerTrip(
-							it,
+							iterators,
 							driverTrip,
 							passengerId,
 							originId,
@@ -89,11 +87,17 @@ public class JointPlanUtils {
 	}
 
 	private static JointTrip getNextPassengerTrip(
-			final Iterator<PlanElement> it,
+			final PlanElementIterators iterators,
 			final DriverTrip driverTrip,
 			final Id passengerId,
 			final Id originId,
 			final Id destinationId) {
+		final Iterator<PlanElement> it =
+			iterators.getIterator(
+					driverTrip.driverId,
+					passengerId,
+					originId,
+					destinationId);
 		while ( it.hasNext() ) {
 			final PlanElement pe = it.next();
 			if (pe instanceof Leg &&
@@ -351,27 +355,58 @@ public class JointPlanUtils {
 				+", passengerLeg="+getPassengerLeg()+"]";
 		}
 	}
+}
 
-	private static class PlanElementIterators {
-		private final JointPlan jointPlan;
-		private final Map<Id, Map<Id, Iterator<PlanElement>>> driver2IteratorPerPassenger = new HashMap<Id, Map<Id, Iterator<PlanElement>>>();
+class PlanElementIterators {
+	private final JointPlan jointPlan;
+	private final Map<TripCharacteristics, Iterator<PlanElement>> iterators = new HashMap<TripCharacteristics, Iterator<PlanElement>>();
 
-		public PlanElementIterators(final JointPlan jointPlan) {
-			this.jointPlan = jointPlan;
+	public PlanElementIterators(final JointPlan jointPlan) {
+		this.jointPlan = jointPlan;
+	}
+
+	public Iterator<PlanElement> getIterator(
+			final Id driver,
+			final Id passenger,
+			final Id origin,
+			final Id destination) {
+		final TripCharacteristics key = new TripCharacteristics( driver, passenger , origin , destination );
+		Iterator<PlanElement> it = iterators.get( key );
+
+		if ( it == null ) {
+			it = jointPlan.getIndividualPlan( passenger ).getPlanElements().iterator();
+			iterators.put( key , it );
 		}
 
-		public Iterator<PlanElement> getIterator(final Id driver, final Id passenger) {
-			final Map<Id, Iterator<PlanElement>> itPerPassenger = MapUtils.getMap( driver , driver2IteratorPerPassenger );
-			
-			Iterator<PlanElement> it = itPerPassenger.get( passenger );
-
-			if ( it == null ) {
-				it = jointPlan.getIndividualPlan( passenger ).getPlanElements().iterator();
-				itPerPassenger.put( passenger , it );
-			}
-
-			return it;
-		}
+		return it;
 	}
 }
 
+class TripCharacteristics {
+	private final Id driver, passenger, origin, destination;
+
+	public TripCharacteristics(
+			final Id driver,
+			final Id passenger,
+			final Id origin,
+			final Id destination) {
+		this.driver = driver;
+		this.passenger = passenger;
+		this.origin = origin;
+		this.destination = destination;
+	}
+
+	@Override
+	public boolean equals(final Object o) {
+		return o instanceof TripCharacteristics &&
+			((TripCharacteristics) o).driver.equals( driver ) &&
+			((TripCharacteristics) o).passenger.equals( passenger ) &&
+			((TripCharacteristics) o).origin.equals( origin ) &&
+			((TripCharacteristics) o).destination.equals( destination );
+	}
+
+	@Override
+	public int hashCode() {
+		return driver.hashCode() + passenger.hashCode() + origin.hashCode() + destination.hashCode();
+	}
+}
