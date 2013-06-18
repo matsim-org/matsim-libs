@@ -21,12 +21,14 @@ package playground.ivt.kticompatibility;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryLogging;
+import org.matsim.pt.PtConstants;
 
 /**
  * run a basic KTI-like scenario.
@@ -44,6 +46,7 @@ public class RunKtiScenario {
 		// Note that you need 
 		final Config config = ConfigUtils.createConfig();
 		config.addModule( new KtiPtConfigGroup() );
+		config.addModule( new KtiLikeScoringConfigGroup() );
 		ConfigUtils.loadConfig( config , configFile );
 
 		// just make sure the scenario is loaded
@@ -55,6 +58,12 @@ public class RunKtiScenario {
 		controler.setTripRouterFactory(
 				new KtiTripRouterFactory(
 					controler ) );
+		controler.setScoringFunctionFactory(
+				new KtiLikeActivitiesScoringFunctionFactory(
+					new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE ),
+					(KtiLikeScoringConfigGroup) config.getModule( KtiLikeScoringConfigGroup.GROUP_NAME ),
+					config.planCalcScore(),
+					scenario) );
 
 		// we're done!
 		controler.run();
