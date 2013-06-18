@@ -36,6 +36,7 @@ import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfig2.ConfigType;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfig2.Matsim4UrbansimType;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfig2.MatsimConfigType;
+import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.Matsim4UrbansimConfigType;
 import org.matsim.contrib.matsim4urbansim.utils.ids.IdFactory;
 import org.matsim.contrib.matsim4urbansim.utils.io.Paths;
 import org.matsim.core.config.Config;
@@ -466,6 +467,15 @@ public class M4UConfigUtils {
 	 */
 	static MatsimConfigType unmarschal(String matsim4urbansimConfigFilename){
 
+//		JAXBUnmarshalV3 um = new JAXBUnmarshalV3(matsim4urbansimConfigFilename);
+//		
+//		Matsim4UrbansimConfigType m4uConfigType = null;
+//		m4uConfigType = um.unmarshal();
+//		
+//		if(m4uConfigType == null)
+//			System.out.println("ERROR");
+		
+		
 		// JAXBUnmaschal reads the UrbanSim generated MATSim config, validates it against
 		// the current xsd (checks e.g. the presents and data type of parameter) and generates
 		// an Java object representing the config file.

@@ -18,6 +18,7 @@ public class AnalysisPopulationCSVWriter {
 	
 	public static final String FILE_NAME= "population.csv";
 	public static final String FILE_NAME_AGGREGATED= "aggregated_population.csv";
+	public static final String PERSONS_COUNT = "persons";
 	/**
 	 * writing raw population data to disc
 	 * @param file
@@ -75,7 +76,7 @@ public class AnalysisPopulationCSVWriter {
 					 		   InternalConstants.NEARESTNODE_ID +","+
 					 		   InternalConstants.NEARESTNODE_X_COORD +","+ 
 					 		   InternalConstants.NEARESTNODE_Y_COORD +","+
-					 		   InternalConstants.PERSONS_COUNT);
+					 		   PERSONS_COUNT);
 			bwAggregatedPopulation.newLine();
 			
 			Iterator<AggregateObject2NearestNode> personIterator = personClusterMap.values().iterator();

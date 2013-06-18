@@ -41,6 +41,11 @@ public class UrbanSimParcelCSVWriter {
 	private static final Logger log 	= Logger.getLogger(UrbanSimParcelCSVWriter.class);
 	private static BufferedWriter parcelWriter = null;
 	public static final String FILE_NAME= "parcels.csv";
+	public static final String ACCESSIBILITY_BY_FREESPEED = "freespeed_accessibility";
+	public static final String ACCESSIBILITY_BY_CAR = "car_accessibility";
+	public static final String ACCESSIBILITY_BY_BIKE = "bike_accessibility";
+	public static final String ACCESSIBILITY_BY_WALK = "walk_accessibility";
+	public static final String ACCESSIBILITY_BY_PT = "pt_accessibility";
 	
 	/**
 	 * writes the header for zones csv file
@@ -53,11 +58,11 @@ public class UrbanSimParcelCSVWriter {
 			
 			// create header
 			parcelWriter.write( InternalConstants.PARCEL_ID + "," +
-								InternalConstants.ACCESSIBILITY_BY_FREESPEED + "," +
-								InternalConstants.ACCESSIBILITY_BY_CAR + "," +
-								InternalConstants.ACCESSIBILITY_BY_BIKE + "," +
-								InternalConstants.ACCESSIBILITY_BY_WALK + "," +
-								InternalConstants.ACCESSIBILITY_BY_PT);
+								ACCESSIBILITY_BY_FREESPEED + "," +
+								ACCESSIBILITY_BY_CAR + "," +
+								ACCESSIBILITY_BY_BIKE + "," +
+								ACCESSIBILITY_BY_WALK + "," +
+								ACCESSIBILITY_BY_PT);
 			parcelWriter.newLine();
 			
 			log.info("... done!");

@@ -86,18 +86,6 @@ public class InternalConstants {
 	
 	/** file names */
 	public static final String GENERATED_PLANS_FILE_NAME = "output_plans.xml.gz";
-	public static final String SCORESTATS_FILE_NAME = "scorestats.txt";
-	public static final String TRAVELDISTANCESSTAT_FILE_NAME = "traveldistancestats.txt";
-	public static final String LOG_FILE_NAME = "logfile.log";
-	public static final String LOG_FILE_WARNINGS_ERRORS_NAME = "logfileWarningsErrors.log";
-	public static final String OUTPUT_CONFIG_FILE_NAME = "output_config.xml.gz";
-	public static final String OUTPUT_NETWORK_FILE_NAME = "output_network.xml.gz";
-	public static final String OUTPUT_SCORESTATS_TXT = "scorestats.txt";
-	public static final String OUTPUT_SCORESTATS_PNG = "scorestats.png";
-	public static final String OUTPUT_TRAVELDISTANCESTATS_TXT = "traveldistancestats.txt";
-	public static final String OUTPUT_TRAVELDISTANCESTATS_PNG = "traveldistancestats.png";
-	public static final String OUTPUT_STOPWATCH = "stopwatch.txt";
-	public static final String GENERATED_MATSIM_CONFIG_FILE_NAME = "MATSimConfigFile.xml.gz";
 	public static final String URBANSIM_PARCEL_DATASET_TABLE = "parcel__dataset_table__exported_indicators__";
 	public static final String URBANSIM_ZONE_DATASET_TABLE = "zone__dataset_table__exported_indicators__";
 	public static final String URBANSIM_PERSON_DATASET_TABLE = "person__dataset_table__exported_indicators__";
@@ -106,16 +94,6 @@ public class InternalConstants {
 	/** file type */
 	public static final String FILE_TYPE_TAB = ".tab";
 	public static final String FILE_TYPE_TXT = ".txt";
-	
-	/** matsim output files */
-	public static final String OUTPUT_PLANS_FILE_GZ 	= "output_plans.xml.gz";
-	public static final String OUTPUT_PLANS_FILE_XML 	= "output_plans.xml";
-	public static final String OUTPUT_PARCEL_FILE_GZ	= "parcels.xml.gz";
-	public static final String OUTPUT_PARCEL_FILE_XML	= "parcels.xml";
-	public static final String OUTPUT_ZONES_FILE_GZ	 	= "zones.xml.gz";
-	public static final String OUTPUT_ZONES_FILE_XML	= "zones.xml";
-	public static final String GRID_DATA_FILE_CSV 		= "grid_data.csv";
-	public static final String ZONES_COMPLETE_FILE_CSV 	= "zones_complete.csv";
 
 	/** parameter for computing urbansim data */
 	public static final String TAB_SEPERATOR = "[\t\n]+";
@@ -138,24 +116,8 @@ public class InternalConstants {
 	public static final String Y_COORDINATE_SP = "y_coord_sp";
 	public static final String X_COORDINATE = "xcoord";
 	public static final String Y_COORDINATE = "ycoord";
-	public static final String FACILITY_DESCRIPTION = "urbansim location";
 	public static final String ACT_HOME = "home";
 	public static final String ACT_WORK = "work";
-	
-	/** UrbanSim and/or MATSim output file header items */
-	public static final String ACCESSIBILITY_BY_FREESPEED = "freespeed_accessibility";
-	public static final String ACCESSIBILITY_BY_CAR = "car_accessibility";
-	public static final String ACCESSIBILITY_BY_BIKE = "bike_accessibility";
-	public static final String ACCESSIBILITY_BY_WALK = "walk_accessibility";
-	public static final String ACCESSIBILITY_BY_PT = "pt_accessibility";
-	public static final String TRAVEL_TIME_ACCESSIBILITY = "travel_time_accessibility";
-	public static final String TRAVEL_COST_ACCESSIBILITY = "travel_cost_accessibility";
-	public static final String TRAVEL_DISTANCE_ACCESSIBILITY = "travel_distance_accessibility";
-	public static final String CONGESTED_TRAVEL_TIME_ACCESSIBILITY = "congested_travel_time_accessibility";
-	public static final String FREESPEED_TRAVEL_TIME_ACCESSIBILITY = "freespeed_travel_time_accessibility";
-	public static final String WALK_TRAVEL_TIME_ACCESSIBILITY = "walk_travel_time_accessibility";
-	public static final String PERSONS_COUNT = "persons";
-	public static final String WORKPLACES_COUNT = "workplaces";
 	
 	/** xsd on matsim.org */
 	public static final String CURRENT_MATSIM_4_URBANSIM_XSD_MATSIMORG = "http://matsim.org/files/dtd/matsim4urbansim_v3.xsd";

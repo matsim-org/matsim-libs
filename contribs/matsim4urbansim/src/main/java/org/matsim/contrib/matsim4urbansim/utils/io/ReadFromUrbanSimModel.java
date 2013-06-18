@@ -127,7 +127,7 @@ public class ReadFromUrbanSimModel {
 
 				// create a facility (within the parcels) object at this coordinate with the correspondent parcel ID
 				ActivityFacilityImpl facility = zones.createAndAddFacility(zone_ID,coord);
-				facility.setDesc( InternalConstants.FACILITY_DESCRIPTION ) ;
+				facility.setDesc( "urbansim location" ) ;
 
 				// set custom attributes, these are needed to compute zone2zone trips
 				Map<String, Object> customFacilityAttributes = facility.getCustomAttributes();
@@ -193,7 +193,7 @@ public class ReadFromUrbanSimModel {
 
 				// create a facility (within the parcels) object at this coordinate with the correspondent parcel ID
 				ActivityFacilityImpl facility = parcels.createAndAddFacility(parcel_ID,coord);
-				facility.setDesc( InternalConstants.FACILITY_DESCRIPTION ) ;
+				facility.setDesc( "urbansim location" ) ;
 				
 				// get zone ID
 				long zoneIdAsLong = (long) Double.parseDouble( parts[ indexZoneID ] );

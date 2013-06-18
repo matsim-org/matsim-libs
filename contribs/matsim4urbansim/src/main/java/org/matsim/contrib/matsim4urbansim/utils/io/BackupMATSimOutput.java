@@ -26,6 +26,13 @@ public class BackupMATSimOutput {
 	// logger
 	private static final Logger log = Logger.getLogger(BackupMATSimOutput.class);
 	
+	public static final String OUTPUT_CONFIG_FILE_NAME = "output_config.xml.gz";
+	public static final String OUTPUT_SCORESTATS_TXT = "scorestats.txt";
+	public static final String OUTPUT_SCORESTATS_PNG = "scorestats.png";
+	public static final String OUTPUT_TRAVELDISTANCESTATS_TXT = "traveldistancestats.txt";
+	public static final String OUTPUT_TRAVELDISTANCESTATS_PNG = "traveldistancestats.png";
+	public static final String OUTPUT_STOPWATCH = "stopwatch.txt";
+	
 	public static void runBackup(ScenarioImpl scenario){
 		
 		UrbanSimParameterConfigModuleV3 module = ConfigurationUtils.getUrbanSimParameterConfigModule(scenario);
@@ -66,13 +73,13 @@ public class BackupMATSimOutput {
 			// backup plans files
 			FileCopy.fileCopy( new File(InternalConstants.MATSIM_4_OPUS_OUTPUT + InternalConstants.GENERATED_PLANS_FILE_NAME) , new File(savePath + InternalConstants.GENERATED_PLANS_FILE_NAME) );
 			// backup matsim config file
-			FileCopy.fileCopy( new File(InternalConstants.MATSIM_4_OPUS_OUTPUT + InternalConstants.OUTPUT_CONFIG_FILE_NAME) , new File(savePath + InternalConstants.OUTPUT_CONFIG_FILE_NAME) );
+			FileCopy.fileCopy( new File(InternalConstants.MATSIM_4_OPUS_OUTPUT + OUTPUT_CONFIG_FILE_NAME) , new File(savePath + OUTPUT_CONFIG_FILE_NAME) );
 			// backup score stats
-			FileCopy.fileCopy( new File(InternalConstants.MATSIM_4_OPUS_OUTPUT + InternalConstants.OUTPUT_SCORESTATS_TXT) , new File(savePath + InternalConstants.OUTPUT_SCORESTATS_TXT) );
-			FileCopy.fileCopy( new File(InternalConstants.MATSIM_4_OPUS_OUTPUT + InternalConstants.OUTPUT_SCORESTATS_PNG) , new File(savePath + InternalConstants.OUTPUT_SCORESTATS_PNG) );
-			FileCopy.fileCopy( new File(InternalConstants.MATSIM_4_OPUS_OUTPUT + InternalConstants.OUTPUT_TRAVELDISTANCESTATS_TXT) , new File(savePath + InternalConstants.OUTPUT_TRAVELDISTANCESTATS_TXT) );
-			FileCopy.fileCopy( new File(InternalConstants.MATSIM_4_OPUS_OUTPUT + InternalConstants.OUTPUT_TRAVELDISTANCESTATS_PNG) , new File(savePath + InternalConstants.OUTPUT_TRAVELDISTANCESTATS_PNG) );
-			FileCopy.fileCopy( new File(InternalConstants.MATSIM_4_OPUS_OUTPUT + InternalConstants.OUTPUT_STOPWATCH) , new File(savePath + InternalConstants.OUTPUT_STOPWATCH) );
+			FileCopy.fileCopy( new File(InternalConstants.MATSIM_4_OPUS_OUTPUT + OUTPUT_SCORESTATS_TXT) , new File(savePath + OUTPUT_SCORESTATS_TXT) );
+			FileCopy.fileCopy( new File(InternalConstants.MATSIM_4_OPUS_OUTPUT + OUTPUT_SCORESTATS_PNG) , new File(savePath + OUTPUT_SCORESTATS_PNG) );
+			FileCopy.fileCopy( new File(InternalConstants.MATSIM_4_OPUS_OUTPUT + OUTPUT_TRAVELDISTANCESTATS_TXT) , new File(savePath + OUTPUT_TRAVELDISTANCESTATS_TXT) );
+			FileCopy.fileCopy( new File(InternalConstants.MATSIM_4_OPUS_OUTPUT + OUTPUT_TRAVELDISTANCESTATS_PNG) , new File(savePath + OUTPUT_TRAVELDISTANCESTATS_PNG) );
+			FileCopy.fileCopy( new File(InternalConstants.MATSIM_4_OPUS_OUTPUT + OUTPUT_STOPWATCH) , new File(savePath + OUTPUT_STOPWATCH) );
 			// backup last iteration
 			int iteration = ((ControlerConfigGroup) scenario.getConfig().getModule(ControlerConfigGroup.GROUP_NAME)).getLastIteration();
 			FileCopy.copyTree(InternalConstants.MATSIM_4_OPUS_OUTPUT + "ITERS/it."+iteration, savePath + "ITERS/it."+iteration);

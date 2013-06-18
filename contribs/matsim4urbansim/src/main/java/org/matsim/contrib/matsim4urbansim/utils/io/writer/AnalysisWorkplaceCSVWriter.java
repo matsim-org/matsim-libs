@@ -17,6 +17,8 @@ public class AnalysisWorkplaceCSVWriter {
 	
 	public static final String FILE_NAME= "workplaces.csv";
 	public static final String FILE_NAME_AGGREGATED= "aggregated_workplaces.csv";
+	
+	public static final String WORKPLACES_COUNT = "workplaces";
 	/**
 	 * Writing aggregated workplace data to disc
 	 * @param file
@@ -35,7 +37,7 @@ public class AnalysisWorkplaceCSVWriter {
 								 InternalConstants.NEARESTNODE_ID +","+
 								 InternalConstants.NEARESTNODE_X_COORD +","+ 
 								 InternalConstants.NEARESTNODE_Y_COORD +","+
-								 InternalConstants.WORKPLACES_COUNT);
+								 WORKPLACES_COUNT);
 			bwAggregatedWP.newLine();
 			
 			for(int i = 0; i < jobClusterArray.length; i++){
