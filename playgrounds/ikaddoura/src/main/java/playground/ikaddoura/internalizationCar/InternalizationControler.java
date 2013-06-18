@@ -47,9 +47,8 @@ public class InternalizationControler {
 			log.info("configFile: "+ configFile);
 			
 		} else {
-			configFile = "/Users/Ihab/Desktop/internalization_input/config_internalization.xml";
-//			configFile = "/Users/Ihab/Desktop/internalization_input/config_noInternalization.xml";
-//			configFile = "/Users/Ihab/Desktop/internalization_input/config.xml";
+			configFile = "/Users/Ihab/Desktop/car_internalization_input/config_internalization.xml";
+//			configFile = "/Users/Ihab/Desktop/car_internalization_input/config_noInternalization.xml";
 		}
 		
 		InternalizationControler main = new InternalizationControler();
