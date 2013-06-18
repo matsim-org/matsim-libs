@@ -282,22 +282,18 @@ public class MarginalCongestionHandlerV2Test {
 		// *****************
 
 		MarginalCongestionEvent congEvent1 = congestionEvents.get(0);
-		MarginalCongestionEvent congEvent2 = congestionEvents.get(1);
 
-		double totalDelay = congEvent1.getDelay() + congEvent2.getDelay();
+		double totalDelay = congEvent1.getDelay();
+
 		Assert.assertEquals("wrong delay.", 40., totalDelay, MatsimTestUtils.EPSILON);
 		
-		Assert.assertEquals("number of congestion events", 2, congestionEvents.size());
+		Assert.assertEquals("number of congestion events", 1, congestionEvents.size());
 
 		Assert.assertEquals("congested link", linkId2.toString(), congEvent1.getLinkId().toString());
 		Assert.assertEquals("causing Agent", testAgent1.toString(), congEvent1.getCausingAgentId().toString());
 		Assert.assertEquals("affected Agent", testAgent2.toString(), congEvent1.getAffectedAgentId().toString());
-		Assert.assertEquals("capacity constraint", "flowCapacity", congEvent1.getCapacityConstraint());
+		Assert.assertEquals("capacity constraint", "storageCapacity", congEvent1.getCapacityConstraint());
 		
-		Assert.assertEquals("congested link", linkId2.toString(), congEvent2.getLinkId().toString());
-		Assert.assertEquals("causing Agent", testAgent1.toString(), congEvent2.getCausingAgentId().toString());
-		Assert.assertEquals("affected Agent", testAgent2.toString(), congEvent2.getAffectedAgentId().toString());
-		Assert.assertEquals("capacity constraint", "storageCapacity", congEvent2.getCapacityConstraint());
 	}
 		
 	// 3 agenten

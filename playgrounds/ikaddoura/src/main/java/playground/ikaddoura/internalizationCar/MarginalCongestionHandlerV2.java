@@ -173,16 +173,13 @@ public class MarginalCongestionHandlerV2 implements
 				// no one left this link before
 				collectLinkInfos(event.getLinkId());
 			}
-			
-			LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
-			
-			updateTrackingMarginalDelays1(event);
+						
+			updateTrackingMarginalDelays(event);
 			calculateCongestion(event);
-			updateTrackingMarginalDelays2(event);
 			trackMarginalDelay(event);
 
+			LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 			linkInfo.setLastLeavingAgent(event.getPersonId());
-
 			linkInfo.getPersonId2freeSpeedLeaveTime().remove(event.getPersonId());
 		}
 	}
@@ -286,27 +283,7 @@ public class MarginalCongestionHandlerV2 implements
 		this.events.processEvent(congestionEvent);
 	}
 	
-	private void updateTrackingMarginalDelays1(LinkLeaveEvent event) {
-		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
-		
-		if (linkInfo.getLeavingAgents().size() == 0) {
-			// no agent is being tracked for that link
-			
-		} else {
-			// clear trackings of persons leaving that link previously
-			double lastLeavingFromThatLink = getLastLeavingTime(linkInfo.getPersonId2linkLeaveTime());
-			double earliestLeaveTime = lastLeavingFromThatLink + linkInfo.getMarginalDelayPerLeavingVehicle_sec();
-			double freeSpeedLeaveTime = linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getPersonId());
-
-			if (freeSpeedLeaveTime > earliestLeaveTime + 1.0){
-//				System.out.println("Flow congestion has disappeared on link " + event.getLinkId() + ". Delete agents leaving previously that link: " + linkInfo.getLeavingAgents().toString());
-				linkInfo.getLeavingAgents().clear();
-				linkInfo.getPersonId2linkLeaveTime().clear();
-			}
-		}
-	}
-	
-	private void updateTrackingMarginalDelays2(LinkLeaveEvent event) {
+	private void updateTrackingMarginalDelays(LinkLeaveEvent event) {
 		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 		
 		if (linkInfo.getLeavingAgents().size() == 0) {
