@@ -187,6 +187,16 @@ public class KtiPtRoutingModule implements RoutingModule {
 		private final double intrazonalSpeed;
 
 		public KtiPtRoutingModuleInfo(
+				final NewKtiConfigGroup config,
+				final Network network) {
+			this( config.getIntrazonalPtSpeed(),
+					config.getWorldFile(),
+					config.getTravelTimesFile(),
+					config.getPtStopsFile(),
+					network);
+		}
+
+		public KtiPtRoutingModuleInfo(
 				final double intrazonalSpeed,
 				// I hate constuctors which read into files,
 				// but do not want to let the dirtyness out of here
