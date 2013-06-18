@@ -82,6 +82,7 @@ import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTim
 import org.matsim.core.mobsim.qsim.multimodalsimengine.tools.EnsureActivityReachability;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.tools.MultiModalNetworkCreator;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.tools.NonCarRouteDropper;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.tools.PrepareMultiModalScenario;
 import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
@@ -529,22 +530,18 @@ public class Controler extends AbstractController {
 		this.travelTimeCalculator = this.travelTimeCalculatorFactory.createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
 	
 		if (this.config.multiModal().isMultiModalSimulationEnabled()) {
-			if (this.config.multiModal().isCreateMultiModalNetwork()) {
-				log.info("Creating multi modal network.");
-				new MultiModalNetworkCreator(this.config.multiModal()).run(this.scenarioData.getNetwork());
-			}
-	
-			if (this.config.multiModal().isEnsureActivityReachability()) {
-				log.info("Relocating activities that cannot be reached by the transport modes of their from- and/or to-legs...");
-				new EnsureActivityReachability(this.scenarioData).run(this.scenarioData.getPopulation());
-			}
-	
-			if (this.config.multiModal().isDropNonCarRoutes()) {
-				log.info("Dropping existing routes of modes which are simulated with the multi modal mobsim.");
-				new NonCarRouteDropper(this.config.multiModal()).run(this.scenarioData.getPopulation());
-			}
-	
-	
+
+			/*
+			 * Outsourced some code. This should be removed when the multi-modal
+			 * simulation has become contrib.
+			 * cdobler, jun'13
+			 */
+			PrepareMultiModalScenario.run(this.scenarioData);
+			
+			/*
+			 * This should also be removed.
+			 * cdobler, jun'13
+			 */	
 			PlansCalcRouteConfigGroup configGroup = this.config.plansCalcRoute();
 			multiModalTravelTimes = new HashMap<String, TravelTime>();
 			multiModalTravelTimes.put(TransportMode.car, this.travelTimeCalculator.getLinkTravelTimes());
