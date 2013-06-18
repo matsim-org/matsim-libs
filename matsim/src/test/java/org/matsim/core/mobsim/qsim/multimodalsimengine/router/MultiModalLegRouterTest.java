@@ -35,10 +35,10 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.BikeTravelTime;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.BikeTravelTimeOld;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTime;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTime;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTime;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTimeOld;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
@@ -82,10 +82,10 @@ public class MultiModalLegRouterTest extends MatsimTestCase {
 		PlansCalcRouteConfigGroup configGroup = config.plansCalcRoute();
 		Map<String, TravelTime> multiModalTravelTimes = new HashMap<String, TravelTime>();
 		multiModalTravelTimes.put(TransportMode.car, travelTimeCalculator.getLinkTravelTimes());
-		multiModalTravelTimes.put(TransportMode.walk, new WalkTravelTime(configGroup));
-		multiModalTravelTimes.put(TransportMode.bike, new BikeTravelTime(configGroup, new WalkTravelTime(configGroup)));
-		multiModalTravelTimes.put(TransportMode.ride, new RideTravelTime(travelTimeCalculator.getLinkTravelTimes(), new WalkTravelTime(configGroup)));
-		multiModalTravelTimes.put(TransportMode.pt, new PTTravelTime(configGroup, travelTimeCalculator.getLinkTravelTimes(), new WalkTravelTime(configGroup)));
+		multiModalTravelTimes.put(TransportMode.walk, new WalkTravelTimeOld(configGroup));
+		multiModalTravelTimes.put(TransportMode.bike, new BikeTravelTimeOld(configGroup, new WalkTravelTimeOld(configGroup)));
+		multiModalTravelTimes.put(TransportMode.ride, new RideTravelTime(travelTimeCalculator.getLinkTravelTimes(), new WalkTravelTimeOld(configGroup)));
+		multiModalTravelTimes.put(TransportMode.pt, new PTTravelTime(configGroup, travelTimeCalculator.getLinkTravelTimes(), new WalkTravelTimeOld(configGroup)));
 		
 		Map<String, LegRouter> legRouters = createLegRouters(config, scenario.getNetwork(), multiModalTravelTimes);
 
