@@ -55,8 +55,7 @@ public class ConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
 		this.checkLaneDefinitionRoutingConfiguration(config);
 		this.checkTransitReplanningConfiguration(config);
 		this.checkPlanCalcScore(config);
-		this.checkMobsimSelection(config) ;
-		this.checkMultimodalMobsim(config);
+		this.checkMobsimSelection(config);
 	}
 
 	/**
@@ -118,20 +117,6 @@ public class ConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
 			}
 			for ( MobsimType mType : MobsimType.values() ) {
 				if ( mType != MobsimType.JDEQSim ) {
-					config.removeModule(mType.toString());
-				}
-			}
-		} else if ( config.controler().getMobsim().equalsIgnoreCase( MobsimType.multimodalQSim.toString() ) ) {
-			if ( config.getModule(MobsimType.multimodalQSim.toString()) == null ) {
-				config.addModule(MultiModalConfigGroup.GROUP_NAME, new MultiModalConfigGroup() ) ;
-				for ( MobsimType mType : MobsimType.values() ) {
-					if ( mType != MobsimType.multimodalQSim ) {
-						checkForConfigModulesOfUnselectedMobsims(config, mType);
-					}
-				}
-			}
-			for ( MobsimType mType : MobsimType.values() ) {
-				if ( mType != MobsimType.multimodalQSim ) {
 					config.removeModule(mType.toString());
 				}
 			}
@@ -198,17 +183,6 @@ public class ConfigConsistencyCheckerImpl implements ConfigConsistencyChecker {
 					throw new RuntimeException("setting the pt interaction activity closing time away from 0 is not allowed because it breaks pt scoring." +
 					" If you need this anyway (for backwards compatibility reasons), you can allow this by a parameter in VspExperimentalConfigGroup.") ;
 				}
-			}
-		}
-	}
-
-	private void checkMultimodalMobsim(final Config c) {
-		if ("multimodalQSim".equals(c.controler().getMobsim()) && (!c.multiModal().isMultiModalSimulationEnabled())) {
-			log.error("A multimodal mobsim should be used according to controler.mobsim, but the multimodal-simulation feature is not enabled in multimodal.multiModalSimulationEnabled.");
-		}
-		if (c.multiModal().isMultiModalSimulationEnabled() && (c.controler().getMobsim() != null)) {
-			if (!"multimodalQSim".equals(c.controler().getMobsim())) {
-				log.error("multimodal-simulation is activated in the multimodal configuration, but no multimodal-supporting mobsim is definied in the controler configuration.");
 			}
 		}
 	}
