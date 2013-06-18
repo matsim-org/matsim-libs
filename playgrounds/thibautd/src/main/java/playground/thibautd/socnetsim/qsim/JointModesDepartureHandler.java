@@ -24,7 +24,6 @@ import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
@@ -39,6 +38,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import playground.thibautd.socnetsim.population.DriverRoute;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.PassengerRoute;
+import playground.thibautd.utils.IdentifiableCollectionsUtils;
 
 /**
  * @author thibautd
@@ -92,10 +92,10 @@ public class JointModesDepartureHandler implements DepartureHandler , MobsimEngi
 					driverId , linkId );
 		final Collection<Id> presentPassengers = new ArrayList<Id>();
 		presentPassengers.addAll( passengersWaiting.keySet() );
-		addAll( vehicle.getPassengers() , presentPassengers );
+		IdentifiableCollectionsUtils.addAll( presentPassengers , vehicle.getPassengers() );
 
 		// all persons in vehicle should be identified as passengers
-		assert containsAll( passengerIds , vehicle.getPassengers() ) :
+		assert IdentifiableCollectionsUtils.containsAll( passengerIds , vehicle.getPassengers() ) :
 			passengerIds+" does not contains all of "+vehicle.getPassengers()+" with present passengers "+presentPassengers;
 
 		if ( presentPassengers.containsAll( passengerIds ) ) {
@@ -109,13 +109,13 @@ public class JointModesDepartureHandler implements DepartureHandler , MobsimEngi
 					// may have to wait for the vehicle to come before departing.
 					((PassengerUnboardingDriverAgent) agent).addPassengerToBoard( passenger );
 				}
-				else assert contains( vehicle.getPassengers(), passengerId );
+				else assert IdentifiableCollectionsUtils.contains( vehicle.getPassengers(), passengerId );
 			}
 
 			// it is possible that not all passengers boarded yet,
 			// but the car mustn't contain passengers that are not
 			// identified as such.
-			assert containsAll( passengerIds , vehicle.getPassengers() ) :
+			assert IdentifiableCollectionsUtils.containsAll( passengerIds , vehicle.getPassengers() ) :
 				passengerIds+" does not contains all of "+vehicle.getPassengers()+" with present passengers "+presentPassengers;
 			final boolean handled =
 				netsimEngine.getDepartureHandler().handleDeparture(
@@ -132,30 +132,6 @@ public class JointModesDepartureHandler implements DepartureHandler , MobsimEngi
 		else {
 			waitingDrivers.put( driverId , new WaitingDriver( agent , linkId ) );
 		}
-	}
-
-	private boolean containsAll(
-			final Collection<Id> list,
-			final Collection<? extends Identifiable> contained) {
-		for ( Identifiable id : contained ) {
-			if ( !list.contains( id.getId() ) ) return false;
-		}
-		return true;
-	}
-
-	private static boolean contains(
-			final Collection<? extends Identifiable> list,
-			final Id passengerId) {
-		for ( Identifiable e : list ) {
-			if ( e.getId().equals( passengerId ) ) return true;
-		}
-		return false;
-	}
-
-	private static void addAll(
-			final Collection<? extends PassengerAgent> passengers,
-			final Collection<Id> collectionToFill) {
-		for ( PassengerAgent p : passengers ) collectionToFill.add( p.getId() );
 	}
 
 	private static Id getVehicleId(final MobsimAgent agent) {
