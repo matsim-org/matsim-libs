@@ -75,6 +75,7 @@ class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, Pa
 			if ( !passengersToBoard.isEmpty() ) {
 				assert ((NetworkRoute) ((Leg) getCurrentPlanElement()).getRoute()).getLinkIds().isEmpty();
 				boardPassengers();
+				assert passengersToBoard.isEmpty();
 			}
 
 			final MobsimVehicle vehicle = netsimEngine.getVehicles().get( delegate.getPlannedVehicleId() );
@@ -108,6 +109,7 @@ class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, Pa
 	public void notifyMoveOverNode(final Id newLinkId) {
 		if ( !passengersToBoard.isEmpty() ) {
 			boardPassengers();
+			assert passengersToBoard.isEmpty();
 		}
 		delegate.notifyMoveOverNode(newLinkId);
 	}

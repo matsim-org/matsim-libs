@@ -94,6 +94,10 @@ public class JointModesDepartureHandler implements DepartureHandler , MobsimEngi
 		presentPassengers.addAll( passengersWaiting.keySet() );
 		addAll( vehicle.getPassengers() , presentPassengers );
 
+		// all persons in vehicle should be identified as passengers
+		assert containsAll( passengerIds , vehicle.getPassengers() ) :
+			passengerIds+" does not contains all of "+vehicle.getPassengers()+" with present passengers "+presentPassengers;
+
 		if ( presentPassengers.containsAll( passengerIds ) ) {
 			// all passengers are or already in the car,
 			// or waiting. Board waiting passengers and depart.
