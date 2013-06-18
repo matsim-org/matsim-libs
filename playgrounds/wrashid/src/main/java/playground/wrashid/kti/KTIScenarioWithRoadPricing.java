@@ -1,7 +1,5 @@
 package playground.wrashid.kti;
 
-import kticompatibility.KtiPtConfigGroup;
-import kticompatibility.KtiTripRouterFactory;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
@@ -11,6 +9,8 @@ import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.roadpricing.RoadPricing;
 
+import playground.ivt.kticompatibility.KtiPtConfigGroup;
+import playground.ivt.kticompatibility.KtiTripRouterFactory;
 import playground.meisterk.kti.controler.KTIControler;
 
 public class KTIScenarioWithRoadPricing {

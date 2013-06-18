@@ -2,8 +2,6 @@ package playground.wrashid.kti;
 
 import java.util.TreeMap;
 
-import kticompatibility.KtiPtConfigGroup;
-import kticompatibility.KtiTripRouterFactory;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -21,6 +19,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.roadpricing.RoadPricing;
 
+import playground.ivt.kticompatibility.KtiPtConfigGroup;
+import playground.ivt.kticompatibility.KtiTripRouterFactory;
 import playground.meisterk.kti.config.KtiConfigGroup;
 import playground.meisterk.kti.controler.KTIControler;
 import playground.meisterk.kti.controler.listeners.CalcLegTimesKTIListener;

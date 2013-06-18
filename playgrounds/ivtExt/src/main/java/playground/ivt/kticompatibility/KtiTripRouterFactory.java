@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package kticompatibility;
+package playground.ivt.kticompatibility;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.Controler;
@@ -25,7 +25,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryImpl;
 
-import kticompatibility.KtiPtRoutingModule.KtiPtRoutingModuleInfo;
+import playground.ivt.kticompatibility.KtiPtRoutingModule.KtiPtRoutingModuleInfo;
 
 /**
  * @author thibautd

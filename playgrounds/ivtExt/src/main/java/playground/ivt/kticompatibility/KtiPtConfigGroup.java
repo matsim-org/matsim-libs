@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package kticompatibility;
+package playground.ivt.kticompatibility;
 
 import org.matsim.core.config.experimental.ReflectiveModule;
 
