@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
@@ -17,10 +16,10 @@ import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
 import org.matsim.contrib.accessibility.interfaces.ZoneDataExchangeInterface;
 import org.matsim.contrib.accessibility.utils.BoundingBox;
-import org.matsim.contrib.accessibility.utils.CreateTestNetwork;
 import org.matsim.contrib.improvedPseudoPt.PtMatrix;
 import org.matsim.contrib.matsim4opus.config.M4UConfigurationConverterV4;
 import org.matsim.contrib.matsim4opus.utils.CreateTestMATSimConfig;
+import org.matsim.contrib.matsim4opus.utils.CreateTestNetwork;
 import org.matsim.contrib.matsim4opus.utils.CreateTestPopulation;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.network.NetworkWriter;
@@ -44,12 +43,12 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 	private List<Double> accessibilitiesHomeZone;
 	private List<Double> accessibilitiesWorkZone;
 
-	public static void main(String[] args) {
-		
-//		new AccessibilityTest().testGridBasedAccessibilityMeasure();
-		new AccessibilityTest().testZoneBasedAccessibilityMeasure();
-
-	}
+//	public static void main(String[] args) {
+//		
+////		new AccessibilityTest().testGridBasedAccessibilityMeasure();
+//		new AccessibilityTest().testZoneBasedAccessibilityMeasure();
+//
+//	}
 	
 	/**
 	 * This method tests the grid based accessibility computation.
@@ -62,7 +61,6 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 	 */
 	
 	@Test
-	@Ignore
 	public void testGridBasedAccessibilityMeasure(){
 
 		//create local temp directory
@@ -144,7 +142,6 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 	 * The test result should be that the accessibility of the work zone is higher than the accessibility of the home zone.
 	 */
 	@Test
-	@Ignore
 	public void testZoneBasedAccessibilityMeasure(){
 		
 		//create local temp directory
