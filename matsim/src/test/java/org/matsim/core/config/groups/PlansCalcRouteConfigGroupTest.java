@@ -22,6 +22,7 @@ package org.matsim.core.config.groups;
 import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.testcases.MatsimTestUtils;
 
 public class PlansCalcRouteConfigGroupTest {
@@ -33,7 +34,7 @@ public class PlansCalcRouteConfigGroupTest {
 		PlansCalcRouteConfigGroup group = new PlansCalcRouteConfigGroup();
 
 		// test default
-		Assert.assertEquals("different default than expected.", 3.0 / 3.6, group.getWalkSpeed(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("different default than expected.", 3.0 / 3.6, group.getTeleportedModeSpeeds().get(TransportMode.walk), MatsimTestUtils.EPSILON);
 		try {
 			group.addParam("walkSpeedFactor", "1.5");
 		}
@@ -41,8 +42,8 @@ public class PlansCalcRouteConfigGroupTest {
 			log.info("catched expected exception: " + e.getMessage());
 			Assert.assertFalse("Exception-Message should not be empty.", e.getMessage().isEmpty());
 		}
-		Assert.assertEquals("value should not have changed.", 3.0 / 3.6, group.getWalkSpeed(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("value should not have changed.", 3.0 / 3.6, group.getTeleportedModeSpeeds().get(TransportMode.walk), MatsimTestUtils.EPSILON);
 		group.addParam("walkSpeed", "1.5");
-		Assert.assertEquals("value should have changed.", 1.5, group.getWalkSpeed(), MatsimTestUtils.EPSILON);
+		Assert.assertEquals("value should have changed.", 1.5, group.getTeleportedModeSpeeds().get(TransportMode.walk), MatsimTestUtils.EPSILON);
 	}
 }

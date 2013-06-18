@@ -1,6 +1,7 @@
 package playground.ciarif.flexibletransports.router;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
@@ -140,7 +141,7 @@ public class PlansCalcRouteFT extends PlansCalcRoute
   }*/
 
   public static double getAccessEgressTime(double distance, PlansCalcRouteConfigGroup group) {
-    return (distance / group.getWalkSpeed());
+    return (distance / group.getTeleportedModeSpeeds().get(TransportMode.walk));
   }
   
   public  PlansCalcRouteFtInfo getPlansCalcRouteFtInfo (){

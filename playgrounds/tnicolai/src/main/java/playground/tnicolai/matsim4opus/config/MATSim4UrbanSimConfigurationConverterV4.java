@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.Module;
@@ -899,14 +900,14 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		double defaultPtSpeed 	= 6.94444444;	// 6.94444444m/s corresponds to 25 km/h
 		
 		// setting teleportation speeds in router
-		config.plansCalcRoute().setWalkSpeed( defaultWalkSpeed ); 
-		config.plansCalcRoute().setBikeSpeed( defaultBicycleSpeed );
-		config.plansCalcRoute().setPtSpeed( defaultPtSpeed );
+		config.plansCalcRoute().setTeleportedModeSpeed(TransportMode.walk, defaultWalkSpeed); 
+		config.plansCalcRoute().setTeleportedModeSpeed(TransportMode.bike, defaultBicycleSpeed);
+		config.plansCalcRoute().setTeleportedModeSpeed(TransportMode.pt, defaultPtSpeed);
 
 		log.info("PlanCalcRouteGroup settings:");							 
-		log.info("Walk Speed: " + config.plansCalcRoute().getWalkSpeed() );
-		log.info("Bike Speed: " + config.plansCalcRoute().getBikeSpeed() );
-		log.info("Pt Speed: " + config.plansCalcRoute().getPtSpeed() );
+		log.info("Walk Speed: " + config.plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk) );
+		log.info("Bike Speed: " + config.plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.bike) );
+		log.info("Pt Speed: " + config.plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.pt) );
 		log.info("Beeline Distance Factor: " + config.plansCalcRoute().getBeelineDistanceFactor() );
 		
 		log.info("...done!");

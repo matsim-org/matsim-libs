@@ -20,6 +20,7 @@
 
 package org.matsim.core.mobsim.qsim.multimodalsimengine.router.util;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
@@ -40,7 +41,7 @@ public class WalkTravelTime implements TravelTime {
 	private double ageScaleFactor;
 	
 	public WalkTravelTime(PlansCalcRouteConfigGroup plansCalcRouteConfigGroup) {
-		this.walkSpeed = plansCalcRouteConfigGroup.getWalkSpeed();
+		this.walkSpeed = plansCalcRouteConfigGroup.getTeleportedModeSpeeds().get(TransportMode.walk);
 	}
 
 	@Override

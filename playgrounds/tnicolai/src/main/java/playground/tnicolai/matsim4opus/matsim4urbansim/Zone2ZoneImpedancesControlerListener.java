@@ -27,6 +27,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -107,7 +108,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 		Controler controler = event.getControler();
 		Scenario sc = controler.getScenario();
 		
-		double walkSpeedMeterPerMinute = sc.getConfig().plansCalcRoute().getWalkSpeed() * 60.;
+		double walkSpeedMeterPerMinute = sc.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk) * 60.;
 		double bikeSpeedMeterPerMinute = 250.; // corresponds to 15 km/h 
 
 		// init least cost path tree in order to calculate travel times and travel costs

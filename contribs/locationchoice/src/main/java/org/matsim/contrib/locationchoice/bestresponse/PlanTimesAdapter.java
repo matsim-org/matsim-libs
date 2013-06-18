@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -307,11 +308,12 @@ public class PlanTimesAdapter {
 		if (mode.equals(TransportMode.pt)) {
 			speed = Double.parseDouble(this.config.locationchoice().getTravelSpeed_pt());	
 		} else if (mode.equals(TransportMode.bike)) {
-			speed = config.plansCalcRoute().getBikeSpeed();
+			speed = config.plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.bike);
 		} else if (mode.equals(TransportMode.walk) || mode.equals(TransportMode.transit_walk)) {
-			speed = config.plansCalcRoute().getWalkSpeed();
+			speed = config.plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk);
 		} else {
-			speed = config.plansCalcRoute().getUndefinedModeSpeed();
+			PlansCalcRouteConfigGroup r = config.plansCalcRoute();
+			speed = r.getTeleportedModeSpeeds().get(PlansCalcRouteConfigGroup.UNDEFINED);
 		}		
 		return distance / speed;	
 	}

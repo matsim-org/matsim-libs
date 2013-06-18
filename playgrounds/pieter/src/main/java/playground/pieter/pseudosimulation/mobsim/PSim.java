@@ -103,7 +103,7 @@ public class PSim implements Mobsim {
 		futures = new Future[numThreads];
 		
 		PlansCalcRouteConfigGroup pcrConfig = sc.getConfig().plansCalcRoute();
-		this.beelineWalkSpeed = pcrConfig.getWalkSpeed() 
+		this.beelineWalkSpeed = pcrConfig.getTeleportedModeSpeeds().get(TransportMode.walk) 
 				/ pcrConfig.getBeelineDistanceFactor();
 	}
 

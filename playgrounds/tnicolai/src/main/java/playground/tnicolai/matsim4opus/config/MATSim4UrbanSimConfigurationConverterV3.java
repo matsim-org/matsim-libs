@@ -793,15 +793,15 @@ public class MATSim4UrbanSimConfigurationConverterV3 {
 	private void initPlanCalcRoute(){
 		log.info("Setting PlanCalcRouteGroup to config...");
 		// setting teleportation speeds in router
-		scenario.getConfig().plansCalcRoute().setWalkSpeed(1.38888889); // 1.38888889m/s corresponds to 5km/h -- alternatively: use 0.833333333333333m/s corresponds to 3km/h
-		scenario.getConfig().plansCalcRoute().setBikeSpeed(4.16666666); // 4.16666666m/s corresponds to 15 km/h
+		scenario.getConfig().plansCalcRoute().setTeleportedModeSpeed(TransportMode.walk, 1.38888889); // 1.38888889m/s corresponds to 5km/h -- alternatively: use 0.833333333333333m/s corresponds to 3km/h
+		scenario.getConfig().plansCalcRoute().setTeleportedModeSpeed(TransportMode.bike, 4.16666666); // 4.16666666m/s corresponds to 15 km/h
 		// tnicolai: deactivate only for nectar
-		 scenario.getConfig().plansCalcRoute().setPtSpeed(6.94444444);	// 6.94444444m/s corresponds to 25 km/h
+		 scenario.getConfig().plansCalcRoute().setTeleportedModeSpeed(TransportMode.pt, 6.94444444);	// 6.94444444m/s corresponds to 25 km/h
 
 		log.info("PlanCalcRouteGroup settings:");							 
-		log.info("Walk Speed: " + scenario.getConfig().plansCalcRoute().getWalkSpeed() );
-		log.info("Bike Speed: " + scenario.getConfig().plansCalcRoute().getBikeSpeed() );
-		log.info("Pt Speed: " + scenario.getConfig().plansCalcRoute().getPtSpeed() );
+		log.info("Walk Speed: " + scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk) );
+		log.info("Bike Speed: " + scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.bike) );
+		log.info("Pt Speed: " + scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.pt) );
 		log.info("Beeline Distance Factor: " + scenario.getConfig().plansCalcRoute().getBeelineDistanceFactor() );
 		
 		log.info("...done!");

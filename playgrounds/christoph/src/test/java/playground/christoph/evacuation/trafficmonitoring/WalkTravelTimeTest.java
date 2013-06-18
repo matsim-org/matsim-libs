@@ -22,6 +22,7 @@ package playground.christoph.evacuation.trafficmonitoring;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
@@ -57,7 +58,7 @@ public class WalkTravelTimeTest extends MatsimTestCase {
 		
 		// set default walk speed; according to Weidmann 1.34 [m/s]
 		double defaultWalkSpeed = 1.34;
-		scenario.getConfig().plansCalcRoute().setWalkSpeed(defaultWalkSpeed);
+		scenario.getConfig().plansCalcRoute().setTeleportedModeSpeed(TransportMode.walk, defaultWalkSpeed);
 		
 		WalkTravelTime walkTravelTime = new WalkTravelTime(scenario.getConfig().plansCalcRoute());
 		

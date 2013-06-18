@@ -164,7 +164,7 @@ public class PlansCalcRouteKti extends PlansCalcRoute {
 	}
 
 	public static double getAccessEgressTime(final double distance, final PlansCalcRouteConfigGroup group) {
-		return distance / group.getWalkSpeed();
+		return distance / group.getTeleportedModeSpeeds().get(TransportMode.walk);
 	}
 
 }

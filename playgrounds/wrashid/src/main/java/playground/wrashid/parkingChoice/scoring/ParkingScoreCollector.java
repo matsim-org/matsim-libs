@@ -5,6 +5,7 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
@@ -98,7 +99,7 @@ public class ParkingScoreCollector implements ParkingArrivalEventHandler, Parkin
 		Coord activityCoord = getActivityCoordinate(event.getActStartEvent().getFacilityId(), event.getActStartEvent()
 				.getLinkId());
 		double walkingTime = GeneralLib.getDistance(event.getParking().getCoord(), activityCoord)
-				/ controler.getConfig().plansCalcRoute().getWalkSpeed();
+				/ controler.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk);
 		walkingTimesAtParkingArrival.put(personId, walkingTime);
 	}
 
@@ -137,7 +138,7 @@ public class ParkingScoreCollector implements ParkingArrivalEventHandler, Parkin
 	private void updateWalkingTime(ParkingDepartureEvent event, Id personId) {
 		Coord activityCoord = controler.getNetwork().getLinks().get(event.getAgentDepartureEvent().getLinkId()).getCoord();
 		double walkingTime = GeneralLib.getDistance(event.getParking().getCoord(), activityCoord)
-				/ controler.getConfig().plansCalcRoute().getWalkSpeed();
+				/ controler.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk);
 		walkingTimesAtParkingDeparture.put(personId, walkingTime);
 	}
 

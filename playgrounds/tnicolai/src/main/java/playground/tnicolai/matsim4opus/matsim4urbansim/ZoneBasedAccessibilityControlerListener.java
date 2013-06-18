@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -92,7 +93,7 @@ public class ZoneBasedAccessibilityControlerListener implements ShutdownListener
 		Controler controler = event.getControler();
 		Scenario sc = controler.getScenario();
 		
-		double walkSpeedMeterPerSec = sc.getConfig().plansCalcRoute().getWalkSpeed();
+		double walkSpeedMeterPerSec = sc.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk);
 		this.walkSpeedMeterPerMin = walkSpeedMeterPerSec * 60.;
 		
 		// init LeastCostPathTree in order to calculate travel times and travel costs

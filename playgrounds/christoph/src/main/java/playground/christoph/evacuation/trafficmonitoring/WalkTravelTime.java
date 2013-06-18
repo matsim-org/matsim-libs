@@ -29,6 +29,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
@@ -108,7 +109,7 @@ public class WalkTravelTime implements TravelTime {
 	private final AtomicInteger ageWarnCount = new AtomicInteger(0);
 	
 	public WalkTravelTime(PlansCalcRouteConfigGroup plansCalcGroup) {
-		this.referenceWalkSpeed = plansCalcGroup.getWalkSpeed();
+		this.referenceWalkSpeed = plansCalcGroup.getTeleportedModeSpeeds().get(TransportMode.walk);
 		this.personCache = new ThreadLocal<Person>();
 		this.personFactorCache = new ThreadLocal<Double>();
 		this.personWalkSpeedCache = new ThreadLocal<Double>();

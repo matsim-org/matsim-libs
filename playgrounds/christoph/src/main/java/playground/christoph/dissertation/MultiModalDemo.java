@@ -177,9 +177,9 @@ public class MultiModalDemo {
 		Set<String> networkRouteModes = CollectionUtils.stringToSet(TransportMode.car + "," + TransportMode.bike + "," + TransportMode.walk);
 		config.plansCalcRoute().setNetworkModes(networkRouteModes);
 		config.plansCalcRoute().setBeelineDistanceFactor(1.0);
-		config.plansCalcRoute().setWalkSpeed(1.34);
-		config.plansCalcRoute().setBikeSpeed(6.01);
-		config.plansCalcRoute().setPtSpeedFactor(2.0);
+		config.plansCalcRoute().setTeleportedModeSpeed(TransportMode.walk, 1.34);
+		config.plansCalcRoute().setTeleportedModeSpeed(TransportMode.bike, 6.01);
+		config.plansCalcRoute().setTeleportedModeFreespeedFactor(TransportMode.pt, 2.0);
 		
 		config.strategy().setMaxAgentPlanMemorySize(4);
 		config.strategy().addParam("Module_1", "SelectExpBeta");

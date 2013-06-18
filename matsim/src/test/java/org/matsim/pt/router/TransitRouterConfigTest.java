@@ -22,6 +22,7 @@ package org.matsim.pt.router;
 import junit.framework.Assert;
 
 import org.junit.Test;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
@@ -50,7 +51,7 @@ public class TransitRouterConfigTest {
 		
 		planScoring.setUtilityOfLineSwitch(-2.34);
 		
-		planRouting.setWalkSpeed(1.37);
+		planRouting.setTeleportedModeSpeed(TransportMode.walk, 1.37);
 		planRouting.setBeelineDistanceFactor(1.2);
 		
 		transitRouting.setAdditionalTransferTime(128.0);

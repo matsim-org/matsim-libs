@@ -50,6 +50,7 @@ import org.jfree.data.statistics.HistogramType;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -819,21 +820,21 @@ public class GeneralLib {
 
 	public static double getWalkingTravelDuration(double distance) {
 		return distance * controler.getConfig().plansCalcRoute().getBeelineDistanceFactor()
-				/ controler.getConfig().plansCalcRoute().getWalkSpeed();
+				/ controler.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk);
 	}
 
 	public static double getWalkingSpeed() {
-		return controler.getConfig().plansCalcRoute().getWalkSpeed();
+		return controler.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk);
 	}
 
 	public static double getPtTravelDuration(double distance) {
 		return distance * controler.getConfig().plansCalcRoute().getBeelineDistanceFactor()
-				/ controler.getConfig().plansCalcRoute().getPtSpeed();
+				/ controler.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.pt);
 	}
 
 	public static double getBikeTravelDuration(double distance) {
 		return distance * controler.getConfig().plansCalcRoute().getBeelineDistanceFactor()
-				/ controler.getConfig().plansCalcRoute().getBikeSpeed();
+				/ controler.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.bike);
 	}
 
 	public static boolean isInZHCityRectangle(Coord coord) {

@@ -9,6 +9,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -134,8 +135,8 @@ public class AccessibilityControlerListenerImpl{
 		useRawSum			= moduleAPCM.isUseRawSumsWithoutLn();
 		logitScaleParameter = moduleAPCM.getLogitScaleParameter();
 		inverseOfLogitScaleParameter = 1/(logitScaleParameter); // logitScaleParameter = same as brainExpBeta on 2-aug-12. kai
-		walkSpeedMeterPerHour = scenario.getConfig().plansCalcRoute().getWalkSpeed() * 3600.;
-		bikeSpeedMeterPerHour = scenario.getConfig().plansCalcRoute().getBikeSpeed() * 3600.; // should be something like 15000
+		walkSpeedMeterPerHour = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk) * 3600.;
+		bikeSpeedMeterPerHour = scenario.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.bike) * 3600.; // should be something like 15000
 		
 		betaCarTT 	   	= moduleAPCM.getBetaCarTravelTime();
 		betaCarTTPower	= moduleAPCM.getBetaCarTravelTimePower2();

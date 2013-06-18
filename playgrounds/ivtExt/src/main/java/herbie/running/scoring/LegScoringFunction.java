@@ -121,7 +121,7 @@ public class LegScoringFunction extends org.matsim.core.scoring.functions.Charyp
 			double distance =  DistanceCalculations.getWalkDistance((GenericRouteImpl) leg.getRoute(), network)
 								* this.config.plansCalcRoute().getBeelineDistanceFactor();
 			
-			travelTime = distance / this.config.plansCalcRoute().getWalkSpeed();
+			travelTime = distance / this.config.plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk);
 			
 //			double tt = travelTime;
 //			double beelinefact = this.config.plansCalcRoute().getBeelineDistanceFactor();

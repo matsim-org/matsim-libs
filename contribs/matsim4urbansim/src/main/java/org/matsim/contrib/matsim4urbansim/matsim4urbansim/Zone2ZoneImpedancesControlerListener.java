@@ -28,6 +28,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -132,8 +133,8 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 		double samplingRate = ConfigurationUtils.getUrbanSimParameterConfigModule((ScenarioImpl)sc).getPopulationSampleRate();
 		double inverseOfSamplingRate = 1/samplingRate;
 		
-		double walkSpeedMeterPerMinute = sc.getConfig().plansCalcRoute().getWalkSpeed() * 60.; // corresponds to 5 km/h
-		double bikeSpeedMeterPerMinute = sc.getConfig().plansCalcRoute().getBikeSpeed() * 60.; // corresponds to 15 km/h 
+		double walkSpeedMeterPerMinute = sc.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk) * 60.; // corresponds to 5 km/h
+		double bikeSpeedMeterPerMinute = sc.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.bike) * 60.; // corresponds to 15 km/h 
 		
 		// get the free-speed car travel times (in seconds)
 		TravelTime ttf = new FreeSpeedTravelTime() ;

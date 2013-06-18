@@ -7,7 +7,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.matsim4opus.analysis.KaiAnalysisListener;
+import org.matsim.contrib.matsim4urbansim.analysis.KaiAnalysisListener;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;

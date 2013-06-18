@@ -95,7 +95,7 @@ public class KtiPtRoutingModule implements RoutingModule {
 			CoordUtils.calcDistance( 
 					fromFacility.getCoord(),
 					stop1.getCoord() ) * KTI_CROWFLY_FACTOR;
-		final double travelTimeLeg1 = distanceLeg1 * config.getWalkSpeed();
+		final double travelTimeLeg1 = distanceLeg1 * config.getTeleportedModeSpeeds().get(TransportMode.walk);
 
 		final Leg walk1 = new LegImpl( TransportMode.transit_walk );
 		final Route route1 = new GenericRouteImpl( fromFacility.getLinkId() , linkStartPt.getId() );
@@ -155,7 +155,7 @@ public class KtiPtRoutingModule implements RoutingModule {
 			CoordUtils.calcDistance( 
 					stop2.getCoord(),
 					toFacility.getCoord() ) * KTI_CROWFLY_FACTOR;
-		final double travelTimeLeg2 = distanceLeg2 * config.getWalkSpeed();
+		final double travelTimeLeg2 = distanceLeg2 * config.getTeleportedModeSpeeds().get(TransportMode.walk);
 
 		final Leg walk2 = new LegImpl( TransportMode.transit_walk );
 		final Route route2 = new GenericRouteImpl( linkEndPt.getId() , toFacility.getLinkId() );

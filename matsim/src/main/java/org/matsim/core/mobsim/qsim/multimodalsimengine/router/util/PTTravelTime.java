@@ -41,7 +41,7 @@ public class PTTravelTime implements TravelTime {
 	
 	public PTTravelTime(PlansCalcRouteConfigGroup plansCalcRouteConfigGroup, 
 			TravelTime carTravelTime, TravelTime walkTravelTime) {
-		this.ptScaleFactor = plansCalcRouteConfigGroup.getPtSpeedFactor();
+		this.ptScaleFactor = plansCalcRouteConfigGroup.getTeleportedModeFreespeedFactors().get(TransportMode.pt);
 		this.carTravelTime = carTravelTime;
 		this.walkTravelTime = walkTravelTime;
 	}

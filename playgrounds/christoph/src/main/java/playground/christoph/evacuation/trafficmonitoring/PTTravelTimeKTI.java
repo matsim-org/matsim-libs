@@ -26,6 +26,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -118,7 +119,7 @@ public class PTTravelTimeKTI implements SwissPTTravelTime {
 		timeInVehicle = addTimePenalty(timeInVehicle, depTime);
 
 		final double walkAccessEgressDistance = newRoute.calcAccessEgressDistance(fromAct, toAct);
-		final double walkAccessEgressTime = walkAccessEgressDistance / configGroup.getWalkSpeed();
+		final double walkAccessEgressTime = walkAccessEgressDistance / configGroup.getTeleportedModeSpeeds().get(TransportMode.walk);
 
 		newRoute.setDistance((walkAccessEgressDistance + newRoute.calcInVehicleDistance()));
 

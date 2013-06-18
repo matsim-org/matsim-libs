@@ -110,7 +110,7 @@ public class HerbieJointLegScoringFunction extends CharyparNagelLegScoring {
 			double distance =  DistanceCalculations.getWalkDistance((GenericRouteImpl) leg.getRoute(), network)
 								* this.config.plansCalcRoute().getBeelineDistanceFactor();
 			
-			travelTime = distance / this.config.plansCalcRoute().getWalkSpeed();
+			travelTime = distance / this.config.plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk);
 			tmpScore += travelScoring.getWalkScore(distance, travelTime);
 			
 		}

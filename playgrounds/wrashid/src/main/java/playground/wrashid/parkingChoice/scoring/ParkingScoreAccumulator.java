@@ -7,6 +7,7 @@ import java.util.Set;
 
 import org.apache.commons.math.stat.descriptive.moment.Mean;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
@@ -78,7 +79,7 @@ public class ParkingScoreAccumulator implements AfterMobsimListener {
 				double sumOfWalkingTimes = parkingScoreCollector.getSumOfWalkingTimes(personId);
 				double sumOfParkingDurations = parkingScoreCollector.getSumOfParkingDurations(personId);
 				sumOfParkingWalkDistances.put(personId, sumOfWalkingTimes
-						* event.getControler().getConfig().plansCalcRoute().getWalkSpeed());
+						* event.getControler().getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk));
 
 				if (!ParkingChoiceLib.isTestCaseRun) {
 					String parkingSelectionManager = controler.getConfig().findParam("parking", "parkingSelectionManager");

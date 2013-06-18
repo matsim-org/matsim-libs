@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -169,8 +170,8 @@ public class AccessibilityControlerListenerImpl{
 		useRawSum			= moduleAPCM.isUsingRawSumsWithoutLn();
 		logitScaleParameter = planCalcScoreConfigGroup.getBrainExpBeta() ;
 		inverseOfLogitScaleParameter = 1/(logitScaleParameter); // logitScaleParameter = same as brainExpBeta on 2-aug-12. kai
-		walkSpeedMeterPerHour = config.plansCalcRoute().getWalkSpeed() * 3600.;
-		bikeSpeedMeterPerHour = config.plansCalcRoute().getBikeSpeed() * 3600.; // should be something like 15000
+		walkSpeedMeterPerHour = config.plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk) * 3600.;
+		bikeSpeedMeterPerHour = config.plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.bike) * 3600.; // should be something like 15000
 
 		betaCarTT 	   	= planCalcScoreConfigGroup.getTraveling_utils_hr() - planCalcScoreConfigGroup.getPerforming_utils_hr();
 		betaCarTD		= planCalcScoreConfigGroup.getMarginalUtilityOfMoney() * planCalcScoreConfigGroup.getMonetaryDistanceCostRateCar();

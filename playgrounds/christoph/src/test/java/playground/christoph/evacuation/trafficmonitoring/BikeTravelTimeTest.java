@@ -22,6 +22,7 @@ package playground.christoph.evacuation.trafficmonitoring;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
@@ -57,11 +58,11 @@ public class BikeTravelTimeTest extends MatsimTestCase {
 		
 		// set default walk speed; according to Weidmann 1.34 [m/s]
 		double defaultWalkSpeed = 1.34;
-		scenario.getConfig().plansCalcRoute().setWalkSpeed(defaultWalkSpeed);
+		scenario.getConfig().plansCalcRoute().setTeleportedModeSpeed(TransportMode.walk, defaultWalkSpeed);
 		
 		// set default bike speed; Prakin and Rotheram according to 6.01 [m/s]
 		double defaultBikeSpeed = 6.01;
-		scenario.getConfig().plansCalcRoute().setBikeSpeed(defaultBikeSpeed);
+		scenario.getConfig().plansCalcRoute().setTeleportedModeSpeed(TransportMode.bike, defaultBikeSpeed);
 		
 		BikeTravelTime bikeTravelTime;
 				

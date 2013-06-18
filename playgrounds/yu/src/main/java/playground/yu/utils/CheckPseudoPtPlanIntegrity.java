@@ -69,7 +69,7 @@ public class CheckPseudoPtPlanIntegrity {
 						route.setDistance(distance);
 
 						leg.setTravelTime(pcrcg.getBeelineDistanceFactor()
-								* distance / pcrcg.getPtSpeed());
+								* distance / pcrcg.getTeleportedModeSpeeds().get(TransportMode.pt));
 
 						// leg.setRoute(route);
 					}
@@ -84,7 +84,7 @@ public class CheckPseudoPtPlanIntegrity {
 
 		PlansCalcRouteConfigGroup pcrcg = config.plansCalcRoute();
 		pcrcg.setBeelineDistanceFactor(1.3);
-		pcrcg.setPtSpeed(25d / 3.6);// 25 [km/h]
+		pcrcg.setTeleportedModeSpeed(TransportMode.pt, 25d / 3.6);// 25 [km/h]
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario)

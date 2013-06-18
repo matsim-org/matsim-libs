@@ -21,6 +21,7 @@
 package org.matsim.pt.router;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.internal.MatsimParameters;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -105,7 +106,7 @@ public class TransitRouterConfig implements MatsimParameters {
 		}
 
 		// walk:
-		this.beelineWalkSpeed = pcrConfig.getWalkSpeed() / pcrConfig.getBeelineDistanceFactor();
+		this.beelineWalkSpeed = pcrConfig.getTeleportedModeSpeeds().get(TransportMode.walk) / pcrConfig.getBeelineDistanceFactor();
 		this.marginalUtilityOfTravelTimeWalk_utl_s = pcsConfig.getTravelingWalk_utils_hr()/3600.0;
 		if ( vspConfig.isUsingOpportunityCostOfTimeInPtRouting() ) {
 			this.marginalUtilityOfTravelTimeWalk_utl_s -= pcsConfig.getPerforming_utils_hr()/3600. ; 

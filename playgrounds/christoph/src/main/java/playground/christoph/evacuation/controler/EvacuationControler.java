@@ -337,8 +337,8 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		/*
 		 * Adapt walk- and bike speed according to car speed reduction.
 		 */
-		this.config.plansCalcRoute().setWalkSpeed(this.config.plansCalcRoute().getWalkSpeed() * EvacuationConfig.speedFactor);
-		this.config.plansCalcRoute().setBikeSpeed(this.config.plansCalcRoute().getBikeSpeed() * EvacuationConfig.speedFactor);
+		this.config.plansCalcRoute().setTeleportedModeSpeed(TransportMode.walk, this.config.plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk) * EvacuationConfig.speedFactor);
+		this.config.plansCalcRoute().setTeleportedModeSpeed(TransportMode.bike, this.config.plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.bike) * EvacuationConfig.speedFactor);
 		
 		// load household object attributes
 		this.householdObjectAttributes = new ObjectAttributes();

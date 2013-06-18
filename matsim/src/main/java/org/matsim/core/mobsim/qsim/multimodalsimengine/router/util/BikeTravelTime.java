@@ -42,7 +42,7 @@ public class BikeTravelTime implements TravelTime {
 	private double ageScaleFactor;
 	
 	public BikeTravelTime(PlansCalcRouteConfigGroup plansCalcRouteConfigGroup, TravelTime walkTravelTime) {
-		this.bikeSpeed = plansCalcRouteConfigGroup.getBikeSpeed();
+		this.bikeSpeed = plansCalcRouteConfigGroup.getTeleportedModeSpeeds().get(TransportMode.bike);
 		this.walkTravelTime = walkTravelTime;
 	}
 

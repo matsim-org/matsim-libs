@@ -41,34 +41,31 @@ import org.matsim.core.utils.collections.CollectionUtils;
  */
 public class PlansCalcRouteConfigGroup extends Module {
 
-	private static final String UNDEFINED = "undefined";
-
-	public enum PtSpeedMode {freespeed, beeline}
 
 	public static final String GROUP_NAME = "planscalcroute";
 
-	private static final String PT_SPEED_MODE = "ptSpeedMode";
-	private static final String PT_SPEED_FACTOR = "ptSpeedFactor";
-
-	private static final String PT_SPEED = "ptSpeed";
-	private static final String WALK_SPEED = "walkSpeed";
-	private static final String BIKE_SPEED = "bikeSpeed";
-	private static final String UNDEFINED_MODE_SPEED = "undefinedModeSpeed";
-
 	private static final String BEELINE_DISTANCE_FACTOR = "beelineDistanceFactor";
-
 	private static final String NETWORK_MODES = "networkModes";
 	private static final String TELEPORTED_MODE_SPEEDS = "teleportedModeSpeed_";
 	private static final String TELEPORTED_MODE_FREESPEED_FACTORS = "teleportedModeFreespeedFactor_";
 
-	private boolean defaultsCleared = false;
+	public static final String UNDEFINED = "undefined";
+	
+	// For config file backward compatibility.
+	// These are just hardcoded versions of the options above.
+	private static final String PT_SPEED_FACTOR = "ptSpeedFactor";
+	private static final String PT_SPEED = "ptSpeed";
+	private static final String WALK_SPEED = "walkSpeed";
+	private static final String BIKE_SPEED = "bikeSpeed";
+	private static final String UNDEFINED_MODE_SPEED = "undefinedModeSpeed";
+	
 	private double beelineDistanceFactor = 1.3;
-	// private double ptSpeed = 25.0 / 3.6; // 25.0 km/h --> m/s
-
 	private Collection<String> networkModes = Arrays.asList(TransportMode.car, TransportMode.ride); 
 	private Map<String, Double> teleportedModeSpeeds = new HashMap<String, Double>();
 	private Map<String, Double> teleportedModeFreespeedFactors = new HashMap<String, Double>();
 
+	private boolean defaultsCleared = false;
+	
 	public PlansCalcRouteConfigGroup() {
 		super(GROUP_NAME);
 		teleportedModeSpeeds.put(TransportMode.bike, 15.0 / 3.6); // 15.0 km/h --> m/s
@@ -92,17 +89,17 @@ public class PlansCalcRouteConfigGroup extends Module {
 	@Override
 	public void addParam(final String key, final String value) {
 		if (PT_SPEED_FACTOR.equals(key)) {
-			setPtSpeedFactor(Double.parseDouble(value));
+			setTeleportedModeFreespeedFactor(TransportMode.pt, Double.parseDouble(value));
 		} else if (BEELINE_DISTANCE_FACTOR.equals(key)) {
 			setBeelineDistanceFactor(Double.parseDouble(value));
 		} else if (PT_SPEED.equals(key)) {
-			setPtSpeed(Double.parseDouble(value));
+			setTeleportedModeSpeed(TransportMode.pt, Double.parseDouble(value));
 		} else if (WALK_SPEED.equals(key)) {
-			setWalkSpeed(Double.parseDouble(value));
+			setTeleportedModeSpeed(TransportMode.walk, Double.parseDouble(value));
 		} else if (BIKE_SPEED.equals(key)) {
-			setBikeSpeed(Double.parseDouble(value));
+			setTeleportedModeSpeed(TransportMode.bike, Double.parseDouble(value));
 		} else if (UNDEFINED_MODE_SPEED.equals(key)) {
-			setUndefinedModeSpeed(Double.parseDouble(value));
+			setTeleportedModeSpeed(UNDEFINED, Double.parseDouble(value));
 		} else if (NETWORK_MODES.equals(key)) {
 			setNetworkModes(Arrays.asList(CollectionUtils.stringToArray(value)));
 		} else if (key.startsWith(TELEPORTED_MODE_SPEEDS)) {
@@ -143,11 +140,6 @@ public class PlansCalcRouteConfigGroup extends Module {
 	@Override
 	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
-		map.put(PT_SPEED_MODE, "Allowed values: freespeed, beeline. Determines if travel times for non-simulated pt legs are " +
-				"estimated by ptSpeedFactor * <freespeed car travel time> (\"freespeed\")" +
-				" or by (<beeline distance> * beelineDistanceFactor) / ptSpeed (\"beeline\")");
-		map.put(PT_SPEED_FACTOR, "factor with which times from the car freespeed travel time " +
-				"calculation are multiplied in order to obtain the pt travel times.  Default is something like 2") ;
 		map.put(BEELINE_DISTANCE_FACTOR, "factor with which beeline distances (and therefore times) " +
 				"are multiplied in order to obtain an estimate of the network distances/times.  Default is something like 1.3") ;
 		map.put(NETWORK_MODES, "All the modes for which the router is supposed to generate network routes (like car)") ;
@@ -163,52 +155,12 @@ public class PlansCalcRouteConfigGroup extends Module {
 		return map;
 	}
 
-	public double getPtSpeedFactor() {
-		return getTeleportedModeFreespeedFactors().get(TransportMode.pt);
-	}
-
-	public double getWalkSpeed() {
-		return getTeleportedModeSpeeds().get(TransportMode.walk);
-	}
-
-	public void setWalkSpeed(final double walkSpeed) {
-		setTeleportedModeSpeed(TransportMode.walk, walkSpeed);
-	}
-
-	public double getBikeSpeed() {
-		return getTeleportedModeSpeeds().get(TransportMode.bike);
-	}
-
-	public void setBikeSpeed(final double bikeSpeed) {
-		setTeleportedModeSpeed(TransportMode.bike, bikeSpeed);
-	}
-
-	public double getUndefinedModeSpeed() {
-		return getTeleportedModeSpeeds().get(UNDEFINED);
-	}
-
-	public void setUndefinedModeSpeed(final double undefinedModeSpeed) {
-		setTeleportedModeSpeed(UNDEFINED, undefinedModeSpeed);
-	}
-
-	public void setPtSpeedFactor(final double ptSpeedFactor) {
-		setTeleportedModeFreespeedFactor(TransportMode.pt, ptSpeedFactor);
-	}
-
 	public double getBeelineDistanceFactor() {
 		return this.beelineDistanceFactor;
 	}
 
 	public void setBeelineDistanceFactor(double beelineDistanceFactor) {
 		this.beelineDistanceFactor = beelineDistanceFactor;
-	}
-
-	public double getPtSpeed() {
-		return getTeleportedModeSpeeds().get(TransportMode.pt);
-	}
-
-	public void setPtSpeed(double ptSpeed) {
-		setTeleportedModeSpeed(TransportMode.pt, ptSpeed);
 	}
 
 	public Collection<String> getNetworkModes() {

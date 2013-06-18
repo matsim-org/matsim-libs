@@ -23,6 +23,7 @@ package playground.gregor.sim2d_v3.simulation.floor;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
@@ -71,7 +72,7 @@ public class DefaultVelocityCalculator implements VelocityCalculator {
 
 	
 	public DefaultVelocityCalculator(PlansCalcRouteConfigGroup plansCalcGroup) {
-		this.referenceWalkSpeed = plansCalcGroup.getWalkSpeed();
+		this.referenceWalkSpeed = plansCalcGroup.getTeleportedModeSpeeds().get(TransportMode.walk);
 		this.random = MatsimRandom.getLocalInstance();
 	}
 	
