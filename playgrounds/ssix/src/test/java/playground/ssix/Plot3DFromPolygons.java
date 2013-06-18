@@ -19,6 +19,8 @@
 
 package playground.ssix;
 
+/*
+
 import java.awt.Rectangle;
 import java.io.BufferedReader;
 import java.io.DataInputStream;
@@ -51,6 +53,8 @@ import org.jzy3d.plot3d.primitives.Shape;
  * 
  * @author: ssix
  */
+
+/*
 
 public class Plot3DFromPolygons {
 
@@ -205,3 +209,5 @@ public class Plot3DFromPolygons {
 	}
 	
 }
+
+*/
