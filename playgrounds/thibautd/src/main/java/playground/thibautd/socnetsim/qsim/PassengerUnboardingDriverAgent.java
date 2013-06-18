@@ -123,7 +123,13 @@ class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, Pa
 			assert ((Leg) getCurrentPlanElement()).getMode().equals( JointActingTypes.DRIVER ) : getCurrentPlanElement();
 			assert ((DriverRoute) ((Leg) getCurrentPlanElement()).getRoute()).getPassengersIds().contains( passenger.getId() ) :
 				passenger+" not in "+((DriverRoute) ((Leg) getCurrentPlanElement()).getRoute()).getPassengersIds()+" for driver "+this;
-			vehicle.addPassenger( passenger );
+
+			final boolean isAdded = vehicle.addPassenger( passenger );
+			if ( !isAdded ) {
+				// do not know how to handle that...
+				throw new RuntimeException( passenger+" could not be added to vehicle "+vehicle );
+			}
+
 			events.processEvent(
 					events.getFactory().createPersonEntersVehicleEvent(
 						internalInterface.getMobsim().getSimTimer().getTimeOfDay(),
