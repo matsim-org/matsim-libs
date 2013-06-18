@@ -6,6 +6,6 @@
   </parent>
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.matsim.contrib</groupId>
-  <artifactId>improvedPseudoPt</artifactId>
-  <name>improvedPseudoPt</name>
+  <artifactId>matrixbasedptrouter</artifactId>
+  <name>matrixbasedptrouter</name>
 </project>

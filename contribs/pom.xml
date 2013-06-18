@@ -91,7 +91,7 @@
 		<module>matsim4urbansim</module>
 		<module>networkEditor</module>
 		<module>otfvis</module>
-		<module>improvedPseudoPt</module>
+		<module>matrixbasedptrouter</module>
 		<module>parking</module>
 		<module>transEnergySim</module>
 		<module>roadpricing</module>
