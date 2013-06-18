@@ -187,7 +187,7 @@ public class KtiPtRoutingModule implements RoutingModule {
 		private final double intrazonalSpeed;
 
 		public KtiPtRoutingModuleInfo(
-				final NewKtiConfigGroup config,
+				final KtiPtConfigGroup config,
 				final Network network) {
 			this( config.getIntrazonalPtSpeed(),
 					config.getWorldFile(),

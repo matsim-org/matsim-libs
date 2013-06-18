@@ -43,7 +43,7 @@ public class RunKtiScenario {
 		// read the config with our special parameters
 		// Note that you need 
 		final Config config = ConfigUtils.createConfig();
-		config.addModule( new NewKtiConfigGroup() );
+		config.addModule( new KtiPtConfigGroup() );
 		ConfigUtils.loadConfig( config , configFile );
 
 		// just make sure the scenario is loaded

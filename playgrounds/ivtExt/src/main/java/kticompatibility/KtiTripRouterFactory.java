@@ -37,7 +37,7 @@ public class KtiTripRouterFactory implements TripRouterFactory {
 	public KtiTripRouterFactory(final Controler controler) {
 		this.controler = controler;
 		this.ptInfo = new KtiPtRoutingModuleInfo(
-				(NewKtiConfigGroup) controler.getScenario().getConfig().getModule( NewKtiConfigGroup.GROUP_NAME ),
+				(KtiPtConfigGroup) controler.getScenario().getConfig().getModule( KtiPtConfigGroup.GROUP_NAME ),
 				controler.getScenario().getNetwork() );
 	}
 

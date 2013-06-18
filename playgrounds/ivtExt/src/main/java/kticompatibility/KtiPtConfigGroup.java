@@ -27,15 +27,15 @@ import org.matsim.core.config.experimental.ReflectiveModule;
  * to the standard config
  * @author thibautd
  */
-public class NewKtiConfigGroup extends ReflectiveModule {
-	public static final String GROUP_NAME = "newKtiConfigGroup";
+public class KtiPtConfigGroup extends ReflectiveModule {
+	public static final String GROUP_NAME = "ktiPtConfigGroup";
 
 	private String worldFile = null;
 	private String travelTimesFile = null;
 	private String ptStopsFile = null;
 	private double intrazonalPtSpeed = 4.361111;
 
-	public NewKtiConfigGroup() {
+	public KtiPtConfigGroup() {
 		super( GROUP_NAME );
 	}
 
