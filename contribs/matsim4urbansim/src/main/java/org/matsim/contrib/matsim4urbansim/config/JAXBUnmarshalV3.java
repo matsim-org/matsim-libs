@@ -21,14 +21,17 @@ public class JAXBUnmarshalV3 extends MatsimJaxbXmlParser{
 	// logger
 	private static final Logger log = Logger.getLogger(JAXBUnmarshalV3.class);
 	
-	private String matsimConfigFile = null;
-	
-	public JAXBUnmarshalV3(String configFile){
+	public JAXBUnmarshalV3(){
 		super(InternalConstants.CURRENT_MATSIM_4_URBANSIM_XSD_MATSIMORG);
-		this.matsimConfigFile = configFile;
 	}
 	
-	public Matsim4UrbansimConfigType unmarshal() {
+	/**
+	 * reads matsim config generated from urbansim and inits jaxbv3 object structure
+	 * @param matsimConfigFile
+	 * @return Matsim4UrbansimConfigType
+	 */
+	@SuppressWarnings("unchecked")
+	public Matsim4UrbansimConfigType unmarshal(String matsimConfigFile) {
 
 		Matsim4UrbansimConfigType m4uConfigType = null;
 
@@ -41,10 +44,10 @@ public class JAXBUnmarshalV3 extends MatsimJaxbXmlParser{
 			Unmarshaller unmarschaller = jaxbContext.createUnmarshaller();
 			
 			// validate file
-			super.validateFile(this.matsimConfigFile, unmarschaller);
+			super.validateFile(matsimConfigFile, unmarschaller);
 			
 			File inputFile = new File( matsimConfigFile );
-			isFileAvailable(inputFile);
+			isFileAvailable(matsimConfigFile, inputFile);
 			// contains the content of the MATSim config.
 			Object object = unmarschaller.unmarshal(inputFile);
 			
@@ -56,9 +59,6 @@ public class JAXBUnmarshalV3 extends MatsimJaxbXmlParser{
 
 		} catch (JAXBException je) {
 			je.printStackTrace();
-			return null;
-		} catch (IOException ioe) {
-			ioe.printStackTrace();
 			return null;
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -73,7 +73,7 @@ public class JAXBUnmarshalV3 extends MatsimJaxbXmlParser{
 	}
 	
 	
-	private void isFileAvailable(File file){
+	private void isFileAvailable(String matsimConfigFile, File file){
 		if(!file.exists()){
 			log.error(matsimConfigFile + " not found!!!");
 			System.exit(-1);
