@@ -28,5 +28,10 @@
   		<artifactId>accessibility</artifactId>
   		<version>0.6.0-SNAPSHOT</version>
   	</dependency>
+  	<dependency>
+  		<groupId>org.matsim.contrib</groupId>
+  		<artifactId>matrixbasedptrouter</artifactId>
+  		<version>0.6.0-SNAPSHOT</version>
+  	</dependency>
   </dependencies>
 </project>
