@@ -127,24 +127,6 @@ public class InternalConstants {
 	public static final String V2_MATSIM_4_URBANSIM_XSD_SOURCEFOREGE = "https://matsim.svn.sourceforge.net/svnroot/matsim/matsim/trunk/dtd/matsim4urbansim_v2.xsd";
 	public static final String V2_MATSIM_4_URBANSIM_XSD_LOCALJAR = "/dtd/matsim4urbansim_v2.xsd";
 	public static final String V2_XSD_FILE_NAME = "matsim4urbansim_v2.xsd";
-	public static final String JAXB_PARSER_PACKAGE_NAME = "matsim4urbansim.jaxbconfigv3";
-	
-	/** MATSim 4 UrbanSim (urbansimParameter) parameter names **/
-	public static final String URBANSIM_PARAMETER = "urbansimParameter";
-	public static final String IS_TEST_RUN = "isTestRun";
-	public static final String SAMPLING_RATE = "samplingRate";
-	public static final String OPUS_HOME_PARAM = "opusHomeParam";
-	public static final String OPUS_DATA_PATH_PARAM = "opusDataPathParam";
-	public static final String MATSIM_4_OPUS_PARAM = "matsim4OpusParam";
-	public static final String MATSIM_4_OPUS_CONFIG_PARAM = "matsim4OpusConfigParam";
-	public static final String MATSIM_4_OPUS_OUTPUT_PARAM = "matsim4OpusOutputParam";
-	public static final String MATSIM_4_OPUS_TEMP_PARAM = "matsim4OpusTempParam";
-	public static final String MATSIM_4_OPUS_BACKUP_PARAM = "matsim4OpusBackupParam";
-	public static final String YEAR = "year";
-	public static final String BACKUP_RUN_DATA_PARAM = "backupRunDataParam";
-	public static final String TEST_PARAMETER_PARAM = "testParameter";
-	public static final String MEASUREMENT_LOGFILE = "psrc_log.txt";
-	public static final String MATSIM_MODE = "matsim_mode";
-	public static final String TARGET_LOCATION_HOT_START_PLANS_FILE = "target_location_for_hotstart_plans_file";	
+	public static final String JAXB_PARSER_PACKAGE_NAME = "matsim4urbansim.jaxbconfigv3";	
 }
 
