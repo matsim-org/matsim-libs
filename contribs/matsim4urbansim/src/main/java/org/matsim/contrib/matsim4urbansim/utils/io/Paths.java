@@ -3,14 +3,8 @@ package org.matsim.contrib.matsim4urbansim.utils.io;
 import java.io.File;
 import java.net.URL;
 
-import org.apache.log4j.Logger;
-import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
-
 
 public class Paths {
-	
-	// logger
-	private static final Logger log = Logger.getLogger(Paths.class);
 	
 	// MATSim4OPUS Test environment (relative paths)
 	public static final String WARM_START_URBANSIM_OUTPUT 	= "warmstart/urbanSimOutput";
@@ -24,10 +18,8 @@ public class Paths {
 	 */
 	public static void isValidPath(String matsimConfiFile){
 		// test the path to matsim config xml
-		if( matsimConfiFile==null || matsimConfiFile.length() <= 0 || !pathExsits( matsimConfiFile ) ){
-			log.error(matsimConfiFile + " is not a valid path to a MATSim configuration file. SHUTDOWN MATSim!");
-			System.exit(InternalConstants.NOT_VALID_PATH);
-		}
+		if( matsimConfiFile==null || matsimConfiFile.length() <= 0 || !pathExsits( matsimConfiFile ) )
+			throw new RuntimeException(matsimConfiFile + " is not a valid path to a MATSim configuration file. SHUTDOWN MATSim!");
 	}
 	
 	/**

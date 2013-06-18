@@ -135,10 +135,10 @@ public class ReadFromUrbanSimModel {
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
-			System.exit( InternalConstants.EXCEPTION_OCCURED );
+			System.exit( -1 );
 		} catch (IOException e) {
 			e.printStackTrace();
-			System.exit( InternalConstants.EXCEPTION_OCCURED );
+			System.exit( -1 );
 		}
 		
 		log.info("Done reading urbansim parcels. Found " + zones.getFacilities().size() + " zones.");
@@ -223,10 +223,10 @@ public class ReadFromUrbanSimModel {
 			reader.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
-			System.exit( InternalConstants.EXCEPTION_OCCURED );
+			System.exit( -1 );
 		} catch (IOException e) {
 			e.printStackTrace();
-			System.exit( InternalConstants.EXCEPTION_OCCURED );
+			System.exit( -1 );
 		}
 		
 		log.info("Done reading urbansim parcels. Found " + parcels.getFacilities().size() + " parcels.");

@@ -28,8 +28,8 @@ import java.io.StringWriter;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.accessibility.config.AccessibilityConfigGroup;
-import org.matsim.contrib.accessibility.config.M4UAccessibilityConfigUtils;
 import org.matsim.contrib.accessibility.config.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
+import org.matsim.contrib.accessibility.config.M4UAccessibilityConfigUtils;
 import org.matsim.contrib.matsim4urbansim.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4urbansim.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
@@ -469,15 +469,14 @@ public class M4UConfigUtils {
 		// JAXBUnmaschal reads the UrbanSim generated MATSim config, validates it against
 		// the current xsd (checks e.g. the presents and data type of parameter) and generates
 		// an Java object representing the config file.
-		JAXBUnmaschalV2 unmarschal = new JAXBUnmaschalV2( matsim4urbansimConfigFilename );
+		JAXBUnmarschalV2 unmarschal = new JAXBUnmarschalV2( matsim4urbansimConfigFilename );
 
 		MatsimConfigType matsim4urbansimConfig = null;
 
 		// binding the parameter from the MATSim Config into the JAXB data structure
-		if( (matsim4urbansimConfig = unmarschal.unmaschalMATSimConfig()) == null){
-			log.error("Unmarschalling failed. SHUTDOWN MATSim!");
-			System.exit(InternalConstants.UNMARSCHALLING_FAILED);
-		}
+		if( (matsim4urbansimConfig = unmarschal.unmaschalMATSimConfig()) == null)
+			throw new RuntimeException("Unmarschalling failed. SHUTDOWN MATSim!");
+			
 		return matsim4urbansimConfig;
 	}
 

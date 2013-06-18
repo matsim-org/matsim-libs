@@ -44,10 +44,10 @@ import org.xml.sax.SAXException;
  * @author thomas
  *
  */
-public class JAXBUnmaschalV2 extends MatsimJaxbXmlParser{
+public class JAXBUnmarschalV2 extends MatsimJaxbXmlParser{
 	
 	// logger
-	private static final Logger log = Logger.getLogger(JAXBUnmaschalV2.class);
+	private static final Logger log = Logger.getLogger(JAXBUnmarschalV2.class);
 	
 	private String matsimConfigFile = null;
 	
@@ -55,7 +55,7 @@ public class JAXBUnmaschalV2 extends MatsimJaxbXmlParser{
 	 * default constructor
 	 * @param configFile
 	 */
-	public JAXBUnmaschalV2(String configFile){
+	public JAXBUnmarschalV2(String configFile){
 		// schemaLocation
 		super(InternalConstants.V2_MATSIM_4_URBANSIM_XSD_MATSIMORG);
 		this.matsimConfigFile = configFile;
