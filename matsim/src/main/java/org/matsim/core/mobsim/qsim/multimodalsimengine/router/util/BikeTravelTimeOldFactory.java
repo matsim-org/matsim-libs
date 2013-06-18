@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * WalkTravelTimeFactory.java
+ * BikeTravelTimeFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -24,17 +24,19 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.TravelTimeFactory;
 
-public class WalkTravelTimeFactory implements TravelTimeFactory {
+public class BikeTravelTimeOldFactory implements TravelTimeFactory {
 
 	private final PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
+	private final TravelTime walkTravelTimeFactory;
 	
-	public WalkTravelTimeFactory(PlansCalcRouteConfigGroup plansCalcRouteConfigGroup) {
+	public BikeTravelTimeOldFactory(PlansCalcRouteConfigGroup plansCalcRouteConfigGroup, TravelTime travelTime) {
 		this.plansCalcRouteConfigGroup = plansCalcRouteConfigGroup;
+		this.walkTravelTimeFactory = travelTime;
 	}
 	
 	@Override
 	public TravelTime createTravelTime() {
-		return new WalkTravelTime(plansCalcRouteConfigGroup);
+		return new BikeTravelTimeOld(plansCalcRouteConfigGroup, walkTravelTimeFactory);
 	}
 	
 }

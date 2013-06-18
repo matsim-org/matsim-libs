@@ -28,10 +28,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.BikeTravelTime;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.BikeTravelTimeOld;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTime;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTime;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTime;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTimeOld;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
@@ -78,13 +78,13 @@ public class HUPCControllerChessBoard extends WithinDayParkingController  {
 		// TravelTimeCollector for car mode
 
 		Map<String, TravelTime> travelTimes = new HashMap<String, TravelTime>();
-		travelTimes.put(TransportMode.walk, new WalkTravelTime(this.config.plansCalcRoute()));
-		travelTimes.put(TransportMode.bike, new BikeTravelTime(this.config.plansCalcRoute(),
-				new WalkTravelTime(this.config.plansCalcRoute())));
+		travelTimes.put(TransportMode.walk, new WalkTravelTimeOld(this.config.plansCalcRoute()));
+		travelTimes.put(TransportMode.bike, new BikeTravelTimeOld(this.config.plansCalcRoute(),
+				new WalkTravelTimeOld(this.config.plansCalcRoute())));
 		travelTimes.put(TransportMode.ride, new RideTravelTime(this.getLinkTravelTimes(), 
-				new WalkTravelTime(this.config.plansCalcRoute())));
+				new WalkTravelTimeOld(this.config.plansCalcRoute())));
 		travelTimes.put(TransportMode.pt, new PTTravelTime(this.config.plansCalcRoute(), 
-				this.getLinkTravelTimes(), new WalkTravelTime(this.config.plansCalcRoute())));
+				this.getLinkTravelTimes(), new WalkTravelTimeOld(this.config.plansCalcRoute())));
 		travelTimes.put(TransportMode.car, super.getTravelTimeCollector());
 
 		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelCostCalculatorFactory();

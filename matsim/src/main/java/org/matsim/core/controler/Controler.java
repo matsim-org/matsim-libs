@@ -73,12 +73,12 @@ import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.MultiModalDepartureHandler;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.MultiModalSimEngine;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.MultiModalSimEngineFactory;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.BikeTravelTime;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.BikeTravelTimeOld;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTime;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTime;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.TravelTimeCalculatorWithBuffer;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.TravelTimeCalculatorWithBufferFactory;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTime;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTimeOld;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.tools.EnsureActivityReachability;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.tools.MultiModalNetworkCreator;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.tools.NonCarRouteDropper;
@@ -545,14 +545,13 @@ public class Controler extends AbstractController {
 			PlansCalcRouteConfigGroup configGroup = this.config.plansCalcRoute();
 			multiModalTravelTimes = new HashMap<String, TravelTime>();
 			multiModalTravelTimes.put(TransportMode.car, this.travelTimeCalculator.getLinkTravelTimes());
-			multiModalTravelTimes.put(TransportMode.walk, new WalkTravelTime(configGroup));
-			multiModalTravelTimes.put(TransportMode.bike, new BikeTravelTime(configGroup,
-					new WalkTravelTime(configGroup)));
+			multiModalTravelTimes.put(TransportMode.walk, new WalkTravelTimeOld(configGroup));
+			multiModalTravelTimes.put(TransportMode.bike, new BikeTravelTimeOld(configGroup,
+					new WalkTravelTimeOld(configGroup)));
 			multiModalTravelTimes.put(TransportMode.ride, new RideTravelTime(((TravelTimeCalculatorWithBuffer) this.travelTimeCalculator).getTravelTimesFromPreviousIteration(), 
-					new WalkTravelTime(configGroup)));
+					new WalkTravelTimeOld(configGroup)));
 			multiModalTravelTimes.put(TransportMode.pt, new PTTravelTime(configGroup, 
-					((TravelTimeCalculatorWithBuffer) this.travelTimeCalculator).getTravelTimesFromPreviousIteration(), new WalkTravelTime(configGroup)));
-	
+					((TravelTimeCalculatorWithBuffer) this.travelTimeCalculator).getTravelTimesFromPreviousIteration(), new WalkTravelTimeOld(configGroup)));
 		}
 	
 		this.events.addHandler(this.travelTimeCalculator);

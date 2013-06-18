@@ -53,10 +53,10 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.BikeTravelTime;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.BikeTravelTimeOld;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTime;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTime;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTime;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTimeOld;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.tools.MultiModalNetworkCreator;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
@@ -322,13 +322,13 @@ public class PED12ScenarioGenZurich {
 		PlansCalcRouteConfigGroup configGroup = scenario.getConfig().plansCalcRoute();
 		Map<String, TravelTime> multiModalTravelTimes = new HashMap<String, TravelTime>();
 		multiModalTravelTimes.put(TransportMode.car, new FreeSpeedTravelTime());
-		multiModalTravelTimes.put(TransportMode.walk, new WalkTravelTime(configGroup));
-		multiModalTravelTimes.put(TransportMode.bike, new BikeTravelTime(configGroup,
-				new WalkTravelTime(configGroup)));
+		multiModalTravelTimes.put(TransportMode.walk, new WalkTravelTimeOld(configGroup));
+		multiModalTravelTimes.put(TransportMode.bike, new BikeTravelTimeOld(configGroup,
+				new WalkTravelTimeOld(configGroup)));
 		multiModalTravelTimes.put(TransportMode.ride, new RideTravelTime(new FreeSpeedTravelTime(), 
-				new WalkTravelTime(configGroup)));
+				new WalkTravelTimeOld(configGroup)));
 		multiModalTravelTimes.put(TransportMode.pt, new PTTravelTime(configGroup, 
-				new FreeSpeedTravelTime(), new WalkTravelTime(configGroup)));
+				new FreeSpeedTravelTime(), new WalkTravelTimeOld(configGroup)));
 	
 		Map<String, LegRouter> legRouters = createLegRouters(scenario.getConfig(), network, 
 				multiModalTravelTimes);

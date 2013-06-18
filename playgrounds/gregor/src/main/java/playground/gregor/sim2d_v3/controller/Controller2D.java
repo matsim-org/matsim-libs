@@ -28,13 +28,12 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTimeFactory;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTimeOldFactory;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.core.router.old.LegRouter;
 import org.matsim.core.router.old.PlanRouterAdapter;
-import org.matsim.core.router.old.PlansCalcRoute;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -99,7 +98,7 @@ public final class Controller2D extends Controler implements StartupListener {
 		
 		PlanRouterAdapter plansCalcRoute = new PlanRouterAdapter( this );
 		
-		TravelTime travelTime = new WalkTravelTimeFactory(config.plansCalcRoute()).createTravelTime();
+		TravelTime travelTime = new WalkTravelTimeOldFactory(config.plansCalcRoute()).createTravelTime();
 		LegRouter walk2DLegRouter = new Walk2DLegRouter(network, travelTime, (IntermodalLeastCostPathCalculator) plansCalcRoute.getLeastCostPathCalculator());
 		plansCalcRoute.addLegHandler("walk2d", walk2DLegRouter);
 		
