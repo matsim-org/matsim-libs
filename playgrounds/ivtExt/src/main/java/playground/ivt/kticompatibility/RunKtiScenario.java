@@ -43,7 +43,9 @@ public class RunKtiScenario {
 		final String configFile = args[ 0 ];
 
 		// read the config with our special parameters
-		// Note that you need 
+		// Note that you need scoring parameters converted
+		// from the KTI config by something like
+		// playground.thibautd.scripts.KtiToSimiliKtiConfig
 		final Config config = ConfigUtils.createConfig();
 		config.addModule( new KtiPtConfigGroup() );
 		config.addModule( new KtiLikeScoringConfigGroup() );
