@@ -122,5 +122,15 @@ public class PassengerRoute implements GenericRoute {
 		c.driver = driver;
 		return c;
 	}
+
+	@Override
+	public String toString() {
+		return "[PassengerRoute: "+
+			"distance="+distance+"; "+
+			"travelTime="+travelTime+"; "+
+			"startLink="+startLink+"; "+
+			"endLink="+endLink+"; "+
+			"driver="+driver+"]";
+	}
 }
 

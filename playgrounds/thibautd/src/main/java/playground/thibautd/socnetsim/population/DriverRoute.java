@@ -206,5 +206,9 @@ public class DriverRoute implements GenericRoute , NetworkRoute {
 		return "driver";
 	}
 
+	@Override
+	public String toString() {
+		return "[DriverRoute: delegate="+netRoute+"; passengers="+passengers+"]";
+	}
 }
 
