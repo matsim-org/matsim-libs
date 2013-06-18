@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.router;
+package kticompatibility;
 
 import java.util.ArrayList;
 import java.util.List;
