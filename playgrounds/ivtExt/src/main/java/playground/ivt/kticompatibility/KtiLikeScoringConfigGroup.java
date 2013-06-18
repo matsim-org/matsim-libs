@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.ivt.scoring;
+package playground.ivt.kticompatibility;
 
 import org.matsim.core.config.experimental.ReflectiveModule;
 
