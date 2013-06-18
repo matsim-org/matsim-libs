@@ -75,31 +75,45 @@ public class JointPlanUtils {
 				final Id destinationId = driverTrip.passengerDestinations.get( passengerId );
 
 				final Iterator<PlanElement> it = iterators.getIterator( driverTrip.driverId , passengerId );
-				while ( it.hasNext() ) {
-					final PlanElement pe = it.next();
-					if (pe instanceof Leg &&
-							((Leg) pe).getMode().equals( JointActingTypes.PASSENGER )) {
-						final PassengerRoute route = (PassengerRoute) ((Leg) pe).getRoute();
-						if ( route.getDriverId().equals( driverTrip.driverId ) &&
-								route.getStartLinkId().equals( originId ) &&
-								route.getEndLinkId().equals( destinationId )) {
-							jointTrips.add(
-									new JointTrip(
-										driverTrip.driverId,
-										extractDriverSubTrip(
-											originId,
-											destinationId,
-											driverTrip.driverTrip ),
-										passengerId,
-										(Leg) pe ));
-							break;
-						}
-					}
-				}
+				jointTrips.add(
+						getNextPassengerTrip(
+							it,
+							driverTrip,
+							passengerId,
+							originId,
+							destinationId) );
 			}
 		}
 
 		return jointTrips;
+	}
+
+	private static JointTrip getNextPassengerTrip(
+			final Iterator<PlanElement> it,
+			final DriverTrip driverTrip,
+			final Id passengerId,
+			final Id originId,
+			final Id destinationId) {
+		while ( it.hasNext() ) {
+			final PlanElement pe = it.next();
+			if (pe instanceof Leg &&
+					((Leg) pe).getMode().equals( JointActingTypes.PASSENGER )) {
+				final PassengerRoute route = (PassengerRoute) ((Leg) pe).getRoute();
+				if ( route.getDriverId().equals( driverTrip.driverId ) &&
+						route.getStartLinkId().equals( originId ) &&
+						route.getEndLinkId().equals( destinationId )) {
+					return new JointTrip(
+								driverTrip.driverId,
+								extractDriverSubTrip(
+									originId,
+									destinationId,
+									driverTrip.driverTrip ),
+								passengerId,
+								(Leg) pe );
+				}
+			}
+		}
+		throw new RuntimeException( "no valid trip found for passenger "+passengerId+" in driver trip "+driverTrip );
 	}
 
 	private static List<Leg> extractDriverSubTrip(
