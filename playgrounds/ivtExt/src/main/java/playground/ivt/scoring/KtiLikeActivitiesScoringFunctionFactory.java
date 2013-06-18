@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.scoring;
+package playground.ivt.scoring;
 
 import java.util.Collection;
 import java.util.TreeMap;
@@ -38,7 +38,7 @@ import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
-import playground.thibautd.scoring.ElementalCharyparNagelLegScoringFunction.LegScoringParameters;
+import playground.ivt.scoring.ElementalCharyparNagelLegScoringFunction.LegScoringParameters;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 
 /**

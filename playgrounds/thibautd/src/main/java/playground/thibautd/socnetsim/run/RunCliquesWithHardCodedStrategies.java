@@ -22,8 +22,6 @@ package playground.thibautd.socnetsim.run;
 import java.util.Arrays;
 import java.util.List;
 
-import kticompatibility.KtiPtRoutingModule;
-import kticompatibility.KtiPtRoutingModule.KtiPtRoutingModuleInfo;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -47,8 +45,10 @@ import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.pt.PtConstants;
 
-import playground.thibautd.scoring.KtiLikeActivitiesScoringFunctionFactory;
-import playground.thibautd.scoring.KtiLikeScoringConfigGroup;
+import playground.ivt.kticompatibility.KtiPtRoutingModule;
+import playground.ivt.kticompatibility.KtiPtRoutingModule.KtiPtRoutingModuleInfo;
+import playground.ivt.scoring.KtiLikeActivitiesScoringFunctionFactory;
+import playground.ivt.scoring.KtiLikeScoringConfigGroup;
 import playground.thibautd.socnetsim.cliques.config.CliquesConfigGroup;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.controller.ControllerRegistryBuilder;

@@ -5,4 +5,4 @@
  * @author thibautd
  */
 
-package playground.thibautd.scoring;
+package playground.ivt.scoring;

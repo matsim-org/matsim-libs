@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.scoring;
+package playground.ivt.scoring;
 
 import java.util.Collections;
 import java.util.HashMap;
