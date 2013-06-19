@@ -18,11 +18,11 @@ public class SetToolBoxProcess extends BasicProcess
 	@Override
 	public void start()
 	{
-		System.out.println("active toolbox: " + controller.getActiveToolBox());
+		System.out.println("!active toolbox: " + controller.getActiveToolBox());
 		
 		//set tool box
 		if ((controller.getActiveToolBox()==null) || (!(controller.getActiveToolBox().getClass().isInstance(toolBox))))
-			addToolBox(toolBox);
+			this.controller.setActiveToolBox(toolBox);
 	}	
 
 }

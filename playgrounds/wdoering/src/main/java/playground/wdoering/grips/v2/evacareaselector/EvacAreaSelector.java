@@ -27,6 +27,7 @@ import playground.wdoering.grips.scenariomanager.model.process.InitMapLayerProce
 import playground.wdoering.grips.scenariomanager.model.process.InitShapeLayerProcess;
 import playground.wdoering.grips.scenariomanager.model.process.ProcessInterface;
 import playground.wdoering.grips.scenariomanager.model.process.SetModuleListenerProcess;
+import playground.wdoering.grips.scenariomanager.model.process.SetToolBoxProcess;
 import playground.wdoering.grips.scenariomanager.model.shape.BoxShape;
 import playground.wdoering.grips.scenariomanager.model.shape.CircleShape;
 import playground.wdoering.grips.scenariomanager.model.shape.ShapeStyle;
@@ -75,16 +76,16 @@ public class EvacAreaSelector extends AbstractModule
 		super(controller.getLocale().moduleEvacAreaSelector(), Constants.ModuleType.EVACUATION, controller);
 		
 		
-//		//disable all layers
+		//disable all layers
 		this.processList.add(new DisableLayersProcess(controller));
 		
 		//initialize GRIPS config
 		this.processList.add(new InitGripsConfigProcess(controller));
 
-//		//check if the default render panel is set
+		//check if the default render panel is set
 		this.processList.add(new InitMainPanelProcess(controller));
 		
-//		// check if there is already a map viewer running, or just (re)set center position
+		// check if there is already a map viewer running, or just (re)set center position
 		this.processList.add(new InitMapLayerProcess(controller));
 		
 		//set module listeners		
@@ -102,14 +103,12 @@ public class EvacAreaSelector extends AbstractModule
 				int shapeRendererId = controller.getVisualizer().getPrimaryShapeRenderLayer().getId();
 				Rectangle2D bbRect = controller.getBoundingBox();
 				controller.addShape(ShapeFactory.getNetBoxShape(shapeRendererId, bbRect, false));
-				
-				System.out.println("active toolbox: " + controller.getActiveToolBox());
-				//set tool box
-				if ((controller.getActiveToolBox()==null) || (!(controller.getActiveToolBox() instanceof EvacToolBox)))
-					addToolBox(new EvacToolBox(this.module, controller));
 			}
 
 		});
+		
+		//add toolbox
+		this.processList.add(new SetToolBoxProcess(controller, getToolBox()));
 		
 		//enable all layers
 		this.processList.add(new EnableLayersProcess(controller));
