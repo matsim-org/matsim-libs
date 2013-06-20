@@ -39,7 +39,6 @@ import org.matsim.contrib.improvedPseudoPt.utils.HeaderParser;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -48,7 +47,11 @@ import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 
 /**
+ * 
  * @author thomas
+ *
+ * Design thoughts: this is a hybrid (see Martin2006CleanCode) should be splitted in 
+ * two classes somewhen a data container and a class containing the algorithm that initializes data. tn/dg/kn june 2013
  *
  */
 public class PtMatrix {
@@ -466,8 +469,12 @@ public class PtMatrix {
 			ptTravelTime = entry.getValue();
 		else{
 			// log.warn("No entry found in od travel times matrix for pt stops: " + fromPtStop.getId() + " " + toPtStop.getId());
-			if(fromPtStop == toPtStop)
+			if(fromPtStop == toPtStop) {
 				ptTravelTime = 0.;
+			}
+			else {
+				throw new RuntimeException("Trying to route matrix based pt through a pair of od stops that is not contained in the travel time od matrix");
+			}
 		}
 		return ptTravelTime;
 	}
@@ -608,7 +615,7 @@ public class PtMatrix {
 		// String BrusselNetwork = "/Users/thomas/Development/opus_home/data/brussels_zone/data/matsim/network/belgium_incl_borderArea_hierarchylayer4_clean_simple.xml.gz";
 		String ZurichNetwork  = "/Users/thomas/Development/opus_home/data/zurich_parcel/data/data/network/ivtch-osm.xml";
 		
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(ZurichNetwork);
 		ScenarioUtils.loadScenario(scenario);
 		
