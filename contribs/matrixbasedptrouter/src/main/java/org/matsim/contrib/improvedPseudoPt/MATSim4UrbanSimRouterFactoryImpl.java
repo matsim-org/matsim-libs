@@ -43,12 +43,6 @@ public class MATSim4UrbanSimRouterFactoryImpl implements TripRouterFactory{
 	// The single instance of ptMatrix is passed to multiple instances of the TripRouter.  Looks to me like this will work, since
 	// there is only read access to ptMatrix.  kai, may'13
 
-//	private PopulationFactory populationFactory;
-//
-//	private ModeRouteFactory modeRouteFactory;
-//
-//	private PlansCalcRouteConfigGroup routeConfigGroup;
-
 	private TripRouterFactoryImpl delegate;
 
 	private boolean firstCall = true;
@@ -60,30 +54,7 @@ public class MATSim4UrbanSimRouterFactoryImpl implements TripRouterFactory{
 	
 	@Override
 	public TripRouter instantiateAndConfigureTripRouter() {
-//		// initialize here - controller should be fully initialized by now
-//		// use fields to keep the rest of the code clean and comparable
-//		
-//		Config config = controler.getScenario().getConfig();
-//		Network network= controler.getScenario().getNetwork();
-//		Scenario scenario= controler.getScenario();
-//		this.populationFactory = controler.getPopulation().getFactory();
-//		this.modeRouteFactory = ((PopulationFactoryImpl) controler.getScenario().getPopulation().getFactory()).getModeRouteFactory();
-//		this.routeConfigGroup = controler.getConfig().plansCalcRoute();
-//		
-//		TripRouter tripRouter = new TripRouter();
-//		
-//		// car routing
-//		tripRouter.setRoutingModule(TransportMode.car, new LegRouterWrapper(
-//				TransportMode.car,
-//				scenario.getPopulation().getFactory(),
-//				new NetworkLegRouter(
-//					network,
-//					controler.getLeastCostPathCalculatorFactory().createPathCalculator(
-//							scenario.getNetwork(), 
-//							controler.getTravelDisutilityFactory().createTravelDisutility(controler.getLinkTravelTimes(), config.planCalcScore()), 
-//							controler.getLinkTravelTimes()),
-//					((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory())));
-//		
+	
 		//initialize TripRouterFactoyImpl only once
 		if(firstCall){
 			this.delegate = new TripRouterFactoryImpl(
@@ -104,16 +75,6 @@ public class MATSim4UrbanSimRouterFactoryImpl implements TripRouterFactory{
 		// add improved pseudo-pt-routing
 		tripRouter.setRoutingModule(TransportMode.pt, 
 				new PseudoPtRoutingModule(controler, ptMatrix));
-
-//		//walk routing
-//		tripRouter.setRoutingModule(TransportMode.walk, 
-//				new LegRouterWrapper(
-//						TransportMode.walk,
-//						populationFactory,
-//						new TeleportationLegRouter(
-//							modeRouteFactory,
-//							routeConfigGroup.getTeleportedModeSpeeds().get( TransportMode.walk),
-//							routeConfigGroup.getBeelineDistanceFactor())));
 		
 		return tripRouter;
 	}
