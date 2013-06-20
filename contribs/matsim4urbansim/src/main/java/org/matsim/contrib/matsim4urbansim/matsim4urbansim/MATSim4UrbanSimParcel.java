@@ -40,7 +40,7 @@ import org.matsim.contrib.accessibility.config.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.config.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
 import org.matsim.contrib.accessibility.utils.AggregateObject2NearestNode;
 import org.matsim.contrib.accessibility.utils.BoundingBox;
-import org.matsim.contrib.improvedPseudoPt.MATSim4UrbanSimRouterFactoryImpl;
+import org.matsim.contrib.improvedPseudoPt.MatrixBasedPtRouterFactoryImpl;
 import org.matsim.contrib.improvedPseudoPt.PtMatrix;
 import org.matsim.contrib.improvedPseudoPt.config.ImprovedPseudoPtConfigGroup;
 import org.matsim.contrib.improvedPseudoPt.config.ImprovedPseudoPtConfigUtils;
@@ -336,7 +336,7 @@ public class MATSim4UrbanSimParcel{
 									plansCalcRoute.getBeelineDistanceFactor(),
 									nbb.getXMin(), nbb.getYMin(), nbb.getXMax(), nbb.getYMax(),
 									ImprovedPseudoPtConfigUtils.getConfigModuleAndPossiblyConvert(controler.getScenario().getConfig()));	
-			controler.setTripRouterFactory( new MATSim4UrbanSimRouterFactoryImpl(controler, ptMatrix) ); // the car and pt router
+			controler.setTripRouterFactory( new MatrixBasedPtRouterFactoryImpl(controler, ptMatrix) ); // the car and pt router
 			
 			log.error("reconstructing pt route distances; not tested ...") ;
 			for ( Person person : scenario.getPopulation().getPersons().values() ) {

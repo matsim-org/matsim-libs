@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.accessibility.utils.BoundingBox;
-import org.matsim.contrib.improvedPseudoPt.MATSim4UrbanSimRouterFactoryImpl;
+import org.matsim.contrib.improvedPseudoPt.MatrixBasedPtRouterFactoryImpl;
 import org.matsim.contrib.improvedPseudoPt.PtMatrix;
 import org.matsim.contrib.improvedPseudoPt.config.ImprovedPseudoPtConfigGroup;
 import org.matsim.contrib.improvedPseudoPt.config.ImprovedPseudoPtConfigUtils;
@@ -119,7 +119,7 @@ public class ImprovedPseudoPtIntegrationTest {
 								plansCalcRoute.getBeelineDistanceFactor(),
 								nbb.getXMin(), nbb.getYMin(), nbb.getXMax(), nbb.getYMax(),
 								ImprovedPseudoPtConfigUtils.getConfigModuleAndPossiblyConvert(controler.getScenario().getConfig()));
-		controler.setTripRouterFactory( new MATSim4UrbanSimRouterFactoryImpl(controler, ptMatrix) ); // the car and pt router
+		controler.setTripRouterFactory( new MatrixBasedPtRouterFactoryImpl(controler, ptMatrix) ); // the car and pt router
 
 		//execute MATSim run
 		controler.run();
