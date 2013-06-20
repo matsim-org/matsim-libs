@@ -188,7 +188,7 @@ public class MATSim4UrbanSimParcel{
 		readFromUrbanSim();
 		
 		// read UrbanSim facilities (these are simply those entities that have the coordinates!)
-		ActivityFacilitiesImpl parcels = null; // new ActivityFacilitiesImpl("urbansim locations (gridcells _or_ parcels _or_ ...)");
+		ActivityFacilitiesImpl parcels = null;
 		ActivityFacilitiesImpl zones   = new ActivityFacilitiesImpl("urbansim zones");
 		ActivityFacilitiesImpl opportunities = new ActivityFacilitiesImpl("opportunity locations (e.g. workplaces) for zones or parcels");
 		
