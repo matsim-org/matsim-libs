@@ -33,9 +33,9 @@ import org.matsim.core.router.TripRouterFactoryImpl;
  * @author thomas
  *
  */
-public class MATSim4UrbanSimRouterFactoryImpl implements TripRouterFactory{
+public class MatrixBasedPtRouterFactoryImpl implements TripRouterFactory{
 	private static final Logger log = Logger
-			.getLogger(MATSim4UrbanSimRouterFactoryImpl.class);
+			.getLogger(MatrixBasedPtRouterFactoryImpl.class);
 
 	private final Controler controler;
 
@@ -47,7 +47,7 @@ public class MATSim4UrbanSimRouterFactoryImpl implements TripRouterFactory{
 
 	private boolean firstCall = true;
 	
-	public MATSim4UrbanSimRouterFactoryImpl(final Controler controler, final PtMatrix ptMatrix) {
+	public MatrixBasedPtRouterFactoryImpl(final Controler controler, final PtMatrix ptMatrix) {
 		this.controler = controler;
 		this.ptMatrix  = ptMatrix;
 	}
@@ -74,7 +74,7 @@ public class MATSim4UrbanSimRouterFactoryImpl implements TripRouterFactory{
 
 		// add improved pseudo-pt-routing
 		tripRouter.setRoutingModule(TransportMode.pt, 
-				new PseudoPtRoutingModule(controler, ptMatrix));
+				new MatrixBasedPtRoutingModule(controler, ptMatrix));
 		
 		return tripRouter;
 	}

@@ -44,7 +44,7 @@ import org.matsim.core.router.StageActivityTypes;
  * @author thomas
  *
  */
-public class PseudoPtRoutingModule implements RoutingModule{
+public class MatrixBasedPtRoutingModule implements RoutingModule{
 	
 	// 1) read a file with every transit stop
 	// 2) read a file with travel times and general costs from every stop to every other stop ("matrix")
@@ -59,7 +59,7 @@ public class PseudoPtRoutingModule implements RoutingModule{
 	private NetworkImpl network;
 	private PtMatrix ptMatrix;
 	
-	public PseudoPtRoutingModule(final Controler controler, PtMatrix ptMatrix){
+	public MatrixBasedPtRoutingModule(final Controler controler, PtMatrix ptMatrix){
 		this.populationFactory = new PopulationFactoryImpl(controler.getScenario());
 		this.genericRouteFactory = new GenericRouteFactory();
 		this.network = (NetworkImpl) controler.getScenario().getNetwork();
