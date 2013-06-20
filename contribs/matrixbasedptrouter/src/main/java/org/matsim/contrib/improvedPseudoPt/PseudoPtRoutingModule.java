@@ -85,7 +85,7 @@ public class PseudoPtRoutingModule implements RoutingModule{
 		Id endLinkId = network.getNearestLinkExactly(toFacility.getCoord()).getId();
 		final Route route = genericRouteFactory.createRoute(startLinkId, endLinkId);
 
-		double distance = this.ptMatrix.getPtTravelDistance_meter(fromFacility.getCoord(), toFacility.getCoord()) ;
+		double distance = this.ptMatrix.getTotalTravelDistance_meter(fromFacility.getCoord(), toFacility.getCoord()) ;
 		route.setDistance(distance) ;
 
 		newLeg.setRoute(route);
