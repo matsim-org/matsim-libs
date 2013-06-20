@@ -41,7 +41,6 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 
 import playground.vsp.analysis.modules.ptRoutes2paxAnalysis.AnalysisVehicle;
-import playground.vsp.analysis.modules.ptRoutes2paxAnalysis.PtRoutes2PaxAnalysisHandler;
 import playground.vsp.analysis.modules.ptRoutes2paxAnalysis.TransitLineContainer;
 
 /**
@@ -61,7 +60,7 @@ public class PtLines2PaxAnalysisHandler implements
 
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger
-			.getLogger(PtRoutes2PaxAnalysisHandler.class);
+			.getLogger(PtLines2PaxAnalysisHandler.class);
 	private HashMap<Id, TransitLines2PaxCounts> linesPaxCounts;
 	private Map<Id, AnalysisVehicle> transitVehicles;
 	private List<Id> drivers;
@@ -74,10 +73,7 @@ public class PtLines2PaxAnalysisHandler implements
 		this.linesPaxCounts = new HashMap<Id, TransitLines2PaxCounts>();
 		this.vehicles = vehicles;
 		for (TransitLine l : lines.values()) {
-//			do something with linesPaxCounts
-			
-//			this.linesContainer.put(l.getId(), new TransitLineContainer(l,
-//					interval, maxSlice));
+			this.linesPaxCounts.put(l.getId(), new TransitLines2PaxCounts(l, interval, maxSlice));
 		}
 	}
 
@@ -120,10 +116,7 @@ public class PtLines2PaxAnalysisHandler implements
 				return;
 			AnalysisVehicle v = this.transitVehicles.get(event.getVehicleId());
 			v.personAlights();
-			
-			
-//			this.linesContainer.get(v.getLineId()).paxAlighting(v.getRouteId(),
-//					v.getStopIndexId(), event.getTime());
+			this.linesPaxCounts.get(v.getLineId()).paxAlighting(v.getLocationId(), 0);
 		}
 	}
 
@@ -137,20 +130,14 @@ public class PtLines2PaxAnalysisHandler implements
 			return;
 		AnalysisVehicle v = this.transitVehicles.get(event.getVehicleId());
 		v.personBoards();
-		
-		
-//		this.linesContainer.get(v.getLineId()).paxBoarding(v.getRouteId(),
-//				v.getStopIndexId(), event.getTime());
+		this.linesPaxCounts.get(v.getLineId()).paxBoarding(v.getLocationId(), 0);
 	}
 
 	@Override
 	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
 		AnalysisVehicle v = this.transitVehicles.get(event.getVehicleId());
-		
-		
-//		this.linesContainer.get(v.getLineId()).vehicleDeparts(event.getTime(),
-//				v.getCapacity(), v.getSeatsOccupied(), v.getStopIndexId(),
-//				v.getRouteId());
+		this.linesPaxCounts.get(v.getLineId()).vehicleDeparts(event.getTime(),
+				v.getCapacity(), v.getSeatsOccupied(), v.getStopIndexId());
 	}
 
 	@Override
@@ -159,9 +146,4 @@ public class PtLines2PaxAnalysisHandler implements
 				event.getFacilityId());
 	}
 
-	public Map<Id, TransitLineContainer> getTransitLinesContainer() {
-		
-		return null;
-//		return this.linesContainer;
-	}
 }

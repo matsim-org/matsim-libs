@@ -78,34 +78,31 @@ public class TransitLines2PaxCounts {
 		}		
 	}
 	
-//	not sure this works
+//	not sure this works properly
 	
 	public void findLongestRoute (List<TransitRouteStop> route_c) {
 		int length_a;
 		int length_b;
 		int length_c = route_c.size();
-		if (this.longestRoute_a!=null) {
-			length_a = this.longestRoute_a.size();
-		}
-		else { 
-			length_a=0;
+		if (this.longestRoute_a == null && this.longestRoute_b == null) {
 			this.longestRoute_a = route_c;
-			this.longestRoute_b = null;
 		}
-		if (this.longestRoute_b!=null) {
-			length_b = this.longestRoute_b.size();
-		}
-		else length_b=0;
-		if (length_c > length_a) {
-			if (route_c.containsAll(longestRoute_a)) {
+		else if (this.longestRoute_a != null && this.longestRoute_b == null) {
+			length_a = this.longestRoute_a.size();
+			if (length_c > length_a && route_c.containsAll(this.longestRoute_a)) {
 				this.longestRoute_a = route_c;
 			}
-			else if (this.longestRoute_b==null) {
+			else if (!this.longestRoute_a.containsAll(route_c) && !route_c.containsAll(this.longestRoute_a)) {
 				this.longestRoute_b = route_c;
 			}
 		}
-		if (length_c > length_b) {
-			if (route_c.containsAll(longestRoute_b)) {
+		else if (this.longestRoute_a != null && this.longestRoute_b != null) {
+			length_a = this.longestRoute_a.size();
+			length_b = this.longestRoute_b.size();
+			if (length_c > length_a && route_c.containsAll(this.longestRoute_a)) {
+				this.longestRoute_a = route_c;
+			}
+			else if (length_c > length_b && route_c.containsAll(longestRoute_b)) {
 				this.longestRoute_b = route_c;
 			}
 		}
