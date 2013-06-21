@@ -19,7 +19,10 @@
 
 package org.matsim.contrib.transEnergySim.analysis.charging;
 
+import java.util.ArrayList;
+
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.parking.lib.GeneralLib;
 
 
 public class InductiveChargingAtRoadOutputLog extends ChargingOutputLog {
@@ -46,5 +49,30 @@ public class InductiveChargingAtRoadOutputLog extends ChargingOutputLog {
 	
 	public void readFromFile(String fileName){
 		//TODO:
+	}
+
+	@Override
+	public void writeToFile(String outputFile) {
+		ArrayList<String> list=new ArrayList<String>();
+		
+		StringBuffer sb=null;
+		
+		list.add(getTitleRowFileOutput());
+		
+		for (ChargingLogRow row:log){
+			sb=new StringBuffer();
+			sb.append(row.getAgentId());
+			sb.append("\t");
+			sb.append(row.getLinkId());
+			sb.append("\t");
+			sb.append(row.getStartChargingTime());
+			sb.append("\t");
+			sb.append(row.getChargingDuration());
+			sb.append("\t");
+			sb.append(row.getEnergyChargedInJoule());
+			list.add(sb.toString());
+		}
+		
+		GeneralLib.writeList(list, outputFile);
 	}
 }

@@ -60,9 +60,7 @@ public abstract class ChargingOutputLog {
 	
 	public abstract void printToConsole();
 	
-	public void writeToFile(String outputFile){
-		//TODO:implement this.
-	}
+	public abstract void writeToFile(String outputFile);
 	
 	public int size(){
 		return log.size();

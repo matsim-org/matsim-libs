@@ -19,6 +19,10 @@
 
 package org.matsim.contrib.transEnergySim.analysis.charging;
 
+import java.util.ArrayList;
+
+import org.matsim.contrib.parking.lib.GeneralLib;
+
 // note somewhere, the facilityId can be a parking facility or a normal facilityId, if parking module not used
 public class StationaryChargingOutputLog extends ChargingOutputLog {
 
@@ -41,6 +45,34 @@ public class StationaryChargingOutputLog extends ChargingOutputLog {
 			ChargingLogRowFacilityLevel chargingLog=(ChargingLogRowFacilityLevel) row;
 			System.out.println(row.getAgentId() + "\t" + chargingLog.getFacilityId()  + "\t" + row.getStartChargingTime() + "\t" + row.getChargingDuration() + "\t" + row.getEnergyChargedInJoule());
 		}
+	}
+
+
+	@Override
+	public void writeToFile(String outputFile) {
+		ArrayList<String> list=new ArrayList<String>();
+		
+		StringBuffer sb=null;
+		
+		list.add(getTitleRowFileOutput());
+		
+		for (ChargingLogRow row:log){
+			ChargingLogRowFacilityLevel chargingLog=(ChargingLogRowFacilityLevel) row;
+			sb=new StringBuffer();
+			sb.append(row.getAgentId());
+			sb.append("\t");
+			sb.append(chargingLog.getFacilityId());
+			sb.append("\t");
+			sb.append(row.getStartChargingTime());
+			sb.append("\t");
+			sb.append(row.getChargingDuration());
+			sb.append("\t");
+			sb.append(row.getEnergyChargedInJoule());
+			list.add(sb.toString());
+		}
+		
+		GeneralLib.writeList(list, outputFile);
+		
 	}
 	
 	

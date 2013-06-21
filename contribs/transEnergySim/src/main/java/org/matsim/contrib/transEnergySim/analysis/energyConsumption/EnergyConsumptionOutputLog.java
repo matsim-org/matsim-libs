@@ -19,9 +19,13 @@
 
 package org.matsim.contrib.transEnergySim.analysis.energyConsumption;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.contrib.transEnergySim.analysis.charging.ChargingLogRow;
+import org.matsim.contrib.transEnergySim.analysis.charging.ChargingLogRowFacilityLevel;
 import org.matsim.contrib.transEnergySim.analysis.charging.ChargingLogRowLinkLevel;
 
 /**
@@ -68,7 +72,23 @@ public class EnergyConsumptionOutputLog {
 	}
 
 	public void writeToFile(String outputFile) {
-		// TODO:implement this.
+		ArrayList<String> list=new ArrayList<String>();
+		
+		StringBuffer sb=null;
+		
+		list.add(getTitleRowFileOutput());
+		
+		for (EnergyConsumptionLogRow row:log){
+			sb=new StringBuffer();
+			sb.append(row.getAgentId());
+			sb.append("\t");
+			sb.append(row.getLinkId());
+			sb.append("\t");
+			sb.append(row.getEnergyConsumedInJoules());
+			list.add(sb.toString());
+		}
+		
+		GeneralLib.writeList(list, outputFile);
 	}
 	
 	public int size(){
