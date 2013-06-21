@@ -72,12 +72,11 @@ public class AccessibilityIntegrationTest {
 
 		final AccessibilityConfigGroup acm = new AccessibilityConfigGroup();
 		config.addModule( acm ) ;
-//		acm.setUsingCustomBoundingBox(true) ;
 		acm.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBox.toString()) ;
-		acm.setBoundingBoxBottom(min) ;// yyyyyy todo
-		acm.setBoundingBoxTop(max) ;// yyyyyy todo
-		acm.setBoundingBoxLeft(min) ;// yyyyyy todo
-		acm.setBoundingBoxRight(max) ;// yyyyyy todo
+		acm.setBoundingBoxBottom(min) ;
+		acm.setBoundingBoxTop(max) ;
+		acm.setBoundingBoxLeft(min) ;
+		acm.setBoundingBoxRight(max) ;
 		
 		// modify config according to needs
 		Network network = CreateTestNetwork.createTestNetwork();
