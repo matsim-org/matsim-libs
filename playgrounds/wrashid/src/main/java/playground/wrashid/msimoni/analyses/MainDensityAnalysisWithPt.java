@@ -33,8 +33,8 @@ import org.matsim.core.events.EventsUtils;
 public class MainDensityAnalysisWithPt {
 
 	public static void main(String[] args) {
-		String networkFile="H:/data/experiments/Mohit/10pct ZH/output_network.xml.gz";
-		String eventsFile="H:/data/experiments/Mohit/10pct ZH/ITERS/it.50/50.events.txt.gz";
+		String networkFile="H:/thesis/output_no_pricing_v3_1pct/output_network.xml.gz";
+		String eventsFile="H:/thesis/output_no_pricing_v3_1pct/ITERS/it.50/50.events.xml";
 		Coord center=null; // center=null means use all links
 		boolean isOldEventFile=false;
 		int binSizeInSeconds=3600;
@@ -142,10 +142,20 @@ public class MainDensityAnalysisWithPt {
 
 			Link link = links.get(linkId);
 
-			System.out.print(linkId + " - " + link.getCoord() + ": ");
+			System.out.print(linkId + " - " + link.getCoord() + ": \t");
 
+			boolean hasTraffic=false;
 			for (int i = 0; i < bins.length; i++) {
-				System.out.print(bins[i] + "\t");
+				if (bins[i]!=0.0){
+					hasTraffic=true;
+					break;
+				}
+			}
+			
+			for (int i = 0; i < bins.length; i++) {
+				if (hasTraffic){
+					System.out.print(bins[i] + "\t");
+				}
 			}
 
 			System.out.println();

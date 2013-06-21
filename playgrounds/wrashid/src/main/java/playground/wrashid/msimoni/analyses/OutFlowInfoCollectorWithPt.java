@@ -93,10 +93,20 @@ public class OutFlowInfoCollectorWithPt implements LinkLeaveEventHandler, LinkEn
 			int[] bins = linkOutFlow.get(linkId);
 
 			Link link = filteredEquilNetLinks.get(linkId);
-			System.out.print(linkId + " - " + link.getCoord() + ": ");
+			System.out.print(linkId + " - " + link.getCoord() + ": \t");
 
+			boolean hasTraffic=false;
 			for (int i = 0; i < bins.length; i++) {
-				System.out.print(bins[i] * 3600 / binSizeInSeconds + "\t");
+				if (bins[i]!=0.0){
+					hasTraffic=true;
+					break;
+				}
+			}
+			
+			for (int i = 0; i < bins.length; i++) {
+				if (hasTraffic){
+					System.out.print(bins[i] * 3600 / binSizeInSeconds + "\t");
+				}
 			}
 
 			System.out.println();

@@ -32,8 +32,8 @@ public class MainFlowAnalysisWithPt {
 
 	public static void main(String[] args) {
 		
-		String networkFile="D:/study/DATA/1pct zh with freight-cross-border-transit-mohit/network.xml";
-		String eventsFile="D:/study/DATA/1pct zh with freight-cross-border-transit-mohit/50.events.txt.gz";
+		String networkFile="H:/thesis/output_no_pricing_v3_1pct/output_network.xml.gz";
+		String eventsFile="H:/thesis/output_no_pricing_v3_1pct/ITERS/it.50/50.events.xml";
 		Coord center=null; // center=null means use all links
 		boolean isOldEventFile=false;
 		int binSizeInSeconds=3600;
