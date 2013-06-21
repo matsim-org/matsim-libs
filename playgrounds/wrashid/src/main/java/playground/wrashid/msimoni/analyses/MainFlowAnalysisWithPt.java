@@ -26,6 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsReaderTXTv1;
+import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 
 public class MainFlowAnalysisWithPt {
@@ -62,11 +63,14 @@ public class MainFlowAnalysisWithPt {
 		events.addHandler(flowAnalyzer); // add handler
 		//eventsInflow.addHandler(inflowAnalyzer);
 		
-		EventsReaderTXTv1 reader = new EventsReaderTXTv1(events);
+		//EventsReaderTXTv1 reader = new EventsReaderTXTv1(events);
 		//EventsReaderTXTv1 readerInflow= new EventsReaderTXTv1(eventsInflow);
 		
-		reader.readFile(eventsFile); //where we find events data
+		//reader.readFile(eventsFile); //where we find events data
 		//readerInflow.readFile(eventsFile);
+		
+		EventsReaderXMLv1 reader=new EventsReaderXMLv1(events);
+		reader.parse(eventsFile);
 		
 		flowAnalyzer.printLinkFlows();
 		//inflowAnalyzer.printLinkInFlow();

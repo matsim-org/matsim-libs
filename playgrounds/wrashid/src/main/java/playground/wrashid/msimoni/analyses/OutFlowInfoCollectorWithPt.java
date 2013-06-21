@@ -32,20 +32,23 @@ import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 
-public class OutFlowInfoCollectorWithPt implements LinkLeaveEventHandler, LinkEnterEventHandler,
-		AgentArrivalEventHandler {
+public class OutFlowInfoCollectorWithPt implements LinkLeaveEventHandler,
+		LinkEnterEventHandler, AgentArrivalEventHandler {
 
 	private int binSizeInSeconds; // set the length of interval
 	public HashMap<Id, int[]> linkOutFlow; // define
 	private Map<Id, ? extends Link> filteredEquilNetLinks; // define
-	
+
 	// personId, linkId
-	private HashMap<Id, Id> lastEnteredLink=new HashMap<Id, Id>(); // define
-	
+	private HashMap<Id, Id> lastEnteredLink = new HashMap<Id, Id>(); // define
+
 	private boolean isOldEventFile;
 
-	public OutFlowInfoCollectorWithPt(Map<Id, ? extends Link> filteredEquilNetLinks,
-			boolean isOldEventFile,int binSizeInSeconds) { // to create the class FlowInfoCollector
+	public OutFlowInfoCollectorWithPt(
+			Map<Id, ? extends Link> filteredEquilNetLinks,
+			boolean isOldEventFile, int binSizeInSeconds) { // to create the
+															// class
+															// FlowInfoCollector
 		// and give the link set
 		this.filteredEquilNetLinks = filteredEquilNetLinks;
 		this.isOldEventFile = isOldEventFile;
@@ -93,23 +96,24 @@ public class OutFlowInfoCollectorWithPt implements LinkLeaveEventHandler, LinkEn
 			int[] bins = linkOutFlow.get(linkId);
 
 			Link link = filteredEquilNetLinks.get(linkId);
-			System.out.print(linkId + " - " + link.getCoord() + ": \t");
 
-			boolean hasTraffic=false;
+			boolean hasTraffic = false;
 			for (int i = 0; i < bins.length; i++) {
-				if (bins[i]!=0.0){
-					hasTraffic=true;
+				if (bins[i] != 0.0) {
+					hasTraffic = true;
 					break;
 				}
 			}
-			
-			for (int i = 0; i < bins.length; i++) {
-				if (hasTraffic){
+
+			if (hasTraffic) {
+				System.out.print(linkId + " - " + link.getCoord() + ": \t");
+
+				for (int i = 0; i < bins.length; i++) {
 					System.out.print(bins[i] * 3600 / binSizeInSeconds + "\t");
 				}
-			}
 
-			System.out.println();
+				System.out.println();
+			}
 		}
 	}
 
@@ -119,13 +123,14 @@ public class OutFlowInfoCollectorWithPt implements LinkLeaveEventHandler, LinkEn
 
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
-		if (lastEnteredLink.containsKey(event.getPersonId()) && lastEnteredLink.get(event.getPersonId())!=null) {
-			if (lastEnteredLink.get(event.getPersonId()).equals(event.getLinkId())){
+		if (lastEnteredLink.containsKey(event.getPersonId())
+				&& lastEnteredLink.get(event.getPersonId()) != null) {
+			if (lastEnteredLink.get(event.getPersonId()).equals(
+					event.getLinkId())) {
 				linkLeave(event.getLinkId(), event.getTime());
-				lastEnteredLink.put(event.getPersonId(),null); //reset value
+				lastEnteredLink.put(event.getPersonId(), null); // reset value
 			}
-			
-			
+
 		}
 	}
 
