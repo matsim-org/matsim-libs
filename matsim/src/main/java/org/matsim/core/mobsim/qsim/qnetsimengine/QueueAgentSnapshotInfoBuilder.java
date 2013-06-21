@@ -52,8 +52,8 @@ public class QueueAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBuil
 	
 
 	@Override
-	public double calculateDistanceOnVectorFromFromNode(double length, double spacing,
-			 double lastDistanceFromFNode, double now, double freespeedTraveltime, double travelTime) {
+	public double calculateDistanceOnVectorFromFromNode2(double length, double spacing,
+			 double lastDistanceFromFNode, double now, double freespeedTraveltime, double remainingTravelTime) {
 		double distanceFromFNode ;
 		
 		if (freespeedTraveltime == 0.0){
@@ -62,7 +62,7 @@ public class QueueAgentSnapshotInfoBuilder extends AbstractAgentSnapshotInfoBuil
 		}
 		else {
 			// we calculate where the vehicle would be with free speed.
-			distanceFromFNode = (travelTime / freespeedTraveltime) * length ;
+			distanceFromFNode = (1. - (remainingTravelTime / freespeedTraveltime)) * length ;
 			if ( distanceFromFNode < 0. ) {
 				distanceFromFNode = 0. ;
 			}

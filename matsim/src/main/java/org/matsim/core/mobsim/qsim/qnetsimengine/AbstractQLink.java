@@ -93,7 +93,10 @@ abstract class AbstractQLink extends QLinkInternalI {
 	 */
 	/*package*/ final Queue<QVehicle> waitingList = new LinkedList<QVehicle>();
 
-	/*package*/ NetElementActivator netElementActivator;
+	/**
+	 * This is often the simEngine, but not when it is a parallel simulation. 
+	 */
+	NetElementActivator netElementActivator;
 
 	/*package*/ final boolean insertingWaitingVehiclesBeforeDrivingVehicles;
 
@@ -319,27 +322,6 @@ abstract class AbstractQLink extends QLinkInternalI {
 			
 			return true;
 		}
-	}
-
-	final boolean addTransitToBuffer(final double now, final QVehicle veh) {
-		if (veh.getDriver() instanceof TransitDriverAgent) {
-			TransitDriverAgent driver = (TransitDriverAgent) veh.getDriver();
-			while (true) {
-				TransitStopFacility stop = driver.getNextTransitStop();
-				if ((stop != null) && (stop.getLinkId().equals(getLink().getId()))) {
-					double delay = driver.handleTransitStop(stop, now);
-					if (delay > 0.0) {
-						veh.setEarliestLinkExitTime(now + delay);
-						// add it to the stop queue, can do this as the waitQueue is also non-blocking anyway
-						transitVehicleStopQueue.add(veh);
-						return true;
-					}
-				} else {
-					return false;
-				}
-			}
-		}
-		return false;
 	}
 
 	@Override

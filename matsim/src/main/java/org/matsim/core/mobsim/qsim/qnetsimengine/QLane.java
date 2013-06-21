@@ -787,9 +787,10 @@ public final class QLane extends AbstractQLane implements Identifiable, Signaliz
 		private double createAndAddVehiclePositionAndReturnDistance(final Collection<AgentSnapshotInfo> positions,
 				AgentSnapshotInfoBuilder snapshotInfoBuilder, double now, double lastDistanceFromFromNode, Link link,
 				double spacing, double freespeedTraveltime, QVehicle veh){
-			double travelTime = now - QLane.this.laneEnterTimeMap.get(veh);
-			lastDistanceFromFromNode = snapshotInfoBuilder.calculateDistanceOnVectorFromFromNode(QLane.this.length, spacing, 
-					lastDistanceFromFromNode, now, freespeedTraveltime, travelTime);
+//			double travelTime = now - QLane.this.laneEnterTimeMap.get(veh);
+			double remainingTravelTime = veh.getEarliestLinkExitTime() - now ;
+			lastDistanceFromFromNode = snapshotInfoBuilder.calculateDistanceOnVectorFromFromNode2(QLane.this.length, spacing, 
+					lastDistanceFromFromNode, now, freespeedTraveltime, remainingTravelTime);
 			double speedValue = snapshotInfoBuilder.calcSpeedValueBetweenZeroAndOne(veh, QLane.this.getInverseSimulatedFlowCapacity(), now, link.getFreespeed());
 //			log.error("  speed: " + speedValue + " distance: " + lastDistanceFromFromNode + " lane " + lane + " flow cap: " + QLane.this.simulatedFlowCapacity);
 			if (this.visLane.getNumberOfLanes() < 2.0){

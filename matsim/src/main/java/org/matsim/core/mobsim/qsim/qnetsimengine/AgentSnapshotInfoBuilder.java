@@ -56,11 +56,23 @@ interface AgentSnapshotInfoBuilder {
 	
 	double calculateVehicleSpacing(double linkLength, double numberOfVehiclesOnLink, double storageCapacity, double bufferStorageCapacity);
 
-	double calculateDistanceOnVectorFromFromNode( double length, double spacing,
-			 double lastDistanceFromFromNode, double now, double freespeedTraveltime, double travelTime);
+//	double calculateDistanceOnVectorFromFromNode( double length, double spacing,
+//			 double lastDistanceFromFromNode, double now, double freespeedTraveltime, double travelTime);
 	
 	Integer guessLane(QVehicle veh, int numberOfLanes);
 
 	double calcSpeedValueBetweenZeroAndOne(QVehicle veh, double inverseSimulatedFlowCapacity, double now, double freespeed);
+
+	/**
+	 * @param length
+	 * @param spacing
+	 * @param lastDistanceFromFromNode
+	 * @param now
+	 * @param freespeedTraveltime
+	 * @param remainingTravelTime
+	 * @return
+	 */
+	double calculateDistanceOnVectorFromFromNode2(double length, double spacing, double lastDistanceFromFromNode, double now,
+			double freespeedTraveltime, double remainingTravelTime);
 
 }

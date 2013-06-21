@@ -52,9 +52,6 @@ abstract class AbstractQLane {
 	
 	abstract Collection<MobsimVehicle> getAllVehicles() ;
 	
-	/**
-	 * upstream add
-	 */
 	abstract void addFromUpstream(final QVehicle veh);
 	
 
