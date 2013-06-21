@@ -205,7 +205,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 				}
 			}
 
-			road.addToBuffer(veh, now);
+			road.addFromWait(veh, now);
 		}
 	}
 
@@ -217,6 +217,8 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 				if ((stop != null) && (stop.getLinkId().equals(getLink().getId()))) {
 					double delay = driver.handleTransitStop(stop, now);
 					if (delay > 0.0) {
+						// yy removing this condition makes at least one test fail.  I still think we could discuss doing this. kai, jun'13
+						
 						veh.setEarliestLinkExitTime(now + delay);
 						// add it to the stop queue: vehicle that is not yet on the road will never block
 						transitVehicleStopQueue.add(veh);

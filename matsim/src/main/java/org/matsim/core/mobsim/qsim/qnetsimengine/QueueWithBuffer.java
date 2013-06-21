@@ -68,7 +68,7 @@ class QueueWithBuffer {
 	/**
 	 * true, i.e. green, if the link is not signalized
 	 */
-	boolean thisTimeStepGreen = true ;
+	private boolean thisTimeStepGreen = true ;
 	double inverseFlowCapacityPerTimeStep;
 	private double flowCapacityPerTimeStepFractionalPart;
 	/**
@@ -76,9 +76,9 @@ class QueueWithBuffer {
 	 */
 	private double flowCapacityPerTimeStep;
 	int bufferStorageCapacity;
-	double usedBufferStorageCapacity = 0.0 ;
+	private double usedBufferStorageCapacity = 0.0 ;
 	Queue<QueueWithBuffer.Hole> holes = new LinkedList<QueueWithBuffer.Hole>();
-	double freespeedTravelTime = Double.NaN;
+	private double freespeedTravelTime = Double.NaN;
 	/** the last timestep the front-most vehicle in the buffer was moved. Used for detecting dead-locks. */
 	double bufferLastMovedTime = Time.UNDEFINED_TIME ;
 	/**
@@ -96,7 +96,7 @@ class QueueWithBuffer {
 	 */
 	Map<QVehicle, Double> linkEnterTimeMap = new ConcurrentHashMap<QVehicle, Double>() ;
 	private double storageCapacity;
-	double usedStorageCapacity;
+	private double usedStorageCapacity;
 	/**
 	 * Holds all vehicles that are ready to cross the outgoing intersection
 	 */
@@ -136,7 +136,7 @@ class QueueWithBuffer {
 	}
 
 
-	void addToBuffer(final QVehicle veh, final double now) {
+	void addFromWait(final QVehicle veh, final double now) {
 		// We are trying to modify this so it also works for vehicles different from size one.  The idea is that vehicles
 		// _larger_ than size one can move as soon as at least one unit of flow or storage capacity is available.  
 		// kai/mz/amit, mar'12
@@ -164,7 +164,7 @@ class QueueWithBuffer {
 		qLinkImpl.getToNode().activateNode();
 	}
 
-	boolean hasBufferSpaceLeft() {
+	private boolean hasBufferSpaceLeft() {
 		return usedBufferStorageCapacity < bufferStorageCapacity;
 	}
 
@@ -184,13 +184,13 @@ class QueueWithBuffer {
 		}
 	}
 
-	void calculateCapacities() {
+	private void calculateCapacities() {
 		this.calculateFlowCapacity(Time.UNDEFINED_TIME);
 		this.calculateStorageCapacity(Time.UNDEFINED_TIME);
 		flowcap_accumulate = (flowCapacityPerTimeStepFractionalPart == 0.0 ? 0.0 : 1.0);
 	}
 
-	void calculateFlowCapacity(final double time) {
+	private void calculateFlowCapacity(final double time) {
 		flowCapacityPerTimeStep = ((LinkImpl)qLinkImpl.getLink()).getFlowCapacity(time);
 		// we need the flow capacity per sim-tick and multiplied with flowCapFactor
 		flowCapacityPerTimeStep = flowCapacityPerTimeStep
@@ -200,7 +200,7 @@ class QueueWithBuffer {
 		flowCapacityPerTimeStepFractionalPart = flowCapacityPerTimeStep - (int) flowCapacityPerTimeStep;
 	}
 
-	void calculateStorageCapacity(final double time) {
+	private void calculateStorageCapacity(final double time) {
 		double storageCapFactor = network.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().getStorageCapFactor();
 		bufferStorageCapacity = (int) Math.ceil(flowCapacityPerTimeStep);
 
@@ -336,14 +336,14 @@ class QueueWithBuffer {
 					continue;
 				}
 			}
-			addToBuffer(veh, now);
-			removeVehicleFromQueue(now, veh);
+			addFromWait(veh, now);
+			removeVehicleFromQueue(now);
 		} // end while
 	}
 
 
-	void removeVehicleFromQueue(final double now, QVehicle veh) {
-		vehQueue.poll();
+	private void removeVehicleFromQueue(final double now) {
+		QVehicle veh = vehQueue.poll();
 		usedStorageCapacity -= veh.getSizeInEquivalents();
 		if ( QueueWithBuffer.HOLES ) {
 			QueueWithBuffer.Hole hole = new QueueWithBuffer.Hole() ;
@@ -358,10 +358,10 @@ class QueueWithBuffer {
 		network.simEngine.letVehicleArrive(veh);
 		qLinkImpl.makeVehicleAvailableToNextDriver(veh, now);
 		// remove _after_ processing the arrival to keep link active
-		removeVehicleFromQueue( now, veh ) ;
+		removeVehicleFromQueue( now ) ;
 	}
 
-	double effectiveVehicleFlowConsumptionInPCU( QVehicle veh ) {
+	private double effectiveVehicleFlowConsumptionInPCU( QVehicle veh ) {
 		//		return Math.min(1.0, veh.getSizeInEquivalents() ) ;
 		return veh.getSizeInEquivalents();
 	}
