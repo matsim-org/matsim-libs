@@ -110,10 +110,10 @@ public class AccessibilityIntegrationTest {
 		// activating transport modes of interest
 		// possible modes are: free speed and congested car,
 		// 					   bicycle, walk and pt
-		gacl.useFreeSpeedGrid();
-		gacl.useCarGrid();
-		gacl.useBikeGrid();
-		gacl.useWalkGrid();
+		gacl.setComputingAccessibilityForFreeSpeedCar(true);
+		gacl.setComputingAccessibilityForCongestedCar(true);
+		gacl.setComputingAccessibilityForBike(true);
+		gacl.setComputingAccessibilityForWalk(true);
 //		gacl.usePtGrid();
 		
 		// this will be called by the accessibility listener after the accessibility calculations are finished
@@ -178,10 +178,10 @@ public class AccessibilityIntegrationTest {
 		// activating transport modes of interest
 		// possible modes are: free speed and congested car,
 		// 					   bicycle, walk and pt
-		gacl.useFreeSpeedGrid();
-		gacl.useCarGrid();
-		gacl.useBikeGrid();
-		gacl.useWalkGrid();
+		gacl.setComputingAccessibilityForFreeSpeedCar(true);
+		gacl.setComputingAccessibilityForCongestedCar(true);
+		gacl.setComputingAccessibilityForBike(true);
+		gacl.setComputingAccessibilityForWalk(true);
 //		gacl.usePtGrid();
 		
 		// this will be called by the accessibility listener after the accessibility calculations are finished
@@ -253,10 +253,10 @@ public class AccessibilityIntegrationTest {
 		// activating transport modes of interest
 		// possible modes are: free speed and congested car,
 		// 					   bicycle, walk and pt
-		gacl.useFreeSpeedGrid();
-		gacl.useCarGrid();
-		gacl.useBikeGrid();
-		gacl.useWalkGrid();
+		gacl.setComputingAccessibilityForFreeSpeedCar(true);
+		gacl.setComputingAccessibilityForCongestedCar(true);
+		gacl.setComputingAccessibilityForBike(true);
+		gacl.setComputingAccessibilityForWalk(true);
 //		gacl.usePtGrid();
 		
 		// this will be called by the accessibility listener after the accessibility calculations are finished

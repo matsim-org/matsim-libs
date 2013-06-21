@@ -583,37 +583,62 @@ public class AccessibilityControlerListenerImpl{
 	
 	/**
 	 * activates the SpatialGrid for free speed car 
+	 * <p/>
+	 * Comments:<ul>
+	 * <li>In the longer run, I would rather have some "list" of modes rather than separate switches. kai, jun'13
+	 * </ul>
+	 * @param val TODO
 	 */
-	public void useFreeSpeedGrid(){
-		this.useFreeSpeedGrid = true;
+	public void setComputingAccessibilityForFreeSpeedCar(boolean val){
+		this.useFreeSpeedGrid = val;
 	}
 	
 	/**
 	 * activates the SpatialGrid for congested car 
+	 * <p/>
+	 * Comments:<ul>
+	 * <li>In the longer run, I would rather have some "list" of modes rather than separate switches. kai, jun'13
+	 * </ul>
+	 * @param val TODO
 	 */
-	public void useCarGrid(){
-		this.useCarGrid = true;
+	public void setComputingAccessibilityForCongestedCar(boolean val){
+		this.useCarGrid = val;
 	}
 	
 	/**
 	 * activates the SpatialGrid for bicycle
+	 * <p/>
+	 * Comments:<ul>
+	 * <li>In the longer run, I would rather have some "list" of modes rather than separate switches. kai, jun'13
+	 * </ul>
+	 * @param val TODO
 	 */
-	public void useBikeGrid(){
-		this.useBikeGrid = true;
+	public void setComputingAccessibilityForBike(boolean val){
+		this.useBikeGrid = val;
 	}
 	
 	/**
 	 * activates the SpatialGrid for traveling on foot
+	 * <p/>
+	 * Comments:<ul>
+	 * <li>In the longer run, I would rather have some "list" of modes rather than separate switches. kai, jun'13
+	 * </ul>
+	 * @param val TODO
 	 */
-	public void useWalkGrid(){
-		this.useWalkGrid = true;
+	public void setComputingAccessibilityForWalk(boolean val){
+		this.useWalkGrid = val;
 	}
 	
 	/**
 	 * activates the SpatialGrid for public transport (improved pseudo pt)
+	 * <p/>
+	 * Comments:<ul>
+	 * <li>In the longer run, I would rather have some "list" of modes rather than separate switches. kai, jun'13
+	 * </ul>
+	 * @param val TODO
 	 */
-	public void usePtGrid(){
-		this.usePtGrid = true;
+	public void setComputingAccessibilityForPt(boolean val){
+		this.usePtGrid = val;
 	}
 	
 	/**

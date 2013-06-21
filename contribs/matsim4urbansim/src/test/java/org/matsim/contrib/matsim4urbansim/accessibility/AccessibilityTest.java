@@ -112,10 +112,10 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 
 		//initialize new grid based accessibility controler listener and grids for the modes we want to analyze here
 		GridBasedAccessibilityControlerListenerV3 listener = new GridBasedAccessibilityControlerListenerV3(opportunities, ptMatrix, config, net);
-		listener.useFreeSpeedGrid();
-		listener.useCarGrid();
-		listener.useBikeGrid();
-		listener.useWalkGrid();
+		listener.setComputingAccessibilityForFreeSpeedCar(true);
+		listener.setComputingAccessibilityForCongestedCar(true);
+		listener.setComputingAccessibilityForBike(true);
+		listener.setComputingAccessibilityForWalk(true);
 		listener.generateGridsAndMeasuringPointsByCustomBoundary(minX, minY, maxX, maxY, resolution);
 		
 		//add grid data exchange listener to get accessibilities
@@ -196,10 +196,10 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 		//initialize new zone based accessibility controler listener and grids for the modes we want to analyze here
 		ZoneBasedAccessibilityControlerListenerV3 listener = new ZoneBasedAccessibilityControlerListenerV3(measuringPoints, opportunities,
 				ptMatrix, path, scenario);
-		listener.useFreeSpeedGrid();
-		listener.useCarGrid();
-		listener.useBikeGrid();
-		listener.useWalkGrid();
+		listener.setComputingAccessibilityForFreeSpeedCar(true);
+		listener.setComputingAccessibilityForCongestedCar(true);
+		listener.setComputingAccessibilityForBike(true);
+		listener.setComputingAccessibilityForWalk(true);
 		
 		//
 		listener.addZoneDataExchangeListener(this);

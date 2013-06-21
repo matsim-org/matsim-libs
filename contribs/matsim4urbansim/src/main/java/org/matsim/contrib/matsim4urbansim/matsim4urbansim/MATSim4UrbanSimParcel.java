@@ -399,11 +399,11 @@ public class MATSim4UrbanSimParcel{
 																											 ptMatrix,
 																											 InternalConstants.MATSIM_4_OPUS_TEMP,
 																											 this.scenario);
-			zbacl.useFreeSpeedGrid();
-			zbacl.useCarGrid();
-			zbacl.useBikeGrid();
-			zbacl.useWalkGrid();
-			zbacl.usePtGrid();
+			zbacl.setComputingAccessibilityForFreeSpeedCar(true);
+			zbacl.setComputingAccessibilityForCongestedCar(true);
+			zbacl.setComputingAccessibilityForBike(true);
+			zbacl.setComputingAccessibilityForWalk(true);
+			zbacl.setComputingAccessibilityForPt(true);
 			controler.addControlerListener( zbacl );
 		}
 		
@@ -414,11 +414,11 @@ public class MATSim4UrbanSimParcel{
 																											 scenario.getConfig(), 
 																											 scenario.getNetwork() );
 			// activating needed SpatialGrids
-			gbacl.useFreeSpeedGrid();
-			gbacl.useCarGrid();
-			gbacl.useBikeGrid();
-			gbacl.useWalkGrid();
-			gbacl.usePtGrid();
+			gbacl.setComputingAccessibilityForFreeSpeedCar(true);
+			gbacl.setComputingAccessibilityForCongestedCar(true);
+			gbacl.setComputingAccessibilityForBike(true);
+			gbacl.setComputingAccessibilityForWalk(true);
+			gbacl.setComputingAccessibilityForPt(true);
 			
 			if(computeGridBasedAccessibilitiesUsingShapeFile)
 				gbacl.generateGridsAndMeasuringPointsByShapeFile(shapeFile, cellSizeInMeter);
