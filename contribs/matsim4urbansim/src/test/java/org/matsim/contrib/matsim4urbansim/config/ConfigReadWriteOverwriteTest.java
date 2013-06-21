@@ -31,6 +31,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.contrib.accessibility.config.AccessibilityConfigGroup;
@@ -158,13 +159,13 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 	 * this, different parameter settings are used in the external config.
 	 */
 	@Test
+	@Ignore
 	public void testExternalMATSimConfig(){
 		
 		// MATSim4UrbanSim configuration converter
 		M4UConfigurationConverterV4 converter = null;
 		
 		try{
-//			String path = TempDirectoryUtil.createCustomTempDirectory("tmp");
 			String path = utils.getOutputDirectory() + "/tmp" ;
 			IOUtils.createDirectory(path) ;
 			
@@ -189,7 +190,6 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 			
 			log.info("Getting config settings in matsim format");
 			Config config = converter.getConfig();
-//			config.controler().setFirstIteration(20) ;
 
 			String revisedFileName = utils.getOutputDirectory()+"/config.xml"  ;
 			log.info( "new: " + revisedFileName ) ;
