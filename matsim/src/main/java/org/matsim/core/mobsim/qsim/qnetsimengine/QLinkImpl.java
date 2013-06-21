@@ -146,7 +146,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 
 		// moveWaitToBuffer moves waiting (i.e. just departed) vehicles into the buffer.
 
-		this.active = this.hasActivity();
+		this.active = this.isHavingActivity();
 		return active;
 	}
 
@@ -183,18 +183,24 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 					// placed on the link, and here we'll remove them again if needed...
 					// ugly hack, but I didn't find a nicer solution sadly... mrieser, 5mar2011
 					// (see also moveLaneToBuffer() )
+					
+					// The situation may have changed a bit: it used to be that agents that had the next activity on the same link would
+					// essentially first enter the vehicle and nearly make a departure, and then turn around.  (This was since we originally 
+					// essentially had driver-vehicle-units.)  Thus a pt vehicle that wanted to make a real departure needed some workaround.
+					// I don't think this is the case any more; now the mobsim agent finds out that the next activity is on the same link 
+					// before entering the vehicle.  Thus, this work around may no longer be necessary.  Tests, however, still fail;
+					// the reason is that pt vehicles without passengers return "false" in the addTransitToStopQueue method above and
+					// then need to be caught here.  Seems to me that this could be fixed--???  kai, jun'13
 					trDriver.endLegAndComputeNextState(now);
 					this.addParkedVehicle(veh);
 					this.network.simEngine.internalInterface.arrangeNextAgentState(trDriver) ;
 					this.makeVehicleAvailableToNextDriver(veh, now);
-					// remove _after_ processing the arrival to keep link active
-					this.road.vehQueue.poll();
-					this.road.usedStorageCapacity -= veh.getSizeInEquivalents();
-					if ( QueueWithBuffer.HOLES ) {
-						QueueWithBuffer.Hole hole = new QueueWithBuffer.Hole() ;
-						hole.setEarliestLinkExitTime( now + this.link.getLength()*3600./15./1000. ) ;
-						road.holes.add( hole ) ;
-					}
+
+//					// remove _after_ processing the arrival to keep link active
+//					road.removeVehicleFromQueue(now, veh) ;
+//					// yyyy this is actually quite weird.  why should we remove a vehicle from the road queue if it is not on the road in the
+//					// first place???  Possibly, this works only because it is never (or rarely) triggered??? kai, jun'13
+					
 					continue;
 				}
 			}
@@ -224,8 +230,6 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		return false;
 	}
 
-
-
 	/**
 	 * This method moves transit vehicles from the stop queue directly to the front of the
 	 * "queue" of the QLink. An advantage is that this will observe flow
@@ -253,7 +257,6 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 			}
 		}
 	}
-
 
 	boolean handleTransitStop(final double now, final QVehicle veh, final MobsimDriverAgent driver) {
 		boolean handled = false;
@@ -353,7 +356,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		return this.visdata;
 	}
 
-	private boolean hasActivity() {
+	private boolean isHavingActivity() {
 		/*
 		 * Leave Link active as long as there are vehicles on the link (ignore
 		 * buffer because the buffer gets emptied by nodes and not links) and leave

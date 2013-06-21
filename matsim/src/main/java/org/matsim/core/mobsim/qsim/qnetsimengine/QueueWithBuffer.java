@@ -342,7 +342,7 @@ class QueueWithBuffer {
 	}
 
 
-	private void removeVehicleFromQueue(final double now, QVehicle veh) {
+	void removeVehicleFromQueue(final double now, QVehicle veh) {
 		vehQueue.poll();
 		usedStorageCapacity -= veh.getSizeInEquivalents();
 		if ( QueueWithBuffer.HOLES ) {
