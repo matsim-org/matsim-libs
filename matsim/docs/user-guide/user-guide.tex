@@ -47,128 +47,33 @@
 \parskip0.3\baselineskip
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \usepackage{hyperref}
 
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
 \tolerance10000
 
-\title{MATSim User's Guide}
+\title{\textcolor{blue}{\sf MATSim User's Guide}}
 \maketitle
+
+\tableofcontents
 
 Generated 2013-06-12T12:13:34+02:00
 \\from matsim.org/docs/userguide
 
-\chapter{Contents}
-\begin{itemize}
-	\item \href{http://www.matsim.org/docs/userguide}{User's Guide}
-\begin{itemize}
-	\item \href{http://www.matsim.org/features}{Features}
-	\item \href{http://www.matsim.org/system-requirements}{System Requirements}
-	\item \href{http://www.matsim.org/terminology}{Terminology}
-\begin{itemize}
-	\item \href{http://www.matsim.org/node/539}{Choice set --$>$ "plan set" of an agent}
-	\item \href{http://www.matsim.org/node/540}{Choice set generation --$>$ Time mutation/re-route/... ; "innovation"}
-	\item \href{http://www.matsim.org/node/546}{Choice set generation, choice --$>$ replanning}
-	\item \href{http://www.matsim.org/node/547}{Convergence --$>$ learning rate}
-	\item \href{http://www.matsim.org/node/545}{Mu (logit model scaling factor) --$>$ beta\_brain}
-	\item \href{http://www.matsim.org/node/541}{Multinomial logit --$>$ ExpBetaPlanSelector}
-	\item \href{http://www.matsim.org/node/543}{Network loading --$>$ mobsim, mobility simulation, physical simulation}
-	\item \href{http://www.matsim.org/node/542}{Stationary --$>$ relaxed}
-	\item \href{http://www.matsim.org/node/544}{Utility $<$--$>$ score}
-\end{itemize}
-	\item \href{http://www.matsim.org/docs/new-scenario}{Building new scenarios}
-\begin{itemize}
-	\item \href{http://www.matsim.org/node/405}{Coordinate Systems in MATSim}
-	\item \href{http://www.matsim.org/node/580}{Using MATSim for Switzerland}
-	\item \href{http://www.matsim.org/matsim4urbansim}{Using MATSim from Urbansim (for the PSRC region)}
-\end{itemize}
-	\item \href{http://www.matsim.org/node/740}{Configuration options}
-\begin{itemize}
-	\item \href{http://www.matsim.org/node/478}{Strategy Modules}
-\begin{itemize}
-	\item \href{http://www.matsim.org/node/698}{BestScore.  Status: works}
-	\item \href{http://www.matsim.org/node/700}{ChangeExpBeta. Status: works. RECOMMENDED!}
-	\item \href{http://www.matsim.org/node/702}{KeepLastSelected. Status: works}
-	\item \href{http://www.matsim.org/node/699}{SelectExpBeta. Status: works}
-	\item \href{http://www.matsim.org/node/701}{SelectRandom}
-	\item \href{http://www.matsim.org/node/697}{---}
-	\item \href{http://www.matsim.org/node/573}{ReRoute.  Status: nearly indispensable}
-	\item \href{http://www.matsim.org/node/388}{TimeAllocationMutator.  Status: works for vsp and ivt}
-	\item \href{http://www.matsim.org/node/736}{ ChangeSingleLegMode. Status: works}
-	\item \href{http://www.matsim.org/node/387}{ChangeLegMode. Status: works}
-	\item \href{http://www.matsim.org/node/218}{LocationChoice. Status: ready}
-	\item \href{http://www.matsim.org/node/477}{SubtourModeChoice. Status: probably works}
-	\item \href{http://www.matsim.org/node/690}{Combination of strategy modules}
-\end{itemize}
-	\item \href{http://www.matsim.org/node/377}{Other configurable modules}
-\begin{itemize}
-	\item \href{http://www.matsim.org/docs/jdeqsim}{"JDEQSim".  Status: works for ivt}
-	\item \href{http://www.matsim.org/node/389}{"controler". Status: indispensable}
-	\item \href{http://www.matsim.org/docs/userguide/usingCounts}{"counts". Status: works for vsp and ivt}
-	\item \href{http://www.matsim.org/node/525}{"evacuation"(-ivt). Status: ??}
-	\item \href{http://www.matsim.org/node/391}{"evacuation"(-vsp). Status: works if you know what you are doing}
-	\item \href{http://www.matsim.org/node/393}{"facilities". Status: "user" version work in progress}
-	\item \href{http://www.matsim.org/node/392}{"global". Status: indispensable}
-	\item \href{http://www.matsim.org/node/394}{"households". Status: probably ready but nowhere used}
-	\item \href{http://www.matsim.org/node/222}{"network" (time dependent). Status: works for vsp}
-	\item \href{http://www.matsim.org/node/460}{"parallelEventHandling". Status: works for ivt and vsp}
-	\item \href{http://www.matsim.org/node/396}{"planCalcScore". Status: nearly indispensible}
-	\item \href{http://www.matsim.org/node/378}{"qsim" (parallel version). Status: looks promising}
-	\item \href{http://www.matsim.org/node/397}{"qsim". Status: works but is not very transparent}
-	\item \href{http://www.matsim.org/node/383}{"roadpricing".  Status: works for vsp}
-	\item \href{http://www.matsim.org/node/384}{"signalsystems". Status: works for vsp}
-	\item \href{http://www.matsim.org/node/398}{"simulation". Status: should work}
-	\item \href{http://www.matsim.org/node/400}{"strategy". Status: indispensable}
-	\item \href{http://www.matsim.org/node/385}{"transit" (public transport).  Status: works}
-	\item \href{http://www.matsim.org/node/401}{"travelTimeCalculator". Status: nearly indispensable}
-	\item \href{http://www.matsim.org/node/515}{"vehicles". Status: probably reads the file correctly, but does nothing else}
-	\item \href{http://www.matsim.org/node/630}{"vspExperimental". Status: used by VSP}
-	\item \href{http://www.matsim.org/node/508}{0 deprecated modules}
-	\item \href{http://www.matsim.org/node/403}{"world"}
-\end{itemize}
-	\item \href{http://www.matsim.org/node/325}{The MATSim default scoring function (= utility function)}
-\begin{itemize}
-	\item \href{http://www.matsim.org/node/650}{Calibration of the scoring function}
-	\item \href{http://www.matsim.org/node/708}{Default values for the Charypar-Nagel scoring function}
-	\item \href{http://www.matsim.org/node/651}{Interpretation of the logarithmic "utility of performing"}
-\end{itemize}
-\end{itemize}
-	\item \href{http://www.matsim.org/node/741}{Visualization and analysis}
-\begin{itemize}
-	\item \href{http://www.matsim.org/node/742}{Using senozon via}
-	\item \href{http://www.matsim.org/node/743}{Events analysis}
-\end{itemize}
-	\item \href{http://www.matsim.org/docs/extensions}{Using MATSim Extensions}
-\begin{itemize}
-	\item \href{http://www.matsim.org/docs/extensions/gtfs2transitschedule}{GTFS2TransitSchedule}
-	\item \href{http://www.matsim.org/docs/extensions/matism4urbansim}{MATSim4UrbanSim}
-\begin{itemize}
-	\item \href{http://www.matsim.org/node/733}{MATSim4UrbanSim (Frist Release)}
-	\item \href{http://www.matsim.org/node/724}{The MATSim network for the Brussels application}
-\end{itemize}
-	\item \href{http://www.matsim.org/docs/extensions/otfvis}{OTFVis}
-\begin{itemize}
-	\item \href{http://www.matsim.org/docs/extensions/otfvis/opengl}{OpenGL Requirements}
-\end{itemize}
-	\item \href{http://www.matsim.org/docs/extensions/transEnergySim}{Transportation Energy Simulation Framework (transEnergySim)}
-\begin{itemize}
-	\item \href{http://www.matsim.org/node/720}{Applications}
-	\item \href{http://www.matsim.org/node/719}{Emissions}
-	\item \href{http://www.matsim.org/node/718}{Hints and Pitfalls}
-	\item \href{http://www.matsim.org/node/715}{Inductive Charging}
-	\item \href{http://www.matsim.org/node/717}{Stationary Charging}
-	\item \href{http://www.matsim.org/node/716}{Vehicle Energy Consumption Models}
-	\item \href{http://www.matsim.org/node/721}{Visualizations}
-\end{itemize}
-	\item \href{http://www.matsim.org/docs/extensions/networkEditor}{networkEditor}
-\end{itemize}
-	\item \href{http://www.matsim.org/node/563}{Policy Measures}
-\end{itemize}
-\end{itemize}
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Introduction}
 
 The "tutorial" section contains "reduced" information about how to find your way into matsim.
@@ -327,6 +232,8 @@ The above means:
 
 At least when using random utility models (such as multinomial logit   aka ExpBeta...), the score has the same function as the deterministic   utility.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Building new scenarios}
 
 Starting  a new scenario (our term for the application of MATSim to a  region/area) can appear quite cumbersome at the first glace, as a lot of  data preparation may be required.In any case required for a new  scenario are:
@@ -413,6 +320,273 @@ Deprecated (and soon to be removed). See \href{http://matsim.org/extensions/mats
 \sout{There is documentation in opus\_matsim/docs .}
 
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\chapter{The MATSim default scoring function (= utility function)}
+
+Optimally, you have gotten your scenario with a ``useful'' set of so-called innovative modules enabled.  
+%
+Then it becomes important to understand the workings of the so-called MATSim default scoring function.
+
+Yet even if you are considering to expand the number of innovative modules that you enable, it is important to understand the concept of the scoring function since otherwise MATSim will not produce plausible results.
+
+This section contains information that pertains to the so-called "Charypar-Nagel scoring function".
+
+\vfill\eject
+\section{Calibration of the scoring function}
+
+\subsection{Quickstart}
+
+A possible approach is as follows (status \today, this may change):
+\begin{enumerate}
+
+\item Set $\beta_{scale} \equiv$ \verb$BrainExpBeta$ to $1.0$.  (This will eventually become the default.)
+
+This is normally a positive value.
+
+\item Set $\beta_{money} \equiv$ \verb$marginalUtilityOfMoney$ to whatever is the prefactor of your monetary term in your mode choice logit model.
+
+If you do not have a mode choice logit model, set to $1.0$. 
+
+This is normally a positive value (since having more money normally increases utility).
+
+\item Set $\beta_{perf} \equiv$ \verb$performing$ to whatever is the prefactor of car travel time in your mode choice mode.
+
+If you do not have a mode choice logit model, set to $-6.0$.
+
+\item Set $\beta_{tt,car} \equiv$ \verb$traveling$ to $0.0$.
+
+\myemph{It is important to understand this!}  
+
+\end{enumerate}
+
+\subsection{Simplified version}
+
+The simplified version assumes that all activities operate near their typical duration. In this case (see \href{http://matsim.org/node/651}{here}),  one can approximate the marginal utility of activity duration (i.e. the  marginal utility if the sum of all activities is extended by that  amount of time) by beta\_perf .
+
+Now let us consider the typical changes (of the Vickrey  scenario). Note that in the Vickrey scenario, the meaning of the  marginal utility of arriving earlier means the marginal contribution  assuming that the travel time remains the same. We will assume  that activities are ended by the endtime attribute, not by the duration  attribute.
+
+\textbf{Travel takes longer}\textbf{ (by amount deltaTtime)}
+
+In this situation, the activity that follows the trip is cut short by  deltaTtime. We thus have the following (linearized) modifications  of the utility:
+\begin{itemize}
+	\item Travel takes longer by deltaTtime; the utility change is  beta\_travel * deltaTtime . Note that beta\_travel typically is  negative.
+	\item The following activity is shortened by deltaTtime; the (linearized)  utility change is - beta\_perf * deltaTtime . beta\_perf is  typically positive, so the contribution is negative.
+\end{itemize}
+
+Overall: The (linearized) utility change caused by longer travel is
+\begin{verbatim}
+( - beta_perf + beta_travel ) * deltaTtime
+
+\end{verbatim}
+
+\textbf{Traveller increases arriving early (by amount deltaEtime)}
+
+In that situation, the traveller will "do nothing" between the  arrival and the opening time of the activity. That is, the amount  of time that the traveller is doing nothing is now increased by  deltaEtime. Consistent with the meaning of the Vickrey parameter  "marginal utility of arriving early", we assume that the travel time is  the same compared to the later arrival. This means that the preceeding  activity was cut shorter by deltaTtime. We thus have the following  (linearized) modifications of the utility:
+\begin{itemize}
+	\item The preceeding activity is shortened by deltaTtime; the  (linearized) utility change is - beta\_perf * deltaEtime .  beta\_perf is typically positive, so the contribution is negative.
+\end{itemize}
+
+There are no other contributions, since the time between the  arrival and the opening time prodices neither positive nor negative  utility contributions. Overall: The (linearized) utility change  caused by arriving early is
+\begin{verbatim}
+( - beta_perf ) * deltaEtime
+
+\end{verbatim}That is, as long as there are no  additional utilities or disutilities of waiting, the marginal utility of  performing can be approximated by the marginal utility of schedule  delay early.
+
+\textbf{Traveller increases arriving late (by amount deltaLtime)}
+
+In this situation, we have the following (linearized) modifications of the utility:
+\begin{itemize}
+	\item The preceeding activity is extended by deltaLtime; the  (linearized) utility change is beta\_perf * deltaLtime . beta\_perf  is typically positive, so the contribution is positive.
+	\item The following activity is shortened by deltaLtime; the (linearized)  utility change is - beta\_perf * deltaLtime . beta\_perf is  typically positive, so the contribution is negative (and exactly cancels  the previous contribution).
+	\item Arriving late is increased by deltaLtime; the (exact) utility change  is beta\_late * deltaLtime . beta\_late is typically negative, so  the contribution is negative.
+\end{itemize}
+
+Overall: The (linearized) utility change caused by increasing the amount of arriving late is
+\begin{verbatim}
+beta_late * deltaLtime
+
+\end{verbatim}
+
+\textbf{Overall}
+
+Overall, calibration of the Charypar-Nagel scoring function is best done as follows:
+\begin{itemize}
+	\item \textbf{Run a survey and estimate logit models that include  penalties for travelling (by mode), schedule delay early, and schedule  delay late.}
+	\item \textbf{The marginal utility of schedule delay early from the logit  model, multiplied by minus one, results in the MATSim beta\_perf.}  Since the marginal utility of schedule delay early is typically  negative, beta\_perf is thus typically positive. This is the  marginal opportunity cost of time. A useful interpretation is that  this is the difference between "leisure" and "doing nothing".
+	\item \textbf{The marginal utility of travelling from the logit model, \emph{plus beta\_perf,} results in the MATSim beta\_trav (by mode).} That is, the MATSim beta\_trav is an \emph{additional utility offset}  when compared to doing nothing. Since driving can well be seen as  more positive than doing nothing (e.g. because of making phone calls,  listening to music, enjoying to drive), the MATSim beta\_trav can well be  positive.
+\\   (Note that this has still nothing to do with "positive values of  travel time", e.g. by Susan Handy. Those positive values imply  that the additional utility offset over-compensates the marginal  opportunity cost of time. In other words, "time spent driving  home" is (to an extent) seen more positive than "being at home".)
+	\item \textbf{The marginal utility of being late from the logit model results in the MATSim beta\_late.}
+	\item Note that you also need reasonable values for opening time, latest  arrival time, and closing time, in order to achieve that the schedule  delay cost mechanics works in MATSim. This is quite clear if you  think about it; nevertheless, it has been forgotten uncountable times  (in particular in studies that start from trips, not from full daily  plans).
+\end{itemize}
+
+\textbf{Without schedule delay}
+
+If you intend to run MATSim without time adaptation  (TimeAllocationMutator), these things are not that critical. In  that situation, you just need to make sure that - beta\_perf + beta\_trav  matches your marginal utility of travel time differences. An easy  way in our view is:
+\begin{itemize}
+	\item Set beta\_car to zero (i.e. assume that driving is as good or bad as doing nothing).
+	\item Set beta\_perf to the estimated marginal utility of travel time  savings (make sure you get the sign right; beta\_perf should be  positive).
+	\item Set (say) beta\_pt to your estimated marginal utility of travel time savings (should be positive) \emph{minus}  the MATSim beta\_perf. The result may be positive (implying that  spending time using the mode is better than doing nothing) or negative  (implying that spending time using the mode is worse than doing  nothing).
+\end{itemize}
+
+Note that even without time adaptation, beta\_late may still have  an influence if you have set the latest arrival times for some  activities.
+
+\subsubsection{Full version}
+
+"Full version" would imply that we could calibrate the MATSim  parameters also for situations where the actual activity durations are  far from their "typical" values. This could happen for two reaons:
+\begin{itemize}
+	\item There are too many activities that need to be squeezed into a  day. A possible interpretation would be that beta\_perf corresponds  to the marginal utility of additional leisure time on, say, sundays,  but the weekday activites cannot be shifted to sundays.
+	\item There are too many activities that need to be squeezed into certain  time periods, say between day care opening and closing, or into typical  business hours.
+\end{itemize}
+
+Both of these interpretations make sense (in my view) and should  be investigated for MATSim. Presumably, there is already general  research; it would then be necessary to bring that research and the  MATSim formulation together.
+
+\vfill\eject
+\section{Default values for the Charypar-Nagel scoring function}
+
+As explained \href{http://matsim.org/node/650}{here},  the MATSim scoring function has, under some circumstances (actual  durations near "typical" durations"), some similarity to the Vickrey  scenario.
+
+The "typical" parameters of the Vickrey scenario are beta\_early=-6, beta\_travel=-12, and beta\_late=-18.
+
+For MATSim, as explained \href{http://matsim.org/node/650}{here},  this translates into beta\_perf=6, beta\_travel=-6, and  beta\_late=-18. These are the parameters that were, for a lack of  estimated parameters, introduced into (the precursor of) MATSim  approximately in 2006.
+
+These parameters are multiplied with the beta\_brain parameter, which  can be seen as a separately configurable logit scale parameter. A  useful setting for this parameter was determined via systematic tests  concerning the stability of the iterations, see \href{https://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2004/04-03/}{here}.
+
+As a next step, an infrastructure to compare MATSim simulations with  real world traffic counts was set up. Only after that  infrastructure was there, an attempt to calibrate the MATSim parameters  from a survey was made. This is documented \href{https://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2009/09-10/}{here}, unfortunately in German. Two results were
+\begin{itemize}
+	\item The estimated parameters all have the same order of magnitude as the MATSim default parameters (the "Vickrey" parameters).
+	\item The results with respect to traffic counts were not considerably different from before.
+\end{itemize}
+
+
+
+\vfill\eject
+\section{Interpretation of the logarithmic "utility of performing"}
+
+The  so-called "Charypar-Nagel scoring function" is used in many  MATSim  studies. It is called that way because there is an ancient paper   where this scoring function was introduced.
+
+It uses a logarithmic utility of time for activities: U = beta * t\_x *  ln(x/t\_0) . I sometimes call t\_x the "typical duration".
+
+The first derivative of U is beta at the typical duration:
+\begin{itemize}
+	\item 
+\begin{verbatim}
+dU/dx = beta * t_x / x
+\end{verbatim}
+	\item 
+\begin{verbatim}
+dU/dx(x=t_x) = beta
+\end{verbatim}
+\end{itemize}
+
+Interpretation: marginal utility of duration at "typical duration" is indep of activity type. (*)
+
+The second derivative of U at the typical duration is
+\begin{itemize}
+	\item 
+\begin{verbatim}
+d^2U/dx^2 = - beta * t_x / x^2
+\end{verbatim}
+	\item 
+\begin{verbatim}
+d^2U/dx^2(x=t_x) = - beta / t_x
+\end{verbatim}
+\end{itemize}
+
+An  important consequence of this is that there is no separate  free  parameter to calibrate the curvature (= 2nd derivative) at the  typical  duration: beta needs to be the same across all activities, and  t\_x is  given by (*).
+
+A second consequence is that t\_0 is largely  irrelevant. It  shifts the function up and down, i.e. it determines how  much you lose  if you drop an activity completely.
+
+
+
+In the  original paper (and in most of MATSim), t\_0 is set to t\_x *   exp(-10h/t\_x) . This has the (intended) consequence that all  activities  have the same utility contribution at their typical  duration:
+\begin{verbatim}
+U = beta * t_x * ln( x / t_x / exp(-10h/t_x) ) = beta * t_x * [ ln( x/t_x ) + 10h/t_x ]
+\end{verbatim}
+
+which   is, at x=t\_x: = beta * t\_x * [ 0 + 10h/t\_x ] = beta *  10h . With  our usual beta = 6Eu/h, this results in 60Eu per  activity.
+
+The slope at U=0, i.e. at x=t\_0, is
+\begin{verbatim}
+(beta * t_x / t_x) * exp( 10h/t_x) = beta * exp( 10h/t_x )
+\end{verbatim}
+
+which \emph{de}creases with increasing t\_x. This means that activities with larger typical duration are \emph{easier} to drop completely.
+
+In the end, this makes sense: Since the additional score of any activity is the same, the score \emph{per time} is smallest for activities with long typical durations. Therefore, it makes sense to drop them first.
+
+But practically, this is probably not desired behavior, since it would first drop the home activity from a daily plan.
+
+Overall, therefore:\emph{\textbf{In my opinion, the current utility function does not work for activity dropping.}}
+
+
+
+An  alternative, never tested since activity dropping was never  tested with  this utl fct, would to to recognize that U'(t\_0) = beta *  t\_x / t\_0 ,  i.e. \emph{increasing}\emph{slope} with \emph{decreasing}  t\_0.  That is, high priority activities should have t\_0 such that  t\_x/t\_0 is  large (large slope = hard to drop). Activities of the  same priority  should have t\_0 such that t\_x/t\_0 is the same between  those activities.  Overall, something like
+\begin{verbatim}
+weight \propto t_x/t_0
+
+\end{verbatim}
+
+or
+\begin{verbatim}
+t_0 \propto t_x/weight
+\end{verbatim}
+
+where large weight implies a large importance of the activity.
+
+This  was, as said, never tried, since activity dropping was never   systematically tried. It also does not fix the problem, discussed   later, that different activities might have different resistance  against  making them shorter; since this is U'', this is -beta/t\_x  with the  above utl fct: activities are shortened proportional to their  typical  duration.
+
+
+
+To make matters worse, there is currently the  convention that  negative values of U are set to zero. This is done  since we need  useable values for negative durations (since they may  happen at the  "stitching together" of the last to the first activity of a  day), and  if we give those a "very negative" score, then the utl at t=0  cannot be  even smaller than this.
+
+This has, however, the  unfortunate consequence that the "drift  direction" of the adaptive  algorithm, once an activity duration has  gone below t\_0, goes to zero  duration.
+
+
+
+Outlook: What would we want for our next generation utl function? Some wishes from my perspective:
+\begin{itemize}
+	\item Curvature at typical duration can be calibrated
+	\item Slope at U=0 can be calibrated
+	\item Utl function extends in meaningful way to negative durations (this would fix the arbitrary handling that we currently employ)
+\end{itemize}
+
+
+
+In  my view, a polynomial of second degree would be worth trying. As  usual,  there are several ways to set this up. One way is to  expand around the  typical duration:
+\begin{verbatim}
+U(t_x + eps) = U(t_x) + eps * U'(t_x) + eps^2 * U''(t_x)/2
+\end{verbatim}
+
+or
+\begin{verbatim}
+U(x) = U(t_x) + (x-t_x) * U'(t_x) + (x-t_x)^2 * U''(t_x)/2
+\end{verbatim}
+
+with   t\_x = typical duration, U'(t\_x) = beta = marg utl at typ dur, U''(t\_x)  =  curvature at typ dur ("priority"), and U(t\_x) = "base value of act"   (which could be something like beta*t\_x ).
+
+
+
+Another way (having the parabola going through (0,0)) would be
+\begin{verbatim}
+U(x) = - a x ( x - c ) = - a x^2 + a c x
+\end{verbatim}
+\begin{verbatim}
+U'(x) = - 2 a x + a c
+\end{verbatim}
+\begin{verbatim}
+prio = U'(x=0) = a c , i.e. c = prio/a .
+\end{verbatim}
+\begin{verbatim}
+beta = U'(x=t_x) = - 2 a t_x + prio, i.e. a = (prio - beta)/2t_x
+\end{verbatim}
+
+
+
+There is other work (e.g. by Joh) that should be looked at.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Strategy Modules}
 
 
@@ -784,6 +958,8 @@ Legend:
 	\item ? means there is no known implementation available
 \end{itemize}
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Other configurable modules}
 
 Modules are loosely defined by their corresponding entry in the config file.
@@ -1376,238 +1552,8 @@ Has been superceeded by calls to geotools. Please use geotools  functionality. L
 
 World also provides datastructures to assign facilities to links, and  links to zones, etc. This functionality is mostly used in initial  demand modelling, but is not very straight-forwardly implemented. Should  be replaced in the future with some kind of "mappig manager" to manage  the mappings between different MATSim objects, like facilities, links,  etc.
 
-\chapter{The MATSim default scoring function (= utility function)}
-
-This section contains information that pertains to the so-called "Charypar-Nagel scoring function".
-
-\vfill\eject
-\section{Calibration of the scoring function}
-
-\subsubsection{Simplified version}
-
-The simplified version assumes that all activities operate near their typical duration. In this case (see \href{http://matsim.org/node/651}{here}),  one can approximate the marginal utility of activity duration (i.e. the  marginal utility if the sum of all activities is extended by that  amount of time) by beta\_perf .
-
-Now let us consider the typical changes (of the Vickrey  scenario). Note that in the Vickrey scenario, the meaning of the  marginal utility of arriving earlier means the marginal contribution  assuming that the travel time remains the same. We will assume  that activities are ended by the endtime attribute, not by the duration  attribute.
-
-\textbf{Travel takes longer}\textbf{ (by amount deltaTtime)}
-
-In this situation, the activity that follows the trip is cut short by  deltaTtime. We thus have the following (linearized) modifications  of the utility:
-\begin{itemize}
-	\item Travel takes longer by deltaTtime; the utility change is  beta\_travel * deltaTtime . Note that beta\_travel typically is  negative.
-	\item The following activity is shortened by deltaTtime; the (linearized)  utility change is - beta\_perf * deltaTtime . beta\_perf is  typically positive, so the contribution is negative.
-\end{itemize}
-
-Overall: The (linearized) utility change caused by longer travel is
-\begin{verbatim}
-( - beta_perf + beta_travel ) * deltaTtime
-
-\end{verbatim}
-
-\textbf{Traveller increases arriving early (by amount deltaEtime)}
-
-In that situation, the traveller will "do nothing" between the  arrival and the opening time of the activity. That is, the amount  of time that the traveller is doing nothing is now increased by  deltaEtime. Consistent with the meaning of the Vickrey parameter  "marginal utility of arriving early", we assume that the travel time is  the same compared to the later arrival. This means that the preceeding  activity was cut shorter by deltaTtime. We thus have the following  (linearized) modifications of the utility:
-\begin{itemize}
-	\item The preceeding activity is shortened by deltaTtime; the  (linearized) utility change is - beta\_perf * deltaEtime .  beta\_perf is typically positive, so the contribution is negative.
-\end{itemize}
-
-There are no other contributions, since the time between the  arrival and the opening time prodices neither positive nor negative  utility contributions. Overall: The (linearized) utility change  caused by arriving early is
-\begin{verbatim}
-( - beta_perf ) * deltaEtime
-
-\end{verbatim}That is, as long as there are no  additional utilities or disutilities of waiting, the marginal utility of  performing can be approximated by the marginal utility of schedule  delay early.
-
-\textbf{Traveller increases arriving late (by amount deltaLtime)}
-
-In this situation, we have the following (linearized) modifications of the utility:
-\begin{itemize}
-	\item The preceeding activity is extended by deltaLtime; the  (linearized) utility change is beta\_perf * deltaLtime . beta\_perf  is typically positive, so the contribution is positive.
-	\item The following activity is shortened by deltaLtime; the (linearized)  utility change is - beta\_perf * deltaLtime . beta\_perf is  typically positive, so the contribution is negative (and exactly cancels  the previous contribution).
-	\item Arriving late is increased by deltaLtime; the (exact) utility change  is beta\_late * deltaLtime . beta\_late is typically negative, so  the contribution is negative.
-\end{itemize}
-
-Overall: The (linearized) utility change caused by increasing the amount of arriving late is
-\begin{verbatim}
-beta_late * deltaLtime
-
-\end{verbatim}
-
-\textbf{Overall}
-
-Overall, calibration of the Charypar-Nagel scoring function is best done as follows:
-\begin{itemize}
-	\item \textbf{Run a survey and estimate logit models that include  penalties for travelling (by mode), schedule delay early, and schedule  delay late.}
-	\item \textbf{The marginal utility of schedule delay early from the logit  model, multiplied by minus one, results in the MATSim beta\_perf.}  Since the marginal utility of schedule delay early is typically  negative, beta\_perf is thus typically positive. This is the  marginal opportunity cost of time. A useful interpretation is that  this is the difference between "leisure" and "doing nothing".
-	\item \textbf{The marginal utility of travelling from the logit model, \emph{plus beta\_perf,} results in the MATSim beta\_trav (by mode).} That is, the MATSim beta\_trav is an \emph{additional utility offset}  when compared to doing nothing. Since driving can well be seen as  more positive than doing nothing (e.g. because of making phone calls,  listening to music, enjoying to drive), the MATSim beta\_trav can well be  positive.
-\\   (Note that this has still nothing to do with "positive values of  travel time", e.g. by Susan Handy. Those positive values imply  that the additional utility offset over-compensates the marginal  opportunity cost of time. In other words, "time spent driving  home" is (to an extent) seen more positive than "being at home".)
-	\item \textbf{The marginal utility of being late from the logit model results in the MATSim beta\_late.}
-	\item Note that you also need reasonable values for opening time, latest  arrival time, and closing time, in order to achieve that the schedule  delay cost mechanics works in MATSim. This is quite clear if you  think about it; nevertheless, it has been forgotten uncountable times  (in particular in studies that start from trips, not from full daily  plans).
-\end{itemize}
-
-\textbf{Without schedule delay}
-
-If you intend to run MATSim without time adaptation  (TimeAllocationMutator), these things are not that critical. In  that situation, you just need to make sure that - beta\_perf + beta\_trav  matches your marginal utility of travel time differences. An easy  way in our view is:
-\begin{itemize}
-	\item Set beta\_car to zero (i.e. assume that driving is as good or bad as doing nothing).
-	\item Set beta\_perf to the estimated marginal utility of travel time  savings (make sure you get the sign right; beta\_perf should be  positive).
-	\item Set (say) beta\_pt to your estimated marginal utility of travel time savings (should be positive) \emph{minus}  the MATSim beta\_perf. The result may be positive (implying that  spending time using the mode is better than doing nothing) or negative  (implying that spending time using the mode is worse than doing  nothing).
-\end{itemize}
-
-Note that even without time adaptation, beta\_late may still have  an influence if you have set the latest arrival times for some  activities.
-
-\subsubsection{Full version}
-
-"Full version" would imply that we could calibrate the MATSim  parameters also for situations where the actual activity durations are  far from their "typical" values. This could happen for two reaons:
-\begin{itemize}
-	\item There are too many activities that need to be squeezed into a  day. A possible interpretation would be that beta\_perf corresponds  to the marginal utility of additional leisure time on, say, sundays,  but the weekday activites cannot be shifted to sundays.
-	\item There are too many activities that need to be squeezed into certain  time periods, say between day care opening and closing, or into typical  business hours.
-\end{itemize}
-
-Both of these interpretations make sense (in my view) and should  be investigated for MATSim. Presumably, there is already general  research; it would then be necessary to bring that research and the  MATSim formulation together.
-
-\vfill\eject
-\section{Default values for the Charypar-Nagel scoring function}
-
-As explained \href{http://matsim.org/node/650}{here},  the MATSim scoring function has, under some circumstances (actual  durations near "typical" durations"), some similarity to the Vickrey  scenario.
-
-The "typical" parameters of the Vickrey scenario are beta\_early=-6, beta\_travel=-12, and beta\_late=-18.
-
-For MATSim, as explained \href{http://matsim.org/node/650}{here},  this translates into beta\_perf=6, beta\_travel=-6, and  beta\_late=-18. These are the parameters that were, for a lack of  estimated parameters, introduced into (the precursor of) MATSim  approximately in 2006.
-
-These parameters are multiplied with the beta\_brain parameter, which  can be seen as a separately configurable logit scale parameter. A  useful setting for this parameter was determined via systematic tests  concerning the stability of the iterations, see \href{https://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2004/04-03/}{here}.
-
-As a next step, an infrastructure to compare MATSim simulations with  real world traffic counts was set up. Only after that  infrastructure was there, an attempt to calibrate the MATSim parameters  from a survey was made. This is documented \href{https://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2009/09-10/}{here}, unfortunately in German. Two results were
-\begin{itemize}
-	\item The estimated parameters all have the same order of magnitude as the MATSim default parameters (the "Vickrey" parameters).
-	\item The results with respect to traffic counts were not considerably different from before.
-\end{itemize}
-
-
-
-\vfill\eject
-\section{Interpretation of the logarithmic "utility of performing"}
-
-The  so-called "Charypar-Nagel scoring function" is used in many  MATSim  studies. It is called that way because there is an ancient paper   where this scoring function was introduced.
-
-It uses a logarithmic utility of time for activities: U = beta * t\_x *  ln(x/t\_0) . I sometimes call t\_x the "typical duration".
-
-The first derivative of U is beta at the typical duration:
-\begin{itemize}
-	\item 
-\begin{verbatim}
-dU/dx = beta * t_x / x
-\end{verbatim}
-	\item 
-\begin{verbatim}
-dU/dx(x=t_x) = beta
-\end{verbatim}
-\end{itemize}
-
-Interpretation: marginal utility of duration at "typical duration" is indep of activity type. (*)
-
-The second derivative of U at the typical duration is
-\begin{itemize}
-	\item 
-\begin{verbatim}
-d^2U/dx^2 = - beta * t_x / x^2
-\end{verbatim}
-	\item 
-\begin{verbatim}
-d^2U/dx^2(x=t_x) = - beta / t_x
-\end{verbatim}
-\end{itemize}
-
-An  important consequence of this is that there is no separate  free  parameter to calibrate the curvature (= 2nd derivative) at the  typical  duration: beta needs to be the same across all activities, and  t\_x is  given by (*).
-
-A second consequence is that t\_0 is largely  irrelevant. It  shifts the function up and down, i.e. it determines how  much you lose  if you drop an activity completely.
-
-
-
-In the  original paper (and in most of MATSim), t\_0 is set to t\_x *   exp(-10h/t\_x) . This has the (intended) consequence that all  activities  have the same utility contribution at their typical  duration:
-\begin{verbatim}
-U = beta * t_x * ln( x / t_x / exp(-10h/t_x) ) = beta * t_x * [ ln( x/t_x ) + 10h/t_x ]
-\end{verbatim}
-
-which   is, at x=t\_x: = beta * t\_x * [ 0 + 10h/t\_x ] = beta *  10h . With  our usual beta = 6Eu/h, this results in 60Eu per  activity.
-
-The slope at U=0, i.e. at x=t\_0, is
-\begin{verbatim}
-(beta * t_x / t_x) * exp( 10h/t_x) = beta * exp( 10h/t_x )
-\end{verbatim}
-
-which \emph{de}creases with increasing t\_x. This means that activities with larger typical duration are \emph{easier} to drop completely.
-
-In the end, this makes sense: Since the additional score of any activity is the same, the score \emph{per time} is smallest for activities with long typical durations. Therefore, it makes sense to drop them first.
-
-But practically, this is probably not desired behavior, since it would first drop the home activity from a daily plan.
-
-Overall, therefore:\emph{\textbf{In my opinion, the current utility function does not work for activity dropping.}}
-
-
-
-An  alternative, never tested since activity dropping was never  tested with  this utl fct, would to to recognize that U'(t\_0) = beta *  t\_x / t\_0 ,  i.e. \emph{increasing}\emph{slope} with \emph{decreasing}  t\_0.  That is, high priority activities should have t\_0 such that  t\_x/t\_0 is  large (large slope = hard to drop). Activities of the  same priority  should have t\_0 such that t\_x/t\_0 is the same between  those activities.  Overall, something like
-\begin{verbatim}
-weight \propto t_x/t_0
-
-\end{verbatim}
-
-or
-\begin{verbatim}
-t_0 \propto t_x/weight
-\end{verbatim}
-
-where large weight implies a large importance of the activity.
-
-This  was, as said, never tried, since activity dropping was never   systematically tried. It also does not fix the problem, discussed   later, that different activities might have different resistance  against  making them shorter; since this is U'', this is -beta/t\_x  with the  above utl fct: activities are shortened proportional to their  typical  duration.
-
-
-
-To make matters worse, there is currently the  convention that  negative values of U are set to zero. This is done  since we need  useable values for negative durations (since they may  happen at the  "stitching together" of the last to the first activity of a  day), and  if we give those a "very negative" score, then the utl at t=0  cannot be  even smaller than this.
-
-This has, however, the  unfortunate consequence that the "drift  direction" of the adaptive  algorithm, once an activity duration has  gone below t\_0, goes to zero  duration.
-
-
-
-Outlook: What would we want for our next generation utl function? Some wishes from my perspective:
-\begin{itemize}
-	\item Curvature at typical duration can be calibrated
-	\item Slope at U=0 can be calibrated
-	\item Utl function extends in meaningful way to negative durations (this would fix the arbitrary handling that we currently employ)
-\end{itemize}
-
-
-
-In  my view, a polynomial of second degree would be worth trying. As  usual,  there are several ways to set this up. One way is to  expand around the  typical duration:
-\begin{verbatim}
-U(t_x + eps) = U(t_x) + eps * U'(t_x) + eps^2 * U''(t_x)/2
-\end{verbatim}
-
-or
-\begin{verbatim}
-U(x) = U(t_x) + (x-t_x) * U'(t_x) + (x-t_x)^2 * U''(t_x)/2
-\end{verbatim}
-
-with   t\_x = typical duration, U'(t\_x) = beta = marg utl at typ dur, U''(t\_x)  =  curvature at typ dur ("priority"), and U(t\_x) = "base value of act"   (which could be something like beta*t\_x ).
-
-
-
-Another way (having the parabola going through (0,0)) would be
-\begin{verbatim}
-U(x) = - a x ( x - c ) = - a x^2 + a c x
-\end{verbatim}
-\begin{verbatim}
-U'(x) = - 2 a x + a c
-\end{verbatim}
-\begin{verbatim}
-prio = U'(x=0) = a c , i.e. c = prio/a .
-\end{verbatim}
-\begin{verbatim}
-beta = U'(x=t_x) = - 2 a t_x + prio, i.e. a = (prio - beta)/2t_x
-\end{verbatim}
-
-
-
-There is other work (e.g. by Joh) that should be looked at.
-
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \chapter{Visualization and analysis}
 
 There are two visualizers available for MATSim. The original, open source visualizer is \href{http://matsim.org/docs/extensions/otfvis}{OTFVis},  which is a MATSim extension. It requires current OpenGL drivers. The  source code is available, so you can add your own information  visualization code. On the other hand, there is little support for it  from our part.
