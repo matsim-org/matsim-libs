@@ -65,7 +65,7 @@ import org.matsim.vis.snapshotwriters.VisData;
 /**
  * A QueueLane has no own active state and only offers isActive() for a
  * stateless check for activation, a QueueLink is active as long as at least one
- * of its QueueLanes is active.
+ * of its QueueLanes is active.  [[hm.  I my intuition, either it does have a state (active or not), or it doesn't. kai]]
  *
  *
  * @author dgrether based on prior QueueLink implementations of
@@ -73,7 +73,7 @@ import org.matsim.vis.snapshotwriters.VisData;
  * @author aneumann
  * @author mrieser
  */
-public final class QLane extends AbstractQLane implements Identifiable, SignalizeableItem {
+public final class QLane extends AbstractQLane implements QLaneI, Identifiable, SignalizeableItem {
 	// this has public material without any kind of interface since it is accessed via qLink.get*Lane*() (in some not-yet-finalized
 	// syntax).  kai, aug'10
 
@@ -110,7 +110,7 @@ public final class QLane extends AbstractQLane implements Identifiable, Signaliz
 	 */
 	private List<QLane> toLanes = null;
 
-	/*package*/ VisDataImpl visdata;
+	/*package*/ private VisDataImpl visdata;
 
 	/**
 	 * This flag indicates whether the QLane is the first lane on the link or one
@@ -268,8 +268,8 @@ public final class QLane extends AbstractQLane implements Identifiable, Signaliz
 		}
 	}
 
-
-	void recalcTimeVariantAttributes(final double now) {
+	@Override
+	public void recalcTimeVariantAttributes(final double now) {
 		this.freespeedTravelTime = this.length / this.qLink.getLink().getFreespeed(now);
 		calculateFlowCapacity(now);
 		calculateStorageCapacity(now);
@@ -298,7 +298,7 @@ public final class QLane extends AbstractQLane implements Identifiable, Signaliz
 	}
 
 	@Override
-	boolean isNotOfferingVehicle() {
+	public boolean isNotOfferingVehicle() {
 		return this.buffer.isEmpty();
 	}
 
@@ -306,7 +306,7 @@ public final class QLane extends AbstractQLane implements Identifiable, Signaliz
 		return this.thisTimeStepGreen ;
 	}
 
-	 boolean addTransit(final double now, final QVehicle veh) {
+	boolean addTransitToStopQueue(final double now, final QVehicle veh) {
 		if (veh.getDriver() instanceof TransitDriverAgent) {
 			TransitDriverAgent driver = (TransitDriverAgent) veh.getDriver();
 			while (true) {
@@ -435,8 +435,8 @@ public final class QLane extends AbstractQLane implements Identifiable, Signaliz
 		}
 	}
 
-
-	boolean isActive() {
+	@Override
+	public boolean isActive() {
 		boolean active = (this.flowcap_accumulate < 1.0) || (!this.vehQueue.isEmpty())
 		|| (!this.isNotOfferingVehicle()) || (!this.transitVehicleStopQueue.isEmpty());
 		return active;
@@ -449,7 +449,7 @@ public final class QLane extends AbstractQLane implements Identifiable, Signaliz
 	 * @return true if there is at least one vehicle moved to another lane
 	 */
 	@Override
-	boolean doSimStep(final double now) {
+	public boolean doSimStep(final double now) {
 		updateRemainingFlowCapacity();
 
 		moveLaneToBuffer(now);
@@ -517,7 +517,7 @@ public final class QLane extends AbstractQLane implements Identifiable, Signaliz
 	}
 
 	@Override
-	/*package*/ void addFromUpstream(final QVehicle veh ){
+	public void addFromUpstream(final QVehicle veh ){
 		double now = this.qLink.network.simEngine.internalInterface.getMobsim().getSimTimer().getTimeOfDay() ;
 
 		double earliestExitTime = (now + this.freespeedTravelTime);
@@ -548,7 +548,8 @@ public final class QLane extends AbstractQLane implements Identifiable, Signaliz
 	
 	
 
-	void addWaitToBuffer(final QVehicle veh, final double now) {
+	@Override
+	public void addFromWait(final QVehicle veh, final double now) {
 		this.laneEnterTimeMap.put(veh, now);
 		this.addToBuffer(veh, now);
 	}
@@ -573,13 +574,14 @@ public final class QLane extends AbstractQLane implements Identifiable, Signaliz
 	/**
 	 * @return <code>true</code> if there are less vehicles in buffer than the flowCapacity's ceil
 	 */
-	 boolean isAcceptingFromWait() {
+	 @Override
+	 public boolean isAcceptingFromWait() {
 		return ((this.buffer.size() < this.bufferStorageCapacity) && ((this.remainingflowCap >= 1.0)
 				|| (this.flowcap_accumulate >= 1.0)));
 	}
 
 	@Override
-	QVehicle popFirstVehicle() {
+	public QVehicle popFirstVehicle() {
 		double now = this.qLink.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 		QVehicle veh = this.buffer.poll();
 		this.bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
@@ -603,12 +605,13 @@ public final class QLane extends AbstractQLane implements Identifiable, Signaliz
 	 * @return the flow capacity of this link per second, scaled by the config
 	 *         values and in relation to the SimulationTimer's simticktime.
 	 */
-	double getSimulatedFlowCapacity() {
+	@Override
+	public double getSimulatedFlowCapacity() {
 		return this.flowCapacityPerTimeStep;
 	}
 
 	@Override
-	QVehicle getFirstVehicle() {
+	public QVehicle getFirstVehicle() {
 		return this.buffer.peek();
 	}
 
@@ -617,17 +620,18 @@ public final class QLane extends AbstractQLane implements Identifiable, Signaliz
 	 *         the whole link), than there is space for vehicles.
 	 */
 	@Override
-	boolean isAcceptingFromUpstream() {
+	public boolean isAcceptingFromUpstream() {
 		return this.usedStorageCapacity < getStorageCapacity();
 	}
 
-	/*package*/ double getStorageCapacity() {
+	@Override
+	public double getStorageCapacity() {
 		// only for tests
 		return this.storageCapacity;
 	}
 
 	@Override
-	void clearVehicles() {
+	public void clearVehicles() {
 		double now = this.qLink.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 
 		for (QVehicle veh : this.vehQueue) {
@@ -650,7 +654,8 @@ public final class QLane extends AbstractQLane implements Identifiable, Signaliz
 	}
 
 	// search for vehicleId..
-	/*package*/ QVehicle getVehicle(final Id id) {
+	@Override
+	public QVehicle getVehicle(final Id id) {
 		for (QVehicle veh : this.vehQueue) {
 			if (veh.getId().equals(id))
 				return veh;
@@ -667,7 +672,7 @@ public final class QLane extends AbstractQLane implements Identifiable, Signaliz
 	 *         ...) on the link.
 	 */
 	@Override
-	Collection<MobsimVehicle> getAllVehicles() {
+	public Collection<MobsimVehicle> getAllVehicles() {
 		Collection<MobsimVehicle> vehicles = new ArrayList<MobsimVehicle>();
 		vehicles.addAll(this.transitVehicleStopQueue);
 		vehicles.addAll(this.vehQueue);
@@ -713,12 +718,12 @@ public final class QLane extends AbstractQLane implements Identifiable, Signaliz
 	}
 
 	@Override
-	double getLastMovementTimeOfFirstVehicle() {
+	public double getLastMovementTimeOfFirstVehicle() {
 		return this.bufferLastMovedTime;
 	}
 
 	@Override
-	boolean hasGreenForToLink(Id toLinkId){
+	public boolean hasGreenForToLink(final Id toLinkId){
 		if (this.qSignalizedItem != null){
 			return this.qSignalizedItem.isLinkGreenForToLink(toLinkId);
 		}
@@ -730,13 +735,13 @@ public final class QLane extends AbstractQLane implements Identifiable, Signaliz
 	}
 
 	@Override
-	public void setSignalStateAllTurningMoves(SignalGroupState state) {
+	public void setSignalStateAllTurningMoves(final SignalGroupState state) {
 		this.qSignalizedItem.setSignalStateAllTurningMoves(state);
 		this.thisTimeStepGreen = this.qSignalizedItem.isLinkGreen();
 	}
 
 	@Override
-	public void setSignalStateForTurningMove(SignalGroupState state, Id toLinkId) {
+	public void setSignalStateForTurningMove( final SignalGroupState state, final Id toLinkId) {
 		if (!this.qLink.getToNode().getNode().getOutLinks().containsKey(toLinkId)){
 			throw new IllegalArgumentException("ToLink " + toLinkId + " is not reachable from QLane Id " + this.getId() + " on QLink " + this.qLink.getLink().getId());
 		}
@@ -745,7 +750,7 @@ public final class QLane extends AbstractQLane implements Identifiable, Signaliz
 	}
 
 	@Override
-	public void setSignalized(boolean isSignalized) {
+	public void setSignalized(final boolean isSignalized) {
 		this.qSignalizedItem = new DefaultSignalizeableItem(this.qLink.getLink().getToNode().getOutLinks().keySet());
 	}
 
@@ -833,7 +838,8 @@ public final class QLane extends AbstractQLane implements Identifiable, Signaliz
 		this.visdata.visLane = otfLane;
 	}
 
-	final void updateRemainingFlowCapacity() {
+	@Override
+	public final void updateRemainingFlowCapacity() {
 			this.remainingflowCap = this.flowCapacityPerTimeStep;
 	//				if (this.thisTimeStepGreen && this.flowcap_accumulate < 1.0 && this.hasBufferSpaceLeft()) {
 			if (this.thisTimeStepGreen && this.flowcap_accumulate < 1.0 && this.isNotOfferingVehicle() ) {
@@ -851,6 +857,22 @@ public final class QLane extends AbstractQLane implements Identifiable, Signaliz
 
 	private boolean hasBufferSpaceLeft() {
 		return usedBufferStorageCapacity < this.bufferStorageCapacity;
+	}
+
+	@Override
+	public VisDataImpl getVisData() {
+		return visdata;
+	}
+
+	@Override
+	public void addTransitSlightlyUpstreamOfStop(final QVehicle veh) {
+		throw new UnsupportedOperationException() ;
+	}
+
+	@Override
+	public QVehicle removeVehicleFromQueue(double now) {
+		// TODO Auto-generated method stub
+		throw new UnsupportedOperationException() ;
 	}
 
 }

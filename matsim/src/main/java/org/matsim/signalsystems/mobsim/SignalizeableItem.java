@@ -34,10 +34,10 @@ import org.matsim.signalsystems.model.SignalGroupState;
  */
 public interface SignalizeableItem {
 	
-	public void setSignalized(boolean isSignalized);
+	public void setSignalized( final boolean isSignalized);
 	
-	public void setSignalStateAllTurningMoves(SignalGroupState state);
+	public void setSignalStateAllTurningMoves( final SignalGroupState state);
 	
-	public void setSignalStateForTurningMove(SignalGroupState state, Id toLinkId);
+	public void setSignalStateForTurningMove( final SignalGroupState state, final Id toLinkId);
 
 }

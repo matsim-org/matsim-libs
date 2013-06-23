@@ -311,9 +311,9 @@ public class QLinkLanesImpl extends AbstractQLink {
 			movedAtLeastOne = true;
 			this.network.simEngine.getMobsim().getEventsManager().processEvent(
 					new AgentWait2LinkEvent(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId()));
-			boolean handled = this.firstLane.addTransit(now, veh);
+			boolean handled = this.firstLane.addTransitToStopQueue(now, veh);
 			if (!handled) {
-				this.firstLane.addWaitToBuffer(veh, now);
+				this.firstLane.addFromWait(veh, now);
 			}
 		}
 		return movedAtLeastOne;
@@ -454,7 +454,7 @@ public class QLinkLanesImpl extends AbstractQLink {
 			AgentSnapshotInfoBuilder agentSnapshotInfoBuilder = QLinkLanesImpl.this.network.simEngine.getAgentSnapshotInfoBuilder();
 
 			for (QLane lane : QLinkLanesImpl.this.getQueueLanes()) {
-				lane.visdata.getAgentSnapshotInfo(positions);
+				lane.getVisData().getAgentSnapshotInfo(positions);
 			}
 			int cnt2 = 10;
 			// treat vehicles from waiting list:

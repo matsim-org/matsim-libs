@@ -19,13 +19,13 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Queue;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
@@ -36,9 +36,14 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.lanes.vis.VisLinkWLanes;
 import org.matsim.signalsystems.mobsim.DefaultSignalizeableItem;
+import org.matsim.signalsystems.mobsim.SignalizeableItem;
 import org.matsim.signalsystems.model.SignalGroupState;
+import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
+import org.matsim.vis.snapshotwriters.VisData;
 
 /**
  * Separating out the "lane" functionality from the "link" functionality also for QLinkImpl.  Ultimate goal is to unite this class here
@@ -52,7 +57,7 @@ import org.matsim.signalsystems.model.SignalGroupState;
  * 
  * @author nagel
  */
-class QueueWithBuffer {
+class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI {
 
 	/**
 	 * The remaining integer part of the flow capacity available in one time step to move vehicles into the
@@ -69,23 +74,23 @@ class QueueWithBuffer {
 	 * true, i.e. green, if the link is not signalized
 	 */
 	private boolean thisTimeStepGreen = true ;
-	double inverseFlowCapacityPerTimeStep;
+	private double inverseFlowCapacityPerTimeStep;
 	private double flowCapacityPerTimeStepFractionalPart;
 	/**
 	 * The number of vehicles able to leave the buffer in one time step (usually 1s).
 	 */
 	private double flowCapacityPerTimeStep;
-	int bufferStorageCapacity;
+	private int bufferStorageCapacity;
 	private double usedBufferStorageCapacity = 0.0 ;
-	Queue<QueueWithBuffer.Hole> holes = new LinkedList<QueueWithBuffer.Hole>();
+	private Queue<QueueWithBuffer.Hole> holes = new LinkedList<QueueWithBuffer.Hole>();
 	private double freespeedTravelTime = Double.NaN;
 	/** the last timestep the front-most vehicle in the buffer was moved. Used for detecting dead-locks. */
-	double bufferLastMovedTime = Time.UNDEFINED_TIME ;
+	private double bufferLastMovedTime = Time.UNDEFINED_TIME ;
 	/**
 	 * The list of vehicles that have not yet reached the end of the link
 	 * according to the free travel speed of the link
 	 */
-	VehicleQ<QVehicle> vehQueue;
+	private  VehicleQ<QVehicle> vehQueue;
 	/**
 	 * This needs to be a ConcurrentHashMap because it can be accessed concurrently from
 	 * two different threads via addFromIntersection(...) and popFirstVehicle().
@@ -94,21 +99,22 @@ class QueueWithBuffer {
 	 * <li> yyyy The _only_ place where this is needed is visualization.  I am, however, convinced that we can also get this from
 	 * earliest link exit time. kai, jun'13
 	 */
-	Map<QVehicle, Double> linkEnterTimeMap = new ConcurrentHashMap<QVehicle, Double>() ;
+	//	Map<QVehicle, Double> linkEnterTimeMap = new ConcurrentHashMap<QVehicle, Double>() ;
 	private double storageCapacity;
 	private double usedStorageCapacity;
 	/**
 	 * Holds all vehicles that are ready to cross the outgoing intersection
 	 */
-	Queue<QVehicle> buffer = new LinkedList<QVehicle>() ;
+	private Queue<QVehicle> buffer = new LinkedList<QVehicle>() ;
 	/**
 	 * null if the link is not signalized
 	 */
-	DefaultSignalizeableItem qSignalizedItem = null ;
+	private DefaultSignalizeableItem qSignalizedItem = null ;
 	private double congestedDensity_veh_m;
 	private int nHolesMax;
 	private final QLinkImpl qLinkImpl;
 	private final QNetwork network ;
+	private VisData visData = new VisDataImpl() ;
 	private static int congDensWarnCnt2 = 0;
 	private static int congDensWarnCnt = 0;
 	private static int spaceCapWarningCount = 0;
@@ -135,8 +141,8 @@ class QueueWithBuffer {
 		}
 	}
 
-
-	void addFromWait(final QVehicle veh, final double now) {
+	@Override
+	public void addFromWait(final QVehicle veh, final double now) {
 		// We are trying to modify this so it also works for vehicles different from size one.  The idea is that vehicles
 		// _larger_ than size one can move as soon as at least one unit of flow or storage capacity is available.  
 		// kai/mz/amit, mar'12
@@ -168,7 +174,12 @@ class QueueWithBuffer {
 		return usedBufferStorageCapacity < bufferStorageCapacity;
 	}
 
-	final boolean hasFlowCapacityLeftAndBufferSpace() {
+	@Override
+	public final boolean isAcceptingFromWait() {
+		return this.hasFlowCapacityLeftAndBufferSpace() ;
+	}
+
+	private final boolean hasFlowCapacityLeftAndBufferSpace() {
 		return (
 				hasBufferSpaceLeft() 
 				&& 
@@ -176,7 +187,8 @@ class QueueWithBuffer {
 				);
 	}
 
-	final void updateRemainingFlowCapacity() {
+	@Override
+	public final void updateRemainingFlowCapacity() {
 		remainingflowCap = flowCapacityPerTimeStep;
 		//				if (this.thisTimeStepGreen && this.flowcap_accumulate < 1.0 && this.hasBufferSpaceLeft()) {
 		if (thisTimeStepGreen && flowcap_accumulate < 1.0 && qLinkImpl.isNotOfferingVehicle() ) {
@@ -284,6 +296,12 @@ class QueueWithBuffer {
 		}
 	}
 
+	@Override
+	public boolean doSimStep(final double now ) {
+		this.moveLaneToBuffer(now);
+		return true ;
+	}
+
 	/**
 	 * Move vehicles from link to buffer, according to buffer capacity and
 	 * departure time of vehicle. Also removes vehicles from lane if the vehicle
@@ -291,7 +309,7 @@ class QueueWithBuffer {
 	 * @param now
 	 *          The current time.
 	 */
-	void moveLaneToBuffer(final double now) {
+	private void moveLaneToBuffer(final double now) {
 		QVehicle veh;
 
 		while ((veh = vehQueue.peek()) != null) {
@@ -306,6 +324,12 @@ class QueueWithBuffer {
 
 			// Check if veh has reached destination:
 			if ((qLinkImpl.getLink().getId().equals(driver.getDestinationLinkId())) && (driver.chooseNextLinkId() == null)) {
+				// (1) we want to be able to have vehicles drive in circles. Thus, as long as they still have a next link,
+				// they continue, even if here is their ultimate destination.
+				// (2) On the other hand, we do not want to rely ONLY on the route plan since technically an agent does not
+				// need to know the next link here already (this might be more picky than necessary; presumably,
+				// it started out as the first condition, and then the second was added to allow driving in circles.)
+				// kai, jun'13
 				letVehicleArrive(now, veh);
 				continue;
 			}
@@ -316,21 +340,8 @@ class QueueWithBuffer {
 			}
 
 			if (driver instanceof TransitDriverAgent) {
-				TransitDriverAgent trDriver = (TransitDriverAgent) driver;
-				Id nextLinkId = trDriver.chooseNextLinkId();
-				if (nextLinkId == null || nextLinkId.equals(trDriver.getCurrentLinkId())) {
-					// special case: transit drivers can specify the next link being the current link
-					// this can happen when a transit-lines route leads over exactly one link
-					// normally, vehicles would not even drive on that link, but transit vehicles must
-					// "drive" on that link in order to handle the stops on that link
-					// so allow them to return some non-null link id in chooseNextLink() in order to be
-					// placed on the link, and here we'll remove them again if needed...
-					// ugly hack, but I didn't find a nicer solution sadly... mrieser, 5mar2011
-
-					// Beispiel: Kanzler-Ubahn in Berlin.  Im Visum-Netz mit nur 1 Kante, mit Haltestelle am Anfang und
-					// am Ende der Kante.  Zweite Haltestelle wird nur bedient, wenn das Fahrzeug im matsim-Sinne zum 
-					// zweiten Mal auf die Kante gesetzt wird (oder so ähnlich, aber wir brauchen "nextLink==currentLink").
-					// kai & marcel, mar'12
+				if (driver.chooseNextLinkId() == null || driver.chooseNextLinkId().equals(driver.getCurrentLinkId())) {
+					// transit drivers sometimes have weaker requirements to arrive
 
 					letVehicleArrive(now,veh) ;
 					continue;
@@ -341,8 +352,8 @@ class QueueWithBuffer {
 		} // end while
 	}
 
-
-	private void removeVehicleFromQueue(final double now) {
+	@Override
+	public QVehicle removeVehicleFromQueue(final double now) {
 		QVehicle veh = vehQueue.poll();
 		usedStorageCapacity -= veh.getSizeInEquivalents();
 		if ( QueueWithBuffer.HOLES ) {
@@ -351,6 +362,7 @@ class QueueWithBuffer {
 			hole.setEarliestLinkExitTime( now + 0.9*offset + 0.2*MatsimRandom.getRandom().nextDouble()*offset ) ;
 			holes.add( hole ) ;
 		}
+		return veh ;
 	}
 
 	private void letVehicleArrive(final double now, QVehicle veh) {
@@ -366,28 +378,32 @@ class QueueWithBuffer {
 		return veh.getSizeInEquivalents();
 	}
 
-	int vehInQueueCount() {
+	public int vehInQueueCount() {
 		// called by one test case
 		return vehQueue.size();
 	}
 
-	boolean isActive() {
+	@Override
+	public boolean isActive() {
 		return (this.flowcap_accumulate < 1.0) // still accumulating, thus active 
 				|| (!this.vehQueue.isEmpty()) ;
 	}
 
-	void setSignalStateAllTurningMoves(SignalGroupState state) {
+	@Override
+	public void setSignalStateAllTurningMoves( final SignalGroupState state) {
 		qSignalizedItem.setSignalStateAllTurningMoves(state);
 
 		thisTimeStepGreen  = qSignalizedItem.isLinkGreen();
 		// (this is only for capacity accumulation)
 	}
 
-	double getSimulatedFlowCapacity() {
+	@Override
+	public double getSimulatedFlowCapacity() {
 		return this.flowCapacityPerTimeStep;
 	}
 
-	boolean isAcceptingFromUpstream() {
+	@Override
+	public boolean isAcceptingFromUpstream() {
 		double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
 
 		boolean storageOk = usedStorageCapacity < storageCapacity ;
@@ -411,13 +427,15 @@ class QueueWithBuffer {
 		return true ;
 	}
 
-	void recalcTimeVariantAttributes(double now) {
+	@Override
+	public void recalcTimeVariantAttributes( final double now) {
 		freespeedTravelTime = qLinkImpl.length / qLinkImpl.getLink().getFreespeed(now);
 		calculateFlowCapacity(now);
 		calculateStorageCapacity(now);
 	}
 
-	public QVehicle getVehicle(Id vehicleId) {
+	@Override
+	public QVehicle getVehicle(final Id vehicleId) {
 		for (QVehicle veh : this.vehQueue) {
 			if (veh.getId().equals(vehicleId))
 				return veh;
@@ -429,17 +447,21 @@ class QueueWithBuffer {
 		return null;
 	}
 
-	void getAllVehicles(Collection<MobsimVehicle> vehicles) {
+	@Override
+	public Collection<MobsimVehicle> getAllVehicles() {
+		Collection<MobsimVehicle> vehicles = new ArrayList<MobsimVehicle>();
 		vehicles.addAll(vehQueue);
 		vehicles.addAll(buffer);
+		return vehicles ;
 	}
 
-	QVehicle popFirstVehicle() {
+	@Override
+	public QVehicle popFirstVehicle() {
 		double now = qLinkImpl.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 		QVehicle veh = buffer.poll();
 		usedBufferStorageCapacity = usedBufferStorageCapacity - veh.getSizeInEquivalents();
 		bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
-		linkEnterTimeMap.remove(veh);
+		//		linkEnterTimeMap.remove(veh);
 
 		//		Assert.assertTrue( veh != null ) ;
 		//		Assert.assertTrue( veh.getDriver() != null ) ;
@@ -449,7 +471,8 @@ class QueueWithBuffer {
 		return veh;
 	}
 
-	void setSignalStateForTurningMove(SignalGroupState state, Id toLinkId) {
+	@Override
+	public void setSignalStateForTurningMove( final SignalGroupState state, final Id toLinkId) {
 		if (!qLinkImpl.getToNode().getNode().getOutLinks().containsKey(toLinkId)){
 			throw new IllegalArgumentException("ToLink " + toLinkId + " is not reachable from QLink Id " + qLinkImpl.getLink().getId());
 		}
@@ -460,22 +483,26 @@ class QueueWithBuffer {
 		// green).
 	}
 
-	boolean hasGreenForToLink(Id toLinkId) {
+	@Override
+	public boolean hasGreenForToLink(final Id toLinkId) {
 		if (qSignalizedItem != null){
 			return qSignalizedItem.isLinkGreenForToLink(toLinkId);
 		}
 		return true; //the lane is not signalized and thus always green
 	}
 
-	double getStorageCapacity() {
+	@Override
+	public double getStorageCapacity() {
 		return storageCapacity;
 	}
 
-	boolean isNotOfferingVehicle() {
+	@Override
+	public boolean isNotOfferingVehicle() {
 		return buffer.isEmpty();
 	}
-
-	void clearVehicles() {
+	
+	@Override
+	public void clearVehicles() {
 		double now = qLinkImpl.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 
 		for (QVehicle veh : vehQueue) {
@@ -485,7 +512,7 @@ class QueueWithBuffer {
 			qLinkImpl.network.simEngine.getMobsim().getAgentCounter().decLiving();
 		}
 		vehQueue.clear();
-		linkEnterTimeMap.clear();
+		//		linkEnterTimeMap.clear();
 
 		for (QVehicle veh : buffer) {
 			qLinkImpl.network.simEngine.getMobsim().getEventsManager().processEvent(
@@ -497,10 +524,11 @@ class QueueWithBuffer {
 		usedBufferStorageCapacity = 0;
 	}
 
-	void addFromUpstream(final QVehicle veh) {
+	@Override
+	public void addFromUpstream(final QVehicle veh) {
 		double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 		qLinkImpl.activateLink();
-		linkEnterTimeMap.put(veh, now);
+		//		linkEnterTimeMap.put(veh, now);
 		usedStorageCapacity += veh.getSizeInEquivalents();
 		double vehicleTravelTime = qLinkImpl.length / veh.getMaximumVelocity();
 		double earliestExitTime = now + Math.max(freespeedTravelTime, vehicleTravelTime);
@@ -516,6 +544,36 @@ class QueueWithBuffer {
 		}
 	}
 
+	@Override
+	public VisData getVisData() {
+		return this.visData  ;
+	}
+
+
+	@Override
+	public QVehicle getFirstVehicle() {
+		return this.buffer.peek() ;
+	}
+
+	@Override
+	public double getLastMovementTimeOfFirstVehicle() {
+		return this.bufferLastMovedTime ;
+	}
+	
+	/**
+	 * Needs to be added _upstream_ of the regular stop location so that a possible second stop on the link can also be served.
+	 */
+	@Override
+	public void addTransitSlightlyUpstreamOfStop( final QVehicle veh) {
+		this.vehQueue.addFirst(veh) ;
+	}
+
+	@Override
+	public void setSignalized( final boolean isSignalized) {
+		qSignalizedItem  = new DefaultSignalizeableItem(qLinkImpl.getLink().getToNode().getOutLinks().keySet());
+	}
+
+
 	static class Hole extends QItem {
 		private double earliestLinkEndTime ;
 
@@ -530,5 +588,67 @@ class QueueWithBuffer {
 		}
 	}
 
+	class VisDataImpl implements VisData {
+
+
+		private VisLinkWLanes otfLink;
+
+		@Override
+		public Collection<AgentSnapshotInfo> getAgentSnapshotInfo(Collection<AgentSnapshotInfo> positions) {
+			AgentSnapshotInfoBuilder snapshotInfoBuilder = QueueWithBuffer.this.network.simEngine.getAgentSnapshotInfoBuilder();
+
+			double numberOfVehiclesDriving = QueueWithBuffer.this.buffer.size() + QueueWithBuffer.this.vehQueue.size();
+			if (numberOfVehiclesDriving > 0) {
+				double now = QueueWithBuffer.this.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
+				Link link = QueueWithBuffer.this.qLinkImpl.getLink();
+				double spacing = snapshotInfoBuilder.calculateVehicleSpacing(link.getLength(), numberOfVehiclesDriving,
+						QueueWithBuffer.this.getStorageCapacity(), QueueWithBuffer.this.bufferStorageCapacity); 
+				double freespeedTraveltime = link.getLength() / link.getFreespeed(now);
+
+				double lastDistanceFromFromNode = Double.NaN;
+				for (QVehicle veh : QueueWithBuffer.this.buffer){
+					lastDistanceFromFromNode = createAndAddVehiclePositionAndReturnDistance(positions, snapshotInfoBuilder, now,
+							lastDistanceFromFromNode, link, spacing, freespeedTraveltime, veh);
+				}
+				for (QVehicle veh : QueueWithBuffer.this.vehQueue) {
+					lastDistanceFromFromNode = createAndAddVehiclePositionAndReturnDistance(positions, snapshotInfoBuilder, now,
+							lastDistanceFromFromNode, link, spacing, freespeedTraveltime, veh);
+				}
+			}
+			
+			return positions ;
+		}
+
+		private double createAndAddVehiclePositionAndReturnDistance(final Collection<AgentSnapshotInfo> positions,
+				AgentSnapshotInfoBuilder snapshotInfoBuilder, double now, double lastDistanceFromFromNode, Link link,
+				double spacing, double freespeedTraveltime, QVehicle veh)
+		{
+			//					double travelTime = Double.POSITIVE_INFINITY ;
+			//					if ( QLinkImpl.this.road.linkEnterTimeMap.get(veh) != null ) {
+			//						// (otherwise the vehicle has never entered from an intersection)
+			//						travelTime = now - QLinkImpl.this.road.linkEnterTimeMap.get(veh);
+			//					}
+			double remainingTravelTime = veh.getEarliestLinkExitTime() - now ;
+			lastDistanceFromFromNode = snapshotInfoBuilder.calculateDistanceOnVectorFromFromNode2(link.getLength(), spacing, 
+					lastDistanceFromFromNode, now, freespeedTraveltime, remainingTravelTime);
+			Integer lane = snapshotInfoBuilder.guessLane(veh, NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
+			double speedValue = snapshotInfoBuilder.calcSpeedValueBetweenZeroAndOne(veh, 
+					QueueWithBuffer.this.inverseFlowCapacityPerTimeStep, now, link.getFreespeed());
+			if (this.otfLink != null){
+				snapshotInfoBuilder.createAndAddVehiclePosition(positions, this.otfLink.getLinkStartCoord(), this.otfLink.getLinkEndCoord(), 
+						QueueWithBuffer.this.qLinkImpl.length, this.otfLink.getEuklideanDistance(), veh, 
+						lastDistanceFromFromNode, lane, speedValue);
+			}
+			else {
+				snapshotInfoBuilder.createAndAddVehiclePosition(positions, link.getFromNode().getCoord(), link.getToNode().getCoord(), 
+						link.getLength(), ((LinkImpl)link).getEuklideanDistance() , veh, lastDistanceFromFromNode, lane, speedValue);
+			}
+			return lastDistanceFromFromNode;
+		}
+
+		public void setOtfLink(VisLinkWLanes otfLink) {
+			this.otfLink = otfLink;
+		}
+	}
 
 }

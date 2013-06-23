@@ -22,15 +22,19 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.PriorityQueue;
+import java.util.Queue;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.qsim.comparators.QVehicleEarliestLinkExitTimeComparator;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
 import org.matsim.core.network.LinkImpl;
@@ -41,7 +45,6 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.vis.VisLaneModelBuilder;
 import org.matsim.lanes.vis.VisLinkWLanes;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.signalsystems.mobsim.DefaultSignalizeableItem;
 import org.matsim.signalsystems.mobsim.SignalizeableItem;
 import org.matsim.signalsystems.model.SignalGroupState;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
@@ -60,6 +63,8 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 
 	// static variables (no problem with memory)
 	final static Logger log = Logger.getLogger(QLinkImpl.class);
+	private static final Comparator<QVehicle> VEHICLE_EXIT_COMPARATOR = new QVehicleEarliestLinkExitTimeComparator();
+	
 	/**
 	 * Reference to the QueueNode which is at the end of each QueueLink instance
 	 */
@@ -72,6 +77,13 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	final double length;
 
 	public QueueWithBuffer road ;
+	
+	/**
+	 * A list containing all transit vehicles that are at a stop but not
+	 * blocking other traffic on the lane.
+	 */
+	private final Queue<QVehicle> transitVehicleStopQueue = new PriorityQueue<QVehicle>(5, VEHICLE_EXIT_COMPARATOR);
+
 
 	/**
 	 * Initializes a QueueLink with one QueueLane.
@@ -92,7 +104,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		this.length = this.getLink().getLength();
 		this.road = new QueueWithBuffer(this, vehicleQueue);
 		this.toQueueNode = toNode;
-		this.visdata = this.new VisDataImpl() ; // instantiating this here so we can cache some things
+		this.visdata = this.new VisDataImpl() ; // instantiating this here and not earlier so we can cache some things
 
 
 	}
@@ -135,10 +147,10 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		if ( this.insertingWaitingVehiclesBeforeDrivingVehicles ) {
 			this.moveWaitToRoad(now);
 			this.handleTransitVehiclesInStopQueue(now);
-			road.moveLaneToBuffer(now);
+			road.doSimStep(now);
 		} else {
 			this.handleTransitVehiclesInStopQueue(now);
-			road.moveLaneToBuffer(now);
+			road.doSimStep(now);
 			this.moveWaitToRoad(now);
 		}
 		// moveLaneToBuffer moves vehicles from lane to buffer.  Includes possible vehicle arrival.  Which, I think, would only be triggered
@@ -158,49 +170,41 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	 *          the current time
 	 */
 	private void moveWaitToRoad(final double now) {
-		while (road.hasFlowCapacityLeftAndBufferSpace()) {
+		while (road.isAcceptingFromWait() ) {
 			QVehicle veh = this.waitingList.poll();
 			if (veh == null) {
 				return;
 			}
+			
+//			System.out.flush() ;
+//			log.warn("veh: " + veh.getId() + " with driver " + veh.getDriver().getId() ) ;
+//			System.err.flush() ;
 
 			this.network.simEngine.getMobsim().getEventsManager().processEvent(
-					new AgentWait2LinkEvent(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId()));
+					new AgentWait2LinkEvent(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId())
+					);
 
 			if ( this.addTransitToStopQueue(now, veh) ) {
 				continue ;
 			}
-
+			
+			// * a newly departing transit vehicle comes via wait, as all other vehicles.
+			// * if it has a stop on its first link, AND there is a passenger waiting, the vehicle is now in the transit stop queue
+			// and all is well.
+			// * if it did, however, not take a passenger on board, it is now here.  From here, it will depart like a normal vehicle,
+			// which is too far downstream to be able to stop a second time on this link.
+			// need to do something against that:
 			if (veh.getDriver() instanceof TransitDriverAgent) {
-				TransitDriverAgent trDriver = (TransitDriverAgent) veh.getDriver();
-				Id nextLinkId = trDriver.chooseNextLinkId();
-				if (nextLinkId == null || nextLinkId.equals(trDriver.getCurrentLinkId())) {
-					// special case: transit drivers can specify the next link being the current link
-					// this can happen when a transit-lines route leads over exactly one link
-					// normally, vehicles would not even drive on that link, but transit vehicles must
-					// "drive" on that link in order to handle the stops on that link
-					// so allow them to return some non-null link id in chooseNextLink() in order to be
-					// placed on the link, and here we'll remove them again if needed...
-					// ugly hack, but I didn't find a nicer solution sadly... mrieser, 5mar2011
-					// (see also moveLaneToBuffer() )
-					
-					// The situation may have changed a bit: it used to be that agents that had the next activity on the same link would
-					// essentially first enter the vehicle and nearly make a departure, and then turn around.  (This was since we originally 
-					// essentially had driver-vehicle-units.)  Thus a pt vehicle that wanted to make a real departure needed some workaround.
-					// I don't think this is the case any more; now the mobsim agent finds out that the next activity is on the same link 
-					// before entering the vehicle.  Thus, this work around may no longer be necessary.  Tests, however, still fail;
-					// the reason is that pt vehicles without passengers return "false" in the addTransitToStopQueue method above and
-					// then need to be caught here.  Seems to me that this could be fixed--???  kai, jun'13
-					trDriver.endLegAndComputeNextState(now);
-					this.addParkedVehicle(veh);
-					this.network.simEngine.internalInterface.arrangeNextAgentState(trDriver) ;
-					this.makeVehicleAvailableToNextDriver(veh, now);
+				if ( veh.getDriver().chooseNextLinkId().equals(veh.getDriver().getCurrentLinkId())) {
 
-//					// remove _after_ processing the arrival to keep link active
-//					road.removeVehicleFromQueue(now, veh) ;
-//					// yyyy this is actually quite weird.  why should we remove a vehicle from the road queue if it is not on the road in the
-//					// first place???  Possibly, this works only because it is never (or rarely) triggered??? kai, jun'13
+// this was the old logic.  It is now jun'13, maybe delete after jun'14 (or even earlier).			
+//					if ( veh.getDriver().chooseNextLinkId() == null || veh.getDriver().chooseNextLinkId().equals(veh.getDriver().getCurrentLinkId())) {
+//					veh.getDriver().endLegAndComputeNextState(now);
+//					this.addParkedVehicle(veh);
+//					this.network.simEngine.internalInterface.arrangeNextAgentState(veh.getDriver()) ;
+//					this.makeVehicleAvailableToNextDriver(veh, now);
 					
+					road.addTransitSlightlyUpstreamOfStop(veh) ;
 					continue;
 				}
 			}
@@ -255,7 +259,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 			// add all departing transit vehicles at the front of the vehQueue
 			ListIterator<QVehicle> iter = departingTransitVehicles.listIterator(departingTransitVehicles.size());
 			while (iter.hasPrevious()) {
-				this.road.vehQueue.addFirst(iter.previous());
+				this.road.addTransitSlightlyUpstreamOfStop(iter.previous()) ;
 			}
 		}
 	}
@@ -274,7 +278,8 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 					// (if the vehicle is not removed from the queue in the following lines, then this will effectively block the lane
 
 					if (!stop.getIsBlockingLane()) {
-						this.road.vehQueue.poll(); // remove the bus from the queue
+//						this.road.vehQueue.poll(); // remove the bus from the queue
+						this.road.removeVehicleFromQueue(now) ;
 						transitVehicleStopQueue.add(veh); // and add it to the stop queue
 					}
 				}
@@ -320,7 +325,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		Collection<MobsimVehicle> vehicles = new ArrayList<MobsimVehicle>();
 		vehicles.addAll(this.transitVehicleStopQueue);
 		vehicles.addAll(this.waitingList);
-		road.getAllVehicles(vehicles);
+		vehicles.addAll( road.getAllVehicles() ) ;
 		return vehicles;
 	}
 
@@ -375,12 +380,12 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 
 	@Override
 	QVehicle getFirstVehicle() {
-		return this.road.buffer.peek();
+		return this.road.getFirstVehicle() ;
 	}
 
 	@Override
 	double getLastMovementTimeOfFirstVehicle() {
-		return this.road.bufferLastMovedTime;
+		return this.road.getLastMovementTimeOfFirstVehicle();
 	}
 
 	@Override
@@ -400,9 +405,8 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 
 	@Override
 	public void setSignalized(boolean isSignalized) {
-		this.road.qSignalizedItem  = new DefaultSignalizeableItem(this.getLink().getToNode().getOutLinks().keySet());
+		road.setSignalized(isSignalized);
 	}
-
 
 	/**
 	 * Inner class to encapsulate visualization methods
@@ -427,28 +431,15 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		}
 
 		@Override
-		public Collection<AgentSnapshotInfo> getAgentSnapshotInfo( final Collection<AgentSnapshotInfo> positions) {
+		public Collection<AgentSnapshotInfo> getAgentSnapshotInfo( Collection<AgentSnapshotInfo> positions) {
 			AgentSnapshotInfoBuilder snapshotInfoBuilder = QLinkImpl.this.network.simEngine.getAgentSnapshotInfoBuilder();
+			
+			VisData roadVisData = road.getVisData() ;
 
-			double numberOfVehiclesDriving = QLinkImpl.this.road.buffer.size() + QLinkImpl.this.road.vehQueue.size();
-			if (numberOfVehiclesDriving > 0) {
-				double now = QLinkImpl.this.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
-				Link link = QLinkImpl.this.getLink();
-				double spacing = snapshotInfoBuilder.calculateVehicleSpacing(link.getLength(), numberOfVehiclesDriving,
-						QLinkImpl.this.road.getStorageCapacity(), QLinkImpl.this.road.bufferStorageCapacity); 
-				double freespeedTraveltime = link.getLength() / link.getFreespeed(now);
+			((QueueWithBuffer.VisDataImpl)roadVisData).setOtfLink( otfLink ) ;
+			// yyyy not so great but an elegant solution needs more thinking about visualizer structure. kai, jun'13
 
-				double lastDistanceFromFromNode = Double.NaN;
-				for (QVehicle veh : QLinkImpl.this.road.buffer){
-					lastDistanceFromFromNode = createAndAddVehiclePositionAndReturnDistance(positions, snapshotInfoBuilder, now,
-							lastDistanceFromFromNode, link, spacing, freespeedTraveltime, veh);
-				}
-				for (QVehicle veh : QLinkImpl.this.road.vehQueue) {
-					lastDistanceFromFromNode = createAndAddVehiclePositionAndReturnDistance(positions, snapshotInfoBuilder, now,
-							lastDistanceFromFromNode, link, spacing, freespeedTraveltime, veh);
-				}
-			}
-
+			positions = roadVisData.getAgentSnapshotInfo(positions) ;
 
 			int cnt2 = 10 ; // a counter according to which non-moving items can be "spread out" in the visualization
 			// initialize a bit away from the lane
@@ -467,32 +458,6 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 			return positions;
 		}
 
-		private double createAndAddVehiclePositionAndReturnDistance(final Collection<AgentSnapshotInfo> positions,
-				AgentSnapshotInfoBuilder snapshotInfoBuilder, double now, double lastDistanceFromFromNode, Link link,
-				double spacing, double freespeedTraveltime, QVehicle veh)
-		{
-//			double travelTime = Double.POSITIVE_INFINITY ;
-//			if ( QLinkImpl.this.road.linkEnterTimeMap.get(veh) != null ) {
-//				// (otherwise the vehicle has never entered from an intersection)
-//				travelTime = now - QLinkImpl.this.road.linkEnterTimeMap.get(veh);
-//			}
-			double remainingTravelTime = veh.getEarliestLinkExitTime() - now ;
-			lastDistanceFromFromNode = snapshotInfoBuilder.calculateDistanceOnVectorFromFromNode2(link.getLength(), spacing, 
-					lastDistanceFromFromNode, now, freespeedTraveltime, remainingTravelTime);
-			Integer lane = snapshotInfoBuilder.guessLane(veh, NetworkUtils.getNumberOfLanesAsInt(Time.UNDEFINED_TIME, link));
-			double speedValue = snapshotInfoBuilder.calcSpeedValueBetweenZeroAndOne(veh, 
-					QLinkImpl.this.road.inverseFlowCapacityPerTimeStep, now, link.getFreespeed());
-			if (this.otfLink != null){
-				snapshotInfoBuilder.createAndAddVehiclePosition(positions, this.otfLink.getLinkStartCoord(), this.otfLink.getLinkEndCoord(), 
-						QLinkImpl.this.length, this.otfLink.getEuklideanDistance(), veh, 
-						lastDistanceFromFromNode, lane, speedValue);
-			}
-			else {
-				snapshotInfoBuilder.createAndAddVehiclePosition(positions, link.getFromNode().getCoord(), link.getToNode().getCoord(), 
-						link.getLength(), ((LinkImpl)link).getEuklideanDistance() , veh, lastDistanceFromFromNode, lane, speedValue);
-			}
-			return lastDistanceFromFromNode;
-		}
 	}
 
 }

@@ -46,7 +46,7 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
  */
 abstract class AbstractQLane {
 	
-	abstract boolean doSimStep(double now) ;
+	abstract boolean doSimStep(final double now) ;
 	
 	abstract void clearVehicles() ;
 	
@@ -71,7 +71,7 @@ abstract class AbstractQLane {
 
 	abstract double getLastMovementTimeOfFirstVehicle();
 
-	abstract boolean hasGreenForToLink(Id toLinkId);
+	abstract boolean hasGreenForToLink(final Id toLinkId);
 	
 	abstract boolean isAcceptingFromUpstream();
 	

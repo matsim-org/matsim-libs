@@ -45,8 +45,6 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.comparators.QVehicleEarliestLinkExitTimeComparator;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * 
@@ -57,8 +55,6 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  *
  */
 abstract class AbstractQLink extends QLinkInternalI {
-
-	private static final Comparator<QVehicle> VEHICLE_EXIT_COMPARATOR = new QVehicleEarliestLinkExitTimeComparator();
 
 	private static Logger log = Logger.getLogger(AbstractQLink.class);
 	
@@ -79,12 +75,6 @@ abstract class AbstractQLink extends QLinkInternalI {
 	
 	// vehicleId 
 	private final Map<Id, Set<MobsimAgent>> passengersWaitingForCars = new LinkedHashMap<Id, Set<MobsimAgent>>();
-
-	/**
-	 * A list containing all transit vehicles that are at a stop but not
-	 * blocking other traffic on the lane.
-	 */
-	/*package*/ final Queue<QVehicle> transitVehicleStopQueue = new PriorityQueue<QVehicle>(5, VEHICLE_EXIT_COMPARATOR);
 
 	/**
 	 * All vehicles from parkingList move to the waitingList as soon as their time
