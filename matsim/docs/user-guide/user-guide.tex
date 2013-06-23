@@ -47,7 +47,7 @@
 \parskip0.3\baselineskip
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+\newcommand{\myemph}[1]{\textcolor{red}{\emph{#1}}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -335,7 +335,9 @@ This section contains information that pertains to the so-called "Charypar-Nagel
 \vfill\eject
 \section{Calibration of the scoring function}
 
-\subsection{Quickstart}
+\subsection{Quickstart by kn}
+
+(different groups have different systems, this is mine, although I took ideas from Michael Balmer)
 
 A possible approach is as follows (status \today, this may change):
 \begin{enumerate}
@@ -350,17 +352,48 @@ If you do not have a mode choice logit model, set to $1.0$.
 
 This is normally a positive value (since having more money normally increases utility).
 
-\item Set $\beta_{perf} \equiv$ \verb$performing$ to whatever is the prefactor of car travel time in your mode choice mode.
+\item Set $\beta_{perf} \equiv$ \verb$performing$ to whatever is the prefactor of car travel time in your mode choice mode (probably with a sign change, see below).
 
-If you do not have a mode choice logit model, set to $-6.0$.
+If you do not have a mode choice logit model, set to $+6.0$.
+
+This is normally a positive value (since performing an activity for more time normally increases utility).
 
 \item Set $\beta_{tt,car} \equiv$ \verb$traveling$ to $0.0$.
 
-\myemph{It is important to understand this!}  
+\myemph{It is important to understand this:}  Even if this value is set to zero, traveling by car will be implicitly punished by the so-called opportunity cost of time: If you are traveling by car, you cannot perform an activity, and thus you are (marginally) losing $\beta_{perf}$.
+
+\item Set all other marginal utilities of travel time by mode relative to the car value.
+
+E.g.\ if your logit model says something like $... -6/h \cdot tt_{car} - 7/h \cdot tt_{pt}$, then $\beta_{perf} = 6$, $\beta_{tt,car} = 0$, and $\beta_{tt,pt} = -1$.
+
+If you do not have a mode choice logit model, set all $\beta_{tt,mode} \equiv$ \verb$travelingXxx$ values to zero (i.e.\ same as car).
+
+\item Use the alternative-specific constants $C_{mode} \equiv$ \verb$constantXxx$ to calibrate your modal split.
+
+(This is, however, not completely simple: One needs to run iterations and look at their end, and especially for modes with small shares one needs to have innovation switched off early enough near the end of the iterations.)
+
+\item Set the distance cost rates \verb$monetaryDistanceCostRateXxx$ to plausible values if you have them.
+
+For the time being, this needs to be negative (which is not entirely plausible but it is the way it is).
 
 \end{enumerate}
 
-\subsection{Simplified version}
+If you end up having your modal split right but its distance distribution not, you probably need to look at the different mode speeds.  In our experience this works better than using the $\beta_{tt,mode}$ for this.
+
+Calibrating schedule-based pt currently goes beyond what can be provided here; recommendations:
+\begin{itemize}
+
+\item Stay away from schedule-based pt until you really understand what you are doing.
+
+\item Treat schedule-based pt as a ``mechanical'' model which just transports people.  For this, completely switch off mode choice.
+
+\item Make a support contract with senozon.
+
+\item Write a joint funding proposal with the MATSim group in Berlin (or in Zurich, but I haven't asked them).  This needs to provide funding for us that is large enough to do research and not just support.
+
+\end{itemize}
+
+\subsection{Some explanation: Simplified version}
 
 The simplified version assumes that all activities operate near their typical duration. In this case (see \href{http://matsim.org/node/651}{here}),  one can approximate the marginal utility of activity duration (i.e. the  marginal utility if the sum of all activities is extended by that  amount of time) by beta\_perf .
 
