@@ -61,6 +61,8 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
+import playground.ikaddoura.internalizationCar.old.MarginalCongestionHandlerV1;
+
 /**
  * @author ikaddoura
  *
