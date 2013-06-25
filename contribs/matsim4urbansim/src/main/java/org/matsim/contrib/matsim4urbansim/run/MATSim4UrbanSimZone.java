@@ -21,7 +21,7 @@
 /**
  *
  */
-package org.matsim.contrib.matsim4urbansim.matsim4urbansim;
+package org.matsim.contrib.matsim4urbansim.run;
 
 
 import java.io.File;
