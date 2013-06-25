@@ -1,11 +1,9 @@
-package playground.southAfrica.freight.digicore;
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,     *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,21 +17,50 @@ package playground.southAfrica.freight.digicore;
  *                                                                         *
  * *********************************************************************** */
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+package playground.southafrica.freight.digicore.algorithms.concaveHull;
 
+import java.util.Comparator;
+import java.util.Map;
 
-public class AllTests {
+import com.vividsolutions.jts.triangulate.quadedge.QuadEdge;
+
+public class DoubleComparator implements Comparator<QuadEdge> {
+
 	
-	public static Test suite(){
-		TestSuite suite = new TestSuite("All tests for playground.southAfrica.freight.digicore");
-		
-		suite.addTest(playground.southAfrica.freight.digicore.containers.AllTests.suite());
-		suite.addTest(playground.southAfrica.freight.digicore.io.AllTests.suite());
-		suite.addTest(playground.southAfrica.freight.digicore.utils.AllTests.suite());
-		suite.addTest(playground.southAfrica.freight.digicore.algorithms.AllTests.suite());
+	Map<QuadEdge,Double> map;
+	
+	/**
+	 * Constructor.
+	 * 
+	 * @param map
+	 * 		map containing QuadEdge and Double
+	 */
+	public DoubleComparator(Map<QuadEdge,Double> map) {
+		this.map = map;
+	}
 
-		return suite;
+	/**
+	 * Method of comparison. Ranks the QuadEdge in descending order.
+	 * 
+	 * @param qeA
+	 * 		quad edge to compare
+	 * @param qeB
+	 * 		quad edge to compare
+	 * @return
+	 * 		1 if double value associated to qeA  < double
+	 * 		value associated to qeB,
+	 * 		0 if values are equals,
+	 * 		-1 otherwise
+	 */
+	//@Override
+	public int compare(QuadEdge qeA, QuadEdge qeB) {
+		if (this.map.get(qeA) < this.map.get(qeB)) {
+			return 1;
+		} else if (this.map.get(qeA) == this.map.get(qeB)) {
+			return 0;
+		} else {
+			return -1;
+		}
 	}
 
 }

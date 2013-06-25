@@ -1,4 +1,4 @@
-package playground.southAfrica.freight.digicore;
+package playground.southAfrica.freight.digicore.algorithms.concaveHull;
 /* *********************************************************************** *
  * project: org.matsim.*
  * AllTests.java
@@ -26,13 +26,9 @@ import junit.framework.TestSuite;
 public class AllTests {
 	
 	public static Test suite(){
-		TestSuite suite = new TestSuite("All tests for playground.southAfrica.freight.digicore");
+		TestSuite suite = new TestSuite("All tests for playground.southAfrica.freight.digicore.algorithms.concaveHull");
 		
-		suite.addTest(playground.southAfrica.freight.digicore.containers.AllTests.suite());
-		suite.addTest(playground.southAfrica.freight.digicore.io.AllTests.suite());
-		suite.addTest(playground.southAfrica.freight.digicore.utils.AllTests.suite());
-		suite.addTest(playground.southAfrica.freight.digicore.algorithms.AllTests.suite());
-
+		suite.addTestSuite(ConcaveHullTest.class);
 		return suite;
 	}
 
