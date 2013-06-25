@@ -112,14 +112,11 @@ public class MATSim4UrbanSimParcel{
 	AggregateObject2NearestNode[] aggregatedOpportunities = null;
 	
 	boolean isParcelMode = true;
-	
-	double timeOfDay	 = -1.;
-	
+
 	// run selected controler
 	boolean computeGridBasedAccessibility			 = false;	// determines whether grid based accessibilities should be calculated
 	boolean computeGridBasedAccessibilitiesUsingShapeFile= false;// determines whether to use a shape file boundary defining the area for grid based accessibilities 
 	boolean computeGridBasedAccessibilityUsingBoundingBox = false; // determines whether to use a customized bounding box
-	// boolean computeGridBasedAccessibilitiesUsingNetworkBoundary = false; // may lead to "out of memory" error when either one/some of this is true: high resolution, huge network, less memory
 	boolean computeZoneBasedAccessibilities			 = false;	// determines whether zone based accessibilities should be calculated
 	boolean computeZone2ZoneImpedance		   		 = false;	// determines whether zone o zone impedances should be calculated
 	boolean computeAgentPerformance					 = false;	// determines whether agent performances should be calculated
@@ -250,20 +247,13 @@ public class MATSim4UrbanSimParcel{
 		// read UrbanSim population (these are simply those entities that have the person, home and work ID)
 		Population oldPopulation = null;
 		
-		M4UControlerConfigModuleV3 m4uModule = getMATSim4UrbanSimControlerConfig();
 		UrbanSimParameterConfigModuleV3 uspModule = getUrbanSimParameterConfig();
-		
+
 		// check for existing plans file
 		if ( scenario.getConfig().plans().getInputFile() != null ) {
-			
-			if(m4uModule.usingHotStart())
-				log.info("MATSim is running in HOT start mode, i.e. MATSim starts with pop file from previous run: " + scenario.getConfig().plans().getInputFile());
-			else if(m4uModule.usingWarmStart())
-				log.info("MATSim is running in WARM start mode, i.e. MATSim starts with pre-existing pop file:" + scenario.getConfig().plans().getInputFile());
-		
+			log.info("MATSim is running in WARM/HOT start mode, i.e. MATSim starts with pre-existing pop file:" + scenario.getConfig().plans().getInputFile());
 			log.info("MATSim will remove persons from plans-file, which are no longer part of the UrbanSim population!");
 			log.info("New UrbanSim persons will be added.");
-
 			oldPopulation = scenario.getPopulation() ;
 		}
 		else {
@@ -381,7 +371,6 @@ public class MATSim4UrbanSimParcel{
 			controler.addControlerListener( new Zone2ZoneImpedancesControlerListener( zones, 
 																					  parcels,
 																					  ptMatrix,
-																					  this.timeOfDay,
 																					  this.benchmark) );
 		}
 		
@@ -499,7 +488,6 @@ public class MATSim4UrbanSimParcel{
 			// log.warn("Using the boundary of the network file for accessibility computation. This could lead to memory issues when the network is large and/or the cell size is too fine.");
 			nwBoundaryBox.setDefaultBoundaryBox(scenario.getNetwork());
 		}
-		this.timeOfDay					= moduleAccessibility.getTimeOfDay();
 	}
 	
 	/**

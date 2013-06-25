@@ -94,14 +94,13 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 	private ActivityFacilitiesImpl parcels;
 	private PtMatrix ptMatrix;		// this could be zero of no input files for pseudo pt are given ...
 	private Benchmark benchmark;
-	private double timeOfDay;
 
 	/**
 	 * constructor	
 	 * @param zones 
 	 * @param parcels
 	 */
-	public Zone2ZoneImpedancesControlerListener( final ActivityFacilitiesImpl zones, ActivityFacilitiesImpl parcels, PtMatrix ptMatrix, double timeOfDay, Benchmark benchmark) {
+	public Zone2ZoneImpedancesControlerListener( final ActivityFacilitiesImpl zones, ActivityFacilitiesImpl parcels, PtMatrix ptMatrix, Benchmark benchmark) {
 		
 		assert(zones != null);
 		this.zones = zones;
@@ -109,7 +108,6 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 		this.parcels = parcels;
 		assert(ptMatrix != null);
 		this.ptMatrix = ptMatrix;
-		this.timeOfDay = timeOfDay;
 		assert(benchmark != null);
 		this.benchmark = benchmark;
 		
@@ -150,7 +148,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 		LeastCostPathTree lcptTravelDistance		 = new LeastCostPathTree( ttf, new TravelDistanceCalculator());
 		
 		NetworkImpl network = (NetworkImpl) controler.getNetwork() ;
-		double depatureTime = this.timeOfDay; // by default this is 8.*3600;
+		double depatureTime = 8.*3600;
 		
 		// od-trip matrix (zonal based)
 		Matrix originDestinationMatrix = new Matrix("tripMatrix", "Zone to Zone origin destination trip matrix");

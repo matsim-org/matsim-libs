@@ -43,6 +43,7 @@ import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
@@ -58,58 +59,6 @@ public class M4UConfigUtils {
 	// module and param names for matsim4urbansim settings stored in an external MATSim config file
 	public static final String MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG = "matsim4urbansimParameter";// module
 	public static final String URBANSIM_ZONE_SHAPEFILE_LOCATION_DISTRIBUTION = "urbanSimZoneShapefileLocationDistribution";
-
-//	/**
-//	 * Setting 
-//	 * 
-//	 * @param matsim4UrbanSimParameter
-//	 * @param config TODO
-//	 */
-//	static void initMATSim4UrbanSimControler(Matsim4UrbansimType matsim4UrbanSimParameter, Config config){
-//
-//		boolean computeCellBasedAccessibility	= matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isCellBasedAccessibility();
-//		boolean computeCellBasedAccessibilityNetwork   = false;
-//		boolean computeCellbasedAccessibilityShapeFile = false;
-//
-//		String shapeFile						= matsim4UrbanSimParameter.getMatsim4UrbansimContoler().getShapeFileCellBasedAccessibility().getInputFile();
-//
-//		// if cell-based accessibility is enabled, check whether a shapefile is given 
-//		if(computeCellBasedAccessibility){ 
-//			if(!Paths.pathExsits(shapeFile)){ // since no shape file found, accessibility computation is applied on the area covering the network
-//				computeCellBasedAccessibilityNetwork   = true;
-//				log.warn("No shape-file given or shape-file not found:" + shapeFile);
-//				log.warn("Instead the boundary of the road network is used to determine the area for which the accessibility computation is applied.");
-//				log.warn("This may be ok of that was your intention.") ;
-//				// yyyyyy the above is automagic; should be replaced by a flag.  kai, apr'13
-//			} else {
-//				computeCellbasedAccessibilityShapeFile = true;
-//			}
-//		}
-//
-//		// ===
-//
-//		// set parameter in module 
-//		M4UControlerConfigModuleV3 module = getMATSim4UrbaSimControlerConfigAndPossiblyConvert(config);
-//		module.setAgentPerformance(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isAgentPerformance());
-//		module.setZone2ZoneImpedance(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isZone2ZoneImpedance());
-//		module.setZoneBasedAccessibility(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isZoneBasedAccessibility());
-//		module.setCellBasedAccessibility(computeCellBasedAccessibility);
-//		
-//		AccessibilityConfigGroup acm = M4UAccessibilityConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
-//		acm.setBoundingBoxLeft(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().getBoundingBoxLeft());
-//		acm.setBoundingBoxBottom(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().getBoundingBoxBottom());
-//		acm.setBoundingBoxRight(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().getBoundingBoxRight());
-//		acm.setBoundingBoxTop(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().getBoundingBoxTop());
-//		acm.setCellSizeCellBasedAccessibility(matsim4UrbanSimParameter.getMatsim4UrbansimContoler().getCellSizeCellBasedAccessibility().intValue());
-//		acm.setShapeFileCellBasedAccessibility(shapeFile);
-//		if (matsim4UrbanSimParameter.getMatsim4UrbansimContoler().isUseCustomBoundingBox() ) {
-//			acm.setAreaOfAccessibilityComputation( AreaOfAccesssibilityComputation.fromBoundingBox.toString() ) ;
-//		} else if (computeCellbasedAccessibilityShapeFile ) {
-//			acm.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromShapeFile.toString() ) ;
-//		} else if ( computeCellBasedAccessibilityNetwork ) {
-//			acm.setAreaOfAccessibilityComputation( AreaOfAccesssibilityComputation.fromNetwork.toString() ) ;
-//		}
-//	}
 
 	/**
 	 * store UrbanSimParameter
@@ -183,6 +132,40 @@ public class M4UConfigUtils {
 		module.setWarmStartPlansLocation(matsim4urbansimConfigPart1.getWarmStartPlansFile().getInputFile());
 		module.setHotStart(matsim4urbansimConfigPart1.isUseHotStart());
 		module.setHotStartPlansFileLocation(matsim4urbansimConfigPart1.getHotStartPlansFile().getInputFile());
+		
+		// setting right plans file
+		if(module.usingWarmStart()){
+			PlansConfigGroup pcg = config.plans();
+			boolean setHotSart = false;
+			
+			// check if hot start is switched on and if the hot start plans file file is available
+			if(module.usingHotStart()){
+				File f = new File(module.getHotStartPlansFileLocation());
+				if(f.exists()){
+					log.info("Hot start flag is set to true. Hot start plans file found at : " + module.getHotStartPlansFileLocation());
+					pcg.setInputFile(module.getHotStartPlansFileLocation());
+					log.info("Setting hot start plans file done!");
+					setHotSart = true;
+				}
+				else{
+					log.warn("Hot start flag is set to true. However, the hot start plans file is not found at given location : " + module.getHotStartPlansFileLocation());
+					log.warn("Warm start will be used instead!");
+					log.warn("This is be ok for the first time when MATSim is called by UrbanSim. Next time MATSim should start with hot start.");
+				}
+			}
+			
+			if(!setHotSart){
+				File f = new File(module.getWarmStartPlansFileLocation());
+				if(f.exists()){
+					log.info("Warm start plans file found at : " + module.getWarmStartPlansFileLocation());
+					pcg.setInputFile(module.getWarmStartPlansFileLocation());
+					log.info("Setting warm start plans file done!");
+				}
+				else{
+					throw new RuntimeException("Given warm start plans file not found : " + module.getWarmStartPlansFileLocation() + " Please check the path in your config file!");
+				}
+			}
+		}
 	}
 
 	/**
