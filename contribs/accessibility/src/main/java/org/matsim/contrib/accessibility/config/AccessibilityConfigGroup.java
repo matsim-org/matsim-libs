@@ -37,43 +37,18 @@ public class AccessibilityConfigGroup extends ReflectiveModule{
 
 	public static final String GROUP_NAME = "accessibility";
 	
-//	private static final String LOGIT_SCALE_PARAMETER = "logitScaleParameter";
 	private static final String USING_RAW_SUMS_WITHOUT_LN = "usingRawSumsWithoutLn";
-//	private static final String USING_PT_PARAMETERS_FROM_MATSIM = "usingPtParametersFromMATSim";
-//	private static final String USING_WALK_PARAMETERS_FROM_MATSIM = "usingWalkParametersFromMATSim";
-//	private static final String USING_BIKE_PARAMETERS_FROM_MATSIM = "usingBikeParametersFromMATSim";
-//	private static final String USING_CAR_PARAMETERS_FROM_MATSIM = "usingCarParametersFromMATSim";
-
 	private static final String ACCESSIBILITY_DESTINATION_SAMPLING_RATE = "accessibilityDestinationSamplingRate";
-
-//	private static final String BETA_BIKE_LN_MONETARY_TRAVEL_COST = "betaBikeLnMonetaryTravelCost";
-//	private static final String BETA_WALK_LN_MONETARY_TRAVEL_COST = "betaWalkLnMonetaryTravelCost";
-//	private static final String BETA_PT_LN_MONETARY_TRAVEL_COST = "betaPtLnMonetaryTravelCost";
-//	private static final String BETA_CAR_LN_MONETARY_TRAVEL_COST = "betaCarLnMonetaryTravelCost";
-
 	// ===
-	
 	private Double accessibilityDestinationSamplingRate;
-	
-//	private static final String USING_LOGIT_SCALE_PARAMETER_FROM_MATSIM = "usingScaleParameterFromMATSim" ;
-//	private Boolean usingLogitScaleParameterFromMATSim;
-	
-//	private Boolean usingCarParameterFromMATSim = true ;
-//	private Boolean usingBikeParameterFromMATSim = true ;
-//	private Boolean usingWalkParameterFromMATSim = true ;
-//	private Boolean usingPtParameterFromMATSim = true ;
-    
 	private Boolean usingRawSumsWithoutLn = false ;
-    
-//	private boolean usingCustomBoundingBox;
+
 	private double boundingBoxTop;
 	private double boundingBoxLeft;
     private double boundingBoxRight;
     private double boundingBoxBottom;
 	
 	private int cellSizeCellBasedAccessibility;
-//	private boolean isCellBasedAccessibilityNetwork;
-//	private boolean isCellbasedAccessibilityShapeFile;
 	private String shapeFileCellBasedAccessibility;
 	
 	private static final String AREA_OF_ACC_COMP = "areaOfAccessibilityComputation" ; 
@@ -81,46 +56,6 @@ public class AccessibilityConfigGroup extends ReflectiveModule{
 	AreaOfAccesssibilityComputation areaOfAccessibilityComputation = AreaOfAccesssibilityComputation.fromNetwork ;
 
 	// ===
-    
-//	private Double betaCarTravelTime;
-//	private Double betaCarTravelTimePower2;
-//	private Double betaCarLnTravelTime;
-//	private Double betaCarTravelDistance;
-//	private Double betaCarTravelDistancePower2;
-//	private Double betaCarLnTravelDistance;
-//	private Double betaCarTravelMonetaryCost;
-//	private Double betaCarTravelMonetaryCostPower2;
-//	private Double betaCarLnTravelMonetaryCost;
-//	
-//	private Double betaBikeTravelTime;
-//	private Double betaBikeTravelTimePower2;
-//	private Double betaBikeLnTravelTime;
-//	private Double betaBikeTravelDistance;
-//	private Double betaBikeTravelDistancePower2;
-//	private Double betaBikeLnTravelDistance;
-//	private Double betaBikeTravelMonetaryCost;
-//	private Double betaBikeTravelMonetaryCostPower2;
-//	private Double betaBikeLnTravelMonetrayCost;
-//
-//	private Double betaWalkTravelTime;
-//	private Double betaWalkTravelTimePower2;
-//	private Double betaWalkLnTravelTime;
-//	private Double betaWalkTravelDistance;
-//	private Double betaWalkTravelDistancePower2;
-//	private Double betaWalkLnTravelDistance;
-//	private Double betaWalkTravelMonetaryCost;
-//	private Double betaWalkTravelMonetrayCostPower2;
-//	private Double betaWalkLnTravelMonetrayCost;
-//	
-//	private Double betaPtTravelTime;
-//	private Double betaPtTravelTimePower2;
-//	private Double betaPtLnTravelTime;
-//	private Double betaPtTravelDistance;
-//	private Double betaPtTravelDistancePower2;
-//	private Double betaPtLnTravelDistance;
-//	private Double betaPtTravelMonetrayCost;
-//	private Double betaPtTravelMonetrayCostPower2;
-//	private Double betaPtLnTravelMonetrayCost;
 
 	public static final String TIME_OF_DAY = "timeOfDay";
 	private Double timeOfDay = 8.*3600 ;
