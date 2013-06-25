@@ -202,7 +202,6 @@ public class TestTorontoRouterNetwork {
 		return s;
 	}
 	
-	@Test
 	public void testTorontoSchedule() throws NetworkFormattingException{
 		String networkFileName = "D:/MATSim/Schedule Data/Files from TAC Paper 2013/Second Full Draft - June 25_2013/2012NetworkWtihTransitFixedAndTypes.xml";
 		String scheduleFileName = "D:/MATSim/Schedule Data/Files from TAC Paper 2013/Second Full Draft - June 25_2013/scheduletrialWithLowDeparturesMergedJune24.xml";
