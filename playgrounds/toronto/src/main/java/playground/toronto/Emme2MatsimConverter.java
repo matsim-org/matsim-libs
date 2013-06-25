@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkFactoryImpl;
 import org.matsim.core.network.LinkImpl;
+import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
@@ -421,6 +422,8 @@ public class Emme2MatsimConverter {
 		network = NetworkImpl.createNetwork();
 		//capperiod="1:00:00"
 		network.setCapacityPeriod(60 * 60); //1 hour, in sec
+		NetworkFactoryImpl factory = network.getFactory();
+		
 		
 		log.info("Reading file \"" + f + "\"...");
 		
@@ -445,11 +448,12 @@ public class Emme2MatsimConverter {
 			
 			if(isReadingNodes){
 				String[] cells = line.split("\\s+");
-				if (cells.length != 8){
-					if (!line.trim().isEmpty()) System.err.println("WARN: Skipped line \"" + line + "\", invalid number of arguments.");
+				/*if (cells.length != 7){
+					if (!line.trim().isEmpty()) log.warn("Skipped line \"" + line + "\", invalid number of arguments.");
+
 					
 					continue;
-				}
+				}*/
 				boolean isZone = cells[0].contains("*");
 				
 				NodeImpl n = new NodeImpl(new IdImpl(cells[1]));
@@ -478,27 +482,37 @@ public class Emme2MatsimConverter {
 				double speed = Double.parseDouble(cells[9]) / 3.6; //converts km/hr to m/s
 				double lanes = Double.parseDouble(cells[6]);
 				double cap = Double.parseDouble(cells[10]) * lanes;
+				String modes = cells[4];
 				if (lanes == 0.0) lanes = 1.0; //ensures that transit-only links have at least one lane.
 				
-				LinkFactoryImpl factory = new LinkFactoryImpl();
-				
-				LinkImpl l = (LinkImpl) factory.createLink(new IdImpl(cells[1] + ">" + cells[2]), 
+				LinkImpl l = (LinkImpl) factory.createLink(new IdImpl(cells[1] + "-" + cells[2]), 
 						i, j, network, length, speed, cap, lanes);
-				Link L = (LinkImpl) factory.createLink(new IdImpl(cells[1] + ">" + cells[2]), 
-						i, j, network, length, speed, cap, lanes);
-				
-				L.setAllowedModes(convertMode(cells[4]));
-				((LinkImpl) L).setType(createType(cells));
-				
-				
-				l.setAllowedModes(convertMode(cells[4]));
+								
+				l.setAllowedModes(convertMode(modes));
 				l.setType(createType(cells));
 
 				network.addLink(l);
 				
+				//Special handling of "l" and "q" modes (LRT/BRT ROW-B)
+				if (modes.contains("l") || modes.contains("q")){
+					l = (LinkImpl) factory.createLink(new IdImpl(cells[1] + "-" + cells[2] + "_TrROW"),
+							i, j, network, length, speed, 9999, 1.0); //Duplicate link for the ROW
+					
+					HashSet<String> modeSet = new HashSet<String>();
+					if (modes.contains("l")) modeSet.add("Streetcar");
+					if (modes.contains("q")) modeSet.add("Bus");
+					l.setAllowedModes(modeSet);
+					
+					l.setType("TransitROW");
+					
+					network.addLink(l);
+				}
+				
 			}
 			
 		}
+		
+		emmeReader.close();
 		
 		log.info("Network contains " + network.getNodes().size() + " nodes and " + network.getLinks().size() + " links.");
 	}
@@ -836,25 +850,18 @@ public class Emme2MatsimConverter {
 			switch (c[i]) {
 			case 'c' : a.add("Car"); break;
 			case 'w' : a.add("Walk"); break;
-			case 't' : a.add("Transfer"); break;
 			case 'h' : a.add("Car"); break;
 			case 'b' : a.add("Bus"); break;
 			case 'm' : a.add("Subway"); break;
 			case 'r' : a.add("Train"); break;
 			case 'g' : a.add("Bus"); break;
 			case 's' : a.add("Streetcar"); break;
-			case 'l' : a.add("LRT"); break;
-			case 'i' : a.add("Car"); break;
 			case 'f' : a.add("Truck"); break;
 			case 'e' : a.add("Truck"); break;
 			case 'd' : a.add("Truck"); break;
-			case 'j' : a.add("Car"); break;
-			case 'a' : a.add("Transfer"); break;
 			case 'p' : a.add("Bus"); break;
-			case 'q' : a.add("Bus"); break;
 			case 'u' : a.add("Transfer"); break;
-			case 'v' : a.add("Transfer"); break;
-			case 'y' : a.add("Walk"); break;
+			default : break;
 			}
 		}
 		
@@ -887,7 +894,7 @@ public class Emme2MatsimConverter {
 		if(cells[7].equals("13") || cells[7].equals("15")) return TorontoLinkTypes.ramp;
 		
 		//Exclusive streetcar ROW
-		if (cells[4].equals("sl") || cells[4].equals("s" )| cells[4].equals("l")) return TorontoLinkTypes.streetcarROW;
+		//if (cells[4].equals("sl") || cells[4].equals("s" )| cells[4].equals("l")) return TorontoLinkTypes.streetcarROW;
 		
 		//Transfer to transit (only contains walk/transfer modes)
 		if ((cells[4].contains("t") || cells[4].contains("u") || cells[4].contains("v") || cells[4].contains("w") || cells[4].contains("a") || cells[4].contains("y")) 

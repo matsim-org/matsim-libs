@@ -49,7 +49,7 @@ public class CreateGTFSFrequencies {
 	private static HashMap<IdImpl, String> routeIdNameMap;
 	private static HashSet<IdImpl> tripGroupsWithOneTrip;
 	
-	private static void loadFiles(String folder, int service) throws FileNotFoundException, IOException{
+	private static void loadFiles(String folder, String service) throws FileNotFoundException, IOException{
 		
 		routeIdNameMap = new HashMap<IdImpl, String>();
 		trips = new HashMap<IdImpl, CreateGTFSFrequencies.Trip>();
@@ -69,8 +69,8 @@ public class CreateGTFSFrequencies {
 		tr.open();
 		tr.ignoreTrailingBlanks(true);
 		while (tr.next()){
-			int svc = Integer.parseInt(tr.current().get("service_id"));
-			if (svc != service) continue;
+			String svc = tr.current().get("service_id");
+			if (!service.equals(svc)) continue;
 			
 			Trip T = new Trip(new IdImpl(tr.current().get("trip_id")));
 			T.dir = tr.current().get("direction_id");
@@ -296,7 +296,7 @@ public class CreateGTFSFrequencies {
 	public static void main(String[] args){
 
 		String folder = args[0];
-		int serviceId = Integer.parseInt(args[1]);
+		String serviceId = args[1];
 		
 		//Don't want to overwrite an existing frequencies file.
 		if (new File(folder + "/frequencies.txt").exists()) {
