@@ -65,6 +65,7 @@ public class ConcaveHull {
 	private GeometryFactory geomFactory;
 	private GeometryCollection filteredPoints;
 	private double threshold;
+	private boolean printIterations = false;
 	
 	private HashMap<LineSegment, Integer> segments = new HashMap<LineSegment, Integer>();
 	private HashMap<Integer, Edge> edges = new HashMap<Integer, Edge>();
@@ -77,10 +78,15 @@ public class ConcaveHull {
 	private Map<Integer, Node> vertices = new HashMap<Integer, Node>();
 
 
-	
+	/* Constructor */
 	public ConcaveHull(GeometryCollection points, double threshold) {
+		this(points, threshold, false);
+	}
+	
+	
+	public ConcaveHull(GeometryCollection points, double threshold, boolean printIterations){
 		this.geomFactory = points.getFactory();
-
+		
 		/* Ensure a unique set of input points. */
 		UniqueCoordinateArrayFilter filter = new UniqueCoordinateArrayFilter();
 		points.apply(filter);
@@ -93,8 +99,45 @@ public class ConcaveHull {
 		}
 		this.filteredPoints = new GeometryCollection(ga, geomFactory);
 		
-		this.threshold = threshold;
+		this.threshold = threshold;		
+		this.printIterations = printIterations;
+		
+		/* Print the header for the iterations' output. */
+		if(this.printIterations){
+			/* File printing triangles. */
+			String filename = String.format("output/concaveHull/Threshold_%.0f_triangles.csv", this.threshold);
+			BufferedWriter bw = IOUtils.getBufferedWriter(filename);
+			try{
+				bw.write("iteration,firstX,firstY,secondX,secondY");
+				bw.newLine();
+			} catch (IOException e) {
+				throw new RuntimeException("Could not write to BufferedWriter " + filename);
+			} finally{
+				try {
+					bw.close();
+				} catch (IOException e) {
+					throw new RuntimeException("Could not close BufferedWriter " + filename);
+				}
+			}
+
+			/* File printing border. */
+			filename = String.format("output/concaveHull/Threshold_%.0f_border.csv", this.threshold);
+			bw = IOUtils.getBufferedWriter(filename);
+			try{
+				bw.write("iteration,firstX,firstY,secondX,secondY");
+				bw.newLine();
+			} catch (IOException e) {
+				throw new RuntimeException("Could not write to BufferedWriter " + filename);
+			} finally{
+				try {
+					bw.close();
+				} catch (IOException e) {
+					throw new RuntimeException("Could not close BufferedWriter " + filename);
+				}
+			}
+		}
 	}
+	
 	
 	
 	/**
@@ -109,17 +152,23 @@ public class ConcaveHull {
 	 * 0 points, an empty {@link GeometryCollection}.
 	 */
 	public Geometry getConcaveHull() {
-
+		
+		/* Empty geometry. */
 		if (this.filteredPoints.getNumGeometries() == 0) {
 			return this.geomFactory.createGeometryCollection(null);
 		}
+		
+		/* Point. */
 		if (this.filteredPoints.getNumGeometries() == 1) {
 			return this.filteredPoints.getGeometryN(0);
 		}
+		
+		/* Line. */
 		if (this.filteredPoints.getNumGeometries() == 2) {
 			return this.geomFactory.createLineString(this.filteredPoints.getCoordinates());
 		}
 
+		/* Polygon: the concave hull. */
 		return concaveHull();
 	}
 	
@@ -176,8 +225,7 @@ public class ConcaveHull {
 		 * of the Delaunay Triangulation process. */
 		for (QuadEdge q : qeFrame) {
 			qes.delete(q);
-			//FIXME We add the removal from quadEdges AND QuadEdgeSubdivision
-//			quadEdges.remove(q);
+			quadEdges.remove(q);
 		}
 		
 		/* Sort the boundary list on edge length in descending order. */
@@ -240,7 +288,7 @@ public class ConcaveHull {
 			Edge edgeB = this.edges.get(this.segments.get(lsB));
 			Edge edgeC = this.edges.get(this.segments.get(lsC));
 
-			Triangle triangle = new Triangle(triangleId, qet.isBorder() ? true : false);
+			Triangle triangle = new Triangle(triangleId);
 			triangle.addEdge(edgeA);
 			triangle.addEdge(edgeB);
 			triangle.addEdge(edgeC);
@@ -264,97 +312,98 @@ public class ConcaveHull {
 			}
 		}
 		
+		/* Write the first iteration's output. */
+		int iteration = 0;
+		if(this.printIterations){
+			writeOutput(iteration++);
+		}
+
 		/* Iteratively remove boundary edges, add the new resulting boundary 
 		 * edges, and sort on edge length until no more boundary edges can be
 		 * removed. */
-		int index = 0;
-		while(index != -1){
-			index = -1;
-			
+		while(!this.consideredEdges.isEmpty()){
+
 			/* Identify the longest edge. */
-			Edge e = null;
-			if(!this.consideredEdges.isEmpty()){
-				e = this.consideredEdges.firstEntry().getValue();
-				index = e.getId();
-			}
-			
-			if(e != null){
-				Triangle triangle = e.getTriangles().get(0);
-				List<Triangle> neighbours = triangle.getNeighbours();
-				
-				/* First test for irregular triangle. If a border edge belongs
-				 * to a triangle that only has ONE neighbour, removing that
-				 * border edge will result in an irregular triangle. 
-				 * TODO Check if this test is really necessary... it seems that
-				 * the second test will cover both possibilities for irregular
-				 * triangles. */
-				if(neighbours.size() == 1){
+			Edge e = this.consideredEdges.firstEntry().getValue();
+
+			Triangle triangle = e.getTriangles().get(0);
+			List<Triangle> neighbours = triangle.getNeighbours();
+
+			/* First test for irregular triangle. If a border edge belongs
+			 * to a triangle that only has ONE neighbour, removing that
+			 * border edge will result in an irregular triangle. 
+			 * TODO Check if this test is really necessary... it seems that
+			 * the second test will cover both possibilities for irregular
+			 * triangles. */
+			if(neighbours.size() == 1){
+				/* It is irregular. Even though it's long enough to be
+				 * considered for removal, it will be flagged and ignored */
+				this.consideredEdges.remove(e.getId());
+				this.ignoredEdges.put(e.getId(), e);
+			} else{
+				Edge e0 = triangle.getEdges().get(0);
+				Edge e1 = triangle.getEdges().get(1);
+
+				/* Second test for irregular triangle. If a triangle has
+				 * ALL THREE nodes on the boundary, none of its edges can
+				 * be removed while remaining regular. */
+				if(e0.getOriginNode().isBorder() &&
+						e0.getDestinationNode().isBorder() &&
+						e1.getOriginNode().isBorder() &&
+						e1.getDestinationNode().isBorder()){
+
 					/* It is irregular. Even though it's long enough to be
 					 * considered for removal, it will be flagged and ignored */
 					this.consideredEdges.remove(e.getId());
 					this.ignoredEdges.put(e.getId(), e);
 				} else{
-					Edge e0 = triangle.getEdges().get(0);
-					Edge e1 = triangle.getEdges().get(1);
-					
-					/* Second test for irregular triangle. If a triangle has
-					 * ALL THREE nodes on the boundary, none of its edges can
-					 * be removed while remaining regular. */
-					if(e0.getOriginNode().isBorder() &&
-					   e0.getDestinationNode().isBorder() &&
-					   e1.getOriginNode().isBorder() &&
-					   e1.getDestinationNode().isBorder()){
-						
-						/* It is irregular. Even though it's long enough to be
-						 * considered for removal, it will be flagged and ignored */
-						this.consideredEdges.remove(e.getId());
-						this.ignoredEdges.put(e.getId(), e);
-					} else{
-						/* It seems it is fine to remove this edge. */
-						
-						/* Border triangles seems to always have only two
-						 * neighbours. */
-						Triangle tA = neighbours.get(0);
-						Triangle tB = neighbours.get(1);
-						tA.setBorder(true); // FIXME not necessarily useful. Consider removing all triangle-related border attributes.
-						tB.setBorder(true); // FIXME not necessarily useful. See above
-						this.triangles.remove(triangle.getId());
-						tA.removeNeighbour(triangle);
-						tB.removeNeighbour(triangle);
-						
-						/* Get the other two edges associated with the triangle, 
-						 * as they will become the new border edges. */
-						List<Edge> triangleEdges = triangle.getEdges();
-						triangleEdges.remove(e);
-						
-						/* Remove the current edge. */
-						this.edges.remove(e.getId());
-						this.consideredEdges.remove(e.getId());
-						
-						/* Add the two new border edges, considering their 
-						 * length as well. */
-						Edge eA = triangleEdges.get(0);
-						eA.setBorder(true);
-						if(eA.getGeometry().getLength() > this.threshold){
-							this.consideredEdges.put(eA.getId(), eA);
-						} else{
-							this.ignoredEdges.put(eA.getId(), eA);
-						}
-						eA.removeTriangle(triangle);
+					/* It seems it is fine to remove this edge. */
 
-						Edge eB = triangleEdges.get(1);
-						eB.setBorder(true);
-						if(eB.getGeometry().getLength() > this.threshold){
-							this.consideredEdges.put(eB.getId(), eB);
-						} else{
-							this.ignoredEdges.put(eB.getId(), eB);
-						}
-						eB.removeTriangle(triangle);
+					/* Border triangles seems to always have only two
+					 * neighbours. */
+					Triangle tA = neighbours.get(0);
+					Triangle tB = neighbours.get(1);
+					this.triangles.remove(triangle.getId());
+					tA.removeNeighbour(triangle);
+					tB.removeNeighbour(triangle);
+
+					/* Get the other two edges associated with the triangle, 
+					 * as they will become the new border edges. */
+					List<Edge> triangleEdges = triangle.getEdges();
+					triangleEdges.remove(e);
+
+					/* Remove the current edge. */
+					this.edges.remove(e.getId());
+					this.consideredEdges.remove(e.getId());
+
+					/* Add the two new border edges, considering their 
+					 * length as well. */
+					Edge eA = triangleEdges.get(0);
+					eA.setBorder(true);
+					if(eA.getGeometry().getLength() > this.threshold){
+						this.consideredEdges.put(eA.getId(), eA);
+					} else{
+						this.ignoredEdges.put(eA.getId(), eA);
+					}
+					eA.removeTriangle(triangle);
+
+					Edge eB = triangleEdges.get(1);
+					eB.setBorder(true);
+					if(eB.getGeometry().getLength() > this.threshold){
+						this.consideredEdges.put(eB.getId(), eB);
+					} else{
+						this.ignoredEdges.put(eB.getId(), eB);
+					}
+					eB.removeTriangle(triangle);
+
+					/* Write the iteration's output. */
+					if(this.printIterations){
+						writeOutput(iteration++);
 					}
 				}
 			}
 		}
-		
+
 		/* Assemble the final concave Hull. Start by adding all the border
 		 * edges. */
 		List<LineString> borderEdges = new ArrayList<LineString>();
@@ -364,7 +413,7 @@ public class ConcaveHull {
 		for(Edge e : this.ignoredEdges.values()){
 			borderEdges.add( e.getGeometry().toGeometry(this.geomFactory) );
 		}
-		
+
 		/* Merge the line strings. */
 		LineMerger lineMerger = new LineMerger();
 		lineMerger.add(borderEdges);
@@ -424,48 +473,64 @@ public class ConcaveHull {
 		return coordinateList;
 	}
 
-	
-	public static void toCsvFile(String outputFolder, Geometry concaveHull, double thresholdParameter) {  
-		
-		Coordinate[] boundaryArray = concaveHull.getCoordinates();
-		List<Tuple<Coordinate, Coordinate>> boundaryList = 
-				new ArrayList<Tuple<Coordinate, Coordinate>>();
-		for (int i = 0; i < boundaryArray.length-1; i++) {
-			Coordinate coordinateA = boundaryArray[i];
-			Coordinate coordinateB = boundaryArray[i+1];
-			Tuple<Coordinate, Coordinate> edgeTuple = 
-					new Tuple<Coordinate, Coordinate>(coordinateA, coordinateB);
-			boundaryList.add(edgeTuple);
-		} 
-		
-		try {
-			BufferedWriter output = new BufferedWriter(
-					new FileWriter(new File(
-							String.format("%sThreshold_%.0f.csv", outputFolder, thresholdParameter))));
-			try {
-				output.write("firstX, firstY, secondX, secondY");
-				output.newLine();
-				
-					for (Tuple<Coordinate, Coordinate> edge : boundaryList) {
-						String firstX = Double.toString(edge.getFirst().x);
-						String firstY = Double.toString(edge.getFirst().y);
-						String secondX = Double.toString(edge.getSecond().x);
-						String secondY = Double.toString(edge.getSecond().y);
-						output.write(firstX);
-						output.write(",");
-						output.write(firstY);
-						output.write(",");
-						output.write(secondX);
-						output.write(",");
-						output.write(secondY);
-						output.newLine();
-					}
-			} finally {
-				output.close();
+
+	/**
+	 * Write out all the edges to one of two files:
+	 * <ul>
+	 *   <li> all border edges are written to one file;
+	 *   <li> all edges that remain in the triangulation are written to another
+	 *        file.
+	 * </ul>
+	 * @param iteration
+	 */
+	private void writeOutput(int iteration){
+		/* Write the Delaunay triangles. */
+		String filename = String.format("output/concaveHull/Threshold_%.0f_triangles.csv", this.threshold);
+		BufferedWriter bw = IOUtils.getAppendingBufferedWriter(filename);
+		try{
+			for(Edge e : this.edges.values()){
+				bw.write(String.format("%d,", iteration));
+				bw.write(String.format("%.2f,", e.getOriginNode().getCoordinate().x));
+				bw.write(String.format("%.2f,", e.getOriginNode().getCoordinate().y));
+				bw.write(String.format("%.2f,", e.getDestinationNode().getCoordinate().x));
+				bw.write(String.format("%.2f\n", e.getDestinationNode().getCoordinate().y));
 			}
-			
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new RuntimeException("Could not write to BufferedWriter " + filename);
+		} finally{
+			try {
+				bw.close();
+			} catch (IOException e) {
+				throw new RuntimeException("Could not close BufferedWriter " + filename);
+			}
+		}
+
+		/* Write the Border triangles. */
+		filename = String.format("output/concaveHull/Threshold_%.0f_border.csv", this.threshold);
+		bw = IOUtils.getAppendingBufferedWriter(filename);
+		try{
+			for(Edge e : this.consideredEdges.values()){
+				bw.write(String.format("%d,", iteration));
+				bw.write(String.format("%.2f,", e.getOriginNode().getCoordinate().x));
+				bw.write(String.format("%.2f,", e.getOriginNode().getCoordinate().y));
+				bw.write(String.format("%.2f,", e.getDestinationNode().getCoordinate().x));
+				bw.write(String.format("%.2f\n", e.getDestinationNode().getCoordinate().y));
+			}
+			for(Edge e : this.ignoredEdges.values()){
+				bw.write(String.format("%d,", iteration));
+				bw.write(String.format("%.2f,", e.getOriginNode().getCoordinate().x));
+				bw.write(String.format("%.2f,", e.getOriginNode().getCoordinate().y));
+				bw.write(String.format("%.2f,", e.getDestinationNode().getCoordinate().x));
+				bw.write(String.format("%.2f\n", e.getDestinationNode().getCoordinate().y));
+			}
+		} catch (IOException e) {
+			throw new RuntimeException("Could not write to BufferedWriter " + filename);
+		} finally{
+			try {
+				bw.close();
+			} catch (IOException e) {
+				throw new RuntimeException("Could not close BufferedWriter " + filename);
+			}
 		}
 	}
 	
@@ -482,11 +547,9 @@ public class ConcaveHull {
 		}
 		GeometryCollection gc = new GeometryCollection(points, gf);
 		
-		ConcaveHull ch = new ConcaveHull(gc, Double.parseDouble(args[2]));
+		ConcaveHull ch = new ConcaveHull(gc, Double.parseDouble(args[2]), true);
 		Geometry g = ch.getConcaveHull();
 
-		ConcaveHull.toCsvFile(args[1], g, Double.parseDouble(args[2]));
-		
 		Header.printFooter();
 	}
 	

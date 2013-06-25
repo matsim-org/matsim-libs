@@ -26,11 +26,6 @@ public class Triangle {
 	/** ID of the triangle */
 	private int id;
 
-	/** Indicator to know if the triangle is a border triangle
-	 * of the triangulation framework */
-	private boolean border;
-	/*TODO Check if this is necessary at all. */
-
 	/** Edges which compose the triangle */
 	private List<Edge> edges = new ArrayList<Edge>();
 	
@@ -56,19 +51,6 @@ public class Triangle {
 		this.id = id;
 	}
 
-	/**
-	 * Constructor.
-	 * 
-	 * @param id
-	 * 		ID of the triangle
-	 * @param border
-	 * 		defines if the triangle is a border triangle
-	 * 		or not in the triangulation framework
-	 */
-	public Triangle(int id, boolean border) {
-		this.id = id;
-		this.border = border;
-	}
 
 	/**
 	 * Returns the ID of the triangle.
@@ -89,30 +71,6 @@ public class Triangle {
 	public void setId(int id) {
 		this.id = id;
 	}
-
-	/**
-	 * Returns true if the triangle is a border triangle
-	 * of the triangulation framework, false otherwise.
-	 * 
-	 * @return
-	 * 		true if the triangle is a border triangle,
-	 * 		false otherwise
-	 */
-	public boolean isBorder() {
-		return this.border;
-	}
-
-	/**
-	 * Defines the indicator to know if the triangle
-	 * is a border triangle of the triangulation framework.
-	 * 
-	 * @param border
-	 * 		true if the triangle is a border triangle,
-	 * 		false otherwise
-	 */
-	public void setBorder(boolean border) {
-		this.border = border;
-	}	
 
 	/**
 	 * Returns the edges which compose the triangle.
