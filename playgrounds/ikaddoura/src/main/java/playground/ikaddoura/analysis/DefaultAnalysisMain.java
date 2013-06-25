@@ -28,10 +28,9 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
-
-import playground.ikaddoura.optimization.externalDelayEffects.InVehicleDelayHandler;
-import playground.ikaddoura.optimization.externalDelayEffects.WaitingDelayHandler;
-import playground.ikaddoura.optimization.handler.MarginalCostPricingPtHandler;
+import playground.ikaddoura.internalizationPt.InVehicleDelayHandler;
+import playground.ikaddoura.internalizationPt.MarginalCostPricingPtHandler;
+import playground.ikaddoura.internalizationPt.WaitingDelayHandler;
 import playground.ikaddoura.optimization.handler.MoneyDetailEventHandler;
 import playground.ikaddoura.optimization.handler.MoneyEventHandler;
 import playground.ikaddoura.optimization.io.TextFileWriter;
