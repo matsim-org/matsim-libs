@@ -20,7 +20,7 @@
 /**
  * 
  */
-package playground.kai.usecases.mobsim;
+package playground.kai.usecases.ownmobsim;
 
 import java.util.Comparator;
 import java.util.LinkedList;

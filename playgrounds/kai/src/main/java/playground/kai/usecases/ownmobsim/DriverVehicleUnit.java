@@ -1,6 +1,5 @@
 /* *********************************************************************** *
- * project: kai
- * KaiControler.java
+ * project: org.matsim.*
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,40 +17,40 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.kai.usecases.mobsim;
+package playground.kai.usecases.ownmobsim;
 
-import java.util.Random;
+import org.junit.Assert;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.core.mobsim.qsim.qnetsimengine.KaiHybridEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.KaiHybridNetworkFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
+public class DriverVehicleUnit {
 
-public class Main {
+	private Person originalPerson;
+	private Id currentLinkId;
+	private int idx=0 ;
 
-	public static void main(String[] args) {
-		
-		Controler controler = new Controler( "examples/config/hybrid-config.xml" ) ;
-		controler.setOverwriteFiles(true) ;
-
-		final MobsimFactory mobsimFactory = new MobsimFactory() {
-			@Override
-			public Mobsim createMobsim(Scenario sc, EventsManager events) {
-				return new MyMobsim(sc,events) ;
-			}
-			
-		} ;
-		controler.setMobsimFactory(mobsimFactory) ;
-
-		controler.run();
+	DriverVehicleUnit(Person person) {
+		this.originalPerson = person ;
+		Plan plan = person.getSelectedPlan() ;
+		Activity act = (Activity) plan.getPlanElements().get(this.idx) ;
+		this.currentLinkId = act.getLinkId() ;
+		Assert.assertNotNull(this.currentLinkId) ;
+	}
 	
+	Id getCurrentLinkId() {
+		return this.currentLinkId ;
+	}
+	
+	double getCurrentActivityEndTime() {
+		Activity act = (Activity) originalPerson.getSelectedPlan().getPlanElements().get(this.idx) ;
+		return act.getEndTime() ;
 	}
 
+	 Id getNextLinkId() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	
 }

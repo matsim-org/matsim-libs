@@ -1,5 +1,6 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+ * project: kai
+ * KaiControler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,48 +18,40 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.kai.usecases.mobsim;
+package playground.kai.usecases.ownmobsim;
 
-import java.util.PriorityQueue;
-import java.util.Queue;
+import java.util.Random;
 
-import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.mobsim.framework.Mobsim;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
+import org.matsim.core.mobsim.qsim.qnetsimengine.KaiHybridEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.KaiHybridNetworkFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 
-class MobsimLink {
+public class Main {
+
+	public static void main(String[] args) {
+		
+		Controler controler = new Controler( "examples/config/hybrid-config.xml" ) ;
+		controler.setOverwriteFiles(true) ;
+
+		final MobsimFactory mobsimFactory = new MobsimFactory() {
+			@Override
+			public Mobsim createMobsim(Scenario sc, EventsManager events) {
+				return new MyMobsim(sc,events) ;
+			}
+			
+		} ;
+		controler.setMobsimFactory(mobsimFactory) ;
+
+		controler.run();
 	
-	Queue<DriverVehicleUnit> driveway = new PriorityQueue<DriverVehicleUnit>() ;
-	
-	MobsimLink(Link link) {
-		// TODO Auto-generated constructor stub
-	}
-
-	public void addToParking(DriverVehicleUnit mp) {
-		
-	}
-
-	public void doSimStep() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public DriverVehicleUnit peek() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public boolean hasSpace() {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	public void remove() {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public void addFromIntersection(DriverVehicleUnit vehicle) {
-		// TODO Auto-generated method stub
-		
 	}
 
 }
