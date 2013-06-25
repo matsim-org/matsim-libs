@@ -24,10 +24,7 @@
 
 package playground.ikaddoura;
 
-import org.matsim.core.api.experimental.events.EventsManager;
-
 import org.matsim.core.controler.events.StartupEvent;
-
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioImpl;
 
@@ -47,7 +44,7 @@ public class IKControlerListener implements StartupListener {
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		
-		EventsManager eventsManager = event.getControler().getEvents();
+//		EventsManager eventsManager = event.getControler().getEvents();
 //		event.getControler().getEvents().addHandler(new MarginalCongestionHandlerV1(eventsManager, scenario));		
 	}
 
