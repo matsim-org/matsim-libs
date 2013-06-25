@@ -20,7 +20,7 @@
 /**
  * 
  */
-package playground.ikaddoura.internalizationCar;
+package playground.ikaddoura.internalizationCar.old;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -47,6 +47,8 @@ import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
+
+import playground.ikaddoura.internalizationCar.MarginalCongestionEvent;
 
 /**
  * This handler calculates car delays (due to flow and storage capacity), identifies the causing agent(s) and throws marginal congestion events.
@@ -81,7 +83,7 @@ public class MarginalCongestionHandlerV1 implements
 	private final EventsManager events;
 	private final List<Id> ptVehicleIDs = new ArrayList<Id>();
 	private final List<Id> ptDriverIDs = new ArrayList<Id>();
-	private final Map<Id, LinkCongestionInfo> linkId2congestionInfo = new HashMap<Id, LinkCongestionInfo>();
+	private final Map<Id, LinkCongestionInfoV1> linkId2congestionInfo = new HashMap<Id, LinkCongestionInfoV1>();
 	
 	public MarginalCongestionHandlerV1(EventsManager events, ScenarioImpl scenario) {
 		this.events = events;
@@ -140,7 +142,7 @@ public class MarginalCongestionHandlerV1 implements
 				collectLinkInfos(event.getLinkId());
 			}
 						
-			LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
+			LinkCongestionInfoV1 linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 			linkInfo.getPersonId2freeSpeedLeaveTime().put(event.getPersonId(), event.getTime() + 1);
 			updateLinkInfo_agentEntersLink(event.getTime(), event.getPersonId(), event.getLinkId());
 			
@@ -162,7 +164,7 @@ public class MarginalCongestionHandlerV1 implements
 				collectLinkInfos(event.getLinkId());
 			}
 						
-			LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
+			LinkCongestionInfoV1 linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 			linkInfo.getPersonId2freeSpeedLeaveTime().put(event.getPersonId(), event.getTime() + linkInfo.getFreeTravelTime() + 1.0);
 			updateLinkInfo_agentEntersLink(event.getTime(), event.getPersonId(), event.getLinkId());
 		}	
@@ -200,7 +202,7 @@ public class MarginalCongestionHandlerV1 implements
 			updateTrackingMarginalDelays2(event);
 			trackMarginalDelay(event);
 			
-			LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
+			LinkCongestionInfoV1 linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 			linkInfo.getPersonId2freeSpeedLeaveTime().remove(event.getPersonId());
 		}
 	}
@@ -208,7 +210,7 @@ public class MarginalCongestionHandlerV1 implements
 	// ################################################################################################################################################################################
 
 	private void updateTrackingMarginalDelays2(LinkLeaveEvent event) {
-		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
+		LinkCongestionInfoV1 linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 		
 		if (linkInfo.getLeavingAgents().size() == 0) {
 			// no agent is being tracked for that link
@@ -229,7 +231,7 @@ public class MarginalCongestionHandlerV1 implements
 	}
 
 	private void calculateCongestion(LinkLeaveEvent event) {
-		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
+		LinkCongestionInfoV1 linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 		
 		double totalDelay = event.getTime() - linkInfo.getPersonId2freeSpeedLeaveTime().get(event.getPersonId());
 		
@@ -275,7 +277,7 @@ public class MarginalCongestionHandlerV1 implements
 	}
 	
 	private double throwFlowCongestionEventsAndReturnStorageDelay(double totalDelay, LinkLeaveEvent event) {
-		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
+		LinkCongestionInfoV1 linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 
 		// Search for agents causing the delay on that link and throw delayEffects for the causing agents.
 		List<Id> reverseList = new ArrayList<Id>();
@@ -336,7 +338,7 @@ public class MarginalCongestionHandlerV1 implements
 		double lastLinkEnterTime = Double.NEGATIVE_INFINITY;
 
 		for (Id linkId : downstreamLinks){
-			LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(linkId);
+			LinkCongestionInfoV1 linkInfo = this.linkId2congestionInfo.get(linkId);
 			
 			int agentsOnNextLink = 0;
 			for (LinkEnterLeaveInfo info : linkInfo.getPersonEnterLeaveInfos()) {
@@ -392,7 +394,7 @@ public class MarginalCongestionHandlerV1 implements
 	}
 	
 	private void updateTrackingMarginalDelays1(LinkLeaveEvent event) {
-		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
+		LinkCongestionInfoV1 linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 		
 		if (linkInfo.getLeavingAgents().size() == 0) {
 			// no agent is being tracked for that link
@@ -418,7 +420,7 @@ public class MarginalCongestionHandlerV1 implements
 	}
 	
 	private void trackMarginalDelay(LinkLeaveEvent event) {
-		LinkCongestionInfo linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
+		LinkCongestionInfoV1 linkInfo = this.linkId2congestionInfo.get(event.getLinkId());
 		
 		// start tracking delays caused by that agent leaving the link	
 		if (linkInfo.getLeavingAgents().contains(event.getPersonId())){
@@ -432,7 +434,7 @@ public class MarginalCongestionHandlerV1 implements
 	}
 
 	private void collectLinkInfos(Id linkId) {
-		LinkCongestionInfo linkInfo = new LinkCongestionInfo();	
+		LinkCongestionInfoV1 linkInfo = new LinkCongestionInfoV1();	
 
 		NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
 		Link link = network.getLinks().get(linkId);

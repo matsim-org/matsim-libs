@@ -20,7 +20,7 @@
 /**
  * 
  */
-package playground.ikaddoura.internalizationCar;
+package playground.ikaddoura.internalizationCar.old;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,6 +29,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 
+import playground.ikaddoura.internalizationCar.old.LinkEnterLeaveInfo;
 
 /**
  * Collects all link specific informations which are required for the calculation of external congestion effects.
@@ -36,7 +37,7 @@ import org.matsim.api.core.v01.Id;
  * @author ikaddoura
  *
  */
-public class LinkCongestionInfo {
+public class LinkCongestionInfoV1 {
 	
 	private Id linkId;
 	private double freeTravelTime;
@@ -44,6 +45,7 @@ public class LinkCongestionInfo {
 	private int storageCapacity_cars;
 	private Map<Id, Double> personId2linkLeaveTime = new HashMap<Id, Double>();
 	private List<Id> leavingAgents = new ArrayList<Id>();
+	private List<LinkEnterLeaveInfo> personEnterLeaveInfos = new ArrayList<LinkEnterLeaveInfo>();
 	private Map<Id, Double> personId2freeSpeedLeaveTime = new HashMap<Id, Double>();
 	private Id lastLeavingAgent;
 	
@@ -84,6 +86,12 @@ public class LinkCongestionInfo {
 	public void setPersonId2freeSpeedLeaveTime(
 			Map<Id, Double> personId2freeSpeedLeaveTime) {
 		this.personId2freeSpeedLeaveTime = personId2freeSpeedLeaveTime;
+	}
+	public List<LinkEnterLeaveInfo> getPersonEnterLeaveInfos() {
+		return personEnterLeaveInfos;
+	}
+	public void setPersonEnterLeaveInfos(List<LinkEnterLeaveInfo> personEnterLeaveInfos) {
+		this.personEnterLeaveInfos = personEnterLeaveInfos;
 	}
 	public Id getLastLeavingAgent() {
 		return lastLeavingAgent;
