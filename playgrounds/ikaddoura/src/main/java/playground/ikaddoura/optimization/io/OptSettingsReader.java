@@ -115,6 +115,9 @@ public class OptSettingsReader {
 	                	} else if (parts[0].equals("marginalCostPricingPt")){
 	                		this.optSettings.setMarginalCostPricingPt(Boolean.parseBoolean(parts[1]));
 	                	
+	                	} else if (parts[0].equals("calculate_carCongestionEffects")){
+	                		this.optSettings.setCalculate_carCongestionEffects(Boolean.parseBoolean(parts[1]));
+	                		
 	                	} else if (parts[0].equals("marginalCostPricingCar")){
 	                		this.optSettings.setMarginalCostPricingCar(Boolean.parseBoolean(parts[1]));
 	                	

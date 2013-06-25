@@ -48,6 +48,7 @@ public class OptSettings {
 	private boolean calculate_inVehicleTimeDelayEffects = false;
 	private boolean calculate_waitingTimeDelayEffects = false;
 	private boolean marginalCostPricingPt = false;
+	private boolean calculate_carCongestionEffects = false;
 	private boolean marginalCostPricingCar = false;
 
 	public double getIncrHeadway() {
@@ -169,6 +170,13 @@ public class OptSettings {
 	}
 	public void setMarginalCostPricingCar(boolean marginalCostPricingCar) {
 		this.marginalCostPricingCar = marginalCostPricingCar;
+	}
+	public boolean isCalculate_carCongestionEffects() {
+		return calculate_carCongestionEffects;
+	}
+	public void setCalculate_carCongestionEffects(
+			boolean calculate_carCongestionEffects) {
+		this.calculate_carCongestionEffects = calculate_carCongestionEffects;
 	}
 	
 }

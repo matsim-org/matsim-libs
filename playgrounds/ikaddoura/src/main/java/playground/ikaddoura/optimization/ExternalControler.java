@@ -78,6 +78,7 @@ class ExternalControler {
 	static boolean calculate_inVehicleTimeDelayEffects;
 	static boolean calculate_waitingTimeDelayEffects;
 	static boolean marginalCostPricingPt;
+	static boolean calculate_carCongestionEffects;
 	static boolean marginalCostPricingCar;
 	
 	static long randomSeed;
@@ -144,7 +145,8 @@ class ExternalControler {
 		calculate_inVehicleTimeDelayEffects = settings.isCalculating_inVehicleTimeDelayEffects();
 		calculate_waitingTimeDelayEffects = settings.isCalculating_waitingTimeDelayEffects();
 		marginalCostPricingPt = settings.isMarginalCostPricingPt();
-		marginalCostPricingCar = settings.isMarginalCostPricingCar();		
+		calculate_carCongestionEffects = settings.isCalculate_carCongestionEffects();
+		marginalCostPricingCar = settings.isMarginalCostPricingCar();
 		
 		if (useRandomSeedsFile){
 			String randomSeedsFile = settings.getRandomSeedsFile();
@@ -271,9 +273,16 @@ class ExternalControler {
 			scenario.getConfig().global().setRandomSeed(randomSeed);
 		}
 		
-		InternalControler internalControler = new InternalControler(scenario, fare, calculate_inVehicleTimeDelayEffects, calculate_waitingTimeDelayEffects, marginalCostPricingPt, marginalCostPricingCar);
-		internalControler.run();
+		InternalControler internalControler = new InternalControler(
+				scenario,
+				fare,
+				calculate_inVehicleTimeDelayEffects, 
+				calculate_waitingTimeDelayEffects, 
+				marginalCostPricingPt,
+				calculate_carCongestionEffects,
+				marginalCostPricingCar);
 		
+		internalControler.run();
 		deleteUnnecessaryInternalIterations(scenario); 
 
 		operator.setParametersForExtIteration(capacity);
@@ -357,19 +366,35 @@ class ExternalControler {
 		double headway = startHeadway;
 		for (int headwayStep = 0; headwayStep <= stepsHeadway ; headwayStep++){
 			
+			// public transport settings
+			String transitRouteMode = "bus";
+			boolean isBlocking = false;
+			boolean awaitDeparture = true;
+			double scheduledTravelTime = 60.;
+			double scheduledStopTime = 2.;
+			double startService = 4. * 3600.;
+			double endService = 24. * 3600.;
+			double slackTime = 1200.;
+			Id ptVehId = new IdImpl("bus");
+			double alightingTime = 0.75;
+			double boardingTime = 1.0;
+			DoorOperationMode doorOperationMode = DoorOperationMode.serial;
+			double ptVehiclePCU = 1.0;
+			double maxVelocity = 500./59.;		
+			
 			log.info("Writing transitSchedule...");
 			TransitSchedule schedule;
 			String scheduleFile = dir + "transitSchedule_headway" + headway + ".xml";
 			
 			ScheduleFromCorridor sfn = new ScheduleFromCorridor(scenario.getNetwork());
-			sfn.createTransitSchedule("bus", false, true, 60., 2.);
+			sfn.createTransitSchedule(transitRouteMode, isBlocking, awaitDeparture, scheduledTravelTime, scheduledStopTime);
 			schedule = sfn.getTransitSchedule();
 			
 			List<Id> lineIDs = new ArrayList<Id>();
 			lineIDs.addAll(schedule.getTransitLines().keySet());
 			 
 			DeparturesGenerator dg = new DeparturesGenerator();
-			dg.addDepartures(schedule, lineIDs, headway, 4. * 3600., 24. * 3600., 1200.);
+			dg.addDepartures(schedule, lineIDs, headway, startService, endService, slackTime);
 			
 			TransitScheduleWriterV1 scheduleWriter = new TransitScheduleWriterV1(schedule);
 			scheduleWriter.write(scheduleFile);
@@ -386,9 +411,19 @@ class ExternalControler {
 				int standingRoom = (int) (capacity * 0.); // for future functionality (e.g. disutility for standing in bus)
 				
 				VehiclesGenerator vg = new VehiclesGenerator();				
-				vg.createVehicles(schedule, lineIDs, busSeats, standingRoom, length, new IdImpl("bus"), 0.75, 1.0, DoorOperationMode.serial, 1.0, (500./59));
+				vg.createVehicles(
+						schedule, 
+						lineIDs, 
+						busSeats,
+						standingRoom, 
+						length,
+						ptVehId,
+						alightingTime,
+						boardingTime,
+						doorOperationMode,
+						ptVehiclePCU,
+						maxVelocity);
 				vehicles = vg.getVehicles();
-				
 				VehicleWriterV1 vehicleWriter = new VehicleWriterV1(vehicles);
 				vehicleWriter.writeFile(vehiclesFile);
 				
@@ -435,25 +470,35 @@ class ExternalControler {
 
 	private void checkSettings() {
 		
-
 		if (calculate_inVehicleTimeDelayEffects){
-			log.info("Calculating inVehicleTimeDelayEffects enabled.");
+			log.info("Calculating in-vehicle time delay effects enabled.");
 		} else {
-			log.info("Calculating inVehicleTimeDelayEffects disabled.");
+			log.info("Calculating in-vehicle time delay effects disabled.");
 		}
 		
 		if (calculate_waitingTimeDelayEffects){
-			log.info("Calculating waitingTimeDelayEffects enabled.");
+			log.info("Calculating waiting time delay effects enabled.");
 		} else {
-			log.info("Calculating waitingTimeDelayEffects disabled.");
+			log.info("Calculating waiting time delay effects disabled.");
 		}
 		
 		if (marginalCostPricingPt){
-			log.info("Marginal cost pricing enabled.");
+			log.info("Marginal cost pricing for public transport enabled.");
 		} else {
-			log.info("Marginal cost pricing disabled.");
+			log.info("Marginal cost pricing for public transport disabled.");
 		}
 		
+		if (calculate_carCongestionEffects){
+			log.info("Calculating car congestion effects enabled.");
+		} else {
+			log.info("Calculating car congestion effects disabled.");
+		}
+		
+		if (marginalCostPricingCar){
+			log.info("Marginal cost pricing for car enabled.");
+		} else {
+			log.info("Marginal cost pricing for car disabled.");
+		}
 		
 		if (usePopulationPathsFile){
 			incrDemand = 0;

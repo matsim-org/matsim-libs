@@ -48,6 +48,7 @@ public class InternalControler {
 	private final boolean marginalCostPricingCar;
 	private final boolean calculate_inVehicleTimeDelayEffects;
 	private final boolean calculate_waitingTimeDelayEffects;
+	private final boolean calculate_carCongestionEffects;
 	
 	private final ScenarioImpl scenario;
 	private final double fare;
@@ -75,10 +76,19 @@ public class InternalControler {
 	private final double WAITING = 0.0;
 	private final double STUCK_SCORE = -100;
 
-	public InternalControler(ScenarioImpl scenario, double fare, boolean calculate_inVehicleTimeDelayEffects, boolean calculate_waitingTimeDelayEffects, boolean marginalCostPricingPt, boolean marginalCostPricingCar) {
+	public InternalControler(
+			ScenarioImpl scenario,
+			double fare,
+			boolean calculate_inVehicleTimeDelayEffects,
+			boolean calculate_waitingTimeDelayEffects,
+			boolean marginalCostPricingPt,
+			boolean calculate_carCongestionEffects, 
+			boolean marginalCostPricingCar) {
+		
 		this.calculate_inVehicleTimeDelayEffects = calculate_inVehicleTimeDelayEffects;
 		this.calculate_waitingTimeDelayEffects = calculate_waitingTimeDelayEffects;
 		this.marginalCostPricingPt = marginalCostPricingPt;
+		this.calculate_carCongestionEffects = calculate_carCongestionEffects;
 		this.marginalCostPricingCar = marginalCostPricingCar;
 		this.scenario = scenario;
 		this.fare = fare;
@@ -100,7 +110,15 @@ public class InternalControler {
 		Controler controler = new Controler(this.scenario);
 		controler.setOverwriteFiles(true);
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
-		controler.addControlerListener(new OptControlerListener(this.fare, this.ptScoringHandler, this.scenario, this.calculate_inVehicleTimeDelayEffects, this.calculate_waitingTimeDelayEffects, this.marginalCostPricingPt, this.marginalCostPricingCar));
+		controler.addControlerListener(
+				new OptControlerListener(this.fare, 
+						this.ptScoringHandler,
+						this.scenario,
+						this.calculate_inVehicleTimeDelayEffects,
+						this.calculate_waitingTimeDelayEffects,
+						this.marginalCostPricingPt,
+						this.calculate_carCongestionEffects,
+						this.marginalCostPricingCar));
 		
 		ControlerConfigGroup controlerConfGroup = controler.getConfig().controler();
 		if (controlerConfGroup.getLastIteration() == 0) {
@@ -132,7 +150,16 @@ public class InternalControler {
 		planCalcScoreConfigGroup.setEarlyDeparture_utils_hr(EARLY_DEPARTURE);
 		planCalcScoreConfigGroup.setMarginalUtlOfWaiting_utils_hr(WAITING);
 		
-		OptimizationScoringFunctionFactory scoringfactory = new OptimizationScoringFunctionFactory(planCalcScoreConfigGroup, scenario.getNetwork(), ptScoringHandler, TRAVEL_PT_IN_VEHICLE, TRAVEL_PT_WAITING, STUCK_SCORE, TRAVEL_PT_ACCESS, TRAVEL_PT_EGRESS);
+		OptimizationScoringFunctionFactory scoringfactory = new OptimizationScoringFunctionFactory(
+				planCalcScoreConfigGroup,
+				scenario.getNetwork(),
+				ptScoringHandler,
+				TRAVEL_PT_IN_VEHICLE, 
+				TRAVEL_PT_WAITING, 
+				STUCK_SCORE, 
+				TRAVEL_PT_ACCESS,
+				TRAVEL_PT_EGRESS);
+		
 		controler.setScoringFunctionFactory(scoringfactory);
 		
 		controler.setCreateGraphs(false);

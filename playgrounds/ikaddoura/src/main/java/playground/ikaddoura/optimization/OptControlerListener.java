@@ -53,14 +53,24 @@ public class OptControlerListener implements StartupListener {
 	private final boolean calculate_waitingTimeDelayEffects;
 	private final boolean marginalCostPricingPt;
 	private final boolean marginalCostPricingCar;
+	private final boolean calculate_carCongestionEffects;
 	
-	public OptControlerListener(double fare, PtLegHandler ptLegHandler, ScenarioImpl scenario, boolean calculate_inVehicleTimeDelayEffects, boolean calculate_waitingTimeDelayEffects, boolean marginalCostPricingPt, boolean marginalCostPricingCar){
+	public OptControlerListener(double fare,
+			PtLegHandler ptLegHandler,
+			ScenarioImpl scenario,
+			boolean calculate_inVehicleTimeDelayEffects,
+			boolean calculate_waitingTimeDelayEffects, 
+			boolean marginalCostPricingPt,
+			boolean calculate_carCongestionEffects,
+			boolean marginalCostPricingCar){
+		
 		this.fare = fare;
 		this.ptScoringHandler = ptLegHandler;
 		this.scenario = scenario;
 		this.calculate_inVehicleTimeDelayEffects = calculate_inVehicleTimeDelayEffects;
 		this.calculate_waitingTimeDelayEffects = calculate_waitingTimeDelayEffects;
 		this.marginalCostPricingPt = marginalCostPricingPt;
+		this.calculate_carCongestionEffects = calculate_carCongestionEffects;
 		this.marginalCostPricingCar = marginalCostPricingCar;
 	}
 	
@@ -69,20 +79,22 @@ public class OptControlerListener implements StartupListener {
 		
 		EventsManager eventsManager = event.getControler().getEvents();
 
+		// pt mode
 		if (this.calculate_inVehicleTimeDelayEffects) {
 			event.getControler().getEvents().addHandler(new InVehicleDelayHandler(eventsManager, scenario));
 		}
-		
 		if (this.calculate_waitingTimeDelayEffects) {
 			event.getControler().getEvents().addHandler(new WaitingDelayHandler(eventsManager, scenario));
 		}
-		
 		if (this.marginalCostPricingPt) {
 			event.getControler().getEvents().addHandler(new MarginalCostPricingPtHandler(eventsManager, scenario));
 		}
 		
-		if (this.marginalCostPricingCar) {
+		// car mode
+		if (this.calculate_carCongestionEffects) {
 			event.getControler().getEvents().addHandler(new MarginalCongestionHandlerV2(eventsManager, scenario));
+		}
+		if (this.marginalCostPricingCar) {
 			event.getControler().getEvents().addHandler(new MarginalCostPricingCarHandler(eventsManager, scenario));
 		}
 				
