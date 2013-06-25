@@ -173,10 +173,6 @@ public class MATSim4UrbanSimParcel{
 	void run(){
 		log.info("Starting MATSim from Urbansim");	
 
-		// checking if this is a test run
-		// a test run only validates the xml config file by initializing the xml config via the xsd.
-		isTestRun();
-
 		// get the network. Always cleaning it seems a good idea since someone may have modified the input files manually in
 		// order to implement policy measures.  Get network early so readXXX can check if links still exist.
 		Network network = scenario.getNetwork();
@@ -184,7 +180,6 @@ public class MATSim4UrbanSimParcel{
 		cleanNetwork(network);
 		
 		// get the data from UrbanSim (parcels and persons)
-		// readFromUrbansim = new ReadFromUrbanSimModel( getUrbanSimParameterConfig().getYear(), null, 0. );
 		readFromUrbanSim();
 		
 		// read UrbanSim facilities (these are simply those entities that have the coordinates!)
@@ -229,15 +224,16 @@ public class MATSim4UrbanSimParcel{
 	 */
 	protected void readFromUrbanSim() {
 		// get the data from UrbanSim (parcels and persons)
-		if(getUrbanSimParameterConfig().isUsingShapefileLocationDistribution()){
+		if(getMATSim4UrbanSimControlerConfig().usingShapefileLocationDistribution()){
 			readFromUrbansim = new ReadFromUrbanSimModel( getUrbanSimParameterConfig().getYear(),
-					  getUrbanSimParameterConfig().getUrbanSimZoneShapefileLocationDistribution(),
-					  getUrbanSimParameterConfig().getUrbanSimZoneRadiusLocationDistribution());
+														  getMATSim4UrbanSimControlerConfig().getUrbansimZoneRandomLocationDistributionShapeFile(),
+														  getMATSim4UrbanSimControlerConfig().getUrbanSimZoneRadiusLocationDistribution());
 		}
-		else
+		else{
 			readFromUrbansim = new ReadFromUrbanSimModel( getUrbanSimParameterConfig().getYear(),
-					  null,
-					  getUrbanSimParameterConfig().getUrbanSimZoneRadiusLocationDistribution());
+														  null,
+														  getMATSim4UrbanSimControlerConfig().getUrbanSimZoneRadiusLocationDistribution());
+		}
 	}
 	
 	/**
@@ -253,15 +249,14 @@ public class MATSim4UrbanSimParcel{
 		Population oldPopulation = null;
 		
 		M4UControlerConfigModuleV3 m4uModule = getMATSim4UrbanSimControlerConfig();
-		UrbanSimParameterConfigModuleV3 uspModule		 = getUrbanSimParameterConfig();
-		
+		UrbanSimParameterConfigModuleV3 uspModule = getUrbanSimParameterConfig();
 		
 		// check for existing plans file
 		if ( scenario.getConfig().plans().getInputFile() != null ) {
 			
-			if(m4uModule.isHotStart())
+			if(m4uModule.usingHotStart())
 				log.info("MATSim is running in HOT start mode, i.e. MATSim starts with pop file from previous run: " + scenario.getConfig().plans().getInputFile());
-			else if(m4uModule.isWarmStart())
+			else if(m4uModule.usingWarmStart())
 				log.info("MATSim is running in WARM start mode, i.e. MATSim starts with pre-existing pop file:" + scenario.getConfig().plans().getInputFile());
 		
 			log.info("MATSim will remove persons from plans-file, which are no longer part of the UrbanSim population!");
@@ -469,12 +464,12 @@ public class MATSim4UrbanSimParcel{
 	void setControlerSettings(String[] args) {
 
 		AccessibilityConfigGroup moduleAccessibility = getAccessibilityParameterConfig();
-		M4UControlerConfigModuleV3 moduleMATSim4UrbanSim = getMATSim4UrbanSimControlerConfig();
+		UrbanSimParameterConfigModuleV3 moduleUrbanSim = getUrbanSimParameterConfig();
 
-		this.computeAgentPerformance	= moduleMATSim4UrbanSim.isAgentPerformance();
-		this.computeZone2ZoneImpedance	= moduleMATSim4UrbanSim.isZone2ZoneImpedance();
-		this.computeZoneBasedAccessibilities = moduleMATSim4UrbanSim.isZoneBasedAccessibility();
-		this.computeGridBasedAccessibility	= moduleMATSim4UrbanSim.isCellBasedAccessibility();
+		this.computeAgentPerformance	= moduleUrbanSim.usingAgentPerformance();
+		this.computeZone2ZoneImpedance	= moduleUrbanSim.usingZone2ZoneImpedance();
+		this.computeZoneBasedAccessibilities = moduleUrbanSim.usingZoneBasedAccessibility();
+		this.computeGridBasedAccessibility	= moduleUrbanSim.usingGridBasedAccessibility();
 		
 		if ( moduleAccessibility.getAreaOfAccessibilityComputation().equals( AreaOfAccesssibilityComputation.fromBoundingBox.toString() ) ) {
 			this.computeGridBasedAccessibilityUsingBoundingBox = true ;
@@ -546,17 +541,6 @@ public class MATSim4UrbanSimParcel{
 	void matsim4UrbanSimShutdown(){
 		BackupMATSimOutput.prepareHotStart(scenario);
 		BackupMATSimOutput.runBackup(scenario);
-	}
-	
-	/**
-	 * 
-	 */
-	void isTestRun(){
-		if(getUrbanSimParameterConfig().isTestRun()){
-			log.info("TestRun was successful...");
-			MATSim4UrbanSimParcel.isSuccessfulMATSimRun = true;
-			return;
-		}
 	}
 	
 	/**

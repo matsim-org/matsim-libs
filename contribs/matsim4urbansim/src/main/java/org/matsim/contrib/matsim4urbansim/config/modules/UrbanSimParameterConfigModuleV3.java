@@ -29,23 +29,6 @@ public class UrbanSimParameterConfigModuleV3 extends Module{
 	
 	public static final String GROUP_NAME = "urbansimParameter";
 
-//	public static final String PROJECT_NAME = "projectName";
-//	public static final String IS_PARCEL_MODE = "isParcelMode";
-//	public static final String POPULATION_SAMPLING_RATE = "populationSampleRate";
-//	public static final String YEAR = "year";
-//	public static final String OPUS_HOME_PATH = "opusHome";
-//	public static final String OPUS_DATA_PATH = "opusDataPath";
-//	public static final String MATSIM4OPUS_PATH = "matsim4Opus";
-//	public static final String MATSIM4OPUS_OUTPUT_PATH = "matsim4OpusOutput";
-//	public static final String MATSIM4OPUS_TEMP_PATH = "matsim4OpusTemp";
-//	public static final String IS_TEST_RUN = "isTestRun";
-//	public static final String USING_SHAPEFILE_LOCATION_DISTRIBUTION = "useShapefileLocationDistribution";
-//	public static final String URBANSIM_ZONE_SHAPEFILE_LOCATION_DISTRIBUTION = "urbanSimZoneShapefileLocationDistribution";
-//	public static final String URBANSIM_ZONE_RADIUS_LOCATION_DISTRIBUTION = "urbanSimZoneRadiusLocationDistribution";
-//	public static final String TEST_PARAMETER = "testParameter";
-//	public static final String IS_BACKUP_RUN_DATA = "isBackup";
-	
-	private String projectName;
 	private boolean isParcel;
 	private double populationSampleRate;
 	private int year;
@@ -56,11 +39,11 @@ public class UrbanSimParameterConfigModuleV3 extends Module{
 	private String matsim4OpusOutput;
 	private String matsim4OpusTemp;
 	private String matsim4OpusBackup;
-	private boolean isTestRun;
-	private boolean usingShapefileLocationDistribution;
-	private String urbanSimZoneShapefileLocationDistribution;
-	private double urbanSimZoneRadiusLocationDistribution;
-	private String testParameter;
+	private String customParameter;
+	private boolean usingZone2ZoneImpedance;
+	private boolean usingAgentPerformance;
+	private boolean usingZoneBasedAccessibility;
+	private boolean usingGridBasedAccessibility;
 	private boolean isBackup;
 	
 	public UrbanSimParameterConfigModuleV3(){
@@ -92,14 +75,6 @@ public class UrbanSimParameterConfigModuleV3 extends Module{
 		
 		return map ;
 	}
-	
-	public void setProjectName(String projectName){
-		this.projectName = projectName;
-	}
-	
-	public String getProjectName(){
-		return this.projectName;
-	}
 
 	public void setSpatialUnitFlag(String spatialUnit){
 		if(spatialUnit.equalsIgnoreCase("parcel"))
@@ -118,30 +93,6 @@ public class UrbanSimParameterConfigModuleV3 extends Module{
 	
 	public double getPopulationSampleRate(){
 		return this.populationSampleRate;
-	}
-	
-	public void setUsingShapefileLocationDistribution(boolean useShapefileLocationDistribution){
-		this.usingShapefileLocationDistribution = useShapefileLocationDistribution;
-	}
-	
-	public boolean isUsingShapefileLocationDistribution(){
-		return this.usingShapefileLocationDistribution;
-	}
-	
-	public void setUrbanSimZoneShapefileLocationDistribution(String shapefile){
-		this.urbanSimZoneShapefileLocationDistribution = shapefile;
-	}
-	
-	public String getUrbanSimZoneShapefileLocationDistribution() {
-		return this.urbanSimZoneShapefileLocationDistribution;
-	}
-	
-	public void setUrbanSimZoneRadiusLocationDistribution(double radius){
-		this.urbanSimZoneRadiusLocationDistribution = radius;
-	}
-	
-	public double getUrbanSimZoneRadiusLocationDistribution() {
-		return this.urbanSimZoneRadiusLocationDistribution;
 	}
 	
 	public void setYear(int year){
@@ -207,21 +158,45 @@ public class UrbanSimParameterConfigModuleV3 extends Module{
 	public String getMATSim4OpusBackup(){
 		return this.matsim4OpusBackup;
 	}
-	
-	public void setTestRun(boolean isTestRun){
-		this.isTestRun = isTestRun;
+
+	public void setCustomParameter(String testParameter){
+		this.customParameter = testParameter;
 	}
 	
-	public boolean isTestRun(){
-		return this.isTestRun;
+	public String getCustomParameter(){
+		return this.customParameter;
 	}
 	
-	public void setTestParameter(String testParameter){
-		this.testParameter = testParameter;
+	public void setUsingZone2ZoneImpedance(boolean value){
+		this.usingZone2ZoneImpedance = value;
 	}
 	
-	public String getTestParameter(){
-		return this.testParameter;
+	public boolean usingZone2ZoneImpedance(){
+		return this.usingZone2ZoneImpedance;
+	}
+	
+	public void setUsingAgentPerformance(boolean value){
+		this.usingAgentPerformance = value;
+	}
+	
+	public boolean usingAgentPerformance(){
+		return this.usingAgentPerformance;
+	}
+	
+	public void setUsingZoneBasedAccessibility(boolean value){
+		this.usingZoneBasedAccessibility = value;
+	}
+	
+	public boolean usingZoneBasedAccessibility(){
+		return this.usingZoneBasedAccessibility;
+	}
+	
+	public void setUsingGridBasedAccessibility(boolean value){
+		this.usingGridBasedAccessibility = value;
+	}
+	
+	public boolean usingGridBasedAccessibility(){
+		return this.usingGridBasedAccessibility;
 	}
 	
 	public void setBackup(boolean isBackup){

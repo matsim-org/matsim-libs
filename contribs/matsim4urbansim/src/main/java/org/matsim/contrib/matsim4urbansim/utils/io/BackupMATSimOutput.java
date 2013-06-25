@@ -127,12 +127,12 @@ public class BackupMATSimOutput {
 		
 		M4UControlerConfigModuleV3 module = ConfigurationUtils.getMATSim4UrbaSimControlerConfigModule(scenario);
 		
-		if(!module.getHotStartTargetLocation().equals("")){
+		if(!module.getHotStartPlansFileLocation().equals("")){
 			
 			String plansFile = InternalConstants.MATSIM_4_OPUS_OUTPUT + InternalConstants.GENERATED_PLANS_FILE_NAME;
 			try{
 				log.info("Preparing hot start for next MATSim run ...");
-				FileCopy.fileCopy(new File(plansFile), new File(module.getHotStartTargetLocation()));
+				FileCopy.fileCopy(new File(plansFile), new File(module.getHotStartPlansFileLocation()));
 			} catch (Exception e) {
 				log.error("Error while copying plans file, i. e. hot start will not work!");
 				e.printStackTrace();

@@ -35,20 +35,17 @@ public class M4UControlerConfigModuleV3 extends Module{
 
 	public static final String GROUP_NAME = "matsim4urbansimControler";
 	
-	private boolean zone2ZoneImpedance;
-	private boolean agentPerformance;
-	private boolean zoneBasedAccessibility;
-	private boolean cellBasedAccessibility;
-    private boolean isColdStart;
-    private boolean isWarmStart;
-    private Boolean isHotStart;
-    private String hotStartTargetLocation;
+	private boolean usingShapefileLocationDistribution;
+	private String urbansimZoneRandomLocationDistributionShapeFile;
+	private double urbansimZoneRandomLocationDistributionRadius;
+	private boolean usingWarmStart;
+    private boolean usingHotStart;
+    private String warmStartPlansFileLocation;
+    private String hotStartPlansFileLocation;
     
 	public M4UControlerConfigModuleV3() {
 		super(GROUP_NAME);
-		this.isColdStart = false;
-		this.isWarmStart = false;
-		this.isHotStart	 = false;
+		this.usingHotStart	 = false;
 		// This class feels quite dangerous to me; one can have inconsistent entries between the Map and the typed values. kai, apr'13 
 		// The way it (hopefully) works now: as long as the config group is not "materialized", one has to use addParam/getValue.
 		// Once the class is materialized, one can only use the direct getters/setters.  kai, may'13
@@ -75,67 +72,60 @@ public class M4UControlerConfigModuleV3 extends Module{
 
 		return map ;
 	}
-   public boolean isZone2ZoneImpedance() {
-        return this.zone2ZoneImpedance;
-    }
 
-    public void setZone2ZoneImpedance(boolean value) {
-        this.zone2ZoneImpedance = value;
-    }
+	public void setUsingShapefileLocationDistribution(boolean useShapefileLocationDistribution){
+		this.usingShapefileLocationDistribution = useShapefileLocationDistribution;
+	}
+	
+	public boolean usingShapefileLocationDistribution(){
+		return this.usingShapefileLocationDistribution;
+	}
+	
+	public void setUrbansimZoneRandomLocationDistributionShapeFile(String shapefile){
+		this.urbansimZoneRandomLocationDistributionShapeFile = shapefile;
+	}
+	
+	public String getUrbansimZoneRandomLocationDistributionShapeFile() {
+		return this.urbansimZoneRandomLocationDistributionShapeFile;
+	}
+	
+	public void setUrbansimZoneRandomLocationDistributionRadius(double radius){
+		this.urbansimZoneRandomLocationDistributionRadius = radius;
+	}
+	
+	public double getUrbanSimZoneRadiusLocationDistribution() {
+		return this.urbansimZoneRandomLocationDistributionRadius;
+	}
 
-    public boolean isAgentPerformance() {
-        return this.agentPerformance;
-    }
-
-    public void setAgentPerformance(boolean value) {
-        this.agentPerformance = value;
-    }
-
-    public boolean isZoneBasedAccessibility() {
-        return this.zoneBasedAccessibility;
-    }
-
-    public void setZoneBasedAccessibility(boolean value) {
-        this.zoneBasedAccessibility = value;
-    }
-
-    public boolean isCellBasedAccessibility() {
-        return this.cellBasedAccessibility;
-    }
-
-    public void setCellBasedAccessibility(boolean value) {
-        this.cellBasedAccessibility = value;
-    }
-    
-    public boolean isColdStart(){
-    	return this.isColdStart;
-    }
-    
-    public void setColdStart(boolean value){
-    	this.isColdStart = value;
-    }
-
-    public boolean isWarmStart(){
-    	return this.isWarmStart;
+    public boolean usingWarmStart(){
+    	return this.usingWarmStart;
     }
     
     public void setWarmStart(boolean value){
-    	this.isWarmStart = value;
+    	this.usingWarmStart = value;
+    }
+	
+    public void setWarmStartPlansLocation(String path){
+    	this.warmStartPlansFileLocation = path;
     }
     
-    public boolean isHotStart(){
-    	return this.isHotStart;
+    public String getWarmStartPlansFileLocation(){
+    	return this.warmStartPlansFileLocation;
+    }
+    
+    public boolean usingHotStart(){
+    	return this.usingHotStart;
     }
     
     public void setHotStart(boolean value){
-    	this.isHotStart = value;
+    	this.usingHotStart = value;
     }
     
-    public String getHotStartTargetLocation(){
-    	return this.hotStartTargetLocation;
+    public String getHotStartPlansFileLocation(){
+    	return this.hotStartPlansFileLocation;
     }
     
-    public void setHotStartTargetLocation(String value){
-    	this.hotStartTargetLocation = value;
+    public void setHotStartPlansFileLocation(String path){
+    	this.hotStartPlansFileLocation = path;
     }
 }

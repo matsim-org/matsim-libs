@@ -62,20 +62,11 @@ public class InternalConstants {
 		MATSIM_4_OPUS_OUTPUT = opusHome+"opus_matsim/output/";
 		MATSIM_4_OPUS_TEMP = opusHome+"opus_matsim/tmp/";
 		MATSIM_4_OPUS_BACKUP = opusHome+"opus_matsim/backup/";
-		
-		log.info("");
-		log.info("Set OPUS_HOME to :" + getOPUS_HOME());
-		log.info("Set OPUS_DATA_PATH to :" + OPUS_DATA_PATH);
-		log.info("Set OPUS MATSim directory to :" + MATSIM_4_OPUS);
-		log.info("Set MATSim config directory to :" + MATSIM_4_OPUS_CONFIG);
-		log.info("Set OPUS MATSim output directory to :" + MATSIM_4_OPUS_OUTPUT);
-		log.info("Set OPUS MATSim temp directory to :" + MATSIM_4_OPUS_TEMP);
-		log.info("Set OPUS MATSim backup directory to :" + MATSIM_4_OPUS_BACKUP);
-		log.info("");
+
 	}
 	
-	public static void setOPUS_HOME(String oPUS_HOME) {
-		OPUS_HOME = oPUS_HOME;
+	public static void setOPUS_HOME(String opusHOME) {
+		OPUS_HOME = opusHOME;
 	}
 	public static String getOPUS_HOME() {
 		return OPUS_HOME;
