@@ -128,7 +128,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 		Controler controler = event.getControler();
 		Scenario sc = controler.getScenario();
 		
-		double samplingRate = ConfigurationUtils.getUrbanSimParameterConfigModule((ScenarioImpl)sc).getPopulationSampleRate();
+		double samplingRate = ConfigurationUtils.getUrbanSimParameterConfigModule(sc).getPopulationSampleRate();
 		double inverseOfSamplingRate = 1/samplingRate;
 		
 		double walkSpeedMeterPerMinute = sc.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk) * 60.; // corresponds to 5 km/h
