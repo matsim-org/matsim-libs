@@ -140,14 +140,14 @@ public class MarginalCongestionHandlerV2 implements
 			linkInfo.getPersonId2freeSpeedLeaveTime().put(event.getPersonId(), event.getTime() + 1);
 
 		} else {			
-			log.warn("Not tested for other modes than car.");
+//			log.warn("Not tested for other modes than car.");
 		}
 	}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		if (this.ptVehicleIDs.contains(event.getVehicleId())){
-			log.warn("Not tested for pt.");
+//			log.warn("Not tested for pt.");
 		
 		} else {
 			// car!
@@ -165,7 +165,7 @@ public class MarginalCongestionHandlerV2 implements
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		if (this.ptVehicleIDs.contains(event.getVehicleId())){
-			log.warn("Not tested for pt.");
+//			log.warn("Not tested for pt.");
 		
 		} else {
 			// car!
