@@ -21,9 +21,7 @@ package playground.southafrica.freight.digicore.algorithms.concaveHull;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -33,7 +31,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.southafrica.utilities.Header;
@@ -56,7 +53,16 @@ import com.vividsolutions.jts.triangulate.quadedge.Vertex;
 import com.vividsolutions.jts.util.UniqueCoordinateArrayFilter;
 
 /**
- * Class to generate the concave hull from a set of given points.
+ * Class to generate the concave hull from a set of given points. The algorithm 
+ * is based on the paper by <br><br> 
+ * &nbsp;&nbsp;&nbsp;&nbsp&nbsp;&nbsp;&nbsp;&nbsp Duckham et al. (2008). 
+ * Efficient generation of simple polygons for characterizing the shape of a set 
+ * of points in the plane. <i>Pattern Recognition</i>, <b>41</b>, 3224-3236. <br><br>
+ * 
+ * This code also benefits from insight gained from the code from Eric Grosso,
+ * but we've adapted (and some cases simplified and improved) for specific 
+ * application to the South African application using <i>Digicore</i> commercial
+ * vehicle activity chain data.
  * 
  * @author jwjoubert
  */
@@ -78,12 +84,37 @@ public class ConcaveHull {
 	private Map<Integer, Node> vertices = new HashMap<Integer, Node>();
 
 
-	/* Constructor */
+	/**
+	 * Constructor for the concave hull algorithm. Be default, not output will
+	 * be written for each iteration of the algorithm's execution. If you
+	 * require control of the output, rather use the alternative constructor
+	 * {@link #ConcaveHull(GeometryCollection, double, boolean)}
+	 * @param points the {@link GeometryCollection} of input points for which 
+	 * 		  the concave hull will be computed. In the South African 
+	 * 		  application the will typically be {@link Point}s, and not 
+	 * 		  {@link Coordinate}s as the latter is <i>not</i> a {@link Geometry}.
+	 * @param threshold the edge length threshold used by the concave hull
+	 *        algorithm. Only border edges with a length <i>longer</i> than the
+	 *        threshold will be considered for removal.
+	 */
 	public ConcaveHull(GeometryCollection points, double threshold) {
 		this(points, threshold, false);
 	}
 	
-	
+	/**
+	 * Constructor for the concave hull algorithm. 
+	 * @param points the {@link GeometryCollection} of input points for which 
+	 * 		  the concave hull will be computed. In the South African 
+	 * 		  application the will typically be {@link Point}s, and not 
+	 * 		  {@link Coordinate}s as the latter is <i>not</i> a {@link Geometry}.
+	 * @param threshold the edge length threshold used by the concave hull
+	 *        algorithm. Only border edges with a length <i>longer</i> than the
+	 *        threshold will be considered for removal.
+	 * @param printIterations boolean choice indicating if output (triangles and
+	 *        borders) will be written to the output folder, or not. This only
+	 *        needs to be true when small-scale single instances are run, 
+	 *        typically for illustration purposes.
+	 */
 	public ConcaveHull(GeometryCollection points, double threshold, boolean printIterations){
 		this.geomFactory = points.getFactory();
 		
@@ -475,13 +506,13 @@ public class ConcaveHull {
 
 
 	/**
-	 * Write out all the edges to one of two files:
+	 * Write out all the edges to the following two files:
 	 * <ul>
 	 *   <li> all border edges are written to one file;
 	 *   <li> all edges that remain in the triangulation are written to another
 	 *        file.
 	 * </ul>
-	 * @param iteration
+	 * @param iteration the current iteration number. 
 	 */
 	private void writeOutput(int iteration){
 		/* Write the Delaunay triangles. */
@@ -535,11 +566,26 @@ public class ConcaveHull {
 	}
 	
 	
+	/**
+	 * Implementation of the concave hull algorithm. Every iteration, starting
+	 * with the zero-th iteration, will be written to file. Both the triangles, 
+	 * and the border will be written to file.
+	 * @param args two arguments required, and in the following order:
+	 * <ol>
+	 *   <li> <b>coordinate file</b> the absolute path of the coordinates to be
+	 *        be read in. It is assumed that the first column of the CSV file 
+	 *        will be the longitude, and the second column the latitude. Also,
+	 *        the coordinate file is assumed to have a header line.
+	 *   <li> <b>threshold</b> the edge length threshold that will be used for
+	 *        the concave hull algorithm.
+	 */
 	public static void main(String[] args) {
 		Header.printHeader(ConcaveHull.class.toString(), args);
 		
+		/* Read in the coordinates from file. */
 		List<Coordinate> coordinates = ConcaveHull.getClusterCoords(args[0]);
 		
+		/* Convert the coordinates to a GeometryCollection. */
 		GeometryFactory gf = new GeometryFactory();
 		Geometry[] points = new Geometry[coordinates.size()];
 		for(int i = 0; i < coordinates.size(); i++){
@@ -547,7 +593,8 @@ public class ConcaveHull {
 		}
 		GeometryCollection gc = new GeometryCollection(points, gf);
 		
-		ConcaveHull ch = new ConcaveHull(gc, Double.parseDouble(args[2]), true);
+		/* Instantiate and run the concave hull algorithm. */
+		ConcaveHull ch = new ConcaveHull(gc, Double.parseDouble(args[1]), true);
 		Geometry g = ch.getConcaveHull();
 
 		Header.printFooter();
