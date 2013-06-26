@@ -123,8 +123,10 @@ public class MarginalCongestionHandlerV2 implements
 	
 	@Override
 	public void handleEvent(AgentStuckEvent event) {
-//		log.warn("Agent stuck event. No garantee for right calculation of marginal congestion effects: " + event.toString());
-		throw new RuntimeException("Agent stuck event. No garantee for right calculation of marginal congestion effects: " + event.toString());
+		if (event.getLegMode().equals(TransportMode.car)) {
+//			log.warn("Agent stuck event. No garantee for right calculation of marginal congestion effects: " + event.toString());
+			throw new RuntimeException("Agent stuck event (leg mode: car). No garantee for right calculation of marginal congestion effects: " + event.toString());
+		}
 	}
 
 	@Override
