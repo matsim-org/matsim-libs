@@ -371,7 +371,7 @@ class ExternalControler {
 			boolean isBlocking = false;
 			boolean awaitDeparture = true;
 			double scheduledTravelTime = 60.;
-			double scheduledStopTime = 2.;
+			double scheduledStopTime = 0.;
 			double startService = 4. * 3600.;
 			double endService = 24. * 3600.;
 			double slackTime = 1200.;
