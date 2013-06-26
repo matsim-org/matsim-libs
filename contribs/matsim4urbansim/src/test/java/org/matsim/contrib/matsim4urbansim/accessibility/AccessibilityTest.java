@@ -43,13 +43,6 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 	private List<Double> accessibilitiesHomeZone;
 	private List<Double> accessibilitiesWorkZone;
 
-//	public static void main(String[] args) {
-//		
-////		new AccessibilityTest().testGridBasedAccessibilityMeasure();
-//		new AccessibilityTest().testZoneBasedAccessibilityMeasure();
-//
-//	}
-	
 	/**
 	 * This method tests the grid based accessibility computation.
 	 * The test scenario contains a small network with 9 nodes at (0,0),(100,0),(200,0),(0,100),(100,100),(200,100),(0,200),(100,200),(200,200)
@@ -72,7 +65,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 		
 		//create matsim config file and write it into the temp director<
 		CreateTestMATSimConfig ctmc = new CreateTestMATSimConfig(path, path+"network.xml");
-		String configLocation = ctmc.generate();
+		String configLocation = ctmc.generateConfigV3();
 
 		//create a test population of n persons
 		Population population = CreateTestPopulation.createTestPopulation(nPersons);
@@ -153,7 +146,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 		
 		//create matsim config file and write it into the temp director<
 		CreateTestMATSimConfig ctmc = new CreateTestMATSimConfig(path, path+"network.xml");
-		String configLocation = ctmc.generate();
+		String configLocation = ctmc.generateConfigV3();
 
 		//create a test population of n persons
 		Population population = CreateTestPopulation.createTestPopulation(nPersons);

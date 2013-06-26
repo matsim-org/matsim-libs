@@ -139,7 +139,7 @@ public class CreateTestExternalMATSimConfig extends CreateTestMATSimConfig{
 	 * generates the external MATSim config file with the specified parameter settings
 	 */
 	@Override
-	public String generate(){
+	public String generateConfigV2(){
 		
 		// creating an empty MASim config
 		Config config = new Config();

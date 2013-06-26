@@ -52,6 +52,7 @@ import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfig2.ObjectFact
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfig2.PlanCalcScoreType;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfig2.StrategyType;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfig2.UrbansimParameterType;
+import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.Matsim4UrbansimConfigType;
 import org.matsim.contrib.matsim4urbansim.utils.io.LoadFile;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -102,7 +103,7 @@ public class CreateTestMATSimConfig {
 	public String matsim4opusTemp						= "";
 	public boolean isTestRun							= false;
 	public Double randomLocationDistributionRadiusForUrbanSimZone	= 0.;
-	public String testParameter							= "";
+	public String customParameter							= "";
 	public boolean backupRunData						= false;
 	public boolean zone2zoneImpedance					= true;
 	public boolean agentPerformance						= true;
@@ -238,7 +239,8 @@ public class CreateTestMATSimConfig {
 	/**
 	 * generates the external MATSim config file with the specified parameter settings
 	 */
-	public String generate(){
+	@Deprecated // this generates a config in old format, use generateConfigV3 instead
+	public String generateConfigV2(){
 		
 		ObjectFactory of = new ObjectFactory();	
 		
@@ -296,7 +298,7 @@ public class CreateTestMATSimConfig {
 		ubansimParameterType.setMatsim4OpusTemp( this.matsim4opusTemp );
 		ubansimParameterType.setIsTestRun( this.isTestRun );
 		ubansimParameterType.setRandomLocationDistributionRadiusForUrbanSimZone( this.randomLocationDistributionRadiusForUrbanSimZone );
-		ubansimParameterType.setTestParameter( this.testParameter );
+		ubansimParameterType.setTestParameter( this.customParameter );
 		ubansimParameterType.setBackupRunData( this.backupRunData );
 		
 		// matsim4UrbanSimControlerType
@@ -352,8 +354,77 @@ public class CreateTestMATSimConfig {
 		matsimConfigType.setConfig(configType);
 		matsimConfigType.setMatsim4Urbansim(matsim4UrbanSimType);
 		
-		return writeConfigFile(matsimConfigType);
+		return writeConfigFileV2(matsimConfigType);
 	}
+	
+	/**
+	 * generates the external MATSim config file with the specified parameter settings
+	 */
+	public String generateConfigV3(){
+		
+		org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.ObjectFactory of = new org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.ObjectFactory();	
+		
+		// create MATSim4UrbanSim xml hierarchy
+		
+		org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.FileType externalMatsimConfig = of.createFileType();
+		externalMatsimConfig.setInputFile(this.matsimConfigInputFile);
+		org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.FileType network = of.createFileType();
+		network.setInputFile(this.networkInputFile);
+		org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.FileType emptyShapeFile = of.createFileType();
+		emptyShapeFile.setInputFile("");
+		org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.FileType warmStartPlansFile = of.createFileType();
+		warmStartPlansFile.setInputFile(this.hotstartPlansFile);
+		org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.FileType hotStartPlansFile = of.createFileType();
+		hotStartPlansFile.setInputFile(this.hotstartPlansFile);
+		
+		// matsimConfigType
+		org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.MatsimConfigType matsimConfigType = of.createMatsimConfigType();
+		matsimConfigType.setCellSize(this.cellSizeCellBasedAccessibility);
+		matsimConfigType.setAccessibilityComputationAreaFromShapeFile(false);
+		matsimConfigType.setAccessibilityComputationAreaFromBoundingBox(false);
+		matsimConfigType.setAccessibilityComputationAreaFromNetwork(true);
+		matsimConfigType.setStudyAreaBoundaryShapeFile(emptyShapeFile);
+		matsimConfigType.setUrbansimZoneRandomLocationDistributionByRadius(this.randomLocationDistributionRadiusForUrbanSimZone);
+		matsimConfigType.setUrbansimZoneRandomLocationDistributionByShapeFile("");
+		matsimConfigType.setExternalMatsimConfig(externalMatsimConfig);
+		matsimConfigType.setNetwork(network);
+		matsimConfigType.setWarmStartPlansFile(warmStartPlansFile);
+		matsimConfigType.setHotStartPlansFile(hotStartPlansFile);		
+		matsimConfigType.setUseHotStart(true);
+		matsimConfigType.setActivityType0(this.activityType_0);
+		matsimConfigType.setActivityType1(this.activityType_1);
+		matsimConfigType.setHomeActivityTypicalDuration(this.homeActivityTypicalDuration);
+		matsimConfigType.setWorkActivityTypicalDuration(this.workActivityTypicalDuration);
+		matsimConfigType.setWorkActivityOpeningTime(this.workActivityOpeningTime);
+		matsimConfigType.setWorkActivityLatestStartTime(this.workActivityLatestStartTime);
+		matsimConfigType.setFirstIteration(this.firstIteration);
+		matsimConfigType.setLastIteration(this.lastIteration);
+		
+		// 
+		org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.Matsim4UrbansimType matsim4UrbanSimType = of.createMatsim4UrbansimType();
+		matsim4UrbanSimType.setPopulationSamplingRate(this.populationSamplingRate);
+		matsim4UrbanSimType.setYear(this.year);
+		matsim4UrbanSimType.setOpusHome(this.opusHome);
+		matsim4UrbanSimType.setOpusDataPath(this.opusDataPath);
+		matsim4UrbanSimType.setMatsim4Opus(this.matsim4opus);
+		matsim4UrbanSimType.setMatsim4OpusConfig(this.matsim4opusConfig);
+		matsim4UrbanSimType.setMatsim4OpusOutput(this.matsim4opusOutput);
+		matsim4UrbanSimType.setMatsim4OpusTemp(this.matsim4opusTemp);
+		matsim4UrbanSimType.setCustomParameter(this.customParameter);
+		matsim4UrbanSimType.setZone2ZoneImpedance(this.zone2zoneImpedance);
+		matsim4UrbanSimType.setAgentPerfomance(this.agentPerformance);
+		matsim4UrbanSimType.setZoneBasedAccessibility(this.zoneBasedAccessibility);
+		matsim4UrbanSimType.setParcelBasedAccessibility(this.cellBasedAccessibility);
+		matsim4UrbanSimType.setBackupRunData(this.backupRunData);
+
+		// MatsimConfigType
+		Matsim4UrbansimConfigType m4uConfigType = of.createMatsim4UrbansimConfigType();
+		m4uConfigType.setMatsim4Urbansim(matsim4UrbanSimType);
+		m4uConfigType.setMatsimConfig(matsimConfigType);
+		
+		return writeConfigFileV3(m4uConfigType);
+	}
+	
 	/**
 	 * generates a minimal matsim4urbansim config
 	 * 
@@ -363,6 +434,7 @@ public class CreateTestMATSimConfig {
 	 * timeAllocationMutatorProbability, changeExpBetaProbability, reRouteDijkstraProbability, 
 	 * populationSamplingRate, etc..
 	 */
+	@Deprecated // this generates a config in old format, use generateConfigV3 instead
 	public String generateMinimalConfig(){
 		
 		ObjectFactory of = new ObjectFactory();	
@@ -406,7 +478,7 @@ public class CreateTestMATSimConfig {
 		ubansimParameterType.setMatsim4OpusConfig( this.matsim4opusConfig );
 		ubansimParameterType.setMatsim4OpusOutput( this.matsim4opusOutput );
 		ubansimParameterType.setMatsim4OpusTemp( this.matsim4opusTemp );
-		ubansimParameterType.setTestParameter( this.testParameter );
+		ubansimParameterType.setTestParameter( this.customParameter );
 		
 		// matsim4UrbanSimControlerType
 		Matsim4UrbansimContolerType matsim4UrbanSimControlerType = of.createMatsim4UrbansimContolerType();
@@ -444,7 +516,7 @@ public class CreateTestMATSimConfig {
 		matsimConfigType.setConfig(configType);
 		matsimConfigType.setMatsim4Urbansim(matsim4UrbanSimType);
 		
-		return writeConfigFile(matsimConfigType);
+		return writeConfigFileV2(matsimConfigType);
 	}
 
 	/**
@@ -453,7 +525,7 @@ public class CreateTestMATSimConfig {
 	 * @param matsimConfigType config in MATSim4UrbanSim format 
 	 * @throws UncheckedIOException
 	 */
-	String writeConfigFile(MatsimConfigType matsimConfigType) throws UncheckedIOException {
+	String writeConfigFileV2(MatsimConfigType matsimConfigType) throws UncheckedIOException {
 		try {
 			String destination = this.dummyPath + "/test_config.xml";	
 			BufferedWriter bw = IOUtils.getBufferedWriter( destination );
@@ -496,6 +568,58 @@ public class CreateTestMATSimConfig {
 		return null;
 	}
 	
+	/**
+	 * writes the Matsim4UrbansimConfigType confing at the specified place using JAXB
+	 * 
+	 * @param m4uConfigType config in MATSim4UrbanSim format 
+	 * @throws UncheckedIOException
+	 */
+	String writeConfigFileV3(Matsim4UrbansimConfigType m4uConfigType) throws UncheckedIOException {
+		try {
+			String destination = this.dummyPath + "/test_config.xml";	
+			BufferedWriter bw = IOUtils.getBufferedWriter( destination );
+			
+			String xsdPath = TempDirectoryUtil.createCustomTempDirectory("xsd");
+			// init loadFile object: it downloads a xsd from matsim.org into a temp directory
+			LoadFile loadFile = new LoadFile(InternalConstants.CURRENT_MATSIM_4_URBANSIM_XSD_MATSIMORG, xsdPath, InternalConstants.CURRENT_XSD_FILE_NAME);
+			File file2XSD = loadFile.loadMATSim4UrbanSimXSD(); // trigger loadFile
+			if(file2XSD == null || !file2XSD.exists()){
+				log.error("Did not find xml schema!");
+				System.exit(1);
+			}
+			log.info("Using following xsd schema: " + file2XSD.getCanonicalPath());
+			
+			// crate a schema factory ...
+			SchemaFactory schemaFactory = SchemaFactory.newInstance( XMLConstants.W3C_XML_SCHEMA_NS_URI );
+			// create a schema object via the given xsd to validate the MATSim xml config.
+			Schema schema = schemaFactory.newSchema(file2XSD);
+			
+			JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
+			Marshaller m = jaxbContext.createMarshaller();
+			m.setSchema(schema);
+			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
+			
+			org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.ObjectFactory of = new org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.ObjectFactory();	
+			//JAXBElement elem = new JAXBElement( new QName("","matsim4urbansim_config"), Matsim4UrbansimConfigType.class, m4uConfigType); 
+			JAXBElement jaxbElement = of.createMatsim4UrbansimConfig(m4uConfigType);
+			// (this is because there is no XMLRootElemet annotation)
+			m.marshal(jaxbElement, bw );
+			
+			return destination;
+			
+		} catch (JAXBException e) {
+			e.printStackTrace();
+			Assert.assertFalse(true) ; // otherwise the test neither returns "good" nor "bad" when there is an exception.  kai, apr'13
+		} catch (SAXException e) {
+			e.printStackTrace();
+			Assert.assertFalse(true) ; // otherwise the test neither returns "good" nor "bad" when there is an exception.  kai, apr'13
+		} catch (IOException e) {
+			e.printStackTrace();
+			Assert.assertFalse(true) ; // otherwise the test neither returns "good" nor "bad" when there is an exception.  kai, apr'13
+		}
+		return null;
+	}
+	
 	public int getStartMode(){
 		return this.startMode;
 	}
@@ -508,7 +632,7 @@ public class CreateTestMATSimConfig {
 		
 		String path = TempDirectoryUtil.createCustomTempDirectory("tmp");
 		CreateTestMATSimConfig config = new CreateTestMATSimConfig(COLD_START, path);
-		String matsimConfiFile = config.generate();
+		String matsimConfiFile = config.generateConfigV2();
 		
 		M4UConfigurationConverterV4 connector = new M4UConfigurationConverterV4( matsimConfiFile );
 		connector.init();
