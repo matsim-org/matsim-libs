@@ -27,16 +27,20 @@ import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.scenario.ScenarioUtils;
 
 public class MainDensityAnalysisWithPtV2 {
 
 	public static void main(String[] args) {
-		String networkFile="D:/Users/Christoph/workspace/matsim/mysimulations/FundamentalDiagram/output_network.xml.gz";
-		String eventsFile="D:/Users/Christoph/workspace/matsim/mysimulations/FundamentalDiagram/it.50/50.events.xml";
+		String networkFile = "H:/thesis/output_no_pricing_v3_subtours_bugfix/output_network.xml.gz";
+		String eventsFile =  "H:/thesis/output_no_pricing_v3_subtours_bugfix/ITERS/it.50/50.events.xml.gz";
 		Coord center = null; // center=null means use all links
 		int binSizeInSeconds = 900;	// 15 minute bins
 
@@ -47,11 +51,20 @@ public class MainDensityAnalysisWithPtV2 {
 		// Coord center=new CoordImpl(0,0);
 		// boolean isOldEventFile=false;
 
-		double radiusInMeters = 50000;
+		double radiusInMeters = 2000;
+		double length = 50.0;
 
 		// input/set center and radius
-		Map<Id, ? extends Link> links = NetworkReadExample.getNetworkLinks(networkFile, center, radiusInMeters);
-
+//		Map<Id, ? extends Link> links = NetworkReadExample.getNetworkLinks(networkFile, center, radiusInMeters);
+		
+		Config config = ConfigUtils.createConfig();
+		config.network().setInputFile(networkFile);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+//		center = scenario.getNetwork().getNodes().get(scenario.createId("17560000106060FT")).getCoord();
+		center = scenario.createCoord(683513.0, 246839.9);
+		
+		Map<Id, Link> links = LinkSelector.selectLinks(scenario.getNetwork(), center, radiusInMeters, length);
+		
 		InFlowInfoAcuumulatorWithPt inflowHandler = new InFlowInfoAcuumulatorWithPt(links, binSizeInSeconds);
 		OutFlowInfoAccumulatorWithPt outflowHandler = new OutFlowInfoAccumulatorWithPt(links, binSizeInSeconds);
 
@@ -130,18 +143,8 @@ public class MainDensityAnalysisWithPtV2 {
 			Link link = links.get(linkId);
 			
 			for (int i = 0; i < densityBins.length; i++) {
-				densityBins[i] = deltaflowBins[i] / (link.getLength() / 1000);
+				densityBins[i] = deltaflowBins[i] / (link.getLength() * link.getNumberOfLanes() / 1000);
 			}
-			
-//			densityBins[0] = deltaflowBins[0];
-//			
-//			for (int i = 1; i < deltaflowBins.length; i++) {
-//				densityBins[i] = (densityBins[i - 1] + deltaflowBins[i]);
-//			}
-//
-//			for (int i = 1; i < deltaflowBins.length; i++) {
-//				densityBins[i] = densityBins[i] / link.getLength() * 1000;
-//			}
 
 			density.put(linkId, densityBins);
 			deltaFlow.remove(linkId);
