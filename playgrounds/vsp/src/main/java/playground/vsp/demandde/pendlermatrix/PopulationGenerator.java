@@ -51,6 +51,7 @@ public class PopulationGenerator implements TripFlowSink {
 
 	private PopulationFactory populationFactory = new PopulationFactoryImpl(null);
 
+	@Override
 	public void process(Zone quelle, Zone ziel, int quantity, String mode, String destinationActivityType, double departureTimeOffset) {
 		for (int i=0; i<quantity; i++) {
 			Person person = populationFactory.createPerson(createId(quelle, ziel, i, mode));
@@ -71,6 +72,7 @@ public class PopulationGenerator implements TripFlowSink {
 		}
 	}
 
+	@Override
 	public void complete() {
 		personSink.complete();
 	}
