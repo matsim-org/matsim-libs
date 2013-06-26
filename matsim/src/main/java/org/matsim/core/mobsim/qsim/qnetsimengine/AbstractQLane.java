@@ -38,6 +38,8 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
  * (QLinkImpl is more modern with respect to pt and with respect to vehicle conservation).
  * kai, nov'11
  * <li> Triggered by a recent bug fix, I started moving some of the joint material up to the present class. kai, jun'13
+ * <li> It is in fact the <i> downstream </i> end that needs to be the same between QLinkImpl and QLane ... since QNode uses 
+ * those to extract vehicles into the intersection.  On the upstream side, however, vehicles are always given to the link.
  * </ul>
  * Please read the docu of QBufferItem, QLane, QLinkInternalI (arguably to be renamed
  * into something like AbstractQLink) and QLinkImpl jointly. kai, nov'11
