@@ -20,7 +20,12 @@
 
 package org.matsim.core.replanning;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.EnumSet;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
@@ -28,10 +33,15 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.core.utils.misc.PopulationUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.utils.eventsfilecomparison.EventsFileComparator;
+
+import difflib.Delta;
+import difflib.DiffUtils;
+import difflib.Patch;
 
 public class ReRoutingTest extends MatsimTestCase {
 
@@ -59,10 +69,45 @@ public class ReRoutingTest extends MatsimTestCase {
 		assertTrue("different event files", EventsFileComparator.compare(inputEvents, outputEvents) == EventsFileComparator.CODE_FILES_ARE_EQUAL);
 		
 		
-		long checksum1 = CRCChecksum.getCRCFromFile(getInputDirectory() + "1.plans.xml.gz");
-		long checksum2 = CRCChecksum.getCRCFromFile(getOutputDirectory() + "ITERS/it.1/1.plans.xml.gz");
-		assertEquals("different plans files", checksum1, checksum2);
+		final String originalFileName = getInputDirectory() + "1.plans.xml.gz";
+		long originalCheckSum = CRCChecksum.getCRCFromFile(originalFileName);
+		final String revisedFileName = getOutputDirectory() + "ITERS/it.1/1.plans.xml.gz";
+		long revisedCheckSum = CRCChecksum.getCRCFromFile(revisedFileName);
+		
+		if ( revisedCheckSum != originalCheckSum ) {
+
+			List<String> original = fileToLines(originalFileName);
+			List<String> revised  = fileToLines(revisedFileName);
+
+			Patch patch = DiffUtils.diff(original, revised);
+
+			for (Delta delta: patch.getDeltas()) {
+				System.out.flush() ;
+				System.err.println(delta.getOriginal());
+				System.err.println(delta.getRevised());
+				System.err.flush() ;
+			}
+
+		}
+		
+		assertEquals("different plans files", originalCheckSum, revisedCheckSum);
 	}
+	
+	// Helper method for get the file content
+	    private static List<String> fileToLines(String filename) {
+	            List<String> lines = new LinkedList<String>();
+	            String line = "";
+	            try {
+	                    BufferedReader in = IOUtils.getBufferedReader(filename);
+	                    while ((line = in.readLine()) != null) {
+	                            lines.add(line);
+	                    }
+	            } catch (IOException e) {
+	                    e.printStackTrace();
+	            }
+	            return lines;
+	    }
+
 
 	static public class TestControler extends Controler {
 
