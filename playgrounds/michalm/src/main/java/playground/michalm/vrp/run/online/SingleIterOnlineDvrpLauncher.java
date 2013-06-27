@@ -26,6 +26,7 @@ import org.matsim.analysis.LegHistogram;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.groups.OTFVisConfigGroup.ColoringScheme;
 import org.matsim.core.events.algorithms.*;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.vis.otfvis.*;
@@ -141,7 +142,7 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
             params.put(key, value);
         }
 
-        dirName = params.get("dirName") + '\\';
+        dirName = params.get("dirName") + '/';
         netFileName = dirName + params.get("netFileName");
 
         plansFileName = dirName + params.get("plansFileName");
@@ -196,6 +197,7 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
         events.addHandler(rvr);
 
         if (otfVis) { // OFTVis visualization
+      	  	scenario.getConfig().otfVis().setColoringScheme( ColoringScheme.taxicab ) ;
             OTFLiveUtils.initQueryHandler(qSim, data.getVrpData());
             OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(),
                     scenario, qSim.getEventsManager(), qSim);

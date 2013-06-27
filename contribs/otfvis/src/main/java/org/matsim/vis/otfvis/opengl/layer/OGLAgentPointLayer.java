@@ -34,7 +34,7 @@ import javax.media.opengl.GL;
 import javax.media.opengl.GL2;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.config.groups.OTFVisConfigGroup;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.MatsimResource;
 import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.caching.SceneLayer;
@@ -60,11 +60,9 @@ public class OGLAgentPointLayer extends OTFGLAbstractDrawable implements SceneLa
 	private final static int BUFFERSIZE = 10000;
 
 	private static OTFOGLDrawer.FastColorizer redToGreenColorizer = new OTFOGLDrawer.FastColorizer(
-			new double[] { 0.0, 30., 50.}, new Color[] {Color.RED, Color.YELLOW, Color.GREEN});
+					new double[] { 0.0, 30., 50.}, new Color[] {Color.RED, Color.YELLOW, Color.GREEN});
 
 
-	private static int bvg2cnt = 0 ;
-	
 	private int count = 0;
 
 	private static int alpha =200;
@@ -87,12 +85,14 @@ public class OGLAgentPointLayer extends OTFGLAbstractDrawable implements SceneLa
 		// Empty constructor.
 	}
 
+	@Override
 	protected void onInit(GL2 gl) {
 		texture = OTFOGLDrawer.createTexture(gl, MatsimResource.getAsInputStream("icon18.png"));
 	}
 
 	private static int infocnt = 0 ;
-	
+
+	@Override
 	public void onDraw(GL2 gl) {
 		gl.glEnable(GL2.GL_POINT_SPRITE);
 
@@ -132,7 +132,7 @@ public class OGLAgentPointLayer extends OTFGLAbstractDrawable implements SceneLa
 	}
 
 	private void drawArray(GL2 gl) {
-	
+
 		// testing if the point sprite is available.  Would be good to not do this in every time step ...
 		// ... move to some earlier place in the calling hierarchy.  kai, feb'11
 		if ( infocnt < 1 ) {
@@ -146,7 +146,7 @@ public class OGLAgentPointLayer extends OTFGLAbstractDrawable implements SceneLa
 				}
 			}
 		}
-	
+
 		ByteBuffer colors =  null;
 		FloatBuffer vertex =  null;
 		for(int i = 0; i < this.posBuffers.size(); i++) {
@@ -181,17 +181,30 @@ public class OGLAgentPointLayer extends OTFGLAbstractDrawable implements SceneLa
 
 	public void addAgent(AgentSnapshotInfo agInfo) {
 		Color color;
-		if ( OTFClientControl.getInstance().getOTFVisConfig().getColoringScheme().equals( OTFVisConfigGroup.ColoringScheme.bvg ) ) {
+		switch ( OTFClientControl.getInstance().getOTFVisConfig().getColoringScheme() ) {
+		case bvg:
 			color = bvgColoringScheme(agInfo);
-		} else if ( OTFClientControl.getInstance().getOTFVisConfig().getColoringScheme().equals( OTFVisConfigGroup.ColoringScheme.bvg2 ) ) {
+			break;
+		case bvg2:
 			color = bvg2ColoringScheme(agInfo);
-		} else if ( OTFClientControl.getInstance().getOTFVisConfig().getColoringScheme().equals( OTFVisConfigGroup.ColoringScheme.byId ) ) {
+			break;
+		case byId:
 			color = byIdColoringScheme(agInfo);
-		} else if ( OTFClientControl.getInstance().getOTFVisConfig().getColoringScheme().equals( OTFVisConfigGroup.ColoringScheme.gtfs ) ) {
+			break;
+		case gtfs:
 			color = gtfsColoringScheme(agInfo);
-		}  else {
+			break;
+		case standard:
 			color = standardColoringScheme(agInfo);
+			break;
+		case taxicab:
+			color = taxicabColoringScheme(agInfo) ;
+			break;
+		default:
+			color = standardColoringScheme(agInfo);
+			break;
 		}
+
 		if (this.count % OGLAgentPointLayer.BUFFERSIZE == 0) {
 			this.vertexIN = Buffers.newDirectFloatBuffer(OGLAgentPointLayer.BUFFERSIZE*2);
 			this.colorsIN = Buffers.newDirectByteBuffer(OGLAgentPointLayer.BUFFERSIZE*4);
@@ -201,16 +214,32 @@ public class OGLAgentPointLayer extends OTFGLAbstractDrawable implements SceneLa
 		this.vertexIN.put((float)agInfo.getEasting());
 		this.vertexIN.put((float)agInfo.getNorthing());
 		this.id2coord.put(Arrays.hashCode(agInfo.getId().toString().toCharArray()),this.count);
-		
+
 		this.colorsIN.put( (byte)color.getRed());
 		this.colorsIN.put( (byte)color.getGreen());
 		this.colorsIN.put((byte)color.getBlue());
 		this.colorsIN.put( (byte)alpha);
-		
+
 		this.count++;
 	}
 
-	private Color standardColoringScheme(AgentSnapshotInfo agInfo) {
+	private static Color taxicabColoringScheme(AgentSnapshotInfo agInfo) {
+		char[] id = agInfo.getId().toString().toCharArray();
+
+		// ===============TAXI COLOURING===============
+		if (id.length > 1 && id[1] == '.') {
+			if (agInfo.getAgentState() == AgentState.PERSON_DRIVING_CAR) {
+				return Color.YELLOW ;
+			}
+			else {
+				return Color.BLACK ;
+			}
+		} else
+			//===============REGULAR COLOURING===============
+			return standardColoringScheme( agInfo ) ;
+	}
+
+	private static Color standardColoringScheme(AgentSnapshotInfo agInfo) {
 		if ( agInfo.getAgentState()==AgentState.PERSON_DRIVING_CAR ) {
 			return redToGreenColorizer.getColorZeroOne(agInfo.getColorValueBetweenZeroAndOne());
 		} else if ( agInfo.getAgentState()==AgentState.PERSON_AT_ACTIVITY ) {
@@ -224,7 +253,7 @@ public class OGLAgentPointLayer extends OTFGLAbstractDrawable implements SceneLa
 		}
 	}
 
-	private Color byIdColoringScheme(AgentSnapshotInfo agInfo) {
+	private static Color byIdColoringScheme(AgentSnapshotInfo agInfo) {
 		String idstr = agInfo.getId().toString() ;
 		int val = 8 ;
 		if ( idstr.hashCode()%val==0 ) {
@@ -248,7 +277,11 @@ public class OGLAgentPointLayer extends OTFGLAbstractDrawable implements SceneLa
 		}
 
 	}
+
+	private static int bvg2cnt = 0 ;
+
 	private Color bvg2ColoringScheme(AgentSnapshotInfo agInfo) {
+
 		if ( bvg2cnt < 1 ) {
 			bvg2cnt++ ;
 			Logger.getLogger(this.getClass()).info( "using bvg2 coloring scheme ...") ;
@@ -276,7 +309,7 @@ public class OGLAgentPointLayer extends OTFGLAbstractDrawable implements SceneLa
 		}
 	}
 
-	private Color bvgColoringScheme(AgentSnapshotInfo agInfo) {
+	private static Color bvgColoringScheme(AgentSnapshotInfo agInfo) {
 		if ( agInfo.getAgentState()==AgentState.PERSON_DRIVING_CAR ) {
 			return Color.DARK_GRAY;
 		} else if ( agInfo.getAgentState()==AgentState.PERSON_AT_ACTIVITY ) {
@@ -298,8 +331,8 @@ public class OGLAgentPointLayer extends OTFGLAbstractDrawable implements SceneLa
 			return Color.YELLOW;
 		}
 	}
-	
-	private Color gtfsColoringScheme(AgentSnapshotInfo agInfo) {
+
+	private static Color gtfsColoringScheme(AgentSnapshotInfo agInfo) {
 		if ( agInfo.getAgentState()==AgentState.PERSON_DRIVING_CAR ) {
 			return Color.DARK_GRAY;
 		} else if ( agInfo.getAgentState()==AgentState.PERSON_AT_ACTIVITY ) {

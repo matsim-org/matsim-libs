@@ -23,7 +23,7 @@ package playground.michalm.vrp.run.online;
 {
     public static void main(String... args)
     {
-        String file = "/Users/nagel/shared-svn/projects/maciejewski/input/mielec-2-peaks/params.in";
+        String file = "./shared-svn/projects/maciejewski/input/mielec-2-peaks/params.in";
         SingleIterOnlineDvrpLauncher launcher = new SingleIterOnlineDvrpLauncher(file);
         launcher.go();
         launcher.generateOutput();
