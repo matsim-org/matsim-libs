@@ -42,7 +42,6 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Stack;
 
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -50,7 +49,6 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JLabel;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JSlider;
@@ -63,48 +61,34 @@ import javax.swing.filechooser.FileFilter;
 import org.apache.log4j.Logger;
 import org.geotools.geometry.Envelope2D;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
-import org.jdesktop.swingx.mapviewer.GeoPosition;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.events.EventsReaderXMLv1;
-import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.geometry.CoordinateTransformation;
-import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
-import org.matsim.core.utils.gis.ShapeFileReader;
-import org.opengis.feature.simple.SimpleFeature;
 
 import playground.wdoering.grips.scenariomanager.control.Controller;
-import playground.wdoering.grips.scenariomanager.model.AbstractModule;
 import playground.wdoering.grips.scenariomanager.model.AbstractToolBox;
 import playground.wdoering.grips.scenariomanager.model.Constants.Mode;
 import playground.wdoering.grips.scenariomanager.model.Constants.Unit;
 import playground.wdoering.grips.scenariomanager.view.renderer.GridRenderer;
-import playground.wdoering.grips.v2.analysis.control.EventHandler;
-import playground.wdoering.grips.v2.analysis.control.EventReaderThread;
 import playground.wdoering.grips.v2.analysis.control.TiffExporter;
-import playground.wdoering.grips.v2.analysis.data.ColorationMode;
-import playground.wdoering.grips.v2.analysis.data.EventData;
 import playground.wdoering.grips.v2.analysis.gui.AbstractDataPanel;
 import playground.wdoering.grips.v2.analysis.gui.EvacuationTimeGraphPanel;
 import playground.wdoering.grips.v2.analysis.gui.KeyPanel;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Envelope;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class EAToolBox extends AbstractToolBox
 {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
 	private int exportSize;
 
 	private static final Logger log = Logger.getLogger(EvacuationAnalysis.class);
@@ -113,7 +97,6 @@ public class EAToolBox extends AbstractToolBox
 	private JButton openBtn;
 	private JPanel blockPanel;
 	private Scenario sc;
-	private GeoPosition networkCenter;
 	private String configFile;
 	private Polygon areaPolygon;
 	private double cellSize = 200;
@@ -129,11 +112,9 @@ public class EAToolBox extends AbstractToolBox
 	private String itersOutputDir;
 	private boolean firstLoad;
 	private Mode mode = Mode.EVACUATION;
-	private ColorationMode colorationMode = ColorationMode.GREEN_YELLOW_RED;
 	private KeyPanel keyPanel;
 	private JLabel gridSizeLabel;
 	private String cellSizeText = " cell size: ";
-	private int k = 5;
 	private boolean useCalculateButton = false;
 	private GeotoolsTransformation ctInverse;
 	
@@ -141,7 +122,6 @@ public class EAToolBox extends AbstractToolBox
 	
 //	private EvacuationAnalysis module 
 
-	private double gridSize;
 	private GridRenderer gridRenderer;
 	
 	public EAToolBox(EvacuationAnalysis module, Controller controller)
@@ -544,10 +524,6 @@ public class EAToolBox extends AbstractToolBox
 				file.getParent();
 				Config c = ConfigUtils.loadConfig(this.configFile);
 				this.sc = ScenarioUtils.loadScenario(c);
-				String shp = this.sc.getConfig().getModule("grips").getValue("evacuationAreaFile");
-
-				// read the shape file
-//				readShapeFile(shp);
 
 				setIterations();
 

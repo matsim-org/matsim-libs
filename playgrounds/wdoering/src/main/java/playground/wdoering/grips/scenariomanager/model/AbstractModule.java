@@ -112,6 +112,12 @@ public abstract class AbstractModule
 			for (ProcessInterface process : this.processList)
 				process.start();
 		}
+		
+		if (this.toolBox!=null)
+			this.toolBox.init();
+		
+		if (this.listener!=null)
+			this.listener.init();
 	}
 	
 	public void sleep(int millis)

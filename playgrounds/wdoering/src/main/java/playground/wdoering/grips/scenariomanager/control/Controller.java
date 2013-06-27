@@ -735,6 +735,7 @@ public class Controller
 
 	public boolean hasSecondaryShapeRenderer()
 	{
+		System.out.println("has secondary shape layer?" + this.visualizer.hasSecondaryShapeRenderer());
 		return this.visualizer.hasSecondaryShapeRenderer();
 
 	}

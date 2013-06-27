@@ -138,5 +138,11 @@ public class AbstractListener implements KeyListener, MouseWheelListener, MouseI
 		this.controller.setMousePosition(point);
 	}
 	
+	public void init()
+	{
+		
+	}
+
+	
 	
 }

@@ -44,24 +44,10 @@ public class RCEEventListener extends AbstractListener
 	public RCEEventListener(Controller controller)
 	{
 		super(controller);
+		
 		this.border = controller.getImageContainer().getBorderWidth();
 		this.offsetX = this.border;
 		this.offsetY = this.border;
-		
-		//initialize 3 elements
-		int layerID = controller.getVisualizer().getSecondaryShapeRenderLayer().getId();
-		this.hoverLine = ShapeFactory.getHoverLineShape(layerID, controller.getCenterPosition(), controller.getCenterPosition()); 
-		this.primarySelectLine = ShapeFactory.getPrimarySelectedLineShape(layerID, controller.getCenterPosition(), controller.getCenterPosition()); 
-		this.secondarySelectLine = ShapeFactory.getSecondarySelectedLineShape(layerID, controller.getCenterPosition(), controller.getCenterPosition());
-		this.hoverLine.setVisible(false);
-		this.primarySelectLine.setVisible(false);
-		this.secondarySelectLine.setVisible(false);
-		this.controller.addShape(this.hoverLine);
-		this.controller.addShape(this.primarySelectLine);
-		this.controller.addShape(this.secondarySelectLine);
-		
-		this.editMode = false;
-		this.freezeMode = false;
 		
 //		this.hoverLine = new LineShape(controller.getVisualizer().getPrimaryShapeRenderLayer().getId(), controller.getCenterPosition(), controller.getCenterPosition());
 	}
@@ -219,5 +205,27 @@ public class RCEEventListener extends AbstractListener
 		viewPortBounds = this.controller.getViewportBounds();
 		return new Point(mousePoint.x+viewPortBounds.x-offsetX,mousePoint.y+viewPortBounds.y-offsetY);
 	}	
+	
+	@Override
+	public void init() {
+		
+		System.out.println("initializing RCE");
+		
+		//initialize 3 elements
+		int layerID = controller.getVisualizer().getSecondaryShapeRenderLayer().getId();
+		this.hoverLine = ShapeFactory.getHoverLineShape(layerID, controller.getCenterPosition(), controller.getCenterPosition()); 
+		this.primarySelectLine = ShapeFactory.getPrimarySelectedLineShape(layerID, controller.getCenterPosition(), controller.getCenterPosition()); 
+		this.secondarySelectLine = ShapeFactory.getSecondarySelectedLineShape(layerID, controller.getCenterPosition(), controller.getCenterPosition());
+		this.hoverLine.setVisible(false);
+		this.primarySelectLine.setVisible(false);
+		this.secondarySelectLine.setVisible(false);
+		this.controller.addShape(this.hoverLine);
+		this.controller.addShape(this.primarySelectLine);
+		this.controller.addShape(this.secondarySelectLine);
+		
+		this.editMode = false;
+		this.freezeMode = false;
+		
+	}
 
 }

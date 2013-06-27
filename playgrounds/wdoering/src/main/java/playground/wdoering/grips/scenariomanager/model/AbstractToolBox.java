@@ -59,4 +59,8 @@ public class AbstractToolBox extends JPanel implements ActionListener
 		return controller;
 	}
 
+	public void init() {
+		
+	}
+
 }

@@ -41,9 +41,17 @@ import playground.wdoering.grips.scenariomanager.model.Constants;
 import playground.wdoering.grips.scenariomanager.model.Constants.Mode;
 import playground.wdoering.grips.scenariomanager.model.imagecontainer.BufferedImageContainer;
 import playground.wdoering.grips.scenariomanager.model.process.BasicProcess;
+import playground.wdoering.grips.scenariomanager.model.process.DisableLayersProcess;
+import playground.wdoering.grips.scenariomanager.model.process.EnableLayersProcess;
+import playground.wdoering.grips.scenariomanager.model.process.InitEvacShapeProcess;
 import playground.wdoering.grips.scenariomanager.model.process.InitMainPanelProcess;
 import playground.wdoering.grips.scenariomanager.model.process.InitMapLayerProcess;
+import playground.wdoering.grips.scenariomanager.model.process.InitMatsimConfigProcess;
+import playground.wdoering.grips.scenariomanager.model.process.InitSecondaryShapeLayerProcess;
+import playground.wdoering.grips.scenariomanager.model.process.InitShapeLayerProcess;
 import playground.wdoering.grips.scenariomanager.model.process.ProcessInterface;
+import playground.wdoering.grips.scenariomanager.model.process.SetModuleListenerProcess;
+import playground.wdoering.grips.scenariomanager.model.process.SetToolBoxProcess;
 import playground.wdoering.grips.scenariomanager.view.DefaultRenderPanel;
 import playground.wdoering.grips.scenariomanager.view.DefaultWindow;
 import playground.wdoering.grips.scenariomanager.view.renderer.GridRenderer;
@@ -54,6 +62,7 @@ import playground.wdoering.grips.v2.analysis.data.EventData;
 import playground.wdoering.grips.v2.analysis.gui.AbstractDataPanel;
 import playground.wdoering.grips.v2.analysis.gui.EvacuationTimeGraphPanel;
 import playground.wdoering.grips.v2.analysis.gui.KeyPanel;
+import playground.wdoering.grips.v2.roadclosures.RCEEventListener;
 
 public class EvacuationAnalysis extends AbstractModule
 {
@@ -107,10 +116,67 @@ public class EvacuationAnalysis extends AbstractModule
 	public EvacuationAnalysis(Controller controller)
 	{
 		super(controller.getLocale().moduleEvacuationAnalysis(), Constants.ModuleType.ANALYSIS, controller);
-		this.processList.add(getInitProcess());
+		
+		//disable all layers
+		this.processList.add(new DisableLayersProcess(controller));
+		
+		//initialize Matsim config
+		this.processList.add(new InitMatsimConfigProcess(controller));
+
+		//check if the default render panel is set
+		this.processList.add(new InitMainPanelProcess(controller));
+		
+		// check if there is already a map viewer running, or just (re)set center position
+		this.processList.add(new InitMapLayerProcess(controller));
+		
+		//set module listeners		
+		this.processList.add(new SetModuleListenerProcess(controller, this, new EAEventListener(controller)));
+		
+		//load evacuation area shape		
+		this.processList.add(new InitEvacShapeProcess(controller));
+		
+		//add grid renderer
+		this.processList.add(new BasicProcess(controller)
+		{
+			@Override
+			public void start()
+			{
+				if (!this.controller.hasGridRenderer())
+				{
+					gridRenderer = new GridRenderer(controller);
+					gridRendererID = gridRenderer.getId();
+					this.controller.addRenderLayer(gridRenderer);
+				}
+			}
+
+		});		
+		
+		//add toolbox
+		this.processList.add(new SetToolBoxProcess(controller, getToolBox()));
+		
+		//enable all layers
+		this.processList.add(new EnableLayersProcess(controller));
+
+		//enable grid renderer
+		this.processList.add(new BasicProcess(controller)
+		{
+			@Override
+			public void start()
+			{
+				toolBox.setGridRenderer(gridRenderer);
+				readEvents();
+				
+				//finally: enable all layers
+				controller.enableMapRenderer();
+				gridRenderer.setEnabled(true);
+			}
+
+		});		
+		
 		
 	}
 	
+
 
 	@Override
 	public AbstractToolBox getToolBox()
@@ -144,6 +210,8 @@ public class EvacuationAnalysis extends AbstractModule
 		public InitProcess(EvacuationAnalysis module, Controller controller)
 		{
 			super(module, controller);
+			
+
 
 		}
 
@@ -162,11 +230,6 @@ public class EvacuationAnalysis extends AbstractModule
 			if (!controller.hasDefaultRenderPanel())
 				controller.setMainPanel(new DefaultRenderPanel(this.controller), true);
 			
-//			// check if there is already a map viewer running, or just (re)set center position
-//			if (!controller.hasMapRenderer())
-//				addMapViewer();
-//			else
-//				controller.getVisualizer().getActiveMapRenderLayer().setPosition(controller.getCenterPosition());
 			new InitMapLayerProcess(controller).start();
 			
 			// set module listeners
@@ -186,11 +249,6 @@ public class EvacuationAnalysis extends AbstractModule
 			//validate render layers
 			this.controller.validateRenderLayers();
 
-//			//add network bounding box shape
-//			int shapeRendererId = controller.getVisualizer().getPrimaryShapeRenderLayer().getId();
-//			Rectangle2D bbRect = controller.getBoundingBox();
-//			controller.addShape(ShapeFactory.getNetBoxShape(shapeRendererId, bbRect, false));
-			
 			//set tool box
 			if ((controller.getActiveToolBox()==null) || (!(controller.getActiveToolBox() instanceof EAToolBox)))
 				addToolBox(getToolBox());

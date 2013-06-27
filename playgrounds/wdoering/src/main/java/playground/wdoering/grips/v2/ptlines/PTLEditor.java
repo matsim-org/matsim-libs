@@ -10,9 +10,18 @@ import playground.wdoering.grips.scenariomanager.model.AbstractToolBox;
 import playground.wdoering.grips.scenariomanager.model.Constants;
 import playground.wdoering.grips.scenariomanager.model.imagecontainer.BufferedImageContainer;
 import playground.wdoering.grips.scenariomanager.model.process.BasicProcess;
+import playground.wdoering.grips.scenariomanager.model.process.DisableLayersProcess;
+import playground.wdoering.grips.scenariomanager.model.process.EnableLayersProcess;
+import playground.wdoering.grips.scenariomanager.model.process.InitBBShapeProcess;
+import playground.wdoering.grips.scenariomanager.model.process.InitEvacShapeProcess;
+import playground.wdoering.grips.scenariomanager.model.process.InitMainPanelProcess;
 import playground.wdoering.grips.scenariomanager.model.process.InitMapLayerProcess;
+import playground.wdoering.grips.scenariomanager.model.process.InitMatsimConfigProcess;
+import playground.wdoering.grips.scenariomanager.model.process.InitSecondaryShapeLayerProcess;
 import playground.wdoering.grips.scenariomanager.model.process.InitShapeLayerProcess;
 import playground.wdoering.grips.scenariomanager.model.process.ProcessInterface;
+import playground.wdoering.grips.scenariomanager.model.process.SetModuleListenerProcess;
+import playground.wdoering.grips.scenariomanager.model.process.SetToolBoxProcess;
 import playground.wdoering.grips.scenariomanager.view.DefaultRenderPanel;
 import playground.wdoering.grips.scenariomanager.view.DefaultWindow;
 import playground.wdoering.grips.scenariomanager.view.renderer.ShapeRenderer;
@@ -49,7 +58,51 @@ public class PTLEditor extends AbstractModule
 	public PTLEditor(Controller controller)
 	{
 		super(controller.getLocale().modulePTLEditor(), Constants.ModuleType.BUSSTOPS, controller);
-		this.processList.add(getInitProcess());
+		
+		//disable all layers
+		this.processList.add(new DisableLayersProcess(controller));
+		
+		//initialize Matsim config
+		this.processList.add(new InitMatsimConfigProcess(controller));
+
+		//check if the default render panel is set
+		this.processList.add(new InitMainPanelProcess(controller));
+		
+		// check if there is already a map viewer running, or just (re)set center position
+		this.processList.add(new InitMapLayerProcess(controller));
+		
+		//check if the default shape layer is set
+		this.processList.add(new InitShapeLayerProcess(controller));
+		
+		//check if the secondary shape layer is set
+		this.processList.add(new InitSecondaryShapeLayerProcess(controller));
+		
+		//set module listeners		
+		this.processList.add(new SetModuleListenerProcess(controller, this, new PTLEventListener(controller)));
+		
+		//load evacuation area shape		
+		this.processList.add(new InitEvacShapeProcess(controller));
+		
+		this.processList.add(new BasicProcess(controller) {
+			@Override
+			public void start()
+			{
+				if (!controller.isPopulationFileOpened())
+					controller.openPopulationFile();
+				
+				controller.openNetworkChangeEvents();
+			}
+		});
+		
+		//add bounding box
+		this.processList.add(new InitBBShapeProcess(controller));
+		
+		//add toolbox
+		this.processList.add(new SetToolBoxProcess(controller, getToolBox()));
+		
+		//enable all layers
+		this.processList.add(new EnableLayersProcess(controller));
+		
 	}
 	
 	@Override
@@ -76,61 +129,61 @@ public class PTLEditor extends AbstractModule
 		public void start()
 		{
 
-			//in case this is only part of something bigger
-			controller.disableAllRenderLayers();
-			
-			// check if Matsim config (including the OSM network) has been loaded
-			if (!controller.isMatsimConfigOpened())
-				if (!controller.openMastimConfig())
-					exit(locale.msgOpenMatsimConfigFailed());
-			
-			//check if the default render panel is set
-			if (!controller.hasDefaultRenderPanel())
-				controller.setMainPanel(new DefaultRenderPanel(this.controller), true);
-
-//			// check if there is already a map viewer running, or just (re)set center position
-//			if (!controller.hasMapRenderer())
-//				addMapViewer();
-//			else
-//				controller.getVisualizer().getActiveMapRenderLayer().setPosition(controller.getCenterPosition());
-			
-			new InitMapLayerProcess(controller).start();
-
-			// check if there is already a primary shape layer
-			if (!controller.hasShapeRenderer())
-				this.controller.addRenderLayer(new ShapeRenderer(controller, controller.getImageContainer()));
-			
-			// check if there is already a secondary shape layer
-			if (!controller.hasSecondaryShapeRenderer())
-				this.controller.addRenderLayer(new ShapeRenderer(controller, controller.getImageContainer()));
-			
-			//set module listeners
-			if ((controller.getListener()==null) || (!(controller.getListener() instanceof PTLEventListener)) )
-				setListeners(new PTLEventListener(controller));
-
-			// check if Grips config (including the OSM network) has been loaded
-			if (!controller.openEvacuationShape(Constants.ID_EVACAREAPOLY))
-				exit(locale.msgOpenEvacShapeFailed());
-			
-			if (!controller.isPopulationFileOpened())
-				controller.openPopulationFile();
-			
-			controller.openNetworkChangeEvents();
-			
-			//validate render layers
-			this.controller.validateRenderLayers();
-
-			//add network bounding box shape
-			int primaryShapeRendererId = controller.getVisualizer().getPrimaryShapeRenderLayer().getId();
-			Rectangle2D bbRect = controller.getBoundingBox();
-			controller.addShape(ShapeFactory.getNetBoxShape(primaryShapeRendererId, bbRect, true));
-			
-			//set tool box
-			if ((controller.getActiveToolBox()==null) || (!(controller.getActiveToolBox() instanceof PTLToolBox)))
-				addToolBox(new PTLToolBox(this.module, controller));
-			
-			//finally: enable all layers
-			controller.enableAllRenderLayers();			
+//			//in case this is only part of something bigger
+//			controller.disableAllRenderLayers();
+//			
+//			// check if Matsim config (including the OSM network) has been loaded
+//			if (!controller.isMatsimConfigOpened())
+//				if (!controller.openMastimConfig())
+//					exit(locale.msgOpenMatsimConfigFailed());
+//			
+//			//check if the default render panel is set
+//			if (!controller.hasDefaultRenderPanel())
+//				controller.setMainPanel(new DefaultRenderPanel(this.controller), true);
+//
+////			// check if there is already a map viewer running, or just (re)set center position
+////			if (!controller.hasMapRenderer())
+////				addMapViewer();
+////			else
+////				controller.getVisualizer().getActiveMapRenderLayer().setPosition(controller.getCenterPosition());
+//			
+//			new InitMapLayerProcess(controller).start();
+//
+//			// check if there is already a primary shape layer
+//			if (!controller.hasShapeRenderer())
+//				this.controller.addRenderLayer(new ShapeRenderer(controller, controller.getImageContainer()));
+//			
+//			// check if there is already a secondary shape layer
+//			if (!controller.hasSecondaryShapeRenderer())
+//				this.controller.addRenderLayer(new ShapeRenderer(controller, controller.getImageContainer()));
+//			
+//			//set module listeners
+//			if ((controller.getListener()==null) || (!(controller.getListener() instanceof PTLEventListener)) )
+//				setListeners(new PTLEventListener(controller));
+//
+//			// check if Grips config (including the OSM network) has been loaded
+//			if (!controller.openEvacuationShape(Constants.ID_EVACAREAPOLY))
+//				exit(locale.msgOpenEvacShapeFailed());
+//			
+//			if (!controller.isPopulationFileOpened())
+//				controller.openPopulationFile();
+//			
+//			controller.openNetworkChangeEvents();
+//			
+//			//validate render layers
+//			this.controller.validateRenderLayers();
+//
+//			//add network bounding box shape
+//			int primaryShapeRendererId = controller.getVisualizer().getPrimaryShapeRenderLayer().getId();
+//			Rectangle2D bbRect = controller.getBoundingBox();
+//			controller.addShape(ShapeFactory.getNetBoxShape(primaryShapeRendererId, bbRect, true));
+//			
+//			//set tool box
+//			if ((controller.getActiveToolBox()==null) || (!(controller.getActiveToolBox() instanceof PTLToolBox)))
+//				addToolBox(new PTLToolBox(this.module, controller));
+//			
+//			//finally: enable all layers
+//			controller.enableAllRenderLayers();			
 			
 			
 		}

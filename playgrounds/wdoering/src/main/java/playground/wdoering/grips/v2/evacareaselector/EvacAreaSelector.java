@@ -1,15 +1,9 @@
 package playground.wdoering.grips.v2.evacareaselector;
 
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Cursor;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-
-import javax.swing.SwingUtilities;
 
 import playground.wdoering.grips.scenariomanager.control.Controller;
 import playground.wdoering.grips.scenariomanager.control.ShapeFactory;
@@ -18,7 +12,6 @@ import playground.wdoering.grips.scenariomanager.model.AbstractToolBox;
 import playground.wdoering.grips.scenariomanager.model.Constants;
 import playground.wdoering.grips.scenariomanager.model.imagecontainer.BufferedImageContainer;
 import playground.wdoering.grips.scenariomanager.model.process.BasicProcess;
-import playground.wdoering.grips.scenariomanager.model.process.CommonProcesses;
 import playground.wdoering.grips.scenariomanager.model.process.DisableLayersProcess;
 import playground.wdoering.grips.scenariomanager.model.process.EnableLayersProcess;
 import playground.wdoering.grips.scenariomanager.model.process.InitGripsConfigProcess;
@@ -28,13 +21,8 @@ import playground.wdoering.grips.scenariomanager.model.process.InitShapeLayerPro
 import playground.wdoering.grips.scenariomanager.model.process.ProcessInterface;
 import playground.wdoering.grips.scenariomanager.model.process.SetModuleListenerProcess;
 import playground.wdoering.grips.scenariomanager.model.process.SetToolBoxProcess;
-import playground.wdoering.grips.scenariomanager.model.shape.BoxShape;
 import playground.wdoering.grips.scenariomanager.model.shape.CircleShape;
-import playground.wdoering.grips.scenariomanager.model.shape.ShapeStyle;
-import playground.wdoering.grips.scenariomanager.model.shape.Shape.DrawMode;
-import playground.wdoering.grips.scenariomanager.view.DefaultRenderPanel;
 import playground.wdoering.grips.scenariomanager.view.DefaultWindow;
-import playground.wdoering.grips.scenariomanager.view.renderer.ShapeRenderer;
 
 /**
  * 
@@ -89,7 +77,7 @@ public class EvacAreaSelector extends AbstractModule
 		this.processList.add(new InitMapLayerProcess(controller));
 		
 		//set module listeners		
-		this.processList.add(new SetModuleListenerProcess(controller, new EvacEventListener(controller)));
+		this.processList.add(new SetModuleListenerProcess(controller, this, new EvacEventListener(controller)));
 		
 		// check if there is already a primary shape layer
 		this.processList.add(new InitShapeLayerProcess(controller));

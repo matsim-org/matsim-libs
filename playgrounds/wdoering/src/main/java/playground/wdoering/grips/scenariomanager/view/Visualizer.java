@@ -153,11 +153,22 @@ public class Visualizer
 	
 	public ShapeRenderer getPrimaryShapeRenderLayer()
 	{
+//		if (this.primaryShapeRenderLayer==null)
+//			this.addRenderLayer(new ShapeRenderer(this.controller, this.getImageContainer()));
+		
 		return primaryShapeRenderLayer;
 	}
 	
 	public ShapeRenderer getSecondaryShapeRenderLayer()
 	{
+//		if (this.secondaryShapeRenderLayer==null)
+//		{
+//			if (this.primaryShapeRenderLayer==null)
+//				this.addRenderLayer(new ShapeRenderer(this.controller, this.getImageContainer()));
+//				
+//			this.addRenderLayer(new ShapeRenderer(this.controller, this.getImageContainer()));
+//		}
+		
 		return secondaryShapeRenderLayer;
 	}
 	
