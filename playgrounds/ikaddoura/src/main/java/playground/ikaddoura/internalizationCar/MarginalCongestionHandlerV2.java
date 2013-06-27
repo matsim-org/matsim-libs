@@ -77,7 +77,6 @@ public class MarginalCongestionHandlerV2 implements
 	private final ScenarioImpl scenario;
 	private final EventsManager events;
 	private final List<Id> ptVehicleIDs = new ArrayList<Id>();
-	private final List<Id> ptDriverIDs = new ArrayList<Id>();
 	private final Map<Id, LinkCongestionInfo> linkId2congestionInfo = new HashMap<Id, LinkCongestionInfo>();
 	
 	public MarginalCongestionHandlerV2(EventsManager events, ScenarioImpl scenario) {
@@ -104,7 +103,6 @@ public class MarginalCongestionHandlerV2 implements
 	@Override
 	public void reset(int iteration) {
 		this.linkId2congestionInfo.clear();
-		this.ptDriverIDs.clear();
 		this.ptVehicleIDs.clear();
 		this.delayNotInternalized = 0.;
 	}
@@ -116,9 +114,6 @@ public class MarginalCongestionHandlerV2 implements
 			this.ptVehicleIDs.add(event.getVehicleId());
 		}
 		
-		if (!this.ptDriverIDs.contains(event.getDriverId())){
-			this.ptDriverIDs.add(event.getDriverId());
-		}
 	}
 	
 	@Override
