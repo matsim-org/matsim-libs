@@ -28,6 +28,7 @@ import java.util.TimeZone;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.core.utils.io.UncheckedIOException;
 import org.xml.sax.Attributes;
 
 import playground.southafrica.freight.digicore.containers.DigicoreActivity;
@@ -63,10 +64,24 @@ public class DigicoreVehicleReader_v1 extends MatsimXmlParser {
 
 	}
 	
-	
+	/**
+	 * Parses the specified file. The file can be gzip-compressed and is decompressed on-the-fly while parsing. A gzip-compressed
+	 * file must have the ending ".gz" to be correctly recognized. The passed filename may or may not contain the ending ".gz". If
+	 * no uncompressed file is found with the specified name, the ending ".gz" will be added  ot the filename and a compressed file
+	 * will be searched for and read if found.
+	 *
+	 * @param filename The filename of the file to read, optionally ending with ".gz" to force reading a gzip-compressed file.
+	 * @throws UncheckedIOException
+	 * @return the parsed {@link DigicoreVehicle}
+	 */
 	public DigicoreVehicle parseDigicoreVehicle(String filename){
 		super.parse(filename);
 		return this.vehicle;		
+	}
+	
+	
+	public DigicoreVehicle getVehicle(){
+		return this.vehicle;
 	}
 	
 	
