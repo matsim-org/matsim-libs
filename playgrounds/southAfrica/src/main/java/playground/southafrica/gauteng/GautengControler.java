@@ -6,7 +6,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.matsim4urbansim.analysis.KaiAnalysisListener;
+import org.matsim.contrib.matsim4opus.analysis.KaiAnalysisListener;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.households.Household;
