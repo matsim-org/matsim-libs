@@ -632,7 +632,7 @@ public class CreateTestMATSimConfig {
 		
 		String path = TempDirectoryUtil.createCustomTempDirectory("tmp");
 		CreateTestMATSimConfig config = new CreateTestMATSimConfig(COLD_START, path);
-		String matsimConfiFile = config.generateConfigV2();
+		String matsimConfiFile = config.generateConfigV3();
 		
 		M4UConfigurationConverterV4 connector = new M4UConfigurationConverterV4( matsimConfiFile );
 		connector.init();
