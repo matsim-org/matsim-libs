@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
@@ -54,6 +55,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 	 */
 	
 	@Test
+	@Ignore
 	public void testGridBasedAccessibilityMeasure(){
 
 		//create local temp directory
@@ -135,6 +137,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 	 * The test result should be that the accessibility of the work zone is higher than the accessibility of the home zone.
 	 */
 	@Test
+	@Ignore
 	public void testZoneBasedAccessibilityMeasure(){
 		
 		//create local temp directory
@@ -246,6 +249,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 	}
 
 	@Override
+	@Ignore
 	public void getZoneAccessibilities(ActivityFacility measurePoint,
 			double freeSpeedAccessibility, double carAccessibility,
 			double bikeAccessibility, double walkAccessibility, double ptAccessibility) {
