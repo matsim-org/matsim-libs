@@ -28,6 +28,8 @@ public class AllTests {
 	public static Test suite(){
 		TestSuite suite = new TestSuite("All tests for playground.southAfrica.freight.digicore.algorithms.djcluster");
 		
+		suite.addTestSuite(DJClusterTest.class);
+		
 		return suite;
 	}
 

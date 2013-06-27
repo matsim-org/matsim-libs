@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * ClusterPoint.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,20 +18,45 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.jjoubert.CommercialClusters;
+package playground.southafrica.freight.digicore.algorithms.djcluster.containers;
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 
 
-public class AllTests {
-
-	public static Test suite(){
-		TestSuite suite = new TestSuite("Tests for playground.jjoubert.CommercialClusters");
-		
-		suite.addTestSuite(DJClusterTest.class);
-		
-		return suite;
+/**
+ * A simple class linking a {@link DigicoreActivity} to a specific cluster.
+ * 
+ * @author jwjoubert
+ */
+public class ClusterActivity implements Identifiable{
+	private Id id;
+	private Coord coord;
+	private DigicoreCluster cluster;
+	
+	public ClusterActivity(Id id, Coord coord, DigicoreCluster cluster){
+		this.id = id;
+		this.coord = coord;
+		this.cluster = cluster;
 	}
+
+	public Coord getCoord() {
+		return this.coord;
+	}
+
+	public DigicoreCluster getCluster() {
+		return cluster;
+	}
+	
+	public void setCluster(DigicoreCluster cluster){
+		this.cluster = cluster;
+	}
+
+	@Override
+	public Id getId() {
+		return this.id;
+	}
+	
 
 }

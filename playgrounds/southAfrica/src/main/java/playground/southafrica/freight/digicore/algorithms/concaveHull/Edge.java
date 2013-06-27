@@ -199,6 +199,16 @@ public class Edge {
 	 */
 	public void setBorder(boolean border) {
 		this.border = border;
+		
+		/* If an edge is changed to a border edge, also flag both origin and 
+		 * destination node as border nodes. The opposite, however, is NOT true:
+		 * that is, if an edge is an internal edge, one (or both) of its nodes
+		 * may be border nodes.
+		 */
+		if(border == true){
+			this.originNode.setBorder(true);
+			this.destinationNode.setBorder(true);
+		}
 	}
 	
 	/**

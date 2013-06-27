@@ -368,7 +368,7 @@ public class ConcaveHull {
 			 * triangles. */
 			if(neighbours.size() == 1){
 				/* It is irregular. Even though it's long enough to be
-				 * considered for removal, it will be flagged and ignored */
+				 * considered for removal, it will be flagged and ignored. */
 				this.consideredEdges.remove(e.getId());
 				this.ignoredEdges.put(e.getId(), e);
 			} else{

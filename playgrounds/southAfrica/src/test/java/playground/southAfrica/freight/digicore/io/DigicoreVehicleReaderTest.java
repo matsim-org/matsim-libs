@@ -32,10 +32,8 @@ import org.matsim.testcases.MatsimTestCase;
 import playground.southafrica.freight.digicore.containers.DigicoreActivity;
 import playground.southafrica.freight.digicore.containers.DigicoreChain;
 import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
-import playground.southafrica.freight.digicore.io.DigicoreVehicleReader;
 import playground.southafrica.freight.digicore.io.DigicoreVehicleReader_v1;
 import playground.southafrica.freight.digicore.io.DigicoreVehicleWriter;
-import playground.southafrica.utilities.SouthAfricaInflationCorrector;
 
 public class DigicoreVehicleReaderTest extends MatsimTestCase {
 	private final static Logger LOG = Logger.getLogger(DigicoreVehicleReaderTest.class);
@@ -52,7 +50,8 @@ public class DigicoreVehicleReaderTest extends MatsimTestCase {
 		dvw.write(getOutputDirectory() + "tmp.xml", v1);
 		
 		DigicoreVehicleReader_v1 dvr = new DigicoreVehicleReader_v1();
-		DigicoreVehicle v2 = dvr.parseDigicoreVehicle(getOutputDirectory() + "tmp.xml");
+		dvr.parse(getOutputDirectory() + "tmp.xml");
+		DigicoreVehicle v2 = dvr.getVehicle();
 		
 		assertEquals("Wrong id.", true, v1.getId().toString().equalsIgnoreCase(v2.getId().toString()));
 		assertEquals("Wrong number of chains.", 1, v2.getChains().size());
