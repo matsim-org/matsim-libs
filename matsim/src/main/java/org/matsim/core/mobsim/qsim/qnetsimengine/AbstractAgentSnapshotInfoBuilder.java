@@ -65,6 +65,7 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 	 * @param waitingList
 	 * @param transitQueueLaneFeature
 	 */
+	@Override
 	public int positionVehiclesFromWaitingList(final Collection<AgentSnapshotInfo> positions,
 			final Link link, int cnt2, final Queue<QVehicle> waitingList) {
 		for (QVehicle veh : waitingList) {
@@ -89,6 +90,7 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 		return cnt2 ;
 	}
 
+	@Override
 	public int positionAgentsInActivities(final Collection<AgentSnapshotInfo> positions, Link link,
 			Collection<MobsimAgent> agentsInActivities,  int cnt2) {
 		for (MobsimAgent pa : agentsInActivities) {
@@ -104,6 +106,7 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 	 * Put the transit vehicles from the transit stop list in positions.
 	 * @param transitVehicleStopQueue 
 	 */
+	@Override
 	public int positionVehiclesFromTransitStop(final Collection<AgentSnapshotInfo> positions, Link link, Queue<QVehicle> transitVehicleStopQueue, int cnt2 ) {
 		if (transitVehicleStopQueue.size() > 0) {
 			for (QVehicle veh : transitVehicleStopQueue) {
@@ -134,6 +137,7 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 		return cnt2 ;
 	}
 
+	@Override
 	public void createAndAddVehiclePosition(final Collection<AgentSnapshotInfo> positions, Coord startCoord, Coord endCoord, 
 			double lengthOfCurve, double euclideanLength, QVehicle veh, 
 			double distanceFromFromNode,	Integer lane, double speedValueBetweenZeroAndOne){
@@ -143,17 +147,20 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 		pos.setColorValueBetweenZeroAndOne(speedValueBetweenZeroAndOne);
 		if (driverAgent instanceof TransitDriverAgent){
 			pos.setAgentState(AgentState.TRANSIT_DRIVER);
-			TransitVehicle transitVehicle = (TransitVehicle) veh; //currently only TransitVehicles are able to have passengers
-			this.createAndAddSnapshotInfoForPassengers(positions, transitVehicle.getPassengers(), distanceFromFromNode, startCoord, endCoord, lengthOfCurve, euclideanLength, 
-					lane, speedValueBetweenZeroAndOne);
 		} else if ( driverAgent.getMode().equals(TransportMode.car)) {
 			pos.setAgentState(AgentState.PERSON_DRIVING_CAR);
 		} else {
 			pos.setAgentState(AgentState.PERSON_OTHER_MODE );
 		}
+
+		this.createAndAddSnapshotInfoForPassengers(positions, veh.getPassengers(), distanceFromFromNode, startCoord, 
+						endCoord, lengthOfCurve, euclideanLength, lane, speedValueBetweenZeroAndOne);
+		// (this is deliberately first memorizing "pos" but then filling in the passengers first)
+		
 		positions.add(pos);
 	}
 	
+	@Override
 	public double calcSpeedValueBetweenZeroAndOne(QVehicle veh, double inverseSimulatedFlowCapacity, double now, double freespeed){
 //		log.error("  earliestLinkExitTime: " + veh.getEarliestLinkExitTime() + " inverseFlowCap: " + inverseSimulatedFlowCapacity);
 
@@ -167,6 +174,7 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 		return speed;
 	}
 	
+	@Override
 	public Integer guessLane(QVehicle veh, int numberOfLanes){
 		Integer tmpLane;
 		try {

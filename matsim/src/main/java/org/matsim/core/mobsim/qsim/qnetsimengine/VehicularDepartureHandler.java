@@ -90,7 +90,10 @@ class VehicularDepartureHandler implements DepartureHandler {
 			if (vehicleBehavior == VehicleBehavior.TELEPORT) {
 				vehicle = qNetsimEngine.getVehicles().get(vehicleId);
 				teleportVehicleTo(vehicle, linkId);
+
 				vehicle.setDriver(agent);
+				agent.setVehicle(vehicle) ;
+
 				qlink.letVehicleDepart(vehicle, now);
 				// (since the "teleportVehicle" does not physically move the vehicle, this is finally achieved in the departure
 				// logic.  kai, nov'11)
@@ -102,6 +105,7 @@ class VehicularDepartureHandler implements DepartureHandler {
 			}
 		} else {
 			vehicle.setDriver(agent);
+			agent.setVehicle(vehicle) ;
 			qlink.letVehicleDepart(vehicle, now);
 		}
 	}
