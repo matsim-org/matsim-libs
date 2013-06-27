@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MyControlerListener.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -21,38 +20,14 @@
 /**
  * 
  */
-
 package playground.ikaddoura.internalizationPt;
 
-import org.matsim.core.api.experimental.events.EventsManager;
-
-import org.matsim.core.controler.events.StartupEvent;
-
-import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.events.handler.EventHandler;
 
 /**
- * @author Ihab
+ * @author ikaddoura
  *
  */
-
-public class InternalizationPtControlerListener implements StartupListener {
-
-	private final ScenarioImpl scenario;
-
-	public InternalizationPtControlerListener(ScenarioImpl scenario){
-		this.scenario = scenario;
-	}
-	
-	@Override
-	public void notifyStartup(StartupEvent event) {
-		
-		EventsManager eventsManager = event.getControler().getEvents();
-		
-		event.getControler().getEvents().addHandler(new InVehicleDelayHandler(eventsManager, scenario));
-		event.getControler().getEvents().addHandler(new WaitingDelayHandler(eventsManager, scenario));
-		event.getControler().getEvents().addHandler(new CapacityWaitingDelayHandler(eventsManager, scenario));
-		event.getControler().getEvents().addHandler(new MarginalCostPricingPtHandler(eventsManager, scenario));
-	}
-
+public interface CapacityWaitingDelayEventHandler extends EventHandler {
+	public void handleEvent (CapacityWaitingDelayEvent event);
 }

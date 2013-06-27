@@ -47,7 +47,7 @@ public class InternalizationPtControler {
 			log.info("configFile: "+ configFile);
 			
 		} else {
-			configFile = "/Users/Ihab/Desktop/pt_internalization_input/config_internalization.xml";
+			configFile = "/Users/Ihab/Desktop/pt_internalization_input/config_test.xml";
 //			configFile = "/Users/Ihab/Desktop/pt_internalization_input/config_noInternalization.xml";
 		}
 		
