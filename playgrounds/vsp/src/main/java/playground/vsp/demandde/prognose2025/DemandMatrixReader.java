@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.vsp.demandde.pendlermatrix;
+package playground.vsp.demandde.prognose2025;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -35,20 +35,22 @@ import org.matsim.core.utils.io.tabularFileParser.TabularFileParser;
 import org.matsim.core.utils.io.tabularFileParser.TabularFileParserConfig;
 import org.opengis.feature.simple.SimpleFeature;
 
+import playground.vsp.demandde.pendlermatrix.TripFlowSink;
+import playground.vsp.demandde.pendlermatrix.Zone;
+
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
 
-public class PendlerMatrixReader {
+public class DemandMatrixReader {
 
-	private static final Logger log = Logger.getLogger(PendlerMatrixReader.class);
+	private static final Logger log = Logger.getLogger(DemandMatrixReader.class);
 
-	private static final String PV_EINPENDLERMATRIX = "../../detailedEval/eingangsdaten/Pendlermatrizen/EinpendlerMUC_843_062004.csv";
+	// PV Matrix enthält keine Richtungs-Info für den Pendlerverkehr --> Pendlerstatistik
+//	private static final String PV_MATRIX = "../../shared-svn/studies/countries/de/prognose_2025/orig/pv-matrizen/2004_nuts_102r6x6.csv";
 
-	private static final String PV_AUSPENDLERMATRIX = "../../detailedEval/eingangsdaten/Pendlermatrizen/AuspendlerMUC_843_062004.csv";
-
-	//	private static final String NODES = "../../shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2004/strasse/knoten_wgs84.csv";
+	private static final String GV_MATRIX = "../../shared-svn/studies/countries/de/prognose_2025/orig/gv-matrizen/gv-matrix-2004.csv";
 
 	private Map<Integer, Zone> zones = new HashMap<Integer, Zone>();
 
@@ -56,15 +58,15 @@ public class PendlerMatrixReader {
 
 	private String shapeFile;
 
-	public PendlerMatrixReader(String shapeFile) {
+	public DemandMatrixReader(String shapeFile) {
 		this.shapeFile = shapeFile;
 	}
 
 	public void run() {
 		//		readNodes();
 		readShape();
-		readMatrix(PV_EINPENDLERMATRIX);
-		readMatrix(PV_AUSPENDLERMATRIX);
+//		readMatrix(PV_MATRIX);
+		readMatrix(GV_MATRIX);
 		flowSink.complete();
 	}
 
@@ -93,46 +95,18 @@ public class PendlerMatrixReader {
 		} while (!g.contains(p));
 		return p;
 	}
-
-	//// leaves some of the municipalities empty...
-	//
-	//	private void readNodes() {
-	//		final CoordinateTransformation coordinateTransformation = TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84, TransformationFactory.DHDN_GK4);
-	//		TabularFileParserConfig tabFileParserConfig = new TabularFileParserConfig();
-	//		tabFileParserConfig.setFileName(NODES);
-	//		tabFileParserConfig.setDelimiterTags(new String[] {";"});
-	//		try {
-	//			new TabularFileParser().parse(tabFileParserConfig,
-	//					new TabularFileHandler() {
-	//				@Override
-	//				public void startRow(String[] row) {
-	//					if (row[0].startsWith("Knoten")) {
-	//						return;
-	//					}
-	//					int zone = Integer.parseInt(row[5]);
-	//					double x = Double.parseDouble(row[2]);
-	//					double y = Double.parseDouble(row[3]);
-	//					Zone zone1 = new Zone(zone, 1, 1, coordinateTransformation.transform(new CoordImpl(x,y)));
-	//					zones.put(zone, zone1);
-	//				}
-	//
-	//			});
-	//		} catch (IOException e) {
-	//			throw new RuntimeException(e);
-	//		}
-	//	}
+	
+	enum Verkehrsmittel { railConv, railComb, LKW, ship } 
+	enum Guetergruppe { gg0, gg1, gg2, gg3, gg4, gg5, gg6, gg7, gg8, gg9 } 
 
 	private void readMatrix(final String filename) {
-
-		Logger.getLogger(this.getClass()).warn("this method may read double entries in the Pendlermatrix (such as Nuernberg) twice. " +
-						"If this may be a problem, you need to check.  kai, apr'11" ) ;
 
 		System.out.println("======================" + "\n"
 						+ "Start reading " + filename + "\n"
 						+ "======================" + "\n");
 		TabularFileParserConfig tabFileParserConfig = new TabularFileParserConfig();
 		tabFileParserConfig.setFileName(filename);
-		tabFileParserConfig.setDelimiterTags(new String[] {","});
+		tabFileParserConfig.setDelimiterTags(new String[] {";"});
 		new TabularFileParser().parse(tabFileParserConfig,
 						new TabularFileHandler() {
 
@@ -148,46 +122,20 @@ public class PendlerMatrixReader {
 				// scale factor, since Pendlermatrix only considers "sozialversicherungspflichtige Arbeitnehmer" (taken from GuthEtAl2005)
 				double scaleFactor = 1.29;
 
-				if (filename.equals(PV_EINPENDLERMATRIX)){
+				if (filename.equals(GV_MATRIX)){
 					try {
-						quelle = Integer.parseInt(row[2]);
-						ziel = 9162 ;
-
-						int totalTrips = (int) (scaleFactor * Integer.parseInt(row[4]));
-						int workPt = (int) ((1 - carMarketShare) * totalTrips) ;
-						int educationPt = 0 ;
-						int workCar = (int) (carMarketShare * totalTrips);
-						int educationCar = 0 ;
-						String label = row[3] ;
-						if ( !label.contains("brige ") && !quelle.equals(ziel)) {
-							process(quelle, ziel, workPt, educationPt, workCar, educationCar);
-						} else {
-							System.out.println( " uebrige? : " + label ) ;
-						}
+						int idx = 0 ;
+						quelle = Integer.parseInt(row[idx]); idx++ ;
+						ziel = Integer.parseInt(row[idx]); idx++ ;
+						
+						Verkehrsmittel vm = Verkehrsmittel.values()[idx] ; idx++ ;
+						Guetergruppe gg = Guetergruppe.values()[idx] ; idx++ ;
+						idx++ ; // Seehafenhinterlandverkehr
+						double tons = Double.parseDouble(row[idx]) ;
+						
 					} catch ( Exception ee ) {
 						System.err.println("we are trying to read quelle: " + quelle ) ;
-						//						System.exit(-1) ;
-					}
-				}
-				else if (filename.equals(PV_AUSPENDLERMATRIX)){
-					try {
-						quelle = 9162;
-						ziel = Integer.parseInt(row[2]);
-
-						int totalTrips = (int) (scaleFactor * Integer.parseInt(row[4]));
-						int workPt = (int) ((1 - carMarketShare) * totalTrips) ;
-						int educationPt = 0 ;
-						int workCar = (int) (carMarketShare * totalTrips);
-						int educationCar = 0 ;
-						String label = row[3] ;
-						if ( !label.contains("brige ") && !quelle.equals(ziel)) {
-							process(quelle, ziel, workPt, educationPt, workCar, educationCar);
-						} else {
-							System.out.println( " uebrige? : " + label ) ;
-						}
-					} catch ( Exception ee ) {
-						System.err.println("we are trying to read quelle: " + quelle ) ;
-						//						System.exit(-1) ;
+						System.exit(-1) ;
 					}
 				}
 				else{

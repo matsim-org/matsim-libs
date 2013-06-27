@@ -35,7 +35,7 @@ public class TravelTimeToWorkCalculator implements TripFlowSink {
 //		}
 	}
 
-	void setSink(TripFlowSink sink) {
+	public void setSink(TripFlowSink sink) {
 		this.sink = sink;
 	}
 

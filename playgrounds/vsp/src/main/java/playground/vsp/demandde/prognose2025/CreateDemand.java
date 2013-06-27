@@ -1,20 +1,23 @@
-package playground.vsp.demandde.pendlermatrix;
+package playground.vsp.demandde.prognose2025;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.vsp.demandde.pendlermatrix.PersonVerschmiererTask;
+import playground.vsp.demandde.pendlermatrix.PopulationGenerator;
+import playground.vsp.demandde.pendlermatrix.TravelTimeToWorkCalculator;
 import playground.vsp.pipeline.PopulationWriterTask;
 
-public class CreatePendlerDemand {
-	private CreatePendlerDemand(){}
+public class CreateDemand {
+	private CreateDemand(){}
 
 	private static final String NETWORK_FILENAME = "../../shared-svn/studies/countries/de/prognose_2025/osm_zellen/motorway_germany.xml";
 
 	private static final String LANDKREISE = "../../shared-svn/studies/countries/de/prognose_2025/osm_zellen/landkreise.shp";
 
-	private static final String OUTPUT_POPULATION_FILENAME = "../../detailedEval/pop/pendlerVerkehr/pendlermatrizen/inAndOut/pendlerverkehr_10pct_scaledAndMode_workStartingTimePeak0800Var2h_dhdn_gk4.xml.gz";
+	private static final String OUTPUT_POPULATION_FILENAME = "/Users/nagel/kw/pop.xml.gz";
 
 	public static void main(String[] args) {
 		Scenario osmNetwork = ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -23,7 +26,7 @@ public class CreatePendlerDemand {
 		PopulationWriterTask populationWriter = new PopulationWriterTask(OUTPUT_POPULATION_FILENAME, osmNetwork.getNetwork());
 		PopulationGenerator populationBuilder = new PopulationGenerator();		
 		TravelTimeToWorkCalculator routerFilter = new TravelTimeToWorkCalculator(osmNetwork.getNetwork());
-		PendlerMatrixReader pvMatrixReader = new PendlerMatrixReader(LANDKREISE);
+		DemandMatrixReader pvMatrixReader = new DemandMatrixReader(LANDKREISE);
 		pvMatrixReader.setFlowSink(routerFilter);
 		routerFilter.setSink(populationBuilder);
 		populationBuilder.setSink(personVerschmiererTask);
