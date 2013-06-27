@@ -23,10 +23,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
-import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.signalsystems.builder.FromDataBuilder;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.SignalsScenarioWriter;
@@ -40,23 +38,20 @@ import org.matsim.signalsystems.model.SignalSystemsManager;
  * @author dgrether
  *
  */
-public class DefaultSignalsControllerListener implements SignalsControllerListener, StartupListener, ShutdownListener, IterationStartsListener {
+public class DefaultSignalsControllerListener implements SignalsControllerListener, ShutdownListener, IterationStartsListener {
 
-	private SignalSystemsManager signalManager;
-	
-	@Override
-	public void notifyStartup(StartupEvent event) {
-		//build model
-		FromDataBuilder modelBuilder = new FromDataBuilder(event.getControler().getScenario(), event.getControler().getEvents());
-		this.signalManager = modelBuilder.createAndInitializeSignalSystemsManager();
-		//init mobility simulation
-		QSimSignalEngine signalEngie = new QSimSignalEngine(this.signalManager);
-		event.getControler().getMobsimListeners().add(signalEngie);
-	}
-	
+	private QSimSignalEngine signalEngine;
+
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
-		this.signalManager.resetModel(event.getIteration());
+		event.getControler().getMobsimListeners().remove(this.signalEngine);
+		//build model
+		FromDataBuilder modelBuilder = new FromDataBuilder(event.getControler().getScenario(), event.getControler().getEvents());
+		SignalSystemsManager signalManager = modelBuilder.createAndInitializeSignalSystemsManager();
+		//init mobility simulation
+		this.signalEngine = new QSimSignalEngine(signalManager);
+		event.getControler().getMobsimListeners().add(signalEngine);
+		signalManager.resetModel(event.getIteration());
 	}
 	
 	@Override
