@@ -46,9 +46,12 @@ import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 public class OperatorCostHandler implements TransitDriverStartsEventHandler, LinkLeaveEventHandler, AgentDepartureEventHandler, AgentArrivalEventHandler {
 	private Network network;
 	private double vehicleKm;
+	private double operatingHours_excludingSlackTimes;
 	
-	private Map<Id, Double> personID2firstDepartureTime = new HashMap<Id, Double>();
-	private Map<Id, Double> personID2lastArrivalTime = new HashMap<Id, Double>();
+	private Map<Id, Double> ptDriverId2firstDepartureTime = new HashMap<Id, Double>();
+	private Map<Id, Double> ptDriverId2lastArrivalTime = new HashMap<Id, Double>();
+	private Map<Id, Double> ptDriverId2lastRouteStartTime = new HashMap<Id, Double>();
+	
 	private final List<Id> ptDriverIDs = new ArrayList<Id>();
 	private final List<Id> ptVehicleIDs = new ArrayList<Id>();
 	
@@ -58,14 +61,14 @@ public class OperatorCostHandler implements TransitDriverStartsEventHandler, Lin
 
 	@Override
 	public void reset(int iteration) {
-		this.personID2firstDepartureTime.clear();
-		this.personID2lastArrivalTime.clear();
+		this.ptDriverId2firstDepartureTime.clear();
+		this.ptDriverId2lastArrivalTime.clear();
+		this.ptDriverId2lastRouteStartTime.clear();
 		this.ptDriverIDs.clear();
 		this.ptVehicleIDs.clear();
 		this.vehicleKm = 0.0;
+		this.operatingHours_excludingSlackTimes = 0.0;
 	}
-
-	
 	
 	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
@@ -82,12 +85,9 @@ public class OperatorCostHandler implements TransitDriverStartsEventHandler, Lin
 	
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
+		
 		if (ptDriverIDs.contains(event.getPersonId())){
-
-			this.vehicleKm = this.vehicleKm + network.getLinks().get(event.getLinkId()).getLength() / 1000;
-			
-		} else {
-			// no public vehicle
+			this.vehicleKm = this.vehicleKm + network.getLinks().get(event.getLinkId()).getLength() / 1000.;
 		}
 	}
 	
@@ -103,47 +103,56 @@ public class OperatorCostHandler implements TransitDriverStartsEventHandler, Lin
 	public void handleEvent(AgentDepartureEvent event) {
 		
 		if (ptDriverIDs.contains(event.getPersonId())){
-			if (this.personID2firstDepartureTime.containsKey(event.getPersonId())){
-				if (event.getTime() < this.personID2firstDepartureTime.get(event.getPersonId())){
-					this.personID2firstDepartureTime.put(event.getPersonId(), event.getTime());
+			
+			if (this.ptDriverId2firstDepartureTime.containsKey(event.getPersonId())){
+				if (event.getTime() < this.ptDriverId2firstDepartureTime.get(event.getPersonId())){
+					this.ptDriverId2firstDepartureTime.put(event.getPersonId(), event.getTime());
 				}
 				else {
 					// not the first departure time of this public vehicle
 				}
 			}
+			
 			else {
-				this.personID2firstDepartureTime.put(event.getPersonId(), event.getTime());
+				this.ptDriverId2firstDepartureTime.put(event.getPersonId(), event.getTime());
 			}
-		} else {
-			// no public vehicle
+			
+			// for the operating times without slack times
+			this.ptDriverId2lastRouteStartTime.put(event.getPersonId(), event.getTime());
 		}
 	}
 
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
 		if (ptDriverIDs.contains(event.getPersonId())){
-			if (this.personID2lastArrivalTime.containsKey(event.getPersonId())){
-				if (event.getTime() > this.personID2lastArrivalTime.get(event.getPersonId())){
-					this.personID2lastArrivalTime.put(event.getPersonId(), event.getTime());
+			if (this.ptDriverId2lastArrivalTime.containsKey(event.getPersonId())){
+				if (event.getTime() > this.ptDriverId2lastArrivalTime.get(event.getPersonId())){
+					this.ptDriverId2lastArrivalTime.put(event.getPersonId(), event.getTime());
 				}
 				else {
 					// not the last arrival time of this public vehicle
 				}
 			}
 			else {
-				this.personID2lastArrivalTime.put(event.getPersonId(), event.getTime());
+				this.ptDriverId2lastArrivalTime.put(event.getPersonId(), event.getTime());
 			}
-		} else {
-			// no public vehicle
+			
+			// for the operating times without slack times
+			double routeOperatingTime = event.getTime() - this.ptDriverId2lastRouteStartTime.get(event.getPersonId());
+			this.operatingHours_excludingSlackTimes = this.operatingHours_excludingSlackTimes + routeOperatingTime;
 		}
 	}
 	
-	public double getVehicleHours() {
+	public double getVehicleHours_includingSlackTimes() {
 		double vehicleSeconds = 0;
-		for (Id id : this.personID2firstDepartureTime.keySet()){
-			vehicleSeconds = vehicleSeconds + ((this.personID2lastArrivalTime.get(id) - this.personID2firstDepartureTime.get(id)));
+		for (Id id : this.ptDriverId2firstDepartureTime.keySet()){
+			vehicleSeconds = vehicleSeconds + ((this.ptDriverId2lastArrivalTime.get(id) - this.ptDriverId2firstDepartureTime.get(id)));
 		}
 		return vehicleSeconds / 3600.0;
 	}
-	
+
+	public double getOperatingHours_excludingSlackTimes() {
+		return operatingHours_excludingSlackTimes / 3600.0;
+	}
+
 }

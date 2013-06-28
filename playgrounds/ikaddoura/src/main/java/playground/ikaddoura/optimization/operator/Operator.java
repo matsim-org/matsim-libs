@@ -53,18 +53,29 @@ public class Operator {
 		double costsPerVehicleDay = 1.6064 * this.capacity + 22.622; // see linear regression analysis in "BusCostsEstimations.xls"
 		double costsPerVehicleKm = 0.006 * this.capacity + 0.513;    // see linear regression analysis in "BusCostsEstimations.xls"
 		
-		log.info("CostsPerVehicleKm (AUD): " + costsPerVehicleKm);
-		log.info("CostsPerVehicleDay (AUD): " + costsPerVehicleDay);
-		log.info("Vehicle-km: " + analysis.getOperatorCostHandler().getVehicleKm());
-		log.info("Veh-Time: " + Time.writeTime(analysis.getOperatorCostHandler().getVehicleHours() * 3600, Time.TIMEFORMAT_HHMMSS));
-		log.info("Number of Buses from Events: " + analysis.getOperatorCostHandler().getVehicleIDs().size());
+		log.info("Costs per vehicle-km (AUD): " + costsPerVehicleKm);
+		log.info("Costs per vehicle day (AUD): " + costsPerVehicleDay);
 		
-		double capitalCosts = analysis.getOperatorCostHandler().getVehicleIDs().size() * costsPerVehicleDay;
-		double kmCosts = analysis.getOperatorCostHandler().getVehicleKm() * costsPerVehicleKm;
-		double hCosts = analysis.getOperatorCostHandler().getVehicleHours() * COSTS_PER_VEH_HOUR;
+		// Constant operating times (slack times are assumed to be operating times, slack times compensate for longer travel times)
+		double vehHours_includingSlackTimes = analysis.getOperatorCostHandler().getVehicleHours_includingSlackTimes();
+		
+		// Variable operating times (slack times are assumed not to be operating times)
+		double vehHours_excludingSlackTime = analysis.getOperatorCostHandler().getOperatingHours_excludingSlackTimes();
+		
+		double vehKm = analysis.getOperatorCostHandler().getVehicleKm();
+		int numberOfVehicles = analysis.getOperatorCostHandler().getVehicleIDs().size();
+		
+		log.info("Used for operator cost calculation: Number of public vehicles: " + numberOfVehicles);
+		log.info("Used for operator cost calculation: Vehicle-km: " + vehKm);
+		log.info("Used for operator cost calculation: Veh-h (operating time excluding slack times): " + Time.writeTime(vehHours_excludingSlackTime * 3600, Time.TIMEFORMAT_HHMMSS));
+		log.info("Not used for operator cost calculation: Veh-h (operating time including slack times): " + Time.writeTime(vehHours_includingSlackTimes * 3600, Time.TIMEFORMAT_HHMMSS));
+		
+		double capitalCosts = numberOfVehicles * costsPerVehicleDay;
+		double kmCosts = vehKm * costsPerVehicleKm;
+		double hCosts = vehHours_excludingSlackTime * COSTS_PER_VEH_HOUR;
 		
 		this.costs = capitalCosts + ((kmCosts + hCosts) * OVERHEAD_PERCENTAGE);
-		log.info("Operator Costs (AUD): " + this.costs);
+		log.info("Operator costs (AUD): " + this.costs);
 	}
 
 	public double getCosts() {
