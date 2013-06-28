@@ -49,6 +49,7 @@ public class InternalControler {
 	private final boolean calculate_inVehicleTimeDelayEffects;
 	private final boolean calculate_waitingTimeDelayEffects;
 	private final boolean calculate_carCongestionEffects;
+	private final boolean calculate_capacityDelayEffects;
 	
 	private final ScenarioImpl scenario;
 	private final double fare;
@@ -81,12 +82,14 @@ public class InternalControler {
 			double fare,
 			boolean calculate_inVehicleTimeDelayEffects,
 			boolean calculate_waitingTimeDelayEffects,
+			boolean calculate_capacityDelayEffects,
 			boolean marginalCostPricingPt,
 			boolean calculate_carCongestionEffects, 
 			boolean marginalCostPricingCar) {
 		
 		this.calculate_inVehicleTimeDelayEffects = calculate_inVehicleTimeDelayEffects;
 		this.calculate_waitingTimeDelayEffects = calculate_waitingTimeDelayEffects;
+		this.calculate_capacityDelayEffects = calculate_capacityDelayEffects;
 		this.marginalCostPricingPt = marginalCostPricingPt;
 		this.calculate_carCongestionEffects = calculate_carCongestionEffects;
 		this.marginalCostPricingCar = marginalCostPricingCar;
@@ -116,6 +119,7 @@ public class InternalControler {
 						this.scenario,
 						this.calculate_inVehicleTimeDelayEffects,
 						this.calculate_waitingTimeDelayEffects,
+						this.calculate_capacityDelayEffects,
 						this.marginalCostPricingPt,
 						this.calculate_carCongestionEffects,
 						this.marginalCostPricingCar));

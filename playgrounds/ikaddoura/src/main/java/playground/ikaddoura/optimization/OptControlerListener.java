@@ -33,6 +33,7 @@ import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.ikaddoura.internalizationCar.MarginalCongestionHandlerV2;
 import playground.ikaddoura.internalizationCar.MarginalCostPricingCarHandler;
+import playground.ikaddoura.internalizationPt.CapacityDelayHandler;
 import playground.ikaddoura.internalizationPt.TransferDelayInVehicleHandler;
 import playground.ikaddoura.internalizationPt.MarginalCostPricingPtHandler;
 import playground.ikaddoura.internalizationPt.TransferDelayWaitingHandler;
@@ -54,12 +55,15 @@ public class OptControlerListener implements StartupListener {
 	private final boolean marginalCostPricingPt;
 	private final boolean marginalCostPricingCar;
 	private final boolean calculate_carCongestionEffects;
-	
+	private final boolean calculate_capacityDelayEffects;
+
 	public OptControlerListener(double fare,
 			PtLegHandler ptLegHandler,
 			ScenarioImpl scenario,
 			boolean calculate_inVehicleTimeDelayEffects,
 			boolean calculate_waitingTimeDelayEffects, 
+			boolean calculate_capacityDelayEffects,
+
 			boolean marginalCostPricingPt,
 			boolean calculate_carCongestionEffects,
 			boolean marginalCostPricingCar){
@@ -69,6 +73,7 @@ public class OptControlerListener implements StartupListener {
 		this.scenario = scenario;
 		this.calculate_inVehicleTimeDelayEffects = calculate_inVehicleTimeDelayEffects;
 		this.calculate_waitingTimeDelayEffects = calculate_waitingTimeDelayEffects;
+		this.calculate_capacityDelayEffects = calculate_capacityDelayEffects;
 		this.marginalCostPricingPt = marginalCostPricingPt;
 		this.calculate_carCongestionEffects = calculate_carCongestionEffects;
 		this.marginalCostPricingCar = marginalCostPricingCar;
@@ -85,6 +90,9 @@ public class OptControlerListener implements StartupListener {
 		}
 		if (this.calculate_waitingTimeDelayEffects) {
 			event.getControler().getEvents().addHandler(new TransferDelayWaitingHandler(eventsManager, scenario));
+		}
+		if (this.calculate_capacityDelayEffects) {
+			event.getControler().getEvents().addHandler(new CapacityDelayHandler(eventsManager, scenario));
 		}
 		if (this.marginalCostPricingPt) {
 			event.getControler().getEvents().addHandler(new MarginalCostPricingPtHandler(eventsManager, scenario));

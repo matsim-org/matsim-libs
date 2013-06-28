@@ -76,6 +76,7 @@ class ExternalControler {
 	static boolean usePopulationPathsFile;
 	static boolean calculate_inVehicleTimeDelayEffects;
 	static boolean calculate_waitingTimeDelayEffects;
+	static boolean calculate_capacityDelayEffects;
 	static boolean marginalCostPricingPt;
 	static boolean calculate_carCongestionEffects;
 	static boolean marginalCostPricingCar;
@@ -143,6 +144,7 @@ class ExternalControler {
 		
 		calculate_inVehicleTimeDelayEffects = settings.isCalculating_inVehicleTimeDelayEffects();
 		calculate_waitingTimeDelayEffects = settings.isCalculating_waitingTimeDelayEffects();
+		calculate_capacityDelayEffects = settings.isCalculate_capacityDelayEffects();
 		marginalCostPricingPt = settings.isMarginalCostPricingPt();
 		calculate_carCongestionEffects = settings.isCalculate_carCongestionEffects();
 		marginalCostPricingCar = settings.isMarginalCostPricingCar();
@@ -276,7 +278,8 @@ class ExternalControler {
 				scenario,
 				fare,
 				calculate_inVehicleTimeDelayEffects, 
-				calculate_waitingTimeDelayEffects, 
+				calculate_waitingTimeDelayEffects,
+				calculate_capacityDelayEffects,
 				marginalCostPricingPt,
 				calculate_carCongestionEffects,
 				marginalCostPricingCar);

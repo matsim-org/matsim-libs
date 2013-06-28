@@ -112,6 +112,9 @@ public class OptSettingsReader {
 	                	} else if (parts[0].equals("calculate_waitingTimeDelayEffects")){
 	                		this.optSettings.setCalculating_waitingTimeDelayEffects(Boolean.parseBoolean(parts[1]));
 	                	
+	                	} else if (parts[0].equals("calculate_capacityDelayEffects")){
+	                		this.optSettings.setCalculate_capacityDelayEffects(Boolean.parseBoolean(parts[1]));
+	                		
 	                	} else if (parts[0].equals("marginalCostPricingPt")){
 	                		this.optSettings.setMarginalCostPricingPt(Boolean.parseBoolean(parts[1]));
 	                	

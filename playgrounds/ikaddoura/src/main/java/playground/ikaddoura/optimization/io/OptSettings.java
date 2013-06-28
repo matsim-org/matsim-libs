@@ -47,6 +47,7 @@ public class OptSettings {
 	private String populationPathsFile = null;
 	private boolean calculate_inVehicleTimeDelayEffects = false;
 	private boolean calculate_waitingTimeDelayEffects = false;
+	private boolean calculate_capacityDelayEffects = false;
 	private boolean marginalCostPricingPt = false;
 	private boolean calculate_carCongestionEffects = false;
 	private boolean marginalCostPricingCar = false;
@@ -177,6 +178,13 @@ public class OptSettings {
 	public void setCalculate_carCongestionEffects(
 			boolean calculate_carCongestionEffects) {
 		this.calculate_carCongestionEffects = calculate_carCongestionEffects;
+	}
+	public boolean isCalculate_capacityDelayEffects() {
+		return calculate_capacityDelayEffects;
+	}
+	public void setCalculate_capacityDelayEffects(
+			boolean calculate_capacityDelayEffects) {
+		this.calculate_capacityDelayEffects = calculate_capacityDelayEffects;
 	}
 	
 }
