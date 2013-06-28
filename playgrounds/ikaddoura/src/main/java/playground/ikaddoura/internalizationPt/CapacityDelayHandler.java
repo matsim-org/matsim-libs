@@ -64,6 +64,8 @@ public class CapacityDelayHandler implements BoardingDeniedEventHandler, PersonE
 	private final List<Id> ptDriverIDs = new ArrayList<Id>();
 	
 	private final CausingAgentsMethod causingAgentsMethod = CausingAgentsMethod.allPassengersInThePublicVehicle;
+//	private final CausingAgentsMethod causingAgentsMethod = CausingAgentsMethod.lastAgentEnteringThePublicVehicle;
+
 	
 	public CapacityDelayHandler(EventsManager events, ScenarioImpl scenario) {
 		this.events = events;
@@ -156,8 +158,8 @@ public class CapacityDelayHandler implements BoardingDeniedEventHandler, PersonE
 		if (this.affectedAgent2causingAgents.containsKey(event.getPersonId())){
 			calculateExternalDelay(event.getTime(), event.getPersonId());
 		}
-		List<Id> causingAgents = new ArrayList<Id>();
 		
+		List<Id> causingAgents = new ArrayList<Id>();
 		if (causingAgentsMethod.equals(CausingAgentsMethod.allPassengersInThePublicVehicle)){
 			causingAgents = getAllAgentsInPublicVehicle(event.getVehicleId());
 		} else if (causingAgentsMethod.equals(CausingAgentsMethod.lastAgentEnteringThePublicVehicle)){
