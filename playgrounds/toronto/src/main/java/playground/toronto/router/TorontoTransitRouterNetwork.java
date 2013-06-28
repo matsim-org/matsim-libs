@@ -161,13 +161,18 @@ public class TorontoTransitRouterNetwork  {
 
 			//Create all transfer connections (keeping in mind transfer penalties)
 			HashSet<Link> transferLinks = baseConnections.get(entry.getKey());
+			
 			for (Link baseConnection : transferLinks){
 				//baseConnection is the override transfer link in the base network.
 				Node baseToNode = baseConnection.getToNode();
-				List<TransitRouterNetworkNode> toTrnStops = baseToRouterNodeMap.get(baseToNode);
-				if (toTrnStops == null){
-					log.error("List of connected TRN stops is null!");
+				
+				if (!baseToRouterNodeMap.containsKey(baseToNode)){
+					//log.warn("Could not add transfer links to node " + baseToNode.getId().toString() + " as it has " +
+					//		"no transit stops incident.");
+					continue;
 				}
+				
+				List<TransitRouterNetworkNode> toTrnStops = baseToRouterNodeMap.get(baseToNode);
 				
 				for (TransitRouterNetworkNode fromNode : entry.getValue()){ //For each stop mapped to this node
 					for (TransitRouterNetworkNode toNode : toTrnStops){ //For each stop mapped to the other node
