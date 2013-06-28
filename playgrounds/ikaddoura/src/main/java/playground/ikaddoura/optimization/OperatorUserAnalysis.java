@@ -33,6 +33,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 
+import playground.ikaddoura.optimization.operator.OperatorCostEventHandler;
 import playground.ikaddoura.optimization.operatorProfitModel.DepartureArrivalEventHandler;
 import playground.ikaddoura.optimization.operatorProfitModel.LinksEventHandler;
 import playground.ikaddoura.optimization.operatorProfitModel.MoneyEventHandler;
@@ -56,6 +57,8 @@ public class OperatorUserAnalysis {
 	private WaitingTimeHandler waitHandler;
 	private CarCongestionHandlerAdvanced congestionHandler;
 	
+	private OperatorCostEventHandler operatorHandler;
+	
 	private final String lastEventFile;
 	private final Network network;
 	private final Double headway;
@@ -77,6 +80,8 @@ public class OperatorUserAnalysis {
 		this.waitHandler = new WaitingTimeHandler(headway);
 		this.congestionHandler = new CarCongestionHandlerAdvanced(this.network);
 		
+		this.operatorHandler = new OperatorCostEventHandler(this.network);
+		
 		events.addHandler(this.departureHandler);	
 		events.addHandler(this.moneyHandler);
 		events.addHandler(this.moneyDetailHandler);
@@ -84,11 +89,17 @@ public class OperatorUserAnalysis {
 		events.addHandler(this.linksHandler);
 		events.addHandler(this.waitHandler);
 		events.addHandler(this.congestionHandler);
+		
+		events.addHandler(this.operatorHandler);
 
 		MatsimEventsReader reader = new MatsimEventsReader(events);
 		reader.readFile(this.lastEventFile);
 	}
-
+	
+	public OperatorCostEventHandler getOperatorCostHandler() {
+		return this.operatorHandler;
+	}
+	
 	public double getVehicleHours() {
 		return this.departureHandler.getVehicleHours();
 	}
