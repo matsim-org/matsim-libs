@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.ikaddoura.optimization.operatorProfitModel;
+package playground.ikaddoura.optimization.users;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
 
-import playground.ikaddoura.optimization.users.FareData;
 
 /**
  * @author Ihab

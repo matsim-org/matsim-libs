@@ -34,13 +34,11 @@ import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 
 import playground.ikaddoura.optimization.operator.OperatorCostEventHandler;
-import playground.ikaddoura.optimization.operatorProfitModel.DepartureArrivalEventHandler;
-import playground.ikaddoura.optimization.operatorProfitModel.LinksEventHandler;
-import playground.ikaddoura.optimization.operatorProfitModel.MoneyEventHandler;
-import playground.ikaddoura.optimization.operatorProfitModel.TransitEventHandler;
 import playground.ikaddoura.optimization.users.CarCongestionHandlerAdvanced;
+import playground.ikaddoura.optimization.users.DepartureArrivalEventHandler;
 import playground.ikaddoura.optimization.users.FareData;
 import playground.ikaddoura.optimization.users.MoneyDetailEventHandler;
+import playground.ikaddoura.optimization.users.MoneyEventHandler;
 import playground.ikaddoura.optimization.users.WaitingTimeHandler;
 
 /**
@@ -52,8 +50,6 @@ public class OperatorUserAnalysis {
 	private DepartureArrivalEventHandler departureHandler;
 	private MoneyEventHandler moneyHandler;
 	private MoneyDetailEventHandler moneyDetailHandler;
-	private TransitEventHandler transitHandler;
-	private LinksEventHandler linksHandler;
 	private WaitingTimeHandler waitHandler;
 	private CarCongestionHandlerAdvanced congestionHandler;
 	
@@ -75,8 +71,6 @@ public class OperatorUserAnalysis {
 		this.departureHandler = new DepartureArrivalEventHandler();
 		this.moneyHandler = new MoneyEventHandler();
 		this.moneyDetailHandler = new MoneyDetailEventHandler();
-		this.transitHandler = new TransitEventHandler();
-		this.linksHandler = new LinksEventHandler(this.network);
 		this.waitHandler = new WaitingTimeHandler(headway);
 		this.congestionHandler = new CarCongestionHandlerAdvanced(this.network);
 		
@@ -85,8 +79,6 @@ public class OperatorUserAnalysis {
 		events.addHandler(this.departureHandler);	
 		events.addHandler(this.moneyHandler);
 		events.addHandler(this.moneyDetailHandler);
-		events.addHandler(this.transitHandler);
-		events.addHandler(this.linksHandler);
 		events.addHandler(this.waitHandler);
 		events.addHandler(this.congestionHandler);
 		
