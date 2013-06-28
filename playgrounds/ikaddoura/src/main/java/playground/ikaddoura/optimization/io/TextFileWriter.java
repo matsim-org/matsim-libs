@@ -14,7 +14,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.misc.Time;
 
 import playground.ikaddoura.optimization.IterationInfo;
-import playground.ikaddoura.optimization.analysis.FareData;
+import playground.ikaddoura.optimization.handler.FareData;
 
 
 /**

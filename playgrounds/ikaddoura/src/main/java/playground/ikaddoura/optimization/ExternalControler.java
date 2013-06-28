@@ -47,7 +47,7 @@ import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehicleType.DoorOperationMode;
 
-import playground.ikaddoura.optimization.analysis.Users;
+import playground.ikaddoura.optimization.handler.Users;
 import playground.ikaddoura.optimization.io.OptSettings;
 import playground.ikaddoura.optimization.io.OptSettingsReader;
 import playground.ikaddoura.optimization.io.PopFilePathsLoader;
