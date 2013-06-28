@@ -70,8 +70,8 @@ import org.matsim.core.scenario.ScenarioImpl;
  * @author Ihab
  *
  */
-public class WaitingDelayHandler implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler, AgentWaitingForPtEventHandler {
-	private final static Logger log = Logger.getLogger(WaitingDelayHandler.class);
+public class TransferDelayWaitingHandler implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler, AgentWaitingForPtEventHandler {
+	private final static Logger log = Logger.getLogger(TransferDelayWaitingHandler.class);
 
 	// extra delay for a bus before and after agents are entering or leaving a public vehicle
 	// currently there is an extra delay of 1 sec before and 1 sec after agents are entering or leaving
@@ -92,7 +92,7 @@ public class WaitingDelayHandler implements PersonEntersVehicleEventHandler, Per
 	private final Map<Id, Double> vehicleId2delay = new HashMap<Id, Double>();
 	private final Map<Id, Boolean> vehicleId2isFirstTransfer = new HashMap<Id, Boolean>();
 
-	public WaitingDelayHandler(EventsManager events, ScenarioImpl scenario) {
+	public TransferDelayWaitingHandler(EventsManager events, ScenarioImpl scenario) {
 		this.events = events;
 		this.scenario = scenario;
 	}
@@ -224,7 +224,7 @@ public class WaitingDelayHandler implements PersonEntersVehicleEventHandler, Per
 				ExtEffectWaitingDelay delay = iterator.next();
 				
 				if (delay.getAffectedVehicle().toString().equals(event.getVehicleId().toString())){
-					WaitingDelayEvent delayWaitingEvent = new WaitingDelayEvent(delay.getPersonId(), delay.getAffectedVehicle(), event.getTime(), delay.getAffectedAgents(), delay.getTransferDelay());
+					TransferDelayWaitingEvent delayWaitingEvent = new TransferDelayWaitingEvent(delay.getPersonId(), delay.getAffectedVehicle(), event.getTime(), delay.getAffectedAgents(), delay.getTransferDelay());
 					this.events.processEvent(delayWaitingEvent);
 					iterator.remove();
 				}
@@ -235,7 +235,7 @@ public class WaitingDelayHandler implements PersonEntersVehicleEventHandler, Per
 				ExtEffectWaitingDelay delay = iterator.next();
 				
 				if (delay.getAffectedVehicle().toString().equals(event.getVehicleId().toString())){
-					WaitingDelayEvent delayWaitingEvent = new WaitingDelayEvent(delay.getPersonId(), delay.getAffectedVehicle(), event.getTime(), delay.getAffectedAgents(), delay.getTransferDelay());
+					TransferDelayWaitingEvent delayWaitingEvent = new TransferDelayWaitingEvent(delay.getPersonId(), delay.getAffectedVehicle(), event.getTime(), delay.getAffectedAgents(), delay.getTransferDelay());
 					this.events.processEvent(delayWaitingEvent);
 					iterator.remove();
 				}
@@ -246,7 +246,7 @@ public class WaitingDelayHandler implements PersonEntersVehicleEventHandler, Per
 				ExtEffectWaitingDelay delay = iterator.next();
 				
 				if (delay.getAffectedVehicle().toString().equals(event.getVehicleId().toString())){
-					WaitingDelayEvent delayWaitingEvent = new WaitingDelayEvent(delay.getPersonId(), delay.getAffectedVehicle(), event.getTime(), delay.getAffectedAgents(), delay.getTransferDelay());
+					TransferDelayWaitingEvent delayWaitingEvent = new TransferDelayWaitingEvent(delay.getPersonId(), delay.getAffectedVehicle(), event.getTime(), delay.getAffectedAgents(), delay.getTransferDelay());
 					this.events.processEvent(delayWaitingEvent);
 					iterator.remove();
 				}

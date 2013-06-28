@@ -28,6 +28,6 @@ import org.matsim.core.events.handler.EventHandler;
  * @author ikaddoura
  *
  */
-public interface WaitingDelayEventHandler extends EventHandler {
-	public void handleEvent (WaitingDelayEvent event);
+public interface TransferDelayWaitingEventHandler extends EventHandler {
+	public void handleEvent (TransferDelayWaitingEvent event);
 }

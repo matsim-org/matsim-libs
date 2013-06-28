@@ -35,7 +35,7 @@ import playground.ikaddoura.internalizationCar.MarginalCongestionHandlerV2;
 import playground.ikaddoura.internalizationCar.MarginalCostPricingCarHandler;
 import playground.ikaddoura.internalizationPt.TransferDelayInVehicleHandler;
 import playground.ikaddoura.internalizationPt.MarginalCostPricingPtHandler;
-import playground.ikaddoura.internalizationPt.WaitingDelayHandler;
+import playground.ikaddoura.internalizationPt.TransferDelayWaitingHandler;
 import playground.ikaddoura.optimization.handler.ConstantFareHandler;
 import playground.ikaddoura.optimization.handler.PtLegHandler;
 
@@ -84,7 +84,7 @@ public class OptControlerListener implements StartupListener {
 			event.getControler().getEvents().addHandler(new TransferDelayInVehicleHandler(eventsManager, scenario));
 		}
 		if (this.calculate_waitingTimeDelayEffects) {
-			event.getControler().getEvents().addHandler(new WaitingDelayHandler(eventsManager, scenario));
+			event.getControler().getEvents().addHandler(new TransferDelayWaitingHandler(eventsManager, scenario));
 		}
 		if (this.marginalCostPricingPt) {
 			event.getControler().getEvents().addHandler(new MarginalCostPricingPtHandler(eventsManager, scenario));
