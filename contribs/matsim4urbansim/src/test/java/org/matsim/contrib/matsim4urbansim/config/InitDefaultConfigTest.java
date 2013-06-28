@@ -36,7 +36,7 @@ import org.matsim.testcases.MatsimTestCase;
  * @author thomas
  *
  */
-public class InitDefaultConfigTest extends MatsimTestCase{
+public class InitDefaultConfigTest /*extends MatsimTestCase*/{
 	
 	private static final Logger log = Logger.getLogger(InitDefaultConfigTest.class);
 	
@@ -62,7 +62,7 @@ public class InitDefaultConfigTest extends MatsimTestCase{
 			
 			// this creates a default MATSim4UrbanSim configuration including an external config
 			CreateTestMATSimConfig testConfig = new CreateTestMATSimConfig(CreateTestMATSimConfig.COLD_START, path, externalConfigLocation);
-			String configLocation = testConfig.generateConfigV2();
+			String configLocation = testConfig.generateConfigV3();
 			
 			log.info("Reading the matsim4urbansim config file ("+configLocation+") and converting it into matsim format");
 			if( !(connector = new M4UConfigurationConverterV4( configLocation )).init() ){
