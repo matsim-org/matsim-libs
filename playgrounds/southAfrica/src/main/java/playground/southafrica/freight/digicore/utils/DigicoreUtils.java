@@ -13,7 +13,6 @@ import java.util.TimeZone;
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
 
 /**
  * A class with various static methods that are frequently used in Digicore
@@ -84,4 +83,6 @@ public class DigicoreUtils {
 		return list;
 	}
 	
+		
+
 }
