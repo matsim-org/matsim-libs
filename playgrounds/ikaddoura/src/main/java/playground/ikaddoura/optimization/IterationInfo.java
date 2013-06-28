@@ -26,7 +26,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 
-import playground.ikaddoura.optimization.handler.FareData;
+import playground.ikaddoura.optimization.users.FareData;
 
 /**
  * @author ihab and benjamin

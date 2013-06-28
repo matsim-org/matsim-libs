@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.ikaddoura.optimization.handler;
+package playground.ikaddoura.optimization.users;
 
 import java.util.ArrayList;
 import java.util.List;

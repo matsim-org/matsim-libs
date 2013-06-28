@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
 
-import playground.ikaddoura.optimization.handler.FareData;
+import playground.ikaddoura.optimization.users.FareData;
 
 /**
  * @author Ihab

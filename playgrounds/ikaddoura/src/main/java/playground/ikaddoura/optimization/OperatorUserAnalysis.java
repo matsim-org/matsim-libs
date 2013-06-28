@@ -33,14 +33,14 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 
-import playground.ikaddoura.optimization.handler.CarCongestionHandlerAdvanced;
-import playground.ikaddoura.optimization.handler.FareData;
-import playground.ikaddoura.optimization.handler.MoneyDetailEventHandler;
-import playground.ikaddoura.optimization.handler.WaitingTimeHandler;
 import playground.ikaddoura.optimization.operatorProfitModel.DepartureArrivalEventHandler;
 import playground.ikaddoura.optimization.operatorProfitModel.LinksEventHandler;
 import playground.ikaddoura.optimization.operatorProfitModel.MoneyEventHandler;
 import playground.ikaddoura.optimization.operatorProfitModel.TransitEventHandler;
+import playground.ikaddoura.optimization.users.CarCongestionHandlerAdvanced;
+import playground.ikaddoura.optimization.users.FareData;
+import playground.ikaddoura.optimization.users.MoneyDetailEventHandler;
+import playground.ikaddoura.optimization.users.WaitingTimeHandler;
 
 /**
  * @author Ihab

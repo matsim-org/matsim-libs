@@ -20,7 +20,7 @@
 /**
  * 
  */
-package playground.ikaddoura.optimization.handler;
+package playground.ikaddoura.optimization.users;
 
 import org.matsim.api.core.v01.Id;
 
