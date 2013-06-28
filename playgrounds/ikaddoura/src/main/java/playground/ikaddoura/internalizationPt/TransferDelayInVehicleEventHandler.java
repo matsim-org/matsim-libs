@@ -28,6 +28,6 @@ import org.matsim.core.events.handler.EventHandler;
  * @author ikaddoura
  *
  */
-public interface InVehicleDelayEventHandler extends EventHandler {
-	public void handleEvent (InVehicleDelayEvent event);
+public interface TransferDelayInVehicleEventHandler extends EventHandler {
+	public void handleEvent (TransferDelayInVehicleEvent event);
 }

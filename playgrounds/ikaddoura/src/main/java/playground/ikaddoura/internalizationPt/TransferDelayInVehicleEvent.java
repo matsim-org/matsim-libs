@@ -32,7 +32,7 @@ import org.matsim.core.api.internal.HasPersonId;
  * Event to indicate that an agent entering or leaving a public vehicle delayed passengers in the public vehicle.
  * @author ikaddoura
  */
-public final class InVehicleDelayEvent extends Event implements HasPersonId {
+public final class TransferDelayInVehicleEvent extends Event implements HasPersonId {
 	
 	public static final String EVENT_TYPE = "ExternalDelayEffectInVehicleTime";
 	public static final String ATTRIBUTE_PERSON = "person";
@@ -45,7 +45,7 @@ public final class InVehicleDelayEvent extends Event implements HasPersonId {
 	private final int affectedAgents;
 	private final double delay;
 
-	public InVehicleDelayEvent(Id personId, Id vehicleId, double time, int delayedPassengers, double externalDelay) {
+	public TransferDelayInVehicleEvent(Id personId, Id vehicleId, double time, int delayedPassengers, double externalDelay) {
 		super(time);
 		this.vehicleId = vehicleId;
 		this.personId = personId;

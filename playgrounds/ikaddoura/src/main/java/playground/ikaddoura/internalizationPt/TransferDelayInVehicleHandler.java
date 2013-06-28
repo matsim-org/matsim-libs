@@ -68,8 +68,8 @@ import org.matsim.core.scenario.ScenarioImpl;
  * @author Ihab
  *
  */
-public class InVehicleDelayHandler implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler {
-	private final static Logger log = Logger.getLogger(InVehicleDelayHandler.class);
+public class TransferDelayInVehicleHandler implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler {
+	private final static Logger log = Logger.getLogger(TransferDelayInVehicleHandler.class);
 
 	// extra delay for a bus before and after agents are entering or leaving a public vehicle
 	private final double doorOpeningTime = 1.0;
@@ -85,7 +85,7 @@ public class InVehicleDelayHandler implements PersonEntersVehicleEventHandler, P
 	private final Map<Id, List<Id>> vehId2agentsBoardingAtThisStop = new HashMap<Id, List<Id>>();
 	private final Map<Id, List<Id>> vehId2agentsAlightingAtThisStop = new HashMap<Id, List<Id>>();
 	
-	public InVehicleDelayHandler(EventsManager events, ScenarioImpl scenario) {
+	public TransferDelayInVehicleHandler(EventsManager events, ScenarioImpl scenario) {
 		this.events = events;
 		this.scenario = scenario;
 	}
@@ -129,7 +129,7 @@ public class InVehicleDelayHandler implements PersonEntersVehicleEventHandler, P
 													
 			double delay = this.scenario.getVehicles().getVehicles().get(event.getVehicleId()).getType().getAccessTime();
 			int delayedPassengers_inVeh = calcDelayedPassengersInVeh(event.getVehicleId());
-			InVehicleDelayEvent delayInVehicleEvent = new InVehicleDelayEvent(event.getPersonId(), event.getVehicleId(), event.getTime(), delayedPassengers_inVeh, delay);
+			TransferDelayInVehicleEvent delayInVehicleEvent = new TransferDelayInVehicleEvent(event.getPersonId(), event.getVehicleId(), event.getTime(), delayedPassengers_inVeh, delay);
 			this.events.processEvent(delayInVehicleEvent);
 			
 			// update number of passengers in vehicle after calculating the external effect
@@ -165,7 +165,7 @@ public class InVehicleDelayHandler implements PersonEntersVehicleEventHandler, P
 			int delayedPassengers_inVeh = calcDelayedPassengersInVeh(event.getVehicleId());
 			
 			// throw delay event
-			InVehicleDelayEvent delayInVehicleEvent = new InVehicleDelayEvent(event.getPersonId(), event.getVehicleId(), event.getTime(), delayedPassengers_inVeh, delay);
+			TransferDelayInVehicleEvent delayInVehicleEvent = new TransferDelayInVehicleEvent(event.getPersonId(), event.getVehicleId(), event.getTime(), delayedPassengers_inVeh, delay);
 			this.events.processEvent(delayInVehicleEvent);
 		}
 	}
@@ -219,7 +219,7 @@ public class InVehicleDelayHandler implements PersonEntersVehicleEventHandler, P
 				}
 				
 				for (Id personId : agentsBoardingAtThisStop){
-					InVehicleDelayEvent delayInVehicleEvent = new InVehicleDelayEvent(personId, event.getVehicleId(), event.getTime(), affectedAgents, delayPerPerson);
+					TransferDelayInVehicleEvent delayInVehicleEvent = new TransferDelayInVehicleEvent(personId, event.getVehicleId(), event.getTime(), affectedAgents, delayPerPerson);
 					this.events.processEvent(delayInVehicleEvent);
 				}
 			}
@@ -236,7 +236,7 @@ public class InVehicleDelayHandler implements PersonEntersVehicleEventHandler, P
 				}
 				
 				for (Id personId : agentsAlightingAtThisStop){
-					InVehicleDelayEvent delayInVehicleEvent = new InVehicleDelayEvent(personId, event.getVehicleId(), event.getTime(), affectedAgents, delayPerPerson);
+					TransferDelayInVehicleEvent delayInVehicleEvent = new TransferDelayInVehicleEvent(personId, event.getVehicleId(), event.getTime(), affectedAgents, delayPerPerson);
 					this.events.processEvent(delayInVehicleEvent);
 				}
 			}

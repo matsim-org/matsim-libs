@@ -31,7 +31,7 @@ import org.matsim.core.scenario.ScenarioImpl;
  * @author ikaddoura
  *
  */
-public class MarginalCostPricingPtHandler implements InVehicleDelayEventHandler, WaitingDelayEventHandler, CapacityDelayEventHandler {
+public class MarginalCostPricingPtHandler implements TransferDelayInVehicleEventHandler, WaitingDelayEventHandler, CapacityDelayEventHandler {
 
 	private final static Logger log = Logger.getLogger(MarginalCostPricingPtHandler.class);
 
@@ -55,7 +55,7 @@ public class MarginalCostPricingPtHandler implements InVehicleDelayEventHandler,
 	}
 
 	@Override
-	public void handleEvent(InVehicleDelayEvent event) {
+	public void handleEvent(TransferDelayInVehicleEvent event) {
 		double amount = (event.getDelay() * event.getAffectedAgents() / 3600) * this.vtts_inVehicle;
 		AgentMoneyEvent moneyEvent = new AgentMoneyEvent(event.getTime(), event.getPersonId(), amount);
 		this.events.processEvent(moneyEvent);

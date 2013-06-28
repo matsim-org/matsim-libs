@@ -28,7 +28,7 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.ikaddoura.internalizationPt.InVehicleDelayHandler;
+import playground.ikaddoura.internalizationPt.TransferDelayInVehicleHandler;
 import playground.ikaddoura.internalizationPt.MarginalCostPricingPtHandler;
 import playground.ikaddoura.internalizationPt.WaitingDelayHandler;
 import playground.ikaddoura.optimization.handler.MoneyDetailEventHandler;
@@ -61,7 +61,7 @@ public class DefaultAnalysisMain {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
 		EventsManager events = EventsUtils.createEventsManager();
 		
-		InVehicleDelayHandler inVehDelayHandler = new InVehicleDelayHandler(events, scenario);
+		TransferDelayInVehicleHandler inVehDelayHandler = new TransferDelayInVehicleHandler(events, scenario);
 		events.addHandler(inVehDelayHandler);
 		WaitingDelayHandler waitingDelayHandler = new WaitingDelayHandler(events, scenario);
 		events.addHandler(waitingDelayHandler);
