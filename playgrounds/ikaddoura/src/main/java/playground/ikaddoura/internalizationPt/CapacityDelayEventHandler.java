@@ -28,6 +28,6 @@ import org.matsim.core.events.handler.EventHandler;
  * @author ikaddoura
  *
  */
-public interface CapacityWaitingDelayEventHandler extends EventHandler {
-	public void handleEvent (CapacityWaitingDelayEvent event);
+public interface CapacityDelayEventHandler extends EventHandler {
+	public void handleEvent (CapacityDelayEvent event);
 }

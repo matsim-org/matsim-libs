@@ -51,7 +51,7 @@ public class InternalizationPtControlerListener implements StartupListener {
 		
 		event.getControler().getEvents().addHandler(new InVehicleDelayHandler(eventsManager, scenario));
 		event.getControler().getEvents().addHandler(new WaitingDelayHandler(eventsManager, scenario));
-		event.getControler().getEvents().addHandler(new CapacityWaitingDelayHandler(eventsManager, scenario));
+		event.getControler().getEvents().addHandler(new CapacityDelayHandler(eventsManager, scenario));
 		event.getControler().getEvents().addHandler(new MarginalCostPricingPtHandler(eventsManager, scenario));
 	}
 

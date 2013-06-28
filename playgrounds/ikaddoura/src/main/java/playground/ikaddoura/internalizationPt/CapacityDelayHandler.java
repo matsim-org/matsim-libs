@@ -1,6 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MoneyThrowEventHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -36,17 +35,24 @@ import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
 import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
 import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
 import org.matsim.core.api.experimental.events.handler.BoardingDeniedEventHandler;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
 /**
+ * Calculates and throws external delay effect events that are related to capacity constraints of public vehicles.
+ * 
  * @author Ihab
  *
  */
-public class CapacityWaitingDelayHandler implements BoardingDeniedEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, TransitDriverStartsEventHandler {
-	private final static Logger log = Logger.getLogger(CapacityWaitingDelayHandler.class);
+public class CapacityDelayHandler implements BoardingDeniedEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, TransitDriverStartsEventHandler {
+	
+	private final static Logger log = Logger.getLogger(CapacityDelayHandler.class);
+	
+	private final ScenarioImpl scenario;
+	private final EventsManager events;
 	
 	private final Map<Id, List<Id>> affectedAgent2causingAgents = new HashMap<Id, List<Id>>();
 	private final Map<Id, Double> affectedAgent2boardingDeniedTime = new HashMap<Id, Double>();
@@ -54,14 +60,21 @@ public class CapacityWaitingDelayHandler implements BoardingDeniedEventHandler, 
 	private final Map<Id, List<Id>> vehId2passengers = new HashMap<Id, List<Id>>();
 	private final Map<Id, Id> vehId2lastEnteringAgent = new HashMap<Id, Id>();
 	
-	private final ScenarioImpl scenario;
-	private final EventsManager events;
 	private final List<Id> ptVehicleIDs = new ArrayList<Id>();
 	private final List<Id> ptDriverIDs = new ArrayList<Id>();
 	
-	public CapacityWaitingDelayHandler(EventsManager events, ScenarioImpl scenario) {
+	private final CausingAgentsMethod causingAgentsMethod = CausingAgentsMethod.allPassengersInThePublicVehicle;
+	
+	public CapacityDelayHandler(EventsManager events, ScenarioImpl scenario) {
 		this.events = events;
 		this.scenario = scenario;
+		
+		log.info("Calculating external delay effects due to capacity constraints of public vehicles.");
+		
+		if (this.scenario.getConfig().vspExperimental().getValue(VspExperimentalConfigKey.isGeneratingBoardingDeniedEvent).equals("false")){
+			throw new RuntimeException("Expecting BoardingDeniedEvents to be generated. Please set config parameter isGeneratingBoardingDeniedEvent in vspExperimental to true. Aborting...");
+		}
+		
 	}
 	
 	@Override
@@ -144,8 +157,15 @@ public class CapacityWaitingDelayHandler implements BoardingDeniedEventHandler, 
 			calculateExternalDelay(event.getTime(), event.getPersonId());
 		}
 		List<Id> causingAgents = new ArrayList<Id>();
-		causingAgents = getAllAgentsInPublicVehicle(event.getVehicleId());
-//		causingAgents = getLastAgentEnteringPublicVehicle(event.getVehicleId());
+		
+		if (causingAgentsMethod.equals(CausingAgentsMethod.allPassengersInThePublicVehicle)){
+			causingAgents = getAllAgentsInPublicVehicle(event.getVehicleId());
+		} else if (causingAgentsMethod.equals(CausingAgentsMethod.lastAgentEnteringThePublicVehicle)){
+			causingAgents = getLastAgentEnteringPublicVehicle(event.getVehicleId());
+		} else {
+			throw new RuntimeException("Unknown method for the identfication of the causing agent(s). Aborting...");
+		}
+		
 		System.out.println("Affected agent: " + event.getPersonId());
 		System.out.println("Causing agents: " + causingAgents.toString());
 
@@ -176,7 +196,7 @@ public class CapacityWaitingDelayHandler implements BoardingDeniedEventHandler, 
 		double delayPerCausingAgent = delay / causingAgents.size();
 		
 		for (Id causingAgentId : causingAgents) {
-			CapacityWaitingDelayEvent capacityDelayEvent = new CapacityWaitingDelayEvent(time, causingAgentId, affectedAgentId, this.affectedAgent2deniedVehicle.get(affectedAgentId), delayPerCausingAgent);
+			CapacityDelayEvent capacityDelayEvent = new CapacityDelayEvent(time, causingAgentId, affectedAgentId, this.affectedAgent2deniedVehicle.get(affectedAgentId), delayPerCausingAgent);
 			System.out.println("Capacity delay event: " + capacityDelayEvent.toString());
 			this.events.processEvent(capacityDelayEvent);
 		}
@@ -184,6 +204,13 @@ public class CapacityWaitingDelayHandler implements BoardingDeniedEventHandler, 
 		this.affectedAgent2causingAgents.remove(affectedAgentId);
 		this.affectedAgent2boardingDeniedTime.remove(affectedAgentId);
 		this.affectedAgent2deniedVehicle.remove(affectedAgentId);
+	}
+	
+	// ######################################################################
+	
+	private static enum CausingAgentsMethod {
+		allPassengersInThePublicVehicle,
+		lastAgentEnteringThePublicVehicle
 	}
 	
 }

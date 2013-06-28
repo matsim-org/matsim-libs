@@ -31,7 +31,7 @@ import org.matsim.core.api.experimental.events.Event;
  * Event to indicate that an agent who is in a public vehicle delayed another passenger who could not board the public vehicle.
  * @author ikaddoura
  */
-public final class CapacityWaitingDelayEvent extends Event {
+public final class CapacityDelayEvent extends Event {
 	
 	public static final String EVENT_TYPE = "ExternalDelayEffectCapacityWaiting";
 	public static final String ATTRIBUTE_PERSON = "causingAgent";
@@ -44,7 +44,7 @@ public final class CapacityWaitingDelayEvent extends Event {
 	private final Id vehicleId;
 	private final double delay;
 
-	public CapacityWaitingDelayEvent(double time, Id causingAgentId, Id affectedAgentId, Id vehicleId, double delay) {
+	public CapacityDelayEvent(double time, Id causingAgentId, Id affectedAgentId, Id vehicleId, double delay) {
 		super(time);
 		this.causingAgentId = causingAgentId;
 		this.affectedAgentId = affectedAgentId;
