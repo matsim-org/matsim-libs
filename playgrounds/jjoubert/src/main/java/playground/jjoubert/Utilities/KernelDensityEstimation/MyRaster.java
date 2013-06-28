@@ -47,7 +47,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * Class used to generate a raster image (with square pixels) that represents the 
  * Kernel Density Estimate (KDE) of 2-dimensional points.
  * 
- * @author johanwjoubert
+ * @author jwjoubert
  */
 public class MyRaster{
 	private final Logger log = Logger.getLogger(MyRaster.class);

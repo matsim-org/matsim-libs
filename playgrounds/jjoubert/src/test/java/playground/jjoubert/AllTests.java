@@ -29,7 +29,6 @@ public class AllTests {
 	public static Test suite(){
 		TestSuite suite = new TestSuite("All tests for playground.jjoubert");
 		
-		suite.addTest(playground.jjoubert.CommercialClusters.AllTests.suite());
 		suite.addTest(playground.jjoubert.CommercialDemandGeneration.AllTests.suite());
 		suite.addTest(playground.jjoubert.CommercialTraffic.AllTests.suite());
 		suite.addTest(playground.jjoubert.roadpricing.AllTests.suite());
