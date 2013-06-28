@@ -33,7 +33,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 
-import playground.ikaddoura.optimization.operator.OperatorCostEventHandler;
+import playground.ikaddoura.optimization.operator.OperatorCostHandler;
 import playground.ikaddoura.optimization.users.CarCongestionHandlerAdvanced;
 import playground.ikaddoura.optimization.users.DepartureArrivalEventHandler;
 import playground.ikaddoura.optimization.users.FareData;
@@ -53,7 +53,7 @@ public class OperatorUserAnalysis {
 	private WaitingTimeHandler waitHandler;
 	private CarCongestionHandlerAdvanced congestionHandler;
 	
-	private OperatorCostEventHandler operatorHandler;
+	private OperatorCostHandler operatorHandler;
 	
 	private final String lastEventFile;
 	private final Network network;
@@ -74,7 +74,7 @@ public class OperatorUserAnalysis {
 		this.waitHandler = new WaitingTimeHandler(headway);
 		this.congestionHandler = new CarCongestionHandlerAdvanced(this.network);
 		
-		this.operatorHandler = new OperatorCostEventHandler(this.network);
+		this.operatorHandler = new OperatorCostHandler(this.network);
 		
 		events.addHandler(this.departureHandler);	
 		events.addHandler(this.moneyHandler);
@@ -88,7 +88,7 @@ public class OperatorUserAnalysis {
 		reader.readFile(this.lastEventFile);
 	}
 	
-	public OperatorCostEventHandler getOperatorCostHandler() {
+	public OperatorCostHandler getOperatorCostHandler() {
 		return this.operatorHandler;
 	}
 	
