@@ -4,10 +4,16 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Logger;
 
 public class FileUtils {
+	private final static Logger LOG = Logger.getLogger(FileUtils.class);
 
 	/**
 	 * Copies a file from one location to another.
@@ -74,6 +80,40 @@ public class FileUtils {
 			}
 		};
 		return filter;
+	}
+
+	
+	/**
+	 * The method samples from a filtered file list. 
+	 * @param the folder (type {@link File}) from where files should be sampled.
+	 * @param number the number of files that must be sampled. 
+	 * @param filter the {@link FilenameFilter} filter that will be	used to 
+	 *        filter the files from the source folder. 
+	 * @return a {@link List} of {@link File}s sampled.
+	 * @author jwjoubert
+	 */
+	public static List<File> sampleFiles(File folder, int number, FileFilter filter){
+		List<File> result = null;
+		if(!folder.exists() || !folder.isDirectory() || !folder.canRead()){
+			LOG.error("Could not read from " + folder.getAbsolutePath());
+			return null;
+		}
+		
+		File[] fileList = folder.listFiles(filter);
+		if(fileList.length > 0){
+			result = new ArrayList<File>();
+			if(fileList.length < number){
+				LOG.warn("Although " + number + " files were requested, only " + fileList.length + " are available");
+			}
+			
+			for(File f : fileList){
+				result.add(f);
+			}
+		} else{
+			LOG.warn("The folder contains no relevant files. A null list is returned!");
+		}
+		LOG.info("File sampling complete.");
+		return result;
 	}
 
 
