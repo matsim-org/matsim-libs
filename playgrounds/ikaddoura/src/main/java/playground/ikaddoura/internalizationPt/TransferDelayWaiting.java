@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.Id;
  * @author ikaddoura
  *
  */
-public class ExtEffectWaitingDelay {
+public class TransferDelayWaiting {
 	
 	private Id personId;
 	private double affectedAgents;
