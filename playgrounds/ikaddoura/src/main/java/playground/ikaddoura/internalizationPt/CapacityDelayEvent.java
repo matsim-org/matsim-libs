@@ -33,7 +33,7 @@ import org.matsim.core.api.experimental.events.Event;
  */
 public final class CapacityDelayEvent extends Event {
 	
-	public static final String EVENT_TYPE = "ExternalDelayEffectCapacityWaiting";
+	public static final String EVENT_TYPE = "CapacityDelayEvent";
 	public static final String ATTRIBUTE_PERSON = "causingAgent";
 	public static final String ATTRIBUTE_AFFECTED_AGENT = "affectedAgent";
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";

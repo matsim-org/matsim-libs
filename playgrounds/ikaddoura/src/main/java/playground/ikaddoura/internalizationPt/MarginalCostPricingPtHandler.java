@@ -57,14 +57,14 @@ public class MarginalCostPricingPtHandler implements TransferDelayInVehicleEvent
 	@Override
 	public void handleEvent(TransferDelayInVehicleEvent event) {
 		double amount = (event.getDelay() * event.getAffectedAgents() / 3600) * this.vtts_inVehicle;
-		AgentMoneyEvent moneyEvent = new AgentMoneyEvent(event.getTime(), event.getPersonId(), amount);
+		AgentMoneyEvent moneyEvent = new AgentMoneyEvent(event.getTime(), event.getCausingAgent(), amount);
 		this.events.processEvent(moneyEvent);
 	}
 
 	@Override
 	public void handleEvent(TransferDelayWaitingEvent event) {
 		double amount = (event.getDelay() * event.getAffectedAgentUnits() / 3600 ) * this.vtts_waiting;
-		AgentMoneyEvent moneyEvent = new AgentMoneyEvent(event.getTime(), event.getPersonId(), amount);
+		AgentMoneyEvent moneyEvent = new AgentMoneyEvent(event.getTime(), event.getCausingAgent(), amount);
 		this.events.processEvent(moneyEvent);		
 	}
 

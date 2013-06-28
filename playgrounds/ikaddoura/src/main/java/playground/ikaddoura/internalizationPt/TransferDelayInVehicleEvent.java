@@ -26,18 +26,17 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.Event;
-import org.matsim.core.api.internal.HasPersonId;
 
 /**
  * Event to indicate that an agent entering or leaving a public vehicle delayed passengers in the public vehicle.
  * @author ikaddoura
  */
-public final class TransferDelayInVehicleEvent extends Event implements HasPersonId {
+public final class TransferDelayInVehicleEvent extends Event {
 	
-	public static final String EVENT_TYPE = "ExternalDelayEffectInVehicleTime";
-	public static final String ATTRIBUTE_PERSON = "person";
+	public static final String EVENT_TYPE = "TransferDelayInVehicleEvent";
+	public static final String ATTRIBUTE_PERSON = "causingAgent";
 	public static final String ATTRIBUTE_VEHICLE = "vehicle";
-	public static final String ATTRIBUTE_AFFECTED_AGENTS = "affectedAgents";
+	public static final String ATTRIBUTE_AFFECTED_AGENTS = "numberOfAffectedAgents";
 	public static final String ATTRIBUTE_DELAY = "delay";
 	
 	private final Id vehicleId;
@@ -53,8 +52,7 @@ public final class TransferDelayInVehicleEvent extends Event implements HasPerso
 		this.delay = externalDelay;
 	}
 
-	@Override
-	public Id getPersonId() {
+	public Id getCausingAgent() {
 		return this.personId;
 	}
 	
