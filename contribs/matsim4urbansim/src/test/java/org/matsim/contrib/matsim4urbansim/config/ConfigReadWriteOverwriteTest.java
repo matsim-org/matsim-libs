@@ -106,7 +106,6 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 			e.printStackTrace();
 			Assert.assertTrue(false);
 		}
-//		TempDirectoryUtil.cleaningUpCustomTempDirectories();
 		log.info("done") ;
 	}
 	
