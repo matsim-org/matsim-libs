@@ -42,7 +42,7 @@ public class MainDensityAnalysisWithPtV2 {
 		String networkFile = "H:/thesis/output_no_pricing_v3_subtours_bugfix/output_network.xml.gz";
 		String eventsFile =  "H:/thesis/output_no_pricing_v3_subtours_bugfix/ITERS/it.50/50.events.xml.gz";
 		Coord center = null; // center=null means use all links
-		int binSizeInSeconds = 900;	// 15 minute bins
+		int binSizeInSeconds = 300;	// 5 minute bins
 
 		// String
 		// networkFile="C:/Users/Nan/Desktop/For matsim/matsim-0.1.1/examples/equil/network.xml";
@@ -51,7 +51,7 @@ public class MainDensityAnalysisWithPtV2 {
 		// Coord center=new CoordImpl(0,0);
 		// boolean isOldEventFile=false;
 
-		double radiusInMeters = 2000;
+		double radiusInMeters = 1500;
 		double length = 50.0;
 
 		// input/set center and radius
@@ -60,8 +60,8 @@ public class MainDensityAnalysisWithPtV2 {
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(networkFile);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-//		center = scenario.getNetwork().getNodes().get(scenario.createId("17560000106060FT")).getCoord();
-		center = scenario.createCoord(683513.0, 246839.9);
+		//center = scenario.getNetwork().getNodes().get(scenario.createId("17560000113841FT")).getCoord();
+		center = scenario.createCoord(682548.0, 247525.5);
 		
 		Map<Id, Link> links = LinkSelector.selectLinks(scenario.getNetwork(), center, radiusInMeters, length);
 		
@@ -169,8 +169,11 @@ public class MainDensityAnalysisWithPtV2 {
 			}
 
 			if (hasTraffic) {
-				System.out.print(linkId + " - " + link.getCoord() + ": \t");
-
+				Coord coord = link.getCoord();
+				System.out.print(linkId.toString() + " : \t");
+				System.out.print(coord.getX() + "\t");
+				System.out.print(coord.getY() + "\t");
+				
 				for (int i = 0; i < bins.length; i++) {
 					System.out.print(bins[i] + "\t");
 				}

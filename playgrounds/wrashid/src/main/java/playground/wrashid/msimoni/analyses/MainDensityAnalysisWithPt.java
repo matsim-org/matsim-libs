@@ -34,8 +34,8 @@ import org.matsim.core.events.EventsUtils;
 public class MainDensityAnalysisWithPt {
 
 	public static void main(String[] args) {
-		String networkFile = "H:/thesis/output_no_pricing_v3_1pct/output_network.xml.gz";
-		String eventsFile = "H:/thesis/output_no_pricing_v3_1pct/ITERS/it.50/50.events.xml.gz";
+		String networkFile = "H:/thesis/output_no_pricing_v3_subtours_bugfix/output_network.xml.gz";
+		String eventsFile =  "H:/thesis/output_no_pricing_v3_subtours_bugfix/ITERS/it.50/50.events.xml.gz";
 		Coord center = null; // center=null means use all links
 		boolean isOldEventFile = false;
 		int binSizeInSeconds = 3600;

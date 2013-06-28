@@ -13,14 +13,14 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-public class LinkSelector {
+public class Coordinate {
 	
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile("H:/thesis/output_no_pricing_v3_subtours/output_network.xml.gz");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
-		Coord center = scenario.createCoord(682548.0, 247525.5);
+		Coord center = scenario.createCoord(684281.6, 246570.3);
 		double distance = 1500.0;
 		double length = 50.0;
 		
