@@ -32,8 +32,8 @@ import playground.ikaddoura.optimization.OperatorUserAnalysis;
  * @author Ihab
  *
  */
-public class OperatorV2 {
-	private final static Logger log = Logger.getLogger(OperatorV2.class);
+public class Operator {
+	private final static Logger log = Logger.getLogger(Operator.class);
 	
 	private final double COSTS_PER_VEH_HOUR = 33.; 	 // in AUD
 	private final double OVERHEAD_PERCENTAGE = 1.21; // on top of direct operating costs

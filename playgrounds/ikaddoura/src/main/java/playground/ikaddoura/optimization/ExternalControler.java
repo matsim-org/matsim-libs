@@ -52,7 +52,7 @@ import playground.ikaddoura.optimization.io.OptSettingsReader;
 import playground.ikaddoura.optimization.io.PopFilePathsLoader;
 import playground.ikaddoura.optimization.io.RndSeedsLoader;
 import playground.ikaddoura.optimization.io.TextFileWriter;
-import playground.ikaddoura.optimization.operator.OperatorV2;
+import playground.ikaddoura.optimization.operator.Operator;
 import playground.ikaddoura.optimization.users.Users;
 import playground.ikaddoura.utils.prepare.PopulationWorkOtherGenerator;
 import playground.ikaddoura.utils.pt.DeparturesGenerator;
@@ -104,8 +104,7 @@ class ExternalControler {
 	private Map<Integer, String> demand2populationFile = new HashMap<Integer, String>();
 	private SortedMap<Integer, IterationInfo> it2information = new TreeMap<Integer, IterationInfo>();
 	private TextFileWriter textWriter = new TextFileWriter();
-//	private Operator operator = new Operator();
-	private OperatorV2 operator = new OperatorV2();
+	private Operator operator = new Operator();
 	private Users users = new Users();
 
 	public static void main(final String[] args) throws IOException {
