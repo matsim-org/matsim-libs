@@ -83,14 +83,9 @@ public class OperatorCostEventHandler implements TransitDriverStartsEventHandler
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		if (ptDriverIDs.contains(event.getPersonId())){
-			System.out.println(network.toString()); 
-			try {
-				this.vehicleKm = this.vehicleKm + network.getLinks().get(event.getLinkId()).getLength() / 1000;
-			} catch (NullPointerException e) {
-				// TODO repair this!
-				this.vehicleKm = .0;
-				
-			}
+
+			this.vehicleKm = this.vehicleKm + network.getLinks().get(event.getLinkId()).getLength() / 1000;
+			
 		} else {
 			// no public vehicle
 		}

@@ -54,10 +54,10 @@ public class OperatorV2 {
 		double costsPerVehicleKm = 0.006 * this.capacity + 0.513;    // see linear regression analysis in "BusCostsEstimations.xls"
 		
 		log.info("CostsPerVehicleKm (AUD): " + costsPerVehicleKm);
-		log.info("costsPerVehicleDay (AUD): " + costsPerVehicleDay);
-		log.info("Vehicle-km: " + analysis.getVehicleKm());
-		log.info("Veh-Time: " + Time.writeTime(analysis.getVehicleHours() * 3600, Time.TIMEFORMAT_HHMMSS));
-		log.info("Number of Buses from Events: " + analysis.getNumberOfBusesFromEvents());
+		log.info("CostsPerVehicleDay (AUD): " + costsPerVehicleDay);
+		log.info("Vehicle-km: " + analysis.getOperatorCostHandler().getVehicleKm());
+		log.info("Veh-Time: " + Time.writeTime(analysis.getOperatorCostHandler().getVehicleHours() * 3600, Time.TIMEFORMAT_HHMMSS));
+		log.info("Number of Buses from Events: " + analysis.getOperatorCostHandler().getVehicleIDs().size());
 		
 		double capitalCosts = analysis.getOperatorCostHandler().getVehicleIDs().size() * costsPerVehicleDay;
 		double kmCosts = analysis.getOperatorCostHandler().getVehicleKm() * costsPerVehicleKm;

@@ -100,18 +100,6 @@ public class OperatorUserAnalysis {
 		return this.operatorHandler;
 	}
 	
-	public double getVehicleHours() {
-		return this.departureHandler.getVehicleHours();
-	}
-
-	public double getVehicleKm() {
-		return linksHandler.getVehicleKm();
-	}
-
-	public int getNumberOfBusesFromEvents() {
-		return transitHandler.getVehicleIDs().size();
-	}
-
 	public double getRevenue() {
 		return moneyHandler.getRevenues();
 	}

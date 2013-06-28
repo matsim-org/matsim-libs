@@ -62,10 +62,9 @@ public class MoneyEventHandler implements AgentMoneyEventHandler {
 		fareData.setPersonId(event.getPersonId());
 		this.fareDataList.add(fareData);
 		
-		
-		
 		if (person2amounts.containsKey(event.getPersonId())){
 			this.person2amounts.get(event.getPersonId()).add(event.getAmount());
+		
 		} else {
 			List<Double> amounts = new ArrayList<Double>();
 			amounts.add(event.getAmount());
