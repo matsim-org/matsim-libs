@@ -43,7 +43,7 @@ import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
  * @author ikaddoura
  *
  */
-public class OperatorCostEventHandler implements TransitDriverStartsEventHandler, LinkLeaveEventHandler, AgentDepartureEventHandler, AgentArrivalEventHandler {
+public class OperatorCostHandler implements TransitDriverStartsEventHandler, LinkLeaveEventHandler, AgentDepartureEventHandler, AgentArrivalEventHandler {
 	private Network network;
 	private double vehicleKm;
 	
@@ -52,7 +52,7 @@ public class OperatorCostEventHandler implements TransitDriverStartsEventHandler
 	private final List<Id> ptDriverIDs = new ArrayList<Id>();
 	private final List<Id> ptVehicleIDs = new ArrayList<Id>();
 	
-	public OperatorCostEventHandler(Network network) {
+	public OperatorCostHandler(Network network) {
 		this.network = network;
 	}
 
