@@ -47,14 +47,13 @@ import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.vehicles.Vehicles;
 import org.matsim.vehicles.VehicleType.DoorOperationMode;
 
-import playground.ikaddoura.optimization.analysis.Operator;
-import playground.ikaddoura.optimization.analysis.OperatorUserAnalysis;
 import playground.ikaddoura.optimization.analysis.Users;
 import playground.ikaddoura.optimization.io.OptSettings;
 import playground.ikaddoura.optimization.io.OptSettingsReader;
 import playground.ikaddoura.optimization.io.PopFilePathsLoader;
 import playground.ikaddoura.optimization.io.RndSeedsLoader;
 import playground.ikaddoura.optimization.io.TextFileWriter;
+import playground.ikaddoura.optimization.operatorProfitModel.Operator;
 import playground.ikaddoura.utils.prepare.PopulationWorkOtherGenerator;
 import playground.ikaddoura.utils.pt.DeparturesGenerator;
 import playground.ikaddoura.utils.pt.ScheduleFromCorridor;

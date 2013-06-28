@@ -21,7 +21,7 @@
 /**
  * 
  */
-package playground.ikaddoura.optimization.analysis;
+package playground.ikaddoura.optimization;
 
 import java.util.List;
 import java.util.Map;
@@ -33,13 +33,14 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 
+import playground.ikaddoura.optimization.analysis.FareData;
 import playground.ikaddoura.optimization.handler.CarCongestionHandlerAdvanced;
-import playground.ikaddoura.optimization.handler.DepartureArrivalEventHandler;
-import playground.ikaddoura.optimization.handler.LinksEventHandler;
 import playground.ikaddoura.optimization.handler.MoneyDetailEventHandler;
-import playground.ikaddoura.optimization.handler.MoneyEventHandler;
-import playground.ikaddoura.optimization.handler.TransitEventHandler;
 import playground.ikaddoura.optimization.handler.WaitingTimeHandler;
+import playground.ikaddoura.optimization.operatorProfitModel.DepartureArrivalEventHandler;
+import playground.ikaddoura.optimization.operatorProfitModel.LinksEventHandler;
+import playground.ikaddoura.optimization.operatorProfitModel.MoneyEventHandler;
+import playground.ikaddoura.optimization.operatorProfitModel.TransitEventHandler;
 
 /**
  * @author Ihab

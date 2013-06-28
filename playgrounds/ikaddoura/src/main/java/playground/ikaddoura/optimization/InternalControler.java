@@ -33,8 +33,8 @@ import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
-import playground.ikaddoura.optimization.handler.PtLegHandler;
 import playground.ikaddoura.optimization.scoring.OptimizationScoringFunctionFactory;
+import playground.ikaddoura.optimization.scoring.PtLegHandler;
 
 /**
  * @author Ihab

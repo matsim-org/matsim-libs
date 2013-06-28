@@ -32,8 +32,8 @@ import playground.ikaddoura.internalizationPt.TransferDelayInVehicleHandler;
 import playground.ikaddoura.internalizationPt.MarginalCostPricingPtHandler;
 import playground.ikaddoura.internalizationPt.TransferDelayWaitingHandler;
 import playground.ikaddoura.optimization.handler.MoneyDetailEventHandler;
-import playground.ikaddoura.optimization.handler.MoneyEventHandler;
 import playground.ikaddoura.optimization.io.TextFileWriter;
+import playground.ikaddoura.optimization.operatorProfitModel.MoneyEventHandler;
 
 /**
  * 

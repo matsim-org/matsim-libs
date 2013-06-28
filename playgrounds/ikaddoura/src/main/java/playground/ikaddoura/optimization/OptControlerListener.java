@@ -37,7 +37,7 @@ import playground.ikaddoura.internalizationPt.TransferDelayInVehicleHandler;
 import playground.ikaddoura.internalizationPt.MarginalCostPricingPtHandler;
 import playground.ikaddoura.internalizationPt.TransferDelayWaitingHandler;
 import playground.ikaddoura.optimization.handler.ConstantFareHandler;
-import playground.ikaddoura.optimization.handler.PtLegHandler;
+import playground.ikaddoura.optimization.scoring.PtLegHandler;
 
 /**
  * @author Ihab

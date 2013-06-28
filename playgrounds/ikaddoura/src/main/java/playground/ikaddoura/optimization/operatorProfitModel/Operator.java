@@ -21,10 +21,12 @@
 /**
  * 
  */
-package playground.ikaddoura.optimization.analysis;
+package playground.ikaddoura.optimization.operatorProfitModel;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.utils.misc.Time;
+
+import playground.ikaddoura.optimization.OperatorUserAnalysis;
 
 /**
  * @author Ihab

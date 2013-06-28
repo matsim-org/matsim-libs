@@ -30,7 +30,6 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
-import playground.ikaddoura.optimization.handler.PtLegHandler;
 
 public class OptimizationScoringFunctionFactory implements ScoringFunctionFactory {
 

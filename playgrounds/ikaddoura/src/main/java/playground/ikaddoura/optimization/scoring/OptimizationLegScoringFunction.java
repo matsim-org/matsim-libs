@@ -33,7 +33,6 @@ import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.pt.PtConstants;
 
-import playground.ikaddoura.optimization.handler.PtLegHandler;
 
 /**
 * Modification of CharyparNagelLegScoring. Scores the in-vehicle time and waiting time for pt as well as access and egress time separately.
