@@ -6,6 +6,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.analysis.kai.KaiAnalysisListener;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.households.Household;
@@ -117,7 +118,10 @@ class GautengControler {
 		// playground.  For the time being, I (kai) would prefer to leave it the way it is since I am running the Gauteng
 		// scenario and I don't want to maintain two separate analysis listeners.  But once that period is over, this
 		// argument does no longer apply.  kai, mar'12
-		controler.addControlerListener(new org.matsim.contrib.analysis.kai.KaiAnalysisListener()) ;
+		//
+		// I (JWJ, June '13) commented this listener out as the dependency is not working.
+		
+		controler.addControlerListener(new KaiAnalysisListener()) ;
 		
 		// RUN:
 		controler.run();
