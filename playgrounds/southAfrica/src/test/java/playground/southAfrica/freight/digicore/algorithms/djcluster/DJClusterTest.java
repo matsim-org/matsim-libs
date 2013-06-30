@@ -51,8 +51,11 @@ public class DJClusterTest extends MatsimTestCase{
 		
 		assertEquals("There should only be two clusters", 2, djc.getClusterList().size());
 		
-		assertEquals("The left cluster must have 8 points.", 8, djc.getClusterList().get(0).getPoints().size());
-		assertEquals("The right cluster must have 4 points.", 4, djc.getClusterList().get(1).getPoints().size());
+		int small = Math.min(djc.getClusterList().get(0).getPoints().size(), djc.getClusterList().get(1).getPoints().size());
+		int large = Math.max(djc.getClusterList().get(0).getPoints().size(), djc.getClusterList().get(1).getPoints().size());
+		
+		assertEquals("The small cluster must have 4 points.", 4, small);
+		assertEquals("The large cluster must have 8 points.", 8, large);
 		
 	}
 	private static List<Coord> buildTestArrayList(){

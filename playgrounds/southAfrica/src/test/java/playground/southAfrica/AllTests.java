@@ -29,8 +29,9 @@ public class AllTests {
 		TestSuite suite = new TestSuite("All tests for playground.southAfrica");
 		
 		suite.addTest(playground.southAfrica.freight.AllTests.suite());
-		suite.addTest(playground.southAfrica.utilities.AllTests.suite());
+		suite.addTest(playground.southAfrica.population.AllTests.suite());
 		suite.addTest(playground.southAfrica.projects.AllTests.suite());
+		suite.addTest(playground.southAfrica.utilities.AllTests.suite());
 
 		return suite;
 	}
