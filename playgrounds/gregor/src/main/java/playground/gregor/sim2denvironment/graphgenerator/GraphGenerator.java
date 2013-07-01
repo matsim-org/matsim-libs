@@ -228,8 +228,8 @@ public class GraphGenerator {
 
 	public static void main(String [] args) throws FactoryRegistryException, SchemaException, IllegalAttributeException {
 		//		String floorplan = "/Users/laemmel/tmp/voronoi/test.shp";
-				String dir = "/Users/laemmel/devel/sim2dDemoIII/env_gen/";
-				String floorplan = dir + "floorplan_offset.shp";
+				String dir = "/Users/laemmel/devel/pantheon/raw/";
+				String floorplan = dir + "floorplan.shp";
 				String net = dir + "raw_network2d_floorplan.xml";
 //		String floorplan = "/Users/laemmel/devel/convexdecomp/03.shp";
 		Config c = ConfigUtils.createConfig();

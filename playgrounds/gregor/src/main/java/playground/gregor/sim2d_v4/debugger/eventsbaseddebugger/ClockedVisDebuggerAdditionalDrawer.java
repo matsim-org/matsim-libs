@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LineEvent.java
+ * ClockedVisdebuggerAdditionalDrawer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,68 +18,11 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.sim2d_v4.events.debug;
+package playground.gregor.sim2d_v4.debugger.eventsbaseddebugger;
 
-import org.matsim.core.api.experimental.events.Event;
-
-import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.Segment;
-
-public class LineEvent extends Event {
-
-	private static final String TYPE = "LINE_EVENT";
+public interface ClockedVisDebuggerAdditionalDrawer extends
+		VisDebuggerAdditionalDrawer {
 	
-	private final boolean isStatic;
-	private final Segment s;
-
-	private final int r,g,b,a,minScale;
-	
-	public LineEvent(double time,Segment s, boolean isStatic) {
-		this(time, s, isStatic, 0, 0, 0, 255, 0);
-	}
-	
-	public LineEvent(double time, Segment s, boolean isStatic, int r, int g, int b, int a, int minScale) {
-		super(time);
-		this.s = s;
-		this.isStatic = isStatic;
-		this.r = r;
-		this.g = g;
-		this.b = b;
-		this.a = a;
-		this.minScale = minScale;
-		
-	}
-
-	@Override
-	public String getEventType() {
-		return TYPE;
-	}
-	
-	public Segment getSegment() {
-		return this.s;
-	}
-	
-	public boolean isStatic() {
-		return this.isStatic;
-	}
-
-	public int getMinScale() {
-		return minScale;
-	}
-
-	public int getA() {
-		return a;
-	}
-
-	public int getB() {
-		return b;
-	}
-
-	public int getG() {
-		return g;
-	}
-
-	public int getR() {
-		return r;
-	}
+	public void update(double time);
 
 }

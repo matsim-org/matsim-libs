@@ -28,11 +28,9 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.gregor.sim2d_v4.cgal.CGAL;
-import playground.gregor.sim2d_v4.events.debug.NeighborsEvent;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.Segment;
@@ -106,9 +104,9 @@ public class Neighbors {
 		} 
 		
 		//DEBUG!!!!
-		if (this.agent.getId().equals(new IdImpl("b111"))) {
-			this.agent.getPSec().getPhysicalEnvironment().getEventsManager().processEvent(new NeighborsEvent(time, this.agent.getId(), this.cachedNeighbors, this.agent));
-		}
+//		if (this.agent.getId().equals(new IdImpl("b111"))) {
+//			this.agent.getPSec().getPhysicalEnvironment().getEventsManager().processEvent(new NeighborsEvent(time, this.agent.getId(), this.cachedNeighbors, this.agent));
+//		}
 		
 		return this.cachedNeighbors;
 	}

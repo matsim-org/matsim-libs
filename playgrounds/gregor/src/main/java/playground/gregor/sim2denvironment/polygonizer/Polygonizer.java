@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.gis.polygonizer;
+package playground.gregor.sim2denvironment.polygonizer;
 
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
@@ -30,7 +30,7 @@ import com.vividsolutions.jts.geom.Geometry;
 public class Polygonizer {
 	
 	public static void main(String args[]) {
-		String input = "/Users/laemmel/devel/sim2dDemoIII/env_gen/floorplan.shp";
+		String input = "/Users/laemmel/devel/pantheon/raw/floorplan.shp";
 		ShapeFileReader reader = new ShapeFileReader();
 		reader.readFileAndInitialize(input);
 		Geometry res = null;
@@ -50,7 +50,7 @@ public class Polygonizer {
 		GisDebugger.setCRSString("EPSG:3395");
 		GisDebugger.addGeometry(e2);
 		
-		GisDebugger.dump("/Users/laemmel/devel/sim2dDemoIII/env_gen/floorplan_p.shp");
+		GisDebugger.dump("/Users/laemmel/devel/pantheon/raw/floorplan_p.shp");
 		
 		System.out.println(res);
 		

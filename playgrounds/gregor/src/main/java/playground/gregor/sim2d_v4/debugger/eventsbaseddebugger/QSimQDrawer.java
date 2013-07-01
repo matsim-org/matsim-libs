@@ -44,22 +44,21 @@ import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.network.NetworkImpl;
 
 import processing.core.PConstants;
-import processing.core.PVector;
 
 
 
-public class QSimDensityDrawer implements VisDebuggerAdditionalDrawer, AgentDepartureEventHandler, AgentArrivalEventHandler, LinkLeaveEventHandler, LinkEnterEventHandler, ActivityStartEventHandler, ActivityEndEventHandler{
+public class QSimQDrawer implements VisDebuggerAdditionalDrawer, AgentDepartureEventHandler, AgentArrivalEventHandler, LinkLeaveEventHandler, LinkEnterEventHandler, ActivityStartEventHandler, ActivityEndEventHandler{
 
-	private static final Logger log = Logger.getLogger(QSimDensityDrawer.class);
+	private static final Logger log = Logger.getLogger(QSimQDrawer.class);
 	
 	List<LinkInfo> links = new ArrayList<LinkInfo>();
 	Map<Id,LinkInfo> map = new HashMap<Id,LinkInfo>();
 
 	private final double minScale = 10;
 	
-	public QSimDensityDrawer(Scenario sc) {
+	public QSimQDrawer(Scenario sc) {
 		for (Link l : sc.getNetwork().getLinks().values()) {
-		if (l.getAllowedModes().contains("walk2d") || l.getCapacity() == 2340){
+		if (l.getAllowedModes().contains("walk2d")){
 			continue;
 		}
 
@@ -72,24 +71,28 @@ public class QSimDensityDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 		dy /= length;
 		LinkInfo info = new LinkInfo();
 		info.id = l.getId();
-		info.cap = (l.getLength()/((NetworkImpl)sc.getNetwork()).getEffectiveCellSize())*l.getNumberOfLanes();
-
+		info.slots = (int) ((l.getLength()/((NetworkImpl)sc.getNetwork()).getEffectiveCellSize())*l.getNumberOfLanes());
+		info.lanes = (int) l.getNumberOfLanes();
+		info.cellSize = l.getLength()/(info.slots/info.lanes);
+		info.laneWidth = width/info.lanes;
+		info.length = l.getLength();
+		
 		double x0 = l.getFromNode().getCoord().getX();
 		double y0 = l.getFromNode().getCoord().getY();
 
-		double x1 = l.getToNode().getCoord().getX();
-		double y1 = l.getToNode().getCoord().getY();
 		
-		x0 += dy * width/2;
-		x1 += dy * width/2;
-		y0 -= dx * width/2;
-		y1 -= dx * width/2;
+//		x0 += dy * width/2;
+//		x1 += dy * width/2;
+//		y0 -= dx * width/2;
+//		y1 -= dx * width/2;
 		
 		info.width = width;
 		info.x0 = x0;
-		info.x1 = x1;
 		info.y0 = y0;
-		info.y1 = y1;
+		info.x1 = x0 + dy*width/2;
+		info.y1 = y0 - dx * width/2;
+		info.dx = dx;
+		info.dy = dy;
 		
 		double tan = dx/dy;
 		double atan = Math.atan(tan);
@@ -99,17 +102,6 @@ public class QSimDensityDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 			atan += Math.PI/2;
 		}
 		
-		double offsetX = dy * .075;
-		double offsetY = -dx * .075;
-		if (dx > 0) {
-			offsetX *= -1;
-			offsetY *= -1;
-		}
-		
-		info.tx = (x0+x1)/2+offsetX;
-		info.ty = (y0+y1)/2+offsetY;
-		info.text = "0";
-		info.atan = atan;
 		
 		this.links.add(info);
 		this.map.put(l.getId(), info);
@@ -120,13 +112,41 @@ public class QSimDensityDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 
 	@Override
 	public void draw(EventsBasedVisDebugger p) {
-		p.stroke(0);
+		if (true)
+		return;
+		p.stroke(255);
+		p.ellipseMode(PConstants.RADIUS);
 //		p.strokeCap(PConstants.ROUND);
 		p.strokeCap(PConstants.SQUARE);
+		p.strokeWeight(.1f);
+		p.fill(0);
 		for (LinkInfo li : this.links) {
-			p.strokeWeight(li.width);
-			p.stroke(li.r,li.g,li.b,li.a);
-			p.line((float)(li.x0+p.offsetX),(float)-(li.y0+p.offsetY),(float)(li.x1+p.offsetX),(float)-(li.y1+p.offsetY));
+			int lines = li.onLink/li.lanes+1;
+			if (li.onLink <= 0) {
+				continue;
+			}
+			double incr = li.length/lines;
+			double delta = incr;
+			while (delta < li.length) {
+				double x0 = li.x0 + delta*li.dx;
+				double x1 = li.x1 + delta*li.dx;
+				double y0 = li.y0 + delta*li.dy;
+				double y1 = li.y1 + delta*li.dy;
+				delta += incr;
+				p.strokeWeight((float)(.1*p.zoomer.getZoomScale()));
+				p.stroke(0,0);
+//				p.strokeCap(PConstants.ROUND);
+//				p.line((float)(x0+p.offsetX),(float)-(y0+p.offsetY),(float)(x1+p.offsetX),(float)-(y1+p.offsetY));
+				p.ellipseMode(PConstants.RADIUS);
+				p.ellipse((float)((x0+x1)/2 + p.offsetX), (float)-((y0+y1)/2 + p.offsetY), .35f, .35f);
+//				p.strokeCap(PConstants.SQUARE);
+//				p.stroke(0);
+//				p.strokeWeight((float)(.1*p.zoomer.getZoomScale()));
+//				p.line((float)(x0+p.offsetX),(float)-(y0+p.offsetY),(float)(x1+p.offsetX),(float)-(y1+p.offsetY));
+			}
+//			p.strokeWeight(li.width);
+//			p.stroke(0,0,0,255);
+//			p.line((float)(li.x0+p.offsetX),(float)-(li.y0+p.offsetY),(float)(li.x1+p.offsetX),(float)-(li.y1+p.offsetY));
 		}
 //		p.strokeCap(PConstants.SQUARE);
 	}
@@ -134,75 +154,26 @@ public class QSimDensityDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 
 	@Override
 	public void drawText(EventsBasedVisDebugger p) {
-		
-		if (p.zoomer.getZoomScale() < this.minScale ) {
-			return;
-		}
-		for (LinkInfo li : this.links) {
-		
-			float ts = (float) (10*p.zoomer.getZoomScale()/this.minScale);
-			p.textSize(ts);	
-			PVector cv = p.zoomer.getCoordToDisp(new PVector((float)(li.tx+p.offsetX),(float)-(li.ty+p.offsetY)));
-			p.fill(0,0,0,255);
-			float w = p.textWidth(li.text);
-			p.textAlign(PConstants.LEFT);
-			p.text(li.text, cv.x-w/2, cv.y+ts/2);
-		}
 	}
 
 
 
 
-	private void updateColor(LinkInfo l) {
-//		if (l.onLink > l.cap) {
-//			l.cap = l.onLink;
-//		}
-		if (l.onLink > l.cap) {
-			log.warn("Assumed storage capacity is smaler than actual storage capacity.");
-			l.cap = l.onLink;
-		}
-		double density =5.4*l.onLink/l.cap;
-		if (density == 0) {
-			l.r = 0;
-			l.g = 0;
-			l.b = 0;
-			l.a = 0;
-		} else if (density < 0.25) {
-			l.a = (int) (128 + 128 * (density/0.25));
-			l.r = 0;
-			l.g = 255;
-			l.b = 0;
-		} else if (density < 1) {
-			l.a = 255;
-			l.g = 255;
-			l.b = 0;
-			l.r = (int) (255 * ((density-.25)/0.75));
-		} else if (density < 2) {
-			l.a = 255;
-			l.g = 255 - (int) (255 * ((density-1)));;
-			l.b = 0;
-			l.r = 255;			
-		} else {
-			l.a = 255;
-			l.g = 0;
-			l.b = (int) (128 * (density-2)/3.4);
-			l.r = 255 - l.b;
-		}
-
-	}
 //
 //
 	private static final class LinkInfo {
+		public double length;
+		public double laneWidth;
+		public double dy;
+		public double dx;
+		public double cellSize;
+		public int lanes;
 		public Id id;
-		public double atan;
-		public String text;
-		public double tx;
-		public double ty;
-		public int r = 255;
-		public int b = 255;
-		public int g = 255;
-		public int a = 0;
-		double cap;
+		public int r;
+		public int b;
+		public int g;
+		public int a = 255;
+		int slots;
 		float width;
 		double x0;
 		double x1;
@@ -232,8 +203,6 @@ public class QSimDensityDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 		}
 		synchronized(info) {
 			info.onLink--;
-			info.text = Integer.toString(info.onLink);
-			updateColor(info);
 		}
 
 	}
@@ -247,8 +216,6 @@ public class QSimDensityDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 		}
 		synchronized(info) {
 			info.onLink++;
-			info.text = Integer.toString(info.onLink);
-			updateColor(info);
 		}		
 	}
 
@@ -261,8 +228,6 @@ public class QSimDensityDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 		}
 		synchronized(info) {
 			info.onLink++;
-			info.text = Integer.toString(info.onLink);
-			updateColor(info);
 		}		
 	}
 
@@ -274,8 +239,6 @@ public class QSimDensityDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 		}
 		synchronized(info) {
 			info.onLink--;
-			info.text = Integer.toString(info.onLink);
-			updateColor(info);
 		}
 	}
 
@@ -289,8 +252,6 @@ public class QSimDensityDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 		}
 		synchronized(info) {
 			info.onLink--;
-			info.text = Integer.toString(info.onLink);
-			updateColor(info);
 		}
 	}
 
@@ -304,8 +265,6 @@ public class QSimDensityDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 		}
 		synchronized(info) {
 			info.onLink++;
-			info.text = Integer.toString(info.onLink);
-			updateColor(info);
 		}		
 	}
 

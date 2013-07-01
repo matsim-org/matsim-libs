@@ -71,10 +71,10 @@ public class Test {
 //		String network = "/Users/laemmel/devel/gr90_sim2d_v4/raw_input/raw_network2d_0.xml";
 //		String output = "/Users/laemmel/devel/gr90_sim2d_v4/raw_input_stage2/sim2dEnv_0.gml.gz";
 
-		String dir = "/Users/laemmel/devel/hhw2/env_gen/";
-		String p = dir + "hhw_station_p_it2.shp";
-		String network = dir + "raw_network2d_hhw_station.xml";
-		String output = dir + "sim2dEnv_hhw_station.gml.gz";
+		String dir = "/Users/laemmel/devel/pantheon/raw/";
+		String p = dir + "floorplan_p.shp";
+		String network = dir + "raw_network2d_floorplan.xml";
+		String output = dir + "s2d_environment.gml.gz";
 		
 		GeometryFactory geofac = new GeometryFactory();
 

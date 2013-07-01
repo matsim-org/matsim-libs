@@ -191,7 +191,7 @@ public class PhysicalSim2DEnvironment {
 		o1.y0 = o.y0;
 		o1.x1 = o1.x0 + ARRIVAL_AREA_LENGTH * o1.dx;
 		o1.y1 = o1.y0 + ARRIVAL_AREA_LENGTH * o1.dy;
-		psec.getObstacles().add(o1);
+//		psec.getObstacles().add(o1);
 		
 
 		Segment o2 = new Segment();
@@ -201,7 +201,7 @@ public class PhysicalSim2DEnvironment {
 		o2.y0 = o.y1 - ARRIVAL_AREA_LENGTH * o2.dy;
 		o2.x1 = o.x1;
 		o2.y1 = o.y1;
-		psec.getObstacles().add(o2);
+//		psec.getObstacles().add(o2);
 		
 		Segment o3 = new Segment();
 		double l = lowResLink.getLink().getLength();
@@ -214,7 +214,7 @@ public class PhysicalSim2DEnvironment {
 		if (l < ARRIVAL_AREA_LENGTH) {
 			log.warn("2D/Q transition link:" + lowResLink.getLink().getId() + " is shorter than arrival area length. This might have negative side effects on the flow!");
 		}
-		psec.getObstacles().add(o3);
+//		psec.getObstacles().add(o3);
 		lowResLink.setEndOfQueueLine(o3);
 		
 		
@@ -293,7 +293,7 @@ public class PhysicalSim2DEnvironment {
 
 		int flowCapNrOfBoxes = (int) Math.ceil(flowCap/maxBoxCap);
 
-		nrOfBoxes = Math.max(flowCapNrOfBoxes, nrOfBoxes);
+		nrOfBoxes = Math.min(flowCapNrOfBoxes, nrOfBoxes);
 
 		double gap = width - (nrOfBoxes * DEP_BOX_WIDTH);
 
@@ -354,6 +354,11 @@ public class PhysicalSim2DEnvironment {
 			hiResLink.createDepartureBox(psecBox,spawnX,spawnY);
 			bottomX += dx;
 			bottomY += dy;
+			
+			
+//			for (Segment oo : psecBox.getObstacles()) {
+//				this.eventsManager.processEvent(new LineEvent(0, oo, true,0,0,0,255,0));
+//			}
 		}
 
 	}

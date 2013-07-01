@@ -38,7 +38,7 @@ public class Sim2DAgent implements TwoDObject {
 	
 	//testing only
 	@Deprecated
-	private final double vCoeff = 1+MatsimRandom.getRandom().nextGaussian()*.1;;
+	private final double vCoeff = 1; //+MatsimRandom.getRandom().nextGaussian()*.1;;
 	
 	private double v0 = 1.34*this.vCoeff;
 	

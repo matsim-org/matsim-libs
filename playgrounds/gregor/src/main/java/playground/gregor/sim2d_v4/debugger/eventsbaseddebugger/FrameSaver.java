@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LineEvent.java
+ * FrameSaver.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,68 +18,53 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.sim2d_v4.events.debug;
+package playground.gregor.sim2d_v4.debugger.eventsbaseddebugger;
 
-import org.matsim.core.api.experimental.events.Event;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
 
-import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.Segment;
+import processing.core.PApplet;
 
-public class LineEvent extends Event {
-
-	private static final String TYPE = "LINE_EVENT";
+public class FrameSaver {
 	
-	private final boolean isStatic;
-	private final Segment s;
+	private final CyclicBarrier barrier = new CyclicBarrier(2);
+	private final String path;
+	private final String extension;
+	private final int frameSkip;
+	private int skiped;
 
-	private final int r,g,b,a,minScale;
-	
-	public LineEvent(double time,Segment s, boolean isStatic) {
-		this(time, s, isStatic, 0, 0, 0, 255, 0);
-	}
-	
-	public LineEvent(double time, Segment s, boolean isStatic, int r, int g, int b, int a, int minScale) {
-		super(time);
-		this.s = s;
-		this.isStatic = isStatic;
-		this.r = r;
-		this.g = g;
-		this.b = b;
-		this.a = a;
-		this.minScale = minScale;
-		
-	}
-
-	@Override
-	public String getEventType() {
-		return TYPE;
+	public FrameSaver(String path, String extension, int frameSkip) {
+		this.path = path;
+		this.extension = extension;
+		this.frameSkip = frameSkip;
+		this.skiped = frameSkip;
 	}
 	
-	public Segment getSegment() {
-		return this.s;
+	public void saveFrame(PApplet p, String identifier) {
+		if (this.skiped != this.frameSkip) {
+			this.skiped++;
+			this.await();
+			return;
+		}
+		this.skiped = 0;
+		StringBuffer bf = new StringBuffer();
+		bf.append(this.path);
+		bf.append("/");
+		bf.append(identifier);
+		bf.append(".");
+		bf.append(this.extension);
+		p.saveFrame(bf.toString());
+		this.await();
 	}
 	
-	public boolean isStatic() {
-		return this.isStatic;
-	}
-
-	public int getMinScale() {
-		return minScale;
-	}
-
-	public int getA() {
-		return a;
-	}
-
-	public int getB() {
-		return b;
-	}
-
-	public int getG() {
-		return g;
-	}
-
-	public int getR() {
-		return r;
+	public void await() {
+		try {
+			this.barrier.await();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		} catch (BrokenBarrierException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

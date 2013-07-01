@@ -53,11 +53,11 @@ public class TileLoader implements Runnable{
 				url = pTile.getUrl();
 			}
 			
-			String path = "/Users/laemmel/tmp/cache/"+url + ".jpeg";
+			String path = "/Users/laemmel/tmp/cache/"+url + ".png";
 			if (new File(path).isFile()) {
 				url = path;
 			}
-			PImage img = this.p.loadImage(url,"jpeg");
+			PImage img = this.p.loadImage(url,"png");
 			synchronized (pTile) {
 				pTile.setPImage(img);
 			}
@@ -77,7 +77,7 @@ public class TileLoader implements Runnable{
 	}
 	
 	public void loadDirectly(Tile t, String path) {
-		PImage img = this.p.loadImage(path,"jpeg");
+		PImage img = this.p.loadImage(path,"png");
 		t.setPImage(img);
 	}
 

@@ -30,9 +30,12 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.gregor.sim2d_v3.trafficmonitoring.MSATravelTimeCalculatorFactory;
+import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.Branding;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.GregorsOffice;
+import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.QSimDensityDrawer;
+import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.SeeCasino;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfigUtils;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
@@ -62,8 +65,8 @@ public class Sim2DRunner implements IterationStartsListener{
 		sc.addScenarioElement(sim2dsc);
 		sim2dsc.connect(sc);
 		
-//		c.getQSimConfigGroup().setEndTime(30*3600+40*60);
-		c.getQSimConfigGroup().setEndTime(5*60);
+//		c.getQSimConfigGroup().setEndTime(15*3600);
+//		c.getQSimConfigGroup().setEndTime(5*60);
 
 		//offsets needed to convert to doubles later in program
 		double minX = Double.POSITIVE_INFINITY;
@@ -108,11 +111,17 @@ public class Sim2DRunner implements IterationStartsListener{
 //			runner.visDebugger.setFrameSaver(fs);
 			
 			EventBasedVisDebuggerEngine dbg = new EventBasedVisDebuggerEngine(sc);
+			InfoBox iBox = new InfoBox(dbg,sc);
+			SeeCasino iCasion = new SeeCasino();
+			dbg.addAdditionalDrawer(iBox);
+			dbg.addAdditionalDrawer(new Branding());
 			QSimDensityDrawer qDbg = new QSimDensityDrawer(sc);
 			dbg.addAdditionalDrawer(qDbg);
+			dbg.addAdditionalDrawer(iCasion);
 			dbg.addAdditionalDrawer(new GregorsOffice());
 			controller.getEvents().addHandler(dbg);
 			controller.getEvents().addHandler(qDbg);
+			controller.getEvents().addHandler(iCasion);
 			
 		}
 

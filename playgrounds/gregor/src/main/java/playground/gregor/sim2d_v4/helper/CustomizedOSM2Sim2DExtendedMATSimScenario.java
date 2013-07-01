@@ -82,7 +82,7 @@ import com.vividsolutions.jts.geom.Polygon;
  *
  */
 public class CustomizedOSM2Sim2DExtendedMATSimScenario {
-	
+
 	private static final Logger log = Logger.getLogger(CustomizedOSM2Sim2DExtendedMATSimScenario.class);
 
 	//ped flow params
@@ -92,6 +92,7 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 	//	private static final String TAG_HIGHWAY = "highway";
 	private static final String K_M_TRA_MODE = "m_tra_mode";
 	private static final String K_M_TYPE = "m_type";
+	private static final String K_M_ONEWAY = "m_oneway";
 	private static final String V_M_TYPE_ENV = "sim2d_section";
 	private static final String V_M_TYPE_NET = "sim2d_link";
 	private static final String K_LEVEL = "level";
@@ -116,7 +117,7 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 	}
 
 	private static final GeometryFactory geofac = new GeometryFactory();
-	
+
 	private static final double THRESHOLD = 1;
 
 	private HashMap<Id, OSMNode> nodes;
@@ -124,8 +125,8 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 	private final OSM osm;
 	private final Sim2DScenario s2dsc;
 	private final Scenario sc;
-	
-	
+
+
 
 	/*package*/ CustomizedOSM2Sim2DExtendedMATSimScenario(Scenario sc) {
 		this(sc,new OSM());
@@ -143,6 +144,7 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 
 		this.osm.addKey(K_M_TYPE);
 		this.osm.addKey(K_M_TRA_MODE);
+		this.osm.addKey(K_M_ONEWAY);
 		OSMXMLParser parser = new OSMXMLParser(this.osm);
 
 		parser.setValidating(false);
@@ -157,7 +159,7 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 			this.nodes.put(node.getId(), node);
 
 		}
-		
+
 		Sim2DEnvironment dummyEnv = new Sim2DEnvironment();
 		dummyEnv.setNetwork(this.sc.getNetwork());
 		try {
@@ -189,11 +191,11 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 				}
 			} else if (way.getTags().get(K_M_TRA_MODE) != null) { //standard matsim 
 				createLinks(way,dummyEnv,walk);
-				
+
 			}
 
 		}
-		
+
 		mappLinksToSections();
 
 	}
@@ -203,9 +205,9 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 			QuadTree<Section> qt = new QuadTree<Section>(env.getEnvelope().getMinX(),env.getEnvelope().getMinY(),env.getEnvelope().getMaxX(),env.getEnvelope().getMaxY());
 			fillQuadtTree(env,qt);
 			Network net = env.getEnvironmentNetwork();
-			
+
 			int mapped = 0;
-			
+
 			for (Link l : net.getLinks().values()) {
 				Point p = MGC.coord2Point(l.getCoord());
 				Section sec = qt.get(p.getX(), p.getY());
@@ -213,21 +215,21 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 					log.info("could not find link section mapping in quadtree using linear search");
 					for (Section sec2 : env.getSections().values()) {
 						if (sec2.getPolygon().contains(p)){
-//							env.addLinkSectionMapping(l, sec2);
+							//							env.addLinkSectionMapping(l, sec2);
 							sec2.addRelatedLinkId(l.getId());
 							mapped++;
 							break;
 						}
 					}
 				} else {
-//					env.addLinkSectionMapping(l, sec);
+					//					env.addLinkSectionMapping(l, sec);
 					sec.addRelatedLinkId(l.getId());
 					mapped++;
 				}
 			}
 			log.warn("there are " + (net.getLinks().size()-mapped) + " unmapped links! This is not necessarily an error");
 		}
-		
+
 	}
 
 	private void fillQuadtTree(Sim2DEnvironment env, QuadTree<Section> qt) {
@@ -235,7 +237,7 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 			Polygon p = sec.getPolygon();
 			Coordinate [] coords = p.getExteriorRing().getCoordinates();
 			Coordinate old = coords[0];
-			
+
 			qt.put(old.x, old.y, sec);
 			for (int i = 1; i < coords.length-1; i++) {
 				Coordinate c = coords[i];
@@ -257,8 +259,8 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 			}
 
 		}
-		
-		
+
+
 	}
 
 	private void createLinks(OSMWay way, Sim2DEnvironment env, Set<String> modes) {
@@ -294,14 +296,16 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 			l0.setLength(l);
 			l0.setAllowedModes(modes);
 			net.addLink(l0);
-			Id id1 = new IdImpl(LINK_ID_PREFIX+i+"_rev_"+ IdSuffix);
-			Link l1 = fac.createLink(id1, n2, n1);
-			l1.setCapacity(capacity);
-			l1.setFreespeed(fs);
-			l1.setNumberOfLanes(nofLanes);
-			l1.setLength(l);
-			l1.setAllowedModes(modes);
-			net.addLink(l1);
+			if (way.getTags().get(K_M_ONEWAY) == null || !way.getTags().get(K_M_ONEWAY).equals("true")) {
+				Id id1 = new IdImpl(LINK_ID_PREFIX+i+"_rev_"+ IdSuffix);
+				Link l1 = fac.createLink(id1, n2, n1);
+				l1.setCapacity(capacity);
+				l1.setFreespeed(fs);
+				l1.setNumberOfLanes(nofLanes);
+				l1.setLength(l);
+				l1.setAllowedModes(modes);
+				net.addLink(l1);
+			} 
 		}
 
 	}
@@ -406,20 +410,20 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 	}
 
 	public static void main (String [] args) throws NoSuchAuthorityCodeException, FactoryException {
-//		String osmFile = "/Users/laemmel/devel/gr90_sim2d_v4/raw_input_stage3/env.osm";
-//		String inputDir = "/Users/laemmel/devel/gr90_sim2d_v4/input";
-//		String outputDir = "/Users/laemmel/devel/gr90_sim2d_v4/output";
-		
-		String osmFile = "/Users/laemmel/devel/burgdorf2d2/raw_input_stage3/map.osm";
-		String inputDir = "/Users/laemmel/devel/burgdorf2d2/input";
-		String outputDir = "/Users/laemmel/devel/burgdorf2d2/output";
-		
+		//		String osmFile = "/Users/laemmel/devel/gr90_sim2d_v4/raw_input_stage3/env.osm";
+		//		String inputDir = "/Users/laemmel/devel/gr90_sim2d_v4/input";
+		//		String outputDir = "/Users/laemmel/devel/gr90_sim2d_v4/output";
+
+		String osmFile = "/Users/laemmel/devel/pantheon/raw/map.osm";
+		String inputDir = "/Users/laemmel/devel/pantheon/input";
+		String outputDir = "/Users/laemmel/devel/pantheon/output";
+
 		Sim2DConfig s2d = Sim2DConfigUtils.createConfig();
 		Sim2DScenario s2dsc = Sim2DScenarioUtils.createSim2dScenario(s2d);
 
 		Config c = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario(c);
-		
+
 		((NetworkImpl)sc.getNetwork()).setEffectiveCellSize(.26);
 		((NetworkImpl)sc.getNetwork()).setEffectiveLaneWidth(.71);
 		sc.addScenarioElement(s2dsc);
@@ -442,19 +446,19 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 
 
 		c.network().setInputFile(inputDir + "/network.xml.gz");
-		
-//		c.strategy().addParam("Module_1", "playground.gregor.sim2d_v4.replanning.Sim2DReRoutePlanStrategy");
+
+		//		c.strategy().addParam("Module_1", "playground.gregor.sim2d_v4.replanning.Sim2DReRoutePlanStrategy");
 		c.strategy().addParam("Module_1", "ReRoute");
 		c.strategy().addParam("ModuleProbability_1", ".1");
 		c.strategy().addParam("ModuleDisableAfterIteration_1", "250");
 		c.strategy().addParam("Module_2", "ChangeExpBeta");
 		c.strategy().addParam("ModuleProbability_2", ".9");
-		
+
 		c.controler().setOutputDirectory(outputDir);
 		c.controler().setLastIteration(500);
-		
+
 		c.plans().setInputFile(inputDir + "/population.xml.gz");
-		
+
 		ActivityParams pre = new ActivityParams("origin");
 		pre.setTypicalDuration(49); // needs to be geq 49, otherwise when running a simulation one gets "java.lang.RuntimeException: zeroUtilityDuration of type pre-evac must be greater than 0.0. Did you forget to specify the typicalDuration?"
 		// the reason is the double precision. see also comment in ActivityUtilityParameters.java (gl)
@@ -465,25 +469,27 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 		pre.setOpeningTime(49);
 
 
-		ActivityParams post = new ActivityParams("destionation");
-		post.setTypicalDuration(49); // dito
-		post.setMinimalDuration(49);
-		post.setClosingTime(49);
-		post.setEarliestEndTime(49);
-		post.setLatestStartTime(49);
-		post.setOpeningTime(49);
+		ActivityParams post = new ActivityParams("destination");
+		post.setTypicalDuration(30*60); // dito
+		post.setMinimalDuration(10*60);
+		post.setClosingTime(14*3600+30*60);
+		post.setEarliestEndTime(11*3600+10*60);
+		post.setLatestStartTime(14*3600);
+		post.setOpeningTime(11*3600);
 		sc.getConfig().planCalcScore().addActivityParams(pre);
 		sc.getConfig().planCalcScore().addActivityParams(post);
 
 		sc.getConfig().planCalcScore().setLateArrival_utils_hr(0.);
 		sc.getConfig().planCalcScore().setPerforming_utils_hr(0.);
-		
-		
+
+
 		QSimConfigGroup qsim = new QSimConfigGroup();
 		qsim.setEndTime(2*3600);
 		c.addModule("qsim", qsim);
 		c.controler().setMobsim("hybridQ2D");
-		
+
+		c.global().setCoordinateSystem("EPSG:3395");
+
 		new ConfigWriter(c).write(inputDir+ "/config.xml");
 
 		new NetworkWriter(sc.getNetwork()).write(c.network().getInputFile());

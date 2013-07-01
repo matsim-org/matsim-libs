@@ -46,7 +46,8 @@ public class NearestPointAtTargetLine implements DesiredDirectionCalculator {
 		double r = CGAL.vectorCoefOfPerpendicularProjection(pos[0], pos[1], fl.x0, fl.y0, fl.x1, fl.y1);
 		
 		double dx, dy;
-		if (r > 0 && r < 1) {
+		
+		if (r >= 0 && r <= 1) {
 //			tx = fl.x0 + r * (fl.x1-fl.x0);
 //			ty = fl.y0 + r * (fl.y1-fl.y0);
 			dx = li.dx;

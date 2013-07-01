@@ -269,14 +269,18 @@ public class NetworkCutter {
 	}
 	
 	public static void main(String [] args) {
-		Sim2DConfig conf = Sim2DConfigUtils.loadConfig("/Users/laemmel/devel/hhw2/env_gen/sim2dConfig.xml");
+		Sim2DConfig conf = Sim2DConfigUtils.loadConfig("/Users/laemmel/devel/fzj/input/s2d_config.xml");
 		Sim2DScenario sc = Sim2DScenarioUtils.loadSim2DScenario(conf);
 		new NetworkCutter().run(sc);
 		
-		String envStr = conf.getSim2DEnvironmentPaths().iterator().next();
-		String n = sc.getSim2DConfig().getNetworkPath(envStr);
-		new NetworkWriter(sc.getSim2DEnvironments().iterator().next().getEnvironmentNetwork()).write(n);
-		new Sim2DEnvironmentWriter02(sc.getSim2DEnvironments().iterator().next()).write(envStr);
+		for (Sim2DEnvironment env : sc.getSim2DEnvironments()){
+			Id id = env.getId();
+			String envFile = "/Users/laemmel/devel/fzj/input/sim2d_environment_"+id.toString()+".gml.gz";
+			String netFile = "/Users/laemmel/devel/fzj/input/sim2d_network_"+id.toString()+".xml.gz";
+			new Sim2DEnvironmentWriter02(env).write(envFile);
+			new NetworkWriter(env.getEnvironmentNetwork()).write(netFile);
+		}
+
 		
 	}
 }

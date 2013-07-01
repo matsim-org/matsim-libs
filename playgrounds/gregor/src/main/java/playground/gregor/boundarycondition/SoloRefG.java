@@ -66,7 +66,7 @@ import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LinearRing;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class ScenarioGenerator {
+public class SoloRefG {
 	
 	public static void main(String [] args) {
 		Config c = ConfigUtils.createConfig();

@@ -64,8 +64,8 @@ public class KeyControl implements KeyListener {
 	@Override
 	public void keyPressed(KeyEvent e) {
 		if (e.getKeyChar() == '+') {
-			if (this.speedup >= 128) {
-				log.info("acceleration already at maximum (128).");
+			if (this.speedup >= 512) {
+				log.info("acceleration already at maximum (512).");
 				return;
 			}
 			this.speedup *= 2;
