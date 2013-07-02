@@ -47,6 +47,7 @@ public abstract class TransformationFactory {
 	public final static String WGS84_SVY21 = "WGS84_SVY21"; //Singapore2
 	public final static String NAD83_UTM17N = "NAD83_UTM17N"; //Toronto, Canada
 	public static final String WGS84_TM = "WGS84_TM"; //Singapore3
+	public static final String PCS_ITRF2000_TM_UOS = "PCS_ITRF2000_TM_UOS"; // South Korea - but used by University of Seoul - probably a wrong one...
 
 	/**
 	 * Returns a coordinate transformation to transform coordinates from one
