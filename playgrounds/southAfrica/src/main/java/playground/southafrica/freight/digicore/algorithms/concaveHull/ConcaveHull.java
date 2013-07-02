@@ -211,11 +211,33 @@ public class ConcaveHull {
 		
 		QuadEdgeSubdivision qes = dtb.getSubdivision();
 		
+		
+		
 		/*TODO Sort out the following warnings...*/
 		Collection<QuadEdge> quadEdges = qes.getEdges();
 		
 		List<QuadEdgeTriangle> qeTriangles = QuadEdgeTriangle.createOn(qes);
 		Collection<Vertex> qeVertices = qes.getVertices(false);
+
+		/*TODO Remove after debugging. It seems that some facilities, although
+		 * they have three or more points, do not have a 'valid' Delaunay
+		 * triangulation. */
+		if(qeTriangles.size() == 0 || qeVertices.size() == 0){
+			LOG.warn("No triangulation for three or more points: " + this.filteredPoints.getNumPoints() + " points!!");
+			Coordinate[] ca = this.filteredPoints.getCoordinates();
+			if(ca.length == 3){
+				LOG.warn("Instead, a polygon (triangle) of the three points will be returned.");
+				Coordinate[] caClosed = new Coordinate[4];
+				caClosed[0] = ca[0];
+				caClosed[1] = ca[1];
+				caClosed[2] = ca[2];
+				caClosed[3] = ca[0];				
+				return this.geomFactory.createPolygon(this.geomFactory.createLinearRing(caClosed), null);
+			} else{
+				LOG.warn("Don't know how to solve this for " + ca.length + " points!! Returning a NULL Geometry");
+				return this.geomFactory.createGeometryCollection(null);
+			}
+		}
 		
 		/* Create index maps for the nodes/vertices. */
 		int nodeId = 0;
@@ -335,11 +357,17 @@ public class ConcaveHull {
 		/* For each edge, check if it belongs to more than one triangle. If so,
 		 * link the triangles as neighbours. */
 		for (Edge edge : this.edges.values()) {
-			if (edge.getTriangles().size() != 1) {
+			int numberOfTriangles = edge.getTriangles().size();
+			if ( numberOfTriangles > 1) {
 				Triangle tA = edge.getTriangles().get(0);
 				Triangle tB = edge.getTriangles().get(1);
 				tA.addNeighbour(tB);
 				tB.addNeighbour(tA);
+			}
+			
+			/* TODO Remove after debugging. */
+			if(numberOfTriangles == 0){
+				LOG.error("An edge not associated with a triangle!");
 			}
 		}
 		

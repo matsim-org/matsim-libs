@@ -7,6 +7,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.Facility;
 
+import com.vividsolutions.jts.geom.Geometry;
+
 public class DigicoreFacility implements Facility {
 		
 	private Id id;

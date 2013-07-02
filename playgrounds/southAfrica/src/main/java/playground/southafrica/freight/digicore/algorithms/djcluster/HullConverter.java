@@ -45,6 +45,7 @@ public class HullConverter implements AttributeConverter<Geometry> {
 	@Override
 	public Geometry convert(String value) {
 		GeometryFactory gf = new GeometryFactory();
+		Geometry g;
 
 		List<Coordinate> list = new ArrayList<Coordinate>();
 		String[] sa = value.split(",");
@@ -56,12 +57,22 @@ public class HullConverter implements AttributeConverter<Geometry> {
 		}
 
 		Coordinate[] ca = new Coordinate[list.size()];
-		for(int i = 0; i < list.size(); i++){
-			ca[i] = list.get(i);
-		}
-		Polygon p = gf.createPolygon(gf.createLinearRing(ca), null);
 		
-		return p;
+		/* Distinguish between points, lines and polygons. */
+		if(ca.length == 1){
+			g = gf.createPoint(ca[0]);
+		} else if(ca.length == 2){
+			ca[0] = list.get(0);
+			ca[1] = list.get(1);
+			g = gf.createLineString(ca);
+		} else{
+			for(int i = 0; i < list.size(); i++){
+				ca[i] = list.get(i);
+			}
+			g = gf.createPolygon(gf.createLinearRing(ca), null);
+		}
+		
+		return g;
 	}
 
 	@Override

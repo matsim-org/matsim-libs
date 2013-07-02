@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Identifiable;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Point;
 
 /**
  * A container class for clusters. Activity locations are grouped into clusters, each
@@ -53,19 +54,25 @@ public class DigicoreCluster implements Identifiable{
 	 * Calculates the center of gravity with each point weighed equally.
 	 */
 	public void setCenterOfGravity(){
-		if(activities.size() > 0){
-			double xTotal = 0;
-			double yTotal = 0;
-			for (ClusterActivity p : activities) {
-				xTotal += p.getCoord().getX();
-				yTotal += p.getCoord().getY();
+		if(this.concaveHull == null){
+			if(activities.size() > 0){
+				double xTotal = 0;
+				double yTotal = 0;
+				for (ClusterActivity p : activities) {
+					xTotal += p.getCoord().getX();
+					yTotal += p.getCoord().getY();
+				}			
+				double xCenter = xTotal / (double) activities.size();
+				double yCenter = yTotal / (double) activities.size();
+				
+				centerOfGravity = new CoordImpl(xCenter, yCenter);			
+			} else{
+				throw new IllegalArgumentException("Not enough points in cluster " + clusterId + " to calculate a center of gravity!");
 			}			
-			double xCenter = xTotal / (double) activities.size();
-			double yCenter = yTotal / (double) activities.size();
-			
-			centerOfGravity = new CoordImpl(xCenter, yCenter);			
 		} else{
-			throw new IllegalArgumentException("Not enough points in cluster " + clusterId + " to calculate a center of gravity!");
+			/* Use the centroid of the hull. */
+			Point centroid = this.concaveHull.getCentroid();
+			centerOfGravity = new CoordImpl(centroid.getX(), centroid.getY());
 		}
 	}
 

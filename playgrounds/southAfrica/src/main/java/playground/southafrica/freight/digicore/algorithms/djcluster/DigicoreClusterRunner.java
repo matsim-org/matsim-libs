@@ -43,15 +43,8 @@ import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
-import org.matsim.utils.objectattributes.AttributeConverter;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
-
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.GeometryCollection;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.Polygon;
 
 import playground.southafrica.freight.digicore.algorithms.concaveHull.ConcaveHull;
 import playground.southafrica.freight.digicore.algorithms.djcluster.containers.ClusterActivity;
@@ -60,6 +53,14 @@ import playground.southafrica.utilities.FileUtils;
 import playground.southafrica.utilities.Header;
 import playground.southafrica.utilities.containers.MyZone;
 import playground.southafrica.utilities.gis.MyMultiFeatureReader;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.GeometryCollection;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Point;
+import com.vividsolutions.jts.geom.Polygon;
 
 
 public class DigicoreClusterRunner {
@@ -141,6 +142,8 @@ public class DigicoreClusterRunner {
 				fw.write(theFacilityFile);				
 				log.info(" Writing the facilities to file: " + theFacilityAttributeFile);
 				ObjectAttributesXmlWriter ow = new ObjectAttributesXmlWriter(dcr.facilityAttributes);
+				ow.putAttributeConverter(Point.class, new HullConverter());
+				ow.putAttributeConverter(LineString.class, new HullConverter());
 				ow.putAttributeConverter(Polygon.class, new HullConverter());
 				ow.writeFile(theFacilityAttributeFile);
 				
@@ -207,8 +210,6 @@ public class DigicoreClusterRunner {
 				List<DigicoreCluster> list = future.get();
 				for(DigicoreCluster dc : list){
 					Id facilityId = new IdImpl(i++);
-					facilities.createAndAddFacility(facilityId, dc.getCenterOfGravity());
-					facilityAttributes.putAttribute(facilityId.toString(), "DigicoreActivityCount", String.valueOf(dc.getPoints().size()));
 
 					/*TODO Construct the concave hull for the clustered points. */
 					List<ClusterActivity> dcPoints = dc.getPoints();
@@ -225,7 +226,12 @@ public class DigicoreClusterRunner {
 						Geometry hull = ch.getConcaveHull();
 						
 						facilityAttributes.putAttribute(facilityId.toString(), "concaveHull", hull);
+						dc.setConcaveHull(hull);
+						dc.setCenterOfGravity();
 					}
+
+					facilities.createAndAddFacility(facilityId, dc.getCenterOfGravity());
+					facilityAttributes.putAttribute(facilityId.toString(), "DigicoreActivityCount", String.valueOf(dc.getPoints().size()));
 								
 					/*TODO If we want to, we need to write all the cluster members out to file HERE. 
 					 * Update (20130627): Or, rather write out the concave hull. */
