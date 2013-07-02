@@ -98,11 +98,8 @@ public class DigicoreClusterRunner {
 		String sourceFolder = args[0];
 		String shapefile = args[1];
 		int idField = Integer.parseInt(args[2]);
-		double radius = Double.parseDouble(args[3]);
-		int minimumPoints = Integer.parseInt(args[4]);
-		int numberOfThreads = Integer.parseInt(args[5]);
-		outputFolder = args[6];
-		
+		int numberOfThreads = Integer.parseInt(args[3]);
+		String outputFolderName = args[4];		
 		
 		/* Read all the `minor' DigicoreActivities from the *.xml.gz Vehicle files. */
 		log.info(" Reading points to cluster...");
@@ -119,11 +116,21 @@ public class DigicoreClusterRunner {
 		log.info(" Clustering the points...");
 		
 		/* These values should be set following Quintin's Design-of-Experiment inputs. */
-		double[] radii = {30};
-		int[] pmins = {15};
+		double[] radii = {30, 25, 20, 15, 10};
+		int[] pmins = {5, 10, 15, 20, 25};
 
 		for(double thisRadius : radii){
 			for(int thisPmin : pmins){
+				/* Create the output folder. If it exists... first delete it. */
+				outputFolder = String.format("%s%.0f_%d/", outputFolderName, thisRadius, thisPmin);
+				File folder = new File(outputFolder);
+				if(folder.exists()){
+					log.warn("Output folder exists, and will be deleted. ");
+					log.warn("  --> " + folder.getAbsolutePath());
+					FileUtils.delete(folder);
+				}
+				folder.mkdirs();
+				
 				dcr.facilities = new ActivityFacilitiesImpl(String.format("Digicore clustered facilities: %.0f (radius); %d (pmin)",thisRadius, thisPmin));
 				dcr.facilityAttributes = new ObjectAttributes();
 				if(dcr.zoneMap != null){
