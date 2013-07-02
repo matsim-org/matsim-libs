@@ -50,20 +50,26 @@ public class ActivityFacilityImpl implements ActivityFacility {
 		this.coord = center;
 	}
 
-	public double calcDistance(Coord coord) {
-		return CoordUtils.calcDistance(this.coord, coord);
+	public double calcDistance(Coord otherCoord) {
+		return CoordUtils.calcDistance(this.coord, otherCoord);
 	}
 
 	public final ActivityOptionImpl createActivityOption(final String type) {
-		if (this.activities.containsKey(type)) {
-			Gbl.errorMsg(this + "[type=" + type + " already exists]");
-		}
 		String type2 = type.intern();
 		ActivityOptionImpl a = new ActivityOptionImpl(type2, this);
-		this.activities.put(type2, a);
+		addActivityOption(a);
 		return a;
 	}
 
+	@Override
+	public void addActivityOption(ActivityOption option) {
+		String type = option.getType() ;
+		if (this.activities.containsKey(type)) {
+			Gbl.errorMsg(this + "[type=" + type + " already exists]");
+		}
+		this.activities.put(type, option);
+	}
+	
 	public final void setCoord(Coord newCoord) {
 		this.coord = newCoord;
 	}

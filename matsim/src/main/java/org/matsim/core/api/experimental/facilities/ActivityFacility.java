@@ -23,8 +23,11 @@ import java.util.Map;
 
 import org.matsim.core.facilities.ActivityOption;
 
+
 public interface ActivityFacility extends Facility {
 
 	public Map<String, ActivityOption> getActivityOptions();
+
+	void addActivityOption(ActivityOption option);
 
 }
