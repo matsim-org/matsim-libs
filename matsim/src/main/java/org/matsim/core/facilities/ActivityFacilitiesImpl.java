@@ -31,8 +31,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.BasicLocations;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.api.experimental.facilities.ActivityFacilitiesFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.core.gbl.Gbl;
 
 public class ActivityFacilitiesImpl implements ActivityFacilities, BasicLocations {
@@ -45,6 +45,7 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, BasicLocation
 	private long nextMsg = 1;
 
 	private static final Logger log = Logger.getLogger(ActivityFacilitiesImpl.class);
+	private final ActivityFacilitiesFactory factory ;
 
 	private Map<Id, ActivityFacility> facilities = new LinkedHashMap<Id, ActivityFacility>();
 
@@ -56,6 +57,7 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, BasicLocation
 
 	public ActivityFacilitiesImpl(final String name) {
 		this.name = name;
+		this.factory = new ActivityFacilitiesFactoryImpl() ;
 	}
 
 	public ActivityFacilitiesImpl() {
@@ -84,8 +86,8 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, BasicLocation
 	}
 
 	@Override
-	public MatsimFactory getFactory() {
-		throw new UnsupportedOperationException( "The factory for facilities needs to be implemented.  kai, jul09" ) ;
+	public ActivityFacilitiesFactory getFactory() {
+		return this.factory ;
 	}
 
 	@Override
@@ -122,6 +124,11 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, BasicLocation
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	@Override
+	public void addActivityFacility(ActivityFacility facility) {
+		this.facilities.put( facility.getId(), facility ) ;
 	}
 
 }

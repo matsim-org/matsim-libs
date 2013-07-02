@@ -1,9 +1,10 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+ * project: matsim
+ * ActivityFacilitiesFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,15 +20,14 @@
 
 package org.matsim.core.api.experimental.facilities;
 
-import java.util.Map;
-
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.internal.MatsimToplevelContainer;
+import org.matsim.core.api.internal.MatsimFactory;
 
-public interface ActivityFacilities extends MatsimToplevelContainer {
-
-	public Map<Id, ? extends ActivityFacility> getFacilities();
-	
-	public void addActivityFacility( ActivityFacility facility ) ;
-
+/**
+ * @author nagel
+ *
+ */
+public interface ActivityFacilitiesFactory extends MatsimFactory {
+	ActivityFacility createActivityFacility( Id id, Coord coord ) ;
 }
