@@ -23,6 +23,7 @@ package playground.southafrica.freight.digicore.algorithms.djcluster.containers;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
@@ -40,6 +41,8 @@ import com.vividsolutions.jts.geom.Point;
  * @author jwjoubert
  */
 public class DigicoreCluster implements Identifiable{
+	private final Logger log = Logger.getLogger(DigicoreCluster.class);
+	
 	private Id clusterId;
 	private Coord centerOfGravity;
 	private List<ClusterActivity> activities;
@@ -70,9 +73,16 @@ public class DigicoreCluster implements Identifiable{
 				throw new IllegalArgumentException("Not enough points in cluster " + clusterId + " to calculate a center of gravity!");
 			}			
 		} else{
-			/* Use the centroid of the hull. */
+			/* Use the centroid of the hull. 
+			 * FIXME There is a chance that the hull is an empty geometry. */
 			Point centroid = this.concaveHull.getCentroid();
-			centerOfGravity = new CoordImpl(centroid.getX(), centroid.getY());
+			if(!centroid.isEmpty()){
+				centerOfGravity = new CoordImpl(centroid.getX(), centroid.getY());				
+			} else{
+				log.warn("Cannot set centre of gravity for an empty point!!");
+				log.debug("   --> Unique facility identifier: " + this.getId().toString());
+				log.debug("   --> No centre of gravity set.");
+			}
 		}
 	}
 

@@ -175,7 +175,9 @@ public class ConcaveHull {
 	 * Returns a {@link Geometry} that represents the concave hull of the input
 	 * geometry according to the threshold.
 	 * The returned geometry contains the minimal number of points needed to
-	 * represent the concave hull.
+	 * represent the concave hull. No facility identifier is required. If you
+	 * require to identify a facility, for example for debugging purposes, 
+	 * rather use the method {@link #getConcaveHull(String)}.
 	 *
 	 * @return if the concave hull contains 3 or more points, a {@link Polygon};
 	 * 2 points, a {@link LineString};
@@ -183,6 +185,27 @@ public class ConcaveHull {
 	 * 0 points, an empty {@link GeometryCollection}.
 	 */
 	public Geometry getConcaveHull() {
+		return getConcaveHull("");
+	}
+	
+	
+	/**
+	 * Returns a {@link Geometry} that represents the concave hull of the input
+	 * geometry according to the threshold.
+	 * The returned geometry contains the minimal number of points needed to
+	 * represent the concave hull.
+	 * 
+	 * @param facilityIdentifier a {@link String} that uniquely identifies the
+	 *        group of points for which the hull is created. For example, this 
+	 *        can be the facility Id, and is useful for debugging, especially 
+	 *        when a Delaunay triangulation cannot be determined for a facility. 
+	 *
+	 * @return if the concave hull contains 3 or more points, a {@link Polygon};
+	 * 2 points, a {@link LineString};
+	 * 1 point, a {@link Point};
+	 * 0 points, an empty {@link GeometryCollection}.
+	 */
+	public Geometry getConcaveHull(String facilityIdentifier) {
 		
 		/* Empty geometry. */
 		if (this.filteredPoints.getNumGeometries() == 0) {
@@ -200,18 +223,18 @@ public class ConcaveHull {
 		}
 
 		/* Polygon: the concave hull. */
-		return concaveHull();
+		return concaveHull(facilityIdentifier);
 	}
 	
 	
-	private Geometry concaveHull(){
+	
+	
+	private Geometry concaveHull(String facilityIdentifier){
 		/* Construct the Delaunay Triangulation. */
 		DelaunayTriangulationBuilder dtb = new DelaunayTriangulationBuilder();
 		dtb.setSites(this.filteredPoints);
 		
 		QuadEdgeSubdivision qes = dtb.getSubdivision();
-		
-		
 		
 		/*TODO Sort out the following warnings...*/
 		Collection<QuadEdge> quadEdges = qes.getEdges();
@@ -223,10 +246,11 @@ public class ConcaveHull {
 		 * they have three or more points, do not have a 'valid' Delaunay
 		 * triangulation. */
 		if(qeTriangles.size() == 0 || qeVertices.size() == 0){
-			LOG.warn("No triangulation for three or more points: " + this.filteredPoints.getNumPoints() + " points!!");
+			LOG.warn("No triangulation for " + this.filteredPoints.getNumPoints() + " points!!");
+			LOG.warn("   --> Unique id for the group of points: " + facilityIdentifier);
 			Coordinate[] ca = this.filteredPoints.getCoordinates();
 			if(ca.length == 3){
-				LOG.warn("Instead, a polygon (triangle) of the three points will be returned.");
+				LOG.warn("   --> Instead, a polygon (triangle) of the three points will be returned.");
 				Coordinate[] caClosed = new Coordinate[4];
 				caClosed[0] = ca[0];
 				caClosed[1] = ca[1];
@@ -234,8 +258,17 @@ public class ConcaveHull {
 				caClosed[3] = ca[0];				
 				return this.geomFactory.createPolygon(this.geomFactory.createLinearRing(caClosed), null);
 			} else{
-				LOG.warn("Don't know how to solve this for " + ca.length + " points!! Returning a NULL Geometry");
-				return this.geomFactory.createGeometryCollection(null);
+				LOG.warn("   --> Returning a single point geometry as the weighted coordinates of the filtered points.");
+				double xSum = 0;
+				double ySum = 0;
+				for(Coordinate c :this.filteredPoints.getCoordinates()){
+					xSum += c.x;
+					ySum += c.y;
+				}
+				double newX = xSum / ((double)this.filteredPoints.getCoordinates().length);
+				double newY = ySum / ((double)this.filteredPoints.getCoordinates().length);
+
+				return this.geomFactory.createPoint(new Coordinate(newX, newY));
 			}
 		}
 		
@@ -368,6 +401,7 @@ public class ConcaveHull {
 			/* TODO Remove after debugging. */
 			if(numberOfTriangles == 0){
 				LOG.error("An edge not associated with a triangle!");
+				LOG.warn("   --> Unique id for the group of points: " + facilityIdentifier);
 			}
 		}
 		
@@ -384,6 +418,17 @@ public class ConcaveHull {
 
 			/* Identify the longest edge. */
 			Edge e = this.consideredEdges.firstEntry().getValue();
+
+			/* TODO Remove after debugging. This was necessary as some links 
+			 * are not associated with triangles... I don't know how that happens! */
+			if(e.getTriangles().size() == 0){
+				LOG.warn("Considered edge without a triangle association!!");
+				LOG.warn("   --> For now (20130703) we deal with this by simply making the link 'ignored'.");
+				LOG.warn("   --> Unique id for the group of points: " + facilityIdentifier);
+				this.consideredEdges.remove(e.getId());
+				this.ignoredEdges.put(e.getId(), e);
+				continue;
+			} 
 
 			Triangle triangle = e.getTriangles().get(0);
 			List<Triangle> neighbours = triangle.getNeighbours();
@@ -484,7 +529,14 @@ public class ConcaveHull {
 			return concaveHull;
 		} else{
 			LOG.warn("Could not create hull as the line segments do not form a closed ring.");
-			return null;
+			LOG.warn("   --> Returning an empty geometry");
+			LOG.warn("   --> Unique id for the group of points: " + facilityIdentifier);
+			LOG.warn("   --> Unique points (" + this.filteredPoints.getNumGeometries() + ":");
+			Coordinate[] ca = this.filteredPoints.getCoordinates();
+			for(Coordinate c : ca){
+				LOG.warn("       (" + c.x + ";" + c.y + ")");				
+			}
+			return this.geomFactory.createGeometryCollection(null);
 		}
 	}
 

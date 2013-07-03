@@ -31,7 +31,6 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class ClusteredChainGenerator {
 	private static Logger log = Logger.getLogger(ClusteredChainGenerator.class);
-	private static int nThreads;
 	private static long reconstructDuration;
 	private static long treeBuildDuration;
 	private static long writeToFileDuration;
@@ -63,27 +62,46 @@ public class ClusteredChainGenerator {
 		Header.printHeader(ClusteredChainGenerator.class.toString(), args);
 		long startTime = System.currentTimeMillis();
 		
-		ClusteredChainGenerator ccg = new ClusteredChainGenerator();
+		String inputVehicleFolder = args[0];
+		String inputFacilityFolder = args[1];
+		int nThreads = Integer.parseInt(args[2]);
 		
-		String inputFolder = args[0];
-		String facilityFile = args[1];
-		String facilityAttributeFile = args[2];
-		String outputFolder = args[3];
-		nThreads = Integer.parseInt(args[4]);
+		/* These values should be set following Quintin's Design-of-Experiment inputs. */
+		double[] radii = {30, 25, 20, 15, 10};
+		int[] pmins = {5, 10, 15, 20, 25};
+
+		for(double thisRadius : radii){
+			for(int thisPmin : pmins){
+				/* Set configuration-specific filenames, */
+				String facilityFile = String.format("%s%.0f_%d/%.0f_%d_facilities.xml.gz", inputFacilityFolder, thisRadius, thisPmin, thisRadius, thisPmin);
+				String facilityAttributeFile = String.format("%s%.0f_%d/%.0f_%d_facilityAttributes.xml.gz", inputFacilityFolder, thisRadius, thisPmin, thisRadius, thisPmin);
+				String xml2Folder = String.format("%s%.0f_%d/xml2/", inputFacilityFolder, thisRadius, thisPmin);
+				
+				ClusteredChainGenerator ccg = new ClusteredChainGenerator();
+				
+				
+				/* Read facility attributes. */
+				ObjectAttributes oa = new ObjectAttributes();
+				ObjectAttributesXmlReader oar = new ObjectAttributesXmlReader(oa);
+				oar.putAttributeConverter(Point.class, new HullConverter());
+				oar.putAttributeConverter(LineString.class, new HullConverter());
+				oar.putAttributeConverter(Polygon.class, new HullConverter());
+				oar.parse(facilityAttributeFile);
+				
+				/*FIXME There are still facilities with a hull that is NOT of 
+				 * type geometry. Clean them before running.*/
+				
+				/* Build facility QuadTree. */
+				QuadTree<DigicoreFacility> facilityTree = ccg.buildFacilityQuadTree(facilityFile, facilityAttributeFile);
+				
+				/* Run through vehicle files to reconstruct the chains */
+				ccg.reconstructChains(facilityTree, oa, inputVehicleFolder, xml2Folder, nThreads);
+			}
+		}
 		
-		/* Read facility attributes. */
-		ObjectAttributes oa = new ObjectAttributes();
-		ObjectAttributesXmlReader oar = new ObjectAttributesXmlReader(oa);
-		oar.putAttributeConverter(Point.class, new HullConverter());
-		oar.putAttributeConverter(LineString.class, new HullConverter());
-		oar.putAttributeConverter(Polygon.class, new HullConverter());
-		oar.parse(facilityAttributeFile);
 		
-		/* Build facility QuadTree. */
-		QuadTree<DigicoreFacility> facilityTree = ccg.buildFacilityQuadTree(facilityFile, facilityAttributeFile);
 		
-		/* Run through vehicle files to reconstruct the chains */
-		ccg.reconstructChains(facilityTree, oa, inputFolder, outputFolder, nThreads);
+
 		
 		long duration = System.currentTimeMillis() - startTime;
 		log.info("	 Tree build time (s): " + treeBuildDuration/1000);
@@ -110,6 +128,15 @@ public class ClusteredChainGenerator {
 			QuadTree<DigicoreFacility> facilityTree, ObjectAttributes facilityAttributes, 
 			String inputFolder, String outputFolder, int nThreads) throws IOException {
 		long startTime = System.currentTimeMillis();
+		
+		/* Check if the output folder exists, and delete if it does. */
+		File folder = new File(outputFolder);
+		if(folder.exists()){
+			log.warn("The output folder exixts and will be edeleted.");
+			log.warn("  --> " + folder.getAbsolutePath());
+			FileUtils.delete(folder);
+		}
+		folder.mkdirs();
 		
 		/* Read vehicle files. */
 		List<File> vehicleList = FileUtils.sampleFiles(new File(inputFolder), Integer.MAX_VALUE, FileUtils.getFileFilter(".xml.gz"));

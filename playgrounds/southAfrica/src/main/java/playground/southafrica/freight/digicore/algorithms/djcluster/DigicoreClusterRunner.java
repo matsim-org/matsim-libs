@@ -65,11 +65,11 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class DigicoreClusterRunner {
 	private static final Logger log = Logger.getLogger(DigicoreClusterRunner.class);
+	
 	private final int numberOfThreads;
 	private Map<Id, List<Coord>> zoneMap = null;
 	private ActivityFacilitiesImpl facilities;
 	private ObjectAttributes facilityAttributes;
-	private static String outputFolder;
 
 	/** 
 	 * Clustering the minor activities from Digicore vehicle chains. The following
@@ -121,8 +121,14 @@ public class DigicoreClusterRunner {
 
 		for(double thisRadius : radii){
 			for(int thisPmin : pmins){
-				/* Create the output folder. If it exists... first delete it. */
-				outputFolder = String.format("%s%.0f_%d/", outputFolderName, thisRadius, thisPmin);
+				/* Create configuration-specific filenames. */
+				String outputFolder = String.format("%s%.0f_%d/", outputFolderName, thisRadius, thisPmin);
+				String theFacilityFile = outputFolder + String.format("%.0f_%d_facilities.xml.gz", thisRadius, thisPmin);
+				String theFacilityAttributeFile = outputFolder + String.format("%.0f_%d_facilityAttributes.xml.gz", thisRadius, thisPmin);
+				String theFacilityCsvFile = outputFolder + String.format("%.0f_%d_facilityCsv.csv", thisRadius, thisPmin);
+				String facilityPointFolder = String.format("%sfacilityPoints/", outputFolder);
+				
+				/* Create the output folders. If it exists... first delete it. */
 				File folder = new File(outputFolder);
 				if(folder.exists()){
 					log.warn("Output folder exists, and will be deleted. ");
@@ -131,52 +137,19 @@ public class DigicoreClusterRunner {
 				}
 				folder.mkdirs();
 				
+				/* Cluster. */
 				dcr.facilities = new ActivityFacilitiesImpl(String.format("Digicore clustered facilities: %.0f (radius); %d (pmin)",thisRadius, thisPmin));
 				dcr.facilityAttributes = new ObjectAttributes();
-				if(dcr.zoneMap != null){
-					dcr.clusterPointLists(thisRadius, thisPmin);
-				} else{
-					throw new RuntimeException("Must first read activities before you can cluster!");
-				}
-				
-				/* Write (for the current configuration) facilities, and the attributes, to file. */
-				String theFacilityFile = outputFolder + String.format("%.0f_%d_facilities.xml.gz", thisRadius, thisPmin);
-				String theFacilityAttributeFile = outputFolder + String.format("%.0f_%d_facilityAttributes.xml.gz", thisRadius, thisPmin);
-				String theFacilityCsvFile = outputFolder + String.format("%.0f_%d_facilityCsv.csv", thisRadius, thisPmin);
-				log.info("-------------------------------------------------------------");
-				log.info(" Writing the facilities to file: " + theFacilityFile);
-				FacilitiesWriter fw = new FacilitiesWriter(dcr.facilities);
-				fw.write(theFacilityFile);				
-				log.info(" Writing the facilities to file: " + theFacilityAttributeFile);
-				ObjectAttributesXmlWriter ow = new ObjectAttributesXmlWriter(dcr.facilityAttributes);
-				ow.putAttributeConverter(Point.class, new HullConverter());
-				ow.putAttributeConverter(LineString.class, new HullConverter());
-				ow.putAttributeConverter(Polygon.class, new HullConverter());
-				ow.writeFile(theFacilityAttributeFile);
-				
-				/* Write out pretty CSV file. */
-				log.info(" Writing the facilities to csv: " + theFacilityCsvFile);
-				BufferedWriter bw = IOUtils.getBufferedWriter(theFacilityCsvFile);
 				try{
-					bw.write("Id,Long,Lat,Count");
-					bw.newLine();
-					for(Id id : dcr.facilities.getFacilities().keySet()){
-						ActivityFacility af = dcr.facilities.getFacilities().get(id);
-						bw.write(id.toString());
-						bw.write(",");
-						bw.write(String.format("%.1f,%.1f,", af.getCoord().getX(), af.getCoord().getY()));
-						bw.write(String.valueOf(dcr.facilityAttributes.getAttribute(id.toString(), "DigicoreActivityCount")));
-						bw.newLine();
-					}
-				} catch (IOException e) {
-					e.printStackTrace();
-				} finally{
-					try {
-						bw.close();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
+					dcr.clusterPointLists(thisRadius, thisPmin, facilityPointFolder);
+				} catch (Exception e){
+					e.printStackTrace();	
+					throw new RuntimeException(e.getMessage());
 				}
+				
+				/* Write output. */
+				dcr.writeOutput(theFacilityFile, theFacilityAttributeFile);
+				dcr.writePrettyCsv(theFacilityCsvFile);
 			}
 		}
 		long clusterTime = System.currentTimeMillis() - jobStart - readTime;
@@ -191,10 +164,67 @@ public class DigicoreClusterRunner {
 		log.info("=============================================================");
 
 	}
+
+
+
+	public void writeOutput(String theFacilityFile, String theFacilityAttributeFile) {
+		/* Write (for the current configuration) facilities, and the attributes, to file. */
+		log.info("-------------------------------------------------------------");
+		log.info(" Writing the facilities to file: " + theFacilityFile);
+		FacilitiesWriter fw = new FacilitiesWriter(facilities);
+		fw.write(theFacilityFile);				
+		log.info(" Writing the facility attributes to file: " + theFacilityAttributeFile);
+		ObjectAttributesXmlWriter ow = new ObjectAttributesXmlWriter(facilityAttributes);
+		ow.putAttributeConverter(Point.class, new HullConverter());
+		ow.putAttributeConverter(LineString.class, new HullConverter());
+		ow.putAttributeConverter(Polygon.class, new HullConverter());
+		ow.writeFile(theFacilityAttributeFile);
+	}
+
+
+
+	public void writePrettyCsv(String theFacilityCsvFile) {
+		/* Write out pretty CSV file. */
+		log.info(" Writing the facilities to csv: " + theFacilityCsvFile);
+		BufferedWriter bw = IOUtils.getBufferedWriter(theFacilityCsvFile);
+		try{
+			bw.write("Id,Long,Lat,Count");
+			bw.newLine();
+			for(Id id : this.facilities.getFacilities().keySet()){
+				ActivityFacility af = this.facilities.getFacilities().get(id);
+				bw.write(id.toString());
+				bw.write(",");
+				bw.write(String.format("%.1f,%.1f,", af.getCoord().getX(), af.getCoord().getY()));
+				bw.write(String.valueOf(this.facilityAttributes.getAttribute(id.toString(), "DigicoreActivityCount")));
+				bw.newLine();
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally{
+			try {
+				bw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 	
 
 
-	private void clusterPointLists(double radius, int minimumPoints) {
+	private void clusterPointLists(double radius, int minimumPoints, String outputFolder) throws Exception {
+		File folder = new File(outputFolder);
+		if(folder.exists()){
+			log.warn("Facility points folder exists, and will be deleted. ");
+			log.warn("  --> " + folder.getAbsolutePath());
+			FileUtils.delete(folder);
+		}
+		folder.mkdirs();
+		
+		/* Check that zone maps have been read. */
+		if(this.zoneMap == null){
+			throw new Exception("Must first read activities before you can cluster!");
+		}
+		
 		ExecutorService threadExecutor = Executors.newFixedThreadPool(this.numberOfThreads);
 		List<Future<List<DigicoreCluster>>> listOfJobs = new ArrayList<Future<List<DigicoreCluster>>>();
 		
@@ -230,15 +260,23 @@ public class DigicoreClusterRunner {
 						GeometryCollection points = new GeometryCollection(ga, gf);
 						
 						ConcaveHull ch = new ConcaveHull(points, 10);
-						Geometry hull = ch.getConcaveHull();
+						Geometry hull = ch.getConcaveHull(facilityId.toString());
 						
-						facilityAttributes.putAttribute(facilityId.toString(), "concaveHull", hull);
-						dc.setConcaveHull(hull);
-						dc.setCenterOfGravity();
+						/*FIXME For some reason there are empty hulls. For now 
+						 * we are only creating facilities for those with a valid
+						 * Geometry for a hull: point, line or polygon.*/
+						if(!hull.isEmpty()){
+							dc.setConcaveHull(hull);
+							dc.setCenterOfGravity();
+							
+							facilities.createAndAddFacility(facilityId, dc.getCenterOfGravity());
+							facilityAttributes.putAttribute(facilityId.toString(), "DigicoreActivityCount", String.valueOf(dc.getPoints().size()));
+							facilityAttributes.putAttribute(facilityId.toString(), "concaveHull", hull);
+						} else{
+							log.debug("Facility " + facilityId.toString() + " is not added. Hull is an empty geometry!");
+						}
 					}
 
-					facilities.createAndAddFacility(facilityId, dc.getCenterOfGravity());
-					facilityAttributes.putAttribute(facilityId.toString(), "DigicoreActivityCount", String.valueOf(dc.getPoints().size()));
 								
 					/*TODO If we want to, we need to write all the cluster members out to file HERE. 
 					 * Update (20130627): Or, rather write out the concave hull. */

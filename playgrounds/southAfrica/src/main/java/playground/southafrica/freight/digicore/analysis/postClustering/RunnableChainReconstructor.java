@@ -34,6 +34,7 @@ public class RunnableChainReconstructor implements Runnable {
 	private QuadTree<DigicoreFacility> facilityTree;
 	private ObjectAttributes facilityAttributes;
 	private Counter threadCounter;
+	private int activitiesAtFacilities;
 
 	public RunnableChainReconstructor(File vehicleFile, QuadTree<DigicoreFacility> facilityTree, ObjectAttributes facilityAttributes, Counter threadCounter, String outputFolder) {
 		this.vehicleFile = vehicleFile;
@@ -41,6 +42,8 @@ public class RunnableChainReconstructor implements Runnable {
 		this.outputFolder = outputFolder;
 		this.facilityTree = facilityTree;
 		this.facilityAttributes = facilityAttributes;
+		
+		this.activitiesAtFacilities = 0;
 	}
 
 	
@@ -89,24 +92,31 @@ public class RunnableChainReconstructor implements Runnable {
 							} else{
 								log.warn("Funny type of Geometry: " + g.getClass().toString());
 							}
+							
+							/* Check if the activity is inside the geometry. */
+							if(g.covers(dap)){
+								found = true;
+								
+//							log.info("  --> " + dv.getId().toString());
+								
+								/* Adapt the facility Id, as well as the coordinate. 
+								 * The coordinate will be the centroid of the hull
+								 * geometry. That is, NOT the weighted average of 
+								 * all the points in the original cluster/hull. */
+								da.setFacilityId(thisFacilityId);
+								if(!g.getCentroid().isEmpty()){
+									da.setCoord(new CoordImpl(g.getCentroid().getX(), g.getCentroid().getY()));
+								} else{
+									log.warn("The geometry is empty and has no centroid. Activity location not changed.");
+								}
+								activitiesAtFacilities++;
+							} else{
+								i++;
+							}
 						} else{
 							/*FIXME This should never happen!! */
 							log.error("The object attribute 'concaveHull' is not a geometry!!");
-						}
-						
-						/* Check if the activity is inside the geometry. */
-						if(g.covers(dap)){
-							found = true;
-							
-//							log.info("  --> " + dv.getId().toString());
-							
-							/* Adapt the facility Id, as well as the coordinate. 
-							 * The coordinate will be the centroid of the hull
-							 * geometry. That is, NOT the weighted average of 
-							 * all the points in the original cluster/hull. */
-							da.setFacilityId(thisFacilityId);
-							da.setCoord(new CoordImpl(g.getCentroid().getX(), g.getCentroid().getY()));
-						} else{
+							log.error("   --> Facility id: " + thisFacilityId.toString());
 							i++;
 						}
 					}
@@ -115,8 +125,10 @@ public class RunnableChainReconstructor implements Runnable {
 		}
 		
 		/* Write the (possibly) adapted vehicle to file. */
-		DigicoreVehicleWriter dvw = new DigicoreVehicleWriter();
-		dvw.write(this.outputFolder + dv.getId().toString() + ".xml.gz", dv);		
+		if(activitiesAtFacilities > 0){
+			DigicoreVehicleWriter dvw = new DigicoreVehicleWriter();
+			dvw.write(this.outputFolder + dv.getId().toString() + ".xml.gz", dv);		
+		}
 		
 		threadCounter.incCounter();
 	}	
