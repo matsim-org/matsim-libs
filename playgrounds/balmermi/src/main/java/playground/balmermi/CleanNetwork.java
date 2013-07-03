@@ -20,6 +20,7 @@
 
 package playground.balmermi;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -30,11 +31,27 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 public class CleanNetwork {
 
+	private static final Logger log = Logger.getLogger(CleanNetwork.class);
+
+	//////////////////////////////////////////////////////////////////////
+	// member methods
+	//////////////////////////////////////////////////////////////////////
+	
 	//////////////////////////////////////////////////////////////////////
 	// cleanNetwork
 	//////////////////////////////////////////////////////////////////////
 
-	public static void cleanNetwork(final String[] args) {
+	public static void cleanNetwork(String[] args) {
+
+		args = new String[] {
+				"D:/tmp/proc0019/network-reducedChanged-cleaned/network-reducedChanged-cleaned.xml.gz",
+				"D:/tmp/proc0019/network-reducedChanged-cleaned",
+		};
+
+		if (args.length != 2) {
+			log.error(CleanNetwork.class.getCanonicalName()+" networkFile outputBase");
+			System.exit(-1);
+		}
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(args[0]);
