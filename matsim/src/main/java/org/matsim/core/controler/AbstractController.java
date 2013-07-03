@@ -56,7 +56,10 @@ public abstract class AbstractController {
 		public void run() {
 			log.warn("S H U T D O W N   ---   received unexpected shutdown request.");
 			shutdown(true);
-			log.info("S H U T D O W N   ---   unexpected shutdown request completed.");
+			System.out.println();
+			log.error("ERROR --- MATSim terminated with some error. Please check the output or the logfile with warnings and errors for hints.");
+			log.error("ERROR --- results should not be used for further analysis.");
+			log.error("S H U T D O W N   ---   unexpected shutdown request completed. ");
 		}
 	};
 
