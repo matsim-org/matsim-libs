@@ -180,20 +180,27 @@ public class TempDirectoryUtil {
 	 */
 	public static void cleaningUpOPUSDirectories(){
 		log.info("Removing temp directories");
-
 		File tempFile = new File(InternalConstants.getOPUS_HOME());
-		if(tempFile.exists())
-			deleteDirectory(tempFile);
+//		used only for tests. At least on my System this call leads to a null-pointer-exception
+//		because there are some other directories in the temp-directory. Especially some hidden ones.
+//		\\ DR, jul'13
+//		System.out.println(tempFile.getAbsolutePath());
+//		if(tempFile.exists())
+//			deleteDirectory(tempFile);
 		tempFile = new File(InternalConstants.MATSIM_4_OPUS);
+		System.out.println(tempFile.getAbsolutePath());
 		if(tempFile.exists())
 			deleteDirectory(tempFile);
 		tempFile = new File(InternalConstants.MATSIM_4_OPUS_OUTPUT);
+		System.out.println(tempFile.getAbsolutePath());
 		if(tempFile.exists())
 			deleteDirectory(tempFile);
 		tempFile = new File(InternalConstants.MATSIM_4_OPUS_TEMP);
+		System.out.println(tempFile.getAbsolutePath());
 		if(tempFile.exists())
 			deleteDirectory(tempFile);
 		tempFile = new File(InternalConstants.MATSIM_4_OPUS_CONFIG);
+		System.out.println(tempFile.getAbsolutePath());
 		if(tempFile.exists())
 			deleteDirectory(tempFile);	
 		log.info("Finished removing temp directories");
