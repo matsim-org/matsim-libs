@@ -25,24 +25,20 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.GridLayout;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.event.MouseInputListener;
 
 import playground.wdoering.grips.scenariomanager.control.Controller;
 import playground.wdoering.grips.scenariomanager.model.AbstractModule;
 import playground.wdoering.grips.scenariomanager.model.Constants;
+import playground.wdoering.grips.scenariomanager.model.ScenarioManagerModuleChain;
 import playground.wdoering.grips.scenariomanager.model.Constants.ModuleType;
 import playground.wdoering.grips.scenariomanager.model.imagecontainer.BufferedImageContainer;
 import playground.wdoering.grips.scenariomanager.view.DefaultWindow;
@@ -55,16 +51,11 @@ import playground.wdoering.grips.v2.roadclosures.RoadClosureEditor;
 import playground.wdoering.grips.v2.scenariogenerator.MatsimScenarioGenerator;
 import playground.wdoering.grips.v2.scenariogenerator.ScenarioGenerator;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
-
 public class ScenarioManager extends DefaultWindow
 {
+	private static final long serialVersionUID = 1L;
 	static int width = 1024;
-	static int height = 720;
+	static int height = 864;
 	static int border = 10;
 	public ConcurrentHashMap<ModuleType, TabButton> selectionButtons;
 	private ConcurrentHashMap<ModuleType, AbstractModule> modules;
@@ -74,6 +65,9 @@ public class ScenarioManager extends DefaultWindow
 		final Controller controller = new Controller(args);
 		controller.setImageContainer(BufferedImageContainer.getImageContainer(width, height, border));
 		controller.setMainFrameUndecorated(false);
+		
+		
+		controller.setModuleChain(new ScenarioManagerModuleChain());
 		
 		controller.setStandAlone(false);
 		
@@ -107,7 +101,6 @@ public class ScenarioManager extends DefaultWindow
 		selectionButtons = new ConcurrentHashMap<ModuleType, TabButton>();
 		modules = new ConcurrentHashMap<ModuleType, AbstractModule>();
 		
-		Random random = new Random();
 		JPanel tabPanel = new JPanel();
 		JPanel tabSelectPanel = new JPanel();
 		JPanel panels = new JPanel();
@@ -184,6 +177,8 @@ public class ScenarioManager extends DefaultWindow
 		{
 			this.manager.controller.setActiveModuleType(this.moduleType);
 			this.manager.modules.get(this.moduleType).start();
+			AbstractModule module = this.manager.controller.getModuleByType(this.moduleType);
+			this.manager.setTitle(module.getTitle());
 		}
 		@Override
 		public void mouseClicked(MouseEvent e) {}
@@ -228,10 +223,7 @@ public class ScenarioManager extends DefaultWindow
 	public void updateMask()
 	{
 		for (AbstractModule module : modules.values())
-		{
-			System.out.println(module.getModuleType() + " is enabled: " + module.isEnabled());
 			this.selectionButtons.get(module.getModuleType()).setEnabled(module.isEnabled());
-		}
 	}
 	
 }

@@ -21,7 +21,6 @@
 package playground.wdoering.grips.v2.analysis;
 
 import java.awt.Cursor;
-import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.util.ArrayList;
@@ -34,7 +33,6 @@ import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 
 import playground.wdoering.grips.scenariomanager.control.Controller;
-import playground.wdoering.grips.scenariomanager.control.ShapeFactory;
 import playground.wdoering.grips.scenariomanager.model.AbstractModule;
 import playground.wdoering.grips.scenariomanager.model.AbstractToolBox;
 import playground.wdoering.grips.scenariomanager.model.Constants;
@@ -47,12 +45,8 @@ import playground.wdoering.grips.scenariomanager.model.process.InitEvacShapeProc
 import playground.wdoering.grips.scenariomanager.model.process.InitMainPanelProcess;
 import playground.wdoering.grips.scenariomanager.model.process.InitMapLayerProcess;
 import playground.wdoering.grips.scenariomanager.model.process.InitMatsimConfigProcess;
-import playground.wdoering.grips.scenariomanager.model.process.InitSecondaryShapeLayerProcess;
-import playground.wdoering.grips.scenariomanager.model.process.InitShapeLayerProcess;
-import playground.wdoering.grips.scenariomanager.model.process.ProcessInterface;
 import playground.wdoering.grips.scenariomanager.model.process.SetModuleListenerProcess;
 import playground.wdoering.grips.scenariomanager.model.process.SetToolBoxProcess;
-import playground.wdoering.grips.scenariomanager.view.DefaultRenderPanel;
 import playground.wdoering.grips.scenariomanager.view.DefaultWindow;
 import playground.wdoering.grips.scenariomanager.view.renderer.GridRenderer;
 import playground.wdoering.grips.v2.analysis.control.EventHandler;
@@ -60,13 +54,10 @@ import playground.wdoering.grips.v2.analysis.control.EventReaderThread;
 import playground.wdoering.grips.v2.analysis.data.ColorationMode;
 import playground.wdoering.grips.v2.analysis.data.EventData;
 import playground.wdoering.grips.v2.analysis.gui.AbstractDataPanel;
-import playground.wdoering.grips.v2.analysis.gui.EvacuationTimeGraphPanel;
 import playground.wdoering.grips.v2.analysis.gui.KeyPanel;
-import playground.wdoering.grips.v2.roadclosures.RCEEventListener;
 
-public class EvacuationAnalysis extends AbstractModule
-{
-	
+public class EvacuationAnalysis extends AbstractModule {
+
 	private ArrayList<File> eventFiles;
 	private File currentEventFile;
 	private EventHandler eventHandler;
@@ -79,15 +70,11 @@ public class EvacuationAnalysis extends AbstractModule
 	private KeyPanel keyPanel;
 	private Thread readerThread;
 	private double gridSize = 200;
-	private String itersOutputDir;
 	private Mode mode;
-	
+
 	private EAToolBox toolBox;
-	
 
-
-	public static void main(String[] args)
-	{
+	public static void main(String[] args) {
 		// set up controller and image interface
 		final Controller controller = new Controller();
 		BufferedImage image = new BufferedImage(width - border * 2, height - border * 2, BufferedImage.TYPE_INT_ARGB);
@@ -96,7 +83,7 @@ public class EvacuationAnalysis extends AbstractModule
 
 		// inform controller that this module is running stand alone
 		controller.setStandAlone(true);
-		
+
 		// instantiate evacuation area selector
 		EvacuationAnalysis evacAnalysis = new EvacuationAnalysis(controller);
 
@@ -110,225 +97,184 @@ public class EvacuationAnalysis extends AbstractModule
 		// start the process chain
 		evacAnalysis.start();
 		frame.requestFocus();
-		
-	}	
-	
-	public EvacuationAnalysis(Controller controller)
-	{
+
+	}
+
+	public EvacuationAnalysis(Controller controller) {
 		super(controller.getLocale().moduleEvacuationAnalysis(), Constants.ModuleType.ANALYSIS, controller);
-		
-		//disable all layers
+
+		// disable all layers
 		this.processList.add(new DisableLayersProcess(controller));
-		
-		//initialize Matsim config
+
+		// initialize Matsim config
 		this.processList.add(new InitMatsimConfigProcess(controller));
 
-		//check if the default render panel is set
+		// check if the default render panel is set
 		this.processList.add(new InitMainPanelProcess(controller));
-		
-		// check if there is already a map viewer running, or just (re)set center position
+
+		// check if there is already a map viewer running, or just (re)set
+		// center position
 		this.processList.add(new InitMapLayerProcess(controller));
-		
-		//set module listeners		
+
+		// set module listeners
 		this.processList.add(new SetModuleListenerProcess(controller, this, new EAEventListener(controller)));
-		
-		//load evacuation area shape		
+
+		// load evacuation area shape
 		this.processList.add(new InitEvacShapeProcess(controller));
-		
-		//add grid renderer
-		this.processList.add(new BasicProcess(controller)
-		{
+
+		// add grid renderer
+		this.processList.add(new BasicProcess(controller) {
 			@Override
-			public void start()
-			{
-				if (!this.controller.hasGridRenderer())
-				{
+			public void start() {
+				if (!this.controller.hasGridRenderer()) {
 					gridRenderer = new GridRenderer(controller);
 					gridRendererID = gridRenderer.getId();
 					this.controller.addRenderLayer(gridRenderer);
 				}
 			}
 
-		});		
-		
-		//add toolbox
+		});
+
+		// add toolbox
 		this.processList.add(new SetToolBoxProcess(controller, getToolBox()));
-		
-		//enable all layers
+
+		// enable all layers
 		this.processList.add(new EnableLayersProcess(controller));
 
-		//enable grid renderer
-		this.processList.add(new BasicProcess(controller)
-		{
+		// enable grid renderer
+		this.processList.add(new BasicProcess(controller) {
 			@Override
-			public void start()
-			{
+			public void start() {
 				toolBox.setGridRenderer(gridRenderer);
 				readEvents();
-				
-				//finally: enable all layers
+
+				// finally: enable all layers
 				controller.enableMapRenderer();
 				gridRenderer.setEnabled(true);
 			}
 
-		});		
-		
-		
-	}
-	
+		});
 
+	}
 
 	@Override
-	public AbstractToolBox getToolBox()
-	{
-		if (this.toolBox==null)
+	public AbstractToolBox getToolBox() {
+		if (this.toolBox == null)
 			this.toolBox = new EAToolBox(this, this.controller);
 		return this.toolBox;
 	}
-	
-	@Override
-	public ProcessInterface getInitProcess()
-	{
-		return new InitProcess(this, this.controller);
-	}
-
-	/**
-	 * Initializing process
-	 * 
-	 * - check if grips config / osm xml network is loaded; if not, load it -
-	 * check if a slippy map viewer has been initialized
-	 * 
-	 * 
-	 * @author vvvvv
-	 * 
-	 */
-	private class InitProcess extends BasicProcess
-	{
-
-		private EvacuationAnalysis module;
-
-		public InitProcess(EvacuationAnalysis module, Controller controller)
-		{
-			super(module, controller);
-			
 
 
-		}
+//	/**
+//	 * Initializing process
+//	 * 
+//	 * - check if grips config / osm xml network is loaded; if not, load it -
+//	 * check if a slippy map viewer has been initialized
+//	 * 
+//	 * 
+//	 * @author vvvvv
+//	 * 
+//	 */
+//	private class InitProcess extends BasicProcess {
+//
+//		public InitProcess(EvacuationAnalysis module, Controller controller) {
+//			super(module, controller);
+//
+//		}
+//
+//		@Override
+//		public void start() {
+//			// in case this is only part of something bigger
+//			controller.disableAllRenderLayers();
+//
+//			// check if Matsim config (including the OSM network) has been
+//			// loaded
+//			if (!controller.isMatsimConfigOpened())
+//				if (!controller.openMastimConfig())
+//					exit(locale.msgOpenMatsimConfigFailed());
+//
+//			// check if the default render panel is set
+//			if (!controller.hasDefaultRenderPanel())
+//				controller.setMainPanel(new DefaultRenderPanel(this.controller), true);
+//
+//			new InitMapLayerProcess(controller).start();
+//
+//			// set module listeners
+//			if ((controller.getListener() == null) || (!(controller.getListener() instanceof EAEventListener)))
+//				setListeners(new EAEventListener(controller));
+//
+//			// disable shape layers - they are not needed
+//			controller.disableShapeLayers();
+//
+//			// add grid layer
+//			if (!this.controller.hasGridRenderer())
+//				addGridRenderer();
+//
+//			// validate render layers
+//			this.controller.validateRenderLayers();
+//
+//			// set tool box
+//			if ((controller.getActiveToolBox() == null) || (!(controller.getActiveToolBox() instanceof EAToolBox)))
+//				addToolBox(getToolBox());
+//
+//			toolBox.setGridRenderer(gridRenderer);
+//
+//			readEvents();
+//
+//			// finally: enable all layers
+//			controller.enableMapRenderer();
+//			gridRenderer.setEnabled(true);
+//		}
+//
+//		private void addGridRenderer() {
+//			gridRenderer = new GridRenderer(controller);
+//			gridRendererID = gridRenderer.getId();
+//			this.controller.addRenderLayer(gridRenderer);
+//
+//		}
+//
+//	}
 
-		@Override
-		public void start()
-		{
-			//in case this is only part of something bigger
-			controller.disableAllRenderLayers();
-			
-			// check if Matsim config (including the OSM network) has been loaded
-			if (!controller.isMatsimConfigOpened())
-				if (!controller.openMastimConfig())
-					exit(locale.msgOpenMatsimConfigFailed());
-			
-			// check if the default render panel is set
-			if (!controller.hasDefaultRenderPanel())
-				controller.setMainPanel(new DefaultRenderPanel(this.controller), true);
-			
-			new InitMapLayerProcess(controller).start();
-			
-			// set module listeners
-			if ((controller.getListener()==null) || (!(controller.getListener() instanceof EAEventListener)) )
-				setListeners(new EAEventListener(controller));
-			
-			
-
-			//disable shape layers - they are not needed
-			controller.disableShapeLayers();
-			
-			// add grid layer
-			if (!this.controller.hasGridRenderer())
-				addGridRenderer();
-			
-			
-			//validate render layers
-			this.controller.validateRenderLayers();
-
-			//set tool box
-			if ((controller.getActiveToolBox()==null) || (!(controller.getActiveToolBox() instanceof EAToolBox)))
-				addToolBox(getToolBox());
-			
-			toolBox.setGridRenderer(gridRenderer);
-			
-			readEvents();
-			
-			//finally: enable all layers
-//			controller.enableAllRenderLayers();
-			controller.enableMapRenderer();
-			gridRenderer.setEnabled(true);
-//			controller.getVisualizer().getPrimaryShapeRenderLayer().setEnabled(false);
-		}
-
-		private void addGridRenderer()
-		{
-			gridRenderer = new GridRenderer(controller);
-			gridRendererID = gridRenderer.getId();
-			this.controller.addRenderLayer(gridRenderer);
-			
-		}
-		
-
-
-	}
-	
-	public void runCalculation()
-	{
-		try
-		{
+	public void runCalculation() {
+		try {
 			this.controller.getParentComponent().setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
-			
-			if (currentEventFile != null)
-			{
+
+			if (currentEventFile != null) {
 				readEvents();
-				
+
 				this.controller.paintLayers();
 
-//				if (this.gridSizeLabel.getText().contains("*"))
-//					this.gridSizeLabel.setText(cellSizeText + (int) this.cellSize + "m ");
 			}
-		}
-		finally
-		{
+		} finally {
 			this.controller.getParentComponent().setCursor(Cursor.getDefaultCursor());
 		}
-	}	
-	
-	public void setCellTransparency(float cellTransparency)
-	{
+	}
+
+	public void setCellTransparency(float cellTransparency) {
 		this.cellTransparency = cellTransparency;
 	}
-	
-	public void readEvents()
-	{
-		if (currentEventFile == null)
-		{
+
+	public void readEvents() {
+		if (currentEventFile == null) {
 			eventFiles = getAvailableEventFiles(this.controller.getIterationsOutputDirectory());
 			currentEventFile = eventFiles.get(0);
-			
+
 			// check if empty
-			if (eventFiles.isEmpty())
-			{
+			if (eventFiles.isEmpty()) {
 				JOptionPane.showMessageDialog(this.controller.getParentComponent(), "Could not find any event files", "Event files unavailable", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
 		}
-		if ((graphPanel == null) || (keyPanel == null))
-		{
-			graphPanel = ((EAToolBox)getToolBox()).getGraphPanel();
-			keyPanel = ((EAToolBox)getToolBox()).getKeyPanel();
+		if ((graphPanel == null) || (keyPanel == null)) {
+			graphPanel = ((EAToolBox) getToolBox()).getGraphPanel();
+			keyPanel = ((EAToolBox) getToolBox()).getKeyPanel();
 		}
-		
+
 		// run event reader
 		runEventReader(currentEventFile);
 
 		// get data from eventhandler (if not null)
-		if (eventHandler != null)
-		{
+		if (eventHandler != null) {
 			eventHandler.setColorationMode(this.colorationMode);
 			eventHandler.setTransparency(this.cellTransparency);
 			eventHandler.setK(k);
@@ -337,24 +283,20 @@ public class EvacuationAnalysis extends AbstractModule
 			EventData data = eventHandler.getData();
 
 			// update data in both the map viewer and the graphs
-			
+
 			this.controller.setEventData(data);
-			
+
 			graphPanel.updateData(data);
 			keyPanel.updateData(data);
 		}
-		((EAToolBox)getToolBox()).setEventFileItems(eventFiles);
-		
-		((EAToolBox)getToolBox()).setFirstLoad(false);
+		((EAToolBox) getToolBox()).setEventFileItems(eventFiles);
 
-		
-//		this.controller.getParentComponent().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
+		((EAToolBox) getToolBox()).setFirstLoad(false);
 
 	}
-	
-	public void runEventReader(File eventFile)
-	{
-		
+
+	public void runEventReader(File eventFile) {
+
 		this.eventHandler = null;
 		EventsManager e = EventsUtils.createEventsManager();
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(e);
@@ -362,14 +304,11 @@ public class EvacuationAnalysis extends AbstractModule
 		this.eventHandler = new EventHandler(eventFile.getName(), this.controller.getScenario(), this.gridSize, this.readerThread);
 		e.addHandler(this.eventHandler);
 		this.readerThread.run();
-		
-	}	
-	
-	
-	public File getEventPathFromName(String selectedItem)
-	{
-		for (File eventFile : eventFiles)
-		{
+
+	}
+
+	public File getEventPathFromName(String selectedItem) {
+		for (File eventFile : eventFiles) {
 			// System.out.println("file " + eventFile.getAbsolutePath() + " - "
 			// + eventFile.getName());
 			if (eventFile.getName().equals(selectedItem))
@@ -377,54 +316,44 @@ public class EvacuationAnalysis extends AbstractModule
 		}
 		return null;
 	}
-	
-	public EventHandler getEventHandler()
-	{
+
+	public EventHandler getEventHandler() {
 		return eventHandler;
 	}
 
-	public File getCurrentEventFile()
-	{
+	public File getCurrentEventFile() {
 		return this.currentEventFile;
 	}
-	
-	public void setCurrentEventFile(File currentEventFile)
-	{
+
+	public void setCurrentEventFile(File currentEventFile) {
 		this.currentEventFile = currentEventFile;
 	}
-	
-	public GridRenderer getGridRenderer()
-	{
+
+	public GridRenderer getGridRenderer() {
 		return gridRenderer;
 	}
-	
-	public int getGridRendererID()
-	{
+
+	public int getGridRendererID() {
 		return gridRendererID;
 	}
-	
-	public ArrayList<File> getAvailableEventFiles(String dirString)
-	{
+
+	public ArrayList<File> getAvailableEventFiles(String dirString) {
 		File dir = new File(dirString);
 		Stack<File> directoriesToScan = new Stack<File>();
 		ArrayList<File> files = new ArrayList<File>();
 
 		directoriesToScan.add(dir);
 
-		while (!directoriesToScan.isEmpty())
-		{
+		while (!directoriesToScan.isEmpty()) {
 			File currentDir = directoriesToScan.pop();
 			File[] filesToCheck = currentDir.listFiles(new EventFileFilter());
-			
-			if (filesToCheck.length>0)
-			{
 
-				for (File currentFile : filesToCheck)
-				{
+			if (filesToCheck.length > 0) {
+
+				for (File currentFile : filesToCheck) {
 					if (currentFile.isDirectory())
 						directoriesToScan.push(currentFile);
-					else
-					{
+					else {
 						// System.out.println("file:" + currentFile.toString());
 						files.add(currentFile);
 					}
@@ -435,27 +364,22 @@ public class EvacuationAnalysis extends AbstractModule
 
 		return files;
 	}
-	
-	class EventFileFilter implements java.io.FileFilter
-	{
+
+	class EventFileFilter implements java.io.FileFilter {
 
 		@Override
-		public boolean accept(File f)
-		{
-			if (f.isDirectory())
-			{
+		public boolean accept(File f) {
+			if (f.isDirectory()) {
 				return true;
 			}
-			if (f.getName().endsWith(".events.xml.gz"))
-			{
+			if (f.getName().endsWith(".events.xml.gz")) {
 				return true;
 			}
 			return false;
 		}
 	}
-	
-	public void setMode(Mode mode)
-	{
+
+	public void setMode(Mode mode) {
 		this.mode = mode;
 
 		this.gridRenderer.setMode(mode);
@@ -464,30 +388,23 @@ public class EvacuationAnalysis extends AbstractModule
 
 	}
 
-	public Mode getMode()
-	{
+	public Mode getMode() {
 		return mode;
 	}
 
-	public void setGraphPanel(AbstractDataPanel graphPanel)
-	{
+	public void setGraphPanel(AbstractDataPanel graphPanel) {
 		this.graphPanel = graphPanel;
-		
+
 	}
 
-	public void setKeyPanel(KeyPanel keyPanel)
-	{
+	public void setKeyPanel(KeyPanel keyPanel) {
 		this.keyPanel = keyPanel;
-		
+
 	}
 
-	public void setGridSize(double gridSize)
-	{
+	public void setGridSize(double gridSize) {
 		this.gridSize = gridSize;
-		
-	}
-	
-	
 
+	}
 
 }

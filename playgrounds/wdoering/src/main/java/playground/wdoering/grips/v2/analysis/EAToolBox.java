@@ -84,9 +84,6 @@ import com.vividsolutions.jts.geom.Polygon;
 
 public class EAToolBox extends AbstractToolBox
 {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	private int exportSize;
@@ -120,8 +117,6 @@ public class EAToolBox extends AbstractToolBox
 	
 	private EvacuationAnalysis module; 
 	
-//	private EvacuationAnalysis module 
-
 	private GridRenderer gridRenderer;
 	
 	public EAToolBox(EvacuationAnalysis module, Controller controller)
@@ -334,7 +329,10 @@ public class EAToolBox extends AbstractToolBox
 		this.controlPanel.add(calculateButtonPanel);
 		this.controlPanel.add(new JSeparator());
 		this.controlPanel.add(transparencySliderPanel);
-		panel.add(this.openBtn);
+		
+		if (this.controller.isStandAlone())
+			panel.add(this.openBtn);
+		
 		panel.add(this.saveButton);
 
 		this.openBtn.addActionListener(this);
@@ -600,29 +598,6 @@ public class EAToolBox extends AbstractToolBox
 		}		
 	}
 
-//	public GeoPosition getNetworkCenter()
-//	{
-//		if (this.networkCenter != null)
-//		{
-//			return this.networkCenter;
-//		}
-//		Envelope e = new Envelope();
-//		for (Node node : this.sc.getNetwork().getNodes().values())
-//		{
-//
-//			// ignore end nodes
-//			if (node.getId().toString().contains("en"))
-//				continue;
-//
-//			e.expandToInclude(MGC.coord2Coordinate(node.getCoord()));
-//		}
-//		Coord centerC = new CoordImpl((e.getMaxX() + e.getMinX()) / 2, (e.getMaxY() + e.getMinY()) / 2);
-//		CoordinateTransformation ct2 = new GeotoolsTransformation(this.sc.getConfig().global().getCoordinateSystem(), "EPSG:4326");
-//		centerC = ct2.transform(centerC);
-//		this.networkCenter = new GeoPosition(centerC.getY(), centerC.getX());
-//
-//		return this.networkCenter;
-//	}
 
 	public void updateMapViewerSize(int width, int height)
 	{
@@ -835,32 +810,6 @@ public class EAToolBox extends AbstractToolBox
 			}
 		}
 	}
-	
-//	private void readEvents(String currentEventFile, ColorationMode colorationMode, float cellTransparency, int k)
-//	{
-//
-//		// run event reader
-//		this.module.runEventReader(new File(currentEventFile));
-//
-//		// get data from eventhandler (if not null)
-//		if (this.module.getEventHandler() != null)
-//		{
-//			this.module.getEventHandler().setColorationMode(colorationMode);
-//			this.module.getEventHandler().setTransparency(cellTransparency);
-//			this.module.getEventHandler().setK(k); //number of clusters
-//
-//			// get data
-//			EventData data = this.module.getEventHandler().getData();
-//			
-//			this.controller.setEventData(data);
-//			this.graphPanel.updateData(data);
-//			this.keyPanel.updateData(data);
-//			
-//			this.controller.paintLayers();
-//
-//		}
-//
-//	}
 	
 	public KeyPanel getKeyPanel()
 	{

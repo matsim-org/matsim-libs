@@ -31,12 +31,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.utils.collections.Tuple;
 
 import playground.wdoering.grips.scenariomanager.model.Constants.Mode;
 import playground.wdoering.grips.scenariomanager.model.Constants.Unit;
-import playground.wdoering.grips.v2.analysis.EvacuationAnalysis;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.utils.collections.Tuple;
 
 public class KeyPanel extends AbstractDataPanel
 {

@@ -1,3 +1,23 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * MyMapViewer.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.wdoering.grips.scenariomanager.model;
 
 import java.awt.Point;
@@ -10,6 +30,12 @@ import playground.wdoering.grips.scenariomanager.model.Constants.ModuleType;
 import playground.wdoering.grips.scenariomanager.model.process.BasicProcess;
 import playground.wdoering.grips.scenariomanager.model.process.ProcessInterface;
 
+/**
+ * class describing general purpose module functions
+ * 
+ * @author wdoering
+ *
+ */
 public abstract class AbstractModule
 {
 	protected static int width = 800;
@@ -26,7 +52,7 @@ public abstract class AbstractModule
 	protected ModuleType moduleType;
 	
 	protected ArrayList<ModuleType> nextModules;
-	protected ArrayList<ModuleType> disableModules;
+	protected ArrayList<ModuleType> pastModules;
 	private boolean enabled = false;
 	
 	protected AbstractToolBox toolBox;
@@ -41,11 +67,8 @@ public abstract class AbstractModule
 		this.moduleType = moduleType;
 		this.controller = controller;
 		this.processList = new ArrayList<ProcessInterface>();
-		this.nextModules = Constants.getNextModules(moduleType);
-		
-		for (ModuleType nextmoduleType : nextModules)
-			System.out.println("type:" + nextmoduleType.toString());
-		System.out.println();
+		this.nextModules = controller.getNextModules(moduleType);
+		this.pastModules = controller.getPastModules(moduleType);
 		
 		//set tool box
 		if (this.controller.isStandAlone())
@@ -53,24 +76,11 @@ public abstract class AbstractModule
 			controller.setActiveToolBox(getToolBox());
 			this.enabled = true;
 		}
-
-		// add processes
-		//processList.add(getInitProcess());
 		
 		this.controller.setActiveModuleType(this.moduleType);
 		
 		this.offsetX = this.offsetY = this.controller.getImageContainer().getBorderWidth();
 		
-	}
-	
-	public void setNextModules(ArrayList<ModuleType> nextModules)
-	{
-		this.nextModules = nextModules;
-	}
-	
-	public ArrayList<ModuleType> getNextModules()
-	{
-		return nextModules;
 	}
 	
 	public String getTitle()
@@ -83,10 +93,6 @@ public abstract class AbstractModule
 		this.title = title;
 	}
 	
-	public ProcessInterface getInitProcess()
-	{
-		return null;
-	}
 
 	public AbstractToolBox getToolBox()
 	{
@@ -153,18 +159,22 @@ public abstract class AbstractModule
 
 	public void enableNextModules()
 	{
-//		System.out.println("this: " + this.getModuleType());
-		for (ModuleType nextModuleType : nextModules)
+		if (nextModules!=null)
 		{
-//			System.out.println("next: " + nextModuleType.toString());
-			controller.enableModule(nextModuleType);
+			for (ModuleType nextModuleType : nextModules)
+				controller.enableModule(nextModuleType);
 		}
-		this.controller.updateParentUI();
 	
 	}
 	
 	public void disablePastModules()
 	{
+		if (pastModules!=null)
+		{
+			for (ModuleType pastModuleType : pastModules)
+				controller.disableModule(pastModuleType);
+			
+		}
 		
 	}
 

@@ -1,3 +1,23 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * MyMapViewer.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.wdoering.grips.v2.scenariogenerator;
 
 import java.awt.BorderLayout;
@@ -9,9 +29,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -22,21 +39,12 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingWorker;
 import javax.swing.border.LineBorder;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Element;
 
-import org.apache.log4j.Appender;
 import org.apache.log4j.AppenderSkeleton;
-import org.apache.log4j.Layout;
-import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
-import org.apache.log4j.helpers.AppenderAttachableImpl;
-import org.apache.log4j.spi.ErrorHandler;
-import org.apache.log4j.spi.Filter;
 import org.apache.log4j.spi.LoggingEvent;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.grips.scenariogenerator.ScenarioGenerator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.controler.Controler;
@@ -46,14 +54,11 @@ import playground.wdoering.grips.scenariomanager.model.locale.Locale;
 
 public class MSGMask extends JPanel
 {
+	private static final long serialVersionUID = 1L;
 	private Controller controller;
 	private JButton btRun;
 	private JTextArea textOutput;
 
-	private JTextField textNumIt;
-
-	private Interceptor outputRedirect;
-	private PrintStream defaultOut;
 	private JTextField textFirstIteration;
 	private JTextField textLastIteration;
 	private Locale locale;
@@ -103,25 +108,15 @@ public class MSGMask extends JPanel
 		this.btRun = new JButton(locale.btRun());
 		this.btRun.setEnabled(false);
 
-		JPanel buttonPanel = new JPanel();
 		JPanel infoPanel = new JPanel();
 		infoPanel.setSize(600, 200);
 
 		infoPanel.add(new JLabel(this.controller.getLocale().moduleMatsimScenarioGenerator()));
 		itPanel.add(btRun);
 		itPanel.add(infoPanel);
-		//
-//		JScrollPane scrollPane = new JScrollPane(textOutput);
 		
 		this.add(new JScrollPane(textOutput), BorderLayout.NORTH);
-//		this.add(infoPanel, BorderLayout.NORTH);
 		this.add(centerPanel, BorderLayout.CENTER);
-		// this.setBackground(Color.pink);
-
-		// this.setMinimumSize(new Dimension(300,300));
-		// this.setPreferredSize(new Dimension(500,500));
-
-//		System.out.println(root.getName());
 		Logger root = Logger.getRootLogger();
 		root.addAppender(new LogAppender(this));
 
@@ -143,8 +138,6 @@ public class MSGMask extends JPanel
 					
 					if (a == JOptionPane.OK_OPTION)
 					{
-//						Logger logger = Logger.getLogger(Controler.class);
-//						logger.addAppender(new LogAppender(MSGMask.this));
 	
 						SwingWorker<String, Void> worker = new SwingWorker<String, Void>()
 						{
@@ -158,12 +151,6 @@ public class MSGMask extends JPanel
 								config.setParam("controler", "lastIteration", textLastIteration.getText());
 								new ConfigWriter(config).write(MSGMask.this.configFile);
 	
-								// ScenarioGenerator scengen = new
-								// org.matsim.contrib.grips.scenariogenerator.ScenarioGenerator(MSGMask.this.controller.getGripsFile());
-	
-								//Controler(final String configFileName, final Config config, final Scenario scenario) {
-								
-//								Controler matsimController = new Controler(MSGMask.this.controller.getMatsimConfigFile());
 								Controler matsimController = new Controler(config);
 								matsimController.setOverwriteFiles(true);
 								matsimController.run();
@@ -189,9 +176,6 @@ public class MSGMask extends JPanel
 					e2.printStackTrace();
 				} finally
 				{
-					// SGMask.this.setBackground(Color.gray);
-					// SGMask.this.setCursor(Cursor.getDefaultCursor());
-					// System.setOut(SGMask.this.defaultOut);
 					MSGMask.this.btRun.setEnabled(true);
 					MSGMask.this.setCursor(Cursor.getDefaultCursor());
 				}
@@ -206,36 +190,11 @@ public class MSGMask extends JPanel
 
 	}
 
-	private class Interceptor extends PrintStream
-	{
-		MSGMask mask;
-
-		public Interceptor(MSGMask mask, OutputStream out)
-		{
-			super(out, true);
-			this.mask = mask;
-		}
-
-		@Override
-		public void print(String s)
-		{
-			mask.textOutput.append(s + "\r\n");
-		}
-
-		@Override
-		public void println(String x)
-		{
-			mask.textOutput.append(x + "\r\n");
-		}
-
-	}
 
 	public void readConfig()
 	{
 		Config config = this.controller.getScenario().getConfig();
 		this.labelConfigName.setText(this.controller.getScenarioPath());
-		// System.out.println(this.controller.getMatsimConfigFile());
-		// System.out.println(this.controller.getScenarioPath());
 		this.configFile = this.controller.getMatsimConfigFile();
 		this.textFirstIteration.setText(config.getModule("controler").getValue("firstIteration"));
 		this.textLastIteration.setText(config.getModule("controler").getValue("lastIteration"));
@@ -274,8 +233,8 @@ public class MSGMask extends JPanel
 
 		public boolean isNumeric(String str)
 		{
-			return str.matches("-?\\d+(\\.\\d+)?"); // match a number with
-													// optional '-' and decimal.
+			return str.matches("-?\\d+(\\.\\d+)?"); 
+													
 		}
 
 	}

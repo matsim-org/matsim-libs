@@ -1,22 +1,44 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * MyMapViewer.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.wdoering.grips.scenariomanager.view;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.awt.image.BufferedImage;
 
-import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
 import playground.wdoering.grips.scenariomanager.control.Controller;
-import playground.wdoering.grips.scenariomanager.model.imagecontainer.ImageContainerInterface;
 
+/**
+ * container class for the slippy map.
+ * 
+ * @author wdoering
+ *
+ */
 public class DefaultRenderPanel extends JPanel implements ComponentListener
 {
+	private static final long serialVersionUID = 1L;
 	private Visualizer visualizer;
-	private Controller controller;
-	
 	private int border;
 	private BufferedImage image;
 

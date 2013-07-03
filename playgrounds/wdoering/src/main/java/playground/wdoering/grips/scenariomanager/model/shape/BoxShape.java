@@ -1,6 +1,25 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * MyMapViewer.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.wdoering.grips.scenariomanager.model.shape;
 
-import java.awt.Color;
 import java.awt.Image;
 import java.awt.Rectangle;
 import java.awt.geom.Point2D;
@@ -24,7 +43,7 @@ public class BoxShape extends Shape
 	{
 		this.layerID = layerID;
 		this.box = new Rectangle2D.Double(x, y, w, h);
-		this.id = (++this.currentNumberId) + "_box";
+		this.id = (++Shape.currentNumberId) + "_box";
 	}
 	
 	public int getOffsetX()
@@ -51,7 +70,7 @@ public class BoxShape extends Shape
 	{
 		this.layerID = layerID;
 		this.box = new Rectangle2D.Double(pos.getX(), pos.getY(), 0, 0);
-		this.id = (++this.currentNumberId) + "_box";
+		this.id = (++Shape.currentNumberId) + "_box";
 	}
 	
 	public BoxShape(int layerID, Rectangle2D rectangle)

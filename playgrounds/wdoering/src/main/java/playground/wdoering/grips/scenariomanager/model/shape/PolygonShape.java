@@ -1,6 +1,24 @@
-package playground.wdoering.grips.scenariomanager.model.shape;
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * MyMapViewer.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 
-import java.awt.Color;
+package playground.wdoering.grips.scenariomanager.model.shape;
 
 import com.vividsolutions.jts.geom.Polygon;
 
@@ -15,7 +33,7 @@ public class PolygonShape extends Shape
 		this.layerID = layerID;
 		this.polygon = polygon;
 		
-		this.id = (++this.currentNumberId) + "_poly";
+		this.id = (++Shape.currentNumberId) + "_poly";
 
 	}
 	

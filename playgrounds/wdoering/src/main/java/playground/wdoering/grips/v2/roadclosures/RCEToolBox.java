@@ -1,10 +1,29 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * MyMapViewer.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.wdoering.grips.v2.roadclosures;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
@@ -13,11 +32,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.geom.Point2D;
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -31,15 +46,6 @@ import javax.swing.filechooser.FileFilter;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.network.NetworkChangeEvent;
-import org.matsim.core.network.NetworkChangeEventFactory;
-import org.matsim.core.network.NetworkChangeEventFactoryImpl;
-import org.matsim.core.network.NetworkChangeEventsWriter;
-import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.misc.Time;
 
 import playground.wdoering.grips.scenariomanager.control.Controller;
 import playground.wdoering.grips.scenariomanager.control.ShapeFactory;
@@ -52,6 +58,7 @@ import playground.wdoering.grips.scenariomanager.model.shape.LineShape;
 public class RCEToolBox extends AbstractToolBox
 {
 
+	private static final long serialVersionUID = 1L;
 	private JTextField blockFieldLink1hh;
 	private JPanel blockPanel;
 	private JTextField blockFieldLink1mm;
@@ -65,7 +72,6 @@ public class RCEToolBox extends AbstractToolBox
 	private JPanel panelLink2;
 	private JButton openBtn;
 	private JButton saveButton;
-	private JPanel compositePanel;
 
 	private boolean saveLink1;
 	private boolean saveLink2;
@@ -208,7 +214,9 @@ public class RCEToolBox extends AbstractToolBox
 		this.add(this.blockPanel, BorderLayout.CENTER);
 
 		this.openBtn = new JButton(locale.btOpen());
-		panel.add(this.openBtn);
+		
+		if (this.controller.isStandAlone())
+			panel.add(this.openBtn);
 
 		this.saveButton = new JButton(locale.btSave());
 		this.saveButton.setEnabled(false);

@@ -1,10 +1,34 @@
-package playground.wdoering.grips.scenariomanager.view.renderer;
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * MyMapViewer.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
 
-import java.util.List;
+package playground.wdoering.grips.scenariomanager.view.renderer;
 
 import playground.wdoering.grips.scenariomanager.control.Controller;
 import playground.wdoering.grips.scenariomanager.model.imagecontainer.ImageContainerInterface;
 
+/**
+ * abstrat class defining render layer basics
+ * 
+ * @author wdoering
+ *
+ */
 public abstract class AbstractRenderLayer
 {
 	protected int id;
@@ -34,11 +58,6 @@ public abstract class AbstractRenderLayer
 	public int getId()
 	{
 		return id;
-	}
-	
-	private void setId(int id)
-	{
-		this.id = id;
 	}
 	
 	public boolean isEnabled()

@@ -1,3 +1,23 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * MyMapViewer.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.wdoering.grips.v2.scenariogenerator;
 
 import java.awt.BorderLayout;
@@ -27,19 +47,18 @@ import playground.wdoering.grips.scenariomanager.model.Constants;
 
 public class SGMask extends JPanel
 {
+	private static final long serialVersionUID = 1L;
 	private Controller controller;
 	private JButton btRun;
 	private JTextArea textOutput;
-	private Interceptor outputRedirect;
-	private PrintStream defaultOut;
 	private playground.wdoering.grips.v2.scenariogenerator.ScenarioGenerator scenarioGeneratorMask;
 	private LogAppender logAppender;
 	private Logger root;
 
+	@SuppressWarnings("resource")
 	public SGMask(playground.wdoering.grips.v2.scenariogenerator.ScenarioGenerator scenariogen, Controller controller)
 	{
-		this.defaultOut = System.out;
-		this.outputRedirect = new Interceptor(this, System.out);
+		new Interceptor(this, System.out);
 		this.scenarioGeneratorMask = scenariogen;
 
 		this.controller = controller;
@@ -49,14 +68,12 @@ public class SGMask extends JPanel
 		this.setLayout(new BorderLayout());
 		this.textOutput = new JTextArea();
 		this.textOutput.setPreferredSize(new Dimension(width - 20,(int)(height/1.5)));
-//		this.textOutput.setMinimumSize(new Dimension(width - 20,(int)(height/1.5)));
 		this.btRun = new JButton(this.controller.getLocale().btRun());
 		this.btRun.setEnabled(false);
 
 		JPanel buttonPanel = new JPanel();
 		JPanel infoPanel = new JPanel();
 
-//		infoPanel.add(new JLabel(this.controller.getLocale().moduleScenarioGenerator()));
 		infoPanel.add(new JScrollPane(this.textOutput));
 		this.textOutput.setEnabled(false);
 		buttonPanel.add(btRun);
@@ -77,7 +94,6 @@ public class SGMask extends JPanel
 			{
 				try
 				{
-//					System.setOut(SGMask.this.outputRedirect);
 					SGMask.this.btRun.setEnabled(false);
 					SGMask.this.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 
@@ -100,8 +116,6 @@ public class SGMask extends JPanel
 							SGMask.this.scenarioGeneratorMask.setMainGoalAchieved(true);
 							SGMask.this.controller.setGoalAchieved(SGMask.this.scenarioGeneratorMask.isMainGoalAchieved());
 							
-							String path = SGMask.this.controller.getScenarioPath();
-							
 							SGMask.this.root.removeAppender(SGMask.this.logAppender);
 							
 
@@ -111,7 +125,7 @@ public class SGMask extends JPanel
 
 						}
 					};
-					// Execute the SwingWorker; the GUI will not freeze
+					
 					worker.execute();
 
 					
@@ -120,9 +134,6 @@ public class SGMask extends JPanel
 					e2.printStackTrace();
 				} finally
 				{
-//					SGMask.this.setBackground(Color.gray);
-//					SGMask.this.setCursor(Cursor.getDefaultCursor());
-//					System.setOut(SGMask.this.defaultOut);
 				}
 
 			}

@@ -1,10 +1,28 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * MyMapViewer.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+
 package playground.wdoering.grips.scenariomanager.control.io;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
-
-import javax.swing.table.DefaultTableModel;
 
 import org.geotools.factory.FactoryRegistryException;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
@@ -29,6 +47,12 @@ import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Polygon;
 import com.vividsolutions.jts.geom.PrecisionModel;
 
+/**
+ * all i/o functions concerning shapes
+ * 
+ * @author wdoering
+ *
+ */
 public class ShapeIO
 {
 	public static boolean savePolygon(Controller controller, PolygonShape polygonShape, String destinationFile)
@@ -140,7 +164,6 @@ public class ShapeIO
 		ShapeFileReader shapeFileReader = new ShapeFileReader();
 		shapeFileReader.readFileAndInitialize(shapeFileString);
 
-		ArrayList<Geometry> geometries = new ArrayList<Geometry>();
 		for (SimpleFeature ft : shapeFileReader.getFeatureSet())
 		{
 			Geometry geo = (Geometry) ft.getDefaultGeometry();

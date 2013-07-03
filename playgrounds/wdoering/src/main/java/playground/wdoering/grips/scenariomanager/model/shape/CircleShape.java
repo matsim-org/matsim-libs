@@ -1,9 +1,27 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * MyMapViewer.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.wdoering.grips.scenariomanager.model.shape;
 
-import java.awt.Color;
 import java.awt.Point;
 import java.awt.geom.Point2D;
-import java.util.HashMap;
 
 public class CircleShape extends Shape
 {
@@ -28,7 +46,7 @@ public class CircleShape extends Shape
 		double y2 = destination.getY();
 		this.radius = Math.sqrt((x1-x2)*(x1-x2) + (y1-y2)*(y1-y2) + .00001);
 		
-		this.id = (++this.currentNumberId) + "_circle";
+		this.id = (++Shape.currentNumberId) + "_circle";
 
 	}
 	

@@ -1,3 +1,23 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * MyMapViewer.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.wdoering.grips.scenariomanager.view;
 
 import java.io.File;
@@ -9,6 +29,7 @@ import playground.wdoering.grips.scenariomanager.control.Controller;
 
 public class DefaultSaveDialog extends JFileChooser
 {
+	private static final long serialVersionUID = 1L;
 	protected Controller controller;
 	public DefaultSaveDialog(Controller controller, final String fileExtension, final String fileDescription, boolean mandatory)
 	{
@@ -34,30 +55,4 @@ public class DefaultSaveDialog extends JFileChooser
 		this.setCurrentDirectory(controller.getCurrentWorkingDirectory());
 	}
 
-	/*
-	 final JFileChooser fc = new JFileChooser();
-				fc.setCurrentDirectory(new File(currentDirectory));
-
-				fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-
-				fc.setFileFilter(new FileFilter() {
-
-					@Override
-					public String getDescription() {
-						return "choose directory for the TIFF export";
-					}
-
-					@Override
-					public boolean accept(File f) {
-						if (f.isDirectory())
-							return true;
-						else
-							return false;
-					}
-				});
-
-				int returnVal = fc.showSaveDialog(this.frame);
-
-				if (returnVal == JFileChooser.APPROVE_OPTION) {
-	 */
 }

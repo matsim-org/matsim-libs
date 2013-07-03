@@ -1,17 +1,46 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * MyMapViewer.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.wdoering.grips.scenariomanager.model;
 
 import java.awt.Color;
 import java.awt.Image;
-import java.io.File;
-import java.util.ArrayList;
 
 import org.matsim.core.gbl.MatsimResource;
 
+import playground.wdoering.grips.scenariomanager.model.locale.EnglishLocale;
+import playground.wdoering.grips.scenariomanager.model.locale.Locale;
 import playground.wdoering.grips.scenariomanager.model.shape.Shape.DrawMode;
 import playground.wdoering.grips.scenariomanager.model.shape.ShapeStyle;
 
+/**
+ * enums, folder and color definitions
+ * 
+ * @author wdoering
+ *
+ */
 public class Constants
 {
+
+	//set language
+	private static Locale locale = new EnglishLocale();
 	
 	public static enum ModuleType { EVACUATION, POPULATION, BUSSTOPS, ROADCLOSURE, ANALYSIS, MATSIMSCENARIO, GRIPSSCENARIO };
 	public static enum LayerType { SLIPPYMAP, SHAPE, LINES, INFO, MISC };
@@ -78,13 +107,6 @@ public class Constants
 
 	public static String META_LINKID = "linkid";
 
-	private static ArrayList<ModuleType> NEXT_MODULES_FOR_COLOR_EVACUATION = new ArrayList<ModuleType>(){{ add(ModuleType.POPULATION); }};
-	private static ArrayList<ModuleType> NEXT_MODULES_FOR_COLOR_POPULATION = new ArrayList<ModuleType>(){{ add(ModuleType.GRIPSSCENARIO); }};
-	private static ArrayList<ModuleType> NEXT_MODULES_FOR_COLOR_GRIPSSCENARIO = new ArrayList<ModuleType>(){{ add(ModuleType.ROADCLOSURE); add(ModuleType.BUSSTOPS); add(ModuleType.MATSIMSCENARIO);}};
-	private static ArrayList<ModuleType> NEXT_MODULES_FOR_COLOR_ROADCLOSURE = new ArrayList<Constants.ModuleType>();
-	private static ArrayList<ModuleType> NEXT_MODULES_FOR_COLOR_PTLINES = new ArrayList<Constants.ModuleType>();
-	private static ArrayList<ModuleType> NEXT_MODULES_FOR_COLOR_MATSIMSCENARIO = new ArrayList<Constants.ModuleType>(){{ add(ModuleType.ANALYSIS); }};
-	private static ArrayList<ModuleType> NEXT_MODULES_FOR_COLOR_ANALYSIS = new ArrayList<Constants.ModuleType>();
 
 	public static Color getModuleColor(ModuleType type)
 	{
@@ -102,6 +124,7 @@ public class Constants
 		return null;
 	}
 
+	
 	public static Image getModuleImage(ModuleType moduleType)
 	{
 		String img = "";
@@ -120,21 +143,6 @@ public class Constants
 		return MatsimResource.getAsImage("grips/" + img);
 	}
 	
-	public static ArrayList<ModuleType> getNextModules(ModuleType moduleType)
-	{
-		switch (moduleType)
-		{
-			case EVACUATION : return NEXT_MODULES_FOR_COLOR_EVACUATION;  
-			case POPULATION : return NEXT_MODULES_FOR_COLOR_POPULATION; 
-			case GRIPSSCENARIO : return NEXT_MODULES_FOR_COLOR_GRIPSSCENARIO; 
-			case ROADCLOSURE : return NEXT_MODULES_FOR_COLOR_ROADCLOSURE; 
-			case BUSSTOPS : return NEXT_MODULES_FOR_COLOR_PTLINES; 
-			case ANALYSIS : return NEXT_MODULES_FOR_COLOR_ANALYSIS; 
-			case MATSIMSCENARIO : return NEXT_MODULES_FOR_COLOR_MATSIMSCENARIO; 
-		}
-		
-		return null;
-	}	
 	
 	public static Image getImageFromMatsimResouce(String imageName)
 	{
@@ -152,6 +160,11 @@ public class Constants
 	
 	public static int FRAME_MIN_WIDTH = 200;
 	public static int FRAME_MIN_HEIGHT = 200;
+
+	public static Locale getLocale()
+	{
+		return locale ;
+	}
 		
 	
 	

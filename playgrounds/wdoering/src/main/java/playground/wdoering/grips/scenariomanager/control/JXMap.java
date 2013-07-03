@@ -21,20 +21,23 @@
 package playground.wdoering.grips.scenariomanager.control;
 
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.util.ArrayList;
 import java.util.EventListener;
-import java.util.List;
 
 import org.jdesktop.swingx.JXMapViewer;
 
+import playground.wdoering.grips.scenariomanager.view.renderer.JXMapRenderer;
+
+/**
+ * JXMap interface for the use in {@link JXMapRenderer}
+ * 
+ * @author wdoering
+ *
+ */
 public class JXMap extends JXMapViewer
 {
 
@@ -47,8 +50,6 @@ public class JXMap extends JXMapViewer
 	private ArrayList<EventListener> listeners;
 
 	private Controller controller;
-	private boolean fromAbove = false;
-	
 	private boolean enabled = false;
 
 	public JXMap(Controller controller)

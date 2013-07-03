@@ -1,8 +1,27 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * MyMapViewer.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.wdoering.grips.v2.ptlines;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.Rectangle;
@@ -26,21 +45,11 @@ import javax.swing.JRadioButton;
 import javax.swing.JSeparator;
 import javax.swing.JSpinner;
 import javax.swing.JTextField;
-import javax.swing.JToggleButton;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 
-import org.jdesktop.swingx.mapviewer.GeoPosition;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.network.NetworkWriter;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.pt.transitSchedule.TransitScheduleWriterV1;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.vehicles.VehicleWriterV1;
 
 import playground.wdoering.grips.scenariomanager.control.Controller;
 import playground.wdoering.grips.scenariomanager.control.ShapeFactory;
@@ -49,26 +58,18 @@ import playground.wdoering.grips.scenariomanager.model.AbstractModule;
 import playground.wdoering.grips.scenariomanager.model.AbstractToolBox;
 import playground.wdoering.grips.scenariomanager.model.Constants;
 import playground.wdoering.grips.scenariomanager.model.shape.BoxShape;
-import playground.wdoering.grips.scenariomanager.model.shape.LineShape;
 import playground.wdoering.grips.scenariomanager.model.shape.Shape;
-
-import com.vividsolutions.jts.geom.Polygon;
 
 public class PTLToolBox extends AbstractToolBox
 {
 
+	private static final long serialVersionUID = 1L;
 	private JTextField blockFieldLink1hh;
 	private JTextField blockFieldLink1mm;
-	private JTextField blockFieldLink2hh;
-	private JTextField blockFieldLink2mm;
-	private JCheckBox cbLink1;
-	private JCheckBox cbLink2;
 	private JButton openBtn;
 	private JButton saveButton;
 	private JPanel compositePanel;
 
-	private boolean saveLink1;
-	private boolean saveLink2;
 
 	// STRING COMMANDS
 	public static final String RED = "LINK_SELECT_RED";
@@ -79,10 +80,6 @@ public class PTLToolBox extends AbstractToolBox
 	private JPanel busStopConfigPanel;
 	private JButton blockButtonOK;
 	private final Map<Id, BusStop> busStops = new HashMap<Id, BusStop>();
-	private Scenario sc;
-	private GeoPosition networkCenter;
-	private String configFile;
-	private String scPath;
 	private JRadioButton redLinkSelct;
 	private JRadioButton greenLinkSelct;
 	private JSpinner numDepSpinner;
@@ -90,8 +87,6 @@ public class PTLToolBox extends AbstractToolBox
 	private JCheckBox circCheck;
 	private JSpinner numVehSpinner;
 	private BusStop currentBusStop;
-	private JToggleButton osmButton;
-	private Polygon areaPolygon;
 
 	private void setBusStopEditorPanelEnabled(boolean toggle)
 	{
@@ -109,9 +104,6 @@ public class PTLToolBox extends AbstractToolBox
 		this.blockButtonRemove.setEnabled(toggle);
 	}
 
-	private Id currentLinkId1 = null;
-	private Id currentLinkId2 = null;
-	private HashMap<Id, String> roadClosures;
 	private JButton blockButtonRemove;
 
 	public PTLToolBox(AbstractModule module, Controller controller)
@@ -327,7 +319,9 @@ public class PTLToolBox extends AbstractToolBox
 		this.add(this.busStopConfigPanel, BorderLayout.EAST);
 
 		this.openBtn = new JButton(locale.btOpen());
-		panel.add(this.openBtn);
+		
+		if (this.controller.isStandAlone())
+			panel.add(this.openBtn);
 
 		this.saveButton = new JButton(locale.btSave());
 		this.saveButton.setEnabled(false);
@@ -341,23 +335,6 @@ public class PTLToolBox extends AbstractToolBox
 
 		this.openBtn.addActionListener(this);
 		this.saveButton.addActionListener(this);
-
-		// this.frame.addComponentListener(new ComponentListener()
-		// {
-		// @Override
-		// public void componentResized(ComponentEvent evt)
-		// {
-		// Component src = (Component)evt.getSource();
-		// Dimension newSize = src.getSize();
-		// updateMapViewerSize(newSize.width-200, newSize.height);
-		// }
-		// @Override
-		// public void componentMoved(ComponentEvent e) {}
-		// @Override
-		// public void componentShown(ComponentEvent e) {}
-		// @Override
-		// public void componentHidden(ComponentEvent e) {}
-		// });
 
 	}
 
@@ -518,58 +495,7 @@ public class PTLToolBox extends AbstractToolBox
 			createAndSavePTLines();
 		} else if (e.getActionCommand() == locale.btOpen())
 		{
-			// final JFileChooser fc = new JFileChooser();
-			// fc.setFileFilter(new FileFilter()
-			// {
-			//
-			// @Override
-			// public String getDescription()
-			// {
-			// return "MATSim config file";
-			// }
-			//
-			// @Override
-			// public boolean accept(File f)
-			// {
-			// if (f.isDirectory())
-			// {
-			// return true;
-			// }
-			// if (f.getName().endsWith("xml"))
-			// {
-			// return true;
-			// }
-			// return false;
-			// }
-			// });
-			//
-			// int returnVal =
-			// fc.showOpenDialog(this.controller.getParentComponent());
-			// if (returnVal == JFileChooser.APPROVE_OPTION)
-			// {
-			// // this.openBtn.setEnabled(false);
-			// // this.saveButton.setEnabled(true);
-			// // File file = fc.getSelectedFile();
-			// // System.out.println("Opening: " + file.getAbsolutePath() +
-			// ".");
-			// // this.configFile = file.getAbsolutePath();
-			// // this.scPath = file.getParent();
-			// // Config c = ConfigUtils.loadConfig(this.configFile);
-			// //
-			// // this.sc = ScenarioUtils.loadScenario(c);
-			// // c.scenario().setUseTransit(true);
-			// // c.scenario().setUseVehicles(true);
-			// //
-			// // //TODO read read shp
-			// // String shp =
-			// this.sc.getConfig().getModule("grips").getValue("evacuationAreaFile");
-			// // readShapeFile(shp);
-			// //
-			// // loadMapView();
-			// } else
-			// {
-			// log.info("Open command cancelled by user.");
-			// }
+			//TODO default open 
 		}
 
 	}

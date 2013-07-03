@@ -1,6 +1,25 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * MyMapViewer.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.wdoering.grips.scenariomanager.view.renderer;
 
-import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -8,7 +27,6 @@ import java.awt.GraphicsConfiguration;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.Transparency;
 import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
@@ -17,15 +35,14 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.jdesktop.swingx.mapviewer.GeoPosition;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.grips.config.ToolConfig;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.QuadTree;
-import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.collections.QuadTree.Rect;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 
@@ -33,19 +50,16 @@ import playground.wdoering.grips.scenariomanager.control.Controller;
 import playground.wdoering.grips.scenariomanager.model.Constants.Mode;
 import playground.wdoering.grips.scenariomanager.model.Constants.Unit;
 import playground.wdoering.grips.v2.analysis.EAToolBox;
-import playground.wdoering.grips.v2.analysis.EvacuationAnalysis;
 import playground.wdoering.grips.v2.analysis.data.AttributeData;
 import playground.wdoering.grips.v2.analysis.data.Cell;
 import playground.wdoering.grips.v2.analysis.data.EventData;
 
-public class GridRenderer extends AbstractRenderLayer
-{
+public class GridRenderer extends AbstractRenderLayer {
 
 	private Mode mode = Mode.EVACUATION;
-//	private final EvacuationAnalysis evacAnalysis;
 	private float transparency;
 	private QuadTree<Cell> cellTree;
-	
+
 	private double minX = Double.NaN;
 	private double minY = Double.NaN;
 	private double maxX = Double.NaN;
@@ -55,35 +69,30 @@ public class GridRenderer extends AbstractRenderLayer
 	private EventData data;
 	private ArrayList<Link> links;
 
-
-	public GridRenderer(Controller controller)
-	{
+	public GridRenderer(Controller controller) {
 		super(controller);
-		
+
 		this.ctInverse = this.controller.getCtTarget2Osm();
 	}
 
-	public void setTransparency(float transparency)
-	{
+	public void setTransparency(float transparency) {
 		this.transparency = transparency;
 	}
 
-	public float getTransparency()
-	{
+	public float getTransparency() {
 		return transparency;
 	}
 
 	@Override
-	public synchronized void paintLayer()
-	{
+	public synchronized void paintLayer() {
 		data = this.controller.getEventData();
 		links = this.controller.getLinkList();
-		
-		if (data==null)
+
+		if (data == null)
 			return;
 		else
 			this.cellTree = data.getCellTree();
-		
+
 		// viewport
 		this.imageContainer.translate(-controller.getViewportBounds().x, -controller.getViewportBounds().y);
 
@@ -98,21 +107,18 @@ public class GridRenderer extends AbstractRenderLayer
 		this.imageContainer.translate(controller.getViewportBounds().x, controller.getViewportBounds().y);
 	}
 
-	private void drawUtilization()
-	{
-		if ((links==null) || (links.size()==0))
+	private void drawUtilization() {
+		if ((links == null) || (links.size() == 0))
 			return;
 
 		HashMap<Id, List<Tuple<Id, Double>>> linkLeaveTimes = data.getLinkLeaveTimes();
 		HashMap<Id, List<Tuple<Id, Double>>> linkEnterTimes = data.getLinkEnterTimes();
 
-		for (Link link : this.links)
-		{
+		for (Link link : this.links) {
 			List<Tuple<Id, Double>> leaveTimes = linkLeaveTimes.get(link.getId());
 			List<Tuple<Id, Double>> enterTimes = linkEnterTimes.get(link.getId());
 
-			if ((enterTimes != null) && (enterTimes.size() > 0) && (leaveTimes != null))
-			{
+			if ((enterTimes != null) && (enterTimes.size() > 0) && (leaveTimes != null)) {
 
 				Coord fromCoord = this.controller.getCtTarget2Osm().transform(new CoordImpl(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY()));
 				Point2D fromP2D = this.controller.geoToPixel(new Point2D.Double(fromCoord.getY(), fromCoord.getX()));
@@ -123,10 +129,8 @@ public class GridRenderer extends AbstractRenderLayer
 				float strokeWidth = 1;
 				Color linkColor = Color.BLUE;
 
-				if (data.getLinkUtilizationVisData() != null)
-				{
-					if (data.getLinkUtilizationVisData().getAttribute((IdImpl) link.getId()) != null)
-					{
+				if (data.getLinkUtilizationVisData() != null) {
+					if (data.getLinkUtilizationVisData().getAttribute((IdImpl) link.getId()) != null) {
 						Tuple<Float, Color> currentColoration = data.getLinkUtilizationVisData().getAttribute((IdImpl) link.getId());
 						strokeWidth = ((currentColoration.getFirst() * 35f) / (float) Math.pow(2, this.controller.getZoom()));
 						linkColor = currentColoration.getSecond();
@@ -143,20 +147,17 @@ public class GridRenderer extends AbstractRenderLayer
 		}
 	}
 
-//	/**
-//	 * draw the grid
-//	 * 
-//	 * @param drawToolTip
-//	 * 
-//	 */
-	private void drawGrid(Mode mode, boolean drawToolTip)
-	{
+	/**
+	 * draw the grid
+	 * 
+	 * @param drawToolTip
+	 * 
+	 */
+	private void drawGrid(Mode mode, boolean drawToolTip) {
 		Point currentMousePosition = this.controller.getMousePosition();
 		double gridSize = this.data.getCellSize();
-		
-		
-		if (this.data != null)
-		{
+
+		if (this.data != null) {
 			this.imageContainer.setColor(Color.BLACK);
 			this.imageContainer.setLineThickness(1);
 
@@ -165,11 +166,8 @@ public class GridRenderer extends AbstractRenderLayer
 			cellTree.get(new Rect(Double.NEGATIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY, Double.POSITIVE_INFINITY), cells);
 
 			this.selectedCell = null;
-			
-			for (Cell cell : cells)
-			{
-				
-//				System.out.println("cell:" + cell);
+
+			for (Cell cell : cells) {
 
 				// get cell coordinate (+ gridsize) and transform into pixel
 				// coordinates
@@ -186,14 +184,12 @@ public class GridRenderer extends AbstractRenderLayer
 				int gridY2 = (int) cellPlusGridCoordP2D.getY();
 
 				// make sure the first values are the smaller ones, if not: swap
-				if (gridX1 > gridX2)
-				{
+				if (gridX1 > gridX2) {
 					int temp = gridX2;
 					gridX2 = gridX1;
 					gridX1 = temp;
 				}
-				if (gridY1 > gridY2)
-				{
+				if (gridY1 > gridY2) {
 					int temp = gridY2;
 					gridY2 = gridY1;
 					gridY1 = temp;
@@ -202,23 +198,19 @@ public class GridRenderer extends AbstractRenderLayer
 				this.imageContainer.setLineThickness(1);
 
 				// color grid (if mode equals evacuation or clearing time)
-				if ((mode.equals(Mode.EVACUATION)) || (mode.equals(Mode.CLEARING)))
-				{
+				if ((mode.equals(Mode.EVACUATION)) || (mode.equals(Mode.CLEARING))) {
 					AttributeData<Color> visData;
 
 					// colorize cell depending on the picked colorization, cell
 					// data and the relative travel or clearance time
 					this.imageContainer.setColor(ToolConfig.COLOR_DISABLED_TRANSPARENT); // default
 
-					if (mode.equals(Mode.EVACUATION))
-					{
+					if (mode.equals(Mode.EVACUATION)) {
 						visData = (AttributeData<Color>) data.getEvacuationTimeVisData();
 						if ((cell.getCount() > 0))
 							this.imageContainer.setColor(visData.getAttribute(cell.getId()));
-						
-					}
-					else if (mode.equals(Mode.CLEARING))
-					{
+
+					} else if (mode.equals(Mode.CLEARING)) {
 						visData = (AttributeData<Color>) data.getClearingTimeVisData();
 						if (cell.getClearingTime() > 0)
 							this.imageContainer.setColor(visData.getAttribute(cell.getId()));
@@ -232,13 +224,11 @@ public class GridRenderer extends AbstractRenderLayer
 				this.imageContainer.setLineThickness(2);
 				this.imageContainer.drawRect(gridX1, gridY1, gridX2 - gridX1, gridY2 - gridY1);
 
-				if (drawToolTip && currentMousePosition != null)
-				{
+				if (drawToolTip && currentMousePosition != null) {
 					int mouseX = this.controller.getMousePosition().x;
 					int mouseY = this.controller.getMousePosition().y;
 
-					if ((mouseX >= gridX1) && (mouseX < gridX2) && (mouseY >= gridY1) && (mouseY < gridY2))
-					{
+					if ((mouseX >= gridX1) && (mouseX < gridX2) && (mouseY >= gridY1) && (mouseY < gridY2)) {
 						this.imageContainer.setColor(ToolConfig.COLOR_HOVER);
 						this.imageContainer.fillRect(gridX1, gridY1, gridX2 - gridX1, gridY2 - gridY1);
 						this.imageContainer.setLineThickness(3);
@@ -251,8 +241,7 @@ public class GridRenderer extends AbstractRenderLayer
 			}
 
 			// draw tooltip
-			if ((this.selectedCell != null) && (this.controller.getMousePosition() != null))
-			{
+			if ((this.selectedCell != null) && (this.controller.getMousePosition() != null)) {
 				Point mp = this.controller.getMousePosition();
 
 				this.imageContainer.setLineThickness(1);
@@ -269,29 +258,19 @@ public class GridRenderer extends AbstractRenderLayer
 				this.imageContainer.drawString(mp.x - 15, mp.y + 80, "average evacuation time:");
 
 				this.imageContainer.setFont(ToolConfig.FONT_DEFAULT);
-				this.imageContainer.drawString(mp.x + 135, mp.y + 40, EAToolBox.getReadableTime(selectedCell.getCount(),Unit.PEOPLE));
-				this.imageContainer.drawString(mp.x + 135, mp.y + 60, EAToolBox.getReadableTime(selectedCell.getClearingTime(),Unit.TIME));
-				this.imageContainer.drawString(mp.x + 135, mp.y + 80, EAToolBox.getReadableTime(selectedCell.getTimeSum() / selectedCell.getCount(),Unit.TIME));
+				this.imageContainer.drawString(mp.x + 135, mp.y + 40, EAToolBox.getReadableTime(selectedCell.getCount(), Unit.PEOPLE));
+				this.imageContainer.drawString(mp.x + 135, mp.y + 60, EAToolBox.getReadableTime(selectedCell.getClearingTime(), Unit.TIME));
+				this.imageContainer.drawString(mp.x + 135, mp.y + 80, EAToolBox.getReadableTime(selectedCell.getTimeSum() / selectedCell.getCount(), Unit.TIME));
 
 			}
 			this.imageContainer.setColor(Color.black);
 		}
 	}
-	
 
-	public BufferedImage getGridAsImage(Mode mode, int width, int height)
-	{
-
-		int zoom = 1;
+	public BufferedImage getGridAsImage(Mode mode, int width, int height) {
 
 		this.controller.getVisualizer().getActiveMapRenderLayer().setPosition(this.controller.getCenterPosition());
 
-		// get viewport offset
-		// Rectangle b = this.getViewportBounds();!!!
-		// System.out.println("minx: " + minX + "|minY: " + minY);
-		// System.out.println("zoom:" + this.getZoom());
-		// System.exit(223);
-		
 		double gridSize = this.data.getCellSize();
 
 		Coord gridFromCoord = this.controller.getCtTarget2Osm().transform(new CoordImpl(minX - gridSize / 2, minY - gridSize / 2));
@@ -317,8 +296,6 @@ public class GridRenderer extends AbstractRenderLayer
 		IG2D.setColor(new Color(255, 255, 0, 0));
 		IG2D.fillRect(0, 0, width, height);
 
-		Rectangle gridRect = new Rectangle(minX, minY, 2215, 250);
-
 		// draw utilization
 		if (mode.equals(Mode.UTILIZATION))
 			drawUtilization();
@@ -327,22 +304,18 @@ public class GridRenderer extends AbstractRenderLayer
 
 		return bImage;
 	}
-	
 
-	public void setMode(Mode mode)
-	{
+	public void setMode(Mode mode) {
 		this.mode = mode;
-		
+
 	}
 
-	public void updateEventData(EventData data)
-	{
-		
+	public void updateEventData(EventData data) {
+
 	}
 
-	public void setBounds(int x, int y, int width, int height)
-	{
-		
+	public void setBounds(int x, int y, int width, int height) {
+
 	}
 
 }

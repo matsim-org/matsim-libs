@@ -29,8 +29,6 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.util.EventListener;
-import java.util.List;
 
 import org.jdesktop.swingx.JXMapViewer;
 
@@ -75,42 +73,7 @@ public class MyMapViewer extends JXMapViewer implements MouseListener, MouseWhee
 		this.addKeyListener(this);
 	}
 
-	/**
-	 * set all listeners
-	 * 
-	 * @param listeners
-	 */
-	private void setListeners(List<EventListener> listeners)
-	{
-		for (EventListener listener : listeners)
-		{
-			if (listener instanceof MouseListener)
-				this.addMouseListener((MouseListener)listener);
-			else if (listener instanceof MouseMotionListener)
-				this.addMouseMotionListener((MouseMotionListener)listener);
-			else if (listener instanceof MouseWheelListener)
-				this.addMouseWheelListener((MouseWheelListener)listener);
-			else if (listener instanceof KeyListener)
-				this.addKeyListener((KeyListener)listener);
-		}
-	}
 	
-	/**
-	 * set specific listener
-	 * 
-	 * @param listener
-	 */
-	private void setListener(EventListener listener)
-	{
-		if (listener instanceof MouseListener)
-			this.addMouseListener((MouseListener)listener);
-		else if (listener instanceof MouseMotionListener)
-			this.addMouseMotionListener((MouseMotionListener)listener);
-		else if (listener instanceof MouseWheelListener)
-			this.addMouseWheelListener((MouseWheelListener)listener);
-		else if (listener instanceof KeyListener)
-			this.addKeyListener((KeyListener)listener);
-	}
 	
 	@Override
 	public void mouseClicked(MouseEvent e) {}

@@ -1,11 +1,29 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * MyMapViewer.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+
 package playground.wdoering.grips.scenariomanager.control;
 
 import java.awt.Color;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
-
-import org.matsim.core.gbl.MatsimResource;
 
 import playground.wdoering.grips.scenariomanager.model.Constants;
 import playground.wdoering.grips.scenariomanager.model.shape.BoxShape;
@@ -13,8 +31,13 @@ import playground.wdoering.grips.scenariomanager.model.shape.CircleShape;
 import playground.wdoering.grips.scenariomanager.model.shape.LineShape;
 import playground.wdoering.grips.scenariomanager.model.shape.Shape.DrawMode;
 import playground.wdoering.grips.scenariomanager.model.shape.ShapeStyle;
-import playground.wdoering.grips.v2.ptlines.BusStop;
 
+/**
+ * helper class for creating standard shapes
+ * 
+ * @author wdoering
+ *
+ */
 public class ShapeFactory
 {
 
@@ -72,7 +95,6 @@ public class ShapeFactory
 		
 		//set style
 		ShapeStyle style = Constants.SHAPESTYLE_ROADCLOSURE;
-//		style.setHoverColor(Constants.COLOR_POPAREA_HOVER);
 		style.setSelectColor(Constants.COLOR_POPAREA_SELECTED);
 		roadClosureLine.setStyle(style);
 		
@@ -136,7 +158,6 @@ public class ShapeFactory
 		
 		BoxShape busStop = new BoxShape(shapeRendererId, pos);
 		busStop.setId(Constants.ID_BUSSTOP_PREFIX + linkID);
-//		busStop.setImageFile(Constants.IMG_BUSSTOP.);
 		busStop.setImage(Constants.IMG_BUSSTOP);
 		busStop.setFixedSize(80,40);
 		busStop.setOffset(0,-40);

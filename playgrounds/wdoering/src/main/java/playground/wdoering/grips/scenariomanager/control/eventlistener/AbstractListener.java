@@ -1,8 +1,27 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * MyMapViewer.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.wdoering.grips.scenariomanager.control.eventlistener;
 
 import java.awt.Cursor;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
@@ -15,6 +34,13 @@ import javax.swing.event.MouseInputListener;
 
 import playground.wdoering.grips.scenariomanager.control.Controller;
 
+/**
+ * class combining all needed listeners for the
+ * interaction with the slippy map
+ * 
+ * @author wdoering
+ *
+ */
 public class AbstractListener implements KeyListener, MouseWheelListener, MouseInputListener
 {
 	protected Controller controller;

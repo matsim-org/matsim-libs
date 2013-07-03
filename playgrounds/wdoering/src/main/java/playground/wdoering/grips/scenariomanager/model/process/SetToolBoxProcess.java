@@ -1,15 +1,32 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * MyMapViewer.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.wdoering.grips.scenariomanager.model.process;
 
 import playground.wdoering.grips.scenariomanager.control.Controller;
-import playground.wdoering.grips.scenariomanager.control.eventlistener.AbstractListener;
 import playground.wdoering.grips.scenariomanager.model.AbstractToolBox;
-import playground.wdoering.grips.v2.analysis.EAToolBox;
 
 public class SetToolBoxProcess extends BasicProcess
 {
 	
 	private AbstractToolBox toolBox;
-	private Class toolboxInstance;
 	
 	public SetToolBoxProcess(Controller controller, AbstractToolBox toolBox)
 	{
@@ -20,9 +37,6 @@ public class SetToolBoxProcess extends BasicProcess
 	@Override
 	public void start()
 	{
-		
-		System.out.println("!active toolbox: " + controller.getActiveToolBox());
-		
 		//set tool box
 		if ((controller.getActiveToolBox()==null) || (!(controller.getActiveToolBox().getClass().isInstance(toolBox))))
 			this.controller.setActiveToolBox(toolBox);

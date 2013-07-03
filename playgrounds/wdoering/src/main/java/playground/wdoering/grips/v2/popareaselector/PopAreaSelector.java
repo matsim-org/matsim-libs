@@ -1,3 +1,23 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * MyMapViewer.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.wdoering.grips.v2.popareaselector;
 
 import java.awt.geom.Rectangle2D;
@@ -17,13 +37,9 @@ import playground.wdoering.grips.scenariomanager.model.process.InitGripsConfigPr
 import playground.wdoering.grips.scenariomanager.model.process.InitMainPanelProcess;
 import playground.wdoering.grips.scenariomanager.model.process.InitMapLayerProcess;
 import playground.wdoering.grips.scenariomanager.model.process.InitShapeLayerProcess;
-import playground.wdoering.grips.scenariomanager.model.process.ProcessInterface;
 import playground.wdoering.grips.scenariomanager.model.process.SetModuleListenerProcess;
 import playground.wdoering.grips.scenariomanager.model.process.SetToolBoxProcess;
-import playground.wdoering.grips.scenariomanager.model.shape.Shape;
-import playground.wdoering.grips.scenariomanager.view.DefaultRenderPanel;
 import playground.wdoering.grips.scenariomanager.view.DefaultWindow;
-import playground.wdoering.grips.scenariomanager.view.renderer.ShapeRenderer;
 
 public class PopAreaSelector extends AbstractModule
 {
@@ -60,7 +76,6 @@ public class PopAreaSelector extends AbstractModule
 	public PopAreaSelector(Controller controller)
 	{
 		super(controller.getLocale().modulePopAreaSelector(), Constants.ModuleType.POPULATION, controller);
-		this.processList.add(getInitProcess());
 		
 		//disable all layers
 		this.processList.add(new DisableLayersProcess(controller));
@@ -105,11 +120,6 @@ public class PopAreaSelector extends AbstractModule
 		//enable all layers
 		this.processList.add(new EnableLayersProcess(controller));
 		
-		System.out.println("processes queued:" + processList.size());
-		for (ProcessInterface process : processList)
-			System.out.println(process.toString());
-		
-		
 	}
 	
 	@Override
@@ -121,88 +131,6 @@ public class PopAreaSelector extends AbstractModule
 		return toolBox;
 	}
 	
-	@Override
-	public ProcessInterface getInitProcess()
-	{
-		return new PopInitProcess(this, this.controller);
-	}
-	
-	/**
-	 * Initializing process
-	 * 
-	 * - check if grips config / osm xml network is loaded; if not, load it -
-	 * check if a slippy map viewer has been initialized
-	 * 
-	 * 
-	 * @author vvvvv
-	 * 
-	 */
-	private class PopInitProcess extends BasicProcess
-	{
-		public PopInitProcess(AbstractModule module, Controller controller)
-		{
-			super(module, controller);
-		}
-
-		@Override
-		public void start()
-		{
-//			//in case this is only part of something bigger
-//			controller.disableAllRenderLayers();
-//			
-//			// check if Grips config (including the OSM network) has been loaded
-//			if (!controller.isGripsConfigOpenend())
-//			{
-//				if (!controller.openGripsConfig())
-//					exit(locale.msgOpenGripsConfigFailed());
-//			}
-//			else
-//			{
-//				if (PopAreaSelector.this.toolBox!=null)
-//					PopAreaSelector.this.toolBox.updateMask();
-//			}
-//			
-//			//check if the default render panel is set
-//			if (!controller.hasDefaultRenderPanel())
-//				controller.setMainPanel(new DefaultRenderPanel(this.controller), true);
-//
-////			// check if there is already a map viewer running, or just (re)set center position
-////			if (!controller.hasMapRenderer())
-////				addMapViewer();
-////			else
-////				controller.getVisualizer().getActiveMapRenderLayer().setPosition(controller.getCenterPosition());
-//			new InitMapLayerProcess(controller).start();
-//			
-//			//set module listeners
-//			if ((controller.getListener()==null) || (!(controller.getListener() instanceof PopEventListener)) )
-//				setListeners(new PopEventListener(controller));
-//
-////			// check if there is already a primary shape layer
-////			if (!controller.hasShapeRenderer())
-////				addShapeRenderer(new ShapeRenderer(controller, controller.getImageContainer()));
-//			new InitShapeLayerProcess(controller).start();
-//			
-//			// check if Grips config (including the OSM network) has been loaded
-//			if (!controller.openEvacuationShape(Constants.ID_EVACAREAPOLY))
-//				exit(locale.msgOpenEvacShapeFailed());
-//			
-////			//validate render layers
-////			this.controller.validateRenderLayers();
-//
-////			//add network bounding box shape
-//			int shapeRendererId = controller.getVisualizer().getPrimaryShapeRenderLayer().getId();
-//			Rectangle2D bbRect = controller.getBoundingBox();
-//			controller.addShape(ShapeFactory.getNetBoxShape(shapeRendererId, bbRect, true));
-//			
-//			//set tool box
-//			if ((controller.getActiveToolBox()==null) || (!(controller.getActiveToolBox() instanceof PopToolBox)))
-//				addToolBox(new PopToolBox(module, controller));
-//			
-//			//finally: enable all layers
-//			controller.enableAllRenderLayers();
-		}
-
-	}
 	
 	
 

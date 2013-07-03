@@ -1,36 +1,45 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * MyMapViewer.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.wdoering.grips.v2.roadclosures;
 
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
 import java.awt.geom.Point2D;
-import java.util.ArrayList;
 
-import org.jdesktop.swingx.mapviewer.GeoPosition;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkQuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.wdoering.grips.scenariomanager.control.Controller;
 import playground.wdoering.grips.scenariomanager.control.ShapeFactory;
 import playground.wdoering.grips.scenariomanager.control.eventlistener.AbstractListener;
-import playground.wdoering.grips.scenariomanager.model.Constants;
 import playground.wdoering.grips.scenariomanager.model.shape.LineShape;
 
 public class RCEEventListener extends AbstractListener
 {
 
-	private boolean editMode = false;
 	private boolean freezeMode = false;
-	private ArrayList<Link> currentHoverLinks;
 	private Rectangle viewPortBounds;
 	private int offsetX;
 	private int offsetY;
@@ -49,7 +58,6 @@ public class RCEEventListener extends AbstractListener
 		this.offsetX = this.border;
 		this.offsetY = this.border;
 		
-//		this.hoverLine = new LineShape(controller.getVisualizer().getPrimaryShapeRenderLayer().getId(), controller.getCenterPosition(), controller.getCenterPosition());
 	}
 
 	@Override
@@ -133,13 +141,7 @@ public class RCEEventListener extends AbstractListener
 	@Override
 	public void mouseReleased(MouseEvent e)
 	{
-
-//		if (!this.controller.isEditMode())
-			super.mouseReleased(e);
-
-//		if (e.getButton() == MouseEvent.BUTTON1)
-//			controller.paintLayers();
-
+		super.mouseReleased(e);
 	}
 
 	@Override
@@ -163,20 +165,9 @@ public class RCEEventListener extends AbstractListener
 			{
 				hoverLink = controller.getLinks().getNearest(wCoord.getX(),wCoord.getY());
 				
-//				Coord from = this.controller.getCtTarget2Osm().transform(hoverLink.getFromNode().getCoord());
-//				Coord to = this.controller.getCtTarget2Osm().transform(hoverLink.getToNode().getCoord());
-				
 				Point2D from2D = this.controller.coordToPoint(hoverLink.getFromNode().getCoord()); 
 				Point2D to2D = this.controller.coordToPoint(hoverLink.getToNode().getCoord()); 
 	
-//				Point2D from2D = this.controller.geoToPixel(new Point2D.Double(from.getY(),from.getX()));
-//				Point2D to2D = this.controller.geoToPixel(new Point2D.Double(to.getY(),to.getX()));
-				
-//				System.out.println("- - ");
-//				System.out.println("from: " + from2D + " | " + viewPortBounds.x);
-//				System.out.println("to: " + to2D + " | "  + viewPortBounds.y);
-//				System.out.println();
-				
 				this.hoverLine.setC0(from2D);
 				this.hoverLine.setC1(to2D);
 				this.hoverLine.setVisible(true);
@@ -223,7 +214,6 @@ public class RCEEventListener extends AbstractListener
 		this.controller.addShape(this.primarySelectLine);
 		this.controller.addShape(this.secondarySelectLine);
 		
-		this.editMode = false;
 		this.freezeMode = false;
 		
 	}

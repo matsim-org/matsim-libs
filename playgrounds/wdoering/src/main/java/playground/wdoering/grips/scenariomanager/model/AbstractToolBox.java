@@ -1,3 +1,23 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * MyMapViewer.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.wdoering.grips.scenariomanager.model;
 
 import java.awt.event.ActionEvent;
@@ -8,8 +28,15 @@ import javax.swing.JPanel;
 import playground.wdoering.grips.scenariomanager.control.Controller;
 import playground.wdoering.grips.scenariomanager.model.locale.Locale;
 
+/**
+ * class describing general purpose toolbox functions
+ * 
+ * @author wdoering
+ *
+ */
 public class AbstractToolBox extends JPanel implements ActionListener
 {
+	private static final long serialVersionUID = 1L;
 	protected Controller controller;
 	protected Locale locale;
 	protected boolean goalAchieved;

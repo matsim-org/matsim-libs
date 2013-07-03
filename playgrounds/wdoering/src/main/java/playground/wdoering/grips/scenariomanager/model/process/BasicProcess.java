@@ -20,18 +20,21 @@
 
 package playground.wdoering.grips.scenariomanager.model.process;
 
-import javax.swing.JFileChooser;
-
 import playground.wdoering.grips.scenariomanager.control.Controller;
 import playground.wdoering.grips.scenariomanager.control.eventlistener.AbstractListener;
 import playground.wdoering.grips.scenariomanager.model.AbstractModule;
 import playground.wdoering.grips.scenariomanager.model.AbstractToolBox;
 import playground.wdoering.grips.scenariomanager.model.locale.Locale;
-import playground.wdoering.grips.scenariomanager.view.DefaultOpenDialog;
-import playground.wdoering.grips.scenariomanager.view.renderer.JXMapRenderer;
 import playground.wdoering.grips.scenariomanager.view.renderer.GridRenderer;
-import playground.wdoering.grips.scenariomanager.view.renderer.ShapeRenderer;
 
+/**
+ * class for encapsulated description of
+ * function calls for the repeated use in
+ * different modules. 
+ * 
+ * @author wdoering
+ *
+ */
 public abstract class BasicProcess implements ProcessInterface
 {
 	protected Controller controller;

@@ -1,10 +1,27 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * MyMapViewer.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.wdoering.grips.scenariomanager.view;
 
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import playground.wdoering.grips.scenariomanager.control.Controller;
 import playground.wdoering.grips.scenariomanager.model.imagecontainer.ImageContainerInterface;
@@ -22,7 +39,6 @@ public class Visualizer
 	private AbstractSlippyMapRenderLayer activeMapRenderLayer;
 	private ShapeRenderer primaryShapeRenderLayer;
 	private ShapeRenderer secondaryShapeRenderLayer;
-	private AtomicBoolean b = new AtomicBoolean(false);
 	private boolean painting = false;
 	
 	public Visualizer(Controller controller)
@@ -153,21 +169,12 @@ public class Visualizer
 	
 	public ShapeRenderer getPrimaryShapeRenderLayer()
 	{
-//		if (this.primaryShapeRenderLayer==null)
-//			this.addRenderLayer(new ShapeRenderer(this.controller, this.getImageContainer()));
 		
 		return primaryShapeRenderLayer;
 	}
 	
 	public ShapeRenderer getSecondaryShapeRenderLayer()
 	{
-//		if (this.secondaryShapeRenderLayer==null)
-//		{
-//			if (this.primaryShapeRenderLayer==null)
-//				this.addRenderLayer(new ShapeRenderer(this.controller, this.getImageContainer()));
-//				
-//			this.addRenderLayer(new ShapeRenderer(this.controller, this.getImageContainer()));
-//		}
 		
 		return secondaryShapeRenderLayer;
 	}

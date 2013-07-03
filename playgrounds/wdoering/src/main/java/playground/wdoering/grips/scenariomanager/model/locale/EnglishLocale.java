@@ -20,35 +20,35 @@
 
 package playground.wdoering.grips.scenariomanager.model.locale;
 
-public class GermanLocale implements Locale
+public class EnglishLocale implements Locale
 {
 	
 	private String btOK = "ok"; 
-	private String btOpen = "öffnen"; 
-	private String btSave = "speichern"; 
-	private String btCancel = "abbrechen"; 
-	private String btRun = "ausführen";
-	private String btRemove = "entfernen";
+	private String btOpen = "open"; 
+	private String btSave = "save"; 
+	private String btCancel = "cancel"; 
+	private String btRun = "run";
+	private String btRemove = "remove";
 	
-	private String infoGripsFile = "Grips Konfiguration";
-	private String infoMatsimFile = "MATSim Konfiguration";
-	private String infoMatsimTime = "Die Berechnung kann unter Umständen sehr viel Zeit beanspruchen!";
+	private String infoGripsFile = "Grips settings";
+	private String infoMatsimFile = "MATSim settings";
+	private String infoMatsimTime = "The calculation may take a long time!";
 	
-	private String msgOpenGripsConfigFailed      = "Die Grips-Datei konnte nicht geöffnet werden."; 
-	private String msgOpenMatsimConfigFailed     = "Die MATSim-Datei konnte nicht geöffnet werden."; 
-	private String msgOpenEvacShapeFailed 		 = "Die Shape-Datei des Evakuierungsgebietes konnte nicht geöffnet werden.";
+	private String msgOpenGripsConfigFailed      = "The Grips file could not be opened."; 
+	private String msgOpenMatsimConfigFailed     = "The MATSim file could not be opened."; 
+	private String msgOpenEvacShapeFailed 		 = "The evacuation area shape file could not be opened.";
 
-	private String moduleEvacAreaSelector 		 = "Evakuierungsgebiet";
-	private String modulePopAreaSelector 		 = "Populationen";
-	private String moduleScenearioGenerator 	 = "Grips Scenario";
-	private String moduleRoadClosureEditor 		 = "Straßensperrungen";
-	private String modulePTLEditor 				 = "Bushaltestellen";
-	private String moduleMatsimScenarioGenerator = "MATSim Scenario";
-	private String moduleEvacuationAnalysis 	 = "Analyse";
+	private String moduleEvacAreaSelector 		 = "evacuation area";
+	private String modulePopAreaSelector 		 = "population areas";
+	private String moduleScenearioGenerator 	 = "Grips scenario";
+	private String moduleRoadClosureEditor 		 = "road closures";
+	private String modulePTLEditor 				 = "bus stops";
+	private String moduleMatsimScenarioGenerator = "MATSim scenario";
+	private String moduleEvacuationAnalysis 	 = "analysis";
 	
-	private String titlePopAreas = "Populationsgebiete";
+	private String titlePopAreas = "population areas";
 	private String titleAreaID = "ID";
-	private String titlePopulation = "Population";
+	private String titlePopulation = "population";
 	
 	
 	@Override
