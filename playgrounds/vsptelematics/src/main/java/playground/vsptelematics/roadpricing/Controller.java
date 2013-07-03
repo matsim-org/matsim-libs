@@ -36,6 +36,7 @@ import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.roadpricing.RoadPricing;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 
@@ -62,6 +63,7 @@ public class Controller {
 	}
 	
 	private void addListener(Controler c){
+		c.addControlerListener(new RoadPricing());
 		c.addControlerListener(new StartupListener(){
 			@Override
 			public void notifyStartup(StartupEvent event) {
