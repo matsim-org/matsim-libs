@@ -68,35 +68,37 @@ import com.vividsolutions.jts.util.Assert;
 public class SpatialAveraging {
 	private static final Logger logger = Logger.getLogger(SpatialAveraging.class);
 
-//	final double scalingFactor = 100.;
-//	private final static String runNumber1 = "baseCase";
+	final double scalingFactor = 100.;
+	private final static String runNumber1 = "baseCase";
+	private final static String runDirectory1 = "../../runs-svn/detEval/latsis/output/output_baseCase_ctd_newCode/";
 //	private final static String runNumber2 = "zone30";
-//	private final static String runDirectory1 = "../../runs-svn/detEval/latsis/output/output_baseCase_ctd_newCode/";
 //	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_zone30/";
-//	private final String netFile1 = runDirectory1 + "output_network.xml.gz";
-//	private final String munichShapeFile = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
-//
-//	private static String configFile1 = runDirectory1 + "output_config.xml.gz";
-//	private final static Integer lastIteration1 = getLastIteration(configFile1);
-//	private static String configFile2 = runDirectory1 + "output_config.xml.gz";
-//	private final static Integer lastIteration2 = getLastIteration(configFile2);
-//	private final String emissionFile1 = runDirectory1 + "ITERS/it." + lastIteration1 + "/" + lastIteration1 + ".emission.events.xml.gz";
-//	private final String emissionFile2 = runDirectory2 + "ITERS/it." + lastIteration2 + "/" + lastIteration2 + ".emission.events.xml.gz";
-	
-	final double scalingFactor = 10.;
-	private final static String runNumber1 = "981";
-	private final static String runNumber2 = "983";
-	private final static String runDirectory1 = "../../runs-svn/run" + runNumber1 + "/";
-	private final static String runDirectory2 = "../../runs-svn/run" + runNumber2 + "/";
-	private final String netFile1 = runDirectory1 + runNumber1 + ".output_network.xml.gz";
+	private final static String runNumber2 = "pricing";
+	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_pricing_newCode/";
+	private final String netFile1 = runDirectory1 + "output_network.xml.gz";
 	private final String munichShapeFile = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
 
-	private static String configFile1 = runDirectory1 + runNumber1 + ".output_config.xml.gz";
+	private static String configFile1 = runDirectory1 + "output_config.xml.gz";
 	private final static Integer lastIteration1 = getLastIteration(configFile1);
-	private static String configFile2 = runDirectory1 + runNumber1 + ".output_config.xml.gz";
+	private static String configFile2 = runDirectory1 + "output_config.xml.gz";
 	private final static Integer lastIteration2 = getLastIteration(configFile2);
-	private final String emissionFile1 = runDirectory1 + "ITERS/it." + lastIteration1 + "/" + runNumber1 + "." + lastIteration1 + ".emission.events.xml.gz";
-	private final String emissionFile2 = runDirectory2 + "ITERS/it." + lastIteration2 + "/" + runNumber2 + "." + lastIteration2 + ".emission.events.xml.gz";
+	private final String emissionFile1 = runDirectory1 + "ITERS/it." + lastIteration1 + "/" + lastIteration1 + ".emission.events.xml.gz";
+	private final String emissionFile2 = runDirectory2 + "ITERS/it." + lastIteration2 + "/" + lastIteration2 + ".emission.events.xml.gz";
+	
+//	final double scalingFactor = 10.;
+//	private final static String runNumber1 = "981";
+//	private final static String runNumber2 = "983";
+//	private final static String runDirectory1 = "../../runs-svn/run" + runNumber1 + "/";
+//	private final static String runDirectory2 = "../../runs-svn/run" + runNumber2 + "/";
+//	private final String netFile1 = runDirectory1 + runNumber1 + ".output_network.xml.gz";
+//	private final String munichShapeFile = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
+//
+//	private static String configFile1 = runDirectory1 + runNumber1 + ".output_config.xml.gz";
+//	private final static Integer lastIteration1 = getLastIteration(configFile1);
+//	private static String configFile2 = runDirectory1 + runNumber1 + ".output_config.xml.gz";
+//	private final static Integer lastIteration2 = getLastIteration(configFile2);
+//	private final String emissionFile1 = runDirectory1 + "ITERS/it." + lastIteration1 + "/" + runNumber1 + "." + lastIteration1 + ".emission.events.xml.gz";
+//	private final String emissionFile2 = runDirectory2 + "ITERS/it." + lastIteration2 + "/" + runNumber2 + "." + lastIteration2 + ".emission.events.xml.gz";
 
 	Network network;
 	Collection<SimpleFeature> featuresInMunich;
@@ -118,7 +120,7 @@ public class SpatialAveraging {
 	final int noOfYbins = 120;
 	final double smoothingRadius_m = 500.; 
 	final String pollutant2analyze = WarmPollutant.NO2.toString();
-	final boolean baseCaseOnly = true;
+	final boolean baseCaseOnly = false;
 	final boolean calculateRelativeChange = false;
 	
 	Map<Double, Map<Id, Map<String, Double>>> time2EmissionMapToAnalyze_g = new HashMap<Double, Map<Id,Map<String,Double>>>();
