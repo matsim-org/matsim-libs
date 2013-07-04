@@ -28,7 +28,6 @@ import java.util.TimeZone;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
-import org.matsim.core.utils.io.UncheckedIOException;
 import org.xml.sax.Attributes;
 
 import playground.southafrica.freight.digicore.containers.DigicoreActivity;
@@ -50,7 +49,7 @@ public class DigicoreVehicleReader_v1 extends MatsimXmlParser {
 	private final static String ATTR_STARTTIME = "start";
 	private final static String ATTR_ENDTIME = "end";
 	private final static String ATTR_ACTIVITYTYPE = "type";
-	private final static String ATTR_FACILITY = "facility";
+	private final static String ATTR_FACILITY = "facilityId";
 	private final static String ATTR_LINK = "link";
 	
 	
