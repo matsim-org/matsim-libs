@@ -1448,9 +1448,80 @@ Publications using this module:
 \end{itemize}
 
 
+\vfill\eject
+\section{"lanes". Status: works}
+
+\textbf{Maintainer:} Dominik Grether
+
+Make sure you read \url{http://svn.vsp.tu-berlin.de/repos/public-svn/publications/vspwp/2012/12-03/} before you use the lanes module to understand effects on the queue model.
+
+\subsection{Configuration}
+
+To use lanes make sure that the following parameters are set
+
+\begin{verbatim}
+<module name="controler" >	
+	...
+	<param name="enableLinkToLinkRouting" value="true" />
+	<param name="mobsim" value="qsim" />
+	...
+</module>
+
+<module name="qsim" >
+	...
+	<param name="numberOfThreads" value="1" />
+	...
+</module>
+
+<module name="scenario" >
+	...
+	<param name="useLanes" value="true" />
+	...
+</module>
+
+<module name="network" >
+	...
+	<param name="laneDefinitionsFile" value="PATH TO FILE" />
+	...
+</module>
+\end{verbatim}
+
+\subsection{Capacity interpretation of lanes}
+
+In principle a lane is similar to the representation of a link in the queue model. 
+
+The (exit) flow capacity of a lane is:
+
+\begin{verbatim}
+capacity_value_of_lane / flow_capacity_factor
+\end{verbatim}
+
+where
+\begin{itemize}
+	\item the capacity value of the lane is given in the laneDefinitions\_v2.0.xsd compatible input file
+	\item the flow capacity factor is given in the qsim config group
+\end{itemize}
+
+The storage capacity of a lane is
+
+\begin{verbatim}
+(length_of_lane * no_of_represented_lanes / effective_cell_size) * storage_capacity_factor
+\end{verbatim}
+
+where
+\begin{itemize}
+	\item the length of the lane is calculated by the value of the \verb$<startsAt meterFromLinkEnd=10 />$ element within the \verb$<lane>$ element of the laneDefinitions\_v2.0.xsd file format. \\
+		\begin{itemize}
+			\item If the lane ends at the end of the link, its length is simply the \verb$meterFromLinkEnd$ value
+			\item If the lane leads to other downstream lanes, its length is calculated from the distance between the position on the link the downstream lanes start from and the \verb$meterFromLinkEnd$ value of the lane. 
+		\end{itemize}
+	\item the number of represented lanes is the value of the \verb$number$ attribute of the  \verb$<representedLanes>$ element of the laneDefinitions\_v2.0.xsd file format.
+	\item the storage capacity factor is given in the qsim config group
+\end{itemize}
+
 
 \vfill\eject
-\section{"signalsystems". Status: works for vsp}
+\section{"signalsystems". Status: works}
 
 \textbf{Maintainer:} Dominik Grether
 
