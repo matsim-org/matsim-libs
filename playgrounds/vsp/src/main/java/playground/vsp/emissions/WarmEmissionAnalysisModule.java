@@ -201,8 +201,8 @@ public class WarmEmissionAnalysisModule {
 		
 		double linkLength_km = linkLength / 1000;
 		double travelTime_h = travelTime / 3600;
-		int freeFlowSpeed_kmh = (int) Math.round(freeVelocity * 3.6);
-		int averageSpeed_kmh = (int) Math.round(linkLength_km / travelTime_h);
+		double freeFlowSpeed_kmh = freeVelocity * 3.6;
+		double averageSpeed_kmh = linkLength_km / travelTime_h;
 		
 		double stopGoSpeed_kmh;
 		double efFreeFlow_gpkm;
@@ -241,17 +241,17 @@ public class WarmEmissionAnalysisModule {
 //				vehAttributesNotSpecified.add(personId);
 			}
 			
-			if (averageSpeed_kmh > freeFlowSpeed_kmh){
+			if ((averageSpeed_kmh - freeFlowSpeed_kmh) > 0.){
 				logger.warn("Average speed (" + averageSpeed_kmh + " kmh) is somehow higher than free flow speed (" + freeFlowSpeed_kmh + " kmh); please check consistency of your scenario!");
 				logger.info("Setting average speed for emission calculation to free flow speed...");
 				averageSpeed_kmh = freeFlowSpeed_kmh;
 //				throw new RuntimeException("Average speed is higher than free flow speed; this might produce negative warm emissions. Aborting...");
 			}
-			if(averageSpeed_kmh == freeFlowSpeed_kmh) {
+			if((averageSpeed_kmh - freeFlowSpeed_kmh) > -1.) { // both speeds are assumed to be not very different > only freeFlow on link
 				generatedEmissions = linkLength_km * efFreeFlow_gpkm;
 				freeFlowCounter++;
 				freeFlowKmCounter = freeFlowKmCounter + linkLength_km;
-			} else if (averageSpeed_kmh <= stopGoSpeed_kmh) {
+			} else if ((averageSpeed_kmh - stopGoSpeed_kmh) <= 0.) { // averageSpeed is less than stopGoSpeed > only stop&go on link
 				generatedEmissions = linkLength_km * efStopGo_gpkm;
 				stopGoCounter++;
 				stopGoKmCounter = stopGoKmCounter + linkLength_km;
