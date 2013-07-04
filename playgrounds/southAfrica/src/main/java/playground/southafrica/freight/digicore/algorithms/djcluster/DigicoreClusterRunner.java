@@ -105,7 +105,7 @@ public class DigicoreClusterRunner {
 		log.info(" Reading points to cluster...");
 		DigicoreClusterRunner dcr = new DigicoreClusterRunner(numberOfThreads);
 		try {
-			dcr.buildMinorPointLists(sourceFolder, shapefile, idField);
+			dcr.buildPointLists(sourceFolder, shapefile, idField);
 		} catch (IOException e) {
 			throw new RuntimeException("Could not build minor points list.");
 		}
@@ -121,6 +121,13 @@ public class DigicoreClusterRunner {
 
 		for(double thisRadius : radii){
 			for(int thisPmin : pmins){
+				/* Just write some indication to the log file as to what we're 
+				 * busy with at this point in time. */
+				log.info("================================================================================");
+				log.info("Executing clustering for radius " + thisRadius + ", and pmin of " + thisPmin);
+				log.info("================================================================================");
+				
+				
 				/* Create configuration-specific filenames. */
 				String outputFolder = String.format("%s%.0f_%d/", outputFolderName, thisRadius, thisPmin);
 				String theFacilityFile = outputFolder + String.format("%.0f_%d_facilities.xml.gz", thisRadius, thisPmin);
@@ -248,7 +255,7 @@ public class DigicoreClusterRunner {
 				for(DigicoreCluster dc : list){
 					Id facilityId = new IdImpl(i++);
 
-					/*TODO Construct the concave hull for the clustered points. */
+					/* Construct the concave hull for the clustered points. */
 					List<ClusterActivity> dcPoints = dc.getPoints();
 					if(dcPoints.size() > 0){
 						GeometryFactory gf = new GeometryFactory();
@@ -276,12 +283,9 @@ public class DigicoreClusterRunner {
 							log.debug("Facility " + facilityId.toString() + " is not added. Hull is an empty geometry!");
 						}
 					}
-
 								
 					/*TODO If we want to, we need to write all the cluster members out to file HERE. 
 					 * Update (20130627): Or, rather write out the concave hull. */
-					
-					
 					
 					/* First, remove duplicate points. 
 					 * TODO Consider the UniqueCoordinateArrayFilter class from vividsolutions.*/
@@ -320,18 +324,17 @@ public class DigicoreClusterRunner {
 		facilities.printFacilitiesCount();	
 	}
 
-	
-	
 
 	/**
-	 * Reads `minor' activities from extracted Digicore vehicle files in a (possibly)
-	 * multi-threaded manner. 
+	 * Reads all activities from extracted Digicore vehicle files in a (possibly)
+	 * multi-threaded manner. This used to only read in 'minor' points, but since
+	 * July 2013, it now reads in <i>all</i> activity types.
 	 * @param sourceFolder
 	 * @param shapefile
 	 * @param idField
 	 * @throws IOException
 	 */
-	private void buildMinorPointLists(String sourceFolder, String shapefile, int idField) throws IOException {
+	private void buildPointLists(String sourceFolder, String shapefile, int idField) throws IOException {
 		MyMultiFeatureReader mfr = new MyMultiFeatureReader();
 		mfr.readMultizoneShapefile(shapefile, idField);
 		List<MyZone> zoneList = mfr.getAllZones();

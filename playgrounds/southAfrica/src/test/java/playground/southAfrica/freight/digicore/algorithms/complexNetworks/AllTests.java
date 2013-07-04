@@ -1,4 +1,3 @@
-package playground.southAfrica.freight.digicore.containers;
 /* *********************************************************************** *
  * project: org.matsim.*
  * AllTests.java
@@ -19,19 +18,20 @@ package playground.southAfrica.freight.digicore.containers;
  *                                                                         *
  * *********************************************************************** */
 
+package playground.southAfrica.freight.digicore.algorithms.complexNetworks;
+
 import junit.framework.Test;
 import junit.framework.TestSuite;
 
 
 public class AllTests {
-	
-	public static Test suite(){
-		TestSuite suite = new TestSuite("All tests for playground.southAfrica.freight.digicore.containers");
 
-		suite.addTestSuite(DigicoreActivityTest.class);
-		suite.addTestSuite(DigicoreChainTest.class);
-		suite.addTestSuite(DigicoreNetworkTest.class);
-		suite.addTestSuite(DigicoreVehicleTest.class);
+	public static Test suite(){
+		TestSuite suite = new TestSuite("All tests for playground.southAfrica.freight.digicore.algorithms.complexNetworks");
+		
+		suite.addTestSuite(DigicoreNetworkBuilderTest.class);
+		suite.addTestSuite(DigicoreNetworkWriterTest.class);
+		suite.addTestSuite(DigicoreNetworkParserTest.class);
 		
 		return suite;
 	}

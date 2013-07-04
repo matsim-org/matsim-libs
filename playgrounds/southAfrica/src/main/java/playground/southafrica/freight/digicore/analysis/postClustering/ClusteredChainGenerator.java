@@ -24,7 +24,10 @@ import playground.southafrica.freight.digicore.algorithms.djcluster.HullConverte
 import playground.southafrica.freight.digicore.containers.DigicoreFacility;
 import playground.southafrica.utilities.FileUtils;
 import playground.southafrica.utilities.Header;
+import playground.southafrica.utilities.containers.MyZone;
+import playground.southafrica.utilities.gis.MyMultiFeatureReader;
 
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
@@ -65,20 +68,38 @@ public class ClusteredChainGenerator {
 		String inputVehicleFolder = args[0];
 		String inputFacilityFolder = args[1];
 		int nThreads = Integer.parseInt(args[2]);
+		String shapefile = args[3];
+		int idField = Integer.parseInt(args[4]);
 		
 		/* These values should be set following Quintin's Design-of-Experiment inputs. */
 		double[] radii = {30, 25, 20, 15, 10};
 		int[] pmins = {5, 10, 15, 20, 25};
 
+		/* Read the study area from shapefile. This is necessary as we
+		 * only want to retain xml files of vehicles that performed at
+		 * least one activity in the study area. */
+		MyMultiFeatureReader mfr = new MyMultiFeatureReader();
+		mfr.readMultizoneShapefile(shapefile, idField);
+		List<MyZone> zones = mfr.getAllZones();
+		if(zones.size() > 1){
+			log.warn("The read shapefile contains multiple zones. Only the first will be used as study area.");
+		}
+		Geometry studyArea = zones.get(0);
+		
 		for(double thisRadius : radii){
 			for(int thisPmin : pmins){
+				/* Just write some indication to the log file as to what we're 
+				 * busy with at this point in time. */
+				log.info("================================================================================");
+				log.info("Executing chain modification for radius " + thisRadius + ", and pmin of " + thisPmin);
+				log.info("================================================================================");
+
 				/* Set configuration-specific filenames, */
 				String facilityFile = String.format("%s%.0f_%d/%.0f_%d_facilities.xml.gz", inputFacilityFolder, thisRadius, thisPmin, thisRadius, thisPmin);
 				String facilityAttributeFile = String.format("%s%.0f_%d/%.0f_%d_facilityAttributes.xml.gz", inputFacilityFolder, thisRadius, thisPmin, thisRadius, thisPmin);
 				String xml2Folder = String.format("%s%.0f_%d/xml2/", inputFacilityFolder, thisRadius, thisPmin);
 				
 				ClusteredChainGenerator ccg = new ClusteredChainGenerator();
-				
 				
 				/* Read facility attributes. */
 				ObjectAttributes oa = new ObjectAttributes();
@@ -88,14 +109,11 @@ public class ClusteredChainGenerator {
 				oar.putAttributeConverter(Polygon.class, new HullConverter());
 				oar.parse(facilityAttributeFile);
 				
-				/*FIXME There are still facilities with a hull that is NOT of 
-				 * type geometry. Clean them before running.*/
-				
 				/* Build facility QuadTree. */
 				QuadTree<DigicoreFacility> facilityTree = ccg.buildFacilityQuadTree(facilityFile, facilityAttributeFile);
 				
 				/* Run through vehicle files to reconstruct the chains */
-				ccg.reconstructChains(facilityTree, oa, inputVehicleFolder, xml2Folder, nThreads);
+				ccg.reconstructChains(facilityTree, oa, inputVehicleFolder, xml2Folder, nThreads, studyArea);
 			}
 		}
 		
@@ -126,13 +144,13 @@ public class ClusteredChainGenerator {
 	
 	public void reconstructChains(
 			QuadTree<DigicoreFacility> facilityTree, ObjectAttributes facilityAttributes, 
-			String inputFolder, String outputFolder, int nThreads) throws IOException {
+			String inputFolder, String outputFolder, int nThreads, Geometry studyArea) throws IOException {
 		long startTime = System.currentTimeMillis();
 		
 		/* Check if the output folder exists, and delete if it does. */
 		File folder = new File(outputFolder);
 		if(folder.exists()){
-			log.warn("The output folder exixts and will be edeleted.");
+			log.warn("The output folder exists and will be deleted.");
 			log.warn("  --> " + folder.getAbsolutePath());
 			FileUtils.delete(folder);
 		}
@@ -143,10 +161,10 @@ public class ClusteredChainGenerator {
 
 		/* Execute the multi-threaded jobs. */
 		ExecutorService threadExecutor = Executors.newFixedThreadPool(nThreads);
-		Counter threadCounter = new Counter("   Vehicles completed: ");
+		Counter threadCounter = new Counter("   vehicles completed: ");
 		
 		for(File vehicleFile : vehicleList){
-			RunnableChainReconstructor rcr = new RunnableChainReconstructor(vehicleFile, facilityTree, facilityAttributes, threadCounter, outputFolder);
+			RunnableChainReconstructor rcr = new RunnableChainReconstructor(vehicleFile, facilityTree, facilityAttributes, threadCounter, outputFolder, studyArea);
 			threadExecutor.execute(rcr);
 		}
 		

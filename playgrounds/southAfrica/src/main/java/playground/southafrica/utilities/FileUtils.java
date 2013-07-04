@@ -1,5 +1,6 @@
 package playground.southafrica.utilities;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
@@ -11,6 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.utils.io.IOUtils;
 
 public class FileUtils {
 	private final static Logger LOG = Logger.getLogger(FileUtils.class);
@@ -114,6 +118,46 @@ public class FileUtils {
 		}
 		LOG.info("File sampling complete.");
 		return result;
+	}
+	
+	
+	/**
+	 * Reads a given file and parses a {@link List} of {@link Id}s from the file.
+	 * It is assumed that the file contains <i>NO HEADER</i> row, and each row 
+	 * contains a single Id. No validation is done on the {@link Id}s, <i><b>so
+	 * make sure you read in the file you really want!</b></i>. The file may be
+	 * compressed as the parsing will uncompress on the fly. 
+	 * @param filename
+	 * @return {@link List}<{@link Id}>.
+	 */
+	public static List<Id> readIds(String filename){
+		LOG.info("Reading Ids from file " + filename);
+		List<Id> list = new ArrayList<Id>();
+		
+		BufferedReader br = IOUtils.getBufferedReader(filename);
+		try{
+			String line = null;
+			while((line = br.readLine()) != null){
+				if(line.contains(" ")){
+					LOG.error("The id `" + line + "' contains whitespaces and will result in a corrupted Id. Line will be ignored.");
+				} else{
+					list.add(new IdImpl(line));
+				}
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Could not read from BufferedReader " + filename);
+		} finally{
+			try {
+				br.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Could not close the BufferedReader " + filename);
+			}
+		}
+		
+		LOG.info("Read " + list.size() + " Ids.");
+		return list;
 	}
 
 

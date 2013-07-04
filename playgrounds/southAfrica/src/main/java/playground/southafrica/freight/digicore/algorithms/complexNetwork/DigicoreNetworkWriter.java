@@ -92,6 +92,7 @@ public class DigicoreNetworkWriter {
 		log.info("Writing network to " + filename);
 		BufferedWriter bw = IOUtils.getBufferedWriter(filename);
 		
+		/* Write the nodes/vertices. */
 		log.info("  Writing nodes (" + network.getVertexCount() + ")");
 		Counter nodeCounter = new Counter("   nodes: ");
 		bw.write("NODES");
@@ -106,6 +107,7 @@ public class DigicoreNetworkWriter {
 		}
 		nodeCounter.printCounter();
 		
+		/* Write the arcs/edges. */
 		log.info("  Writing arcs (" + network.getEdgeCount() + ")");
 		Counter arcCounter = new Counter("   arcs: ");
 		bw.write("ARCS");

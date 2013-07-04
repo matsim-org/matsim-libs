@@ -20,7 +20,9 @@
 
 package playground.southafrica.freight.digicore.containers;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -43,6 +45,8 @@ import edu.uci.ics.jung.graph.util.Pair;
 public class DigicoreNetwork extends DirectedSparseGraph<Id, Pair<Id>>{
 	private final Logger LOG = Logger.getLogger(DigicoreNetwork.class);
 	
+	private List<String> activityTypes;
+	
 	private Map< Tuple<Pair<Id>, Pair<String>>, Integer> weights 
 		= new HashMap<Tuple<Pair<Id>,Pair<String>>, Integer>();
 	
@@ -60,7 +64,7 @@ public class DigicoreNetwork extends DirectedSparseGraph<Id, Pair<Id>>{
 	private static final long serialVersionUID = 1L;
 	
 	public DigicoreNetwork() {
-
+		this.activityTypes = new ArrayList<String>();
 	}
 	
 
@@ -88,6 +92,14 @@ public class DigicoreNetwork extends DirectedSparseGraph<Id, Pair<Id>>{
 		if(!this.containsVertex(destination.getFacilityId())){
 			this.addVertex(destination.getFacilityId());
 			this.coord.put(destination.getFacilityId(), destination.getCoord());
+		}
+		
+		/* Check if both the origin and destination activity types are already recorded. */
+		if(!this.activityTypes.contains(origin.getType())){
+			this.activityTypes.add( origin.getType() );
+		}
+		if(!this.activityTypes.contains( destination.getType() )){
+			this.activityTypes.add( destination.getType() );
 		}
 		
 		/* Add the edge with weight 1 if it does not exist yet, otherwise 
@@ -122,23 +134,6 @@ public class DigicoreNetwork extends DirectedSparseGraph<Id, Pair<Id>>{
 	
 		
 	/**
-	 * Gets the weight of the directed edge.
-	 * @param origin
-	 * @param destination
-	 * @return the weight of the directed edge, or 0 if the edge is not in the graph.
-	 */
-	public int getEdgeWeight(Id origin, Id destination){
-		Id[] ia = {origin, destination};
-		Pair<Id> p = new Pair<Id>(ia);
-		if(!this.getEdges().contains(p)){
-			return 0;
-		} else{
-			return this.getWeights().get(p);
-		}
-	}
-	
-	
-	/**
 	 * Determines the minimum and maximum edge weights. Returns [0,0] if the graph
 	 * has no edges.
 	 * @return
@@ -161,6 +156,44 @@ public class DigicoreNetwork extends DirectedSparseGraph<Id, Pair<Id>>{
 
 	public Map<Tuple<Pair<Id>, Pair<String>>, Integer> getWeights(){
 		return this.weights;
+	}
+	
+	
+	public int getMultiplexEdgeWeight(Id oId, String oType, Id dId, String dType){
+		Pair<Id> idPair = new Pair<Id>(oId, dId);
+		Pair<String> typePair = new Pair<String>(oType, dType);
+		Tuple<Pair<Id>, Pair<String>> tuple = new Tuple<Pair<Id>, Pair<String>>(idPair, typePair);
+		
+		if(this.weights.containsKey(tuple)){
+			return this.weights.get(tuple);
+		} else {
+			return 0;
+		}
+	}
+	
+	
+	/**
+	 * Gets the weight of the directed edge. All possible activity type
+	 * combinations are added together. In a multiplex network, you may 
+	 * want to get the weight for each activity type combination uniquely,
+	 * then rather use the method {@link #getMultiplexEdgeWeight(Id, String, Id, String)}
+	 * @param origin
+	 * @param destination
+	 * @return the weight of the directed edge, or 0 if the edge is not in the graph.
+	 */
+	public int getEdgeWeight(Id oId, Id dId){
+		int totalWeight = 0;
+		for(int i = 0; i < this.activityTypes.size(); i++){
+			for(int j = 0; j < this.activityTypes.size(); j++){
+				totalWeight += this.getMultiplexEdgeWeight(oId, this.activityTypes.get(i), dId, this.activityTypes.get(j));
+			}
+		}
+		return totalWeight;
+	}
+	
+	
+	public List<String> getActivityTypes(){
+		return this.activityTypes;				
 	}
 	
 	

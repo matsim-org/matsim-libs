@@ -67,10 +67,10 @@ public class DigicoreVehicleWriterHandlerImpl_v1 implements
 		out.write("\t\t\tx=\"" + String.format("%.2f", activity.getCoord().getX()) + "\"");
 		out.write(" y=\"" + String.format("%.2f", activity.getCoord().getY()) + "\"");
 		if(activity.getFacilityId() != null){
-			out.write(" facilityId=\"" + activity.getFacilityId().toString() + "\"");
+			out.write(" facility=\"" + activity.getFacilityId().toString() + "\"");
 		}
 		if(activity.getLinkId() != null){
-			out.write(" linkId=\"" + activity.getLinkId().toString() + "\"");
+			out.write(" link=\"" + activity.getLinkId().toString() + "\"");
 		}
 	}
 

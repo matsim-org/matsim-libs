@@ -1,11 +1,10 @@
-package playground.southAfrica.freight.digicore.containers;
 /* *********************************************************************** *
  * project: org.matsim.*
- * AllTests.java
+ * DigicoreActivityTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,21 +18,15 @@ package playground.southAfrica.freight.digicore.containers;
  *                                                                         *
  * *********************************************************************** */
 
-import junit.framework.Test;
-import junit.framework.TestSuite;
+package playground.southAfrica.freight.digicore.containers;
 
+import org.matsim.testcases.MatsimTestCase;
 
-public class AllTests {
+public class DigicoreVehicleTest extends MatsimTestCase{
 	
-	public static Test suite(){
-		TestSuite suite = new TestSuite("All tests for playground.southAfrica.freight.digicore.containers");
-
-		suite.addTestSuite(DigicoreActivityTest.class);
-		suite.addTestSuite(DigicoreChainTest.class);
-		suite.addTestSuite(DigicoreNetworkTest.class);
-		suite.addTestSuite(DigicoreVehicleTest.class);
-		
-		return suite;
+	public void testConstructor(){
+		//TODO Finish
 	}
 
 }
+

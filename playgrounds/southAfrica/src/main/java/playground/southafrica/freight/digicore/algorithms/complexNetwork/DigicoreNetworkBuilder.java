@@ -1,6 +1,5 @@
 package playground.southafrica.freight.digicore.algorithms.complexNetwork;
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -9,7 +8,6 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 
 import playground.southafrica.freight.digicore.algorithms.djcluster.DigicoreClusterRunner;
@@ -27,6 +25,8 @@ import playground.southafrica.utilities.Header;
 public class DigicoreNetworkBuilder {
 	private final static Logger LOG = Logger.getLogger(DigicoreNetworkBuilder.class);
 	private DigicoreNetwork network;
+	private long buildStartTime;
+	private long buildStopTime;
 
 	
 	/**
@@ -39,17 +39,12 @@ public class DigicoreNetworkBuilder {
 	 * @param args the following arguments to be provided, and in the following 
 	 * 		order:
 	 * 	<ol>
-	 * 		<li> absolute path of the folder containing the {@link DigicoreVehicle}
-	 * 			 files, i.e. XML files;
-	 * 		<li> the absolute path of the graph's output file;
-	 * 		<li> the absolute path of the graph vertices' order output file;
-	 * 	    <li> the absolute path of the file containing the vehicle {@link Id}s
-	 * 			 for which the network must be built. If "null", then all vehicle
-	 * 			 files will be used to create the network. (Note: currently MUST
-	 *           be null - JWJ 20130702)
-	 * 		<li> boolean indicating <code>true</code> if only activities with a
-	 * 			 facility {@link Id} must be considered as nodes, <code>false</code>
-	 * 		  	 otherwise.
+	 * 		<li> absolute path of the folder containing the clustering analysis. 
+	 * 	         Since the clustering parameters influence the facilities, which
+	 * 			 in turn influences the complex network structure, we need to build
+	 * 			 the complex network(s) for a specific set of clustering parameters.
+	 * 			 Inside each clustering parameter configuration there should be a 
+	 * 			 folder titled `xml2' containing the {@link DigicoreVehicle} files;
 	 * 		<li> (optional) {@link Id} of a {@link DigicoreFacility} on which the
 	 * 			 chains will be filtered. Only necessary, for example, when you
 	 * 			 only want to build the network graph using chains that passed 
@@ -73,78 +68,97 @@ public class DigicoreNetworkBuilder {
 		
 		String inputfolder = args[0];
 		
-		DigicoreNetworkBuilder dfgb = new DigicoreNetworkBuilder();
+		/* These values should be set following Quintin's Design-of-Experiment inputs. */
+		double[] radii = {30, 25, 20, 15, 10};
+		int[] pmins = {5, 10, 15, 20, 25};
 
-		/* Determine which vehicles must be used to build the network. */
-		/* FIXME Change FileUtils to only sample files for a given list of 
-		 * vehicle Ids. */
-		List<File> fileList = FileUtils.sampleFiles(new File(inputfolder), Integer.MAX_VALUE, FileUtils.getFileFilter(".xml.gz"));
-			
-		boolean cleanNetwork = Boolean.parseBoolean(args[4]);
-		
-		/* Checks if a filter facility is provided. */
-		Object filter = null;
-		if(args.length > 5){
-			File f = new File(args[5]);
+		/* Checks if a filter facility is provided. Either as a readable file,
+		 * or as sequential Id arguments. */
+		List<Id> filter = null;
+		if(args.length > 1){
+			File f = new File(args[1]);
 			if(f.exists() && f.canRead() && f.isFile()){
-				filter = dfgb.readFilterList(f.getAbsolutePath());
+				filter = FileUtils.readIds(f.getAbsolutePath());
 			} else{
-				if(args[5].length() > 0){
-					filter = new IdImpl(args[4]);									
+				filter = new ArrayList<Id>();
+				int numberOfIdArguments = 0;
+				for(int i = 1; i < args.length; i++){
+					filter.add(new IdImpl(args[i]));
+					numberOfIdArguments++;
+				}
+				LOG.info("Read " + numberOfIdArguments + " Ids from arguments.");
+			}
+		}
+
+		/* Build the networks for all configurations. */
+		for(double thisRadius : radii){
+			for(int thisPmin : pmins){
+				/* Just write some indication to the log file as to what we're 
+				 * busy with at this point in time. */
+				LOG.info("================================================================================");
+				LOG.info("Executing complex network building for radius " + thisRadius + ", and pmin of " + thisPmin);
+				LOG.info("================================================================================");
+				
+				/* Determine configuration-specific filenames. */
+				String xmlFolder = String.format("%s%.0f_%d/xml2/", inputfolder, thisRadius, thisPmin);
+				String networkFile = String.format("%s%.0f_%d/%.0f_%d_network.txt", inputfolder, thisRadius, thisPmin, thisRadius, thisPmin);
+				String networkOrderFile = String.format("%s%.0f_%d/%.0f_%d_networkOrder.txt", inputfolder, thisRadius, thisPmin, thisRadius, thisPmin);
+				
+				/* Get the list of vehicles to use. */
+				List<File> fileList = FileUtils.sampleFiles(new File(xmlFolder), Integer.MAX_VALUE, FileUtils.getFileFilter(".xml.gz"));
+				
+				DigicoreNetworkBuilder dfgb = new DigicoreNetworkBuilder();
+				
+				dfgb.buildNetwork(filter, fileList);
+
+				/* Write the output. */
+				DigicoreNetworkWriter dnw = new DigicoreNetworkWriter(dfgb.getNetwork());
+				try {
+					dnw.writeNetwork(networkFile, false);
+				} catch (IOException e) {
+					LOG.error(e.getMessage());
+					LOG.error("Couldn't write network.");
+				}
+				try {
+					dnw.writeGraphOrderToFile(networkOrderFile);
+				} catch (IOException e) {
+					LOG.error("Couldn't write network order.");
 				}
 			}
 		}
+				
+		Header.printFooter();
+	}
+
+
+	public void buildNetwork(List<Id> filter, List<File> fileList) {
+		LOG.info("Building network... number of vehicle files to process: " + fileList.size());
+		this.buildStartTime = System.currentTimeMillis();
 		
-		LOG.info(" Total number of files to process: " + fileList.size());
-		Counter xmlCounter = new Counter("   Vehicles completed: ");
-		int dummyCounter = 0;
+		Counter xmlCounter = new Counter("   vehicles completed: ");
 		for(File f : fileList){
+			/* Read the vehicle file. */
 			DigicoreVehicleReader_v1 dvr = new DigicoreVehicleReader_v1();
 			dvr.parse(f.getAbsolutePath());
 			DigicoreVehicle dv = dvr.getVehicle();
+			
+			/* Process vehicle's activities. */
 			for(DigicoreChain dc : dv.getChains()){
-				if( dfgb.checkChain(dc, filter) ){
+				if( this.checkChain(dc, filter) ){
 					for(int i = 0; i < dc.size() - 1; i++){
 						DigicoreActivity origin = dc.getAllActivities().get(i);
 						DigicoreActivity destination = dc.getAllActivities().get(i+1);
-						if(cleanNetwork){
-							if(origin.getFacilityId() != null && destination.getFacilityId() != null){
-								dfgb.network.addArc(origin, destination);
-							}
-						} else{
-							/* Build a network from ALL links, not just between `interesting' facilities, i.e.
-							 * those that were clustered into formal facilities.
-							 */
-							Id originId = origin.getFacilityId() != null ? origin.getFacilityId() : new IdImpl("d" + dummyCounter++);
-							Id destinationId = destination.getFacilityId() != null ? destination.getFacilityId() : new IdImpl("d" + dummyCounter++);
-							origin.setFacilityId(originId);
-							destination.setFacilityId(destinationId);
-							dfgb.network.addArc(origin, destination);
+						if(origin.getFacilityId() != null && destination.getFacilityId() != null){
+							this.network.addArc(origin, destination);
 						}
-					}						
-				}
+					}
+				}						
 			}
 			xmlCounter.incCounter();
 		}
 		xmlCounter.printCounter();
-		dfgb.writeGraphStatistics();
-		
-
-		/* Write the output. */
-		DigicoreNetworkWriter dnw = new DigicoreNetworkWriter(dfgb.getNetwork());
-		try {
-			dnw.writeNetwork(args[1], false);
-		} catch (IOException e) {
-			LOG.error(e.getMessage());
-			LOG.error("Couldn't write network.");
-		}
-//		try {
-//			dnw.writeGraphOrderToFile(args[2]);
-//		} catch (IOException e) {
-//			LOG.error("Couldn't write network order.");
-//		}
-		
-		Header.printFooter();
+		this.buildStopTime = System.currentTimeMillis();
+		this.writeGraphStatistics();
 	}
 	
 	
@@ -164,21 +178,18 @@ public class DigicoreNetworkBuilder {
 	 * 			 of a list of {@link DigicoreFacility}s.
 	 * @param chain
 	 * @param filter
-	 * @return
+	 * @return <code>true</code> if the chain contains facilities of interest, 
+	 * 		   <code>false</code> otherwise.
 	 */
-	public boolean checkChain(DigicoreChain chain, Object filter){
+	public boolean checkChain(DigicoreChain chain, List<Id> filter){
 		boolean check = false;
 		if(filter == null){
 			check = true;
-		} else if(filter instanceof Id){
-			check = chain.containsFacility((Id) filter);
-		} else if(filter instanceof List<?>){
-			@SuppressWarnings("unchecked")
-			List<Id> list = (List<Id>)filter;
+		} else {
 			boolean found = false;
 			int i = 0;
-			while(!found && i < list.size()){
-				found = chain.containsFacility(list.get(i));
+			while(!found && i < filter.size()){
+				found = chain.containsFacility(filter.get(i));
 				i++;
 			}
 			check = found;
@@ -186,55 +197,36 @@ public class DigicoreNetworkBuilder {
 		return check;
 	}
 	
+	
 	public DigicoreNetwork getNetwork(){
 		return this.network;
 	}	
 
 	
-	public List<Id> readFilterList(String filename){
-		List<Id> list = new ArrayList<Id>();
-		BufferedReader br = IOUtils.getBufferedReader(filename);
-		try{
-			String line = null;
-			while((line = br.readLine()) != null){
-				if(line.contains(" ")){
-					throw new IllegalArgumentException("Id contains spaces!! Not allowed.");
-				}
-				list.add(new IdImpl(line));
-			}
-		} catch (IOException e) {
-			throw new RuntimeException("IOException when reading from " + filename);
-		} finally{
-			try {
-				br.close();
-			} catch (IOException e) {
-				throw new RuntimeException("IOException when closing BufferedReader " + filename);
-			}
-		}
-		
-		return list;
-	}
-	
-	
-	
+	/** 
+	 * Writing some predetermined statistics regarding the network, and the 
+	 * time taken to build the network. Current statistics include:
+	 * <ul>
+	 * 		<li> number of arcs;
+	 * 		<li> number of vertices;
+	 * 		<li> graph density;
+	 * 		<li> minimum edge weight;
+	 * 		<li> maximum edge weight;
+	 * 		<li> time (in seconds) required to build the network.
+	 * </ul> */
 	public void writeGraphStatistics(){
 		LOG.info(" Preparing statistics...");
 		
 		int[] minMax = this.getNetwork().getMinMaxEdgeWeights();
 				
 		LOG.info("---------------------  Graph statistics  -------------------");
-		LOG.info("      Number of arcs: " + network.getEdgeCount());
-		LOG.info("  Number of vertices: " + network.getVertexCount());
-		LOG.info("             Density: " + String.format("%01.6f", this.getNetwork().getDensity()));
-		LOG.info(" Minimum edge weight: " + minMax[0]);
-		LOG.info(" Maximum edge weight: " + minMax[1]);
+		LOG.info("         Number of arcs: " + network.getEdgeCount());
+		LOG.info("     Number of vertices: " + network.getVertexCount());
+		LOG.info("                Density: " + String.format("%01.6f", this.getNetwork().getDensity()));
+		LOG.info("    Minimum edge weight: " + minMax[0]);
+		LOG.info("    Maximum edge weight: " + minMax[1]);
+		LOG.info(" Network build time (s): " + String.format("%.2f", ((double)this.buildStopTime - (double)this.buildStartTime)/1000));
 		LOG.info("------------------------------------------------------------");
 	}
 	
-	
-	
-		
-	
-	
-
 }
