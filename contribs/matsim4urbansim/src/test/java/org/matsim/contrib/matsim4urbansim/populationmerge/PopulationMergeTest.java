@@ -41,6 +41,7 @@ import org.matsim.contrib.matsim4urbansim.utils.io.ReadFromUrbanSimModel;
 import org.matsim.contrib.matsim4urbansim.utils.io.ReadFromUrbanSimModel.PopulationCounter;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.population.PersonImpl;
@@ -64,7 +65,7 @@ public class PopulationMergeTest extends MatsimTestCase{
 	private static final double radius = 100.;
 	
 	@Test
-	public void testPopulationMergeZoneColdStart(){
+	public void testPopulationMergeZoneColdStart(Config config){
 		
 		log.info("Testing merge process of new and old population for cold start (zones)");
 		
@@ -72,7 +73,7 @@ public class PopulationMergeTest extends MatsimTestCase{
 		
 		// create dummy persons
 		Population oldPop = null;
-		PopulationCounter counter = runTestZone(oldPop, zones);
+		PopulationCounter counter = runTestZone(oldPop, zones, config);
 		
 		TempDirectoryUtil.cleaningUpOPUSDirectories();
 		
@@ -96,6 +97,7 @@ public class PopulationMergeTest extends MatsimTestCase{
 		ActivityFacilitiesImpl zones = createZones();
 		
 		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario( ConfigUtils.createConfig() );
+		Config config = scenario.getConfig() ;
 		
 		// create dummy persons
 		Population oldPop = scenario.getPopulation();
@@ -146,7 +148,7 @@ public class PopulationMergeTest extends MatsimTestCase{
 		oldPop.addPerson(person5);
 		oldPop.addPerson(person6);
 		
-		PopulationCounter counter = runTestZone(oldPop, zones);
+		PopulationCounter counter = runTestZone(oldPop, zones, config);
 		
 		TempDirectoryUtil.cleaningUpOPUSDirectories();
 		
@@ -173,10 +175,10 @@ public class PopulationMergeTest extends MatsimTestCase{
 		return zones;
 	}
 	
-	private PopulationCounter runTestZone(Population oldPop, ActivityFacilitiesImpl zones){
+	private PopulationCounter runTestZone(Population oldPop, ActivityFacilitiesImpl zones, Config config){
 		
 		// creates necessary folder structure (OPUS_HOME)
-		TempDirectoryUtil.createOPUSDirectories();
+		TempDirectoryUtil.createOPUSDirectories(config);
 		// create dummy network
 		Network network = CreateTestNetwork.createTestNetwork();
 		// dump new dummy population zone 

@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import org.apache.log4j.Logger;
 import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
 import org.matsim.contrib.matsim4urbansim.utils.io.Paths;
+import org.matsim.core.config.Config;
 
 
 
@@ -150,8 +151,9 @@ public class TempDirectoryUtil {
 	
 	/**
 	 * create new temp directories. these will be deleted after each test run.
+	 * @param config TODO
 	 */
-	public static void createOPUSDirectories(){
+	public static void createOPUSDirectories(Config config){
 		log.info("Creating temp directories");
 		
 		// set temp directory as opus_home
