@@ -37,8 +37,8 @@ public class SVDValuesAsObjAttrReader {
 		this.personIds = personIds;
 	}
 	
-	protected Map <Id, SVDvalues> readFile(final String svdSolutionFile){
-		Map <Id, SVDvalues> svdMap = new TreeMap <Id, SVDvalues>();
+	protected Map <Id, IndividualPreferences> readFile(final String svdSolutionFile){
+		Map <Id, IndividualPreferences> svdMap = new TreeMap <Id, IndividualPreferences>();
 		
 		ObjectAttributes attributes = new ObjectAttributes();
 		ObjectAttributesXmlReader reader = new ObjectAttributesXmlReader(attributes);
@@ -53,7 +53,7 @@ public class SVDValuesAsObjAttrReader {
 			double wTime = ((Double) attributes.getAttribute(strId, STR_wTime)).doubleValue();
 			double wDista = ((Double) attributes.getAttribute(strId, STR_wDista)).doubleValue();
 			double wChng = ((Double) attributes.getAttribute(strId, STR_wChng)).doubleValue();
-			SVDvalues svdValues = new SVDvalues(id, wWalk, wTime, wDista, wChng); 
+			IndividualPreferences svdValues = new IndividualPreferences(id, wWalk, wTime, wDista, wChng); 
 			svdMap.put(id, svdValues);
 		}
 		return svdMap;

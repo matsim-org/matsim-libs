@@ -22,10 +22,9 @@ package playground.mmoyo.taste_variations;
 import java.io.File;
 
 import org.apache.commons.math.linear.Array2DRowRealMatrix;
-import org.apache.commons.math.linear.ArrayRealVector;
 import org.apache.commons.math.linear.DecompositionSolver;
 import org.apache.commons.math.linear.RealMatrix;
-import org.apache.commons.math.linear.RealVector;
+import org.apache.commons.math.linear.SingularValueDecomposition;
 import org.apache.commons.math.linear.SingularValueDecompositionImpl;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -37,6 +36,9 @@ import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlWriter;
+import org.apache.commons.math.linear.QRDecomposition;
+import org.apache.commons.math.linear.QRDecompositionImpl;
+import org.apache.log4j.Logger;
 
 import playground.mmoyo.analysis.tools.PtPlanAnalyzer;
 import playground.mmoyo.analysis.tools.PtPlanAnalyzer.PtPlanAnalysisValues;
@@ -44,19 +46,28 @@ import playground.mmoyo.io.PopSecReader;
 import playground.mmoyo.io.TextFileWriter;
 import playground.mmoyo.utils.DataLoader;
 
-public class MySVDcalculator implements PersonAlgorithm{
+
+public class MyLeastSquareSolutionCalculator implements PersonAlgorithm{
+	private static final Logger log = Logger.getLogger(MyLeastSquareSolutionCalculator.class);
+	
 	PtPlanAnalyzer planAnalizer;
 	private StringBuffer sBuff = new StringBuffer("IdAgent\tBetawalk\tBetainvehTime\tBetaDistance\tBetaTransfer");
 	private ObjectAttributes attrs = new ObjectAttributes() ;
+	final String method;
 	final String TB = "\t";
 	final String NL = "\n";
 	
-	public MySVDcalculator(final Network net, final TransitSchedule schedule){
+	public static final String SVD = "SVD";
+	public static final String QRD = "QRD";
+	
+	
+	public MyLeastSquareSolutionCalculator(final Network net, final TransitSchedule schedule, final String method){
 		planAnalizer = new PtPlanAnalyzer(net, schedule);
+		this.method = method;
 	}
 	
-	public SVDvalues getSVDvalues(final Person person, double [] utilCorrection) {
-		//objective: to create these matrices
+	public IndividualPreferences getSVDvalues(final Person person, final double [] utilCorr_MatrixB) {
+		//objective: to create and  populate these matrices, find solutions for X
 		//						A						X			b
 		//         walk time dist chng     	betas		UtlCorr 	
 		//plan1 ┌ w1   t1   d1   c1 ¬  	┌ ßw¬   	┌λ1¬ 
@@ -65,31 +76,49 @@ public class MySVDcalculator implements PersonAlgorithm{
 		//plan4 └ w4   t4	  d4   c4 ┘		└ ßc ┘	└λ4 ┘
 		
 		int plansNum = person.getPlans().size();
-		if (utilCorrection.length != plansNum){
+		if (utilCorr_MatrixB.length != plansNum){
 			throw new RuntimeException(" Number of plans utility corrections is not the same as the number of agent plans");
 		}
 		
 		//up to now it is hard coded to 4 beta values in matrix X: trWalkTime_sec, trTravelTime_sec, InVehDist_mts, transfers_num  
 		double[][] arrayA = new double [plansNum][4]; 
-		double[] arrayB = new double [utilCorrection.length]; //oder [plansNum]
 		int i = 0;
-		for (Plan plan: person.getPlans()){
+		for (Plan plan: person.getPlans()){   //fill entries of "coefficients" matrix A
 			PtPlanAnalysisValues v = planAnalizer.run(plan);
 			arrayA[i][0] = v.getTransitWalkTime_secs();  //[row][col] 
 			arrayA[i][1] = v.trTravelTime_secs();
-			arrayA[i][2] = v.getInVehDist_mts();
+			arrayA[i][2] = v.getInVehDist_mts();        //it means, does not consider walk distance!
 			arrayA[i][3] = v.getTransfers_num();
-			arrayB[i]= utilCorrection[i];
 			i++;
 		}
-
-		//invoke SVD
-		RealMatrix matrixA = new Array2DRowRealMatrix(arrayA, false);   //"coefficients" matrix
-		DecompositionSolver svd = new SingularValueDecompositionImpl(matrixA).getSolver(); 
-		RealVector utlCorrections = new ArrayRealVector(arrayB, false); //"constants" matrix
-		RealVector solution = svd.solve(utlCorrections);
 		
-		return new SVDvalues (person.getId(), solution.getEntry(0), solution.getEntry(1), solution.getEntry(2), solution.getEntry(3));
+		RealMatrix matrixA = new Array2DRowRealMatrix(arrayA, false);   
+		double[] solution = new double[4];   // <- Warning! hard-coded to 4 travel parameters
+		if(method.equals(SVD)){
+			solution = getSVDsolution (matrixA, utilCorr_MatrixB);
+		}else if (method.equals(QRD)){
+			solution = getQRDsolution (matrixA, utilCorr_MatrixB);
+		}else{
+			log.warn("No least square method was specified, SVD will be used");
+			solution = getSVDsolution (matrixA, utilCorr_MatrixB);
+		}
+		return new IndividualPreferences (person.getId(), solution[0], solution[1], solution[2], solution[3]);
+	}
+	
+	//uses Singular Value Decomposition 	   http://en.wikipedia.org/wiki/SV_decomposition
+	private double[] getSVDsolution (final RealMatrix matrixA,  final double [] arrayB) {
+		SingularValueDecomposition svd = new SingularValueDecompositionImpl(matrixA);
+		DecompositionSolver svdSolver = svd.getSolver(); 
+		double[] arrayX = svdSolver.solve(arrayB); 
+		return arrayX;
+	}
+	
+	//uses QR Decomposition 	    http://en.wikipedia.org/wiki/QR_decomposition
+	private double[] getQRDsolution (final RealMatrix matrixA,  final double [] arrayB) {
+		QRDecomposition qrd = new QRDecompositionImpl(matrixA);
+		DecompositionSolver qrSolver = qrd.getSolver();
+		double[] arrayX = qrSolver.solve(arrayB);
+		return arrayX;
 	}
 	
 	
@@ -99,12 +128,12 @@ public class MySVDcalculator implements PersonAlgorithm{
 	final String strWchng = "wChng";
 	
 	@Override
-	public void run(final Person person) {   //it assumes that the score is the utility correction!
+	public void run(final Person person) {   //Warning! it assumes that the score is the utility correction!
 		double[] scores = new double[person.getPlans().size()];
 		for (int i=0; i<person.getPlans().size() ; i++ ){
 			scores[i] = person.getPlans().get(i).getScore();
 		}
-		SVDvalues svdValues = this.getSVDvalues(person, scores );
+		IndividualPreferences svdValues = this.getSVDvalues(person, scores);
 		sBuff.append(NL + svdValues.getIdAgent() + TB + svdValues.getWeight_trWalkTime() + TB + svdValues.getWeight_trTime() + TB + svdValues.getWeight_trDistance() + TB + svdValues.getWeight_changes());
 		attrs.putAttribute( person.getId().toString() , strWwalk  , svdValues.getWeight_trWalkTime()) ;
 		attrs.putAttribute( person.getId().toString() , strWtime  , svdValues.getWeight_trTime()) ;
@@ -131,14 +160,18 @@ public class MySVDcalculator implements PersonAlgorithm{
 		String netFilePath;
 		String popFilePath;
 		String schdFilePath;
+		String decompMethod;
+		
 		if (args.length>0){
 			popFilePath = args[0];
 			netFilePath = args[1];
 			schdFilePath = args[2];
+			decompMethod = args[3];
 		}else{
-			popFilePath = "../../";   //assumes that the scores are the utility correction
-			netFilePath = "../../";
-			schdFilePath = "../../";
+			popFilePath = "../../input/deleteme2/1000.plans.xml.gz";   //assumes that the scores are the utility correction
+			netFilePath = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/pt_network.xml.gz";
+			schdFilePath = "../../berlin-bvg09/pt/nullfall_berlin_brandenburg/input/pt_transitSchedule.xml.gz";
+			decompMethod = SVD;
 		}
 
 		DataLoader dataLoader = new DataLoader ();
@@ -148,7 +181,7 @@ public class MySVDcalculator implements PersonAlgorithm{
 		
 		final Network net = scn.getNetwork();
 		final TransitSchedule schedule = dataLoader.readTransitSchedule(schdFilePath);
-		MySVDcalculator solver = new MySVDcalculator(net, schedule);
+		MyLeastSquareSolutionCalculator solver = new MyLeastSquareSolutionCalculator(net, schedule, decompMethod);
 		new PopSecReader(scn, solver).readFile(popFilePath);
 		
 		//write solutions file

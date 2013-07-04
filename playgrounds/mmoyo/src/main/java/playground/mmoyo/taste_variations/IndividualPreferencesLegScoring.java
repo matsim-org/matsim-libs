@@ -34,19 +34,21 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import playground.mmoyo.utils.ExpTransRouteUtils;
 
-public class SVDscoring  implements BasicScoring, ScoringFunction {
+public class IndividualPreferencesLegScoring  implements BasicScoring, ScoringFunction {
 	private final Network network;
-	private final SVDvalues svdValues;
+	private final IndividualPreferences svdValues;
 	protected double score;
 	//private static final double INITIAL_SCORE = 0.0;
 	private Plan plan; 
 	private final TransitSchedule schedule;
+	private double scoreWeight =1.0;
 	
-	public SVDscoring(final Plan plan, final SVDvalues svdValues, final Network network, final TransitSchedule schedule) {
+	public IndividualPreferencesLegScoring(final Plan plan, final IndividualPreferences svdValues, final Network network, final TransitSchedule schedule, final double scoreWeight) {
 		this.plan = plan;
 		this.schedule = schedule;
 		this.network = network;
 		this.svdValues = svdValues;
+		this.scoreWeight = scoreWeight;
 	}
 	
 	@Override
@@ -94,7 +96,7 @@ public class SVDscoring  implements BasicScoring, ScoringFunction {
 				lastActType=act.getType();
 			}
 		}
-		score = tmpScore;
+		score = tmpScore * scoreWeight;
 		return score;
 		
 	}

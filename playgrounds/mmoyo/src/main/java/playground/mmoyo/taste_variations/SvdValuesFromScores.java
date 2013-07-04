@@ -75,7 +75,7 @@ public class SvdValuesFromScores {
 		Network net = scnWOpop.getNetwork();
 		matsimNetReader = null;
 		TransitSchedule schedule = loader.readTransitSchedule(config.transit().getTransitScheduleFile());
-		MySVDcalculator solver = new MySVDcalculator(net, schedule);
+		MyLeastSquareSolutionCalculator solver = new MyLeastSquareSolutionCalculator(net, schedule, MyLeastSquareSolutionCalculator.SVD);
 		new PopSecReader(scnWOpop, solver).readFile(popWutlCorr);    //Sequential calculation
 		
 		//write solutions file in the folder where the Corrections File is

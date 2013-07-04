@@ -29,20 +29,22 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 public class SVDScoringfunctionFactory implements ScoringFunctionFactory {
-	private final Map <Id, SVDvalues> svdValuesMap;
+	private final Map <Id, IndividualPreferences> svdValuesMap;
 	private final Network net;
 	private final TransitSchedule schedule;
+	private final double scoreWeight;
 	
-	public SVDScoringfunctionFactory(final Map <Id, SVDvalues> svdValuesMap, final Network net, final TransitSchedule schedule) {
+	public SVDScoringfunctionFactory(final Map <Id, IndividualPreferences> svdValuesMap, final Network net, final TransitSchedule schedule, double scoreWeight ) {
 		this.svdValuesMap = svdValuesMap;
 		this.net = net; 
 		this.schedule = schedule;
+		this.scoreWeight = scoreWeight;
 	}
 	
 	@Override
 	public ScoringFunction createNewScoringFunction(final Plan plan) {
-		final SVDvalues svdValues = svdValuesMap.get(plan.getPerson().getId());
-		ScoringFunction svdScoringFunction = new SVDscoring(plan, svdValues, net, schedule);
+		final IndividualPreferences svdValues = svdValuesMap.get(plan.getPerson().getId());
+		ScoringFunction svdScoringFunction = new IndividualPreferencesLegScoring(plan, svdValues, net, schedule, scoreWeight);
 		return svdScoringFunction;
 	}
 }

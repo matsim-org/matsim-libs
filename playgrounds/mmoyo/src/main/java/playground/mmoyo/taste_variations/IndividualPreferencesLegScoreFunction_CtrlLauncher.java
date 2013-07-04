@@ -19,6 +19,7 @@
 
 package playground.mmoyo.taste_variations;
 
+import java.io.File;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
@@ -29,22 +30,29 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.cadyts.pt.CadytsPtConfigGroup;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
-import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import playground.mmoyo.analysis.stopZoneOccupancyAnalysis.CtrlListener4configurableOcuppAnalysis;
+import playground.mmoyo.io.PopSecReader;
 import playground.mmoyo.utils.DataLoader;
 
-public class SVD_CtrlLauncher {
+/**
+ * Starts a individualized scoring run, replaces leg scoring by a least square sense-based function scoring .
+ */
 
-	public SVD_CtrlLauncher( Scenario scn, final String svdSolutionsFile, boolean doZoneConversion){
+public class IndividualPreferencesLegScoreFunction_CtrlLauncher {
+	//public class SVD_CtrlLauncher {
+
+	public IndividualPreferencesLegScoreFunction_CtrlLauncher( Scenario scn, final String svdSolutionsFile, boolean doZoneConversion, final double scoreWeight){
 		Population pop = scn.getPopulation();
 		final Network net = scn.getNetwork();
 		final TransitSchedule schedule = scn.getTransitSchedule();
@@ -56,29 +64,22 @@ public class SVD_CtrlLauncher {
 		controler.getConfig().addModule(CadytsPtConfigGroup.GROUP_NAME, ccc) ;
 		
 		
-		
-	
-		
-//		Map <Id, SVDvalues> svdMap = new SVDValuesAsObjAttrReader(pop.getPersons().keySet()).readFile(svdSolutionsFile); 
-//		controler.setScoringFunctionFactory(new SVDScoringfunctionFactory(svdMap, net, schedule));
-	/////////set scoring functions/////////////////////////////// 
-		
-		//scoring 
-		final Map <Id, SVDvalues> svdMap = new SVDValuesAsObjAttrReader(pop.getPersons().keySet()).readFile(svdSolutionsFile); 
+		//leg scoring based on data obtained with least square calculation of individual preferences 
+		final Map <Id, IndividualPreferences> svdMap = new SVDValuesAsObjAttrReader(pop.getPersons().keySet()).readFile(svdSolutionsFile); 
 		final CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(scn.getConfig().planCalcScore()); //M
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			@Override
 			public ScoringFunction createNewScoringFunction(Plan plan) {
 			
 				ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
-				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
+				//scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, controler.getScenario().getNetwork()));
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 				
-				//set SVD-Scoring function
-				SVDvalues svdValues = svdMap.get(plan.getPerson().getId());
-				SVDscoring svdScoring = new SVDscoring(plan, svdValues, net, schedule);
-				scoringFunctionAccumulator.addScoringFunction(svdScoring);
+				//set individualized preferences-based leg scoring function
+				IndividualPreferences indValues = svdMap.get(plan.getPerson().getId());
+				IndividualPreferencesLegScoring indPrefLegScoring = new IndividualPreferencesLegScoring(plan, indValues, net, schedule, scoreWeight);
+				scoringFunctionAccumulator.addScoringFunction(indPrefLegScoring);
  
 				return scoringFunctionAccumulator;
 			}
@@ -108,23 +109,56 @@ public class SVD_CtrlLauncher {
 	
 	public static void main(String[] args) {
 		String configFile;
-		String svdSolutionFile;
+		String calibrationOutputPlans;
 		String strDoZoneConversion;
+		double scoreWeight;
 		if (args.length>0){
 			configFile = args[0];
-			svdSolutionFile = args[1];
+			calibrationOutputPlans = args[1];
 			strDoZoneConversion = args[2];
+			scoreWeight = Double.parseDouble(args[3]);
 		}else{
 			configFile = "../../";
-			svdSolutionFile = "../../";
+			calibrationOutputPlans = "../../";
 			strDoZoneConversion = "false";
+			scoreWeight = 1.0;
 		}
 		
-		//load data
+		//real config scenario
 		DataLoader dataLoader = new DataLoader();
 		Scenario scn =dataLoader.loadScenario(configFile);
+		final TransitSchedule schedule = scn.getTransitSchedule();
+		
+		////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//calculate individualized values from calibration output
+		DataLoader dummyDataLoader = new DataLoader();									//prepare data to parse
+		ScenarioImpl dummyScn = (ScenarioImpl) dummyDataLoader.createScenario(); 
+		MatsimNetworkReader matsimNetReader = new MatsimNetworkReader(dummyScn);
+		matsimNetReader.readFile(scn.getConfig().network().getInputFile());
+		Network dummyNet = dummyScn.getNetwork();
+		
+		MyLeastSquareSolutionCalculator solver = new MyLeastSquareSolutionCalculator(dummyNet, schedule, "SVD"); //calculate svd values
+		PopSecReader reader = new PopSecReader(dummyScn, solver);
+		reader.readFile(calibrationOutputPlans);
+		
+		File file = new File(calibrationOutputPlans);      					//write solutions file
+		String solutionFile = file.getPath() + "SVDSolutions.xml.gz";
+		solver.writeSolutionObjAttr(solutionFile);
+		
+		dummyDataLoader = null;
+		dummyScn = null;
+		matsimNetReader = null;
+		dummyNet = null;
+		solver = null;
+		reader = null;
+		file = null;
+		solver = null;
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		
+		
+		//start svd scoring run
 		boolean doZoneConversion = Boolean.parseBoolean(strDoZoneConversion);
-		new SVD_CtrlLauncher(scn, svdSolutionFile, doZoneConversion );
+		new IndividualPreferencesLegScoreFunction_CtrlLauncher(scn, solutionFile, doZoneConversion, scoreWeight);
 	}
 	
 }

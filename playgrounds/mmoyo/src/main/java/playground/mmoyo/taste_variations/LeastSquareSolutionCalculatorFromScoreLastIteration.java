@@ -19,28 +19,33 @@
 
 package playground.mmoyo.taste_variations;
 
-import org.matsim.api.core.v01.Id;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
 
-public class SVDvalues{
-
-	private Id idAgent;
-	private double weigth_trWalkTime;
-	private double weigth_trTime;
-	private double weigth_trDistance;
-	private double weight_changes;
+/**
+  * Calculates and stores svd values from plans at the end of a iteration
+  */
+public class LeastSquareSolutionCalculatorFromScoreLastIteration implements IterationEndsListener{
 	
-	public SVDvalues(Id idAgent, double weigth_trWalkTime, double weigth_trTime, double weigth_trDistance, double weight_changes) {
-		this.idAgent = idAgent;
-		this.weigth_trWalkTime = weigth_trWalkTime;
-		this.weigth_trTime = weigth_trTime;
-		this.weigth_trDistance = weigth_trDistance;
-		this.weight_changes = weight_changes;
+	public LeastSquareSolutionCalculatorFromScoreLastIteration(){
+	
+	}
+
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+	
+		//calculate svd from scores from last iteration and iteration number 10 
+		if (   event.getIteration() == event.getControler().getConfig().controler().getLastIteration() ||  event.getIteration() ==10) {
+			System.err.println("calculating svd values.........");
+			MyLeastSquareSolutionCalculator lssCalculator = new MyLeastSquareSolutionCalculator(event.getControler().getScenario().getNetwork(), event.getControler().getScenario().getTransitSchedule(), MyLeastSquareSolutionCalculator.SVD );
+			lssCalculator.run(event.getControler().getPopulation());
+			String STR_Solutions = "SVDSolutions.xml.gz";
+			String filename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), STR_Solutions);
+			lssCalculator.writeSolutionObjAttr(filename);
+			STR_Solutions = null;
+			filename = null;
+			lssCalculator = null;
+		}
 	}
 	
-	//just getters
-	public Id getIdAgent() {return idAgent;}
-	public double getWeight_trWalkTime() {return weigth_trWalkTime;}
-	public double getWeight_trTime() {	return weigth_trTime;}
-	public double getWeight_trDistance() {return weigth_trDistance;}
-	public double getWeight_changes() {return weight_changes;}
 }

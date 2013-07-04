@@ -74,7 +74,7 @@ public class CadytsUtlCorrectionsCollecter implements IterationEndsListener{
 			
 			String STR_UTLCORR = "UtlCorr";
 			
-			MySVDcalculator svd;
+			MyLeastSquareSolutionCalculator svd;
 			int numPlansMax=0;
 			for (Person person : pop.getPersons().values()) {
 				String strId = person.getId().toString();
@@ -95,8 +95,8 @@ public class CadytsUtlCorrectionsCollecter implements IterationEndsListener{
 				}
 
 				//invoke svd calculator and put resulting values in attrs
-				svd = new MySVDcalculator(net , schedule );
-				SVDvalues values = svd.getSVDvalues(person, utCorrec);
+				svd = new MyLeastSquareSolutionCalculator(net , schedule, MyLeastSquareSolutionCalculator.SVD );
+				IndividualPreferences values = svd.getSVDvalues(person, utCorrec);
 				attrs.putAttribute( strId , STR_SEL_INX, Integer.valueOf(person.getPlans().indexOf(person.getSelectedPlan())));
 				attrs.putAttribute( strId , STR_wWALK , Double.valueOf(values.getWeight_trWalkTime()));
 				attrs.putAttribute( strId , STR_wTIME, Double.valueOf(values.getWeight_trTime()));

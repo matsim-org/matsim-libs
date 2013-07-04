@@ -42,7 +42,7 @@ public class UtilCorrectonReader implements TabularFileHandler {
 		private int rowNum=0;
 		final static String TB = "\t";
 		private Map <Id, double[]> correcMap = new TreeMap <Id, double[]>();
-		private Map <Id, SVDvalues> svdMap = new TreeMap <Id, SVDvalues>();
+		private Map <Id, IndividualPreferences> svdMap = new TreeMap <Id, IndividualPreferences>();
 		
 		public UtilCorrectonReader(){
 			this.tabFileParserConfig = new TabularFileParserConfig();
@@ -67,7 +67,7 @@ public class UtilCorrectonReader implements TabularFileHandler {
 				correcArray[4] = Double.parseDouble(row[5]);
 				correcMap.put(agentId, correcArray);
 
-				SVDvalues svdValues = new SVDvalues(agentId, Double.parseDouble(row[6]), Double.parseDouble(row[7]), Double.parseDouble(row[8]),Double.parseDouble(row[9])); 
+				IndividualPreferences svdValues = new IndividualPreferences(agentId, Double.parseDouble(row[6]), Double.parseDouble(row[7]), Double.parseDouble(row[8]),Double.parseDouble(row[9])); 
 				svdMap.put(agentId, svdValues);				
 				
 			}else{
@@ -95,7 +95,7 @@ public class UtilCorrectonReader implements TabularFileHandler {
 			return correcMap;
 		}
 		
-		public Map <Id, SVDvalues> getsvdMap (){
+		public Map <Id, IndividualPreferences> getsvdMap (){
 			return svdMap;
 		}
 		

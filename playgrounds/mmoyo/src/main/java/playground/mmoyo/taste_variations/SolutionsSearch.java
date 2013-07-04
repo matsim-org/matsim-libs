@@ -154,7 +154,7 @@ public class SolutionsSearch {
 		controler.addControlerListener(ctrlListener4configurableOcuppAnalysis);
 
 		//add a svd calculator as control listener to get svd values from final outputplans
-		SolutionSvdCalculatorFromScoreLastIteration svdCalculatorListener = new SolutionSvdCalculatorFromScoreLastIteration();
+		LeastSquareSolutionCalculatorFromScoreLastIteration svdCalculatorListener = new LeastSquareSolutionCalculatorFromScoreLastIteration();
 		controler.addControlerListener(svdCalculatorListener);
 		
 		controler.run();
