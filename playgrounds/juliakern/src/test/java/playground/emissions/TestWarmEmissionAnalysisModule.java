@@ -162,7 +162,8 @@ public class TestWarmEmissionAnalysisModule {
 	@Test 
 	
 
-	public void testWarmEmissionAnalysisParameter(){
+	
+public void testWarmEmissionAnalysisParameter(){
 		WarmEmissionAnalysisModuleParameter weamp = new WarmEmissionAnalysisModuleParameter(null, null, null);
 		Assert.assertEquals(weamp.getClass(), WarmEmissionAnalysisModuleParameter.class);
 		// TODO Benjamin: null als Konstructoreingabe erlaubt, exception erst bei Konstruction des WEAM
@@ -730,11 +731,41 @@ public class TestWarmEmissionAnalysisModule {
 
 	
 
-	
-	@Test
-	public void testRescaleWarmEmissions(){
-		//TODO
+	@Test 
+	public void rescaleWarmEmissionsTest() {
+		
+		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable = new HashMap<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor>();
+		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable = new HashMap<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor>();
+		Map<Integer, String> roadTypeMapping = new HashMap<Integer, String>();
+		fillAverageTable(avgHbefaWarmTable);
+		fillDetailedTable(detailedHbefaWarmTable);
+		fillRoadTypeMapping(roadTypeMapping);
+		Map<WarmPollutant, Double> warmEmissions;
+		
+		EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
+		//HandlerToTestEmissionAnalysisModules htt = new HandlerToTestEmissionAnalysisModules();
+		
+		Double rescaleF = 1.0003;
+		
+		WarmEmissionAnalysisModuleParameter weamParameter = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, avgHbefaWarmTable, detailedHbefaWarmTable);
+		WarmEmissionAnalysisModule weam = new WarmEmissionAnalysisModule(weamParameter , emissionEventManager, rescaleF);
+		HandlerToTestEmissionAnalysisModules.reset();
+		
+		Id idForAvgTable = new IdImpl("link id avg"), personIdForAvgTable = new IdImpl("person avg");
+		String dieselVehicleInformation = passengercar +";"+ dieselTechnology+ ";"+ dieselSizeClass+";"+dieselConcept;
+		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(personIdForAvgTable, roadType, dieselFreeVelocity/3.6, 1000., 1000./dieselFreeVelocity*3.6, dieselVehicleInformation);
+		weam.throwWarmEmissionEvent(10, idForAvgTable, personIdForAvgTable, warmEmissions);
+		
+		int numberOfWarmEmissions = WarmPollutant.values().length;
+		
+		String message = "The expected rescaled emissions for this event are (calculated emissions * rescalefactor) = " 
+				+ (numberOfWarmEmissions*avgDieselFactorFf) + " * " + rescaleF + " = " +
+				(numberOfWarmEmissions*avgDieselFactorFf*rescaleF) + " but were " + HandlerToTestEmissionAnalysisModules.getSum();
+		Assert.assertEquals(message, rescaleF*numberOfWarmEmissions*avgDieselFactorFf, HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON);
+		
 	}
+	
+
 	
 	private void fillDetailedTable(
 			Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> detailedHbefaWarmTable) {

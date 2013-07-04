@@ -141,6 +141,7 @@ public class TestColdEmissionAnalysisModule {
 			String message = "The expected emissions for " + tc.toString() + " are " + 
 						numberOfColdEmissions*(Double)tc.get(4) + " but were " + HandlerToTestEmissionAnalysisModules.getSum();
 			Assert.assertEquals(message, numberOfColdEmissions*(Double)tc.get(4), HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON);
+			//TODO pruefen, ob ich wirklich hier her komme
 
 		}
 		
@@ -354,11 +355,11 @@ for (ColdPollutant cp: ColdPollutant.values()) {
 		avColdFactor.setColdEmissionFactor(petrolFactor);
 		
 		for (ColdPollutant cp: ColdPollutant.values()) {	
-		HbefaColdEmissionFactorKey avColdKey = new HbefaColdEmissionFactorKey();
-		avColdKey.setHbefaDistance(tableAccDistance);
-		avColdKey.setHbefaParkingTime(tableParkingDuration);
-		avColdKey.setHbefaVehicleAttributes(vehAtt);
-		avColdKey.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
+			HbefaColdEmissionFactorKey avColdKey = new HbefaColdEmissionFactorKey();
+			avColdKey.setHbefaDistance(tableAccDistance);
+			avColdKey.setHbefaParkingTime(tableParkingDuration);
+			avColdKey.setHbefaVehicleAttributes(vehAtt);
+			avColdKey.setHbefaVehicleCategory(HbefaVehicleCategory.PASSENGER_CAR);
 			avColdKey.setHbefaComponent(cp);
 			avgHbefaColdTable.put(avColdKey, avColdFactor);
 		}

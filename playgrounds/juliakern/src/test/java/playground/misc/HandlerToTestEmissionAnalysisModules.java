@@ -18,7 +18,10 @@ public class HandlerToTestEmissionAnalysisModules implements EventsManager {
 	public void processEvent(Event event) {	
 		for(String attribute: event.getAttributes().keySet()){
 			try {
-				sumOverAll += Double.parseDouble(event.getAttributes().get(attribute));
+				if (!(attribute.equals("time"))) {
+					sumOverAll += Double.parseDouble(event.getAttributes().get(attribute));
+				}
+				
 			} catch (NumberFormatException e) {
 				String notANumber = event.getAttributes().get(attribute).toString();
 				if(notANumber.equals("coldEmissionEvent")||notANumber.equals("coldEmissionEventLinkId")||notANumber.equals("personId")){
