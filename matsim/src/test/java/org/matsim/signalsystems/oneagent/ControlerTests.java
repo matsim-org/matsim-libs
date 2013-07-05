@@ -19,16 +19,14 @@
  * *********************************************************************** */
 package org.matsim.signalsystems.oneagent;
 
+import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
-import org.matsim.signalsystems.builder.FromDataBuilder;
-import org.matsim.signalsystems.mobsim.QSimSignalEngine;
-import org.matsim.signalsystems.mobsim.SignalEngine;
-import org.matsim.signalsystems.model.SignalSystemsManager;
+import org.matsim.signalsystems.data.SignalsData;
+import org.matsim.testcases.MatsimTestUtils;
 
 
 /**
@@ -36,19 +34,22 @@ import org.matsim.signalsystems.model.SignalSystemsManager;
  *
  */
 public class ControlerTests {
-
+	@Rule
+	public MatsimTestUtils testUtils = new MatsimTestUtils();
 	
 	/**
 	 * Tests the setup with a traffic light that shows all the time green
 	 */
 	@Test
-	public void testSignalSystemsIterationsAllGreenAllRed() {
+	public void testModifySignalControlDataOnsetOffset() {
 		//configure and load standard scenario
 		Fixture fixture = new Fixture();
 		Scenario scenario = fixture.createAndLoadTestScenario(false);
 		scenario.getConfig().controler().setFirstIteration(0);
 		scenario.getConfig().controler().setLastIteration(1);
+		scenario.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory());
 		
+		SignalsData signalsData = scenario.getScenarioElement(SignalsData.class);
 		
 //		SignalSystemControllerData controllerData = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(id2);
 //		SignalPlanData planData = controllerData.getSignalPlanData().get(id2);
@@ -63,12 +64,8 @@ public class ControlerTests {
 //		events.addHandler(this);
 //		this.link2EnterTime = 100.0;
 		
-		FromDataBuilder builder = new FromDataBuilder(scenario, events);
-		SignalSystemsManager manager = builder.createAndInitializeSignalSystemsManager();
-		SignalEngine engine = new QSimSignalEngine(manager);
+		Controler controler = new Controler(scenario);
+		controler.run();
 		
-		QSim qsim = (QSim) new QSimFactory().createMobsim(scenario, events);
-		qsim.addQueueSimulationListeners(engine);
-		qsim.run();
 	}
 }

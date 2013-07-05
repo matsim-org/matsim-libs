@@ -22,10 +22,13 @@ package org.matsim.signalsystems.oneagent;
 import java.lang.reflect.Method;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.SignalSystemsConfigGroup;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.run.LaneDefinitonsV11ToV20Converter;
@@ -53,6 +56,14 @@ public class Fixture {
 		String plansFile = testUtils.getClassInputDirectory() + "plans1Agent.xml";
 		Config conf = ConfigUtils.createConfig();
 		conf.controler().setMobsim("qsim");
+		ActivityParams params = new ActivityParams("h");
+		params.setTypicalDuration(24.0 * 3600.0);
+		conf.planCalcScore().addActivityParams(params);
+
+		StrategySettings settings = new StrategySettings(new IdImpl("1"));
+		settings.setModuleName("ChangeExpBeta");
+		settings.setProbability(1.0);
+		conf.strategy().addStrategySettings(settings);
 		conf.network().setInputFile(testUtils.getClassInputDirectory() + "network.xml.gz");
 		String laneDefinitions = testUtils.getClassInputDirectory() + "testLaneDefinitions_v1.1.xml";
 		String lanes20 = testUtils.getOutputDirectory() + "testLaneDefinitions_v2.0.xml";
