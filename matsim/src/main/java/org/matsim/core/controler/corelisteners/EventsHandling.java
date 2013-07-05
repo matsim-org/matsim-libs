@@ -87,7 +87,6 @@ public class EventsHandling implements BeforeMobsimListener,
 		}
 		
 		eventsManager.resetHandlers(event.getIteration());
-		eventsManager.resetCounter();
 
 		if ((this.writeEventsInterval > 0) && (event.getIteration() % writeEventsInterval == 0)) {
 			for (EventsFileFormat format : eventsFileFormats) {
@@ -125,6 +124,14 @@ public class EventsHandling implements BeforeMobsimListener,
 		 * After this command, the ParallelEventsManager behaves like the non-parallel
 		 * implementation, therefore the main thread will have to wait until a created event has
 		 * been handled.
+		 * 
+		 * This means, this thing prevents _two_ different bad things from happening:
+		 * 1.) Road pricing (for example) from starting to calculate road prices 
+		 *      while Mobsim-Events are still coming in (and crashing)
+		 * 2.) Later things which happen in the Controler (e.g. Scoring) from starting
+		 * 	    to score while (for example) road pricing events are still coming in
+		 *      (and crashing).
+		 * michaz (talking to cdobler), jun'13
 		 */
 		eventsManager.finishProcessing();
 

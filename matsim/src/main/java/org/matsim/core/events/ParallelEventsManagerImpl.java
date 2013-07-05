@@ -25,6 +25,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.Event;
+import org.matsim.core.api.experimental.events.EventsFactory;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.handler.EventHandler;
 
 /**
@@ -55,7 +57,7 @@ import org.matsim.core.events.handler.EventHandler;
  * @author rashid_waraich
  *
  */
-public class ParallelEventsManagerImpl extends EventsManagerImpl {
+public class ParallelEventsManagerImpl implements EventsManager {
 
 	private boolean parallelMode = true;
 	private int numberOfThreads;
@@ -76,6 +78,7 @@ public class ParallelEventsManagerImpl extends EventsManagerImpl {
 	// for small simulations, the default value is ok and it even works
 	// quite well for larger simulations with 10 million events
 	private int preInputBufferMaxLength = 100000;
+	private final EventsFactory builder = new EventsFactory();
 
 	/**
 	 * @param numberOfThreads
@@ -129,15 +132,6 @@ public class ParallelEventsManagerImpl extends EventsManagerImpl {
 	}
 
 	@Override
-	public void resetCounter() {
-		synchronized (this) {
-			for (int i = 0; i < events.length; i++) {
-				events[i].resetCounter();
-			}
-		}
-	}
-
-	@Override
 	public void removeHandler(final EventHandler handler) {
 		synchronized (this) {
 			for (int i = 0; i < events.length; i++) {
@@ -146,17 +140,7 @@ public class ParallelEventsManagerImpl extends EventsManagerImpl {
 		}
 	}
 
-	@Override
-	public void clearHandlers() {
-		synchronized (this) {
-			for (int i = 0; i < events.length; i++) {
-				events[i].clearHandlers();
-			}
-		}
-	}
-
-	@Override
-	public void printEventHandlers() {
+	private void printEventHandlers() {
 		synchronized (this) {
 			for (int i = 0; i < events.length; i++) {
 				log.info("registered event handlers for thread " + i + ":");
@@ -246,6 +230,17 @@ public class ParallelEventsManagerImpl extends EventsManagerImpl {
 			this.hadException.set(true);
 		}
 
+	}
+
+	@Override
+	public EventsFactory getFactory() {
+		return this.builder;
+	}
+
+
+	@Override
+	public void afterSimStep(double time) {
+		// nothing to do in this implementation
 	}
 
 }

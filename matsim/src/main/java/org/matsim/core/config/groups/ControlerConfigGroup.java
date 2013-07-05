@@ -73,6 +73,7 @@ public class ControlerConfigGroup extends Module {
 	private Set<String> snapshotFormat = Collections.emptySet();
 	private String mobsim = null;
 	private int writeSnapshotsInterval = 1;
+	private boolean createGraphs = true;
 
 	public ControlerConfigGroup() {
 		super(GROUP_NAME);
@@ -335,6 +336,14 @@ public class ControlerConfigGroup extends Module {
 	
 	public void setWriteSnapshotsInterval(int writeSnapshotsInterval) {
 		this.writeSnapshotsInterval = writeSnapshotsInterval;
+	}
+
+	public boolean isCreateGraphs() {
+		return createGraphs;
+	}
+
+	public void setCreateGraphs(boolean createGraphs) {
+		this.createGraphs = createGraphs;
 	}
 
 }

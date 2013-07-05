@@ -37,7 +37,7 @@ public class EventProcessing {
 		double timer=System.currentTimeMillis();
 		EventProcessing ep=new EventProcessing();
 		
-		EventsManagerImpl events = new ParallelEventsManagerImpl(numberOfThreads);
+		ParallelEventsManagerImpl events = new ParallelEventsManagerImpl(numberOfThreads);
 		//Events events = new Events();
 		
 		// start iteration

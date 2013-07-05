@@ -37,7 +37,7 @@ public class MyQSimEngineRunner extends NetElementActivator {
 	private double time = 0.0;
 	private boolean simulateAllNodes = false;
 	private boolean simulateAllLinks = false;
-	private boolean useNodeArray = QNetsimEngine.useNodeArray;
+	private boolean useNodeArray = false;
 
 	private QNode[] nodesArray = null;
 	private List<QNode> nodesList = null;

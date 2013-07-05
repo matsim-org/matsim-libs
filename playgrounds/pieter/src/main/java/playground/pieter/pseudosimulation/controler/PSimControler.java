@@ -1,28 +1,17 @@
 package playground.pieter.pseudosimulation.controler;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 
 import org.apache.log4j.Logger;
-import org.matsim.analysis.ScoreStats;
-import org.matsim.analysis.TravelDistanceStats;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.PlanStrategyRegistrar;
-import org.matsim.core.controler.corelisteners.LegHistogramListener;
-import org.matsim.core.controler.corelisteners.LinkStatsControlerListener;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.counts.CountControlerListener;
-import org.matsim.population.VspPlansCleaner;
-import org.matsim.pt.counts.PtCountControlerListener;
 
-import playground.pieter.annealing.SimpleAnnealer;
 import playground.pieter.pseudosimulation.controler.listeners.AfterScoringSelectedPlanScoreRestoreListener;
 import playground.pieter.pseudosimulation.controler.listeners.BeforePSimSelectedPlanScoreRecorder;
 import playground.pieter.pseudosimulation.controler.listeners.MobSimSwitcher;

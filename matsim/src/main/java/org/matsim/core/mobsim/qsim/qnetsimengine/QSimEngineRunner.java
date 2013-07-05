@@ -42,7 +42,7 @@ public class QSimEngineRunner extends NetElementActivator implements Runnable {
 	private double time = 0.0;
 	private boolean simulateAllNodes = false;
 	private boolean simulateAllLinks = false;
-	private boolean useNodeArray = QNetsimEngine.useNodeArray;
+	private boolean useNodeArray = false;
 
 	private volatile boolean simulationRunning = true;
 

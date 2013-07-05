@@ -22,7 +22,6 @@ package playground.christoph.energyflows.controller;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.ScoreStats;
-import org.matsim.analysis.TravelDistanceStats;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
@@ -74,15 +73,15 @@ public class EnergyFlowsController extends Controler {
 		}
 		
 		// add subpopulation score stats
-		ScoreStats nonTransitScoreStats = new ScoreStats(nonTransitPopulation, super.getControlerIO().getOutputFilename("nontransit" + FILENAME_SCORESTATS), super.getCreateGraphs());
+		ScoreStats nonTransitScoreStats = new ScoreStats(nonTransitPopulation, super.getControlerIO().getOutputFilename("nontransit" + FILENAME_SCORESTATS), config.controler().isCreateGraphs());
 		this.addControlerListener(nonTransitScoreStats);
-		ScoreStats transitScoreStats = new ScoreStats(transitPopulation, super.getControlerIO().getOutputFilename("transit" + FILENAME_SCORESTATS), super.getCreateGraphs());
+		ScoreStats transitScoreStats = new ScoreStats(transitPopulation, super.getControlerIO().getOutputFilename("transit" + FILENAME_SCORESTATS), config.controler().isCreateGraphs());
 		this.addControlerListener(transitScoreStats);
 
 		// add subpopulation travel distance stats
-		TravelDistanceStats nonTransitTravelDistanceStats = new TravelDistanceStats(nonTransitPopulation, this.network, super.getControlerIO().getOutputFilename("nontransit" + FILENAME_TRAVELDISTANCESTATS), super.getCreateGraphs());
+		TravelDistanceStats nonTransitTravelDistanceStats = new TravelDistanceStats(nonTransitPopulation, this.network, super.getControlerIO().getOutputFilename("nontransit" + FILENAME_TRAVELDISTANCESTATS), config.controler().isCreateGraphs());
 		this.addControlerListener(nonTransitTravelDistanceStats);
-		TravelDistanceStats transitTravelDistanceStats = new TravelDistanceStats(transitPopulation, this.network, super.getControlerIO().getOutputFilename("transit" + FILENAME_TRAVELDISTANCESTATS), super.getCreateGraphs());
+		TravelDistanceStats transitTravelDistanceStats = new TravelDistanceStats(transitPopulation, this.network, super.getControlerIO().getOutputFilename("transit" + FILENAME_TRAVELDISTANCESTATS), config.controler().isCreateGraphs());
 		this.addControlerListener(transitTravelDistanceStats);
 	}
 	

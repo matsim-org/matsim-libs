@@ -118,11 +118,7 @@ public class EventsManagerImpl implements EventsManager {
 	private long counter = 0;
 	private long nextCounterMsg = 1;
 
-	private EventsFactory builder;
-
-	protected EventsManagerImpl() {
-		this.builder = new EventsFactory();
-	}
+	private final EventsFactory builder = new EventsFactory();
 
 	private HandlerData findHandler(final Class<?> evklass) {
 		for (HandlerData handler : this.handlerData) {
@@ -138,20 +134,11 @@ public class EventsManagerImpl implements EventsManager {
 		this.counter++;
 		if (this.counter == this.nextCounterMsg) {
 			this.nextCounterMsg *= 2;
-			printEventsCount();
+			log.info(" event # " + this.counter);
 		}
-		try {
-			computeEvent(event);
-		} catch (NullPointerException e) {
-			e.printStackTrace(); // print the stack trace here, as it seems to be lost in the later process until it gets catched.
-			throw e;
-		}
+		computeEvent(event);
 	}
 
-	@Override
-	public void printEventsCount() {
-		log.info(" event # " + this.counter);
-	}
 
 	@Override
 	public void addHandler (final EventHandler handler) {
@@ -182,15 +169,6 @@ public class EventsManagerImpl implements EventsManager {
 	}
 
 	@Override
-	public void clearHandlers() {
-		log.info("clearing Event-Handlers");
-		for (HandlerData handler : this.handlerData) {
-			handler.handlerList.clear();
-		}
-		this.cacheHandlers.clear();
-	}
-
-	@Override
 	public void resetHandlers(final int iteration) {
 		log.info("resetting Event-Handlers");
 		this.counter = 0;
@@ -207,15 +185,6 @@ public class EventsManagerImpl implements EventsManager {
 		}
 	}
 
-	/**
-	 * Resets the event counter to zero.
-	 */
-	@Override
-	public void resetCounter() {
-		this.counter = 0;
-		this.nextCounterMsg = 1;
-	}
-
 	@Override
 	public void initProcessing() {
 		// nothing to do in this implementation
@@ -225,7 +194,7 @@ public class EventsManagerImpl implements EventsManager {
 	public void afterSimStep(double time) {
 		// nothing to do in this implementation
 	}
-	
+
 	@Override
 	public void finishProcessing() {
 		// nothing to do in this implementation
@@ -321,8 +290,8 @@ public class EventsManagerImpl implements EventsManager {
 	// this method is purely for performance reasons and need not be implemented
 	private boolean callHandlerFast(final Class<?> klass, final Event ev, final EventHandler handler) {
 		if (klass == LinkLeaveEvent.class) {
-				((LinkLeaveEventHandler)handler).handleEvent((LinkLeaveEvent)ev);
-				return true;
+			((LinkLeaveEventHandler)handler).handleEvent((LinkLeaveEvent)ev);
+			return true;
 		} else if (klass == LinkEnterEvent.class) {
 			((LinkEnterEventHandler)handler).handleEvent((LinkEnterEvent)ev);
 			return true;
@@ -372,7 +341,6 @@ public class EventsManagerImpl implements EventsManager {
 		return false;
 	}
 
-	@Override
 	public void printEventHandlers() {
 		log.info("currently registered event-handlers:");
 		for (HandlerData handlerType : this.handlerData) {

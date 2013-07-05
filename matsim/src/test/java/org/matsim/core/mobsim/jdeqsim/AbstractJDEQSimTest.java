@@ -32,7 +32,6 @@ import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandle
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.EventsManagerImpl;
-import org.matsim.core.events.ParallelEventsManagerImpl;
 import org.matsim.core.mobsim.jdeqsim.util.CppEventFileParser;
 import org.matsim.core.mobsim.jdeqsim.util.EventLibrary;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -58,32 +57,13 @@ public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 		super.tearDown();
 	}
 
-
-	// if populationModifier == null, then the DummyPopulationModifier is used
-	// if planFilePath == null, then the plan specified in the config file is
-	// used
 	public void runJDEQSim(Scenario scenario) {
-/*
-		Config config = loadConfig(configFilePath);
-		if (planFilePath != null) {
-			config.plans().setInputFile(planFilePath);
-		}
-		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
-		loader.loadScenario();
-		ScenarioImpl scenario = loader.getScenario();
-		NetworkLayer network = scenario.getNetwork();
-		PopulationImpl population = scenario.getPopulation();
-		if (populationModifier != null) {
-			population = populationModifier.modifyPopulation(population);
-		}
-	*/
-		EventsManagerImpl events = new ParallelEventsManagerImpl(1);
+		EventsManagerImpl events = new EventsManagerImpl();
 		events.addHandler(new PersonEventCollector());
 		events.initProcessing();
 		new JDEQSimulation(scenario, events).run();
 		events.finishProcessing();
 	}
-
 
 	protected void checkAscendingTimeStamps() {
 		// all events of one agent must have ascending time stamps

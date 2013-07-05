@@ -58,7 +58,6 @@ public class IteratorTask implements ScenarioSinkSource {
 	}
 	
 	private void resetEvents(int iteration) {
-		eventsManager.resetCounter();
 		eventsManager.resetHandlers(iteration);
 	}
 

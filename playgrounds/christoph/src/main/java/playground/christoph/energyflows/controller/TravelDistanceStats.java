@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.analysis;
+package playground.christoph.energyflows.controller;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -26,16 +26,22 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Locale;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.config.Config;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.ShutdownEvent;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.ShutdownListener;
+import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
@@ -46,25 +52,35 @@ import org.matsim.core.utils.misc.RouteUtils;
  *
  * Calculates at the end of each iteration the following statistics:
  * <ul>
- * 	<li>average of the average leg distance per plan</li>
+ * 	<li>average of the average leg distance per plan (worst plans only)</li>
+ * 	<li>average of the average leg distance per plan (best plans only)</li>
+ * 	<li>average of the average leg distance per plan (selected plans only)</li>
+ * 	<li>average of the average leg distance per plan (all plans)</li>
  * </ul>
  *
- * Is used by the standard Controler and fed the "really executed" "plans" which
- * are generated from Events during the simulation and which are also used by the scoring.
- * But you can also use it on other kinds of plans from your own code.
  *
- * @author anhorni, michaz
+ * @author anhorni
  */
 
-public class TravelDistanceStats {
+/*
+ * TODO: [AH] This is copy-paste based on "ScoreStats". Refactoring needed!
+ *
+ */
+public class TravelDistanceStats implements StartupListener, IterationEndsListener, ShutdownListener {
 
-	final private Config config;
+	final private static int INDEX_WORST = 0;
+	final private static int INDEX_BEST = 1;
+	final private static int INDEX_AVERAGE = 2;
+	final private static int INDEX_EXECUTED = 3;
+
+	final private Population population;
 	final private Network network;
 	final private BufferedWriter out;
 	final private String fileName;
 
 	private final boolean createPNG;
-	private double[] history = null;
+	private double[][] history = null;
+	private int minIteration = 0;
 
 	private Thread[] threads = null;
 	private StatsCalculator[] statsCalculators = null;
@@ -74,22 +90,16 @@ public class TravelDistanceStats {
 	private final static Logger log = Logger.getLogger(TravelDistanceStats.class);
 
 	/**
+	 * @param population
 	 * @param filename including the path, excluding the file type extension
 	 * @param createPNG true if in every iteration, the distance statistics should be visualized in a graph and written to disk.
 	 * @throws UncheckedIOException
 	 */
-	public TravelDistanceStats(final Config config, final Network network, final String filename, final boolean createPNG) throws UncheckedIOException {
-		this.config = config;
+	public TravelDistanceStats(final Population population, final Network network, final String filename, final boolean createPNG) throws UncheckedIOException {
+		this.population = population;
 		this.network = network;
 		this.fileName = filename;
 		this.createPNG = createPNG;
-		if (this.createPNG) {
-			int iterations = config.controler().getLastIteration() - config.controler().getFirstIteration();
-			if (iterations > 5000) {
-				iterations = 5000; // limit the history size
-			}
-			this.history = new double[iterations+1];
-		}
 		if (filename.toLowerCase(Locale.ROOT).endsWith(".txt")) {
 			this.out = IOUtils.getBufferedWriter(filename);
 		} else {
@@ -102,16 +112,31 @@ public class TravelDistanceStats {
 		}
 	}
 
-	public void addIteration(int iteration, Map<Id, Plan> map) {
+	@Override
+	public void notifyStartup(final StartupEvent event) {
+		if (this.createPNG) {
+			Controler controler = event.getControler();
+			this.minIteration = controler.getFirstIteration();
+			int maxIter = controler.getLastIteration();
+			int iterations = maxIter - this.minIteration;
+			if (iterations > 5000) {
+				iterations = 5000; // limit the history size
+			}
+			this.history = new double[4][iterations+1];
+		}
+	}
 
-		int numOfThreads = this.config.global().getNumberOfThreads();
+	@Override
+	public void notifyIterationEnds(final IterationEndsEvent event) {
+
+		int numOfThreads = event.getControler().getConfig().global().getNumberOfThreads();
 		if (numOfThreads < 1) numOfThreads = 1;
 
 		initThreads(numOfThreads);
 
 		int roundRobin = 0;
-		for (Plan plan : map.values()) {
-			this.statsCalculators[roundRobin++ % numOfThreads].addPerson(plan);
+		for (Person person : this.population.getPersons().values()) {
+			this.statsCalculators[roundRobin++ % numOfThreads].addPerson(person);
 		}
 
 		log.info("[" + this.getClass().getSimpleName() + "] using " + numOfThreads + " thread(s).");
@@ -132,14 +157,23 @@ public class TravelDistanceStats {
 			throw new RuntimeException("Some threads crashed, thus not all persons may have been handled.");
 		}
 
-
+		double sumAvgPlanLegTravelDistanceWorst = 0.0;
+		double sumAvgPlanLegTravelDistanceBest = 0.0;
+		double sumAvgPlanLegTravelDistanceAll = 0.0;
 		double sumAvgPlanLegTravelDistanceExecuted = 0.0;
-
+		int nofLegTravelDistanceWorst = 0;
+		int nofLegTravelDistanceBest = 0;
+		int nofLegTravelDistanceAvg = 0;
 		int nofLegTravelDistanceExecuted = 0;
 
 		for (StatsCalculator statsCalculator : statsCalculators) {
-
+			sumAvgPlanLegTravelDistanceWorst += statsCalculator.sumAvgPlanLegTravelDistanceWorst;
+			sumAvgPlanLegTravelDistanceBest += statsCalculator.sumAvgPlanLegTravelDistanceBest;
+			sumAvgPlanLegTravelDistanceAll += statsCalculator.sumAvgPlanLegTravelDistanceAll;
 			sumAvgPlanLegTravelDistanceExecuted += statsCalculator.sumAvgPlanLegTravelDistanceExecuted;
+			nofLegTravelDistanceWorst += statsCalculator.nofLegTravelDistanceWorst;
+			nofLegTravelDistanceBest += statsCalculator.nofLegTravelDistanceBest;
+			nofLegTravelDistanceAvg += statsCalculator.nofLegTravelDistanceAvg;
 			nofLegTravelDistanceExecuted += statsCalculator.nofLegTravelDistanceExecuted;
 		}
 
@@ -148,46 +182,68 @@ public class TravelDistanceStats {
 		this.threads = null;
 
 		log.info("-- average of the average leg distance per plan (executed plans only): " + (sumAvgPlanLegTravelDistanceExecuted / nofLegTravelDistanceExecuted));
+		log.info("-- average of the average leg distance per plan (worst plans only): " + (sumAvgPlanLegTravelDistanceWorst / nofLegTravelDistanceWorst));
+		log.info("-- average of the average leg distance per plan (all plans): " + (sumAvgPlanLegTravelDistanceAll / nofLegTravelDistanceAvg));
+		log.info("-- average of the average leg distance per plan (best plans only): " + (sumAvgPlanLegTravelDistanceBest / nofLegTravelDistanceBest));
 		log.info("(TravelDistanceStats takes an average over all legs that have a NetworkRoute.  These are usually all car legs.)") ;
 
 		try {
-			this.out.write(iteration + "\t" + (sumAvgPlanLegTravelDistanceExecuted / nofLegTravelDistanceExecuted) + "\t" + "\n");
+			this.out.write(event.getIteration() + "\t" + (sumAvgPlanLegTravelDistanceExecuted / nofLegTravelDistanceExecuted) + "\t" +
+					(sumAvgPlanLegTravelDistanceWorst / nofLegTravelDistanceWorst) + "\t" + (sumAvgPlanLegTravelDistanceAll / nofLegTravelDistanceAvg) 
+					+ "\t" + (sumAvgPlanLegTravelDistanceBest / nofLegTravelDistanceBest) + "\n");
 			this.out.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
 		if (this.history != null) {
-			int index = iteration - config.controler().getFirstIteration();
-			this.history[index] = (sumAvgPlanLegTravelDistanceExecuted / nofLegTravelDistanceExecuted);
+			int index = event.getIteration() - this.minIteration;
+			this.history[INDEX_WORST][index] = (sumAvgPlanLegTravelDistanceWorst / nofLegTravelDistanceWorst);
+			this.history[INDEX_BEST][index] = (sumAvgPlanLegTravelDistanceBest / nofLegTravelDistanceBest);
+			this.history[INDEX_AVERAGE][index] = (sumAvgPlanLegTravelDistanceAll / nofLegTravelDistanceAvg);
+			this.history[INDEX_EXECUTED][index] = (sumAvgPlanLegTravelDistanceExecuted / nofLegTravelDistanceExecuted);
 
-			if (iteration != config.controler().getFirstIteration()) {
+			if (event.getIteration() != this.minIteration) {
 				// create chart when data of more than one iteration is available.
 				XYLineChart chart = new XYLineChart("Leg Travel Distance Statistics", "iteration", "average of the average leg distance per plan ");
 				double[] iterations = new double[index + 1];
 				for (int i = 0; i <= index; i++) {
-					iterations[i] = i + config.controler().getFirstIteration();
+					iterations[i] = i + this.minIteration;
 				}
 				double[] values = new double[index + 1];
-				System.arraycopy(this.history, 0, values, 0, index + 1);
+				System.arraycopy(this.history[INDEX_WORST], 0, values, 0, index + 1);
+				chart.addSeries("worst plan", iterations, values);
+				System.arraycopy(this.history[INDEX_BEST], 0, values, 0, index + 1);
+				chart.addSeries("best plan", iterations, values);
+				System.arraycopy(this.history[INDEX_AVERAGE], 0, values, 0, index + 1);
+				chart.addSeries("avg. of plans", iterations, values);
+				System.arraycopy(this.history[INDEX_EXECUTED], 0, values, 0, index + 1);
 				chart.addSeries("executed plan", iterations, values);
 				chart.addMatsimLogo();
 				chart.saveAsPng(this.fileName + ".png", 800, 600);
 			}
-			if (index == (this.history.length - 1)) {
+			if (index == (this.history[0].length - 1)) {
 				// we cannot store more information, so disable the graph feature.
 				this.history = null;
 			}
 		}
 	}
 
-	public void close() {
+	@Override
+	public void notifyShutdown(final ShutdownEvent controlerShudownEvent) {
 		try {
 			this.out.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 
+	}
+
+	/**
+	 * @return the history of ltd in last iterations
+	 */
+	public double[][] getHistory() {
+		return this.history.clone();
 	}
 
 	private void initThreads(int numOfThreads) {
@@ -211,29 +267,85 @@ public class TravelDistanceStats {
 
 	private static class StatsCalculator implements Runnable {
 
-
+		double sumAvgPlanLegTravelDistanceWorst = 0.0;
+		double sumAvgPlanLegTravelDistanceBest = 0.0;
+		double sumAvgPlanLegTravelDistanceAll = 0.0;
 		double sumAvgPlanLegTravelDistanceExecuted = 0.0;
+		int nofLegTravelDistanceWorst = 0;
+		int nofLegTravelDistanceBest = 0;
+		int nofLegTravelDistanceAvg = 0;
 		int nofLegTravelDistanceExecuted = 0;
 
-		private Collection<Plan> persons;
+		private Collection<Person> persons;
 		private Network network;
 
 		public StatsCalculator(Network network) {
 			this.network = network;
-			persons = new ArrayList<Plan>();
+			persons = new ArrayList<Person>();
 		}
 
-		public void addPerson(Plan plan) {
-			persons.add(plan);
+		public void addPerson(Person person) {
+			persons.add(person);
 		}
 
 		@Override
 		public void run() {
-			for (Plan plan : persons) {
-				sumAvgPlanLegTravelDistanceExecuted += getAvgLegTravelDistance(plan);
-				nofLegTravelDistanceExecuted++;
-			}
+			for (Person person : persons) {
+				Plan worstPlan = null;
+				Plan bestPlan = null;
+				double worstScore = Double.POSITIVE_INFINITY;
+				double bestScore = Double.NEGATIVE_INFINITY;
+				double sumAvgLegTravelDistance = 0.0;
+				double cntAvgLegTravelDistance = 0;
+				for (Plan plan : person.getPlans()) {
 
+					if (plan.getScore() == null) {
+						continue;
+					}
+					double score = plan.getScore().doubleValue();
+
+					// worst plan -----------------------------------------------------
+					if (worstPlan == null) {
+						worstPlan = plan;
+						worstScore = score;
+					} else if (score < worstScore) {
+						worstPlan = plan;
+						worstScore = score;
+					}
+
+					// best plan -------------------------------------------------------
+					if (bestPlan == null) {
+						bestPlan = plan;
+						bestScore = score;
+					} else if (score > bestScore) {
+						bestPlan = plan;
+						bestScore = score;
+					}
+
+					// avg. leg travel distance
+					sumAvgLegTravelDistance += getAvgLegTravelDistance(plan);
+					cntAvgLegTravelDistance++;
+
+					// executed plan? --------------------------------------------------
+					if (plan.isSelected()) {
+						sumAvgPlanLegTravelDistanceExecuted += getAvgLegTravelDistance(plan);
+						nofLegTravelDistanceExecuted++;
+					}
+				}
+
+				if (worstPlan != null) {
+					nofLegTravelDistanceWorst++;
+					sumAvgPlanLegTravelDistanceWorst += getAvgLegTravelDistance(worstPlan);
+				}
+				if (bestPlan != null) {
+					nofLegTravelDistanceBest++;
+					sumAvgPlanLegTravelDistanceBest += getAvgLegTravelDistance(bestPlan);
+				}
+				if (cntAvgLegTravelDistance > 0) {
+					sumAvgPlanLegTravelDistanceAll += (sumAvgLegTravelDistance / cntAvgLegTravelDistance);
+					nofLegTravelDistanceAvg++;
+				}
+			}
 		}
 
 		private double getAvgLegTravelDistance(final Plan plan) {
@@ -247,13 +359,9 @@ public class TravelDistanceStats {
 					if (leg.getRoute() instanceof NetworkRoute) {
 						planTravelDistance += RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), this.network);
 						numberOfLegs++;
-					} else {
-						double distance = leg.getRoute().getDistance();
-						if (!Double.isNaN(distance)) {
-							planTravelDistance += distance;
-						}
-						numberOfLegs++;
 					}
+					// yyyyyy Seems that this averages only over routes of type NetworkRoute.  This is, minimally, not consistent with what we had before
+					// (average over ALL modes).  kai/benjamin, apr'10
 				}
 			}
 			if (numberOfLegs>0) {
@@ -278,6 +386,4 @@ public class TravelDistanceStats {
 		}
 
 	}
-
-	
 }

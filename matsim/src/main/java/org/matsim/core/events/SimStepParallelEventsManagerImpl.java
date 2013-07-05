@@ -54,8 +54,8 @@ public class SimStepParallelEventsManagerImpl implements EventsManager {
 	private CyclicBarrier iterationEndBarrier;
 	private CyclicBarrier waitForEmptyQueuesBarrier;
 	private ProcessEventsRunnable[] runnables;
-	private EventsManager[] eventsManagers;
-	private EventsManager delegate;
+	private EventsManagerImpl[] eventsManagers;
+	private EventsManagerImpl delegate;
 	private ProcessedEventsChecker processedEventsChecker;
 	
 	private boolean parallelMode = false;
@@ -80,14 +80,10 @@ public class SimStepParallelEventsManagerImpl implements EventsManager {
 		this.simStepEndBarrier = new CyclicBarrier(this.numOfThreads + 1);
 		this.iterationEndBarrier = new CyclicBarrier(this.numOfThreads + 1);
 		
-		this.delegate = EventsUtils.createEventsManager();
-		if (!(delegate instanceof EventsManagerImpl)) {
-			throw new RuntimeException("Expected a EventsManagerImpl to be created but found a " +
-					delegate.getClass().toString());
-		}
+		this.delegate = new EventsManagerImpl();
 
-		this.eventsManagers = new EventsManager[this.numOfThreads];
-		for (int i = 0; i < numOfThreads; i++) this.eventsManagers[i] = EventsUtils.createEventsManager();
+		this.eventsManagers = new EventsManagerImpl[this.numOfThreads];
+		for (int i = 0; i < numOfThreads; i++) this.eventsManagers[i] = new EventsManagerImpl();
 	}
 
 	@Override
@@ -123,36 +119,6 @@ public class SimStepParallelEventsManagerImpl implements EventsManager {
 	public void resetHandlers(int iteration) {
 		delegate.resetHandlers(iteration);
 		counter.set(0);
-	}
-	
-	@Override
-	public void resetCounter() {
-		delegate.resetCounter();
-		counter.set(0);
-		
-		for (EventsManager eventsManager : eventsManagers) eventsManager.resetCounter();
-	}
-
-	@Override
-	public void clearHandlers() {
-		delegate.clearHandlers();
-		
-		for (EventsManager eventsManager : eventsManagers) eventsManager.clearHandlers();
-	}
-	
-	@Override
-	public void printEventHandlers() {
-		log.info("all event handlers");
-		delegate.printEventHandlers();
-	}
-
-	@Override
-	public void printEventsCount() {
-		log.info(" overall event # " + this.counter.get());
-		log.info(" non parallel events:");
-		delegate.printEventsCount();
-		log.info(" parallel events:");
-		for (EventsManager eventsManager : this.eventsManagers) eventsManager.printEventsCount();
 	}
 
 	@Override
@@ -270,7 +236,7 @@ public class SimStepParallelEventsManagerImpl implements EventsManager {
 		}
 	}
 	
-	private static class ProcessEventsRunnable implements Runnable, EventsManager {
+	private static class ProcessEventsRunnable implements Runnable {
 		
 		private final EventsManager eventsManager;
 		private final ProcessedEventsChecker processedEventsChecker;
@@ -312,7 +278,7 @@ public class SimStepParallelEventsManagerImpl implements EventsManager {
 					 * Check whether the events are ordered chronologically.
 					 */
 					if (event.getTime() < this.lastEventTime) {
-						throw new RuntimeException("Events in the queue are not ordered chronoligically. " +
+						throw new RuntimeException("Events in the queue are not ordered chronologically. " +
 								"This should never happen. Is the SimTimeStepParallelEventsManager registered " +
 								"as a MobsimAfterSimStepListener?");
 					} else this.lastEventTime = event.getTime();
@@ -373,66 +339,8 @@ public class SimStepParallelEventsManagerImpl implements EventsManager {
 			Gbl.printCurrentThreadCpuTime();
 		}
 
-		@Override
 		public void processEvent(Event event) {
 			this.eventsQueue.add(event);
-		}
-		
-		@Override
-		public void addHandler(EventHandler handler) {
-			throw new RuntimeException("This method should never be called - calls should go to the EventHandlers directly.");
-		}
-
-		@Override
-		public EventsFactory getFactory() {
-			throw new RuntimeException("This method should never be called - calls should go to the EventHandlers directly.");
-		}
-
-		@Override
-		public void removeHandler(EventHandler handler) {
-			throw new RuntimeException("This method should never be called - calls should go to the EventHandlers directly.");
-		}
-
-		@Override
-		public void initProcessing() {
-			this.eventsManager.initProcessing();
-		}
-
-		@Override
-		public void afterSimStep(double time) {
-			this.eventsManager.afterSimStep(time);
-		}
-
-		@Override
-		public void finishProcessing() {
-			this.eventsManager.finishProcessing();
-		}
-
-		@Override
-		public void resetCounter() {
-			this.eventsManager.resetCounter();
-		}
-
-		@Override
-		public void clearHandlers() {
-			this.eventsManager.clearHandlers();			
-		}
-		
-		@Override
-		public void resetHandlers(int iteration) {
-			throw new RuntimeException("This method should never be called - calls should go to the EventHandlers directly.");
-		}
-
-		@Override
-		public void printEventsCount() {
-			log.info(Thread.currentThread().getName() + " events count:");
-			this.eventsManager.printEventHandlers();
-		}
-
-		@Override
-		public void printEventHandlers() {
-			log.info(Thread.currentThread().getName() + " registered EventHandlers:");
-			this.eventsManager.printEventHandlers();
 		}
 		
 	}	// ProcessEventsRunnable

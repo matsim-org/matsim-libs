@@ -33,7 +33,6 @@ import org.apache.log4j.PatternLayout;
 import org.matsim.analysis.CalcLegTimes;
 import org.matsim.analysis.CalcLinkStats;
 import org.matsim.analysis.ScoreStats;
-import org.matsim.analysis.TravelDistanceStats;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -79,9 +78,6 @@ import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTim
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.TravelTimeCalculatorWithBuffer;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.TravelTimeCalculatorWithBufferFactory;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTimeOld;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.tools.EnsureActivityReachability;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.tools.MultiModalNetworkCreator;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.tools.NonCarRouteDropper;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.tools.PrepareMultiModalScenario;
 import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -196,7 +192,6 @@ public class Controler extends AbstractController {
 	protected boolean scenarioLoaded = false;
 	private PlansScoring plansScoring = null;
 	private ScoreStats scoreStats = null;
-	private TravelDistanceStats travelDistanceStats = null;
 
 	/**
 	 * Attribute for the routing factory
@@ -463,12 +458,7 @@ public class Controler extends AbstractController {
 		this.scoreStats = new ScoreStats(this.population,
 				this.getControlerIO().getOutputFilename(FILENAME_SCORESTATS), this.createGraphs);
 		this.addControlerListener(this.scoreStats);
-	
-		// optional: travel distance stats
-		this.travelDistanceStats = new TravelDistanceStats(this.population, this.network,
-				this.getControlerIO() .getOutputFilename(FILENAME_TRAVELDISTANCESTATS), this.createGraphs);
-		this.addControlerListener(this.travelDistanceStats);
-	
+		
 		// load counts, if requested
 		if (this.config.counts().getCountsFileName() != null) {
 			CountControlerListener ccl = new CountControlerListener(this.config.counts());
@@ -753,14 +743,7 @@ public class Controler extends AbstractController {
 	 *            true if graphs showing analyses' output should be generated.
 	 */
 	public final void setCreateGraphs(final boolean createGraphs) {
-		this.createGraphs = createGraphs;
-	}
-
-	/**
-	 * @return true if analyses should create graphs showing there results.
-	 */
-	public final boolean getCreateGraphs() {
-		return this.createGraphs;
+		this.config.controler().setCreateGraphs(createGraphs);
 	}
 
 	/**

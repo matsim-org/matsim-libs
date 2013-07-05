@@ -31,16 +31,8 @@ public interface EventsManager {
 	public void addHandler(final EventHandler handler);
 	
 	public void removeHandler(final EventHandler handler);
-	
-	public void resetCounter();
 
 	public void resetHandlers(int iteration);
-	
-	public void clearHandlers();
-	
-	public void printEventsCount();
-	
-	public void printEventHandlers();
 	
 	/**
 	 * Called before the first event is sent for processing. Allows to initialize internal

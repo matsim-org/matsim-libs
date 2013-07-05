@@ -143,7 +143,7 @@ public class MyParallelQNetsimEngine extends QNetsimEngine {
 		createNodesLists();
 		createLinkLists();
 
-		if (useNodeArray) {
+		if (false) {
 			createNodesArray();
 			// if we use arrays, we don't need the lists anymore
 			this.parallelNodesLists = null;
@@ -157,9 +157,9 @@ public class MyParallelQNetsimEngine extends QNetsimEngine {
 
 		// setup threads
 		for (int i = 0; i < numOfTasks; i++) {
-			MyQSimEngineRunner engine = new MyQSimEngineRunner(simulateAllNodes, simulateAllLinks);
+			MyQSimEngineRunner engine = new MyQSimEngineRunner(false, false);
 
-			if (useNodeArray) {
+			if (false) {
 				engine.setQNodeArray(this.parallelNodesArrays[i]);
 			} else {
 				engine.setQNodeList(this.parallelNodesLists.get(i));
@@ -191,7 +191,7 @@ public class MyParallelQNetsimEngine extends QNetsimEngine {
 		}
 
 		int roundRobin = 0;
-		for (QNode node : allNodes) {
+		for (QNode node : network.getNetsimNodes().values()) {
 			node.getCustomAttributes().put(Random.class.getName(), MatsimRandom.getLocalInstance());
 			parallelNodesLists.get(roundRobin % this.numOfTasks).add(node);
 			roundRobin++;
@@ -225,17 +225,6 @@ public class MyParallelQNetsimEngine extends QNetsimEngine {
 		for (int i = 0; i < this.numOfTasks; i++) {
 			this.parallelSimLinksLists.add(new ArrayList<QLinkInternalI>());
 		}
-
-		/*
-		 * If we simulate all Links, we have to add them initially to the Lists.
-		 */
-		if (simulateAllLinks) {
-			int roundRobin = 0;
-			for(QLinkInternalI link : allLinks) {
-				this.parallelSimLinksLists.get(roundRobin % this.numOfTasks).add(link);
-				roundRobin++;
-			}
-		}
 	}
 
 	/*
@@ -245,7 +234,7 @@ public class MyParallelQNetsimEngine extends QNetsimEngine {
 	 */
 	private void assignNetElementActivators() {
 		int thread = 0;
-		if (useNodeArray) {
+		if (false) {
 			for (QNode[] array : parallelNodesArrays) {
 				for (QNode node : array) {
 					node.setNetElementActivator(this.engines[thread]);
@@ -266,9 +255,6 @@ public class MyParallelQNetsimEngine extends QNetsimEngine {
 				for (QNode node : list) {
 					// set activator for nodes
 					node.setNetElementActivator(this.engines[thread]);
-					// If we simulate all Nodes, we have to add them initially to the Lists.
-					if (simulateAllNodes) this.engines[thread].activateNode(node);
-
 					// set activator for links
 					for (Link outLink : node.getNode().getOutLinks().values()) {
 						AbstractQLink qLink = (AbstractQLink) network.getNetsimLink(outLink.getId());
@@ -278,7 +264,6 @@ public class MyParallelQNetsimEngine extends QNetsimEngine {
 						qLink.setNetElementActivator(this.engines[thread]);
 					}
 				}
-				if (simulateAllNodes) this.engines[thread].activateNodes();
 				thread++;
 			}
 		}

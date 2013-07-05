@@ -91,10 +91,10 @@ public class RunSimulation {
 	}
 
 	public static void main(String[] args) {
-		Config config = createConfig(D4DConsts.WORK_DIR + "/0213-capital-only-025freespeed-beginning-disutility-travel-qs", 4);
+		Config config = createConfig(D4DConsts.WORK_DIR + "/0620wo-capital-only-025freespeed-beginning-disutility-travel-qs", 4);
 		run(config);
-		config = createConfig(D4DConsts.WORK_DIR + "/0213-capital-only-05freespeed-beginning-disutility-travel-qs", 2);
-		run(config);
+//		config = createConfig(D4DConsts.WORK_DIR + "/0213-capital-only-05freespeed-beginning-disutility-travel-qs", 2);
+//		run(config);
 //		config = createConfig("./0211-capital-only-0125freespeed-beginning-disutility-travel", 8);
 //		run(config);
 //		config = createConfig("./0211-capital-only-1freespeed-beginning-disutility-travel", 1);
@@ -145,8 +145,12 @@ public class RunSimulation {
 
 	public static Config createConfig(String outputDirectory, double travelTimeFactor) {
 		Config config = ConfigUtils.createConfig();
+		
+		config.planCalcScore().setWriteExperiencedPlans(true);
+		
 		config.addQSimConfigGroup(new QSimConfigGroup());
-		config.controler().setLastIteration(180);
+	//	config.controler().setLastIteration(180);
+		config.controler().setLastIteration(1);
 		config.controler().setMobsim(MobsimType.qsim.toString());
 		config.controler().setOutputDirectory(outputDirectory);
 		// config.controler().setMobsim("DoNothing");

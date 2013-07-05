@@ -36,7 +36,6 @@ public class BasicEventsHandlerTest extends MatsimTestCase {
 		EventsManagerImpl events = (EventsManagerImpl) EventsUtils.createEventsManager();
 		MyLinkEnterEventHandler handler = new MyLinkEnterEventHandler();
 		events.addHandler(handler);
-		events.printEventHandlers();
 
 		NetworkImpl network = NetworkImpl.createNetwork();
 		Node node1 = network.getFactory().createNode(new IdImpl(1), new CoordImpl(0, 0));

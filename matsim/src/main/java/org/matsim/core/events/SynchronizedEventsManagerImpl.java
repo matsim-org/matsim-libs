@@ -40,66 +40,47 @@ import org.matsim.core.events.handler.EventHandler;
  */
 public class SynchronizedEventsManagerImpl implements EventsManager {
 
-  private final EventsManager delegate;
-  
-  public SynchronizedEventsManagerImpl(EventsManager eventsManager){
-    this.delegate = eventsManager;
-  }
-  
-  @Override
-  public void addHandler(EventHandler handler) {
-    this.delegate.addHandler(handler);
-  }
+	private final EventsManager delegate;
 
-  @Override
-  public synchronized EventsFactory getFactory() {
-    return this.delegate.getFactory();
-  }
-
-  @Override
-  public synchronized void processEvent(Event event) {
-    this.delegate.processEvent(event);
-  }
-  @Override
-  public void removeHandler(EventHandler handler) {
-    this.delegate.removeHandler(handler);
-  }
+	public SynchronizedEventsManagerImpl(EventsManager eventsManager){
+		this.delegate = eventsManager;
+	}
 
 	@Override
-	public void resetCounter() {
-		delegate.resetCounter();
+	public void addHandler(EventHandler handler) {
+		this.delegate.addHandler(handler);
+	}
+
+	@Override
+	public synchronized EventsFactory getFactory() {
+		return this.delegate.getFactory();
+	}
+
+	@Override
+	public synchronized void processEvent(Event event) {
+		this.delegate.processEvent(event);
 	}
 	
+	@Override
+	public void removeHandler(EventHandler handler) {
+		this.delegate.removeHandler(handler);
+	}
+
 	@Override
 	public void resetHandlers(int iteration) {
 		delegate.resetHandlers(iteration);
 	}
-	
-	@Override
-	public void clearHandlers() {
-		delegate.clearHandlers();
-	}
-	
-	@Override
-	public void printEventsCount() {
-		delegate.printEventsCount();
-	}
-	
-	@Override
-	public void printEventHandlers() {
-		delegate.printEventHandlers();
-	}
-	
+
 	@Override
 	public void initProcessing() {
 		delegate.initProcessing();
 	}
-	
+
 	@Override
 	public void afterSimStep(double time) {
 		delegate.afterSimStep(time);
 	}
-	
+
 	@Override
 	public void finishProcessing() {
 		delegate.finishProcessing();

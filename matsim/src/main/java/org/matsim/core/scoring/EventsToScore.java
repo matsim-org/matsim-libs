@@ -20,6 +20,8 @@
 
 package org.matsim.core.scoring;
 
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -245,6 +247,10 @@ public class EventsToScore implements BasicEventHandler {
 
 	public ScoringFunction getScoringFunctionForAgent(Id agentId) {
 		return scoringFunctionsForPopulation.getScoringFunctionForAgent(agentId);
+	}
+
+	public Map<Id, Plan> getAgentRecords() {
+		return scoringFunctionsForPopulation.getAgentRecords();
 	}
 
 	public void writeExperiencedPlans(String iterationFilename) {

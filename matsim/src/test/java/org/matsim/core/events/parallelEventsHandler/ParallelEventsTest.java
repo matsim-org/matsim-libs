@@ -23,7 +23,6 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.ParallelEventsManagerImpl;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -54,7 +53,7 @@ public class ParallelEventsTest extends MatsimTestCase {
 
 	/** test, if adding and removing a handler works */
 	public void testAddAndRemoveHandler() {
-		EventsManagerImpl events = new ParallelEventsManagerImpl(2);
+		ParallelEventsManagerImpl events = new ParallelEventsManagerImpl(2);
 
 		// start iteration
 		events.initProcessing();
@@ -74,14 +73,14 @@ public class ParallelEventsTest extends MatsimTestCase {
 		assertEquals(0, handler.getNumberOfProcessedMessages());
 	}
 
-	private void processEvents(final EventsManagerImpl events, final int eventCount,
+	private void processEvents(final ParallelEventsManagerImpl parallelEventsManagerImpl, final int eventCount,
 			final int numberOfHandlers, final int numberOfIterations) {
 
 		Handler1[] handlers = new Handler1[numberOfHandlers];
 
 		for (int i = 0; i < numberOfHandlers; i++) {
 			handlers[i] = new Handler1();
-			events.addHandler(handlers[i]);
+			parallelEventsManagerImpl.addHandler(handlers[i]);
 		}
 
 		LinkLeaveEvent linkLeaveEvent = new LinkLeaveEvent(0, new IdImpl(""), new IdImpl(""), null);
@@ -89,15 +88,15 @@ public class ParallelEventsTest extends MatsimTestCase {
 		for (int j = 0; j < numberOfIterations; j++) {
 
 			// initialize events handling for new iteration
-			events.initProcessing();
+			parallelEventsManagerImpl.initProcessing();
 
 			for (int i = 0; i < eventCount; i++) {
-				events.processEvent(linkLeaveEvent);
+				parallelEventsManagerImpl.processEvent(linkLeaveEvent);
 			}
 
 			// wait on all event handler threads
 			// very important for the functionality of parallelEvents class
-			events.finishProcessing();
+			parallelEventsManagerImpl.finishProcessing();
 
 			for (int i = 0; i < numberOfHandlers; i++) {
 				assertEquals(eventCount, handlers[i]
@@ -111,7 +110,7 @@ public class ParallelEventsTest extends MatsimTestCase {
 	 * @author mrieser
 	 */
 	public void testCrashingHandler() {
-		EventsManagerImpl events = new ParallelEventsManagerImpl(2);
+		ParallelEventsManagerImpl events = new ParallelEventsManagerImpl(2);
 
 		// start iteration
 		events.initProcessing();

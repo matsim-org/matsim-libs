@@ -188,7 +188,6 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		EventsCollector collector = new EventsCollector();
 		events.addHandler(collector);
 		new MatsimEventsReader(events).readFile(eventsFile);
-		events.printEventsCount();
 
 		EventsManager events2 = EventsUtils.createEventsManager();
 

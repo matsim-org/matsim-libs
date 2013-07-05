@@ -44,14 +44,14 @@ public class Run {
 			controler.run();
 		}
 
-		{
-			Scenario scenario = loadScenario();
-			scenario.getConfig().controler().setOutputDirectory("/Users/michaelzilske/gtfs-ulm/output-marcel");
-			Controler controler = new Controler(scenario);
-			controler.setOverwriteFiles(true);
-			controler.run();
-
-		}
+//		{
+//			Scenario scenario = loadScenario();
+//			scenario.getConfig().controler().setOutputDirectory("/Users/michaelzilske/gtfs-ulm/output-marcel");
+//			Controler controler = new Controler(scenario);
+//			controler.setOverwriteFiles(true);
+//			controler.run();
+//
+//		}
 	}
 
 	private static Scenario loadScenario() {

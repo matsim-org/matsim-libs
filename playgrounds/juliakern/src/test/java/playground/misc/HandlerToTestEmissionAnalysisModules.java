@@ -49,31 +49,7 @@ public class HandlerToTestEmissionAnalysisModules implements EventsManager {
 	}
 
 	@Override
-	public void resetCounter() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
 	public void resetHandlers(int iteration) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void clearHandlers() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void printEventsCount() {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void printEventHandlers() {
 		// TODO Auto-generated method stub
 
 	}

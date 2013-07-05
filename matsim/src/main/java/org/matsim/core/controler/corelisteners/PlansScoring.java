@@ -20,16 +20,20 @@
 
 package org.matsim.core.controler.corelisteners;
 
+import org.matsim.analysis.TravelDistanceStats;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ScoringEvent;
+import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.ScoringListener;
+import org.matsim.core.controler.listener.ShutdownListener;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -42,7 +46,7 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
  *
  * @author mrieser, michaz
  */
-public class PlansScoring implements ScoringListener, IterationStartsListener, IterationEndsListener {
+public class PlansScoring implements ScoringListener, IterationStartsListener, IterationEndsListener, ShutdownListener {
 
 	private EventsToScore eventsToScore;
 
@@ -54,11 +58,14 @@ public class PlansScoring implements ScoringListener, IterationStartsListener, I
 
 	private OutputDirectoryHierarchy controlerIO;
 
+	private TravelDistanceStats travelDistanceStats; 
+	
 	public PlansScoring( Scenario sc, EventsManager events, OutputDirectoryHierarchy controlerIO, ScoringFunctionFactory scoringFunctionFactory ) {
 		this.sc = sc ;
 		this.events = events ;
 		this.scoringFunctionFactory = scoringFunctionFactory ;
 		this.controlerIO = controlerIO;
+		this.travelDistanceStats = new TravelDistanceStats(sc.getConfig(), sc.getNetwork(), controlerIO.getOutputFilename(Controler.FILENAME_TRAVELDISTANCESTATS), sc.getConfig().controler().isCreateGraphs());
 	}
 
 	@Override
@@ -78,6 +85,11 @@ public class PlansScoring implements ScoringListener, IterationStartsListener, I
 		if(sc.getConfig().planCalcScore().isWriteExperiencedPlans()) {
 			this.eventsToScore.writeExperiencedPlans(controlerIO.getIterationFilename(event.getIteration(), "experienced_plans.xml"));
 		}
+		this.travelDistanceStats.addIteration(event.getIteration(), eventsToScore.getAgentRecords());
+	}
+
+	public void notifyShutdown(ShutdownEvent controlerShudownEvent) {
+		travelDistanceStats.close();
 	}
 
 	/** 

@@ -34,29 +34,24 @@ import org.matsim.core.utils.io.IOUtils;
  *
  */
 class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
-	
+
 	private ScoringFunctionFactory scoringFunctionFactory = null;
 
 	private final TreeMap<Id,  ScoringFunction> agentScorers = new TreeMap<Id,ScoringFunction>();
-	
+
 	private final Map<Id,  Plan> agentRecords = new TreeMap<Id,Plan>();
 	private final Map<Id,List<Double>> partialScores = new TreeMap<Id,List<Double>>() ;
 
 	private Scenario scenario;
-	
+
 	public ScoringFunctionsForPopulation(Scenario scenario, ScoringFunctionFactory scoringFunctionFactory) {
 		this.scoringFunctionFactory = scoringFunctionFactory;
 		this.scenario = scenario;
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 			ScoringFunction data = this.scoringFunctionFactory.createNewScoringFunction(person.getSelectedPlan());
 			this.agentScorers.put(person.getId(), data);
-			
-		}
-		if (scenario.getConfig().planCalcScore().isWriteExperiencedPlans()) {
-			for (Person person : scenario.getPopulation().getPersons().values()) {
-				this.agentRecords.put(person.getId(), new PlanImpl());
-				this.partialScores.put(person.getId(), new ArrayList<Double>() ) ;
-			}
+			this.agentRecords.put(person.getId(), new PlanImpl());
+			this.partialScores.put(person.getId(), new ArrayList<Double>() ) ;
 		}
 	}
 
@@ -73,58 +68,56 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 	public ScoringFunction getScoringFunctionForAgent(final Id agentId) {
 		return this.agentScorers.get(agentId);
 	}
-	
-	@Override
-    public void handleActivity(Id agentId, Activity activity) {
-        ScoringFunction scoringFunctionForAgent = this.getScoringFunctionForAgent(agentId);
-        if (scoringFunctionForAgent != null) {
-            scoringFunctionForAgent.handleActivity(activity);
-            if (scenario.getConfig().planCalcScore().isWriteExperiencedPlans()) {
-                agentRecords.get(agentId).addActivity(activity);
-                Collection<Double> partialScoresForAgent = partialScores.get(agentId) ;
-                partialScoresForAgent.add( scoringFunctionForAgent.getScore() ) ;
-            }
-        }
-    }
 
-    @Override
-    public void handleLeg(Id agentId, Leg leg) {
-        ScoringFunction scoringFunctionForAgent = this.getScoringFunctionForAgent(agentId);
-        if (scoringFunctionForAgent != null) {
-            scoringFunctionForAgent.handleLeg(leg);
-            if (scenario.getConfig().planCalcScore().isWriteExperiencedPlans()) {
-            	agentRecords.get(agentId).addLeg(leg);
-                Collection<Double> partialScoresForAgent = partialScores.get(agentId) ;
-                partialScoresForAgent.add( scoringFunctionForAgent.getScore() ) ;
-            }
-        }
-    }
-    
-    public void finishScoringFunctions() {
+	public Map<Id, Plan> getAgentRecords() {
+		return agentRecords;
+	}
+
+	@Override
+	public void handleActivity(Id agentId, Activity activity) {
+		ScoringFunction scoringFunctionForAgent = this.getScoringFunctionForAgent(agentId);
+		if (scoringFunctionForAgent != null) {
+			scoringFunctionForAgent.handleActivity(activity);
+			agentRecords.get(agentId).addActivity(activity);
+			Collection<Double> partialScoresForAgent = partialScores.get(agentId) ;
+			partialScoresForAgent.add( scoringFunctionForAgent.getScore() ) ;
+		}
+	}
+
+	@Override
+	public void handleLeg(Id agentId, Leg leg) {
+		ScoringFunction scoringFunctionForAgent = this.getScoringFunctionForAgent(agentId);
+		if (scoringFunctionForAgent != null) {
+			scoringFunctionForAgent.handleLeg(leg);
+			agentRecords.get(agentId).addLeg(leg);
+			Collection<Double> partialScoresForAgent = partialScores.get(agentId) ;
+			partialScoresForAgent.add( scoringFunctionForAgent.getScore() ) ;
+		}
+	}
+
+	public void finishScoringFunctions() {
 		for (ScoringFunction sf : agentScorers.values()) {
 			sf.finish();
 		}
-		if ( scenario.getConfig().planCalcScore().isWriteExperiencedPlans() ) {
-			for ( Entry<Id, List<Double>> entry : this.partialScores.entrySet() ) {
-				entry.getValue().add( 1, this.getScoringFunctionForAgent(entry.getKey()).getScore() ) ;
-			}
+		for ( Entry<Id, List<Double>> entry : this.partialScores.entrySet() ) {
+			entry.getValue().add(this.getScoringFunctionForAgent(entry.getKey()).getScore()) ;
 		}
 	}
 
 	public void writeExperiencedPlans(String iterationFilename) {
 		PopulationImpl population = new PopulationImpl((ScenarioImpl) scenario);
 		for (Entry<Id, Plan> entry : agentRecords.entrySet()) {
-			Person person = new PersonImpl(entry.getKey());
+			PersonImpl person = new PersonImpl(entry.getKey());
 			Plan plan = entry.getValue();
 			plan.setScore(getScoringFunctionForAgent(person.getId()).getScore());
+			person.addPlan(plan);
+			population.addPerson(person);
 			if ( plan.getScore().isNaN() ) {
 				Logger.getLogger(this.getClass()).warn("score is NaN; plan:" + plan.toString() );
 			}
-			person.addPlan(plan);
-			population.addPerson(person);
 		}
 		new PopulationWriter(population, scenario.getNetwork()).writeV5(iterationFilename);
-		
+
 		BufferedWriter out = IOUtils.getBufferedWriter(iterationFilename+".scores") ;
 		for ( Entry<Id,List<Double>> entry : partialScores.entrySet() ) {
 			try {
@@ -142,6 +135,6 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-    }
+	}
 
 }

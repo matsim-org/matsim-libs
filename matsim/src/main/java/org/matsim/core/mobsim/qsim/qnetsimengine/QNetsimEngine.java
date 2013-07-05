@@ -20,11 +20,8 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ListIterator;
@@ -54,45 +51,12 @@ import org.matsim.lanes.data.v20.LaneDefinitions20;
  */
 public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 
-	private static final class NodeIdComparator implements Comparator<QNode>, Serializable {
-		private static final long serialVersionUID = 1L;
-
-		@Override
-		public int compare(final QNode o1, final QNode o2) {
-			return o1.getNode().getId().compareTo(o2.getNode().getId());
-		}
-	}
-
-
 	private static final Logger log = Logger.getLogger(QNetsimEngine.class);
 
 	private static final int INFO_PERIOD = 3600;
 	
-	/* If simulateAllLinks is set to true, then the method "moveLink" will be called for every link in every timestep.
-	 * If simulateAllLinks is set to false, the method "moveLink" will only be called for "active" links (links where at least one
-	 * car is in one of the many queues).
-	 * One should assume, that the result of a simulation is the same, no matter how "simulateAllLinks" is set. But the order how
-	 * the links are processed influences the order of events within one time step. Thus, just comparing the event-files will not
-	 * work, but first sorting the two event-files by time and agent-id and then comparing them, will work.
-	 */
-	/*package*/ static boolean simulateAllLinks = false;
-	/*package*/ static boolean simulateAllNodes = false;
-
-	/*
-	 * "Classic" behavior is using an array of nodes. However, in many
-	 * cases it is faster, if non-active nodes are de-activated. Note that
-	 * enabling this option might (slightly) change the simulation results. 
-	 * A node that is de-activated and re-activated later will be at another 
-	 * position in the list of nodes which are simulated. As a result, different
-	 * random numbers will be used when the node is simulated.  
-	 * In the future each node should get its own random number generator - then
-	 * there is no difference anymore between the results w/o de-activated nodes.
-	 */
-	/*package*/ static boolean useNodeArray = false;
 	/*package*/   QNetwork network;
 
-	/*package*/  List<QLinkInternalI> allLinks = null;
-	/*package*/  List<QNode> allNodes = null;
 	/** This is the collection of links that have to be moved in the simulation */
 	/*package*/  List<QLinkInternalI> simLinksList = new ArrayList<QLinkInternalI>();
 	/** This is the collection of nodes that have to be moved in the simulation */
@@ -204,20 +168,7 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 
 	@Override
 	public void onPrepareSim() {
-		this.allLinks = new ArrayList<QLinkInternalI>(network.getNetsimLinks().values());
-		this.allNodes = new ArrayList<QNode>(network.getNetsimNodes().values());
-		if (useNodeArray) {
-			this.simNodesArray = network.getNetsimNodes().values().toArray(new QNode[network.getNetsimNodes().values().size()]);
-			//dg[april08] as the order of nodes has an influence on the simulation
-			//results they are sorted to avoid indeterministic simulations
-			Arrays.sort(this.simNodesArray, new NodeIdComparator());			
-		} else {
-			simNodesList = new ArrayList<QNode>();
-			Collections.sort(simNodesList, new NodeIdComparator());
-		}
-		if (simulateAllLinks) {
-			this.simLinksList.addAll(this.allLinks);
-		}
+		simNodesList = new ArrayList<QNode>();
 		this.infoTime = Math.floor(internalInterface.getMobsim().getSimTimer().getSimStartTime()
 				/ INFO_PERIOD)
 				* INFO_PERIOD; // infoTime may be < simStartTime, this ensures
@@ -232,7 +183,7 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 		 * in the buffer (such links are *not* active, as the buffer gets emptied
 		 * when handling the nodes.
 		 */
-		for (QLinkInternalI link : this.allLinks) {
+		for (QLinkInternalI link : network.getNetsimLinks().values()) {
 			link.clearVehicles();
 		}
 	}
@@ -249,29 +200,15 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 	}
 
 	private void moveNodes(final double time) {
-		if (useNodeArray) {
-			for (QNode node : this.simNodesArray) {
-				if (node.isActive() /*|| node.isSignalized()*/ || simulateAllNodes) {
-					/* It is faster to first test if the node is active, and only then call moveNode(),
-					 * than calling moveNode() directly and that one returns immediately when it's not
-					 * active. Most likely, the getter isActive() can be in-lined by the compiler, while
-					 * moveNode() cannot, resulting in fewer method-calls when isActive() is used.
-					 * -marcel/20aug2008
-					 */
-					node.doSimStep(time);
-				}
-			}			
-		} else {
-			reactivateNodes();
-			ListIterator<QNode> simNodes = this.simNodesList.listIterator();
-			QNode node;
+		reactivateNodes();
+		ListIterator<QNode> simNodes = this.simNodesList.listIterator();
+		QNode node;
 
-			while (simNodes.hasNext()) {
-				node = simNodes.next();
-				node.doSimStep(time);
+		while (simNodes.hasNext()) {
+			node = simNodes.next();
+			node.doSimStep(time);
 
-				if (!node.isActive()) simNodes.remove();
-			}
+			if (!node.isActive()) simNodes.remove();
 		}
 	}
 
@@ -284,7 +221,7 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 		while (simLinks.hasNext()) {
 			link = simLinks.next();
 			isActive = link.doSimStep(time);
-			if (!isActive && !simulateAllLinks) {
+			if (!isActive && !false) {
 				simLinks.remove();
 			}
 		}
@@ -303,13 +240,13 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 
 	@Override
 	protected void activateLink(final QLinkInternalI link) {
-		if (!simulateAllLinks) {
+		if (!false) {
 			this.simActivateLinks.add(link);
 		}
 	}
 
 	private void reactivateLinks() {
-		if ((!simulateAllLinks) && (!this.simActivateLinks.isEmpty())) {
+		if ((!false) && (!this.simActivateLinks.isEmpty())) {
 			this.simLinksList.addAll(this.simActivateLinks);
 			this.simActivateLinks.clear();
 		}
@@ -317,13 +254,13 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 
 	@Override
 	protected void activateNode(QNode node) {
-		if (!useNodeArray && !simulateAllNodes) {
+		if (!false && !false) {
 			this.simActivateNodes.add(node);
 		}
 	}
 
 	private void reactivateNodes() {
-		if ((!simulateAllNodes) && (!this.simActivateNodes.isEmpty())) {
+		if ((!false) && (!this.simActivateNodes.isEmpty())) {
 			this.simNodesList.addAll(this.simActivateNodes);
 			this.simActivateNodes.clear();
 		}
@@ -331,8 +268,7 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 
 	@Override
 	public int getNumberOfSimulatedNodes() {
-		if (useNodeArray) return this.simNodesArray.length;
-		else return this.simNodesList.size();
+		return this.simNodesList.size();
 	}
 
 	@Override
