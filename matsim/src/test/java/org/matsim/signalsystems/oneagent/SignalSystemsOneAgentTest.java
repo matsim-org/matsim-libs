@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.signalsystems;
+package org.matsim.signalsystems.oneagent;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
@@ -30,20 +30,12 @@ import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.SignalGroupStateChangedEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.config.groups.SignalSystemsConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.SignalGroupStateChangedEventHandler;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.lanes.run.LaneDefinitonsV11ToV20Converter;
 import org.matsim.signalsystems.builder.FromDataBuilder;
 import org.matsim.signalsystems.data.SignalsData;
-import org.matsim.signalsystems.data.SignalsScenarioLoader;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalGroupSettingsData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalPlanData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalSystemControllerData;
@@ -53,8 +45,8 @@ import org.matsim.signalsystems.model.SignalSystemsManager;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
- * Simple test case for the QueueSim signal system implementation.
- * One agent drives one round in the signal system default simple test
+ * Simple test case for the Controler and or QSim and the default signal system implementation.
+ * One agent drives one round a simple test
  * network.
  *
  * @author dgrether
@@ -73,48 +65,15 @@ public class SignalSystemsOneAgentTest implements
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 	
-	private Scenario createAndLoadTestScenario(){
-		String plansFile = testUtils.getClassInputDirectory() + "plans1Agent.xml";
-		Config conf = ConfigUtils.createConfig();
-		conf.controler().setMobsim("qsim");
-		conf.network().setInputFile(testUtils.getClassInputDirectory() + "network.xml.gz");
-		String laneDefinitions = testUtils.getClassInputDirectory() + "testLaneDefinitions_v1.1.xml";
-		String lanes20 = testUtils.getOutputDirectory() + "testLaneDefinitions_v2.0.xml";
-		new LaneDefinitonsV11ToV20Converter().convert(laneDefinitions,lanes20, conf.network().getInputFile());
-		conf.network().setLaneDefinitionsFile(lanes20);
-		conf.plans().setInputFile(plansFile);
-		conf.scenario().setUseLanes(true);
-		conf.scenario().setUseSignalSystems(false);
-		//as signals are configured below we don't need signals on
-		conf.addQSimConfigGroup(new QSimConfigGroup());
-		conf.getQSimConfigGroup().setStuckTime(1000);
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(conf);
-		return scenario;
-	}
 	
-	private void setSignalSystemConfigValues(SignalSystemsConfigGroup signalsConfig){
-		String signalSystemsFile = testUtils.getClassInputDirectory() + "testSignalSystems_v2.0.xml";
-		String signalGroupsFile = testUtils.getClassInputDirectory() + "testSignalGroups_v2.0.xml";
-		String signalControlFile = testUtils.getClassInputDirectory() + "testSignalControl_v2.0.xml";
-		String amberTimesFile = testUtils.getClassInputDirectory() + "testAmberTimes_v1.0.xml";
-		signalsConfig.setSignalSystemFile(signalSystemsFile);
-		signalsConfig.setSignalGroupsFile(signalGroupsFile);
-		signalsConfig.setSignalControlFile(signalControlFile);
-		signalsConfig.setAmberTimesFile(amberTimesFile);
-	}
-
 	/**
 	 * Tests the setup with a traffic light that shows all the time green
 	 */
 	@Test
 	public void testTrafficLightIntersection2arms1AgentV20() {
 		//configure and load standard scenario
-		Scenario scenario = this.createAndLoadTestScenario();
-		SignalSystemsConfigGroup signalsConfig = scenario.getConfig().signalSystems();
-		this.setSignalSystemConfigValues(signalsConfig);
-		
-		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(signalsConfig);
-		scenario.addScenarioElement(signalsLoader.loadSignalsData());
+		Fixture fixture = new Fixture();
+		Scenario scenario = fixture.createAndLoadTestScenario(true);
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(this);
@@ -136,14 +95,10 @@ public class SignalSystemsOneAgentTest implements
 	@Test
 	public void testSignalSystems1AgentGreenAtSec100() {
 		//configure and load standard scenario
-		Scenario scenario = this.createAndLoadTestScenario();
-		SignalSystemsConfigGroup signalsConfig = scenario.getConfig().signalSystems();
-		this.setSignalSystemConfigValues(signalsConfig);
-		
-		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(signalsConfig);
-		SignalsData signalsData = signalsLoader.loadSignalsData();
-		scenario.addScenarioElement(signalsData);
-		
+		Fixture fixture = new Fixture();
+		Scenario scenario = fixture.createAndLoadTestScenario(false);
+		SignalsData signalsData = scenario.getScenarioElement(SignalsData.class);
+	
 		SignalSystemControllerData controllerData = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(id2);
 		SignalPlanData planData = controllerData.getSignalPlanData().get(id2);
 		planData.setStartTime(0.0);
@@ -166,22 +121,18 @@ public class SignalSystemsOneAgentTest implements
 		qsim.run();
 	}
 	
+
+	
+	
 	/**
 	 * Tests the setup with a traffic light that shows all the time green
 	 */
 	@Test
 	public void testIntergreensAbortOneAgentDriving() {
 		//configure and load standard scenario
-		Scenario scenario = this.createAndLoadTestScenario();
-		SignalSystemsConfigGroup signalsConfig = scenario.getConfig().signalSystems();
-		this.setSignalSystemConfigValues(signalsConfig);
-		signalsConfig.setIntergreenTimesFile(testUtils.getClassInputDirectory() + "testIntergreenTimes_v1.0.xml");
-		signalsConfig.setUseIntergreenTimes(true);
-		signalsConfig.setActionOnIntergreenViolation(SignalSystemsConfigGroup.EXCEPTION_ON_INTERGREEN_VIOLATION);
-		
-		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(signalsConfig);
-		SignalsData signalsData = signalsLoader.loadSignalsData();
-		scenario.addScenarioElement(signalsData);
+		Fixture fixture = new Fixture();
+		Scenario scenario = fixture.createAndLoadTestScenario(true);
+		SignalsData signalsData = scenario.getScenarioElement(SignalsData.class);
 		
 		SignalSystemControllerData controllerData = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(id2);
 		SignalPlanData planData = controllerData.getSignalPlanData().get(id2);
