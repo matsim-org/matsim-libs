@@ -45,8 +45,10 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 
 /**
- * Calculates a least-cost-path tree using Dijkstra's algorithm for calculating a shortest-path
+ * Calculates a least-cost-path tree using Dijkstra's algorithm  for calculating a shortest-path
  * tree, given a node as root of the tree.
+ * 
+ * (The overall algorithm is sometimes called Kruskal's algorithm, the least-cost-path tree in graph theory is a spanning tree. dg 2013)
  * 
  * @author balmermi, mrieser
  */
