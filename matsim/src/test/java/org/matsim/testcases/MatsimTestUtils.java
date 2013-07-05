@@ -20,6 +20,7 @@
 package org.matsim.testcases;
 
 import java.io.File;
+import java.lang.reflect.Method;
 
 import org.junit.Assert;
 import org.junit.rules.TestWatchman;
@@ -157,6 +158,16 @@ public class MatsimTestUtils extends TestWatchman {
 		return this.testMethodName;
 	}
 
+	/**
+	 * Initializes MatsimTestUtils without requiring the method of a class to be a JUnit test. 
+	 * This should be used for "fixtures" only that provide a scenario common to several
+	 * test cases.  
+	 */
+	public void initWithoutJUnitForFixture(Class fixture, Method method){
+		this.testClass = fixture;
+		this.testMethodName = method.getName();
+	}
+	
 	/* inspired by
 	 * @see org.junit.rules.TestName#starting(org.junit.runners.model.FrameworkMethod)
 	 */
