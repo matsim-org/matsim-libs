@@ -4,13 +4,13 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
-import org.matsim.core.replanning.modules.TripTimeAllocationMutatorStrategyFactory;
+import org.matsim.core.replanning.modules.TimeAllocationMutatorPlanStrategyFactory;
 
 import playground.pieter.pseudosimulation.controler.PSimControler;
 import playground.pieter.pseudosimulation.replanning.modules.PSimPlanMarkerModule;
 
 public class PSimTripTimeAllocationMutatorStrategyFactory extends
-		TripTimeAllocationMutatorStrategyFactory {
+		TimeAllocationMutatorPlanStrategyFactory {
 
 	private PSimControler controler;
 

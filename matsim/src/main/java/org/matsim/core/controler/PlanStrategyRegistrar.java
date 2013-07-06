@@ -34,8 +34,6 @@ import org.matsim.core.replanning.modules.SelectRandomStrategyFactory;
 import org.matsim.core.replanning.modules.SubtourModeChoiceStrategyFactory;
 import org.matsim.core.replanning.modules.TimeAllocationMutatorPlanStrategyFactory;
 import org.matsim.core.replanning.modules.TripSubtourModeChoiceStrategyFactory;
-import org.matsim.core.replanning.modules.TripTimeAllocationMutatorRerouteStrategyFactory;
-import org.matsim.core.replanning.modules.TripTimeAllocationMutatorStrategyFactory;
 
 
 public class PlanStrategyRegistrar {
@@ -65,15 +63,7 @@ public class PlanStrategyRegistrar {
 		register.register("ChangeSingleTripMode", new ChangeSingleTripModeStrategyFactory());
 		register.register("SubtourModeChoice", new SubtourModeChoiceStrategyFactory());
 		register.register("ChangeTripMode", new ChangeTripModeStrategyFactory());
-		register.register("TransitTimeAllocationMutator", new TripTimeAllocationMutatorStrategyFactory());
-		register.register("TripTimeAllocationMutator_ReRoute", new TripTimeAllocationMutatorRerouteStrategyFactory());
 		register.register("TripSubtourModeChoice", new TripSubtourModeChoiceStrategyFactory());
-		
-		// for backwards compatibility:
-		register.register("TransitChangeLegMode", new ChangeTripModeStrategyFactory()); // for backwards compatibility
-		register.register("TransitTimeAllocationMutator_ReRoute", new TripTimeAllocationMutatorRerouteStrategyFactory()); // for backwards compatibility
-		register.register("TransitSubtourModeChoice", new TripSubtourModeChoiceStrategyFactory()); // for backwards compatibility
-		register.register("TransitChangeSingleLegMode", new ChangeSingleTripModeStrategyFactory()); // for backwards compatibility
 	}
 	
 	public PlanStrategyFactoryRegister getFactoryRegister() {

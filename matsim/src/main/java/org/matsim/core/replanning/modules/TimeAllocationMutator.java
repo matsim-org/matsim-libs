@@ -27,6 +27,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.PlanMutateTimeAllocation;
 import org.matsim.population.algorithms.PlanMutateTimeAllocationSimplified;
+import org.matsim.population.algorithms.TripPlanMutateTimeAllocation;
 
 /**
  * Wraps the {@link org.matsim.population.algorithms.PlanMutateTimeAllocation}-
@@ -38,8 +39,8 @@ import org.matsim.population.algorithms.PlanMutateTimeAllocationSimplified;
  */
 public class TimeAllocationMutator extends AbstractMultithreadedModule {
 
-	private double mutationRange;
-	private ActivityDurationInterpretation activityDurationInterpretation = ActivityDurationInterpretation.minOfDurationAndEndTime;
+	private final double mutationRange;
+	private final ActivityDurationInterpretation activityDurationInterpretation;
 
 	/**
 	 * Creates a new TimeAllocationMutator with a mutation range as defined in
@@ -47,18 +48,20 @@ public class TimeAllocationMutator extends AbstractMultithreadedModule {
 	 */
 	public TimeAllocationMutator(Config config) {
 		super(config.global());
-
 		this.mutationRange = config.timeAllocationMutator().getMutationRange();
+		this.activityDurationInterpretation = config.vspExperimental().getActivityDurationInterpretation();
 	}
 
 	public TimeAllocationMutator(Config config, final int mutationRange) {
 		super(config.global());
 		this.mutationRange = mutationRange;
+		this.activityDurationInterpretation = config.vspExperimental().getActivityDurationInterpretation();
 	}
 	
 	public TimeAllocationMutator(Config config, final double mutationRange) {
 		super(config.global());
 		this.mutationRange = mutationRange;
+		this.activityDurationInterpretation = config.vspExperimental().getActivityDurationInterpretation();
 	}
 
 	@Override
@@ -66,7 +69,10 @@ public class TimeAllocationMutator extends AbstractMultithreadedModule {
 		PlanAlgorithm pmta;
 		switch (this.activityDurationInterpretation) {
 		case minOfDurationAndEndTime:
-			pmta = new PlanMutateTimeAllocation(mutationRange, MatsimRandom.getLocalInstance());
+			pmta = new TripPlanMutateTimeAllocation(
+					getReplanningContext().getTripRouterFactory().instantiateAndConfigureTripRouter().getStageActivityTypes(), 
+					mutationRange, 
+					MatsimRandom.getLocalInstance());
 			break;
 		default:
 			pmta = new PlanMutateTimeAllocationSimplified(

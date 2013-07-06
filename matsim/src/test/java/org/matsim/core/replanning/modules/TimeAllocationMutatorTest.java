@@ -24,15 +24,19 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.PlanMutateTimeAllocation;
+import org.matsim.population.algorithms.PlanMutateTimeAllocationSimplified;
+import org.matsim.population.algorithms.TripPlanMutateTimeAllocation;
+import org.matsim.pt.PtConstants;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -44,72 +48,15 @@ import org.matsim.testcases.MatsimTestCase;
 public class TimeAllocationMutatorTest extends MatsimTestCase {
 
 	/**
-	 * Tests that the default value is respected.
-	 *
-	 * @author mrieser
-	 */
-	public void testMutationRangeDefault() {
-		Config config = loadConfig(null);
-		config.global().setNumberOfThreads(0);
-		for ( ActivityDurationInterpretation activityDurationInterpretation : ActivityDurationInterpretation.values() ) {
-			config.vspExperimental().setActivityDurationInterpretation(activityDurationInterpretation) ;
-			// Note: the different activity duration interpretations internall call different PlanMutateTimeAllocation classes.
-			// Maybe should be more explicit? How? kai, jun'12
-			runMutationRangeTest(new TimeAllocationMutator(config), 1800);
-		}
-	}
-
-	/**
-	 * Tests that the mutation range set in the configuration file is respected.
-	 *
-	 * @author mrieser
-	 */
-	public void testMutationRangeConfig() {
-		Config config = loadConfig(null);
-		config.global().setNumberOfThreads(0);
-		for ( ActivityDurationInterpretation activityDurationInterpretation : ActivityDurationInterpretation.values() ) {
-			config.vspExperimental().setActivityDurationInterpretation(activityDurationInterpretation) ;
-			// Note: the different activity duration interpretations internall call different PlanMutateTimeAllocation classes.
-			// Maybe should be more explicit? How? kai, jun'12
-
-			// test smaller value than default
-			//		config.setParam(TimeAllocationMutator.CONFIG_GROUP, TimeAllocationMutator.CONFIG_MUTATION_RANGE, "900");
-			config.timeAllocationMutator().setMutationRange( 900. ) ;
-			runMutationRangeTest(new TimeAllocationMutator(config), 900);
-
-			// test bigger value than default
-			//		config.setParam(TimeAllocationMutator.CONFIG_GROUP, TimeAllocationMutator.CONFIG_MUTATION_RANGE, "2700");
-			config.timeAllocationMutator().setMutationRange(2700.) ;
-			runMutationRangeTest(new TimeAllocationMutator(config), 2700);
-
-		}
-	}
-
-	/**
 	 * Tests that the mutation range given in the constructor is respected.
 	 *
 	 * @author mrieser
 	 */
 	public void testMutationRangeParam() {
-		Config config = loadConfig(null);
-		config.global().setNumberOfThreads(0);
-		for ( ActivityDurationInterpretation activityDurationInterpretation : ActivityDurationInterpretation.values() ) {
-			config.vspExperimental().setActivityDurationInterpretation(activityDurationInterpretation) ;
-			// Note: the different activity duration interpretations internall call different PlanMutateTimeAllocation classes.
-			// Maybe should be more explicit? How? kai, jun'12
-
-			// test smaller value than default
-			runMutationRangeTest(new TimeAllocationMutator(config, 750), 750);
-
-			// test bigger value than default
-
-			// I found the following line.  presumably, it deliberately sets the config to a different value
-			// than what is used in the constructor.  ???  kai, jun'12
-			//		config.setParam(TimeAllocationMutator.CONFIG_GROUP, TimeAllocationMutator.CONFIG_MUTATION_RANGE, "2700");
-			config.timeAllocationMutator().setMutationRange(2700.) ;
-
-			runMutationRangeTest(new TimeAllocationMutator(config, 7200), 7200);
-		}
+		runMutationRangeTest(new TripPlanMutateTimeAllocation(new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE ), 750, MatsimRandom.getLocalInstance()), 750);
+		runMutationRangeTest(new TripPlanMutateTimeAllocation(new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE ), 7200, MatsimRandom.getLocalInstance()), 7200);
+		// runMutationRangeTest(new PlanMutateTimeAllocationSimplified(new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE ), 750, MatsimRandom.getLocalInstance()), 750);
+		// runMutationRangeTest(new PlanMutateTimeAllocationSimplified(new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE ), 7200, MatsimRandom.getLocalInstance()), 7200);
 	}
 
 	/**
@@ -119,10 +66,10 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 	 * durations have changed and thus ensuring, the differences are within the
 	 * expected range.
 	 *
-	 * @param mutator A preset TimeAllocationMutator to be used for the tests.
+	 * @param tripPlanMutateTimeAllocation A preset TimeAllocationMutator to be used for the tests.
 	 * @param expectedMutationRange The expected range for mutation.
 	 */
-	private void runMutationRangeTest(final TimeAllocationMutator mutator, final int expectedMutationRange) {
+	private void runMutationRangeTest(final PlanAlgorithm tripPlanMutateTimeAllocation, final int expectedMutationRange) {
 		// setup network
 		NetworkImpl network = NetworkImpl.createNetwork();
 		network.setCapacityPeriod(Time.parseTime("01:00:00"));
@@ -154,9 +101,6 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 			throw new RuntimeException(e);
 		}
 
-		// setup mutator
-		mutator.prepareReplanning(null);
-
 		// run test
 		double act1Dur = act1.getEndTime();
 		double minDiff1 = Double.POSITIVE_INFINITY;
@@ -164,8 +108,10 @@ public class TimeAllocationMutatorTest extends MatsimTestCase {
 		double act2Dur = act2.getMaximumDuration();
 		double minDiff2 = Double.POSITIVE_INFINITY;
 		double maxDiff2 = Double.NEGATIVE_INFINITY;
+		//	planMutateTimeAllocation.prepareReplanning(null);
 		for (int i = 0; i < 150; i++) {
-			mutator.handlePlan(plan);
+			//planMutateTimeAllocation.handlePlan(plan);
+			tripPlanMutateTimeAllocation.run(plan);
 			// test duration of act1
 			double diff = act1Dur - act1.getMaximumDuration();
 			if (diff > maxDiff1) maxDiff1 = diff;

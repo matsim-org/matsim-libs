@@ -41,7 +41,7 @@ public class TripPlanMutateTimeAllocation implements PlanAlgorithm {
 	private final  StageActivityTypes stageActivities;
 	private final double mutationRange;
 	private final Random random;
-	private boolean useActivityDurations;
+	private boolean useActivityDurations = true;
 
 	public TripPlanMutateTimeAllocation(
 			final StageActivityTypes stageActivities,
