@@ -37,6 +37,11 @@ import org.matsim.core.trafficmonitoring.TravelTimeDataHashMapFactory;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 
+/**
+ * This is not a "full" integration test running from files. It rather tests, if the travel time calculator can be
+ * used with a time variant network.  
+ *
+ */
 public class TravelTimeCalculatorIntegrationTest extends MatsimTestCase {
 
 	public void testTravelTimeCalculatorArray() {
