@@ -23,14 +23,18 @@ package org.matsim.integration.timevariantnetworks;
 import java.util.ArrayList;
 import java.util.List;
 
+import junit.framework.Assert;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
@@ -38,7 +42,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
@@ -58,6 +61,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.testcases.utils.EventsLogger;
 
 /**
  * Tests that the QSim takes a TimeVariant Network into account.
@@ -170,6 +174,83 @@ public class QSimIntegrationTest extends MatsimTestCase {
 
 	}
 
+	/**
+	 * Test the queue simulation for correct behavior if capacity of links is
+	 * reduced to 0.
+	 *
+	 * @author dgrether
+	 */
+	public void testZeroCapacity() {
+		final double capacityFactor = 0.0;
+
+		Config config = loadConfig(null);
+		config.network().setTimeVariantNetwork(true);
+		config.addQSimConfigGroup(new QSimConfigGroup());
+		config.getQSimConfigGroup().setStartTime(0.0);
+		final double simEndTime = 7200.0;
+		config.getQSimConfigGroup().setEndTime(simEndTime);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+
+		NetworkImpl network = createNetwork(scenario);
+		final Id id1 = scenario.createId("1");
+		final Id id2 = scenario.createId("2");
+		final Id id3 = scenario.createId("3");
+		
+		Link link1 = network.getLinks().get(id1);
+		Link link2 = network.getLinks().get(id2);
+		Link link3 = network.getLinks().get(id3);
+		/*
+		 * Create a network change event that reduces the capacity.
+		 */
+		NetworkChangeEvent change1 = network.getFactory().createNetworkChangeEvent(0);
+		change1.addLink(link2);
+		change1.setFlowCapacityChange(new ChangeValue(ChangeType.FACTOR, capacityFactor));
+		network.addNetworkChangeEvent(change1);
+		/*
+		 * Create two waves of persons, each counting 10.
+		 */
+		Population plans = scenario.getPopulation();
+		List<PersonImpl> persons1 = createPersons(0, link1, link3, network, 1);
+		final Id personId = persons1.get(0).getId();
+		for(PersonImpl p : persons1) {
+			plans.addPerson(p);
+		}
+
+		/*
+		 * Run the simulation with the time-variant network and the two waves of
+		 * persons. Observe the last person of each wave.
+		 */
+		EventsManager events = EventsUtils.createEventsManager();
+		events.addHandler(new EventsLogger());
+		events.addHandler(new LinkEnterEventHandler(){
+			public void reset(int iteration) {}
+
+			public void handleEvent(LinkEnterEvent event) {
+				if (id2.equals(event.getLinkId()))
+					Assert.assertEquals(1.0, event.getTime());
+				if (id3.equals(event.getLinkId()))
+					Assert.fail("Link 3 should never be reached as capacity of link 2 is set to 0");
+			}
+		});
+		
+		events.addHandler(new AgentStuckEventHandler() {
+			public void reset(int iteration) {}
+			
+			public void handleEvent(AgentStuckEvent event) {
+				Assert.assertEquals(id2, event.getLinkId());
+				Assert.assertEquals(simEndTime, event.getTime());
+				Assert.assertEquals(personId, event.getPersonId());
+			}
+		});
+
+		
+		Mobsim qsim = new QSimFactory().createMobsim(scenario, events);
+        qsim.run();
+
+	}
+
+	
+	
 	/**
 	 * Creates a network with three links of length 100 m, capacity 3600 veh/h
 	 * and freespeed 10 m/s.
