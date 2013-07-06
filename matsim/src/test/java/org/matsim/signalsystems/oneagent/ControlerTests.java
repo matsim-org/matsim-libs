@@ -19,26 +19,46 @@
  * *********************************************************************** */
 package org.matsim.signalsystems.oneagent;
 
+import junit.framework.Assert;
+
+import org.apache.log4j.Logger;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.SignalGroupStateChangedEvent;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.events.EventsUtils;
+import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.events.IterationStartsEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.controler.listener.IterationStartsListener;
+import org.matsim.core.events.handler.SignalGroupStateChangedEventHandler;
 import org.matsim.signalsystems.data.SignalsData;
+import org.matsim.signalsystems.data.signalcontrol.v20.SignalGroupSettingsData;
+import org.matsim.signalsystems.data.signalcontrol.v20.SignalPlanData;
+import org.matsim.signalsystems.data.signalcontrol.v20.SignalSystemControllerData;
+import org.matsim.signalsystems.model.SignalGroupState;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.testcases.utils.EventsLogger;
 
 
 /**
+ * Contains tests that use the signals one agent scenario as base and test functionality of the Controler.
  * @author dgrether
  *
  */
 public class ControlerTests {
+	
+	private static final Logger log = Logger.getLogger(ControlerTests.class);
+	
 	@Rule
 	public MatsimTestUtils testUtils = new MatsimTestUtils();
 	
 	/**
-	 * Tests the setup with a traffic light that shows all the time green
+	 * Tests the setup with a traffic light that shows all the time green in the 0th iteration.
+	 * After the mobsim is run the signal settings are changed thus in the 1st iteration
+	 * the signal should be red in sec [0,99] and green in [100,2000]
 	 */
 	@Test
 	public void testModifySignalControlDataOnsetOffset() {
@@ -49,23 +69,76 @@ public class ControlerTests {
 		scenario.getConfig().controler().setLastIteration(1);
 		scenario.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory());
 		
-		SignalsData signalsData = scenario.getScenarioElement(SignalsData.class);
-		
-//		SignalSystemControllerData controllerData = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(id2);
-//		SignalPlanData planData = controllerData.getSignalPlanData().get(id2);
-//		planData.setStartTime(0.0);
-//		planData.setEndTime(0.0);
-//		planData.setCycleTime(5 * 3600);
-//		SignalGroupSettingsData groupData = planData.getSignalGroupSettingsDataByGroupId().get(id100);
-//		groupData.setDropping(0);
-//		groupData.setOnset(100);
-		
-		EventsManager events = EventsUtils.createEventsManager();
-//		events.addHandler(this);
-//		this.link2EnterTime = 100.0;
-		
 		Controler controler = new Controler(scenario);
-		controler.run();
+		controler.setCreateGraphs(false);
+		controler.addControlerListener(new AfterMobsimListener() {
+
+			public void notifyAfterMobsim(AfterMobsimEvent event) {
+				Scenario scenario = event.getControler().getScenario();
+				int dropping = 0;
+				int onset = 100;
+				for (SignalSystemControllerData intersectionSignal : scenario
+						.getScenarioElement(SignalsData.class).getSignalControlData()
+						.getSignalSystemControllerDataBySystemId().values()) {
+					
+					for (SignalPlanData plan : intersectionSignal.getSignalPlanData().values()) {
+						plan.setCycleTime(2000);
+						for (SignalGroupSettingsData data : plan.getSignalGroupSettingsDataByGroupId().values()) {
+							data.setDropping(dropping);
+							data.setOnset(onset);
+						}
+					}
+				}
+			}
+		});
 		
+		controler.addControlerListener(new IterationStartsListener() {
+			
+			public void notifyIterationStarts(IterationStartsEvent event) {
+				event.getControler().getEvents().addHandler(new EventsLogger());
+
+				TestLink2EnterEventHandler enterHandler = new TestLink2EnterEventHandler();
+				if (0 == event.getIteration()) {
+					enterHandler.link2EnterTime = 38.0;
+				}
+
+				if (1 == event.getIteration()) {
+					enterHandler.link2EnterTime = 100.0;
+					SignalGroupStateChangedEventHandler signalsHandler0 = new TestSignalGroupStateChangedHandler();
+					event.getControler().getEvents().addHandler(signalsHandler0);
+				}
+			}
+		});
+		
+		controler.run();
 	}
+	
+	
+	private static final class TestSignalGroupStateChangedHandler implements
+			SignalGroupStateChangedEventHandler {
+
+		public void reset(int i) {}
+
+		@Override
+		public void handleEvent(SignalGroupStateChangedEvent e) {
+			if (e.getNewState().equals(SignalGroupState.RED)){
+				Assert.assertEquals(0.0, e.getTime());
+			}
+			else if (e.getNewState().equals(SignalGroupState.GREEN)) {
+				Assert.assertEquals(100.0, e.getTime());
+			}
+		}
+	}
+
+
+	private static final class TestLink2EnterEventHandler implements LinkEnterEventHandler {
+		double link2EnterTime = 0;
+		public void reset(int i) {}
+		public void handleEvent(LinkEnterEvent e){
+			if (e.getLinkId().equals(Fixture.id2)) {
+				Assert.assertEquals(link2EnterTime,  e.getTime(), MatsimTestUtils.EPSILON);
+			}
+		}
+	}
+	
 }

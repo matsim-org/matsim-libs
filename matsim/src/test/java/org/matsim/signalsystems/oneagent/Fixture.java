@@ -21,6 +21,7 @@ package org.matsim.signalsystems.oneagent;
 
 import java.lang.reflect.Method;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -29,7 +30,6 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.SignalSystemsConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.lanes.run.LaneDefinitonsV11ToV20Converter;
 import org.matsim.signalsystems.data.SignalsData;
@@ -42,6 +42,10 @@ import org.matsim.testcases.MatsimTestUtils;
  *
  */
 public class Fixture {
+
+	static final Id id1 = new IdImpl(1);
+	static final Id id2 = new IdImpl(2);
+	static final Id id100 = new IdImpl(100);
 
 	public Scenario createAndLoadTestScenario(Boolean useIntergreens){
 		MatsimTestUtils testUtils = new MatsimTestUtils();
@@ -71,14 +75,15 @@ public class Fixture {
 		conf.network().setLaneDefinitionsFile(lanes20);
 		conf.plans().setInputFile(plansFile);
 		conf.scenario().setUseLanes(true);
-		conf.scenario().setUseSignalSystems(false);
+		conf.scenario().setUseSignalSystems(true);
 		//as signals are configured below we don't need signals on
 		conf.addQSimConfigGroup(new QSimConfigGroup());
 		conf.getQSimConfigGroup().setStuckTime(1000);
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(conf);
-		
-		SignalSystemsConfigGroup signalsConfig = scenario.getConfig().signalSystems();
+		conf.getQSimConfigGroup().setStartTime(0.0);
+		SignalSystemsConfigGroup signalsConfig = conf.signalSystems();
 		this.setSignalSystemConfigValues(signalsConfig, testUtils);
+		Scenario scenario = ScenarioUtils.loadScenario(conf);
+		
 		if (useIntergreens) {
 			signalsConfig.setIntergreenTimesFile(testUtils.getClassInputDirectory() + "testIntergreenTimes_v1.0.xml");
 			signalsConfig.setUseIntergreenTimes(true);

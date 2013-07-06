@@ -23,13 +23,11 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.SignalGroupStateChangedEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.SignalGroupStateChangedEventHandler;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -51,15 +49,11 @@ import org.matsim.testcases.MatsimTestUtils;
  *
  * @author dgrether
  */
-public class SignalSystemsOneAgentTest implements
+public class QSimTests implements
 		LinkEnterEventHandler, SignalGroupStateChangedEventHandler {
 
-	private static final Logger log = Logger.getLogger(SignalSystemsOneAgentTest.class);
+	private static final Logger log = Logger.getLogger(QSimTests.class);
 
-	private Id id1 = new IdImpl(1);
-	private Id id2 = new IdImpl(2);
-	private Id id100 = new IdImpl(100);
-	
 	private double link2EnterTime = Double.NaN;
 
 	@Rule
@@ -71,8 +65,8 @@ public class SignalSystemsOneAgentTest implements
 	 */
 	@Test
 	public void testTrafficLightIntersection2arms1AgentV20() {
-		//configure and load standard scenario
 		Fixture fixture = new Fixture();
+		//configure and load standard scenario
 		Scenario scenario = fixture.createAndLoadTestScenario(true);
 		
 		EventsManager events = EventsUtils.createEventsManager();
@@ -90,7 +84,7 @@ public class SignalSystemsOneAgentTest implements
 	
 
 	/**
-	 * Tests the setup with a traffic light that shows all the time green
+	 * Tests the setup with a traffic light that shows red up to second 99 then in sec 100 green. 
 	 */
 	@Test
 	public void testSignalSystems1AgentGreenAtSec100() {
@@ -99,12 +93,12 @@ public class SignalSystemsOneAgentTest implements
 		Scenario scenario = fixture.createAndLoadTestScenario(false);
 		SignalsData signalsData = scenario.getScenarioElement(SignalsData.class);
 	
-		SignalSystemControllerData controllerData = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(id2);
-		SignalPlanData planData = controllerData.getSignalPlanData().get(id2);
+		SignalSystemControllerData controllerData = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(Fixture.id2);
+		SignalPlanData planData = controllerData.getSignalPlanData().get(Fixture.id2);
 		planData.setStartTime(0.0);
 		planData.setEndTime(0.0);
 		planData.setCycleTime(5 * 3600);
-		SignalGroupSettingsData groupData = planData.getSignalGroupSettingsDataByGroupId().get(id100);
+		SignalGroupSettingsData groupData = planData.getSignalGroupSettingsDataByGroupId().get(Fixture.id100);
 		groupData.setDropping(0);
 		groupData.setOnset(100);
 		
@@ -134,12 +128,12 @@ public class SignalSystemsOneAgentTest implements
 		Scenario scenario = fixture.createAndLoadTestScenario(true);
 		SignalsData signalsData = scenario.getScenarioElement(SignalsData.class);
 		
-		SignalSystemControllerData controllerData = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(id2);
-		SignalPlanData planData = controllerData.getSignalPlanData().get(id2);
+		SignalSystemControllerData controllerData = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(Fixture.id2);
+		SignalPlanData planData = controllerData.getSignalPlanData().get(Fixture.id2);
 		planData.setStartTime(0.0);
 		planData.setEndTime(0.0);
 		planData.setCycleTime(60);
-		SignalGroupSettingsData groupData = planData.getSignalGroupSettingsDataByGroupId().get(id100);
+		SignalGroupSettingsData groupData = planData.getSignalGroupSettingsDataByGroupId().get(Fixture.id100);
 		groupData.setDropping(0);
 		groupData.setOnset(30);
 		
@@ -166,10 +160,10 @@ public class SignalSystemsOneAgentTest implements
 	@Override
 	public void handleEvent(LinkEnterEvent e) {
 		log.info("Link id: " + e.getLinkId().toString() + " enter time: " + e.getTime());
-		if (e.getLinkId().equals(id1)){
+		if (e.getLinkId().equals(Fixture.id1)){
 			Assert.assertEquals(1.0, e.getTime(), MatsimTestUtils.EPSILON);
 		}
-		else if (e.getLinkId().equals(id2)){
+		else if (e.getLinkId().equals(Fixture.id2)){
 			Assert.assertEquals(this.link2EnterTime, e.getTime(), MatsimTestUtils.EPSILON);
 		}
 	}
