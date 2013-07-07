@@ -197,9 +197,9 @@ public class OGLAgentPointLayer extends OTFGLAbstractDrawable implements SceneLa
 		case standard:
 			color = standardColoringScheme(agInfo);
 			break;
-//		case taxicab:
-//			color = taxicabColoringScheme(agInfo) ;
-//			break;
+		case taxicab:
+			color = taxicabColoringScheme(agInfo) ;
+			break;
 		default:
 			color = standardColoringScheme(agInfo);
 			break;
