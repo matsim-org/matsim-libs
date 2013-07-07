@@ -30,7 +30,6 @@ import org.matsim.contrib.matsim4urbansim.utils.CreateTestExternalMATSimConfig;
 import org.matsim.contrib.matsim4urbansim.utils.CreateTestMATSimConfig;
 import org.matsim.contrib.matsim4urbansim.utils.TempDirectoryUtil;
 import org.matsim.core.config.Config;
-import org.matsim.testcases.MatsimTestCase;
 
 /**
  * @author thomas

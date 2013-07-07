@@ -109,7 +109,7 @@ public class MatsimConfigType {
     @XmlElement(name = "external_matsim_config", required = true)
     protected FileType externalMatsimConfig;
     @XmlElement(required = true)
-    protected FileType network;
+    protected String network;
     @XmlElement(required = true)
     protected FileType warmStartPlansFile;
     protected boolean useHotStart;
@@ -374,7 +374,7 @@ public class MatsimConfigType {
      *     {@link FileType }
      *     
      */
-    public FileType getNetwork() {
+    public String getNetwork() {
         return network;
     }
 
@@ -386,7 +386,7 @@ public class MatsimConfigType {
      *     {@link FileType }
      *     
      */
-    public void setNetwork(FileType value) {
+    public void setNetwork(String value) {
         this.network = value;
     }
 

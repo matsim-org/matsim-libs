@@ -58,11 +58,13 @@ public class JAXBUnmarshalV3 extends MatsimJaxbXmlParser{
 				m4uConfigType = (( JAXBElement<Matsim4UrbansimConfigType>) object).getValue();
 
 		} catch (JAXBException je) {
+			System.out.flush() ;
 			je.printStackTrace();
-			return null;
+			throw new RuntimeException("unmarschalling failed; aborting ...") ;
 		} catch (Exception e) {
+			System.out.flush() ;
 			e.printStackTrace();
-			return null;
+			throw new RuntimeException("unmarschalling failed; aborting ...") ;
 		}
 
 		log.info("... finished unmarschallig");

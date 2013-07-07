@@ -35,6 +35,7 @@ import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.Matsim4UrbansimConfigType;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.Matsim4UrbansimType;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.MatsimConfigType;
+import org.matsim.contrib.matsim4urbansim.utils.ids.IdFactory;
 import org.matsim.contrib.matsim4urbansim.utils.io.Paths;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -45,8 +46,11 @@ import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
+import org.matsim.core.controler.PlanStrategyRegistrar.Names;
+import org.matsim.core.controler.PlanStrategyRegistrar.Selector;
 import org.matsim.core.utils.io.UncheckedIOException;
 
 /**
@@ -127,8 +131,13 @@ public class M4UConfigUtils {
 			log.info("<param name=\"urbanSimZoneShapefileLocationDistribution\" value=\"/path/to/shapeFile\" />");
 			log.info("</module>");
 		}
-		
-		module.setWarmStart( (new File(matsim4urbansimConfigPart1.getWarmStartPlansFile().getInputFile())).exists() );
+		if ( matsim4urbansimConfigPart1.getWarmStartPlansFile()==null ) {
+			module.setWarmStart(false) ;
+		} else if ( matsim4urbansimConfigPart1.getWarmStartPlansFile().getInputFile() == null ) {
+			module.setWarmStart(false) ;
+		} else {
+			module.setWarmStart( (new File(matsim4urbansimConfigPart1.getWarmStartPlansFile().getInputFile())).exists() );
+		}
 		module.setWarmStartPlansLocation(matsim4urbansimConfigPart1.getWarmStartPlansFile().getInputFile());
 		module.setHotStart(matsim4urbansimConfigPart1.isUseHotStart());
 		module.setHotStartPlansFileLocation(matsim4urbansimConfigPart1.getHotStartPlansFile().getInputFile());
@@ -237,7 +246,7 @@ public class M4UConfigUtils {
 	 */
 	static void initNetwork(MatsimConfigType matsim4urbansimConfigPart1, Config config){
 		log.info("Setting NetworkConfigGroup to config...");
-		config.network().setInputFile( matsim4urbansimConfigPart1.getNetwork().getInputFile() );
+		config.network().setInputFile( matsim4urbansimConfigPart1.getNetwork() );
 		log.info("...done!");
 	}
 
@@ -288,6 +297,8 @@ public class M4UConfigUtils {
 		workActivity.setLatestStartTime( matsim4urbansimConfigPart1.getWorkActivityLatestStartTime().intValue() );	// should be something like 9*60*60
 		config.planCalcScore().addActivityParams( homeActivity );
 		config.planCalcScore().addActivityParams( workActivity );
+		
+		config.planCalcScore().setBrainExpBeta(1.) ;
 
 		log.info("...done!");
 	}
@@ -341,39 +352,40 @@ public class M4UConfigUtils {
 	}
 
 // tn june'13 this does no longer exist in the MATSim4UrbanSim configuration and can be removed from here 
-//	/**
-//	 * setting strategy
-//	 * @param config TODO
-//	 */
-//	static void initStrategy(ConfigType matsim4urbansimConfig, Config config){
-//		log.info("Setting StrategyConfigGroup to config...");
-//
-//		config.strategy().setMaxAgentPlanMemorySize( matsim4urbansimConfig.getStrategy().getMaxAgentPlanMemorySize().intValue() );
-//
-//		StrategyConfigGroup.StrategySettings changeExpBeta = new StrategyConfigGroup.StrategySettings(IdFactory.get(1));
-//		changeExpBeta.setModuleName(Selector.ChangeExpBeta.toString());
-//		changeExpBeta.setProbability( matsim4urbansimConfig.getStrategy().getChangeExpBetaProbability() ); // should be something like 0.9
-//		config.strategy().addStrategySettings(changeExpBeta);
-//
-//		StrategyConfigGroup.StrategySettings timeAlocationMutator = new StrategyConfigGroup.StrategySettings(IdFactory.get(2));
-//		timeAlocationMutator.setModuleName(Names.TimeAllocationMutator.toString()); 
-//		timeAlocationMutator.setProbability( matsim4urbansimConfig.getStrategy().getTimeAllocationMutatorProbability() ); // should be something like 0.1
-//		timeAlocationMutator.setDisableAfter(disableStrategyAfterIteration(config)); // just to be sure
-//		config.strategy().addStrategySettings(timeAlocationMutator);
-//		config.timeAllocationMutator().setMutationRange(7200.) ;
-//
-//		StrategyConfigGroup.StrategySettings reroute = new StrategyConfigGroup.StrategySettings(IdFactory.get(3));
-//		reroute.setModuleName(Names.ReRoute.toString());  
-//		reroute.setProbability( matsim4urbansimConfig.getStrategy().getReRouteDijkstraProbability() ); 	// should be something like 0.1
-//		reroute.setDisableAfter(disableStrategyAfterIteration(config));
-//		config.strategy().addStrategySettings(reroute);
-//
-//		log.info("...done!");
-//	}
-//
-//	private static int disableStrategyAfterIteration(Config config) {
-//		return (int) Math.ceil(config.controler().getLastIteration() * 0.8);
-//	}
+	// looks like tn never tried this out: still need to set this!!
+	/**
+	 * setting strategy
+	 * @param config TODO
+	 */
+	static void initStrategy(Config config){
+		log.info("Setting StrategyConfigGroup to config...");
+
+		config.strategy().setMaxAgentPlanMemorySize( 5 );
+
+		StrategyConfigGroup.StrategySettings changeExpBeta = new StrategyConfigGroup.StrategySettings(IdFactory.get(1));
+		changeExpBeta.setModuleName(Selector.ChangeExpBeta.toString());
+		changeExpBeta.setProbability( 0.8 ) ;
+		config.strategy().addStrategySettings(changeExpBeta);
+
+		StrategyConfigGroup.StrategySettings timeAlocationMutator = new StrategyConfigGroup.StrategySettings(IdFactory.get(2));
+		timeAlocationMutator.setModuleName(Names.TimeAllocationMutator.toString()); 
+		timeAlocationMutator.setProbability( 0.1 ); 
+		timeAlocationMutator.setDisableAfter(disableStrategyAfterIteration(config)); // just to be sure
+		config.strategy().addStrategySettings(timeAlocationMutator);
+		config.timeAllocationMutator().setMutationRange(7200.) ;
+
+		StrategyConfigGroup.StrategySettings reroute = new StrategyConfigGroup.StrategySettings(IdFactory.get(3));
+		reroute.setModuleName(Names.ReRoute.toString());  
+		reroute.setProbability( 0.1 );
+		reroute.setDisableAfter(disableStrategyAfterIteration(config));
+		config.strategy().addStrategySettings(reroute);
+
+		log.info("...done!");
+	}
+
+	private static int disableStrategyAfterIteration(Config config) {
+		return (int) Math.ceil(config.controler().getLastIteration() * 0.8);
+	}
 	
 	/**
 	 * loads the external config into a temporary structure
@@ -424,32 +436,20 @@ public class M4UConfigUtils {
 	 */
 	static Matsim4UrbansimConfigType unmarschal(String matsim4urbansimConfigFilename){
 
-		// JAXBUnmaschal reads the UrbanSim generated MATSim config, validates it against
+		// JAXBUnmarschal reads the UrbanSim generated MATSim config, validates it against
 		// the current xsd (checks e.g. the presents and data type of parameter) and generates
-		// an Java object representing the config file.
+		// a Java object representing the config file.
 		JAXBUnmarshalV3 um = new JAXBUnmarshalV3();
 		
 		Matsim4UrbansimConfigType m4uConfigType = null;
 		m4uConfigType = um.unmarshal(matsim4urbansimConfigFilename);
 		
+		if(m4uConfigType == null) {
+			throw new RuntimeException("Unmarschalling failed. SHUTDOWN MATSim!");
+		}
+
 		return m4uConfigType;
 		
-//		if(m4uConfigType == null)
-//			throw new RuntimeException("Unmarschalling failed. SHUTDOWN MATSim!");
-//		
-//		
-//		// JAXBUnmaschal reads the UrbanSim generated MATSim config, validates it against
-//		// the current xsd (checks e.g. the presents and data type of parameter) and generates
-//		// an Java object representing the config file.
-//		JAXBUnmarschalV2 unmarschal = new JAXBUnmarschalV2( matsim4urbansimConfigFilename );
-//
-//		MatsimConfigType matsim4urbansimConfig = null;
-//
-//		// binding the parameter from the MATSim Config into the JAXB data structure
-//		if( (matsim4urbansimConfig = unmarschal.unmaschalMATSimConfig()) == null)
-//			throw new RuntimeException("Unmarschalling failed. SHUTDOWN MATSim!");
-//			
-//		return matsim4urbansimConfig;
 	}
 
 	public static UrbanSimParameterConfigModuleV3 getUrbanSimParameterConfigAndPossiblyConvert(Config config) {

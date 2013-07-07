@@ -130,6 +130,7 @@ public class M4UConfigurationConverterV4 {
 		M4UConfigUtils.initControler(matsim4urbansimConfigPart1, config); // yyyy can't fix since it is using static variables.  kai, may'13 , (tn june'13 removed static variable)
 		M4UConfigUtils.initPlanCalcScore(matsim4urbansimConfigPart1, config); // ok
 		M4UConfigUtils.initQSim(matsim4urbansimConfigPart2, config);
+		M4UConfigUtils.initStrategy(config) ;
 		ImprovedPseudoPtConfigUtils.initImprovedPseudoPtParameter(matsim4urbansimConfigPart3, config);
 		// note: ending innovation after 80% of iterations is now switched on in "createEmptyConfigWithSomeDefaults" above.
 

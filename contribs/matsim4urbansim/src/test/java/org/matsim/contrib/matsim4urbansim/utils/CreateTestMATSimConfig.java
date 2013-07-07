@@ -271,11 +271,11 @@ public class CreateTestMATSimConfig {
 		planCalcScore.setWorkActivityTypicalDuration( this.workActivityTypicalDuration );
 		planCalcScore.setWorkActivityOpeningTime( this.workActivityOpeningTime );
 		planCalcScore.setWorkActivityLatestStartTime( this.workActivityLatestStartTime );
-		StrategyType strategy = of.createStrategyType();
-		strategy.setMaxAgentPlanMemorySize( this.maxAgentPlanMemorySize );
-		strategy.setTimeAllocationMutatorProbability( this.timeAllocationMutatorProbability );
-		strategy.setChangeExpBetaProbability( this.changeExpBetaProbability );
-		strategy.setReRouteDijkstraProbability( this.reRouteDijkstraProbability );
+//		StrategyType strategy = of.createStrategyType();
+//		strategy.setMaxAgentPlanMemorySize( this.maxAgentPlanMemorySize );
+//		strategy.setTimeAllocationMutatorProbability( this.timeAllocationMutatorProbability );
+//		strategy.setChangeExpBetaProbability( this.changeExpBetaProbability );
+//		strategy.setReRouteDijkstraProbability( this.reRouteDijkstraProbability );
 		
 		ConfigType configType = of.createConfigType();
 		configType.setMatsimConfig(matsim_config);
@@ -284,7 +284,7 @@ public class CreateTestMATSimConfig {
 		configType.setHotStartPlansFile(hotStratPlansFile);
 		configType.setControler(controler);
 		configType.setPlanCalcScore(planCalcScore);
-		configType.setStrategy(strategy);
+//		configType.setStrategy(strategy);
 		
 		// UrbanSimParameterType
 		UrbansimParameterType ubansimParameterType = of.createUrbansimParameterType();
@@ -466,8 +466,8 @@ public class CreateTestMATSimConfig {
 		planCalcScore.setWorkActivityTypicalDuration( this.workActivityTypicalDuration );
 		planCalcScore.setWorkActivityOpeningTime( this.workActivityOpeningTime );
 		planCalcScore.setWorkActivityLatestStartTime( this.workActivityLatestStartTime );
-		StrategyType strategy = of.createStrategyType();
-		strategy.setMaxAgentPlanMemorySize( this.maxAgentPlanMemorySize );
+//		StrategyType strategy = of.createStrategyType();
+//		strategy.setMaxAgentPlanMemorySize( this.maxAgentPlanMemorySize );
 		
 		// UrbanSimParameterType
 		UrbansimParameterType ubansimParameterType = of.createUrbansimParameterType();
@@ -503,7 +503,7 @@ public class CreateTestMATSimConfig {
 		configType.setHotStartPlansFile(hotStratPlansFile);
 		configType.setControler(controler);
 		configType.setPlanCalcScore(planCalcScore);
-		configType.setStrategy(strategy);
+//		configType.setStrategy(strategy);
 		
 		// matsim4urbansimtype
 		Matsim4UrbansimType matsim4UrbanSimType = of.createMatsim4UrbansimType();
