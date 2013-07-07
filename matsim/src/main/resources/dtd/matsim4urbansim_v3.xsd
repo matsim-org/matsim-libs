@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xs:schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.matsim.org/files/dtd/matsim4urbansim_v3.xsd">
-
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<!-- <xs:schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.matsim.org/files/dtd/matsim4urbansim_v3.xsd">
+ -->
 	<!-- Editor: Thomas Nicolai, VSP, Berlin Institute of Technology (TU Berlin) -->
 	<!-- This xml schema contains xml definitions used for MATSim4UrbanSim -->
 	
@@ -61,7 +62,7 @@
 			<xs:element name="urbansimZoneRandomLocationDistributionByShapeFile" type="xs:token"/>
 			
 			<!-- commonn parameters -->
-		    <xs:element name="external_matsim_config" type="xs:token" minOccurs="1" 
+			<xs:element name="external_matsim_config" type="xs:token" minOccurs="1" 
 				maxOccurs="1"/>
 			<xs:element name="network" type="xs:token" minOccurs="1" 
 				maxOccurs="1"/>
