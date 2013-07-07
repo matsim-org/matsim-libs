@@ -58,7 +58,7 @@ public class IteratorTask implements ScenarioSinkSource {
 	}
 	
 	private void resetEvents(int iteration) {
-		eventsManager.resetCounter();
+//		eventsManager.resetCounter();
 		eventsManager.resetHandlers(iteration);
 	}
 
@@ -79,10 +79,12 @@ public class IteratorTask implements ScenarioSinkSource {
 			// Nothing to do.
 		}
 		
+		@Override
 		public void setSink(ScenarioSink sink) {
 			this.sink = sink;
 		}
 		
+		@Override
 		public void process(Scenario scenario) {
 			sink.process(scenario);
 		}
