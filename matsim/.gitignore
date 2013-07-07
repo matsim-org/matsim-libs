@@ -7,3 +7,4 @@ bin
 target
 output
 /test
+src/main/java/.gitignore
