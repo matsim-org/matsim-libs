@@ -26,7 +26,16 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.api.experimental.facilities.ActivityFacilitiesFactory;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.api.experimental.facilities.Facility;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -50,14 +59,17 @@ public class PendlerMatrixReader {
 
 	//	private static final String NODES = "../../shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2004/strasse/knoten_wgs84.csv";
 
-	private Map<Integer, Zone> zones = new HashMap<Integer, Zone>();
+	private Map<Integer, ActivityFacility> facilities = new HashMap<Integer, ActivityFacility>();
 
 	private TripFlowSink flowSink;
 
 	private String shapeFile;
+	
+	private final Scenario sc ;
 
 	public PendlerMatrixReader(String shapeFile) {
 		this.shapeFile = shapeFile;
+		this.sc = ScenarioUtils.createScenario(ConfigUtils.createConfig()) ;
 	}
 
 	public void run() {
@@ -70,6 +82,7 @@ public class PendlerMatrixReader {
 
 	private void readShape() {
 		Collection<SimpleFeature> landkreise = ShapeFileReader.getAllFeatures(this.shapeFile);
+		ActivityFacilitiesFactory factory = ((ScenarioImpl)sc).getActivityFacilities().getFactory() ;
 		for (SimpleFeature landkreis : landkreise) {
 			Integer gemeindeschluessel = Integer.parseInt((String) landkreis.getAttribute("gemeindesc"));
 			Geometry geo = (Geometry) landkreis.getDefaultGeometry();
@@ -78,8 +91,18 @@ public class PendlerMatrixReader {
 			Double xcoordinate = coordinate.x;
 			Double ycoordinate = coordinate.y;
 			Coord coord = new CoordImpl(xcoordinate.toString(), ycoordinate.toString());
-			Zone zone = new Zone(gemeindeschluessel, 1, 1, coord);
-			zones.put(gemeindeschluessel, zone);
+			ActivityFacility facility = factory.createActivityFacility(new IdImpl(gemeindeschluessel), coord) ;
+			{
+				ActivityOption option = factory.createActivityOption("work", facility ) ;
+				option.setCapacity(1.) ;
+				facility.addActivityOption(option) ;
+			}
+			{
+				ActivityOption option = factory.createActivityOption("home", facility ) ;
+				option.setCapacity(1.) ;
+				facility.addActivityOption(option) ;
+			}
+			facilities.put(gemeindeschluessel, facility);
 		}
 	}
 
@@ -199,8 +222,8 @@ public class PendlerMatrixReader {
 	}
 
 	private void process(int quelle, int ziel, int workPt, int educationPt, int workCar, int educationCar) {
-		Zone source = zones.get(quelle);
-		Zone sink = zones.get(ziel);
+		Facility source = facilities.get(quelle);
+		Facility sink = facilities.get(ziel);
 		if (source == null) {
 			log.error("Unknown source: " + quelle);
 			return;
@@ -216,11 +239,11 @@ public class PendlerMatrixReader {
 
 		if (scaledCarQuantity != 0) {
 			log.info(quelle + "->" + ziel + ": " + scaledCarQuantity + " car trips");
-			flowSink.process(zones.get(quelle), zones.get(ziel), scaledCarQuantity, TransportMode.car, "pvWork", 0.0);
+			flowSink.process(facilities.get(quelle), facilities.get(ziel), scaledCarQuantity, TransportMode.car, "pvWork", 0.0);
 		}
 		if (scaledPtQuantity != 0){
 			log.info(quelle + "->" + ziel + ": " + scaledPtQuantity + " pt trips");
-			flowSink.process(zones.get(quelle), zones.get(ziel), scaledPtQuantity, TransportMode.pt, "pvWork", 0.0);
+			flowSink.process(facilities.get(quelle), facilities.get(ziel), scaledPtQuantity, TransportMode.pt, "pvWork", 0.0);
 		}
 	}
 

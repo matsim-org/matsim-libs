@@ -21,17 +21,27 @@ package playground.vsp.demandde.pendlermatrix;
 
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.api.experimental.facilities.ActivityFacilitiesFactory;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.api.experimental.facilities.Facility;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 
 public class RouterFilter implements TripFlowSink {
 
@@ -46,20 +56,29 @@ public class RouterFilter implements TripFlowSink {
 	private double travelTimeToLink = 0.0;
 	
 	private Coord entryCoord;
+	
+	private final Scenario sc ;
 
 	public RouterFilter(Network network) {
 		this.network = network;
 		FreespeedTravelTimeAndDisutility fttc = new FreespeedTravelTimeAndDisutility(new PlanCalcScoreConfigGroup());
 		dijkstra = new Dijkstra(network, fttc, fttc);
+		this.sc = ScenarioUtils.createScenario(ConfigUtils.createConfig()) ;
 	}
 
 	@Override
-	public void process(Zone quelle, Zone ziel, int quantity, String mode, String destinationActivityType, double departureTimeOffset) {
-		Node quellNode = ((NetworkImpl) network).getNearestNode(quelle.coord);
-		Node zielNode = ((NetworkImpl) network).getNearestNode(ziel.coord);
+	public void process(ActivityFacility quelle, ActivityFacility ziel, int quantity, String mode, String destinationActivityType, double departureTimeOffset) {
+		Node quellNode = ((NetworkImpl) network).getNearestNode(quelle.getCoord());
+		Node zielNode = ((NetworkImpl) network).getNearestNode(ziel.getCoord());
 		Path path = dijkstra.calcLeastCostPath(quellNode, zielNode, 0.0, null, null);
+		ActivityFacilitiesFactory factory = ((ScenarioImpl)sc).getActivityFacilities().getFactory() ;
 		if (isInteresting(path)) {
-			Zone newQuelle = new Zone(quelle.id, quelle.workplaces, quelle.workingPopulation, entryCoord);
+//			Facility newQuelle = new Zone(quelle.getId(), quelle.workplaces, quelle.workingPopulation, entryCoord);
+			ActivityFacility newQuelle = factory.createActivityFacility(quelle.getId(), quelle.getCoord() ) ;
+			for ( ActivityOption option : quelle.getActivityOptions().values() ) { 
+				newQuelle.addActivityOption(option) ;
+			}
+
 			sink.process(newQuelle, ziel, quantity, mode, destinationActivityType, departureTimeOffset + travelTimeToLink);
 		}
 	}

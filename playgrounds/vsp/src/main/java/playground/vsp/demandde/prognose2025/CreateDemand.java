@@ -10,6 +10,10 @@ import playground.vsp.demandde.pendlermatrix.PopulationGenerator;
 import playground.vsp.demandde.pendlermatrix.TravelTimeToWorkCalculator;
 import playground.vsp.pipeline.PopulationWriterTask;
 
+/**
+ * @author nagel
+ *
+ */
 public class CreateDemand {
 	private CreateDemand(){}
 
@@ -21,17 +25,20 @@ public class CreateDemand {
 
 	public static void main(String[] args) {
 		Scenario osmNetwork = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimNetworkReader(osmNetwork).readFile(NETWORK_FILENAME);		
+		new MatsimNetworkReader(osmNetwork).readFile(NETWORK_FILENAME);	
+		
 		PersonVerschmiererTask personVerschmiererTask = new PersonVerschmiererTask(LANDKREISE);	
 		PopulationWriterTask populationWriter = new PopulationWriterTask(OUTPUT_POPULATION_FILENAME, osmNetwork.getNetwork());
 		PopulationGenerator populationBuilder = new PopulationGenerator();		
 		TravelTimeToWorkCalculator routerFilter = new TravelTimeToWorkCalculator(osmNetwork.getNetwork());
 		DemandMatrixReader pvMatrixReader = new DemandMatrixReader(LANDKREISE);
+
 		pvMatrixReader.setFlowSink(routerFilter);
 		routerFilter.setSink(populationBuilder);
 		populationBuilder.setSink(personVerschmiererTask);
 		personVerschmiererTask.setSink(populationWriter);		
 		pvMatrixReader.run();
+
 		System.err.println("some landkreises do not work because of gebietsreform; check!") ;
 	}
 

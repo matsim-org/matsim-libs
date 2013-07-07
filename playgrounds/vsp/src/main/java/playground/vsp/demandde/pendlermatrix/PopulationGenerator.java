@@ -11,8 +11,11 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.vsp.pipeline.PersonSink;
 
@@ -49,15 +52,18 @@ public class PopulationGenerator implements TripFlowSink {
 
 	private PersonSink personSink;
 
-	private PopulationFactory populationFactory = new PopulationFactoryImpl(null);
+	private final PopulationFactory populationFactory ;
+	public PopulationGenerator() {
+		this.populationFactory = ScenarioUtils.createScenario(ConfigUtils.createConfig()).getPopulation().getFactory() ;
+	}
 
 	@Override
-	public void process(Zone quelle, Zone ziel, int quantity, String mode, String destinationActivityType, double departureTimeOffset) {
+	public void process(ActivityFacility quelle, ActivityFacility ziel, int quantity, String mode, String destinationActivityType, double departureTimeOffset) {
 		for (int i=0; i<quantity; i++) {
 			Person person = populationFactory.createPerson(createId(quelle, ziel, i, mode));
 			Plan plan = populationFactory.createPlan();
-			Coord homeLocation = quelle.coord;
-			Coord workLocation = ziel.coord;
+			Coord homeLocation = quelle.getCoord();
+			Coord workLocation = ziel.getCoord();
 			double workStartTime = calculateNormallyDistributedTime(8*60*60);
 			double freespeedTravelTimeToWork = - departureTimeOffset;
 			double homeEndTime = Math.max((workStartTime - freespeedTravelTimeToWork), 0.00);
@@ -100,8 +106,8 @@ public class PopulationGenerator implements TripFlowSink {
 		return endTimeInSec;
 	}
 
-	private Id createId(Zone source, Zone sink, int i, String transportMode) {
-		return new IdImpl(transportMode + "_" + source.id + "_" + sink.id + "_" + i);
+	private Id createId(Facility source, Facility sink, int i, String transportMode) {
+		return new IdImpl(transportMode + "_" + source.getId() + "_" + sink.getId() + "_" + i);
 	}
 
 	public void setSink(PersonSink personSink) {

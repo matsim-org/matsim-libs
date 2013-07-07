@@ -61,6 +61,8 @@ def process_anbindung(anbindungs_file)
         1.upto(n) { |i|
 #          print sp[(2 + i)], " ", sp[(3 + n + i)], " "
           zone.knoten_distance_map[sp[(2 + i)]] = sp[(2 + (2*i))].to_f
+            #(feels wrong to me. in my intuition, both indices would need to 
+            # have a "2*i" somwhere. kai, jul'13)
         }
 #        puts
       end
