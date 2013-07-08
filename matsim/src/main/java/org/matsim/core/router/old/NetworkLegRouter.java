@@ -56,8 +56,8 @@ public class NetworkLegRouter implements LegRouter {
 		double travTime = 0;
 		Link fromLink = this.network.getLinks().get(fromAct.getLinkId());
 		Link toLink = this.network.getLinks().get(toAct.getLinkId());
-		if (fromLink == null) throw new RuntimeException("fromLink missing.");
-		if (toLink == null) throw new RuntimeException("toLink missing.");
+		if (fromLink == null) throw new RuntimeException("fromLink "+fromAct.getLinkId()+" missing.");
+		if (toLink == null) throw new RuntimeException("toLink "+toAct.getLinkId()+" missing.");
 
 		Node startNode = fromLink.getToNode();	// start at the end of the "current" link
 		Node endNode = toLink.getFromNode(); // the target is the start of the link
