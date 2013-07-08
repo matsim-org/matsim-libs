@@ -59,12 +59,12 @@ public class QVehicle extends QItem implements MobsimVehicle {
 	protected Collection<PassengerAgent> passengers = null;
 	private Id id;
 	private Link currentLink = null;
-	private Vehicle basicVehicle;
+	private Vehicle vehicle;
 	private final int passengerCapacity;
 	
 	public QVehicle(final Vehicle basicVehicle) {
 		this.id = basicVehicle.getId();
-		this.basicVehicle = basicVehicle;
+		this.vehicle = basicVehicle;
 		this.passengers = new ArrayList<PassengerAgent>();
 
 		VehicleCapacity capacity = basicVehicle.getType().getCapacity();
@@ -167,12 +167,12 @@ public class QVehicle extends QItem implements MobsimVehicle {
 
 	@Override
 	public double getSizeInEquivalents() {
-		return basicVehicle.getType().getPcuEquivalents();
+		return vehicle.getType().getPcuEquivalents();
 	}
 
 	@Override
 	public Vehicle getVehicle() {
-		return this.basicVehicle;
+		return this.vehicle;
 	}
 
 	@Override
@@ -182,7 +182,7 @@ public class QVehicle extends QItem implements MobsimVehicle {
 	}
 
 	public double getMaximumVelocity() {
-		return basicVehicle.getType().getMaximumVelocity();
+		return vehicle.getType().getMaximumVelocity();
 	}
 	
 	@Override

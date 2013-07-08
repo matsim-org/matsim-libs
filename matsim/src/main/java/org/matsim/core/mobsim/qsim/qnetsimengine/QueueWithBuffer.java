@@ -531,7 +531,8 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 		//		linkEnterTimeMap.put(veh, now);
 		usedStorageCapacity += veh.getSizeInEquivalents();
 		double vehicleTravelTime = qLinkImpl.length / veh.getMaximumVelocity();
-		double earliestExitTime = now + Math.max(freespeedTravelTime, vehicleTravelTime);
+		double linkTravelTime = Math.max(freespeedTravelTime, vehicleTravelTime);
+		double earliestExitTime = now + linkTravelTime;
 		earliestExitTime = Math.floor(earliestExitTime);
 		veh.setEarliestLinkExitTime(earliestExitTime);
 		veh.setCurrentLink(qLinkImpl.getLink());
