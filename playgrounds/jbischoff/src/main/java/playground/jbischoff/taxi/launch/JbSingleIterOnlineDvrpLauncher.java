@@ -40,7 +40,13 @@ import playground.michalm.util.gis.Schedules2GIS;
 import playground.michalm.vrp.RunningVehicleRegister;
 import playground.michalm.vrp.data.MatsimVrpData;
 import playground.michalm.vrp.otfvis.OTFLiveUtils;
-
+/**
+ * 
+ * 
+ * 
+ * @author jbischoff
+ *
+ */
 
 /*package*/class JbSingleIterOnlineDvrpLauncher
 {

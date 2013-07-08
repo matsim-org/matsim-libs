@@ -29,7 +29,13 @@ import playground.jbischoff.taxi.launch.ElectroCabLaunchUtils.TravelCostSource;
 import playground.jbischoff.taxi.launch.ElectroCabLaunchUtils.TravelTimeSource;
 import playground.jbischoff.taxi.optimizer.rank.NOSRankTaxiOptimizer;
 import playground.jbischoff.taxi.optimizer.rank.RankTaxiOptimizer;
-
+/**
+ * 
+ * 
+ * 
+ * @author jbischoff
+ *
+ */
 
 /*package*/class AlgorithmConfig
 {
