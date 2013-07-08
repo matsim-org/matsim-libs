@@ -39,6 +39,7 @@ public class WeightsConfigGroup extends ReflectiveModule {
 	private int disableInnovationAfterIter = -1;
 	private boolean considerVehicleIncompatibilities = true;
 	private double initialTimeMutationTemperature = 24;
+	private boolean useLimitedVehicles = true;
 
 	public static enum Synchro {
 		dynamic, none, all;
@@ -218,5 +219,15 @@ public class WeightsConfigGroup extends ReflectiveModule {
 	public void setInitialTimeMutationTemperature(
 			final double initialTimeMutationTemperature) {
 		this.initialTimeMutationTemperature = initialTimeMutationTemperature;
+	}
+
+	@StringGetter( "useLimitedVehicles" )
+	public boolean getUseLimitedVehicles() {
+		return this.useLimitedVehicles;
+	}
+
+	@StringSetter( "useLimitedVehicles" )
+	public void setUseLimitedVehicles( final boolean useLimitedVehicles ) {
+		this.useLimitedVehicles = useLimitedVehicles;
 	}
 }

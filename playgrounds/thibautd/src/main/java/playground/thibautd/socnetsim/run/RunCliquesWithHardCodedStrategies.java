@@ -88,13 +88,14 @@ public class RunCliquesWithHardCodedStrategies {
 
 	public static Scenario createScenario(final String configFile) {
 		final Config config = JointScenarioUtils.loadConfig( configFile );
-		config.addModule( WeightsConfigGroup.GROUP_NAME , new WeightsConfigGroup() );
-		config.addModule( ScoringFunctionConfigGroup.GROUP_NAME , new ScoringFunctionConfigGroup() );
-		config.addModule( KtiLikeScoringConfigGroup.GROUP_NAME , new KtiLikeScoringConfigGroup() );
-		config.addModule( KtiInputFilesConfigGroup.GROUP_NAME , new KtiInputFilesConfigGroup() );
+		final WeightsConfigGroup weights = new WeightsConfigGroup();
+		config.addModule( weights );
+		config.addModule( new ScoringFunctionConfigGroup() );
+		config.addModule( new KtiLikeScoringConfigGroup() );
+		config.addModule( new KtiInputFilesConfigGroup() );
 		final Scenario scenario = JointScenarioUtils.loadScenario( config );
 
-		if ( config.scenario().isUseHouseholds() ) {
+		if ( config.scenario().isUseHouseholds() && weights.getUseLimitedVehicles() ) {
 			scenario.addScenarioElement(
 							new HouseholdBasedVehicleRessources(
 								((ScenarioImpl) scenario).getHouseholds() ) );
