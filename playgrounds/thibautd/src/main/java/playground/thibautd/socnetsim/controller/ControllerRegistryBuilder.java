@@ -25,6 +25,7 @@ import java.util.LinkedList;
 import org.matsim.analysis.CalcLegTimes;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -41,13 +42,13 @@ import org.matsim.core.router.util.FastAStarLandmarksFactory;
 import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PreProcessDijkstra;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
-import org.matsim.population.algorithms.PersonAlgorithm;
-import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.population.algorithms.XY2Links;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.router.TransitRouterImplFactory;
@@ -363,19 +364,21 @@ public class ControllerRegistryBuilder {
 					scenario.getConfig().global()) {
 					@Override
 					public GenericPlanAlgorithm<ReplanningGroup> createAlgorithm() {
-						final PersonAlgorithm prepareForSim =
-							new PersonPrepareForSim(
+						final PlanAlgorithm routingAlgorithm =
 									getPlanRoutingAlgorithmFactory().createPlanRoutingAlgorithm(
-										getTripRouterFactory().instantiateAndConfigureTripRouter() ),
-									scenario);
-						final PersonAlgorithm checkJointRoutes =
+										getTripRouterFactory().instantiateAndConfigureTripRouter() );
+						final PlanAlgorithm checkJointRoutes =
 							new ImportedJointRoutesChecker( getTripRouterFactory().instantiateAndConfigureTripRouter() );
+						final PlanAlgorithm xy2link = new XY2Links( (ScenarioImpl) scenario );
 						return new GenericPlanAlgorithm<ReplanningGroup>() {
 							@Override
 							public void run(final ReplanningGroup group) {
 								for ( Person person : group.getPersons() ) {
-									checkJointRoutes.run( person );
-									prepareForSim.run( person );
+									for ( Plan plan : person.getPlans() ) {
+										xy2link.run( plan );
+										checkJointRoutes.run( plan );
+										routingAlgorithm.run( plan );
+									}
 								}
 							}
 						};
