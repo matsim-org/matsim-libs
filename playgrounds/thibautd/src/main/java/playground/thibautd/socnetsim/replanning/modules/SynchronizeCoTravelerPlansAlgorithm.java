@@ -67,6 +67,9 @@ public class SynchronizeCoTravelerPlansAlgorithm implements GenericPlanAlgorithm
 
 		for ( JointTrip jt : jointTravelStructure.getJointTrips() ) {
 			final double pickUpTime = inferPickUpTime( jt , plan );
+			if ( pickUpTime < 0 ) {
+				throw new RuntimeException( "got negative PU time for joint trip "+jt+" in plan "+plan );
+			}
 			setPassengerDepartureTime( jt , plan , pickUpTime );
 		}
 	}
@@ -88,7 +91,8 @@ public class SynchronizeCoTravelerPlansAlgorithm implements GenericPlanAlgorithm
 			// assume stage activities have 0 duration
 			if ( pe instanceof Activity &&
 					!stageTypes.isStageActivity( ((Activity) pe).getType() ) ) {
-				((Activity) pe).setEndTime( now );
+				((Activity) pe).setMaximumDuration( Time.UNDEFINED_TIME );
+				((Activity) pe).setEndTime( now > 0 ? now : 0 );
 				return;
 			}
 
