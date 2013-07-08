@@ -49,6 +49,9 @@ import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.PassengerRoute;
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
 import playground.thibautd.socnetsim.utils.JointMainModeIdentifier;
+import playground.thibautd.socnetsim.utils.JointPlanUtils;
+import playground.thibautd.socnetsim.utils.JointPlanUtils.JointTrip;
+import playground.thibautd.socnetsim.utils.JointPlanUtils.JointTravelStructure;
 
 /**
  * An algorithm which creates joint trips from nothing,
@@ -82,7 +85,10 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 			final JointPlan jointPlan,
 			final Collection<Id> agentsToIgnore) {
 		final ClassifiedTrips trips = extractClassifiedTrips( jointPlan , agentsToIgnore );
-		final List<Match> matches = extractMatches( trips );
+		final List<Match> matches =
+			extractMatches(
+					jointPlan,
+					trips );
 		if (matches.size() == 0) return null;
 
 		final Match match = chooseMatch( matches );
@@ -156,13 +162,17 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 		return !isPartOfJointTrip;
 	}
 
-	private List<Match> extractMatches(final ClassifiedTrips trips) {
+	private List<Match> extractMatches(
+			final JointPlan jointPlan,
+			final ClassifiedTrips trips) {
 		final List<Match> matches = new ArrayList<Match>();
+		final JointTravelStructure structure = JointPlanUtils.analyseJointTravel( jointPlan );
 
 		for (Trip driverTrip : trips.carTrips) {
 			final Id driverId = driverTrip.agentId;
 			for (Trip passengerTrip : trips.nonChainBasedModeTrips) {
-				if ( !driverId.equals( passengerTrip.agentId ) ) {
+				if ( !driverId.equals( passengerTrip.agentId ) &&
+						isInCorrectSequence( jointPlan , structure , driverTrip , passengerTrip ) ) {
 					matches.add(
 							new Match(
 								driverTrip,
@@ -175,6 +185,40 @@ public class JointTripInsertorAlgorithm implements GenericPlanAlgorithm<JointPla
 		}
 
 		return matches;
+	}
+
+	private static boolean isInCorrectSequence(
+			final JointPlan jointPlan,
+			final JointTravelStructure structure,
+			final Trip driverTrip,
+			final Trip passengerTrip) {
+		final int positionInDriverPlan = getPosition( jointPlan , structure , driverTrip , passengerTrip.agentId );
+		final int positionInPassengerPlan = getPosition( jointPlan , structure , passengerTrip , driverTrip.agentId );
+		return positionInDriverPlan == positionInPassengerPlan;
+	}
+
+	private static int getPosition(
+			final JointPlan jointPlan,
+			final JointTravelStructure structure,
+			final Trip trip,
+			final Id cotraveler) {
+		final Plan plan = jointPlan.getIndividualPlan( trip.agentId );
+		final List<JointTrip> jointTrips = structure.getJointTripsForCotravelers( trip.agentId , cotraveler );
+
+		final int indexOfTrip = plan.getPlanElements().indexOf( trip.departure );
+
+		// count joint trips occuring before the candidate trip
+		int pos = 0;
+		for ( JointTrip jt : jointTrips ) {
+			final int indexOfJointTrip =
+				Math.max(
+						plan.getPlanElements().indexOf( jt.getPassengerLeg() ),
+						plan.getPlanElements().indexOf( jt.getDriverLegs().get( 0 ) ) );
+			assert indexOfJointTrip >= 0;
+			if ( indexOfJointTrip < indexOfTrip ) pos++;
+		}
+
+		return pos;
 	}
 
 	private double calcMatchCost(
