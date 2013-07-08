@@ -20,6 +20,7 @@
 
 package playground.southAfrica.freight.digicore.containers;
 
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -39,27 +40,27 @@ public class DigicoreChainTest extends MatsimTestCase{
 	
 	public void testGetChainStartDay(){
 		/* Thursday, 4 October 2012 */
-		GregorianCalendar gc1a = new GregorianCalendar(); gc1a.setTimeInMillis(1349301600*1000); // 00:00:00
-		GregorianCalendar gc1b = new GregorianCalendar(); gc1a.setTimeInMillis(1349330400*1000); // 08:00:00
-		GregorianCalendar gc2a = new GregorianCalendar(); gc1a.setTimeInMillis(1349362800*1000); // 17:00:00
-		GregorianCalendar gc2b = new GregorianCalendar(); gc1a.setTimeInMillis(1349387999*1000); // 23:59:59
+		GregorianCalendar gc1a = new GregorianCalendar(2012, Calendar.OCTOBER, 4, 0, 0, 0); gc1a.setTimeZone(TimeZone.getTimeZone("GMT+2"));    // 00:00:00
+		GregorianCalendar gc1b = new GregorianCalendar(2012, Calendar.OCTOBER, 4, 8, 0, 0); gc1b.setTimeZone(TimeZone.getTimeZone("GMT+2"));    // 08:00:00
+		GregorianCalendar gc2a = new GregorianCalendar(2012, Calendar.OCTOBER, 4, 17, 0, 0); gc2a.setTimeZone(TimeZone.getTimeZone("GMT+2"));   // 17:00:00
+		GregorianCalendar gc2b = new GregorianCalendar(2012, Calendar.OCTOBER, 4, 23, 59, 59); gc2b.setTimeZone(TimeZone.getTimeZone("GMT+2")); // 23:59:59
 		
 		/* Create chain. */
 		DigicoreChain dc = new DigicoreChain();
 		
 		DigicoreActivity da1 = new DigicoreActivity("test1", TimeZone.getTimeZone("GMT+2"), new Locale("en"));
-		da1.setStartTime(gc1a.getTimeInMillis() / 1000);
-		da1.setEndTime(gc1b.getTimeInMillis() / 1000);
+		da1.setStartTime((double)gc1a.getTimeInMillis() / (double)1000);
+		da1.setEndTime((double)gc1b.getTimeInMillis() / (double)1000);
 		da1.setType("major");
 		dc.add(da1);
 		
 		DigicoreActivity da2 = new DigicoreActivity("test2", TimeZone.getTimeZone("GMT+2"), new Locale("en"));
-		da2.setStartTime(gc2a.getTimeInMillis() / 1000);
-		da2.setEndTime(gc2b.getTimeInMillis() / 1000);
+		da2.setStartTime((double)gc2a.getTimeInMillis() / (double)1000);
+		da2.setEndTime((double)gc2b.getTimeInMillis() / (double)1000);
 		da2.setType("major");
 		dc.add(da2);
 		
-		assertEquals("Wrong start day.", 5, dc.getChainStartDay());
+		assertEquals("Wrong start day.", Calendar.THURSDAY, dc.getChainStartDay());
 	}
 	
 	

@@ -28,10 +28,10 @@ public class AllTests {
 	public static Test suite(){
 		TestSuite suite = new TestSuite("All tests for playground.southAfrica.freight.digicore");
 		
+		suite.addTest(playground.southAfrica.freight.digicore.algorithms.AllTests.suite());
 		suite.addTest(playground.southAfrica.freight.digicore.containers.AllTests.suite());
 		suite.addTest(playground.southAfrica.freight.digicore.io.AllTests.suite());
 		suite.addTest(playground.southAfrica.freight.digicore.utils.AllTests.suite());
-		suite.addTest(playground.southAfrica.freight.digicore.algorithms.AllTests.suite());
 
 		return suite;
 	}
