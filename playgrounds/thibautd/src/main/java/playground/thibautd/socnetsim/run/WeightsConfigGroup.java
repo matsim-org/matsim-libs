@@ -37,6 +37,7 @@ public class WeightsConfigGroup extends ReflectiveModule {
 	private boolean checkConsistency = false;
 	private int graphWriteInterval = 25;
 	private int disableInnovationAfterIter = -1;
+	private boolean considerVehicleIncompatibilities = true;
 
 	public static enum Synchro {
 		dynamic, none, all;
@@ -194,5 +195,16 @@ public class WeightsConfigGroup extends ReflectiveModule {
 	@StringSetter( "disableInnovationAfterIteration" )
 	public void setDisableInnovationAfterIteration(int disableInnovationAfterIter) {
 		this.disableInnovationAfterIter = disableInnovationAfterIter;
+	}
+
+	@StringGetter( "considerVehicleIncompatibilities" )
+	public boolean getConsiderVehicleIncompatibilities() {
+		return this.considerVehicleIncompatibilities;
+	}
+
+	@StringSetter( "considerVehicleIncompatibilities" )
+	public void setConsiderVehicleIncompatibilities(
+			final boolean considerVehicleIncompatibilities) {
+		this.considerVehicleIncompatibilities = considerVehicleIncompatibilities;
 	}
 }

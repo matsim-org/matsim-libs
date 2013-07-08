@@ -173,11 +173,12 @@ public class RunCliquesWithHardCodedStrategies {
 					.withAdditionalPrepareForSimModule(
 							additionalPrepareModule )
 					.withIncompatiblePlansIdentifierFactory(
-						!weights.getSynchronize().equals( Synchro.none ) &&
-						scenario.getScenarioElement( VehicleRessources.class ) != null ?
-							new VehicleBasedIncompatiblePlansIdentifierFactory(
-									SharedVehicleUtils.DEFAULT_VEHICULAR_MODES ) :
-							new EmptyIncompatiblePlansIdentifierFactory() )
+							weights.getConsiderVehicleIncompatibilities() &&
+							!weights.getSynchronize().equals( Synchro.none ) &&
+							scenario.getScenarioElement( VehicleRessources.class ) != null ?
+								new VehicleBasedIncompatiblePlansIdentifierFactory(
+										SharedVehicleUtils.DEFAULT_VEHICULAR_MODES ) :
+								new EmptyIncompatiblePlansIdentifierFactory() )
 					.withScoringFunctionFactory(
 							scoringFunctionConf.isUseKtiScoring() ?
 							new KtiScoringFunctionFactoryWithJointModes(
