@@ -20,7 +20,13 @@
 package playground.jbischoff.energy.log;
 
 import org.matsim.api.core.v01.Id;
-
+/**
+ * 
+ * 
+ * 
+ * @author jbischoff
+ *
+ */
 public class SocLogRow implements Comparable<SocLogRow> {
 	private Id agentId;
 

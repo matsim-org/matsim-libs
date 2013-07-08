@@ -33,7 +33,7 @@ import org.matsim.contrib.transEnergySim.analysis.charging.ChargingLogRowLinkLev
  * 
  * 
  * 
- * @author User
+ * @author jbischoff
  *
  */
 public class SoCLog {
