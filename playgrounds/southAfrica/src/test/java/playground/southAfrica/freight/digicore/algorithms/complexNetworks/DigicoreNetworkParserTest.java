@@ -27,6 +27,7 @@ import java.util.TimeZone;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -57,12 +58,13 @@ public class DigicoreNetworkParserTest extends MatsimTestCase {
 			assertTrue("Wrong coordinate for node " + node.toString(), dn1.getCoordinates().get(node).equals(dn2.getCoordinates().get(node)));
 		}
 		
+		/* Test edges. */
 		for(Pair<Id> arc : dn1.getEdges()){
 			assertTrue("Couldn't find arc " + arc.toString() + " in output network.", dn2.containsEdge(arc));
 		}
 		for(Pair<Id> arc : dn2.getEdges()){
 			assertTrue("Couldn't find arc " + arc.toString() + " in input network.", dn1.containsEdge(arc));
-			assertTrue("Wrong weight for arc " + arc.toString(), dn1.getWeights().get(arc).equals(dn2.getWeights().get(arc)));
+			assertEquals("Wrong weight for arc " + arc.toString(), dn1.getMultiplexEdgeWeight(arc.getFirst(), "test", arc.getSecond(), "test"), dn2.getMultiplexEdgeWeight(arc.getFirst(), "test", arc.getSecond(), "test"));
 		}		
 	}
 

@@ -28,6 +28,7 @@ public class AllTests {
 	public static Test suite(){
 		TestSuite suite = new TestSuite("All tests for playground.southAfrica.freight.digicore.algorithms");
 		
+		suite.addTest(playground.southAfrica.freight.digicore.algorithms.complexNetworks.AllTests.suite());
 		suite.addTest(playground.southAfrica.freight.digicore.algorithms.concaveHull.AllTests.suite());
 		suite.addTest(playground.southAfrica.freight.digicore.algorithms.djcluster.AllTests.suite());
 		
