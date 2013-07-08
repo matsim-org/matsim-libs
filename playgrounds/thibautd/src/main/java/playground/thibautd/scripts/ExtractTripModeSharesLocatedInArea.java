@@ -47,6 +47,7 @@ import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.io.IOUtils;
+import org.matsim.core.utils.misc.Counter;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.pt.PtConstants;
 
@@ -103,14 +104,17 @@ public class ExtractTripModeSharesLocatedInArea {
 	private static void writeRawData(
 			final Collection<TripInfo> tripInfos,
 			final String outFile ) throws IOException {
+		final Counter counter = new Counter( outFile+": line # " );
 		final BufferedWriter writer = IOUtils.getBufferedWriter( outFile );
 		writer.write( "mode"+SEP+"xOrig"+SEP+"yOrig"+SEP+"xDest"+SEP+"yDest" );
 		for ( TripInfo info : tripInfos ) {
+			counter.incCounter();
 			writer.newLine();
 			writer.write( info.mode + SEP +
 					info.origin.getX() + SEP + info.origin.getY() +SEP+
 					info.destination.getX() + SEP + info.destination.getY() );
 		}
+		counter.printCounter();
 		writer.close();
 	}
 
@@ -122,6 +126,7 @@ public class ExtractTripModeSharesLocatedInArea {
 		writer.write( "x"+SEP+"y" );
 		for ( String mode : modes ) writer.write( SEP+mode );
 
+		final Counter counter = new Counter( outFile+": line # " );
 		for ( double x = locatedTrips.getMinEasting();
 				x < locatedTrips.getMaxEasting();
 				x += CELL_WIDTH ) {
@@ -137,6 +142,7 @@ public class ExtractTripModeSharesLocatedInArea {
 							new ArrayList<TripInfo>() );
 				final Map<String, Double> shares = calcShares( modesInCell );
 
+				counter.incCounter();
 				writer.newLine();
 				writer.write( ""+((x + x + CELL_WIDTH) / 2) );
 				writer.write( SEP+((y + y + CELL_WIDTH) / 2) );
@@ -146,6 +152,7 @@ public class ExtractTripModeSharesLocatedInArea {
 				}
 			}
 		}
+		counter.printCounter();
 
 		writer.close();
 	}
