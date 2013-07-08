@@ -41,7 +41,6 @@ public class BlackListedTimeAllocationMutator implements PlanAlgorithm {
 	private static final Logger log =
 		Logger.getLogger(BlackListedTimeAllocationMutator.class);
 
-	private double temperature = 1;
 	private final double mutationRange;
 	private final StageActivityTypes blackList;
 	private final Random random;
@@ -105,21 +104,10 @@ public class BlackListedTimeAllocationMutator implements PlanAlgorithm {
 		if ( time == Time.UNDEFINED_TIME ) return time;
 		if ( Double.isNaN( time ) ) throw new IllegalArgumentException( ""+time );
 
-		final double actualRange = temperature * mutationRange;
-		final double t = time + (int)((this.random.nextDouble() * 2.0 - 1.0) * actualRange);
+		final double t = time + (int)((this.random.nextDouble() * 2.0 - 1.0) * mutationRange);
 		assert !Double.isNaN( t ) : t;
 		assert !Double.isInfinite( t ) : t;
 		return t < 0 ? 0 : t;
-	}
-
-	/**
-	 * @param t a constant by which to multiply the mutation range.
-	 * If used, this should start high and decrease with iterations.
-	 */
-	public void setTemperature(final double t) {
-		if ( t < 0 ) throw new IllegalArgumentException();
-		if ( t < 1 ) log.warn( "temperature below 1 is discouraged, as the meaning of the mutation range becomes dubious" );
-		this.temperature = t;
 	}
 
 	public void setSetting(final Setting setting) {

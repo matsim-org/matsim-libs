@@ -112,11 +112,7 @@ public class GroupPlanStrategyFactory {
 							final CompositeStageActivityTypes blackList = new CompositeStageActivityTypes();
 							blackList.addActivityTypes( tripRouterFactory.instantiateAndConfigureTripRouter().getStageActivityTypes() );
 							blackList.addActivityTypes( JointActingTypes.JOINT_STAGE_ACTS );
-							final BlackListedTimeAllocationMutator algo =
-									new BlackListedTimeAllocationMutator(
-										blackList,
-										config.timeAllocationMutator().getMutationRange(),
-										MatsimRandom.getLocalInstance() );
+
 							final int iteration = getReplanningContext().getIteration();
 							final int firstIteration = config.controler().getFirstIteration();
 							final double nIters = config.controler().getLastIteration() - firstIteration;
@@ -127,7 +123,11 @@ public class GroupPlanStrategyFactory {
 							final double progress = (iteration - firstIteration) / startMin;
 							final double temp = minTemp + Math.max(1 - progress , 0) * (maxTemp - minTemp);
 							log.debug( "temperature in iteration "+iteration+": "+temp );
-							algo.setTemperature( temp );
+							final BlackListedTimeAllocationMutator algo =
+									new BlackListedTimeAllocationMutator(
+										blackList,
+										config.timeAllocationMutator().getMutationRange() * temp,
+										MatsimRandom.getLocalInstance() );
 							return algo;
 						}
 					}));
