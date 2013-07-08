@@ -79,7 +79,7 @@ public class KtiScoringFunctionFactoryWithJointModes implements ScoringFunctionF
 						0 ),
 					scenario.getNetwork()));
 
-		return null;
+		return scoringFunctionAccumulator;
 	}
 }
 
