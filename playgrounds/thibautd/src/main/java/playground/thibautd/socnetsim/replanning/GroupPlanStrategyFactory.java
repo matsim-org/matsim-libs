@@ -97,6 +97,12 @@ public class GroupPlanStrategyFactory {
 
 	public static GroupPlanStrategy createTimeAllocationMutator(
 			final ControllerRegistry registry) {
+		return createTimeAllocationMutator( 24 , registry );
+	}
+
+	public static GroupPlanStrategy createTimeAllocationMutator(
+			final double maxTemp,
+			final ControllerRegistry registry) {
 		final GroupPlanStrategy strategy =
 				createRandomSelectingStrategy(
 					registry.getIncompatiblePlansIdentifierFactory());
@@ -116,8 +122,6 @@ public class GroupPlanStrategyFactory {
 							final int iteration = getReplanningContext().getIteration();
 							final int firstIteration = config.controler().getFirstIteration();
 							final double nIters = config.controler().getLastIteration() - firstIteration;
-							// TODO: make temperature more configurable
-							final double maxTemp = 24;
 							final double minTemp = 1;
 							final double startMin = (2 / 3.) * nIters;
 							final double progress = (iteration - firstIteration) / startMin;

@@ -96,6 +96,7 @@ public class RunUtils {
 				weights.getDisableInnovationAfterIter());
 		strategyRegistry.addStrategy(
 				GroupPlanStrategyFactory.createTimeAllocationMutator(
+					weights.getInitialTimeMutationTemperature(),
 					controllerRegistry ),
 				weights.getTimeMutationWeight(),
 				weights.getDisableInnovationAfterIter());
