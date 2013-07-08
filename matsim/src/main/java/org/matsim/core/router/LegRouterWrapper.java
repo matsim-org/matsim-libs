@@ -155,5 +155,10 @@ public class LegRouterWrapper implements RoutingModule {
 		public Id getFacilityId() {
 			throw new UnsupportedOperationException( "only facility fields access are supported" );
 		}
+
+		@Override
+		public String toString() {
+			return "[FacilityWrapper: wrapped="+wrapped+"]";
+		}
 	}
 }
