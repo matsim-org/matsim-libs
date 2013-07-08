@@ -263,6 +263,54 @@ public class JointPlanUtils {
 			return jointTrips;
 		}
 
+		public List<JointTrip> getJointTripsForPassenger(final Id id) {
+			final List<JointTrip> trips = new ArrayList<JointTrip>();
+
+			for (JointTrip jt : jointTrips) {
+				if ( jt.getPassengerId().equals( id ) ) trips.add( jt );
+			}
+
+			return Collections.unmodifiableList( trips );
+		}
+
+		public List<JointTrip> getJointTripsForDriver(final Id id) {
+			final List<JointTrip> trips = new ArrayList<JointTrip>();
+
+			for (JointTrip jt : jointTrips) {
+				if ( jt.getDriverId().equals( id ) ) trips.add( jt );
+			}
+
+			return Collections.unmodifiableList( trips );
+		}
+
+		public List<JointTrip> getJointTripsForDriverAndPassenger(final Id driver, final Id passenger) {
+			final List<JointTrip> trips = new ArrayList<JointTrip>();
+
+			for (JointTrip jt : jointTrips) {
+				if ( jt.getDriverId().equals( driver ) &&
+						jt.getPassengerId().equals( passenger ) ) { 
+					trips.add( jt );
+				}
+			}
+
+			return Collections.unmodifiableList( trips );
+		}
+
+		public List<JointTrip> getJointTripsForCotravelers(final Id id1, final Id id2) {
+			final List<JointTrip> trips = new ArrayList<JointTrip>();
+
+			for (JointTrip jt : jointTrips) {
+				if ( (jt.getDriverId().equals( id1 ) &&
+						jt.getPassengerId().equals( id2 )) ||
+					 (jt.getDriverId().equals( id2 ) &&
+						jt.getPassengerId().equals( id1 )) ) { 
+					trips.add( jt );
+				}
+			}
+
+			return Collections.unmodifiableList( trips );
+		}
+
 		@Override
 		public int hashCode() {
 			return getJointTrips().hashCode();
