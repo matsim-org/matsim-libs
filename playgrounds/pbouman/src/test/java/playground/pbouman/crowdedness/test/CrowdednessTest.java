@@ -395,7 +395,9 @@ public class CrowdednessTest
 		stratSets.setProbability(0.8);
 		config.strategy().addStrategySettings(stratSets);
 		stratSets = new StrategySettings(scen.createId("2"));
-		stratSets.setModuleName("TransitTimeAllocationMutator");
+		// Note: this used to be TransitTimeAllocationMutator, but this mutator does not exist any more (at least not by that name?).
+		// Anyway, the test does not really depend on the strategy module selected here.
+		stratSets.setModuleName("TimeAllocationMutator");
 		stratSets.setProbability(0.2);
 		config.strategy().addStrategySettings(stratSets);
 		
