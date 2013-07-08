@@ -84,7 +84,7 @@ public class GroupStrategyManager {
 					jointPlans,
 					g );
 
-			final GroupPlanStrategy strategy = registry.chooseStrategy( random.nextDouble() );
+			final GroupPlanStrategy strategy = registry.chooseStrategy( iteration , random.nextDouble() );
 			List<ReplanningGroup> alloc = strategyAllocations.get( strategy );
 
 			if (alloc == null) {

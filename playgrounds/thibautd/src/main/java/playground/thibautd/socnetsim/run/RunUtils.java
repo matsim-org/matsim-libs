@@ -92,46 +92,56 @@ public class RunUtils {
 		strategyRegistry.addStrategy(
 				GroupPlanStrategyFactory.createReRoute(
 					controllerRegistry ),
-				weights.getReRouteWeight());
+				weights.getReRouteWeight(),
+				weights.getDisableInnovationAfterIter());
 		strategyRegistry.addStrategy(
 				GroupPlanStrategyFactory.createTimeAllocationMutator(
 					controllerRegistry ),
-				weights.getTimeMutationWeight());
+				weights.getTimeMutationWeight(),
+				weights.getDisableInnovationAfterIter());
 		if (weights.getJtmOptimizes()) {
 			strategyRegistry.addStrategy(
 					GroupPlanStrategyFactory.createCliqueJointTripMutator( controllerRegistry ),
-					weights.getJointTripMutationWeight());
+					weights.getJointTripMutationWeight(),
+				weights.getDisableInnovationAfterIter());
 		}
 		else {
 			strategyRegistry.addStrategy(
 					GroupPlanStrategyFactory.createNonOptimizingCliqueJointTripMutator( controllerRegistry ),
-					weights.getJointTripMutationWeight());
+					weights.getJointTripMutationWeight(),
+				weights.getDisableInnovationAfterIter());
 		}
 		strategyRegistry.addStrategy(
 				GroupPlanStrategyFactory.createSubtourModeChoice(
 					controllerRegistry ),
-				weights.getModeMutationWeight());
+				weights.getModeMutationWeight(),
+				weights.getDisableInnovationAfterIter());
 		strategyRegistry.addStrategy(
 				GroupPlanStrategyFactory.createSelectExpBeta(
 						controllerRegistry.getIncompatiblePlansIdentifierFactory(),
 						config ),
-				weights.getLogitSelectionWeight() );
+				weights.getLogitSelectionWeight(),
+				-1);
 		strategyRegistry.addStrategy(
 				GroupPlanStrategyFactory.createTourVehicleAllocation(
 					controllerRegistry ),
-				weights.getTourLevelReallocateVehicleWeight() );
+				weights.getTourLevelReallocateVehicleWeight(),
+				weights.getDisableInnovationAfterIter());
 		strategyRegistry.addStrategy(
 				GroupPlanStrategyFactory.createGroupPlanVehicleAllocation(
 					controllerRegistry ),
-				weights.getPlanLevelReallocateVehicleWeight() );
+				weights.getPlanLevelReallocateVehicleWeight(),
+				weights.getDisableInnovationAfterIter());
 		strategyRegistry.addStrategy(
 				GroupPlanStrategyFactory.createOptimizingTourVehicleAllocation(
 					controllerRegistry ),
-				weights.getTourLevelOptimizeVehicleWeight() );
+				weights.getTourLevelOptimizeVehicleWeight(),
+				weights.getDisableInnovationAfterIter());
 		strategyRegistry.addStrategy(
 				GroupPlanStrategyFactory.createRandomJointPlansRecomposer(
 					controllerRegistry ),
-				weights.getRecomposeJointPlansRandomlyWeight() );
+				weights.getRecomposeJointPlansRandomlyWeight(),
+				weights.getDisableInnovationAfterIter());
 	}
 
 	public static void loadDefaultAnalysis(

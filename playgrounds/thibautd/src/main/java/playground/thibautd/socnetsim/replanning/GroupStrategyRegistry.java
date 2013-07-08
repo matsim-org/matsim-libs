@@ -20,7 +20,6 @@
 package playground.thibautd.socnetsim.replanning;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -32,33 +31,46 @@ public final class GroupStrategyRegistry {
 	private static final Logger log = Logger.getLogger( GroupStrategyRegistry.class );
 	private final List<GroupPlanStrategy> strategies = new ArrayList<GroupPlanStrategy>();
 	private final List<Double> weights = new ArrayList<Double>();
-	private double sumOfWeights = 0;
+	private final List<Integer> lastIters = new ArrayList<Integer>();
 
 	public final void addStrategy(
 			final GroupPlanStrategy strategy,
-			final double weight) {
+			final double weight,
+			final int lastIteration) {
 		if ( weight <= 0.0 ) {
 			log.info( "strategy "+strategy+" with weight "+weight+" will not be added: weight negative or null." );
 			return;
 		}
 		strategies.add( strategy );
 		weights.add( weight );
-		sumOfWeights += weight;
+		lastIters.add( lastIteration < 0 ? Integer.MAX_VALUE : lastIteration );
 	}
 
-	public GroupPlanStrategy chooseStrategy( final double randomDraw ) {
+	public GroupPlanStrategy chooseStrategy(
+			final int iteration,
+			final double randomDraw ) {
 		if (randomDraw < 0 || randomDraw > 1) throw new IllegalArgumentException( ""+randomDraw );
-		final double choice = randomDraw * sumOfWeights;
-		int i = 0;
+		final double choice = randomDraw * calcSumOfWeights( iteration );
 
-		Iterator<Double> iter = weights.iterator();
-		double cumul = iter.next();
-		while ( choice > cumul ) {
-			cumul += iter.next();
-			i++;
+		double cumul = 0;
+		for ( int i = 0; i < weights.size(); i++ ) {
+			if ( iteration <= lastIters.get( i ) ) {
+				cumul += weights.get( i );
+				if ( cumul > choice ) return strategies.get( i );
+			}
 		}
 
-		return strategies.get( i );
+		throw new RuntimeException( "choice="+randomDraw+" not found in "+calcSumOfWeights( iteration ) );
+	}
+
+	private double calcSumOfWeights(final int iteration) {
+		double sum = 0;
+		for ( int i = 0; i < weights.size(); i++ ) {
+			if ( iteration <= lastIters.get( i ) ) {
+				sum += weights.get( i );
+			}
+		}
+		return sum;
 	}
 }
 

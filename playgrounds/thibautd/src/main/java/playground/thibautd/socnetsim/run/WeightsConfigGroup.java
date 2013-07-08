@@ -36,6 +36,7 @@ public class WeightsConfigGroup extends ReflectiveModule {
 	private Synchro doSynchronize = Synchro.dynamic;
 	private boolean checkConsistency = false;
 	private int graphWriteInterval = 25;
+	private int disableInnovationAfterIter = -1;
 
 	public static enum Synchro {
 		dynamic, none, all;
@@ -183,5 +184,15 @@ public class WeightsConfigGroup extends ReflectiveModule {
 	@StringGetter( "graphWriteInterval" )
 	public int getGraphWriteInterval() {
 		return this.graphWriteInterval;
+	}
+
+	@StringGetter( "disableInnovationAfterIteration" )
+	public int getDisableInnovationAfterIter() {
+		return this.disableInnovationAfterIter;
+	}
+
+	@StringSetter( "disableInnovationAfterIteration" )
+	public void setDisableInnovationAfterIteration(int disableInnovationAfterIter) {
+		this.disableInnovationAfterIter = disableInnovationAfterIter;
 	}
 }
