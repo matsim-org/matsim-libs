@@ -99,6 +99,7 @@ public class KtiPtRoutingModule implements RoutingModule {
 
 		final Leg walk1 = new LegImpl( TransportMode.transit_walk );
 		final Route route1 = new GenericRouteImpl( fromFacility.getLinkId() , linkStartPt.getId() );
+		walk1.setTravelTime( travelTimeLeg1 );
 		route1.setTravelTime( travelTimeLeg1 );
 		route1.setDistance( distanceLeg1 );
 		walk1.setRoute( route1 );
@@ -139,6 +140,7 @@ public class KtiPtRoutingModule implements RoutingModule {
 				ptDistance / info.intrazonalSpeed :
 				ptTravelTimeEntry.getValue() * 60;
 
+		ptLeg.setTravelTime( ptTravelTime );
 		ptRoute.setTravelTime( ptTravelTime );
 		ptRoute.setDistance( ptDistance );
 		ptLeg.setRoute( ptRoute );
@@ -159,6 +161,7 @@ public class KtiPtRoutingModule implements RoutingModule {
 
 		final Leg walk2 = new LegImpl( TransportMode.transit_walk );
 		final Route route2 = new GenericRouteImpl( linkEndPt.getId() , toFacility.getLinkId() );
+		walk2.setTravelTime( travelTimeLeg2 );
 		route2.setTravelTime( travelTimeLeg2 );
 		route2.setDistance( distanceLeg2 );
 		walk2.setRoute( route2 );
