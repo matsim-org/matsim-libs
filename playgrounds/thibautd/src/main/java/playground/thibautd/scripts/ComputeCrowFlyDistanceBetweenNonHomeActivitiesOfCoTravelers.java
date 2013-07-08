@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -38,6 +38,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 
+import playground.thibautd.socnetsim.population.DriverRoute;
 import playground.thibautd.socnetsim.population.DriverRouteFactory;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.PassengerRoute;
@@ -63,35 +64,59 @@ public class ComputeCrowFlyDistanceBetweenNonHomeActivitiesOfCoTravelers {
 		new MatsimPopulationReader( scenario ).readFile( popFile );
 
 		final BufferedWriter writer = IOUtils.getBufferedWriter( outFile );
-		writer.write( "type\tdist" );
+		writer.write( "typePassenger\ttypeDriver\tdist" );
 		for ( Person p : scenario.getPopulation().getPersons().values() ) {
 			if ( !hasOnlyOnPassengerTrip( p ) ) continue;
-			final Activity passengerAct = getNonJointAct( p );
-			final Activity driverAct = getDriverAct( p , scenario.getPopulation() );
+			final Activity passengerAct = getJointAct( p );
+
+			final Id driverId = getDriver( p );
+			final Person driver = scenario.getPopulation().getPersons().get( driverId );
+			final Activity driverAct = getDriverJointAct( p , driver );
+
+			final Activity passengerNonJoint = getOtherNonHome( p , passengerAct );
+			final Activity driverNonJoint = getOtherNonHome( driver , driverAct );
 
 			writer.newLine();
-			writer.write( passengerAct.getType() +"\t"+ CoordUtils.calcDistance( passengerAct.getCoord() , driverAct.getCoord() ) );
+			writer.write( passengerNonJoint.getType() +"\t"+ driverNonJoint.getType() +"\t"+ CoordUtils.calcDistance( passengerNonJoint.getCoord() , driverNonJoint.getCoord() ) );
 		}
 		writer.close();
 	}
 
-	private static Activity getDriverAct(
-			final Person passenger,
-			final Population population) {
-		final Id driverId = getDriver( passenger );
-		final Person driver = population.getPersons().get( driverId );
-
-		final Activity pAct = getNonJointAct( passenger );
-
-		for ( Activity act : TripStructureUtils.getActivities( driver.getSelectedPlan() , JointActingTypes.JOINT_STAGE_ACTS ) ) {
-			if ( act.getType().equals( pAct.getType() ) ) return act;
+	private static Activity getOtherNonHome(
+			final Person p,
+			final Activity toExclude) {
+		for ( Activity act : TripStructureUtils.getActivities( p.getSelectedPlan() , JointActingTypes.JOINT_STAGE_ACTS ) ) {
+			if ( !act.getType().equals( "h" ) && !act.equals( toExclude ) ) return act;
 		}
 		throw new RuntimeException();
 	}
 
-	private static Activity getNonJointAct(final Person passenger) {
+	private static Activity getDriverJointAct(
+			final Person passenger,
+			final Person driver) {
+		for ( Trip trip : TripStructureUtils.getTrips( driver.getSelectedPlan() , JointActingTypes.JOINT_STAGE_ACTS ) ) {
+			if ( containsPassenger( trip , passenger.getId() ) ) {
+				return trip.getOriginActivity().getType().equals( "h" ) ?
+					trip.getDestinationActivity() :
+					trip.getOriginActivity();
+			}
+		}
+		throw new RuntimeException();
+	}
+
+	private static boolean containsPassenger(final Trip trip, final Id id) {
+		for ( Leg l : trip.getLegsOnly() ) {
+			final Route route = l.getRoute();
+			if ( route instanceof DriverRoute && ((DriverRoute) route).getPassengersIds().contains( id ) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static Activity getJointAct(final Person passenger) {
 		for ( Trip t : TripStructureUtils.getTrips( passenger.getSelectedPlan() , JointActingTypes.JOINT_STAGE_ACTS ) ) {
-			if ( t.getLegsOnly().size() == 1 ) {
+			if ( isPassengerTrip( t ) ) {
 				// assume no complex trip. should be checked.
 				return t.getOriginActivity().getType().equals( "h" ) ?
 					t.getDestinationActivity() :
@@ -99,6 +124,13 @@ public class ComputeCrowFlyDistanceBetweenNonHomeActivitiesOfCoTravelers {
 			}
 		}
 		throw new RuntimeException();
+	}
+
+	private static boolean isPassengerTrip(final Trip t) {
+		for ( Leg l : t.getLegsOnly() ) {
+			if ( l.getMode().equals( JointActingTypes.PASSENGER ) ) return true;
+		}
+		return false;
 	}
 
 	private static Id getDriver(final Person passenger) {
