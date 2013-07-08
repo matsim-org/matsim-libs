@@ -263,10 +263,10 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 		Assert.assertTrue(config.controler().getLastIteration() == externalTestConfig.lastIteration.intValue());
 		Assert.assertTrue( Paths.checkPathEnding( config.controler().getOutputDirectory() ).equalsIgnoreCase( Paths.checkPathEnding( externalTestConfig.matsim4opusOutput ) ));
 		
-		Assert.assertTrue( Paths.checkPathEnding( config.network().getInputFile() ).equalsIgnoreCase( Paths.checkPathEnding( externalTestConfig.networkInputFile ) ));
+		Assert.assertTrue( Paths.checkPathEnding( config.network().getInputFile() ).equalsIgnoreCase( Paths.checkPathEnding( externalTestConfig.networkInputFileName ) ));
 		
 		if(testConfig.getStartMode() != CreateTestMATSimConfig.COLD_START){
-			Assert.assertTrue( Paths.checkPathEnding( config.plans().getInputFile() ).equalsIgnoreCase( Paths.checkPathEnding( externalTestConfig.inputPlansFile ) ));
+			Assert.assertTrue( Paths.checkPathEnding( config.plans().getInputFile() ).equalsIgnoreCase( Paths.checkPathEnding( externalTestConfig.inputPlansFileName ) ));
 		}
 		
 		Iterator<StrategySettings> iteratorStrategyCG = config.strategy().getStrategySettings().iterator();
@@ -339,11 +339,11 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 		Assert.assertTrue( Paths.checkPathEnding( contolerCG.getOutputDirectory() ).equalsIgnoreCase( Paths.checkPathEnding( testConfig.matsim4opusOutput ) ));
 
 		NetworkConfigGroup networkCG = (NetworkConfigGroup) config.getModule(NetworkConfigGroup.GROUP_NAME);
-		Assert.assertTrue( Paths.checkPathEnding( networkCG.getInputFile() ).equalsIgnoreCase( Paths.checkPathEnding( testConfig.networkInputFile ) ));
+		Assert.assertTrue( Paths.checkPathEnding( networkCG.getInputFile() ).equalsIgnoreCase( Paths.checkPathEnding( testConfig.networkInputFileName ) ));
 		
 		if(testConfig.getStartMode() != testConfig.COLD_START){
 			PlansConfigGroup plansCG = (PlansConfigGroup) config.getModule(PlansConfigGroup.GROUP_NAME);
-			Assert.assertTrue( Paths.checkPathEnding( plansCG.getInputFile() ).equalsIgnoreCase( Paths.checkPathEnding( testConfig.inputPlansFile ) ));
+			Assert.assertTrue( Paths.checkPathEnding( plansCG.getInputFile() ).equalsIgnoreCase( Paths.checkPathEnding( testConfig.inputPlansFileName ) ));
 		}
 		
 		StrategyConfigGroup strategyCG = (StrategyConfigGroup) config.getModule(StrategyConfigGroup.GROUP_NAME);

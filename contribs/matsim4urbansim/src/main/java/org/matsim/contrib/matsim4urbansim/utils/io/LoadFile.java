@@ -40,6 +40,7 @@ import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
  * @author thomas
  *
  */
+@Deprecated // should be replaced by matsim core xml parsing. kai, jul'13
 public class LoadFile {
 	
 	// logger
@@ -48,17 +49,13 @@ public class LoadFile {
 	private String source 			= null;
 	private String destinationPath	= null;
 	private String fileName 		= null;
-	
-	@SuppressWarnings(value = "all")
-	private LoadFile(){
-		// deactivated default constructor
-	}
-	
+		
 	/**
 	 * constructor
 	 * @param source
 	 * @param destination
 	 */
+	@Deprecated // should be replaced by matsim core xml parsing. kai, jul'13
 	public LoadFile(String source, String destination, String fileName){
 		this.source = source;
 		this.destinationPath = Paths.checkPathEnding( destination );
@@ -70,6 +67,7 @@ public class LoadFile {
 	 * of the loaded xsd file
 	 * @return path of loaded xsd file
 	 */
+	@Deprecated // should be replaced by matsim core xml parsing. kai, jul'13
 	public String loadMATSim4UrbanSimXSDString(){
 		
 		try {
@@ -86,6 +84,7 @@ public class LoadFile {
 	 * and returns the reference to the created file
 	 * @return reference to the created xsd file
 	 */
+	@Deprecated // should be replaced by matsim core xml parsing. kai, jul'13
 	public File loadMATSim4UrbanSimXSD(){
 		
 		InputStream is = null;
@@ -143,25 +142,47 @@ public class LoadFile {
 				return output; // return path to local xsd file
 			}
 			
-			// This works in Eclipse environment for debugging ...
-			String currentDir = System.getProperty("user.dir");
-			int index = (currentDir.indexOf("playground") > 0) ? currentDir.indexOf("playground") : currentDir.indexOf("contrib");
-			String root = currentDir.substring(0, index);
-				
-			dtdFile = new File( root + "/matsim" + InternalConstants.CURRENT_MATSIM_4_URBANSIM_XSD_LOCALJAR );
-			log.info("Trying to access local dtd folder at standard location " + dtdFile.getAbsolutePath() + " ...");
-			
-			if (dtdFile.exists() && dtdFile.isFile() && dtdFile.canRead()) {
-				log.info("Using the local DTD " + dtdFile.getAbsolutePath());
-				output = new File( dtdFile.getAbsolutePath() );
-				// URL localUrl = this.getClass().getResource(Constants.MATSIM_4_URBANSIM_XSD_LOCAL_CURRENT);
-				// output = new File( localUrl.getPath() );
-				return output; // return path to local xsd file
-			}			
+			{
+				// This works in Eclipse environment for debugging ...
+				String currentDir = System.getProperty("user.dir");
+				int index = (currentDir.indexOf("playground") > 0) ? currentDir.indexOf("playground") : currentDir.indexOf("contrib");
+				String root = currentDir.substring(0, index);
+
+				dtdFile = new File( root + "/matsim" + InternalConstants.CURRENT_MATSIM_4_URBANSIM_XSD_LOCALJAR );
+				log.info("Trying to access local dtd folder at standard location " + dtdFile.getAbsolutePath() + " ...");
+
+				if (dtdFile.exists() && dtdFile.isFile() && dtdFile.canRead()) {
+					log.info("Using the local DTD " + dtdFile.getAbsolutePath());
+					output = new File( dtdFile.getAbsolutePath() );
+					// URL localUrl = this.getClass().getResource(Constants.MATSIM_4_URBANSIM_XSD_LOCAL_CURRENT);
+					// output = new File( localUrl.getPath() );
+					return output; // return path to local xsd file
+				}
+			}
+
+			{
+				// This works for me (kai) for command line calling ...
+				String currentDir = System.getProperty("user.dir");
+				int index = (currentDir.indexOf("playground") > 0) ? currentDir.indexOf("playground") : currentDir.indexOf("contrib");
+				String root = currentDir.substring(0, index);
+
+				dtdFile = new File( root + "/matsim/src/main/resources/" + InternalConstants.CURRENT_MATSIM_4_URBANSIM_XSD_LOCALJAR );
+				log.info("Trying to access local dtd folder at standard location " + dtdFile.getAbsolutePath() + " ...");
+
+				if (dtdFile.exists() && dtdFile.isFile() && dtdFile.canRead()) {
+					log.info("Using the local DTD " + dtdFile.getAbsolutePath());
+					output = new File( dtdFile.getAbsolutePath() );
+					// URL localUrl = this.getClass().getResource(Constants.MATSIM_4_URBANSIM_XSD_LOCAL_CURRENT);
+					// output = new File( localUrl.getPath() );
+					return output; // return path to local xsd file
+				}			
+			}
 		}
 		
 		// could neither get the remote nor the local version of the xsd
+		System.out.flush();
 		log.warn("Could neither get the XSD from the web nor a local one.");
+		System.err.flush() ;
 		return null;
 	}
 }

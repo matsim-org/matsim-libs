@@ -38,7 +38,6 @@ import javax.xml.validation.SchemaFactory;
 
 import org.apache.log4j.Logger;
 import org.junit.Assert;
-import org.matsim.contrib.matsim4urbansim.config.M4UConfigurationConverterV4;
 import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfig2.AccessibilityParameterType;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfig2.ConfigType;
@@ -50,7 +49,6 @@ import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfig2.Matsim4Urb
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfig2.MatsimConfigType;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfig2.ObjectFactory;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfig2.PlanCalcScoreType;
-import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfig2.StrategyType;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfig2.UrbansimParameterType;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.Matsim4UrbansimConfigType;
 import org.matsim.contrib.matsim4urbansim.utils.io.LoadFile;
@@ -77,10 +75,10 @@ public class CreateTestMATSimConfig {
 	
 	// yy why is all of this public?  could you please write a comment why that design decision was made?  thx.  kai, apr'13
 	
-	public String matsimConfigInputFile 				= "";
-	public String networkInputFile 	 					= "";
-	public String inputPlansFile 						= "";
-	public String hotstartPlansFile						= "";
+	private String matsimExternalConfigFileName 				= "";
+	public String networkInputFileName 	 					= "";
+	public String inputPlansFileName 						= "";
+	public String hotstartPlansFileName						= "";
 	public BigInteger firstIteration					= new BigInteger("0");
 	public BigInteger lastIteration						= new BigInteger("1");
 	public String activityType_0						= "home";
@@ -153,16 +151,16 @@ public class CreateTestMATSimConfig {
 	public CreateTestMATSimConfig(final int startMode, String path){
 		this.startMode 			= startMode;
 		this.dummyPath 			= path;
-		this.networkInputFile 	= path + DUMMY_FILE;
-		this.inputPlansFile		= path + DUMMY_FILE;
-		this.hotstartPlansFile	= path + DUMMY_FILE;
+		this.networkInputFileName 	= path + DUMMY_FILE;
+		this.inputPlansFileName		= path + DUMMY_FILE;
+		this.hotstartPlansFileName	= path + DUMMY_FILE;
 		this.opusHome			= path;
 		this.opusDataPath		= path;
 		this.matsim4opus		= path;
 		this.matsim4opusConfig	= path;
 		this.matsim4opusOutput	= path;
 		this.matsim4opusTemp	= path;
-		this.matsimConfigInputFile = "";
+		this.matsimExternalConfigFileName = "";
 	}
 	
 	/**
@@ -176,16 +174,16 @@ public class CreateTestMATSimConfig {
 	public CreateTestMATSimConfig(final int startMode, String path, boolean testrun){
 		this.startMode 			= startMode;
 		this.dummyPath 			= path;
-		this.networkInputFile 	= path + DUMMY_FILE;
-		this.inputPlansFile		= path + DUMMY_FILE;
-		this.hotstartPlansFile	= path + DUMMY_FILE;
+		this.networkInputFileName 	= path + DUMMY_FILE;
+		this.inputPlansFileName		= path + DUMMY_FILE;
+		this.hotstartPlansFileName	= path + DUMMY_FILE;
 		this.opusHome			= path;
 		this.opusDataPath		= path;
 		this.matsim4opus		= path;
 		this.matsim4opusConfig	= path;
 		this.matsim4opusOutput	= path;
 		this.matsim4opusTemp	= path;
-		this.matsimConfigInputFile = "";
+		this.matsimExternalConfigFileName = "";
 		this.isTestRun			= testrun;
 	}
 	
@@ -202,16 +200,16 @@ public class CreateTestMATSimConfig {
 	public CreateTestMATSimConfig(final int startMode, String path, String externalConfig){
 		this.startMode = startMode;
 		this.dummyPath = path;
-		this.networkInputFile 	= path + DUMMY_FILE;
-		this.inputPlansFile		= path + DUMMY_FILE;
-		this.hotstartPlansFile	= path + DUMMY_FILE;
+		this.networkInputFileName 	= path + DUMMY_FILE;
+		this.inputPlansFileName		= path + DUMMY_FILE;
+		this.hotstartPlansFileName	= path + DUMMY_FILE;
 		this.opusHome			= path;
 		this.opusDataPath		= path;
 		this.matsim4opus		= path;
 		this.matsim4opusConfig	= path;
 		this.matsim4opusOutput	= path;
 		this.matsim4opusTemp	= path;
-		this.matsimConfigInputFile = externalConfig;
+		this.matsimExternalConfigFileName = externalConfig;
 	}
 	
 	/**
@@ -224,16 +222,16 @@ public class CreateTestMATSimConfig {
 	 */
 	public CreateTestMATSimConfig(String path, String inputNetworkFile){
 		this.dummyPath = path;
-		this.networkInputFile = inputNetworkFile;
-		this.inputPlansFile		= "";
-		this.hotstartPlansFile	= "";
+		this.networkInputFileName = inputNetworkFile;
+		this.inputPlansFileName		= "";
+		this.hotstartPlansFileName	= "";
 		this.opusHome			= path;
 		this.opusDataPath		= path;
 		this.matsim4opus		= path;
 		this.matsim4opusConfig	= path;
 		this.matsim4opusOutput	= path;
 		this.matsim4opusTemp	= path;
-		this.matsimConfigInputFile = "";
+		this.matsimExternalConfigFileName = "";
 	}
 
 	/**
@@ -248,17 +246,17 @@ public class CreateTestMATSimConfig {
 		
 		// Config Type
 		FileType matsim_config = of.createFileType();
-		matsim_config.setInputFile( this.matsimConfigInputFile );
+		matsim_config.setInputFile( this.matsimExternalConfigFileName );
 		FileType network = of.createFileType();
-		network.setInputFile( this.networkInputFile );
+		network.setInputFile( this.networkInputFileName );
 		InputPlansFileType inputPlansFileType = of.createInputPlansFileType();
 		if(this.startMode == CreateTestMATSimConfig.COLD_START)
 			inputPlansFileType.setInputFile( "" );
 		else if(this.startMode == CreateTestMATSimConfig.WARRM_START)
-			inputPlansFileType.setInputFile( this.inputPlansFile );
+			inputPlansFileType.setInputFile( this.inputPlansFileName );
 		InputPlansFileType hotStratPlansFile = of.createInputPlansFileType();
 		if(this.startMode == CreateTestMATSimConfig.HOT_START)
-			hotStratPlansFile.setInputFile( this.hotstartPlansFile );
+			hotStratPlansFile.setInputFile( this.hotstartPlansFileName );
 		else
 			hotStratPlansFile.setInputFile( "" );
 		ControlerType controler = of.createControlerType();
@@ -362,20 +360,21 @@ public class CreateTestMATSimConfig {
 	 */
 	public String generateConfigV3(){
 		
-		org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.ObjectFactory of = new org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.ObjectFactory();	
+		org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.ObjectFactory of 
+			= new org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.ObjectFactory();	
 		
 		// create MATSim4UrbanSim xml hierarchy
 		
-		org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.FileType externalMatsimConfig = of.createFileType();
-		externalMatsimConfig.setInputFile(this.matsimConfigInputFile);
-		org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.FileType network = of.createFileType();
-		network.setInputFile(this.networkInputFile);
-		org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.FileType emptyShapeFile = of.createFileType();
-		emptyShapeFile.setInputFile("");
-		org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.FileType warmStartPlansFile = of.createFileType();
-		warmStartPlansFile.setInputFile(this.hotstartPlansFile);
-		org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.FileType hotStartPlansFile = of.createFileType();
-		hotStartPlansFile.setInputFile(this.hotstartPlansFile);
+//		org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.FileType externalMatsimConfig = of.createFileType();
+//		externalMatsimConfig.setInputFile(this.matsimConfigInputFile);
+//		org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.FileType network = of.createFileType();
+//		network.setInputFile(this.networkInputFile);
+//		org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.FileType emptyShapeFile = of.createFileType();
+//		emptyShapeFile.setInputFile("");
+//		org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.FileType warmStartPlansFile = of.createFileType();
+//		warmStartPlansFile.setInputFile(this.hotstartPlansFile);
+//		org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.FileType hotStartPlansFile = of.createFileType();
+//		hotStartPlansFile.setInputFile(this.hotstartPlansFile);
 		
 		// matsimConfigType
 		org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.MatsimConfigType matsimConfigType = of.createMatsimConfigType();
@@ -383,13 +382,13 @@ public class CreateTestMATSimConfig {
 		matsimConfigType.setAccessibilityComputationAreaFromShapeFile(false);
 		matsimConfigType.setAccessibilityComputationAreaFromBoundingBox(false);
 		matsimConfigType.setAccessibilityComputationAreaFromNetwork(true);
-		matsimConfigType.setStudyAreaBoundaryShapeFile(emptyShapeFile);
+		matsimConfigType.setStudyAreaBoundaryShapeFile("");
 		matsimConfigType.setUrbansimZoneRandomLocationDistributionByRadius(this.randomLocationDistributionRadiusForUrbanSimZone);
 		matsimConfigType.setUrbansimZoneRandomLocationDistributionByShapeFile("");
-		matsimConfigType.setExternalMatsimConfig(externalMatsimConfig);
-		matsimConfigType.setNetwork(network);
-		matsimConfigType.setWarmStartPlansFile(warmStartPlansFile);
-		matsimConfigType.setHotStartPlansFile(hotStartPlansFile);		
+		matsimConfigType.setExternalMatsimConfig(this.matsimExternalConfigFileName);
+		matsimConfigType.setNetwork(networkInputFileName);
+		matsimConfigType.setWarmStartPlansFile(this.hotstartPlansFileName);
+		matsimConfigType.setHotStartPlansFile(hotstartPlansFileName);		
 		matsimConfigType.setUseHotStart(true);
 		matsimConfigType.setActivityType0(this.activityType_0);
 		matsimConfigType.setActivityType1(this.activityType_1);
@@ -401,7 +400,8 @@ public class CreateTestMATSimConfig {
 		matsimConfigType.setLastIteration(this.lastIteration);
 		
 		// 
-		org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.Matsim4UrbansimType matsim4UrbanSimType = of.createMatsim4UrbansimType();
+		org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.Matsim4UrbansimType matsim4UrbanSimType 
+			= of.createMatsim4UrbansimType();
 		matsim4UrbanSimType.setPopulationSamplingRate(this.populationSamplingRate);
 		matsim4UrbanSimType.setYear(this.year);
 		matsim4UrbanSimType.setOpusHome(this.opusHome);
@@ -443,17 +443,17 @@ public class CreateTestMATSimConfig {
 		
 		// Config Type
 		FileType matsim_config = of.createFileType();
-		matsim_config.setInputFile( this.matsimConfigInputFile );
+		matsim_config.setInputFile( this.matsimExternalConfigFileName );
 		FileType network = of.createFileType();
-		network.setInputFile( this.networkInputFile );
+		network.setInputFile( this.networkInputFileName );
 		InputPlansFileType inputPlansFileType = of.createInputPlansFileType();
 		if(this.startMode == CreateTestMATSimConfig.COLD_START)
 			inputPlansFileType.setInputFile( "" );
 		else if(this.startMode == CreateTestMATSimConfig.WARRM_START)
-			inputPlansFileType.setInputFile( this.inputPlansFile );
+			inputPlansFileType.setInputFile( this.inputPlansFileName );
 		InputPlansFileType hotStratPlansFile = of.createInputPlansFileType();
 		if(this.startMode == CreateTestMATSimConfig.HOT_START)
-			hotStratPlansFile.setInputFile( this.hotstartPlansFile );
+			hotStratPlansFile.setInputFile( this.hotstartPlansFileName );
 		else
 			hotStratPlansFile.setInputFile( "" );
 		ControlerType controler = of.createControlerType();
@@ -577,6 +577,7 @@ public class CreateTestMATSimConfig {
 	String writeConfigFileV3(Matsim4UrbansimConfigType m4uConfigType) throws UncheckedIOException {
 		try {
 			String destination = this.dummyPath + "/test_config.xml";	
+			log.info("writing test config into: " + destination ) ;
 			BufferedWriter bw = IOUtils.getBufferedWriter( destination );
 			
 			String xsdPath = TempDirectoryUtil.createCustomTempDirectory("xsd");
@@ -594,14 +595,16 @@ public class CreateTestMATSimConfig {
 			// create a schema object via the given xsd to validate the MATSim xml config.
 			Schema schema = schemaFactory.newSchema(file2XSD);
 			
-			JAXBContext jaxbContext = JAXBContext.newInstance(ObjectFactory.class);
+			JAXBContext jaxbContext = JAXBContext.newInstance(org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.ObjectFactory.class);
 			Marshaller m = jaxbContext.createMarshaller();
 			m.setSchema(schema);
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
 			
-			org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.ObjectFactory of = new org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.ObjectFactory();	
-			//JAXBElement elem = new JAXBElement( new QName("","matsim4urbansim_config"), Matsim4UrbansimConfigType.class, m4uConfigType); 
-			JAXBElement jaxbElement = of.createMatsim4UrbansimConfig(m4uConfigType);
+			org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.ObjectFactory of 
+				= new org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.ObjectFactory();	
+//			JAXBElement jaxbElement = new JAXBElement( new QName("","matsim4urbansim_config"), 
+//			Matsim4UrbansimConfigRoot.class, m4uConfigType); 
+			JAXBElement<Matsim4UrbansimConfigType> jaxbElement = of.createMatsim4UrbansimConfig(m4uConfigType);
 			// (this is because there is no XMLRootElemet annotation)
 			m.marshal(jaxbElement, bw );
 			
@@ -631,13 +634,14 @@ public class CreateTestMATSimConfig {
 	public static void main(String args[]){
 		
 		String path = TempDirectoryUtil.createCustomTempDirectory("tmp");
-		CreateTestMATSimConfig config = new CreateTestMATSimConfig(COLD_START, path);
-		String matsimConfiFile = config.generateConfigV3();
+		CreateTestMATSimConfig testConfig = new CreateTestMATSimConfig(COLD_START, path);
+
+		String matsimConfiFile = testConfig.generateConfigV3();
+
+//		M4UConfigurationConverterV4 connector = new M4UConfigurationConverterV4( matsimConfiFile );
+//		connector.init();
 		
-		M4UConfigurationConverterV4 connector = new M4UConfigurationConverterV4( matsimConfiFile );
-		connector.init();
-		
-		TempDirectoryUtil.cleaningUpCustomTempDirectories();
+//		TempDirectoryUtil.cleaningUpCustomTempDirectories();
 	}
 	
 }

@@ -130,9 +130,9 @@ public class CreateTestExternalMATSimConfig extends CreateTestMATSimConfig{
 		this.ptTravelTimes 		= path + DUMMY_FILE_2;
 		this.ptTravelDistances 	= path + DUMMY_FILE_2;
 		this.useTravelTimesAndDistances = "FALSE";
-		this.networkInputFile	= path + DUMMY_FILE_2;
+		this.networkInputFileName	= path + DUMMY_FILE_2;
 		this.lastIteration     	= new BigInteger("100");
-		this.inputPlansFile		= path + DUMMY_FILE_2;
+		this.inputPlansFileName		= path + DUMMY_FILE_2;
 	}
 
 	/**
@@ -194,7 +194,7 @@ public class CreateTestExternalMATSimConfig extends CreateTestMATSimConfig{
 		
 		// network module
 		Module networkModule = config.createModule(NetworkConfigGroup.GROUP_NAME);
-		networkModule.addParam(networkParamName, networkInputFile);
+		networkModule.addParam(networkParamName, networkInputFileName);
 		
 		// controler module 
 		Module contolerModule = config.createModule(ControlerConfigGroup.GROUP_NAME);
@@ -212,7 +212,7 @@ public class CreateTestExternalMATSimConfig extends CreateTestMATSimConfig{
 		
 		// plans module
 		Module plansModule = config.createModule(PlansConfigGroup.GROUP_NAME);
-		plansModule.addParam(plansPramName, inputPlansFile);
+		plansModule.addParam(plansPramName, inputPlansFileName);
 		
 		// qsim module
 		Module qsimModule = config.createModule(QSimConfigGroup.GROUP_NAME);

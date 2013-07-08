@@ -23,6 +23,8 @@
  */
 package org.matsim.contrib.matsim4urbansim.config;
 
+import junit.framework.Assert;
+
 import org.apache.log4j.Logger;
 import org.matsim.contrib.accessibility.config.M4UAccessibilityConfigUtils;
 import org.matsim.contrib.improvedPseudoPt.config.ImprovedPseudoPtConfigUtils;
@@ -102,7 +104,8 @@ public class M4UConfigurationConverterV4 {
 	 * @param matsim4urbansimConfigFilename path to matsim config file
 	 */
 	public M4UConfigurationConverterV4(final String matsim4urbansimConfigFilename){
-		this.matsim4urbansimConfig = M4UConfigUtils.unmarschal(matsim4urbansimConfigFilename); // loading and initializing MATSim config		
+		this.matsim4urbansimConfig = M4UConfigUtils.unmarschal(matsim4urbansimConfigFilename); // loading and initializing MATSim config	
+		Assert.assertTrue( this.matsim4urbansimConfig!= null ) ;
 	}
 	
 	/**
@@ -113,12 +116,18 @@ public class M4UConfigurationConverterV4 {
 
 		// creates an empty config to be filled by settings from the MATSim4UrbanSim and external config files
 		this.config = M4UConfigUtils.createEmptyConfigWithSomeDefaults();
+		Assert.assertTrue( this.config != null ) ;
 
 		// get root elements from JAXB matsim4urbansim config object
 		MatsimConfigType matsim4urbansimConfigPart1 = this.matsim4urbansimConfig.getMatsimConfig();
+		Assert.assertTrue( matsim4urbansimConfigPart1 != null ) ;
+		
 		Matsim4UrbansimType matsim4urbansimConfigPart2 = this.matsim4urbansimConfig.getMatsim4Urbansim();
+		Assert.assertTrue( matsim4urbansimConfigPart2 != null ) ;
+		
 		// loads the external MATSim config separately (to get additional MATSim4UrbanSim parameters)
-		Module matsim4urbansimConfigPart3 = M4UConfigUtils.getM4UModuleFromExternalConfig(matsim4urbansimConfigPart1.getExternalMatsimConfig().getInputFile());
+		Module matsim4urbansimConfigPart3 
+			= M4UConfigUtils.getM4UModuleFromExternalConfig(matsim4urbansimConfigPart1.getExternalMatsimConfig());
 		
 		// int MATSimConfigType parameters
 		M4UConfigUtils.initAccessibilityConfigGroupParameters(matsim4urbansimConfigPart1, config);

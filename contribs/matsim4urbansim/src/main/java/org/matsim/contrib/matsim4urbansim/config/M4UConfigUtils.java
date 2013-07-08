@@ -84,11 +84,12 @@ public class M4UConfigUtils {
 			
 			acm.setAreaOfAccessibilityComputation(AccessibilityConfigGroup.AreaOfAccesssibilityComputation.fromShapeFile.toString());
 
-			if(matsim4urbansimConfigPart1.getStudyAreaBoundaryShapeFile().getInputFile() != null &&
-			  (new File(matsim4urbansimConfigPart1.getStudyAreaBoundaryShapeFile().getInputFile())).exists())
-				acm.setShapeFileCellBasedAccessibility( matsim4urbansimConfigPart1.getStudyAreaBoundaryShapeFile().getInputFile() );
+			if(matsim4urbansimConfigPart1.getStudyAreaBoundaryShapeFile()  != null &&
+			  (new File(matsim4urbansimConfigPart1.getStudyAreaBoundaryShapeFile())).exists())
+				acm.setShapeFileCellBasedAccessibility( matsim4urbansimConfigPart1.getStudyAreaBoundaryShapeFile() );
 			else
-				throw new RuntimeException("Study area boundary shape file not found! Given shape file location:" + matsim4urbansimConfigPart1.getStudyAreaBoundaryShapeFile().getInputFile());
+				throw new RuntimeException("Study area boundary shape file not found! Given shape file location:" 
+			+ matsim4urbansimConfigPart1.getStudyAreaBoundaryShapeFile());
 		}
 		// by bounding box
 		if(matsim4urbansimConfigPart1.isAccessibilityComputationAreaFromBoundingBox()){
@@ -133,14 +134,14 @@ public class M4UConfigUtils {
 		}
 		if ( matsim4urbansimConfigPart1.getWarmStartPlansFile()==null ) {
 			module.setWarmStart(false) ;
-		} else if ( matsim4urbansimConfigPart1.getWarmStartPlansFile().getInputFile() == null ) {
+		} else if ( matsim4urbansimConfigPart1.getWarmStartPlansFile() == null ) {
 			module.setWarmStart(false) ;
 		} else {
-			module.setWarmStart( (new File(matsim4urbansimConfigPart1.getWarmStartPlansFile().getInputFile())).exists() );
+			module.setWarmStart( (new File(matsim4urbansimConfigPart1.getWarmStartPlansFile())).exists() );
 		}
-		module.setWarmStartPlansLocation(matsim4urbansimConfigPart1.getWarmStartPlansFile().getInputFile());
+		module.setWarmStartPlansLocation(matsim4urbansimConfigPart1.getWarmStartPlansFile());
 		module.setHotStart(matsim4urbansimConfigPart1.isUseHotStart());
-		module.setHotStartPlansFileLocation(matsim4urbansimConfigPart1.getHotStartPlansFile().getInputFile());
+		module.setHotStartPlansFileLocation(matsim4urbansimConfigPart1.getHotStartPlansFile());
 		
 		// setting right plans file
 		if(module.usingWarmStart()){
@@ -398,7 +399,7 @@ public class M4UConfigUtils {
 	 */
 	static void loadExternalConfigAndOverwriteMATSim4UrbanSimSettings(MatsimConfigType matsim4urbansimConfigPart1, Config config) throws UncheckedIOException {
 		// check if external MATsim config is given
-		String externalMATSimConfig = matsim4urbansimConfigPart1.getExternalMatsimConfig().getInputFile();
+		String externalMATSimConfig = matsim4urbansimConfigPart1.getExternalMatsimConfig();
 		if(externalMATSimConfig != null && Paths.pathExsits(externalMATSimConfig)){
 
 			log.info("Loading settings from external MATSim config: " + externalMATSimConfig);
