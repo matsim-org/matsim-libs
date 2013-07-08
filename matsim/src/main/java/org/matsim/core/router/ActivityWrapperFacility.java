@@ -58,5 +58,10 @@ public class ActivityWrapperFacility implements Facility {
 	public Id getLinkId() {
 		return wrapped.getLinkId();
 	}
+
+	@Override
+	public String toString() {
+		return "[ActivityWrapperFacility: wrapped="+wrapped+"]";
+	}
 }
 
