@@ -53,13 +53,12 @@ import playground.thibautd.utils.UniqueIdFactory;
  * @author thibautd
  */
 public class GenerateRandomHouseholdScenario {
-	private final static int popSize = 1000;
-	private final static int maxHouseholdSize = 20;
-
 	public static void main(final String[] args) {
 		final String inputNetworkFile = args[ 0 ];
 		final String outputPopulationFile = args[ 1 ];
 		final String outputHouseholdsFile = args[ 2 ];
+		final int popSize = Integer.valueOf( args[ 3 ] ).intValue();
+		final int maxHouseholdSize = Integer.valueOf( args[ 4 ] ).intValue();
 
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
 		new MatsimNetworkReader( scenario ).readFile( inputNetworkFile );
@@ -69,7 +68,7 @@ public class GenerateRandomHouseholdScenario {
 		final PopulationFactory popFactory = population.getFactory();
 		final Households households = new HouseholdsImpl();
 
-		final HouseholdSizes hhSizes = new HouseholdSizes();
+		final HouseholdSizes hhSizes = new HouseholdSizes( maxHouseholdSize );
 		final RandomLinkGetter randomLinks = new RandomLinkGetter( network );
 		final UniqueIdFactory hhIdFactory = new UniqueIdFactory( "hh-" );
 		final UniqueIdFactory personIdFactory = new UniqueIdFactory( "person-" );
@@ -190,9 +189,13 @@ public class GenerateRandomHouseholdScenario {
 	private static class HouseholdSizes {
 		private final int step = 2;
 		private final int min = 2;
-		private final int max = maxHouseholdSize;
+		private final int max;
 
 		private int current = 0;
+
+		public HouseholdSizes(final int max) {
+			this.max = max;
+		}
 
 		public int nextSize() {
 			return min + ( (current += step) % (max - min) );
