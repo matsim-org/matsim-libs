@@ -23,16 +23,13 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.Desires;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
@@ -41,12 +38,12 @@ import playground.thibautd.socnetsim.cliques.config.CliquesConfigGroup;
 import playground.thibautd.socnetsim.cliques.config.JointTimeModeChooserConfigGroup;
 import playground.thibautd.socnetsim.cliques.config.JointTripInsertorConfigGroup;
 import playground.thibautd.socnetsim.cliques.config.JointTripsMutatorConfigGroup;
-import playground.thibautd.socnetsim.population.DriverRoute;
+import playground.thibautd.socnetsim.population.DriverRouteFactory;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.population.JointPlansConfigGroup;
 import playground.thibautd.socnetsim.population.JointPlansXmlReader;
-import playground.thibautd.socnetsim.population.PassengerRoute;
+import playground.thibautd.socnetsim.population.PassengerRouteFactory;
 import playground.thibautd.utils.DesiresConverter;
 
 /**
@@ -75,24 +72,10 @@ public class JointScenarioUtils {
 		ModeRouteFactory rFactory = ((PopulationFactoryImpl) sc.getPopulation().getFactory()).getModeRouteFactory();
 		rFactory.setRouteFactory(
 				JointActingTypes.DRIVER,
-				new RouteFactory() {
-					@Override
-					public Route createRoute(
-						final Id s,
-						final Id e) {
-						return new DriverRoute( s , e );
-					}
-				});
+				new DriverRouteFactory());
 		rFactory.setRouteFactory(
 				JointActingTypes.PASSENGER,
-				new RouteFactory() {
-					@Override
-					public Route createRoute(
-						final Id s,
-						final Id e) {
-						return new PassengerRoute( s , e );
-					}
-				});
+				new PassengerRouteFactory());
 		return sc;
 	}
 
