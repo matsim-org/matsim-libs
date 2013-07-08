@@ -170,6 +170,99 @@ public class SynchronizeCoTravelerPlansAlgorithmTest {
 		fixtures.add( builder.build() );
 	}
 
+	@Before
+	public void createFixtureWithPotentiallyNegativeEndTimes() {
+		final FixtureBuilder builder = new FixtureBuilder();
+
+		final Id driverId = new IdImpl( "driver" );
+		final Id passengerId1 = new IdImpl( "p1" );
+		final Id passengerId2 = new IdImpl( "p2" );
+
+		final Id link1 = new IdImpl( "link1" );
+		final Id link2 = new IdImpl( "link2" );
+		final Id link3 = new IdImpl( "link3" );
+		final Id link4 = new IdImpl( "link4" );
+
+		// DRIVER
+		builder.startPerson( driverId );
+
+		builder.startActivity( "h" , link1 );
+		builder.setCurrentActivityEndTime( 100 );
+
+		builder.startLeg( TransportMode.car , 100 );
+
+		builder.startActivity( JointActingTypes.PICK_UP , link2 );
+
+		builder.startLeg( JointActingTypes.DRIVER , 100 );
+		final DriverRoute dr1 = new DriverRoute( link2 , link3 );
+		dr1.addPassenger( passengerId1 );
+		builder.setCurrentLegRoute( dr1 );
+
+		builder.startActivity( JointActingTypes.PICK_UP , link3 );
+
+		builder.startLeg( JointActingTypes.DRIVER , 100 );
+		final DriverRoute dr2 = new DriverRoute( link3 , link4 );
+		dr2.addPassenger( passengerId1 );
+		dr2.addPassenger( passengerId2 );
+		builder.setCurrentLegRoute( dr2 );
+
+		builder.startActivity( JointActingTypes.DROP_OFF , link4 );
+
+		builder.startLeg( TransportMode.car , 100 );
+
+		builder.startActivity( "h" , link1 );
+
+		// PASSENGER 1
+		builder.startPerson( passengerId1 );
+
+		builder.startActivity( "h" , link3 );
+		builder.setCurrentActivityEndTime( 100 );
+		builder.setCurrentActivityExpectedEndTime( 0d );
+
+		builder.startLeg( TransportMode.walk , 2000 );
+
+		builder.startActivity( JointActingTypes.PICK_UP , link2 );
+
+		builder.startLeg( JointActingTypes.PASSENGER , 200 );
+		final PassengerRoute pr1 = new PassengerRoute( link2 , link4 );
+		pr1.setDriverId( driverId );
+		builder.setCurrentLegRoute( pr1 );
+
+		builder.startActivity( JointActingTypes.DROP_OFF , link4 );
+
+		builder.startLeg( TransportMode.car , 200 );
+
+		builder.startActivity( "h" , link1 );
+
+		// PASSENGER 2
+		builder.startPerson( passengerId2 );
+
+		builder.startActivity( "h" , link2 );
+		builder.setCurrentActivityEndTime( 50 );
+		builder.setCurrentActivityExpectedEndTime( 0 );
+
+		builder.startLeg( TransportMode.walk );
+		final Route walkRoute = new GenericRouteImpl( link2 , link3 );
+		walkRoute.setTravelTime( 500000000 );
+		builder.setCurrentLegRoute( walkRoute );
+
+		builder.startActivity( JointActingTypes.PICK_UP , link3 );
+
+		builder.startLeg( JointActingTypes.PASSENGER );
+		final PassengerRoute pr2 = new PassengerRoute( link3 , link4 );
+		pr2.setDriverId( driverId );
+		pr2.setTravelTime( 50 );
+		builder.setCurrentLegRoute( pr2 );
+
+		builder.startActivity( JointActingTypes.DROP_OFF , link4 );
+
+		builder.startLeg( TransportMode.walk , 50 );
+
+		builder.startActivity( "h" , link2 );
+
+		fixtures.add( builder.build() );
+	}
+
 	// to help creation of fixtures
 	private static class FixtureBuilder {
 		final PopulationFactory popFact = ScenarioUtils.createScenario( ConfigUtils.createConfig() ).getPopulation().getFactory();
