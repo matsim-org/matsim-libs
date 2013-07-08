@@ -146,6 +146,8 @@ public class GenerateRandomHouseholdScenario {
 					leisureLink,
 					random.nextDouble() * 24 * 3600 ) );
 
+		plan.addLeg( popFactory.createLeg( TransportMode.pt ) );
+
 		plan.addActivity(
 				createActivity(
 					popFactory,
