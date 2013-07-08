@@ -20,10 +20,7 @@
 package org.matsim.core.router;
 
 import java.util.List;
-import java.util.Map;
 
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -169,33 +166,5 @@ public class PlanRouter implements PlanAlgorithm, PersonAlgorithm {
 		double tt = ((Leg) pe).getTravelTime();
 		return now + (tt != Time.UNDEFINED_TIME ? tt : 0);
 	}	
-
-	private static class ActivityWrapperFacility implements Facility {
-		private final Activity act;
-
-		public ActivityWrapperFacility(final Activity act) {
-			this.act = act;
-		}
-
-		@Override
-		public Coord getCoord() {
-			return act.getCoord();
-		}
-
-		@Override
-		public Id getId() {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public Map<String, Object> getCustomAttributes() {
-			return null;
-		}
-
-		@Override
-		public Id getLinkId() {
-			return act.getLinkId();
-		}
-	}
 }
 
