@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.api.core.v01.population.Route;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
@@ -78,9 +79,7 @@ public class SynchronizeCoTravelerPlansAlgorithmTest {
 
 	@Before
 	public void createSimpleFixture() {
-		final PopulationFactory popFact = ScenarioUtils.createScenario( ConfigUtils.createConfig() ).getPopulation().getFactory();
-		final Map<Id, Plan> plans = new HashMap<Id, Plan>();
-		final Map<Activity, Double> expectedEndTimes = new HashMap<Activity, Double>();
+		final FixtureBuilder builder = new FixtureBuilder();
 
 		final Id driverId = new IdImpl( "driver" );
 		final Id passengerId1 = new IdImpl( "p1" );
@@ -92,128 +91,137 @@ public class SynchronizeCoTravelerPlansAlgorithmTest {
 		final Id link4 = new IdImpl( "link4" );
 
 		// DRIVER
-		final Person person1 = popFact.createPerson( driverId );
-		final Plan plan1 = popFact.createPlan();
-		plan1.setPerson( person1 );
-		person1.addPlan( plan1 );
-		plans.put( driverId , plan1 );
+		builder.startPerson( driverId );
 
-		final Activity originD = popFact.createActivityFromLinkId( "h" , link1 );
-		originD.setEndTime( 100 );
-		plan1.addActivity( originD );
+		builder.startActivity( "h" , link1 );
+		builder.setCurrentActivityEndTime( 100 );
 
-		final Leg leg1D = popFact.createLeg( TransportMode.car );
-		leg1D.setTravelTime( 100 );
-		plan1.addLeg( leg1D );
+		builder.startLeg( TransportMode.car , 100 );
 
-		final Activity puD = popFact.createActivityFromLinkId( JointActingTypes.PICK_UP , link2 );
-		plan1.addActivity( puD );
+		builder.startActivity( JointActingTypes.PICK_UP , link2 );
 
-		final Leg leg2D = popFact.createLeg( JointActingTypes.DRIVER );
+		builder.startLeg( JointActingTypes.DRIVER , 100 );
 		final DriverRoute dr1 = new DriverRoute( link2 , link3 );
 		dr1.addPassenger( passengerId1 );
-		leg2D.setRoute( dr1 );
-		leg2D.setTravelTime( 100 );
-		plan1.addLeg( leg2D );
+		builder.setCurrentLegRoute( dr1 );
 
-		final Activity pu2D = popFact.createActivityFromLinkId( JointActingTypes.PICK_UP , link3 );
-		plan1.addActivity( pu2D );
+		builder.startActivity( JointActingTypes.PICK_UP , link3 );
 
-		final Leg leg3D = popFact.createLeg( JointActingTypes.DRIVER );
+		builder.startLeg( JointActingTypes.DRIVER , 100 );
 		final DriverRoute dr2 = new DriverRoute( link3 , link4 );
 		dr2.addPassenger( passengerId1 );
 		dr2.addPassenger( passengerId2 );
-		leg3D.setRoute( dr2 );
-		dr2.setTravelTime( 100 );
-		plan1.addLeg( leg3D );
+		builder.setCurrentLegRoute( dr2 );
 
-		final Activity doD = popFact.createActivityFromLinkId( JointActingTypes.DROP_OFF , link4 );
-		plan1.addActivity( doD );
+		builder.startActivity( JointActingTypes.DROP_OFF , link4 );
 
-		final Leg leg4D = popFact.createLeg( TransportMode.car );
-		leg4D.setTravelTime( 100 );
-		plan1.addLeg( leg4D );
+		builder.startLeg( TransportMode.car , 100 );
 
-		final Activity destD = popFact.createActivityFromLinkId( "h" , link1 );
-		plan1.addActivity( destD );
+		builder.startActivity( "h" , link1 );
 
 		// PASSENGER 1
-		final Person person2 = popFact.createPerson( passengerId1 );
-		final Plan plan2 = popFact.createPlan();
-		plan2.setPerson( person2 );
-		person2.addPlan( plan2 );
-		plans.put( passengerId1 , plan2 );
+		builder.startPerson( passengerId1 );
 
-		final Activity originP1 = popFact.createActivityFromLinkId( "h" , link3 );
-		originP1.setEndTime( 200 );
-		plan2.addActivity( originP1 );
-		expectedEndTimes.put( originP1 , 0d );
+		builder.startActivity( "h" , link3 );
+		builder.setCurrentActivityEndTime( 200 );
+		builder.setCurrentActivityExpectedEndTime( 0d );
 
-		final Leg leg1P1 = popFact.createLeg( TransportMode.walk );
-		leg1P1.setTravelTime( 200 );
-		plan2.addLeg( leg1P1 );
+		builder.startLeg( TransportMode.walk , 200 );
 
-		final Activity puP1 = popFact.createActivityFromLinkId( JointActingTypes.PICK_UP , link2 );
-		plan2.addActivity( puP1 );
+		builder.startActivity( JointActingTypes.PICK_UP , link2 );
 
-		final Leg leg2P1 = popFact.createLeg( JointActingTypes.PASSENGER );
+		builder.startLeg( JointActingTypes.PASSENGER , 200 );
 		final PassengerRoute pr1 = new PassengerRoute( link2 , link4 );
 		pr1.setDriverId( driverId );
-		leg2P1.setRoute( pr1 );
-		leg2P1.setTravelTime( 200 );
-		plan2.addLeg( leg2P1 );
+		builder.setCurrentLegRoute( pr1 );
 
-		final Activity doP1 = popFact.createActivityFromLinkId( JointActingTypes.DROP_OFF , link4 );
-		plan2.addActivity( doP1 );
+		builder.startActivity( JointActingTypes.DROP_OFF , link4 );
 
-		final Leg leg3P1 = popFact.createLeg( TransportMode.car );
-		leg3P1.setTravelTime( 200 );
-		plan2.addLeg( leg3P1 );
+		builder.startLeg( TransportMode.car , 200 );
 
-		final Activity destP1 = popFact.createActivityFromLinkId( "h" , link1 );
-		plan2.addActivity( destP1 );
+		builder.startActivity( "h" , link1 );
 
 		// PASSENGER 2
-		final Person person3 = popFact.createPerson( passengerId2 );
-		final Plan plan3 = popFact.createPlan();
-		plan3.setPerson( person3 );
-		person3.addPlan( plan3 );
-		plans.put( passengerId2 , plan3 );
+		builder.startPerson( passengerId2 );
 
-		final Activity originP2 = popFact.createActivityFromLinkId( "h" , link2 );
-		originP1.setEndTime( 50 );
-		plan3.addActivity( originP2 );
-		expectedEndTimes.put( originP2 , 250d );
+		builder.startActivity( "h" , link2 );
+		builder.setCurrentActivityEndTime( 50 );
+		builder.setCurrentActivityExpectedEndTime(  250d );
 
-		final Leg leg1P2 = popFact.createLeg( TransportMode.walk );
-		leg1P2.setRoute( new GenericRouteImpl( link2 , link3 ) );
-		leg1P2.getRoute().setTravelTime( 50 );
-		plan3.addLeg( leg1P2 );
+		builder.startLeg( TransportMode.walk );
+		final Route walkRoute = new GenericRouteImpl( link2 , link3 );
+		walkRoute.setTravelTime( 50 );
+		builder.setCurrentLegRoute( walkRoute );
 
-		final Activity puP2 = popFact.createActivityFromLinkId( JointActingTypes.PICK_UP , link3 );
-		plan3.addActivity( puP2 );
+		builder.startActivity( JointActingTypes.PICK_UP , link3 );
 
-		final Leg leg2P2 = popFact.createLeg( JointActingTypes.PASSENGER );
+		builder.startLeg( JointActingTypes.PASSENGER );
 		final PassengerRoute pr2 = new PassengerRoute( link3 , link4 );
-		leg2P2.setRoute( pr2 );
 		pr2.setDriverId( driverId );
 		pr2.setTravelTime( 50 );
-		plan3.addLeg( leg2P2 );
+		builder.setCurrentLegRoute( pr2 );
 
-		final Activity doP2 = popFact.createActivityFromLinkId( JointActingTypes.DROP_OFF , link4 );
-		plan3.addActivity( doP2 );
+		builder.startActivity( JointActingTypes.DROP_OFF , link4 );
 
-		final Leg leg3P2 = popFact.createLeg( TransportMode.walk );
-		leg3P2.setTravelTime( 50 );
-		plan3.addLeg( leg3P2 );
+		builder.startLeg( TransportMode.walk , 50 );
 
-		final Activity destP2 = popFact.createActivityFromLinkId( "h" , link2 );
-		plan3.addActivity( destP2 );
+		builder.startActivity( "h" , link2 );
 
-		fixtures.add(
-				new Fixture(
-					new JointPlanFactory().createJointPlan( plans ),
-					expectedEndTimes) );
+		fixtures.add( builder.build() );
+	}
+
+	// to help creation of fixtures
+	private static class FixtureBuilder {
+		final PopulationFactory popFact = ScenarioUtils.createScenario( ConfigUtils.createConfig() ).getPopulation().getFactory();
+		private final Map<Id, Plan> plans = new HashMap<Id, Plan>();
+		private Plan currentPlan = null;
+		private Activity currentActivity = null;
+		private Leg currentLeg = null;
+
+		private final Map<Activity, Double> expectedEndTimes = new HashMap<Activity, Double>();
+
+		public void startPerson(final Id id) {
+			final Person person = popFact.createPerson( id );
+			this.currentPlan = popFact.createPlan();
+			currentPlan.setPerson( person );
+			person.addPlan( currentPlan );
+			plans.put( id , currentPlan );
+		}
+
+		public void startActivity(final String type, final Id link) {
+			currentLeg = null;
+			currentActivity = popFact.createActivityFromLinkId( type , link );
+			currentPlan.addActivity( currentActivity );
+		}
+
+		public void setCurrentActivityEndTime(final double endTime) {
+			currentActivity.setEndTime( endTime );
+		}
+
+		public void setCurrentActivityExpectedEndTime(final double expectedEndTime) {
+			expectedEndTimes.put( currentActivity , expectedEndTime );
+		}
+
+		public void startLeg(final String transportMode, double tt) {
+			startLeg( transportMode );
+			currentLeg.setTravelTime( tt );
+		}
+
+		public void startLeg(final String transportMode) {
+			currentActivity = null;
+			currentLeg = popFact.createLeg( transportMode );
+			currentPlan.addLeg( currentLeg );
+		}
+
+		public void setCurrentLegRoute(final Route route) {
+			currentLeg.setRoute( route );
+		}
+
+		public Fixture build() {
+			return new Fixture(
+						new JointPlanFactory().createJointPlan( plans ),
+						expectedEndTimes);
+		}
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -243,5 +251,6 @@ public class SynchronizeCoTravelerPlansAlgorithmTest {
 					fixture.expectedEndTimes.isEmpty() );
 		}
 	}
-}
 
+
+}
