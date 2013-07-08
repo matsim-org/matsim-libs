@@ -117,7 +117,7 @@ public class GroupPlanStrategyFactory {
 							final int firstIteration = config.controler().getFirstIteration();
 							final double nIters = config.controler().getLastIteration() - firstIteration;
 							// TODO: make temperature more configurable
-							final double maxTemp = 3;
+							final double maxTemp = 24;
 							final double minTemp = 1;
 							final double startMin = (2 / 3.) * nIters;
 							final double progress = (iteration - firstIteration) / startMin;
