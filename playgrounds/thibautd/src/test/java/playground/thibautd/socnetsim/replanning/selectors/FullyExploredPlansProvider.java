@@ -33,8 +33,6 @@ import java.util.Random;
 
 import org.apache.log4j.Logger;
 
-import org.junit.runners.model.FrameworkMethod;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -48,7 +46,6 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Counter;
-import org.matsim.testcases.MatsimTestUtils;
 
 import playground.thibautd.socnetsim.cliques.population.CliquesWriter;
 import playground.thibautd.socnetsim.population.JointPlan;
@@ -68,16 +65,7 @@ public class FullyExploredPlansProvider {
 	private static final Logger log =
 		Logger.getLogger(FullyExploredPlansProvider.class);
 
-	// XXX: this is hideous, but better than other solutions I could imagine...
-	// I want:
-	// - to use the standard way of getting the input test path provided by MatsimTestUtils
-	// - outside of a test.
-	private static final String CACHE_DIRECTORY;
-	static {
-		final MatsimTestUtils utils = new MatsimTestUtils();
-		utils.starting( new FrameworkMethod( FullyExploredPlansProvider.class.getMethods()[0] ) );
-		CACHE_DIRECTORY = utils.getClassInputDirectory();
-	}
+	private static final String CACHE_DIRECTORY = "test/output/cache/"+FullyExploredPlansProvider.class.getName()+"/";
 
 	private FullyExploredPlansProvider() {};
 
@@ -90,8 +78,8 @@ public class FullyExploredPlansProvider {
 			return fromFile;
 		}
 
-		log.info( "plans reading FAILED" );
-		return createGroupsAndSelected( incompFactory , isBlocking );
+		log.info( "plans reading FAILED: generating it" );
+		return generateInputData( incompFactory , isBlocking );
 	}
 
 	private static SelectedInformation readGroupsAndSelected(
@@ -311,29 +299,7 @@ public class FullyExploredPlansProvider {
 		}
 	}
 
-	/**
-	 * to generate test data.
-	 * mvn -e exec:java -Dexec.mainClass="playground.thibautd.socnetsim.replanning.selectors.FullyExploredPlansProvider" -Dexec.classpathScope="test"
-	 */
-	public static void main(final String[] args) {
-		generateInputData(
-				new EmptyIncompatiblePlansIdentifierFactory(),
-				true );
-
-		generateInputData(
-				new EmptyIncompatiblePlansIdentifierFactory(),
-				false );
-
-		generateInputData(
-				new FewGroupsIncompatibilityFactory(),
-				true );
-
-		generateInputData(
-				new FewGroupsIncompatibilityFactory(),
-				false );
-	}
-
-	private static void generateInputData(
+	private static SelectedInformation generateInputData(
 			final IncompatiblePlansIdentifierFactory factory,
 			final boolean blocking) {
 		final SelectedInformation toDump = createGroupsAndSelected( factory , blocking );
@@ -366,7 +332,7 @@ public class FullyExploredPlansProvider {
 				for ( Person p : info.getFirst().getPersons() ) {
 					// XXX THIS IS UGLY!!!
 					// we HAVE to do something like this because this stupid PersonImpl
-					// doesn't accept to have no plan selected...
+					// doesn't accept to have no plan selected at import...
 					final Plan dummyPlan = scenario.getPopulation().getFactory().createPlan();
 					dummyPlan.setScore( null );
 					p.addPlan( dummyPlan );
@@ -374,8 +340,8 @@ public class FullyExploredPlansProvider {
 				}
 			}
 
-			assert consistentSelectionStatus( info.getSecond().getJointPlans() );
-			assert !inJointPlans( info.getSecond().getIndividualPlans() , toDump.getJointPlans() );
+			assert info.getSecond() == null || consistentSelectionStatus( info.getSecond().getJointPlans() );
+			assert info.getSecond() == null || !inJointPlans( info.getSecond().getIndividualPlans() , toDump.getJointPlans() );
 		}
 		cliquesWriter.finishAndCloseFile();
 
@@ -388,6 +354,16 @@ public class FullyExploredPlansProvider {
 				scenario.getPopulation(),
 				toDump.getJointPlans(),
 				paths.jointPlansFilePath );
+
+		// remove dirty hack before returning data to use in tests...
+		for ( Person person : scenario.getPopulation().getPersons().values() ) {
+			final Plan selectedPlan = person.getSelectedPlan();
+			if ( selectedPlan.getScore() == null ) {
+				person.getPlans().remove( selectedPlan );
+			}
+		}
+
+		return toDump;
 	}
 
 	private static boolean inJointPlans(
