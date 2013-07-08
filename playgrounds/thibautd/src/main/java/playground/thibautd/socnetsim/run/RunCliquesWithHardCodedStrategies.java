@@ -195,7 +195,7 @@ public class RunCliquesWithHardCodedStrategies {
 							// XXX not nice...
 							null );
 
-		if ( scoringFunctionConf.isUseKtiScoring() ) {
+		if ( scoringFunctionConf.isUseKtiScoring() && !config.scenario().isUseTransit() ) {
 			builder.withTripRouterFactory(
 					new TripRouterFactory() {
 						private final TripRouterFactory delegate =
@@ -243,6 +243,7 @@ public class RunCliquesWithHardCodedStrategies {
 						}
 					});
 		}
+		// else the JointTripRouterFactory is used with pt from the config file
 
 		final ControllerRegistry controllerRegistry = builder.build();
 
