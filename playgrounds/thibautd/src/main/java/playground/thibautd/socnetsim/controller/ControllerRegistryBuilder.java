@@ -42,7 +42,6 @@ import org.matsim.core.router.util.FastAStarLandmarksFactory;
 import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.PreProcessDijkstra;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
@@ -369,7 +368,7 @@ public class ControllerRegistryBuilder {
 										getTripRouterFactory().instantiateAndConfigureTripRouter() );
 						final PlanAlgorithm checkJointRoutes =
 							new ImportedJointRoutesChecker( getTripRouterFactory().instantiateAndConfigureTripRouter() );
-						final PlanAlgorithm xy2link = new XY2Links( (ScenarioImpl) scenario );
+						final PlanAlgorithm xy2link = new XY2Links( scenario.getNetwork() );
 						return new GenericPlanAlgorithm<ReplanningGroup>() {
 							@Override
 							public void run(final ReplanningGroup group) {
