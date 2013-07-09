@@ -32,6 +32,9 @@ public class MultiModalConfigGroup extends Module {
 	private static final String MULTI_MODAL_SIMULATION_ENABLED = "multiModalSimulationEnabled";
 	private static final String NUMBER_OF_THREADS = "numberOfThreads";
 	private static final String SIMULATED_MODES = "simulatedModes";
+	private static final String INPUT_SLOPE_INFORMATION_FILE = "inputSlopeInformationFile";
+	
+	// to be removed...
 	private static final String CREATE_MULTI_MODAL_NETWORK = "createMultiModalNetwork";
 	private static final String CUTOFF_VALUE_FOR_NON_MOTORIZED_MODES  = "cuttoffValueForNonCarModes";
 	private static final String DROP_NON_CAR_ROUTES = "dropNonCarRoutes";
@@ -39,7 +42,9 @@ public class MultiModalConfigGroup extends Module {
 
 	private boolean multiModalSimulationEnabled = false;
 	private int numberOfThreads = 1;
-	private String simulatedModes = "pt,walk,ride,bike"; 
+	private String simulatedModes = "bike,walk"; 
+	private String slopeInformationFile = null;
+	
 	private boolean createMultiModalNetwork = false;
 	private double cuttoffValueForNonMotorizedModes = 80/3.6;	// 80km/h -> m/s
 	private boolean dropNonCarRoutes = false;
@@ -57,6 +62,8 @@ public class MultiModalConfigGroup extends Module {
 			setNumberOfThreads(Integer.parseInt(value));
 		} else if (SIMULATED_MODES.equals(key)) {
 			setSimulatedModes(value);
+		} else if (INPUT_SLOPE_INFORMATION_FILE.equals(key)) {
+			setSlopeInformationFile(value);
 		} else if (CREATE_MULTI_MODAL_NETWORK.equals(key)) {
 			setCreateMultiModalNetwork(Boolean.parseBoolean(value.trim()));
 		} else if (CUTOFF_VALUE_FOR_NON_MOTORIZED_MODES.equals(key)) {
@@ -78,6 +85,8 @@ public class MultiModalConfigGroup extends Module {
 			return Integer.toString(getNumberOfThreads());
 		} else if (SIMULATED_MODES.equals(key)) {
 			return getSimulatedModes();
+		} else if (INPUT_SLOPE_INFORMATION_FILE.equals(key)) {
+			return getSlopeInformationFile();
 		} else if (CREATE_MULTI_MODAL_NETWORK.equals(key)) {
 			return Boolean.toString(isCreateMultiModalNetwork());
 		} else if (CUTOFF_VALUE_FOR_NON_MOTORIZED_MODES.equals(key)) {
@@ -97,6 +106,7 @@ public class MultiModalConfigGroup extends Module {
 		map.put(MULTI_MODAL_SIMULATION_ENABLED, getValue(MULTI_MODAL_SIMULATION_ENABLED));
 		map.put(NUMBER_OF_THREADS, getValue(NUMBER_OF_THREADS));
 		map.put(SIMULATED_MODES, getValue(SIMULATED_MODES));
+		map.put(INPUT_SLOPE_INFORMATION_FILE, getValue(INPUT_SLOPE_INFORMATION_FILE));
 		map.put(CREATE_MULTI_MODAL_NETWORK, getValue(CREATE_MULTI_MODAL_NETWORK));
 		map.put(CUTOFF_VALUE_FOR_NON_MOTORIZED_MODES, getValue(CUTOFF_VALUE_FOR_NON_MOTORIZED_MODES));
 		map.put(DROP_NON_CAR_ROUTES, getValue(DROP_NON_CAR_ROUTES));
@@ -106,7 +116,10 @@ public class MultiModalConfigGroup extends Module {
 	@Override
 	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
+		map.put(MULTI_MODAL_SIMULATION_ENABLED, "Set this parameter to true if multi modal simulation should be used, false if not.");
 		map.put(NUMBER_OF_THREADS, "Use number of threads > 1 for parallel version using the specified number of threads.");
+		map.put(SIMULATED_MODES, "List the modes that should be simulated by the multi modal simulation (supported so far: bike, walk).");
+		map.put(INPUT_SLOPE_INFORMATION_FILE, "Path to a file containing slope information for the network's links (required file format: ObjectAttributes).");
 		map.put(CREATE_MULTI_MODAL_NETWORK, "Use this if your network is not multi modal. Links with free speeds that are lower than " +
 				"the specified cutoff value will be usable for walk and bike trips.");
 		map.put(CUTOFF_VALUE_FOR_NON_MOTORIZED_MODES, "Only used if createMultiModalNetwork is enabled (set value in m/s).");
@@ -141,6 +154,14 @@ public class MultiModalConfigGroup extends Module {
 		return this.simulatedModes;
 	}
 
+	public void setSlopeInformationFile(String file) {
+		this.slopeInformationFile = file;
+	}
+	
+	public String getSlopeInformationFile() {
+		return this.slopeInformationFile;
+	}
+	
 	public void setCreateMultiModalNetwork(final boolean enabled) {
 		this.createMultiModalNetwork = enabled;
 	}
