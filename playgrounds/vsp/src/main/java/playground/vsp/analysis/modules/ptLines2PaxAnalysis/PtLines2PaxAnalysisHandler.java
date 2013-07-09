@@ -41,7 +41,6 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 
 import playground.vsp.analysis.modules.ptRoutes2paxAnalysis.AnalysisVehicle;
-import playground.vsp.analysis.modules.ptRoutes2paxAnalysis.TransitLineContainer;
 
 /**
  * @author sfuerbas after droeder
@@ -77,6 +76,11 @@ public class PtLines2PaxAnalysisHandler implements
 		}
 	}
 
+	
+	public HashMap<Id, TransitLines2PaxCounts> getLinesPaxCounts() {
+		return linesPaxCounts;
+	}
+
 	@Override
 	public void reset(int iteration) {
 		// do nothing
@@ -102,14 +106,6 @@ public class PtLines2PaxAnalysisHandler implements
 		if (this.drivers.contains(event.getPersonId())) {
 			// but finish his route and remove him and the vehicle
 			this.drivers.remove(event.getPersonId());
-			// AnalysisVehicle v =
-			// this.transitVehicles.remove(event.getVehicleId());
-			// this.linesContainer.get(v.getLineId()).vehicleDeparts(
-			// event.getTime(),
-			// v.getCapacity(),
-			// v.getSeatsOccupied(),
-			// v.getStopIndexId(),
-			// v.getRouteId());
 		} else {
 			// only count boarding/alighting for transit
 			if (!this.transitVehicles.keySet().contains(event.getVehicleId()))
@@ -137,7 +133,7 @@ public class PtLines2PaxAnalysisHandler implements
 	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
 		AnalysisVehicle v = this.transitVehicles.get(event.getVehicleId());
 		this.linesPaxCounts.get(v.getLineId()).vehicleDeparts(event.getTime(),
-				v.getCapacity(), v.getSeatsOccupied(), v.getStopIndexId());
+				v.getCapacity(), v.getSeatsOccupied(), v.getLocationId());
 	}
 
 	@Override

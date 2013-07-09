@@ -19,26 +19,35 @@
 
 package playground.vsp.analysis.modules.ptLines2PaxAnalysis;
 
+import java.io.BufferedWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.handler.EventHandler;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.io.IOUtils;
+import org.matsim.counts.Count;
+import org.matsim.counts.Counts;
+import org.matsim.counts.Volume;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.Vehicles;
 
+import playground.vsp.analysis.VspAnalyzer;
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
-import playground.vsp.analysis.modules.ptRoutes2paxAnalysis.PtRoutes2PaxAnalysis;
-import playground.vsp.analysis.modules.ptRoutes2paxAnalysis.PtRoutes2PaxAnalysisHandler;
-import playground.vsp.analysis.modules.ptRoutes2paxAnalysis.TransitLineContainer;
-import playground.vsp.analysis.modules.ptRoutes2paxAnalysis.TransitRouteContainer;
+import playground.vsp.analysis.modules.ptRoutes2paxAnalysis.CreateRscript;
 
 /**
- * @author sfuerbas after droeder
+ * @author fuerbas after droeder
  *
  */
 
@@ -64,28 +73,87 @@ public class PtLines2PaxAnalysis extends AbstractAnalyisModule {
 
 	@Override
 	public void preProcessData() {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void postProcessData() {
-		// TODO Auto-generated method stub
 
 	}
 
 	@Override
 	public void writeResults(String outputFolder) {
-		// TODO Auto-generated method stub
-
+		String dir;
+		for(TransitLines2PaxCounts tl2c: this.handler.getLinesPaxCounts().values()){
+			dir = outputFolder + tl2c.getId().toString() + "--";
+//			for "all longest" route = route with most stops write line files
+			writeLineFiles(dir, tl2c, this.lines.get(tl2c.getId()));
+		}
+		CreateRscript.createScript(this.lines, outputFolder);
+	}
+	
+//	works with simplistic example
+	
+	private void writeCounts2File(TransitLines2PaxCounts tl, Integer maxSlice, Counts counts, String file, String typeOfOutput) {
+		BufferedWriter w = IOUtils.getBufferedWriter(file);
+		Id stopId; 
+		Count c;
+		Volume v;
+		try {
+			//create header
+			w.write("index;stopId;name");
+			for(int i = 0; i < (maxSlice + 1); i++){
+				w.write(";" + String.valueOf(i));
+			}
+			w.write("\n");
+			// ...
+			log.info("Number of TransitRoutes to be written for "+typeOfOutput+": "+tl.getRoutesByNumberOfStops().size());
+			for(int i = 0; i < tl.getRoutesByNumberOfStops().size() ; i++){
+				TransitRoute tr = tl.getRoutesByNumberOfStops().get(i);
+				log.info("Writing output "+typeOfOutput+" for TransitRoute "+(i+1)+" of "+tl.getRoutesByNumberOfStops().size()+
+						" total routes, id = "+tr.getId()+" length = "+tr.getStops().size());
+				for (int noStops = 0; noStops < tr.getStops().size(); noStops++) {	
+					stopId = tr.getStops().get(noStops).getStopFacility().getId();
+					c = counts.getCount(stopId);
+					w.write(String.valueOf(noStops) + ";" + c.getCsId() + ";" + tr.getStops().get(noStops).getStopFacility().getName());
+					for(int j = 0; j < (maxSlice + 1); j++){
+						v = c.getVolume(j);
+						String value = (v == null) ? "--" : String.valueOf(v.getValue());
+						w.write(";" + value);
+					}
+					w.write("\n");
+				}
+			}
+			w.flush();
+			w.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void writeLineFiles(String dir, TransitLines2PaxCounts tl2c, TransitLine tl) {
+		writeCounts2File(tl2c, tl2c.getMaxSlice(), tl2c.getAlighting(), dir + tl2c.getId().toString() + "--alighting.csv", "alighting");
+		writeCounts2File(tl2c, tl2c.getMaxSlice(), tl2c.getBoarding(), dir + tl2c.getId().toString() + "--boarding.csv", "boarding");
+		writeCounts2File(tl2c, tl2c.getMaxSlice(), tl2c.getCapacity(), dir + tl2c.getId().toString() + "--capacity.csv", "capacity");
+		writeCounts2File(tl2c, tl2c.getMaxSlice(), tl2c.getOccupancy(), dir + tl2c.getId().toString() + "--occupancy.csv", "occupancy");
+		writeCounts2File(tl2c, tl2c.getMaxSlice(), tl2c.getTotalPax(), dir + tl2c.getId().toString() + "--totalPax.csv", "totalPax");
 	}
 	
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
+		String dir = "Z:\\WinHome\\workspace\\PtRoutes2PaxAna_Daten\\schedule\\";
+		VspAnalyzer analyzer = new VspAnalyzer(dir, dir + "tut_10min_0.0.events.xml.gz");
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		sc.getConfig().scenario().setUseTransit(true);
+		sc.getConfig().scenario().setUseVehicles(true);
+//		new TransitScheduleReader(sc).readFile(dir + "tut_10min_0.0.transitSchedule.xml.gz");
+		new TransitScheduleReader(sc).readFile(dir + "tut_10min_0.0.transitSchedule_1.xml");	//for testing
+		new VehicleReaderV1(((ScenarioImpl) sc).getVehicles()).readFile(dir + "tut_10min_0.0.vehicles.xml.gz");
+		PtLines2PaxAnalysis ptLinesPax = new PtLines2PaxAnalysis(sc.getTransitSchedule().getTransitLines(), ((ScenarioImpl) sc).getVehicles(), 3600, 24);
+		analyzer.addAnalysisModule(ptLinesPax);
+		analyzer.run();
 	}
 
 }
