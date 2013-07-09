@@ -49,7 +49,6 @@ import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.tools.MultiModalNetworkCreator;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
@@ -79,6 +78,8 @@ import playground.christoph.evacuation.network.AddZCoordinatesToNetwork;
 import playground.christoph.evacuation.withinday.replanning.identifiers.InformedHouseholdsTracker;
 
 import com.vividsolutions.jts.geom.Geometry;
+
+import contrib.multimodal.tools.MultiModalNetworkCreator;
 
 /**
  * Decides where a household will meet after the evacuation order has been given.
