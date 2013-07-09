@@ -69,8 +69,8 @@ public class DigicoreNetworkBuilder {
 		String inputfolder = args[0];
 		
 		/* These values should be set following Quintin's Design-of-Experiment inputs. */
-		double[] radii = {30, 25, 20, 15, 10};
-		int[] pmins = {1};
+		double[] radii = {40, 35, 30, 25, 20, 15, 10};
+		int[] pmins = {1, 5, 10, 15, 20, 25};
 
 		/* Checks if a filter facility is provided. Either as a readable file,
 		 * or as sequential Id arguments. */
