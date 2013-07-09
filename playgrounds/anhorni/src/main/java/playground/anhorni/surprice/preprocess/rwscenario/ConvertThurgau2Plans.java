@@ -48,11 +48,11 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 public class ConvertThurgau2Plans {
 	private static final String HOME = "home";
-	private static final String WORK = "work";
-	private static final String LEIS = "leisure";
+	private static final String COMMUTING = "commuting";
+	private static final String BUSINESS = "business";
+	private static final String LEISURE = "leisure";
 	private static final String SHOP = "shop";	
-	private static final String EDUC = "education";
-	private static final String OTHER = "other";
+	
 	private static final String MALE = "m";
 	private static final String FEMALE = "f";
 	
@@ -129,16 +129,16 @@ public class ConvertThurgau2Plans {
 		// destination activity type -------------------------------------------------
 		int purpose = Integer.parseInt(entrs[24].trim());
 		String acttype = null;
-		if 		(purpose == 1) { acttype = OTHER; }	// Pick up/Drop off
-		else if (purpose == 2) { acttype = OTHER; }	// Private business
-		else if (purpose == 3) { acttype = WORK; }	// Work related
-		else if (purpose == 4) { acttype = EDUC; }	// School
-		else if (purpose == 5) { acttype = WORK; }	// Work
-		else if (purpose == 6) { acttype = SHOP; }	// Shopping daily
-		else if (purpose == 7) { acttype = SHOP; }	// Shopping long-term
-		else if (purpose == 8) { acttype = LEIS; }	// Leisure
-		else if (purpose == 9) { acttype = OTHER; }	// Other
-		else if (purpose == 10) { acttype = HOME; }	// Home
+		if 		(purpose == 1) { acttype = LEISURE; }	// Pick up/Drop off
+		else if (purpose == 2) { acttype = LEISURE; }	// Private business
+		else if (purpose == 3) { acttype = BUSINESS; }	// Work related
+		else if (purpose == 4) { acttype = COMMUTING; }	// School
+		else if (purpose == 5) { acttype = COMMUTING; }	// Work
+		else if (purpose == 6) { acttype = SHOP; }		// Shopping daily
+		else if (purpose == 7) { acttype = SHOP; }		// Shopping long-term
+		else if (purpose == 8) { acttype = LEISURE; }	// Leisure
+		else if (purpose == 9) { acttype = LEISURE; }	// Other
+		else if (purpose == 10) { acttype = HOME; }		// Home
 		else { Gbl.errorMsg("pid=" + pid + ": purpose=" + purpose + " not known!"); }
 		
 		// trip mode type --------------------------------------------------------------				
@@ -147,7 +147,7 @@ public class ConvertThurgau2Plans {
 		}				
 		int m = Integer.parseInt(entrs[29].trim());
 		String mode = null;
-		if (m == 0) 	 { mode = "undefined"; }	// Unkown
+		if (m == 0) 	 { mode = "undefined"; }		// Unkown
 		else if (m == 1) { mode = TransportMode.pt; }	// Rail
 		else if (m == 2) { mode = TransportMode.pt; }	// Bus
 		else if (m == 3) { mode = TransportMode.car; }	// Car driver
@@ -396,7 +396,7 @@ public class ConvertThurgau2Plans {
 				for (PlanElement pe : plan.getPlanElements()) {
 					if (pe instanceof Activity) {
 						Activity act = (Activity) pe;
-						if (act.getType().startsWith(OTHER)) {
+						if (act.getType().startsWith(LEISURE)) {
 							removePlans.add(plan);
 							removeCnt++;
 						}

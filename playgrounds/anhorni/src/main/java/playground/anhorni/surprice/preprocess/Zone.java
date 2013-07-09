@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.anhorni.surprice.preprocess.miniscenario;
+package playground.anhorni.surprice.preprocess;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +28,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.core.utils.geometry.CoordUtils;
 
 public class Zone {	
 	String name;
@@ -37,11 +39,20 @@ public class Zone {
 	private List<ActivityFacility> facilitiesInZone = new Vector<ActivityFacility>();
 	private final static Logger log = Logger.getLogger(Zone.class);	
 	
+	private CoordImpl center;
+	private double radius = -1.0;
+	
 	public Zone(String name, Coord topleft, double height, double length) {
 		this.name = name;
 		this.topleft = topleft;
 		this.height = height;
 		this.length = length;
+	}
+	
+	public Zone(String name, CoordImpl center, double radius) {
+		this.name = name;
+		this.center = center;
+		this.radius = radius;
 	}
 	
 	public Coord getTopleft() {
@@ -84,13 +95,22 @@ public class Zone {
 		return links;
 	}
  	
-	public boolean inZone(Coord point) {
-		if ((point.getX() >= topleft.getX() && point.getX() <= topleft.getX() + length) && 
-				point.getY() <= topleft.getY() && point.getY() >= topleft.getY() - height) {
-			return true;
-		}
-		else {
-			return false;
+	public boolean inZone(Coord point) {	
+		if (center != null && radius > 0.0) {
+			if (CoordUtils.calcDistance(center, point) < radius) {
+				return true;
+			}
+			else {
+				return false;
+			}
+		} else {
+			if ((point.getX() >= topleft.getX() && point.getX() <= topleft.getX() + length) && 
+					point.getY() <= topleft.getY() && point.getY() >= topleft.getY() - height) {
+				return true;
+			}
+			else {
+				return false;
+			}
 		}
 	}
 

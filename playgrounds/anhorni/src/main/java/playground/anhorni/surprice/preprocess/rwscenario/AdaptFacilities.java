@@ -21,22 +21,20 @@ package playground.anhorni.surprice.preprocess.rwscenario;
 
 import java.util.Map;
 import java.util.SortedSet;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTime.DayType;
-import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 
 
@@ -57,49 +55,13 @@ public class AdaptFacilities {
 	
 	public void run(String facilitiesFileIn, String facilitiesFileOut, String networkFile) {
 		new MatsimNetworkReader(scenario).readFile(networkFile);
-		
 		new FacilitiesReaderMatsimV1(scenario).readFile(facilitiesFileIn);
+				
+		// -------------------------------------------------------
+		// adding new act types:
 		
-		QuadTree<ActivityFacilityImpl> otherFacQuadTree = null;
-		
-		double minx = Double.POSITIVE_INFINITY;
-		double miny = Double.POSITIVE_INFINITY;
-		double maxx = Double.NEGATIVE_INFINITY;
-		double maxy = Double.NEGATIVE_INFINITY;
-		
-		for (ActivityFacility f : this.scenario.getActivityFacilities().getFacilities().values()) {
-			if (f.getActivityOptions().get("home") != null) {
-				if (f.getCoord().getX() < minx) { minx = f.getCoord().getX(); }
-				if (f.getCoord().getY() < miny) { miny = f.getCoord().getY(); }
-				if (f.getCoord().getX() > maxx) { maxx = f.getCoord().getX(); }
-				if (f.getCoord().getY() > maxy) { maxy = f.getCoord().getY(); }
-			}
-		}
-		minx -= 1.0;
-		miny -= 1.0;
-		maxx += 1.0;
-		maxy += 1.0;		
-		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
-		otherFacQuadTree = new QuadTree<ActivityFacilityImpl>(minx, miny, maxx, maxy);
-		
-		log.info("add act opt other ................");
+		// commuting:
 		for (ActivityFacility facility : this.scenario.getActivityFacilities().getFacilities().values()) {
-						
-			if (otherFacQuadTree.get(facility.getCoord().getX(), facility.getCoord().getY(), 100.0).size() == 0 
-					&& (facility.getActivityOptions().containsKey("home") ||
-							facility.getActivityOptions().containsKey("work") ||
-							facility.getActivityOptions().containsKey("shop") ||
-							facility.getActivityOptions().containsKey("education") ||
-							facility.getActivityOptions().containsKey("leisure"))) { 
-				
-				otherFacQuadTree.put(facility.getCoord().getX(), facility.getCoord().getY(),(ActivityFacilityImpl) facility);
-				((ActivityFacilityImpl)facility).createActivityOption("other");
-				ActivityOption actOpt = ((ActivityFacilityImpl)facility).getActivityOptions().get("other");
-				
-				for (DayType day : DayType.values()) {				
-					actOpt.addOpeningTime(new OpeningTimeImpl(day, 0.0 * 3600, 24.0 * 3600));
-				}
-			}
 			ActivityOptionImpl actOpt2 = (ActivityOptionImpl) facility.getActivityOptions().get("work_sector2");
 			ActivityOptionImpl actOpt3 = (ActivityOptionImpl) facility.getActivityOptions().get("work_sector3");
 			
@@ -107,16 +69,38 @@ public class AdaptFacilities {
 			if (actOpt3 != null) actOpt = actOpt3;
 			
 			if (actOpt != null) {
-				((ActivityFacilityImpl)facility).createActivityOption("work");
-				
-				Map<DayType,SortedSet<OpeningTime>> otss = actOpt.getOpeningTimes();
-				for (SortedSet<OpeningTime> ots : otss.values()) {
-					for (OpeningTime ot : ots) {
-						facility.getActivityOptions().get("work").addOpeningTime(ot);
-					}
-				}
+				ActivityOptionImpl aOptWork = ((ActivityFacilityImpl)facility).createActivityOption("work");				
+				Map<DayType,SortedSet<OpeningTime>> ots = actOpt.getOpeningTimes();
+				aOptWork.setOpeningTimes(ots);
 			}
 		}
+		
+		TreeMap<Id, ActivityFacility> workFacilities = this.scenario.getActivityFacilities().getFacilitiesForActivityType("work");		
+		for (ActivityFacility facility : workFacilities.values()) {
+			ActivityOptionImpl aOptWork = (ActivityOptionImpl) facility.getActivityOptions().get("work");
+			Map<DayType, SortedSet<OpeningTime>> ots = aOptWork.getOpeningTimes();
+						
+			ActivityOptionImpl aOptComm = ((ActivityFacilityImpl)facility).createActivityOption("commuting");
+			aOptComm.setOpeningTimes(ots);
+			
+			// business:
+			ActivityOptionImpl aOptBusiness = ((ActivityFacilityImpl)facility).createActivityOption("business");
+			aOptBusiness.setOpeningTimes(ots);
+			
+			((ActivityFacilityImpl)facility).getActivityOptions().remove("work");
+		}
+		
+		TreeMap<Id, ActivityFacility> educFacilities = this.scenario.getActivityFacilities().getFacilitiesForActivityType("education");		
+		for (ActivityFacility facility : educFacilities.values()) {
+			ActivityOptionImpl aOptEduc = (ActivityOptionImpl) facility.getActivityOptions().get("education");
+			Map<DayType, SortedSet<OpeningTime>> ots = aOptEduc.getOpeningTimes();
+						
+			ActivityOptionImpl aOptComm = ((ActivityFacilityImpl)facility).createActivityOption("commuting");
+			aOptComm.setOpeningTimes(ots);
+			
+			((ActivityFacilityImpl)facility).getActivityOptions().remove("education");
+		}
+		// ----------------------
 		new FacilitiesWriter(this.scenario.getActivityFacilities()).write(facilitiesFileOut);
 	}
 }

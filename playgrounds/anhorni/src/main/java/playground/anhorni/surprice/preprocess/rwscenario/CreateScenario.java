@@ -30,7 +30,6 @@ import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.analysis.Bins;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
@@ -58,13 +57,13 @@ import playground.anhorni.surprice.DayConverter;
 import playground.anhorni.surprice.Surprice;
 import playground.anhorni.surprice.preprocess.Analyzer;
 import playground.anhorni.surprice.preprocess.CreateToll;
-import playground.anhorni.surprice.preprocess.miniscenario.Zone;
+import playground.anhorni.surprice.preprocess.Zone;
 
 
 public class CreateScenario {	
 	private ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());	
 	private ConvertThurgau2Plans thurgauConverter = new ConvertThurgau2Plans();
-	private TreeMap<Id, PersonHomeWork> personHWFacilities = new TreeMap<Id, PersonHomeWork>();
+	private TreeMap<Id, PersonHomeWork> personHCFacilities = new TreeMap<Id, PersonHomeWork>();
 	private Random random = new Random(102830259L);
 	private TreeMap<Id, PersonWeeks> personWeeksMZ = new TreeMap<Id, PersonWeeks>();
 	private Config config;
@@ -221,35 +220,36 @@ public class CreateScenario {
 					);
 		}
 		
-		// dummy zone
-		Zone tollZone =  new Zone("tollZone", (Coord) new CoordImpl(0.0, 0.0), 1000.0, 1000.0); 
 		CoordImpl bellevue = new CoordImpl(683518.0,246836.0);
+		Zone tollZone =  new Zone("tollZone", bellevue, 2000.0); 
+		
 		for (ActivityFacility facility : this.scenario.getActivityFacilities().getFacilities().values()) {	
 			if (bellevue.calcDistance(facility.getCoord()) < radius) {
 				tollZone.addFacility(facility);
 			}
 		}
 		
-		CreateToll tollCreator = new CreateToll();
-		tollCreator.createLinkTolling(
-				outPath, 
-				network,
-				tollZone,
-				6.0 * 3600.0,
-				20.0 * 3600.0,
-				1.0,
-				"link",
-				"ZH scenario"); 
-				
 //		CreateToll tollCreator = new CreateToll();
-//		tollCreator.create(
+//		tollCreator.createLinkTolling(
 //				outPath, 
+//				network,
 //				tollZone,
-//				8.0 * 3600.0,
-//				18.0 * 3600.0,
+//				6.0 * 3600.0,
+//				20.0 * 3600.0,
 //				1.0,
 //				"link",
 //				"ZH scenario"); 
+		
+		// String path, Zone tollZone, double startTime, double endTime, double amount, String type, String desc
+		CreateToll tollCreator = new CreateToll();
+		tollCreator.create(
+				outPath, 
+				tollZone,
+				6.0 * 3600.0,
+				10.0 * 3600.0,
+				3.0,
+				"area",
+				"ZH scenario"); 
 	}
 	
 	private void writeWeek(String outPath) {
@@ -320,17 +320,17 @@ public class CreateScenario {
 			}
 			PlanImpl plan = (PlanImpl)p.getSelectedPlan();
 			Id homeFacilityId = plan.getFirstActivity().getFacilityId();
-			Id workFacilityId = this.getWorkFacilityId(plan);			
-			this.personHWFacilities.put(p.getId(), new PersonHomeWork(p, homeFacilityId, workFacilityId));
+			Id workFacilityId = this.getCommuteFacilityId(plan);			
+			this.personHCFacilities.put(p.getId(), new PersonHomeWork(p, homeFacilityId, workFacilityId));
 		}
 	}
 	
-	private Id getWorkFacilityId(PlanImpl plan) {
+	private Id getCommuteFacilityId(PlanImpl plan) {
 		Id workId = null;
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Activity) {
 				ActivityImpl act = (ActivityImpl)pe;				
-				if (act.getType().startsWith("w")) {
+				if (act.getType().startsWith("c")) {
 					workId = act.getFacilityId();
 				}
 			}
@@ -357,7 +357,7 @@ public class CreateScenario {
 				log.info(" person # " + counter);
 			}			
 			PersonWeeks personWeeksThurgau;
-			if (this.personHWFacilities.get(p.getId()).getWorkFaciliyId() != null) {
+			if (this.personHCFacilities.get(p.getId()).getWorkFaciliyId() != null) {
 				personWeeksThurgau = this.chooseWeek(workersNormalized);
 			}
 			else {
@@ -387,11 +387,11 @@ public class CreateScenario {
 			// TODO: smear times
 			
 			// assign home and work locations
-			PersonHomeWork phw = this.personHWFacilities.get(person.getId());			
+			PersonHomeWork phw = this.personHCFacilities.get(person.getId());			
 			for (PlanElement pe : planNew.getPlanElements()) {
 				if (pe instanceof Activity) {
 					ActivityImpl act = (ActivityImpl)pe;				
-					if (act.getType().startsWith("w")) {
+					if (act.getType().startsWith("c")) {
 						act.setFacilityId(phw.getWorkFaciliyId());
 						act.setCoord(this.scenario.getActivityFacilities().getFacilities().get(phw.getWorkFaciliyId()).getCoord());
 						act.setLinkId(this.scenario.getActivityFacilities().getFacilities().get(phw.getWorkFaciliyId()).getLinkId());

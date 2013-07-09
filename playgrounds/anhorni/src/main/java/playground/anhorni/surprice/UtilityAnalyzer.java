@@ -42,7 +42,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 import playground.anhorni.surprice.analysis.SupriceBoxPlot;
-import playground.anhorni.surprice.preprocess.miniscenario.Zone;
+import playground.anhorni.surprice.preprocess.Zone;
 
 public class UtilityAnalyzer {
 	

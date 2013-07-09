@@ -26,7 +26,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.roadpricing.RoadPricingWriterXMLv1;
-import playground.anhorni.surprice.preprocess.miniscenario.Zone;
 
 public class CreateToll {
 	

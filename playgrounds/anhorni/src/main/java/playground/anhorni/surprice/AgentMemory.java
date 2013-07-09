@@ -31,7 +31,7 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
 
-import playground.anhorni.surprice.preprocess.miniscenario.Zone;
+import playground.anhorni.surprice.preprocess.Zone;
 
 public class AgentMemory {
 	

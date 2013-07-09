@@ -46,6 +46,7 @@ import playground.anhorni.surprice.AgentMemory;
 import playground.anhorni.surprice.DecisionModel;
 import playground.anhorni.surprice.DecisionModels;
 import playground.anhorni.surprice.Surprice;
+import playground.anhorni.surprice.preprocess.Zone;
 
 public class CreatePopulation {
 	private ScenarioImpl scenario = null;	
