@@ -95,9 +95,12 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 	
 //	@Override
 //	void modifyNetwork( Network net ) {
+//	
+//	
+//		generated network may be found in the relevant folder in shared-svn (opus_home\data\brussels_zone\base_year_data\2001\matsim\network) \DR
 //
 //		if ( BRUSSELS_SCENARIO_MODIFY_NETWORK ) {
-//
+//			
 //			log.error("cutting the Brussels network.  It is really really dangerous to leave this in the code as such.  kai, apr'13") ;
 //			Coord min = new CoordImpl(94902.,112575.) ;
 //			Coord max = new CoordImpl(220907.,220000.) ;
