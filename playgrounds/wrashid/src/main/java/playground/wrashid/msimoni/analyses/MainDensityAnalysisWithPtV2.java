@@ -41,6 +41,9 @@ public class MainDensityAnalysisWithPtV2 {
 	public static void main(String[] args) {
 		String networkFile = "H:/thesis/output_no_pricing_v3_subtours_bugfix/output_network.xml.gz";
 		String eventsFile =  "H:/thesis/output_no_pricing_v3_subtours_bugfix/ITERS/it.50/50.events.xml.gz";
+//		String networkFile = "D:/Users/Christoph/workspace/matsim/mysimulations/FundamentalDiagram/output_network.xml.gz";
+//		String eventsFile =  "D:/Users/Christoph/workspace/matsim/mysimulations/FundamentalDiagram/it.50/50.events.xml.gz";
+		
 		Coord center = null; // center=null means use all links
 		int binSizeInSeconds = 300;	// 5 minute bins
 
@@ -68,14 +71,21 @@ public class MainDensityAnalysisWithPtV2 {
 		InFlowInfoAcuumulatorWithPt inflowHandler = new InFlowInfoAcuumulatorWithPt(links, binSizeInSeconds);
 		OutFlowInfoAccumulatorWithPt outflowHandler = new OutFlowInfoAccumulatorWithPt(links, binSizeInSeconds);
 
+		InFlowInfoAcuumulatorWithPt avgInflowHandler = new InFlowInfoAcuumulatorWithPt(links, 1);
+		OutFlowInfoAccumulatorWithPt avgOutflowHandler = new OutFlowInfoAccumulatorWithPt(links, 1);
+				
 		inflowHandler.reset(0);
 		outflowHandler.reset(0);
+		avgInflowHandler.reset(0);
+		avgOutflowHandler.reset(0);
 
 		EventsManager events = EventsUtils.createEventsManager();
 
 		events.addHandler(inflowHandler); // add handler
 		events.addHandler(outflowHandler);
-
+		events.addHandler(avgInflowHandler); // add handler
+		events.addHandler(avgOutflowHandler);
+		
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
 		reader.parse(eventsFile);
 
@@ -88,8 +98,24 @@ public class MainDensityAnalysisWithPtV2 {
 		HashMap<Id, int[]> deltaFlow = deltaFlow(linkInFlow, linkOutFlow);
 		HashMap<Id, double[]> density = calculateDensity(deltaFlow, links);
 
-		printDensity(density, links);
+		System.out.println("inflows-----------------------------------------------");
+		printFlow(linkInFlow, links);
 
+		System.out.println("outflows-----------------------------------------------");
+		printFlow(linkOutFlow, links);
+
+		
+		System.out.println("density-----------------------------------------------");
+		printDensity(density, links);
+		
+		HashMap<Id, int[]> avgLinkInFlow = avgInflowHandler.getLinkInFlow();
+		HashMap<Id, int[]> avgLinkOutFlow = avgOutflowHandler.getLinkOutFlow();
+
+		HashMap<Id, int[]> avgDeltaFlow = deltaFlow(avgLinkInFlow, avgLinkOutFlow);
+		HashMap<Id, double[]> avgDensity = calculateAverageDensity(calculateDensity(avgDeltaFlow, links), binSizeInSeconds);
+		
+		System.out.println("avg density-----------------------------------------------");
+		printDensity(avgDensity, links);
 	}
 
 	public static HashMap<Id, int[]> deltaFlow(HashMap<Id, int[]> linkInFlow, HashMap<Id, int[]> linkOutFlow) {
@@ -153,10 +179,69 @@ public class MainDensityAnalysisWithPtV2 {
 		return density;
 	}
 
+	public static HashMap<Id, double[]> calculateAverageDensity(HashMap<Id, double[]> density, int timeBinSize) {
+
+		HashMap<Id, double[]> avgDensity = new HashMap<Id, double[]>();
+		
+		for (Id linkId : density.keySet()) {
+
+			double[] linkDensity = density.get(linkId);
+			
+			double[] avgLinkDensity = new double[(int) Math.ceil(linkDensity.length / timeBinSize)];
+			avgDensity.put(linkId, avgLinkDensity);
+			
+			int index = 0;
+			double sumDensity = 0.0;
+			for (int i = 0; i < linkDensity.length; i++) {
+
+				sumDensity += linkDensity[i];
+				
+				// if all entries of the time bin have been processed
+				if ((i+1) % timeBinSize == 0) {
+					avgLinkDensity[index] = sumDensity / timeBinSize;
+					sumDensity = 0.0;
+					index++;
+				}
+			}
+		}
+
+		return avgDensity;
+	}
+	
 	public static void printDensity(HashMap<Id, double[]> density,
 			Map<Id, ? extends Link> links) { // print
 		for (Id linkId : density.keySet()) {
 			double[] bins = density.get(linkId);
+
+			Link link = links.get(linkId);
+
+			boolean hasTraffic = false;
+			for (int i = 0; i < bins.length; i++) {
+				if (bins[i] != 0.0) {
+					hasTraffic = true;
+					break;
+				}
+			}
+
+			if (hasTraffic) {
+				Coord coord = link.getCoord();
+				System.out.print(linkId.toString() + " : \t");
+				System.out.print(coord.getX() + "\t");
+				System.out.print(coord.getY() + "\t");
+				
+				for (int i = 0; i < bins.length; i++) {
+					System.out.print(bins[i] + "\t");
+				}
+
+				System.out.println();
+			}
+		}
+	}
+	
+	public static void printFlow(HashMap<Id, int[]> flow,
+			Map<Id, ? extends Link> links) { // print
+		for (Id linkId : flow.keySet()) {
+			int[] bins = flow.get(linkId);
 
 			Link link = links.get(linkId);
 
