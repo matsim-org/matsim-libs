@@ -126,7 +126,7 @@ public class MainDensityAnalysisWithPt {
 			}
 			
 			for (int i=1;i<deltaflowBins.length;i++){
-				densityBins[i]=densityBins[i]/link.getLength()*1000;
+				densityBins[i]=densityBins[i]/(link.getLength()*link.getNumberOfLanes())*1000;
 			}
 			
 			density.put(linkId,densityBins);
