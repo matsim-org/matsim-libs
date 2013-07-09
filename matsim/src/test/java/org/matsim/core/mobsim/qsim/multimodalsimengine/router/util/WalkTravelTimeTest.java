@@ -20,6 +20,7 @@
 
 package org.matsim.core.mobsim.qsim.multimodalsimengine.router.util;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -37,7 +38,6 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.objectattributes.ObjectAttributes;
 
 public class WalkTravelTimeTest extends MatsimTestCase {
 
@@ -54,11 +54,11 @@ public class WalkTravelTimeTest extends MatsimTestCase {
 		scenario.getNetwork().addNode(node2);
 		scenario.getNetwork().addLink(link);
 
-		ObjectAttributes heightInformation = new ObjectAttributes();		
-		heightInformation.putAttribute(node1.getId().toString(), CalcLinkSlopes.ATTRIBUTE_NAME, "0.0");
-		heightInformation.putAttribute(node2.getId().toString(), CalcLinkSlopes.ATTRIBUTE_NAME, "0.0");
-		Map<Id, Double> linkSlopes;
-		linkSlopes = new CalcLinkSlopes().calcLinkSlopes(scenario.getNetwork(), heightInformation);
+		double h1 = 0.0;
+		double h2 = 0.0;
+		Map<Id, Double> linkSlopes = new HashMap<Id, Double>();
+		double slope = 100 * (h2 - h1) / link.getLength();
+		linkSlopes.put(link.getId(), slope);
 		
 		PersonImpl person = (PersonImpl) scenario.getPopulation().getFactory().createPerson(scenario.createId("p1"));
 		person.setAge(20);
@@ -80,7 +80,7 @@ public class WalkTravelTimeTest extends MatsimTestCase {
 		speed = defaultWalkSpeed * walkTravelTime.personFactors.get(person.getId()) * 1.0;
 		expectedTravelTime = link.getLength() / speed;
 
-		printInfo(person, link, expectedTravelTime, calculatedTravelTime, heightInformation);
+		printInfo(person, expectedTravelTime, calculatedTravelTime, slope);
 		assertTrue(Math.abs(expectedTravelTime - calculatedTravelTime) < EPSILON);
 		assertEquals(calculatedTravelTime - 0.42018055124753945, 0.0);
 
@@ -90,7 +90,7 @@ public class WalkTravelTimeTest extends MatsimTestCase {
 		calculatedTravelTime = walkTravelTime.getLinkTravelTime(link, 0.0, person, null);
 		speed = defaultWalkSpeed * walkTravelTime.personFactors.get(person.getId()) * 1.0;
 		expectedTravelTime = link.getLength() / speed;
-		printInfo(person, link, expectedTravelTime, calculatedTravelTime, heightInformation);
+		printInfo(person, expectedTravelTime, calculatedTravelTime, slope);
 		assertTrue(Math.abs(expectedTravelTime - calculatedTravelTime) < EPSILON);
 		assertEquals(calculatedTravelTime - 0.9896153709417187, 0.0);
 				
@@ -100,38 +100,40 @@ public class WalkTravelTimeTest extends MatsimTestCase {
 		calculatedTravelTime = walkTravelTime.getLinkTravelTime(link, 0.0, person, null);
 		speed = defaultWalkSpeed * walkTravelTime.personFactors.get(person.getId()) * 1.0;
 		expectedTravelTime = link.getLength() / speed;
-		printInfo(person, link, expectedTravelTime, calculatedTravelTime, heightInformation);
+		printInfo(person, expectedTravelTime, calculatedTravelTime, slope);
 		assertTrue(Math.abs(expectedTravelTime - calculatedTravelTime) < EPSILON);
 		assertEquals(calculatedTravelTime - 1.0987068291557665, 0.0);
 
 		// change slope from 0% to -10%
-		heightInformation.putAttribute(node2.getId().toString(), CalcLinkSlopes.ATTRIBUTE_NAME, "-0.1");
-		linkSlopes = new CalcLinkSlopes().calcLinkSlopes(scenario.getNetwork(), heightInformation);
+		h2 = -0.1;
+		slope = 100 * (h2 - h1) / link.getLength();
+		linkSlopes.put(link.getId(), slope);
 		walkTravelTime = new WalkTravelTime(scenario.getConfig().plansCalcRoute(), linkSlopes);
-		double slope = walkTravelTime.getSlope(link);
-		double slopeFactor = walkTravelTime.getSlopeFactor(slope);
+		double slope2 = walkTravelTime.getSlope(link);
+		double slopeFactor = walkTravelTime.getSlopeFactor(slope2);
 		calculatedTravelTime = walkTravelTime.getLinkTravelTime(link, 0.0, person, null);
 		speed = defaultWalkSpeed * walkTravelTime.personFactors.get(person.getId()) * slopeFactor;
 		expectedTravelTime = link.getLength() / speed;
-		printInfo(person, link, expectedTravelTime, calculatedTravelTime, heightInformation);				
+		printInfo(person, expectedTravelTime, calculatedTravelTime, slope);				
 		assertTrue(Math.abs(expectedTravelTime - calculatedTravelTime) < EPSILON);
 		assertEquals(calculatedTravelTime - 1.0489849428640121, 0.0);
 		
 		// change slope from -10% to 10%
-		heightInformation.putAttribute(node2.getId().toString(), CalcLinkSlopes.ATTRIBUTE_NAME, "0.1");
-		linkSlopes = new CalcLinkSlopes().calcLinkSlopes(scenario.getNetwork(), heightInformation);
+		h2 = 0.1;
+		slope = 100 * (h2 - h1) / link.getLength();
+		linkSlopes.put(link.getId(), slope);
 		walkTravelTime = new WalkTravelTime(scenario.getConfig().plansCalcRoute(), linkSlopes);
-		slope = walkTravelTime.getSlope(link);
+		slope2 = walkTravelTime.getSlope(link);
 		slopeFactor = walkTravelTime.getSlopeFactor(slope);
 		calculatedTravelTime = walkTravelTime.getLinkTravelTime(link, 0.0, person, null);
 		speed = defaultWalkSpeed * walkTravelTime.personFactors.get(person.getId()) * slopeFactor;
 		expectedTravelTime = link.getLength() / speed;
-		printInfo(person, link, expectedTravelTime, calculatedTravelTime, heightInformation);				
+		printInfo(person, expectedTravelTime, calculatedTravelTime, slope);				
 		assertTrue(Math.abs(expectedTravelTime - calculatedTravelTime) < EPSILON);
 		assertEquals(calculatedTravelTime - 1.2397955643824945, 0.0);
 	}
 	
-	private void printInfo(PersonImpl p, Link l, double expected, double calculated, ObjectAttributes heightInformation) {
+	private void printInfo(PersonImpl p, double expected, double calculated, double slope) {
 		StringBuffer sb = new StringBuffer();
 		sb.append("Age: ");
 		sb.append(p.getAge());
@@ -142,9 +144,7 @@ public class WalkTravelTimeTest extends MatsimTestCase {
 		sb.append("; ");
 		
 		sb.append("Link Steepness: ");
-		String fromHeight = (String) heightInformation.getAttribute(l.getFromNode().getId().toString(), CalcLinkSlopes.ATTRIBUTE_NAME);
-		String toHeight = (String) heightInformation.getAttribute(l.getToNode().getId().toString(), CalcLinkSlopes.ATTRIBUTE_NAME);
-		sb.append(100.0 * (Double.valueOf(toHeight) - Double.valueOf(fromHeight)) / l.getLength());
+		sb.append(slope);
 		sb.append("%; ");
 		
 		sb.append("Expected Travel Time: ");
@@ -178,11 +178,12 @@ public class WalkTravelTimeTest extends MatsimTestCase {
 		scenario.getNetwork().addNode(node2);
 		scenario.getNetwork().addLink(link);
 		
-		ObjectAttributes heightInformation = new ObjectAttributes();		
-		heightInformation.putAttribute(node1.getId().toString(), CalcLinkSlopes.ATTRIBUTE_NAME, "0.0");
-		heightInformation.putAttribute(node2.getId().toString(), CalcLinkSlopes.ATTRIBUTE_NAME, "0.0");
-		Map<Id, Double> linkSlopes = new CalcLinkSlopes().calcLinkSlopes(scenario.getNetwork(), heightInformation);
-
+		double h1 = 0.0;
+		double h2 = 0.0;
+		Map<Id, Double> linkSlopes = new HashMap<Id, Double>();
+		double slope = 100 * (h2 - h1) / link.getLength();
+		linkSlopes.put(link.getId(), slope);
+		
 		WalkTravelTime walkTravelTime = new WalkTravelTime(config.plansCalcRoute(), linkSlopes);
 		
 		double tt1 = walkTravelTime.getLinkTravelTime(link, 0.0, p1, null);

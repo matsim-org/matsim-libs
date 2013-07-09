@@ -20,6 +20,7 @@
 
 package org.matsim.core.mobsim.qsim.multimodalsimengine.router.util;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -37,7 +38,6 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
-import org.matsim.utils.objectattributes.ObjectAttributes;
 
 public class BikeTravelTimeTest extends MatsimTestCase {
 
@@ -54,11 +54,11 @@ public class BikeTravelTimeTest extends MatsimTestCase {
 		scenario.getNetwork().addNode(node2);
 		scenario.getNetwork().addLink(link);
 		
-		ObjectAttributes heightInformation = new ObjectAttributes();		
-		heightInformation.putAttribute(node1.getId().toString(), CalcLinkSlopes.ATTRIBUTE_NAME, "0.0");
-		heightInformation.putAttribute(node2.getId().toString(), CalcLinkSlopes.ATTRIBUTE_NAME, "0.0");
-		Map<Id, Double> linkSlopes;
-		linkSlopes = new CalcLinkSlopes().calcLinkSlopes(scenario.getNetwork(), heightInformation);
+		double h1 = 0.0;
+		double h2 = 0.0;
+		Map<Id, Double> linkSlopes = new HashMap<Id, Double>();
+		double slope = 100 * (h2 - h1) / link.getLength();
+		linkSlopes.put(link.getId(), slope);
 
 		PersonImpl person = (PersonImpl) scenario.getPopulation().getFactory().createPerson(scenario.createId("p1"));
 		person.setAge(20);
@@ -83,7 +83,7 @@ public class BikeTravelTimeTest extends MatsimTestCase {
 		calculatedTravelTime = bikeTravelTime.getLinkTravelTime(link, 0.0, person, null);
 		speed = defaultBikeSpeed * bikeTravelTime.personFactorCache.get() * 1.0;
 		expectedTravelTime = link.getLength() / speed;
-		printInfo(person, link, expectedTravelTime, calculatedTravelTime, heightInformation);
+		printInfo(person, expectedTravelTime, calculatedTravelTime, slope);
 		assertTrue(Math.abs(expectedTravelTime - calculatedTravelTime) < EPSILON);
 		assertEquals(calculatedTravelTime - 0.09368418280727171, 0.0);
 		
@@ -93,7 +93,7 @@ public class BikeTravelTimeTest extends MatsimTestCase {
 		calculatedTravelTime = bikeTravelTime.getLinkTravelTime(link, 0.0, person, null);
 		speed = defaultBikeSpeed * bikeTravelTime.personFactorCache.get() * 1.0;
 		expectedTravelTime = link.getLength() / speed;
-		printInfo(person, link, expectedTravelTime, calculatedTravelTime, heightInformation);
+		printInfo(person, expectedTravelTime, calculatedTravelTime, slope);
 		assertTrue(Math.abs(expectedTravelTime - calculatedTravelTime) < EPSILON);
 		assertEquals(calculatedTravelTime - 0.2206463555843433, 0.0);
 
@@ -103,52 +103,55 @@ public class BikeTravelTimeTest extends MatsimTestCase {
 		calculatedTravelTime = bikeTravelTime.getLinkTravelTime(link, 0.0, person, null);
 		speed = defaultBikeSpeed * bikeTravelTime.personFactorCache.get() * 1.0;
 		expectedTravelTime = link.getLength() / speed;
-		printInfo(person, link, expectedTravelTime, calculatedTravelTime, heightInformation);
+		printInfo(person, expectedTravelTime, calculatedTravelTime, slope);
 		assertTrue(Math.abs(expectedTravelTime - calculatedTravelTime) < EPSILON);
 		assertEquals(calculatedTravelTime - 0.24496957588497956, 0.0);
 		
 		// change slope from 0% to 10%
-		heightInformation.putAttribute(node2.getId().toString(), CalcLinkSlopes.ATTRIBUTE_NAME, "0.1");
-		linkSlopes = new CalcLinkSlopes().calcLinkSlopes(scenario.getNetwork(), heightInformation);
+		h2 = 0.1;
+		slope = 100 * (h2 - h1) / link.getLength();
+		linkSlopes.put(link.getId(), slope);
 		bikeTravelTime = new BikeTravelTime(scenario.getConfig().plansCalcRoute(), linkSlopes);
 
 		calculatedTravelTime = bikeTravelTime.getLinkTravelTime(link, 0.0, person, null);
-		double slope = bikeTravelTime.getSlope(link);
-		double slopeShift = bikeTravelTime.getSlopeShift(slope);
+		double slope2 = bikeTravelTime.getSlope(link);
+		double slopeShift = bikeTravelTime.getSlopeShift(slope2);
 		speed = defaultBikeSpeed * bikeTravelTime.personFactorCache.get() + slopeShift;
 		expectedTravelTime = link.getLength() / speed;
-		printInfo(person, link, expectedTravelTime, calculatedTravelTime, heightInformation);				
+		printInfo(person, expectedTravelTime, calculatedTravelTime, slope);				
 		assertTrue(Math.abs(expectedTravelTime - calculatedTravelTime) < EPSILON);
 		assertEquals(calculatedTravelTime - 0.7332007724445855, 0.0);
 		
 		// change slope from 10% to -10%
-		heightInformation.putAttribute(node2.getId().toString(), CalcLinkSlopes.ATTRIBUTE_NAME, "-0.1");
-		linkSlopes = new CalcLinkSlopes().calcLinkSlopes(scenario.getNetwork(), heightInformation);
+		h2 = -0.1;
+		slope = 100 * (h2 - h1) / link.getLength();
+		linkSlopes.put(link.getId(), slope);
 		bikeTravelTime = new BikeTravelTime(scenario.getConfig().plansCalcRoute(), linkSlopes);
 
 		calculatedTravelTime = bikeTravelTime.getLinkTravelTime(link, 0.0, person, null);
-		slope = bikeTravelTime.getSlope(link);
-		slopeShift = bikeTravelTime.getSlopeShift(slope);
+		slope2 = bikeTravelTime.getSlope(link);
+		slopeShift = bikeTravelTime.getSlopeShift(slope2);
 		speed = defaultBikeSpeed * bikeTravelTime.personFactorCache.get() + slopeShift;
 		expectedTravelTime = link.getLength() / speed;
-		printInfo(person, link, expectedTravelTime, calculatedTravelTime, heightInformation);				
+		printInfo(person, expectedTravelTime, calculatedTravelTime, slope);				
 		assertTrue(Math.abs(expectedTravelTime - calculatedTravelTime) < EPSILON);
 		assertEquals(calculatedTravelTime - 0.40547153706106515, 0.0);
 		
 		// on very steep links bike speed should equals walk speed - set slope to 25%
-		heightInformation.putAttribute(node2.getId().toString(), CalcLinkSlopes.ATTRIBUTE_NAME, "0.25");
-		linkSlopes = new CalcLinkSlopes().calcLinkSlopes(scenario.getNetwork(), heightInformation);
+		h2 = 0.25;
+		slope = 100 * (h2 - h1) / link.getLength();
+		linkSlopes.put(link.getId(), slope);
 		bikeTravelTime = new BikeTravelTime(scenario.getConfig().plansCalcRoute(), linkSlopes);
 
 		WalkTravelTime walkTravelTime = new WalkTravelTime(scenario.getConfig().plansCalcRoute(), linkSlopes);
 		calculatedTravelTime = bikeTravelTime.getLinkTravelTime(link, 0.0, person, null);	
 		expectedTravelTime = walkTravelTime.getLinkTravelTime(link, 0.0, person, null);
-		printInfo(person, link, expectedTravelTime, calculatedTravelTime, heightInformation);
+		printInfo(person, expectedTravelTime, calculatedTravelTime, slope);
 		assertTrue(Math.abs(expectedTravelTime - calculatedTravelTime) < EPSILON);
 		assertEquals(calculatedTravelTime - 1.7305194978040106, 0.0);
 	}
 	
-	private void printInfo(PersonImpl p, Link l, double expected, double calculated, ObjectAttributes heightInformation) {
+	private void printInfo(PersonImpl p, double expected, double calculated, double slope) {
 		StringBuffer sb = new StringBuffer();
 		sb.append("Age: ");
 		sb.append(p.getAge());
@@ -159,9 +162,7 @@ public class BikeTravelTimeTest extends MatsimTestCase {
 		sb.append("; ");
 		
 		sb.append("Link Steepness: ");
-		String fromHeight = (String) heightInformation.getAttribute(l.getFromNode().getId().toString(), CalcLinkSlopes.ATTRIBUTE_NAME);
-		String toHeight = (String) heightInformation.getAttribute(l.getToNode().getId().toString(), CalcLinkSlopes.ATTRIBUTE_NAME);
-		sb.append(100.0 * (Double.valueOf(toHeight) - Double.valueOf(fromHeight)) / l.getLength());
+		sb.append(slope);
 		sb.append("%; ");
 		
 		sb.append("Expected Travel Time: ");
@@ -195,10 +196,11 @@ public class BikeTravelTimeTest extends MatsimTestCase {
 		scenario.getNetwork().addNode(node2);
 		scenario.getNetwork().addLink(link);
 		
-		ObjectAttributes heightInformation = new ObjectAttributes();		
-		heightInformation.putAttribute(node1.getId().toString(), CalcLinkSlopes.ATTRIBUTE_NAME, "0.0");
-		heightInformation.putAttribute(node2.getId().toString(), CalcLinkSlopes.ATTRIBUTE_NAME, "0.0");
-		Map<Id, Double> linkSlopes = new CalcLinkSlopes().calcLinkSlopes(scenario.getNetwork(), heightInformation);
+		double h1 = 0.0;
+		double h2 = 0.0;
+		Map<Id, Double> linkSlopes = new HashMap<Id, Double>();
+		double slope = 100 * (h2 - h1) / link.getLength();
+		linkSlopes.put(link.getId(), slope);
 
 		BikeTravelTime bikeTravelTime = new BikeTravelTime(config.plansCalcRoute(), linkSlopes);
 		
