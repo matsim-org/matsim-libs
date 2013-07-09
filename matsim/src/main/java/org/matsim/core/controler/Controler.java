@@ -22,7 +22,6 @@ package org.matsim.core.controler;
 
 import java.util.ArrayList;
 import java.util.EnumSet;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -35,7 +34,6 @@ import org.matsim.analysis.CalcLinkStats;
 import org.matsim.analysis.ScoreStats;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -47,7 +45,6 @@ import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
@@ -72,12 +69,8 @@ import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.MultiModalDepartureHandler;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.MultiModalSimEngine;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.MultiModalSimEngineFactory;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.BikeTravelTimeOld;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTime;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTime;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.TravelTimeCalculatorWithBuffer;
+import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTimeFactory;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.TravelTimeCalculatorWithBufferFactory;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTimeOld;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.tools.PrepareMultiModalScenario;
 import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -532,17 +525,8 @@ public class Controler extends AbstractController {
 			 * This should also be removed.
 			 * cdobler, jun'13
 			 */	
-			PlansCalcRouteConfigGroup configGroup = this.config.plansCalcRoute();
-			multiModalTravelTimes = new HashMap<String, TravelTime>();
-			multiModalTravelTimes.put(TransportMode.car, this.travelTimeCalculator.getLinkTravelTimes());
-			multiModalTravelTimes.put(TransportMode.walk, new WalkTravelTimeOld(configGroup));
-			multiModalTravelTimes.put(TransportMode.bike, new BikeTravelTimeOld(configGroup,
-					new WalkTravelTimeOld(configGroup)));
-			multiModalTravelTimes.put(TransportMode.ride, new RideTravelTime(((TravelTimeCalculatorWithBuffer) this.travelTimeCalculator).getTravelTimesFromPreviousIteration(), 
-					new WalkTravelTimeOld(configGroup)));
-			multiModalTravelTimes.put(TransportMode.pt, new PTTravelTime(configGroup, 
-					((TravelTimeCalculatorWithBuffer) this.travelTimeCalculator).getTravelTimesFromPreviousIteration(), new WalkTravelTimeOld(configGroup)));
-		}
+			MultiModalTravelTimeFactory multiModalTravelTimeFactory = new MultiModalTravelTimeFactory(this.config);
+			this.multiModalTravelTimes = multiModalTravelTimeFactory.createTravelTimes();		}
 	
 		this.events.addHandler(this.travelTimeCalculator);
 	
