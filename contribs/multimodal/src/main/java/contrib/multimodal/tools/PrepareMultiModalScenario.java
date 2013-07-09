@@ -23,14 +23,24 @@ package contrib.multimodal.tools;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
+import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteFactory;
+import org.matsim.core.utils.collections.CollectionUtils;
 
 public class PrepareMultiModalScenario {
 
 	private static final Logger log = Logger.getLogger(PrepareMultiModalScenario.class);
 	
 	public static void run(Scenario scenario) {
-		
 		Config config = scenario.getConfig();
+		log.info("setting up multi modal simulation");
+		
+		// set Route Factories
+		LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
+		for (String mode : CollectionUtils.stringToArray(config.multiModal().getSimulatedModes())) {
+			((PopulationFactoryImpl) scenario.getPopulation().getFactory()).setRouteFactory(mode, factory);
+		}
+		
 		if (config.multiModal().isCreateMultiModalNetwork()) {
 			log.info("Creating multi modal network.");
 			new MultiModalNetworkCreator(config.multiModal()).run(scenario.getNetwork());

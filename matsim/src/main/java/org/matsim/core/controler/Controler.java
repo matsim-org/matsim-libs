@@ -283,9 +283,6 @@ public class Controler extends AbstractController {
 	 */
 	public final void run() {
 		setupOutputDirectory(this.config.controler().getOutputDirectory(), this.config.controler().getRunId(), this.overwriteFiles);
-		if (this.config.multiModal().isMultiModalSimulationEnabled()) {
-			setupMultiModalSimulation();
-		}
 		if (this.config.scenario().isUseTransit()) {
 			setupTransitSimulation();
 		}
@@ -300,16 +297,6 @@ public class Controler extends AbstractController {
 //		doIterations(config.controler().getFirstIteration(), config.global().getRandomSeed());
 //		shutdown(false);
 
-	}
-
-	private final void setupMultiModalSimulation() {
-		log.info("setting up multi modal simulation");
-	
-		// set Route Factories
-		LinkNetworkRouteFactory factory = new LinkNetworkRouteFactory();
-		for (String mode : CollectionUtils.stringToArray(this.config.multiModal().getSimulatedModes())) {
-			((PopulationFactoryImpl) this.getPopulation().getFactory()).setRouteFactory(mode, factory);
-		}
 	}
 
 	private final void setupTransitSimulation() {
