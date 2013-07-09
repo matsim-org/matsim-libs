@@ -20,6 +20,8 @@
 
 package org.matsim.core.mobsim.qsim.multimodalsimengine;
 
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -39,7 +41,7 @@ public class MultiModalQNodeExtension {
 	/*
 	 * Is set to "true" if the MultiModalNodeExtension has active inLinks.
 	 */
-	protected boolean isActive = false;
+	protected AtomicBoolean isActive = new AtomicBoolean(false);
 	
 	public MultiModalQNodeExtension(Node node, MultiModalSimEngine simEngine) {	
 		this.node = node;
@@ -92,13 +94,15 @@ public class MultiModalQNodeExtension {
 		return true;
 	}
 	
-	/*
-	 * activateNode is protected in QNode.
-	 * We add this method because we have to reactivate the Node from MultiModalQLinkImpl
-	 */
 	/*package*/ void activateNode() {
-		this.isActive = true;
-		simEngine.activateNode(this);
+		/*
+		 * If isActive is false, then it is set to true ant the
+		 * node is activated. Using an AtomicBoolean is thread-safe.
+		 * Otherwise, it could be activated multiple times concurrently.
+		 */
+		if (this.isActive.compareAndSet(false, true)) {
+			simEngine.activateNode(this);			
+		}
 	}
 	
 	private void checkNextLinkSemantics(Link currentLink, Link nextLink, MobsimAgent personAgent){

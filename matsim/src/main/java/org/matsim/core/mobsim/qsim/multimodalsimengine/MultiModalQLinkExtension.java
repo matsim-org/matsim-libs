@@ -26,6 +26,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
@@ -48,7 +49,7 @@ public class MultiModalQLinkExtension {
 	/*
 	 * Is set to "true" if the MultiModalQLinkExtension has active Agents.
 	 */
-	protected boolean isActive = false;
+	protected AtomicBoolean isActive = new AtomicBoolean(false);
 
 	private final Queue<Tuple<Double, MobsimAgent>> agents = new PriorityQueue<Tuple<Double, MobsimAgent>>(30, new TravelTimeComparator());
 	private final Queue<MobsimAgent> waitingAfterActivityAgents = new LinkedList<MobsimAgent>();
@@ -109,21 +110,24 @@ public class MultiModalQLinkExtension {
 	}
 
 	protected boolean moveLink(double now) {
-		isActive = moveAgents(now);
+		
+		boolean keepLinkActive = moveAgents(now);
+		this.isActive.set(keepLinkActive);
 
 		moveWaitingAfterActivityAgents();
 
-		return isActive;
+		return keepLinkActive;
 	}
 
 	private void activateLink() {
 		/*
-		 *  If the QLink and/or the MultiModalQLink is already active
-		 *  we do not do anything.
+		 * If isActive is false, then it is set to true ant the
+		 * link is activated. Using an AtomicBoolean is thread-safe.
+		 * Otherwise, it could be activated multiple times concurrently.
 		 */
-		if (isActive) return;
-
-		else simEngine.activateLink(this);
+		if (this.isActive.compareAndSet(false, true)) {			
+			simEngine.activateLink(this);
+		}
 	}
 
 	/*

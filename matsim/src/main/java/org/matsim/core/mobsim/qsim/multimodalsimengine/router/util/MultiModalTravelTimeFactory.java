@@ -29,13 +29,14 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.TravelTimeFactory;
 import org.matsim.core.utils.collections.CollectionUtils;
 
-public class MultiModalTravelTimeFactory {
+public class MultiModalTravelTimeFactory implements MatsimFactory {
 	
 	protected static final Logger log = Logger.getLogger(MultiModalTravelTimeFactory.class);
 	

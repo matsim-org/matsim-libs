@@ -73,8 +73,7 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 		linksToActivate = new ConcurrentLinkedQueue<MultiModalQLinkExtension>();	// thread-safe Queue!
 		nodesToActivate = new ConcurrentLinkedQueue<MultiModalQNodeExtension>();	// thread-safe Queue!
 
-		this.multiModalTravelTimes = map; 
-
+		this.multiModalTravelTimes = map;
 	}
 
 	Netsim getMobsim() {
