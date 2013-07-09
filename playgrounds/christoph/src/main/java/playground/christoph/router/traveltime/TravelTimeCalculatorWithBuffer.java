@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.qsim.multimodalsimengine.router.util;
+package playground.christoph.router.traveltime;
 
 import java.io.File;
 import java.util.HashSet;

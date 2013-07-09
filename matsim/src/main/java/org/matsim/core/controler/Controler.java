@@ -70,7 +70,6 @@ import org.matsim.core.mobsim.qsim.multimodalsimengine.MultiModalDepartureHandle
 import org.matsim.core.mobsim.qsim.multimodalsimengine.MultiModalSimEngine;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.MultiModalSimEngineFactory;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTimeFactory;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.TravelTimeCalculatorWithBufferFactory;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.tools.PrepareMultiModalScenario;
 import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -281,15 +280,8 @@ public class Controler extends AbstractController {
 		this.planStrategyFactoryRegister = planStrategyFactoryRegistrar.getFactoryRegister();
 		this.events = EventsUtils.createEventsManager(this.config);
 		
-		if (this.config.multiModal().isMultiModalSimulationEnabled()) {
-			// Actually, this is not so much about multi-modal but about within-day replanning.
-			// It provides last iteration's travel times to be used during the current interation.
-			// It just happens to be used only for the "multi-modal" routers. michaz '13
-			this.travelTimeCalculatorFactory = new TravelTimeCalculatorWithBufferFactory();
-		} else {
-			this.travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
-		}
 		// yy is it really so practical to do this in this way?  People might (re)set this factory between constructor and run()--???  kai, may'13
+		this.travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
 		
 		this.config.parallelEventHandling().makeLocked();
 	}
