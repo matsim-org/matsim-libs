@@ -41,7 +41,7 @@ import org.matsim.vis.otfvis.OnTheFlyServer;
 
 public class FourWaysVis {
 
-	public static final String TESTINPUTDIR = "../../matsim/test/input/org/matsim/signalsystems/TravelTimeFourWaysTest/";
+	public static final String TESTINPUTDIR = "../../matsim/src/test/resources/test/input/org/matsim/signalsystems/TravelTimeFourWaysTest/";
 	
 	/**
 	 * @param args

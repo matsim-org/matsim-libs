@@ -29,8 +29,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
@@ -46,8 +44,6 @@ import playground.dgrether.koehlerstrehlersignal.ids.DgIdConverter;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdPool;
 import playground.dgrether.signalsystems.utils.DgSignalsUtils;
 import playground.dgrether.utils.zones.DgZone;
-import playground.dgrether.utils.zones.DgZoneUtils;
-import playground.dgrether.utils.zones.DgZones;
 
 /**
  * Converts a MATSim Scenario to the traffic signal optimization model published in 
@@ -92,11 +88,7 @@ public class Scenario2KoehlerStrehler2010 {
 	}
 
 
-	public void convert(String outputDirectory, String name, DgZones zones, double boundingBoxOffset, int cellsX, int cellsY, double startTimeSec, double endTimeSec) throws IOException{
-
-		Map<DgZone, Link> zones2LinkMap = DgZoneUtils.createZoneCenter2LinkMapping(zones, (NetworkImpl) network);
-		DgZoneUtils.writeLinksOfZones2Shapefile(zones, zones2LinkMap, crs, shapeFileDirectory + "links_for_zones.shp");
-
+	public void convert(String outputDirectory, String name, String description, Map<DgZone, Link> zones2LinkMap, double startTimeSec, double endTimeSec) throws IOException{
 		//create koehler strehler network
 		DgIdPool idPool = new DgIdPool();
 		DgIdConverter idConverter = new DgIdConverter(idPool);
@@ -118,9 +110,6 @@ public class Scenario2KoehlerStrehler2010 {
 			}
 		}
 		
-		String description = "offset: " + boundingBoxOffset + "cellsX: " + cellsX + " cellsY: " + cellsY + " startTimeSec: " + startTimeSec + " endTimeSec: " + endTimeSec;
-		description += "matsimPopsampleSize: " + this.matsimPopSampleSize + " ksModelCommoditySampleSize: " + this.ksModelCommoditySampleSize;
-
 		Network newMatsimNetwork = new DgKSNet2MatsimNet().convertNetwork(ksNet);
 		DgKoehlerStrehler2010Router router = new DgKoehlerStrehler2010Router();
 		List<Id> invalidCommodities = router.routeCommodities(newMatsimNetwork, commodities);
@@ -134,10 +123,9 @@ public class Scenario2KoehlerStrehler2010 {
 		DgNetworkUtils.writeNetwork2Shape(newMatsimNetwork, shapeFileDirectory + "matsimNetworkKsModel.shp");
 		
 		new DgKoehlerStrehler2010ModelWriter().write(ksNet, commodities, name, description, outputDirectory + modelOutfile);
-		writeStats(cellsX, cellsY, boundingBoxOffset, startTimeSec, endTimeSec, ksNet, commodities);
+		writeStats(ksNet, commodities);
 		
 		idPool.writeToFile(outputDirectory + "id_conversions.txt");
-		
 	}
 
 	private Set<Id> getSignalizedLinkIds(SignalSystemsData signals){
@@ -149,14 +137,7 @@ public class Scenario2KoehlerStrehler2010 {
 		return signalizedLinks;
 	}
 
-	public void writeStats(int cellsX, int cellsY, double boundingBoxOffset, double startTime, double endTime, DgKSNetwork ksNet, DgCommodities commodities){
-		log.info("Cells:");
-		log.info("  X " + cellsX + " Y " + cellsY);
-		log.info("Bounding Box: ");
-		log.info("  Offset: " + boundingBoxOffset);
-		log.info("Time: " );
-		log.info("  startTime: " + startTime + " " + Time.writeTime(startTime));
-		log.info("  endTime: " + endTime  + " " + Time.writeTime(endTime));
+	private void writeStats( DgKSNetwork ksNet, DgCommodities commodities){
 		log.info("Network: ");
 		log.info("  # Streets: " + ksNet.getStreets().size() );
 		log.info("  # Crossings: " + ksNet.getCrossings().size());
@@ -171,10 +152,7 @@ public class Scenario2KoehlerStrehler2010 {
 		log.info("Commodities: ");
 		log.info("  # Commodities: " + commodities.getCommodities().size());
 	}
-	
 
-	
-	
 	
 	public double getKsModelCommoditySampleSize() {
 		return ksModelCommoditySampleSize;

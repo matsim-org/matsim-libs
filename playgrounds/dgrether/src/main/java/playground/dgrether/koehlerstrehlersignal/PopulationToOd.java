@@ -39,6 +39,8 @@ import com.vividsolutions.jts.geom.Envelope;
 
 
 /**
+ * Matches the population routed on a large scale network to a smaller network. 
+ * Then it converts the population to od pairs
  * @author dgrether
  *
  */
@@ -47,8 +49,6 @@ public class PopulationToOd {
 	private double matsimPopSampleSize = 1.0;
 	private Map<Id, Id> originalToSimplifiedLinkIdMatching;
 	private DgZones zones;
-	
-	
 	
 	public void matchPopulationToGrid(Network fullNetwork, Population population, CoordinateReferenceSystem crs, 
 			Network smallNetwork, DgSignalsBoundingBox signalsBoundingBox, int cellsX, int cellsY,

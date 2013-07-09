@@ -34,8 +34,8 @@ public class CottbusPTLivePlayer {
 
 	
 	public static void main(String[] args) {
-		String CottbusBaseDirectory = "\\\\vsp-nas\\jbischoff\\WinHome\\Docs\\svn-checkouts\\cottbus\\cottbus_feb_fix\\";
-//		String CottbusBaseDirectoy = "/shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/";
+//		String CottbusBaseDirectory = "\\\\vsp-nas\\jbischoff\\WinHome\\Docs\\svn-checkouts\\cottbus\\cottbus_feb_fix\\";
+		String CottbusBaseDirectory = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/";
 		
 		String configfile = CottbusBaseDirectory + "Cottbus-pt/config.xml";
 		String network = CottbusBaseDirectory + "Cottbus-pt/network_pt.xml";

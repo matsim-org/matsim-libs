@@ -20,14 +20,20 @@
 package playground.dgrether.signalsystems.cottbus.scripts;
 
 import java.io.File;
+import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryLogging;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.core.utils.misc.Time;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.dgrether.DgPaths;
@@ -35,6 +41,8 @@ import playground.dgrether.koehlerstrehlersignal.PopulationToOd;
 import playground.dgrether.koehlerstrehlersignal.Scenario2KoehlerStrehler2010;
 import playground.dgrether.koehlerstrehlersignal.ScenarioShrinker;
 import playground.dgrether.signalsystems.cottbus.DgCottbusScenarioPaths;
+import playground.dgrether.utils.zones.DgZone;
+import playground.dgrether.utils.zones.DgZoneUtils;
 import playground.dgrether.utils.zones.DgZones;
 
 
@@ -44,6 +52,8 @@ import playground.dgrether.utils.zones.DgZones;
  */
 public class DgCb2Ks2010 {
 
+	private static final Logger log = Logger.getLogger(DgCb2Ks2010.class);
+	
 	private static String shapeFileDirectory = "shapes/";
 
 	
@@ -73,11 +83,11 @@ public class DgCb2Ks2010 {
 		String name = "run 1292 output plans between 05:30 and 09:30";
 		CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84_UTM33N);
 		
-		
+		// reduce the size of the scenario
 		ScenarioShrinker scenarioShrinker = new ScenarioShrinker(fullScenario,  crs);
 		scenarioShrinker.shrinkScenario(outputDirectory, shapeFileDirectory, boundingBoxOffset);
 		
-	
+		// match population to the small network and convert to od 
 		PopulationToOd pop2od = new PopulationToOd();
 		pop2od.setMatsimPopSampleSize(matsimPopSampleSize);
 		pop2od.setOriginalToSimplifiedLinkMapping(scenarioShrinker.getOriginalToSimplifiedLinkIdMatching());
@@ -85,15 +95,45 @@ public class DgCb2Ks2010 {
 				cellsX, cellsY, startTime, endTime, shapeFileDirectory);
 		DgZones zones = pop2od.getZones();
 		
+		//zones to links matching
+		Map<DgZone, Link> zones2LinkMap = DgZoneUtils.createZoneCenter2LinkMapping(zones, (NetworkImpl) scenarioShrinker.getShrinkedNetwork());
+		writeZones2Shape(zones, zones2LinkMap, scenarioShrinker.getShrinkedNetwork(), crs);
+		
+		//convert to KoehlerStrehler2010 file format
 		Scenario2KoehlerStrehler2010 converter = new Scenario2KoehlerStrehler2010(scenarioShrinker.getShrinkedNetwork(), 
 				scenarioShrinker.getShrinkedLanes(), scenarioShrinker.getShrinkedSignals(), crs);
+		String description = createDescription(cellsX, cellsY, startTime, endTime, boundingBoxOffset, matsimPopSampleSize, ksModelCommoditySampleSize);
 		converter.setKsModelCommoditySampleSize(ksModelCommoditySampleSize);
-		converter.convert(outputDirectory, name, zones, boundingBoxOffset, cellsX, cellsY, startTime, endTime);
+		converter.convert(outputDirectory, name, description, zones2LinkMap, startTime, endTime);
 		
+		
+		
+		printStatistics(cellsX, cellsY, boundingBoxOffset, startTime, endTime);
 		OutputDirectoryLogging.closeOutputDirLogging();		
 		System.exit(0);
 	}
+	
+	private static String createDescription(int cellsX, int cellsY, double startTime, double endTime, double boundingBoxOffset, double matsimPopSampleSize, double ksModelCommoditySampleSize){
+		String description = "offset: " + boundingBoxOffset + "cellsX: " + cellsX + " cellsY: " + cellsY + " startTimeSec: " + startTime + " endTimeSec: " + endTime;
+		description += "matsimPopsampleSize: " + matsimPopSampleSize + " ksModelCommoditySampleSize: " + ksModelCommoditySampleSize;
+		return description;
+	}
 
+	private static void writeZones2Shape(DgZones zones, Map<DgZone, Link>  zones2LinkMap, Network network, CoordinateReferenceSystem crs){
+		DgZoneUtils.writeLinksOfZones2Shapefile(zones, zones2LinkMap, crs, shapeFileDirectory + "links_for_zones.shp");
+	}
+	
+	
+	private static void printStatistics(int cellsX, int cellsY,double boundingBoxOffset, double startTime, double endTime){
+		log.info("Number of Cells:");
+		log.info("  X " + cellsX + " Y " + cellsY);
+		log.info("Bounding Box: ");
+		log.info("  Offset: " + boundingBoxOffset);
+		log.info("Time: " );
+		log.info("  startTime: " + startTime + " " + Time.writeTime(startTime));
+		log.info("  endTime: " + endTime  + " " + Time.writeTime(endTime));
+	}
+	
 	private static String createShapeFileDirectory(String outputDirectory) {
 		String shapeDir = outputDirectory + shapeFileDirectory;
 		File outdir = new File(shapeDir);
