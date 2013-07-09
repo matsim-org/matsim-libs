@@ -107,9 +107,7 @@ public class CapacityDelayHandler implements BoardingDeniedEventHandler, PersonE
 				
 		if (!ptDriverIDs.contains(event.getPersonId()) && ptVehicleIDs.contains(event.getVehicleId())){
 			// a "normal" agent is entering a public vehicle
-			
-			System.out.println(event.toString());
-			
+						
 			if (this.affectedAgent2causingAgents.containsKey(event.getPersonId())){
 				System.out.println("Boarding agent was boarding denied before.");
 				calculateExternalDelay(event.getTime(), event.getPersonId());
@@ -153,7 +151,6 @@ public class CapacityDelayHandler implements BoardingDeniedEventHandler, PersonE
 	
 	@Override
 	public void handleEvent(BoardingDeniedEvent event) {
-		System.out.println(event.toString());
 		
 		if (this.affectedAgent2causingAgents.containsKey(event.getPersonId())){
 			calculateExternalDelay(event.getTime(), event.getPersonId());
@@ -168,8 +165,8 @@ public class CapacityDelayHandler implements BoardingDeniedEventHandler, PersonE
 			throw new RuntimeException("Unknown method for the identfication of the causing agent(s). Aborting...");
 		}
 		
-		System.out.println("Affected agent: " + event.getPersonId());
-		System.out.println("Causing agents: " + causingAgents.toString());
+//		System.out.println("Affected agent: " + event.getPersonId());
+//		System.out.println("Causing agents: " + causingAgents.toString());
 
 		this.affectedAgent2boardingDeniedTime.put(event.getPersonId(), event.getTime());
 		this.affectedAgent2causingAgents.put(event.getPersonId(), causingAgents);

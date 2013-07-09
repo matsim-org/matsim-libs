@@ -39,6 +39,9 @@ public class MarginalCostPricingPtHandler implements TransferDelayInVehicleEvent
 	private final ScenarioImpl scenario;
 	private final double vtts_inVehicle;
 	private final double vtts_waiting;
+	
+	// TODO: make configurable
+	private final double operatorCostPerVehHour = 39.93; // = 33 * 1.21 (overhead)
 
 	public MarginalCostPricingPtHandler(EventsManager eventsManager, ScenarioImpl scenario) {
 		this.events = eventsManager;
@@ -56,21 +59,28 @@ public class MarginalCostPricingPtHandler implements TransferDelayInVehicleEvent
 
 	@Override
 	public void handleEvent(TransferDelayInVehicleEvent event) {
-		double amount = (event.getDelay() * event.getAffectedAgents() / 3600) * this.vtts_inVehicle;
-		AgentMoneyEvent moneyEvent = new AgentMoneyEvent(event.getTime(), event.getCausingAgent(), amount);
+		
+		// external delay effects among users
+		double amount1 = (event.getDelay() * event.getAffectedAgents() / 3600.0) * this.vtts_inVehicle;
+		AgentMoneyEvent moneyEvent = new AgentMoneyEvent(event.getTime(), event.getCausingAgent(), amount1);
 		this.events.processEvent(moneyEvent);
+		
+		// marginal operator cost
+		double amount2 = (event.getDelay() / 3600.0) * this.operatorCostPerVehHour * (-1);
+		AgentMoneyEvent moneyEvent2 = new AgentMoneyEvent(event.getTime(), event.getCausingAgent(), amount2);
+		this.events.processEvent(moneyEvent2);
 	}
 
 	@Override
 	public void handleEvent(TransferDelayWaitingEvent event) {
-		double amount = (event.getDelay() * event.getAffectedAgentUnits() / 3600 ) * this.vtts_waiting;
+		double amount = (event.getDelay() * event.getAffectedAgentUnits() / 3600.0 ) * this.vtts_waiting;
 		AgentMoneyEvent moneyEvent = new AgentMoneyEvent(event.getTime(), event.getCausingAgent(), amount);
 		this.events.processEvent(moneyEvent);		
 	}
 
 	@Override
 	public void handleEvent(CapacityDelayEvent event) {
-		double amount = (event.getDelay() / 3600 ) * this.vtts_waiting;
+		double amount = (event.getDelay() / 3600.0 ) * this.vtts_waiting;
 		AgentMoneyEvent moneyEvent = new AgentMoneyEvent(event.getTime(), event.getCausingAgentId(), amount);
 		this.events.processEvent(moneyEvent);		
 	}
