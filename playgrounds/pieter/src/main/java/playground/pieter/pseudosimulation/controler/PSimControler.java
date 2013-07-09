@@ -58,7 +58,7 @@ public class PSimControler extends Controler{
 		this.addControlerListener(new BeforePSimSelectedPlanScoreRecorder(this));
 		this.addControlerListener(new AfterScoringSelectedPlanScoreRestoreListener(this));
 		this.carTravelTimeCalculator = new PSimTravelTimeCalculator(getNetwork(),
-				getConfig().travelTimeCalculator());
+				getConfig().travelTimeCalculator(),70);
 		this.getEvents().addHandler(carTravelTimeCalculator);
 		if (this.getConfig().scenario().isUseTransit()) {
 			this.waitTimeCalculator = new PSimWaitTimeCalculator(

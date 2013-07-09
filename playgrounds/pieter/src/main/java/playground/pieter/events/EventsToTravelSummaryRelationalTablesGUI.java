@@ -42,7 +42,7 @@ import java.lang.reflect.Field;
 import java.sql.SQLException;
 import java.util.Properties;
 
-public class EventsToJourneyTablesGUI extends JFrame {
+public class EventsToTravelSummaryRelationalTablesGUI extends JFrame {
 
 	private JPanel contentPane;
 	private JTextField schemaNameComponent;
@@ -61,7 +61,7 @@ public class EventsToJourneyTablesGUI extends JFrame {
 	private String tableSuffix = "_ezlinksim";
 	private String schemaName = "u_fouriep";
 	private String postgresProperties = "data/matsim2postgres.properties";
-	private EventsToJourneyTablesGUI self = this;
+	private EventsToTravelSummaryRelationalTablesGUI self = this;
 	private String defaultpath = "";
 
 	/**
@@ -71,7 +71,7 @@ public class EventsToJourneyTablesGUI extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					EventsToJourneyTablesGUI frame = new EventsToJourneyTablesGUI();
+					EventsToTravelSummaryRelationalTablesGUI frame = new EventsToTravelSummaryRelationalTablesGUI();
 					frame.setVisible(true);
 					frame.loadDefaultProperties(new File(
 							"eventsToSQL.properties"));
@@ -85,7 +85,7 @@ public class EventsToJourneyTablesGUI extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public EventsToJourneyTablesGUI() {
+	public EventsToTravelSummaryRelationalTablesGUI() {
 		setTitle("Events to PostgreSQL tables");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 764, 300);

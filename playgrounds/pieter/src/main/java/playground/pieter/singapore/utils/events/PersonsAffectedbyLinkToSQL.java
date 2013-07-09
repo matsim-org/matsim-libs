@@ -50,8 +50,15 @@ public class PersonsAffectedbyLinkToSQL {
 	public static void main(String[] args) throws InstantiationException, IllegalAccessException, ClassNotFoundException, IOException, SQLException {
 		DataBaseAdmin dba = new DataBaseAdmin(new File("f:\\data\\matsim2postgres.properties"));
 		HashSet<String> linkIds = new HashSet<String>();
-		linkIds.add("106026");
-		linkIds.add("106025");
+		linkIds.add("25755");
+		linkIds.add("58340");
+		linkIds.add("61153");
+		linkIds.add("61590");
+		linkIds.add("61153");
+		linkIds.add("61590");
+		linkIds.add("34161");
+		linkIds.add("26443");
+		linkIds.add("73266");
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		// first, read through the events file and get all person ids crossing
@@ -60,10 +67,10 @@ public class PersonsAffectedbyLinkToSQL {
 				linkIds);
 		events.addHandler(idFinder);
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
-		reader.parse("x:\\fourie\\data\\zoutput\\quicktest_toll_hotstart\\ITERS\\it.200\\0.1_0_100Q1P24.200.events.xml.gz");
-		String actTableName = "u_fouriep.affected_after_hotstart";
+		reader.parse("F:\\data\\sing2.2\\40.events.xml.gz");
+		String actTableName = "u_fouriep.idsforlinkanalysis";
 		List<PostgresqlColumnDefinition> columns = new ArrayList<PostgresqlColumnDefinition>();
-		columns.add(new PostgresqlColumnDefinition("personId",
+		columns.add(new PostgresqlColumnDefinition("person_id",
 				PostgresType.TEXT));
 		PostgresqlCSVWriter idwriter = new PostgresqlCSVWriter("ACTS",
 				actTableName, dba, 100000, columns);

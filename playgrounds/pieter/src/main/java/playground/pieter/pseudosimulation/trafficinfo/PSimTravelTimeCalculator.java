@@ -23,8 +23,8 @@ import playground.pieter.pseudosimulation.controler.listeners.MobSimSwitcher;
  */
 public class PSimTravelTimeCalculator extends TravelTimeCalculator {
 	public PSimTravelTimeCalculator(Network network,
-			TravelTimeCalculatorConfigGroup ttconfigGroup) {
-		super(network, ttconfigGroup.getTraveltimeBinSize(), 50 * 3600,
+			TravelTimeCalculatorConfigGroup ttconfigGroup, int numHrs) {
+		super(network, ttconfigGroup.getTraveltimeBinSize(), numHrs,
 				ttconfigGroup);
 	}
 

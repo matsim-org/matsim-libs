@@ -1,7 +1,7 @@
 package playground.pieter.singapore.utils.postgresql;
 
 public enum PostgresType {
-	FLOAT8(64), INT(32), TEXT(500), BOOLEAN(4);
+	FLOAT8(128), INT(64), TEXT(1000), BOOLEAN(8);
 	private final int size;
 
 	PostgresType(int size) {

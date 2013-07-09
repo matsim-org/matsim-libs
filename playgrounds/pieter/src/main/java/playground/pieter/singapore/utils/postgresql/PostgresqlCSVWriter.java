@@ -17,41 +17,21 @@ import others.sergioo.util.dataBase.NoConnectionException;
 
 
 
- public class PostgresqlCSVWriter {
-	String writerName = "";
-	String tableName;
-	DataBaseAdmin dba;
-	int modfactor = 1;
-	int lineCounter = 0;
-	int batchSize = 2000;
-	int pushBackSize = 200000;
-	StringBuilder sb = new StringBuilder();
-	CopyManager cpManager;
-	List<PostgresqlColumnDefinition> columns;
-	private PushbackReader reader;
+ public class PostgresqlCSVWriter  extends TableWriter {
+
+	private DataBaseAdmin dba;
+	private CopyManager cpManager;
 
 	public PostgresqlCSVWriter(String tableName, DataBaseAdmin dba,
 			int batchSize, List<PostgresqlColumnDefinition> columns) {
-		super();
+		super(tableName, batchSize, columns);
 		this.tableName = tableName;
 		this.dba = dba;
-		this.batchSize = batchSize;
-		this.columns = columns;
-		this.pushBackSize = 0;
-		for (PostgresqlColumnDefinition col : columns) {
-			pushBackSize += col.type.size();
-		}
-		pushBackSize *= batchSize;
 		init();
+
 	}
 
-	/**
-	 * @param writerName the name of this particular writer instance, used in syso logging
-	 * @param tableName
-	 * @param dba
-	 * @param batchSize the larger the batchsize, the more lines are sent in one request.
-	 * @param columns column definitions, assuming only the 4 basic data types for now.
-	 */
+
 	public PostgresqlCSVWriter(String writerName, String tableName,
 			DataBaseAdmin dba, int batchSize,
 			List<PostgresqlColumnDefinition> columns) {
@@ -163,7 +143,4 @@ import others.sergioo.util.dataBase.NoConnectionException;
 		System.out.println(writerName + ": Processed line no " + lineCounter);
 	}
 
-	public String getTableName() {
-		return tableName;
-	}
 }

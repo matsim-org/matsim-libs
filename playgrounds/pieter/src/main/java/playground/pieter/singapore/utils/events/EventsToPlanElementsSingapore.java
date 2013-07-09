@@ -129,14 +129,14 @@ public class EventsToPlanElementsSingapore implements TransitDriverStartsEventHa
 		new MatsimNetworkReader(scenario).readFile(args[1]);
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
-		File properties = new File("data/matsim2postgres.properties");
+		File properties = new File("f:/data/matsim2postgres.properties");
 		String suffix = args[5];
 //		EventsToPlanElements test = new EventsToPlanElements(
 //				scenario.getTransitSchedule(), scenario.getNetwork(),
 //				scenario.getConfig(), properties, suffix);
 		EventsToPlanElementsSingapore test = new EventsToPlanElementsSingapore(
 				scenario.getTransitSchedule(), scenario.getNetwork(),
-				scenario.getConfig(),  suffix, args[6]);
+				scenario.getConfig(),properties,  suffix, "u_fouriep");
 		eventsManager.addHandler(test);
 		new MatsimEventsReader(eventsManager).readFile(args[2]);
 		if (test.isWriteIdsForLinks())
@@ -144,8 +144,8 @@ public class EventsToPlanElementsSingapore implements TransitDriverStartsEventHa
 		if (Boolean.parseBoolean(args[4]))
 			test.writeSimulationResultsToSQL(properties, args[2], suffix);
 		System.out.println(test.getStuck());
-		if (test.isWriteIdsForLinks())
-			test.indexLinkRecords(properties, suffix);
+//		if (test.isWriteIdsForLinks())
+//			test.indexLinkRecords(properties, suffix);
 	}
 
 	public void indexLinkRecords(File properties, String suffix) {
@@ -264,7 +264,8 @@ public class EventsToPlanElementsSingapore implements TransitDriverStartsEventHa
 	private void samplePersonIdsForLinkWriting(File connectionProperties) {
 		try {
 			DataBaseAdmin dba = new DataBaseAdmin(connectionProperties);
-			String idSelectionStatement = "SELECT person_id FROM " + schemaName + ".matsim_persons where sample_selector <= 0.01";
+			String idSelectionStatement = "SELECT person_id FROM m_calibration.matsim_persons where sample_selector <= 0.1";
+//			String idSelectionStatement = "SELECT person_id FROM u_fouriep.idsforlinkanalysis";
 			ResultSet rs = dba.executeQuery(idSelectionStatement);
 			this.personIdsForLinks = new HashSet<Id>();
 			while(rs.next()){

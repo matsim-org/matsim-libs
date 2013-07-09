@@ -1,0 +1,710 @@
+package playground.pieter.events;
+
+import java.awt.BorderLayout;
+import java.awt.EventQueue;
+
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.border.EmptyBorder;
+import javax.swing.JButton;
+import javax.swing.JTextField;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+
+import javax.swing.JDialog;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.SwingConstants;
+import javax.swing.JCheckBox;
+
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.events.EventsReaderTXTv1;
+import org.matsim.core.events.EventsReaderXMLv1;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+
+import others.sergioo.util.dataBase.DataBaseAdmin;
+import others.sergioo.util.dataBase.NoConnectionException;
+import playground.pieter.singapore.utils.postgresql.CSVWriter;
+import playground.pieter.singapore.utils.postgresql.PostgresType;
+import playground.pieter.singapore.utils.postgresql.PostgresqlCSVWriter;
+import playground.pieter.singapore.utils.postgresql.PostgresqlColumnDefinition;
+import playground.pieter.singapore.utils.postgresql.TableWriter;
+import playground.pieter.singapore.utils.postgresql.travelcomponents.Activity;
+import playground.pieter.singapore.utils.postgresql.travelcomponents.Journey;
+import playground.pieter.singapore.utils.postgresql.travelcomponents.Transfer;
+import playground.pieter.singapore.utils.postgresql.travelcomponents.TravellerChain;
+import playground.pieter.singapore.utils.postgresql.travelcomponents.Trip;
+import playground.wrashid.nan.InFlowInfoCollectorWithPt;
+import playground.wrashid.nan.MainDensityAnalysisWithPt;
+import playground.wrashid.nan.NetworkReadExample;
+import playground.wrashid.nan.OutFlowInfoCollectorWithPt;
+
+import java.awt.GridBagLayout;
+import java.awt.GridBagConstraints;
+import java.awt.Insets;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.lang.reflect.Field;
+import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Map.Entry;
+
+import javax.swing.JTextPane;
+import java.awt.Color;
+import javax.swing.UIManager;
+import java.awt.Font;
+
+public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
+
+	private JPanel contentPane;
+	private JTextField schemaNameComponent;
+	private JTextField postgresPropertiesComponent;
+	private JTextField tableSuffixComponent;
+	private JTextField eventsToLinkFlowAndDensityToSQLPropertiesFileComponent;
+	private JTextField networkFileComponent;
+	private JTextField eventsFileComponent;
+	private Properties defaultProperties;
+	private EventsToLinkFlowAndDensityToSQLgui self = this;
+	private String defaultpath = "";
+	private JTextField centreYCoordComponent;
+	private JTextField radiusComponent;
+	private JTextField centreXCoordComponent;
+	private JTextField binSizeComponent;
+	private String schemaName;
+	private String postgresProperties;
+	private String tableSuffix;
+	private String networkFile;
+	private String eventsFile;
+	private String centreYCoord;
+	private String centreXCoord;
+	private String radius;
+	private JTextPane commentComponent;
+	private String comment;
+	private String binSize;
+	private HashMap<Id, int[]> linkOutFlow;
+	private HashMap<Id, double[]> instantaneousLinkDensities;
+	private HashMap<Id, double[]> averageLinkDensities;
+	private Map<Id, ? extends Link> links;
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+
+					EventsToLinkFlowAndDensityToSQLgui frame = new EventsToLinkFlowAndDensityToSQLgui();
+					frame.setVisible(true);
+					frame.loadDefaultProperties(new File(
+							frame.eventsToLinkFlowAndDensityToSQLPropertiesFileComponent
+									.getText()));
+
+			}
+		});
+	}
+
+	/**
+	 * Create the frame.
+	 */
+	public EventsToLinkFlowAndDensityToSQLgui() {
+		setTitle("Events to Link flows and densities written to PostgreSQL / CSV tables");
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setBounds(100, 100, 764, 403);
+		contentPane = new JPanel();
+		contentPane.setBackground(UIManager.getColor("Panel.background"));
+		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+		setContentPane(contentPane);
+		GridBagLayout gbl_contentPane = new GridBagLayout();
+		gbl_contentPane.columnWidths = new int[] { 268, 500 };
+		gbl_contentPane.rowHeights = new int[] { 20, 20, 20, 20, 20, 40, 0, 30,
+				20, 23, 0 };
+		gbl_contentPane.columnWeights = new double[] { 1.0, 1.0 };
+		gbl_contentPane.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0,
+				1.0, 1.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
+		contentPane.setLayout(gbl_contentPane);
+
+		JLabel lblFillFromProperties = new JLabel("Fill from properties file");
+		GridBagConstraints gbc_lblFillFromProperties = new GridBagConstraints();
+		gbc_lblFillFromProperties.anchor = GridBagConstraints.WEST;
+		gbc_lblFillFromProperties.insets = new Insets(0, 0, 5, 5);
+		gbc_lblFillFromProperties.gridx = 0;
+		gbc_lblFillFromProperties.gridy = 0;
+		contentPane.add(lblFillFromProperties, gbc_lblFillFromProperties);
+
+		eventsToLinkFlowAndDensityToSQLPropertiesFileComponent = new JTextField();
+		eventsToLinkFlowAndDensityToSQLPropertiesFileComponent
+				.addMouseListener(new MouseAdapter() {
+					@Override
+					public void mouseClicked(MouseEvent e) {
+						File defaultPropertiesFile = fileSelect(
+								eventsToLinkFlowAndDensityToSQLPropertiesFileComponent
+										.getText(), "Select properties file");
+						eventsToLinkFlowAndDensityToSQLPropertiesFileComponent
+								.setText(defaultPropertiesFile.getPath());
+						loadDefaultProperties(defaultPropertiesFile);
+					}
+				});
+		eventsToLinkFlowAndDensityToSQLPropertiesFileComponent
+				.setText("./eventsToLinkFlowAndDensityToSQL.properties");
+		GridBagConstraints gbc_txtDataeventstosqlproperties = new GridBagConstraints();
+		gbc_txtDataeventstosqlproperties.anchor = GridBagConstraints.NORTH;
+		gbc_txtDataeventstosqlproperties.fill = GridBagConstraints.HORIZONTAL;
+		gbc_txtDataeventstosqlproperties.insets = new Insets(0, 0, 5, 0);
+		gbc_txtDataeventstosqlproperties.gridx = 1;
+		gbc_txtDataeventstosqlproperties.gridy = 0;
+		contentPane.add(eventsToLinkFlowAndDensityToSQLPropertiesFileComponent,
+				gbc_txtDataeventstosqlproperties);
+		eventsToLinkFlowAndDensityToSQLPropertiesFileComponent.setColumns(10);
+
+		JLabel lblSchemaName = new JLabel(
+				"Schema name for SQL/output path for CSVs");
+		lblSchemaName.setHorizontalAlignment(SwingConstants.LEFT);
+		GridBagConstraints gbc_lblSchemaName = new GridBagConstraints();
+		gbc_lblSchemaName.anchor = GridBagConstraints.WEST;
+		gbc_lblSchemaName.insets = new Insets(0, 0, 5, 5);
+		gbc_lblSchemaName.gridx = 0;
+		gbc_lblSchemaName.gridy = 1;
+		contentPane.add(lblSchemaName, gbc_lblSchemaName);
+
+		schemaNameComponent = new JTextField();
+		schemaNameComponent.setText("m_calibration");
+		GridBagConstraints gbc_schemaName = new GridBagConstraints();
+		gbc_schemaName.anchor = GridBagConstraints.NORTH;
+		gbc_schemaName.fill = GridBagConstraints.HORIZONTAL;
+		gbc_schemaName.insets = new Insets(0, 0, 5, 0);
+		gbc_schemaName.gridx = 1;
+		gbc_schemaName.gridy = 1;
+		contentPane.add(schemaNameComponent, gbc_schemaName);
+		schemaNameComponent.setColumns(10);
+
+		JLabel lblNetwork = new JLabel("Network");
+		GridBagConstraints gbc_lblNetwork = new GridBagConstraints();
+		gbc_lblNetwork.anchor = GridBagConstraints.WEST;
+		gbc_lblNetwork.insets = new Insets(0, 0, 5, 5);
+		gbc_lblNetwork.gridx = 0;
+		gbc_lblNetwork.gridy = 2;
+		contentPane.add(lblNetwork, gbc_lblNetwork);
+
+		networkFileComponent = new JTextField();
+		networkFileComponent.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				networkFileComponent.setText(fileSelect(
+						networkFileComponent.getText(), "select network file")
+						.getPath());
+			}
+		});
+		networkFileComponent.setText("./");
+		GridBagConstraints gbc_networkFile = new GridBagConstraints();
+		gbc_networkFile.anchor = GridBagConstraints.NORTH;
+		gbc_networkFile.fill = GridBagConstraints.HORIZONTAL;
+		gbc_networkFile.insets = new Insets(0, 0, 5, 0);
+		gbc_networkFile.gridx = 1;
+		gbc_networkFile.gridy = 2;
+		contentPane.add(networkFileComponent, gbc_networkFile);
+		networkFileComponent.setColumns(10);
+
+		JLabel lblpropertiesForPostgresql = new JLabel(
+				".properties for postgresql (leave empty for CSV)");
+		GridBagConstraints gbc_lblpropertiesForPostgresql = new GridBagConstraints();
+		gbc_lblpropertiesForPostgresql.anchor = GridBagConstraints.WEST;
+		gbc_lblpropertiesForPostgresql.insets = new Insets(0, 0, 5, 5);
+		gbc_lblpropertiesForPostgresql.gridx = 0;
+		gbc_lblpropertiesForPostgresql.gridy = 3;
+		contentPane.add(lblpropertiesForPostgresql,
+				gbc_lblpropertiesForPostgresql);
+
+		postgresPropertiesComponent = new JTextField();
+		postgresPropertiesComponent.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				postgresPropertiesComponent.setText(fileSelect(
+						postgresPropertiesComponent.getText(),
+						"select PostgreSQL connection properties file")
+						.getPath());
+
+			}
+		});
+		postgresPropertiesComponent.setText("data/matsim2postgres.properties");
+		GridBagConstraints gbc_postgresProperties = new GridBagConstraints();
+		gbc_postgresProperties.anchor = GridBagConstraints.NORTH;
+		gbc_postgresProperties.fill = GridBagConstraints.HORIZONTAL;
+		gbc_postgresProperties.insets = new Insets(0, 0, 5, 0);
+		gbc_postgresProperties.gridx = 1;
+		gbc_postgresProperties.gridy = 3;
+		contentPane.add(postgresPropertiesComponent, gbc_postgresProperties);
+		postgresPropertiesComponent.setColumns(10);
+
+		JLabel lblEvents = new JLabel("Events file?");
+		GridBagConstraints gbc_lblEvents = new GridBagConstraints();
+		gbc_lblEvents.anchor = GridBagConstraints.WEST;
+		gbc_lblEvents.insets = new Insets(0, 0, 5, 5);
+		gbc_lblEvents.gridx = 0;
+		gbc_lblEvents.gridy = 4;
+		contentPane.add(lblEvents, gbc_lblEvents);
+
+		eventsFileComponent = new JTextField();
+		eventsFileComponent.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				eventsFileComponent.setText(fileSelect(
+						eventsFileComponent.getText(), "select events file")
+						.getPath());
+			}
+		});
+		eventsFileComponent.setText("./");
+		GridBagConstraints gbc_eventsFile = new GridBagConstraints();
+		gbc_eventsFile.anchor = GridBagConstraints.NORTH;
+		gbc_eventsFile.fill = GridBagConstraints.HORIZONTAL;
+		gbc_eventsFile.insets = new Insets(0, 0, 5, 0);
+		gbc_eventsFile.gridx = 1;
+		gbc_eventsFile.gridy = 4;
+		contentPane.add(eventsFileComponent, gbc_eventsFile);
+		eventsFileComponent.setColumns(10);
+
+		JTextPane commentLabel = new JTextPane();
+		commentLabel.setFont(new Font("Tahoma", Font.PLAIN, 11));
+		commentLabel.setEditable(false);
+		commentLabel.setBackground(UIManager.getColor("Panel.background"));
+		commentLabel
+				.setText("Table comment (leaving this field empty will identify table by date, events and network file names)");
+		GridBagConstraints gbc_commentLabel = new GridBagConstraints();
+		gbc_commentLabel.insets = new Insets(0, 0, 5, 5);
+		gbc_commentLabel.fill = GridBagConstraints.BOTH;
+		gbc_commentLabel.gridx = 0;
+		gbc_commentLabel.gridy = 5;
+		contentPane.add(commentLabel, gbc_commentLabel);
+
+		commentComponent = new JTextPane();
+		GridBagConstraints gbc_commentComponent = new GridBagConstraints();
+		gbc_commentComponent.insets = new Insets(0, 0, 5, 0);
+		gbc_commentComponent.fill = GridBagConstraints.BOTH;
+		gbc_commentComponent.gridx = 1;
+		gbc_commentComponent.gridy = 5;
+		contentPane.add(commentComponent, gbc_commentComponent);
+
+		JTextPane txtpnCentreCoordinateIf = new JTextPane();
+		txtpnCentreCoordinateIf.setEditable(false);
+		txtpnCentreCoordinateIf.setBackground(UIManager
+				.getColor("Panel.background"));
+		txtpnCentreCoordinateIf
+				.setText("Centre coordinate if you want to only process a subset of links within a certain radius from this coord. Leaving these fields empty will process the entire network.");
+		GridBagConstraints gbc_txtpnCentreCoordinateIf = new GridBagConstraints();
+		gbc_txtpnCentreCoordinateIf.insets = new Insets(0, 0, 5, 5);
+		gbc_txtpnCentreCoordinateIf.fill = GridBagConstraints.BOTH;
+		gbc_txtpnCentreCoordinateIf.gridx = 0;
+		gbc_txtpnCentreCoordinateIf.gridy = 6;
+		contentPane.add(txtpnCentreCoordinateIf, gbc_txtpnCentreCoordinateIf);
+
+		JPanel panel = new JPanel();
+		GridBagConstraints gbc_panel = new GridBagConstraints();
+		gbc_panel.insets = new Insets(0, 0, 5, 0);
+		gbc_panel.fill = GridBagConstraints.BOTH;
+		gbc_panel.gridx = 1;
+		gbc_panel.gridy = 6;
+		contentPane.add(panel, gbc_panel);
+		GridBagLayout gbl_panel = new GridBagLayout();
+		gbl_panel.columnWidths = new int[] { 200, 200, 100 };
+		gbl_panel.rowHeights = new int[] { 20, 20 };
+		gbl_panel.columnWeights = new double[] { 1.0, 1.0, 1.0 };
+		gbl_panel.rowWeights = new double[] { 0.0, 0.0 };
+		panel.setLayout(gbl_panel);
+
+		JLabel lblNewLabel = new JLabel("Centre: x ");
+		GridBagConstraints gbc_lblNewLabel = new GridBagConstraints();
+		gbc_lblNewLabel.insets = new Insets(0, 0, 5, 5);
+		gbc_lblNewLabel.gridx = 0;
+		gbc_lblNewLabel.gridy = 0;
+		panel.add(lblNewLabel, gbc_lblNewLabel);
+
+		JLabel lblCentreY = new JLabel("Centre: y");
+		GridBagConstraints gbc_lblCentreY = new GridBagConstraints();
+		gbc_lblCentreY.insets = new Insets(0, 0, 5, 5);
+		gbc_lblCentreY.gridx = 1;
+		gbc_lblCentreY.gridy = 0;
+		panel.add(lblCentreY, gbc_lblCentreY);
+
+		JLabel lblRadiusmeters = new JLabel("Radius");
+		GridBagConstraints gbc_lblRadiusmeters = new GridBagConstraints();
+		gbc_lblRadiusmeters.insets = new Insets(0, 0, 5, 0);
+		gbc_lblRadiusmeters.gridx = 2;
+		gbc_lblRadiusmeters.gridy = 0;
+		panel.add(lblRadiusmeters, gbc_lblRadiusmeters);
+
+		centreXCoordComponent = new JTextField();
+		GridBagConstraints gbc_xCoordComponent = new GridBagConstraints();
+		gbc_xCoordComponent.insets = new Insets(0, 0, 0, 5);
+		gbc_xCoordComponent.fill = GridBagConstraints.HORIZONTAL;
+		gbc_xCoordComponent.gridx = 0;
+		gbc_xCoordComponent.gridy = 1;
+		panel.add(centreXCoordComponent, gbc_xCoordComponent);
+		centreXCoordComponent.setColumns(10);
+
+		centreYCoordComponent = new JTextField();
+		GridBagConstraints gbc_yCoordComponent = new GridBagConstraints();
+		gbc_yCoordComponent.insets = new Insets(0, 0, 0, 5);
+		gbc_yCoordComponent.fill = GridBagConstraints.HORIZONTAL;
+		gbc_yCoordComponent.gridx = 1;
+		gbc_yCoordComponent.gridy = 1;
+		panel.add(centreYCoordComponent, gbc_yCoordComponent);
+		centreYCoordComponent.setColumns(10);
+
+		radiusComponent = new JTextField();
+		radiusComponent.setText("5000");
+		GridBagConstraints gbc_radiusComponent = new GridBagConstraints();
+		gbc_radiusComponent.fill = GridBagConstraints.HORIZONTAL;
+		gbc_radiusComponent.gridx = 2;
+		gbc_radiusComponent.gridy = 1;
+		panel.add(radiusComponent, gbc_radiusComponent);
+		radiusComponent.setColumns(10);
+
+		JLabel lblBinSizeFor = new JLabel(
+				"Bin size for analysis (seconds) - CAREFUL!");
+		GridBagConstraints gbc_lblBinSizeFor = new GridBagConstraints();
+		gbc_lblBinSizeFor.anchor = GridBagConstraints.WEST;
+		gbc_lblBinSizeFor.insets = new Insets(0, 0, 5, 5);
+		gbc_lblBinSizeFor.gridx = 0;
+		gbc_lblBinSizeFor.gridy = 7;
+		contentPane.add(lblBinSizeFor, gbc_lblBinSizeFor);
+
+		binSizeComponent = new JTextField();
+		binSizeComponent.setText("300");
+		GridBagConstraints gbc_binSizeComponent = new GridBagConstraints();
+		gbc_binSizeComponent.insets = new Insets(0, 0, 5, 0);
+		gbc_binSizeComponent.fill = GridBagConstraints.HORIZONTAL;
+		gbc_binSizeComponent.gridx = 1;
+		gbc_binSizeComponent.gridy = 7;
+		contentPane.add(binSizeComponent, gbc_binSizeComponent);
+		binSizeComponent.setColumns(10);
+
+		JLabel lblTableNameSuffix = new JLabel(
+				"Table name suffix (to distinguish between runs)");
+		GridBagConstraints gbc_lblTableNameSuffix = new GridBagConstraints();
+		gbc_lblTableNameSuffix.anchor = GridBagConstraints.WEST;
+		gbc_lblTableNameSuffix.insets = new Insets(0, 0, 5, 5);
+		gbc_lblTableNameSuffix.gridx = 0;
+		gbc_lblTableNameSuffix.gridy = 8;
+		contentPane.add(lblTableNameSuffix, gbc_lblTableNameSuffix);
+
+		tableSuffixComponent = new JTextField();
+		tableSuffixComponent.setText("_test");
+		GridBagConstraints gbc_tableSuffix = new GridBagConstraints();
+		gbc_tableSuffix.anchor = GridBagConstraints.NORTH;
+		gbc_tableSuffix.fill = GridBagConstraints.HORIZONTAL;
+		gbc_tableSuffix.insets = new Insets(0, 0, 5, 0);
+		gbc_tableSuffix.gridx = 1;
+		gbc_tableSuffix.gridy = 8;
+		contentPane.add(tableSuffixComponent, gbc_tableSuffix);
+		tableSuffixComponent.setColumns(10);
+
+		JButton btnSaveAsDefault = new JButton("Save as default setup");
+		btnSaveAsDefault.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				saveDefaultProperties();
+			}
+
+		});
+		GridBagConstraints gbc_btnSaveAsDefault = new GridBagConstraints();
+		gbc_btnSaveAsDefault.fill = GridBagConstraints.BOTH;
+		gbc_btnSaveAsDefault.insets = new Insets(0, 0, 0, 5);
+		gbc_btnSaveAsDefault.gridx = 0;
+		gbc_btnSaveAsDefault.gridy = 9;
+		contentPane.add(btnSaveAsDefault, gbc_btnSaveAsDefault);
+
+		JButton btnStartEventsProcessing = new JButton(
+				"START EVENTS PROCESSING");
+		btnStartEventsProcessing.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				self.setVisible(false);
+				try {
+					runEventsProcessing();
+				} catch (Exception ex) {
+					ex.printStackTrace();
+					System.exit(ABORT);
+				}
+				System.exit(0);
+			}
+		});
+		GridBagConstraints gbc_btnStartEventsProcessing = new GridBagConstraints();
+		gbc_btnStartEventsProcessing.anchor = GridBagConstraints.NORTH;
+		gbc_btnStartEventsProcessing.fill = GridBagConstraints.HORIZONTAL;
+		gbc_btnStartEventsProcessing.gridx = 1;
+		gbc_btnStartEventsProcessing.gridy = 9;
+		contentPane.add(btnStartEventsProcessing, gbc_btnStartEventsProcessing);
+	}
+
+	public void saveDefaultProperties() {
+		this.defaultProperties = new Properties();
+
+		this.defaultProperties.setProperty("schemaName",
+				schemaNameComponent.getText());
+		this.defaultProperties.setProperty("postgresProperties",
+				postgresPropertiesComponent.getText());
+		this.defaultProperties.setProperty("tableSuffix",
+				tableSuffixComponent.getText());
+		this.defaultProperties.setProperty("networkFile",
+				networkFileComponent.getText());
+		this.defaultProperties.setProperty("eventsFile",
+				eventsFileComponent.getText());
+		this.defaultProperties.setProperty("comment",
+				commentComponent.getText());
+		this.defaultProperties.setProperty("radius", radiusComponent.getText());
+		this.defaultProperties.setProperty("centreXCoord",
+				centreXCoordComponent.getText());
+		this.defaultProperties.setProperty("centreYCoord",
+				centreYCoordComponent.getText());
+		this.defaultProperties.setProperty("binSize",
+				binSizeComponent.getText());
+		try {
+			this.defaultProperties.store(
+					new FileOutputStream(new File(
+							eventsToLinkFlowAndDensityToSQLPropertiesFileComponent
+									.getText())), "");
+		} catch (FileNotFoundException e) {
+
+			fileSelect(
+					eventsToLinkFlowAndDensityToSQLPropertiesFileComponent
+							.getText(),
+					"Path not found. Enter proerties filename.");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public void runEventsProcessing() throws InstantiationException,
+			IllegalAccessException, ClassNotFoundException, IOException,
+			SQLException {
+		String networkFile = networkFileComponent.getText();
+		String eventsFile = eventsFileComponent.getText();
+		String x = centreXCoordComponent.getText();
+		String y = centreYCoordComponent.getText();
+		// if any one of these is empty, or invalid, process the entire network
+		Coord center = null;
+		double radiusInMeters = 5000;
+		try {
+			center = new CoordImpl(x, y); // center=null means use all links
+			radiusInMeters = Double.parseDouble(radiusComponent.getText());
+		} catch (Exception e) {
+
+		}
+		boolean isOldEventFile = false;
+		int binSizeInSeconds = Integer.parseInt(binSizeComponent.getText());
+
+		// String
+		// networkFile="C:/Users/Nan/Desktop/For matsim/matsim-0.1.1/examples/equil/network.xml";
+		// String
+		// eventsFile="C:/Users/Nan/Desktop/For matsim/matsim-0.1.1/output/equil/ITERS/it.5/5.events.txt.gz";
+		// Coord center=new CoordImpl(0,0);
+		// boolean isOldEventFile=false;
+
+		links = NetworkReadExample.getNetworkLinks(
+				networkFile, center, radiusInMeters);// input/set center and
+														// radius
+//		InFlowInfoCollectorWithPt inflowHandler = new InFlowInfoCollectorWithPt(
+//				links, isOldEventFile, binSizeInSeconds);
+//		OutFlowInfoCollectorWithPt outflowHandler = new OutFlowInfoCollectorWithPt(
+//				links, isOldEventFile, binSizeInSeconds);// "links" makes run
+//															// faster
+//
+//		inflowHandler.reset(0);
+//		outflowHandler.reset(0);
+		FlowAndDensityCollector flowAndDensityCollector = new FlowAndDensityCollector(links, binSizeInSeconds);
+		flowAndDensityCollector.reset(0);
+
+		EventsManager events = EventsUtils.createEventsManager(); // create new
+																	// object of
+																	// events-manager
+																	// class
+
+//		events.addHandler(inflowHandler); // add handler
+//		events.addHandler(outflowHandler);
+		events.addHandler(flowAndDensityCollector);
+
+		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
+
+		reader.parse(eventsFile); // where we find events data
+
+		HashMap<Id, int[]> linkInFlow = flowAndDensityCollector.getLinkInFlow(); // get
+																		// the
+																		// matrix
+		linkOutFlow = flowAndDensityCollector.getLinkOutFlow();
+
+		HashMap<Id, int[]> deltaFlow = MainDensityAnalysisWithPt.deltaFlow(
+				linkInFlow, linkOutFlow);
+		instantaneousLinkDensities = MainDensityAnalysisWithPt.calculateDensity(deltaFlow,
+				links);
+		averageLinkDensities = flowAndDensityCollector.getAvgDeltaFlow();
+
+		// if there arent any postgres properties, attempt to write to csv, else
+		// write to postgres
+
+		writeResults(!postgresPropertiesComponent.getText().equals(""));
+
+	}
+
+	private void writeResults(boolean toSQL) throws InstantiationException,
+			IllegalAccessException, ClassNotFoundException, IOException,
+			SQLException {
+		DateFormat df = new SimpleDateFormat("yyyy_MM_dd");
+		String formattedDate = df.format(new Date());
+		// start with activities
+		String densityTableName = "matsim_link_flow_and_density"
+				+ tableSuffixComponent.getText();
+		List<PostgresqlColumnDefinition> columns = new ArrayList<PostgresqlColumnDefinition>();
+		columns.add(new PostgresqlColumnDefinition("link_id", PostgresType.TEXT));
+		columns.add(new PostgresqlColumnDefinition("length", PostgresType.FLOAT8));
+		columns.add(new PostgresqlColumnDefinition("lanes", PostgresType.FLOAT8));
+		columns.add(new PostgresqlColumnDefinition("bin_end_time",
+				PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("outflow", PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("veh_per_lane_km_instantaneous",
+				PostgresType.FLOAT8));
+		columns.add(new PostgresqlColumnDefinition("avg_number_of_vehicles_on_link",
+				PostgresType.FLOAT8));
+		TableWriter densityWriter = null;
+		if (toSQL) {
+			String tabname = schemaNameComponent.getText()+"."+densityTableName;
+			String fileName =  
+							postgresPropertiesComponent.getText();
+			File file = new File(fileName);
+			DataBaseAdmin dba = new DataBaseAdmin(file);
+			densityWriter = new PostgresqlCSVWriter("DENSITYWRITER",
+					tabname, dba, 100000, columns);
+		} else {
+			densityWriter = new CSVWriter("DENSITYWRITER", densityTableName,
+					schemaNameComponent.getText(), 100000, columns);
+		}
+		if (commentComponent.getText().equals("")) {
+			densityWriter.addComment(commentComponent.getText().replaceAll("[^a-zA-Z0-9-.]", " "));
+		} else {
+			String eventsFileName = eventsFileComponent.getText();
+			eventsFileName = eventsFileName.replaceAll("\\\\", "/");
+			eventsFileName = eventsFileName.replaceAll(":", "");
+			String networkFileName = networkFileComponent.getText();
+			networkFileName = networkFileName.replaceAll("\\\\", "/");
+			networkFileName = networkFileName.replaceAll(":", "");
+			densityWriter
+					.addComment(String
+							.format("Link outflow and density in veh per lane km for network %s from events file %s, created on %s.",
+									networkFileName,
+									eventsFileName,
+									formattedDate));
+
+		}
+
+		for (Id id : linkOutFlow.keySet()) {
+			int[] flows = linkOutFlow.get(id);
+			double[] densities = instantaneousLinkDensities.get(id);
+			double[] avgLevels = averageLinkDensities.get(id);
+			for (int i = 0; i < flows.length; i++) {
+				Object[] args = {
+						id.toString(),
+						new Double(links.get(id).getLength()),
+						new Double(links.get(id).getNumberOfLanes()),
+						new Integer(i
+								* Integer.parseInt(this.binSizeComponent
+										.getText())),
+										new Integer(flows[i]),
+						new Double(densities[i]),
+						new Double(avgLevels[i])
+				};
+				densityWriter.addLine(args);
+			}
+
+		}
+		densityWriter.finish();
+	}
+
+	public void loadDefaultProperties(File defaultPropertiesFile) {
+		this.defaultProperties = new Properties();
+		try {
+			this.defaultProperties.load(new FileInputStream(
+					defaultPropertiesFile));
+			String[] properties = { "comment", "networkFile", "eventsFile",
+					"centreXCoord", "centreYCoord", "tableSuffix",
+					"schemaName", "postgresProperties", "radius", "binSize" };
+			for (String property : properties) {
+				try {
+					String propertyValue = this.defaultProperties
+							.getProperty(property);
+					// reflection
+					Field aField = getClass().getDeclaredField(property);
+					aField.set(this, propertyValue);
+					setComponentValues();
+				} catch (NullPointerException e) {
+					e.printStackTrace();
+				} catch (IllegalArgumentException e) {
+					e.printStackTrace();
+				} catch (IllegalAccessException e) {
+					e.printStackTrace();
+				} catch (NoSuchFieldException e) {
+					e.printStackTrace();
+				} catch (SecurityException e) {
+
+					e.printStackTrace();
+				}
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void setComponentValues() {
+		schemaNameComponent.setText(schemaName);
+		postgresPropertiesComponent.setText(postgresProperties);
+		tableSuffixComponent.setText(tableSuffix);
+		networkFileComponent.setText(networkFile);
+		eventsFileComponent.setText(eventsFile);
+		centreXCoordComponent.setText(centreXCoord);
+		centreYCoordComponent.setText(centreYCoord);
+		radiusComponent.setText(radius);
+		commentComponent.setText(comment);
+		binSizeComponent.setText(binSize);
+	}
+
+	public File fileSelect(String path, String title) {
+		boolean validPath = false;
+		File file = null;
+		try {
+			file = new File(path);
+			validPath = file.isFile();
+			if (validPath)
+				this.defaultpath = file.getPath();
+		} catch (Exception e) {
+
+		}
+		JFileChooser chooser = new JFileChooser(defaultpath);
+		chooser.setToolTipText(title);
+		chooser.setDialogTitle(title);
+		chooser.showOpenDialog(new JPanel());
+		defaultpath = chooser.getSelectedFile().getPath();
+		return chooser.getSelectedFile();
+	}
+}

@@ -11,6 +11,7 @@ public class Main {
 	public static void main(String[] args) {
 		PSimControler c = new PSimControler(args);
 		c.setOverwriteFiles(true);
+		c.setCreateGraphs(false);
 		c.run();
 		System.exit(0);
 		
