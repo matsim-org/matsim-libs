@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * QSimEngineImpl.java
+ * QNetsimEngine.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -59,9 +59,10 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 
 	/** This is the collection of links that have to be moved in the simulation */
 	/*package*/  List<QLinkInternalI> simLinksList = new ArrayList<QLinkInternalI>();
+	
 	/** This is the collection of nodes that have to be moved in the simulation */
-	/*package*/  QNode[] simNodesArray = null;
 	/*package*/  List<QNode> simNodesList = null;
+	
 	/** This is the collection of links that have to be activated in the current time step */
 	/*package*/  ArrayList<QLinkInternalI> simActivateLinks = new ArrayList<QLinkInternalI>();
 
@@ -75,18 +76,18 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 	private final AgentSnapshotInfoBuilder positionInfoBuilder;
 
 	private final double stucktimeCache;
-	private final DepartureHandler dpHandler ;
+	private final DepartureHandler dpHandler;
 
 	private double infoTime = 0;
 	
 	/*package*/ InternalInterface internalInterface = null ;
 	@Override
-	public void setInternalInterface( InternalInterface internalInterface ) {
-		this.internalInterface = internalInterface ;
+	public void setInternalInterface( InternalInterface internalInterface) {
+		this.internalInterface = internalInterface;
 	}
 
-	public QNetsimEngine(final QSim sim ) {
-		this( sim, null ) ;
+	public QNetsimEngine(final QSim sim) {
+		this(sim, null);
 	}
 
 	public QNetsimEngine(final QSim sim, NetsimNetworkFactory<QNode, ? extends QLinkInternalI> netsimNetworkFactory ) {
@@ -169,11 +170,12 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 	@Override
 	public void onPrepareSim() {
 		simNodesList = new ArrayList<QNode>();
-		this.infoTime = Math.floor(internalInterface.getMobsim().getSimTimer().getSimStartTime()
-				/ INFO_PERIOD)
-				* INFO_PERIOD; // infoTime may be < simStartTime, this ensures
-		// to print out the info at the very first
-		// timestep already
+		this.infoTime = 
+				Math.floor(internalInterface.getMobsim().getSimTimer().getSimStartTime() / INFO_PERIOD) * INFO_PERIOD; 
+		/*
+		 * infoTime may be < simStartTime, this ensures to print out the
+		 * info at the very first timestep already 
+		 */
 	}
 
 	@Override
@@ -221,7 +223,7 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 		while (simLinks.hasNext()) {
 			link = simLinks.next();
 			isActive = link.doSimStep(time);
-			if (!isActive && !false) {
+			if (!isActive) {
 				simLinks.remove();
 			}
 		}
@@ -240,13 +242,11 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 
 	@Override
 	protected void activateLink(final QLinkInternalI link) {
-		if (!false) {
-			this.simActivateLinks.add(link);
-		}
+		this.simActivateLinks.add(link);
 	}
 
 	private void reactivateLinks() {
-		if ((!false) && (!this.simActivateLinks.isEmpty())) {
+		if (!this.simActivateLinks.isEmpty()) {
 			this.simLinksList.addAll(this.simActivateLinks);
 			this.simActivateLinks.clear();
 		}
@@ -254,13 +254,11 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 
 	@Override
 	protected void activateNode(QNode node) {
-		if (!false && !false) {
-			this.simActivateNodes.add(node);
-		}
+		this.simActivateNodes.add(node);
 	}
 
 	private void reactivateNodes() {
-		if ((!false) && (!this.simActivateNodes.isEmpty())) {
+		if (!this.simActivateNodes.isEmpty()) {
 			this.simNodesList.addAll(this.simActivateNodes);
 			this.simActivateNodes.clear();
 		}
@@ -292,7 +290,7 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 	 * convenience method so that stuck time can be cached without caching it in every node separately.  kai, jun'10
 	 */
 	double getStuckTime() {
-		return this.stucktimeCache ;
+		return this.stucktimeCache;
 	}
 
 	public DepartureHandler getDepartureHandler() {
@@ -323,7 +321,7 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 		// reset vehicles driver
 		veh.setDriver(null);
 		driver.endLegAndComputeNextState(now);
-		this.internalInterface.arrangeNextAgentState(driver) ;
+		this.internalInterface.arrangeNextAgentState(driver);
 	}
 
 }
