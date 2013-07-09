@@ -47,7 +47,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.tools.MultiModalNetworkCreator;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -76,6 +75,8 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import playground.christoph.evacuation.population.CreateMultiModalLegRouters;
 
 import com.vividsolutions.jts.geom.Coordinate;
+
+import contrib.multimodal.tools.MultiModalNetworkCreator;
 
 public class CreateMarathonPopulation {
 	
