@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.qsim.multimodalsimengine.router.util;
+package contrib.multimodal.router.util;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -38,6 +38,8 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestCase;
+
+import contrib.multimodal.router.util.WalkTravelTime;
 
 public class WalkTravelTimeTest extends MatsimTestCase {
 

@@ -57,7 +57,6 @@ import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.BikeTravelTim
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTime;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTime;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTimeOld;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.tools.MultiModalNetworkCreator;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -88,6 +87,8 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.population.algorithms.PlanAlgorithm;
+
+import contrib.multimodal.tools.MultiModalNetworkCreator;
 
 import playground.gregor.sim2d_v3.random.XORShiftRandom;
 

@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * UnknownTravelTime.java
+ * NetworkElementActivator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,27 +18,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.qsim.multimodalsimengine.router.util;
+package contrib.multimodal.simengine;
 
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.vehicles.Vehicle;
+public interface NetworkElementActivator {
 
-/**
- * Travel time calculator for unknown modes. Agents move with constant speed. No
- * agent specific parameters are taken into account.
- */
-public class UnknownTravelTime implements TravelTime {
+	/*package*/ void activateLink(MultiModalQLinkExtension link);
 
-	private final double speed;
-		
-	public UnknownTravelTime(double speed) {
-		this.speed = speed;
-	}
+	/*package*/ int getNumberOfSimulatedLinks();
 	
-	@Override
-	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {		
-		return link.getLength() / speed;
-	}
+	/*package*/ void activateNode(MultiModalQNodeExtension node);
+
+	/*package*/ int getNumberOfSimulatedNodes();
 }

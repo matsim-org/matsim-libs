@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * WalkTravelTimeFactory.java
+ * UnknownTravelTime.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,33 +18,27 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.qsim.multimodalsimengine.router.util;
+package contrib.multimodal.router.util;
 
-import java.util.Map;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.router.util.TravelTimeFactory;
+import org.matsim.vehicles.Vehicle;
 
-public class WalkTravelTimeFactory implements TravelTimeFactory {
+/**
+ * Travel time calculator for unknown modes. Agents move with constant speed. No
+ * agent specific parameters are taken into account.
+ */
+public class UnknownTravelTime implements TravelTime {
 
-	private final PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
-	private final Map<Id, Double> linkSlopes;	// slope information in %
+	private final double speed;
+		
+	public UnknownTravelTime(double speed) {
+		this.speed = speed;
+	}
 	
-	public WalkTravelTimeFactory(PlansCalcRouteConfigGroup plansCalcRouteConfigGroup) {
-		this(plansCalcRouteConfigGroup, null);
-	}
-
-	public WalkTravelTimeFactory(PlansCalcRouteConfigGroup plansCalcRouteConfigGroup,
-			Map<Id, Double> linkSlopes) {
-		this.plansCalcRouteConfigGroup = plansCalcRouteConfigGroup;
-		this.linkSlopes = linkSlopes;
-	}
-
 	@Override
-	public TravelTime createTravelTime() {
-		return new WalkTravelTime(this.plansCalcRouteConfigGroup, this.linkSlopes);
+	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {		
+		return link.getLength() / speed;
 	}
-	
 }

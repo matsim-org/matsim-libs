@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.qsim.multimodalsimengine.router.util;
+package contrib.multimodal.router.util;
 
 import java.util.Map;
 

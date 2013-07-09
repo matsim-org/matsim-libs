@@ -44,7 +44,6 @@ import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.MultiModalSimEngine;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
@@ -98,7 +97,6 @@ public final class QSim implements VisMobsim, Netsim {
 	private final EventsManager events;
 
 	private QNetsimEngine netEngine;
-	private MultiModalSimEngine multiModalEngine = null;
 
 	private Collection<MobsimEngine> mobsimEngines = new ArrayList<MobsimEngine>();
 
@@ -431,12 +429,6 @@ public final class QSim implements VisMobsim, Netsim {
 		return this.netEngine;
 	}
 
-	// For a test 
-	// the corresponding test could be moved into this package. kai
-	public MultiModalSimEngine getMultiModalSimEngine() {
-		return this.multiModalEngine;
-	}
-
 	public void addMobsimEngine(MobsimEngine mobsimEngine) {
 		if (mobsimEngine instanceof TransitQSimEngine) {
 			if ( this.transitEngine != null ) {
@@ -444,13 +436,6 @@ public final class QSim implements VisMobsim, Netsim {
 						"there can only be one TransitQSimEngine") ;
 			}
 			this.transitEngine = (TransitQSimEngine) mobsimEngine;
-		} 
-		if (mobsimEngine instanceof MultiModalSimEngine) {
-			if ( this.multiModalEngine != null ) {
-				log.warn("pre-existing multiModalEngine != null; will be overwritten; with the current design, " +
-						"there can only be one MultiModalSimEngine") ;
-			}
-			this.multiModalEngine = (MultiModalSimEngine) mobsimEngine;
 		}
 		if (mobsimEngine instanceof ActivityEngine) {
 			this.activityEngine = (ActivityEngine) mobsimEngine;

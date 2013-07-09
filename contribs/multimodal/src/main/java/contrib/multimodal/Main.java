@@ -6,10 +6,11 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTimeFactory;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.tools.PrepareMultiModalScenario;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import contrib.multimodal.router.util.MultiModalTravelTimeFactory;
+import contrib.multimodal.tools.PrepareMultiModalScenario;
 
 public class Main {
 

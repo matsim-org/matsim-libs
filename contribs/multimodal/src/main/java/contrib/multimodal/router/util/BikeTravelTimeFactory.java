@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * UnknownTravelTimeFactory.java
+ * BikeTravelTimeFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,22 +18,33 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.mobsim.qsim.multimodalsimengine.router.util;
+package contrib.multimodal.router.util;
 
+import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.TravelTimeFactory;
 
-public class UnknownTravelTimeFactory implements TravelTimeFactory {
+public class BikeTravelTimeFactory implements TravelTimeFactory {
 
-	private final double speed;
+	private final PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
+	private final Map<Id, Double> linkSlopes;	// slope information in %
 	
-	public UnknownTravelTimeFactory(double speed) {
-		this.speed = speed;
+	public BikeTravelTimeFactory(PlansCalcRouteConfigGroup plansCalcRouteConfigGroup) {
+		this(plansCalcRouteConfigGroup, null);
 	}
-
+	
+	public BikeTravelTimeFactory(PlansCalcRouteConfigGroup plansCalcRouteConfigGroup,
+			Map<Id, Double> linkSlopes) {
+		this.plansCalcRouteConfigGroup = plansCalcRouteConfigGroup;
+		this.linkSlopes = linkSlopes;
+	}
+	
 	@Override
 	public TravelTime createTravelTime() {
-		return new UnknownTravelTime(this.speed);
+		return new BikeTravelTime(this.plansCalcRouteConfigGroup, this.linkSlopes);
 	}
 	
 }

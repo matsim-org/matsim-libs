@@ -8,10 +8,11 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.MultiModalDepartureHandler;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.MultiModalSimEngine;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.MultiModalSimEngineFactory;
 import org.matsim.core.router.util.TravelTime;
+
+import contrib.multimodal.simengine.MultiModalDepartureHandler;
+import contrib.multimodal.simengine.MultiModalSimEngine;
+import contrib.multimodal.simengine.MultiModalSimEngineFactory;
 
 public class MultimodalQSimFactory implements MobsimFactory {
 

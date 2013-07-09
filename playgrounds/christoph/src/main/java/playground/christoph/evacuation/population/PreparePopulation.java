@@ -32,7 +32,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.tools.MultiModalNetworkCreator;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
@@ -53,6 +52,8 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
+
+import contrib.multimodal.tools.MultiModalNetworkCreator;
 
 import playground.meisterk.kti.config.KtiConfigGroup;
 import playground.meisterk.kti.router.KtiPtRouteFactory;
