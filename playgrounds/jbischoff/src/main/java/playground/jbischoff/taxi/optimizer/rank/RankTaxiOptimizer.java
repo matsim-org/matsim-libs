@@ -19,6 +19,7 @@
 
 package playground.jbischoff.taxi.optimizer.rank;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.jfree.util.Log;
@@ -88,12 +89,14 @@ public abstract class RankTaxiOptimizer
 
     private TaxiDelaySpeedupStats delaySpeedupStats;
     private final boolean destinationKnown;
+    private List<Integer> shortTimeIdlers;
 
 
     public RankTaxiOptimizer(VrpData data, boolean destinationKnown)
     {
         super(data);
         this.destinationKnown = destinationKnown;
+        this.shortTimeIdlers = new ArrayList<Integer>();
     }
 
 
@@ -227,6 +230,110 @@ public abstract class RankTaxiOptimizer
     }
 
 
+    protected void scheduleRankReturn(Vehicle veh){
+    	
+    	  Schedule sched = veh.getSchedule();
+    	  int currentTime = data.getTime();
+    	  int oldendtime;
+//          if (sched.getStatus() != ScheduleStatus.UNPLANNED) {// PLANNED or STARTED
+              WaitTask lastTask = (WaitTask)Schedules.getLastTask(sched);// only WAIT
+
+              
+              
+              switch (lastTask.getStatus()) {
+                  case PLANNED:
+                	  return;
+//                      if (lastTask.getBeginTime() == best.t1) { // waiting for 0 seconds!!!
+//                          sched.removeLastPlannedTask();// remove WaitTask
+//                      }
+//                      else {
+//                          // TODO actually this WAIT task will not be performed
+//                          // so maybe we can remove it right now?
+//
+//                          lastTask.setEndTime(best.t1);// shortening the WAIT task
+//                      }
+//                      break;
+
+                  case STARTED:
+                      oldendtime = lastTask.getEndTime();
+                	  lastTask.setEndTime(currentTime);// shortening the WAIT task
+                      
+                      break;
+
+                  case PERFORMED:
+                	  throw new IllegalStateException();
+                  default:
+                      throw new IllegalStateException();
+              }
+
+//          }
+
+          Vertex lastVertex = lastTask.getAtVertex();
+
+          if (veh.getDepot().getVertex() != lastVertex) {// not a loop
+        	  Arc darc = data.getVrpGraph().getArc(lastVertex, veh.getDepot().getVertex());
+        	  int arrivalTime = darc.getTimeOnDeparture(currentTime) + currentTime; 
+        	  
+              sched.addTask(new BackToRankTask(currentTime, arrivalTime, darc));
+              sched.addTask(new WaitTaskImpl(arrivalTime, oldendtime, veh.getDepot().getVertex()));
+          }
+
+
+    	
+    }
+    
+    public void updateIdlers(){
+    	this.shortTimeIdlers.clear();
+       	for (Vehicle veh : data.getVehicles()){
+ 		   Task last = Schedules.getLastTask(veh.getSchedule());	
+ 		if (last instanceof WaitTask ){
+ 			WaitTask lastw = (WaitTask) last;
+ 			if (!lastw.getAtVertex().equals(veh.getDepot().getVertex())){
+ 				this.shortTimeIdlers.add(veh.getId());
+ 				}
+ 			}
+ 			
+ 		}   
+    	
+    }
+    
+    public void sendIdlingTaxisToRank(int idletime){
+    	
+   for (Vehicle veh: data.getVehicles()){
+	   	if (shortTimeIdlers.contains(veh.getId())){
+		   Task last = Schedules.getLastTask(veh.getSchedule());	
+		   if (last instanceof WaitTask){
+			   scheduleRankReturn(veh);
+		   }
+	   	}	   
+   } 	
+   
+    	
+//    	int now = data.getTime();	
+//    		if (veh.getSchedule().getStatus() != ScheduleStatus.STARTED) {
+//                continue;
+//            }
+//    		
+//    		if (!veh.getSchedule().getCurrentTask().getType().equals(TaskType.WAIT)) continue;
+//    		Vertex currentVertex;
+//    		if (veh.getName().equals("5.7")) System.out.println("V "+veh.getName()+" on idle " + now);
+//    		
+//            Task currentTask = veh.getSchedule().getCurrentTask();
+//            if ((currentTask.getBeginTime()+idletime)>now){
+//                    currentVertex = ((WaitTask)currentTask).getAtVertex();
+//            		if (veh.getName().equals("5.7")) System.out.println("V "+veh.getName()+" on idle at " + currentVertex + " home "+veh.getDepot().getVertex());
+//
+//                 
+//    		if (currentVertex!=veh.getDepot().getVertex()){
+//    			System.out.println("Sending vehicle to Rank "+veh.getName() );
+//    			scheduleRankReturn(veh);
+//    		}
+//            
+//            }
+    	
+    	
+    }
+    
     @Override
     protected boolean updateBeforeNextTask(Vehicle vehicle)
     {

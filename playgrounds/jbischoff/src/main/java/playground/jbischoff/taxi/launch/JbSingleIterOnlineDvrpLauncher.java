@@ -85,7 +85,7 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
     	dirName = "Z:\\WinHome\\Docs\\svn-checkouts\\jbischoff\\jbmielec\\";
         netFileName = dirName + "network.xml";
         electricStatsFilename = dirName + "elstats.txt";
-        electricStatsDir = dirName +"electric_depots\\";
+        electricStatsDir = dirName +"electric_idledepots\\";
         plansFileName = dirName + "20.plans.xml.gz";
 
         taxiCustomersFileName = dirName + "taxiCustomers_05_pc.txt";

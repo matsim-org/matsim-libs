@@ -49,6 +49,7 @@ public class NOSRankTaxiOptimizer
     private IdleRankVehicleFinder idleVehicleFinder;
     private DepotArrivalDepartureCharger depotArrivalDepartureCharger;
 	private boolean rankmode;
+	private boolean idleRankMode;
 
     public NOSRankTaxiOptimizer(VrpData data, boolean destinationKnown, boolean straightLineDistance)
     {
@@ -61,6 +62,10 @@ public class NOSRankTaxiOptimizer
     public void setRankMode (boolean rankMode){
     	this.rankmode = rankMode;
     }
+    
+	public void setIdleRankMode(boolean b) {
+		this.idleRankMode = b;
+	}
 
     public void addDepotArrivalCharger(DepotArrivalDepartureCharger depotArrivalDepartureCharger){
     	this.depotArrivalDepartureCharger = depotArrivalDepartureCharger;
@@ -129,24 +134,40 @@ public class NOSRankTaxiOptimizer
         if ((this.rankmode)||(this.depotArrivalDepartureCharger.needsToReturnToRank(vid))){
         
         
-        if (reqToVertex != schedule.getVehicle().getDepot().getVertex()){
+        	if (reqToVertex != schedule.getVehicle().getDepot().getVertex()){
         	Arc darc = data.getVrpGraph().getArc(reqToVertex,schedule.getVehicle().getDepot().getVertex());
   		    startWaiting = startIdling + darc.getTimeOnDeparture(startIdling);
   		    schedule.addTask(new BackToRankTask(startIdling,startWaiting,darc));
-//  		    System.out.println("scheduled wait task Id"+ schedule.getVehicle().getName()+" start "+startWaiting + " end "+tEnd);
+//  		 System.out.println("scheduled wait task Id"+ schedule.getVehicle().getName()+" start "+startWaiting + " end "+tEnd);
   		    schedule.addTask(new WaitTaskImpl(startWaiting, tEnd, schedule.getVehicle().getDepot().getVertex()));
   		
         	
         	}
-        else{
+        else
+        {
             schedule.addTask(new WaitTaskImpl(startIdling, tEnd, reqToVertex));
         }
-        
         }
+//        else if (this.idleRankMode)
+//        {
+//        	int endOfMiniIdle = startIdling+60;
+//        	schedule.addTask(new WaitTaskImpl(startIdling,endOfMiniIdle, reqToVertex));
+//        	Arc darc = data.getVrpGraph().getArc(reqToVertex,schedule.getVehicle().getDepot().getVertex());
+//  		    startWaiting = endOfMiniIdle + darc.getTimeOnDeparture(startIdling);
+//  		 
+//  		    schedule.addTask(new BackToRankTask(endOfMiniIdle,startWaiting,darc));
+//  		    schedule.addTask(new WaitTaskImpl(startWaiting, tEnd, schedule.getVehicle().getDepot().getVertex()));
+//  		    System.out.println("rank visit scheduled for " + schedule.getVehicle().getName());
+//        }
+       
+        
+        
         else{
         schedule.addTask(new WaitTaskImpl(startIdling, tEnd, reqToVertex));
         }
     }
+
+
 
 
 

@@ -90,7 +90,7 @@ public class IdleRankVehicleFinder
             		}
             		if (veh.getSchedule().getCurrentTask().getBeginTime() < bestVeh.getSchedule().getCurrentTask().getBeginTime())
             		bestVeh= veh;
-            	           	
+            		//FIFO, if distance is equal	
             }
         }
 
