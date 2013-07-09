@@ -40,9 +40,6 @@ import org.matsim.core.gbl.Gbl;
 public class QSimEngineRunner extends NetElementActivator implements Runnable {
 
 	private double time = 0.0;
-	private boolean simulateAllNodes = false;
-	private boolean simulateAllLinks = false;
-	private boolean useNodeArray = false;
 
 	private volatile boolean simulationRunning = true;
 
@@ -50,7 +47,6 @@ public class QSimEngineRunner extends NetElementActivator implements Runnable {
 	private final CyclicBarrier separationBarrier;
 	private final CyclicBarrier endBarrier;
 
-	private QNode[] nodesArray = null;
 	private List<QNode> nodesList = null;
 	private List<QLinkInternalI> linksList = new ArrayList<QLinkInternalI>();
 
@@ -69,16 +65,10 @@ public class QSimEngineRunner extends NetElementActivator implements Runnable {
 	/** This is the collection of links that have to be activated in the current time step */
 	private final ArrayList<QLinkInternalI> linksToActivate = new ArrayList<QLinkInternalI>();
 	
-	/*package*/ QSimEngineRunner(boolean simulateAllNodes, boolean simulateAllLinks, CyclicBarrier startBarrier, CyclicBarrier separationBarrier, CyclicBarrier endBarrier) {
-		this.simulateAllNodes = simulateAllNodes;
-		this.simulateAllLinks = simulateAllLinks;
+	/*package*/ QSimEngineRunner(CyclicBarrier startBarrier, CyclicBarrier separationBarrier, CyclicBarrier endBarrier) {
 		this.startBarrier = startBarrier;
 		this.separationBarrier = separationBarrier;
 		this.endBarrier = endBarrier;
-	}
-
-	/*package*/ void setQNodeArray(QNode[] nodes) {
-		this.nodesArray = nodes;
 	}
 
 	/*package*/ void setQNodeList(List<QNode> nodes) {
@@ -124,21 +114,13 @@ public class QSimEngineRunner extends NetElementActivator implements Runnable {
 				/*
 				 * Move Nodes
 				 */
-				if (useNodeArray) {
-					for (QNode node : nodesArray) {
-						if (node.isActive() /*|| node.isSignalized()*/ || simulateAllNodes) {
-							node.doSimStep(time);
-						}
-					}
-				} else {
-					ListIterator<QNode> simNodes = this.nodesList.listIterator();
-					QNode node;
-
-					while (simNodes.hasNext()) {
-						node = simNodes.next();
-						node.doSimStep(time);
-						if (!node.isActive()) simNodes.remove();
-					}
+				ListIterator<QNode> simNodes = this.nodesList.listIterator();
+				QNode node;
+				
+				while (simNodes.hasNext()) {
+					node = simNodes.next();
+					node.doSimStep(time);
+					if (!node.isActive()) simNodes.remove();
 				}
 
 				/*
@@ -160,7 +142,7 @@ public class QSimEngineRunner extends NetElementActivator implements Runnable {
 
 					isActive = link.doSimStep(time);
 
-					if (!isActive && !simulateAllLinks) {
+					if (!isActive) {
 						simLinks.remove();
 					}
 				}
@@ -181,9 +163,7 @@ public class QSimEngineRunner extends NetElementActivator implements Runnable {
 
 	@Override
 	protected void activateLink(QLinkInternalI link) {
-		if (!simulateAllLinks) {
-			linksToActivate.add(link);
-		}
+		linksToActivate.add(link);
 	}
 
 	/*package*/ void activateLinks() {
@@ -198,22 +178,17 @@ public class QSimEngineRunner extends NetElementActivator implements Runnable {
 
 	@Override
 	protected void activateNode(QNode node) {
-		if (!useNodeArray && !simulateAllNodes) {
-			this.nodesToActivate.put(node.getNode().getId(), node);
-		}
+		this.nodesToActivate.put(node.getNode().getId(), node);
 	}
 
 	/*package*/ void activateNodes() {
-		if (!useNodeArray && !simulateAllNodes) {
-			this.nodesList.addAll(this.nodesToActivate.values());
-			this.nodesToActivate.clear();
-		}
+		this.nodesList.addAll(this.nodesToActivate.values());
+		this.nodesToActivate.clear();
 	}
 
 	@Override
 	public int getNumberOfSimulatedNodes() {
-		if (useNodeArray) return nodesArray.length;
-		else return nodesList.size();
+		return nodesList.size();
 	}
 
 	public NetsimNetworkFactory<QNode,QLinkInternalI> getNetsimNetworkFactory() {
