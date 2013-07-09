@@ -67,8 +67,8 @@ public class DgCb2Ks2010 {
 		String signalGroupsFilename = DgCottbusScenarioPaths.SIGNAL_GROUPS_FILENAME;
 		String signalControlFilename = DgCottbusScenarioPaths.SIGNAL_CONTROL_FIXEDTIME_FILENAME;
 		//TODO change to run1712 when finished
-//		String populationFilename = DgPaths.REPOS + "runs-svn/run1292/1292.output_plans_sample.xml";
-		String populationFilename = DgPaths.REPOS + "runs-svn/run1292/1292.output_plans.xml.gz";
+		String populationFilename = DgPaths.REPOS + "runs-svn/run1292/1292.output_plans_sample.xml";
+//		String populationFilename = DgPaths.REPOS + "runs-svn/run1292/1292.output_plans.xml.gz";
 		Scenario fullScenario = DgCb2Ks2010.loadScenario(networkFilename, populationFilename, lanesFilename, signalSystemsFilename, signalGroupsFilename, signalControlFilename);
 		String name = "run 1292 output plans between 05:30 and 09:30";
 		CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84_UTM33N);
@@ -77,6 +77,7 @@ public class DgCb2Ks2010 {
 		ScenarioShrinker scenarioShrinker = new ScenarioShrinker(fullScenario,  crs);
 		scenarioShrinker.shrinkScenario(outputDirectory, shapeFileDirectory, boundingBoxOffset);
 		
+	
 		PopulationToOd pop2od = new PopulationToOd();
 		pop2od.setMatsimPopSampleSize(matsimPopSampleSize);
 		pop2od.setOriginalToSimplifiedLinkMapping(scenarioShrinker.getOriginalToSimplifiedLinkIdMatching());
@@ -84,13 +85,13 @@ public class DgCb2Ks2010 {
 				cellsX, cellsY, startTime, endTime, shapeFileDirectory);
 		DgZones zones = pop2od.getZones();
 		
-		System.exit(0);
 		Scenario2KoehlerStrehler2010 converter = new Scenario2KoehlerStrehler2010(scenarioShrinker.getShrinkedNetwork(), 
 				scenarioShrinker.getShrinkedLanes(), scenarioShrinker.getShrinkedSignals(), crs);
 		converter.setKsModelCommoditySampleSize(ksModelCommoditySampleSize);
 		converter.convert(outputDirectory, name, zones, boundingBoxOffset, cellsX, cellsY, startTime, endTime);
 		
 		OutputDirectoryLogging.closeOutputDirLogging();		
+		System.exit(0);
 	}
 
 	private static String createShapeFileDirectory(String outputDirectory) {
