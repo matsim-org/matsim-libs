@@ -96,6 +96,7 @@
 		<module>parking</module>
 		<module>transEnergySim</module>
 		<module>roadpricing</module>
+		<module>multimodal</module>
 	</modules>
 	<repositories>
 		<repository>

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.router;
+package contrib.multimodal;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -30,13 +30,16 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.groups.MultiModalConfigGroup;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.router.LegRouterWrapper;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryImpl;
 import org.matsim.core.router.old.NetworkLegRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
 
@@ -48,32 +51,17 @@ public class MultimodalSimulationTripRouterFactory implements TripRouterFactory 
 	
 	protected static final Logger log = Logger.getLogger(MultimodalSimulationTripRouterFactory.class);
 	
-	private final TripRouterFactory delegateFactory;
-	private final Network network;
-	private final LeastCostPathCalculatorFactory leastCostAlgoFactory;
-	private final TravelDisutility travelDisutility;
-	private final MultiModalConfigGroup configGroup;
-	private final PopulationFactory populationFactory;
 	private final Map<String, TravelTime> multimodalTravelTimes;
 	private final Map<String, Network> multimodalSubNetworks;
 	private final Map<String, Set<String>> modeRestrictions;
+
+	private Controler controler;
 	
 	public MultimodalSimulationTripRouterFactory(
-			final Network network,
-			final PopulationFactory populationFactory,
-			final LeastCostPathCalculatorFactory leastCostAlgoFactory,
-			final TravelDisutility travelDisutility,
-			final Map<String, TravelTime> multimodalTravelTimes,
-			final MultiModalConfigGroup configGroup,
-			final TripRouterFactory delegateFactory) {
-		this.network = network;
-		this.populationFactory = populationFactory;
-		this.leastCostAlgoFactory = leastCostAlgoFactory;
-		this.configGroup = configGroup;
-		this.travelDisutility = travelDisutility;
+			final Controler controler,
+			final Map<String, TravelTime> multimodalTravelTimes) {
+		this.controler = controler;
 		this.multimodalTravelTimes = multimodalTravelTimes;
-		this.delegateFactory = delegateFactory;
-		
 		this.modeRestrictions = new HashMap<String, Set<String>>();
 		this.multimodalSubNetworks = new HashMap<String, Network>();
 		
@@ -141,14 +129,17 @@ public class MultimodalSimulationTripRouterFactory implements TripRouterFactory 
 	@Override
 	public TripRouter instantiateAndConfigureTripRouter() {
 		
-		/*
-		 * If a delegateFactory is set, use it to create a TripRouter. By doing so,
-		 * modes not simulated by the multi-modal simulation are also taken into account.
-		 */
-		TripRouter instance = null;
-		if (delegateFactory != null) instance = delegateFactory.instantiateAndConfigureTripRouter();
-		else instance = new TripRouter();
-					
+		final TripRouterFactory delegate =
+				new TripRouterFactoryImpl(
+					controler.getScenario(),
+					controler.getTravelDisutilityFactory(),
+					controler.getLinkTravelTimes(),
+					controler.getLeastCostPathCalculatorFactory(),
+					controler.getTransitRouterFactory() );
+		
+		TripRouter instance = delegate.instantiateAndConfigureTripRouter();
+		MultiModalConfigGroup configGroup = controler.getConfig().multiModal();			
+		
 		for (String mode : CollectionUtils.stringToArray( configGroup.getSimulatedModes() )) {
 			
 			if (instance.getRegisteredModes().contains(mode)) {
@@ -162,26 +153,27 @@ public class MultimodalSimulationTripRouterFactory implements TripRouterFactory 
 			Network subNetwork = multimodalSubNetworks.get(mode);
 			if (subNetwork == null) {
 				subNetwork = NetworkImpl.createNetwork();
-				TransportModeNetworkFilter networkFilter = new TransportModeNetworkFilter(this.network);
+				TransportModeNetworkFilter networkFilter = new TransportModeNetworkFilter(controler.getScenario().getNetwork());
 				networkFilter.filter(subNetwork, restrictions);
 				multimodalSubNetworks.put(mode, subNetwork);
 			}
 						
-			LeastCostPathCalculator routeAlgo =
-				leastCostAlgoFactory.createPathCalculator(
+			
+			
+			LeastCostPathCalculator routeAlgo = controler.getLeastCostPathCalculatorFactory().createPathCalculator(
 						subNetwork,
-						travelDisutility,
+						controler.getTravelDisutilityFactory().createTravelDisutility(multimodalTravelTimes.get(mode), controler.getConfig().planCalcScore()),
 						multimodalTravelTimes.get(mode));
 
 			instance.setRoutingModule(
 					mode,
 					new LegRouterWrapper(
 						mode,
-						populationFactory,
+						controler.getScenario().getPopulation().getFactory(),
 						new NetworkLegRouter(
 							subNetwork,
 							routeAlgo,
-							((PopulationFactoryImpl) populationFactory).getModeRouteFactory())));
+							((PopulationFactoryImpl) controler.getScenario().getPopulation().getFactory()).getModeRouteFactory())));
 		}
 
 		return instance;

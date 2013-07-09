@@ -64,13 +64,7 @@ import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.ObservableMobsim;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulationFactory;
-import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.MultiModalDepartureHandler;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.MultiModalSimEngine;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.MultiModalSimEngineFactory;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.MultiModalTravelTimeFactory;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.tools.PrepareMultiModalScenario;
 import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
@@ -78,7 +72,6 @@ import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.router.LinkToLinkTripRouterFactory;
-import org.matsim.core.router.MultimodalSimulationTripRouterFactory;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryImpl;
@@ -206,7 +199,6 @@ public class Controler extends AbstractController {
 	
 	protected boolean dumpDataAtEnd = true;
 	private boolean overwriteFiles = false;
-	private Map<String, TravelTime> multiModalTravelTimes;
 
 	private final boolean useTripRouting = true;
 	public static void main(final String[] args) {
@@ -503,23 +495,6 @@ public class Controler extends AbstractController {
 		// yyyy cannot make this final since it is overridden at about 25 locations.  kai, jan'13
 		
 		this.travelTimeCalculator = this.travelTimeCalculatorFactory.createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
-	
-		if (this.config.multiModal().isMultiModalSimulationEnabled()) {
-
-			/*
-			 * Outsourced some code. This should be removed when the multi-modal
-			 * simulation has become contrib.
-			 * cdobler, jun'13
-			 */
-			PrepareMultiModalScenario.run(this.scenarioData);
-			
-			/*
-			 * This should also be removed.
-			 * cdobler, jun'13
-			 */	
-			MultiModalTravelTimeFactory multiModalTravelTimeFactory = new MultiModalTravelTimeFactory(this.config);
-			this.multiModalTravelTimes = multiModalTravelTimeFactory.createTravelTimes();		}
-	
 		this.events.addHandler(this.travelTimeCalculator);
 	
 		if (this.leastCostPathCalculatorFactory != null) {
@@ -558,17 +533,6 @@ public class Controler extends AbstractController {
 					getLinkTravelTimes(),
 					getLeastCostPathCalculatorFactory(),
 					getScenario().getConfig().scenario().isUseTransit() ? getTransitRouterFactory() : null);
-	
-			if ( config.multiModal().isMultiModalSimulationEnabled() ) {
-				tripRouterFactory = new MultimodalSimulationTripRouterFactory(
-						network,
-						population.getFactory(),
-						getLeastCostPathCalculatorFactory(),
-						createTravelDisutilityCalculator(),
-						multiModalTravelTimes,
-						config.multiModal(),
-						tripRouterFactory);
-			}
 	
 			if (this.getScenario().getConfig().controler().isLinkToLinkRoutingEnabled()) {
 				tripRouterFactory = new LinkToLinkTripRouterFactory(
@@ -670,19 +634,7 @@ public class Controler extends AbstractController {
 				((ObservableMobsim) simulation).addQueueSimulationListeners(manager);
 			}
 		}
-		if (simulation instanceof QSim) {
-			// The QSim may need a multiModalSimEngine, which needs travel times, which are kept from iteration to iteration by the Controler.
-			// One day, we may create a dynamic equivalent to the Scenario, which things like Mobsims have access to 
-			// (and which would then also contain the Plan database).
-			// But until then, this is too special for my taste to put into the MobsimFactory interface, so we add it here in passing.  mz 2012-03
-			if (config.multiModal().isMultiModalSimulationEnabled()) {
-				log.info("Using MultiModalMobsim...");
-				QSim qSim = (QSim) simulation;
-				MultiModalSimEngine multiModalEngine = new MultiModalSimEngineFactory().createMultiModalSimEngine(qSim, this.multiModalTravelTimes);
-				qSim.addMobsimEngine(multiModalEngine);
-				qSim.addDepartureHandler(new MultiModalDepartureHandler(multiModalEngine, config.multiModal()));
-			}
-		}
+
 	}
 
 	public final void removeControlerListener(final ControlerListener l) {
@@ -986,8 +938,9 @@ public class Controler extends AbstractController {
 		this.transitRouterFactory = transitRouterFactory;
 	}
 
+	// Currently under removal, jul '13
 	public final Map<String, TravelTime> getMultiModalTravelTimes() {
-		return this.multiModalTravelTimes;
+		return null;
 	}
 
 }
