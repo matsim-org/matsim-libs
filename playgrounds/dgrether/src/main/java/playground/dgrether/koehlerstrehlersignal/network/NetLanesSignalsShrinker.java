@@ -37,6 +37,8 @@ import org.matsim.signalsystems.data.SignalsScenarioWriter;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
+import playground.dgrether.lanes.LanesConsistencyChecker;
+import playground.dgrether.signalsystems.data.consistency.SignalSystemsDataConsistencyChecker;
 import playground.dgrether.signalsystems.utils.DgSignalsBoundingBox;
 import playground.dgrether.signalsystems.utils.DgSignalsUtils;
 
@@ -45,7 +47,6 @@ import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * @author dgrether
- *
  */
 public class NetLanesSignalsShrinker {
 	
@@ -113,7 +114,11 @@ public class NetLanesSignalsShrinker {
 		this.shrinkedLanes = this.fullScenario.getScenarioElement(LaneDefinitions20.class);
 		this.shrinkedSignals = this.fullScenario.getScenarioElement(SignalsData.class);
 		
+		LanesConsistencyChecker lanesConsistency = new LanesConsistencyChecker(smallNetwork, shrinkedLanes);
+		lanesConsistency.checkConsistency();
 		
+		SignalSystemsDataConsistencyChecker signalsConsistency = new SignalSystemsDataConsistencyChecker(this.shrinkedNetwork, this.shrinkedLanes, this.shrinkedSignals);
+		signalsConsistency.checkConsistency();
 
 		//write shrunk data to disk
 		String simplifiedNetworkFile = outputDirectory + simplifiedNetworkFilename;

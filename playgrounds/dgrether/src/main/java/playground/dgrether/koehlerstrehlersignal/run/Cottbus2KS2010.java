@@ -67,15 +67,16 @@ public class Cottbus2KS2010 {
 	//private static double startTime = 13.5 * 3600.0;
 	//private static double endTime = 18.5 * 3600.0;
 		double matsimPopSampleSize = 1.0;
-		double ksModelCommoditySampleSize = 0.01;
+		double ksModelCommoditySampleSize = 1.0;
+		double minCommodityFlow = 100.0;
 		String networkFilename = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network_wgs84_utm33n.xml.gz";
 		String lanesFilename = DgCottbusScenarioPaths.LANES_FILENAME;
 		String signalSystemsFilename = DgPaths.REPOS +  "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_systems.xml";
 		String signalGroupsFilename = DgCottbusScenarioPaths.SIGNAL_GROUPS_FILENAME;
 		String signalControlFilename = DgCottbusScenarioPaths.SIGNAL_CONTROL_FIXEDTIME_FILENAME;
 		//TODO change to run1712 when finished
-		String populationFilename = DgPaths.REPOS + "runs-svn/run1292/1292.output_plans_sample.xml";
-//		String populationFilename = DgPaths.REPOS + "runs-svn/run1292/1292.output_plans.xml.gz";
+//		String populationFilename = DgPaths.REPOS + "runs-svn/run1292/1292.output_plans_sample.xml";
+		String populationFilename = DgPaths.REPOS + "runs-svn/run1292/1292.output_plans.xml.gz";
 		String name = "run 1292 output plans between 05:30 and 09:30";
 		CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84_UTM33N);
 		final String outputDirectory = DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/test_tt/";
@@ -104,8 +105,10 @@ public class Cottbus2KS2010 {
 		//convert to KoehlerStrehler2010 file format
 		M2KS2010Converter converter = new M2KS2010Converter(scenarioShrinker.getShrinkedNetwork(), 
 				scenarioShrinker.getShrinkedLanes(), scenarioShrinker.getShrinkedSignals());
-		String description = createDescription(cellsX, cellsY, startTime, endTime, boundingBoxOffset, matsimPopSampleSize, ksModelCommoditySampleSize);
+		String description = createDescription(cellsX, cellsY, startTime, endTime, boundingBoxOffset, 
+				matsimPopSampleSize, ksModelCommoditySampleSize, minCommodityFlow);
 		converter.setKsModelCommoditySampleSize(ksModelCommoditySampleSize);
+		converter.setMinCommodityFlow(minCommodityFlow);
 		converter.convert(outputDirectory, shapeFileDirectory, name, description, zones2LinkMap, startTime, endTime);
 		
 		printStatistics(cellsX, cellsY, boundingBoxOffset, startTime, endTime);
@@ -113,9 +116,11 @@ public class Cottbus2KS2010 {
 		System.exit(0);
 	}
 	
-	private static String createDescription(int cellsX, int cellsY, double startTime, double endTime, double boundingBoxOffset, double matsimPopSampleSize, double ksModelCommoditySampleSize){
+	private static String createDescription(int cellsX, int cellsY, double startTime, double endTime, double boundingBoxOffset, double matsimPopSampleSize, 
+			double ksModelCommoditySampleSize, double minCommodityFlow){
 		String description = "offset: " + boundingBoxOffset + "cellsX: " + cellsX + " cellsY: " + cellsY + " startTimeSec: " + startTime + " endTimeSec: " + endTime;
-		description += "matsimPopsampleSize: " + matsimPopSampleSize + " ksModelCommoditySampleSize: " + ksModelCommoditySampleSize;
+		description += " matsimPopsampleSize: " + matsimPopSampleSize + " ksModelCommoditySampleSize: " + ksModelCommoditySampleSize;
+		description += " minimum flow of commodities to be included in conversion: " + minCommodityFlow;
 		return description;
 	}
 

@@ -592,7 +592,7 @@ public class PoznanNetwork
                 scenario.getLaneDefinitions11(), scenario.getNetwork());
         LanesConsistencyChecker lcc = new LanesConsistencyChecker(scenario.getNetwork(), lanes20);
         lcc.checkConsistency();
-        SignalSystemsDataConsistencyChecker sscc = new SignalSystemsDataConsistencyChecker(scenario);
+        SignalSystemsDataConsistencyChecker sscc = new SignalSystemsDataConsistencyChecker(scenario.getNetwork(), lanes20, scenario.getScenarioElement(SignalsData.class));
         sscc.checkConsistency();
 
         SignalGroupsDataConsistencyChecker sgcc = new SignalGroupsDataConsistencyChecker(scenario);

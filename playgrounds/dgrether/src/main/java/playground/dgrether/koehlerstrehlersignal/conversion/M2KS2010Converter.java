@@ -20,8 +20,10 @@
 package playground.dgrether.koehlerstrehlersignal.conversion;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -70,6 +72,8 @@ public class M2KS2010Converter {
 
 	private SignalsData signals;
 
+	private double minCommodityFlow;
+
 	
 	public M2KS2010Converter(Network network, LaneDefinitions20 lanes,
 			SignalsData signals) {
@@ -101,14 +105,30 @@ public class M2KS2010Converter {
 			}
 		}
 		
+		Set<Id> commoditiesToRemove = new HashSet<Id>();
+		for (DgCommodity com : commodities.getCommodities().values()){
+			if (com.getFlow() < minCommodityFlow){
+				commoditiesToRemove.add(com.getId());
+			}
+		}
+		for (Id id : commoditiesToRemove){
+			commodities.getCommodities().remove(id);
+			log.info("Removed commodity id " + id + " because flow is less than " + minCommodityFlow);
+		}
+		
+		// convert the KS2010 network back to the matsim format for debugging and visualization
 		Network newMatsimNetwork = new DgKSNet2MatsimNet().convertNetwork(ksNet);
 		DgKS2010Router router = new DgKS2010Router();
 		List<Id> invalidCommodities = router.routeCommodities(newMatsimNetwork, commodities);
 		for (Id id : invalidCommodities) {
 			commodities.getCommodities().remove(id);
+			log.warn("removed commodity id : " + id + " because it can not be routed on the network.");
 		}
 		log.info("testing routing again...");
-		router.routeCommodities(newMatsimNetwork, commodities);
+		invalidCommodities = router.routeCommodities(newMatsimNetwork, commodities);
+		if (! invalidCommodities.isEmpty()){
+			throw new IllegalStateException("Commodities that can not be routed still exist");
+		}
 		
 		DgNetworkUtils.writeNetwork(newMatsimNetwork, outputDirectory + "matsim_network_ks_model.xml.gz");
 		DgNetworkUtils.writeNetwork2Shape(newMatsimNetwork, shapeFileDirectory + "matsim_network_ks_model.shp");
@@ -145,6 +165,11 @@ public class M2KS2010Converter {
 	
 	public void setKsModelCommoditySampleSize(double ksModelCommoditySampleSize) {
 		this.ksModelCommoditySampleSize = ksModelCommoditySampleSize;
+	}
+
+
+	public void setMinCommodityFlow(double minCommodityFlow) {
+		this.minCommodityFlow = minCommodityFlow;
 	}
 
 

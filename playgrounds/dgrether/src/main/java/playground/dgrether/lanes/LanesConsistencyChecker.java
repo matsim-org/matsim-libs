@@ -38,14 +38,12 @@ import org.matsim.lanes.data.v20.LaneData20;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 
-import playground.dgrether.designdrafts.consistency.ConsistencyChecker;
-
 
 /**
+ * 
  * @author dgrether
- *
  */
-public class LanesConsistencyChecker implements ConsistencyChecker{
+public class LanesConsistencyChecker {
   
 	private static final Logger log = Logger.getLogger(LanesConsistencyChecker.class);
 	private Network network;
@@ -57,7 +55,6 @@ public class LanesConsistencyChecker implements ConsistencyChecker{
 		this.lanes = laneDefs;
 	}
 	
-	@Override
 	public void checkConsistency() {
 		log.info("checking consistency...");
 		List<Id> malformedLinkIds = new ArrayList<Id>();
