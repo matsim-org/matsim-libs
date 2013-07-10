@@ -68,7 +68,7 @@ public class Cottbus2KS2010 {
 	//private static double endTime = 18.5 * 3600.0;
 		double matsimPopSampleSize = 1.0;
 		double ksModelCommoditySampleSize = 1.0;
-		double minCommodityFlow = 100.0;
+		double minCommodityFlow = 120.0;
 		String networkFilename = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network_wgs84_utm33n.xml.gz";
 		String lanesFilename = DgCottbusScenarioPaths.LANES_FILENAME;
 		String signalSystemsFilename = DgPaths.REPOS +  "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_systems.xml";
@@ -79,7 +79,7 @@ public class Cottbus2KS2010 {
 		String populationFilename = DgPaths.REPOS + "runs-svn/run1292/1292.output_plans.xml.gz";
 		String name = "run 1292 output plans between 05:30 and 09:30";
 		CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84_UTM33N);
-		final String outputDirectory = DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/test_tt/";
+		final String outputDirectory = DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-07-10_test/";
 		
 		// run
 		OutputDirectoryLogging.initLoggingWithOutputDirectory(outputDirectory);
