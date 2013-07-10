@@ -48,9 +48,7 @@ import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
  *         track the average density and flow inside a link
  * 
  */
-public class FlowAndDensityCollector implements LinkLeaveEventHandler,
-		LinkEnterEventHandler, AgentArrivalEventHandler,
-		AgentWait2LinkEventHandler {
+public class FlowAndDensityCollector implements LinkLeaveEventHandler, LinkEnterEventHandler, AgentArrivalEventHandler, AgentWait2LinkEventHandler {
 	private int binSizeInSeconds; // set the length of interval
 	private HashMap<Id, int[]> linkOutFlow; // define
 	private HashMap<Id, int[]> linkInFlow;
@@ -65,8 +63,7 @@ public class FlowAndDensityCollector implements LinkLeaveEventHandler,
 	// personId, linkId
 	private HashMap<Id, Id> lastEnteredLink = new HashMap<Id, Id>(); // define
 
-	public FlowAndDensityCollector(
-			Map<Id, ? extends Link> filteredEquilNetLinks, int binSizeInSeconds) {
+	public FlowAndDensityCollector(Map<Id, ? extends Link> filteredEquilNetLinks, int binSizeInSeconds) {
 		this.filteredEquilNetLinks = filteredEquilNetLinks;
 		this.binSizeInSeconds = binSizeInSeconds;
 	}
@@ -124,8 +121,7 @@ public class FlowAndDensityCollector implements LinkLeaveEventHandler,
 			// size the array to number of intervals
 			linkInFlow.put(linkId, new int[(86400 / binSizeInSeconds) + 1]);
 			linkOutFlow.put(linkId, new int[(86400 / binSizeInSeconds) + 1]);
-			avgDeltaFlow
-					.put(linkId, new double[(86400 / binSizeInSeconds) + 1]);
+			avgDeltaFlow.put(linkId, new double[(86400 / binSizeInSeconds) + 1]);
 			// start tracking the number of vehicles on this link
 			deltaFlow.put(linkId, new TreeMap<Integer, Integer>());
 			TreeMap<Integer, Integer> df = deltaFlow.get(linkId);
@@ -139,8 +135,8 @@ public class FlowAndDensityCollector implements LinkLeaveEventHandler,
 		int binIndex = (int) Math.round(Math.floor(time / binSizeInSeconds));
 
 		if (time < 86400) {
-//			increment the number of vehicles entering this link
-			inBins[binIndex] = inBins[binIndex] + 1; 
+			// increment the number of vehicles entering this link
+			inBins[binIndex] = inBins[binIndex] + 1;
 			if (binIndex == lastBinIndex) {
 				int lastDelta = deltaFlow.get(linkId).lastEntry().getValue();
 				deltaFlow.get(linkId).put((int) time, lastDelta + 1);
@@ -153,8 +149,7 @@ public class FlowAndDensityCollector implements LinkLeaveEventHandler,
 		}
 	}
 
-	private void calculateAverageDeltaFlowsAndReinitialize(double time,
-			int binIndex) {
+	private void calculateAverageDeltaFlowsAndReinitialize(double time, int binIndex) {
 
 		for (Id id : deltaFlow.keySet()) {
 			ArrayList<Integer> times = new ArrayList<Integer>();
@@ -169,9 +164,12 @@ public class FlowAndDensityCollector implements LinkLeaveEventHandler,
 			for (int t = times.size() - 1; t >= 0; t--) {
 				lastDelta = deltaFlow.get(id).get(times.get(t));
 				weightedLevel += lastDelta * (endTime - times.get(t));
+				endTime = times.get(t);
 			}
-			avgDeltaFlow.get(id)[binIndex] = weightedLevel
-					/ (double) binSizeInSeconds;
+			avgDeltaFlow.get(id)[binIndex] = weightedLevel / (double) binSizeInSeconds;
+			// store the last delta and initialize the new structure with this
+			// value
+			lastDelta = deltaFlow.get(id).floorEntry((int) time).getValue();
 			deltaFlow.get(id).clear();
 			deltaFlow.get(id).put((int) time, lastDelta);
 		}
@@ -188,10 +186,8 @@ public class FlowAndDensityCollector implements LinkLeaveEventHandler,
 
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
-		if (lastEnteredLink.containsKey(event.getPersonId())
-				&& lastEnteredLink.get(event.getPersonId()) != null) {
-			if (lastEnteredLink.get(event.getPersonId()).equals(
-					event.getLinkId())) {
+		if (lastEnteredLink.containsKey(event.getPersonId()) && lastEnteredLink.get(event.getPersonId()) != null) {
+			if (lastEnteredLink.get(event.getPersonId()).equals(event.getLinkId())) {
 				linkLeave(event.getLinkId(), event.getTime());
 				lastEnteredLink.put(event.getPersonId(), null); // reset value
 			}
@@ -209,40 +205,4 @@ public class FlowAndDensityCollector implements LinkLeaveEventHandler,
 		return avgDeltaFlow;
 	}
 
-	// class TimeAndLevel {
-	// private LinkedList<Integer> times;
-	// public TimeAndLevel(int key, int value) {
-	// super();
-	// this.times = new LinkedList<Integer>();
-	// this.values = new LinkedList<Integer>();
-	// times.add(key);
-	// values.add(value);
-	// }
-	//
-	// private LinkedList<Integer> values;
-	//
-	// public void put(int key, int value) {
-	// try {
-	// int idx = times.indexOf(key);
-	// values.set(idx, value);
-	// } catch (Exception e) {
-	// times.add(key);
-	// values.add(value);
-	//
-	// }
-	// }
-	//
-	// public int get(int key) {
-	// int idx = times.indexOf(key);
-	// return values.get(idx);
-	// }
-	//
-	// public LinkedList<Integer> getTimes() {
-	// return times;
-	// }
-	//
-	// public LinkedList<Integer> getValues() {
-	// return values;
-	// }
-	// }
 }

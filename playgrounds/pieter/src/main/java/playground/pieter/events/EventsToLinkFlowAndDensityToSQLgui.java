@@ -115,11 +115,10 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 
-					EventsToLinkFlowAndDensityToSQLgui frame = new EventsToLinkFlowAndDensityToSQLgui();
-					frame.setVisible(true);
-					frame.loadDefaultProperties(new File(
-							frame.eventsToLinkFlowAndDensityToSQLPropertiesFileComponent
-									.getText()));
+				EventsToLinkFlowAndDensityToSQLgui frame = new EventsToLinkFlowAndDensityToSQLgui();
+				frame.setVisible(true);
+				frame.loadDefaultProperties(new File(frame.eventsToLinkFlowAndDensityToSQLPropertiesFileComponent
+						.getText()));
 
 			}
 		});
@@ -138,11 +137,9 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 		setContentPane(contentPane);
 		GridBagLayout gbl_contentPane = new GridBagLayout();
 		gbl_contentPane.columnWidths = new int[] { 268, 500 };
-		gbl_contentPane.rowHeights = new int[] { 20, 20, 20, 20, 20, 40, 0, 30,
-				20, 23, 0 };
+		gbl_contentPane.rowHeights = new int[] { 20, 20, 20, 20, 20, 40, 0, 30, 20, 23, 0 };
 		gbl_contentPane.columnWeights = new double[] { 1.0, 1.0 };
-		gbl_contentPane.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0,
-				1.0, 1.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
+		gbl_contentPane.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, Double.MIN_VALUE };
 		contentPane.setLayout(gbl_contentPane);
 
 		JLabel lblFillFromProperties = new JLabel("Fill from properties file");
@@ -154,32 +151,26 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 		contentPane.add(lblFillFromProperties, gbc_lblFillFromProperties);
 
 		eventsToLinkFlowAndDensityToSQLPropertiesFileComponent = new JTextField();
-		eventsToLinkFlowAndDensityToSQLPropertiesFileComponent
-				.addMouseListener(new MouseAdapter() {
-					@Override
-					public void mouseClicked(MouseEvent e) {
-						File defaultPropertiesFile = fileSelect(
-								eventsToLinkFlowAndDensityToSQLPropertiesFileComponent
-										.getText(), "Select properties file");
-						eventsToLinkFlowAndDensityToSQLPropertiesFileComponent
-								.setText(defaultPropertiesFile.getPath());
-						loadDefaultProperties(defaultPropertiesFile);
-					}
-				});
-		eventsToLinkFlowAndDensityToSQLPropertiesFileComponent
-				.setText("./eventsToLinkFlowAndDensityToSQL.properties");
+		eventsToLinkFlowAndDensityToSQLPropertiesFileComponent.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				File defaultPropertiesFile = fileSelect(
+						eventsToLinkFlowAndDensityToSQLPropertiesFileComponent.getText(), "Select properties file");
+				eventsToLinkFlowAndDensityToSQLPropertiesFileComponent.setText(defaultPropertiesFile.getPath());
+				loadDefaultProperties(defaultPropertiesFile);
+			}
+		});
+		eventsToLinkFlowAndDensityToSQLPropertiesFileComponent.setText("./eventsToLinkFlowAndDensityToSQL.properties");
 		GridBagConstraints gbc_txtDataeventstosqlproperties = new GridBagConstraints();
 		gbc_txtDataeventstosqlproperties.anchor = GridBagConstraints.NORTH;
 		gbc_txtDataeventstosqlproperties.fill = GridBagConstraints.HORIZONTAL;
 		gbc_txtDataeventstosqlproperties.insets = new Insets(0, 0, 5, 0);
 		gbc_txtDataeventstosqlproperties.gridx = 1;
 		gbc_txtDataeventstosqlproperties.gridy = 0;
-		contentPane.add(eventsToLinkFlowAndDensityToSQLPropertiesFileComponent,
-				gbc_txtDataeventstosqlproperties);
+		contentPane.add(eventsToLinkFlowAndDensityToSQLPropertiesFileComponent, gbc_txtDataeventstosqlproperties);
 		eventsToLinkFlowAndDensityToSQLPropertiesFileComponent.setColumns(10);
 
-		JLabel lblSchemaName = new JLabel(
-				"Schema name for SQL/output path for CSVs");
+		JLabel lblSchemaName = new JLabel("Schema name for SQL/output path for CSVs");
 		lblSchemaName.setHorizontalAlignment(SwingConstants.LEFT);
 		GridBagConstraints gbc_lblSchemaName = new GridBagConstraints();
 		gbc_lblSchemaName.anchor = GridBagConstraints.WEST;
@@ -211,8 +202,7 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 		networkFileComponent.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				networkFileComponent.setText(fileSelect(
-						networkFileComponent.getText(), "select network file")
+				networkFileComponent.setText(fileSelect(networkFileComponent.getText(), "select network file")
 						.getPath());
 			}
 		});
@@ -226,24 +216,20 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 		contentPane.add(networkFileComponent, gbc_networkFile);
 		networkFileComponent.setColumns(10);
 
-		JLabel lblpropertiesForPostgresql = new JLabel(
-				".properties for postgresql (leave empty for CSV)");
+		JLabel lblpropertiesForPostgresql = new JLabel(".properties for postgresql (leave empty for CSV)");
 		GridBagConstraints gbc_lblpropertiesForPostgresql = new GridBagConstraints();
 		gbc_lblpropertiesForPostgresql.anchor = GridBagConstraints.WEST;
 		gbc_lblpropertiesForPostgresql.insets = new Insets(0, 0, 5, 5);
 		gbc_lblpropertiesForPostgresql.gridx = 0;
 		gbc_lblpropertiesForPostgresql.gridy = 3;
-		contentPane.add(lblpropertiesForPostgresql,
-				gbc_lblpropertiesForPostgresql);
+		contentPane.add(lblpropertiesForPostgresql, gbc_lblpropertiesForPostgresql);
 
 		postgresPropertiesComponent = new JTextField();
 		postgresPropertiesComponent.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				postgresPropertiesComponent.setText(fileSelect(
-						postgresPropertiesComponent.getText(),
-						"select PostgreSQL connection properties file")
-						.getPath());
+				postgresPropertiesComponent.setText(fileSelect(postgresPropertiesComponent.getText(),
+						"select PostgreSQL connection properties file").getPath());
 
 			}
 		});
@@ -269,9 +255,7 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 		eventsFileComponent.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
-				eventsFileComponent.setText(fileSelect(
-						eventsFileComponent.getText(), "select events file")
-						.getPath());
+				eventsFileComponent.setText(fileSelect(eventsFileComponent.getText(), "select events file").getPath());
 			}
 		});
 		eventsFileComponent.setText("./");
@@ -307,10 +291,10 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 
 		JTextPane txtpnCentreCoordinateIf = new JTextPane();
 		txtpnCentreCoordinateIf.setEditable(false);
-		txtpnCentreCoordinateIf.setBackground(UIManager
-				.getColor("Panel.background"));
+		txtpnCentreCoordinateIf.setBackground(UIManager.getColor("Panel.background"));
 		txtpnCentreCoordinateIf
-				.setText("Centre coordinate if you want to only process a subset of links within a certain radius from this coord. Leaving these fields empty will process the entire network.");
+				.setText("Centre coordinate if you want to only process a subset of links within a certain radius from this coord. "
+						+ "Leaving these fields empty will process the entire network.");
 		GridBagConstraints gbc_txtpnCentreCoordinateIf = new GridBagConstraints();
 		gbc_txtpnCentreCoordinateIf.insets = new Insets(0, 0, 5, 5);
 		gbc_txtpnCentreCoordinateIf.fill = GridBagConstraints.BOTH;
@@ -380,8 +364,7 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 		panel.add(radiusComponent, gbc_radiusComponent);
 		radiusComponent.setColumns(10);
 
-		JLabel lblBinSizeFor = new JLabel(
-				"Bin size for analysis (seconds) - CAREFUL!");
+		JLabel lblBinSizeFor = new JLabel("Bin size for analysis (seconds) - CAREFUL!");
 		GridBagConstraints gbc_lblBinSizeFor = new GridBagConstraints();
 		gbc_lblBinSizeFor.anchor = GridBagConstraints.WEST;
 		gbc_lblBinSizeFor.insets = new Insets(0, 0, 5, 5);
@@ -399,8 +382,7 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 		contentPane.add(binSizeComponent, gbc_binSizeComponent);
 		binSizeComponent.setColumns(10);
 
-		JLabel lblTableNameSuffix = new JLabel(
-				"Table name suffix (to distinguish between runs)");
+		JLabel lblTableNameSuffix = new JLabel("Table name suffix (to distinguish between runs)");
 		GridBagConstraints gbc_lblTableNameSuffix = new GridBagConstraints();
 		gbc_lblTableNameSuffix.anchor = GridBagConstraints.WEST;
 		gbc_lblTableNameSuffix.insets = new Insets(0, 0, 5, 5);
@@ -434,8 +416,7 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 		gbc_btnSaveAsDefault.gridy = 9;
 		contentPane.add(btnSaveAsDefault, gbc_btnSaveAsDefault);
 
-		JButton btnStartEventsProcessing = new JButton(
-				"START EVENTS PROCESSING");
+		JButton btnStartEventsProcessing = new JButton("START EVENTS PROCESSING");
 		btnStartEventsProcessing.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -460,35 +441,22 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 	public void saveDefaultProperties() {
 		this.defaultProperties = new Properties();
 
-		this.defaultProperties.setProperty("schemaName",
-				schemaNameComponent.getText());
-		this.defaultProperties.setProperty("postgresProperties",
-				postgresPropertiesComponent.getText());
-		this.defaultProperties.setProperty("tableSuffix",
-				tableSuffixComponent.getText());
-		this.defaultProperties.setProperty("networkFile",
-				networkFileComponent.getText());
-		this.defaultProperties.setProperty("eventsFile",
-				eventsFileComponent.getText());
-		this.defaultProperties.setProperty("comment",
-				commentComponent.getText());
+		this.defaultProperties.setProperty("schemaName", schemaNameComponent.getText());
+		this.defaultProperties.setProperty("postgresProperties", postgresPropertiesComponent.getText());
+		this.defaultProperties.setProperty("tableSuffix", tableSuffixComponent.getText());
+		this.defaultProperties.setProperty("networkFile", networkFileComponent.getText());
+		this.defaultProperties.setProperty("eventsFile", eventsFileComponent.getText());
+		this.defaultProperties.setProperty("comment", commentComponent.getText());
 		this.defaultProperties.setProperty("radius", radiusComponent.getText());
-		this.defaultProperties.setProperty("centreXCoord",
-				centreXCoordComponent.getText());
-		this.defaultProperties.setProperty("centreYCoord",
-				centreYCoordComponent.getText());
-		this.defaultProperties.setProperty("binSize",
-				binSizeComponent.getText());
+		this.defaultProperties.setProperty("centreXCoord", centreXCoordComponent.getText());
+		this.defaultProperties.setProperty("centreYCoord", centreYCoordComponent.getText());
+		this.defaultProperties.setProperty("binSize", binSizeComponent.getText());
 		try {
-			this.defaultProperties.store(
-					new FileOutputStream(new File(
-							eventsToLinkFlowAndDensityToSQLPropertiesFileComponent
-									.getText())), "");
+			this.defaultProperties.store(new FileOutputStream(new File(
+					eventsToLinkFlowAndDensityToSQLPropertiesFileComponent.getText())), "");
 		} catch (FileNotFoundException e) {
 
-			fileSelect(
-					eventsToLinkFlowAndDensityToSQLPropertiesFileComponent
-							.getText(),
+			fileSelect(eventsToLinkFlowAndDensityToSQLPropertiesFileComponent.getText(),
 					"Path not found. Enter proerties filename.");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
@@ -496,9 +464,8 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 		}
 	}
 
-	public void runEventsProcessing() throws InstantiationException,
-			IllegalAccessException, ClassNotFoundException, IOException,
-			SQLException {
+	public void runEventsProcessing() throws InstantiationException, IllegalAccessException, ClassNotFoundException,
+			IOException, SQLException {
 		String networkFile = networkFileComponent.getText();
 		String eventsFile = eventsFileComponent.getText();
 		String x = centreXCoordComponent.getText();
@@ -522,17 +489,23 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 		// Coord center=new CoordImpl(0,0);
 		// boolean isOldEventFile=false;
 
-		links = NetworkReadExample.getNetworkLinks(
-				networkFile, center, radiusInMeters);// input/set center and
-														// radius
-//		InFlowInfoCollectorWithPt inflowHandler = new InFlowInfoCollectorWithPt(
-//				links, isOldEventFile, binSizeInSeconds);
-//		OutFlowInfoCollectorWithPt outflowHandler = new OutFlowInfoCollectorWithPt(
-//				links, isOldEventFile, binSizeInSeconds);// "links" makes run
-//															// faster
-//
-//		inflowHandler.reset(0);
-//		outflowHandler.reset(0);
+		links = NetworkReadExample.getNetworkLinks(networkFile, center, radiusInMeters);// input/set
+																						// center
+																						// and
+																						// radius
+																						// InFlowInfoCollectorWithPt
+																						// inflowHandler
+																						// =
+																						// new
+																						// InFlowInfoCollectorWithPt(
+		// links, isOldEventFile, binSizeInSeconds);
+		// OutFlowInfoCollectorWithPt outflowHandler = new
+		// OutFlowInfoCollectorWithPt(
+		// links, isOldEventFile, binSizeInSeconds);// "links" makes run
+		// // faster
+		//
+		// inflowHandler.reset(0);
+		// outflowHandler.reset(0);
 		FlowAndDensityCollector flowAndDensityCollector = new FlowAndDensityCollector(links, binSizeInSeconds);
 		flowAndDensityCollector.reset(0);
 
@@ -541,8 +514,8 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 																	// events-manager
 																	// class
 
-//		events.addHandler(inflowHandler); // add handler
-//		events.addHandler(outflowHandler);
+		// events.addHandler(inflowHandler); // add handler
+		// events.addHandler(outflowHandler);
 		events.addHandler(flowAndDensityCollector);
 
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
@@ -550,14 +523,12 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 		reader.parse(eventsFile); // where we find events data
 
 		HashMap<Id, int[]> linkInFlow = flowAndDensityCollector.getLinkInFlow(); // get
-																		// the
-																		// matrix
+		// the
+		// matrix
 		linkOutFlow = flowAndDensityCollector.getLinkOutFlow();
 
-		HashMap<Id, int[]> deltaFlow = MainDensityAnalysisWithPt.deltaFlow(
-				linkInFlow, linkOutFlow);
-		instantaneousLinkDensities = MainDensityAnalysisWithPt.calculateDensity(deltaFlow,
-				links);
+		HashMap<Id, int[]> deltaFlow = MainDensityAnalysisWithPt.deltaFlow(linkInFlow, linkOutFlow);
+		instantaneousLinkDensities = MainDensityAnalysisWithPt.calculateDensity(deltaFlow, links);
 		averageLinkDensities = flowAndDensityCollector.getAvgDeltaFlow();
 
 		// if there arent any postgres properties, attempt to write to csv, else
@@ -567,39 +538,32 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 
 	}
 
-	private void writeResults(boolean toSQL) throws InstantiationException,
-			IllegalAccessException, ClassNotFoundException, IOException,
-			SQLException {
+	private void writeResults(boolean toSQL) throws InstantiationException, IllegalAccessException,
+			ClassNotFoundException, IOException, SQLException {
 		DateFormat df = new SimpleDateFormat("yyyy_MM_dd");
 		String formattedDate = df.format(new Date());
 		// start with activities
-		String densityTableName = "matsim_link_flow_and_density"
-				+ tableSuffixComponent.getText();
+		String densityTableName = "matsim_link_flow_and_density" + tableSuffixComponent.getText();
 		List<PostgresqlColumnDefinition> columns = new ArrayList<PostgresqlColumnDefinition>();
 		columns.add(new PostgresqlColumnDefinition("link_id", PostgresType.TEXT));
 		columns.add(new PostgresqlColumnDefinition("length", PostgresType.FLOAT8));
 		columns.add(new PostgresqlColumnDefinition("lanes", PostgresType.FLOAT8));
-		columns.add(new PostgresqlColumnDefinition("bin_end_time",
-				PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("bin_end_time", PostgresType.INT));
 		columns.add(new PostgresqlColumnDefinition("outflow", PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("veh_per_lane_km_instantaneous",
-				PostgresType.FLOAT8));
-		columns.add(new PostgresqlColumnDefinition("avg_number_of_vehicles_on_link",
-				PostgresType.FLOAT8));
+		columns.add(new PostgresqlColumnDefinition("veh_per_lane_km_instantaneous", PostgresType.FLOAT8));
+		columns.add(new PostgresqlColumnDefinition("avg_number_of_vehicles_on_link", PostgresType.FLOAT8));
 		TableWriter densityWriter = null;
 		if (toSQL) {
-			String tabname = schemaNameComponent.getText()+"."+densityTableName;
-			String fileName =  
-							postgresPropertiesComponent.getText();
+			String tabname = schemaNameComponent.getText() + "." + densityTableName;
+			String fileName = postgresPropertiesComponent.getText();
 			File file = new File(fileName);
 			DataBaseAdmin dba = new DataBaseAdmin(file);
-			densityWriter = new PostgresqlCSVWriter("DENSITYWRITER",
-					tabname, dba, 100000, columns);
+			densityWriter = new PostgresqlCSVWriter("DENSITYWRITER", tabname, dba, 100000, columns);
 		} else {
-			densityWriter = new CSVWriter("DENSITYWRITER", densityTableName,
-					schemaNameComponent.getText(), 100000, columns);
+			densityWriter = new CSVWriter("DENSITYWRITER", densityTableName, schemaNameComponent.getText(), 100000,
+					columns);
 		}
-		if (commentComponent.getText().equals("")) {
+		if (!commentComponent.getText().equals("")) {
 			densityWriter.addComment(commentComponent.getText().replaceAll("[^a-zA-Z0-9-.]", " "));
 		} else {
 			String eventsFileName = eventsFileComponent.getText();
@@ -608,12 +572,9 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 			String networkFileName = networkFileComponent.getText();
 			networkFileName = networkFileName.replaceAll("\\\\", "/");
 			networkFileName = networkFileName.replaceAll(":", "");
-			densityWriter
-					.addComment(String
-							.format("Link outflow and density in veh per lane km for network %s from events file %s, created on %s.",
-									networkFileName,
-									eventsFileName,
-									formattedDate));
+			densityWriter.addComment(String.format(
+					"Link outflow and density in veh per lane km for network %s from events file %s, created on %s. Bin size is %s",
+					networkFileName, eventsFileName, formattedDate, binSizeComponent.getText()));
 
 		}
 
@@ -622,17 +583,10 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 			double[] densities = instantaneousLinkDensities.get(id);
 			double[] avgLevels = averageLinkDensities.get(id);
 			for (int i = 0; i < flows.length; i++) {
-				Object[] args = {
-						id.toString(),
-						new Double(links.get(id).getLength()),
+				Object[] args = { id.toString(), new Double(links.get(id).getLength()),
 						new Double(links.get(id).getNumberOfLanes()),
-						new Integer(i
-								* Integer.parseInt(this.binSizeComponent
-										.getText())),
-										new Integer(flows[i]),
-						new Double(densities[i]),
-						new Double(avgLevels[i])
-				};
+						new Integer(i * Integer.parseInt(this.binSizeComponent.getText())), new Integer(flows[i]),
+						new Double(densities[i]), new Double(avgLevels[i]) };
 				densityWriter.addLine(args);
 			}
 
@@ -643,15 +597,12 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 	public void loadDefaultProperties(File defaultPropertiesFile) {
 		this.defaultProperties = new Properties();
 		try {
-			this.defaultProperties.load(new FileInputStream(
-					defaultPropertiesFile));
-			String[] properties = { "comment", "networkFile", "eventsFile",
-					"centreXCoord", "centreYCoord", "tableSuffix",
-					"schemaName", "postgresProperties", "radius", "binSize" };
+			this.defaultProperties.load(new FileInputStream(defaultPropertiesFile));
+			String[] properties = { "comment", "networkFile", "eventsFile", "centreXCoord", "centreYCoord",
+					"tableSuffix", "schemaName", "postgresProperties", "radius", "binSize" };
 			for (String property : properties) {
 				try {
-					String propertyValue = this.defaultProperties
-							.getProperty(property);
+					String propertyValue = this.defaultProperties.getProperty(property);
 					// reflection
 					Field aField = getClass().getDeclaredField(property);
 					aField.set(this, propertyValue);
