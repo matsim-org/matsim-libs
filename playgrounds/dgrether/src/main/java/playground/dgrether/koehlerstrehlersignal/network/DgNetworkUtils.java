@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * SignalizedLinkSpeedFilter
+ * Ks2010Utils
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,43 +17,32 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.koehlerstrehlersignal;
+package playground.dgrether.koehlerstrehlersignal.network;
 
-import java.util.Set;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.experimental.network.NetworkWriter;
+import org.matsim.core.utils.geometry.geotools.MGC;
+import org.matsim.core.utils.geometry.transformations.TransformationFactory;
+import org.matsim.utils.gis.matsim2esri.network.Nodes2ESRIShape;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.network.filter.NetworkLinkFilter;
+import playground.dgrether.utils.DgNet2Shape;
 
 
 /**
  * @author dgrether
  *
  */
-public class SignalizedNodesSpeedFilter implements NetworkLinkFilter {
-
-	private Set<Id> signalizedNodes;
-	private Set<Id> shortestPathLinkIds;
-
-	public SignalizedNodesSpeedFilter(Set<Id> signalizedNodes, Set<Id> shortestPathLinkIds) {
-		this.signalizedNodes = signalizedNodes;
-		this.shortestPathLinkIds = shortestPathLinkIds;
+public class DgNetworkUtils {
+	
+	public static void writeNetwork(Network net, String outputFile){
+		NetworkWriter netWriter = new NetworkWriter(net);
+		netWriter.write(outputFile);
 	}
-
-	@Override
-	public boolean judgeLink(Link l) {
-		if (this.shortestPathLinkIds.contains(l.getId())){
-			return true;
-		}
-		Id fromNodeId = l.getFromNode().getId();
-		Id toNodeId = l.getToNode().getId();
-		if (this.signalizedNodes.contains(fromNodeId) || this.signalizedNodes.contains(toNodeId)) {
-			return true;
-		}
-		if (l.getFreespeed() > 10.0) {
-			return true;
-		}
-		return false;
+	
+	public static void writeNetwork2Shape(Network net, String outputFilename){
+		CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84_UTM33N);
+		new DgNet2Shape().write(net, outputFilename + "_links.shp", crs);
+		new Nodes2ESRIShape(net, outputFilename + "_nodes.shp", crs).write();
 	}
-
 }

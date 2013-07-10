@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.koehlerstrehlersignal;
+package playground.dgrether.koehlerstrehlersignal.network;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;
@@ -61,9 +61,9 @@ import playground.dgrether.signalsystems.utils.DgSignalsUtils;
  * @author dgrether
  *
  */
-public class DgMatsim2KoehlerStrehler2010NetworkConverter {
+public class DgM2KS2010NetworkConverter {
 	
-	private static final Logger log = Logger.getLogger(DgMatsim2KoehlerStrehler2010NetworkConverter.class);
+	private static final Logger log = Logger.getLogger(DgM2KS2010NetworkConverter.class);
 	
 	private Integer cycle = null;
 	private Id defaultProgramId = new IdImpl("4711");
@@ -75,7 +75,7 @@ public class DgMatsim2KoehlerStrehler2010NetworkConverter {
 
 	private Set<Id> signalizedLinks;
 	
-	public DgMatsim2KoehlerStrehler2010NetworkConverter(DgIdConverter idConverter){
+	public DgM2KS2010NetworkConverter(DgIdConverter idConverter){
 		this.idConverter = idConverter;
 	}
 	

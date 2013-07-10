@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.koehlerstrehlersignal;
+package playground.dgrether.koehlerstrehlersignal.conversion;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -36,11 +36,14 @@ import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodities;
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodity;
 import playground.dgrether.koehlerstrehlersignal.data.DgCrossing;
-import playground.dgrether.koehlerstrehlersignal.data.DgKSNet2MatsimNet;
 import playground.dgrether.koehlerstrehlersignal.data.DgKSNetwork;
+import playground.dgrether.koehlerstrehlersignal.data.KS2010ModelWriter;
+import playground.dgrether.koehlerstrehlersignal.demand.M2KS2010Zones2Commodities;
 import playground.dgrether.koehlerstrehlersignal.gexf.DgKSNetwork2Gexf;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdConverter;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdPool;
+import playground.dgrether.koehlerstrehlersignal.network.DgM2KS2010NetworkConverter;
+import playground.dgrether.koehlerstrehlersignal.network.DgNetworkUtils;
 import playground.dgrether.signalsystems.utils.DgSignalsUtils;
 import playground.dgrether.utils.zones.DgZone;
 
@@ -58,9 +61,9 @@ import playground.dgrether.utils.zones.DgZone;
  * @author dgrether
  * @author tthunig
  */
-public class Scenario2KoehlerStrehler2010 {
+public class M2KS2010Converter {
 	
-	public static final Logger log = Logger.getLogger(Scenario2KoehlerStrehler2010.class);
+	public static final Logger log = Logger.getLogger(M2KS2010Converter.class);
 	
 	private static final String modelOutfile = "koehler_strehler_model.xml";
 	
@@ -73,7 +76,7 @@ public class Scenario2KoehlerStrehler2010 {
 	private SignalsData signals;
 
 	
-	public Scenario2KoehlerStrehler2010(Network network, LaneDefinitions20 lanes,
+	public M2KS2010Converter(Network network, LaneDefinitions20 lanes,
 			SignalsData signals) {
 		this.network = network;
 		this.lanes = lanes;
@@ -87,13 +90,13 @@ public class Scenario2KoehlerStrehler2010 {
 		DgIdConverter idConverter = new DgIdConverter(idPool);
 		
 		Set<Id> signalizedLinks = this.getSignalizedLinkIds(this.signals.getSignalSystemsData());
-		DgMatsim2KoehlerStrehler2010NetworkConverter netConverter = new DgMatsim2KoehlerStrehler2010NetworkConverter(idConverter);
+		DgM2KS2010NetworkConverter netConverter = new DgM2KS2010NetworkConverter(idConverter);
 		netConverter.setSignalizedLinks(signalizedLinks);
 		DgKSNetwork ksNet = netConverter.convertNetworkLanesAndSignals(this.network, this.lanes, this.signals, startTimeSec, endTimeSec);
 		DgKSNetwork2Gexf converter = new DgKSNetwork2Gexf();
 		converter.convertAndWrite(ksNet, outputDirectory + "network_small_simplified.gexf");
 		
-		DgMatsim2KoehlerStrehler2010Zones2Commodities demandConverter = new DgMatsim2KoehlerStrehler2010Zones2Commodities(zones2LinkMap, idConverter);
+		M2KS2010Zones2Commodities demandConverter = new M2KS2010Zones2Commodities(zones2LinkMap, idConverter);
 		DgCommodities commodities = demandConverter.convert(ksNet);
 		
 		if (ksModelCommoditySampleSize != 1.0){
@@ -104,7 +107,7 @@ public class Scenario2KoehlerStrehler2010 {
 		}
 		
 		Network newMatsimNetwork = new DgKSNet2MatsimNet().convertNetwork(ksNet);
-		DgKoehlerStrehler2010Router router = new DgKoehlerStrehler2010Router();
+		DgKS2010Router router = new DgKS2010Router();
 		List<Id> invalidCommodities = router.routeCommodities(newMatsimNetwork, commodities);
 		for (Id id : invalidCommodities) {
 			commodities.getCommodities().remove(id);
@@ -115,7 +118,7 @@ public class Scenario2KoehlerStrehler2010 {
 		DgNetworkUtils.writeNetwork(newMatsimNetwork, outputDirectory + "matsim_network_ks_model.xml.gz");
 		DgNetworkUtils.writeNetwork2Shape(newMatsimNetwork, shapeFileDirectory + "matsim_network_ks_model.shp");
 		
-		new DgKoehlerStrehler2010ModelWriter().write(ksNet, commodities, name, description, outputDirectory + modelOutfile);
+		new KS2010ModelWriter().write(ksNet, commodities, name, description, outputDirectory + modelOutfile);
 		writeStats(ksNet, commodities);
 		
 		idPool.writeToFile(outputDirectory + "id_conversions.txt");

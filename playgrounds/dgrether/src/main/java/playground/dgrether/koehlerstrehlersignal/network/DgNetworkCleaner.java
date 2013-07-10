@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.dgrether.koehlerstrehlersignal;
+package playground.dgrether.koehlerstrehlersignal.network;
 
 import java.util.HashMap;
 import java.util.HashSet;

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.koehlerstrehlersignal;
+package playground.dgrether.koehlerstrehlersignal.conversion;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -45,7 +45,7 @@ import playground.dgrether.koehlerstrehlersignal.data.DgCommodity;
  * @author dgrether
  *
  */
-public class DgKoehlerStrehler2010Router {
+public class DgKS2010Router {
 
 	private static final class SimpleTravelTimeDisutility implements TravelTime, TravelDisutility {
 
@@ -113,7 +113,7 @@ public class DgKoehlerStrehler2010Router {
 		}
 	};
 
-	private static final Logger log = Logger.getLogger(DgKoehlerStrehler2010Router.class);
+	private static final Logger log = Logger.getLogger(DgKS2010Router.class);
 	
 	
 	public List<Id> routeCommodities(Network network, DgCommodities commodities) {

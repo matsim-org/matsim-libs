@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.cottbus.scripts;
+package playground.dgrether.koehlerstrehlersignal.run;
 
 import java.io.File;
 import java.util.Map;
@@ -37,9 +37,9 @@ import org.matsim.core.utils.misc.Time;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.dgrether.DgPaths;
-import playground.dgrether.koehlerstrehlersignal.PopulationToOd;
-import playground.dgrether.koehlerstrehlersignal.Scenario2KoehlerStrehler2010;
-import playground.dgrether.koehlerstrehlersignal.ScenarioShrinker;
+import playground.dgrether.koehlerstrehlersignal.conversion.M2KS2010Converter;
+import playground.dgrether.koehlerstrehlersignal.demand.PopulationToOd;
+import playground.dgrether.koehlerstrehlersignal.network.NetLanesSignalsShrinker;
 import playground.dgrether.signalsystems.cottbus.DgCottbusScenarioPaths;
 import playground.dgrether.utils.zones.DgZone;
 import playground.dgrether.utils.zones.DgZoneUtils;
@@ -50,9 +50,9 @@ import playground.dgrether.utils.zones.DgZones;
  * @author dgrether
  *
  */
-public class DgCb2Ks2010 {
+public class Cottbus2KS2010 {
 
-	private static final Logger log = Logger.getLogger(DgCb2Ks2010.class);
+	private static final Logger log = Logger.getLogger(Cottbus2KS2010.class);
 	
 	private static String shapeFileDirectoryName = "shapes/";
 
@@ -83,10 +83,10 @@ public class DgCb2Ks2010 {
 		// run
 		OutputDirectoryLogging.initLoggingWithOutputDirectory(outputDirectory);
 		String shapeFileDirectory = createShapeFileDirectory(outputDirectory);
-		Scenario fullScenario = DgCb2Ks2010.loadScenario(networkFilename, populationFilename, lanesFilename, signalSystemsFilename, signalGroupsFilename, signalControlFilename);
+		Scenario fullScenario = Cottbus2KS2010.loadScenario(networkFilename, populationFilename, lanesFilename, signalSystemsFilename, signalGroupsFilename, signalControlFilename);
 		
 		// reduce the size of the scenario
-		ScenarioShrinker scenarioShrinker = new ScenarioShrinker(fullScenario,  crs);
+		NetLanesSignalsShrinker scenarioShrinker = new NetLanesSignalsShrinker(fullScenario,  crs);
 		scenarioShrinker.shrinkScenario(outputDirectory, shapeFileDirectory, boundingBoxOffset);
 		
 		// match population to the small network and convert to od 
@@ -102,13 +102,11 @@ public class DgCb2Ks2010 {
 		writeZones2Shape(shapeFileDirectory, zones, zones2LinkMap, scenarioShrinker.getShrinkedNetwork(), crs);
 		
 		//convert to KoehlerStrehler2010 file format
-		Scenario2KoehlerStrehler2010 converter = new Scenario2KoehlerStrehler2010(scenarioShrinker.getShrinkedNetwork(), 
+		M2KS2010Converter converter = new M2KS2010Converter(scenarioShrinker.getShrinkedNetwork(), 
 				scenarioShrinker.getShrinkedLanes(), scenarioShrinker.getShrinkedSignals());
 		String description = createDescription(cellsX, cellsY, startTime, endTime, boundingBoxOffset, matsimPopSampleSize, ksModelCommoditySampleSize);
 		converter.setKsModelCommoditySampleSize(ksModelCommoditySampleSize);
 		converter.convert(outputDirectory, shapeFileDirectory, name, description, zones2LinkMap, startTime, endTime);
-		
-		
 		
 		printStatistics(cellsX, cellsY, boundingBoxOffset, startTime, endTime);
 		OutputDirectoryLogging.closeOutputDirLogging();		

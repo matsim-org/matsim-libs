@@ -17,13 +17,18 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.koehlerstrehlersignal.data;
+package playground.dgrether.koehlerstrehlersignal.conversion;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.network.NetworkImpl;
+
+import playground.dgrether.koehlerstrehlersignal.data.DgCrossing;
+import playground.dgrether.koehlerstrehlersignal.data.DgCrossingNode;
+import playground.dgrether.koehlerstrehlersignal.data.DgKSNetwork;
+import playground.dgrether.koehlerstrehlersignal.data.DgStreet;
 
 
 /**

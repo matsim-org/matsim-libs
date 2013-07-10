@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.koehlerstrehlersignal;
+package playground.dgrether.koehlerstrehlersignal.demand;
 
 import java.util.Map;
 import java.util.Map.Entry;
@@ -38,12 +38,12 @@ import playground.dgrether.utils.zones.DgZoneFromLink;
  * @author dgrether
  *
  */
-public class DgMatsim2KoehlerStrehler2010Zones2Commodities  {
+public class M2KS2010Zones2Commodities  {
 
 	private Map<DgZone, Link> zones2LinkMap;
 	private DgIdConverter idConverter;
 
-	public DgMatsim2KoehlerStrehler2010Zones2Commodities(Map<DgZone, Link> zones2LinkMap, DgIdConverter idConverter) {
+	public M2KS2010Zones2Commodities(Map<DgZone, Link> zones2LinkMap, DgIdConverter idConverter) {
 		this.zones2LinkMap = zones2LinkMap;
 		this.idConverter = idConverter;
 	}

@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.koehlerstrehlersignal;
+package playground.dgrether.koehlerstrehlersignal.conversion;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -40,7 +40,7 @@ import playground.dgrether.koehlerstrehlersignal.data.DgStreet;
 /**
  * @author dgrether
  */
-public class DgMatsim2KoehlerStrehler2010SimpleDemandConverter {
+public class M2KS2010SimpleDemandConverter {
 
 	
 	private DgCommodities commodities;

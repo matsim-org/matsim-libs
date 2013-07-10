@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.koehlerstrehlersignal;
+package playground.dgrether.koehlerstrehlersignal.network;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -47,9 +47,9 @@ import com.vividsolutions.jts.geom.Envelope;
  * @author dgrether
  *
  */
-public class ScenarioShrinker {
+public class NetLanesSignalsShrinker {
 	
-	private static final Logger log = Logger.getLogger(ScenarioShrinker.class);
+	private static final Logger log = Logger.getLogger(NetLanesSignalsShrinker.class);
 	
 	private static final String smallNetworkFilename = "network_small.xml.gz";
 	private static final String simplifiedNetworkFilename = "network_small_simplified.xml.gz";
@@ -68,7 +68,7 @@ public class ScenarioShrinker {
 
 	private SignalsData shrinkedSignals;
 
-	public ScenarioShrinker(Scenario scenario, CoordinateReferenceSystem crs){
+	public NetLanesSignalsShrinker(Scenario scenario, CoordinateReferenceSystem crs){
 		this.fullScenario = scenario;
 		this.crs = crs;
 	}

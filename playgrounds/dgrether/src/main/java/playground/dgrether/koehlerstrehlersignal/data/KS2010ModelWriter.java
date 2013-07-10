@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.koehlerstrehlersignal;
+package playground.dgrether.koehlerstrehlersignal.data;
 
 import java.io.Writer;
 
@@ -33,18 +33,10 @@ import org.matsim.core.utils.io.IOUtils;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.AttributesImpl;
 
-import playground.dgrether.koehlerstrehlersignal.data.DgCommodities;
-import playground.dgrether.koehlerstrehlersignal.data.DgCommodity;
-import playground.dgrether.koehlerstrehlersignal.data.DgCrossing;
-import playground.dgrether.koehlerstrehlersignal.data.DgCrossingNode;
-import playground.dgrether.koehlerstrehlersignal.data.DgGreen;
-import playground.dgrether.koehlerstrehlersignal.data.DgKSNetwork;
-import playground.dgrether.koehlerstrehlersignal.data.DgProgram;
-import playground.dgrether.koehlerstrehlersignal.data.DgStreet;
 
-public class DgKoehlerStrehler2010ModelWriter {
+public class KS2010ModelWriter {
 
-	private static final Logger log = Logger.getLogger(DgKoehlerStrehler2010ModelWriter.class);
+	private static final Logger log = Logger.getLogger(KS2010ModelWriter.class);
 
 	// common tags
 	private static final String CDATA = "CDATA";
