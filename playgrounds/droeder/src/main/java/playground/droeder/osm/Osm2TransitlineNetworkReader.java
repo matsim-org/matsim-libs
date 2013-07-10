@@ -32,10 +32,10 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.openstreetmap.osmosis.core.filter.common.IdTrackerType;
-import org.openstreetmap.osmosis.xml.common.CompressionMethod;
+import org.openstreetmap.osmosis.core.xml.common.CompressionMethod;
 
-import playground.mzilske.osm.JOSMTolerantFastXMLReader;
-import playground.mzilske.osm.NetworkSink;
+import playground.andreas.mzilske.osm.JOSMTolerantFastXMLReader;
+import playground.andreas.mzilske.osm.NetworkSink;
 
 /**
  * @author droeder

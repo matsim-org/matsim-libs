@@ -24,21 +24,21 @@
   		<artifactId>otfvis</artifactId>
   		<version>0.6.0-SNAPSHOT</version>
   	</dependency>
-  	<dependency>
+  	<!-- <dependency>
   		<groupId>playground</groupId>
   		<artifactId>southAfrica</artifactId>
   		<version>0.6.0-SNAPSHOT</version>
-  	</dependency>
-  	  	<dependency>
+  	</dependency> -->
+  	<dependency>
   		<groupId>playground</groupId>
   		<artifactId>vsp</artifactId>
   		<version>0.6.0-SNAPSHOT</version>
   	</dependency>
-    <dependency>
+    <!-- <dependency>
   		<groupId>org.matsim.contrib</groupId>
   		<artifactId>matrixbasedptrouter</artifactId>
   		<version>0.6.0-SNAPSHOT</version>
-  	</dependency>
+  	</dependency>-->
   </dependencies>
 
 </project>
