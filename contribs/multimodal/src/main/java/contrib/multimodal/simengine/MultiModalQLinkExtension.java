@@ -81,9 +81,7 @@ public class MultiModalQLinkExtension {
 
 		this.addAgent(mobsimAgent, now);
 
-		this.simEngine.getMobsim().getEventsManager().processEvent(
-
-			new LinkEnterEvent(now, mobsimAgent.getId(), qLink.getId(), null));
+		this.simEngine.getMobsim().getEventsManager().processEvent(new LinkEnterEvent(now, mobsimAgent.getId(), qLink.getId(), null));
 	}
 
 	private void addAgent(MobsimAgent mobsimAgent, double now) {
@@ -116,6 +114,9 @@ public class MultiModalQLinkExtension {
 
 		moveWaitingAfterActivityAgents();
 
+		// If agents are ready to leave the link, ensure that the to Node is active and handles them.
+		if (waitingToLeaveAgents.size() > 0) toNode.activateNode();
+		
 		return keepLinkActive;
 	}
 
@@ -162,10 +163,10 @@ public class MultiModalQLinkExtension {
 			 * The PersonAgent can leave, therefore we move him to the waitingToLeave Queue.
 			 */
 			else {
-				waitingToLeaveAgents.add(tuple.getSecond());
+				this.waitingToLeaveAgents.add(driver);
 			}
 		}
-
+		
 		return agents.size() > 0;
 	}
 
@@ -176,8 +177,6 @@ public class MultiModalQLinkExtension {
 	private void moveWaitingAfterActivityAgents() {
 		waitingToLeaveAgents.addAll(waitingAfterActivityAgents);
 		waitingAfterActivityAgents.clear();
-
-		if (waitingToLeaveAgents.size() > 0) toNode.activateNode();
 	}
 
 	public MobsimAgent getNextWaitingAgent(double now) {

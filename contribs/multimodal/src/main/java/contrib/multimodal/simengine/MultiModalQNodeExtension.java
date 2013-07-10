@@ -68,17 +68,22 @@ public class MultiModalQNodeExtension {
 		 *  Check all incoming links for WaitingToLeaveAgents
 		 *  If waiting Agents are found, we activate the Node.
 		 */
-		int inLinksCounter = 0;
+		boolean agentsWaitingAtInLinks = false;
 		for (MultiModalQLinkExtension link : this.inLinksArrayCache) {
 			if(link.hasWaitingToLeaveAgents()) {
-				inLinksCounter++;
+				agentsWaitingAtInLinks = true;
+				break;
 			}
 		}
 
-		if (inLinksCounter > 0) {
-			this.activateNode();
+		/*
+		 * If no agents are waiting to be moved at one of the incoming links,
+		 * the node can be deactivated.
+		 */
+		if (!agentsWaitingAtInLinks) {
+			this.isActive.set(false);
+			return false;
 		}
-		else return false;
 		
 		/*
 		 * At the moment we do not simulate capacities in the additional

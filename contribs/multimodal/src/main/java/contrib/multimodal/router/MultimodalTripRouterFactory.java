@@ -56,21 +56,15 @@ public class MultimodalTripRouterFactory implements TripRouterFactory {
 	protected static final Logger log = Logger.getLogger(MultimodalTripRouterFactory.class);
 	
 	private final Controler controler;
-	private final TripRouterFactory delegateFactory;
 	private final Map<String, TravelTime> multimodalTravelTimes;
+	
+	private TripRouterFactory delegateFactory;
 	
 	private final Map<String, Network> multimodalSubNetworks = new HashMap<String, Network>();
 	
 	public MultimodalTripRouterFactory(Controler controler, Map<String, TravelTime> multimodalTravelTimes) {
 		this.controler = controler;
 		this.multimodalTravelTimes = multimodalTravelTimes;
-		
-		this.delegateFactory = new TripRouterFactoryImpl(
-				controler.getScenario(),
-				controler.getTravelDisutilityFactory(),
-				controler.getLinkTravelTimes(),
-				controler.getLeastCostPathCalculatorFactory(),
-				controler.getTransitRouterFactory() );
 	}
 	
 	public MultimodalTripRouterFactory(Controler controler, Map<String, TravelTime> multimodalTravelTimes, 
@@ -83,6 +77,14 @@ public class MultimodalTripRouterFactory implements TripRouterFactory {
 	@Override
 	public TripRouter instantiateAndConfigureTripRouter() {	
 
+		if (this.delegateFactory == null) {
+			this.delegateFactory = new TripRouterFactoryImpl(
+					controler.getScenario(),
+					controler.getTravelDisutilityFactory(),
+					controler.getLinkTravelTimes(),
+					controler.getLeastCostPathCalculatorFactory(),
+					controler.getTransitRouterFactory() );
+		}
 		TripRouter instance = this.delegateFactory.instantiateAndConfigureTripRouter();
 		
 		Network network = this.controler.getNetwork();

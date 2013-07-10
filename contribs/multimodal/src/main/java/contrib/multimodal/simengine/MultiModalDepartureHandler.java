@@ -24,11 +24,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.groups.MultiModalConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
+import org.matsim.core.utils.collections.CollectionUtils;
 
 public class MultiModalDepartureHandler implements DepartureHandler {
 
@@ -37,23 +37,18 @@ public class MultiModalDepartureHandler implements DepartureHandler {
 	
 	public MultiModalDepartureHandler(MultiModalSimEngine simEngine, MultiModalConfigGroup multiModalConfigGroup) {
 		this.simEngine = simEngine;
-		
-		String simulatedModes = multiModalConfigGroup.getSimulatedModes();
-		if (simulatedModes.contains("walk")) handledModes.add(TransportMode.walk);
-		if (simulatedModes.contains("bike")) handledModes.add(TransportMode.bike);
-		if (simulatedModes.contains("ride")) handledModes.add(TransportMode.ride);
-		if (simulatedModes.contains("pt")) handledModes.add(TransportMode.pt);
+		this.handledModes = CollectionUtils.stringToSet(multiModalConfigGroup.getSimulatedModes());
 	}
 	
 	@Override
-	public boolean handleDeparture(double now, MobsimAgent personAgent, Id linkId) {
+	public boolean handleDeparture(double now, MobsimAgent mobsimAgent, Id linkId) {
 
-		if (handledModes.contains(personAgent.getMode())) {
-			if (personAgent instanceof MobsimDriverAgent) {
-				handleMultiModalDeparture(now, (MobsimDriverAgent)personAgent, linkId);
+		if (handledModes.contains(mobsimAgent.getMode())) {
+			if (mobsimAgent instanceof MobsimDriverAgent) {
+				handleMultiModalDeparture(now, (MobsimDriverAgent)mobsimAgent, linkId);
 				return true;
 			} else {
-				throw new UnsupportedOperationException("PersonAgent is not from type PersonDriverAgent - cannot handle departure. Found PersonAgent class is " + personAgent.getClass().toString());
+				throw new UnsupportedOperationException("MobsimAgent is not from type MobsimDriverAgent - cannot handle departure. Found PersonAgent class is " + mobsimAgent.getClass().toString());
 			}
 		}
 		
@@ -66,7 +61,7 @@ public class MultiModalDepartureHandler implements DepartureHandler {
 		
 		if ((personAgent.getDestinationLinkId().equals(linkId)) && (personAgent.chooseNextLinkId() == null)) {
 			personAgent.endLegAndComputeNextState(now);
-			this.simEngine.internalInterface.arrangeNextAgentState(personAgent) ;
+			this.simEngine.internalInterface.arrangeNextAgentState(personAgent);
 			/* yyyy The "non-departure" should be caught in the framework.  kai, dec'11 */  
 		} else {
 			extension.addDepartingAgent(personAgent, now);
