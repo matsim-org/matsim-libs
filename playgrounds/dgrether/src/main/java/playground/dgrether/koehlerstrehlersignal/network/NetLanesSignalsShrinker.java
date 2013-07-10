@@ -104,11 +104,18 @@ public class NetLanesSignalsShrinker {
 		Set<Integer> nodeTypesToMerge = new TreeSet<Integer>();
 		nodeTypesToMerge.add(NetworkCalcTopoType.PASS1WAY); //PASS1WAY: 1 in- and 1 outgoing link
 		nodeTypesToMerge.add(NetworkCalcTopoType.PASS2WAY); //PASS2WAY: 2 in- and 2 outgoing links
-		NetworkSimplifier nsimply = new NetworkSimplifier();
+		NetworkLanesSignalsSimplifier nsimply = new NetworkLanesSignalsSimplifier();
 		nsimply.setNodesToMerge(nodeTypesToMerge);
 		nsimply.simplifyNetworkLanesAndSignals(smallNetwork, this.fullScenario.getScenarioElement(LaneDefinitions20.class), this.fullScenario.getScenarioElement(SignalsData.class));
 		this.originalToSimplifiedLinkIdMatching = nsimply.getOriginalToSimplifiedLinkIdMatching();
 		
+		this.shrinkedNetwork =  smallNetwork;
+		this.shrinkedLanes = this.fullScenario.getScenarioElement(LaneDefinitions20.class);
+		this.shrinkedSignals = this.fullScenario.getScenarioElement(SignalsData.class);
+		
+		
+
+		//write shrunk data to disk
 		String simplifiedNetworkFile = outputDirectory + simplifiedNetworkFilename;
 		DgNetworkUtils.writeNetwork(smallNetwork, simplifiedNetworkFile);
 		DgNetworkUtils.writeNetwork2Shape(smallNetwork, shapeFileDirectory + "network_small_simplified");
@@ -119,9 +126,6 @@ public class NetLanesSignalsShrinker {
 		SignalsScenarioWriter signalsWriter = new SignalsScenarioWriter(outputDirectory);
 		signalsWriter.writeSignalsData(this.fullScenario.getScenarioElement(SignalsData.class));
 		
-		this.shrinkedNetwork =  smallNetwork;
-		this.shrinkedLanes = this.fullScenario.getScenarioElement(LaneDefinitions20.class);
-		this.shrinkedSignals = this.fullScenario.getScenarioElement(SignalsData.class);
 	}
 		
 	public DgSignalsBoundingBox getSignalsBoundingBox() {

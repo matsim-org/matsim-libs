@@ -37,6 +37,7 @@ public class DgIdConverter {
 	
 	public  Id convertLinkId2FromCrossingNodeId(Id linkId){
 		String idString = linkId.toString() + "11";
+//		String idString = linkId.toString();
 		return idPool.createId(idString);
 	}
 	

@@ -20,10 +20,8 @@
 package playground.dgrether.koehlerstrehlersignal.conversion;
 
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -31,7 +29,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.signalsystems.data.SignalsData;
-import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
 
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodities;
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodity;
@@ -42,9 +39,7 @@ import playground.dgrether.koehlerstrehlersignal.demand.M2KS2010Zones2Commoditie
 import playground.dgrether.koehlerstrehlersignal.gexf.DgKSNetwork2Gexf;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdConverter;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdPool;
-import playground.dgrether.koehlerstrehlersignal.network.DgM2KS2010NetworkConverter;
 import playground.dgrether.koehlerstrehlersignal.network.DgNetworkUtils;
-import playground.dgrether.signalsystems.utils.DgSignalsUtils;
 import playground.dgrether.utils.zones.DgZone;
 
 /**
@@ -89,10 +84,10 @@ public class M2KS2010Converter {
 		DgIdPool idPool = new DgIdPool();
 		DgIdConverter idConverter = new DgIdConverter(idPool);
 		
-		Set<Id> signalizedLinks = this.getSignalizedLinkIds(this.signals.getSignalSystemsData());
-		DgM2KS2010NetworkConverter netConverter = new DgM2KS2010NetworkConverter(idConverter);
-		netConverter.setSignalizedLinks(signalizedLinks);
+		M2KS2010NetworkConverter netConverter = new M2KS2010NetworkConverter(idConverter);
 		DgKSNetwork ksNet = netConverter.convertNetworkLanesAndSignals(this.network, this.lanes, this.signals, startTimeSec, endTimeSec);
+		
+		//gexf output for visualization
 		DgKSNetwork2Gexf converter = new DgKSNetwork2Gexf();
 		converter.convertAndWrite(ksNet, outputDirectory + "network_small_simplified.gexf");
 		
@@ -124,14 +119,7 @@ public class M2KS2010Converter {
 		idPool.writeToFile(outputDirectory + "id_conversions.txt");
 	}
 
-	private Set<Id> getSignalizedLinkIds(SignalSystemsData signals){
-		Map<Id, Set<Id>> signalizedLinksPerSystem = DgSignalsUtils.calculateSignalizedLinksPerSystem(signals);
-		Set<Id> signalizedLinks = new HashSet<Id>();
-		for (Set<Id> signalizedLinksOfSystem : signalizedLinksPerSystem.values()){
-			signalizedLinks.addAll(signalizedLinksOfSystem);
-		}
-		return signalizedLinks;
-	}
+
 
 	private void writeStats( DgKSNetwork ksNet, DgCommodities commodities){
 		log.info("Network: ");

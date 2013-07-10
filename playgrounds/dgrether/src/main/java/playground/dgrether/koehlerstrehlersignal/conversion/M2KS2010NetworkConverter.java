@@ -17,13 +17,14 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.koehlerstrehlersignal.network;
+package playground.dgrether.koehlerstrehlersignal.conversion;
 
 import java.awt.geom.Point2D;
 import java.awt.geom.Point2D.Double;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -61,9 +62,9 @@ import playground.dgrether.signalsystems.utils.DgSignalsUtils;
  * @author dgrether
  *
  */
-public class DgM2KS2010NetworkConverter {
+public class M2KS2010NetworkConverter {
 	
-	private static final Logger log = Logger.getLogger(DgM2KS2010NetworkConverter.class);
+	private static final Logger log = Logger.getLogger(M2KS2010NetworkConverter.class);
 	
 	private Integer cycle = null;
 	private Id defaultProgramId = new IdImpl("4711");
@@ -75,7 +76,7 @@ public class DgM2KS2010NetworkConverter {
 
 	private Set<Id> signalizedLinks;
 	
-	public DgM2KS2010NetworkConverter(DgIdConverter idConverter){
+	public M2KS2010NetworkConverter(DgIdConverter idConverter){
 		this.idConverter = idConverter;
 	}
 	
@@ -84,6 +85,7 @@ public class DgM2KS2010NetworkConverter {
 		log.info("Checking cycle time...");
 		this.cycle = readCycle(signals);
 		log.info("cycle set to " + this.cycle);
+		signalizedLinks = this.getSignalizedLinkIds(signals.getSignalSystemsData());
 		log.info("Converting network ...");
 		this.timeInterval = endTime - startTime;
 		this.dgNetwork = this.convertNetwork(network, lanes, signals);
@@ -249,8 +251,8 @@ public class DgM2KS2010NetworkConverter {
 		DgCrossingNode outLinkFromNode = crossing.getNodes().get(convertedOutLinkId);
 		if (outLinkFromNode == null){
 			log.error("Crossing " + crossing.getId() + " has no node with id " + convertedOutLinkId);
-//			throw new IllegalStateException("outLinkFromNode not found.");
-			return null;
+			throw new IllegalStateException("outLinkFromNode not found.");
+//			return null;
 		}
 		DgStreet street = new DgStreet(lightId, inLinkToNode, outLinkFromNode);
 		crossing.addLight(street);
@@ -453,8 +455,13 @@ public class DgM2KS2010NetworkConverter {
 		return outLinks;
 	}
 	
-	public void setSignalizedLinks(Set<Id> signalizedLinks) {
-		this.signalizedLinks = signalizedLinks;
+	private Set<Id> getSignalizedLinkIds(SignalSystemsData signals){
+		Map<Id, Set<Id>> signalizedLinksPerSystem = DgSignalsUtils.calculateSignalizedLinksPerSystem(signals);
+		Set<Id> signalizedLinks = new HashSet<Id>();
+		for (Set<Id> signalizedLinksOfSystem : signalizedLinksPerSystem.values()){
+			signalizedLinks.addAll(signalizedLinksOfSystem);
+		}
+		return signalizedLinks;
 	}
 
 	

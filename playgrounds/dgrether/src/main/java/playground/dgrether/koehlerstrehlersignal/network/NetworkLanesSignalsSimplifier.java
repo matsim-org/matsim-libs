@@ -38,8 +38,12 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
+import org.matsim.lanes.data.v20.LaneData20;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 import org.matsim.signalsystems.data.SignalsData;
+import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
+import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
 
 import playground.dgrether.signalsystems.utils.DgSignalsUtils;
 
@@ -50,9 +54,9 @@ import playground.dgrether.signalsystems.utils.DgSignalsUtils;
  * @author dgrether
  * 
  */
-public class NetworkSimplifier {
+public class NetworkLanesSignalsSimplifier {
 
-	private static final Logger log = Logger.getLogger(NetworkSimplifier.class);
+	private static final Logger log = Logger.getLogger(NetworkLanesSignalsSimplifier.class);
 	private Set<Integer> nodeTopoToMerge = new TreeSet<Integer>();
 
 	private Map<Id, Id> originalToSimplifiedLinkIdMatching = new HashMap<Id, Id>();
@@ -85,7 +89,7 @@ public class NetworkSimplifier {
 	
 	public void simplifyNetworkLanesAndSignals(final Network network, LaneDefinitions20 lanes,
 			SignalsData signalsData) {
-		Map<Id, Set<Id>> signalizedNodesBySystem = DgSignalsUtils.calculateSignalizedNodesPerSystem(signalsData.getSignalSystemsData(), network);
+				
 		if (this.nodeTopoToMerge.size() == 0) {
 			log.error("No types of node specified. Please use setNodesToMerge to specify which nodes should be merged");
 		}
@@ -102,15 +106,17 @@ public class NetworkSimplifier {
 
 			if (this.nodeTopoToMerge.contains(Integer.valueOf(nodeTopo.getTopoType(node)))) {
 
-				List<Link> iLinks = new ArrayList<Link>(node.getInLinks().values());
+				List<Link> inLinks = new ArrayList<Link>(node.getInLinks().values());
 
-				for (Link iL : iLinks) {
-					LinkImpl inLink = (LinkImpl) iL;
+				for (Link iL : inLinks) {
+					Link inLink = iL;
+					List<Link> outLinks = new ArrayList<Link>(node.getOutLinks().values());
 
-					List<Link> oLinks = new ArrayList<Link>(node.getOutLinks().values());
-
-					for (Link oL : oLinks) {
-						LinkImpl outLink = (LinkImpl) oL;
+					for (Link oL : outLinks) {
+						Map<Id, Set<Id>> signalizedNodesBySystem = DgSignalsUtils.calculateSignalizedNodesPerSystem(signalsData.getSignalSystemsData(), network);
+						Map<Id, Set<Id>> signalizedLinksBySystemId = DgSignalsUtils.calculateSignalizedLinksPerSystem(signalsData.getSignalSystemsData());
+					
+						Link  outLink = oL;
 						if (inLink != null && outLink != null) {
 							if (!outLink.getToNode().equals(inLink.getFromNode())) {
 								// Only merge links with same attributes
@@ -131,6 +137,35 @@ public class NetworkSimplifier {
 									if (lanes.getLanesToLinkAssignments().containsKey(inLink.getId())) {
 										lanes.getLanesToLinkAssignments().remove(inLink.getId());
 									}
+									
+									if (lanes.getLanesToLinkAssignments().containsKey(outLink.getId())){
+										LanesToLinkAssignment20 l2l = lanes.getLanesToLinkAssignments().remove(outLink.getId());
+										LanesToLinkAssignment20 newL2l = lanes.getFactory().createLanesToLinkAssignment(newLink.getId());
+										newL2l.getLanes().putAll(l2l.getLanes());
+										lanes.addLanesToLinkAssignment(newL2l);
+									}
+									
+									for (LanesToLinkAssignment20  l2l : lanes.getLanesToLinkAssignments().values()){
+										for (LaneData20 lane : l2l.getLanes().values()){
+											if (lane.getToLinkIds() != null && lane.getToLinkIds().contains(inLink.getId())) {
+												lane.getToLinkIds().remove(inLink.getId());
+												lane.getToLinkIds().add(newLink.getId());
+											}
+										}
+									}
+									
+									for (Entry<Id, Set<Id>> entry : signalizedLinksBySystemId.entrySet()){
+										if (entry.getValue().contains(outLink.getId())){
+											Id signalSystemId = entry.getKey();
+											SignalSystemData system = signalsData.getSignalSystemsData().getSignalSystemData().get(signalSystemId);
+											for (SignalData signal : system.getSignalData().values()){
+												if (signal.getLinkId().equals(outLink.getId())){
+													signal.setLinkId(newLink.getId());
+												}
+											}
+										}
+									}
+									
 									for (Entry<Id, Set<Id>> entry : signalizedNodesBySystem.entrySet()){
 										if (entry.getValue().contains(removedNode.getId())){
 											Id signalSystemId = entry.getKey();
@@ -181,7 +216,7 @@ public class NetworkSimplifier {
 	/**
 	 * Compare link attributes. Return whether they are the same or not.
 	 */
-	private boolean bothLinksHaveSameLinkStats(LinkImpl linkA, LinkImpl linkB) {
+	private boolean bothLinksHaveSameLinkStats(Link linkA, Link linkB) {
 
 		boolean bothLinksHaveSameLinkStats = true;
 
@@ -206,7 +241,7 @@ public class NetworkSimplifier {
 
 	public static void main(String[] args){
 		//some kind of unit test for id matchings ;-)
-		NetworkSimplifier ns = new NetworkSimplifier();
+		NetworkLanesSignalsSimplifier ns = new NetworkLanesSignalsSimplifier();
 		Id id1 = new IdImpl("1");
 		Id id2 = new IdImpl("2");
 		Id id12 = ns.createId(id1, id2);

@@ -30,13 +30,13 @@ import org.matsim.signalsystems.data.SignalsData;
 import org.xml.sax.SAXException;
 
 import playground.dgrether.DgPaths;
+import playground.dgrether.koehlerstrehlersignal.conversion.M2KS2010NetworkConverter;
 import playground.dgrether.koehlerstrehlersignal.conversion.M2KS2010SimpleDemandConverter;
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodities;
 import playground.dgrether.koehlerstrehlersignal.data.DgKSNetwork;
 import playground.dgrether.koehlerstrehlersignal.data.KS2010ModelWriter;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdConverter;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdPool;
-import playground.dgrether.koehlerstrehlersignal.network.DgM2KS2010NetworkConverter;
 
 
 public class DgFigure9ToKoehlerStrehler2010ModelConverter {
@@ -55,7 +55,7 @@ public class DgFigure9ToKoehlerStrehler2010ModelConverter {
 		DgIdPool idPool = new DgIdPool();
 		DgIdConverter idConverter = new DgIdConverter(idPool);
 
-		DgM2KS2010NetworkConverter converter = new DgM2KS2010NetworkConverter(idConverter);
+		M2KS2010NetworkConverter converter = new M2KS2010NetworkConverter(idConverter);
 		log.warn("Check times of demand!");
 		DgKSNetwork net = converter.convertNetworkLanesAndSignals(sc.getNetwork(), sc.getScenarioElement(LaneDefinitions20.class), 
 				sc.getScenarioElement(SignalsData.class), 0.0, 3600.0);
