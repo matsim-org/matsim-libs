@@ -63,7 +63,7 @@ import playground.anhorni.surprice.preprocess.Zone;
 public class CreateScenario {	
 	private ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());	
 	private ConvertThurgau2Plans thurgauConverter = new ConvertThurgau2Plans();
-	private TreeMap<Id, PersonHomeWork> personHCFacilities = new TreeMap<Id, PersonHomeWork>();
+	private TreeMap<Id, PersonHomeWork> personHWFacilities = new TreeMap<Id, PersonHomeWork>();
 	private Random random = new Random(102830259L);
 	private TreeMap<Id, PersonWeeks> personWeeksMZ = new TreeMap<Id, PersonWeeks>();
 	private Config config;
@@ -106,40 +106,8 @@ public class CreateScenario {
 		
 		this.createIncomes(config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath"), 
 				config.findParam(Surprice.SURPRICE_PREPROCESS, "mzIncomeFile"));
+	}
 		
-		this.createPreferences(config.findParam(Surprice.SURPRICE_PREPROCESS, "outPath"));
-	}
-	
-	private void createPreferences(String path) {
-		ObjectAttributes preferences = new ObjectAttributes();
-		for (PersonWeeks personWeeks : personWeeksMZ.values()) {	
-			
-				// incomes 0..8				
-				double incomeNzd = personWeeks.getIncome() / 8.0; // income [0..1] [low .. high]
-				double alpha = 0.5 + incomeNzd; // alpha [0.5 ... 1.5]
-								
-				double k = (8.0 - personWeeks.getIncome()) / 8.0; // [0.0 .. 1.0] [high .. low]
-				double gamma = 0.5 + k; // gamma [0.5 ... 1.5]
-			
-//				// incomes 0..8				
-//				double incomeNzd = personWeeks.getIncome() / 8.0; // income [0..1] [low .. high]
-//				double alpha = 2.0 + incomeNzd; // alpha [0.5 ... 1.5]
-//								
-//				double k = (8.0 - personWeeks.getIncome()) / 8.0; // [0.0 .. 1.0] [high .. low]
-//				double gamma = 2.0 + k; // gamma [0.5 ... 1.5]
-				
-				preferences.putAttribute(personWeeks.getPerson().getId().toString(), "alpha", alpha);
-				preferences.putAttribute(personWeeks.getPerson().getId().toString(), "gamma", gamma);
-		}
-		this.writePreferences(path, preferences);
-	}
-	
-	private void writePreferences(String path, ObjectAttributes preferences) {
-		log.info("Writing preferences to " + path + "/preferences.xml");
-		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(preferences);
-		attributesWriter.writeFile(path + "/preferences.xml"); 
-	}
-	
 	private void createIncomes(String outPath, String mzIncomeFile) {
 		TreeMap<Double, Integer> incomesNormalized = new TreeMap<Double, Integer>();
 		try {
@@ -320,17 +288,17 @@ public class CreateScenario {
 			}
 			PlanImpl plan = (PlanImpl)p.getSelectedPlan();
 			Id homeFacilityId = plan.getFirstActivity().getFacilityId();
-			Id workFacilityId = this.getCommuteFacilityId(plan);			
-			this.personHCFacilities.put(p.getId(), new PersonHomeWork(p, homeFacilityId, workFacilityId));
+			Id workFacilityId = this.getWorkFacilityId(plan);			
+			this.personHWFacilities.put(p.getId(), new PersonHomeWork(p, homeFacilityId, workFacilityId));
 		}
 	}
 	
-	private Id getCommuteFacilityId(PlanImpl plan) {
+	private Id getWorkFacilityId(PlanImpl plan) {
 		Id workId = null;
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof Activity) {
 				ActivityImpl act = (ActivityImpl)pe;				
-				if (act.getType().startsWith("c")) {
+				if (act.getType().startsWith("w")) {
 					workId = act.getFacilityId();
 				}
 			}
@@ -357,7 +325,7 @@ public class CreateScenario {
 				log.info(" person # " + counter);
 			}			
 			PersonWeeks personWeeksThurgau;
-			if (this.personHCFacilities.get(p.getId()).getWorkFaciliyId() != null) {
+			if (this.personHWFacilities.get(p.getId()).getWorkFaciliyId() != null) {
 				personWeeksThurgau = this.chooseWeek(workersNormalized);
 			}
 			else {
@@ -387,11 +355,11 @@ public class CreateScenario {
 			// TODO: smear times
 			
 			// assign home and work locations
-			PersonHomeWork phw = this.personHCFacilities.get(person.getId());			
+			PersonHomeWork phw = this.personHWFacilities.get(person.getId());			
 			for (PlanElement pe : planNew.getPlanElements()) {
 				if (pe instanceof Activity) {
 					ActivityImpl act = (ActivityImpl)pe;				
-					if (act.getType().startsWith("c")) {
+					if (act.getType().startsWith("w")) {
 						act.setFacilityId(phw.getWorkFaciliyId());
 						act.setCoord(this.scenario.getActivityFacilities().getFacilities().get(phw.getWorkFaciliyId()).getCoord());
 						act.setLinkId(this.scenario.getActivityFacilities().getFacilities().get(phw.getWorkFaciliyId()).getLinkId());
