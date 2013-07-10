@@ -50,15 +50,17 @@ AgentArrivalEventHandler {
 	private OTFAgentsListHandler.Writer walk2dWriter;
 	private final LinkedHashMap<Id, AgentSnapshotInfo> visData = new LinkedHashMap<Id, AgentSnapshotInfo>();
 	private final EventsManager eventsManager;
+	private Scenario scenario;
 
 	public OTFVisMobsimFeature(VisMobsim queueSimulation, Scenario scenario, EventsManager eventsManager) {
 		this.queueSimulation = queueSimulation;
 		this.eventsManager = eventsManager;
+		this.scenario = scenario;
 	}
 
 	@Override
 	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
-		this.server = OnTheFlyServer.createInstance(this.queueSimulation.getScenario(), this.eventsManager);
+		this.server = OnTheFlyServer.createInstance(this.scenario, this.eventsManager);
 		this.server.setSimulation(queueSimulation);
 
 

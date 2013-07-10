@@ -497,7 +497,7 @@ public final class QSim implements VisMobsim, Netsim {
 	}
 
 	@Override
-	public VisData getNonNetwokAgentSnapshots() {
+	public VisData getNonNetworkAgentSnapshots() {
 		return new VisData() {
 
 			@Override

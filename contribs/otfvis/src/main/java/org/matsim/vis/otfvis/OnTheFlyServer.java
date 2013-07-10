@@ -128,7 +128,7 @@ public class OnTheFlyServer implements OTFLiveServer {
 		@Override
 		public VisData getNonNetwokAgentSnapshots() {
 			if (visMobsim != null) {
-				return visMobsim.getNonNetwokAgentSnapshots();
+				return visMobsim.getNonNetworkAgentSnapshots();
 			} else {
 				return visData;
 			}
@@ -318,10 +318,12 @@ public class OnTheFlyServer implements OTFLiveServer {
 			}
 			if (this.visMobsim != null) {
 				quad = new LiveServerQuadTree(this.visMobsim.getVisNetwork());
-				OTFAgentsListHandler.Writer teleportationWriter;
-				teleportationWriter = new OTFAgentsListHandler.Writer();
-				teleportationWriter.setSrc(this.visMobsim.getNonNetwokAgentSnapshots());
-				quad.addAdditionalElement(teleportationWriter);
+				if (config.otfVis().isShowTeleportedAgents()) {
+					OTFAgentsListHandler.Writer teleportationWriter;
+					teleportationWriter = new OTFAgentsListHandler.Writer();
+					teleportationWriter.setSrc(this.visMobsim.getNonNetworkAgentSnapshots());
+					quad.addAdditionalElement(teleportationWriter);
+				}
 			} else {
 				quad = new SnapshotWriterQuadTree(this.scenario.getNetwork());
 				OTFAgentsListHandler.Writer teleportationWriter;

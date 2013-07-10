@@ -440,8 +440,7 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 	}
 
 	@Override
-	public VisData getNonNetwokAgentSnapshots() {
-		// This simulation simulates only agents on the network.
+	public VisData getNonNetworkAgentSnapshots() {
 		// We do not keep physical positions for teleporting agents, and other modes do not exist.
 		return new VisData() {
 

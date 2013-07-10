@@ -1,14 +1,11 @@
 package org.matsim.core.mobsim.qsim;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
-import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -22,11 +19,10 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.TeleportationVisData;
 import org.matsim.vis.snapshotwriters.VisData;
-import org.matsim.vis.snapshotwriters.VisLink;
 import org.matsim.vis.snapshotwriters.VisMobsim;
 
 public class TeleportationEngine implements DepartureHandler, MobsimEngine,
-		VisData {
+VisData {
 	/**
 	 * Includes all agents that have transportation modes unknown to the
 	 * QueueSimulation (i.e. != "car") or have two activities on the same link
@@ -35,18 +31,7 @@ public class TeleportationEngine implements DepartureHandler, MobsimEngine,
 			30, new TeleportationArrivalTimeComparator());
 	private final LinkedHashMap<Id, TeleportationVisData> teleportationData = new LinkedHashMap<Id, TeleportationVisData>();
 	private InternalInterface internalInterface;
-	private final Set<Id> trackedAgents = new HashSet<Id>();
 	private final Map<Id, MobsimAgent> agents = new HashMap<Id, MobsimAgent>();
-	private boolean doVisualizeTeleportedAgents;
-	private Collection<AgentSnapshotInfo> snapshots = new ArrayList<AgentSnapshotInfo>();
-
-	public void removeTrackedAgent(Id id) {
-		trackedAgents.remove(id);
-	}
-
-	public void addTrackedAgent(Id agentId) {
-		trackedAgents.add(agentId);
-	}
 
 	@Override
 	public boolean handleDeparture(double now, MobsimAgent agent, Id linkId) {
@@ -68,43 +53,18 @@ public class TeleportationEngine implements DepartureHandler, MobsimEngine,
 	}
 
 	@Override
-	public Collection<AgentSnapshotInfo> getAgentSnapshotInfo(
-			Collection<AgentSnapshotInfo> snapshotList) {
-		snapshotList.addAll(this.snapshots);
+	public Collection<AgentSnapshotInfo> getAgentSnapshotInfo(Collection<AgentSnapshotInfo> snapshotList) {
+		double time = internalInterface.getMobsim().getSimTimer().getTimeOfDay();
+		for (TeleportationVisData teleportationVisData : teleportationData.values()) {
+			teleportationVisData.calculatePosition(time);
+			snapshotList.add(teleportationVisData);
+		}
 		return snapshotList;
 	}
 
 	@Override
 	public void doSimStep(double time) {
-		this.updateSnapshots(time);
 		handleTeleportationArrivals();
-	}
-
-	private void updateSnapshots(double time) {
-		snapshots.clear();
-		if (this.doVisualizeTeleportedAgents) {
-			for (TeleportationVisData teleportationVisData : teleportationData.values()) {
-				teleportationVisData.calculatePosition(time);
-				snapshots.add(teleportationVisData);
-			}
-		}
-		for (Id personId : trackedAgents) {
-			TeleportationVisData teleportationVisData = teleportationData.get(personId);
-			if (teleportationVisData != null) {
-				teleportationVisData.calculatePosition(time);
-				snapshots.add(teleportationVisData);
-			} else {
-				Collection<AgentSnapshotInfo> positions = new ArrayList<AgentSnapshotInfo>();
-				MobsimAgent agent = agents.get(personId);
-				VisLink visLink = internalInterface.getMobsim().getNetsimNetwork().getVisLinks().get(agent.getCurrentLinkId());
-				visLink.getVisData().getAgentSnapshotInfo(positions);
-				for (AgentSnapshotInfo position : positions) {
-					if (position.getId().equals(personId)) {
-						snapshots.add(position);
-					}
-				}
-			}
-		}
 	}
 
 	private void handleTeleportationArrivals() {
@@ -127,8 +87,6 @@ public class TeleportationEngine implements DepartureHandler, MobsimEngine,
 
 	@Override
 	public void onPrepareSim() {
-		this.doVisualizeTeleportedAgents = internalInterface.getMobsim()
-				.getScenario().getConfig().otfVis().isShowTeleportedAgents();
 		for (MobsimAgent agent : ((VisMobsim) internalInterface.getMobsim())
 				.getAgents()) {
 			agents.put(agent.getId(), agent);

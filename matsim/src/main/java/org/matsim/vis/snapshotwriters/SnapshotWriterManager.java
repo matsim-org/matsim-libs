@@ -94,6 +94,10 @@ public class SnapshotWriterManager implements MobsimBeforeCleanupListener, Mobsi
 			for (VisLink link : visMobsim.getVisNetwork().getVisLinks().values()) {
 				link.getVisData().getAgentSnapshotInfo(positions);
 			}
+			
+			// We do not put non-network agents in movies.
+			// Otherwise, we would add snapshots from visMobsim.getNonNetworkAgentSnapshots() here.
+			
 			for (SnapshotWriter writer : this.snapshotWriters) {
 				writer.beginSnapshot(time);
 				for (AgentSnapshotInfo position : positions) {
