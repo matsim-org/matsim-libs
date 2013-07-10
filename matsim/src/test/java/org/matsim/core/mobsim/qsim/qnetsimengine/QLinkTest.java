@@ -97,7 +97,7 @@ public class QLinkTest extends MatsimTestCase {
 	}
 
 
-	private PersonDriverAgentImpl createAndInsertPersonDriverAgentImpl(PersonImpl p, Netsim simulation) {
+	private PersonDriverAgentImpl createAndInsertPersonDriverAgentImpl(PersonImpl p, QSim simulation) {
 		PersonDriverAgentImpl agent = new PersonDriverAgentImpl(p, p.getSelectedPlan(), simulation);
 		simulation.insertAgentIntoMobsim(agent); 
 		return agent;

@@ -22,7 +22,6 @@ package org.matsim.core.mobsim.qsim.interfaces;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.ObservableMobsim;
 
@@ -87,11 +86,6 @@ import org.matsim.core.mobsim.framework.ObservableMobsim;
  *
  */
 public interface Mobsim extends ObservableMobsim {
-	/**
-	 * If you are not inserting (i.e. instantiating) an Agent, please try to use the 
-	 * InternalInterface .  kai, nov'11
-	 */
-	void insertAgentIntoMobsim( MobsimAgent agent ) ;
 
 	EventsManager getEventsManager();
 

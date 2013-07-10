@@ -20,7 +20,6 @@
 
 package org.matsim.core.mobsim.queuesim;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -322,8 +321,7 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 		}
 	}
 
-	@Override
-	public /*package*/ void insertAgentIntoMobsim( MobsimAgent agent ) {
+	void insertAgentIntoMobsim( MobsimAgent agent ) {
 		this.agentCounter.incLiving();
 		this.arrangeNextAgentAction(agent) ;
 	}
