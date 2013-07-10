@@ -109,7 +109,7 @@ public class CapacityDelayHandler implements BoardingDeniedEventHandler, PersonE
 			// a "normal" agent is entering a public vehicle
 						
 			if (this.affectedAgent2causingAgents.containsKey(event.getPersonId())){
-				System.out.println("Boarding agent was boarding denied before.");
+//				System.out.println("Boarding agent was boarding denied before.");
 				calculateExternalDelay(event.getTime(), event.getPersonId());
 			}
 			
@@ -189,14 +189,14 @@ public class CapacityDelayHandler implements BoardingDeniedEventHandler, PersonE
 	private void calculateExternalDelay(double time, Id affectedAgentId) {
 		
 		double delay = time - this.affectedAgent2boardingDeniedTime.get(affectedAgentId);
-		System.out.println("Delay: " + delay);
+//		System.out.println("Delay: " + delay);
 		List<Id> causingAgents = this.affectedAgent2causingAgents.get(affectedAgentId);
-		System.out.println("Causing agents: " + causingAgents);
+//		System.out.println("Causing agents: " + causingAgents);
 		double delayPerCausingAgent = delay / causingAgents.size();
 		
 		for (Id causingAgentId : causingAgents) {
 			CapacityDelayEvent capacityDelayEvent = new CapacityDelayEvent(time, causingAgentId, affectedAgentId, this.affectedAgent2deniedVehicle.get(affectedAgentId), delayPerCausingAgent);
-			System.out.println("Capacity delay event: " + capacityDelayEvent.toString());
+//			System.out.println("Capacity delay event: " + capacityDelayEvent.toString());
 			this.events.processEvent(capacityDelayEvent);
 		}
 				
