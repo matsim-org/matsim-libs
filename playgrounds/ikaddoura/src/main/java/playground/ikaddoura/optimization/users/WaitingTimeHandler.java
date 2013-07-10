@@ -32,11 +32,13 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.BoardingDeniedEvent;
 import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.handler.BoardingDeniedEventHandler;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
@@ -45,7 +47,7 @@ import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
  * @author Ihab
  *
  */
-public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, AgentDepartureEventHandler, AgentArrivalEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler {
+public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, AgentDepartureEventHandler, AgentArrivalEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler, BoardingDeniedEventHandler {
 	private final static Logger log = Logger.getLogger(WaitingTimeHandler.class);
 
 	private final List <Double> waitingTimes = new ArrayList<Double>();
@@ -59,6 +61,7 @@ public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, Agen
 	private final Map <Id, Id> busId2currentFacilityId = new HashMap<Id, Id>();
 
 	private int numberOfMissedVehicles;
+	private int boardingDeniedEvents;
 		
 	private final double headway;
 	
@@ -224,5 +227,14 @@ public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, Agen
 			}
 		}
 	}
-	
+
+	@Override
+	public void handleEvent(BoardingDeniedEvent event) {
+		this.boardingDeniedEvents++;
+	}
+
+	public int getBoardingDeniedEvents() {
+		return boardingDeniedEvents;
+	}
+
 }

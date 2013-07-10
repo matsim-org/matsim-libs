@@ -314,6 +314,7 @@ class ExternalControler {
 		info.setWaitingTimesMissed(analysis.getWaitHandler().getWaitingTimesMissed());
 		info.setPersonId2waitingTimes(analysis.getWaitHandler().getPersonId2waitingTimes());
 		info.setNumberOfMissedVehicles(analysis.getWaitHandler().getNumberOfMissedVehicles());
+		info.setNumberOfBoardingDeniedEvents(analysis.getWaitHandler().getBoardingDeniedEvents());
 		
 		info.setMaxDepartureDelay(analysis.getWaitHandler().getMaxDepartDelay());
 		info.setMaxArrivalDelay(analysis.getWaitHandler().getMaxArriveDelay());

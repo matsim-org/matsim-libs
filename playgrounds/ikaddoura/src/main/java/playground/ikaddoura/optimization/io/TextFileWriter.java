@@ -32,7 +32,7 @@ public class TextFileWriter {
 	    String zeile0 = directoryExtItParam;
 	    bw.write(zeile0);
 	    bw.newLine();
-	    String zeile1 = "ITERATION;Headway (sec);NumberOfBuses;Headway (hh:mm:ss);Fare (AUD);AvgFarePerAgent (AUD);Capacity (Pers/Veh);TotalDemand;OperatorCosts (AUD);OperatorRevenue (AUD);OperatorProfit (AUD);UsersLogSum (AUD);Welfare (AUD);CarLegs;PtLegs;WalkLegs;AvgWaitingTimeAll (sec);AvgWaitingTimeNotMissing (sec);AvgWaitingTimeMissing (sec);NumberOfMissedBusTrips;NumberOfNotMissedBusTrips;MissedBusses;t0MinusTActSum (sec);avgT0MinusTActPerPerson (sec);avgT0MinusTActDivT0perTrip;maxDepartureDelay (sec);maxArrivalDelay (sec);NumberOfAgentsNoValidPlan";
+	    String zeile1 = "ITERATION;Headway (sec);NumberOfBuses;Headway (hh:mm:ss);Fare (AUD);AvgFarePerAgent (AUD);Capacity (Pers/Veh);TotalDemand;OperatorCosts (AUD);OperatorRevenue (AUD);OperatorProfit (AUD);UsersLogSum (AUD);Welfare (AUD);CarLegs;PtLegs;WalkLegs;AvgWaitingTimeAll (sec);AvgWaitingTimeNotMissing (sec);AvgWaitingTimeMissing (sec);NumberOfMissedBusTrips;NumberOfNotMissedBusTrips;MissedBusses;boardingDeniedEvents;t0MinusTActSum (sec);avgT0MinusTActPerPerson (sec);avgT0MinusTActDivT0perTrip;maxDepartureDelay (sec);maxArrivalDelay (sec);NumberOfAgentsNoValidPlan";
 	    bw.write(zeile1);
 	    bw.newLine();
 	
@@ -57,6 +57,7 @@ public class TextFileWriter {
 	    	double waitingTimeMoreThanHeadway = extIt2information.get(iteration).getMissedBusTrips();
 	    	double waitingTimeLessThanHeadway = extIt2information.get(iteration).getNotMissedBusTrips();
 	    	double missedBusses = extIt2information.get(iteration).getNumberOfMissedVehicles();
+	    	double boardingDeniedEvents = extIt2information.get(iteration).getNumberOfBoardingDeniedEvents();
 	    	double t0MinustActSum = extIt2information.get(iteration).getT0MinusTActSum();
 	    	double avgT0MinustActPerPerson = extIt2information.get(iteration).getAvgT0MinusTActPerPerson();
 	    	double avgT0MinusTActDivT0perTrip = extIt2information.get(iteration).getAvgT0MinusTActDivT0PerTrip();
@@ -65,7 +66,7 @@ public class TextFileWriter {
 	    	double maxDepartureDelay = extIt2information.get(iteration).getMaxDepartureDelay();
 	    	double maxArrivalDelay = extIt2information.get(iteration).getMaxArrivalDelay();
 	    	
-	    	String zeile = iteration+ ";"+headway_sec+";"+numberOfBuses+";"+headway+";"+fare+";"+avgFarePerAgent+";"+capacity+";"+totalDemand+";"+costs+ ";"+revenue+";"+operatorProfit+";"+userScoreSum+";"+totalScore+";"+carLegs+";"+ptLegs+";"+walkLegs+";"+avgWaitTimeAll+";" +avgWaitTimeNotMissing+";"+avgWaitTimeMissing+";"+waitingTimeMoreThanHeadway+";"+waitingTimeLessThanHeadway+";"+missedBusses+ ";" +t0MinustActSum+ ";" +avgT0MinustActPerPerson+ ";" +avgT0MinusTActDivT0perTrip+ ";"+maxDepartureDelay+";"+maxArrivalDelay+";"+numberOfAgentsNoValidPlan;
+	    	String zeile = iteration+ ";"+headway_sec+";"+numberOfBuses+";"+headway+";"+fare+";"+avgFarePerAgent+";"+capacity+";"+totalDemand+";"+costs+ ";"+revenue+";"+operatorProfit+";"+userScoreSum+";"+totalScore+";"+carLegs+";"+ptLegs+";"+walkLegs+";"+avgWaitTimeAll+";" +avgWaitTimeNotMissing+";"+avgWaitTimeMissing+";"+waitingTimeMoreThanHeadway+";"+waitingTimeLessThanHeadway+";"+missedBusses+ ";"+boardingDeniedEvents+";"+t0MinustActSum+ ";" +avgT0MinustActPerPerson+ ";" +avgT0MinusTActDivT0perTrip+ ";"+maxDepartureDelay+";"+maxArrivalDelay+";"+numberOfAgentsNoValidPlan;
 	
 	    	bw.write(zeile);
 	        bw.newLine();

@@ -61,6 +61,8 @@ public class IterationInfo {
 	private List <Double> waitingTimesNotMissed = new ArrayList<Double>();
 			
 	private int numberOfMissedVehicles;
+	private int numberOfBoardingDeniedEvents;
+	
 	private double maxArrivalDelay;
 	private double maxDepartureDelay;
 	
@@ -324,6 +326,14 @@ public class IterationInfo {
 
 	public void setMaxDepartureDelay(double maxDepartureDelay) {
 		this.maxDepartureDelay = maxDepartureDelay;
+	}
+
+	public int getNumberOfBoardingDeniedEvents() {
+		return numberOfBoardingDeniedEvents;
+	}
+
+	public void setNumberOfBoardingDeniedEvents(int numberOfBoardingDeniedEvents) {
+		this.numberOfBoardingDeniedEvents = numberOfBoardingDeniedEvents;
 	}
 	
 }
