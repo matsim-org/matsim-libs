@@ -25,7 +25,7 @@ import java.util.Arrays;
 public class Surprice {
 	
 	public static ArrayList<String> days = new ArrayList<String>(Arrays.asList("mon", "tue", "wed", "thu", "fri", "sat", "sun"));
-	public static ArrayList<String> modes = new ArrayList<String>(Arrays.asList("car", "pt", "bike", "walk"));
+	public static ArrayList<String> modes = new ArrayList<String>(Arrays.asList("car", "pt", "pax", "slm", "mtb", "other", "undefined"));
 	public static final String SURPRICE_RUN = "surprice_run";
 	public static final String SURPRICE_PREPROCESS = "surprice_preprocess";
 	

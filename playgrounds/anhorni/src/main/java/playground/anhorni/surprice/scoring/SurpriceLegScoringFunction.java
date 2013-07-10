@@ -52,25 +52,20 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
     private String day;
     private AgentMemory memory;
     private Config config;
-    
-    private double alpha_tot;
-    private double gamma_tot;
-    
+        
     private double constantCar;
     private double constantPt;
     private double constantBike;
     private double constantWalk;  
     
     public SurpriceLegScoringFunction(final CharyparNagelScoringParameters params, Network network, final Config config, AgentMemory memory, 
-    		String day, double alpha_tot, double gamma_tot, PersonImpl person) {
+    		String day, PersonImpl person) {
 		this.params = params;
         this.network = network;
         this.config = config;
         
         this.memory = memory;
         this.day = day;
-        this.alpha_tot = alpha_tot;
-        this.gamma_tot = gamma_tot;
         
         this.constantCar = this.params.constantCar;
     	this.constantPt = this.params.constantPt;
@@ -144,14 +139,8 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 	}
 
 	protected double calcLegScore(final double departureTime, final double arrivalTime, final Leg leg) {	
-		
 		if (Boolean.parseBoolean(this.config.findParam(Surprice.SURPRICE_RUN, "useLaggedVars"))) {
 			this.adaptCoefficientsLagged();			
-		}
-		
-		if (!Boolean.parseBoolean(this.config.findParam(Surprice.SURPRICE_RUN, "usePrefs"))) {
-			this.alpha_tot = 1.0;
-			this.gamma_tot = 1.0;
 		}		
 		double tmpScore = 0.0;
 		double travelTime = arrivalTime - departureTime; // travel time in seconds	
@@ -163,11 +152,11 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 			double dist = 0.0; // distance in meters
 			dist = getDistance(route);
 						
-			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s * Math.max(alpha_tot, 0.0) + 
-			Math.max(this.gamma_tot, 0.0) * this.params.monetaryDistanceCostRateCar * this.params.marginalUtilityOfMoney * dist;
+			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s + 
+			this.params.monetaryDistanceCostRateCar * this.params.marginalUtilityOfMoney * dist;
 			tmpScore += this.constantCar;
 			
-			tmpMonetaryCosts += Math.max(this.gamma_tot, 0.0) * this.params.monetaryDistanceCostRateCar * this.params.marginalUtilityOfMoney * dist;
+			tmpMonetaryCosts += this.params.monetaryDistanceCostRateCar * this.params.marginalUtilityOfMoney * dist;
 						
 		// ============= CAR =======================================================
 		} else if (TransportMode.pt.equals(leg.getMode())) {			
@@ -175,28 +164,28 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 			double dist = 0.0; // distance in meters
 			dist = getDistance(route);
 			
-			tmpScore += travelTime * this.params.marginalUtilityOfTravelingPT_s * Math.max(alpha_tot, 0.0) + 
-			Math.max(this.gamma_tot, 0.0) * this.params.monetaryDistanceCostRatePt * this.params.marginalUtilityOfMoney * dist;
+			tmpScore += travelTime * this.params.marginalUtilityOfTravelingPT_s + 
+			this.params.monetaryDistanceCostRatePt * this.params.marginalUtilityOfMoney * dist;
 			tmpScore += this.constantPt;	
 			
-			tmpMonetaryCosts += Math.max(this.gamma_tot, 0.0) * this.params.monetaryDistanceCostRatePt * this.params.marginalUtilityOfMoney * dist;
+			tmpMonetaryCosts += this.params.monetaryDistanceCostRatePt * this.params.marginalUtilityOfMoney * dist;
 			
 		} else if (TransportMode.walk.equals(leg.getMode()) || TransportMode.transit_walk.equals(leg.getMode())) {
-			tmpScore += travelTime * this.params.marginalUtilityOfTravelingWalk_s * Math.max(alpha_tot, 0.0);
+			tmpScore += travelTime * this.params.marginalUtilityOfTravelingWalk_s;
 			tmpScore +=  this.constantWalk;
 		} else if (TransportMode.bike.equals(leg.getMode())) {
-			tmpScore += travelTime * this.params.marginalUtilityOfTravelingBike_s * Math.max(alpha_tot, 0.0);
+			tmpScore += travelTime * this.params.marginalUtilityOfTravelingBike_s;
 			tmpScore += this.constantBike;
 		} else {
 			double dist = 0.0; // distance in meters
 			Route route = leg.getRoute();
 			dist = getDistance(route);
 			// use the same values as for "car"
-			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s * Math.max(alpha_tot, 0.0) + 
-			Math.max(this.gamma_tot, 0.0) * this.params.monetaryDistanceCostRateCar * this.params.marginalUtilityOfMoney * dist;
+			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s + 
+			this.params.monetaryDistanceCostRateCar * this.params.marginalUtilityOfMoney * dist;
 			tmpScore += this.constantCar;
 			
-			tmpMonetaryCosts += Math.max(this.gamma_tot, 0.0) * this.params.monetaryDistanceCostRateCar * this.params.marginalUtilityOfMoney * dist;
+			tmpMonetaryCosts += this.params.monetaryDistanceCostRateCar * this.params.marginalUtilityOfMoney * dist;
 		}
 		double prevVal = 0.0;
 		if (this.person.getCustomAttributes().get(day + ".legScore") != null) {

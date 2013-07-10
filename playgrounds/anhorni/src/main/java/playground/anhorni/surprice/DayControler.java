@@ -19,13 +19,9 @@
 
 package playground.anhorni.surprice;
 
-import java.util.Random;
-
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.anhorni.surprice.analysis.AgentAnalysisShutdownListener;
@@ -39,7 +35,6 @@ public class DayControler extends Controler {
 	private AgentMemories memories = new AgentMemories();
 	private String day;	
 	private ObjectAttributes preferences;
-	private Random random;
 	private Population populationPreviousDay = null;
 	private TerminationCriterionScoreBased terminationCriterion = null;
 		
@@ -63,7 +58,6 @@ public class DayControler extends Controler {
 //	}
 	
 	protected void setUp() {
-		this.generateAlphaGammaTrip();
 		SurpriceTravelCostCalculatorFactoryImpl costCalculatorFactory = new SurpriceTravelCostCalculatorFactoryImpl(this.day);
 		this.setTravelDisutilityFactory(costCalculatorFactory);
 		super.setUp();	
@@ -100,33 +94,6 @@ public class DayControler extends Controler {
 		}
 		else {
 			return this.terminationCriterion.getFinalIteration();
-		}
-	}
-	
-	private void generateAlphaGammaTrip() {
-		for (Person p : this.scenarioData.getPopulation().getPersons().values()) {
-			this.random = new Random(Integer.parseInt(p.getId().toString()) + Surprice.days.indexOf(this.day) * 10000);
-			
-			for (int i = 0; i < 100; i++) {
-				this.random.nextDouble();
-			}
-			
-			double alphaTripRange = Double.parseDouble(this.getConfig().findParam(Surprice.SURPRICE_RUN, "alphaTripRange"));
-			double r = this.random.nextDouble();
-			double alphaTrip = alphaTripRange * (0.5 - r);	// tripRange * [-0.5 .. 0.5]
-			double gammaTrip = -1.0 * alphaTrip;
-			double alpha = (Double)this.preferences.getAttribute(p.getId().toString(), "alpha");
-			double gamma = (Double)this.preferences.getAttribute(p.getId().toString(), "gamma");
-			
-			p.getCustomAttributes().put(day + ".alpha_tot", alpha + alphaTrip);
-			p.getCustomAttributes().put(day + ".gamma_tot", gamma + gammaTrip);
-			
-			for (int i = 0; i < 100; i++) {
-				this.random.nextDouble();
-			}
-			
-			double fLagged = 0.5 + this.random.nextDouble(); // [0.5 .. 1.5]
-			p.getCustomAttributes().put(day + ".fLagged", fLagged);
 		}
 	}
 }

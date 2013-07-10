@@ -67,29 +67,14 @@ public class SurpriceTravelTimeAndDistanceBasedTravelDisutility implements Trave
 
 	@Override
 	public double getLinkTravelDisutility(final Link link, final double time, final Person person, final Vehicle vehicle) {
-		double travelTime = this.timeCalculator.getLinkTravelTime(link, time, person, vehicle);
-		
-//		if (this.marginalCostOfDistance == 0.0) {
-//			return travelTime * this.marginalCostOfTime;
-//		}
-		// commenting this out since we think it is not (no longer?) necessary.  kai/benjamin, jun'11
-		
-		double alpha_tot = (Double) person.getCustomAttributes().get(this.day + ".alpha_tot");
-		double gamma_tot = (Double) person.getCustomAttributes().get(this.day + ".gamma_tot");
-		
-		return this.marginalCostOfTime * alpha_tot * travelTime + this.marginalCostOfDistance * link.getLength() * gamma_tot;
+		double travelTime = this.timeCalculator.getLinkTravelTime(link, time, person, vehicle);		
+		return this.marginalCostOfTime * travelTime + this.marginalCostOfDistance * link.getLength();
 	}
 
 	@Override
-	public double getLinkMinimumTravelDisutility(final Link link) {
-		
+	public double getLinkMinimumTravelDisutility(final Link link) {		
 		log.error("this one should not be used :( ");
 		System.exit(99);
-
-//		if (this.marginalCostOfDistance == 0.0) {
-//			return (link.getLength() / link.getFreespeed()) * this.marginalCostOfTime;
-//		}
-		// commenting this out since we think it is not (no longer?) necessary.  kai/benjamin, jun'11
 
 		return (link.getLength() / link.getFreespeed()) * this.marginalCostOfTime
 		+ this.marginalCostOfDistance * link.getLength();

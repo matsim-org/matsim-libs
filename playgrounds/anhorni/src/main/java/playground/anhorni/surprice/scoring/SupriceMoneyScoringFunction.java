@@ -27,16 +27,13 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 public class SupriceMoneyScoringFunction implements MoneyScoring, BasicScoring {
 
 	protected double score;
-
 	private static final double INITIAL_SCORE = 0.0;
-	private double gamma;
 	private PersonImpl person;
 	private String day;
 	protected final CharyparNagelScoringParameters params;
 
-	public SupriceMoneyScoringFunction(final CharyparNagelScoringParameters params, double gamma, PersonImpl person, String day) {
+	public SupriceMoneyScoringFunction(final CharyparNagelScoringParameters params, PersonImpl person, String day) {
 		this.params = params;
-		this.gamma = gamma;
 		this.person = person;
 		this.day = day;
 		this.reset();
@@ -50,13 +47,13 @@ public class SupriceMoneyScoringFunction implements MoneyScoring, BasicScoring {
 
 	@Override
 	public void addMoney(final double amount) {
-		this.score += this.gamma * amount * this.params.marginalUtilityOfMoney; // linear mapping of money to score
+		this.score += amount * this.params.marginalUtilityOfMoney; // linear mapping of money to score
 		
 		double prevVal = 0.0;
 		if (this.person.getCustomAttributes().get(day + ".tollScore") != null) {
 			prevVal = (Double)this.person.getCustomAttributes().get(day + ".tollScore");
 		}		
-		this.person.getCustomAttributes().put(day + ".tollScore", prevVal + this.gamma * amount * this.params.marginalUtilityOfMoney);
+		this.person.getCustomAttributes().put(day + ".tollScore", prevVal + amount * this.params.marginalUtilityOfMoney);
 	}
 
 	@Override

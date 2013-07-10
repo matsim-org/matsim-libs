@@ -66,13 +66,7 @@ public class MultiDayControler {
 			}
 			log.info("storing final iteration: " + controler.getFinalIteration());
 			finalIterations[Surprice.days.indexOf(day)] = controler.getFinalIteration();
-		}
-		// only used for small-scale scenario
-//		UtilityAnalyzer analyzer = new UtilityAnalyzer();
-//		Config configCreate = ConfigUtils.loadConfig("C:/l/studies/surprice/configCreateSC.xml");
-//		double sideLength = Double.parseDouble(configCreate.findParam(Surprice.SURPRICE_PREPROCESS, "sideLength"));
-//		analyzer.analyze(config, outPath, sideLength);
-		
+		}		
 		Analyzer analyzer = new Analyzer();
 		analyzer.init(configFile, incomesFile);
 		analyzer.setFinalIterations(finalIterations);

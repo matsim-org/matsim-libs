@@ -56,19 +56,17 @@ public class SurpriceScoringFunctionFactory extends org.matsim.core.scoring.func
 						
 		scoringFunctionAccumulator.addScoringFunction(new SurpriceActivityScoringFunction(
 				plan, new CharyparNagelScoringParameters(config), controler.getConfig(), this.controler.getFacilities(), 
-				(Double)plan.getPerson().getCustomAttributes().get(this.day + ".alpha_tot"), this.day));
+				this.day));
 		
 		scoringFunctionAccumulator.addScoringFunction(new SurpriceLegScoringFunction(
 				new CharyparNagelScoringParameters(config), controler.getNetwork(), controler.getConfig(),
 				this.memories.getMemory(plan.getPerson().getId()),
-				this.day, (Double)plan.getPerson().getCustomAttributes().get(this.day + ".alpha_tot"), 
-				(Double)plan.getPerson().getCustomAttributes().get(this.day + ".gamma_tot"), (PersonImpl)plan.getPerson()));
+				this.day, (PersonImpl)plan.getPerson()));
 		
 		if (Boolean.parseBoolean(controler.getConfig().findParam(Surprice.SURPRICE_RUN, "useRoadPricing"))) {	
 			scoringFunctionAccumulator.addScoringFunction(new SupriceMoneyScoringFunction(
-					new CharyparNagelScoringParameters(config), (Double)plan.getPerson().getCustomAttributes().get(this.day + ".gamma_tot"), (PersonImpl)plan.getPerson(), this.day));
-		}		
-		
+					new CharyparNagelScoringParameters(config), (PersonImpl)plan.getPerson(), this.day));
+		}				
 		//scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(super.getParams()));
 		return scoringFunctionAccumulator;
 	}
