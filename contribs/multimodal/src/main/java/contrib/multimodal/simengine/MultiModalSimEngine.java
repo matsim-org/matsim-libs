@@ -26,8 +26,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -49,11 +47,8 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 	
 	/*package*/ Netsim qSim;
 	/*package*/ Map<String, TravelTime> multiModalTravelTimes;
-	/*package*/ List<MultiModalQLinkExtension> allLinks = null;
 	/*package*/ List<MultiModalQLinkExtension> activeLinks;
 	/*package*/ List<MultiModalQNodeExtension> activeNodes;
-	/*package*/ Queue<MultiModalQLinkExtension> linksToActivate;
-	/*package*/ Queue<MultiModalQNodeExtension> nodesToActivate;
 
 	private Map<Id, MultiModalQNodeExtension> nodes = new HashMap<Id, MultiModalQNodeExtension>();
 	private Map<Id, MultiModalQLinkExtension> links = new HashMap<Id, MultiModalQLinkExtension>();
@@ -65,15 +60,13 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 		this.internalInterface = internalInterface ;
 	}
 
-	/*package*/ MultiModalSimEngine(Netsim qSim, Map<String, TravelTime> map) {
+	/*package*/ MultiModalSimEngine(Netsim qSim, Map<String, TravelTime> multiModalTravelTimes) {
 		this.qSim = qSim;
 
 		activeLinks = new ArrayList<MultiModalQLinkExtension>();
 		activeNodes = new ArrayList<MultiModalQNodeExtension>();
-		linksToActivate = new ConcurrentLinkedQueue<MultiModalQLinkExtension>();	// thread-safe Queue!
-		nodesToActivate = new ConcurrentLinkedQueue<MultiModalQNodeExtension>();	// thread-safe Queue!
 
-		this.multiModalTravelTimes = map;
+		this.multiModalTravelTimes = multiModalTravelTimes;
 	}
 
 	Netsim getMobsim() {
@@ -105,10 +98,6 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 			extension.init();
 		}
 		
-		allLinks = new ArrayList<MultiModalQLinkExtension>();
-		for (NetsimLink qLink : this.qSim.getNetsimNetwork().getNetsimLinks().values()) {
-			allLinks.add(this.getMultiModalQLinkExtension(qLink.getLink().getId()));
-		}
 		/*
 		 * InfoTime may be < simStartTime, this ensures to print out the info 
 		 * at the very first timestep already
@@ -124,7 +113,6 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 	}
 
 	/*package*/ void moveNodes(final double time) {
-		reactivateNodes();
 
 		ListIterator<MultiModalQNodeExtension> simNodes = this.activeNodes.listIterator();
 		MultiModalQNodeExtension node;
@@ -140,7 +128,6 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 	}
 
 	/*package*/ void moveLinks(final double time) {
-		reactivateLinks();
 
 		ListIterator<MultiModalQLinkExtension> simLinks = this.activeLinks.listIterator();
 		MultiModalQLinkExtension link;
@@ -172,19 +159,29 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 		 * in the buffer (such links are *not* active, as the buffer gets emptied
 		 * when handling the nodes.
 		 */
-		for (MultiModalQLinkExtension link : this.allLinks) {
+		for (MultiModalQLinkExtension link : this.links.values()) {
 			link.clearVehicles();
 		}
 	}
 
+	/*
+	 * This is now thread-safe since the MultiModalQLinkExtension uses an
+	 * AtomicBoolean to store its state. Therefore, it cannot be activated
+	 * multiple times.
+	 */
 	@Override
 	public void activateLink(MultiModalQLinkExtension link) {
-		linksToActivate.add(link);
+		this.activeLinks.add(link);
 	}
 
+	/*
+	 * This is now thread-safe since the MultiModalQNodeExtension uses an
+	 * AtomicBoolean to store its state. Therefore, it cannot be activated
+	 * multiple times.
+	 */
 	@Override
 	public void activateNode(MultiModalQNodeExtension node) {
-		nodesToActivate.add(node);
+		this.activeNodes.add(node);
 	}
 
 	@Override
@@ -195,20 +192,6 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 	@Override
 	public int getNumberOfSimulatedNodes() {
 		return activeNodes.size();
-	}
-
-	/*package*/ void reactivateLinks() {
-		if (!linksToActivate.isEmpty()) {
-			activeLinks.addAll(linksToActivate);
-			linksToActivate.clear();
-		}
-	}
-
-	/*package*/ void reactivateNodes() {
-		if (!nodesToActivate.isEmpty()) {
-			activeNodes.addAll(nodesToActivate);
-			nodesToActivate.clear();
-		}
 	}
 
 	/*package*/ Map<String, TravelTime> getMultiModalTravelTimes() {

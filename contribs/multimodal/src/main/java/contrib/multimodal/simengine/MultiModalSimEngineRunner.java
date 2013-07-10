@@ -35,20 +35,16 @@ public class MultiModalSimEngineRunner extends MultiModalSimEngine implements Ru
 	private volatile boolean simulationRunning = true;
 	
 	private final CyclicBarrier startBarrier;
-	private final CyclicBarrier reactivateNodesBarrier;
 	private final CyclicBarrier separationBarrier;
-	private final CyclicBarrier reactivateLinksBarrier;
 	private final CyclicBarrier endBarrier;
 	private final MultiModalSimEngine multiModalSimEngine;
 	
-	/*package*/ MultiModalSimEngineRunner(CyclicBarrier startBarrier, CyclicBarrier reactivateNodesBarrier,
-			CyclicBarrier separationBarrier, CyclicBarrier reactivateLinksBarrier, CyclicBarrier endBarrier,
-			Netsim sim, Map<String, TravelTime> multiModalTravelTime, MultiModalSimEngine multiModalSimEngine) {
+	/*package*/ MultiModalSimEngineRunner(CyclicBarrier startBarrier, CyclicBarrier separationBarrier, 
+			CyclicBarrier endBarrier, Netsim sim, Map<String, TravelTime> multiModalTravelTime, 
+			MultiModalSimEngine multiModalSimEngine) {
 		super(sim, multiModalTravelTime);
 		this.startBarrier = startBarrier;
-		this.reactivateNodesBarrier = reactivateNodesBarrier;
 		this.separationBarrier = separationBarrier;
-		this.reactivateLinksBarrier = reactivateLinksBarrier;
 		this.endBarrier = endBarrier;
 		this.multiModalTravelTimes = multiModalTravelTime;
 		this.multiModalSimEngine = multiModalSimEngine;
@@ -65,41 +61,7 @@ public class MultiModalSimEngineRunner extends MultiModalSimEngine implements Ru
 	public void onPrepareSim() {
 		throw new RuntimeException("This method should never be called - calls should go to the ParallelMultiModalSimEngine.");
 	}
-	
-	/*
-	 * After reactivating the Links we wait until all Threads reach the barrier.
-	 * By doing so we ensure, that no Links to activate are added to another Thread
-	 * which is still processing its List.
-	 */
-	/*package*/ @Override
-	void reactivateLinks() {
-		try {
-			super.reactivateLinks();
-			reactivateLinksBarrier.await();
-		} catch (InterruptedException e) {
-			Gbl.errorMsg(e);
-		} catch (BrokenBarrierException e) {
-	      	Gbl.errorMsg(e);
-		}
-	}
-	
-	/*
-	 * After reactivating the Nodes we wait until all Threads reach the barrier.
-	 * By doing so we ensure, that no Nodes to activate are added to another Thread
-	 * which is still processing its List.
-	 */
-	/*package*/ @Override
-	void reactivateNodes() {
-		try {
-			super.reactivateNodes();
-			reactivateNodesBarrier.await();
-		} catch (InterruptedException e) {
-			Gbl.errorMsg(e);
-		} catch (BrokenBarrierException e) {
-	      	Gbl.errorMsg(e);
-		}
-	}
-		
+			
 	/*
 	 * Changed behavior here:
 	 * Only the current Time is set. Afterwards the ParallelMultiModalSimEngine
@@ -139,8 +101,7 @@ public class MultiModalSimEngineRunner extends MultiModalSimEngine implements Ru
 
 				/*
 				 * After moving the Nodes all we use a CyclicBarrier to synchronize
-				 * the Threads. By using a Runnable within the Barrier we activate
-				 * some Links.
+				 * the Threads.
 				 */
 				this.separationBarrier.await();
 				

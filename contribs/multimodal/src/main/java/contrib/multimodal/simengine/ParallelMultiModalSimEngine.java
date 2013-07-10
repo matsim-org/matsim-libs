@@ -38,27 +38,17 @@ class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 	private Thread[] threads;
 	private MultiModalSimEngineRunner[] engines;
 	private CyclicBarrier startBarrier;
-	private CyclicBarrier reactivateNodesBarrier;
 	private CyclicBarrier separationBarrier;	// separates moveNodes and moveLinks
-	private CyclicBarrier reactivateLinksBarrier;
 	private CyclicBarrier endBarrier;
 	
-	/**
-	 * Since MultiModalTravelTime is personalizable, every thread needs its own instance
-	 * to avoid running into race conditions. Therefore, we need a factory object to create
-	 * those instances.
-	 * 
-	 * @param sim
-	 * @param map
-	 */
 	// use the factory
-	/*package*/ ParallelMultiModalSimEngine(Netsim sim, Map<String, TravelTime> map) {
-		super(sim, map);
+	/*package*/ ParallelMultiModalSimEngine(Netsim sim, Map<String, TravelTime> multiModalTravelTimes) {
+		super(sim, multiModalTravelTimes);
 		this.numOfThreads = this.getMobsim().getScenario().getConfig().getQSimConfigGroup().getNumberOfThreads();
 	}
 	
 	@Override
-	public void setInternalInterface( InternalInterface internalInterface ) {
+	public void setInternalInterface( InternalInterface internalInterface) {
 		super.setInternalInterface(internalInterface);
 		
 		/*
@@ -136,7 +126,7 @@ class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 		}
 
 		/*
-		 * Triggering the startBarrier of the QSimEngineThreads.
+		 * Triggering the startBarrier of the MultiModalSimEngineRunners.
 		 * They will check whether the Simulation is still running.
 		 * It is not, so the Threads will stop running.
 		 */
@@ -194,15 +184,13 @@ class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 		this.engines = new MultiModalSimEngineRunner[numOfThreads];
 
 		this.startBarrier = new CyclicBarrier(numOfThreads + 1);
-		this.reactivateNodesBarrier = new CyclicBarrier(numOfThreads);
 		this.separationBarrier = new CyclicBarrier(numOfThreads);
-		this.reactivateLinksBarrier = new CyclicBarrier(numOfThreads);
 		this.endBarrier = new CyclicBarrier(numOfThreads + 1);
 
 		// setup runners
 		for (int i = 0; i < numOfThreads; i++) {
-			MultiModalSimEngineRunner engine = new MultiModalSimEngineRunner(startBarrier, reactivateLinksBarrier, 
-					separationBarrier, reactivateNodesBarrier, endBarrier, this.getMobsim(), multiModalTravelTimes, this);
+			MultiModalSimEngineRunner engine = new MultiModalSimEngineRunner(startBarrier, 
+					separationBarrier, endBarrier, this.getMobsim(), multiModalTravelTimes, this);
 
 			engine.setInternalInterface(this.internalInterface);
 			

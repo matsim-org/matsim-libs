@@ -106,7 +106,7 @@ public class MultiModalQNodeExtension {
 		 * Otherwise, it could be activated multiple times concurrently.
 		 */
 		if (this.isActive.compareAndSet(false, true)) {
-			simEngine.activateNode(this);			
+			simEngine.activateNode(this);
 		}
 	}
 	
