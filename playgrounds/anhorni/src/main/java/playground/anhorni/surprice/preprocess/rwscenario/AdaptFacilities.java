@@ -58,9 +58,8 @@ public class AdaptFacilities {
 		new FacilitiesReaderMatsimV1(scenario).readFile(facilitiesFileIn);
 				
 		// -------------------------------------------------------
-		// adding new act types:
+		// adding new act types: commuting, business
 		
-		// commuting:
 		for (ActivityFacility facility : this.scenario.getActivityFacilities().getFacilities().values()) {
 			ActivityOptionImpl actOpt2 = (ActivityOptionImpl) facility.getActivityOptions().get("work_sector2");
 			ActivityOptionImpl actOpt3 = (ActivityOptionImpl) facility.getActivityOptions().get("work_sector3");
@@ -83,7 +82,6 @@ public class AdaptFacilities {
 			ActivityOptionImpl aOptComm = ((ActivityFacilityImpl)facility).createActivityOption("commuting");
 			aOptComm.setOpeningTimes(ots);
 			
-			// business:
 			ActivityOptionImpl aOptBusiness = ((ActivityFacilityImpl)facility).createActivityOption("business");
 			aOptBusiness.setOpeningTimes(ots);
 			
@@ -100,7 +98,6 @@ public class AdaptFacilities {
 			
 			((ActivityFacilityImpl)facility).getActivityOptions().remove("education");
 		}
-		// ----------------------
 		new FacilitiesWriter(this.scenario.getActivityFacilities()).write(facilitiesFileOut);
 	}
 }

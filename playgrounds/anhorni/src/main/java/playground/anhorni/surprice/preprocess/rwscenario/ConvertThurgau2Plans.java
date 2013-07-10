@@ -151,11 +151,11 @@ public class ConvertThurgau2Plans {
 		else if (m == 1) { mode = TransportMode.pt; }	// Rail
 		else if (m == 2) { mode = TransportMode.pt; }	// Bus
 		else if (m == 3) { mode = TransportMode.car; }	// Car driver
-		else if (m == 4) { mode = TransportMode.car; }	// Car passenger
-		else if (m == 5) { mode = TransportMode.car; }	// Motorcycle
-		else if (m == 6) { mode = TransportMode.bike; }	// Cycle
-		else if (m == 7) { mode = TransportMode.walk; }	// Walking
-		else if (m == 8) { mode = "undefined"; }		// Other
+		else if (m == 4) { mode = "pax"; }	// Car passenger
+		else if (m == 5) { mode = "mtb"; }	// Motorcycle
+		else if (m == 6) { mode = "slm"; }	// Cycle
+		else if (m == 7) { mode = "slm"; }	// Walking
+		else if (m == 8) { mode = "other"; }			// Other
 		else {
 			Gbl.errorMsg("pid = " + pid + ": m = " + m + " not known!");
 		}
