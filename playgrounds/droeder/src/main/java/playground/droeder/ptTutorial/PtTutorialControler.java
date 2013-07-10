@@ -18,6 +18,8 @@
  * *********************************************************************** */
 package playground.droeder.ptTutorial;
 
+import java.io.File;
+
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
 
@@ -32,6 +34,9 @@ public class PtTutorialControler {
 			.getLogger(PtTutorialControler.class);
 
 	public static void main(String[] args) {
+		if(! new File("E:/sandbox/org.matsim/examples/pt-tutorial/scheduleWithBus.xml.gz").exists()){
+			ExtendPtTutorial.main(null);
+		}
 		Controler c = new Controler("E:/sandbox/org.matsim/examples/pt-tutorial/config.xml");
 		c.setOverwriteFiles(true);
 		c.run();

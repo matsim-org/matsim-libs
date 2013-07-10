@@ -21,7 +21,6 @@ package playground.droeder.ptTutorial;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -67,7 +66,12 @@ public class ExtendPtTutorial {
 		new TransitScheduleReader(sc).readFile(DIR + "transitschedule.xml");
 		new VehicleReaderV1(((ScenarioImpl) sc).getVehicles()).readFile(DIR + "transitVehicles.xml");
 		
-		List<Id> links = new ArrayList<Id>(){{
+		List<Id> links = new ArrayList<Id>(){/**
+			 * 
+			 */
+			private static final long serialVersionUID = 1L;
+
+		{
 			add(new IdImpl("1112"));
 			add(new IdImpl("1213"));
 			add(new IdImpl("1323"));
@@ -120,15 +124,22 @@ public class ExtendPtTutorial {
 		}
 		line.addRoute(route);
 		schedule.addTransitLine(line);
-		new TransitScheduleWriter(schedule).writeFileV1(DIR + "scheduleWithBus.xml");
+		new TransitScheduleWriter(schedule).writeFileV1(DIR + "scheduleWithBus.xml.gz");
 		new VehicleWriterV1(((ScenarioImpl) sc).getVehicles()).writeFile(DIR + "vehiclesWithBus.xml.gz");
 		
 		Config c = ConfigUtils.loadConfig(DIR + "config.xml");
 		c.transit().setTransitScheduleFile(DIR + "scheduleWithBus.xml.gz");
 		c.transit().setVehiclesFile(DIR + "vehiclesWithBus.xml.gz");
-		c.network().setInputFile(c.network().getInputFile().replace("examples/pt-tutorial/", DIR));
-		c.plans().setInputFile(c.plans().getInputFile().replace("examples/pt-tutorial/", DIR));
+		c.network().setInputFile(DIR + "multimodalnetwork.xml");
+		c.plans().setInputFile(DIR + "population.xml");
 		c.controler().setOutputDirectory("E:/sandbox/org.matsim/output/pt-tutorial/");
+		c.strategy().setFractionOfIterationsToDisableInnovation(0.8);
+		if(c.strategy().getValue("Module_3").equals("TransitTimeAllocationMutator")){
+			c.strategy().addParam("Module_3", "TimeAllocationMutator");
+		}
+		if(c.strategy().getValue("Module_4").equals("TransitChangeLegMode")){
+			c.strategy().addParam("Module_4", "TripSubtourModeChoice");
+		}
 		new ConfigWriter(c).write(DIR + "config.xml");
 		
 	}	
