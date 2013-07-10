@@ -25,7 +25,6 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Queue;
 
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -34,7 +33,6 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
-import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo.AgentState;
@@ -190,12 +188,17 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 	}
 	
 	protected void createAndAddSnapshotInfoForPassengers(Collection<AgentSnapshotInfo> positions,
-			Collection<? extends PassengerAgent> passengers, double distanceOnLink, Coord startCoord, Coord endCoord, double lengthOfCurve, double euclideanLength, int lane, double speedValueBetweenZeroAndOne)
+			Collection<? extends PassengerAgent> passengers, double distanceOnLink, Coord startCoord, Coord endCoord, 
+			double lengthOfCurve, double euclideanLength, Integer lane, double speedValueBetweenZeroAndOne)
 	{
 		int cnt = passengers.size();
+		int laneInt = 2*cnt;
+		if (lane != null){
+			laneInt += lane;
+		}
 		for (PassengerAgent passenger : passengers) {
 			AgentSnapshotInfo passengerPosition = snapshotInfoFactory.createAgentSnapshotInfo(passenger.getId(), startCoord, endCoord, 
-					distanceOnLink, lane+2*cnt, lengthOfCurve, euclideanLength);
+					distanceOnLink, laneInt, lengthOfCurve, euclideanLength);
 			passengerPosition.setColorValueBetweenZeroAndOne(speedValueBetweenZeroAndOne);
 			passengerPosition.setAgentState(AgentState.PERSON_OTHER_MODE); // in 2010, probably a passenger
 			positions.add(passengerPosition);
