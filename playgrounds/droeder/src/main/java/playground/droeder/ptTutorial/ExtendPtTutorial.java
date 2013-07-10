@@ -1,0 +1,136 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+package playground.droeder.ptTutorial;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.pt.transitSchedule.api.Departure;
+import org.matsim.pt.transitSchedule.api.TransitLine;
+import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
+import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleCapacity;
+import org.matsim.vehicles.VehicleReaderV1;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleWriterV1;
+import org.matsim.vehicles.VehiclesFactory;
+
+/**
+ * @author droeder
+ *
+ */
+public class ExtendPtTutorial {
+	
+	
+	private final static String DIR = "E:/sandbox/org.matsim/examples/pt-tutorial/";
+
+	public static void main(String[] args) {
+		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		sc.getConfig().scenario().setUseTransit(true);
+		sc.getConfig().scenario().setUseVehicles(true);
+		new MatsimNetworkReader(sc).readFile(DIR + "multimodalnetwork.xml");
+		new TransitScheduleReader(sc).readFile(DIR + "transitschedule.xml");
+		new VehicleReaderV1(((ScenarioImpl) sc).getVehicles()).readFile(DIR + "transitVehicles.xml");
+		
+		List<Id> links = new ArrayList<Id>(){{
+			add(new IdImpl("1112"));
+			add(new IdImpl("1213"));
+			add(new IdImpl("1323"));
+			add(new IdImpl("2324"));
+			add(new IdImpl("2434"));
+			add(new IdImpl("3444"));
+			add(new IdImpl("4434"));
+			add(new IdImpl("3424"));
+			add(new IdImpl("2423"));
+			add(new IdImpl("2313"));
+			add(new IdImpl("1312"));
+			add(new IdImpl("1211"));
+		}};
+		
+		
+		TransitSchedule schedule = sc.getTransitSchedule();
+		TransitScheduleFactory fac = schedule.getFactory();
+		Link l;
+		TransitStopFacility f;
+		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
+		NetworkRoute nRoute = new LinkNetworkRouteImpl(links.get(0), links.get(0));
+		nRoute.setLinkIds(nRoute.getStartLinkId(), links.subList(1, links.size()), nRoute.getEndLinkId());
+		Double delay = 0.;
+		for(Id linkId: links){
+			l = sc.getNetwork().getLinks().get(linkId);
+			f = fac.createTransitStopFacility(linkId, l.getToNode().getCoord(), false);
+			f.setLinkId(linkId);
+			schedule.addStopFacility(f);
+			delay += l.getLength() / (l.getFreespeed() * 0.8);
+			stops.add(fac.createTransitRouteStop(f, delay, delay + 10));
+		}
+		
+		TransitLine line = fac.createTransitLine(sc.createId("busline"));
+		TransitRoute route = fac.createTransitRoute(sc.createId("busroute"), nRoute, stops, "bus");
+		Departure d;
+		Vehicle v;
+		VehiclesFactory vFac = ((ScenarioImpl) sc).getVehicles().getFactory();
+		VehicleType type = vFac.createVehicleType(new IdImpl("bus"));
+		((ScenarioImpl) sc).getVehicles().getVehicleTypes().put(type.getId(), type);
+		VehicleCapacity vCap = vFac.createVehicleCapacity();
+		vCap.setSeats(100);
+		type.setCapacity(vCap);
+		
+		for(int i = 0; i< 86400; i+= 600){
+			d = fac.createDeparture(sc.createId(String.valueOf(i)), i);
+			v = vFac.createVehicle(sc.createId(String.valueOf(i)), type);
+			((ScenarioImpl) sc).getVehicles().getVehicles().put(v.getId(), v);
+			d.setVehicleId(v.getId());
+			route.addDeparture(d);
+		}
+		line.addRoute(route);
+		schedule.addTransitLine(line);
+		new TransitScheduleWriter(schedule).writeFileV1(DIR + "scheduleWithBus.xml");
+		new VehicleWriterV1(((ScenarioImpl) sc).getVehicles()).writeFile(DIR + "vehiclesWithBus.xml.gz");
+		
+		Config c = ConfigUtils.loadConfig(DIR + "config.xml");
+		c.transit().setTransitScheduleFile(DIR + "scheduleWithBus.xml.gz");
+		c.transit().setVehiclesFile(DIR + "vehiclesWithBus.xml.gz");
+		c.network().setInputFile(c.network().getInputFile().replace("examples/pt-tutorial/", DIR));
+		c.plans().setInputFile(c.plans().getInputFile().replace("examples/pt-tutorial/", DIR));
+		c.controler().setOutputDirectory("E:/sandbox/org.matsim/output/pt-tutorial/");
+		new ConfigWriter(c).write(DIR + "config.xml");
+		
+	}	
+	
+}
