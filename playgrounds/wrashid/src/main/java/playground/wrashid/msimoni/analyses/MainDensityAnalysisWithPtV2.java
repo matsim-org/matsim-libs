@@ -71,8 +71,9 @@ public class MainDensityAnalysisWithPtV2 {
 		InFlowInfoAcuumulatorWithPt inflowHandler = new InFlowInfoAcuumulatorWithPt(links, binSizeInSeconds);
 		OutFlowInfoAccumulatorWithPt outflowHandler = new OutFlowInfoAccumulatorWithPt(links, binSizeInSeconds);
 
-		InFlowInfoAcuumulatorWithPt avgInflowHandler = new InFlowInfoAcuumulatorWithPt(links, 1);
-		OutFlowInfoAccumulatorWithPt avgOutflowHandler = new OutFlowInfoAccumulatorWithPt(links, 1);
+		int avgBinSize = 5;	// calculate a value every 5 seconds
+		InFlowInfoAcuumulatorWithPt avgInflowHandler = new InFlowInfoAcuumulatorWithPt(links, avgBinSize);
+		OutFlowInfoAccumulatorWithPt avgOutflowHandler = new OutFlowInfoAccumulatorWithPt(links, avgBinSize);
 				
 		inflowHandler.reset(0);
 		outflowHandler.reset(0);
@@ -112,7 +113,9 @@ public class MainDensityAnalysisWithPtV2 {
 		HashMap<Id, int[]> avgLinkOutFlow = avgOutflowHandler.getLinkOutFlow();
 
 		HashMap<Id, int[]> avgDeltaFlow = deltaFlow(avgLinkInFlow, avgLinkOutFlow);
-		HashMap<Id, double[]> avgDensity = calculateAverageDensity(calculateDensity(avgDeltaFlow, links), binSizeInSeconds);
+		int valuesPerBin = binSizeInSeconds / avgBinSize;
+		if (binSizeInSeconds % avgBinSize != 0) throw new RuntimeException("binSize in seconds % binSize for averaging is != 0");
+		HashMap<Id, double[]> avgDensity = calculateAverageDensity(calculateDensity(avgDeltaFlow, links), valuesPerBin);
 		
 		System.out.println("avg density-----------------------------------------------");
 		printDensity(avgDensity, links);
@@ -179,7 +182,7 @@ public class MainDensityAnalysisWithPtV2 {
 		return density;
 	}
 
-	public static HashMap<Id, double[]> calculateAverageDensity(HashMap<Id, double[]> density, int timeBinSize) {
+	public static HashMap<Id, double[]> calculateAverageDensity(HashMap<Id, double[]> density, int valuesPerBin) {
 
 		HashMap<Id, double[]> avgDensity = new HashMap<Id, double[]>();
 		
@@ -187,7 +190,7 @@ public class MainDensityAnalysisWithPtV2 {
 
 			double[] linkDensity = density.get(linkId);
 			
-			double[] avgLinkDensity = new double[(int) Math.ceil(linkDensity.length / timeBinSize)];
+			double[] avgLinkDensity = new double[(int) Math.ceil(linkDensity.length / valuesPerBin)];
 			avgDensity.put(linkId, avgLinkDensity);
 			
 			int index = 0;
@@ -197,8 +200,8 @@ public class MainDensityAnalysisWithPtV2 {
 				sumDensity += linkDensity[i];
 				
 				// if all entries of the time bin have been processed
-				if ((i+1) % timeBinSize == 0) {
-					avgLinkDensity[index] = sumDensity / timeBinSize;
+				if ((i+1) % valuesPerBin == 0) {
+					avgLinkDensity[index] = sumDensity / valuesPerBin;
 					sumDensity = 0.0;
 					index++;
 				}
