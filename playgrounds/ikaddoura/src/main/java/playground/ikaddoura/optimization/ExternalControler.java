@@ -376,7 +376,7 @@ class ExternalControler {
 			double scheduledStopTime = 0.;
 			double startService = 4. * 3600.;
 			double endService = 24. * 3600.;
-			double slackTime = 600.;
+			double slackTime = 1200.;
 			Id ptVehId = new IdImpl("bus");
 			double alightingTime = 0.75;
 			double boardingTime = 1.0;
