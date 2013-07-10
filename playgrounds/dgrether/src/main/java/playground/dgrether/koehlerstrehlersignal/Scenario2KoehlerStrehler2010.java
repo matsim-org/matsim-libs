@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodities;
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodity;
@@ -65,12 +64,7 @@ public class Scenario2KoehlerStrehler2010 {
 	
 	private static final String modelOutfile = "koehler_strehler_model.xml";
 	
-	private double matsimPopSampleSize = 1.0;
 	private double ksModelCommoditySampleSize = 1.0;
-	private String shapeFileDirectory = "shapes/";
-
-
-	private CoordinateReferenceSystem crs;
 
 	private Network network;
 
@@ -80,15 +74,14 @@ public class Scenario2KoehlerStrehler2010 {
 
 	
 	public Scenario2KoehlerStrehler2010(Network network, LaneDefinitions20 lanes,
-			SignalsData signals, CoordinateReferenceSystem crs) {
+			SignalsData signals) {
 		this.network = network;
 		this.lanes = lanes;
 		this.signals = signals;
-		this.crs = crs;
 	}
 
 
-	public void convert(String outputDirectory, String name, String description, Map<DgZone, Link> zones2LinkMap, double startTimeSec, double endTimeSec) throws IOException{
+	public void convert(String outputDirectory, String shapeFileDirectory, String name, String description, Map<DgZone, Link> zones2LinkMap, double startTimeSec, double endTimeSec) throws IOException{
 		//create koehler strehler network
 		DgIdPool idPool = new DgIdPool();
 		DgIdConverter idConverter = new DgIdConverter(idPool);
@@ -98,7 +91,7 @@ public class Scenario2KoehlerStrehler2010 {
 		netConverter.setSignalizedLinks(signalizedLinks);
 		DgKSNetwork ksNet = netConverter.convertNetworkLanesAndSignals(this.network, this.lanes, this.signals, startTimeSec, endTimeSec);
 		DgKSNetwork2Gexf converter = new DgKSNetwork2Gexf();
-		converter.convertAndWrite(ksNet, outputDirectory + "network_small.gexf");
+		converter.convertAndWrite(ksNet, outputDirectory + "network_small_simplified.gexf");
 		
 		DgMatsim2KoehlerStrehler2010Zones2Commodities demandConverter = new DgMatsim2KoehlerStrehler2010Zones2Commodities(zones2LinkMap, idConverter);
 		DgCommodities commodities = demandConverter.convert(ksNet);
@@ -119,8 +112,8 @@ public class Scenario2KoehlerStrehler2010 {
 		log.info("testing routing again...");
 		router.routeCommodities(newMatsimNetwork, commodities);
 		
-		DgNetworkUtils.writeNetwork(newMatsimNetwork, outputDirectory + "matsimNetworkKsModel.xml.gz");
-		DgNetworkUtils.writeNetwork2Shape(newMatsimNetwork, shapeFileDirectory + "matsimNetworkKsModel.shp");
+		DgNetworkUtils.writeNetwork(newMatsimNetwork, outputDirectory + "matsim_network_ks_model.xml.gz");
+		DgNetworkUtils.writeNetwork2Shape(newMatsimNetwork, shapeFileDirectory + "matsim_network_ks_model.shp");
 		
 		new DgKoehlerStrehler2010ModelWriter().write(ksNet, commodities, name, description, outputDirectory + modelOutfile);
 		writeStats(ksNet, commodities);

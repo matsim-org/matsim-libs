@@ -54,10 +54,11 @@ public class DgCb2Ks2010 {
 
 	private static final Logger log = Logger.getLogger(DgCb2Ks2010.class);
 	
-	private static String shapeFileDirectory = "shapes/";
+	private static String shapeFileDirectoryName = "shapes/";
 
 	
 	public static void main(String[] args) throws Exception {
+		// parameters
 		int cellsX = 5;
 		int cellsY = 5;
 		double boundingBoxOffset = 50.0;
@@ -67,10 +68,6 @@ public class DgCb2Ks2010 {
 	//private static double endTime = 18.5 * 3600.0;
 		double matsimPopSampleSize = 1.0;
 		double ksModelCommoditySampleSize = 0.01;
-		final String outputDirectory = DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/test_tt/";
-		OutputDirectoryLogging.initLoggingWithOutputDirectory(outputDirectory);
-		String shapeFileDirectory = createShapeFileDirectory(outputDirectory);
-		
 		String networkFilename = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network_wgs84_utm33n.xml.gz";
 		String lanesFilename = DgCottbusScenarioPaths.LANES_FILENAME;
 		String signalSystemsFilename = DgPaths.REPOS +  "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_systems.xml";
@@ -79,9 +76,14 @@ public class DgCb2Ks2010 {
 		//TODO change to run1712 when finished
 		String populationFilename = DgPaths.REPOS + "runs-svn/run1292/1292.output_plans_sample.xml";
 //		String populationFilename = DgPaths.REPOS + "runs-svn/run1292/1292.output_plans.xml.gz";
-		Scenario fullScenario = DgCb2Ks2010.loadScenario(networkFilename, populationFilename, lanesFilename, signalSystemsFilename, signalGroupsFilename, signalControlFilename);
 		String name = "run 1292 output plans between 05:30 and 09:30";
 		CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84_UTM33N);
+		final String outputDirectory = DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/test_tt/";
+		
+		// run
+		OutputDirectoryLogging.initLoggingWithOutputDirectory(outputDirectory);
+		String shapeFileDirectory = createShapeFileDirectory(outputDirectory);
+		Scenario fullScenario = DgCb2Ks2010.loadScenario(networkFilename, populationFilename, lanesFilename, signalSystemsFilename, signalGroupsFilename, signalControlFilename);
 		
 		// reduce the size of the scenario
 		ScenarioShrinker scenarioShrinker = new ScenarioShrinker(fullScenario,  crs);
@@ -97,14 +99,14 @@ public class DgCb2Ks2010 {
 		
 		//zones to links matching
 		Map<DgZone, Link> zones2LinkMap = DgZoneUtils.createZoneCenter2LinkMapping(zones, (NetworkImpl) scenarioShrinker.getShrinkedNetwork());
-		writeZones2Shape(zones, zones2LinkMap, scenarioShrinker.getShrinkedNetwork(), crs);
+		writeZones2Shape(shapeFileDirectory, zones, zones2LinkMap, scenarioShrinker.getShrinkedNetwork(), crs);
 		
 		//convert to KoehlerStrehler2010 file format
 		Scenario2KoehlerStrehler2010 converter = new Scenario2KoehlerStrehler2010(scenarioShrinker.getShrinkedNetwork(), 
-				scenarioShrinker.getShrinkedLanes(), scenarioShrinker.getShrinkedSignals(), crs);
+				scenarioShrinker.getShrinkedLanes(), scenarioShrinker.getShrinkedSignals());
 		String description = createDescription(cellsX, cellsY, startTime, endTime, boundingBoxOffset, matsimPopSampleSize, ksModelCommoditySampleSize);
 		converter.setKsModelCommoditySampleSize(ksModelCommoditySampleSize);
-		converter.convert(outputDirectory, name, description, zones2LinkMap, startTime, endTime);
+		converter.convert(outputDirectory, shapeFileDirectory, name, description, zones2LinkMap, startTime, endTime);
 		
 		
 		
@@ -119,7 +121,7 @@ public class DgCb2Ks2010 {
 		return description;
 	}
 
-	private static void writeZones2Shape(DgZones zones, Map<DgZone, Link>  zones2LinkMap, Network network, CoordinateReferenceSystem crs){
+	private static void writeZones2Shape(String shapeFileDirectory, DgZones zones, Map<DgZone, Link>  zones2LinkMap, Network network, CoordinateReferenceSystem crs){
 		DgZoneUtils.writeLinksOfZones2Shapefile(zones, zones2LinkMap, crs, shapeFileDirectory + "links_for_zones.shp");
 	}
 	
@@ -135,7 +137,7 @@ public class DgCb2Ks2010 {
 	}
 	
 	private static String createShapeFileDirectory(String outputDirectory) {
-		String shapeDir = outputDirectory + shapeFileDirectory;
+		String shapeDir = outputDirectory + shapeFileDirectoryName;
 		File outdir = new File(shapeDir);
 		outdir.mkdir();
 		return shapeDir;
