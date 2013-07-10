@@ -23,7 +23,6 @@ package playground.singapore.transitRouterEventsBased;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
@@ -53,9 +52,9 @@ public class WaitTimeCalculator implements AgentDepartureEventHandler, PersonEnt
 
 	//Attributes
 	private final double timeSlot;
-	private final Map<TransitRoute, Map<Id, WaitTimeData>> waitTimes = new ConcurrentHashMap<TransitRoute, Map<Id, WaitTimeData>>(1000);
-	private final Map<TransitRoute, Map<Id, double[]>> scheduledWaitTimes = new ConcurrentHashMap<TransitRoute, Map<Id, double[]>>(1000);
-	private final Map<Id, Double> agentsWaitingData = new ConcurrentHashMap<Id, Double>();
+	private final Map<TransitRoute, Map<Id, WaitTimeData>> waitTimes = new HashMap<TransitRoute, Map<Id, WaitTimeData>>(1000);
+	private final Map<TransitRoute, Map<Id, double[]>> scheduledWaitTimes = new HashMap<TransitRoute, Map<Id, double[]>>(1000);
+	private final Map<Id, Double> agentsWaitingData = new HashMap<Id, Double>();
 	private TransitSchedule transitSchedule;
 	private Map<Id, Tuple<Id, Id>> linesRoutesOfVehicle = new HashMap<Id, Tuple<Id, Id>>();
 	private Map<Id, Id> stopOfVehicle = new HashMap<Id, Id>();
@@ -105,12 +104,10 @@ public class WaitTimeCalculator implements AgentDepartureEventHandler, PersonEnt
 	//Methods
 	public WaitTime getWaitTimes() {
 		return new WaitTime() {
-			
 			@Override
 			public double getRouteStopWaitTime(TransitLine line, TransitRoute route, Id stopId, double time) {
 				return WaitTimeCalculator.this.getRouteStopWaitTime(line, route, stopId, time);
 			}
-		
 		};
 	}
 	private double getRouteStopWaitTime(TransitLine line, TransitRoute route, Id stopId, double time) {
@@ -128,6 +125,8 @@ public class WaitTimeCalculator implements AgentDepartureEventHandler, PersonEnt
 			for(WaitTimeData waitTimeData:routeData.values())
 				waitTimeData.resetWaitTimes();
 		agentsWaitingData.clear();
+		linesRoutesOfVehicle.clear();
+		stopOfVehicle.clear();
 	}
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {

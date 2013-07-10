@@ -48,7 +48,7 @@ public class WaitTimeDataArray implements WaitTimeData {
 		}
 	}
 	@Override
-	public void addWaitTime(int timeSlot, double waitTime) {
+	public synchronized void addWaitTime(int timeSlot, double waitTime) {
 		waitTimes[timeSlot] = (waitTimes[timeSlot]*numTimes[timeSlot]+waitTime)/++numTimes[timeSlot];
 	}
 	@Override

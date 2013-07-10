@@ -23,7 +23,6 @@ package playground.singapore.transitRouterEventsBased;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
@@ -58,10 +57,10 @@ public class WaitTimeStuckCalculator implements AgentDepartureEventHandler, Pers
 
 	//Attributes
 	private final double timeSlot;
-	private final Map<TransitRoute, Map<Id, WaitTimeData>> waitTimes = new ConcurrentHashMap<TransitRoute, Map<Id, WaitTimeData>>(1000);
-	private final Map<TransitRoute, Map<Id, double[]>> scheduledWaitTimes = new ConcurrentHashMap<TransitRoute, Map<Id, double[]>>(1000);
-	private final Map<Id, Double> agentsWaitingData = new ConcurrentHashMap<Id, Double>();
-	private final Map<Id, Integer> agentsCurrentLeg = new ConcurrentHashMap<Id, Integer>();
+	private final Map<TransitRoute, Map<Id, WaitTimeData>> waitTimes = new HashMap<TransitRoute, Map<Id, WaitTimeData>>(1000);
+	private final Map<TransitRoute, Map<Id, double[]>> scheduledWaitTimes = new HashMap<TransitRoute, Map<Id, double[]>>(1000);
+	private final Map<Id, Double> agentsWaitingData = new HashMap<Id, Double>();
+	private final Map<Id, Integer> agentsCurrentLeg = new HashMap<Id, Integer>();
 	private final Population population;
 	private TransitSchedule transitSchedule;
 
@@ -121,12 +120,13 @@ public class WaitTimeStuckCalculator implements AgentDepartureEventHandler, Pers
 	}
 	private double getRouteStopWaitTime(TransitLine line, TransitRoute route, Id stopId, double time) {
 		WaitTimeData waitTimeData = waitTimes.get(route).get(stopId);
-		if(waitTimeData.getNumData((int) (time/timeSlot))==0) {
+		double tTime = waitTimeData.getNumData((int) (time/timeSlot));
+		if(tTime==0) {
 			double[] waitTimes = scheduledWaitTimes.get(route).get(stopId);
 			return waitTimes[(int) (time/timeSlot)<waitTimes.length?(int) (time/timeSlot):(waitTimes.length-1)];
 		}
 		else
-			return waitTimeData.getWaitTime((int) (time/timeSlot));
+			return tTime;
 	}
 	@Override
 	public void reset(int iteration) {

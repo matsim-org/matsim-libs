@@ -23,7 +23,7 @@ public class StopStopTimeDataArray implements StopStopTimeData {
 		return stopStopTimes[timeSlot<stopStopTimes.length?timeSlot:(stopStopTimes.length-1)];
 	}
 	@Override
-	public void addStopStopTime(int timeSlot, double stopStopTime) {
+	public synchronized void addStopStopTime(int timeSlot, double stopStopTime) {
 		stopStopTimes[timeSlot] = (stopStopTimes[timeSlot]*numTimes[timeSlot]+stopStopTime)/++numTimes[timeSlot];
 	}
 	@Override
