@@ -38,7 +38,6 @@ import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelActivityScoring;
 import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
-import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
@@ -48,7 +47,7 @@ import playground.mmoyo.utils.DataLoader;
 
 /**
  * Launches a standard transit simulation. Values for leg scoring are read from a object attributes
- * This class uses the sandard MATSim leg scoring, only the default values are replaced by individual preferences values
+ * This class uses the standard MATSim leg scoring, only the default values are replaced by individual preferences values
  */
 
 public class IndividualPreferencesValues4LegScore_CtrlLauncher {
@@ -62,7 +61,10 @@ public class IndividualPreferencesValues4LegScore_CtrlLauncher {
 		CadytsPtConfigGroup ccc = new CadytsPtConfigGroup() ;
 		controler.getConfig().addModule(CadytsPtConfigGroup.GROUP_NAME, ccc) ;
 		
-
+		//Add an event handler and special leg scoring that calculates pt legs distances because the normal CharyparNagelLegScoring does not handle them
+		final IndividualPTvaluesFromEvents indptValues = new IndividualPTvaluesFromEvents(controler.getScenario().getTransitSchedule(), controler.getScenario().getNetwork());
+		controler.getEvents().addHandler(indptValues);
+		
 		//scoring 
 		final Map <Id, IndividualPreferences> svdMap = new SVDValuesAsObjAttrReader(scn.getPopulation().getPersons().keySet()).readFile(svdSolutionsFile); 
 		
@@ -73,23 +75,42 @@ public class IndividualPreferencesValues4LegScore_CtrlLauncher {
 				//create personalized PlanCalcScoreConfigGroup with personalized values for leg scoring
 				PlanCalcScoreConfigGroup persCalcScoreCnfigGroup = new PlanCalcScoreConfigGroup(); // a copy so that old/new values are safe 
 				persCalcScoreCnfigGroup = scn.getConfig().planCalcScore();
-				IndividualPreferences svdValues = svdMap.get(plan.getPerson().getId());      		
 				
-				persCalcScoreCnfigGroup.setTravelingPt_utils_hr(svdValues.getWeight_trTime());
+				//al these parameters are involved in normal leg scoring, they must be set to zero, so that the individualized preferences scoring works
+//				persCalcScoreCnfigGroup.setConstantPt(0.0);
+//				persCalcScoreCnfigGroup.setConstantWalk(0.0);
+//				persCalcScoreCnfigGroup.setConstantBike(0.0);
+//				persCalcScoreCnfigGroup.setConstantCar(0.0);
+//				persCalcScoreCnfigGroup.setConstantOther(0.0);
+//				persCalcScoreCnfigGroup.setMarginalUtlOfDistanceWalk(0.0);   it should be 0 because it is considered in scoring
+//				persCalcScoreCnfigGroup.setMarginalUtlOfWaiting_utils_hr(0.0);
+//				persCalcScoreCnfigGroup.setMarginalUtlOfDistanceOther(0.0);
+//				persCalcScoreCnfigGroup.setMonetaryDistanceCostRateCar(0.0);
+//				persCalcScoreCnfigGroup.setTravelingOther_utils_hr(0.0);
+//				persCalcScoreCnfigGroup.setTraveling_utils_hr(0.0);
+//				persCalcScoreCnfigGroup.setTravelingBike_utils_hr(0.0);
+				
+				//set individualized preferences values to parameters
+				Id personId = plan.getPerson().getId();
+				IndividualPreferences svdValues = svdMap.get(personId);
+				persCalcScoreCnfigGroup.setTravelingPt_utils_hr(svdValues.getWeight_trTime() * 3600.0);
 				persCalcScoreCnfigGroup.setUtilityOfLineSwitch(svdValues.getWeight_changes());
-				persCalcScoreCnfigGroup.setTravelingWalk_utils_hr(svdValues.getWeight_trWalkTime());
+				persCalcScoreCnfigGroup.setTravelingWalk_utils_hr(svdValues.getWeight_trWalkTime() * 3600.0);
 				persCalcScoreCnfigGroup.setMonetaryDistanceCostRatePt(svdValues.getWeight_trDistance()); //svdValues does not consider walk distance, only in vehTime!
-				persCalcScoreCnfigGroup.setMarginalUtilityOfMoney(1.0); // this is because marginalUtilityOfDistancePt_m = MonetaryDistanceCostRatePt * MarginalUtilityOfMoney!!   
-
-				CharyparNagelScoringParameters personalizedParams = new CharyparNagelScoringParameters(persCalcScoreCnfigGroup);
+				persCalcScoreCnfigGroup.setMarginalUtilityOfMoney(1.0); // it must be 1. this is because marginalUtilityOfDistancePt_m = MonetaryDistanceCostRatePt * MarginalUtilityOfMoney!!   
 				
+				//set scoring functions
+				CharyparNagelScoringParameters personalizedParams = new CharyparNagelScoringParameters(persCalcScoreCnfigGroup);
 				ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(personalizedParams)) ;
+				//scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(personalizedParams, controler.getScenario().getNetwork()));
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(personalizedParams));
-				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(personalizedParams, controler.getScenario().getNetwork()));
 				
-				//persCalcScoreCnfigGroup = null;  // For performance would be perfect, validate that it works
-				//personalizedParams =null;// For performance would be perfect, validate that it works
+				CharyparNagelLegScoringWRouteDistance charyparNagelLegScoringWRouteDistance = new CharyparNagelLegScoringWRouteDistance (personId, personalizedParams, controler.getScenario().getNetwork(), indptValues);
+				scoringFunctionAccumulator.addScoringFunction(charyparNagelLegScoringWRouteDistance);
+								
+				persCalcScoreCnfigGroup = null;  // For performance, it was validates that it does not causes problems
+				personalizedParams =null;// For performance, it was validates that it does not causes problems
 				
 				return scoringFunctionAccumulator;
 			}
