@@ -48,7 +48,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 public class ConvertThurgau2Plans {
 	private static final String HOME = "home";
-	private static final String COMMUTING = "commuting";
+	private static final String WORK = "work";
+	private static final String EDUCATION = "education";
 	private static final String BUSINESS = "business";
 	private static final String LEISURE = "leisure";
 	private static final String SHOP = "shop";	
@@ -132,8 +133,8 @@ public class ConvertThurgau2Plans {
 		if 		(purpose == 1) { acttype = LEISURE; }	// Pick up/Drop off
 		else if (purpose == 2) { acttype = LEISURE; }	// Private business
 		else if (purpose == 3) { acttype = BUSINESS; }	// Work related
-		else if (purpose == 4) { acttype = COMMUTING; }	// School
-		else if (purpose == 5) { acttype = COMMUTING; }	// Work
+		else if (purpose == 4) { acttype = EDUCATION; }	// School
+		else if (purpose == 5) { acttype = WORK; }		// Work
 		else if (purpose == 6) { acttype = SHOP; }		// Shopping daily
 		else if (purpose == 7) { acttype = SHOP; }		// Shopping long-term
 		else if (purpose == 8) { acttype = LEISURE; }	// Leisure

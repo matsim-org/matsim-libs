@@ -58,7 +58,7 @@ public class AdaptFacilities {
 		new FacilitiesReaderMatsimV1(scenario).readFile(facilitiesFileIn);
 				
 		// -------------------------------------------------------
-		// adding new act types: commuting, business
+		// adding new act type: business and merge work_sector 2 and 3
 		
 		for (ActivityFacility facility : this.scenario.getActivityFacilities().getFacilities().values()) {
 			ActivityOptionImpl actOpt2 = (ActivityOptionImpl) facility.getActivityOptions().get("work_sector2");
@@ -78,25 +78,9 @@ public class AdaptFacilities {
 		for (ActivityFacility facility : workFacilities.values()) {
 			ActivityOptionImpl aOptWork = (ActivityOptionImpl) facility.getActivityOptions().get("work");
 			Map<DayType, SortedSet<OpeningTime>> ots = aOptWork.getOpeningTimes();
-						
-			ActivityOptionImpl aOptComm = ((ActivityFacilityImpl)facility).createActivityOption("commuting");
-			aOptComm.setOpeningTimes(ots);
-			
+					
 			ActivityOptionImpl aOptBusiness = ((ActivityFacilityImpl)facility).createActivityOption("business");
 			aOptBusiness.setOpeningTimes(ots);
-			
-			((ActivityFacilityImpl)facility).getActivityOptions().remove("work");
-		}
-		
-		TreeMap<Id, ActivityFacility> educFacilities = this.scenario.getActivityFacilities().getFacilitiesForActivityType("education");		
-		for (ActivityFacility facility : educFacilities.values()) {
-			ActivityOptionImpl aOptEduc = (ActivityOptionImpl) facility.getActivityOptions().get("education");
-			Map<DayType, SortedSet<OpeningTime>> ots = aOptEduc.getOpeningTimes();
-						
-			ActivityOptionImpl aOptComm = ((ActivityFacilityImpl)facility).createActivityOption("commuting");
-			aOptComm.setOpeningTimes(ots);
-			
-			((ActivityFacilityImpl)facility).getActivityOptions().remove("education");
 		}
 		new FacilitiesWriter(this.scenario.getActivityFacilities()).write(facilitiesFileOut);
 	}
