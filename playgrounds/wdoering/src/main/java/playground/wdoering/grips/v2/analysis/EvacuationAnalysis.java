@@ -119,8 +119,8 @@ public class EvacuationAnalysis extends AbstractModule {
 		// set module listeners
 		this.processList.add(new SetModuleListenerProcess(controller, this, new EAEventListener(controller)));
 
-		// load evacuation area shape
-		this.processList.add(new InitEvacShapeProcess(controller));
+//		// load evacuation area shape
+//		this.processList.add(new InitEvacShapeProcess(controller));
 
 		// add grid renderer
 		this.processList.add(new BasicProcess(controller) {
@@ -150,6 +150,9 @@ public class EvacuationAnalysis extends AbstractModule {
 
 				// finally: enable all layers
 				controller.enableMapRenderer();
+				
+				controller.setToolBoxVisible(true);
+				
 				gridRenderer.setEnabled(true);
 			}
 
@@ -164,76 +167,6 @@ public class EvacuationAnalysis extends AbstractModule {
 		return this.toolBox;
 	}
 
-
-//	/**
-//	 * Initializing process
-//	 * 
-//	 * - check if grips config / osm xml network is loaded; if not, load it -
-//	 * check if a slippy map viewer has been initialized
-//	 * 
-//	 * 
-//	 * @author vvvvv
-//	 * 
-//	 */
-//	private class InitProcess extends BasicProcess {
-//
-//		public InitProcess(EvacuationAnalysis module, Controller controller) {
-//			super(module, controller);
-//
-//		}
-//
-//		@Override
-//		public void start() {
-//			// in case this is only part of something bigger
-//			controller.disableAllRenderLayers();
-//
-//			// check if Matsim config (including the OSM network) has been
-//			// loaded
-//			if (!controller.isMatsimConfigOpened())
-//				if (!controller.openMastimConfig())
-//					exit(locale.msgOpenMatsimConfigFailed());
-//
-//			// check if the default render panel is set
-//			if (!controller.hasDefaultRenderPanel())
-//				controller.setMainPanel(new DefaultRenderPanel(this.controller), true);
-//
-//			new InitMapLayerProcess(controller).start();
-//
-//			// set module listeners
-//			if ((controller.getListener() == null) || (!(controller.getListener() instanceof EAEventListener)))
-//				setListeners(new EAEventListener(controller));
-//
-//			// disable shape layers - they are not needed
-//			controller.disableShapeLayers();
-//
-//			// add grid layer
-//			if (!this.controller.hasGridRenderer())
-//				addGridRenderer();
-//
-//			// validate render layers
-//			this.controller.validateRenderLayers();
-//
-//			// set tool box
-//			if ((controller.getActiveToolBox() == null) || (!(controller.getActiveToolBox() instanceof EAToolBox)))
-//				addToolBox(getToolBox());
-//
-//			toolBox.setGridRenderer(gridRenderer);
-//
-//			readEvents();
-//
-//			// finally: enable all layers
-//			controller.enableMapRenderer();
-//			gridRenderer.setEnabled(true);
-//		}
-//
-//		private void addGridRenderer() {
-//			gridRenderer = new GridRenderer(controller);
-//			gridRendererID = gridRenderer.getId();
-//			this.controller.addRenderLayer(gridRenderer);
-//
-//		}
-//
-//	}
 
 	public void runCalculation() {
 		try {
