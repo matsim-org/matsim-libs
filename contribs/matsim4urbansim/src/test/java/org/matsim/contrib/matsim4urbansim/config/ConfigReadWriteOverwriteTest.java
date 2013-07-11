@@ -38,7 +38,6 @@ import org.matsim.contrib.accessibility.config.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.config.M4UAccessibilityConfigUtils;
 import org.matsim.contrib.matrixbasedptrouter.config.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.config.MatrixBasedPtRouterConfigUtils;
-import org.matsim.contrib.matsim4urbansim.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4urbansim.utils.CreateTestExternalMATSimConfig;
 import org.matsim.contrib.matsim4urbansim.utils.CreateTestMATSimConfig;
 import org.matsim.contrib.matsim4urbansim.utils.TempDirectoryUtil;
@@ -46,7 +45,6 @@ import org.matsim.contrib.matsim4urbansim.utils.io.Paths;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
-import org.matsim.core.config.Module;
 import org.matsim.core.config.consistency.VspConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.NetworkConfigGroup;
@@ -240,6 +238,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
                     while ((line = in.readLine()) != null) {
                             lines.add(line);
                     }
+                    in.close() ;
             } catch (IOException e) {
                     e.printStackTrace();
             }
@@ -295,12 +294,12 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 		// Here, additional parameters from the external config, that are not overlapping, are tested!
 		///////////////////////////////////////////////////
 		
-		Module matsim4UrbanSimModule = config.getModule(M4UConfigUtils.MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG);
+//		Module matsim4UrbanSimModule = config.getModule(M4UConfigUtils.MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG);
 		
 		///////////////////////////////////////////////////
 		// MATSim4UrbanSim Controler Config Module Settings
 		///////////////////////////////////////////////////
-		M4UControlerConfigModuleV3 matsim4UrbanSimControlerModule = M4UConfigUtils.getMATSim4UrbaSimControlerConfigAndPossiblyConvert(config) ;
+//		M4UControlerConfigModuleV3 matsim4UrbanSimControlerModule = M4UConfigUtils.getMATSim4UrbaSimControlerConfigAndPossiblyConvert(config) ;
 		AccessibilityConfigGroup acm = M4UAccessibilityConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
 		MatrixBasedPtRouterConfigGroup ippcm = MatrixBasedPtRouterConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
 		
@@ -341,7 +340,7 @@ public class ConfigReadWriteOverwriteTest /*extends MatsimTestCase*/{
 		NetworkConfigGroup networkCG = (NetworkConfigGroup) config.getModule(NetworkConfigGroup.GROUP_NAME);
 		Assert.assertTrue( Paths.checkPathEnding( networkCG.getInputFile() ).equalsIgnoreCase( Paths.checkPathEnding( testConfig.networkInputFileName ) ));
 		
-		if(testConfig.getStartMode() != testConfig.COLD_START){
+		if(testConfig.getStartMode() != CreateTestMATSimConfig.COLD_START){
 			PlansConfigGroup plansCG = (PlansConfigGroup) config.getModule(PlansConfigGroup.GROUP_NAME);
 			Assert.assertTrue( Paths.checkPathEnding( plansCG.getInputFile() ).equalsIgnoreCase( Paths.checkPathEnding( testConfig.inputPlansFileName ) ));
 		}

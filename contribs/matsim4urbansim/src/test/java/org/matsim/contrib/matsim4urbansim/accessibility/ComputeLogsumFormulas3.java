@@ -54,16 +54,16 @@ public class ComputeLogsumFormulas3  extends MatsimTestCase{
 		// travel time costs (h)
 		double cijTT = 1.5 / 60.; 		// time to reach j from i
 		double chiTT = 1.2 / 60.;		// time to reach network from origin
-		double cjk1TT= 1.5 / 60.;		// time to reach cjk1 from j
-		double cjk2TT= 1.2 / 60.;		// time to reach cjk2 from j
-		double cjk3TT= 1.4 / 60.;		// time to reach cjk3 from j
+//		double cjk1TT= 1.5 / 60.;		// time to reach cjk1 from j
+//		double cjk2TT= 1.2 / 60.;		// time to reach cjk2 from j
+//		double cjk3TT= 1.4 / 60.;		// time to reach cjk3 from j
 		
 		// travel distance (m)
 		double cijTD = 500.;	// distance to reach j from i
 		double chiTD = 20.;		// distance to reach network from origin
-		double cjk1TD= 80.;		// distance to reach cjk1 from j
-		double cjk2TD= 30.;		// distance to reach cjk2 from j
-		double cjk3TD= 50.;		// distance to reach cjk3 from j
+//		double cjk1TD= 80.;		// distance to reach cjk1 from j
+//		double cjk2TD= 30.;		// distance to reach cjk2 from j
+//		double cjk3TD= 50.;		// distance to reach cjk3 from j
 
 		// travel monetary cost / toll (money)
 		double cijTMC= 10;		// toll to get from i to j
@@ -71,9 +71,9 @@ public class ComputeLogsumFormulas3  extends MatsimTestCase{
 		///////
 		// opportunities
 		///////
-		double sumExpVjk = Math.exp( (cjk1TT * betaWalkTT) + (cjk1TD * betaWalkTD) );
-		sumExpVjk 		+= Math.exp( (cjk2TT * betaWalkTT) + (cjk2TD * betaWalkTD) );
-		sumExpVjk 		+= Math.exp( (cjk3TT * betaWalkTT) + (cjk3TD * betaWalkTD) );
+//		double sumExpVjk = Math.exp( (cjk1TT * betaWalkTT) + (cjk1TD * betaWalkTD) );
+//		sumExpVjk 		+= Math.exp( (cjk2TT * betaWalkTT) + (cjk2TD * betaWalkTD) );
+//		sumExpVjk 		+= Math.exp( (cjk3TT * betaWalkTT) + (cjk3TD * betaWalkTD) );
 
 		///////
 		// OLD 
@@ -83,8 +83,8 @@ public class ComputeLogsumFormulas3  extends MatsimTestCase{
 		double VhjOldTMC= cijTMC * betaCarTMC + 0;
 		
 		double VhjOld = VhjOldTT + VhjOldTD + VhjOldTMC;
-		double expOldVhj = Math.exp( VhjOld );
-		double expOldVhk = expOldVhj * sumExpVjk;
+//		double expOldVhj = Math.exp( VhjOld );
+//		double expOldVhk = expOldVhj * sumExpVjk;
 		
 		///////
 		// NEW 
@@ -92,8 +92,8 @@ public class ComputeLogsumFormulas3  extends MatsimTestCase{
 		double VijCar = (cijTT * betaCarTT) + (cijTD * betaCarTD) + (cijTMC * betaCarTMC);
 		double VhiWalk= (chiTT * betaWalkTT) + (chiTD * betaWalkTD);
 		double VhjNew = VijCar + VhiWalk;
-		double expNewVhj= Math.exp( VhjNew );
-		double expNewVhk= expNewVhj * sumExpVjk;
+//		double expNewVhj= Math.exp( VhjNew );
+//		double expNewVhk= expNewVhj * sumExpVjk;
 		
 		Assert.assertTrue(VhjOld == VhjNew);	// old accessibility computation == new accessibility computation
 	

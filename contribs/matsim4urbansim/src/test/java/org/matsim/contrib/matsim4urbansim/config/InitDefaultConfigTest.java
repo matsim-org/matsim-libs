@@ -56,7 +56,7 @@ public class InitDefaultConfigTest /*extends MatsimTestCase*/{
 			log.info("Creating a matsim4urbansim config file and writing it on hand disk");
 			
 			// this creates a default external configuration file, some parameters overlap with the MATSim4UrbanSim configuration
-			CreateTestExternalMATSimConfig testExternalConfig = new CreateTestExternalMATSimConfig(CreateTestExternalMATSimConfig.COLD_START, path);
+			CreateTestExternalMATSimConfig testExternalConfig = new CreateTestExternalMATSimConfig(CreateTestMATSimConfig.COLD_START, path);
 			String externalConfigLocation = testExternalConfig.generateConfigV2();
 			
 			// this creates a default MATSim4UrbanSim configuration including an external config
