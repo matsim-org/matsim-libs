@@ -571,7 +571,7 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		// set the TravelTimeCollector for car mode
 		travelTimes.put(TransportMode.car, this.getTravelTimeCollector());
 	
-		this.selectHouseholdMeetingPoint = new SelectHouseholdMeetingPoint(this.scenarioData, travelTimes, 
+		this.selectHouseholdMeetingPoint = new SelectHouseholdMeetingPoint(this, travelTimes, 
 				this.vehiclesTracker, this.coordAnalyzer.createInstance(), this.affectedArea, 
 				this.modeAvailabilityChecker.createInstance(), this.informedHouseholdsTracker, this.decisionDataProvider,
 				this.decisionModelRunner);

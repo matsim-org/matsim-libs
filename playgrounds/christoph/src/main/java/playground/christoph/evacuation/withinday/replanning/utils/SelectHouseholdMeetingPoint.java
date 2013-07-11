@@ -40,8 +40,10 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
@@ -50,8 +52,7 @@ import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -62,8 +63,8 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicle;
-import org.matsim.withinday.replanning.modules.ReplanningModule;
 
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.config.EvacuationConfig;
@@ -79,6 +80,8 @@ import playground.christoph.evacuation.withinday.replanning.identifiers.Informed
 
 import com.vividsolutions.jts.geom.Geometry;
 
+import contrib.multimodal.router.MultimodalTripRouterFactory;
+import contrib.multimodal.router.TripRouterObjectProvider;
 import contrib.multimodal.tools.MultiModalNetworkCreator;
 
 /**
@@ -96,6 +99,7 @@ public class SelectHouseholdMeetingPoint implements MobsimInitializedListener, M
 
 	private static final Logger log = Logger.getLogger(SelectHouseholdMeetingPoint.class);
 	
+	private final Controler controler;
 	private final Scenario scenario;
 	private final Map<String, TravelTime> travelTimes;
 	private final Map<Id, MobsimAgent> agents;
@@ -109,8 +113,8 @@ public class SelectHouseholdMeetingPoint implements MobsimInitializedListener, M
 	private final LatestAcceptedLeaveTimeModel latestAcceptedLeaveTimeModel;
 	private final DecisionDataProvider decisionDataProvider;
 
-	private ReplanningModule toHomeFacilityRouter;
-	private ReplanningModule fromHomeFacilityRouter;
+	private TripRouterFactory toHomeFacilityRouterFactory;
+	private TripRouterFactory fromHomeFacilityRouterFactory;
 	
 	private Thread[] threads;
 	private Runnable[] runnables;
@@ -127,11 +131,11 @@ public class SelectHouseholdMeetingPoint implements MobsimInitializedListener, M
 	private int meetSecure = 0;
 	private int meetInsecure = 0;
 	
-	public SelectHouseholdMeetingPoint(Scenario scenario, Map<String,TravelTime> travelTimes,
+	public SelectHouseholdMeetingPoint(Controler controler, Map<String,TravelTime> travelTimes,
 			VehiclesTracker vehiclesTracker, CoordAnalyzer coordAnalyzer, Geometry affectedArea, 
 			ModeAvailabilityChecker modeAvailabilityChecker, InformedHouseholdsTracker informedHouseholdsTracker,
 			DecisionDataProvider decisionDataProvider, DecisionModelRunner decisionModelRunner) {
-		this.scenario = scenario;
+		this.controler = controler;
 		this.travelTimes = travelTimes;
 		this.vehiclesTracker = vehiclesTracker;
 		this.coordAnalyzer = coordAnalyzer;
@@ -140,6 +144,7 @@ public class SelectHouseholdMeetingPoint implements MobsimInitializedListener, M
 		this.informedHouseholdsTracker = informedHouseholdsTracker;
 		this.decisionDataProvider = decisionDataProvider;
 		
+		this.scenario = this.controler.getScenario();
 		this.numOfThreads = this.scenario.getConfig().global().getNumberOfThreads();
 		this.allMeetingsPointsSelected = new AtomicBoolean(false);
 		this.evacuationDecisionModel = decisionModelRunner.getEvacuationDecisionModel();
@@ -153,14 +158,17 @@ public class SelectHouseholdMeetingPoint implements MobsimInitializedListener, M
 		
 		Config config = scenario.getConfig();
 		
-		// get route factory
-		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).getModeRouteFactory();
+		TravelDisutilityFactory disutilityFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
 		
-		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
+		LeastCostPathCalculatorFactory toHomePathCalculatorFactory = new FastAStarLandmarksFactory(this.scenario.getNetwork(), new FreespeedTravelTimeAndDisutility(config.planCalcScore()));
 		
-		LeastCostPathCalculatorFactory toHomeFactory = new FastAStarLandmarksFactory(this.scenario.getNetwork(), new FreespeedTravelTimeAndDisutility(config.planCalcScore()));
-		this.toHomeFacilityRouter = new ReplanningModule(config, scenario.getNetwork(), costFactory, travelTimes, toHomeFactory, routeFactory);
-
+		TripRouterObjectProvider toHomeObjectProvider = new TripRouterObjectProvider(scenario,
+				disutilityFactory, 
+				this.travelTimes.get(TransportMode.car),
+				toHomePathCalculatorFactory,
+				controler.getTransitRouterFactory());
+		this.toHomeFacilityRouterFactory = new MultimodalTripRouterFactory(toHomeObjectProvider, travelTimes); 
+				
 		/*
 		 * Create a subnetwork that only contains the Evacuation area plus some exit nodes.
 		 * This network is used to calculate estimated evacuation times starting from the 
@@ -274,10 +282,20 @@ public class SelectHouseholdMeetingPoint implements MobsimInitializedListener, M
 		for (Entry<String, TravelTime> entry : this.travelTimes.entrySet()) {
 			tts.put(entry.getKey(), new TravelTimeWrapper(entry.getValue()));
 		}
+			
+		LeastCostPathCalculatorFactory fromPathCalculatorHomeFactory = new FastAStarLandmarksFactory(this.scenario.getNetwork(), new FreespeedTravelTimeAndDisutility(config.planCalcScore()));
 		
-		LeastCostPathCalculatorFactory fromHomeFactory = new FastAStarLandmarksFactory(this.scenario.getNetwork(), new FreespeedTravelTimeAndDisutility(config.planCalcScore()));
-		this.fromHomeFacilityRouter = new ReplanningModule(config, subNetwork, costFactory, tts, fromHomeFactory, routeFactory);
+		// use a ScenarioWrapper that returns the sub-network instead of the network
+		Scenario fromHomeScenario = new ScenarioWrapper(scenario, subNetwork);
+		TripRouterObjectProvider fromHomeObjectProvider = new TripRouterObjectProvider(fromHomeScenario,
+				disutilityFactory, 
+				this.travelTimes.get(TransportMode.car),
+				fromPathCalculatorHomeFactory,
+				controler.getTransitRouterFactory());
+		this.fromHomeFacilityRouterFactory = new MultimodalTripRouterFactory(fromHomeObjectProvider, travelTimes); 
 	}
+
+
 	
 	/*
 	 * Identify facilities that are located inside the affected area. They
@@ -496,8 +514,10 @@ public class SelectHouseholdMeetingPoint implements MobsimInitializedListener, M
 		
 		for (int i = 0; i < this.numOfThreads; i++) {
 			
-			SelectHouseholdMeetingPointRunner runner = new SelectHouseholdMeetingPointRunner(scenario, toHomeFacilityRouter, 
-					fromHomeFacilityRouter, vehiclesTracker, coordAnalyzer.createInstance(), modeAvailabilityChecker.createInstance(), 
+			SelectHouseholdMeetingPointRunner runner = new SelectHouseholdMeetingPointRunner(scenario, 
+					toHomeFacilityRouterFactory.instantiateAndConfigureTripRouter(), 
+					fromHomeFacilityRouterFactory.instantiateAndConfigureTripRouter(), 
+					vehiclesTracker, coordAnalyzer.createInstance(), modeAvailabilityChecker.createInstance(), 
 					decisionDataProvider, agents, startBarrier, endBarrier, allMeetingsPointsSelected);
 			runner.setTime(time);
 			runnables[i] = runner; 
@@ -532,4 +552,62 @@ public class SelectHouseholdMeetingPoint implements MobsimInitializedListener, M
 
 	}
 
+	/*
+	 * Returns a sub-network instead of the full network.
+	 */
+	private static class ScenarioWrapper implements Scenario {
+
+		private final Scenario scenario;
+		private final Network network;
+		
+		public ScenarioWrapper(Scenario scenario, Network network) {
+			this.scenario = scenario;
+			this.network = network;
+		}
+		
+		@Override
+		public Id createId(String id) {
+			return this.scenario.createId(id);
+		}
+
+		@Override
+		public Network getNetwork() {
+			return this.network;
+		}
+
+		@Override
+		public Population getPopulation() {
+			return this.scenario.getPopulation();
+		}
+
+		@Override
+		public TransitSchedule getTransitSchedule() {
+			return this.scenario.getTransitSchedule();
+		}
+
+		@Override
+		public Config getConfig() {
+			return this.scenario.getConfig();
+		}
+
+		@Override
+		public Coord createCoord(double x, double y) {
+			return this.scenario.createCoord(x, y);
+		}
+
+		@Override
+		public void addScenarioElement(Object o) {
+			this.scenario.addScenarioElement(o);
+		}
+
+		@Override
+		public boolean removeScenarioElement(Object o) {
+			return this.scenario.removeScenarioElement(o);
+		}
+
+		@Override
+		public <T> T getScenarioElement(Class<? extends T> klass) {
+			return this.scenario.getScenarioElement(klass);
+		}
+	}
 }

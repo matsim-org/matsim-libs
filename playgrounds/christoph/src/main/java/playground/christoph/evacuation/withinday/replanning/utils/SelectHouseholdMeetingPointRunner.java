@@ -49,10 +49,10 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.households.Household;
-import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.withinday.replanning.modules.ReplanningModule;
 
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.mobsim.AgentPosition;
@@ -80,8 +80,8 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 	private final CoordAnalyzer coordAnalyzer;
 	private final ModeAvailabilityChecker modeAvailabilityChecker;
 	private final DecisionDataProvider decisionDataProvider;
-	private final PlanAlgorithm toHomeFacilityPlanAlgo;
-	private final PlanAlgorithm evacuationPlanAlgo;
+	private final TripRouter toHomeFacilityPlanAlgo;
+	private final TripRouter evacuationPlanAlgo;
 	private final Map<Id, MobsimAgent> agents;
 	
 	private final List<Household> householdsToCheck;
@@ -92,8 +92,8 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 	private final AtomicBoolean allMeetingsPointsSelected;
 	private final Random random;
 	
-	public SelectHouseholdMeetingPointRunner(Scenario scenario, ReplanningModule toHomeFacilityRouter, 
-			ReplanningModule fromHomeFacilityRouter, VehiclesTracker vehiclesTracker, CoordAnalyzer coordAnalyzer, 
+	public SelectHouseholdMeetingPointRunner(Scenario scenario, TripRouter toHomeFacilityRouter, 
+			TripRouter fromHomeFacilityRouter, VehiclesTracker vehiclesTracker, CoordAnalyzer coordAnalyzer, 
 			ModeAvailabilityChecker modeAvailabilityChecker, DecisionDataProvider decisionDataProvider, 
 			Map<Id, MobsimAgent> agents, CyclicBarrier startBarrier, CyclicBarrier endBarrier, 
 			AtomicBoolean allMeetingsPointsSelected) {
@@ -109,8 +109,8 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 		this.allMeetingsPointsSelected = allMeetingsPointsSelected;
 		
 		this.random = MatsimRandom.getLocalInstance();
-		this.toHomeFacilityPlanAlgo = toHomeFacilityRouter.getPlanAlgoInstance();
-		this.evacuationPlanAlgo = fromHomeFacilityRouter.getPlanAlgoInstance();
+		this.toHomeFacilityPlanAlgo = toHomeFacilityRouter;
+		this.evacuationPlanAlgo = fromHomeFacilityRouter;
 		
 		this.householdsToCheck = new ArrayList<Household>();
 	}
@@ -485,7 +485,7 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 	/*
 	 * Calculates (estimates) the travel time from a fromLink to a toLink using a given mode.
 	 */
-	private double calculateTravelTime(PlanAlgorithm planAlgo, Id personId, Id fromLinkId, Id toLinkId, String mode, double departureTime) {
+	private double calculateTravelTime(TripRouter tripRouter, Id personId, Id fromLinkId, Id toLinkId, String mode, double departureTime) {
 		
 		PopulationFactory factory = scenario.getPopulation().getFactory();
 		
@@ -502,9 +502,13 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 		plan.addLeg(leg);
 		plan.addActivity(toActivity);
 		
-		planAlgo.run(plan);
+		PlanRouter planRouter = new PlanRouter(tripRouter);
 		
-		return Math.round(leg.getTravelTime());
+		planRouter.run(plan);
+		
+		throw new RuntimeException("Check whether the trip router sets the travel times in the leg.");
+		
+//		return Math.round(leg.getTravelTime());
 	}
 	
 	/*
