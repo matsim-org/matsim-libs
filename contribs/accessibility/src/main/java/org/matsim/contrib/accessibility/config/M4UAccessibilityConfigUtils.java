@@ -32,27 +32,28 @@ import org.matsim.core.config.Module;
 public class M4UAccessibilityConfigUtils {
 	private M4UAccessibilityConfigUtils() {} // static methods only
 	
-	public static void initAccessibilityParameters(Config config){
-	
-		AccessibilityConfigGroup module = getConfigModuleAndPossiblyConvert(config);
-	
-		// accessibility destination sampling rate:
-		double accessibilityDestinationSamplingRate = 1.; // matsim4UrbanSimParamsFromU.getAccessibilityParameter().getAccessibilityDestinationSamplingRate();
-		// (maybe leave in UrbanSim)
-		if ( module.getAccessibilityDestinationSamplingRate() != null ) {
-			accessibilityDestinationSamplingRate = module.getAccessibilityDestinationSamplingRate() ;
-		}
-		module.setAccessibilityDestinationSamplingRate(accessibilityDestinationSamplingRate);
-
-		// raw sums?
-		// (leave in urbansim)
-		boolean useRawSum						= false; // matsim4UrbanSimParamsFromU.getAccessibilityParameter().isUseRawSumsWithoutLn();
-		if ( module.isUsingRawSumsWithoutLn() != null ) {
-			useRawSum = module.isUsingRawSumsWithoutLn() ;
-		}
-		module.setUsingRawSumsWithoutLn(useRawSum);
-
-	}
+	// This used to copy params from urbansim into the matsim config. But it is not doing this any more.  kai,jul'13
+//	public static void initAccessibilityParameters(Config config){
+//	
+//		AccessibilityConfigGroup module = getConfigModuleAndPossiblyConvert(config);
+//	
+//		// accessibility destination sampling rate:
+//		double accessibilityDestinationSamplingRate = 1.; // matsim4UrbanSimParamsFromU.getAccessibilityParameter().getAccessibilityDestinationSamplingRate();
+//		// (maybe leave in UrbanSim)
+//		if ( module.getAccessibilityDestinationSamplingRate() != null ) {
+//			accessibilityDestinationSamplingRate = module.getAccessibilityDestinationSamplingRate() ;
+//		}
+//		module.setAccessibilityDestinationSamplingRate(accessibilityDestinationSamplingRate);
+//
+//		// raw sums?
+//		// (leave in urbansim)
+//		boolean useRawSum						= false; // matsim4UrbanSimParamsFromU.getAccessibilityParameter().isUseRawSumsWithoutLn();
+//		if ( module.isUsingRawSumsWithoutLn() != null ) {
+//			useRawSum = module.isUsingRawSumsWithoutLn() ;
+//		}
+//		module.setUsingRawSumsWithoutLn(useRawSum);
+//
+//	}
 
 	public static AccessibilityConfigGroup getConfigModuleAndPossiblyConvert(Config config) {
 		Module m = config.getModule(AccessibilityConfigGroup.GROUP_NAME);

@@ -134,7 +134,7 @@ public class M4UConfigurationConverterV4 {
 		M4UConfigUtils.initM4UControlerConfigModuleV3Parameters(matsim4urbansimConfigPart1, config);
 		M4UConfigUtils.initUrbanSimParameterConfigModuleV3Parameters(matsim4urbansimConfigPart2, config);
 		
-		M4UAccessibilityConfigUtils.initAccessibilityParameters(config);
+//		M4UAccessibilityConfigUtils.initAccessibilityParameters(config);
 		M4UConfigUtils.initNetwork(matsim4urbansimConfigPart1, config);
 		M4UConfigUtils.initControler(matsim4urbansimConfigPart1, config);
 		M4UConfigUtils.initPlanCalcScore(matsim4urbansimConfigPart1, config);
