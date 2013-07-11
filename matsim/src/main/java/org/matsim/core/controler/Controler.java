@@ -23,7 +23,6 @@ package org.matsim.core.controler;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Layout;
@@ -66,8 +65,6 @@ import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.jdeqsim.JDEQSimulationFactory;
 import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
@@ -92,7 +89,6 @@ import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
-import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.counts.CountControlerListener;
 import org.matsim.counts.Counts;
 import org.matsim.population.VspPlansCleaner;
@@ -923,11 +919,6 @@ public class Controler extends AbstractController {
 	public final void setTransitRouterFactory(
 			final TransitRouterFactory transitRouterFactory) {
 		this.transitRouterFactory = transitRouterFactory;
-	}
-
-	// Currently under removal, jul '13
-	public final Map<String, TravelTime> getMultiModalTravelTimes() {
-		return null;
 	}
 
 }
