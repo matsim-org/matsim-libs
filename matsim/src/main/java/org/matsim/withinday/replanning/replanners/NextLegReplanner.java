@@ -22,7 +22,9 @@ package org.matsim.withinday.replanning.replanners;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.router.TripRouter;
@@ -37,10 +39,13 @@ import org.matsim.withinday.utils.EditRoutes;
 public class NextLegReplanner extends WithinDayDuringActivityReplanner {
 
 	private final TripRouter tripRouter;
+	private final EditRoutes editRoutes;
+
 	
 	/*package*/ NextLegReplanner(Id id, Scenario scenario, InternalInterface internalInterface, TripRouter tripRouter) {
 		super(id, scenario, internalInterface);
 		this.tripRouter = tripRouter;
+		this.editRoutes = new EditRoutes();
 	}
 
 	/*
@@ -73,8 +78,23 @@ public class NextLegReplanner extends WithinDayDuringActivityReplanner {
 		 */
 		int currentPlanElementIndex = withinDayAgent.getCurrentPlanElementIndex();
 
+		/*
+		 * Search next leg in the agent's plan
+		 */
+		Leg nextLeg = null;
+		for (int i = currentPlanElementIndex + 1; i < executedPlan.getPlanElements().size(); i++) {
+			PlanElement planElement = executedPlan.getPlanElements().get(i);
+			if (planElement instanceof Leg) {
+				nextLeg = (Leg) planElement;
+				break;
+			}
+		}
+		
+		// check whether a next leg was found
+		if (nextLeg == null) return false;
+		
 		// new Route for next Leg
-		new EditRoutes().replanFutureLegRoute(executedPlan, currentPlanElementIndex + 1, this.tripRouter);
+		this.editRoutes.replanFutureLegRoute(nextLeg, executedPlan.getPerson(), scenario.getNetwork(), tripRouter);
 
 		return true;
 	}
