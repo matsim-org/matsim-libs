@@ -34,8 +34,7 @@ import org.matsim.core.router.TripRouterFactoryImpl;
  *
  */
 public class MatrixBasedPtRouterFactoryImpl implements TripRouterFactory{
-	private static final Logger log = Logger
-			.getLogger(MatrixBasedPtRouterFactoryImpl.class);
+	private static final Logger log = Logger.getLogger(MatrixBasedPtRouterFactoryImpl.class);
 
 	private final Controler controler;
 
@@ -45,7 +44,7 @@ public class MatrixBasedPtRouterFactoryImpl implements TripRouterFactory{
 
 	private TripRouterFactoryImpl delegate;
 
-	private boolean firstCall = true;
+//	private boolean firstCall = true;
 	
 	public MatrixBasedPtRouterFactoryImpl(final Controler controler, final PtMatrix ptMatrix) {
 		this.controler = controler;
@@ -56,25 +55,24 @@ public class MatrixBasedPtRouterFactoryImpl implements TripRouterFactory{
 	public TripRouter instantiateAndConfigureTripRouter() {
 	
 		//initialize TripRouterFactoyImpl only once
-		if(firstCall){
+//		if(firstCall){ // I think this does not belong here but maybe I am overlooking something??? kai, jul'13
 			this.delegate = new TripRouterFactoryImpl(
 					controler.getScenario(),
 					controler.getTravelDisutilityFactory(), 
 					controler.getLinkTravelTimes(), 
 					controler.getLeastCostPathCalculatorFactory(), 
 					controler.getScenario().getConfig().scenario().isUseTransit() ? controler.getTransitRouterFactory() : null);
-			log.warn("overriding default Pt-RoutingModule with PseudoPtRoutingModule. Message thrown only once.");
+//			log.warn("overriding default Pt-RoutingModule with PseudoPtRoutingModule. Message thrown only once.");
 			if ( controler.getConfig().scenario().isUseTransit() ) {
 				log.warn("you try to use PseudoPtRoutingModule and physical transit simulation at the same time. This probably will not work!");
 			}
-			firstCall = false;
-		}
+//			firstCall = false;
+//		}
 		//initialize triprouter
 		TripRouter tripRouter = this.delegate.instantiateAndConfigureTripRouter();
 
 		// add improved pseudo-pt-routing
-		tripRouter.setRoutingModule(TransportMode.pt, 
-				new MatrixBasedPtRoutingModule(controler, ptMatrix));
+		tripRouter.setRoutingModule(TransportMode.pt, new MatrixBasedPtRoutingModule(controler, ptMatrix));
 		
 		return tripRouter;
 	}

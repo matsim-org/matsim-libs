@@ -268,7 +268,6 @@ public class M4UConfigUtils {
 		controlerCG.setLastIteration( lastIteration);
 		UrbanSimParameterConfigModuleV3 module = getUrbanSimParameterConfigAndPossiblyConvert(config);
 		controlerCG.setOutputDirectory( module.getMATSim4OpusOutput() );
-		// yyyy don't use static variables (this is a variable albeit it claims to be a constant).  kai, may'13
 		controlerCG.setWriteSnapshotsInterval( 0 ); // disabling snapshots
 
 		// set Qsim

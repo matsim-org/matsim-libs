@@ -27,13 +27,13 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.GenericRouteFactory;
 import org.matsim.core.router.EmptyStageActivityTypes;
@@ -66,19 +66,19 @@ public class MatrixBasedPtRoutingModule implements RoutingModule{
 		this.ptMatrix= ptMatrix;
 	}
 	
+	@Override
 	public List<? extends PlanElement> calcRoute(Facility fromFacility, Facility toFacility, double departureTime, Person person){
 
 		// create new leg with mode pt
-		LegImpl newLeg = (LegImpl) populationFactory.createLeg( TransportMode.pt );
+		Leg newLeg = populationFactory.createLeg( TransportMode.pt );
 		
 		// set departure time
 		newLeg.setDepartureTime( departureTime );
 		// set travel time
-		// double travelTime = 10. * 60.; // for testing
 		double travelTime = this.ptMatrix.getTotalTravelTime_seconds(fromFacility.getCoord(), toFacility.getCoord());
 		newLeg.setTravelTime( travelTime );
 		// set arrival time
-		newLeg.setArrivalTime( departureTime + travelTime );
+//		newLeg.setArrivalTime( departureTime + travelTime );  // should not be necessary. kai, jul'12
 		
 		// set generic route for teleportation
 		Id startLinkId = network.getNearestLinkExactly(fromFacility.getCoord()).getId();
@@ -94,6 +94,7 @@ public class MatrixBasedPtRoutingModule implements RoutingModule{
 		return Arrays.asList( newLeg );
 	}
 	
+	@Override
 	public StageActivityTypes getStageActivityTypes(){
 		return EmptyStageActivityTypes.INSTANCE;
 	}
