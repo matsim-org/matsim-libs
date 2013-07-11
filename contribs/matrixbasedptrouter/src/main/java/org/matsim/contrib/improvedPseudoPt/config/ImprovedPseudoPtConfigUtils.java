@@ -52,20 +52,20 @@ public class ImprovedPseudoPtConfigUtils {
 	/**
 	 * Setting improved pseudo pt into MATSim Config
 	 * 
-	 * @param matsim4urbansimModule Module containing pt settings
+	 * @param module Module containing pt settings
 	 * @param config MATSim Config object
 	 */
-	public static void initImprovedPseudoPtParameter(Module matsim4urbansimModule, Config config){
+	public static void initImprovedPseudoPtParameter(Module module, Config config){
 		
 		log.info("Checking improved pseudo pt settings ...");
 		ImprovedPseudoPtConfigGroup ippcm = ImprovedPseudoPtConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
 		
-		if(matsim4urbansimModule != null){
-			String usePtStops = matsim4urbansimModule.getValue(ImprovedPseudoPtConfigGroup.PT_STOPS_SWITCH);
-			String ptStops = matsim4urbansimModule.getValue(ImprovedPseudoPtConfigGroup.PT_STOPS);
-			String useTravelTimesAndDistances =  matsim4urbansimModule.getValue(ImprovedPseudoPtConfigGroup.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH);
-			String ptTravelTimes =  matsim4urbansimModule.getValue(ImprovedPseudoPtConfigGroup.PT_TRAVEL_TIMES);
-			String ptTravelDistances =  matsim4urbansimModule.getValue(ImprovedPseudoPtConfigGroup.PT_TRAVEL_DISTANCES);
+		if(module != null){
+			String usePtStops = module.getValue(ImprovedPseudoPtConfigGroup.PT_STOPS_SWITCH);
+			String ptStops = module.getValue(ImprovedPseudoPtConfigGroup.PT_STOPS);
+			String useTravelTimesAndDistances =  module.getValue(ImprovedPseudoPtConfigGroup.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH);
+			String ptTravelTimes =  module.getValue(ImprovedPseudoPtConfigGroup.PT_TRAVEL_TIMES);
+			String ptTravelDistances =  module.getValue(ImprovedPseudoPtConfigGroup.PT_TRAVEL_DISTANCES);
 
 			if(usePtStops != null &&  usePtStops.equalsIgnoreCase("true")){
 				log.info(ImprovedPseudoPtConfigGroup.PT_STOPS_SWITCH + " switch is set to true. Trying to find pt stops file ...");
