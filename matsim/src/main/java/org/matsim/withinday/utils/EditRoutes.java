@@ -115,19 +115,13 @@ public class EditRoutes {
 		return replanFutureLegRoute(leg, plan.getPerson(), null, tripRouter);
 	}
 
-	/*
-	 * We create a new Plan which contains only the Leg that should be replanned and its previous and next
-	 * Activities. By doing so the PlanAlgorithm will only change the Route of that Leg.
-	 *
-	 * Use currentNodeIndex from a DriverAgent if possible!
-	 *
-	 * Otherwise code it as following:
-	 * startLink - Node1 - routeLink1 - Node2 - routeLink2 - Node3 - endLink
-	 * The currentNodeIndex has to Point to the next Node
-	 * (which is the endNode of the current Link)
+	/**
+	 * Re-locates a future route. The route is given by its leg.
+	 * 
+	 * @return true when replacing the route worked, false when something went wrong
 	 */
-	public boolean replanCurrentLegRoute(Leg leg, Person person, int currentLinkIndex, double time, Network network, TripRouter tripRouter) {
-				
+	public boolean relocateCurrentLegRoute(Leg leg, Person person, int currentLinkIndex, Id toLinkId, double time, Network network, TripRouter tripRouter) {
+		
 		Route route = leg.getRoute();
 
 		// if the route type is not supported (e.g. because it is a walking agent)
@@ -143,7 +137,7 @@ public class EditRoutes {
 		Id currentLinkId = allLinkIds.get(currentLinkIndex);
 
 		Link fromLink = network.getLinks().get(currentLinkId);
-		Link toLink = network.getLinks().get(route.getEndLinkId());
+		Link toLink = network.getLinks().get(toLinkId);
 		
 		Facility fromFacility = new LinkWrapperFacility(fromLink);
 		Facility toFacility = new LinkWrapperFacility(toLink);
@@ -194,6 +188,28 @@ public class EditRoutes {
 		oldRoute.setLinkIds(oldRoute.getStartLinkId(), linkIds, toFacility.getLinkId());
 
 		return true;
+	}
+	
+	/*
+	 * We create a new Plan which contains only the Leg that should be replanned and its previous and next
+	 * Activities. By doing so the PlanAlgorithm will only change the Route of that Leg.
+	 *
+	 * Use currentNodeIndex from a DriverAgent if possible!
+	 *
+	 * Otherwise code it as following:
+	 * startLink - Node1 - routeLink1 - Node2 - routeLink2 - Node3 - endLink
+	 * The currentNodeIndex has to Point to the next Node
+	 * (which is the endNode of the current Link)
+	 */
+	public boolean replanCurrentLegRoute(Leg leg, Person person, int currentLinkIndex, double time, Network network, TripRouter tripRouter) {
+
+		Route route = leg.getRoute();
+
+		// if the route type is not supported (e.g. because it is a walking agent)
+		if (!(route instanceof NetworkRoute)) return false;
+
+		// This is just a special case of relocateCurrentLegRoute where the end link of the route is not changed.
+		return relocateCurrentLegRoute(leg, person, currentLinkIndex, route.getEndLinkId(), time, network, tripRouter);
 	}
 	
 	@Deprecated
