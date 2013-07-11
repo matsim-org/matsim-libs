@@ -24,8 +24,10 @@ import java.util.Collections;
 import java.util.LinkedList;
 import org.matsim.analysis.CalcLegTimes;
 import org.matsim.analysis.VolumesAnalyzer;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -376,9 +378,20 @@ public class ControllerRegistryBuilder {
 									for ( Plan plan : person.getPlans() ) {
 										xy2link.run( plan );
 										checkJointRoutes.run( plan );
-										routingAlgorithm.run( plan );
+										if ( hasLegsWithoutRoutes( plan ) ) {
+											routingAlgorithm.run( plan );
+										}
 									}
 								}
+							}
+
+							private boolean hasLegsWithoutRoutes(final Plan plan) {
+								for ( PlanElement pe : plan.getPlanElements() ) {
+									if ( pe instanceof Leg && ((Leg) pe).getRoute() == null ) {
+										return true;
+									}
+								}
+								return false;
 							}
 						};
 					}
