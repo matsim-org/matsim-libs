@@ -2,6 +2,7 @@ package playground.wrashid.kti;
 
 import org.apache.log4j.Logger;
 
+import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -61,5 +62,11 @@ public class KTIScenarioWithRoadPricing {
 
 		// we're done!
 		controler.run();
+
+		// finally, dump plans in V4 to allow hot start
+		new PopulationWriter(
+				scenario.getPopulation(),
+				scenario.getNetwork() ).writeV4(
+					controler.getControlerIO().getOutputFilename( "output_plans_v4.xml.gz" ) );
 	}
 }
