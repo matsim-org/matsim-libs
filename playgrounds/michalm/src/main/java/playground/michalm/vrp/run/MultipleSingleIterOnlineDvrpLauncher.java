@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.vrp.run.online;
+package playground.michalm.vrp.run;
 
 import java.io.*;
 

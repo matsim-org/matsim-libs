@@ -48,8 +48,6 @@ public class DynAgent
 
     private Id currentLinkId;
 
-    private Id nextLinkId;
-
     // =====
 
     private DynActivity dynActivity;
@@ -130,7 +128,6 @@ public class DynAgent
         }
         else {
             dynLeg = (DynLeg)nextDynAction;
-            nextLinkId = dynLeg.getNextLinkId();
             state = MobsimAgent.State.LEG;
         }
     }
@@ -228,16 +225,15 @@ public class DynAgent
     @Override
     public Id chooseNextLinkId()
     {
-        return nextLinkId;
+        return dynLeg.getNextLinkId();
     }
 
 
     @Override
     public void notifyMoveOverNode(Id newLinkId)
     {
-        agentLogic.notifyMoveOverNode(currentLinkId, newLinkId);
-
-        nextLinkId = dynLeg.getNextLinkId();
+        double now = internalInterface.getMobsim().getSimTimer().getTimeOfDay();
+        dynLeg.movedOverNode(currentLinkId, newLinkId, (int)now);
         currentLinkId = newLinkId;
     }
 

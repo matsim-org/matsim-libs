@@ -29,10 +29,6 @@ import playground.michalm.vrp.data.network.MatsimVertex;
 
 public class ShortestPathCalculator
 {
-    // include toLink or fromLink in time/cost (depends on the way the qsim is implemented...)
-    // by default: true (toLinks are included)
-    public static final boolean INCLUDE_TO_LINK = true;
-
     private final LeastCostPathCalculator router;
     private final TravelTime travelTime;
     private final TravelDisutility travelDisutility;
@@ -60,30 +56,27 @@ public class ShortestPathCalculator
             Path path = router.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(),
                     departTime, null, null);
 
-            double time = path.travelTime;
-            double cost = path.travelCost;
-            int idCount = path.links.size() + 1;
-            Id[] ids = new Id[idCount];
-            int idxShift;
+            int count = path.links.size();
+            Id[] ids = new Id[count + 1];
+            int[] accLinkTravelTimes = new int[count + 1];
+            int accTT = 0;
 
-            if (INCLUDE_TO_LINK) {
-                time += travelTime.getLinkTravelTime(toLink, departTime, null, null);
-                cost += travelDisutility.getLinkTravelDisutility(toLink, time, null, null);
-                ids[idCount - 1] = toLink.getId();
-                idxShift = 0;
-            }
-            else {
-                time += travelTime.getLinkTravelTime(fromLink, departTime, null, null);
-                cost += travelDisutility.getLinkTravelDisutility(fromLink, time, null, null);
-                ids[0] = fromLink.getId();
-                idxShift = 1;
+            for (int i = 0; i < count; i++) {
+                Link link = path.links.get(i);
+                ids[i] = link.getId();
+                accTT += travelTime.getLinkTravelTime(link, departTime + accTT, null, null);
+                accLinkTravelTimes[i] = accTT;
             }
 
-            for (int idx = 0; idx < idCount - 1; idx++) {
-                ids[idx + idxShift] = path.links.get(idx).getId();
-            }
+            ids[count] = toLink.getId();
+            accTT += travelTime.getLinkTravelTime(toLink, departTime + accTT, null, null);
+            accLinkTravelTimes[count] = accTT;
 
-            return new ShortestPath((int)time, cost, ids);
+            double cost = path.travelCost
+                    + travelDisutility.getLinkTravelDisutility(toLink, departTime + accTT, null,
+                            null);
+
+            return new ShortestPath((int)accTT, cost, ids, accLinkTravelTimes);
         }
         else {
             return ShortestPath.ZERO_PATH_ENTRY;

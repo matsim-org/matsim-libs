@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.vrp.run.online;
+package playground.michalm.vrp.run;
 
 import java.io.*;
 import java.util.*;
@@ -197,7 +197,7 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
         events.addHandler(rvr);
 
         if (otfVis) { // OFTVis visualization
-      	  scenario.getConfig().otfVis().setColoringScheme( ColoringScheme.taxicab ) ;
+            scenario.getConfig().otfVis().setColoringScheme( ColoringScheme.taxicab ) ;
             OTFLiveUtils.initQueryHandler(qSim, data.getVrpData());
             OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(),
                     scenario, qSim.getEventsManager(), qSim);

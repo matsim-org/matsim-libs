@@ -25,17 +25,19 @@ import org.matsim.api.core.v01.Id;
 public class ShortestPath
 {
     // optimization
-    public static final ShortestPath ZERO_PATH_ENTRY = new ShortestPath(0, 0, new Id[0]);
+    public static final ShortestPath ZERO_PATH_ENTRY = new ShortestPath(0, 0, new Id[0], new int[0]);
 
     public final int travelTime;
     public final double travelCost;
     public final Id[] linkIds;
+    public final int[] accLinkTravelTimes;//accumulated link travel times
 
 
-    public ShortestPath(int travelTime, double travelCost, Id[] linkIds)
+    public ShortestPath(int travelTime, double travelCost, Id[] linkIds, int[] accLinkTravelTimes)
     {
         this.travelTime = travelTime;
         this.travelCost = travelCost;
         this.linkIds = linkIds;
+        this.accLinkTravelTimes = accLinkTravelTimes;
     }
 }

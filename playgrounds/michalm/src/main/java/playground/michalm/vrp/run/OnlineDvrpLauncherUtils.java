@@ -1,4 +1,4 @@
-package playground.michalm.vrp.run.online;
+package playground.michalm.vrp.run;
 
 import java.io.*;
 import java.util.*;
@@ -29,7 +29,6 @@ import playground.michalm.vrp.data.file.DepotReader;
 import playground.michalm.vrp.data.network.*;
 import playground.michalm.vrp.data.network.router.*;
 import playground.michalm.vrp.data.network.shortestpath.MatsimArcFactories;
-import playground.michalm.vrp.run.VrpConfigUtils;
 import playground.michalm.vrp.taxi.*;
 
 

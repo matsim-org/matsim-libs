@@ -19,20 +19,16 @@
 
 package playground.michalm.vrp.taxi;
 
-import org.matsim.api.core.v01.Id;
-
-import playground.michalm.dynamic.DynLegImpl;
-import playground.michalm.vrp.data.network.shortestpath.ShortestPath;
-
-import com.google.common.collect.Iterators;
+import pl.poznan.put.vrp.dynamic.data.schedule.DriveTask;
+import playground.michalm.vrp.data.network.shortestpath.ShortestPathDynLeg;
 
 
 public class TaxiLeg
-    extends DynLegImpl
+    extends ShortestPathDynLeg
 {
-    public TaxiLeg(ShortestPath path, Id destinationLinkId)
+    public TaxiLeg(DriveTask driveTask)
     {
-        super(Iterators.forArray(path.linkIds), destinationLinkId);
+        super(driveTask);
     }
 
 

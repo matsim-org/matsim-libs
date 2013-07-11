@@ -26,14 +26,12 @@ import org.matsim.core.api.experimental.events.*;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 
-import pl.poznan.put.vrp.dynamic.data.model.*;
+import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.schedule.TaxiDriveTask;
 import playground.michalm.dynamic.*;
 import playground.michalm.vrp.data.model.TaxiCustomer;
-import playground.michalm.vrp.data.network.MatsimArc;
-import playground.michalm.vrp.data.network.shortestpath.ShortestPath;
 
 
 public class TaxiAgentLogic
@@ -53,9 +51,9 @@ public class TaxiAgentLogic
 
 
     @Override
-    public DynActivity init(DynAgent adapterAgent)
+    public DynActivity init(DynAgent dynAgent)
     {
-        this.agent = adapterAgent;
+        this.agent = dynAgent;
         return createBeforeScheduleActivity();// INITIAL ACTIVITY (activate the agent in QSim)
     }
 
@@ -78,11 +76,6 @@ public class TaxiAgentLogic
     }
 
 
-    @Override
-    public void notifyMoveOverNode(Id oldLinkId, Id newLinkId)
-    {}
-
-
     public void schedulePossiblyChanged()
     {
         agent.update();
@@ -101,11 +94,12 @@ public class TaxiAgentLogic
         int time = (int)now;
         taxiSimEngine.nextTask(vrpVehicle, time);
         // REFRESH status (after nextTask)!!!
-        
-        if (schedule.getStatus() == ScheduleStatus.COMPLETED) {// this happens as a result of nextTask() call
+
+        if (schedule.getStatus() == ScheduleStatus.COMPLETED) {// this happens as a result of
+                                                               // nextTask() call
             return createAfterScheduleActivity();// FINAL ACTIVITY (deactivate the agent in QSim)
         }
-        
+
         Task task = schedule.getCurrentTask();
 
         switch (task.getType()) {
@@ -115,10 +109,10 @@ public class TaxiAgentLogic
                 switch (tdt.getDriveType()) {
                     case PICKUP:
                     case CRUISE:
-                        return createLeg((DriveTask)task, time);
+                        return createLeg(tdt);
 
                     case DELIVERY:
-                        return createLegWithPassenger(tdt, time);
+                        return createLegWithPassenger(tdt);
 
                     default:
                         throw new IllegalStateException("Not supported enum type");
@@ -205,13 +199,9 @@ public class TaxiAgentLogic
 
     // ========================================================================================
 
-    private TaxiLeg createLegWithPassenger(final TaxiDriveTask driveTask, int realDepartTime)
+    private TaxiLeg createLegWithPassenger(final TaxiDriveTask driveTask)
     {
-        MatsimArc arc = (MatsimArc)driveTask.getArc();
-        ShortestPath path = arc.getShortestPath(realDepartTime);
-        Id destinationLinkId = arc.getToVertex().getLink().getId();
-
-        return new TaxiLeg(path, destinationLinkId) {
+        return new TaxiLeg(driveTask) {
             @Override
             public void endLeg(double now)
             {
@@ -243,12 +233,8 @@ public class TaxiAgentLogic
     }
 
 
-    private TaxiLeg createLeg(DriveTask driveTask, int realDepartTime)
+    private TaxiLeg createLeg(TaxiDriveTask driveTask)
     {
-        MatsimArc arc = (MatsimArc)driveTask.getArc();
-        ShortestPath path = arc.getShortestPath(realDepartTime);
-        Id destinationLinkId = arc.getToVertex().getLink().getId();
-
-        return new TaxiLeg(path, destinationLinkId);
+        return new TaxiLeg(driveTask);
     }
 }

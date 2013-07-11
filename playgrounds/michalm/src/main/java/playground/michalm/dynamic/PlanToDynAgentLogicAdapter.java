@@ -21,7 +21,6 @@ package playground.michalm.dynamic;
 
 import java.util.Iterator;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.*;
 import org.matsim.core.population.routes.NetworkRoute;
 
@@ -83,9 +82,4 @@ public class PlanToDynAgentLogicAdapter
             throw new IllegalStateException();
         }
     }
-
-
-    @Override
-    public void notifyMoveOverNode(Id oldLinkId, Id newLinkId)
-    {}
 }
