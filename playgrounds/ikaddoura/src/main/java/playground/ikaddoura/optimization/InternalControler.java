@@ -62,9 +62,7 @@ public class InternalControler {
 	private final double MONETARY_DISTANCE_COST_RATE_CAR = -0.00040;
 
 	private final double CONSTANT_WALK = 0.0;
-	private final double TRAVEL_WALK = -20.0; // for the ptRouter to avoid transit walks over longer distances, not used for scoring because of the following differentiation in access and egress time:
-	private final double TRAVEL_PT_ACCESS = -0.;
-	private final double TRAVEL_PT_EGRESS = -0.;
+	private final double TRAVEL_WALK = -0.0;
 	
 	private double CONSTANT_PT;
 	private final double TRAVEL_PT_IN_VEHICLE = -0.18;
@@ -156,13 +154,8 @@ public class InternalControler {
 		
 		OptimizationScoringFunctionFactory scoringfactory = new OptimizationScoringFunctionFactory(
 				planCalcScoreConfigGroup,
-				scenario.getNetwork(),
-				ptScoringHandler,
-				TRAVEL_PT_IN_VEHICLE, 
-				TRAVEL_PT_WAITING, 
-				STUCK_SCORE, 
-				TRAVEL_PT_ACCESS,
-				TRAVEL_PT_EGRESS);
+				scenario.getNetwork(), 
+				STUCK_SCORE);
 		
 		controler.setScoringFunctionFactory(scoringfactory);
 		
