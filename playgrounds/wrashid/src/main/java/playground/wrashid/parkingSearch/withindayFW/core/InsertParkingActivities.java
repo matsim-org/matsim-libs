@@ -36,30 +36,30 @@ import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.PersonAlgorithm;
 import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.withinday.utils.EditRoutes;
 
-import playground.wrashid.parkingSearch.withindayFW.util.EditPartialRoute;
-
 public class InsertParkingActivities implements PlanAlgorithm {
 
 	private final Scenario scenario;
 	private final PersonAlgorithm personPrepareForSim;
 	private final ParkingInfrastructure parkingInfrastructure;
-	private final PlanAlgorithm routingAlgorithm;
+	private final TripRouter tripRouter;
 
 	
 	// TODO: instead of selecting closest parking, we could select parking from previous day.
 	/*
 	 * use a InitialIdentifierImpl and set handleAllAgents to true
 	 */
-	public InsertParkingActivities(Scenario scenario, PlanAlgorithm planAlgorithm, ParkingInfrastructure parkingInfrastructure) {
+	public InsertParkingActivities(Scenario scenario, TripRouter tripRouter, ParkingInfrastructure parkingInfrastructure) {
 		this.scenario = scenario;
-		this.routingAlgorithm = planAlgorithm;
-		this.personPrepareForSim = new PersonPrepareForSim(planAlgorithm, (ScenarioImpl) scenario);
+		this.tripRouter = tripRouter;
+		this.personPrepareForSim = new PersonPrepareForSim(new PlanRouter(tripRouter), (ScenarioImpl) scenario);
 		this.parkingInfrastructure = parkingInfrastructure;
 	}
 
@@ -185,11 +185,11 @@ public class InsertParkingActivities implements PlanAlgorithm {
 						EditRoutes editRoutes=new EditRoutes();
 												
 						//update walk leg
-						editRoutes.replanFutureLegRoute(plan, i-1, routingAlgorithm);
+						editRoutes.replanFutureLegRoute(plan, i-1, tripRouter);
 						//update car leg
 												
 												
-						editRoutes.replanFutureLegRoute(plan, i+1, routingAlgorithm);
+						editRoutes.replanFutureLegRoute(plan, i+1, tripRouter);
 						
 						
 						//EditPartialRoute editPartialRoute=new EditPartialRoute(scenario, routingAlgorithm);
@@ -230,7 +230,7 @@ public class InsertParkingActivities implements PlanAlgorithm {
 				}
 			}
 			
-			PlanAlgorithm routingAlgo=routingAlgorithm;
+//			PlanAlgorithm routingAlgo=routingAlgorithm;
 			
 			Id newParkingFacilityId=null;
 			if (nextParkingArrivalAct!=null){
@@ -299,7 +299,7 @@ public class InsertParkingActivities implements PlanAlgorithm {
 	
 	
 	public static void updateNextParkingActivityIfNeededDuringDay(ParkingInfrastructure pi,
-			PlanBasedWithinDayAgent withinDayAgent, Scenario sc, PlanAlgorithm routeAlgo) {
+			PlanBasedWithinDayAgent withinDayAgent, Scenario sc, TripRouter tripRouter) {
 		//EditPartialRoute editPartialRoute=new EditPartialRoute(sc, routeAlgo);
 		
 

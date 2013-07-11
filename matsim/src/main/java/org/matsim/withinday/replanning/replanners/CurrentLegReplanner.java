@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.core.router.TripRouter;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.utils.EditRoutes;
 
@@ -45,8 +46,11 @@ import org.matsim.withinday.utils.EditRoutes;
  */
 public class CurrentLegReplanner extends WithinDayDuringLegReplanner {
 
-	/*package*/ CurrentLegReplanner(Id id, Scenario scenario, InternalInterface internalInterface) {
+	private final TripRouter tripRouter;
+	
+	/*package*/ CurrentLegReplanner(Id id, Scenario scenario, InternalInterface internalInterface, TripRouter tripRouter) {
 		super(id, scenario, internalInterface);
+		this.tripRouter = tripRouter;
 	}
 
 	/*
@@ -60,12 +64,6 @@ public class CurrentLegReplanner extends WithinDayDuringLegReplanner {
 	@Override
 	public boolean doReplanning(PlanBasedWithinDayAgent withinDayAgent) {
 
-		// If we don't have a valid Replanner.
-		if (this.routeAlgo == null) return false;
-
-		// If we don't have a valid PersonAgent
-		if (withinDayAgent == null) return false;
-
 		Plan executedPlan = withinDayAgent.getSelectedPlan();
 
 		// If we don't have an executed plan
@@ -75,7 +73,7 @@ public class CurrentLegReplanner extends WithinDayDuringLegReplanner {
 		int currentLinkIndex = withinDayAgent.getCurrentRouteLinkIdIndex();
 
 		// new Route for current Leg
-		new EditRoutes().replanCurrentLegRoute(executedPlan, currentLegIndex, currentLinkIndex, routeAlgo, time);
+		new EditRoutes().replanCurrentLegRoute(executedPlan, currentLegIndex, currentLinkIndex, this.tripRouter, this.time);
 
 		// Finally reset the cached Values of the PersonAgent - they may have changed!
 		withinDayAgent.resetCaches();

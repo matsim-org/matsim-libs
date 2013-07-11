@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MyMobsimListener.java
+ * MyWithinDayMobsimListener.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,6 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package tutorial.unsupported.example50WithinDayReplanningFromPlans;
 
 import java.util.ArrayList;
@@ -35,36 +36,26 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
-import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.router.old.PlansCalcRoute;
-import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.TripRouter;
 import org.matsim.withinday.utils.EditRoutes;
-
 
 /**
  * @author nagel
  *
  */
-public class MyWithinDayMobsimListener implements MobsimListener, MobsimBeforeSimStepListener {
-    private static final Logger log = Logger.getLogger("dummy");
-
+public class MyWithinDayMobsimListener implements MobsimBeforeSimStepListener {
+    
+	private static final Logger log = Logger.getLogger("dummy");
 	
-	private TravelDisutility travCostCalc;
-	private TravelTime travTimeCalc;
-	private PlansCalcRoute routeAlgo ;
+	private TripRouter tripRouter;
 	private Scenario scenario;
 
-	MyWithinDayMobsimListener (TravelDisutility travelCostCalculator, TravelTime travelTimeCalculator ) {
-		this.travCostCalc = travelCostCalculator ;
-		this.travTimeCalc = travelTimeCalculator ;
+	MyWithinDayMobsimListener(TripRouter tripRouter) {
+		this.tripRouter = tripRouter;
 	}
 
 	@Override
@@ -73,13 +64,10 @@ public class MyWithinDayMobsimListener implements MobsimListener, MobsimBeforeSi
 		Netsim mobsim = (Netsim) event.getQueueSimulation() ;
 		this.scenario = mobsim.getScenario();
 
-		Collection<MobsimAgent> agentsToReplan = getAgentsToReplan( mobsim ) ; 
-		
-		this.routeAlgo = new PlansCalcRoute(mobsim.getScenario().getConfig().plansCalcRoute(), mobsim.getScenario().getNetwork(), 
-				this.travCostCalc, this.travTimeCalc, new DijkstraFactory(), ((PopulationFactoryImpl) mobsim.getScenario().getPopulation().getFactory()).getModeRouteFactory());
-		
-		for ( MobsimAgent pa : agentsToReplan ) {
-			doReplanning( pa, mobsim ) ;
+		Collection<MobsimAgent> agentsToReplan = getAgentsToReplan(mobsim); 
+				
+		for (MobsimAgent ma : agentsToReplan) {
+			doReplanning(ma, mobsim);
 		}
 	}
 	
@@ -155,10 +143,10 @@ public class MyWithinDayMobsimListener implements MobsimListener, MobsimBeforeSi
 		// EditRoutes at this point only works for car routes
 		
 		// new Route for current Leg.
-		new EditRoutes().replanCurrentLegRoute(plan, planElementsIndex, withindayAgent.getCurrentRouteLinkIdIndex(), routeAlgo, now) ;
+		new EditRoutes().replanCurrentLegRoute(plan, planElementsIndex, withindayAgent.getCurrentRouteLinkIdIndex(), tripRouter, now) ;
 		
 		// the route _from_ the modified activity also needs to be replanned:
-		new EditRoutes().replanFutureLegRoute(plan, planElementsIndex+1, routeAlgo);
+		new EditRoutes().replanFutureLegRoute(plan, planElementsIndex+2, tripRouter);
 		
 		// =============================================================================================================
 		// =============================================================================================================

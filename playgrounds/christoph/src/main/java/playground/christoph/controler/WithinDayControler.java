@@ -20,21 +20,9 @@
 
 package playground.christoph.controler;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.AStarLandmarksFactory;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scoring.functions.OnlyTravelDependentScoringFunctionFactory;
 import org.matsim.withinday.controller.WithinDayController;
@@ -47,7 +35,6 @@ import org.matsim.withinday.replanning.identifiers.interfaces.InitialIdentifier;
 import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 import org.matsim.withinday.replanning.identifiers.tools.SelectHandledAgentsByProbability;
-import org.matsim.withinday.replanning.modules.ReplanningModule;
 import org.matsim.withinday.replanning.replanners.CurrentLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.InitialReplannerFactory;
 import org.matsim.withinday.replanning.replanners.NextLegReplannerFactory;
@@ -123,24 +110,14 @@ public class WithinDayControler extends WithinDayController {
 	 */
 	protected void initReplanningRouter() {
 
-		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) sim.getScenario().getPopulation().getFactory()).getModeRouteFactory();
-		
 		super.initWithinDayEngine(numReplanningThreads);
-
 		super.createAndInitTravelTimeCollector();
-		travelTime = super.getTravelTimeCollector();
-
-		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
-		
-		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeAndDisutility(this.config.planCalcScore()));
-		
-		Map<String, TravelTime> travelTimes = new HashMap<String, TravelTime>();
-		travelTimes.put(TransportMode.car, getTravelTimeCollector());
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, costFactory, travelTimes, factory, routeFactory);
+		super.initWithinDayTripRouterFactory();
+		super.getWithinDayEngine().setTripRouterFactory(this.getWithinDayTripRouterFactory());
 
 		this.initialIdentifier = new InitialIdentifierImplFactory(this.sim).createIdentifier();
 		this.selector.addIdentifier(this.initialIdentifier, this.pInitialReplanning);
-		this.initialReplannerFactory = new InitialReplannerFactory(this.scenarioData, this.getWithinDayEngine(), router, 1.0);
+		this.initialReplannerFactory = new InitialReplannerFactory(this.scenarioData, this.getWithinDayEngine());
 		this.initialReplannerFactory.addIdentifier(this.initialIdentifier);
 		super.getWithinDayEngine().addIntialReplannerFactory(this.initialReplannerFactory);
 
@@ -148,7 +125,7 @@ public class WithinDayControler extends WithinDayController {
 		ActivityReplanningMap activityReplanningMap = super.getActivityReplanningMap();
 		this.duringActivityIdentifier = new ActivityEndIdentifierFactory(activityReplanningMap).createIdentifier();
 		this.selector.addIdentifier(this.duringActivityIdentifier, this.pActEndReplanning);
-		this.duringActivityReplannerFactory = new NextLegReplannerFactory(this.scenarioData, this.getWithinDayEngine(), router, 1.0);
+		this.duringActivityReplannerFactory = new NextLegReplannerFactory(this.scenarioData, this.getWithinDayEngine());
 		this.duringActivityReplannerFactory.addIdentifier(this.duringActivityIdentifier);
 		super.getWithinDayEngine().addDuringActivityReplannerFactory(this.duringActivityReplannerFactory);
 
@@ -156,7 +133,7 @@ public class WithinDayControler extends WithinDayController {
 		LinkReplanningMap linkReplanningMap = super.getLinkReplanningMap();
 		this.duringLegIdentifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
 		this.selector.addIdentifier(this.duringLegIdentifier, this.pLeaveLinkReplanning);
-		this.duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenarioData, this.getWithinDayEngine(), router, 1.0);
+		this.duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenarioData, this.getWithinDayEngine());
 		this.duringLegReplannerFactory.addIdentifier(this.duringLegIdentifier);
 		super.getWithinDayEngine().addDuringLegReplannerFactory(this.duringLegReplannerFactory);
 	}

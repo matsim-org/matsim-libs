@@ -38,6 +38,7 @@ import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.RouteUtils;
@@ -59,14 +60,17 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 	protected final DecisionDataProvider decisionDataProvider;
 	protected final ModeAvailabilityChecker modeAvailabilityChecker;
 	protected final SwissPTTravelTime ptTravelTime;
+	protected final TripRouter tripRouter;
 	
 	/*package*/ CurrentActivityToMeetingPointReplanner(Id id, Scenario scenario,
 			InternalInterface internalInterface, DecisionDataProvider decisionDataProvider,
-			ModeAvailabilityChecker modeAvailabilityChecker, SwissPTTravelTime ptTravelTime) {
+			ModeAvailabilityChecker modeAvailabilityChecker, SwissPTTravelTime ptTravelTime,
+			TripRouter tripRouter) {
 		super(id, scenario, internalInterface);
 		this.decisionDataProvider = decisionDataProvider;
 		this.modeAvailabilityChecker = modeAvailabilityChecker;
 		this.ptTravelTime = ptTravelTime;
+		this.tripRouter = tripRouter;
 	}
 	
 	@Override
@@ -152,7 +156,7 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 			executedPlan.insertLegAct(position, legToMeeting, meetingActivity);
 			
 			// calculate route for the leg to the rescue facility using the identified mode
-			new EditRoutes().replanFutureLegRoute(executedPlan, position, routeAlgo);
+			new EditRoutes().replanFutureLegRoute(executedPlan, position, tripRouter);
 			
 			// if the person has to walk, we additionally try pt
 			if (transportMode.equals(TransportMode.walk)) {
@@ -165,7 +169,7 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 					legToMeeting.setMode(TransportMode.pt);
 					
 					// calculate route for the leg to the rescue facility
-					new EditRoutes().replanFutureLegRoute(executedPlan, position, routeAlgo);
+					new EditRoutes().replanFutureLegRoute(executedPlan, position, tripRouter);
 					
 					// set travel time
 					legToMeeting.getRoute().setTravelTime(travelTimePT);

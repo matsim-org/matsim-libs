@@ -28,6 +28,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
+import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryImpl;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.mobsim.WithinDayQSimFactory;
@@ -58,6 +60,7 @@ public class WithinDayController extends Controler {
 
 	private boolean withinDayEngineInitialized = false;
 	private WithinDayEngine withinDayEngine;
+	private TripRouterFactory withinDayTripRouterFactory;
 	private FixedOrderSimulationListener fosl = new FixedOrderSimulationListener();
 
 	public WithinDayController(String[] args) {
@@ -77,7 +80,6 @@ public class WithinDayController extends Controler {
 
 		init();
 	}
-
 
 	/*
 	 * ===================================================================
@@ -154,10 +156,30 @@ public class WithinDayController extends Controler {
 		}
 	}
 
+	/*
+	 * Use travel times from the travel time collector for car trips.
+	 */
+	public void initWithinDayTripRouterFactory() {
+		this.withinDayTripRouterFactory = new TripRouterFactoryImpl(
+				getScenario(),
+				getTravelDisutilityFactory(),
+				this.getTravelTimeCollector(),
+				getLeastCostPathCalculatorFactory(),
+				getScenario().getConfig().scenario().isUseTransit() ? getTransitRouterFactory() : null);
+	}
+	
 	public WithinDayEngine getWithinDayEngine() {
 		return this.withinDayEngine;
 	}
+	
+	public void setWithinDayTripRouterFactory(TripRouterFactory tripRouterFactory) {
+		this.withinDayTripRouterFactory = tripRouterFactory;
+	}
 
+	public TripRouterFactory getWithinDayTripRouterFactory() {
+		return this.withinDayTripRouterFactory;
+	}
+	
 	public FixedOrderSimulationListener getFixedOrderSimulationListener() {
 		return this.fosl;
 	}

@@ -64,9 +64,9 @@ import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTimeF
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
-import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
+import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryImpl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -89,11 +89,11 @@ import org.matsim.withinday.mobsim.WithinDayQSimFactory;
 import org.matsim.withinday.replanning.identifiers.ActivityPerformingIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.LegPerformingIdentifierFactory;
+import org.matsim.withinday.replanning.identifiers.filter.ProbabilityFilterFactory;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifierFactory;
-import org.matsim.withinday.replanning.modules.ReplanningModule;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplannerFactory;
@@ -133,6 +133,8 @@ import playground.gregor.sim2d_v3.simulation.floor.VelocityCalculator;
 import playground.meisterk.kti.config.KtiConfigGroup;
 
 import com.vividsolutions.jts.geom.Geometry;
+
+import contrib.multimodal.router.MultimodalTripRouterFactory;
 
 public final class MarathonController extends WithinDayController implements StartupListener, 
 	MobsimInitializedListener, MobsimBeforeSimStepListener, MobsimAfterSimStepListener {
@@ -750,7 +752,8 @@ public final class MarathonController extends WithinDayController implements Sta
 		duringLegFactory = new LeaveLinkIdentifierFactory(this.getLinkReplanningMap()); 
 		duringLegFactory.addAgentFilterFactory(notInitialReplanningFilterFactory);
 		this.duringLegRerouteIdentifier = duringLegFactory.createIdentifier();
-
+		this.duringLegRerouteIdentifier.addAgentFilter(new ProbabilityFilterFactory(EvacuationConfig.duringLegReroutingShare).createAgentFilter());
+		
 		duringActivityFactory = null;
 		duringLegFactory = null;
 	}
@@ -761,36 +764,34 @@ public final class MarathonController extends WithinDayController implements Sta
 	 */
 	private void initReplanners(QSim sim) {
 		
-		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) sim.getScenario().getPopulation().getFactory()).getModeRouteFactory();
-		
-
-		Map<String, TravelTime> factory = new HashMap<String, TravelTime>();
-			factory.put(TransportMode.walk, new WalkTravelTimeFactory(this.config.plansCalcRoute()).createTravelTime());
-			factory.put("walk2d", new WalkTravelTimeFactory(this.config.plansCalcRoute()).createTravelTime());
-			factory.put(TransportMode.bike, new BikeTravelTimeFactory(this.config.plansCalcRoute()).createTravelTime());
-			factory.put(TransportMode.pt, new PTTravelTimeKTIEvacuationFactory(this.scenarioData, 
+		Map<String, TravelTime> travelTimes = new HashMap<String, TravelTime>();
+		travelTimes.put(TransportMode.walk, new WalkTravelTimeFactory(this.config.plansCalcRoute()).createTravelTime());
+		travelTimes.put("walk2d", new WalkTravelTimeFactory(this.config.plansCalcRoute()).createTravelTime());
+		travelTimes.put(TransportMode.bike, new BikeTravelTimeFactory(this.config.plansCalcRoute()).createTravelTime());
+		travelTimes.put(TransportMode.pt, new PTTravelTimeKTIEvacuationFactory(this.scenarioData, 
 					new PTTravelTimeFactory(this.config.plansCalcRoute(), getTravelTimeCollector(), new WalkTravelTimeFactory(this.config.plansCalcRoute()).createTravelTime()).createTravelTime()).createTravelTime());
 		
 //		// add time dependent penalties to travel costs within the affected area
 		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
 		TravelDisutilityFactory penaltyCostFactory = new PenaltyTravelCostFactory(costFactory, coordAnalyzer);
 
-
-		LeastCostPathCalculatorFactory lfactory = new FastAStarLandmarksFactory(this.network, new FreespeedTravelTimeAndDisutility(this.config.planCalcScore()));
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, penaltyCostFactory, factory, lfactory, routeFactory);
+		LeastCostPathCalculatorFactory factory = new FastAStarLandmarksFactory(this.network, new FreespeedTravelTimeAndDisutility(this.config.planCalcScore()));
+		
+		TripRouterFactory delegate = new TripRouterFactoryImpl(this.scenarioData, penaltyCostFactory, this.getTravelTimeCollector(), factory, this.getTransitRouterFactory());
+		MultimodalTripRouterFactory tripRouterFactory = new MultimodalTripRouterFactory(this, travelTimes, delegate);
+		this.getWithinDayEngine().setTripRouterFactory(tripRouterFactory);
 		
 		/*
 		 * During Activity Replanners
 		 */
-		EndActivityAndEvacuateReplannerFactory endActivityAndEvacuateReplannerFactory = new EndActivityAndEvacuateReplannerFactory(this.scenarioData, this.getWithinDayEngine(), router, 1.0, 
+		EndActivityAndEvacuateReplannerFactory endActivityAndEvacuateReplannerFactory = new EndActivityAndEvacuateReplannerFactory(this.scenarioData, this.getWithinDayEngine(),
 				(SwissPTTravelTime) this.ptTravelTime);
-		this.marathonEndActivityAndEvacuateReplannerFactory = new MarathonEndActivityAndEvacuateReplannerFactory(this.scenarioData, this.getWithinDayEngine(), router, 1.0, 
-				endActivityAndEvacuateReplannerFactory);
+		this.marathonEndActivityAndEvacuateReplannerFactory = new MarathonEndActivityAndEvacuateReplannerFactory(this.scenarioData, this.getWithinDayEngine(), endActivityAndEvacuateReplannerFactory);
 		this.marathonEndActivityAndEvacuateReplannerFactory.addIdentifier(this.affectedActivityPerformingIdentifier);
 		this.getWithinDayEngine().addTimedDuringActivityReplannerFactory(this.marathonEndActivityAndEvacuateReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 		
 		
-		this.extendCurrentActivityReplannerFactory = new ExtendCurrentActivityReplannerFactory(this.scenarioData, this.getWithinDayEngine(), router, 1.0);
+		this.extendCurrentActivityReplannerFactory = new ExtendCurrentActivityReplannerFactory(this.scenarioData, this.getWithinDayEngine());
 		this.extendCurrentActivityReplannerFactory.addIdentifier(this.notAffectedActivityPerformingIdentifier);
 		this.getWithinDayEngine().addTimedDuringActivityReplannerFactory(this.extendCurrentActivityReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 		
@@ -803,15 +804,15 @@ public final class MarathonController extends WithinDayController implements Sta
 //		this.getReplanningManager().addTimedDuringLegReplannerFactory(this.currentLegInitialReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 		
 		// use buffered affected area
-		this.currentLegInitialReplannerFactory = new CurrentLegInitialReplannerFactory(this.scenarioData, this.getWithinDayEngine(), router, 1.0, this.bufferedCoordAnalyzer);
+		this.currentLegInitialReplannerFactory = new CurrentLegInitialReplannerFactory(this.scenarioData, this.getWithinDayEngine(), this.bufferedCoordAnalyzer);
 		this.currentLegInitialReplannerFactory.addIdentifier(this.legPerformingIdentifier);
 		this.getWithinDayEngine().addTimedDuringLegReplannerFactory(this.currentLegInitialReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 		
-		this.switchWalkModeReplannerFactory = new SwitchToWalk2DLegReplannerFactory(this.scenarioData, this.getWithinDayEngine(), router, 1.0, this.coordAnalyzer);
+		this.switchWalkModeReplannerFactory = new SwitchToWalk2DLegReplannerFactory(this.scenarioData, this.getWithinDayEngine(), this.coordAnalyzer);
 		this.switchWalkModeReplannerFactory.addIdentifier(this.duringLegRerouteIdentifier);
 		this.getWithinDayEngine().addTimedDuringLegReplannerFactory(this.switchWalkModeReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 
-		this.duringLegRerouteReplannerFactory = new MarathonCurrentLegReplannerFactory(this.scenarioData, this.getWithinDayEngine(), router, EvacuationConfig.duringLegReroutingShare);
+		this.duringLegRerouteReplannerFactory = new MarathonCurrentLegReplannerFactory(this.scenarioData, this.getWithinDayEngine());
 		this.duringLegRerouteReplannerFactory.addIdentifier(this.duringLegRerouteIdentifier);
 		this.getWithinDayEngine().addTimedDuringLegReplannerFactory(this.duringLegRerouteReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 		

@@ -106,7 +106,7 @@ public class PrepareScenarioControler extends KTIEnergyFlowsController implement
 		/*
 		 * Using a LegModeChecker to ensure that all agents' plans have valid mode chains.
 		 */
-		legModeChecker = new LegModeChecker(this.createRoutingAlgorithm());
+		legModeChecker = new LegModeChecker(event.getControler().getTripRouterFactory().instantiateAndConfigureTripRouter());
 		legModeChecker.setValidNonCarModes(new String[]{TransportMode.walk, TransportMode.bike, TransportMode.pt});
 		legModeChecker.setToCarProbability(0.5);
 		legModeChecker.run(this.scenarioData.getPopulation());
@@ -135,7 +135,7 @@ public class PrepareScenarioControler extends KTIEnergyFlowsController implement
 		/*
 		 * Assign vehicles to agent's plans.
 		 */
-		this.assignVehiclesToPlans = new AssignVehiclesToPlans(this.scenarioData, this.createRoutingAlgorithm());
+		this.assignVehiclesToPlans = new AssignVehiclesToPlans(this.scenarioData, event.getControler().getTripRouterFactory().instantiateAndConfigureTripRouter());
 		for (Household household : ((ScenarioImpl) scenarioData).getHouseholds().getHouseholds().values()) {
 			this.assignVehiclesToPlans.run(household);
 		}

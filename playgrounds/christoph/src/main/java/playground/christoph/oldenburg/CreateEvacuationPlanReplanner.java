@@ -34,22 +34,23 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.core.router.PlanRouter;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
 
 public class CreateEvacuationPlanReplanner extends WithinDayInitialReplanner {
 	
 	private Random random;
+	private PlanRouter planRouter;
 	
-	/*package*/ CreateEvacuationPlanReplanner(Id id, Scenario scenario, InternalInterface internalInterface) {
+	/*package*/ CreateEvacuationPlanReplanner(Id id, Scenario scenario, InternalInterface internalInterface,
+			PlanRouter planRouter) {
 		super(id, scenario, internalInterface);
+		this.planRouter = planRouter;
 		this.random = MatsimRandom.getLocalInstance();
 	}
 
 	@Override
 	public boolean doReplanning(PlanBasedWithinDayAgent withinDayAgent) {
-		
-		// If we don't have a valid Replanner.
-		if (this.routeAlgo == null) return false;
 
 		// If we don't have a valid personAgent
 		if (withinDayAgent == null) return false;
@@ -88,7 +89,7 @@ public class CreateEvacuationPlanReplanner extends WithinDayInitialReplanner {
 		leg.setDepartureTime(departureTime);
 				
 		// create a route for the new leg
-		this.routeAlgo.run(executedPlan);
+		this.planRouter.run(executedPlan);
 		
 		activity.setStartTime(departureTime + leg.getTravelTime());
 		

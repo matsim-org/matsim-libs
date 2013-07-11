@@ -37,6 +37,7 @@ import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.RouteUtils;
@@ -50,11 +51,13 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 	private static final Logger log = Logger.getLogger(EndActivityAndEvacuateReplanner.class);
 	
 	private final SwissPTTravelTime ptTravelTime;
+	private final TripRouter tripRouter;
 	
 	/*package*/ EndActivityAndEvacuateReplanner(Id id, Scenario scenario, InternalInterface internalInterface, 
-			SwissPTTravelTime ptTravelTime) {
+			SwissPTTravelTime ptTravelTime, TripRouter tripRouter) {
 		super(id, scenario, internalInterface);
 		this.ptTravelTime = ptTravelTime;
+		this.tripRouter = tripRouter;
 	}
 	
 	@Override
@@ -120,7 +123,7 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 		executedPlan.insertLegAct(position, legToRescue, rescueActivity);
 		
 		// calculate route for the leg to the rescue facility
-		new EditRoutes().replanFutureLegRoute(executedPlan, position, routeAlgo);
+		new EditRoutes().replanFutureLegRoute(executedPlan, position, tripRouter);
 
 		/*
 		 * Identify the last non-rescue link and relocate rescue activity to it.
@@ -151,7 +154,7 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 				legToRescue.setMode(TransportMode.pt);
 				
 				// calculate route for the leg to the rescue facility
-				new EditRoutes().replanFutureLegRoute(executedPlan, position, routeAlgo);
+				new EditRoutes().replanFutureLegRoute(executedPlan, position, tripRouter);
 				
 				// set travel time
 				legToRescue.getRoute().setTravelTime(travelTimePT);

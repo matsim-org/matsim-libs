@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.core.router.TripRouter;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.utils.EditRoutes;
 
@@ -37,15 +38,16 @@ import org.matsim.withinday.utils.EditRoutes;
  */
 public class MarathonCurrentLegReplanner extends WithinDayDuringLegReplanner {
 
-	/*package*/ MarathonCurrentLegReplanner(Id id, Scenario scenario, InternalInterface internalInterface) {
+	private final TripRouter tripRouter;
+	
+	/*package*/ MarathonCurrentLegReplanner(Id id, Scenario scenario, InternalInterface internalInterface,
+			TripRouter tripRouter) {
 		super(id, scenario, internalInterface);
+		this.tripRouter = tripRouter;
 	}
 
 	@Override
 	public boolean doReplanning(PlanBasedWithinDayAgent withinDayAgent) {
-
-		// If we don't have a valid Replanner.
-		if (this.routeAlgo == null) return false;
 
 		// If we don't have a valid PersonAgent
 		if (withinDayAgent == null) return false;
@@ -68,7 +70,7 @@ public class MarathonCurrentLegReplanner extends WithinDayDuringLegReplanner {
 		}
 
 		// new Route for current Leg
-		new EditRoutes().replanCurrentLegRoute(executedPlan, currentLegIndex, currentLinkIndex, routeAlgo, time);
+		new EditRoutes().replanCurrentLegRoute(executedPlan, currentLegIndex, currentLinkIndex, tripRouter, time);
 
 		// switch back to walk2d
 		if (isWalk2d) {

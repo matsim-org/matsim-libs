@@ -54,18 +54,17 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
-import org.matsim.core.router.old.PlansCalcRoute;
-import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterFactoryImpl;
+import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
+import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactory;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
 import org.matsim.population.algorithms.PersonPrepareForSim;
-import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.testcases.MatsimTestCase;
 
 import playground.wrashid.lib.obj.IntegerValueHashMap;
@@ -135,14 +134,12 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 		assertEquals(9, plan.getPlanElements().size());
 		
 		TravelTimeCalculatorFactory ttCalcFactory = new TravelTimeCalculatorFactoryImpl();
-		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) sc.getPopulation().getFactory()).getModeRouteFactory();
 		TravelTime travelTime = ttCalcFactory.createTravelTimeCalculator(sc.getNetwork(), sc.getConfig().travelTimeCalculator()).getLinkTravelTimes() ;
-		TravelDisutility travelCost = new TravelTimeAndDistanceBasedTravelDisutility(travelTime, sc.getConfig().planCalcScore());
 		
-		PlanAlgorithm plansAlgorithm = new PlansCalcRoute(config.plansCalcRoute(), sc.getNetwork(), travelCost, travelTime, routeFactory);
+		TripRouter tripRouter = new TripRouterFactoryImpl(sc, new TravelCostCalculatorFactoryImpl(), travelTime, new DijkstraFactory(), null).instantiateAndConfigureTripRouter();
 		
 		// initialize routes
-		new PersonPrepareForSim(plansAlgorithm, (ScenarioImpl) sc).run(sc.getPopulation());
+		new PersonPrepareForSim(new PlanRouter(tripRouter), (ScenarioImpl) sc).run(sc.getPopulation());
 
 //		ParkingInfrastructure parkingInfrastructure = new ParkingInfrastructure(sc, null, null);
 		HashMap<String, HashSet<Id>> parkingTypes = new HashMap<String, HashSet<Id>>();
@@ -164,7 +161,7 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 		
 		ParkingInfrastructure parkingInfrastructure = new ParkingInfrastructure(sc, parkingTypes, new ParkingCostCalculatorFW(parkingTypes));
 
-		InsertParkingActivities insertParkingActivities = new InsertParkingActivities(sc, plansAlgorithm, parkingInfrastructure);
+		InsertParkingActivities insertParkingActivities = new InsertParkingActivities(sc, tripRouter, parkingInfrastructure);
 		
 		// init parking facility capacities
 		IntegerValueHashMap<Id> facilityCapacities = new IntegerValueHashMap<Id>();

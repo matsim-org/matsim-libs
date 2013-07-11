@@ -1,9 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * ProbabilityFilter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,21 +18,40 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.withinday2;
+package org.matsim.withinday.replanning.identifiers.filter;
 
-import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
-import org.matsim.testcases.MatsimTestCase;
+import java.util.Iterator;
+import java.util.Random;
+import java.util.Set;
 
-public class EquilTest extends MatsimTestCase {
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilter;
 
-	public void testScenario() {
-		Config config = this.loadConfig(this.getInputDirectory() + "config.xml");
-		config.multiModal().setMultiModalSimulationEnabled(true);
-		final Controler controler = new Controler(config);
-		controler.setOverwriteFiles(true);
-		controler.addControlerListener(new MyControlerListener()) ;
-		controler.run();
+public class ProbabilityFilter implements AgentFilter {
+
+	private final Random random = MatsimRandom.getLocalInstance();
+	private final double replanningProbability;
+	
+	// use the factory
+	/*package*/ ProbabilityFilter(double replanningProbability) {
+		this.replanningProbability = replanningProbability;
 	}
-
+	
+	@Override
+	public void applyAgentFilter(Set<Id> set, double time) {
+		Iterator<Id> iter = set.iterator();
+		
+		while (iter.hasNext()) {
+			iter.next();
+			
+			/*
+			 * Based on a random number it is decided whether an agent should 
+			 * do a replanning or not.
+			 * number > replanningProbability: no replanning
+			 */
+			double rand = random.nextDouble();
+			if (rand > replanningProbability) iter.remove();
+		}
+	}
 }

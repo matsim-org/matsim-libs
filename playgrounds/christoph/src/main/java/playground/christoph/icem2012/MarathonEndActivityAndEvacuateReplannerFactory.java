@@ -21,7 +21,6 @@
 package playground.christoph.icem2012;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
@@ -34,10 +33,9 @@ public class MarathonEndActivityAndEvacuateReplannerFactory extends WithinDayDur
 	private Scenario scenario;
 	private EndActivityAndEvacuateReplannerFactory factory;
 	
-	public MarathonEndActivityAndEvacuateReplannerFactory(Scenario scenario, WithinDayEngine replanningManager,
-			AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability,
+	public MarathonEndActivityAndEvacuateReplannerFactory(Scenario scenario, WithinDayEngine withinDayEngine,
 			EndActivityAndEvacuateReplannerFactory factory) {
-		super(replanningManager, abstractMultithreadedModule, replanningProbability);
+		super(withinDayEngine);
 		this.scenario = scenario;
 		this.factory = factory;
 	}
@@ -46,11 +44,9 @@ public class MarathonEndActivityAndEvacuateReplannerFactory extends WithinDayDur
 	public WithinDayDuringActivityReplanner createReplanner() {
 		
 		EndActivityAndEvacuateReplanner delegate = (EndActivityAndEvacuateReplanner) factory.createReplanner();
-		super.initNewInstance(delegate);
 		
 		WithinDayDuringActivityReplanner replanner = new MarathonEndActivityAndEvacuateReplanner(super.getId(), 
-				scenario, this.getReplanningManager().getInternalInterface(), delegate);
-		super.initNewInstance(replanner);
+				scenario, this.getWithinDayEngine().getInternalInterface(), delegate);
 		return replanner;
 	}
 

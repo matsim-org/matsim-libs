@@ -127,7 +127,7 @@ public class HUPCBasicControllerKTI extends KTIWithinDayControler  {
 		
 		// adding hight utility parking choice algo
 		HUPCReplannerFactory hupcReplannerFactory = new HUPCReplannerFactory(this.getWithinDayEngine(),
-				router, 1.0, this.scenarioData, parkingAgentsTracker);
+				this.scenarioData, parkingAgentsTracker);
 		HUPCIdentifier hupcSearchIdentifier = new HUPCIdentifier(parkingAgentsTracker, parkingInfrastructure);
 		this.getFixedOrderSimulationListener().addSimulationListener(hupcSearchIdentifier);
 		hupcReplannerFactory.addIdentifier(hupcSearchIdentifier);

@@ -28,6 +28,7 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.utils.EditRoutes;
@@ -48,18 +49,18 @@ public class CurrentLegToMeetingPointReplanner extends WithinDayDuringLegReplann
 	public static final String activityType = "meetHousehold";
 	
 	protected final DecisionDataProvider decisionDataProvider;
+	protected final TripRouter tripRouter;
 	
 	/*package*/ CurrentLegToMeetingPointReplanner(Id id, Scenario scenario,
-			InternalInterface internalInterface, DecisionDataProvider decisionDataProvider) {
+			InternalInterface internalInterface, DecisionDataProvider decisionDataProvider,
+			TripRouter tripRouter) {
 		super(id, scenario, internalInterface);
 		this.decisionDataProvider = decisionDataProvider;
+		this.tripRouter = tripRouter;
 	}
 
 	@Override
 	public boolean doReplanning(PlanBasedWithinDayAgent withinDayAgent) {
-				
-		// If we don't have a valid Replanner.
-		if (this.routeAlgo == null) return false;
 
 		// If we don't have a valid WithinDayPersonAgent
 		if (withinDayAgent == null) return false;
@@ -122,9 +123,9 @@ public class CurrentLegToMeetingPointReplanner extends WithinDayDuringLegReplann
 			 * TODO: remove this, if the queue logic is adapted...
 			 */
 			if (currentLinkIndex == 0) currentLinkIndex++;
-			
+
 			// new Route for current Leg
-			new EditRoutes().replanCurrentLegRoute(executedPlan, currentLegIndex, currentLinkIndex, routeAlgo, time);
+			new EditRoutes().replanCurrentLegRoute(executedPlan, currentLegIndex, currentLinkIndex, tripRouter, time);
 			
 			// Remove all legs and activities after the next activity.
 			int nextActivityIndex = executedPlan.getActLegIndex(meetingActivity);

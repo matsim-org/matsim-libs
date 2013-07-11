@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -51,7 +52,7 @@ import org.matsim.withinday.utils.EditRoutes;
  */
 public class LegModeChecker extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
-	private final PlanAlgorithm routingAlgorithm;
+	private final TripRouter tripRouter;
 	private final Counter counter;
 	private final EditRoutes editRoutes;
 	
@@ -59,8 +60,8 @@ public class LegModeChecker extends AbstractPersonAlgorithm implements PlanAlgor
 	private Random random = MatsimRandom.getLocalInstance();
 	private String[] validNonCarModes = {TransportMode.bike, TransportMode.pt, TransportMode.walk};
 	
-	public LegModeChecker(PlanAlgorithm routingAlgorithm) {
-		this.routingAlgorithm = routingAlgorithm;
+	public LegModeChecker(TripRouter tripRouter) {
+		this.tripRouter = tripRouter;
 		
 		this.counter = new Counter("Adapted mode chains: ");
 		this.editRoutes = new EditRoutes();
@@ -160,7 +161,7 @@ public class LegModeChecker extends AbstractPersonAlgorithm implements PlanAlgor
 					// if the route is null, create a new one
 					if (leg.getRoute() == null) {
 						adapted = true;
-						editRoutes.replanFutureLegRoute(plan, i, routingAlgorithm);
+						editRoutes.replanFutureLegRoute(plan, i, tripRouter);
 					}
 				}
 				if (adapted) counter.incCounter();

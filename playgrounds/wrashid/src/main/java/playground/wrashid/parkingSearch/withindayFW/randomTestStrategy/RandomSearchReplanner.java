@@ -37,13 +37,13 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.utils.EditRoutes;
 
 import playground.wrashid.parkingSearch.withindayFW.core.InsertParkingActivities;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingAgentsTracker;
-import playground.wrashid.parkingSearch.withindayFW.util.EditPartialRoute;
 
 /**
  * 
@@ -54,12 +54,14 @@ public class RandomSearchReplanner extends WithinDayDuringLegReplanner {
 	private final Random random;
 	private final EditRoutes editRoutes;
 	private final ParkingAgentsTracker parkingAgentsTracker;
+	private final TripRouter tripRouter;
 	
 	RandomSearchReplanner(Id id, Scenario scenario, InternalInterface internalInterface, 
-			ParkingAgentsTracker parkingAgentsTracker) {
+			ParkingAgentsTracker parkingAgentsTracker, TripRouter tripRouter) {
 		super(id, scenario, internalInterface);
 		this.parkingAgentsTracker = parkingAgentsTracker;
-
+		this.tripRouter = tripRouter;
+		
 		this.editRoutes = new EditRoutes();
 		this.random = MatsimRandom.getLocalInstance();
 	}
@@ -176,19 +178,19 @@ public class RandomSearchReplanner extends WithinDayDuringLegReplanner {
 				 * machen, weil hier geht es ja nur um nicht ausgeführte Teile
 				 * des Plans.
 				 */
-				InsertParkingActivities.updateNextParkingActivityIfNeededDuringDay(parkingAgentsTracker.getParkingInfrastructure()  , withinDayAgent , scenario, routeAlgo);
+				InsertParkingActivities.updateNextParkingActivityIfNeededDuringDay(parkingAgentsTracker.getParkingInfrastructure()  , withinDayAgent , scenario, tripRouter);
 				
 					
 				
 				if (nextParkingLegIndex!=null){
 					// update walk leg to parking activity
-					editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), nextParkingLegIndex - 1, routeAlgo);
+					editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), nextParkingLegIndex - 1, tripRouter);
 					
 					
 					
 					// update car leg from parking activity
 					//editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), nextParkingLegIndex + 1, routeAlgo);
-					editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), nextParkingLegIndex + 1, routeAlgo);
+					editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), nextParkingLegIndex + 1, tripRouter);
 				}
 
 			// as we have found a parking on our way to the planned parking, we discard the rest
@@ -209,7 +211,7 @@ public class RandomSearchReplanner extends WithinDayDuringLegReplanner {
 //						withinDayAgent.getCurrentRouteLinkIdIndex(), routeAlgo, this.time);
 
 				editRoutes.replanCurrentLegRoute(plan, withinDayAgent.getCurrentPlanElementIndex(),
-						withinDayAgent.getCurrentRouteLinkIdIndex(), routeAlgo, this.time);
+						withinDayAgent.getCurrentRouteLinkIdIndex(), tripRouter, this.time);
 						
 				
 				
@@ -218,7 +220,7 @@ public class RandomSearchReplanner extends WithinDayDuringLegReplanner {
 
 			// update walk leg away from arriving pariking act
 			editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(),
-					withinDayAgent.getCurrentPlanElementIndex() + 2, routeAlgo);	
+					withinDayAgent.getCurrentPlanElementIndex() + 2, tripRouter);	
 			
 			
 			

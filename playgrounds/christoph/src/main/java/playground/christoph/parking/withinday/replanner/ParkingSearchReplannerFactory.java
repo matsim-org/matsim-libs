@@ -21,7 +21,6 @@
 package playground.christoph.parking.withinday.replanner;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
@@ -37,10 +36,10 @@ public class ParkingSearchReplannerFactory extends WithinDayDuringLegReplannerFa
 	protected final ParkingInfrastructure parkingInfrastructure;
 	protected final ParkingRouterFactory parkingRouterFactory;
 	
-	public ParkingSearchReplannerFactory(WithinDayEngine withindayDayEngine, AbstractMultithreadedModule abstractMultithreadedModule,
-			double replanningProbability, Scenario scenario, ParkingAgentsTracker parkingAgentsTracker, 
-			ParkingInfrastructure parkingInfrastructure, ParkingRouterFactory parkingRouterFactory) {
-		super(withindayDayEngine, abstractMultithreadedModule, replanningProbability);
+	public ParkingSearchReplannerFactory(WithinDayEngine withindayDayEngine, Scenario scenario, 
+			ParkingAgentsTracker parkingAgentsTracker, ParkingInfrastructure parkingInfrastructure, 
+			ParkingRouterFactory parkingRouterFactory) {
+		super(withindayDayEngine);
 		
 		this.scenario = scenario;
 		this.parkingAgentsTracker = parkingAgentsTracker;
@@ -52,8 +51,7 @@ public class ParkingSearchReplannerFactory extends WithinDayDuringLegReplannerFa
 	public ParkingSearchReplanner createReplanner() {
 		ParkingRouter parkingRouter = this.parkingRouterFactory.createParkingRouter();
 		ParkingSearchReplanner replanner = new ParkingSearchReplanner(super.getId(), scenario, 
-				this.getReplanningManager().getInternalInterface(), parkingAgentsTracker, parkingInfrastructure, parkingRouter);
-		super.initNewInstance(replanner);
+				this.getWithinDayEngine().getInternalInterface(), parkingAgentsTracker, parkingInfrastructure, parkingRouter);
 		return replanner;
 	}
 

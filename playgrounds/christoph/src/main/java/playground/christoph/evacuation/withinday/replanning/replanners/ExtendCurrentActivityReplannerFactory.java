@@ -21,7 +21,6 @@
 package playground.christoph.evacuation.withinday.replanning.replanners;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
@@ -30,16 +29,15 @@ public class ExtendCurrentActivityReplannerFactory extends WithinDayDuringActivi
 
 	private Scenario scenario;
 	
-	public ExtendCurrentActivityReplannerFactory(Scenario scenario, WithinDayEngine replanningManager, AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability) {
-		super(replanningManager, abstractMultithreadedModule, replanningProbability);
+	public ExtendCurrentActivityReplannerFactory(Scenario scenario, WithinDayEngine withinDayEngine) {
+		super(withinDayEngine);
 		this.scenario = scenario;
 	}
 
 	@Override
 	public WithinDayDuringActivityReplanner createReplanner() {
 		WithinDayDuringActivityReplanner replanner = new ExtendCurrentActivityReplanner(super.getId(),
-				scenario, this.getReplanningManager().getInternalInterface());
-		super.initNewInstance(replanner);
+				scenario, this.getWithinDayEngine().getInternalInterface());
 		return replanner;
 	}
 

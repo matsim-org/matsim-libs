@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * ReplannerYoungPeopleFactory.java
+ * ProbabilityFilterFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,29 +18,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.withinday2;
+package org.matsim.withinday.replanning.identifiers.filter;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.withinday.mobsim.WithinDayEngine;
-import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
-import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
+import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilterFactory;
 
-public class YoungPeopleReplannerFactory extends WithinDayDuringLegReplannerFactory {
+public class ProbabilityFilterFactory implements AgentFilterFactory {
 
-	private Scenario scenario;
-	
-	public YoungPeopleReplannerFactory(Scenario scenario, WithinDayEngine replanningManager,
-			AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability) {
-		super(replanningManager, abstractMultithreadedModule, replanningProbability);
-		this.scenario = scenario;
+	private final double replanningProbability;
+
+	public ProbabilityFilterFactory(double replanningProbability) {
+		this.replanningProbability = replanningProbability;
 	}
-
+	
 	@Override
-	public WithinDayDuringLegReplanner createReplanner() {
-		WithinDayDuringLegReplanner replanner = new YoungPeopleReplanner(super.getId(), scenario,
-				this.getReplanningManager().getInternalInterface());
-		super.initNewInstance(replanner);
-		return replanner;
+	public ProbabilityFilter createAgentFilter() {
+		return new ProbabilityFilter(replanningProbability);
 	}
 }

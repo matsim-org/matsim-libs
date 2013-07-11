@@ -378,6 +378,8 @@ public class BurgdorfRoutes {
 	public static String[] toParking09 = new String[] {"L09", "L11", "L13", "L25", "LP09a"};
 	public static String[] fromParking09 = new String[] {"LP09b", "L26","L14","L12",  "L10"};
 	
+	public static String burgdorfToBernUpstream = "17560001383090FT";
+	public static String burgdorfToZurichUpstream = "17560002014773FT";
 	
 	public static void checkRouteValidity(Scenario scenario, List<Id> linkIds) {
 				

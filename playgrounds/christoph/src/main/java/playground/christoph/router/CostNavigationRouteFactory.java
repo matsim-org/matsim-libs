@@ -22,7 +22,6 @@ package playground.christoph.router;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
@@ -39,11 +38,10 @@ public class CostNavigationRouteFactory extends WithinDayDuringLegReplannerFacto
 	private CostNavigationTravelTimeLogger costNavigationTravelTimeLogger;
 	private LeastCostPathCalculatorFactory routerFactory;
 	
-	public CostNavigationRouteFactory(Scenario scenario, Network network, WithinDayEngine replanningManager, 
-			AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability,
+	public CostNavigationRouteFactory(Scenario scenario, Network network, WithinDayEngine withinDayEngine,
 			CostNavigationTravelTimeLogger costNavigationTravelTimeLogger, TravelDisutilityFactory travelCostFactory,
 			TravelTime travelTime, LeastCostPathCalculatorFactory routerFactory) {
-		super(replanningManager, abstractMultithreadedModule, replanningProbability);
+		super(withinDayEngine);
 		this.scenario = scenario;
 		this.network = network;
 		this.costNavigationTravelTimeLogger = costNavigationTravelTimeLogger;
@@ -55,9 +53,8 @@ public class CostNavigationRouteFactory extends WithinDayDuringLegReplannerFacto
 	@Override
 	public WithinDayDuringLegReplanner createReplanner() {
 		WithinDayDuringLegReplanner replanner = new CostNavigationRoute(super.getId(), scenario, 
-				this.getReplanningManager().getInternalInterface(), network, costNavigationTravelTimeLogger, 
+				this.getWithinDayEngine().getInternalInterface(), network, costNavigationTravelTimeLogger, 
 				travelCostFactory, travelTime, routerFactory);
-		super.initNewInstance(replanner);
 		return replanner;
 	}
 }

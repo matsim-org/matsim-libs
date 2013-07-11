@@ -24,9 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
-import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.withinday.replanning.identifiers.interfaces.Identifier;
 
 /*
@@ -39,9 +37,7 @@ public abstract class WithinDayReplanner<T extends Identifier> {
 	protected final Id id;
 	protected final Scenario scenario;
 	protected final InternalInterface internalInterface;
-	
-	protected AbstractMultithreadedModule abstractMultithreadedModule;
-	protected PlanAlgorithm routeAlgo;
+
 	protected double time = Time.UNDEFINED_TIME;
 
 	public WithinDayReplanner(Id id, Scenario scenario, InternalInterface internalInterface) {
@@ -51,7 +47,6 @@ public abstract class WithinDayReplanner<T extends Identifier> {
 	}
 	
 	public abstract boolean doReplanning(PlanBasedWithinDayAgent withinDayAgent);
-
 	
 	public final Id getId() {
 		return this.id;
@@ -63,11 +58,6 @@ public abstract class WithinDayReplanner<T extends Identifier> {
 	
 	public final void setTime(double time) {
 		this.time = time;
-	}
-	
-	public final void setAbstractMultithreadedModule(AbstractMultithreadedModule module) {
-		this.abstractMultithreadedModule = module;
-		this.routeAlgo = module.getPlanAlgoInstance();
 	}
 	
 	public void reset() {

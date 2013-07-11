@@ -11,13 +11,17 @@ import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.router.TripRouter;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.utils.EditRoutes;
 
 public class ReplannerOldPeople extends WithinDayDuringActivityReplanner {
 
-	/*package*/ ReplannerOldPeople(Id id, Scenario scenario, InternalInterface internalInterface) {
+	private final TripRouter tripRouter;
+	
+	/*package*/ ReplannerOldPeople(Id id, Scenario scenario, InternalInterface internalInterface, TripRouter tripRouter) {
 		super(id, scenario, internalInterface);
+		this.tripRouter = tripRouter;
 	}
 
 	@Override
@@ -25,10 +29,6 @@ public class ReplannerOldPeople extends WithinDayDuringActivityReplanner {
 	 * return value (in future it might be true, when successful call)
 	 */
 	public boolean doReplanning(PlanBasedWithinDayAgent withinDayAgent) {
-		
-		// If we don't have a valid Replanner.
-		// (only extra security)
-		if (this.routeAlgo == null) return false;
 		
 		// If we don't have a valid personAgent (only extra security)
 		if (withinDayAgent == null) return false;
@@ -62,8 +62,8 @@ public class ReplannerOldPeople extends WithinDayDuringActivityReplanner {
 		executedPlan.insertLegAct(legToNewWorkIndex, legToNewWork, newWorkAct);
 		
 		// replan the new Legs
-		new EditRoutes().replanFutureLegRoute(executedPlan, legToNewWorkIndex, routeAlgo);
-		new EditRoutes().replanFutureLegRoute(executedPlan, homeLegIndex, routeAlgo);
+		new EditRoutes().replanFutureLegRoute(executedPlan, legToNewWorkIndex, tripRouter);
+		new EditRoutes().replanFutureLegRoute(executedPlan, homeLegIndex, tripRouter);
 				
 		return true;
 	}

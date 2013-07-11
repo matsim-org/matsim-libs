@@ -185,7 +185,7 @@ public abstract class WithinDayParkingController extends WithinDayController imp
 		this.getEvents().addHandler(this.parkingAgentsTracker);
 		this.addControlerListener(parkingAgentsTracker);
 
-		insertParkingActivities = new InsertParkingActivities(scenarioData, this.createRoutingAlgorithm(), parkingInfrastructure);
+		insertParkingActivities = new InsertParkingActivities(scenarioData, this.getWithinDayEngine().getTripRouterFactory().instantiateAndConfigureTripRouter(), parkingInfrastructure);
 
 		this.getWithinDayEngine().initializeReplanningModules(numReplanningThreads);
 		MobsimFactory mobsimFactory = new ParkingQSimFactory(insertParkingActivities, parkingInfrastructure, this.getWithinDayEngine());

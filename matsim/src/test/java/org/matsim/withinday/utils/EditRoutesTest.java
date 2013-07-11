@@ -40,17 +40,16 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelDisutilityCalculator;
-import org.matsim.core.router.old.PlansCalcRoute;
+import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryImpl;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
 import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
-import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.testcases.MatsimTestCase;
 
 public class EditRoutesTest extends MatsimTestCase {
@@ -59,7 +58,7 @@ public class EditRoutesTest extends MatsimTestCase {
 		
 	private Scenario scenario;
 	private Plan plan;
-	private PlanAlgorithm planAlgorithm;
+	private TripRouter tripRouter;
 	
 	/**
 	 * @author cdobler
@@ -75,13 +74,13 @@ public class EditRoutesTest extends MatsimTestCase {
 		ActivityImpl activityH2 = (ActivityImpl) plan.getPlanElements().get(4);
 		
 		// expect EditRoutes to return false if the Plan or the PlanAlgorithm is null
-		assertEquals(false, ed.replanFutureLegRoute(null, 1, planAlgorithm));
+		assertEquals(false, ed.replanFutureLegRoute(null, 1, tripRouter));
 		assertEquals(false, ed.replanFutureLegRoute(plan, 1, null));
 		
 		// expect EditRoutes to return false if the index does not point to a Leg
-		assertEquals(false, ed.replanFutureLegRoute(plan, 0, planAlgorithm));
-		assertEquals(false, ed.replanFutureLegRoute(plan, 2, planAlgorithm));
-		assertEquals(false, ed.replanFutureLegRoute(plan, 4, planAlgorithm));
+		assertEquals(false, ed.replanFutureLegRoute(plan, 0, tripRouter));
+		assertEquals(false, ed.replanFutureLegRoute(plan, 2, tripRouter));
+		assertEquals(false, ed.replanFutureLegRoute(plan, 4, tripRouter));
 		
 		// create new, empty routes and set them in the Legs
 		NetworkRoute networkRouteHW = (NetworkRoute) new LinkNetworkRouteFactory().createRoute(legHW.getRoute().getStartLinkId(), legHW.getRoute().getEndLinkId());
@@ -94,8 +93,8 @@ public class EditRoutesTest extends MatsimTestCase {
 		assertEquals(networkRouteWH.getLinkIds().size(), 0);
 		
 		// replan the legs to recreate the routes
-		assertEquals(true, ed.replanFutureLegRoute(plan, 1, planAlgorithm));
-		assertEquals(true, ed.replanFutureLegRoute(plan, 3, planAlgorithm));
+		assertEquals(true, ed.replanFutureLegRoute(plan, 1, tripRouter));
+		assertEquals(true, ed.replanFutureLegRoute(plan, 3, tripRouter));
 		
 		// the legs have been replaced, the original ones should not have changed
 		assertEquals(0, networkRouteHW.getLinkIds().size());
@@ -117,8 +116,8 @@ public class EditRoutesTest extends MatsimTestCase {
 		activityH2.setLinkId(scenario.createId("l4"));
 		
 		// replan the legs to recreate the routes
-		assertEquals(true, ed.replanFutureLegRoute(plan, 1, planAlgorithm));
-		assertEquals(true, ed.replanFutureLegRoute(plan, 3, planAlgorithm));
+		assertEquals(true, ed.replanFutureLegRoute(plan, 1, tripRouter));
+		assertEquals(true, ed.replanFutureLegRoute(plan, 3, tripRouter));
 		
 		// get replaced legs and routes
 		legHW = (Leg) plan.getPlanElements().get(1);
@@ -141,9 +140,9 @@ public class EditRoutesTest extends MatsimTestCase {
 		legHW.setMode(TransportMode.walk);
 		legWH.setRoute(null);
 		legWH.setMode(TransportMode.walk);
-		ed.replanFutureLegRoute(plan, 1, planAlgorithm);
-		assertEquals(true, ed.replanFutureLegRoute(plan, 1, planAlgorithm));
-		assertEquals(true, ed.replanFutureLegRoute(plan, 3, planAlgorithm));
+		ed.replanFutureLegRoute(plan, 1, tripRouter);
+		assertEquals(true, ed.replanFutureLegRoute(plan, 1, tripRouter));
+		assertEquals(true, ed.replanFutureLegRoute(plan, 3, tripRouter));
 		assertNotNull(legHW.getRoute());
 		assertNotNull(legWH.getRoute());
 	}
@@ -159,34 +158,34 @@ public class EditRoutesTest extends MatsimTestCase {
 		ActivityImpl activityH2 = null;
 		
 		// expect EditRoutes to return false if the Plan or the PlanAlgorithm is null
-		assertEquals(false, ed.replanCurrentLegRoute(null, 1, 0, planAlgorithm, 8.0*3600));
+		assertEquals(false, ed.replanCurrentLegRoute(null, 1, 0, tripRouter, 8.0*3600));
 		assertEquals(false, ed.replanCurrentLegRoute(plan, 1, 0, null, 8.0*3600));
 		
 		// expect EditRoutes to return false if the index does not point to a Leg
-		assertEquals(false, ed.replanCurrentLegRoute(plan, 0, 0, planAlgorithm, 8.0*3600));
-		assertEquals(false, ed.replanCurrentLegRoute(plan, 2, 0, planAlgorithm, 8.0*3600));
-		assertEquals(false, ed.replanCurrentLegRoute(plan, 4, 0, planAlgorithm, 8.0*3600));
+		assertEquals(false, ed.replanCurrentLegRoute(plan, 0, 0, tripRouter, 8.0*3600));
+		assertEquals(false, ed.replanCurrentLegRoute(plan, 2, 0, tripRouter, 8.0*3600));
+		assertEquals(false, ed.replanCurrentLegRoute(plan, 4, 0, tripRouter, 8.0*3600));
 		
 		// expect ArrayIndexOutOfBoundsException - using illegal indices for the current position in the route
 		try {
-			ed.replanCurrentLegRoute(plan, 1, -1, planAlgorithm, 8.0*3600);
-			ed.replanCurrentLegRoute(plan, 1, 100, planAlgorithm, 8.0*3600);
+			ed.replanCurrentLegRoute(plan, 1, -1, tripRouter, 8.0*3600);
+			ed.replanCurrentLegRoute(plan, 1, 100, tripRouter, 8.0*3600);
 			fail("expected ArrayIndexOutOfBoundsException.");
 		} catch (ArrayIndexOutOfBoundsException e) {
 			log.debug("catched expected exception.", e);
 		}
 		
 		// create new routes for HW-trip
-		assertEquals(true, ed.replanCurrentLegRoute(plan, 1, 0, planAlgorithm, 8.0*3600));	// HW, start Link
-		assertEquals(true, ed.replanCurrentLegRoute(plan, 1, 1, planAlgorithm, 8.0*3600));	// HW, en-route
-		assertEquals(true, ed.replanCurrentLegRoute(plan, 1, 2, planAlgorithm, 8.0*3600));	// HW, end Link
+		assertEquals(true, ed.replanCurrentLegRoute(plan, 1, 0, tripRouter, 8.0*3600));	// HW, start Link
+		assertEquals(true, ed.replanCurrentLegRoute(plan, 1, 1, tripRouter, 8.0*3600));	// HW, en-route
+		assertEquals(true, ed.replanCurrentLegRoute(plan, 1, 2, tripRouter, 8.0*3600));	// HW, end Link
 
 		// create new routes for WH-trip
-		assertEquals(true, ed.replanCurrentLegRoute(plan, 3, 0, planAlgorithm, 8.0*3600));	// WH, start Link
-		assertEquals(true, ed.replanCurrentLegRoute(plan, 3, 1, planAlgorithm, 8.0*3600));	// WH, en-route
-		assertEquals(true, ed.replanCurrentLegRoute(plan, 3, 2, planAlgorithm, 8.0*3600));	// WH, en-route
-		assertEquals(true, ed.replanCurrentLegRoute(plan, 3, 3, planAlgorithm, 8.0*3600));	// WH, en-route
-		assertEquals(true, ed.replanCurrentLegRoute(plan, 3, 4, planAlgorithm, 8.0*3600));	// WH, end Link
+		assertEquals(true, ed.replanCurrentLegRoute(plan, 3, 0, tripRouter, 8.0*3600));	// WH, start Link
+		assertEquals(true, ed.replanCurrentLegRoute(plan, 3, 1, tripRouter, 8.0*3600));	// WH, en-route
+		assertEquals(true, ed.replanCurrentLegRoute(plan, 3, 2, tripRouter, 8.0*3600));	// WH, en-route
+		assertEquals(true, ed.replanCurrentLegRoute(plan, 3, 3, tripRouter, 8.0*3600));	// WH, en-route
+		assertEquals(true, ed.replanCurrentLegRoute(plan, 3, 4, tripRouter, 8.0*3600));	// WH, end Link
 		
 		/*
 		 *  replace destinations and create new routes
@@ -195,50 +194,50 @@ public class EditRoutesTest extends MatsimTestCase {
 		createScenario();	// reset scenario
 		activityW1 = (ActivityImpl) plan.getPlanElements().get(2);
 		activityW1.setLinkId(scenario.createId("l2"));	// move Activity location		
-		assertEquals(true, ed.replanCurrentLegRoute(plan, 1, 0, planAlgorithm, 8.0*3600));	// HW, start Link
+		assertEquals(true, ed.replanCurrentLegRoute(plan, 1, 0, tripRouter, 8.0*3600));	// HW, start Link
 		assertEquals(true, checkRouteValidity((NetworkRoute)((Leg)plan.getPlanElements().get(1)).getRoute()));
 		
 		createScenario();	// reset scenario
 		activityW1 = (ActivityImpl) plan.getPlanElements().get(2);
 		activityW1.setLinkId(scenario.createId("l2"));	// move Activity location
-		assertEquals(true, ed.replanCurrentLegRoute(plan, 1, 1, planAlgorithm, 8.0*3600));	// HW, en-route
+		assertEquals(true, ed.replanCurrentLegRoute(plan, 1, 1, tripRouter, 8.0*3600));	// HW, en-route
 		assertEquals(true, checkRouteValidity((NetworkRoute)((Leg)plan.getPlanElements().get(1)).getRoute()));
 		
 		createScenario();	// reset scenario
 		activityW1 = (ActivityImpl) plan.getPlanElements().get(2);
 		activityW1.setLinkId(scenario.createId("l2"));	// move Activity location
-		assertEquals(true, ed.replanCurrentLegRoute(plan, 1, 2, planAlgorithm, 8.0*3600));	// HW, end Link
+		assertEquals(true, ed.replanCurrentLegRoute(plan, 1, 2, tripRouter, 8.0*3600));	// HW, end Link
 		assertEquals(true, checkRouteValidity((NetworkRoute)((Leg)plan.getPlanElements().get(1)).getRoute()));
 		
 		// create new routes for WH-trip
 		createScenario();	// reset scenario
 		activityH2 = (ActivityImpl) plan.getPlanElements().get(4);
 		activityH2.setLinkId(scenario.createId("l4"));	// move Activity location
-		assertEquals(true, ed.replanCurrentLegRoute(plan, 3, 0, planAlgorithm, 8.0*3600));	// WH, start Link
+		assertEquals(true, ed.replanCurrentLegRoute(plan, 3, 0, tripRouter, 8.0*3600));	// WH, start Link
 		assertEquals(true, checkRouteValidity((NetworkRoute)((Leg)plan.getPlanElements().get(3)).getRoute()));
 		
 		createScenario();	// reset scenario
 		activityH2 = (ActivityImpl) plan.getPlanElements().get(4);
 		activityH2.setLinkId(scenario.createId("l4"));	// move Activity location
-		assertEquals(true, ed.replanCurrentLegRoute(plan, 3, 1, planAlgorithm, 8.0*3600));	// WH, en-route
+		assertEquals(true, ed.replanCurrentLegRoute(plan, 3, 1, tripRouter, 8.0*3600));	// WH, en-route
 		assertEquals(true, checkRouteValidity((NetworkRoute)((Leg)plan.getPlanElements().get(3)).getRoute()));
 		
 		createScenario();	// reset scenario
 		activityH2 = (ActivityImpl) plan.getPlanElements().get(4);
 		activityH2.setLinkId(scenario.createId("l4"));	// move Activity location
-		assertEquals(true, ed.replanCurrentLegRoute(plan, 3, 2, planAlgorithm, 8.0*3600));	// WH, en-route
+		assertEquals(true, ed.replanCurrentLegRoute(plan, 3, 2, tripRouter, 8.0*3600));	// WH, en-route
 		assertEquals(true, checkRouteValidity((NetworkRoute)((Leg)plan.getPlanElements().get(3)).getRoute()));
 		
 		createScenario();	// reset scenario
 		activityH2 = (ActivityImpl) plan.getPlanElements().get(4);
 		activityH2.setLinkId(scenario.createId("l4"));	// move Activity location
-		assertEquals(true, ed.replanCurrentLegRoute(plan, 3, 3, planAlgorithm, 8.0*3600));	// WH, en-route
+		assertEquals(true, ed.replanCurrentLegRoute(plan, 3, 3, tripRouter, 8.0*3600));	// WH, en-route
 		assertEquals(true, checkRouteValidity((NetworkRoute)((Leg)plan.getPlanElements().get(3)).getRoute()));
 
 		createScenario();	// reset scenario
 		activityH2 = (ActivityImpl) plan.getPlanElements().get(4);
 		activityH2.setLinkId(scenario.createId("l4"));	// move Activity location
-		assertEquals(true, ed.replanCurrentLegRoute(plan, 3, 4, planAlgorithm, 8.0*3600));	// WH, end Link
+		assertEquals(true, ed.replanCurrentLegRoute(plan, 3, 4, tripRouter, 8.0*3600));	// WH, end Link
 		assertEquals(true, checkRouteValidity((NetworkRoute)((Leg)plan.getPlanElements().get(3)).getRoute()));
 		
 		
@@ -250,9 +249,9 @@ public class EditRoutesTest extends MatsimTestCase {
 		legHW.setMode(TransportMode.walk);
 		legWH.setRoute(null);
 		legWH.setMode(TransportMode.walk);
-		ed.replanCurrentLegRoute(plan, 1, 0, planAlgorithm, 8.0*3600);
-		assertEquals(false, ed.replanCurrentLegRoute(plan, 1, 0, planAlgorithm, 8.0*3600));
-		assertEquals(false, ed.replanCurrentLegRoute(plan, 3, 0, planAlgorithm, 8.0*3600));
+		ed.replanCurrentLegRoute(plan, 1, 0, tripRouter, 8.0*3600);
+		assertEquals(false, ed.replanCurrentLegRoute(plan, 1, 0, tripRouter, 8.0*3600));
+		assertEquals(false, ed.replanCurrentLegRoute(plan, 3, 0, tripRouter, 8.0*3600));
 	}
 	
 	/**
@@ -262,7 +261,7 @@ public class EditRoutesTest extends MatsimTestCase {
 		scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
 		createSampleNetwork();
-		createPlanAlgorithm();
+		createTripRouter();
 		createSamplePlan();
 	}
 	
@@ -358,19 +357,24 @@ public class EditRoutesTest extends MatsimTestCase {
 		((ActivityImpl) activityH2).setCoord(scenario.getNetwork().getLinks().get(activityH2.getLinkId()).getCoord());
 		
 		/*
-		 * run the planAlgorithm to create and set routes
-		 */		
-		planAlgorithm.run(plan);
+		 * run a PlanRouter to create and set routes
+		 */
+		new PlanRouter(tripRouter).run(plan);
 	}
 	
 	/**
 	 * @author cdobler
 	 */
-	private void createPlanAlgorithm() {
-		TravelTime travelTime = new FreeSpeedTravelTime();
-		TravelDisutility travelCost = new OnlyTimeDependentTravelDisutilityCalculator(travelTime);
-		planAlgorithm = new PlansCalcRoute(scenario.getConfig().plansCalcRoute(), scenario.getNetwork(), 
-				travelCost, travelTime, new DijkstraFactory(), ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory());
+	private void createTripRouter() {
+		
+		TripRouterFactory tripRouterFactory = new TripRouterFactoryImpl(
+				scenario,
+				new OnlyTimeDependentTravelCostCalculatorFactory(),
+				new FreeSpeedTravelTime(),
+				new DijkstraFactory(),
+				null);
+		
+		tripRouter = tripRouterFactory.instantiateAndConfigureTripRouter();		
 	}
 	
 	/**

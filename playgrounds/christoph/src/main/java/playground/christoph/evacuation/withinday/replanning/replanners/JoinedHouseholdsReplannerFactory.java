@@ -21,7 +21,6 @@
 package playground.christoph.evacuation.withinday.replanning.replanners;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
@@ -37,11 +36,10 @@ public class JoinedHouseholdsReplannerFactory extends WithinDayDuringActivityRep
 	private final JoinedHouseholdsIdentifier identifier;
 	private final SwissPTTravelTime ptTravelTime;
 	
-	public JoinedHouseholdsReplannerFactory(Scenario scenario, WithinDayEngine replanningManager,
-			AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability,
+	public JoinedHouseholdsReplannerFactory(Scenario scenario, WithinDayEngine withinDayEngine,
 			DecisionDataProvider decisionDataProvider, JoinedHouseholdsIdentifier identifier,
 			SwissPTTravelTime ptTravelTime) {
-		super(replanningManager, abstractMultithreadedModule, replanningProbability);
+		super(withinDayEngine);
 		this.scenario = scenario;
 		this.decisionDataProvider = decisionDataProvider;
 		this.identifier = identifier;
@@ -51,8 +49,8 @@ public class JoinedHouseholdsReplannerFactory extends WithinDayDuringActivityRep
 	@Override
 	public WithinDayDuringActivityReplanner createReplanner() {
 		WithinDayDuringActivityReplanner replanner = new JoinedHouseholdsReplanner(super.getId(), scenario, 
-				this.getReplanningManager().getInternalInterface(), decisionDataProvider, identifier, ptTravelTime);
-		super.initNewInstance(replanner);
+				this.getWithinDayEngine().getInternalInterface(), decisionDataProvider, identifier, ptTravelTime,
+				this.getWithinDayEngine().getTripRouterFactory().instantiateAndConfigureTripRouter());
 		return replanner;
 	}
 

@@ -20,15 +20,13 @@
 
 package org.matsim.withinday.replanning.replanners.interfaces;
 
-import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 
 public abstract class WithinDayDuringActivityReplannerFactory extends WithinDayReplannerFactory<DuringActivityIdentifier> {
 
-	public WithinDayDuringActivityReplannerFactory(WithinDayEngine replanningManager, 
-			AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability) {
-		super(replanningManager, abstractMultithreadedModule, replanningProbability);
+	public WithinDayDuringActivityReplannerFactory(WithinDayEngine withinDayEngine) {
+		super(withinDayEngine);
 	}
 	
 	@Override

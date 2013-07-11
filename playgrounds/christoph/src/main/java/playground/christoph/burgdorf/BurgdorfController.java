@@ -20,9 +20,7 @@
 
 package playground.christoph.burgdorf;
 
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
@@ -31,19 +29,16 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.network.NetworkChangeEvent;
+import org.matsim.core.network.NetworkChangeEvent.ChangeType;
+import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
+import org.matsim.core.network.NetworkImpl;
 import org.matsim.withinday.controller.WithinDayController;
 import org.matsim.withinday.replanning.identifiers.filter.CollectionAgentFilterFactory;
 import org.matsim.withinday.replanning.identifiers.filter.LinkFilterFactory;
 import org.matsim.withinday.replanning.identifiers.filter.TransportModeFilterFactory;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifierFactory;
-import org.matsim.withinday.replanning.modules.ReplanningModule;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
 import playground.christoph.burgdorf.withinday.identifiers.ParkingIdentifierFactory;
@@ -55,8 +50,8 @@ import playground.christoph.burgdorf.withinday.replanners.ParkingReplannerFactor
  */
 public class BurgdorfController extends WithinDayController implements StartupListener {
 
-	private static String runId = "SamstagToBurgdorf";
-//	private static String runId = "SonntagFromBurgdorf";
+//	private static String runId = "SamstagToBurgdorf";
+	private static String runId = "SonntagFromBurgdorf";
 	
 	private DuringLegIdentifierFactory duringLegFactory;
 	private DuringLegIdentifier parkingIdentifier;
@@ -64,11 +59,15 @@ public class BurgdorfController extends WithinDayController implements StartupLi
 	private CollectionAgentFilterFactory visitorAgentFilterFactory;
 	private TransportModeFilterFactory carLegAgentsFilterFactory;
 	private LinkFilterFactory linkFilterFactory;
-	
-	private double duringLegReroutingShare = 1.00;
-	
+		
 	private boolean useWithinDayReplanning = false;
 //	private boolean useWithinDayReplanning = true;
+	
+//	private boolean reduceUpstreamCapacity = false;
+	private boolean reduceUpstreamCapacity = true;
+	
+	private double reduceCapacityTime = 17 * 3600;
+	private double resetCapacityTime = 20 * 3600;
 	
 	/*
 	 * ===================================================================
@@ -122,6 +121,39 @@ public class BurgdorfController extends WithinDayController implements StartupLi
 		 */
 		int numReplanningThreads = this.config.global().getNumberOfThreads();
 		super.initWithinDayEngine(numReplanningThreads);
+		
+		/*
+		 * If network capacities have to be adapted.
+		 */
+		if(reduceUpstreamCapacity) {
+			NetworkImpl network = (NetworkImpl) scenarioData.getNetwork();
+			ChangeValue changeValue;
+			NetworkChangeEvent networkChangeEvent;
+
+//			network.getLinks().get(scenarioData.createId(BurgdorfRoutes.burgdorfToBernUpstream)).setCapacity(200);
+			
+			// reduce capacity
+			networkChangeEvent = network.getFactory().createNetworkChangeEvent(reduceCapacityTime);
+//			changeValue = new ChangeValue(ChangeType.FACTOR, 0.5);
+			changeValue = new ChangeValue(ChangeType.ABSOLUTE, 500.0/3600.0);
+			networkChangeEvent.setFlowCapacityChange(changeValue);
+			changeValue = new ChangeValue(ChangeType.ABSOLUTE, 1);
+			networkChangeEvent.setLanesChange(changeValue);
+			networkChangeEvent.addLink(network.getLinks().get(scenarioData.createId(BurgdorfRoutes.burgdorfToBernUpstream)));
+			networkChangeEvent.addLink(network.getLinks().get(scenarioData.createId(BurgdorfRoutes.burgdorfToZurichUpstream)));
+			network.addNetworkChangeEvent(networkChangeEvent);
+			
+			// reset capacity
+			networkChangeEvent = network.getFactory().createNetworkChangeEvent(resetCapacityTime);
+//			changeValue = new ChangeValue(ChangeType.FACTOR, 2.0);
+			changeValue = new ChangeValue(ChangeType.ABSOLUTE, 4000.0/3600.0);
+			networkChangeEvent.setFlowCapacityChange(changeValue);
+			changeValue = new ChangeValue(ChangeType.ABSOLUTE, 2);
+			networkChangeEvent.setLanesChange(changeValue);
+			networkChangeEvent.addLink(network.getLinks().get(scenarioData.createId(BurgdorfRoutes.burgdorfToBernUpstream)));
+			networkChangeEvent.addLink(network.getLinks().get(scenarioData.createId(BurgdorfRoutes.burgdorfToZurichUpstream)));
+			network.addNetworkChangeEvent(networkChangeEvent);
+		}
 	}
 	
 	@Override
@@ -168,27 +200,13 @@ public class BurgdorfController extends WithinDayController implements StartupLi
 		this.parkingIdentifier = duringLegFactory.createIdentifier();
 	}
 	
-	private void initReplanners() {
-		
-		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) this.getPopulation().getFactory()).getModeRouteFactory();
-								
-		Map<String, TravelTime> travelTimes = new HashMap<String, TravelTime>();	
-//		travelTimes.put(TransportMode.car, this.getTravelTimeCalculator());	// TravelTimeCalculator?!
-		travelTimes.put(TransportMode.car, this.getTravelTimeCollector());
-		
-		// add time dependent penalties to travel costs within the affected area
-		TravelDisutilityFactory disutilityFactory = this.getTravelDisutilityFactory();
-		
-		LeastCostPathCalculatorFactory factory = this.getLeastCostPathCalculatorFactory();
-	
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, disutilityFactory, travelTimes, factory, routeFactory);
-
+	private void initReplanners() {	
 		/*
 		 * During Leg Replanner
 		 */
 		WithinDayDuringLegReplannerFactory duringLegReplannerFactory;
 		
-		duringLegReplannerFactory = new ParkingReplannerFactory(this.scenarioData, this.getWithinDayEngine(), router, duringLegReroutingShare);
+		duringLegReplannerFactory = new ParkingReplannerFactory(this.scenarioData, this.getWithinDayEngine());
 		duringLegReplannerFactory.addIdentifier(this.parkingIdentifier);
 		this.getWithinDayEngine().addDuringLegReplannerFactory(duringLegReplannerFactory);
 	}

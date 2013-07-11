@@ -36,6 +36,7 @@ import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.RouteUtils;
@@ -64,14 +65,16 @@ public class JoinedHouseholdsReplanner extends WithinDayDuringActivityReplanner 
 	private final DecisionDataProvider decisionDataProvider;
 	private final JoinedHouseholdsIdentifier identifier;
 	private final SwissPTTravelTime ptTravelTime;
+	private final TripRouter tripRouter;
 	
 	public JoinedHouseholdsReplanner(Id id, Scenario scenario, InternalInterface internalInterface, 
 			DecisionDataProvider decisionDataProvider, JoinedHouseholdsIdentifier identifier,
-			SwissPTTravelTime ptTravelTime) {
+			SwissPTTravelTime ptTravelTime, TripRouter tripRouter) {
 		super(id, scenario, internalInterface);
 		this.decisionDataProvider = decisionDataProvider;
 		this.identifier = identifier;
 		this.ptTravelTime = ptTravelTime;
+		this.tripRouter = tripRouter;
 	}
 
 	@Override
@@ -145,7 +148,7 @@ public class JoinedHouseholdsReplanner extends WithinDayDuringActivityReplanner 
 		executedPlan.insertLegAct(position, legToMeeting, meetingActivity);
 		
 		// calculate route for the leg to the rescue facility
-		new EditRoutes().replanFutureLegRoute(executedPlan, position, routeAlgo);
+		new EditRoutes().replanFutureLegRoute(executedPlan, position, tripRouter);
 		
 		// set correct transport mode
 		legToMeeting.setMode(transportMode);
@@ -174,7 +177,7 @@ public class JoinedHouseholdsReplanner extends WithinDayDuringActivityReplanner 
 				legToMeeting.setMode(TransportMode.pt);
 				
 				// calculate route for the leg to the rescue facility
-				new EditRoutes().replanFutureLegRoute(executedPlan, position, routeAlgo);
+				new EditRoutes().replanFutureLegRoute(executedPlan, position, tripRouter);
 				
 				// set travel time
 				legToMeeting.getRoute().setTravelTime(travelTimePT);

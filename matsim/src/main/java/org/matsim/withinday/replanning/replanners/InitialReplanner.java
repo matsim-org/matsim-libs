@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.core.router.PlanRouter;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
 
 /*
@@ -33,19 +34,17 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialRep
 
 public class InitialReplanner extends WithinDayInitialReplanner {
 
-	/*package*/ InitialReplanner(Id id, Scenario scenario, InternalInterface internalInterface) {
+	private final PlanRouter planRouter;
+	
+	/*package*/ InitialReplanner(Id id, Scenario scenario, InternalInterface internalInterface, PlanRouter planRouter) {
 		super(id, scenario, internalInterface);
+		this.planRouter = planRouter;
 	}
 
 	@Override
 	public boolean doReplanning(PlanBasedWithinDayAgent withinDayAgent) {
-		// If we don't have a valid Replanner.
-		if (this.routeAlgo == null) return false;
-
-		// If we don't have a valid personAgent
-		if (withinDayAgent == null) return false;
-
-		routeAlgo.run(withinDayAgent.getSelectedPlan());
+		
+		this.planRouter.run(withinDayAgent.getSelectedPlan());
 
 		return true;
 	}

@@ -21,7 +21,6 @@
 package playground.wrashid.parkingSearch.withindayFW.randomTestStrategy;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
@@ -32,9 +31,8 @@ public class RandomSearchReplannerFactory extends WithinDayDuringLegReplannerFac
 	private final Scenario scenario;
 	private final ParkingAgentsTracker parkingAgentsTracker;
 	
-	public RandomSearchReplannerFactory(WithinDayEngine replanningManager, AbstractMultithreadedModule abstractMultithreadedModule,
-			double replanningProbability, Scenario scenario, ParkingAgentsTracker parkingAgentsTracker) {
-		super(replanningManager, abstractMultithreadedModule, replanningProbability);
+	public RandomSearchReplannerFactory(WithinDayEngine withinDayEngine, Scenario scenario, ParkingAgentsTracker parkingAgentsTracker) {
+		super(withinDayEngine);
 		
 		this.scenario = scenario;
 		this.parkingAgentsTracker = parkingAgentsTracker;
@@ -43,8 +41,8 @@ public class RandomSearchReplannerFactory extends WithinDayDuringLegReplannerFac
 	@Override
 	public RandomSearchReplanner createReplanner() {
 		RandomSearchReplanner replanner = new RandomSearchReplanner(super.getId(), scenario, 
-				this.getReplanningManager().getInternalInterface(), parkingAgentsTracker);
-		super.initNewInstance(replanner);
+				this.getWithinDayEngine().getInternalInterface(), parkingAgentsTracker,
+				this.getWithinDayEngine().getTripRouterFactory().instantiateAndConfigureTripRouter());
 		return replanner;
 	}
 

@@ -25,43 +25,25 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.identifiers.interfaces.Identifier;
 import org.matsim.withinday.replanning.replanners.tools.ReplanningIdGenerator;
 
 public abstract class WithinDayReplannerFactory<T extends Identifier> {
 
-	private final WithinDayEngine replanningManager;
+	private final WithinDayEngine withinDayEngine;
 	private Id id;
-	private AbstractMultithreadedModule abstractMultithreadedModule;
-	private double replanningProbability = 1.0;
 	private Set<T> identifiers = new HashSet<T>();
 	
-	public WithinDayReplannerFactory(WithinDayEngine replanningManager, 
-			AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability) {
-		this.replanningManager = replanningManager;
-		this.abstractMultithreadedModule = abstractMultithreadedModule;
-		this.replanningProbability = replanningProbability;
+	public WithinDayReplannerFactory(WithinDayEngine withinDayEngine) {
+		this.withinDayEngine = withinDayEngine;
 		this.id = ReplanningIdGenerator.getNextId();
 	}
 	
 	public abstract WithinDayReplanner<? extends Identifier> createReplanner();
 	
-	/*
-	 * This method should be called after a new Replanner instance
-	 * has been created. Is there any way to force this???
-	 */
-	public final void initNewInstance(WithinDayReplanner<? extends Identifier> replanner) {
-		replanner.setAbstractMultithreadedModule(this.abstractMultithreadedModule);
-	}
-	
-	public final double getReplanningProbability() {
-		return this.replanningProbability;
-	}
-	
-	public final WithinDayEngine getReplanningManager() {
-		return this.replanningManager;
+	public final WithinDayEngine getWithinDayEngine() {
+		return this.withinDayEngine;
 	}
 	
 	public final Id getId() {

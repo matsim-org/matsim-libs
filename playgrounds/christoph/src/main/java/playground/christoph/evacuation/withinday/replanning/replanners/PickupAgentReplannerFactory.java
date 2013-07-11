@@ -21,7 +21,6 @@
 package playground.christoph.evacuation.withinday.replanning.replanners;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
@@ -30,9 +29,8 @@ public class PickupAgentReplannerFactory extends WithinDayDuringLegReplannerFact
 
 	private final Scenario scenario;
 	
-	public PickupAgentReplannerFactory(Scenario scenario, WithinDayEngine replanningManager,
-			AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability) {
-		super(replanningManager, abstractMultithreadedModule, replanningProbability);
+	public PickupAgentReplannerFactory(Scenario scenario, WithinDayEngine withinDayEngine) {
+		super(withinDayEngine);
 		this.scenario = scenario;
 
 	}
@@ -40,8 +38,7 @@ public class PickupAgentReplannerFactory extends WithinDayDuringLegReplannerFact
 	@Override
 	public WithinDayDuringLegReplanner createReplanner() {
 		WithinDayDuringLegReplanner replanner = new PickupAgentReplanner(super.getId(), scenario,
-				this.getReplanningManager().getInternalInterface());
-		super.initNewInstance(replanner);
+				this.getWithinDayEngine().getInternalInterface());
 		return replanner;
 	}
 }

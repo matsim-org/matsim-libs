@@ -74,9 +74,6 @@ public class CostNavigationRoute extends WithinDayDuringLegReplanner {
 	@Override
 	public boolean doReplanning(PlanBasedWithinDayAgent withinDayAgent) {
 
-		// If we don't have a valid Replanner.
-		if (this.routeAlgo == null) return false;
-
 		// If we don't have a valid PersonAgent
 		if (withinDayAgent == null) return false;
 

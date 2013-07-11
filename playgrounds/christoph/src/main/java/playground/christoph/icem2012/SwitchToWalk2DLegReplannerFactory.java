@@ -21,7 +21,6 @@
 package playground.christoph.icem2012;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
@@ -33,10 +32,9 @@ public class SwitchToWalk2DLegReplannerFactory extends WithinDayDuringLegReplann
 	private final Scenario scenario;
 	private final CoordAnalyzer coordAnalyzer;
 	
-	public SwitchToWalk2DLegReplannerFactory(Scenario scenario, WithinDayEngine replanningManager,
-			AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability,
+	public SwitchToWalk2DLegReplannerFactory(Scenario scenario, WithinDayEngine withinDayEngine,
 			CoordAnalyzer coordAnalyzer) {
-		super(replanningManager, abstractMultithreadedModule, replanningProbability);
+		super(withinDayEngine);
 		this.scenario = scenario;
 		this.coordAnalyzer = coordAnalyzer;
 	}
@@ -44,8 +42,7 @@ public class SwitchToWalk2DLegReplannerFactory extends WithinDayDuringLegReplann
 	@Override
 	public WithinDayDuringLegReplanner createReplanner() {
 		WithinDayDuringLegReplanner replanner = new SwitchToWalk2DLegReplanner(super.getId(), scenario,
-				this.getReplanningManager().getInternalInterface(), this.coordAnalyzer);
-		super.initNewInstance(replanner);
+				this.getWithinDayEngine().getInternalInterface(), this.coordAnalyzer);
 		return replanner;
 	}
 }

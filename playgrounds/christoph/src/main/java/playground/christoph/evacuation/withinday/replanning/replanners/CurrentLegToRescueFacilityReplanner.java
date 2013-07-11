@@ -30,6 +30,7 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
@@ -40,8 +41,12 @@ import playground.christoph.evacuation.config.EvacuationConfig;
 
 public class CurrentLegToRescueFacilityReplanner extends WithinDayDuringLegReplanner {
 
-	/*package*/ CurrentLegToRescueFacilityReplanner(Id id, Scenario scenario, InternalInterface internalInterface) {
+	protected final TripRouter tripRouter;
+	
+	/*package*/ CurrentLegToRescueFacilityReplanner(Id id, Scenario scenario, InternalInterface internalInterface,
+			TripRouter tripRouter) {
 		super(id, scenario, internalInterface);
+		this.tripRouter = tripRouter;
 	}
 
 	@Override
@@ -50,9 +55,6 @@ public class CurrentLegToRescueFacilityReplanner extends WithinDayDuringLegRepla
 		// do Replanning only in the timestep where the Evacuation has started.
 		if (this.time > EvacuationConfig.evacuationTime) return true;
 				
-		// If we don't have a valid Replanner.
-		if (this.routeAlgo == null) return false;
-
 		// If we don't have a valid WithinDayPersonAgent
 		if (withinDayAgent == null) return false;
 		
@@ -98,7 +100,7 @@ public class CurrentLegToRescueFacilityReplanner extends WithinDayDuringLegRepla
 			int position = executedPlan.getPlanElements().size() - 1; 
 			executedPlan.addActivity(rescueActivity);
 			
-			new EditRoutes().replanFutureLegRoute(executedPlan, position, routeAlgo);
+			new EditRoutes().replanFutureLegRoute(executedPlan, position, tripRouter);
 		}
 		
 		else {
@@ -112,7 +114,7 @@ public class CurrentLegToRescueFacilityReplanner extends WithinDayDuringLegRepla
 			new ReplacePlanElements().replaceActivity(executedPlan, nextActivity, rescueActivity);
 			
 			// new Route for current Leg
-			new EditRoutes().replanCurrentLegRoute(executedPlan, currentLegIndex, currentLinkIndex, routeAlgo, time);
+			new EditRoutes().replanCurrentLegRoute(executedPlan, currentLegIndex, currentLinkIndex, tripRouter, time);
 			
 			// Remove all legs and activities after the next activity.
 			int nextActivityIndex = executedPlan.getActLegIndex(rescueActivity);

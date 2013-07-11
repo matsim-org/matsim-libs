@@ -38,13 +38,7 @@ import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgentFactory
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
-import org.matsim.core.router.util.FastAStarLandmarksFactory;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.withinday.controller.WithinDayController;
@@ -54,7 +48,6 @@ import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilter;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 import org.matsim.withinday.replanning.identifiers.tools.SelectHandledAgentsByProbability;
-import org.matsim.withinday.replanning.modules.ReplanningModule;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
 import playground.christoph.router.AnalyzeTravelTimes;
@@ -124,15 +117,11 @@ public class CostNavigationRouteController extends WithinDayController implement
 	 * By doing this every person can use a personalized Router.
 	 */
 	protected void initReplanners(QSim sim) {
-		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) sim.getScenario().getPopulation().getFactory()).getModeRouteFactory();
 //		PersonalizableTravelTime travelTime = super.getTravelTimeCollector();
 		TravelTime travelTime = this.lookupTravelTime;
 		
 		OnlyTimeDependentTravelCostCalculatorFactory travelCostFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
-		LeastCostPathCalculatorFactory factory = new FastAStarLandmarksFactory(this.network, new FreespeedTravelTimeAndDisutility(this.config.planCalcScore()));
-		
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, travelCostFactory, this.getMultiModalTravelTimes(), factory, routeFactory);
-		
+				
 		if (agentsLearn) {
 			costNavigationTravelTimeLogger = new CostNavigationTravelTimeLogger(this.scenarioData.getPopulation(), this.lookupNetwork, travelTime,
 					followedAndAccepted, followedAndNotAccepted, notFollowedAndAccepted, notFollowedAndNotAccepted);			
@@ -149,7 +138,7 @@ public class CostNavigationRouteController extends WithinDayController implement
 		LinkReplanningMap linkReplanningMap = super.getLinkReplanningMap();
 		this.duringLegIdentifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
 		this.selector.addIdentifier(duringLegIdentifier, pDuringLegReplanning);
-		this.duringLegReplannerFactory = new CostNavigationRouteFactory(this.scenarioData, this.lookupNetwork, this.getWithinDayEngine(), router, 1.0, 
+		this.duringLegReplannerFactory = new CostNavigationRouteFactory(this.scenarioData, this.lookupNetwork, this.getWithinDayEngine(), 
 				costNavigationTravelTimeLogger, travelCostFactory, travelTime, this.getLeastCostPathCalculatorFactory());
 		this.duringLegReplannerFactory.addIdentifier(this.duringLegIdentifier);
 		this.getWithinDayEngine().addDuringLegReplannerFactory(this.duringLegReplannerFactory);

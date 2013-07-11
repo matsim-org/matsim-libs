@@ -42,6 +42,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.internal.MatsimComparator;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.RouteUtils;
@@ -57,7 +58,7 @@ public class AssignVehiclesToPlans extends AbstractPersonAlgorithm implements Pl
 	private static Logger log = Logger.getLogger(AssignVehiclesToPlans.class);
 	
 	private final Scenario scenario;
-	private final PlanAlgorithm routingAlgorithm;
+	private final TripRouter tripRouter;
 	private final Counter assignedVehiclesCounter;
 	private final Counter removedCarLegsCounter;
 	private final Counter addedCarLegsCounter;
@@ -65,16 +66,16 @@ public class AssignVehiclesToPlans extends AbstractPersonAlgorithm implements Pl
 	private final LegModeChecker legModeChecker;
 	private final EditRoutes editRoutes;
 	
-	public AssignVehiclesToPlans(Scenario scenario, PlanAlgorithm planAlgorithm) {
+	public AssignVehiclesToPlans(Scenario scenario, TripRouter tripRouter) {
 		this.scenario = scenario;
-		this.routingAlgorithm = planAlgorithm;
+		this.tripRouter = tripRouter;
 		
 		this.assignedVehiclesCounter = new Counter("Assigned vehicles: ");
 		this.removedCarLegsCounter = new Counter("Legs with mode changed from car to another mode: ");
 		this.addedCarLegsCounter = new Counter("Legs with mode changed from another mode to car: ");
 		this.mapping = new HashMap<Id, Id>();
 		
-		this.legModeChecker = new LegModeChecker(planAlgorithm);
+		this.legModeChecker = new LegModeChecker(tripRouter);
 		this.editRoutes = new EditRoutes();
 	}
 	
@@ -183,7 +184,7 @@ public class AssignVehiclesToPlans extends AbstractPersonAlgorithm implements Pl
 				else if (distance < 5000.0) leg.setMode(TransportMode.bike);
 				else leg.setMode(TransportMode.pt);
 				
-				editRoutes.replanFutureLegRoute(plan, i, routingAlgorithm);
+				editRoutes.replanFutureLegRoute(plan, i, tripRouter);
 				
 //				/*
 //				 * Create a new route for the given leg.
@@ -251,7 +252,7 @@ public class AssignVehiclesToPlans extends AbstractPersonAlgorithm implements Pl
 					 */
 					leg.setMode(TransportMode.car);
 					
-					editRoutes.replanFutureLegRoute(plan, i, routingAlgorithm);
+					editRoutes.replanFutureLegRoute(plan, i, tripRouter);
 					
 //					Activity previousActivity = (Activity) plan.getPlanElements().get(i - 1);
 //					Activity nextActivity = (Activity) plan.getPlanElements().get(i + 1);

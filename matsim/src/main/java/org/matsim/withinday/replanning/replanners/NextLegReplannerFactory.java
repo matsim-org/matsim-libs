@@ -21,7 +21,6 @@
 package org.matsim.withinday.replanning.replanners;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
@@ -30,17 +29,16 @@ public class NextLegReplannerFactory extends WithinDayDuringActivityReplannerFac
 
 	private Scenario scenario;
 	
-	public NextLegReplannerFactory(Scenario scenario, WithinDayEngine replanningManager,
-			AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability) {
-		super(replanningManager, abstractMultithreadedModule, replanningProbability);
+	public NextLegReplannerFactory(Scenario scenario, WithinDayEngine withinDayEngine) {
+		super(withinDayEngine);
 		this.scenario = scenario;
 	}
 
 	@Override
 	public WithinDayDuringActivityReplanner createReplanner() {
 		WithinDayDuringActivityReplanner replanner = new NextLegReplanner(super.getId(), scenario, 
-				this.getReplanningManager().getInternalInterface());
-		super.initNewInstance(replanner);
+				this.getWithinDayEngine().getInternalInterface(),
+				this.getWithinDayEngine().getTripRouterFactory().instantiateAndConfigureTripRouter());
 		return replanner;
 	}
 

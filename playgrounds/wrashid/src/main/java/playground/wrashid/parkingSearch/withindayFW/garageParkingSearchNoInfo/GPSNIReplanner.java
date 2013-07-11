@@ -36,6 +36,7 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.utils.EditRoutes;
@@ -52,11 +53,13 @@ public class GPSNIReplanner extends WithinDayDuringLegReplanner {
 	private final Random random;
 	private final EditRoutes editRoutes;
 	private final ParkingAgentsTracker parkingAgentsTracker;
+	private final TripRouter tripRouter;
 	
 	GPSNIReplanner(Id id, Scenario scenario, InternalInterface internalInterface, 
-			ParkingAgentsTracker parkingAgentsTracker) {
+			ParkingAgentsTracker parkingAgentsTracker, TripRouter tripRouter) {
 		super(id, scenario, internalInterface);
 		this.parkingAgentsTracker = parkingAgentsTracker;
+		this.tripRouter = tripRouter;
 
 		this.editRoutes = new EditRoutes();
 		this.random = MatsimRandom.getLocalInstance();
@@ -159,10 +162,10 @@ public class GPSNIReplanner extends WithinDayDuringLegReplanner {
 							a.setFacilityId(parkingFacilityId);
 
 							// update walk leg to parking activity
-							editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), i - 1, routeAlgo);
+							editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), i - 1, tripRouter);
 
 							// update car leg from parking activity
-							editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), i + 1, routeAlgo);
+							editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), i + 1, tripRouter);
 						}
 					}
 				}
@@ -179,7 +182,7 @@ public class GPSNIReplanner extends WithinDayDuringLegReplanner {
 
 				// update agent's route
 				editRoutes.replanCurrentLegRoute(plan, withinDayAgent.getCurrentPlanElementIndex(),
-						withinDayAgent.getCurrentRouteLinkIdIndex(), routeAlgo, this.time);
+						withinDayAgent.getCurrentRouteLinkIdIndex(), tripRouter, this.time);
 
 				updateNextLeg = true;
 			}
@@ -187,10 +190,10 @@ public class GPSNIReplanner extends WithinDayDuringLegReplanner {
 			// adapt next walk leg.
 			if (updateNextLeg) {
 				editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(),
-						withinDayAgent.getCurrentPlanElementIndex() + 2, routeAlgo);
+						withinDayAgent.getCurrentPlanElementIndex() + 2, tripRouter);
 			}
 			
-			InsertParkingActivities.updateNextParkingActivityIfNeededDuringDay(parkingAgentsTracker.getParkingInfrastructure()  , withinDayAgent , scenario, routeAlgo);
+			InsertParkingActivities.updateNextParkingActivityIfNeededDuringDay(parkingAgentsTracker.getParkingInfrastructure()  , withinDayAgent , scenario, tripRouter);
 		}
 
 		withinDayAgent.resetCaches();

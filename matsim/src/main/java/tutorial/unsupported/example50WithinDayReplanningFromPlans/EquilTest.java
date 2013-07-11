@@ -19,9 +19,19 @@
 
 package tutorial.unsupported.example50WithinDayReplanningFromPlans;
 
+import java.util.HashSet;
+import java.util.Set;
+
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryImpl;
+import org.matsim.core.router.util.TravelTime;
+import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
+import org.matsim.withinday.trafficmonitoring.TravelTimeCollectorFactory;
 
 public class EquilTest {
 
@@ -32,10 +42,39 @@ public class EquilTest {
 			@Override
 			public void notifyStartup(StartupEvent event) {
 				Controler controler = event.getControler() ;
-				controler.setMobsimFactory(new MyMobsimFactory(controler.createTravelDisutilityCalculator(), controler.getLinkTravelTimes())) ;
+				
+				Set<String> analyzedModes = new HashSet<String>();
+				analyzedModes.add(TransportMode.car);
+				TravelTime travelTime = new TravelTimeCollectorFactory().createTravelTimeCollector(controler.getScenario(), analyzedModes);
+				controler.getEvents().addHandler((TravelTimeCollector) travelTime);
+				controler.getMobsimListeners().add((TravelTimeCollector) travelTime);
+				
+				controler.setMobsimFactory(new MyMobsimFactory(new WithinDayTripRouterFactory(event.getControler(), travelTime)));
 			}
 		}) ;
 		controler.run();
 	}
+	
+	private static class WithinDayTripRouterFactory implements TripRouterFactory {
 
+		private final Controler controler;
+		private final TravelTime travelTime;
+		
+		public WithinDayTripRouterFactory(Controler controler, TravelTime travelTime) {
+			this.controler = controler;
+			this.travelTime = travelTime;
+		}
+		
+		@Override
+		public TripRouter instantiateAndConfigureTripRouter() {
+			return new TripRouterFactoryImpl(
+					controler.getScenario(), 
+					controler.getTravelDisutilityFactory(),
+					travelTime, 
+					controler.getLeastCostPathCalculatorFactory(), 
+					controler.getTransitRouterFactory()).instantiateAndConfigureTripRouter();
+		}
+		
+		
+	}
 }

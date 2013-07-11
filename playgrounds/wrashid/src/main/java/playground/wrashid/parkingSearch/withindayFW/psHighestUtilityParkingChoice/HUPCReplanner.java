@@ -38,6 +38,7 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.utils.EditRoutes;
@@ -55,10 +56,13 @@ public class HUPCReplanner extends WithinDayDuringLegReplanner {
 	private final Random random;
 	private final EditRoutes editRoutes;
 	private final ParkingAgentsTracker parkingAgentsTracker;
+	private final TripRouter tripRouter;
 
-	HUPCReplanner(Id id, Scenario scenario, InternalInterface internalInterface, ParkingAgentsTracker parkingAgentsTracker) {
+	HUPCReplanner(Id id, Scenario scenario, InternalInterface internalInterface, ParkingAgentsTracker parkingAgentsTracker,
+			TripRouter tripRouter) {
 		super(id, scenario, internalInterface);
 		this.parkingAgentsTracker = parkingAgentsTracker;
+		this.tripRouter = tripRouter;
 
 		this.editRoutes = new EditRoutes();
 		this.random = MatsimRandom.getLocalInstance();
@@ -93,7 +97,7 @@ public class HUPCReplanner extends WithinDayDuringLegReplanner {
 		firstParkingAct.setLinkId(parkingFacility.getLinkId());
 
 		
-		editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), firstWalkLegIndex, routeAlgo);
+		editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), firstWalkLegIndex, tripRouter);
 
 		Integer secondParkingActIndex = getSecondParkingActIndex(withinDayAgent);
 		if (!lastParkingOfDay(secondParkingActIndex)) {
@@ -107,11 +111,11 @@ public class HUPCReplanner extends WithinDayDuringLegReplanner {
 			secondParkingAct.setLinkId(parkingFacility.getLinkId());
 
 			InsertParkingActivities.updateNextParkingActivityIfNeededDuringDay(parkingAgentsTracker.getParkingInfrastructure(),
-					withinDayAgent, scenario, routeAlgo);
+					withinDayAgent, scenario, tripRouter);
 			
-			editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), secondWalkgLegIndex, routeAlgo);
+			editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), secondWalkgLegIndex, tripRouter);
 			
-			editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), nextCarLegIndex, routeAlgo);
+			editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), nextCarLegIndex, tripRouter);
 		}
 		
 		
@@ -121,7 +125,7 @@ public class HUPCReplanner extends WithinDayDuringLegReplanner {
 		
 		Route preRoute = ((LegImpl) plan.getPlanElements().get(currentLegIndex)).getRoute().clone();
 		//editRoutes.replanCurrentLegRoute(withinDayAgent.getSelectedPlan(), currentLegIndex, currentLinkIndex, routeAlgo, time);
-		editRoutes.replanCurrentLegRoute(plan, currentLegIndex, currentLinkIndex,  routeAlgo,time);
+		editRoutes.replanCurrentLegRoute(plan, currentLegIndex, currentLinkIndex, tripRouter ,time);
 		
 		
 		Route postRoute = ((LegImpl) plan.getPlanElements().get(currentLegIndex)).getRoute();

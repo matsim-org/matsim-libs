@@ -30,8 +30,7 @@ import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgentFactory
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.TripRouterFactory;
 
 /**
  * @author nagel
@@ -39,12 +38,10 @@ import org.matsim.core.router.util.TravelTime;
  */
 public class MyMobsimFactory implements MobsimFactory {
 
-	private TravelDisutility travCostCalc;
-	private TravelTime travTimeCalc;
+	private TripRouterFactory tripRouterFactory;
 
-	MyMobsimFactory(TravelDisutility travelCostCalculator, TravelTime travelTimeCalculator ) {
-		this.travCostCalc = travelCostCalculator ;
-		this.travTimeCalc = travelTimeCalculator ;
+	MyMobsimFactory(TripRouterFactory tripRouterFactory) {
+		this.tripRouterFactory = tripRouterFactory;
 	}
 
 	@Override
@@ -59,7 +56,7 @@ public class MyMobsimFactory implements MobsimFactory {
 		TeleportationEngine teleportationEngine = new TeleportationEngine();
 		qSim1.addMobsimEngine(teleportationEngine);
 		QSim qSim = qSim1;
-		qSim.addQueueSimulationListeners(new MyWithinDayMobsimListener(this.travCostCalc,this.travTimeCalc)) ;
+		qSim.addQueueSimulationListeners(new MyWithinDayMobsimListener(this.tripRouterFactory.instantiateAndConfigureTripRouter())) ;
 
 		ExperimentalBasicWithindayAgentFactory fac = new ExperimentalBasicWithindayAgentFactory(qSim);
 		PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), fac, qSim);

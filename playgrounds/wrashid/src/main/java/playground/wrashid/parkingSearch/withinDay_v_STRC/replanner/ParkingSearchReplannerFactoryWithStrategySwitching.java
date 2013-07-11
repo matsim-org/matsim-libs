@@ -21,9 +21,7 @@ package playground.wrashid.parkingSearch.withinDay_v_STRC.replanner;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.withinday.mobsim.WithinDayEngine;
-import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
 import playground.christoph.parking.core.mobsim.ParkingInfrastructure;
 import playground.christoph.parking.withinday.replanner.ParkingSearchReplanner;
@@ -32,26 +30,22 @@ import playground.christoph.parking.withinday.replanner.strategy.ParkingSearchSt
 import playground.christoph.parking.withinday.utils.ParkingAgentsTracker;
 import playground.christoph.parking.withinday.utils.ParkingRouter;
 import playground.christoph.parking.withinday.utils.ParkingRouterFactory;
-import playground.wrashid.parkingSearch.withindayFW.core.ParkingStrategy;
 
 public class ParkingSearchReplannerFactoryWithStrategySwitching extends ParkingSearchReplannerFactory {
 
 	private LinkedList<ParkingSearchStrategy> strategies;
 
 	public ParkingSearchReplannerFactoryWithStrategySwitching(WithinDayEngine withindayDayEngine,
-			AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability, Scenario scenario,
-			ParkingAgentsTracker parkingAgentsTracker, ParkingInfrastructure parkingInfrastructure,
+			Scenario scenario, ParkingAgentsTracker parkingAgentsTracker, ParkingInfrastructure parkingInfrastructure,
 			ParkingRouterFactory parkingRouterFactory) {
-		super(withindayDayEngine, abstractMultithreadedModule, replanningProbability, scenario, parkingAgentsTracker,
-				parkingInfrastructure, parkingRouterFactory);
+		super(withindayDayEngine, scenario, parkingAgentsTracker, parkingInfrastructure, parkingRouterFactory);
 	}
 
 	@Override
 	public ParkingSearchReplanner createReplanner() {
 		ParkingRouter parkingRouter = this.parkingRouterFactory.createParkingRouter();
 		ParkingSearchReplanner replanner = new ParkingSearchReplannerWithStrategySwitching(super.getId(), scenario, 
-				this.getReplanningManager().getInternalInterface(), parkingAgentsTracker, parkingInfrastructure, parkingRouter, strategies);
-		super.initNewInstance(replanner);
+				this.getWithinDayEngine().getInternalInterface(), parkingAgentsTracker, parkingInfrastructure, parkingRouter, strategies);
 		return replanner;
 	}
 

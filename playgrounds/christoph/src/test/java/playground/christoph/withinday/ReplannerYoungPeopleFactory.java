@@ -21,7 +21,6 @@
 package playground.christoph.withinday;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
@@ -30,17 +29,16 @@ public class ReplannerYoungPeopleFactory extends WithinDayDuringLegReplannerFact
 
 	private Scenario scenario;
 	
-	public ReplannerYoungPeopleFactory(Scenario scenario, WithinDayEngine replanningManager,
-			AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability) {
-		super(replanningManager, abstractMultithreadedModule, replanningProbability);
+	public ReplannerYoungPeopleFactory(Scenario scenario, WithinDayEngine withinDayEngine) {
+		super(withinDayEngine);
 		this.scenario = scenario;
 	}
 
 	@Override
 	public WithinDayDuringLegReplanner createReplanner() {
 		WithinDayDuringLegReplanner replanner = new ReplannerYoungPeople(super.getId(), scenario,
-				this.getReplanningManager().getInternalInterface());
-		super.initNewInstance(replanner);
+				this.getWithinDayEngine().getInternalInterface(),
+				this.getWithinDayEngine().getTripRouterFactory().instantiateAndConfigureTripRouter());
 		return replanner;
 	}
 }

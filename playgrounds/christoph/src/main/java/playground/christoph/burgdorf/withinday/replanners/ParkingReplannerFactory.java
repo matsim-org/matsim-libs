@@ -21,7 +21,6 @@
 package playground.christoph.burgdorf.withinday.replanners;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
@@ -30,17 +29,15 @@ public class ParkingReplannerFactory extends WithinDayDuringLegReplannerFactory 
 
 	private Scenario scenario;
 	
-	public ParkingReplannerFactory(Scenario scenario, WithinDayEngine replanningManager,
-			AbstractMultithreadedModule abstractMultithreadedModule, double replanningProbability) {
-		super(replanningManager, abstractMultithreadedModule, replanningProbability);
+	public ParkingReplannerFactory(Scenario scenario, WithinDayEngine withinDayEngine) {
+		super(withinDayEngine);
 		this.scenario = scenario;
 	}
 
 	@Override
 	public WithinDayDuringLegReplanner createReplanner() {
 		WithinDayDuringLegReplanner replanner = new ParkingReplanner(super.getId(), scenario,
-				this.getReplanningManager().getInternalInterface());
-		super.initNewInstance(replanner);
+				this.getWithinDayEngine().getInternalInterface());
 		return replanner;
 	}
 }

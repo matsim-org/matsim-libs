@@ -22,25 +22,29 @@ package org.matsim.withinday.utils;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
-import org.matsim.core.population.PlanImpl;
+import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.population.algorithms.PlanAlgorithm;
+import org.matsim.core.router.TripRouter;
 
 public class EditRoutes {
 
 	private static final Logger logger = Logger.getLogger(EditRoutes.class);
 
-	/**Re-plans a future route between two activities.  The route is given by its leg, which is given by the planElementIndex.
+	private Network network;
+	
+	/**
+	 * Re-plans a future route between two activities.  The route is given by its leg, which is given by the planElementIndex.
 	 * <p/>
 	 * The leg needs to be preceded and followed by activities in order for this method to work.  This is not as strong a
 	 * requirement as one may think, since pt plans also need to be stripped down to the "real" activities before routing starts.
@@ -50,58 +54,34 @@ public class EditRoutes {
 	 * @param planAlgorithm an algorithm that fulfills the PlanAlgorithm interface, but needs to be a router for this method to make sense
 	 * @return true when replacing the route worked, false when something went wrong
 	 */
-	public boolean replanFutureLegRoute(Plan plan, int legPlanElementIndex, PlanAlgorithm planAlgorithm) {
-
-		if (plan == null) return false;
-		if (planAlgorithm == null) return false;
-
+	// TODO: refactor this to (network, leg, triprouter)
+	public boolean replanFutureLegRoute(Plan plan, int legPlanElementIndex, TripRouter tripRouter) {
+		
 		Leg leg;
 		PlanElement planElement = plan.getPlanElements().get(legPlanElementIndex);
 		if (planElement instanceof Leg) {
 			leg = (Leg) planElement;
 		} else return false;
 
-		// yy This will (obviously) fail if the plan does not have alternating acts and legs.  kai, nov'10
-		Activity fromActivity = (Activity) plan.getPlanElements().get(legPlanElementIndex - 1);
-		Activity toActivity = (Activity) plan.getPlanElements().get(legPlanElementIndex + 1);
-
-//		Route oldRoute = leg.getRoute();
+		Route route = leg.getRoute();
 		
-		/*
-		 * We create a new Plan which contains only the Leg that should be replanned and its previous 
-		 * and next Activities. By doing so the PlanAlgorithm will only change the Route of that Leg.
-		 *
-		 * Create a new Plan that contains only the Leg which should be replanned and run the PlanAlgorithm.
-		 */
-		PlanImpl newPlan = new PlanImpl(plan.getPerson());
-		newPlan.addActivity(fromActivity);
-		newPlan.addLeg(leg);
-		newPlan.addActivity(toActivity);
-		planAlgorithm.run(newPlan);
+		Link fromLink = network.getLinks().get(route.getStartLinkId());
+		Link toLink = network.getLinks().get(route.getEndLinkId());
 		
-		/*
-		 * Replace route in existing leg. This is necessary since the router creates an entirely new leg 
-		 * and not only replaces the route inside the leg.
-		 */
-		Leg newLeg = (Leg) newPlan.getPlanElements().get(1);
-		if (leg != newLeg) {
-			leg.setDepartureTime(newLeg.getDepartureTime());
-			leg.setTravelTime(newLeg.getTravelTime());
-			leg.setRoute(newLeg.getRoute());
+		Facility fromFacility = new LinkWrapperFacility(fromLink);
+		Facility toFacility = new LinkWrapperFacility(toLink);
+		
+		List<? extends PlanElement> planElements = tripRouter.calcRoute(leg.getMode(), fromFacility, toFacility, leg.getDepartureTime(), plan.getPerson());
+		
+		if (planElements.size() != 1) {
+			throw new RuntimeException("Expected a list of PlanElements containing exactly one element, " +
+					"but the returned list contained " + planElements.size() + " elements."); 
 		}
 		
-//		/*
-//		 * If possible, reuse existing route objects. Someone might already be
-//		 * using a reference to that object.
-//		 */
-//		Route newRoute = leg.getRoute();
-//		if (oldRoute != null && oldRoute != newRoute) {
-//			if (oldRoute instanceof NetworkRoute && newRoute instanceof NetworkRoute) {
-//				List<Id> linkIds = ((NetworkRoute) newRoute).getLinkIds();
-//				((NetworkRoute) oldRoute).setLinkIds(newRoute.getStartLinkId(), linkIds, newRoute.getEndLinkId());
-//				leg.setRoute(oldRoute);
-//			}
-//		}
+		Leg newLeg = (Leg) planElements.get(0);
+		
+		leg.setTravelTime(newLeg.getTravelTime());
+		leg.setRoute(newLeg.getRoute());
 		
 		return true;
 	}
@@ -117,24 +97,14 @@ public class EditRoutes {
 	 * The currentNodeIndex has to Point to the next Node
 	 * (which is the endNode of the current Link)
 	 */
-	public boolean replanCurrentLegRoute(Plan plan, int legPlanElementIndex, int currentLinkIndex, PlanAlgorithm planAlgorithm, double time) {
-		if (plan == null) return false;
-		if (planAlgorithm == null) return false;
+	// TODO: refactor this to (leg, linkindex, triprouter, time) 
+	public boolean replanCurrentLegRoute(Plan plan, int legPlanElementIndex, int currentLinkIndex, TripRouter tripRouter, double time) {
 
 		Leg leg;
 		PlanElement planElement = plan.getPlanElements().get(legPlanElementIndex);
 		if (planElement instanceof Leg) {
 			leg = (Leg) planElement;
 		} else return false;
-
-
-		// yyyy I can't say how safe this is.  There is no guarantee that the same entry is not used twice in the plan.  This will in
-		// particular be a problem if we override the "equals" contract, in the sense that two activities are equal if
-		// certain (or all) elements are equal.  kai, oct'10
-		// using index now - should be save... cdobler, nov'10
-
-		Activity fromActivity = (Activity) plan.getPlanElements().get(legPlanElementIndex - 1);
-		Activity toActivity = (Activity) plan.getPlanElements().get(legPlanElementIndex + 1);
 
 		Route route = leg.getRoute();
 
@@ -150,14 +120,19 @@ public class EditRoutes {
 		List<Id> allLinkIds = getRouteLinkIds(oldRoute);
 		Id currentLinkId = allLinkIds.get(currentLinkIndex);
 
-		/*
-		 *  Create a new Plan with one Leg that leeds from the
-		 *  current Position to the destination Activity.
-		 */
-		Activity newFromActivity = new ActivityImpl(fromActivity.getType(), currentLinkId);
-		newFromActivity.setStartTime(time);
-		newFromActivity.setEndTime(time);
-
+		Link fromLink = network.getLinks().get(currentLinkId);
+		Link toLink = network.getLinks().get(route.getEndLinkId());
+		
+		Facility fromFacility = new LinkWrapperFacility(fromLink);
+		Facility toFacility = new LinkWrapperFacility(toLink);
+		
+		List<? extends PlanElement> planElements = tripRouter.calcRoute(leg.getMode(), fromFacility, toFacility, time, plan.getPerson());
+		
+		if (planElements.size() != 1) {
+			throw new RuntimeException("Expected a list of PlanElements containing exactly one element, " +
+					"but the returned list contained " + planElements.size() + " elements."); 
+		}
+				
 		// The linkIds of the new Route
 		List<Id> linkIds = new ArrayList<Id>();
 
@@ -171,21 +146,7 @@ public class EditRoutes {
 			linkIds.addAll(allLinkIds.subList(1, currentLinkIndex + 1));
 		}
 
-		// Create a new leg and use the subRoute.
-		Leg newLeg = new LegImpl((LegImpl) leg);
-		newLeg.setDepartureTime(time);
-//		newLeg.setRoute(subRoute);
-
-		/*
-		 *  Create a new Plan that contains only the Leg
-		 *  which should be replanned and run the PlanAlgorithm.
-		 */
-		PlanImpl newPlan = new PlanImpl(plan.getPerson());
-		newPlan.addActivity(newFromActivity);
-		newPlan.addLeg(newLeg);
-		newPlan.addActivity(toActivity);
-		planAlgorithm.run(newPlan);
-
+		Leg newLeg = (Leg) planElements.get(0);
 		Route newRoute = newLeg.getRoute();
 
 		// Merge old and new Route.
@@ -208,7 +169,7 @@ public class EditRoutes {
 		}
 
 		// Overwrite old Route
-		oldRoute.setLinkIds(oldRoute.getStartLinkId(), linkIds, toActivity.getLinkId());
+		oldRoute.setLinkIds(oldRoute.getStartLinkId(), linkIds, toFacility.getLinkId());
 
 		return true;
 	}
@@ -226,5 +187,42 @@ public class EditRoutes {
 		}
 
 		return linkIds;
+	}
+	
+	/*
+	 * Wrapps a Link into a Facility.
+	 */
+	public class LinkWrapperFacility implements Facility {
+		
+		private final Link wrapped;
+
+		public LinkWrapperFacility(final Link toWrap) {
+			wrapped = toWrap;
+		}
+
+		@Override
+		public Coord getCoord() {
+			return wrapped.getCoord();
+		}
+
+		@Override
+		public Id getId() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public Map<String, Object> getCustomAttributes() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public Id getLinkId() {
+			return wrapped.getId();
+		}
+
+		@Override
+		public String toString() {
+			return "[LinkWrapperFacility: wrapped="+wrapped+"]";
+		}
 	}
 }

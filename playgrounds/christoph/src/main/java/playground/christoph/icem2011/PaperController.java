@@ -26,15 +26,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.events.StartupEvent;
@@ -50,12 +47,6 @@ import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.router.util.FastDijkstraFactory;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.withinday.controller.ExampleWithinDayController;
 import org.matsim.withinday.controller.WithinDayController;
@@ -63,7 +54,6 @@ import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 import org.matsim.withinday.replanning.identifiers.tools.SelectHandledAgentsByProbability;
-import org.matsim.withinday.replanning.modules.ReplanningModule;
 import org.matsim.withinday.replanning.replanners.CurrentLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
@@ -149,13 +139,6 @@ public class PaperController extends WithinDayController implements StartupListe
 	 * By doing this every person can use a personalized Router.
 	 */
 	protected void initReplanners(QSim sim) {
-
-		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) sim.getScenario().getPopulation().getFactory()).getModeRouteFactory();
-		LeastCostPathCalculatorFactory factory = new FastDijkstraFactory();
-		
-		Map<String, TravelTime> travelTimes = new HashMap<String, TravelTime>();
-		travelTimes.put(TransportMode.car, this.getTravelTimeCollector());
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, super.getTravelDisutilityFactory(), travelTimes, factory, routeFactory);
 		
 //		this.initialIdentifier = new InitialIdentifierImplFactory(sim).createIdentifier();
 //		this.selector.addIdentifier(initialIdentifier, pInitialReplanning);
@@ -179,11 +162,15 @@ public class PaperController extends WithinDayController implements StartupListe
 		getAffectedAgents(this.noEventEventsFile);
 		getReplanningAgents(this.noEventEventsFile);
 		parseReplanningLinks(this.replanningLinksFile);
+		
+		this.initWithinDayTripRouterFactory();
+		this.getWithinDayEngine().setTripRouterFactory(this.getWithinDayTripRouterFactory());
+		
 		LinkReplanningMap linkReplanningMap = super.getLinkReplanningMap();
 		DuringLegIdentifier identifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
 		this.selector.addIdentifier(identifier, pDuringLegReplanning);
 		this.duringLegIdentifier = new AgentFilteredDuringLegIdentifier(new LinkFilteredDuringLegIdentifier(identifier, this.replanningLinks), this.replanningAgents);
-		this.duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenarioData, this.getWithinDayEngine(), router, 1.0);
+		this.duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenarioData, this.getWithinDayEngine());
 		this.duringLegReplannerFactory.addIdentifier(this.duringLegIdentifier);
 		this.getWithinDayEngine().addDuringLegReplannerFactory(this.duringLegReplannerFactory);
 	}

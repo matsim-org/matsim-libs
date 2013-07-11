@@ -21,10 +21,8 @@
 package playground.christoph.controler;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Scenario;
@@ -43,23 +41,19 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.withinday.controller.WithinDayController;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.LegStartedIdentifierFactory;
+import org.matsim.withinday.replanning.identifiers.filter.ProbabilityFilterFactory;
 import org.matsim.withinday.replanning.identifiers.filter.TransportModeFilterFactory;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifierFactory;
-import org.matsim.withinday.replanning.modules.ReplanningModule;
 import org.matsim.withinday.replanning.replanners.CurrentLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
@@ -227,7 +221,8 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 		if (duringLegRerouting) {
 			duringLegFactory = new LeaveLinkIdentifierFactory(this.getLinkReplanningMap());
 			duringLegFactory.addAgentFilterFactory(carLegAgentsFilterFactory);
-			this.legPerformingIdentifier = duringLegFactory.createIdentifier();			
+			this.legPerformingIdentifier = duringLegFactory.createIdentifier();	
+			this.legPerformingIdentifier.addAgentFilter(new ProbabilityFilterFactory(this.duringLegReroutingShare).createAgentFilter());
 		}
 		
 		if (initialLegRerouting) {
@@ -239,32 +234,22 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 	
 	private void initReplanners() {
 		
-		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) this.getPopulation().getFactory()).getModeRouteFactory();
-								
-		Map<String, TravelTime> travelTimes = new HashMap<String, TravelTime>();	
-//		travelTimes.put(TransportMode.car, this.getTravelTimeCalculator());	// TravelTimeCalculator?!
-		travelTimes.put(TransportMode.car, this.getTravelTimeCollector());
+		this.initWithinDayTripRouterFactory();
+		this.getWithinDayEngine().setTripRouterFactory(this.getWithinDayTripRouterFactory());
 		
-		// add time dependent penalties to travel costs within the affected area
-		TravelDisutilityFactory disutilityFactory = this.getTravelDisutilityFactory();
-		
-		LeastCostPathCalculatorFactory factory = this.getLeastCostPathCalculatorFactory();
-	
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, disutilityFactory, travelTimes, factory, routeFactory);
-
 		/*
 		 * During Leg Replanner
 		 */
 		WithinDayDuringLegReplannerFactory duringLegReplannerFactory;
 		
 		if (duringLegRerouting) {
-			duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenarioData, this.getWithinDayEngine(), router, duringLegReroutingShare);
+			duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenarioData, this.getWithinDayEngine());
 			duringLegReplannerFactory.addIdentifier(this.legPerformingIdentifier);
 			this.getWithinDayEngine().addDuringLegReplannerFactory(duringLegReplannerFactory);			
 		}
 		
 		if (initialLegRerouting) {
-			duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenarioData, this.getWithinDayEngine(), router, 1.0);
+			duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenarioData, this.getWithinDayEngine());
 			duringLegReplannerFactory.addIdentifier(this.legStartedIdentifier);
 			this.getWithinDayEngine().addDuringLegReplannerFactory(duringLegReplannerFactory);			
 		}

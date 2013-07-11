@@ -20,9 +20,6 @@
 
 package playground.wrashid.parkingSearch.withinday;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
@@ -32,23 +29,9 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.BikeTravelTimeOld;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTime;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTime;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTimeOld;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.AStarLandmarksFactory;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.withinday.controller.WithinDayController;
-import org.matsim.withinday.replanning.modules.ReplanningModule;
 
 import playground.wrashid.lib.obj.IntegerValueHashMap;
 import playground.wrashid.parkingSearch.withindayFW.core.InsertParkingActivities;
@@ -88,26 +71,8 @@ public class WithinDayParkingController extends WithinDayController implements S
 	 * By doing this every person can use a personalised Router.
 	 */
 	protected void initReplanners() {
-
-		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeAndDisutility(this.config.planCalcScore()));
-		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) this.scenarioData.getPopulation().getFactory()).getModeRouteFactory();
-
-		// create a copy of the MultiModalTravelTimeWrapperFactory and set the TravelTimeCollector for car mode
-		Map<String, TravelTime> times = new HashMap<String, TravelTime>();
-		times.put(TransportMode.walk, new WalkTravelTimeOld(this.config.plansCalcRoute()));
-		times.put(TransportMode.bike, new BikeTravelTimeOld(this.config.plansCalcRoute(),
-				new WalkTravelTimeOld(this.config.plansCalcRoute())));
-		times.put(TransportMode.ride, new RideTravelTime(this.getLinkTravelTimes(), 
-				new WalkTravelTimeOld(this.config.plansCalcRoute())));
-		times.put(TransportMode.pt, new PTTravelTime(this.config.plansCalcRoute(), 
-				this.getLinkTravelTimes(), new WalkTravelTimeOld(this.config.plansCalcRoute())));
-		times.put(TransportMode.car, super.getTravelTimeCollector());
-		
-		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
-		
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, costFactory, times, factory, routeFactory);
 	
-		this.randomSearchReplannerFactory = new RandomSearchReplannerFactory(this.getWithinDayEngine(), router, 1.0, this.scenarioData, parkingAgentsTracker);
+		this.randomSearchReplannerFactory = new RandomSearchReplannerFactory(this.getWithinDayEngine(), this.scenarioData, parkingAgentsTracker);
 		this.randomSearchReplannerFactory.addIdentifier(this.randomSearchIdentifier);		
 		this.getWithinDayEngine().addDuringLegReplannerFactory(this.randomSearchReplannerFactory);
 	}
@@ -146,7 +111,7 @@ public class WithinDayParkingController extends WithinDayController implements S
 		this.getFixedOrderSimulationListener().addSimulationListener(this.parkingAgentsTracker);
 		this.getEvents().addHandler(this.parkingAgentsTracker);
 		
-		insertParkingActivities = new InsertParkingActivities(scenarioData, this.createRoutingAlgorithm(), parkingInfrastructure);
+		insertParkingActivities = new InsertParkingActivities(scenarioData, this.getWithinDayEngine().getTripRouterFactory().instantiateAndConfigureTripRouter(), parkingInfrastructure);
 		
 		MobsimFactory mobsimFactory = new ParkingQSimFactory(insertParkingActivities, parkingInfrastructure, this.getWithinDayEngine());
 		this.setMobsimFactory(mobsimFactory);

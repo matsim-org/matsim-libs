@@ -36,22 +36,13 @@ import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTime;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTime;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.FastAStarLandmarksFactory;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryImpl;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.withinday.controller.WithinDayController;
-import org.matsim.withinday.replanning.modules.ReplanningModule;
 
 import playground.christoph.evacuation.trafficmonitoring.BikeTravelTime;
 import playground.christoph.evacuation.trafficmonitoring.WalkTravelTime;
@@ -69,12 +60,11 @@ import playground.wrashid.parkingSearch.withinDay_v_STRC.scoring.ParkingScoreMan
 import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.FullParkingSearchStrategy;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.GarageParkingStrategy;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.StreetParkingStrategy;
-import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.fullParkingStrategies.FakeStrategy;
-import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.fullParkingStrategies.OptimalParkingStrategy;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.manager.ParkingStrategyManager;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.util.ParkingAgentsTracker_v2;
 import playground.wrashid.parkingSearch.withindayFW.controllers.kti.HUPCControllerKTIzh;
 import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas;
+import contrib.multimodal.router.MultimodalTripRouterFactory;
 
 public class WithinDayParkingController extends WithinDayController implements ReplanningListener {
 
@@ -128,24 +118,20 @@ public class WithinDayParkingController extends WithinDayController implements R
 	 */
 	protected void initReplanners() {
 
-		LeastCostPathCalculatorFactory factory = new FastAStarLandmarksFactory(this.network, new FreespeedTravelTimeAndDisutility(this.config.planCalcScore()));
-		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) this.scenarioData.getPopulation().getFactory()).getModeRouteFactory();
-
 		// create a copy of the MultiModalTravelTimeWrapperFactory and set the TravelTimeCollector for car mode
 		Map<String, TravelTime> times = new HashMap<String, TravelTime>();
 		times.put(TransportMode.walk, new WalkTravelTime(this.config.plansCalcRoute()));
 		times.put(TransportMode.bike, new BikeTravelTime(this.config.plansCalcRoute()));
-		times.put(TransportMode.ride, new RideTravelTime(this.getLinkTravelTimes(), new WalkTravelTime(this.config.plansCalcRoute())));
-		times.put(TransportMode.pt, new PTTravelTime(this.config.plansCalcRoute(), this.getLinkTravelTimes(), new WalkTravelTime(this.config.plansCalcRoute())));
 		times.put(TransportMode.car, super.getTravelTimeCollector());
 		
-		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
+		TripRouterFactory delegate = new TripRouterFactoryImpl(this.scenarioData, this.getTravelDisutilityFactory(), this.getTravelTimeCollector(), 
+				this.getLeastCostPathCalculatorFactory(), this.getTransitRouterFactory());
+		MultimodalTripRouterFactory tripRouterFactory = new MultimodalTripRouterFactory(this, times, delegate);
+		this.getWithinDayEngine().setTripRouterFactory(tripRouterFactory);
 		
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, costFactory, times, factory, routeFactory);
-
 		// Use a the TravelTimeCollector here for within-day routes replanning!
 		ParkingRouterFactory parkingRouterFactory = new ParkingRouterFactory(this.scenarioData, times, 
-				this.createTravelDisutilityCalculator(), this.getTripRouterFactory(), nodesToCheck);
+				this.createTravelDisutilityCalculator(), tripRouterFactory, nodesToCheck);
 		
 		LinkedList<FullParkingSearchStrategy> allStrategies = getParkingStrategiesForScenario(parkingRouterFactory);
 		
@@ -153,7 +139,7 @@ public class WithinDayParkingController extends WithinDayController implements R
 		ParkingStrategyManager parkingStrategyManager=new ParkingStrategyManager(allStrategies);
 		parkingAgentsTracker.setParkingStrategyManager(parkingStrategyManager);
 		
-		this.searchReplannerFactory = new ParkingSearchReplannerFactoryWithStrategySwitching(this.getWithinDayEngine(), router, 1.0, this.scenarioData, 
+		this.searchReplannerFactory = new ParkingSearchReplannerFactoryWithStrategySwitching(this.getWithinDayEngine(), this.scenarioData, 
 				parkingAgentsTracker, parkingInfrastructure, parkingRouterFactory);
 		this.searchReplannerFactory.addIdentifier(this.parkingSearchIdentifier);		
 		this.getWithinDayEngine().addDuringLegReplannerFactory(this.searchReplannerFactory);

@@ -24,13 +24,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.mobsim.WithinDayQSimFactory;
-import org.matsim.withinday.replanning.modules.ReplanningModule;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
@@ -75,22 +70,12 @@ class MyWithinDayControler extends Controler {
 	 */
 	private void initReplanningRouter() {
 
-		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) sim.getScenario().getPopulation().getFactory()).getModeRouteFactory();
+		withinDayEngine.setTripRouterFactory(this.getTripRouterFactory());
 		
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, this.getTravelDisutilityFactory(), this.getMultiModalTravelTimes(), new DijkstraFactory(), routeFactory);
-		// ReplanningModule is a wrapper that either returns PlansCalcRoute or MultiModalPlansCalcRoute
-		// this pretends being a general Plan Algorithm, but I wonder if it can reasonably be anything else but a router?
-
-//		this.initialIdentifier = new InitialIdentifierImpl(this.sim);
-//		this.initialReplanner = new InitialReplanner(ReplanningIdGenerator.getNextId());
-//		this.initialReplanner.setReplanner(dijkstraRouter);
-//		this.initialReplanner.addAgentsToReplanIdentifier(this.initialIdentifier);
-//		this.parallelInitialReplanner.addWithinDayReplanner(this.initialReplanner);
-
 
 		// replanning while at activity:
 
-		WithinDayDuringActivityReplannerFactory duringActivityReplannerFactory = new ReplannerOldPeopleFactory(this.scenarioData, withinDayEngine, router, 1.0); 
+		WithinDayDuringActivityReplannerFactory duringActivityReplannerFactory = new ReplannerOldPeopleFactory(this.scenarioData, withinDayEngine); 
 		// defines a "doReplanning" method which contains the core of the work
 		// as a piece, it re-routes a _future_ leg.  
 		
@@ -104,7 +89,7 @@ class MyWithinDayControler extends Controler {
 		
 		// replanning while on leg:
 		
-		WithinDayDuringLegReplannerFactory duringLegReplannerFactory = new ReplannerYoungPeopleFactory(this.scenarioData, withinDayEngine, router, 1.0);
+		WithinDayDuringLegReplannerFactory duringLegReplannerFactory = new ReplannerYoungPeopleFactory(this.scenarioData, withinDayEngine);
 		// defines a "doReplanning" method which contains the core of the work
 		// it replaces the next activity
 		// in order to get there, it re-routes the current route

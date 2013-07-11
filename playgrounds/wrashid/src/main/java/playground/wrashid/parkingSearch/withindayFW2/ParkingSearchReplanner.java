@@ -36,6 +36,7 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.NetworkRoute;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.utils.EditRoutes;
@@ -49,10 +50,12 @@ public class ParkingSearchReplanner extends WithinDayDuringLegReplanner {
 	private final Random random;
 	private final EditRoutes editRoutes;
 	private final ParkingAgentsTracker parkingAgentsTracker;
+	private final TripRouter tripRouter;
 	
 	ParkingSearchReplanner(Id id, Scenario scenario, InternalInterface internalInterface, 
-			ParkingAgentsTracker parkingAgentsTracker) {
+			TripRouter tripRouter, ParkingAgentsTracker parkingAgentsTracker) {
 		super(id, scenario, internalInterface);
+		this.tripRouter = tripRouter;
 		this.parkingAgentsTracker = parkingAgentsTracker;
 
 		this.editRoutes = new EditRoutes();
@@ -156,10 +159,10 @@ public class ParkingSearchReplanner extends WithinDayDuringLegReplanner {
 							a.setFacilityId(parkingFacilityId);
 
 							// update walk leg to parking activity
-							editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), i - 1, routeAlgo);
+							editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), i - 1, tripRouter);
 
 							// update car leg from parking activity
-							editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), i + 1, routeAlgo);
+							editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), i + 1, tripRouter);
 						}
 					}
 				}
@@ -176,7 +179,7 @@ public class ParkingSearchReplanner extends WithinDayDuringLegReplanner {
 
 				// update agent's route
 				editRoutes.replanCurrentLegRoute(plan, withinDayAgent.getCurrentPlanElementIndex(),
-						withinDayAgent.getCurrentRouteLinkIdIndex(), routeAlgo, this.time);
+						withinDayAgent.getCurrentRouteLinkIdIndex(), tripRouter, this.time);
 
 				updateNextLeg = true;
 			}
@@ -184,7 +187,7 @@ public class ParkingSearchReplanner extends WithinDayDuringLegReplanner {
 			// adapt next walk leg.
 			if (updateNextLeg) {
 				editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(),
-						withinDayAgent.getCurrentPlanElementIndex() + 2, routeAlgo);
+						withinDayAgent.getCurrentPlanElementIndex() + 2, tripRouter);
 			}
 		}
 

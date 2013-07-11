@@ -37,6 +37,7 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteFactory;
+import org.matsim.core.router.TripRouter;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.utils.EditRoutes;
 
@@ -54,18 +55,18 @@ public class DropOffAgentReplanner extends WithinDayDuringLegReplanner {
 	public static final String activityType = "dropoff";
 	
 	private final RouteFactory routeFactory;
+	private final TripRouter tripRouter;
 	
-	/*package*/ DropOffAgentReplanner(Id id, Scenario scenario, InternalInterface internalInterface) {
+	/*package*/ DropOffAgentReplanner(Id id, Scenario scenario, InternalInterface internalInterface,
+			TripRouter tripRouter) {
 		super(id, scenario, internalInterface);
+		this.tripRouter = tripRouter;
 		this.routeFactory = new LinkNetworkRouteFactory();
 	}
 
 	@Override
 	public boolean doReplanning(PlanBasedWithinDayAgent withinDayAgent) {
-		
-		// If we don't have a valid Replanner.
-		if (this.routeAlgo == null) return false;
-
+	
 		// If we don't have a valid WithinDayPersonAgent
 		if (withinDayAgent == null) return false;
 		
@@ -208,7 +209,7 @@ public class DropOffAgentReplanner extends WithinDayDuringLegReplanner {
 		/*
 		 * Create a new route for the walk leg.
 		 */
-		new EditRoutes().replanFutureLegRoute(executedPlan, currentLegIndex + 2, this.routeAlgo);
+		new EditRoutes().replanFutureLegRoute(executedPlan, currentLegIndex + 2, this.tripRouter);
 				
 		// Finally reset the cached Values of the PersonAgent - they may have changed!
 		withinDayAgent.resetCaches();

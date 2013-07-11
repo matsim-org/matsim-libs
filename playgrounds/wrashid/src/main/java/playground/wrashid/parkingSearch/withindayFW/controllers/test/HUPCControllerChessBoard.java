@@ -89,12 +89,8 @@ public class HUPCControllerChessBoard extends WithinDayParkingController  {
 
 		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
 
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, costFactory, travelTimes, factory,
-				routeFactory);
-
 		// adding hight utility parking choice algo
-		HUPCReplannerFactory hupcReplannerFactory = new HUPCReplannerFactory(this.getWithinDayEngine(),
-				router, 1.0, this.scenarioData, parkingAgentsTracker);
+		HUPCReplannerFactory hupcReplannerFactory = new HUPCReplannerFactory(this.getWithinDayEngine(), this.scenarioData, parkingAgentsTracker);
 		HUPCIdentifier hupcSearchIdentifier = new HUPCIdentifier(parkingAgentsTracker, parkingInfrastructure);
 		this.getFixedOrderSimulationListener().addSimulationListener(hupcSearchIdentifier);
 		hupcReplannerFactory.addIdentifier(hupcSearchIdentifier);

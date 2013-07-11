@@ -38,16 +38,12 @@ import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTim
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
-import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.FastAStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.withinday.controller.WithinDayController;
-import org.matsim.withinday.replanning.modules.ReplanningModule;
 
 import playground.christoph.evacuation.trafficmonitoring.BikeTravelTime;
 import playground.christoph.evacuation.trafficmonitoring.WalkTravelTime;
@@ -122,15 +118,14 @@ public class WithinDayParkingController extends WithinDayController implements R
 		times.put(TransportMode.pt, new PTTravelTime(this.config.plansCalcRoute(), this.getLinkTravelTimes(), new WalkTravelTime(this.config.plansCalcRoute())));
 		times.put(TransportMode.car, super.getTravelTimeCollector());
 		
-		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
+		this.initWithinDayTripRouterFactory();
+		this.getWithinDayEngine().setTripRouterFactory(this.getWithinDayTripRouterFactory());
 		
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, costFactory, times, factory, routeFactory);
-
 		// Use a the TravelTimeCollector here for within-day routes replanning!
 		ParkingRouterFactory parkingRouterFactory = new ParkingRouterFactory(this.scenarioData, times, 
-				this.createTravelDisutilityCalculator(), this.getTripRouterFactory(), nodesToCheck);
+				this.createTravelDisutilityCalculator(), this.getWithinDayTripRouterFactory(), nodesToCheck);
 		
-		this.randomSearchReplannerFactory = new ParkingSearchReplannerFactory(this.getWithinDayEngine(), router, 1.0, this.scenarioData, 
+		this.randomSearchReplannerFactory = new ParkingSearchReplannerFactory(this.getWithinDayEngine(), this.scenarioData, 
 				parkingAgentsTracker, parkingInfrastructure, parkingRouterFactory);
 		this.randomSearchReplannerFactory.addIdentifier(this.randomSearchIdentifier);		
 		this.getWithinDayEngine().addDuringLegReplannerFactory(this.randomSearchReplannerFactory);
