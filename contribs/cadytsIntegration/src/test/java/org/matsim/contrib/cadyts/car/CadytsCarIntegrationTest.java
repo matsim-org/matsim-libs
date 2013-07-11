@@ -58,16 +58,31 @@ public class CadytsCarIntegrationTest {
 
 		Config config = createTestConfig(inputDir, this.utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
+		
 		StrategySettings stratSets = new StrategySettings(new IdImpl(1));
 		stratSets.setModuleName("ccc") ;
+		// communicates with PlanStrategy below based on this name ("ccc")
 		stratSets.setProbability(1.) ;
 		config.strategy().addStrategySettings(stratSets) ;
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config) ;
 		final Controler controler = new Controler(scenario);
 		final CadytsContext context = new CadytsContext( config ) ;
+		
+		// in pt these parameters are already set in method "createTestConfig", for car they can, however, only be
+		// set here, because the CadytsCarConfigGroup is created with the CadytsCarContext which is created just above
+		config.getModule("cadytsCar").addParam("startTime", "04:00:00");
+		config.getModule("cadytsCar").addParam("endTime", "20:00:00");
+		config.getModule("cadytsCar").addParam("regressionInertia", "0.95");
+		config.getModule("cadytsCar").addParam("useBruteForce", "true");
+		config.getModule("cadytsCar").addParam("minFlowStddevVehH", "8");
+		config.getModule("cadytsCar").addParam("preparatoryIterations", "1");
+		config.getModule("cadytsCar").addParam("timeBinSize", "3600");
+		
+				
 		controler.addControlerListener(context) ;
 		controler.setOverwriteFiles(true);
+		
 		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
@@ -82,17 +97,14 @@ public class CadytsCarIntegrationTest {
 		controler.run();
 		
 		//test calibration settings
-		// Assert.assertEquals(true, context.getCalibrator().getBruteForce());
-		Assert.assertEquals(false, context.getCalibrator().getBruteForce());
+		Assert.assertEquals(true, context.getCalibrator().getBruteForce());
 		Assert.assertEquals(false, context.getCalibrator().getCenterRegression());
 		Assert.assertEquals(Integer.MAX_VALUE, context.getCalibrator().getFreezeIteration());
-		// Assert.assertEquals(8.0, context.getCalibrator().getMinStddev(SingleLinkMeasurement.TYPE.FLOW_VEH_H), MatsimTestUtils.EPSILON);
-		Assert.assertEquals(25.0, context.getCalibrator().getMinStddev(SingleLinkMeasurement.TYPE.FLOW_VEH_H), MatsimTestUtils.EPSILON);
+		Assert.assertEquals(8.0, context.getCalibrator().getMinStddev(SingleLinkMeasurement.TYPE.FLOW_VEH_H), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(1, context.getCalibrator().getPreparatoryIterations());
 		Assert.assertEquals(0.95, context.getCalibrator().getRegressionInertia(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(1.0, context.getCalibrator().getVarianceScale(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals(3600.0, context.getCalibrator().getTimeBinSize_s(), MatsimTestUtils.EPSILON);
-
 	}
 
 
@@ -143,7 +155,8 @@ public class CadytsCarIntegrationTest {
 		// ---		
 		
 //		Module cadytsCarConfig = config.createModule(CadytsCarConfigGroup.GROUP_NAME ) ;
-//		
+		
+			
 //		cadytsCarConfig.addParam(CadytsCarConfigGroup.START_TIME, "04:00:00") ;
 //		cadytsCarConfig.addParam(CadytsCarConfigGroup.END_TIME, "20:00:00" ) ;
 //		cadytsCarConfig.addParam(CadytsCarConfigGroup.REGRESSION_INERTIA, "0.95") ;

@@ -129,7 +129,7 @@ public class CadytsCarConfigGroup extends Module {
 		params.put(USE_BRUTE_FORCE, Boolean.toString(useBruteForce()));
 		params.put(WRITE_ANALYSIS_FILE, Boolean.toString(isWriteAnalysisFile()));
 		params.put(START_TIME, Integer.toString(getStartTime()));
-		params.put(END_TIME, Integer.toString(getStartTime()));
+		params.put(END_TIME, Integer.toString(getEndTime()));
 		params.put(CALIBRATED_LINKS, CollectionUtils.idSetToString(this.calibratedLinks));
 		params.put(TIME_BIN_SIZE, Integer.toString(getTimeBinSize())) ;
 
