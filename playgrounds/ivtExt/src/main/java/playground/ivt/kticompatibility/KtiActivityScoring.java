@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.ivt.kticompatibility;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -61,7 +62,7 @@ public class KtiActivityScoring implements ActivityScoring {
 	private static final Logger logger = Logger.getLogger(KtiActivityScoring.class);
 
 	// lock at reset or getScore, to avoid strange hard-to detect bugs
-	private boolean isLocked = false;
+	private final Lock lock = new Lock();
 	private double score = 0;
 
 	// TODO should be in person.desires
@@ -104,7 +105,7 @@ public class KtiActivityScoring implements ActivityScoring {
 	private Activity activityWithoutStart = null;
 	@Override
 	public void endActivity(double time, Activity act) {
-		if ( isLocked ) throw new IllegalStateException( "a scoring function can only be used once." );
+		lock.checkLock();
 		assert time == act.getEndTime();
 		final double startTime = act.getStartTime();
 		final double endTime = act.getEndTime();
@@ -354,13 +355,13 @@ public class KtiActivityScoring implements ActivityScoring {
 
 	@Override
 	public double getScore() {
-		isLocked = true;
+		lock.lock();
 		return score;
 	}
 
 	@Override
 	public void reset() {
-		isLocked = true;
+		lock.lock();
 	}
 
 	@Override
@@ -368,9 +369,22 @@ public class KtiActivityScoring implements ActivityScoring {
 		// do not care: everything is in the activity, so just handle it at the end
 		// also: do not accept to score the same plan several times.
 		// reseting is too easily bugged.
-		if ( isLocked ) throw new IllegalStateException( "a scoring function can only be used once." );
+		lock.checkLock();
 	}
 
 
+}
 
+class Lock {
+	private StackTraceElement[] stackTraceAtLock = null;
+
+	public void lock() {
+		stackTraceAtLock = Thread.currentThread().getStackTrace();
+	}
+
+	public void checkLock() {
+		if (stackTraceAtLock != null) {
+			throw new IllegalStateException( "a scoring function can only be used once. Was already locked with stack "+Arrays.toString( stackTraceAtLock ) );
+		}
+	}
 }
