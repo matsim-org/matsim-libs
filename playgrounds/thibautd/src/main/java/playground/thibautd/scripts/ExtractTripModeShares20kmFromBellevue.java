@@ -23,6 +23,7 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -32,8 +33,10 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -68,7 +71,19 @@ public class ExtractTripModeShares20kmFromBellevue {
 					PtConstants.TRANSIT_ACTIVITY_TYPE,
 					JointActingTypes.PICK_UP,
 					JointActingTypes.DROP_OFF ) );
-	private static final MainModeIdentifier MODE_IDENTIFIER = new JointMainModeIdentifier( new MainModeIdentifierImpl() );
+	private static final MainModeIdentifier MODE_IDENTIFIER = 
+		new MainModeIdentifier() {
+			final MainModeIdentifier delegate = new JointMainModeIdentifier( new MainModeIdentifierImpl() );
+
+			@Override
+			public String identifyMainMode(final List<PlanElement> tripElements) {
+				if ( tripElements.size() == 1 &&
+						((Leg) tripElements.get( 0 )).getMode().equals( TransportMode.transit_walk ) ) {
+					return TransportMode.walk;
+				}
+				return delegate.identifyMainMode( tripElements );
+			}
+		};
 
 	private static final double CROW_FLY_FACTOR = 1.2;
 
