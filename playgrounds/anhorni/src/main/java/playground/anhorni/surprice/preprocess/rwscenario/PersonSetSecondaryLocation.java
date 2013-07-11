@@ -48,11 +48,11 @@ public class PersonSetSecondaryLocation extends AbstractPersonAlgorithm implemen
 	private static final String L = "leisure";
 	private static final String S = "shop";
 	private static final String E = "education";
-	private static final String O = "other";
+	private static final String B = "business";
 	private static final String EDUCATION = "education";
 	private static final String LEISURE = "leisure";
 	private static final String SHOP = "shop";
-	private static final String OTHER = "other";
+	private static final String BUSINESS = "business";
 	private static final CoordImpl ZERO = new CoordImpl(0.0,0.0);
 
 	private final ActivityFacilitiesImpl facilities;
@@ -60,7 +60,7 @@ public class PersonSetSecondaryLocation extends AbstractPersonAlgorithm implemen
 	private QuadTree<ActivityFacilityImpl> shopFacQuadTree = null;
 	private QuadTree<ActivityFacilityImpl> leisFacQuadTree = null;
 	private QuadTree<ActivityFacilityImpl> educFacQuadTree = null;
-	private QuadTree<ActivityFacilityImpl> otherFacQuadTree = null;
+	private QuadTree<ActivityFacilityImpl> businessFacQuadTree = null;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
@@ -191,10 +191,10 @@ public class PersonSetSecondaryLocation extends AbstractPersonAlgorithm implemen
 		maxx += 1.0;
 		maxy += 1.0;
 		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
-		this.otherFacQuadTree = new QuadTree<ActivityFacilityImpl>(minx, miny, maxx, maxy);
+		this.businessFacQuadTree = new QuadTree<ActivityFacilityImpl>(minx, miny, maxx, maxy);
 		for (ActivityFacility f : this.facilities.getFacilities().values()) {
-			if (f.getActivityOptions().get(OTHER) != null) {
-				this.otherFacQuadTree.put(f.getCoord().getX(),f.getCoord().getY(),(ActivityFacilityImpl) f);
+			if (f.getActivityOptions().get(BUSINESS) != null) {
+				this.businessFacQuadTree.put(f.getCoord().getX(),f.getCoord().getY(),(ActivityFacilityImpl) f);
 			}
 		}
 		System.out.println("      done.");
@@ -209,7 +209,7 @@ public class PersonSetSecondaryLocation extends AbstractPersonAlgorithm implemen
 		if (E.equals(act_type)) { return this.educFacQuadTree; }
 		else if (S.equals(act_type)) { return this.shopFacQuadTree; }
 		else if (L.equals(act_type)) { return this.leisFacQuadTree; }
-		else if (O.equals(act_type)) { return this.otherFacQuadTree; }
+		else if (B.equals(act_type)) { return this.businessFacQuadTree; }
 		else { Gbl.errorMsg("act_type=" + act_type + " not allowed!"); return null; }
 	}
 
@@ -217,7 +217,7 @@ public class PersonSetSecondaryLocation extends AbstractPersonAlgorithm implemen
 		if (E.equals(act_type)) { return EDUCATION; }
 		else if (S.equals(act_type)) { return SHOP; }
 		else if (L.equals(act_type)) { return LEISURE; }
-		else if (O.equals(act_type)) { return OTHER; }
+		else if (B.equals(act_type)) { return BUSINESS; }
 		else { Gbl.errorMsg("act_type=" + act_type + " not allowed!"); return null; }
 	}
 
@@ -272,7 +272,8 @@ public class PersonSetSecondaryLocation extends AbstractPersonAlgorithm implemen
 		Collection<ActivityFacilityImpl> fs = this.getFacilities(act_type).get(coord1.getX(),coord1.getY(),radius);
 		fs.addAll(this.getFacilities(act_type).get(coord2.getX(),coord2.getY(),radius));
 		if (fs.isEmpty()) {
-			if (radius > 200000) { Gbl.errorMsg("radius>200'000 meters and still no facility found!"); }
+			if (radius > 200000) { Gbl.errorMsg(act_type + " radius>200'000 meters and still no facility found!"); 
+			}
 			return this.getFacility(coord1,coord2,2.0*radius,act_type);
 		}
 		return this.getFacility(fs,act_type);

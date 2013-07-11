@@ -35,20 +35,23 @@ public class DayControler extends Controler {
 	private AgentMemories memories = new AgentMemories();
 	private String day;	
 	private ObjectAttributes preferences;
+	private ObjectAttributes incomes;
 	private Population populationPreviousDay = null;
 	private TerminationCriterionScoreBased terminationCriterion = null;
 		
-	public DayControler(final Config config, AgentMemories memories, String day, ObjectAttributes preferences, Population populationPreviousDay) {
+	public DayControler(final Config config, AgentMemories memories, String day, ObjectAttributes preferences, Population populationPreviousDay,
+			ObjectAttributes incomes) {
 		super(config);	
 		super.setOverwriteFiles(true);
 		this.memories = memories;	
 		this.day = day;
 		this.preferences = preferences;
+		this.incomes = incomes;
 		this.populationPreviousDay = populationPreviousDay;
 		
 		this.setScoringFunctionFactory(
 				new SurpriceScoringFunctionFactory(
-			  			this, this.config.planCalcScore(), this.network, this.memories, this.day, this.preferences)
+			  			this, this.config.planCalcScore(), this.network, this.memories, this.day, this.preferences, this.incomes)
 				);
 	} 
 			

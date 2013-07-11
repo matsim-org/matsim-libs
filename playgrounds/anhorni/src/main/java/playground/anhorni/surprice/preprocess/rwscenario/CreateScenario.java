@@ -213,8 +213,8 @@ public class CreateScenario {
 		tollCreator.create(
 				outPath, 
 				tollZone,
-				6.0 * 3600.0,
-				10.0 * 3600.0,
+				5.75 * 3600.0,
+				8.5 * 3600.0,
 				3.0,
 				"area",
 				"ZH scenario"); 
@@ -392,7 +392,7 @@ public class CreateScenario {
 			double sDur = 0.0; int sCount = 0;
 			double lDur = 0.0; int lCount = 0;
 			double eDur = 0.0; int eCount = 0;
-			double oDur = 0.0; int oCount = 0;
+			double bDur = 0.0; int bCount = 0;
 			int hCount = 0;
 						
 			for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {
@@ -406,8 +406,8 @@ public class CreateScenario {
 						lDur += (act.getEndTime() - act.getStartTime()); lCount++;
 					} else if (act.getType().startsWith("e")) {
 						eDur += (act.getEndTime() - act.getStartTime()); eCount++;
-					} else if (act.getType().startsWith("o")) {
-						oDur += (act.getEndTime() - act.getStartTime()); oCount++;
+					} else if (act.getType().startsWith("b")) {
+						bDur += (act.getEndTime() - act.getStartTime()); bCount++;
 					} else if (act.getType().startsWith("h")) {
 						hCount++;
 					}
@@ -417,14 +417,14 @@ public class CreateScenario {
 			if (sCount > 0) sDur = Math.max(3.0 * 60.0, sDur / sCount);
 			if (lCount > 0) lDur = Math.max(5.0 * 60.0, lDur / lCount);
 			if (eCount > 0) eDur = Math.max(5.0 * 60.0, eDur / eCount);
-			if (oCount > 0) oDur = Math.max(61.0, oDur / oCount);
-			double hDur = Math.max(10.0, 24.0 * 3600.0 - wDur - sDur - lDur - eDur - oDur) / hCount;	
+			if (bCount > 0) bDur = Math.max(61.0, bDur / bCount);
+			double hDur = Math.max(10.0, 24.0 * 3600.0 - wDur - sDur - lDur - eDur - bDur) / hCount;	
 			
 			if (wDur > 0.0) ((PersonImpl)person).getDesires().putActivityDuration("work", wDur);
 			if (sDur > 0.0) ((PersonImpl)person).getDesires().putActivityDuration("shop", sDur);
 			if (lDur > 0.0) ((PersonImpl)person).getDesires().putActivityDuration("leisure", lDur);
 			if (eDur > 0.0) ((PersonImpl)person).getDesires().putActivityDuration("education", eDur);
-			if (oDur > 0.0) ((PersonImpl)person).getDesires().putActivityDuration("other", oDur);
+			if (bDur > 0.0) ((PersonImpl)person).getDesires().putActivityDuration("business", bDur);
 			if (hDur > 0.0) ((PersonImpl)person).getDesires().putActivityDuration("home", hDur);			
 		}
 	}

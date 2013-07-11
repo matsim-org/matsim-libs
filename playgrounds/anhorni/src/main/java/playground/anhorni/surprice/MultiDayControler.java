@@ -47,6 +47,10 @@ public class MultiDayControler {
 		ObjectAttributesXmlReader preferencesReader = new ObjectAttributesXmlReader(preferences);
 		preferencesReader.parse(path + "/preferences.xml");
 		
+		ObjectAttributes incomes = new ObjectAttributes();
+		ObjectAttributesXmlReader incomesReader = new ObjectAttributesXmlReader(incomes);
+		incomesReader.parse(path + "/incomes.xml");
+						
 		AgentMemories memories = new AgentMemories();
 		Population populationPreviousDay = null;
 		int finalIterations[] = new int[7];		
@@ -55,7 +59,7 @@ public class MultiDayControler {
 			config.setParam("plans", "inputPlansFile", path + "/" + day + "/plans.xml");
 			config.setParam("controler", "runId", day);
 						
-			DayControler controler = new DayControler(config, memories, day, preferences, populationPreviousDay);
+			DayControler controler = new DayControler(config, memories, day, preferences, populationPreviousDay, incomes);
 			controler.run();
 			
 			if (day.equals("sat")) {

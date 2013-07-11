@@ -24,8 +24,8 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.config.Config;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.BasicScoring;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.LegScoring;
@@ -51,74 +51,31 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
     
     private String day;
     private AgentMemory memory;
-    private Config config;
-        
-    private double constantCar;
-    private double constantPt;
-    private double constantBike;
-    private double constantWalk;  
     
-    public SurpriceLegScoringFunction(final CharyparNagelScoringParameters params, Network network, final Config config, AgentMemory memory, 
-    		String day, PersonImpl person) {
+    private double income;
+    private double avgIncome;
+        
+    
+    public SurpriceLegScoringFunction(final CharyparNagelScoringParameters params, Network network, AgentMemory memory, 
+    		String day, PersonImpl person, double income, double avgIncome) {
 		this.params = params;
         this.network = network;
-        this.config = config;
-        
         this.memory = memory;
-        this.day = day;
-        
-        this.constantCar = this.params.constantCar;
-    	this.constantPt = this.params.constantPt;
-    	this.constantBike = this.params.constantBike;
-    	this.constantWalk = this.params.constantWalk; 
-    	
+        this.day = day;    	
     	this.person = person;
+    	
+    	this.income = income;
+    	this.avgIncome = avgIncome;
         
 		this.reset();		
 	}
-        
-    private void adaptCoefficientsLagged() {    	
-    	double fLagged = (Double) this.person.getCustomAttributes().get(day + ".fLagged");
-    	
-		// adapt for tue - sun: 
-		if (!this.day.equals("mon")) {
-			String mode = this.memory.getMainModePreviousDay(this.day);
-			
-			if (mode.equals("car")) {
-				this.constantCar = this.params.constantCar * fLagged + 2 * (1.0 - fLagged);
-			} else if (mode.equals("pt")) {
-				this.constantPt = this.params.constantPt * fLagged + 2 * (1.0 - fLagged);
-			} else if (mode.equals("bike")) {
-				this.constantBike = this.params.constantBike * fLagged + 2 * (1.0 - fLagged);			
-			} else if (mode.equals("walk")) {
-				this.constantWalk = this.params.constantWalk * fLagged + 2 * (1.0 - fLagged);
-			}
-			else {
-				// do nothing
-			}
-			this.person.getCustomAttributes().put(day + ".constantCar", this.constantCar);
-			this.person.getCustomAttributes().put(day + ".constantPt", this.constantPt);
-			this.person.getCustomAttributes().put(day + ".constantBike", this.constantBike);
-			this.person.getCustomAttributes().put(day + ".constantWalk", this.constantWalk);
-		}
-	}
-	
+        	
 	@Override
 	public void reset() {
 		this.lastTime = INITIAL_LAST_TIME;
 		this.score = INITIAL_SCORE;
 		this.person.getCustomAttributes().put(day + ".legScore", null);
 		this.person.getCustomAttributes().put(day + ".legMonetaryCosts", null);
-		
-		this.person.getCustomAttributes().put(day + ".constantCar", null);
-		this.person.getCustomAttributes().put(day + ".constantPt", null);
-		this.person.getCustomAttributes().put(day + ".constantBike", null);
-		this.person.getCustomAttributes().put(day + ".constantWalk", null);
-		
-		this.constantCar = this.params.constantCar;
-    	this.constantPt = this.params.constantPt;
-    	this.constantBike = this.params.constantBike;
-    	this.constantWalk = this.params.constantWalk;
 	}
 
 	@Override
@@ -138,66 +95,123 @@ public class SurpriceLegScoringFunction implements LegScoring, BasicScoring {
 		this.score += calcLegScore(this.lastTime, time, leg);
 	}
 
-	protected double calcLegScore(final double departureTime, final double arrivalTime, final Leg leg) {	
-		if (Boolean.parseBoolean(this.config.findParam(Surprice.SURPRICE_RUN, "useLaggedVars"))) {
-			this.adaptCoefficientsLagged();			
-		}		
-		double tmpScore = 0.0;
-		double travelTime = arrivalTime - departureTime; // travel time in seconds	
-		double tmpMonetaryCosts = 0.0;
+	protected double calcLegScore(final double departureTime, final double arrivalTime, final Leg leg) {
 		
-		// ============= CAR =======================================================
-		if (TransportMode.car.equals(leg.getMode())) {			
-			Route route = leg.getRoute();
-			double dist = 0.0; // distance in meters
-			dist = getDistance(route);
-						
-			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s + 
-			this.params.monetaryDistanceCostRateCar * this.params.marginalUtilityOfMoney * dist;
-			tmpScore += this.constantCar;
-			
-			tmpMonetaryCosts += this.params.monetaryDistanceCostRateCar * this.params.marginalUtilityOfMoney * dist;
-						
-		// ============= CAR =======================================================
-		} else if (TransportMode.pt.equals(leg.getMode())) {			
-			Route route = leg.getRoute();
-			double dist = 0.0; // distance in meters
-			dist = getDistance(route);
-			
-			tmpScore += travelTime * this.params.marginalUtilityOfTravelingPT_s + 
-			this.params.monetaryDistanceCostRatePt * this.params.marginalUtilityOfMoney * dist;
-			tmpScore += this.constantPt;	
-			
-			tmpMonetaryCosts += this.params.monetaryDistanceCostRatePt * this.params.marginalUtilityOfMoney * dist;
-			
-		} else if (TransportMode.walk.equals(leg.getMode()) || TransportMode.transit_walk.equals(leg.getMode())) {
-			tmpScore += travelTime * this.params.marginalUtilityOfTravelingWalk_s;
-			tmpScore +=  this.constantWalk;
-		} else if (TransportMode.bike.equals(leg.getMode())) {
-			tmpScore += travelTime * this.params.marginalUtilityOfTravelingBike_s;
-			tmpScore += this.constantBike;
-		} else {
-			double dist = 0.0; // distance in meters
-			Route route = leg.getRoute();
-			dist = getDistance(route);
-			// use the same values as for "car"
-			tmpScore += travelTime * this.params.marginalUtilityOfTraveling_s + 
-			this.params.monetaryDistanceCostRateCar * this.params.marginalUtilityOfMoney * dist;
-			tmpScore += this.constantCar;
-			
-			tmpMonetaryCosts += this.params.monetaryDistanceCostRateCar * this.params.marginalUtilityOfMoney * dist;
+		String purpose = ((PlanImpl)this.person.getSelectedPlan()).getNextActivity(leg).getType();	
+		
+		boolean mLag_purpose = false;
+		boolean mLag_time = false;		
+		// lag effects for tue - sun: 
+		if (!this.day.equals("mon")) {				
+			mLag_purpose = this.memory.getLagPurpose(departureTime, purpose, day, leg.getMode());
+			mLag_time = this.memory.getLagTime(departureTime, purpose, day, leg.getMode());
+		}	
+		
+		double travelTime = arrivalTime - departureTime; // travel time in seconds	
+				
+		double beta_TC = 0.0;
+		double beta_TT = 0.0;
+		double lambda_I_TC = 0.0;
+		double lambda_D_TT;
+		double lambda_D_TC;
+		
+		double lagP = 0.0;
+		double lagT = 0.0;
+		
+		double asc = 0.0;
+		double distance = getDistance(leg.getRoute());
+		
+		// ============= car, other, unkown, pax, mtb ================================	
+		if (purpose.equals("work") || purpose.equals("education") || purpose.equals("home")) {
+			beta_TC = Surprice.beta_TC_car_com;
+			beta_TT = Surprice.beta_TT_car_com;
+			lambda_I_TC = Surprice.lambda_I_TC_car_com;
+//			lambda_D_TT = Surprice.lambda_D_TT_car_com;
+//			lambda_D_TC = Surprice.lambda_D_TC_car_com;
+		} else if (purpose.equals("shop")) {
+			beta_TC = Surprice.beta_TC_car_shp;
+			beta_TT = Surprice.beta_TT_car_shp;
+			lambda_I_TC = Surprice.lambda_I_TC_car_shp;
+//			lambda_D_TT = Surprice.lambda_D_TT_car_shp;
+//			lambda_D_TC = Surprice.lambda_D_TC_car_shp;
+		} else if (purpose.equals("leisure")) {
+			beta_TC = Surprice.beta_TC_car_lei;
+			beta_TT = Surprice.beta_TT_car_lei;
+			lambda_I_TC = Surprice.lambda_I_TC_car_lei;
+//			lambda_D_TT = Surprice.lambda_D_TT_car_lei;
+//			lambda_D_TC = Surprice.lambda_D_TC_car_lei;
+		} 
+		lagP = (mLag_purpose? 1 : 0) * Surprice.lag_purpose_car;
+		lagT = (mLag_time? 1 : 0) * Surprice.lag_time_car;
+		asc = Surprice.constantCar;	
+							
+		// ============= PT =======================================================
+		if (TransportMode.pt.equals(leg.getMode())) {			
+			if (purpose.equals("work") || purpose.equals("education") || purpose.equals("home")) {
+				beta_TC = Surprice.beta_TC_pt_com;
+				beta_TT = Surprice.beta_TT_pt_com;
+				lambda_I_TC = Surprice.lambda_I_TC_pt_com;
+//				lambda_D_TT = Surprice.lambda_D_TT_pt_com;
+//				lambda_D_TC = Surprice.lambda_D_TC_pt_com;
+			} else if (purpose.equals("shop")) {
+				beta_TC = Surprice.beta_TC_pt_shp;
+				beta_TT = Surprice.beta_TT_pt_shp;
+				lambda_I_TC = Surprice.lambda_I_TC_pt_shp;
+//				lambda_D_TT = Surprice.lambda_D_TT_pt_shp;
+//				lambda_D_TC = Surprice.lambda_D_TC_pt_shp;
+			} else if (purpose.equals("leisure")) {
+				beta_TC = Surprice.beta_TC_pt_lei;
+				beta_TT = Surprice.beta_TT_pt_lei;
+				lambda_I_TC = Surprice.lambda_I_TC_pt_lei;
+//				lambda_D_TT = Surprice.lambda_D_TT_pt_lei;
+//				lambda_D_TC = Surprice.lambda_D_TC_pt_lei;
+			} 
+			lagP = (mLag_purpose? 1 : 0) * Surprice.lag_purpose_pt;
+			lagT = (mLag_time? 1 : 0) * Surprice.lag_time_pt;
+			asc = Surprice.constantPt;
+		
+		// ============= slm =======================================================
+		} else if (TransportMode.bike.equals(leg.getMode()) || TransportMode.bike.equals(leg.getMode())) {
+			if (purpose.equals("work") || purpose.equals("education") || purpose.equals("home")) {
+				beta_TC = Surprice.beta_TC_slm_com;
+				beta_TT = Surprice.beta_TT_slm_com;
+				lambda_I_TC = Surprice.lambda_I_TC_slm_com;
+//				lambda_D_TT = Surprice.lambda_D_TT_slm_com;
+//				lambda_D_TC = Surprice.lambda_D_TC_slm_com;
+			} else if (purpose.equals("shop")) {
+				beta_TC = Surprice.beta_TC_slm_shp;
+				beta_TT = Surprice.beta_TT_slm_shp;
+				lambda_I_TC = Surprice.lambda_I_TC_slm_shp;
+//				lambda_D_TT = Surprice.lambda_D_TT_slm_shp;
+//				lambda_D_TC = Surprice.lambda_D_TC_slm_shp;
+			} else if (purpose.equals("leisure")) {
+				beta_TC = Surprice.beta_TC_slm_lei;
+				beta_TT = Surprice.beta_TT_slm_lei;
+				lambda_I_TC = Surprice.lambda_I_TC_slm_lei;
+//				lambda_D_TT = Surprice.lambda_D_TT_slm_lei;
+//				lambda_D_TC = Surprice.lambda_D_TC_slm_lei;
+			} 
+			lagP = (mLag_purpose? 1 : 0) * Surprice.lag_purpose_slm;
+			lagT = (mLag_time? 1 : 0) * Surprice.lag_time_slm;
+			asc = Surprice.constantPt;
+		} 		
+		double tmpScore = beta_TT * travelTime + beta_TC * distance * Surprice.costPerKm * Math.pow((this.income / this.avgIncome), lambda_I_TC);
+		tmpScore += lagP + lagT;
+		
+		// TODO: add epsilon
+		
+		double prevValLag = 0.0;
+		if (this.person.getCustomAttributes().get(day + ".legScoreLag") != null) {
+			prevValLag = (Double)this.person.getCustomAttributes().get(day + ".legScoreLag");
 		}
+		person.getCustomAttributes().put(day + ".legScoreLag", prevValLag + tmpScore);
+		
 		double prevVal = 0.0;
 		if (this.person.getCustomAttributes().get(day + ".legScore") != null) {
 			prevVal = (Double)this.person.getCustomAttributes().get(day + ".legScore");
 		}
 		person.getCustomAttributes().put(day + ".legScore", prevVal + tmpScore);
 		
-		prevVal = 0.0;
-		if (this.person.getCustomAttributes().get(day + ".legMonetaryCosts") != null) {
-			prevVal = (Double) this.person.getCustomAttributes().get(day + ".legMonetaryCosts");
-		}
-		person.getCustomAttributes().put(day + ".legMonetaryCosts" , prevVal + tmpMonetaryCosts);
 		return tmpScore;
 	}
 
