@@ -129,24 +129,29 @@ public class MyWithinDayMobsimListener implements MobsimBeforeSimStepListener {
 			return false ;
 		}
 
-		// now the real work begins.  This, as an example, changes the activity (i.e. the destination of the current leg) and then
+		// now the real work begins. This, as an example, changes the activity (i.e. the destination of the current leg) and then
 		// re-splices the plan
 		
 		Id linkId = mobsim.getScenario().createId("22") ;
 		Activity newAct = mobsim.getScenario().getPopulation().getFactory().createActivityFromLinkId("w", linkId ) ;
 		newAct.setMaximumDuration(3600);
 		
-		planElements.set( planElementsIndex+1, newAct ) ;
+		planElements.set( planElementsIndex+1, newAct );
 		
 		// =============================================================================================================
 		// =============================================================================================================
 		// EditRoutes at this point only works for car routes
 		
+		EditRoutes ed = new EditRoutes();
+		
 		// new Route for current Leg.
-		new EditRoutes().replanCurrentLegRoute(plan, planElementsIndex, withindayAgent.getCurrentRouteLinkIdIndex(), tripRouter, now) ;
+		ed.relocateCurrentLegRoute((Leg) plan.getPlanElements().get(planElementsIndex), withindayAgent.getPerson(), 
+				withindayAgent.getCurrentRouteLinkIdIndex(), linkId, now, scenario.getNetwork(), tripRouter);
 		
 		// the route _from_ the modified activity also needs to be replanned:
-		new EditRoutes().replanFutureLegRoute(plan, planElementsIndex+2, tripRouter);
+		Leg futureLeg = (Leg) plan.getPlanElements().get(planElementsIndex + 2);
+		ed.relocateFutureLegRoute(futureLeg, linkId, futureLeg.getRoute().getEndLinkId(), withindayAgent.getPerson(), 
+				scenario.getNetwork(), tripRouter);
 		
 		// =============================================================================================================
 		// =============================================================================================================
