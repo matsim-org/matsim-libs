@@ -8,6 +8,7 @@ import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JButton;
 import javax.swing.JTextField;
+
 import java.awt.FlowLayout;
 import java.awt.GridLayout;
 
@@ -66,14 +67,18 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Map.Entry;
 
 import javax.swing.JTextPane;
+
 import java.awt.Color;
+
 import javax.swing.UIManager;
+
 import java.awt.Font;
 
 public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
@@ -103,10 +108,11 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 	private JTextPane commentComponent;
 	private String comment;
 	private String binSize;
-	private HashMap<Id, int[]> linkOutFlow;
-	private HashMap<Id, double[]> instantaneousLinkDensities;
-	private HashMap<Id, double[]> averageLinkDensities;
+	private HashMap<MultiModalFlowAndDensityCollector.FlowType, HashMap<Id, int[]>> linkOutFlowsByType = new HashMap<MultiModalFlowAndDensityCollector.FlowType, HashMap<Id, int[]>>();
+	private HashMap<MultiModalFlowAndDensityCollector.FlowType, HashMap<Id, int[]>> instantaneousLinkOccupancyByType = new HashMap<MultiModalFlowAndDensityCollector.FlowType, HashMap<Id, int[]>>();
+	private HashMap<MultiModalFlowAndDensityCollector.FlowType, HashMap<Id, double[]>> averageLinkOccupancyByType = new HashMap<MultiModalFlowAndDensityCollector.FlowType, HashMap<Id, double[]>>();
 	private Map<Id, ? extends Link> links;
+	private int numberOfTimeBins;
 
 	/**
 	 * Launch the application.
@@ -506,8 +512,10 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 		//
 		// inflowHandler.reset(0);
 		// outflowHandler.reset(0);
-		FlowAndDensityCollector flowAndDensityCollector = new FlowAndDensityCollector(links, binSizeInSeconds);
+		MultiModalFlowAndDensityCollector flowAndDensityCollector = new MultiModalFlowAndDensityCollector(links,
+				binSizeInSeconds);
 		flowAndDensityCollector.reset(0);
+		this.numberOfTimeBins = flowAndDensityCollector.getNumberOfTimeBins();
 
 		EventsManager events = EventsUtils.createEventsManager(); // create new
 																	// object of
@@ -521,19 +529,21 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
 
 		reader.parse(eventsFile); // where we find events data
+		for (MultiModalFlowAndDensityCollector.FlowType flowType : MultiModalFlowAndDensityCollector.FlowType.values()) {
+			HashMap<Id, int[]> linkInFlow = flowAndDensityCollector.getLinkInFlow(flowType);
+			HashMap<Id, int[]> linkOutFlow = flowAndDensityCollector.getLinkOutFlow(flowType);
 
-		HashMap<Id, int[]> linkInFlow = flowAndDensityCollector.getLinkInFlow(); // get
-		// the
-		// matrix
-		linkOutFlow = flowAndDensityCollector.getLinkOutFlow();
-
-		HashMap<Id, int[]> deltaFlow = MainDensityAnalysisWithPt.deltaFlow(linkInFlow, linkOutFlow);
-		instantaneousLinkDensities = MainDensityAnalysisWithPt.calculateDensity(deltaFlow, links);
-		averageLinkDensities = flowAndDensityCollector.getAvgDeltaFlow();
-
+			HashMap<Id, int[]> deltaFlow = MainDensityAnalysisWithPt.deltaFlow(linkInFlow, linkOutFlow);
+			HashMap<Id, int[]> instantaneousLinkOccupancy = flowAndDensityCollector.calculateOccupancy(deltaFlow,
+					links);
+			HashMap<Id, double[]> averageLinkDensities = flowAndDensityCollector.getAvgDeltaFlow(flowType);
+			// add to the map of flows
+			this.linkOutFlowsByType.put(flowType, linkOutFlow);
+			this.instantaneousLinkOccupancyByType.put(flowType, instantaneousLinkOccupancy);
+			this.averageLinkOccupancyByType.put(flowType, averageLinkDensities);
+		}
 		// if there arent any postgres properties, attempt to write to csv, else
 		// write to postgres
-
 		writeResults(!postgresPropertiesComponent.getText().equals(""));
 
 	}
@@ -548,10 +558,15 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 		columns.add(new PostgresqlColumnDefinition("link_id", PostgresType.TEXT));
 		columns.add(new PostgresqlColumnDefinition("length", PostgresType.FLOAT8));
 		columns.add(new PostgresqlColumnDefinition("lanes", PostgresType.FLOAT8));
-		columns.add(new PostgresqlColumnDefinition("bin_end_time", PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("outflow", PostgresType.INT));
-		columns.add(new PostgresqlColumnDefinition("veh_per_lane_km_instantaneous", PostgresType.FLOAT8));
-		columns.add(new PostgresqlColumnDefinition("avg_number_of_vehicles_on_link", PostgresType.FLOAT8));
+		columns.add(new PostgresqlColumnDefinition("bin_start_time", PostgresType.INT));
+		columns.add(new PostgresqlColumnDefinition("allowed_modes", PostgresType.TEXT));
+		for (MultiModalFlowAndDensityCollector.FlowType flowType : MultiModalFlowAndDensityCollector.FlowType.values()) {
+			columns.add(new PostgresqlColumnDefinition("outflow_" + flowType.toString().toLowerCase(), PostgresType.INT));
+			columns.add(new PostgresqlColumnDefinition("vehs_on_link_instant_" + flowType.toString().toLowerCase(),
+					PostgresType.INT));
+			columns.add(new PostgresqlColumnDefinition("avg_vehs_on_link_" + flowType.toString().toLowerCase(),
+					PostgresType.FLOAT8));
+		}
 		TableWriter densityWriter = null;
 		if (toSQL) {
 			String tabname = schemaNameComponent.getText() + "." + densityTableName;
@@ -572,21 +587,34 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 			String networkFileName = networkFileComponent.getText();
 			networkFileName = networkFileName.replaceAll("\\\\", "/");
 			networkFileName = networkFileName.replaceAll(":", "");
-			densityWriter.addComment(String.format(
-					"Link outflow and density in veh per lane km for network %s from events file %s, created on %s. Bin size is %s",
-					networkFileName, eventsFileName, formattedDate, binSizeComponent.getText()));
+			densityWriter
+					.addComment(String
+							.format("Link outflow and density in veh per lane km for network %s from events file %s, created on %s. Bin size is %s",
+									networkFileName, eventsFileName, formattedDate, binSizeComponent.getText()));
 
 		}
-
-		for (Id id : linkOutFlow.keySet()) {
-			int[] flows = linkOutFlow.get(id);
-			double[] densities = instantaneousLinkDensities.get(id);
-			double[] avgLevels = averageLinkDensities.get(id);
-			for (int i = 0; i < flows.length; i++) {
-				Object[] args = { id.toString(), new Double(links.get(id).getLength()),
-						new Double(links.get(id).getNumberOfLanes()),
-						new Integer(i * Integer.parseInt(this.binSizeComponent.getText())), new Integer(flows[i]),
-						new Double(densities[i]), new Double(avgLevels[i]) };
+		for (Id id : links.keySet()) {
+			for (int i = 0; i < this.numberOfTimeBins; i++) {
+				Object[] args = new Object[columns.size()];
+				args[0] = id.toString();
+				args[1] = new Double(links.get(id).getLength());
+				args[2] = new Double(links.get(id).getNumberOfLanes());
+				args[3] = new Integer(i * Integer.parseInt(this.binSizeComponent.getText()));
+				args[4] = links.get(id).getAllowedModes();
+				int argsIndex = 5;
+				for (MultiModalFlowAndDensityCollector.FlowType flowType : MultiModalFlowAndDensityCollector.FlowType
+						.values()) {
+					HashMap<Id, int[]> linkOutFlow = this.linkOutFlowsByType.get(flowType);
+					HashMap<Id, int[]> instantaneousLinkOccupancy = this.instantaneousLinkOccupancyByType
+							.get(flowType);
+					HashMap<Id, double[]> averageLinkDensities = this.averageLinkOccupancyByType.get(flowType);
+					int[] flows = linkOutFlow.get(id);
+					int[] occupancy = instantaneousLinkOccupancy.get(id);
+					double[] avgOccup = averageLinkDensities.get(id);
+					args[argsIndex++] = flows == null ? 0 : new Integer(flows[i]);
+					args[argsIndex++] = occupancy == null ? 0 : new Integer(occupancy[i]);
+					args[argsIndex++] = avgOccup == null ? 0 : new Double(avgOccup[i]);
+				}
 				densityWriter.addLine(args);
 			}
 

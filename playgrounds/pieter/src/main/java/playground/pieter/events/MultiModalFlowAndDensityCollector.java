@@ -43,8 +43,10 @@ import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
+import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
 
@@ -64,7 +66,7 @@ import playground.pieter.singapore.utils.postgresql.travelcomponents.Trip;
  */
 public class MultiModalFlowAndDensityCollector implements LinkLeaveEventHandler, LinkEnterEventHandler,
 		AgentArrivalEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
-		AgentWait2LinkEventHandler {
+		AgentWait2LinkEventHandler, TransitDriverStartsEventHandler {
 	private class PTVehicle {
 
 		// Attributes
@@ -73,6 +75,7 @@ public class MultiModalFlowAndDensityCollector implements LinkLeaveEventHandler,
 		boolean in = false;
 		private HashSet<Id> passengers = new HashSet<Id>();
 		Id lastStop;
+		private Id lastLink;
 		private double linkEnterTime = 0.0;
 
 		// Constructors
@@ -93,10 +96,23 @@ public class MultiModalFlowAndDensityCollector implements LinkLeaveEventHandler,
 			passengers.remove(passengerId);
 		}
 
+		public Id getLastLinkId() {
+			return lastLink;
+		}
+
+		public void setLastLinkId(Id link) {
+			lastLink = link;
+		}
+
+	}
+
+	public enum FlowType {
+		Car, PTVehicle, PTPassenger
 	}
 
 	// set the length of interval
 	private int binSizeInSeconds;
+	private int numberOfTimeBins;
 	private HashMap<Id, int[]> linkOutFlowCar;
 	private HashMap<Id, int[]> linkInFlowCar;
 	// store the times when the number of vehicles on each link changes,
@@ -106,7 +122,7 @@ public class MultiModalFlowAndDensityCollector implements LinkLeaveEventHandler,
 	private HashMap<Id, double[]> avgDeltaFlowCar;
 	private Map<Id, ? extends Link> filteredEquilNetLinks; // define
 	private int lastBinIndex = 0;
-	private HashSet<Id> transitDriverIds = new HashSet<Id>();
+	private HashMap<Id, Id> transitDriverIdToVehicleId = new HashMap<Id, Id>();
 	private Map<Id, PTVehicle> ptVehicles = new HashMap<Id, PTVehicle>();
 	private HashMap<Id, Id> lastEnteredLink = new HashMap<Id, Id>();
 	private HashMap<Id, int[]> linkOutFlowPTVehicle;
@@ -117,10 +133,12 @@ public class MultiModalFlowAndDensityCollector implements LinkLeaveEventHandler,
 	private HashMap<Id, int[]> linkInFlowPTPassenger;
 	private HashMap<Id, TreeMap<Integer, Integer>> deltaFlowPTPassenger;
 	private HashMap<Id, double[]> avgDeltaFlowPTPassenger;
+	private double lastTime;
 
 	public MultiModalFlowAndDensityCollector(Map<Id, ? extends Link> filteredEquilNetLinks, int binSizeInSeconds) {
 		this.filteredEquilNetLinks = filteredEquilNetLinks;
 		this.binSizeInSeconds = binSizeInSeconds;
+		this.numberOfTimeBins = (86400 / binSizeInSeconds) + 1;
 	}
 
 	@Override
@@ -153,6 +171,7 @@ public class MultiModalFlowAndDensityCollector implements LinkLeaveEventHandler,
 	}
 
 	private void leaveLink(Id linkId, double time, boolean isTransitVehicle, Id vehicleId) {
+		this.lastTime = time;
 		if (!filteredEquilNetLinks.containsKey(linkId)) {
 			return; // if the link is not in the link set, then exit the method
 		}
@@ -199,8 +218,7 @@ public class MultiModalFlowAndDensityCollector implements LinkLeaveEventHandler,
 							processingPassengers ? (lastDelta - ptVehicles.get(vehicleId).getNumberOfpassengers())
 									: (lastDelta - 1));
 				} else {
-					calculateAverageDeltaFlowsAndReinitialize(time, lastBinIndex, deltaFlow, avgDeltaFlow);
-					lastBinIndex = binIndex;
+					calculateAverageDeltaFlowsAndReinitialize(binIndex);
 					int lastDelta = deltaFlow.get(linkId).lastEntry().getValue();
 					// check if we're processing passengers and remove all the
 					// passengers in the vehicle from the link if so, else just
@@ -226,10 +244,14 @@ public class MultiModalFlowAndDensityCollector implements LinkLeaveEventHandler,
 	}
 
 	public void handleEvent(AgentWait2LinkEvent event) {
-		enterLink(event.getLinkId(), event.getTime(), transitDriverIds.contains(event.getPersonId()), null);
+		Id vehId = transitDriverIdToVehicleId.get(event.getPersonId());
+		if (vehId != null)
+			ptVehicles.get(vehId).setLastLinkId(event.getLinkId());
+		enterLink(event.getLinkId(), event.getTime(), vehId != null, vehId);
 	}
 
 	private void enterLink(Id linkId, double time, boolean isTransitVehicle, Id vehicleId) {
+		this.lastTime = time;
 		if (!filteredEquilNetLinks.containsKey(linkId)) {
 			return; // if the link is not in the link set, then exit the method
 		}
@@ -262,9 +284,9 @@ public class MultiModalFlowAndDensityCollector implements LinkLeaveEventHandler,
 			// this has to run for all
 			if (!linkInFlow.containsKey(linkId)) {
 				// size the array to number of intervals
-				linkInFlow.put(linkId, new int[(86400 / binSizeInSeconds) + 1]);
-				linkOutFlow.put(linkId, new int[(86400 / binSizeInSeconds) + 1]);
-				avgDeltaFlow.put(linkId, new double[(86400 / binSizeInSeconds) + 1]);
+				linkInFlow.put(linkId, new int[numberOfTimeBins]);
+				linkOutFlow.put(linkId, new int[numberOfTimeBins]);
+				avgDeltaFlow.put(linkId, new double[numberOfTimeBins]);
 				// start tracking the number of vehicles on this link
 				deltaFlow.put(linkId, new TreeMap<Integer, Integer>());
 				TreeMap<Integer, Integer> df = deltaFlow.get(linkId);
@@ -289,8 +311,7 @@ public class MultiModalFlowAndDensityCollector implements LinkLeaveEventHandler,
 									: (lastDelta + 1));
 
 				} else {
-					calculateAverageDeltaFlowsAndReinitialize(time, lastBinIndex, deltaFlow, avgDeltaFlow);
-					lastBinIndex = binIndex;
+					calculateAverageDeltaFlowsAndReinitialize(binIndex);
 					int lastDelta = deltaFlow.get(linkId).lastEntry().getValue();
 					deltaFlow.get(linkId).put(
 							(int) time,
@@ -310,47 +331,168 @@ public class MultiModalFlowAndDensityCollector implements LinkLeaveEventHandler,
 		}
 	}
 
-	private void calculateAverageDeltaFlowsAndReinitialize(double time, int binIndex,
-			HashMap<Id, TreeMap<Integer, Integer>> deltaFlow, HashMap<Id, double[]> avgDeltaFlow) {
+	/**
+	 * @param linkId
+	 * @param time
+	 *            <P>
+	 *            increments the number of passengers on a link when a person
+	 *            boards a pt vehicle
+	 */
+	private void enterPassenger(Id linkId, double time) {
+		this.lastTime = time;
+		if (!filteredEquilNetLinks.containsKey(linkId)) {
+			return;
+		}
 
-		for (Id id : deltaFlow.keySet()) {
-			ArrayList<Integer> times = new ArrayList<Integer>();
-			times.addAll(deltaFlow.get(id).keySet());
-			Collections.sort(times);
-			int endTime = (int) time - 1; // the bin ends one second before the
-											// start of the new bin, which is
-											// the only time this method gets
-											// called
-			double weightedLevel = 0;
-			int lastDelta = 0;
-			for (int t = times.size() - 1; t >= 0; t--) {
-				lastDelta = deltaFlow.get(id).get(times.get(t));
-				weightedLevel += lastDelta * (endTime - times.get(t));
-				endTime = times.get(t);
+		HashMap<Id, TreeMap<Integer, Integer>> deltaFlow;
+		HashMap<Id, double[]> avgDeltaFlow;
+
+		deltaFlow = deltaFlowPTPassenger;
+		avgDeltaFlow = avgDeltaFlowPTPassenger;
+		HashMap<Id, int[]> linkInFlow = linkInFlowPTPassenger;
+
+		int binIndex = (int) Math.round(Math.floor(time / binSizeInSeconds));
+		int[] inBins = linkInFlow.get(linkId);
+		if (time < 86400) {
+			inBins[binIndex] = inBins[binIndex] + 1;
+			if (binIndex == lastBinIndex) {
+				int lastDelta = deltaFlow.get(linkId).lastEntry().getValue();
+				deltaFlow.get(linkId).put((int) time, lastDelta + 1);
+
+			} else {
+				calculateAverageDeltaFlowsAndReinitialize(binIndex);
+				int lastDelta = deltaFlow.get(linkId).lastEntry().getValue();
+				deltaFlow.get(linkId).put((int) time, lastDelta + 1);
 			}
-			avgDeltaFlow.get(id)[binIndex] = weightedLevel / (double) binSizeInSeconds;
-			// store the last delta and initialize the new structure with this
-			// value
-			lastDelta = deltaFlow.get(id).floorEntry((int) time).getValue();
-			deltaFlow.get(id).clear();
-			deltaFlow.get(id).put((int) time, lastDelta);
 		}
 
 	}
 
-	public HashMap<Id, int[]> getLinkOutFlowCar() {
-		return linkOutFlowCar;
+	/**
+	 * @param linkId
+	 * @param time
+	 *            <P>
+	 *            decrements the number of passengers on a link when a person
+	 *            exits a transit vehicle
+	 */
+	private void exitPassenger(Id linkId, double time) {
+		this.lastTime = time;
+		if (!filteredEquilNetLinks.containsKey(linkId)) {
+			return; // if the link is not in the link set, then exit the method
+		}
+
+		HashMap<Id, TreeMap<Integer, Integer>> deltaFlow;
+		HashMap<Id, double[]> avgDeltaFlow;
+
+		deltaFlow = deltaFlowPTPassenger;
+		avgDeltaFlow = avgDeltaFlowPTPassenger;
+		HashMap<Id, int[]> linkOutFlow = linkOutFlowPTPassenger;
+
+		int binIndex = (int) Math.round(Math.floor(time / binSizeInSeconds));
+		int[] outBins = linkOutFlow.get(linkId);
+		if (time < 86400) {
+			// increment the number of vehicles/passengers entering this
+			// link
+			outBins[binIndex] = outBins[binIndex] + 1;
+			if (binIndex == lastBinIndex) {
+				int lastDelta = deltaFlow.get(linkId).lastEntry().getValue();
+				deltaFlow.get(linkId).put((int) time, lastDelta - 1);
+
+			} else {
+				calculateAverageDeltaFlowsAndReinitialize(binIndex);
+				int lastDelta = deltaFlow.get(linkId).lastEntry().getValue();
+				deltaFlow.get(linkId).put((int) time, lastDelta - 1);
+			}
+		}
+
 	}
 
-	public HashMap<Id, int[]> getLinkInFlowCar() {
-		return linkInFlowCar;
+	private void calculateAverageDeltaFlowsAndReinitialize(int binIndex) {
+
+		HashMap<Id, TreeMap<Integer, Integer>> deltaFlow = null;
+		HashMap<Id, double[]> avgDeltaFlow = null;
+		while (lastBinIndex < binIndex) {
+
+			for (FlowType flowType : FlowType.values()) {
+				switch (flowType) {
+				case Car:
+					deltaFlow = deltaFlowCar;
+					avgDeltaFlow = avgDeltaFlowCar;
+					break;
+				case PTPassenger:
+					deltaFlow = deltaFlowPTPassenger;
+					avgDeltaFlow = avgDeltaFlowPTPassenger;
+					break;
+				case PTVehicle:
+					deltaFlow = deltaFlowPTVehicle;
+					avgDeltaFlow = avgDeltaFlowPTVehicle;
+					break;
+				default:
+					break;
+				}
+				for (Id id : deltaFlow.keySet()) {
+					ArrayList<Integer> times = new ArrayList<Integer>();
+					times.addAll(deltaFlow.get(id).keySet());
+					Collections.sort(times);
+					int endTime = (lastBinIndex + 1) * binSizeInSeconds;
+					double weightedLevel = 0;
+					int lastDelta = 0;
+					for (int t = times.size() - 1; t >= 0; t--) {
+						lastDelta = deltaFlow.get(id).get(times.get(t));
+						weightedLevel += lastDelta * (endTime - times.get(t));
+						endTime = times.get(t);
+					}
+					avgDeltaFlow.get(id)[lastBinIndex] = weightedLevel / (double) binSizeInSeconds;
+					// store the last delta and initialize the new structure
+					// with
+					// this
+					// value
+					lastDelta = deltaFlow.get(id).lastEntry().getValue();
+					deltaFlow.get(id).clear();
+					deltaFlow.get(id).put((lastBinIndex + 1) * binSizeInSeconds, lastDelta);
+				}
+			}
+			// complete, update the binindex
+			lastBinIndex++;
+		}
+	}
+
+	public HashMap<Id, int[]> getLinkOutFlow(FlowType flowType) {
+		switch (flowType) {
+		case Car:
+			return this.linkOutFlowCar;
+		case PTVehicle:
+			return this.linkOutFlowPTVehicle;
+		case PTPassenger:
+			return this.linkOutFlowPTPassenger;
+
+		default:
+			return null;
+		}
+	}
+
+	public HashMap<Id, int[]> getLinkInFlow(FlowType flowType) {
+		switch (flowType) {
+		case Car:
+			return this.linkInFlowCar;
+		case PTVehicle:
+			return this.linkInFlowPTVehicle;
+		case PTPassenger:
+			return this.linkInFlowPTPassenger;
+
+		default:
+			return null;
+		}
 	}
 
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
 		if (lastEnteredLink.containsKey(event.getPersonId()) && lastEnteredLink.get(event.getPersonId()) != null) {
 			if (lastEnteredLink.get(event.getPersonId()).equals(event.getLinkId())) {
-				leaveLink(event.getLinkId(), event.getTime(), transitDriverIds.contains(event.getPersonId()), null);
+
+				Id vehId = transitDriverIdToVehicleId.get(event.getPersonId());
+				leaveLink(event.getLinkId(), event.getTime(), vehId != null, vehId);
+
 				lastEnteredLink.put(event.getPersonId(), null); // reset value
 			}
 
@@ -360,18 +502,31 @@ public class MultiModalFlowAndDensityCollector implements LinkLeaveEventHandler,
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		lastEnteredLink.put(event.getPersonId(), event.getLinkId());
+		if (ptVehicles.containsKey(event.getVehicleId()))
+			ptVehicles.get(event.getVehicleId()).setLastLinkId(event.getLinkId());
+
 		enterLink(event.getLinkId(), event.getTime(), ptVehicles.containsKey(event.getVehicleId()),
 				event.getVehicleId());
 	}
 
-	public HashMap<Id, double[]> getAvgDeltaFlowCar() {
-		return avgDeltaFlowCar;
+	public HashMap<Id, double[]> getAvgDeltaFlow(FlowType flowType) {
+		switch (flowType) {
+		case Car:
+			return this.avgDeltaFlowCar;
+		case PTVehicle:
+			return this.avgDeltaFlowPTVehicle;
+		case PTPassenger:
+			return this.avgDeltaFlowPTPassenger;
+
+		default:
+			return null;
+		}
 	}
 
 	public void handleEvent(TransitDriverStartsEvent event) {
 		try {
 			ptVehicles.put(event.getVehicleId(), new PTVehicle(event.getTransitLineId(), event.getTransitRouteId()));
-			transitDriverIds.add(event.getDriverId());
+			transitDriverIdToVehicleId.put(event.getDriverId(), event.getVehicleId());
 		} catch (Exception e) {
 			String fullStackTrace = org.apache.commons.lang.exception.ExceptionUtils.getFullStackTrace(e);
 			System.err.println(fullStackTrace);
@@ -382,11 +537,12 @@ public class MultiModalFlowAndDensityCollector implements LinkLeaveEventHandler,
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		try {
-			if (transitDriverIds.contains(event.getPersonId()))
+			if (transitDriverIdToVehicleId.keySet().contains(event.getPersonId()))
 				return;
 			if (ptVehicles.keySet().contains(event.getVehicleId())) {
 
 				ptVehicles.get(event.getVehicleId()).addPassenger(event.getPersonId());
+				enterPassenger(ptVehicles.get(event.getVehicleId()).getLastLinkId(), event.getTime());
 
 			}
 		} catch (Exception e) {
@@ -398,13 +554,14 @@ public class MultiModalFlowAndDensityCollector implements LinkLeaveEventHandler,
 
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
-		if (transitDriverIds.contains(event.getPersonId()))
+		if (transitDriverIdToVehicleId.keySet().contains(event.getPersonId()))
 			return;
 		try {
 			if (ptVehicles.keySet().contains(event.getVehicleId())) {
 
 				PTVehicle vehicle = ptVehicles.get(event.getVehicleId());
 				vehicle.removePassenger(event.getPersonId());
+				exitPassenger(ptVehicles.get(event.getVehicleId()).getLastLinkId(), event.getTime());
 
 			}
 
@@ -413,5 +570,73 @@ public class MultiModalFlowAndDensityCollector implements LinkLeaveEventHandler,
 			System.err.println(fullStackTrace);
 			System.err.println(event.toString());
 		}
+	}
+
+	public int getNumberOfTimeBins() {
+		return numberOfTimeBins;
+	}
+
+	public HashMap<Id, double[]> calculateDensity(HashMap<Id, int[]> deltaFlow, Map<Id, ? extends Link> links) {
+		// send actual link info.)
+		HashMap<Id, double[]> density = new HashMap<Id, double[]>();
+
+		for (Id linkId : deltaFlow.keySet()) {
+			density.put(linkId, null);
+		}
+
+		for (Id linkId : density.keySet()) {
+
+			if (linkId.equals(new IdImpl(126216))) {
+				System.out.println();
+			}
+
+			int[] deltaflowBins = deltaFlow.get(linkId);// give labels to
+														// deltaflowBins
+			double[] densityBins = new double[deltaflowBins.length];
+			Link link = links.get(linkId);
+			densityBins[0] = deltaflowBins[0];
+			for (int i = 1; i < deltaflowBins.length; i++) {
+				densityBins[i] = (densityBins[i - 1] + deltaflowBins[i]);
+			}
+
+			for (int i = 1; i < deltaflowBins.length; i++) {
+				densityBins[i] = densityBins[i] / (link.getLength() * link.getNumberOfLanes()) * 1000;
+			}
+
+			density.put(linkId, densityBins);
+			deltaFlow.remove(linkId);
+		}
+
+		return density;
+	}
+
+	public HashMap<Id, int[]> calculateOccupancy(HashMap<Id, int[]> deltaFlow, Map<Id, ? extends Link> links) {
+		// send actual link info.)
+		HashMap<Id, int[]> occupancy = new HashMap<Id, int[]>();
+
+		for (Id linkId : deltaFlow.keySet()) {
+			occupancy.put(linkId, null);
+		}
+
+		for (Id linkId : occupancy.keySet()) {
+
+			if (linkId.equals(new IdImpl(126216))) {
+				System.out.println();
+			}
+
+			int[] deltaflowBins = deltaFlow.get(linkId);// give labels to
+														// deltaflowBins
+			int[] occupancyBins = new int[deltaflowBins.length];
+			Link link = links.get(linkId);
+			occupancyBins[0] = deltaflowBins[0];
+			for (int i = 1; i < deltaflowBins.length; i++) {
+				occupancyBins[i] = (occupancyBins[i - 1] + deltaflowBins[i]);
+			}
+
+			occupancy.put(linkId, occupancyBins);
+			deltaFlow.remove(linkId);
+		}
+
+		return occupancy;
 	}
 }
