@@ -55,7 +55,7 @@ public class MultimodalTripRouterFactory implements TripRouterFactory {
 	
 	protected static final Logger log = Logger.getLogger(MultimodalTripRouterFactory.class);
 	
-	private final Controler controler;
+	private final TripRouterObjectProvider objectProvider;
 	private final Map<String, TravelTime> multimodalTravelTimes;
 	
 	private TripRouterFactory delegateFactory;
@@ -63,13 +63,25 @@ public class MultimodalTripRouterFactory implements TripRouterFactory {
 	private final Map<String, Network> multimodalSubNetworks = new HashMap<String, Network>();
 	
 	public MultimodalTripRouterFactory(Controler controler, Map<String, TravelTime> multimodalTravelTimes) {
-		this.controler = controler;
 		this.multimodalTravelTimes = multimodalTravelTimes;
+		this.objectProvider = new TripRouterObjectProvider(controler);
 	}
 	
 	public MultimodalTripRouterFactory(Controler controler, Map<String, TravelTime> multimodalTravelTimes, 
 			TripRouterFactory delegate) {
-		this.controler = controler;
+		this.objectProvider = new TripRouterObjectProvider(controler);
+		this.multimodalTravelTimes = multimodalTravelTimes;
+		this.delegateFactory = delegate;
+	}
+	
+	public MultimodalTripRouterFactory(TripRouterObjectProvider objectProvider, Map<String, TravelTime> multimodalTravelTimes) {
+		this.objectProvider = objectProvider;
+		this.multimodalTravelTimes = multimodalTravelTimes;
+	}
+	
+	public MultimodalTripRouterFactory(TripRouterObjectProvider objectProvider, Map<String, TravelTime> multimodalTravelTimes, 
+			TripRouterFactory delegate) {
+		this.objectProvider = objectProvider;
 		this.multimodalTravelTimes = multimodalTravelTimes;
 		this.delegateFactory = delegate;
 	}
@@ -79,22 +91,22 @@ public class MultimodalTripRouterFactory implements TripRouterFactory {
 
 		if (this.delegateFactory == null) {
 			this.delegateFactory = new TripRouterFactoryImpl(
-					controler.getScenario(),
-					controler.getTravelDisutilityFactory(),
-					controler.getLinkTravelTimes(),
-					controler.getLeastCostPathCalculatorFactory(),
-					controler.getTransitRouterFactory() );
+					this.objectProvider.getScenario(),
+					this.objectProvider.getTravelDisutilityFactory(),
+					this.objectProvider.getTravelTime(),
+					this.objectProvider.getLeastCostPathCalculatorFactory(),
+					this.objectProvider.getTransitRouterFactory());
 		}
 		TripRouter instance = this.delegateFactory.instantiateAndConfigureTripRouter();
 		
-		Network network = this.controler.getNetwork();
-		LeastCostPathCalculatorFactory leastCostAlgoFactory = this.controler.getLeastCostPathCalculatorFactory();
-		TravelDisutilityFactory travelDisutilityFactory = this.controler.getTravelDisutilityFactory();
-		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = this.controler.getConfig().planCalcScore();
-		PopulationFactory populationFactory = this.controler.getPopulation().getFactory();
+		Network network = this.objectProvider.getScenario().getNetwork();
+		LeastCostPathCalculatorFactory leastCostAlgoFactory = this.objectProvider.getLeastCostPathCalculatorFactory();
+		TravelDisutilityFactory travelDisutilityFactory = this.objectProvider.getTravelDisutilityFactory();
+		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = this.objectProvider.getScenario().getConfig().planCalcScore();
+		PopulationFactory populationFactory = this.objectProvider.getScenario().getPopulation().getFactory();
 		ModeRouteFactory modeRouteFactory = ((PopulationFactoryImpl) populationFactory).getModeRouteFactory();
 		
-		Set<String> simulatedModes = CollectionUtils.stringToSet(this.controler.getConfig().multiModal().getSimulatedModes());
+		Set<String> simulatedModes = CollectionUtils.stringToSet(this.objectProvider.getScenario().getConfig().multiModal().getSimulatedModes());
 		for (String mode : simulatedModes) {
 
 			if (instance.getRegisteredModes().contains(mode)) {
