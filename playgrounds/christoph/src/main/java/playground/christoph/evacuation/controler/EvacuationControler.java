@@ -321,7 +321,7 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		/*
 		 * Using a LegModeChecker to ensure that all agents' plans have valid mode chains.
 		 */
-		LegModeChecker legModeChecker = new LegModeChecker(this.getTripRouterFactory().instantiateAndConfigureTripRouter());
+		LegModeChecker legModeChecker = new LegModeChecker(this.getTripRouterFactory().instantiateAndConfigureTripRouter(), this.getNetwork());
 		legModeChecker.setValidNonCarModes(new String[]{TransportMode.walk, TransportMode.bike, TransportMode.pt});
 		legModeChecker.setToCarProbability(0.5);
 		legModeChecker.run(this.scenarioData.getPopulation());

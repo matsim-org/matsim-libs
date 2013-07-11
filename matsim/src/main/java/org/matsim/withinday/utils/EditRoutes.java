@@ -102,18 +102,6 @@ public class EditRoutes {
 		
 		return true;
 	}
-	
-	@Deprecated
-	public boolean replanFutureLegRoute(Plan plan, int legPlanElementIndex, TripRouter tripRouter) {
-		
-		Leg leg;
-		PlanElement planElement = plan.getPlanElements().get(legPlanElementIndex);
-		if (planElement instanceof Leg) {
-			leg = (Leg) planElement;
-		} else return false;
-		
-		return replanFutureLegRoute(leg, plan.getPerson(), null, tripRouter);
-	}
 
 	/**
 	 * Re-locates a future route. The route is given by its leg.

@@ -52,12 +52,14 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 	
 	private final SwissPTTravelTime ptTravelTime;
 	private final TripRouter tripRouter;
+	private final EditRoutes editRoutes;
 	
 	/*package*/ EndActivityAndEvacuateReplanner(Id id, Scenario scenario, InternalInterface internalInterface, 
 			SwissPTTravelTime ptTravelTime, TripRouter tripRouter) {
 		super(id, scenario, internalInterface);
 		this.ptTravelTime = ptTravelTime;
 		this.tripRouter = tripRouter;
+		this.editRoutes = new EditRoutes();
 	}
 	
 	@Override
@@ -123,7 +125,8 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 		executedPlan.insertLegAct(position, legToRescue, rescueActivity);
 		
 		// calculate route for the leg to the rescue facility
-		new EditRoutes().replanFutureLegRoute(executedPlan, position, tripRouter);
+		this.editRoutes.relocateFutureLegRoute(legToRescue, currentActivity.getLinkId(), rescueActivity.getLinkId(), 
+				executedPlan.getPerson(), scenario.getNetwork(), tripRouter);
 
 		/*
 		 * Identify the last non-rescue link and relocate rescue activity to it.
@@ -154,7 +157,8 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 				legToRescue.setMode(TransportMode.pt);
 				
 				// calculate route for the leg to the rescue facility
-				new EditRoutes().replanFutureLegRoute(executedPlan, position, tripRouter);
+				this.editRoutes.relocateFutureLegRoute(legToRescue, currentActivity.getLinkId(), rescueActivity.getLinkId(), 
+						executedPlan.getPerson(), scenario.getNetwork(), tripRouter);
 				
 				// set travel time
 				legToRescue.getRoute().setTravelTime(travelTimePT);

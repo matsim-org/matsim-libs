@@ -61,6 +61,7 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 	protected final ModeAvailabilityChecker modeAvailabilityChecker;
 	protected final SwissPTTravelTime ptTravelTime;
 	protected final TripRouter tripRouter;
+	protected final EditRoutes editRoutes;
 	
 	/*package*/ CurrentActivityToMeetingPointReplanner(Id id, Scenario scenario,
 			InternalInterface internalInterface, DecisionDataProvider decisionDataProvider,
@@ -71,6 +72,7 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 		this.modeAvailabilityChecker = modeAvailabilityChecker;
 		this.ptTravelTime = ptTravelTime;
 		this.tripRouter = tripRouter;
+		this.editRoutes = new EditRoutes();
 	}
 	
 	@Override
@@ -156,7 +158,8 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 			executedPlan.insertLegAct(position, legToMeeting, meetingActivity);
 			
 			// calculate route for the leg to the rescue facility using the identified mode
-			new EditRoutes().replanFutureLegRoute(executedPlan, position, tripRouter);
+			this.editRoutes.relocateFutureLegRoute(legToMeeting, currentActivity.getLinkId(), meetingActivity.getLinkId(), 
+					executedPlan.getPerson(), scenario.getNetwork(), tripRouter);
 			
 			// if the person has to walk, we additionally try pt
 			if (transportMode.equals(TransportMode.walk)) {
@@ -167,9 +170,9 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 				// If using pt is faster than walking switch to pt.
 				if (travelTimePT < travelTimeWalk) {
 					legToMeeting.setMode(TransportMode.pt);
-					
-					// calculate route for the leg to the rescue facility
-					new EditRoutes().replanFutureLegRoute(executedPlan, position, tripRouter);
+										
+					this.editRoutes.relocateFutureLegRoute(legToMeeting, currentActivity.getLinkId(), meetingActivity.getLinkId(), 
+							executedPlan.getPerson(), scenario.getNetwork(), tripRouter);
 					
 					// set travel time
 					legToMeeting.getRoute().setTravelTime(travelTimePT);

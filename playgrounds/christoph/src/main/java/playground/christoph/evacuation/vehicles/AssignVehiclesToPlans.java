@@ -75,7 +75,7 @@ public class AssignVehiclesToPlans extends AbstractPersonAlgorithm implements Pl
 		this.addedCarLegsCounter = new Counter("Legs with mode changed from another mode to car: ");
 		this.mapping = new HashMap<Id, Id>();
 		
-		this.legModeChecker = new LegModeChecker(tripRouter);
+		this.legModeChecker = new LegModeChecker(tripRouter, scenario.getNetwork());
 		this.editRoutes = new EditRoutes();
 	}
 	
@@ -184,7 +184,7 @@ public class AssignVehiclesToPlans extends AbstractPersonAlgorithm implements Pl
 				else if (distance < 5000.0) leg.setMode(TransportMode.bike);
 				else leg.setMode(TransportMode.pt);
 				
-				editRoutes.replanFutureLegRoute(plan, i, tripRouter);
+				this.editRoutes.replanFutureLegRoute(leg, plan.getPerson(), scenario.getNetwork(), tripRouter);
 				
 //				/*
 //				 * Create a new route for the given leg.
@@ -252,7 +252,7 @@ public class AssignVehiclesToPlans extends AbstractPersonAlgorithm implements Pl
 					 */
 					leg.setMode(TransportMode.car);
 					
-					editRoutes.replanFutureLegRoute(plan, i, tripRouter);
+					this.editRoutes.replanFutureLegRoute(leg, plan.getPerson(), scenario.getNetwork(), tripRouter);
 					
 //					Activity previousActivity = (Activity) plan.getPlanElements().get(i - 1);
 //					Activity nextActivity = (Activity) plan.getPlanElements().get(i + 1);

@@ -66,6 +66,7 @@ public class JoinedHouseholdsReplanner extends WithinDayDuringActivityReplanner 
 	private final JoinedHouseholdsIdentifier identifier;
 	private final SwissPTTravelTime ptTravelTime;
 	private final TripRouter tripRouter;
+	private final EditRoutes editRoutes;
 	
 	public JoinedHouseholdsReplanner(Id id, Scenario scenario, InternalInterface internalInterface, 
 			DecisionDataProvider decisionDataProvider, JoinedHouseholdsIdentifier identifier,
@@ -75,6 +76,7 @@ public class JoinedHouseholdsReplanner extends WithinDayDuringActivityReplanner 
 		this.identifier = identifier;
 		this.ptTravelTime = ptTravelTime;
 		this.tripRouter = tripRouter;
+		this.editRoutes = new EditRoutes();
 	}
 
 	@Override
@@ -148,7 +150,8 @@ public class JoinedHouseholdsReplanner extends WithinDayDuringActivityReplanner 
 		executedPlan.insertLegAct(position, legToMeeting, meetingActivity);
 		
 		// calculate route for the leg to the rescue facility
-		new EditRoutes().replanFutureLegRoute(executedPlan, position, tripRouter);
+		this.editRoutes.relocateFutureLegRoute(legToMeeting, currentActivity.getLinkId(), meetingActivity.getLinkId(), 
+				executedPlan.getPerson(), scenario.getNetwork(), tripRouter);
 		
 		// set correct transport mode
 		legToMeeting.setMode(transportMode);
@@ -177,7 +180,8 @@ public class JoinedHouseholdsReplanner extends WithinDayDuringActivityReplanner 
 				legToMeeting.setMode(TransportMode.pt);
 				
 				// calculate route for the leg to the rescue facility
-				new EditRoutes().replanFutureLegRoute(executedPlan, position, tripRouter);
+				this.editRoutes.relocateFutureLegRoute(legToMeeting, currentActivity.getLinkId(), meetingActivity.getLinkId(), 
+						executedPlan.getPerson(), scenario.getNetwork(), tripRouter);
 				
 				// set travel time
 				legToMeeting.getRoute().setTravelTime(travelTimePT);

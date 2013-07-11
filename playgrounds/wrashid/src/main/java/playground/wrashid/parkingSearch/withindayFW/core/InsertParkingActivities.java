@@ -182,14 +182,17 @@ public class InsertParkingActivities implements PlanAlgorithm {
 					updateSecondParkingActivityLinkOfDayIfNeeded(parkingInfrastructure,plan,scenario);
 					
 					synchronized(this){
-						EditRoutes editRoutes=new EditRoutes();
+						EditRoutes editRoutes = new EditRoutes();
 												
 						//update walk leg
-						editRoutes.replanFutureLegRoute(plan, i-1, tripRouter);
+						Leg walkLeg = (Leg) plan.getPlanElements().get(i - 1);
+						editRoutes.relocateFutureLegRoute(walkLeg, walkLeg.getRoute().getStartLinkId(), 
+								act.getLinkId(), plan.getPerson(), scenario.getNetwork(), tripRouter);
+
 						//update car leg
-												
-												
-						editRoutes.replanFutureLegRoute(plan, i+1, tripRouter);
+						Leg carLeg = (Leg) plan.getPlanElements().get(i + 1);
+						editRoutes.relocateFutureLegRoute(carLeg, act.getLinkId(), 
+								carLeg.getRoute().getEndLinkId(), plan.getPerson(), scenario.getNetwork(), tripRouter);
 						
 						
 						//EditPartialRoute editPartialRoute=new EditPartialRoute(scenario, routingAlgorithm);

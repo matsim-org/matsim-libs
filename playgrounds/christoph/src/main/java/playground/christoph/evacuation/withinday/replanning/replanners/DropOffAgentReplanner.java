@@ -56,12 +56,14 @@ public class DropOffAgentReplanner extends WithinDayDuringLegReplanner {
 	
 	private final RouteFactory routeFactory;
 	private final TripRouter tripRouter;
+	private final EditRoutes editRoutes;
 	
 	/*package*/ DropOffAgentReplanner(Id id, Scenario scenario, InternalInterface internalInterface,
 			TripRouter tripRouter) {
 		super(id, scenario, internalInterface);
 		this.tripRouter = tripRouter;
 		this.routeFactory = new LinkNetworkRouteFactory();
+		this.editRoutes = new EditRoutes();
 	}
 
 	@Override
@@ -191,6 +193,7 @@ public class DropOffAgentReplanner extends WithinDayDuringLegReplanner {
 		/*
 		 * End agent's current leg at the current link.
 		 */
+		Id oldDestinationLinkId = currentLeg.getRoute().getEndLinkId();
 		currentLeg.getRoute().setEndLinkId(currentLinkId);
 		currentLeg.setTravelTime(this.time - currentLeg.getDepartureTime());
 		
@@ -209,7 +212,8 @@ public class DropOffAgentReplanner extends WithinDayDuringLegReplanner {
 		/*
 		 * Create a new route for the walk leg.
 		 */
-		new EditRoutes().replanFutureLegRoute(executedPlan, currentLegIndex + 2, this.tripRouter);
+		this.editRoutes.relocateFutureLegRoute(walkLeg, currentLinkId, oldDestinationLinkId, executedPlan.getPerson(), 
+				scenario.getNetwork(), tripRouter); 
 				
 		// Finally reset the cached Values of the PersonAgent - they may have changed!
 		withinDayAgent.resetCaches();
