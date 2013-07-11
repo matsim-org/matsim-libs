@@ -698,13 +698,15 @@ public class MultiModalDemo {
 			this.getEvents().addHandler(waitToLinkCalculator);
 			this.addControlerListener(waitToLinkCalculator);
 			
-			super.getMultiModalTravelTimes().put(TransportMode.bike, bikeTravelTime);
-			super.getMultiModalTravelTimes().put(TransportMode.walk, walkTravelTime);
+			Map<String, TravelTime> travelTimes = new HashMap<String, TravelTime>();
+			
+			travelTimes.put(TransportMode.bike, bikeTravelTime);
+			travelTimes.put(TransportMode.walk, walkTravelTime);
 			
 			for (PlanStrategy planStrategy : this.strategyManager.getStrategies()) {
 				if (planStrategy instanceof ChooseBestLegModePlanStrategy) {
 					((ChooseBestLegModePlanStrategy) planStrategy).setWaitToLinkCalculator(waitToLinkCalculator);
-					((ChooseBestLegModePlanStrategy) planStrategy).setTravelTimes(this.getMultiModalTravelTimes());
+					((ChooseBestLegModePlanStrategy) planStrategy).setTravelTimes(travelTimes);
 					((ChooseBestLegModePlanStrategy) planStrategy).setTravelDisutilityFactory(this.getTravelDisutilityFactory());
 				}
 			}
