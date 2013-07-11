@@ -211,17 +211,6 @@ public class EditRoutes {
 		// This is just a special case of relocateCurrentLegRoute where the end link of the route is not changed.
 		return relocateCurrentLegRoute(leg, person, currentLinkIndex, route.getEndLinkId(), time, network, tripRouter);
 	}
-	
-	@Deprecated
-	public boolean replanCurrentLegRoute(Plan plan, int legPlanElementIndex, int currentLinkIndex, TripRouter tripRouter, double time) {
-		Leg leg;
-		PlanElement planElement = plan.getPlanElements().get(legPlanElementIndex);
-		if (planElement instanceof Leg) {
-			leg = (Leg) planElement;
-		} else return false;
-
-		return this.replanCurrentLegRoute(leg, plan.getPerson(), currentLinkIndex, time, null, tripRouter);
-	}
 
 	private List<Id> getRouteLinkIds(Route route) {
 		List<Id> linkIds = new ArrayList<Id>();

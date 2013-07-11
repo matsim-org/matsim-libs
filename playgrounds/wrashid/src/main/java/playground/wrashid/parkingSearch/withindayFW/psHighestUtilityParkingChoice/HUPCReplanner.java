@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
@@ -45,7 +46,6 @@ import org.matsim.withinday.utils.EditRoutes;
 
 import playground.wrashid.parkingSearch.withindayFW.core.InsertParkingActivities;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingAgentsTracker;
-import playground.wrashid.parkingSearch.withindayFW.util.EditPartialRoute;
 
 /**
  * 
@@ -96,12 +96,12 @@ public class HUPCReplanner extends WithinDayDuringLegReplanner {
 				.get(parkingFacilityId);
 		firstParkingAct.setLinkId(parkingFacility.getLinkId());
 
-		
-		editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), firstWalkLegIndex, tripRouter);
+		Leg firstWalkLeg = (Leg) plan.getPlanElements().get(firstParkingActIndex);
+		this.editRoutes.relocateFutureLegRoute(firstWalkLeg, parkingFacility.getLinkId(), firstWalkLeg.getRoute().getEndLinkId(),
+				plan.getPerson(), scenario.getNetwork(), tripRouter);
 
 		Integer secondParkingActIndex = getSecondParkingActIndex(withinDayAgent);
 		if (!lastParkingOfDay(secondParkingActIndex)) {
-			
 			
 			Integer secondWalkgLegIndex = secondParkingActIndex - 1;
 			Integer nextCarLegIndex = secondParkingActIndex + 1;
@@ -113,26 +113,22 @@ public class HUPCReplanner extends WithinDayDuringLegReplanner {
 			InsertParkingActivities.updateNextParkingActivityIfNeededDuringDay(parkingAgentsTracker.getParkingInfrastructure(),
 					withinDayAgent, scenario, tripRouter);
 			
-			editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), secondWalkgLegIndex, tripRouter);
+			Leg secondWalkLeg = (Leg) plan.getPlanElements().get(secondWalkgLegIndex);
+			this.editRoutes.relocateFutureLegRoute(secondWalkLeg, secondWalkLeg.getRoute().getStartLinkId(), parkingFacility.getLinkId(),
+					plan.getPerson(), scenario.getNetwork(), tripRouter);
 			
-			editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), nextCarLegIndex, tripRouter);
+			Leg nextCarLeg = (Leg) plan.getPlanElements().get(nextCarLegIndex);
+			this.editRoutes.relocateFutureLegRoute(nextCarLeg, parkingFacility.getLinkId(), nextCarLeg.getRoute().getEndLinkId(),
+					plan.getPerson(), scenario.getNetwork(), tripRouter);
 		}
-		
-		
-
 		int currentLinkIndex = withinDayAgent.getCurrentRouteLinkIdIndex();
 		
-		
 		Route preRoute = ((LegImpl) plan.getPlanElements().get(currentLegIndex)).getRoute().clone();
-		//editRoutes.replanCurrentLegRoute(withinDayAgent.getSelectedPlan(), currentLegIndex, currentLinkIndex, routeAlgo, time);
-		editRoutes.replanCurrentLegRoute(plan, currentLegIndex, currentLinkIndex, tripRouter ,time);
 		
+		this.editRoutes.relocateCurrentLegRoute(withinDayAgent.getCurrentLeg(), plan.getPerson(), currentLinkIndex, 
+				parkingFacility.getLinkId(), time, scenario.getNetwork(), tripRouter);
 		
 		Route postRoute = ((LegImpl) plan.getPlanElements().get(currentLegIndex)).getRoute();
-		
-		
-		
-		
 
 		withinDayAgent.resetCaches();
 		return true;

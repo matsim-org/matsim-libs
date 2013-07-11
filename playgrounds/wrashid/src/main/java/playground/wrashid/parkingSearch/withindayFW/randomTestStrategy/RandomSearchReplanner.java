@@ -179,18 +179,18 @@ public class RandomSearchReplanner extends WithinDayDuringLegReplanner {
 				 * des Plans.
 				 */
 				InsertParkingActivities.updateNextParkingActivityIfNeededDuringDay(parkingAgentsTracker.getParkingInfrastructure()  , withinDayAgent , scenario, tripRouter);
-				
+							
+				if (nextParkingLegIndex!=null) {
 					
-				
-				if (nextParkingLegIndex!=null){
 					// update walk leg to parking activity
-					editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), nextParkingLegIndex - 1, tripRouter);
-					
-					
-					
+					Leg previousLeg = (Leg) plan.getPlanElements().get(nextParkingLegIndex - 1);
+					this.editRoutes.relocateFutureLegRoute(previousLeg, previousLeg.getRoute().getStartLinkId(), 
+							linkId, plan.getPerson(), scenario.getNetwork(), tripRouter);
+
 					// update car leg from parking activity
-					//editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), nextParkingLegIndex + 1, routeAlgo);
-					editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), nextParkingLegIndex + 1, tripRouter);
+					Leg nextLeg = (Leg) plan.getPlanElements().get(nextParkingLegIndex + 1);
+					this.editRoutes.relocateFutureLegRoute(nextLeg, linkId, previousLeg.getRoute().getEndLinkId(), 
+							plan.getPerson(), scenario.getNetwork(), tripRouter);					
 				}
 
 			// as we have found a parking on our way to the planned parking, we discard the rest
@@ -210,21 +210,16 @@ public class RandomSearchReplanner extends WithinDayDuringLegReplanner {
 //				editRoutes.replanCurrentLegRoute(plan, withinDayAgent.getCurrentPlanElementIndex(),
 //						withinDayAgent.getCurrentRouteLinkIdIndex(), routeAlgo, this.time);
 
-				editRoutes.replanCurrentLegRoute(plan, withinDayAgent.getCurrentPlanElementIndex(),
-						withinDayAgent.getCurrentRouteLinkIdIndex(), tripRouter, this.time);
-						
-				
+				this.editRoutes.relocateCurrentLegRoute(leg, plan.getPerson(), 
+						withinDayAgent.getCurrentRouteLinkIdIndex(), endLink, time, scenario.getNetwork(), tripRouter);			
 				
 				updateNextLeg = true;
 			}
 
 			// update walk leg away from arriving pariking act
-			editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(),
-					withinDayAgent.getCurrentPlanElementIndex() + 2, tripRouter);	
-			
-			
-			
-			
+			Leg nextLeg = (Leg) plan.getPlanElements().get(withinDayAgent.getCurrentPlanElementIndex() + 2);
+			this.editRoutes.relocateFutureLegRoute(nextLeg, endLink, nextLeg.getRoute().getEndLinkId(), 
+					plan.getPerson(), scenario.getNetwork(), tripRouter);	
 		}
 
 		withinDayAgent.resetCaches();

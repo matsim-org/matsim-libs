@@ -162,10 +162,14 @@ public class GPSNIReplanner extends WithinDayDuringLegReplanner {
 							a.setFacilityId(parkingFacilityId);
 
 							// update walk leg to parking activity
-							editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), i - 1, tripRouter);
+							Leg previousLeg = (Leg) plan.getPlanElements().get(i - 1);
+							this.editRoutes.relocateFutureLegRoute(previousLeg, previousLeg.getRoute().getStartLinkId(), 
+									linkId, plan.getPerson(), scenario.getNetwork(), tripRouter);
 
 							// update car leg from parking activity
-							editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(), i + 1, tripRouter);
+							Leg nextLeg = (Leg) plan.getPlanElements().get(i + 1);
+							this.editRoutes.relocateFutureLegRoute(nextLeg, linkId, previousLeg.getRoute().getEndLinkId(), 
+									plan.getPerson(), scenario.getNetwork(), tripRouter);
 						}
 					}
 				}
@@ -181,16 +185,17 @@ public class GPSNIReplanner extends WithinDayDuringLegReplanner {
 				route.setLinkIds(startLink, links, endLink);
 
 				// update agent's route
-				editRoutes.replanCurrentLegRoute(plan, withinDayAgent.getCurrentPlanElementIndex(),
-						withinDayAgent.getCurrentRouteLinkIdIndex(), tripRouter, this.time);
+				this.editRoutes.relocateCurrentLegRoute(leg, plan.getPerson(), 
+						withinDayAgent.getCurrentRouteLinkIdIndex(), endLink, time, scenario.getNetwork(), tripRouter);			
 
 				updateNextLeg = true;
 			}
 
 			// adapt next walk leg.
 			if (updateNextLeg) {
-				editRoutes.replanFutureLegRoute(withinDayAgent.getSelectedPlan(),
-						withinDayAgent.getCurrentPlanElementIndex() + 2, tripRouter);
+				Leg nextLeg = (Leg) plan.getPlanElements().get(withinDayAgent.getCurrentPlanElementIndex() + 2);
+				this.editRoutes.relocateFutureLegRoute(nextLeg, endLink, nextLeg.getRoute().getEndLinkId(), 
+						plan.getPerson(), scenario.getNetwork(), tripRouter);
 			}
 			
 			InsertParkingActivities.updateNextParkingActivityIfNeededDuringDay(parkingAgentsTracker.getParkingInfrastructure()  , withinDayAgent , scenario, tripRouter);

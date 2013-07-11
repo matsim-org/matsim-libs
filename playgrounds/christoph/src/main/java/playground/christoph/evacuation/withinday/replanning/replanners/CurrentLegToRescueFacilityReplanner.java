@@ -100,7 +100,6 @@ public class CurrentLegToRescueFacilityReplanner extends WithinDayDuringLegRepla
 			}
 			
 			Leg newLeg = executedPlan.createAndAddLeg(TransportMode.car);
-			int position = executedPlan.getPlanElements().size() - 1; 
 			executedPlan.addActivity(rescueActivity);
 			
 			this.editRoutes.relocateFutureLegRoute(newLeg, withinDayAgent.getCurrentLinkId(), rescueActivity.getLinkId(), executedPlan.getPerson(), scenario.getNetwork(), tripRouter);
