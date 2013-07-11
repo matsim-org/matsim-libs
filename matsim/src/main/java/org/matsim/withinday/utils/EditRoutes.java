@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
@@ -40,38 +41,21 @@ import org.matsim.core.router.TripRouter;
 public class EditRoutes {
 
 	private static final Logger logger = Logger.getLogger(EditRoutes.class);
-
-	private Network network;
 	
 	/**
-	 * Re-plans a future route between two activities.  The route is given by its leg, which is given by the planElementIndex.
-	 * <p/>
-	 * The leg needs to be preceded and followed by activities in order for this method to work.  This is not as strong a
-	 * requirement as one may think, since pt plans also need to be stripped down to the "real" activities before routing starts.
-	 * <p/>
-	 * @param plan the plan containing the leg/route to be re-planned
-	 * @param legPlanElementIndex the index for the leg containing the route to be re-planned
-	 * @param planAlgorithm an algorithm that fulfills the PlanAlgorithm interface, but needs to be a router for this method to make sense
+	 * Re-locates a future route. The route is given by its leg.
+	 * 
 	 * @return true when replacing the route worked, false when something went wrong
 	 */
-	// TODO: refactor this to (network, leg, triprouter)
-	public boolean replanFutureLegRoute(Plan plan, int legPlanElementIndex, TripRouter tripRouter) {
-		
-		Leg leg;
-		PlanElement planElement = plan.getPlanElements().get(legPlanElementIndex);
-		if (planElement instanceof Leg) {
-			leg = (Leg) planElement;
-		} else return false;
-
-		Route route = leg.getRoute();
-		
-		Link fromLink = network.getLinks().get(route.getStartLinkId());
-		Link toLink = network.getLinks().get(route.getEndLinkId());
+	public boolean relocateFutureLegRoute(Leg leg, Id fromLinkId, Id toLinkId, Person person, Network network, TripRouter tripRouter) {
+				
+		Link fromLink = network.getLinks().get(fromLinkId);
+		Link toLink = network.getLinks().get(toLinkId);
 		
 		Facility fromFacility = new LinkWrapperFacility(fromLink);
 		Facility toFacility = new LinkWrapperFacility(toLink);
 		
-		List<? extends PlanElement> planElements = tripRouter.calcRoute(leg.getMode(), fromFacility, toFacility, leg.getDepartureTime(), plan.getPerson());
+		List<? extends PlanElement> planElements = tripRouter.calcRoute(leg.getMode(), fromFacility, toFacility, leg.getDepartureTime(), person);
 		
 		if (planElements.size() != 1) {
 			throw new RuntimeException("Expected a list of PlanElements containing exactly one element, " +
@@ -85,6 +69,51 @@ public class EditRoutes {
 		
 		return true;
 	}
+	
+	/**
+	 * Re-plans a future route. The route is given by its leg. It is expected that the
+	 * leg's route is not null and that the start- and end link Ids are set properly.
+	 * 
+	 * If the start- and or end-location of the leg have changed, use relocateFutureLegRoute(...)!
+	 * 
+	 * @return true when replacing the route worked, false when something went wrong
+	 */
+	public boolean replanFutureLegRoute(Leg leg, Person person, Network network, TripRouter tripRouter) {
+		
+		Route route = leg.getRoute();
+		
+		Link fromLink = network.getLinks().get(route.getStartLinkId());
+		Link toLink = network.getLinks().get(route.getEndLinkId());
+		
+		Facility fromFacility = new LinkWrapperFacility(fromLink);
+		Facility toFacility = new LinkWrapperFacility(toLink);
+		
+		List<? extends PlanElement> planElements = tripRouter.calcRoute(leg.getMode(), fromFacility, toFacility, leg.getDepartureTime(), person);
+		
+		if (planElements.size() != 1) {
+			throw new RuntimeException("Expected a list of PlanElements containing exactly one element, " +
+					"but the returned list contained " + planElements.size() + " elements."); 
+		}
+		
+		Leg newLeg = (Leg) planElements.get(0);
+		
+		leg.setTravelTime(newLeg.getTravelTime());
+		leg.setRoute(newLeg.getRoute());
+		
+		return true;
+	}
+	
+	@Deprecated
+	public boolean replanFutureLegRoute(Plan plan, int legPlanElementIndex, TripRouter tripRouter) {
+		
+		Leg leg;
+		PlanElement planElement = plan.getPlanElements().get(legPlanElementIndex);
+		if (planElement instanceof Leg) {
+			leg = (Leg) planElement;
+		} else return false;
+		
+		return replanFutureLegRoute(leg, plan.getPerson(), null, tripRouter);
+	}
 
 	/*
 	 * We create a new Plan which contains only the Leg that should be replanned and its previous and next
@@ -97,15 +126,8 @@ public class EditRoutes {
 	 * The currentNodeIndex has to Point to the next Node
 	 * (which is the endNode of the current Link)
 	 */
-	// TODO: refactor this to (leg, linkindex, triprouter, time) 
-	public boolean replanCurrentLegRoute(Plan plan, int legPlanElementIndex, int currentLinkIndex, TripRouter tripRouter, double time) {
-
-		Leg leg;
-		PlanElement planElement = plan.getPlanElements().get(legPlanElementIndex);
-		if (planElement instanceof Leg) {
-			leg = (Leg) planElement;
-		} else return false;
-
+	public boolean replanCurrentLegRoute(Leg leg, Person person, int currentLinkIndex, double time, Network network, TripRouter tripRouter) {
+				
 		Route route = leg.getRoute();
 
 		// if the route type is not supported (e.g. because it is a walking agent)
@@ -126,7 +148,7 @@ public class EditRoutes {
 		Facility fromFacility = new LinkWrapperFacility(fromLink);
 		Facility toFacility = new LinkWrapperFacility(toLink);
 		
-		List<? extends PlanElement> planElements = tripRouter.calcRoute(leg.getMode(), fromFacility, toFacility, time, plan.getPerson());
+		List<? extends PlanElement> planElements = tripRouter.calcRoute(leg.getMode(), fromFacility, toFacility, time, person);
 		
 		if (planElements.size() != 1) {
 			throw new RuntimeException("Expected a list of PlanElements containing exactly one element, " +
@@ -172,6 +194,17 @@ public class EditRoutes {
 		oldRoute.setLinkIds(oldRoute.getStartLinkId(), linkIds, toFacility.getLinkId());
 
 		return true;
+	}
+	
+	@Deprecated
+	public boolean replanCurrentLegRoute(Plan plan, int legPlanElementIndex, int currentLinkIndex, TripRouter tripRouter, double time) {
+		Leg leg;
+		PlanElement planElement = plan.getPlanElements().get(legPlanElementIndex);
+		if (planElement instanceof Leg) {
+			leg = (Leg) planElement;
+		} else return false;
+
+		return this.replanCurrentLegRoute(leg, plan.getPerson(), currentLinkIndex, time, null, tripRouter);
 	}
 
 	private List<Id> getRouteLinkIds(Route route) {
