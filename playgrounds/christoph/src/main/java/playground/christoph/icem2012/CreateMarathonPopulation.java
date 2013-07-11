@@ -45,6 +45,7 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkWriter;
@@ -388,10 +389,36 @@ public class CreateMarathonPopulation {
 		
 		// convert zurich network to multi-modal network
 		Config config = scenario.getConfig();
-		config.multiModal().setCreateMultiModalNetwork(true);
-		config.multiModal().setCutoffValueForNonCarModes(80/3.6);
-		config.multiModal().setSimulatedModes("walk,ride,bike,pt");
-		new MultiModalNetworkCreator(config.multiModal()).run(scenario.getNetwork());
+        MultiModalConfigGroup multiModalConfigGroup3 = (MultiModalConfigGroup) config.getModule(MultiModalConfigGroup.GROUP_NAME);
+        if (multiModalConfigGroup3 == null) {
+            multiModalConfigGroup3 = new MultiModalConfigGroup();
+            config.addModule(multiModalConfigGroup3);
+        }
+        multiModalConfigGroup3.setCreateMultiModalNetwork(true);
+        // TODO: Refactored out of core config
+        // Please just create and add the config group instead.
+        MultiModalConfigGroup multiModalConfigGroup2 = (MultiModalConfigGroup) config.getModule(MultiModalConfigGroup.GROUP_NAME);
+        if (multiModalConfigGroup2 == null) {
+            multiModalConfigGroup2 = new MultiModalConfigGroup();
+            config.addModule(multiModalConfigGroup2);
+        }
+        multiModalConfigGroup2.setCutoffValueForNonCarModes(80 / 3.6);
+        // TODO: Refactored out of core config
+        // Please just create and add the config group instead.
+        MultiModalConfigGroup multiModalConfigGroup1 = (MultiModalConfigGroup) config.getModule(MultiModalConfigGroup.GROUP_NAME);
+        if (multiModalConfigGroup1 == null) {
+            multiModalConfigGroup1 = new MultiModalConfigGroup();
+            config.addModule(multiModalConfigGroup1);
+        }
+        multiModalConfigGroup1.setSimulatedModes("walk,ride,bike,pt");
+        // TODO: Refactored out of core config
+        // Please just create and add the config group instead.
+        MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) config.getModule(MultiModalConfigGroup.GROUP_NAME);
+        if (multiModalConfigGroup == null) {
+            multiModalConfigGroup = new MultiModalConfigGroup();
+            config.addModule(multiModalConfigGroup);
+        }
+        new MultiModalNetworkCreator(multiModalConfigGroup).run(scenario.getNetwork());
 		
 		/*
 		 * Adapt links that are used for the track.

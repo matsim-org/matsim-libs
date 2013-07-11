@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.config.groups;
+package contrib.multimodal.config;
 
 import java.util.Map;
 import java.util.TreeMap;

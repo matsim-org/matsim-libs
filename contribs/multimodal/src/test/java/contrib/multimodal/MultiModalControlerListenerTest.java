@@ -42,7 +42,7 @@ import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandle
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.MultiModalConfigGroup;
+import contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -73,12 +73,13 @@ public class MultiModalControlerListenerTest extends MatsimTestCase {
 		config.getQSimConfigGroup().setEndTime(24*3600);
 		
 		config.controler().setLastIteration(0);
-			
-		MultiModalConfigGroup multiModalConfig = config.multiModal();
-		multiModalConfig.setMultiModalSimulationEnabled(true);
-		multiModalConfig.setSimulatedModes("walk,bike,unknown");
-		multiModalConfig.setNumberOfThreads(numberOfThreads);
-		
+
+        MultiModalConfigGroup multiModalConfigGroup = new MultiModalConfigGroup();
+        multiModalConfigGroup.setMultiModalSimulationEnabled(true);
+		multiModalConfigGroup.setSimulatedModes("walk,bike,unknown");
+		multiModalConfigGroup.setNumberOfThreads(numberOfThreads);
+		config.addModule(multiModalConfigGroup);
+
 		ActivityParams homeParams = new ActivityParams("home");
 		homeParams.setTypicalDuration(16*3600);
 		config.planCalcScore().addActivityParams(homeParams);

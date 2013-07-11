@@ -43,6 +43,7 @@ import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.Module;
+import contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -206,9 +207,23 @@ public final class MarathonController extends WithinDayController implements Sta
 		Scenario sc = ScenarioUtils.createScenario(c);
 		((PopulationFactoryImpl)sc.getPopulation().getFactory()).setRouteFactory("walk2d", new LinkNetworkRouteFactory());
 		((PopulationFactoryImpl)sc.getPopulation().getFactory()).setRouteFactory(TransportMode.walk, new LinkNetworkRouteFactory());
-		
-		if (c.multiModal().isMultiModalSimulationEnabled()) {
-			for (String transportMode : CollectionUtils.stringToArray(c.multiModal().getSimulatedModes())) {
+
+        // TODO: Refactored out of core config
+        // Please just create and add the config group instead.
+        MultiModalConfigGroup multiModalConfigGroup1 = (MultiModalConfigGroup) c.getModule(MultiModalConfigGroup.GROUP_NAME);
+        if (multiModalConfigGroup1 == null) {
+            multiModalConfigGroup1 = new MultiModalConfigGroup();
+            c.addModule(multiModalConfigGroup1);
+        }
+        if (multiModalConfigGroup1.isMultiModalSimulationEnabled()) {
+            // TODO: Refactored out of core config
+            // Please just create and add the config group instead.
+            MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) c.getModule(MultiModalConfigGroup.GROUP_NAME);
+            if (multiModalConfigGroup == null) {
+                multiModalConfigGroup = new MultiModalConfigGroup();
+                c.addModule(multiModalConfigGroup);
+            }
+            for (String transportMode : CollectionUtils.stringToArray(multiModalConfigGroup.getSimulatedModes())) {
 				((PopulationFactoryImpl)sc.getPopulation().getFactory()).setRouteFactory(transportMode, new LinkNetworkRouteFactory());
 			}	
 		}

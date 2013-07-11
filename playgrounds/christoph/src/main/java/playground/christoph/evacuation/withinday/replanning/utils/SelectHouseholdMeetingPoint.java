@@ -43,6 +43,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
+import contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -181,9 +182,23 @@ public class SelectHouseholdMeetingPoint implements MobsimInitializedListener, M
 		/*
 		 * If enabled in config file, convert subNetwork to a multi-modal network.
 		 */
-		if (this.scenario.getConfig().multiModal().isCreateMultiModalNetwork()) {
+        // TODO: Refactored out of core config
+        // Please just create and add the config group instead.
+        MultiModalConfigGroup multiModalConfigGroup1 = (MultiModalConfigGroup) this.scenario.getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
+        if (multiModalConfigGroup1 == null) {
+            multiModalConfigGroup1 = new MultiModalConfigGroup();
+            this.scenario.getConfig().addModule(multiModalConfigGroup1);
+        }
+        if (multiModalConfigGroup1.isCreateMultiModalNetwork()) {
 			log.info("Creating multi modal network.");
-			new MultiModalNetworkCreator(this.scenario.getConfig().multiModal()).run(subNetwork);
+            // TODO: Refactored out of core config
+            // Please just create and add the config group instead.
+            MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) this.scenario.getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
+            if (multiModalConfigGroup == null) {
+                multiModalConfigGroup = new MultiModalConfigGroup();
+                this.scenario.getConfig().addModule(multiModalConfigGroup);
+            }
+            new MultiModalNetworkCreator(multiModalConfigGroup).run(subNetwork);
 		}
 		
 		/*

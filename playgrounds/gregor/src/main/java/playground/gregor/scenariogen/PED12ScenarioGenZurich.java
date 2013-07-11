@@ -51,6 +51,7 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.BikeTravelTimeOld;
@@ -139,10 +140,38 @@ public class PED12ScenarioGenZurich {
 		Scenario zurichScenario = ScenarioUtils.loadScenario(zurichConfig);
 				
 		// convert zurich network to multi-modal network
-		zurichConfig.multiModal().setCreateMultiModalNetwork(true);
-		zurichConfig.multiModal().setCutoffValueForNonCarModes(80/3.6);
-		zurichConfig.multiModal().setSimulatedModes(modes);
-		new MultiModalNetworkCreator(zurichConfig.multiModal()).run(zurichScenario.getNetwork());
+        // TODO: Refactored out of core config
+        // Please just create and add the config group instead.
+        MultiModalConfigGroup multiModalConfigGroup3 = (MultiModalConfigGroup) zurichConfig.getModule(MultiModalConfigGroup.GROUP_NAME);
+        if (multiModalConfigGroup3 == null) {
+            multiModalConfigGroup3 = new MultiModalConfigGroup();
+            zurichConfig.addModule(multiModalConfigGroup3);
+        }
+        multiModalConfigGroup3.setCreateMultiModalNetwork(true);
+        // TODO: Refactored out of core config
+        // Please just create and add the config group instead.
+        MultiModalConfigGroup multiModalConfigGroup2 = (MultiModalConfigGroup) zurichConfig.getModule(MultiModalConfigGroup.GROUP_NAME);
+        if (multiModalConfigGroup2 == null) {
+            multiModalConfigGroup2 = new MultiModalConfigGroup();
+            zurichConfig.addModule(multiModalConfigGroup2);
+        }
+        multiModalConfigGroup2.setCutoffValueForNonCarModes(80 / 3.6);
+        // TODO: Refactored out of core config
+        // Please just create and add the config group instead.
+        MultiModalConfigGroup multiModalConfigGroup1 = (MultiModalConfigGroup) zurichConfig.getModule(MultiModalConfigGroup.GROUP_NAME);
+        if (multiModalConfigGroup1 == null) {
+            multiModalConfigGroup1 = new MultiModalConfigGroup();
+            zurichConfig.addModule(multiModalConfigGroup1);
+        }
+        multiModalConfigGroup1.setSimulatedModes(modes);
+        // TODO: Refactored out of core config
+        // Please just create and add the config group instead.
+        MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) zurichConfig.getModule(MultiModalConfigGroup.GROUP_NAME);
+        if (multiModalConfigGroup == null) {
+            multiModalConfigGroup = new MultiModalConfigGroup();
+            zurichConfig.addModule(multiModalConfigGroup);
+        }
+        new MultiModalNetworkCreator(multiModalConfigGroup).run(zurichScenario.getNetwork());
 		
 		// prepare Zurich population
 		prepareZurichPopulation(zurichScenario);

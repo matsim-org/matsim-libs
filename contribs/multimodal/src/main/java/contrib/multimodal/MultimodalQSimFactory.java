@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
+import contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -47,7 +48,8 @@ public class MultimodalQSimFactory implements MobsimFactory {
 		QSim qSim = (QSim) new QSimFactory().createMobsim(sc, eventsManager);
 		MultiModalSimEngine multiModalEngine = new MultiModalSimEngineFactory().createMultiModalSimEngine(qSim, this.multiModalTravelTimes);
 		qSim.addMobsimEngine(multiModalEngine);
-		qSim.addDepartureHandler(new MultiModalDepartureHandler(multiModalEngine, sc.getConfig().multiModal()));
+        MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) sc.getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
+        qSim.addDepartureHandler(new MultiModalDepartureHandler(multiModalEngine, multiModalConfigGroup));
 		return qSim;
 	}
 

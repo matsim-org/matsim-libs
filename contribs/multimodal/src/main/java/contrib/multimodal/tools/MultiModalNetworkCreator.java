@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.internal.NetworkRunnable;
-import org.matsim.core.config.groups.MultiModalConfigGroup;
+import contrib.multimodal.config.MultiModalConfigGroup;
 
 /*
  * Simple tool that converts a car only network into a multi modal network.

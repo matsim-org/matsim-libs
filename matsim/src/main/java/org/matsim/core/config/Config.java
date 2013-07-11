@@ -35,7 +35,6 @@ import org.matsim.core.config.groups.GlobalConfigGroup;
 import org.matsim.core.config.groups.HouseholdsConfigGroup;
 import org.matsim.core.config.groups.LinkStatsConfigGroup;
 import org.matsim.core.config.groups.LocationChoiceConfigGroup;
-import org.matsim.core.config.groups.MultiModalConfigGroup;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.OTFVisConfigGroup;
 import org.matsim.core.config.groups.ParallelEventHandlingConfigGroup;
@@ -85,7 +84,6 @@ public class Config {
 	private GlobalConfigGroup global = null;
 	private HouseholdsConfigGroup households;
 	private LocationChoiceConfigGroup locationchoice = null;
-	private MultiModalConfigGroup multiModal = null;
 	private NetworkConfigGroup network = null;
 	private ParallelEventHandlingConfigGroup parallelEventHandling = null;
 	private PlansCalcRouteConfigGroup plansCalcRoute = null;
@@ -198,9 +196,6 @@ public class Config {
 		this.otfVis = new OTFVisConfigGroup();
 		this.modules.put(OTFVisConfigGroup.GROUP_NAME, this.otfVis);
 
-		this.multiModal = new MultiModalConfigGroup();
-		this.modules.put(MultiModalConfigGroup.GROUP_NAME, this.multiModal);
-
 		this.ptCounts = new PtCountsConfigGroup();
 		this.modules.put(PtCountsConfigGroup.GROUP_NAME, this.ptCounts);
 
@@ -309,7 +304,6 @@ public class Config {
 	 * the configuration. Does nothing if this module was not existing.
 	 *
 	 * @param name
-	 * @param module
 	 *
 	 */
 	public final void removeModule(final String name) {
@@ -504,11 +498,7 @@ public class Config {
 		return this.otfVis;
 	}
 
-	public MultiModalConfigGroup multiModal() {
-		return this.multiModal;
-	}
-
-	public QSimConfigGroup getQSimConfigGroup() {
+    public QSimConfigGroup getQSimConfigGroup() {
 		return this.qSimConfigGroup;
 	}
 

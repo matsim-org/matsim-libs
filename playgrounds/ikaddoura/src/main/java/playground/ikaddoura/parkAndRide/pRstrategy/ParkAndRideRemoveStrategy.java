@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
+import contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.ReplanningContext;
@@ -101,8 +102,15 @@ public class ParkAndRideRemoveStrategy implements PlanStrategyModule {
 					List<String> availableModes = new ArrayList<String>();
 					availableModes.add(TransportMode.car);
 					availableModes.add(TransportMode.pt);
-					
-					String modes = sc.getConfig().multiModal().getSimulatedModes();
+
+                    // TODO: Refactored out of core config
+                    // Please just create and add the config group instead.
+                    MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) sc.getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
+                    if (multiModalConfigGroup == null) {
+                        multiModalConfigGroup = new MultiModalConfigGroup();
+                        sc.getConfig().addModule(multiModalConfigGroup);
+                    }
+                    String modes = multiModalConfigGroup.getSimulatedModes();
 					if (modes != null) {
 						String[] parts = StringUtils.explode(modes, ',');
 						for (int i = 0, n = parts.length; i < n; i++) {

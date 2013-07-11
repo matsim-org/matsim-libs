@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.core.config.Config;
+import contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.TravelTimeFactory;
@@ -68,7 +69,8 @@ public class MultiModalTravelTimeFactory implements MatsimFactory {
 	private void initMultiModalTravelTimeFactories(Config config) {
 		
 		PlansCalcRouteConfigGroup plansCalcRouteConfigGroup = config.plansCalcRoute();
-		Set<String> simulatedModes = CollectionUtils.stringToSet(config.multiModal().getSimulatedModes());
+        MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) config.getModule(MultiModalConfigGroup.GROUP_NAME);
+        Set<String> simulatedModes = CollectionUtils.stringToSet(multiModalConfigGroup.getSimulatedModes());
 		
 		for (String mode : simulatedModes) {
 			Double speed = config.plansCalcRoute().getTeleportedModeSpeeds().get(mode);

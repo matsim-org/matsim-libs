@@ -20,13 +20,21 @@
 package playground.christoph.withinday;
 
 import org.matsim.core.config.Config;
+import contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.testcases.MatsimTestCase;
 
 public class EquilTest extends MatsimTestCase {
 
 	public void testScenario(){
 		Config config = this.loadConfig(this.getInputDirectory() + "config.xml");
-		config.multiModal().setMultiModalSimulationEnabled(true);
+        // TODO: Refactored out of core config
+        // Please just create and add the config group instead.
+        MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) config.getModule(MultiModalConfigGroup.GROUP_NAME);
+        if (multiModalConfigGroup == null) {
+            multiModalConfigGroup = new MultiModalConfigGroup();
+            config.addModule(multiModalConfigGroup);
+        }
+        multiModalConfigGroup.setMultiModalSimulationEnabled(true);
 		MyWithinDayControler.start(config);
 	}
 

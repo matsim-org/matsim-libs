@@ -28,6 +28,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkImpl;
@@ -105,8 +106,9 @@ public class MultimodalTripRouterFactory implements TripRouterFactory {
 		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = this.objectProvider.getScenario().getConfig().planCalcScore();
 		PopulationFactory populationFactory = this.objectProvider.getScenario().getPopulation().getFactory();
 		ModeRouteFactory modeRouteFactory = ((PopulationFactoryImpl) populationFactory).getModeRouteFactory();
-		
-		Set<String> simulatedModes = CollectionUtils.stringToSet(this.objectProvider.getScenario().getConfig().multiModal().getSimulatedModes());
+
+        MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) this.objectProvider.getScenario().getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
+        Set<String> simulatedModes = CollectionUtils.stringToSet(multiModalConfigGroup.getSimulatedModes());
 		for (String mode : simulatedModes) {
 
 			if (instance.getRegisteredModes().contains(mode)) {

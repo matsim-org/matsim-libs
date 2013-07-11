@@ -34,9 +34,20 @@ public abstract class ConfigUtils {
 		return config;
 	}
 
-	public static Config loadConfig(final String filename) throws UncheckedIOException {
+	public static Config loadConfig(final String filename, Class<? extends Module>... customModuleClasses) throws UncheckedIOException {
 		Config config = new Config();
 		config.addCoreModules();
+
+        for (Class<? extends Module> customModuleClass : customModuleClasses) {
+            try {
+                Module m = customModuleClass.newInstance();
+                config.addModule(m);
+            } catch (InstantiationException e) {
+                throw new RuntimeException(e);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        }
 
 		new MatsimConfigReader(config).parse(filename);
 
