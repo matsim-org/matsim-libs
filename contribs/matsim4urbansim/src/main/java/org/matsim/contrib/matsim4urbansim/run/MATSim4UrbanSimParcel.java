@@ -295,16 +295,18 @@ public class MATSim4UrbanSimParcel{
 			// routerFactory has changed an initialization of plansCalcRoute
 			// as it was done before is no longer possible. Thus, I think a 
 			// more meaningful message seems to be helpful. Daniel, May '13
-			if(ippcm.getPtTravelDistancesInputFile() == null || ippcm.getPtTravelTimesInputFile() == null){
-				if(controler.getScenario().getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.pt) == null){
-					throw new RuntimeException("you try to run the pseudo-pt-router without distances and/or traveltimes, " +
-							"but without a teleportedModeSpeed for pt as well. Default is teleportedModeFreespeedFactor...");
-				}
-				if(controler.getScenario().getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk) == null){
-					throw new RuntimeException("you try to run the pseudo-pt-router without distances and/or traveltimes, " +
-							"but without a teleportedModeSpeed for walk as well. Default is teleportedModeFreespeed...");
-				}
-			}
+			
+			// I don't think that the following are very helpful.  If needed, it should be in the consistency checker ...
+//			if(ippcm.getPtTravelDistancesInputFile() == null || ippcm.getPtTravelTimesInputFile() == null){
+//				if(controler.getScenario().getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.pt) == null){
+//					throw new RuntimeException("you try to run the pseudo-pt-router without distances and/or traveltimes, " +
+//							"but without a teleportedModeSpeed for pt as well. Default is teleportedModeFreespeedFactor...");
+//				}
+//				if(controler.getScenario().getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk) == null){
+//					throw new RuntimeException("you try to run the pseudo-pt-router without distances and/or traveltimes, " +
+//							"but without a teleportedModeSpeed for walk as well. Default is teleportedModeFreespeed...");
+//				}
+//			}
 			
 			// determining the bounds minX/minY -- maxX/maxY. For optimal performance of the QuadTree. All pt stops should be evenly distributed within this rectangle.
 			MyBoundingBox nbb = new MyBoundingBox();
@@ -362,9 +364,10 @@ public class MATSim4UrbanSimParcel{
 																					  this.benchmark) );
 		}
 		
-		if(computeAgentPerformance)
+		if(computeAgentPerformance) {
 			// creates a persons.csv output for UrbanSim
 			controler.addControlerListener(new AgentPerformanceControlerListener(benchmark, ptMatrix));
+		}
 		
 		if(computeZoneBasedAccessibilities){
 			// creates zone based table of log sums
