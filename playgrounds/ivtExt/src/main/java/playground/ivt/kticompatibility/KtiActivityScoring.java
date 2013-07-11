@@ -355,7 +355,7 @@ public class KtiActivityScoring implements ActivityScoring {
 
 	@Override
 	public double getScore() {
-		lock.lock();
+		//lock.lock();
 		return score;
 	}
 
