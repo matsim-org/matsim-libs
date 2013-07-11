@@ -94,7 +94,6 @@ public class StopStopTimeCalculator implements VehicleArrivesAtFacilityEventHand
 		for(Map<Id, StopStopTimeData> map:stopStopTimes.values())
 			for(StopStopTimeData stopStopTimeData:map.values())
 				stopStopTimeData.resetStopStopTimes();
-		stopStopTimes.clear();
 		inTransitVehicles.clear();
 	}
 	@Override
