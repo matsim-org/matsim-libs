@@ -85,7 +85,9 @@ public class ExtractTripModeShares20kmFromBellevue {
 			}
 		};
 
-	private static final double CROW_FLY_FACTOR = 1.2;
+	// MZ: just use ht ecrow fly distance
+	private static final double CROW_FLY_FACTOR = 1;
+	private static final boolean USE_NET_DIST = false;
 
 	private static enum OutputType { COUNT, DETAILED; }
 	private static final OutputType OUTPUT_TYPE = OutputType.DETAILED;
@@ -144,7 +146,7 @@ public class ExtractTripModeShares20kmFromBellevue {
 
 		for ( Leg l : trip.getLegsOnly() ) {
 			final Route r = l.getRoute();
-			if ( r instanceof NetworkRoute )  {
+			if ( USE_NET_DIST && r instanceof NetworkRoute )  {
 				dist += RouteUtils.calcDistance( (NetworkRoute) r , network );
 			}
 			else {
