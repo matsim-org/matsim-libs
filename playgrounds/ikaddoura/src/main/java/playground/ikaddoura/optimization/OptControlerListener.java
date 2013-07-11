@@ -37,7 +37,6 @@ import playground.ikaddoura.internalizationPt.CapacityDelayHandler;
 import playground.ikaddoura.internalizationPt.TransferDelayInVehicleHandler;
 import playground.ikaddoura.internalizationPt.MarginalCostPricingPtHandler;
 import playground.ikaddoura.internalizationPt.TransferDelayWaitingHandler;
-import playground.ikaddoura.optimization.scoring.PtLegHandler;
 import playground.ikaddoura.optimization.users.ConstantFareHandler;
 
 /**
@@ -48,7 +47,6 @@ import playground.ikaddoura.optimization.users.ConstantFareHandler;
 public class OptControlerListener implements StartupListener {
 
 	private final double fare;
-	private final PtLegHandler ptScoringHandler;
 	private final ScenarioImpl scenario;
 	private final boolean calculate_inVehicleTimeDelayEffects;
 	private final boolean calculate_waitingTimeDelayEffects;
@@ -58,7 +56,6 @@ public class OptControlerListener implements StartupListener {
 	private final boolean calculate_capacityDelayEffects;
 
 	public OptControlerListener(double fare,
-			PtLegHandler ptLegHandler,
 			ScenarioImpl scenario,
 			boolean calculate_inVehicleTimeDelayEffects,
 			boolean calculate_waitingTimeDelayEffects, 
@@ -69,7 +66,6 @@ public class OptControlerListener implements StartupListener {
 			boolean marginalCostPricingCar){
 		
 		this.fare = fare;
-		this.ptScoringHandler = ptLegHandler;
 		this.scenario = scenario;
 		this.calculate_inVehicleTimeDelayEffects = calculate_inVehicleTimeDelayEffects;
 		this.calculate_waitingTimeDelayEffects = calculate_waitingTimeDelayEffects;
@@ -107,7 +103,6 @@ public class OptControlerListener implements StartupListener {
 		}
 				
 		event.getControler().getEvents().addHandler(new ConstantFareHandler(eventsManager, this.fare));
-		event.getControler().getEvents().addHandler(ptScoringHandler);
 	}
 
 }

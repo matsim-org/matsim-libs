@@ -34,7 +34,6 @@ import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 import playground.ikaddoura.optimization.scoring.OptimizationScoringFunctionFactory;
-import playground.ikaddoura.optimization.scoring.PtLegHandler;
 
 /**
  * @author Ihab
@@ -43,7 +42,6 @@ import playground.ikaddoura.optimization.scoring.PtLegHandler;
 public class InternalControler {
 	private final static Logger log = Logger.getLogger(InternalControler.class);
 
-	private PtLegHandler ptScoringHandler;
 	private final boolean marginalCostPricingPt;
 	private final boolean marginalCostPricingCar;
 	private final boolean calculate_inVehicleTimeDelayEffects;
@@ -93,7 +91,6 @@ public class InternalControler {
 		this.marginalCostPricingCar = marginalCostPricingCar;
 		this.scenario = scenario;
 		this.fare = fare;
-		this.ptScoringHandler = new PtLegHandler();
 
 		this.CONSTANT_PT = scenario.getConfig().planCalcScore().getConstantPt();
 		log.info("Pt constant set to " + this.CONSTANT_PT);
@@ -113,7 +110,6 @@ public class InternalControler {
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
 		controler.addControlerListener(
 				new OptControlerListener(this.fare, 
-						this.ptScoringHandler,
 						this.scenario,
 						this.calculate_inVehicleTimeDelayEffects,
 						this.calculate_waitingTimeDelayEffects,
