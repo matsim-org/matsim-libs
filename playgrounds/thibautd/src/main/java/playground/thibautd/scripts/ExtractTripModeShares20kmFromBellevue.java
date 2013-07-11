@@ -90,6 +90,9 @@ public class ExtractTripModeShares20kmFromBellevue {
 	private static enum OutputType { COUNT, DETAILED; }
 	private static final OutputType OUTPUT_TYPE = OutputType.DETAILED;
 
+	// TODO pass this as argument
+	private static final Filter FILTER = true ? new ODFilter() : new HomeCoordFilter();
+
 	public static void main(final String[] args) throws IOException {
 		final String plansFile = args[ 0 ];
 		final String outputFile = args[ 1 ];
@@ -105,10 +108,10 @@ public class ExtractTripModeShares20kmFromBellevue {
 
 		switch ( OUTPUT_TYPE ) {
 			case COUNT:
-				count( scenario , outputFile );
+				count( FILTER , scenario , outputFile );
 				break;
 			case DETAILED:
-				detailed( scenario , outputFile );
+				detailed( FILTER , scenario , outputFile );
 				break;
 		default:
 			throw new RuntimeException( ""+OUTPUT_TYPE );
@@ -116,6 +119,7 @@ public class ExtractTripModeShares20kmFromBellevue {
 	}
 
 	private static void detailed(
+			final Filter filter,
 			final Scenario scenario,
 			final String outputFile) throws IOException {
 		final BufferedWriter writer = IOUtils.getBufferedWriter( outputFile );
@@ -123,9 +127,9 @@ public class ExtractTripModeShares20kmFromBellevue {
 
 		for ( Person person : scenario.getPopulation().getPersons().values() ) {
 			final Plan plan = person.getSelectedPlan();
-			final Activity act = getHomeActivity( plan );
-			if ( CoordUtils.calcDistance( act.getCoord() , BELLEVUE_COORD ) > radius ) continue;
+			if ( !filter.acceptPlan( plan ) ) continue;
 			for ( Trip trip : TripStructureUtils.getTrips( plan , STAGES ) ) {
+				if ( !filter.acceptTrip( trip ) ) continue;
 				final String mode = MODE_IDENTIFIER.identifyMainMode( trip.getTripElements() );
 				writer.newLine();
 				writer.write( person.getId()+"\t"+mode+"\t"+calcDist( trip , scenario.getNetwork() ) );
@@ -157,6 +161,7 @@ public class ExtractTripModeShares20kmFromBellevue {
 	}
 
 	private static void count(
+			final Filter filter,
 			final Scenario scenario,
 			final String outputFile) throws IOException {
 		final Map<String, Integer> counts = new TreeMap<String, Integer>();
@@ -164,9 +169,9 @@ public class ExtractTripModeShares20kmFromBellevue {
 		int total = 0;
 		for ( Person person : scenario.getPopulation().getPersons().values() ) {
 			final Plan plan = person.getSelectedPlan();
-			final Activity act = getHomeActivity( plan );
-			if ( CoordUtils.calcDistance( act.getCoord() , BELLEVUE_COORD ) > radius ) continue;
+			if ( !filter.acceptPlan( plan ) ) continue;
 			for ( Trip trip : TripStructureUtils.getTrips( plan , STAGES ) ) {
+				if ( !filter.acceptTrip( trip ) ) continue;
 				final String mode = MODE_IDENTIFIER.identifyMainMode( trip.getTripElements() );
 				final Integer count = counts.get( mode );
 				counts.put( mode , count == null ? 1 : count + 1 );
@@ -183,10 +188,42 @@ public class ExtractTripModeShares20kmFromBellevue {
 		writer.close();
 	}
 
-	private static Activity getHomeActivity(final Plan plan) {
-		final Activity activity = (Activity) plan.getPlanElements().get( 0 );
-		if ( !activity.getType().equals( "home" ) ) throw new IllegalArgumentException( ""+plan.getPlanElements() );
-		return activity;
+
+	private static interface Filter {
+		public boolean acceptPlan(final Plan plan);
+		public boolean acceptTrip(final Trip trip);
+	}
+
+	private static class HomeCoordFilter implements Filter {
+		@Override
+		public boolean acceptPlan(final Plan plan) {
+			final Activity act = getHomeActivity( plan );
+			return CoordUtils.calcDistance( act.getCoord() , BELLEVUE_COORD ) <= radius;
+		}
+
+		@Override
+		public boolean acceptTrip(final Trip trip) {
+			return true;
+		}
+
+		private static Activity getHomeActivity(final Plan plan) {
+			final Activity activity = (Activity) plan.getPlanElements().get( 0 );
+			if ( !activity.getType().equals( "home" ) ) throw new IllegalArgumentException( ""+plan.getPlanElements() );
+			return activity;
+		}
+	}
+
+	private static class ODFilter implements Filter {
+		@Override
+		public boolean acceptPlan(final Plan plan) {
+			return true;
+		}
+
+		@Override
+		public boolean acceptTrip(final Trip trip) {
+			return CoordUtils.calcDistance( trip.getOriginActivity().getCoord() , BELLEVUE_COORD ) <= radius &&
+				 CoordUtils.calcDistance( trip.getDestinationActivity().getCoord() , BELLEVUE_COORD ) <= radius;
+		}
 	}
 }
 
