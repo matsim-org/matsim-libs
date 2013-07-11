@@ -32,16 +32,9 @@ import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.BikeTravelTim
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTime;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTime;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTimeOld;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
+import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.AStarLandmarksFactory;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.withinday.replanning.modules.ReplanningModule;
 
 import playground.wrashid.lib.obj.IntegerValueHashMap;
 import playground.wrashid.parkingSearch.withindayFW.controllers.WithinDayParkingController;
@@ -53,13 +46,13 @@ import playground.wrashid.parkingSearch.withindayFW.psHighestUtilityParkingChoic
 import playground.wrashid.parkingSearch.withindayFW.randomTestStrategy.RandomSearchIdentifier;
 import playground.wrashid.parkingSearch.withindayFW.randomTestStrategy.RandomSearchReplannerFactory;
 import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas;
+import contrib.multimodal.router.MultimodalTripRouterFactory;
 
 public class HUPCAndRandomControllerChessBoard extends WithinDayParkingController  {
 	public HUPCAndRandomControllerChessBoard(String[] args) {
 		super(args);
 	}
 
-	 
 	@Override
 	protected void startUpFinishing() {
 		
@@ -70,11 +63,6 @@ public class HUPCAndRandomControllerChessBoard extends WithinDayParkingControlle
 		ParkingStrategyManager parkingStrategyManager = new ParkingStrategyManager(parkingStrategyActivityMapperFW,
 				parkingStrategies, parkingPersonalBetas);
 		parkingAgentsTracker.setParkingStrategyManager(parkingStrategyManager);
-
-		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeAndDisutility(
-				this.config.planCalcScore()));
-		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) this.scenarioData.getPopulation().getFactory())
-				.getModeRouteFactory();
 
 		// create a copy of the MultiModalTravelTimeWrapperFactory and set the
 		// TravelTimeCollector for car mode
@@ -89,11 +77,12 @@ public class HUPCAndRandomControllerChessBoard extends WithinDayParkingControlle
 				this.getLinkTravelTimes(), new WalkTravelTimeOld(this.config.plansCalcRoute())));
 
 		travelTimes.put(TransportMode.car, super.getTravelTimeCollector());
-
-		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
-
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, costFactory, travelTimes, factory,
-				routeFactory);
+		
+		this.setTravelDisutilityFactory(new OnlyTimeDependentTravelCostCalculatorFactory());
+		this.initWithinDayTripRouterFactory();
+		TripRouterFactory tripRouterFactory = new MultimodalTripRouterFactory(this, travelTimes, this.getWithinDayTripRouterFactory());
+		this.setWithinDayTripRouterFactory(tripRouterFactory);
+		this.getWithinDayEngine().setTripRouterFactory(this.getWithinDayTripRouterFactory());
 
 		// adding hight utility parking choice algo
 		HUPCReplannerFactory hupcReplannerFactory = new HUPCReplannerFactory(this.getWithinDayEngine(),

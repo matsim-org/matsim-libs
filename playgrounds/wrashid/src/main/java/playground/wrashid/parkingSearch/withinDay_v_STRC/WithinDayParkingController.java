@@ -159,7 +159,7 @@ public class WithinDayParkingController extends WithinDayController implements R
 		super.setUp();
 		
 		// replace travel time calculators for walk and bike
-		Map<String, TravelTime> times = this.getMultiModalTravelTimes();
+		Map<String, TravelTime> times = new HashMap<String, TravelTime>();
 		times.put(TransportMode.walk, new WalkTravelTime(this.config.plansCalcRoute()));
 		times.put(TransportMode.bike, new BikeTravelTime(this.config.plansCalcRoute()));
 		

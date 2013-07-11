@@ -23,7 +23,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -41,17 +40,8 @@ import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.AStarLandmarksFactory;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.withinday.replanning.modules.ReplanningModule;
 
 import playground.wrashid.lib.obj.IntegerValueHashMap;
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
@@ -154,11 +144,6 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 				parkingStrategies, parkingPersonalBetas);
 		parkingAgentsTracker.setParkingStrategyManager(parkingStrategyManager);
 
-		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeAndDisutility(
-				this.config.planCalcScore()));
-		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) this.scenarioData.getPopulation().getFactory())
-				.getModeRouteFactory();
-
 		/*
 		 * Initialize TravelTimeCollector and create a FactoryWrapper which will act as
 		 * factory but returns always the same travel time object, which is possible since
@@ -167,34 +152,14 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 		Set<String> analyzedModes = new HashSet<String>();
 		analyzedModes.add(TransportMode.car);
 		super.createAndInitTravelTimeCollector(analyzedModes);
-
-//		// create a copy of the MultiModalTravelTimeWrapperFactory and set the
-//		// TravelTimeCollector for car mode
-//		MultiModalTravelTimeWrapperFactory timeFactory = new MultiModalTravelTimeWrapperFactory();
-//		for (Entry<String, PersonalizableTravelTimeFactory> entry : this.getMultiModalTravelTimeWrapperFactory()
-//				.getPersonalizableTravelTimeFactories().entrySet()) {
-//			timeFactory.setPersonalizableTravelTimeFactory(entry.getKey(), entry.getValue());
-//		}
-//
-//		timeFactory.setPersonalizableTravelTimeFactory(TransportMode.car, travelTimeCollectorWrapperFactory);
 		
-		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
-
-//		AbstractMultithreadedModule router = new ReplanningModule(config, network, costFactory, timeFactory, factory,
-//				routeFactory);
-		
-		Map<String, TravelTime> travelTimes = new HashMap<String, TravelTime>();
-		travelTimes.put(TransportMode.car, this.getTravelTimeCollector());
-		AbstractMultithreadedModule router = new ReplanningModule(config, network, costFactory, travelTimes, factory,
-				routeFactory);
+		this.setTravelDisutilityFactory(new OnlyTimeDependentTravelCostCalculatorFactory());
+		this.initWithinDayTripRouterFactory();
+		this.getWithinDayEngine().setTripRouterFactory(this.getWithinDayTripRouterFactory());
 		
 		// adding hight utility parking choice algo
 		HUPCReplannerFactory hupcReplannerFactory = new HUPCReplannerFactory(this.getWithinDayEngine(),
 				this.scenarioData, parkingAgentsTracker);
-		
-		
-		
-		
 		
 		HUPCIdentifier hupcSearchIdentifier = new HUPCIdentifier(parkingAgentsTracker, (ParkingInfrastructureZH) parkingInfrastructure, this);
 		this.getFixedOrderSimulationListener().addSimulationListener(hupcSearchIdentifier);
@@ -212,16 +177,12 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 		parkingStrategyActivityMapperFW.addSearchStrategy(null, "education_primary", parkingStrategy);
 		parkingStrategyActivityMapperFW.addSearchStrategy(null, "education_secondary", parkingStrategy);
 		parkingStrategyActivityMapperFW.addSearchStrategy(null, "education_higher", parkingStrategy);
-
-		
 		
 		this.addControlerListener(parkingStrategyManager);
 		this.getFixedOrderSimulationListener().addSimulationListener(parkingStrategyManager);
 	
-
 		initParkingFacilityCapacities();
-		
-		
+			
 		cleanNetwork();
 		
 		parkingAgentsTracker.setParkingAnalysisHandler(new ParkingAnalysisHandlerZH(this,parkingInfrastructure));
