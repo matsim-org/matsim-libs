@@ -42,8 +42,8 @@ import org.matsim.contrib.accessibility.utils.AggregateObject2NearestNode;
 import org.matsim.contrib.accessibility.utils.BoundingBox;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterFactoryImpl;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
-import org.matsim.contrib.matrixbasedptrouter.config.ImprovedPseudoPtConfigGroup;
-import org.matsim.contrib.matrixbasedptrouter.config.ImprovedPseudoPtConfigUtils;
+import org.matsim.contrib.matrixbasedptrouter.config.MatrixBasedPtRouterConfigGroup;
+import org.matsim.contrib.matrixbasedptrouter.config.MatrixBasedPtRouterConfigUtils;
 import org.matsim.contrib.matsim4urbansim.config.M4UConfigurationConverterV4;
 import org.matsim.contrib.matsim4urbansim.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4urbansim.config.modules.UrbanSimParameterConfigModuleV3;
@@ -288,7 +288,7 @@ public class MATSim4UrbanSimParcel{
 		controler.setCreateGraphs(true);	// sets whether output graphs are created
 		
 		PtMatrix ptMatrix = null ;
-		ImprovedPseudoPtConfigGroup ippcm = ImprovedPseudoPtConfigUtils.getConfigModuleAndPossiblyConvert(scenario.getConfig()) ;
+		MatrixBasedPtRouterConfigGroup ippcm = MatrixBasedPtRouterConfigUtils.getConfigModuleAndPossiblyConvert(scenario.getConfig()) ;
 		if(ippcm.getPtStopsInputFile() != null){
 			log.info("Initializing MATSim4UrbanSim pseudo pt router ...");
 			// will lead to a null pointer anyway, but since the 
@@ -316,7 +316,7 @@ public class MATSim4UrbanSimParcel{
 									plansCalcRoute.getTeleportedModeSpeeds().get(TransportMode.pt),
 									plansCalcRoute.getBeelineDistanceFactor(),
 									nbb.getXMin(), nbb.getYMin(), nbb.getXMax(), nbb.getYMax(),
-									ImprovedPseudoPtConfigUtils.getConfigModuleAndPossiblyConvert(controler.getScenario().getConfig()));	
+									MatrixBasedPtRouterConfigUtils.getConfigModuleAndPossiblyConvert(controler.getScenario().getConfig()));	
 			controler.setTripRouterFactory( new MatrixBasedPtRouterFactoryImpl(controler, ptMatrix) ); // the car and pt router
 			
 			log.error("reconstructing pt route distances; not tested ...") ;

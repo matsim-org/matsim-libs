@@ -28,7 +28,7 @@ import org.matsim.core.config.experimental.ReflectiveModule;
  * @author nagel
  *
  */
-public class ImprovedPseudoPtConfigGroup extends ReflectiveModule {
+public class MatrixBasedPtRouterConfigGroup extends ReflectiveModule {
 	public static final String GROUP_NAME="improvedPseudoPt" ;
 
 	private static final String USING_PT_STOPS = "usingPtStops";
@@ -43,7 +43,7 @@ public class ImprovedPseudoPtConfigGroup extends ReflectiveModule {
 	private boolean usingTravelTimesAndDistances = false ;
 	private boolean usingPtStops = false ;
 	
-	public ImprovedPseudoPtConfigGroup() {
+	public MatrixBasedPtRouterConfigGroup() {
 		super(GROUP_NAME);
 	}
 

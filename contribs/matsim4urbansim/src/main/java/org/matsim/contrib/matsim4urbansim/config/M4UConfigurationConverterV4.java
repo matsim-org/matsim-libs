@@ -27,7 +27,7 @@ import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.accessibility.config.M4UAccessibilityConfigUtils;
-import org.matsim.contrib.matrixbasedptrouter.config.ImprovedPseudoPtConfigUtils;
+import org.matsim.contrib.matrixbasedptrouter.config.MatrixBasedPtRouterConfigUtils;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.Matsim4UrbansimConfigType;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.Matsim4UrbansimType;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.MatsimConfigType;
@@ -140,7 +140,7 @@ public class M4UConfigurationConverterV4 {
 		M4UConfigUtils.initPlanCalcScore(matsim4urbansimConfigPart1, config); // ok
 		M4UConfigUtils.initQSim(matsim4urbansimConfigPart2, config);
 		M4UConfigUtils.initStrategy(config) ;
-		ImprovedPseudoPtConfigUtils.initImprovedPseudoPtParameter(matsim4urbansimConfigPart3, config);
+		MatrixBasedPtRouterConfigUtils.initMatrixBasedPtRouterParameters(matsim4urbansimConfigPart3, config);
 		// note: ending innovation after 80% of iterations is now switched on in "createEmptyConfigWithSomeDefaults" above.
 
 		// loading the external MATSim config in to the initialized config

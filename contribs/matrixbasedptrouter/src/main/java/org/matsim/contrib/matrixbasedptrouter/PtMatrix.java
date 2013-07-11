@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.matrixbasedptrouter.config.ImprovedPseudoPtConfigGroup;
+import org.matsim.contrib.matrixbasedptrouter.config.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.utils.HeaderParser;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
@@ -73,7 +73,7 @@ public class PtMatrix {
 	private long wrnCntSkip = 0;
 	private long wrnCntParse = 0;
 	
-	public PtMatrix(final Network network, final Double meterPerSecWalkSpeed, final Double meterPerSecPtSpeed, final Double beelineDistanceFactor, final double minX, final double minY, final double maxX, final double maxY, final ImprovedPseudoPtConfigGroup ippcm){
+	public PtMatrix(final Network network, final Double meterPerSecWalkSpeed, final Double meterPerSecPtSpeed, final Double beelineDistanceFactor, final double minX, final double minY, final double maxX, final double maxY, final MatrixBasedPtRouterConfigGroup ippcm){
 
 		// get the locations for ptStops, travel times and distances from controler
 		String ptStopInputFile = ippcm.getPtStopsInputFile();
@@ -622,7 +622,7 @@ public class PtMatrix {
 		Network network = scenario.getNetwork() ;
 		// TravelTime ttc = new TravelTimeCalculator(network,60,30*3600, scenario.getConfig().travelTimeCalculator()).getLinkTravelTimes();
 		
-		ImprovedPseudoPtConfigGroup module = new ImprovedPseudoPtConfigGroup();
+		MatrixBasedPtRouterConfigGroup module = new MatrixBasedPtRouterConfigGroup();
 		// m4uccm.setPtStopsInputFile("/Users/thomas/Development/opus_home/data/brussels_zone/data/transit_csvs_from_Dimitris_20121002/underground.csv"); 	// for Brussels
 		module.setPtStopsInputFile("/Users/thomas/Development/opus_home/data/zurich_parcel/data/Matrizen__OeV/Zones_Attributes.csv");					  	// for Zurich
 		module.setPtTravelTimesInputFile("/Users/thomas/Development/opus_home/data/zurich_parcel/data/Matrizen__OeV/OeV_2007_7_8.JRT");						// for Zurich

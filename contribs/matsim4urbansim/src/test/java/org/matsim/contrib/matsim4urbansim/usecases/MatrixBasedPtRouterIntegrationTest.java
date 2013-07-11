@@ -34,8 +34,8 @@ import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.contrib.accessibility.utils.BoundingBox;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterFactoryImpl;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
-import org.matsim.contrib.matrixbasedptrouter.config.ImprovedPseudoPtConfigGroup;
-import org.matsim.contrib.matrixbasedptrouter.config.ImprovedPseudoPtConfigUtils;
+import org.matsim.contrib.matrixbasedptrouter.config.MatrixBasedPtRouterConfigGroup;
+import org.matsim.contrib.matrixbasedptrouter.config.MatrixBasedPtRouterConfigUtils;
 import org.matsim.contrib.matsim4urbansim.utils.CreateTestNetwork;
 import org.matsim.contrib.matsim4urbansim.utils.CreateTestPopulation;
 import org.matsim.core.config.Config;
@@ -51,7 +51,7 @@ import org.matsim.testcases.MatsimTestUtils;
  * @author nagel
  *
  */
-public class ImprovedPseudoPtIntegrationTest {
+public class MatrixBasedPtRouterIntegrationTest {
 	@Rule public MatsimTestUtils utils = new MatsimTestUtils();
 
 	/**
@@ -68,7 +68,7 @@ public class ImprovedPseudoPtIntegrationTest {
 		
 		//create a new config file and add a config group for pseudo pt
 		Config config = ConfigUtils.createConfig() ;
-		config.addModule( new ImprovedPseudoPtConfigGroup() ) ;
+		config.addModule( new MatrixBasedPtRouterConfigGroup() ) ;
 
 		//a dummy network is created and written into the output directory
 		Network network = CreateTestNetwork.createTestNetwork();
@@ -84,9 +84,9 @@ public class ImprovedPseudoPtIntegrationTest {
 		String distancesLocation = CreateTestNetwork.createTestPtTravelTimesAndDistancesCSVFile();
 
 		//add stops, travel times and travel distances file to the pseudo pt config group
-		((ImprovedPseudoPtConfigGroup)config.getModule("improvedPseudoPt")).setPtStopsInputFile(stopsLocation);
-		((ImprovedPseudoPtConfigGroup)config.getModule("improvedPseudoPt")).setPtTravelTimesInputFile(timesLocation);
-		((ImprovedPseudoPtConfigGroup)config.getModule("improvedPseudoPt")).setPtTravelDistancesInputFile(distancesLocation);
+		((MatrixBasedPtRouterConfigGroup)config.getModule(MatrixBasedPtRouterConfigGroup.GROUP_NAME)).setPtStopsInputFile(stopsLocation);
+		((MatrixBasedPtRouterConfigGroup)config.getModule(MatrixBasedPtRouterConfigGroup.GROUP_NAME)).setPtTravelTimesInputFile(timesLocation);
+		((MatrixBasedPtRouterConfigGroup)config.getModule(MatrixBasedPtRouterConfigGroup.GROUP_NAME)).setPtTravelDistancesInputFile(distancesLocation);
 
 		//modification of the config according to what's needed
 		config.controler().setMobsim("qsim");
@@ -118,7 +118,7 @@ public class ImprovedPseudoPtIntegrationTest {
 								plansCalcRoute.getTeleportedModeSpeeds().get(TransportMode.pt),
 								plansCalcRoute.getBeelineDistanceFactor(),
 								nbb.getXMin(), nbb.getYMin(), nbb.getXMax(), nbb.getYMax(),
-								ImprovedPseudoPtConfigUtils.getConfigModuleAndPossiblyConvert(controler.getScenario().getConfig()));
+								MatrixBasedPtRouterConfigUtils.getConfigModuleAndPossiblyConvert(controler.getScenario().getConfig()));
 		controler.setTripRouterFactory( new MatrixBasedPtRouterFactoryImpl(controler, ptMatrix) ); // the car and pt router
 
 		//execute MATSim run

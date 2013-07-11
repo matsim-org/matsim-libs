@@ -32,20 +32,20 @@ import org.matsim.core.config.Module;
  * @author nagel
  *
  */
-public class ImprovedPseudoPtConfigUtils {
+public class MatrixBasedPtRouterConfigUtils {
 	
-	private static final Logger log = Logger.getLogger(ImprovedPseudoPtConfigUtils.class);
+	private static final Logger log = Logger.getLogger(MatrixBasedPtRouterConfigUtils.class);
 	
-	private ImprovedPseudoPtConfigUtils() {} // container for static methods; do not instantiate
+	private MatrixBasedPtRouterConfigUtils() {} // container for static methods; do not instantiate
 
-	public static ImprovedPseudoPtConfigGroup getConfigModuleAndPossiblyConvert(Config config) {
-		Module m = config.getModule(ImprovedPseudoPtConfigGroup.GROUP_NAME);
-		if (m instanceof ImprovedPseudoPtConfigGroup) {
-			return (ImprovedPseudoPtConfigGroup) m;
+	public static MatrixBasedPtRouterConfigGroup getConfigModuleAndPossiblyConvert(Config config) {
+		Module m = config.getModule(MatrixBasedPtRouterConfigGroup.GROUP_NAME);
+		if (m instanceof MatrixBasedPtRouterConfigGroup) {
+			return (MatrixBasedPtRouterConfigGroup) m;
 		}
 		
-		ImprovedPseudoPtConfigGroup ippcm = new ImprovedPseudoPtConfigGroup();
-		config.addModule( ImprovedPseudoPtConfigGroup.GROUP_NAME, ippcm ) ;
+		MatrixBasedPtRouterConfigGroup ippcm = new MatrixBasedPtRouterConfigGroup();
+		config.addModule( MatrixBasedPtRouterConfigGroup.GROUP_NAME, ippcm ) ;
 		return ippcm;
 	}	
 	
@@ -55,20 +55,20 @@ public class ImprovedPseudoPtConfigUtils {
 	 * @param module Module containing pt settings
 	 * @param config MATSim Config object
 	 */
-	public static void initImprovedPseudoPtParameter(Module module, Config config){
+	public static void initMatrixBasedPtRouterParameters(Module module, Config config){
 		
 		log.info("Checking improved pseudo pt settings ...");
-		ImprovedPseudoPtConfigGroup ippcm = ImprovedPseudoPtConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
+		MatrixBasedPtRouterConfigGroup ippcm = MatrixBasedPtRouterConfigUtils.getConfigModuleAndPossiblyConvert(config) ;
 		
 		if(module != null){
-			String usePtStops = module.getValue(ImprovedPseudoPtConfigGroup.PT_STOPS_SWITCH);
-			String ptStops = module.getValue(ImprovedPseudoPtConfigGroup.PT_STOPS);
-			String useTravelTimesAndDistances =  module.getValue(ImprovedPseudoPtConfigGroup.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH);
-			String ptTravelTimes =  module.getValue(ImprovedPseudoPtConfigGroup.PT_TRAVEL_TIMES);
-			String ptTravelDistances =  module.getValue(ImprovedPseudoPtConfigGroup.PT_TRAVEL_DISTANCES);
+			String usePtStops = module.getValue(MatrixBasedPtRouterConfigGroup.PT_STOPS_SWITCH);
+			String ptStops = module.getValue(MatrixBasedPtRouterConfigGroup.PT_STOPS);
+			String useTravelTimesAndDistances =  module.getValue(MatrixBasedPtRouterConfigGroup.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH);
+			String ptTravelTimes =  module.getValue(MatrixBasedPtRouterConfigGroup.PT_TRAVEL_TIMES);
+			String ptTravelDistances =  module.getValue(MatrixBasedPtRouterConfigGroup.PT_TRAVEL_DISTANCES);
 
 			if(usePtStops != null &&  usePtStops.equalsIgnoreCase("true")){
-				log.info(ImprovedPseudoPtConfigGroup.PT_STOPS_SWITCH + " switch is set to true. Trying to find pt stops file ...");
+				log.info(MatrixBasedPtRouterConfigGroup.PT_STOPS_SWITCH + " switch is set to true. Trying to find pt stops file ...");
 				// checking for pt stops
 				if(ptStops != null){
 					File ptStopsFile = new File(ptStops);
@@ -84,7 +84,7 @@ public class ImprovedPseudoPtConfigUtils {
 					
 					// checking for other input files
 					if(useTravelTimesAndDistances != null && useTravelTimesAndDistances.equalsIgnoreCase("true")){
-						log.info(ImprovedPseudoPtConfigGroup.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH + " switch is set to true. Trying to find travel times and distances files ...");
+						log.info(MatrixBasedPtRouterConfigGroup.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH + " switch is set to true. Trying to find travel times and distances files ...");
 						
 						File ptTravelTimesFile = new File(ptTravelTimes);
 						File ptTravelDistancesFile = new File(ptTravelDistances); 
@@ -106,14 +106,14 @@ public class ImprovedPseudoPtConfigUtils {
 						}
 					}
 					else
-						log.info(ImprovedPseudoPtConfigGroup.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH + " switch is set to false. Additional travel times and distances files will not be read!");
+						log.info(MatrixBasedPtRouterConfigGroup.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH + " switch is set to false. Additional travel times and distances files will not be read!");
 					
 				}
 				else
 					log.warn("No pt stops file given. Improved pseudo pt will not be initialized!");
 			}
 			else
-				log.info(ImprovedPseudoPtConfigGroup.PT_STOPS_SWITCH + " switch is set to false. Improved pseudo pt will not be initialized.");
+				log.info(MatrixBasedPtRouterConfigGroup.PT_STOPS_SWITCH + " switch is set to false. Improved pseudo pt will not be initialized.");
 		}
 	}
 	

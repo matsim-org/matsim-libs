@@ -25,7 +25,7 @@ package org.matsim.contrib.matsim4urbansim.utils;
 import java.math.BigInteger;
 
 import org.matsim.contrib.accessibility.config.AccessibilityConfigGroup;
-import org.matsim.contrib.matrixbasedptrouter.config.ImprovedPseudoPtConfigGroup;
+import org.matsim.contrib.matrixbasedptrouter.config.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matsim4urbansim.config.M4UConfigUtils;
 import org.matsim.contrib.matsim4urbansim.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4urbansim.config.modules.UrbanSimParameterConfigModuleV3;
@@ -150,12 +150,12 @@ public class CreateTestExternalMATSimConfig extends CreateTestMATSimConfig{
 		Module matsim4UrbanSimModule = config.createModule( M4UConfigUtils.MATSIM4URBANSIM_MODULE_EXTERNAL_CONFIG);
 		matsim4UrbanSimModule.addParam(M4UConfigUtils.URBANSIM_ZONE_SHAPEFILE_LOCATION_DISTRIBUTION, this.urbanSimZoneShapefileLocationDistribution);
 
-		Module ippcm = config.createModule( ImprovedPseudoPtConfigGroup.GROUP_NAME ) ;
-		ippcm.addParam(ImprovedPseudoPtConfigGroup.PT_STOPS, this.ptStops);
-		ippcm.addParam(ImprovedPseudoPtConfigGroup.PT_STOPS_SWITCH, this.usePtStops);
-		ippcm.addParam(ImprovedPseudoPtConfigGroup.PT_TRAVEL_TIMES, this.ptTravelTimes);
-		ippcm.addParam(ImprovedPseudoPtConfigGroup.PT_TRAVEL_DISTANCES, this.ptTravelDistances);
-		ippcm.addParam(ImprovedPseudoPtConfigGroup.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH, this.useTravelTimesAndDistances);
+		Module ippcm = config.createModule( MatrixBasedPtRouterConfigGroup.GROUP_NAME ) ;
+		ippcm.addParam(MatrixBasedPtRouterConfigGroup.PT_STOPS, this.ptStops);
+		ippcm.addParam(MatrixBasedPtRouterConfigGroup.PT_STOPS_SWITCH, this.usePtStops);
+		ippcm.addParam(MatrixBasedPtRouterConfigGroup.PT_TRAVEL_TIMES, this.ptTravelTimes);
+		ippcm.addParam(MatrixBasedPtRouterConfigGroup.PT_TRAVEL_DISTANCES, this.ptTravelDistances);
+		ippcm.addParam(MatrixBasedPtRouterConfigGroup.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH, this.useTravelTimesAndDistances);
 
 		// tnicolai: this are no default parameters anymore.
 //		matsim4UrbanSimModule.addParam(MATSim4UrbanSimConfigurationConverterV4.BETA_BIKE_TRAVEL_TIME, this.betaBikeTravelTime + "");
@@ -243,10 +243,10 @@ public class CreateTestExternalMATSimConfig extends CreateTestMATSimConfig{
 		
 
 		// improved pseudo pt:
-		Module ippcm = config.createModule( ImprovedPseudoPtConfigGroup.GROUP_NAME ) ;
-		ippcm.addParam(ImprovedPseudoPtConfigGroup.PT_STOPS, this.ptStops);
-		ippcm.addParam(ImprovedPseudoPtConfigGroup.PT_STOPS_SWITCH, "tRue" );
-		ippcm.addParam(ImprovedPseudoPtConfigGroup.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH, this.useTravelTimesAndDistances);
+		Module ippcm = config.createModule( MatrixBasedPtRouterConfigGroup.GROUP_NAME ) ;
+		ippcm.addParam(MatrixBasedPtRouterConfigGroup.PT_STOPS, this.ptStops);
+		ippcm.addParam(MatrixBasedPtRouterConfigGroup.PT_STOPS_SWITCH, "tRue" );
+		ippcm.addParam(MatrixBasedPtRouterConfigGroup.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH, this.useTravelTimesAndDistances);
 
 		// changeLegMode module
 		Module changeLegModeModule = config.createModule(changeLegModeModuleName);

@@ -32,7 +32,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.accessibility.utils.BoundingBox;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
-import org.matsim.contrib.matrixbasedptrouter.config.ImprovedPseudoPtConfigGroup;
+import org.matsim.contrib.matrixbasedptrouter.config.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matsim4urbansim.utils.CreateTestNetwork;
 import org.matsim.contrib.matsim4urbansim.utils.TempDirectoryUtil;
 import org.matsim.contrib.matsim4urbansim.utils.network.NetworkUtil;
@@ -85,7 +85,7 @@ public class PtMatrixTest extends MatsimTestCase{
 		Network network = CreateTestNetwork.createTestNetwork();			// creates a dummy network
 		String location = CreateTestNetwork.createTestPtStationCSVFile();	// creates a dummy csv file with pt stops fitting into the dummy network
 		
-		ImprovedPseudoPtConfigGroup module = new ImprovedPseudoPtConfigGroup();
+		MatrixBasedPtRouterConfigGroup module = new MatrixBasedPtRouterConfigGroup();
 		module.setPtStopsInputFile(location);								// this is to be compatible with real code
 
 		// determining the bounds minX/minY -- maxX/maxY. For optimal performance of the QuadTree. All pt stops should be evenly distributed within this rectangle.
@@ -187,7 +187,7 @@ public class PtMatrixTest extends MatsimTestCase{
 		String timesLocation = CreateTestNetwork.createTestPtTravelTimesAndDistancesCSVFile();	// creates a dummy csv file with pt travel times fitting into the dummy network
 		String distancesLocation = CreateTestNetwork.createTestPtTravelTimesAndDistancesCSVFile();	// creates a dummy csv file with pt travel distances fitting into the dummy network
 		
-		ImprovedPseudoPtConfigGroup module = new ImprovedPseudoPtConfigGroup();
+		MatrixBasedPtRouterConfigGroup module = new MatrixBasedPtRouterConfigGroup();
 		module.setPtStopsInputFile(stopsLocation);								// this is to be compatible with real code
 		module.setPtTravelTimesInputFile(timesLocation);						// this is to be compatible with real code
 		module.setPtTravelDistancesInputFile(distancesLocation);				// this is to be compatible with real code
