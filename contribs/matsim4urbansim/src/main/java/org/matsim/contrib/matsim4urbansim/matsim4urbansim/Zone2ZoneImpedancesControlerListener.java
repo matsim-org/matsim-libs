@@ -35,7 +35,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.accessibility.utils.LeastCostPathTreeExtended;
-import org.matsim.contrib.improvedPseudoPt.PtMatrix;
+import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matsim4urbansim.config.ConfigurationUtils;
 import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
 import org.matsim.contrib.matsim4urbansim.gis.ZoneUtil;

@@ -20,7 +20,7 @@
 /**
  * 
  */
-package org.matsim.contrib.improvedPseudoPt.config;
+package org.matsim.contrib.matrixbasedptrouter.config;
 
 import org.matsim.core.config.experimental.ReflectiveModule;
 

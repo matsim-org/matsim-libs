@@ -7,7 +7,7 @@ import org.matsim.contrib.accessibility.costcalculator.TravelDistanceCalculator;
 import org.matsim.contrib.accessibility.utils.Benchmark;
 import org.matsim.contrib.accessibility.utils.LeastCostPathTreeExtended;
 import org.matsim.contrib.accessibility.utils.io.writer.UrbanSimZoneCSVWriterV2;
-import org.matsim.contrib.improvedPseudoPt.PtMatrix;
+import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;

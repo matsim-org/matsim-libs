@@ -20,7 +20,7 @@
 /**
  * 
  */
-package org.matsim.contrib.improvedPseudoPt;
+package org.matsim.contrib.matrixbasedptrouter;
 
 
 import java.io.BufferedReader;
@@ -34,8 +34,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.improvedPseudoPt.config.ImprovedPseudoPtConfigGroup;
-import org.matsim.contrib.improvedPseudoPt.utils.HeaderParser;
+import org.matsim.contrib.matrixbasedptrouter.config.ImprovedPseudoPtConfigGroup;
+import org.matsim.contrib.matrixbasedptrouter.utils.HeaderParser;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;

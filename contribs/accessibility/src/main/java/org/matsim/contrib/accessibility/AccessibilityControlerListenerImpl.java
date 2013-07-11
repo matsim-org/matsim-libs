@@ -22,7 +22,7 @@ import org.matsim.contrib.accessibility.utils.Distances;
 import org.matsim.contrib.accessibility.utils.LeastCostPathTreeExtended;
 import org.matsim.contrib.accessibility.utils.NetworkUtil;
 import org.matsim.contrib.accessibility.utils.ProgressBar;
-import org.matsim.contrib.improvedPseudoPt.PtMatrix;
+import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;

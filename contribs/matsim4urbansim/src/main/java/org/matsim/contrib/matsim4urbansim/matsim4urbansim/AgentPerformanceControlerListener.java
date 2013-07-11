@@ -13,7 +13,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.contrib.improvedPseudoPt.PtMatrix;
+import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
 import org.matsim.contrib.matsim4urbansim.utils.helperobjects.Benchmark;
 import org.matsim.contrib.matsim4urbansim.utils.io.writer.UrbanSimPersonCSVWriter;

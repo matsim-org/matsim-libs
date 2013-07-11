@@ -39,7 +39,7 @@ import org.matsim.contrib.accessibility.config.AccessibilityConfigGroup.AreaOfAc
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
 import org.matsim.contrib.accessibility.utils.CreateTestNetwork;
-import org.matsim.contrib.improvedPseudoPt.PtMatrix;
+import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;

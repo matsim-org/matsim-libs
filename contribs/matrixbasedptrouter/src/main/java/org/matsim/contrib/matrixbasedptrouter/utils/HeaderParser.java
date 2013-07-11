@@ -1,4 +1,4 @@
-package org.matsim.contrib.improvedPseudoPt.utils;
+package org.matsim.contrib.matrixbasedptrouter.utils;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

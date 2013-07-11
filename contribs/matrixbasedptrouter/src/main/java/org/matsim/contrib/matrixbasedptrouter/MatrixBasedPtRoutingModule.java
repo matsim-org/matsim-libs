@@ -20,7 +20,7 @@
 /**
  * 
  */
-package org.matsim.contrib.improvedPseudoPt;
+package org.matsim.contrib.matrixbasedptrouter;
 
 import java.util.Arrays;
 import java.util.List;

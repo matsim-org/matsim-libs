@@ -17,7 +17,7 @@ import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
 import org.matsim.contrib.accessibility.interfaces.ZoneDataExchangeInterface;
 import org.matsim.contrib.accessibility.utils.BoundingBox;
-import org.matsim.contrib.improvedPseudoPt.PtMatrix;
+import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matsim4urbansim.config.M4UConfigurationConverterV4;
 import org.matsim.contrib.matsim4urbansim.utils.CreateTestMATSimConfig;
 import org.matsim.contrib.matsim4urbansim.utils.CreateTestNetwork;

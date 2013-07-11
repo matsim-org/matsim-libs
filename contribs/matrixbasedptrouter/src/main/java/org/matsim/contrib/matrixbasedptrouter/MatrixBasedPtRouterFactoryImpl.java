@@ -20,7 +20,7 @@
 /**
  * 
  */
-package org.matsim.contrib.improvedPseudoPt;
+package org.matsim.contrib.matrixbasedptrouter;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;

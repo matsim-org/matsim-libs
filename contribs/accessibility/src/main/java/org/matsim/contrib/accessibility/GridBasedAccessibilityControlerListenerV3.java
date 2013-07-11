@@ -14,7 +14,7 @@ import org.matsim.contrib.accessibility.utils.BoundingBox;
 import org.matsim.contrib.accessibility.utils.LeastCostPathTreeExtended;
 import org.matsim.contrib.accessibility.utils.TempDirectoryUtil;
 import org.matsim.contrib.accessibility.utils.io.writer.AnalysisCellBasedAccessibilityCSVWriterV2;
-import org.matsim.contrib.improvedPseudoPt.PtMatrix;
+import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;

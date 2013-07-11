@@ -27,7 +27,7 @@ import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.accessibility.config.M4UAccessibilityConfigUtils;
-import org.matsim.contrib.improvedPseudoPt.config.ImprovedPseudoPtConfigUtils;
+import org.matsim.contrib.matrixbasedptrouter.config.ImprovedPseudoPtConfigUtils;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.Matsim4UrbansimConfigType;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.Matsim4UrbansimType;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.MatsimConfigType;
