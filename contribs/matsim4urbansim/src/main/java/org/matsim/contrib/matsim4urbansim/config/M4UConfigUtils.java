@@ -396,14 +396,13 @@ public class M4UConfigUtils {
 	 * @param config TODO
 	 * @throws UncheckedIOException
 	 */
-	static void loadExternalConfigAndOverwriteMATSim4UrbanSimSettings(MatsimConfigType matsim4urbansimConfigPart1, Config config) throws UncheckedIOException {
+	static void loadExternalConfigAndOverwriteMATSim4UrbanSimSettings(String externalMATSimConfigFileName, Config config) throws UncheckedIOException {
 		// check if external MATsim config is given
-		String externalMATSimConfig = matsim4urbansimConfigPart1.getExternalMatsimConfig();
-		if(externalMATSimConfig != null && Paths.pathExsits(externalMATSimConfig)){
+		if(externalMATSimConfigFileName != null && Paths.pathExsits(externalMATSimConfigFileName)){
 
-			log.info("Loading settings from external MATSim config: " + externalMATSimConfig);
+			log.info("Loading settings from external MATSim config: " + externalMATSimConfigFileName);
 			log.warn("NOTE: MATSim4UrbanSim settings will be overwritten by settings in the external config! Make sure that this is what you intended!");
-			new MatsimConfigReader(config).parse(externalMATSimConfig);
+			new MatsimConfigReader(config).parse(externalMATSimConfigFileName);
 			log.info("... loading settings done!");
 		}
 	}

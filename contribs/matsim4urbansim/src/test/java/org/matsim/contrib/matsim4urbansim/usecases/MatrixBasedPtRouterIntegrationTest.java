@@ -84,9 +84,11 @@ public class MatrixBasedPtRouterIntegrationTest {
 		String distancesLocation = CreateTestNetwork.createTestPtTravelTimesAndDistancesCSVFile();
 
 		//add stops, travel times and travel distances file to the pseudo pt config group
-		((MatrixBasedPtRouterConfigGroup)config.getModule(MatrixBasedPtRouterConfigGroup.GROUP_NAME)).setPtStopsInputFile(stopsLocation);
-		((MatrixBasedPtRouterConfigGroup)config.getModule(MatrixBasedPtRouterConfigGroup.GROUP_NAME)).setPtTravelTimesInputFile(timesLocation);
-		((MatrixBasedPtRouterConfigGroup)config.getModule(MatrixBasedPtRouterConfigGroup.GROUP_NAME)).setPtTravelDistancesInputFile(distancesLocation);
+		final MatrixBasedPtRouterConfigGroup matrixBasedPtRouterConfigGroup 
+			= (MatrixBasedPtRouterConfigGroup)config.getModule(MatrixBasedPtRouterConfigGroup.GROUP_NAME);
+		matrixBasedPtRouterConfigGroup.setPtStopsInputFile(stopsLocation);
+		matrixBasedPtRouterConfigGroup.setPtTravelTimesInputFile(timesLocation);
+		matrixBasedPtRouterConfigGroup.setPtTravelDistancesInputFile(distancesLocation);
 
 		//modification of the config according to what's needed
 		config.controler().setMobsim("qsim");

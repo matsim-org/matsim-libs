@@ -22,6 +22,9 @@
  */
 package org.matsim.contrib.matrixbasedptrouter.config;
 
+import java.io.File;
+
+import org.apache.log4j.Logger;
 import org.matsim.core.config.experimental.ReflectiveModule;
 
 /**
@@ -29,6 +32,8 @@ import org.matsim.core.config.experimental.ReflectiveModule;
  *
  */
 public class MatrixBasedPtRouterConfigGroup extends ReflectiveModule {
+	static final Logger log = Logger.getLogger(MatrixBasedPtRouterConfigGroup.class) ;
+	
 	public static final String GROUP_NAME="matrixBasedPtRouter" ;
 
 	private static final String USING_PT_STOPS = "usingPtStops";
@@ -87,5 +92,52 @@ public class MatrixBasedPtRouterConfigGroup extends ReflectiveModule {
 	public void setUsingPtStops(boolean usingPtStops) {
 		this.usingPtStops = usingPtStops;
 	}
+    
+    	@Override
+	protected void checkConsistency() {
+    		boolean problem = false ;
+		if( isUsingPtStops() ) {
+			log.info(MatrixBasedPtRouterConfigGroup.PT_STOPS_SWITCH + " switch is set to true. Trying to find pt stops file ...");
+			// checking for pt stops
+			if( getPtStopsInputFile() != null){
+				File ptStopsFile = new File(getPtStopsInputFile());
+				if(ptStopsFile.exists()){
+					log.info("Found pt stops file " + getPtStopsInputFile());
+				} else {
+					problem = true ;
+					log.error("Pt stops file " + getPtStopsInputFile() + " not found although switch is set to true! Will abort ...");
+
+				}
+				
+				// checking for other input files
+				if( isUsingTravelTimesAndDistances() ) {
+					log.info(MatrixBasedPtRouterConfigGroup.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH + " switch is set to true. Trying to find travel times and distances files ...");
+					
+					if(new File( getPtTravelTimesInputFile() ).exists() && new File( getPtTravelDistancesInputFile() ).exists()){
+						log.info("Found travel times and travel distances input files:");
+						log.info("Travel times input file: " + getPtTravelTimesInputFile());
+						log.info("Travel distances input file: " + getPtTravelDistancesInputFile() );
+					} else {
+						problem = true ;
+						log.error("Travel times and/or travel distances input files not found!  Will abort ...");
+						log.warn("Travel times input file name: " + getPtTravelTimesInputFile());
+						log.warn("Travel distances input file name: " + getPtTravelDistancesInputFile());
+					}
+				} else {
+					log.info(MatrixBasedPtRouterConfigGroup.PT_TRAVEL_TIMES_AND_DISTANCES_SWITCH + " switch is set to false. Additional travel times and distances files will not be read!");
+				}
+				
+			} else {
+				problem = true ;
+				log.warn("No pt stops file given although switch is set to true!  Will abort ...");
+			}
+		} else {
+			log.info(MatrixBasedPtRouterConfigGroup.PT_STOPS_SWITCH + " switch is set to false. Matrix based pt router will not be initialized.");
+		}
+		if ( problem ) {
+			throw new RuntimeException("found fatal problem in matrix based pt router initialization; aborting ...") ;
+		}
+
+    	}
 
 }

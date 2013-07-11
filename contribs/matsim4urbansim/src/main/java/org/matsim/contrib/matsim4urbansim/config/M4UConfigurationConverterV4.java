@@ -125,26 +125,30 @@ public class M4UConfigurationConverterV4 {
 		Matsim4UrbansimType matsim4urbansimConfigPart2 = this.matsim4urbansimConfig.getMatsim4Urbansim();
 		Assert.assertTrue( matsim4urbansimConfigPart2 != null ) ;
 		
-		// loads the external MATSim config separately (to get additional MATSim4UrbanSim parameters)
-		Module matsim4urbansimConfigPart3 
-			= M4UConfigUtils.getM4UModuleFromExternalConfig(matsim4urbansimConfigPart1.getExternalMatsimConfig());
+//		// loads the external MATSim config separately (to get additional MATSim4UrbanSim parameters)
+//		Module matsim4urbansimConfigPart3 
+//			= M4UConfigUtils.getM4UModuleFromExternalConfig(matsim4urbansimConfigPart1.getExternalMatsimConfig());
+		// no longer necessary.  kai, jul'13
 		
 		// int MATSimConfigType parameters
 		M4UConfigUtils.initAccessibilityConfigGroupParameters(matsim4urbansimConfigPart1, config);
 		M4UConfigUtils.initM4UControlerConfigModuleV3Parameters(matsim4urbansimConfigPart1, config);
 		M4UConfigUtils.initUrbanSimParameterConfigModuleV3Parameters(matsim4urbansimConfigPart2, config);
 		
-//		M4UAccessibilityConfigUtils.initAccessibilityParameters(config);
 		M4UConfigUtils.initNetwork(matsim4urbansimConfigPart1, config);
 		M4UConfigUtils.initControler(matsim4urbansimConfigPart1, config);
 		M4UConfigUtils.initPlanCalcScore(matsim4urbansimConfigPart1, config);
 		M4UConfigUtils.initQSim(matsim4urbansimConfigPart2, config);
+
 		M4UConfigUtils.initStrategy(config) ;
-		MatrixBasedPtRouterConfigUtils.initMatrixBasedPtRouterParameters(matsim4urbansimConfigPart3, config);
 		// note: ending innovation after 80% of iterations is now switched on in "createEmptyConfigWithSomeDefaults" above.
 
+//		MatrixBasedPtRouterConfigUtils.initMatrixBasedPtRouterParameters(matsim4urbansimConfigPart3, config);
+		// (was, in my view, not doing anything besides consistency checking, which is now in the config group consistency
+		// checker. kai, jul'13)
+
 		// loading the external MATSim config in to the initialized config
-		M4UConfigUtils.loadExternalConfigAndOverwriteMATSim4UrbanSimSettings(matsim4urbansimConfigPart1, config);
+		M4UConfigUtils.loadExternalConfigAndOverwriteMATSim4UrbanSimSettings(matsim4urbansimConfigPart1.getExternalMatsimConfig(), config);
 		// (by the design, the matsim xml config reader over-writes only entries which are explicitly mentioned in the external config)
 
 		// show final settings
