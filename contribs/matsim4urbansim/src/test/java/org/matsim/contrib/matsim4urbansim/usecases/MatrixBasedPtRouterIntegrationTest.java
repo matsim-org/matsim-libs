@@ -31,11 +31,11 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.contrib.accessibility.utils.BoundingBox;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterFactoryImpl;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.config.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.config.MatrixBasedPtRouterConfigUtils;
+import org.matsim.contrib.matrixbasedptrouter.utils.MyBoundingBox;
 import org.matsim.contrib.matsim4urbansim.utils.CreateTestNetwork;
 import org.matsim.contrib.matsim4urbansim.utils.CreateTestPopulation;
 import org.matsim.core.config.Config;
@@ -111,16 +111,12 @@ public class MatrixBasedPtRouterIntegrationTest {
 		PlansCalcRouteConfigGroup plansCalcRoute = controler.getScenario().getConfig().plansCalcRoute();
 		
 		// determining the bounds minX/minY -- maxX/maxY. For optimal performance of the QuadTree. All pt stops should be evenly distributed within this rectangle.
-		BoundingBox nbb = new BoundingBox();
+		MyBoundingBox nbb = new MyBoundingBox();
 		nbb.setDefaultBoundaryBox(network);
 		
 		//create new pt matrix
-		PtMatrix ptMatrix = new PtMatrix(controler.getScenario().getNetwork(),
-								plansCalcRoute.getTeleportedModeSpeeds().get(TransportMode.walk),
-								plansCalcRoute.getTeleportedModeSpeeds().get(TransportMode.pt),
-								plansCalcRoute.getBeelineDistanceFactor(),
-								nbb.getXMin(), nbb.getYMin(), nbb.getXMax(), nbb.getYMax(),
-								MatrixBasedPtRouterConfigUtils.getConfigModuleAndPossiblyConvert(controler.getScenario().getConfig()));
+		PtMatrix ptMatrix = new PtMatrix(plansCalcRoute,
+								nbb, MatrixBasedPtRouterConfigUtils.getConfigModuleAndPossiblyConvert(controler.getScenario().getConfig()));
 		controler.setTripRouterFactory( new MatrixBasedPtRouterFactoryImpl(controler, ptMatrix) ); // the car and pt router
 
 		//execute MATSim run

@@ -29,13 +29,16 @@ import junit.framework.Assert;
 import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.accessibility.utils.BoundingBox;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.config.MatrixBasedPtRouterConfigGroup;
+import org.matsim.contrib.matrixbasedptrouter.utils.MyBoundingBox;
 import org.matsim.contrib.matsim4urbansim.utils.CreateTestNetwork;
 import org.matsim.contrib.matsim4urbansim.utils.TempDirectoryUtil;
 import org.matsim.contrib.matsim4urbansim.utils.network.NetworkUtil;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -82,17 +85,23 @@ public class PtMatrixTest extends MatsimTestCase{
 		double defaultPtSpeed 	= 10.; // in m/s
 		double beelineDistanceFactor = 2.; // a multiplier for the pt travel distance
 
+		Config config = ConfigUtils.createConfig() ;
+		config.plansCalcRoute().setBeelineDistanceFactor(beelineDistanceFactor ) ;
+		config.plansCalcRoute().setTeleportedModeSpeed(TransportMode.walk, defaultWalkSpeed) ;
+		config.plansCalcRoute().setTeleportedModeSpeed(TransportMode.pt, defaultPtSpeed ) ;
+
 		Network network = CreateTestNetwork.createTestNetwork();			// creates a dummy network
 		String location = CreateTestNetwork.createTestPtStationCSVFile();	// creates a dummy csv file with pt stops fitting into the dummy network
 		
 		MatrixBasedPtRouterConfigGroup module = new MatrixBasedPtRouterConfigGroup();
 		module.setPtStopsInputFile(location);								// this is to be compatible with real code
+		config.addModule(module) ;
 
 		// determining the bounds minX/minY -- maxX/maxY. For optimal performance of the QuadTree. All pt stops should be evenly distributed within this rectangle.
-		BoundingBox nbb = new BoundingBox();
+		MyBoundingBox nbb = new MyBoundingBox();
 		nbb.setDefaultBoundaryBox(network);
 		// call and init the pt matrix
-		PtMatrix ptm = new PtMatrix(network, defaultWalkSpeed, defaultPtSpeed, beelineDistanceFactor, nbb.getXMin(), nbb.getYMin(), nbb.getXMax(), nbb.getYMax(), module);
+		PtMatrix ptm = new PtMatrix(config.plansCalcRoute(), nbb, module);
 
 		// test the matrix
 		List<Coord> facilityList = CreateTestNetwork.getTestFacilityLocations();
@@ -181,6 +190,12 @@ public class PtMatrixTest extends MatsimTestCase{
 		double defaultWalkSpeed = 1.; // in m/s
 		double defaultPtSpeed 	= 10.; // in m/s
 		double beelineDistanceFactor = 2.; // a multiplier for the pt travel distance
+		
+		Config config = ConfigUtils.createConfig() ;
+		config.plansCalcRoute().setBeelineDistanceFactor(beelineDistanceFactor ) ;
+		config.plansCalcRoute().setTeleportedModeSpeed(TransportMode.walk, defaultWalkSpeed) ;
+		config.plansCalcRoute().setTeleportedModeSpeed(TransportMode.pt, defaultPtSpeed ) ;
+
 
 		Network network = CreateTestNetwork.createTestNetwork();			// creates a dummy network
 		String stopsLocation = CreateTestNetwork.createTestPtStationCSVFile();	// creates a dummy csv file with pt stops fitting into the dummy network
@@ -193,10 +208,10 @@ public class PtMatrixTest extends MatsimTestCase{
 		module.setPtTravelDistancesInputFile(distancesLocation);				// this is to be compatible with real code
 
 		// determining the bounds minX/minY -- maxX/maxY. For optimal performance of the QuadTree. All pt stops should be evenly distributed within this rectangle.
-		BoundingBox nbb = new BoundingBox();
+		MyBoundingBox nbb = new MyBoundingBox();
 		nbb.setDefaultBoundaryBox(network);
 		// call and init the pt matrix
-		PtMatrix ptm = new PtMatrix(network, defaultWalkSpeed, defaultPtSpeed, beelineDistanceFactor, nbb.getXMin(), nbb.getYMin(), nbb.getXMax(), nbb.getYMax(), module);
+		PtMatrix ptm = new PtMatrix(config.plansCalcRoute(), nbb, module);
 
 		// test the matrix
 		List<Coord> facilityList = CreateTestNetwork.getTestFacilityLocations();

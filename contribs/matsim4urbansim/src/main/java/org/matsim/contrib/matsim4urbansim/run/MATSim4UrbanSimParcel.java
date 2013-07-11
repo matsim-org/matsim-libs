@@ -39,11 +39,11 @@ import org.matsim.contrib.accessibility.ZoneBasedAccessibilityControlerListenerV
 import org.matsim.contrib.accessibility.config.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.config.AccessibilityConfigGroup.AreaOfAccesssibilityComputation;
 import org.matsim.contrib.accessibility.utils.AggregateObject2NearestNode;
-import org.matsim.contrib.accessibility.utils.BoundingBox;
 import org.matsim.contrib.matrixbasedptrouter.MatrixBasedPtRouterFactoryImpl;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.config.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.config.MatrixBasedPtRouterConfigUtils;
+import org.matsim.contrib.matrixbasedptrouter.utils.MyBoundingBox;
 import org.matsim.contrib.matsim4urbansim.config.M4UConfigurationConverterV4;
 import org.matsim.contrib.matsim4urbansim.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4urbansim.config.modules.UrbanSimParameterConfigModuleV3;
@@ -122,7 +122,7 @@ public class MATSim4UrbanSimParcel{
 	boolean computeAgentPerformance					 = false;	// determines whether agent performances should be calculated
 	String shapeFile 						 		 = null;
 	double cellSizeInMeter 							 = -1;
-	BoundingBox nwBoundaryBox				 = null;
+	MyBoundingBox nwBoundaryBox				 = null;
 	
 	/**
 	 * constructor
@@ -306,17 +306,11 @@ public class MATSim4UrbanSimParcel{
 				}
 			}
 			
-			// if ptStops etc are given in config
-			PlansCalcRouteConfigGroup plansCalcRoute = controler.getScenario().getConfig().plansCalcRoute();
 			// determining the bounds minX/minY -- maxX/maxY. For optimal performance of the QuadTree. All pt stops should be evenly distributed within this rectangle.
-			BoundingBox nbb = new BoundingBox();
+			MyBoundingBox nbb = new MyBoundingBox();
 			nbb.setDefaultBoundaryBox(controler.getScenario().getNetwork());
-			ptMatrix = new PtMatrix(controler.getScenario().getNetwork(),
-									plansCalcRoute.getTeleportedModeSpeeds().get(TransportMode.walk),
-									plansCalcRoute.getTeleportedModeSpeeds().get(TransportMode.pt),
-									plansCalcRoute.getBeelineDistanceFactor(),
-									nbb.getXMin(), nbb.getYMin(), nbb.getXMax(), nbb.getYMax(),
-									MatrixBasedPtRouterConfigUtils.getConfigModuleAndPossiblyConvert(controler.getScenario().getConfig()));	
+			ptMatrix = new PtMatrix(controler.getScenario().getConfig().plansCalcRoute(),
+									nbb, MatrixBasedPtRouterConfigUtils.getConfigModuleAndPossiblyConvert(controler.getScenario().getConfig()));	
 			controler.setTripRouterFactory( new MatrixBasedPtRouterFactoryImpl(controler, ptMatrix) ); // the car and pt router
 			
 			log.error("reconstructing pt route distances; not tested ...") ;
@@ -470,7 +464,7 @@ public class MATSim4UrbanSimParcel{
 		
 		// the boundary box defines the study area for accessibility calculations if no shape file is provided or a zone based UrbanSim application is used
 		// the boundary is either defined by a user defined boundary box or if not applicable by the extend of the road network
-		this.nwBoundaryBox 				= new BoundingBox();
+		this.nwBoundaryBox 				= new MyBoundingBox();
 		if(this.computeGridBasedAccessibilityUsingBoundingBox){	// check if a boundary box is defined
 			// log.info("Using custom bounding box for accessibility computation.");
 			nwBoundaryBox.setCustomBoundaryBox(moduleAccessibility.getBoundingBoxLeft(), 

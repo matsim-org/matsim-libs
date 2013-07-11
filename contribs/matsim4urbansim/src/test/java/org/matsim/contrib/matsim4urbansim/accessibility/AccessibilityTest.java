@@ -16,8 +16,8 @@ import org.matsim.contrib.accessibility.gis.GridUtils;
 import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
 import org.matsim.contrib.accessibility.interfaces.ZoneDataExchangeInterface;
-import org.matsim.contrib.accessibility.utils.BoundingBox;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
+import org.matsim.contrib.matrixbasedptrouter.utils.MyBoundingBox;
 import org.matsim.contrib.matsim4urbansim.config.M4UConfigurationConverterV4;
 import org.matsim.contrib.matsim4urbansim.utils.CreateTestMATSimConfig;
 import org.matsim.contrib.matsim4urbansim.utils.CreateTestNetwork;
@@ -88,7 +88,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 		ctrl.setOverwriteFiles(true);
 		
 		//create a bounding box with 9 measuring points (one for each node)
-		BoundingBox bbox = new BoundingBox();
+		MyBoundingBox bbox = new MyBoundingBox();
 		double[] boundary = NetworkUtils.getBoundingBox(net.getNodes().values());
 		
 		double minX = boundary[0]-resolution/2;
@@ -170,7 +170,7 @@ public class AccessibilityTest implements SpatialGridDataExchangeInterface, Zone
 		ctrl.setOverwriteFiles(true);
 			
 		//create a bounding box with 9 measuring points (one for each node)
-		BoundingBox bbox = new BoundingBox();
+		MyBoundingBox bbox = new MyBoundingBox();
 		double[] boundary = NetworkUtils.getBoundingBox(net.getNodes().values());
 				
 		double minX = boundary[0]-resolution/2;

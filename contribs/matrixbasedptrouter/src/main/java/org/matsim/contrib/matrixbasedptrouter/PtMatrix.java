@@ -33,11 +33,14 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.matrixbasedptrouter.config.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.utils.HeaderParser;
+import org.matsim.contrib.matrixbasedptrouter.utils.MyBoundingBox;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
@@ -63,8 +66,6 @@ public class PtMatrix {
 	private Matrix originDestinationTravelDistanceMatrix;
 	// quad tree 
 	private QuadTree<PtStop> qTree;
-	// walk speed
-	private double meterPerSecWalkSpeed;
 	
 	private long wrnCnt = 0;
 	private long wrnCntParam = 0;
@@ -72,52 +73,46 @@ public class PtMatrix {
 	private long wrnCntFormat = 0;
 	private long wrnCntSkip = 0;
 	private long wrnCntParse = 0;
-	
-	public PtMatrix(final Network network, final Double meterPerSecWalkSpeed, final Double meterPerSecPtSpeed, final Double beelineDistanceFactor, final double minX, final double minY, final double maxX, final double maxY, final MatrixBasedPtRouterConfigGroup ippcm){
 
+	private double meterPerSecWalkSpeed;
+	
+	public PtMatrix(PlansCalcRouteConfigGroup plansCalcRoute, final MyBoundingBox bb, final MatrixBasedPtRouterConfigGroup ippcm){
+
+		meterPerSecWalkSpeed = plansCalcRoute.getTeleportedModeSpeeds().get(TransportMode.walk) ;
+		
 		// get the locations for ptStops, travel times and distances from controler
 		String ptStopInputFile = ippcm.getPtStopsInputFile();
-		String ptTravelTimeInputFile = ippcm.getPtTravelTimesInputFile();
-		String ptTravelDistanceInputFile= ippcm.getPtTravelDistancesInputFile();
-		
-		this.meterPerSecWalkSpeed = meterPerSecWalkSpeed;
-		
-		// LeastCostPathCalculator
-		// DijkstraFactory dijkstra = new DijkstraFactory();
-		// lcpc = dijkstra.createPathCalculator(network, new TravelWalkTimeCostCalculator(meterPerSecWalkSpeed), ttc);
-		
 		// init quad tree, it contains all pt stops (coordinate, id)
-		qTree = initQuadTree( network, ptStopInputFile, minX, minY, maxX, maxY );
+		qTree = initQuadTree( ptStopInputFile, bb );
 
 		// init od matrix containing the travel times
 		originDestinationTravelTimeMatrix 	 = new Matrix("PtStopTravelTimeMatrix", "Stop to stop origin destination travel time matrix");
 		originDestinationTravelDistanceMatrix= new Matrix("PtStopTravelDistanceMatrix", "Stop to stop origin destination travel distance matrix");
 		
-		if(ptTravelTimeInputFile == null || ptTravelDistanceInputFile == null){
+		if(ippcm.getPtTravelTimesInputFile() == null || ippcm.getPtTravelDistancesInputFile() == null){
 			// if travel times and distances are not provided by external files ...
-			initODMatrixBasedOnPtStopsOnly( beelineDistanceFactor, meterPerSecPtSpeed, qTree, originDestinationTravelTimeMatrix, originDestinationTravelDistanceMatrix );
+			initODMatrixBasedOnPtStopsOnly( plansCalcRoute.getBeelineDistanceFactor(), 
+					plansCalcRoute.getTeleportedModeSpeeds().get(TransportMode.pt), 
+					qTree, originDestinationTravelTimeMatrix, originDestinationTravelDistanceMatrix );
 		}
 		else{
-			initODMatrixFromFile( qTree, originDestinationTravelTimeMatrix, originDestinationTravelDistanceMatrix, ptTravelTimeInputFile, ptTravelDistanceInputFile);
+			initODMatrixFromFile( qTree, originDestinationTravelTimeMatrix, originDestinationTravelDistanceMatrix, 
+					ippcm.getPtTravelTimesInputFile(), ippcm.getPtTravelDistancesInputFile() );
 		}
 	}
 	
 	/**
 	 * Building QuadTree with pt stops
-	 * 
-	 * @param Network MATSim road network used in present scenario
 	 * @param ptStopInputFile input file with pt stops
-	 * @param minX The smallest x coordinate (easting, longitude) expected
-	 * @param minY The smallest y coordinate (northing, latitude) expected
-	 * @param maxX The largest x coordinate (easting, longitude) expected
-	 * @param maxY The largest y coordinate (northing, latitude) expected
+	 * @param bb The smallest x coordinate (easting, longitude) expected
+	 * @param Network MATSim road network used in present scenario
 	 * @return
 	 */
-	private QuadTree<PtStop> initQuadTree(Network network, String ptStopInputFile, final double minX, final double minY, final double maxX, final double maxY){
+	private QuadTree<PtStop> initQuadTree(String ptStopInputFile, final MyBoundingBox bb){
 		
 		log.info("Building QuadTree for pt stops.");
 
-		QuadTree<PtStop> qTree = new QuadTree<PtStop>(minX, minY, maxX, maxY);
+		QuadTree<PtStop> qTree = new QuadTree<PtStop>(bb.getXMin(), bb.getYMin(), bb.getXMax(), bb.getYMax() );
 		
 		try {
 			BufferedReader bwPtStops = IOUtils.getBufferedReader(ptStopInputFile);
@@ -608,9 +603,9 @@ public class PtMatrix {
 		log.info("Start testing");
 		
 		long start = System.currentTimeMillis();
-		double defaultWalkSpeed = 1.38888889;
-		double defaultPtSpeed 	= 6.94444444;	// 6.94444444m/s corresponds to 25 km/h
-		double beelineDistanceFactor = 1.3;
+//		double defaultWalkSpeed = 1.38888889;
+//		double defaultPtSpeed 	= 6.94444444;	// 6.94444444m/s corresponds to 25 km/h
+//		double beelineDistanceFactor = 1.3;
 		
 		// String BrusselNetwork = "/Users/thomas/Development/opus_home/data/brussels_zone/data/matsim/network/belgium_incl_borderArea_hierarchylayer4_clean_simple.xml.gz";
 		String ZurichNetwork  = "/Users/thomas/Development/opus_home/data/zurich_parcel/data/data/network/ivtch-osm.xml";
@@ -619,17 +614,22 @@ public class PtMatrix {
 		new MatsimNetworkReader(scenario).readFile(ZurichNetwork);
 		ScenarioUtils.loadScenario(scenario);
 		
-		Network network = scenario.getNetwork() ;
+//		Network network = scenario.getNetwork() ;
 		// TravelTime ttc = new TravelTimeCalculator(network,60,30*3600, scenario.getConfig().travelTimeCalculator()).getLinkTravelTimes();
 		
-		MatrixBasedPtRouterConfigGroup module = new MatrixBasedPtRouterConfigGroup();
+		MatrixBasedPtRouterConfigGroup matrixBasedPtRouterConfig = new MatrixBasedPtRouterConfigGroup();
 		// m4uccm.setPtStopsInputFile("/Users/thomas/Development/opus_home/data/brussels_zone/data/transit_csvs_from_Dimitris_20121002/underground.csv"); 	// for Brussels
-		module.setPtStopsInputFile("/Users/thomas/Development/opus_home/data/zurich_parcel/data/Matrizen__OeV/Zones_Attributes.csv");					  	// for Zurich
-		module.setPtTravelTimesInputFile("/Users/thomas/Development/opus_home/data/zurich_parcel/data/Matrizen__OeV/OeV_2007_7_8.JRT");						// for Zurich
-		module.setPtTravelDistancesInputFile("/Users/thomas/Development/opus_home/data/zurich_parcel/data/Matrizen__OeV/OeV_2007_7_8.JRD");					// for Zurich
+		matrixBasedPtRouterConfig.setPtStopsInputFile("/Users/thomas/Development/opus_home/data/zurich_parcel/data/Matrizen__OeV/Zones_Attributes.csv");					  	// for Zurich
+		matrixBasedPtRouterConfig.setPtTravelTimesInputFile("/Users/thomas/Development/opus_home/data/zurich_parcel/data/Matrizen__OeV/OeV_2007_7_8.JRT");						// for Zurich
+		matrixBasedPtRouterConfig.setPtTravelDistancesInputFile("/Users/thomas/Development/opus_home/data/zurich_parcel/data/Matrizen__OeV/OeV_2007_7_8.JRD");					// for Zurich
 
+		scenario.getConfig().addModule(matrixBasedPtRouterConfig) ;
+		
 		// PtMatrix ptm = new PtMatrix(network, defaultWalkSpeed, defaultPtSpeed, beelineDistanceFactor, 101957.4, 127352.6, 207191., 202664., module);		// for Brussels
-		PtMatrix ptm = new PtMatrix(network, defaultWalkSpeed, defaultPtSpeed, beelineDistanceFactor, 1234982.0, 178454.0, 280600.0, 1300000.0, module); 	// for Zurich
+
+		MyBoundingBox bb = new MyBoundingBox() ;
+		bb.setCustomBoundaryBox(1234982.0, 178454.0, 280600.0, 1300000.0) ;
+		PtMatrix ptm = new PtMatrix(scenario.getConfig().plansCalcRoute(), bb, matrixBasedPtRouterConfig); 	// for Zurich
 		
 		// get QuadTree
 		QuadTree<PtStop> qTreeTest = ptm.getQuadTree();
