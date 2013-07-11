@@ -39,11 +39,13 @@ import org.matsim.withinday.utils.EditRoutes;
 public class MarathonCurrentLegReplanner extends WithinDayDuringLegReplanner {
 
 	private final TripRouter tripRouter;
+	private final EditRoutes editRoutes;
 	
 	/*package*/ MarathonCurrentLegReplanner(Id id, Scenario scenario, InternalInterface internalInterface,
 			TripRouter tripRouter) {
 		super(id, scenario, internalInterface);
 		this.tripRouter = tripRouter;
+		this.editRoutes = new EditRoutes();
 	}
 
 	@Override
@@ -57,7 +59,6 @@ public class MarathonCurrentLegReplanner extends WithinDayDuringLegReplanner {
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
 
-		int currentLegIndex = withinDayAgent.getCurrentPlanElementIndex();
 		int currentLinkIndex = withinDayAgent.getCurrentRouteLinkIdIndex();
 
 		// for walk2d legs: switch mode to walk for routing
@@ -70,7 +71,8 @@ public class MarathonCurrentLegReplanner extends WithinDayDuringLegReplanner {
 		}
 
 		// new Route for current Leg
-		new EditRoutes().replanCurrentLegRoute(executedPlan, currentLegIndex, currentLinkIndex, tripRouter, time);
+		this.editRoutes.replanCurrentLegRoute(currentLeg, executedPlan.getPerson(), currentLinkIndex, time, 
+				scenario.getNetwork(), tripRouter); 
 
 		// switch back to walk2d
 		if (isWalk2d) {

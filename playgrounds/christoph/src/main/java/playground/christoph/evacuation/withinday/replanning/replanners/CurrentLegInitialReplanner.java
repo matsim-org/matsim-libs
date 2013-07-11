@@ -51,12 +51,14 @@ public class CurrentLegInitialReplanner extends WithinDayDuringLegReplanner {
 
 	private final CoordAnalyzer coordAnalyzer;
 	private final TripRouter tripRouter;
+	private final EditRoutes editRoutes;
 	
 	/*package*/ CurrentLegInitialReplanner(Id id, Scenario scenario, InternalInterface internalInterface,
 			CoordAnalyzer coordAnalyzer, TripRouter tripRouter) {
 		super(id, scenario, internalInterface);
 		this.coordAnalyzer = coordAnalyzer;
 		this.tripRouter = tripRouter;
+		this.editRoutes = new EditRoutes();
 	}
 
 	@Override
@@ -70,7 +72,6 @@ public class CurrentLegInitialReplanner extends WithinDayDuringLegReplanner {
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
 
-		int currentLegIndex = withinDayAgent.getCurrentPlanElementIndex();
 		int currentLinkIndex = withinDayAgent.getCurrentRouteLinkIdIndex();
 		Activity nextActivity = (Activity) executedPlan.getPlanElements().get(withinDayAgent.getCurrentPlanElementIndex() + 1);
 		nextActivity.setEndTime(Time.UNDEFINED_TIME);
@@ -104,7 +105,8 @@ public class CurrentLegInitialReplanner extends WithinDayDuringLegReplanner {
 			}
 
 			// new Route for current Leg
-			new EditRoutes().replanCurrentLegRoute(executedPlan, currentLegIndex, currentLinkIndex, tripRouter, time);
+			this.editRoutes.relocateCurrentLegRoute(currentLeg, executedPlan.getPerson(), currentLinkIndex, 
+					scenario.createId("rescueLink"), time, scenario.getNetwork(), tripRouter);
 			
 			// switch back to walk2d
 			if (isWalk2d) {

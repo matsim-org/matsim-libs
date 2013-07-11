@@ -60,11 +60,13 @@ import playground.christoph.evacuation.config.EvacuationConfig;
 public class CurrentLegToSecureFacilityReplanner extends WithinDayDuringLegReplanner {
 
 	protected final TripRouter tripRouter;
+	protected final EditRoutes editRoutes;
 	
 	/*package*/ CurrentLegToSecureFacilityReplanner(Id id, Scenario scenario, InternalInterface internalInterface,
 			TripRouter tripRouter) {
 		super(id, scenario, internalInterface);
 		this.tripRouter = tripRouter;
+		this.editRoutes = new EditRoutes();
 	}
 
 	@Override
@@ -120,8 +122,9 @@ public class CurrentLegToSecureFacilityReplanner extends WithinDayDuringLegRepla
 			new ReplacePlanElements().replaceActivity(executedPlan, nextActivity, rescueActivity);
 			
 			int currentLinkIndex = withinDayAgent.getCurrentRouteLinkIdIndex();
+
 			// new Route for current Leg
-			new EditRoutes().replanCurrentLegRoute(executedPlan, currentLegIndex, currentLinkIndex, tripRouter, time);
+			this.editRoutes.relocateCurrentLegRoute(currentLeg, executedPlan.getPerson(), currentLinkIndex, rescueActivity.getLinkId(), currentLinkIndex, scenario.getNetwork(), tripRouter);
 		}
 		
 		// Remove all legs and activities after the next activity.

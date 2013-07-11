@@ -42,11 +42,13 @@ import playground.christoph.evacuation.config.EvacuationConfig;
 public class CurrentLegToRescueFacilityReplanner extends WithinDayDuringLegReplanner {
 
 	protected final TripRouter tripRouter;
+	protected final EditRoutes editRoutes;
 	
 	/*package*/ CurrentLegToRescueFacilityReplanner(Id id, Scenario scenario, InternalInterface internalInterface,
 			TripRouter tripRouter) {
 		super(id, scenario, internalInterface);
 		this.tripRouter = tripRouter;
+		this.editRoutes = new EditRoutes();
 	}
 
 	@Override
@@ -63,7 +65,7 @@ public class CurrentLegToRescueFacilityReplanner extends WithinDayDuringLegRepla
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
 
-		int currentLegIndex = withinDayAgent.getCurrentPlanElementIndex();
+		Leg currentLeg = withinDayAgent.getCurrentLeg();
 		int currentLinkIndex = withinDayAgent.getCurrentRouteLinkIdIndex();
 		Activity nextActivity = (Activity) executedPlan.getPlanElements().get(withinDayAgent.getCurrentPlanElementIndex() + 1);
 				
@@ -84,7 +86,8 @@ public class CurrentLegToRescueFacilityReplanner extends WithinDayDuringLegRepla
 		 * If the Agent wants to perform the next Activity at the current Link we
 		 * cannot replace that Activity at the moment (Simulation logic...).
 		 * Therefore we set the Duration of the next Activity to 0 and add a new
-		 * Rescue Activity afterwithinDayAgent*/
+		 * Rescue Activity afterwards.
+		 */
 		if (withinDayAgent.getDestinationLinkId().equals(nextActivity.getLinkId())) {
 			nextActivity.setStartTime(this.time);
 			nextActivity.setEndTime(this.time);
@@ -100,7 +103,7 @@ public class CurrentLegToRescueFacilityReplanner extends WithinDayDuringLegRepla
 			int position = executedPlan.getPlanElements().size() - 1; 
 			executedPlan.addActivity(rescueActivity);
 			
-			new EditRoutes().replanFutureLegRoute(executedPlan, position, tripRouter);
+			this.editRoutes.relocateFutureLegRoute(newLeg, withinDayAgent.getCurrentLinkId(), rescueActivity.getLinkId(), executedPlan.getPerson(), scenario.getNetwork(), tripRouter);
 		}
 		
 		else {
@@ -114,7 +117,8 @@ public class CurrentLegToRescueFacilityReplanner extends WithinDayDuringLegRepla
 			new ReplacePlanElements().replaceActivity(executedPlan, nextActivity, rescueActivity);
 			
 			// new Route for current Leg
-			new EditRoutes().replanCurrentLegRoute(executedPlan, currentLegIndex, currentLinkIndex, tripRouter, time);
+			this.editRoutes.relocateCurrentLegRoute(currentLeg, executedPlan.getPerson(), currentLinkIndex, 
+					rescueActivity.getLinkId(), time, scenario.getNetwork(), tripRouter);
 			
 			// Remove all legs and activities after the next activity.
 			int nextActivityIndex = executedPlan.getActLegIndex(rescueActivity);

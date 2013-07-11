@@ -23,6 +23,7 @@ package playground.christoph.evacuation.withinday.replanning.replanners;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
@@ -50,6 +51,7 @@ public class CurrentLegToMeetingPointReplanner extends WithinDayDuringLegReplann
 	
 	protected final DecisionDataProvider decisionDataProvider;
 	protected final TripRouter tripRouter;
+	private final EditRoutes editRoutes;
 	
 	/*package*/ CurrentLegToMeetingPointReplanner(Id id, Scenario scenario,
 			InternalInterface internalInterface, DecisionDataProvider decisionDataProvider,
@@ -57,6 +59,7 @@ public class CurrentLegToMeetingPointReplanner extends WithinDayDuringLegReplann
 		super(id, scenario, internalInterface);
 		this.decisionDataProvider = decisionDataProvider;
 		this.tripRouter = tripRouter;
+		this.editRoutes = new EditRoutes();
 	}
 
 	@Override
@@ -70,7 +73,6 @@ public class CurrentLegToMeetingPointReplanner extends WithinDayDuringLegReplann
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
 
-		int currentLegIndex = withinDayAgent.getCurrentPlanElementIndex();
 		int currentLinkIndex = withinDayAgent.getCurrentRouteLinkIdIndex();
 		Activity nextActivity = (Activity) executedPlan.getPlanElements().get(withinDayAgent.getCurrentPlanElementIndex() + 1);
 		
@@ -124,8 +126,11 @@ public class CurrentLegToMeetingPointReplanner extends WithinDayDuringLegReplann
 			 */
 			if (currentLinkIndex == 0) currentLinkIndex++;
 
+			Leg currentLeg = withinDayAgent.getCurrentLeg();
+			
 			// new Route for current Leg
-			new EditRoutes().replanCurrentLegRoute(executedPlan, currentLegIndex, currentLinkIndex, tripRouter, time);
+			this.editRoutes.relocateCurrentLegRoute(currentLeg, executedPlan.getPerson(), currentLinkIndex, 
+					meetingActivity.getLinkId(), time, scenario.getNetwork(), tripRouter);
 			
 			// Remove all legs and activities after the next activity.
 			int nextActivityIndex = executedPlan.getActLegIndex(meetingActivity);
