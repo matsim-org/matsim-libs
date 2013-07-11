@@ -64,7 +64,7 @@ import others.sergioo.util.dataBase.NoConnectionException;
 			createString.append(");");
 			dba.executeStatement(createString.toString());
 			cpManager = ((PGConnection) dba.getConnection()).getCopyAPI();
-			reader = new PushbackReader(new StringReader(""), pushBackSize);
+			reader = new PushbackReader(new StringReader(""), pushBackSize*2);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
