@@ -29,7 +29,7 @@ import org.matsim.core.config.experimental.ReflectiveModule;
  *
  */
 public class MatrixBasedPtRouterConfigGroup extends ReflectiveModule {
-	public static final String GROUP_NAME="improvedPseudoPt" ;
+	public static final String GROUP_NAME="matrixBasedPtRouter" ;
 
 	private static final String USING_PT_STOPS = "usingPtStops";
 	public static final String PT_STOPS = "ptStopsFile"; // tnicolai: originally, this was named "ptStops" in the matsim config. old config files need to be adjusted
