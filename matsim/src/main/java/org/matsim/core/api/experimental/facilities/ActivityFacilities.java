@@ -23,11 +23,14 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 
 public interface ActivityFacilities extends MatsimToplevelContainer {
 
 	public Map<Id, ? extends ActivityFacility> getFacilities();
-	
+
 	public void addActivityFacility( ActivityFacility facility ) ;
+
+	public ObjectAttributes getFacilityAttributes();
 
 }

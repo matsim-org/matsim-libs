@@ -34,6 +34,7 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacilitiesFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 
 public class ActivityFacilitiesImpl implements ActivityFacilities, BasicLocations {
 
@@ -47,9 +48,11 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, BasicLocation
 	private static final Logger log = Logger.getLogger(ActivityFacilitiesImpl.class);
 	private final ActivityFacilitiesFactory factory ;
 
-	private Map<Id, ActivityFacility> facilities = new LinkedHashMap<Id, ActivityFacility>();
+	private final Map<Id, ActivityFacility> facilities = new LinkedHashMap<Id, ActivityFacility>();
 
 	private String name;
+
+	private final ObjectAttributes facilityAttributes = new ObjectAttributes();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructor
@@ -69,11 +72,11 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, BasicLocation
 	//////////////////////////////////////////////////////////////////////
 
 	public final ActivityFacilityImpl createAndAddFacility(final Id id, final Coord center) {
-		if (facilities.containsKey(id)) {
+		if (this.facilities.containsKey(id)) {
 			Gbl.errorMsg("Facility id=" + id + " already exists.");
 		}
 		ActivityFacilityImpl f = new ActivityFacilityImpl(id, center);
-		facilities.put(f.getId(),f);
+		this.facilities.put(f.getId(),f);
 
 		// show counter
 		this.counter++;
@@ -92,7 +95,7 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, BasicLocation
 
 	@Override
 	public final Map<Id, ActivityFacility> getFacilities() {
-		return facilities;
+		return this.facilities;
 	}
 
 	//Added 27.03.08 JH for random secondary location changes
@@ -119,7 +122,7 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, BasicLocation
 	}
 
 	public String getName() {
-		return name;
+		return this.name;
 	}
 
 	public void setName(String name) {
@@ -129,6 +132,11 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, BasicLocation
 	@Override
 	public void addActivityFacility(ActivityFacility facility) {
 		this.facilities.put( facility.getId(), facility ) ;
+	}
+
+	@Override
+	public ObjectAttributes getFacilityAttributes() {
+		return this.facilityAttributes;
 	}
 
 }

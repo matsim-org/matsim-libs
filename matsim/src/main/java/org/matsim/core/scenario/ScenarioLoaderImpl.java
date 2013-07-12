@@ -57,7 +57,7 @@ import org.matsim.vehicles.VehicleReaderV1;
  * <p/>
  * Design thoughts:<ul>
  * <li> Given what we have now, does it make sense to leave this class public?  yy kai, mar'11
- * </ul> 
+ * </ul>
  *
  * @see org.matsim.core.scenario.ScenarioImpl
  *
@@ -67,7 +67,7 @@ public class ScenarioLoaderImpl {
 
 	private static final Logger log = Logger.getLogger(ScenarioLoaderImpl.class);
 
-	
+
 	static Scenario loadScenario(Config config) {
 		ScenarioLoaderImpl scenarioLoader = new ScenarioLoaderImpl(config);
 		Scenario scenario = scenarioLoader.loadScenario();
@@ -111,10 +111,10 @@ public class ScenarioLoaderImpl {
 		this.config = this.scenario.getConfig();
 	}
 
-	
+
 	/**
 	 * @deprecated  Please use the static calls in ScenarioUtils instead.
-	 * 
+	 *
 	 */
 	@Deprecated
 	public Scenario getScenario() {
@@ -156,10 +156,10 @@ public class ScenarioLoaderImpl {
 
 	/**
 	 * Loads the network into the scenario of this class
-	 * 
+	 *
 	 * @deprecated  Please use the static calls in ScenarioUtils to load a scenario.
 	 * 				If you want only a network, use the MatsimNetworkReader directly.
-	 * 
+	 *
 	 */
 	@Deprecated
 	public void loadNetwork() {
@@ -176,10 +176,10 @@ public class ScenarioLoaderImpl {
 				((PopulationFactoryImpl) this.scenario.getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new ExperimentalTransitRouteFactory());
 			}
 			new MatsimNetworkReader(this.scenario).parse(networkFileName);
-			if ((config.network().getChangeEventsInputFile() != null) && config.network().isTimeVariantNetwork()) {
-				log.info("loading network change events from " + config.network().getChangeEventsInputFile());
+			if ((this.config.network().getChangeEventsInputFile() != null) && this.config.network().isTimeVariantNetwork()) {
+				log.info("loading network change events from " + this.config.network().getChangeEventsInputFile());
 				NetworkChangeEventsParser parser = new NetworkChangeEventsParser(network);
-				parser.parse(config.network().getChangeEventsInputFile());
+				parser.parse(this.config.network().getChangeEventsInputFile());
 				network.setNetworkChangeEvents(parser.getEvents());
 			}
 		}
@@ -188,7 +188,7 @@ public class ScenarioLoaderImpl {
 	/**
 	 * @deprecated  Please use the static calls in ScenarioUtils to load a scenario.
 	 * 				If you want only Facilities, use the MatsimFacilitiesReader directly.
-	 * 
+	 *
 	 */
 	@Deprecated
 	public void loadActivityFacilities() {
@@ -197,7 +197,7 @@ public class ScenarioLoaderImpl {
 			log.info("loading facilities from " + facilitiesFileName);
 			try {
 				new MatsimFacilitiesReader(this.scenario).parse(facilitiesFileName);
-				
+
 				this.scenario.getActivityFacilities().printFacilitiesCount();
 			} catch (Exception e) {
 				throw new RuntimeException(e);
@@ -206,12 +206,20 @@ public class ScenarioLoaderImpl {
 		else {
 			log.info("no facilities file set in config, therefore not loading any facilities.  This is not a problem except if you are using facilities");
 		}
+		if ((this.config.facilities() != null) && (this.config.facilities().getInputFacilitiesAttributesFile() != null)) {
+			String facilitiesAttributesFileName = this.config.facilities().getInputFacilitiesAttributesFile();
+			log.info("loading facility attributes from " + facilitiesAttributesFileName);
+			new ObjectAttributesXmlReader(this.scenario.getActivityFacilities().getFacilityAttributes()).parse(facilitiesAttributesFileName);
+		}
+		else {
+			log.info("no facility-attributes file set in config, not loading any facility attributes");
+		}
 	}
 
 	/**
 	 * @deprecated  Please use the static calls in ScenarioUtils to load a scenario.
 	 * 				If you want only a Population, use the MatsimPopulationReader directly.
-	 * 
+	 *
 	 */
 	@Deprecated
 	public void loadPopulation() {
@@ -219,7 +227,7 @@ public class ScenarioLoaderImpl {
 			String populationFileName = this.config.plans().getInputFile();
 			log.info("loading population from " + populationFileName);
 			new MatsimPopulationReader(this.scenario).parse(populationFileName);
-			
+
 			if (this.scenario.getPopulation() instanceof PopulationImpl) {
 				((PopulationImpl)this.scenario.getPopulation()).printPlansCount();
 			}
@@ -283,7 +291,7 @@ public class ScenarioLoaderImpl {
 			}
 		}
 		if ((laneDefinitions != null) && (filename != null)) {
-			MatsimLaneDefinitionsReader reader = new MatsimLaneDefinitionsReader(scenario);
+			MatsimLaneDefinitionsReader reader = new MatsimLaneDefinitionsReader(this.scenario);
 			reader.readFile(filename);
 		}
 		else {

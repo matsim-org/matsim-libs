@@ -28,7 +28,7 @@ import org.matsim.core.config.Config;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
- * @author mrieser
+ * @author mrieser / Senozon AG
  */
 public class ScenarioLoaderImplTest {
 
@@ -36,35 +36,44 @@ public class ScenarioLoaderImplTest {
 
 	@Test
 	public void testLoadScenario_loadTransitData() {
-		Scenario scenario = ScenarioUtils.createScenario(util.loadConfig(util.getClassInputDirectory() + "transitConfig.xml"));
+		Scenario scenario = ScenarioUtils.createScenario(this.util.loadConfig(this.util.getClassInputDirectory() + "transitConfig.xml"));
 		Assert.assertEquals(0, scenario.getTransitSchedule().getTransitLines().size());
 		Assert.assertEquals(0, scenario.getTransitSchedule().getFacilities().size());
 		ScenarioUtils.loadScenario(scenario);
 		Assert.assertEquals(1, scenario.getTransitSchedule().getTransitLines().size());
 		Assert.assertEquals(2, scenario.getTransitSchedule().getFacilities().size());
 	}
-	
+
 	@Test
 	public void testLoadScenario_loadPersonAttributes() {
-		Config config = util.loadConfig(util.getClassInputDirectory() + "personAttributesConfig.xml");
-		config.plans().addParam("inputPersonAttributesFile", util.getClassInputDirectory() + "personAttributes.xml");
+		Config config = this.util.loadConfig(this.util.getClassInputDirectory() + "personAttributesConfig.xml");
+		config.plans().addParam("inputPersonAttributesFile", this.util.getClassInputDirectory() + "personAttributes.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Assert.assertEquals("world", scenario.getPopulation().getPersonAttributes().getAttribute("1", "hello"));
 	}
 
 	@Test
 	public void testLoadScenario_loadTransitLinesAttributes() {
-		Config config = util.loadConfig(util.getClassInputDirectory() + "transitConfig.xml");
-		config.transit().setTransitLinesAttributesFile(util.getClassInputDirectory() + "transitLinesAttributes.xml");
+		Config config = this.util.loadConfig(this.util.getClassInputDirectory() + "transitConfig.xml");
+		config.transit().setTransitLinesAttributesFile(this.util.getClassInputDirectory() + "transitLinesAttributes.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Assert.assertEquals("world", scenario.getTransitSchedule().getTransitLinesAttributes().getAttribute("Blue Line", "hello"));
 	}
 
 	@Test
 	public void testLoadScenario_loadTransitStopsAttributes() {
-		Config config = util.loadConfig(util.getClassInputDirectory() + "transitConfig.xml");
-		config.transit().setTransitStopsAttributesFile(util.getClassInputDirectory() + "transitStopsAttributes.xml");
+		Config config = this.util.loadConfig(this.util.getClassInputDirectory() + "transitConfig.xml");
+		config.transit().setTransitStopsAttributesFile(this.util.getClassInputDirectory() + "transitStopsAttributes.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Assert.assertEquals(Boolean.TRUE, scenario.getTransitSchedule().getTransitStopsAttributes().getAttribute("1", "hasP+R"));
 	}
+
+	@Test
+	public void testLoadScenario_loadFacilitiesAttributes() {
+		Config config = this.util.loadConfig(this.util.getClassInputDirectory() + "facilityAttributesConfig.xml");
+		config.facilities().addParam("inputFacilityAttributesFile", this.util.getClassInputDirectory() + "facilityAttributes.xml");
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Assert.assertEquals("world", ((ScenarioImpl) scenario).getActivityFacilities().getFacilityAttributes().getAttribute("1", "hello"));
+	}
+
 }
