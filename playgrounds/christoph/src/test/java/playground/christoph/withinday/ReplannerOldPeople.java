@@ -18,10 +18,12 @@ import org.matsim.withinday.utils.EditRoutes;
 public class ReplannerOldPeople extends WithinDayDuringActivityReplanner {
 
 	private final TripRouter tripRouter;
+	private final EditRoutes editRoutes;
 	
 	/*package*/ ReplannerOldPeople(Id id, Scenario scenario, InternalInterface internalInterface, TripRouter tripRouter) {
 		super(id, scenario, internalInterface);
 		this.tripRouter = tripRouter;
+		this.editRoutes = new EditRoutes();
 	}
 
 	@Override
@@ -62,8 +64,10 @@ public class ReplannerOldPeople extends WithinDayDuringActivityReplanner {
 		executedPlan.insertLegAct(legToNewWorkIndex, legToNewWork, newWorkAct);
 		
 		// replan the new Legs
-		new EditRoutes().replanFutureLegRoute(executedPlan, legToNewWorkIndex, tripRouter);
-		new EditRoutes().replanFutureLegRoute(executedPlan, homeLegIndex, tripRouter);
+		this.editRoutes.relocateFutureLegRoute(legToNewWork, currentActivity.getLinkId(), newWorkAct.getLinkId(), executedPlan.getPerson(), 
+				scenario.getNetwork(), tripRouter);
+		this.editRoutes.relocateFutureLegRoute(homeLeg, newWorkAct.getLinkId(), homeAct.getLinkId(), executedPlan.getPerson(), 
+				scenario.getNetwork(), tripRouter);
 				
 		return true;
 	}

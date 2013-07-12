@@ -29,8 +29,6 @@ import org.matsim.withinday.mobsim.WithinDayQSimFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
-import playground.christoph.controler.WithinDayControler;
-
 class MyWithinDayControler extends Controler {
 
 	MyWithinDayControler(String configFileName) {
@@ -62,7 +60,7 @@ class MyWithinDayControler extends Controler {
 	protected WithinDayEngine withinDayEngine;
 	protected QSim sim;
 
-	private static final Logger log = Logger.getLogger(WithinDayControler.class);
+	private static final Logger log = Logger.getLogger(MyWithinDayControler.class);
 
 	/*
 	 * New Routers for the Replanning are used instead of using the controler's.

@@ -29,9 +29,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ReplanningEvent;
-import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
-import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.network.NetworkImpl;
@@ -49,7 +47,7 @@ import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
 import playground.wrashid.parkingSearch.withindayFW.core.mobsim.ParkingQSimFactory;
 import playground.wrashid.parkingSearch.withindayFW.impl.ParkingCostCalculatorFW;
 
-public abstract class WithinDayParkingController extends WithinDayController implements StartupListener, ReplanningListener  {
+public abstract class WithinDayParkingController extends WithinDayController implements ReplanningListener  {
 
 	protected static int currentScenarioId=2;
 	
@@ -140,18 +138,6 @@ public abstract class WithinDayParkingController extends WithinDayController imp
 		this.getFixedOrderSimulationListener().addSimulationListener(parkingStrategyManager);
 */
 	}
-
-
-	/*
-	 * When the Controller Startup Event is created, the EventsManager has
-	 * already been initialized. Therefore we can initialize now all Objects,
-	 * that have to be registered at the EventsManager.
-	 */
-	@Override
-	public void notifyStartup(StartupEvent event) {
-		
-	}
-	
 	
 	protected void setUp(){
 //		setUseTripRouting(false);		

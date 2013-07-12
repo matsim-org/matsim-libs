@@ -26,6 +26,7 @@ import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -53,6 +54,7 @@ import org.matsim.withinday.utils.EditRoutes;
 public class LegModeChecker extends AbstractPersonAlgorithm implements PlanAlgorithm {
 
 	private final TripRouter tripRouter;
+	private final Network network;
 	private final Counter counter;
 	private final EditRoutes editRoutes;
 	
@@ -60,8 +62,9 @@ public class LegModeChecker extends AbstractPersonAlgorithm implements PlanAlgor
 	private Random random = MatsimRandom.getLocalInstance();
 	private String[] validNonCarModes = {TransportMode.bike, TransportMode.pt, TransportMode.walk};
 	
-	public LegModeChecker(TripRouter tripRouter) {
+	public LegModeChecker(TripRouter tripRouter, Network network) {
 		this.tripRouter = tripRouter;
+		this.network = network;
 		
 		this.counter = new Counter("Adapted mode chains: ");
 		this.editRoutes = new EditRoutes();
@@ -161,7 +164,7 @@ public class LegModeChecker extends AbstractPersonAlgorithm implements PlanAlgor
 					// if the route is null, create a new one
 					if (leg.getRoute() == null) {
 						adapted = true;
-						editRoutes.replanFutureLegRoute(plan, i, tripRouter);
+						this.editRoutes.replanFutureLegRoute(leg, plan.getPerson(), network, tripRouter);
 					}
 				}
 				if (adapted) counter.incCounter();

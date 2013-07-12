@@ -36,6 +36,7 @@ import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryImpl;
@@ -116,8 +117,11 @@ public class WithinDayParkingController extends WithinDayController implements R
 	 * New Routers for the Replanning are used instead of using the controler's.
 	 * By doing this every person can use a personalised Router.
 	 */
-	protected void initReplanners() {
+	@Override
+	protected void initReplanners(QSim sim) {
 
+		initIdentifiers();
+		
 		// create a copy of the MultiModalTravelTimeWrapperFactory and set the TravelTimeCollector for car mode
 		Map<String, TravelTime> times = new HashMap<String, TravelTime>();
 		times.put(TransportMode.walk, new WalkTravelTime(this.config.plansCalcRoute()));
@@ -196,9 +200,6 @@ public class WithinDayParkingController extends WithinDayController implements R
 		MobsimFactory mobsimFactory = new ParkingQSimFactory(parkingInfrastructure, parkingRouterFactory, this.getWithinDayEngine(),
 				this.parkingAgentsTracker);
 		this.setMobsimFactory(mobsimFactory);
-		
-		this.initIdentifiers();
-		this.initReplanners();
 	}
 
 	private HashMap<Id, String> getParkingTypesForScenario() {

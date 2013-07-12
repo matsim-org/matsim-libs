@@ -28,10 +28,9 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.events.ReplanningEvent;
-import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
-import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.BikeTravelTimeOld;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTime;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTime;
@@ -54,7 +53,7 @@ import playground.wrashid.parkingSearch.withindayFW.core.InsertParkingActivities
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
 import playground.wrashid.parkingSearch.withindayFW.core.mobsim.ParkingQSimFactory;
 
-public class WithinDayParkingController extends WithinDayController implements StartupListener, ReplanningListener {
+public class WithinDayParkingController extends WithinDayController implements ReplanningListener {
 
 	/*
 	 * How many parallel Threads shall do the Replanning.
@@ -86,8 +85,11 @@ public class WithinDayParkingController extends WithinDayController implements S
 	 * New Routers for the Replanning are used instead of using the controler's.
 	 * By doing this every person can use a personalised Router.
 	 */
-	protected void initReplanners() {
+	@Override
+	protected void initReplanners(QSim sim) {
 
+		initIdentifiers();
+		
 		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeAndDisutility(this.config.planCalcScore()));
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) this.scenarioData.getPopulation().getFactory()).getModeRouteFactory();
 
@@ -147,21 +149,8 @@ public class WithinDayParkingController extends WithinDayController implements S
 		
 		MobsimFactory mobsimFactory = new ParkingQSimFactory(insertParkingActivities, parkingInfrastructure, this.getWithinDayEngine());
 		this.setMobsimFactory(mobsimFactory);
-		
-		this.initIdentifiers();
-		this.initReplanners();
 	}
 	
-	/*
-	 * When the Controller Startup Event is created, the EventsManager
-	 * has already been initialized. Therefore we can initialize now
-	 * all Objects, that have to be registered at the EventsManager.
-	 */
-	@Override
-	public void notifyStartup(StartupEvent event) {
-
-	}
-
 	@Override
 	public void notifyReplanning(ReplanningEvent event) {
 		/*

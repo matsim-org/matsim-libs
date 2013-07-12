@@ -20,6 +20,7 @@
 
 package org.matsim.withinday.controller;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
@@ -27,7 +28,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
+import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryImpl;
 import org.matsim.core.router.util.TravelTime;
@@ -39,22 +45,23 @@ import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollectorFactory;
 
 /**
- * This controller should give an example what is needed to run
- * simulations with WithinDayReplanning.
- *
- * The path to a config file is needed as argument to run the
- * simulation.
- *
- * By default "test/scenarios/berlin/config.xml" should work.
+ * This controller contains the basic structure for
+ * simulation runs using within-day replanning.
  *
  * @author Christoph Dobler
  */
-public class WithinDayController extends Controler {
+public abstract class WithinDayController extends Controler implements StartupListener, MobsimInitializedListener {
 
 	private static final Logger log = Logger.getLogger(WithinDayController.class);
 
+	/*
+	 * How many parallel Threads shall do the Replanning.
+	 */
+	private int numReplanningThreads = 2;
+	
 	private TravelTimeCollectorFactory travelTimeCollectorFactory = new TravelTimeCollectorFactory();
 	private TravelTimeCollector travelTimeCollector;
+	private Set<String> travelTimeCollectorModes = null;
 	private ActivityReplanningMap activityReplanningMap;
 	private LinkReplanningMap linkReplanningMap;
 
@@ -87,8 +94,25 @@ public class WithinDayController extends Controler {
 	 * by within-day replanning code.
 	 * ===================================================================
 	 */
+	
+	public void setNumberOfReplanningThreads(int threads) {
+		this.numReplanningThreads = threads;
+	}
+	
+	public int getNumberOfReplanningThreads() {
+		return this.numReplanningThreads;
+	}
+	
+	public void setModesAnalyzedByTravelTimeCollector(Set<String> modes) {
+		this.travelTimeCollectorModes = modes;
+	}
+	
+	public Set<String> getModesAnalyzedByTravelTimeCollector() {
+		return Collections.unmodifiableSet(this.travelTimeCollectorModes);
+	}
+	
 	public void createAndInitTravelTimeCollector() {
-		this.createAndInitTravelTimeCollector(null);
+		this.createAndInitTravelTimeCollector(this.travelTimeCollectorModes);
 	}
 
 	public void createAndInitTravelTimeCollector(Set<String> analyzedModes) {
@@ -188,30 +212,40 @@ public class WithinDayController extends Controler {
 	 */
 
 	private void init() {
+		
 		super.getMobsimListeners().add(fosl);
 		
+		// initialize a withinDayEngine and set WithinDayQSimFactory as MobsimFactory
 		this.withinDayEngine = new WithinDayEngine(this.getEvents());
+		this.setMobsimFactory(new WithinDayQSimFactory(withinDayEngine));
+		
+		// register this as a Controller and Simulation Listener
+		this.getFixedOrderSimulationListener().addSimulationListener(this);
+		this.addControlerListener(this);
 	}
 
+	/*
+	 * When the Controller Startup Event is created, the EventsManager
+	 * has already been initialized. Therefore we can initialize now
+	 * all Objects, that have to be registered at the EventsManager.
+	 */
 	@Override
-	protected void setUp() {
-
-		// set WithinDayQSimFactory
-		super.setMobsimFactory(new WithinDayQSimFactory(withinDayEngine));
-
-		super.setUp();
+	public void notifyStartup(StartupEvent event) {
+		this.initWithinDayEngine(this.numReplanningThreads);
+		this.createAndInitTravelTimeCollector();
+		this.createAndInitActivityReplanningMap();
+		this.createAndInitLinkReplanningMap();
 	}
-
+	
 	@Override
-	protected void runMobSim() {
-		// ensure that all modules have been initialized
-		if (withinDayEngine == null) {
-			log.warn("Within-day replanning modules have not been initialized! Force initialization using 1 replanning thread. " +
-					"Please call createAndInitReplanningManager(int numOfThreads).");
-			initWithinDayEngine(1);
-		}
-
-		super.runMobSim();
+	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
+		initReplanners((QSim)e.getQueueSimulation());
 	}
+	
+	/**
+	 * This is where one should initialize the Replanners and Identifiers.
+	 * It is called by a MobsimInitializedListener.
+	 */
+	protected abstract void initReplanners(QSim sim);
 
 }

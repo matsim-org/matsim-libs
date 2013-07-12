@@ -20,11 +20,18 @@
 
 package org.matsim.withinday.replanning.identifiers.tools;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
@@ -32,7 +39,10 @@ import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.testcases.MatsimTestCase;
+import org.matsim.withinday.events.ReplanningEvent;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.mobsim.WithinDayQSimFactory;
 
@@ -55,7 +65,7 @@ public class ActivityReplanningMapTest extends MatsimTestCase {
 		WithinDayEngine withinDayEngine = new WithinDayEngine(controler.getEvents());
 		withinDayEngine.initializeReplanningModules(2);
 		controler.setMobsimFactory(new WithinDayQSimFactory(withinDayEngine));
-		ControlerListenerForTests listener = new ControlerListenerForTests();
+		ControlerListenerForTests listener = new ControlerListenerForTests(withinDayEngine);
 		controler.addControlerListener(listener);
 		controler.setCreateGraphs(false);
 		controler.setDumpDataAtEnd(false);
@@ -72,11 +82,17 @@ public class ActivityReplanningMapTest extends MatsimTestCase {
 	 */
 	private static class ControlerListenerForTests implements StartupListener {
 
+		private final WithinDayEngine withinDayEngine;
+		
+		public ControlerListenerForTests(WithinDayEngine withinDayEngine) {
+			this.withinDayEngine = withinDayEngine;
+		}
+		
 		@Override
 		public void notifyStartup(final StartupEvent event) {
 			ActivityReplanningMap arp = new ActivityReplanningMap();
 			event.getControler().getEvents().addHandler(arp);
-			MobsimListenerForTests listener = new MobsimListenerForTests(arp);
+			MobsimListenerForTests listener = new MobsimListenerForTests(arp, withinDayEngine);
 			FixedOrderSimulationListener fosl = new FixedOrderSimulationListener();
 			fosl.addSimulationListener(arp);
 			fosl.addSimulationListener(listener);
@@ -93,19 +109,28 @@ public class ActivityReplanningMapTest extends MatsimTestCase {
 		MobsimAfterSimStepListener {
 
 		private final ActivityReplanningMap arp;
+		private final WithinDayEngine withinDayEngine;
+		private final Map<Id, MobsimAgent> agents;
 		private static final int t1 = 5*3600 + 58*60 + 30;
 		private static final int t2 = 5*3600 + 59*60;
 		private static final int t3 = 5*3600 + 59*60 + 30;
 		private static final int t4 = 6*3600;
+		private static final int t5 = 6*3600 + 60;
+		private static final int t6 = 6*3600 + 120;
 
-		public MobsimListenerForTests(final ActivityReplanningMap arp) {
+		public MobsimListenerForTests(final ActivityReplanningMap arp, WithinDayEngine withinDayEngine) {
 			this.arp = arp;
+			this.withinDayEngine = withinDayEngine;
+			this.agents = new LinkedHashMap<Id, MobsimAgent>();
 		}
 
 		@Override
 		public void notifyMobsimInitialized(final MobsimInitializedEvent e) {
 			assertEquals(100, this.arp.getActivityPerformingAgents().size());	// all agents perform an activity
 			assertEquals(0, this.arp.getActivityEndingAgents(0.0).size());		// no agent ends an activity
+			
+			QSim sim = (QSim) e.getQueueSimulation();
+			for (MobsimAgent agent : sim.getAgents()) this.agents.put(agent.getId(), agent);
 		}
 
 		@Override
@@ -128,7 +153,32 @@ public class ActivityReplanningMapTest extends MatsimTestCase {
 			if (e.getSimulationTime() == t4) {
 				assertEquals(97, this.arp.getActivityPerformingAgents().size());	// 97 agents perform an activity before the time step
 				assertEquals(97, this.arp.getActivityEndingAgents(e.getSimulationTime()).size());	// 97 agents end an activity
+				
+				// now reschedule the activity end time of an agent
+				ExperimentalBasicWithindayAgent agent = (ExperimentalBasicWithindayAgent) this.agents.get(new IdImpl("40"));
+				Activity currentActivity = (Activity) agent.getCurrentPlanElement();
+				currentActivity.setEndTime(e.getSimulationTime() + 60);
+				agent.resetCaches();
+				this.withinDayEngine.getInternalInterface().rescheduleActivityEnd(agent);
+				((QSim) e.getQueueSimulation()).getEventsManager().processEvent(new ReplanningEvent(e.getSimulationTime(), agent.getId(), "ActivityRescheduler"));
+				
+				// reschedule a second time to check what happens if the agent is replanned multiple times in one time step
+				currentActivity.setEndTime(e.getSimulationTime() + 120);
+				agent.resetCaches();
+				this.withinDayEngine.getInternalInterface().rescheduleActivityEnd(agent);
+				((QSim) e.getQueueSimulation()).getEventsManager().processEvent(new ReplanningEvent(e.getSimulationTime(), agent.getId(), "ActivityRescheduler"));
 			}
+			
+			if (e.getSimulationTime() == t5) {
+				assertEquals(1, this.arp.getActivityPerformingAgents().size());	// one agent performs an activity before the time step
+				assertEquals(0, this.arp.getActivityEndingAgents(e.getSimulationTime()).size());	// no agent ends an activity
+			}
+			
+			if (e.getSimulationTime() == t6) {
+				assertEquals(1, this.arp.getActivityPerformingAgents().size());	// one agent performs an activity before the time step
+				assertEquals(1, this.arp.getActivityEndingAgents(e.getSimulationTime()).size());	// one agent ends an activity
+			}
+
 		}
 
 		@Override
@@ -149,6 +199,16 @@ public class ActivityReplanningMapTest extends MatsimTestCase {
 			}
 
 			if (e.getSimulationTime() == t4) {
+				assertEquals(1, this.arp.getActivityPerformingAgents().size());	// one agents perform an activity after the time step
+				assertEquals(0, this.arp.getActivityEndingAgents(e.getSimulationTime()).size());		// no agent ends an activity
+			}
+			
+			if (e.getSimulationTime() == t5) {
+				assertEquals(1, this.arp.getActivityPerformingAgents().size());	// one agents perform an activity after the time step
+				assertEquals(0, this.arp.getActivityEndingAgents(e.getSimulationTime()).size());		// no agent ends an activity
+			}
+			
+			if (e.getSimulationTime() == t6) {
 				assertEquals(0, this.arp.getActivityPerformingAgents().size());	// no agents perform an activity after the time step
 				assertEquals(0, this.arp.getActivityEndingAgents(e.getSimulationTime()).size());		// no agent ends an activity
 			}

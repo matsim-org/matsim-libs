@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.locationchoice.facilityload.FacilityPenalties;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -139,6 +140,12 @@ public class KTIWithinDayControler extends WithinDayParkingController {
 			controler.run();
 		}
 		System.exit(0);
+	}
+
+	@Override
+	protected void initReplanners(QSim sim) {
+		// TODO Auto-generated method stub
+		
 	}
 	
 }

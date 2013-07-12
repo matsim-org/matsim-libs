@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.BikeTravelTimeOld;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTime;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTime;
@@ -147,6 +148,12 @@ public class HUPCAndRandomControllerChessBoard extends WithinDayParkingControlle
 
 		
 		System.exit(0);
+	}
+
+	@Override
+	protected void initReplanners(QSim sim) {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

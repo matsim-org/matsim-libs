@@ -17,10 +17,12 @@ import org.matsim.withinday.utils.ReplacePlanElements;
 public class ReplannerYoungPeople extends WithinDayDuringLegReplanner {
 
 	private final TripRouter tripRouter;
+	private final EditRoutes editRoutes;
 	
 	/*package*/ ReplannerYoungPeople(Id id, Scenario scenario, InternalInterface internalInterface, TripRouter tripRouter) {
 		super(id, scenario, internalInterface);
 		this.tripRouter = tripRouter;
+		this.editRoutes = new EditRoutes();
 	}
 
 	@Override
@@ -35,13 +37,14 @@ public class ReplannerYoungPeople extends WithinDayDuringLegReplanner {
 		if (executedPlan == null) return false;
 
 		Leg currentLeg = withinDayAgent.getCurrentLeg();
-		int currentLegIndex = withinDayAgent.getCurrentPlanElementIndex();
 		Activity nextActivity = executedPlan.getNextActivity(currentLeg);
+		int currentLinkIndex = withinDayAgent.getCurrentRouteLinkIdIndex();
 
 		// If it is not a car Leg we don't replan it.
 		if (!currentLeg.getMode().equals(TransportMode.car)) return false;
 		
-		ActivityImpl newWorkAct = new ActivityImpl("w", this.scenario.createId("22"));
+		Id linkId = this.scenario.createId("22");
+		ActivityImpl newWorkAct = new ActivityImpl("w", linkId);
 		newWorkAct.setMaximumDuration(3600);
 
 		// Replace Activity
@@ -49,16 +52,16 @@ public class ReplannerYoungPeople extends WithinDayDuringLegReplanner {
 		
 		/*
 		 *  Replan Routes
-		 */
-		int currentPlanElementIndex =  withinDayAgent.getCurrentPlanElementIndex();
+		 */		
 		
 		// new Route for current Leg
-		new EditRoutes().replanCurrentLegRoute(executedPlan, currentLegIndex, currentPlanElementIndex, tripRouter, time);
+		this.editRoutes.relocateCurrentLegRoute(currentLeg, executedPlan.getPerson(), currentLinkIndex, linkId, 
+				time, scenario.getNetwork(), tripRouter); 
 		
 		// new Route for next Leg
 		Leg homeLeg = executedPlan.getNextLeg(newWorkAct);
-		int homeLegIndex = executedPlan.getPlanElements().indexOf(homeLeg);
-		new EditRoutes().replanFutureLegRoute(executedPlan, homeLegIndex, tripRouter);
+		this.editRoutes.relocateFutureLegRoute(homeLeg, linkId, homeLeg.getRoute().getEndLinkId(), 
+				executedPlan.getPerson(), scenario.getNetwork(), tripRouter);
 		
 		// finally reset the cached Values of the PersonAgent - they may have changed!
 		withinDayAgent.resetCaches();

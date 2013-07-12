@@ -43,15 +43,12 @@ import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.Module;
-import contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTimeImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
@@ -135,9 +132,10 @@ import playground.meisterk.kti.config.KtiConfigGroup;
 
 import com.vividsolutions.jts.geom.Geometry;
 
+import contrib.multimodal.config.MultiModalConfigGroup;
 import contrib.multimodal.router.MultimodalTripRouterFactory;
 
-public final class MarathonController extends WithinDayController implements StartupListener, 
+public final class MarathonController extends WithinDayController implements 
 	MobsimInitializedListener, MobsimBeforeSimStepListener, MobsimAfterSimStepListener {
 
 	private final static Logger log = Logger.getLogger(MarathonController.class);
@@ -257,9 +255,33 @@ public final class MarathonController extends WithinDayController implements Sta
 //		// explicit set the mobsim factory
 //		this.setMobsimFactory(factory);
 		
-		this.addCoreControlerListener(this);
-		this.getFixedOrderSimulationListener().addSimulationListener(this);
-		throw new RuntimeException(Gbl.CREATE_ROUTING_ALGORITHM_WARNING_MESSAGE) ;
+		this.setNumberOfReplanningThreads(this.config.global().getNumberOfThreads());
+		
+		/*
+		 * Initialize TravelTimeCollector and create a FactoryWrapper which will act as
+		 * factory but returns always the same travel time object, which is possible since
+		 * the TravelTimeCollector is not personalized.
+		 */
+		Set<String> analyzedModes = new HashSet<String>();
+		analyzedModes.add(TransportMode.car);
+		this.setModesAnalyzedByTravelTimeCollector(analyzedModes);
+		
+		/*
+		 * Use advanced walk-, bike and pt travel time calculators
+		 */
+		Map<String, TravelTime> travelTimes = new HashMap<String, TravelTime>();
+		travelTimes.put(TransportMode.car, this.carTravelTime);
+		travelTimes.put(TransportMode.walk, this.walkTravelTime);
+		travelTimes.put("walk2d", this.walkTravelTime);
+		travelTimes.put(TransportMode.bike, this.bikeTravelTime);
+		travelTimes.put(TransportMode.ride, this.rideTravelTime);
+		travelTimes.put(TransportMode.pt, this.ptTravelTime);
+		
+		/*
+		 * Create and initialize replanning manager and replanning maps.
+		 */
+		Map<String, TravelTime> linkReplanningTravelTime = this.createLinkReplanningMapTravelTime();
+		super.createAndInitLinkReplanningMap(linkReplanningTravelTime);		
 	}
 	
 	@Override
@@ -357,13 +379,6 @@ public final class MarathonController extends WithinDayController implements Sta
 		}
 	}
 
-//	@Override
-//	public PlanAlgorithm createRoutingAlgorithm() {
-//		return createRoutingAlgorithm(
-//				this.createTravelCostCalculator(),
-//				this.getLinkTravelTimes());
-//	}
-
 	public PlanAlgorithm createRoutingAlgorithm(TravelDisutility travelCosts, TravelTime travelTimes) {
 		
 		// the contructor does not call createRoutingAlgorithm on the argument, so it is ok (td)
@@ -378,6 +393,8 @@ public final class MarathonController extends WithinDayController implements Sta
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
+		
+		super.notifyStartup(event);
 		
 		XYDataWriter xyDataWriter = new XYDataWriter();
 		this.getEvents().addHandler(xyDataWriter);
@@ -430,39 +447,7 @@ public final class MarathonController extends WithinDayController implements Sta
 
 		this.addControlerListener(agentsInEvacuationAreaCounter);
 		this.getFixedOrderSimulationListener().addSimulationListener(agentsInEvacuationAreaCounter);
-		this.events.addHandler(agentsInEvacuationAreaCounter);	
-			
-		/*
-		 * Initialize TravelTimeCollector and create a FactoryWrapper which will act as
-		 * factory but returns always the same travel time object, which is possible since
-		 * the TravelTimeCollector is not personalized.
-		 */
-		Set<String> analyzedModes = new HashSet<String>();
-		analyzedModes.add(TransportMode.car);
-		super.createAndInitTravelTimeCollector(analyzedModes);
-		
-		/*
-		 * Use advanced walk-, bike and pt travel time calculators
-		 */
-		
-		Map<String, TravelTime> travelTimes = new HashMap<String, TravelTime>();
-		travelTimes.put(TransportMode.car, this.carTravelTime);
-		travelTimes.put(TransportMode.walk, this.walkTravelTime);
-		travelTimes.put("walk2d", this.walkTravelTime);
-		travelTimes.put(TransportMode.bike, this.bikeTravelTime);
-		travelTimes.put(TransportMode.ride, this.rideTravelTime);
-		travelTimes.put(TransportMode.pt, this.ptTravelTime);
-				
-		/*
-		 * Create and initialize replanning manager and replanning maps.
-		 */
-		super.initWithinDayEngine(this.config.global().getNumberOfThreads());
-		super.createAndInitActivityReplanningMap();
-		 Map<String, TravelTime> linkReplanningTravelTime = this.createLinkReplanningMapTravelTime();
-		super.createAndInitLinkReplanningMap(linkReplanningTravelTime);
-		
-		// initialize the Identifiers here because some of them have to be registered as SimulationListeners
-		this.initIdentifiers();
+		this.events.addHandler(agentsInEvacuationAreaCounter);
 	}
 
 	@Override
@@ -777,7 +762,10 @@ public final class MarathonController extends WithinDayController implements Sta
 	 * New Routers for the Replanning are used instead of using the controler's.
 	 * By doing this every person can use a personalized Router.
 	 */
-	private void initReplanners(QSim sim) {
+	@Override
+	protected void initReplanners(QSim sim) {
+		
+		initIdentifiers();
 		
 		Map<String, TravelTime> travelTimes = new HashMap<String, TravelTime>();
 		travelTimes.put(TransportMode.walk, new WalkTravelTimeFactory(this.config.plansCalcRoute()).createTravelTime());

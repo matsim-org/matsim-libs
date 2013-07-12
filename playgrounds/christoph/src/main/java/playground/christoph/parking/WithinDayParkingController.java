@@ -33,6 +33,7 @@ import org.matsim.core.controler.listener.ReplanningListener;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTime;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTime;
 import org.matsim.core.network.NetworkImpl;
@@ -90,9 +91,6 @@ public class WithinDayParkingController extends WithinDayController implements R
 	
 	public WithinDayParkingController(String[] args) {
 		super(args);
-		
-		// register this as a Controller Listener
-		super.addControlerListener(this);
 	}
 
 	protected void initIdentifiers() {
@@ -105,8 +103,11 @@ public class WithinDayParkingController extends WithinDayController implements R
 	 * New Routers for the Replanning are used instead of using the controler's.
 	 * By doing this every person can use a personalised Router.
 	 */
-	protected void initReplanners() {
+	@Override
+	protected void initReplanners(QSim qsim) {
 
+		initIdentifiers();
+		
 		LeastCostPathCalculatorFactory factory = new FastAStarLandmarksFactory(this.network, new FreespeedTravelTimeAndDisutility(this.config.planCalcScore()));
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) this.scenarioData.getPopulation().getFactory()).getModeRouteFactory();
 
@@ -166,9 +167,6 @@ public class WithinDayParkingController extends WithinDayController implements R
 		MobsimFactory mobsimFactory = new ParkingQSimFactory(parkingInfrastructure, parkingRouterFactory, this.getWithinDayEngine(),
 				this.parkingAgentsTracker);
 		this.setMobsimFactory(mobsimFactory);
-		
-		this.initIdentifiers();
-		this.initReplanners();
 	}
 	
 	@Override

@@ -38,9 +38,7 @@ import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
-import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
-import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTimeFactory;
@@ -142,7 +140,7 @@ import com.vividsolutions.jts.geom.Geometry;
 
 import contrib.multimodal.router.MultimodalTripRouterFactory;
 
-public class EvacuationControler extends WithinDayController implements MobsimInitializedListener, 
+public class EvacuationControler extends WithinDayController implements 
 		MobsimAfterSimStepListener, IterationStartsListener, AfterMobsimListener {
 
 //	public static final String referenceEventsFile = "../../matsim/mysimulations/census2000V2/output_10pct_evac_reference/ITERS/it.0/evac.1.0.events.xml.gz";
@@ -151,11 +149,6 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 	public static final String FILENAME_VEHICLES = "output_vehicles.xml.gz";
 	
 	protected boolean adaptOriginalPlans = true;
-
-	/*
-	 * How many parallel Threads shall do the Replanning.
-	 */
-	protected int numReplanningThreads;
 
 	/*
 	 * Identifiers
@@ -248,11 +241,18 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		EvacuationConfig.printConfig();
 		
 		// Use a Scoring Function, that only scores the travel times!
-		this.setScoringFunctionFactory(new OnlyTravelDependentScoringFunctionFactory());
+		this.setScoringFunctionFactory(new OnlyTravelDependentScoringFunctionFactory());	
+
+		/*
+		 * get number of threads from config file
+		 */
+		this.setNumberOfReplanningThreads(this.config.global().getNumberOfThreads());
 		
-		// register this as a Controller and Simulation Listener
-		super.getFixedOrderSimulationListener().addSimulationListener(this);
-		super.addControlerListener(this);
+		/*
+		 * Create and initialize replanning manager and replanning maps.
+		 */
+		Map<String, TravelTime> linkReplanningTravelTimes = this.createLinkReplanningMapTravelTimes();
+		super.createAndInitLinkReplanningMap(linkReplanningTravelTimes);
 	}
 
 	@Override
@@ -309,11 +309,6 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		
 		// initialze plan router
 		super.setUp();
-
-		/*
-		 * get number of threads from config file
-		 */
-		this.numReplanningThreads = this.config.global().getNumberOfThreads();
 		
 //		PlansLinkReferenceDumping planAlgo = new PlansLinkReferenceDumping();
 //		planAlgo.run(population);
@@ -533,14 +528,6 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 			this.getFixedOrderSimulationListener().addSimulationListener(agentsReturnHomeCounter);
 			this.events.addHandler(agentsReturnHomeCounter);
 		}
-		
-		/*
-		 * Create and initialize replanning manager and replanning maps.
-		 */
-		super.initWithinDayEngine(numReplanningThreads);
-		super.createAndInitActivityReplanningMap();
-		Map<String, TravelTime> linkReplanningTravelTimes = this.createLinkReplanningMapTravelTimes();
-		super.createAndInitLinkReplanningMap(linkReplanningTravelTimes);
 				
 		// initialize the Identifiers here because some of them have to be registered as SimulationListeners
 		this.initIdentifiers();
@@ -588,12 +575,6 @@ public class EvacuationControler extends WithinDayController implements MobsimIn
 		if (event.getIteration() == this.config.controler().getFirstIteration()) {
 			this.assignVehiclesToPlans.reassignVehicles();
 		}
-	}
-	
-	@Override
-	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
-			
-		this.initReplanners((QSim)e.getQueueSimulation());		
 	}
 	
 	@Override
