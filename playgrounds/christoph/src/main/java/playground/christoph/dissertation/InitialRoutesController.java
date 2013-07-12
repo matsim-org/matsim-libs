@@ -31,6 +31,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.analysis.christoph.ActivitiesAnalyzer;
+import org.matsim.contrib.analysis.christoph.TripsAnalyzer;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -38,8 +40,6 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.christoph.analysis.ActivitiesAnalyzer;
-import playground.christoph.analysis.TripsAnalyzer;
 import playground.christoph.controler.WithinDayInitialRoutesController;
 import playground.christoph.scoring.DesiresAndOpenTimesScoringFunctionFactory;
 

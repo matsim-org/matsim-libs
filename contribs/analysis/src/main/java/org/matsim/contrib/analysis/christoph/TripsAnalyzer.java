@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.analysis;
+package org.matsim.contrib.analysis.christoph;
 
 import java.io.BufferedWriter;
 import java.io.IOException;

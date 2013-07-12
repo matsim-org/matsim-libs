@@ -48,6 +48,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.contrib.analysis.christoph.ActivitiesAnalyzer;
+import org.matsim.contrib.analysis.christoph.TripsAnalyzer;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
@@ -56,7 +58,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.ControlerConfigGroup;
-import contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -88,11 +89,10 @@ import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.christoph.analysis.ActivitiesAnalyzer;
-import playground.christoph.analysis.TripsAnalyzer;
 import playground.christoph.evacuation.analysis.TravelTimesWriter;
 import playground.christoph.evacuation.trafficmonitoring.BikeTravelTimeFactory;
 import playground.christoph.evacuation.trafficmonitoring.WalkTravelTimeFactory;
+import contrib.multimodal.config.MultiModalConfigGroup;
 
 /**
  * Demonstrate the influence of age and gender on persons' walk speed.
