@@ -41,6 +41,11 @@ import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 
 /**
+ * Design thoughts:<ul>
+ * <li>yyyy The module includes walk times and walk distances.  But rather than putting them into a separate leg, they are
+ * included "silently" in the pt leg, which thus pretends to go door to door. kai, jul'13
+ * </ul>
+ * 
  * @author thomas
  *
  */
@@ -72,19 +77,21 @@ public class MatrixBasedPtRoutingModule implements RoutingModule{
 		// create new leg with mode pt
 		Leg newLeg = populationFactory.createLeg( TransportMode.pt );
 		
+		// set generic route for teleportation
+		Id startLinkId = network.getNearestLinkExactly(fromFacility.getCoord()).getId();
+		Id endLinkId = network.getNearestLinkExactly(toFacility.getCoord()).getId();
+		final Route route = genericRouteFactory.createRoute(startLinkId, endLinkId);
+
 		// set departure time
 		newLeg.setDepartureTime( departureTime );
+
 		// set travel time
 		double travelTime = this.ptMatrix.getTotalTravelTime_seconds(fromFacility.getCoord(), toFacility.getCoord());
 		newLeg.setTravelTime( travelTime );
 		// set arrival time
 //		newLeg.setArrivalTime( departureTime + travelTime );  // should not be necessary. kai, jul'12
 		
-		// set generic route for teleportation
-		Id startLinkId = network.getNearestLinkExactly(fromFacility.getCoord()).getId();
-		Id endLinkId = network.getNearestLinkExactly(toFacility.getCoord()).getId();
-		final Route route = genericRouteFactory.createRoute(startLinkId, endLinkId);
-
+		// set distance
 		double distance = this.ptMatrix.getTotalTravelDistance_meter(fromFacility.getCoord(), toFacility.getCoord()) ;
 		route.setDistance(distance) ;
 
