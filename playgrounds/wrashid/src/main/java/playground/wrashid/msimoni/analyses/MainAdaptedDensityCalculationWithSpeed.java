@@ -149,6 +149,8 @@ public class MainAdaptedDensityCalculationWithSpeed {
 					System.out.print(linkId.toString() + " : \t");
 					System.out.print(coord.getX() + "\t");
 					System.out.print(coord.getY() + "\t");
+					System.out.print(link.getLength() + "\t");
+					System.out.print(link.getNumberOfLanes() + "\t");
 					
 					for (int i = 0; i < bins.length; i++) {
 						System.out.print(bins[i] + "\t");
