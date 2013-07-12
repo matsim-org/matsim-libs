@@ -37,6 +37,16 @@ private HashMap<ClassKey1, DoubleValueHashMap<ClassKey2>> hashMap=new HashMap<Cl
 	public Set<ClassKey1> getKeySet1(){
 		return hashMap.keySet();
 	}
+	
+	public boolean containsKeyTwo(ClassKey1 key1, ClassKey2 key2){
+		checkHashMapAndInitializeIfNeeded(key1);
+		return hashMap.get(key1).containsKey(key2);
+	}
+	
+	public void removeValue(ClassKey1 key1, ClassKey2 key2){
+		checkHashMapAndInitializeIfNeeded(key1);
+		hashMap.get(key1).remove(key2);
+	}
 
 	public void put(ClassKey1 key1, ClassKey2 key2, double value){
 		checkHashMapAndInitializeIfNeeded(key1);
