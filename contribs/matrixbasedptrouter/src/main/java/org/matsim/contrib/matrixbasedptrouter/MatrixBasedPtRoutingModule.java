@@ -26,13 +26,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.Facility;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.GenericRouteFactory;
@@ -64,10 +64,10 @@ public class MatrixBasedPtRoutingModule implements RoutingModule{
 	private NetworkImpl network;
 	private PtMatrix ptMatrix;
 	
-	public MatrixBasedPtRoutingModule(final Controler controler, PtMatrix ptMatrix){
-		this.populationFactory = new PopulationFactoryImpl(controler.getScenario());
+	public MatrixBasedPtRoutingModule(Scenario scenario, PtMatrix ptMatrix){
+		this.populationFactory = new PopulationFactoryImpl(scenario);
 		this.genericRouteFactory = new GenericRouteFactory();
-		this.network = (NetworkImpl) controler.getScenario().getNetwork();
+		this.network = (NetworkImpl) scenario.getNetwork();
 		this.ptMatrix= ptMatrix;
 	}
 	

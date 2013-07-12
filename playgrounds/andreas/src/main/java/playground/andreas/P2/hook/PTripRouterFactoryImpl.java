@@ -31,11 +31,12 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
+import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.LegRouterWrapper;
 import org.matsim.core.router.TransitRouterWrapper;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.old.NetworkLegRouter;
@@ -46,7 +47,9 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.misc.NetworkUtils;
+import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
+import org.matsim.pt.router.TransitRouterImplFactory;
 
 /**
  * This class exists only to allow the transit schedule to be updated in each iteration
@@ -67,11 +70,18 @@ public class PTripRouterFactoryImpl implements TripRouterFactory {
 	private LeastCostPathCalculatorFactory leastCostPathAlgorithmFactory;
 	private ModeRouteFactory modeRouteFactory;
 	private PopulationFactory populationFactory;
-	private TransitRouterFactory transitRouterFactory;
+	private final TransitRouterFactory transitRouterFactory;
 	private Scenario scenario;
 
 	public PTripRouterFactoryImpl(final Controler controler) {
 		this.controler = controler;
+		this.transitRouterFactory = new TransitRouterImplFactory(
+	            scenario.getTransitSchedule(),
+	            new TransitRouterConfig(
+	                    config.planCalcScore(),
+	                    config.plansCalcRoute(),
+	                    config.transitRouter(),
+	                    config.vspExperimental()));
 	}
 
 
@@ -86,7 +96,7 @@ public class PTripRouterFactoryImpl implements TripRouterFactory {
 	}
 
 	@Override
-	public TripRouter instantiateAndConfigureTripRouter() {
+	public TripRouter instantiateAndConfigureTripRouter(RoutingContext iterationContext) {
 		// initialize here - controller should be fully initialized by now
 		// use fields to keep the rest of the code clean and comparable
 		
@@ -97,12 +107,7 @@ public class PTripRouterFactoryImpl implements TripRouterFactory {
 		this.leastCostPathAlgorithmFactory = controler.getLeastCostPathCalculatorFactory();
 		this.modeRouteFactory = ((PopulationFactoryImpl) controler.getScenario().getPopulation().getFactory()).getModeRouteFactory();
 		this.populationFactory = controler.getScenario().getPopulation().getFactory();
-		this.transitRouterFactory = controler.getScenario().getConfig().scenario().isUseTransit() ?
-				controler.getTransitRouterFactory() :
-				null;
-		this.scenario = controler.getScenario().getConfig().scenario().isUseTransit() ?
-				controler.getScenario() :
-			null;
+		this.scenario = controler.getScenario();
 		
 		// end of own code
 		

@@ -35,7 +35,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryInternal;
 import org.matsim.population.algorithms.PermissibleModesCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -59,7 +59,7 @@ public class ParkAndRideChooseModeForSubtourModule extends AbstractMultithreaded
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		TripRouterFactory tripRouterFactory = controler.getTripRouterFactory();
+		TripRouterFactoryInternal tripRouterFactory = controler.getTripRouterFactory();
 		TripRouter tripRouter = tripRouterFactory.instantiateAndConfigureTripRouter();
 		ParkAndRideFacilities facilities = ParkAndRideUtils.getParkAndRideFacilities( controler.getScenario() );
 		ParkAndRideIncluder includer;

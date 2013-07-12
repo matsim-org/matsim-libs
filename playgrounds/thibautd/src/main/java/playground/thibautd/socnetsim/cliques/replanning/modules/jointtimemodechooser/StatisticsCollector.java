@@ -25,7 +25,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryInternal;
 import org.matsim.core.utils.io.IOUtils;
 
 
@@ -39,7 +39,7 @@ class StatisticsCollector {
 
 	private final Map<String, String> routingModuleClasses = new HashMap<String, String>();
 
-	public synchronized  void notifyTripRouterFactory(final TripRouterFactory factory) {
+	public synchronized  void notifyTripRouterFactory(final TripRouterFactoryInternal factory) {
 		TripRouter router = factory.instantiateAndConfigureTripRouter();
 		for (String mode : router.getRegisteredModes()) {
 			routingModuleClasses.put(

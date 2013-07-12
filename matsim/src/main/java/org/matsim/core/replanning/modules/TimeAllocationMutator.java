@@ -70,13 +70,13 @@ public class TimeAllocationMutator extends AbstractMultithreadedModule {
 		switch (this.activityDurationInterpretation) {
 		case minOfDurationAndEndTime:
 			pmta = new TripPlanMutateTimeAllocation(
-					getReplanningContext().getTripRouterFactory().instantiateAndConfigureTripRouter().getStageActivityTypes(), 
+					getReplanningContext().getTripRouter().getStageActivityTypes(), 
 					mutationRange, 
 					MatsimRandom.getLocalInstance());
 			break;
 		default:
 			pmta = new PlanMutateTimeAllocationSimplified(
-					getReplanningContext().getTripRouterFactory().instantiateAndConfigureTripRouter().getStageActivityTypes(),
+					getReplanningContext().getTripRouter().getStageActivityTypes(),
 					mutationRange,
 					MatsimRandom.getLocalInstance());
 		}

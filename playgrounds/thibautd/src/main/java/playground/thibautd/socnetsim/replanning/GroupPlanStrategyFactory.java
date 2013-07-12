@@ -27,7 +27,7 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.core.replanning.modules.SubtourModeChoice;
 import org.matsim.core.router.CompositeStageActivityTypes;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryInternal;
 import org.matsim.core.trafficmonitoring.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.TripsToLegsAlgorithm;
@@ -107,7 +107,7 @@ public class GroupPlanStrategyFactory {
 				createRandomSelectingStrategy(
 					registry.getIncompatiblePlansIdentifierFactory());
 		final Config config = registry.getScenario().getConfig();
-		final TripRouterFactory tripRouterFactory = registry.getTripRouterFactory();
+		final TripRouterFactoryInternal tripRouterFactory = registry.getTripRouterFactory();
 		final PlanRoutingAlgorithmFactory planRouterFactory = registry.getPlanRoutingAlgorithmFactory();
 
 		strategy.addStrategyModule(
@@ -439,7 +439,7 @@ public class GroupPlanStrategyFactory {
 	// /////////////////////////////////////////////////////////////////////////
 	public static GenericStrategyModule<GroupPlans> createTripsToLegsModule(
 			final Config config,
-			final TripRouterFactory tripRouterFactory) {
+			final TripRouterFactoryInternal tripRouterFactory) {
 		return new IndividualBasedGroupStrategyModule(
 				new AbstractMultithreadedModule( config.global() ) {
 					@Override
@@ -451,7 +451,7 @@ public class GroupPlanStrategyFactory {
 
 	public static GenericStrategyModule<GroupPlans> createSynchronizerModule(
 			final Config config,
-			final TripRouterFactory tripRouterFactory) {
+			final TripRouterFactoryInternal tripRouterFactory) {
 		return new JointPlanBasedGroupStrategyModule(
 				new SynchronizeCoTravelerPlansModule(
 					config.global().getNumberOfThreads(),
@@ -461,7 +461,7 @@ public class GroupPlanStrategyFactory {
 	public static GenericStrategyModule<GroupPlans> createReRouteModule(
 			final Config config,
 			final PlanRoutingAlgorithmFactory planRouterFactory,
-			final TripRouterFactory tripRouterFactory) {
+			final TripRouterFactoryInternal tripRouterFactory) {
 		return new IndividualBasedGroupStrategyModule(
 				new AbstractMultithreadedModule( config.global() ) {
 					@Override

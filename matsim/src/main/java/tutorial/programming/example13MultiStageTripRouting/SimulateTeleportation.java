@@ -21,10 +21,10 @@ package tutorial.programming.example13MultiStageTripRouting;
 
 import java.util.Map;
 
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -62,7 +62,7 @@ public class SimulateTeleportation {
 		// now, plug our stuff in
 		controler.setTripRouterFactory(
 				new MyTripRouterFactory(
-						controler,
+						scenario,
 						teleport));
 		controler.run();
 	}

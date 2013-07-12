@@ -26,7 +26,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterFactoryInternal;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -55,7 +56,7 @@ public final class ControllerRegistry {
 	private final ScoringFunctionFactory scoringFunctionFactory;
 	private final CalcLegTimes legTimes;
 	private final MobsimFactory mobsimFactory;
-	private final TripRouterFactory tripRouterFactory;
+	private final TripRouterFactoryInternal tripRouterFactory;
 	private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 	private final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory;
 	private final GroupIdentifier groupIdentifier;
@@ -71,7 +72,7 @@ public final class ControllerRegistry {
 			final ScoringFunctionFactory scoringFunctionFactory,
 			final CalcLegTimes legTimes,
 			final MobsimFactory mobsimFactory,
-			final TripRouterFactory tripRouterFactory,
+			final TripRouterFactoryInternal tripRouterFactory,
 			final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory,
 			final PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory,
 			final GroupIdentifier groupIdentifier,
@@ -142,7 +143,7 @@ public final class ControllerRegistry {
 		return mobsimFactory;
 	}
 
-	public TripRouterFactory getTripRouterFactory() {
+	public TripRouterFactoryInternal getTripRouterFactory() {
 		return tripRouterFactory;
 	}
 
@@ -159,20 +160,17 @@ public final class ControllerRegistry {
 	public ReplanningContext createReplanningContext(final int iter) {
 		final ControllerRegistry registry = this;
 		return new ReplanningContext() {
-			@Override
-			public TripRouterFactory getTripRouterFactory() {
-				return registry.getTripRouterFactory();
-			}
+
 
 			@Override
-			public TravelDisutility getTravelCostCalculator() {
+			public TravelDisutility getTravelDisutility() {
 				return registry.getTravelDisutilityFactory().createTravelDisutility(
 					registry.getTravelTime().getLinkTravelTimes(),
 					registry.getScenario().getConfig().planCalcScore() );
 			}
 
 			@Override
-			public TravelTime getTravelTimeCalculator() {
+			public TravelTime getTravelTime() {
 				return registry.getTravelTime().getLinkTravelTimes();
 			}
 
@@ -184,6 +182,11 @@ public final class ControllerRegistry {
 			@Override
 			public int getIteration() {
 				return iter;
+			}
+
+			@Override
+			public TripRouter getTripRouter() {
+				return registry.getTripRouterFactory().instantiateAndConfigureTripRouter();
 			}
 		};
 	}

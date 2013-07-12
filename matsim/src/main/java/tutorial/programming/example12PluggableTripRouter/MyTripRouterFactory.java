@@ -22,17 +22,11 @@
  */
 package tutorial.programming.example12PluggableTripRouter;
 
-import java.util.List;
-
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.facilities.Facility;
-import org.matsim.core.router.RoutingModule;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.RoutingContext;
+import org.matsim.core.router.TripRouter;
 
 /**
  * @author nagel
@@ -47,13 +41,16 @@ class MyTripRouterFactory implements TripRouterFactory {
 	}
 
 	@Override
-	public TripRouter instantiateAndConfigureTripRouter() {
+	public TripRouter instantiateAndConfigureTripRouter(RoutingContext iterationContext) {
 		final MyRoutingModule module = new MyRoutingModule();
 		
 		// my own router could listen to events:
-		events.addHandler(module) ;
+		events.addHandler(module) ; // Problem here.
 		// (this is a very simple design; one may want to separate the tasks of the observer from the tasks of the router)
-
+		
+		// !! One needs to, because TripRouters are light-weight objects (created any time someone needs one),
+		// so these would pile up in the EventsHandler !! 
+		
 		TripRouter tr = new TripRouter() ;
 		tr.setRoutingModule(TransportMode.car, module ) ;
 		return tr ;

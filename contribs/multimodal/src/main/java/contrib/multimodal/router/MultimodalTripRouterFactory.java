@@ -26,20 +26,20 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import contrib.multimodal.config.MultiModalConfigGroup;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.router.DefaultTripRouterFactoryImpl;
+import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.LegRouterWrapper;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.TripRouterFactoryImpl;
+import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.old.LegRouter;
 import org.matsim.core.router.old.NetworkLegRouter;
@@ -49,6 +49,8 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
 
+import contrib.multimodal.config.MultiModalConfigGroup;
+
 /**
  * @author cdobler
  */
@@ -56,58 +58,33 @@ public class MultimodalTripRouterFactory implements TripRouterFactory {
 	
 	protected static final Logger log = Logger.getLogger(MultimodalTripRouterFactory.class);
 	
-	private final TripRouterObjectProvider objectProvider;
 	private final Map<String, TravelTime> multimodalTravelTimes;
 	
-	private TripRouterFactory delegateFactory;
+	private final TravelDisutilityFactory travelDisutilityFactory = new TravelCostCalculatorFactoryImpl();
+	
+	private final DefaultTripRouterFactoryImpl delegateFactory;
 	
 	private final Map<String, Network> multimodalSubNetworks = new HashMap<String, Network>();
+
+	private Scenario scenario;
 	
-	public MultimodalTripRouterFactory(Controler controler, Map<String, TravelTime> multimodalTravelTimes) {
+	public MultimodalTripRouterFactory(Scenario scenario, Map<String, TravelTime> multimodalTravelTimes) {
 		this.multimodalTravelTimes = multimodalTravelTimes;
-		this.objectProvider = new TripRouterObjectProvider(controler);
-	}
-	
-	public MultimodalTripRouterFactory(Controler controler, Map<String, TravelTime> multimodalTravelTimes, 
-			TripRouterFactory delegate) {
-		this.objectProvider = new TripRouterObjectProvider(controler);
-		this.multimodalTravelTimes = multimodalTravelTimes;
-		this.delegateFactory = delegate;
-	}
-	
-	public MultimodalTripRouterFactory(TripRouterObjectProvider objectProvider, Map<String, TravelTime> multimodalTravelTimes) {
-		this.objectProvider = objectProvider;
-		this.multimodalTravelTimes = multimodalTravelTimes;
-	}
-	
-	public MultimodalTripRouterFactory(TripRouterObjectProvider objectProvider, Map<String, TravelTime> multimodalTravelTimes, 
-			TripRouterFactory delegate) {
-		this.objectProvider = objectProvider;
-		this.multimodalTravelTimes = multimodalTravelTimes;
-		this.delegateFactory = delegate;
+		this.scenario = scenario;
+		this.delegateFactory = DefaultTripRouterFactoryImpl.createRichTripRouterFactoryImpl(scenario);
 	}
 	
 	@Override
-	public TripRouter instantiateAndConfigureTripRouter() {	
+	public TripRouter instantiateAndConfigureTripRouter(RoutingContext iterationContext) {	
 
-		if (this.delegateFactory == null) {
-			this.delegateFactory = new TripRouterFactoryImpl(
-					this.objectProvider.getScenario(),
-					this.objectProvider.getTravelDisutilityFactory(),
-					this.objectProvider.getTravelTime(),
-					this.objectProvider.getLeastCostPathCalculatorFactory(),
-					this.objectProvider.getTransitRouterFactory());
-		}
-		TripRouter instance = this.delegateFactory.instantiateAndConfigureTripRouter();
+		TripRouter instance = this.delegateFactory.instantiateAndConfigureTripRouter(iterationContext);
 		
-		Network network = this.objectProvider.getScenario().getNetwork();
-		LeastCostPathCalculatorFactory leastCostAlgoFactory = this.objectProvider.getLeastCostPathCalculatorFactory();
-		TravelDisutilityFactory travelDisutilityFactory = this.objectProvider.getTravelDisutilityFactory();
-		PlanCalcScoreConfigGroup planCalcScoreConfigGroup = this.objectProvider.getScenario().getConfig().planCalcScore();
-		PopulationFactory populationFactory = this.objectProvider.getScenario().getPopulation().getFactory();
+		Network network = this.scenario.getNetwork();
+		LeastCostPathCalculatorFactory leastCostAlgoFactory = delegateFactory.getLeastCostPathCalculatorFactory();
+		PopulationFactory populationFactory = this.scenario.getPopulation().getFactory();
 		ModeRouteFactory modeRouteFactory = ((PopulationFactoryImpl) populationFactory).getModeRouteFactory();
 
-        MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) this.objectProvider.getScenario().getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
+        MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) scenario.getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
         Set<String> simulatedModes = CollectionUtils.stringToSet(multiModalConfigGroup.getSimulatedModes());
 		for (String mode : simulatedModes) {
 
@@ -130,7 +107,7 @@ public class MultimodalTripRouterFactory implements TripRouterFactory {
 				this.multimodalSubNetworks.put(mode, subNetwork);
 			}
 			
-			TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime, planCalcScoreConfigGroup);
+			TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime, scenario.getConfig().planCalcScore());		
 			LeastCostPathCalculator routeAlgo = leastCostAlgoFactory.createPathCalculator(subNetwork, travelDisutility, travelTime);
 			LegRouter networkLegRouter = new NetworkLegRouter(subNetwork, routeAlgo, modeRouteFactory);
 			RoutingModule legRouterWrapper = new LegRouterWrapper(mode, populationFactory, networkLegRouter); 

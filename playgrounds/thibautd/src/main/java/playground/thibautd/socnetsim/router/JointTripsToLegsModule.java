@@ -21,14 +21,14 @@ package playground.thibautd.socnetsim.router;
 
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryInternal;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 /**
  * @author thibautd
  */
 public class JointTripsToLegsModule extends AbstractMultithreadedModule {
-	private final TripRouterFactory tripRouterFactory;
+	private final TripRouterFactoryInternal tripRouterFactory;
 
 	public JointTripsToLegsModule(final Controler controler) {
 		super( controler.getConfig().global() );

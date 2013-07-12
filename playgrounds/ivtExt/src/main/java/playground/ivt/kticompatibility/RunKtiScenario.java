@@ -20,14 +20,12 @@
 package playground.ivt.kticompatibility;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.router.StageActivityTypesImpl;
-import org.matsim.core.scenario.ScenarioUtils;
-
-
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryLogging;
+import org.matsim.core.router.StageActivityTypesImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
 
 /**
@@ -59,7 +57,7 @@ public class RunKtiScenario {
 		final Controler controler = new Controler( scenario );
 		controler.setTripRouterFactory(
 				new KtiTripRouterFactory(
-					controler ) );
+					scenario ) );
 		controler.setScoringFunctionFactory(
 				new KtiLikeActivitiesScoringFunctionFactory(
 					new StageActivityTypesImpl( PtConstants.TRANSIT_ACTIVITY_TYPE ),

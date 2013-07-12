@@ -34,7 +34,7 @@ import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.router.PlanRouter;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryInternal;
 import org.matsim.core.router.TripRouterFactoryImpl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -140,7 +140,7 @@ public class InitRoutes {
 		//plans.addAlgorithm(new PlansCalcRoute(this.config.plansCalcRoute(), network, timeCostCalc, timeCostCalc,
 		//		new AStarLandmarksFactory(network, timeCostCalc, this.config.global().getNumberOfThreads()), 
 		//		((PopulationFactoryImpl) plans.getFactory()).getModeRouteFactory()));
-		TripRouterFactory tripRouterFact = new TripRouterFactoryImpl( 
+		TripRouterFactoryInternal tripRouterFact = new TripRouterFactoryImpl( 
 				scenario,
 				new TravelDisutilityFactory() {
 					@Override

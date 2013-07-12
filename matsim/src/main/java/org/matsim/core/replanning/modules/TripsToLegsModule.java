@@ -57,7 +57,7 @@ public class TripsToLegsModule extends AbstractMultithreadedModule {
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		TripRouter router = getReplanningContext().getTripRouterFactory().instantiateAndConfigureTripRouter();
+		TripRouter router = getReplanningContext().getTripRouter();
 		StageActivityTypes blackListToUse = router.getStageActivityTypes();
 
 		if (additionalBlackList != null) {

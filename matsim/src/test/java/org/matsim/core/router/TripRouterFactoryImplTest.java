@@ -111,7 +111,7 @@ public class TripRouterFactoryImplTest {
 		net.addLink( l3 );
 
 		// create the factory, get a router, route.
-		TripRouterFactory factory =
+		TripRouterFactoryInternal factory =
 			new TripRouterFactoryImpl(
 					scenario,
 					new OnlyTimeDependentTravelCostCalculatorFactory(),
@@ -183,7 +183,7 @@ public class TripRouterFactoryImplTest {
 		net.addLink( l3 );
 
 		// create the factory, get a router, route.
-		TripRouterFactory factory =
+		TripRouterFactoryInternal factory =
 			new TripRouterFactoryImpl(
 					scenario,
 					new OnlyTimeDependentTravelCostCalculatorFactory(),

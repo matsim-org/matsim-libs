@@ -3,8 +3,9 @@ package playground.mzilske.vbb;
 import java.io.File;
 import java.io.IOException;
 
-import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.RoutingContext;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.opentripplanner.routing.algorithm.GenericAStar;
@@ -51,9 +52,10 @@ public final class OTPTripRouterFactory implements
 	private TransitSchedule transitSchedule;
 	
 	@Override
-	public TripRouter instantiateAndConfigureTripRouter() {
+	public TripRouter instantiateAndConfigureTripRouter(RoutingContext iterationContext) {
 		TripRouter tripRouter = new TripRouter();
 		tripRouter.setRoutingModule("pt", new OTPRoutingModule(pathservice, transitSchedule, day, ct));
 		return tripRouter;
 	}
+	
 }

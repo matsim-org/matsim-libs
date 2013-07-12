@@ -80,7 +80,7 @@ public class SubtourModeChoice extends AbstractMultithreadedModule {
 
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
-		final TripRouter tripRouter = getReplanningContext().getTripRouterFactory().instantiateAndConfigureTripRouter();
+		final TripRouter tripRouter = getReplanningContext().getTripRouter();
 		final ChooseRandomLegModeForSubtour chooseRandomLegMode =
 				new ChooseRandomLegModeForSubtour(
 						tripRouter.getStageActivityTypes(),

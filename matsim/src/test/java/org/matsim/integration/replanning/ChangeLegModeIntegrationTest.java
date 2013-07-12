@@ -37,7 +37,8 @@ import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterFactoryInternal;
 import org.matsim.core.router.TripRouterFactoryImpl;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
 import org.matsim.core.router.util.DijkstraFactory;
@@ -92,17 +93,12 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
 		manager.run(population, new ReplanningContext() {
 
 			@Override
-			public TripRouterFactory getTripRouterFactory() {
-				return new TripRouterFactoryImpl( scenario, new OnlyTimeDependentTravelCostCalculatorFactory(), new FreeSpeedTravelTime(), new DijkstraFactory(), null );
-			}
-
-			@Override
-			public TravelDisutility getTravelCostCalculator() {
+			public TravelDisutility getTravelDisutility() {
 				return null;
 			}
 
 			@Override
-			public TravelTime getTravelTimeCalculator() {
+			public TravelTime getTravelTime() {
 				return null;
 			}
 
@@ -114,6 +110,11 @@ public class ChangeLegModeIntegrationTest extends MatsimTestCase {
 			@Override
 			public int getIteration() {
 				return 0;
+			}
+
+			@Override
+			public TripRouter getTripRouter() {
+				return new TripRouterFactoryImpl( scenario, new OnlyTimeDependentTravelCostCalculatorFactory(), new FreeSpeedTravelTime(), new DijkstraFactory(), null ).instantiateAndConfigureTripRouter();
 			}
 			
 		});

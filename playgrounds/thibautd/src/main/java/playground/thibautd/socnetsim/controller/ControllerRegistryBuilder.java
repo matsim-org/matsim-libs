@@ -37,7 +37,7 @@ import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryInternal;
 import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.router.util.FastAStarLandmarksFactory;
@@ -87,7 +87,7 @@ public class ControllerRegistryBuilder {
 	private TravelDisutilityFactory travelDisutilityFactory = null;
 	private ScoringFunctionFactory scoringFunctionFactory = null;
 	private MobsimFactory mobsimFactory = null;
-	private TripRouterFactory tripRouterFactory = null;
+	private TripRouterFactoryInternal tripRouterFactory = null;
 	private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = null;
 	private PlanRoutingAlgorithmFactory planRoutingAlgorithmFactory = null;
 	private GroupIdentifier groupIdentifier = null;
@@ -146,7 +146,7 @@ public class ControllerRegistryBuilder {
 	}
 
 	public ControllerRegistryBuilder withTripRouterFactory(
-			final TripRouterFactory tripRouterFactory2) {
+			final TripRouterFactoryInternal tripRouterFactory2) {
 		if ( this.tripRouterFactory != null ) throw new IllegalStateException( "object already set" );
 		this.tripRouterFactory = tripRouterFactory2;
 		return this;
@@ -329,7 +329,7 @@ public class ControllerRegistryBuilder {
 		return leastCostPathCalculatorFactory;
 	}
 
-	public TripRouterFactory getTripRouterFactory() {
+	public TripRouterFactoryInternal getTripRouterFactory() {
 		if ( tripRouterFactory == null ) {
 			final TransitSchedule schedule = scenario.getTransitSchedule();
 			final TransitRouterFactory transitRouterFactory =

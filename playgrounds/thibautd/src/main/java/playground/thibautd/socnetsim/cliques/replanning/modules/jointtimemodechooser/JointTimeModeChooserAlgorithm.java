@@ -26,7 +26,7 @@ import java.util.Random;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryInternal;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -54,7 +54,7 @@ public class JointTimeModeChooserAlgorithm implements GenericPlanAlgorithm<Joint
 
 	private final TravelTime travelTimeCalculator;
 	private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
-	private final TripRouterFactory exactRouterFactory;
+	private final TripRouterFactoryInternal exactRouterFactory;
 
 	public JointTimeModeChooserAlgorithm(
 			final Random random,
@@ -79,7 +79,7 @@ public class JointTimeModeChooserAlgorithm implements GenericPlanAlgorithm<Joint
 			final ScoringFunctionFactory scoringFunctionFactory,
 			final TravelTime travelTimeCalculator,
 			final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory,
-			final TripRouterFactory tripRouterFactory) {
+			final TripRouterFactoryInternal tripRouterFactory) {
 		this.random = random;
 		this.statsCollector = statsCollector;
 		this.delay = delay;
@@ -92,7 +92,7 @@ public class JointTimeModeChooserAlgorithm implements GenericPlanAlgorithm<Joint
 
 	@Override
 	public void run(final JointPlan jointPlan) {
-		TripRouterFactory estimatorRouterFactory =
+		TripRouterFactoryInternal estimatorRouterFactory =
 			getAndTuneTripRouterFactory(
 					jointPlan,
 					delay,
@@ -145,13 +145,13 @@ public class JointTimeModeChooserAlgorithm implements GenericPlanAlgorithm<Joint
 		}
 	}
 
-	private static TripRouterFactory getAndTuneTripRouterFactory(
+	private static TripRouterFactoryInternal getAndTuneTripRouterFactory(
 			final JointPlan plan,
 			final DepartureDelayAverageCalculator delay,
 			final Scenario scenario,
 			final TravelTime travelTimeCalculator,
 			final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory,
-			final TripRouterFactory tripRouterFactory) {
+			final TripRouterFactoryInternal tripRouterFactory) {
 		return new EstimatorTripRouterFactory(
 				plan.getIndividualPlans().values().iterator().next(),
 				scenario.getPopulation().getFactory(),

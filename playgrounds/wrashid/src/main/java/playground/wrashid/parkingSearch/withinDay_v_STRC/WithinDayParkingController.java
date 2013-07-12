@@ -38,13 +38,14 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryInternal;
 import org.matsim.core.router.TripRouterFactoryImpl;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.withinday.controller.WithinDayController;
 
+import playground.christoph.evacuation.controler.WithindayMultimodalTripRouterFactory;
 import playground.christoph.evacuation.trafficmonitoring.BikeTravelTime;
 import playground.christoph.evacuation.trafficmonitoring.WalkTravelTime;
 import playground.christoph.parking.core.ParkingCostCalculatorImpl;
@@ -128,9 +129,9 @@ public class WithinDayParkingController extends WithinDayController implements R
 		times.put(TransportMode.bike, new BikeTravelTime(this.config.plansCalcRoute()));
 		times.put(TransportMode.car, super.getTravelTimeCollector());
 		
-		TripRouterFactory delegate = new TripRouterFactoryImpl(this.scenarioData, this.getTravelDisutilityFactory(), this.getTravelTimeCollector(), 
+		TripRouterFactoryInternal delegate = new TripRouterFactoryImpl(this.scenarioData, this.getTravelDisutilityFactory(), this.getTravelTimeCollector(), 
 				this.getLeastCostPathCalculatorFactory(), this.getTransitRouterFactory());
-		MultimodalTripRouterFactory tripRouterFactory = new MultimodalTripRouterFactory(this, times, delegate);
+		WithindayMultimodalTripRouterFactory tripRouterFactory = new WithindayMultimodalTripRouterFactory(this, times, delegate);
 		this.getWithinDayEngine().setTripRouterFactory(tripRouterFactory);
 		
 		// Use a the TravelTimeCollector here for within-day routes replanning!

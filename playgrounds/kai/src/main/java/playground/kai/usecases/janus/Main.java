@@ -27,6 +27,7 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimFactory;
 
 /**
  * @author nagel
@@ -39,7 +40,7 @@ class Main {
 		ctrl.setMobsimFactory(new MobsimFactory(){
 			@Override
 			public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-				QSim qsim = (QSim) ctrl.getMobsimFactory().createMobsim(sc, eventsManager) ;
+				QSim qsim = (QSim) new QSimFactory().createMobsim(sc, eventsManager) ;
 
 				MobsimAgent ma = new MyMobsimDriverAgent( sc.getNetwork() ) ;
 				qsim.insertAgentIntoMobsim(ma) ;

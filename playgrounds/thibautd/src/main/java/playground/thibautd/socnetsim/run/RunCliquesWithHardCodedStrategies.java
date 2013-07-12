@@ -40,7 +40,7 @@ import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryInternal;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.pt.PtConstants;
@@ -197,8 +197,8 @@ public class RunCliquesWithHardCodedStrategies {
 
 		if ( scoringFunctionConf.isUseKtiScoring() && !config.scenario().isUseTransit() ) {
 			builder.withTripRouterFactory(
-					new TripRouterFactory() {
-						private final TripRouterFactory delegate =
+					new TripRouterFactoryInternal() {
+						private final TripRouterFactoryInternal delegate =
 							new JointTripRouterFactory(
 								scenario,
 								builder.getTravelDisutilityFactory(),

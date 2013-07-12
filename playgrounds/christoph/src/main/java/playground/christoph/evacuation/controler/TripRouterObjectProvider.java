@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package contrib.multimodal.router;
+package playground.christoph.evacuation.controler;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.Controler;

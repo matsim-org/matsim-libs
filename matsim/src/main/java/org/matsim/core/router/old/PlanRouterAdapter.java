@@ -106,17 +106,10 @@ public class PlanRouterAdapter implements PlanAlgorithm, PersonAlgorithm {
 
 	public PlanRouterAdapter(
 			final Controler controler) {
-		this( new PlanRouter(
-					controler.getTripRouterFactory().instantiateAndConfigureTripRouter(),
-					((ScenarioImpl) controler.getScenario()).getActivityFacilities() ),
-				controler);
-	}
-
-	public PlanRouterAdapter(
-			final PlanRouter planRouter,
-			final Controler controler) {
-		this.planRouter = planRouter;
-
+		this.planRouter = new PlanRouter(
+							controler.getTripRouterFactory().instantiateAndConfigureTripRouter(),
+							((ScenarioImpl) controler.getScenario()).getActivityFacilities() );
+		
 		TravelTime time = controler.getLinkTravelTimes();
 		TravelDisutility disutility =
 			controler.getTravelDisutilityFactory().createTravelDisutility(
@@ -124,7 +117,7 @@ public class PlanRouterAdapter implements PlanAlgorithm, PersonAlgorithm {
 					controler.getConfig().planCalcScore());
 		FreespeedTravelTimeAndDisutility ptTimeCostCalc =
 			new FreespeedTravelTimeAndDisutility(-1.0, 0.0, 0.0);
-
+		
 		LeastCostPathCalculatorFactory factory = controler.getLeastCostPathCalculatorFactory();
 		this.network = controler.getNetwork();
 		this.routeAlgo = factory.createPathCalculator(network, disutility, time);

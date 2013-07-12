@@ -193,9 +193,9 @@ public class ChoiceSet {
 	
 	private TreeMap<Double,Id> createReducedChoiceSetWithScores(int actlegIndex, ActivityFacilities facilities, ScoringFunctionAccumulator scoringFunction,
 			Plan plan, ReplanningContext replanningContext) {
-		TravelTime travelTime = replanningContext.getTravelTimeCalculator() ; 
-		TravelDisutility travelCost = replanningContext.getTravelCostCalculator() ;
-		TripRouter router = replanningContext.getTripRouterFactory().instantiateAndConfigureTripRouter() ;
+		TravelTime travelTime = replanningContext.getTravelTime() ; 
+		TravelDisutility travelCost = replanningContext.getTravelDisutility() ;
+		TripRouter router = replanningContext.getTripRouter() ;
 		
 		Activity act = (Activity) plan.getPlanElements().get(actlegIndex);
 		

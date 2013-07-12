@@ -25,9 +25,10 @@ import java.lang.reflect.InvocationTargetException;
 import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryInternal;
 
 /**
- * Decide which {@link TripRouterFactory} to use.
+ * Decide which {@link TripRouterFactoryInternal} to use.
  * 
  * @author aneumann, droeder
  *

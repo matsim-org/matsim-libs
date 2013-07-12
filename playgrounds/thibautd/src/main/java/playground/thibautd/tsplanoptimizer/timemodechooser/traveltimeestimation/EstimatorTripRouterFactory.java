@@ -28,7 +28,7 @@ import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TransitRouterWrapper;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryInternal;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.DepartureDelayAverageCalculator;
@@ -38,8 +38,8 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 /**
  * @author thibautd
  */
-public class EstimatorTripRouterFactory implements TripRouterFactory {
-	private final TripRouterFactory delegate;
+public class EstimatorTripRouterFactory implements TripRouterFactoryInternal {
+	private final TripRouterFactoryInternal delegate;
 	private final PlansCalcRouteConfigGroup config;
 	private final Plan plan;
 	private final PopulationFactory populationFactory;
@@ -60,7 +60,7 @@ public class EstimatorTripRouterFactory implements TripRouterFactory {
 			final TransitSchedule transitSchedule,
 			final PlansCalcRouteConfigGroup config,
 			final DepartureDelayAverageCalculator delay,
-			final TripRouterFactory delegate) {
+			final TripRouterFactoryInternal delegate) {
 		this.plan = plan;
 		this.config = config;
 		this.delay = delay;

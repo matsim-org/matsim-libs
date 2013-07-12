@@ -33,10 +33,11 @@ import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.BikeTravelTim
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTime;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTime;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTimeOld;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryInternal;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 
+import playground.christoph.evacuation.controler.WithindayMultimodalTripRouterFactory;
 import playground.wrashid.lib.obj.IntegerValueHashMap;
 import playground.wrashid.parkingSearch.withindayFW.controllers.WithinDayParkingController;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingStrategy;
@@ -47,7 +48,6 @@ import playground.wrashid.parkingSearch.withindayFW.psHighestUtilityParkingChoic
 import playground.wrashid.parkingSearch.withindayFW.randomTestStrategy.RandomSearchIdentifier;
 import playground.wrashid.parkingSearch.withindayFW.randomTestStrategy.RandomSearchReplannerFactory;
 import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas;
-import contrib.multimodal.router.MultimodalTripRouterFactory;
 
 public class HUPCAndRandomControllerChessBoard extends WithinDayParkingController  {
 	public HUPCAndRandomControllerChessBoard(String[] args) {
@@ -77,11 +77,12 @@ public class HUPCAndRandomControllerChessBoard extends WithinDayParkingControlle
 		travelTimes.put(TransportMode.pt, new PTTravelTime(this.config.plansCalcRoute(), 
 				this.getLinkTravelTimes(), new WalkTravelTimeOld(this.config.plansCalcRoute())));
 
-		travelTimes.put(TransportMode.car, super.getTravelTimeCollector());
+		// travelTimes.put(TransportMode.car, super.getTravelTimeCollector());
+		// Only the "non-simulated" modes handled by the multimodal extension should go in there.
 		
 		this.setTravelDisutilityFactory(new OnlyTimeDependentTravelCostCalculatorFactory());
 		this.initWithinDayTripRouterFactory();
-		TripRouterFactory tripRouterFactory = new MultimodalTripRouterFactory(this, travelTimes, this.getWithinDayTripRouterFactory());
+		TripRouterFactoryInternal tripRouterFactory = new WithindayMultimodalTripRouterFactory(this, travelTimes, this.getTripRouterFactory());
 		this.setWithinDayTripRouterFactory(tripRouterFactory);
 		this.getWithinDayEngine().setTripRouterFactory(this.getWithinDayTripRouterFactory());
 

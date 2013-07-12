@@ -43,7 +43,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
-import contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -53,7 +52,8 @@ import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryInternal;
+import org.matsim.core.router.TripRouterFactoryImpl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -69,6 +69,8 @@ import org.matsim.vehicles.Vehicle;
 
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.config.EvacuationConfig;
+import playground.christoph.evacuation.controler.TripRouterObjectProvider;
+import playground.christoph.evacuation.controler.WithindayMultimodalTripRouterFactory;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.mobsim.decisiondata.HouseholdDecisionData;
@@ -81,8 +83,8 @@ import playground.christoph.evacuation.withinday.replanning.identifiers.Informed
 
 import com.vividsolutions.jts.geom.Geometry;
 
+import contrib.multimodal.config.MultiModalConfigGroup;
 import contrib.multimodal.router.MultimodalTripRouterFactory;
-import contrib.multimodal.router.TripRouterObjectProvider;
 import contrib.multimodal.tools.MultiModalNetworkCreator;
 
 /**
@@ -114,8 +116,8 @@ public class SelectHouseholdMeetingPoint implements MobsimInitializedListener, M
 	private final LatestAcceptedLeaveTimeModel latestAcceptedLeaveTimeModel;
 	private final DecisionDataProvider decisionDataProvider;
 
-	private TripRouterFactory toHomeFacilityRouterFactory;
-	private TripRouterFactory fromHomeFacilityRouterFactory;
+	private TripRouterFactoryInternal toHomeFacilityRouterFactory;
+	private TripRouterFactoryInternal fromHomeFacilityRouterFactory;
 	
 	private Thread[] threads;
 	private Runnable[] runnables;
@@ -168,7 +170,9 @@ public class SelectHouseholdMeetingPoint implements MobsimInitializedListener, M
 				this.travelTimes.get(TransportMode.car),
 				toHomePathCalculatorFactory,
 				controler.getTransitRouterFactory());
-		this.toHomeFacilityRouterFactory = new MultimodalTripRouterFactory(toHomeObjectProvider, travelTimes); 
+		this.toHomeFacilityRouterFactory = new WithindayMultimodalTripRouterFactory(toHomeObjectProvider, travelTimes,
+				new TripRouterFactoryImpl(scenario, disutilityFactory, this.travelTimes.get(TransportMode.car),toHomePathCalculatorFactory,
+				controler.getTransitRouterFactory())); 
 				
 		/*
 		 * Create a subnetwork that only contains the Evacuation area plus some exit nodes.
@@ -307,7 +311,11 @@ public class SelectHouseholdMeetingPoint implements MobsimInitializedListener, M
 				this.travelTimes.get(TransportMode.car),
 				fromPathCalculatorHomeFactory,
 				controler.getTransitRouterFactory());
-		this.fromHomeFacilityRouterFactory = new MultimodalTripRouterFactory(fromHomeObjectProvider, travelTimes); 
+		this.fromHomeFacilityRouterFactory = new WithindayMultimodalTripRouterFactory(fromHomeObjectProvider, travelTimes,
+				new TripRouterFactoryImpl(fromHomeScenario, disutilityFactory, 
+						this.travelTimes.get(TransportMode.car),
+						fromPathCalculatorHomeFactory,
+						controler.getTransitRouterFactory())); 
 	}
 
 

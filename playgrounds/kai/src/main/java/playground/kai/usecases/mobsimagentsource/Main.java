@@ -22,7 +22,6 @@ package playground.kai.usecases.mobsimagentsource;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.AgentSource;
@@ -30,6 +29,7 @@ import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
 
@@ -47,7 +47,7 @@ public class Main {
 		ctrl.setMobsimFactory(new MobsimFactory(){
 			@Override
 			public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-				final QSim qsim = (QSim) ctrl.getMobsimFactory().createMobsim(sc, eventsManager) ;
+				final QSim qsim = (QSim) new QSimFactory().createMobsim(sc, eventsManager) ;
 
 				// not recommended (insertion too early):
 				MobsimAgent ag = new MyMobsimAgent() ;
@@ -59,7 +59,7 @@ public class Main {
 		ctrl.setMobsimFactory(new MobsimFactory(){
 			@Override
 			public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-				final QSim qsim = (QSim) ctrl.getMobsimFactory().createMobsim(sc, eventsManager) ;
+				final QSim qsim = (QSim) new QSimFactory().createMobsim(sc, eventsManager) ;
 				
 				// Why agent source instead of inserting them directly?  Inserting agents into activities is, in fact possible just
 				// after the QSim constructor.  However, inserting vehicles or agents into links is not.  Agentsource makes

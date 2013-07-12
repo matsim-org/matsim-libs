@@ -35,7 +35,7 @@ public class LinkToLinkTripRouterFactory implements TripRouterFactory {
 	private static final Logger log =
 		Logger.getLogger(LinkToLinkTripRouterFactory.class);
 
-	private final TripRouterFactory delegate;
+	private final DefaultTripRouterFactoryImpl delegate;
 	private final Scenario scenario;
 	private final LeastCostPathCalculatorFactory leastCostAlgoFactory;
 	private final TravelDisutilityFactory travelDisutilityFactory;
@@ -48,18 +48,19 @@ public class LinkToLinkTripRouterFactory implements TripRouterFactory {
 			final TravelDisutilityFactory travelDisutilityFactory,
 			final LinkToLinkTravelTime travelTimes,
 			final PopulationFactory populationFactory,
-			final TripRouterFactory delegate) {
+			final DefaultTripRouterFactoryImpl delegate) {
 		this.scenario = scenario;
-		this.leastCostAlgoFactory = leastCostAlgoFactory;
+		this.leastCostAlgoFactory = delegate.getLeastCostPathCalculatorFactory();
 		this.travelDisutilityFactory = travelDisutilityFactory;
 		this.travelTimes = travelTimes;
 		this.populationFactory = populationFactory;
 		this.delegate = delegate;
 	}
 
+
 	@Override
-	public TripRouter instantiateAndConfigureTripRouter() {
-		TripRouter instance = delegate.instantiateAndConfigureTripRouter();
+	public TripRouter instantiateAndConfigureTripRouter(RoutingContext iterationContext) {
+		TripRouter instance = delegate.instantiateAndConfigureTripRouter(iterationContext);
 
 		//Note that the inverted network is created once per thread
 		InvertedNetworkLegRouter invertedNetLegRouter =

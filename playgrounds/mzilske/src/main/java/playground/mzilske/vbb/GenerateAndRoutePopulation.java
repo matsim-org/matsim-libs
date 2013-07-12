@@ -20,7 +20,10 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -108,7 +111,21 @@ public class GenerateAndRoutePopulation {
 			@Override
 			public AbstractPersonAlgorithm getPersonAlgorithm() {
 				return new PersonPrepareForSim(new PlanRouter(
-						trf.instantiateAndConfigureTripRouter(),
+						trf.instantiateAndConfigureTripRouter(new RoutingContext() {
+
+							@Override
+							public TravelDisutility getTravelDisutility() {
+								// TODO Auto-generated method stub
+								return null;
+							}
+
+							@Override
+							public TravelTime getTravelTime() {
+								// TODO Auto-generated method stub
+								return null;
+							}
+							
+						}),
 						((ScenarioImpl)scenario).getActivityFacilities()), scenario);
 			}
 		});

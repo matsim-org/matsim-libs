@@ -20,11 +20,12 @@
 package tutorial.programming.example13MultiStageTripRouting;
 
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.facilities.Facility;
-import org.matsim.core.controler.Controler;
-import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.DefaultTripRouterFactoryImpl;
 import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.TripRouterFactoryImpl;
+import org.matsim.core.router.RoutingContext;
+import org.matsim.core.router.TripRouter;
 
 /**
  * @author thibautd
@@ -32,31 +33,30 @@ import org.matsim.core.router.TripRouterFactoryImpl;
 public class MyTripRouterFactory implements TripRouterFactory {
 	public static final String TELEPORTATION_MAIN_MODE = "myTeleportationMainMode";
 
-	private final Controler controler;
 	private final Facility teleport;
 
-	public MyTripRouterFactory(
-			final Controler controler,
-			final Facility teleport ) {
-		this.controler = controler;
-		this.teleport = teleport;
-	}
+	private TripRouterFactory delegate;
 
-	@Override
-	public TripRouter instantiateAndConfigureTripRouter() {
+	private Scenario scenario;
+
+	public MyTripRouterFactory(
+			final Scenario scenario,
+			final Facility teleport ) {
+		this.teleport = teleport;
 		// this factory initializes a TripRouter with default modules,
 		// taking into account what is asked for in the config
 		// (for instance, detailled or teleported pt).
 		// This allows us to just add our module and go.
-		final TripRouterFactory delegate =
-			new TripRouterFactoryImpl(
-				controler.getScenario(),
-				controler.getTravelDisutilityFactory(),
-				controler.getLinkTravelTimes(),
-				controler.getLeastCostPathCalculatorFactory(),
-				controler.getTransitRouterFactory() );
 
-		final TripRouter router = delegate.instantiateAndConfigureTripRouter();
+		this.delegate = DefaultTripRouterFactoryImpl.createRichTripRouterFactoryImpl(scenario);
+		this.scenario = scenario;
+	}
+
+	@Override
+	public TripRouter instantiateAndConfigureTripRouter(RoutingContext iterationContext) {
+
+
+		final TripRouter router = delegate.instantiateAndConfigureTripRouter(iterationContext);
 
 		// add our module to the instance
 		router.setRoutingModule(
@@ -67,7 +67,7 @@ public class MyTripRouterFactory implements TripRouterFactory {
 				// including if they are specified at a later stage
 				// in the initialisation process.
 				router,
-				controler.getScenario().getPopulation().getFactory(),
+				scenario.getPopulation().getFactory(),
 				teleport));
 
 		// we still need to provide a way to identify our trips

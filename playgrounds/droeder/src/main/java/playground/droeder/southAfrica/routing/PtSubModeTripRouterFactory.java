@@ -27,10 +27,11 @@ import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.LegRouterWrapper;
 import org.matsim.core.router.TransitRouterWrapper;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryImpl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -87,7 +88,7 @@ public class PtSubModeTripRouterFactory implements TripRouterFactory{
 	}
 	
 	@Override
-	public TripRouter instantiateAndConfigureTripRouter() {
+	public TripRouter instantiateAndConfigureTripRouter(RoutingContext iterationContext) {
 		
 		this.config = controler.getScenario().getConfig();
 		this.network = controler.getScenario().getNetwork();

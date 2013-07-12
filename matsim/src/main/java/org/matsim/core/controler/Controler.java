@@ -42,7 +42,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.consistency.ConfigConsistencyCheckerImpl;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
-import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.SimulationConfigGroup;
@@ -68,17 +67,17 @@ import org.matsim.core.mobsim.queuesim.QueueSimulationFactory;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
+import org.matsim.core.router.DefaultTripRouterFactoryImpl;
 import org.matsim.core.router.LinkToLinkTripRouterFactory;
 import org.matsim.core.router.PlanRouter;
+import org.matsim.core.router.RoutingContext;
+import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.TripRouterFactoryImpl;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
+import org.matsim.core.router.TripRouterFactoryInternal;
 import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.FastAStarLandmarksFactory;
-import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -98,9 +97,7 @@ import org.matsim.population.algorithms.PersonPrepareForSim;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.counts.PtCountControlerListener;
-import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
-import org.matsim.pt.router.TransitRouterImplFactory;
 import org.matsim.signalsystems.controler.DefaultSignalsControllerListenerFactory;
 import org.matsim.signalsystems.controler.SignalsControllerListenerFactory;
 import org.matsim.vis.snapshotwriters.SnapshotWriter;
@@ -150,34 +147,28 @@ public class Controler extends AbstractController {
 	public static interface TerminationCriterion {
 		boolean continueIterations( int iteration ) ;
 	}
-	
+
 	private TerminationCriterion terminationCriterion = new TerminationCriterion() {
-	
+
 		@Override
 		public boolean continueIterations(int iteration) {
 			return (iteration <= config.controler().getLastIteration());
 		}
-		
+
 	};
 	protected TravelTimeCalculator travelTimeCalculator = null;
 	protected ScoringFunctionFactory scoringFunctionFactory = null;
 	protected StrategyManager strategyManager = null;
 
-
-	/* default analyses */
-	/* package */CalcLinkStats linkStats = null;
-	/* package */CalcLegTimes legTimes = null;
-	/* package */VolumesAnalyzer volumes = null;
+	private CalcLinkStats linkStats = null;
+	private CalcLegTimes legTimes = null;
+	private VolumesAnalyzer volumes = null;
 
 	private boolean createGraphs = true;
 	protected boolean scenarioLoaded = false;
 	private PlansScoring plansScoring = null;
 	private ScoreStats scoreStats = null;
 
-	/**
-	 * Attribute for the routing factory
-	 */
-	private LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 	private final List<MobsimListener> simulationListeners = new ArrayList<MobsimListener>();
 
 	private TravelTimeCalculatorFactory travelTimeCalculatorFactory;
@@ -186,17 +177,19 @@ public class Controler extends AbstractController {
 	private MobsimFactory thisMobsimFactory = null;
 
 	private SignalsControllerListenerFactory signalsFactory = new DefaultSignalsControllerListenerFactory();
-	private TransitRouterFactory transitRouterFactory = null;
+
+	private TripRouterFactoryBuilderWithDefaults tripRouterFactoryBuilder = new TripRouterFactoryBuilderWithDefaults();
 	private TripRouterFactory tripRouterFactory = null;
 
 	private MobsimFactoryRegister mobsimFactoryRegister;
 	private SnapshotWriterFactoryRegister snapshotWriterRegister;
 	private PlanStrategyFactoryRegister planStrategyFactoryRegister;
-	
+
 	protected boolean dumpDataAtEnd = true;
 	private boolean overwriteFiles = false;
 
-	private final boolean useTripRouting = true;
+	private boolean routerCreated = false;
+
 	public static void main(final String[] args) {
 		if ((args == null) || (args.length == 0)) {
 			System.out.println("No argument given!");
@@ -243,7 +236,7 @@ public class Controler extends AbstractController {
 			this.config = scenario.getConfig();
 			this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
 			checkConfigConsistencyAndWriteToLog(this.config,"Complete config dump directly after reading/getting the config file.  " +
-			"See later for config dump after setup.");
+					"See later for config dump after setup.");
 		} else {
 			if (this.configFileName == null) {
 				if (config == null) {
@@ -255,7 +248,7 @@ public class Controler extends AbstractController {
 			}
 			this.config.addConfigConsistencyChecker(new ConfigConsistencyCheckerImpl());
 			checkConfigConsistencyAndWriteToLog(this.config,"Complete config dump directly after reading/getting the config file.  " +
-			"See later for config dump after setup.");
+					"See later for config dump after setup.");
 			this.scenarioData = (ScenarioImpl) ScenarioUtils.createScenario(this.config);
 		}
 		this.network = this.scenarioData.getNetwork();
@@ -267,10 +260,10 @@ public class Controler extends AbstractController {
 		PlanStrategyRegistrar planStrategyFactoryRegistrar = new PlanStrategyRegistrar();
 		this.planStrategyFactoryRegister = planStrategyFactoryRegistrar.getFactoryRegister();
 		this.events = EventsUtils.createEventsManager(this.config);
-		
+
 		// yy is it really so practical to do this in this way?  People might (re)set this factory between constructor and run()--???  kai, may'13
 		this.travelTimeCalculatorFactory = new TravelTimeCalculatorFactoryImpl();
-		
+
 		this.config.parallelEventHandling().makeLocked();
 	}
 
@@ -284,14 +277,14 @@ public class Controler extends AbstractController {
 		}
 		loadData();
 		run(config);
-		
+
 		// "run(config)" is:
-//		loadCoreListeners();
-//		this.controlerListenerManager.fireControlerStartupEvent();
-//		checkConfigConsistencyAndWriteToLog(config, "config dump before iterations start" ) ;
-//		prepareForSim();
-//		doIterations(config.controler().getFirstIteration(), config.global().getRandomSeed());
-//		shutdown(false);
+		//		loadCoreListeners();
+		//		this.controlerListenerManager.fireControlerStartupEvent();
+		//		checkConfigConsistencyAndWriteToLog(config, "config dump before iterations start" ) ;
+		//		prepareForSim();
+		//		doIterations(config.controler().getFirstIteration(), config.global().getRandomSeed());
+		//		shutdown(false);
 
 	}
 
@@ -300,11 +293,11 @@ public class Controler extends AbstractController {
 		if (!this.config.scenario().isUseVehicles()) {
 			log.warn("Your are using Transit but not Vehicles. This most likely won't work.");
 		}
-	
+
 		Set<EventsFileFormat> formats = EnumSet.copyOf(this.config.controler().getEventsFileFormats());
 		formats.add(EventsFileFormat.xml);
 		this.config.controler().setEventsFileFormats(formats);
-	
+
 		ActivityParams transitActivityParams = new ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
 		transitActivityParams.setTypicalDuration(120.0);
 
@@ -312,12 +305,12 @@ public class Controler extends AbstractController {
 		// ActivityUtilityParameters will set the scoreAtAll flag to false (also introduced in nov/12).  kai, nov'12
 		transitActivityParams.setOpeningTime(0.) ;
 		transitActivityParams.setClosingTime(0.) ;
-		
+
 		this.config.planCalcScore().addActivityParams(transitActivityParams);
 		// yy would this overwrite user-defined definitions of "pt interaction"?
 		// No, I think that the user-defined parameters are set later, in fact overwriting this setting here.
 		// kai, nov'12
-	
+
 		// the QSim reads the config by itself, and configures itself as a
 		// transit-enabled mobsim. kai, nov'11
 	}
@@ -355,16 +348,16 @@ public class Controler extends AbstractController {
 		 * IMPORTANT: The execution order is reverse to the order the listeners
 		 * are added to the list.
 		 */
-	
+
 		if (this.dumpDataAtEnd) {
 			this.addCoreControlerListener(new DumpDataAtEnd(scenarioData, getControlerIO()));
 		}
-	
-	
+
+
 		if (this.scoringFunctionFactory == null) {
 			this.scoringFunctionFactory = new CharyparNagelScoringFunctionFactory(this.config.planCalcScore(), this.getNetwork());
 		}
-	
+
 		// the default handling of plans
 		this.plansScoring = new PlansScoring( this.scenarioData, this.events, getControlerIO(), this.scoringFunctionFactory );
 		this.addCoreControlerListener(this.plansScoring);
@@ -373,8 +366,8 @@ public class Controler extends AbstractController {
 		this.addCoreControlerListener(new PlansReplanning(this.strategyManager, population));
 		this.addCoreControlerListener(new PlansDumping(this.scenarioData, this.getFirstIteration(), this.config.controler().getWritePlansInterval(),
 				this.stopwatch, this.getControlerIO() ));
-	
-	
+
+
 		/*
 		 * TODO [MR] linkStats uses ttcalc and volumes, but ttcalc has
 		 * 15min-steps, while volumes uses 60min-steps! It works a.t.m., but the
@@ -384,16 +377,16 @@ public class Controler extends AbstractController {
 		this.linkStats = new CalcLinkStats(this.network);
 		this.volumes = new VolumesAnalyzer(3600, 24 * 3600 - 1, this.network);
 		this.events.addHandler(this.volumes);
-	
+
 		this.legTimes = new CalcLegTimes();
 		this.events.addHandler(this.legTimes);
 		this.addCoreControlerListener(new LegTimesListener(legTimes, getControlerIO()));
-	
+
 		this.addCoreControlerListener(new EventsHandling(this.events, this.getConfig().controler().getWriteEventsInterval(),
 				this.getConfig().controler().getEventsFileFormats(), this.getControlerIO() ));
 		// must be last being added (=first being executed)
-	
-	
+
+
 		loadControlerListeners();
 	}
 
@@ -413,46 +406,46 @@ public class Controler extends AbstractController {
 
 		// optional: LegHistogram
 		this.addControlerListener(new LegHistogramListener(this.events, this.createGraphs));
-	
+
 		// optional: score stats
 		this.scoreStats = new ScoreStats(this.population,
 				this.getControlerIO().getOutputFilename(FILENAME_SCORESTATS), this.createGraphs);
 		this.addControlerListener(this.scoreStats);
-		
+
 		// load counts, if requested
 		if (this.config.counts().getCountsFileName() != null) {
 			CountControlerListener ccl = new CountControlerListener(this.config.counts());
 			this.addControlerListener(ccl);
 			this.counts = ccl.getCounts();
 		}
-	
+
 		if (this.config.linkStats().getWriteLinkStatsInterval() > 0) {
 			this.addControlerListener(new LinkStatsControlerListener(this.config.linkStats()));
 		}
-	
+
 		if (this.config.scenario().isUseTransit()) {
 			if (this.config.ptCounts().getAlightCountsFileName() != null) {
 				// only works when all three files are defined! kai, oct'10
 				addControlerListener(new PtCountControlerListener(this.config));
 			}
 		}
-	
+
 		if (this.config.scenario().isUseSignalSystems()) {
 			addControlerListener(this.signalsFactory.createSignalsControllerListener());
 		}
-	
+
 		if ( !this.config.vspExperimental().getActivityDurationInterpretation().equals(ActivityDurationInterpretation.minOfDurationAndEndTime)
 				|| this.config.vspExperimental().isRemovingUnneccessaryPlanAttributes() ) {
 			addControlerListener(new VspPlansCleaner());
 		}
-	
+
 	}
 
 	@Override
 	protected final void prepareForSim() {
-		
+
 		setUp();
-		
+
 		// make sure all routes are calculated.
 		ParallelPersonAlgorithmRunner.run(this.getPopulation(), this.config.global().getNumberOfThreads(),
 				new ParallelPersonAlgorithmRunner.PersonAlgorithmProvider() {
@@ -476,58 +469,28 @@ public class Controler extends AbstractController {
 	 */
 	protected void setUp() {
 		// yyyy cannot make this final since it is overridden at about 25 locations.  kai, jan'13
-		
+
 		this.travelTimeCalculator = this.travelTimeCalculatorFactory.createTravelTimeCalculator(this.network, this.config.travelTimeCalculator());
 		this.events.addHandler(this.travelTimeCalculator);
-	
-		if (this.leastCostPathCalculatorFactory != null) {
-			log.info("leastCostPathCalculatorFactory already set, ignoring RoutingAlgorithmType specified in config");
-		} else {
-			if (this.config.controler().getRoutingAlgorithmType().equals(RoutingAlgorithmType.Dijkstra)) {
-				this.leastCostPathCalculatorFactory = new DijkstraFactory();
-			} else if (this.config.controler().getRoutingAlgorithmType().equals(RoutingAlgorithmType.AStarLandmarks)) {
-				this.leastCostPathCalculatorFactory = new AStarLandmarksFactory(
-						this.network, new FreespeedTravelTimeAndDisutility(this.config.planCalcScore()), this.config.global().getNumberOfThreads());
-			} else if (this.config.controler().getRoutingAlgorithmType().equals(RoutingAlgorithmType.FastDijkstra)) {
-				this.leastCostPathCalculatorFactory = new FastDijkstraFactory();
-			} else if (this.config.controler().getRoutingAlgorithmType().equals(RoutingAlgorithmType.FastAStarLandmarks)) {
-				this.leastCostPathCalculatorFactory = new FastAStarLandmarksFactory(
-						this.network, new FreespeedTravelTimeAndDisutility(this.config.planCalcScore()));
-			} else {
-				throw new IllegalStateException("Enumeration Type RoutingAlgorithmType was extended without adaptation of Controler!");
-			}
-		}
-	
-		if ( config.scenario().isUseTransit() && getTransitRouterFactory() == null ) {
-			setTransitRouterFactory(
-					new TransitRouterImplFactory(
-							getScenario().getTransitSchedule(),
-							new TransitRouterConfig(
-									config.planCalcScore(),
-									config.plansCalcRoute(),
-									config.transitRouter(),
-									config.vspExperimental() )));
-		}
-	
-		if ( getUseTripRouting() && tripRouterFactory == null ) {
-			tripRouterFactory = new TripRouterFactoryImpl(
-					getScenario(),
-					getTravelDisutilityFactory(),
-					getLinkTravelTimes(),
-					getLeastCostPathCalculatorFactory(),
-					getScenario().getConfig().scenario().isUseTransit() ? getTransitRouterFactory() : null);
-	
+
+		if ( tripRouterFactory == null ) {
+			// This builder is just for compatibility, in case somebody
+			// uses setTransitRouter or setLeastCostPathCalculatorFactory.
+			tripRouterFactory = tripRouterFactoryBuilder.build(scenarioData);
+
+			// Special case
 			if (this.getScenario().getConfig().controler().isLinkToLinkRoutingEnabled()) {
 				tripRouterFactory = new LinkToLinkTripRouterFactory(
 						getScenario(),
-						getLeastCostPathCalculatorFactory(),
+						new DijkstraFactory(),
 						getTravelDisutilityFactory(),
 						travelTimeCalculator.getLinkToLinkTravelTimes(),
 						getPopulation().getFactory(),
-						tripRouterFactory);
+						(DefaultTripRouterFactoryImpl) tripRouterFactory);
 			}
 		}
-	
+		routerCreated = true;
+
 	}
 
 	/**
@@ -545,7 +508,7 @@ public class Controler extends AbstractController {
 	protected final boolean continueIterations(int it) {
 		return terminationCriterion.continueIterations(it);
 	}
-	
+
 	@Override
 	protected final void runMobSim(int iteration) {
 		this.thisIteration = iteration; // yyyy this line should not be necessary any more. kai, feb'13
@@ -620,107 +583,53 @@ public class Controler extends AbstractController {
 
 	}
 
-	public final void removeControlerListener(final ControlerListener l) {
-		this.controlerListenerManager.removeControlerListener(l);
-	}
-
-	/**
-	 * Sets whether the Controler is allowed to overwrite files in the output
-	 * directory or not. <br>
-	 * When starting, the Controler can check that the output directory is empty
-	 * or does not yet exist, so no files will be overwritten (default setting).
-	 * While useful in a productive environment, this security feature may be
-	 * interfering in test cases or while debugging. <br>
-	 * <strong>Use this setting with caution, as it can result in data
-	 * loss!</strong>
-	 *
-	 * @param overwrite
-	 *            whether files and directories should be overwritten (true) or
-	 *            not (false)
-	 */
-	public final void setOverwriteFiles(final boolean overwrite) {
-		this.overwriteFiles = overwrite;
-	}
-
-
-	/**
-	 * Sets whether graphs showing some analyses should automatically be
-	 * generated during the simulation. The generation of graphs usually takes a
-	 * small amount of time that does not have any weight in big simulations,
-	 * but add a significant overhead in smaller runs or in test cases where the
-	 * graphical output is not even requested.
-	 *
-	 * @param createGraphs
-	 *            true if graphs showing analyses' output should be generated.
-	 */
-	public final void setCreateGraphs(final boolean createGraphs) {
-		this.config.controler().setCreateGraphs(createGraphs);
-	}
-
-	/**
-	 * @param dumpData
-	 *            <code>true</code> if at the end of a run, plans, network,
-	 *            config etc should be dumped to a file.
-	 */
-	public final void setDumpDataAtEnd(final boolean dumpData) {
-		this.dumpDataAtEnd = dumpData;
-	}
-
-	public final TravelDisutility createTravelDisutilityCalculator() {
-		return this.travelCostCalculatorFactory.createTravelDisutility(
-				this.travelTimeCalculator.getLinkTravelTimes(), this.config.planCalcScore());
-	}
+	// ******** --------- *******
+	// The following is the internal interface of the Controler, which
+	// is meant to be called while the Controler is running (not before),
+	// meaning mostly from ControlerListeners, except possibly the StartupListener,
+	// as the TravelTimeCalculator and the TripRouterFactory aren't available there yet.
+	//
+	// These, or some of these, would probably go on the ControlerEvents,
+	// when they could stop passing the whole Controler.
+	// 
+	// Please try and do not use them for cascaded setting from the outside,
+	// i.e. get something, look if it is instance of something,
+	// and then change something on it. Or wrap it in something else and set it again.
+	// These things are basically made to be
+	// used, not changed. Send me (michaz) a mail if you need to do it.
+	// I really want to sort this out.
+	// ******** --------- *******
 
 	public final TravelTime getLinkTravelTimes() {
 		return this.travelTimeCalculator.getLinkTravelTimes();
 	}
 
-	/**
-	 * Sets a new {@link org.matsim.core.scoring.ScoringFunctionFactory} to use.
-	 * <strong>Note:</strong> This will reset all scores calculated so far! Only
-	 * call this before any events are generated in an iteration.
-	 *
-	 * @param factory
-	 *            The new ScoringFunctionFactory to be used.
-	 */
-	public final void setScoringFunctionFactory(
-			final ScoringFunctionFactory factory) {
-		this.scoringFunctionFactory = factory;
-	}
+	public final TripRouterFactoryInternal getTripRouterFactory() {
+		// I think this could just be createTripRouter(). Not sure
+		// if the indirection is necessary. People just want to get a TripRouter. michaz
+		return new TripRouterFactoryInternal() {
 
-	/**
-	 * @return the currently used
-	 *         {@link org.matsim.core.scoring.ScoringFunctionFactory} for
-	 *         scoring plans.
-	 */
-	public final ScoringFunctionFactory getScoringFunctionFactory() {
-		return this.scoringFunctionFactory;
-	}
+			@Override
+			public TripRouter instantiateAndConfigureTripRouter() {
+				return Controler.this.tripRouterFactory.instantiateAndConfigureTripRouter(new RoutingContext() {
 
-	/**
-	 * @return Returns the {@link org.matsim.core.replanning.StrategyManager}
-	 *         used for the replanning of plans.
-	 */
-	@Deprecated // use addPlanStrategyFactory instead. kai, jan'13
-	public final StrategyManager getStrategyManager() {
-		return this.strategyManager;
-	}
+					@Override
+					public TravelDisutility getTravelDisutility() {
+						return createTravelDisutilityCalculator();
+					}
 
-	public final LeastCostPathCalculatorFactory getLeastCostPathCalculatorFactory() {
-		return this.leastCostPathCalculatorFactory;
-	}
+					@Override
+					public TravelTime getTravelTime() {
+						return travelTimeCalculator.getLinkTravelTimes();
+					}
 
-	public final void setLeastCostPathCalculatorFactory(
-			final LeastCostPathCalculatorFactory factory) {
-		this.leastCostPathCalculatorFactory = factory;
+				});
+			}
+
+		};
 	}
 
 	/**Design comments:<ul>
-	 * <li> yyyy It seems to me that one would need a factory at <i>this</i> level. kai, may'12
-	 * <li> An issue is that the TravelTime(Calculator) object needs to be passed into the factory.  I don't think that
-	 * this is a large problem, but it needs to be dealt with. kai, may'12
-	 * </ul>
-	 *
 	 * @return a new instance of a {@link PlanAlgorithm} to calculate the routes
 	 *         of plans with the default (= the current from the last or current
 	 *         iteration) travel costs and travel times. Only to be used by a
@@ -740,25 +649,25 @@ public class Controler extends AbstractController {
 				) ; 
 	}
 
+	public final TravelDisutility createTravelDisutilityCalculator() {
+		return this.travelCostCalculatorFactory.createTravelDisutility(
+				this.travelTimeCalculator.getLinkTravelTimes(), this.config.planCalcScore());
+	}
 
-	public final TripRouterFactory getTripRouterFactory() {
-		if ( !useTripRouting ) {
-			throw new IllegalStateException( "cannot get the trip router: useTripRouting is false" );
+	public final LeastCostPathCalculatorFactory getLeastCostPathCalculatorFactory() {
+		if (!(this.tripRouterFactory instanceof DefaultTripRouterFactoryImpl)) {
+			throw new RuntimeException("You've set a custom TripRouter. Then please also keep the routing algorithm by yourself.");
 		}
-		return tripRouterFactory;
+		return ((DefaultTripRouterFactoryImpl) this.tripRouterFactory).getLeastCostPathCalculatorFactory();
 	}
 
-	public final void setTripRouterFactory(final TripRouterFactory factory) {
-		tripRouterFactory = factory;
-	}
-
-//	public final void setUseTripRouting(final boolean useTripRouting) {
-//		this.useTripRouting = useTripRouting;
-//	}
-
-	@Deprecated // always true (I think)
-	public final boolean getUseTripRouting() {
-		return useTripRouting;
+	/**
+	 * @return the currently used
+	 *         {@link org.matsim.core.scoring.ScoringFunctionFactory} for
+	 *         scoring plans.
+	 */
+	public final ScoringFunctionFactory getScoringFunctionFactory() {
+		return this.scoringFunctionFactory;
 	}
 
 	public final int getFirstIteration() {
@@ -826,10 +735,6 @@ public class Controler extends AbstractController {
 		return this.scoreStats;
 	}
 
-	public final List<MobsimListener> getMobsimListeners() {
-		return this.simulationListeners;
-	}
-
 	@Deprecated
 	/**
 	 * This method exposes something which is definitely private to the Controler,
@@ -840,24 +745,10 @@ public class Controler extends AbstractController {
 		return this.plansScoring;
 	}
 
-	@Deprecated
-	public final TravelTimeCalculatorFactory getTravelTimeCalculatorFactory() {
-		// does it really make sense to give people not even the factory?  kai, may'13
-		return this.travelTimeCalculatorFactory;
-	}
-
-	public final void setTravelTimeCalculatorFactory(
-			final TravelTimeCalculatorFactory travelTimeCalculatorFactory) {
-		this.travelTimeCalculatorFactory = travelTimeCalculatorFactory;
-	}
-
+	// Not sure if necessary. Perhaps try to unwind, directly calling
+	// createTravelDisutilityCalculator instead? michaz
 	public final TravelDisutilityFactory getTravelDisutilityFactory() {
 		return this.travelCostCalculatorFactory;
-	}
-
-	public final void setTravelDisutilityFactory(
-			final TravelDisutilityFactory travelCostCalculatorFactory) {
-		this.travelCostCalculatorFactory = travelCostCalculatorFactory;
 	}
 
 	/**
@@ -870,18 +761,144 @@ public class Controler extends AbstractController {
 		log.warn("Controler.getIterationNumber() is deprecated and wrong. If you need the iteration number, just be an EventHandler or an IterationStartsListener and you will be told.");
 		return this.thisIteration;
 	}
-	
-	public final void setTerminationCriterion(TerminationCriterion terminationCriterion) {
-		this.terminationCriterion = terminationCriterion;
+
+	public final TransitRouterFactory getTransitRouterFactory() {
+		if (!(this.tripRouterFactory instanceof DefaultTripRouterFactoryImpl)) {
+			throw new RuntimeException("You've set a custom TripRouter. Then please also keep the routing algorithm by yourself.");
+		}
+		return ((DefaultTripRouterFactoryImpl) this.tripRouterFactory).getTransitRouterFactory();
 	}
 
-	public final MobsimFactory getMobsimFactory() {
-		return this.thisMobsimFactory;
+
+	// ******** --------- *******
+	// The following methods are the outer interface of the Controler. They are used
+	// to set up infrastructure from the outside, before calling run().
+	// Some of them may also work from the StartupListeners, I haven't sorted that out yet.
+	// Contrast to the outermost interface, see below.
+	// ******** --------- *******
+
+	/**
+	 * It should be possible to add or remove MobsimListeners between iterations, no problem.
+	 * @return
+	 */
+	public final List<MobsimListener> getMobsimListeners() {
+		return this.simulationListeners;
+	}
+
+	public final void removeControlerListener(final ControlerListener l) {
+		// Not sure if necessary or when this is allowed to be called.
+		this.controlerListenerManager.removeControlerListener(l);
+	}
+
+	public final void setTravelDisutilityFactory(
+			final TravelDisutilityFactory travelCostCalculatorFactory) {
+		this.travelCostCalculatorFactory = travelCostCalculatorFactory;
+	}
+
+	public final void setTravelTimeCalculatorFactory(
+			final TravelTimeCalculatorFactory travelTimeCalculatorFactory) {
+		this.travelTimeCalculatorFactory = travelTimeCalculatorFactory;
 	}
 
 	public final void setMobsimFactory(final MobsimFactory mobsimFactory) {
 		this.thisMobsimFactory = mobsimFactory;
 	}
+
+	/**
+	 * Sets a new {@link org.matsim.core.scoring.ScoringFunctionFactory} to use.
+	 * <strong>Note:</strong> This will reset all scores calculated so far! Only
+	 * call this before any events are generated in an iteration.
+	 *
+	 * @param factory
+	 *            The new ScoringFunctionFactory to be used.
+	 */
+	public final void setScoringFunctionFactory(
+			final ScoringFunctionFactory factory) {
+		this.scoringFunctionFactory = factory;
+	}
+
+	public final void setTerminationCriterion(TerminationCriterion terminationCriterion) {
+		this.terminationCriterion = terminationCriterion;
+	}
+
+	public final void setTransitRouterFactory(
+			final TransitRouterFactory transitRouterFactory) {
+		if (!routerCreated) {
+			this.tripRouterFactoryBuilder.setTransitRouterFactory(transitRouterFactory);
+		} else {
+			throw new RuntimeException("Too late for that.");
+		}
+	}
+
+	public final void setLeastCostPathCalculatorFactory(final LeastCostPathCalculatorFactory factory) {
+		if (!routerCreated) {
+			this.tripRouterFactoryBuilder.setLeastCostPathCalculatorFactory(factory);
+		} else {
+			throw new RuntimeException("Too late for that.");
+		}
+	}
+
+	public final void setTripRouterFactory(final TripRouterFactory factory) {
+		if (!routerCreated ) {
+			tripRouterFactory = factory;
+		} else {
+			throw new RuntimeException("Too late for that.");
+		}
+	}
+
+	/**
+	 * Sets whether the Controler is allowed to overwrite files in the output
+	 * directory or not. <br>
+	 * When starting, the Controler can check that the output directory is empty
+	 * or does not yet exist, so no files will be overwritten (default setting).
+	 * While useful in a productive environment, this security feature may be
+	 * interfering in test cases or while debugging. <br>
+	 * <strong>Use this setting with caution, as it can result in data
+	 * loss!</strong>
+	 *
+	 * @param overwrite
+	 *            whether files and directories should be overwritten (true) or
+	 *            not (false)
+	 */
+	public final void setOverwriteFiles(final boolean overwrite) {
+		this.overwriteFiles = overwrite;
+	}
+
+	/**
+	 * Sets whether graphs showing some analyses should automatically be
+	 * generated during the simulation. The generation of graphs usually takes a
+	 * small amount of time that does not have any weight in big simulations,
+	 * but add a significant overhead in smaller runs or in test cases where the
+	 * graphical output is not even requested.
+	 *
+	 * @param createGraphs
+	 *            true if graphs showing analyses' output should be generated.
+	 */
+	public final void setCreateGraphs(final boolean createGraphs) {
+		this.config.controler().setCreateGraphs(createGraphs);
+	}
+
+	/**
+	 * @param dumpData
+	 *            <code>true</code> if at the end of a run, plans, network,
+	 *            config etc should be dumped to a file.
+	 */
+	public final void setDumpDataAtEnd(final boolean dumpData) {
+		this.dumpDataAtEnd = dumpData;
+	}
+	
+	
+	// ******** --------- *******
+	// The following methods are the outermost interface of the Controler. They are used
+	// to register infrastructure provided by components, which may or may not be used
+	// then, depending on what is in the Config file.
+	// This is the point at which a component loader would operate - it would 
+	// create this thing, go through the components to see what they provide, and put them
+	// here.
+	// These methods in principle be factored out to a Controller or OuterController or
+	// something, which then creates and configures a Controler based on the config,
+	// using the methods above.
+	// ******** --------- *******
 
 	/**
 	 * Register a {@link MobsimFactory} with a given name.
@@ -898,13 +915,9 @@ public class Controler extends AbstractController {
 	public final void addSnapshotWriterFactory(final String snapshotWriterName, final SnapshotWriterFactory snapshotWriterFactory) {
 		this.snapshotWriterRegister.register(snapshotWriterName, snapshotWriterFactory);
 	}
-	
+
 	public final void addPlanStrategyFactory(final String planStrategyFactoryName, final PlanStrategyFactory planStrategyFactory) {
 		this.planStrategyFactoryRegister.register(planStrategyFactoryName, planStrategyFactory);
-	}
-
-	public final SignalsControllerListenerFactory getSignalsControllerListenerFactory() {
-		return this.signalsFactory;
 	}
 
 	public final void setSignalsControllerListenerFactory(
@@ -912,13 +925,18 @@ public class Controler extends AbstractController {
 		this.signalsFactory = signalsFactory;
 	}
 
-	public final TransitRouterFactory getTransitRouterFactory() {
-		return this.transitRouterFactory;
-	}
 
-	public final void setTransitRouterFactory(
-			final TransitRouterFactory transitRouterFactory) {
-		this.transitRouterFactory = transitRouterFactory;
+	// ******** --------- *******
+	// The following are methods which should not be used at all,
+	// or where I am not sure when it is allowed to call them.
+	// ******** --------- *******
+	/**
+	 * @return Returns the {@link org.matsim.core.replanning.StrategyManager}
+	 *         used for the replanning of plans.
+	 */
+	@Deprecated // use addPlanStrategyFactory instead. kai, jan'13
+	public final StrategyManager getStrategyManager() {
+		return this.strategyManager;
 	}
 
 }

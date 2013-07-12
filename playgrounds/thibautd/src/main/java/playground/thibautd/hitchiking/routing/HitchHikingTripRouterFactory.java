@@ -23,8 +23,9 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.router.DefaultTripRouterFactoryImpl;
+import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactoryImpl;
 
 import playground.thibautd.hitchiking.HitchHikingConfigGroup;
 import playground.thibautd.hitchiking.HitchHikingConstants;
@@ -34,7 +35,7 @@ import playground.thibautd.hitchiking.spotweights.SpotWeighter;
 /**
  * @author thibautd
  */
-public class HitchHikingTripRouterFactory extends TripRouterFactoryImpl {
+public class HitchHikingTripRouterFactory extends DefaultTripRouterFactoryImpl {
 	private final HitchHikingSpots spots;
 	private final Controler controler;
 	private final SpotWeighter spotWeighter;
@@ -45,13 +46,7 @@ public class HitchHikingTripRouterFactory extends TripRouterFactoryImpl {
 			final HitchHikingSpots spots,
 			final SpotWeighter spotWeighter,
 			final HitchHikingConfigGroup config) {
-		super(controler.getScenario(),
-				controler.getTravelDisutilityFactory(),
-				controler.getLinkTravelTimes(),
-				controler.getLeastCostPathCalculatorFactory(),
-				controler.getScenario().getConfig().scenario().isUseTransit() ?
-					controler.getTransitRouterFactory() :
-					null);
+		super(controler.getScenario());
 		this.controler = controler;
 		this.spotWeighter = spotWeighter;
 		this.spots = spots;
@@ -59,10 +54,10 @@ public class HitchHikingTripRouterFactory extends TripRouterFactoryImpl {
 	}
 
 	@Override
-	public TripRouter instantiateAndConfigureTripRouter() {
+	public TripRouter instantiateAndConfigureTripRouter(RoutingContext iterationContext) {
 		if (true) 
 			throw new UnsupportedOperationException( "TODO: replace MainModeIdentifier in PlanRouter" );
-		TripRouter instance = super.instantiateAndConfigureTripRouter();
+		TripRouter instance = super.instantiateAndConfigureTripRouter(iterationContext);
 
 		instance.setRoutingModule(
 				HitchHikingConstants.PASSENGER_MODE,

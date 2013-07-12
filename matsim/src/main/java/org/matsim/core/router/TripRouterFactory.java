@@ -1,22 +1,3 @@
-/* *********************************************************************** *
- * project: org.matsim.*
- * TripRouterFactory.java
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
- *                   LICENSE and WARRANTY file.                            *
- * email           : info at matsim dot org                                *
- *                                                                         *
- * *********************************************************************** *
- *                                                                         *
- *   This program is free software; you can redistribute it and/or modify  *
- *   it under the terms of the GNU General Public License as published by  *
- *   the Free Software Foundation; either version 2 of the License, or     *
- *   (at your option) any later version.                                   *
- *   See also COPYING, LICENSE and WARRANTY file                           *
- *                                                                         *
- * *********************************************************************** */
 package org.matsim.core.router;
 
 import org.matsim.core.api.internal.MatsimFactory;
@@ -27,6 +8,7 @@ import org.matsim.core.api.internal.MatsimFactory;
  * @author thibautd
  */
 public interface TripRouterFactory extends MatsimFactory {
+
 	/**
 	 * Creates a new {@link TripRouter} instance.
 	 * <p/>
@@ -44,8 +26,10 @@ public interface TripRouterFactory extends MatsimFactory {
 	 * Also see <code> tutorial.programming.example12PluggableTripRouter </code> 
 	 * and <code> tutorial.programming.example13MultiStateTripRouting </code>.
 	 * 
+	 * @param routingContext Will contain current travel times and disutilities, to be
+	 * used for routing.
 	 * @return a fully initialised {@link TripRouter}.
 	 */
-	public TripRouter instantiateAndConfigureTripRouter();
-}
+	TripRouter instantiateAndConfigureTripRouter(RoutingContext routingContext);
 
+}

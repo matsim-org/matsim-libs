@@ -44,7 +44,7 @@ import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryInternal;
 import org.matsim.core.router.TripRouterFactoryImpl;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
 import org.matsim.core.router.util.DijkstraFactory;
@@ -365,7 +365,7 @@ public class EditRoutesTest extends MatsimTestCase {
 	 */
 	private void createTripRouter() {
 		
-		TripRouterFactory tripRouterFactory = new TripRouterFactoryImpl(
+		TripRouterFactoryInternal tripRouterFactory = new TripRouterFactoryImpl(
 				scenario,
 				new OnlyTimeDependentTravelCostCalculatorFactory(),
 				new FreeSpeedTravelTime(),

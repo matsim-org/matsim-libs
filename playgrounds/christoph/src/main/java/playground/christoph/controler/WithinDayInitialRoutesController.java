@@ -40,11 +40,13 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.router.DefaultTripRouterFactoryImpl;
+import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.EmptyStageActivityTypes;
+import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.withinday.controller.WithinDayController;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
@@ -172,9 +174,9 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 		 * dummy routes for within-day replanned modes.
 		 */
 		PopulationFactory populationFactory = this.getPopulation().getFactory();
-		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) this.getPopulation().getFactory()).getModeRouteFactory();
+		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) this.getScenario().getPopulation().getFactory()).getModeRouteFactory();
 		Set<String> dummyModes = CollectionUtils.stringToSet(TransportMode.car);
-		tripRouterFactory = new WithinDayInitialRoutesTripRouterFactory(this.getTripRouterFactory(), dummyModes,
+		tripRouterFactory = new WithinDayInitialRoutesTripRouterFactory(DefaultTripRouterFactoryImpl.createRichTripRouterFactoryImpl(this.getScenario()), dummyModes,
 				populationFactory, routeFactory);
 		this.setTripRouterFactory(tripRouterFactory);
 	}
@@ -254,8 +256,8 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 		}
 		
 		@Override
-		public TripRouter instantiateAndConfigureTripRouter() {
-			TripRouter tripRouter = tripRouterFactory.instantiateAndConfigureTripRouter();
+		public TripRouter instantiateAndConfigureTripRouter(RoutingContext iterationContext) {
+			TripRouter tripRouter = tripRouterFactory.instantiateAndConfigureTripRouter(iterationContext);
 
 			if (replaceDummyModes) {
 				// replace routing modules for dummy modes

@@ -57,7 +57,6 @@ import org.matsim.contrib.matsim4urbansim.utils.io.ReadFromUrbanSimModel;
 import org.matsim.contrib.matsim4urbansim.utils.io.writer.UrbanSimParcelCSVWriterListener;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Module;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -313,7 +312,7 @@ public class MATSim4UrbanSimParcel{
 			nbb.setDefaultBoundaryBox(controler.getScenario().getNetwork());
 			ptMatrix = new PtMatrix(controler.getScenario().getConfig().plansCalcRoute(),
 									nbb, MatrixBasedPtRouterConfigUtils.getConfigModuleAndPossiblyConvert(controler.getScenario().getConfig()));	
-			controler.setTripRouterFactory( new MatrixBasedPtRouterFactoryImpl(controler, ptMatrix) ); // the car and pt router
+			controler.setTripRouterFactory( new MatrixBasedPtRouterFactoryImpl(scenario, ptMatrix) ); // the car and pt router
 			
 			log.error("reconstructing pt route distances; not tested ...") ;
 			for ( Person person : scenario.getPopulation().getPersons().values() ) {

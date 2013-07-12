@@ -40,7 +40,7 @@ public class MultiModalControlerListener implements StartupListener {
 		Map<String, TravelTime> multiModalTravelTimes = multiModalTravelTimeFactory.createTravelTimes();	
 	
 		MultimodalTripRouterFactory tripRouterFactory = new MultimodalTripRouterFactory(
-				controler, multiModalTravelTimes);
+				event.getControler().getScenario(), multiModalTravelTimes);
 		MultimodalQSimFactory qSimFactory = new MultimodalQSimFactory(multiModalTravelTimes);
 		controler.setTripRouterFactory(tripRouterFactory);
 		controler.setMobsimFactory(qSimFactory);

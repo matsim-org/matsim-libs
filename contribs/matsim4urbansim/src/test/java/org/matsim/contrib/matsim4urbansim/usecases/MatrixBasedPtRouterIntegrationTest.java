@@ -25,7 +25,7 @@ package org.matsim.contrib.matsim4urbansim.usecases;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -44,6 +44,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkWriter;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -97,8 +98,10 @@ public class MatrixBasedPtRouterIntegrationTest {
 		config.network().setInputFile(path+"network.xml");
 		config.plans().setInputFile(path+"plans.xml");
 
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		
 		//set up controler
-		Controler controler = new Controler(config) ;
+		Controler controler = new Controler(scenario) ;
 		controler.setOverwriteFiles(true);		
 		
 		//add home and work activity to plansCalcScoreConfigGroup
@@ -117,7 +120,7 @@ public class MatrixBasedPtRouterIntegrationTest {
 		//create new pt matrix
 		PtMatrix ptMatrix = new PtMatrix(plansCalcRoute,
 								nbb, MatrixBasedPtRouterConfigUtils.getConfigModuleAndPossiblyConvert(controler.getScenario().getConfig()));
-		controler.setTripRouterFactory( new MatrixBasedPtRouterFactoryImpl(controler, ptMatrix) ); // the car and pt router
+		controler.setTripRouterFactory( new MatrixBasedPtRouterFactoryImpl(controler.getScenario(), ptMatrix) ); // the car and pt router
 
 		//execute MATSim run
 		controler.run();

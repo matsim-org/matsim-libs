@@ -617,10 +617,8 @@ public class ControlerTest {
 		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.txt, EventsFileFormat.xml));
 
 		final Controler controler = new Controler(config);
-		assertNull(controler.getMobsimFactory());
 		FakeMobsimFactory testFactory = new FakeMobsimFactory();
 		controler.setMobsimFactory(testFactory);
-		assertEquals(testFactory, controler.getMobsimFactory());
 		controler.setCreateGraphs(false);
 		controler.setDumpDataAtEnd(false);
 		controler.run();

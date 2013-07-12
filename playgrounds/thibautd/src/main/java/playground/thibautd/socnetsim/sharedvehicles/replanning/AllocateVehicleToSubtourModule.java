@@ -46,7 +46,7 @@ public class AllocateVehicleToSubtourModule extends AbstractMultithreadedModule 
 		return new AllocateVehicleToSubtourAlgorithm(
 				MatsimRandom.getLocalInstance(),
 				mode,
-				getReplanningContext().getTripRouterFactory().instantiateAndConfigureTripRouter(),
+				getReplanningContext().getTripRouter(),
 				ressources);
 	}
 }

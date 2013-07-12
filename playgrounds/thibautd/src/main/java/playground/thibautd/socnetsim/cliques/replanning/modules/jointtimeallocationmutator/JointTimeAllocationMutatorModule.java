@@ -22,7 +22,7 @@ package playground.thibautd.socnetsim.cliques.replanning.modules.jointtimealloca
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryInternal;
 
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
@@ -32,7 +32,7 @@ import playground.thibautd.socnetsim.replanning.modules.AbstractMultithreadedGen
  * @author thibautd
  */
 public class JointTimeAllocationMutatorModule extends AbstractMultithreadedGenericStrategyModule<JointPlan> {
-	private final TripRouterFactory tripRouterFactory;
+	private final TripRouterFactoryInternal tripRouterFactory;
 	private final double mutationRange;
 
 	public JointTimeAllocationMutatorModule(final Controler controler) {
@@ -41,7 +41,7 @@ public class JointTimeAllocationMutatorModule extends AbstractMultithreadedGener
 
 	public JointTimeAllocationMutatorModule(
 			final Config config,
-			final TripRouterFactory tripRouterFactory) {
+			final TripRouterFactoryInternal tripRouterFactory) {
 		super( config.global() );
 		this.tripRouterFactory = tripRouterFactory;
 		this.mutationRange = config.timeAllocationMutator().getMutationRange();

@@ -50,8 +50,8 @@ public class ReRouteLandmarks extends AbstractMultithreadedModule  {
 		return new PlansCalcRoute(
 				this.configGroup, 
 				scenario.getNetwork(), 
-				getReplanningContext().getTravelCostCalculator(), 
-				getReplanningContext().getTravelTimeCalculator(), 
+				getReplanningContext().getTravelDisutility(), 
+				getReplanningContext().getTravelTime(), 
 				this.factory, 
 				((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory());
 	}

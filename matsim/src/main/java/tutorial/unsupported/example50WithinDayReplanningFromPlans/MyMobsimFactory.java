@@ -30,7 +30,7 @@ import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgentFactory
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryInternal;
 
 /**
  * @author nagel
@@ -38,9 +38,9 @@ import org.matsim.core.router.TripRouterFactory;
  */
 public class MyMobsimFactory implements MobsimFactory {
 
-	private TripRouterFactory tripRouterFactory;
+	private TripRouterFactoryInternal tripRouterFactory;
 
-	MyMobsimFactory(TripRouterFactory tripRouterFactory) {
+	MyMobsimFactory(TripRouterFactoryInternal tripRouterFactory) {
 		this.tripRouterFactory = tripRouterFactory;
 	}
 

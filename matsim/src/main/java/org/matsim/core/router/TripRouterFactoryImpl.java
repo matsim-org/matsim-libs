@@ -48,7 +48,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
  * config file.
  * @author thibautd
  */
-public class TripRouterFactoryImpl implements TripRouterFactory {
+public class TripRouterFactoryImpl implements TripRouterFactoryInternal {
 	private static final Logger log = Logger.getLogger(TripRouterFactoryImpl.class);
 
 	private final Config config;

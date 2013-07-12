@@ -63,7 +63,7 @@ import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryInternal;
 import org.matsim.core.router.TripRouterFactoryImpl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
@@ -101,6 +101,7 @@ import playground.christoph.evacuation.analysis.AgentsInEvacuationAreaCounter;
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.api.core.v01.Coord3d;
 import playground.christoph.evacuation.config.EvacuationConfig;
+import playground.christoph.evacuation.controler.WithindayMultimodalTripRouterFactory;
 import playground.christoph.evacuation.core.utils.geometry.Coord3dImpl;
 import playground.christoph.evacuation.mobsim.AgentsTracker;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
@@ -343,7 +344,7 @@ public final class MarathonController extends WithinDayController implements
 		 * Replace WithinDayQSimFactory with a CombiMobsimFactory
 		 * which combines a WithinDayQSimFactory with a HybridQ2DMobsimFactory. 
 		 */
-		super.setMobsimFactory(new CombiMobsimFactory((WithinDayQSimFactory) super.getMobsimFactory()));
+		super.setMobsimFactory(new CombiMobsimFactory(new WithinDayQSimFactory(getWithinDayEngine())));
 	}
 	
 	/*
@@ -452,16 +453,16 @@ public final class MarathonController extends WithinDayController implements
 
 	@Override
 	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
-		MobsimFactory factory = super.getMobsimFactory();
-		if (factory instanceof HybridQ2DMobsimFactory) {
-			log.info("Replacing VelocityCalculator with MarathonVelocityCalculator");
-			Sim2DEngine sim2DEngine = ((HybridQ2DMobsimFactory) factory).getSim2DEngine();
-			
-			VelocityCalculator velocityCalculator = new MarathonVelocityCalculator(
-					new DefaultVelocityCalculator(this.config.plansCalcRoute())); 
-			sim2DEngine.setVelocityCalculator(velocityCalculator);
-		}
-		
+//		MobsimFactory factory = super.getMobsimFactory();
+//		if (factory instanceof HybridQ2DMobsimFactory) {
+//			log.info("Replacing VelocityCalculator with MarathonVelocityCalculator");
+//			Sim2DEngine sim2DEngine = ((HybridQ2DMobsimFactory) factory).getSim2DEngine();
+//			
+//			VelocityCalculator velocityCalculator = new MarathonVelocityCalculator(
+//					new DefaultVelocityCalculator(this.config.plansCalcRoute())); 
+//			sim2DEngine.setVelocityCalculator(velocityCalculator);
+//		}
+//		
 		this.initReplanners((QSim)e.getQueueSimulation());
 	}
 	
@@ -780,8 +781,8 @@ public final class MarathonController extends WithinDayController implements
 
 		LeastCostPathCalculatorFactory factory = new FastAStarLandmarksFactory(this.network, new FreespeedTravelTimeAndDisutility(this.config.planCalcScore()));
 		
-		TripRouterFactory delegate = new TripRouterFactoryImpl(this.scenarioData, penaltyCostFactory, this.getTravelTimeCollector(), factory, this.getTransitRouterFactory());
-		MultimodalTripRouterFactory tripRouterFactory = new MultimodalTripRouterFactory(this, travelTimes, delegate);
+		TripRouterFactoryInternal delegate = new TripRouterFactoryImpl(this.scenarioData, penaltyCostFactory, this.getTravelTimeCollector(), factory, this.getTransitRouterFactory());
+		WithindayMultimodalTripRouterFactory tripRouterFactory = new WithindayMultimodalTripRouterFactory(this, travelTimes, delegate);
 		this.getWithinDayEngine().setTripRouterFactory(tripRouterFactory);
 		
 		/*

@@ -48,7 +48,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureWriter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerDepartureHandler;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryInternal;
 import org.matsim.core.router.TripRouterFactoryImpl;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
@@ -138,7 +138,6 @@ import playground.meisterk.kti.config.KtiConfigGroup;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-import contrib.multimodal.router.MultimodalTripRouterFactory;
 
 public class EvacuationControler extends WithinDayController implements 
 		MobsimAfterSimStepListener, IterationStartsListener, AfterMobsimListener {
@@ -710,7 +709,7 @@ public class EvacuationControler extends WithinDayController implements
 		travelTimes.put(TransportMode.bike, bikeTravelTime);
 		travelTimes.put(TransportMode.pt, ptTravelTime);
 		travelTimes.put(TransportMode.ride, rideTravelTime);
-		travelTimes.put(TransportMode.car, carTravelTime);
+		// travelTimes.put(TransportMode.car, carTravelTime);
 
 		
 		// add time dependent penalties to travel costs within the affected area
@@ -721,8 +720,8 @@ public class EvacuationControler extends WithinDayController implements
 		LeastCostPathCalculatorFactory panicFactory = new RandomCompassRouterFactory(EvacuationConfig.tabuSearch, EvacuationConfig.compassProbability);
 		LeastCostPathCalculatorFactory factory = new LeastCostPathCalculatorSelectorFactory(nonPanicFactory, panicFactory, this.decisionDataProvider);
 		
-		TripRouterFactory delegate = new TripRouterFactoryImpl(this.scenarioData, penaltyCostFactory, carTravelTime, factory, this.getTransitRouterFactory());
-		MultimodalTripRouterFactory tripRouterFactory = new MultimodalTripRouterFactory(this, travelTimes, delegate);
+		TripRouterFactoryInternal delegate = new TripRouterFactoryImpl(this.scenarioData, penaltyCostFactory, carTravelTime, factory, this.getTransitRouterFactory());
+		WithindayMultimodalTripRouterFactory tripRouterFactory = new WithindayMultimodalTripRouterFactory(this, travelTimes, delegate);
 		this.getWithinDayEngine().setTripRouterFactory(tripRouterFactory);
 		
 		/*

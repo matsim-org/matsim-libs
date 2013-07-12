@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryInternal;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -73,7 +73,7 @@ public class TimeModeChooserAlgorithm implements PlanAlgorithm {
 
 	@Override
 	public void run(final Plan plan) {
-		TripRouterFactory tripRouterFactory =
+		TripRouterFactoryInternal tripRouterFactory =
 			getAndTuneTripRouterFactory(
 					plan,
 					delay,
@@ -138,7 +138,7 @@ public class TimeModeChooserAlgorithm implements PlanAlgorithm {
 		}
 	}
 
-	private static TripRouterFactory getAndTuneTripRouterFactory(
+	private static TripRouterFactoryInternal getAndTuneTripRouterFactory(
 			final Plan plan,
 			final DepartureDelayAverageCalculator delay,
 			final Controler controler ) {

@@ -34,7 +34,7 @@ import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryInternal;
 import org.matsim.core.router.TripRouterFactoryImpl;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.withinday.mobsim.WithinDayEngine;
@@ -67,7 +67,7 @@ public abstract class WithinDayController extends Controler implements StartupLi
 
 	private boolean withinDayEngineInitialized = false;
 	private WithinDayEngine withinDayEngine;
-	private TripRouterFactory withinDayTripRouterFactory;
+	private TripRouterFactoryInternal withinDayTripRouterFactory;
 	private FixedOrderSimulationListener fosl = new FixedOrderSimulationListener();
 
 	public WithinDayController(String[] args) {
@@ -196,11 +196,11 @@ public abstract class WithinDayController extends Controler implements StartupLi
 		return this.withinDayEngine;
 	}
 	
-	public void setWithinDayTripRouterFactory(TripRouterFactory tripRouterFactory) {
+	public void setWithinDayTripRouterFactory(TripRouterFactoryInternal tripRouterFactory) {
 		this.withinDayTripRouterFactory = tripRouterFactory;
 	}
 
-	public TripRouterFactory getWithinDayTripRouterFactory() {
+	public TripRouterFactoryInternal getWithinDayTripRouterFactory() {
 		return this.withinDayTripRouterFactory;
 	}
 	
@@ -217,7 +217,8 @@ public abstract class WithinDayController extends Controler implements StartupLi
 		
 		// initialize a withinDayEngine and set WithinDayQSimFactory as MobsimFactory
 		this.withinDayEngine = new WithinDayEngine(this.getEvents());
-		this.setMobsimFactory(new WithinDayQSimFactory(withinDayEngine));
+		WithinDayQSimFactory mobsimFactory = new WithinDayQSimFactory(withinDayEngine);
+		this.setMobsimFactory(mobsimFactory);
 		
 		// register this as a Controller and Simulation Listener
 		this.getFixedOrderSimulationListener().addSimulationListener(this);
