@@ -63,7 +63,7 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialRep
 
 //mysimulations/kt-zurich/configIterative.xml
 
-public class SimpleRouterControler extends WithinDayController implements MobsimInitializedListener {
+public class SimpleRouterControler extends WithinDayController {
 
 	private static final Logger log = Logger.getLogger(SimpleRouterControler.class);
 
@@ -162,7 +162,8 @@ public class SimpleRouterControler extends WithinDayController implements Mobsim
 	 * New Routers for the Replanning are used instead of using the controler's.
 	 * By doing this every person can use a personalized Router.
 	 */
-	protected void initReplanningRouter(QSim sim) {
+	@Override
+	protected void initReplanners(QSim sim) {
 		
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) sim.getScenario().getPopulation().getFactory()).getModeRouteFactory();
 		AbstractMultithreadedModule router;
@@ -207,17 +208,10 @@ public class SimpleRouterControler extends WithinDayController implements Mobsim
 //		this.randomDijkstraReplanner.addAgentsToReplanIdentifier(this.dijkstraIdentifier);
 //		super.getReplanningManager().addIntialReplanner(this.randomDijkstraReplanner);	
 	}
-
-	@Override
-	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
-		log.info("Initialize Replanning Routers");
-		initReplanningRouter((QSim)e.getQueueSimulation());
-	}
 	
 	@Override
 	protected void runMobSim() {
 		
-		super.initWithinDayEngine(numReplanningThreads);
 		super.getWithinDayEngine().doDuringActivityReplanning(false);
 		super.getWithinDayEngine().doDuringLegReplanning(false);
 

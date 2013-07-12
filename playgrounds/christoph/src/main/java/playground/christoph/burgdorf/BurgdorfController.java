@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeType;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
@@ -48,7 +48,7 @@ import playground.christoph.burgdorf.withinday.replanners.ParkingReplannerFactor
  *  
  * @author cdobler
  */
-public class BurgdorfController extends WithinDayController implements StartupListener {
+public class BurgdorfController extends WithinDayController {
 
 //	private static String runId = "SamstagToBurgdorf";
 	private static String runId = "SonntagFromBurgdorf";
@@ -90,37 +90,23 @@ public class BurgdorfController extends WithinDayController implements StartupLi
 	
 	public BurgdorfController(String[] args) {
 		super(args);
-		
-		init();
-	}
-	
-	private void init() {
-		
-		// register this as a Controller Listener
-		super.addControlerListener(this);
 	}
 		
 	@Override
 	public void notifyStartup(StartupEvent event) {
-						
+		
 		if (useWithinDayReplanning) {
 			/*
 			 * Initialize TravelTimeCollector.
 			 */
 			Set<String> analyzedModes = new HashSet<String>();
 			analyzedModes.add(TransportMode.car);
-			super.createAndInitTravelTimeCollector(analyzedModes);
+			super.setModesAnalyzedByTravelTimeCollector(analyzedModes);
 			
-			/*
-			 * Create and initialize replanning manager and replanning maps.
-			 */
-			super.createAndInitLinkReplanningMap();			
+			super.setNumberOfReplanningThreads(this.config.global().getNumberOfThreads());
+			
+			super.notifyStartup(event);
 		}
-		/*
-		 * Get number of threads from config file and initialize WithinDayEngine.
-		 */
-		int numReplanningThreads = this.config.global().getNumberOfThreads();
-		super.initWithinDayEngine(numReplanningThreads);
 		
 		/*
 		 * If network capacities have to be adapted.
@@ -155,22 +141,7 @@ public class BurgdorfController extends WithinDayController implements StartupLi
 			network.addNetworkChangeEvent(networkChangeEvent);
 		}
 	}
-	
-	@Override
-	protected void setUp() {
-		/*
-		 * The Controler initialized the LeastCostPathCalculatorFactory here, which is required
-		 * by the replanners.
-		 */
-		super.setUp();
-				
-		// initialize Identifiers and Replanners
-		if (useWithinDayReplanning) {
-			this.initIdentifiers();
-			this.initReplanners();			
-		}
-	}
-	
+		
 	private void initIdentifiers() {
 		
 		/*
@@ -200,7 +171,14 @@ public class BurgdorfController extends WithinDayController implements StartupLi
 		this.parkingIdentifier = duringLegFactory.createIdentifier();
 	}
 	
-	private void initReplanners() {	
+	@Override
+	protected void initReplanners(QSim qsim) {
+		
+		// initialize Identifiers and Replanners
+		if (!useWithinDayReplanning) return;
+		
+		this.initIdentifiers();
+		
 		/*
 		 * During Leg Replanner
 		 */

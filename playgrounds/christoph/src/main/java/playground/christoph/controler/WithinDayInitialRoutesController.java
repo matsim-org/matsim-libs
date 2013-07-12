@@ -35,9 +35,8 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
@@ -68,8 +67,7 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegR
  *  
  * @author cdobler
  */
-public class WithinDayInitialRoutesController extends WithinDayController implements 
-	StartupListener, IterationStartsListener {
+public class WithinDayInitialRoutesController extends WithinDayController implements IterationStartsListener {
 
 	private DuringLegIdentifierFactory duringLegFactory;
 	private DuringLegIdentifierFactory startedLegFactory;
@@ -132,33 +130,13 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 		 * routes are written to the output plans file.
 		 */
 		ExperimentalBasicWithindayAgent.copySelectedPlan = false;
+
+		this.setNumberOfReplanningThreads( this.config.global().getNumberOfThreads());
 		
-		// register this as a Controller Listener
-		super.addControlerListener(this);
-	}
-		
-	@Override
-	public void notifyStartup(StartupEvent event) {
-				
-		/*
-		 * Get number of threads from config file.
-		 */
-		int numReplanningThreads = this.config.global().getNumberOfThreads();
-		
-		/*
-		 * Initialize TravelTimeCollector.
-		 */
 		Set<String> analyzedModes = new HashSet<String>();
 		analyzedModes.add(TransportMode.car);
-		super.createAndInitTravelTimeCollector(analyzedModes);
-		
-		/*
-		 * Create and initialize replanning manager and replanning maps.
-		 */
-		super.initWithinDayEngine(numReplanningThreads);
-		super.createAndInitLinkReplanningMap();
+		this.setModesAnalyzedByTravelTimeCollector(analyzedModes);
 	}
-	
 
 	@Override
 	public void notifyIterationStarts(IterationStartsEvent event) {
@@ -199,10 +177,6 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 		tripRouterFactory = new WithinDayInitialRoutesTripRouterFactory(this.getTripRouterFactory(), dummyModes,
 				populationFactory, routeFactory);
 		this.setTripRouterFactory(tripRouterFactory);
-		
-		// initialize Identifiers and Replanners
-		this.initIdentifiers();
-		this.initReplanners();
 	}
 	
 	private void initIdentifiers() {
@@ -232,7 +206,10 @@ public class WithinDayInitialRoutesController extends WithinDayController implem
 		}
 	}
 	
-	private void initReplanners() {
+	@Override
+	protected void initReplanners(QSim sim) {
+		
+		this.initIdentifiers();
 		
 		this.initWithinDayTripRouterFactory();
 		this.getWithinDayEngine().setTripRouterFactory(this.getWithinDayTripRouterFactory());
