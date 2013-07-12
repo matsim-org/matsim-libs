@@ -36,7 +36,6 @@ public class MainFlowAnalysisWithPt {
 		String networkFile = "H:/thesis/output_no_pricing_v3_subtours_bugfix/output_network.xml.gz";
 		String eventsFile =  "H:/thesis/output_no_pricing_v3_subtours_bugfix/ITERS/it.50/50.events.xml.gz";
 		Coord center=null; // center=null means use all links
-		boolean isOldEventFile=false;
 		int binSizeInSeconds=3600;
 		
 //		String networkFile="C:/Users/Nan/Desktop/For matsim/matsim-0.1.1/examples/equil/network.xml";
@@ -50,7 +49,7 @@ public class MainFlowAnalysisWithPt {
 		Map<Id, ? extends Link> links = NetworkReadExample.getNetworkLinks(networkFile,center,radiusInMeters);// input/set center and radius
 		
 		
-		OutFlowInfoCollectorWithPt flowAnalyzer=new OutFlowInfoCollectorWithPt(links,isOldEventFile,binSizeInSeconds); 
+		OutFlowInfoCollectorWithPt flowAnalyzer=new OutFlowInfoCollectorWithPt(links,binSizeInSeconds); 
 		// in order for FlowInfoCollector functioning, we call links from NetworkReadExample
 		//InFlowInfoCollector inflowAnalyzer=new InFlowInfoCollector(NetworkReadExample.getFilteredEquilNetLinks());		
 		

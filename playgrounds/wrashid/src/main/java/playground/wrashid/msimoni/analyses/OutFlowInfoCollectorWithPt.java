@@ -32,7 +32,7 @@ import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 
-public class OutFlowInfoCollectorWithPt implements LinkLeaveEventHandler,
+public class OutFlowInfoCollectorWithPt extends AbstractFlowAccumulator implements LinkLeaveEventHandler,
 		LinkEnterEventHandler, AgentArrivalEventHandler {
 
 	private int binSizeInSeconds; // set the length of interval
@@ -42,16 +42,13 @@ public class OutFlowInfoCollectorWithPt implements LinkLeaveEventHandler,
 	// personId, linkId
 	private HashMap<Id, Id> lastEnteredLink = new HashMap<Id, Id>(); // define
 
-	private boolean isOldEventFile;
-
 	public OutFlowInfoCollectorWithPt(
 			Map<Id, ? extends Link> filteredEquilNetLinks,
-			boolean isOldEventFile, int binSizeInSeconds) { // to create the
+			int binSizeInSeconds) { // to create the
 															// class
 															// FlowInfoCollector
 		// and give the link set
 		this.filteredEquilNetLinks = filteredEquilNetLinks;
-		this.isOldEventFile = isOldEventFile;
 		this.binSizeInSeconds = binSizeInSeconds;
 	}
 
@@ -137,6 +134,11 @@ public class OutFlowInfoCollectorWithPt implements LinkLeaveEventHandler,
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		lastEnteredLink.put(event.getPersonId(), event.getLinkId());
+	}
+	
+	@Override
+	protected int[] getFlow(Id linkId) {
+		return linkOutFlow.get(linkId);
 	}
 
 }

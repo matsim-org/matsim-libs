@@ -29,7 +29,7 @@ import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 
-public class InFlowInfoCollectorWithPt implements LinkEnterEventHandler,
+public class InFlowInfoCollectorWithPt extends AbstractFlowAccumulator implements LinkEnterEventHandler,
 		AgentWait2LinkEventHandler {
 
 	private int binSizeInSeconds; // set the length of interval
@@ -37,12 +37,9 @@ public class InFlowInfoCollectorWithPt implements LinkEnterEventHandler,
 	public HashMap<Id, int[]> linkInFlow;
 	private Map<Id, ? extends Link> filteredEquilNetLinks; //
 
-	private boolean isOldEventFile;
-
 	public InFlowInfoCollectorWithPt(Map<Id, ? extends Link> filteredEquilNetLinks,
-			boolean isOldEventFile, int binSizeInSeconds) {
+			 int binSizeInSeconds) {
 		this.filteredEquilNetLinks = filteredEquilNetLinks;
-		this.isOldEventFile = isOldEventFile;
 		this.binSizeInSeconds=binSizeInSeconds;
 	}
 
@@ -106,5 +103,12 @@ public class InFlowInfoCollectorWithPt implements LinkEnterEventHandler,
 	public void handleEvent(AgentWait2LinkEvent event) {
 		enterLink(event.getLinkId(), event.getTime());		
 	}
+
+	@Override
+	protected int[] getFlow(Id linkId) {
+		return linkInFlow.get(linkId);
+	}
+	
+	
 
 }
