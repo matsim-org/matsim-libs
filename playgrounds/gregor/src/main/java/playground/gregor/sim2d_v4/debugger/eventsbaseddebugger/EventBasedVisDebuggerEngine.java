@@ -167,6 +167,7 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 	@Override
 	public void reset(int iteration) {
 		this.time = -1;
+		this.vis.reset(iteration);
 
 	}
 

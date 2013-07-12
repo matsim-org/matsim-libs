@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * FrameSaver.java
+ * VoronoiTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,61 +18,21 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.sim2d_v4.debugger.eventsbaseddebugger;
+package playground.gregor;
 
-import java.util.concurrent.BrokenBarrierException;
-import java.util.concurrent.CyclicBarrier;
+import java.util.List;
 
-import processing.core.PApplet;
+import be.humphreys.simplevoronoi.GraphEdge;
+import be.humphreys.simplevoronoi.Voronoi;
 
-public class FrameSaver {
+public class VoronoiTest {
+public static void main(String[]args) {
+	Voronoi v = new Voronoi(.1);
 	
-	private final CyclicBarrier barrier = new CyclicBarrier(2);
-	private final String path;
-	private final String extension;
-	private final int frameSkip;
-	private int skiped;
-
-	public FrameSaver(String path, String extension, int frameSkip) {
-		this.path = path;
-		this.extension = extension;
-		this.frameSkip = frameSkip;
-		this.skiped = frameSkip;
-	}
+	double [] x = {1,2,3,4};
+	double [] y = {0,1,0,3,2};
 	
-//	public boolean skipNext() {
-//		if (this.skiped == this.frameSkip) {
-//			return true;
-//		}
-//		this.skiped++;
-//		return false;
-//	}
-	
-	public void saveFrame(PApplet p, String identifier) {
-		if (this.skiped != this.frameSkip) {
-			this.skiped++;
-			this.await();
-			return;
-		}
-		this.skiped = 0;
-		StringBuffer bf = new StringBuffer();
-		bf.append(this.path);
-		bf.append("/");
-		bf.append(identifier);
-		bf.append(".");
-		bf.append(this.extension);
-		p.saveFrame(bf.toString());
-		this.await();
-	}
-	
-	public void await() {
-		try {
-			this.barrier.await();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		} catch (BrokenBarrierException e) {
-			e.printStackTrace();
-		}
-	}
-
+	List<GraphEdge> gg = v.generateVoronoi(x, y, -1, 5, -1, 5);
+	System.out.println(gg.size());
+}
 }

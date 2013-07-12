@@ -55,6 +55,7 @@ public final class HybridQSim2DNetworkFactory implements NetsimNetworkFactory<QN
 		boolean sim2DQTransitionLink = false;
 		boolean qSim2DTransitionLink = link.getAllowedModes().contains(TransportMode.walk2d);
 
+		
 		if (qSim2DTransitionLink){
 			if (link.getFromNode().getOutLinks().size() > 1) {
 				qSim2DTransitionLink = false;

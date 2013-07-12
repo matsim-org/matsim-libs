@@ -414,9 +414,9 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 		//		String inputDir = "/Users/laemmel/devel/gr90_sim2d_v4/input";
 		//		String outputDir = "/Users/laemmel/devel/gr90_sim2d_v4/output";
 
-		String osmFile = "/Users/laemmel/devel/pantheon/raw/map.osm";
-		String inputDir = "/Users/laemmel/devel/pantheon/input";
-		String outputDir = "/Users/laemmel/devel/pantheon/output";
+		String osmFile = "/Users/laemmel/devel/gct/osm/map.osm";
+		String inputDir = "/Users/laemmel/devel/gct/input";
+		String outputDir = "/Users/laemmel/devel/gct/output";
 
 		Sim2DConfig s2d = Sim2DConfigUtils.createConfig();
 		Sim2DScenario s2dsc = Sim2DScenarioUtils.createSim2dScenario(s2d);
@@ -467,6 +467,15 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 		pre.setEarliestEndTime(49);
 		pre.setLatestStartTime(49);
 		pre.setOpeningTime(49);
+		
+		ActivityParams ticket = new ActivityParams("ticket");
+		ticket.setTypicalDuration(49); // needs to be geq 49, otherwise when running a simulation one gets "java.lang.RuntimeException: zeroUtilityDuration of type pre-evac must be greater than 0.0. Did you forget to specify the typicalDuration?"
+		// the reason is the double precision. see also comment in ActivityUtilityParameters.java (gl)
+		ticket.setMinimalDuration(49);
+		ticket.setClosingTime(49);
+		ticket.setEarliestEndTime(49);
+		ticket.setLatestStartTime(49);
+		ticket.setOpeningTime(49);
 
 
 		ActivityParams post = new ActivityParams("destination");
@@ -477,6 +486,7 @@ public class CustomizedOSM2Sim2DExtendedMATSimScenario {
 		post.setLatestStartTime(14*3600);
 		post.setOpeningTime(11*3600);
 		sc.getConfig().planCalcScore().addActivityParams(pre);
+		sc.getConfig().planCalcScore().addActivityParams(ticket);
 		sc.getConfig().planCalcScore().addActivityParams(post);
 
 		sc.getConfig().planCalcScore().setLateArrival_utils_hr(0.);

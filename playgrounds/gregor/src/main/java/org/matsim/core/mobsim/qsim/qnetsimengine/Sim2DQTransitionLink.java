@@ -42,7 +42,7 @@ public class Sim2DQTransitionLink extends QLinkInternalI{
 	private double qy1;
 	private double qDx;
 	private double qDy;
-	private int veh = 0;
+	private final int veh = 0;
 	private Segment queueLine;
 
 	Sim2DQTransitionLink(QLinkImpl qLinkImpl) {
@@ -174,20 +174,7 @@ public class Sim2DQTransitionLink extends QLinkInternalI{
 
 	@Override
 	public void addFromUpstream(QVehicle veh) {
-		//hook 1
-		this.veh++;
-		double sp = this.ql.getSpaceCap();
-		double l = this.ql.link.getLength();
-		double vl = l/sp;
-		double ql = vl*this.veh;
-		if (ql > l) {
-			ql = l;
-		}
-		this.queueLine.x0 = this.qx0 + ql*this.qDx;
-		this.queueLine.y0 = this.qy0 + ql*this.qDy;
-		this.queueLine.x1 = this.qx1 + ql*this.qDx;
-		this.queueLine.y1 = this.qy1 + ql*this.qDy;
-		
+
 		this.ql.addFromUpstream(veh);
 	}
 
@@ -198,20 +185,7 @@ public class Sim2DQTransitionLink extends QLinkInternalI{
 
 	@Override
 	QVehicle popFirstVehicle() {
-		//hook2
-		this.veh--;
-		double sp = this.ql.getSpaceCap();
-		double l = this.ql.link.getLength();
-		double vl = l/sp;
-		double ql = vl*this.veh;
-		if (ql > l) {
-			ql = l;
-		}
-		this.queueLine.x0 = this.qx0 + ql*this.qDx;
-		this.queueLine.y0 = this.qy0 + ql*this.qDy;
-		this.queueLine.x1 = this.qx1 + ql*this.qDx;
-		this.queueLine.y1 = this.qy1 + ql*this.qDy;
-		
+
 		
 		return this.ql.popFirstVehicle();
 	}

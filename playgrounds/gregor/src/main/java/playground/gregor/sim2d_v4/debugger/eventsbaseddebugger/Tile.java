@@ -39,11 +39,12 @@ public class Tile {
 	private final MathTransform transform;
 
 	public Tile(double tx, double ty, double bx, double by, MathTransform transform) {
-		this.tx = tx;
-		this.ty = ty;
-		this.bx = bx;
-		this.by = by;
+		this.tx = Math.min(tx,bx);
+		this.ty = Math.min(ty,by);
+		this.bx = Math.max(tx,bx);
+		this.by = Math.max(ty,by);
 		this.transform = transform;
+//		System.out.println(tx + "\t" + bx);
 	}
 	
 	public double getTx() {

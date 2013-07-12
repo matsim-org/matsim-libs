@@ -156,7 +156,7 @@ public class ScenarioGenerator {
 	}
 
 	private static void createPopulation(Scenario sc) {
-		int nrAgents = 60000;
+		int nrAgents = 20000;
 		Population pop = sc.getPopulation();
 		pop.getPersons().clear();
 		PopulationFactory fac = pop.getFactory();
@@ -166,7 +166,7 @@ public class ScenarioGenerator {
 			Plan plan = fac.createPlan();
 			pers.addPlan(plan);
 			Activity act0;
-			act0 = fac.createActivityFromLinkId("origin", new IdImpl("l1"));
+			act0 = fac.createActivityFromLinkId("origin", new IdImpl("l0"));
 			act0.setEndTime(t);
 			plan.addActivity(act0);
 			Leg leg = fac.createLeg("car");
@@ -231,7 +231,7 @@ public class ScenarioGenerator {
 	private static void createNetwork(Scenario sc) {
 		Network net = sc.getNetwork();
 		NetworkFactory fac = net.getFactory();
-		Node n0 = fac.createNode(new IdImpl(0), new CoordImpl(0,0));
+		Node n0 = fac.createNode(new IdImpl(0), new CoordImpl(-5,0));
 		Node n1 = fac.createNode(new IdImpl(1), new CoordImpl(1,0));
 		Node n2 = fac.createNode(new IdImpl(2), new CoordImpl(5,0));
 		Node n3 = fac.createNode(new IdImpl(3), new CoordImpl(35,0));
@@ -243,14 +243,14 @@ public class ScenarioGenerator {
 		net.addNode(n3);
 		net.addNode(n4);
 		net.addNode(n5);
-		double flow = 1.3 * 4;
+		double flow = 1.33 * 4;
 		Link l0 = fac.createLink(new IdImpl("l0"), n0, n1);
 		Link l1 = fac.createLink(new IdImpl("l1"), n1, n2);
 		Link l2 = fac.createLink(new IdImpl("l2"), n3, n4);
 		Link l3 = fac.createLink(new IdImpl("l3"), n4, n5);
 		Set<String> modes = new HashSet<String>();
 		 modes.add("walk");modes.add("car");
-		l0.setLength(1);
+		l0.setLength(6);
 		l1.setLength(4);
 		l2.setLength(5);
 		l3.setLength(1);
@@ -262,8 +262,8 @@ public class ScenarioGenerator {
 		l1.setFreespeed(1.34);
 		l2.setFreespeed(1.34);
 		l3.setFreespeed(1.34);
-		l0.setCapacity(4*flow);
-		l1.setCapacity(4*flow);
+		l0.setCapacity(flow*.45);
+		l1.setCapacity(flow);
 		l2.setCapacity(flow);
 		l3.setCapacity(flow);
 		double lanes = 4/0.71;

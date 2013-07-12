@@ -59,7 +59,7 @@ public class QSimDensityDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 	
 	public QSimDensityDrawer(Scenario sc) {
 		for (Link l : sc.getNetwork().getLinks().values()) {
-		if (l.getAllowedModes().contains("walk2d") || l.getCapacity() == 2340){
+		if (l.getAllowedModes().contains("walk2d")){// || l.getCapacity() == 2340){
 			continue;
 		}
 
@@ -283,30 +283,30 @@ public class QSimDensityDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
-		LinkInfo info = this.map.get(event.getLinkId());
-		if (info == null) {
-			return;
-		}
-		synchronized(info) {
-			info.onLink--;
-			info.text = Integer.toString(info.onLink);
-			updateColor(info);
-		}
+//		LinkInfo info = this.map.get(event.getLinkId());
+//		if (info == null) {
+//			return;
+//		}
+//		synchronized(info) {
+//			info.onLink++;
+//			info.text = Integer.toString(info.onLink);
+//			updateColor(info);
+//		}
 	}
 
 
 
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
-		LinkInfo info = this.map.get(event.getLinkId());
-		if (info == null) {
-			return;
-		}
-		synchronized(info) {
-			info.onLink++;
-			info.text = Integer.toString(info.onLink);
-			updateColor(info);
-		}		
+//		LinkInfo info = this.map.get(event.getLinkId());
+//		if (info == null) {
+//			return;
+//		}
+//		synchronized(info) {
+//			info.onLink++;
+//			info.text = Integer.toString(info.onLink);
+//			updateColor(info);
+//		}		
 	}
 
 

@@ -42,7 +42,6 @@ import processing.core.PVector;
 
 public class EventsBasedVisDebugger extends PApplet {
 
-
 	private final JFrame fr;
 
 	private List<Object> elements = Collections.synchronizedList(new ArrayList<Object>());
@@ -53,8 +52,6 @@ public class EventsBasedVisDebugger extends PApplet {
 	private final List<Object> elementsStatic = Collections.synchronizedList(new ArrayList<Object>());
 
 	private final List<VisDebuggerAdditionalDrawer> additionalDrawers = Collections.synchronizedList(new ArrayList<VisDebuggerAdditionalDrawer>());
-
-	//	private final List<VisDebuggerAdditionalDrawer> additionalDrawers = new ArrayList<VisDebuggerAdditionalDrawer>();
 
 	double offsetX = -1113948;
 	double offsetY = -7041222;
@@ -67,14 +64,15 @@ public class EventsBasedVisDebugger extends PApplet {
 
 	double time;	
 	
-//	private final FrameSaver fs = new FrameSaver("/Users/laemmel/tmp/processing/", "png", 9);
+//	private final FrameSaver fs = new FrameSaver("/Users/laemmel/tmp/processing/", "png", 9*7);
 	private final FrameSaver fs = null;
+	private String it;
 	public EventsBasedVisDebugger(Scenario sc) {
 
 		computeOffsets(sc);
 		this.fr = new JFrame();
-		//		this.fr.setSize(1024,788);
-		this.fr.setSize(1920,1100);
+				this.fr.setSize(1024,788);
+//		this.fr.setSize(1280,740);
 		JPanel compositePanel = new JPanel();
 		compositePanel.setLayout(new OverlayLayout(compositePanel));
 
@@ -92,10 +90,6 @@ public class EventsBasedVisDebugger extends PApplet {
 		frameRate(90);
 		//		size(1024, 768);
 		this.fr.setVisible(true);
-
-
-
-
 	}
 
 	private void computeOffsets(Scenario sc) {
@@ -122,13 +116,12 @@ public class EventsBasedVisDebugger extends PApplet {
 		}
 		this.offsetX = -(maxX+minX)/2;
 		this.offsetY = -(maxY+minY)/2;
-
 	}
 
 	@Override
 	public void setup() {
-		//		size(1024,768);
-		size(1920,1080);
+				size(1024,768);
+//		size(1280,720);
 		background(0);
 
 	}
@@ -155,7 +148,7 @@ public class EventsBasedVisDebugger extends PApplet {
 		}
 		// This enables zooming/panning and should be in the draw method.
 		this.zoomer.transform();
-		background(0);	
+		background(255);	
 
 
 
@@ -173,6 +166,9 @@ public class EventsBasedVisDebugger extends PApplet {
 
 		synchronized (this.additionalDrawers) {
 			for (VisDebuggerAdditionalDrawer d : this.additionalDrawers) {
+				if (d instanceof VoronoiDiagramDrawer) {
+					continue;
+				}
 				d.draw(this);
 			}
 		}
@@ -181,6 +177,8 @@ public class EventsBasedVisDebugger extends PApplet {
 		strokeWeight((float) (2/this.zoomer.getZoomScale()));
 		strokeCap(ROUND);
 
+
+		
 		synchronized(this.elementsStatic) {
 			Iterator<Object> it = this.elementsStatic.iterator();
 			while (it.hasNext()) {
@@ -205,7 +203,14 @@ public class EventsBasedVisDebugger extends PApplet {
 			}
 		}
 
-
+		synchronized (this.additionalDrawers) {
+			for (VisDebuggerAdditionalDrawer d : this.additionalDrawers) {
+				if (d instanceof VoronoiDiagramDrawer) {
+					
+					d.draw(this);
+				}
+			}
+		}
 
 		//		System.out.println(this.zoomer.getDispToCoord(new PVector(this.width/2, this.height/2)));
 		//		popMatrix();
@@ -248,7 +253,7 @@ public class EventsBasedVisDebugger extends PApplet {
 		}
 
 		if (this.fs != null) {
-			this.fs.saveFrame(this, Time.writeTime(this.time, Time.TIMEFORMAT_HHMMSS));
+			this.fs.saveFrame(this, this.it+Time.writeTime(this.time, Time.TIMEFORMAT_HHMMSS));
 		}
 
 	}
@@ -271,10 +276,13 @@ public class EventsBasedVisDebugger extends PApplet {
 		else {
 			//			fill(122,122,122,122);
 			stroke(0);
+			line((float)(tile.getTx()+this.offsetX),-(float)(tile.getTy()+this.offsetY),(float)(tile.getBx()+this.offsetX),(float)-(tile.getBy()+this.offsetY));
+			line((float)(tile.getBx()+this.offsetX),-(float)(tile.getTy()+this.offsetY),(float)(tile.getTx()+this.offsetX),(float)-(tile.getBy()+this.offsetY));
 			line((float)(tile.getTx()+this.offsetX),-(float)(tile.getTy()+this.offsetY),(float)(tile.getBx()+this.offsetX),(float)-(tile.getTy()+this.offsetY));
-			line((float)(tile.getBx()+this.offsetX),-(float)(tile.getTy()+this.offsetY),(float)(tile.getBx()+this.offsetX),(float)(tile.getBy()+this.offsetY));
-			line((float)(tile.getBx()+this.offsetX),-(float)(tile.getBy()+this.offsetY),(float)(tile.getTx()+this.offsetX),-(float)(tile.getBy()+this.offsetY));
-			line((float)(tile.getTx()+this.offsetX),-(float)(tile.getBy()+this.offsetY),(float)(tile.getTx()+this.offsetX),-(float)(tile.getTy()+this.offsetY));
+			line((float)(tile.getBx()+this.offsetX),-(float)(tile.getBy()+this.offsetY),(float)(tile.getTx()+this.offsetX),(float)-(tile.getBy()+this.offsetY));
+			
+//			line((float)(tile.getBx()+this.offsetX),-(float)(tile.getBy()+this.offsetY),(float)(tile.getTx()+this.offsetX),-(float)(tile.getBy()+this.offsetY));
+//			line((float)(tile.getTx()+this.offsetX),-(float)(tile.getBy()+this.offsetY),(float)(tile.getTx()+this.offsetX),-(float)(tile.getTy()+this.offsetY));
 		}
 	}
 
@@ -295,6 +303,7 @@ public class EventsBasedVisDebugger extends PApplet {
 			textAlign(LEFT);
 			text(t.text, cv.x-w/2, cv.y+ts/2);
 		}
+//		System.out.println(cv.x  + "  " +  cv.y);
 	}
 
 	private void drawTriangle(Triangle t) {
@@ -588,6 +597,17 @@ public class EventsBasedVisDebugger extends PApplet {
 	public void addKeyControl(KeyControl keyControl) {
 		this.addKeyListener(keyControl);
 		this.keyControl = keyControl;
+	}
+
+	public void reset(int it) {
+		if (it < 10) {
+			this.it = "it.00"+it+"_";
+		} else if (it < 100) {
+			this.it = "it.0"+it+"_";
+		} else {
+			this.it = "it."+it+"_";
+		}
+		
 	}
 
 

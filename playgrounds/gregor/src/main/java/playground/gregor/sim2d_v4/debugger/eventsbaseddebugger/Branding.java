@@ -25,6 +25,7 @@ import processing.core.PImage;
 public class Branding implements VisDebuggerAdditionalDrawer{
 
 	private PImage logo;
+	private PImage contact;
 
 	@Override
 	public void draw(EventsBasedVisDebugger p) {
@@ -36,6 +37,7 @@ public class Branding implements VisDebuggerAdditionalDrawer{
 	public void drawText(EventsBasedVisDebugger p) {
 		if (this.logo == null){
 			this.logo = p.loadImage("/Users/laemmel/devel/fzj/logo/black_300dpi.png");
+			this.contact = p.loadImage("/Users/laemmel/devel/fzj/logo/contact2.png");
 			
 		}
 		float ts = 18;
@@ -52,6 +54,8 @@ public class Branding implements VisDebuggerAdditionalDrawer{
 		p.rect(tx-5, ty-5, w+10, h+10,round);
 		p.image(this.logo,tx, ty, w, h);
 //		
+		p.image(this.contact,5,p.height-this.contact.height-5,this.contact.width,this.contact.height);
+		
 //		float x = 5 + round;
 //		float y = 5 + round + ts;
 //		p.textSize(ts);	
@@ -64,7 +68,24 @@ public class Branding implements VisDebuggerAdditionalDrawer{
 //		String stm = "time: " + tm;
 //		float w = p.textWidth(stm);
 //		
-//		
+//		p.fill
+//		p.textSize(ts);
+//		p.stroke(0,235);
+//		float tw = p.textWidth("contact: g.laemmel@fz-juelich.de");
+//		System.out.println(tw);
+//		p.rect(5, p.height-5-ts, tw, ts,round/2);
+//		p.pushMatrix();
+//		p.translate(ts/2+5+5, p.height -tw/2-5-5-5);
+//		p.rotate((float) -Math.PI/2);
+//		p.textAlign(PConstants.LEFT) ;
+		
+		
+//		p.fill(255);
+//		p.textAlign(PConstants.CENTER, PConstants.CENTER);
+
+		
+//		p.text("contact: g.laemmel@fz-juelich.de", 5,p.height-5-2.5f);
+//		p.popMatrix();
 //		p.fill(255);
 //		p.textAlign(PConstants.LEFT);
 //		p.text(stm, x, y);

@@ -36,6 +36,7 @@ import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.GregorsOffice;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.QSimDensityDrawer;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.SeeCasino;
+import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.VoronoiDiagramDrawer;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfigUtils;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
@@ -65,7 +66,7 @@ public class Sim2DRunner implements IterationStartsListener{
 		sc.addScenarioElement(sim2dsc);
 		sim2dsc.connect(sc);
 		
-//		c.getQSimConfigGroup().setEndTime(15*3600);
+		c.getQSimConfigGroup().setEndTime(15*3600);
 //		c.getQSimConfigGroup().setEndTime(5*60);
 
 		//offsets needed to convert to doubles later in program
@@ -113,15 +114,18 @@ public class Sim2DRunner implements IterationStartsListener{
 			EventBasedVisDebuggerEngine dbg = new EventBasedVisDebuggerEngine(sc);
 			InfoBox iBox = new InfoBox(dbg,sc);
 			SeeCasino iCasion = new SeeCasino();
+			VoronoiDiagramDrawer v = new VoronoiDiagramDrawer();
 			dbg.addAdditionalDrawer(iBox);
 			dbg.addAdditionalDrawer(new Branding());
 			QSimDensityDrawer qDbg = new QSimDensityDrawer(sc);
 			dbg.addAdditionalDrawer(qDbg);
 			dbg.addAdditionalDrawer(iCasion);
 			dbg.addAdditionalDrawer(new GregorsOffice());
+			dbg.addAdditionalDrawer(v);
 			controller.getEvents().addHandler(dbg);
 			controller.getEvents().addHandler(qDbg);
 			controller.getEvents().addHandler(iCasion);
+			controller.getEvents().addHandler(v);
 			
 		}
 

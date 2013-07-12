@@ -20,10 +20,8 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -31,6 +29,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
@@ -40,8 +39,8 @@ import playground.gregor.sim2d_v4.events.Sim2DAgentConstructEvent;
 import playground.gregor.sim2d_v4.scenario.Sim2DEnvironment;
 import playground.gregor.sim2d_v4.simulation.Sim2DAgentFactory;
 import playground.gregor.sim2d_v4.simulation.Sim2DEngine;
-import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection;
 import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
+import playground.gregor.sim2d_v4.simulation.physics.TransitionArea;
 
 public class QSim2DTransitionLink extends QLinkInternalI {
 
@@ -58,9 +57,18 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 
 	private final Sim2DEnvironment env;
 
-	private final List<DepartureBox> dBoxes = new ArrayList<DepartureBox>();
 
 	private final Sim2DAgentFactory agentBuilder;
+
+	private TransitionArea ta;
+
+	private double spawnX;
+
+	private double spawnY;
+
+	private final double area;
+
+	private final QLinkInternalI qPred;
 
 	QSim2DTransitionLink(Link link, QNetwork network, QNode toQueueNode, Sim2DEngine hybridEngine, QLinkImpl qLinkImpl, Sim2DEnvironment env, Sim2DAgentFactory builder) {
 		this.link = link;
@@ -70,6 +78,17 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 		this.qLinkDelegate = qLinkImpl;
 		this.env = env;
 		this.agentBuilder = builder;
+		this.area = link.getLength() * link.getNumberOfLanes()/.71;
+		
+		Iterator<? extends Link> it = link.getFromNode().getInLinks().values().iterator();
+		Link pred = it.next();
+		if (pred.getAllowedModes().contains("walk2d") && it.hasNext()){
+			pred = it.next();
+		}
+//		if (it.hasNext()) {
+//			throw new RuntimeException();
+//		}
+		this.qPred = this.qNetwork.getNetsimLink(pred.getId());
 		init();
 	}
 
@@ -91,14 +110,11 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 		if (!this.transferToSim2D) {
 			this.qLinkDelegate.addFromUpstream(veh);
 		} else {
-			DepartureBox dbox = this.dBoxes.get(0);
-			PhysicalSim2DSection psecBox = dbox.psecBox;
-			if (psecBox.getNumberOfAllAgents() != 0) {
-				throw new RuntimeException("trying to spawn agent in a non empty departure box");
-			}
-			Sim2DAgent agent = this.agentBuilder.buildAgent(veh,dbox.spawnX,dbox.spawnY, psecBox.getPhysicalEnvironment());
+			
+		
+			Sim2DAgent agent = this.agentBuilder.buildAgent(veh,this.spawnX+MatsimRandom.getRandom().nextDouble()-.5,this.spawnY+MatsimRandom.getRandom().nextDouble()-.5, this.ta.getPhysicalEnvironment());
 			agent.setDesiredSpeed(this.getLink().getFreespeed());
-			psecBox.addAgentToInBuffer(agent);
+			this.ta.addAgentTransitionBuffer(agent,this.qPred.getAllVehicles().size()/this.area);
 			double now = this.qNetwork.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 			this.qNetwork.simEngine.getMobsim().getEventsManager().processEvent(
 					new LinkEnterEvent(now, veh.getDriver().getId(),
@@ -262,8 +278,7 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 		if (!this.transferToSim2D) {
 			return this.qLinkDelegate.isAcceptingFromUpstream();
 		} else {
-			Collections.sort(this.dBoxes);
-			return this.dBoxes.get(0).psecBox.getNumberOfAllAgents() == 0;
+			return this.ta.hasBufferSpace();
 		}
 	}
 
@@ -408,29 +423,13 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 		}
 	}
 
-	public void createDepartureBox(PhysicalSim2DSection psecBox, double spawnX,
+	@Deprecated
+	public void createDepartureBox(TransitionArea psecBox, double spawnX,
 			double spawnY) {
-		DepartureBox dBox = new DepartureBox();
-		dBox.psecBox = psecBox;
-		dBox.spawnX = spawnX;
-		dBox.spawnY = spawnY;
-		this.dBoxes.add(dBox);
+		this.ta = psecBox;
+		this.spawnX = spawnX;
+		this.spawnY = spawnY;
 	}
 	
-	private static final class DepartureBox implements Comparable<DepartureBox>{
-		PhysicalSim2DSection psecBox;
-		double spawnX;
-		double spawnY;
-		@Override
-		public int compareTo(DepartureBox o) {
-			if (this.psecBox.getNumberOfAllAgents() < o.psecBox.getNumberOfAllAgents()) {
-				return -1;
-			}
-			if (this.psecBox.getNumberOfAllAgents() > o.psecBox.getNumberOfAllAgents()) {
-				return 1;
-			}
-			return 0;
-		}
-	}
 
 }

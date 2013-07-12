@@ -38,9 +38,11 @@ public class Sim2DAgent implements TwoDObject {
 	
 	//testing only
 	@Deprecated
-	private final double vCoeff = 1; //+MatsimRandom.getRandom().nextGaussian()*.1;;
+	private final double vCoeff = 1;//+MatsimRandom.getRandom().nextGaussian()*.1;;
 	
-	private double v0 = 1.34*this.vCoeff;
+//	private final double vStd
+	
+	private double v0 = 1.34;//*this.vCoeff;
 	
 	
 	private final double [] pos = {0,0};
@@ -51,7 +53,7 @@ public class Sim2DAgent implements TwoDObject {
 	private final MobsimDriverAgent driver;
 	private PhysicalSim2DSection currentPSec;
 
-	private final double r = .25; //0.19; //MatsimRandom.getRandom().nextDouble()*.1 + 0.25; //radius
+	private final double r = .19;//MatsimRandom.getRandom().nextDouble()*.1 + 0.25; //radius//.25; //0.19; //MatsimRandom.getRandom().nextDouble()*.1 + 0.25; //radius
 	
 	private final double height = 1.72 + MatsimRandom.getRandom().nextGaussian()*0.1; //TODO find a meaningful value here [gl April '13]
 	

@@ -65,8 +65,8 @@ public class InfoBox implements ClockedVisDebuggerAdditionalDrawer {
 		String tm = Time.writeTime(t, Time.TIMEFORMAT_HHMMSS);
 		String stm = "time: " + tm;
 		float w = p.textWidth(stm);
-		p.rect(5, 5, 5+15+w+round, 5+round+ts+round + ts + ts/2 + ts + ts/2,round);
-//		p.rect(5, 5, 5+15+w+round, 5+round+ts+round,round);
+//		p.rect(5, 5, 5+15+w+round, 5+round+ts+round + ts + ts/2 + ts + ts/2,round);
+		p.rect(5, 5, 5+15+w+round, 5+round+ts+round,round);
 		
 		p.fill(255);
 		p.textAlign(PConstants.LEFT);
@@ -74,8 +74,8 @@ public class InfoBox implements ClockedVisDebuggerAdditionalDrawer {
 		double sph = this.speedup > .98 ? Math.round(this.speedup) : this.speedup;
 //		String tt = Integer.toString(ttt);
 //		String dec = Integer.toString((int)((this.speedup-ttt)*100));
-		p.text("speedup: " + sph , x, y+ts+ts/2);
-		p.text("fps: " + (int)(p.frameRate+.5) , x, y+ts+ts/2 + ts + ts/2);
+//		p.text("speedup: " + sph , x, y+ts+ts/2);
+//		p.text("fps: " + (int)(p.frameRate+.5) , x, y+ts+ts/2 + ts + ts/2);
 
 	}
 

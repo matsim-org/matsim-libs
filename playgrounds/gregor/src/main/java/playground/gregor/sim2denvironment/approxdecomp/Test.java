@@ -71,7 +71,7 @@ public class Test {
 //		String network = "/Users/laemmel/devel/gr90_sim2d_v4/raw_input/raw_network2d_0.xml";
 //		String output = "/Users/laemmel/devel/gr90_sim2d_v4/raw_input_stage2/sim2dEnv_0.gml.gz";
 
-		String dir = "/Users/laemmel/devel/pantheon/raw/";
+		String dir = "/Users/laemmel/devel/gct/floorpl/";
 		String p = dir + "floorplan_p.shp";
 		String network = dir + "raw_network2d_floorplan.xml";
 		String output = dir + "s2d_environment.gml.gz";

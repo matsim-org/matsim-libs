@@ -122,12 +122,13 @@ public class TileMap implements ZoomPanListener {
 			for (PVector vec : coords) {
 				double x = vec.x - this.offsetX;
 				double y = -( this.offsetY + vec.y);
+//				System.out.println(this.currentZoom);
 				double range = this.currentZoom*this.tileSize/2;
 				Collection<Tile> tmp = new ArrayList<Tile>();
 				 this.currentQuad.get(x-range, y-range,x+range,y+range,tmp);
+//				 System.out.println("one new at:" + x + "  " + y);
 				Tile tile = null;
 				if (tmp.size() == 0) {
-					System.out.println("one new at:" + x + "  " + y);
 					tile = createAndAddNewTile(x,y);
 					this.cachedTiles.add(tile);
 //					double cx = (tile.getTx()+tile.getBx())/2;
@@ -154,7 +155,11 @@ public class TileMap implements ZoomPanListener {
 	private Tile createAndAddNewTile(double x, double y) {
 		double tx = x - (x%(this.tileSize*this.currentZoom));
 		double ty = y - (y%(this.tileSize*this.currentZoom));
-		Tile ret = new Tile(tx,ty,tx+this.tileSize*this.currentZoom,ty+this.tileSize*this.currentZoom,this.transform);
+		int xSign = 1;
+		if (tx < 0) {
+			xSign = -1;
+		}
+		Tile ret = new Tile(tx,ty,tx+this.tileSize*this.currentZoom*xSign,ty+this.tileSize*this.currentZoom,this.transform);
 		this.currentQuad.put((ret.getTx()+ret.getBx())/2 , (ret.getTy()+ret.getBy())/2, ret);
 		
 		this.loader.addTile(ret);

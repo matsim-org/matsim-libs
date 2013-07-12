@@ -52,7 +52,7 @@ public class PhysicalSim2DSection {
 
 	private final Sim2DScenario sim2dsc;
 
-	private final List<Sim2DAgent> inBuffer = new LinkedList<Sim2DAgent>();
+	protected final List<Sim2DAgent> inBuffer = new LinkedList<Sim2DAgent>();
 	protected final List<Sim2DAgent> agents = new LinkedList<Sim2DAgent>();
 
 	protected final double timeStepSize;
@@ -61,7 +61,7 @@ public class PhysicalSim2DSection {
 
 	private final Map<Segment,PhysicalSim2DSection> neighbors = new HashMap<Segment,PhysicalSim2DSection>();
 
-	private final TwoDTree<Sim2DAgent> agentTwoDTree;
+	protected final TwoDTree<Sim2DAgent> agentTwoDTree;
 
 	//	private final Map<Segment,Id> openingLinkIdMapping = new HashMap<Segment,Id>();
 
@@ -80,7 +80,6 @@ public class PhysicalSim2DSection {
 		init();
 	}
 
-	//physics
 	public int getNumberOfAllAgents() {
 		return this.inBuffer.size() + this.agents.size();
 	}
@@ -152,7 +151,7 @@ public class PhysicalSim2DSection {
 	//		return this.openingLinkIdMapping.get(opening);
 	//	}
 
-	private void updateAgent(Sim2DAgent agent, double time) {
+	protected void updateAgent(Sim2DAgent agent, double time) {
 		//		agent.calcNeighbors(this);
 		//		agent.setObstacles(this.obstacles);
 		agent.updateVelocity(time);
