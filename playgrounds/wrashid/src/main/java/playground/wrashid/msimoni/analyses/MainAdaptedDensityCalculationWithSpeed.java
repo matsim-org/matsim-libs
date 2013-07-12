@@ -20,8 +20,8 @@ public class MainAdaptedDensityCalculationWithSpeed {
 			//String networkFile = "H:/thesis/output_no_pricing_v3_subtours_bugfix/output_network.xml.gz";
 			//String eventsFile =  "H:/thesis/output_no_pricing_v3_subtours_bugfix/ITERS/it.50/50.events.xml.gz";
 			
-			String networkFile = "H:/data/experiments/TRBAug2011/runs/run2/output/herbie.output_network.xml.gz";
-			String eventsFile =	"H:/data/experiments/TRBAug2011/runs/run2/output/ITERS/it.0/herbie.0.events.xml.gz";	
+			String networkFile = "H:/data/experiments/TRBAug2011/runs/run4/output/herbie.output_network.xml.gz";
+			String eventsFile =	"H:/data/experiments/TRBAug2011/runs/run4/output/ITERS/it.0/herbie.0.events.xml.gz";	
 			
 			
 			Coord center = null; // center=null means use all links
@@ -73,6 +73,14 @@ public class MainAdaptedDensityCalculationWithSpeed {
 				int[] inFlowAccumulated = outflowHandler.getAccumulatedFlow(link.getId());
 				
 				if(outFlowAccumulated[0]-inFlowAccumulated[0]==0){
+					if (linkOutFlow.get(link.getId())==null){
+						System.out.println();
+					}
+					
+					if (averageSpeeds.get(link.getId())==null){
+						System.out.println();
+					}
+					
 					bins[0]=linkOutFlow.get(link.getId())[0]*(3600/binSizeInSeconds)/(averageSpeeds.get(link.getId())[0]*3.6);
 				} else {
 					bins[0]=linkInFlow.get(link.getId())[0]-linkOutFlow.get(link.getId())[0]/(link.getLength()*link.getNumberOfLanes()/1000);

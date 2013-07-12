@@ -40,6 +40,7 @@ public class AverageSpeedCalculator implements LinkEnterEventHandler,
 					bins[i]=sa[i].getAverageSpeed();
 				}
 			}
+			result.put(linkId, bins);
 		}
 		return result;
 	}
@@ -71,7 +72,7 @@ public class AverageSpeedCalculator implements LinkEnterEventHandler,
 			if (linkEnterTime.containsKeyTwo(linkId,
 					personId)) {
 				
-				int binIndex = (int) Math.round(Math.floor(event.getTime() / binSizeInSeconds));
+				int binIndex = (int) Math.round(Math.floor(GeneralLib.projectTimeWithin24Hours(event.getTime()) / binSizeInSeconds));
 				if (speedAccumulator.get(linkId)[binIndex]==null){
 					speedAccumulator.get(linkId)[binIndex]=new SpeedAccumulator();
 				}
