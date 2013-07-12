@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.matrixbasedptrouter.config.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.utils.HeaderParser;
 import org.matsim.contrib.matrixbasedptrouter.utils.MyBoundingBox;
@@ -50,11 +49,13 @@ import org.matsim.matrices.Entry;
 import org.matsim.matrices.Matrix;
 
 /**
- * 
- * @author thomas
- *
- * Design thoughts: this is a hybrid (see Martin2006CleanCode) should be splitted in 
+ * Design thoughts:<ul>
+ * <li> this is a hybrid (see Martin2006CleanCode) should be splitted in 
  * two classes somewhen a data container and a class containing the algorithm that initializes data. tn/dg/kn june 2013
+ * <li> yyyy walk does not use the beeline distance although it should. kai, jul'13
+ * </ul>
+ *
+ * @author thomas
  *
  */
 public class PtMatrix {
@@ -90,6 +91,8 @@ public class PtMatrix {
 		originDestinationTravelDistanceMatrix= new Matrix("PtStopTravelDistanceMatrix", "Stop to stop origin destination travel distance matrix");
 		
 		if(ippcm.getPtTravelTimesInputFile() == null || ippcm.getPtTravelDistancesInputFile() == null){
+			// (yyyy wrong test; there is now a switch. kai, jul'13)
+
 			// if travel times and distances are not provided by external files ...
 			initODMatrixBasedOnPtStopsOnly( plansCalcRoute.getBeelineDistanceFactor(), 
 					plansCalcRoute.getTeleportedModeSpeeds().get(TransportMode.pt), 
