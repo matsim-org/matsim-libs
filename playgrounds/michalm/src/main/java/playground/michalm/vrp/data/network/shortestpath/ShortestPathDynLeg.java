@@ -38,11 +38,11 @@ public class ShortestPathDynLeg
 
     private final int beginTime;
 
-    private int currentLinkIdx = -1;//fromLink idx == -1
-    private int expectedLinkTravelTime = 0;//fromLink travel time == 0
+    private int currentLinkIdx = -1;// fromLink idx == -1
+    private int expectedLinkTravelTime = 0;// fromLink travel time == 0
 
-    private int timeAtLatestNode = -1;//has not been reached yet
-    private int delayAtLatestNode = 0;//ditto
+    private int timeAtLatestNode = -1;// has not been reached yet
+    private int delayAtLatestNode = 0;// ditto
 
 
     public ShortestPathDynLeg(DriveTask driveTask)
@@ -55,7 +55,7 @@ public class ShortestPathDynLeg
 
         shortestPath = arc.getShortestPath(beginTime);
         destinationLinkIdx = shortestPath.linkIds.length - 1;
-        
+
         driveTask.setDelayEstimator(this);
     }
 
@@ -64,13 +64,14 @@ public class ShortestPathDynLeg
     public void movedOverNode(Id oldLinkId, Id newLinkId, int time)
     {
         currentLinkIdx++;
-        expectedLinkTravelTime = shortestPath.accLinkTravelTimes[currentLinkIdx]
-                - shortestPath.accLinkTravelTimes[currentLinkIdx - 1];
 
-        timeAtLatestNode = time;
-        int actualTimeEnRoute = timeAtLatestNode - beginTime;
         int expectedTimeEnRoute = (currentLinkIdx == 0) ? 0
                 : shortestPath.accLinkTravelTimes[currentLinkIdx - 1];
+        int actualTimeEnRoute = timeAtLatestNode - beginTime;
+
+        expectedLinkTravelTime = shortestPath.accLinkTravelTimes[currentLinkIdx]
+                - expectedTimeEnRoute;
+        timeAtLatestNode = time;
         delayAtLatestNode = actualTimeEnRoute - expectedTimeEnRoute;
     }
 
