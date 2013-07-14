@@ -110,7 +110,7 @@ public class DynAgent
     }
 
 
-    private void startNextAction(DynAction oldDynAction, double now)
+    private void computeNextAction(DynAction oldDynAction, double now)
     {
         state = null;// !!! this is important
         dynActivity = null;
@@ -139,7 +139,7 @@ public class DynAgent
         eventsManager.processEvent(eventsManager.getFactory().createActivityEndEvent(now, id,
                 currentLinkId, null, dynActivity.getActivityType()));
 
-        startNextAction(dynActivity, now);
+        computeNextAction(dynActivity, now);
     }
 
 
@@ -149,7 +149,7 @@ public class DynAgent
         eventsManager.processEvent(eventsManager.getFactory().createAgentArrivalEvent(now, id,
                 currentLinkId, TransportMode.car));
 
-        startNextAction(dynLeg, now);
+        computeNextAction(dynLeg, now);
     }
 
 
