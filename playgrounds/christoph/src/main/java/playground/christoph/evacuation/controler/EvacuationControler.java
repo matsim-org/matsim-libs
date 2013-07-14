@@ -48,8 +48,8 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureWriter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerDepartureHandler;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.TripRouterFactoryInternal;
 import org.matsim.core.router.TripRouterFactoryImpl;
+import org.matsim.core.router.TripRouterFactoryInternal;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -137,7 +137,6 @@ import playground.christoph.evacuation.withinday.replanning.utils.SelectHousehol
 import playground.meisterk.kti.config.KtiConfigGroup;
 
 import com.vividsolutions.jts.geom.Geometry;
-
 
 public class EvacuationControler extends WithinDayController implements 
 		MobsimAfterSimStepListener, IterationStartsListener, AfterMobsimListener {

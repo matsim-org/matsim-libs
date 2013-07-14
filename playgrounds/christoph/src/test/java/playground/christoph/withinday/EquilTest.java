@@ -19,8 +19,8 @@
 
 package playground.christoph.withinday;
 
+import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.config.Config;
-import contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.testcases.MatsimTestCase;
 
 public class EquilTest extends MatsimTestCase {

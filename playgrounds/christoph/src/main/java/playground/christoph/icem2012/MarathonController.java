@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.facilities.Facility;
@@ -50,7 +51,6 @@ import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
@@ -63,8 +63,8 @@ import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
-import org.matsim.core.router.TripRouterFactoryInternal;
 import org.matsim.core.router.TripRouterFactoryImpl;
+import org.matsim.core.router.TripRouterFactoryInternal;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -127,14 +127,9 @@ import playground.gregor.sim2d_v3.scenario.ScenarioLoader2DImpl;
 import playground.gregor.sim2d_v3.simulation.HybridQ2DMobsimFactory;
 import playground.gregor.sim2d_v3.simulation.Sim2DDepartureHandler;
 import playground.gregor.sim2d_v3.simulation.Sim2DEngine;
-import playground.gregor.sim2d_v3.simulation.floor.DefaultVelocityCalculator;
-import playground.gregor.sim2d_v3.simulation.floor.VelocityCalculator;
 import playground.meisterk.kti.config.KtiConfigGroup;
 
 import com.vividsolutions.jts.geom.Geometry;
-
-import contrib.multimodal.config.MultiModalConfigGroup;
-import contrib.multimodal.router.MultimodalTripRouterFactory;
 
 public final class MarathonController extends WithinDayController implements 
 	MobsimInitializedListener, MobsimBeforeSimStepListener, MobsimAfterSimStepListener {
