@@ -21,16 +21,19 @@ package playground.michalm.vrp.data.network.shortestpath;
 
 import org.matsim.api.core.v01.Id;
 
+import pl.poznan.put.vrp.dynamic.data.network.VertexTimePair;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.DriveTask.DelayEstimator;
+import pl.poznan.put.vrp.dynamic.data.schedule.DriveTask.VehiclePositioning;
 import playground.michalm.dynamic.DynLeg;
-import playground.michalm.vrp.data.network.MatsimArc;
+import playground.michalm.vrp.data.network.*;
 
 
 public class ShortestPathDynLeg
-    implements DynLeg, DelayEstimator
+    implements DynLeg, DelayEstimator, VehiclePositioning
 {
     private final ShortestPath shortestPath;
+    private final MatsimVrpGraph vrpGraph;
 
     private final Id originLinkId;
     private final Id destinationLinkId;
@@ -45,8 +48,9 @@ public class ShortestPathDynLeg
     private int delayAtLatestNode = 0;// ditto
 
 
-    public ShortestPathDynLeg(DriveTask driveTask)
+    public ShortestPathDynLeg(DriveTask driveTask, MatsimVrpGraph vrpGraph)
     {
+        this.vrpGraph = vrpGraph;
         beginTime = driveTask.getBeginTime();
 
         MatsimArc arc = (MatsimArc)driveTask.getArc();
@@ -117,5 +121,21 @@ public class ShortestPathDynLeg
         }
 
         return estimatedDelay;
+    }
+
+
+    @Override
+    public VertexTimePair getLastRecordedPosition()
+    {
+        return new VertexTimePair(vrpGraph.getVertex(getCurrentLinkId()), timeAtLatestNode);
+    }
+
+
+    @Override
+    public VertexTimePair getNextPredictedPosition(int currentTime)
+    {
+        int predictedTimeAtNextNode = timeAtLatestNode
+                + Math.max(currentTime - timeAtLatestNode, expectedLinkTravelTime);
+        return new VertexTimePair(vrpGraph.getVertex(getNextLinkId()), predictedTimeAtNextNode);
     }
 }

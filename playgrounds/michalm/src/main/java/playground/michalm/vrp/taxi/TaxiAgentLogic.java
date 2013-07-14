@@ -20,11 +20,9 @@
 package playground.michalm.vrp.taxi;
 
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.*;
-import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.PassengerAgent;
+import org.matsim.core.mobsim.framework.*;
 
 import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
@@ -32,21 +30,24 @@ import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.schedule.TaxiDriveTask;
 import playground.michalm.dynamic.*;
 import playground.michalm.vrp.data.model.TaxiCustomer;
+import playground.michalm.vrp.data.network.MatsimVrpGraph;
 
 
 public class TaxiAgentLogic
     implements DynAgentLogic
 {
     private final TaxiSimEngine taxiSimEngine;
+    private final MatsimVrpGraph vrpGraph;
 
     private final Vehicle vrpVehicle;
     private DynAgent agent;
 
 
-    public TaxiAgentLogic(Vehicle vrpVehicle, TaxiSimEngine taxiSimEngine)
+    public TaxiAgentLogic(Vehicle vrpVehicle, TaxiSimEngine taxiSimEngine, MatsimVrpGraph vrpGraph)
     {
         this.vrpVehicle = vrpVehicle;
         this.taxiSimEngine = taxiSimEngine;
+        this.vrpGraph = vrpGraph;
     }
 
 
@@ -183,14 +184,16 @@ public class TaxiAgentLogic
         EventsManager events = taxiSimEngine.getInternalInterface().getMobsim().getEventsManager();
         EventsFactory evFac = events.getFactory();
         events.processEvent(evFac.createPersonEntersVehicleEvent(now, passenger.getId(),
-      		                agent.getId()));
-//      				  agent.getVehicle().getId() )); // does not work.  why??
-        
-        if ( passenger instanceof PassengerAgent ) {
-      	  	agent.getVehicle().addPassenger((PassengerAgent) passenger) ;
-        } else {
-      	  	Logger.getLogger(this.getClass()).warn( "mobsim agent could not be converted to type PassengerAgent; will probably work anyway but " +
-      	  			"for the simulation the agent is now not in the vehicle");
+                agent.getId()));
+        //      				  agent.getVehicle().getId() )); // does not work.  why??
+
+        if (passenger instanceof PassengerAgent) {
+            agent.getVehicle().addPassenger((PassengerAgent)passenger);
+        }
+        else {
+            Logger.getLogger(this.getClass()).warn(
+                    "mobsim agent could not be converted to type PassengerAgent; will probably work anyway but "
+                            + "for the simulation the agent is now not in the vehicle");
         }
 
         return TaxiTaskActivity.createServeActivity(task);
@@ -201,7 +204,7 @@ public class TaxiAgentLogic
 
     private TaxiLeg createLegWithPassenger(final TaxiDriveTask driveTask)
     {
-        return new TaxiLeg(driveTask) {
+        return new TaxiLeg(driveTask, vrpGraph) {
             @Override
             public void endLeg(double now)
             {
@@ -211,18 +214,17 @@ public class TaxiAgentLogic
                 MobsimAgent passenger = ((TaxiCustomer)driveTask.getRequest().getCustomer())
                         .getPassenger();
 
-                
                 // deliver the passenger
-                if ( passenger instanceof PassengerAgent ) {
-            	    	agent.getVehicle().removePassenger((PassengerAgent) passenger) ;
+                if (passenger instanceof PassengerAgent) {
+                    agent.getVehicle().removePassenger((PassengerAgent)passenger);
                 }
-                
+
                 EventsManager events = taxiSimEngine.getInternalInterface().getMobsim()
                         .getEventsManager();
                 EventsFactory evFac = events.getFactory();
                 events.processEvent(evFac.createPersonLeavesVehicleEvent(now, passenger.getId(),
-            	                        agent.getId()));
-//            				    agent.getVehicle().getId() )); // will probably not work (see above).  why?
+                        agent.getId()));
+                //            				    agent.getVehicle().getId() )); // will probably not work (see above).  why?
 
                 passenger.notifyArrivalOnLinkByNonNetworkMode(passenger.getDestinationLinkId());
                 passenger.endLegAndComputeNextState(now);
@@ -235,6 +237,6 @@ public class TaxiAgentLogic
 
     private TaxiLeg createLeg(TaxiDriveTask driveTask)
     {
-        return new TaxiLeg(driveTask);
+        return new TaxiLeg(driveTask, vrpGraph);
     }
 }

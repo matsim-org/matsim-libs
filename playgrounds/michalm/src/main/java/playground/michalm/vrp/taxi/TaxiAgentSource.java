@@ -63,7 +63,8 @@ public class TaxiAgentSource
         List<Vehicle> vehicles = data.getVrpData().getVehicles();
 
         for (Vehicle vrpVeh : vehicles) {
-            TaxiAgentLogic taxiAgentLogic = new TaxiAgentLogic(vrpVeh, taxiSimEngine);
+            TaxiAgentLogic taxiAgentLogic = new TaxiAgentLogic(vrpVeh, taxiSimEngine,
+                    data.getMatsimVrpGraph());
             taxiSimEngine.addAgentLogic(taxiAgentLogic);
 
             ((DynAgentVehicle)vrpVeh).setAgentLogic(taxiAgentLogic);
