@@ -9,12 +9,12 @@
 
 	<module name="network">
 		<param name="inputNetworkFile"
-			value="../../matsim/src/test/resources/test/scenarios/berlin/network.xml.gz" />
+			value="test/resources/test/scenarios/berlin/network.xml.gz" />
 	</module>
 
 	<module name="plans">
 		<param name="inputPlansFile"
-			value="../../matsim/src/test/resources/test/scenarios/berlin/plans_hwh_1pct.xml.gz" /> <!-- 1% sample of commuters, 15931 agents -->
+			value="test/resources/test/scenarios/berlin/plans_hwh_1pct.xml.gz" /> <!-- 1% sample of commuters, 15931 agents -->
 	</module>
 
 	<module name="controler">
