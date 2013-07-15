@@ -142,9 +142,9 @@ public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 		// yyyy some other way to pass the different grids needs to be found; the danger of exchanging two of them seems too large.
 		// kai, jun'13
 		
-		log.info("Initializing ParcelBasedAccessibilityControlerListenerV3 ...");
+		log.info("Initializing  ...");
 
-		this.ptMatrix = ptMatrix;	// this could be zero of no input files for pseudo pt are given ...
+		this.ptMatrix = ptMatrix;	// this could be zero if no input files for pseudo pt are given ...
 		assert (config != null);
 		assert (network != null);
 
