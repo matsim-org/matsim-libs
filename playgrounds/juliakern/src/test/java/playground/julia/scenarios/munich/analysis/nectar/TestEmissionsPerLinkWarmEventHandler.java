@@ -69,9 +69,7 @@ public class TestEmissionsPerLinkWarmEventHandler {
 		Assert.assertEquals(0.0, handler.getTime2linkIdLeaveCount().get(0.0).get(linkId));
 		Assert.assertNull(handler.getTime2linkIdLeaveCount().get(endOfTimeIntervall).get(new IdImpl("unused link")));
 		
-		handler.getTime2linkIdLeaveCount();
-		handler.getWarmEmissionsPerLinkAndTimeInterval();
-		// TODO assert stuff
+		// TODO go on here
 		
 		WarmEmissionEvent event2 = new WarmEmissionEventImpl(0.0, linkId, vehicleId, warmEmissions);
 		handler.handleEvent(event2);
