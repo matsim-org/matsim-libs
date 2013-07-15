@@ -45,7 +45,7 @@ public class ReplannerYoungPeople extends WithinDayDuringLegReplanner {
 		
 		Id linkId = this.scenario.createId("22");
 		ActivityImpl newWorkAct = new ActivityImpl("w", linkId);
-		newWorkAct.setMaximumDuration(3600);
+		newWorkAct.setEndTime(nextActivity.getEndTime());
 
 		// Replace Activity
 		new ReplacePlanElements().replaceActivity(executedPlan, nextActivity, newWorkAct);
@@ -60,6 +60,7 @@ public class ReplannerYoungPeople extends WithinDayDuringLegReplanner {
 		
 		// new Route for next Leg
 		Leg homeLeg = executedPlan.getNextLeg(newWorkAct);
+		homeLeg.setDepartureTime(newWorkAct.getEndTime());
 		this.editRoutes.relocateFutureLegRoute(homeLeg, linkId, homeLeg.getRoute().getEndLinkId(), 
 				executedPlan.getPerson(), scenario.getNetwork(), tripRouter);
 		
