@@ -244,7 +244,6 @@ public class SpatialAveraging {
 		}
 		String outputPath = outPathStub + "demand.txt";
 		writeRoutputLinksToEmissions(demandLinkMatrix, outputPath);
-		// TODO Auto-generated method stub
 		
 	}
 
@@ -700,14 +699,23 @@ public class SpatialAveraging {
 				double demandBefore = entry1.getValue();
 				double demandAfter = time2CountsPerLinkFilledAndFiltered2.get(endOfTimeInterval).get(linkId);
 				if (demandBefore == 0.0){ // cannot calculate relative change if "before" value is 0 ...
-					logger.warn("Setting demand in baseCase for link " + linkId + " from " + demandBefore + " to 1.0 ...");
-					// s.o. maxvalue?
-					demandBefore = 1;
+					if(demandAfter != 0.0){
+						// variante 1
+						delta.put(linkId, Double.MAX_VALUE);
+						// variante 2
+						delta.put(linkId, null);
+						// variante 3 (bisherige Variante, demandBefore :=1)
+						delta.put(linkId, (demandAfter - 1));
+//						logger.warn("Setting demand in baseCase for link " + linkId + " from " + demandBefore + " to 1.0 ...");
+					}else{//demandAfter = demandBefore = 0.0
+						delta.put(linkId, 0.0);
+					}
+
 				} else {
-					// do nothing
-				}
-				double demandDifferenceRatio = (demandAfter - demandBefore) / demandBefore;
+					double demandDifferenceRatio = (demandAfter - demandBefore) / demandBefore;
 				delta.put(linkId, demandDifferenceRatio);
+				}
+				
 				
 				//===
 //				double linkLength_km = this.network.getLinks().get(linkId).getLength() / 1000.;
@@ -748,7 +756,7 @@ public class SpatialAveraging {
 			Map<Id, Map<String, Double>> linkId2emissions = entry0.getValue();
 			Map<Id, Map<String, Double>> relativeDelta = new HashMap<Id, Map<String, Double>>();
 
-			// jeder link
+			// jeder link -- alle Links des Netzwerks sind enthalten
 			for(Entry<Id, Map<String, Double>> entry1 : linkId2emissions.entrySet()){
 				Id linkId = entry1.getKey();
 				Map<String, Double> emissionDifferenceMap = new HashMap<String, Double>(); //fuer diesen link in diesem zeitintervall
@@ -756,14 +764,27 @@ public class SpatialAveraging {
 					double emissionsBefore = entry1.getValue().get(pollutant);
 					double emissionsAfter = time2EmissionsTotalFilledAndFiltered2.get(endOfTimeInterval).get(linkId).get(pollutant);
 					if (emissionsBefore == 0.0){ // cannot calculate relative change if "before" value is 0.0 ...
-						logger.warn("Setting emissions in baseCase on link " + linkId + " and pollutant " + pollutant + " from " + emissionsBefore + " to 1.0 ...");
-						// TODO soll das 1.0 bleiben? alternative double.maxvalue
-						emissionsBefore = 1.0;
-					} else {
-						// do nothing
+						if(emissionsAfter != 0.0){
+							// default value 0.0001
+							// variante 1
+							emissionDifferenceMap.put(pollutant, Double.MAX_VALUE);
+							// variante 2
+							emissionDifferenceMap.put(pollutant, null); // TODO wo wird das ausgelesen und was passiert dann?
+							// vatiante 3 (bisherige variante, emissionsBefore := 1.0)
+							//logger.warn("Setting emissions in baseCase on link " + linkId + " and pollutant " + pollutant + " from " + emissionsBefore + " to 1.0 ...");
+							double emissionDifferenceRatio = (emissionsAfter - 1.0);
+							emissionDifferenceMap.put(pollutant, emissionDifferenceRatio);
+							
+						}else{ // emissions before = emissions after = 0.0
+							emissionDifferenceMap.put(pollutant, 0.0);
+						}					
+						
+					} else {// emissions before not 0.0
+						
+						double emissionDifferenceRatio = (emissionsAfter - emissionsBefore) / emissionsBefore;
+						emissionDifferenceMap.put(pollutant, emissionDifferenceRatio);
 					}
-					double emissionDifferenceRatio = (emissionsAfter - emissionsBefore) / emissionsBefore;
-					emissionDifferenceMap.put(pollutant, emissionDifferenceRatio);
+					
 				}
 				relativeDelta.put(linkId, emissionDifferenceMap);
 			}
@@ -800,8 +821,7 @@ public class SpatialAveraging {
 		Map<Double, Map<Id, SortedMap<String, Double>>> time2EmissionsTotalFilled = new HashMap<Double, Map<Id, SortedMap<String, Double>>>();
 		
 		for(double endOfTimeInterval : time2EmissionsTotal.keySet()){
-			// TODO tut das was es soll
-			// TODO go on here
+			
 			Map<Id, SortedMap<String, Double>> emissionsTotalFilled = this.emissionUtils.setNonCalculatedEmissionsForNetwork(this.network, time2EmissionsTotal.get(endOfTimeInterval));
 			time2EmissionsTotalFilled.put(endOfTimeInterval, emissionsTotalFilled);
 		}
