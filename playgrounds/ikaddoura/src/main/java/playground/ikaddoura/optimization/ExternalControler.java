@@ -110,9 +110,9 @@ class ExternalControler {
 		
 		log.info("Setting parameters...");
 		if (args.length == 0){
-			settingsFile = "/Users/Ihab/Desktop/internalization_input/settingsFile.csv";
-			configFile = "/Users/Ihab/Desktop/internalization_input/config.xml";
-			outputPath = "/Users/Ihab/Desktop/internalization_output";
+			settingsFile = "/Users/Ihab/Desktop/optimization/input/settingsFile_MCP_inVeh.csv";
+			configFile = "/Users/Ihab/Desktop/optimization/input/config.xml";
+			outputPath = "/Users/Ihab/Desktop/optimization/output/MCP_inVeh_ohneMCoperator";
 			
 		} else {
 			settingsFile = args[0];

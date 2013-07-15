@@ -65,10 +65,10 @@ public class MarginalCostPricingPtHandler implements TransferDelayInVehicleEvent
 		AgentMoneyEvent moneyEvent = new AgentMoneyEvent(event.getTime(), event.getCausingAgent(), amount1);
 		this.events.processEvent(moneyEvent);
 		
-		// marginal operator cost
-		double amount2 = (event.getDelay() / 3600.0) * this.operatorCostPerVehHour * (-1);
-		AgentMoneyEvent moneyEvent2 = new AgentMoneyEvent(event.getTime(), event.getCausingAgent(), amount2);
-		this.events.processEvent(moneyEvent2);
+//		// marginal operator cost
+//		double amount2 = (event.getDelay() / 3600.0) * this.operatorCostPerVehHour * (-1);
+//		AgentMoneyEvent moneyEvent2 = new AgentMoneyEvent(event.getTime(), event.getCausingAgent(), amount2);
+//		this.events.processEvent(moneyEvent2);
 	}
 
 	@Override

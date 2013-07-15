@@ -144,7 +144,7 @@ public class OperatorCostHandler implements TransitDriverStartsEventHandler, Lin
 	}
 	
 	public double getVehicleHours_includingSlackTimes() {
-		double vehicleSeconds = 0;
+		double vehicleSeconds = 0.;
 		for (Id id : this.ptDriverId2firstDepartureTime.keySet()){
 			vehicleSeconds = vehicleSeconds + ((this.ptDriverId2lastArrivalTime.get(id) - this.ptDriverId2firstDepartureTime.get(id)));
 		}

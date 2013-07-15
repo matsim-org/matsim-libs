@@ -67,13 +67,15 @@ public class Operator {
 		
 		log.info("Used for operator cost calculation: Number of public vehicles: " + numberOfVehicles);
 		log.info("Used for operator cost calculation: Vehicle-km: " + vehKm);
-		log.info("Used for operator cost calculation: Veh-h (operating time excluding slack times): " + Time.writeTime(vehHours_excludingSlackTime * 3600, Time.TIMEFORMAT_HHMMSS));
-		log.info("Not used for operator cost calculation: Veh-h (operating time including slack times): " + Time.writeTime(vehHours_includingSlackTimes * 3600, Time.TIMEFORMAT_HHMMSS));
+		log.info("Veh-h (operating time excluding slack times): " + Time.writeTime(vehHours_excludingSlackTime * 3600, Time.TIMEFORMAT_HHMMSS));
+		log.info("Veh-h (operating time including slack times): " + Time.writeTime(vehHours_includingSlackTimes * 3600, Time.TIMEFORMAT_HHMMSS));
 		
 		double capitalCosts = numberOfVehicles * costsPerVehicleDay;
 		double kmCosts = vehKm * costsPerVehicleKm;
-		double hCosts = vehHours_excludingSlackTime * COSTS_PER_VEH_HOUR;
 		
+//		double hCosts = vehHours_excludingSlackTime * COSTS_PER_VEH_HOUR;
+		double hCosts = vehHours_includingSlackTimes * COSTS_PER_VEH_HOUR;
+
 		this.costs = capitalCosts + ((kmCosts + hCosts) * OVERHEAD_PERCENTAGE);
 		log.info("Operator costs (AUD): " + this.costs);
 	}
