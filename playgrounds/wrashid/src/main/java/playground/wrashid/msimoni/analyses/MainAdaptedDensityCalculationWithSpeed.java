@@ -17,8 +17,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class MainAdaptedDensityCalculationWithSpeed {
 
 		public static void main(String[] args) {
-			String networkFile = "H:/thesis/output_no_pricing_v3_subtours_bugfix/output_network.xml.gz";
-			String eventsFile =  "H:/thesis/output_no_pricing_v3_subtours_bugfix/ITERS/it.50/50.events.xml.gz";
+			String networkFile = "\\\\kosrae.ethz.ch\\ivt-home\\simonimi/thesis/output_no_pricing_v5_subtours_bugfix/output_network.xml.gz";
+			String eventsFile =  "\\\\kosrae.ethz.ch\\ivt-home\\simonimi/thesis/output_no_pricing_v5_subtours_bugfix/ITERS/it.10/10.events.xml.gz";
 			
 			//String networkFile = "H:/data/experiments/TRBAug2011/runs/run4/output/herbie.output_network.xml.gz";
 			//String eventsFile =	"H:/data/experiments/TRBAug2011/runs/run4/output/ITERS/it.0/herbie.0.events.xml.gz";	
@@ -69,18 +69,15 @@ public class MainAdaptedDensityCalculationWithSpeed {
 			
 			for (Link link : links.values()) {
 				double[] bins=new double[getNumberOfBins(binSizeInSeconds)];
+				
+				if (inflowHandler.getFlow(link.getId())==null || outflowHandler.getFlow(link.getId())==null){
+					continue;
+				}
+				
 				int[] outFlowAccumulated = inflowHandler.getAccumulatedFlow(link.getId());
 				int[] inFlowAccumulated = outflowHandler.getAccumulatedFlow(link.getId());
 				
 				if(outFlowAccumulated[0]-inFlowAccumulated[0]==0){
-					if (linkOutFlow.get(link.getId())==null){
-						System.out.println();
-					}
-					
-					if (averageSpeeds.get(link.getId())==null){
-						System.out.println();
-					}
-					
 					bins[0]=linkOutFlow.get(link.getId())[0]*(3600/binSizeInSeconds)/(averageSpeeds.get(link.getId())[0]*3.6);
 				} else {
 					bins[0]=linkInFlow.get(link.getId())[0]-linkOutFlow.get(link.getId())[0]/(link.getLength()*link.getNumberOfLanes()/1000);
