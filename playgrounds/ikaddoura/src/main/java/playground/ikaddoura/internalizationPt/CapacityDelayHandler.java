@@ -104,15 +104,20 @@ public class CapacityDelayHandler implements BoardingDeniedEventHandler, PersonE
 	
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
+		
 				
 		if (!ptDriverIDs.contains(event.getPersonId()) && ptVehicleIDs.contains(event.getVehicleId())){
 			// a "normal" agent is entering a public vehicle
-						
+			
+			System.out.println("ENTERING: " + event.toString());
+
 			if (this.affectedAgent2causingAgents.containsKey(event.getPersonId())){
 //				System.out.println("Boarding agent was boarding denied before.");
 				calculateExternalDelay(event.getTime(), event.getPersonId());
 			}
 			
+			System.out.println("Vorher: " + this.vehId2passengers.toString());
+
 			// update number of passengers in vehicle
 			if (this.vehId2passengers.containsKey(event.getVehicleId())){
 				List<Id> passengers = new ArrayList<Id>();
@@ -125,6 +130,8 @@ public class CapacityDelayHandler implements BoardingDeniedEventHandler, PersonE
 				this.vehId2passengers.put(event.getVehicleId(), passengersInVeh);
 			}
 			
+			System.out.println("Nachher: " + this.vehId2passengers.toString());
+			
 			// update last entering agent
 			this.vehId2lastEnteringAgent.put(event.getVehicleId(), event.getPersonId());
 		}
@@ -132,19 +139,23 @@ public class CapacityDelayHandler implements BoardingDeniedEventHandler, PersonE
 	
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
-		
+				
 		if (!ptDriverIDs.contains(event.getPersonId()) && ptVehicleIDs.contains(event.getVehicleId())){
 			// a "normal" agent is leaving a public vehicle
+			System.out.println("LEAVING: " + event.toString());
+			
+			System.out.println("Vorher: " + this.vehId2passengers.toString());
 			
 			// update number of passengers in vehicle
 			if (this.vehId2passengers.containsKey(event.getVehicleId())){
 				List<Id> passengers = new ArrayList<Id>();
 				passengers = this.vehId2passengers.get(event.getVehicleId());
-				passengers.remove(event.getVehicleId());
+				passengers.remove(event.getPersonId());
 				this.vehId2passengers.put(event.getVehicleId(), passengers);
 			} else {
 				throw new RuntimeException("A person is leaving a public vehicle without entering it before. Aborting...");
 			}
+			System.out.println("Nachher: " + this.vehId2passengers.toString());
 		}
 		
 	}
@@ -158,9 +169,9 @@ public class CapacityDelayHandler implements BoardingDeniedEventHandler, PersonE
 		
 		List<Id> causingAgents = new ArrayList<Id>();
 		if (causingAgentsMethod.equals(CausingAgentsMethod.allPassengersInThePublicVehicle)){
-			causingAgents = getAllAgentsInPublicVehicle(event.getVehicleId());
+			causingAgents.addAll(getAllAgentsInPublicVehicle(event.getVehicleId()));
 		} else if (causingAgentsMethod.equals(CausingAgentsMethod.lastAgentEnteringThePublicVehicle)){
-			causingAgents = getLastAgentEnteringPublicVehicle(event.getVehicleId());
+			causingAgents.addAll(getLastAgentEnteringPublicVehicle(event.getVehicleId()));
 		} else {
 			throw new RuntimeException("Unknown method for the identfication of the causing agent(s). Aborting...");
 		}
@@ -191,6 +202,7 @@ public class CapacityDelayHandler implements BoardingDeniedEventHandler, PersonE
 		double delay = time - this.affectedAgent2boardingDeniedTime.get(affectedAgentId);
 //		System.out.println("Delay: " + delay);
 		List<Id> causingAgents = this.affectedAgent2causingAgents.get(affectedAgentId);
+		System.out.println("calculate external delay effect. causing agents: " + causingAgents);
 //		System.out.println("Causing agents: " + causingAgents);
 		double delayPerCausingAgent = delay / causingAgents.size();
 		
