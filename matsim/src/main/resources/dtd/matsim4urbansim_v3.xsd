@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-<!-- <xs:schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://www.matsim.org/files/dtd/matsim4urbansim_v3.xsd">
- -->
+
 	<!-- Editor: Thomas Nicolai, VSP, Berlin Institute of Technology (TU Berlin) -->
 	<!-- This xml schema contains xml definitions used for MATSim4UrbanSim -->
 	
@@ -50,7 +49,7 @@
 			<xs:element name="accessibilityComputationAreaFromShapeFile" type="xs:boolean"/>
 			<xs:element name="accessibilityComputationAreaFromBoundingBox" type="xs:boolean"/>
 			<xs:element name="accessibilityComputationAreaFromNetwork" type="xs:boolean"/>
-			<xs:element name="studyAreaBoundaryShapeFile" type="xs:token" minOccurs="1" 
+			<xs:element name="studyAreaBoundaryShapeFile" type="fileType" minOccurs="1" 
 				maxOccurs="1"/>
 			<xs:element name="boundingBoxTop" type="xs:double"/>
 			<xs:element name="boundingBoxLeft" type="xs:double"/>
@@ -62,14 +61,14 @@
 			<xs:element name="urbansimZoneRandomLocationDistributionByShapeFile" type="xs:token"/>
 			
 			<!-- commonn parameters -->
-			<xs:element name="external_matsim_config" type="xs:token" minOccurs="1" 
+		    <xs:element name="external_matsim_config" type="fileType" minOccurs="1" 
 				maxOccurs="1"/>
-			<xs:element name="network" type="xs:token" minOccurs="1" 
+			<xs:element name="network" type="fileType" minOccurs="1" 
 				maxOccurs="1"/>
-			<xs:element name="warmStartPlansFile" type="xs:token" minOccurs="1" 
+			<xs:element name="warmStartPlansFile" type="fileType" minOccurs="1" 
 				maxOccurs="1"/>
 			<xs:element name="useHotStart" type="xs:boolean"/>
-			<xs:element name="hotStartPlansFile" type="xs:token" minOccurs="1" 
+			<xs:element name="hotStartPlansFile" type="fileType" minOccurs="1" 
 				maxOccurs="1"/>
 			
 			<!-- plan calc score parameters -->
@@ -83,6 +82,13 @@
 			<!-- matsim parameters --> 
 			<xs:element name="firstIteration" type="xs:nonNegativeInteger"/>
 			<xs:element name="lastIteration" type="xs:nonNegativeInteger"/>
+		</xs:sequence>
+	</xs:complexType>
+	
+	<!-- file element definition -->
+	<xs:complexType name="fileType">
+		<xs:sequence>
+			<xs:element name="inputFile" type="xs:token"/>
 		</xs:sequence>
 	</xs:complexType>
 
