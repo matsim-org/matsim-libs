@@ -573,7 +573,7 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 			String fileName = postgresPropertiesComponent.getText();
 			File file = new File(fileName);
 			DataBaseAdmin dba = new DataBaseAdmin(file);
-			densityWriter = new PostgresqlCSVWriter("DENSITYWRITER", tabname, dba, 100000, columns);
+			densityWriter = new PostgresqlCSVWriter("DENSITYWRITER", tabname, dba, 100, columns);
 		} else {
 			densityWriter = new CSVWriter("DENSITYWRITER", densityTableName, schemaNameComponent.getText(), 100000,
 					columns);
@@ -600,7 +600,11 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 				args[1] = new Double(links.get(id).getLength());
 				args[2] = new Double(links.get(id).getNumberOfLanes());
 				args[3] = new Integer(i * Integer.parseInt(this.binSizeComponent.getText()));
-				args[4] = links.get(id).getAllowedModes();
+				String modeString="";
+				for(String mode:links.get(id).getAllowedModes()){
+					modeString += mode + " ";
+				}
+				args[4] = modeString;
 				int argsIndex = 5;
 				for (MultiModalFlowAndDensityCollector.FlowType flowType : MultiModalFlowAndDensityCollector.FlowType
 						.values()) {
