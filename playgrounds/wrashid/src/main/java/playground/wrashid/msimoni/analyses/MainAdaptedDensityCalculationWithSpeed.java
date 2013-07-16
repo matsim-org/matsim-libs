@@ -17,23 +17,36 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class MainAdaptedDensityCalculationWithSpeed {
 
 		public static void main(String[] args) {
-			String networkFile = "\\\\kosrae.ethz.ch\\ivt-home\\simonimi/thesis/output_no_pricing_v5_subtours_bugfix/output_network.xml.gz";
-			String eventsFile =  "\\\\kosrae.ethz.ch\\ivt-home\\simonimi/thesis/output_no_pricing_v5_subtours_bugfix/ITERS/it.10/10.events.xml.gz";
+			String networkFile = "C:/Users/simonimi/workspace_new/matsim/output/equil_JDEQSim/output_network.xml.gz";
+			String eventsFile =  "C:/Users/simonimi/workspace_new/matsim/output/equil_JDEQSim/ITERS/it.10/10.events.xml.gz";
+			
+			
+			//String networkFile = "C:/Users/simonimi/workspace_new/matsim/output2/berlin/output_network.xml.gz";
+			//String eventsFile =  "C:/Users/simonimi/workspace_new/matsim/output2/berlin/ITERS/it.0/0.events.xml.gz";
+		
+			
+			//String networkFile = "H:/thesis/output_no_pricing_v5_subtours_bugfix/output_network.xml.gz";
+			//String eventsFile =  "H:/thesis/output_no_pricing_v5_subtours_congested_withHole/ITERS/it.0/0.events.xml.gz";
+
+			//String networkFile = "\\\\kosrae.ethz.ch\\ivt-home\\simonimi/thesis/output_no_pricing_v5_subtours_bugfix/output_network.xml.gz";
+			//String eventsFile =  "\\\\kosrae.ethz.ch\\ivt-home\\simonimi/thesis/output_no_pricing_v5_subtours_bugfix/ITERS/it.10/10.events.xml.gz";
+
 			
 			//String networkFile = "H:/data/experiments/TRBAug2011/runs/run4/output/herbie.output_network.xml.gz";
 			//String eventsFile =	"H:/data/experiments/TRBAug2011/runs/run4/output/ITERS/it.0/herbie.0.events.xml.gz";	
 			
 			
 			Coord center = null; // center=null means use all links
-			int binSizeInSeconds = 60;	// 5 minute bins
+			int binSizeInSeconds = 30;	// 5 minute bins
 
-			double radiusInMeters = 1500;
+			double radiusInMeters = 10000;
 			double length = 50.0;
 
 			Config config = ConfigUtils.createConfig();
 			config.network().setInputFile(networkFile);
 			Scenario scenario = ScenarioUtils.loadScenario(config);
-			center = scenario.createCoord(682548.0, 247525.5);
+			//center = scenario.createCoord(682548.0, 247525.5);
+			center = scenario.createCoord(0, 0);
 			
 			Map<Id, Link> links = LinkSelector.selectLinks(scenario.getNetwork(), center, radiusInMeters, length);
 			
@@ -55,7 +68,7 @@ public class MainAdaptedDensityCalculationWithSpeed {
 
 			HashMap<Id, double[]> densities=calculateDensities(links,inflowHandler,outflowHandler,averageSpeedCalculator.getAverageSpeeds(),binSizeInSeconds);
 			
-			printDensity(densities,links);
+			printDensityAndOutFlow(densities,links, outflowHandler, averageSpeedCalculator);
 		}
 		
 		private static HashMap<Id, double[]> calculateDensities(
@@ -77,18 +90,18 @@ public class MainAdaptedDensityCalculationWithSpeed {
 				int[] outFlowAccumulated = inflowHandler.getAccumulatedFlow(link.getId());
 				int[] inFlowAccumulated = outflowHandler.getAccumulatedFlow(link.getId());
 				
-				if(outFlowAccumulated[0]-inFlowAccumulated[0]==0){
+				//if(outFlowAccumulated[0]-inFlowAccumulated[0]==0){
 					bins[0]=linkOutFlow.get(link.getId())[0]*(3600/binSizeInSeconds)/(averageSpeeds.get(link.getId())[0]*3.6);
-				} else {
-					bins[0]=linkInFlow.get(link.getId())[0]-linkOutFlow.get(link.getId())[0]/(link.getLength()*link.getNumberOfLanes()/1000);
-				}
+				//} else {
+				//	bins[0]=linkInFlow.get(link.getId())[0]-linkOutFlow.get(link.getId())[0]/(link.getLength()*link.getNumberOfLanes()/1000);
+				//}
 				
 				for (int i=1;i<getNumberOfBins(binSizeInSeconds);i++){
-					if(outFlowAccumulated[i]-inFlowAccumulated[i]==0){
+					//if(outFlowAccumulated[i]-inFlowAccumulated[i]==0){
 						bins[i]=linkOutFlow.get(link.getId())[i]*(3600/binSizeInSeconds)/(averageSpeeds.get(link.getId())[i]*3.6);
-					} else {
-						bins[i]=linkInFlow.get(link.getId())[i]-linkOutFlow.get(link.getId())[i]/(link.getLength()*link.getNumberOfLanes()/1000)+bins[i-1];
-					}
+					//} else {
+					//	bins[i]=linkInFlow.get(link.getId())[i]-linkOutFlow.get(link.getId())[i]/(link.getLength()*link.getNumberOfLanes()/1000)+bins[i-1];
+					//}
 				}
 				
 				density.put(link.getId(), bins);
@@ -97,37 +110,76 @@ public class MainAdaptedDensityCalculationWithSpeed {
 			return density;
 		}
 
-		public static HashMap<Id, double[]> calculateDensities(HashMap<Id, int[]> deltaFlow, Map<Id, ? extends Link> links) {
-
-			HashMap<Id, double[]> density = new HashMap<Id, double[]>();
-
-			for (Id linkId : deltaFlow.keySet()) {
-				density.put(linkId, null);
-			}
-
-			for (Id linkId : density.keySet()) {
-
-				int[] deltaflowBins = deltaFlow.get(linkId);
-				double[] densityBins = new double[deltaflowBins.length];
-				Link link = links.get(linkId);
-				
-				for (int i = 0; i < densityBins.length; i++) {
-					densityBins[i] = deltaflowBins[i] / (link.getLength() * link.getNumberOfLanes() / 1000);
-				}
-
-				density.put(linkId, densityBins);
-				deltaFlow.remove(linkId);
-			}
-
-			return density;
-		}
+		
 		
 		private static int getNumberOfBins(int binSizeInSeconds) {
 			return (86400 / binSizeInSeconds) + 1;
 		}
 		
-		public static void printDensity(HashMap<Id, double[]> density,
-				Map<Id, ? extends Link> links) { // print
+		public static void printDensityAndOutFlow(HashMap<Id, double[]> density,
+				Map<Id, ? extends Link> links, OutFlowInfoCollectorWithPt outflowHandler, AverageSpeedCalculator averageSpeedCalculator) { // print
+			
+			for (Id linkId : density.keySet()) {
+				double[] bins = averageSpeedCalculator.getAverageSpeeds().get(linkId);
+
+				Link link = links.get(linkId);
+
+				boolean hasTraffic = false;
+				for (int i = 0; i < bins.length; i++) {
+					if (bins[i] != 0.0) {
+						hasTraffic = true;
+						break;
+					}
+				}
+
+				if (hasTraffic) {
+					Coord coord = link.getCoord();
+					System.out.print(linkId.toString() + " : \t");
+					System.out.print(coord.getX() + "\t");
+					System.out.print(coord.getY() + "\t");
+					System.out.print(link.getLength() + "\t");
+					System.out.print(link.getNumberOfLanes() + "\t");
+					
+					for (int i = 0; i < bins.length; i++) {
+						System.out.print(bins[i] + "\t");
+					}
+
+					System.out.println();
+				}
+			}
+			System.out.println("outflow: ==============================================");
+			
+			for (Id linkId : density.keySet()) {
+				int[] bins = outflowHandler.getFlow(linkId);
+
+				Link link = links.get(linkId);
+
+				boolean hasTraffic = false;
+				for (int i = 0; i < bins.length; i++) {
+					if (bins[i] != 0.0) {
+						hasTraffic = true;
+						break;
+					}
+				}
+
+				if (hasTraffic) {
+					Coord coord = link.getCoord();
+					System.out.print(linkId.toString() + " : \t");
+					System.out.print(coord.getX() + "\t");
+					System.out.print(coord.getY() + "\t");
+					System.out.print(link.getLength() + "\t");
+					System.out.print(link.getNumberOfLanes() + "\t");
+					
+					for (int i = 0; i < bins.length; i++) {
+						System.out.print(bins[i] + "\t");
+					}
+
+					System.out.println();
+				}
+			}
+			
+			System.out.println("density: ==============================================");
+			
 			for (Id linkId : density.keySet()) {
 				double[] bins = density.get(linkId);
 
