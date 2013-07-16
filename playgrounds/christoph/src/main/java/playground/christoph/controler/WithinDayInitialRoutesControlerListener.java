@@ -116,30 +116,15 @@ public class WithinDayInitialRoutesControlerListener implements StartupListener,
 		 */
 		ExperimentalBasicWithindayAgent.copySelectedPlan = false;
 
+		/*
+		 * Create a WithinDayControlerListener but do NOT register it as ControlerListener.
+		 * It implements the StartupListener interface as this class also does. The
+		 * StartupEvent is passed over to it when this class handles the event. 
+		 */
 		this.withinDayControlerListener = new WithinDayControlerListener();
 		
 		// workaround
 		this.withinDayControlerListener.setLeastCostPathCalculatorFactory(new DijkstraFactory());
-		
-//		/*
-//		 * The withinDayControlerListener is also a StartupListener. Its notifyStartup(...)
-//		 * method has to be called first. Since The registered ControlerListeners are
-//		 * called in reverse order, we add the withinDayControlerListener last.
-//		 */
-//		controler.addControlerListener(this);
-//		controler.addControlerListener(this.withinDayControlerListener);
-//		controler.getMobsimListeners().add(this.withinDayControlerListener);
-		
-//		this.withinDayControlerListener.setModesAnalyzedByTravelTimeCollector(modes);
-//		Set<String> analyzedModes = new HashSet<String>();
-//		analyzedModes.add(TransportMode.car);
-//		this.setModesAnalyzedByTravelTimeCollector(analyzedModes);
-//		
-//		/*
-//		 * Add some analysis modules.
-//		 */
-//		controler.addControlerListener(new TripsAnalyzer());
-//		controler.addControlerListener(new ActivitiesAnalyzer());
 	}
 
 
