@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.jfree.chart.axis.NumberAxis;
 import org.matsim.api.core.v01.population.Activity;
@@ -38,11 +39,14 @@ import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -55,28 +59,51 @@ import org.matsim.core.utils.io.UncheckedIOException;
  * @author cdobler
  */
 public class ActivitiesAnalyzer implements ActivityStartEventHandler, ActivityEndEventHandler, 
-		BeforeMobsimListener, IterationEndsListener {
+		StartupListener, BeforeMobsimListener, IterationEndsListener {
 
+	public static String defaultActivitiesFileName = "activityCounts";
+	
+	private final boolean autoConfig;
+	
 	private double endTime = 30*3600;
 	
-	private final String activitiesFileName;
-	private final boolean createGraphs;
-	private final Map<String, LinkedList<ActivityData>> activityCountData;
-	private final LinkedList<ActivityData> overallCount;
+	private String activitiesFileName = defaultActivitiesFileName;
+	private boolean createGraphs;
+	private final Map<String, LinkedList<ActivityData>> activityCountData = new TreeMap<String, LinkedList<ActivityData>>();
+	private final LinkedList<ActivityData> overallCount = new LinkedList<ActivityData>();
+	
+	/**
+	 * This is how most people will probably will use this class.
+	 * It has to be created an registered as ControlerListener.
+	 * Then, it auto-configures itself (register as events handler,
+	 * get paths to output files, ...).
+	 */
+	public ActivitiesAnalyzer() {
+		
+		this.autoConfig = true;
+		
+		this.createGraphs = true;
+		
+		reset(0);
+	}
 	
 	public ActivitiesAnalyzer(String activitiesFileName, Set<String> activityTypes, boolean createGraphs) {
+		
+		this.autoConfig = false;
 		
 		this.activitiesFileName = activitiesFileName;
 		this.createGraphs = createGraphs;
 		
-		this.activityCountData = new TreeMap<String, LinkedList<ActivityData>>();
-		this.overallCount = new LinkedList<ActivityData>();
-		
-		// use all activity types defined in the config
+		// use all activity defined in the set
 		for (String activityType : activityTypes) {
 			this.activityCountData.put(activityType, new LinkedList<ActivityData>());
 		}
+		
 		reset(0);
+	}
+	
+	public void setCreateGraphs(boolean createGraphs) {
+		this.createGraphs = createGraphs;
 	}
 	
 	public void setEndTime(double endTime) {
@@ -129,6 +156,23 @@ public class ActivitiesAnalyzer implements ActivityStartEventHandler, ActivityEn
 		}
 		this.overallCount.clear();
 		this.overallCount.add(new ActivityData(0.0, 0));
+	}
+	
+
+	@Override
+	public void notifyStartup(StartupEvent event) {
+		
+		Controler controler = event.getControler();	
+		
+		if (autoConfig) {
+			// use all activity types defined in the config
+			Set<String> activityTypes = new TreeSet<String>(event.getControler().getConfig().planCalcScore().getActivityTypes());
+			for (String activityType : activityTypes) {
+				this.activityCountData.put(activityType, new LinkedList<ActivityData>());
+			}
+			
+			controler.getEvents().addHandler(this);
+		}
 	}
 	
 	@Override
@@ -251,4 +295,5 @@ public class ActivitiesAnalyzer implements ActivityStartEventHandler, ActivityEn
 			this.activityCount = activityCount;
 		}
 	}
+
 }

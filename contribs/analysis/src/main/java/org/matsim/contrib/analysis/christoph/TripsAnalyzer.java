@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
@@ -58,52 +59,61 @@ import org.matsim.core.utils.io.UncheckedIOException;
 public class TripsAnalyzer implements AgentDepartureEventHandler, AgentArrivalEventHandler,
 		StartupListener, IterationEndsListener, ShutdownListener {
 
-	private final BufferedWriter tripsWriter;
-	private final BufferedWriter durationWriter;
+	public static String defaultTripsFileName = "tripCounts";
+	public static String defaultDurationsFileName = "tripDurations";
+
+	private final boolean autoConfig;
 	
-	private final Set<String> sortedModes;
+	private final Set<String> sortedModes = new TreeSet<String>();
 	private final Map<Id, Double> departureTimes = new HashMap<Id, Double>();
 	private final Map<String, List<Double>> legTravelTimes = new HashMap<String, List<Double>>();
 	
-	private final String tripsFileName;
-	private final String durationsFileName;
-	private final boolean createGraphs;
+	private String tripsFileName;
+	private String durationsFileName;
+	private boolean createGraphs;
+	
+	private BufferedWriter tripsWriter;
+	private BufferedWriter durationWriter;
 	
 	private double[][] tripsHistory;
 	private double[][] durationHistory;
 	private int minIteration;
 	
+	/**
+	 * This is how most people will probably will use this class.
+	 * It has to be created an registered as ControlerListener.
+	 * Then, it auto-configures itself (register as events handler,
+	 * get paths to output files, ...).
+	 */
+	public TripsAnalyzer() {
+		
+		this.autoConfig = true;
+
+		this.createGraphs = true;
+		
+		// modes which are analyzed by default
+		this.sortedModes.add(TransportMode.bike);
+		this.sortedModes.add(TransportMode.car);
+		this.sortedModes.add(TransportMode.pt);
+		this.sortedModes.add(TransportMode.ride);
+		this.sortedModes.add(TransportMode.walk);
+	}
+	
 	public TripsAnalyzer(String tripsFileName, String durationsFileName, Set<String> modes, boolean createGraphs) {
 
+		this.autoConfig = false;
+		
 		this.tripsFileName = tripsFileName;
 		this.durationsFileName = durationsFileName;
 		this.createGraphs = createGraphs;
-		
-		this.tripsWriter = IOUtils.getBufferedWriter(tripsFileName + ".txt");
-		this.durationWriter = IOUtils.getBufferedWriter(durationsFileName + ".txt");
-		
-		sortedModes = new TreeSet<String>(modes);
-		try {
-			this.tripsWriter.write("ITERATION");
-			this.durationWriter.write("ITERATION");
-			for (String mode : sortedModes) {
-				this.tripsWriter.write("\t");
-				this.tripsWriter.write(mode.toUpperCase());
-				this.durationWriter.write("\t");
-				this.durationWriter.write(mode.toUpperCase());
-				
-				this.legTravelTimes.put(mode, new LinkedList<Double>());
-			}
-			this.tripsWriter.write("\t");
-			this.tripsWriter.write("OVERALL");
-			this.tripsWriter.write("\n");
-			this.durationWriter.write("\t");
-			this.durationWriter.write("OVERALL");
-			this.durationWriter.write("\n");
-			
-		} catch (IOException e) {
-			throw new UncheckedIOException(e);
-		}
+	}
+	
+	public void setCreateGraphs(boolean createGraphs) {
+		this.createGraphs = createGraphs;
+	}
+	
+	public Set<String> getModes() {
+		return this.sortedModes;
 	}
 	
 	@Override
@@ -132,12 +142,45 @@ public class TripsAnalyzer implements AgentDepartureEventHandler, AgentArrivalEv
 
 	@Override
 	public void notifyStartup(final StartupEvent event) {
-		Controler controler = event.getControler();
+
+		Controler controler = event.getControler();	
 		this.minIteration = controler.getFirstIteration();
 		int maxIter = controler.getLastIteration();
 		int iterations = maxIter - this.minIteration;
 		this.tripsHistory = new double[this.sortedModes.size() + 1][iterations + 1];
-		this.durationHistory = new double[this.sortedModes.size() + 1][iterations + 1];
+		this.durationHistory = new double[this.sortedModes.size() + 1][iterations + 1];	
+		
+		if (autoConfig) {
+			this.tripsFileName = event.getControler().getControlerIO().getOutputFilename(defaultTripsFileName);
+			this.durationsFileName = event.getControler().getControlerIO().getOutputFilename(defaultDurationsFileName);
+			
+			controler.getEvents().addHandler(this);
+		}
+
+		this.tripsWriter = IOUtils.getBufferedWriter(tripsFileName + ".txt");
+		this.durationWriter = IOUtils.getBufferedWriter(durationsFileName + ".txt");
+
+		try {
+			this.tripsWriter.write("ITERATION");
+			this.durationWriter.write("ITERATION");
+			for (String mode : sortedModes) {
+				this.tripsWriter.write("\t");
+				this.tripsWriter.write(mode.toUpperCase());
+				this.durationWriter.write("\t");
+				this.durationWriter.write(mode.toUpperCase());
+				
+				this.legTravelTimes.put(mode, new LinkedList<Double>());
+			}
+			this.tripsWriter.write("\t");
+			this.tripsWriter.write("OVERALL");
+			this.tripsWriter.write("\n");
+			this.durationWriter.write("\t");
+			this.durationWriter.write("OVERALL");
+			this.durationWriter.write("\n");
+			
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
 	}
 	
 	@Override
