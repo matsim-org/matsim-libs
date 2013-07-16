@@ -1,9 +1,6 @@
 package org.matsim.contrib.matsim4urbansim.utils.io;
 
 import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.accessibility.AccessibilityControlerListenerImpl;
@@ -58,7 +55,7 @@ public class BackupMATSimOutput {
 		int currentYear = uspModule.getYear();
 		
 		String saveDirectory = "run" + currentYear;
-		String savePath = Paths.checkPathEnding( InternalConstants.MATSIM_4_OPUS_BACKUP + saveDirectory );
+		String savePath = Paths.checkPathEnding( uspModule.getMATSim4OpusBackup() + saveDirectory );
 		// copy all files from matsim4opus/tmp to matsim4opus/backup
 		// FileCopy.copyTree(InternalConstants.MATSIM_4_OPUS_TEMP, savePath);
 		File saveDir = new File(savePath);
@@ -69,48 +66,48 @@ public class BackupMATSimOutput {
 		// backup files from matsim output
 		try {
 			// backup plans files
-			FileCopy.fileCopy( new File(InternalConstants.MATSIM_4_OPUS_OUTPUT + InternalConstants.GENERATED_PLANS_FILE_NAME) , new File(savePath + InternalConstants.GENERATED_PLANS_FILE_NAME) );
+			FileCopy.fileCopy( new File(uspModule.getMATSim4OpusOutput() + InternalConstants.GENERATED_PLANS_FILE_NAME) , new File(savePath + InternalConstants.GENERATED_PLANS_FILE_NAME) );
 			// backup matsim config file
-			FileCopy.fileCopy( new File(InternalConstants.MATSIM_4_OPUS_OUTPUT + OUTPUT_CONFIG_FILE_NAME) , new File(savePath + OUTPUT_CONFIG_FILE_NAME) );
+			FileCopy.fileCopy( new File(uspModule.getMATSim4OpusOutput() + OUTPUT_CONFIG_FILE_NAME) , new File(savePath + OUTPUT_CONFIG_FILE_NAME) );
 			// backup score stats
-			FileCopy.fileCopy( new File(InternalConstants.MATSIM_4_OPUS_OUTPUT + OUTPUT_SCORESTATS_TXT) , new File(savePath + OUTPUT_SCORESTATS_TXT) );
-			FileCopy.fileCopy( new File(InternalConstants.MATSIM_4_OPUS_OUTPUT + OUTPUT_SCORESTATS_PNG) , new File(savePath + OUTPUT_SCORESTATS_PNG) );
-			FileCopy.fileCopy( new File(InternalConstants.MATSIM_4_OPUS_OUTPUT + OUTPUT_TRAVELDISTANCESTATS_TXT) , new File(savePath + OUTPUT_TRAVELDISTANCESTATS_TXT) );
-			FileCopy.fileCopy( new File(InternalConstants.MATSIM_4_OPUS_OUTPUT + OUTPUT_TRAVELDISTANCESTATS_PNG) , new File(savePath + OUTPUT_TRAVELDISTANCESTATS_PNG) );
-			FileCopy.fileCopy( new File(InternalConstants.MATSIM_4_OPUS_OUTPUT + OUTPUT_STOPWATCH) , new File(savePath + OUTPUT_STOPWATCH) );
+			FileCopy.fileCopy( new File(uspModule.getMATSim4OpusOutput() + OUTPUT_SCORESTATS_TXT) , new File(savePath + OUTPUT_SCORESTATS_TXT) );
+			FileCopy.fileCopy( new File(uspModule.getMATSim4OpusOutput() + OUTPUT_SCORESTATS_PNG) , new File(savePath + OUTPUT_SCORESTATS_PNG) );
+			FileCopy.fileCopy( new File(uspModule.getMATSim4OpusOutput() + OUTPUT_TRAVELDISTANCESTATS_TXT) , new File(savePath + OUTPUT_TRAVELDISTANCESTATS_TXT) );
+			FileCopy.fileCopy( new File(uspModule.getMATSim4OpusOutput() + OUTPUT_TRAVELDISTANCESTATS_PNG) , new File(savePath + OUTPUT_TRAVELDISTANCESTATS_PNG) );
+			FileCopy.fileCopy( new File(uspModule.getMATSim4OpusOutput() + OUTPUT_STOPWATCH) , new File(savePath + OUTPUT_STOPWATCH) );
 			// backup last iteration
 			int iteration = ((ControlerConfigGroup) scenario.getConfig().getModule(ControlerConfigGroup.GROUP_NAME)).getLastIteration();
-			FileCopy.copyTree(InternalConstants.MATSIM_4_OPUS_OUTPUT + "ITERS/it."+iteration, savePath + "ITERS/it."+iteration);
+			FileCopy.copyTree(uspModule.getMATSim4OpusOutput() + "ITERS/it."+iteration, savePath + "ITERS/it."+iteration);
 
 			// backup zone csv file (feedback for UrbanSim)
-			if(new File(InternalConstants.MATSIM_4_OPUS_TEMP + UrbanSimZoneCSVWriterV2.FILE_NAME).exists())
-				FileCopy.fileCopy(new File(InternalConstants.MATSIM_4_OPUS_TEMP + UrbanSimZoneCSVWriterV2.FILE_NAME), new File(savePath + UrbanSimZoneCSVWriterV2.FILE_NAME) );
+			if(new File(uspModule.getMATSim4OpusTemp() + UrbanSimZoneCSVWriterV2.FILE_NAME).exists())
+				FileCopy.fileCopy(new File(uspModule.getMATSim4OpusTemp()  + UrbanSimZoneCSVWriterV2.FILE_NAME), new File(savePath + UrbanSimZoneCSVWriterV2.FILE_NAME) );
 			// backup parcel csv file (feedback for UrbanSim)
-			if(new File(InternalConstants.MATSIM_4_OPUS_TEMP + UrbanSimParcelCSVWriter.FILE_NAME).exists())
-				FileCopy.fileCopy(new File(InternalConstants.MATSIM_4_OPUS_TEMP + UrbanSimParcelCSVWriter.FILE_NAME), new File(savePath + UrbanSimParcelCSVWriter.FILE_NAME) );
+			if(new File(uspModule.getMATSim4OpusTemp() + UrbanSimParcelCSVWriter.FILE_NAME).exists())
+				FileCopy.fileCopy(new File(uspModule.getMATSim4OpusTemp()  + UrbanSimParcelCSVWriter.FILE_NAME), new File(savePath + UrbanSimParcelCSVWriter.FILE_NAME) );
 			// backup person csv file (feedback for UrbanSim)
-			if(new File(InternalConstants.MATSIM_4_OPUS_TEMP + UrbanSimPersonCSVWriter.FILE_NAME).exists())
-				FileCopy.fileCopy(new File(InternalConstants.MATSIM_4_OPUS_TEMP + UrbanSimPersonCSVWriter.FILE_NAME), new File(savePath + UrbanSimPersonCSVWriter.FILE_NAME) );
+			if(new File(uspModule.getMATSim4OpusTemp()  + UrbanSimPersonCSVWriter.FILE_NAME).exists())
+				FileCopy.fileCopy(new File(uspModule.getMATSim4OpusTemp()  + UrbanSimPersonCSVWriter.FILE_NAME), new File(savePath + UrbanSimPersonCSVWriter.FILE_NAME) );
 			// backup travel_data csv file (feedback for UrbanSim)
-			if(new File(InternalConstants.MATSIM_4_OPUS_TEMP + Zone2ZoneImpedancesControlerListener.FILE_NAME).exists())
-				FileCopy.fileCopy(new File(InternalConstants.MATSIM_4_OPUS_TEMP + Zone2ZoneImpedancesControlerListener.FILE_NAME), new File(savePath + Zone2ZoneImpedancesControlerListener.FILE_NAME) );
+			if(new File(uspModule.getMATSim4OpusTemp()  + Zone2ZoneImpedancesControlerListener.FILE_NAME).exists())
+				FileCopy.fileCopy(new File(uspModule.getMATSim4OpusTemp() + Zone2ZoneImpedancesControlerListener.FILE_NAME), new File(savePath + Zone2ZoneImpedancesControlerListener.FILE_NAME) );
 			
 			// backup plotting files free speed
 			String fileName = AccessibilityControlerListenerImpl.FREESEED_FILENAME + (double)acm.getCellSizeCellBasedAccessibility() + InternalConstants.FILE_TYPE_TXT;
-			if( new File(InternalConstants.MATSIM_4_OPUS_TEMP + fileName).exists() )
-				FileCopy.fileCopy(new File(InternalConstants.MATSIM_4_OPUS_TEMP + fileName), new File(savePath + fileName) );
+			if( new File(uspModule.getMATSim4OpusTemp()  + fileName).exists() )
+				FileCopy.fileCopy(new File(uspModule.getMATSim4OpusTemp()  + fileName), new File(savePath + fileName) );
 			// backup plotting files for car
 			fileName = AccessibilityControlerListenerImpl.CAR_FILENAME + (double)acm.getCellSizeCellBasedAccessibility() + InternalConstants.FILE_TYPE_TXT;
-			if( new File(InternalConstants.MATSIM_4_OPUS_TEMP + fileName).exists() )
-				FileCopy.fileCopy(new File(InternalConstants.MATSIM_4_OPUS_TEMP + fileName), new File(savePath + fileName) );
+			if( new File(uspModule.getMATSim4OpusTemp()  + fileName).exists() )
+				FileCopy.fileCopy(new File(uspModule.getMATSim4OpusTemp()  + fileName), new File(savePath + fileName) );
 			// backup plotting files for bike
 			fileName = AccessibilityControlerListenerImpl.BIKE_FILENAME + (double)acm.getCellSizeCellBasedAccessibility() + InternalConstants.FILE_TYPE_TXT;
-			if( new File(InternalConstants.MATSIM_4_OPUS_TEMP + fileName).exists() )
-				FileCopy.fileCopy(new File(InternalConstants.MATSIM_4_OPUS_TEMP + fileName), new File(savePath + fileName) );
+			if( new File(uspModule.getMATSim4OpusTemp()  + fileName).exists() )
+				FileCopy.fileCopy(new File(uspModule.getMATSim4OpusTemp()  + fileName), new File(savePath + fileName) );
 			// backup plotting files for walk
 			fileName = AccessibilityControlerListenerImpl.WALK_FILENAME + (double)acm.getCellSizeCellBasedAccessibility() + InternalConstants.FILE_TYPE_TXT;
-			if( new File(InternalConstants.MATSIM_4_OPUS_TEMP + fileName).exists() )
-				FileCopy.fileCopy(new File(InternalConstants.MATSIM_4_OPUS_TEMP + fileName), new File(savePath + fileName) );
+			if( new File(uspModule.getMATSim4OpusTemp()  + fileName).exists() )
+				FileCopy.fileCopy(new File(uspModule.getMATSim4OpusTemp()  + fileName), new File(savePath + fileName) );
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -124,10 +121,11 @@ public class BackupMATSimOutput {
 	public static void prepareHotStart(ScenarioImpl scenario){
 		
 		M4UControlerConfigModuleV3 module = ConfigurationUtils.getMATSim4UrbaSimControlerConfigModule(scenario);
+		UrbanSimParameterConfigModuleV3 uspModule = M4UConfigUtils.getUrbanSimParameterConfigAndPossiblyConvert(scenario.getConfig()) ;
 		
 		if(!module.getHotStartPlansFileLocation().equals("")){
 			
-			String plansFile = InternalConstants.MATSIM_4_OPUS_OUTPUT + InternalConstants.GENERATED_PLANS_FILE_NAME;
+			String plansFile = uspModule.getMATSim4OpusOutput() + InternalConstants.GENERATED_PLANS_FILE_NAME;
 			try{
 				log.info("Preparing hot start for next MATSim run ...");
 				FileCopy.fileCopy(new File(plansFile), new File(module.getHotStartPlansFileLocation()));
@@ -140,30 +138,32 @@ public class BackupMATSimOutput {
 		}
 	}
 	
-	/**
-	 * This is experimental
-	 * Removes UrbanSim output files for MATSim, since they are 
-	 * saved by performing saveRunOutputs() in a previous step.
-	 */
-	private static void cleanUrbanSimOutput(ScenarioImpl scenario){
-		
-		log.info("Cleaning MATSim4Opus temp directory (" + InternalConstants.MATSIM_4_OPUS_TEMP + ") from UrbanSim output." );
-		
-		ArrayList<File> fileNames = FileCopy.listAllFiles(new File(InternalConstants.MATSIM_4_OPUS_TEMP), Boolean.FALSE);
-		Iterator<File> fileNameIterator = fileNames.iterator();
-		while(fileNameIterator.hasNext()){
-			File f = fileNameIterator.next();
-			try {
-				if(f.getCanonicalPath().endsWith(".tab") || f.getCanonicalPath().endsWith(".meta")){
-					log.info("Removing " + f.getCanonicalPath());
-					f.delete();
-				}
-			} catch (IOException e) {
-				e.printStackTrace();
-				log.info("While removing UrbanSim output an IO error occured. This is not critical.");
-			}
-		}
-		log.info("Cleaning MATSim4Opus temp directory done!");
-	}
+//	/**
+//	 * This is experimental
+//	 * Removes UrbanSim output files for MATSim, since they are 
+//	 * saved by performing saveRunOutputs() in a previous step.
+//	 */
+//	private static void cleanUrbanSimOutput(ScenarioImpl scenario){
+//		
+//		UrbanSimParameterConfigModuleV3 uspModule = M4UConfigUtils.getUrbanSimParameterConfigAndPossiblyConvert(scenario.getConfig()) ;
+//		log.info("Cleaning MATSim4Opus temp directory (" + uspModule.getMATSim4OpusTemp() + ") from UrbanSim output." );
+//		
+//		
+//		ArrayList<File> fileNames = FileCopy.listAllFiles(new File(uspModule.getMATSim4OpusTemp()), Boolean.FALSE);
+//		Iterator<File> fileNameIterator = fileNames.iterator();
+//		while(fileNameIterator.hasNext()){
+//			File f = fileNameIterator.next();
+//			try {
+//				if(f.getCanonicalPath().endsWith(".tab") || f.getCanonicalPath().endsWith(".meta")){
+//					log.info("Removing " + f.getCanonicalPath());
+//					f.delete();
+//				}
+//			} catch (IOException e) {
+//				e.printStackTrace();
+//				log.info("While removing UrbanSim output an IO error occured. This is not critical.");
+//			}
+//		}
+//		log.info("Cleaning MATSim4Opus temp directory done!");
+//	}
 
 }

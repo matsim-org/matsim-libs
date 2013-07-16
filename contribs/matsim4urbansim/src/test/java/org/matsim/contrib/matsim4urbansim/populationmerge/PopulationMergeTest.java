@@ -33,6 +33,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.matsim4urbansim.config.M4UConfigUtils;
+import org.matsim.contrib.matsim4urbansim.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
 import org.matsim.contrib.matsim4urbansim.utils.CreateTestNetwork;
 import org.matsim.contrib.matsim4urbansim.utils.TempDirectoryUtil;
@@ -42,11 +44,9 @@ import org.matsim.contrib.matsim4urbansim.utils.io.ReadFromUrbanSimModel.Populat
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
@@ -65,17 +65,19 @@ public class PopulationMergeTest extends MatsimTestCase{
 	private static final double radius = 100.;
 	
 	@Test
-	public void testPopulationMergeZoneColdStart(Config config){
+	public void testPopulationMergeZoneColdStart(){
+		Config config = M4UConfigUtils.createEmptyConfigWithSomeDefaults();
+		TempDirectoryUtil.setTmpDirectories(config);
 		
 		log.info("Testing merge process of new and old population for cold start (zones)");
-		
+				
 		ActivityFacilitiesImpl zones = createZones();
 		
 		// create dummy persons
 		Population oldPop = null;
 		PopulationCounter counter = runTestZone(oldPop, zones, config);
 		
-		TempDirectoryUtil.cleaningUpOPUSDirectories();
+		TempDirectoryUtil.cleaningUpOPUSDirectories(config);
 		
 		Assert.assertTrue( counter.numberOfUrbanSimPersons == 6);
 		Assert.assertTrue( counter.fromBackupCnt == 0);				// 0 since no old population is there for comparison
@@ -96,8 +98,9 @@ public class PopulationMergeTest extends MatsimTestCase{
 		
 		ActivityFacilitiesImpl zones = createZones();
 		
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		Config config = scenario.getConfig() ;
+		Scenario scenario = ScenarioUtils.createScenario(M4UConfigUtils.createEmptyConfigWithSomeDefaults());
+		Config config = scenario.getConfig();
+		TempDirectoryUtil.setTmpDirectories(config);
 		
 		// create dummy persons
 		Population oldPop = scenario.getPopulation();
@@ -150,7 +153,7 @@ public class PopulationMergeTest extends MatsimTestCase{
 		
 		PopulationCounter counter = runTestZone(oldPop, zones, config);
 		
-		TempDirectoryUtil.cleaningUpOPUSDirectories();
+		TempDirectoryUtil.cleaningUpOPUSDirectories(config);
 		
 		Assert.assertTrue( counter.numberOfUrbanSimPersons == 6);   // number of processed persons
 		Assert.assertTrue( counter.fromBackupCnt == 1);				// one person not found in new population (person 1)
@@ -182,10 +185,10 @@ public class PopulationMergeTest extends MatsimTestCase{
 		// create dummy network
 		Network network = CreateTestNetwork.createTestNetwork();
 		// dump new dummy population zone 
-		dumpDummyPopulationZone();
+		dumpDummyPopulationZone(config);
 		
 		// init 
-		ReadFromUrbanSimModel readFromUrbansim = new ReadFromUrbanSimModel(year, null, radius);
+		ReadFromUrbanSimModel readFromUrbansim = new ReadFromUrbanSimModel(year, null, radius, config);
 		// start Population merge
 		readFromUrbansim.readPersonsZone(oldPop, zones, network, samplingRate);
 		
@@ -194,9 +197,9 @@ public class PopulationMergeTest extends MatsimTestCase{
 		
 	}
 	
-	private void dumpDummyPopulationZone(){
-		
-		String fileLocation = InternalConstants.MATSIM_4_OPUS_TEMP + InternalConstants.URBANSIM_PERSON_DATASET_TABLE + year + InternalConstants.FILE_TYPE_TAB;
+	private void dumpDummyPopulationZone(Config c){
+		UrbanSimParameterConfigModuleV3 module = (UrbanSimParameterConfigModuleV3) c.getModule(UrbanSimParameterConfigModuleV3.GROUP_NAME);
+		String fileLocation = module.getMATSim4OpusTemp() + InternalConstants.URBANSIM_PERSON_DATASET_TABLE + year + InternalConstants.FILE_TYPE_TAB;
 		
 		BufferedWriter bw = IOUtils.getBufferedWriter(fileLocation);
 		

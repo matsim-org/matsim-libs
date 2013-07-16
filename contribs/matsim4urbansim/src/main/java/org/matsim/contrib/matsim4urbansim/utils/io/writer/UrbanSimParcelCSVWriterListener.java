@@ -8,6 +8,7 @@ import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterf
 import org.matsim.contrib.matsim4urbansim.interpolation.Interpolation;
 import org.matsim.contrib.matsim4urbansim.utils.io.misc.ProgressBar;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 
 public class UrbanSimParcelCSVWriterListener implements SpatialGridDataExchangeInterface {
@@ -15,13 +16,17 @@ public class UrbanSimParcelCSVWriterListener implements SpatialGridDataExchangeI
 	private static final Logger log = Logger.getLogger(UrbanSimParcelCSVWriterListener.class);
 	
 	private final ActivityFacilitiesImpl parcels;
+
+	private Config config;
 	
 	/**
 	 * constructor
 	 * @param parcels
+	 * @param config 
 	 */
-	public UrbanSimParcelCSVWriterListener(final ActivityFacilitiesImpl parcels){
+	public UrbanSimParcelCSVWriterListener(final ActivityFacilitiesImpl parcels, Config config){
 		this.parcels = parcels;
+		this.config = config;
 	}
 	
 	/**
@@ -34,7 +39,7 @@ public class UrbanSimParcelCSVWriterListener implements SpatialGridDataExchangeI
 			SpatialGrid bikeGrid, SpatialGrid walkGrid, SpatialGrid ptGrid) {
 
 		// from here accessibility feedback for each parcel
-		UrbanSimParcelCSVWriter.initUrbanSimZoneWriter();
+		UrbanSimParcelCSVWriter.initUrbanSimZoneWriter(config);
 		
 		Interpolation freeSpeedGridInterpolation = null;
 		Interpolation carGridInterpolation = null;
@@ -91,7 +96,7 @@ public class UrbanSimParcelCSVWriterListener implements SpatialGridDataExchangeI
 											  bikeAccessibility, walkAccessibility, ptAccessibility);
 			}
 			log.info("... done!");
-			UrbanSimParcelCSVWriter.close();
+			UrbanSimParcelCSVWriter.close(config);
 		}
 	}
 }

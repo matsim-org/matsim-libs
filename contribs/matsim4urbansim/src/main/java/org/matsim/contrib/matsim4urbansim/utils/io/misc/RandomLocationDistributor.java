@@ -215,52 +215,52 @@ public class RandomLocationDistributor {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		
-		String shapeFile = "/Users/thomas/Development/opus_home/data/brussels_zone/shapefiles/zone.shp";
-		String networkFile = "/Users/thomas/Development/opus_home/data/brussels_zone/data/matsim/network/belgium_incl_borderArea_clean_simple_epsg31300projection.xml.gz";
-		int year = 2001;
-		double radius = 300.; // meter
-		ReadFromUrbanSimModel readFromUrbanSim = new ReadFromUrbanSimModel(year, shapeFile, radius);
-		
-		RandomLocationDistributor rld;
-		
-		// use this as switch
-		boolean isShapefileApproach = false;
-		
-		try{
-			InternalConstants.MATSIM_4_OPUS_TEMP = "/Users/thomas/Development/opus_home/matsim4opus/tmp/";
-			BufferedWriter writer = IOUtils.getBufferedWriter(InternalConstants.MATSIM_4_OPUS_TEMP + "shootTest.csv");
-			writer.write("zone_id, x, y, counter");
-			writer.newLine();
-			
-			Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-			((NetworkConfigGroup)scenario.getConfig().getModule(NetworkConfigGroup.GROUP_NAME)).setInputFile(networkFile);
-			ScenarioUtils.loadScenario(scenario);
-			
-			if(isShapefileApproach)
-				rld = new RandomLocationDistributor(shapeFile, radius);
-			else
-				rld = new RandomLocationDistributor(null, radius);
-			
-			ActivityFacilitiesImpl zones   = new ActivityFacilitiesImpl("urbansim zones");
-			readFromUrbanSim.readFacilitiesZones(zones);
-			Iterator<ActivityFacility> zoneIterator = zones.getFacilities().values().iterator();
-			
-			while(zoneIterator.hasNext()){
-				ActivityFacility zone = zoneIterator.next();
-				Coord zoneCoordinate = zone.getCoord();
-
-				for(int i = 0; i < 10; i++){ // creates 10 test shoots per zone
-					Coord c = rld.getRandomLocation(zone.getId(), zoneCoordinate);
-					log.info(String.valueOf(zone.getId()) + "," + String.valueOf(c.getX()) + "," + String.valueOf(c.getY()) + "," + String.valueOf(i));
-					writer.write(String.valueOf(zone.getId()) + "," + String.valueOf(c.getX()) + "," + String.valueOf(c.getY()) + "," + String.valueOf(i));
-					writer.newLine();
-				}
-			}
-
-			writer.flush();
-			writer.close();
-			log.info("... done!");
-		} catch(IOException e){ e.printStackTrace(); }
+		// I think this is only a test?!, DR jul'13
+//		String shapeFile = "/Users/thomas/Development/opus_home/data/brussels_zone/shapefiles/zone.shp";
+//		String networkFile = "/Users/thomas/Development/opus_home/data/brussels_zone/data/matsim/network/belgium_incl_borderArea_clean_simple_epsg31300projection.xml.gz";
+//		int year = 2001;
+//		double radius = 300.; // meter
+//		ReadFromUrbanSimModel readFromUrbanSim = new ReadFromUrbanSimModel(year, shapeFile, radius);
+//		
+//		RandomLocationDistributor rld;
+//		
+//		// use this as switch
+//		boolean isShapefileApproach = false;
+//		
+//		try{
+//			InternalConstants.MATSIM_4_OPUS_TEMP = "/Users/thomas/Development/opus_home/matsim4opus/tmp/";
+//			BufferedWriter writer = IOUtils.getBufferedWriter(InternalConstants.MATSIM_4_OPUS_TEMP + "shootTest.csv");
+//			writer.write("zone_id, x, y, counter");
+//			writer.newLine();
+//			
+//			Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+//			((NetworkConfigGroup)scenario.getConfig().getModule(NetworkConfigGroup.GROUP_NAME)).setInputFile(networkFile);
+//			ScenarioUtils.loadScenario(scenario);
+//			
+//			if(isShapefileApproach)
+//				rld = new RandomLocationDistributor(shapeFile, radius);
+//			else
+//				rld = new RandomLocationDistributor(null, radius);
+//			
+//			ActivityFacilitiesImpl zones   = new ActivityFacilitiesImpl("urbansim zones");
+//			readFromUrbanSim.readFacilitiesZones(zones);
+//			Iterator<ActivityFacility> zoneIterator = zones.getFacilities().values().iterator();
+//			
+//			while(zoneIterator.hasNext()){
+//				ActivityFacility zone = zoneIterator.next();
+//				Coord zoneCoordinate = zone.getCoord();
+//
+//				for(int i = 0; i < 10; i++){ // creates 10 test shoots per zone
+//					Coord c = rld.getRandomLocation(zone.getId(), zoneCoordinate);
+//					log.info(String.valueOf(zone.getId()) + "," + String.valueOf(c.getX()) + "," + String.valueOf(c.getY()) + "," + String.valueOf(i));
+//					writer.write(String.valueOf(zone.getId()) + "," + String.valueOf(c.getX()) + "," + String.valueOf(c.getY()) + "," + String.valueOf(i));
+//					writer.newLine();
+//				}
+//			}
+//
+//			writer.flush();
+//			writer.close();
+//			log.info("... done!");
+//		} catch(IOException e){ e.printStackTrace(); }
 	}
 }

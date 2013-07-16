@@ -14,6 +14,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
+import org.matsim.contrib.matsim4urbansim.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
 import org.matsim.contrib.matsim4urbansim.utils.helperobjects.Benchmark;
 import org.matsim.contrib.matsim4urbansim.utils.io.writer.UrbanSimPersonCSVWriter;
@@ -38,14 +39,16 @@ public class AgentPerformanceControlerListener implements ShutdownListener{
 	
 	private Benchmark benchmark;
 	private PtMatrix ptMatrix = null;
+	UrbanSimParameterConfigModuleV3 module;
 	
-	public AgentPerformanceControlerListener(Benchmark benchmark, PtMatrix ptMatrix){
+	public AgentPerformanceControlerListener(Benchmark benchmark, PtMatrix ptMatrix, UrbanSimParameterConfigModuleV3 module){
 		this.benchmark = benchmark;
 		this.ptMatrix = ptMatrix;
 		// writing agent performances continuously into "persons.csv"-file. Naming of this 
 		// files is given by the UrbanSim convention importing a csv file into a identically named 
 		// data set table. THIS PRODUCES INPUT FOR URBANSIM 
-		UrbanSimPersonCSVWriter.initUrbanSimPersonWriter();
+		UrbanSimPersonCSVWriter.initUrbanSimPersonWriter(module);
+		this.module =  module;
 	}
 	
 	/**
@@ -159,7 +162,7 @@ public class AgentPerformanceControlerListener implements ShutdownListener{
 			//		+ "],Work2HomeDistance[" + distance_work_home_meter + "]");
 		}
 		// close writer
-		UrbanSimPersonCSVWriter.close();
+		UrbanSimPersonCSVWriter.close(module);
 		
 		log.info("Used transport modes ...");
 		log.info("Car " + carModeCounter);

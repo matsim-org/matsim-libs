@@ -37,6 +37,7 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.accessibility.utils.LeastCostPathTreeExtended;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matsim4urbansim.config.ConfigurationUtils;
+import org.matsim.contrib.matsim4urbansim.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
 import org.matsim.contrib.matsim4urbansim.gis.ZoneUtil;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.costcalculators.TravelDistanceCalculator;
@@ -52,7 +53,6 @@ import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.matrices.Entry;
@@ -155,7 +155,9 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 		
 		try {
 			// creating zone-to-zone impedance matrix with header
-			BufferedWriter travelDataWriter = initZone2ZoneImpedaceWriter(InternalConstants.MATSIM_4_OPUS_TEMP + FILE_NAME); 
+			UrbanSimParameterConfigModuleV3 module = (UrbanSimParameterConfigModuleV3) event.getControler().
+					getConfig().getModule(UrbanSimParameterConfigModuleV3.GROUP_NAME);
+			BufferedWriter travelDataWriter = initZone2ZoneImpedaceWriter(module.getMATSim4OpusTemp() + FILE_NAME); 
 			
 			computeZoneToZoneTrips(sc, originDestinationMatrix, depatureTime);
 
@@ -264,8 +266,8 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 			travelDataWriter.close();
 			
 			// copy the zones file to the outputfolder...
-			log.info("Copying " + InternalConstants.MATSIM_4_OPUS_TEMP + FILE_NAME + " to " + InternalConstants.MATSIM_4_OPUS_OUTPUT + FILE_NAME);
-			IOUtils.copyFile(new File( InternalConstants.MATSIM_4_OPUS_TEMP + FILE_NAME),	new File( InternalConstants.MATSIM_4_OPUS_OUTPUT + FILE_NAME));
+			log.info("Copying " + module.getMATSim4OpusTemp() + FILE_NAME + " to " + module.getMATSim4OpusOutput() + FILE_NAME);
+			IOUtils.copyFile(new File( module.getMATSim4OpusTemp() + FILE_NAME),	new File( module.getMATSim4OpusOutput() + FILE_NAME));
 			
 			log.info("... done with writing travel_data.csv" );
 			

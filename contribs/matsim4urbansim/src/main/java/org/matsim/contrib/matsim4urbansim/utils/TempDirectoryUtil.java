@@ -28,7 +28,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
+import org.matsim.contrib.matsim4urbansim.config.M4UConfigUtils;
+import org.matsim.contrib.matsim4urbansim.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4urbansim.utils.io.Paths;
 import org.matsim.core.config.Config;
 
@@ -149,6 +150,18 @@ public class TempDirectoryUtil {
 		return (path.delete());
 	}
 	
+	public static void setTmpDirectories(Config c){
+		UrbanSimParameterConfigModuleV3 module = (UrbanSimParameterConfigModuleV3) c.getModule(UrbanSimParameterConfigModuleV3.GROUP_NAME);
+		String tmp = Paths.checkPathEnding(System.getProperty("java.io.tmpdir"));
+		module.setOpusHome(tmp);
+		module.setOpusDataPath(tmp + "data/");
+		module.setMATSim4Opus(tmp + "opus_matsim/");
+		module.setMATSim4OpusConfig(tmp + "opus_matsim/matsim_config/");
+		module.setMATSim4OpusOutput(tmp + "opus_matsim/output/");
+		module.setMATSim4OpusTemp(tmp + "opus_matsim/tmp/");
+		module.setMATSim4OpusBackup(tmp + "opus_matsim/backup/");
+	}
+	
 	/**
 	 * create new temp directories. these will be deleted after each test run.
 	 * @param config TODO
@@ -156,22 +169,23 @@ public class TempDirectoryUtil {
 	public static void createOPUSDirectories(Config config){
 		log.info("Creating temp directories");
 		
+		UrbanSimParameterConfigModuleV3 module = M4UConfigUtils.getUrbanSimParameterConfigAndPossiblyConvert(config);
 		// set temp directory as opus_home
-		InternalConstants.setOpusHomeDirectory(System.getProperty("java.io.tmpdir"));
+//		InternalConstants.setOpusHomeDirectory(System.getProperty("java.io.tmpdir"));
 
-		File tempFile = new File(InternalConstants.getOPUS_HOME());
+		File tempFile = new File(module.getOpusHome());
 		tempFile.mkdirs();
 		
-		tempFile = new File(InternalConstants.MATSIM_4_OPUS);
+		tempFile = new File(module.getMATSim4Opus());
 		tempFile.mkdirs();
 		
-		tempFile = new File(InternalConstants.MATSIM_4_OPUS_OUTPUT);
+		tempFile = new File(module.getMATSim4OpusOutput());
 		tempFile.mkdirs();
 		
-		tempFile = new File(InternalConstants.MATSIM_4_OPUS_TEMP);
+		tempFile = new File(module.getMATSim4OpusTemp());
 		tempFile.mkdirs();
 		
-		tempFile = new File(InternalConstants.MATSIM_4_OPUS_CONFIG);
+		tempFile = new File(module.getMATSim4OpusConfig());
 		tempFile.mkdirs();
 		log.info("Finished creating temp directories");
 	}
@@ -179,25 +193,27 @@ public class TempDirectoryUtil {
 	/**
 	 * Removes the output directory for the UrbanSim data
 	 * if doesn't existed before the test run. 
+	 * @param config TODO
 	 */
-	public static void cleaningUpOPUSDirectories(){
+	public static void cleaningUpOPUSDirectories(Config config){
 		log.info("Removing temp directories");
-		File tempFile = new File(InternalConstants.getOPUS_HOME());
+		UrbanSimParameterConfigModuleV3 module = M4UConfigUtils.getUrbanSimParameterConfigAndPossiblyConvert(config);
+		File tempFile;// = new File(InternalConstants.getOPUS_HOME());
 //		used only for tests. At least on my System this call leads to a null-pointer-exception
 //		because there are some other directories in the temp-directory. Especially some hidden ones.
 //		\\ DR, jul'13
 //		if(tempFile.exists())
 //			deleteDirectory(tempFile);
-		tempFile = new File(InternalConstants.MATSIM_4_OPUS);
+		tempFile = new File(module.getMATSim4Opus());
 		if(tempFile.exists())
 			deleteDirectory(tempFile);
-		tempFile = new File(InternalConstants.MATSIM_4_OPUS_OUTPUT);
+		tempFile = new File(module.getMATSim4OpusOutput());
 		if(tempFile.exists())
 			deleteDirectory(tempFile);
-		tempFile = new File(InternalConstants.MATSIM_4_OPUS_TEMP);
+		tempFile = new File(module.getMATSim4OpusTemp());
 		if(tempFile.exists())
 			deleteDirectory(tempFile);
-		tempFile = new File(InternalConstants.MATSIM_4_OPUS_CONFIG);
+		tempFile = new File(module.getMATSim4OpusConfig());
 		if(tempFile.exists())
 			deleteDirectory(tempFile);	
 		log.info("Finished removing temp directories");

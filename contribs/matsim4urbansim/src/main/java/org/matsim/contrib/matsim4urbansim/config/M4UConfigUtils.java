@@ -189,13 +189,13 @@ public class M4UConfigUtils {
 		
 		module.setPopulationSampleRate(matsim4urbansimConfigPart2.getPopulationSamplingRate());
 		module.setYear(matsim4urbansimConfigPart2.getYear().intValue());
-		module.setOpusHome(matsim4urbansimConfigPart2.getOpusHome());
-		module.setOpusDataPath(matsim4urbansimConfigPart2.getOpusDataPath());
-		module.setMATSim4Opus(matsim4urbansimConfigPart2.getMatsim4Opus());
-		module.setMATSim4OpusConfig(matsim4urbansimConfigPart2.getMatsim4OpusConfig());
-		module.setMATSim4OpusOutput(matsim4urbansimConfigPart2.getMatsim4OpusOutput());
-		module.setMATSim4OpusTemp(matsim4urbansimConfigPart2.getMatsim4OpusTemp());
-		module.setMATSim4OpusBackup(matsim4urbansimConfigPart2.getMatsim4Opus() + "/backup");
+		module.setOpusHome(Paths.checkPathEnding(matsim4urbansimConfigPart2.getOpusHome()));
+		module.setOpusDataPath(Paths.checkPathEnding(matsim4urbansimConfigPart2.getOpusDataPath()));
+		module.setMATSim4Opus(Paths.checkPathEnding(matsim4urbansimConfigPart2.getMatsim4Opus()));
+		module.setMATSim4OpusConfig(Paths.checkPathEnding(matsim4urbansimConfigPart2.getMatsim4OpusConfig()));
+		module.setMATSim4OpusOutput(Paths.checkPathEnding(matsim4urbansimConfigPart2.getMatsim4OpusOutput()));
+		module.setMATSim4OpusTemp(Paths.checkPathEnding(matsim4urbansimConfigPart2.getMatsim4OpusTemp()));
+		module.setMATSim4OpusBackup(Paths.checkPathEnding(matsim4urbansimConfigPart2.getMatsim4Opus() + "/backup"));
 		module.setCustomParameter(matsim4urbansimConfigPart2.getCustomParameter());
 		module.setUsingZone2ZoneImpedance(matsim4urbansimConfigPart2.isZone2ZoneImpedance());
 		module.setUsingAgentPerformance(matsim4urbansimConfigPart2.isAgentPerfomance());
@@ -204,13 +204,13 @@ public class M4UConfigUtils {
 		module.setBackup(matsim4urbansimConfigPart2.isBackupRunData());
 		
 		// setting paths into constants structure
-		InternalConstants.setOPUS_HOME( Paths.checkPathEnding(module.getOpusHome()) );
-		InternalConstants.OPUS_DATA_PATH = Paths.checkPathEnding(module.getOpusDataPath());
-		InternalConstants.MATSIM_4_OPUS = Paths.checkPathEnding(module.getMATSim4Opus());
-		InternalConstants.MATSIM_4_OPUS_CONFIG = Paths.checkPathEnding(module.getMATSim4OpusConfig());
-		InternalConstants.MATSIM_4_OPUS_OUTPUT = Paths.checkPathEnding(module.getMATSim4OpusOutput());
-		InternalConstants.MATSIM_4_OPUS_TEMP = Paths.checkPathEnding(module.getMATSim4OpusTemp());
-		InternalConstants.MATSIM_4_OPUS_BACKUP = Paths.checkPathEnding(module.getMATSim4OpusBackup());
+//		InternalConstants.setOPUS_HOME( Paths.checkPathEnding(module.getOpusHome()) );
+//		InternalConstants.OPUS_DATA_PATH = Paths.checkPathEnding(module.getOpusDataPath());
+//		InternalConstants.MATSIM_4_OPUS = Paths.checkPathEnding(module.getMATSim4Opus());
+//		InternalConstants.MATSIM_4_OPUS_CONFIG = Paths.checkPathEnding(module.getMATSim4OpusConfig());
+//		InternalConstants.MATSIM_4_OPUS_OUTPUT = Paths.checkPathEnding(module.getMATSim4OpusOutput());
+//		InternalConstants.MATSIM_4_OPUS_TEMP = Paths.checkPathEnding(module.getMATSim4OpusTemp());
+//		InternalConstants.MATSIM_4_OPUS_BACKUP = Paths.checkPathEnding(module.getMATSim4OpusBackup());
 	}
 	
 	/**
@@ -410,7 +410,7 @@ public class M4UConfigUtils {
 	/**
 	 * creates an empty MATSim config to be filled by MATSim4UrbanSim + external MATSim config settings
 	 */
-	static Config createEmptyConfigWithSomeDefaults() {
+	public static Config createEmptyConfigWithSomeDefaults() {
 		log.info("Creating an empty MATSim scenario.");
 		Config config = ConfigUtils.createConfig();
 
@@ -481,13 +481,13 @@ public class M4UConfigUtils {
 		log.info("UrbanSimParameter settings:");
 		log.info("PopulationSamplingRate: " + module.getPopulationSampleRate() );
 		log.info("Year: " + module.getYear() ); 
-		log.info("OPUS_HOME: " + InternalConstants.getOPUS_HOME() );
-		log.info("OPUS_DATA_PATH: " + InternalConstants.OPUS_DATA_PATH );
-		log.info("MATSIM_4_OPUS: " + InternalConstants.MATSIM_4_OPUS );
-		log.info("MATSIM_4_OPUS_CONIG: " + InternalConstants.MATSIM_4_OPUS_CONFIG );
-		log.info("MATSIM_4_OPUS_OUTPUT: " + InternalConstants.MATSIM_4_OPUS_OUTPUT );
-		log.info("MATSIM_4_OPUS_TEMP: " + InternalConstants.MATSIM_4_OPUS_TEMP ); 
-		log.info("MATSIM_4_OPUS_BACKUP: " + InternalConstants.MATSIM_4_OPUS_BACKUP );
+		log.info("OPUS_HOME: " + module.getOpusHome() );
+		log.info("OPUS_DATA_PATH: " + module.getOpusDataPath() );
+		log.info("MATSIM_4_OPUS: " + module.getMATSim4Opus() );
+		log.info("MATSIM_4_OPUS_CONIG: " + module.getMATSim4OpusConfig() );
+		log.info("MATSIM_4_OPUS_OUTPUT: " + module.getMATSim4OpusOutput() );
+		log.info("MATSIM_4_OPUS_TEMP: " + module.getMATSim4OpusTemp() ); 
+		log.info("MATSIM_4_OPUS_BACKUP: " + module.getMATSim4OpusBackup());
 		log.info("Compute Agent-performance: " + module.usingAgentPerformance() );
 		log.info("Compute Zone2Zone Impedance Matrix: " + module.usingZone2ZoneImpedance() ); 
 		log.info("Compute Zone-Based Accessibilities: " + module.usingZoneBasedAccessibility() );

@@ -7,6 +7,7 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.accessibility.utils.AggregateObject2NearestNode;
+import org.matsim.contrib.matsim4urbansim.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
 import org.matsim.contrib.matsim4urbansim.utils.helperobjects.SpatialReferenceObject;
 import org.matsim.core.utils.io.IOUtils;
@@ -21,15 +22,16 @@ public class AnalysisPopulationCSVWriter {
 	public static final String PERSONS_COUNT = "persons";
 	/**
 	 * writing raw population data to disc
-	 * @param file
 	 * @param personLocations
+	 * @param module2 TODO
+	 * @param file
 	 */
-	public static void writePopulationData2CSV(final Map<Id, SpatialReferenceObject> personLocations){
+	public static void writePopulationData2CSV(final Map<Id, SpatialReferenceObject> personLocations, UrbanSimParameterConfigModuleV3 module){
 		
 		try{
 			log.info("Initializing AnalysisPopulationCSVWriter ...");
-			BufferedWriter bwPopulation = IOUtils.getBufferedWriter( InternalConstants.MATSIM_4_OPUS_OUTPUT + FILE_NAME );
-			log.info("Writing (population) data into " + InternalConstants.MATSIM_4_OPUS_OUTPUT + FILE_NAME + " ...");
+			BufferedWriter bwPopulation = IOUtils.getBufferedWriter( module.getMATSim4OpusOutput() + FILE_NAME );
+			log.info("Writing (population) data into " + module.getMATSim4OpusOutput() + FILE_NAME + " ...");
 			
 			// create header
 			bwPopulation.write(InternalConstants.PERSON_ID +","+ 
@@ -63,13 +65,13 @@ public class AnalysisPopulationCSVWriter {
 	/**
 	 * writing aggregated population data to disc
 	 * @param personClusterMap
+	 * @param module2 TODO
 	 */
-	public static void writeAggregatedPopulationData2CSV(final Map<Id, AggregateObject2NearestNode> personClusterMap){
-		
+	public static void writeAggregatedPopulationData2CSV(final Map<Id, AggregateObject2NearestNode> personClusterMap, UrbanSimParameterConfigModuleV3 module){
 		try{
 			log.info("Initializing AnalysisPopulationCSVWriter ...");
-			BufferedWriter bwAggregatedPopulation = IOUtils.getBufferedWriter( InternalConstants.MATSIM_4_OPUS_OUTPUT + FILE_NAME_AGGREGATED );
-			log.info("Writing (population) data into " + InternalConstants.MATSIM_4_OPUS_OUTPUT + FILE_NAME_AGGREGATED + " ...");
+			BufferedWriter bwAggregatedPopulation = IOUtils.getBufferedWriter( module.getMATSim4OpusOutput() + FILE_NAME_AGGREGATED );
+			log.info("Writing (population) data into " + module.getMATSim4OpusOutput() + FILE_NAME_AGGREGATED + " ...");
 			
 			// create header
 			bwAggregatedPopulation.write(InternalConstants.PARCEL_ID +","+ 

@@ -44,10 +44,10 @@ import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.config.MatrixBasedPtRouterConfigGroup;
 import org.matsim.contrib.matrixbasedptrouter.config.MatrixBasedPtRouterConfigUtils;
 import org.matsim.contrib.matrixbasedptrouter.utils.MyBoundingBox;
+import org.matsim.contrib.matsim4urbansim.config.M4UConfigUtils;
 import org.matsim.contrib.matsim4urbansim.config.M4UConfigurationConverterV4;
 import org.matsim.contrib.matsim4urbansim.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4urbansim.config.modules.UrbanSimParameterConfigModuleV3;
-import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.AgentPerformanceControlerListener;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.Zone2ZoneImpedancesControlerListener;
 import org.matsim.contrib.matsim4urbansim.utils.helperobjects.Benchmark;
@@ -219,12 +219,14 @@ public class MATSim4UrbanSimParcel{
 		if(getMATSim4UrbanSimControlerConfig().usingShapefileLocationDistribution()){
 			readFromUrbansim = new ReadFromUrbanSimModel( getUrbanSimParameterConfig().getYear(),
 														  getMATSim4UrbanSimControlerConfig().getUrbansimZoneRandomLocationDistributionShapeFile(),
-														  getMATSim4UrbanSimControlerConfig().getUrbanSimZoneRadiusLocationDistribution());
+														  getMATSim4UrbanSimControlerConfig().getUrbanSimZoneRadiusLocationDistribution(), 
+														  this.scenario.getConfig());
 		}
 		else{
 			readFromUrbansim = new ReadFromUrbanSimModel( getUrbanSimParameterConfig().getYear(),
 														  null,
-														  getMATSim4UrbanSimControlerConfig().getUrbanSimZoneRadiusLocationDistribution());
+														  getMATSim4UrbanSimControlerConfig().getUrbanSimZoneRadiusLocationDistribution(), 
+														  this.scenario.getConfig());
 		}
 	}
 	
@@ -365,15 +367,18 @@ public class MATSim4UrbanSimParcel{
 		
 		if(computeAgentPerformance) {
 			// creates a persons.csv output for UrbanSim
-			controler.addControlerListener(new AgentPerformanceControlerListener(benchmark, ptMatrix));
+			UrbanSimParameterConfigModuleV3 module = M4UConfigUtils.getUrbanSimParameterConfigAndPossiblyConvert(controler.getConfig());
+			controler.addControlerListener(new AgentPerformanceControlerListener(benchmark, ptMatrix, module));
 		}
 		
 		if(computeZoneBasedAccessibilities){
 			// creates zone based table of log sums
+			UrbanSimParameterConfigModuleV3 module = (UrbanSimParameterConfigModuleV3) controler.
+					getConfig().getModule(UrbanSimParameterConfigModuleV3.GROUP_NAME);
 			ZoneBasedAccessibilityControlerListenerV3 zbacl = new ZoneBasedAccessibilityControlerListenerV3( zones,
 																											 opportunities,
 																											 ptMatrix,
-																											 InternalConstants.MATSIM_4_OPUS_TEMP,
+																											 module.getMATSim4OpusTemp(),
 																											 this.scenario);
 			zbacl.setComputingAccessibilityForFreeSpeedCar(true);
 			zbacl.setComputingAccessibilityForCongestedCar(true);
@@ -408,7 +413,7 @@ public class MATSim4UrbanSimParcel{
 			
 			if(isParcelMode){
 				// creating a writer listener that writes out accessibility results in UrbanSim format for parcels
-				UrbanSimParcelCSVWriterListener csvParcelWiterListener = new UrbanSimParcelCSVWriterListener(parcels);
+				UrbanSimParcelCSVWriterListener csvParcelWiterListener = new UrbanSimParcelCSVWriterListener(parcels,controler.getConfig());
 				// the writer listener is added to grid based accessibility controler listener and will be triggered when accessibility calculations are done.
 				// (adding such a listener is optional, here its done to be compatible with UrbanSim)
 				gbacl.addSpatialGridDataExchangeListener(csvParcelWiterListener);

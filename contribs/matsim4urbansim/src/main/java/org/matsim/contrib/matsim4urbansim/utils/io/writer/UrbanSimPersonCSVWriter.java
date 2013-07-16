@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.matsim4urbansim.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -17,12 +18,13 @@ public class UrbanSimPersonCSVWriter {
 	
 	/**
 	 * writes the header for persons csv file
+	 * @param config TODO
 	 */
-	public static void initUrbanSimPersonWriter(){
+	public static void initUrbanSimPersonWriter(UrbanSimParameterConfigModuleV3 module){
 		try{
 			log.info("Initializing UrbanSimZoneCSVWriter ...");
-			personWriter = IOUtils.getBufferedWriter( InternalConstants.MATSIM_4_OPUS_TEMP + FILE_NAME );
-			log.info("Writing data into " + InternalConstants.MATSIM_4_OPUS_TEMP + FILE_NAME + " ...");
+			personWriter = IOUtils.getBufferedWriter( module.getMATSim4OpusTemp() + FILE_NAME );
+			log.info("Writing data into " + module.getMATSim4OpusTemp() + FILE_NAME + " ...");
 			
 			// create header
 			personWriter.write( InternalConstants.PERSON_ID + "," +
@@ -66,8 +68,9 @@ public class UrbanSimPersonCSVWriter {
 
 	/**
 	 * finalize and close csv file
+	 * @param config TODO
 	 */
-	public static void close(){
+	public static void close(UrbanSimParameterConfigModuleV3 module){
 		try {
 			log.info("Closing UrbanSimPersonCSVWriter ...");
 			assert(UrbanSimPersonCSVWriter.personWriter != null);
@@ -75,8 +78,8 @@ public class UrbanSimPersonCSVWriter {
 			personWriter.close();
 			
 			// copy the zones file to the outputfolder...
-			log.info("Copying " + InternalConstants.MATSIM_4_OPUS_TEMP + FILE_NAME + " to " + InternalConstants.MATSIM_4_OPUS_OUTPUT + FILE_NAME);
-			IOUtils.copyFile(new File( InternalConstants.MATSIM_4_OPUS_TEMP + FILE_NAME),	new File( InternalConstants.MATSIM_4_OPUS_OUTPUT + FILE_NAME));
+			log.info("Copying " + module.getMATSim4OpusTemp() + FILE_NAME + " to " + module.getMATSim4OpusOutput() + FILE_NAME);
+			IOUtils.copyFile(new File( module.getMATSim4OpusTemp() + FILE_NAME),	new File( module.getMATSim4OpusOutput() + FILE_NAME));
 			
 			log.info("... done!");
 		} catch (IOException e) {

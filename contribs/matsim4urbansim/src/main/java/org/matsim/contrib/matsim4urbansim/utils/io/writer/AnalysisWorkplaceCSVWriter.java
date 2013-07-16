@@ -6,8 +6,10 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.contrib.accessibility.utils.AggregateObject2NearestNode;
+import org.matsim.contrib.matsim4urbansim.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
 import org.matsim.contrib.matsim4urbansim.utils.helperobjects.SpatialReferenceObject;
+import org.matsim.core.config.Config;
 import org.matsim.core.utils.io.IOUtils;
 
 
@@ -21,15 +23,16 @@ public class AnalysisWorkplaceCSVWriter {
 	public static final String WORKPLACES_COUNT = "workplaces";
 	/**
 	 * Writing aggregated workplace data to disc
-	 * @param file
 	 * @param jobClusterArray
+	 * @param config TODO
+	 * @param file
 	 */
-	public static void writeAggregatedWorkplaceData2CSV(final AggregateObject2NearestNode[] jobClusterArray){
-		
+	public static void writeAggregatedWorkplaceData2CSV(final AggregateObject2NearestNode[] jobClusterArray, Config config){
+		UrbanSimParameterConfigModuleV3 module = (UrbanSimParameterConfigModuleV3) config.getModule(UrbanSimParameterConfigModuleV3.GROUP_NAME);
 		try{
 			log.info("Initializing AnalysisWorkplaceCSVWriter ...");
-			BufferedWriter bwAggregatedWP = IOUtils.getBufferedWriter( InternalConstants.MATSIM_4_OPUS_OUTPUT + FILE_NAME_AGGREGATED );
-			log.info("Writing (aggregated workplace) data into " + InternalConstants.MATSIM_4_OPUS_OUTPUT + FILE_NAME_AGGREGATED + " ...");
+			BufferedWriter bwAggregatedWP = IOUtils.getBufferedWriter(module.getMATSim4OpusOutput() + FILE_NAME_AGGREGATED );
+			log.info("Writing (aggregated workplace) data into " + module.getMATSim4OpusOutput() + FILE_NAME_AGGREGATED + " ...");
 			
 			// create header
 			bwAggregatedWP.write(InternalConstants.ZONE_ID +","+ 
@@ -61,15 +64,16 @@ public class AnalysisWorkplaceCSVWriter {
 	
 	/**
 	 * writing raw workplace data to disc
-	 * @param file
 	 * @param jobSampleList
+	 * @param config TODO
+	 * @param file
 	 */
-	public static void writeWorkplaceData2CSV(final List<SpatialReferenceObject> jobSampleList){
-		
+	public static void writeWorkplaceData2CSV(final List<SpatialReferenceObject> jobSampleList, Config config){
+		UrbanSimParameterConfigModuleV3 module = (UrbanSimParameterConfigModuleV3) config.getModule(UrbanSimParameterConfigModuleV3.GROUP_NAME);
 		try{
 			log.info("Initializing AnalysisWorkplaceCSVWriter ...");
-			BufferedWriter bwWorkplaces = IOUtils.getBufferedWriter( InternalConstants.MATSIM_4_OPUS_OUTPUT + FILE_NAME );
-			log.info("Writing data into " + InternalConstants.MATSIM_4_OPUS_OUTPUT + FILE_NAME + " ...");
+			BufferedWriter bwWorkplaces = IOUtils.getBufferedWriter( module.getMATSim4OpusOutput() + FILE_NAME );
+			log.info("Writing data into " + module.getMATSim4OpusOutput() + FILE_NAME + " ...");
 			
 			
 			// create header

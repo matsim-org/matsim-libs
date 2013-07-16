@@ -8,12 +8,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -24,14 +22,16 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.accessibility.utils.AggregateObject2NearestNode;
+import org.matsim.contrib.matsim4urbansim.config.M4UConfigUtils;
+import org.matsim.contrib.matsim4urbansim.config.modules.UrbanSimParameterConfigModuleV3;
 import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
 import org.matsim.contrib.matsim4urbansim.utils.helperobjects.SpatialReferenceObject;
 import org.matsim.contrib.matsim4urbansim.utils.ids.ZoneId;
-import org.matsim.contrib.matsim4urbansim.utils.io.misc.ProgressBar;
 import org.matsim.contrib.matsim4urbansim.utils.io.misc.RandomLocationDistributor;
 import org.matsim.contrib.matsim4urbansim.utils.io.writer.AnalysisPopulationCSVWriter;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -66,24 +66,28 @@ public class ReadFromUrbanSimModel {
 	private PopulationCounter cnt;
 	private String shapefile = null;
 	private double radius 	 = 0.;
+	private UrbanSimParameterConfigModuleV3 module;
 	
 	/**
 	 * constructor
 	 * @param year of current run
+	 * @param config TODO
 	 */
-	public ReadFromUrbanSimModel ( final int year ) {
+	public ReadFromUrbanSimModel ( final int year, Config config ) {
 		this.year 	= year;
 		this.cnt 	= new PopulationCounter();
 		this.shapefile = null;
 		this.radius	= 0.;
+		this.module =  M4UConfigUtils.getUrbanSimParameterConfigAndPossiblyConvert(config);
 	}
 
 	public ReadFromUrbanSimModel(final int year, final String shapefile,
-			final double radius) {
+			final double radius, Config config ) {
 		this.year	= year;
 		this.cnt	= new PopulationCounter();
 		this.shapefile = shapefile;
 		this.radius	= radius;
+		this.module =  M4UConfigUtils.getUrbanSimParameterConfigAndPossiblyConvert(config);
 	}
 
 	/**
@@ -94,7 +98,7 @@ public class ReadFromUrbanSimModel {
 	 */
 	public void readFacilitiesZones(final ActivityFacilitiesImpl zones) {
 		// (these are simply defined as those entities that have x/y coordinates in UrbanSim)
-		String filename = InternalConstants.MATSIM_4_OPUS_TEMP + InternalConstants.URBANSIM_ZONE_DATASET_TABLE + this.year + InternalConstants.FILE_TYPE_TAB;
+		String filename = module.getMATSim4OpusTemp() + InternalConstants.URBANSIM_ZONE_DATASET_TABLE + this.year + InternalConstants.FILE_TYPE_TAB;
 		
 		log.info( "Starting to read urbansim zones table from " + filename );
 
@@ -152,7 +156,7 @@ public class ReadFromUrbanSimModel {
 	 */
 	public void readFacilitiesParcel(final ActivityFacilitiesImpl parcels, final ActivityFacilitiesImpl zones) {
 		// (these are simply defined as those entities that have x/y coordinates in UrbanSim)
-		String filename = InternalConstants.MATSIM_4_OPUS_TEMP + InternalConstants.URBANSIM_PARCEL_DATASET_TABLE + this.year + InternalConstants.FILE_TYPE_TAB;
+		String filename = module.getMATSim4OpusTemp() + InternalConstants.URBANSIM_PARCEL_DATASET_TABLE + this.year + InternalConstants.FILE_TYPE_TAB;
 		
 		log.info( "Starting to read urbansim parcels table from " + filename );
 
@@ -294,7 +298,7 @@ public class ReadFromUrbanSimModel {
 		boolean compensationFlag = false;
 		ZoneLocations currentZoneLocations = null;
 
-		String filename = InternalConstants.MATSIM_4_OPUS_TEMP + InternalConstants.URBANSIM_PERSON_DATASET_TABLE + this.year + InternalConstants.FILE_TYPE_TAB;
+		String filename = module.getMATSim4OpusTemp() + InternalConstants.URBANSIM_PERSON_DATASET_TABLE + this.year + InternalConstants.FILE_TYPE_TAB;
 		
 		log.info( "Starting to read persons table from " + filename );
 
@@ -413,7 +417,7 @@ public class ReadFromUrbanSimModel {
 		
 		boolean compensationFlag = false;
 
-		String filename = InternalConstants.MATSIM_4_OPUS_TEMP + InternalConstants.URBANSIM_PERSON_DATASET_TABLE + this.year + InternalConstants.FILE_TYPE_TAB;
+		String filename = module.getMATSim4OpusTemp() + InternalConstants.URBANSIM_PERSON_DATASET_TABLE + this.year + InternalConstants.FILE_TYPE_TAB;
 		
 		log.info( "Starting to read persons table from " + filename );
 
@@ -748,7 +752,7 @@ public class ReadFromUrbanSimModel {
 	 */
 	public void readJobs(ActivityFacilitiesImpl opportunities, final ActivityFacilitiesImpl parcelsOrZones, final boolean isParcel){
 		
-		String filename = InternalConstants.MATSIM_4_OPUS_TEMP + InternalConstants.URBANSIM_JOB_DATASET_TABLE + this.year + InternalConstants.FILE_TYPE_TAB;
+		String filename = module.getMATSim4OpusTemp() + InternalConstants.URBANSIM_JOB_DATASET_TABLE + this.year + InternalConstants.FILE_TYPE_TAB;
 		
 		Map<Id, ActivityFacility> facilityMap = parcelsOrZones.getFacilities();
 		
@@ -961,7 +965,7 @@ public class ReadFromUrbanSimModel {
 	 */
 	public void readAndDumpPersons2CSV(final ActivityFacilitiesImpl parcels, final Network network){
 		
-		String filename = InternalConstants.MATSIM_4_OPUS_TEMP + InternalConstants.URBANSIM_PERSON_DATASET_TABLE + this.year + InternalConstants.FILE_TYPE_TAB;
+		String filename = module.getMATSim4OpusTemp() + InternalConstants.URBANSIM_PERSON_DATASET_TABLE + this.year + InternalConstants.FILE_TYPE_TAB;
 		log.info( "Starting to read persons table from " + filename );
 		
 		Map<Id, SpatialReferenceObject> personLocations = new ConcurrentHashMap<Id, SpatialReferenceObject>();
@@ -1013,9 +1017,9 @@ public class ReadFromUrbanSimModel {
 				}
 			}
 			// dump population data
-			AnalysisPopulationCSVWriter.writePopulationData2CSV( personLocations );
+			AnalysisPopulationCSVWriter.writePopulationData2CSV( personLocations, module );
 			// dump aggregated population data
-			AnalysisPopulationCSVWriter.writeAggregatedPopulationData2CSV(personClusterMap);
+			AnalysisPopulationCSVWriter.writeAggregatedPopulationData2CSV(personClusterMap, module);
 			
 		} catch (Exception e) {e.printStackTrace();}
 	}
