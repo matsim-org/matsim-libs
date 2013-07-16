@@ -20,13 +20,8 @@
 
 package playground.christoph.dissertation;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.TreeSet;
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
@@ -36,11 +31,9 @@ import org.matsim.contrib.analysis.christoph.TripsAnalyzer;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.christoph.controler.WithinDayInitialRoutesController;
+import playground.christoph.controler.WithinDayInitialRoutesControlerListener;
 import playground.christoph.scoring.DesiresAndOpenTimesScoringFunctionFactory;
 
 public class InitialRoutesController {
@@ -102,14 +95,19 @@ public class InitialRoutesController {
 			}
 		}
 		
+		controler = new Controler(scenario);			
+		/*
+		 * Add some analysis modules to the controler.
+		 */
+		controler.addControlerListener(new TripsAnalyzer());
+		controler.addControlerListener(new ActivitiesAnalyzer());
+		
 		if (useWithinDayReplanning) {
-			controler = new WithinDayInitialRoutesController(scenario);
-
-			((WithinDayInitialRoutesController) controler).setInitialLegReroutingEnabled(initialLegRerouting);
-			((WithinDayInitialRoutesController) controler).setDuringLegReroutingEnabled(duringLegRerouting);
-			((WithinDayInitialRoutesController) controler).setDuringLegReroutingShare(duringLegReroutingShare);
-		} else {
-			controler = new Controler(scenario);			
+			WithinDayInitialRoutesControlerListener controlerListener = new WithinDayInitialRoutesControlerListener(controler);
+			controlerListener.setDuringLegReroutingEnabled(duringLegRerouting);
+			controlerListener.setDuringLegReroutingShare(duringLegReroutingShare);
+			controlerListener.setInitialLegReroutingEnabled(initialLegRerouting);
+			controler.addControlerListener(controlerListener);
 		}
 		
 		/*
@@ -119,41 +117,6 @@ public class InitialRoutesController {
 //			controler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(config.planCalcScore(), scenario));
 			controler.setScoringFunctionFactory(new DesiresAndOpenTimesScoringFunctionFactory(config.planCalcScore(), scenario));
 		}
-				
-		controler.addControlerListener(new StartupListener() {
-			
-			@Override
-			public void notifyStartup(StartupEvent event) {
-				/*
-				 * Create average travel time statistics.
-				 */
-				String tripsFileName = "tripCounts";
-				String durationsFileName = "tripDurations";
-				String outputTripsFileName = event.getControler().getControlerIO().getOutputFilename(tripsFileName);
-				String outputDurationsFileName = event.getControler().getControlerIO().getOutputFilename(durationsFileName);
-				Set<String> modes = new HashSet<String>();
-				modes.add(TransportMode.bike);
-				modes.add(TransportMode.car);
-				modes.add(TransportMode.pt);
-				modes.add(TransportMode.ride);
-				modes.add(TransportMode.walk);
-				
-				// create TripsAnalyzer and register it as ControlerListener and EventsHandler
-				TripsAnalyzer tripsAnalyzer = new TripsAnalyzer(outputTripsFileName, outputDurationsFileName, modes, true);
-				event.getControler().addControlerListener(tripsAnalyzer);
-				event.getControler().getEvents().addHandler(tripsAnalyzer);
-				
-				// TripsAnalyzer is a StartupEventListener, therefore pass event over to it.
-				tripsAnalyzer.notifyStartup(event);
-				
-				// create ActivitiesAnalyzer and register it as ControlerListener and EventsHandler
-				String activitiesFileName = "activityCounts";
-				Set<String> activityTypes = new TreeSet<String>(event.getControler().getConfig().planCalcScore().getActivityTypes());
-				ActivitiesAnalyzer activitiesAnalyzer = new ActivitiesAnalyzer(activitiesFileName, activityTypes, true);
-				event.getControler().addControlerListener(activitiesAnalyzer);
-				event.getControler().getEvents().addHandler(activitiesAnalyzer);
-			}
-		});
 		
 		controler.run();
 	}
