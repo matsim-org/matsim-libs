@@ -123,7 +123,7 @@ public class BackupMATSimOutput {
 		M4UControlerConfigModuleV3 module = ConfigurationUtils.getMATSim4UrbaSimControlerConfigModule(scenario);
 		UrbanSimParameterConfigModuleV3 uspModule = M4UConfigUtils.getUrbanSimParameterConfigAndPossiblyConvert(scenario.getConfig()) ;
 		
-		String hotStartFile = module.getHotStartPlansFileLocation();
+		String hotStartFile = module.getHotStartPlansFileLocation().trim();
 		if(exists(hotStartFile)){
 			
 			String plansFile = uspModule.getMATSim4OpusOutput() + InternalConstants.GENERATED_PLANS_FILE_NAME;
