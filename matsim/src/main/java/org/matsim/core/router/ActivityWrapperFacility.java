@@ -36,17 +36,17 @@ public class ActivityWrapperFacility implements Facility {
 	private final Activity wrapped;
 
 	public ActivityWrapperFacility( final Activity toWrap ) {
-		wrapped = toWrap;
+		this.wrapped = toWrap;
 	}
 
 	@Override
 	public Coord getCoord() {
-		return wrapped.getCoord();
+		return this.wrapped.getCoord();
 	}
 
 	@Override
 	public Id getId() {
-		throw new UnsupportedOperationException();
+		return this.wrapped.getFacilityId();
 	}
 
 	@Override
@@ -56,12 +56,12 @@ public class ActivityWrapperFacility implements Facility {
 
 	@Override
 	public Id getLinkId() {
-		return wrapped.getLinkId();
+		return this.wrapped.getLinkId();
 	}
 
 	@Override
 	public String toString() {
-		return "[ActivityWrapperFacility: wrapped="+wrapped+"]";
+		return "[ActivityWrapperFacility: wrapped="+this.wrapped+"]";
 	}
 }
 
