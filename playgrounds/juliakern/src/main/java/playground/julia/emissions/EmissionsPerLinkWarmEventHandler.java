@@ -46,7 +46,7 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 	EmissionUtils emissionUtils;
 
 	public EmissionsPerLinkWarmEventHandler(double simulationEndTime, int noOfTimeBins){
-		System.out.println("number of time bins" + noOfTimeBins);
+		System.out.println("number of time bins " + noOfTimeBins);
 		this.noOfTimeBins = noOfTimeBins;
 		this.timeBinSize = simulationEndTime / noOfTimeBins;
 		this.emissionUtils = new EmissionUtils();
@@ -65,15 +65,63 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 		Double time = event.getTime();
 		Id linkId = event.getLinkId();
 		Map<WarmPollutant, Double> warmEmissionsOfEvent = event.getWarmEmissions();
-		double endOfTimeInterval = time - (time % timeBinSize) + timeBinSize;
+		// do not cannot use modulo for doubles
+		int numberOfInterval = (int)Math.ceil(time/timeBinSize);
+		if(numberOfInterval==0) numberOfInterval=1; //only happens if time = 0.0
+		if(numberOfInterval>noOfTimeBins) numberOfInterval=noOfTimeBins; // this should not happen but might due to rounding errors when time = simulationEndTime
+		double endOfTimeInterval = numberOfInterval * timeBinSize;
 
 		Map<Id, Map<WarmPollutant, Double>> warmEmissionsTotal = new HashMap<Id, Map<WarmPollutant, Double>>();
 		Map<Id, Double> countTotal = new HashMap<Id, Double>();
 
-		if (endOfTimeInterval <= this.noOfTimeBins * this.timeBinSize) {
+		if (endOfTimeInterval < this.noOfTimeBins * this.timeBinSize+1) {
 			
-			warmEmissionsTotal = this.time2warmEmissionsTotal.get(endOfTimeInterval);
-			countTotal = this.time2linkIdLeaveCount.get(endOfTimeInterval);	
+			// make sure all fields are initilized / set values to zero
+			// TODO not needed.... check local maps instead?
+			if (this.time2warmEmissionsTotal.containsKey(endOfTimeInterval)==false){
+				Map<Id, Map<WarmPollutant, Double>> map = new HashMap<Id, Map<WarmPollutant,Double>>();
+				Map<WarmPollutant, Double> warmpollutant2zero = new HashMap<WarmPollutant, Double>();
+				for(WarmPollutant wp: WarmPollutant.values()){
+					warmpollutant2zero.put(wp, 0.0);
+				}
+				map.put(linkId, warmpollutant2zero);
+				this.time2warmEmissionsTotal.put(endOfTimeInterval, map);
+			}
+			if (this.time2linkIdLeaveCount.containsKey(endOfTimeInterval)==false){
+				Map<Id, Double> map = new HashMap<Id, Double>();
+				map.put(linkId, 0.0);
+				this.time2linkIdLeaveCount.put(endOfTimeInterval, map);
+			}
+			
+			// time2warmEmissionsTotal contains at least that entry
+			warmEmissionsTotal.putAll(this.time2warmEmissionsTotal.get(endOfTimeInterval));
+			// time2linkIdLeaveCount contains at least that entry
+			countTotal.putAll(this.time2linkIdLeaveCount.get(endOfTimeInterval));	
+			
+			if (this.time2warmEmissionsTotal.get(endOfTimeInterval) == null) {
+				Map<Id, Map<WarmPollutant, Double>> map = new HashMap<Id, Map<WarmPollutant, Double>>();
+				this.time2warmEmissionsTotal.put(endOfTimeInterval, map );
+			}
+			if (this.time2linkIdLeaveCount.get(endOfTimeInterval) == null) {
+				Map<Id, Double> map = new HashMap<Id, Double>();
+				this.time2linkIdLeaveCount.put(endOfTimeInterval, map);
+			}
+			
+			if(warmEmissionsOfEvent == null){
+				warmEmissionsOfEvent = new HashMap<WarmPollutant, Double>();
+				for(WarmPollutant wp : WarmPollutant.values()){
+					warmEmissionsOfEvent.put(wp, 0.0);
+				}
+			}
+			
+			if(warmEmissionsTotal.containsKey(linkId)==false){
+				Map<WarmPollutant, Double> map = new HashMap<WarmPollutant, Double>();
+				for(WarmPollutant wp : WarmPollutant.values()){
+					map.put(wp, 0.0);
+				}
+				warmEmissionsTotal.put(linkId, map);
+			}
+			
 			Map<WarmPollutant, Double> warmEmissionsSoFar = warmEmissionsTotal.get(linkId);
 			Map<WarmPollutant, Double> newWarmEmissionsSoFar = new HashMap<WarmPollutant, Double>();
 			
@@ -86,22 +134,11 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 				}
 			}
 						
-			if (this.time2warmEmissionsTotal.get(endOfTimeInterval) == null) {
-				Map<Id, Map<WarmPollutant, Double>> map = new HashMap<Id, Map<WarmPollutant, Double>>();
-				this.time2warmEmissionsTotal.put(endOfTimeInterval, map );
-			}
-			if (this.time2linkIdLeaveCount.get(endOfTimeInterval) == null) {
-				Map<Id, Double> map = new HashMap<Id, Double>();
-				this.time2linkIdLeaveCount.put(endOfTimeInterval, map);
-			}
-			if (warmEmissionsTotal.get(linkId) == null) {
-				Map<WarmPollutant, Double> map = new HashMap<WarmPollutant, Double>();
-				warmEmissionsTotal.put(linkId, map);
-			}
+
+
 			if (countTotal.get(linkId)==null){
 				countTotal.put(linkId, 0.0);
 			}
-
 
 			for(Entry<WarmPollutant, Double> entry : warmEmissionsOfEvent.entrySet()){
 					WarmPollutant pollutant = entry.getKey();
