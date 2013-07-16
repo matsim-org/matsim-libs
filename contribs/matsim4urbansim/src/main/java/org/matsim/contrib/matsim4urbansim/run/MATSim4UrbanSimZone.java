@@ -81,6 +81,8 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 	static final boolean BRUSSELS_SCENARIO_MODIFY_NETWORK = true ;
 	static final boolean BRUSSELS_SCENARIO_CALCULATE_ZONE2ZONE_MATRIX = false ;
 
+	private String cleFile;
+
 	/**
 	 * constructor
 	 * 
@@ -91,6 +93,11 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 		super(args);
 		// set flag to false (needed for ReadFromUrbanSimModel to choose the right method)
 		isParcelMode = false;
+	}
+	
+	MATSim4UrbanSimZone(String args[], String cleFile){
+		this(args);
+		this.cleFile = cleFile;
 	}
 	
 //	@Override
@@ -139,22 +146,24 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 	@Override
 	void addFurtherControlerListener(ActivityFacilities zones, ActivityFacilities parcels, Controler controler) {
 		controler.addControlerListener(new KaiAnalysisListener()) ;
-		// not very nice, but the correct folder is not specified anywhere and change with every new urbansim-run... // Daniel May'13
-//		String cleFile = this.getUrbanSimParameterConfig().getMATSim4OpusTemp().replaceFirst("/tmp/", "/") + "cle.csv";
-		String cleFile = this.getUrbanSimParameterConfig().getMATSim4Opus() + "cle.csv";
-		if(new File(cleFile).exists()){
-			log.info("loading " + DanielAnalysisListenerEvents.class.getSimpleName() + " with " + cleFile + "...");
-			List<Tuple<Integer, Integer>> timeslots = new ArrayList<Tuple<Integer,Integer>>();
-			timeslots.add(new Tuple<Integer, Integer>(0, 6));
-			timeslots.add(new Tuple<Integer, Integer>(6, 10));
-			timeslots.add(new Tuple<Integer, Integer>(10, 14));
-			timeslots.add(new Tuple<Integer, Integer>(14, 18));
-			timeslots.add(new Tuple<Integer, Integer>(18, 24));
-			timeslots.add(new Tuple<Integer, Integer>(0, 24));
-			controler.addControlerListener(new DanielAnalysisListenerEvents(cleFile, zones, timeslots));
-		}else{
-			log.error("can not find " + cleFile);
-//			throw new RuntimeException("can not find " + cleFile);
+		// do nothing when no file is specified, otherwise check if it exists
+		if(!(cleFile == null)){
+			if(new File(cleFile).exists()){
+				log.info("loading " + DanielAnalysisListenerEvents.class.getSimpleName() + " with " + cleFile + "...");
+				List<Tuple<Integer, Integer>> timeslots = new ArrayList<Tuple<Integer,Integer>>();
+				timeslots.add(new Tuple<Integer, Integer>(0, 6));
+				timeslots.add(new Tuple<Integer, Integer>(6, 10));
+				timeslots.add(new Tuple<Integer, Integer>(10, 14));
+				timeslots.add(new Tuple<Integer, Integer>(14, 18));
+				timeslots.add(new Tuple<Integer, Integer>(18, 24));
+				timeslots.add(new Tuple<Integer, Integer>(0, 24));
+				controler.addControlerListener(new DanielAnalysisListenerEvents(cleFile, zones, timeslots));
+			}else{
+//				log.error("can not find " + cleFile);
+				throw new RuntimeException("You specified a cleFile but it does not exist: " + cleFile + 
+						". This is very special and only used for the brussels case-study. Usually you should call" +
+						" Matsim4UrbanSimZone.main with only one argument...");
+			}
 		}
 	}
 
@@ -165,8 +174,20 @@ public class MATSim4UrbanSimZone extends MATSim4UrbanSimParcel{
 	public static void main(String args[]){
 		
 		long start = System.currentTimeMillis();
+		String[] arguments = null;
+		String cleFile = null;
+		if(args.length == 1){
+			arguments = args;
+		}else if(args.length == 2){
+			arguments = new String[1];
+			arguments[0] = args[0];
+			cleFile = args[1];
+		}else{
+			log.error("only one or two arguments are allowed.");
+			System.exit(-1);
+		}
 		
-		MATSim4UrbanSimZone m4u = new MATSim4UrbanSimZone(args);
+		MATSim4UrbanSimZone m4u = new MATSim4UrbanSimZone(arguments, cleFile);
 		m4u.run();
 		m4u.matsim4UrbanSimShutdown();
 		MATSim4UrbanSimZone.isSuccessfulMATSimRun = Boolean.TRUE;
