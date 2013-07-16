@@ -123,19 +123,39 @@ public class BackupMATSimOutput {
 		M4UControlerConfigModuleV3 module = ConfigurationUtils.getMATSim4UrbaSimControlerConfigModule(scenario);
 		UrbanSimParameterConfigModuleV3 uspModule = M4UConfigUtils.getUrbanSimParameterConfigAndPossiblyConvert(scenario.getConfig()) ;
 		
-		if(!module.getHotStartPlansFileLocation().equals("")){
+		String hotStartFile = module.getHotStartPlansFileLocation();
+		if(exists(hotStartFile)){
 			
 			String plansFile = uspModule.getMATSim4OpusOutput() + InternalConstants.GENERATED_PLANS_FILE_NAME;
 			try{
 				log.info("Preparing hot start for next MATSim run ...");
-				FileCopy.fileCopy(new File(plansFile), new File(module.getHotStartPlansFileLocation()));
+				FileCopy.fileCopy(new File(plansFile), new File(hotStartFile));
 			} catch (Exception e) {
 				log.error("Error while copying plans file, i. e. hot start will not work!");
 				e.printStackTrace();
 			}
 			
 			log.info("Hot start preparation successful!");
+		}else{
+			log.info("can not prepare hotStart. hotstart-file does not exist: " + hotStartFile);
 		}
+	}
+
+	/**
+	 * @param hotStartFile
+	 * @return
+	 */
+	private static boolean exists(String hotStartFile) {
+		if(hotStartFile.endsWith(".xml") || hotStartFile.endsWith(".xml.gz")){
+			File f = new File(hotStartFile);
+			String fileName = f.getName();
+			String dir = f.getAbsolutePath().replaceAll(fileName, "");
+			File directory = new File(dir);
+			if(directory.exists()){
+				return true;
+			}
+		}
+		return false;
 	}
 	
 //	/**
