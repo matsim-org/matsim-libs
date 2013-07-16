@@ -35,7 +35,25 @@ public class AverageSpeedCalculator implements LinkEnterEventHandler,
 			
 			for(int i=0;i<getNumberOfBins();i++){
 				if (sa[i]==null){
-					bins[i]=link.getFreespeed();
+					if (i==0){
+						if (sa[getNumberOfBins()-1]!=null){
+							bins[0]=sa[getNumberOfBins()-1].getAverageSpeed();
+						} else {
+							bins[0]=link.getFreespeed();
+						}
+					} else {
+						if (i<getNumberOfBins()-1){
+							if (sa[i+1]!=null){
+								bins[i]=bins[i-1];
+							} else {
+								bins[i]=link.getFreespeed();
+							}
+						} else {
+							bins[i]=bins[i-1];
+						}
+						
+					}
+					
 				} else {
 					bins[i]=sa[i].getAverageSpeed();
 				}
@@ -76,7 +94,7 @@ public class AverageSpeedCalculator implements LinkEnterEventHandler,
 				if (speedAccumulator.get(linkId)[binIndex]==null){
 					speedAccumulator.get(linkId)[binIndex]=new SpeedAccumulator();
 				}
-				speedAccumulator.get(linkId)[binIndex].addSpeedSample(GeneralLib.getIntervalDuration(linkEnterTime.get(linkId, personId), event.getTime()));
+				speedAccumulator.get(linkId)[binIndex].addSpeedSample(filteredLinks.get(linkId).getLength() /  GeneralLib.getIntervalDuration(linkEnterTime.get(linkId, personId), event.getTime()));
 				linkEnterTime.removeValue(linkId, personId);
 			}
 		}
