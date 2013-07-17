@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.Facility;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -45,15 +44,13 @@ import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.RoutingContext;
+import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -313,29 +310,5 @@ public class WithinDayInitialRoutesControlerListener implements StartupListener,
 		public PlanAlgorithm getPlanAlgorithm() {
 			return new PlanRouter(this.tripRouterFactory.instantiateAndConfigureTripRouter(routingContext));
 		}
-	}
-	
-	private static class RoutingContextImpl implements RoutingContext {
-
-		private final TravelDisutilityFactory travelDisutilityFactory;
-		private final TravelTime travelTime;
-		private final PlanCalcScoreConfigGroup cnScoringGroup;
-		
-		public RoutingContextImpl(TravelDisutilityFactory travelDisutilityFactory, TravelTime travelTime,
-				PlanCalcScoreConfigGroup cnScoringGroup) {
-			this.travelDisutilityFactory = travelDisutilityFactory;
-			this.travelTime = travelTime;
-			this.cnScoringGroup = cnScoringGroup;
-		}
-		
-		@Override
-		public TravelDisutility getTravelDisutility() {
-			return this.travelDisutilityFactory.createTravelDisutility(travelTime, cnScoringGroup);
-		}
-
-		@Override
-		public TravelTime getTravelTime() {
-			return this.travelTime;
-		}		
 	}
 }
