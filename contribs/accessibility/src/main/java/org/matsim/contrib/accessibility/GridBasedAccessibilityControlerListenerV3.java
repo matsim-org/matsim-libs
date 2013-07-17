@@ -1,12 +1,9 @@
 package org.matsim.contrib.accessibility;
 
-import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.accessibility.costcalculator.TravelDistanceCalculator;
@@ -121,7 +118,8 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author thomas
  * 
  */
-public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityControlerListenerImpl implements ShutdownListener{ // implements ShutdownListener
+public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityControlerListenerImpl 
+implements ShutdownListener{ 
 	
 	private static final Logger log = Logger.getLogger(GridBasedAccessibilityControlerListenerV3.class);
 	private AnalysisCellBasedAccessibilityCSVWriterV2 accessibilityWriter;
@@ -142,9 +140,6 @@ public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 													 PtMatrix ptMatrix,
 													 Config config, 
 													 Network network){
-		
-		// yyyy some other way to pass the different grids needs to be found; the danger of exchanging two of them seems too large.
-		// kai, jun'13
 		
 		log.info("Initializing  ...");
 
@@ -210,11 +205,9 @@ public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 									 lcptExtFreeSpeedCarTrvelTime,
 									 lcptExtCongestedCarTravelTime, 
 									 lcptTravelDistance, 
-									 ptMatrix,
 									 network,
 									 measuringPoints,
-									 PARCEL_BASED,
-									 controler);
+									 PARCEL_BASED);
 			System.out.println();
 
 			if (this.benchmark != null && benchmarkID > 0) {
@@ -268,7 +261,7 @@ public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 			double ptAccessibility) {
 		
 		// writing accessibility measures of current measurePoint in csv format
-		accessibilityWriter.write(measurePoint, fromNode, freeSpeedAccessibility,
+		accessibilityWriter.writeRecord(measurePoint, fromNode, freeSpeedAccessibility,
 														carAccessibility, bikeAccessibility, walkAccessibility, ptAccessibility);
 	}
 	

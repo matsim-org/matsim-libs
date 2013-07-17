@@ -19,16 +19,16 @@ import org.matsim.core.utils.io.IOUtils;
 public class UrbanSimZoneCSVWriterV2 {
 	
 	private static final Logger log 	= Logger.getLogger(UrbanSimZoneCSVWriterV2.class);
-	private static BufferedWriter zoneWriter = null;
+	private BufferedWriter zoneWriter = null;
 	public static final String FILE_NAME= "zones.csv";
-	private static String matsim4opusTempDirectory = null;
+	private  String matsim4opusTempDirectory ;
 	
 	/**
 	 * writes the header for zones csv file
 	 */
-	public static void initUrbanSimZoneWriter(String matsim4opusTempDirectory){
+	public UrbanSimZoneCSVWriterV2(String matsim4opusTempDirectory){
 		
-		UrbanSimZoneCSVWriterV2.matsim4opusTempDirectory = matsim4opusTempDirectory;
+		this.matsim4opusTempDirectory = matsim4opusTempDirectory;
 		
 		try{
 			log.info("Initializing UrbanSimZoneCSVWriterV2 ...");
@@ -60,7 +60,7 @@ public class UrbanSimZoneCSVWriterV2 {
 	 * @param bikeAccessibility
 	 * @param walkAccessibility
 	 */
-	public static synchronized void write( ActivityFacility startZone,
+	public  void write( ActivityFacility startZone,
 										 double freeSpeedAccessibility,
 										 double carAccessibility, 
 										 double bikeAccessibility,
@@ -68,7 +68,7 @@ public class UrbanSimZoneCSVWriterV2 {
 										 double ptAccessibility){
 		
 		try{
-			assert(UrbanSimZoneCSVWriterV2.zoneWriter != null);
+			assert(zoneWriter != null);
 			zoneWriter.write( startZone.getId().toString() + "," + 
 							  freeSpeedAccessibility + "," + 
 							  carAccessibility + "," + 
@@ -85,16 +85,16 @@ public class UrbanSimZoneCSVWriterV2 {
 	/**
 	 * finalize and close csv file
 	 */
-	public static void close(String matsimOutputDirectory){
+	public void close(String matsimOutputDirectory){
 		try {
 			log.info("Closing UrbanSimZoneCSVWriterV2 ...");
-			assert(UrbanSimZoneCSVWriterV2.zoneWriter != null);
+			assert(zoneWriter != null);
 			zoneWriter.flush();
 			zoneWriter.close();
 			
 			// copy the zones file to the outputfolder...
-			log.info("Copying " + UrbanSimZoneCSVWriterV2.matsim4opusTempDirectory + FILE_NAME + " to " + matsimOutputDirectory + FILE_NAME);
-			IOUtils.copyFile(new File( UrbanSimZoneCSVWriterV2.matsim4opusTempDirectory + FILE_NAME),	new File( matsimOutputDirectory + FILE_NAME));
+			log.info("Copying " + matsim4opusTempDirectory + FILE_NAME + " to " + matsimOutputDirectory + FILE_NAME);
+			IOUtils.copyFile(new File( matsim4opusTempDirectory + FILE_NAME),	new File( matsimOutputDirectory + FILE_NAME));
 			
 			log.info("... done!");
 		} catch (IOException e) {

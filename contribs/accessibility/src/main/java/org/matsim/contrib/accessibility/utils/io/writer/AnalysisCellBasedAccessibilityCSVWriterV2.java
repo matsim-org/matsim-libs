@@ -55,7 +55,7 @@ public class AnalysisCellBasedAccessibilityCSVWriterV2 {
 	 * @param bikeAccessibility
 	 * @param walkAccessibility
 	 */
-	public void write(ActivityFacility startZone, 
+	public void writeRecord(ActivityFacility startZone, 
 							 Node node, 
 							 double freeSpeedAccessibility,
 							 double carAccessibility, 
@@ -80,6 +80,15 @@ public class AnalysisCellBasedAccessibilityCSVWriterV2 {
 		}
 		catch(Exception e){
 			e.printStackTrace();
+		}
+	}
+	
+	public void writeNewLine() {
+		try {
+			accessibilityDataWriter.newLine() ;
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("i/o failure") ;
 		}
 	}
 	

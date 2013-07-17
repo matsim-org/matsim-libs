@@ -58,6 +58,7 @@ import org.matsim.utils.LeastCostPathTree;
 public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityControlerListenerImpl implements ShutdownListener{
 	
 	private static final Logger log = Logger.getLogger(ZoneBasedAccessibilityControlerListenerV3.class);
+	private UrbanSimZoneCSVWriterV2 urbanSimZoneCSVWriterV2;
 	
 
 	// ////////////////////////////////////////////////////////////////////
@@ -83,7 +84,7 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 		// writing accessibility measures continuously into "zone.csv"-file. Naming of this 
 		// files is given by the UrbanSim convention importing a csv file into a identically named 
 		// data set table. THIS PRODUCES URBANSIM INPUT
-		UrbanSimZoneCSVWriterV2.initUrbanSimZoneWriter(matsim4opusTempDirectory);
+		urbanSimZoneCSVWriterV2 = new UrbanSimZoneCSVWriterV2(matsim4opusTempDirectory);
 		initAccessibilityParameters(scenario.getConfig());
 		// aggregating facilities to their nearest node on the road network
 		this.aggregatedFacilities = aggregatedOpportunities(opportunities, scenario.getNetwork());
@@ -139,16 +140,14 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 					lcptExtFreeSpeedCarTrvelTime,
 					lcptExtCongestedCarTravelTime, 
 					lcptTravelDistance, 
-					ptMatrix, 
-					network,
+					network, 
 					measuringPoints,
-					ZONE_BASED,
-					controler);
+					ZONE_BASED);
 			
 			System.out.println();
 			// finalizing/closing csv file containing accessibility measures
 			String matsimOutputDirectory = event.getControler().getScenario().getConfig().controler().getOutputDirectory();
-			UrbanSimZoneCSVWriterV2.close(matsimOutputDirectory);
+			urbanSimZoneCSVWriterV2.close(matsimOutputDirectory);
 			
 			if (this.benchmark != null && benchmarkID > 0) {
 				this.benchmark.stoppMeasurement(benchmarkID);
@@ -188,7 +187,7 @@ public class ZoneBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 		
 		// writing accessibility measures of current measurePoint in csv format
 		// The UrbanSimZoneCSVWriterV2 writer produces URBANSIM INPUT
-		UrbanSimZoneCSVWriterV2.write(measurePoint,
+		urbanSimZoneCSVWriterV2.write(measurePoint,
 									  freeSpeedAccessibility,
 									  carAccessibility,
 									  bikeAccessibility,

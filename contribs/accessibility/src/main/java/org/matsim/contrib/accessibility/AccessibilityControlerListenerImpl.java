@@ -26,7 +26,6 @@ import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
@@ -59,12 +58,12 @@ import org.matsim.utils.LeastCostPathTree;
  * @author thomas
  *
  */
-public class AccessibilityControlerListenerImpl{
+public abstract class AccessibilityControlerListenerImpl {
 	
 	private static final Logger log = Logger.getLogger(AccessibilityControlerListenerImpl.class);
 	
 	public static final String FREESEED_FILENAME= "freeSpeedAccessibility_cellsize_";
-	public static final String CAR_FILENAME 	= "carAccessibility_cellsize_";
+	public static final String CAR_FILENAME 		= "carAccessibility_cellsize_";
 	public static final String BIKE_FILENAME 	= "bikeAccessibility_cellsize_";
 	public static final String WALK_FILENAME 	= "walkAccessibility_cellsize_";
 	public static final String PT_FILENAME 		= "ptAccessibility_cellsize_";
@@ -314,10 +313,10 @@ public class AccessibilityControlerListenerImpl{
 	
 	/**
 	 * @param ttc
-	 * @param lcptFreeSpeedCarTravelTime
-	 * @param lcptCongestedCarTravelTime
 	 * @param lcptTravelDistance
 	 * @param network
+	 * @param lcptFreeSpeedCarTravelTime
+	 * @param lcptCongestedCarTravelTime
 	 * @param inverseOfLogitScaleParameter
 	 * @param accCsvWriter
 	 * @param measuringPointIterator
@@ -326,11 +325,9 @@ public class AccessibilityControlerListenerImpl{
 											LeastCostPathTreeExtended lcptExtFreeSpeedCarTravelTime,
 											LeastCostPathTreeExtended lcptExtCongestedCarTravelTime,
 											LeastCostPathTree lcptTravelDistance, 
-											PtMatrix ptMatrix,
 											NetworkImpl network,
 											ActivityFacilitiesImpl mp,
-											int mode,
-											Controler contorler) {
+											int mode) {
 
 		GeneralizedCostSum gcs = new GeneralizedCostSum();
 		
@@ -677,14 +674,11 @@ public class AccessibilityControlerListenerImpl{
 	 * @param bikeAccessibility
 	 * @param walkAccessibility
 	 */
-	void writeCSVData(
+	abstract void writeCSVData(
 			ActivityFacility measurePoint, Node fromNode,
 			double freeSpeedAccessibility, double carAccessibility,
 			double bikeAccessibility, double walkAccessibility,
-			double ptAccessibility) {
-		// this is just a stub and does nothing. 
-		// this needs to be implemented/overwritten by an inherited class
-	}
+			double ptAccessibility) ;
 	
 	// ////////////////////////////////////////////////////////////////////
 	// inner classes
