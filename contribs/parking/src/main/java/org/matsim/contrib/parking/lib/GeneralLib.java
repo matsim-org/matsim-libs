@@ -19,6 +19,7 @@
 
 package org.matsim.contrib.parking.lib;
 
+import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -44,9 +45,14 @@ import net.opengis.kml._2.ObjectFactory;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.data.statistics.HistogramDataset;
 import org.jfree.data.statistics.HistogramType;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -85,7 +91,6 @@ import org.matsim.core.utils.io.OsmNetworkReader;
 import org.matsim.vis.kml.KMZWriter;
 import org.xml.sax.SAXException;
 
-
 public class GeneralLib {
 
 	public static final double numberOfSecondsInDay = 86400;
@@ -99,7 +104,8 @@ public class GeneralLib {
 	 * Note: use the other method with the same name, if this poses problems.
 	 */
 	public static Scenario readScenario(String plansFile, String networkFile) {
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
+				.createScenario(ConfigUtils.createConfig());
 		Population population = scenario.getPopulation();
 
 		Network network = scenario.getNetwork();
@@ -114,12 +120,15 @@ public class GeneralLib {
 	/*
 	 * Reads the population from the plans file.
 	 */
-	public static Scenario readScenario(String plansFile, String networkFile, String facilititiesPath) {
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	public static Scenario readScenario(String plansFile, String networkFile,
+			String facilititiesPath) {
+		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils
+				.createScenario(ConfigUtils.createConfig());
 
 		sc.getConfig().setParam("plans", "inputPlansFile", plansFile);
 		sc.getConfig().setParam("network", "inputNetworkFile", networkFile);
-		sc.getConfig().setParam("facilities", "inputFacilitiesFile", facilititiesPath);
+		sc.getConfig().setParam("facilities", "inputFacilitiesFile",
+				facilititiesPath);
 
 		ScenarioLoaderImpl sl = new ScenarioLoaderImpl(sc);
 
@@ -132,7 +141,8 @@ public class GeneralLib {
 	 * Reads the network from the network file.
 	 */
 	public static Network readNetwork(String networkFile) {
-		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils
+				.createScenario(ConfigUtils.createConfig());
 
 		sc.getConfig().setParam("network", "inputNetworkFile", networkFile);
 
@@ -143,15 +153,18 @@ public class GeneralLib {
 		return sc.getNetwork();
 	}
 
-	public static void writeNetwork(Network network, String outputNetworkFileName) {
+	public static void writeNetwork(Network network,
+			String outputNetworkFileName) {
 		new NetworkWriter(network).write(outputNetworkFileName);
 	}
 
 	/*
 	 * Write the population to the specified file.
 	 */
-	public static void writePopulation(Population population, Network network, String plansFile) {
-		MatsimWriter populationWriter = new PopulationWriter(population, network);
+	public static void writePopulation(Population population, Network network,
+			String plansFile) {
+		MatsimWriter populationWriter = new PopulationWriter(population,
+				network);
 
 		populationWriter.write(plansFile);
 	}
@@ -160,8 +173,10 @@ public class GeneralLib {
 	 * @param facilitiesFile
 	 * @return
 	 */
-	public static ActivityFacilitiesImpl readActivityFacilities(String facilitiesFile) {
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	public static ActivityFacilitiesImpl readActivityFacilities(
+			String facilitiesFile) {
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
+				.createScenario(ConfigUtils.createConfig());
 		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).readFile(facilitiesFile);
 		return facilities;
@@ -170,7 +185,8 @@ public class GeneralLib {
 	/*
 	 * Write the facilities to the specified file.
 	 */
-	public static void writeActivityFacilities(ActivityFacilitiesImpl facilities, String facilitiesFile) {
+	public static void writeActivityFacilities(
+			ActivityFacilitiesImpl facilities, String facilitiesFile) {
 		new FacilitiesWriter(facilities).write(facilitiesFile);
 	}
 
@@ -187,7 +203,8 @@ public class GeneralLib {
 			FileOutputStream fos = new FileOutputStream(fileName);
 			OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fos);
 
-			char[] charArray = Lists.getCharsOfAllArrayItemsWithNewLineCharacterInbetween(list);
+			char[] charArray = Lists
+					.getCharsOfAllArrayItemsWithNewLineCharacterInbetween(list);
 			outputStreamWriter.write(charArray);
 
 			outputStreamWriter.flush();
@@ -205,7 +222,8 @@ public class GeneralLib {
 	 * @param numberOfColumns
 	 * @return
 	 */
-	public static double[][] trimMatrix(double[][] matrix, int numberOfRows, int numberOfColumns) {
+	public static double[][] trimMatrix(double[][] matrix, int numberOfRows,
+			int numberOfColumns) {
 		double newMatrix[][] = new double[numberOfRows][numberOfColumns];
 
 		for (int i = 0; i < numberOfRows; i++) {
@@ -227,7 +245,8 @@ public class GeneralLib {
 	 * @param fileName
 	 * @param headerLine
 	 */
-	public static void writeMatrix(double[][] matrix, String fileName, String headerLine) {
+	public static void writeMatrix(double[][] matrix, String fileName,
+			String headerLine) {
 		ArrayList<String> list = new ArrayList<String>();
 
 		if (headerLine != null) {
@@ -256,7 +275,8 @@ public class GeneralLib {
 	 * @param ignoreFirstLine
 	 * @return
 	 */
-	public static double[][] readMatrix(int numberOfRows, int numberOfColumns, boolean ignoreFirstLine, String fileName) {
+	public static double[][] readMatrix(int numberOfRows, int numberOfColumns,
+			boolean ignoreFirstLine, String fileName) {
 
 		double[][] matrix = new double[numberOfRows][numberOfColumns];
 
@@ -336,7 +356,8 @@ public class GeneralLib {
 
 	// TODO: write tests.
 	// create target directory, if it does not exist.
-	public static void copyDirectory(String sourceDirectoryPath, String targetDirectoryPath) {
+	public static void copyDirectory(String sourceDirectoryPath,
+			String targetDirectoryPath) {
 
 		File sourceDirectory = new File(sourceDirectoryPath);
 		File targetDirectory = new File(targetDirectoryPath);
@@ -350,12 +371,14 @@ public class GeneralLib {
 
 				String[] children = sourceDirectory.list();
 				for (int i = 0; i < children.length; i++) {
-					copyDirectory(sourceDirectoryPath + "\\" + children[i], targetDirectory + "\\" + children[i]);
+					copyDirectory(sourceDirectoryPath + "\\" + children[i],
+							targetDirectory + "\\" + children[i]);
 				}
 			} else {
 
 				// copy the file
-				copyFile(sourceDirectory.getAbsolutePath(), targetDirectory.getAbsolutePath());
+				copyFile(sourceDirectory.getAbsolutePath(),
+						targetDirectory.getAbsolutePath());
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -411,7 +434,8 @@ public class GeneralLib {
 	 * @param xLabel
 	 * @param yLabel
 	 */
-	public static void writeHubGraphic(String fileName, double[][] matrix, String title, String xLabel, String yLabel) {
+	public static void writeHubGraphic(String fileName, double[][] matrix,
+			String title, String xLabel, String yLabel) {
 		int numberOfXValues = matrix.length;
 		int numberOfFunctions = matrix[0].length;
 		String[] seriesLabels = new String[numberOfFunctions];
@@ -426,11 +450,13 @@ public class GeneralLib {
 			seriesLabels[i] = "hub-" + i;
 		}
 
-		writeGraphic(fileName, matrix, title, xLabel, yLabel, seriesLabels, time);
+		writeGraphic(fileName, matrix, title, xLabel, yLabel, seriesLabels,
+				time);
 	}
 
-	public static void writeGraphic(String fileName, double[][] matrix, String title, String xLabel, String yLabel,
-			String[] seriesLabels, double[] xValues) {
+	public static void writeGraphic(String fileName, double[][] matrix,
+			String title, String xLabel, String yLabel, String[] seriesLabels,
+			double[] xValues) {
 		XYLineChart chart = new XYLineChart(title, xLabel, yLabel);
 
 		int numberOfXValues = matrix.length;
@@ -447,13 +473,14 @@ public class GeneralLib {
 		// chart.addMatsimLogo();
 		chart.saveAsPng(fileName, 800, 600);
 
-		//if (GlobalRegistry.doPrintGraficDataToConsole) {
-		//	printGraphicDataToConsole(fileName, matrix, title, xLabel, yLabel, seriesLabels, xValues);
-		//}
+		// if (GlobalRegistry.doPrintGraficDataToConsole) {
+		// printGraphicDataToConsole(fileName, matrix, title, xLabel, yLabel,
+		// seriesLabels, xValues);
+		// }
 	}
 
-	public static void generateHistogram(String fileName, double[] value, int numberOfBins, String title, String xLabel,
-			String yLabel) {
+	public static void generateHistogram(String fileName, double[] value,
+			int numberOfBins, String title, String xLabel, String yLabel) {
 		HistogramDataset dataset = new HistogramDataset();
 		dataset.setType(HistogramType.FREQUENCY);
 		dataset.addSeries(title, value, numberOfBins);
@@ -464,32 +491,83 @@ public class GeneralLib {
 		boolean show = false;
 		boolean toolTips = false;
 		boolean urls = false;
-		JFreeChart chart = ChartFactory.createHistogram(plotTitle, xaxis, yaxis, dataset, orientation, show, toolTips, urls);
+		JFreeChart chart = ChartFactory.createHistogram(plotTitle, xaxis,
+				yaxis, dataset, orientation, show, toolTips, urls);
 		int width = 500;
 		int height = 300;
 		try {
-			ChartUtilities.saveChartAsPNG(new File(fileName), chart, width, height);
+			ChartUtilities.saveChartAsPNG(new File(fileName), chart, width,
+					height);
 		} catch (IOException e) {
 
 		}
 	}
 
-	public static void generateSimpleHistogram(String fileName, double[] value, int numberOfBins) {
+	public static void generateXYScatterPlot(String fileName, double[] x,
+			double[] y, String title, String xLabel, String yLabel) {
+
+		if (x.length != y.length) {
+			DebugLib.stopSystemAndReportInconsistency("dimensions of arrays do not match");
+		}
+
+		final XYSeries series1 = new XYSeries(title);
+
+		for (int i = 0; i < x.length; i++) {
+			series1.add(x[i], y[i]);
+		}
+
+		final XYSeriesCollection dataset = new XYSeriesCollection();
+		dataset.addSeries(series1);
+
+		final JFreeChart chart = ChartFactory.createXYLineChart(title, xLabel,
+				yLabel, dataset, PlotOrientation.VERTICAL, true, true, false);
+
+		chart.setBackgroundPaint(Color.white);
+
+		final XYPlot plot = chart.getXYPlot();
+		plot.setBackgroundPaint(Color.lightGray);
+		plot.setDomainGridlinePaint(Color.white);
+		plot.setRangeGridlinePaint(Color.white);
+
+		final XYLineAndShapeRenderer renderer = new XYLineAndShapeRenderer();
+		renderer.setSeriesLinesVisible(0, false);
+		renderer.setSeriesShapesVisible(1, false);
+		plot.setRenderer(renderer);
+
+		final NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+		rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
+
+		int width = 500;
+		int height = 300;
+
+		try {
+			ChartUtilities.saveChartAsPNG(new File(fileName), chart, width,
+					height);
+		} catch (IOException e) {
+
+		}
+	}
+
+	public static void generateSimpleHistogram(String fileName, double[] value,
+			int numberOfBins) {
 		generateHistogram(fileName, value, numberOfBins, "", "", "");
 	}
 
-	public static void printGraphicDataToConsole(String fileName, double[][] matrix, String title, String xLabel, String yLabel,
+	public static void printGraphicDataToConsole(String fileName,
+			double[][] matrix, String title, String xLabel, String yLabel,
 			String[] seriesLabels, double[] xValues) {
 		int numberOfXValues = matrix.length;
 		int numberOfFunctions = matrix[0].length;
 
-		System.out.println("===================================================");
+		System.out
+				.println("===================================================");
 
 		System.out.println("title:" + title);
 		System.out.println("xLabel:" + xLabel);
 		System.out.println("yLabel:" + yLabel);
 
-		System.out.println("----------------------------------------------------");
+		System.out
+				.println("----------------------------------------------------");
 
 		System.out.print("xValues");
 
@@ -498,7 +576,8 @@ public class GeneralLib {
 		}
 
 		System.out.print("\n");
-		System.out.println("----------------------------------------------------");
+		System.out
+				.println("----------------------------------------------------");
 
 		for (int i = 0; i < numberOfXValues; i++) {
 			System.out.print(xValues[i]);
@@ -509,7 +588,8 @@ public class GeneralLib {
 			System.out.print("\n");
 		}
 
-		System.out.println("==================================================");
+		System.out
+				.println("==================================================");
 	}
 
 	public static double[][] scaleMatrix(double[][] matrix, double scalingFactor) {
@@ -540,7 +620,8 @@ public class GeneralLib {
 	public static double projectTimeWithin24Hours(double time) {
 		double secondsInOneDay = 60 * 60 * 24;
 
-		if (time == Double.NEGATIVE_INFINITY || time == Double.POSITIVE_INFINITY) {
+		if (time == Double.NEGATIVE_INFINITY
+				|| time == Double.POSITIVE_INFINITY) {
 			DebugLib.stopSystemAndReportInconsistency("time is not allowed to be minus or plus infinity");
 		}
 
@@ -551,7 +632,9 @@ public class GeneralLib {
 		if (time < secondsInOneDay) {
 			return time;
 		} else {
-			return ((time / secondsInOneDay) - (Math.floor(time / secondsInOneDay))) * secondsInOneDay;
+			return ((time / secondsInOneDay) - (Math.floor(time
+					/ secondsInOneDay)))
+					* secondsInOneDay;
 		}
 	}
 
@@ -562,7 +645,8 @@ public class GeneralLib {
 	 * @param endIntervalTime
 	 * @return
 	 */
-	public static double getIntervalDuration(double startIntervalTime, double endIntervalTime) {
+	public static double getIntervalDuration(double startIntervalTime,
+			double endIntervalTime) {
 		double secondsInOneDay = 60 * 60 * 24;
 		startIntervalTime = projectTimeWithin24Hours(startIntervalTime);
 		endIntervalTime = projectTimeWithin24Hours(endIntervalTime);
@@ -582,16 +666,20 @@ public class GeneralLib {
 	 * @param timeToCheck
 	 * @return
 	 */
-	public static boolean isIn24HourInterval(double startIntervalTime, double endIntervalTime, double timeToCheck) {
+	public static boolean isIn24HourInterval(double startIntervalTime,
+			double endIntervalTime, double timeToCheck) {
 		errorIfNot24HourProjectedTime(startIntervalTime);
 		errorIfNot24HourProjectedTime(endIntervalTime);
 		errorIfNot24HourProjectedTime(timeToCheck);
 
-		if (startIntervalTime < endIntervalTime && timeToCheck >= startIntervalTime && timeToCheck <= endIntervalTime) {
+		if (startIntervalTime < endIntervalTime
+				&& timeToCheck >= startIntervalTime
+				&& timeToCheck <= endIntervalTime) {
 			return true;
 		}
 
-		if (startIntervalTime > endIntervalTime && (timeToCheck >= startIntervalTime || timeToCheck <= endIntervalTime)) {
+		if (startIntervalTime > endIntervalTime
+				&& (timeToCheck >= startIntervalTime || timeToCheck <= endIntervalTime)) {
 			return true;
 		}
 
@@ -623,8 +711,10 @@ public class GeneralLib {
 	 * @param outputPlansFileName
 	 * @param network
 	 */
-	public static void writePersons(Collection<? extends Person> persons, String outputPlansFileName, Network network) {
-		PopulationWriter popWriter = new PopulationWriter(new PopulationImpl(null), network);
+	public static void writePersons(Collection<? extends Person> persons,
+			String outputPlansFileName, Network network) {
+		PopulationWriter popWriter = new PopulationWriter(new PopulationImpl(
+				null), network);
 		popWriter.writeStartPlans(outputPlansFileName);
 
 		for (Person person : persons) {
@@ -633,7 +723,7 @@ public class GeneralLib {
 
 		popWriter.writeEndPlans();
 	}
-	
+
 	/**
 	 * TODO: write test.
 	 * 
@@ -641,8 +731,10 @@ public class GeneralLib {
 	 * @param outputPlansFileName
 	 * @param network
 	 */
-	public static void writePersons(Collection<? extends Person> persons, String outputPlansFileName, Network network, ScenarioImpl scenario) {
-		PopulationWriter popWriter = new PopulationWriter(new PopulationImpl(scenario), network);
+	public static void writePersons(Collection<? extends Person> persons,
+			String outputPlansFileName, Network network, ScenarioImpl scenario) {
+		PopulationWriter popWriter = new PopulationWriter(new PopulationImpl(
+				scenario), network);
 		popWriter.writeStartPlans(outputPlansFileName);
 
 		for (Person person : persons) {
@@ -650,7 +742,7 @@ public class GeneralLib {
 		}
 
 		popWriter.writeEndPlans();
-	}	
+	}
 
 	/**
 	 * copy the person and the selected plan of the person
@@ -669,7 +761,8 @@ public class GeneralLib {
 		return newPerson;
 	}
 
-	public static void convertMATSimNetworkToKmz(String matsimNetworkFileName, String outputKmzFileName) throws IOException {
+	public static void convertMATSimNetworkToKmz(String matsimNetworkFileName,
+			String outputKmzFileName) throws IOException {
 		Network network = readNetwork(matsimNetworkFileName);
 
 		ObjectFactory kmlObjectFactory = new ObjectFactory();
@@ -677,23 +770,27 @@ public class GeneralLib {
 
 		KmlType mainKml = kmlObjectFactory.createKmlType();
 		DocumentType mainDoc = kmlObjectFactory.createDocumentType();
-		mainKml.setAbstractFeatureGroup(kmlObjectFactory.createDocument(mainDoc));
+		mainKml.setAbstractFeatureGroup(kmlObjectFactory
+				.createDocument(mainDoc));
 
 		// KmlNetworkWriter kmlNetworkWriter = new KmlNetworkWriter(network, new
 		// AtlantisToWGS84(), kmzWriter, mainDoc);
-		KmlNetworkWriter kmlNetworkWriter = new KmlNetworkWriter(network, new CH1903LV03toWGS84(), kmzWriter, mainDoc);
+		KmlNetworkWriter kmlNetworkWriter = new KmlNetworkWriter(network,
+				new CH1903LV03toWGS84(), kmzWriter, mainDoc);
 		// KmlNetworkWriter kmlNetworkWriter = new
 		// KmlNetworkWriter(network,TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_UTM35S,
 		// TransformationFactory.WGS84), kmzWriter, mainDoc);
 
-		mainDoc.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(kmlNetworkWriter.getNetworkFolder()));
+		mainDoc.getAbstractFeatureGroup().add(
+				kmlObjectFactory.createFolder(kmlNetworkWriter
+						.getNetworkFolder()));
 
 		kmzWriter.writeMainKml(mainKml);
 		kmzWriter.close();
 	}
 
-	public static Network convertOsmNetworkToMATSimNetwork(String osmNetworkFile) throws SAXException,
-			ParserConfigurationException, IOException {
+	public static Network convertOsmNetworkToMATSimNetwork(String osmNetworkFile)
+			throws SAXException, ParserConfigurationException, IOException {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Network net = sc.getNetwork();
 
@@ -737,7 +834,8 @@ public class GeneralLib {
 		return list;
 	}
 
-	public static StringMatrix readStringMatrix(String fileName, String delim, StringMatrixFilter filter) {
+	public static StringMatrix readStringMatrix(String fileName, String delim,
+			StringMatrixFilter filter) {
 		StringMatrix matrix = new StringMatrix();
 
 		try {
@@ -786,8 +884,6 @@ public class GeneralLib {
 		return readStringMatrix(fileName, delim, null);
 	}
 
-	
-
 	public static void printLinkedListToConsole(LinkedList list) {
 		for (Object value : list) {
 			System.out.println(value);
@@ -801,7 +897,8 @@ public class GeneralLib {
 		return Math.round((float) Math.floor(time / binSizeInSeconds));
 	}
 
-	public static boolean isNumberInBetween(double numberOne, double numberTwo, double numberToCheck) {
+	public static boolean isNumberInBetween(double numberOne, double numberTwo,
+			double numberToCheck) {
 		if (numberOne < numberTwo) {
 			return isNumberInBetweenOrdered(numberOne, numberTwo, numberToCheck);
 		} else if (numberOne > numberTwo) {
@@ -811,7 +908,8 @@ public class GeneralLib {
 		return false;
 	}
 
-	private static boolean isNumberInBetweenOrdered(double smallerNumber, double biggerNumber, double numberToCheck) {
+	private static boolean isNumberInBetweenOrdered(double smallerNumber,
+			double biggerNumber, double numberToCheck) {
 		if (smallerNumber < numberToCheck && biggerNumber > numberToCheck) {
 			return true;
 		}
@@ -819,22 +917,32 @@ public class GeneralLib {
 	}
 
 	public static double getWalkingTravelDuration(double distance) {
-		return distance * controler.getConfig().plansCalcRoute().getBeelineDistanceFactor()
-				/ controler.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk);
+		return distance
+				* controler.getConfig().plansCalcRoute()
+						.getBeelineDistanceFactor()
+				/ controler.getConfig().plansCalcRoute()
+						.getTeleportedModeSpeeds().get(TransportMode.walk);
 	}
 
 	public static double getWalkingSpeed() {
-		return controler.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.walk);
+		return controler.getConfig().plansCalcRoute().getTeleportedModeSpeeds()
+				.get(TransportMode.walk);
 	}
 
 	public static double getPtTravelDuration(double distance) {
-		return distance * controler.getConfig().plansCalcRoute().getBeelineDistanceFactor()
-				/ controler.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.pt);
+		return distance
+				* controler.getConfig().plansCalcRoute()
+						.getBeelineDistanceFactor()
+				/ controler.getConfig().plansCalcRoute()
+						.getTeleportedModeSpeeds().get(TransportMode.pt);
 	}
 
 	public static double getBikeTravelDuration(double distance) {
-		return distance * controler.getConfig().plansCalcRoute().getBeelineDistanceFactor()
-				/ controler.getConfig().plansCalcRoute().getTeleportedModeSpeeds().get(TransportMode.bike);
+		return distance
+				* controler.getConfig().plansCalcRoute()
+						.getBeelineDistanceFactor()
+				/ controler.getConfig().plansCalcRoute()
+						.getTeleportedModeSpeeds().get(TransportMode.bike);
 	}
 
 	public static boolean isInZHCityRectangle(Coord coord) {
@@ -847,7 +955,8 @@ public class GeneralLib {
 		return false;
 	}
 
-	public static void writeArrayToFile(double[] array, String fileName, String headerLine) {
+	public static void writeArrayToFile(double[] array, String fileName,
+			String headerLine) {
 		double matrix[][] = new double[array.length][1];
 
 		for (int i = 0; i < array.length; i++) {
@@ -879,7 +988,8 @@ public class GeneralLib {
 		return list;
 	}
 
-	public static void writeHashMapToFile(HashMap hm, String headerLine, String fileName) {
+	public static void writeHashMapToFile(HashMap hm, String headerLine,
+			String fileName) {
 		ArrayList<String> list = new ArrayList<String>();
 		list.add(headerLine);
 
