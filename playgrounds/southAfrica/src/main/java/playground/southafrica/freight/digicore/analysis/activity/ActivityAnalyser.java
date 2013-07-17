@@ -143,6 +143,11 @@ public class ActivityAnalyser {
 			listOfJobs.add(job);
 		}
 		
+		this.threadExecutor.shutdown();
+		while(!this.threadExecutor.isTerminated()){
+		}
+		counter.printCounter();
+		
 		/* Consolidate the output */
 		Map<String, Integer> map = new TreeMap<String, Integer>();
 		for(ActivityStartTimeRunable job : listOfJobs){
