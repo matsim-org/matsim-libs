@@ -6,6 +6,7 @@ package playground.dgrether.signalsystems.tacontrol.testisolatedcrossing;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
@@ -39,14 +40,17 @@ import playground.dgrether.DgPaths;
  * @author dgrether
  */
 public class IsolatedCrossingMain {
-
+	
+	private static final Logger log = Logger.getLogger(IsolatedCrossingMain.class);
+	
 	private final double tCycleSec = 120.0;
 	private final double tDesired = 120.0;
 	private final double tmax = 180.0;
-	private final double maxFlowEWPerHour = 1440.0;
+	private final double tau0 = 5.0;
+	private final double maxFlowWEPerHour = 1440.0;
 	private final double maxFlowNSPerHour = 180.0;
 	private final double lambdaMax = 0.1;
-	private final double runtimeSeconds = 5400.0;
+	private final double runtimeSeconds = 7200.0;
 	private final double startTimeSeconds = 0.0;
 	private final double endTimeSeconds = startTimeSeconds + runtimeSeconds;
 	private int personIdInt = 1;
@@ -115,7 +119,6 @@ public class IsolatedCrossingMain {
 		this.sN = scenario.createId("sN");
 		this.sS = scenario.createId("sS");
 		this.systemId = scenario.createId("C");
-		
 	}
 
 	
@@ -124,15 +127,67 @@ public class IsolatedCrossingMain {
 		Config config = this.createConfig();
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		this.createIds(scenario);
-		for (double lambda = 0.0; lambda <= lambdaMax; lambda += 0.1){
+		for (double lambdaWestEast = 0.0; lambdaWestEast <= lambdaMax; lambdaWestEast += 0.1){
 			
 		}
-		double lambda = 0.1;
-		this.createPopulation(scenario, lambda);
+		double lambdaWestEast = 0.5;
+		this.createPopulation(scenario, lambdaWestEast);
 		this.createSignals(scenario);
+		this.createSignalControl(scenario, lambdaWestEast);
 		OTFVis.playScenario(scenario);
 	}
 	
+	
+	
+	private void createSignalControl(Scenario scenario, double lambdaWestEast){
+		SignalsData signals = scenario.getScenarioElement(SignalsData.class);
+		SignalControlData control = signals.getSignalControlData();
+		SignalControlDataFactory fac = signals.getSignalControlData().getFactory();
+		SignalSystemControllerData controller = fac.createSignalSystemControllerData(systemId);
+		control.addSignalSystemControllerData(controller);
+		controller.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
+		
+		SignalPlanData plan = fac.createSignalPlanData(systemId);
+		plan.setCycleTime((int) this.tCycleSec);
+		controller.addSignalPlanData(plan);
+
+		double sumIntergreen = 4.0 * this.tau0;
+		double effectiveGreenTime = this.tCycleSec - sumIntergreen;
+		double effectiveflowWE = lambdaWestEast * this.maxFlowWEPerHour;
+		double sumFlow = (2.0 * this.maxFlowNSPerHour) + (2.0 * effectiveflowWE) ;
+		int greenNS = (int) Math.round(this.maxFlowNSPerHour / sumFlow * effectiveGreenTime);
+		int greenEW = (int) Math.round(effectiveflowWE / sumFlow * effectiveGreenTime);
+		log.info("greenNS: " + greenNS + " greenWE: " + greenEW);
+		
+		int second = 0;
+		SignalGroupSettingsData settings = fac.createSignalGroupSettingsData(sN);
+		settings.setOnset(second);
+		second += greenNS;
+		settings.setDropping(second);
+		plan.addSignalGroupSettings(settings);
+		second = (int) (greenNS + this.tau0);
+
+		settings = fac.createSignalGroupSettingsData(sE);
+		settings.setOnset(second);
+		second += greenEW;
+		settings.setDropping(second);
+		plan.addSignalGroupSettings(settings);
+		second += this.tau0;
+		
+		settings = fac.createSignalGroupSettingsData(sS);
+		settings.setOnset(second);
+		second += greenNS;
+		settings.setDropping(second);
+		plan.addSignalGroupSettings(settings);
+		second += this.tau0;
+		
+		settings = fac.createSignalGroupSettingsData(sW);
+		settings.setOnset(second);
+		second += greenEW;
+		settings.setDropping(second);
+		plan.addSignalGroupSettings(settings);
+		
+	}
 	
 	
 	private void createSignals(Scenario scenario) {
@@ -154,44 +209,11 @@ public class IsolatedCrossingMain {
 		system.addSignalData(signal);
 		
 		SignalUtils.createAndAddSignalGroups4Signals(signals.getSignalGroupsData(), system);
-	
-		SignalControlData control = signals.getSignalControlData();
-		SignalControlDataFactory fac = signals.getSignalControlData().getFactory();
-		SignalSystemControllerData controller = fac.createSignalSystemControllerData(systemId);
-		control.addSignalSystemControllerData(controller);
-		controller.setControllerIdentifier(DefaultPlanbasedSignalSystemController.IDENTIFIER);
-		
-		SignalPlanData plan = fac.createSignalPlanData(systemId);
-		plan.setCycleTime((int) this.tCycleSec);
-		controller.addSignalPlanData(plan);
-	
-		SignalGroupSettingsData settings = fac.createSignalGroupSettingsData(sE);
-		settings.setOnset(0);
-		settings.setDropping(15);
-		plan.addSignalGroupSettings(settings);
-
-		settings = fac.createSignalGroupSettingsData(sW);
-		settings.setOnset(0);
-		settings.setDropping(15);
-		plan.addSignalGroupSettings(settings);
-
-		
-		settings = fac.createSignalGroupSettingsData(sN);
-		settings.setOnset(0);
-		settings.setDropping(15);
-		plan.addSignalGroupSettings(settings);
-
-		
-		settings = fac.createSignalGroupSettingsData(sS);
-		settings.setOnset(0);
-		settings.setDropping(15);
-		plan.addSignalGroupSettings(settings);
-
 	}
 
 
 
-	private void createPopulation(Scenario scenario, double lambda) {
+	private void createPopulation(Scenario scenario, double lambdaWestEast) {
 		
 		Population pop = scenario.getPopulation();
 		PopulationFactory fac = pop.getFactory();
@@ -245,7 +267,7 @@ public class IsolatedCrossingMain {
 
 		
 		//E->W
-		frequency = 3600.0 / (maxFlowEWPerHour * lambda);
+		frequency = 3600.0 / (maxFlowWEPerHour * lambdaWestEast);
 		routeIds = new ArrayList<Id>();
 		routeIds.add(linkE2E3Id);
 		routeIds.add(linkE3CId);
@@ -309,7 +331,9 @@ public class IsolatedCrossingMain {
 		config.scenario().setUseSignalSystems(true);
 		QSimConfigGroup qsim = new QSimConfigGroup();
 		qsim.setSnapshotStyle("queue");
+		qsim.setStuckTime(1000.0);
 		config.addQSimConfigGroup(qsim);
+		config.otfVis().setNodeOffset(20.0);
 		config.otfVis().setShowTeleportedAgents(true);
 		config.otfVis().setDrawNonMovingItems(true);
 		return config;
