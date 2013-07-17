@@ -72,13 +72,13 @@ public class GeographicClassifier {
 		double threshold = Double.parseDouble(args[3]);
 		int nThreads = Integer.parseInt(args[4]);
 		String outputFolder = args[5];
-		String year = args[6];
+		String descriptor = args[6];
 
 		GeographicClassifier classifier = new GeographicClassifier(inputFolder, shapefile, idField);
 				
 		classifier.splitIntraInterExtra(threshold, nThreads);
 		
-		classifier.writeLists(outputFolder, year);
+		classifier.writeLists(outputFolder, descriptor);
 		
 		Header.printFooter();
 	}
