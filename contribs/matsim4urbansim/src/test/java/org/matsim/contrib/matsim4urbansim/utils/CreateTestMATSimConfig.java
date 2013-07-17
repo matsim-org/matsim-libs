@@ -365,16 +365,16 @@ public class CreateTestMATSimConfig {
 		
 		// create MATSim4UrbanSim xml hierarchy
 		
-//		org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.FileType externalMatsimConfig = of.createFileType();
-//		externalMatsimConfig.setInputFile(this.matsimConfigInputFile);
-//		org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.FileType network = of.createFileType();
-//		network.setInputFile(this.networkInputFile);
-//		org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.FileType emptyShapeFile = of.createFileType();
-//		emptyShapeFile.setInputFile("");
-//		org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.FileType warmStartPlansFile = of.createFileType();
-//		warmStartPlansFile.setInputFile(this.hotstartPlansFile);
-//		org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.FileType hotStartPlansFile = of.createFileType();
-//		hotStartPlansFile.setInputFile(this.hotstartPlansFile);
+		org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.FileType externalMatsimConfig = of.createFileType();
+		externalMatsimConfig.setInputFile(this.matsimExternalConfigFileName);
+		org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.FileType network = of.createFileType();
+		network.setInputFile(this.networkInputFileName);
+		org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.FileType emptyShapeFile = of.createFileType();
+		emptyShapeFile.setInputFile("");
+		org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.FileType warmStartPlansFile = of.createFileType();
+		warmStartPlansFile.setInputFile(this.hotstartPlansFileName);
+		org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.FileType hotStartPlansFile = of.createFileType();
+		hotStartPlansFile.setInputFile(this.hotstartPlansFileName);
 		
 		// matsimConfigType
 		org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.MatsimConfigType matsimConfigType = of.createMatsimConfigType();
@@ -382,13 +382,13 @@ public class CreateTestMATSimConfig {
 		matsimConfigType.setAccessibilityComputationAreaFromShapeFile(false);
 		matsimConfigType.setAccessibilityComputationAreaFromBoundingBox(false);
 		matsimConfigType.setAccessibilityComputationAreaFromNetwork(true);
-		matsimConfigType.setStudyAreaBoundaryShapeFile("");
+		matsimConfigType.setStudyAreaBoundaryShapeFile(emptyShapeFile);
 		matsimConfigType.setUrbansimZoneRandomLocationDistributionByRadius(this.randomLocationDistributionRadiusForUrbanSimZone);
 		matsimConfigType.setUrbansimZoneRandomLocationDistributionByShapeFile("");
-		matsimConfigType.setExternalMatsimConfig(this.matsimExternalConfigFileName);
-		matsimConfigType.setNetwork(networkInputFileName);
-		matsimConfigType.setWarmStartPlansFile(this.hotstartPlansFileName);
-		matsimConfigType.setHotStartPlansFile(hotstartPlansFileName);		
+		matsimConfigType.setExternalMatsimConfig(externalMatsimConfig);
+		matsimConfigType.setNetwork(network);
+		matsimConfigType.setWarmStartPlansFile(warmStartPlansFile);
+		matsimConfigType.setHotStartPlansFile(hotStartPlansFile);		
 		matsimConfigType.setUseHotStart(true);
 		matsimConfigType.setActivityType0(this.activityType_0);
 		matsimConfigType.setActivityType1(this.activityType_1);

@@ -33,11 +33,12 @@ import org.apache.log4j.Logger;
 public class InternalConstants {
 	
 	// logger
+	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(InternalConstants.class);
 	
 	/** important system environments */
-	private static String OPUS_HOME;
-	public static String OPUS_DATA_PATH;
+//	private static String OPUS_HOME;
+//	private static String OPUS_DATA_PATH;
 	
 	/** subdirectories in OPUS_HOME */
 //	public static String MATSIM_4_OPUS; 		// OPUS_HOME/matsim4opus/

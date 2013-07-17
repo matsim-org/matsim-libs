@@ -13,6 +13,7 @@ import org.matsim.contrib.accessibility.utils.Benchmark;
 import org.matsim.contrib.accessibility.utils.LeastCostPathTreeExtended;
 import org.matsim.contrib.accessibility.utils.TempDirectoryUtil;
 import org.matsim.contrib.accessibility.utils.io.writer.AnalysisCellBasedAccessibilityCSVWriterV2;
+import org.matsim.contrib.accessibility.utils.io.writer.SpatialGridTableWriter;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.MyBoundingBox;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
@@ -25,6 +26,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.roadpricing.RoadPricingSchemeImpl;
 import org.matsim.utils.LeastCostPathTree;
 
@@ -196,7 +198,7 @@ implements ShutdownListener{
 		
 		this.scheme = controler.getScenario().getScenarioElement(RoadPricingSchemeImpl.class);
 
-		try{
+//		try{
 			log.info("Computing and writing cell based accessibility measures ...");
 			// printParameterSettings(); // use only for debugging (settings are printed as part of config dump)
 			log.info(measuringPoints.getFacilities().values().size() + " measurement points are now processing ...");
@@ -234,11 +236,11 @@ implements ShutdownListener{
 					this.spatialGridDataExchangeListenerList.get(i).getAndProcessSpatialGrids(freeSpeedGrid, carGrid, bikeGrid, walkGrid, ptGrid);
 			}
 			
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+//		} catch (FileNotFoundException e) {
+//			e.printStackTrace();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
 	}
 
 	/**
@@ -271,33 +273,45 @@ implements ShutdownListener{
 	 * @param matsimOutputDirectory
 	 * @throws IOException
 	 */
-	private void writePlottingData(String matsimOutputDirectory) throws IOException{
+	private void writePlottingData(String matsimOutputDirectory) {
 		
 		final String FILE_TYPE_TXT = ".txt";
 
 		log.info("Writing plotting data for R analyis into " + matsimOutputDirectory + " ...");
 		if(freeSpeedGrid != null)
 			GridUtils.writeSpatialGridTable(freeSpeedGrid, matsimOutputDirectory
-				+ FREESEED_FILENAME + freeSpeedGrid.getResolution()
+				+ "/" + FREESEED_FILENAME + freeSpeedGrid.getResolution()
 				+ FILE_TYPE_TXT);
 		if(carGrid != null)
 			GridUtils.writeSpatialGridTable(carGrid, matsimOutputDirectory
-				+ CAR_FILENAME + carGrid.getResolution()
+				+ "/" + CAR_FILENAME + carGrid.getResolution()
 				+ FILE_TYPE_TXT);
 		if(bikeGrid != null)
 			GridUtils.writeSpatialGridTable(bikeGrid, matsimOutputDirectory
-				+ BIKE_FILENAME + bikeGrid.getResolution()
+				+ "/" + BIKE_FILENAME + bikeGrid.getResolution()
 				+ FILE_TYPE_TXT);
 		if(walkGrid != null)
 			GridUtils.writeSpatialGridTable(walkGrid, matsimOutputDirectory
-				+ WALK_FILENAME + walkGrid.getResolution()
+				+ "/" + WALK_FILENAME + walkGrid.getResolution()
 				+ FILE_TYPE_TXT);
 		if(ptGrid != null)
 			GridUtils.writeSpatialGridTable(ptGrid, matsimOutputDirectory
-				+ PT_FILENAME + ptGrid.getResolution()
+				+ "/" + PT_FILENAME + ptGrid.getResolution()
 				+ FILE_TYPE_TXT);
 		
 		log.info("Writing plotting data for R done!");
+		
+		log.info("Writing data for gnuplot into " + matsimOutputDirectory + " ...") ;
+		AnalysisCellBasedAccessibilityCSVWriterV2 writer = new AnalysisCellBasedAccessibilityCSVWriterV2(matsimOutputDirectory,"car") ;
+		for(double y = carGrid.getYmin(); y <= carGrid.getYmax() ; y += carGrid.getResolution()) {
+			for(double x = carGrid.getXmin(); x <= carGrid.getXmax(); x += carGrid.getResolution()) {
+				writer.writeRecord( new CoordImpl(x,y), carGrid.getValue(x, y)) ;
+			}
+			writer.writeNewLine() ;
+		}
+		writer.close() ;
+		
+		log.info("Writing data for gnuplot done ..." ) ;
 	}
 	
 	

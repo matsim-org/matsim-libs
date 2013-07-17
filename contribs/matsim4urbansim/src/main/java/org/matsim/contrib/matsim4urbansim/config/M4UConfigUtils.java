@@ -85,8 +85,8 @@ public class M4UConfigUtils {
 			acm.setAreaOfAccessibilityComputation(AccessibilityConfigGroup.AreaOfAccesssibilityComputation.fromShapeFile.toString());
 
 			if(matsim4urbansimConfigPart1.getStudyAreaBoundaryShapeFile()  != null &&
-			  (new File(matsim4urbansimConfigPart1.getStudyAreaBoundaryShapeFile())).exists())
-				acm.setShapeFileCellBasedAccessibility( matsim4urbansimConfigPart1.getStudyAreaBoundaryShapeFile() );
+			  (new File(matsim4urbansimConfigPart1.getStudyAreaBoundaryShapeFile().getInputFile())).exists())
+				acm.setShapeFileCellBasedAccessibility( matsim4urbansimConfigPart1.getStudyAreaBoundaryShapeFile().getInputFile() );
 			else
 				throw new RuntimeException("Study area boundary shape file not found! Given shape file location:" 
 			+ matsim4urbansimConfigPart1.getStudyAreaBoundaryShapeFile());
@@ -137,11 +137,11 @@ public class M4UConfigUtils {
 		} else if ( matsim4urbansimConfigPart1.getWarmStartPlansFile() == null ) {
 			module.setWarmStart(false) ;
 		} else {
-			module.setWarmStart( (new File(matsim4urbansimConfigPart1.getWarmStartPlansFile())).exists() );
+			module.setWarmStart( (new File(matsim4urbansimConfigPart1.getWarmStartPlansFile().getInputFile())).exists() );
 		}
-		module.setWarmStartPlansLocation(matsim4urbansimConfigPart1.getWarmStartPlansFile());
+		module.setWarmStartPlansLocation(matsim4urbansimConfigPart1.getWarmStartPlansFile().getInputFile());
 		module.setHotStart(matsim4urbansimConfigPart1.isUseHotStart());
-		module.setHotStartPlansFileLocation(matsim4urbansimConfigPart1.getHotStartPlansFile());
+		module.setHotStartPlansFileLocation(matsim4urbansimConfigPart1.getHotStartPlansFile().getInputFile());
 		
 		// setting right plans file
 		if(module.usingWarmStart()){
@@ -247,7 +247,7 @@ public class M4UConfigUtils {
 	 */
 	static void initNetwork(MatsimConfigType matsim4urbansimConfigPart1, Config config){
 		log.info("Setting NetworkConfigGroup to config...");
-		config.network().setInputFile( matsim4urbansimConfigPart1.getNetwork() );
+		config.network().setInputFile( matsim4urbansimConfigPart1.getNetwork().getInputFile() );
 		log.info("...done!");
 	}
 

@@ -357,11 +357,10 @@ public abstract class AccessibilityControlerListenerImpl {
 		}
 		
 		log.info("");
-		log.info("Number of measure points: " + mp.getFacilities().values().size());
-		log.info("Number of aggregated measure points: " + aggregatedMeasurementPointsV2.size());
-		log.info("");
+		log.info("Number of measurement points (origins): " + mp.getFacilities().values().size());
+		log.info("Number of aggregated measurement points (origins): " + aggregatedMeasurementPointsV2.size());
+		log.info("Now going through all origins:");
 		
-
 		ProgressBar bar = new ProgressBar( aggregatedMeasurementPointsV2.size() );
 		
 		// contains all nodes that have a measuring point (origin) assigned

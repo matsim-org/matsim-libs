@@ -96,7 +96,7 @@ public class MatsimConfigType {
     protected boolean accessibilityComputationAreaFromBoundingBox;
     protected boolean accessibilityComputationAreaFromNetwork;
     @XmlElement(required = true)
-    protected String studyAreaBoundaryShapeFile;
+    protected FileType studyAreaBoundaryShapeFile;
     protected double boundingBoxTop;
     protected double boundingBoxLeft;
     protected double boundingBoxRight;
@@ -107,14 +107,14 @@ public class MatsimConfigType {
     @XmlSchemaType(name = "token")
     protected String urbansimZoneRandomLocationDistributionByShapeFile;
     @XmlElement(name = "external_matsim_config", required = true)
-    protected String externalMatsimConfig;
+    protected FileType externalMatsimConfig;
     @XmlElement(required = true)
-    protected String network;
+    protected FileType network;
     @XmlElement(required = true)
-    protected String warmStartPlansFile;
+    protected FileType warmStartPlansFile;
     protected boolean useHotStart;
     @XmlElement(required = true)
-    protected String hotStartPlansFile;
+    protected FileType hotStartPlansFile;
     @XmlElement(name = "activityType_0", required = true)
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlSchemaType(name = "token")
@@ -222,7 +222,7 @@ public class MatsimConfigType {
      *     {@link FileType }
      *     
      */
-    public String getStudyAreaBoundaryShapeFile() {
+    public FileType getStudyAreaBoundaryShapeFile() {
         return studyAreaBoundaryShapeFile;
     }
 
@@ -234,7 +234,7 @@ public class MatsimConfigType {
      *     {@link FileType }
      *     
      */
-    public void setStudyAreaBoundaryShapeFile(String value) {
+    public void setStudyAreaBoundaryShapeFile(FileType value) {
         this.studyAreaBoundaryShapeFile = value;
     }
 
@@ -350,7 +350,7 @@ public class MatsimConfigType {
      *     {@link FileType }
      *     
      */
-    public String getExternalMatsimConfig() {
+    public FileType getExternalMatsimConfig() {
         return externalMatsimConfig;
     }
 
@@ -362,7 +362,7 @@ public class MatsimConfigType {
      *     {@link FileType }
      *     
      */
-    public void setExternalMatsimConfig(String matsimConfigInputFile) {
+    public void setExternalMatsimConfig(FileType matsimConfigInputFile) {
         this.externalMatsimConfig = matsimConfigInputFile;
     }
 
@@ -374,7 +374,7 @@ public class MatsimConfigType {
      *     {@link FileType }
      *     
      */
-    public String getNetwork() {
+    public FileType getNetwork() {
         return network;
     }
 
@@ -386,7 +386,7 @@ public class MatsimConfigType {
      *     {@link FileType }
      *     
      */
-    public void setNetwork(String value) {
+    public void setNetwork(FileType value) {
         this.network = value;
     }
 
@@ -398,7 +398,7 @@ public class MatsimConfigType {
      *     {@link FileType }
      *     
      */
-    public String getWarmStartPlansFile() {
+    public FileType getWarmStartPlansFile() {
         return warmStartPlansFile;
     }
 
@@ -410,7 +410,7 @@ public class MatsimConfigType {
      *     {@link FileType }
      *     
      */
-    public void setWarmStartPlansFile(String hotstartPlansFile2) {
+    public void setWarmStartPlansFile(FileType hotstartPlansFile2) {
         this.warmStartPlansFile = hotstartPlansFile2;
     }
 
@@ -438,7 +438,7 @@ public class MatsimConfigType {
      *     {@link FileType }
      *     
      */
-    public String getHotStartPlansFile() {
+    public FileType getHotStartPlansFile() {
         return hotStartPlansFile;
     }
 
@@ -450,7 +450,7 @@ public class MatsimConfigType {
      *     {@link FileType }
      *     
      */
-    public void setHotStartPlansFile(String hotstartPlansFile2) {
+    public void setHotStartPlansFile(FileType hotstartPlansFile2) {
         this.hotStartPlansFile = hotstartPlansFile2;
     }
 

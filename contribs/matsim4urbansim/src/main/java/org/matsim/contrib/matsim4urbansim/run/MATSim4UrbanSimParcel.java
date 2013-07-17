@@ -386,6 +386,10 @@ public class MATSim4UrbanSimParcel{
 			zbacl.setComputingAccessibilityForWalk(true);
 			zbacl.setComputingAccessibilityForPt(true);
 			controler.addControlerListener( zbacl );
+			
+			log.error("yyyy I think that ZoneBasedAccessibilityControlerListener and GridBasedAccessibilityControlerListener are writing " +
+					"to the same file!!!!  Check, and fix if true.  kai, jul'13") ;
+			
 		}
 		
 		if(computeGridBasedAccessibility){
@@ -425,8 +429,10 @@ public class MATSim4UrbanSimParcel{
 		{ // dump population in csv format
 		if(isParcelMode)
 			readFromUrbansim.readAndDumpPersons2CSV(parcels, controler.getNetwork());
-		else
-			readFromUrbansim.readAndDumpPersons2CSV(zones, controler.getNetwork());
+//		else
+//			readFromUrbansim.readAndDumpPersons2CSV(zones, controler.getNetwork());
+			// I don't think that this has a chance to work: uses the parcel model keys to extract info from a zone 
+		// model person file.  kai, jul'13
 		}
 	}
 	

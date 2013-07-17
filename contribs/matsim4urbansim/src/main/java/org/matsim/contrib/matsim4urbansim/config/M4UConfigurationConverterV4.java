@@ -148,7 +148,7 @@ public class M4UConfigurationConverterV4 {
 		// checker. kai, jul'13)
 
 		// loading the external MATSim config in to the initialized config
-		M4UConfigUtils.loadExternalConfigAndOverwriteMATSim4UrbanSimSettings(matsim4urbansimConfigPart1.getExternalMatsimConfig(), config);
+		M4UConfigUtils.loadExternalConfigAndOverwriteMATSim4UrbanSimSettings(matsim4urbansimConfigPart1.getExternalMatsimConfig().getInputFile(), config);
 		// (by the design, the matsim xml config reader over-writes only entries which are explicitly mentioned in the external config)
 
 		// show final settings

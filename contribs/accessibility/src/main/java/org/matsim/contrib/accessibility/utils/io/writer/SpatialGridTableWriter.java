@@ -34,28 +34,58 @@ public class SpatialGridTableWriter {
 	
 	public static final String separator = "\t";
 
-	public void write(SpatialGrid grid, String file) throws IOException {
-		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
-		
-		for(double x = grid.getXmin(); x <= grid.getXmax(); x += grid.getResolution()) {
-			writer.write(SpatialGridTableWriter.separator);
-			writer.write(String.valueOf(x));
-		}
-		writer.newLine();
-		
-		for(double y = grid.getYmin(); y <= grid.getYmax() ; y += grid.getResolution()) {
-			writer.write(String.valueOf(y));
+	public void write(SpatialGrid grid, String fileName) throws IOException {
+		{
+			BufferedWriter writer = new BufferedWriter(new FileWriter(fileName));
+
 			for(double x = grid.getXmin(); x <= grid.getXmax(); x += grid.getResolution()) {
 				writer.write(SpatialGridTableWriter.separator);
-				Double val = grid.getValue(x, y);
-				if(!Double.isNaN(val))
-					writer.write(String.valueOf(val));
-				else
-					writer.write("NaN");
+				writer.write(String.valueOf(x));
 			}
 			writer.newLine();
+
+			for(double y = grid.getYmin(); y <= grid.getYmax() ; y += grid.getResolution()) {
+				writer.write(String.valueOf(y));
+				for(double x = grid.getXmin(); x <= grid.getXmax(); x += grid.getResolution()) {
+					writer.write(SpatialGridTableWriter.separator);
+					Double val = grid.getValue(x, y);
+					if(!Double.isNaN(val))
+						writer.write(String.valueOf(val));
+					else
+						writer.write("NaN");
+				}
+				writer.newLine();
+			}
+			writer.flush();
+			writer.close();
 		}
-		writer.flush();
-		writer.close();
+		
+//		// it is a bit idiotic to do as follows.  However, I need the output scanline by scanline, and that is not possible with the
+//		// regular accessibility writer.  Clearly, the following should somehow be separate ... and then combine all the
+//		// values of a given coordinate.  kai, jul'13
+//		{
+//			BufferedWriter writer = new BufferedWriter(new FileWriter(fileName+"_2"));
+//			
+//			writer.write("#x" + separator + "y" + separator + "accessibility") ;
+//			
+//			for(double y = grid.getYmin(); y <= grid.getYmax() ; y += grid.getResolution()) {
+//				for(double x = grid.getXmin(); x <= grid.getXmax(); x += grid.getResolution()) {
+//					writer.write(String.valueOf(x));
+//					writer.write(SpatialGridTableWriter.separator);
+//					writer.write(String.valueOf(y));
+//					writer.write(SpatialGridTableWriter.separator);
+//					Double val = grid.getValue(x, y);
+//					if(!Double.isNaN(val))
+//						writer.write(String.valueOf(val));
+//					else
+//						writer.write("NaN");
+//					writer.newLine();
+//				}
+//				writer.newLine();
+//			}
+//			writer.flush();
+//			writer.close();
+//		}
+		// now in ...Accessibility...Writer. kai, jul'13
 	}
 }
