@@ -18,6 +18,8 @@
  *                                                                         *
  * *********************************************************************** */
 /**
+ * 
+ * Package for code that reduces the size of a signalized network. 
  * @author dgrether
  *
  */
