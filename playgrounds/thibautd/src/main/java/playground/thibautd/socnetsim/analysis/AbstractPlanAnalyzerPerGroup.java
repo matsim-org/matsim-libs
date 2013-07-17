@@ -109,7 +109,7 @@ public abstract class AbstractPlanAnalyzerPerGroup implements IterationEndsListe
 			final Id groupId = entry.getKey();
 			final History history = entry.getValue();
 			dropDataFile( groupId , history );
-			if ( graphWriteInterval < 1 || event.getIteration() % graphWriteInterval == 0 ) {
+			if ( graphWriteInterval > 0 && event.getIteration() % graphWriteInterval == 0 ) {
 				dropChart( groupId , history );
 			}
 		}
