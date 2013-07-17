@@ -1,4 +1,4 @@
-Package: matsim-analysis
+Package: matsim.analysis
 Type: Package
 Title: functions to produce graphs from matsim output files
 Version: 1.0
