@@ -3,13 +3,9 @@ package playground.southAfrica.freight.digicore.analysis.geographicClassifier;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
@@ -20,17 +16,9 @@ import playground.southafrica.freight.digicore.containers.DigicoreActivity;
 import playground.southafrica.freight.digicore.containers.DigicoreChain;
 import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
 import playground.southafrica.freight.digicore.io.DigicoreVehicleWriter;
-import playground.southafrica.utilities.FileUtils;
 
 
 public class GeographicClassifierTest extends MatsimTestCase {
-	private final Logger log = Logger.getLogger(GeographicClassifierTest.class);
-	private File inputFolder;
-	private String shapefile;
-	private double threshold;
-	private int nThreads;
-	private File outputFolder;
-	
 	
 	public void testConstructor() throws IOException{
 		GeographicClassifier gc = new GeographicClassifier(getOutputDirectory(), getPackageInputDirectory() + "shapefile/testShapefile.shp", 1);
@@ -43,56 +31,8 @@ public class GeographicClassifierTest extends MatsimTestCase {
 		assertTrue("Inter list should be empty.", gc.getLists().get("inter").isEmpty());
 		assertTrue("Should have an intra list", gc.getLists().containsKey("extra"));
 		assertTrue("Extra list should be empty.", gc.getLists().get("extra").isEmpty());
-		
-		
-//		
-//		shapefile = inputFolder.getAbsolutePath() + "/testShapefile.shp";
-//		outputFolder = new File(getPackageInputDirectory());
-//		threshold = 0.6;
-//		nThreads = 1;
-//
-//		
-//		log.info("inputFolder: " + inputFolder.getAbsolutePath());
-//		
-//		List<File> listOfVehicles = FileUtils.sampleFiles(outputFolder, Integer.MAX_VALUE, FileUtils.getFileFilter(".xml.gz"));
-//		Collections.sort(listOfVehicles);
-//		assertEquals("Number of vehicle files incorrect", 3, listOfVehicles.size());
-//				
-//		//split vehicles
-//		List<List<Id>> listOfLists = mvi.splitIntraInterExtra(listOfVehicles, shapefile, threshold, nThreads);
-//		//check that there are 3 lists
-//		assertEquals("The number of lists is incorrect", 3, listOfLists.size());
-//	
-//		//check if intra list contains vehicle 1
-//		List<Id> intraList = listOfLists.get(0);
-//		assertEquals("Wrong vehicle as intra-provincial", 1, Integer.parseInt(intraList.get(0).toString()));
-//		//check if intra list contains vehicle 1
-//		List<Id> interList = listOfLists.get(1);
-//		assertEquals("Wrong vehicle as inter-provincial", 2, Integer.parseInt(interList.get(0).toString()));
-//		//check if intra list contains vehicle 1
-//		List<Id> extraList = listOfLists.get(2);
-//		assertEquals("Wrong vehicle as extra-provincial", 3, Integer.parseInt(extraList.get(0).toString()));
-//		
-//		mvi.writeListToFile(outputFolder.getAbsolutePath(), "intra", intraList);
-//		mvi.writeListToFile(outputFolder.getAbsolutePath(), "inter", interList);
-//		mvi.writeListToFile(outputFolder.getAbsolutePath(), "extra", extraList);
-//	
-//		String intraFile1 = outputFolder.getAbsolutePath() + "/intra.txt";
-//		String interFile2 = outputFolder.getAbsolutePath() + "/inter.txt";
-//		String extraFile3 = outputFolder.getAbsolutePath() + "/extra.txt";
-//		
-//		List<File> newIntraList = mvi.readListFromFile(intraFile1, outputFolder.getAbsolutePath());
-//		List<File> newInterList = mvi.readListFromFile(interFile2, outputFolder.getAbsolutePath());
-//		List<File> newExtraList = mvi.readListFromFile(extraFile3, outputFolder.getAbsolutePath());
-//		
-//		assertTrue("Intra-lists differ...something wrong with readListFromFile method",
-//				intraList.get(0).equals(new IdImpl(newIntraList.get(0).getName().substring(0, newIntraList.get(0).getName().indexOf(".")))));
-//		assertTrue("Inter-lists differ...something wrong with readListFromFile method",
-//				interList.get(0).equals(new IdImpl(newInterList.get(0).getName().substring(0, newInterList.get(0).getName().indexOf(".")))));
-//		assertTrue("Extra-lists differ...something wrong with readListFromFile method",
-//				extraList.get(0).equals(new IdImpl(newExtraList.get(0).getName().substring(0, newExtraList.get(0).getName().indexOf(".")))));
-//		
 	}
+	
 	
 	public void testSplitInterIntraExtra(){
 		setUpIntraVehicle();
@@ -112,6 +52,7 @@ public class GeographicClassifierTest extends MatsimTestCase {
 		assertTrue("Wrong inter vehicle.", gc.getLists().get("inter").contains(new IdImpl(2)));
 		assertTrue("Wrong extra vehicle.", gc.getLists().get("extra").contains(new IdImpl(3)));
 	}
+	
 	
 	public void testWriteLists(){
 		setUpIntraVehicle();
