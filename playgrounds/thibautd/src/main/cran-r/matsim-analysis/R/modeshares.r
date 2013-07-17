@@ -54,3 +54,34 @@ plotshareevolution <- function(
 	abline( h=0 , lty=2 )
 }
 
+plotshareevolution.nonstacked <- function(
+						   tripmodesharefile="tripmodeshares.dat",
+						   dataframe=read.table( tripmodesharefile , header=T ) ,
+						   cols=rainbow( length( unique( dataframe$mode ) ) ),
+						   legendpos="topright",
+							   ...) {
+	modes <- unique( dataframe$mode )
+	plot( dataframe$iter[ dataframe$mode == modes[ 1 ] ],
+		 dataframe$nTrips[ dataframe$mode == modes[ 1 ] ] ,
+		 #main="average executed joint plan size" ,
+		 main="" ,
+		 xlab="Iteration" , ylab="# Trips",
+		 type="l",
+		 bty="n",
+		 xlim=c(min( dataframe$iter ) , max( dataframe$iter ) ),
+		 ylim=c(0, max( dataframe$nTrips )),
+		 col=cols[ 1 ],
+		 ...)
+	for ( i in seq(2,length(modes)) ) {
+		lines(
+			 dataframe$iter[ dataframe$mode == modes[ i ] ],
+			 dataframe$nTrips[ dataframe$mode == modes[ i ] ] ,
+			 col=cols[ i ] )
+	}
+	legend(
+		   legendpos,
+		   legend=modes,
+		   col=cols,
+		   lty=1,
+		   box.lty=0)
+}
