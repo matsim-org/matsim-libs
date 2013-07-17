@@ -107,6 +107,7 @@ public class NetLanesSignalsShrinker {
 		nodeTypesToMerge.add(NetworkCalcTopoType.PASS2WAY); //PASS2WAY: 2 in- and 2 outgoing links
 		NetworkLanesSignalsSimplifier nsimply = new NetworkLanesSignalsSimplifier();
 		nsimply.setNodesToMerge(nodeTypesToMerge);
+		nsimply.setSimplifySignalizedNodes(false);
 		nsimply.simplifyNetworkLanesAndSignals(smallNetwork, this.fullScenario.getScenarioElement(LaneDefinitions20.class), this.fullScenario.getScenarioElement(SignalsData.class));
 		this.originalToSimplifiedLinkIdMatching = nsimply.getOriginalToSimplifiedLinkIdMatching();
 		

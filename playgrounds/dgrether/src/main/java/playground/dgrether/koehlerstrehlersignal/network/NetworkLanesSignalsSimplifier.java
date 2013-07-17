@@ -63,6 +63,7 @@ public class NetworkLanesSignalsSimplifier {
 	private Map<Id, List<Id>> simplifiedToOriginalLinkIdMatching = new HashMap<Id, List<Id>>();
 
 	private Set<Id> nodeIdsToRemove = new HashSet<Id>();
+	private boolean simplifySignalizedNodes;
 
 	private Id createId(Id inLink, Id outLink) {
 		Id id = new IdImpl(inLink + "-" + outLink);
@@ -118,10 +119,22 @@ public class NetworkLanesSignalsSimplifier {
 					
 						Link  outLink = oL;
 						if (inLink != null && outLink != null) {
-							if (!outLink.getToNode().equals(inLink.getFromNode())) {
+							if (! outLink.getToNode().equals(inLink.getFromNode())) {
+								Node removedNode = outLink.getFromNode();
+								
+								if (! this.simplifySignalizedNodes) {
+									boolean stop = false;
+									for (Entry<Id, Set<Id>> entry : signalizedNodesBySystem.entrySet()){
+										if (entry.getValue().contains(removedNode.getId())){
+											stop = true;
+											break;
+										}
+									}
+									if (stop) continue;
+								}
+								
 								// Only merge links with same attributes
 								if (bothLinksHaveSameLinkStats(inLink, outLink)) {
-									Node removedNode = outLink.getFromNode();
 									LinkImpl newLink = ((NetworkImpl) network).createAndAddLink(
 											this.createId(inLink.getId(), outLink.getId()), inLink.getFromNode(), outLink.getToNode(),
 											inLink.getLength() + outLink.getLength(), inLink.getFreespeed(),
@@ -262,6 +275,10 @@ public class NetworkLanesSignalsSimplifier {
 		log.error(ns.originalToSimplifiedLinkIdMatching);
 		
 		
+	}
+
+	public void setSimplifySignalizedNodes(boolean b) {
+		this.simplifySignalizedNodes = b;
 	}
 
 	
