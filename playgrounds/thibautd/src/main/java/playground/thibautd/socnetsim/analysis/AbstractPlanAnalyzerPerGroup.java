@@ -74,7 +74,7 @@ public abstract class AbstractPlanAnalyzerPerGroup implements IterationEndsListe
 		this.scenario = scenario;
 		this.groupIdentifier = groupIdentifier;
 		fileName = controlerIO.getOutputFilename( getStatName()+"Stats" );
-		writer = IOUtils.getBufferedWriter( fileName +".dat.gz" );
+		writer = IOUtils.getBufferedWriter( fileName +".dat" );
 
 		try {
 			writer.write( "iter\tgroupId\tmin\tmax\tavg\texec" );
@@ -137,6 +137,8 @@ public abstract class AbstractPlanAnalyzerPerGroup implements IterationEndsListe
 					history.getAvgOfMaximums()[ n ]+"\t"+
 					history.getAvgOfAverages()[ n ]+"\t"+
 					history.getAvgOfExecuted()[ n ]);
+			// make lines directly available
+			writer.flush();
 		} catch (IOException e) {
 			log.error( e );
 		}
