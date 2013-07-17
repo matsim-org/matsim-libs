@@ -70,11 +70,7 @@ public class OutFlowInfoCollectorWithPt implements LinkLeaveEventHandler,
 		}
 
 		if (!linkOutFlow.containsKey(linkId)) {
-			linkOutFlow.put(linkId, new int[(86400 / binSizeInSeconds) + 1]); // set
-																				// the
-																				// number
-																				// of
-																				// intervals
+			linkOutFlow.put(linkId, new int[(86400 / binSizeInSeconds) + 1]);
 		}
 
 		int[] bins = linkOutFlow.get(linkId);
@@ -82,9 +78,7 @@ public class OutFlowInfoCollectorWithPt implements LinkLeaveEventHandler,
 		int binIndex = (int) Math.round(Math.floor(time / binSizeInSeconds));
 
 		if (time < 86400) {
-			bins[binIndex] = bins[binIndex] + 1; // count the number of agents
-													// for each link at each
-													// time interval
+			bins[binIndex] = bins[binIndex] + 1; 
 		}
 	}
 

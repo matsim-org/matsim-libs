@@ -17,13 +17,13 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.wrashid.msimoni.analyses.LinkSelector;
 
-public class MainFundamentalDiagram {
+public class MainFundamentalDiagramInstantanious {
 
 	static boolean doConsoleOutput = false;
 
 	public static void main(String[] args) {
-		String networkFile = "C:/data/workspace3/matsim/output/equil/output_network.xml.gz";
-		String eventsFile = "C:/data/workspace3/matsim/output/equil/ITERS/it.10/10.events.xml.gz";
+		String networkFile = "C:/data/workspace3/matsim/output/equil_jdeq/output_network.xml.gz";
+		String eventsFile = "C:/data/workspace3/matsim/output/equil_jdeq/ITERS/it.10/10.events.xml.gz";
 		// String networkFile =
 		// "H:/data/experiments/TRBAug2011/runs/ktiRun24/output/output_network.xml.gz";
 		// String eventsFile =
@@ -46,7 +46,7 @@ public class MainFundamentalDiagram {
 
 		DensityInfoCollectorWithPt densityHandler = new DensityInfoCollectorWithPt(
 				links, binSizeInSeconds);
-		OutFlowInfoCollectorWithPt outflowHandler = new OutFlowInfoCollectorWithPt(
+		InstantaniousOutflowCollector outflowHandler = new InstantaniousOutflowCollector(
 				links, binSizeInSeconds);
 
 		densityHandler.reset(0);
@@ -94,10 +94,10 @@ public class MainFundamentalDiagram {
 
 	public static void printDensityAndOutFlow(HashMap<Id, double[]> density,
 			Map<Id, ? extends Link> links,
-			OutFlowInfoCollectorWithPt outflowHandler) { // print
+			InstantaniousOutflowCollector outflowHandler) { // print
 
 		for (Id linkId : density.keySet()) {
-			int[] tempBin = outflowHandler.linkOutFlow.get(linkId);
+			int[] tempBin = outflowHandler.getLinkOutFlow().get(linkId);
 
 			double[] outFlowBins = new double[tempBin.length];
 
@@ -126,7 +126,7 @@ public class MainFundamentalDiagram {
 				.println("outflow: ==============================================");
 
 		for (Id linkId : density.keySet()) {
-			int[] bins = outflowHandler.linkOutFlow.get(linkId);
+			int[] bins = outflowHandler.getLinkOutFlow().get(linkId);
 
 			Link link = links.get(linkId);
 
