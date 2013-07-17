@@ -37,14 +37,14 @@ public class SpatialGridTableWriter {
 	public void write(SpatialGrid grid, String file) throws IOException {
 		BufferedWriter writer = new BufferedWriter(new FileWriter(file));
 		
-//		for(double x = grid.getXmin(); x <= grid.getXmax(); x += grid.getResolution()) {
-//			writer.write(SpatialGridTableWriter.separator);
-//			writer.write(String.valueOf(x));
-//		}
-//		writer.newLine();
+		for(double x = grid.getXmin(); x <= grid.getXmax(); x += grid.getResolution()) {
+			writer.write(SpatialGridTableWriter.separator);
+			writer.write(String.valueOf(x));
+		}
+		writer.newLine();
 		
 		for(double y = grid.getYmin(); y <= grid.getYmax() ; y += grid.getResolution()) {
-//			writer.write(String.valueOf(y));
+			writer.write(String.valueOf(y));
 			for(double x = grid.getXmin(); x <= grid.getXmax(); x += grid.getResolution()) {
 				writer.write(SpatialGridTableWriter.separator);
 				Double val = grid.getValue(x, y);
