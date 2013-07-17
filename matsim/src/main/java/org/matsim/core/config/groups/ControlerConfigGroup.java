@@ -214,20 +214,24 @@ public class ControlerConfigGroup extends Module {
 		map.put(ROUTINGALGORITHM_TYPE, "The type of routing (least cost path) algorithm used, may have the values: " + RoutingAlgorithmType.Dijkstra + ", " + 
 				RoutingAlgorithmType.FastDijkstra + ", " + RoutingAlgorithmType.AStarLandmarks + " or "  + RoutingAlgorithmType.FastAStarLandmarks);
 		map.put(RUNID, "An identifier for the current run which is used as prefix for output files and mentioned in output xml files etc.");
-		map.put(EVENTS_FILE_FORMAT, "Specifies the file format for writing events. Currently supported: txt, xml. Multiple values can be specified separated by commas (',').");
+		map.put(EVENTS_FILE_FORMAT, "Default="+EventsFileFormat.xml+"; Specifies the file format for writing events. Currently supported: txt, xml."+IOUtils.NATIVE_NEWLINE+ "\t\t" +
+				"Multiple values can be specified separated by commas (',').");
 		map.put(WRITE_EVENTS_INTERVAL, "iterationNumber % writeEventsInterval == 0 defines in which iterations events are written " +
 				"to a file. `0' disables events writing completely.");
 		map.put(WRITE_PLANS_INTERVAL, "iterationNumber % writePlansInterval == 0 defines (hopefully) in which iterations plans are " +
 				"written to a file. `0' disables plans writing completely.  Some plans in early iterations are always written");
+		map.put(LINKTOLINK_ROUTING_ENABLED, "Default=false; "); // TODO: add description
+		map.put(FIRST_ITERATION, "Default=0; "); // TODO: add description
+		map.put(LAST_ITERATION, "Default=1000; "); // TODO: add description
 		
 		StringBuilder mobsimTypes = new StringBuilder();
 		for ( MobsimType mtype : MobsimType.values() ) {
 			mobsimTypes.append(mtype.toString());
 			mobsimTypes.append(' ');
 		}
-		map.put(MOBSIM, "Defines which mobility simulation will be used. Currently supported: " + mobsimTypes + IOUtils.NATIVE_NEWLINE +
-				"Depending on the chosen mobsim, you'll have to add additional config modules to configure the corresponding mobsim." + IOUtils.NATIVE_NEWLINE +
-				"For 'qsim', add a module 'qsim' to the config." + IOUtils.NATIVE_NEWLINE +
+		map.put(MOBSIM, "Defines which mobility simulation will be used. Currently supported: " + mobsimTypes + IOUtils.NATIVE_NEWLINE + "\t\t" +
+				"Depending on the chosen mobsim, you'll have to add additional config modules to configure the corresponding mobsim." + IOUtils.NATIVE_NEWLINE + "\t\t" +
+				"For 'qsim', add a module 'qsim' to the config." + IOUtils.NATIVE_NEWLINE + "\t\t" +
 				"For 'queueSimulation', add a module 'simulation' to the config.");
 		
 		map.put(SNAPSHOT_FORMAT, "Comma-separated list of visualizer output file formats. `transims', `googleearth', and `otfvis'.");

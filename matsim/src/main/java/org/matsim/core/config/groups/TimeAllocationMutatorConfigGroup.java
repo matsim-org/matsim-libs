@@ -63,7 +63,7 @@ public class TimeAllocationMutatorConfigGroup extends Module {
 	@Override
 	public Map<String, String> getComments() {
 		Map<String, String> comments = super.getComments();
-		comments.put(MUTATION_RANGE, "Defines how many seconds a time mutation can maximally shift a time."); 
+		comments.put(MUTATION_RANGE, "Default:1800.0; Defines how many seconds a time mutation can maximally shift a time."); 
 		return comments;
 	}
 
