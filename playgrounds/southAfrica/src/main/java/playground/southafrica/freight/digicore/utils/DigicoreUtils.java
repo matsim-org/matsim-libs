@@ -11,7 +11,11 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.IOUtils;
+
+import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
+import playground.southafrica.utilities.FileUtils;
 
 
 /**
@@ -83,6 +87,48 @@ public class DigicoreUtils {
 		return list;
 	}
 	
+	
+	/**
+	 * This method reads in a .txt file containing vehicle {@link Id}s, one per 
+	 * line, and creates a {@link List} of {@link File}s if a corresponding 
+	 * {@link DigicoreVehicle} file can be identified. 
+	 * 
+	 * @param inputFile containing the {@link Id}s;
+	 * @param xmlFolder where {@link DigicoreVehicle} files will be checked;
+	 * @return the {@link List} of {@link DigicoreVehicle} files.
+	 */
+	public List<File> readDigicoreVehicleIds(String inputFile, String xmlFolder) throws IOException{
+		File inputFolder = new File(xmlFolder);
+		
+		List<String> list = new ArrayList<String>();
+		List<File> listOfVehicleFiles = new ArrayList<File>();
+		
+		/* Read in the vehicle Ids, and add the file extension. */
+		BufferedReader br = IOUtils.getBufferedReader(inputFile);
+		try{
+			String inputLine = null;
+			while((inputLine = br.readLine()) != null){
+				list.add(inputLine + ".xml.gz");
+			}
+		} finally{
+			br.close();
+		}
+		
+		/* Get all the xml files in the folder. */
+		List<File> allVehicleFiles = FileUtils.sampleFiles(inputFolder, Integer.MAX_VALUE, FileUtils.getFileFilter(".xml.gz"));
+		
+		/* Compare the read Ids with the available files, and add those matching
+		 * to the result list. */
+		for(File vehicleFile : allVehicleFiles){
+			String fileName = vehicleFile.getName();
+			if(list.contains(fileName)){
+				listOfVehicleFiles.add(vehicleFile);
+			}
+		}
+		
+		return listOfVehicleFiles;
+	}
+
 		
 
 }
