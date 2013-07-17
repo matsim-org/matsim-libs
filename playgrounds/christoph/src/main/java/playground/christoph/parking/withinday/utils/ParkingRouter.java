@@ -43,6 +43,7 @@ import org.matsim.core.router.MyMultiNodeDijkstra;
 import org.matsim.core.router.MyMultiNodeDijkstra.InitialNode;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.MyFastDijkstraFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -56,25 +57,27 @@ public class ParkingRouter {
 	
 	private final Scenario scenario;
 	private final Map<String, TravelTime> travelTimes;
-	private final TravelDisutility travelDisutility;
+	private final Map<String, TravelDisutility> travelDisutilities;
 	private final TripRouter tripRouter;
 	private final int nodesToCheck;
 	
 	private final Map<String, MyMultiNodeDijkstra> dijkstras;
 	
-	public ParkingRouter(Scenario scenario, Map<String, TravelTime> travelTimes, TravelDisutility travelDisutility, TripRouter tripRouter, int nodesToCheck) {
+	public ParkingRouter(Scenario scenario, Map<String, TravelTime> travelTimes, TravelDisutilityFactory travelDisutilityFactory, TripRouter tripRouter, int nodesToCheck) {
 		this.scenario = scenario;
 		this.travelTimes = travelTimes;
-		this.travelDisutility = travelDisutility;
 		this.tripRouter = tripRouter;
 		
 		if (nodesToCheck > 0) this.nodesToCheck = nodesToCheck;
 		else this.nodesToCheck = 1;
 		
+		this.travelDisutilities = new HashMap<String, TravelDisutility>();
 		this.dijkstras = new HashMap<String, MyMultiNodeDijkstra>();
 		for (Entry<String, TravelTime> entry : travelTimes.entrySet()) {
 			String mode = entry.getKey();
 			TravelTime travelTime = entry.getValue();
+			TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime, scenario.getConfig().planCalcScore());
+			this.travelDisutilities.put(mode, travelDisutility);
 			MyMultiNodeDijkstra modeDijsktra = (MyMultiNodeDijkstra) new MyFastDijkstraFactory().createPathCalculator(scenario.getNetwork(), travelDisutility, travelTime); 
 			this.dijkstras.put(mode, modeDijsktra); 
 		}
@@ -90,10 +93,11 @@ public class ParkingRouter {
 	 * @param mode
 	 */
 	public void adaptStartOfRoute(NetworkRoute route, Id startLinkId, double time, Person person, Vehicle vehicle, String mode) {
-		adaptStartOfRoute(route, startLinkId, time, person, vehicle, this.dijkstras.get(mode));
+		adaptStartOfRoute(route, startLinkId, time, person, vehicle, this.dijkstras.get(mode), this.travelDisutilities.get(mode));
 	}
 	
-	private void adaptStartOfRoute(NetworkRoute route, Id startLinkId, double time, Person person, Vehicle vehicle, MyMultiNodeDijkstra dijkstra) {
+	private void adaptStartOfRoute(NetworkRoute route, Id startLinkId, double time, Person person, Vehicle vehicle, 
+			MyMultiNodeDijkstra dijkstra, TravelDisutility travelDisutility) {
 		
 		// check whether the start link has really changed
 		if (route.getStartLinkId().equals(startLinkId)) return;
@@ -174,10 +178,11 @@ public class ParkingRouter {
 	 * @param mode
 	 */
 	public void adaptEndOfRoute(NetworkRoute route, Id endLinkId, double time, Person person, Vehicle vehicle, String mode) {
-		adaptEndOfRoute(route, endLinkId, time, person, vehicle, this.dijkstras.get(mode));
+		adaptEndOfRoute(route, endLinkId, time, person, vehicle, this.dijkstras.get(mode), this.travelDisutilities.get(mode));
 	}
 	
-	private void adaptEndOfRoute(NetworkRoute route, Id endLinkId, double time, Person person, Vehicle vehicle, MyMultiNodeDijkstra dijkstra) {
+	private void adaptEndOfRoute(NetworkRoute route, Id endLinkId, double time, Person person, Vehicle vehicle, 
+			MyMultiNodeDijkstra dijkstra, TravelDisutility travelDisutility) {
 		
 		// check whether the end link has really changed
 		if (route.getEndLinkId().equals(endLinkId)) return;
@@ -268,21 +273,22 @@ public class ParkingRouter {
 	 * @param mode
 	 */
 	public void adaptStartAndEndOfRoute(NetworkRoute route, Id startLinkId, Id endLinkId, double time, Person person, Vehicle vehicle, String mode) {
-		adaptStartAndEndOfRoute(route, startLinkId, endLinkId, time, person, vehicle, this.dijkstras.get(mode));
+		adaptStartAndEndOfRoute(route, startLinkId, endLinkId, time, person, vehicle, this.dijkstras.get(mode), this.travelDisutilities.get(mode));
 	}
 	
-	private void adaptStartAndEndOfRoute(NetworkRoute route, Id startLinkId, Id endLinkId, double time, Person person, Vehicle vehicle, MyMultiNodeDijkstra dijkstra) {
+	private void adaptStartAndEndOfRoute(NetworkRoute route, Id startLinkId, Id endLinkId, double time, Person person, Vehicle vehicle, 
+			MyMultiNodeDijkstra dijkstra, TravelDisutility travelDisutility) {
 		
 		// check whether the start and / or link have really changed
 		if (route.getStartLinkId().equals(startLinkId)) {
 			if (route.getEndLinkId().equals(endLinkId)) return;
 			else {
-				adaptEndOfRoute(route, endLinkId, time, person, vehicle, dijkstra);
+				adaptEndOfRoute(route, endLinkId, time, person, vehicle, dijkstra, travelDisutility);
 				return;
 			}
 		} else {
 			if (route.getEndLinkId().equals(endLinkId)) {
-				adaptStartOfRoute(route, startLinkId, time, person, vehicle, dijkstra);
+				adaptStartOfRoute(route, startLinkId, time, person, vehicle, dijkstra, travelDisutility);
 				return;
 			}
 		}
@@ -310,8 +316,8 @@ public class ParkingRouter {
 			
 			route.setLinkIds(startLinkId, linkIds, endLinkId);
 		} else {
-			adaptStartOfRoute(route, startLinkId, time, person, vehicle, dijkstra);
-			adaptEndOfRoute(route, endLinkId, time, person, vehicle, dijkstra);
+			adaptStartOfRoute(route, startLinkId, time, person, vehicle, dijkstra, travelDisutility);
+			adaptEndOfRoute(route, endLinkId, time, person, vehicle, dijkstra, travelDisutility);
 		}
 	}
 	

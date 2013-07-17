@@ -24,27 +24,28 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.router.TripRouterFactoryInternal;
-import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 
 public class ParkingRouterFactory {
 
 	private final Scenario scenario;
 	private final Map<String, TravelTime> travelTimes;
-	private final TravelDisutility travelDisutility;
+	private final TravelDisutilityFactory travelDisutilityFactory;
 	private final TripRouterFactoryInternal tripRouterFactory;
 	private final int nodesToCheck;
 
-	public ParkingRouterFactory(Scenario scenario, Map<String, TravelTime> travelTimes, TravelDisutility travelDisutility,
+	public ParkingRouterFactory(Scenario scenario, Map<String, TravelTime> travelTimes, 
+			TravelDisutilityFactory travelDisutilityFactory,
 			TripRouterFactoryInternal tripRouterFactory, int nodesToCheck) {
 		this.scenario = scenario;
 		this.travelTimes = travelTimes;
-		this.travelDisutility = travelDisutility;
+		this.travelDisutilityFactory = travelDisutilityFactory;
 		this.tripRouterFactory = tripRouterFactory;
 		this.nodesToCheck = nodesToCheck;
 	}
 	
 	public ParkingRouter createParkingRouter() {
-		return new ParkingRouter(scenario, travelTimes, travelDisutility, tripRouterFactory.instantiateAndConfigureTripRouter(), nodesToCheck);
+		return new ParkingRouter(scenario, travelTimes, travelDisutilityFactory, tripRouterFactory.instantiateAndConfigureTripRouter(), nodesToCheck);
 	}
 }

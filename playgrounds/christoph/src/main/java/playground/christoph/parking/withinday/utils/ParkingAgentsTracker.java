@@ -61,7 +61,6 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 
 import playground.christoph.parking.core.mobsim.ParkingInfrastructure;
-import playground.christoph.parking.core.mobsim.ParkingInfrastructure.ParkingFacility;
 
 public class ParkingAgentsTracker implements LinkEnterEventHandler, AgentArrivalEventHandler, AgentDepartureEventHandler,
 		ActivityStartEventHandler, ActivityEndEventHandler, MobsimInitializedListener, MobsimAfterSimStepListener,
