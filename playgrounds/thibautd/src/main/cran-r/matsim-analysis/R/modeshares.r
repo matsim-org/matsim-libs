@@ -1,4 +1,7 @@
-plotshareevolution <- function( tripmodesharefile="tripmodeshares.dat", dataframe=read.table( tripmodesharefile , header=T ) ) {
+plotshareevolution <- function(
+						   tripmodesharefile="tripmodeshares.dat",
+						   dataframe=read.table( tripmodesharefile , header=T ) ,
+							   ...) {
 	dataframe$mode <- as.factor( dataframe$mode )
 	modes <- unique( dataframe$mode )
 
@@ -23,7 +26,8 @@ plotshareevolution <- function( tripmodesharefile="tripmodeshares.dat", datafram
 		 main="" ,
 		 xlab="Iteration" , ylab="Cumul Trips",
 		 type="n", bty="n",
-		 ylim=c(0, max( cumulated.counts.per.mode[[ length( modes ) ]] )) )
+		 ylim=c(0, max( cumulated.counts.per.mode[[ length( modes ) ]] )),
+		 ...)
 
 	prev <- rep( 0 , length( cumulated.counts.per.mode[[ 1 ]] ) )
 	minIter <- 0
@@ -48,5 +52,4 @@ plotshareevolution <- function( tripmodesharefile="tripmodeshares.dat", datafram
 
 	abline( h=0 , lty=2 )
 }
-
 
