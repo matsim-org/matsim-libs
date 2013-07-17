@@ -76,7 +76,7 @@ public class DepotArrivalDepartureCharger implements AgentArrivalEventHandler,
 
 	}
 
-	public void chargeAllVehiclesInDepots(double time, double duration){
+	private void chargeAllVehiclesInDepots(double time, double duration){
 		
 	for (Entry<Id,Double> e : arrivalTimes.entrySet()){
 		double chargeWatt = duration * POWERINKW * 1000;
@@ -167,5 +167,15 @@ public class DepotArrivalDepartureCharger implements AgentArrivalEventHandler,
 					lackOfSoc= true;
 		
 		return lackOfSoc;
+	}
+
+	public void doSimStep(double time) {
+		if (time % 60 == 0) {
+			chargeAllVehiclesInDepots(time, 60);
+			refreshLog(time);
+
+
+		}
+		
 	}
 }
