@@ -263,7 +263,7 @@ public class ElectroCabLaunchUtils
 
         qSim.addAgentSource(new PopulationAgentSource(scenario.getPopulation(),
                 new DefaultAgentFactory(qSim), qSim));
-        qSim.addAgentSource(new TaxiAgentSource(data, taxiSimEngine));
+        qSim.addAgentSource(new TaxiAgentSource(data, taxiSimEngine, false));
         qSim.addDepartureHandler(new TaxiModeDepartureHandler(taxiSimEngine, data));
 
         
