@@ -193,6 +193,7 @@ public class TransferDelayWaitingHandler implements PersonEntersVehicleEventHand
 			if (this.vehId2agentsTransferingAtThisStop.get(event.getVehicleId()) == null){
 				agentsTransferingAtThisStop = new ArrayList<Id>();
 			} else {
+				// TODO: AddAll
 				agentsTransferingAtThisStop = this.vehId2agentsTransferingAtThisStop.get(event.getVehicleId());
 			}
 			agentsTransferingAtThisStop.add(event.getPersonId());
@@ -273,6 +274,7 @@ public class TransferDelayWaitingHandler implements PersonEntersVehicleEventHand
 			if (this.vehId2agentsTransferingAtThisStop.get(event.getVehicleId()) == null){
 				agentsTransferingAtThisStop = new ArrayList<Id>();
 			} else {
+				// TODO: AddAll
 				agentsTransferingAtThisStop = this.vehId2agentsTransferingAtThisStop.get(event.getVehicleId());
 			}
 			agentsTransferingAtThisStop.add(event.getPersonId());
