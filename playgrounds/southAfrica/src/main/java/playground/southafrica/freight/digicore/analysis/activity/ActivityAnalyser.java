@@ -30,10 +30,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 
 import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
+import playground.southafrica.freight.digicore.utils.DigicoreUtils;
 import playground.southafrica.utilities.FileUtils;
 import playground.southafrica.utilities.Header;
 
@@ -48,13 +50,14 @@ public class ActivityAnalyser {
 	 */
 	public static void main(String[] args) {
 		Header.printHeader(ActivityAnalyser.class.toString(), args);
-		String inputFolder = args[0];
-		String outputFile = args[1];
-		int analysis = Integer.parseInt(args[2]);
-		int numberOfThreads = Integer.parseInt(args[3]);
+		String xmlFolder = args[0];
+		String vehicleIdFile = args[1];
+		String outputFile = args[2];
+		int analysis = Integer.parseInt(args[3]);
+		int numberOfThreads = Integer.parseInt(args[4]);
 		
 		ActivityAnalyser aa = new ActivityAnalyser(numberOfThreads);
-		aa.analyse(analysis, inputFolder, outputFile);
+		aa.analyse(analysis, xmlFolder, vehicleIdFile, outputFile);
 		
 		Header.printFooter();
 	}
@@ -81,23 +84,42 @@ public class ActivityAnalyser {
 	
 	/**
 	 * Perform a variety of analysis on digicore vehicle files.
+	 * @param the folder where {@link DigicoreVehicle} files can be found;
 	 * @param analysis a value indicating the specific analysis to perform. The
 	 * 		  following values apply:
 	 * 		  <ol>
 	 * 			<li> minor activity start time;
 	 * 		  </ol>
-	 * @param input the folder where {@link DigicoreVehicle} files can be found;
+	 * @param input the file containing {@link DigicoreVehicle} {@link Id}s that
+	 * 		  will be used as filter. If this is null, or the file is not 
+	 * 		  readable, then all files will be used from the given inputfolder.
 	 * @param output the file to which the relevant analysis will be written.
 	 * 		  This will typically then be further analysed using R. 
 	 */
-	public void analyse(int analysis, String input, String output){
-		/* Check that input folder exists, and get the vehicle files. */
-		File folder = new File(input);
-		if(!folder.exists() || !folder.canRead()){
-			throw new RuntimeException("Cannot read vehicle files from " + input);
+	public void analyse(int analysis, String xmlFolder, String input, String output){
+		/* Check xml folder. */ 
+		File folder = new File(xmlFolder);
+		if(!folder.exists() || !folder.canRead() || !folder.isDirectory()){
+			throw new IllegalArgumentException("Cannot read from " + xmlFolder);
 		}
-		List<File> vehicleFiles = FileUtils.sampleFiles(folder, Integer.MAX_VALUE, FileUtils.getFileFilter(".xml.gz"));
 		
+		/* Check (optional) input. */
+		List<File> vehicleFiles = null;
+		File f = new File(input);
+		if(input == null || input.equalsIgnoreCase("null") ||
+				!f.exists() || !f.isFile() || !f.canRead()){
+			/* Read all the vehicle files from the xml folder. */
+			vehicleFiles = FileUtils.sampleFiles(f, Integer.MAX_VALUE, FileUtils.getFileFilter(".xml.gz"));
+		} else{
+			/* The input location is assumed to be a file containing the Ids of
+			 * those vehicles that should be taken into account. */
+			try {
+				vehicleFiles = DigicoreUtils.readDigicoreVehicleIds(input, xmlFolder);
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Could not read vehicle Ids from " + input);
+			}
+		}
 
 		switch (analysis) {
 		case 1:

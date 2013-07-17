@@ -97,7 +97,7 @@ public class DigicoreUtils {
 	 * @param xmlFolder where {@link DigicoreVehicle} files will be checked;
 	 * @return the {@link List} of {@link DigicoreVehicle} files.
 	 */
-	public List<File> readDigicoreVehicleIds(String inputFile, String xmlFolder) throws IOException{
+	public static List<File> readDigicoreVehicleIds(String inputFile, String xmlFolder) throws IOException{
 		File inputFolder = new File(xmlFolder);
 		
 		List<String> list = new ArrayList<String>();
