@@ -582,7 +582,7 @@ public class PoznanNetwork
         config.scenario().setUseLanes(true);
         config.scenario().setUseSignalSystems(true);
         config.otfVis().setAgentSize(70.0f);
-        config.otfVis().setNodeOffset(30);
+        config.getQSimConfigGroup().setNodeOffset(30);
         config.signalSystems().setUseAmbertimes(true);
         scenario = (ScenarioImpl)ScenarioUtils.createScenario(config);
 

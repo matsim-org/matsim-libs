@@ -115,12 +115,6 @@ public class OTFVisConfigGroup extends Module {
 	
 	private String linkWidthIsProportionalTo = NUMBER_OF_LANES ;
 	
-	private static final String NODE_OFFSET = "nodeOffset";
-	
-	private double nodeOffset = 0;
-	
-	// ---
-
 	public OTFVisConfigGroup() {
 		super(GROUP_NAME);
 	}
@@ -226,9 +220,6 @@ public class OTFVisConfigGroup extends Module {
 		else if (MAP_OVERLAY_MODE.equalsIgnoreCase(key)) {
 			this.mapOverlayMode = Boolean.parseBoolean(value);
 		}
-		else if (NODE_OFFSET.equalsIgnoreCase(key)){
-			this.nodeOffset = Double.parseDouble(value);
-		}
 		else if (MAP_BASE_URL.equalsIgnoreCase(key)) {
 			this.mapBaseURL = value;
 		}
@@ -263,7 +254,6 @@ public class OTFVisConfigGroup extends Module {
 		map.put(LINK_WIDTH, Double.toString(this.getLinkWidth()));
 		map.put(COLORING, this.getColoringScheme().toString() );
 		map.put(MAP_OVERLAY_MODE, Boolean.toString(this.isMapOverlayMode()));
-		map.put(NODE_OFFSET, Double.toString(this.getNodeOffset()));
 		map.put(MAP_BASE_URL, this.mapBaseURL);
 		map.put(MAP_LAYER, this.mapLayer);
 		map.put(DRAW_NON_MOVING_ITEMS, Boolean.toString(this.showParking));
@@ -292,7 +282,6 @@ public class OTFVisConfigGroup extends Module {
 		map.put(MAP_LAYER, "The WMS layer to display. For GeoServer and a layer called clipped in workspace mz, use mz:clipped");
 		
 		
-		map.put(NODE_OFFSET, "Shortens a link's start and end point in the visualization.");
 		map.put(DRAW_NON_MOVING_ITEMS, "If non-moving items (e.g. agents at activities, at bus stops, etc.) should be showed.  " +
 				"May affect all non-moving items.") ;
 		return map ;
@@ -517,17 +506,7 @@ public class OTFVisConfigGroup extends Module {
 	public void setMapOverlayMode(boolean mapOverlayMode) {
 		this.mapOverlayMode = mapOverlayMode;
 	}
-
 	
-	public double getNodeOffset() {
-		return nodeOffset;
-	}
-
-	
-	public void setNodeOffset(double nodeOffset) {
-		this.nodeOffset = nodeOffset;
-	}
-
 	public void setMapBaseUrl(String mapBaseURL) {
 		this.mapBaseURL = mapBaseURL;
 	}

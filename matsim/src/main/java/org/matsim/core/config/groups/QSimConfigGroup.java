@@ -62,7 +62,9 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 	public static final String VEHICLE_BEHAVIOR_TELEPORT = "teleport";
 	public static final String VEHICLE_BEHAVIOR_WAIT = "wait";
 	public static final String VEHICLE_BEHAVIOR_EXCEPTION = "exception";
+	private static final String NODE_OFFSET = "nodeOffset";
 
+	
 	private double startTime = Time.UNDEFINED_TIME;
 	private double endTime = Time.UNDEFINED_TIME;
 	private double timeStepSize = 1.0;
@@ -92,6 +94,10 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 	private static final String INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES = "insertingWaitingVehiclesBeforeDrivingVehicles" ;
 	private boolean insertingWaitingVehiclesBeforeDrivingVehicles = false ;
 
+	private double nodeOffset = 0;
+	private float linkWidth = 30;
+	public static final String LINK_WIDTH = "linkWidth";
+
 	public QSimConfigGroup() {
 		super(GROUP_NAME);
 	}
@@ -119,7 +125,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		} else if (REMOVE_STUCK_VEHICLES.equals(key)) {
 			setRemoveStuckVehicles(Boolean.parseBoolean(value));
 		} else if (NUMBER_OF_THREADS.equals(key)){
-		  setNumberOfThreads(Integer.parseInt(value));
+		  setNumberOfThreads(Integer.parseInt(value)); 
 		} else if (TRAFFIC_DYNAMICS.equals(key)) {
 			setTrafficDynamics(value) ;
 		} else if (SIM_STARTTIME_INTERPRETATION.equals(key)) {
@@ -136,7 +142,11 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 			log.error( "The config entry `snapshotFormat' was removed from the qsim config group. " +
 					"It is now in the controler config group; please move it there.  Aborting ...") ;
 			throw new IllegalArgumentException(key);
-		} else {
+		} else if (NODE_OFFSET.equalsIgnoreCase(key)){
+			this.nodeOffset = Double.parseDouble(value);
+		} 	else if (LINK_WIDTH.equalsIgnoreCase(key)) {
+			this.linkWidth = Float.parseFloat(value);
+		}else {
 			throw new IllegalArgumentException(key);
 		}
 	}
@@ -165,6 +175,8 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		map.put(VEHICLE_BEHAVIOR, getVehicleBehavior());
 		map.put(MAIN_MODE, CollectionUtils.setToString(new HashSet<String>(getMainMode()))) ;
 		map.put(INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES, String.valueOf( isInsertingWaitingVehiclesBeforeDrivingVehicles() ) ) ;
+		map.put(NODE_OFFSET, Double.toString(this.getNodeOffset()));
+		map.put(LINK_WIDTH, Double.toString(this.getLinkWidth()));
 		return map;
 	}
 
@@ -194,6 +206,8 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 				"factor, and storage capacity factor need to be set with diligence.  Needs to be a vehicular mode to make sense.") ;
 		map.put(INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES, 
 				"decides if waiting vehicles enter the network after or before the already driving vehicles were moved. Default: false") ; 
+		map.put(NODE_OFFSET, "Shortens a link's start and end point in the visualization.");
+		map.put(LINK_WIDTH, "The (initial) width of the links of the network. Use positive floating point values.");
 		return map ;
 	}
 	/* direct access */
@@ -331,7 +345,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 	public String getVehicleBehavior() {
 		return this.vehicleBehavior;
 	}
-
+	
 	public void setMainModes(Collection<String> mainModes) {
 		this.mainModes = mainModes;
 	}
@@ -348,4 +362,19 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		this.insertingWaitingVehiclesBeforeDrivingVehicles = val;
 	}
 	
+	public double getNodeOffset() {
+		return nodeOffset;
+	}
+	
+	public void setNodeOffset(double nodeOffset) {
+		this.nodeOffset = nodeOffset;
+	}
+	
+	public float getLinkWidth() {
+		return this.linkWidth;
+	}
+
+	public void setLinkWidth(final float linkWidth) {
+		this.linkWidth = linkWidth;
+	}
 }

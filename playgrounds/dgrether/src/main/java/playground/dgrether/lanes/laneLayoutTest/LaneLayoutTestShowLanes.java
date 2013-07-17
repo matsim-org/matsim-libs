@@ -53,7 +53,7 @@ public class LaneLayoutTestShowLanes {
 		config.addQSimConfigGroup(new QSimConfigGroup());
 //		config.otfVis().setLinkWidth(150.0f);
 		config.otfVis().setDrawLinkIds(true);
-		config.otfVis().setNodeOffset(30);
+		config.getQSimConfigGroup().setNodeOffset(30);
 		config.getQSimConfigGroup().setSnapshotStyle("queue");
 
 		Scenario sc = ScenarioUtils.loadScenario(config);

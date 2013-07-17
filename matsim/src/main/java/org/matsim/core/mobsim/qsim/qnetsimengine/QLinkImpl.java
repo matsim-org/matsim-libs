@@ -37,11 +37,8 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.comparators.QVehicleEarliestLinkExitTimeComparator;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
-import org.matsim.core.utils.misc.NetworkUtils;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.vis.VisLaneModelBuilder;
 import org.matsim.lanes.vis.VisLinkWLanes;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
@@ -419,7 +416,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		private VisLinkWLanes otfLink = null;
 
 		private VisDataImpl() {
-			double nodeOffset = QLinkImpl.this.network.simEngine.getMobsim().getScenario().getConfig().otfVis().getNodeOffset(); 
+			double nodeOffset = QLinkImpl.this.network.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().getNodeOffset(); 
 			if (nodeOffset != 0.0) {
 				nodeOffset = nodeOffset +2.0; // +2.0: eventually we need a bit space for the signal
 				laneModelBuilder = new VisLaneModelBuilder();

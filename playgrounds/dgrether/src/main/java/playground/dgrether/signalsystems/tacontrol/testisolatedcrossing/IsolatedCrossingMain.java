@@ -333,7 +333,7 @@ public class IsolatedCrossingMain {
 		qsim.setSnapshotStyle("queue");
 		qsim.setStuckTime(1000.0);
 		config.addQSimConfigGroup(qsim);
-		config.otfVis().setNodeOffset(20.0);
+		config.getQSimConfigGroup().setNodeOffset(20.0);
 		config.otfVis().setShowTeleportedAgents(true);
 		config.otfVis().setDrawNonMovingItems(true);
 		return config;

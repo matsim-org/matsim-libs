@@ -25,7 +25,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.SignalGroupStateChangedEvent;
-import org.matsim.core.config.groups.OTFVisConfigGroup;
+import org.matsim.core.config.Config;
 import org.matsim.core.utils.misc.ByteBufferUtils;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.lanes.otfvis.io.OTFLaneWriter;
@@ -45,8 +45,8 @@ public class OTFSignalWriter extends OTFLaneWriter {
 	private transient SignalGroupsData signalGroups;
 	private transient SignalSystemsData signalSystems;
 
-	public OTFSignalWriter(VisNetwork visNetwork, LaneDefinitions20 lanes, OTFVisConfigGroup otfVisConfigGroup, SignalSystemsData signalSystemsData, SignalGroupsData signalGroupsData, SignalGroupStateChangeTracker signalTracker) {
-		super(visNetwork, lanes, otfVisConfigGroup);
+	public OTFSignalWriter(VisNetwork visNetwork, LaneDefinitions20 lanes, Config config, SignalSystemsData signalSystemsData, SignalGroupsData signalGroupsData, SignalGroupStateChangeTracker signalTracker) {
+		super(visNetwork, lanes, config);
 		this.signalTracker = signalTracker;
 		this.signalSystems = signalSystemsData;
 		this.signalGroups = signalGroupsData;

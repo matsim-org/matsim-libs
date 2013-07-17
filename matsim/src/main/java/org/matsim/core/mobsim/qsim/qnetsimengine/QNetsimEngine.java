@@ -136,8 +136,7 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 		} else {
 			network = new QNetwork(sim.getScenario().getNetwork(), new DefaultQNetworkFactory());
 		}
-
-		network.getLinkWidthCalculator().setLinkWidth(sim.getScenario().getConfig().otfVis().getLinkWidth());
+		network.getLinkWidthCalculator().setLinkWidth(sim.getScenario().getConfig().getQSimConfigGroup().getLinkWidth());
 		network.initialize(this);
 
 		this.positionInfoBuilder = this.createAgentSnapshotInfoBuilder( sim.getScenario() );

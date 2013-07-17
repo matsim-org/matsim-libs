@@ -168,7 +168,7 @@ public class CreateSimpleTrafficSignalScenario {
 		config.network().setInputFile("examples/tutorial/unsupported/example90TrafficLights/network.xml.gz");
 		config.plans().setInputFile("examples/tutorial/unsupported/example90TrafficLights/population.xml.gz");
 		config.scenario().setUseSignalSystems(true);
-	//	config.otfVis().setNodeOffset(20.0);
+		config.getQSimConfigGroup().setNodeOffset(20.0);
 		config.controler().setMobsim("qsim");
 		config.addQSimConfigGroup(new QSimConfigGroup());
 		config.getQSimConfigGroup().setSnapshotStyle("queue");

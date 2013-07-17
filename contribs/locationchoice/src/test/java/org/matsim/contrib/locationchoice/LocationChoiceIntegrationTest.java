@@ -42,9 +42,9 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.LocationChoiceConfigGroup.Algotype;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -374,7 +374,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		config.strategy().addStrategySettings(strategySettings);
 		
 		config.otfVis().setEffectiveLaneWidth(1.) ;
-		config.otfVis().setLinkWidth((float)1.) ;
+		config.getQSimConfigGroup().setLinkWidth((float)1.) ;
 		config.otfVis().setShowTeleportedAgents(true) ;
 		config.otfVis().setDrawNonMovingItems(true) ;
 

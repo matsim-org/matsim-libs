@@ -224,7 +224,7 @@ public class OTFVis {
 
 		if (config.scenario().isUseLanes() && (!config.scenario().isUseSignalSystems())) {
 			config.otfVis().setScaleQuadTreeRect(true);
-			OTFLaneWriter otfLaneWriter = new OTFLaneWriter(qSim.getVisNetwork(), scenario.getScenarioElement(LaneDefinitions20.class), scenario.getConfig().otfVis());
+			OTFLaneWriter otfLaneWriter = new OTFLaneWriter(qSim.getVisNetwork(), scenario.getScenarioElement(LaneDefinitions20.class), scenario.getConfig());
 			server.addAdditionalElement(otfLaneWriter);
 		} else if (config.scenario().isUseSignalSystems()) {
 			config.otfVis().setScaleQuadTreeRect(true);
@@ -234,7 +234,7 @@ public class OTFVis {
 			LaneDefinitions20 laneDefs = scenario.getScenarioElement(LaneDefinitions20.class);
 			SignalSystemsData systemsData = signalsData.getSignalSystemsData();
 			SignalGroupsData groupsData = signalsData.getSignalGroupsData();
-			OTFSignalWriter otfSignalWriter = new OTFSignalWriter(qSim.getVisNetwork(), laneDefs, scenario.getConfig().otfVis(), systemsData, groupsData , signalTracker);
+			OTFSignalWriter otfSignalWriter = new OTFSignalWriter(qSim.getVisNetwork(), laneDefs, scenario.getConfig(), systemsData, groupsData , signalTracker);
 			server.addAdditionalElement(otfSignalWriter);
 		}
 		server.pause();
