@@ -21,7 +21,10 @@ plotshareevolution <- function(
 	}
 
 	# to size plot area
-	plot( cumulated.counts.per.mode[[ length( modes ) ]] ,
+	minIter <- 0
+	maxIter <- max( dataframe$iter )
+	plot( seq( minIter , maxIter ),
+		 cumulated.counts.per.mode[[ length( modes ) ]] ,
 		 #main="average executed joint plan size" ,
 		 main="" ,
 		 xlab="Iteration" , ylab="Cumul Trips",
@@ -30,8 +33,6 @@ plotshareevolution <- function(
 		 ...)
 
 	prev <- rep( 0 , length( cumulated.counts.per.mode[[ 1 ]] ) )
-	minIter <- 0
-	maxIter <- max( dataframe$iter )
 	the.colors <- rainbow( length( modes ) )
 	for ( i in seq( 1 , length( modes ) ) ) {
 		the.counts <- cumulated.counts.per.mode[[ i ]]
