@@ -30,16 +30,18 @@ import org.matsim.contrib.freight.carrier.CarrierPlanStrategyManagerFactory;
 import org.matsim.contrib.freight.carrier.CarrierScoringFunctionFactory;
 import org.matsim.contrib.freight.carrier.Carriers;
 import org.matsim.contrib.freight.controler.CarrierController;
-import org.matsim.contrib.freight.mobsim.ScoringFunctionFactoryForTests;
-import org.matsim.contrib.freight.mobsim.StrategyManagerFactoryForTests;
+import org.matsim.contrib.freight.replanning.CarrierReplanningStrategyManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionAccumulator;
 
 /**
+ * This is just a template to get a very general feel of the freight stuff from Stephan Schröder (and, in part, Michael Zilske).  It just compiles ...
+ * 
  * @author nagel
- *
  */
 final class Main {
 
@@ -55,9 +57,24 @@ final class Main {
 			carriers.getCarriers().put(id, carrier) ;
 		}
 
-		CarrierPlanStrategyManagerFactory strategyManagerFactory  = new StrategyManagerFactoryForTests() ;
+		CarrierPlanStrategyManagerFactory strategyManagerFactory  = new CarrierPlanStrategyManagerFactory() {
+			@Override
+			public CarrierReplanningStrategyManager createStrategyManager(Controler controler) {
+				CarrierReplanningStrategyManager manager = new CarrierReplanningStrategyManager() ;
+				// manager.add(stuff) ;
+				return manager ;
+			}
+		} ;
 
-		CarrierScoringFunctionFactory scoringFunctionFactory = new ScoringFunctionFactoryForTests(sc.getNetwork()) ;
+		CarrierScoringFunctionFactory scoringFunctionFactory = new CarrierScoringFunctionFactory() {
+			@Override
+			public ScoringFunction createScoringFunction(Carrier carrier) {
+				ScoringFunctionAccumulator fct = new ScoringFunctionAccumulator() ;
+				// fct.add(stuff) ;
+				return fct;
+			}
+			
+		};
 
 		CarrierController listener = new CarrierController(carriers, strategyManagerFactory, scoringFunctionFactory ) ;
 		
