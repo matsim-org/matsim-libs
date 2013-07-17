@@ -160,6 +160,9 @@ public abstract class OutputDirectoryLogging {
 	 * @see IOUtils#initLoggingWithOutputDirectory(String)
 	 */
 	public static void closeOutputDirLogging() {
+		//might also be sent to the warn logstream but then you end up with a warning even if everything is alright
+		String endLoggingInfo = "closing the logfile, i.e. messages sent to the logger after this message are not written to the logfile.";
+		log.info(endLoggingInfo);
 		Logger root = Logger.getRootLogger();
 		Appender app = root.getAppender(LOGFILE);
 		if (app != null) {
