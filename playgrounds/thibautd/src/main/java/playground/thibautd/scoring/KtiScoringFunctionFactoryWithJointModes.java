@@ -19,12 +19,16 @@
  * *********************************************************************** */
 package playground.thibautd.scoring;
 
+import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
+import org.matsim.core.scoring.ScoringFunctionAccumulator.ActivityScoring;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
@@ -42,6 +46,8 @@ public class KtiScoringFunctionFactoryWithJointModes implements ScoringFunctionF
     private final ScoringFunctionFactory delegate;
 	private final CharyparNagelScoringParameters params;
 	private final Scenario scenario;
+
+	private static final double UTIL_OF_NOT_PERF = -1000;
 
 	public KtiScoringFunctionFactoryWithJointModes(
 			final StageActivityTypes typesNotToScore,
@@ -78,6 +84,35 @@ public class KtiScoringFunctionFactoryWithJointModes implements ScoringFunctionF
 						// passenger doesn't pay gasoline
 						0 ),
 					scenario.getNetwork()));
+		scoringFunctionAccumulator.addScoringFunction( 
+				// technical penalty: penalize plans which do not result in performing
+				// all activities.
+				// This is necessary when using huge time mutation ranges.
+				new ActivityScoring() {
+					// start at one, because first act doesnt generate a start event
+					int actCount = 1;
+
+					@Override
+					public void finish() {}
+
+					@Override
+					public double getScore() {
+						final int nNonPerfActs = TripStructureUtils.getActivities( plan , EmptyStageActivityTypes.INSTANCE ).size() - actCount;
+						assert nNonPerfActs >= 0;
+						return nNonPerfActs * UTIL_OF_NOT_PERF;
+					}
+
+					@Override
+					public void reset() {}
+
+					@Override
+					public void startActivity(double time, Activity act) {
+						actCount++;
+					}
+
+					@Override
+					public void endActivity(double time, Activity act) {}
+				});
 
 		return scoringFunctionAccumulator;
 	}
