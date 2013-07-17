@@ -176,7 +176,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		map.put(MAIN_MODE, CollectionUtils.setToString(new HashSet<String>(getMainMode()))) ;
 		map.put(INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES, String.valueOf( isInsertingWaitingVehiclesBeforeDrivingVehicles() ) ) ;
 		map.put(NODE_OFFSET, Double.toString(this.getNodeOffset()));
-		map.put(LINK_WIDTH, Double.toString(this.getLinkWidth()));
+		
 		return map;
 	}
 
