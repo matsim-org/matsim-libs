@@ -34,6 +34,8 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.router.RoutingContext;
+import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.population.Desires;
@@ -171,7 +173,9 @@ public abstract class WithinDayParkingController extends WithinDayController imp
 		this.getEvents().addHandler(this.parkingAgentsTracker);
 		this.addControlerListener(parkingAgentsTracker);
 
-		insertParkingActivities = new InsertParkingActivities(scenarioData, this.getWithinDayEngine().getTripRouterFactory().instantiateAndConfigureTripRouter(), parkingInfrastructure);
+		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory(), super.getTravelTimeCollector(), this.config.planCalcScore());
+		
+		insertParkingActivities = new InsertParkingActivities(scenarioData, this.getWithinDayTripRouterFactory().instantiateAndConfigureTripRouter(routingContext), parkingInfrastructure);
 
 		this.getWithinDayEngine().initializeReplanningModules(numReplanningThreads);
 		MobsimFactory mobsimFactory = new ParkingQSimFactory(insertParkingActivities, parkingInfrastructure, this.getWithinDayEngine());

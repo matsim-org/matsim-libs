@@ -33,8 +33,11 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
-import org.matsim.core.router.TripRouterFactoryImpl;
-import org.matsim.core.router.TripRouterFactoryInternal;
+import org.matsim.core.router.RoutingContext;
+import org.matsim.core.router.RoutingContextImpl;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
@@ -75,7 +78,7 @@ public class WithinDayControlerListener implements StartupListener {
 	private TransitRouterFactory transitRouterFactory;
 
 	private WithinDayEngine withinDayEngine;
-	private TripRouterFactoryInternal withinDayTripRouterFactory;
+	private TripRouterFactory withinDayTripRouterFactory;
 	private final FixedOrderSimulationListener fosl = new FixedOrderSimulationListener();
 	private final Map<String, TravelTime> multiModalTravelTimes = new HashMap<String, TravelTime>();
 
@@ -145,13 +148,22 @@ public class WithinDayControlerListener implements StartupListener {
 		return this.withinDayEngine;
 	}
 	
-	public void setWithinDayTripRouterFactory(TripRouterFactoryInternal tripRouterFactory) {
+	public void setWithinDayTripRouterFactory(TripRouterFactory tripRouterFactory) {
 		if (locked) throw new RuntimeException(this.getClass().toString() + " configuration has already been locked!");
 		this.withinDayTripRouterFactory = tripRouterFactory;
 	}
 
-	public TripRouterFactoryInternal getWithinDayTripRouterFactory() {
+	public TripRouterFactory getWithinDayTripRouterFactory() {
 		return this.withinDayTripRouterFactory;
+	}
+	
+	/**
+	 * Uses travel times from the travel time collector for car trips.
+	 */
+	public TripRouter getTripRouterInstance() {
+		RoutingContext routingContext = new RoutingContextImpl(this.travelDisutilityFactory, 
+				this.getTravelTimeCollector(), this.scenario.getConfig().planCalcScore());
+		return this.withinDayTripRouterFactory.instantiateAndConfigureTripRouter(routingContext);
 	}
 	
 	public FixedOrderSimulationListener getFixedOrderSimulationListener() {
@@ -197,9 +209,11 @@ public class WithinDayControlerListener implements StartupListener {
 			this.travelDisutilityFactory = controler.getTravelDisutilityFactory();
 		} else log.info("TravelDisutilityFactory has already been set - it is NOT overwritten!");
 		
-		if (this.transitRouterFactory == null) {
-			this.transitRouterFactory = controler.getTransitRouterFactory();
-		} else log.info("TransitRouterFactory has already been set - it is NOT overwritten!");
+		if (scenario.getConfig().scenario().isUseTransit()) {
+			if (this.transitRouterFactory == null) {
+				this.transitRouterFactory = controler.getTransitRouterFactory();
+			} else log.info("TransitRouterFactory has already been set - it is NOT overwritten!");			
+		}
 		
 		if (this.withinDayTripRouterFactory == null) {
 			this.initWithinDayTripRouterFactory();
@@ -224,18 +238,10 @@ public class WithinDayControlerListener implements StartupListener {
 		withinDayEngine.initializeReplanningModules(numOfThreads);
 	}
 
-	/*
-	 * Use travel times from the travel time collector for car trips.
-	 */
 	private void initWithinDayTripRouterFactory() {
-		this.withinDayTripRouterFactory = new TripRouterFactoryImpl(
-				this.scenario,
-				this.travelDisutilityFactory,
-				this.travelTimeCollector,
-				this.leastCostPathCalculatorFactory,
-				this.transitRouterFactory);
-	}
-	
+		TripRouterFactoryBuilderWithDefaults tripRouterFactoryBuilder = new TripRouterFactoryBuilderWithDefaults();
+		this.withinDayTripRouterFactory = tripRouterFactoryBuilder.build(this.scenario);
+	}	
 	
 	private void createAndInitTravelTimeCollector() {
 		this.createAndInitTravelTimeCollector(this.travelTimeCollectorModes);

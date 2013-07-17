@@ -47,6 +47,8 @@ import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.router.RoutingContext;
+import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.withinday.controller.ExampleWithinDayController;
 import org.matsim.withinday.controller.WithinDayController;
@@ -164,13 +166,15 @@ public class PaperController extends WithinDayController implements StartupListe
 		parseReplanningLinks(this.replanningLinksFile);
 		
 		this.initWithinDayTripRouterFactory();
-		this.getWithinDayEngine().setTripRouterFactory(this.getWithinDayTripRouterFactory());
+		
+		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory(), this.getTravelTimeCollector(), this.config.planCalcScore());
 		
 		LinkReplanningMap linkReplanningMap = super.getLinkReplanningMap();
 		DuringLegIdentifier identifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
 		this.selector.addIdentifier(identifier, pDuringLegReplanning);
 		this.duringLegIdentifier = new AgentFilteredDuringLegIdentifier(new LinkFilteredDuringLegIdentifier(identifier, this.replanningLinks), this.replanningAgents);
-		this.duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenarioData, this.getWithinDayEngine());
+		this.duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenarioData, this.getWithinDayEngine(),
+				this.getWithinDayTripRouterFactory(), routingContext);
 		this.duringLegReplannerFactory.addIdentifier(this.duringLegIdentifier);
 		this.getWithinDayEngine().addDuringLegReplannerFactory(this.duringLegReplannerFactory);
 	}

@@ -21,6 +21,8 @@
 package playground.christoph.evacuation.withinday.replanning.replanners;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.router.RoutingContext;
+import org.matsim.core.router.TripRouterFactory;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
@@ -35,16 +37,21 @@ public class CurrentActivityToMeetingPointReplannerFactory extends WithinDayDuri
 	private final DecisionDataProvider decisionDataProvider; 
 	private final ModeAvailabilityChecker modeAvailabilityChecker;
 	private final SwissPTTravelTime ptTravelTime;
+	private final TripRouterFactory tripRouterFactory;
+	private final RoutingContext routingContext;
 	
 	public CurrentActivityToMeetingPointReplannerFactory(Scenario scenario, 
 			WithinDayEngine withinDayEngine, DecisionDataProvider decisionDataProvider, 
 			ModeAvailabilityChecker modeAvailabilityChecker,
-			SwissPTTravelTime ptTravelTime) {
+			SwissPTTravelTime ptTravelTime,
+			TripRouterFactory tripRouterFactory, RoutingContext routingContext) {
 		super(withinDayEngine);
 		this.scenario = scenario;
 		this.decisionDataProvider = decisionDataProvider;
 		this.modeAvailabilityChecker = modeAvailabilityChecker;
 		this.ptTravelTime = ptTravelTime;
+		this.tripRouterFactory = tripRouterFactory;
+		this.routingContext = routingContext;
 	}
 
 	@Override
@@ -52,7 +59,7 @@ public class CurrentActivityToMeetingPointReplannerFactory extends WithinDayDuri
 		WithinDayDuringActivityReplanner replanner = new CurrentActivityToMeetingPointReplanner(super.getId(), scenario,
 				this.getWithinDayEngine().getInternalInterface(), decisionDataProvider, 
 				modeAvailabilityChecker.createInstance(), ptTravelTime,
-				this.getWithinDayEngine().getTripRouterFactory().instantiateAndConfigureTripRouter());
+				this.tripRouterFactory.instantiateAndConfigureTripRouter(this.routingContext));
 		return replanner;
 	}
 

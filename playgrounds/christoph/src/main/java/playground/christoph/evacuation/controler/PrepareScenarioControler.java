@@ -34,6 +34,12 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.router.RoutingContext;
+import org.matsim.core.router.RoutingContextImpl;
+import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.households.Household;
 import org.matsim.vehicles.VehicleWriterV1;
@@ -106,7 +112,10 @@ public class PrepareScenarioControler extends KTIEnergyFlowsController implement
 		/*
 		 * Using a LegModeChecker to ensure that all agents' plans have valid mode chains.
 		 */
-		legModeChecker = new LegModeChecker(event.getControler().getTripRouterFactory().instantiateAndConfigureTripRouter(), this.getNetwork());
+		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory(), this.getLinkTravelTimes(), this.config.planCalcScore());
+		TripRouterFactory tripRouterFactory = new TripRouterFactoryBuilderWithDefaults().build(this.scenarioData);		
+		
+		legModeChecker = new LegModeChecker(tripRouterFactory.instantiateAndConfigureTripRouter(routingContext), this.getNetwork());
 		legModeChecker.setValidNonCarModes(new String[]{TransportMode.walk, TransportMode.bike, TransportMode.pt});
 		legModeChecker.setToCarProbability(0.5);
 		legModeChecker.run(this.scenarioData.getPopulation());

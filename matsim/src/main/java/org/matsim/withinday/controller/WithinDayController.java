@@ -34,8 +34,11 @@ import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.router.TripRouterFactoryInternal;
-import org.matsim.core.router.TripRouterFactoryImpl;
+import org.matsim.core.router.RoutingContext;
+import org.matsim.core.router.RoutingContextImpl;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.mobsim.WithinDayQSimFactory;
@@ -67,7 +70,7 @@ public abstract class WithinDayController extends Controler implements StartupLi
 
 	private boolean withinDayEngineInitialized = false;
 	private WithinDayEngine withinDayEngine;
-	private TripRouterFactoryInternal withinDayTripRouterFactory;
+	private TripRouterFactory withinDayTripRouterFactory;
 	private FixedOrderSimulationListener fosl = new FixedOrderSimulationListener();
 
 	public WithinDayController(String[] args) {
@@ -180,28 +183,30 @@ public abstract class WithinDayController extends Controler implements StartupLi
 		}
 	}
 
-	/*
-	 * Use travel times from the travel time collector for car trips.
-	 */
 	public void initWithinDayTripRouterFactory() {
-		this.withinDayTripRouterFactory = new TripRouterFactoryImpl(
-				getScenario(),
-				getTravelDisutilityFactory(),
-				this.getTravelTimeCollector(),
-				getLeastCostPathCalculatorFactory(),
-				getScenario().getConfig().scenario().isUseTransit() ? getTransitRouterFactory() : null);
+		TripRouterFactoryBuilderWithDefaults tripRouterFactoryBuilder = new TripRouterFactoryBuilderWithDefaults();
+		this.withinDayTripRouterFactory = tripRouterFactoryBuilder.build(this.scenarioData);
 	}
 	
 	public WithinDayEngine getWithinDayEngine() {
 		return this.withinDayEngine;
 	}
 	
-	public void setWithinDayTripRouterFactory(TripRouterFactoryInternal tripRouterFactory) {
+	public void setWithinDayTripRouterFactory(TripRouterFactory tripRouterFactory) {
 		this.withinDayTripRouterFactory = tripRouterFactory;
 	}
 
-	public TripRouterFactoryInternal getWithinDayTripRouterFactory() {
+	public TripRouterFactory getWithinDayTripRouterFactory() {
 		return this.withinDayTripRouterFactory;
+	}
+	
+	/**
+	 * Uses travel times from the travel time collector for car trips.
+	 */
+	public TripRouter getTripRouterInstance() {
+		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory(), 
+				this.getTravelTimeCollector(), this.scenarioData.getConfig().planCalcScore());
+		return this.withinDayTripRouterFactory.instantiateAndConfigureTripRouter(routingContext);
 	}
 	
 	public FixedOrderSimulationListener getFixedOrderSimulationListener() {

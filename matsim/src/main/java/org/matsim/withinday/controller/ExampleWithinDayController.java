@@ -22,6 +22,8 @@ package org.matsim.withinday.controller;
 
 import org.matsim.core.config.Config;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.router.RoutingContext;
+import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
 import org.matsim.core.scoring.functions.OnlyTravelDependentScoringFunctionFactory;
 import org.matsim.withinday.replanning.identifiers.ActivityEndIdentifierFactory;
@@ -109,13 +111,16 @@ public class ExampleWithinDayController extends WithinDayController {
 		 */
 		this.setTravelDisutilityFactory(new OnlyTimeDependentTravelCostCalculatorFactory());
 		this.initWithinDayTripRouterFactory();
-		this.getWithinDayEngine().setTripRouterFactory(this.getWithinDayTripRouterFactory());
+		
+		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory(), 
+				this.getTravelTimeCollector(), this.config.planCalcScore());
 		
 		this.initialIdentifierFactory = new InitialIdentifierImplFactory(sim);
 		this.initialProbabilityFilterFactory = new ProbabilityFilterFactory(this.pInitialReplanning);
 		this.initialIdentifierFactory.addAgentFilterFactory(this.initialProbabilityFilterFactory);
 		this.initialIdentifier = initialIdentifierFactory.createIdentifier();
-		this.initialReplannerFactory = new InitialReplannerFactory(this.scenarioData, this.getWithinDayEngine());
+		this.initialReplannerFactory = new InitialReplannerFactory(this.scenarioData, this.getWithinDayEngine(),
+				this.getWithinDayTripRouterFactory(), routingContext);
 		this.initialReplannerFactory.addIdentifier(this.initialIdentifier);
 		this.getWithinDayEngine().addIntialReplannerFactory(this.initialReplannerFactory);
 		
@@ -123,7 +128,8 @@ public class ExampleWithinDayController extends WithinDayController {
 		this.duringActivityProbabilityFilterFactory = new ProbabilityFilterFactory(this.pDuringActivityReplanning);
 		this.duringActivityIdentifierFactory.addAgentFilterFactory(this.duringActivityProbabilityFilterFactory);
 		this.duringActivityIdentifier = duringActivityIdentifierFactory.createIdentifier();
-		this.duringActivityReplannerFactory = new NextLegReplannerFactory(this.scenarioData, this.getWithinDayEngine());
+		this.duringActivityReplannerFactory = new NextLegReplannerFactory(this.scenarioData, this.getWithinDayEngine(),
+				this.getWithinDayTripRouterFactory(), routingContext);
 		this.duringActivityReplannerFactory.addIdentifier(this.duringActivityIdentifier);
 		this.getWithinDayEngine().addDuringActivityReplannerFactory(this.duringActivityReplannerFactory);
 		
@@ -131,7 +137,8 @@ public class ExampleWithinDayController extends WithinDayController {
 		this.duringLegProbabilityFilterFactory = new ProbabilityFilterFactory(this.pDuringLegReplanning);
 		this.duringLegIdentifierFactory.addAgentFilterFactory(this.duringLegProbabilityFilterFactory);
 		this.duringLegIdentifier = this.duringLegIdentifierFactory.createIdentifier();
-		this.duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenarioData, this.getWithinDayEngine());
+		this.duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenarioData, this.getWithinDayEngine(),
+				this.getWithinDayTripRouterFactory(), routingContext);
 		this.duringLegReplannerFactory.addIdentifier(this.duringLegIdentifier);
 		this.getWithinDayEngine().addDuringLegReplannerFactory(this.duringLegReplannerFactory);
 	}

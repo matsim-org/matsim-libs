@@ -28,7 +28,6 @@ import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-import org.matsim.core.router.TripRouterFactoryInternal;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.withinday.replanning.parallel.ParallelDuringActivityReplanner;
@@ -68,7 +67,6 @@ public class WithinDayEngine implements MobsimEngine {
 	private Map<WithinDayDuringActivityReplannerFactory, Tuple<Double, Double>> duringActivityReplannerFactory;
 	private Map<WithinDayDuringLegReplannerFactory, Tuple<Double, Double>> duringLegReplannerFactory;
 	
-	private TripRouterFactoryInternal tripRouterFactory;
 	private InternalInterface internalInterface;
 	
 	public WithinDayEngine(EventsManager eventsManager) {
@@ -211,13 +209,5 @@ public class WithinDayEngine implements MobsimEngine {
 	
 	public InternalInterface getInternalInterface() {
 		return this.internalInterface;
-	}
-	
-	public void setTripRouterFactory(TripRouterFactoryInternal tripRouterFactory) {
-		this.tripRouterFactory = tripRouterFactory;
-	}
-	
-	public TripRouterFactoryInternal getTripRouterFactory() {
-		return this.tripRouterFactory;
 	}
 }

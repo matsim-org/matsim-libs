@@ -21,24 +21,31 @@
 package playground.christoph.withinday;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.router.RoutingContext;
+import org.matsim.core.router.TripRouterFactory;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
 public class ReplannerYoungPeopleFactory extends WithinDayDuringLegReplannerFactory {
 
-	private Scenario scenario;
+	private final Scenario scenario;
+	private final TripRouterFactory tripRouterFactory;
+	private final RoutingContext routingContext;
 	
-	public ReplannerYoungPeopleFactory(Scenario scenario, WithinDayEngine withinDayEngine) {
+	public ReplannerYoungPeopleFactory(Scenario scenario, WithinDayEngine withinDayEngine,
+			TripRouterFactory tripRouterFactory, RoutingContext routingContext) {
 		super(withinDayEngine);
 		this.scenario = scenario;
+		this.tripRouterFactory = tripRouterFactory;
+		this.routingContext = routingContext;
 	}
 
 	@Override
 	public WithinDayDuringLegReplanner createReplanner() {
-		WithinDayDuringLegReplanner replanner = new ReplannerYoungPeople(super.getId(), scenario,
+		WithinDayDuringLegReplanner replanner = new ReplannerYoungPeople(super.getId(), this.scenario,
 				this.getWithinDayEngine().getInternalInterface(),
-				this.getWithinDayEngine().getTripRouterFactory().instantiateAndConfigureTripRouter());
+				this.tripRouterFactory.instantiateAndConfigureTripRouter(this.routingContext));
 		return replanner;
 	}
 }

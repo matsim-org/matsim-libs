@@ -56,7 +56,7 @@ public class Main {
 		Map<String, TravelTime> multiModalTravelTimes = multiModalTravelTimeFactory.createTravelTimes();	
 	
 		MultimodalTripRouterFactory tripRouterFactory = new MultimodalTripRouterFactory(
-				scenario, multiModalTravelTimes);
+				scenario, multiModalTravelTimes, controler.getTravelDisutilityFactory());
 		MultimodalQSimFactory qSimFactory = new MultimodalQSimFactory(multiModalTravelTimes);
 		controler.setTripRouterFactory(tripRouterFactory);
 		controler.setMobsimFactory(qSimFactory);

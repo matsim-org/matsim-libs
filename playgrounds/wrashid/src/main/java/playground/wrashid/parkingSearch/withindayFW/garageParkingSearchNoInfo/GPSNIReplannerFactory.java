@@ -21,6 +21,8 @@
 package playground.wrashid.parkingSearch.withindayFW.garageParkingSearchNoInfo;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.router.RoutingContext;
+import org.matsim.core.router.TripRouterFactory;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
@@ -30,19 +32,23 @@ public class GPSNIReplannerFactory extends WithinDayDuringLegReplannerFactory {
 
 	private final Scenario scenario;
 	private final ParkingAgentsTracker parkingAgentsTracker;
+	private final TripRouterFactory tripRouterFactory;
+	private final RoutingContext routingContext;
 	
-	public GPSNIReplannerFactory(WithinDayEngine withinDayEngine, Scenario scenario, ParkingAgentsTracker parkingAgentsTracker) {
+	public GPSNIReplannerFactory(WithinDayEngine withinDayEngine, Scenario scenario, ParkingAgentsTracker parkingAgentsTracker,
+			TripRouterFactory tripRouterFactory, RoutingContext routingContext) {
 		super(withinDayEngine);
-		
 		this.scenario = scenario;
 		this.parkingAgentsTracker = parkingAgentsTracker;
+		this.tripRouterFactory = tripRouterFactory;
+		this.routingContext = routingContext;
 	}
 
 	@Override
 	public GPSNIReplanner createReplanner() {
-		GPSNIReplanner replanner = new GPSNIReplanner(super.getId(), scenario, 
-				this.getWithinDayEngine().getInternalInterface(), parkingAgentsTracker,
-				this.getWithinDayEngine().getTripRouterFactory().instantiateAndConfigureTripRouter());
+		GPSNIReplanner replanner = new GPSNIReplanner(super.getId(), this.scenario, 
+				this.getWithinDayEngine().getInternalInterface(), this.parkingAgentsTracker,
+				this.tripRouterFactory.instantiateAndConfigureTripRouter(this.routingContext));
 		return replanner;
 	}
 

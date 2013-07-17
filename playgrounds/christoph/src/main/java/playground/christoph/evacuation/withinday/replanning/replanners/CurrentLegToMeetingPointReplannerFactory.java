@@ -21,6 +21,8 @@
 package playground.christoph.evacuation.withinday.replanning.replanners;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.router.RoutingContext;
+import org.matsim.core.router.TripRouterFactory;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
@@ -31,19 +33,23 @@ public class CurrentLegToMeetingPointReplannerFactory extends WithinDayDuringLeg
 
 	private final Scenario scenario;
 	private final DecisionDataProvider decisionDataProvider;
+	private final TripRouterFactory tripRouterFactory;
+	private final RoutingContext routingContext;
 	
 	public CurrentLegToMeetingPointReplannerFactory(Scenario scenario, WithinDayEngine withinDayEngine,
-			DecisionDataProvider decisionDataProvider) {
+			DecisionDataProvider decisionDataProvider, TripRouterFactory tripRouterFactory, RoutingContext routingContext) {
 		super(withinDayEngine);
 		this.scenario = scenario;
 		this.decisionDataProvider = decisionDataProvider;
+		this.tripRouterFactory = tripRouterFactory;
+		this.routingContext = routingContext;
 	}
 
 	@Override
 	public WithinDayDuringLegReplanner createReplanner() {
 		WithinDayDuringLegReplanner replanner = new CurrentLegToMeetingPointReplanner(super.getId(), 
-				scenario, this.getWithinDayEngine().getInternalInterface(), decisionDataProvider,
-				this.getWithinDayEngine().getTripRouterFactory().instantiateAndConfigureTripRouter());
+				this.scenario, this.getWithinDayEngine().getInternalInterface(), this.decisionDataProvider,
+				this.tripRouterFactory.instantiateAndConfigureTripRouter(this.routingContext));
 		return replanner;
 	}
 }

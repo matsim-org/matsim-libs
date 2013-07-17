@@ -148,13 +148,8 @@ public class WithinDayParkingControlerListener implements StartupListener, Repla
 		multiModalTravelTimes.put(TransportMode.walk, new WalkTravelTime(this.scenario.getConfig().plansCalcRoute()));
 		multiModalTravelTimes.put(TransportMode.bike, new BikeTravelTime(this.scenario.getConfig().plansCalcRoute()));
 		
-		this.tripRouterFactory = new MultimodalTripRouterFactory(scenario, multiModalTravelTimes);
-//		this.withinDayControlerListener.setWithinDayTripRouterFactory(tripRouterFactory);
-		// workaround
-		TripRouterFactoryWrapper tripRouterFactoryWrapper = new TripRouterFactoryWrapper(
-				this.tripRouterFactory, event.getControler().getTravelDisutilityFactory(),
-				this.withinDayControlerListener.getTravelTimeCollector(), event.getControler().getConfig().planCalcScore());
-		this.withinDayControlerListener.setWithinDayTripRouterFactory(tripRouterFactoryWrapper);
+		this.tripRouterFactory = new MultimodalTripRouterFactory(scenario, multiModalTravelTimes, event.getControler().getTravelDisutilityFactory());
+		this.withinDayControlerListener.setWithinDayTripRouterFactory(tripRouterFactory);
 		
 		/*
 		 * notifyStartup has to be called after the WithinDayTripRouterFactory has been set.
@@ -178,11 +173,11 @@ public class WithinDayParkingControlerListener implements StartupListener, Repla
 		legModeChecker.setToCarProbability(0.5);
 		legModeChecker.run(this.scenario.getPopulation());	
 		
-//		this.parkingRouterFactory = new ParkingRouterFactory(this.scenario, multiModalTravelTimes, 
-//				controler.createTravelDisutilityCalculator(), tripRouterFactory, nodesToCheck);
-		//workaround
 		this.parkingRouterFactory = new ParkingRouterFactory(this.scenario, multiModalTravelTimes, 
-				event.getControler().getTravelDisutilityFactory(), tripRouterFactoryWrapper, nodesToCheck);
+				event.getControler().getTravelDisutilityFactory(), tripRouterFactory, nodesToCheck);
+//		workaround
+//		this.parkingRouterFactory = new ParkingRouterFactory(this.scenario, multiModalTravelTimes, 
+//				event.getControler().getTravelDisutilityFactory(), tripRouterFactoryWrapper, nodesToCheck);
 		
 		ParkingCostCalculatorImpl parkingCostCalculator = new ParkingCostCalculatorImpl(this.initParkingTypes());
 		this.parkingInfrastructure = new ParkingInfrastructure(this.scenario, parkingCostCalculator);

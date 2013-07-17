@@ -217,19 +217,24 @@ public class WithinDayInitialRoutesControlerListener implements StartupListener,
 	
 	protected void initReplanners() {
 				
+		RoutingContext routingContext = new RoutingContextImpl(this.withinDayControlerListener.getTravelDisutilityFactory(),
+				this.withinDayControlerListener.getTravelTimeCollector(), this.scenario.getConfig().planCalcScore());
+		
 		/*
 		 * During Leg Replanner
 		 */
 		WithinDayDuringLegReplannerFactory duringLegReplannerFactory;
 		
 		if (duringLegRerouting) {
-			duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenario, this.withinDayControlerListener.getWithinDayEngine());
+			duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenario, this.withinDayControlerListener.getWithinDayEngine(),
+					this.withinDayControlerListener.getWithinDayTripRouterFactory(), routingContext);
 			duringLegReplannerFactory.addIdentifier(this.legPerformingIdentifier);
 			this.withinDayControlerListener.getWithinDayEngine().addDuringLegReplannerFactory(duringLegReplannerFactory);
 		}
 		
 		if (initialLegRerouting) {
-			duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenario, this.withinDayControlerListener.getWithinDayEngine());
+			duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenario, this.withinDayControlerListener.getWithinDayEngine(),
+					this.withinDayControlerListener.getWithinDayTripRouterFactory(), routingContext);
 			duringLegReplannerFactory.addIdentifier(this.legStartedIdentifier);
 			this.withinDayControlerListener.getWithinDayEngine().addDuringLegReplannerFactory(duringLegReplannerFactory);
 		}

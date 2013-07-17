@@ -42,6 +42,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
+import org.matsim.contrib.multimodal.router.MultimodalTripRouterFactory;
 import org.matsim.contrib.multimodal.tools.MultiModalNetworkCreator;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
@@ -54,13 +55,11 @@ import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.router.TripRouterFactoryImpl;
-import org.matsim.core.router.TripRouterFactoryInternal;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
+import org.matsim.core.router.RoutingContext;
+import org.matsim.core.router.RoutingContextImpl;
+import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.FastAStarLandmarksFactory;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -71,8 +70,6 @@ import org.matsim.vehicles.Vehicle;
 
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.config.EvacuationConfig;
-import playground.christoph.evacuation.controler.TripRouterObjectProvider;
-import playground.christoph.evacuation.controler.WithindayMultimodalTripRouterFactory;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.mobsim.decisiondata.HouseholdDecisionData;
@@ -114,8 +111,9 @@ public class SelectHouseholdMeetingPoint implements MobsimInitializedListener, M
 	private final LatestAcceptedLeaveTimeModel latestAcceptedLeaveTimeModel;
 	private final DecisionDataProvider decisionDataProvider;
 
-	private TripRouterFactoryInternal toHomeFacilityRouterFactory;
-	private TripRouterFactoryInternal fromHomeFacilityRouterFactory;
+	private TravelDisutilityFactory disutilityFactory;
+	private TripRouterFactory toHomeFacilityRouterFactory;
+	private TripRouterFactory fromHomeFacilityRouterFactory;
 	
 	private Thread[] threads;
 	private Runnable[] runnables;
@@ -159,18 +157,9 @@ public class SelectHouseholdMeetingPoint implements MobsimInitializedListener, M
 		
 		Config config = scenario.getConfig();
 		
-		TravelDisutilityFactory disutilityFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
+		this.disutilityFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
 		
-		LeastCostPathCalculatorFactory toHomePathCalculatorFactory = new FastAStarLandmarksFactory(this.scenario.getNetwork(), new FreespeedTravelTimeAndDisutility(config.planCalcScore()));
-		
-		TripRouterObjectProvider toHomeObjectProvider = new TripRouterObjectProvider(scenario,
-				disutilityFactory, 
-				this.travelTimes.get(TransportMode.car),
-				toHomePathCalculatorFactory,
-				controler.getTransitRouterFactory());
-		this.toHomeFacilityRouterFactory = new WithindayMultimodalTripRouterFactory(toHomeObjectProvider, travelTimes,
-				new TripRouterFactoryImpl(scenario, disutilityFactory, this.travelTimes.get(TransportMode.car),toHomePathCalculatorFactory,
-				controler.getTransitRouterFactory())); 
+		this.toHomeFacilityRouterFactory = new MultimodalTripRouterFactory(this.scenario, this.travelTimes, disutilityFactory);
 				
 		/*
 		 * Create a subnetwork that only contains the Evacuation area plus some exit nodes.
@@ -300,20 +289,9 @@ public class SelectHouseholdMeetingPoint implements MobsimInitializedListener, M
 			tts.put(entry.getKey(), new TravelTimeWrapper(entry.getValue()));
 		}
 			
-		LeastCostPathCalculatorFactory fromPathCalculatorHomeFactory = new FastAStarLandmarksFactory(this.scenario.getNetwork(), new FreespeedTravelTimeAndDisutility(config.planCalcScore()));
-		
 		// use a ScenarioWrapper that returns the sub-network instead of the network
 		Scenario fromHomeScenario = new ScenarioWrapper(scenario, subNetwork);
-		TripRouterObjectProvider fromHomeObjectProvider = new TripRouterObjectProvider(fromHomeScenario,
-				disutilityFactory, 
-				this.travelTimes.get(TransportMode.car),
-				fromPathCalculatorHomeFactory,
-				controler.getTransitRouterFactory());
-		this.fromHomeFacilityRouterFactory = new WithindayMultimodalTripRouterFactory(fromHomeObjectProvider, travelTimes,
-				new TripRouterFactoryImpl(fromHomeScenario, disutilityFactory, 
-						this.travelTimes.get(TransportMode.car),
-						fromPathCalculatorHomeFactory,
-						controler.getTransitRouterFactory())); 
+		this.fromHomeFacilityRouterFactory = new MultimodalTripRouterFactory(fromHomeScenario, this.travelTimes, disutilityFactory);
 	}
 
 
@@ -533,11 +511,13 @@ public class SelectHouseholdMeetingPoint implements MobsimInitializedListener, M
 		this.startBarrier = new CyclicBarrier(numOfThreads + 1);
 		this.endBarrier = new CyclicBarrier(numOfThreads + 1);
 		
+		RoutingContext routingContext = new RoutingContextImpl(disutilityFactory, this.travelTimes.get(TransportMode.car), this.scenario.getConfig().planCalcScore());
+		
 		for (int i = 0; i < this.numOfThreads; i++) {
 			
 			SelectHouseholdMeetingPointRunner runner = new SelectHouseholdMeetingPointRunner(scenario, 
-					toHomeFacilityRouterFactory.instantiateAndConfigureTripRouter(), 
-					fromHomeFacilityRouterFactory.instantiateAndConfigureTripRouter(), 
+					toHomeFacilityRouterFactory.instantiateAndConfigureTripRouter(routingContext), 
+					fromHomeFacilityRouterFactory.instantiateAndConfigureTripRouter(routingContext), 
 					vehiclesTracker, coordAnalyzer.createInstance(), modeAvailabilityChecker.createInstance(), 
 					decisionDataProvider, agents, startBarrier, endBarrier, allMeetingsPointsSelected);
 			runner.setTime(time);

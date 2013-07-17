@@ -40,6 +40,8 @@ import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.router.RoutingContext;
+import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 
@@ -155,11 +157,12 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 		
 		this.setTravelDisutilityFactory(new OnlyTimeDependentTravelCostCalculatorFactory());
 		this.initWithinDayTripRouterFactory();
-		this.getWithinDayEngine().setTripRouterFactory(this.getWithinDayTripRouterFactory());
-		
+
+		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory(), this.getTravelTimeCollector(), this.config.planCalcScore());
+				
 		// adding hight utility parking choice algo
 		HUPCReplannerFactory hupcReplannerFactory = new HUPCReplannerFactory(this.getWithinDayEngine(),
-				this.scenarioData, parkingAgentsTracker);
+				this.scenarioData, parkingAgentsTracker, this.getWithinDayTripRouterFactory(), routingContext);
 		
 		HUPCIdentifier hupcSearchIdentifier = new HUPCIdentifier(parkingAgentsTracker, (ParkingInfrastructureZH) parkingInfrastructure, this);
 		this.getFixedOrderSimulationListener().addSimulationListener(hupcSearchIdentifier);

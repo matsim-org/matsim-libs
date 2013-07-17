@@ -26,6 +26,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.multimodal.router.MultimodalTripRouterFactory;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -33,11 +34,12 @@ import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.BikeTravelTim
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTime;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTime;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTimeOld;
-import org.matsim.core.router.TripRouterFactoryInternal;
+import org.matsim.core.router.RoutingContext;
+import org.matsim.core.router.RoutingContextImpl;
+import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 
-import playground.christoph.evacuation.controler.WithindayMultimodalTripRouterFactory;
 import playground.wrashid.lib.obj.IntegerValueHashMap;
 import playground.wrashid.parkingSearch.withindayFW.controllers.WithinDayParkingController;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingStrategy;
@@ -82,13 +84,16 @@ public class HUPCAndRandomControllerChessBoard extends WithinDayParkingControlle
 		
 		this.setTravelDisutilityFactory(new OnlyTimeDependentTravelCostCalculatorFactory());
 		this.initWithinDayTripRouterFactory();
-		TripRouterFactoryInternal tripRouterFactory = new WithindayMultimodalTripRouterFactory(this, travelTimes, this.getTripRouterFactory());
+		
+		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory(), this.getTravelTimeCollector(), this.config.planCalcScore());
+		
+		TripRouterFactory tripRouterFactory = new MultimodalTripRouterFactory(this.scenarioData, travelTimes,
+				this.getTravelDisutilityFactory());
 		this.setWithinDayTripRouterFactory(tripRouterFactory);
-		this.getWithinDayEngine().setTripRouterFactory(this.getWithinDayTripRouterFactory());
 
 		// adding hight utility parking choice algo
 		HUPCReplannerFactory hupcReplannerFactory = new HUPCReplannerFactory(this.getWithinDayEngine(),
-				this.scenarioData, parkingAgentsTracker);
+				this.scenarioData, parkingAgentsTracker, tripRouterFactory, routingContext);
 		HUPCIdentifier hupcSearchIdentifier = new HUPCIdentifier(parkingAgentsTracker, parkingInfrastructure);
 		this.getFixedOrderSimulationListener().addSimulationListener(hupcSearchIdentifier);
 		hupcReplannerFactory.addIdentifier(hupcSearchIdentifier);
@@ -103,7 +108,7 @@ public class HUPCAndRandomControllerChessBoard extends WithinDayParkingControlle
 		
 		// adding random test strategy
 		RandomSearchReplannerFactory randomReplannerFactory = new RandomSearchReplannerFactory(this.getWithinDayEngine(),
-				this.scenarioData, parkingAgentsTracker);
+				this.scenarioData, parkingAgentsTracker, this.getWithinDayTripRouterFactory(), routingContext);
 		RandomSearchIdentifier randomSearchIdentifier = new RandomSearchIdentifier(parkingAgentsTracker, parkingInfrastructure);
 		this.getFixedOrderSimulationListener().addSimulationListener(randomSearchIdentifier);
 		randomReplannerFactory.addIdentifier(randomSearchIdentifier);

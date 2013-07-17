@@ -29,6 +29,7 @@ import java.util.Random;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.contrib.multimodal.router.MultimodalTripRouterFactory;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.events.ReplanningEvent;
@@ -38,14 +39,14 @@ import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.router.TripRouterFactoryImpl;
-import org.matsim.core.router.TripRouterFactoryInternal;
+import org.matsim.core.router.RoutingContext;
+import org.matsim.core.router.RoutingContextImpl;
+import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.withinday.controller.WithinDayController;
 
-import playground.christoph.evacuation.controler.WithindayMultimodalTripRouterFactory;
 import playground.christoph.evacuation.trafficmonitoring.BikeTravelTime;
 import playground.christoph.evacuation.trafficmonitoring.WalkTravelTime;
 import playground.christoph.parking.core.ParkingCostCalculatorImpl;
@@ -128,10 +129,11 @@ public class WithinDayParkingController extends WithinDayController implements R
 		times.put(TransportMode.bike, new BikeTravelTime(this.config.plansCalcRoute()));
 		times.put(TransportMode.car, super.getTravelTimeCollector());
 		
-		TripRouterFactoryInternal delegate = new TripRouterFactoryImpl(this.scenarioData, this.getTravelDisutilityFactory(), this.getTravelTimeCollector(), 
-				this.getLeastCostPathCalculatorFactory(), this.getTransitRouterFactory());
-		WithindayMultimodalTripRouterFactory tripRouterFactory = new WithindayMultimodalTripRouterFactory(this, times, delegate);
-		this.getWithinDayEngine().setTripRouterFactory(tripRouterFactory);
+		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory(), this.getTravelTimeCollector(), this.config.planCalcScore());
+		
+		TripRouterFactory tripRouterFactory = new MultimodalTripRouterFactory(this.scenarioData, times,
+				this.getTravelDisutilityFactory());
+		this.setWithinDayTripRouterFactory(tripRouterFactory);
 		
 		// Use a the TravelTimeCollector here for within-day routes replanning!
 		ParkingRouterFactory parkingRouterFactory = new ParkingRouterFactory(this.scenarioData, times, 
@@ -195,7 +197,7 @@ public class WithinDayParkingController extends WithinDayController implements R
 		this.addControlerListener(parkingAgentsTracker);
 		
 		ParkingRouterFactory parkingRouterFactory = new ParkingRouterFactory(this.scenarioData, times, 
-				this.getTravelDisutilityFactory(), this.getTripRouterFactory(), nodesToCheck);
+				this.getTravelDisutilityFactory(), this.getWithinDayTripRouterFactory(), nodesToCheck);
 		
 		MobsimFactory mobsimFactory = new ParkingQSimFactory(parkingInfrastructure, parkingRouterFactory, this.getWithinDayEngine(),
 				this.parkingAgentsTracker);

@@ -40,6 +40,8 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.router.RoutingContext;
+import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.scoring.functions.OnlyTravelDependentScoringFunctionFactory;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.VehicleType;
@@ -105,22 +107,28 @@ public class DemoController extends WithinDayController implements MobsimInitial
 	protected void initReplanners(QSim sim) {
 
 		this.initWithinDayTripRouterFactory();
-		this.getWithinDayEngine().setTripRouterFactory(this.getWithinDayTripRouterFactory());
+
+		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory(), 
+				this.getTravelTimeCollector(), this.config.planCalcScore());
+
 		
 		this.initialIdentifier = new InitialIdentifierImplFactory(sim).createIdentifier();
-		this.initialReplannerFactory = new CreateEvacuationPlanReplannerFactory(this.scenarioData, this.getWithinDayEngine());
+		this.initialReplannerFactory = new CreateEvacuationPlanReplannerFactory(this.scenarioData, this.getWithinDayEngine(),
+				this.getWithinDayTripRouterFactory(), routingContext);
 		this.initialReplannerFactory.addIdentifier(this.initialIdentifier);
 		this.getWithinDayEngine().addIntialReplannerFactory(this.initialReplannerFactory);
 		
 		ActivityReplanningMap activityReplanningMap = super.getActivityReplanningMap();
 		this.duringActivityIdentifier = new ActivityEndIdentifierFactory(activityReplanningMap).createIdentifier();
-		this.duringActivityReplannerFactory = new NextLegReplannerFactory(this.scenarioData, this.getWithinDayEngine());
+		this.duringActivityReplannerFactory = new NextLegReplannerFactory(this.scenarioData, this.getWithinDayEngine(),
+				this.getWithinDayTripRouterFactory(), routingContext);
 		this.duringActivityReplannerFactory.addIdentifier(this.duringActivityIdentifier);
 		this.getWithinDayEngine().addDuringActivityReplannerFactory(this.duringActivityReplannerFactory);
 		
 		LinkReplanningMap linkReplanningMap = super.getLinkReplanningMap();
 		this.duringLegIdentifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
-		this.duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenarioData, this.getWithinDayEngine());
+		this.duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenarioData, this.getWithinDayEngine(),
+				this.getWithinDayTripRouterFactory(), routingContext);
 		this.duringLegReplannerFactory.addIdentifier(this.duringLegIdentifier);
 		this.getWithinDayEngine().addDuringLegReplannerFactory(this.duringLegReplannerFactory);
 	}

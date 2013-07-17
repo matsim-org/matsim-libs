@@ -24,6 +24,10 @@ import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.listeners.FixedOrderSimulationListener;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.router.RoutingContext;
+import org.matsim.core.router.RoutingContextImpl;
+import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.mobsim.WithinDayQSimFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
@@ -68,12 +72,13 @@ class MyWithinDayControler extends Controler {
 	 */
 	private void initReplanningRouter() {
 
-		withinDayEngine.setTripRouterFactory(this.getTripRouterFactory());
-		
-
+		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory(), 
+				this.getLinkTravelTimes(), this.config.planCalcScore());
+		TripRouterFactory tripRouterFactory = new TripRouterFactoryBuilderWithDefaults().build(this.scenarioData);
 		// replanning while at activity:
 
-		WithinDayDuringActivityReplannerFactory duringActivityReplannerFactory = new ReplannerOldPeopleFactory(this.scenarioData, withinDayEngine); 
+		WithinDayDuringActivityReplannerFactory duringActivityReplannerFactory = new ReplannerOldPeopleFactory(this.scenarioData, withinDayEngine,
+				tripRouterFactory, routingContext); 
 		// defines a "doReplanning" method which contains the core of the work
 		// as a piece, it re-routes a _future_ leg.  
 		
@@ -87,7 +92,8 @@ class MyWithinDayControler extends Controler {
 		
 		// replanning while on leg:
 		
-		WithinDayDuringLegReplannerFactory duringLegReplannerFactory = new ReplannerYoungPeopleFactory(this.scenarioData, withinDayEngine);
+		WithinDayDuringLegReplannerFactory duringLegReplannerFactory = new ReplannerYoungPeopleFactory(this.scenarioData, withinDayEngine,
+				tripRouterFactory, routingContext);
 		// defines a "doReplanning" method which contains the core of the work
 		// it replaces the next activity
 		// in order to get there, it re-routes the current route

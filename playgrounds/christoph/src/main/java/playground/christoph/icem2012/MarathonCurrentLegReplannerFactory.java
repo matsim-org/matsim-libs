@@ -21,6 +21,8 @@
 package playground.christoph.icem2012;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.router.RoutingContext;
+import org.matsim.core.router.TripRouterFactory;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
@@ -28,17 +30,22 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegR
 public class MarathonCurrentLegReplannerFactory extends WithinDayDuringLegReplannerFactory {
 
 	private final Scenario scenario;
+	private final TripRouterFactory tripRouterFactory;
+	private final RoutingContext routingContext;
 	
-	public MarathonCurrentLegReplannerFactory(Scenario scenario, WithinDayEngine withinDayEngine) {
+	public MarathonCurrentLegReplannerFactory(Scenario scenario, WithinDayEngine withinDayEngine,
+			TripRouterFactory tripRouterFactory, RoutingContext routingContext) {
 		super(withinDayEngine);
 		this.scenario = scenario;
+		this.tripRouterFactory = tripRouterFactory;
+		this.routingContext = routingContext;
 	}
 
 	@Override
 	public WithinDayDuringLegReplanner createReplanner() {
-		WithinDayDuringLegReplanner replanner = new MarathonCurrentLegReplanner(super.getId(), scenario,
+		WithinDayDuringLegReplanner replanner = new MarathonCurrentLegReplanner(super.getId(), this.scenario,
 				this.getWithinDayEngine().getInternalInterface(),
-				this.getWithinDayEngine().getTripRouterFactory().instantiateAndConfigureTripRouter());
+				this.tripRouterFactory.instantiateAndConfigureTripRouter(this.routingContext));
 		return replanner;
 	}
 }

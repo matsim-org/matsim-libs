@@ -40,7 +40,6 @@ import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.costcalculators.TravelCostCalculatorFactoryImpl;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.old.LegRouter;
 import org.matsim.core.router.old.NetworkLegRouter;
@@ -59,7 +58,7 @@ public class MultimodalTripRouterFactory implements TripRouterFactory {
 	
 	private final Map<String, TravelTime> multimodalTravelTimes;
 	
-	private final TravelDisutilityFactory travelDisutilityFactory = new TravelCostCalculatorFactoryImpl();
+	private final TravelDisutilityFactory travelDisutilityFactory;
 	
 	private final DefaultTripRouterFactoryImpl delegateFactory;
 	
@@ -67,9 +66,12 @@ public class MultimodalTripRouterFactory implements TripRouterFactory {
 
 	private Scenario scenario;
 	
-	public MultimodalTripRouterFactory(Scenario scenario, Map<String, TravelTime> multimodalTravelTimes) {
-		this.multimodalTravelTimes = multimodalTravelTimes;
+	public MultimodalTripRouterFactory(Scenario scenario, Map<String, TravelTime> multimodalTravelTimes,
+			TravelDisutilityFactory travelDisutilityFactory) {
 		this.scenario = scenario;
+		this.multimodalTravelTimes = multimodalTravelTimes;
+		this.travelDisutilityFactory = travelDisutilityFactory;
+		
 		this.delegateFactory = DefaultTripRouterFactoryImpl.createRichTripRouterFactoryImpl(scenario);
 	}
 	

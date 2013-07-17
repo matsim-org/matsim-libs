@@ -23,7 +23,10 @@ package playground.christoph.parking.withinday.utils;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.router.TripRouterFactoryInternal;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.router.RoutingContext;
+import org.matsim.core.router.RoutingContextImpl;
+import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.TravelTime;
 
@@ -32,12 +35,12 @@ public class ParkingRouterFactory {
 	private final Scenario scenario;
 	private final Map<String, TravelTime> travelTimes;
 	private final TravelDisutilityFactory travelDisutilityFactory;
-	private final TripRouterFactoryInternal tripRouterFactory;
+	private final TripRouterFactory tripRouterFactory;
 	private final int nodesToCheck;
 
 	public ParkingRouterFactory(Scenario scenario, Map<String, TravelTime> travelTimes, 
 			TravelDisutilityFactory travelDisutilityFactory,
-			TripRouterFactoryInternal tripRouterFactory, int nodesToCheck) {
+			TripRouterFactory tripRouterFactory, int nodesToCheck) {
 		this.scenario = scenario;
 		this.travelTimes = travelTimes;
 		this.travelDisutilityFactory = travelDisutilityFactory;
@@ -46,6 +49,9 @@ public class ParkingRouterFactory {
 	}
 	
 	public ParkingRouter createParkingRouter() {
-		return new ParkingRouter(scenario, travelTimes, travelDisutilityFactory, tripRouterFactory.instantiateAndConfigureTripRouter(), nodesToCheck);
+		RoutingContext routingContext = new RoutingContextImpl(this.travelDisutilityFactory, 
+				this.travelTimes.get(TransportMode.car), this.scenario.getConfig().planCalcScore());
+		return new ParkingRouter(scenario, travelTimes, travelDisutilityFactory, 
+				tripRouterFactory.instantiateAndConfigureTripRouter(routingContext), nodesToCheck);
 	}
 }

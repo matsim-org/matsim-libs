@@ -33,13 +33,10 @@ import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.BikeTravelTim
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTime;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTime;
 import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTimeOld;
-import org.matsim.core.population.PopulationFactoryImpl;
-import org.matsim.core.population.routes.ModeRouteFactory;
-import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
+import org.matsim.core.router.RoutingContext;
+import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.AStarLandmarksFactory;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 
 import playground.wrashid.lib.obj.IntegerValueHashMap;
@@ -55,7 +52,6 @@ public class HUPCControllerChessBoard extends WithinDayParkingController  {
 	public HUPCControllerChessBoard(String[] args) {
 		super(args);
 	}
-
 	 
 	@Override
 	protected void startUpFinishing() {
@@ -67,11 +63,6 @@ public class HUPCControllerChessBoard extends WithinDayParkingController  {
 		ParkingStrategyManager parkingStrategyManager = new ParkingStrategyManager(parkingStrategyActivityMapperFW,
 				parkingStrategies, parkingPersonalBetas);
 		parkingAgentsTracker.setParkingStrategyManager(parkingStrategyManager);
-
-		LeastCostPathCalculatorFactory factory = new AStarLandmarksFactory(this.network, new FreespeedTravelTimeAndDisutility(
-				this.config.planCalcScore()));
-		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) this.scenarioData.getPopulation().getFactory())
-				.getModeRouteFactory();
 
 		// create a copy of the MultiModalTravelTimeWrapperFactory and set the
 		// TravelTimeCollector for car mode
@@ -88,8 +79,11 @@ public class HUPCControllerChessBoard extends WithinDayParkingController  {
 
 		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
 
+		RoutingContext routingContext = new RoutingContextImpl(costFactory, super.getTravelTimeCollector(), this.config.planCalcScore());
+		
 		// adding hight utility parking choice algo
-		HUPCReplannerFactory hupcReplannerFactory = new HUPCReplannerFactory(this.getWithinDayEngine(), this.scenarioData, parkingAgentsTracker);
+		HUPCReplannerFactory hupcReplannerFactory = new HUPCReplannerFactory(this.getWithinDayEngine(), this.scenarioData, parkingAgentsTracker,
+				this.getWithinDayTripRouterFactory(), routingContext);
 		HUPCIdentifier hupcSearchIdentifier = new HUPCIdentifier(parkingAgentsTracker, parkingInfrastructure);
 		this.getFixedOrderSimulationListener().addSimulationListener(hupcSearchIdentifier);
 		hupcReplannerFactory.addIdentifier(hupcSearchIdentifier);

@@ -21,6 +21,8 @@
 package playground.christoph.evacuation.withinday.replanning.replanners;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.router.RoutingContext;
+import org.matsim.core.router.TripRouterFactory;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
@@ -29,21 +31,25 @@ import playground.christoph.evacuation.trafficmonitoring.SwissPTTravelTime;
 
 public class EndActivityAndEvacuateReplannerFactory extends WithinDayDuringActivityReplannerFactory {
 
-	private Scenario scenario;
-	private SwissPTTravelTime ptTravelTime;
+	private final Scenario scenario;
+	private final SwissPTTravelTime ptTravelTime;
+	private final TripRouterFactory tripRouterFactory;
+	private final RoutingContext routingContext;
 	
 	public EndActivityAndEvacuateReplannerFactory(Scenario scenario, WithinDayEngine withinDayEngine,
-			SwissPTTravelTime ptTravelTime) {
+			SwissPTTravelTime ptTravelTime, TripRouterFactory tripRouterFactory, RoutingContext routingContext) {
 		super(withinDayEngine);
 		this.scenario = scenario;
 		this.ptTravelTime = ptTravelTime;
+		this.tripRouterFactory = tripRouterFactory;
+		this.routingContext = routingContext;
 	}
 
 	@Override
 	public WithinDayDuringActivityReplanner createReplanner() {
 		WithinDayDuringActivityReplanner replanner = new EndActivityAndEvacuateReplanner(super.getId(), 
-				scenario, this.getWithinDayEngine().getInternalInterface(), ptTravelTime,
-				this.getWithinDayEngine().getTripRouterFactory().instantiateAndConfigureTripRouter());
+				this.scenario, this.getWithinDayEngine().getInternalInterface(), ptTravelTime,
+				this.tripRouterFactory.instantiateAndConfigureTripRouter(this.routingContext));
 		return replanner;
 	}
 
