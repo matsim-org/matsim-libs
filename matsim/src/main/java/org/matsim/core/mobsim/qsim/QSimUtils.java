@@ -22,10 +22,7 @@
  */
 package org.matsim.core.mobsim.qsim;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.groups.OTFVisConfigGroup;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.vehicles.VehicleImpl;
