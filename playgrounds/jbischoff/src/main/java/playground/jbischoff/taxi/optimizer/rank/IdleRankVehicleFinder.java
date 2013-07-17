@@ -30,7 +30,6 @@ import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
-import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiUtils;
 import playground.jbischoff.energy.charging.DepotArrivalDepartureCharger;
 /**
  * 

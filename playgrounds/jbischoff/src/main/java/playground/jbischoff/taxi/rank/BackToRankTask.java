@@ -42,7 +42,7 @@ public class BackToRankTask extends TaxiDriveTask implements DriveTask {
 	public BackToRankTask(int beginTime, int endTime, Arc arc) {
 		super(beginTime, endTime, arc);
 		
-		//the following is possibly nonsense, as a drive to rank is clearly not a pickup task. 
+		//the following is nonsense, as a drive to rank is clearly not a pickup task. 
 		//But it works for the time being as expected
 	
 		driveType = TaxiDriveType.PICKUP;

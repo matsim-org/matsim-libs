@@ -46,19 +46,9 @@ public class ElectricTaxiSimEngine extends TaxiSimEngine {
 	@Override
 	public void doSimStep(double time) {
 		
-		if ((time-5) % 60 == 0){
-			this.optimizer.updateIdlers();
-		}
-		
+		this.optimizer.doSimStep(time);
+		this.dac.doSimStep(time);
 	
-		
-		if (time % 60 == 0) {
-			this.dac.chargeAllVehiclesInDepots(time, 60);
-			this.dac.refreshLog(time);
-			this.optimizer.sendIdlingTaxisToRank(5);
-
-		}
-		
 
 
 }

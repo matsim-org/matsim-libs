@@ -90,6 +90,7 @@ public abstract class RankTaxiOptimizer
     private TaxiDelaySpeedupStats delaySpeedupStats;
     private final boolean destinationKnown;
     private List<Integer> shortTimeIdlers;
+    private boolean IDLEDRIVESTORANK;
 
 
     public RankTaxiOptimizer(VrpData data, boolean destinationKnown)
@@ -97,6 +98,7 @@ public abstract class RankTaxiOptimizer
         super(data);
         this.destinationKnown = destinationKnown;
         this.shortTimeIdlers = new ArrayList<Integer>();
+        this.IDLEDRIVESTORANK = true;
     }
 
 
@@ -183,7 +185,17 @@ public abstract class RankTaxiOptimizer
         throw new IllegalStateException();
     }
 
+    public void doSimStep(double time){
+    	if (IDLEDRIVESTORANK){
+    	if (time % 60. == 0.){
+    		updateIdlers();
+    	}
+    	if (time % 60. == 5.){
+    		sendIdlingTaxisToRank();
 
+    	}
+    	}
+    }
     protected void scheduleRequestImpl(VehicleDrive best, Request req)
     {
         Schedule bestSched = best.vehicle.getSchedule();
@@ -235,7 +247,6 @@ public abstract class RankTaxiOptimizer
     	  Schedule sched = veh.getSchedule();
     	  int currentTime = data.getTime();
     	  int oldendtime;
-//          if (sched.getStatus() != ScheduleStatus.UNPLANNED) {// PLANNED or STARTED
               WaitTask lastTask = (WaitTask)Schedules.getLastTask(sched);// only WAIT
 
               
@@ -243,20 +254,11 @@ public abstract class RankTaxiOptimizer
               switch (lastTask.getStatus()) {
                   case PLANNED:
                 	  return;
-//                      if (lastTask.getBeginTime() == best.t1) { // waiting for 0 seconds!!!
-//                          sched.removeLastPlannedTask();// remove WaitTask
-//                      }
-//                      else {
-//                          // TODO actually this WAIT task will not be performed
-//                          // so maybe we can remove it right now?
-//
-//                          lastTask.setEndTime(best.t1);// shortening the WAIT task
-//                      }
-//                      break;
 
                   case STARTED:
                       oldendtime = lastTask.getEndTime();
                 	  lastTask.setEndTime(currentTime);// shortening the WAIT task
+
                       
                       break;
 
@@ -266,7 +268,6 @@ public abstract class RankTaxiOptimizer
                       throw new IllegalStateException();
               }
 
-//          }
 
           Vertex lastVertex = lastTask.getAtVertex();
 
@@ -276,6 +277,7 @@ public abstract class RankTaxiOptimizer
         	  
               sched.addTask(new BackToRankTask(currentTime, arrivalTime, darc));
               sched.addTask(new WaitTaskImpl(arrivalTime, oldendtime, veh.getDepot().getVertex()));
+//              System.out.println("T :"+data.getTime()+" V: "+veh.getName()+" OET:" +oldendtime);
           }
 
 
@@ -297,7 +299,7 @@ public abstract class RankTaxiOptimizer
     	
     }
     
-    public void sendIdlingTaxisToRank(int idletime){
+    public void sendIdlingTaxisToRank(){
     	
    for (Vehicle veh: data.getVehicles()){
 	   	if (shortTimeIdlers.contains(veh.getId())){
@@ -307,31 +309,7 @@ public abstract class RankTaxiOptimizer
 		   }
 	   	}	   
    } 	
-   
-    	
-//    	int now = data.getTime();	
-//    		if (veh.getSchedule().getStatus() != ScheduleStatus.STARTED) {
-//                continue;
-//            }
-//    		
-//    		if (!veh.getSchedule().getCurrentTask().getType().equals(TaskType.WAIT)) continue;
-//    		Vertex currentVertex;
-//    		if (veh.getName().equals("5.7")) System.out.println("V "+veh.getName()+" on idle " + now);
-//    		
-//            Task currentTask = veh.getSchedule().getCurrentTask();
-//            if ((currentTask.getBeginTime()+idletime)>now){
-//                    currentVertex = ((WaitTask)currentTask).getAtVertex();
-//            		if (veh.getName().equals("5.7")) System.out.println("V "+veh.getName()+" on idle at " + currentVertex + " home "+veh.getDepot().getVertex());
-//
-//                 
-//    		if (currentVertex!=veh.getDepot().getVertex()){
-//    			System.out.println("Sending vehicle to Rank "+veh.getName() );
-//    			scheduleRankReturn(veh);
-//    		}
-//            
-//            }
-    	
-    	
+    	   	
     }
     
     @Override
