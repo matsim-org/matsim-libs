@@ -27,9 +27,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 
@@ -38,7 +40,7 @@ import playground.wrashid.lib.obj.TwoKeyHashMapsWithDouble;
 
 // TODO: accumulate
 public class DensityInfoCollectorWithPt implements LinkLeaveEventHandler,
-		LinkEnterEventHandler, AgentArrivalEventHandler {
+		LinkEnterEventHandler, AgentArrivalEventHandler, AgentDepartureEventHandler {
 
 	private int binSizeInSeconds; // set the length of interval
 	public HashMap<Id, int[]> density; // define
@@ -140,6 +142,11 @@ public class DensityInfoCollectorWithPt implements LinkLeaveEventHandler,
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
+		linkEnterTime.put(event.getLinkId(), event.getPersonId(), event.getTime());
+	}
+
+	@Override
+	public void handleEvent(AgentDepartureEvent event) {
 		linkEnterTime.put(event.getLinkId(), event.getPersonId(), event.getTime());
 	}
 	

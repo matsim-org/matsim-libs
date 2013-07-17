@@ -19,11 +19,11 @@ import playground.wrashid.msimoni.analyses.LinkSelector;
 
 public class MainFundamentalDiagram {
 
-	static boolean doConsoleOutput = false;
+	static boolean doConsoleOutput = true;
 
 	public static void main(String[] args) {
-		String networkFile = "C:/data/workspace3/matsim/output/equil/output_network.xml.gz";
-		String eventsFile = "C:/data/workspace3/matsim/output/equil/ITERS/it.10/10.events.xml.gz";
+		String networkFile = "C:/data/workspace3/matsim/output/equil_jdeq/output_network.xml.gz";
+		String eventsFile = "C:/data/workspace3/matsim/output/equil_jdeq/ITERS/it.0/0.events.xml.gz";
 		// String networkFile =
 		// "H:/data/experiments/TRBAug2011/runs/ktiRun24/output/output_network.xml.gz";
 		// String eventsFile =
