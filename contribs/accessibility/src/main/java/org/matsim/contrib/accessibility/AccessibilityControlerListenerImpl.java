@@ -61,7 +61,7 @@ import org.matsim.utils.LeastCostPathTree;
  */
 public class AccessibilityControlerListenerImpl{
 	
-	static final Logger log = Logger.getLogger(AccessibilityControlerListenerImpl.class);
+	private static final Logger log = Logger.getLogger(AccessibilityControlerListenerImpl.class);
 	
 	public static final String FREESEED_FILENAME= "freeSpeedAccessibility_cellsize_";
 	public static final String CAR_FILENAME 	= "carAccessibility_cellsize_";
@@ -81,7 +81,7 @@ public class AccessibilityControlerListenerImpl{
 	
 	// storing the accessibility results
 	SpatialGrid freeSpeedGrid 	= null;
-	SpatialGrid carGrid			= null;
+	SpatialGrid carGrid		= null;
 	SpatialGrid bikeGrid		= null;
 	SpatialGrid walkGrid		= null;
 	SpatialGrid ptGrid			= null;
@@ -90,7 +90,7 @@ public class AccessibilityControlerListenerImpl{
 	boolean useCarGrid 			= false;
 	boolean useBikeGrid			= false;
 	boolean useWalkGrid			= false;
-	boolean usePtGrid			= false;
+	boolean usePtGrid				= false;
 	
 	// storing pt matrix
 	PtMatrix ptMatrix;

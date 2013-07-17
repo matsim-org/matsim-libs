@@ -1,9 +1,12 @@
 package org.matsim.contrib.accessibility;
 
+import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.accessibility.costcalculator.TravelDistanceCalculator;
@@ -121,6 +124,7 @@ import com.vividsolutions.jts.geom.Geometry;
 public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityControlerListenerImpl implements ShutdownListener{ // implements ShutdownListener
 	
 	private static final Logger log = Logger.getLogger(GridBasedAccessibilityControlerListenerV3.class);
+	private AnalysisCellBasedAccessibilityCSVWriterV2 accessibilityWriter;
 	
 	// ////////////////////////////////////////////////////////////////////
 	// constructors
@@ -153,7 +157,7 @@ public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 		// writing accessibility measures continuously into a csv file, which is not 
 		// dedicated for as input for UrbanSim, but for analysis purposes
 		String matsimOutputDirectory = config.controler().getOutputDirectory();
-		AnalysisCellBasedAccessibilityCSVWriterV2.initAnalysisCellBasedAccessibilityCSVWriterV2(matsimOutputDirectory);
+		accessibilityWriter = new AnalysisCellBasedAccessibilityCSVWriterV2(matsimOutputDirectory);
 		initAccessibilityParameters(config);
 		// aggregating facilities to their nearest node on the road network
 		this.aggregatedFacilities = aggregatedOpportunities(opportunities, network);
@@ -228,7 +232,7 @@ public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 			
 			String matsimOutputDirectory = event.getControler().getScenario().getConfig().controler().getOutputDirectory();
 			
-			AnalysisCellBasedAccessibilityCSVWriterV2.close(); 
+			accessibilityWriter.close(); 
 			writePlottingData(matsimOutputDirectory);			
 			
 			if(this.spatialGridDataExchangeListenerList != null){
@@ -264,7 +268,7 @@ public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 			double ptAccessibility) {
 		
 		// writing accessibility measures of current measurePoint in csv format
-		AnalysisCellBasedAccessibilityCSVWriterV2.write(measurePoint, fromNode, freeSpeedAccessibility,
+		accessibilityWriter.write(measurePoint, fromNode, freeSpeedAccessibility,
 														carAccessibility, bikeAccessibility, walkAccessibility, ptAccessibility);
 	}
 	
@@ -299,7 +303,7 @@ public class GridBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 			GridUtils.writeSpatialGridTable(ptGrid, matsimOutputDirectory
 				+ PT_FILENAME + ptGrid.getResolution()
 				+ FILE_TYPE_TXT);
-
+		
 		log.info("Writing plotting data for R done!");
 	}
 	

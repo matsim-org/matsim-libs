@@ -10,15 +10,16 @@ import org.matsim.core.utils.io.IOUtils;
 
 
 public class AnalysisCellBasedAccessibilityCSVWriterV2 {
-	
 	private static final Logger log = Logger.getLogger(AnalysisCellBasedAccessibilityCSVWriterV2.class);
-	private static BufferedWriter accessibilityDataWriter = null;
-	public static final String FILE_NAME= "accessibility_indicators.csv";
 	
+	public static final String FILE_NAME= "accessibility_indicators.csv";
+
+	private BufferedWriter accessibilityDataWriter ;
+
 	/**
 	 * writes the header of accessibility data csv file
 	 */
-	public static void initAnalysisCellBasedAccessibilityCSVWriterV2(String matsimOutputDirectory){
+	public AnalysisCellBasedAccessibilityCSVWriterV2(String matsimOutputDirectory){
 		try{
 			log.info("Initializing AnalysisCellBasedAccessibilityCSVWriterV2 ...");
 			accessibilityDataWriter = IOUtils.getBufferedWriter( matsimOutputDirectory + FILE_NAME );
@@ -54,7 +55,7 @@ public class AnalysisCellBasedAccessibilityCSVWriterV2 {
 	 * @param bikeAccessibility
 	 * @param walkAccessibility
 	 */
-	public static void write(ActivityFacility startZone, 
+	public void write(ActivityFacility startZone, 
 							 Node node, 
 							 double freeSpeedAccessibility,
 							 double carAccessibility, 
@@ -63,7 +64,7 @@ public class AnalysisCellBasedAccessibilityCSVWriterV2 {
 							 double ptAccessibility){
 		
 		try{
-			assert(AnalysisCellBasedAccessibilityCSVWriterV2.accessibilityDataWriter != null);
+			assert(accessibilityDataWriter != null);
 			accessibilityDataWriter.write( startZone.getId().toString() + "," +
 										   startZone.getCoord().getX() + "," +
 										   startZone.getCoord().getY() + "," +
@@ -85,10 +86,10 @@ public class AnalysisCellBasedAccessibilityCSVWriterV2 {
 	/**
 	 * finalize and close csv file
 	 */
-	public static void close(){
+	public void close(){
 		try {
 			log.info("Closing AnalysisCellBasedAccessibilityCSVWriterV2 ...");
-			assert(AnalysisCellBasedAccessibilityCSVWriterV2.accessibilityDataWriter != null);
+			assert(accessibilityDataWriter != null);
 			accessibilityDataWriter.flush();
 			accessibilityDataWriter.close();
 			log.info("... done!");
