@@ -20,16 +20,15 @@
 package playground.michalm.vrp.taxi;
 
 import pl.poznan.put.vrp.dynamic.data.schedule.DriveTask;
-import playground.michalm.vrp.data.network.MatsimVrpGraph;
 import playground.michalm.vrp.data.network.shortestpath.ShortestPathDynLeg;
 
 
 public class TaxiLeg
     extends ShortestPathDynLeg
 {
-    public TaxiLeg(DriveTask driveTask, MatsimVrpGraph vrpGraph)
+    public TaxiLeg(DriveTask driveTask)
     {
-        super(driveTask, vrpGraph);
+        super(driveTask);
     }
 
 

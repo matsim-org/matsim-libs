@@ -156,7 +156,8 @@ public class OnlineDvrpLauncherUtils
     /**
      * Mandatory
      */
-    public static QSim initQSim(MatsimVrpData data, TaxiOptimizer optimizer)
+    public static QSim initQSim(MatsimVrpData data, TaxiOptimizer optimizer,
+            boolean onlineVehicleTracker)
     {
         Scenario scenario = data.getScenario();
         EventsManager events = EventsUtils.createEventsManager();
@@ -178,7 +179,7 @@ public class OnlineDvrpLauncherUtils
 
         qSim.addAgentSource(new PopulationAgentSource(scenario.getPopulation(),
                 new DefaultAgentFactory(qSim), qSim));
-        qSim.addAgentSource(new TaxiAgentSource(data, taxiSimEngine));
+        qSim.addAgentSource(new TaxiAgentSource(data, taxiSimEngine, onlineVehicleTracker));
         qSim.addDepartureHandler(new TaxiModeDepartureHandler(taxiSimEngine, data));
 
         return qSim;

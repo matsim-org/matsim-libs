@@ -46,9 +46,12 @@ import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiEvaluator.TaxiEvaluation;
     }
 
 
-    /*package*/void run(int configIdx, int runs, PrintWriter pw, PrintWriter pw2)
+    /*package*/void run(int configIdx, int runs, boolean destinationKnown,
+            boolean onlineVehicleTracker, PrintWriter pw, PrintWriter pw2)
     {
         launcher.algorithmConfig = AlgorithmConfig.ALL[configIdx];
+        launcher.destinationKnown = destinationKnown;
+        launcher.onlineVehicleTracker = onlineVehicleTracker;
 
         // taxiPickupDriveTime
         // taxiDeliveryDriveTime
@@ -149,6 +152,34 @@ import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiEvaluator.TaxiEvaluation;
     }
 
 
+    private static void run(int configIdx, int runs, String paramFile, boolean destinationKnown,
+            boolean onlineVehicleTracker)
+        throws FileNotFoundException
+    {
+        MultipleSingleIterOnlineDvrpLauncher multiLauncher = new MultipleSingleIterOnlineDvrpLauncher(
+                paramFile);
+
+        String txt = (destinationKnown ? "D1" : "D0") + "_" + (onlineVehicleTracker ? "M1" : "M2");
+
+        PrintWriter pw = new PrintWriter(multiLauncher.launcher.dirName + "stats_" + txt + ".out");
+        PrintWriter pw2 = new PrintWriter(multiLauncher.launcher.dirName + "timeUpdates_" + txt
+                + ".out");
+
+        if (configIdx == -1) {
+            for (int i = 0; i < AlgorithmConfig.ALL.length; i++) {
+                multiLauncher.run(i, runs, destinationKnown, onlineVehicleTracker, pw, pw2);
+            }
+        }
+        else {
+            multiLauncher.run(configIdx, runs, destinationKnown, onlineVehicleTracker, pw, pw2);
+        }
+
+        pw.close();
+        pw2.close();
+
+    }
+
+
     // args: configIdx runs
     public static void main(String... args)
         throws FileNotFoundException
@@ -174,22 +205,9 @@ import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiEvaluator.TaxiEvaluation;
             throw new RuntimeException();
         }
 
-        MultipleSingleIterOnlineDvrpLauncher multiLauncher = new MultipleSingleIterOnlineDvrpLauncher(
-                paramFile);
-
-        PrintWriter pw = new PrintWriter(multiLauncher.launcher.dirName + "stats.out");
-        PrintWriter pw2 = new PrintWriter(multiLauncher.launcher.dirName + "timeUpdates.out");
-
-        if (configIdx == -1) {
-            for (int i = 0; i < AlgorithmConfig.ALL.length; i++) {
-                multiLauncher.run(i, runs, pw, pw2);
-            }
-        }
-        else {
-            multiLauncher.run(configIdx, runs, pw, pw2);
-        }
-
-        pw.close();
-        pw2.close();
+        run(configIdx, runs, paramFile, false, false);
+        run(configIdx, runs, paramFile, false, true);
+        run(configIdx, runs, paramFile, true, false);
+        run(configIdx, runs, paramFile, true, true);
     }
 }

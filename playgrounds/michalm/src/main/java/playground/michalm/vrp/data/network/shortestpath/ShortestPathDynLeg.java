@@ -22,18 +22,16 @@ package playground.michalm.vrp.data.network.shortestpath;
 import org.matsim.api.core.v01.Id;
 
 import pl.poznan.put.vrp.dynamic.data.network.VertexTimePair;
-import pl.poznan.put.vrp.dynamic.data.schedule.*;
-import pl.poznan.put.vrp.dynamic.data.schedule.DriveTask.DelayEstimator;
-import pl.poznan.put.vrp.dynamic.data.schedule.DriveTask.VehiclePositioning;
+import pl.poznan.put.vrp.dynamic.data.online.VehicleTracker;
+import pl.poznan.put.vrp.dynamic.data.schedule.DriveTask;
 import playground.michalm.dynamic.DynLeg;
 import playground.michalm.vrp.data.network.*;
 
 
 public class ShortestPathDynLeg
-    implements DynLeg, DelayEstimator, VehiclePositioning
+    implements DynLeg
 {
     private final ShortestPath shortestPath;
-    private final MatsimVrpGraph vrpGraph;
 
     private final Id originLinkId;
     private final Id destinationLinkId;
@@ -42,15 +40,12 @@ public class ShortestPathDynLeg
     private final int beginTime;
 
     private int currentLinkIdx = -1;// fromLink idx == -1
-    private int expectedLinkTravelTime = 0;// fromLink travel time == 0
 
-    private int timeAtLatestNode = -1;// has not been reached yet
-    private int delayAtLatestNode = 0;// ditto
+    private OnlineVehicleTracker onlineVehicleTracker;
 
 
-    public ShortestPathDynLeg(DriveTask driveTask, MatsimVrpGraph vrpGraph)
+    public ShortestPathDynLeg(DriveTask driveTask)
     {
-        this.vrpGraph = vrpGraph;
         beginTime = driveTask.getBeginTime();
 
         MatsimArc arc = (MatsimArc)driveTask.getArc();
@@ -59,8 +54,15 @@ public class ShortestPathDynLeg
 
         shortestPath = arc.getShortestPath(beginTime);
         destinationLinkIdx = shortestPath.linkIds.length - 1;
+    }
 
-        driveTask.setDelayEstimator(this);
+
+    public void initOnlineVehicleTracker(DriveTask driveTask, MatsimVrpGraph graph)
+    {
+        if (onlineVehicleTracker == null) {
+            onlineVehicleTracker = new OnlineVehicleTracker(graph);
+            driveTask.setVehicleTracker(onlineVehicleTracker);
+        }
     }
 
 
@@ -69,14 +71,9 @@ public class ShortestPathDynLeg
     {
         currentLinkIdx++;
 
-        int expectedTimeEnRoute = (currentLinkIdx == 0) ? 0
-                : shortestPath.accLinkTravelTimes[currentLinkIdx - 1];
-        int actualTimeEnRoute = timeAtLatestNode - beginTime;
-
-        expectedLinkTravelTime = shortestPath.accLinkTravelTimes[currentLinkIdx]
-                - expectedTimeEnRoute;
-        timeAtLatestNode = time;
-        delayAtLatestNode = actualTimeEnRoute - expectedTimeEnRoute;
+        if (onlineVehicleTracker != null) {
+            onlineVehicleTracker.movedOverNode(time);
+        }
     }
 
 
@@ -109,33 +106,64 @@ public class ShortestPathDynLeg
     }
 
 
-    @Override
-    public int getCurrentDelay(int currentTime)
+    private class OnlineVehicleTracker
+        implements VehicleTracker
     {
-        int estimatedDelay = delayAtLatestNode;
-        int timeOnLink = currentTime - timeAtLatestNode;
+        private final MatsimVrpGraph vrpGraph;
 
-        // delay on the current link
-        if (timeOnLink > expectedLinkTravelTime) {
-            estimatedDelay += (timeOnLink - expectedLinkTravelTime);
+        private int expectedLinkTravelTime = 0;// fromLink travel time == 0
+
+        private int timeAtLatestNode = -1;// has not been reached yet
+        private int delayAtLatestNode = 0;// ditto
+
+
+        public OnlineVehicleTracker(MatsimVrpGraph vrpGraph)
+        {
+            this.vrpGraph = vrpGraph;
         }
 
-        return estimatedDelay;
-    }
+
+        private void movedOverNode(int time)
+        {
+            int expectedTimeEnRoute = (currentLinkIdx == 0) ? 0
+                    : shortestPath.accLinkTravelTimes[currentLinkIdx - 1];
+            int actualTimeEnRoute = timeAtLatestNode - beginTime;
+
+            expectedLinkTravelTime = shortestPath.accLinkTravelTimes[currentLinkIdx]
+                    - expectedTimeEnRoute;
+            timeAtLatestNode = time;
+            delayAtLatestNode = actualTimeEnRoute - expectedTimeEnRoute;
+        }
 
 
-    @Override
-    public VertexTimePair getLastRecordedPosition()
-    {
-        return new VertexTimePair(vrpGraph.getVertex(getCurrentLinkId()), timeAtLatestNode);
-    }
+        @Override
+        public int calculateCurrentDelay(int currentTime)
+        {
+            int estimatedDelay = delayAtLatestNode;
+            int timeOnLink = currentTime - timeAtLatestNode;
+
+            // delay on the current link
+            if (timeOnLink > expectedLinkTravelTime) {
+                estimatedDelay += (timeOnLink - expectedLinkTravelTime);
+            }
+
+            return estimatedDelay;
+        }
 
 
-    @Override
-    public VertexTimePair getNextPredictedPosition(int currentTime)
-    {
-        int predictedTimeAtNextNode = timeAtLatestNode
-                + Math.max(currentTime - timeAtLatestNode, expectedLinkTravelTime);
-        return new VertexTimePair(vrpGraph.getVertex(getNextLinkId()), predictedTimeAtNextNode);
+        @Override
+        public VertexTimePair getLastPosition()
+        {
+            return new VertexTimePair(vrpGraph.getVertex(getCurrentLinkId()), timeAtLatestNode);
+        }
+
+
+        @Override
+        public VertexTimePair predictNextPosition(int currentTime)
+        {
+            int predictedTimeAtNextNode = timeAtLatestNode
+                    + Math.max(currentTime - timeAtLatestNode, expectedLinkTravelTime);
+            return new VertexTimePair(vrpGraph.getVertex(getNextLinkId()), predictedTimeAtNextNode);
+        }
     }
 }

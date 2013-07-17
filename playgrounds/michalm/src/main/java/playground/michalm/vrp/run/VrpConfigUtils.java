@@ -37,6 +37,7 @@ public class VrpConfigUtils
 
     public static Config loadConfig(final String filename)
     {
+        @SuppressWarnings("unchecked")
         Config config = ConfigUtils.loadConfig(filename);
         QSimConfigGroup qSimConfig = config.getQSimConfigGroup();
 

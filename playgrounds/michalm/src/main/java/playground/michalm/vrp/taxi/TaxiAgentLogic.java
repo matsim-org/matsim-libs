@@ -37,17 +37,22 @@ public class TaxiAgentLogic
     implements DynAgentLogic
 {
     private final TaxiSimEngine taxiSimEngine;
-    private final MatsimVrpGraph vrpGraph;
+
+    private final boolean onlineVehicleTracker;
+    private final MatsimVrpGraph graph;
 
     private final Vehicle vrpVehicle;
     private DynAgent agent;
 
 
-    public TaxiAgentLogic(Vehicle vrpVehicle, TaxiSimEngine taxiSimEngine, MatsimVrpGraph vrpGraph)
+    public TaxiAgentLogic(Vehicle vrpVehicle, TaxiSimEngine taxiSimEngine, MatsimVrpGraph graph,
+            boolean onlineVehicleTracker)
     {
         this.vrpVehicle = vrpVehicle;
         this.taxiSimEngine = taxiSimEngine;
-        this.vrpGraph = vrpGraph;
+
+        this.graph = graph;
+        this.onlineVehicleTracker = onlineVehicleTracker;
     }
 
 
@@ -204,7 +209,7 @@ public class TaxiAgentLogic
 
     private TaxiLeg createLegWithPassenger(final TaxiDriveTask driveTask)
     {
-        return new TaxiLeg(driveTask, vrpGraph) {
+        TaxiLeg taxiLeg = new TaxiLeg(driveTask) {
             @Override
             public void endLeg(double now)
             {
@@ -232,11 +237,23 @@ public class TaxiAgentLogic
                         passenger);
             }
         };
+
+        if (onlineVehicleTracker) {
+            taxiLeg.initOnlineVehicleTracker(driveTask, graph);
+        }
+
+        return taxiLeg;
     }
 
 
     private TaxiLeg createLeg(TaxiDriveTask driveTask)
     {
-        return new TaxiLeg(driveTask, vrpGraph);
+        TaxiLeg taxiLeg = new TaxiLeg(driveTask);
+
+        if (onlineVehicleTracker) {
+            taxiLeg.initOnlineVehicleTracker(driveTask, graph);
+        }
+
+        return taxiLeg;
     }
 }

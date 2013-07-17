@@ -37,21 +37,27 @@ import playground.michalm.vrp.driver.VrpSchedulePlanFactory;
 public class TaxiAgentSource
     implements AgentSource
 {
-    private MatsimVrpData data;
-    private TaxiSimEngine taxiSimEngine;
-    private boolean isAgentWithPlan;
+    private final MatsimVrpData data;
+    private final TaxiSimEngine taxiSimEngine;
+
+    private final boolean onlineVehicleTracker;
+    private final boolean isAgentWithPlan;
 
 
-    public TaxiAgentSource(MatsimVrpData data, TaxiSimEngine vrpSimEngine)
+    public TaxiAgentSource(MatsimVrpData data, TaxiSimEngine vrpSimEngine,
+            boolean onlineVehicleTracker)
     {
-        this(data, vrpSimEngine, false);
+        this(data, vrpSimEngine, onlineVehicleTracker, false);
     }
 
 
-    public TaxiAgentSource(MatsimVrpData data, TaxiSimEngine taxiSimEngine, boolean isAgentWithPlan)
+    public TaxiAgentSource(MatsimVrpData data, TaxiSimEngine taxiSimEngine,
+            boolean onlineVehicleTracker, boolean isAgentWithPlan)
     {
         this.data = data;
         this.taxiSimEngine = taxiSimEngine;
+
+        this.onlineVehicleTracker = onlineVehicleTracker;
         this.isAgentWithPlan = isAgentWithPlan;
     }
 
@@ -64,7 +70,7 @@ public class TaxiAgentSource
 
         for (Vehicle vrpVeh : vehicles) {
             TaxiAgentLogic taxiAgentLogic = new TaxiAgentLogic(vrpVeh, taxiSimEngine,
-                    data.getMatsimVrpGraph());
+                    data.getMatsimVrpGraph(), onlineVehicleTracker);
             taxiSimEngine.addAgentLogic(taxiAgentLogic);
 
             ((DynAgentVehicle)vrpVeh).setAgentLogic(taxiAgentLogic);

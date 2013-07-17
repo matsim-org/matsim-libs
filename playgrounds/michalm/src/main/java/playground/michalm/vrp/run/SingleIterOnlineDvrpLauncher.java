@@ -65,7 +65,8 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
     /*package*/final Scenario scenario;
 
     /*package*/AlgorithmConfig algorithmConfig;
-    /*package*/final boolean destinationKnown;
+    /*package*/boolean destinationKnown;
+    /*package*/boolean onlineVehicleTracker;
 
     /*package*/LegHistogram legHistogram;
     /*package*/MatsimVrpData data;
@@ -108,6 +109,7 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
         // algorithmConfig = AlgorithmConfig.RES_DRV_15_MIN;
 
         destinationKnown = true;
+        onlineVehicleTracker = false;
 
         otfVis = !true;
 
@@ -156,6 +158,7 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
         algorithmConfig = AlgorithmConfig.ALL[Integer.valueOf(params.get("algorithmConfig"))];
 
         destinationKnown = Boolean.valueOf(params.get("destinationKnown"));
+        onlineVehicleTracker = Boolean.valueOf(params.get("onlineVehicleTracker"));
 
         otfVis = Boolean.valueOf(params.get("otfVis"));
 
@@ -184,7 +187,7 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
                 data.getVrpData(), destinationKnown);
         optimizer.setDelaySpeedupStats(delaySpeedupStats);
 
-        QSim qSim = OnlineDvrpLauncherUtils.initQSim(data, optimizer);
+        QSim qSim = OnlineDvrpLauncherUtils.initQSim(data, optimizer, onlineVehicleTracker);
         EventsManager events = qSim.getEventsManager();
 
         EventWriter eventWriter = null;
@@ -197,7 +200,7 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
         events.addHandler(rvr);
 
         if (otfVis) { // OFTVis visualization
-            scenario.getConfig().otfVis().setColoringScheme( ColoringScheme.taxicab ) ;
+            scenario.getConfig().otfVis().setColoringScheme(ColoringScheme.taxicab);
             OTFLiveUtils.initQueryHandler(qSim, data.getVrpData());
             OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(),
                     scenario, qSim.getEventsManager(), qSim);
