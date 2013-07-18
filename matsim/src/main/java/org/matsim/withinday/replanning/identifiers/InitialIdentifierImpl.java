@@ -23,29 +23,30 @@ package org.matsim.withinday.replanning.identifiers;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 import org.matsim.withinday.replanning.identifiers.interfaces.InitialIdentifier;
+import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 
 public class InitialIdentifierImpl extends InitialIdentifier {
 
-	protected QSim qsim;
+	protected ActivityReplanningMap activityReplanningMap;
 
 	// use the Factory!
-	/*package*/ InitialIdentifierImpl(QSim qsim) {
-		this.qsim = qsim;
+	/*package*/ InitialIdentifierImpl(ActivityReplanningMap activityReplanningMap) {
+		this.activityReplanningMap = activityReplanningMap;
 	}
 	
 	@Override
 	public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
-				
-		Collection<MobsimAgent> mobsimAgents = this.qsim.getAgents();
+		
+		Collection<MobsimAgent> mobsimAgents = new LinkedHashSet<MobsimAgent>(this.activityReplanningMap.getPersonAgentMapping().values()); 
 		Set<PlanBasedWithinDayAgent> agentsToReplan = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
 
 		/*

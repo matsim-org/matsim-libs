@@ -20,11 +20,14 @@
 
 package org.matsim.withinday.controller;
 
-import org.matsim.core.config.Config;
-import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
+import org.matsim.core.router.util.DijkstraFactory;
 import org.matsim.core.scoring.functions.OnlyTravelDependentScoringFunctionFactory;
 import org.matsim.withinday.replanning.identifiers.ActivityEndIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.InitialIdentifierImplFactory;
@@ -44,19 +47,19 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegR
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplannerFactory;
 
 /**
- * This controller should give an example what is needed to run
+ * This class should give an example what is needed to run
  * simulations with WithinDayReplanning.
  *
  * The path to a config file is needed as argument to run the
  * simulation.
  * 
- * It should be possible to run this controller with
+ * It should be possible to run this class with
  * "src/test/resources/test/scenarios/berlin/config_withinday.xml"
  * as argument.
  *
  * @author Christoph Dobler
  */
-public class ExampleWithinDayController extends WithinDayController {
+public class ExampleWithinDayController implements StartupListener {
 
 	/*
 	 * Define the Probability that an Agent uses the
@@ -80,68 +83,9 @@ public class ExampleWithinDayController extends WithinDayController {
 	protected ProbabilityFilterFactory duringActivityProbabilityFilterFactory;
 	protected ProbabilityFilterFactory duringLegProbabilityFilterFactory;
 	
-	public ExampleWithinDayController(String[] args) {
-		super(args);
-
-		init();
-	}
-
-	// only for Batch Runs
-	public ExampleWithinDayController(Config config) {
-		super(config);
-
-		init();
-	}
-
-	private void init() {
-		// Use a Scoring Function, that only scores the travel times!
-		this.setScoringFunctionFactory(new OnlyTravelDependentScoringFunctionFactory());
-	}
-
-	/*
-	 * New Routers for the Replanning are used instead of using the controler's.
-	 * By doing this every person can use a personalised Router.
-	 */
-	@Override
-	protected void initReplanners(QSim sim) {
-		
-		/*
-		 * Initialize TripRouterFactory for within-day replanning. For car travel times,
-		 * a TravelTimeCollector is used which provides real time information.
-		 */
-		this.setTravelDisutilityFactory(new OnlyTimeDependentTravelCostCalculatorFactory());
-		this.initWithinDayTripRouterFactory();
-		
-		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory(), 
-				this.getTravelTimeCollector(), this.config.planCalcScore());
-		
-		this.initialIdentifierFactory = new InitialIdentifierImplFactory(sim);
-		this.initialProbabilityFilterFactory = new ProbabilityFilterFactory(this.pInitialReplanning);
-		this.initialIdentifierFactory.addAgentFilterFactory(this.initialProbabilityFilterFactory);
-		this.initialIdentifier = initialIdentifierFactory.createIdentifier();
-		this.initialReplannerFactory = new InitialReplannerFactory(this.scenarioData, this.getWithinDayEngine(),
-				this.getWithinDayTripRouterFactory(), routingContext);
-		this.initialReplannerFactory.addIdentifier(this.initialIdentifier);
-		this.getWithinDayEngine().addIntialReplannerFactory(this.initialReplannerFactory);
-		
-		this.duringActivityIdentifierFactory = new ActivityEndIdentifierFactory(super.getActivityReplanningMap());
-		this.duringActivityProbabilityFilterFactory = new ProbabilityFilterFactory(this.pDuringActivityReplanning);
-		this.duringActivityIdentifierFactory.addAgentFilterFactory(this.duringActivityProbabilityFilterFactory);
-		this.duringActivityIdentifier = duringActivityIdentifierFactory.createIdentifier();
-		this.duringActivityReplannerFactory = new NextLegReplannerFactory(this.scenarioData, this.getWithinDayEngine(),
-				this.getWithinDayTripRouterFactory(), routingContext);
-		this.duringActivityReplannerFactory.addIdentifier(this.duringActivityIdentifier);
-		this.getWithinDayEngine().addDuringActivityReplannerFactory(this.duringActivityReplannerFactory);
-		
-		this.duringLegIdentifierFactory = new LeaveLinkIdentifierFactory(super.getLinkReplanningMap());
-		this.duringLegProbabilityFilterFactory = new ProbabilityFilterFactory(this.pDuringLegReplanning);
-		this.duringLegIdentifierFactory.addAgentFilterFactory(this.duringLegProbabilityFilterFactory);
-		this.duringLegIdentifier = this.duringLegIdentifierFactory.createIdentifier();
-		this.duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenarioData, this.getWithinDayEngine(),
-				this.getWithinDayTripRouterFactory(), routingContext);
-		this.duringLegReplannerFactory.addIdentifier(this.duringLegIdentifier);
-		this.getWithinDayEngine().addDuringLegReplannerFactory(this.duringLegReplannerFactory);
-	}
+	protected Scenario scenario;
+	protected WithinDayControlerListener withinDayControlerListener;
+	
 
 	/*
 	 * ===================================================================
@@ -154,10 +98,66 @@ public class ExampleWithinDayController extends WithinDayController {
 			System.out.println("Usage: Controler config-file [dtd-file]");
 			System.out.println();
 		} else {
-			final ExampleWithinDayController controller = new ExampleWithinDayController(args);
-			controller.run();
+			final Controler controler = new Controler(args);
+			controler.addControlerListener(new ExampleWithinDayController(controler));
+			controler.run();
 		}
 		System.exit(0);
+	}
+	
+	public ExampleWithinDayController(Controler controler) {
+		
+		this.scenario = controler.getScenario();
+		this.withinDayControlerListener = new WithinDayControlerListener();
+		
+		// Use a Scoring Function, that only scores the travel times!
+		controler.setScoringFunctionFactory(new OnlyTravelDependentScoringFunctionFactory());
+		controler.setTravelDisutilityFactory(new OnlyTimeDependentTravelCostCalculatorFactory());
+		
+		// workaround
+		this.withinDayControlerListener.setLeastCostPathCalculatorFactory(new DijkstraFactory());
+	}
+
+	@Override
+	public void notifyStartup(StartupEvent event) {
+		
+		// initialze within-day module
+		this.withinDayControlerListener.notifyStartup(event);
+		
+		this.initReplanners();
+	}
+	
+	public void initReplanners() {
+		
+		RoutingContext routingContext = new RoutingContextImpl(this.withinDayControlerListener.getTravelDisutilityFactory(), 
+				this.withinDayControlerListener.getTravelTimeCollector(), this.scenario.getConfig().planCalcScore());
+		
+		this.initialIdentifierFactory = new InitialIdentifierImplFactory(this.withinDayControlerListener.getActivityReplanningMap());
+		this.initialProbabilityFilterFactory = new ProbabilityFilterFactory(this.pInitialReplanning);
+		this.initialIdentifierFactory.addAgentFilterFactory(this.initialProbabilityFilterFactory);
+		this.initialIdentifier = initialIdentifierFactory.createIdentifier();
+		this.initialReplannerFactory = new InitialReplannerFactory(this.scenario, this.withinDayControlerListener.getWithinDayEngine(),
+				this.withinDayControlerListener.getWithinDayTripRouterFactory(), routingContext);
+		this.initialReplannerFactory.addIdentifier(this.initialIdentifier);
+		this.withinDayControlerListener.getWithinDayEngine().addIntialReplannerFactory(this.initialReplannerFactory);
+		
+		this.duringActivityIdentifierFactory = new ActivityEndIdentifierFactory(this.withinDayControlerListener.getActivityReplanningMap());
+		this.duringActivityProbabilityFilterFactory = new ProbabilityFilterFactory(this.pDuringActivityReplanning);
+		this.duringActivityIdentifierFactory.addAgentFilterFactory(this.duringActivityProbabilityFilterFactory);
+		this.duringActivityIdentifier = duringActivityIdentifierFactory.createIdentifier();
+		this.duringActivityReplannerFactory = new NextLegReplannerFactory(this.scenario, this.withinDayControlerListener.getWithinDayEngine(),
+				this.withinDayControlerListener.getWithinDayTripRouterFactory(), routingContext);
+		this.duringActivityReplannerFactory.addIdentifier(this.duringActivityIdentifier);
+		this.withinDayControlerListener.getWithinDayEngine().addDuringActivityReplannerFactory(this.duringActivityReplannerFactory);
+		
+		this.duringLegIdentifierFactory = new LeaveLinkIdentifierFactory(this.withinDayControlerListener.getLinkReplanningMap());
+		this.duringLegProbabilityFilterFactory = new ProbabilityFilterFactory(this.pDuringLegReplanning);
+		this.duringLegIdentifierFactory.addAgentFilterFactory(this.duringLegProbabilityFilterFactory);
+		this.duringLegIdentifier = this.duringLegIdentifierFactory.createIdentifier();
+		this.duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenario, this.withinDayControlerListener.getWithinDayEngine(),
+				this.withinDayControlerListener.getWithinDayTripRouterFactory(), routingContext);
+		this.duringLegReplannerFactory.addIdentifier(this.duringLegIdentifier);
+		this.withinDayControlerListener.getWithinDayEngine().addDuringLegReplannerFactory(this.duringLegReplannerFactory);
 	}
 
 }
