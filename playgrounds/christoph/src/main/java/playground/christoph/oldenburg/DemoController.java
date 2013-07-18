@@ -104,15 +104,15 @@ public class DemoController extends WithinDayController implements MobsimInitial
 	 * New Routers for the replanning are used instead of using the controller's.
 	 * By doing this every person can use a personalized Router.
 	 */
+	@Override
 	protected void initReplanners(QSim sim) {
 
 		this.initWithinDayTripRouterFactory();
 
 		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory(), 
 				this.getTravelTimeCollector(), this.config.planCalcScore());
-
 		
-		this.initialIdentifier = new InitialIdentifierImplFactory(sim).createIdentifier();
+		this.initialIdentifier = new InitialIdentifierImplFactory(this.getActivityReplanningMap()).createIdentifier();
 		this.initialReplannerFactory = new CreateEvacuationPlanReplannerFactory(this.scenarioData, this.getWithinDayEngine(),
 				this.getWithinDayTripRouterFactory(), routingContext);
 		this.initialReplannerFactory.addIdentifier(this.initialIdentifier);
