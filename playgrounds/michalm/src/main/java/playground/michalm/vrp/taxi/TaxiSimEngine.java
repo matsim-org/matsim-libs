@@ -37,7 +37,7 @@ public class TaxiSimEngine
     implements MobsimEngine, MobsimBeforeSimStepListener
 {
     private final VrpData vrpData;
-    private final MobsimTimer simTimer;
+    protected final MobsimTimer simTimer;
 
     private final TaxiOptimizer optimizer;
 
@@ -114,7 +114,7 @@ public class TaxiSimEngine
     {}
 
 
-    private void notifyAgentLogics()
+    protected void notifyAgentLogics()
     {
         for (TaxiAgentLogic a : agentLogics) {
             a.schedulePossiblyChanged();
