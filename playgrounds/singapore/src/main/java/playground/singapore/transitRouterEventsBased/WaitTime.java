@@ -21,8 +21,6 @@
 package playground.singapore.transitRouterEventsBased;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
 
 /**
  * Gives an average of the wait time of people for a line, route, stop and in a time of the day 
@@ -33,6 +31,6 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 public interface WaitTime {
 
 	//Methods
-	public double getRouteStopWaitTime(TransitLine line, TransitRoute route, Id stopId, double time);
+	public double getRouteStopWaitTime(Id line, Id route, Id stopId, double time);
 
 }

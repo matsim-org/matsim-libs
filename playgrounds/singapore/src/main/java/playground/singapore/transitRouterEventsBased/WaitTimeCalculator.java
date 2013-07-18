@@ -52,10 +52,9 @@ public class WaitTimeCalculator implements AgentDepartureEventHandler, PersonEnt
 
 	//Attributes
 	private final double timeSlot;
-	private final Map<TransitRoute, Map<Id, WaitTimeData>> waitTimes = new HashMap<TransitRoute, Map<Id, WaitTimeData>>(1000);
-	private final Map<TransitRoute, Map<Id, double[]>> scheduledWaitTimes = new HashMap<TransitRoute, Map<Id, double[]>>(1000);
+	private final Map<Tuple<Id, Id>, Map<Id, WaitTimeData>> waitTimes = new HashMap<Tuple<Id, Id>, Map<Id, WaitTimeData>>(1000);
+	private final Map<Tuple<Id, Id>, Map<Id, double[]>> scheduledWaitTimes = new HashMap<Tuple<Id, Id>, Map<Id, double[]>>(1000);
 	private final Map<Id, Double> agentsWaitingData = new HashMap<Id, Double>();
-	private TransitSchedule transitSchedule;
 	private Map<Id, Tuple<Id, Id>> linesRoutesOfVehicle = new HashMap<Id, Tuple<Id, Id>>();
 	private Map<Id, Id> stopOfVehicle = new HashMap<Id, Id>();
 	
@@ -64,7 +63,6 @@ public class WaitTimeCalculator implements AgentDepartureEventHandler, PersonEnt
 		this(transitSchedule, config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config.getQSimConfigGroup().getEndTime()-config.getQSimConfigGroup().getStartTime()));
 	}
 	public WaitTimeCalculator(final TransitSchedule transitSchedule, final int timeSlot, final int totalTime) {
-		this.transitSchedule = transitSchedule;
 		this.timeSlot = timeSlot;
 		for(TransitLine line:transitSchedule.getTransitLines().values())
 			for(TransitRoute route:line.getRoutes().values()) {
@@ -96,8 +94,9 @@ public class WaitTimeCalculator implements AgentDepartureEventHandler, PersonEnt
 					}
 					stopsScheduledMap.put(stop.getStopFacility().getId(), cacheWaitTimes);
 				}
-				waitTimes.put(route, stopsMap);
-				scheduledWaitTimes.put(route, stopsScheduledMap);
+				Tuple<Id, Id> key = new Tuple<Id, Id>(line.getId(), route.getId());
+				waitTimes.put(key, stopsMap);
+				scheduledWaitTimes.put(key, stopsScheduledMap);
 			}
 	}
 
@@ -105,15 +104,16 @@ public class WaitTimeCalculator implements AgentDepartureEventHandler, PersonEnt
 	public WaitTime getWaitTimes() {
 		return new WaitTime() {
 			@Override
-			public double getRouteStopWaitTime(TransitLine line, TransitRoute route, Id stopId, double time) {
-				return WaitTimeCalculator.this.getRouteStopWaitTime(line, route, stopId, time);
+			public double getRouteStopWaitTime(Id lineId, Id routeId, Id stopId, double time) {
+				return WaitTimeCalculator.this.getRouteStopWaitTime(lineId, routeId, stopId, time);
 			}
 		};
 	}
-	private double getRouteStopWaitTime(TransitLine line, TransitRoute route, Id stopId, double time) {
-		WaitTimeData waitTimeData = waitTimes.get(route).get(stopId);
+	private double getRouteStopWaitTime(Id lineId, Id routeId, Id stopId, double time) {
+		Tuple<Id, Id> key = new Tuple<Id, Id>(lineId, routeId);
+		WaitTimeData waitTimeData = waitTimes.get(key).get(stopId);
 		if(waitTimeData.getNumData((int) (time/timeSlot))==0) {
-			double[] waitTimes = scheduledWaitTimes.get(route).get(stopId);
+			double[] waitTimes = scheduledWaitTimes.get(key).get(stopId);
 			return waitTimes[(int) (time/timeSlot)<waitTimes.length?(int) (time/timeSlot):(waitTimes.length-1)];
 		}
 		else
@@ -140,7 +140,7 @@ public class WaitTimeCalculator implements AgentDepartureEventHandler, PersonEnt
 		Double startWaitingTime = agentsWaitingData.get(event.getPersonId());
 		if(startWaitingTime!=null) {
 			Tuple<Id, Id> lineRoute = linesRoutesOfVehicle.get(event.getVehicleId());
-			WaitTimeData data = waitTimes.get(transitSchedule.getTransitLines().get(lineRoute.getFirst()).getRoutes().get(lineRoute.getSecond())).get(stopOfVehicle.get(event.getVehicleId()));
+			WaitTimeData data = waitTimes.get(lineRoute).get(stopOfVehicle.get(event.getVehicleId()));
 			data.addWaitTime((int) (startWaitingTime/timeSlot), event.getTime()-startWaitingTime);
 			agentsWaitingData.remove(event.getPersonId());
 		}
@@ -148,9 +148,8 @@ public class WaitTimeCalculator implements AgentDepartureEventHandler, PersonEnt
 
 	@Override
 	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
-		if(linesRoutesOfVehicle.get(event.getVehicleId())!=null) {
+		if(linesRoutesOfVehicle.get(event.getVehicleId())!=null)
 			stopOfVehicle.put(event.getVehicleId(), event.getFacilityId());
-		}
 	}
 
 	@Override

@@ -37,6 +37,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.population.routes.GenericRoute;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -57,12 +58,11 @@ public class WaitTimeStuckCalculator implements AgentDepartureEventHandler, Pers
 
 	//Attributes
 	private final double timeSlot;
-	private final Map<TransitRoute, Map<Id, WaitTimeData>> waitTimes = new HashMap<TransitRoute, Map<Id, WaitTimeData>>(1000);
-	private final Map<TransitRoute, Map<Id, double[]>> scheduledWaitTimes = new HashMap<TransitRoute, Map<Id, double[]>>(1000);
+	private final Map<Tuple<Id, Id>, Map<Id, WaitTimeData>> waitTimes = new HashMap<Tuple<Id, Id>, Map<Id, WaitTimeData>>(1000);
+	private final Map<Tuple<Id, Id>, Map<Id, double[]>> scheduledWaitTimes = new HashMap<Tuple<Id, Id>, Map<Id, double[]>>(1000);
 	private final Map<Id, Double> agentsWaitingData = new HashMap<Id, Double>();
 	private final Map<Id, Integer> agentsCurrentLeg = new HashMap<Id, Integer>();
 	private final Population population;
-	private TransitSchedule transitSchedule;
 
 	//Constructors
 	public WaitTimeStuckCalculator(final Population population, final TransitSchedule transitSchedule, final Config config) {
@@ -70,7 +70,6 @@ public class WaitTimeStuckCalculator implements AgentDepartureEventHandler, Pers
 	}
 	public WaitTimeStuckCalculator(final Population population, final TransitSchedule transitSchedule, final int timeSlot, final int totalTime) {
 		this.population = population;
-		this.transitSchedule = transitSchedule;
 		this.timeSlot = timeSlot;
 		for(TransitLine line:transitSchedule.getTransitLines().values())
 			for(TransitRoute route:line.getRoutes().values()) {
@@ -102,8 +101,9 @@ public class WaitTimeStuckCalculator implements AgentDepartureEventHandler, Pers
 					}
 					stopsScheduledMap.put(stop.getStopFacility().getId(), cacheWaitTimes);
 				}
-				waitTimes.put(route, stopsMap);
-				scheduledWaitTimes.put(route, stopsScheduledMap);
+				Tuple<Id, Id> key = new Tuple<Id, Id>(line.getId(), route.getId());
+				waitTimes.put(key, stopsMap);
+				scheduledWaitTimes.put(key, stopsScheduledMap);
 			}
 	}
 
@@ -112,21 +112,21 @@ public class WaitTimeStuckCalculator implements AgentDepartureEventHandler, Pers
 		return new WaitTime() {
 			
 			@Override
-			public double getRouteStopWaitTime(TransitLine line, TransitRoute route, Id stopId, double time) {
-				return WaitTimeStuckCalculator.this.getRouteStopWaitTime(line, route, stopId, time);
+			public double getRouteStopWaitTime(Id lineId, Id routeId, Id stopId, double time) {
+				return WaitTimeStuckCalculator.this.getRouteStopWaitTime(lineId, routeId, stopId, time);
 			}
 		
 		};
 	}
-	private double getRouteStopWaitTime(TransitLine line, TransitRoute route, Id stopId, double time) {
-		WaitTimeData waitTimeData = waitTimes.get(route).get(stopId);
-		double tTime = waitTimeData.getNumData((int) (time/timeSlot));
-		if(tTime==0) {
-			double[] waitTimes = scheduledWaitTimes.get(route).get(stopId);
+	private double getRouteStopWaitTime(Id lineId, Id routeId, Id stopId, double time) {
+		Tuple<Id, Id> key = new Tuple<Id, Id>(lineId, routeId);
+		WaitTimeData waitTimeData = waitTimes.get(key).get(stopId);
+		if(waitTimeData.getNumData((int) (time/timeSlot))==0) {
+			double[] waitTimes = scheduledWaitTimes.get(key).get(stopId);
 			return waitTimes[(int) (time/timeSlot)<waitTimes.length?(int) (time/timeSlot):(waitTimes.length-1)];
 		}
 		else
-			return tTime;
+			return waitTimeData.getWaitTime((int) (time/timeSlot));
 	}
 	@Override
 	public void reset(int iteration) {
@@ -159,7 +159,7 @@ public class WaitTimeStuckCalculator implements AgentDepartureEventHandler, Pers
 				if(planElement instanceof Leg) {
 					if(currentLeg==legs) {
 						String[] leg = ((GenericRoute)((Leg)planElement).getRoute()).getRouteDescription().split(SEPARATOR);
-						WaitTimeData data = waitTimes.get(transitSchedule.getTransitLines().get(new IdImpl(leg[2])).getRoutes().get(new IdImpl(leg[3]))).get(new IdImpl(leg[1]));
+						WaitTimeData data = waitTimes.get(new Tuple<Id, Id>(new IdImpl(leg[2]), new IdImpl(leg[3]))).get(new IdImpl(leg[1]));
 						data.addWaitTime((int) (startWaitingTime/timeSlot), event.getTime()-startWaitingTime);
 						agentsWaitingData.remove(event.getPersonId());
 						break PLAN_ELEMENTS;
@@ -180,7 +180,7 @@ public class WaitTimeStuckCalculator implements AgentDepartureEventHandler, Pers
 				if(planElement instanceof Leg) {
 					if(currentLeg==legs) {
 						String[] leg = ((GenericRoute)((Leg)planElement).getRoute()).getRouteDescription().split(SEPARATOR);
-						WaitTimeData data = waitTimes.get(transitSchedule.getTransitLines().get(new IdImpl(leg[2])).getRoutes().get(new IdImpl(leg[3]))).get(new IdImpl(leg[1]));
+						WaitTimeData data = waitTimes.get(new Tuple<Id, Id>(new IdImpl(leg[2]), new IdImpl(leg[3]))).get(new IdImpl(leg[1]));
 						if(data!=null)
 							data.addWaitTime((int) (startWaitingTime/timeSlot), event.getTime()-startWaitingTime);
 						agentsWaitingData.remove(event.getPersonId());
