@@ -1,6 +1,7 @@
 package playground.wrashid.fd;
 
 import java.util.HashMap;
+import java.util.HashSet;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
@@ -12,6 +13,8 @@ import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandle
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 
+import playground.wrashid.lib.obj.TwoKeyHashMapsWithDouble;
+
 public abstract class AbstractDualSimHandler implements LinkLeaveEventHandler,
 		LinkEnterEventHandler, AgentArrivalEventHandler,
 		AgentWait2LinkEventHandler {
@@ -20,10 +23,13 @@ public abstract class AbstractDualSimHandler implements LinkLeaveEventHandler,
 
 	public abstract boolean isLinkPartOfStudyArea(Id linkId);
 
-	public abstract void processLeaveLink(Id linkId, Id personId, double time);
+	public abstract void processLeaveLink(Id linkId, Id personId, double enterTime, double leaveTime);
 
-	// personId, linkId
-	private HashMap<Id, Id> lastEnteredLink = new HashMap<Id, Id>();
+	// personId
+	private HashSet<Id> agentsTravellingOnLinks = new HashSet<Id>();
+
+	// linkId, personId
+	private TwoKeyHashMapsWithDouble<Id, Id> linkEnterTime = new TwoKeyHashMapsWithDouble<Id, Id>();
 
 	@Override
 	public void reset(int iteration) {
@@ -33,38 +39,44 @@ public abstract class AbstractDualSimHandler implements LinkLeaveEventHandler,
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		if (isLinkPartOfStudyArea(event.getLinkId())) {
-			if (lastEnteredLink.get(event.getPersonId()) != null) {
+			if (agentsTravellingOnLinks.contains(event.getPersonId())) {
 				processLeaveLink(event.getLinkId(), event.getPersonId(),
-						event.getTime());
+						linkEnterTime.get(event.getLinkId(), event.getPersonId()), event.getTime());
 			}
 		}
-		lastEnteredLink.put(event.getPersonId(), null);
+		agentsTravellingOnLinks.remove(event.getPersonId());
+		linkEnterTime.removeValue(event.getLinkId(), event.getPersonId());
 	}
 
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
 		if (isLinkPartOfStudyArea(event.getLinkId())) {
-			if (lastEnteredLink.get(event.getPersonId()) != null) {
+			if (agentsTravellingOnLinks.contains(event.getPersonId())) {
 				if (!isJDEQSim()) {
 					processLeaveLink(event.getLinkId(), event.getPersonId(),
-							event.getTime());
+							linkEnterTime.get(event.getLinkId(), event.getPersonId()), event.getTime());
 				}
 			}
 		}
-		lastEnteredLink.put(event.getPersonId(), null); // reset value
+		agentsTravellingOnLinks.remove(event.getPersonId());
+		linkEnterTime.removeValue(event.getLinkId(), event.getPersonId());
 	}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		lastEnteredLink.put(event.getPersonId(), event.getLinkId());
+		agentsTravellingOnLinks.add(event.getPersonId());
+		linkEnterTime.put(event.getLinkId(), event.getPersonId(),
+				event.getTime());
 	}
 
 	@Override
 	public void handleEvent(AgentWait2LinkEvent event) {
 		if (isJDEQSim()) {
-			lastEnteredLink.put(event.getPersonId(), event.getLinkId());
+			agentsTravellingOnLinks.add(event.getPersonId());
+			linkEnterTime.put(event.getLinkId(), event.getPersonId(),
+					event.getTime());
 		} else {
-			lastEnteredLink.put(event.getPersonId(), null);
+			agentsTravellingOnLinks.remove(event.getPersonId());
 		}
 	}
 }

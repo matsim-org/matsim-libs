@@ -45,7 +45,6 @@ public class DensityInfoCollectorDualSim extends AbstractDualSimHandler {
 	private int binSizeInSeconds; // set the length of interval
 	public HashMap<Id, int[]> density; // define
 	private Map<Id, ? extends Link> filteredEquilNetLinks; // define
-	private TwoKeyHashMapsWithDouble<Id, Id> linkEnterTime = new TwoKeyHashMapsWithDouble<Id, Id>();
 
 	private boolean isJDEQSim;
 
@@ -79,7 +78,7 @@ public class DensityInfoCollectorDualSim extends AbstractDualSimHandler {
 	}
 
 	@Override
-	public void processLeaveLink(Id linkId, Id personId, double time) {
+	public void processLeaveLink(Id linkId, Id personId, double enterTime, double leaveTime) {
 
 		if (!density.containsKey(linkId)) {
 			density.put(linkId, new int[(86400 / binSizeInSeconds) + 1]);
@@ -87,13 +86,12 @@ public class DensityInfoCollectorDualSim extends AbstractDualSimHandler {
 
 		int[] bins = density.get(linkId);
 
-		if (time < 86400) {
+		if (leaveTime < 86400) {
 			int startBinIndex = (int) Math.round(Math.floor(GeneralLib
-					.projectTimeWithin24Hours(linkEnterTime.get(linkId,
-							personId))
+					.projectTimeWithin24Hours(enterTime)
 					/ binSizeInSeconds));
 			int endBinIndex = (int) Math.round(Math.floor(GeneralLib
-					.projectTimeWithin24Hours(time / binSizeInSeconds)));
+					.projectTimeWithin24Hours(leaveTime / binSizeInSeconds)));
 
 			for (int i = startBinIndex; i <= endBinIndex; i++) {
 				bins[i]++;

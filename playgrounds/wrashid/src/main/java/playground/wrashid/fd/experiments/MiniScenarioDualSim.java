@@ -65,7 +65,8 @@ public class MiniScenarioDualSim {
 
 	private static final Logger log = Logger.getLogger(MiniScenarioDualSim.class);
 	
-	private int agentsPerHour = 100;
+	private int initialAgents = 100;
+	private int agentIncrementPerHour = 0;
 	
 	public static void main(String[] args) {
 		new MiniScenarioDualSim();
@@ -140,7 +141,7 @@ public class MiniScenarioDualSim {
 		Random random = MatsimRandom.getLocalInstance();
 		int p = 0;
 		for (int hour = 0; hour < 24; hour++) {
-			for (int pNum = 0; pNum < agentsPerHour; pNum++) {
+			for (int pNum = 0; pNum < initialAgents+agentIncrementPerHour*hour; pNum++) {
 				Person person = factory.createPerson(scenario.createId(String.valueOf(p++)));
 				Plan plan = factory.createPlan();
 				Activity from = factory.createActivityFromLinkId("home", scenario.createId("l3"));
@@ -177,7 +178,7 @@ public class MiniScenarioDualSim {
 		
 
 		boolean isJDEQSim=true;
-		int binSizeInSeconds = 30;	
+		int binSizeInSeconds = 300;	
 		DensityInfoCollectorDualSim densityHandler = new DensityInfoCollectorDualSim(
 				links, binSizeInSeconds,isJDEQSim);
 		OutFlowInfoCollectorDualSim outflowHandler = new OutFlowInfoCollectorDualSim(

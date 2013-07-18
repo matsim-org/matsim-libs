@@ -73,16 +73,16 @@ public class OutFlowInfoCollectorDualSim extends AbstractDualSimHandler {
 	}
 
 	@Override
-	public void processLeaveLink(Id linkId, Id personId, double time) {
+	public void processLeaveLink(Id linkId, Id personId, double enterTime, double leaveTime) {
 		if (!linkOutFlow.containsKey(linkId)) {
 			linkOutFlow.put(linkId, new int[(86400 / binSizeInSeconds) + 1]);
 		}
 
 		int[] bins = linkOutFlow.get(linkId);
 
-		int binIndex = (int) Math.round(Math.floor(time / binSizeInSeconds));
+		int binIndex = (int) Math.round(Math.floor(leaveTime / binSizeInSeconds));
 
-		if (time < 86400) {
+		if (leaveTime < 86400) {
 			bins[binIndex] = bins[binIndex] + 1;
 		}
 
