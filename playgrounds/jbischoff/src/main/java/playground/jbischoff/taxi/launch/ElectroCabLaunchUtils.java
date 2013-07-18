@@ -203,9 +203,8 @@ public class ElectroCabLaunchUtils
      */
     public  QSim initQSim(MatsimVrpData data, NOSRankTaxiOptimizer optimizer)
     {
-    	optimizer.setRankMode(false);
-        optimizer.setIdleRankMode(true); 
-
+    	optimizer.setRankMode(true);
+        optimizer.setIdleRankMode(false); 
     	boolean ALLCARSELECTRIC = true;
     	
     	Scenario scenario = data.getScenario();
@@ -244,7 +243,9 @@ public class ElectroCabLaunchUtils
 		events.addHandler(handlerGroup);
 		
 		
+		
         QSim qSim = new QSim(scenario, events);
+
         ActivityEngine activityEngine = new ActivityEngine();
         qSim.addMobsimEngine(activityEngine);
         qSim.addActivityHandler(activityEngine);

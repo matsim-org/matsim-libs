@@ -48,6 +48,7 @@ public class ElectricTaxiSimEngine extends TaxiSimEngine {
 		
 		this.optimizer.doSimStep(time);
 		this.dac.doSimStep(time);
+		notifyAgentLogics();
 	
 
 

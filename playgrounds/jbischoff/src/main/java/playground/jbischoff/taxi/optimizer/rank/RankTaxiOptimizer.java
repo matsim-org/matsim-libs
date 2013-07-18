@@ -36,6 +36,7 @@ import pl.poznan.put.vrp.dynamic.optimizer.taxi.schedule.TaxiDriveTask;
 import playground.jbischoff.taxi.rank.BackToRankTask;
 
 
+
 /**
  * The main assumption: Requests are scheduled at the last request in the schedule (of a given
  * vehicle)
@@ -90,7 +91,7 @@ public abstract class RankTaxiOptimizer
     private TaxiDelaySpeedupStats delaySpeedupStats;
     private final boolean destinationKnown;
     private List<Integer> shortTimeIdlers;
-    private boolean IDLEDRIVESTORANK;
+	private boolean idleRankMode;
 
 
     public RankTaxiOptimizer(VrpData data, boolean destinationKnown)
@@ -98,8 +99,12 @@ public abstract class RankTaxiOptimizer
         super(data);
         this.destinationKnown = destinationKnown;
         this.shortTimeIdlers = new ArrayList<Integer>();
-        this.IDLEDRIVESTORANK = true;
     }
+    
+	public void setIdleRankMode(boolean b) {
+		this.idleRankMode = b;
+	}
+
 
 
     public void setDelaySpeedupStats(TaxiDelaySpeedupStats delaySpeedupStats)
@@ -186,7 +191,7 @@ public abstract class RankTaxiOptimizer
     }
 
     public void doSimStep(double time){
-    	if (IDLEDRIVESTORANK){
+    	if (this.idleRankMode){
     	if (time % 60. == 0.){
     		updateIdlers();
     	}
@@ -308,7 +313,7 @@ public abstract class RankTaxiOptimizer
 			   scheduleRankReturn(veh);
 		   }
 	   	}	   
-   } 	
+   	} 	
     	   	
     }
     

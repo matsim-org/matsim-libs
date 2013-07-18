@@ -82,10 +82,11 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
     /*package*/JbSingleIterOnlineDvrpLauncher()
     {
 //    	dirName = "Z:\\WinHome\\Docs\\maciejewski\\jbtest\\";
-    	dirName = "Z:\\WinHome\\Docs\\svn-checkouts\\jbischoff\\jbmielec\\";
+//    	dirName = "Z:\\WinHome\\Docs\\svn-checkouts\\jbischoff\\jbmielec\\";
+    	dirName = "C:\\local_jb\\Dropbox\\MasterOfDesaster\\jbischoff\\jbmielec\\";
         netFileName = dirName + "network.xml";
         electricStatsFilename = dirName + "elstats.txt";
-        electricStatsDir = dirName +"electric_idledepots\\";
+        electricStatsDir = dirName +"electric_depots\\";
         plansFileName = dirName + "20.plans.xml.gz";
 
         taxiCustomersFileName = dirName + "taxiCustomers_05_pc.txt";

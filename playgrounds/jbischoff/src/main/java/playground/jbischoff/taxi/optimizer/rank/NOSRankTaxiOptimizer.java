@@ -49,7 +49,7 @@ public class NOSRankTaxiOptimizer
     private IdleRankVehicleFinder idleVehicleFinder;
     private DepotArrivalDepartureCharger depotArrivalDepartureCharger;
 	private boolean rankmode;
-	private boolean idleRankMode;
+
 
     public NOSRankTaxiOptimizer(VrpData data, boolean destinationKnown, boolean straightLineDistance)
     {
@@ -63,9 +63,6 @@ public class NOSRankTaxiOptimizer
     	this.rankmode = rankMode;
     }
     
-	public void setIdleRankMode(boolean b) {
-		this.idleRankMode = b;
-	}
 
     public void addDepotArrivalCharger(DepotArrivalDepartureCharger depotArrivalDepartureCharger){
     	this.depotArrivalDepartureCharger = depotArrivalDepartureCharger;
