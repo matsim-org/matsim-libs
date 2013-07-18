@@ -31,6 +31,7 @@ public class MainFundamentalDiagram {
 
 		Coord center = null; // center=null means use all links
 		int binSizeInSeconds = 20; // 5 minute bins
+		boolean isJDEQSim=true;
 
 		double radiusInMeters = 100000;
 		double length = 50.0;
@@ -44,10 +45,10 @@ public class MainFundamentalDiagram {
 		Map<Id, Link> links = LinkSelector.selectLinks(scenario.getNetwork(),
 				center, radiusInMeters, length);
 
-		DensityInfoCollectorWithPt densityHandler = new DensityInfoCollectorWithPt(
-				links, binSizeInSeconds);
-		OutFlowInfoCollectorWithPt outflowHandler = new OutFlowInfoCollectorWithPt(
-				links, binSizeInSeconds);
+		DensityInfoCollectorDualSim densityHandler = new DensityInfoCollectorDualSim(
+				links, binSizeInSeconds,isJDEQSim);
+		OutFlowInfoCollectorDualSim outflowHandler = new OutFlowInfoCollectorDualSim(
+				links, binSizeInSeconds,isJDEQSim);
 
 		densityHandler.reset(0);
 		outflowHandler.reset(0);
@@ -67,7 +68,7 @@ public class MainFundamentalDiagram {
 	}
 
 	private static HashMap<Id, double[]> calculateDensities(
-			Map<Id, Link> links, DensityInfoCollectorWithPt densityHandler,
+			Map<Id, Link> links, DensityInfoCollectorDualSim densityHandler,
 			int binSizeInSeconds) {
 
 		HashMap<Id, double[]> density = new HashMap<Id, double[]>();
@@ -94,7 +95,7 @@ public class MainFundamentalDiagram {
 
 	public static void printDensityAndOutFlow(HashMap<Id, double[]> density,
 			Map<Id, ? extends Link> links,
-			OutFlowInfoCollectorWithPt outflowHandler) { // print
+			OutFlowInfoCollectorDualSim outflowHandler) { // print
 
 		for (Id linkId : density.keySet()) {
 			int[] tempBin = outflowHandler.linkOutFlow.get(linkId);

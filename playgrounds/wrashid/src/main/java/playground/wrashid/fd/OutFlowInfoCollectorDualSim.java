@@ -27,50 +27,53 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 
-public class OutFlowInfoCollectorWithPt implements LinkLeaveEventHandler,
-		LinkEnterEventHandler, AgentArrivalEventHandler, AgentDepartureEventHandler {
+public class OutFlowInfoCollectorDualSim extends AbstractDualSimHandler {
 
 	private int binSizeInSeconds; // set the length of interval
 	public HashMap<Id, int[]> linkOutFlow; // define
 	private Map<Id, ? extends Link> filteredEquilNetLinks; // define
 
-	// personId, linkId
-	private HashMap<Id, Id> lastEnteredLink = new HashMap<Id, Id>(); // define
+	private boolean isJDEQSim;
 
-	public OutFlowInfoCollectorWithPt(
+	public OutFlowInfoCollectorDualSim(
 			Map<Id, ? extends Link> filteredEquilNetLinks,
-			int binSizeInSeconds) { // to create the
-															// class
-															// FlowInfoCollector
-		// and give the link set
+			int binSizeInSeconds, boolean isJDEQSim) { 
+
 		this.filteredEquilNetLinks = filteredEquilNetLinks;
 		this.binSizeInSeconds = binSizeInSeconds;
+		this.isJDEQSim = isJDEQSim;
 	}
 
 	@Override
 	public void reset(int iteration) {
-		linkOutFlow = new HashMap<Id, int[]>(); // reset the variables (private
-												// ones)
+		linkOutFlow = new HashMap<Id, int[]>(); 
+	}
+
+	public HashMap<Id, int[]> getLinkOutFlow() {
+		return linkOutFlow;
 	}
 
 	@Override
-	public void handleEvent(LinkLeaveEvent event) { // call from
-													// NetworkReadExample
-		linkLeave(event.getLinkId(), event.getTime());
+	public boolean isJDEQSim() {
+		return isJDEQSim;
 	}
 
-	private void linkLeave(Id linkId, double time) {
-		if (!filteredEquilNetLinks.containsKey(linkId)) {
-			return; // if the link is not in the link set, then exit the method
-		}
+	@Override
+	public boolean isLinkPartOfStudyArea(Id linkId) {
+		return filteredEquilNetLinks.containsKey(linkId);
+	}
 
+	@Override
+	public void processLeaveLink(Id linkId, Id personId, double time) {
 		if (!linkOutFlow.containsKey(linkId)) {
 			linkOutFlow.put(linkId, new int[(86400 / binSizeInSeconds) + 1]);
 		}
@@ -80,62 +83,9 @@ public class OutFlowInfoCollectorWithPt implements LinkLeaveEventHandler,
 		int binIndex = (int) Math.round(Math.floor(time / binSizeInSeconds));
 
 		if (time < 86400) {
-			bins[binIndex] = bins[binIndex] + 1; 
+			bins[binIndex] = bins[binIndex] + 1;
 		}
+
 	}
-
-	public void printLinkFlows() { // print
-		for (Id linkId : linkOutFlow.keySet()) {
-			int[] bins = linkOutFlow.get(linkId);
-
-			Link link = filteredEquilNetLinks.get(linkId);
-
-			boolean hasTraffic = false;
-			for (int i = 0; i < bins.length; i++) {
-				if (bins[i] != 0.0) {
-					hasTraffic = true;
-					break;
-				}
-			}
-
-			if (hasTraffic) {
-				System.out.print(linkId + " - " + link.getCoord() + ": \t");
-
-				for (int i = 0; i < bins.length; i++) {
-					System.out.print(bins[i] * 3600 / binSizeInSeconds + "\t");
-				}
-
-				System.out.println();
-			}
-		}
-	}
-
-	public HashMap<Id, int[]> getLinkOutFlow() {
-		return linkOutFlow;
-	}
-
-	@Override
-	public void handleEvent(AgentArrivalEvent event) {
-		if (lastEnteredLink.containsKey(event.getPersonId())
-				&& lastEnteredLink.get(event.getPersonId()) != null) {
-			if (lastEnteredLink.get(event.getPersonId()).equals(
-					event.getLinkId())) {
-				linkLeave(event.getLinkId(), event.getTime());
-				lastEnteredLink.put(event.getPersonId(), null); // reset value
-			}
-
-		}
-	}
-
-	@Override
-	public void handleEvent(LinkEnterEvent event) {
-		lastEnteredLink.put(event.getPersonId(), event.getLinkId());
-	}
-
-	@Override
-	public void handleEvent(AgentDepartureEvent event) {
-		lastEnteredLink.put(event.getPersonId(), event.getLinkId());
-	}
-	
 
 }

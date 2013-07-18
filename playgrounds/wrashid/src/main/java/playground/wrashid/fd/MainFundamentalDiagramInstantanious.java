@@ -31,6 +31,7 @@ public class MainFundamentalDiagramInstantanious {
 
 		Coord center = null; // center=null means use all links
 		int binSizeInSeconds = 20; // 5 minute bins
+		boolean isJDEQSim=true;
 
 		double radiusInMeters = 100000;
 		double length = 50.0;
@@ -44,8 +45,8 @@ public class MainFundamentalDiagramInstantanious {
 		Map<Id, Link> links = LinkSelector.selectLinks(scenario.getNetwork(),
 				center, radiusInMeters, length);
 
-		DensityInfoCollectorWithPt densityHandler = new DensityInfoCollectorWithPt(
-				links, binSizeInSeconds);
+		DensityInfoCollectorDualSim densityHandler = new DensityInfoCollectorDualSim(
+				links, binSizeInSeconds,isJDEQSim);
 		InstantaniousOutflowCollector outflowHandler = new InstantaniousOutflowCollector(
 				links, binSizeInSeconds);
 
@@ -67,7 +68,7 @@ public class MainFundamentalDiagramInstantanious {
 	}
 
 	private static HashMap<Id, double[]> calculateDensities(
-			Map<Id, Link> links, DensityInfoCollectorWithPt densityHandler,
+			Map<Id, Link> links, DensityInfoCollectorDualSim densityHandler,
 			int binSizeInSeconds) {
 
 		HashMap<Id, double[]> density = new HashMap<Id, double[]>();
