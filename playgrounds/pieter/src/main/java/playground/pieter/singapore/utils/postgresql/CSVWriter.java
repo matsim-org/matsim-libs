@@ -61,7 +61,6 @@ import others.sergioo.util.dataBase.NoConnectionException;
 			createString.deleteCharAt(createString.length() - 1);
 			createString.append("\n");
 			writer.write(createString.toString());
-			reader = new PushbackReader(new StringReader(""), pushBackSize);
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -91,6 +90,7 @@ import others.sergioo.util.dataBase.NoConnectionException;
 			sb.append("\n");
 			if (lineCounter % batchSize == 0) {
 				writer.write(sb.toString());
+				sb.delete(0, sb.length());
 			}
 			if (lineCounter >= modfactor && lineCounter % modfactor == 0) {
 				System.out.println(writerName + ": Processed line no "
