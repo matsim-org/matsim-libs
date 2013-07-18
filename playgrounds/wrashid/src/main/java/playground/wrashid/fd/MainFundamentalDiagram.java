@@ -22,8 +22,15 @@ public class MainFundamentalDiagram {
 	static boolean doConsoleOutput = true;
 
 	public static void main(String[] args) {
-		String networkFile = "C:/data/workspace3/matsim/output/equil_jdeq/output_network.xml.gz";
-		String eventsFile = "C:/data/workspace3/matsim/output/equil_jdeq/ITERS/it.0/0.events.xml.gz";
+		//String networkFile = "C:/data/workspace3/matsim/output/equil_jdeq/output_network.xml.gz";
+		//String eventsFile = "C:/data/workspace3/matsim/output/equil_jdeq/ITERS/it.0/0.events.xml.gz";
+		
+		String networkFile = "C:/data/Dropbox/eigene/ETHZ/matsim/output/equil_jdeq/output_network.xml.gz";
+		String eventsFile = "C:/data/Dropbox/eigene/ETHZ/matsim/output/equil_jdeq/ITERS/it.10/10.events.xml.gz";
+		
+		
+		
+		
 		// String networkFile =
 		// "H:/data/experiments/TRBAug2011/runs/ktiRun24/output/output_network.xml.gz";
 		// String eventsFile =
@@ -67,7 +74,7 @@ public class MainFundamentalDiagram {
 		printDensityAndOutFlow(densities, links, outflowHandler);
 	}
 
-	private static HashMap<Id, double[]> calculateDensities(
+	public static HashMap<Id, double[]> calculateDensities(
 			Map<Id, Link> links, DensityInfoCollectorDualSim densityHandler,
 			int binSizeInSeconds) {
 

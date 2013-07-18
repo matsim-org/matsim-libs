@@ -38,6 +38,7 @@ public abstract class AbstractDualSimHandler implements LinkLeaveEventHandler,
 						event.getTime());
 			}
 		}
+		lastEnteredLink.put(event.getPersonId(), null);
 	}
 
 	@Override
@@ -48,9 +49,9 @@ public abstract class AbstractDualSimHandler implements LinkLeaveEventHandler,
 					processLeaveLink(event.getLinkId(), event.getPersonId(),
 							event.getTime());
 				}
-				lastEnteredLink.put(event.getPersonId(), null); // reset value
 			}
 		}
+		lastEnteredLink.put(event.getPersonId(), null); // reset value
 	}
 
 	@Override
