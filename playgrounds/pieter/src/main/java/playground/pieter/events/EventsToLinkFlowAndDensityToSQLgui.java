@@ -575,7 +575,7 @@ public class EventsToLinkFlowAndDensityToSQLgui extends JFrame {
 			DataBaseAdmin dba = new DataBaseAdmin(file);
 			densityWriter = new PostgresqlCSVWriter("DENSITYWRITER", tabname, dba, 100, columns);
 		} else {
-			densityWriter = new CSVWriter("DENSITYWRITER", densityTableName, schemaNameComponent.getText(), 100000,
+			densityWriter = new CSVWriter("DENSITYWRITER", densityTableName, schemaNameComponent.getText(), 1000,
 					columns);
 		}
 		if (!commentComponent.getText().equals("")) {

@@ -693,7 +693,7 @@ public class EventsToPlanElementsSingapore implements TransitDriverStartsEventHa
 				PostgresType.FLOAT8));
 		DataBaseAdmin actDBA = new DataBaseAdmin(connectionProperties);
 		PostgresqlCSVWriter activityWriter = new PostgresqlCSVWriter("ACTS",
-				actTableName, actDBA, 100000, columns);
+				actTableName, actDBA, 1000, columns);
 		activityWriter.addComment(String.format(
 				"MATSim activities from events file %s, created on %s.",
 				eventsFileName, formattedDate));
@@ -741,7 +741,7 @@ public class EventsToPlanElementsSingapore implements TransitDriverStartsEventHa
 				PostgresType.FLOAT8));
 		DataBaseAdmin journeyDBA = new DataBaseAdmin(connectionProperties);
 		PostgresqlCSVWriter journeyWriter = new PostgresqlCSVWriter("JOURNEYS",
-				journeyTableName, journeyDBA, 50000, columns);
+				journeyTableName, journeyDBA, 1000, columns);
 		journeyWriter.addComment(String.format(
 				"MATSim journeys from events file %s, created on %s.",
 				eventsFileName, formattedDate));
@@ -767,7 +767,7 @@ public class EventsToPlanElementsSingapore implements TransitDriverStartsEventHa
 				PostgresType.FLOAT8));
 		DataBaseAdmin tripDBA = new DataBaseAdmin(connectionProperties);
 		PostgresqlCSVWriter tripWriter = new PostgresqlCSVWriter("TRIPS",
-				tripTableName, tripDBA, 100000, columns);
+				tripTableName, tripDBA, 1000, columns);
 		tripWriter.addComment(String.format(
 				"MATSim trips (stages) from events file %s, created on %s.",
 				eventsFileName, formattedDate));
@@ -794,7 +794,7 @@ public class EventsToPlanElementsSingapore implements TransitDriverStartsEventHa
 				PostgresType.FLOAT8));
 		DataBaseAdmin transferDBA = new DataBaseAdmin(connectionProperties);
 		PostgresqlCSVWriter transferWriter = new PostgresqlCSVWriter(
-				"TRANSFERS", transferTableName, transferDBA, 100000, columns);
+				"TRANSFERS", transferTableName, transferDBA, 1000, columns);
 		transferWriter.addComment(String.format(
 				"MATSim transfers from events file %s, created on %s.",
 				eventsFileName, formattedDate));
