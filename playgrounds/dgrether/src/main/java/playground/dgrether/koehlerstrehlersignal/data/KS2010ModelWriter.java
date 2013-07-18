@@ -195,7 +195,7 @@ public class KS2010ModelWriter {
 			hd.startElement("", "", SOURCES, atts);
 
 			atts.clear();
-			atts.addAttribute("", "", ID, CDATA, co.getSourceNode().toString());
+			atts.addAttribute("", "", ID, CDATA, co.getSourceNodeId().toString());
 			atts.addAttribute("", "", FLOW, CDATA, Double.toString(co.getFlow()));
 			hd.startElement("", "", NODE, atts);
 			hd.endElement("", "", NODE);

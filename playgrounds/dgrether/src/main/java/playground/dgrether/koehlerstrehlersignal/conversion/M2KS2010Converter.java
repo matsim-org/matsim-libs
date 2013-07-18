@@ -31,9 +31,11 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.signalsystems.data.SignalsData;
+import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodities;
 import playground.dgrether.koehlerstrehlersignal.data.DgCommodity;
+import playground.dgrether.koehlerstrehlersignal.data.DgCommodityUtils;
 import playground.dgrether.koehlerstrehlersignal.data.DgCrossing;
 import playground.dgrether.koehlerstrehlersignal.data.DgKSNetwork;
 import playground.dgrether.koehlerstrehlersignal.data.KS2010ModelWriter;
@@ -62,8 +64,6 @@ public class M2KS2010Converter {
 	
 	public static final Logger log = Logger.getLogger(M2KS2010Converter.class);
 	
-	private static final String modelOutfile = "koehler_strehler_model.xml";
-	
 	private double ksModelCommoditySampleSize = 1.0;
 
 	private Network network;
@@ -74,16 +74,29 @@ public class M2KS2010Converter {
 
 	private double minCommodityFlow;
 
+	private CoordinateReferenceSystem crs;
+
 	
 	public M2KS2010Converter(Network network, LaneDefinitions20 lanes,
-			SignalsData signals) {
+			SignalsData signals, CoordinateReferenceSystem crs) {
 		this.network = network;
 		this.lanes = lanes;
 		this.signals = signals;
+		this.crs = crs;
+	}
+	
+	private void scaleCommodities(DgCommodities commodities){
+		if (ksModelCommoditySampleSize != 1.0){
+			for (DgCommodity com : commodities.getCommodities().values()) {
+				double flow = com.getFlow() * ksModelCommoditySampleSize;
+				com.setSourceNode(com.getSourceNodeId(), flow);
+			}
+		}
 	}
 
 
-	public void convert(String outputDirectory, String shapeFileDirectory, String name, String description, Map<DgZone, Link> zones2LinkMap, double startTimeSec, double endTimeSec) throws IOException{
+	public void convertAndWrite(String outputDirectory, String shapeFileDirectory, String filename, 
+			String name, String description, Map<DgZone, Link> zones2LinkMap, double startTimeSec, double endTimeSec) throws IOException{
 		//create koehler strehler network
 		DgIdPool idPool = new DgIdPool();
 		DgIdConverter idConverter = new DgIdConverter(idPool);
@@ -97,13 +110,8 @@ public class M2KS2010Converter {
 		
 		M2KS2010Zones2Commodities demandConverter = new M2KS2010Zones2Commodities(zones2LinkMap, idConverter);
 		DgCommodities commodities = demandConverter.convert(ksNet);
-		
-		if (ksModelCommoditySampleSize != 1.0){
-			for (DgCommodity com : commodities.getCommodities().values()) {
-				double flow = com.getFlow() * ksModelCommoditySampleSize;
-				com.setSourceNode(com.getSourceNode(), flow);
-			}
-		}
+
+		this.scaleCommodities(commodities);
 		
 		Set<Id> commoditiesToRemove = new HashSet<Id>();
 		for (DgCommodity com : commodities.getCommodities().values()){
@@ -130,10 +138,13 @@ public class M2KS2010Converter {
 			throw new IllegalStateException("Commodities that can not be routed still exist");
 		}
 		
-		DgNetworkUtils.writeNetwork(newMatsimNetwork, outputDirectory + "matsim_network_ks_model.xml.gz");
-		DgNetworkUtils.writeNetwork2Shape(newMatsimNetwork, shapeFileDirectory + "matsim_network_ks_model.shp");
 		
-		new KS2010ModelWriter().write(ksNet, commodities, name, description, outputDirectory + modelOutfile);
+		DgNetworkUtils.writeNetwork(newMatsimNetwork, outputDirectory + "matsim_network_ks_model.xml.gz");
+		DgNetworkUtils.writeNetwork2Shape(newMatsimNetwork, crs,  shapeFileDirectory + "matsim_network_ks_model.shp");
+		
+		DgCommodityUtils.write2Shapefile(commodities, newMatsimNetwork, crs,  shapeFileDirectory + "commodities.shp");
+
+		new KS2010ModelWriter().write(ksNet, commodities, name, description, outputDirectory + filename);
 		writeStats(ksNet, commodities);
 		
 		idPool.writeToFile(outputDirectory + "id_conversions.txt");

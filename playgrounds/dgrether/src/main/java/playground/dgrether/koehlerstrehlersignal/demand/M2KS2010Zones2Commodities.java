@@ -107,7 +107,7 @@ public class M2KS2010Zones2Commodities  {
 				//link 2 link
 				for (Entry<Link, Double> entry : fromLink.getDestinationLinkTrips().entrySet()){
 					Id id = this.idConverter.createFromLink2ToLinkId(fromLink.getLink().getId(), entry.getKey().getId());
-					Id toNodeId = this.idConverter.convertLinkId2FromCrossingNodeId(entry.getKey().getId());
+					Id toNodeId = this.idConverter.convertLinkId2ToCrossingNodeId(entry.getKey().getId());
 					this.addCommodity(coms, id, fromNodeId2, toNodeId, entry.getValue(), network);
 				}
 			}			

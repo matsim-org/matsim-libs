@@ -56,7 +56,7 @@ public class DgCommodity {
 		return this.drainNodes;
 	}
 	
-	public Id getSourceNode(){
+	public Id getSourceNodeId(){
 		return this.sourceNode;
 	}
 	

@@ -77,7 +77,7 @@ public class NetLanesSignalsShrinker {
 	public void shrinkScenario(String outputDirectory, String shapeFileDirectory, double boundingBoxOffset) throws IOException{
 		//Some initialization
 		Set<Id> signalizedNodes = this.getSignalizedNodeIds(this.fullScenario.getScenarioElement(SignalsData.class).getSignalSystemsData(), this.fullScenario.getNetwork());
-		DgNetworkUtils.writeNetwork2Shape(fullScenario.getNetwork(), shapeFileDirectory + "network_full");
+		DgNetworkUtils.writeNetwork2Shape(fullScenario.getNetwork(), crs, shapeFileDirectory + "network_full");
 		
 		//create the bounding box
 		this.signalsBoundingBox = new DgSignalsBoundingBox(crs);
@@ -91,14 +91,14 @@ public class NetLanesSignalsShrinker {
 		Network smallNetwork = netShrinker.createSmallNetwork(fullScenario.getNetwork(), boundingBox, crs);
 		
 		DgNetworkUtils.writeNetwork(smallNetwork, outputDirectory +  smallNetworkFilename);
-		DgNetworkUtils.writeNetwork2Shape(smallNetwork, shapeFileDirectory + "network_small");
+		DgNetworkUtils.writeNetwork2Shape(smallNetwork, crs, shapeFileDirectory + "network_small");
 		
 		//"clean" the small network
 		DgNetworkCleaner cleaner = new DgNetworkCleaner();
 		cleaner.cleanNetwork(smallNetwork);
 		String smallNetworkClean = outputDirectory + "network_small_clean.xml.gz";
 		DgNetworkUtils.writeNetwork(smallNetwork, smallNetworkClean);
-		DgNetworkUtils.writeNetwork2Shape(smallNetwork, shapeFileDirectory + "network_small_clean");
+		DgNetworkUtils.writeNetwork2Shape(smallNetwork, crs, shapeFileDirectory + "network_small_clean");
 
 		
 		//run a network simplifier to merge links with same attributes
@@ -124,7 +124,7 @@ public class NetLanesSignalsShrinker {
 		//write shrunk data to disk
 		String simplifiedNetworkFile = outputDirectory + simplifiedNetworkFilename;
 		DgNetworkUtils.writeNetwork(smallNetwork, simplifiedNetworkFile);
-		DgNetworkUtils.writeNetwork2Shape(smallNetwork, shapeFileDirectory + "network_small_simplified");
+		DgNetworkUtils.writeNetwork2Shape(smallNetwork, crs, shapeFileDirectory + "network_small_simplified");
 
 		LaneDefinitionsWriter20 lanesWriter = new LaneDefinitionsWriter20(this.fullScenario.getScenarioElement(LaneDefinitions20.class));
 		lanesWriter.write(outputDirectory + simplifiedLanesFilename);

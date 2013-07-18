@@ -21,8 +21,6 @@ package playground.dgrether.koehlerstrehlersignal.network;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.network.NetworkWriter;
-import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.gis.matsim2esri.network.Nodes2ESRIShape;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
@@ -40,9 +38,8 @@ public class DgNetworkUtils {
 		netWriter.write(outputFile);
 	}
 	
-	public static void writeNetwork2Shape(Network net, String outputFilename){
-		CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84_UTM33N);
-		new DgNet2Shape().write(net, outputFilename + "_links.shp", crs);
-		new Nodes2ESRIShape(net, outputFilename + "_nodes.shp", crs).write();
+	public static void writeNetwork2Shape(Network net, CoordinateReferenceSystem crs, String outputFilenamePrefix){
+		new DgNet2Shape().write(net, outputFilenamePrefix + "_links.shp", crs);
+		new Nodes2ESRIShape(net, outputFilenamePrefix + "_nodes.shp", crs).write();
 	}
 }

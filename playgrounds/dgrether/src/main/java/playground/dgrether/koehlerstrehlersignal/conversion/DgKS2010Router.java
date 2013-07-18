@@ -121,7 +121,7 @@ public class DgKS2010Router {
 		Dijkstra dijkstra = new Dijkstra(network, travelTime, travelTime);
 		List<Id> invalidCommodities = new ArrayList<Id>();
 		for (DgCommodity commodity : commodities.getCommodities().values()){
-			Node fromNode = network.getNodes().get(commodity.getSourceNode());
+			Node fromNode = network.getNodes().get(commodity.getSourceNodeId());
 			Node toNode = network.getNodes().get(commodity.getDrainNodeId());
 			log.info("Searching path from,to node " + fromNode.getId() + "," + toNode.getId());
 			Path path = dijkstra.calcLeastCostPath(fromNode, toNode, 1.0, fakePerson, fakeVehicle); //call for dijkstra
