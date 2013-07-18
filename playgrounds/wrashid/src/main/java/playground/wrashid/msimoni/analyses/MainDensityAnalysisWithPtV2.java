@@ -190,7 +190,7 @@ public class MainDensityAnalysisWithPtV2 {
 
 			double[] linkDensity = density.get(linkId);
 			
-			double[] avgLinkDensity = new double[(int) Math.ceil(linkDensity.length / valuesPerBin)];
+			double[] avgLinkDensity = new double[(int) Math.ceil(linkDensity.length / valuesPerBin) + 1];
 			avgDensity.put(linkId, avgLinkDensity);
 			
 			int index = 0;
