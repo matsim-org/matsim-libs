@@ -28,23 +28,25 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsReaderTXTv1;
+import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 public class MainDensityAnalysisWithPt {
 
 	public static void main(String[] args) {
-		String networkFile="H:/data/experiments/Mohit/10pct ZH/output_network.xml.gz";
-		String eventsFile="H:/data/experiments/Mohit/10pct ZH/ITERS/it.50/50.events.txt.gz";
-		Coord center=null; // center=null means use all links
+		String networkFile="C:/experiments/berlin/output_network.xml.gz";
+		String eventsFile="C:/experiments/berlin/ITERS/it.50/50.events.xml.gz";
+		Coord center=new CoordImpl(4594503,5820304); // center=null means use all links
 		boolean isOldEventFile=false;
-		int binSizeInSeconds=3600;
+		int binSizeInSeconds=300;
 		
 //		String networkFile="C:/Users/Nan/Desktop/For matsim/matsim-0.1.1/examples/equil/network.xml";
 //		String eventsFile="C:/Users/Nan/Desktop/For matsim/matsim-0.1.1/output/equil/ITERS/it.5/5.events.txt.gz";
 //		Coord center=new CoordImpl(0,0);
 		//boolean isOldEventFile=false;
 		
-		double radiusInMeters=50000;
+		double radiusInMeters=1000;
 		
 		
 		
@@ -61,9 +63,12 @@ public class MainDensityAnalysisWithPt {
 		events.addHandler(inflowHandler); // add handler
 		events.addHandler(outflowHandler);
 		
-		EventsReaderTXTv1 reader = new EventsReaderTXTv1(events);
-	
-		reader.readFile(eventsFile); //where we find events data
+		//EventsReaderTXTv1 reader = new EventsReaderTXTv1(events);
+		//reader.readFile(eventsFile); //where we find events data
+		
+		
+		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
+		reader.parse(eventsFile);
 		
 		HashMap<Id, int[]> linkInFlow = inflowHandler.getLinkInFlow();	//get the matrix
 		HashMap<Id, int[]> linkOutFlow = outflowHandler.getLinkOutFlow();	
