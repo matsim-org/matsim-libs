@@ -77,6 +77,20 @@ class VehicularDepartureHandler implements DepartureHandler {
 					// consistently implemented.  One could also decide to not have these departure/arrival events here
 					// (we would still have actEnd/actStart events).  kai, nov'11
 
+				    // we need the following 4 lines, for example, in taxicabs:
+				    // when the first request is located at the same link as the taxi then for
+				    // the pickup trip we have: fromLink==toLink. Without these 4 lines,
+				    // that would lead to not setting the bi-directional vehicle-driver assignment.
+				    // However, this assignment must exist before taxi departs with the customer --
+				    // i.e. the customer must know which vehicle to enter.
+				    // (previously, the assignment used to be set during the departure
+				    // ("delivery trip"), which was too late. 
+				    // michalm, kai, jul'13
+                    Id vehicleId = agent.getPlannedVehicleId();
+                    QVehicle vehicle = qNetsimEngine.getVehicles().get(vehicleId);
+                    vehicle.setDriver(agent);
+                    agent.setVehicle(vehicle);
+
 					agent.endLegAndComputeNextState(now) ;
 					this.qNetsimEngine.internalInterface.arrangeNextAgentState(agent) ;
 					return;
