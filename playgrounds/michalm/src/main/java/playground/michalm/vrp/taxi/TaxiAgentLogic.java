@@ -23,6 +23,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.*;
 import org.matsim.core.mobsim.framework.*;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 
 import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
@@ -188,12 +189,14 @@ public class TaxiAgentLogic
         // event handling
         EventsManager events = taxiSimEngine.getInternalInterface().getMobsim().getEventsManager();
         EventsFactory evFac = events.getFactory();
-        events.processEvent(evFac.createPersonEntersVehicleEvent(now, passenger.getId(),
-                agent.getId()));
-        //      				  agent.getVehicle().getId() )); // does not work.  why??
+        events.processEvent(evFac.createPersonEntersVehicleEvent(now, passenger.getId(), agent
+                .getVehicle().getId()));
 
         if (passenger instanceof PassengerAgent) {
-            agent.getVehicle().addPassenger((PassengerAgent)passenger);
+            PassengerAgent passengerAgent = (PassengerAgent)passenger;
+            MobsimVehicle mobVehicle = agent.getVehicle();
+            mobVehicle.addPassenger(passengerAgent);
+            passengerAgent.setVehicle(mobVehicle);
         }
         else {
             Logger.getLogger(this.getClass()).warn(
@@ -221,15 +224,17 @@ public class TaxiAgentLogic
 
                 // deliver the passenger
                 if (passenger instanceof PassengerAgent) {
-                    agent.getVehicle().removePassenger((PassengerAgent)passenger);
+                    PassengerAgent passengerAgent = (PassengerAgent)passenger;
+                    MobsimVehicle mobVehicle = agent.getVehicle();
+                    mobVehicle.removePassenger(passengerAgent);
+                    passengerAgent.setVehicle(null);
                 }
 
                 EventsManager events = taxiSimEngine.getInternalInterface().getMobsim()
                         .getEventsManager();
                 EventsFactory evFac = events.getFactory();
                 events.processEvent(evFac.createPersonLeavesVehicleEvent(now, passenger.getId(),
-                        agent.getId()));
-                //            				    agent.getVehicle().getId() )); // will probably not work (see above).  why?
+                        agent.getVehicle().getId()));
 
                 passenger.notifyArrivalOnLinkByNonNetworkMode(passenger.getDestinationLinkId());
                 passenger.endLegAndComputeNextState(now);
