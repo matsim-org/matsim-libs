@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PaperController.java
+ * PaperRunner.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -32,17 +32,16 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
-import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
-import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
-import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 import org.matsim.core.network.NetworkChangeEvent;
@@ -50,8 +49,7 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.utils.misc.Counter;
-import org.matsim.withinday.controller.ExampleWithinDayController;
-import org.matsim.withinday.controller.WithinDayController;
+import org.matsim.withinday.controller.WithinDayControlerListener;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
@@ -60,14 +58,13 @@ import org.matsim.withinday.replanning.replanners.CurrentLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 
 /**
- * Controller for the simulation runs presented in the ICEM 2011 paper. 
+ * Code for the simulation runs presented in the ICEM 2011 (respectively TRB 2012) paper. 
  * 
  * @author cdobler
  */
-public class PaperController extends WithinDayController implements StartupListener,
-		MobsimInitializedListener, MobsimBeforeSimStepListener {
+public class PaperRunner implements StartupListener, MobsimBeforeSimStepListener {
 
-	private static final Logger log = Logger.getLogger(ExampleWithinDayController.class);
+	private static final Logger log = Logger.getLogger(PaperRunner.class);
 
 	/*
 	 * Define the Probability that an Agent uses the
@@ -119,28 +116,24 @@ public class PaperController extends WithinDayController implements StartupListe
 //	protected WithinDayDuringActivityReplanner duringActivityReplanner;
 	protected WithinDayDuringLegReplannerFactory duringLegReplannerFactory;
 
+	protected Scenario scenario;
+	protected WithinDayControlerListener withinDayControlerListener;
 	protected SelectHandledAgentsByProbability selector;
 
-	public PaperController(String[] args) {
-		super(args);
+	public PaperRunner(Controler controler) {
 
-		init();
-	}
-
-	private void init() {
+		this.scenario = controler.getScenario();
+		this.withinDayControlerListener = new WithinDayControlerListener();
+		
 		// Use a Scoring Function, that only scores the travel times!
 //		this.setScoringFunctionFactory(new OnlyTimeDependentScoringFunctionFactory());
-		
-		// register this as a Controller and Simulation Listener
-		super.getFixedOrderSimulationListener().addSimulationListener(this);
-		super.addControlerListener(this);
 	}
 
 	/*
 	 * New Routers for the Replanning are used instead of using the controler's.
 	 * By doing this every person can use a personalized Router.
 	 */
-	protected void initReplanners(QSim sim) {
+	protected void initReplanners() {
 		
 //		this.initialIdentifier = new InitialIdentifierImplFactory(sim).createIdentifier();
 //		this.selector.addIdentifier(initialIdentifier, pInitialReplanning);
@@ -165,18 +158,21 @@ public class PaperController extends WithinDayController implements StartupListe
 		getReplanningAgents(this.noEventEventsFile);
 		parseReplanningLinks(this.replanningLinksFile);
 		
-		this.initWithinDayTripRouterFactory();
+		selector = new SelectHandledAgentsByProbability();
+		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(selector);
 		
-		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory(), this.getTravelTimeCollector(), this.config.planCalcScore());
+		RoutingContext routingContext = new RoutingContextImpl(this.withinDayControlerListener.getTravelDisutilityFactory(),
+				this.withinDayControlerListener.getTravelTimeCollector(), this.scenario.getConfig().planCalcScore());
 		
-		LinkReplanningMap linkReplanningMap = super.getLinkReplanningMap();
+		LinkReplanningMap linkReplanningMap = this.withinDayControlerListener.getLinkReplanningMap();
 		DuringLegIdentifier identifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
 		this.selector.addIdentifier(identifier, pDuringLegReplanning);
 		this.duringLegIdentifier = new AgentFilteredDuringLegIdentifier(new LinkFilteredDuringLegIdentifier(identifier, this.replanningLinks), this.replanningAgents);
-		this.duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenarioData, this.getWithinDayEngine(),
-				this.getWithinDayTripRouterFactory(), routingContext);
+		this.duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenario, 
+				this.withinDayControlerListener.getWithinDayEngine(),
+				this.withinDayControlerListener.getWithinDayTripRouterFactory(), routingContext);
 		this.duringLegReplannerFactory.addIdentifier(this.duringLegIdentifier);
-		this.getWithinDayEngine().addDuringLegReplannerFactory(this.duringLegReplannerFactory);
+		this.withinDayControlerListener.getWithinDayEngine().addDuringLegReplannerFactory(this.duringLegReplannerFactory);
 	}
 
 	/*
@@ -186,45 +182,41 @@ public class PaperController extends WithinDayController implements StartupListe
 	 */
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		super.initWithinDayEngine(numReplanningThreads);
-		super.createAndInitTravelTimeCollector();
-//		super.createAndInitActivityReplanningMap();
-		super.createAndInitLinkReplanningMap();
 		
-		this.getWithinDayEngine().doInitialReplanning(false);
-		this.getWithinDayEngine().doDuringActivityReplanning(false);
-		this.getWithinDayEngine().doDuringLegReplanning(false);
-		
-		// Module to analyze expected travel time on a single link
-		Collection<Link> changedLinks = new HashSet<Link>();
-		for (NetworkChangeEvent networkChangeEvent : ((NetworkImpl) super.getNetwork()).getNetworkChangeEvents()) {
-			changedLinks.addAll(networkChangeEvent.getLinks());
-		}
-		LogLinkTravelTime logLinkTravelTime = new LogLinkTravelTime(changedLinks, super.getTravelTimeCollector(), super.getLinkTravelTimes());
-		super.addControlerListener(logLinkTravelTime);
-		super.getFixedOrderSimulationListener().addSimulationListener(logLinkTravelTime);
-	}
-	
-	@Override
-	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
-		initReplanners((QSim)e.getQueueSimulation());
+		this.withinDayControlerListener.notifyStartup(event);
+				
+		this.withinDayControlerListener.getWithinDayEngine().doInitialReplanning(false);
+		this.withinDayControlerListener.getWithinDayEngine().doDuringActivityReplanning(false);
+		this.withinDayControlerListener.getWithinDayEngine().doDuringLegReplanning(false);
+
+		initReplanners();
 		
 		// Module to analyze the travel times
-		AnalyzeTravelTimes analyzeTravelTimes = new AnalyzeTravelTimes(this.scenarioData, cityZurichSHPFile, cantonZurichSHPFile, affectedAgents, replanningAgents);
-		super.addControlerListener(analyzeTravelTimes);
-		super.getEvents().addHandler(analyzeTravelTimes);
+		AnalyzeTravelTimes analyzeTravelTimes = new AnalyzeTravelTimes(this.scenario, cityZurichSHPFile, cantonZurichSHPFile, affectedAgents, replanningAgents);
+		event.getControler().addControlerListener(analyzeTravelTimes);
+		event.getControler().getEvents().addHandler(analyzeTravelTimes);
+
+		// Module to analyze expected travel time on a single link
+		Collection<Link> changedLinks = new HashSet<Link>();
+		for (NetworkChangeEvent networkChangeEvent : ((NetworkImpl) event.getControler().getNetwork()).getNetworkChangeEvents()) {
+			changedLinks.addAll(networkChangeEvent.getLinks());
+		}
+		LogLinkTravelTime logLinkTravelTime = new LogLinkTravelTime(changedLinks, 
+				this.withinDayControlerListener.getTravelTimeCollector());
+		event.getControler().addControlerListener(logLinkTravelTime);
+		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(logLinkTravelTime);			
 	}
-	
+
 	@Override
 	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
 		boolean currentState = this.enabled;
 		int time = (int) e.getSimulationTime();
 		if (time >= this.tWithinDayEnabled && time <= this.tWithinDayDisabled) {
 			this.enabled = true;
-			this.getWithinDayEngine().doDuringLegReplanning(true);
+			this.withinDayControlerListener.getWithinDayEngine().doDuringLegReplanning(true);
 		} else {
 			this.enabled = false;
-			this.getWithinDayEngine().doDuringLegReplanning(false);
+			this.withinDayControlerListener.getWithinDayEngine().doDuringLegReplanning(false);
 		}
 		
 		// if state has changed
@@ -234,16 +226,6 @@ public class PaperController extends WithinDayController implements StartupListe
 		}
 	}
 	
-	@Override
-	protected void runMobSim() {
-		
-		selector = new SelectHandledAgentsByProbability();
-		super.getFixedOrderSimulationListener().addSimulationListener(selector);
-		
-		super.runMobSim();
-	}
-
-
 	private void parseReplanningLinks(String replanningLinksFile) {
 		replanningLinks = new HashSet<Id>();
 	    	    
@@ -265,7 +247,7 @@ public class PaperController extends WithinDayController implements StartupListe
 	    	String line;
 	    	while((line = br.readLine()) != null) {
 	    		
-	    		replanningLinks.add(this.scenarioData.createId(line));
+	    		replanningLinks.add(this.scenario.createId(line));
 	    		lineCounter.incCounter();
 	    	}	    	
 
@@ -281,7 +263,7 @@ public class PaperController extends WithinDayController implements StartupListe
 	}
 	
 	private void getAffectedAgents(String eventsFile) {
-		IdentifyAffectedAgents iaa = new IdentifyAffectedAgents(scenarioData, tBeginEvent, tEndEvent, affectedAgentsFile);
+		IdentifyAffectedAgents iaa = new IdentifyAffectedAgents(scenario, tBeginEvent, tEndEvent, affectedAgentsFile);
 		
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		eventsManager.addHandler(iaa);
@@ -293,7 +275,7 @@ public class PaperController extends WithinDayController implements StartupListe
 	
 	private void getReplanningAgents(String eventsFile) {
 		
-		IdentifyAffectedAgents iaa = new IdentifyAffectedAgents(scenarioData, tBeginEvent, tEndEvent, replanningAgentsFile);
+		IdentifyAffectedAgents iaa = new IdentifyAffectedAgents(scenario, tBeginEvent, tEndEvent, replanningAgentsFile);
 		
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		eventsManager.addHandler(iaa);
@@ -379,7 +361,12 @@ public class PaperController extends WithinDayController implements StartupListe
 			System.out.println("Usage: Controler config-file [dtd-file]");
 			System.out.println();
 		} else {		
-			final PaperController controller = new PaperController(new String[]{args[0]});
+			final Controler controler = new Controler(args[0]);
+
+			// create a PaperRunner and register it as a Controller and Simulation Listener
+			PaperRunner paperRunner = new PaperRunner(controler);
+			controler.addControlerListener(paperRunner);
+			controler.getMobsimListeners().add(paperRunner);
 			
 			// do not dump plans, network and facilities and the end
 //			controller.setDumpDataAtEnd(false);
@@ -388,58 +375,58 @@ public class PaperController extends WithinDayController implements StartupListe
 			for (int i = 1; i < args.length; i++) {
 				if (args[i].equalsIgnoreCase(NUMOFTHREADS)) {
 					i++;
-					controller.numReplanningThreads = Integer.parseInt(args[i]);
+					paperRunner.numReplanningThreads = Integer.parseInt(args[i]);
 					log.info("number of replanning threads: " + args[i]);
 				} else if (args[i].equalsIgnoreCase(LEGREPLANNINGSHARE)) {
 					i++;
 					double share = Double.parseDouble(args[i]);
 					if (share > 1.0) share = 1.0;
 					else if (share < 0.0) share = 0.0;
-					controller.pDuringLegReplanning = share;
+					paperRunner.pDuringLegReplanning = share;
 					log.info("share of leg replanning agents: " + args[i]);
 				} else if (args[i].equalsIgnoreCase(NOEVENTEVENTSFILE)) {
 					i++;
-					controller.noEventEventsFile = args[i];
+					paperRunner.noEventEventsFile = args[i];
 					log.info("no event occuring events file: " + args[i]);
 				} else if (args[i].equalsIgnoreCase(AFFECTEDAGENTSFILE)) {
 					i++;
-					controller.affectedAgentsFile = args[i];
+					paperRunner.affectedAgentsFile = args[i];
 					log.info("affected agents file: " + args[i]);
 				} else if (args[i].equalsIgnoreCase(REPLANNINGAGENTSFILE)) {
 					i++;
-					controller.replanningAgentsFile = args[i];
+					paperRunner.replanningAgentsFile = args[i];
 					log.info("leg replanning agents file: " + args[i]);
 				} else if (args[i].equalsIgnoreCase(REPLANNINGLINKSFILE)) {
 					i++;
-					controller.replanningLinksFile = args[i];
+					paperRunner.replanningLinksFile = args[i];
 					log.info("leg replanning links file: " + args[i]);
 				} else if (args[i].equalsIgnoreCase(STARTEVENT)) {
 					i++;
-					controller.tBeginEvent = Integer.parseInt(args[i]);
+					paperRunner.tBeginEvent = Integer.parseInt(args[i]);
 					log.info("start event: " + args[i]);
 				} else if (args[i].equalsIgnoreCase(ENDEVENT)) {
 					i++;
-					controller.tEndEvent = Integer.parseInt(args[i]);
+					paperRunner.tEndEvent = Integer.parseInt(args[i]);
 					log.info("end event: " + args[i]);
 				}  else if (args[i].equalsIgnoreCase(STARTREPLANNING)) {
 					i++;
-					controller.tWithinDayEnabled = Integer.parseInt(args[i]);
+					paperRunner.tWithinDayEnabled = Integer.parseInt(args[i]);
 					log.info("start within-day replanning: " + args[i]);
 				} else if (args[i].equalsIgnoreCase(ENDREPLANNING)) {
 					i++;
-					controller.tWithinDayDisabled = Integer.parseInt(args[i]);
+					paperRunner.tWithinDayDisabled = Integer.parseInt(args[i]);
 					log.info("end within-day replanning: " + args[i]);
 				} else if (args[i].equalsIgnoreCase(ZURICHCITYSHP)) {
 					i++;
-					controller.cityZurichSHPFile = args[i];
+					paperRunner.cityZurichSHPFile = args[i];
 					log.info("city of zurich shp file: " + args[i]);
 				} else if (args[i].equalsIgnoreCase(ZURICHCANTONSHP)) {
 					i++;
-					controller.cantonZurichSHPFile = args[i];
+					paperRunner.cantonZurichSHPFile = args[i];
 					log.info("canton of zurich shp file: " + args[i]);
 				} else log.warn("Unknown Parameter: " + args[i]);
 			}
-			controller.run();
+			controler.run();
 		}
 		System.exit(0);
 	}

@@ -74,15 +74,15 @@ public class LogLinkTravelTime implements MobsimBeforeSimStepListener, BeforeMob
 	private Map<Id, List<Double>> data = null;	// <LinkId, <ExpectedTravelTime>>
 	private List<Double> times;
 	
-	public LogLinkTravelTime(Collection<Link> links, TravelTime expectedTravelTime, TravelTime measuredTravelTime) {
+	public LogLinkTravelTime(Collection<Link> links, TravelTime expectedTravelTime) {
 		this.links = links;
 		this.expectedTravelTime = expectedTravelTime;
-		this.measuredTravelTime = measuredTravelTime;
 	}
 
 	@Override
 	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
 		
+		this.measuredTravelTime = event.getControler().getLinkTravelTimes();
 //		data = new HashMap<Id, StringBuffer>();
 //		
 //		for (Link link : links) {
