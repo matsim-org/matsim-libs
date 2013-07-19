@@ -202,7 +202,12 @@ public class WithinDayControlerListener implements StartupListener {
 		this.createAndInitLinkReplanningMap();
 		
 		if (this.leastCostPathCalculatorFactory == null) {
-			this.leastCostPathCalculatorFactory = controler.getLeastCostPathCalculatorFactory();
+			// at this point, the LeastCostPathCalculatorFactory is not set in the controler
+//			this.leastCostPathCalculatorFactory = controler.getLeastCostPathCalculatorFactory();
+			
+			// the controler set its LeastCostPathCalculatorFactory like this 
+			this.leastCostPathCalculatorFactory = new TripRouterFactoryBuilderWithDefaults().
+					createDefaultLeastCostPathCalculatorFactory(controler.getScenario());
 		} else log.info("LeastCostPathCalculatorFactory has already been set - it is NOT overwritten!");
 		
 		if (this.travelDisutilityFactory == null) {
