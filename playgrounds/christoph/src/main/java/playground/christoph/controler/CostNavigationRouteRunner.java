@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CostNavigationRouteController.java
+ * CostNavigationRouteRunner.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -25,23 +25,20 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
-import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.TeleportationEngine;
-import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
-import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.withinday.controller.WithinDayController;
+import org.matsim.withinday.controller.WithinDayControlerListener;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.filter.CollectionAgentFilter;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilter;
@@ -58,7 +55,7 @@ import playground.christoph.router.traveltime.LookupNetwork;
 import playground.christoph.router.traveltime.LookupNetworkFactory;
 import playground.christoph.router.traveltime.LookupTravelTime;
 
-public class CostNavigationRouteController extends WithinDayController implements MobsimInitializedListener, StartupListener  {
+public class CostNavigationRouteRunner implements MobsimInitializedListener, AfterMobsimListener, StartupListener  {
 	/*
 	 * Define the Probability that an Agent uses the
 	 * Replanning Strategy. It is possible to assign
@@ -93,55 +90,41 @@ public class CostNavigationRouteController extends WithinDayController implement
 	protected AnalyzeTravelTimes analyzeTravelTimes; 
 	protected SelectHandledAgentsByProbability selector;
 	protected CostNavigationTravelTimeLogger costNavigationTravelTimeLogger;
-		
+	
 	protected LookupNetwork lookupNetwork;
 	protected LookupTravelTime lookupTravelTime;
 	protected int updateLookupTravelTimeInterval = 15;
+	
+	protected Scenario scenario;
+	protected WithinDayControlerListener withinDayControlerListener;
+	
+	private static final Logger log = Logger.getLogger(CostNavigationRouteRunner.class);
+
+	public CostNavigationRouteRunner(Controler controler) {
+	
+		this.scenario = controler.getScenario();
 		
-	private static final Logger log = Logger.getLogger(CostNavigationRouteController.class);
-
-	public CostNavigationRouteController(String[] args) {
-		super(args);
-
-		init();
-	}
-
-	private void init() {	
-		// register this as a Controller and Simulation Listener
-		super.getFixedOrderSimulationListener().addSimulationListener(this);
-		super.addControlerListener(this);
+		this.withinDayControlerListener = new WithinDayControlerListener();
+		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(this);
 	}
 
 	/*
 	 * New Routers for the Replanning are used instead of using the controler's.
 	 * By doing this every person can use a personalized Router.
 	 */
-	protected void initReplanners(QSim sim) {
-//		PersonalizableTravelTime travelTime = super.getTravelTimeCollector();
+	protected void initReplanners() {
+
 		TravelTime travelTime = this.lookupTravelTime;
 		
 		OnlyTimeDependentTravelCostCalculatorFactory travelCostFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
 				
-		if (agentsLearn) {
-			costNavigationTravelTimeLogger = new CostNavigationTravelTimeLogger(this.scenarioData.getPopulation(), this.lookupNetwork, travelTime,
-					followedAndAccepted, followedAndNotAccepted, notFollowedAndAccepted, notFollowedAndNotAccepted);			
-		} else {
-			costNavigationTravelTimeLogger = new NonLearningCostNavigationTravelTimeLogger(this.scenarioData.getPopulation(), this.lookupNetwork, travelTime, this.gamma);
-			log.info("Agents learning is disabled - using constant gamma of " + this.gamma + "!");
-		}
-		costNavigationTravelTimeLogger.toleranceSlower = tauminus;
-		costNavigationTravelTimeLogger.toleranceFaster = tauplus;
-		costNavigationTravelTimeLogger.toleranceAlternativeRoute = tau;
-		
-		this.events.addHandler(costNavigationTravelTimeLogger);
-		
-		LinkReplanningMap linkReplanningMap = super.getLinkReplanningMap();
+		LinkReplanningMap linkReplanningMap = this.withinDayControlerListener.getLinkReplanningMap();
 		this.duringLegIdentifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
 		this.selector.addIdentifier(duringLegIdentifier, pDuringLegReplanning);
-		this.duringLegReplannerFactory = new CostNavigationRouteFactory(this.scenarioData, this.lookupNetwork, this.getWithinDayEngine(), 
-				costNavigationTravelTimeLogger, travelCostFactory, travelTime, this.getLeastCostPathCalculatorFactory());
+		this.duringLegReplannerFactory = new CostNavigationRouteFactory(this.scenario, this.lookupNetwork, this.withinDayControlerListener.getWithinDayEngine(), 
+				costNavigationTravelTimeLogger, travelCostFactory, travelTime, this.withinDayControlerListener.getLeastCostPathCalculatorFactory());
 		this.duringLegReplannerFactory.addIdentifier(this.duringLegIdentifier);
-		this.getWithinDayEngine().addDuringLegReplannerFactory(this.duringLegReplannerFactory);
+		this.withinDayControlerListener.getWithinDayEngine().addDuringLegReplannerFactory(this.duringLegReplannerFactory);
 	}
 
 	/*
@@ -151,20 +134,37 @@ public class CostNavigationRouteController extends WithinDayController implement
 	 */
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		super.initWithinDayEngine(numReplanningThreads);
-		super.createAndInitTravelTimeCollector();
-		super.createAndInitLinkReplanningMap();
 		
+		this.withinDayControlerListener.notifyStartup(event);
+				
 		checkNetwork();
 		
-		this.lookupNetwork = new LookupNetworkFactory().createLookupNetwork(this.network);
-		this.lookupTravelTime = new LookupTravelTime(lookupNetwork, this.getTravelTimeCollector(), scenarioData.getConfig().global().getNumberOfThreads());
+		this.lookupNetwork = new LookupNetworkFactory().createLookupNetwork(this.scenario.getNetwork());
+		this.lookupTravelTime = new LookupTravelTime(lookupNetwork, this.withinDayControlerListener.getTravelTimeCollector(), 
+				this.scenario.getConfig().global().getNumberOfThreads());
 		this.lookupTravelTime.setUpdateInterval(this.updateLookupTravelTimeInterval);
-		this.getFixedOrderSimulationListener().addSimulationListener(lookupTravelTime);
+		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(this.lookupTravelTime);
+		
+		if (agentsLearn) {
+			costNavigationTravelTimeLogger = new CostNavigationTravelTimeLogger(this.scenario.getPopulation(), this.lookupNetwork, this.lookupTravelTime,
+					followedAndAccepted, followedAndNotAccepted, notFollowedAndAccepted, notFollowedAndNotAccepted);			
+		} else {
+			costNavigationTravelTimeLogger = new NonLearningCostNavigationTravelTimeLogger(this.scenario.getPopulation(), this.lookupNetwork, this.lookupTravelTime, this.gamma);
+			log.info("Agents learning is disabled - using constant gamma of " + this.gamma + "!");
+		}
+		costNavigationTravelTimeLogger.toleranceSlower = tauminus;
+		costNavigationTravelTimeLogger.toleranceFaster = tauplus;
+		costNavigationTravelTimeLogger.toleranceAlternativeRoute = tau;
+		
+		event.getControler().getEvents().addHandler(costNavigationTravelTimeLogger);
+		
+		this.selector = new SelectHandledAgentsByProbability();
+		
+		this.initReplanners();
 	}
 	
 	private void checkNetwork() {
-		for (Link link : this.network.getLinks().values()) {
+		for (Link link : this.scenario.getNetwork().getLinks().values()) {
 			if (link.getLength() == 0) {
 				double distance = CoordUtils.calcDistance(link.getFromNode().getCoord(), link.getToNode().getCoord());
 				if (distance == 0.0) distance = 1.0;
@@ -176,8 +176,7 @@ public class CostNavigationRouteController extends WithinDayController implement
 	
 	@Override
 	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
-		initReplanners((QSim)e.getQueueSimulation());
-		
+
 		this.selector.notifyMobsimInitialized(e);
 		
 		replannedAgents = new HashSet<Id>();
@@ -188,58 +187,68 @@ public class CostNavigationRouteController extends WithinDayController implement
 				handledAgents = replannedAgents.size();
 			}
 		}
-		this.analyzeTravelTimes = new AnalyzeTravelTimes(replannedAgents, scenarioData.getPopulation().getPersons().size());
-		this.getEvents().addHandler(analyzeTravelTimes);
+		this.analyzeTravelTimes = new AnalyzeTravelTimes(replannedAgents, this.scenario.getPopulation().getPersons().size());
+		((QSim) e.getQueueSimulation()).getEventsManager().addHandler(this.analyzeTravelTimes);
 	}
 	
+	/*
+	 * I think this is not needed anymore. It was added for backwards compatibility.
+	 * However, due to the several changes in the code's structure it won't be compatible anymore.
+	 */
+//	@Override
+//	protected void runMobSim() {
+//		
+//		
+//		
+//		/*
+//		 * If no events file is given, the simulation is run...
+//		 */
+//		if (eventsFile == null) {
+//			super.runMobSim();
+//		}
+//		
+//		/*
+//		 * ... otherwise the events file is parsed and analyzed.
+//		 */
+//		else {
+//			QSim qSim1 = new QSim(this.scenario, events);
+//			ActivityEngine activityEngine = new ActivityEngine();
+//			qSim1.addMobsimEngine(activityEngine);
+//			qSim1.addActivityHandler(activityEngine);
+//			QNetsimEngine netsimEngine = new DefaultQSimEngineFactory().createQSimEngine(qSim1);
+//			qSim1.addMobsimEngine(netsimEngine);
+//			qSim1.addDepartureHandler(netsimEngine.getDepartureHandler());
+//			TeleportationEngine teleportationEngine = new TeleportationEngine();
+//			qSim1.addMobsimEngine(teleportationEngine);
+//			QSim qSim = qSim1;
+//			ExperimentalBasicWithindayAgentFactory agentFactory = new ExperimentalBasicWithindayAgentFactory(qSim);
+//			PopulationAgentSource agentSource = new PopulationAgentSource(this.scenario.getPopulation(), agentFactory, qSim);
+//			qSim.addAgentSource(agentSource);
+//			agentSource.insertAgentsIntoMobsim();
+//			
+//			/*
+//			 * To create consistent results, the same random numbers have to be used. When running
+//			 * a real simulation, for each node in the network, an additional random object is created.
+//			 * Since those objects are not created when the QSim does not run, we create them by our own.
+//			 */
+//			for (int i = 0; i < this.scenario.getNetwork().getNodes().size(); i++) MatsimRandom.getLocalInstance();
+//			
+//				throw new RuntimeException("Events are no longer settable in this place after some refactoring. Sorry."); // mrieser, 11Sep2012
+////			this.events = (EventsManagerImpl) EventsUtils.createEventsManager();
+////						
+////			this.notifyMobsimInitialized(new MobsimInitializedEventImpl(qSim));
+////			log.info("Agents to be handled: " + handledAgents);
+////			new EventsReaderXMLv1(getEvents()).parse(eventsFile);
+//		}		
+//		
+//		printStatistics();
+//		this.analyzeTravelTimes.printStatistics();
+//	}
+	
+
 	@Override
-	protected void runMobSim() {
-		
-		selector = new SelectHandledAgentsByProbability();
-		
-		/*
-		 * If no events file is given, the simulation is run...
-		 */
-		if (eventsFile == null) {
-			super.runMobSim();
-		}
-		
-		/*
-		 * ... otherwise the events file is parsed and analyzed.
-		 */
-		else {
-			QSim qSim1 = new QSim(scenarioData, events);
-			ActivityEngine activityEngine = new ActivityEngine();
-			qSim1.addMobsimEngine(activityEngine);
-			qSim1.addActivityHandler(activityEngine);
-			QNetsimEngine netsimEngine = new DefaultQSimEngineFactory().createQSimEngine(qSim1);
-			qSim1.addMobsimEngine(netsimEngine);
-			qSim1.addDepartureHandler(netsimEngine.getDepartureHandler());
-			TeleportationEngine teleportationEngine = new TeleportationEngine();
-			qSim1.addMobsimEngine(teleportationEngine);
-			QSim qSim = qSim1;
-			ExperimentalBasicWithindayAgentFactory agentFactory = new ExperimentalBasicWithindayAgentFactory(qSim);
-			PopulationAgentSource agentSource = new PopulationAgentSource(scenarioData.getPopulation(), agentFactory, qSim);
-			qSim.addAgentSource(agentSource);
-			agentSource.insertAgentsIntoMobsim();
-			
-			/*
-			 * To create consistent results, the same random numbers have to be used. When running
-			 * a real simulation, for each node in the network, an additional random object is created.
-			 * Since those objects are not created when the QSim does not run, we create them by our own.
-			 */
-			for (int i = 0; i < this.scenarioData.getNetwork().getNodes().size(); i++) MatsimRandom.getLocalInstance();
-			
-				throw new RuntimeException("Events are no longer settable in this place after some refactoring. Sorry."); // mrieser, 11Sep2012
-//			this.events = (EventsManagerImpl) EventsUtils.createEventsManager();
-//						
-//			this.notifyMobsimInitialized(new MobsimInitializedEventImpl(qSim));
-//			log.info("Agents to be handled: " + handledAgents);
-//			new EventsReaderXMLv1(getEvents()).parse(eventsFile);
-		}		
-		
+	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		printStatistics();
-		this.analyzeTravelTimes.printStatistics();
 	}
 
 	private void printStatistics() {
@@ -293,10 +302,14 @@ public class CostNavigationRouteController extends WithinDayController implement
 			System.out.println("No argument given!");
 			System.out.println("Usage: CostNavigationRouteController config-file parameters");
 		} else {
-			final CostNavigationRouteController controller = new CostNavigationRouteController(args);
+			final Controler controler = new Controler(args);
 
+			// Create a CostNavigationRouteRunner and register it as a Controller Listener
+			CostNavigationRouteRunner costNavigationRouteRunner = new CostNavigationRouteRunner(controler);
+			controler.addControlerListener(costNavigationRouteRunner);
+			
 			// do not dump plans, network and facilities and the end
-			controller.setDumpDataAtEnd(false);
+			controler.setDumpDataAtEnd(false);
 						
 			// set parameter from command line
 			for (int i = 1; i < args.length; i++) {
@@ -304,87 +317,88 @@ public class CostNavigationRouteController extends WithinDayController implement
 					i++;
 					int threads = Integer.parseInt(args[i]);
 					if (threads < 1) threads = 1;
-					controller.numReplanningThreads = threads;
+					costNavigationRouteRunner.numReplanningThreads = threads;
 					log.info("number of replanning threads: " + threads);
 				} else if (args[i].equalsIgnoreCase(REPLANNINGSHARE)) {
 					i++;
 					double share = Double.parseDouble(args[i]);
 					if (share > 1.0) share = 1.0;
 					else if (share < 0.0) share = 0.0;
-					controller.pDuringLegReplanning = share;
+					costNavigationRouteRunner.pDuringLegReplanning = share;
 					log.info("share of leg replanning agents: " + share);
 				} else if (args[i].equalsIgnoreCase(LOOKUPTABLEUPDATEINTERVAL)) {
 					i++;
 					int interval = Integer.parseInt(args[i]);
 					if (interval < 1) interval = 1;
-					controller.updateLookupTravelTimeInterval = interval;
+					costNavigationRouteRunner.updateLookupTravelTimeInterval = interval;
 					log.info("travel time lookup table update interval: " + interval);
 				} else if (args[i].equalsIgnoreCase(AGENTSLEARN)) {
 					i++;
 					boolean agentsLearn = true;
 					if (args[i].toLowerCase().equals("false")) agentsLearn = false;
-					controller.agentsLearn = agentsLearn;
+					costNavigationRouteRunner.agentsLearn = agentsLearn;
 					log.info("agents learn: " + agentsLearn);
 				} else if (args[i].equalsIgnoreCase(GAMMA)) {
 					i++;
 					double gamma = Double.parseDouble(args[i]);
 					if (gamma > 1.0) gamma = 1.0;
 					else if (gamma < 0.0) gamma = 0.0;
-					controller.gamma = gamma;
+					costNavigationRouteRunner.gamma = gamma;
 					log.info("gamma: " + gamma);
 				} else if (args[i].equalsIgnoreCase(TAU)) {
 					i++;
 					double tau = Double.parseDouble(args[i]);
 					if (tau < 1.0) tau = 1.0;
-					controller.tau = tau;
+					costNavigationRouteRunner.tau = tau;
 					log.info("tau: " + tau);
 				} else if (args[i].equalsIgnoreCase(TAUPLUS)) {
 					i++;
 					double tauplus = Double.parseDouble(args[i]);
 					if (tauplus > 1.0) tauplus = 1.0;
 					else if (tauplus < 0.0) tauplus = 0.0;
-					controller.tauplus = tauplus;
+					costNavigationRouteRunner.tauplus = tauplus;
 					log.info("tauplus: " + tauplus);
 				} else if (args[i].equalsIgnoreCase(TAUMINUS)) {
 					i++;
 					double tauminus = Double.parseDouble(args[i]);
 					if (tauminus < 1.0) tauminus = 1.0;
-					controller.tauminus = tauminus;
+					costNavigationRouteRunner.tauminus = tauminus;
 					log.info("tauminus: " + tauminus);
 				} else if (args[i].equalsIgnoreCase(FOLLOWEDANDACCEPTED)) {
 					i++;
 					int value = Integer.parseInt(args[i]);
 					if (value < 0) value = 0;
-					controller.followedAndAccepted = value;
+					costNavigationRouteRunner.followedAndAccepted = value;
 					log.info("followedAndAccepted: " + value);
 				} else if (args[i].equalsIgnoreCase(FOLLOWEDANDNOTACCEPTED)) {
 					i++;
 					int value = Integer.parseInt(args[i]);
 					if (value < 0) value = 0;
-					controller.followedAndNotAccepted = value;
+					costNavigationRouteRunner.followedAndNotAccepted = value;
 					log.info("followedAndNotAccepted: " + value);
 				} else if (args[i].equalsIgnoreCase(NOTFOLLOWEDANDACCEPTED)) {
 					i++;
 					int value = Integer.parseInt(args[i]);
 					if (value < 0) value = 0;
-					controller.notFollowedAndAccepted = value;
+					costNavigationRouteRunner.notFollowedAndAccepted = value;
 					log.info("notFollowedAndAccepted: " + value);
 				} else if (args[i].equalsIgnoreCase(NOTFOLLOWEDANDNOTACCEPTED)) {
 					i++;
 					int value = Integer.parseInt(args[i]);
 					if (value < 0) value = 0;
-					controller.notFollowedAndNotAccepted = value;
+					costNavigationRouteRunner.notFollowedAndNotAccepted = value;
 					log.info("notFollowedAndNotAccepted: " + value);
 				}  else if (args[i].equalsIgnoreCase(EVENTSFILE)) {
 					i++;
 					String value = args[i];
-					controller.eventsFile = value;
+					costNavigationRouteRunner.eventsFile = value;
 					log.info("events file to analyze: " + value);
 				} else log.warn("Unknown Parameter: " + args[i]);
 			}
 
-			controller.run();
+			controler.run();
 		}
 		System.exit(0);
 	}
+
 }
