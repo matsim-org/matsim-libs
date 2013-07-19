@@ -223,12 +223,20 @@ public class OGLAgentPointLayer extends OTFGLAbstractDrawable implements SceneLa
 	}
 
 	private static Color taxicabColoringScheme(AgentSnapshotInfo agInfo) {
-		if (agInfo.getAgentState() == AgentState.PERSON_DRIVING_CAR) {
-			return Color.YELLOW ;
-		}
-		else {
-			return Color.BLACK ;
-		}
+        char[] id = agInfo.getId().toString().toCharArray();
+
+        // ===============TAXI COLOURING===============
+        if (id.length > 1 && id[1] == '.') {
+            if (agInfo.getAgentState() == AgentState.PERSON_DRIVING_CAR) {
+                return Color.YELLOW ;
+            }
+            else {
+                return Color.BLACK ;
+            }
+        } else {
+            //===============REGULAR COLOURING===============
+            return standardColoringScheme( agInfo ) ;
+        }
 	}
 
 	private static Color standardColoringScheme(AgentSnapshotInfo agInfo) {
