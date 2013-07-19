@@ -37,6 +37,8 @@ import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -51,6 +53,7 @@ public class InsertParkingActivities implements PlanAlgorithm {
 	private final PersonAlgorithm personPrepareForSim;
 	private final ParkingInfrastructure parkingInfrastructure;
 	private final TripRouter tripRouter;
+	private final ModeRouteFactory modeRouteFactory;
 
 	
 	// TODO: instead of selecting closest parking, we could select parking from previous day.
@@ -62,69 +65,53 @@ public class InsertParkingActivities implements PlanAlgorithm {
 		this.tripRouter = tripRouter;
 		this.personPrepareForSim = new PersonPrepareForSim(new PlanRouter(tripRouter), (ScenarioImpl) scenario);
 		this.parkingInfrastructure = parkingInfrastructure;
+		
+		this.modeRouteFactory = ((PopulationFactoryImpl) scenario.getPopulation().getFactory()).getModeRouteFactory();
 	}
 
 	@Override
 	public void run(Plan plan) {
 		
+		Id vehicleId = plan.getPerson().getId();
+		
+		boolean firstParking = true;
+		
 		List<PlanElement> planElements = plan.getPlanElements();
-		
-		
 
 		/*
 		 * Changes to this plan will be executed but not written to the person
 		 */
-		List<Integer> carLegIndices = new ArrayList<Integer>();
-		int index = 0;
+		List<Leg> carLegs = new ArrayList<Leg>();
 		for (PlanElement planElement : planElements) {
 			if (planElement instanceof Leg) {
 				if (((Leg) planElement).getMode().equals(TransportMode.car)) {
-					carLegIndices.add(index);
+					carLegs.add((Leg) planElement);
 				}
 			}
-			index++;
 		}
 
 		// if no car legs are performed, no adaption of the plan is necessary
-		if (carLegIndices.size() == 0)
-			return;
+		if (carLegs.size() == 0) return;
 
-		for (int i = carLegIndices.size(); i > 0; i--) {
-			index = carLegIndices.get(i - 1);
-
+		for (Leg carLeg : carLegs) {
+			int index = planElements.indexOf(carLeg);
+			
 			Activity previousActivity = (Activity) planElements.get(index - 1);
+//			Leg carLeg = (Leg) planElements.get(index);
 			Activity nextActivity = (Activity) planElements.get(index + 1);
-
-			// TODO: uncomment if needed.
-			// Link prevActLink =
-			// scenario.getNetwork().getLinks().get(previousActivity.getLinkId());
-			// Link nextActLink =
-			// scenario.getNetwork().getLinks().get(nextActivity.getLinkId());
-
-			// double
-			// minDistanceBetweenConsecutiveActivitiesToPerfomNewParkingOperation
-			// = 500;
-			// if (GeneralLib.getDistance(prevActLink.getCoord(),
-			// nextActLink.getCoord()) <
-			// minDistanceBetweenConsecutiveActivitiesToPerfomNewParkingOperation)
-			// {
-			// Leg currentLeg = (Leg) planElements.get(index);
-			// currentLeg.setMode(TransportMode.walk);
-			// continue;
-			// }
-
-			planElements.add(index + 1, createWalkLeg());
-			planElements.add(index + 1, createParkingActivity(((Activity) nextActivity).getFacilityId()));
-			planElements.add(index, createParkingActivity(((Activity) previousActivity).getFacilityId()));
-
-			// planElements.add(index + 1,
-			// createParkingOnSameLinkAsActivity(((Activity)
-			// nextActivity).getFacilityId()));
-			// planElements.add(index,
-			// createParkingOnSameLinkAsActivity(((Activity)
-			// previousActivity).getFacilityId()));
-
-			planElements.add(index, createWalkLeg());
+			
+			// create walk legs and parking activities
+			Leg walkLegToParking = createWalkLeg(carLeg.getDepartureTime(), previousActivity.getLinkId(), previousActivity.getLinkId());
+			Activity firstParkingActivity = createParkingActivity(((Activity) previousActivity).getFacilityId(), vehicleId, firstParking);
+			firstParking = false;
+			Activity secondParkingActivity = createParkingActivity(((Activity) nextActivity).getFacilityId(), vehicleId, firstParking);
+			Leg walkLegFromParking = createWalkLeg(carLeg.getDepartureTime() + carLeg.getTravelTime(), nextActivity.getLinkId(), nextActivity.getLinkId());
+			
+			// add legs and activities to plan
+			planElements.add(index + 1, walkLegFromParking);
+			planElements.add(index + 1, secondParkingActivity);
+			planElements.add(index, firstParkingActivity);
+			planElements.add(index, walkLegToParking);
 		}
 
 		/*
@@ -184,7 +171,7 @@ public class InsertParkingActivities implements PlanAlgorithm {
 					
 					synchronized(this){
 						EditRoutes editRoutes = new EditRoutes();
-												
+						
 						//update walk leg
 						Leg walkLeg = (Leg) plan.getPlanElements().get(i - 1);
 						Assert.assertNotNull(walkLeg) ;
@@ -285,7 +272,7 @@ public class InsertParkingActivities implements PlanAlgorithm {
 		return activity;
 	}
 
-	private Activity createParkingActivity(Id facilityId) {
+	private Activity createParkingActivity(Id facilityId, Id vehicleId, boolean firstParking) {
 
 		// get the facility where the activity is performed
 		ActivityFacility facility = ((ScenarioImpl) this.scenario).getActivityFacilities().getFacilities().get(facilityId);
@@ -305,8 +292,6 @@ public class InsertParkingActivities implements PlanAlgorithm {
 		activity.setFacilityId(parkingFacilityId);
 		return activity;
 	}
-
-	
 	
 	public static void updateNextParkingActivityIfNeededDuringDay(ParkingInfrastructure pi,
 			PlanBasedWithinDayAgent withinDayAgent, Scenario sc, TripRouter tripRouter) {
@@ -412,8 +397,11 @@ public class InsertParkingActivities implements PlanAlgorithm {
 
 	}
 
-	private Leg createWalkLeg() {
-		return this.scenario.getPopulation().getFactory().createLeg(TransportMode.walk);
+	private Leg createWalkLeg(double departureTime, Id startLinkId, Id endLinkId) {
+		Leg walkLeg = this.scenario.getPopulation().getFactory().createLeg(TransportMode.walk);
+		walkLeg.setDepartureTime(departureTime);
+		walkLeg.setRoute(modeRouteFactory.createRoute(TransportMode.walk, startLinkId, endLinkId));
+		return walkLeg;
 	}
 
 }
