@@ -159,7 +159,7 @@ import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiEvaluator.TaxiEvaluation;
         MultipleSingleIterOnlineDvrpLauncher multiLauncher = new MultipleSingleIterOnlineDvrpLauncher(
                 paramFile);
 
-        String txt = (destinationKnown ? "D1" : "D0") + "_" + (onlineVehicleTracker ? "M1" : "M2");
+        String txt = "destination_" + destinationKnown + "_online_" + onlineVehicleTracker;
 
         PrintWriter pw = new PrintWriter(multiLauncher.launcher.dirName + "stats_" + txt + ".out");
         PrintWriter pw2 = new PrintWriter(multiLauncher.launcher.dirName + "timeUpdates_" + txt
