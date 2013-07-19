@@ -67,7 +67,7 @@ public class Cottbus2KS2010 {
 	//private static double endTime = 18.5 * 3600.0;
 		double matsimPopSampleSize = 1.0;
 		double ksModelCommoditySampleSize = 1.0;
-		double minCommodityFlow = 120.0;
+		double minCommodityFlow = 10.0;
 		String networkFilename = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network_wgs84_utm33n.xml.gz";
 		String lanesFilename = DgCottbusScenarioPaths.LANES_FILENAME;
 		String signalSystemsFilename = DgPaths.REPOS +  "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_systems.xml";
@@ -75,10 +75,10 @@ public class Cottbus2KS2010 {
 		String signalControlFilename = DgCottbusScenarioPaths.SIGNAL_CONTROL_FIXEDTIME_FILENAME;
 		//TODO change to run1712 when finished
 //		String populationFilename = DgPaths.REPOS + "runs-svn/run1292/1292.output_plans_sample.xml";
-		String populationFilename = DgPaths.REPOS + "runs-svn/run1292/1292.output_plans.xml.gz";
+		String populationFilename = DgPaths.REPOS + "runs-svn/run1712/1712.output_plans.xml.gz";
 		String name = "run 1292 output plans between 05:30 and 09:30";
 		CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84_UTM33N);
-		final String outputDirectory = DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-07-17_test/";
+		final String outputDirectory = DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-07-19_test_10/";
 		String ksModelOutputFilename = "ks2010_model_";
 		ksModelOutputFilename += Double.toString(minCommodityFlow) + "_" + Double.toString(startTime) + ".xml";
 				
