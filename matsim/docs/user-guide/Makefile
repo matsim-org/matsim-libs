@@ -24,7 +24,7 @@ veryclean:
 	-rm -rf html
 
 tags:
-	-etags *.tex
+	-etags *.tex */*.tex
 
 wc:
 	pdftotext ${NAME}.pdf
