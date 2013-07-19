@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import org.junit.Assert;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -186,6 +187,12 @@ public class InsertParkingActivities implements PlanAlgorithm {
 												
 						//update walk leg
 						Leg walkLeg = (Leg) plan.getPlanElements().get(i - 1);
+						Assert.assertNotNull(walkLeg) ;
+						Assert.assertNotNull(walkLeg.getRoute()) ;
+						Assert.assertNotNull(act) ;
+						Assert.assertNotNull(plan);
+						Assert.assertNotNull(scenario) ;
+						Assert.assertNotNull(tripRouter) ;
 						editRoutes.relocateFutureLegRoute(walkLeg, walkLeg.getRoute().getStartLinkId(), 
 								act.getLinkId(), plan.getPerson(), scenario.getNetwork(), tripRouter);
 
