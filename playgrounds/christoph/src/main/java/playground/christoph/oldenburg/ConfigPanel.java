@@ -47,6 +47,7 @@ import javax.swing.SwingWorker;
 import javax.swing.border.TitledBorder;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.network.NetworkChangeEvent;
@@ -638,22 +639,26 @@ public class ConfigPanel extends JPanel {
 	private static class Task extends SwingWorker<Void, Void> implements StartupListener {
 		
 		/*package*/ ConfigPanel parent;
-		/*package*/ DemoController controller;
+		/*package*/ Controler controler;
+		/*package*/ DemoRunner demoRunner;
 		
 		public Task(ConfigPanel parent) {
 			this.parent = parent;
 		}
 		
 		private void initSimulation() {
-			controller = new DemoController(new String[]{DemoConfig.configFile});
+			controler = new Controler(new String[]{DemoConfig.configFile});
 
+			demoRunner = new DemoRunner(controler);
+			controler.addControlerListener(demoRunner);
+			
 			// do not dump plans, network and facilities and the end
 //			controller(false);
 			
 			// overwrite old files
-			controller.setOverwriteFiles(true);
+			controler.setOverwriteFiles(true);
 			
-			controller.addControlerListener(this);
+			controler.addControlerListener(this);
 		}
 		
 
@@ -677,7 +682,7 @@ public class ConfigPanel extends JPanel {
 			
 			int i = 0;
 			List<NetworkChangeEvent> adaptedChangeEvents = new ArrayList<NetworkChangeEvent>();
-			for (NetworkChangeEvent networkChangeEvent : ((NetworkImpl) controller.getNetwork()).getNetworkChangeEvents()) {
+			for (NetworkChangeEvent networkChangeEvent : ((NetworkImpl) controler.getNetwork()).getNetworkChangeEvents()) {
 				
 				int selected = selection.get(i);
 				
@@ -691,7 +696,7 @@ public class ConfigPanel extends JPanel {
 				 */
 				double time = DemoConfig.evacuationTime + (selected - 1) * 1800;
 				
-				NetworkChangeEvent newEvent = ((NetworkFactoryImpl) controller.getNetwork().getFactory()).createNetworkChangeEvent(time);
+				NetworkChangeEvent newEvent = ((NetworkFactoryImpl) controler.getNetwork().getFactory()).createNetworkChangeEvent(time);
 				
 				// clone event parameter
 				for (Link link : networkChangeEvent.getLinks()) newEvent.addLink(link);
@@ -705,7 +710,7 @@ public class ConfigPanel extends JPanel {
 			}
 			
 			// replace network change events
-			((NetworkImpl) controller.getNetwork()).setNetworkChangeEvents(adaptedChangeEvents);			
+			((NetworkImpl) controler.getNetwork()).setNetworkChangeEvents(adaptedChangeEvents);			
 		}
 		
         /*
@@ -720,7 +725,7 @@ public class ConfigPanel extends JPanel {
         	
         	parent.jProgressBar.setIndeterminate(true);
         	parent.jProgressBar.setStringPainted(true); 
-        	controller.run();
+        	controler.run();
         	parent.jProgressBar.setStringPainted(false);
         	parent.jProgressBar.setIndeterminate(false);
             return null;
@@ -733,9 +738,9 @@ public class ConfigPanel extends JPanel {
         public void done() {
 //            Toolkit.getDefaultToolkit().beep();
     		
-        	parent.jLabelLongestEvacuationTimeResult.setText(Time.writeTime(controller.evacuationTimeAnalyzer.longestEvacuationTime));
+        	parent.jLabelLongestEvacuationTimeResult.setText(Time.writeTime(demoRunner.evacuationTimeAnalyzer.longestEvacuationTime));
         	parent.jLabelLongestEvacuationTimeResult.updateUI();
-        	parent.jlabelMeanEvacuationTimeResult.setText(Time.writeTime(controller.evacuationTimeAnalyzer.sumEvacuationTimes / controller.getScenario().getPopulation().getPersons().size()));
+        	parent.jlabelMeanEvacuationTimeResult.setText(Time.writeTime(demoRunner.evacuationTimeAnalyzer.sumEvacuationTimes / controler.getScenario().getPopulation().getPersons().size()));
     		parent.jlabelMeanEvacuationTimeResult.updateUI();
     		
     		parent.jButtonStartSimulation.setEnabled(true);

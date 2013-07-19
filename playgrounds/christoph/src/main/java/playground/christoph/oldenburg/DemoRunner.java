@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DemoController.java
+ * DemoRunner.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -24,7 +24,9 @@ import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -47,7 +49,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.VehiclesFactory;
-import org.matsim.withinday.controller.WithinDayController;
+import org.matsim.withinday.controller.WithinDayControlerListener;
 import org.matsim.withinday.replanning.identifiers.ActivityEndIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.InitialIdentifierImplFactory;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
@@ -62,10 +64,10 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActi
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplannerFactory;
 
-public class DemoController extends WithinDayController implements MobsimInitializedListener, StartupListener, 
+public class DemoRunner implements MobsimInitializedListener, StartupListener, 
 	MobsimBeforeSimStepListener, IterationEndsListener {
 
-	private static final Logger log = Logger.getLogger(DemoController.class);
+	private static final Logger log = Logger.getLogger(DemoRunner.class);
 	
 	/*
 	 * How many parallel Threads shall do the Replanning.
@@ -79,58 +81,52 @@ public class DemoController extends WithinDayController implements MobsimInitial
 	protected WithinDayDuringActivityReplannerFactory duringActivityReplannerFactory;
 	protected WithinDayDuringLegReplannerFactory duringLegReplannerFactory;
 	
+	protected Scenario scenario;
+	protected WithinDayControlerListener withinDayControlerListener;
 	protected EvacuationTimeAnalyzer evacuationTimeAnalyzer;
 	
-	public DemoController(String[] args) {
-		super(args);
-
-		init();
-	}
-
-	private void init() {
+	public DemoRunner(Controler controler) {
 		
+		this.scenario = controler.getScenario();
+		
+		this.withinDayControlerListener = new WithinDayControlerListener();
+		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(this);
+
 		// let Agents adapt their original plans
 		ExperimentalBasicWithindayAgent.copySelectedPlan = false;
 		
 		// Use a Scoring Function, that only scores the travel times!
-		this.setScoringFunctionFactory(new OnlyTravelDependentScoringFunctionFactory());
-		
-		// register this as a Controller and Simulation Listener
-		super.getFixedOrderSimulationListener().addSimulationListener(this);
-		super.addControlerListener(this);
+		controler.setScoringFunctionFactory(new OnlyTravelDependentScoringFunctionFactory());
 	}
 	
 	/*
 	 * New Routers for the replanning are used instead of using the controller's.
 	 * By doing this every person can use a personalized Router.
 	 */
-	@Override
-	protected void initReplanners(QSim sim) {
+	protected void initReplanners() {
 
-		this.initWithinDayTripRouterFactory();
-
-		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory(), 
-				this.getTravelTimeCollector(), this.config.planCalcScore());
+		RoutingContext routingContext = new RoutingContextImpl(this.withinDayControlerListener.getTravelDisutilityFactory(), 
+				this.withinDayControlerListener.getTravelTimeCollector(), this.scenario.getConfig().planCalcScore());
 		
-		this.initialIdentifier = new InitialIdentifierImplFactory(this.getActivityReplanningMap()).createIdentifier();
-		this.initialReplannerFactory = new CreateEvacuationPlanReplannerFactory(this.scenarioData, this.getWithinDayEngine(),
-				this.getWithinDayTripRouterFactory(), routingContext);
+		this.initialIdentifier = new InitialIdentifierImplFactory(this.withinDayControlerListener.getActivityReplanningMap()).createIdentifier();
+		this.initialReplannerFactory = new CreateEvacuationPlanReplannerFactory(this.scenario, this.withinDayControlerListener.getWithinDayEngine(),
+				this.withinDayControlerListener.getWithinDayTripRouterFactory(), routingContext);
 		this.initialReplannerFactory.addIdentifier(this.initialIdentifier);
-		this.getWithinDayEngine().addIntialReplannerFactory(this.initialReplannerFactory);
+		this.withinDayControlerListener.getWithinDayEngine().addIntialReplannerFactory(this.initialReplannerFactory);
 		
-		ActivityReplanningMap activityReplanningMap = super.getActivityReplanningMap();
+		ActivityReplanningMap activityReplanningMap = this.withinDayControlerListener.getActivityReplanningMap();
 		this.duringActivityIdentifier = new ActivityEndIdentifierFactory(activityReplanningMap).createIdentifier();
-		this.duringActivityReplannerFactory = new NextLegReplannerFactory(this.scenarioData, this.getWithinDayEngine(),
-				this.getWithinDayTripRouterFactory(), routingContext);
+		this.duringActivityReplannerFactory = new NextLegReplannerFactory(this.scenario, this.withinDayControlerListener.getWithinDayEngine(),
+				this.withinDayControlerListener.getWithinDayTripRouterFactory(), routingContext);
 		this.duringActivityReplannerFactory.addIdentifier(this.duringActivityIdentifier);
-		this.getWithinDayEngine().addDuringActivityReplannerFactory(this.duringActivityReplannerFactory);
+		this.withinDayControlerListener.getWithinDayEngine().addDuringActivityReplannerFactory(this.duringActivityReplannerFactory);
 		
-		LinkReplanningMap linkReplanningMap = super.getLinkReplanningMap();
+		LinkReplanningMap linkReplanningMap = this.withinDayControlerListener.getLinkReplanningMap();
 		this.duringLegIdentifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
-		this.duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenarioData, this.getWithinDayEngine(),
-				this.getWithinDayTripRouterFactory(), routingContext);
+		this.duringLegReplannerFactory = new CurrentLegReplannerFactory(this.scenario, this.withinDayControlerListener.getWithinDayEngine(),
+				this.withinDayControlerListener.getWithinDayTripRouterFactory(), routingContext);
 		this.duringLegReplannerFactory.addIdentifier(this.duringLegIdentifier);
-		this.getWithinDayEngine().addDuringLegReplannerFactory(this.duringLegReplannerFactory);
+		this.withinDayControlerListener.getWithinDayEngine().addDuringLegReplannerFactory(this.duringLegReplannerFactory);
 	}
 	
 	/*
@@ -140,19 +136,18 @@ public class DemoController extends WithinDayController implements MobsimInitial
 	 */
 	@Override
 	public void notifyStartup(StartupEvent event) {
-		super.initWithinDayEngine(numReplanningThreads);
-		super.createAndInitTravelTimeCollector();
-		super.createAndInitActivityReplanningMap();
-		super.createAndInitLinkReplanningMap();
 		
+		this.withinDayControlerListener.notifyStartup(event);
+				
 		// initialize the EvacuationTimeAnalyzer
 		evacuationTimeAnalyzer = new EvacuationTimeAnalyzer();
-		super.getEvents().addHandler(evacuationTimeAnalyzer);
+		event.getControler().getEvents().addHandler(evacuationTimeAnalyzer);
+		
+		this.initReplanners();
 	}
 	
 	@Override
 	public void notifyMobsimInitialized(MobsimInitializedEvent e) {		
-		initReplanners((QSim)e.getQueueSimulation());
 		
 		VehiclesFactory vehiclesFactory = VehicleUtils.getFactory();
 		VehicleType vehicleType = VehicleUtils.getDefaultVehicleType();
@@ -179,7 +174,7 @@ public class DemoController extends WithinDayController implements MobsimInitial
 		// Das könnte man so sehen.  Besprichst Du es mal mit den Autoren (Dominik & Gregor)?
 		// Aber: Ist die Rechnung denn richtig?  Müsste man nicht schauen, wie weit das Fahrzeug auf der Kante
 		// bereits ist?  Ansonsten ersetzt man einfach einen Fehler durch einen anderen, oder?  kai, nov'11
-		for (NetworkChangeEvent networkChangeEvent : ((NetworkImpl) this.getNetwork()).getNetworkChangeEvents()) {
+		for (NetworkChangeEvent networkChangeEvent : ((NetworkImpl) scenario.getNetwork()).getNetworkChangeEvents()) {
 			if(networkChangeEvent.getStartTime() == e.getSimulationTime()) {
 				for (Link link : networkChangeEvent.getLinks()) {
 
@@ -209,24 +204,27 @@ public class DemoController extends WithinDayController implements MobsimInitial
 	@Override
 	public void notifyIterationEnds(IterationEndsEvent event) {
 		log.info("Longest evacuation time: " + Time.writeTime(evacuationTimeAnalyzer.longestEvacuationTime));
-		log.info("Mean evacuation time: " + Time.writeTime(evacuationTimeAnalyzer.sumEvacuationTimes / scenarioData.getPopulation().getPersons().size()));
+		log.info("Mean evacuation time: " + Time.writeTime(evacuationTimeAnalyzer.sumEvacuationTimes / scenario.getPopulation().getPersons().size()));
 	}
-		
+	
 	public static void main(final String[] args) {
 		if ((args == null) || (args.length == 0)) {
 			System.out.println("No argument given!");
 			System.out.println("Usage: Controler config-file [dtd-file]");
 			System.out.println();
 		} else {		
-			final DemoController controller = new DemoController(new String[]{args[0]});
+			final Controler controler = new Controler(args[0]);
+			
+			DemoRunner demoController = new DemoRunner(controler);
+			controler.addControlerListener(demoController);
 			
 			// do not dump plans, network and facilities and the end
 //			controller.setDumpDataAtEnd(false);
 			
 			// overwrite old files
-			controller.setOverwriteFiles(true);
+			controler.setOverwriteFiles(true);
 
-			controller.run();
+			controler.run();
 		}
 		System.exit(0);
 	}
