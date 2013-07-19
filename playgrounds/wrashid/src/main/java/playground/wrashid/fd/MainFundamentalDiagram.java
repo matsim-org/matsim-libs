@@ -71,7 +71,7 @@ public class MainFundamentalDiagram {
 		HashMap<Id, double[]> densities = calculateDensities(links,
 				densityHandler, binSizeInSeconds);
 
-		printDensityAndOutFlow(densities, links, outflowHandler, doConsoleOutput,0);
+		printDensityAndOutFlow(densities, links, outflowHandler, doConsoleOutput,0,"");
 	}
 
 	public static HashMap<Id, double[]> calculateDensities(
@@ -102,7 +102,7 @@ public class MainFundamentalDiagram {
 
 	public static void printDensityAndOutFlow(HashMap<Id, double[]> density,
 			Map<Id, ? extends Link> links,
-			OutFlowInfoCollectorDualSim outflowHandler, boolean doConsoleOutput, int runId) { // print
+			OutFlowInfoCollectorDualSim outflowHandler, boolean doConsoleOutput, int runId, String caption) { // print
 
 		for (Id linkId : density.keySet()) {
 			int[] tempBin = outflowHandler.linkOutFlow.get(linkId);
@@ -125,7 +125,7 @@ public class MainFundamentalDiagram {
 
 			if (hasTraffic) {
 				GeneralLib.generateXYScatterPlot("c:/tmp/runId-" + runId +"-link-" + linkId
-						+ ".png", densityBins, outFlowBins, "outflow",
+						+ ".png", densityBins, outFlowBins, caption,
 						"density", "outflow");
 			}
 		}

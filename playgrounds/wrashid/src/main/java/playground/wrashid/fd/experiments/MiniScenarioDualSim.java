@@ -77,7 +77,7 @@ public class MiniScenarioDualSim {
 		
 		createNetwork(scenario);
 		createPopulation(scenario,100,0);
-		runSimulation(scenario,300,0);
+		runSimulation(scenario,300,0,"");
 	}
 	
 	public static void createNetwork(Scenario scenario) {
@@ -159,7 +159,7 @@ public class MiniScenarioDualSim {
 		log.info("Created " + scenario.getPopulation().getPersons().size() + " persons");
 	}
 	
-	public static void runSimulation(Scenario scenario,int binSizeInSeconds, int runId) {
+	public static void runSimulation(Scenario scenario,int binSizeInSeconds, int runId, String caption) {
 		
 		
 		EventsManager eventsManager = EventsUtils.createEventsManager();
@@ -215,6 +215,6 @@ public class MiniScenarioDualSim {
 		HashMap<Id, double[]> densities = MainFundamentalDiagram.calculateDensities(links,
 				densityHandler, binSizeInSeconds);
 
-		MainFundamentalDiagram.printDensityAndOutFlow(densities, links, outflowHandler,false,runId);
+		MainFundamentalDiagram.printDensityAndOutFlow(densities, links, outflowHandler,false,runId, caption);
 	}
 }
