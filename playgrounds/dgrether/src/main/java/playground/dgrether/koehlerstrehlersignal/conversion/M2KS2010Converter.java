@@ -22,12 +22,10 @@ package playground.dgrether.koehlerstrehlersignal.conversion;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.signalsystems.data.SignalsData;
@@ -44,7 +42,7 @@ import playground.dgrether.koehlerstrehlersignal.gexf.DgKSNetwork2Gexf;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdConverter;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdPool;
 import playground.dgrether.koehlerstrehlersignal.network.DgNetworkUtils;
-import playground.dgrether.utils.zones.DgZone;
+import playground.dgrether.utils.zones.DgZones;
 
 /**
  * Converts a MATSim Scenario to the traffic signal optimization model published in 
@@ -96,7 +94,7 @@ public class M2KS2010Converter {
 
 
 	public void convertAndWrite(String outputDirectory, String shapeFileDirectory, String filename, 
-			String name, String description, Map<DgZone, Link> zones2LinkMap, double startTimeSec, double endTimeSec) throws IOException{
+			String name, String description, DgZones zones, double startTimeSec, double endTimeSec) throws IOException{
 		//create koehler strehler network
 		DgIdPool idPool = new DgIdPool();
 		DgIdConverter idConverter = new DgIdConverter(idPool);
@@ -108,7 +106,7 @@ public class M2KS2010Converter {
 		DgKSNetwork2Gexf converter = new DgKSNetwork2Gexf();
 		converter.convertAndWrite(ksNet, outputDirectory + "network_small_simplified.gexf");
 		
-		M2KS2010Zones2Commodities demandConverter = new M2KS2010Zones2Commodities(zones2LinkMap, idConverter);
+		M2KS2010Zones2Commodities demandConverter = new M2KS2010Zones2Commodities(zones, idConverter);
 		DgCommodities commodities = demandConverter.convert(ksNet);
 
 		this.scaleCommodities(commodities);

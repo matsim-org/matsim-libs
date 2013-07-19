@@ -43,6 +43,7 @@ public class DgZone extends DgOriginImpl implements DgOrigin{
 	private Polygon polygon;
 	private Id id;
 	private Map<Id, DgZoneFromLink> fromLinks = new HashMap<Id, DgZoneFromLink>();
+	private Link zoneNetworkConnectionLink;
 	
 	public DgZone(Id id, Polygon p) {
 		this.id = id;
@@ -76,6 +77,16 @@ public class DgZone extends DgOriginImpl implements DgOrigin{
 			fromLinks.put(startLink.getId(), new DgZoneFromLink(startLink));
 		}
 		return fromLinks.get(startLink.getId());
+	}
+
+	
+	public Link getZoneNetworkConnectionLink() {
+		return zoneNetworkConnectionLink;
+	}
+
+	
+	public void setZoneNetworkConnectionLink(Link zoneNetworkConnectionLink) {
+		this.zoneNetworkConnectionLink = zoneNetworkConnectionLink;
 	}
 	
 }

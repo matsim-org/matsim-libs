@@ -20,9 +20,7 @@
 package playground.dgrether.utils.zones;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.geotools.feature.simple.SimpleFeatureBuilder;
@@ -67,22 +65,19 @@ public class DgZoneUtils {
 	}
 
 	
-	public static Map<DgZone, Link> createZoneCenter2LinkMapping(DgZones zones, NetworkImpl network){
-		Map<DgZone, Link> map = new HashMap<DgZone, Link>();
+	public static void createZoneCenter2LinkMapping(DgZones zones, NetworkImpl network){
 		for (DgZone zone : zones.values()){
 			Coord coord = MGC.coordinate2Coord(zone.getCoordinate());
 			Link link = network.getNearestLinkExactly(coord);
 			if (link == null) throw new IllegalStateException("No nearest link found");
-			map.put(zone, link);
+			zone.setZoneNetworkConnectionLink(link);
 		}
-		return map;
 	}
 
 
 	
 
-	public static void writeLinksOfZones2Shapefile(DgZones cells, Map<DgZone, Link> zones2LinkMap, 
-			CoordinateReferenceSystem crs, String shapeFilename){
+	public static void writeLinksOfZones2Shapefile(DgZones cells, 	CoordinateReferenceSystem crs, String shapeFilename){
 		List<SimpleFeature> featureCollection = new ArrayList<SimpleFeature>();
 		GeometryFactory geoFac = new GeometryFactory();
 		SimpleFeatureTypeBuilder linkFeatureTypeBuilder = new SimpleFeatureTypeBuilder();
@@ -106,7 +101,7 @@ public class DgZoneUtils {
 					featureId++;
 					featureCollection.add(linkFeature);
 				}
-				Link l = zones2LinkMap.get(zone);
+				Link l = zone.getZoneNetworkConnectionLink();
 				Coordinate startCoordinate = MGC.coord2Coordinate(l.getFromNode().getCoord());
 				Coordinate endCoordinate = MGC.coord2Coordinate(l.getToNode().getCoord());
 				Coordinate[] coordinates = {startCoordinate, endCoordinate};

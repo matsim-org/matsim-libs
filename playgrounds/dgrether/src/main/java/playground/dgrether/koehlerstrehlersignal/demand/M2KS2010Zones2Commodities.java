@@ -19,7 +19,6 @@
  * *********************************************************************** */
 package playground.dgrether.koehlerstrehlersignal.demand;
 
-import java.util.Map;
 import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
@@ -32,6 +31,7 @@ import playground.dgrether.koehlerstrehlersignal.data.DgKSNetwork;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdConverter;
 import playground.dgrether.utils.zones.DgZone;
 import playground.dgrether.utils.zones.DgZoneFromLink;
+import playground.dgrether.utils.zones.DgZones;
 
 
 /**
@@ -40,11 +40,11 @@ import playground.dgrether.utils.zones.DgZoneFromLink;
  */
 public class M2KS2010Zones2Commodities  {
 
-	private Map<DgZone, Link> zones2LinkMap;
+	private DgZones zones;
 	private DgIdConverter idConverter;
 
-	public M2KS2010Zones2Commodities(Map<DgZone, Link> zones2LinkMap, DgIdConverter idConverter) {
-		this.zones2LinkMap = zones2LinkMap;
+	public M2KS2010Zones2Commodities(DgZones zones, DgIdConverter idConverter) {
+		this.zones = zones;
 		this.idConverter = idConverter;
 	}
 
@@ -77,14 +77,14 @@ public class M2KS2010Zones2Commodities  {
 	
 	public DgCommodities convert(DgKSNetwork network) {
 		DgCommodities coms = new DgCommodities();
-		for (DgZone fromZone : this.zones2LinkMap.keySet()){
-			Link fromZoneLink = this.zones2LinkMap.get(fromZone);
+		for (DgZone fromZone : this.zones.values()){
+			Link fromZoneLink = fromZone.getZoneNetworkConnectionLink();
 			Id fromNodeId = this.idConverter.convertLinkId2ToCrossingNodeId(fromZoneLink.getId());
 			
 			//zone 2 zone
 			for (Entry<DgZone, Double> entry : fromZone.getDestinationZoneTrips().entrySet()){
 				Id id = this.idConverter.createFromZone2ToZoneId(fromZone.getId(), entry.getKey().getId());
-				Link toZoneLink = this.zones2LinkMap.get(entry.getKey());
+				Link toZoneLink = entry.getKey().getZoneNetworkConnectionLink();
 				Id toNodeId = this.idConverter.convertLinkId2FromCrossingNodeId(toZoneLink.getId());
 				this.addCommodity(coms, id, fromNodeId, toNodeId, entry.getValue(), network);
 			}
@@ -100,7 +100,7 @@ public class M2KS2010Zones2Commodities  {
 				//link 2 zone
 				for (Entry<DgZone, Double> entry : fromLink.getDestinationZoneTrips().entrySet()){
 					Id id = this.idConverter.createFrom2ToId(fromLink.getLink().getId(), entry.getKey().getId());
-					Link toZoneLink = this.zones2LinkMap.get(entry.getKey());
+					Link toZoneLink = entry.getKey().getZoneNetworkConnectionLink();
 					Id toNodeId = this.idConverter.convertLinkId2FromCrossingNodeId(toZoneLink.getId());
 					this.addCommodity(coms, id, fromNodeId2, toNodeId, entry.getValue(), network);
 				}

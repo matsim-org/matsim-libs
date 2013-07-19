@@ -20,16 +20,12 @@
 package playground.dgrether.koehlerstrehlersignal.run;
 
 import java.io.File;
-import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryLogging;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -39,10 +35,9 @@ import org.opengis.referencing.crs.CoordinateReferenceSystem;
 import playground.dgrether.DgPaths;
 import playground.dgrether.koehlerstrehlersignal.conversion.M2KS2010Converter;
 import playground.dgrether.koehlerstrehlersignal.demand.PopulationToOd;
+import playground.dgrether.koehlerstrehlersignal.demand.ZoneBuilder;
 import playground.dgrether.koehlerstrehlersignal.network.NetLanesSignalsShrinker;
 import playground.dgrether.signalsystems.cottbus.DgCottbusScenarioPaths;
-import playground.dgrether.utils.zones.DgZone;
-import playground.dgrether.utils.zones.DgZoneUtils;
 import playground.dgrether.utils.zones.DgZones;
 
 
@@ -76,7 +71,7 @@ public class Cottbus2KS2010 {
 		//TODO change to run1712 when finished
 //		String populationFilename = DgPaths.REPOS + "runs-svn/run1292/1292.output_plans_sample.xml";
 		String populationFilename = DgPaths.REPOS + "runs-svn/run1712/1712.output_plans.xml.gz";
-		String name = "run 1292 output plans between 05:30 and 09:30";
+		String name = "run run1712 output plans between 05:30 and 09:30";
 		CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84_UTM33N);
 		final String outputDirectory = DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-07-19_test_10/";
 		String ksModelOutputFilename = "ks2010_model_";
@@ -91,17 +86,19 @@ public class Cottbus2KS2010 {
 		NetLanesSignalsShrinker scenarioShrinker = new NetLanesSignalsShrinker(fullScenario,  crs);
 		scenarioShrinker.shrinkScenario(outputDirectory, shapeFileDirectory, boundingBoxOffset);
 		
+		//create the zones (that are currently not used) but serve as container for the OD pairs
+		ZoneBuilder zoneBuilder = new ZoneBuilder(crs);
+		DgZones zones = zoneBuilder.createAndWriteZones(scenarioShrinker.getShrinkedNetwork(), scenarioShrinker.getSignalsBoundingBox(),
+				cellsX, cellsY, shapeFileDirectory);
+		
 		// match population to the small network and convert to od 
 		PopulationToOd pop2od = new PopulationToOd();
 		pop2od.setMatsimPopSampleSize(matsimPopSampleSize);
 		pop2od.setOriginalToSimplifiedLinkMapping(scenarioShrinker.getOriginalToSimplifiedLinkIdMatching());
-		pop2od.matchPopulationToGrid(fullScenario.getNetwork(), fullScenario.getPopulation(), crs, scenarioShrinker.getShrinkedNetwork(), scenarioShrinker.getSignalsBoundingBox(), 
-				cellsX, cellsY, startTime, endTime, shapeFileDirectory);
-		DgZones zones = pop2od.getZones();
+		pop2od.convertPopulation2OdPairs(zones, fullScenario.getNetwork(), fullScenario.getPopulation(), crs, 
+				scenarioShrinker.getShrinkedNetwork(), scenarioShrinker.getSignalsBoundingBox(), 
+				startTime, endTime, shapeFileDirectory);
 		
-		//zones to links matching
-		Map<DgZone, Link> zones2LinkMap = DgZoneUtils.createZoneCenter2LinkMapping(zones, (NetworkImpl) scenarioShrinker.getShrinkedNetwork());
-		writeZones2Shape(shapeFileDirectory, zones, zones2LinkMap, scenarioShrinker.getShrinkedNetwork(), crs);
 		
 		//convert to KoehlerStrehler2010 file format
 		M2KS2010Converter converter = new M2KS2010Converter(scenarioShrinker.getShrinkedNetwork(), 
@@ -110,12 +107,11 @@ public class Cottbus2KS2010 {
 				matsimPopSampleSize, ksModelCommoditySampleSize, minCommodityFlow);
 		converter.setKsModelCommoditySampleSize(ksModelCommoditySampleSize);
 		converter.setMinCommodityFlow(minCommodityFlow);
-		converter.convertAndWrite(outputDirectory, shapeFileDirectory, ksModelOutputFilename , name, description, zones2LinkMap, startTime, endTime);
+		converter.convertAndWrite(outputDirectory, shapeFileDirectory, ksModelOutputFilename , name, description, zones, startTime, endTime);
 		
 		
 		printStatistics(cellsX, cellsY, boundingBoxOffset, startTime, endTime);
 		OutputDirectoryLogging.closeOutputDirLogging();		
-		System.exit(0);
 	}
 	
 	private static String createDescription(int cellsX, int cellsY, double startTime, double endTime, double boundingBoxOffset, double matsimPopSampleSize, 
@@ -126,10 +122,6 @@ public class Cottbus2KS2010 {
 		return description;
 	}
 
-	private static void writeZones2Shape(String shapeFileDirectory, DgZones zones, Map<DgZone, Link>  zones2LinkMap, Network network, CoordinateReferenceSystem crs){
-		DgZoneUtils.writeLinksOfZones2Shapefile(zones, zones2LinkMap, crs, shapeFileDirectory + "links_for_zones.shp");
-	}
-	
 	
 	private static void printStatistics(int cellsX, int cellsY,double boundingBoxOffset, double startTime, double endTime){
 		log.info("Number of Cells:");
