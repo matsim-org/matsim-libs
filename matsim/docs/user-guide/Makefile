@@ -1,9 +1,13 @@
-.PHONY: pdf bib clean veryclean tags wc
+.PHONY: pdf html bib clean veryclean tags wc
 
 NAME=user-guide
 
 pdf:
 	pdflatex ${NAME}
+
+html:
+	-mkdir html/
+	htlatex ${NAME} 'html,2' "" -dhtml/
 
 bib: clean
 	-pdflatex -interaction nonstopmode ${NAME}
@@ -12,10 +16,12 @@ bib: clean
 	-pdflatex -interaction nonstopmode ${NAME}
 
 clean:
-	-rm *.aux *.log
+	-rm *.aux *.log *.out *.toc *.4ct *.4tc *.dvi *.idv *.lg *.tmp *.xref *.html *.css
+	-rm chapters/*.aux
 
 veryclean:
-	-rm *.bbl *.blg
+	-rm *.bbl *.blg *.pdf
+	-rm -rf html
 
 tags:
 	-etags *.tex

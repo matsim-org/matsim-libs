@@ -1,0 +1,144 @@
+\NextFile{Applications.html}
+\chapter{Applications}
+
+TODO: Describe ARTEMIS and THELMA project here with figures and references.
+
+
+
+TODO: also add work of stella, zain, raffaela, marina, etc. here.
+
+\vfill\eject
+\section{Emissions}
+
+Modules for green house gas and other emissions coming soon here.
+
+\vfill\eject
+\section{Hints and Pitfalls}
+
+ParallelEventHandling
+
+Many of the modules for keeping track of charging and energy  consumption are based on event handlers. In order to avoid  raceconditions and accessing the same data unsynchronized (e.g. vehicle  trying to charge before the energy consumption is updated), we advise to  use the EventHandlerGroup class (or inherit from it, if needed). Using  this class, you can clearly control, which thing happens first, e.g.  energy consumption updated first and trying to charge happening  afterwards (also important for road charging). For an example, see the  InductiveChargingController.
+
+At the moment, the it does not seem to be a performance issue, to  group several modules together (forming effectivly one event handler).  But if there are concerns about this, a synchronized version could be  provided in future.
+
+\vfill\eject
+\section{Inductive Charging}
+
+Charging along Roads
+
+For Inductive charging along roads the InductiveStreetCharger Module  can be used, which is based on event handlers. An example controller,  which allows both stationary charging at activitiy locations and  charging at roads is calledInductiveChargingController. General  help regarding how to configure the controller, can be found in a test  of the controller and the documentation of the different modules, which  are used in that controller.
+
+(TODO: add links to the code/test cases)
+
+
+
+Stationary Inductive Charging
+
+This is currently not distinguished separatly from stationary charging with a plug, although it might be in future.
+
+\vfill\eject
+\section{Stationary Charging}
+
+For stationary charing, at the moment the following modules are available:
+
+ChargingUponArrival: Vehicles with a state of charge (SOC) smaller  than the "usable battery size" start charging immediatly opon arrival at  a location. TODO: descibe, how to filter the location, where vehicle  can be charged.
+
+\vfill\eject
+\section{Vehicle Energy Consumption Models}
+
+Each  vehicle in the vehicle has an Energy consumption model attached to it,  based on which vehicle energy consumption is logged for each street.  Furthermore for electric and plug-in hybrid electric vehicles (EV/PHEV),  this module also updates the state of charge (SOC) of the vehicles.
+
+A couple of models are available for use, of which many have been  contributed by the respective authors of the models. If you want to  contribute a new model, please drop an email to  waraich@ivt.baug.ethz.ch.
+
+Electric Vehicle
+
+
+
+PHEV
+
+Galus Model
+
+TODO: also show shape of curve!
+
+
+
+Conventional Vehicle
+
+(no model available at the moment)
+
+
+
+\vfill\eject
+\section{Visualizations}
+
+TODO: emissions map, charging acts, power load per link, etc.
+
+\vfill\eject
+\section{networkEditor}
+
+\subsubsection{Starting the network editor}
+
+If you're working with a release, make sure to have MATSim and the networkEditor extension \href{http://www.matsim.org/downloads}{downloaded}.
+\begin{itemize}
+	\item \textbf{If you use Eclipse to run MATSim}
+\\     Make  sure that you have MATSim correctly added to your project's build path.  Add the jar file for the networkEditor the same way to your project's  build path. Then, start the class 
+\texttt{org.matsim.contrib.networkEditor.run.NetworkEditor}.
+	\item \textbf{If you run MATSim on a shell / command line}
+\\      Make sure you have MATSim correctly downloaded and ready for use. Add  the networkEditor extension next to the MATSim jar file and the 
+\texttt{libs} directory. Then, use the following command to start the network editor:
+\\
+\texttt{java -Xmx512m -cp networkEditor/networkEditor.jar:matsim.jar $\backslash$
+\\      org.matsim.contrib.networkEditor.run.NetworkEditor}
+\\Note: On Windows, use 
+\texttt{;} instead of 
+\texttt{:} to separate the two jar files.
+\end{itemize}
+
+Depending on the size of the network you want to edit, make sure  the editor has enough memory by increasing the memory limit (e.g. "
+\texttt{-Xmx1500m}" instead of only "
+\texttt{-Xmx512m}").
+
+If the application correctly starts, you should see window similar to the one below:
+
+
+%\includegraphics{User%27s%20Guide_files/emptyNetworkEditor.png}
+
+\subsubsection{Loading network data}
+
+To load an existing MATSim network, click on the button "Read  Network" at the bottom of the window and select the network you want to  load.
+
+Alternatively, you can import data from OpenStreetMap (OSM) and  automatically convert it into a network. For this, first download the  osm data for the region you're interested in. The \href{http://www.matsim.org/docs/tutorials/8lessons/input/creating/network}{tutorial}  contains information on how you can download the required data from  OSM. Once you have a *.osm file containing the data for your region,  click on the button "Read OSM" and select the file. When loading the  data, the following window will open:
+
+
+%\includegraphics{User%27s%20Guide_files/crsNetworkEditor.png}
+
+The original data from OSM contains coordinates in the WGS 84  coordinate reference system. WGS 84 is impractical to work with in  MATSim, so we need to convert the coordinates into another coordinate  reference system (CRS). In the example above, we convert it to the Swiss  national coordinate reference system. To find the corresponding EPSG  codes, or the Well-Known-Text description of your CRS, have a look at \href{http://spatialreference.org/}{http://spatialreference.org/} and search for your CRS.
+
+Click OK to close the dialog once you have the correct CRS set. The  OSM data will now be converted and the network displayed afterwards in  the editor. Especially for larger osm files, have some patience for the  conversion process. It may take some while to convert the data and  finally show the network.
+
+\subsubsection{Editing network}
+
+Once a network is loaded, most of the tools in the upper left corner of the window become active:
+
+
+%\includegraphics{User%27s%20Guide_files/toolsNetworkEditor.png}
+
+The 4 green arrows are to move the network around in the editor view.  The blue + and – are for zooming in and out. In the row below, the  buttons have the following functionality:
+\begin{itemize}
+	\item undo / redo: revert and redo changes you did to the network
+	\item Selection: select a link or a node by clicking on them in the editor  view. click and drag to select multiple elements. If you have a single  link selected, you can change some of the link's attributes in the panel  on the lower left of the window.
+	\item move view: click and drag the network to move the network in the editor view
+	\item add link: click in a place to start a new link, click a second time  to end the link at that place. If the clicks are close to a node, the  link will start/end at that node, otherwise a new node will be created.
+	\item divide a link: select a link first, then use the scissors to cut the  link into two. A new node will be added at the location of the click,  and the original link will be splitted into two parts.
+	\item delete a link: select a link first, then click this button to delete  the selected link. If you clicked on the button by accident, use the  undo-button.
+\end{itemize}
+
+\subsubsection{Saving a network}
+
+To save a network in MATSim's format, click on the button "Save  Network". Alternatively, you can export the network as a Shape file that  can be used by allmost all GIS applications for visualization purposes  (but not necessarily for network operations that some GIS applications  offer). Just click on "Export as Shp" to export the network as a Shape  file.
+
+\subsubsection{Working with counts data}
+
+Once you have a network loaded, you can optionally also load some  existing counts for this network. If you just converted your network  from OSM data, you likely won't have any such file. In that case, you  can directly start to add counts where you want. Select a link by  clicking on it. If the link already has counts associated, they will be  displayed in the panel on the left side of the window. Click the + there  to add count values, even if no counts exist yet for this link.
+
+After you're done with the counts editing, save the counts to a file by clicking on "Save Counts".

@@ -1,0 +1,30 @@
+\NextFile{SystemRequirements.html}
+\chapter{System Requirements}
+
+\subsubsection{Software}
+
+MATSim runs on any machine that has the \href{http://java.sun.com/javase/downloads/index.jsp}{Java Platform, Standard Edition} (SE) 6 or newer installed (commonly referred to as "Java 6" or newer).
+
+\subsubsection{Hardware}
+
+Smaller  scenarios (e.g. the examples included in the tutorials, 5\%- or  10\%-samples of large scenarios) can be run on common desktop or laptop  computers.
+
+To simulate large scenarios (several hundreds of  thousands of agents, networks with ten-thousands of links and nodes),  high end computers with a large amount of memory (RAM) may be required  to keep the agents' data in memory. The description of agents' plans and  the simulation output can take several Gigabytes of hard disk space. To  store the data for several scenarios and / or output of simulation  runs, large amounts of disk space may thus be needed. MATSim can read  and write compressed files to reduce the amount of required disk space,  but this aspect still shouldn't be underestimated. MATSim can make use  of multiple CPUs or CPU cores that share common memory ("shared memory  machine") during the replanning-phase.
+
+Running large scenarios for  a high number of iterations can take several hours, up to a few days.  Thus it may be advisable to have a dedicated machine running MATSim if  you plan to simulate many different scenarios.
+
+\subsubsection{Recommendations}
+\begin{itemize}
+	\item To try MATSim out:
+\\Any modern laptop or desktop computer with 1GB RAM and 500MB free disk space should be suitable.
+	\item To run a large scenario (100 000+ agents, networks with 50 000+ links): 
+\\A high-end desktop computer with at least 4GB RAM and 200 GB free disk space.
+	\item To run many large scenarios, so they can be compared against each other: 
+\\Multiple high-end desktop computers or servers with at least 4GB RAM that share a common storage disk (at least 1TB).
+\end{itemize}
+
+The  high numbers for free disk space result from the fact that the  simulation writes quite a lot of data to the disk during a run. For  analysis, usually only the last version of the data is required, and  data from earlier iterations can be deleted, freeing space up again.
+
+\subsubsection{What we use}
+
+Currently,  we simulate most of our scenarios on machines with 8 or 16 GB RAM,  having 2 dual-core processors. The amount of memory allows us to run 2  scenarios at the same time on the machines. A\href{http://en.wikipedia.org/wiki/RAID}{RAID}  array is used as storage backend, offering about 4 TB of hard disk  space. This huge disk space is able to store the results of hundreds of  simulations and will suit us for the next few years. Computers and RAID  are regular components used in data centers, usually available at  moderate prices.

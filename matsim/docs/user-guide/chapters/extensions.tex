@@ -1,0 +1,67 @@
+\NextFile{UsingExtensions.html}
+\chapter{Using MATSim Extensions}
+
+\subsubsection{Introduction}
+
+The default MATSim releases contain all the functionality typically  used to model agent behavior and simulate traffic. But sometimes, this  just is not enough. The MATSim Extensions provide additional  functionality for specific tasks, and can be used along MATSim. \href{http://www.matsim.org/extensions}{MATSim Extensions}  gives an overview of the currently available extensions. Please note  that these extensions are usually provided and maintained by single  persons from the community, and thus long-term support may vary from the  default MATSim release.
+
+\subsubsection{Downloading Extensions}
+
+All extensions come as a compressed zip-file. You can either download  the last stable release of an extension to be used together with the  stable release of MATSim, or you can download a so-called "nightly  build"—an automatically created, but untested and probably unstable  version of the extension.
+\begin{itemize}
+	\item You can download the stable releases of extensions from \href{http://sourceforge.net/projects/matsim/files/MATSim/}{SourceForge}.
+	\item Likely unstable nightly builds can be downloaded from our \href{http://matsim.org/files/builds/}{nightly builds directory}.
+	\item Make sure to also download MATSim itself. The extensions cannot be used without MATSim.
+\end{itemize}
+
+\subsubsection{Using Extensions on the Command Line}
+
+Once you've downloaded an extension and MATSim, unzip the extension  and place the extension's directory inside the MATSim directory, next to  the 
+\texttt{libs} directory. The file/directory structure should look similar to the following example:
+\begin{verbatim}
+matsim/
++ MATSim.jar
++ libs/
+| + $<$lots of .jar files$>$
++ extension1/
+| + extension1.jar
++extension2/
+| + extension2.jar
+| + libs/       $<$-- not all extensions contain additional libs
+| | + $<$one or more .jar files$>$
+\end{verbatim}
+
+Then, start your simulation with the extension.jar-file on the classpath along the MATSim jar-file, e.g:
+\begin{verbatim}
+java -Xmx512m -cp MATSim.jar:extension1/extension1.jar:extension2/extension2.jar org.matsim.run.Controler myConfig.xml
+
+
+\end{verbatim}
+
+On Windows, use 
+\texttt{;} instead of 
+\texttt{:} to separate the different jar-files.
+
+\subsubsection{Using Extensions in Eclipse}
+
+Unzip the downloaded extension and place the extension's directory in  your eclipse project. Then, add the extension's jar-file to the 
+\texttt{Java Build Path} in Eclipse's 
+\texttt{Project Settings}.
+
+\subsubsection{Documentation about Specific Extensions}
+
+Extensions are developed and documented by their maintainers. Not all extensions are listed below; see the \href{http://www.matsim.org/extensions}{list of available} extensions for their description and documentation.
+
+
+
+\vfill\eject
+\input{chapters/extensions_gtfs}
+
+\vfill\eject
+\input{chapters/extensions_urbansim}
+
+\vfill\eject
+\input{chapters/extensions_otfvis}
+
+\vfill\eject
+\input{chapters/extensions_transEnergySim}

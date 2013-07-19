@@ -1,0 +1,30 @@
+\NextFile{Visualization.html}
+\chapter{Visualization and analysis}
+
+There are two visualizers available for MATSim. The original, open source visualizer is \href{http://matsim.org/docs/extensions/otfvis}{OTFVis},  which is a MATSim extension. It requires current OpenGL drivers. The  source code is available, so you can add your own information  visualization code. On the other hand, there is little support for it  from our part.
+
+Then there is via, a commercial visualizer developed by senozon. It  has more features, a better UI, and it is more stable. On the other  hand, it visualizes output files from simulation runs, whereas OTFVis  runs in the same VM as MATSim and can peek into the running simulation.
+
+The supported way of programming your own data anylsis or  visualization code is to analyze MATSim output in the form of Events,  either reading in the events.xml file, or writing an EventHandler and  receiving Events programmatically.
+
+\vfill\eject
+\section{Using senozon via}
+
+
+
+\href{http://senozon.com/products/via}{See here on the senozon website.}
+
+
+
+On the relation between senozon (commercial), senzon via (commercial), MATSim (open source) and MATSim OTFVis (open source):
+\begin{itemize}
+	\item Historically, MATSim is open source. An important reason  for this was that multiple teams contribute, and we wanted to make  progress rather than sorting out the intellectual property.
+	\item However, this community is unable to provide support for any and all  requests that may come up. As a result, the commercial company \href{http://www.senzon.com/}{senozon} was founded, which provides commercial support for such situations.
+	\item Senozon also helps significantly with the development and  maintenance of the MATSim core. The open source community and senozon  have a shared interest in a functional and robust MATSim core: Both our  academic research and the senozon commercial success depend on this.
+	\item In addition, senozon has developed the \href{http://senozon.com/products/via}{MATSim visualization and analysis software via}.  OTFVis remains available but maintenance is limited. In  particular, please understand that we are unable to provide support for  specific hardware configurations or specific query requests.
+\end{itemize}
+
+\vfill\eject
+\section{Events analysis}
+
+In  order to write MATSim events handlers, some amount of Java programming  is necessary. Material can thus found in the api-users section of  the documentation, see \href{http://www.matsim.org/node/17}{here}.
