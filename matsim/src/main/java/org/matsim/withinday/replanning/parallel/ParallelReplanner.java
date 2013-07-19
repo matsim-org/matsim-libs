@@ -100,6 +100,27 @@ public abstract class ParallelReplanner<T extends WithinDayReplannerFactory<? ex
 
 	public final void onPrepareSim() {
 		
+		/*
+		 * Moved this here from addWithinDayReplannerFactory(...).
+		 * By doing so, the Replanners are created after the mobsim has been initialized.
+		 * Moreover, the Replanners are now re-created from scratch for each iteration.
+		 * cdobler, jul'13
+		 */
+		for (T factory : this.replannerFactories) {
+			if (shareReplannerQueue) {
+				Queue<ReplanningTask> queue = new LinkedBlockingQueue<ReplanningTask>();
+				for (ReplanningRunnable replanningRunnable : this.replanningRunnables) {
+					WithinDayReplanner<? extends Identifier> newInstance = factory.createReplanner();
+					replanningRunnable.addWithinDayReplanner(newInstance, queue);
+				}
+			} else {
+				for (ReplanningRunnable replanningRunnable : this.replanningRunnables) {
+					WithinDayReplanner<? extends Identifier> newInstance = factory.createReplanner();
+					replanningRunnable.addWithinDayReplanner(newInstance, new LinkedList<ReplanningTask>());
+				}
+			}			
+		}
+		
 		Thread[] replanningThreads = new Thread[numOfThreads];
 		
 		// initialize threads
@@ -170,6 +191,15 @@ public abstract class ParallelReplanner<T extends WithinDayReplannerFactory<? ex
 		 */
 		for (ReplanningRunnable runnable : this.replanningRunnables) {
 			runnable.afterSim();
+			
+			/*
+			 * Remove replanners from the runnables - now they are re-created from scratch
+			 * for each iteration.
+			 * cdobler, jul'13
+			 */
+			for (T factory : this.replannerFactories) {
+				runnable.removeWithinDayReplanner(factory.getId());
+			}
 		}
 
 		/*
@@ -188,19 +218,6 @@ public abstract class ParallelReplanner<T extends WithinDayReplannerFactory<? ex
 	
 	public final void addWithinDayReplannerFactory(T factory) {
 		this.replannerFactories.add(factory);
-
-		if (shareReplannerQueue) {
-			Queue<ReplanningTask> queue = new LinkedBlockingQueue<ReplanningTask>();
-			for (ReplanningRunnable replanningRunnable : this.replanningRunnables) {
-				WithinDayReplanner<? extends Identifier> newInstance = factory.createReplanner();
-				replanningRunnable.addWithinDayReplanner(newInstance, queue);
-			}
-		} else {
-			for (ReplanningRunnable replanningRunnable : this.replanningRunnables) {
-				WithinDayReplanner<? extends Identifier> newInstance = factory.createReplanner();
-				replanningRunnable.addWithinDayReplanner(newInstance, new LinkedList<ReplanningTask>());
-			}
-		}
 	}
 
 	public final void removeWithinDayReplannerFactory(T factory) {
