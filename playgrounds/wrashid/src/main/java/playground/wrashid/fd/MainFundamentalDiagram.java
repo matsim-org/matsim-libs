@@ -19,7 +19,7 @@ import playground.wrashid.msimoni.analyses.LinkSelector;
 
 public class MainFundamentalDiagram {
 
-	static boolean doConsoleOutput = true;
+	
 
 	public static void main(String[] args) {
 		//String networkFile = "C:/data/workspace3/matsim/output/equil_jdeq/output_network.xml.gz";
@@ -35,7 +35,7 @@ public class MainFundamentalDiagram {
 		// "H:/data/experiments/TRBAug2011/runs/ktiRun24/output/output_network.xml.gz";
 		// String eventsFile =
 		// "H:/data/experiments/TRBAug2011/runs/ktiRun24/output/ITERS/it.50/50.events.xml.gz";
-
+		boolean doConsoleOutput = true;
 		Coord center = null; // center=null means use all links
 		int binSizeInSeconds = 20; // 5 minute bins
 		boolean isJDEQSim=true;
@@ -71,7 +71,7 @@ public class MainFundamentalDiagram {
 		HashMap<Id, double[]> densities = calculateDensities(links,
 				densityHandler, binSizeInSeconds);
 
-		printDensityAndOutFlow(densities, links, outflowHandler);
+		printDensityAndOutFlow(densities, links, outflowHandler, doConsoleOutput,0);
 	}
 
 	public static HashMap<Id, double[]> calculateDensities(
@@ -102,7 +102,7 @@ public class MainFundamentalDiagram {
 
 	public static void printDensityAndOutFlow(HashMap<Id, double[]> density,
 			Map<Id, ? extends Link> links,
-			OutFlowInfoCollectorDualSim outflowHandler) { // print
+			OutFlowInfoCollectorDualSim outflowHandler, boolean doConsoleOutput, int runId) { // print
 
 		for (Id linkId : density.keySet()) {
 			int[] tempBin = outflowHandler.linkOutFlow.get(linkId);
@@ -124,7 +124,7 @@ public class MainFundamentalDiagram {
 			}
 
 			if (hasTraffic) {
-				GeneralLib.generateXYScatterPlot("c:/tmp/links" + linkId
+				GeneralLib.generateXYScatterPlot("c:/tmp/runId-" + runId +"-link-" + linkId
 						+ ".png", densityBins, outFlowBins, "outflow",
 						"density", "outflow");
 			}

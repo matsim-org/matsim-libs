@@ -48,6 +48,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.ParallelEventsManagerImpl;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.Mobsim;
@@ -65,9 +66,6 @@ public class MiniScenarioDualSim {
 
 	private static final Logger log = Logger.getLogger(MiniScenarioDualSim.class);
 	
-	private int initialAgents = 100;
-	private int agentIncrementPerHour = 0;
-	
 	public static void main(String[] args) {
 		new MiniScenarioDualSim();
 	}
@@ -78,11 +76,11 @@ public class MiniScenarioDualSim {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
 		createNetwork(scenario);
-		createPopulation(scenario);
-		runSimulation(scenario);
+		createPopulation(scenario,100,0);
+		runSimulation(scenario,300,0);
 	}
 	
-	private void createNetwork(Scenario scenario) {
+	public static void createNetwork(Scenario scenario) {
 		
 		NetworkFactory factory = scenario.getNetwork().getFactory();
 		
@@ -124,7 +122,8 @@ public class MiniScenarioDualSim {
 		new NetworkWriter(scenario.getNetwork()).write("network.xml");
 	}
 	
-	private void createPopulation(Scenario scenario) {
+	
+	public static void createPopulation(Scenario scenario, int initialAgents,int agentIncrementPerHour) {
 		
 		PopulationFactory factory = scenario.getPopulation().getFactory();
 		
@@ -160,10 +159,12 @@ public class MiniScenarioDualSim {
 		log.info("Created " + scenario.getPopulation().getPersons().size() + " persons");
 	}
 	
-	private void runSimulation(Scenario scenario) {
+	public static void runSimulation(Scenario scenario,int binSizeInSeconds, int runId) {
 		
 		
 		EventsManager eventsManager = EventsUtils.createEventsManager();
+		//EventsManager eventsManager = new ParallelEventsManagerImpl(4);
+		eventsManager.initProcessing();
 		
 		EventWriterXML eventsWriter = new EventWriterXML(Controler.FILENAME_EVENTS_XML);
 		eventsManager.addHandler(eventsWriter);
@@ -178,7 +179,6 @@ public class MiniScenarioDualSim {
 		
 
 		boolean isJDEQSim=true;
-		int binSizeInSeconds = 300;	
 		DensityInfoCollectorDualSim densityHandler = new DensityInfoCollectorDualSim(
 				links, binSizeInSeconds,isJDEQSim);
 		OutFlowInfoCollectorDualSim outflowHandler = new OutFlowInfoCollectorDualSim(
@@ -209,12 +209,12 @@ public class MiniScenarioDualSim {
 		Mobsim sim = new QSimFactory().createMobsim(scenario, eventsManager);
 		sim.run();
 		*/
-		
+		eventsManager.finishProcessing();
 		eventsWriter.closeFile();
 		
 		HashMap<Id, double[]> densities = MainFundamentalDiagram.calculateDensities(links,
 				densityHandler, binSizeInSeconds);
 
-		MainFundamentalDiagram.printDensityAndOutFlow(densities, links, outflowHandler);
+		MainFundamentalDiagram.printDensityAndOutFlow(densities, links, outflowHandler,false,runId);
 	}
 }
