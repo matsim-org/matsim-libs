@@ -40,7 +40,6 @@ import org.matsim.core.scoring.ScoringFunctionAccumulator.ArbitraryEventScoring;
 
 import playground.thibautd.utils.MapUtils;
 import playground.thibautd.utils.MapUtils.Factory;
-import playground.thibautd.utils.MapUtils.DefaultFactory;
 
 /**
  * @author thibautd
@@ -51,7 +50,12 @@ public class BeingTogetherScoring implements ArbitraryEventScoring {
 	private final Set<Id> alters;
 
 	private final Factory<IntervalsAtLocation> locatedIntervalsFactory =
-		new DefaultFactory<IntervalsAtLocation>( IntervalsAtLocation.class );
+		new Factory<IntervalsAtLocation>() {
+			@Override
+			public IntervalsAtLocation create() {
+				return new IntervalsAtLocation();
+			}
+		};
 	private final IntervalsAtLocation intervalsForEgo = new IntervalsAtLocation();
 	private final Map<Id, IntervalsAtLocation> intervalsPerAlter = new HashMap<Id, IntervalsAtLocation>();
 
@@ -96,8 +100,6 @@ public class BeingTogetherScoring implements ArbitraryEventScoring {
 			final List<Interval> egoIntervals,
 			final List<Interval> alterIntervals) {
 		double sum = 0;
-		// If needed, can be made more efficient, taking into account that
-		// the intervals are in proper temporal sequence.
 		for ( Interval ego : egoIntervals ) {
 			for ( Interval alter : alterIntervals ) {
 				sum += measureOverlap( ego , alter );
@@ -131,7 +133,7 @@ public class BeingTogetherScoring implements ArbitraryEventScoring {
 	}
 
 	private void enterVehicle(final PersonEntersVehicleEvent event) {
-		if ( event.getPersonId().equals( ego ) || alters.contains( event.getPersonId() ) ) return;
+		if ( !isRelevant( event.getPersonId() ) ) return;
 		final IntervalsAtLocation intervals =
 			event.getPersonId().equals( ego ) ?
 			intervalsForEgo :
@@ -145,7 +147,7 @@ public class BeingTogetherScoring implements ArbitraryEventScoring {
 	}
 
 	private void leaveVehicle(final PersonLeavesVehicleEvent event) {
-		if ( event.getPersonId().equals( ego ) || alters.contains( event.getPersonId() ) ) return;
+		if ( !isRelevant( event.getPersonId() ) ) return;
 		final IntervalsAtLocation intervals =
 			event.getPersonId().equals( ego ) ?
 			intervalsForEgo :
@@ -159,7 +161,7 @@ public class BeingTogetherScoring implements ArbitraryEventScoring {
 	}
 
 	private void startAct(final ActivityStartEvent event) {
-		if ( event.getPersonId().equals( ego ) || alters.contains( event.getPersonId() ) ) return;
+		if ( !isRelevant( event.getPersonId() ) ) return;
 		final IntervalsAtLocation intervals =
 			event.getPersonId().equals( ego ) ?
 			intervalsForEgo :
@@ -167,13 +169,13 @@ public class BeingTogetherScoring implements ArbitraryEventScoring {
 					event.getPersonId(),
 					intervalsPerAlter,
 					locatedIntervalsFactory);
-		intervals.endInterval(
+		intervals.startInterval(
 				new Location( event.getLinkId() , event.getFacilityId() , event.getActType() ),
 				event.getTime() );		
 	}
 
 	private void endAct(final ActivityEndEvent event) {
-		if ( event.getPersonId().equals( ego ) || alters.contains( event.getPersonId() ) ) return;
+		if ( !isRelevant( event.getPersonId() ) ) return;
 		final IntervalsAtLocation intervals =
 			event.getPersonId().equals( ego ) ?
 			intervalsForEgo :
@@ -186,9 +188,21 @@ public class BeingTogetherScoring implements ArbitraryEventScoring {
 				event.getTime() );	
 	}
 
+	private boolean isRelevant(final Id personId) {
+		return ego.equals( personId ) || alters.contains( personId );
+	}
+
+	// /////////////////////////////////////////////////////////////////////////
+	// classes
+	// /////////////////////////////////////////////////////////////////////////
 	private static class IntervalsAtLocation {
 		private final Factory<WrappedAroundIntervalSequence> seqFactory =
-			new DefaultFactory<WrappedAroundIntervalSequence>( WrappedAroundIntervalSequence.class );
+			new Factory<WrappedAroundIntervalSequence>() {
+				@Override
+				public WrappedAroundIntervalSequence create() {
+					return new WrappedAroundIntervalSequence();
+				}
+			};
 		private final Map<Location, WrappedAroundIntervalSequence> map =
 			new HashMap<Location,WrappedAroundIntervalSequence>();
 
@@ -288,17 +302,54 @@ public class BeingTogetherScoring implements ArbitraryEventScoring {
 				assert Double.isNaN( last.end );
 				final Interval wrap = new Interval();
 				wrap.start = last.start;
-				wrap.end = first.start + 24 * 3600;
+				wrap.end = first.end + 24 * 3600;
 				if ( wrap.start > wrap.end ) throw new RuntimeException( "scenario seems more than 24h: start wraparound at "+wrap.start+" and end at "+wrap.end );
 				seq.add( wrap );
 			}
-			return seq;
+			// XXX probably a better way
+			return fitIn24Hours( seq );
+		}
+
+		private static List<Interval> fitIn24Hours(final List<Interval> seq) {
+			final List<Interval> newList = new ArrayList<Interval>();
+
+			for ( Interval old : seq ) {
+				newList.addAll( splitIn24Hours( old ) );
+			}
+
+			return newList;
+		}
+
+		private static Collection<Interval> splitIn24Hours(final Interval old) {
+			if ( old.start >= 0 && old.end <= 24 * 3600 ) return Collections.singleton( old );
+
+			if ( old.start < 0 ) throw new IllegalArgumentException( ""+old.start );
+			if ( old.end > 2 * 24 * 3600 ) throw new IllegalArgumentException( ""+old.start );
+
+			if ( old.start > 24 * 3600 ) {
+				final Interval newi = new Interval();
+				newi.start = old.start - 24 * 3600;
+				newi.end = old.end - 24 * 3600;
+				return Collections.singleton( newi );
+			}
+
+			final List<Interval> split = new ArrayList<Interval>();
+			split.add( new Interval( old.start , 24 * 3600 ) );
+			split.add( new Interval( 0 , old.end - 24 * 3600 ) );
+
+			return split;
 		}
 	}
 
 	private static class Interval {
 		private double start = Double.NaN;
 		private double end = Double.NaN;
+
+		public Interval() {}
+		public Interval(final double start, final double end) {
+			this.start = start;
+			this.end = end;
+		}
 	}
 }
 
