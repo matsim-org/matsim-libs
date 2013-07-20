@@ -19,10 +19,12 @@
 
 package playground.michalm.vrp.data.network.shortestpath;
 
+import java.util.*;
+
 import org.matsim.api.core.v01.Id;
 
-import pl.poznan.put.vrp.dynamic.data.network.VertexTimePair;
-import pl.poznan.put.vrp.dynamic.data.online.VehicleTracker;
+import pl.poznan.put.vrp.dynamic.data.network.Vertex;
+import pl.poznan.put.vrp.dynamic.data.online.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.DriveTask;
 import playground.michalm.dynamic.DynLeg;
 import playground.michalm.vrp.data.network.*;
@@ -57,11 +59,13 @@ public class ShortestPathDynLeg
     }
 
 
-    public void initOnlineVehicleTracker(DriveTask driveTask, MatsimVrpGraph graph)
+    public void initOnlineVehicleTracker(DriveTask driveTask, MatsimVrpGraph graph,
+            VehicleTrackerListener listener)
     {
         if (onlineVehicleTracker == null) {
-            onlineVehicleTracker = new OnlineVehicleTracker(graph);
+            onlineVehicleTracker = new OnlineVehicleTracker(driveTask, graph);
             driveTask.setVehicleTracker(onlineVehicleTracker);
+            onlineVehicleTracker.addListener(listener);
         }
     }
 
@@ -109,6 +113,7 @@ public class ShortestPathDynLeg
     private class OnlineVehicleTracker
         implements VehicleTracker
     {
+        private final DriveTask driveTask;
         private final MatsimVrpGraph vrpGraph;
 
         private int expectedLinkTravelTime = 0;// fromLink travel time == 0
@@ -116,23 +121,42 @@ public class ShortestPathDynLeg
         private int timeAtLatestNode = -1;// has not been reached yet
         private int delayAtLatestNode = 0;// ditto
 
+        private List<VehicleTrackerListener> listeners = new ArrayList<VehicleTrackerListener>();
 
-        public OnlineVehicleTracker(MatsimVrpGraph vrpGraph)
+
+        public OnlineVehicleTracker(DriveTask driveTask, MatsimVrpGraph vrpGraph)
         {
+            this.driveTask = driveTask;
             this.vrpGraph = vrpGraph;
+        }
+
+
+        private int getAccLinkTravelTimes(int linkIdx)
+        {
+            return (linkIdx == -1) ? 0 : shortestPath.accLinkTravelTimes[linkIdx];
         }
 
 
         private void movedOverNode(int time)
         {
-            int expectedTimeEnRoute = (currentLinkIdx == 0) ? 0
-                    : shortestPath.accLinkTravelTimes[currentLinkIdx - 1];
+            int expectedTimeEnRoute = getAccLinkTravelTimes(currentLinkIdx - 1);
             int actualTimeEnRoute = timeAtLatestNode - beginTime;
 
             expectedLinkTravelTime = shortestPath.accLinkTravelTimes[currentLinkIdx]
                     - expectedTimeEnRoute;
             timeAtLatestNode = time;
             delayAtLatestNode = actualTimeEnRoute - expectedTimeEnRoute;
+
+            for (VehicleTrackerListener l : listeners) {
+                l.notifyNextPositionReached(this);
+            }
+        }
+
+
+        @Override
+        public DriveTask getDriveTask()
+        {
+            return driveTask;
         }
 
 
@@ -152,18 +176,56 @@ public class ShortestPathDynLeg
 
 
         @Override
-        public VertexTimePair getLastPosition()
+        public Vertex getLastPosition()
         {
-            return new VertexTimePair(vrpGraph.getVertex(getCurrentLinkId()), timeAtLatestNode);
+            return vrpGraph.getVertex(getCurrentLinkId());
         }
 
 
         @Override
-        public VertexTimePair predictNextPosition(int currentTime)
+        public int getLastPositionTime()
+        {
+            return timeAtLatestNode;
+        }
+
+
+        @Override
+        public Vertex predictNextPosition(int currentTime)
+        {
+            return vrpGraph.getVertex(getNextLinkId());
+        }
+
+
+        @Override
+        public int predictNextPositionTime(int currentTime)
         {
             int predictedTimeAtNextNode = timeAtLatestNode
                     + Math.max(currentTime - timeAtLatestNode, expectedLinkTravelTime);
-            return new VertexTimePair(vrpGraph.getVertex(getNextLinkId()), predictedTimeAtNextNode);
+            return predictedTimeAtNextNode;
+        }
+
+
+        @Override
+        public int predictEndTime(int currentTime)
+        {
+            int predictedTimeFromNextNode = shortestPath.accLinkTravelTimes[destinationLinkIdx]
+                    - getAccLinkTravelTimes(currentLinkIdx);
+
+            return predictNextPositionTime(currentTime) + predictedTimeFromNextNode;
+        }
+
+
+        @Override
+        public void addListener(VehicleTrackerListener listener)
+        {
+            listeners.add(listener);
+        }
+
+
+        @Override
+        public void removeListener(VehicleTrackerListener listener)
+        {
+            listeners.remove(listener);
         }
     }
 }

@@ -55,6 +55,12 @@ public class TaxiSimEngine
     }
 
 
+    /*package*/TaxiOptimizer getOptimizer()
+    {
+        return optimizer;
+    }
+
+
     /*package*/InternalInterface getInternalInterface()
     {
         return internalInterface;

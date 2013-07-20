@@ -26,6 +26,7 @@ import org.matsim.core.mobsim.framework.*;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 
 import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
+import pl.poznan.put.vrp.dynamic.data.online.VehicleTrackerListener;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.schedule.TaxiDriveTask;
@@ -244,7 +245,8 @@ public class TaxiAgentLogic
         };
 
         if (onlineVehicleTracker) {
-            taxiLeg.initOnlineVehicleTracker(driveTask, graph);
+            taxiLeg.initOnlineVehicleTracker(driveTask, graph,
+                    (VehicleTrackerListener)taxiSimEngine.getOptimizer());//a bit ugly casting!
         }
 
         return taxiLeg;
@@ -256,7 +258,8 @@ public class TaxiAgentLogic
         TaxiLeg taxiLeg = new TaxiLeg(driveTask);
 
         if (onlineVehicleTracker) {
-            taxiLeg.initOnlineVehicleTracker(driveTask, graph);
+            taxiLeg.initOnlineVehicleTracker(driveTask, graph,
+                    (VehicleTrackerListener)taxiSimEngine.getOptimizer());//a bit ugly casting!
         }
 
         return taxiLeg;
