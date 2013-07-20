@@ -43,6 +43,7 @@ import playground.thibautd.socnetsim.population.JointPlanFactory;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.replanning.modules.AbstractMultithreadedGenericStrategyModule;
 import playground.thibautd.socnetsim.replanning.modules.JointPlanMergingModule;
+import playground.thibautd.socnetsim.replanning.modules.MutateActivityLocationsToLocationsOfOthersModule;
 import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanAlgorithm.PlanLinkIdentifier;
 import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanModule;
 import playground.thibautd.socnetsim.replanning.modules.SynchronizeCoTravelerPlansModule;
@@ -430,6 +431,28 @@ public class GroupPlanStrategyFactory {
 					registry.getScenario().getConfig(),
 					registry.getJointPlans().getFactory(),
 					registry.getPlanLinkIdentifier()));
+
+		return strategy;
+	}
+
+	public static GroupPlanStrategy createActivityInGroupLocationChoice(
+			final String type,
+			final ControllerRegistry registry) {
+		final GroupPlanStrategy strategy =
+				createRandomSelectingStrategy(
+					registry.getIncompatiblePlansIdentifierFactory());
+
+		strategy.addStrategyModule(
+				new MutateActivityLocationsToLocationsOfOthersModule(
+					registry.getScenario().getConfig().global().getNumberOfThreads(),
+					registry.getScenario().getPopulation(),
+					type ) );
+
+		strategy.addStrategyModule(
+				createReRouteModule(
+					registry.getScenario().getConfig(),
+					registry.getPlanRoutingAlgorithmFactory(),
+					registry.getTripRouterFactory() ) );
 
 		return strategy;
 	}
