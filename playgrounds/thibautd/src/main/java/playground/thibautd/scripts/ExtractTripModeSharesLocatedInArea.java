@@ -106,11 +106,12 @@ public class ExtractTripModeSharesLocatedInArea {
 			final String outFile ) throws IOException {
 		final Counter counter = new Counter( outFile+": line # " );
 		final BufferedWriter writer = IOUtils.getBufferedWriter( outFile );
-		writer.write( "mode"+SEP+"xOrig"+SEP+"yOrig"+SEP+"xDest"+SEP+"yDest" );
+		writer.write( "mode"+SEP+"origType"+SEP+"destType"+SEP+"xOrig"+SEP+"yOrig"+SEP+"xDest"+SEP+"yDest" );
 		for ( TripInfo info : tripInfos ) {
 			counter.incCounter();
 			writer.newLine();
 			writer.write( info.mode + SEP +
+					info.origType + SEP + info.destType +SEP+
 					info.origin.getX() + SEP + info.origin.getY() +SEP+
 					info.destination.getX() + SEP + info.destination.getY() );
 		}
@@ -226,7 +227,9 @@ public class ExtractTripModeSharesLocatedInArea {
 								new TripInfo(
 									MODE_IDENTIFIER.identifyMainMode( trip.getTripElements() ),
 									trip.getOriginActivity().getCoord(),
-									trip.getDestinationActivity().getCoord() ) );
+									trip.getDestinationActivity().getCoord(),
+									trip.getOriginActivity().getType(),
+									trip.getDestinationActivity().getType()) );
 						}
 					}
 				});
@@ -238,14 +241,19 @@ public class ExtractTripModeSharesLocatedInArea {
 	private static class TripInfo {
 		public final String mode;
 		public final Coord origin, destination;
+		public final String origType, destType;
 
 		public TripInfo(
 				final String mode,
 				final Coord origin,
-				final Coord destination) {
+				final Coord destination,
+				final String origType,
+				final String destType) {
 			this.mode = mode;
 			this.origin = origin;
 			this.destination = destination;
+			this.origType = origType;
+			this.destType = destType;
 		}
 	}
 }
