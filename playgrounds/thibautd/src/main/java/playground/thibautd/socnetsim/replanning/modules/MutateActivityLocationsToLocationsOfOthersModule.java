@@ -29,6 +29,7 @@ import playground.thibautd.socnetsim.replanning.modules.MutateActivityLocationsT
 /**
  * @author thibautd
  */
+@Deprecated
 public class MutateActivityLocationsToLocationsOfOthersModule extends AbstractMultithreadedGenericStrategyModule<GroupPlans> {
 	private final ChoiceSet choiceSet;
 

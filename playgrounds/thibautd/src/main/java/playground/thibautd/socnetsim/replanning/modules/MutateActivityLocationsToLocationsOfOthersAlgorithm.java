@@ -46,7 +46,9 @@ import playground.thibautd.utils.ObjectPool;
 
 /**
  * @author thibautd
+ * @deprecated quick and dirty for experiments. Not a long-term solution.
  */
+@Deprecated
 public class MutateActivityLocationsToLocationsOfOthersAlgorithm implements GenericPlanAlgorithm<GroupPlans> {
 	private final Random random;
 	private final ChoiceSet choiceSet;
@@ -57,8 +59,6 @@ public class MutateActivityLocationsToLocationsOfOthersAlgorithm implements Gene
 		this.random = random;
 		this.choiceSet = choiceSet;
 	}
-
-
 
 	@Override
 	public void run(final GroupPlans plans) {
