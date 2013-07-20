@@ -254,6 +254,55 @@ public class BeingTogetherScoringTest {
 
 	}
 
+	@Test
+	public void testOvelapsOfLegs() throws Exception {
+		final Id ego = new IdImpl( "ego" );
+		final Id alter = new IdImpl( "alter" );
+		
+		final Id vehId = new IdImpl( 1 );
+		
+		final EventsFactory fact = EventsUtils.createEventsManager().getFactory();
+		for ( OverlapSpec os : new OverlapSpec[]{
+				new OverlapSpec( 0 , 10 , 20 , 30 ),
+				new OverlapSpec( 0 , 10 , 10 , 30 ),
+				new OverlapSpec( 0 , 20 , 10 , 30 ),
+				new OverlapSpec( 10 , 20 , 10 , 30 ),
+				new OverlapSpec( 20 , 30 , 10 , 30 ),
+				new OverlapSpec( 30 , 50 , 10 , 30 ) }) {
+			final BeingTogetherScoring testee =
+				new BeingTogetherScoring(
+						1,
+						ego,
+						Collections.singleton( alter ) );
+			testee.handleEvent(
+					fact.createPersonEntersVehicleEvent(
+						os.startEgo,
+						ego,
+						vehId ) );
+			testee.handleEvent(
+					fact.createPersonEntersVehicleEvent(
+						os.startAlter,
+						alter,
+						vehId ) );
+			testee.handleEvent(
+					fact.createPersonLeavesVehicleEvent(
+						os.endEgo,
+						ego,
+						vehId ) );
+			testee.handleEvent(
+					fact.createPersonLeavesVehicleEvent(
+						os.endAlter,
+						alter,
+						vehId) );
+
+			Assert.assertEquals(
+					"unexpected overlap for "+os,
+					Math.max( Math.min( os.endAlter , os.endEgo ) - Math.max( os.startAlter , os.startEgo ) , 0 ),
+					testee.getScore(),
+					MatsimTestUtils.EPSILON);
+		}
+	}
+
 	private static class OverlapSpec {
 		public double startEgo, startAlter, endEgo, endAlter;
 
