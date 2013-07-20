@@ -34,11 +34,11 @@ For  some operations, MATSim must know about the coordinate system your data  is
 \subsubsection{Specifying the Coordinate System used}
 
 You can specify the coordinate system in the config-file:
-\begin{verbatim}
-$<$module name="global"$>$
-  $<$param name="coordinateSystem" value="CH1903LV1903" /$>$
-$<$/module$>$
-\end{verbatim}
+\begin{lstlisting}{language=XML}
+<module name="global">
+  <param name="coordinateSystem" value="CH1903LV1903" />
+</module>
+\end{lstlisting}
 
 The value specified for the coordinateSystem parameter can be:
 \begin{itemize}
