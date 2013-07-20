@@ -324,17 +324,22 @@ public class BeingTogetherScoring implements ArbitraryEventScoring {
 		}
 
 		private static Collection<Interval> splitIn24Hours(final Interval old) {
-			if ( old.start >= 0 && old.end <= 24 * 3600 ) return Collections.singleton( old );
-
 			if ( old.start < 0 ) throw new IllegalArgumentException( ""+old.start );
-			if ( old.end > 2 * 24 * 3600 ) throw new IllegalArgumentException( ""+old.start );
+			if ( old.start > old.end ) throw new IllegalArgumentException( old.start+" > "+old.end );
 
-			if ( old.start > 24 * 3600 ) {
-				final Interval newi = new Interval();
-				newi.start = old.start - 24 * 3600;
-				newi.end = old.end - 24 * 3600;
-				return Collections.singleton( newi );
+			final Interval newInterval = new Interval( old.start , old.end );
+			if ( newInterval.start > 24 * 3600 ) {
+				int c = 0;
+				// shift start in day
+				while ( newInterval.start > 24 * 3600 ) {
+					newInterval.start -= 24 * 3600;
+					c++;
+				}
+				// shift end by same amount
+				newInterval.end = old.end - c * 24d * 3600;
 			}
+
+			if ( newInterval.end < 24 * 3600 ) return Collections.singleton( newInterval );
 
 			final List<Interval> split = new ArrayList<Interval>();
 			split.add( new Interval( old.start , 24 * 3600 ) );

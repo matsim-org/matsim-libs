@@ -147,6 +147,59 @@ public class BeingTogetherScoringTest {
 	}
 
 	@Test
+	public void testWrapAroundAfter24h() throws Exception {
+		final Id ego = new IdImpl( "ego" );
+		final Id alter = new IdImpl( "alter" );
+		
+		final Id linkId = new IdImpl( 1 );
+		final String type = "type";
+
+		final EventsFactory fact = EventsUtils.createEventsManager().getFactory();
+
+		final BeingTogetherScoring testee =
+			new BeingTogetherScoring(
+					1,
+					ego,
+					Collections.singleton( alter ) );
+
+		testee.handleEvent(
+				fact.createActivityEndEvent(
+					10,
+					ego,
+					linkId,
+					null,
+					type) );
+		testee.handleEvent(
+				fact.createActivityStartEvent(
+					10,
+					ego,
+					linkId,
+					null,
+					type) );
+
+		testee.handleEvent(
+				fact.createActivityEndEvent(
+					26 * 3600,
+					alter,
+					linkId,
+					null,
+					type) );
+		testee.handleEvent(
+				fact.createActivityStartEvent(
+					26 * 3600,
+					alter,
+					linkId,
+					null,
+					type) );
+
+		Assert.assertEquals(
+				"unexpected overlap",
+				24 * 3600,
+				testee.getScore(),
+				MatsimTestUtils.EPSILON);
+	}
+
+	@Test
 	public void testNoOverlapIfDifferentActTypes() throws Exception {
 		final Id ego = new IdImpl( "ego" );
 		final Id alter = new IdImpl( "alter" );
