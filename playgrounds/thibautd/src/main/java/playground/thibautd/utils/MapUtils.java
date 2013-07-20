@@ -84,5 +84,40 @@ public class MapUtils {
 
 		return coll;
 	}
+
+	public static <K,T> T getArbitraryObject(
+			final K key,
+			final Map<K, T> map,
+			final Factory<T> fact) {
+		T coll = map.get( key );
+
+		if ( coll == null ) {
+			coll = fact.create();
+			map.put( key , coll );
+		}
+
+		return coll;
+	}
+
+	public static interface Factory<T> {
+		public T create();
+	}
+
+	public static class DefaultFactory<T> implements Factory<T> {
+		private final Class<? extends T> theClass;
+
+		public DefaultFactory( final Class<? extends T> theClass ) {
+			this.theClass = theClass;
+		}
+
+		@Override
+		public T create() {
+			try {
+				return theClass.getConstructor().newInstance();
+			} catch (Exception e) {
+				throw new RuntimeException( e );
+			}
+		}
+	}
 }
 
