@@ -20,17 +20,18 @@
 package playground.thibautd.socnetsim.run;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.experimental.ReflectiveModule;
 import org.matsim.core.controler.OutputDirectoryLogging;
@@ -55,6 +56,7 @@ import playground.thibautd.socnetsim.controller.ControllerRegistryBuilder;
 import playground.thibautd.socnetsim.controller.ImmutableJointController;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlans;
+import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.socnetsim.replanning.DefaultPlanLinkIdentifier;
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
 import playground.thibautd.socnetsim.replanning.GenericStrategyModule;
@@ -66,8 +68,8 @@ import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifierFi
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.modules.AbstractMultithreadedGenericStrategyModule;
 import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanAlgorithm.PlanLinkIdentifier;
-import playground.thibautd.socnetsim.replanning.selectors.LowestScoreSumSelectorForRemoval;
 import playground.thibautd.socnetsim.replanning.selectors.EmptyIncompatiblePlansIdentifierFactory;
+import playground.thibautd.socnetsim.replanning.selectors.LowestScoreSumSelectorForRemoval;
 import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
 import playground.thibautd.socnetsim.router.JointTripRouterFactory;
 import playground.thibautd.socnetsim.run.WeightsConfigGroup.Synchro;
@@ -189,7 +191,9 @@ public class RunCliquesWithHardCodedStrategies {
 												JointActingTypes.PICK_UP,
 												JointActingTypes.DROP_OFF) ),
 								(KtiLikeScoringConfigGroup) config.getModule( KtiLikeScoringConfigGroup.GROUP_NAME ),
+								scoringFunctionConf.getMarginalUtilityOfBeingTogether_s(),
 								config.planCalcScore(),
+								toSocialNetwork( cliques ),
 								scenario) :
 							// if null, default will be used
 							// XXX not nice...
@@ -286,6 +290,19 @@ public class RunCliquesWithHardCodedStrategies {
 		controller.run();
 	}
 
+	private static SocialNetwork toSocialNetwork(
+			final FixedGroupsIdentifier cliques) {
+		final SocialNetwork socNet = new SocialNetwork();
+		for ( Collection<? extends Id> clique : cliques.getGroupInfo() ) {
+			for ( Id id1 : clique ) {
+				for ( Id id2 : clique ) {
+					socNet.addMonodirectionalTie( id1 , id2 );
+				}
+			}
+		}
+		return socNet;
+	}
+
 	private static PlanLinkIdentifier linkIdentifier(final Synchro synchro) {
 		switch ( synchro ) {
 			case all:
@@ -329,6 +346,7 @@ public class RunCliquesWithHardCodedStrategies {
 class ScoringFunctionConfigGroup extends ReflectiveModule {
 	public static final String GROUP_NAME = "scoringFunction";
 	private boolean useKtiScoring = false;
+	private double marginalUtilityOfBeingTogether_h = 0;
 
 	public ScoringFunctionConfigGroup() {
 		super( GROUP_NAME );
@@ -343,6 +361,22 @@ class ScoringFunctionConfigGroup extends ReflectiveModule {
 	public boolean isUseKtiScoring() {
 		return useKtiScoring;
 	}
+
+	@StringGetter( "marginalUtilityOfBeingTogether_s" )
+	public double getMarginalUtilityOfBeingTogether_h() {
+		return this.marginalUtilityOfBeingTogether_h;
+	}
+
+	public double getMarginalUtilityOfBeingTogether_s() {
+		return this.marginalUtilityOfBeingTogether_h / 3600;
+	}
+
+	@StringSetter( "marginalUtilityOfBeingTogether_s" )
+	public void setMarginalUtilityOfBeingTogether_h(
+			double marginalUtilityOfBeingTogether_h) {
+		this.marginalUtilityOfBeingTogether_h = marginalUtilityOfBeingTogether_h;
+	}
+
 }
 
 class KtiInputFilesConfigGroup extends ReflectiveModule {
