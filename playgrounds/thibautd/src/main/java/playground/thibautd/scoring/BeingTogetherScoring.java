@@ -303,8 +303,11 @@ public class BeingTogetherScoring implements ArbitraryEventScoring {
 				final Interval wrap = new Interval();
 				wrap.start = last.start;
 				wrap.end = first.end + 24 * 3600;
-				if ( wrap.start > wrap.end ) throw new RuntimeException( "scenario seems more than 24h: start wraparound at "+wrap.start+" and end at "+wrap.end );
-				seq.add( wrap );
+				if ( wrap.start <= wrap.end ) {
+					// if time inconsistent, just do not add an interval
+					// (the agent is "less than not here")
+					seq.add( wrap );
+				}
 			}
 			// XXX probably a better way
 			return fitIn24Hours( seq );
