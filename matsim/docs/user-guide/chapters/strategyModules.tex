@@ -3,14 +3,14 @@
 
 
 These are modules that can be used via the syntax
-\begin{verbatim}
-	$<$module name="strategy" $>$
-		$<$param name="ModuleProbability_1" value="0.1" /$>$
-		$<$param name="Module_1" value="ChangeLegMode" /$>$
-                $<$param name="ModuleProbability_2" value="0.1" /$>$
-                $<$param name="Module_2" value="TimeAllocationMutator" /$>$
-	$<$/module$>$
-\end{verbatim}
+\begin{lstlisting}{language=XML}
+<module name="strategy" >
+	<param name="ModuleProbability_1" value="0.1" />
+	<param name="Module_1" value="ChangeLegMode" />
+        <param name="ModuleProbability_2" value="0.1" />
+        <param name="Module_2" value="TimeAllocationMutator" />
+</module>
+\end{lstlisting}
 
 
 Strategy modules are numbered. Also, each  module is given a weight which determines the probability by which the  course of action represented by the module is taken. In this example,  each person stands a chance of 1/2 that their transport mode is changed,  and a chance of 1/2 that their time allocation is changed. (The  weights are renormalized so that they add up to one.)
@@ -177,17 +177,17 @@ M. Rieser, D. Grether, K. Nagel;\textbf{Adding mode choice to a multi-agent tran
 
 \subsection{LocationChoice. Status: ready}
 
-\subsubsection{\textbf{Maintenance and Questions}}
+\subsubsection{{Maintenance and Questions}}
 
 A. Horni, IVT (horni\_at\_IVT.baug.ethz.ch)
 
-\subsubsection{\textbf{Javadoc}}
+\subsubsection{{Javadoc}}
 
 \href{http://www.matsim.org/javadoc/org/matsim/locationchoice/package-summary.html}{www.matsim.org/javadoc/org/matsim/locationchoice/package-summary.html}
 
 
 
-%%\subsubsection{\textbf{\textbf{Config Parameters\hypertarget{parameters}{}}}}
+%%\subsubsection{{\textbf{Config Parameters\hypertarget{parameters}{}}}}
 \subsubsection{Config Parameters}
 
 
@@ -195,11 +195,11 @@ A. Horni, IVT (horni\_at\_IVT.baug.ethz.ch)
 
 
 
-\subsubsection{\textbf{Status}}
+\subsubsection{{Status}}
 
 Ready
 
-\subsubsection{\textbf{In Brief}}
+\subsubsection{{In Brief}}
 
 MATSim provides destination choice based on three  different basic concepts. First, random search can be applied. Second,  local search implemented in the time geography framework is available  [1]. Third, the most recent module ist best response and includes random  error terms to make MATSim fully compatible with discrete choice theory  [2]. The authors recommend to use this recent module in general. Random  search should be utilized for algorithmic comparative investigations  only.
 
@@ -211,7 +211,7 @@ Estimation of a MATSim destination choice utility function for Switzerland is in
 
 
 
-\subsubsection{\textbf{Calling the Location Choice Strategy}}
+\subsubsection{{Calling the Location Choice Strategy}}
 
 The strategy module in the config file needs to be extended as follows:
 \begin{verbatim}
@@ -224,12 +224,12 @@ $<$/module$>$
 \end{verbatim}
 
 
-\subsubsection{\textbf{I. Random Search}}
+\subsubsection{{I. Random Search}}
 
 Due to slow convergence, this approach is only useful for very small scenarios.
 
 
-\subsubsection{\textbf{II. Local Search With Time Geography}}
+\subsubsection{{II. Local Search With Time Geography}}
 
 The MATSim local search destination choice module is  based on Hägerstrand's time geography. That is, in every replanning step  locations are chosen within the region restrained by travel time  budgets as defined by the time allocation module (see \hyperlink{Figure1}{Figure 1} and \hyperlink{Figure2}{Figure 2}). Within this region the choice is performed based on the MATSim utility function.
 
@@ -238,7 +238,7 @@ In more detail, the following procedure is  iteratively applied. An approximate 
 The parameters \emph{recursionTravelSpeed}, \emph{recursionTravelSpeedChange}and \emph{maxRecursions }are explained in Section \hyperlink{parameters}{Parameters}
 
 
-\subsubsection{\textbf{III. Best Response Including Random Error Terms}}
+\subsubsection{{III. Best Response Including Random Error Terms}}
 
 The parameters \emph{scaleEpsShopping }and \emph{scaleEpsLeisure }correspond to f$_Shopping$ and f$_Leisure$ in [2]. \emph{probChoiceSetSize }is $\Phi$, epsilonDistribution, \emph{tt\_}\emph{approximationLevel}, \emph{maxDistanceEpsilon}, and \emph{probChoiceExponent }are explained in in Section \hyperlink{parameters}{Parameters}.
 
@@ -246,7 +246,7 @@ The parameters \emph{scaleEpsShopping }and \emph{scaleEpsLeisure }can be calibra
 
 NOTE: This  variant will NOT work as described in Ref. [2] when configuring it as  described above. Additionally, the scoring function needs to be  modified. As of now, there does not seem to be a way to achieve  this without some Java programming. kai, jan'13
 
-\subsubsection{\textbf{Spatial Competition: Facility Load Penalty Computation}}
+\subsubsection{{Spatial Competition: Facility Load Penalty Computation}}
 
 Similar to route and time choice being influenced by  the competition in transport infrastructure it can be expected that  competition in activities infrastructure has an effect on destination  choice. Consequently, the utility of performing an activity is dependend  on the actual load of the activities infrastructure at least for some  activities such as e.g., grocery shopping (e.g.; searching for a parking  space or waiting time at cash points etc.). In MATSim spatial  competition is taken into account, which has shown to reduce the number  of implausibly overcrowded locations (see \hyperlink{Figure3}{Figure 3} below).
 
@@ -263,7 +263,7 @@ fcrf = restraintFcnFactor * [(facility load) / (facility capacity)]^{restraintFc
 The parameters \emph{restraintFcnFactor}and \emph{restraintFcnExp }are explained in the section \hyperlink{parameters}{Parameters}
 
 
-\subsubsection{\textbf{Literature}}
+\subsubsection{{Literature}}
 
 [1] Horni, A., D.M. Scott, M. Balmer and K.W. Axhausen (2009)  Location choice modeling for shopping and leisure activities with  MATSim: Combining micro-simulation and time geography, \emph{Transportation Research Record}, \textbf{2135}, 87-95.
 

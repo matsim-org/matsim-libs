@@ -1,15 +1,20 @@
 \NextFile{ScoringFunction.html}
 \chapter{The MATSim default scoring function (= utility function)}
 
-Optimally, you have gotten your scenario with a ``useful'' set of so-called innovative modules enabled.  
-%
-Then it becomes important to understand the workings of the so-called MATSim default scoring function.
+\centerline{\hfill Author(s): Kai Nagel}
 
-Yet even if you are considering to expand the number of innovative modules that you enable, it is important to understand the concept of the scoring function since otherwise MATSim will not produce plausible results.
+\bigskip
 
-This section contains information that pertains to the so-called "Charypar-Nagel scoring function".
+%%Optimally, you have gotten your scenario with a ``useful'' set of so-called innovative modules enabled.  
+%%%
+%%Then it becomes important to understand the workings of the so-called MATSim default scoring function.
 
-\vfill\eject
+%%Yet even if you are considering to expand the number of innovative modules that you enable, it is important to understand the concept of the scoring function since otherwise MATSim will not produce plausible results.
+
+% some intro missing, but the above text is not very meaningful.  kai, jul'13
+
+This section contains information that pertains to the so-called ``Charypar-Nagel scoring function''.
+
 \section{Calibration of the scoring function}
 
 \subsection{Quickstart by kn}
@@ -45,13 +50,13 @@ E.g.\ if your logit model says something like $... -6/h \cdot tt_{car} - 7/h \cd
 
 If you do not have a mode choice logit model, set all $\beta_{tt,mode} \equiv$ \verb$travelingXxx$ values to zero (i.e.\ same as car).
 
-\item Use the alternative-specific constants $C_{mode} \equiv$ \verb$constantXxx$ to calibrate your modal split.
-
-(This is, however, not completely simple: One needs to run iterations and look at their end, and especially for modes with small shares one needs to have innovation switched off early enough near the end of the iterations.)
-
 \item Set the distance cost rates \verb$monetaryDistanceCostRateXxx$ to plausible values if you have them.
 
 For the time being, this needs to be negative (which is not entirely plausible but it is the way it is).
+
+\item Use the alternative-specific constants $C_{mode} \equiv$ \verb$constantXxx$ to calibrate your modal split.
+
+(This is, however, not completely simple: One needs to run iterations and look at their end, and especially for modes with small shares one needs to have innovation switched off early enough near the end of the iterations.)
 
 \end{enumerate}
 
@@ -72,86 +77,116 @@ Calibrating schedule-based pt currently goes beyond what can be provided here; r
 
 \subsection{Some explanation: Simplified version}
 
-The simplified version assumes that all activities operate near their typical duration. In this case (see \href{http://matsim.org/node/651}{here}),  one can approximate the marginal utility of activity duration (i.e. the  marginal utility if the sum of all activities is extended by that  amount of time) by beta\_perf .
+The simplified version assumes that all activities operate near their typical duration. In this case (see \href{http://matsim.org/node/651}{here}),  one can approximate the marginal utility of activity duration (i.e. the  marginal utility if the sum of all activities is extended by that  amount of time) by $\beta_{perf}$.
 
 Now let us consider the typical changes (of the Vickrey  scenario). Note that in the Vickrey scenario, the meaning of the  marginal utility of arriving earlier means the marginal contribution  assuming that the travel time remains the same. We will assume  that activities are ended by the endtime attribute, not by the duration  attribute.
 
-\textbf{Travel takes longer}\textbf{ (by amount deltaTtime)}
+\subsubsection{Travel takes longer (by amount $\Delta t$)}
 
-In this situation, the activity that follows the trip is cut short by  deltaTtime. We thus have the following (linearized) modifications  of the utility:
+In this situation, the activity that follows the trip is cut short by  $\Delta t$. We thus have the following (linearized) modifications  of the utility:
 \begin{itemize}
-	\item Travel takes longer by deltaTtime; the utility change is  beta\_travel * deltaTtime . Note that beta\_travel typically is  negative.
-	\item The following activity is shortened by deltaTtime; the (linearized)  utility change is - beta\_perf * deltaTtime . beta\_perf is  typically positive, so the contribution is negative.
-\end{itemize}
 
+\item Travel takes longer by $\Delta t$; the utility change is  $\beta_{tt} \cdot \Delta t$. Note that $\beta_{tt}$ typically is  negative.
+
+\item The following activity is shortened by $\Delta t$; the (linearized)  utility change is $- \beta_{perf} \cdot \Delta t$.  $\beta_{perf}$ is  typically positive, so the contribution is negative.
+
+\end{itemize}
 Overall: The (linearized) utility change caused by longer travel is
-\begin{verbatim}
-( - beta_perf + beta_travel ) * deltaTtime
+\[
+( - \beta_{perf} + \beta_{tt} ) * \Delta t \ .
+\]
 
-\end{verbatim}
 
-\textbf{Traveller increases arriving early (by amount deltaEtime)}
+\subsubsection{Traveller increases arriving early (by amount $\Delta t$)}
 
-In that situation, the traveller will "do nothing" between the  arrival and the opening time of the activity. That is, the amount  of time that the traveller is doing nothing is now increased by  deltaEtime. Consistent with the meaning of the Vickrey parameter  "marginal utility of arriving early", we assume that the travel time is  the same compared to the later arrival. This means that the preceeding  activity was cut shorter by deltaTtime. We thus have the following  (linearized) modifications of the utility:
+In this situation, the traveller will ``do nothing'' between the  arrival and the opening time of the activity. That is, the amount  of time that the traveller is doing nothing is now increased by  $\Delta t$. Consistent with the meaning of the Vickrey parameter  ``marginal utility of arriving early'', we assume that the travel time is  the same compared to the later arrival. This means that the preceeding  activity was cut shorter by $\Delta t$. We thus have the following  (linearized) modifications of the utility:
 \begin{itemize}
-	\item The preceeding activity is shortened by deltaTtime; the  (linearized) utility change is - beta\_perf * deltaEtime .  beta\_perf is typically positive, so the contribution is negative.
+
+\item The preceeding activity is shortened by $\Delta t$; the
+(linearized) utility change is $- \beta_{perf} \cdot \Delta t$.
+	$\beta_{perf}$ is typically positive, so the contribution is
+	negative.
+
 \end{itemize}
-
 There are no other contributions, since the time between the  arrival and the opening time prodices neither positive nor negative  utility contributions. Overall: The (linearized) utility change  caused by arriving early is
-\begin{verbatim}
-( - beta_perf ) * deltaEtime
+\[
+- \beta_{perf} \cdot \Delta t \ .
+\]
+That is, as long as there are no  additional utilities or disutilities of waiting, the marginal utility of  performing can be approximated by the marginal utility of schedule  delay early.
 
-\end{verbatim}That is, as long as there are no  additional utilities or disutilities of waiting, the marginal utility of  performing can be approximated by the marginal utility of schedule  delay early.
-
-\textbf{Traveller increases arriving late (by amount deltaLtime)}
+\subsubsection{Traveller increases arriving late (by amount $\Delta t$)}
 
 In this situation, we have the following (linearized) modifications of the utility:
 \begin{itemize}
-	\item The preceeding activity is extended by deltaLtime; the  (linearized) utility change is beta\_perf * deltaLtime . beta\_perf  is typically positive, so the contribution is positive.
-	\item The following activity is shortened by deltaLtime; the (linearized)  utility change is - beta\_perf * deltaLtime . beta\_perf is  typically positive, so the contribution is negative (and exactly cancels  the previous contribution).
-	\item Arriving late is increased by deltaLtime; the (exact) utility change  is beta\_late * deltaLtime . beta\_late is typically negative, so  the contribution is negative.
+
+\item The preceeding activity is extended by $\Delta t$; the
+(linearized) utility change is $\beta_{perf} \cdot \Delta
+t$. $\beta_{perf}$ is typically positive, so the contribution is
+positive.
+
+\item The following activity is shortened by deltaLtime; the (linearized)  utility change is $- \beta_{perf} \cdot \Delta t$. $\beta_{perf}$ is  typically positive, so the contribution is negative (and exactly cancels  the previous contribution).
+
+\item Arriving late is increased by deltaLtime; the (exact) utility change  is $\beta_{late} \cdot \Delta t$. $\beta_{late}$ is typically negative, so  the contribution is negative.
+
 \end{itemize}
 
 Overall: The (linearized) utility change caused by increasing the amount of arriving late is
-\begin{verbatim}
-beta_late * deltaLtime
+\[
+\beta_{late} \cdot \Delta t \ .
+\]
 
-\end{verbatim}
 
-\textbf{Overall}
+% this is already said above (in quickstart)
+%%\subsubsection{Overall}
 
-Overall, calibration of the Charypar-Nagel scoring function is best done as follows:
+%%Overall, calibration of the Charypar-Nagel scoring function is best done as follows:
+%%\begin{itemize}
+%%	\item \textbf{Run a survey and estimate logit models that include  penalties for travelling (by mode), schedule delay early, and schedule  delay late.}
+%%	\item \textbf{The marginal utility of schedule delay early from the logit  model, multiplied by minus one, results in the MATSim beta\_perf.}  Since the marginal utility of schedule delay early is typically  negative, beta\_perf is thus typically positive. This is the  marginal opportunity cost of time. A useful interpretation is that  this is the difference between "leisure" and "doing nothing".
+%%	\item \textbf{The marginal utility of travelling from the logit model, \emph{plus beta\_perf,} results in the MATSim beta\_trav (by mode).} That is, the MATSim beta\_trav is an \emph{additional utility offset}  when compared to doing nothing. Since driving can well be seen as  more positive than doing nothing (e.g. because of making phone calls,  listening to music, enjoying to drive), the MATSim beta\_trav can well be  positive.
+%%\\   (Note that this has still nothing to do with "positive values of  travel time", e.g. by Susan Handy. Those positive values imply  that the additional utility offset over-compensates the marginal  opportunity cost of time. In other words, "time spent driving  home" is (to an extent) seen more positive than "being at home".)
+%%	\item \textbf{The marginal utility of being late from the logit model results in the MATSim beta\_late.}
+%%	\item Note that you also need reasonable values for opening time, latest  arrival time, and closing time, in order to achieve that the schedule  delay cost mechanics works in MATSim. This is quite clear if you  think about it; nevertheless, it has been forgotten uncountable times  (in particular in studies that start from trips, not from full daily  plans).
+%%\end{itemize}
+
+\subsubsection{Without schedule delay}
+
+If you intend to run MATSim without time adaptation  (TimeAllocationMutator), these things are not that critical. In  that situation, you just need to make sure that $\beta_{perf} + \beta_{tt}$  matches your marginal utility of travel time savings. An easy  way in our view is:
 \begin{itemize}
-	\item \textbf{Run a survey and estimate logit models that include  penalties for travelling (by mode), schedule delay early, and schedule  delay late.}
-	\item \textbf{The marginal utility of schedule delay early from the logit  model, multiplied by minus one, results in the MATSim beta\_perf.}  Since the marginal utility of schedule delay early is typically  negative, beta\_perf is thus typically positive. This is the  marginal opportunity cost of time. A useful interpretation is that  this is the difference between "leisure" and "doing nothing".
-	\item \textbf{The marginal utility of travelling from the logit model, \emph{plus beta\_perf,} results in the MATSim beta\_trav (by mode).} That is, the MATSim beta\_trav is an \emph{additional utility offset}  when compared to doing nothing. Since driving can well be seen as  more positive than doing nothing (e.g. because of making phone calls,  listening to music, enjoying to drive), the MATSim beta\_trav can well be  positive.
-\\   (Note that this has still nothing to do with "positive values of  travel time", e.g. by Susan Handy. Those positive values imply  that the additional utility offset over-compensates the marginal  opportunity cost of time. In other words, "time spent driving  home" is (to an extent) seen more positive than "being at home".)
-	\item \textbf{The marginal utility of being late from the logit model results in the MATSim beta\_late.}
-	\item Note that you also need reasonable values for opening time, latest  arrival time, and closing time, in order to achieve that the schedule  delay cost mechanics works in MATSim. This is quite clear if you  think about it; nevertheless, it has been forgotten uncountable times  (in particular in studies that start from trips, not from full daily  plans).
+
+\item Set $\beta_{tt,car}$ to zero (i.e.\ assume that driving
+	is as good or bad as doing nothing).  
+
+\item Set $\beta_{perf}$ to
+	the estimated marginal utility of travel time savings (make
+	sure you get the sign right; $\beta_{perf}$ should be
+	positive).  \item Set (say) $\beta_{tt,pt}$ to your estimated
+	marginal utility of travel time savings (should be
+	positive) \emph{minus} the MATSim $\beta_{perf}$. The result may
+	be positive (implying that spending time using the mode is
+	better than doing nothing) or negative (implying that spending
+	time using the mode is worse than doing nothing).
 \end{itemize}
-
-\textbf{Without schedule delay}
-
-If you intend to run MATSim without time adaptation  (TimeAllocationMutator), these things are not that critical. In  that situation, you just need to make sure that - beta\_perf + beta\_trav  matches your marginal utility of travel time differences. An easy  way in our view is:
-\begin{itemize}
-	\item Set beta\_car to zero (i.e. assume that driving is as good or bad as doing nothing).
-	\item Set beta\_perf to the estimated marginal utility of travel time  savings (make sure you get the sign right; beta\_perf should be  positive).
-	\item Set (say) beta\_pt to your estimated marginal utility of travel time savings (should be positive) \emph{minus}  the MATSim beta\_perf. The result may be positive (implying that  spending time using the mode is better than doing nothing) or negative  (implying that spending time using the mode is worse than doing  nothing).
-\end{itemize}
-
-Note that even without time adaptation, beta\_late may still have  an influence if you have set the latest arrival times for some  activities.
+Note that even without time adaptation, $\beta_{late}$ may still have an influence if you have set the latest arrival times for some  activities.
 
 \subsubsection{Full version}
 
-"Full version" would imply that we could calibrate the MATSim  parameters also for situations where the actual activity durations are  far from their "typical" values. This could happen for two reaons:
+``Full version'' would imply that we could calibrate the MATSim  parameters also for situations where the actual activity durations are  far from their ``typical'' values. This could happen for two reaons:
 \begin{itemize}
-	\item There are too many activities that need to be squeezed into a  day. A possible interpretation would be that beta\_perf corresponds  to the marginal utility of additional leisure time on, say, sundays,  but the weekday activites cannot be shifted to sundays.
-	\item There are too many activities that need to be squeezed into certain  time periods, say between day care opening and closing, or into typical  business hours.
+
+\item There are too many activities that need to be squeezed into a  day. A possible interpretation would be that $\beta_{perf}$ corresponds  to the marginal utility of additional leisure time on, say, sundays,  but the weekday activites cannot be shifted to sundays.
+
+\item There are too many activities that need to be squeezed
+into certain time periods, say between day care opening and closing,
+or into typical business hours.
+
 \end{itemize}
+Both of these interpretations make sense (in my view) and should be
+investigated for MATSim. Presumably, there is already general
+research; it would then be necessary to bring that research and the
+MATSim formulation together.
 
-Both of these interpretations make sense (in my view) and should  be investigated for MATSim. Presumably, there is already general  research; it would then be necessary to bring that research and the  MATSim formulation together.
 
-\vfill\eject
 \section{Default values for the Charypar-Nagel scoring function}
 
 As explained \href{http://matsim.org/node/650}{here},  the MATSim scoring function has, under some circumstances (actual  durations near "typical" durations"), some similarity to the Vickrey  scenario.
@@ -170,7 +205,6 @@ As a next step, an infrastructure to compare MATSim simulations with  real world
 
 
 
-\vfill\eject
 \section{Interpretation of the logarithmic "utility of performing"}
 
 The  so-called "Charypar-Nagel scoring function" is used in many  MATSim  studies. It is called that way because there is an ancient paper   where this scoring function was introduced.
@@ -294,3 +328,12 @@ beta = U'(x=t_x) = - 2 a t_x + prio, i.e. a = (prio - beta)/2t_x
 
 
 There is other work (e.g. by Joh) that should be looked at.
+
+% Local Variables:
+% mode: latex
+% mode: reftex
+% mode: visual-line
+% TeX-master: "../user-guide.tex"
+% comment-padding: 1
+% fill-column: 9999
+% End: 
