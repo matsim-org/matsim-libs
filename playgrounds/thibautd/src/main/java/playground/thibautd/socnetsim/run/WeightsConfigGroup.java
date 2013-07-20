@@ -40,6 +40,8 @@ public class WeightsConfigGroup extends ReflectiveModule {
 	private boolean considerVehicleIncompatibilities = true;
 	private double initialTimeMutationTemperature = 24;
 	private boolean useLimitedVehicles = true;
+	private String locationChoiceActivityType = "leisure";
+	private double locationChoice = -1;
 
 	public static enum Synchro {
 		dynamic, none, all;
@@ -230,4 +232,25 @@ public class WeightsConfigGroup extends ReflectiveModule {
 	public void setUseLimitedVehicles( final boolean useLimitedVehicles ) {
 		this.useLimitedVehicles = useLimitedVehicles;
 	}
+
+	@StringGetter( "locationChoiceActivity" )
+	public String getLocationChoiceActivityType() {
+		return this.locationChoiceActivityType;
+	}
+
+	@StringSetter( "locationChoiceActivity" )
+	public void setLocationChoiceActivityType(String locationChoiceActivityType) {
+		this.locationChoiceActivityType = locationChoiceActivityType;
+	}
+
+	@StringGetter( "locationChoice" )
+	public double getLocationChoiceWeight() {
+		return this.locationChoice;
+	}
+
+	@StringSetter( "locationChoice" )
+	public void setLocationChoice(final double locationChoice) {
+		this.locationChoice = locationChoice;
+	}
+
 }

@@ -143,6 +143,13 @@ public class RunUtils {
 					controllerRegistry ),
 				weights.getRecomposeJointPlansRandomlyWeight(),
 				weights.getDisableInnovationAfterIter());
+		strategyRegistry.addStrategy(
+				GroupPlanStrategyFactory.createActivityInGroupLocationChoice(
+					weights.getLocationChoiceActivityType(),
+					controllerRegistry ),
+				weights.getLocationChoiceWeight(),
+				weights.getDisableInnovationAfterIter());
+
 	}
 
 	public static void loadDefaultAnalysis(
