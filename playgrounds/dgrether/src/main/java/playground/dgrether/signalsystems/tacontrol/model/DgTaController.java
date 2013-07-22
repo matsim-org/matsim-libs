@@ -33,9 +33,39 @@ public class DgTaController  extends DgAbstractSignalController implements Signa
 	@Override
 	public void updateState(double timeSeconds) {
 		
-		this.getNumberOfExpectedVehicles(timeSeconds);
+		
+		// for all approaches
+		this.calculatePriorityIndex(timeSeconds);
+		
 	}
 
+	
+	private void calculatePriorityIndex(double timeSeconds) {
+		this.getNumberOfExpectedVehicles(timeSeconds);
+		
+	}
+
+	/**
+	 * 
+	 * @return \hat{n_i} (t)
+	 */
+	private int getNumberOfVehiclesForClearance(){
+		
+		return 0;
+	}
+	
+	
+	/**
+	 * Zeitreihe der erwarteten Ankuenfte an der Haltelinie
+	 * 
+	 * N_i^{exp}(t + \hat(g)_i))
+	 * 
+	 */
+	private int getNumberOfExpectedVehicles(double timeSeconds){
+		return 0;
+	}
+	
+	
 	@Override
 	public void reset(Integer iterationNumber) {
 	}
@@ -45,11 +75,5 @@ public class DgTaController  extends DgAbstractSignalController implements Signa
 	}
 	
 	
-	/**
-	 * Zeitreihe der erwarteten Ankuenfte an der Haltelinie
-	 */
-	private int getNumberOfExpectedVehicles(double timeSeconds){
-		return 0;
-	}
 
 }

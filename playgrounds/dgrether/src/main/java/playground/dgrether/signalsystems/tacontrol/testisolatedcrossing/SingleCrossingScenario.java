@@ -15,7 +15,6 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -39,9 +38,9 @@ import playground.dgrether.DgPaths;
 /**
  * @author dgrether
  */
-public class IsolatedCrossingMain {
+public class SingleCrossingScenario {
 	
-	private static final Logger log = Logger.getLogger(IsolatedCrossingMain.class);
+	private static final Logger log = Logger.getLogger(SingleCrossingScenario.class);
 	
 	private final double tCycleSec = 120.0;
 	private final double tDesired = 120.0;
@@ -49,7 +48,7 @@ public class IsolatedCrossingMain {
 	private final double tau0 = 5.0;
 	private final double maxFlowWEPerHour = 1440.0;
 	private final double maxFlowNSPerHour = 180.0;
-	private final double lambdaMax = 0.1;
+	
 	private final double runtimeSeconds = 7200.0;
 	private final double startTimeSeconds = 0.0;
 	private final double endTimeSeconds = startTimeSeconds + runtimeSeconds;
@@ -123,18 +122,15 @@ public class IsolatedCrossingMain {
 
 	
 	
-	public void run(){
+	public Scenario createScenario(double lambdaWestEast){
 		Config config = this.createConfig();
-		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Scenario scenario = ScenarioUtils.createScenario(config);
 		this.createIds(scenario);
-		for (double lambdaWestEast = 0.0; lambdaWestEast <= lambdaMax; lambdaWestEast += 0.1){
-			
-		}
-		double lambdaWestEast = 0.5;
+		
 		this.createPopulation(scenario, lambdaWestEast);
 		this.createSignals(scenario);
 		this.createSignalControl(scenario, lambdaWestEast);
-		OTFVis.playScenario(scenario);
+		return scenario;
 	}
 	
 	
@@ -339,8 +335,5 @@ public class IsolatedCrossingMain {
 		return config;
 	}
 	
-	public static void main(String[] args) {
-		new IsolatedCrossingMain().run();
-	}
 
 }
