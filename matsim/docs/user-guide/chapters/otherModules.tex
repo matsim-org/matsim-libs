@@ -29,17 +29,19 @@ JDEQSim (Java Deterministic Event Driven Queue Based Simulation) has the followi
 \subsubsection{Usage}
 
 Insert  a new module called 'JDEQSim' into the config XML file. All parameters  are optional and have default values (shown below), never the less it  could be helpful to know their meaning and physical units.
-\begin{verbatim}
-	$<$module name="JDEQSim"$>$
-		$<$param name="endTime" value="00:00:00"   /$>$
-		$<$param name="flowCapacityFactor" value="1.0"   /$>$
-		$<$param name="storageCapacityFactor" value="1.0"   /$>$
-		$<$param name="minimumInFlowCapacity" value="1800"   /$>$
-		$<$param name="carSize" value="7.5"   /$>$
-		$<$param name="gapTravelSpeed" value="15.0"   /$>$
-		$<$param name="squeezeTime" value="1800"   /$>$
-	$<$/module$>$
-\end{verbatim}The mobsim type now  also needs to be defined in the controler section of the config  file. See comments in config dumps in logfiles.
+\begin{lstlisting}{language=XML}
+<module name="JDEQSim">
+    <param name="endTime" value="00:00:00"   />
+    <param name="flowCapacityFactor" value="1.0"   />
+    <param name="storageCapacityFactor" value="1.0"   />
+    <param name="minimumInFlowCapacity" value="1800"   />
+    <param name="carSize" value="7.5"   />
+    <param name="gapTravelSpeed" value="15.0"   />
+    <param name="squeezeTime" value="1800"   />
+</module>
+\end{lstlisting}
+
+The mobsim type now  also needs to be defined in the controler section of the config  file. See comments in config dumps in logfiles.
 
 The  'endTime' defines the time of the last event of the simulation. If it is  set to '00:00:00', no end time is defined and the simulation will stop,  when the last event of the simulation has been processed. The (scaling)  parameters  'flowCapacityFactor' and 'storageCapacityFactor' can  be used as with mobSim and have no unit. The 'minimumInFlowCapacity'  defines for all roads the minimum number of cars, which could enter the  road per hour, for the congestion less case. The 'carSize' parameter  allows to set the size of a car in meters. The 'gapTravelSpeed'  parameter defines the speed of gaps in [m/s]. Finally the 'squeezeTime'  is used for deadlock prevention and defines, how long a car should wait  at maximum for entering the next road before deadlock prevention is  turned on (unit: seconds).
 
@@ -47,10 +49,7 @@ The 'minimumInFlowCapacity' is a  parameter, which was not published in the C++ 
 
 \subsubsection{Hints}
 \begin{itemize}
-	\item \sout{If the module 'JDEQSim' is present all parameters from module 'simulation' are ignored.}  [[Given that the type of the mobsim now needs to be specified in the  controler section of the config file, this works differently now.  kai, apr'11]]
 	\item You might consider turning on the module  'parallelEventHandling' when using JDEQSim, as often JDEQSim can make  much better use of this module than QueueSim (as JDEQSim is faster).
-	\item Use  the the following controller for running the java DEQSim  micro-simulation: org.matsim.controler.Controler (and not  org.matsim.mobsim.cppdeqsim.DEQSimControler, which is used for C++  DEQSim)
-\\
 	\item If you are getting lots of breakdowns, consider using smaller squeezeTime (e.g. 10 seconds or lower)
 \end{itemize}
 
@@ -106,7 +105,7 @@ Waraich,  R., D. Charypar, M. Balmer and K.W. Axhausen (2009) Performance  impro
 
 \subsubsection{\textbf{Maintenance and Questions}}
 
-Marcel Rieser, senozon AG (rieser\_at\_senozon.com)
+Marcel Rieser, Senozon AG (rieser\_at\_senozon.com)
 
 \subsubsection{\textbf{Javadoc}}
 
@@ -176,10 +175,10 @@ The file contains the following information:
 
 Add the following lines to your configuration file:
 \begin{verbatim}
-$<$module name="counts"$>$
-  $<$param name="inputCountsFile" value="/path/to/counts.xml" /$>$
-  $<$param name="outputformat" value="txt,html,kml" /$>$
-$<$/module$>$
+<module name="counts">
+  <param name="inputCountsFile" value="/path/to/counts.xml" />
+  <param name="outputformat" value="txt,html,kml" />
+</module>
 
 \end{verbatim}
 
@@ -192,7 +191,7 @@ The comparison is automatically generated every 10th iteration.  Generated outpu
 The counts-module offers the following config-parameters:
 \begin{itemize}
 	\item 
-\texttt{$<$param name="outputformat" value="txt,html,kml" /$>$}
+\texttt{<param name="outputformat" value="txt,html,kml" />}
 \\     The output format specifies in which format the comparison results are written to disk. It can be any combination of 
 \texttt{txt}, html and 
 \texttt{kml}. Multiple formats can be specified separated by commas. 
@@ -200,11 +199,11 @@ The counts-module offers the following config-parameters:
 \texttt{html} creates a directory containing several html files, allowing to browse the results interactively. 
 \texttt{kml} creates a file to be displayed in Google Earth. This last option only works if the \href{http://www.matsim.org/node/405}{correct coordinate system is set}.
 	\item 
-\texttt{$<$param name="countsScaleFactor" value="1.0" /$>$}
+\texttt{<param name="countsScaleFactor" value="1.0" />}
 \\     If you only simulate a sample of your population, the simulated  traffic volumes are likely lower than the real-world traffic counts. In  order to allow useful comparison, one can specify a factor by which the  simulated traffic volumes are multiplied. For example, if you simulate a  25\% sample of your full population, specify a countsScaleFactor  of 4.
 	\item 
-\texttt{$<$param name="distanceFilterCenterNode" value="2386" /$>$
-\\     $<$param name="distanceFiler" value="30000.0" /$>$}
+\texttt{<param name="distanceFilterCenterNode" value="2386" />
+\\     <param name="distanceFiler" value="30000.0" />}
 \\     If the traffic counts cover a larger area than the area being  simulated, the traffic counts outside your area will result in a bad  comparison. Instead of removing the traffic counts from the counts.xml,  you can specify a filter to only include some traffic counts from the  file in the comparison. To activate the filter, specify the id of a node  that acts as the center of a circle. The circle has the radius  specified in "
 \texttt{distanceFilter}", the unit being the same unit as the length of links (i.e. usually meters).
 \end{itemize}
@@ -273,45 +272,46 @@ I (kn) don't know the exact status.
 \textbf{Maintenance:} G. Lämmel, VSP
 
 MATSim provides the opportunity to model time dependent aspects of  the network explicitly. For each link in the network basic parameters  (i.e. freespeed, number of lanes and flow capacity) can be varied over  the time. So it is possible to model accidents or the like. One  particular area for this technique is the modeling of evacuation  scenarios.
-\\  In the case of an evacuation simulation the network has time dependent  attributes. For instance, large-scale inundations or conflagrations do  not cover all the endangered area at once.
-\\  In MATSim this time varying aspects are modeled as network change  events. A network change event modifies parameters of links in the  network at predefined time steps. The network change events have to be  provided in a XML file to MATSim.
-\\
-\\  A sample network change event XML file could look like:
-\\
-\\
-\texttt{$<$?xml version="1.0" encoding="UTF-8"?$>$
-\\  $<$networkChangeEvents xmlns="http://www.matsim.org/files/dtd"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  xsi:schemaLocation="http://www.matsim.org/files/dtd  http://www.matsim.org/files/dtd/networkChangeEvents.xsd"$>$}
-\\
-\texttt{ $<$networkChangeEvent startTime="03:06:00"$>$
-\\   $<$link refId="12487"/$>$
-\\   $<$link refId="12489"/$>$
-\\   $<$link refId="12491"/$>$
-\\   $<$freespeed type="absolute" value="0.0"/$>$
-\\   $<$/networkChangeEvent$>$}
-\\
-\texttt{$<$/networkChangeEvents$>$}
-\\
-\\  This change event would set the freespeed of the links 
+In the case of an evacuation simulation the network has time dependent  attributes. For instance, large-scale inundations or conflagrations do  not cover all the endangered area at once.
+In MATSim this time varying aspects are modeled as network change  events. A network change event modifies parameters of links in the  network at predefined time steps. The network change events have to be  provided in a XML file to MATSim.
+
+A sample network change event XML file could look like:
+
+\begin{lstlisting}{language=XML}
+<?xml version="1.0" encoding="UTF-8"?>
+<networkChangeEvents xmlns="http://www.matsim.org/files/dtd"  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  xsi:schemaLocation="http://www.matsim.org/files/dtd  http://www.matsim.org/files/dtd/networkChangeEvents.xsd">}
+
+  <networkChangeEvent startTime="03:06:00">
+    <link refId="12487"/>
+    <link refId="12489"/>
+    <link refId="12491"/>
+    <freespeed type="absolute" value="0.0"/>
+  </networkChangeEvent>
+
+</networkChangeEvents>
+\end{lstlisting}
+
+This change event would set the freespeed of the links 
 \texttt{12487, 12489, 12491} to 0 m/s at 
 \texttt{03:06}  am (all values have to be provided in SI units). These values are valid  until the next network change event (if there is any) changes the  freespeed of link 
 \texttt{12487, 12489, 12491} again. In this example the freespeed would be set to an absolute value. It is also possible to take the old 
 \texttt{freespeed} value and multiply it by a factor. For dividing the old 
 \texttt{freespeed} value by 2, the corresponding line of the network change event XML file would look like:
 \\   
-\texttt{$<$freespeed type="scaleFactor" value="0.5"/$>$}
+\texttt{<freespeed type="scaleFactor" value="0.5"/>}
 \\  Besides changing the 
 \texttt{freespeed}, one could also change the number of 
 \texttt{lane}s:
 \\   
-\texttt{$<$lane type="absolute" value="2.0"/$>$}
+\texttt{<lane type="absolute" value="2.0"/>}
 \\  Or the flow capacity:
 \\   
-\texttt{$<$flowCapacity type="absolute" value="0.0"/$>$}
+\texttt{<flowCapacity type="absolute" value="0.0"/>}
 \\
 \\  To make use of the network change events one has to define it in the  MATSim config file. Therefore the following two lines have to be added  in the network section of the config file:
 \\
-\texttt{$<$param name="timeVariantNetwork" value="true" /$>$
-\\  $<$param name="inputChangeEventsFile" value="path\_to\_ change\_events\_file" /$>$}
+\texttt{<param name="timeVariantNetwork" value="true" />
+\\  <param name="inputChangeEventsFile" value="path\_to\_ change\_events\_file" />}
 \\
 \\  Now one has just to start the controller with this config file and the network change events will be applied automatically.
 
@@ -363,10 +363,10 @@ Working paper will be published in Q2 2010.
 
 The config option presumably is:
 \begin{verbatim}
-$<$module name="qsim"$>$
+<module name="qsim">
    ...
-   $<$param name="numberOfThreads" value="5"/$>$
-$<$/module$>$
+   <param name="numberOfThreads" value="5"/>
+</module>
 
 \end{verbatim}
 
@@ -573,13 +573,13 @@ Note that you will get a "simulation" section in the log file even if  you have 
 
 There used to be an option to start an external mobsim. This still seems to be there but the syntax is a bit awkward:
 \begin{verbatim}
-$<$module name="controler" $>$
+<module name="controler" >
    ...
-   $<$param name="mobsim" value="null" /$>$
-$<$/module$>$
-$<$module name="simulation" $>$
-   $<$param name="externalExe" value="$<$path-to-executable$>$" /$>$
-$<$/module$>$
+   <param name="mobsim" value="null" />
+</module>
+<module name="simulation" >
+   <param name="externalExe" value="<path-to-executable>" />
+</module>
 
 
 \end{verbatim}
@@ -606,7 +606,7 @@ See the \href{http://matsim.org/docs/tutorials/transit}{tutorial}. This requires
 
 \subsubsection{Reference}
 
-M. Rieser, K. Nagel;\textbf{Combined agent-based simulation of private car traffic and transit}; IATBR 2009
+M. Rieser, K. Nagel; \textbf{Combined agent-based simulation of private car traffic and transit}; IATBR 2009
 
 \vfill\eject
 \section{"travelTimeCalculator". Status: nearly indispensable}
@@ -629,10 +629,10 @@ This  section defines switches that are used at VSP or when collaborating  with 
 
 I (kn) am in the process of defining some defaults that everybody at VSP should be using. These can be switched on by:
 \begin{verbatim}
-$<$module name="vspExperimental" $>$
-   $<$param name="vspDefaultsCheckingLevel" value="abort" /$>$
+<module name="vspExperimental" >
+   <param name="vspDefaultsCheckingLevel" value="abort" />
    ...
-$<$/module$>$
+</module>
 
 \end{verbatim}
 
@@ -649,12 +649,9 @@ If you think that you cannot live with these settings, please talk to me.
 Since those settings involve all aspects of matsim, they may often be irrelevant to you. Please set them anyways.
 
 \vfill\eject
-\section{0 deprecated modules}
+\section{Deprecated modules}
 
-\subsubsection{Deprecated Modules}
-
-\vfill\eject
-\section{"world"}
+\subsection{"world"}
 
 \textbf{Dismantler:} Michael Zilske
 

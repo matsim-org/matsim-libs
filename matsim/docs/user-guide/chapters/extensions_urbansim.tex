@@ -259,9 +259,8 @@ Thissectioncontainsparametersfor theconfigurationof thetrafficmodel.
 \\     In order to set an external configuration file add the following  lines in the "travel\_model\_configuration $>$ matsim\_config $>$ common"  section:
 \\
 \begin{verbatim}
-
 <external_matsim_config type="dictionary">
-  <matsim_config name="2001" type="file">relative_path/to/external_matsim_config.xml</matsim_config$
+  <matsim_config name="2001" type="file">relative_path/to/external_matsim_config.xml</matsim_config>
 </external_matsim_config>}
 \end{verbatim}
 	\item \textbf{matsim\_network\_file}: This points, as the name  implies, to a road network in MATSim format. A relative path (located in  the OPUS\_HOME directory) to the network file is expected.
@@ -293,9 +292,9 @@ Thissectioncontainsparametersfor theconfigurationof thetrafficmodel.
 This defines the years in which the travel model should run. In order  to add additional years add the following lines in the  "travel\_model\_configuration $>$ years\_to\_run" section:
 \begin{verbatim}
 
-\texttt{           $<$run_description type="directory"$>$}
-\texttt{                   $<$year type="integer"$>$2002$<$/year$>$}
-\texttt{           $<$/run_description$>$}
+<run_description type="directory">
+    <year type="integer">2002</year>
+</run_description>
 \end{verbatim}
 
 \subsubsection{4 Additional MATSim4UrbanSim Parameters}
@@ -563,8 +562,11 @@ These OSM files are now merged to a coherent OSM network in a two  step process 
 	\item In the first step each OSM network is treated separately on the command line as follows:
 \end{itemize}
 \begin{verbatim}
-
-\texttt{osmosis --rx xxx.osm.bz2 --lp interval=60 --bb top=51.671 left=2.177 bottom=49.402 right=6.764 completeWays=yes --tf accept-ways highway= motorway,motorway_link,trunk,trunk_link,primary,primary_link,secondary, tertiary,minor,unclassified,residential,living_street --tf reject-relations --used-node --wx xxx_filtered.osm.bz2}
+osmosis --rx xxx.osm.bz2 --lp interval=60 --bb top=51.671 left=2.177 \
+    bottom=49.402 right=6.764 completeWays=yes --tf accept-ways \
+    highway= motorway,motorway_link,trunk,trunk_link,primary,primary_link,secondary,\
+    tertiary,minor,unclassified,residential,living_street --tf reject-relations \
+    --used-node --wx xxx_filtered.osm.bz2
 \end{verbatim}
 
 This modifies each network file as follows:
@@ -576,8 +578,7 @@ This modifies each network file as follows:
 	\item In the second step, the modified networks are merged on the command line as follows:
 \end{itemize}
 \begin{verbatim}
-
-\texttt{osmosis --rx xxx_filtered.osm.bz2 --lp interval=30 --m --wx belgium_incl_borderArea.osm}
+osmosis --rx xxx_filtered.osm.bz2 --lp interval=30 --m --wx belgium_incl_borderArea.osm
 \end{verbatim}
 
 At this point we have one merged OSM network "belgium\_incl\_borderArea.osm" for our area of interest.
@@ -589,15 +590,13 @@ The merged OSM network is converted into MATSim format. To be  consistent with t
 Finally the MATSim network is “cleaned” and “simplified”. Cleaning  means, that only links that can be reached by other links are kept in  the network. Simplifying means, that a set of links that belong to a  road are merged into one single link. The resulting network is depicted  below, where the study area is highlighted in blue.
 
 The Java code for the conversion is given in here:
-\begin{verbatim}
-
-\texttt{Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+\begin{lstlisting}{language=Java}
+Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 // creating an empty matsim network
 Network network = sc.getNetwork();
 // using the Belge Lambert 72 projection for the matsim network
 CoordinateTransformation ct = TransformationFactory
-                .getCoordinateTransformation(TransformationFactory.WGS84,
-                        "EPSG:31300");
+        .getCoordinateTransformation(TransformationFactory.WGS84, "EPSG:31300");
 OsmNetworkReader osmReader = new OsmNetworkReader(network, ct);
 
 osmReader.setKeepPaths(false);
@@ -614,19 +613,19 @@ new NetworkWriter(network).write(OUTFILE);
 // into the scenario
 new NetworkCleaner().run(OUTFILE, OUTFILE.split(".xml")[0] + "_clean.xml.gz");
 Scenario scenario = (ScenarioImpl) ScenarioUtils
-                .createScenario(ConfigUtils.createConfig());
+        .createScenario(ConfigUtils.createConfig());
 new MatsimNetworkReader(scenario).readFile(OUTFILE.split(".xml")[0] + "_clean.xml.gz");
 network = (NetworkImpl) scenario.getNetwork();
 
 // simplifying the cleaned network
 NetworkSimplifier simplifier = new NetworkSimplifier();
-Set$<$Integer$>$ nodeTypess2merge = new HashSet$<$Integer$>$();
+Set<Integer> nodeTypess2merge = new HashSet<Integer>();
 nodeTypess2merge.add(new Integer(4));
 nodeTypess2merge.add(new Integer(5));
 simplifier.setNodesToMerge(nodeTypess2merge);
 simplifier.run(network);
-new NetworkWriter(network).write(OUTFILE.split(".xml")[0] + "_clean_simple.xml.gz");}
-\end{verbatim}
+new NetworkWriter(network).write(OUTFILE.split(".xml")[0] + "_clean_simple.xml.gz");
+\end{lstlisting}
 
 
 

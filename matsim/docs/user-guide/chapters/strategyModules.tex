@@ -5,10 +5,10 @@
 These are modules that can be used via the syntax
 \begin{lstlisting}{language=XML}
 <module name="strategy" >
-	<param name="ModuleProbability_1" value="0.1" />
-	<param name="Module_1" value="ChangeLegMode" />
-        <param name="ModuleProbability_2" value="0.1" />
-        <param name="Module_2" value="TimeAllocationMutator" />
+    <param name="ModuleProbability_1" value="0.1" />
+    <param name="Module_1" value="ChangeLegMode" />
+    <param name="ModuleProbability_2" value="0.1" />
+    <param name="Module_2" value="TimeAllocationMutator" />
 </module>
 \end{lstlisting}
 
@@ -25,8 +25,8 @@ The strategy modules that are understood by MATSim are defined in the class \hre
 
 Unfortunately, the naming in the code is different from the naming in the config file:
 \begin{itemize}
-	\item "strategy" in config file --$>$ StrategyManager (or "set of strategies") in code
-	\item "strategy module" in config file --$>$ PlanStrategy in code
+	\item "strategy" in config file $\rightarrow$ StrategyManager (or "set of strategies") in code
+	\item "strategy module" in config file $\rightarrow$ PlanStrategy in code
 	\item There is a PlanStrategyModule in the code; it corresponds to what was called strategy module element in the description above.
 \end{itemize}
 
@@ -72,24 +72,25 @@ Divider: Pure plan selectors above, innovative strategy modules below.
 All routes of a plan are recomputed.
 
 The module is called by inserting the following lines into the "strategy" module:
-\begin{verbatim}
-$<$module name="strategy" $>$
-	$<$param name="ModuleProbability_XXX" value="0.1" /$>$
-	$<$param name="Module_XXX" value="ReRoute" /$>$
-                ...
-$<$/module$>$
-\end{verbatim}
+\begin{lstlisting}{language=XML}
+<module name="strategy" >
+    <param name="ModuleProbability_XXX" value="0.1" />
+    <param name="Module_XXX" value="ReRoute" />
+    ...
+</module>
+\end{lstlisting}
+
 
 The corresponding configuration module unfortunately has a different name:
-\begin{verbatim}
-$<$module name="planscalcroute" $>$
-	$<$param name="beelineDistanceFactor" value="1.3" /$>$
-	$<$param name="bikeSpeed" value="4.166666666666667" /$>$
-	$<$param name="ptSpeedFactor" value="2.0" /$>$
-	$<$param name="undefinedModeSpeed" value="13.88888888888889" /$>$
-	$<$param name="walkSpeed" value="0.8333333333333333" /$>$
-$<$/module$>$
-\end{verbatim}
+\begin{lstlisting}{language=XML}
+<module name="planscalcroute" >
+    <param name="beelineDistanceFactor" value="1.3" />
+    <param name="bikeSpeed" value="4.166666666666667" />
+    <param name="ptSpeedFactor" value="2.0" />
+    <param name="undefinedModeSpeed" value="13.88888888888889" />
+    <param name="walkSpeed" value="0.8333333333333333" />
+</module>
+\end{lstlisting}
 
 This works pretty reliably for car.
 
@@ -102,7 +103,7 @@ It also works for other modes, as "pseudo"-mode, in the following way:
 
 It is possible to route such legs on the network, by using a different router.
 
-It is \emph{not} possible to "physically" execute a leg in the  mobsim if it has not been routed before. That is, the capability  of the router needs to be $>$= the capability of the mobsim.  (Makes sense, if one thinks about it.)
+It is \emph{not} possible to "physically" execute a leg in the  mobsim if it has not been routed before. That is, the capability  of the router needs to be >= the capability of the mobsim.  (Makes sense, if one thinks about it.)
 
 \subsection{TimeAllocationMutator.  Status: works for vsp and ivt}
 
@@ -118,19 +119,19 @@ The usage of the module is configured in the "strategy" section.
 
 This replanning module randomly picks one of the plans of a person and changes the mode of transport of \textbf{one single leg}. The leg is picked randomly. For changing the mode of transport for all legs use \href{http://www.matsim.org/node/387}{ChangeLegMode}. In contrast to \href{http://www.matsim.org/node/387}{ChangeLegMode},  ChangeSingleLegMode allows for multiple modes in one plan. By default,  the supported modes are driving a car and using public transport. Also,  this module is able to (optionally) respect car-availability.
 
-Note that the configuration is done by $<$module  name="changeLegMode"$>$ and not by $<$module  name="changeSingleLegMode"$>$. The replanning module is configured like  this using the very same configuration module as \href{http://www.matsim.org/node/387}{ChangeLegMode}:
-\begin{verbatim}
-$<$module name="changeLegMode"$>$
-   $<$param name="modes" value="car,pt,bike,walk" /$>$
-   $<$param name="ignoreCarAvailability" value="false" /$>$
-$<$/module$>$
-\end{verbatim}
+Note that the configuration is done by <module  name="changeLegMode"> and not by <module  name="changeSingleLegMode">. The replanning module is configured like  this using the very same configuration module as \href{http://www.matsim.org/node/387}{ChangeLegMode}:
+\begin{lstlisting}{language=XML}
+<module name="changeLegMode">
+    <param name="modes" value="car,pt,bike,walk" />
+    <param name="ignoreCarAvailability" value="false" />
+</module>
+\end{lstlisting}
 
 Add the module to the replanning strategy like this:
-\begin{verbatim}
-$<$param name="Module_X" value="ChangeSingleLegMode" /$>$
-$<$param name="ModuleProbability_X" value="0.1" /$>$
-\end{verbatim}
+\begin{lstlisting}{language=XML}
+<param name="Module_X" value="ChangeSingleLegMode" />
+<param name="ModuleProbability_X" value="0.1" />
+\end{lstlisting}
 
 Replace the 'X' with the number you assign to this module. For some more details on the syntax of this section, see \href{http://matsim.org/node/478}{here}.
 
@@ -146,18 +147,18 @@ By default, the simulation will handle legs with modes different from  "car" by 
 This replanning module randomly picks one of the plans of a person  and changes its mode of transport.By default, the supported modes  are driving a car and using public transport. Only one mode of transport  per plan is supported. For using different modes for sub-tours on a  single day see the "SubtourModeChoice" module. Also, this module is able  to (optionally) respect car-availability.
 
 The replanning module is configured like this, where the value  parameter lists the modes of transport from which the module randomly  chooses:
-\begin{verbatim}
-$<$module name="changeLegMode"$>$
-   $<$param name="modes" value="car,pt,bike,walk" /$>$
-   $<$param name="ignoreCarAvailability" value="false" /$>$
-$<$/module$>$
-\end{verbatim}
+\begin{lstlisting}{language=XML}
+<module name="changeLegMode">
+    <param name="modes" value="car,pt,bike,walk" />
+    <param name="ignoreCarAvailability" value="false" />
+</module>
+\end{lstlisting}
 
 Add the module to the replanning strategy like this:
-\begin{verbatim}
-$<$param name="Module_X" value="ChangeLegMode" /$>$
-$<$param name="ModuleProbability_X" value="0.1" /$>$
-\end{verbatim}
+\begin{lstlisting}{language=XML}
+<param name="Module_X" value="ChangeLegMode" />
+<param name="ModuleProbability_X" value="0.1" />
+\end{lstlisting}
 
 Replace the 'X' with the number you assign to this module. For some more details on the syntax of this section, see \href{http://matsim.org/node/478}{here}.
 
@@ -165,11 +166,15 @@ By default, the simulation will handle legs with modes different from  "car" by 
 
 This module can be used with the detailed simulation of public transport by changing the line
 
-$<$param name="Module\_X" value="ChangeLegMode" /$>$
+\begin{lstlisting}{language=XML}
+<param name="Module\_X" value="ChangeLegMode" />
+\end{lstlisting}
 
 to
 
-$<$param name="Module\_X" value="TransitChangeLegMode" /$>$
+\begin{lstlisting}{language=XML}
+<param name="Module\_X" value="TransitChangeLegMode" />
+\end{lstlisting}
 
 \subsubsection{Reference}
 
@@ -210,18 +215,17 @@ Estimation of a MATSim destination choice utility function for Switzerland is in
 
 
 
-
 \subsubsection{{Calling the Location Choice Strategy}}
 
 The strategy module in the config file needs to be extended as follows:
-\begin{verbatim}
-$<$module name="strategy"$>$
+\begin{lstlisting}{language=XML}
+<module name="strategy">
     ...
-    $<$param name="ModuleProbability_X" value="0.0 $<$ double $<$=1.0" /$>$
-    $<$param name="Module_X" value="LocationChoice" /$>$
+    <param name="ModuleProbability_X" value="0.0 < double <=1.0" />
+    <param name="Module_X" value="LocationChoice" />
     ...
-$<$/module$>$
-\end{verbatim}
+</module>
+\end{lstlisting}
 
 
 \subsubsection{{I. Random Search}}
@@ -294,8 +298,6 @@ The parameters \emph{restraintFcnFactor}and \emph{restraintFcnExp }are explained
 
 
 
-
-
 \subsection{SubtourModeChoice. Status: probably works}
 
 \textbf{Maintainer:} Michael Zilske
@@ -305,23 +307,22 @@ In contrast to "ChangeLegMode", which changes \emph{all} legs of a plan to a dif
 For example, somebody might take the car to work, walk to lunch and back, and take the car back home.
 
 "chainBasedModes" means modes where a vehicle (car, bicycle,  ...) is parked and in consequence needs to be picked up again.
-\begin{verbatim}
-	$<$module name="subtourModeChoice" $>$
-		$<$param name="chainBasedModes" value="car, bike" /$>$
-		$<$param name="modes" value="car, bike, pt, walk" /$>$
-	$<$/module$>$
+\begin{lstlisting}{language=XML}
+<module name="subtourModeChoice" >
+    <param name="chainBasedModes" value="car, bike" />
+    <param name="modes" value="car, bike, pt, walk" />
+</module>
+\end{lstlisting}
 
-\end{verbatim}
 
 The module is called by inserting the following lines into the "strategy" module:
-\begin{verbatim}
-	$<$module name="strategy" $>$
-		$<$param name="ModuleProbability_XXX" value="0.1" /$>$
-		$<$param name="Module_XXX" value="SubtourModeChoice" /$>$
-                ...
-        $<$/module$>$
-
-\end{verbatim}
+\begin{lstlisting}{language=XML}
+<module name="strategy" >
+    <param name="ModuleProbability_XXX" value="0.1" />
+    <param name="Module_XXX" value="SubtourModeChoice" />
+    ...
+</module>
+\end{lstlisting}
 
 
 For modes other than car, travel time and travel distance are  computed according to some heuristics, which are configured in the  router.
@@ -341,24 +342,14 @@ departure time choice & TimeAllocationMutator & TransitTimeAllocationMutator & ?
 \hline
 route choice & ReRoute & ReRoute & ? \\ 
 \hline
-mode choice
-\\     (all legs get same mode) & ChangeLegMode & TransitChangeLegMode & ? \\ 
+mode choice (all legs get same mode) & ChangeLegMode & TransitChangeLegMode & ? \\ 
 \hline
-mode choice
-\\     (each leg can have a different mode) & ChangeSingleLegMode & TransitChangeSingleLegMode & ? \\ 
+mode choice (each leg can have a different mode) & ChangeSingleLegMode & TransitChangeSingleLegMode & ? \\ 
 \hline
-mode choice
-\\     (subtour-based) & SubtourModeChoice & TransitSubtourModeChoice & ? \\ 
+mode choice (subtour-based) & SubtourModeChoice & TransitSubtourModeChoice & ? \\ 
 \hline
 location choice & LocationChoice & ? & ? \\ 
 \hline
- &  &  &  \\ 
-\hline
- &  &  &  \\ 
-\hline
- &  &  &  \\ 
-\hline
-
 \end{tabularx}
 \end{center}
 
