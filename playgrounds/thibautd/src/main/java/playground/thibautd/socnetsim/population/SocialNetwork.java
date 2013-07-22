@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.utils.misc.Counter;
 
 import playground.thibautd.utils.MapUtils;
 
@@ -31,6 +32,7 @@ import playground.thibautd.utils.MapUtils;
  * @author thibautd
  */
 public class SocialNetwork {
+	private final Counter tieCounter = new Counter( "SocialNetwork: (Monodirectional) Tie # " );
 	private final Map<Id, Set<Id>> map = new HashMap<Id, Set<Id>>();
 
 	public void addBidirectionalTie(final Id id1, final Id id2) {
@@ -42,7 +44,8 @@ public class SocialNetwork {
 			final Id ego,
 			final Id alter) {
 		final Set<Id> alters = MapUtils.getSet( ego , map );
-		alters.add( alter );
+		final boolean added = alters.add( alter );
+		if ( added ) tieCounter.incCounter();
 	}
 
 	public Set<Id> getAlters(final Id ego) {

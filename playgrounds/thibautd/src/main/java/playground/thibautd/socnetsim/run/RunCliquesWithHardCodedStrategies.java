@@ -49,6 +49,7 @@ import org.matsim.pt.PtConstants;
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
 import playground.ivt.kticompatibility.KtiPtRoutingModule;
 import playground.ivt.kticompatibility.KtiPtRoutingModule.KtiPtRoutingModuleInfo;
+import playground.thibautd.scoring.FireMoneyEventsForUtilityOfBeingTogether;
 import playground.thibautd.scoring.KtiScoringFunctionFactoryWithJointModes;
 import playground.thibautd.socnetsim.cliques.config.CliquesConfigGroup;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
@@ -191,9 +192,7 @@ public class RunCliquesWithHardCodedStrategies {
 												JointActingTypes.PICK_UP,
 												JointActingTypes.DROP_OFF) ),
 								(KtiLikeScoringConfigGroup) config.getModule( KtiLikeScoringConfigGroup.GROUP_NAME ),
-								scoringFunctionConf.getMarginalUtilityOfBeingTogether_s(),
 								config.planCalcScore(),
-								toSocialNetwork( cliques ),
 								scenario) :
 							// if null, default will be used
 							// XXX not nice...
@@ -250,6 +249,12 @@ public class RunCliquesWithHardCodedStrategies {
 		// else the JointTripRouterFactory is used with pt from the config file
 
 		final ControllerRegistry controllerRegistry = builder.build();
+		controllerRegistry.getEvents().addHandler(
+				new FireMoneyEventsForUtilityOfBeingTogether(
+					controllerRegistry.getEvents(),
+					scoringFunctionConf.getMarginalUtilityOfBeingTogether_s(),
+					scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney(),
+					toSocialNetwork( cliques ) ) );
 
 		// init strategies
 		final GroupStrategyRegistry strategyRegistry = new GroupStrategyRegistry();

@@ -38,7 +38,6 @@ import playground.ivt.scoring.ElementalCharyparNagelLegScoringFunction;
 import playground.ivt.scoring.ElementalCharyparNagelLegScoringFunction.LegScoringParameters;
 
 import playground.thibautd.socnetsim.population.JointActingTypes;
-import playground.thibautd.socnetsim.population.SocialNetwork;
 
 /**
  * @author thibautd
@@ -47,22 +46,16 @@ public class KtiScoringFunctionFactoryWithJointModes implements ScoringFunctionF
     private final ScoringFunctionFactory delegate;
 	private final CharyparNagelScoringParameters params;
 	private final Scenario scenario;
-	private final SocialNetwork socialNetwork;
-	private final double marginalUtilityOfBeingTogether_s;
 
 	private static final double UTIL_OF_NOT_PERF = -1000;
 
 	public KtiScoringFunctionFactoryWithJointModes(
 			final StageActivityTypes typesNotToScore,
 			final KtiLikeScoringConfigGroup ktiConfig,
-			final double marginalUtilityOfBeingTogether_s,
 			final PlanCalcScoreConfigGroup config,
-			final SocialNetwork socNet,
 			final Scenario scenario) {
 		this.scenario = scenario;
 		this.params = new CharyparNagelScoringParameters(config);
-		this.marginalUtilityOfBeingTogether_s = marginalUtilityOfBeingTogether_s;
-		this.socialNetwork = socNet;
 		this.delegate = new KtiLikeActivitiesScoringFunctionFactory(
 			typesNotToScore,
 			ktiConfig,
@@ -121,11 +114,13 @@ public class KtiScoringFunctionFactoryWithJointModes implements ScoringFunctionF
 					public void endActivity(double time, Activity act) {}
 				});
 
-		scoringFunctionAccumulator.addScoringFunction(
-				new BeingTogetherScoring(
-					marginalUtilityOfBeingTogether_s,
-					plan.getPerson().getId(),
-					socialNetwork.getAlters( plan.getPerson().getId() ) ) );
+		// XXX this doesn't work, because it just gets the events from the agent
+		// (not alters)
+		//scoringFunctionAccumulator.addScoringFunction(
+		//		new BeingTogetherScoring(
+		//			marginalUtilityOfBeingTogether_s,
+		//			plan.getPerson().getId(),
+		//			socialNetwork.getAlters( plan.getPerson().getId() ) ) );
 
 		return scoringFunctionAccumulator;
 	}
