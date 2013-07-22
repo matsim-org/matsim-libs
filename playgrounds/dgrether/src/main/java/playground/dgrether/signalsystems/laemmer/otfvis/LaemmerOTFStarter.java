@@ -36,6 +36,7 @@ import org.matsim.vis.otfvis.OnTheFlyServer;
 
 import playground.dgrether.signalsystems.DgSensorManager;
 import playground.dgrether.signalsystems.laemmer.model.LaemmerSignalModelFactory;
+import playground.dgrether.utils.DgOTFVisUtils;
 
 
 /**
@@ -44,6 +45,10 @@ import playground.dgrether.signalsystems.laemmer.model.LaemmerSignalModelFactory
  */
 public class LaemmerOTFStarter {
 
+	public void prepare4SimAndPlay(Scenario scenario){
+		DgOTFVisUtils.preparePopulation4Simulation(scenario);
+		this.playScenario(scenario);
+	}
 	
 	public void playScenario(Scenario scenario){
 		EventsManager events = EventsUtils.createEventsManager();

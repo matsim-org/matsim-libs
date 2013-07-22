@@ -124,7 +124,7 @@ public class SingleCrossingScenario {
 	
 	public Scenario createScenario(double lambdaWestEast){
 		Config config = this.createConfig();
-		Scenario scenario = ScenarioUtils.createScenario(config);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 		this.createIds(scenario);
 		this.createPopulation(scenario, lambdaWestEast);
 		this.createSignals(scenario);
