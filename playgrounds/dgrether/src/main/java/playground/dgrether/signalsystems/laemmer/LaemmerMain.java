@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RunOTFVis
+ * TaMain
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,23 +17,43 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.laemmer.testisolatedcrossing;
+package playground.dgrether.signalsystems.laemmer;
 
-import org.matsim.api.core.v01.Scenario;
+import org.apache.log4j.Logger;
+import org.matsim.core.controler.Controler;
 
-import playground.dgrether.signalsystems.laemmer.otfvis.LaemmerOTFStarter;
+import playground.dgrether.DgPaths;
+import playground.dgrether.signalsystems.laemmer.controler.LaemmerControlerListenerFactory;
 
 
 /**
  * @author dgrether
  *
  */
-public class RunOTFVis {
-
+public class LaemmerMain {
+  
+	private static final Logger log = Logger.getLogger(LaemmerMain.class);
+	/**
+	 * @param args
+	 */
 	public static void main(String[] args) {
-		double lambdaWestEast = 0.5;
-		Scenario scenario = new SingleCrossingScenario().createScenario(lambdaWestEast);
-		new LaemmerOTFStarter().playScenario(scenario);
+		log.info("Running Laemmer main method...");
+		String[] args2 = null;
+		if (args == null || args.length == 0){
+			log.info("No args given, running local config...");
+			args2 = new String[1];
+			args2[0] = DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/config.xml";
+		}
+		else {
+			args2 = args;
+		}
+
+		
+		Controler controler = new Controler(args2);
+		controler.setSignalsControllerListenerFactory(new LaemmerControlerListenerFactory());
+		controler.setOverwriteFiles(true);
+		controler.run();
+
 	}
 
 }

@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgTaController
+ * TaSingleCrossingMain
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,65 +17,36 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.laemmer.model;
+package playground.dgrether.signalsystems.laemmer.scripts;
 
-import org.matsim.signalsystems.model.SignalController;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.controler.Controler;
 
-import playground.dgrether.signalsystems.utils.DgAbstractSignalController;
+import playground.dgrether.signalsystems.laemmer.controler.LaemmerControlerListenerFactory;
+import playground.dgrether.signalsystems.laemmer.testsinglecrossing.SingleCrossingScenario;
 
 
 /**
  * @author dgrether
  *
  */
-public class DgTaController  extends DgAbstractSignalController implements SignalController {
+public class SingleCrossingLaemmerMain {
 
-	public static final String IDENTIFIER = "LaemmerSignalSystemController";
+	private final static double lambdaMax = 0.1;
 	
-	@Override
-	public void updateState(double timeSeconds) {
+	public static void main(String[] args) {
 		
+		for (double lambdaWestEast = 0.0; lambdaWestEast <= lambdaMax; lambdaWestEast += 0.1){
+			
+		}
+		double lambdaWestEast = 0.5;
+		Scenario scenario = new SingleCrossingScenario().createScenario(lambdaWestEast);
 		
-		// for all approaches
-		this.calculatePriorityIndex(timeSeconds);
-		
-	}
+		Controler controler = new Controler(scenario);
+		controler.setSignalsControllerListenerFactory(new LaemmerControlerListenerFactory());
+		controler.setOverwriteFiles(true);
+		controler.run();
 
-	
-	private void calculatePriorityIndex(double timeSeconds) {
-		this.getNumberOfExpectedVehicles(timeSeconds);
-		
 	}
-
-	/**
-	 * 
-	 * @return \hat{n_i} (t)
-	 */
-	private int getNumberOfVehiclesForClearance(){
-		
-		return 0;
-	}
-	
-	
-	/**
-	 * Zeitreihe der erwarteten Ankuenfte an der Haltelinie
-	 * 
-	 * N_i^{exp}(t + \hat(g)_i))
-	 * 
-	 */
-	private int getNumberOfExpectedVehicles(double timeSeconds){
-		return 0;
-	}
-	
-	
-	@Override
-	public void reset(Integer iterationNumber) {
-	}
-
-	@Override
-	public void simulationInitialized(double simStartTimeSeconds) {
-	}
-	
-	
 
 }

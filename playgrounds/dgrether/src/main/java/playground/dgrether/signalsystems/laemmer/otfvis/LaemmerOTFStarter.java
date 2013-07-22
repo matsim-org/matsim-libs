@@ -35,7 +35,7 @@ import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
 import playground.dgrether.signalsystems.DgSensorManager;
-import playground.dgrether.signalsystems.laemmer.model.DgTaSignalModelFactory;
+import playground.dgrether.signalsystems.laemmer.model.LaemmerSignalModelFactory;
 
 
 /**
@@ -53,7 +53,7 @@ public class LaemmerOTFStarter {
 		events.addHandler(sensorManager);
 		
 		DefaultSignalModelFactory defaultSignalModelFactory = new DefaultSignalModelFactory();
-		DgTaSignalModelFactory signalModelFactory = new DgTaSignalModelFactory(defaultSignalModelFactory, sensorManager);
+		LaemmerSignalModelFactory signalModelFactory = new LaemmerSignalModelFactory(defaultSignalModelFactory, sensorManager);
 		
 		FromDataBuilder modelBuilder = new FromDataBuilder(scenario, signalModelFactory , events);
 		SignalSystemsManager signalManager = modelBuilder.createAndInitializeSignalSystemsManager();

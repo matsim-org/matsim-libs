@@ -35,12 +35,12 @@ import playground.dgrether.signalsystems.DgSensorManager;
  * @author dgrether
  *
  */
-public class DgTaSignalModelFactory implements SignalModelFactory {
+public class LaemmerSignalModelFactory implements SignalModelFactory {
 
 	private DgSensorManager sensorManager;
 	private DefaultSignalModelFactory delegate;
 
-	public DgTaSignalModelFactory(DefaultSignalModelFactory defaultSignalModelFactory,
+	public LaemmerSignalModelFactory(DefaultSignalModelFactory defaultSignalModelFactory,
 			DgSensorManager sensorManager) {
 		this.delegate = defaultSignalModelFactory;
 		this.sensorManager = sensorManager;
@@ -58,8 +58,8 @@ public class DgTaSignalModelFactory implements SignalModelFactory {
 
 	@Override
 	public SignalController createSignalSystemController(String controllerIdentifier) {
-		if (DgTaController.IDENTIFIER.equals(controllerIdentifier)){
-			return new DgTaController();
+		if (LaemmerSignalController.IDENTIFIER.equals(controllerIdentifier)){
+			return new LaemmerSignalController();
 		}
 		return this.delegate.createSignalSystemController(controllerIdentifier);
 	}

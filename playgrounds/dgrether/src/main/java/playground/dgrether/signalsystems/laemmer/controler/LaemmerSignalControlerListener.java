@@ -35,14 +35,14 @@ import org.matsim.signalsystems.mobsim.SignalEngine;
 import org.matsim.signalsystems.model.SignalSystemsManager;
 
 import playground.dgrether.signalsystems.DgSensorManager;
-import playground.dgrether.signalsystems.laemmer.model.DgTaSignalModelFactory;
+import playground.dgrether.signalsystems.laemmer.model.LaemmerSignalModelFactory;
 
 
 /**
  * @author dgrether
  *
  */
-public class DgTaSignalControlerListener implements SignalsControllerListener , StartupListener, IterationStartsListener,
+public class LaemmerSignalControlerListener implements SignalsControllerListener , StartupListener, IterationStartsListener,
 		ShutdownListener {
 
 	private SignalSystemsManager signalManager;
@@ -58,7 +58,7 @@ public class DgTaSignalControlerListener implements SignalsControllerListener , 
 		event.getControler().getEvents().addHandler(sensorManager);
 		
 		FromDataBuilder modelBuilder = new FromDataBuilder(scenario, 
-				new DgTaSignalModelFactory(new DefaultSignalModelFactory(), sensorManager) , event.getControler().getEvents());
+				new LaemmerSignalModelFactory(new DefaultSignalModelFactory(), sensorManager) , event.getControler().getEvents());
 		this.signalManager = modelBuilder.createAndInitializeSignalSystemsManager();
 		
 		SignalEngine engine = new QSimSignalEngine(this.signalManager);

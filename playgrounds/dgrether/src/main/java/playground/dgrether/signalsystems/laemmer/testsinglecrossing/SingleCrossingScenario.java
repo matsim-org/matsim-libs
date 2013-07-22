@@ -1,7 +1,7 @@
 /**
  * 
  */
-package playground.dgrether.signalsystems.laemmer.testisolatedcrossing;
+package playground.dgrether.signalsystems.laemmer.testsinglecrossing;
 
 import java.util.ArrayList;
 import java.util.List;

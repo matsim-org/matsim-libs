@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgSylviaControlerListenerFactory
+ * RunOTFVis
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,21 +17,24 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.laemmer.controler;
+package playground.dgrether.signalsystems.laemmer.scripts;
 
-import org.matsim.signalsystems.controler.SignalsControllerListener;
-import org.matsim.signalsystems.controler.SignalsControllerListenerFactory;
+import org.matsim.api.core.v01.Scenario;
+
+import playground.dgrether.signalsystems.laemmer.otfvis.LaemmerOTFStarter;
+import playground.dgrether.signalsystems.laemmer.testsinglecrossing.SingleCrossingScenario;
 
 
 /**
  * @author dgrether
  *
  */
-public class DgTaControlerListenerFactory implements SignalsControllerListenerFactory {
+public class SingleCrossingRunOTFVis {
 
-	@Override
-	public SignalsControllerListener createSignalsControllerListener() {
-		return new DgTaSignalControlerListener();
+	public static void main(String[] args) {
+		double lambdaWestEast = 0.5;
+		Scenario scenario = new SingleCrossingScenario().createScenario(lambdaWestEast);
+		new LaemmerOTFStarter().playScenario(scenario);
 	}
 
 }

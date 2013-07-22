@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TaSingleCrossingMain
+ * DgSylviaControlerListenerFactory
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,36 +17,21 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.laemmer;
+package playground.dgrether.signalsystems.laemmer.controler;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.controler.Controler;
-
-import playground.dgrether.signalsystems.laemmer.controler.DgTaControlerListenerFactory;
-import playground.dgrether.signalsystems.laemmer.testisolatedcrossing.SingleCrossingScenario;
+import org.matsim.signalsystems.controler.SignalsControllerListener;
+import org.matsim.signalsystems.controler.SignalsControllerListenerFactory;
 
 
 /**
  * @author dgrether
  *
  */
-public class TaSingleCrossingMain {
+public class LaemmerControlerListenerFactory implements SignalsControllerListenerFactory {
 
-	private final static double lambdaMax = 0.1;
-	
-	public static void main(String[] args) {
-		
-		for (double lambdaWestEast = 0.0; lambdaWestEast <= lambdaMax; lambdaWestEast += 0.1){
-			
-		}
-		double lambdaWestEast = 0.5;
-		Scenario scenario = new SingleCrossingScenario().createScenario(lambdaWestEast);
-		
-		Controler controler = new Controler(scenario);
-		controler.setSignalsControllerListenerFactory(new DgTaControlerListenerFactory());
-		controler.setOverwriteFiles(true);
-		controler.run();
-
+	@Override
+	public SignalsControllerListener createSignalsControllerListener() {
+		return new LaemmerSignalControlerListener();
 	}
 
 }

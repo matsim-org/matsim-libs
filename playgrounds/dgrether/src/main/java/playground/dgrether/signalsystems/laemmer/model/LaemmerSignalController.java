@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TaMain
+ * DgTaController
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,43 +17,65 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.laemmer;
+package playground.dgrether.signalsystems.laemmer.model;
 
-import org.apache.log4j.Logger;
-import org.matsim.core.controler.Controler;
+import org.matsim.signalsystems.model.SignalController;
 
-import playground.dgrether.DgPaths;
-import playground.dgrether.signalsystems.laemmer.controler.DgTaControlerListenerFactory;
+import playground.dgrether.signalsystems.utils.DgAbstractSignalController;
 
 
 /**
  * @author dgrether
  *
  */
-public class TaMain {
-  
-	private static final Logger log = Logger.getLogger(TaMain.class);
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		log.info("Running SylviaMain...");
-		String[] args2 = null;
-		if (args == null || args.length == 0){
-			log.info("No args given, running local config...");
-			args2 = new String[1];
-			args2[0] = DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/config.xml";
-		}
-		else {
-			args2 = args;
-		}
+public class LaemmerSignalController  extends DgAbstractSignalController implements SignalController {
 
+	public static final String IDENTIFIER = "LaemmerSignalSystemController";
+	
+	@Override
+	public void updateState(double timeSeconds) {
 		
-		Controler controler = new Controler(args2);
-		controler.setSignalsControllerListenerFactory(new DgTaControlerListenerFactory());
-		controler.setOverwriteFiles(true);
-		controler.run();
-
+		
+		// for all approaches
+		this.calculatePriorityIndex(timeSeconds);
+		
 	}
+
+	
+	private void calculatePriorityIndex(double timeSeconds) {
+		this.getNumberOfExpectedVehicles(timeSeconds);
+		
+	}
+
+	/**
+	 * 
+	 * @return \hat{n_i} (t)
+	 */
+	private int getNumberOfVehiclesForClearance(){
+		
+		return 0;
+	}
+	
+	
+	/**
+	 * Zeitreihe der erwarteten Ankuenfte an der Haltelinie
+	 * 
+	 * N_i^{exp}(t + \hat(g)_i))
+	 * 
+	 */
+	private int getNumberOfExpectedVehicles(double timeSeconds){
+		return 0;
+	}
+	
+	
+	@Override
+	public void reset(Integer iterationNumber) {
+	}
+
+	@Override
+	public void simulationInitialized(double simStartTimeSeconds) {
+	}
+	
+	
 
 }
