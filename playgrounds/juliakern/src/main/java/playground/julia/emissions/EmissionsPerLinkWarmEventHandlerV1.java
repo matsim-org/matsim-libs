@@ -34,8 +34,8 @@ import playground.vsp.emissions.utils.EmissionUtils;
  * @author benjamin, julia
  *
  */
-public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandler{
-	private static final Logger logger = Logger.getLogger(EmissionsPerLinkWarmEventHandler.class);
+public class EmissionsPerLinkWarmEventHandlerV1 implements WarmEmissionEventHandler{
+	private static final Logger logger = Logger.getLogger(EmissionsPerLinkWarmEventHandlerV1.class);
 
 	Map<Double, Map<Id, Map<WarmPollutant, Double>>> time2warmEmissionsTotal = new HashMap<Double, Map<Id, Map<WarmPollutant, Double>>>();
 	Map<Double, Map<Id, Double>> time2linkIdLeaveCount = new HashMap<Double, Map<Id,Double>>();
@@ -44,7 +44,7 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 	final double timeBinSize;
 	EmissionUtils emissionUtils;
 
-	public EmissionsPerLinkWarmEventHandler(double simulationEndTime, int noOfTimeBins){
+	public EmissionsPerLinkWarmEventHandlerV1(double simulationEndTime, int noOfTimeBins){
 		System.out.println("number of time bins " + noOfTimeBins);
 		this.noOfTimeBins = noOfTimeBins;
 		this.timeBinSize = simulationEndTime / noOfTimeBins;
@@ -61,8 +61,6 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 
 	@Override
 	public void handleEvent(WarmEmissionEvent event) {
-		//TODO vermutlich schnell mit try und catch:
-		// in den meisten faellen wird das event alle eintraege haben und schon 
 		Double time = event.getTime();
 		Id linkId = event.getLinkId();
 		Map<WarmPollutant, Double> warmEmissionsOfEvent = event.getWarmEmissions();
@@ -77,6 +75,29 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 
 		if (endOfTimeInterval < this.noOfTimeBins * this.timeBinSize+1) {
 			
+			/*
+			 *  try to add emissions so far and emissions of this event.
+			 *  if there are entries for this time intervall and link for every pollutant this works
+			 *  if not -> catch nullpointer -> initialize everything necessary (takes much longer) 
+			 */
+			
+			try{
+				Map<Id, Map<WarmPollutant, Double>> prevWarmEmissionsTotal = new HashMap<Id, Map<WarmPollutant,Double>>();
+				prevWarmEmissionsTotal.putAll(this.time2warmEmissionsTotal.get(endOfTimeInterval));
+				Map<WarmPollutant, Double> warmEmissionsTotalOnThisLink = new HashMap<WarmPollutant, Double>();
+				warmEmissionsTotalOnThisLink.putAll(prevWarmEmissionsTotal.get(linkId));
+				// emission values
+				for(WarmPollutant wp: WarmPollutant.values()){
+					warmEmissionsTotalOnThisLink.put(wp, warmEmissionsTotalOnThisLink.get(wp)+warmEmissionsOfEvent.get(wp));
+				}
+				countTotal.put(linkId, countTotal.get(linkId)+1);
+				
+				// if everything went like supposed, put new values into the map
+				prevWarmEmissionsTotal.put(linkId, warmEmissionsTotalOnThisLink);
+				this.time2warmEmissionsTotal.put(endOfTimeInterval, warmEmissionsTotal);
+				this.time2linkIdLeaveCount.put(endOfTimeInterval, countTotal);
+				
+			}catch(NullPointerException e){ // -- catch: something was not initialized -> go through everything and initialize as zero if needed
 			// make sure all fields are initilized / set values to zero
 			// get previous emissions of this time interval
 			if(this.time2warmEmissionsTotal != null && this.time2warmEmissionsTotal.containsKey(endOfTimeInterval)){
@@ -143,6 +164,7 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 			this.time2warmEmissionsTotal.put(endOfTimeInterval, warmEmissionsTotal);
 			this.time2linkIdLeaveCount.put(endOfTimeInterval, countTotal);
 		}
+		} // -- end of 'catch'
 		// do nothing if time of event is later than the simulation end
 	}
 
