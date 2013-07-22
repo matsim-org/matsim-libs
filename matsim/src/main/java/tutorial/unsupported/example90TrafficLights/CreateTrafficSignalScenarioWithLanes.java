@@ -245,9 +245,9 @@ public class CreateTrafficSignalScenarioWithLanes {
 		config.plans().setInputFile("examples/tutorial/unsupported/example90TrafficLights/population.xml.gz");
 		config.scenario().setUseLanes(true);
 		config.scenario().setUseSignalSystems(true);
-		config.getQSimConfigGroup().setNodeOffset(20.0);
 		config.controler().setMobsim("qsim");
 		config.addQSimConfigGroup(new QSimConfigGroup());
+		config.getQSimConfigGroup().setNodeOffset(20.0);
 		config.getQSimConfigGroup().setSnapshotStyle("queue");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		
