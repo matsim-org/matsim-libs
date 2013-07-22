@@ -356,8 +356,10 @@ First performance measurements show promising results.
 
 Working paper will be published in Q2 2010.
 
-
-%\includegraphics{User%27s%20Guide_files/parallelqsim_png_4b7c0bbb21.png}
+\begin{figure}[htp]
+\includegraphics[width=\textwidth]{figures/qsimParallel/parallelqsim.png}
+\caption{Design of the parallel qsim}
+\end{figure}
 
 The config option presumably is:
 \begin{verbatim}
@@ -368,7 +370,7 @@ $<$/module$>$
 
 \end{verbatim}
 
-Any number of threads larger than one triggers the use of the parallel version. (??)
+Any number of threads larger than $1$ triggers the use of the parallel version.
 
 \vfill\eject
 \section{"qsim". Status: works but is not very transparent}
@@ -409,9 +411,9 @@ where
 	\item There  is also an effective lane width, also at the beginning of the "links"  section in the network file, normally set to 3.75m. See below for  its use.
 \end{itemize}
 
-This is most useful if you have something else than  cars, for example pedestrians. Let us assume an effective lane  with of 0.4m and an effective cell size also of 0.4m. This would  lead to a maximum density of 0.4*0.4=0.16persons/m\textasciicircum2, not totally  unrealistic.
+This is most useful if you have something else than  cars, for example pedestrians. Let us assume an effective lane  with of 0.4m and an effective cell size also of 0.4m. This would  lead to a maximum density of 0.4*0.4=0.16persons/$m^2$, not totally  unrealistic.
 
-If, now, a link has an area of 200m\textasciicircum2 and a length of 50m, then it would obtain
+If, now, a link has an area of $200m^2$ and a length of 50m, then it would obtain
 \begin{verbatim}
 number_of_lanes = area / length / effective_lane_width = 200 / 50 / 0.4 = 10
 
@@ -429,7 +431,7 @@ in the above example
 
 \end{verbatim}
 
-This is, naturally, the same as dividing the 200m\textasciicircum2 of the link by the 0.16persons/m\textasciicircum2.
+This is, naturally, the same as dividing the 200m\textasciicircum2 of the link by the 0.16persons/$m^2$.
 
 The effective lane width might be used by the visualization (unclear if this is the case).
 

@@ -3,6 +3,7 @@
 \makeatletter
 \@ifpackageloaded{tex4ht}{%
 	% packages/options only used for generating html
+	\usepackage{graphicx}	
 	
 }{%
 	% packages/options only used for generating pdf
@@ -96,7 +97,9 @@
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 \begin{document}
+\NextFile{index.html}
 \tolerance10000
 
 \title{\textcolor{blue}{\sf MATSim User's Guide}}

@@ -203,7 +203,7 @@ Ready
 
 MATSim provides destination choice based on three  different basic concepts. First, random search can be applied. Second,  local search implemented in the time geography framework is available  [1]. Third, the most recent module ist best response and includes random  error terms to make MATSim fully compatible with discrete choice theory  [2]. The authors recommend to use this recent module in general. Random  search should be utilized for algorithmic comparative investigations  only.
 
-The time geography module provides the possibility to  take into account spatial competition in the activity location  infrastructure (see \hyperlink{Figure3}{Figure 3}). It is planned-after a thorough calibration-to integrate spatial competition in the best response version.
+The time geography module provides the possibility to  take into account spatial competition in the activity location  infrastructure (see Fig.~\ref{fig:locachoice:3}). It is planned-after a thorough calibration-to integrate spatial competition in the best response version.
 
 Estimation of a MATSim destination choice utility function for Switzerland is in development [3].
 % EndFragment
@@ -231,7 +231,7 @@ Due to slow convergence, this approach is only useful for very small scenarios.
 
 \subsubsection{{II. Local Search With Time Geography}}
 
-The MATSim local search destination choice module is  based on Hägerstrand's time geography. That is, in every replanning step  locations are chosen within the region restrained by travel time  budgets as defined by the time allocation module (see \hyperlink{Figure1}{Figure 1} and \hyperlink{Figure2}{Figure 2}). Within this region the choice is performed based on the MATSim utility function.
+The MATSim local search destination choice module is  based on Hägerstrand's time geography. That is, in every replanning step  locations are chosen within the region restrained by travel time  budgets as defined by the time allocation module (see Fig.~\ref{fig:locachoice:1} and Fig.~\ref{fig:locachoice:2}). Within this region the choice is performed based on the MATSim utility function.
 
 In more detail, the following procedure is  iteratively applied. An approximate choice set of locations is built to  begin with, where the constructing of this set is initially based on an  initial global travel speed assumption (\emph{recursionTravelSpeed}).  After tentatively choosing one location from this approximate set, the  actual accessibility in terms of travel time is checked. If the location  is not accessible it is rejected, the initial travel time is adapted  according to the \emph{recursionTravelSpeedChange}parameter  in the configuration file and a next trial is started. After a certain  number of failed trials to find an accessible location (\emph{maxRecursions}), the choice is made from the universal choice set.
 
@@ -273,25 +273,23 @@ The parameters \emph{restraintFcnFactor}and \emph{restraintFcnExp }are explained
 
 \subsubsection{Figures}
 
-\emph{\textbf{Figure 1:}}
+\begin{figure}
+\includegraphics[width=.9\textwidth]{figures/locationChoice/locachoice1.png}
+\caption{Region restrained by travel time budget}
+\label{fig:locachoice:1}
+\end{figure}
 
+\begin{figure}
+\includegraphics[width=.9\textwidth]{figures/locationChoice/locachoice2.png}
+\caption{Region restrained by travel time budget}
+\label{fig:locachoice:2}
+\end{figure}
 
-
-%\includegraphics{User%27s%20Guide_files/locachoice1_png_4b7c607586.png}
-
-
-
-\emph{\textbf{Figure 2:}}
-
-
-%\includegraphics{User%27s%20Guide_files/locachoice2_png_4b7c607592.png}
-
-
-
-\emph{\textbf{Figure 3:}}
-
-
-%\includegraphics{User%27s%20Guide_files/locachoice_capacities_png_4b7c607592.png}
+\begin{figure}
+\includegraphics[width=.5\textwidth]{figures/locationChoice/locachoice_capacities.png}
+\caption{Taking spatial competition into account}
+\label{fig:locachoice:3}
+\end{figure}
 
 
 
