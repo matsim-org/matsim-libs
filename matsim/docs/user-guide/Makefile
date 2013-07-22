@@ -1,13 +1,21 @@
-.PHONY: pdf html bib clean veryclean tags wc
+.PHONY: pdf pdf-full html bib clean veryclean tags wc
 
 NAME=user-guide
 
 pdf:
 	pdflatex ${NAME}
 
+# pdf-full is used by the build server to build the complete pdf from a clean checkout
+pdf-full:
+	pdflatex -interaction=nonstopmode ${NAME}
+	pdflatex -interaction=nonstopmode ${NAME}
+	pdflatex -interaction=nonstopmode ${NAME}
+
+
 html:
 	-mkdir html/
-	htlatex ${NAME} 'html,2' "" -dhtml/
+	htlatex ${NAME} 'html,2' "" -dhtml/ -interaction=nonstopmode 
+	cp -r figures html/
 
 bib: clean
 	-pdflatex -interaction nonstopmode ${NAME}
