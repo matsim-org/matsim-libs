@@ -186,6 +186,6 @@ public class MiniScenarioDualSim {
 		
 		System.out.println(densityHandler.getNumberOfProcessedVehicles()); 
 
-		MainFundamentalDiagram.printDensityAndOutFlow(densities, links, outflowHandler,true,runId, caption,binSizeInSeconds);
+		MainFundamentalDiagram.printDensityAndOutFlow(densities, links, outflowHandler,true,runId, caption,binSizeInSeconds,1.0);
 	}
 }

@@ -48,6 +48,7 @@ public class MainFundamentalDiagram {
 
 		double radiusInMeters = 1000;
 		double length = 50.0;
+		double sampleSize=0.1;
 
 		Config config = ConfigUtils.createConfig();
 		config.network().setInputFile(networkFile);
@@ -81,7 +82,7 @@ public class MainFundamentalDiagram {
 		
 		System.out.println(densityHandler.getNumberOfProcessedVehicles()); 
 
-		printDensityAndOutFlow(densities, links, outflowHandler, doConsoleOutput,0,"",binSizeInSeconds);
+		printDensityAndOutFlow(densities, links, outflowHandler, doConsoleOutput,0,"",binSizeInSeconds,sampleSize);
 	}
 
 	public static HashMap<Id, double[]> calculateDensities(
@@ -112,7 +113,7 @@ public class MainFundamentalDiagram {
 
 	public static void printDensityAndOutFlow(HashMap<Id, double[]> density,
 			Map<Id, ? extends Link> links,
-			OutFlowInfoCollectorDualSim outflowHandler, boolean doConsoleOutput, int runId, String caption, int binSizeInSeconds) { // print
+			OutFlowInfoCollectorDualSim outflowHandler, boolean doConsoleOutput, int runId, String caption, int binSizeInSeconds, double sampleSize) { // print
 
 		for (Id linkId : density.keySet()) {
 			int[] tempBin = outflowHandler.linkOutFlow.get(linkId);
@@ -208,12 +209,12 @@ public class MainFundamentalDiagram {
 			}
 		}
 		
-		printCordonDensityFlowGraph(density,outflowHandler,binSizeInSeconds,links);
+		printCordonDensityFlowGraph(density,outflowHandler,binSizeInSeconds,links,sampleSize);
 	}
 
 	private static void printCordonDensityFlowGraph(
 			HashMap<Id, double[]> density,
-			OutFlowInfoCollectorDualSim outflowHandler, int binSizeInSeconds, Map<Id, ? extends Link> links) {
+			OutFlowInfoCollectorDualSim outflowHandler, int binSizeInSeconds, Map<Id, ? extends Link> links, double sampleSize) {
 		double[] cordonDensity = new double[getNumberOfBins(binSizeInSeconds)];
 		double[] cordonOutflow = new double[getNumberOfBins(binSizeInSeconds)];
 		double lengthOfLinksInCordon = 0;
@@ -257,7 +258,7 @@ public class MainFundamentalDiagram {
 		}
 		System.out.println();
 		
-		GeneralLib.generateXYScatterPlot("c:/tmp/density_2.png", cordonDensity, cordonOutflow, "cordon density vs. flow",
+		GeneralLib.generateXYScatterPlot("c:/tmp/density_2.png", cordonDensity, cordonOutflow, "cordon density vs. flow (sample size:" + sampleSize + ")",
 				"density", "outflow");
 	}
 
