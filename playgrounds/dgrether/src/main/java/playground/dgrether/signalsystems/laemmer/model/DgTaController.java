@@ -30,6 +30,8 @@ import playground.dgrether.signalsystems.utils.DgAbstractSignalController;
  */
 public class DgTaController  extends DgAbstractSignalController implements SignalController {
 
+	public static final String IDENTIFIER = "LaemmerSignalSystemController";
+	
 	@Override
 	public void updateState(double timeSeconds) {
 		

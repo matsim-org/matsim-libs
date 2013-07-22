@@ -37,13 +37,18 @@ import playground.dgrether.signalsystems.DgSensorManager;
  */
 public class DgTaSignalModelFactory implements SignalModelFactory {
 
+	private DgSensorManager sensorManager;
+	private DefaultSignalModelFactory delegate;
+
 	public DgTaSignalModelFactory(DefaultSignalModelFactory defaultSignalModelFactory,
 			DgSensorManager sensorManager) {
+		this.delegate = defaultSignalModelFactory;
+		this.sensorManager = sensorManager;
 	}
 
 	@Override
 	public SignalSystemsManager createSignalSystemsManager() {
-		return null;
+		return this.delegate.createSignalSystemsManager();
 	}
 
 	@Override
@@ -53,12 +58,15 @@ public class DgTaSignalModelFactory implements SignalModelFactory {
 
 	@Override
 	public SignalController createSignalSystemController(String controllerIdentifier) {
-		return null;
+		if (DgTaController.IDENTIFIER.equals(controllerIdentifier)){
+			return new DgTaController();
+		}
+		return this.delegate.createSignalSystemController(controllerIdentifier);
 	}
 
 	@Override
 	public SignalPlan createSignalPlan(SignalPlanData planData) {
-		return null;
+		return this.delegate.createSignalPlan(planData);
 	}
 
 }

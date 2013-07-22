@@ -20,7 +20,8 @@
 package playground.dgrether.signalsystems.laemmer.testisolatedcrossing;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.otfvis.OTFVis;
+
+import playground.dgrether.signalsystems.laemmer.otfvis.LaemmerOTFStarter;
 
 
 /**
@@ -32,7 +33,7 @@ public class RunOTFVis {
 	public static void main(String[] args) {
 		double lambdaWestEast = 0.5;
 		Scenario scenario = new SingleCrossingScenario().createScenario(lambdaWestEast);
-		OTFVis.playScenario(scenario);
+		new LaemmerOTFStarter().playScenario(scenario);
 	}
 
 }
