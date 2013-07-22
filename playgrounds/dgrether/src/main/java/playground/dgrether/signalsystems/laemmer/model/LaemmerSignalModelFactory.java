@@ -53,7 +53,7 @@ public class LaemmerSignalModelFactory implements SignalModelFactory {
 
 	@Override
 	public SignalSystem createSignalSystem(Id id) {
-		return null;
+		return this.delegate.createSignalSystem(id);
 	}
 
 	@Override
