@@ -90,8 +90,10 @@ To test your installation open a command prompt (Windows) or a  terminal (Mac, L
 
 This starts a test scenario. If the test completes without errors, your travel model plug-in should be working.
 
-
-%\includegraphics{User%27s%20Guide_files/structure.png}Figure 1: After the installation the matsim4opus directory should contain the depicted files and subdirectories.
+\begin{figure}[htp]
+\includegraphics[width=\textwidth]{figures/matsim4urbansim/structure.png}
+\caption{After the installation the matsim4opus directory should contain the depicted files and subdirectories.}
+\end{figure}
 
 \subsubsection{3 Using MATSim for UrbanSim}
 
@@ -109,10 +111,10 @@ These files are not included in the UrbanSim base\_year\_data and  must be added
 
 For the current Seattle parcel example scenario you can download the zipped matsim folder \href{https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/examples/countries/us/seattle/matsim.zip}{here.}  Unzip it into your OPUS\_DATA/seattle\_parcel/base\_year\_data/2000/  directory. After that your seattle\_parcel base\_year\_data should look  like Figure 2.
 
-
-%\includegraphics{User%27s%20Guide_files/seattle_parcel_base_year_dir_v2.png}
-
-Figure 2: Store MATSim related files like road networks and  plans-files directly in the base\_year\_data folder of the corresponding  UrbanSim application.
+\begin{figure}[htp]
+\includegraphics[width=\textwidth]{figures/matsim4urbansim/seattle_parcel_base_year_dir_v2.png}
+\caption{Store MATSim related files like road networks and  plans-files directly in the base\_year\_data folder of the corresponding  UrbanSim application.}
+\end{figure}
 
 \subparagraph{UrbanSim Data Requirements}
 
@@ -140,10 +142,10 @@ In order to create input data for MATSim UrbanSim requires certain  data sets an
 
 In a recent effort a set of MATSim configuration parameters are  embedded into the travel\_parameter\_configuration section of the UrbanSim  configuration. This allows to configure MATSim in the OPUS GUI under  the Models tab as shown in Figure 3. The travel model conguration  section consists of a few lines of XML code and can be added into  existing UrbanSim configurations. A sample configuration for Seattle  parcel including the travel model configuration section can be  downloaded \href{https://svn.vsp.tu-berlin.de/repos/public-svn/matsim/examples/countries/us/seattle/seattle_parcel.xml}{here}.
 
-
-%\includegraphics{User%27s%20Guide_files/Gui.png}
-
-Figure 3: MATSim4UrbanSim configuration in OPUS GUI
+\begin{figure}[htp]
+\includegraphics[width=\textwidth]{figures/matsim4urbansim/gui.png}
+\caption{MATSim4UrbanSim configuration in OPUS GUI}
+\end{figure}
 
 The following explains step by step the MATSim configuration options provided by the OPUS GUI.
 
@@ -185,10 +187,11 @@ To run MATSim for parcel applications enable the models \textbf{1},\textbf{ 3} a
 
 By  default neither a shape file nor a bounding box is needed. In this case  MATSim takes the road network to determine the study area, which could  need more ram and computation time for accessibility computation.
 
+\begin{figure}[htp]
+\includegraphics[width=\textwidth]{figures/matsim4urbansim/resolution.png}
+\caption{The figure visualizes how the study area (blue area) is  subdivided into cells of configurable size by using the "cell\_size"  parameter. The left illustration has a side length of 200 meter  (cell\_size=200), the right illustration has a side length of 400 meter  (cell\_size=400). The blue dots are the corresponding cell centroids,  which serve as measuring points for the accessibility computation.}
+\end{figure}
 
-%\includegraphics{User%27s%20Guide_files/resolution.png}
-
-Figure 4: The figure visualizes how the study area (blue area) is  subdivided into cells of configurable size by using the "cell\_size"  parameter. The left illustration has a side length of 200 meter  (cell\_size=200), the right illustration has a side length of 400 meter  (cell\_size=400). The blue dots are the corresponding cell centroids,  which serve as measuring points for the accessibility computation.
 \begin{itemize}
 	\item \textbf{accessibility\_parameter}: At this point the marginal utilities e.g. for different transport modes can be configured (\sout{for calibration instructions see \href{http://www.matsim.org/node/650}{here}} no this has nothing to do with calibration. kn, apr'13]]):   
 \begin{itemize}
@@ -228,18 +231,20 @@ Figure 4: The figure visualizes how the study area (blue area) is  subdivided in
 \\
 \\  Setting the marginal utility beta$_xx$ to zero removes the corresponding summand from the equation. In order to use your own V$_ik,mode$  make sure that the corresponding switches  ("use\_car\_parameter\_from\_MATSim" and/or  "use\_walk\_parameter\_from\_MATSim") are disabled.}
 
+\begin{figure}[htp]
+\includegraphics[width=.5\textwidth]{figures/matsim4urbansim/vik.png}
+\caption{The composition of the disutility V$_ik,xx,mode $consists  of three parts: the cost (1) to reach network from i, (2) the cost on  the network and (3) the costs to reach the opportunity \emph{k} from the network.}
+\end{figure}
 
-%\includegraphics{User%27s%20Guide_files/vik.png}
-
-Figure 5: The composition of the disutility V$_ik,xx,mode $consists  of three parts: the cost (1) to reach network from i, (2) the cost on  the network and (3) the costs to reach the opportunity \emph{k} from the network.
 \begin{itemize}
 	\item \textbf{random\_location\_distribution\_radius\_for urbansim\_zone}:  This option is only relevant for UrbanSim zone applications. It  randomly distributes persons living in a certain zone within a given  radius (in meter) around the zone centroid. See also section 4  "Additional MATSim4UrbanSim Parameters" for an alternative distribution  of persons.
 \end{itemize}
 
+\begin{figure}[htp]
+\includegraphics[width=\textwidth]{figures/matsim4urbansim/radius.png}
+\caption{The random\_location\_distribution\_radius\_ for\_urbansim\_zone  parameter randomly distributes persons (red dots) living in a certain  zone within a given radius around the zone centroid (blue dot).}
+\end{figure}
 
-%\includegraphics{User%27s%20Guide_files/radius.png}
-
-Figure 6: The random\_location\_distribution\_radius\_ for\_urbansim\_zone  parameter randomly distributes persons (red dots) living in a certain  zone within a given radius around the zone centroid (blue dot).
 
 \textbf{MATSim Config}:
 
@@ -255,9 +260,9 @@ Thissectioncontainsparametersfor theconfigurationof thetrafficmodel.
 \\
 \begin{verbatim}
 
-\texttt{$<$external_matsim_config type="dictionary"$>$
-  $<$matsim_config name="2001" type="file"$>$ralative_path/to/external_matsim_config.xml$<$/matsim_config$>$
-$<$/external_matsim_config$>$}
+<external_matsim_config type="dictionary">
+  <matsim_config name="2001" type="file">relative_path/to/external_matsim_config.xml</matsim_config$
+</external_matsim_config>}
 \end{verbatim}
 	\item \textbf{matsim\_network\_file}: This points, as the name  implies, to a road network in MATSim format. A relative path (located in  the OPUS\_HOME directory) to the network file is expected.
 	\item \textbf{last\_iteration}: This gives the number of MATSim iterations to perform. In MATSim iterations start at zero.
@@ -322,15 +327,15 @@ A full description for the changeLegMode module is given \href{http://www.matsim
 
 Note: When using MATSim4UrbanSim  make sure that any strategy defined in the standard MATSim  configuration has an "index" $>$= 4 (ModuleProbability\_index,  Module\_index). Otherwise these strategies are overwritten by the  strategies that are configurable via the OPUS GUI, see above "strategy".
 
+\begin{figure}[htp]
+\includegraphics[width=\textwidth]{figures/matsim4urbansim/external_matsim_config_1.png}
+\caption{Some addidional configuration settings for MATSim4UrbanSim  are only available/configurable via the standard MATSim configuration,  which are depicted in this illustration.}
+\end{figure}
 
-%\includegraphics{User%27s%20Guide_files/external_matsim_config_1.png}
-
-Figure 7: Some addidional configuration settings for MATSim4UrbanSim  are only available/configurable via the standard MATSim configuration,  which are depicted in this illustration.
-
-
-%\includegraphics{User%27s%20Guide_files/brussel_zone_shapefile.png}
-
-Figure 8: A zone shape file at the example of the greater Brussels area.
+\begin{figure}[htp]
+\includegraphics[width=\textwidth]{figures/matsim4urbansim/brussel_zone_shapefile.png}
+\caption{A zone shape file at the example of the greater Brussels area.}
+\end{figure}
 
 \subsubsection{5 Create An Initial Plans File}
 
