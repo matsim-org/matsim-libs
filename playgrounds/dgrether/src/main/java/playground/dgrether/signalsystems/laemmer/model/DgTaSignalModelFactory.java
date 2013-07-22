@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgTaController
+ * DgTaSignalModelFactory
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,63 +17,48 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.tacontrol.model;
+package playground.dgrether.signalsystems.laemmer.model;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.signalsystems.builder.DefaultSignalModelFactory;
+import org.matsim.signalsystems.builder.SignalModelFactory;
+import org.matsim.signalsystems.data.signalcontrol.v20.SignalPlanData;
 import org.matsim.signalsystems.model.SignalController;
+import org.matsim.signalsystems.model.SignalPlan;
+import org.matsim.signalsystems.model.SignalSystem;
+import org.matsim.signalsystems.model.SignalSystemsManager;
 
-import playground.dgrether.signalsystems.utils.DgAbstractSignalController;
+import playground.dgrether.signalsystems.DgSensorManager;
 
 
 /**
  * @author dgrether
  *
  */
-public class DgTaController  extends DgAbstractSignalController implements SignalController {
+public class DgTaSignalModelFactory implements SignalModelFactory {
 
-	@Override
-	public void updateState(double timeSeconds) {
-		
-		
-		// for all approaches
-		this.calculatePriorityIndex(timeSeconds);
-		
-	}
-
-	
-	private void calculatePriorityIndex(double timeSeconds) {
-		this.getNumberOfExpectedVehicles(timeSeconds);
-		
-	}
-
-	/**
-	 * 
-	 * @return \hat{n_i} (t)
-	 */
-	private int getNumberOfVehiclesForClearance(){
-		
-		return 0;
-	}
-	
-	
-	/**
-	 * Zeitreihe der erwarteten Ankuenfte an der Haltelinie
-	 * 
-	 * N_i^{exp}(t + \hat(g)_i))
-	 * 
-	 */
-	private int getNumberOfExpectedVehicles(double timeSeconds){
-		return 0;
-	}
-	
-	
-	@Override
-	public void reset(Integer iterationNumber) {
+	public DgTaSignalModelFactory(DefaultSignalModelFactory defaultSignalModelFactory,
+			DgSensorManager sensorManager) {
 	}
 
 	@Override
-	public void simulationInitialized(double simStartTimeSeconds) {
+	public SignalSystemsManager createSignalSystemsManager() {
+		return null;
 	}
-	
-	
+
+	@Override
+	public SignalSystem createSignalSystem(Id id) {
+		return null;
+	}
+
+	@Override
+	public SignalController createSignalSystemController(String controllerIdentifier) {
+		return null;
+	}
+
+	@Override
+	public SignalPlan createSignalPlan(SignalPlanData planData) {
+		return null;
+	}
 
 }

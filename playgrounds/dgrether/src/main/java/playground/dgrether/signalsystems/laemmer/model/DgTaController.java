@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RunOTFVis
+ * DgTaController
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,22 +17,63 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.tacontrol.testisolatedcrossing;
+package playground.dgrether.signalsystems.laemmer.model;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.otfvis.OTFVis;
+import org.matsim.signalsystems.model.SignalController;
+
+import playground.dgrether.signalsystems.utils.DgAbstractSignalController;
 
 
 /**
  * @author dgrether
  *
  */
-public class RunOTFVis {
+public class DgTaController  extends DgAbstractSignalController implements SignalController {
 
-	public static void main(String[] args) {
-		double lambdaWestEast = 0.5;
-		Scenario scenario = new SingleCrossingScenario().createScenario(lambdaWestEast);
-		OTFVis.playScenario(scenario);
+	@Override
+	public void updateState(double timeSeconds) {
+		
+		
+		// for all approaches
+		this.calculatePriorityIndex(timeSeconds);
+		
 	}
+
+	
+	private void calculatePriorityIndex(double timeSeconds) {
+		this.getNumberOfExpectedVehicles(timeSeconds);
+		
+	}
+
+	/**
+	 * 
+	 * @return \hat{n_i} (t)
+	 */
+	private int getNumberOfVehiclesForClearance(){
+		
+		return 0;
+	}
+	
+	
+	/**
+	 * Zeitreihe der erwarteten Ankuenfte an der Haltelinie
+	 * 
+	 * N_i^{exp}(t + \hat(g)_i))
+	 * 
+	 */
+	private int getNumberOfExpectedVehicles(double timeSeconds){
+		return 0;
+	}
+	
+	
+	@Override
+	public void reset(Integer iterationNumber) {
+	}
+
+	@Override
+	public void simulationInitialized(double simStartTimeSeconds) {
+	}
+	
+	
 
 }

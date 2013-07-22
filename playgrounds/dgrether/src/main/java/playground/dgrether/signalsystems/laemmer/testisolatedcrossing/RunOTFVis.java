@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgSylviaControlerListenerFactory
+ * RunOTFVis
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,21 +17,22 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.tacontrol.controler;
+package playground.dgrether.signalsystems.laemmer.testisolatedcrossing;
 
-import org.matsim.signalsystems.controler.SignalsControllerListener;
-import org.matsim.signalsystems.controler.SignalsControllerListenerFactory;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.otfvis.OTFVis;
 
 
 /**
  * @author dgrether
  *
  */
-public class DgTaControlerListenerFactory implements SignalsControllerListenerFactory {
+public class RunOTFVis {
 
-	@Override
-	public SignalsControllerListener createSignalsControllerListener() {
-		return new DgTaSignalControlerListener();
+	public static void main(String[] args) {
+		double lambdaWestEast = 0.5;
+		Scenario scenario = new SingleCrossingScenario().createScenario(lambdaWestEast);
+		OTFVis.playScenario(scenario);
 	}
 
 }

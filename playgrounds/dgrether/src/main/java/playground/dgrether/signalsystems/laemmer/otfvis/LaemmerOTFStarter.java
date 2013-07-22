@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.tacontrol.otfvis;
+package playground.dgrether.signalsystems.laemmer.otfvis;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
@@ -35,7 +35,7 @@ import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
 import playground.dgrether.signalsystems.DgSensorManager;
-import playground.dgrether.signalsystems.tacontrol.model.DgTaSignalModelFactory;
+import playground.dgrether.signalsystems.laemmer.model.DgTaSignalModelFactory;
 
 
 /**

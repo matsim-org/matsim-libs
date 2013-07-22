@@ -23,7 +23,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
 
 import playground.dgrether.DgPaths;
-import playground.dgrether.signalsystems.tacontrol.controler.DgTaControlerListenerFactory;
+import playground.dgrether.signalsystems.laemmer.controler.DgTaControlerListenerFactory;
 
 
 /**

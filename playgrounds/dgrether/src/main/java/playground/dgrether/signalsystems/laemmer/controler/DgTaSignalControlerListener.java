@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.tacontrol.controler;
+package playground.dgrether.signalsystems.laemmer.controler;
 
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -35,7 +35,7 @@ import org.matsim.signalsystems.mobsim.SignalEngine;
 import org.matsim.signalsystems.model.SignalSystemsManager;
 
 import playground.dgrether.signalsystems.DgSensorManager;
-import playground.dgrether.signalsystems.tacontrol.model.DgTaSignalModelFactory;
+import playground.dgrether.signalsystems.laemmer.model.DgTaSignalModelFactory;
 
 
 /**

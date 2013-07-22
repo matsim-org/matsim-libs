@@ -22,8 +22,8 @@ package playground.dgrether.signalsystems.laemmercontrol;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.Controler;
 
-import playground.dgrether.signalsystems.tacontrol.controler.DgTaControlerListenerFactory;
-import playground.dgrether.signalsystems.tacontrol.testisolatedcrossing.SingleCrossingScenario;
+import playground.dgrether.signalsystems.laemmer.controler.DgTaControlerListenerFactory;
+import playground.dgrether.signalsystems.laemmer.testisolatedcrossing.SingleCrossingScenario;
 
 
 /**
