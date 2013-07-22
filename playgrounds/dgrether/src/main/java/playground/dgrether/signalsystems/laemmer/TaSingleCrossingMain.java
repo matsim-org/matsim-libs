@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.laemmercontrol;
+package playground.dgrether.signalsystems.laemmer;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.Controler;
