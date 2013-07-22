@@ -22,12 +22,24 @@ package playground.thibautd.scoring;
 import java.util.Collections;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.events.EventsFactory;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scoring.EventsToScore;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionAccumulator;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.testcases.MatsimTestUtils;
 
 /**
@@ -92,6 +104,85 @@ public class BeingTogetherScoringTest {
 					MatsimTestUtils.EPSILON);
 		}
 	}
+
+	@Test
+	@Ignore( "doesn't pass (see MATSIM-149)" )
+	public void testOvelapsOfActivitiesUnderEventsToScore() throws Exception {
+		final Id ego = new IdImpl( "ego" );
+		final Id alter = new IdImpl( "alter" );
+		
+		final Id linkId = new IdImpl( 1 );
+		final String type = "type";
+		
+		for ( OverlapSpec os : new OverlapSpec[]{
+				new OverlapSpec( 0 , 10 , 20 , 30 ),
+				new OverlapSpec( 0 , 10 , 10 , 30 ),
+				new OverlapSpec( 0 , 20 , 10 , 30 ),
+				new OverlapSpec( 10 , 20 , 10 , 30 ),
+				new OverlapSpec( 20 , 30 , 10 , 30 ),
+				new OverlapSpec( 30 , 50 , 10 , 30 ) }) {
+			final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
+			sc.getPopulation().addPerson( createPerson( ego , sc.getPopulation().getFactory() ) );
+			sc.getPopulation().addPerson( createPerson( alter , sc.getPopulation().getFactory() ) );
+			final BeingTogetherScoring testee =
+				new BeingTogetherScoring(
+						1,
+						ego,
+						Collections.singleton( alter ) );
+			final EventsToScore eventsToScore =
+				new EventsToScore(
+						sc,
+						new ScoringFunctionFactory() {
+
+							@Override
+							public ScoringFunction createNewScoringFunction(
+									Plan plan) {
+								final ScoringFunctionAccumulator sf = new ScoringFunctionAccumulator();
+								if ( plan.getPerson().getId().equals( ego ) ) sf.addScoringFunction( testee );
+								return sf;
+							}
+						});
+			final EventsManager events = EventsUtils.createEventsManager();
+			events.addHandler( eventsToScore );
+			final EventsFactory fact = events.getFactory();
+
+			events.processEvent(
+					fact.createActivityStartEvent(
+						os.startEgo,
+						ego,
+						linkId,
+						null,
+						type) );
+			events.processEvent(
+					fact.createActivityStartEvent(
+						os.startAlter,
+						alter,
+						linkId,
+						null,
+						type) );
+			events.processEvent(
+					fact.createActivityEndEvent(
+						os.endEgo,
+						ego,
+						linkId,
+						null,
+						type) );
+			events.processEvent(
+					fact.createActivityEndEvent(
+						os.endAlter,
+						alter,
+						linkId,
+						null,
+						type) );
+
+			Assert.assertEquals(
+					"unexpected overlap for "+os,
+					Math.max( Math.min( os.endAlter , os.endEgo ) - Math.max( os.startAlter , os.startEgo ) , 0 ),
+					testee.getScore(),
+					MatsimTestUtils.EPSILON);
+		}
+	}
+
 
 	@Test
 	public void testWrapAround() throws Exception {
@@ -354,6 +445,81 @@ public class BeingTogetherScoringTest {
 					testee.getScore(),
 					MatsimTestUtils.EPSILON);
 		}
+	}
+
+	@Test
+	@Ignore( "doesn't pass (see MATSIM-149)" )
+	public void testOvelapsOfLegsUnderEventsToScore() throws Exception {
+		final Id ego = new IdImpl( "ego" );
+		final Id alter = new IdImpl( "alter" );
+		
+		final Id vehId = new IdImpl( 1 );
+		
+		for ( OverlapSpec os : new OverlapSpec[]{
+				new OverlapSpec( 0 , 10 , 20 , 30 ),
+				new OverlapSpec( 0 , 10 , 10 , 30 ),
+				new OverlapSpec( 0 , 20 , 10 , 30 ),
+				new OverlapSpec( 10 , 20 , 10 , 30 ),
+				new OverlapSpec( 20 , 30 , 10 , 30 ),
+				new OverlapSpec( 30 , 50 , 10 , 30 ) }) {
+			final Scenario sc = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
+			sc.getPopulation().addPerson( createPerson( ego , sc.getPopulation().getFactory() ) );
+			sc.getPopulation().addPerson( createPerson( alter , sc.getPopulation().getFactory() ) );
+			final BeingTogetherScoring testee =
+				new BeingTogetherScoring(
+						1,
+						ego,
+						Collections.singleton( alter ) );
+			final EventsToScore eventsToScore =
+				new EventsToScore(
+						sc,
+						new ScoringFunctionFactory() {
+
+							@Override
+							public ScoringFunction createNewScoringFunction(
+									Plan plan) {
+								final ScoringFunctionAccumulator sf = new ScoringFunctionAccumulator();
+								if ( plan.getPerson().getId().equals( ego ) ) sf.addScoringFunction( testee );
+								return sf;
+							}
+						});
+			final EventsManager events = EventsUtils.createEventsManager();
+			events.addHandler( eventsToScore );
+			final EventsFactory fact = events.getFactory();
+
+			events.processEvent(
+					fact.createPersonEntersVehicleEvent(
+						os.startEgo,
+						ego,
+						vehId ) );
+			events.processEvent(
+					fact.createPersonEntersVehicleEvent(
+						os.startAlter,
+						alter,
+						vehId ) );
+			events.processEvent(
+					fact.createPersonLeavesVehicleEvent(
+						os.endEgo,
+						ego,
+						vehId ) );
+			events.processEvent(
+					fact.createPersonLeavesVehicleEvent(
+						os.endAlter,
+						alter,
+						vehId) );
+
+			Assert.assertEquals(
+					"unexpected overlap for "+os,
+					Math.max( Math.min( os.endAlter , os.endEgo ) - Math.max( os.startAlter , os.startEgo ) , 0 ),
+					testee.getScore(),
+					MatsimTestUtils.EPSILON);
+		}
+	}
+
+	private static Person createPerson(final Id id, final PopulationFactory factory) {
+		final Person person = factory.createPerson( id );
+		person.addPlan( factory.createPlan() );
+		return person;
 	}
 
 	private static class OverlapSpec {
