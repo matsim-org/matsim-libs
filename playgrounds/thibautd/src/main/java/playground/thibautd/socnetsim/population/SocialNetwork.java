@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.population;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -49,7 +50,8 @@ public class SocialNetwork {
 	}
 
 	public Set<Id> getAlters(final Id ego) {
-		return map.get( ego );
+		final Set<Id> alters = map.get( ego );
+		return alters == null ? Collections.<Id>emptySet() : alters;
 	}
 }
 
