@@ -15,7 +15,7 @@ pdf-full:
 html:
 	-mkdir html/
 	htlatex ${NAME} 'html,2' "" -dhtml/ -interaction=nonstopmode 
-	cp -r figures html/
+	-cp -r figures html/
 
 bib: clean
 	-pdflatex -interaction nonstopmode ${NAME}
