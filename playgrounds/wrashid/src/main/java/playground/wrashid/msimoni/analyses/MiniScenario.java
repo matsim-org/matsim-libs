@@ -77,7 +77,7 @@ public class MiniScenario {
 		runSimulation(scenario);
 	}
 	
-	private void createNetwork(Scenario scenario) {
+	public static void createNetwork(Scenario scenario) {
 		
 		NetworkFactory factory = scenario.getNetwork().getFactory();
 		
@@ -181,7 +181,7 @@ public class MiniScenario {
 		links.put(scenario.createId("l2"), scenario.getNetwork().getLinks().get(scenario.createId("l2")));
 		links.put(scenario.createId("l3"), scenario.getNetwork().getLinks().get(scenario.createId("l3")));
 		
-		int binSizeInSeconds = 300;	// 5 minute bins
+		int binSizeInSeconds = 90;	// 5 minute bins
 		InFlowInfoAcuumulatorWithPt inflowHandler = new InFlowInfoAcuumulatorWithPt(links, binSizeInSeconds);
 		OutFlowInfoAccumulatorWithPt outflowHandler = new OutFlowInfoAccumulatorWithPt(links, binSizeInSeconds);
 		eventsManager.addHandler(inflowHandler);

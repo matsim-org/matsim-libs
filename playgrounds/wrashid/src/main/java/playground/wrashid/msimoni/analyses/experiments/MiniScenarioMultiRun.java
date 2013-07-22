@@ -98,7 +98,7 @@ public class MiniScenarioMultiRun {
 
 	}
 
-	private static void createNetwork(Scenario scenario) {
+	public static void createNetwork(Scenario scenario) {
 
 		NetworkFactory factory = scenario.getNetwork().getFactory();
 

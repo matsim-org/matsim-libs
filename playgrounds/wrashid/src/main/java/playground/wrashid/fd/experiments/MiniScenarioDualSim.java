@@ -61,6 +61,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import playground.wrashid.fd.DensityInfoCollectorDualSim;
 import playground.wrashid.fd.MainFundamentalDiagram;
 import playground.wrashid.fd.OutFlowInfoCollectorDualSim;
+import playground.wrashid.msimoni.analyses.MiniScenario;
+import playground.wrashid.msimoni.analyses.experiments.MiniScenarioMultiRun;
 
 public class MiniScenarioDualSim {
 
@@ -76,50 +78,13 @@ public class MiniScenarioDualSim {
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		
 		createNetwork(scenario);
-		createPopulation(scenario,100,0);
+		createPopulation(scenario,3,0);
 		runSimulation(scenario,300,0,"");
 	}
 	
 	public static void createNetwork(Scenario scenario) {
-		
-		NetworkFactory factory = scenario.getNetwork().getFactory();
-		
-		Node n0 = factory.createNode(scenario.createId("n0"), scenario.createCoord(0.0, 0.0));
-		Node n1 = factory.createNode(scenario.createId("n1"), scenario.createCoord(5000.0, 0.0));
-		Node n2 = factory.createNode(scenario.createId("n2"), scenario.createCoord(5000.0, 5000.0));
-		Node n3 = factory.createNode(scenario.createId("n3"), scenario.createCoord(0.0, 5000.0));
-		
-		Link l0 = factory.createLink(scenario.createId("l0"), n0, n1);
-		Link l1 = factory.createLink(scenario.createId("l1"), n1, n2);
-		Link l2 = factory.createLink(scenario.createId("l2"), n2, n3);
-		Link l3 = factory.createLink(scenario.createId("l3"), n3, n0);
-		
-		l0.setFreespeed(80.0 / 3.6);
-		l1.setFreespeed(80.0 / 3.6);
-		l2.setFreespeed(80.0 / 3.6);
-		l3.setFreespeed(80.0 / 3.6);
-		
-		l0.setLength(5000.0);
-		l1.setLength(5000.0);
-		l2.setLength(5000.0);
-		l3.setLength(5000.0);
-		
-		l0.setCapacity(Double.MAX_VALUE);
-		l1.setCapacity(2000.0);
-		l2.setCapacity(Double.MAX_VALUE);
-		l3.setCapacity(Double.MAX_VALUE);
-				
-		scenario.getNetwork().addNode(n0);
-		scenario.getNetwork().addNode(n1);
-		scenario.getNetwork().addNode(n2);
-		scenario.getNetwork().addNode(n3);
-		
-		scenario.getNetwork().addLink(l0);
-		scenario.getNetwork().addLink(l1);
-		scenario.getNetwork().addLink(l2);
-		scenario.getNetwork().addLink(l3);
-		
-		new NetworkWriter(scenario.getNetwork()).write("network.xml");
+		//MiniScenario.createNetwork(scenario);
+		MiniScenarioMultiRun.createNetwork(scenario);
 	}
 	
 	
@@ -194,8 +159,8 @@ public class MiniScenarioDualSim {
 		
 		scenario.getConfig().setParam("JDEQSim", "endTime", "96:00:00");
 		scenario.getConfig().setParam("JDEQSim", "gapTravelSpeed", "5.0");	// instead of 15m/s
-//		scenario.getConfig().setParam("JDEQSim", "squeezeTime", "10.0");// instead of 1800.0
-//		scenario.getConfig().setParam("JDEQSim", "minimumInFlowCapacity", "100.0");	// instead of 1800.0
+		scenario.getConfig().setParam("JDEQSim", "squeezeTime", "180000");// instead of 1800.0
+//		scenario.getConfig().setParam("JDEQSim", "minimumInFlowCapacity", "0.0");	// instead of 1800.0
 //		scenario.getConfig().setParam("JDEQSim", "storageCapacityFactor", "5.0");	// instead of 1.0
 		Mobsim sim = new JDEQSimulationFactory().createMobsim(scenario, eventsManager);
 		sim.run();
@@ -221,6 +186,6 @@ public class MiniScenarioDualSim {
 		
 		System.out.println(densityHandler.getNumberOfProcessedVehicles()); 
 
-		MainFundamentalDiagram.printDensityAndOutFlow(densities, links, outflowHandler,false,runId, caption,binSizeInSeconds);
+		MainFundamentalDiagram.printDensityAndOutFlow(densities, links, outflowHandler,true,runId, caption,binSizeInSeconds);
 	}
 }
