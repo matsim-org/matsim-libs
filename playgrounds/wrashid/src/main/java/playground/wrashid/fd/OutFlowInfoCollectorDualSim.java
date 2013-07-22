@@ -83,7 +83,7 @@ public class OutFlowInfoCollectorDualSim extends AbstractDualSimHandler {
 		int binIndex = (int) Math.round(Math.floor(leaveTime / binSizeInSeconds));
 
 		if (leaveTime < 86400) {
-			bins[binIndex] = bins[binIndex] + 1;
+			bins[binIndex]++;
 		}
 
 	}

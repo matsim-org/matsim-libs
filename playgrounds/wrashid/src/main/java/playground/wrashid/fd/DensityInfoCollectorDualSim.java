@@ -43,10 +43,12 @@ import playground.wrashid.lib.obj.TwoKeyHashMapsWithDouble;
 public class DensityInfoCollectorDualSim extends AbstractDualSimHandler {
 
 	private int binSizeInSeconds; // set the length of interval
-	public HashMap<Id, int[]> density; // define
+	public HashMap<Id, double[]> density; // define
 	private Map<Id, ? extends Link> filteredEquilNetLinks; // define
+	int numberOfProcessedVehicles;
 
 	private boolean isJDEQSim;
+	private int calculationTimeBinSize=5;
 
 	public DensityInfoCollectorDualSim(
 			Map<Id, ? extends Link> filteredEquilNetLinks,
@@ -60,11 +62,39 @@ public class DensityInfoCollectorDualSim extends AbstractDualSimHandler {
 
 	@Override
 	public void reset(int iteration) {
-		density = new HashMap<Id, int[]>();
+		density = new HashMap<Id, double[]>();
 	}
 
-	public HashMap<Id, int[]> getLinkOutFlow() {
-		return density;
+	public HashMap<Id, double[]> getLinkDensities() {
+		/**
+		HashMap<Id, double[]> avgDensity = new HashMap<Id, double[]>();
+		
+		for (Id linkId : density.keySet()) {
+			double[] linkDensity = density.get(linkId);
+			
+			double[] avgLinkDensity = density.put(linkId, new double[(86400 / binSizeInSeconds) + 1]);
+			avgDensity.put(linkId, avgLinkDensity);
+			
+			
+			for (int i=0;i<linkDensity.length;i++){
+				
+			}
+			
+		}
+		*/
+		for (Id linkId : density.keySet()) {
+			double[] linkDensity = density.get(linkId);
+			
+			for (int i = 0; i < linkDensity.length; i++) {
+				Link link = filteredEquilNetLinks.get(linkId);
+				linkDensity[i]=linkDensity[i]/link.getLength()/link.getNumberOfLanes();
+			}
+			
+		}
+		
+		
+		
+		return getAverageDensity(binSizeInSeconds/calculationTimeBinSize);
 	}
 
 	@Override
@@ -81,23 +111,56 @@ public class DensityInfoCollectorDualSim extends AbstractDualSimHandler {
 	public void processLeaveLink(Id linkId, Id personId, double enterTime, double leaveTime) {
 
 		if (!density.containsKey(linkId)) {
-			density.put(linkId, new int[(86400 / binSizeInSeconds) + 1]);
+			density.put(linkId, new double[(86400 / calculationTimeBinSize) + 1]);
 		}
 
-		int[] bins = density.get(linkId);
+		double[] bins = density.get(linkId);
 
 		if (leaveTime < 86400) {
 			int startBinIndex = (int) Math.round(Math.floor(GeneralLib
 					.projectTimeWithin24Hours(enterTime)
-					/ binSizeInSeconds));
+					/ calculationTimeBinSize));
 			int endBinIndex = (int) Math.round(Math.floor(GeneralLib
-					.projectTimeWithin24Hours(leaveTime / binSizeInSeconds)));
+					.projectTimeWithin24Hours(leaveTime) / calculationTimeBinSize));
 
 			for (int i = startBinIndex; i <= endBinIndex; i++) {
 				bins[i]++;
 			}
 		}
+		numberOfProcessedVehicles++;
+	}
+	
+	public int getNumberOfProcessedVehicles(){
+		return numberOfProcessedVehicles;
+	}
+	
+	private HashMap<Id, double[]> getAverageDensity(int valuesPerBin) {
 
+		HashMap<Id, double[]> avgDensity = new HashMap<Id, double[]>();
+		
+		for (Id linkId : density.keySet()) {
+
+			double[] linkDensity = density.get(linkId);
+			
+			double[] avgLinkDensity = new double[(int) Math.ceil(linkDensity.length / valuesPerBin) + 1];
+			avgDensity.put(linkId, avgLinkDensity);
+			
+			int index = 0;
+			double sumDensity = 0.0;
+			for (int i = 0; i < linkDensity.length; i++) {
+
+				sumDensity += linkDensity[i];
+				
+				// if all entries of the time bin have been processed
+				if ((i+1) % valuesPerBin == 0) {
+					avgLinkDensity[index] = sumDensity / valuesPerBin;
+					sumDensity = 0.0;
+					index++;
+				}
+			}
+		}
+
+		return avgDensity;
 	}
 
 }

@@ -212,9 +212,15 @@ public class MiniScenarioDualSim {
 		eventsManager.finishProcessing();
 		eventsWriter.closeFile();
 		
+		/*
 		HashMap<Id, double[]> densities = MainFundamentalDiagram.calculateDensities(links,
 				densityHandler, binSizeInSeconds);
+		*/
+		
+		HashMap<Id, double[]> densities = densityHandler.getLinkDensities();
+		
+		System.out.println(densityHandler.getNumberOfProcessedVehicles()); 
 
-		MainFundamentalDiagram.printDensityAndOutFlow(densities, links, outflowHandler,false,runId, caption);
+		MainFundamentalDiagram.printDensityAndOutFlow(densities, links, outflowHandler,false,runId, caption,binSizeInSeconds);
 	}
 }
