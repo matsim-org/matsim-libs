@@ -80,7 +80,7 @@ public class WithinDayControlerListener implements StartupListener {
 	private WithinDayEngine withinDayEngine;
 	private TripRouterFactory withinDayTripRouterFactory;
 	private final FixedOrderSimulationListener fosl = new FixedOrderSimulationListener();
-	private final Map<String, TravelTime> multiModalTravelTimes = new HashMap<String, TravelTime>();
+	private final Map<String, TravelTime> linkReplanningTravelTimes = new HashMap<String, TravelTime>();
 
 	/*
 	 * ===================================================================
@@ -126,6 +126,10 @@ public class WithinDayControlerListener implements StartupListener {
 	public void setModesAnalyzedByTravelTimeCollector(Set<String> modes) {
 		if (locked) throw new RuntimeException(this.getClass().toString() + " configuration has already been locked!");
 		this.travelTimeCollectorModes = modes;
+	}
+	
+	public Map<String, TravelTime> getLinkReplanningTravelTimes() {
+		return this.linkReplanningTravelTimes;
 	}
 	
 	public Set<String> getModesAnalyzedByTravelTimeCollector() {
@@ -270,9 +274,9 @@ public class WithinDayControlerListener implements StartupListener {
 		 * has to be configured to run in multi-modal mode.
 		 * TODO: what happens if main mode is NOT car?
 		 */
-		if (this.multiModalTravelTimes.size() > 0) {
-			this.multiModalTravelTimes.put(TransportMode.car, new FreeSpeedTravelTime());
-			linkReplanningMap = new LinkReplanningMap(this.scenario.getNetwork(), this.multiModalTravelTimes);
+		if (this.linkReplanningTravelTimes.size() > 0) {
+			this.linkReplanningTravelTimes.put(TransportMode.car, new FreeSpeedTravelTime());
+			linkReplanningMap = new LinkReplanningMap(this.scenario.getNetwork(), this.linkReplanningTravelTimes);
 		} else linkReplanningMap = new LinkReplanningMap(this.scenario.getNetwork());
 		
 		this.eventsManager.addHandler(linkReplanningMap);
