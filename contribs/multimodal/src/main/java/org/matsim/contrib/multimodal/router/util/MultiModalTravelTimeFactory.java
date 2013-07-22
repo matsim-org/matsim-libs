@@ -46,12 +46,15 @@ public class MultiModalTravelTimeFactory implements MatsimFactory {
 	
 	public MultiModalTravelTimeFactory(Config config) {
 		this(config, null);
-		log.warn("No slope information for the links available - travel time will only take agents age and gender into account!");
 	}
 	
 	public MultiModalTravelTimeFactory(Config config, Map<Id, Double> linkSlopes) {
 		this.linkSlopes = linkSlopes;
 		this.factories = new LinkedHashMap<String, TravelTimeFactory>();
+		
+		if (this.linkSlopes == null) {
+			log.warn("No slope information for the links available - travel time will only take agents age and gender into account!");
+		}
 		
 		this.initMultiModalTravelTimeFactories(config);
 	}

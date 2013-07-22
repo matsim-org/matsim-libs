@@ -22,8 +22,10 @@ package org.matsim.contrib.multimodal;
 
 import java.util.Map;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.contrib.multimodal.router.MultimodalTripRouterFactory;
+import org.matsim.contrib.multimodal.router.util.LinkSlopesReader;
 import org.matsim.contrib.multimodal.router.util.MultiModalTravelTimeFactory;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
@@ -38,9 +40,12 @@ public class MultiModalControlerListener implements StartupListener {
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
-
+		
 		Controler controler = event.getControler();
-		MultiModalTravelTimeFactory multiModalTravelTimeFactory = new MultiModalTravelTimeFactory(event.getControler().getConfig());
+		MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) controler.getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
+				
+		Map<Id, Double> linkSlopes = new LinkSlopesReader().getLinkSlopes(multiModalConfigGroup, event.getControler().getNetwork());
+		MultiModalTravelTimeFactory multiModalTravelTimeFactory = new MultiModalTravelTimeFactory(event.getControler().getConfig(), linkSlopes);
 		Map<String, TravelTime> multiModalTravelTimes = multiModalTravelTimeFactory.createTravelTimes();	
 	
 		MultimodalTripRouterFactory tripRouterFactory = new MultimodalTripRouterFactory(
@@ -50,7 +55,6 @@ public class MultiModalControlerListener implements StartupListener {
 		controler.setMobsimFactory(qSimFactory);
 		
 		// ensure that NetworkRoutes are created for legs using one of the simulated modes
-		MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) controler.getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
 		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) controler.getScenario().getPopulation().getFactory()).getModeRouteFactory();
 		for (String mode : CollectionUtils.stringToSet(multiModalConfigGroup.getSimulatedModes())) {
 			routeFactory.setRouteFactory(mode, new LinkNetworkRouteFactory());

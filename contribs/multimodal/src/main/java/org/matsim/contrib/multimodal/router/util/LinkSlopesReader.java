@@ -43,11 +43,13 @@ public class LinkSlopesReader {
 	 * It is assumed that the heightInformation ObjectAttributes contain a field
 	 * "slope" for each link Id in the network.
 	 * 
-	 * @return Map<LinkId, Slope in %>
+	 * @return Map<LinkId, Slope in %> or null, if no slopes file has been set in the config group.
 	 */
 	public Map<Id, Double> getLinkSlopes(MultiModalConfigGroup configGroup, Network network) {
 		
 		ObjectAttributes slopeInformation = this.getSlopeInformation(configGroup);
+		
+		if (slopeInformation == null) return null;
 		
 		Map<Id, Double> linkSlopes = this.getLinkSlopes(network, slopeInformation);
 		
@@ -64,15 +66,16 @@ public class LinkSlopesReader {
 	 */
 	private ObjectAttributes getSlopeInformation(MultiModalConfigGroup configGroup) {
 		
-		ObjectAttributes objectAttributes = new ObjectAttributes();
 		String slopeInformationFile = configGroup.getSlopeInformationFile();
 		if (slopeInformationFile != null) {
+			ObjectAttributes objectAttributes = new ObjectAttributes();
 			log.info("Loading slope information from " + slopeInformationFile);
 			new ObjectAttributesXmlReader(objectAttributes).parse(slopeInformationFile);
+			return objectAttributes;
 		} else {
 			log.warn("No slope information file specified in the multi modal config group!");
+			return null;
 		}
-		return objectAttributes;
 	}
 	
 	private Map<Id, Double> getLinkSlopes(Network network, ObjectAttributes slopeInformation) {
@@ -80,8 +83,8 @@ public class LinkSlopesReader {
 		Map<Id, Double> linkSlopes = new HashMap<Id, Double>();
 		
 		for (Id linkId : network.getLinks().keySet()) {
-			String slope = slopeInformation.getAttribute(linkId.toString(), ATTRIBUTE_NAME).toString();
-			if (slope != null) linkSlopes.put(linkId, Double.valueOf(slope));
+			Object slope = slopeInformation.getAttribute(linkId.toString(), ATTRIBUTE_NAME);
+			if (slope != null) linkSlopes.put(linkId, Double.valueOf(slope.toString()));
 		}
 		return linkSlopes;
 	}
