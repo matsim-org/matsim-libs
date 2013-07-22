@@ -49,7 +49,7 @@ import playground.telaviv.config.TelAvivConfig;
 import playground.telaviv.network.NetworkEmme2MATSim2012;
 
 /*
- * Assigning the counts from a Emme2Model to a MATSim Network.
+ * Assigning the counts from Count Stations to a MATSim Network.
  *
  * When creating the MATSim Network some Links of the Emme2Network have to be
  * converted due to the fact that they contain turning conditions that cannot
@@ -127,6 +127,11 @@ public class CountsCreatorV2 {
 				if (count == null) count = counts.createCount(link.getId(), emme2Count.inode + "_" + emme2Count.jnode);
 				
 				count.createVolume(emme2Count.hour, emme2Count.value);
+				
+				if (link.getCapacity() < emme2Count.value) {
+					log.warn("Links capacity is exceeded. Link " + link.getId() + ", capacity=" + link.getCapacity() +
+							", count value=" + emme2Count.value + " in hour " + emme2Count.hour);
+				}
 				
 				counter.incCounter();
 			}
