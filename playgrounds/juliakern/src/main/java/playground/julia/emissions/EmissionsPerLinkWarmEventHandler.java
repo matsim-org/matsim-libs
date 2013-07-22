@@ -21,7 +21,6 @@ package playground.julia.emissions;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -32,7 +31,7 @@ import playground.vsp.emissions.types.WarmPollutant;
 import playground.vsp.emissions.utils.EmissionUtils;
 
 /**
- * @author benjamin
+ * @author benjamin, julia
  *
  */
 public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandler{
@@ -65,7 +64,7 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 		Double time = event.getTime();
 		Id linkId = event.getLinkId();
 		Map<WarmPollutant, Double> warmEmissionsOfEvent = event.getWarmEmissions();
-		// do not cannot use modulo for doubles
+		// do not use modulo for doubles
 		int numberOfInterval = (int)Math.ceil(time/timeBinSize);
 		if(numberOfInterval==0) numberOfInterval=1; //only happens if time = 0.0
 		if(numberOfInterval>noOfTimeBins) numberOfInterval=noOfTimeBins; // this should not happen but might due to rounding errors when time = simulationEndTime
@@ -77,43 +76,39 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 		if (endOfTimeInterval < this.noOfTimeBins * this.timeBinSize+1) {
 			
 			// make sure all fields are initilized / set values to zero
-			// TODO not needed.... check local maps instead?
-			if (this.time2warmEmissionsTotal.containsKey(endOfTimeInterval)==false){
-				Map<Id, Map<WarmPollutant, Double>> map = new HashMap<Id, Map<WarmPollutant,Double>>();
-				Map<WarmPollutant, Double> warmpollutant2zero = new HashMap<WarmPollutant, Double>();
+			// get previous emissions of this time interval
+			if(this.time2warmEmissionsTotal != null && this.time2warmEmissionsTotal.containsKey(endOfTimeInterval)){
+				warmEmissionsTotal.putAll(this.time2warmEmissionsTotal.get(endOfTimeInterval));
+			}else{ // no emissions at this time so far - initialize as zero
+				Map<WarmPollutant, Double> map = new HashMap<WarmPollutant, Double>();
 				for(WarmPollutant wp: WarmPollutant.values()){
-					warmpollutant2zero.put(wp, 0.0);
+					map.put(wp, 0.0);
 				}
-				map.put(linkId, warmpollutant2zero);
-				this.time2warmEmissionsTotal.put(endOfTimeInterval, map);
-			}
-			if (this.time2linkIdLeaveCount.containsKey(endOfTimeInterval)==false){
-				Map<Id, Double> map = new HashMap<Id, Double>();
-				map.put(linkId, 0.0);
-				this.time2linkIdLeaveCount.put(endOfTimeInterval, map);
+				warmEmissionsTotal.put(linkId, map);
 			}
 			
-			// time2warmEmissionsTotal contains at least that entry
-			warmEmissionsTotal.putAll(this.time2warmEmissionsTotal.get(endOfTimeInterval));
-			// time2linkIdLeaveCount contains at least that entry
-			countTotal.putAll(this.time2linkIdLeaveCount.get(endOfTimeInterval));	
-			
-			if (this.time2warmEmissionsTotal.get(endOfTimeInterval) == null) {
-				Map<Id, Map<WarmPollutant, Double>> map = new HashMap<Id, Map<WarmPollutant, Double>>();
-				this.time2warmEmissionsTotal.put(endOfTimeInterval, map );
-			}
-			if (this.time2linkIdLeaveCount.get(endOfTimeInterval) == null) {
-				Map<Id, Double> map = new HashMap<Id, Double>();
-				this.time2linkIdLeaveCount.put(endOfTimeInterval, map);
+			// get previous counts or set them to zero 
+			if(this.time2linkIdLeaveCount != null && this.time2linkIdLeaveCount.containsKey(endOfTimeInterval)){
+				countTotal.putAll(this.time2linkIdLeaveCount.get(endOfTimeInterval));	
+			}else{ // no counts so far - initialize as zero
+				countTotal.put(linkId, 0.0);
 			}
 			
+			// this event
 			if(warmEmissionsOfEvent == null){
 				warmEmissionsOfEvent = new HashMap<WarmPollutant, Double>();
 				for(WarmPollutant wp : WarmPollutant.values()){
 					warmEmissionsOfEvent.put(wp, 0.0);
 				}
 			}
+			// check whether all pollutants exist
+			for(WarmPollutant wp: WarmPollutant.values()){
+				if(warmEmissionsOfEvent.containsKey(wp)==false){
+					warmEmissionsOfEvent.put(wp, 0.0);
+				}
+			}
 			
+			// check wheter an old entry for this link exists - if not create on with zero as values
 			if(warmEmissionsTotal.containsKey(linkId)==false){
 				Map<WarmPollutant, Double> map = new HashMap<WarmPollutant, Double>();
 				for(WarmPollutant wp : WarmPollutant.values()){
@@ -123,46 +118,30 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 			}
 			
 			Map<WarmPollutant, Double> warmEmissionsSoFar = warmEmissionsTotal.get(linkId);
-			Map<WarmPollutant, Double> newWarmEmissionsSoFar = new HashMap<WarmPollutant, Double>();
-			
-			// make sure all maps are initialized / set values to zero
-			newWarmEmissionsSoFar.putAll(warmEmissionsSoFar); // siehe ***
+			// make sure an entry for each pollutant exists
 			for(WarmPollutant wp : WarmPollutant.values()){ //funktioniert, falls der wp gar nicht enthalten ist, aber auch, wenn der wert 'null' ist
 				// schnellere abfrage aber laengerer code? via contains(null) und keySet.size()
-				if(newWarmEmissionsSoFar.get(wp)==null){
-					newWarmEmissionsSoFar.put(wp, 0.0);
+				if(warmEmissionsSoFar.get(wp)==null){
+					warmEmissionsSoFar.put(wp, 0.0);
 				}
 			}
 						
-
-
+			// sum up emission values
+			for(WarmPollutant wp : WarmPollutant.values()){
+				warmEmissionsSoFar.put(wp, warmEmissionsSoFar.get(wp)+warmEmissionsOfEvent.get(wp)); //this is ok without check... values set to zero above if they didnt exist before
+			}
+			warmEmissionsTotal.put(linkId, warmEmissionsSoFar);
+			
+			// make sure an entry for the counts exists
 			if (countTotal.get(linkId)==null){
 				countTotal.put(linkId, 0.0);
 			}
-
-			for(Entry<WarmPollutant, Double> entry : warmEmissionsOfEvent.entrySet()){
-					WarmPollutant pollutant = entry.getKey();
-					Double eventValue;
-					if (entry.getValue()!=null) {
-						eventValue = entry.getValue();
-					}else{
-						eventValue = 0.0;
-					}
-					Double previousValue = warmEmissionsSoFar.get(pollutant); // *** warmEmissionsSoFar koennte Eintraege haben, die 
-									// das aktuelle event nicht hat. die wuerden dann verloren gehen
-					Double newValue = previousValue + eventValue;
-					newWarmEmissionsSoFar.put(pollutant, newValue);
-				}
-			
-			warmEmissionsTotal.put(linkId, newWarmEmissionsSoFar);
-			double countsSoFar = countTotal.get(linkId);
-			double newValue = countsSoFar + 1.;
-			countTotal.put(linkId, newValue);
+			countTotal.put(linkId, countTotal.get(linkId)+1);
 		
+			this.time2warmEmissionsTotal.put(endOfTimeInterval, warmEmissionsTotal);
+			this.time2linkIdLeaveCount.put(endOfTimeInterval, countTotal);
 		}
-		this.time2warmEmissionsTotal.put(endOfTimeInterval, warmEmissionsTotal);
-		this.time2linkIdLeaveCount.put(endOfTimeInterval, countTotal);
-
+		// do nothing if time of event is later than the simulation end
 	}
 
 	public Map<Double, Map<Id, Double>> getTime2linkIdLeaveCount() {
