@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MarathonController.java
+ * MarathonRunner.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -47,6 +47,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.Module;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
+import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.OpeningTime;
@@ -63,16 +64,13 @@ import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTimeF
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
-import org.matsim.core.router.IntermodalLeastCostPathCalculator;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.old.LegRouter;
-import org.matsim.core.router.old.PlanRouterAdapter;
-import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
@@ -80,8 +78,7 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
 import org.matsim.households.HouseholdsFactory;
-import org.matsim.population.algorithms.PlanAlgorithm;
-import org.matsim.withinday.controller.WithinDayController;
+import org.matsim.withinday.controller.WithinDayControlerListener;
 import org.matsim.withinday.mobsim.WithinDayQSimFactory;
 import org.matsim.withinday.replanning.identifiers.ActivityPerformingIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
@@ -120,7 +117,6 @@ import playground.christoph.evacuation.withinday.replanning.replanners.ExtendCur
 import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
 import playground.gregor.sim2d_v3.events.XYDataWriter;
 import playground.gregor.sim2d_v3.helper.gisdebug.GisDebugger;
-import playground.gregor.sim2d_v3.router.Walk2DLegRouter;
 import playground.gregor.sim2d_v3.scenario.ScenarioLoader2DImpl;
 import playground.gregor.sim2d_v3.simulation.HybridQ2DMobsimFactory;
 import playground.gregor.sim2d_v3.simulation.Sim2DDepartureHandler;
@@ -129,10 +125,10 @@ import playground.meisterk.kti.config.KtiConfigGroup;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-public final class MarathonController extends WithinDayController implements 
+public final class MarathonRunner implements StartupListener,
 	MobsimInitializedListener, MobsimBeforeSimStepListener, MobsimAfterSimStepListener {
 
-	private final static Logger log = Logger.getLogger(MarathonController.class);
+	private final static Logger log = Logger.getLogger(MarathonRunner.class);
 	
 	public static String basePath = "D:/Users/Christoph/workspace/matsim/mysimulations/";
 //	public static String basePath = "/home/cdobler/workspace/matsim/mysimulations/";
@@ -189,6 +185,8 @@ public final class MarathonController extends WithinDayController implements
 	private TravelTime carTravelTime;
 	private TravelTime ptTravelTime;
 	
+	private Scenario scenario;
+	private WithinDayControlerListener withinDayControlerListener;
 	private AgentsInEvacuationAreaCounter agentsInEvacuationAreaCounter;
 	
 	public static void main(String[] args) {
@@ -222,18 +220,25 @@ public final class MarathonController extends WithinDayController implements
 				
 		ScenarioUtils.loadScenario(sc);
 
-		Controler controller = new MarathonController(sc);
-		controller.run();
+		Controler controler = new Controler(sc);
+		controler.setOverwriteFiles(true);
+		
+		MarathonRunner controlerListener = new MarathonRunner(controler);
+		controler.addControlerListener(controlerListener);
+		
+		controler.run();
 	}
 
-	public MarathonController(Scenario sc) {
-		super(sc);
-		setOverwriteFiles(true);
+	public MarathonRunner(Controler controler) {
 		
-		/*
-		 * Create the empty object. They are filled in the loadData() method.
-		 */
-		this.ktiConfigGroup = new KtiConfigGroup();
+		this.scenario = controler.getScenario();
+		
+		this.withinDayControlerListener = new WithinDayControlerListener();
+				
+		init();
+	}
+	
+	protected void init() {
 		
 		/*
 		 * Set evacuation parameter.
@@ -249,7 +254,7 @@ public final class MarathonController extends WithinDayController implements
 //		// explicit set the mobsim factory
 //		this.setMobsimFactory(factory);
 		
-		this.setNumberOfReplanningThreads(this.config.global().getNumberOfThreads());
+		this.withinDayControlerListener.setNumberOfReplanningThreads(this.scenario.getConfig().global().getNumberOfThreads());
 		
 		/*
 		 * Initialize TravelTimeCollector and create a FactoryWrapper which will act as
@@ -258,7 +263,7 @@ public final class MarathonController extends WithinDayController implements
 		 */
 		Set<String> analyzedModes = new HashSet<String>();
 		analyzedModes.add(TransportMode.car);
-		this.setModesAnalyzedByTravelTimeCollector(analyzedModes);
+		this.withinDayControlerListener.setModesAnalyzedByTravelTimeCollector(analyzedModes);
 		
 		/*
 		 * Use advanced walk-, bike and pt travel time calculators
@@ -275,20 +280,20 @@ public final class MarathonController extends WithinDayController implements
 		 * Create and initialize replanning manager and replanning maps.
 		 */
 		Map<String, TravelTime> linkReplanningTravelTime = this.createLinkReplanningMapTravelTime();
-		super.createAndInitLinkReplanningMap(linkReplanningTravelTime);		
-	}
-	
-	@Override
-	protected void loadData() {
-		super.loadData();
+		this.withinDayControlerListener.getLinkReplanningTravelTimes().putAll(linkReplanningTravelTime);
+		
+		/*
+		 * Create the empty object. They are filled in the loadData() method.
+		 */
+		this.ktiConfigGroup = new KtiConfigGroup();
 		
 		/*
 		 * The KTIConfigGroup is loaded as generic Module. We replace this
 		 * generic object with a KtiConfigGroup object and copy all its parameter.
 		 */
-		Module module = this.config.getModule(KtiConfigGroup.GROUP_NAME);
-		this.config.removeModule(KtiConfigGroup.GROUP_NAME);
-		this.config.addModule(KtiConfigGroup.GROUP_NAME, this.ktiConfigGroup);
+		Module module = this.scenario.getConfig().getModule(KtiConfigGroup.GROUP_NAME);
+		this.scenario.getConfig().removeModule(KtiConfigGroup.GROUP_NAME);
+		this.scenario.getConfig().addModule(KtiConfigGroup.GROUP_NAME, this.ktiConfigGroup);
 		
 		for (Entry<String, String> entry : module.getParams().entrySet()) {
 			this.ktiConfigGroup.addParam(entry.getKey(), entry.getValue());
@@ -304,7 +309,7 @@ public final class MarathonController extends WithinDayController implements
 		 * Adding z-coordinates to the network
 		 */
 		AddZCoordinatesToNetwork zCoordinateAdder;
-		zCoordinateAdder = new AddZCoordinatesToNetwork(this.scenarioData, dhm25File, srtmFile);
+		zCoordinateAdder = new AddZCoordinatesToNetwork(this.scenario, dhm25File, srtmFile);
 		zCoordinateAdder.addZCoordinatesToNetwork();
 		zCoordinateAdder.checkSteepness();
 		
@@ -312,11 +317,11 @@ public final class MarathonController extends WithinDayController implements
 		 * Fixing height coordinates of nodes that have been added and that
 		 * are not included in the height shp files.
 		 */
-		for (Node node : scenarioData.getNetwork().getNodes().values()) {
+		for (Node node : this.scenario.getNetwork().getNodes().values()) {
 			String idString = node.getId().toString(); 
 			if (idString.contains("_shifted")) {
 				idString = idString.replace("_shifted", "");
-				Node node2 = scenarioData.getNetwork().getNodes().get(scenarioData.createId(idString));
+				Node node2 = this.scenario.getNetwork().getNodes().get(this.scenario.createId(idString));
 				Coord3d coord2 = (Coord3d) node2.getCoord();
 				
 				Coord coord = node.getCoord();
@@ -325,19 +330,8 @@ public final class MarathonController extends WithinDayController implements
 			}
 		}
 		
-		ScenarioLoader2DImpl loader = new ScenarioLoader2DImpl(this.scenarioData);
+		ScenarioLoader2DImpl loader = new ScenarioLoader2DImpl(this.scenario);
 		loader.load2DScenario();
-	}
-
-	@Override
-	protected void setUp() {
-		super.setUp();
-	
-		/*
-		 * Replace WithinDayQSimFactory with a CombiMobsimFactory
-		 * which combines a WithinDayQSimFactory with a HybridQ2DMobsimFactory. 
-		 */
-		super.setMobsimFactory(new CombiMobsimFactory(new WithinDayQSimFactory(getWithinDayEngine())));
 	}
 	
 	/*
@@ -373,27 +367,34 @@ public final class MarathonController extends WithinDayController implements
 		}
 	}
 
-	public PlanAlgorithm createRoutingAlgorithm(TravelDisutility travelCosts, TravelTime travelTimes) {
-		
-		// the contructor does not call createRoutingAlgorithm on the argument, so it is ok (td)
-		PlanRouterAdapter plansCalcRoute = new PlanRouterAdapter( this );
-		
-		TravelTime travelTime = new WalkTravelTimeFactory(config.plansCalcRoute()).createTravelTime();
-		LegRouter walk2DLegRouter = new Walk2DLegRouter(network, travelTime, (IntermodalLeastCostPathCalculator) plansCalcRoute.getLeastCostPathCalculator());
-		plansCalcRoute.addLegHandler("walk2d", walk2DLegRouter);
-		
-		return plansCalcRoute;
-	}
+//	public PlanAlgorithm createRoutingAlgorithm(TravelDisutility travelCosts, TravelTime travelTimes) {
+//		
+//		// the contructor does not call createRoutingAlgorithm on the argument, so it is ok (td)
+//		PlanRouterAdapter plansCalcRoute = new PlanRouterAdapter( this );
+//		
+//		TravelTime travelTime = new WalkTravelTimeFactory(this.scenario.getConfig().plansCalcRoute()).createTravelTime();
+//		LegRouter walk2DLegRouter = new Walk2DLegRouter(this.scenario.getNetwork(), travelTime, (IntermodalLeastCostPathCalculator) plansCalcRoute.getLeastCostPathCalculator());
+//		plansCalcRoute.addLegHandler("walk2d", walk2DLegRouter);
+//		
+//		return plansCalcRoute;
+//	}
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
+
 		
-		super.notifyStartup(event);
+		this.withinDayControlerListener.notifyStartup(event);
+		
+		/*
+		 * Replace WithinDayQSimFactory with a CombiMobsimFactory
+		 * which combines a WithinDayQSimFactory with a HybridQ2DMobsimFactory. 
+		 */
+		event.getControler().setMobsimFactory(new CombiMobsimFactory(new WithinDayQSimFactory(this.withinDayControlerListener.getWithinDayEngine())));
 		
 		XYDataWriter xyDataWriter = new XYDataWriter();
-		this.getEvents().addHandler(xyDataWriter);
-		this.addControlerListener(xyDataWriter);
-		this.getMobsimListeners().add(xyDataWriter);
+		event.getControler().getEvents().addHandler(xyDataWriter);
+		event.getControler().addControlerListener(xyDataWriter);
+		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(xyDataWriter);
 		
 		readAffectedArea();
 		
@@ -401,15 +402,15 @@ public final class MarathonController extends WithinDayController implements
 		
 		createPreAndPostRunFacilities();
 		
-		createExitLinks();
+		createExitLinks(event.getControler());
 		
-		this.informedHouseholdsTracker = new InformedHouseholdsTracker(this.scenarioData.getHouseholds(), 
-				this.scenarioData.getPopulation().getPersons().keySet(), this.getEvents(), EvacuationConfig.informAgentsRayleighSigma);
-		this.getFixedOrderSimulationListener().addSimulationListener(informedHouseholdsTracker);
+		this.informedHouseholdsTracker = new InformedHouseholdsTracker(((ScenarioImpl) this.scenario).getHouseholds(), 
+				this.scenario.getPopulation().getPersons().keySet(), event.getControler().getEvents(), EvacuationConfig.informAgentsRayleighSigma);
+		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(informedHouseholdsTracker);
 		
-		this.agentsTracker = new AgentsTracker(this.scenarioData);
-		this.getEvents().addHandler(agentsTracker);
-		this.getFixedOrderSimulationListener().addSimulationListener(agentsTracker);
+		this.agentsTracker = new AgentsTracker(this.scenario);
+		event.getControler().getEvents().addHandler(agentsTracker);
+		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(agentsTracker);
 		
 		// we do not use vehicles so far
 //		this.vehiclesTracker = new VehiclesTracker(this.getEvents());
@@ -435,13 +436,15 @@ public final class MarathonController extends WithinDayController implements
 		transportModes.add("walk2d");
 		
 		// Create and add an AgentsInEvacuationAreaCounter
-		double scaleFactor = 1 / this.config.getQSimConfigGroup().getFlowCapFactor();
-		agentsInEvacuationAreaCounter = new AgentsInEvacuationAreaCounter(this.scenarioData, transportModes, coordAnalyzer.createInstance(), 
+		double scaleFactor = 1 / this.scenario.getConfig().getQSimConfigGroup().getFlowCapFactor();
+		agentsInEvacuationAreaCounter = new AgentsInEvacuationAreaCounter(this.scenario, transportModes, coordAnalyzer.createInstance(), 
 				decisionDataProvider, scaleFactor);
 
-		this.addControlerListener(agentsInEvacuationAreaCounter);
-		this.getFixedOrderSimulationListener().addSimulationListener(agentsInEvacuationAreaCounter);
-		this.events.addHandler(agentsInEvacuationAreaCounter);
+		event.getControler().addControlerListener(agentsInEvacuationAreaCounter);
+		event.getControler().getEvents().addHandler(agentsInEvacuationAreaCounter);
+		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(agentsInEvacuationAreaCounter);
+		
+		this.initReplanners();
 	}
 
 	@Override
@@ -456,7 +459,6 @@ public final class MarathonController extends WithinDayController implements
 //			sim2DEngine.setVelocityCalculator(velocityCalculator);
 //		}
 //		
-		this.initReplanners((QSim)e.getQueueSimulation());
 	}
 	
 	@Override
@@ -473,9 +475,9 @@ public final class MarathonController extends WithinDayController implements
 				
 				for (WithinDayReplannerFactory<?> factory : this.initialReplannerFactories) {
 					if (factory instanceof WithinDayDuringActivityReplannerFactory) {
-						this.getWithinDayEngine().removeDuringActivityReplannerFactory((WithinDayDuringActivityReplannerFactory) factory);
+						this.withinDayControlerListener.getWithinDayEngine().removeDuringActivityReplannerFactory((WithinDayDuringActivityReplannerFactory) factory);
 					} else if(factory instanceof WithinDayDuringLegReplannerFactory) {
-						this.getWithinDayEngine().removeDuringLegReplannerFactory((WithinDayDuringLegReplannerFactory) factory);
+						this.withinDayControlerListener.getWithinDayEngine().removeDuringLegReplannerFactory((WithinDayDuringLegReplannerFactory) factory);
 					} 
 				}
 				log.info("Disabled initial within-day replanners");
@@ -492,10 +494,10 @@ public final class MarathonController extends WithinDayController implements
 	 */
 	private void createHouseholds() {
 		
-		Households households = scenarioData.getHouseholds();
+		Households households = ((ScenarioImpl) this.scenario).getHouseholds();
 		HouseholdsFactory factory = households.getFactory();
 		
-		for (Person person : scenarioData.getPopulation().getPersons().values()) {
+		for (Person person : this.scenario.getPopulation().getPersons().values()) {
 			Household household = factory.createHousehold(person.getId());
 			household.getMemberIds().add(person.getId());
 			households.getHouseholds().put(household.getId(), household);
@@ -516,41 +518,41 @@ public final class MarathonController extends WithinDayController implements
 		affectedLinks = new HashSet<Id>();
 		affectedFacilities = new HashSet<Id>();
 		
-		for (Node node : scenarioData.getNetwork().getNodes().values()) {
+		for (Node node : this.scenario.getNetwork().getNodes().values()) {
 			if (coordAnalyzer.isNodeAffected(node)) affectedNodes.add(node.getId());
 		}
-		for (Link link : scenarioData.getNetwork().getLinks().values()) {
+		for (Link link : this.scenario.getNetwork().getLinks().values()) {
 			if (coordAnalyzer.isLinkAffected(link)) affectedLinks.add(link.getId());
 		}
-		for (Facility facility : scenarioData.getActivityFacilities().getFacilities().values()) {
+		for (Facility facility : ((ScenarioImpl) this.scenario).getActivityFacilities().getFacilities().values()) {
 			if (coordAnalyzer.isFacilityAffected(facility)) affectedFacilities.add(facility.getId());
 		}
 	}
 	
 	private void createPreAndPostRunFacilities() {
 		
-		Id startLinkId = scenarioData.createId(CreateMarathonPopulation.startLink);
-		Id endLinkId = scenarioData.createId(CreateMarathonPopulation.endLink);
+		Id startLinkId = this.scenario.createId(CreateMarathonPopulation.startLink);
+		Id endLinkId = this.scenario.createId(CreateMarathonPopulation.endLink);
 		
-		Link startLink = scenarioData.getNetwork().getLinks().get(startLinkId);
-		Link endLink = scenarioData.getNetwork().getLinks().get(endLinkId);
+		Link startLink = this.scenario.getNetwork().getLinks().get(startLinkId);
+		Link endLink = this.scenario.getNetwork().getLinks().get(endLinkId);
 		
-		Id preRunFacilityId = scenarioData.createId("preRunFacility");
-		ActivityFacility preRunFacility = (scenarioData).getActivityFacilities().createAndAddFacility(preRunFacilityId, startLink.getCoord());
+		Id preRunFacilityId = this.scenario.createId("preRunFacility");
+		ActivityFacility preRunFacility = ((ScenarioImpl) this.scenario).getActivityFacilities().createAndAddFacility(preRunFacilityId, startLink.getCoord());
 		((ActivityFacilityImpl) preRunFacility).setLinkId(startLinkId);
 		ActivityOption activityOption = ((ActivityFacilityImpl) preRunFacility).createActivityOption("preRun");
 		activityOption.addOpeningTime(new OpeningTimeImpl(OpeningTime.DayType.wk, 0*3600, 24*3600));
 		activityOption.setCapacity(Double.MAX_VALUE);
 				
-		Id postRunFacilityId = scenarioData.createId("postRunFacility");
-		ActivityFacility postRunFacility = (scenarioData).getActivityFacilities().createAndAddFacility(postRunFacilityId, endLink.getCoord());
+		Id postRunFacilityId = this.scenario.createId("postRunFacility");
+		ActivityFacility postRunFacility = ((ScenarioImpl) this.scenario).getActivityFacilities().createAndAddFacility(postRunFacilityId, endLink.getCoord());
 		((ActivityFacilityImpl) postRunFacility).setLinkId(startLinkId);
 		activityOption = ((ActivityFacilityImpl) preRunFacility).createActivityOption("postRun");
 		activityOption.addOpeningTime(new OpeningTimeImpl(OpeningTime.DayType.wk, 0*3600, 24*3600));
 		activityOption.setCapacity(Double.MAX_VALUE);
 	}
 	
-	private void createExitLinks() {
+	private void createExitLinks(Controler controler) {
 		Geometry innerBuffer = affectedArea.buffer(this.innerBuffer);
 		Geometry outerBuffer = affectedArea.buffer(this.outerBuffer);
 		
@@ -558,16 +560,16 @@ public final class MarathonController extends WithinDayController implements
 		
 		CoordAnalyzer innerAnalyzer = new CoordAnalyzer(innerBuffer);
 		GisDebugger.addGeometry(innerBuffer, "inner Buffer");
-		GisDebugger.dump(this.getControlerIO().getOutputFilename("affectedAreaInnerBuffer.shp"));
+		GisDebugger.dump(controler.getControlerIO().getOutputFilename("affectedAreaInnerBuffer.shp"));
 		
 		CoordAnalyzer outerAnalyzer = new CoordAnalyzer(outerBuffer);
 		GisDebugger.addGeometry(outerBuffer, "outer Buffer");
-		GisDebugger.dump(this.getControlerIO().getOutputFilename("/affectedAreaOuterBuffer.shp"));
+		GisDebugger.dump(controler.getControlerIO().getOutputFilename("/affectedAreaOuterBuffer.shp"));
 		
 		this.bufferedCoordAnalyzer = new CoordAnalyzer(innerBuffer);
 		
 		Set<Node> exitNodes = new LinkedHashSet<Node>();
-		for (Node node : scenarioData.getNetwork().getNodes().values()) {
+		for (Node node : this.scenario.getNetwork().getNodes().values()) {
 			if (outerAnalyzer.isNodeAffected(node) && !innerAnalyzer.isNodeAffected(node)) {
 				
 				// if the from node of an in-link is inside the affected area, we ignore the node
@@ -588,10 +590,10 @@ public final class MarathonController extends WithinDayController implements
 		 * Use a coordinate which should be outside the evacuation area but still is feasible.
 		 * Otherwise the AStarLandmarks algorithm could be confused and loose some performance.
 		 */
-		Coord rescueNodeCoord = scenarioData.createCoord(683595.0, 244940.0); // somewhere in Lake Zurich
-		Id rescueNodeId = scenarioData.createId("rescueNode");
-		Node rescueNode = network.getFactory().createNode(rescueNodeId, rescueNodeCoord);
-		network.addNode(rescueNode);
+		Coord rescueNodeCoord = this.scenario.createCoord(683595.0, 244940.0); // somewhere in Lake Zurich
+		Id rescueNodeId = this.scenario.createId("rescueNode");
+		Node rescueNode = this.scenario.getNetwork().getFactory().createNode(rescueNodeId, rescueNodeCoord);
+		this.scenario.getNetwork().addNode(rescueNode);
 
 		Set<String> allowedTransportModes = new HashSet<String>();
 		allowedTransportModes.add(TransportMode.bike);
@@ -604,14 +606,14 @@ public final class MarathonController extends WithinDayController implements
 		int counter = 0;
 		for (Node node :exitNodes) {
 			counter++;
-			Id rescueLinkId = scenarioData.createId("rescueLink" + counter);
-			Link rescueLink = network.getFactory().createLink(rescueLinkId, node, rescueNode);
+			Id rescueLinkId = this.scenario.createId("rescueLink" + counter);
+			Link rescueLink = this.scenario.getNetwork().getFactory().createLink(rescueLinkId, node, rescueNode);
 			rescueLink.setNumberOfLanes(10);
 			rescueLink.setLength(10);	// use short links for non-vehicular traffic
 			rescueLink.setCapacity(1000000);
 			rescueLink.setFreespeed(1000000);
 			rescueLink.setAllowedModes(allowedTransportModes);
-			network.addLink(rescueLink);
+			this.scenario.getNetwork().addLink(rescueLink);
 		}
 		log.info("Created " + counter + " exit links.");
 		
@@ -620,26 +622,26 @@ public final class MarathonController extends WithinDayController implements
 		 * first rescue node. The link between them gets equipped with the
 		 * rescue facility that is the destination of the evacuated persons.
 		 */
-		Coord rescueNodeCoord2 = scenarioData.createCoord(rescueNodeCoord.getX() + 1.0, 
+		Coord rescueNodeCoord2 = this.scenario.createCoord(rescueNodeCoord.getX() + 1.0, 
 				rescueNodeCoord.getY() + 1.0);
-		Id rescueNodeId2 = scenarioData.createId("rescueNode2");
-		Node rescueNode2 = network.getFactory().createNode(rescueNodeId2, rescueNodeCoord2);
-		network.addNode(rescueNode2);
+		Id rescueNodeId2 = this.scenario.createId("rescueNode2");
+		Node rescueNode2 = this.scenario.getNetwork().getFactory().createNode(rescueNodeId2, rescueNodeCoord2);
+		this.scenario.getNetwork().addNode(rescueNode2);
 		
-		Id rescueLinkId = scenarioData.createId("rescueLink");
-		Link rescueLink = network.getFactory().createLink(rescueLinkId, rescueNode, rescueNode2);
+		Id rescueLinkId = this.scenario.createId("rescueLink");
+		Link rescueLink = this.scenario.getNetwork().getFactory().createLink(rescueLinkId, rescueNode, rescueNode2);
 		rescueLink.setNumberOfLanes(10);
 		rescueLink.setLength(10);	// use short links for non-vehicular traffic
 		rescueLink.setCapacity(1000000);
 		rescueLink.setFreespeed(1000000);
 		rescueLink.setAllowedModes(allowedTransportModes);
-		network.addLink(rescueLink);
+		this.scenario.getNetwork().addLink(rescueLink);
 		
 		/*
 		 * Create and add the rescue facility and an activity option ("rescue")
 		 */
-		Id rescueFacilityId = scenarioData.createId("rescueFacility");
-		ActivityFacility rescueFacility = (scenarioData).getActivityFacilities().createAndAddFacility(rescueFacilityId, rescueLink.getCoord());
+		Id rescueFacilityId = this.scenario.createId("rescueFacility");
+		ActivityFacility rescueFacility = ((ScenarioImpl) this.scenario).getActivityFacilities().createAndAddFacility(rescueFacilityId, rescueLink.getCoord());
 		((ActivityFacilityImpl) rescueFacility).setLinkId(rescueLink.getId());
 		
 		ActivityOption activityOption = ((ActivityFacilityImpl) rescueFacility).createActivityOption("rescue");
@@ -651,8 +653,8 @@ public final class MarathonController extends WithinDayController implements
 		 */
 		for (Node node :exitNodes) {
 			for (Link inLink : node.getInLinks().values()) {
-				rescueFacilityId = scenarioData.createId("rescueFacility" + inLink.getId().toString());
-				rescueFacility = (scenarioData).getActivityFacilities().createAndAddFacility(rescueFacilityId, inLink.getCoord());
+				rescueFacilityId = this.scenario.createId("rescueFacility" + inLink.getId().toString());
+				rescueFacility = ((ScenarioImpl) this.scenario).getActivityFacilities().createAndAddFacility(rescueFacilityId, inLink.getCoord());
 				((ActivityFacilityImpl) rescueFacility).setLinkId(rescueLink.getId());
 				
 				activityOption = ((ActivityFacilityImpl) rescueFacility).createActivityOption("rescue");
@@ -670,9 +672,9 @@ public final class MarathonController extends WithinDayController implements
 		 */
 		for (Id affectedLinkId : this.affectedLinks) {
 			
-			Link link = this.scenarioData.getNetwork().getLinks().get(affectedLinkId);
-			Id facilityId = scenarioData.createId("switchWalkModeFacility" + affectedLinkId.toString());
-			ActivityFacility facility = (scenarioData).getActivityFacilities().createAndAddFacility(facilityId, link.getToNode().getCoord());
+			Link link = this.scenario.getNetwork().getLinks().get(affectedLinkId);
+			Id facilityId = this.scenario.createId("switchWalkModeFacility" + affectedLinkId.toString());
+			ActivityFacility facility = ((ScenarioImpl) this.scenario).getActivityFacilities().createAndAddFacility(facilityId, link.getToNode().getCoord());
 			((ActivityFacilityImpl) facility).setLinkId(link.getId());
 			
 			activityOption = ((ActivityFacilityImpl) facility).createActivityOption("switchWalkMode");
@@ -687,8 +689,8 @@ public final class MarathonController extends WithinDayController implements
 	 */
 	private void updateTrackModes() {
 		for (String linkId : CreateMarathonPopulation.trackRelatedLinks) {
-			Id id = scenarioData.createId(linkId);
-			Link link = scenarioData.getNetwork().getLinks().get(id);
+			Id id = this.scenario.createId(linkId);
+			Link link = this.scenario.getNetwork().getLinks().get(id);
 			Set<String> modes = new HashSet<String>(link.getAllowedModes());
 			modes.add(TransportMode.walk);
 			modes.add(TransportMode.bike);
@@ -714,9 +716,9 @@ public final class MarathonController extends WithinDayController implements
 //				this.vehiclesTracker, this.coordAnalyzer, AffectedAgentsFilter.FilterType.NotAffected);
 
 		// use buffered affected area
-		AffectedAgentsFilterFactory affectedAgentsFilterFactory = new AffectedAgentsFilterFactory(this.scenarioData, this.agentsTracker,
+		AffectedAgentsFilterFactory affectedAgentsFilterFactory = new AffectedAgentsFilterFactory(this.scenario, this.agentsTracker,
 				this.vehiclesTracker, this.bufferedCoordAnalyzer, AffectedAgentsFilter.FilterType.Affected);
-		AffectedAgentsFilterFactory notAffectedAgentsFilterFactory = new AffectedAgentsFilterFactory(this.scenarioData, this.agentsTracker,
+		AffectedAgentsFilterFactory notAffectedAgentsFilterFactory = new AffectedAgentsFilterFactory(this.scenario, this.agentsTracker,
 				this.vehiclesTracker, this.bufferedCoordAnalyzer, AffectedAgentsFilter.FilterType.NotAffected);
 		
 		DuringActivityIdentifierFactory duringActivityFactory;
@@ -725,12 +727,12 @@ public final class MarathonController extends WithinDayController implements
 		/*
 		 * During Activity Identifiers
 		 */
-		duringActivityFactory = new ActivityPerformingIdentifierFactory(this.getActivityReplanningMap());
+		duringActivityFactory = new ActivityPerformingIdentifierFactory(this.withinDayControlerListener.getActivityReplanningMap());
 		duringActivityFactory.addAgentFilterFactory(affectedAgentsFilterFactory);
 		duringActivityFactory.addAgentFilterFactory(initialReplanningFilterFactory);
 		this.affectedActivityPerformingIdentifier = duringActivityFactory.createIdentifier();
 		
-		duringActivityFactory = new ActivityPerformingIdentifierFactory(this.getActivityReplanningMap());
+		duringActivityFactory = new ActivityPerformingIdentifierFactory(this.withinDayControlerListener.getActivityReplanningMap());
 		duringActivityFactory.addAgentFilterFactory(notAffectedAgentsFilterFactory);
 		duringActivityFactory.addAgentFilterFactory(initialReplanningFilterFactory);
 		this.notAffectedActivityPerformingIdentifier = duringActivityFactory.createIdentifier();
@@ -738,12 +740,12 @@ public final class MarathonController extends WithinDayController implements
 		/*
 		 * During Leg Identifiers
 		 */
-		duringLegFactory = new LegPerformingIdentifierFactory(this.getLinkReplanningMap());
+		duringLegFactory = new LegPerformingIdentifierFactory(this.withinDayControlerListener.getLinkReplanningMap());
 		duringLegFactory.addAgentFilterFactory(initialReplanningFilterFactory);
 		this.legPerformingIdentifier = duringLegFactory.createIdentifier();
 		
 		// replan all transport modes
-		duringLegFactory = new LeaveLinkIdentifierFactory(this.getLinkReplanningMap()); 
+		duringLegFactory = new LeaveLinkIdentifierFactory(this.withinDayControlerListener.getLinkReplanningMap()); 
 		duringLegFactory.addAgentFilterFactory(notInitialReplanningFilterFactory);
 		this.duringLegRerouteIdentifier = duringLegFactory.createIdentifier();
 		this.duringLegRerouteIdentifier.addAgentFilter(new ProbabilityFilterFactory(EvacuationConfig.duringLegReroutingShare).createAgentFilter());
@@ -756,39 +758,39 @@ public final class MarathonController extends WithinDayController implements
 	 * New Routers for the Replanning are used instead of using the controler's.
 	 * By doing this every person can use a personalized Router.
 	 */
-	@Override
-	protected void initReplanners(QSim sim) {
+	protected void initReplanners() {
 		
 		initIdentifiers();
 		
 		Map<String, TravelTime> travelTimes = new HashMap<String, TravelTime>();
-		travelTimes.put(TransportMode.walk, new WalkTravelTimeFactory(this.config.plansCalcRoute()).createTravelTime());
-		travelTimes.put("walk2d", new WalkTravelTimeFactory(this.config.plansCalcRoute()).createTravelTime());
-		travelTimes.put(TransportMode.bike, new BikeTravelTimeFactory(this.config.plansCalcRoute()).createTravelTime());
-		travelTimes.put(TransportMode.pt, new PTTravelTimeKTIEvacuationFactory(this.scenarioData, 
-					new PTTravelTimeFactory(this.config.plansCalcRoute(), getTravelTimeCollector(), new WalkTravelTimeFactory(this.config.plansCalcRoute()).createTravelTime()).createTravelTime()).createTravelTime());
+		travelTimes.put(TransportMode.walk, new WalkTravelTimeFactory(this.scenario.getConfig().plansCalcRoute()).createTravelTime());
+		travelTimes.put("walk2d", new WalkTravelTimeFactory(this.scenario.getConfig().plansCalcRoute()).createTravelTime());
+		travelTimes.put(TransportMode.bike, new BikeTravelTimeFactory(this.scenario.getConfig().plansCalcRoute()).createTravelTime());
+		travelTimes.put(TransportMode.pt, new PTTravelTimeKTIEvacuationFactory(this.scenario, 
+					new PTTravelTimeFactory(this.scenario.getConfig().plansCalcRoute(), this.withinDayControlerListener.getTravelTimeCollector(), 
+							new WalkTravelTimeFactory(this.scenario.getConfig().plansCalcRoute()).createTravelTime()).createTravelTime()).createTravelTime());
 		
 //		// add time dependent penalties to travel costs within the affected area
 		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
 		TravelDisutilityFactory penaltyCostFactory = new PenaltyTravelCostFactory(costFactory, coordAnalyzer);
 
-		TripRouterFactory tripRouterFactory = new MultimodalTripRouterFactory(this.scenarioData, travelTimes, penaltyCostFactory);
-		this.setWithinDayTripRouterFactory(tripRouterFactory);
+		TripRouterFactory tripRouterFactory = new MultimodalTripRouterFactory(this.scenario, travelTimes, penaltyCostFactory);
+		this.withinDayControlerListener.setWithinDayTripRouterFactory(tripRouterFactory);
 		
-		RoutingContext routingContext = new RoutingContextImpl(penaltyCostFactory, this.getTravelTimeCollector(), this.config.planCalcScore());
+		RoutingContext routingContext = new RoutingContextImpl(penaltyCostFactory, this.withinDayControlerListener.getTravelTimeCollector(), this.scenario.getConfig().planCalcScore());
 		
 		/*
 		 * During Activity Replanners
 		 */
-		EndActivityAndEvacuateReplannerFactory endActivityAndEvacuateReplannerFactory = new EndActivityAndEvacuateReplannerFactory(this.scenarioData, this.getWithinDayEngine(),
-				(SwissPTTravelTime) this.ptTravelTime, this.getWithinDayTripRouterFactory(), routingContext);
-		this.marathonEndActivityAndEvacuateReplannerFactory = new MarathonEndActivityAndEvacuateReplannerFactory(this.scenarioData, this.getWithinDayEngine(), endActivityAndEvacuateReplannerFactory);
+		EndActivityAndEvacuateReplannerFactory endActivityAndEvacuateReplannerFactory = new EndActivityAndEvacuateReplannerFactory(this.scenario, this.withinDayControlerListener.getWithinDayEngine(),
+				(SwissPTTravelTime) this.ptTravelTime, this.withinDayControlerListener.getWithinDayTripRouterFactory(), routingContext);
+		this.marathonEndActivityAndEvacuateReplannerFactory = new MarathonEndActivityAndEvacuateReplannerFactory(this.scenario, this.withinDayControlerListener.getWithinDayEngine(), endActivityAndEvacuateReplannerFactory);
 		this.marathonEndActivityAndEvacuateReplannerFactory.addIdentifier(this.affectedActivityPerformingIdentifier);
-		this.getWithinDayEngine().addTimedDuringActivityReplannerFactory(this.marathonEndActivityAndEvacuateReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+		this.withinDayControlerListener.getWithinDayEngine().addTimedDuringActivityReplannerFactory(this.marathonEndActivityAndEvacuateReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 				
-		this.extendCurrentActivityReplannerFactory = new ExtendCurrentActivityReplannerFactory(this.scenarioData, this.getWithinDayEngine());
+		this.extendCurrentActivityReplannerFactory = new ExtendCurrentActivityReplannerFactory(this.scenario, this.withinDayControlerListener.getWithinDayEngine());
 		this.extendCurrentActivityReplannerFactory.addIdentifier(this.notAffectedActivityPerformingIdentifier);
-		this.getWithinDayEngine().addTimedDuringActivityReplannerFactory(this.extendCurrentActivityReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+		this.withinDayControlerListener.getWithinDayEngine().addTimedDuringActivityReplannerFactory(this.extendCurrentActivityReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 		
 		/*
 		 * During Leg Replanners
@@ -799,19 +801,19 @@ public final class MarathonController extends WithinDayController implements
 //		this.getReplanningManager().addTimedDuringLegReplannerFactory(this.currentLegInitialReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 		
 		// use buffered affected area
-		this.currentLegInitialReplannerFactory = new CurrentLegInitialReplannerFactory(this.scenarioData, 
-				this.getWithinDayEngine(), this.bufferedCoordAnalyzer, this.getWithinDayTripRouterFactory(), routingContext);
+		this.currentLegInitialReplannerFactory = new CurrentLegInitialReplannerFactory(this.scenario, 
+				this.withinDayControlerListener.getWithinDayEngine(), this.bufferedCoordAnalyzer, this.withinDayControlerListener.getWithinDayTripRouterFactory(), routingContext);
 		this.currentLegInitialReplannerFactory.addIdentifier(this.legPerformingIdentifier);
-		this.getWithinDayEngine().addTimedDuringLegReplannerFactory(this.currentLegInitialReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+		this.withinDayControlerListener.getWithinDayEngine().addTimedDuringLegReplannerFactory(this.currentLegInitialReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 		
-		this.switchWalkModeReplannerFactory = new SwitchToWalk2DLegReplannerFactory(this.scenarioData, this.getWithinDayEngine(), this.coordAnalyzer);
+		this.switchWalkModeReplannerFactory = new SwitchToWalk2DLegReplannerFactory(this.scenario, this.withinDayControlerListener.getWithinDayEngine(), this.coordAnalyzer);
 		this.switchWalkModeReplannerFactory.addIdentifier(this.duringLegRerouteIdentifier);
-		this.getWithinDayEngine().addTimedDuringLegReplannerFactory(this.switchWalkModeReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+		this.withinDayControlerListener.getWithinDayEngine().addTimedDuringLegReplannerFactory(this.switchWalkModeReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 
-		this.duringLegRerouteReplannerFactory = new MarathonCurrentLegReplannerFactory(this.scenarioData, 
-				this.getWithinDayEngine(), this.getWithinDayTripRouterFactory(), routingContext);
+		this.duringLegRerouteReplannerFactory = new MarathonCurrentLegReplannerFactory(this.scenario, 
+				this.withinDayControlerListener.getWithinDayEngine(), this.withinDayControlerListener.getWithinDayTripRouterFactory(), routingContext);
 		this.duringLegRerouteReplannerFactory.addIdentifier(this.duringLegRerouteIdentifier);
-		this.getWithinDayEngine().addTimedDuringLegReplannerFactory(this.duringLegRerouteReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+		this.withinDayControlerListener.getWithinDayEngine().addTimedDuringLegReplannerFactory(this.duringLegRerouteReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
 		
 		/*
 		 * Collect Replanners that can be disabled after all agents have been informed.
@@ -833,9 +835,9 @@ public final class MarathonController extends WithinDayController implements
 	private Map<String, TravelTime> createLinkReplanningMapTravelTime() {
 		
 		Map<String, TravelTime> factory = new HashMap<String, TravelTime>();
-		factory.put(TransportMode.walk, new WalkTravelTimeFactory(this.config.plansCalcRoute()).createTravelTime());
-		factory.put("walk2d", new WalkTravelTimeFactory(this.config.plansCalcRoute()).createTravelTime());
-		factory.put(TransportMode.bike, new BikeTravelTimeFactory(this.config.plansCalcRoute()).createTravelTime());
+		factory.put(TransportMode.walk, new WalkTravelTimeFactory(this.scenario.getConfig().plansCalcRoute()).createTravelTime());
+		factory.put("walk2d", new WalkTravelTimeFactory(this.scenario.getConfig().plansCalcRoute()).createTravelTime());
+		factory.put(TransportMode.bike, new BikeTravelTimeFactory(this.scenario.getConfig().plansCalcRoute()).createTravelTime());
 	
 		// replace modes
 		factory.put(TransportMode.car, new FreeSpeedTravelTime());
