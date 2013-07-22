@@ -39,7 +39,6 @@ public class DgTaSignalModelFactory implements SignalModelFactory {
 
 	public DgTaSignalModelFactory(DefaultSignalModelFactory defaultSignalModelFactory,
 			DgSensorManager sensorManager) {
-		// TODO Auto-generated constructor stub
 	}
 
 	@Override
