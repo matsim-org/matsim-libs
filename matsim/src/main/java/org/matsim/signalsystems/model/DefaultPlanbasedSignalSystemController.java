@@ -31,6 +31,8 @@ import org.matsim.api.core.v01.Id;
 
 
 /**
+ * Implements a Fixed-time control.
+ * 
  * @author dgrether
  *
  */
