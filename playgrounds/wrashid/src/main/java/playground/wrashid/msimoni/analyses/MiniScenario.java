@@ -85,36 +85,48 @@ public class MiniScenario {
 		Node n1 = factory.createNode(scenario.createId("n1"), scenario.createCoord(5000.0, 0.0));
 		Node n2 = factory.createNode(scenario.createId("n2"), scenario.createCoord(5000.0, 5000.0));
 		Node n3 = factory.createNode(scenario.createId("n3"), scenario.createCoord(0.0, 5000.0));
+		Node nEnterLeave = factory.createNode(scenario.createId("nEnterLeave"), scenario.createCoord(-5000.0, 0.0));
 		
 		Link l0 = factory.createLink(scenario.createId("l0"), n0, n1);
 		Link l1 = factory.createLink(scenario.createId("l1"), n1, n2);
 		Link l2 = factory.createLink(scenario.createId("l2"), n2, n3);
 		Link l3 = factory.createLink(scenario.createId("l3"), n3, n0);
+		Link lEnter = factory.createLink(scenario.createId("lEnter"), nEnterLeave, n0);
+		Link lLeave = factory.createLink(scenario.createId("lLeave"), n0, nEnterLeave);
 		
 		l0.setFreespeed(80.0 / 3.6);
 		l1.setFreespeed(80.0 / 3.6);
 		l2.setFreespeed(80.0 / 3.6);
 		l3.setFreespeed(80.0 / 3.6);
+		lEnter.setFreespeed(80.0 / 3.6);
+		lLeave.setFreespeed(80.0 / 3.6);
 		
 		l0.setLength(5000.0);
 		l1.setLength(5000.0);
 		l2.setLength(5000.0);
 		l3.setLength(5000.0);
+		lEnter.setLength(5000.0);
+		lLeave.setLength(5000.0);
 		
 		l0.setCapacity(Double.MAX_VALUE);
 		l1.setCapacity(2000.0);
 		l2.setCapacity(Double.MAX_VALUE);
 		l3.setCapacity(Double.MAX_VALUE);
-				
+		lEnter.setCapacity(Double.MAX_VALUE);
+		lLeave.setCapacity(Double.MAX_VALUE);
+		
 		scenario.getNetwork().addNode(n0);
 		scenario.getNetwork().addNode(n1);
 		scenario.getNetwork().addNode(n2);
 		scenario.getNetwork().addNode(n3);
+		scenario.getNetwork().addNode(nEnterLeave);
 		
 		scenario.getNetwork().addLink(l0);
 		scenario.getNetwork().addLink(l1);
 		scenario.getNetwork().addLink(l2);
 		scenario.getNetwork().addLink(l3);
+		scenario.getNetwork().addLink(lEnter);
+		scenario.getNetwork().addLink(lLeave);
 		
 		new NetworkWriter(scenario.getNetwork()).write("network.xml");
 	}
@@ -130,8 +142,8 @@ public class MiniScenario {
 			linkIds.add(scenario.createId("l2"));
 			linkIds.add(scenario.createId("l3"));
 		}
-		NetworkRoute route = (NetworkRoute) new LinkNetworkRouteFactory().createRoute(scenario.createId("l3"), scenario.createId("l0"));
-		route.setLinkIds(scenario.createId("l3"), linkIds, scenario.createId("l0"));
+		NetworkRoute route = (NetworkRoute) new LinkNetworkRouteFactory().createRoute(scenario.createId("lEnter"), scenario.createId("lLeave"));
+		route.setLinkIds(scenario.createId("lEnter"), linkIds, scenario.createId("lLeave"));
 		
 		Random random = MatsimRandom.getLocalInstance();
 		int p = 0;
