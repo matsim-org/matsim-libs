@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TaSingleCrossingMain
+ * TaMain
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2011 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,32 +17,39 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.tacontrol;
+package playground.dgrether.signalsystems.laemmercontrol;
 
-import org.matsim.api.core.v01.Scenario;
+import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
 
+import playground.dgrether.DgPaths;
 import playground.dgrether.signalsystems.tacontrol.controler.DgTaControlerListenerFactory;
-import playground.dgrether.signalsystems.tacontrol.testisolatedcrossing.SingleCrossingScenario;
 
 
 /**
  * @author dgrether
  *
  */
-public class TaSingleCrossingMain {
-
-	private final static double lambdaMax = 0.1;
-	
+public class TaMain {
+  
+	private static final Logger log = Logger.getLogger(TaMain.class);
+	/**
+	 * @param args
+	 */
 	public static void main(String[] args) {
-		
-		for (double lambdaWestEast = 0.0; lambdaWestEast <= lambdaMax; lambdaWestEast += 0.1){
-			
+		log.info("Running SylviaMain...");
+		String[] args2 = null;
+		if (args == null || args.length == 0){
+			log.info("No args given, running local config...");
+			args2 = new String[1];
+			args2[0] = DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/config.xml";
 		}
-		double lambdaWestEast = 0.5;
-		Scenario scenario = new SingleCrossingScenario().createScenario(lambdaWestEast);
+		else {
+			args2 = args;
+		}
+
 		
-		Controler controler = new Controler(scenario);
+		Controler controler = new Controler(args2);
 		controler.setSignalsControllerListenerFactory(new DgTaControlerListenerFactory());
 		controler.setOverwriteFiles(true);
 		controler.run();
