@@ -19,6 +19,10 @@
  * *********************************************************************** */
 package air.analysis.lhi;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
@@ -40,6 +44,8 @@ public class LegModeHistogramImproved implements
 	public static final String all = "all";
 	
 	private CategoryHistogram histogram;
+
+	private Map<Id, AgentDepartureEvent> departureEventsByPersonId;
 	
 	public LegModeHistogramImproved() {
 		this(5 * 60);
@@ -55,30 +61,44 @@ public class LegModeHistogramImproved implements
 	 */
 	public LegModeHistogramImproved(final int binSize) {
 		this.histogram = new CategoryHistogram(binSize);
+		this.departureEventsByPersonId = new HashMap<Id, AgentDepartureEvent>();
 		reset(0);
 	}
 
 	@Override
 	public void reset(int iteration) {
 		this.histogram.reset(iteration);
+		this.departureEventsByPersonId.clear();
 	}
 
 	@Override
 	public void handleEvent(final AgentDepartureEvent event) {
-		this.histogram.increase(event.getTime(), 1, all);
-		this.histogram.increase(event.getTime(), 1, event.getLegMode());
+		this.departureEventsByPersonId.put(event.getPersonId(), event);
+	}
+	
+	private void processDeparture(double time, String mode){
+		this.histogram.increase(time, 1, all);
+		this.histogram.increase(time, 1, mode);
 	}
 	
 	@Override
 	public void handleEvent(final AgentArrivalEvent event) {
-		this.histogram.decrease(event.getTime(), 1, all);
-		this.histogram.decrease(event.getTime(), 1, event.getLegMode());
+		AgentDepartureEvent e = this.departureEventsByPersonId.get(event.getPersonId());
+		if (e != null) {
+			this.processDeparture(e.getTime(), e.getLegMode());
+			this.histogram.decrease(event.getTime(), 1, all);
+			this.histogram.decrease(event.getTime(), 1, event.getLegMode());
+		}
 	}
 
 	@Override
 	public void handleEvent(final AgentStuckEvent event) {
-		this.histogram.abort(event.getTime(), 1, all);
-		this.histogram.abort(event.getTime(), 1, event.getLegMode());
+		AgentDepartureEvent e = this.departureEventsByPersonId.get(event.getPersonId());
+		if (e != null) {
+			this.processDeparture(e.getTime(), e.getLegMode());
+			this.histogram.abort(event.getTime(), 1, all);
+			this.histogram.abort(event.getTime(), 1, event.getLegMode());
+		}
 	}
 
 	public CategoryHistogram getCategoryHistogram() {

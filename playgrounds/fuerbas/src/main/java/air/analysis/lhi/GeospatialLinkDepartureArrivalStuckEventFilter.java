@@ -36,7 +36,7 @@ import playground.dgrether.events.filters.EventFilter;
  * @author dgrether
  *
  */
-public class GeospatialLinkDepartureArrivalEventFilter implements EventFilter {
+public class GeospatialLinkDepartureArrivalStuckEventFilter implements EventFilter {
 
 	private Network network;
 	private Map<Id, Boolean> networkContainedLastDepartureByPersonId;
@@ -44,7 +44,7 @@ public class GeospatialLinkDepartureArrivalEventFilter implements EventFilter {
 	/**
 	 * @param network
 	 */
-	public GeospatialLinkDepartureArrivalEventFilter(Network network) {
+	public GeospatialLinkDepartureArrivalStuckEventFilter(Network network) {
 		this.network =network;
 		this.networkContainedLastDepartureByPersonId = new HashMap<Id, Boolean>();
 	}
@@ -65,14 +65,15 @@ public class GeospatialLinkDepartureArrivalEventFilter implements EventFilter {
 		}
 		else if (event instanceof AgentArrivalEvent) {
 			AgentArrivalEvent e = (AgentArrivalEvent) event;
-			if (this.networkContainedLastDepartureByPersonId.get(e.getPersonId()) ){
-//					&& this.network.getLinks().containsKey(e.getLinkId())) {
+			if (this.networkContainedLastDepartureByPersonId.get(e.getPersonId())
+					&& this.network.getLinks().containsKey(e.getLinkId())) {
 				return true;
 			}
 		}
 		else if (event instanceof AgentStuckEvent){
 			AgentStuckEvent e = (AgentStuckEvent) event;
-			if (this.networkContainedLastDepartureByPersonId.get(e.getPersonId())) {
+			if (this.networkContainedLastDepartureByPersonId.get(e.getPersonId())
+					&& this.network.getLinks().containsKey(e.getLinkId())) {
 				return true;
 			}
 		}

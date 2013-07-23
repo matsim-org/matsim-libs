@@ -61,9 +61,9 @@ public class BoardingDeniedStuckEvaluator {
 	}
 
 	public void writeToFiles(String outputFilePrefix) {
-		String odStuckStats = outputFilePrefix + "stucked_by_od_pair.csv";
+		String odStuckStats = outputFilePrefix + "stuck_by_od_pair.csv";
 		this.writeOdStuckStats(odStuckStats);
-		String airportStuckStats = outputFilePrefix + "stucked_by_airport.csv";
+		String airportStuckStats = outputFilePrefix + "stuck_by_airport.csv";
 		this.writeAirportStuckStats(airportStuckStats);
 		log.info("No Stuck but Boarding Denied: " + boardingDeniedNoStuck.size());
 	}

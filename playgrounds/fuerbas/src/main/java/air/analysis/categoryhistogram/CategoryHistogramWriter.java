@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package air.analysis.categoryhistogram;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Font;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -77,7 +79,7 @@ public class CategoryHistogramWriter {
 		stream.print("\n");
 
 		Map<String, Integer> enRouteMap = new HashMap<String, Integer>();
-		for (int i = this.getFirstIndex(histo); i <= histo.getLastIndex() + 2; i++) {
+		for (int i = this.getFirstIndex(histo) - 2; i <= histo.getLastIndex() + 2; i++) {
 			int seconds = i * histo.getBinSizeSeconds();
 			stream.print(Time.writeTime(seconds));
 			stream.print("\t");
@@ -124,7 +126,7 @@ public class CategoryHistogramWriter {
 		final XYSeries arrivalsSerie = new XYSeries(this.arrivalsName, false, true);
 		final XYSeries onRouteSerie = new XYSeries(this.enRouteName, false, true);
 		Integer enRoute = 0;
-		for (int i = this.getFirstIndex(histo); i <= histo.getLastIndex() + 2; i++) {
+		for (int i = this.getFirstIndex(histo) - 2 ; i <= histo.getLastIndex() + 2; i++) {
 			int departures = histo.getDepartures(modeName, i);
 			int arrivals = histo.getArrivals(modeName, i);
 			int stuck = histo.getAbort(modeName, i);
@@ -138,8 +140,14 @@ public class CategoryHistogramWriter {
 		xyData.addSeries(arrivalsSerie);
 		xyData.addSeries(onRouteSerie);
 
-		final JFreeChart chart = ChartFactory.createXYStepChart(this.title + ", " + modeName + ", it."
-				+ histo.getIteration(), "time [h]", yTitle , xyData, PlotOrientation.VERTICAL, true, // legend
+		final JFreeChart chart = ChartFactory.createXYStepChart(this.title + ", " + modeName + ", " +
+				"it."
+				+ histo.getIteration(), 
+				"time [h]", 
+				yTitle , 
+				xyData, 
+				PlotOrientation.VERTICAL, 
+				true, // legend
 				false, // tooltips
 				false // urls
 				);
@@ -149,6 +157,14 @@ public class CategoryHistogramWriter {
 		final CategoryAxis axis1 = new CategoryAxis("hour");
 		axis1.setTickLabelFont(new Font("SansSerif", Font.PLAIN, 7));
 		plot.setDomainAxis(new NumberAxis("time"));
+		
+		plot.getRenderer().setSeriesStroke(0, new BasicStroke(2.0f));
+		plot.getRenderer().setSeriesStroke(1, new BasicStroke(2.0f));
+		plot.getRenderer().setSeriesStroke(2, new BasicStroke(2.0f));
+		plot.setBackgroundPaint(Color.white);
+		plot.setRangeGridlinePaint(Color.gray);  
+		plot.setDomainGridlinePaint(Color.gray);  
+		
 		return chart;
 	}
 	

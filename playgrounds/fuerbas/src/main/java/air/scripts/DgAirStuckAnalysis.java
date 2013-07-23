@@ -35,7 +35,7 @@ import air.analysis.stuck.CollectBoardingDeniedStuckEventHandler;
  * @author dgrether
  *
  */
-public class DgAirStuckedAnalysis {
+public class DgAirStuckAnalysis {
 
 	/**
 	 */
@@ -56,20 +56,28 @@ public class DgAirStuckedAnalysis {
 //				"1852",
 //				"1853"
 				
-				"1854",
+//				"1854",
 //				"1855",
 //				"1856",
 //				"1857",
 //				"1858",
 //				"1859",
 //				
-				"1860",
+//				"1860",
 //				"1861",
 //				"1862",
 //				"1863",
 //				"1864"
+
+			"1865",
+			"1866",
+			"1867",
+			"1868",
+			"1869",
+				"1870"
+
 		};
-		String iteration = "500";
+		String iteration = "600";
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimPopulationReader popReader = new MatsimPopulationReader(sc);
 		popReader.readFile(populationFile);

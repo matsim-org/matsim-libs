@@ -55,6 +55,8 @@ public class CreateLegHistogramImproved {
 	public static void main(String[] args) {
 		String baseDirectory = "/media/data/work/repos/";
 		Tuple[] runs = { 
+
+//								new Tuple<String, Integer>("1811", 0),
 //				new Tuple<String, Integer>("1836", 600),
 //				new Tuple<String, Integer>("1837", 600), 
 //				new Tuple<String, Integer>("1838", 600),
@@ -68,19 +70,25 @@ public class CreateLegHistogramImproved {
 //				new Tuple<String, Integer>("1852", 600),
 //				new Tuple<String, Integer>("1853", 600) 
 
-			new Tuple<String, Integer>("1854", 1),
-			new Tuple<String, Integer>("1855", 1),
-			new Tuple<String, Integer>("1856", 1),
-			new Tuple<String, Integer>("1857", 1),
-			new Tuple<String, Integer>("1858", 1),
-			new Tuple<String, Integer>("1859", 1),
-			
-			new Tuple<String, Integer>("1860", 1),
-			new Tuple<String, Integer>("1861", 1),
-			new Tuple<String, Integer>("1862", 1),
-			new Tuple<String, Integer>("1863", 1),
-			new Tuple<String, Integer>("1864", 1)
+//			new Tuple<String, Integer>("1854", 1),
+//			new Tuple<String, Integer>("1855", 1),
+//			new Tuple<String, Integer>("1856", 1),
+//			new Tuple<String, Integer>("1857", 1),
+//			new Tuple<String, Integer>("1858", 1),
+//			new Tuple<String, Integer>("1859", 1),
+//			
+//			new Tuple<String, Integer>("1860", 1),
+//			new Tuple<String, Integer>("1861", 1),
+//			new Tuple<String, Integer>("1862", 1),
+//			new Tuple<String, Integer>("1863", 1),
+//			new Tuple<String, Integer>("1864", 1)
 				
+			new Tuple<String, Integer>("1865", 600),
+			new Tuple<String, Integer>("1866", 600),
+			new Tuple<String, Integer>("1867", 600),
+			new Tuple<String, Integer>("1868", 600),
+			new Tuple<String, Integer>("1869", 600),
+			new Tuple<String, Integer>("1870", 600),
 		};
 
 		String vehiclesFile = "/home/dgrether/data/work/repos/shared-svn/studies/countries/eu/flight/dg_oag_tuesday_flight_model_2_runways_airport_capacities_www_storage_restriction/flight_transit_vehicles.xml";
@@ -111,13 +119,6 @@ public class CreateLegHistogramImproved {
 			String txtOutputSeatsHisto = pngOutputSeatsHisto + ".csv";
 			String pngOutputInVehHisto = out.getIterationFilename(it, "in_vehicle_histogram_improved_de");
 			String txtOutputInVehHisto = pngOutputInVehHisto + ".csv";
-
-			// eventsFilename =
-			// "/home/dgrether/data/work/matsim/matsimOutput/flight_model_one_line/ITERS/it.0/0.events.xml.gz";
-			// txtOutput =
-			// "/home/dgrether/data/work/matsim/matsimOutput/flight_model_one_line/ITERS/it.0/0.leg_histogram_improved.csv";
-			// pngOutput =
-			// "/home/dgrether/data/work/matsim/matsimOutput/flight_model_one_line/ITERS/it.0/0.leg_histogram_improved";
 
 			// Persons in vehicle over time data
 			EventsFilterManager eventsManager = new EventsFilterManagerImpl();
@@ -157,9 +158,10 @@ public class CreateLegHistogramImproved {
 
 			// conventional leg histogram improved
 			eventsManager = new EventsFilterManagerImpl();
-			GeospatialLinkDepartureArrivalEventFilter legHistoFilter = new GeospatialLinkDepartureArrivalEventFilter(
-					filterNetwork);
-			eventsManager.addFilter(legHistoFilter);
+//			GeospatialLinkDepartureArrivalStuckEventFilter legHistoFilter = new GeospatialLinkDepartureArrivalStuckEventFilter(
+//					filterNetwork);
+//			eventsManager.addFilter(legHistoFilter);
+//			eventsManager.addFilter(new NotCarModeLinkEventFilter());
 			LegModeHistogramImproved handler = new LegModeHistogramImproved();
 			handler.reset(it);
 			eventsManager.addHandler(handler);
