@@ -203,7 +203,7 @@ public abstract class WithinDayController extends Controler implements StartupLi
 	/**
 	 * Uses travel times from the travel time collector for car trips.
 	 */
-	public TripRouter getTripRouterInstance() {
+	public TripRouter getWithinDayTripRouterInstance() {
 		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory(), 
 				this.getTravelTimeCollector(), this.scenarioData.getConfig().planCalcScore());
 		return this.withinDayTripRouterFactory.instantiateAndConfigureTripRouter(routingContext);
