@@ -66,6 +66,9 @@ public class ShortestPathCalculator
 
             ids[0] = fromLink.getId();
             accTT = 0;//we start at the end of fromLink
+            //actually, in QSim it is usually 1 second
+            //(when INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES is ON;
+            //otherwise it may take even longer)
             accLinkTravelTimes[0] = accTT;
 
             for (int i = 0; i < count; i++) {
