@@ -12,8 +12,10 @@ import org.matsim.contrib.transEnergySim.vehicles.api.BatteryElectricVehicle;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
@@ -23,7 +25,7 @@ import playground.jbischoff.energy.log.SocLogRow;
 
 
 public class DepotArrivalDepartureCharger implements AgentArrivalEventHandler,
-		AgentDepartureEventHandler, ShutdownListener {
+		LinkLeaveEventHandler, ShutdownListener {
 
 	
 	private List<Id> depotLocations;
@@ -59,17 +61,18 @@ public class DepotArrivalDepartureCharger implements AgentArrivalEventHandler,
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(LinkLeaveEvent event) {
 		if (!isMonitoredVehicle(event.getPersonId())) return;
 		if (!isBatteryElectricVehicle(event.getPersonId())) return;
 		//technically no battery-electric-vehicles (e.g. trolleybusses) could also be handled here, therefore the exclusion
 		if (!isAtDepotLocation(event.getLinkId())) return;
 		if (!this.arrivalTimes.containsKey(event.getPersonId())) return;
 		//assumption: Charging before first activity does not take place as cars are assumed to be charged in the morning, this goes in Line with the BatteryElectricVehicleImpl
+		//assumption2: ignore random trespassing of link
 		
 		double chargetime = event.getTime() - this.arrivalTimes.get(event.getPersonId())-MINIMUMCHARGETIME;
 		if (chargetime>0)
-//		log.info("Charged v: "+event.getPersonId()+" for "+chargetime+" old Soc: " + (this.socUponArrival.get(event.getPersonId())/3600/1000)+ " new SoC: " + (((BatteryElectricVehicle)this.vehicles.get(event.getPersonId())).getSocInJoules()/3600/1000)  );
+		log.info("Charged v: "+event.getPersonId()+" for "+chargetime+" old Soc: " + (this.socUponArrival.get(event.getPersonId())/3600/1000)+ " new SoC: " + (((BatteryElectricVehicle)this.vehicles.get(event.getPersonId())).getSocInJoules()/3600/1000)  );
 		
 		this.arrivalTimes.remove(event.getPersonId());
 		this.socUponArrival.remove(event.getPersonId());
@@ -149,11 +152,12 @@ public class DepotArrivalDepartureCharger implements AgentArrivalEventHandler,
 	public boolean isChargedForTask(Id carId){
 		boolean charged = true; //default is true, e.g. for petrol-based cars in mixed taxi fleets
 	
-		if (this.vehicles.containsKey(carId))
+		if (this.vehicles.containsKey(carId)){
 			if (isBatteryElectricVehicle(carId))			
 				if (((BatteryElectricVehicle)this.vehicles.get(carId)).getSocInJoules() < this.MINIMUMSOCFORDEPARTURE*3600*1000) 
 					charged= false;
-		
+		}
+
 		return charged;
 	}
 

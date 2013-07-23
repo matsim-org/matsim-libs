@@ -25,11 +25,15 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.TreeSet;
 
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -49,11 +53,11 @@ public class MielecDemandExtender {
 	private String inputNetFile = "C:\\local_jb\\Dropbox\\MasterOfDesaster\\jbischoff\\jbmielec\\network.xml";
 
 	private String inputTaxiDemand = "C:\\local_jb\\Dropbox\\MasterOfDesaster\\jbischoff\\jbmielec\\taxiCustomers_05_pc.txt";
-	private String outputTaxiDemandDir =  "C:\\local_jb\\Dropbox\\MasterOfDesaster\\jbischoff\\jbmielec\\taxidemand\\";
+	private String outputTaxiDemandDir =  "C:\\local_jb\\Dropbox\\MasterOfDesaster\\jbischoff\\jbmielec\\increaseddemand\\taxidemand\\";
 	
 	private TreeSet<Id> customerIds = new TreeSet<Id>();
 	private HashSet<Id> agentIds;
-	private int MAXIMUMDEMANDINPERCENT = 99;
+	private int MAXIMUMDEMANDINPERCENT = 50;
 	/**
 	 * @param args
 	 */
@@ -85,6 +89,7 @@ public class MielecDemandExtender {
 		double d = (double)customerIds.size()/(double)agentIds.size();
 		long currentPercentage = Math.round(d*100);
 		Random r = new Random();
+		exportCustomers(currentPercentage);
 		currentPercentage++;
 		for (;currentPercentage<=MAXIMUMDEMANDINPERCENT;currentPercentage++){
 			long amountOfPlans = Math.round((((double)currentPercentage/100.)*agentIds.size()));
@@ -98,7 +103,7 @@ public class MielecDemandExtender {
 	
 	private void exportCustomers (long percentage){
 		try {
-			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(outputTaxiDemandDir+"taxiCustomers_"+percentage+"_.txt")));
+			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(outputTaxiDemandDir+"taxiCustomers_"+percentage+".txt")));
 			
 			
 			TreeSet<Integer> ints = new TreeSet<Integer>();
@@ -141,10 +146,35 @@ public class MielecDemandExtender {
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(sc).readFile(inputNetFile);
 		new MatsimPopulationReader(sc).readFile(inputPlansFile);
-		agentIds = new HashSet<Id>(sc.getPopulation().getPersons().keySet());
+		agentIds = new HashSet<Id>();
+		for (Entry<Id, ? extends Person> e : sc.getPopulation().getPersons().entrySet()){
+			if (e.getKey().equals(sc.createId("1398"))) continue;
+			Activity a = (Activity)e.getValue().getSelectedPlan().getPlanElements().get(0);
+			Coord coorda = sc.getNetwork().getLinks().get(a.getLinkId()).getCoord();
+			Activity b = (Activity)e.getValue().getSelectedPlan().getPlanElements().get(2);
+			Coord coordb = sc.getNetwork().getLinks().get(b.getLinkId()).getCoord();
+			if (isInCity(coorda) && isInCity(coordb)) {
+				agentIds.add(e.getKey());
+			}
+			
+		}
+		System.out.println("found "+agentIds.size() +" within city trips");
+//		agentIds = new HashSet<Id>(sc.getPopulation().getPersons().keySet());
 		
 	}
 
+	private boolean isInCity(Coord c){
+		double x = c.getX();
+		double y = c.getY();
+		
+		if (x<-500) return false;
+		if (x>8000) return false;
+		if (y<-8000) return false;
+		if (y>500) return false;
+		
+		return true;
+		
+	}
 	
 
 }

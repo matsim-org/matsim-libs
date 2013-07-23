@@ -120,7 +120,7 @@ public class TravelDistanceTimeEvaluator implements LinkLeaveEventHandler, Perso
 		System.out.println("Average Taxi pkm travelled:" +tpkm/this.taxiTravelDistance.size());
 
 	}
-	public void writeTravelDistanceStatsToFiles(String distanceFile){
+	public String writeTravelDistanceStatsToFiles(String distanceFile){
 		
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(distanceFile)));
@@ -149,14 +149,17 @@ public class TravelDistanceTimeEvaluator implements LinkLeaveEventHandler, Perso
 			ps /=this.taxiTravelDistance.size();
 			
 			bw.newLine();
-			bw.write("average\t"+tkm+"\t"+tpkm+"\t"+(tpkm/tkm)+"\t"+s+"\t"+ps+"\t"+(ps/s));
+			String avs = "average\t"+Math.round(tkm)+"\t"+Math.round(tpkm)+"\t"+(tpkm/tkm)+"\t"+s+"\t"+ps+"\t"+(ps/s);
+			bw.write(avs);
 			
 			bw.flush();
 			bw.close();
+			return avs;
 		} catch (IOException e) {
 			System.err.println("Could not create File" + distanceFile);
 			e.printStackTrace();
 		}
+		return null;
 	}
 	
 

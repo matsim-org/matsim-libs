@@ -245,7 +245,6 @@ public class ElectroCabLaunchUtils
 		
 		
         QSim qSim = new QSim(scenario, events);
-
         ActivityEngine activityEngine = new ActivityEngine();
         qSim.addMobsimEngine(activityEngine);
         qSim.addActivityHandler(activityEngine);
@@ -301,16 +300,16 @@ public class ElectroCabLaunchUtils
 	}
 
 	
-	public void writeStatisticsToFiles(String dirname) {
+	public String writeStatisticsToFiles(String dirname) {
 		System.out.println("writing energy consumption stats directory to "+ dirname);
 		depotArrivalDepartureCharger.getSoCLog().writeToFiles(dirname);
-		travelDistanceEvaluator.writeTravelDistanceStatsToFiles(dirname + "travelDistanceStats.txt");
-		taxiCustomerWaitTimeAnalyser.writeCustomerWaitStats(dirname+"customerWaitStatistic.txt");
+		String dist = travelDistanceEvaluator.writeTravelDistanceStatsToFiles(dirname + "travelDistanceStats.txt");
+		String wait = taxiCustomerWaitTimeAnalyser.writeCustomerWaitStats(dirname+"customerWaitStatistic.txt");
 		System.out.println("...done");
 		travelDistanceEvaluator.printTravelDistanceStatistics();
 		taxiCustomerWaitTimeAnalyser.printTaxiCustomerWaitStatistics();
 
-	
+		return wait+"\t"+dist;
 	}
 	
 }

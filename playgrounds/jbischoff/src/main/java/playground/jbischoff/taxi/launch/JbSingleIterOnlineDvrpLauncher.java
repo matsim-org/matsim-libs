@@ -53,7 +53,7 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
     /*package*/final String dirName;
     /*package*/final String netFileName;
     /*package*/final String plansFileName;
-    /*package*/final String taxiCustomersFileName;
+    		    String taxiCustomersFileName;
     /*package*/final String depotsFileName;
 
     /*package*/final boolean vrpOutFiles;
@@ -67,7 +67,7 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
     /*package*/final boolean writeSimEvents;
     /*package*/final String eventsFileName;
 
-    /*package*/final Scenario scenario;
+    Scenario scenario;
     
 
     /*package*/MatsimVrpData data;
@@ -75,8 +75,8 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
     /*package*/LegHistogram legHistogram;
 
     /*package*/TaxiDelaySpeedupStats delaySpeedupStats;
-    private String electricStatsFilename;
     private String electricStatsDir;
+    List<String> waitList;
 
 
     /*package*/JbSingleIterOnlineDvrpLauncher()
@@ -85,7 +85,6 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
 //    	dirName = "Z:\\WinHome\\Docs\\svn-checkouts\\jbischoff\\jbmielec\\";
     	dirName = "C:\\local_jb\\Dropbox\\MasterOfDesaster\\jbischoff\\jbmielec\\";
         netFileName = dirName + "network.xml";
-        electricStatsFilename = dirName + "elstats.txt";
         electricStatsDir = dirName +"electric_depots\\";
         plansFileName = dirName + "20.plans.xml.gz";
 
@@ -126,64 +125,19 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
         histogramOutDirName = dirName + "histograms";
 
         writeSimEvents = true;
+        waitList = new ArrayList<String>();
 
         scenario = ElectroCabLaunchUtils.initMatsimData(netFileName, plansFileName,
                 taxiCustomersFileName);
     }
 
 
-    /*package*/JbSingleIterOnlineDvrpLauncher(String paramFile)
-    {
-        Scanner scanner;
-        try {
-            scanner = new Scanner(new BufferedReader(new FileReader(paramFile)));
-        }
-        catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
-        }
-
-        Map<String, String> params = new HashMap<String, String>();
-
-        while (scanner.hasNext()) {
-            String key = scanner.next();
-            String value = scanner.next();
-            params.put(key, value);
-        }
-
-        dirName = params.get("dirName") + '\\';
-        
-        
-        netFileName = dirName + params.get("netFileName");
-
-        plansFileName = dirName + params.get("plansFileName");
-
-        taxiCustomersFileName = dirName + params.get("taxiCustomersFileName");
-
-        depotsFileName = dirName + params.get("depotsFileName");
-
-        eventsFileName = dirName + params.get("eventsFileName");
-
-        algorithmConfig = AlgorithmConfig.ALL[Integer.valueOf(params.get("algorithmConfig"))];
-
-        otfVis = Boolean.valueOf(params.get("otfVis"));
-
-        vrpOutFiles = Boolean.valueOf(params.get("vrpOutFiles"));
-        vrpOutDirName = dirName + params.get("vrpOutDirName");
-
-        outHistogram = Boolean.valueOf(params.get("outHistogram"));
-        histogramOutDirName = dirName + params.get("histogramOutDirName");
-
-        writeSimEvents = Boolean.valueOf(params.get("writeSimEvents"));
-
-        scenario = ElectroCabLaunchUtils.initMatsimData(netFileName, plansFileName,
-                taxiCustomersFileName);
-    }
 
 
     /**
      * Can be called several times (1 call == 1 simulation)
      */
-    /*package*/void go()
+    /*package*/void go(int run)
     {
 
     	File f = new File(electricStatsDir);
@@ -226,7 +180,7 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
         if (outHistogram) {
             events.addHandler(legHistogram = new LegHistogram(300));
         }
-
+//        qSim.getScenario().getConfig().simulation().setEndTime(86399);
         qSim.run();
 
         events.finishProcessing();
@@ -234,8 +188,7 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
         if (writeSimEvents) {
             eventWriter.closeFile();
         }
-//        olutils.printStatisticsToConsole();
-        olutils.writeStatisticsToFiles(electricStatsDir);
+        waitList.add(run+"\t"+olutils.writeStatisticsToFiles(electricStatsDir)+"\n");
         
         // check if all reqs have been served
         for (Request r : data.getVrpData().getRequests()) {
@@ -267,18 +220,44 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
 
     public static void main(String... args)
     {
+    	
         JbSingleIterOnlineDvrpLauncher launcher;
-        if (args.length == 0) {
-            launcher = new JbSingleIterOnlineDvrpLauncher();
-        }
-        else if (args.length == 1) {
-            launcher = new JbSingleIterOnlineDvrpLauncher(args[0]);
-        }
-        else {
-            throw new RuntimeException();
-        }
-
-        launcher.go();
+        launcher = new JbSingleIterOnlineDvrpLauncher();
+//        launcher.goIncreasedDemand(50);
+       
+        launcher.go(0);
         launcher.generateOutput();
     }
+
+
+
+
+	private void goIncreasedDemand(int maxd) {
+		String outdir =dirName +"increaseddemand\\electric\\" ;
+		for (Integer i = 5;i<=maxd;i++){
+			
+			taxiCustomersFileName = dirName + "increaseddemand\\taxidemand\\taxiCustomers_"+i.toString()+".txt";
+			electricStatsDir = outdir +i.toString()+"\\";
+			
+			scenario = ElectroCabLaunchUtils.initMatsimData(netFileName, plansFileName,
+	                taxiCustomersFileName);
+			go(i);
+		}
+		
+		BufferedWriter bw;
+		try {
+			bw = new BufferedWriter(new FileWriter(new File(outdir+"accWaitStat.txt")));
+			bw.write("total taxi trips\taverage wait Time\tMinimum Wait Time\tMaximum Wait Time\tAgent ID\tdistanceTravelled\tdistanceTravelledWithPax\tOccupanceOverDistance\tTravelTime\tTravelTimeWithPax\tOccupanceOverTime\n");
+			for (String s : waitList){
+				bw.write(s);
+				
+			}
+			bw.flush();
+			bw.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
 }

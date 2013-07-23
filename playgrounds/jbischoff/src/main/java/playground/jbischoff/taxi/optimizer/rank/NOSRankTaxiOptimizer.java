@@ -136,6 +136,7 @@ public class NOSRankTaxiOptimizer
   		    startWaiting = startIdling + darc.getTimeOnDeparture(startIdling);
   		    schedule.addTask(new BackToRankTask(startIdling,startWaiting,darc));
 //  		 System.out.println("scheduled wait task Id"+ schedule.getVehicle().getName()+" start "+startWaiting + " end "+tEnd);
+//  		    if (startWaiting>tEnd) tEnd = startWaiting+1;
   		    schedule.addTask(new WaitTaskImpl(startWaiting, tEnd, schedule.getVehicle().getDepot().getVertex()));
   		
         	

@@ -95,19 +95,23 @@ public class TaxiCustomerWaitTimeAnalyser implements
 	}
 
 
-	public void writeCustomerWaitStats(String waitstatsFile){
+	public String writeCustomerWaitStats(String waitstatsFile){
 		
 		try {
 			BufferedWriter bw = new BufferedWriter(new FileWriter(new File(waitstatsFile)));
 			bw.write("total taxi trips\taverage wait Time\tMinimum Wait Time\tMaximum Wait Time\n");
-			bw.write(this.totalWaitTime.size()+"\t"+Math.round(this.calculateAverageWaitTime())+"\t"+Math.round(this.returnMinWaitTime())+"\t"+Math.round(this.returnMaxWaitTime()));
+			String output =this.totalWaitTime.size()+"\t"+Math.round(this.calculateAverageWaitTime())+"\t"+Math.round(this.returnMinWaitTime())+"\t"+Math.round(this.returnMaxWaitTime());
+			bw.write(output);
 			bw.flush();
 			bw.close();
+			return output;
 		}
 		 catch (IOException e) {
 				System.err.println("Could not create File" + waitstatsFile);
 				e.printStackTrace();
 			}
+		return null;
+
 		
 	}
 	
