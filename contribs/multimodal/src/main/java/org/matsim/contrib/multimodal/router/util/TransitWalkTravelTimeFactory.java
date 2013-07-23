@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * UnknownTravelTimeFactory.java
+ * TransitWalkTravelTimeFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,34 +20,36 @@
 
 package org.matsim.contrib.multimodal.router.util;
 
+import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.TravelTimeFactory;
 
-public class UnknownTravelTimeFactory implements TravelTimeFactory {
+public class TransitWalkTravelTimeFactory implements TravelTimeFactory {
 
-	private final String mode;
 	private final PlansCalcRouteConfigGroup plansCalcRouteConfigGroup;
+	private final Map<Id, Double> linkSlopes;	// slope information in %
 	
-	public UnknownTravelTimeFactory(String mode, PlansCalcRouteConfigGroup plansCalcRouteConfigGroup) {
+	public TransitWalkTravelTimeFactory(PlansCalcRouteConfigGroup plansCalcRouteConfigGroup) {
+		this(plansCalcRouteConfigGroup, null);
+	}
 
-		this.mode = mode;
+	public TransitWalkTravelTimeFactory(PlansCalcRouteConfigGroup plansCalcRouteConfigGroup,
+			Map<Id, Double> linkSlopes) {
 		this.plansCalcRouteConfigGroup = plansCalcRouteConfigGroup;
+		this.linkSlopes = linkSlopes;
 		
-		Double speed = plansCalcRouteConfigGroup.getTeleportedModeSpeeds().get(mode);
-		Double speedFactor = plansCalcRouteConfigGroup.getTeleportedModeFreespeedFactors().get(mode);
-		
-		if (speed != null && speedFactor != null) {
-			throw new RuntimeException("Speed as well as speed factor was found for mode " + mode + 
-					"!  Don't know which should be used. Aborting.");
-		} else if (speed == null && speedFactor == null) {
-			throw new RuntimeException("Neither speed nor speed factor was found for mode " + mode + "! Aborting.");
+		if (plansCalcRouteConfigGroup.getTeleportedModeSpeeds().get(TransportMode.transit_walk) == null) {
+			throw new RuntimeException("No speed was found for mode transit_walk! Aborting.");
 		}
 	}
 
 	@Override
 	public TravelTime createTravelTime() {
-		return new UnknownTravelTime(this.mode, this.plansCalcRouteConfigGroup);
+		return new WalkTravelTime(plansCalcRouteConfigGroup.getTeleportedModeSpeeds().get(TransportMode.transit_walk), this.linkSlopes);
 	}
 	
 }

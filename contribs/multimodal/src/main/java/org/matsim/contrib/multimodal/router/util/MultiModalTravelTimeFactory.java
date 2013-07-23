@@ -75,27 +75,25 @@ public class MultiModalTravelTimeFactory implements MatsimFactory {
         MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) config.getModule(MultiModalConfigGroup.GROUP_NAME);
         Set<String> simulatedModes = CollectionUtils.stringToSet(multiModalConfigGroup.getSimulatedModes());
 		
-		for (String mode : simulatedModes) {
-			Double speed = config.plansCalcRoute().getTeleportedModeSpeeds().get(mode);
-			if (speed == null) {
-				throw new RuntimeException("No speed was found for mode " + mode + "! Aborting.");
-			}
-			
+		for (String mode : simulatedModes) {		
 			if (mode.equals(TransportMode.walk)) {
 				TravelTimeFactory factory = new WalkTravelTimeFactory(plansCalcRouteConfigGroup, linkSlopes);
+				this.factories.put(mode, factory);
+			} else if (mode.equals(TransportMode.transit_walk)) {
+				TravelTimeFactory factory = new TransitWalkTravelTimeFactory(plansCalcRouteConfigGroup, linkSlopes);
 				this.factories.put(mode, factory);
 			} else if (mode.equals(TransportMode.bike)) {
 				TravelTimeFactory factory = new BikeTravelTimeFactory(plansCalcRouteConfigGroup, linkSlopes);
 				this.factories.put(mode, factory);
 			} else {
-				TravelTimeFactory factory = createTravelTimeFactory(mode);
+				TravelTimeFactory factory = getTravelTimeFactory(mode);
 				
 				if (factory == null) {
 					log.warn("Mode " + mode + " is not supported! " + 
 							"Use a constructor where you provide the travel time objects. " +
 							"Using a UnknownTravelTime calculator based on constant speed." +
 							"Agent specific attributes are not taken into account!");
-					factory = new UnknownTravelTimeFactory(speed);
+					factory = new UnknownTravelTimeFactory(mode, plansCalcRouteConfigGroup);
 					this.factories.put(mode, factory);
 				}
 			}
@@ -105,7 +103,7 @@ public class MultiModalTravelTimeFactory implements MatsimFactory {
 	/*
 	 * One might override this to add support for additional modes.
 	 */
-	protected TravelTimeFactory createTravelTimeFactory(String mode) {
+	protected TravelTimeFactory getTravelTimeFactory(String mode) {
 		return null;
 	}
 }

@@ -54,17 +54,15 @@ import org.matsim.core.utils.collections.CollectionUtils;
  */
 public class MultimodalTripRouterFactory implements TripRouterFactory {
 	
-	protected static final Logger log = Logger.getLogger(MultimodalTripRouterFactory.class);
+	private static final Logger log = Logger.getLogger(MultimodalTripRouterFactory.class);
 	
-	private final Map<String, TravelTime> multimodalTravelTimes;
-	
+	private final Scenario scenario;
 	private final TravelDisutilityFactory travelDisutilityFactory;
-	
-	private final DefaultTripRouterFactoryImpl delegateFactory;
+	private final Map<String, TravelTime> multimodalTravelTimes;
+	private final TripRouterFactory delegateFactory;
+	private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
 	
 	private final Map<String, Network> multimodalSubNetworks = new HashMap<String, Network>();
-
-	private Scenario scenario;
 	
 	public MultimodalTripRouterFactory(Scenario scenario, Map<String, TravelTime> multimodalTravelTimes,
 			TravelDisutilityFactory travelDisutilityFactory) {
@@ -72,16 +70,27 @@ public class MultimodalTripRouterFactory implements TripRouterFactory {
 		this.multimodalTravelTimes = multimodalTravelTimes;
 		this.travelDisutilityFactory = travelDisutilityFactory;
 		
-		this.delegateFactory = DefaultTripRouterFactoryImpl.createRichTripRouterFactoryImpl(scenario);
+		DefaultTripRouterFactoryImpl tripRouterFactory = DefaultTripRouterFactoryImpl.createRichTripRouterFactoryImpl(scenario);
+		this.leastCostPathCalculatorFactory = tripRouterFactory.getLeastCostPathCalculatorFactory();
+		this.delegateFactory = tripRouterFactory;
+	}
+	
+	public MultimodalTripRouterFactory(Scenario scenario, Map<String, TravelTime> multimodalTravelTimes,
+			TravelDisutilityFactory travelDisutilityFactory, TripRouterFactory delegateFactory, 
+			LeastCostPathCalculatorFactory leastCostPathCalculatorFactory) {
+		this.scenario = scenario;
+		this.multimodalTravelTimes = multimodalTravelTimes;
+		this.travelDisutilityFactory = travelDisutilityFactory;
+		this.delegateFactory = delegateFactory;
+		this.leastCostPathCalculatorFactory = leastCostPathCalculatorFactory;
 	}
 	
 	@Override
-	public TripRouter instantiateAndConfigureTripRouter(RoutingContext iterationContext) {	
+	public TripRouter instantiateAndConfigureTripRouter(RoutingContext routingContext) {
 
-		TripRouter instance = this.delegateFactory.instantiateAndConfigureTripRouter(iterationContext);
+		TripRouter instance = this.delegateFactory.instantiateAndConfigureTripRouter(routingContext);
 		
 		Network network = this.scenario.getNetwork();
-		LeastCostPathCalculatorFactory leastCostAlgoFactory = delegateFactory.getLeastCostPathCalculatorFactory();
 		PopulationFactory populationFactory = this.scenario.getPopulation().getFactory();
 		ModeRouteFactory modeRouteFactory = ((PopulationFactoryImpl) populationFactory).getModeRouteFactory();
 
@@ -108,8 +117,12 @@ public class MultimodalTripRouterFactory implements TripRouterFactory {
 				this.multimodalSubNetworks.put(mode, subNetwork);
 			}
 			
-			TravelDisutility travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime, scenario.getConfig().planCalcScore());		
-			LeastCostPathCalculator routeAlgo = leastCostAlgoFactory.createPathCalculator(subNetwork, travelDisutility, travelTime);
+			/*
+			 * We cannot use the travel disutility object from the routingContext since it
+			 * has not been created for the modes used here.
+			 */
+			TravelDisutility travelDisutility = this.travelDisutilityFactory.createTravelDisutility(travelTime, scenario.getConfig().planCalcScore());		
+			LeastCostPathCalculator routeAlgo = this.leastCostPathCalculatorFactory.createPathCalculator(subNetwork, travelDisutility, travelTime);
 			LegRouter networkLegRouter = new NetworkLegRouter(subNetwork, routeAlgo, modeRouteFactory);
 			RoutingModule legRouterWrapper = new LegRouterWrapper(mode, populationFactory, networkLegRouter); 
 			instance.setRoutingModule(mode, legRouterWrapper);

@@ -20,12 +20,12 @@
 
 package org.matsim.contrib.multimodal.simengine;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
-import java.util.ListIterator;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -47,8 +47,8 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 	
 	/*package*/ Netsim qSim;
 	/*package*/ Map<String, TravelTime> multiModalTravelTimes;
-	/*package*/ List<MultiModalQLinkExtension> activeLinks;
-	/*package*/ List<MultiModalQNodeExtension> activeNodes;
+	/*package*/ Collection<MultiModalQLinkExtension> activeLinks;
+	/*package*/ Collection<MultiModalQNodeExtension> activeNodes;
 
 	private Map<Id, MultiModalQNodeExtension> nodes = new HashMap<Id, MultiModalQNodeExtension>();
 	private Map<Id, MultiModalQLinkExtension> links = new HashMap<Id, MultiModalQLinkExtension>();
@@ -63,9 +63,23 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 	/*package*/ MultiModalSimEngine(Netsim qSim, Map<String, TravelTime> multiModalTravelTimes) {
 		this.qSim = qSim;
 
-		activeLinks = new ArrayList<MultiModalQLinkExtension>();
-		activeNodes = new ArrayList<MultiModalQNodeExtension>();
+		/*
+		 * This is the collection of active nodes. This needs to be thread-safe since in the
+		 * parallel implementation, multiple threads could activate nodes concurrently.
+		 * (Each thread has its own queue. However, it is not guaranteed that all incoming
+		 * links of a node are handled by the same thread). 
+		 */
+		activeNodes = new ConcurrentLinkedQueue<MultiModalQNodeExtension>();
 
+		/*
+		 * Here, in theory, no thread-safe data structure is needed since links can only
+		 * be activated by their from links and all links are handled by the same thread
+		 * as that node is handled (see assignSimEngines() method in ParallelMultiModalSimEngine).
+		 * However, since this assignment might be changed, we still use a thread-safe data 
+		 * structure.
+		 */
+		activeLinks = new ConcurrentLinkedQueue<MultiModalQLinkExtension>();
+		
 		this.multiModalTravelTimes = multiModalTravelTimes;
 	}
 
@@ -114,7 +128,7 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 
 	/*package*/ void moveNodes(final double time) {
 
-		ListIterator<MultiModalQNodeExtension> simNodes = this.activeNodes.listIterator();
+		Iterator<MultiModalQNodeExtension> simNodes = this.activeNodes.iterator();
 		MultiModalQNodeExtension node;
 		boolean isActive;
 
@@ -129,7 +143,7 @@ public class MultiModalSimEngine implements MobsimEngine, NetworkElementActivato
 
 	/*package*/ void moveLinks(final double time) {
 
-		ListIterator<MultiModalQLinkExtension> simLinks = this.activeLinks.listIterator();
+		Iterator<MultiModalQLinkExtension> simLinks = this.activeLinks.iterator();
 		MultiModalQLinkExtension link;
 		boolean isActive;
 

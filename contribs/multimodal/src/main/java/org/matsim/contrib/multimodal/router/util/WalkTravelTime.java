@@ -116,6 +116,18 @@ public class WalkTravelTime implements TravelTime {
 		this.personFactors = new ConcurrentHashMap<Id, Double>();
 		this.linkSlopes = linkSlopes;
 	}
+	
+	// when used for transit_walk
+	/*package*/ WalkTravelTime(double referenceWalkSpeed, Map<Id, Double> linkSlopes) {
+		this.referenceWalkSpeed = referenceWalkSpeed;
+		this.personCache = new ThreadLocal<Person>();
+		this.personFactorCache = new ThreadLocal<Double>();
+		this.personWalkSpeedCache = new ThreadLocal<Double>();
+		
+		this.personFactors = new ConcurrentHashMap<Id, Double>();
+		this.linkSlopes = linkSlopes;
+	}
+
 
 	public WalkTravelTime(PlansCalcRouteConfigGroup plansCalcGroup) {
 		this(plansCalcGroup, null);

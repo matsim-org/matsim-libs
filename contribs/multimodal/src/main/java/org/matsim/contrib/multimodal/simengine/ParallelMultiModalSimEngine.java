@@ -48,7 +48,7 @@ class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 	}
 	
 	@Override
-	public void setInternalInterface( InternalInterface internalInterface) {
+	public void setInternalInterface(InternalInterface internalInterface) {
 		super.setInternalInterface(internalInterface);
 		
 		/*

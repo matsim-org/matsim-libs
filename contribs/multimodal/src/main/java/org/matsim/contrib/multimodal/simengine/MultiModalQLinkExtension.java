@@ -66,7 +66,7 @@ public class MultiModalQLinkExtension {
 	}
 
 	/*package*/ boolean hasWaitingToLeaveAgents() {
-		return waitingToLeaveAgents.size() > 0;
+		return this.waitingToLeaveAgents.size() > 0;
 	}
 
 	/**
@@ -115,7 +115,7 @@ public class MultiModalQLinkExtension {
 		moveWaitingAfterActivityAgents();
 
 		// If agents are ready to leave the link, ensure that the to Node is active and handles them.
-		if (waitingToLeaveAgents.size() > 0) toNode.activateNode();
+		if (this.hasWaitingToLeaveAgents()) toNode.activateNode();
 		
 		return keepLinkActive;
 	}
@@ -191,12 +191,27 @@ public class MultiModalQLinkExtension {
 		double now = this.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 
 		for (Tuple<Double, MobsimAgent> tuple : agents) {
-			MobsimAgent personAgent = tuple.getSecond();
+			MobsimAgent mobsimAgent = tuple.getSecond();
 			this.simEngine.getMobsim().getEventsManager().processEvent(
-					new AgentStuckEvent(now, personAgent.getId(), qLink.getId(), personAgent.getMode()));
+					new AgentStuckEvent(now, mobsimAgent.getId(), qLink.getId(), mobsimAgent.getMode()));
 			this.simEngine.getMobsim().getAgentCounter().incLost();
 			this.simEngine.getMobsim().getAgentCounter().decLiving();
 		}
+		
+		for (MobsimAgent mobsimAgent : this.waitingAfterActivityAgents) {
+			this.simEngine.getMobsim().getEventsManager().processEvent(
+					new AgentStuckEvent(now, mobsimAgent.getId(), qLink.getId(), mobsimAgent.getMode()));
+			this.simEngine.getMobsim().getAgentCounter().incLost();
+			this.simEngine.getMobsim().getAgentCounter().decLiving();
+		}
+		
+		for (MobsimAgent mobsimAgent : this.waitingToLeaveAgents) {
+			this.simEngine.getMobsim().getEventsManager().processEvent(
+					new AgentStuckEvent(now, mobsimAgent.getId(), qLink.getId(), mobsimAgent.getMode()));
+			this.simEngine.getMobsim().getAgentCounter().incLost();
+			this.simEngine.getMobsim().getAgentCounter().decLiving();
+		}
+		
 		this.agents.clear();
 	}
 

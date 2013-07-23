@@ -23,6 +23,7 @@ package org.matsim.contrib.multimodal.simengine;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.api.internal.MatsimFactory;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.router.util.TravelTime;
@@ -35,7 +36,9 @@ public class MultiModalSimEngineFactory implements MatsimFactory {
 		
 		MultiModalSimEngine simEngine;
 		
-		int numOfThreads = sim.getScenario().getConfig().getQSimConfigGroup().getNumberOfThreads(); 
+		MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) sim.getScenario().getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
+		
+		int numOfThreads = multiModalConfigGroup.getNumberOfThreads(); 
 		if (numOfThreads > 1) {
 			simEngine = new ParallelMultiModalSimEngine(sim, map);
 			log.info("Using ParallelMultiModalSimEngine with " + numOfThreads + " threads.");

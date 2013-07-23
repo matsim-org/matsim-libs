@@ -23,6 +23,7 @@ package org.matsim.contrib.multimodal.router.util;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.TravelTimeFactory;
@@ -40,6 +41,10 @@ public class WalkTravelTimeFactory implements TravelTimeFactory {
 			Map<Id, Double> linkSlopes) {
 		this.plansCalcRouteConfigGroup = plansCalcRouteConfigGroup;
 		this.linkSlopes = linkSlopes;
+		
+		if (plansCalcRouteConfigGroup.getTeleportedModeSpeeds().get(TransportMode.walk) == null) {
+			throw new RuntimeException("No speed was found for mode walk! Aborting.");
+		}
 	}
 
 	@Override

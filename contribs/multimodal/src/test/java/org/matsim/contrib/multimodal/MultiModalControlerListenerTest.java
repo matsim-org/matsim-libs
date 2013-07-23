@@ -173,6 +173,15 @@ public class MultiModalControlerListenerTest {
 	
 	@Test
 	public void testBerlinScenario() {
+		log.info("Run test single threaded...");
+		runBerlinScenario(1);
+		
+		log.info("Run test multi threaded...");
+		runBerlinScenario(2);
+		runBerlinScenario(4);
+	}
+	
+	public void runBerlinScenario(int numberOfThreads) {
 		
 		String inputDir = this.utils.getClassInputDirectory();
 
@@ -181,6 +190,9 @@ public class MultiModalControlerListenerTest {
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
+		MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) scenario.getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
+		multiModalConfigGroup.setNumberOfThreads(numberOfThreads);
+		
 		/*
 		 * Create some bike trips since there are non present in the population.
 		 */

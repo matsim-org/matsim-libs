@@ -24,7 +24,9 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
+import org.matsim.contrib.multimodal.router.DefaultDelegateFactory;
 import org.matsim.contrib.multimodal.router.MultimodalTripRouterFactory;
+import org.matsim.contrib.multimodal.router.TransitTripRouterFactory;
 import org.matsim.contrib.multimodal.router.util.LinkSlopesReader;
 import org.matsim.contrib.multimodal.router.util.MultiModalTravelTimeFactory;
 import org.matsim.core.controler.Controler;
@@ -33,8 +35,13 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
+import org.matsim.core.router.util.FastDijkstraFactory;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
+import org.matsim.pt.router.TransitRouterFactory;
 
 public class MultiModalControlerListener implements StartupListener {
 
@@ -44,14 +51,37 @@ public class MultiModalControlerListener implements StartupListener {
 		Controler controler = event.getControler();
 		MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) controler.getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
 				
-		Map<Id, Double> linkSlopes = new LinkSlopesReader().getLinkSlopes(multiModalConfigGroup, event.getControler().getNetwork());
-		MultiModalTravelTimeFactory multiModalTravelTimeFactory = new MultiModalTravelTimeFactory(event.getControler().getConfig(), linkSlopes);
+		Map<Id, Double> linkSlopes = new LinkSlopesReader().getLinkSlopes(multiModalConfigGroup, controler.getNetwork());
+		MultiModalTravelTimeFactory multiModalTravelTimeFactory = new MultiModalTravelTimeFactory(controler.getConfig(), linkSlopes);
 		Map<String, TravelTime> multiModalTravelTimes = multiModalTravelTimeFactory.createTravelTimes();	
 	
-		MultimodalTripRouterFactory tripRouterFactory = new MultimodalTripRouterFactory(
-				event.getControler().getScenario(), multiModalTravelTimes, controler.getTravelDisutilityFactory());
+		/*
+		 * Cannot get the factory from the controler, therefore create a new one as the controler does. 
+		 */
+		TripRouterFactoryBuilderWithDefaults builder = new TripRouterFactoryBuilderWithDefaults();
+		LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = builder.createDefaultLeastCostPathCalculatorFactory(controler.getScenario());
+		TransitRouterFactory transitRouterFactory = null;
+		if (controler.getConfig().scenario().isUseTransit()) transitRouterFactory = builder.createDefaultTransitRouter(controler.getScenario());
+		
+		/*
+		 * Use a ...
+		 * - defaultDelegateFactory for the QNetsim modes
+		 * - multiModalTripRouterFactory for the multi-modal modes
+		 * - transitTripRouterFactory for transit trips
+		 * 
+		 * Note that a FastDijkstraFactory is used for the multiModalTripRouterFactory
+		 * since ...
+		 * - only "fast" router implementations handle sub-networks correct
+		 * - AStarLandmarks uses link speed information instead of agent speeds
+		 */
+		TripRouterFactory defaultDelegateFactory = new DefaultDelegateFactory(controler.getScenario(), leastCostPathCalculatorFactory);
+		TripRouterFactory multiModalTripRouterFactory = new MultimodalTripRouterFactory(controler.getScenario(), multiModalTravelTimes, 
+				controler.getTravelDisutilityFactory(), defaultDelegateFactory, new FastDijkstraFactory());
+		TripRouterFactory transitTripRouterFactory = new TransitTripRouterFactory(controler.getScenario(), multiModalTripRouterFactory, 
+				transitRouterFactory);
+		controler.setTripRouterFactory(transitTripRouterFactory);
+
 		MultimodalQSimFactory qSimFactory = new MultimodalQSimFactory(multiModalTravelTimes);
-		controler.setTripRouterFactory(tripRouterFactory);
 		controler.setMobsimFactory(qSimFactory);
 		
 		// ensure that NetworkRoutes are created for legs using one of the simulated modes
