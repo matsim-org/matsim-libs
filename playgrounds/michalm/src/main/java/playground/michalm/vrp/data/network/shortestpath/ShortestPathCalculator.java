@@ -49,37 +49,44 @@ public class ShortestPathCalculator
         return calculateShortestPath(fromVertex.getLink(), tovVertex.getLink(), departTime);
     }
 
-
-    public ShortestPath calculateShortestPath(Link fromLink, Link toLink, int departTime)
+    
+    /**
+     * ASSUMPTION: A vehicle enters and exits links at their ends (link.getToNode()) 
+     */
+    public ShortestPath calculateShortestPath(Link fromLink, Link toLink, int departureTime)
     {
         if (fromLink != toLink) {
             Path path = router.calcLeastCostPath(fromLink.getToNode(), toLink.getFromNode(),
-                    departTime, null, null);
+                    departureTime, null, null);
 
             int count = path.links.size();
-            Id[] ids = new Id[count + 1];
-            int[] accLinkTravelTimes = new int[count + 1];
+            Id[] ids = new Id[count + 2];
+            int[] accLinkTravelTimes = new int[count + 2];
             int accTT = 0;
+
+            ids[0] = fromLink.getId();
+            accTT = 0;//we start at the end of fromLink
+            accLinkTravelTimes[0] = accTT;
 
             for (int i = 0; i < count; i++) {
                 Link link = path.links.get(i);
-                ids[i] = link.getId();
-                accTT += travelTime.getLinkTravelTime(link, departTime + accTT, null, null);
-                accLinkTravelTimes[i] = accTT;
+                ids[i + 1] = link.getId();
+                accTT += travelTime.getLinkTravelTime(link, departureTime + accTT, null, null);
+                accLinkTravelTimes[i + 1] = accTT;
             }
 
-            ids[count] = toLink.getId();
-            accTT += travelTime.getLinkTravelTime(toLink, departTime + accTT, null, null);
-            accLinkTravelTimes[count] = accTT;
+            ids[count + 1] = toLink.getId();
+            int toLinkEnterTime = departureTime + accTT;
+            accTT += travelTime.getLinkTravelTime(toLink, toLinkEnterTime, null, null);
+            accLinkTravelTimes[count + 1] = accTT;
 
             double cost = path.travelCost
-                    + travelDisutility.getLinkTravelDisutility(toLink, departTime + accTT, null,
-                            null);
+                    + travelDisutility.getLinkTravelDisutility(toLink, toLinkEnterTime, null, null);
 
             return new ShortestPath((int)accTT, cost, ids, accLinkTravelTimes);
         }
         else {
-            return ShortestPath.ZERO_PATH_ENTRY;
+            return new ShortestPath(0, 0, new Id[] { fromLink.getId() }, new int[] { 0 });
         }
     }
 }

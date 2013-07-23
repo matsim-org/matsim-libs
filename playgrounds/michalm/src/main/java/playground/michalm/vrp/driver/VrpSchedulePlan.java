@@ -105,13 +105,13 @@ public class VrpSchedulePlan
     }
 
 
-    private void addLeg(MatsimArc arc, int departTime, int arrivalTime)
+    private void addLeg(MatsimArc arc, int departureTime, int arrivalTime)
     {
-        ShortestPath path = arc.getShortestPath(departTime);
+        ShortestPath path = arc.getShortestPath(departureTime);
 
         Leg leg = populFactory.createLeg(TransportMode.car);
 
-        leg.setDepartureTime(departTime);
+        leg.setDepartureTime(departureTime);
 
         Link fromLink = arc.getFromVertex().getLink();
         Link toLink = arc.getToVertex().getLink();
@@ -121,29 +121,29 @@ public class VrpSchedulePlan
         NetworkRoute netRoute = (NetworkRoute) ((PopulationFactoryImpl)populFactory).createRoute(
                 TransportMode.car, fromLink.getId(), toLink.getId());
 
-        if (linkIds.length > 0) {// means: fromLink != toLink
+        if (linkIds.length > 1) {// means: fromLink != toLink
 
-            // all except the last one (it's the toLink)
+            // all except the first and last ones (== fromLink and toLink)
             ArrayList<Id> linkIdList = new ArrayList<Id>(linkIds.length - 1);
 
-            for (int i = 0; i < linkIds.length - 1; i++) {
+            for (int i = 1; i < linkIds.length - 1; i++) {
                 linkIdList.add(linkIds[i]);
             }
 
-            netRoute.setLinkIds(fromLink.getId(), Arrays.asList(path.linkIds), toLink.getId());
+            netRoute.setLinkIds(fromLink.getId(), linkIdList, toLink.getId());
             netRoute.setDistance(RouteUtils.calcDistance(netRoute, network));
         }
         else {
             netRoute.setDistance(0.0);
         }
 
-        int travelTime = arrivalTime - departTime;// According to the route
+        int travelTime = arrivalTime - departureTime;// According to the route
 
         netRoute.setTravelTime(travelTime);
         netRoute.setTravelCost(path.travelCost);
 
         leg.setRoute(netRoute);
-        leg.setDepartureTime(departTime);
+        leg.setDepartureTime(departureTime);
         leg.setTravelTime(travelTime);
         ((LegImpl)leg).setArrivalTime(arrivalTime);
 

@@ -97,20 +97,16 @@ public class Schedules2GIS
 
         Id[] ids = path.linkIds;
 
-        if (ids.length == 0) {
+        if (ids.length == 1) {
             return null;
         }
 
         List<Coordinate> coordList = new ArrayList<Coordinate>();
         Map<Id, ? extends Link> linksMap = data.getScenario().getNetwork().getLinks();
 
-        Link link = linksMap.get(path.linkIds[0]);
-        Coord c = link.getFromNode().getCoord();
-        coordList.add(new Coordinate(c.getX(), c.getY()));
-
         for (Id l : path.linkIds) {
-            link = linksMap.get(l);
-            c = link.getToNode().getCoord();
+            Link link = linksMap.get(l);
+            Coord c = link.getToNode().getCoord();
             coordList.add(new Coordinate(c.getX(), c.getY()));
         }
 

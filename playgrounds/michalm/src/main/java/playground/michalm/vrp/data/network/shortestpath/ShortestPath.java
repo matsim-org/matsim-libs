@@ -24,9 +24,6 @@ import org.matsim.api.core.v01.Id;
 
 public class ShortestPath
 {
-    // optimization
-    public static final ShortestPath ZERO_PATH_ENTRY = new ShortestPath(0, 0, new Id[0], new int[0]);
-
     public final int travelTime;
     public final double travelCost;
     public final Id[] linkIds;
