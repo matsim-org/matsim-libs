@@ -249,12 +249,6 @@ public class RunCliquesWithHardCodedStrategies {
 		// else the JointTripRouterFactory is used with pt from the config file
 
 		final ControllerRegistry controllerRegistry = builder.build();
-		controllerRegistry.getEvents().addHandler(
-				new FireMoneyEventsForUtilityOfBeingTogether(
-					controllerRegistry.getEvents(),
-					scoringFunctionConf.getMarginalUtilityOfBeingTogether_s(),
-					scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney(),
-					toSocialNetwork( cliques ) ) );
 
 		// init strategies
 		final GroupStrategyRegistry strategyRegistry = new GroupStrategyRegistry();
@@ -275,6 +269,16 @@ public class RunCliquesWithHardCodedStrategies {
 					new GroupReplanningListenner(
 						controllerRegistry,
 						strategyManager));
+
+
+		final FireMoneyEventsForUtilityOfBeingTogether socialScorer =
+				new FireMoneyEventsForUtilityOfBeingTogether(
+					controllerRegistry.getEvents(),
+					scoringFunctionConf.getMarginalUtilityOfBeingTogether_s(),
+					scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney(),
+					toSocialNetwork( cliques ) );
+		controllerRegistry.getEvents().addHandler( socialScorer );
+		controller.addControlerListener( socialScorer );
 
 		if (produceAnalysis) {
 			RunUtils.loadDefaultAnalysis(
