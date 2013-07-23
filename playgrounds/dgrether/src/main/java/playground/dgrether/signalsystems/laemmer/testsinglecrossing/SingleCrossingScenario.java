@@ -34,6 +34,7 @@ import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.signalsystems.model.DefaultPlanbasedSignalSystemController;
 
 import playground.dgrether.DgPaths;
+import playground.dgrether.signalsystems.laemmer.model.LaemmerSignalController;
 
 /**
  * @author dgrether
@@ -122,19 +123,33 @@ public class SingleCrossingScenario {
 
 	
 	
-	public Scenario createScenario(double lambdaWestEast){
+	public Scenario createScenario(double lambdaWestEast, boolean useFixeTimeControl){
 		Config config = this.createConfig();
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		this.createIds(scenario);
 		this.createPopulation(scenario, lambdaWestEast);
 		this.createSignals(scenario);
-		this.createSignalControl(scenario, lambdaWestEast);
+		if (useFixeTimeControl){
+			this.createFixedTimeSignalControl(scenario, lambdaWestEast);
+		}
+		else {
+			this.createLaemmerSignalControl(scenario);
+		}
 		return scenario;
 	}
 	
+	private void createLaemmerSignalControl(Scenario scenario){
+		SignalsData signals = scenario.getScenarioElement(SignalsData.class);
+		SignalControlData control = signals.getSignalControlData();
+		SignalControlDataFactory fac = signals.getSignalControlData().getFactory();
+		SignalSystemControllerData controller = fac.createSignalSystemControllerData(systemId);
+		control.addSignalSystemControllerData(controller);
+		controller.setControllerIdentifier(LaemmerSignalController.IDENTIFIER);
+		
+	}
 	
 	
-	private void createSignalControl(Scenario scenario, double lambdaWestEast){
+	private void createFixedTimeSignalControl(Scenario scenario, double lambdaWestEast){
 		SignalsData signals = scenario.getScenarioElement(SignalsData.class);
 		SignalControlData control = signals.getSignalControlData();
 		SignalControlDataFactory fac = signals.getSignalControlData().getFactory();

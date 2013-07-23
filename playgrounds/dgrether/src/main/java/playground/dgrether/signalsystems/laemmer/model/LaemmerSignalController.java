@@ -19,8 +19,13 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.laemmer.model;
 
+import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Id;
+import org.matsim.signalsystems.model.Signal;
 import org.matsim.signalsystems.model.SignalController;
+import org.matsim.signalsystems.model.SignalGroup;
 
+import playground.dgrether.signalsystems.DgSensorManager;
 import playground.dgrether.signalsystems.utils.DgAbstractSignalController;
 
 
@@ -30,14 +35,34 @@ import playground.dgrether.signalsystems.utils.DgAbstractSignalController;
  */
 public class LaemmerSignalController  extends DgAbstractSignalController implements SignalController {
 
+	private static final Logger log = Logger.getLogger(LaemmerSignalController.class);
+	
 	public static final String IDENTIFIER = "LaemmerSignalSystemController";
+	
+	private DgSensorManager sensorManager = null;
+
+	
+	public LaemmerSignalController(DgSensorManager sensorManager){
+		this.sensorManager = sensorManager;
+	}
+	
+	@Override
+	public void simulationInitialized(double simStartTimeSeconds) {
+		this.initializeSensoring();
+
+		for (SignalGroup group : this.system.getSignalGroups().values()){
+			this.system.scheduleDropping(simStartTimeSeconds, group.getId());
+		}
+		
+	}
 	
 	@Override
 	public void updateState(double timeSeconds) {
 		
-		
-		// for all approaches
-		this.calculatePriorityIndex(timeSeconds);
+		for (SignalGroup group : this.system.getSignalGroups().values()){
+			this.calculatePriorityIndex(timeSeconds);
+			
+		}
 		
 	}
 
@@ -72,8 +97,23 @@ public class LaemmerSignalController  extends DgAbstractSignalController impleme
 	public void reset(Integer iterationNumber) {
 	}
 
-	@Override
-	public void simulationInitialized(double simStartTimeSeconds) {
+	
+	private void initializeSensoring(){
+		for (SignalGroup group :  this.system.getSignalGroups().values() ){
+			for (Signal signal : group.getSignals().values()) {
+				if (signal.getLaneIds() == null || signal.getLaneIds().isEmpty()){
+					//					log.error("system: " + this.system.getId() + " signal: " + signal.getId() + " has no lanes...");
+					this.sensorManager.registerNumberOfCarsMonitoring(signal.getLinkId());
+				}
+				else {
+					for (Id laneId : signal.getLaneIds()){
+						//TODO check this part again concerning implementation of CarsOnLaneHandler
+						this.sensorManager.registerNumberOfCarsMonitoringOnLane(signal.getLinkId(), laneId);
+					}
+				}
+
+			}
+		}
 	}
 	
 	

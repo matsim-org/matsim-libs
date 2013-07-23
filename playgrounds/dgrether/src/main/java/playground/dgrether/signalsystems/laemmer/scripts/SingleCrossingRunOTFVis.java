@@ -33,7 +33,7 @@ public class SingleCrossingRunOTFVis {
 
 	public static void main(String[] args) {
 		double lambdaWestEast = 0.5;
-		Scenario scenario = new SingleCrossingScenario().createScenario(lambdaWestEast);
+		Scenario scenario = new SingleCrossingScenario().createScenario(lambdaWestEast, false);
 		new LaemmerOTFStarter().playScenario(scenario);
 	}
 

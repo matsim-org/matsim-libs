@@ -40,7 +40,7 @@ public class SingleCrossingLaemmerMain {
 			
 		}
 		double lambdaWestEast = 0.5;
-		Scenario scenario = new SingleCrossingScenario().createScenario(lambdaWestEast);
+		Scenario scenario = new SingleCrossingScenario().createScenario(lambdaWestEast, false);
 		
 		Controler controler = new Controler(scenario);
 		controler.setSignalsControllerListenerFactory(new LaemmerControlerListenerFactory());
