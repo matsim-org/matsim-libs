@@ -49,6 +49,8 @@ public class BeingTogetherScoring implements ArbitraryEventScoring {
 	private final Id ego;
 	private final Set<Id> alters;
 
+	private final Interval activeTimeWindow;
+
 	private final Factory<IntervalsAtLocation> locatedIntervalsFactory =
 		new Factory<IntervalsAtLocation>() {
 			@Override
@@ -65,6 +67,20 @@ public class BeingTogetherScoring implements ArbitraryEventScoring {
 			final double marginalUtilityOfTime,
 			final Id ego,
 			final Collection<Id> alters) {
+		this( Double.NEGATIVE_INFINITY,
+				Double.POSITIVE_INFINITY,
+				marginalUtilityOfTime,
+				ego,
+				alters );
+	}
+
+	public BeingTogetherScoring(
+			final double startActiveWindow,
+			final double endActiveWindow,
+			final double marginalUtilityOfTime,
+			final Id ego,
+			final Collection<Id> alters) {
+		this.activeTimeWindow = new Interval( startActiveWindow , endActiveWindow );
 		this.marginalUtilityOfTime = marginalUtilityOfTime;
 		this.ego = ego;
 		this.alters = Collections.unmodifiableSet( new HashSet<Id>( alters ) );
@@ -89,7 +105,7 @@ public class BeingTogetherScoring implements ArbitraryEventScoring {
 				final WrappedAroundIntervalSequence seq = locatedAlterIntervals.map.get( location );
 				if ( seq == null ) continue;
 				final List<Interval> alterIntervals = seq.getWrappedAroundSequence();
-				accumulatedTimePassedTogether += calcOverlap( egoIntervals , alterIntervals );
+				accumulatedTimePassedTogether += calcOverlap( activeTimeWindow , egoIntervals , alterIntervals );
 			}
 		}
 
@@ -97,15 +113,26 @@ public class BeingTogetherScoring implements ArbitraryEventScoring {
 	}
 
 	private static double calcOverlap(
+			final Interval activeTimeWindow,
 			final List<Interval> egoIntervals,
 			final List<Interval> alterIntervals) {
 		double sum = 0;
 		for ( Interval ego : egoIntervals ) {
+			final Interval activeEgo = intersect( ego , activeTimeWindow );
 			for ( Interval alter : alterIntervals ) {
-				sum += measureOverlap( ego , alter );
+				sum += measureOverlap( activeEgo , alter );
 			}
 		}
 		return sum;
+	}
+
+	private static Interval intersect(
+			final Interval i1,
+			final Interval i2) {
+		final double startOverlap = Math.max( i1.start , i2.start );
+		final double endOverlap = Math.min( i1.end , i2.end );
+		// XXX end can be before start!
+		return new Interval( startOverlap , endOverlap );
 	}
 
 	private static double measureOverlap(
