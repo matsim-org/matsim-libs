@@ -1,5 +1,5 @@
 plotshareevolution <- function(
-						   tripmodesharefile="tripmodeshares.dat",
+						   tripmodesharefile="tripModeShares.dat",
 						   dataframe=read.table( tripmodesharefile , header=T ) ,
 							   ...) {
 	dataframe$mode <- as.factor( dataframe$mode )
@@ -55,7 +55,7 @@ plotshareevolution <- function(
 }
 
 plotshareevolution.nonstacked <- function(
-						   tripmodesharefile="tripmodeshares.dat",
+						   tripmodesharefile="tripModeShares.dat",
 						   dataframe=read.table( tripmodesharefile , header=T ) ,
 						   cols=rainbow( length( unique( dataframe$mode ) ) ),
 						   legendpos="topright",
