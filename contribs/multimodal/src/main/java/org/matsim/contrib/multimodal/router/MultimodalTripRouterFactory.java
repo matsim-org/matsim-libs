@@ -64,6 +64,7 @@ public class MultimodalTripRouterFactory implements TripRouterFactory {
 	
 	private final Map<String, Network> multimodalSubNetworks = new HashMap<String, Network>();
 	
+	@Deprecated
 	public MultimodalTripRouterFactory(Scenario scenario, Map<String, TravelTime> multimodalTravelTimes,
 			TravelDisutilityFactory travelDisutilityFactory) {
 		this.scenario = scenario;

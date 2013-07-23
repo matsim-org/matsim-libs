@@ -20,6 +20,7 @@
 
 package org.matsim.contrib.multimodal;
 
+import java.util.Collections;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
@@ -45,15 +46,17 @@ import org.matsim.pt.router.TransitRouterFactory;
 
 public class MultiModalControlerListener implements StartupListener {
 
+	private Map<String, TravelTime> multiModalTravelTimes;
+	
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		
 		Controler controler = event.getControler();
 		MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) controler.getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
-				
+		
 		Map<Id, Double> linkSlopes = new LinkSlopesReader().getLinkSlopes(multiModalConfigGroup, controler.getNetwork());
 		MultiModalTravelTimeFactory multiModalTravelTimeFactory = new MultiModalTravelTimeFactory(controler.getConfig(), linkSlopes);
-		Map<String, TravelTime> multiModalTravelTimes = multiModalTravelTimeFactory.createTravelTimes();	
+		this.multiModalTravelTimes = multiModalTravelTimeFactory.createTravelTimes();	
 	
 		/*
 		 * Cannot get the factory from the controler, therefore create a new one as the controler does. 
@@ -89,5 +92,9 @@ public class MultiModalControlerListener implements StartupListener {
 		for (String mode : CollectionUtils.stringToSet(multiModalConfigGroup.getSimulatedModes())) {
 			routeFactory.setRouteFactory(mode, new LinkNetworkRouteFactory());
 		}
-	}	
+	}
+	
+	public Map<String, TravelTime> getMultiModalTravelTimes() {
+		return Collections.unmodifiableMap(this.multiModalTravelTimes);
+	}
 }

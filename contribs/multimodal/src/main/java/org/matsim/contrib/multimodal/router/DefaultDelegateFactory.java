@@ -49,7 +49,6 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.pt.router.TransitRouterFactory;
 
 /**
  * Due to several reasons, the DefaultTripRouterFactoryImpl should not be used
