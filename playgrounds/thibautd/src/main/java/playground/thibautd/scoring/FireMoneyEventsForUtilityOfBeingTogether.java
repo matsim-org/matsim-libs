@@ -33,6 +33,7 @@ import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
 import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
+import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
@@ -73,25 +74,26 @@ public class FireMoneyEventsForUtilityOfBeingTogether implements
 
 	@Override
 	public void handleEvent(final ActivityEndEvent event) {
-		transmitEventToRelevantPersons( event.getPersonId() , event );
+		transmitEventToRelevantPersons( event );
 	}
 
 	@Override
 	public void handleEvent(final ActivityStartEvent event) {
-		transmitEventToRelevantPersons( event.getPersonId() , event );
+		transmitEventToRelevantPersons( event );
 	}
 
 	@Override
 	public void handleEvent(final PersonLeavesVehicleEvent event) {
-		transmitEventToRelevantPersons( event.getPersonId() , event );
+		transmitEventToRelevantPersons( event );
 	}
 
 	@Override
 	public void handleEvent(final PersonEntersVehicleEvent event) {
-		transmitEventToRelevantPersons( event.getPersonId() , event );
+		transmitEventToRelevantPersons(  event );
 	}
 
-	private void transmitEventToRelevantPersons( final Id ego, final Event event ) {
+	private <T extends Event & HasPersonId> void transmitEventToRelevantPersons( final T event ) {
+		final Id ego = event.getPersonId();
 		for ( Id id : cat( ego , socialNetwork.getAlters( ego ) ) ) {
 			final Id finalId = id;
 			final BeingTogetherScoring scoring =
