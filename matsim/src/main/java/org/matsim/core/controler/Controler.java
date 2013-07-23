@@ -190,6 +190,7 @@ public class Controler extends AbstractController {
 	private boolean overwriteFiles = false;
 
 	private boolean routerCreated = false;
+	private boolean componentOfDefaultTripRouterFactoryChanged = false;
 
 	public static void main(final String[] args) {
 		if ((args == null) || (args.length == 0)) {
@@ -845,6 +846,7 @@ public class Controler extends AbstractController {
 			final TransitRouterFactory transitRouterFactory) {
 		if (!routerCreated) {
 			this.tripRouterFactoryBuilder.setTransitRouterFactory(transitRouterFactory);
+			this.componentOfDefaultTripRouterFactoryChanged = true;
 		} else {
 			throw new RuntimeException("Too late for that.");
 		}
@@ -853,13 +855,18 @@ public class Controler extends AbstractController {
 	public final void setLeastCostPathCalculatorFactory(final LeastCostPathCalculatorFactory factory) {
 		if (!routerCreated) {
 			this.tripRouterFactoryBuilder.setLeastCostPathCalculatorFactory(factory);
+			this.componentOfDefaultTripRouterFactoryChanged = true;
 		} else {
 			throw new RuntimeException("Too late for that.");
 		}
 	}
 
 	public final void setTripRouterFactory(final TripRouterFactory factory) {
-		if (!routerCreated ) {
+		if (this.componentOfDefaultTripRouterFactoryChanged) {
+			throw new RuntimeException("Setting a new TripRouterFactory means you cannot set a TransitRouterFactory or a LeastCostPathCalculatorFactory before." +
+											" A custom TripRouterFactory should instantiate its own components.");
+		}
+		if (!routerCreated) {
 			tripRouterFactory = factory;
 		} else {
 			throw new RuntimeException("Too late for that.");

@@ -33,13 +33,6 @@ public class Run {
 			scenario.getConfig().controler().setOutputDirectory("/Users/michaelzilske/gtfs-ulm/output-otp");
 			Controler controler = new Controler(scenario);
 			controler.setOverwriteFiles(true);
-			controler.setTransitRouterFactory(new TransitRouterFactory() {
-				@Override
-				public TransitRouter createTransitRouter() {
-					throw new RuntimeException();
-				}
-
-			});
 			controler.setTripRouterFactory(new OTPTripRouterFactory(scenario.getTransitSchedule(), TransformationFactory.getCoordinateTransformation(TransformationFactory.WGS84_UTM35S, TransformationFactory.WGS84), "2013-08-24"));		
 			controler.run();
 		}
