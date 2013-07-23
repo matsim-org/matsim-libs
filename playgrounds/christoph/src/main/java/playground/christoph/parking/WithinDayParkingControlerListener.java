@@ -23,14 +23,17 @@ package playground.christoph.parking;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.contrib.multimodal.MultiModalControlerListener;
 import org.matsim.contrib.multimodal.router.MultimodalTripRouterFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -39,22 +42,29 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimFactory;
+import org.matsim.core.network.NetworkImpl;
+import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
+import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.routes.ModeRouteFactory;
+import org.matsim.core.router.LegRouterWrapper;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingContextImpl;
+import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.TripRouterFactoryInternal;
-import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.core.router.old.LegRouter;
+import org.matsim.core.router.old.NetworkLegRouter;
+import org.matsim.core.router.util.LeastCostPathCalculator;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.withinday.controller.WithinDayControlerListener;
 
-import playground.christoph.evacuation.trafficmonitoring.BikeTravelTime;
-import playground.christoph.evacuation.trafficmonitoring.WalkTravelTime;
 import playground.christoph.parking.core.ParkingCostCalculatorImpl;
 import playground.christoph.parking.core.mobsim.InsertParkingActivities;
 import playground.christoph.parking.core.mobsim.ParkingInfrastructure;
@@ -88,7 +98,6 @@ public class WithinDayParkingControlerListener implements StartupListener, Repla
 	 */
 	protected double searchRadius = 1.0;
 
-	protected TripRouterFactory tripRouterFactory;
 	protected ParkingSearchIdentifier randomSearchIdentifier;
 	protected ParkingSearchReplannerFactory randomSearchReplannerFactory;
 
@@ -100,10 +109,12 @@ public class WithinDayParkingControlerListener implements StartupListener, Repla
 	
 	private Scenario scenario;
 	private WithinDayControlerListener withinDayControlerListener;
+	private MultiModalControlerListener multiModalControlerListener;
 	
-	public WithinDayParkingControlerListener(Controler controler) {
+	public WithinDayParkingControlerListener(Controler controler, MultiModalControlerListener multiModalControlerListener) {
 		
 		this.scenario = controler.getScenario();
+		this.multiModalControlerListener = multiModalControlerListener;
 		
 		init(controler);
 	}
@@ -116,9 +127,26 @@ public class WithinDayParkingControlerListener implements StartupListener, Repla
 		 * StartupEvent is passed over to it when this class handles the event. 
 		 */
 		this.withinDayControlerListener = new WithinDayControlerListener();
+	}
+	
+	private void checkModeChains(Controler controler, Map<String, TravelTime> multiModalTravelTimes) {
 		
-		// workaround
-		this.withinDayControlerListener.setLeastCostPathCalculatorFactory(new DijkstraFactory());
+		LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = 
+				new TripRouterFactoryBuilderWithDefaults().createDefaultLeastCostPathCalculatorFactory(controler.getScenario());
+		
+		TripRouterFactory defaultTripRouterFactory = new TripRouterFactoryBuilderWithDefaults().build(controler.getScenario());
+		TripRouterFactory multiModalTripRouterFactory = new MultimodalTripRouterFactory(scenario, multiModalTravelTimes, 
+				controler.getTravelDisutilityFactory(), defaultTripRouterFactory, leastCostPathCalculatorFactory);
+		
+		// ensure that all agents' plans have valid mode chains
+		RoutingContext routingContext = new RoutingContextImpl(controler.getTravelDisutilityFactory(), 
+				new FreeSpeedTravelTime(), controler.getConfig().planCalcScore());
+		TripRouter tripRouter = multiModalTripRouterFactory.instantiateAndConfigureTripRouter(routingContext);
+		PlanAlgorithm planAlgorithm = new PlanRouter(tripRouter);
+		legModeChecker = new LegModeChecker(this.scenario, planAlgorithm);
+		legModeChecker.setValidNonCarModes(new String[]{TransportMode.walk});
+		legModeChecker.setToCarProbability(0.5);
+		legModeChecker.run(this.scenario.getPopulation());
 	}
 	
 	private void initIdentifiers() {
@@ -143,14 +171,18 @@ public class WithinDayParkingControlerListener implements StartupListener, Repla
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		
-		// create a copy of the MultiModalTravelTimeWrapperFactory and set the TravelTimeCollector for car mode
-		Map<String, TravelTime> multiModalTravelTimes = new HashMap<String, TravelTime>();
-		multiModalTravelTimes.put(TransportMode.walk, new WalkTravelTime(this.scenario.getConfig().plansCalcRoute()));
-		multiModalTravelTimes.put(TransportMode.bike, new BikeTravelTime(this.scenario.getConfig().plansCalcRoute()));
+		this.checkModeChains(event.getControler(), this.multiModalControlerListener.getMultiModalTravelTimes());
 		
-		this.tripRouterFactory = new MultimodalTripRouterFactory(scenario, multiModalTravelTimes, event.getControler().getTravelDisutilityFactory());
-		this.withinDayControlerListener.setWithinDayTripRouterFactory(tripRouterFactory);
+		LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = 
+				new TripRouterFactoryBuilderWithDefaults().createDefaultLeastCostPathCalculatorFactory(event.getControler().getScenario());
 		
+		// This is a workaround since the controler does not return its TripRouterFactory
+		TripRouterFactory tripRouterFactoryWrapper = new TripRouterFactoryWrapper(event.getControler().getScenario(), 
+				event.getControler().getTripRouterFactory(), leastCostPathCalculatorFactory);
+		
+		// we can use the TripRouterFactory that has been initialized by the MultiModalControlerListener
+		this.withinDayControlerListener.setWithinDayTripRouterFactory(tripRouterFactoryWrapper);
+				
 		/*
 		 * notifyStartup has to be called after the WithinDayTripRouterFactory has been set.
 		 * After this call, the setters cannot be called anymore.
@@ -158,26 +190,15 @@ public class WithinDayParkingControlerListener implements StartupListener, Repla
 		this.withinDayControlerListener.notifyStartup(event);
 
 		/*
+		 * Create a copy of the multiModalTravelTimes map and set the TravelTimeCollector for car mode.
 		 * After the withinDayControlerListener has handled the startup event, its TravelTimeCollector
 		 * has been initialized. Therefore, we can add it now to the multiModalTravelTimes map.
 		 */
+		Map<String, TravelTime> multiModalTravelTimes = new HashMap<String, TravelTime>(this.multiModalControlerListener.getMultiModalTravelTimes());
 		multiModalTravelTimes.put(TransportMode.car, this.withinDayControlerListener.getTravelTimeCollector());
 		
-		// ensure that all agents' plans have valid mode chains
-		RoutingContext routingContext = new RoutingContextImpl(event.getControler().getTravelDisutilityFactory(), 
-				new FreeSpeedTravelTime(), event.getControler().getConfig().planCalcScore());
-		TripRouter tripRouter = this.tripRouterFactory.instantiateAndConfigureTripRouter(routingContext);
-		PlanAlgorithm planAlgorithm = new PlanRouter(tripRouter);
-		legModeChecker = new LegModeChecker(this.scenario, planAlgorithm);
-		legModeChecker.setValidNonCarModes(new String[]{TransportMode.walk});
-		legModeChecker.setToCarProbability(0.5);
-		legModeChecker.run(this.scenario.getPopulation());	
-		
 		this.parkingRouterFactory = new ParkingRouterFactory(this.scenario, multiModalTravelTimes, 
-				event.getControler().getTravelDisutilityFactory(), tripRouterFactory, nodesToCheck);
-//		workaround
-//		this.parkingRouterFactory = new ParkingRouterFactory(this.scenario, multiModalTravelTimes, 
-//				event.getControler().getTravelDisutilityFactory(), tripRouterFactoryWrapper, nodesToCheck);
+				event.getControler().getTravelDisutilityFactory(), tripRouterFactoryWrapper, nodesToCheck);
 		
 		ParkingCostCalculatorImpl parkingCostCalculator = new ParkingCostCalculatorImpl(this.initParkingTypes());
 		this.parkingInfrastructure = new ParkingInfrastructure(this.scenario, parkingCostCalculator);
@@ -194,7 +215,7 @@ public class WithinDayParkingControlerListener implements StartupListener, Repla
 		this.initIdentifiers();
 		this.initReplanners();
 	}
-	
+		
 	@Override
 	public void notifyReplanning(ReplanningEvent event) {
 		/*
@@ -236,26 +257,41 @@ public class WithinDayParkingControlerListener implements StartupListener, Repla
 		return parkingTypes;
 	}
 	
-	private static class TripRouterFactoryWrapper implements TripRouterFactoryInternal {
+	private static class TripRouterFactoryWrapper implements TripRouterFactory {
 
-		private final TripRouterFactory tripRouterFactory;
-		private final TravelDisutilityFactory travelDisutilityFactory;
-		private final TravelTime travelTime;
-		private final PlanCalcScoreConfigGroup cnScoringGroup;
+		private final TripRouterFactoryInternal internalFactory;
+		private final LeastCostPathCalculatorFactory leastCostPathCalculatorFactory;
+
+		private final PopulationFactory populationFactory;
+		private final ModeRouteFactory modeRouteFactory;
+		private final Network subNetwork;
 		
-		public TripRouterFactoryWrapper(TripRouterFactory tripRouterFactory, TravelDisutilityFactory travelDisutilityFactory,
-				TravelTime travelTime, PlanCalcScoreConfigGroup cnScoringGroup) {
-			this.tripRouterFactory = tripRouterFactory;
-			this.travelDisutilityFactory = travelDisutilityFactory;
-			this.travelTime = travelTime;
-			this.cnScoringGroup = cnScoringGroup;
+		public TripRouterFactoryWrapper(Scenario scenario, TripRouterFactoryInternal internalFactory,
+				LeastCostPathCalculatorFactory leastCostPathCalculatorFactory) {
+			this.internalFactory = internalFactory;
+			this.leastCostPathCalculatorFactory = leastCostPathCalculatorFactory;
+		
+			this.populationFactory = scenario.getPopulation().getFactory();
+			this.modeRouteFactory = ((PopulationFactoryImpl) populationFactory).getModeRouteFactory();
+			
+			this.subNetwork = NetworkImpl.createNetwork();
+			Set<String> restrictions = new HashSet<String>();
+			restrictions.add(TransportMode.car);
+			TransportModeNetworkFilter networkFilter = new TransportModeNetworkFilter(scenario.getNetwork());
+			networkFilter.filter(subNetwork, restrictions);
 		}
 		
 		@Override
-		public TripRouter instantiateAndConfigureTripRouter() {
-			RoutingContext routingContext = new RoutingContextImpl(this.travelDisutilityFactory, 
-					this.travelTime, this.cnScoringGroup);
-			TripRouter tripRouter = this.tripRouterFactory.instantiateAndConfigureTripRouter(routingContext);
+		public TripRouter instantiateAndConfigureTripRouter(RoutingContext routingContext) {
+			TripRouter tripRouter = internalFactory.instantiateAndConfigureTripRouter();
+			
+	        LeastCostPathCalculator leastCostPathCalculator = leastCostPathCalculatorFactory.createPathCalculator(
+	        		this.subNetwork, routingContext.getTravelDisutility(), routingContext.getTravelTime());
+
+	        LegRouter networkLegRouter = new NetworkLegRouter(this.subNetwork, leastCostPathCalculator, this.modeRouteFactory);
+			RoutingModule legRouterWrapper = new LegRouterWrapper(TransportMode.car, populationFactory, networkLegRouter); 
+			tripRouter.setRoutingModule(TransportMode.car, legRouterWrapper);
+	        
 			return tripRouter;
 		}
 		

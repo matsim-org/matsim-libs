@@ -55,12 +55,17 @@ public class WithinDayParkingRunner {
 			
 			Controler controler = new Controler(scenario);
 			
-			WithinDayParkingControlerListener controlerListener = new WithinDayParkingControlerListener(controler);
-			controler.addControlerListener(controlerListener);
+			// initialize Controler listeners
+			MultiModalControlerListener multiModalControlerListener = new MultiModalControlerListener();
+			WithinDayParkingControlerListener parkingControlerListener = new WithinDayParkingControlerListener(controler,
+					multiModalControlerListener);
 
-			// controler listener that initializes the multi-modal simulation
-			MultiModalControlerListener listener = new MultiModalControlerListener();
-			controler.addControlerListener(listener);
+			/*
+			 * Controler listeners are called in reverse order. Since the parkingControlerListener
+			 * depends on the outcomes of the multiModalControlerListener, we add the later last.
+			 */
+			controler.addControlerListener(parkingControlerListener);
+			controler.addControlerListener(multiModalControlerListener);
 			
 			controler.setOverwriteFiles(true);
 			controler.run();
