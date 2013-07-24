@@ -22,7 +22,9 @@ package playground.vsp.analysis.modules.ptLines2PaxAnalysis;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -66,7 +68,6 @@ public class TransitLines2PaxCounts {
 		this.maxSlice = maxSlice;
 		this.routeList = new ArrayList<TransitRoute>();
 		for (TransitRoute tr : tl.getRoutes().values()) {
-//			findLongestRoute(tr.getStops());
 			this.routeList.add(tr);
 			int numberOfStops = tr.getStops().size();
 			for (int ii=0; ii < numberOfStops; ii++) {
@@ -81,14 +82,47 @@ public class TransitLines2PaxCounts {
 				}
 			}
 		}	
-		
+//		remove duplicate routes
+		cleanRouteList();
 	}
 	
-//	not sure this works properly
 	
 	public List<TransitRoute> getRoutesByNumberOfStops() {
 		Collections.sort(this.routeList, new RouteSizeComparator());
 		return this.routeList;
+	}
+
+	
+//	this might not be the best way of removing duplicate routes, it seems to work properly nontheless
+	private void cleanRouteList () {
+		Map<Integer, List<TransitRoute>> stops2routes = new HashMap<Integer, List<TransitRoute>>();
+		List<TransitRoute> dupeRoutes = new ArrayList<TransitRoute>();
+		int numberOfRoutes = this.routeList.size();
+//		put all TransitRoutes in map with number of stops as key 
+		for (int ii=0; ii<numberOfRoutes; ii++) {
+			TransitRoute tr = this.routeList.get(ii);
+			Integer numberOfStops = tr.getStops().size();
+			if (stops2routes.get(numberOfStops) == null) {
+				stops2routes.put(numberOfStops, new ArrayList<TransitRoute>());
+				stops2routes.get(numberOfStops).add(tr);
+			}
+			else {
+				stops2routes.get(numberOfStops).add(tr);
+			}
+		}
+		for (Integer ns: stops2routes.keySet()) {
+			for (int jj=this.routeList.size(); jj>1; jj--) {
+				TransitRoute tr = this.routeList.get(jj-1);
+				for (int kk=0; kk<stops2routes.get(ns).size(); kk++) {
+					TransitRoute tr2 = stops2routes.get(ns).get(kk);
+					if ((tr.getId()!=tr2.getId()) && (tr2.getStops().containsAll(tr.getStops()))) { 
+						dupeRoutes.add(tr);
+					}
+				}
+			}
+		}
+		log.warn("NUMBER OF ROUTES ON DUPE LIST: "+dupeRoutes.size()+" WITH TOTAL ROUTES: "+this.routeList.size());
+		this.routeList.removeAll(dupeRoutes);
 	}
 	
 	public class RouteSizeComparator implements Comparator<TransitRoute> {

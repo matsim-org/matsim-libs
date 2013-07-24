@@ -112,7 +112,7 @@ public class PtLines2PaxAnalysisHandler implements
 				return;
 			AnalysisVehicle v = this.transitVehicles.get(event.getVehicleId());
 			v.personAlights();
-			this.linesPaxCounts.get(v.getLineId()).paxAlighting(v.getLocationId(), 0);
+			this.linesPaxCounts.get(v.getLineId()).paxAlighting(v.getLocationId(), event.getTime());
 		}
 	}
 
@@ -126,7 +126,7 @@ public class PtLines2PaxAnalysisHandler implements
 			return;
 		AnalysisVehicle v = this.transitVehicles.get(event.getVehicleId());
 		v.personBoards();
-		this.linesPaxCounts.get(v.getLineId()).paxBoarding(v.getLocationId(), 0);
+		this.linesPaxCounts.get(v.getLineId()).paxBoarding(v.getLocationId(), event.getTime());
 	}
 
 	@Override

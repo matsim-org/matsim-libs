@@ -109,6 +109,7 @@ public class PtLines2PaxAnalysis extends AbstractAnalyisModule {
 			// ...
 			log.info("Number of TransitRoutes to be written for "+typeOfOutput+": "+tl.getRoutesByNumberOfStops().size());
 			for(int i = 0; i < tl.getRoutesByNumberOfStops().size() ; i++){
+				w.write("\n");
 				TransitRoute tr = tl.getRoutesByNumberOfStops().get(i);
 				log.info("Writing output "+typeOfOutput+" for TransitRoute "+(i+1)+" of "+tl.getRoutesByNumberOfStops().size()+
 						" total routes, id = "+tr.getId()+" length = "+tr.getStops().size());
@@ -139,9 +140,7 @@ public class PtLines2PaxAnalysis extends AbstractAnalyisModule {
 		writeCounts2File(tl2c, tl2c.getMaxSlice(), tl2c.getTotalPax(), dir + tl2c.getId().toString() + "--totalPax.csv", "totalPax");
 	}
 	
-	/**
-	 * @param args
-	 */
+
 	public static void main(String[] args) {
 		String dir = "Z:\\WinHome\\workspace\\PtRoutes2PaxAna_Daten\\schedule\\";
 		VspAnalyzer analyzer = new VspAnalyzer(dir, dir + "tut_10min_0.0.events.xml.gz");
