@@ -195,13 +195,9 @@ public class ScenarioLoaderImpl {
 		if ((this.config.facilities() != null) && (this.config.facilities().getInputFile() != null)) {
 			String facilitiesFileName = this.config.facilities().getInputFile();
 			log.info("loading facilities from " + facilitiesFileName);
-			try {
-				new MatsimFacilitiesReader(this.scenario).parse(facilitiesFileName);
+			new MatsimFacilitiesReader(this.scenario).parse(facilitiesFileName);
 
-				this.scenario.getActivityFacilities().printFacilitiesCount();
-			} catch (Exception e) {
-				throw new RuntimeException(e);
-			}
+			this.scenario.getActivityFacilities().printFacilitiesCount();
 		}
 		else {
 			log.info("no facilities file set in config, therefore not loading any facilities.  This is not a problem except if you are using facilities");
