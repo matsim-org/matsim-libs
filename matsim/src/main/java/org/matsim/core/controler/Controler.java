@@ -606,15 +606,6 @@ public class Controler extends AbstractController {
 		return this.travelTimeCalculator.getLinkTravelTimes();
 	}
 
-	
-	/*
-	 * This will be replaced by a method that returns the controler's internal
-	 * TripRouterFactory. Most people in fact only need a TripRouter instance and
-	 * not the factory behind. The calls to 
-	 * getTripRouterFactory().instantiateAndConfigureTripRouter() will be replaced
-	 * by getTripRouterInstance(). cdobler, jul'13
-	 */
-	@Deprecated
 	public final TripRouterFactoryInternal getTripRouterFactory() {
 		// I think this could just be createTripRouter(). Not sure
 		// if the indirection is necessary. People just want to get a TripRouter. michaz
@@ -638,16 +629,6 @@ public class Controler extends AbstractController {
 			}
 
 		};
-	}
-
-	/**
-	 * 
-	 * @return a TripRouter object that uses the controler's travel disutility factory and travel time.
-	 */
-	public final TripRouter getTripRouterInstance() {
-		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory(), 
-				this.getLinkTravelTimes(), this.config.planCalcScore());
-		return this.tripRouterFactory.instantiateAndConfigureTripRouter(routingContext);
 	}
 	
 	/**Design comments:<ul>
