@@ -37,7 +37,7 @@ public class CreateCounts {
 		//Config config = ConfigUtils.createConfig();
 		Config config = new Config();
 		CountsConfigGroup configGroup = new CountsConfigGroup();
-		config.addModule( CountsConfigGroup.NAME , configGroup );
+		config.addModule( configGroup );
 		ConfigUtils.loadConfig( config , args[0] );
 
 		MoreIOUtils.initOut( configGroup.getOutputDir() );

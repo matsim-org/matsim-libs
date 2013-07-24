@@ -68,7 +68,7 @@ public class CadytsContext implements StartupListener, IterationEndsListener {
 		this.countsScaleFactor = config.counts().getCountsScaleFactor();
 		
 		this.cadytsConfig = new CadytsCarConfigGroup();
-		config.addModule(CadytsCarConfigGroup.GROUP_NAME, cadytsConfig);
+		config.addModule(cadytsConfig);
 		// addModule() also initializes the config group with the values read from the config file
 		cadytsConfig.setWriteAnalysisFile(true);
 		

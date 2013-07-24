@@ -52,7 +52,7 @@
  *    some sense together after being read from a file.</li> 
  * </ul> 
  * The custom config-group must be 
- * {@linkplain org.matsim.core.config.Config#addModule(String, Module) added} to the 
+ * {@linkplain org.matsim.core.config.Config#addModule(Module) added} to the 
  * {@link org.matsim.core.config.Config}-object before the configuration is read from file, because
  * otherwise a generic {@link org.matsim.core.config.Module} will be created for these settings. The 
  * {@linkplain org.matsim.core.controler controler-documenation} has an example of how to use custom

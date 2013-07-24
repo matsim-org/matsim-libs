@@ -51,7 +51,7 @@ public class PControler{
 		}
 		
 		Config config = new Config();
-		config.addModule(PConfigGroup.GROUP_NAME, new PConfigGroup());
+		config.addModule(new PConfigGroup());
 		ConfigUtils.loadConfig(config, args[0]);
 		
 		PScenarioImpl scenario = new PScenarioImpl(config);

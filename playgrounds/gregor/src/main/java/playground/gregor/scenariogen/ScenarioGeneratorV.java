@@ -112,9 +112,9 @@ public class ScenarioGeneratorV {
 		QSimConfigGroup qsim = new QSimConfigGroup();
 		qsim.setEndTime(300);
 		//				qsim.setTimeStepSize(1./25.);
-		c.addModule("qsim", qsim);
+		c.addModule(qsim);
 		
-		c.addModule("sim2d", s2d);
+		c.addModule(s2d);
 		new ConfigWriter(c).write(inputDir + "/config.xml");
 
 

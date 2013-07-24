@@ -700,7 +700,7 @@ public class CadytsIntegrationTest {
 		cadytsPtConfig.addParam(CadytsPtConfigGroup.CALIBRATED_LINES, "M44,M43") ;
 		
 		CadytsPtConfigGroup ccc = new CadytsPtConfigGroup() ;
-		config.addModule(CadytsPtConfigGroup.GROUP_NAME, ccc) ;
+		config.addModule(ccc) ;
 		
 		
 		// ---

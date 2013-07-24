@@ -58,7 +58,7 @@ public class KtiConfigGroupTest extends MatsimTestCase {
 
 		Config config = new Config();
 		KtiConfigGroup testee = new KtiConfigGroup();
-		config.addModule(KtiConfigGroup.GROUP_NAME, testee);
+		config.addModule(testee);
 		new MatsimConfigReader(config).readFile(this.getInputDirectory() + "config.xml", null);
 
 		assertEquals(999.9, testee.getConstBike());

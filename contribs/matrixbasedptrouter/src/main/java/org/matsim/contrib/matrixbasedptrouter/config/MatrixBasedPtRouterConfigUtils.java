@@ -46,7 +46,7 @@ public class MatrixBasedPtRouterConfigUtils {
 		}
 		
 		MatrixBasedPtRouterConfigGroup ippcm = new MatrixBasedPtRouterConfigGroup();
-		config.addModule( MatrixBasedPtRouterConfigGroup.GROUP_NAME, ippcm ) ;
+		config.addModule( ippcm ) ;
 		return ippcm;
 	}	
 	

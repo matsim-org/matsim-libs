@@ -130,7 +130,7 @@ public class ScenarioGeneratorPT extends ScenarioGenerator {
 		
 		QSimConfigGroup qsim = new QSimConfigGroup();
 		qsim.setEndTime(4*3600);
-		this.c.addModule("qsim", qsim);
+		this.c.addModule(qsim);
 		
 //		Sim2DConfigGroup s2d = new Sim2DConfigGroup();
 //		s2d.setFloorShapeFile("/Users/laemmel/devel/pt_evac_demo/input/floorplan.shp");

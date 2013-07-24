@@ -80,7 +80,7 @@ public class ControlerTest {
 	private UglyHerbieMultilegControler initializeControler() {
 		Config config = ConfigUtils.createConfig();
 		ParkAndRideUtils.setConfigGroup( config );
-		config.addModule( HerbieConfigGroup.GROUP_NAME , new HerbieConfigGroup() );
+		config.addModule( new HerbieConfigGroup() );
 
 		String inputDir = utils.getPackageInputDirectory();
 		inputDir = inputDir.substring( 0 , inputDir.lastIndexOf( "/" ) );

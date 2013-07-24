@@ -145,19 +145,14 @@ public class JointScenarioUtils {
 		final Config config = ConfigUtils.createConfig();
 
 		config.addModule(
-				CliquesConfigGroup.GROUP_NAME,
 				new CliquesConfigGroup());
 		config.addModule(
-				JointTripsMutatorConfigGroup.GROUP_NAME,
 				new JointTripsMutatorConfigGroup());
 		config.addModule(
-				JointTimeModeChooserConfigGroup.GROUP_NAME,
 				new JointTimeModeChooserConfigGroup());
 		config.addModule(
-				JointTripInsertorConfigGroup.GROUP_NAME,
 				new JointTripInsertorConfigGroup());
 		config.addModule(
-				JointPlansConfigGroup.GROUP_NAME,
 				new JointPlansConfigGroup());
 
 		return config;

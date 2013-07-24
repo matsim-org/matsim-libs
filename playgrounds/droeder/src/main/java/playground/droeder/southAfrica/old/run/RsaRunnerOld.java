@@ -78,7 +78,7 @@ public class RsaRunnerOld {
 		
 		boolean fixedSubMode = true;
 		Config config = new Config();
-		config.addModule(PConfigGroup.GROUP_NAME, new PConfigGroup());
+		config.addModule(new PConfigGroup());
 		ConfigUtils.loadConfig(config, conf);
 		
 		PScenarioImpl scenario = new PScenarioImpl(config);

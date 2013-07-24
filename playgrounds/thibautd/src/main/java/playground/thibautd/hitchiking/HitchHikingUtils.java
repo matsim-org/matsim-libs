@@ -92,7 +92,7 @@ public class HitchHikingUtils {
 	}
 
 	public static void loadConfig( final Config config , final String file ) {
-		config.addModule( HitchHikingConfigGroup.GROUP_NAME , new HitchHikingConfigGroup() );
+		config.addModule( new HitchHikingConfigGroup() );
 		ConfigUtils.loadConfig ( config , file );
 	}
 

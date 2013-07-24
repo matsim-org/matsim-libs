@@ -36,7 +36,7 @@ public class ConfigReaderMatsimV1Test extends MatsimTestCase {
 	public void testNullParam() {
 		Config config = new Config();
 		TestModule testModule = new TestModule("test");
-		config.addModule("test", testModule);
+		config.addModule(testModule);
 
 		ConfigReaderMatsimV1 reader = new ConfigReaderMatsimV1(config);
 		Attributes atts = new AttributesBuilder().add("name", "test").get();

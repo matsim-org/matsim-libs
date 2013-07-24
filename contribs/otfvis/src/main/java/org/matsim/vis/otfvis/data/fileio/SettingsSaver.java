@@ -144,7 +144,7 @@ public class SettingsSaver {
 		log.info("OTFVis config dump:");
 		StringWriter writer = new StringWriter();
 		Config tmpConfig = new Config();
-		tmpConfig.addModule(OTFVisConfigGroup.GROUP_NAME, visConfig);
+		tmpConfig.addModule(visConfig);
 		PrintWriter pw = new PrintWriter(writer);
 		new ConfigWriter(tmpConfig).writeStream(pw);
 		log.info("\n\n" + writer.getBuffer().toString());

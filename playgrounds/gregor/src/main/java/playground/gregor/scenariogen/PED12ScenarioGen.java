@@ -202,9 +202,9 @@ public class PED12ScenarioGen {
 		qsim.setRemoveStuckVehicles(false);
 		qsim.setNumberOfThreads(2);
 		//				qsim.setTimeStepSize(1./25.);
-		c.addModule("qsim", qsim);
+		c.addModule(qsim);
 
-		c.addModule("sim2d", s2d);
+		c.addModule(s2d);
 
 		ActivityParams pre = new ActivityParams("h");
 		pre.setTypicalDuration(49); // needs to be geq 49, otherwise when running a simulation one gets "java.lang.RuntimeException: zeroUtilityDuration of type pre-evac must be greater than 0.0. Did you forget to specify the typicalDuration?"

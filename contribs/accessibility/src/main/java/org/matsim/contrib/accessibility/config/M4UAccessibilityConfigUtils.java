@@ -65,7 +65,7 @@ public class M4UAccessibilityConfigUtils {
 		// yyyyyy the above code does NOT convert but throws the config entries away.
 		// In contrast, config.addModule(...) would convert.  kai, may'13
 		// I just changed that:
-		config.addModule(AccessibilityConfigGroup.GROUP_NAME, module ) ;
+		config.addModule(module ) ;
 		return module;
 	}
 

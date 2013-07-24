@@ -38,7 +38,7 @@ public class TemplateControlerListener implements StartupListener, IterationEnds
 		final Controler controler = event.getControler();
 
 		// config
-		controler.getConfig().addModule(TemplateConfigGroup.GROUP_NAME, this.pluginConfig); // too late here... but could be fixed in Config.java
+		controler.getConfig().addModule(this.pluginConfig); // too late here... but could be fixed in Config.java
 		
 		// event handler
 		this.eventHandler = new TemplateEventHandler();

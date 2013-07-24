@@ -111,7 +111,7 @@ public class Config {
 
 	/** static Logger-instance. */
 	private static final Logger log = Logger.getLogger(Config.class);
-	
+
 	private boolean locked = false;
 
 	// ////////////////////////////////////////////////////////////////////
@@ -151,7 +151,7 @@ public class Config {
 
 		this.households = new HouseholdsConfigGroup();
 		this.modules.put(HouseholdsConfigGroup.GROUP_NAME, this.households);
-		
+
 		this.parallelEventHandling = new ParallelEventHandlingConfigGroup();
 		this.modules.put(ParallelEventHandlingConfigGroup.GROUP_NAME, this.parallelEventHandling );
 
@@ -178,7 +178,7 @@ public class Config {
 
 		this.plansCalcRoute = new PlansCalcRouteConfigGroup();
 		this.modules.put(PlansCalcRouteConfigGroup.GROUP_NAME, this.plansCalcRoute);
-		
+
 		this.timeAllocationMutator = new TimeAllocationMutatorConfigGroup();
 		this.modules.put(TimeAllocationMutatorConfigGroup.GROUP_NAME, this.timeAllocationMutator );
 
@@ -201,7 +201,7 @@ public class Config {
 
 		this.transit = new TransitConfigGroup();
 		this.modules.put(TransitConfigGroup.GROUP_NAME, this.transit);
-		
+
 		this.linkStats = new LinkStatsConfigGroup();
 		this.modules.put(LinkStatsConfigGroup.GROUP_NAME, this.linkStats);
 
@@ -248,38 +248,28 @@ public class Config {
 		this.modules.put(name, m);
 		return m;
 	}
-	
-	/**
-	 * Convenience method to addModule( name, module) that takes the name directly out of the module (since it should be there).
-	 * 
-	 * @param specializedConfigModule
-	 */
-	public final void addModule( final Module specializedConfigModule ) {
-		if ( specializedConfigModule.getName().isEmpty() ) {
-			throw new RuntimeException("cannot insert module with empty name") ;
-		}
-		addModule( specializedConfigModule.getName(), specializedConfigModule ) ;
-	}
 
 	/**
 	 * Adds the specified module / config-group with the specified name to the
 	 * configuration.
 	 * <p/>
 	 * This is the typical way to "materialize" material that, so far, exists only as Map, into a specialized module.
-	 *
-	 * @param name
 	 * @param specializedConfigModule
 	 *
 	 * @throws IllegalArgumentException
 	 *             if a config-group with the specified name already exists.
 	 */
-	public final void addModule(final String name, final Module specializedConfigModule) {
-		// The logic is as follows: 
+	public final void addModule(final Module specializedConfigModule) {
+		String name = specializedConfigModule.getName();
+		if (name == null || name.isEmpty()) {
+			throw new RuntimeException("cannot insert module with empty name") ;
+		}
+		// The logic is as follows:
 		// (1) assume that module is some SpecializedConfigModule that extends Module
-		
-		// (2) it is presumably found her from parsing, but as a general Module: 
+
+		// (2) it is presumably found here from parsing, but as a general Module:
 		Module m = this.modules.get(name);
-		
+
 		if (m != null) {
 			// (3) this is the corresponding test: m is general, module is specialized:
 			if (m.getClass() == Module.class && specializedConfigModule.getClass() != Module.class) {
@@ -288,10 +278,10 @@ public class Config {
 				for (Map.Entry<String, String> e : m.getParams().entrySet()) {
 					specializedConfigModule.addParam(e.getKey(), e.getValue());
 				}
-				
+
 				// (5) register the resulting module under "name" (which will over-write m):
 				this.modules.put(name, specializedConfigModule);
-				
+
 			} else {
 				throw new IllegalArgumentException("Module " + name + " exists already.");
 			}
@@ -513,15 +503,15 @@ public class Config {
 	public TransitRouterConfigGroup transitRouter() {
 		return this.transitRouter;
 	}
-	
+
 	public LinkStatsConfigGroup linkStats() {
 		return this.linkStats;
 	}
-	
+
 	public TimeAllocationMutatorConfigGroup timeAllocationMutator() {
 		return this.timeAllocationMutator;
 	}
-	
+
 	public ParallelEventHandlingConfigGroup parallelEventHandling() {
 		return this.parallelEventHandling;
 	}
@@ -535,7 +525,7 @@ public class Config {
 
 	public void addSimulationConfigGroup( final SimulationConfigGroup tmp ) {
 		this.simulation = tmp;
-		this.addModule( SimulationConfigGroup.GROUP_NAME, tmp );
+		this.addModule( tmp );
 	}
 
 	public void addQSimConfigGroup(final QSimConfigGroup qSimConfigGroup) {
@@ -543,7 +533,7 @@ public class Config {
 //		log.warn("Might be better to modify the code to use the existing create/add/removeModule mechanics. kai, oct'10");
 		this.qSimConfigGroup = qSimConfigGroup;
 //		this.modules.put(QSimConfigGroup.GROUP_NAME, qSimConfigGroup);
-		this.addModule(QSimConfigGroup.GROUP_NAME, qSimConfigGroup);
+		this.addModule(qSimConfigGroup);
 	}
 
 	// other:
@@ -553,7 +543,7 @@ public class Config {
 	}
 
 	public final boolean isLocked() {
-		return locked;
+		return this.locked;
 	}
 
 	public final void setLocked(boolean locked) {

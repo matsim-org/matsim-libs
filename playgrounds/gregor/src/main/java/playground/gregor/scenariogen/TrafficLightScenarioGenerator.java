@@ -103,7 +103,7 @@ public class TrafficLightScenarioGenerator {
 		s2d.setEnablePhysicalEnvironmentForceModule("false");
 
 
-		c.addModule("sim2d", s2d);
+		c.addModule(s2d);
 		new ConfigWriter(c).write(inputDir + "/config.xml");
 
 

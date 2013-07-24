@@ -136,7 +136,7 @@ public class Bottleneck
 			
 //			s2d.setFloorShapeFile(inputDir +"/bottleneck" + (int)width + "_" + (int)length +  ".shp");
 			s2d.setFloorShapeFile(inputDir +"/floorplan.shp");
-			c.addModule("sim2d", s2d);
+			c.addModule(s2d);
 			new ConfigWriter(c).write(inputDir + "/config.xml");
 			
 			System.out.println("");

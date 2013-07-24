@@ -92,7 +92,7 @@ public class CadytsIntegration_launcher {
 
 		//create cadyts context
 		CadytsPtConfigGroup ccc = new CadytsPtConfigGroup() ;
-		config.addModule(CadytsPtConfigGroup.GROUP_NAME, ccc) ;
+		config.addModule(ccc) ;
 		final CadytsContext cContext = new CadytsContext( config ) ;
 		controler.addControlerListener(cContext) ;
 		

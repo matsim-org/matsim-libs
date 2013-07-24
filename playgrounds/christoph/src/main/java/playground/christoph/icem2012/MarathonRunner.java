@@ -293,7 +293,7 @@ public final class MarathonRunner implements StartupListener,
 		 */
 		Module module = this.scenario.getConfig().getModule(KtiConfigGroup.GROUP_NAME);
 		this.scenario.getConfig().removeModule(KtiConfigGroup.GROUP_NAME);
-		this.scenario.getConfig().addModule(KtiConfigGroup.GROUP_NAME, this.ktiConfigGroup);
+		this.scenario.getConfig().addModule(this.ktiConfigGroup);
 		
 		for (Entry<String, String> entry : module.getParams().entrySet()) {
 			this.ktiConfigGroup.addParam(entry.getKey(), entry.getValue());

@@ -270,7 +270,7 @@ public class HerbiePlanBasedLegScoringFunctionTest {
 	private void initConfig() {
 		config = ConfigUtils.createConfig();
 		ktiConfigGroup = new HerbieConfigGroup();
-		config.addModule( HerbieConfigGroup.GROUP_NAME , ktiConfigGroup );
+		config.addModule( ktiConfigGroup );
 		config.planCalcScore().setMarginalUtlOfDistanceWalk( -5 );
 		config.planCalcScore().setMarginalUtlOfDistanceOther( -9 );
 		config.planCalcScore().setMonetaryDistanceCostRateCar( -1 );

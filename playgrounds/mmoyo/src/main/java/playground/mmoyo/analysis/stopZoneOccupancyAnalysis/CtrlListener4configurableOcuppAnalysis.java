@@ -39,7 +39,7 @@ public class CtrlListener4configurableOcuppAnalysis implements IterationEndsList
 		//create occupancy analyzer based on CadytsPtConfigGroup();		
 		if (!(controler.getConfig().getModule(CadytsPtConfigGroup.GROUP_NAME) instanceof org.matsim.contrib.cadyts.pt.CadytsPtConfigGroup)){
 			CadytsPtConfigGroup ccc = new CadytsPtConfigGroup() ;
-			controler.getConfig().addModule(CadytsPtConfigGroup.GROUP_NAME, ccc) ;
+			controler.getConfig().addModule(ccc) ;
 		}
 		CadytsPtConfigGroup cptcg = (CadytsPtConfigGroup) controler.getConfig().getModule(CadytsPtConfigGroup.GROUP_NAME);
 		configurableOccupAnalyzer = new ConfigurableOccupancyAnalyzer( cptcg.getCalibratedLines() ,  cptcg.getTimeBinSize());

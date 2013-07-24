@@ -146,7 +146,7 @@ public class MyRuns {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config config = scenario.getConfig();
 		KtiConfigGroup ktiConfigGroup = new KtiConfigGroup();
-		config.addModule(KtiConfigGroup.GROUP_NAME, ktiConfigGroup);
+		config.addModule(ktiConfigGroup);
 		MatsimConfigReader reader = new MatsimConfigReader(config);
 		reader.readFile(args[0]);
 
@@ -201,7 +201,7 @@ public class MyRuns {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config config = scenario.getConfig();
 		MeisterkConfigGroup meisterkConfigGroup = new MeisterkConfigGroup();
-		config.addModule(MeisterkConfigGroup.GROUP_NAME, meisterkConfigGroup);
+		config.addModule(meisterkConfigGroup);
 		MatsimConfigReader reader = new MatsimConfigReader(config);
 		reader.readFile(args[0]);
 		MatsimRandom.reset(config.global().getRandomSeed());

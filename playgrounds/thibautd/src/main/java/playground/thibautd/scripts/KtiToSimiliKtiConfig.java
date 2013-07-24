@@ -39,12 +39,12 @@ public class KtiToSimiliKtiConfig {
 
 		final Config inputConfig = ConfigUtils.createConfig();
 		final KtiConfigGroup ktiConfigGroup = new KtiConfigGroup();
-		inputConfig.addModule( KtiConfigGroup.GROUP_NAME , ktiConfigGroup );
+		inputConfig.addModule( ktiConfigGroup );
 		ConfigUtils.loadConfig( inputConfig , inputConfigFile );
 
 		final Config outputConfig = new Config();
 		final PlanCalcScoreConfigGroup planCalcScore = new PlanCalcScoreConfigGroup();
-		outputConfig.addModule( PlanCalcScoreConfigGroup.GROUP_NAME , planCalcScore );
+		outputConfig.addModule( planCalcScore );
 		MyConfigUtils.transmitParams( inputConfig.planCalcScore() , planCalcScore );
 		// XXX KTI defines a constant for car in the config group,
 		// BUT IT IS NOT USED IN THE SCORING FUNCTION!!!!!!!
@@ -67,7 +67,7 @@ public class KtiToSimiliKtiConfig {
 				planCalcScore.getMarginalUtilityOfMoney() );
 
 		final KtiLikeScoringConfigGroup ktiLikeConfigGroup = new KtiLikeScoringConfigGroup();
-		outputConfig.addModule( KtiLikeScoringConfigGroup.GROUP_NAME , ktiLikeConfigGroup );
+		outputConfig.addModule( ktiLikeConfigGroup );
 		ktiLikeConfigGroup.setTravelCardRatio( ktiConfigGroup.getDistanceCostPtUnknownTravelCard() / ktiConfigGroup.getDistanceCostPtNoTravelCard() );
 
 		new ConfigWriter( outputConfig ).write( outputConfigFile );

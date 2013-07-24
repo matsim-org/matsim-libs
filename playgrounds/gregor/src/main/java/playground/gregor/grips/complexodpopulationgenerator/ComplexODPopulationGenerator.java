@@ -456,7 +456,7 @@ public class ComplexODPopulationGenerator implements ActionListener{
 				{
 					c = ConfigUtils.createConfig();
 					gcm = new GripsConfigModule("grips");
-					c.addModule("grips", gcm);
+					c.addModule(gcm);
 					c.global().setCoordinateSystem("EPSG:3395");
 					
 					GripsConfigDeserializer parser = new GripsConfigDeserializer(gcm,false);

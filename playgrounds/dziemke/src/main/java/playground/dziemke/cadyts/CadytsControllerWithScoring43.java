@@ -73,7 +73,7 @@ public class CadytsControllerWithScoring43 {
 		CadytsCarConfigGroup cadytsCarConfigGroup = new CadytsCarConfigGroup();
 		cadytsCarConfigGroup.setEndTime(24*60*60);
 		cadytsCarConfigGroup.setUseBruteForce(false);
-		config.addModule("ccc", cadytsCarConfigGroup);
+		config.addModule(cadytsCarConfigGroup);
 		
 		// simulation
 		config.addSimulationConfigGroup(new SimulationConfigGroup());

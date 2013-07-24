@@ -58,7 +58,7 @@ public class KtiTravelTimeDistanceCostCalculatorTest extends MatsimTestCase {
 		Config config = new Config();
 		config = super.loadConfig(null);
 		KtiConfigGroup ktiConfigGroup = new KtiConfigGroup();
-		config.addModule(KtiConfigGroup.GROUP_NAME, ktiConfigGroup);
+		config.addModule(ktiConfigGroup);
 
 		ktiConfigGroup.setDistanceCostCar(5.0);
 

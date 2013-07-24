@@ -65,7 +65,7 @@ public class PRRunner {
 	private void run() {
 		
 		Config config = new Config();
-		config.addModule(PRConfigGroup.GROUP_NAME, new PRConfigGroup());
+		config.addModule(new PRConfigGroup());
 		ConfigUtils.loadConfig(config, configFile);
 				
 		Controler controler = new Controler(config);

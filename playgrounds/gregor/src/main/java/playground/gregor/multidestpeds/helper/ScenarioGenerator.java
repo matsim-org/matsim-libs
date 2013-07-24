@@ -82,7 +82,7 @@ public class ScenarioGenerator {
 		QSimConfigGroup qsim = new QSimConfigGroup();
 		qsim.setEndTime(600);
 		//				qsim.setTimeStepSize(1./25.);
-		c.addModule("qsim", qsim);
+		c.addModule(qsim);
 
 		Sim2DConfigGroup s2d = new Sim2DConfigGroup();
 		s2d.setFloorShapeFile(inputDir +"/floorplan.shp");
@@ -131,7 +131,7 @@ public class ScenarioGenerator {
 		ShapeFileReader r = new ShapeFileReader();
 		r.readFileAndInitialize(shpFile);
 
-		c.addModule("sim2d", s2d);
+		c.addModule(s2d);
 
 		createNetwork(sc,inputDir,r.getFeatureSet());
 

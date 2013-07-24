@@ -48,7 +48,7 @@ public class HerbieEnergyFlowsController extends EnergyFlowsController {
 	
 	public HerbieEnergyFlowsController(String[] args) {
 		super(args);
-		super.config.addModule(HerbieConfigGroup.GROUP_NAME, this.herbieConfigGroup);
+		super.config.addModule(this.herbieConfigGroup);
 		super.setOverwriteFiles(true);
 	}
 

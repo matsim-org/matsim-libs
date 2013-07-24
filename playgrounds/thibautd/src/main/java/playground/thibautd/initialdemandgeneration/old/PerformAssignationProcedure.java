@@ -88,7 +88,7 @@ public class PerformAssignationProcedure {
 			String configFile = args[ 0 ];
 			MzGroupsModule groups = new MzGroupsModule();
 			Config config = ConfigUtils.createConfig( );
-			config.addModule( MzGroupsModule.NAME , groups );
+			config.addModule( groups );
 			ConfigUtils.loadConfig( config , configFile );
 			Module configGroup = config.getModule( CONF_GROUP );
 			String outputDir = configGroup.getValue( OUT_FIELD );

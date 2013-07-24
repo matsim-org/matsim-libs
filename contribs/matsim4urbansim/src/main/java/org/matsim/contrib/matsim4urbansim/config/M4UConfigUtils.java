@@ -457,7 +457,7 @@ public class M4UConfigUtils {
 			return (UrbanSimParameterConfigModuleV3) m;
 		}
 		UrbanSimParameterConfigModuleV3 upcm = new UrbanSimParameterConfigModuleV3();
-		config.addModule( UrbanSimParameterConfigModuleV3.GROUP_NAME, upcm ) ;
+		config.addModule( upcm ) ;
 		return upcm;
 	}
 
@@ -467,7 +467,7 @@ public class M4UConfigUtils {
 			return (M4UControlerConfigModuleV3) m;
 		}
 		M4UControlerConfigModuleV3 mccm = new M4UControlerConfigModuleV3();
-		config.addModule(M4UControlerConfigModuleV3.GROUP_NAME, mccm ) ;
+		config.addModule(mccm ) ;
 		return mccm;
 	}
 

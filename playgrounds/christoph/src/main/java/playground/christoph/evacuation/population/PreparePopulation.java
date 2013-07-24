@@ -67,7 +67,7 @@ public class PreparePopulation {
 		Config config = ConfigUtils.createConfig();
 		
 		KtiConfigGroup ktiConfigGroup = new KtiConfigGroup();
-		config.addModule(KtiConfigGroup.GROUP_NAME, ktiConfigGroup);
+		config.addModule(ktiConfigGroup);
 		
 		ConfigUtils.loadConfig(config, args[0]);
 			

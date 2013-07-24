@@ -197,7 +197,7 @@ public class BenchmarkV2 {
 		if (nOfThreadsEvents > 0) {
 			Module m = new Module("parallelEventHandling");
 			m.addParam("numberOfThreads", Integer.toString(nOfThreadsEvents));
-			c.addModule("parallelEventHandling", m);
+			c.addModule(m);
 		}
 
 		Controler ctrl = new Controler(this.scenario);

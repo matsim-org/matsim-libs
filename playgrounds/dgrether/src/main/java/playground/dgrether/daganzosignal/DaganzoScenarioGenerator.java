@@ -446,7 +446,7 @@ public class DaganzoScenarioGenerator {
 		if (this.initialRedNormalRoute != null) {
 			module.addParam(INTIAL_RED_NORMAL_ROUTE_CONFIG_PARAMETER, Double.toString(this.initialRedNormalRoute));
 		}
-		config.addModule(CONFIG_MODULE, module);
+		config.addModule(module);
 	}
 
 

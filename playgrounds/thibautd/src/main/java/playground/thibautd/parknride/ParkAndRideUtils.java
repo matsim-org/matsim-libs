@@ -66,7 +66,7 @@ public class ParkAndRideUtils {
 	 * convenience method which adds pnr related config group(s)
 	 */
 	public static void setConfigGroup(final Config config) {
-		config.addModule( ParkAndRideConfigGroup.GROUP_NAME , new ParkAndRideConfigGroup() );
+		config.addModule( new ParkAndRideConfigGroup() );
 	}
 
 	/**

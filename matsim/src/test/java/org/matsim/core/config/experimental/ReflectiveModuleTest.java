@@ -48,7 +48,7 @@ public class ReflectiveModuleTest {
 		dumpedModule.setCoordField( new CoordImpl( 265 , 463 ) );
 
 		final Config dumpedConfig = new Config();
-		dumpedConfig.addModule( TestModule.GROUP_NAME , dumpedModule );
+		dumpedConfig.addModule( dumpedModule );
 
 		final String fileName = utils.getOutputDirectory() + "/dump.xml";
 
@@ -56,7 +56,7 @@ public class ReflectiveModuleTest {
 		final Config readConfig = ConfigUtils.loadConfig( fileName );
 		final TestModule readModule = new TestModule();
 		// ass a side effect, this loads the information
-		readConfig.addModule( TestModule.GROUP_NAME , readModule );
+		readConfig.addModule( readModule );
 
 		assertSame( dumpedModule , readModule );
 	}

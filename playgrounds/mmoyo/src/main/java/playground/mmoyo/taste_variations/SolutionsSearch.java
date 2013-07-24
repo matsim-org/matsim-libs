@@ -117,7 +117,7 @@ public class SolutionsSearch {
 		}
 		//create cadyts context
 		CadytsPtConfigGroup ccc = new CadytsPtConfigGroup() ;
-		config.addModule(CadytsPtConfigGroup.GROUP_NAME, ccc) ;
+		config.addModule(ccc) ;
 		ccc.setPreparatoryIterations(rndRouterIterations);
 		ccc.setUseBruteForce(true);
 		final CadytsContext cContext = new CadytsContext( config ) ;

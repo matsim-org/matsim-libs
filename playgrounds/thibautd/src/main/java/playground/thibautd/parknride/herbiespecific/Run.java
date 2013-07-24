@@ -49,7 +49,7 @@ public class Run {
 
 		Config config = ConfigUtils.createConfig();
 		ParkAndRideUtils.setConfigGroup( config );
-		config.addModule( HerbieConfigGroup.GROUP_NAME , new HerbieConfigGroup() );
+		config.addModule( new HerbieConfigGroup() );
 		ConfigUtils.loadConfig( config , configFile );
 
 		Scenario scenario = ParkAndRideUtils.loadScenario( config );

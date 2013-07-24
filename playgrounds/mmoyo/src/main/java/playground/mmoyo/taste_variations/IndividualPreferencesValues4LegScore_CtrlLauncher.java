@@ -59,7 +59,7 @@ public class IndividualPreferencesValues4LegScore_CtrlLauncher {
 		controler.setOverwriteFiles(true);
 		
 		CadytsPtConfigGroup ccc = new CadytsPtConfigGroup() ;
-		controler.getConfig().addModule(CadytsPtConfigGroup.GROUP_NAME, ccc) ;
+		controler.getConfig().addModule(ccc) ;
 		
 		//Add an event handler and special leg scoring that calculates pt legs distances because the normal CharyparNagelLegScoring does not handle them
 		final IndividualPTvaluesFromEvents indptValues = new IndividualPTvaluesFromEvents(controler.getScenario().getTransitSchedule(), controler.getScenario().getNetwork());

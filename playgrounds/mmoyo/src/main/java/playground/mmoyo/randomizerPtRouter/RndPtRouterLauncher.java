@@ -75,7 +75,7 @@ public class RndPtRouterLauncher {
 		Config config = ConfigUtils.loadConfig(configFile) ;
 		
 		CadytsPtConfigGroup ccc = new CadytsPtConfigGroup() ;
-		config.addModule(CadytsPtConfigGroup.GROUP_NAME, ccc) ;
+		config.addModule(ccc) ;
 		
 		int lastStrategyIdx = config.strategy().getStrategySettings().size() ;
 		if ( lastStrategyIdx >= 1 ) {

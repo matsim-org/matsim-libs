@@ -61,7 +61,7 @@ public final class FlexibleTransportControler extends Controler
    super(args);
 //
    //super.config.addModule(KtiConfigGroup.GROUP_NAME, this.ktiConfigGroup);
-   super.config.addModule(FtConfigGroup.GROUP_NAME, this.ftConfigGroup);
+   super.config.addModule(this.ftConfigGroup);
 //
     ((PopulationFactoryImpl) this.getPopulation().getFactory()).setRouteFactory(MyTransportMode.car, new KtiLinkNetworkRouteFactory(getNetwork(), new PlanomatConfigGroup()));
     ((PopulationFactoryImpl) this.getPopulation().getFactory()).setRouteFactory(MyTransportMode.pt, new FtCarSharingRouteFactory(this.plansCalcRouteFtInfo));

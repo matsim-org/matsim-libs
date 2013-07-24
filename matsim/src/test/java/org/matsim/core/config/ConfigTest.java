@@ -34,7 +34,7 @@ public class ConfigTest {
 		Config config = new Config();
 		ConfigTestGroup group = new ConfigTestGroup();
 
-		config.addModule(ConfigTestGroup.GROUP_NAME, group);
+		config.addModule(group);
 
 		Assert.assertNull(group.getA());
 		Assert.assertNull(group.getB());
@@ -76,7 +76,7 @@ public class ConfigTest {
 		Assert.assertNull(group.getA());
 		Assert.assertNull(group.getB());
 
-		config.addModule(ConfigTestGroup.GROUP_NAME, group);
+		config.addModule(group);
 
 		Assert.assertEquals("aaa", group.getA());
 		Assert.assertEquals("bbb", group.getB());

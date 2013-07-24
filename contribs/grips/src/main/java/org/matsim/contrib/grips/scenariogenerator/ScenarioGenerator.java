@@ -107,7 +107,7 @@ public class ScenarioGenerator {
 		try {
 			this.c = ConfigUtils.createConfig();
 			GripsConfigModule gcm = new GripsConfigModule("grips");
-			this.c.addModule("grips", gcm);
+			this.c.addModule(gcm);
 
 			this.c.global().setCoordinateSystem("EPSG:3395");
 
@@ -128,7 +128,7 @@ public class ScenarioGenerator {
 		
 		QSimConfigGroup qsim = new QSimConfigGroup();
 		qsim.setEndTime(30*3600);
-		this.c.addModule("qsim", qsim);
+		this.c.addModule(qsim);
 		
 		this.c.timeAllocationMutator().setMutationRange(0.);
 

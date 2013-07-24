@@ -77,7 +77,7 @@ public class TransitControler extends Controler {
 
 	private final void init() {
 		if (this.config.getModule(TransitConfigGroup.GROUP_NAME) == null) {
-			this.config.addModule(TransitConfigGroup.GROUP_NAME, this.transitConfig);
+			this.config.addModule(this.transitConfig);
 		} else {
 			// this would not be necessary if TransitConfigGroup is part of core config
 			Module oldModule = this.config.getModule(TransitConfigGroup.GROUP_NAME);

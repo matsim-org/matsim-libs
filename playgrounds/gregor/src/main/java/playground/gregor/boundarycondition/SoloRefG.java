@@ -141,7 +141,7 @@ public class SoloRefG {
 		
 		QSimConfigGroup qsim = new QSimConfigGroup();
 		qsim.setEndTime(2*3600);
-		c.addModule("qsim", qsim);
+		c.addModule(qsim);
 		c.controler().setMobsim("hybridQ2D");
 		
 		c.global().setCoordinateSystem("EPSG:3395");

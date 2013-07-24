@@ -55,7 +55,7 @@ public class HerbieControler extends Controler {
 	
 	public HerbieControler(String[] args) {
 		super(args);
-		super.config.addModule(HerbieConfigGroup.GROUP_NAME, this.herbieConfigGroup);
+		super.config.addModule(this.herbieConfigGroup);
 		super.setOverwriteFiles(true);
 	}
 

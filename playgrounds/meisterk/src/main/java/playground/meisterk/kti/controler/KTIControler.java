@@ -64,7 +64,7 @@ public class KTIControler extends Controler {
 	public KTIControler(String[] args) {
 		super(args);
 
-		super.config.addModule(KtiConfigGroup.GROUP_NAME, this.ktiConfigGroup);
+		super.config.addModule(this.ktiConfigGroup);
 
 		((PopulationFactoryImpl) this.getPopulation().getFactory()).setRouteFactory(TransportMode.car, new KtiLinkNetworkRouteFactory(this.getNetwork(), new PlanomatConfigGroup()));
 		((PopulationFactoryImpl) this.getPopulation().getFactory()).setRouteFactory(TransportMode.pt, new KtiPtRouteFactory(this.plansCalcRouteKtiInfo));

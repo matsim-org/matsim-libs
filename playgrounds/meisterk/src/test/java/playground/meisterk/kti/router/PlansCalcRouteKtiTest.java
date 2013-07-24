@@ -55,7 +55,7 @@ public class PlansCalcRouteKtiTest extends MatsimTestCase {
 		ktiConfigGroup.setPtHaltestellenFilename(this.getClassInputDirectory() + "haltestellen.txt");
 		ktiConfigGroup.setPtTraveltimeMatrixFilename(this.getClassInputDirectory() + "pt_Matrix.mtx");
 		ktiConfigGroup.setWorldInputFilename(this.getClassInputDirectory() + "world.xml");
-		config.addModule(KtiConfigGroup.GROUP_NAME, ktiConfigGroup);
+		config.addModule(ktiConfigGroup);
 
 		network = NetworkImpl.createNetwork();
 

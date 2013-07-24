@@ -51,7 +51,7 @@ public class KtiPtRouteTest extends MatsimTestCase {
 		ktiConfigGroup.setPtTraveltimeMatrixFilename(this.getClassInputDirectory() + "pt_Matrix.mtx");
 		ktiConfigGroup.setWorldInputFilename(this.getClassInputDirectory() + "world.xml");
 		ktiConfigGroup.setIntrazonalPtSpeed(10.0);
-		config.addModule(KtiConfigGroup.GROUP_NAME, ktiConfigGroup);
+		config.addModule(ktiConfigGroup);
 
 		NetworkImpl dummyNetwork = NetworkImpl.createNetwork();
 		dummyNetwork.createAndAddNode(new IdImpl("1000"), new CoordImpl(900.0, 900.0));

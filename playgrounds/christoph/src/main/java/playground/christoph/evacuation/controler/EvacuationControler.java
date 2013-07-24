@@ -266,7 +266,7 @@ public class EvacuationControler extends WithinDayController implements
 		 */
 		Module module = this.config.getModule(KtiConfigGroup.GROUP_NAME);
 		this.config.removeModule(KtiConfigGroup.GROUP_NAME);
-		this.config.addModule(KtiConfigGroup.GROUP_NAME, this.ktiConfigGroup);
+		this.config.addModule(this.ktiConfigGroup);
 		
 		for (Entry<String, String> entry : module.getParams().entrySet()) {
 			this.ktiConfigGroup.addParam(entry.getKey(), entry.getValue());

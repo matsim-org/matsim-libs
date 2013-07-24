@@ -38,7 +38,7 @@ public class Run {
 		String configFile = args[ 0 ];
 
 		Config config = ConfigUtils.createConfig();
-		config.addModule( HerbieConfigGroup.GROUP_NAME , new HerbieConfigGroup() );
+		config.addModule( new HerbieConfigGroup() );
 		HitchHikingUtils.loadConfig( config , configFile );
 		Scenario sc = HitchHikingUtils.loadScenario( config );
 

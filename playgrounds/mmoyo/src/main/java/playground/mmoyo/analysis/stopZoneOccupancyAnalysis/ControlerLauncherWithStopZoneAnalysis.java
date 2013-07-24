@@ -41,7 +41,7 @@ public class ControlerLauncherWithStopZoneAnalysis {
 		controler.setOverwriteFiles(true);
 		
 		CadytsPtConfigGroup ccg = new CadytsPtConfigGroup() ;
-		config.addModule(CadytsPtConfigGroup.GROUP_NAME, ccg) ;
+		config.addModule(ccg) ;
 		
 		//add analyzer for specific bus line and stop Zone conversion
 		CtrlListener4configurableOcuppAnalysis ctrlListener4configurableOcuppAnalysis = new CtrlListener4configurableOcuppAnalysis(controler);

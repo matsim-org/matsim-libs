@@ -52,7 +52,7 @@ public class AnalysisLauncher {
 		//load calibrated lines and TimeBinSize from config
 		final Config config = ConfigUtils.loadConfig(configFile);
 		CadytsPtConfigGroup cadytsConfig = new CadytsPtConfigGroup();
-		config.addModule(CadytsPtConfigGroup.GROUP_NAME, cadytsConfig);
+		config.addModule(cadytsConfig);
 		
 		//read events
 		ConfigurableOccupancyAnalyzer occupancyAnalyzerAllDay = new ConfigurableOccupancyAnalyzer(cadytsConfig.getCalibratedLines(), cadytsConfig.getTimeBinSize());

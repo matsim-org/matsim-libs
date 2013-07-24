@@ -61,7 +61,7 @@ public class IndividualPreferencesLegScoreFunction_CtrlLauncher {
 		controler.setOverwriteFiles(true);
 		
 		CadytsPtConfigGroup ccc = new CadytsPtConfigGroup() ;
-		controler.getConfig().addModule(CadytsPtConfigGroup.GROUP_NAME, ccc) ;
+		controler.getConfig().addModule(ccc) ;
 		
 		
 		//leg scoring based on data obtained with least square calculation of individual preferences 
