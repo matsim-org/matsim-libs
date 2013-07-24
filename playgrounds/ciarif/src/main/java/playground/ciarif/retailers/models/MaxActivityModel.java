@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -16,6 +17,7 @@ import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PersonImpl;
+
 import playground.ciarif.retailers.data.LinkRetailersImpl;
 import playground.ciarif.retailers.data.PersonPrimaryActivity;
 import playground.ciarif.retailers.data.PersonRetailersImpl;
@@ -64,7 +66,7 @@ public class MaxActivityModel extends RetailerModelImpl
 
       int globalShopsCapacity = 0;
       for (ActivityFacility shop : shops) {
-        globalShopsCapacity = (int)(globalShopsCapacity + ((ActivityOption)shop.getActivityOptions().get("shopgrocery")).getCapacity().doubleValue());
+        globalShopsCapacity = (int)(globalShopsCapacity + ((ActivityOption)shop.getActivityOptions().get("shopgrocery")).getCapacity());
       }
       log.info("primaryActivities = " + primaryActivities.size());
       log.info("globalShopsCapacity = " + globalShopsCapacity);

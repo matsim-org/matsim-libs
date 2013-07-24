@@ -93,7 +93,7 @@ public class ActivityOptionImpl implements ActivityOption {
 	}
 
 	@Override
-	public final void setCapacity(Double capacity) {
+	public final void setCapacity(double capacity) {
 		if (capacity < 0) {
 			throw new NumberFormatException("A capacity of an activity must be >= 0.");
 		}
@@ -123,7 +123,7 @@ public class ActivityOptionImpl implements ActivityOption {
 	}
 
 	@Override
-	public final Double getCapacity() {
+	public final double getCapacity() {
 		return this.capacity;
 	}
 

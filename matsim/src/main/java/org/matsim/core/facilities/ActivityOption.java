@@ -31,9 +31,9 @@ import org.matsim.core.facilities.OpeningTime.DayType;
  */
 public interface ActivityOption extends MatsimFacilitiesObject {
 
-	public Double getCapacity();
+	public double getCapacity();
 
-	public void setCapacity(Double cap);
+	public void setCapacity(double cap);
 
 	public void addOpeningTime(OpeningTime openingTime);
 

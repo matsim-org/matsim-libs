@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -17,6 +18,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
+
 import playground.ciarif.retailers.data.LinkRetailersImpl;
 import playground.ciarif.retailers.data.Retailer;
 import playground.ciarif.retailers.data.Retailers;
@@ -146,7 +148,7 @@ public class LinksRetailerReader
         for (ActivityFacility facility : facilities)
         {
           if (facility.getActivityOptions().get("shopgrocery") != null) {
-            double shopCapacity = ((ActivityOption)facility.getActivityOptions().get("shopgrocery")).getCapacity().doubleValue();
+            double shopCapacity = ((ActivityOption)facility.getActivityOptions().get("shopgrocery")).getCapacity();
             globalCapacity += shopCapacity;
           }
         }
@@ -205,7 +207,7 @@ public class LinksRetailerReader
         int numberShops = 0;
         for (ActivityFacility facility : facilities) {
           if (facility.getActivityOptions().get("shopgrocery") != null) {
-            double shopCapacity = ((ActivityOption)facility.getActivityOptions().get("shopgrocery")).getCapacity().doubleValue();
+            double shopCapacity = ((ActivityOption)facility.getActivityOptions().get("shopgrocery")).getCapacity();
             globalCapacity += shopCapacity;
             numberShops = numberShops+1;
           }

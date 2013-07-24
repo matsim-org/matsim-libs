@@ -224,7 +224,7 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 
 		int[] dist_sum = new int[facs.size()];
 		ActivityOptionImpl activityOption = (ActivityOptionImpl) facs.get(0).getActivityOptions().get(act_type);
-		dist_sum[0] = activityOption.getCapacity().intValue();
+		dist_sum[0] = (int) activityOption.getCapacity();
 		if ((dist_sum[0] <= 0) || (dist_sum[0] == Integer.MAX_VALUE)) {
 			dist_sum[0] = 1;
 			activityOption.setCapacity((double) 1);
@@ -232,7 +232,7 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 		int n = facs.size();
 		for (int i=1; i<n; i++) {
 			ActivityOptionImpl activityOption2 = (ActivityOptionImpl) facs.get(i).getActivityOptions().get(act_type);
-			int val = activityOption2.getCapacity().intValue();
+			int val = (int) activityOption2.getCapacity();
 			if ((val <= 0) || (val == Integer.MAX_VALUE)) {
 				val = 1;
 				activityOption2.setCapacity((double) 1);

@@ -123,11 +123,11 @@ public class GravityModelRetailerStrategy extends RetailerStrategyImpl
       for (ActivityFacilityImpl aaff : this.shops.values()) {
         dist2 = aaff.calcDistance(((PlanImpl)c.getPerson().getSelectedPlan()).getFirstActivity().getCoord());
         sumDist += dist2;
-        dim = ((ActivityOptionImpl)aaff.getActivityOptions().get("shopgrocery")).getCapacity().doubleValue();
+        dim = ((ActivityOptionImpl)aaff.getActivityOptions().get("shopgrocery")).getCapacity();
         sumDim += dim;
       }
       variables_matrix.set(consumer_index, 0, Math.log(dist1 / sumDist / this.shops.size()));
-      variables_matrix.set(consumer_index, 1, Math.log(((ActivityOptionImpl)af.getActivityOptions().get("shopgrocery")).getCapacity().doubleValue() / sumDim / this.shops.size()));
+      variables_matrix.set(consumer_index, 1, Math.log(((ActivityOptionImpl)af.getActivityOptions().get("shopgrocery")).getCapacity() / sumDim / this.shops.size()));
     }
 
     log.info("A 'zero distance' has been detected and modified, in " + cases + " cases");

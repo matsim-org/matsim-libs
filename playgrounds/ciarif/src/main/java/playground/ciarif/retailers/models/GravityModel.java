@@ -2,28 +2,24 @@ package playground.ciarif.retailers.models;
 
 import java.util.ArrayList;
 import java.util.Map;
-import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
+
 import playground.ciarif.retailers.data.PersonRetailersImpl;
 import playground.ciarif.retailers.data.RetailZone;
 import playground.ciarif.retailers.data.RetailZones;
@@ -101,7 +97,7 @@ public class GravityModel extends RetailerModelImpl
         if (dist1 == 0.0D) {
           dist1 = 10.0D;
         }
-        pers_potential = Math.pow(dist1, this.betas[0]) + Math.pow(((ActivityOption)c.getActivityOptions().get("shopgrocery")).getCapacity().doubleValue(), this.betas[1]);
+        pers_potential = Math.pow(dist1, this.betas[0]) + Math.pow(((ActivityOption)c.getActivityOptions().get("shopgrocery")).getCapacity(), this.betas[1]);
 
         if (pr.getGlobalShopsUtility() == 0.0D) {
           processPerson();
@@ -130,7 +126,7 @@ public class GravityModel extends RetailerModelImpl
               ++count;
             }
 
-            double potential = Math.pow(dist, this.betas[0]) + Math.pow(((ActivityOption)s.getActivityOptions().get("shopgrocery")).getCapacity().doubleValue(), this.betas[1]);
+            double potential = Math.pow(dist, this.betas[0]) + Math.pow(((ActivityOption)s.getActivityOptions().get("shopgrocery")).getCapacity(), this.betas[1]);
 
             pers_sum_potential += potential;
           }
@@ -197,7 +193,7 @@ public class GravityModel extends RetailerModelImpl
           if (dist1 == 0.0D) {
             dist1 = 10.0D;
           }
-          pers_potential = Math.pow(dist1, this.betas[0]) + Math.pow(((ActivityOption)c.getActivityOptions().get("shopgrocery")).getCapacity().doubleValue(), this.betas[1]);
+          pers_potential = Math.pow(dist1, this.betas[0]) + Math.pow(((ActivityOption)c.getActivityOptions().get("shopgrocery")).getCapacity(), this.betas[1]);
 
           if (pr.getGlobalShopsUtility() == 0.0D) {
             processPerson();
@@ -227,7 +223,7 @@ public class GravityModel extends RetailerModelImpl
                 ++count;
               }
 
-              double potential = Math.pow(dist, this.betas[0]) + Math.pow(((ActivityOption)s.getActivityOptions().get("shopgrocery")).getCapacity().doubleValue(), this.betas[1]);
+              double potential = Math.pow(dist, this.betas[0]) + Math.pow(((ActivityOption)s.getActivityOptions().get("shopgrocery")).getCapacity(), this.betas[1]);
 
               pers_sum_potential += potential;
             }

@@ -198,7 +198,7 @@ public class PersonSetSecLoc extends AbstractPersonAlgorithm implements PlanAlgo
 		Iterator<ActivityFacilityImpl> f_it = fs.iterator();
 		ActivityFacilityImpl f = f_it.next();
 		ActivityOptionImpl activityOption = (ActivityOptionImpl) f.getActivityOptions().get(act_type);
-		dist_sum[i] = activityOption.getCapacity().intValue();
+		dist_sum[i] = (int) activityOption.getCapacity();
 		if ((dist_sum[i] == 0) || (dist_sum[i] == Integer.MAX_VALUE)) {
 			dist_sum[i] = 1;
 			activityOption.setCapacity((double) 1);
@@ -206,7 +206,7 @@ public class PersonSetSecLoc extends AbstractPersonAlgorithm implements PlanAlgo
 		while (f_it.hasNext()) {
 			f = f_it.next();
 			i++;
-			int val = activityOption.getCapacity().intValue();
+			int val = (int) activityOption.getCapacity();
 			if ((val == 0) || (val == Integer.MAX_VALUE)) {
 				val = 1;
 				activityOption.setCapacity((double) 1);
