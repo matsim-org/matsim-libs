@@ -179,7 +179,7 @@ public class BeingTogetherScoring {
 	// /////////////////////////////////////////////////////////////////////////
 	public void handleEvent(final Event event) {
 		if (event instanceof AgentDepartureEvent) startMode( (AgentDepartureEvent) event );
-		if (event instanceof AgentArrivalEvent) endMode( (AgentDepartureEvent) event );
+		if (event instanceof AgentArrivalEvent) endMode( (AgentArrivalEvent) event );
 		if (event instanceof ActivityStartEvent) startAct( (ActivityStartEvent) event );
 		if (event instanceof ActivityEndEvent) endAct( (ActivityEndEvent) event );
 		if (event instanceof PersonEntersVehicleEvent) enterVehicle( (PersonEntersVehicleEvent) event );
@@ -191,7 +191,7 @@ public class BeingTogetherScoring {
 		currentModeOfRelevantAgents.put( event.getPersonId() , event.getLegMode() );
 	}
 
-	private void endMode(final AgentDepartureEvent event) {
+	private void endMode(final AgentArrivalEvent event) {
 		// no need to check if "relevant agent" here
 		currentModeOfRelevantAgents.remove( event.getPersonId() );
 	}
