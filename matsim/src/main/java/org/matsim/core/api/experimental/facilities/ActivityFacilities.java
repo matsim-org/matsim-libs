@@ -25,7 +25,15 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
+/**
+ * Root class for activity facilities.
+ *
+ * @author mrieser / Senozon AG
+ */
 public interface ActivityFacilities extends MatsimToplevelContainer {
+
+	@Override
+	public ActivityFacilitiesFactory getFactory();
 
 	public Map<Id, ? extends ActivityFacility> getFacilities();
 
