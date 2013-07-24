@@ -17,4 +17,12 @@
 		<lanes type="scaleFactor" value="3.0"/>
 	</networkChangeEvent>
 
+	<networkChangeEvent startTime="25:00:00">
+		<link refId="2"/>
+		<link refId="1"/>
+		<flowCapacity type="absolute" value="1.5"/>
+		<freespeed type="scaleFactor" value="36.11"/>
+		<lanes type="scaleFactor" value="3.0"/>
+	</networkChangeEvent>
+
 </networkChangeEvents>
