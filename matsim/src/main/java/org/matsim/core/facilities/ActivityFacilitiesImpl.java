@@ -132,7 +132,7 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, BasicLocation
 	public void addActivityFacility(ActivityFacility facility) {
 		// validation
 		if (this.facilities.containsKey(facility.getId())) {
-			throw new IllegalArgumentException("Facility with id=" + id + " already exists.");
+			throw new IllegalArgumentException("Facility with id=" + facility.getId() + " already exists.");
 		}
 
 		this.facilities.put(facility.getId(),facility);
