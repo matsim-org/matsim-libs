@@ -44,6 +44,8 @@ import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.utils.misc.Time;
 
+import playground.thibautd.scoring.BeingTogetherScoring.Filter;
+import playground.thibautd.scoring.BeingTogetherScoring.AcceptAllFilter;
 import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.utils.MapUtils;
 
@@ -54,8 +56,13 @@ public class FireMoneyEventsForUtilityOfBeingTogether implements
 		PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, ActivityStartEventHandler, ActivityEndEventHandler,
 		AgentDepartureEventHandler, AgentArrivalEventHandler,
 		AfterMobsimListener {
+
 	private final double marginalUtilityOfTime;
 	private final double marginalUtilityOfMoney;
+
+	private final Filter actTypeFilter;
+	private final Filter modeFilter;
+
 	private final SocialNetwork socialNetwork;
 	private final Map<Id, BeingTogetherScoring> scorings = new HashMap<Id, BeingTogetherScoring>();
 
@@ -66,6 +73,23 @@ public class FireMoneyEventsForUtilityOfBeingTogether implements
 			final double marginalUtilityOfTime,
 			final double marginalUtilityOfMoney,
 			final SocialNetwork socialNetwork) {
+		this( events,
+				new AcceptAllFilter(),
+				new AcceptAllFilter(),
+				marginalUtilityOfTime,
+				marginalUtilityOfMoney,
+				socialNetwork );
+	}
+
+	public FireMoneyEventsForUtilityOfBeingTogether(
+			final EventsManager events,
+			final Filter actTypeFilter,
+			final Filter modeFilter,
+			final double marginalUtilityOfTime,
+			final double marginalUtilityOfMoney,
+			final SocialNetwork socialNetwork) {
+		this.actTypeFilter = actTypeFilter;
+		this.modeFilter = modeFilter;
 		this.events = events;
 		this.marginalUtilityOfTime = marginalUtilityOfTime;
 		this.marginalUtilityOfMoney = marginalUtilityOfMoney;
@@ -119,6 +143,8 @@ public class FireMoneyEventsForUtilityOfBeingTogether implements
 							@Override
 							public BeingTogetherScoring create() {
 								return new BeingTogetherScoring(
+										actTypeFilter,
+										modeFilter,
 										marginalUtilityOfTime,
 										finalId,
 										socialNetwork.getAlters( finalId ) );
