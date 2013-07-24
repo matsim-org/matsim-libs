@@ -38,15 +38,13 @@ import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
 import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
-import org.matsim.core.scoring.ScoringFunctionAccumulator.ArbitraryEventScoring;
-
 import playground.thibautd.utils.MapUtils;
 import playground.thibautd.utils.MapUtils.Factory;
 
 /**
  * @author thibautd
  */
-public class BeingTogetherScoring implements ArbitraryEventScoring {
+public class BeingTogetherScoring {
 	private final double marginalUtilityOfTime;
 	private final Id ego;
 	private final Set<Id> alters;
@@ -67,8 +65,6 @@ public class BeingTogetherScoring implements ArbitraryEventScoring {
 	private final Map<Id, IntervalsAtLocation> intervalsPerAlter = new HashMap<Id, IntervalsAtLocation>();
 
 	private final Map<Id, String> currentModeOfRelevantAgents = new HashMap<Id, String>();
-
-	private boolean wasReset = false;
 
 	public BeingTogetherScoring(
 			final double marginalUtilityOfTime,
@@ -130,13 +126,7 @@ public class BeingTogetherScoring implements ArbitraryEventScoring {
 	// /////////////////////////////////////////////////////////////////////////
 	// basic scoring
 	// /////////////////////////////////////////////////////////////////////////
-	@Override
-	public void finish() {}
-
-	@Override
 	public double getScore() {
-		if ( wasReset ) throw new IllegalArgumentException();
-	
 		double accumulatedTimePassedTogether = 0;
 		for ( Map.Entry<Location, WrappedAroundIntervalSequence> e : intervalsForEgo.map.entrySet() ) {
 			final Location location = e.getKey();
@@ -184,15 +174,9 @@ public class BeingTogetherScoring implements ArbitraryEventScoring {
 		return Math.max( endOverlap - startOverlap , 0 );
 	}
 
-	@Override
-	public void reset() {
-		wasReset = true;
-	}
-
 	// /////////////////////////////////////////////////////////////////////////
 	// event handling
 	// /////////////////////////////////////////////////////////////////////////
-	@Override
 	public void handleEvent(final Event event) {
 		if (event instanceof AgentDepartureEvent) startMode( (AgentDepartureEvent) event );
 		if (event instanceof AgentArrivalEvent) endMode( (AgentDepartureEvent) event );

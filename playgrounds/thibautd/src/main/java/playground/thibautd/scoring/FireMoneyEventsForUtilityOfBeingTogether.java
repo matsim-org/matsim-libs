@@ -140,7 +140,6 @@ public class FireMoneyEventsForUtilityOfBeingTogether implements
 			final Id id = e.getKey();
 			final BeingTogetherScoring scoring = e.getValue();
 
-			scoring.finish();
 			events.processEvent(
 					events.getFactory().createAgentMoneyEvent(
 						Time.MIDNIGHT,
