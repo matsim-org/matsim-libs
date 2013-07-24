@@ -49,6 +49,7 @@ import org.matsim.pt.PtConstants;
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
 import playground.ivt.kticompatibility.KtiPtRoutingModule;
 import playground.ivt.kticompatibility.KtiPtRoutingModule.KtiPtRoutingModuleInfo;
+import playground.thibautd.scoring.BeingTogetherScoring;
 import playground.thibautd.scoring.FireMoneyEventsForUtilityOfBeingTogether;
 import playground.thibautd.scoring.KtiScoringFunctionFactoryWithJointModes;
 import playground.thibautd.socnetsim.cliques.config.CliquesConfigGroup;
@@ -274,6 +275,8 @@ public class RunCliquesWithHardCodedStrategies {
 		final FireMoneyEventsForUtilityOfBeingTogether socialScorer =
 				new FireMoneyEventsForUtilityOfBeingTogether(
 					controllerRegistry.getEvents(),
+					scoringFunctionConf.getActTypeFilterForJointScoring(),
+					scoringFunctionConf.getModeFilterForJointScoring(),
 					scoringFunctionConf.getMarginalUtilityOfBeingTogether_s(),
 					scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney(),
 					toSocialNetwork( cliques ) );
@@ -356,6 +359,13 @@ class ScoringFunctionConfigGroup extends ReflectiveModule {
 	public static final String GROUP_NAME = "scoringFunction";
 	private boolean useKtiScoring = false;
 	private double marginalUtilityOfBeingTogether_h = 0;
+	
+	static enum TogetherScoringType {
+		allModesAndActs,
+		leisureOnly;
+	}
+
+	private TogetherScoringType togetherScoringType = TogetherScoringType.allModesAndActs;
 
 	public ScoringFunctionConfigGroup() {
 		super( GROUP_NAME );
@@ -386,6 +396,42 @@ class ScoringFunctionConfigGroup extends ReflectiveModule {
 		this.marginalUtilityOfBeingTogether_h = marginalUtilityOfBeingTogether_h;
 	}
 
+	@StringGetter( "togetherScoringType" )
+	public TogetherScoringType getTogetherScoringType() {
+		return this.togetherScoringType;
+	}
+
+	@StringSetter( "togetherScoringType" )
+	public void setTogetherScoringType(final String v) {
+		setTogetherScoringType( TogetherScoringType.valueOf( v ) );
+	}
+
+	public void setTogetherScoringType(final TogetherScoringType togetherScoringType) {
+		this.togetherScoringType = togetherScoringType;
+	}
+
+	// I do not like so much this kind of "intelligent" method in Modules...
+	public BeingTogetherScoring.Filter getActTypeFilterForJointScoring() {
+		switch ( togetherScoringType ) {
+			case allModesAndActs:
+				return new BeingTogetherScoring.AcceptAllFilter();
+			case leisureOnly:
+				return new BeingTogetherScoring.AcceptAllInListFilter( "leisure" );
+			default:
+				throw new IllegalStateException( "gné?! "+togetherScoringType );
+		}
+	}
+
+	public BeingTogetherScoring.Filter getModeFilterForJointScoring() {
+		switch ( togetherScoringType ) {
+			case allModesAndActs:
+				return new BeingTogetherScoring.AcceptAllFilter();
+			case leisureOnly:
+				return new BeingTogetherScoring.RejectAllFilter();
+			default:
+				throw new IllegalStateException( "gné?! "+togetherScoringType );
+		}
+	}
 }
 
 class KtiInputFilesConfigGroup extends ReflectiveModule {
