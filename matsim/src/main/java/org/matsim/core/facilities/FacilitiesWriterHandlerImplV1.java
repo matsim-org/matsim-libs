@@ -115,7 +115,7 @@ import org.matsim.core.utils.misc.Time;
 	@Override
 	public void startOpentime(final OpeningTime opentime, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t<opentime");
-		out.write(" day=\"" + opentime.getDay() + "\"");
+		out.write(" day=\"" + ((OpeningTimeImpl) opentime).getDay() + "\"");
 		out.write(" start_time=\"" + Time.writeTime(opentime.getStartTime()) + "\"");
 		out.write(" end_time=\"" + Time.writeTime(opentime.getEndTime()) + "\"");
 		out.write(" />\n");

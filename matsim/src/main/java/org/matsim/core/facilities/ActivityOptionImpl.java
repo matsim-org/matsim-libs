@@ -43,7 +43,7 @@ public class ActivityOptionImpl implements ActivityOption {
 
 	@Override
 	public void addOpeningTime(OpeningTime opentime) {
-		DayType day = opentime.getDay();
+		DayType day = ((OpeningTimeImpl) opentime).getDay();
 		if (!this.opentimes.containsKey(day)) {
 			this.opentimes.put(day,new TreeSet<OpeningTime>());
 		}

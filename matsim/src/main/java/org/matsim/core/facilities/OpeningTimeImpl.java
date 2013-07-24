@@ -20,7 +20,6 @@
 
 package org.matsim.core.facilities;
 
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.misc.Time;
 
 public class OpeningTimeImpl implements OpeningTime {
@@ -28,7 +27,15 @@ public class OpeningTimeImpl implements OpeningTime {
 	private DayType day;
 	private double startTime;
 	private double endTime;
+	
+	public OpeningTimeImpl(final double startTime, final double endTime) {
+		this.day = null;
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.acceptTimes();
+	}
 
+	@Deprecated
 	public OpeningTimeImpl(final DayType day, final double startTime, final double endTime) {
 		this.day = day;
 		this.startTime = startTime;
@@ -117,7 +124,7 @@ public class OpeningTimeImpl implements OpeningTime {
 
 	private final void acceptTimes() {
 		if (this.startTime >= this.endTime) {
-			Gbl.errorMsg(this + "[startTime=" + this.startTime + " >= endTime=" + this.endTime + " not allowed]");
+			throw new RuntimeException(this + "[startTime=" + this.startTime + " >= endTime=" + this.endTime + " not allowed]");
 		}
 	}
 
@@ -137,7 +144,7 @@ public class OpeningTimeImpl implements OpeningTime {
 		this.acceptTimes();
 	}
 	
-	@Override
+	@Deprecated
 	public void setDay(DayType day) {
 		this.day = day;
 	}
@@ -146,7 +153,7 @@ public class OpeningTimeImpl implements OpeningTime {
 	// get methods
 	//////////////////////////////////////////////////////////////////////
 
-	@Override
+	@Deprecated
 	public final DayType getDay() {
 		return this.day;
 	}
