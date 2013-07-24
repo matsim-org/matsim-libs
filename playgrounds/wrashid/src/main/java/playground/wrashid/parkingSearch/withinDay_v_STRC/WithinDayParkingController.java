@@ -34,10 +34,14 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.multimodal.MultiModalControlerListener;
+import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.contrib.multimodal.router.MultimodalTripRouterFactory;
+import org.matsim.contrib.multimodal.tools.MultiModalNetworkCreator;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -67,6 +71,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.withinday.controller.WithinDayControlerListener;
@@ -194,6 +199,12 @@ public class WithinDayParkingController implements StartupListener, ReplanningLi
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
+		
+		// ensure that network is multi-modal
+		if (!NetworkUtils.isMultimodal(event.getControler().getNetwork())) {
+			MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) event.getControler().getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
+			new MultiModalNetworkCreator(multiModalConfigGroup).run(event.getControler().getNetwork());
+		}
 		
 		// connect facilities to network
 		new WorldConnectLocations(this.scenario.getConfig()).
@@ -367,7 +378,8 @@ public class WithinDayParkingController implements StartupListener, ReplanningLi
 			System.out.println("Usage: Controler config-file [dtd-file]");
 			System.out.println("using default config");
 		}
-		final Controler controler = new Controler(args);
+		Config config = ConfigUtils.loadConfig(args[0], MultiModalConfigGroup.class);
+		final Controler controler = new Controler(config);
 		controler.setOverwriteFiles(true);
 		
 		/*
