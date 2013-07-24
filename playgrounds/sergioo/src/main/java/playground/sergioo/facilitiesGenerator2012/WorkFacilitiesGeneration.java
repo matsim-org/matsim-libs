@@ -116,7 +116,7 @@ public class WorkFacilitiesGeneration {
 	private static final String SEPARATOR = ";;;";
 	private static final int NUM_NEAR = 3;
 	private static int NUM_ITERATIONS = 100;
-	
+
 	//Attributes
 
 	//Methods
@@ -170,7 +170,8 @@ public class WorkFacilitiesGeneration {
 					for(int s=0; s<matrix.getDimension(2); s++)
 						pTCapacityFO += matrix.getElement(f, o, s);
 					if(pTCapacityFO>0) {
-						ActivityOption activityOption = new ActivityOptionImpl(optionText, mPArea);
+						ActivityOptionImpl activityOption = new ActivityOptionImpl(optionText);
+						activityOption.setFacility(mPArea);
 						activityOption.setCapacity(pTCapacityFO/mPAreaData.getModeShare());
 						activityOption.addOpeningTime(openingTime);
 						mPArea.getActivityOptions().put(activityOption.getType(), activityOption);
@@ -197,7 +198,8 @@ public class WorkFacilitiesGeneration {
 				for(ActivityOption activityOptionArea:mPArea.getActivityOptions().values()) {
 					double capacity = activityOptionArea.getCapacity()*proportion;
 					if(capacity>0) {
-						ActivityOption activityOption = new ActivityOptionImpl(activityOptionArea.getType(), building);
+						ActivityOptionImpl activityOption = new ActivityOptionImpl(activityOptionArea.getType());
+						activityOption.setFacility(building);
 						activityOption.setCapacity(capacity);
 						activityOption.addOpeningTime(activityOptionArea.getOpeningTimes(DayType.wkday).first());
 						building.getActivityOptions().put(activityOption.getType(), activityOption);
@@ -464,7 +466,7 @@ public class WorkFacilitiesGeneration {
 				String clusterBText = ((int)startTimeB/(15*60))*(15*60)/3600+":"+(((int)startTimeB/(15*60))*(15*60)%3600)/60+"_"+((int)endTimeB/(15*60))*(15*60)/3600+":"+(((int)endTimeB/(15*60))*(15*60)%3600)/60;
 				if(i<j)
 					printWriter.println(clusterAText+"_"+i+" "+clusterBText+"_"+j+" "+clusterA.getCenter().distanceFrom(clusterB.getCenter()));
-				j++;	
+				j++;
 			}
 			i++;
 		}
@@ -566,7 +568,7 @@ public class WorkFacilitiesGeneration {
 				return link.getLength()/WALKING_SPEED;
 			}
 		};
-		TravelTime timeFunction = new TravelTime() {	
+		TravelTime timeFunction = new TravelTime() {
 			@Override
 			public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
 				return link.getLength();
@@ -864,5 +866,5 @@ public class WorkFacilitiesGeneration {
 		System.out.println("Max areas done!");
 		return new Tuple<FittingCapacities, List<Cluster<PointPerson>>>(new FittingCapacities(new int[]{mPAreas.size(),clusters.size(),stopsBase.size()}, weights, quantities, proportions, maxs), clusters) ;
 	}
-	
+
 }

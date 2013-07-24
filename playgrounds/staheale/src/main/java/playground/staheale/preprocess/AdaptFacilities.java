@@ -20,13 +20,10 @@
 
 package playground.staheale.preprocess;
 
-import java.io.BufferedWriter;
 import java.io.IOException;
-
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -34,25 +31,19 @@ import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
-import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTime.DayType;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.core.utils.geometry.CoordUtils;
-import org.matsim.core.utils.io.IOUtils;
-
-import playground.staheale.occupancy.FacilityOccupancy;
 
 public class AdaptFacilities {
 
 	private static Logger log = Logger.getLogger(AdaptFacilities.class);
 	private ScenarioImpl scenario;
-	private CoordImpl ZurichCenter = new CoordImpl(683508.5,246832.9063);
+	private final CoordImpl ZurichCenter = new CoordImpl(683508.5,246832.9063);
 
 	public AdaptFacilities() {
-		super();		
+		super();
 	}
 
 	public static void main(String[] args) throws IOException {
@@ -61,41 +52,45 @@ public class AdaptFacilities {
 	}
 
 	public void run() {
-		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
-		MatsimFacilitiesReader FacReader = new MatsimFacilitiesReader((ScenarioImpl) scenario);  
+		MatsimFacilitiesReader FacReader = new MatsimFacilitiesReader(this.scenario);
 		System.out.println("Reading facilities xml file... ");
 		FacReader.readFile("./input/facilities.xml.gz");
 		System.out.println("Reading facilities xml file...done.");
-		ActivityFacilitiesImpl facilities = ((ScenarioImpl) scenario).getActivityFacilities();
+		ActivityFacilitiesImpl facilities = this.scenario.getActivityFacilities();
 		log.info("Number of facilities: " +facilities.getFacilities().size());
-		
+
 		    for (ActivityFacility f : facilities.getFacilities().values()) {
 		    	if (f.getActivityOptions().containsKey("shop_retail")){
 		    		ActivityFacilityImpl fImpl = (ActivityFacilityImpl) f;
 		    		ActivityOption a = fImpl.getActivityOptions().get("shop_retail");
-		    		double cap = a.getCapacity();
-		    		fImpl.getActivityOptions().put("shop_retail", new ActivityOptionImpl("shop", fImpl));
-		    		
+//		    		double cap = a.getCapacity();
+//		    		fImpl.getActivityOptions().put("shop_retail", new ActivityOptionImpl("shop", fImpl));
+		    		fImpl.addActivityOption(new ActivityOptionImpl("shop"));
+
 					if (a.getOpeningTimes(DayType.mon)!=null) {;}
-					
+
 		    	}
 		    	if (f.getActivityOptions().containsKey("shop_service")){
-		    		ActivityFacilityImpl fImpl = (ActivityFacilityImpl) f;
-		    		fImpl.getActivityOptions().put("shop_service", new ActivityOptionImpl("shop", fImpl));
+//		    		ActivityFacilityImpl fImpl = (ActivityFacilityImpl) f;
+//		    		fImpl.getActivityOptions().put("shop_service", new ActivityOptionImpl("shop", fImpl));
+		    		f.addActivityOption(new ActivityOptionImpl("shop"));
 		    	}
 		    	if (f.getActivityOptions().containsKey("leisure_gastro_culture")){
-		    		ActivityFacilityImpl fImpl = (ActivityFacilityImpl) f;
-		    		fImpl.getActivityOptions().put("leisure_gastro_culture", new ActivityOptionImpl("leisure", fImpl));
+//		    		ActivityFacilityImpl fImpl = (ActivityFacilityImpl) f;
+//		    		fImpl.getActivityOptions().put("leisure_gastro_culture", new ActivityOptionImpl("leisure", fImpl));
+		    		f.addActivityOption(new ActivityOptionImpl("leisure"));
 		    	}
 		    	if (f.getActivityOptions().containsKey("leisure_sports_fun")){
-		    		ActivityFacilityImpl fImpl = (ActivityFacilityImpl) f;
-		    		fImpl.getActivityOptions().put("leisure_sports_fun", new ActivityOptionImpl("leisure", fImpl));
+//		    		ActivityFacilityImpl fImpl = (ActivityFacilityImpl) f;
+//		    		fImpl.getActivityOptions().put("leisure_sports_fun", new ActivityOptionImpl("leisure", fImpl));
+		    		f.addActivityOption(new ActivityOptionImpl("leisure"));
 		    	}
 		    }
-		    
+
 		    new FacilitiesWriter(facilities).write("./output/facilitiesAdapted2013.xml.gz");
-	
+
 
 		//    for (ActivityFacility f : facilities.getFacilitiesForActivityType("shop_retail").values()) {
 		//    	double cap = Math.max(10,Math.round((f.getActivityOptions().get("shop_retail").getCapacity())/10));

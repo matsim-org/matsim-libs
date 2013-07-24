@@ -72,7 +72,7 @@ import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
 public class LocationChoiceIntegrationTest extends MatsimTestCase {
-	
+
 	public void testLocationChoiceJan2013() {
 		//	CONFIG:
 		final Config config = localCreateConfig();
@@ -95,11 +95,11 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		// joint context (based on scenario):
 		final DestinationChoiceBestResponseContext lcContext = new DestinationChoiceBestResponseContext(scenario) ;
 		lcContext.init();
-				
+
 		// CONTROL(L)ER:
 		Controler controler = new Controler(scenario);
 		controler.setOverwriteFiles(true) ;
-		
+
 		ReadOrComputeMaxDCScore computer = new ReadOrComputeMaxDCScore(lcContext);
   		computer.readOrCreateMaxDCScore(controler, lcContext.kValsAreRead());
   		final ObjectAttributes personsMaxDCScoreUnscaled = computer.getPersonsMaxEpsUnscaled();
@@ -107,7 +107,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		// set scoring function factory:
 		controler.setScoringFunctionFactory( new ScoringFunctionFactory(){
 			@Override
-			public ScoringFunction createNewScoringFunction(Plan plan) {		
+			public ScoringFunction createNewScoringFunction(Plan plan) {
 				ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 				scoringFunctionAccumulator.addScoringFunction(new DCActivityWOFacilitiesScoringFunction(plan, lcContext ) );
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(lcContext.getParams(), scenario.getNetwork()));
@@ -115,7 +115,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 				return scoringFunctionAccumulator;
 			}
 		}) ;
-		
+
 		MaxDCScoreWrapper dcScore = new MaxDCScoreWrapper();
 		dcScore.setPersonsMaxDCScoreUnscaled(personsMaxDCScoreUnscaled);
 		controler.getScenario().addScenarioElement(lcContext);
@@ -131,7 +131,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 				// as long as the factories remain anonymous classes, this is most probably ok. kai, feb'13
 			}
 		});
-		
+
 		// this is here only to switch on otfvis if needed:
 //		controler.setMobsimFactory(new FactoryForMobsimWithOTFVis() ) ;
 
@@ -169,11 +169,11 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 
 		final DestinationChoiceBestResponseContext lcContext = new DestinationChoiceBestResponseContext(scenario) ;
 		lcContext.init();
-		
+
 		// CONTROL(L)ER:
 		Controler controler = new Controler(scenario);
 		controler.setOverwriteFiles(true) ;
-		
+
 		ReadOrComputeMaxDCScore computer = new ReadOrComputeMaxDCScore(lcContext);
   		computer.readOrCreateMaxDCScore(controler, lcContext.kValsAreRead());
   		final ObjectAttributes personsMaxDCScoreUnscaled = computer.getPersonsMaxEpsUnscaled();
@@ -183,7 +183,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		scoringFunctionFactory.setUsingConfigParamsForScoring(true) ;
 
 		controler.setScoringFunctionFactory(scoringFunctionFactory);
-		
+
 		MaxDCScoreWrapper dcScore = new MaxDCScoreWrapper();
 		dcScore.setPersonsMaxDCScoreUnscaled(personsMaxDCScoreUnscaled);
 		controler.getScenario().addScenarioElement(lcContext);
@@ -252,13 +252,13 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 				network.addLink(link) ;
 			}
 
-			ActivityFacility facility = scenario.getActivityFacilities().createAndAddFacility(new IdImpl(ii), coord ) ;
-			facility.getActivityOptions().put("work", new ActivityOptionImpl("work", facility)) ;
+			ActivityFacility facility = scenario.getActivityFacilities().createAndAddFacility(new IdImpl(ii), coord);
+			facility.addActivityOption(new ActivityOptionImpl("work"));
 		}
 
 		// create one additional facility for the initial activity:
 		ActivityFacilityImpl facility1 = scenario.getActivityFacilities().createAndAddFacility(new IdImpl(1), new CoordImpl(scale,0) );
-		facility1.getActivityOptions().put("work", new ActivityOptionImpl("work", facility1)) ;
+		facility1.addActivityOption(new ActivityOptionImpl("work"));
 		// (as soon as you set a scoring function that looks if activity types match opportunities at facilities, you can only use
 		// an activity type that indeed is at the facility)
 	}
@@ -273,11 +273,11 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		Node node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(1000, 0));
 		Link link = network.createAndAddLink(new IdImpl(1), node1, node2, 1000, 10, 3600, 1);
 		ActivityFacilityImpl facility1 = scenario.getActivityFacilities().createAndAddFacility(new IdImpl(1), new CoordImpl(0, 500));
-		facility1.getActivityOptions().put("initial-work", new ActivityOptionImpl("initial-work", facility1));
+		facility1.addActivityOption(new ActivityOptionImpl("initial-work"));
 		ActivityFacilityImpl facility2 = scenario.getActivityFacilities().createAndAddFacility(new IdImpl(2), new CoordImpl(0, 400));
-		facility2.getActivityOptions().put("work", new ActivityOptionImpl("work", facility2));
+		facility2.addActivityOption(new ActivityOptionImpl("work"));
 		ActivityFacilityImpl facility3 = scenario.getActivityFacilities().createAndAddFacility(new IdImpl(3), new CoordImpl(0, 300));
-		facility3.getActivityOptions().put("work", new ActivityOptionImpl("work", facility3));
+		facility3.addActivityOption(new ActivityOptionImpl("work"));
 
 		Person person = localCreatePopWOnePerson(scenario, link, facility1, 17.*60.*60.);
 
@@ -292,12 +292,12 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		});
 		// (this is now only necessary since the config for all three tests sets MyLocationChoice instead of LocationChoice. Probably
 		// should pull the best response test away from the other (old) test.  kai, feb'13
-		
+
 		controler.run();
 
 		// test that everything worked as expected
 		// The initial facility is *not* part of the choice set (its supported activity type is called "initial-work" for that reason)
-		// so that the test can notice that there is a difference. In my earlier attempt, the random facility chosen would always be the one 
+		// so that the test can notice that there is a difference. In my earlier attempt, the random facility chosen would always be the one
 		// on which I already am, so the test was no good.
 		// Secondly, I need to give it two facilities to choose from, because a choice set of size 1 is treated specially
 		// (it is assumed that the one element is the one I'm already on, so nothing is done).
@@ -308,7 +308,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		assertTrue(newWork.getFacilityId().equals(new IdImpl(2)) || newWork.getFacilityId().equals(new IdImpl(3)));
 	}
 
-	/** 
+	/**
 	 * setup population with one person
 	 * @param workActEndTime TODO
 	 */
@@ -372,7 +372,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		strategySettings.setModuleName("MyLocationChoice");
 		strategySettings.setProbability(1.0);
 		config.strategy().addStrategySettings(strategySettings);
-		
+
 		config.otfVis().setEffectiveLaneWidth(1.) ;
 		config.getQSimConfigGroup().setLinkWidth((float)1.) ;
 		config.otfVis().setShowTeleportedAgents(true) ;
@@ -380,7 +380,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 
 		return config;
 	}
-	
+
 	class FactoryForMobsimWithOTFVis implements MobsimFactory {
 		@Override
 		public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
@@ -388,7 +388,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(sc.getConfig(), sc, eventsManager, qSim);
 			OTFClientLive.run(sc.getConfig(), server);
 			return qSim ;
-		} 
-	} 
+		}
+	}
 
 }

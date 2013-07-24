@@ -37,7 +37,6 @@ import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
@@ -195,7 +194,8 @@ public class AdaptZHScenario {
 	}
 	
 	private ActivityOptionImpl replaceActOption(String type, ActivityOptionImpl option, ActivityFacility facility) {
-		ActivityOptionImpl optionNew = new ActivityOptionImpl(type, (ActivityFacilityImpl)facility);
+		ActivityOptionImpl optionNew = new ActivityOptionImpl(type);
+		optionNew.setFacility(facility);
 				
 		Map<DayType, SortedSet<OpeningTime>> ot = (Map<DayType, SortedSet<OpeningTime>>) option.getOpeningTimes();
 		optionNew.setOpeningTimes(ot);				

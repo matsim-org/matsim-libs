@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
@@ -46,22 +45,22 @@ import org.matsim.core.utils.collections.QuadTree;
 
 public class FacilitiesAdderAndModifier {
 	private final static Logger log = Logger.getLogger(FacilitiesAdderAndModifier.class);
-	
 
-	public void add(Config config, ScenarioImpl scenario) {	
+
+	public void add(Config config, ScenarioImpl scenario) {
 		new FacilitiesReaderMatsimV1(scenario).readFile(config.getModule("facilities").getValue("inputFacilitiesFile"));
 		this.simplifyTypes(scenario);
-						
+
 		log.info("Adapting plans ... of " + scenario.getPopulation().getPersons().size() + " persons");
 		this.addfacilities2Plans(scenario);
 	}
-	
+
 	private void simplifyTypes(ScenarioImpl scenario) {
 			for (ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values()) {
-			
+
 			Vector<ActivityOption> options = new Vector<ActivityOption>();
 
-			for (ActivityOption option : facility.getActivityOptions().values()) {				
+			for (ActivityOption option : facility.getActivityOptions().values()) {
 				if (option.getType().startsWith("h")) {
 					options.add(this.replaceActOption("h", (ActivityOptionImpl)option, facility));
 				}
@@ -74,29 +73,30 @@ public class FacilitiesAdderAndModifier {
 				else if (option.getType().startsWith("s")) {
 					options.add(this.replaceActOption("s", (ActivityOptionImpl)option, facility));
 				}
-				else if (option.getType().startsWith("l")) { 
+				else if (option.getType().startsWith("l")) {
 					options.add(this.replaceActOption("l", (ActivityOptionImpl)option, facility));
 				}
 				else {
 					options.add(this.replaceActOption("tta", (ActivityOptionImpl)option, facility));
-				}				
+				}
 			}
 			facility.getActivityOptions().clear();
 			for (ActivityOption option : options) {
 				facility.getActivityOptions().put(option.getType(), option);
 			}
-		}	
+		}
 	}
-	
+
 	private ActivityOptionImpl replaceActOption(String type, ActivityOptionImpl option, ActivityFacility facility) {
-		ActivityOptionImpl optionNew = new ActivityOptionImpl(type, (ActivityFacilityImpl)facility);				
-		Map<DayType, SortedSet<OpeningTime>> ot = (Map<DayType, SortedSet<OpeningTime>>) option.getOpeningTimes();
-		optionNew.setOpeningTimes(ot);				
+		ActivityOptionImpl optionNew = new ActivityOptionImpl(type);
+		optionNew.setFacility(facility);
+		Map<DayType, SortedSet<OpeningTime>> ot = option.getOpeningTimes();
+		optionNew.setOpeningTimes(ot);
 		optionNew.setCapacity(option.getCapacity());
 		return optionNew;
 	}
-	
-	private void addfacilities2Plans(ScenarioImpl scenario) {			
+
+	private void addfacilities2Plans(ScenarioImpl scenario) {
 		TreeMap<String, QuadTree<ActivityFacility>> trees = new TreeMap<String, QuadTree<ActivityFacility>>();
 		trees.put("h", this.builFacQuadTree("h", scenario.getActivityFacilities().getFacilitiesForActivityType("h")));
 		trees.put("w", this.builFacQuadTree("w", scenario.getActivityFacilities().getFacilitiesForActivityType("w")));
@@ -104,10 +104,10 @@ public class FacilitiesAdderAndModifier {
 		trees.put("s", this.builFacQuadTree("s", scenario.getActivityFacilities().getFacilitiesForActivityType("s")));
 		trees.put("l", this.builFacQuadTree("l", scenario.getActivityFacilities().getFacilitiesForActivityType("l")));
 		trees.put("tta", this.builFacQuadTree("tta", scenario.getActivityFacilities().getFacilitiesForActivityType("tta")));
-		
+
 		int counter = 0;
 		int nextMsg = 1;
-		for (Person p : scenario.getPopulation().getPersons().values()) {	
+		for (Person p : scenario.getPopulation().getPersons().values()) {
 			Plan plan = p.getSelectedPlan();
 			counter++;
 			if (counter % nextMsg == 0) {
@@ -117,7 +117,7 @@ public class FacilitiesAdderAndModifier {
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Activity) {
 					ActivityImpl act = (ActivityImpl)pe;
-									
+
 					if (act.getType().equals("tta")) {
 						((ActivityImpl)pe).setFacilityId(
 								trees.get("tta").get(act.getCoord().getX(), act.getCoord().getY()).
@@ -132,7 +132,7 @@ public class FacilitiesAdderAndModifier {
 			}
 		}
 	}
-							
+
 	private QuadTree<ActivityFacility> builFacQuadTree(String type, TreeMap<Id,ActivityFacility> facilities_of_type) {
 		Gbl.startMeasurement();
 		log.info(" building " + type + " facility quad tree");

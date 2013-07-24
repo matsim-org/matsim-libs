@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -19,39 +19,35 @@
 
 package org.matsim.core.facilities;
 
-import java.util.SortedSet;
-
-import org.matsim.api.core.v01.Id;
+import org.junit.Assert;
+import org.junit.Test;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.api.internal.MatsimFacilitiesObject;
-import org.matsim.core.facilities.OpeningTime.DayType;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 /**
- * @author dgrether
+ * @author mrieser / Senozon AG
  */
-public interface ActivityOption extends MatsimFacilitiesObject {
+public class ActivityFacilitiesFactoryImplTest {
 
-	public Double getCapacity();
+	@Test
+	public void testCreateActivityFacility() {
+		ActivityFacilitiesFactoryImpl factory = new ActivityFacilitiesFactoryImpl();
+		ActivityFacility facility = factory.createActivityFacility(new IdImpl(1980), new CoordImpl(5, 11));
 
-	public void setCapacity(Double cap);
+		Assert.assertEquals("1980", facility.getId().toString());
+		Assert.assertEquals(5.0, facility.getCoord().getX(), 1e-9);
+		Assert.assertEquals(11.0, facility.getCoord().getY(), 1e-9);
+	}
 
-	public void addOpeningTime(OpeningTime openingTime);
+	@Test
+	public void testCreateActivityOption() {
+		ActivityFacilitiesFactoryImpl factory = new ActivityFacilitiesFactoryImpl();
+		ActivityOption option = factory.createActivityOption("leisure");
 
-	public SortedSet<OpeningTime> getOpeningTimes(DayType day);
-
-	public String getType();
-
-	public ActivityFacility getFacility();
-	
-	/**
-	 * Sets the reference to the facility this activity option belongs to.
-	 * This is done automatically if using {@link ActivityFacility#addActivityOption(ActivityOption)}.
-	 * Make sure that the bidirectional reference is set correctly if you are using this method!
-	 * 
-	 * @param facility
-	 */
-	public void setFacility(final ActivityFacility facility);
-	
-	public Id getFacilityId();
+		Assert.assertEquals("leisure", option.getType());
+		Assert.assertEquals((double) Integer.MAX_VALUE, option.getCapacity(), 1e-9);
+		Assert.assertNull(option.getFacility());
+	}
 
 }

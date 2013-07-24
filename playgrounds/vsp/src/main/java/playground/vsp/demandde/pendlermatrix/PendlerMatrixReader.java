@@ -59,17 +59,17 @@ public class PendlerMatrixReader {
 
 	//	private static final String NODES = "../../shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2004/strasse/knoten_wgs84.csv";
 
-	private Map<Integer, ActivityFacility> facilities = new HashMap<Integer, ActivityFacility>();
+	private final Map<Integer, ActivityFacility> facilities = new HashMap<Integer, ActivityFacility>();
 
 	private TripFlowSink flowSink;
 
-	private String shapeFile;
-	
-	private final Scenario sc ;
+	private final String shapeFile;
+
+	private final Scenario sc;
 
 	public PendlerMatrixReader(String shapeFile) {
 		this.shapeFile = shapeFile;
-		this.sc = ScenarioUtils.createScenario(ConfigUtils.createConfig()) ;
+		this.sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	}
 
 	public void run() {
@@ -77,12 +77,12 @@ public class PendlerMatrixReader {
 		readShape();
 		readMatrix(PV_EINPENDLERMATRIX);
 		readMatrix(PV_AUSPENDLERMATRIX);
-		flowSink.complete();
+		this.flowSink.complete();
 	}
 
 	private void readShape() {
 		Collection<SimpleFeature> landkreise = ShapeFileReader.getAllFeatures(this.shapeFile);
-		ActivityFacilitiesFactory factory = ((ScenarioImpl)sc).getActivityFacilities().getFactory() ;
+		ActivityFacilitiesFactory factory = ((ScenarioImpl)this.sc).getActivityFacilities().getFactory();
 		for (SimpleFeature landkreis : landkreise) {
 			Integer gemeindeschluessel = Integer.parseInt((String) landkreis.getAttribute("gemeindesc"));
 			Geometry geo = (Geometry) landkreis.getDefaultGeometry();
@@ -91,18 +91,18 @@ public class PendlerMatrixReader {
 			Double xcoordinate = coordinate.x;
 			Double ycoordinate = coordinate.y;
 			Coord coord = new CoordImpl(xcoordinate.toString(), ycoordinate.toString());
-			ActivityFacility facility = factory.createActivityFacility(new IdImpl(gemeindeschluessel), coord) ;
+			ActivityFacility facility = factory.createActivityFacility(new IdImpl(gemeindeschluessel), coord);
 			{
-				ActivityOption option = factory.createActivityOption("work", facility ) ;
-				option.setCapacity(1.) ;
-				facility.addActivityOption(option) ;
+				ActivityOption option = factory.createActivityOption("work");
+				option.setCapacity(1.);
+				facility.addActivityOption(option);
 			}
 			{
-				ActivityOption option = factory.createActivityOption("home", facility ) ;
-				option.setCapacity(1.) ;
-				facility.addActivityOption(option) ;
+				ActivityOption option = factory.createActivityOption("home");
+				option.setCapacity(1.);
+				facility.addActivityOption(option);
 			}
-			facilities.put(gemeindeschluessel, facility);
+			this.facilities.put(gemeindeschluessel, facility);
 		}
 	}
 
@@ -148,7 +148,7 @@ public class PendlerMatrixReader {
 	private void readMatrix(final String filename) {
 
 		Logger.getLogger(this.getClass()).warn("this method may read double entries in the Pendlermatrix (such as Nuernberg) twice. " +
-						"If this may be a problem, you need to check.  kai, apr'11" ) ;
+						"If this may be a problem, you need to check.  kai, apr'11");
 
 		System.out.println("======================" + "\n"
 						+ "Start reading " + filename + "\n"
@@ -164,7 +164,7 @@ public class PendlerMatrixReader {
 				if (row[0].startsWith("#")) {
 					return;
 				}
-				Integer quelle = null ;
+				Integer quelle = null;
 				Integer ziel = 0;
 				// car market share for commuter work/education trips (taken from "Regionaler Nahverkehrsplan-Fortschreibung, MVV 2007)
 				double carMarketShare = 0.67;
@@ -174,22 +174,22 @@ public class PendlerMatrixReader {
 				if (filename.equals(PV_EINPENDLERMATRIX)){
 					try {
 						quelle = Integer.parseInt(row[2]);
-						ziel = 9162 ;
+						ziel = 9162;
 
 						int totalTrips = (int) (scaleFactor * Integer.parseInt(row[4]));
-						int workPt = (int) ((1 - carMarketShare) * totalTrips) ;
-						int educationPt = 0 ;
+						int workPt = (int) ((1 - carMarketShare) * totalTrips);
+						int educationPt = 0;
 						int workCar = (int) (carMarketShare * totalTrips);
-						int educationCar = 0 ;
-						String label = row[3] ;
+						int educationCar = 0;
+						String label = row[3];
 						if ( !label.contains("brige ") && !quelle.equals(ziel)) {
 							process(quelle, ziel, workPt, educationPt, workCar, educationCar);
 						} else {
-							System.out.println( " uebrige? : " + label ) ;
+							System.out.println( " uebrige? : " + label);
 						}
-					} catch ( Exception ee ) {
-						System.err.println("we are trying to read quelle: " + quelle ) ;
-						//						System.exit(-1) ;
+					} catch ( Exception ee) {
+						System.err.println("we are trying to read quelle: " + quelle);
+						//						System.exit(-1);
 					}
 				}
 				else if (filename.equals(PV_AUSPENDLERMATRIX)){
@@ -198,23 +198,23 @@ public class PendlerMatrixReader {
 						ziel = Integer.parseInt(row[2]);
 
 						int totalTrips = (int) (scaleFactor * Integer.parseInt(row[4]));
-						int workPt = (int) ((1 - carMarketShare) * totalTrips) ;
-						int educationPt = 0 ;
+						int workPt = (int) ((1 - carMarketShare) * totalTrips);
+						int educationPt = 0;
 						int workCar = (int) (carMarketShare * totalTrips);
-						int educationCar = 0 ;
-						String label = row[3] ;
+						int educationCar = 0;
+						String label = row[3];
 						if ( !label.contains("brige ") && !quelle.equals(ziel)) {
 							process(quelle, ziel, workPt, educationPt, workCar, educationCar);
 						} else {
-							System.out.println( " uebrige? : " + label ) ;
+							System.out.println( " uebrige? : " + label);
 						}
-					} catch ( Exception ee ) {
-						System.err.println("we are trying to read quelle: " + quelle ) ;
-						//						System.exit(-1) ;
+					} catch ( Exception ee) {
+						System.err.println("we are trying to read quelle: " + quelle);
+						//						System.exit(-1);
 					}
 				}
 				else{
-					System.err.println("ATTENTION: check filename!") ;
+					System.err.println("ATTENTION: check filename!");
 				}
 			}
 
@@ -222,8 +222,8 @@ public class PendlerMatrixReader {
 	}
 
 	private void process(int quelle, int ziel, int workPt, int educationPt, int workCar, int educationCar) {
-		Facility source = facilities.get(quelle);
-		Facility sink = facilities.get(ziel);
+		Facility source = this.facilities.get(quelle);
+		Facility sink = this.facilities.get(ziel);
 		if (source == null) {
 			log.error("Unknown source: " + quelle);
 			return;
@@ -232,23 +232,23 @@ public class PendlerMatrixReader {
 			log.error("Unknown sink: " + ziel);
 			return;
 		}
-		int carQuantity = workCar + educationCar ;
+		int carQuantity = workCar + educationCar;
 		int ptQuantity = workPt + educationPt;
 		int scaledCarQuantity = scale(carQuantity);
 		int scaledPtQuantity = scale(ptQuantity);
 
 		if (scaledCarQuantity != 0) {
 			log.info(quelle + "->" + ziel + ": " + scaledCarQuantity + " car trips");
-			flowSink.process(facilities.get(quelle), facilities.get(ziel), scaledCarQuantity, TransportMode.car, "pvWork", 0.0);
+			this.flowSink.process(this.facilities.get(quelle), this.facilities.get(ziel), scaledCarQuantity, TransportMode.car, "pvWork", 0.0);
 		}
 		if (scaledPtQuantity != 0){
 			log.info(quelle + "->" + ziel + ": " + scaledPtQuantity + " pt trips");
-			flowSink.process(facilities.get(quelle), facilities.get(ziel), scaledPtQuantity, TransportMode.pt, "pvWork", 0.0);
+			this.flowSink.process(this.facilities.get(quelle), this.facilities.get(ziel), scaledPtQuantity, TransportMode.pt, "pvWork", 0.0);
 		}
 	}
 
 	private int scale(int quantityOut) {
-		int scaled = (int) (quantityOut * 0.1 );
+		int scaled = (int) (quantityOut * 0.1);
 		return scaled;
 	}
 

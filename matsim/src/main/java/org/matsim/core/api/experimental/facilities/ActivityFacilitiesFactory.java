@@ -33,6 +33,6 @@ public interface ActivityFacilitiesFactory extends MatsimFactory {
 
 	public ActivityFacility createActivityFacility(Id id, Coord coord);
 
-	public ActivityOption createActivityOption(String type, ActivityFacility facility);
+	public ActivityOption createActivityOption(String type);
 
 }

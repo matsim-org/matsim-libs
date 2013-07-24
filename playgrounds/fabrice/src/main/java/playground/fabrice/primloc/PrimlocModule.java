@@ -81,7 +81,6 @@ import playground.balmermi.world.Layer;
 import playground.balmermi.world.World;
 import playground.balmermi.world.Zone;
 import playground.balmermi.world.ZoneLayer;
-
 import Jama.Matrix;
 
 public class PrimlocModule extends AbstractPersonAlgorithm {
@@ -140,7 +139,7 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 			return;
 
 		KnowledgeImpl knowledge = this.knowledges.getKnowledgesByPersonId().get(guy.getId());
-		ActivityFacilityImpl home = knowledge.getActivities("home").get(0).getFacility();
+		ActivityFacility home = knowledge.getActivities("home").get(0).getFacility();
 		Zone homezone = (Zone) zoneLayer.getNearestLocations( home.getCoord(), null).get(0);
 		if( homezone == null )
 			log.warn("Homeless person (poor guy)" );
@@ -172,7 +171,7 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 			// Change the knowledge of the person
 			if( overwriteKnowledge )
 				knowledge.removeActivities( primaryActivityName );
-			knowledge.addActivityOption(new ActivityOptionImpl(primaryActivityName, workplace), true);
+			knowledge.addActivityOption(new ActivityOptionImpl(primaryActivityName), true);
 		}
 	}
 
@@ -297,7 +296,7 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 		// Determine how many employed persons live in each zone
 		for (Person guy : population.getPersons().values())
 			if( agentHasPrimaryActivityInPlan( guy ) ){
-				ActivityFacilityImpl homeOfGuy = this.knowledges.getKnowledgesByPersonId().get(guy.getId()).getActivities("home").get(0).getFacility();
+				ActivityFacility homeOfGuy = this.knowledges.getKnowledgesByPersonId().get(guy.getId()).getActivities("home").get(0).getFacility();
 				ArrayList<? extends BasicLocation> list = zoneLayer.getNearestLocations(homeOfGuy.getCoord(), null);
 				Zone homezone = (Zone) list.get(0);
 				if( homezone == null )

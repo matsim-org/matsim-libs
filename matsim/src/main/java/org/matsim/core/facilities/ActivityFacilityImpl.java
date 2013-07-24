@@ -26,11 +26,13 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.utils.customize.Customizable;
 import org.matsim.utils.customize.CustomizableImpl;
 
+/**
+ * maintainer: mrieser / Senozon AG
+ */
 public class ActivityFacilityImpl implements ActivityFacility {
 	
 	private Customizable customizableDelegate;
@@ -56,7 +58,7 @@ public class ActivityFacilityImpl implements ActivityFacility {
 
 	public final ActivityOptionImpl createActivityOption(final String type) {
 		String type2 = type.intern();
-		ActivityOptionImpl a = new ActivityOptionImpl(type2, this);
+		ActivityOptionImpl a = new ActivityOptionImpl(type2);
 		addActivityOption(a);
 		return a;
 	}
@@ -65,8 +67,12 @@ public class ActivityFacilityImpl implements ActivityFacility {
 	public void addActivityOption(ActivityOption option) {
 		String type = option.getType() ;
 		if (this.activities.containsKey(type)) {
-			Gbl.errorMsg(this + "[type=" + type + " already exists]");
+			throw new RuntimeException(this + "[type=" + type + " already exists]");
 		}
+		if (option.getFacilityId() != null && !option.getFacilityId().equals(this.id)) {
+			throw new RuntimeException("This activity option already belongs to a different ActivityFacility!");
+		}
+		option.setFacility(this);
 		this.activities.put(type, option);
 	}
 	

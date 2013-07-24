@@ -37,8 +37,8 @@ public class ActivityFacilitiesFactoryImpl implements ActivityFacilitiesFactory 
 	}
 
 	@Override
-	public ActivityOption createActivityOption(String type, ActivityFacility facility) {
-		return new ActivityOptionImpl(type, facility);
+	public ActivityOption createActivityOption(String type) {
+		return new ActivityOptionImpl(type);
 	}
 
 }

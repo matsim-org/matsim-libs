@@ -36,7 +36,7 @@ public class CleanPopulation {
 					String type = ((Activity)planElement).getType();
 					if(!options.keySet().contains(type)) {
 						System.out.println(++k+" "+person.getId()+" "+type+" "+facility.getId());
-						options.put(type, new ActivityOptionImpl(type, facility));
+						options.put(type, new ActivityOptionImpl(type));
 					}
 				}
 		(new FacilitiesWriter(((ScenarioImpl)scenario).getActivityFacilities())).write(args[3]);

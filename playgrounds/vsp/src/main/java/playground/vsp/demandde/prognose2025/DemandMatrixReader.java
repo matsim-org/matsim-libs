@@ -35,7 +35,6 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -68,43 +67,43 @@ public class DemandMatrixReader {
 	private static final String ANBINDUNG = "../../shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2004/strasse/anbindung.csv" ;
 	private static final String NODES = "../../shared-svn/studies/countries/de/prognose_2025/orig/netze/netz-2004/strasse/knoten_wgs84.csv" ;
 
-	private Map<Integer, ActivityFacility> facilities = new HashMap<Integer, ActivityFacility>();
+	private final Map<Integer, ActivityFacility> facilities = new HashMap<Integer, ActivityFacility>();
 
 	private TripFlowSink flowSink;
 
-	private String shapeFile;
+	private final String shapeFile;
 
-	private Scenario sc ;
+	private final Scenario sc ;
 
-	private Map<Id, NodesAndDistances> zoneToConnectorsMap = new HashMap<Id,NodesAndDistances>() ;
-	
+	private final Map<Id, NodesAndDistances> zoneToConnectorsMap = new HashMap<Id,NodesAndDistances>();
+
 	class NodesAndDistances {
-		private Map<Id,Double> nodesAndDistances = new HashMap<Id,Double>() ;
+		private final Map<Id,Double> nodesAndDistances = new HashMap<Id,Double>();
 		Map<Id,Double> getNodesAndDistances() {
-			return nodesAndDistances ;
+			return this.nodesAndDistances ;
 		}
 	}
 
 	public DemandMatrixReader(String shapeFile) {
 		this.shapeFile = shapeFile;
-		this.sc = ScenarioUtils.createScenario(ConfigUtils.createConfig()) ;
+		this.sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	}
 
 	public void run() {
 		readNodes();
 		readShape();
-		readAnbindungen() ;
+		readAnbindungen();
 		//		readMatrix(PV_MATRIX);
 		readMatrix(GV_MATRIX);
-		flowSink.complete();
+		this.flowSink.complete();
 	}
 
 	private void readAnbindungen() {
-		TabularFileParserConfig tabFileParserConfig = new TabularFileParserConfig() ;
-		tabFileParserConfig.setFileName(ANBINDUNG) ;
-		tabFileParserConfig.setDelimiterTags(new String[]{";"}) ;
+		TabularFileParserConfig tabFileParserConfig = new TabularFileParserConfig();
+		tabFileParserConfig.setFileName(ANBINDUNG);
+		tabFileParserConfig.setDelimiterTags(new String[]{";"});
 		try {
-			new TabularFileParser().parse(tabFileParserConfig, 
+			new TabularFileParser().parse(tabFileParserConfig,
 					new TabularFileHandler() {
 
 				@Override
@@ -112,23 +111,23 @@ public class DemandMatrixReader {
 					if ( row[0].startsWith("Zonennummer") ) {
 						return ;
 					}
-					int pvgv = Integer.parseInt(row[1]) ;
+					int pvgv = Integer.parseInt(row[1]);
 					if ( pvgv==1 ) { // "1" means "Anbindung f. PV"
-						return ; 
+						return ;
 					}
-					Id zoneId = sc.createId(row[1]);
-					int anzahl = Integer.parseInt(row[2]) ;
-					NodesAndDistances nodeToDistanceMap = new NodesAndDistances() ;
+					Id zoneId = DemandMatrixReader.this.sc.createId(row[1]);
+					int anzahl = Integer.parseInt(row[2]);
+					NodesAndDistances nodeToDistanceMap = new NodesAndDistances();
 					for ( int ii=0 ; ii<anzahl ; ii++ ) {
-						Id nodeId = sc.createId( row[3+2*ii] ) ;
-						double distance = Double.parseDouble(row[3+2*ii+1]) ;
-						nodeToDistanceMap.getNodesAndDistances().put( nodeId, distance ) ;
+						Id nodeId = DemandMatrixReader.this.sc.createId( row[3+2*ii]);
+						double distance = Double.parseDouble(row[3+2*ii+1]);
+						nodeToDistanceMap.getNodesAndDistances().put( nodeId, distance);
 					}
-					zoneToConnectorsMap.put( zoneId, nodeToDistanceMap );
+					DemandMatrixReader.this.zoneToConnectorsMap.put( zoneId, nodeToDistanceMap );
 				}
 			});
 		} catch ( Exception e ) {
-			throw new RuntimeException(e) ;
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -147,9 +146,9 @@ public class DemandMatrixReader {
 					}
 					double x = Double.parseDouble(row[2]);
 					double y = Double.parseDouble(row[3]);
-					Node node = sc.getNetwork().getFactory().createNode(sc.createId(row[5]), 
-							coordinateTransformation.transform(sc.createCoord(x, y) ) ) ;
-					sc.getNetwork().addNode(node) ;
+					Node node = DemandMatrixReader.this.sc.getNetwork().getFactory().createNode(DemandMatrixReader.this.sc.createId(row[5]),
+							coordinateTransformation.transform(DemandMatrixReader.this.sc.createCoord(x, y) ));
+					DemandMatrixReader.this.sc.getNetwork().addNode(node);
 				}
 
 			});
@@ -160,7 +159,7 @@ public class DemandMatrixReader {
 
 	private void readShape() {
 		Collection<SimpleFeature> landkreise = ShapeFileReader.getAllFeatures(this.shapeFile);
-		final ActivityFacilitiesFactory factory = ((ScenarioImpl)sc).getActivityFacilities().getFactory();
+		final ActivityFacilitiesFactory factory = ((ScenarioImpl)this.sc).getActivityFacilities().getFactory();
 		for (SimpleFeature landkreis : landkreise) {
 			Integer gemeindeschluessel = Integer.parseInt((String) landkreis.getAttribute("gemeindesc"));
 			Geometry geo = (Geometry) landkreis.getDefaultGeometry();
@@ -169,18 +168,18 @@ public class DemandMatrixReader {
 			Double xcoordinate = coordinate.x;
 			Double ycoordinate = coordinate.y;
 			Coord coord = new CoordImpl(xcoordinate.toString(), ycoordinate.toString());
-			ActivityFacility facility = factory.createActivityFacility(new IdImpl(gemeindeschluessel), coord) ;
+			ActivityFacility facility = factory.createActivityFacility(new IdImpl(gemeindeschluessel), coord);
 			{
-				ActivityOption option = factory.createActivityOption("work", facility ) ;
-				option.setCapacity(1.) ;
-				facility.addActivityOption(option) ;
+				ActivityOption option = factory.createActivityOption("work");
+				option.setCapacity(1.);
+				facility.addActivityOption(option);
 			}
 			{
-				ActivityOption option = factory.createActivityOption("home", facility ) ;
-				option.setCapacity(1.) ;
-				facility.addActivityOption(option) ;
+				ActivityOption option = factory.createActivityOption("home");
+				option.setCapacity(1.);
+				facility.addActivityOption(option);
 			}
-			facilities.put(gemeindeschluessel, facility);
+			this.facilities.put(gemeindeschluessel, facility);
 		}
 	}
 
@@ -195,8 +194,8 @@ public class DemandMatrixReader {
 		return p;
 	}
 
-	enum Verkehrsmittel { railConv, railComb, LKW, ship } 
-	enum Guetergruppe { gg0, gg1, gg2, gg3, gg4, gg5, gg6, gg7, gg8, gg9 } 
+	enum Verkehrsmittel { railConv, railComb, LKW, ship }
+	enum Guetergruppe { gg0, gg1, gg2, gg3, gg4, gg5, gg6, gg7, gg8, gg9 }
 
 	private void readMatrix(final String filename) {
 
@@ -217,22 +216,22 @@ public class DemandMatrixReader {
 				if (filename.equals(GV_MATRIX)){
 					try {
 						int idx = 0 ;
-						Id quellZonenId = sc.createId(row[idx]); idx++ ;
-						Id zielZonenId = sc.createId(row[idx]); idx++ ;
+						Id quellZonenId = DemandMatrixReader.this.sc.createId(row[idx]); idx++ ;
+						Id zielZonenId = DemandMatrixReader.this.sc.createId(row[idx]); idx++ ;
 
 						Verkehrsmittel vm = Verkehrsmittel.values()[idx] ; idx++ ;
 						Guetergruppe gg = Guetergruppe.values()[idx] ; idx++ ;
 						idx++ ; // Seehafenhinterlandverkehr
-						double tons = Double.parseDouble(row[idx]) ;
-						
-						process( quellZonenId, zielZonenId, vm, gg, tons ) ;
+						double tons = Double.parseDouble(row[idx]);
+
+						process( quellZonenId, zielZonenId, vm, gg, tons);
 
 					} catch ( Exception ee ) {
-						throw new RuntimeException(ee) ;
+						throw new RuntimeException(ee);
 					}
 				}
 				else{
-					System.err.println("ATTENTION: check filename!") ;
+					System.err.println("ATTENTION: check filename!");
 				}
 			}
 
@@ -244,18 +243,18 @@ public class DemandMatrixReader {
 	}
 
 	private Coord getCoordFromZone(Id zoneId) {
-		NodesAndDistances connectors = this.zoneToConnectorsMap.get(zoneId) ;
+		NodesAndDistances connectors = this.zoneToConnectorsMap.get(zoneId);
 		Node node = null ;
 		for ( Id nodeId : connectors.getNodesAndDistances().keySet() ) {
-			node = sc.getNetwork().getNodes().get( nodeId ) ;
+			node = this.sc.getNetwork().getNodes().get( nodeId);
 			break ;
 		}
-		return node.getCoord() ;
+		return node.getCoord();
 	}
 
 	private void process(int quelle, int ziel, int workPt, int educationPt, int workCar, int educationCar) {
-		Facility source = facilities.get(quelle);
-		Facility sink = facilities.get(ziel);
+		Facility source = this.facilities.get(quelle);
+		Facility sink = this.facilities.get(ziel);
 		if (source == null) {
 			log.error("Unknown source: " + quelle);
 			return;
@@ -271,11 +270,11 @@ public class DemandMatrixReader {
 
 		if (scaledCarQuantity != 0) {
 			log.info(quelle + "->" + ziel + ": " + scaledCarQuantity + " car trips");
-			flowSink.process(facilities.get(quelle), facilities.get(ziel), scaledCarQuantity, TransportMode.car, "pvWork", 0.0);
+			this.flowSink.process(this.facilities.get(quelle), this.facilities.get(ziel), scaledCarQuantity, TransportMode.car, "pvWork", 0.0);
 		}
 		if (scaledPtQuantity != 0){
 			log.info(quelle + "->" + ziel + ": " + scaledPtQuantity + " pt trips");
-			flowSink.process(facilities.get(quelle), facilities.get(ziel), scaledPtQuantity, TransportMode.pt, "pvWork", 0.0);
+			this.flowSink.process(this.facilities.get(quelle), this.facilities.get(ziel), scaledPtQuantity, TransportMode.pt, "pvWork", 0.0);
 		}
 	}
 

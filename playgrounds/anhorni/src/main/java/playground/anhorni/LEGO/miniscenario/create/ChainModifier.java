@@ -71,7 +71,8 @@ public class ChainModifier {
 		KnowledgeImpl knowledge = this.scenario.getKnowledges().getFactory().createKnowledge(p.getId(), "knowledge");
 		ActivityImpl activity = (ActivityImpl)p.getSelectedPlan().getPlanElements().get(0);
 		ActivityFacilityImpl facility = (ActivityFacilityImpl) this.scenario.getActivityFacilities().getFacilities().get(activity.getFacilityId());
-		ActivityOptionImpl actOpt = new ActivityOptionImpl(activity.getType(), facility);
+		ActivityOptionImpl actOpt = new ActivityOptionImpl(activity.getType());
+		actOpt.setFacility(facility);
 		knowledge.addActivityOption(actOpt);
 		
 		// work

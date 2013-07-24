@@ -117,14 +117,14 @@ public class MainWorkplaceCapacities {
 
 	//Classes
 	private static class ModeShareZone {
-		private double modeShare;
+		private final double modeShare;
 		private double difference = 0;
-		private List<Double> capacities = new ArrayList<Double>();
+		private final List<Double> capacities = new ArrayList<Double>();
 		public ModeShareZone(double modeShare) {
 			this.modeShare = modeShare;
 		}
 	}
-	
+
 	//Constants
 	private static final String NETWORK_FILE = "./data/currentSimulation/singapore2.xml";
 	private static final String LINKS_MAP_FILE = "./data/facilities/auxiliar/links.map";
@@ -148,7 +148,7 @@ public class MainWorkplaceCapacities {
 	private static final double MAX_TRAVEL_TIME = 15*60;
 	private static final String SEPARATOR = ";;;";
 	private static final int NUM_NEAR = 3;
-	
+
 	//Static attributes
 	private static int SIZE = 10;
 	private static int NUM_ITERATIONS = 100;
@@ -168,13 +168,13 @@ public class MainWorkplaceCapacities {
 	//Main
 	/**
 	 * @param args
-	 * @throws NoConnectionException 
-	 * @throws SQLException 
-	 * @throws ClassNotFoundException 
-	 * @throws IllegalAccessException 
-	 * @throws InstantiationException 
-	 * @throws IOException 
-	 * @throws BadStopException 
+	 * @throws NoConnectionException
+	 * @throws SQLException
+	 * @throws ClassNotFoundException
+	 * @throws IllegalAccessException
+	 * @throws InstantiationException
+	 * @throws IOException
+	 * @throws BadStopException
 	 */
 	public static void main(String[] args) throws BadStopException, IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NoConnectionException {
 		if(args.length==2) {
@@ -594,7 +594,7 @@ public class MainWorkplaceCapacities {
 							else if(factory.createPoint(new Coordinate(toNodeCoord.getX(), toNodeCoord.getY())).within(mPArea.getPolygon()))
 								mPArea.addLinkId(link.getId());
 					}
-				if(nearestLink==null && mPArea.getLinkIds().size()==0) { 
+				if(nearestLink==null && mPArea.getLinkIds().size()==0) {
 					for(Link link:network.getLinks().values())
 						if(link.getAllowedModes().contains("car")) {
 							Coord fromNodeCoord = link.getFromNode().getCoord();
@@ -670,7 +670,7 @@ public class MainWorkplaceCapacities {
 				return link.getLength()/WALKING_SPEED;
 			}
 		};
-		TravelTime timeFunction = new TravelTime() {	
+		TravelTime timeFunction = new TravelTime() {
 
 			@Override
 			public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
@@ -681,7 +681,7 @@ public class MainWorkplaceCapacities {
 		preProcessData.run(network);
 		AStarLandmarks aStarLandmarks = new AStarLandmarks(network, preProcessData, timeFunction);
 		Map<Tuple<Id, Id>,Tuple<Boolean,Double>> weights = new HashMap<Tuple<Id,Id>, Tuple<Boolean,Double>>();
-		Collection<Tuple<Id, Integer>> removeStops = new ArrayList<Tuple<Id, Integer>>(); 
+		Collection<Tuple<Id, Integer>> removeStops = new ArrayList<Tuple<Id, Integer>>();
 		travelTimes = new ArrayList<List<Double>>();
 		int s=0;
 		for(Entry<String, Coord> stop: stopsBase.entrySet()) {
@@ -1013,7 +1013,8 @@ public class MainWorkplaceCapacities {
 				for(int s=0; s<matrix.getDimension(2); s++)
 					pTCapacityFO += matrix.getElement(f, o, s);
 				if(pTCapacityFO>0) {
-					ActivityOption activityOption = new ActivityOptionImpl(optionText, fac);
+					ActivityOptionImpl activityOption = new ActivityOptionImpl(optionText);
+					activityOption.setFacility(fac);
 					activityOption.setCapacity(pTCapacityFO/mPArea.getModeShare());
 					activityOption.addOpeningTime(openingTime);
 					mPArea.putActivityOption(activityOption);
@@ -1098,7 +1099,8 @@ public class MainWorkplaceCapacities {
 			for(int w=0; w<matrixCapacities.length; w++) {
 				MPAreaData mPArea = mPAreaI.next();
 				double pTCapacityFO = matrixCapacities[w][c];
-				ActivityOption activityOption = new ActivityOptionImpl(optionText, fac);
+				ActivityOptionImpl activityOption = new ActivityOptionImpl(optionText);
+				activityOption.setFacility(fac);
 				double capacity = 0;
 				for(int sc=0; sc<matrixCapacities[0].length; sc++)
 					capacity += matrixCapacities[w][sc];
@@ -1139,7 +1141,8 @@ public class MainWorkplaceCapacities {
 					if(scheduleCapacity==null)
 						scheduleCapacity = 0.0;
 					scheduleCapacities.put(activityOptionArea.getType(), scheduleCapacity+capacity);
-					ActivityOption activityOption = new ActivityOptionImpl(activityOptionArea.getType(), building);
+					ActivityOptionImpl activityOption = new ActivityOptionImpl(activityOptionArea.getType());
+					activityOption.setFacility(building);
 					activityOption.setCapacity(capacity);
 					activityOption.addOpeningTime(activityOptionArea.getOpeningTimes(DayType.wkday).first());
 					building.getActivityOptions().put(activityOption.getType(), activityOption);

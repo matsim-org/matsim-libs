@@ -90,16 +90,16 @@ public class FacilitiesProductionKTI {
 	public static final String LEISURE_GASTRO = ACT_TYPE_LEISURE + "_gastro";
 	public static final String LEISURE_HOSPITALITY = ACT_TYPE_LEISURE + "_hospitality";
 
-	private static Logger log = Logger.getLogger(FacilitiesProductionKTI.class);	
+	private static Logger log = Logger.getLogger(FacilitiesProductionKTI.class);
 	private ActivityFacilitiesImpl facilities = new ActivityFacilitiesImpl();
-	
-	private ObjectAttributes facilitiesAttributes = new ObjectAttributes();
-	
-	private Coord center = new CoordImpl(682756, 248732); // Letten
-	private double radius = 5000.0;
-	
+
+	private final ObjectAttributes facilitiesAttributes = new ObjectAttributes();
+
+	private final Coord center = new CoordImpl(682756, 248732); // Letten
+	private final double radius = 5000.0;
+
 	/**
-	 * @param 
+	 * @param
 	 * 	inputHectareAggregationFile BZ01_UNT.TXT
 	 *  presenceCodeFile BZ01_UNT_P_DSVIEW.TXT
 	 */
@@ -110,113 +110,112 @@ public class FacilitiesProductionKTI {
 		String facilitiesFile = args[3];
 		String zhShops = args[4];
 		String outFile = args[5];
-		
+
 		FacilitiesProductionKTI creator = new FacilitiesProductionKTI();
 		creator.facilitiesProduction(
 				KTIYear.KTI_YEAR_2008, inputHectareAggregationFile, presenceCodeFile, shopsOf2005Filename, facilitiesFile, zhShops, outFile);
 	}
-	
-	public void facilitiesProduction(KTIYear ktiYear, String inputHectareAggregationFile, 
-			String presenceCodeFile, String shopsOf2005Filename, String facilitesFile, String zhShopsFile, String outdir) {		
-		this.facilities = new ActivityFacilitiesImpl();//(FacilitiesImpl)Gbl.createWorld().createLayer(Facilities.LAYER_TYPE,null);	
-		facilities.setName("Facilities based on the Swiss National Enterprise Census.");		
+
+	public void facilitiesProduction(KTIYear ktiYear, String inputHectareAggregationFile,
+			String presenceCodeFile, String shopsOf2005Filename, String facilitesFile, String zhShopsFile, String outdir) {
+		this.facilities = new ActivityFacilitiesImpl();//(FacilitiesImpl)Gbl.createWorld().createLayer(Facilities.LAYER_TYPE,null);
+		this.facilities.setName("Facilities based on the Swiss National Enterprise Census.");
 		log.info("Adding and running facilities algorithms ...");
-		new FacilitiesAllActivitiesFTE(ktiYear).run(facilities, inputHectareAggregationFile, presenceCodeFile);
+		new FacilitiesAllActivitiesFTE(ktiYear).run(this.facilities, inputHectareAggregationFile, presenceCodeFile);
 		AddOpentimes addOpentimes = new AddOpentimes(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())), shopsOf2005Filename);
 		addOpentimes.init();
 		addOpentimes.run(this.facilities);
-		
+
 		this.assignSizeAndPrice(zhShopsFile);
-		
+
 		log.info("adding home facilities ... ");
 		ScenarioImpl scenario = ((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig()));
 		FacilitiesReaderMatsimV1 facilities_reader = new FacilitiesReaderMatsimV1(scenario);
-		facilities_reader.readFile(facilitesFile);		
+		facilities_reader.readFile(facilitesFile);
 		this.combineFacilities(scenario);
 
 		log.info("  writing facilities file... ");
 		new FacilitiesWriter(this.facilities).write(outdir + "facilities_fr.xml.gz");
-		log.info("Writting: " + this.facilities.getFacilities().size() + " facilities --------------------- ");	
-		
+		log.info("Writting: " + this.facilities.getFacilities().size() + " facilities --------------------- ");
+
 		ObjectAttributesXmlWriter attributesWriter = new ObjectAttributesXmlWriter(this.facilitiesAttributes);
 		attributesWriter.writeFile(outdir + "/facilitiesAttributes.xml");
 	}
-	
+
 	private void combineFacilities(ScenarioImpl scenario) {
 		for (ActivityFacility f : scenario.getActivityFacilities().getFacilities().values()) {
 			if (f.getActivityOptions().containsKey("home")) {
 				this.facilities.createAndAddFacility(f.getId(), f.getCoord());
-				ActivityFacilityImpl facility = (ActivityFacilityImpl)this.facilities.getFacilities().get(f.getId());	
-				ActivityOptionImpl ao = new ActivityOptionImpl("h", f);
+				ActivityFacilityImpl facility = (ActivityFacilityImpl)this.facilities.getFacilities().get(f.getId());
+				ActivityOptionImpl ao = new ActivityOptionImpl("h");
 				ao.addOpeningTime(new OpeningTimeImpl(DayType.wk, 0.0 * 3600, 24.0 * 3600));
-				facility.getActivityOptions().put("h", ao);
+				facility.addActivityOption(ao);
 			}
 		}
 	}
-	
+
 	private void assignSizeAndPrice(String zhShopsFile) {
 		CH1903LV03toWGS84 trafo = new CH1903LV03toWGS84();
 		WGS84toCH1903LV03 trafoback = new WGS84toCH1903LV03();
 		QuadTree<Location> zhShopsQuadTree = this.createZHShops(zhShopsFile);
-		
+
 		int sizeCnt = 0;
 		int priceCnt = 0;
-		
+
 		for (ActivityFacility f : this.facilities.getFacilitiesForActivityType("s").values()) {
 			ShopLocation shop = (ShopLocation) zhShopsQuadTree.get(
-					trafo.transform(f.getCoord()).getX(), trafo.transform(f.getCoord()).getY());			
+					trafo.transform(f.getCoord()).getX(), trafo.transform(f.getCoord()).getY());
 			if (CoordUtils.calcDistance(f.getCoord(), trafoback.transform(shop.getCoord())) < 150.0 &&
 					this.isFood(f)) {
-				facilitiesAttributes.putAttribute(f.getId().toString(), "price", 1.0 * shop.getPrice());
-				
-				double dist = CoordUtils.calcDistance(f.getCoord(), center);
-					if (dist < radius) {
+				this.facilitiesAttributes.putAttribute(f.getId().toString(), "price", 1.0 * shop.getPrice());
+
+				double dist = CoordUtils.calcDistance(f.getCoord(), this.center);
+					if (dist < this.radius) {
 						((ActivityFacilityImpl)f).createActivityOption("sg");
-				
+
 						// copy opening times
 						ActivityOptionImpl optionNew = (ActivityOptionImpl) f.getActivityOptions().get("sg");
-				
-						Map<DayType, SortedSet<OpeningTime>> ot = (Map<DayType, SortedSet<OpeningTime>>) 
-								((ActivityOptionImpl)f.getActivityOptions().get("s")).getOpeningTimes();
-						optionNew.setOpeningTimes(ot);	
+
+						Map<DayType, SortedSet<OpeningTime>> ot = ((ActivityOptionImpl)f.getActivityOptions().get("s")).getOpeningTimes();
+						optionNew.setOpeningTimes(ot);
 					}
 				if (shop.getPrice() > 0) priceCnt++;
-				
+
 			}
 			else {
-				facilitiesAttributes.putAttribute(f.getId().toString(), "price", -1.0);
-			}	
+				this.facilitiesAttributes.putAttribute(f.getId().toString(), "price", -1.0);
+			}
 			int size = this.assignSize(f);
 			this.facilitiesAttributes.putAttribute(f.getId().toString(), "size", size);
-			
+
 			if (size > 0) sizeCnt++;
 		}
 		log.info("price cnt: " + priceCnt + " size cnt: " + sizeCnt);
 	}
-	
+
 	private boolean isFood(ActivityFacility f) {
 		boolean isFood = false;
-		if (f.getActivityOptions().containsKey("B015211E") || 
+		if (f.getActivityOptions().containsKey("B015211E") ||
 				f.getActivityOptions().containsKey("B015211D") ||
 				f.getActivityOptions().containsKey("B015211C") ||
 				f.getActivityOptions().containsKey("B015211B") ||
 				f.getActivityOptions().containsKey("B015211A")) {
-			isFood = true;	
+			isFood = true;
 		}
 		return isFood;
 	}
-	
+
 	private QuadTree<Location> createZHShops(String zhShopsFile) {
 		UniversalChoiceSetReader ucsReader = new UniversalChoiceSetReader();
 		TreeMap<Id, ShopLocation> shops = new TreeMap<Id, ShopLocation>();
-		shops = ucsReader.readUniversalCS(zhShopsFile);	
-		
+		shops = ucsReader.readUniversalCS(zhShopsFile);
+
 		this.assignPrice(shops);
-		
+
 		QuadTree<Location> zhShopsQuadTree = Utils.buildLocationQuadTree(shops);
 		return zhShopsQuadTree;
 	}
-	
+
 	/*
 	2008:
 	B0808471101;B0808471102;B0808471103;B0808471104;B0808471105
@@ -225,7 +224,7 @@ public class FacilitiesProductionKTI {
 	471103	3	Kleine Supermärkte (400-999 m2)
 	471104	2	Grosse Geschäfte (100-399 m2)
 	471105	1	Kleine Geschäfte (< 100 m2)
-	
+
 	2001:
 	B015211A	|	shop_retail_gt2500sqm
 	B015211B	|	shop_retail_get1000sqm
@@ -236,30 +235,30 @@ public class FacilitiesProductionKTI {
 	private int assignSize(ActivityFacility f) {
 		int size = -1;
 		if (f.getActivityOptions().containsKey("B015211E")) {
-			size = 1;	
+			size = 1;
 		}
 		if (f.getActivityOptions().containsKey("B015211D")) {
-			size = 2;	
+			size = 2;
 		}
 		if (f.getActivityOptions().containsKey("B015211C")) {
-			size = 3;	
+			size = 3;
 		}
 		if (f.getActivityOptions().containsKey("B015211B")) {
-			size = 4;	
+			size = 4;
 		}
 		if (f.getActivityOptions().containsKey("B015211A")) {
-			size = 4;	
+			size = 4;
 		}
 		return size;
 	}
-	
+
 	private void assignPrice(TreeMap<Id, ShopLocation> shops) {
 		for (ShopLocation shop:shops.values()) {
 			int lidl_aldi = 1;
 			int denner = 2;
 			int migros_coop = 3;
 			int spar_other = 4;
-			int marinello_globus = 5;			
+			int marinello_globus = 5;
 			int idint = Integer.parseInt(shop.getId().toString());
 
 			if (idint < 20000) {

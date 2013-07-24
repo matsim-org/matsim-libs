@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.OpeningTime.DayType;
@@ -57,19 +56,19 @@ public class SimpleMasterAreas {
 	private static final String AREAS_MAP_FILE = "./data/facilities/auxiliar/areasMP.map";
 	private static final String POLYGONS_FILE = "./data/facilities/Masterplan_Areas.shp";
 	private static final String BUILDINGS_FILE = "./data/facilities/auxiliar/buildings.xml";
-	
+
 	private static HashMap<String, Double> workerAreas = new HashMap<String, Double>();
 	private static SortedMap<Id, MPAreaData> dataMPAreas = new TreeMap<Id, MPAreaData>();
 	private static SortedMap<Id, Double> mPAreasPlotRatio = new TreeMap<Id, Double>();
-	
+
 	/**
 	 * @param args
-	 * @throws SQLException 
-	 * @throws ClassNotFoundException 
-	 * @throws IllegalAccessException 
-	 * @throws InstantiationException 
-	 * @throws IOException 
-	 * @throws NoConnectionException 
+	 * @throws SQLException
+	 * @throws ClassNotFoundException
+	 * @throws IllegalAccessException
+	 * @throws InstantiationException
+	 * @throws IOException
+	 * @throws NoConnectionException
 	 */
 	public static void main(String[] args) throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NoConnectionException {
 		DataBaseAdmin dataBaseAux  = new DataBaseAdmin(new File("./data/facilities/DataBaseAuxiliar.properties"));
@@ -106,7 +105,8 @@ public class SimpleMasterAreas {
 			building.setDesc(buildingsR.getString(6)+":"+mPArea.getType().replaceAll("&", "AND"));
 			double capacity = buildingsR.getDouble(7)*mPAreasPlotRatio.get(areaId)/workerAreas.get(mPArea.getType());
 			if(capacity>0) {
-				ActivityOption activityOption = new ActivityOptionImpl("work", building);
+				ActivityOptionImpl activityOption = new ActivityOptionImpl("work");
+				activityOption.setFacility(building);
 				activityOption.setCapacity(capacity);
 				activityOption.addOpeningTime(new OpeningTimeImpl(DayType.wkday, 0, 24*3600));
 				building.getActivityOptions().put(activityOption.getType(), activityOption);

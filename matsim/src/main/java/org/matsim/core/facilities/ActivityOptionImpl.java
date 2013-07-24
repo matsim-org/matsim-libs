@@ -35,13 +35,11 @@ public class ActivityOptionImpl implements ActivityOption {
 
 	private final String type;
 	private Double capacity = Double.valueOf(Integer.MAX_VALUE);
-	private final ActivityFacilityImpl facility;
+	private ActivityFacility facility = null;
 	private Map<DayType, SortedSet<OpeningTime>> opentimes = new TreeMap<DayType, SortedSet<OpeningTime>>();
 
-	public ActivityOptionImpl(final String type, final ActivityFacility facility) {
+	public ActivityOptionImpl(final String type) {
 		this.type = type;
-		this.facility = (ActivityFacilityImpl) facility;
-		if (this.facility == null) { Gbl.errorMsg("facility=null not allowed!"); }
 	}
 
 	@Override
@@ -111,7 +109,11 @@ public class ActivityOptionImpl implements ActivityOption {
 		return this.type;
 	}
 
-	public final ActivityFacilityImpl getFacility() {
+	public final void setFacility(ActivityFacility facility) {
+		this.facility = facility;
+	}
+
+	public final ActivityFacility getFacility() {
 		return this.facility;
 	}
 
@@ -141,5 +143,5 @@ public class ActivityOptionImpl implements ActivityOption {
 				"[facility_id=" + this.facility.getId() + "]" +
 				"[nof_opentimes=" + this.getOpeningTimes().size() + "]";
 	}
-	
+
 }

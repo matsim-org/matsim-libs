@@ -111,7 +111,7 @@ public class ScenarioCut {
 			}
 			if (((ScenarioImpl) scenario).getKnowledges().getKnowledgesByPersonId().get(p.getId()) != null) {
 				for (ActivityOptionImpl ao : ((ScenarioImpl) scenario).getKnowledges().getKnowledgesByPersonId().get(p.getId()).getActivities()) {
-					ActivityFacilityImpl f = ao.getFacility();
+					ActivityFacility f = ao.getFacility();
 					if (f.getCoord().getX() < min.getX()) { min.setX(f.getCoord().getX()); }
 					if (f.getCoord().getY() < min.getY()) { min.setY(f.getCoord().getY()); }
 					if (f.getCoord().getX() > max.getX()) { max.setX(f.getCoord().getX()); }
