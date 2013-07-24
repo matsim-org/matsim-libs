@@ -33,6 +33,8 @@ import org.apache.commons.lang.ObjectUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
 import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
@@ -49,6 +51,9 @@ public class BeingTogetherScoring implements ArbitraryEventScoring {
 	private final Id ego;
 	private final Set<Id> alters;
 
+	private final Filter actTypeFilter;
+	private final Filter modeFilter;
+
 	private final Interval activeTimeWindow;
 
 	private final Factory<IntervalsAtLocation> locatedIntervalsFactory =
@@ -60,6 +65,8 @@ public class BeingTogetherScoring implements ArbitraryEventScoring {
 		};
 	private final IntervalsAtLocation intervalsForEgo = new IntervalsAtLocation();
 	private final Map<Id, IntervalsAtLocation> intervalsPerAlter = new HashMap<Id, IntervalsAtLocation>();
+
+	private final Map<Id, String> currentModeOfRelevantAgents = new HashMap<Id, String>();
 
 	private boolean wasReset = false;
 
@@ -80,6 +87,40 @@ public class BeingTogetherScoring implements ArbitraryEventScoring {
 			final double marginalUtilityOfTime,
 			final Id ego,
 			final Collection<Id> alters) {
+		this( startActiveWindow,
+				endActiveWindow,
+				new AcceptAllFilter(),
+				new AcceptAllFilter(),
+				marginalUtilityOfTime,
+				ego,
+				alters );
+	}
+
+	public BeingTogetherScoring(
+			final Filter actTypeFilter,
+			final Filter modeFilter,
+			final double marginalUtilityOfTime,
+			final Id ego,
+			final Collection<Id> alters) {
+		this( Double.NEGATIVE_INFINITY,
+				Double.POSITIVE_INFINITY,
+				actTypeFilter,
+				modeFilter,
+				marginalUtilityOfTime,
+				ego,
+				alters );
+	}
+
+	public BeingTogetherScoring(
+			final double startActiveWindow,
+			final double endActiveWindow,
+			final Filter actTypeFilter,
+			final Filter modeFilter,
+			final double marginalUtilityOfTime,
+			final Id ego,
+			final Collection<Id> alters) {
+		this.actTypeFilter = actTypeFilter;
+		this.modeFilter = modeFilter;
 		this.activeTimeWindow = new Interval( startActiveWindow , endActiveWindow );
 		this.marginalUtilityOfTime = marginalUtilityOfTime;
 		this.ego = ego;
@@ -153,14 +194,27 @@ public class BeingTogetherScoring implements ArbitraryEventScoring {
 	// /////////////////////////////////////////////////////////////////////////
 	@Override
 	public void handleEvent(final Event event) {
+		if (event instanceof AgentDepartureEvent) startMode( (AgentDepartureEvent) event );
+		if (event instanceof AgentArrivalEvent) endMode( (AgentDepartureEvent) event );
 		if (event instanceof ActivityStartEvent) startAct( (ActivityStartEvent) event );
 		if (event instanceof ActivityEndEvent) endAct( (ActivityEndEvent) event );
 		if (event instanceof PersonEntersVehicleEvent) enterVehicle( (PersonEntersVehicleEvent) event );
 		if (event instanceof PersonLeavesVehicleEvent) leaveVehicle( (PersonLeavesVehicleEvent) event );
 	}
 
+	private void startMode(final AgentDepartureEvent event) {
+		if ( !isRelevant( event.getPersonId() ) ) return;
+		currentModeOfRelevantAgents.put( event.getPersonId() , event.getLegMode() );
+	}
+
+	private void endMode(final AgentDepartureEvent event) {
+		// no need to check if "relevant agent" here
+		currentModeOfRelevantAgents.remove( event.getPersonId() );
+	}
+
 	private void enterVehicle(final PersonEntersVehicleEvent event) {
 		if ( !isRelevant( event.getPersonId() ) ) return;
+		if ( !modeFilter.consider( currentModeOfRelevantAgents.get( event.getPersonId() ) ) ) return;
 		final IntervalsAtLocation intervals =
 			event.getPersonId().equals( ego ) ?
 			intervalsForEgo :
@@ -175,6 +229,7 @@ public class BeingTogetherScoring implements ArbitraryEventScoring {
 
 	private void leaveVehicle(final PersonLeavesVehicleEvent event) {
 		if ( !isRelevant( event.getPersonId() ) ) return;
+		if ( !modeFilter.consider( currentModeOfRelevantAgents.get( event.getPersonId() ) ) ) return;
 		final IntervalsAtLocation intervals =
 			event.getPersonId().equals( ego ) ?
 			intervalsForEgo :
@@ -189,6 +244,7 @@ public class BeingTogetherScoring implements ArbitraryEventScoring {
 
 	private void startAct(final ActivityStartEvent event) {
 		if ( !isRelevant( event.getPersonId() ) ) return;
+		if ( !actTypeFilter.consider( event.getActType() ) ) return;
 		final IntervalsAtLocation intervals =
 			event.getPersonId().equals( ego ) ?
 			intervalsForEgo :
@@ -203,6 +259,7 @@ public class BeingTogetherScoring implements ArbitraryEventScoring {
 
 	private void endAct(final ActivityEndEvent event) {
 		if ( !isRelevant( event.getPersonId() ) ) return;
+		if ( !actTypeFilter.consider( event.getActType() ) ) return;
 		final IntervalsAtLocation intervals =
 			event.getPersonId().equals( ego ) ?
 			intervalsForEgo :
@@ -384,6 +441,37 @@ public class BeingTogetherScoring implements ArbitraryEventScoring {
 		public Interval(final double start, final double end) {
 			this.start = start;
 			this.end = end;
+		}
+	}
+
+	public static interface Filter {
+		public boolean consider(final String typeOrMode);
+	}
+
+	public static class AcceptAllFilter implements Filter {
+		@Override
+		public boolean consider(final String typeOrMode) {
+			return true;
+		}
+	}
+
+	public static class AcceptAllInListFilter implements Filter {
+		private final Collection<String> toAccept = new ArrayList<String>();
+
+		public AcceptAllInListFilter( final String... types ) {
+			for ( String s : types ) toAccept.add( s );
+		}
+
+		@Override
+		public boolean consider(final String typeOrMode) {
+			return toAccept.contains( typeOrMode );
+		}
+	}
+
+	public static class RejectAllFilter implements Filter {
+		@Override
+		public boolean consider(final String typeOrMode) {
+			return false;
 		}
 	}
 }

@@ -42,6 +42,9 @@ import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 import org.matsim.testcases.MatsimTestUtils;
 
+import playground.thibautd.scoring.BeingTogetherScoring.AcceptAllFilter;
+import playground.thibautd.scoring.BeingTogetherScoring.RejectAllFilter;
+
 /**
  * @author thibautd
  */
@@ -399,6 +402,61 @@ public class BeingTogetherScoringTest {
 	}
 
 	@Test
+	public void testNoOverlapIfRejectedActivity() throws Exception {
+		final Id ego = new IdImpl( "ego" );
+		final Id alter = new IdImpl( "alter" );
+		
+		final Id linkId = new IdImpl( 1 );
+		final String type = "type";
+
+		final EventsFactory fact = EventsUtils.createEventsManager().getFactory();
+
+		final BeingTogetherScoring testee =
+			new BeingTogetherScoring(
+					new RejectAllFilter(),
+					new AcceptAllFilter(),
+					1,
+					ego,
+					Collections.singleton( alter ) );
+
+		testee.handleEvent(
+				fact.createActivityStartEvent(
+					0,
+					ego,
+					linkId,
+					null,
+					type) );
+		testee.handleEvent(
+				fact.createActivityStartEvent(
+					0,
+					alter,
+					linkId,
+					null,
+					type) );
+		testee.handleEvent(
+				fact.createActivityEndEvent(
+					100,
+					ego,
+					linkId,
+					null,
+					type) );
+		testee.handleEvent(
+				fact.createActivityEndEvent(
+					100,
+					alter,
+					linkId,
+					null,
+					type) );
+
+		Assert.assertEquals(
+				"unexpected overlap",
+				0,
+				testee.getScore(),
+				MatsimTestUtils.EPSILON);
+
+	}
+
+	@Test
 	public void testOvelapsOfLegs() throws Exception {
 		final Id ego = new IdImpl( "ego" );
 		final Id alter = new IdImpl( "alter" );
@@ -488,6 +546,69 @@ public class BeingTogetherScoringTest {
 						os.endAlter,
 						alter,
 						vehId2) );
+
+			Assert.assertEquals(
+					"unexpected overlap for "+os,
+					0,
+					testee.getScore(),
+					MatsimTestUtils.EPSILON);
+		}
+	}
+
+	@Test
+	public void testNoOvelapIfRejectedMode() throws Exception {
+		final Id ego = new IdImpl( "ego" );
+		final Id alter = new IdImpl( "alter" );
+		
+		final Id vehId = new IdImpl( 1 );
+		
+		final EventsFactory fact = EventsUtils.createEventsManager().getFactory();
+		for ( OverlapSpec os : new OverlapSpec[]{
+				new OverlapSpec( 0 , 10 , 20 , 30 ),
+				new OverlapSpec( 0 , 10 , 10 , 30 ),
+				new OverlapSpec( 0 , 20 , 10 , 30 ),
+				new OverlapSpec( 10 , 20 , 10 , 30 ),
+				new OverlapSpec( 20 , 30 , 10 , 30 ),
+				new OverlapSpec( 30 , 50 , 10 , 30 ) }) {
+			final BeingTogetherScoring testee =
+				new BeingTogetherScoring(
+						new AcceptAllFilter(),
+						new RejectAllFilter(),
+						1,
+						ego,
+						Collections.singleton( alter ) );
+			testee.handleEvent(
+					fact.createAgentDepartureEvent(
+						0,
+						new IdImpl( 1 ),
+						ego,
+						"mode" ) );
+			testee.handleEvent(
+					fact.createPersonEntersVehicleEvent(
+						os.startEgo,
+						ego,
+						vehId ) );
+			testee.handleEvent(
+					fact.createAgentDepartureEvent(
+						0,
+						new IdImpl( 1 ),
+						alter,
+						"mode" ) );
+			testee.handleEvent(
+					fact.createPersonEntersVehicleEvent(
+						os.startAlter,
+						alter,
+						vehId ) );
+			testee.handleEvent(
+					fact.createPersonLeavesVehicleEvent(
+						os.endEgo,
+						ego,
+						vehId ) );
+			testee.handleEvent(
+					fact.createPersonLeavesVehicleEvent(
+						os.endAlter,
+						alter,
+						vehId) );
 
 			Assert.assertEquals(
 					"unexpected overlap for "+os,

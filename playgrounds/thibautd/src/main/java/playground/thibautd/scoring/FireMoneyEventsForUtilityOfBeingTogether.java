@@ -27,8 +27,12 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
 import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
@@ -48,6 +52,7 @@ import playground.thibautd.utils.MapUtils;
  */
 public class FireMoneyEventsForUtilityOfBeingTogether implements
 		PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, ActivityStartEventHandler, ActivityEndEventHandler,
+		AgentDepartureEventHandler, AgentArrivalEventHandler,
 		AfterMobsimListener {
 	private final double marginalUtilityOfTime;
 	private final double marginalUtilityOfMoney;
@@ -90,6 +95,16 @@ public class FireMoneyEventsForUtilityOfBeingTogether implements
 	@Override
 	public void handleEvent(final PersonEntersVehicleEvent event) {
 		transmitEventToRelevantPersons(  event );
+	}
+
+	@Override
+	public void handleEvent(final AgentArrivalEvent event) {
+		transmitEventToRelevantPersons( event );
+	}
+
+	@Override
+	public void handleEvent(final AgentDepartureEvent event) {
+		transmitEventToRelevantPersons( event );
 	}
 
 	private <T extends Event & HasPersonId> void transmitEventToRelevantPersons( final T event ) {
