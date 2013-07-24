@@ -22,30 +22,22 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
-import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 
 import playground.christoph.parking.core.mobsim.ParkingInfrastructure;
 import playground.christoph.parking.withinday.utils.ParkingAgentsTracker;
-import playground.wrashid.parkingSearch.withinDay_v_STRC.WithinDayParkingController;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.core.mobsim.ParkingInfrastructure_v2;
-import playground.wrashid.parkingSearch.withinDay_v_STRC.scoring.ParkingScoreManager;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.manager.ParkingStrategyManager;
 
 public class ParkingAgentsTracker_v2 extends ParkingAgentsTracker implements IterationEndsListener {
 
 	protected ParkingStrategyManager parkingStrategyManager;
-	protected WithinDayParkingController controler;
+	protected Controler controler;
 	private DoubleValueHashMap<Id> firstCarDepartureTimeOfDay;
 	
 	
@@ -53,7 +45,7 @@ public class ParkingAgentsTracker_v2 extends ParkingAgentsTracker implements Ite
 		return scenario;
 	}
 	
-	public ParkingAgentsTracker_v2(Scenario scenario, ParkingInfrastructure parkingInfrastructure, double distance, WithinDayParkingController controler) {
+	public ParkingAgentsTracker_v2(Scenario scenario, ParkingInfrastructure parkingInfrastructure, double distance, Controler controler) {
 		super(scenario, parkingInfrastructure, distance);
 		this.controler = controler;
 	}

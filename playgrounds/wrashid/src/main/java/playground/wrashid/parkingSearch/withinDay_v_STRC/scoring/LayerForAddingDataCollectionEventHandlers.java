@@ -28,18 +28,17 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.ActivityImpl;
 
 import playground.christoph.parking.core.mobsim.ParkingInfrastructure;
 import playground.wrashid.lib.obj.IntegerValueHashMap;
-import playground.wrashid.parkingSearch.withinDay_v_STRC.WithinDayParkingController;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.util.ParkingAgentsTracker_v2;
 
 public class LayerForAddingDataCollectionEventHandlers extends ParkingAgentsTracker_v2 {
@@ -75,7 +74,7 @@ public class LayerForAddingDataCollectionEventHandlers extends ParkingAgentsTrac
 	protected IntegerValueHashMap<Id> currentPlanElementIndexHm;
 
 	public LayerForAddingDataCollectionEventHandlers(Scenario scenario, ParkingInfrastructure parkingInfrastructure,
-			double distance, WithinDayParkingController controler) {
+			double distance, Controler controler) {
 		super(scenario, parkingInfrastructure, distance, controler);
 
 	}

@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.parking.lib.obj.Pair;
@@ -49,6 +48,7 @@ import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.TravelledEvent;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.events.handler.TravelledEventHandler;
@@ -63,7 +63,6 @@ import playground.christoph.parking.core.events.handler.ParkingSearchEventHandle
 import playground.christoph.parking.core.mobsim.ParkingInfrastructure;
 import playground.wrashid.lib.obj.IntegerValueHashMap;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
-import playground.wrashid.parkingSearch.withinDay_v_STRC.WithinDayParkingController;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.core.mobsim.ParkingInfrastructure_v2;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.util.ParkingAgentsTracker_v2;
 import playground.wrashid.parkingSearch.withindayFW.analysis.ParkingAnalysisHandler;
@@ -98,7 +97,7 @@ public class ParkingScoreManager extends ParkingAgentsTracker_v2 implements Acti
 	private ParkingScoreEvaluator parkingScoreEvaluator;
 
 	public ParkingScoreManager(Scenario scenario, ParkingInfrastructure parkingInfrastructure, double distance,
-			WithinDayParkingController controler, ParkingPersonalBetas parkingPersonalBetas) {
+			Controler controler, ParkingPersonalBetas parkingPersonalBetas) {
 		super(scenario, parkingInfrastructure, distance, controler);
 		
 		this.parkingPersonalBetas = parkingPersonalBetas;
