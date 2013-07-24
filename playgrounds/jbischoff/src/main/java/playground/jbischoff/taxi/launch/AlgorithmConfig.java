@@ -190,13 +190,6 @@ import playground.jbischoff.taxi.optimizer.rank.RankTaxiOptimizer;
         switch (algorithmType) {
             case NO_SCHEDULING:
                 return new NOSRankTaxiOptimizer(data,destinationKnown, this == NOS_FREE_FLOW);
-
-//            case ONE_TIME_SCHEDULING:
-//                return new OTSTaxiOptimizer(data, optimizationPolicy);
-//
-//            case RE_SCHEDULING:
-//                return new RESTaxiOptimizer(data, optimizationPolicy);
-
             default:
                 throw new IllegalStateException();
         }

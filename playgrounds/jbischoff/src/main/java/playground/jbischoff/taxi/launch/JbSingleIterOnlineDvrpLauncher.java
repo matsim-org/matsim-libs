@@ -19,21 +19,29 @@
 
 package playground.jbischoff.taxi.launch;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.matsim.analysis.LegHistogram;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.algorithms.*;
+import org.matsim.core.events.algorithms.EventWriter;
+import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.vis.otfvis.*;
+import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OnTheFlyServer;
 
 import pl.poznan.put.util.jfreechart.ChartUtils;
-import pl.poznan.put.vrp.dynamic.data.model.*;
+import pl.poznan.put.vrp.dynamic.data.model.Request;
 import pl.poznan.put.vrp.dynamic.data.model.Request.ReqStatus;
-import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
+import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiDelaySpeedupStats;
+import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiEvaluator;
 import playground.jbischoff.taxi.evaluation.ScheduleChartUtils;
 import playground.jbischoff.taxi.optimizer.rank.NOSRankTaxiOptimizer;
 import playground.michalm.util.gis.Schedules2GIS;
@@ -60,7 +68,7 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
     /*package*/final String vrpOutDirName;
 
     /*package*/final boolean outHistogram;
-    /*package*/final String histogramOutDirName;
+    /*package*/ String histogramOutDirName;
 
     /*package*/final boolean otfVis;
 
@@ -85,10 +93,18 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
 //    	dirName = "Z:\\WinHome\\Docs\\svn-checkouts\\jbischoff\\jbmielec\\";
     	dirName = "C:\\local_jb\\Dropbox\\MasterOfDesaster\\jbischoff\\jbmielec\\";
         netFileName = dirName + "network.xml";
-        electricStatsDir = dirName +"electric_depots\\";
+        
+//        electricStatsDir = dirName +"electric_nodepots\\";
+//        electricStatsDir = dirName +"electric_idledepots\\";
+//        electricStatsDir = dirName +"electric_depots\\";
+//        electricStatsDir = dirName +"gas_nodepots\\";
+//      electricStatsDir = dirName +"gas_idledepots\\";
+//      electricStatsDir = dirName +"gas_depots\\";
+        electricStatsDir = dirName +"electric_9\\";
+
         plansFileName = dirName + "20.plans.xml.gz";
 
-        taxiCustomersFileName = dirName + "taxiCustomers_05_pc.txt";
+        taxiCustomersFileName = dirName + "taxiCustomers_09_pc.txt";
         // taxiCustomersFileName = dirName + "taxiCustomers_10_pc.txt";
 
         depotsFileName = dirName + "depots-5_taxis-50.xml";
@@ -121,8 +137,8 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
         vrpOutFiles = !true;
         vrpOutDirName = dirName + "vrp_output";
 
-        outHistogram = false;
-        histogramOutDirName = dirName + "histograms";
+        outHistogram = true;
+        histogramOutDirName = electricStatsDir + "histograms";
 
         writeSimEvents = true;
         waitList = new ArrayList<String>();
@@ -210,8 +226,14 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
         }
 
         // ChartUtils.showFrame(RouteChartUtils.chartRoutesByStatus(data.getVrpData()));
-        ChartUtils.showFrame(ScheduleChartUtils.chartSchedule(data.getVrpData()));
-
+//        ChartUtils.showFrame(ScheduleChartUtils.chartSchedule(data.getVrpData()));
+        
+        try {
+			ChartUtils.saveAsPDF(ScheduleChartUtils.chartSchedule(data.getVrpData()), electricStatsDir+"taxiSchedules", 2048, 1546);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
         if (outHistogram) {
             ElectroCabLaunchUtils.writeHistograms(legHistogram, histogramOutDirName);
         }
@@ -223,10 +245,10 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
     	
         JbSingleIterOnlineDvrpLauncher launcher;
         launcher = new JbSingleIterOnlineDvrpLauncher();
-//        launcher.goIncreasedDemand(50);
+        launcher.goIncreasedDemand(11);
        
-        launcher.go(0);
-        launcher.generateOutput();
+//        launcher.go(0);
+//        launcher.generateOutput();
     }
 
 
@@ -234,14 +256,17 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
 
 	private void goIncreasedDemand(int maxd) {
 		String outdir =dirName +"increaseddemand\\electric\\" ;
+//		String outdir =dirName +"increaseddemand\\gas\\" ;
+		
 		for (Integer i = 5;i<=maxd;i++){
 			
 			taxiCustomersFileName = dirName + "increaseddemand\\taxidemand\\taxiCustomers_"+i.toString()+".txt";
 			electricStatsDir = outdir +i.toString()+"\\";
-			
+			histogramOutDirName = electricStatsDir + "histograms\\";
 			scenario = ElectroCabLaunchUtils.initMatsimData(netFileName, plansFileName,
 	                taxiCustomersFileName);
 			go(i);
+			generateOutput();
 		}
 		
 		BufferedWriter bw;

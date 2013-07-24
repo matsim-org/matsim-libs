@@ -130,10 +130,15 @@ public class ScheduleChartUtils
             ChartTask t = getTask(row, column);
 
             ChartTask tt;
+            ChartTask ttt;
             TaskType lastType = TaskType.WAIT;
+            TaskType nextType = null;
+            
             if (column > 0){
             	tt = getTask(row,column-1);
             	 lastType = tt.vrpTask.getType();
+            	 ttt=getTask(row,column+1);
+            	 if (ttt!=null) nextType = ttt.vrpTask.getType();
             }
             
             switch (t.vrpTask.getType()) {
@@ -141,17 +146,23 @@ public class ScheduleChartUtils
                     return Color.DARK_GRAY;
                 case DRIVE:
                 	if (column > 0){
-                		if (lastType.equals(t.vrpTask.getType())){
+                		
+                		if (nextType!=null){
+                		if (lastType.equals(TaskType.WAIT)&&nextType.equals(TaskType.WAIT)){
                 			return Color.MAGENTA;
+                		}else if (lastType.equals(t.vrpTask.getType())){
+                			return Color.MAGENTA;	
                 		}
+                		
                 		else return DARK_BLUE;
+                		}
                 		
                 	}
                 	else  return DARK_BLUE;
                 case SERVE:
-                    if ( ((ServeTask)t.vrpTask).getRequest().getFixedVehicle()) {
-                        return Color.ORANGE;
-                    }
+//                    if ( ((ServeTask)t.vrpTask).getRequest().getFixedVehicle()) {
+//                        return Color.ORANGE;
+//                    }
                     
                     return DARK_RED;
                 default:
@@ -164,8 +175,13 @@ public class ScheduleChartUtils
 
         private ChartTask getTask(int series, int item)
         {
+        	try{
             return (ChartTask)tsc.getSeries(series).get(item);
-        }
+        	}
+        	catch (IndexOutOfBoundsException e){
+        		return null;
+        	}
+        	}
 
     }
 

@@ -136,6 +136,7 @@ public class IdleRankVehicleFinder
             return deltaX * deltaX + deltaY * deltaY;
         }
         else {
+        	
             return data.getVrpGraph().getArc(fromVertex, toVertex).getCostOnDeparture(departTime);
         }
     }

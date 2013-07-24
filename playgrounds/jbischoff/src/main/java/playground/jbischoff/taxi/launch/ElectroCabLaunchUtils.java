@@ -44,7 +44,6 @@ import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
-
 import pl.poznan.put.util.lang.TimeDiscretizer;
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
@@ -63,235 +62,233 @@ import playground.michalm.vrp.data.network.router.*;
 import playground.michalm.vrp.data.network.shortestpath.MatsimArcFactories;
 import playground.michalm.vrp.run.VrpConfigUtils;
 import playground.michalm.vrp.taxi.*;
+
 /**
  * 
  * 
  * 
  * @author jbischoff
- *
+ * 
  */
 
-public class ElectroCabLaunchUtils
-{
-    public enum TravelTimeSource
-    {
-        FREE_FLOW_SPEED(24 * 60 * 60), // no eventsFileName
-        EVENTS_24_H(24 * 60 * 60), // based on eventsFileName, with 24-hour time interval
-        EVENTS_15_MIN(15 * 60); // based on eventsFileName, with 15-minute time interval
+public class ElectroCabLaunchUtils {
+	public enum TravelTimeSource {
+		FREE_FLOW_SPEED(24 * 60 * 60), // no eventsFileName
+		EVENTS_24_H(24 * 60 * 60), // based on eventsFileName, with 24-hour time
+									// interval
+		EVENTS_15_MIN(15 * 60); // based on eventsFileName, with 15-minute time
+								// interval
 
-        /*package*/final int travelTimeBinSize;
-        /*package*/final int numSlots;
+		/* package */final int travelTimeBinSize;
+		/* package */final int numSlots;
 
+		private TravelTimeSource(int travelTimeBinSize) {
+			this.travelTimeBinSize = travelTimeBinSize;
+			this.numSlots = 24 * 60 * 60 / travelTimeBinSize;// to cover 24
+																// hours
+		}
+	}
 
-        private TravelTimeSource(int travelTimeBinSize)
-        {
-            this.travelTimeBinSize = travelTimeBinSize;
-            this.numSlots = 24 * 60 * 60 / travelTimeBinSize;// to cover 24 hours
-        }
-    }
+	public enum TravelCostSource {
+		TIME, // travel time
+		DISTANCE; // travel distance
+	}
 
+	private EnergyConsumptionTracker energyConsumptionTracker;
+	// private ChargeUponDepotArrival chargeUponDepotArrival;
+	private DepotReader depotReader;
+	private DepotArrivalDepartureCharger depotArrivalDepartureCharger;
+	private TravelDistanceTimeEvaluator travelDistanceEvaluator;
+	private TaxiCustomerWaitTimeAnalyser taxiCustomerWaitTimeAnalyser;
 
-    public enum TravelCostSource
-    {
-        TIME, // travel time
-        DISTANCE; // travel distance
-    }
-    private EnergyConsumptionTracker energyConsumptionTracker ;
-//    private ChargeUponDepotArrival chargeUponDepotArrival;
-    private DepotReader depotReader;
-    private DepotArrivalDepartureCharger depotArrivalDepartureCharger;
-    private TravelDistanceTimeEvaluator travelDistanceEvaluator;
-    private TaxiCustomerWaitTimeAnalyser taxiCustomerWaitTimeAnalyser;
+	/**
+	 * Mandatory
+	 */
+	public static Scenario initMatsimData(String netFileName,
+			String plansFileName, String taxiCustomersFileName) {
+		Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils
+				.createConfig());
 
-    /**
-     * Mandatory
-     */
-    public static Scenario initMatsimData(String netFileName, String plansFileName,
-            String taxiCustomersFileName)
-    {
-        Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
+		new MatsimNetworkReader(scenario).readFile(netFileName);
+		new MatsimPopulationReader(scenario).readFile(plansFileName);
 
-        new MatsimNetworkReader(scenario).readFile(netFileName);
-        new MatsimPopulationReader(scenario).readFile(plansFileName);
+		List<String> taxiCustomerIds;
+		try {
+			taxiCustomerIds = ODDemandGenerator
+					.readTaxiCustomerIds(taxiCustomersFileName);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 
-        List<String> taxiCustomerIds;
-        try {
-            taxiCustomerIds = ODDemandGenerator.readTaxiCustomerIds(taxiCustomersFileName);
-        }
-        catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+		for (String id : taxiCustomerIds) {
+			Person person = scenario.getPopulation().getPersons()
+					.get(scenario.createId(id));
+			Leg leg = (Leg) person.getSelectedPlan().getPlanElements().get(1);
+			leg.setMode(TaxiModeDepartureHandler.TAXI_MODE);
+		}
 
-        for (String id : taxiCustomerIds) {
-            Person person = scenario.getPopulation().getPersons().get(scenario.createId(id));
-            Leg leg = (Leg)person.getSelectedPlan().getPlanElements().get(1);
-            leg.setMode(TaxiModeDepartureHandler.TAXI_MODE);
-        }
+		return scenario;
+	}
 
-        return scenario;
-    }
+	/**
+	 * Mandatory
+	 */
+	public MatsimVrpData initMatsimVrpData(Scenario scenario,
+			TravelTimeSource ttimeSource, TravelCostSource tcostSource,
+			String eventsFileName, String depotsFileName) {
+		int travelTimeBinSize = ttimeSource.travelTimeBinSize;
+		int numSlots = ttimeSource.numSlots;
 
+		scenario.getConfig().travelTimeCalculator()
+				.setTraveltimeBinSize(travelTimeBinSize);
 
-    /**
-     * Mandatory
-     */
-    public  MatsimVrpData initMatsimVrpData(Scenario scenario, TravelTimeSource ttimeSource,
-            TravelCostSource tcostSource, String eventsFileName, String depotsFileName)
-    {
-        int travelTimeBinSize = ttimeSource.travelTimeBinSize;
-        int numSlots = ttimeSource.numSlots;
+		TravelTime ttimeCalc;
+		TravelDisutility tcostCalc;
 
-        scenario.getConfig().travelTimeCalculator().setTraveltimeBinSize(travelTimeBinSize);
+		switch (ttimeSource) {
+		case FREE_FLOW_SPEED:
+			ttimeCalc = new FreeSpeedTravelTime();
+			break;
 
-        TravelTime ttimeCalc;
-        TravelDisutility tcostCalc;
+		case EVENTS_15_MIN:
+		case EVENTS_24_H:
+			ttimeCalc = TravelTimeCalculators.createTravelTimeFromEvents(
+					eventsFileName, scenario);
+			break;
 
-        switch (ttimeSource) {
-            case FREE_FLOW_SPEED:
-                ttimeCalc = new FreeSpeedTravelTime();
-                break;
+		default:
+			throw new IllegalArgumentException();
+		}
 
-            case EVENTS_15_MIN:
-            case EVENTS_24_H:
-                ttimeCalc = TravelTimeCalculators.createTravelTimeFromEvents(eventsFileName,
-                        scenario);
-                break;
+		switch (tcostSource) {
+		case DISTANCE:
+			tcostCalc = new DistanceAsTravelDisutility();
+			break;
 
-            default:
-                throw new IllegalArgumentException();
-        }
+		case TIME:
+			tcostCalc = new TimeAsTravelDisutility(ttimeCalc);
+			break;
 
-        switch (tcostSource) {
-            case DISTANCE:
-                tcostCalc = new DistanceAsTravelDisutility();
-                break;
+		default:
+			throw new IllegalArgumentException();
+		}
 
-            case TIME:
-                tcostCalc = new TimeAsTravelDisutility(ttimeCalc);
-                break;
+		Network network = scenario.getNetwork();
+		TimeDiscretizer timeDiscretizer = new TimeDiscretizer(
+				travelTimeBinSize, numSlots);
+		ArcFactory arcFactory = MatsimArcFactories.createArcFactory(network,
+				ttimeCalc, tcostCalc, timeDiscretizer, false);
 
-            default:
-                throw new IllegalArgumentException();
-        }
+		MatsimVrpGraph graph;
+		try {
+			graph = MatsimVrpGraphCreator.create(network, arcFactory, false);
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
 
-        Network network = scenario.getNetwork();
-        TimeDiscretizer timeDiscretizer = new TimeDiscretizer(travelTimeBinSize, numSlots);
-        ArcFactory arcFactory = MatsimArcFactories.createArcFactory(network, ttimeCalc, tcostCalc,
-                timeDiscretizer, false);
+		VrpData vrpData = new VrpData();
+		vrpData.setVrpGraph(graph);
+		vrpData.setCustomers(new ArrayList<Customer>());
+		vrpData.setRequests(new ArrayList<Request>());
+		this.depotReader = new DepotReader(scenario, vrpData);
+		this.depotReader.readFile(depotsFileName);
 
-        MatsimVrpGraph graph;
-        try {
-            graph = MatsimVrpGraphCreator.create(network, arcFactory, false);
-        }
-        catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+		return new MatsimVrpData(vrpData, scenario);
+	}
 
-        VrpData vrpData = new VrpData();
-        vrpData.setVrpGraph(graph);
-        vrpData.setCustomers(new ArrayList<Customer>());
-        vrpData.setRequests(new ArrayList<Request>());
-        this.depotReader =  new DepotReader(scenario, vrpData);
-        this.depotReader.readFile(depotsFileName);
-       
-        return new MatsimVrpData(vrpData, scenario);
-    }
+	/**
+	 * Mandatory
+	 */
+	public QSim initQSim(MatsimVrpData data, NOSRankTaxiOptimizer optimizer) {
+		optimizer.setRankMode(false);
+		optimizer.setIdleRankMode(true);
+		boolean ALLCARSELECTRIC = true;
 
-
-    /**
-     * Mandatory
-     */
-    public  QSim initQSim(MatsimVrpData data, NOSRankTaxiOptimizer optimizer)
-    {
-    	optimizer.setRankMode(true);
-        optimizer.setIdleRankMode(false); 
-    	boolean ALLCARSELECTRIC = true;
-    	
-    	Scenario scenario = data.getScenario();
-        EventsManager events = EventsUtils.createEventsManager();
+		Scenario scenario = data.getScenario();
+		EventsManager events = EventsUtils.createEventsManager();
 		EventHandlerGroup handlerGroup = new EventHandlerGroup();
-		
+
 		EnergyConsumptionModel ecm = new EnergyConsumptionModelRicardoFaria2012();
 
-		HashMap<Id, org.matsim.contrib.transEnergySim.vehicles.api.Vehicle> elvehicles=new HashMap<Id, org.matsim.contrib.transEnergySim.vehicles.api.Vehicle>();
-		
-		travelDistanceEvaluator = new TravelDistanceTimeEvaluator(scenario.getNetwork());
-		
-		if (ALLCARSELECTRIC){
+		HashMap<Id, org.matsim.contrib.transEnergySim.vehicles.api.Vehicle> elvehicles = new HashMap<Id, org.matsim.contrib.transEnergySim.vehicles.api.Vehicle>();
 
-		for (Vehicle v : data.getVrpData().getVehicles()){
+		travelDistanceEvaluator = new TravelDistanceTimeEvaluator(
+				scenario.getNetwork());
+
+		if (ALLCARSELECTRIC) {
+
+			for (Vehicle v : data.getVrpData().getVehicles()) {
+				Id aid = new IdImpl(v.getName());
+				elvehicles.put(aid, new BatteryElectricVehicleImpl(ecm,
+						20 * 1000 * 3600));
+				travelDistanceEvaluator.addAgent(aid);
+			}
+		}
+
+		for (Vehicle v : data.getVrpData().getVehicles()) {
 			Id aid = new IdImpl(v.getName());
-			elvehicles.put(aid, new BatteryElectricVehicleImpl(ecm,20*1000*3600));
 			travelDistanceEvaluator.addAgent(aid);
 		}
-		}
-		
-		for (Vehicle v : data.getVrpData().getVehicles()){
-			Id aid = new IdImpl(v.getName());
-			travelDistanceEvaluator.addAgent(aid);
-		}
-		
-		energyConsumptionTracker = new EnergyConsumptionTracker(elvehicles, scenario.getNetwork());
-		depotArrivalDepartureCharger =new DepotArrivalDepartureCharger(elvehicles);
+
+		energyConsumptionTracker = new EnergyConsumptionTracker(elvehicles,
+				scenario.getNetwork());
+		depotArrivalDepartureCharger = new DepotArrivalDepartureCharger(
+				elvehicles);
 		taxiCustomerWaitTimeAnalyser = new TaxiCustomerWaitTimeAnalyser();
-		
+
 		handlerGroup.addHandler(travelDistanceEvaluator);
 		handlerGroup.addHandler(energyConsumptionTracker);
 		handlerGroup.addHandler(depotArrivalDepartureCharger);
 		handlerGroup.addHandler(taxiCustomerWaitTimeAnalyser);
-		depotArrivalDepartureCharger.setDepotLocations(this.depotReader.getDepotLinks());
+		depotArrivalDepartureCharger.setDepotLocations(this.depotReader
+				.getDepotLinks());
 		events.addHandler(handlerGroup);
-		
-		
-		
-        QSim qSim = new QSim(scenario, events);
-        ActivityEngine activityEngine = new ActivityEngine();
-        qSim.addMobsimEngine(activityEngine);
-        qSim.addActivityHandler(activityEngine);
-        QNetsimEngine netsimEngine = new DefaultQSimEngineFactory().createQSimEngine(qSim);
-        qSim.addMobsimEngine(netsimEngine);
-        qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
 
-        TeleportationEngine teleportationEngine = new TeleportationEngine();
-        qSim.addMobsimEngine(teleportationEngine);
-        
-        
-        optimizer.addDepotArrivalCharger(depotArrivalDepartureCharger);
-        
-        TaxiSimEngine taxiSimEngine = new ElectricTaxiSimEngine(qSim, data, optimizer,depotArrivalDepartureCharger);
-        qSim.addMobsimEngine(taxiSimEngine);
+		QSim qSim = new QSim(scenario, events);
+		ActivityEngine activityEngine = new ActivityEngine();
+		qSim.addMobsimEngine(activityEngine);
+		qSim.addActivityHandler(activityEngine);
+		QNetsimEngine netsimEngine = new DefaultQSimEngineFactory()
+				.createQSimEngine(qSim);
+		qSim.addMobsimEngine(netsimEngine);
+		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
 
-        qSim.addAgentSource(new PopulationAgentSource(scenario.getPopulation(),
-                new DefaultAgentFactory(qSim), qSim));
-        qSim.addAgentSource(new TaxiAgentSource(data, taxiSimEngine, false));
-        qSim.addDepartureHandler(new TaxiModeDepartureHandler(taxiSimEngine, data));
+		TeleportationEngine teleportationEngine = new TeleportationEngine();
+		qSim.addMobsimEngine(teleportationEngine);
 
-        
-        
-//    	chargeUponDepotArrival = new ChargeUponDepotArrival(elvehicles);
-//    	chargeUponDepotArrival.setDepotLocations(this.depotReader.getDepotLinks());
-    	
-//      handlerGroup.addHandler(chargeUponDepotArrival);
-        return qSim;
-    }
-    
-    
+		optimizer.addDepotArrivalCharger(depotArrivalDepartureCharger);
 
+		TaxiSimEngine taxiSimEngine = new ElectricTaxiSimEngine(qSim, data,
+				optimizer, depotArrivalDepartureCharger);
+		qSim.addMobsimEngine(taxiSimEngine);
 
-    /**
-     * Optional
-     */
-    public static void writeHistograms(LegHistogram legHistogram, String histogramOutDirName)
-    {
-        new File(histogramOutDirName).mkdir();
-        legHistogram.write(histogramOutDirName + "legHistogram_all.txt");
-        legHistogram.writeGraphic(histogramOutDirName + "legHistogram_all.png");
-        for (String legMode : legHistogram.getLegModes()) {
-            legHistogram.writeGraphic(histogramOutDirName + "legHistogram_" + legMode + ".png",
-                    legMode);
-        }
-    }
-    
+		qSim.addAgentSource(new PopulationAgentSource(scenario.getPopulation(),
+				new DefaultAgentFactory(qSim), qSim));
+		qSim.addAgentSource(new TaxiAgentSource(data, taxiSimEngine, false));
+		qSim.addDepartureHandler(new TaxiModeDepartureHandler(taxiSimEngine,
+				data));
+
+		// chargeUponDepotArrival = new ChargeUponDepotArrival(elvehicles);
+		// chargeUponDepotArrival.setDepotLocations(this.depotReader.getDepotLinks());
+
+		// handlerGroup.addHandler(chargeUponDepotArrival);
+		return qSim;
+	}
+
+	/**
+	 * Optional
+	 */
+	public static void writeHistograms(LegHistogram legHistogram,
+			String histogramOutDirName) {
+		new File(histogramOutDirName).mkdir();
+		legHistogram.write(histogramOutDirName + "legHistogram_all.txt");
+		legHistogram.writeGraphic(histogramOutDirName + "legHistogram_all.png");
+		for (String legMode : legHistogram.getLegModes()) {
+			legHistogram.writeGraphic(histogramOutDirName + "legHistogram_"
+					+ legMode + ".png", legMode);
+		}
+	}
+
 	public void printStatisticsToConsole() {
 		System.out.println("energy consumption stats");
 		depotArrivalDepartureCharger.getSoCLog().printToConsole();
@@ -299,17 +296,20 @@ public class ElectroCabLaunchUtils
 
 	}
 
-	
 	public String writeStatisticsToFiles(String dirname) {
-		System.out.println("writing energy consumption stats directory to "+ dirname);
+		System.out.println("writing energy consumption stats directory to "
+				+ dirname);
 		depotArrivalDepartureCharger.getSoCLog().writeToFiles(dirname);
-		String dist = travelDistanceEvaluator.writeTravelDistanceStatsToFiles(dirname + "travelDistanceStats.txt");
-		String wait = taxiCustomerWaitTimeAnalyser.writeCustomerWaitStats(dirname+"customerWaitStatistic.txt");
+		String dist = travelDistanceEvaluator
+				.writeTravelDistanceStatsToFiles(dirname
+						+ "travelDistanceStats.txt");
+		String wait = taxiCustomerWaitTimeAnalyser
+				.writeCustomerWaitStats(dirname + "customerWaitStatistic.txt");
 		System.out.println("...done");
 		travelDistanceEvaluator.printTravelDistanceStatistics();
 		taxiCustomerWaitTimeAnalyser.printTaxiCustomerWaitStatistics();
 
-		return wait+"\t"+dist;
+		return wait + "\t" + dist;
 	}
-	
+
 }

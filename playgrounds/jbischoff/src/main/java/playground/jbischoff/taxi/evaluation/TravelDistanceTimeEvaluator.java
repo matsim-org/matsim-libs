@@ -25,7 +25,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,7 +41,6 @@ import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 
-import playground.jbischoff.energy.log.SocLogRow;
 /**
  * 
  * 
