@@ -69,7 +69,7 @@ public class ActivityFacilityImpl implements ActivityFacility {
 		if (this.activities.containsKey(type)) {
 			throw new RuntimeException(this + "[type=" + type + " already exists]");
 		}
-		if (option.getFacilityId() != null && !option.getFacilityId().equals(this.id)) {
+		if (option.getFacility() != null && option.getFacility() != this) {
 			throw new RuntimeException("This activity option already belongs to a different ActivityFacility!");
 		}
 		option.setFacility(this);

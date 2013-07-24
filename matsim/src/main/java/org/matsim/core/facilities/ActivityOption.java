@@ -21,7 +21,6 @@ package org.matsim.core.facilities;
 
 import java.util.SortedSet;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.internal.MatsimFacilitiesObject;
 import org.matsim.core.facilities.OpeningTime.DayType;
@@ -52,6 +51,4 @@ public interface ActivityOption extends MatsimFacilitiesObject {
 	 */
 	public void setFacility(final ActivityFacility facility);
 	
-	public Id getFacilityId();
-
 }

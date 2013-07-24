@@ -308,8 +308,8 @@ public class CreateCensusV2Households {
 //			Id houseHoldId = scenario.createId(idString);
 			Id householdId = this.scenario.createId(description);
 
-			Id homeFacilityId = knowledge.getActivities("home").get(0).getFacilityId();
-			Coord homeFacilityCoord = facilities.getFacilities().get(homeFacilityId).getCoord();
+			ActivityFacility homeFacility = knowledge.getActivities("home").get(0).getFacility();
+			Coord homeFacilityCoord = homeFacility.getCoord();
 
 			Household household = households.getHouseholds().get(householdId);
 
@@ -323,14 +323,14 @@ public class CreateCensusV2Households {
 				household = households.getFactory().createHousehold(householdId);
 				households.getHouseholds().put(householdId, household);
 
-				householdFacilityMap.put(householdId, homeFacilityId);
+				householdFacilityMap.put(householdId, homeFacility.getId());
 
-				this.householdAttributes.putAttribute(householdId.toString(), "homeFacilityId", homeFacilityId.toString());
+				this.householdAttributes.putAttribute(householdId.toString(), "homeFacilityId", homeFacility.getId().toString());
 				this.householdAttributes.putAttribute(householdId.toString(), "x", homeFacilityCoord.getX());
 				this.householdAttributes.putAttribute(householdId.toString(), "y", homeFacilityCoord.getY());
 			} else {
 				Id householdFacilityId = householdFacilityMap.get(householdId);
-				if (!homeFacilityId.equals(householdFacilityId)) {
+				if (!homeFacility.getId().equals(householdFacilityId)) {
 
 					log.warn("Home facility has changed - knowledge and plans have to be adapted!");
 
@@ -689,7 +689,7 @@ public class CreateCensusV2Households {
 		for (ActivityOptionImpl activityOption : list) {
 			ActivityOptionImpl newActivityOption = new ActivityOptionImpl("home");
 			newActivityOption.setFacility(homeFacility);
-			boolean isPrimary = knowledge.isPrimary("home", activityOption.getFacilityId());
+			boolean isPrimary = knowledge.isPrimary("home", activityOption.getFacility().getId());
 			knowledge.removeActivity(activityOption);
 			knowledge.addActivityOption(newActivityOption, isPrimary);
 		}

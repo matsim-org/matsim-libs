@@ -117,7 +117,6 @@ public class ActivityOptionImpl implements ActivityOption {
 		return this.facility;
 	}
 
-	@Override
 	public Id getFacilityId() {
 		if (this.facility == null) {
 			return null;
