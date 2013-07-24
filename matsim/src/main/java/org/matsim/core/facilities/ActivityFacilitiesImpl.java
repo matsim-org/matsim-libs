@@ -33,7 +33,6 @@ import org.matsim.core.api.experimental.BasicLocations;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacilitiesFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 public class ActivityFacilitiesImpl implements ActivityFacilities, BasicLocations {
@@ -73,7 +72,7 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, BasicLocation
 
 	public final ActivityFacilityImpl createAndAddFacility(final Id id, final Coord center) {
 		if (this.facilities.containsKey(id)) {
-			Gbl.errorMsg("Facility id=" + id + " already exists.");
+			throw new IllegalArgumentException("Facility with id=" + id + " already exists.");
 		}
 		ActivityFacilityImpl f = new ActivityFacilityImpl(id, center);
 		this.facilities.put(f.getId(),f);
@@ -131,6 +130,11 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, BasicLocation
 
 	@Override
 	public void addActivityFacility(ActivityFacility facility) {
+		// validation
+		if (this.facilities.containsKey(facility.getId())) {
+			throw new IllegalArgumentException("Facility with id=" + id + " already exists.");
+		}
+
 		this.facilities.put(facility.getId(),facility);
 	}
 
