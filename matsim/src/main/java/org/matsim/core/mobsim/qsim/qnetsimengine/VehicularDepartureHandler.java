@@ -115,7 +115,7 @@ class VehicularDepartureHandler implements DepartureHandler {
 				// While we are waiting for our car
 				qlink.registerDriverAgentWaitingForCar(agent);
 			} else {
-				throw new RuntimeException("vehicle not available for agent " + agent.getId() + " on link " + linkId);
+				throw new RuntimeException("vehicle " + vehicleId + " not available for agent " + agent.getId() + " on link " + linkId);
 			}
 		} else {
 			vehicle.setDriver(agent);
