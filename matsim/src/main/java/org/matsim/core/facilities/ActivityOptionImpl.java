@@ -26,7 +26,6 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.gbl.Gbl;
@@ -115,13 +114,6 @@ public class ActivityOptionImpl implements ActivityOption {
 
 	public final ActivityFacility getFacility() {
 		return this.facility;
-	}
-
-	public Id getFacilityId() {
-		if (this.facility == null) {
-			return null;
-		}
-		return this.facility.getId();
 	}
 
 	@Override
