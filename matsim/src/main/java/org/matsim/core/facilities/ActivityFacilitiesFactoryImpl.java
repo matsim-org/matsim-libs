@@ -33,12 +33,12 @@ public class ActivityFacilitiesFactoryImpl implements ActivityFacilitiesFactory 
 
 	@Override
 	public ActivityFacility createActivityFacility(Id id, Coord coord) {
-		return new ActivityFacilityImpl(id,coord) ;
+		return new ActivityFacilityImpl(id,coord);
 	}
 
 	@Override
 	public ActivityOption createActivityOption(String type, ActivityFacility facility) {
-		return new ActivityOptionImpl( type, facility ) ;
+		return new ActivityOptionImpl(type, facility);
 	}
 
 }

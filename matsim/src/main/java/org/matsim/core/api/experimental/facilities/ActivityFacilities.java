@@ -29,7 +29,7 @@ public interface ActivityFacilities extends MatsimToplevelContainer {
 
 	public Map<Id, ? extends ActivityFacility> getFacilities();
 
-	public void addActivityFacility( ActivityFacility facility ) ;
+	public void addActivityFacility(ActivityFacility facility);
 
 	public ObjectAttributes getFacilityAttributes();
 

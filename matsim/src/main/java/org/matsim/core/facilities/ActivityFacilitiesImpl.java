@@ -60,7 +60,7 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, BasicLocation
 
 	public ActivityFacilitiesImpl(final String name) {
 		this.name = name;
-		this.factory = new ActivityFacilitiesFactoryImpl() ;
+		this.factory = new ActivityFacilitiesFactoryImpl();
 	}
 
 	public ActivityFacilitiesImpl() {
@@ -90,7 +90,7 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, BasicLocation
 
 	@Override
 	public ActivityFacilitiesFactory getFactory() {
-		return this.factory ;
+		return this.factory;
 	}
 
 	@Override
@@ -131,7 +131,7 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, BasicLocation
 
 	@Override
 	public void addActivityFacility(ActivityFacility facility) {
-		this.facilities.put( facility.getId(), facility ) ;
+		this.facilities.put(facility.getId(),facility);
 	}
 
 	@Override
