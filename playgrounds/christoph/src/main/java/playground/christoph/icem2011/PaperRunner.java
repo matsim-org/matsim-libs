@@ -48,6 +48,7 @@ import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingContextImpl;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.withinday.controller.WithinDayControlerListener;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
@@ -161,8 +162,9 @@ public class PaperRunner implements StartupListener, MobsimBeforeSimStepListener
 		selector = new SelectHandledAgentsByProbability();
 		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(selector);
 		
-		RoutingContext routingContext = new RoutingContextImpl(this.withinDayControlerListener.getTravelDisutilityFactory(),
-				this.withinDayControlerListener.getTravelTimeCollector(), this.scenario.getConfig().planCalcScore());
+		TravelDisutility travelDisutility = this.withinDayControlerListener.getTravelDisutilityFactory().createTravelDisutility(
+				this.withinDayControlerListener.getTravelTimeCollector(), this.scenario.getConfig().planCalcScore()); 
+		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, this.withinDayControlerListener.getTravelTimeCollector());
 		
 		LinkReplanningMap linkReplanningMap = this.withinDayControlerListener.getLinkReplanningMap();
 		DuringLegIdentifier identifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();

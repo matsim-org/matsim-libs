@@ -51,6 +51,8 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -171,10 +173,10 @@ public class WithinDayInitialRoutesControlerListener implements StartupListener,
 		Set<String> dummyModes = CollectionUtils.stringToSet(TransportMode.car);
 		TripRouterFactory tripRouterFactory = new WithinDayInitialRoutesTripRouterFactory(defaultTripRouterFactory, dummyModes,
 				populationFactory, routeFactory);
-//		RoutingContextImpl routingContext = new RoutingContextImpl(controler.getTravelDisutilityFactory(), controler.getLinkTravelTimes(),
-//				scenario.getConfig().planCalcScore());
-		RoutingContextImpl routingContext = new RoutingContextImpl(controler.getTravelDisutilityFactory(), new FreeSpeedTravelTime(),
-		scenario.getConfig().planCalcScore());
+		
+		TravelTime travelTime = new FreeSpeedTravelTime();
+		TravelDisutility travelDisutility = controler.getTravelDisutilityFactory().createTravelDisutility(travelTime, this.scenario.getConfig().planCalcScore());
+		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, travelTime);
 
 		final PlanRouterProvider planRouterProvider = new PlanRouterProvider(tripRouterFactory, routingContext);
 		
@@ -216,9 +218,10 @@ public class WithinDayInitialRoutesControlerListener implements StartupListener,
 	}
 	
 	protected void initReplanners() {
-				
-		RoutingContext routingContext = new RoutingContextImpl(this.withinDayControlerListener.getTravelDisutilityFactory(),
-				this.withinDayControlerListener.getTravelTimeCollector(), this.scenario.getConfig().planCalcScore());
+		
+		TravelDisutility travelDisutility = this.withinDayControlerListener.getTravelDisutilityFactory().createTravelDisutility(
+				this.withinDayControlerListener.getTravelTimeCollector(), this.scenario.getConfig().planCalcScore()); 
+		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, this.withinDayControlerListener.getTravelTimeCollector());
 		
 		/*
 		 * During Leg Replanner

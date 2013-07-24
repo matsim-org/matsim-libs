@@ -44,6 +44,7 @@ import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingContextImpl;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scoring.functions.OnlyTravelDependentScoringFunctionFactory;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.VehicleType;
@@ -105,9 +106,10 @@ public class DemoRunner implements MobsimInitializedListener, StartupListener,
 	 */
 	protected void initReplanners() {
 
-		RoutingContext routingContext = new RoutingContextImpl(this.withinDayControlerListener.getTravelDisutilityFactory(), 
-				this.withinDayControlerListener.getTravelTimeCollector(), this.scenario.getConfig().planCalcScore());
-		
+		TravelDisutility travelDisutility = this.withinDayControlerListener.getTravelDisutilityFactory().createTravelDisutility(
+				this.withinDayControlerListener.getTravelTimeCollector(), this.scenario.getConfig().planCalcScore()); 
+		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, this.withinDayControlerListener.getTravelTimeCollector());
+
 		this.initialIdentifier = new InitialIdentifierImplFactory(this.withinDayControlerListener.getActivityReplanningMap()).createIdentifier();
 		this.initialReplannerFactory = new CreateEvacuationPlanReplannerFactory(this.scenario, this.withinDayControlerListener.getWithinDayEngine(),
 				this.withinDayControlerListener.getWithinDayTripRouterFactory(), routingContext);

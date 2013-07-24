@@ -28,6 +28,7 @@ import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.mobsim.WithinDayQSimFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
@@ -72,8 +73,8 @@ class MyWithinDayControler extends Controler {
 	 */
 	private void initReplanningRouter() {
 
-		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory(), 
-				this.getLinkTravelTimes(), this.config.planCalcScore());
+		RoutingContext routingContext = new RoutingContextImpl(this.createTravelDisutilityCalculator(), this.getLinkTravelTimes());
+
 		TripRouterFactory tripRouterFactory = new TripRouterFactoryBuilderWithDefaults().build(this.scenarioData);
 		// replanning while at activity:
 

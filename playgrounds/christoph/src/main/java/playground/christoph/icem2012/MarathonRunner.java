@@ -69,6 +69,7 @@ import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -776,8 +777,10 @@ public final class MarathonRunner implements StartupListener,
 
 		TripRouterFactory tripRouterFactory = new MultimodalTripRouterFactory(this.scenario, travelTimes, penaltyCostFactory);
 		this.withinDayControlerListener.setWithinDayTripRouterFactory(tripRouterFactory);
-		
-		RoutingContext routingContext = new RoutingContextImpl(penaltyCostFactory, this.withinDayControlerListener.getTravelTimeCollector(), this.scenario.getConfig().planCalcScore());
+
+		TravelDisutility travelDisutility = penaltyCostFactory.createTravelDisutility(this.withinDayControlerListener.getTravelTimeCollector(), 
+				this.scenario.getConfig().planCalcScore()); 
+		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, this.withinDayControlerListener.getTravelTimeCollector());
 		
 		/*
 		 * During Activity Replanners

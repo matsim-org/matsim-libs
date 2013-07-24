@@ -59,6 +59,7 @@ import org.matsim.core.router.old.LegRouter;
 import org.matsim.core.router.old.NetworkLegRouter;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
@@ -139,8 +140,10 @@ public class WithinDayParkingControlerListener implements StartupListener, Repla
 				controler.getTravelDisutilityFactory(), defaultTripRouterFactory, leastCostPathCalculatorFactory);
 		
 		// ensure that all agents' plans have valid mode chains
-		RoutingContext routingContext = new RoutingContextImpl(controler.getTravelDisutilityFactory(), 
-				new FreeSpeedTravelTime(), controler.getConfig().planCalcScore());
+		TravelTime travelTime = new FreeSpeedTravelTime();
+		TravelDisutility travelDisutility = controler.getTravelDisutilityFactory().createTravelDisutility(travelTime, 
+				controler.getConfig().planCalcScore());
+		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, travelTime);
 		TripRouter tripRouter = multiModalTripRouterFactory.instantiateAndConfigureTripRouter(routingContext);
 		PlanAlgorithm planAlgorithm = new PlanRouter(tripRouter);
 		legModeChecker = new LegModeChecker(this.scenario, planAlgorithm);

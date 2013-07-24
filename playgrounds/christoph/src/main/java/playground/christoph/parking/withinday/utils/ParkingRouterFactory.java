@@ -28,6 +28,7 @@ import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 
 public class ParkingRouterFactory {
@@ -49,8 +50,10 @@ public class ParkingRouterFactory {
 	}
 	
 	public ParkingRouter createParkingRouter() {
-		RoutingContext routingContext = new RoutingContextImpl(this.travelDisutilityFactory, 
-				this.travelTimes.get(TransportMode.car), this.scenario.getConfig().planCalcScore());
+		TravelTime travelTime = this.travelTimes.get(TransportMode.car);
+		TravelDisutility travelDisutility = this.travelDisutilityFactory.createTravelDisutility(travelTime, 
+				this.scenario.getConfig().planCalcScore());
+		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, travelTime);
 		return new ParkingRouter(scenario, travelTimes, travelDisutilityFactory, 
 				tripRouterFactory.instantiateAndConfigureTripRouter(routingContext), nodesToCheck);
 	}
