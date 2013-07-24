@@ -27,20 +27,24 @@ import org.matsim.core.router.util.TravelTime;
 
 public class RoutingContextImpl implements RoutingContext {
 
-	private final TravelDisutilityFactory travelDisutilityFactory;
+	private final TravelDisutility travelDisutility;
 	private final TravelTime travelTime;
-	private final PlanCalcScoreConfigGroup cnScoringGroup;
-	
+
+	public RoutingContextImpl(TravelDisutility travelDisutility, TravelTime travelTime) {
+		this.travelDisutility = travelDisutility;
+		this.travelTime = travelTime;
+	}
+
+	@Deprecated
 	public RoutingContextImpl(TravelDisutilityFactory travelDisutilityFactory, TravelTime travelTime,
 			PlanCalcScoreConfigGroup cnScoringGroup) {
-		this.travelDisutilityFactory = travelDisutilityFactory;
+		this.travelDisutility = travelDisutilityFactory.createTravelDisutility(travelTime, cnScoringGroup);
 		this.travelTime = travelTime;
-		this.cnScoringGroup = cnScoringGroup;
 	}
 	
 	@Override
 	public TravelDisutility getTravelDisutility() {
-		return this.travelDisutilityFactory.createTravelDisutility(travelTime, cnScoringGroup);
+		return this.travelDisutility;
 	}
 
 	@Override

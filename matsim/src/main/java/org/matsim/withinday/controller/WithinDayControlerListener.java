@@ -40,6 +40,7 @@ import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.pt.router.TransitRouterFactory;
@@ -165,8 +166,9 @@ public class WithinDayControlerListener implements StartupListener {
 	 * Uses travel times from the travel time collector for car trips.
 	 */
 	public TripRouter getTripRouterInstance() {
-		RoutingContext routingContext = new RoutingContextImpl(this.travelDisutilityFactory, 
-				this.getTravelTimeCollector(), this.scenario.getConfig().planCalcScore());
+		TravelDisutility travelDisutility = this.travelDisutilityFactory.createTravelDisutility(this.getTravelTimeCollector(), 
+				this.scenario.getConfig().planCalcScore());
+		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, this.getTravelTimeCollector());
 		return this.withinDayTripRouterFactory.instantiateAndConfigureTripRouter(routingContext);
 	}
 	

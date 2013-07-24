@@ -28,6 +28,7 @@ import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
 import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.scoring.functions.OnlyTravelDependentScoringFunctionFactory;
 import org.matsim.withinday.replanning.identifiers.ActivityEndIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.InitialIdentifierImplFactory;
@@ -129,8 +130,9 @@ public class ExampleWithinDayController implements StartupListener {
 	
 	public void initReplanners() {
 		
-		RoutingContext routingContext = new RoutingContextImpl(this.withinDayControlerListener.getTravelDisutilityFactory(), 
-				this.withinDayControlerListener.getTravelTimeCollector(), this.scenario.getConfig().planCalcScore());
+		TravelDisutility travelDisutility = this.withinDayControlerListener.getTravelDisutilityFactory()
+				.createTravelDisutility(this.withinDayControlerListener.getTravelTimeCollector(), this.scenario.getConfig().planCalcScore());
+		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, this.withinDayControlerListener.getTravelTimeCollector());
 		
 		this.initialIdentifierFactory = new InitialIdentifierImplFactory(this.withinDayControlerListener.getActivityReplanningMap());
 		this.initialProbabilityFilterFactory = new ProbabilityFilterFactory(this.pInitialReplanning);

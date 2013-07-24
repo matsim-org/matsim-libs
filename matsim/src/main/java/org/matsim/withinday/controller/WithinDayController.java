@@ -39,6 +39,7 @@ import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.mobsim.WithinDayQSimFactory;
@@ -204,8 +205,9 @@ public abstract class WithinDayController extends Controler implements StartupLi
 	 * Uses travel times from the travel time collector for car trips.
 	 */
 	public TripRouter getWithinDayTripRouterInstance() {
-		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory(), 
-				this.getTravelTimeCollector(), this.scenarioData.getConfig().planCalcScore());
+		TravelDisutility travelDisutility = this.getTravelDisutilityFactory().createTravelDisutility(this.getTravelTimeCollector(), 
+				this.scenarioData.getConfig().planCalcScore());
+		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, this.getTravelTimeCollector());
 		return this.withinDayTripRouterFactory.instantiateAndConfigureTripRouter(routingContext);
 	}
 	
