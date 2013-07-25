@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -233,7 +234,7 @@ public class ActivityAnalyser {
 		
 		/* Execute the multi-threaded analysis. */
 		for(File file : vehicles){
-			ActivityWithFacilityIdCallable job = new ActivityWithFacilityIdCallable(file, counter);
+			Callable<Tuple<Id, Double>> job = new ActivityWithFacilityIdCallable(file, counter);
 			Future<Tuple<Id, Double>> result = this.threadExecutor.submit(job);
 			listOfJobs.add(result);
 		}
