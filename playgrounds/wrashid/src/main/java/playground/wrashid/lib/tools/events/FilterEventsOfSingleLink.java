@@ -31,11 +31,11 @@ public class FilterEventsOfSingleLink {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String inputEventsFilePath="C:/data/workspace3/playgrounds/wrashid/events.xml/events.xml";
-		String outputEventsFilePath="C:/data/workspace3/playgrounds/wrashid/events.xml/events_filtered.xml";
+		String inputEventsFilePath="\\\\kosrae.ethz.ch\\ivt-home\\simonimi\\thesis\\output_no_pricing_v5_subtours_JDEQSim_squeeze60\\ITERS\\it.50\\50.events.xml.gz";
+		String outputEventsFilePath="C:/data/workspace3/playgrounds/wrashid/events.xml/events_filtered2.xml";
+		EventsFilter eventsFilter = new EventsFilter(outputEventsFilePath, new IdImpl("17560001228443FT"));
 		EventsManager events = EventsUtils.createEventsManager();
 
-		EventsFilter eventsFilter = new EventsFilter(outputEventsFilePath, new IdImpl("l1"));
 
 		events.addHandler(eventsFilter);
 
