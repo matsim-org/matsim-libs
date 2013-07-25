@@ -52,7 +52,7 @@ public class CheckActivityPercentages {
 		for(double thisRadius : radii){
 			for(int thisPmin : pmins){
 				LOG.info("================================================================================");
-				LOG.info("Executing chain modification for radius " + thisRadius + ", and pmin of " + thisPmin);
+				LOG.info("Performing percentage-facility-id analysis for radius " + thisRadius + ", and pmin of " + thisPmin);
 				LOG.info("================================================================================");
 				/* Set configuration-specific filenames */
 				String vehicleFolder = String.format("%s%.0f_%d/xml2/", sourceFolder, thisRadius, thisPmin);
