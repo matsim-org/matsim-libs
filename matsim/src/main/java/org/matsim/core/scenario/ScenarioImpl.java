@@ -134,6 +134,7 @@ public class ScenarioImpl implements Scenario {
 		this.addScenarioElement(new SignalsDataImpl(this.config.signalSystems()));
 	}
 
+	@Override
 	public ActivityFacilitiesImpl getActivityFacilities() {
 		return this.facilities;
 	}

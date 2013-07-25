@@ -44,6 +44,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.contrib.multimodal.router.MultimodalTripRouterFactory;
 import org.matsim.contrib.multimodal.tools.MultiModalNetworkCreator;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -584,6 +585,11 @@ public class SelectHouseholdMeetingPoint implements MobsimInitializedListener, M
 		@Override
 		public TransitSchedule getTransitSchedule() {
 			return this.scenario.getTransitSchedule();
+		}
+		
+		@Override
+		public ActivityFacilities getActivityFacilities() {
+			return this.scenario.getActivityFacilities();
 		}
 
 		@Override

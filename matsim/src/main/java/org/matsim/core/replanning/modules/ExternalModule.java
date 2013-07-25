@@ -35,6 +35,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
@@ -49,7 +50,6 @@ import org.matsim.core.population.PopulationWriter;
 import org.matsim.core.population.PopulationWriterHandlerImplV4;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.ExeRunner;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -264,6 +264,11 @@ public class ExternalModule implements PlanStrategyModule {
 			return null;
 		}
 
+		@Override
+		public ActivityFacilities getActivityFacilities() {
+			return null;
+		}
+		
 		@Override
 		public Coord createCoord(double x, double y) {
 			return this.scenario.createCoord(x, y);

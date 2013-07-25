@@ -5,6 +5,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -33,6 +34,11 @@ public class SharedNetScenario implements Scenario {
 	@Override
 	public TransitSchedule getTransitSchedule() {
 		return this.scenario.getTransitSchedule();
+	}
+	
+	@Override
+	public ActivityFacilities getActivityFacilities() {
+		return this.scenario.getActivityFacilities();
 	}
 
 	@Override
