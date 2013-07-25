@@ -112,19 +112,23 @@ public class ActivityAnalyser {
 		
 		/* Check (optional) input. */
 		List<File> vehicleFiles = null;
-		File f = new File(input);
-		if(input == null || input.equalsIgnoreCase("null") ||
-				!f.exists() || !f.isFile() || !f.canRead()){
+		if(input == null){
 			/* Read all the vehicle files from the xml folder. */
-			vehicleFiles = FileUtils.sampleFiles(f, Integer.MAX_VALUE, FileUtils.getFileFilter(".xml.gz"));
+			vehicleFiles = FileUtils.sampleFiles(folder, Integer.MAX_VALUE, FileUtils.getFileFilter(".xml.gz"));
 		} else{
-			/* The input location is assumed to be a file containing the Ids of
-			 * those vehicles that should be taken into account. */
-			try {
-				vehicleFiles = DigicoreUtils.readDigicoreVehicleIds(input, xmlFolder);
-			} catch (IOException e) {
-				e.printStackTrace();
-				throw new RuntimeException("Could not read vehicle Ids from " + input);
+			File f = new File(input);
+			if(input.equalsIgnoreCase("null") || !f.exists() || !f.isFile() || !f.canRead()){
+				/* Read all the vehicle files from the xml folder. */
+				vehicleFiles = FileUtils.sampleFiles(folder, Integer.MAX_VALUE, FileUtils.getFileFilter(".xml.gz"));
+			} else{
+				/* The input location is assumed to be a file containing the Ids of
+				 * those vehicles that should be taken into account. */
+				try {
+					vehicleFiles = DigicoreUtils.readDigicoreVehicleIds(input, xmlFolder);
+				} catch (IOException e) {
+					e.printStackTrace();
+					throw new RuntimeException("Could not read vehicle Ids from " + input);
+				}
 			}
 		}
 
