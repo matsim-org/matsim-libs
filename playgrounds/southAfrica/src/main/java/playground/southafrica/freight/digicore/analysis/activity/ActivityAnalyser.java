@@ -47,7 +47,7 @@ import playground.southafrica.utilities.Header;
 
 public class ActivityAnalyser {
 	final private static Logger LOG = Logger.getLogger(ActivityAnalyser.class);
-	private final ExecutorService threadExecutor;
+	private int numberOfThreads = 1;
 	
 	/**
 	 * Simple class to perform a number of analysis on activity times and 
@@ -75,7 +75,7 @@ public class ActivityAnalyser {
 	 */
 	public ActivityAnalyser(int numberOfThreads) {
 		/* Set up the multithreaded analysis. */
-		this.threadExecutor = Executors.newFixedThreadPool(numberOfThreads);
+		this.numberOfThreads = numberOfThreads;
 	}
 	
 	
@@ -162,14 +162,15 @@ public class ActivityAnalyser {
 		List<ActivityStartTimeRunable> listOfJobs = new ArrayList<ActivityStartTimeRunable>(vehicles.size());
 		
 		/* Execute the multi-threaded analysis. */
+		ExecutorService threadExecutor = Executors.newFixedThreadPool(numberOfThreads);
 		for(File file : vehicles){
 			ActivityStartTimeRunable job = new ActivityStartTimeRunable(file, counter, "minor");
-			this.threadExecutor.execute(job);
+			threadExecutor.execute(job);
 			listOfJobs.add(job);
 		}
 		
-		this.threadExecutor.shutdown();
-		while(!this.threadExecutor.isTerminated()){
+		threadExecutor.shutdown();
+		while(!threadExecutor.isTerminated()){
 		}
 		counter.printCounter();
 		
@@ -233,14 +234,18 @@ public class ActivityAnalyser {
 		List<Future<Tuple<Id, Double>>> listOfJobs = new ArrayList<Future<Tuple<Id,Double>>>();
 		
 		/* Execute the multi-threaded analysis. */
+		ExecutorService threadExecutor = Executors.newFixedThreadPool(numberOfThreads);
 		for(File file : vehicles){
+			/*TODO Remove after debugging. */
+			LOG.info("   --> " + file.getAbsolutePath());
+			
 			Callable<Tuple<Id, Double>> job = new ActivityWithFacilityIdCallable(file, counter);
-			Future<Tuple<Id, Double>> result = this.threadExecutor.submit(job);
+			Future<Tuple<Id, Double>> result = threadExecutor.submit(job);
 			listOfJobs.add(result);
 		}
 		
-		this.threadExecutor.shutdown();
-		while(!this.threadExecutor.isTerminated()){
+		threadExecutor.shutdown();
+		while(!threadExecutor.isTerminated()){
 		}
 		counter.printCounter();
 		
