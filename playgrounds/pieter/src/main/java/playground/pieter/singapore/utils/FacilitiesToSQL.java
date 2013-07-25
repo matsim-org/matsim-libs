@@ -7,24 +7,18 @@ import java.io.StringReader;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Iterator;
-import java.util.Map;
-import java.util.SortedSet;
-import java.util.logging.Logger;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
-import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.facilities.OpeningTime;
-import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.facilities.OpeningTime.DayType;
+import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.postgresql.PGConnection;
@@ -52,7 +46,7 @@ public class FacilitiesToSQL {
 				"y_utm48n real," +
 				"description VARCHAR(255)" +			
 				")",tableName));
-		ActivityFacilitiesImpl facs = scenario.getActivityFacilities();
+		ActivityFacilities facs = scenario.getActivityFacilities();
 		for(ActivityFacility fac:facs.getFacilities().values()){
 			ActivityFacilityImpl fi = (ActivityFacilityImpl) fac;
 			String id = fi.getId().toString();
@@ -81,7 +75,7 @@ public class FacilitiesToSQL {
 			e.printStackTrace();
 		}
 		System.out.println("Filling the table");
-		ActivityFacilitiesImpl facs = scenario.getActivityFacilities();
+		ActivityFacilities facs = scenario.getActivityFacilities();
 		int modfactor = 1;
 		int counter = 0;
 		int lineCounter = 0;
@@ -154,7 +148,7 @@ public class FacilitiesToSQL {
 				"endTime REAL" +				
 				")",tableName));
 		System.out.println("Filling the table");
-		ActivityFacilitiesImpl facs = scenario.getActivityFacilities();
+		ActivityFacilities facs = scenario.getActivityFacilities();
 		int modfactor = 1;
 		int counter = 0;
 		int lineCounter = 0;
@@ -226,7 +220,7 @@ public class FacilitiesToSQL {
 				// "description VARCHAR(255)" +
 				")", tableName+"_sh"));
 		System.out.println("Filling the table");
-		ActivityFacilitiesImpl facs = scenario.getActivityFacilities();
+		ActivityFacilities facs = scenario.getActivityFacilities();
 		int modfactor = 1;
 		int counter = 0;
 		int lineCounter = 0;

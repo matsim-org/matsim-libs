@@ -42,7 +42,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -360,7 +359,7 @@ public class MyRuns {
 
 		// - facilities
 		logger.info("Reading facilities xml file...");
-		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
+		ActivityFacilities facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).parse(config.facilities().getInputFile());
 		logger.info("Reading facilities xml file...");
 

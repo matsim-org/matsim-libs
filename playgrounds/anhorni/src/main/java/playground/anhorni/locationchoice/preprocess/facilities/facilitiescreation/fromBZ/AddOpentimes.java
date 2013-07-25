@@ -26,6 +26,7 @@ import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
@@ -38,6 +39,7 @@ import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.algorithms.AbstractFacilityAlgorithm;
+
 import playground.anhorni.csestimation.Utils;
 
 /**
@@ -49,7 +51,7 @@ import playground.anhorni.csestimation.Utils;
 public class AddOpentimes extends AbstractFacilityAlgorithm {
 
 	private final ScenarioImpl scenario;
-	private final ActivityFacilitiesImpl shopsOf2005;
+	private final ActivityFacilities shopsOf2005;
 	private String shopsOf2005Filename; // "input/facilities/facilities_shopsOf2005.xml";
 	private static final Logger log = Logger.getLogger(AddOpentimes.class);
 	private QuadTree<ActivityFacility> shopQuadTree;
@@ -58,7 +60,7 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 		super();
 		this.scenario = scenario;
 		this.shopsOf2005 = this.scenario.getActivityFacilities();
-		this.shopsOf2005.setName("shopsOf2005");
+//		this.shopsOf2005.setName("shopsOf2005");
 		this.shopsOf2005Filename = shopsOf2005Filename;
 	}
 
@@ -68,7 +70,7 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 		facilities_reader.readFile(this.shopsOf2005Filename);
 		log.info("Reading shops Of 2005 xml file...done.");		
 		this.shopQuadTree = Utils.buildLocationQuadTreeFacilities(
-				this.scenario.getActivityFacilities().getFacilitiesForActivityType("shop"));
+				((ActivityFacilitiesImpl) this.scenario.getActivityFacilities()).getFacilitiesForActivityType("shop"));
 	}
 
 	@Override

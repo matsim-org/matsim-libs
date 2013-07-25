@@ -223,7 +223,7 @@ public class GridUtils {
 		
 		Set<Zone<Id>> zones = new HashSet<Zone<Id>>();
 
-		Iterator<ActivityFacility> facilityIterator =  facility.getFacilities().values().iterator();
+		Iterator<? extends ActivityFacility> facilityIterator =  facility.getFacilities().values().iterator();
 		
 		while(facilityIterator.hasNext()){
 			

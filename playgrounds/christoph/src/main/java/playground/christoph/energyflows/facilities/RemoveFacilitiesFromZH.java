@@ -25,13 +25,13 @@ import java.util.List;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.utils.misc.Counter;
 
 public class RemoveFacilitiesFromZH {
 	
-	public List<ActivityFacility> removeFacilities(ActivityFacilitiesImpl facilities, Set<Id> facilitiesToRemove) {
+	public List<ActivityFacility> removeFacilities(ActivityFacilities facilities, Set<Id> facilitiesToRemove) {
 		
 		List<ActivityFacility> removedFacilities = new ArrayList<ActivityFacility>();
 		Counter counter = new Counter("removed facilities: ");

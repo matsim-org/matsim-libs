@@ -27,8 +27,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
@@ -57,7 +57,7 @@ public class PersonSetSecLoc extends AbstractPersonAlgorithm implements PlanAlgo
 	private static final String SHOP = "shop";
 	private static final CoordImpl ZERO = new CoordImpl(0.0,0.0);
 
-	private final ActivityFacilitiesImpl facilities;
+	private final ActivityFacilities facilities;
 	private final Persons persons;
 
 	private QuadTree<ActivityFacilityImpl> shopFacQuadTree = null;
@@ -68,7 +68,7 @@ public class PersonSetSecLoc extends AbstractPersonAlgorithm implements PlanAlgo
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PersonSetSecLoc(final ActivityFacilitiesImpl facilities, final Persons persons) {
+	public PersonSetSecLoc(final ActivityFacilities facilities, final Persons persons) {
 		super();
 		System.out.println("    init " + this.getClass().getName() + " module...");
 		this.facilities = facilities;
@@ -201,7 +201,7 @@ public class PersonSetSecLoc extends AbstractPersonAlgorithm implements PlanAlgo
 		dist_sum[i] = (int) activityOption.getCapacity();
 		if ((dist_sum[i] == 0) || (dist_sum[i] == Integer.MAX_VALUE)) {
 			dist_sum[i] = 1;
-			activityOption.setCapacity((double) 1);
+			activityOption.setCapacity(1);
 		}
 		while (f_it.hasNext()) {
 			f = f_it.next();
@@ -209,7 +209,7 @@ public class PersonSetSecLoc extends AbstractPersonAlgorithm implements PlanAlgo
 			int val = (int) activityOption.getCapacity();
 			if ((val == 0) || (val == Integer.MAX_VALUE)) {
 				val = 1;
-				activityOption.setCapacity((double) 1);
+				activityOption.setCapacity(1);
 			}
 			dist_sum[i] = dist_sum[i-1] + val;
 		}

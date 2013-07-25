@@ -32,6 +32,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -54,21 +56,20 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  * create facilities to the zrh-demand
  *
  * @author yu
- *
  */
 public class NewDemandWithFacilities4Zrh {
 	public static class CreateActFacility extends AbstractPersonAlgorithm
 			implements PlanAlgorithm {
-		private ActivityFacilitiesImpl afs = null;
-		private Map<Coord, ActivityFacilityImpl> afMap = null;
+		private ActivityFacilities afs = null;
+		private Map<Coord, ActivityFacility> afMap = null;
 		private PersonImpl currentPerson = null;
 		private KnowledgeImpl currentKnowledge = null;
 		private long facCnt = 0;
 		private final Knowledges knowledges;
 
-		public CreateActFacility(final ActivityFacilitiesImpl activityFacilities, Knowledges knowledges) {
+		public CreateActFacility(final ActivityFacilities activityFacilities, Knowledges knowledges) {
 			afs = activityFacilities;
-			afMap = new HashMap<Coord, ActivityFacilityImpl>();
+			afMap = new HashMap<Coord, ActivityFacility>();
 			this.knowledges = knowledges;
 		}
 
@@ -99,15 +100,15 @@ public class NewDemandWithFacilities4Zrh {
 		private void allocateFacility2PrimaryActs4Zrh(final String type,
 				final ActivityImpl act) {
 			Coord coord = act.getCoord();
-			ActivityFacilityImpl af = afMap.get(coord);
+			ActivityFacility af = afMap.get(coord);
 			if (af == null) {
-				af = afs.createAndAddFacility(new IdImpl(facCnt++), coord);
+				af = ((ActivityFacilitiesImpl) afs).createAndAddFacility(new IdImpl(facCnt++), coord);
 				afMap.put(coord, af);
 			}
 			act.setFacilityId(af.getId());
 			ActivityOptionImpl ao = (ActivityOptionImpl) af.getActivityOptions().get(type);
 			if (ao == null)
-				ao = af.createActivityOption(type);
+				ao = ((ActivityFacilityImpl) af).createActivityOption(type);
 			// 3 primary type in Zurich scenario
 			currentKnowledge.addActivityOption(ao, (type.startsWith("h")
 					|| type.startsWith("w") || type.startsWith("e")));
@@ -144,7 +145,7 @@ public class NewDemandWithFacilities4Zrh {
 		Population pop = scenario.getPopulation();
 		new MatsimPopulationReader(scenario).readFile(inputPopFilename);
 
-		ActivityFacilitiesImpl afs = scenario.getActivityFacilities();
+		ActivityFacilities afs = scenario.getActivityFacilities();
 
 		new CreateActFacility(afs, knowledges).run(pop);
 

@@ -37,10 +37,11 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.api.experimental.facilities.ActivityFacilitiesFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.gbl.Gbl;
@@ -151,19 +152,22 @@ public class ScnCreator {
 	}
 		
 	private void smearFacilities() {	
-		for (ActivityFacility facility : ((ScenarioImpl)this.origScenario).getActivityFacilities().getFacilities().values()) {
+		ActivityFacilities newFacilities = this.newScenario.getActivityFacilities();
+		ActivityFacilitiesFactory newFactory = newFacilities.getFactory();
+		for (ActivityFacility facility : this.origScenario.getActivityFacilities().getFacilities().values()) {
 			// do not add home facilities
 			if (facility.getActivityOptions().size() == 1 && facility.getActivityOptions().containsKey("home")) continue;
 			Coord coord = facility.getCoord();
 			double xNew = coord.getX() + this.randomize();
 			double yNew = coord.getY() + this.randomize(); 
 			Coord newCoord = new CoordImpl(xNew, yNew);
-			
-			ActivityFacilityImpl newFacility = (ActivityFacilityImpl)
-			((ScenarioImpl)this.newScenario).getActivityFacilities().createAndAddFacility(facility.getId(), newCoord);
-			
+
+			ActivityFacility newFacility = newFactory.createActivityFacility(facility.getId(), newCoord);
+			newFacilities.addActivityFacility(newFacility);
+
 			for (ActivityOption actOption : facility.getActivityOptions().values()) {
-				newFacility.createActivityOption(actOption.getType());
+				ActivityOption ao = newFactory.createActivityOption(actOption.getType());
+				newFacility.addActivityOption(ao);
 			}
 		}
 	}

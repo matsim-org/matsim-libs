@@ -265,7 +265,7 @@ public class Zone2ZoneImpedancesControlerListener implements ShutdownListener {
 		// yyyy might make even more sense to do this via events.  kai, feb'11
 		Entry matrixEntry = null;
 		
-		Map<Id, ActivityFacility> allFacilities; 
+		Map<Id, ? extends ActivityFacility> allFacilities; 
 		if(parcels == null)
 			allFacilities = zones.getFacilities();	// used for UrbanSim Zone Models
 		else

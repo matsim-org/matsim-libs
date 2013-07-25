@@ -37,7 +37,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
@@ -124,7 +123,7 @@ public class ScenarioCut {
 
 	//////////////////////////////////////////////////////////////////////
 
-	private static void reduceFacilities(ActivityFacilitiesImpl facilities, Network network) {
+	private static void reduceFacilities(ActivityFacilities facilities, Network network) {
 		System.out.println("removing facilities that refer to removed links of the network... " + (new Date()));
 		Set<Id> toRemove = new HashSet<Id>();
 		for (ActivityFacility f : facilities.getFacilities().values()) {
@@ -138,7 +137,7 @@ public class ScenarioCut {
 
 	//////////////////////////////////////////////////////////////////////
 
-	private static void reduceFacilities(ActivityFacilitiesImpl facilities, Coord center, double radius) {
+	private static void reduceFacilities(ActivityFacilities facilities, Coord center, double radius) {
 		System.out.println("removing facilities outside of circle ("+center.toString()+";"+radius+""+")... " + (new Date()));
 		Set<Id> toRemove = new HashSet<Id>();
 		for (ActivityFacility f : facilities.getFacilities().values()) {
@@ -152,7 +151,7 @@ public class ScenarioCut {
 
 	//////////////////////////////////////////////////////////////////////
 
-	private static void reduceFacilities(ActivityFacilitiesImpl facilities, Coord min, Coord max) {
+	private static void reduceFacilities(ActivityFacilities facilities, Coord min, Coord max) {
 		System.out.println("removing facilities outside of rectangle ("+min.toString()+";"+max.toString()+""+")... " + (new Date()));
 		Set<Id> toRemove = new HashSet<Id>();
 		for (ActivityFacility f : facilities.getFacilities().values()) {

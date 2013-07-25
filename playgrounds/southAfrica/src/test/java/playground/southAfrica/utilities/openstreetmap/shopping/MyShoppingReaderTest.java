@@ -26,10 +26,9 @@ package playground.southAfrica.utilities.openstreetmap.shopping;
 
 import java.io.FileNotFoundException;
 
-import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -91,7 +90,7 @@ public class MyShoppingReaderTest extends MatsimTestCase {
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		FacilitiesReaderMatsimV1 fr = new FacilitiesReaderMatsimV1(sc);
 		fr.parse(getOutputDirectory() + "facilities.xml");
-		ActivityFacilitiesImpl afi = sc.getActivityFacilities();
+		ActivityFacilities afi = sc.getActivityFacilities();
 		
 		ObjectAttributes oa = new ObjectAttributes();
 		ObjectAttributesXmlReader oar = new ObjectAttributesXmlReader(oa);

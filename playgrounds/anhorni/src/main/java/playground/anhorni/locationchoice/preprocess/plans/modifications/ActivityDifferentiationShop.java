@@ -23,16 +23,16 @@ import java.util.List;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.QuadTree;
 
 import playground.anhorni.locationchoice.preprocess.facilities.FacilityQuadTreeBuilder;
@@ -46,12 +46,12 @@ public class ActivityDifferentiationShop {
 	private final double groceryShare = 0.66;
 	private int numberOfShopActs;
 
-	private final ScenarioImpl scenario;
+	private final Scenario scenario;
 
-	private ActivityFacilitiesImpl facilitiesActDiff;
+	private ActivityFacilities facilitiesActDiff;
 	private final String facilitiesActDifffilePath = "input/facilities/facilitiesActDiff.xml.gz";
 
-	public ActivityDifferentiationShop(ScenarioImpl scenario) {
+	public ActivityDifferentiationShop(Scenario scenario) {
 		this.scenario = scenario;
 	}
 

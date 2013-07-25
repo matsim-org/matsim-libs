@@ -23,6 +23,7 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -213,7 +214,7 @@ public class AccessibilityCalculator {
 		this.transitNetwork = transitNetwork;
 		
 		/* Build QuadTree of facilities. */
-		Map<Id, ActivityFacility> facilities = sc.getActivityFacilities().getFacilities();
+		Map<Id, ? extends ActivityFacility> facilities = sc.getActivityFacilities().getFacilities();
 		double minX = Double.POSITIVE_INFINITY;
 		double maxX = Double.NEGATIVE_INFINITY;
 		double minY = Double.POSITIVE_INFINITY;
@@ -363,7 +364,7 @@ public class AccessibilityCalculator {
 						NodeImpl toNode = (NodeImpl) transitNetwork.getLinks().get(linkId).getToNode();
 						if(toNode.getOutLinks().size() > 1 || toNode.getInLinks().size() > 1){
 							/* Only consider intersections. */
-							CoordImpl albersIntersection = (CoordImpl) new CoordImpl(toNode.getCoord().getX(), toNode.getCoord().getY());
+							CoordImpl albersIntersection = new CoordImpl(toNode.getCoord().getX(), toNode.getCoord().getY());
 							CoordImpl closestTaxiStop = (CoordImpl) taxiStops.get(albersIntersection.getX(), albersIntersection.getY());
 							if(closestTaxiStop == null){
 								taxiStops.put(albersIntersection.getX(), albersIntersection.getY(), albersIntersection);
@@ -512,7 +513,7 @@ public class AccessibilityCalculator {
 		int oldValue = numberInClasses.get(accessibilityClass);
 		numberInClasses.set(accessibilityClass, oldValue+1);
 		
-		CoordImpl homeCoord = (CoordImpl) ((ActivityImpl)person.getSelectedPlan().getPlanElements().get(0)).getCoord();
+		Coord homeCoord = ((ActivityImpl)person.getSelectedPlan().getPlanElements().get(0)).getCoord();
 
 		/*--- Mobility ---*/
 		double tt_work;
@@ -793,7 +794,7 @@ public class AccessibilityCalculator {
 				this.facilityQT.getMaxEasting(),
 				this.facilityQT.getMaxNorthing()
 				);
-		for(ActivityFacility af : this.sc.getActivityFacilities().getFacilitiesForActivityType(activityType).values()){
+		for(ActivityFacility af : ((ActivityFacilitiesImpl) this.sc.getActivityFacilities()).getFacilitiesForActivityType(activityType).values()) {
 			qt.put(af.getCoord().getX(), af.getCoord().getY(), af.getCoord());
 		}
 		

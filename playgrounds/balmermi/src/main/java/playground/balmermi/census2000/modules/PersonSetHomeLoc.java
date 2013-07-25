@@ -23,9 +23,8 @@ package playground.balmermi.census2000.modules;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.collections.QuadTree;
@@ -44,15 +43,15 @@ public class PersonSetHomeLoc extends AbstractPersonAlgorithm implements PlanAlg
 	private static final String H = "h";
 	private static final String HOME = "home";
 
-	private final ActivityFacilitiesImpl facilities;
+	private final ActivityFacilities facilities;
 	private final Persons persons;
-	private QuadTree<ActivityFacilityImpl> homeFacQuadTree = null;
+	private QuadTree<ActivityFacility> homeFacQuadTree = null;
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PersonSetHomeLoc(final ActivityFacilitiesImpl facilities, final Persons persons) {
+	public PersonSetHomeLoc(final ActivityFacilities facilities, final Persons persons) {
 		super();
 		System.out.println("    init " + this.getClass().getName() + " module...");
 		this.facilities = facilities;
@@ -85,10 +84,10 @@ public class PersonSetHomeLoc extends AbstractPersonAlgorithm implements PlanAlg
 		maxx += 1.0;
 		maxy += 1.0;
 		System.out.println("        xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
-		this.homeFacQuadTree = new QuadTree<ActivityFacilityImpl>(minx, miny, maxx, maxy);
+		this.homeFacQuadTree = new QuadTree<ActivityFacility>(minx, miny, maxx, maxy);
 		for (ActivityFacility f : this.facilities.getFacilities().values()) {
 			if (f.getActivityOptions().get(HOME) != null) {
-				this.homeFacQuadTree.put(f.getCoord().getX(),f.getCoord().getY(),(ActivityFacilityImpl) f);
+				this.homeFacQuadTree.put(f.getCoord().getX(),f.getCoord().getY(),f);
 			}
 		}
 		System.out.println("      done.");
@@ -103,7 +102,7 @@ public class PersonSetHomeLoc extends AbstractPersonAlgorithm implements PlanAlg
 	public void run(Person person) {
 		Integer p_id = Integer.valueOf(person.getId().toString());
 		CoordImpl coord = persons.getPerson(p_id).getHousehold().getCoord();
-		ActivityFacilityImpl f = this.homeFacQuadTree.get(coord.getX(),coord.getY());
+		ActivityFacility f = this.homeFacQuadTree.get(coord.getX(),coord.getY());
 		Plan plan = person.getSelectedPlan();
 		for (PlanElement pe : plan.getPlanElements()) {
 			if (pe instanceof ActivityImpl) {

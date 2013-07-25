@@ -10,11 +10,10 @@ import java.io.ObjectOutputStream;
 import java.io.PushbackReader;
 import java.io.StringReader;
 import java.sql.SQLException;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Properties;
 import java.util.StringTokenizer;
+
 import javax.management.timer.Timer;
 
 import org.apache.log4j.Logger;
@@ -27,7 +26,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
-import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
@@ -586,10 +584,10 @@ public class Version2pt1DemandGenerationScript {
 	private double interFacilityDistance(String originFacilityId,
 			String destinationFacilityId) {
 		ActivityFacilityImpl origin = (ActivityFacilityImpl) this.scenario
-				.getActivityFacilities().getLocation(
+				.getActivityFacilities().getFacilities().get(
 						new IdImpl(originFacilityId));
 		BasicLocation destination = this.scenario.getActivityFacilities()
-				.getLocation(new IdImpl(destinationFacilityId));
+				.getFacilities().get(new IdImpl(destinationFacilityId));
 		double distance = origin.calcDistance(destination.getCoord());
 		return distance;
 	}

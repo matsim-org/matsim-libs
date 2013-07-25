@@ -33,8 +33,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
@@ -60,7 +60,7 @@ public class AlbatrossFacilitiesCreator {
 	
 	private Scenario scenario;
 	private Map<Integer, List<Id>> connectorLinksMapping;
-	private ActivityFacilitiesImpl activityFacilities;
+	private ActivityFacilities activityFacilities;
 	
 	private double capacity = 1000000.0;
 	
@@ -98,7 +98,7 @@ public class AlbatrossFacilitiesCreator {
 	 * we could get two facilities with the same coordinate (from & to link). 
 	 */
 	/*package*/ void createFacilities() {
-		activityFacilities = ((ScenarioImpl)scenario).getActivityFacilities();
+		activityFacilities = scenario.getActivityFacilities();
 	
 		for (Entry<Integer, List<Id>> entry : connectorLinksMapping.entrySet()) {
 //			int TAZ = entry.getKey();			
@@ -128,7 +128,8 @@ public class AlbatrossFacilitiesCreator {
 				
 				Coord coord = new CoordImpl(centerX + unitVectorX, centerY + unitVectorY);
 				
-				ActivityFacilityImpl facility = activityFacilities.createAndAddFacility(linkId, coord);
+				ActivityFacilityImpl facility = (ActivityFacilityImpl) activityFacilities.getFactory().createActivityFacility(linkId, coord);
+				activityFacilities.addActivityFacility(facility);
 				facility.setLinkId(((LinkImpl)link).getId());
 				
 				createAndAddActivityOptions(facility);

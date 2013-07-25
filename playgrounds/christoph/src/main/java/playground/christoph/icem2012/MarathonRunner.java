@@ -40,6 +40,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.contrib.multimodal.router.MultimodalTripRouterFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.config.Config;
@@ -532,6 +533,8 @@ public final class MarathonRunner implements StartupListener,
 	
 	private void createPreAndPostRunFacilities() {
 		
+		ActivityFacilities facilities = this.scenario.getActivityFacilities();
+		
 		Id startLinkId = this.scenario.createId(CreateMarathonPopulation.startLink);
 		Id endLinkId = this.scenario.createId(CreateMarathonPopulation.endLink);
 		
@@ -539,14 +542,16 @@ public final class MarathonRunner implements StartupListener,
 		Link endLink = this.scenario.getNetwork().getLinks().get(endLinkId);
 		
 		Id preRunFacilityId = this.scenario.createId("preRunFacility");
-		ActivityFacility preRunFacility = ((ScenarioImpl) this.scenario).getActivityFacilities().createAndAddFacility(preRunFacilityId, startLink.getCoord());
+		ActivityFacility preRunFacility = facilities.getFactory().createActivityFacility(preRunFacilityId, startLink.getCoord());
+		facilities.addActivityFacility(preRunFacility);
 		((ActivityFacilityImpl) preRunFacility).setLinkId(startLinkId);
 		ActivityOption activityOption = ((ActivityFacilityImpl) preRunFacility).createActivityOption("preRun");
 		activityOption.addOpeningTime(new OpeningTimeImpl(OpeningTime.DayType.wk, 0*3600, 24*3600));
 		activityOption.setCapacity(Double.MAX_VALUE);
 				
 		Id postRunFacilityId = this.scenario.createId("postRunFacility");
-		ActivityFacility postRunFacility = ((ScenarioImpl) this.scenario).getActivityFacilities().createAndAddFacility(postRunFacilityId, endLink.getCoord());
+		ActivityFacility postRunFacility = facilities.getFactory().createActivityFacility(postRunFacilityId, endLink.getCoord());
+		facilities.addActivityFacility(postRunFacility);
 		((ActivityFacilityImpl) postRunFacility).setLinkId(startLinkId);
 		activityOption = ((ActivityFacilityImpl) preRunFacility).createActivityOption("postRun");
 		activityOption.addOpeningTime(new OpeningTimeImpl(OpeningTime.DayType.wk, 0*3600, 24*3600));
@@ -638,15 +643,17 @@ public final class MarathonRunner implements StartupListener,
 		rescueLink.setAllowedModes(allowedTransportModes);
 		this.scenario.getNetwork().addLink(rescueLink);
 		
+		ActivityFacilities facilities = this.scenario.getActivityFacilities();
 		/*
 		 * Create and add the rescue facility and an activity option ("rescue")
 		 */
 		Id rescueFacilityId = this.scenario.createId("rescueFacility");
-		ActivityFacility rescueFacility = ((ScenarioImpl) this.scenario).getActivityFacilities().createAndAddFacility(rescueFacilityId, rescueLink.getCoord());
+		ActivityFacility rescueFacility = facilities.getFactory().createActivityFacility(rescueFacilityId, rescueLink.getCoord());
+		facilities.addActivityFacility(rescueFacility);
 		((ActivityFacilityImpl) rescueFacility).setLinkId(rescueLink.getId());
 		
 		ActivityOption activityOption = ((ActivityFacilityImpl) rescueFacility).createActivityOption("rescue");
-		activityOption.addOpeningTime(new OpeningTimeImpl(OpeningTime.DayType.wk, 0*3600, 24*3600));
+		activityOption.addOpeningTime(new OpeningTimeImpl(0*3600, 24*3600));
 		activityOption.setCapacity(Double.MAX_VALUE);
 		
 		/*
@@ -655,11 +662,12 @@ public final class MarathonRunner implements StartupListener,
 		for (Node node :exitNodes) {
 			for (Link inLink : node.getInLinks().values()) {
 				rescueFacilityId = this.scenario.createId("rescueFacility" + inLink.getId().toString());
-				rescueFacility = ((ScenarioImpl) this.scenario).getActivityFacilities().createAndAddFacility(rescueFacilityId, inLink.getCoord());
+				rescueFacility = facilities.getFactory().createActivityFacility(rescueFacilityId, inLink.getCoord());
+				facilities.addActivityFacility(rescueFacility);
 				((ActivityFacilityImpl) rescueFacility).setLinkId(rescueLink.getId());
 				
 				activityOption = ((ActivityFacilityImpl) rescueFacility).createActivityOption("rescue");
-				activityOption.addOpeningTime(new OpeningTimeImpl(OpeningTime.DayType.wk, 0*3600, 24*3600));
+				activityOption.addOpeningTime(new OpeningTimeImpl(0*3600, 24*3600));
 				activityOption.setCapacity(Double.MAX_VALUE);
 				
 				if (coordAnalyzer.isFacilityAffected(rescueFacility)) {
@@ -675,11 +683,12 @@ public final class MarathonRunner implements StartupListener,
 			
 			Link link = this.scenario.getNetwork().getLinks().get(affectedLinkId);
 			Id facilityId = this.scenario.createId("switchWalkModeFacility" + affectedLinkId.toString());
-			ActivityFacility facility = ((ScenarioImpl) this.scenario).getActivityFacilities().createAndAddFacility(facilityId, link.getToNode().getCoord());
+			ActivityFacility facility = facilities.getFactory().createActivityFacility(facilityId, link.getToNode().getCoord());
+			facilities.addActivityFacility(facility);
 			((ActivityFacilityImpl) facility).setLinkId(link.getId());
 			
 			activityOption = ((ActivityFacilityImpl) facility).createActivityOption("switchWalkMode");
-			activityOption.addOpeningTime(new OpeningTimeImpl(OpeningTime.DayType.wk, 0*3600, 24*3600));
+			activityOption.addOpeningTime(new OpeningTimeImpl(0*3600, 24*3600));
 			activityOption.setCapacity(Double.MAX_VALUE);
 
 		}

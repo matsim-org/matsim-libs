@@ -1,6 +1,5 @@
 package org.matsim.contrib.accessibility;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
@@ -13,15 +12,14 @@ import org.matsim.contrib.accessibility.utils.Benchmark;
 import org.matsim.contrib.accessibility.utils.LeastCostPathTreeExtended;
 import org.matsim.contrib.accessibility.utils.TempDirectoryUtil;
 import org.matsim.contrib.accessibility.utils.io.writer.AnalysisCellBasedAccessibilityCSVWriterV2;
-import org.matsim.contrib.accessibility.utils.io.writer.SpatialGridTableWriter;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
 import org.matsim.contrib.matrixbasedptrouter.utils.MyBoundingBox;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
@@ -138,7 +136,7 @@ implements ShutdownListener{
 	 * @param config MATSim Config object
 	 * @param network MATSim road network
 	 */
-	public GridBasedAccessibilityControlerListenerV3(ActivityFacilitiesImpl opportunities,
+	public GridBasedAccessibilityControlerListenerV3(ActivityFacilities opportunities,
 													 PtMatrix ptMatrix,
 													 Config config, 
 													 Network network){

@@ -8,7 +8,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
 
@@ -28,7 +28,7 @@ public class ClosestParkingMatrix {
 	private NetworkImpl network;
 	LinkParkingFacilityAssociation parkingAssociations;
 
-	public ClosestParkingMatrix(ActivityFacilitiesImpl facilities, NetworkImpl network) {
+	public ClosestParkingMatrix(ActivityFacilities facilities, NetworkImpl network) {
 		this.network = network;
 		this.parkingAssociations = new LinkParkingFacilityAssociation(facilities, network);
 	}

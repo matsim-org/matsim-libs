@@ -23,8 +23,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -39,7 +39,7 @@ public class PlanRemoveUnselected {
 
 	private Population plans=null;
 	private Network network=null;
-	private ActivityFacilitiesImpl  facilities =null;
+	private ActivityFacilities facilities =null;
 	private String outputpath="";
 
 	private final static Logger log = Logger.getLogger(PlanRemoveUnselected.class);

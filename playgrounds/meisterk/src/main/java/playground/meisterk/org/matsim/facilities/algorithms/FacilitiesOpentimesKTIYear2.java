@@ -28,9 +28,10 @@ import java.util.regex.Pattern;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.BasicLocation;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
@@ -38,7 +39,6 @@ import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.facilities.OpeningTimeImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.facilities.algorithms.AbstractFacilityAlgorithm;
 
@@ -52,8 +52,8 @@ import playground.meisterk.org.matsim.run.facilities.FacilitiesProductionKTI;
  */
 public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 
-	private final ScenarioImpl scenario;
-	private final ActivityFacilitiesImpl shopsOf2005;
+	private final Scenario scenario;
+	private final ActivityFacilities shopsOf2005;
 
 	private final String shopsOf2005Filename = "/home/meisterk/sandbox00/ivt/studies/switzerland/facilities/shopsOf2005/facilities_shopsOf2005.xml";
 
@@ -61,7 +61,7 @@ public class FacilitiesOpentimesKTIYear2 extends AbstractFacilityAlgorithm {
 
 	public FacilitiesOpentimesKTIYear2() {
 		super();
-		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		this.shopsOf2005 = scenario.getActivityFacilities();
 		this.shopsOf2005.setName("shopsOf2005");
 	}

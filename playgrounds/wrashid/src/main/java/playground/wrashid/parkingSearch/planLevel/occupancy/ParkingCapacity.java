@@ -1,14 +1,31 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.wrashid.parkingSearch.planLevel.occupancy;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
-import org.matsim.core.facilities.ActivityOptionImpl;
 
 public class ParkingCapacity {
 
@@ -16,13 +33,13 @@ public class ParkingCapacity {
 	 * id: facilityId value: capacity of the facility
 	 */
 	private HashMap<Id, Integer> facilityCapacity = new HashMap<Id, Integer>();
-	private ArrayList<ActivityFacilityImpl> parkingFacilities=new ArrayList<ActivityFacilityImpl>();
+	private ArrayList<ActivityFacility> parkingFacilities=new ArrayList<ActivityFacility>();
 
-	public ArrayList<ActivityFacilityImpl> getParkingFacilities() {
+	public ArrayList<ActivityFacility> getParkingFacilities() {
 		return parkingFacilities;
 	}
 
-	public ParkingCapacity(ActivityFacilitiesImpl facilities) {
+	public ParkingCapacity(ActivityFacilities facilities) {
 
 		for (ActivityFacility facility : facilities.getFacilities().values()) {
 
@@ -30,7 +47,7 @@ public class ParkingCapacity {
 
 				if (activityOption.getType().equalsIgnoreCase("parking")) {
 					facilityCapacity.put(facility.getId(), (int) Math.round(Math.floor(activityOption.getCapacity())));
-					parkingFacilities.add((ActivityFacilityImpl) facility);
+					parkingFacilities.add(facility);
 				}
 
 			}

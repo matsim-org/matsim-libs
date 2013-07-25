@@ -71,7 +71,6 @@ import org.matsim.core.router.DefaultTripRouterFactoryImpl;
 import org.matsim.core.router.LinkToLinkTripRouterFactory;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.RoutingContext;
-import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
@@ -647,7 +646,7 @@ public class Controler extends AbstractController {
 		// yy public use at about 10 locations.  kai, may'13
 		return new PlanRouter(
 				getTripRouterFactory().instantiateAndConfigureTripRouter(),
-				((ScenarioImpl)getScenario()).getActivityFacilities()
+				getScenario().getActivityFacilities()
 				) ; 
 	}
 

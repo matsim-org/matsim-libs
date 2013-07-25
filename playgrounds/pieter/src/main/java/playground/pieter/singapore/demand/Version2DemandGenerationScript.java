@@ -9,9 +9,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.sql.SQLException;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Properties;
 import java.util.StringTokenizer;
+
 import javax.management.timer.Timer;
 
 import org.apache.log4j.Logger;
@@ -485,10 +485,10 @@ public class Version2DemandGenerationScript {
 	private Tuple<Double, Double> getGravityFactor(PaxSG p, String originFacilityId,
 			String destinationFacilityId, String actType, double capacity) {
 		ActivityFacilityImpl origin = (ActivityFacilityImpl) this.scenario
-				.getActivityFacilities().getLocation(
+				.getActivityFacilities().getFacilities().get(
 						new IdImpl(originFacilityId));
 		BasicLocation destination = this.scenario.getActivityFacilities()
-				.getLocation(new IdImpl(destinationFacilityId));
+				.getFacilities().get(new IdImpl(destinationFacilityId));
 		double distance = origin.calcDistance(destination.getCoord());
 		// double distance =
 		// HITSAnalyser.getShortestPathDistance(home.getCoord(),

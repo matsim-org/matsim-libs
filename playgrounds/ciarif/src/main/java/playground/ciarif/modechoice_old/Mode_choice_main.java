@@ -24,9 +24,9 @@ import java.io.IOException;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.algorithms.NetworkCalcTopoType;
@@ -51,7 +51,7 @@ public class Mode_choice_main {
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		World world = null;
-		final ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
+		final ActivityFacilities facilities = scenario.getActivityFacilities();
 		System.out.println("  reading world xml file... ");
 		final MatsimWorldReader worldReader = new MatsimWorldReader(scenario, world);
 		worldReader.readFile(null);

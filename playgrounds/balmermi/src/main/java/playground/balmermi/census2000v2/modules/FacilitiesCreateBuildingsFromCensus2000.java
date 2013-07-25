@@ -28,8 +28,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.gbl.Gbl;
@@ -65,7 +65,7 @@ public class FacilitiesCreateBuildingsFromCensus2000 {
 	// private methods
 	//////////////////////////////////////////////////////////////////////
 
-	private final int getMinFacilityId(final ActivityFacilitiesImpl facilities) {
+	private final int getMinFacilityId(final ActivityFacilities facilities) {
 		int min_id = Integer.MAX_VALUE;
 		for (Id id : facilities.getFacilities().keySet()) {
 			int f_id = Integer.parseInt(id.toString());
@@ -78,7 +78,7 @@ public class FacilitiesCreateBuildingsFromCensus2000 {
 	// run method
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(final ActivityFacilitiesImpl facilities) {
+	public void run(final ActivityFacilities facilities) {
 		log.info("    running " + this.getClass().getName() + " module...");
 		log.info("      # facilities = " + facilities.getFacilities().size());
 
@@ -116,9 +116,10 @@ public class FacilitiesCreateBuildingsFromCensus2000 {
 				ActivityFacilityImpl f = (ActivityFacilityImpl) facilities.getFacilities().get(f_id);
 				if (f == null) {
 					// create new home facility id
-					f = facilities.createAndAddFacility(f_id,coord);
+					f = (ActivityFacilityImpl) facilities.getFactory().createActivityFacility(f_id, coord);
+					facilities.addActivityFacility(f);
 					ActivityOptionImpl act = f.createActivityOption(CAtts.ACT_HOME);
-					act.setCapacity((double) 1);
+					act.setCapacity(1);
 
 					// store some info
 					home_fac_cnt++;

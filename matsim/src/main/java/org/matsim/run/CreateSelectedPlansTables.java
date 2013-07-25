@@ -32,9 +32,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -362,7 +362,7 @@ public class CreateSelectedPlansTables {
 		}
 
 		@Override
-		public ActivityFacilitiesImpl getActivityFacilities() {
+		public ActivityFacilities getActivityFacilities() {
 			return this.scenario.getActivityFacilities();
 		}
 

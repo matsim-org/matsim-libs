@@ -5,35 +5,27 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
-import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.network.NetworkImpl;
-import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-import playground.ciarif.flexibletransports.config.FtConfigGroup;
 import playground.ciarif.flexibletransports.data.FlexTransPersonImpl;
 import playground.ciarif.flexibletransports.router.CarSharingStation;
 import playground.ciarif.flexibletransports.router.CarSharingStations;
 import playground.ciarif.flexibletransports.utils.MembershipUtils;
-import playground.ciarif.retailers.data.PersonPrimaryActivity;
 
 
 public class MembershipAssigner {
@@ -42,7 +34,7 @@ public class MembershipAssigner {
 	//////////////////////////////////////////////////////////////////////
 	
 	private final static Logger log = Logger.getLogger(MembershipAssigner.class);
-	private ScenarioImpl scenario;
+	private Scenario scenario;
 	 
 
 	private CarSharingStations carStations;
@@ -55,7 +47,7 @@ public class MembershipAssigner {
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public MembershipAssigner(ScenarioImpl scenario) {
+	public MembershipAssigner(Scenario scenario) {
 		this.scenario = scenario;
 		this.init();
 	}

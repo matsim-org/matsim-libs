@@ -12,9 +12,9 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
@@ -82,7 +82,7 @@ public class SetSecondaryLocation  {
 		log.info("Reading facilities xml file... ");
 		FacReader.readFile("./input/facilities2012.xml.gz");
 		log.info("Reading facilities xml file...done.");
-		ActivityFacilitiesImpl facilities = ((ScenarioImpl) sc).getActivityFacilities();
+		ActivityFacilities facilities = sc.getActivityFacilities();
 		log.info("Number of facilities: " +facilities.getFacilities().size());
 
 		//////////////////////////////////////////////////////////////////////

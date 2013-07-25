@@ -10,8 +10,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.StringMatrix;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;
@@ -19,7 +19,6 @@ import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 
-import playground.wrashid.lib.tools.facility.FacilityLib;
 import playground.wrashid.parkingChoice.infrastructure.ActInfo;
 import playground.wrashid.parkingChoice.infrastructure.PrivateParking;
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
@@ -306,7 +305,7 @@ public class PrivateParkingsIndoorWriter_v0 extends MatsimXmlWriter {
 	}
 
 	public static QuadTree<ActivityFacilityImpl> getFacilitiesQuadTree(String facilitiesPath) {
-		ActivityFacilitiesImpl facilities = GeneralLib.readActivityFacilities(facilitiesPath);
+		ActivityFacilities facilities = GeneralLib.readActivityFacilities(facilitiesPath);
 		
 		return getFacilitiesQuadTree(facilities.getFacilities().values());
 	}
@@ -322,7 +321,7 @@ public class PrivateParkingsIndoorWriter_v0 extends MatsimXmlWriter {
 		return getFacilitiesQuadTree(facilitiesPath);
 	}
 	
-	public static QuadTree<ActivityFacilityImpl> getFacilitiesQuadTree(Collection<ActivityFacility> facilities) {
+	public static QuadTree<ActivityFacilityImpl> getFacilitiesQuadTree(Collection<? extends ActivityFacility> facilities) {
 		double minX = Double.MAX_VALUE;
 		double minY = Double.MAX_VALUE;
 		double maxX = Double.MIN_VALUE;

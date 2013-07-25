@@ -23,8 +23,8 @@ package playground.balmermi.census2000v2.modules;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 
 public class FacilitiesRenameAndRemoveNOGAActTypes {
 
@@ -48,7 +48,7 @@ public class FacilitiesRenameAndRemoveNOGAActTypes {
 	// run method
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(final ActivityFacilitiesImpl facilities) {
+	public void run(final ActivityFacilities facilities) {
 		log.info("    running " + this.getClass().getName() + " module...");
 		log.info("      # facilities = " + facilities.getFacilities().size());
 

@@ -31,8 +31,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 
@@ -91,7 +91,7 @@ public class Households {
 	// public methods
 	//////////////////////////////////////////////////////////////////////
 
-	public final void parse(String infile, Population plans, ActivityFacilitiesImpl facilities) {
+	public final void parse(String infile, Population plans, ActivityFacilities facilities) {
 		int line_cnt = 0;
 		try {
 			FileReader fr = new FileReader(infile);

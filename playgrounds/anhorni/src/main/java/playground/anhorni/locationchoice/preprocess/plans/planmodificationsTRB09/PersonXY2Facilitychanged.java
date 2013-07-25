@@ -28,9 +28,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.collections.QuadTree;
@@ -62,14 +61,14 @@ public class PersonXY2Facilitychanged extends AbstractPersonAlgorithm implements
 	private static final String[] SHOPS = { CAtts.ACT_S1, CAtts.ACT_S2, CAtts.ACT_S3, CAtts.ACT_S4, CAtts.ACT_S5};
 	private static final String[] TTAS = { "tta" };
 
-	private final ActivityFacilitiesImpl facilities;
-	private final Map<String,QuadTree<ActivityFacilityImpl>> fqts = new HashMap<String, QuadTree<ActivityFacilityImpl>>();
+	private final ActivityFacilities facilities;
+	private final Map<String,QuadTree<ActivityFacility>> fqts = new HashMap<String, QuadTree<ActivityFacility>>();
 
 	//////////////////////////////////////////////////////////////////////
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PersonXY2Facilitychanged(final ActivityFacilitiesImpl facilities) {
+	public PersonXY2Facilitychanged(final ActivityFacilities facilities) {
 		super();
 		System.out.println("    init " + this.getClass().getName() + " module...");
 		this.facilities = facilities;
@@ -105,14 +104,14 @@ public class PersonXY2Facilitychanged extends AbstractPersonAlgorithm implements
 			}
 			minx -= 1.0; miny -= 1.0; maxx += 1.0; maxy += 1.0;
 			log.info("        type="+types[i]+": xrange(" + minx + "," + maxx + "); yrange(" + miny + "," + maxy + ")");
-			QuadTree<ActivityFacilityImpl> qt = new QuadTree<ActivityFacilityImpl>(minx,miny,maxx,maxy);
+			QuadTree<ActivityFacility> qt = new QuadTree<ActivityFacility>(minx,miny,maxx,maxy);
 			for (ActivityFacility f : this.facilities.getFacilities().values()) {
 				String[] type_set = this.getFacilityActTypes(types[i]);
 				boolean ok = false;
 				for (int j=0; j<type_set.length; j++) {
 					if (f.getActivityOptions().keySet().contains(type_set[j])) { ok = true; }
 				}
-				if (ok) { qt.put(f.getCoord().getX(),f.getCoord().getY(),(ActivityFacilityImpl) f); }
+				if (ok) { qt.put(f.getCoord().getX(),f.getCoord().getY(),f); }
 			}
 			log.info("        "+qt.size()+" facilities of type="+types[i]+" added.");
 			this.fqts.put(types[i],qt);
@@ -154,7 +153,7 @@ public class PersonXY2Facilitychanged extends AbstractPersonAlgorithm implements
 			if (pe instanceof ActivityImpl) {
 				ActivityImpl act = (ActivityImpl) pe;
 				Coord coord = act.getCoord();
-				QuadTree<ActivityFacilityImpl> qt = null;
+				QuadTree<ActivityFacility> qt = null;
 				if (act.getType().startsWith(H)) { qt = this.fqts.get(H); }
 				else if (act.getType().startsWith(W)) { qt = this.fqts.get(W); }
 				else if (act.getType().startsWith(E)) { qt = this.fqts.get(E); }
@@ -163,7 +162,7 @@ public class PersonXY2Facilitychanged extends AbstractPersonAlgorithm implements
 				else if (act.getType().startsWith(T)) { qt = this.fqts.get(T); }
 				else { throw new RuntimeException("act type ="+act.getType()+"not known!"); }
 				
-				ActivityFacilityImpl f = qt.get(coord.getX(),coord.getY());
+				ActivityFacility f = qt.get(coord.getX(),coord.getY());
 				if (f == null) { throw new RuntimeException("Coordinates == null; something is wrong!"); }
 				
 				Id lId = f.getLinkId();

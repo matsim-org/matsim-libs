@@ -23,6 +23,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -41,7 +42,7 @@ public class FacilityValidator {
 
 	public static final String HOME_PREFIX = "home";
 	
-	public static void generate(ActivityFacilitiesImpl facilities, NetworkImpl network, SocialGraph graph) {
+	public static void generate(ActivityFacilities facilities, NetworkImpl network, SocialGraph graph) {
 		/*
 		 * set link ids
 		 */
@@ -57,7 +58,7 @@ public class FacilityValidator {
 			Person person = v.getPerson().getPerson();
 			
 			Id id = new IdImpl(HOME_PREFIX + person.getId().toString());
-			ActivityFacilityImpl homeFac = facilities.createAndAddFacility(id, MatsimCoordUtils.pointToCoord(v.getPoint()));
+			ActivityFacilityImpl homeFac = ((ActivityFacilitiesImpl) facilities).createAndAddFacility(id, MatsimCoordUtils.pointToCoord(v.getPoint()));
 			homeFac.createActivityOption("visit");
 			Link link = network.getNearestLink(homeFac.getCoord());
 			homeFac.setLinkId(link.getId());

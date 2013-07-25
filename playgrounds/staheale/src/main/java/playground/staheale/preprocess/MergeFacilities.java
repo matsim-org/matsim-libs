@@ -23,19 +23,16 @@ package playground.staheale.preprocess;
 
 
 import java.io.IOException;
-
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
-import org.matsim.core.facilities.OpeningTimeImpl;
-import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
@@ -50,7 +47,7 @@ public class MergeFacilities {
 		System.out.println("Reading work facilities xml file... ");
 		workFacReader.readFile("./input/workFacilitiesNew.xml.gz");
 		System.out.println("Reading work facilities xml file...done.");
-		ActivityFacilitiesImpl workFacilities = ((ScenarioImpl) scenarioWork).getActivityFacilities();
+		ActivityFacilities workFacilities = scenarioWork.getActivityFacilities();
 		log.info("Number of work facilities: " +workFacilities.getFacilities().size());
 
 
@@ -62,10 +59,10 @@ public class MergeFacilities {
 		System.out.println("Reading home facilities xml file... ");
 		homeFacReader.readFile("./input/homeFacilities.xml.gz");
 		System.out.println("Reading home facilities xml file...done.");
-		ActivityFacilitiesImpl homeFacilities = ((ScenarioImpl) scenarioHome).getActivityFacilities();
+		ActivityFacilities homeFacilities = scenarioHome.getActivityFacilities();
 		log.info("Number of home facilities: " +homeFacilities.getFacilities().size());
 
-		TreeMap<Id, ActivityFacility> ActHomeFacilities = homeFacilities.getFacilitiesForActivityType("home");
+		TreeMap<Id, ActivityFacility> ActHomeFacilities = ((ActivityFacilitiesImpl) homeFacilities).getFacilitiesForActivityType("home");
 		log.info("Number of facilities of activity type home: " +ActHomeFacilities.size());
 
 		//------------------initial home facility file is zero------
@@ -87,8 +84,9 @@ public class MergeFacilities {
 
 		for (ActivityFacility f : ActHomeFacilities.values()) {
 
-			ActivityFacilityImpl a = workFacilities.createAndAddFacility(f.getId(), f.getCoord());
-			a.createActivityOption("home");
+			ActivityFacility a = workFacilities.getFactory().createActivityFacility(f.getId(), f.getCoord());
+			workFacilities.addActivityFacility(a);
+			a.addActivityOption(workFacilities.getFactory().createActivityOption("home"));
 			//        a.getActivityOptions().get("home").addOpeningTime(new OpeningTimeImpl(
 			//				DayType.wk,
 			//				0.0 * 3600,

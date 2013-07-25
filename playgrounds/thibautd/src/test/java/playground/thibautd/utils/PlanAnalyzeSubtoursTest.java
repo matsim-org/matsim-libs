@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.BasicLocations;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -42,11 +43,8 @@ import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
-
-import playground.thibautd.utils.PlanAnalyzeSubtours;
 
 /**
  * Test class for {@link PlanAnalyzeSubtours}.
@@ -89,10 +87,10 @@ public class PlanAnalyzeSubtoursTest extends MatsimTestCase {
 	
 	public void testFacilitiesBased() {
 		Config config = loadConfig(PlanAnalyzeSubtoursTest.CONFIGFILE);
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
-		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
+		Scenario scenario = ScenarioUtils.createScenario(config);
+		ActivityFacilities facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());
-		this.runDemo(facilities, TripStructureAnalysisLayerOption.facility);
+		this.runDemo((BasicLocations) facilities, TripStructureAnalysisLayerOption.facility);
 	}
 
 	@SuppressWarnings("unchecked")

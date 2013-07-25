@@ -26,13 +26,14 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.OpeningTime;
-import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.facilities.OpeningTime.DayType;
+import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
@@ -49,7 +50,7 @@ public class PersonAdaptPlanAndCreateFacilities extends AbstractPersonAlgorithm 
 	//////////////////////////////////////////////////////////////////////
 
 	private final Random random = MatsimRandom.getRandom();
-	private final ActivityFacilitiesImpl activityFacilities;
+	private final ActivityFacilities activityFacilities;
 	private final QuadTree<ActivityFacilityImpl> facs = new QuadTree<ActivityFacilityImpl>(-900000,-900000,2700000,2700000);
 	private int id;
 
@@ -57,7 +58,7 @@ public class PersonAdaptPlanAndCreateFacilities extends AbstractPersonAlgorithm 
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PersonAdaptPlanAndCreateFacilities(ActivityFacilitiesImpl activityFacilities) {
+	public PersonAdaptPlanAndCreateFacilities(ActivityFacilities activityFacilities) {
 		super();
 		this.activityFacilities = activityFacilities;
 		if (!activityFacilities.getFacilities().isEmpty()) { throw new RuntimeException("given facilities container is not empty!"); }
@@ -124,7 +125,7 @@ public class PersonAdaptPlanAndCreateFacilities extends AbstractPersonAlgorithm 
 					CoordImpl c = new CoordImpl(x,y);
 					ActivityFacilityImpl af = facs.get(x,y);
 					if (af == null) {
-						af = activityFacilities.createAndAddFacility(new IdImpl(id),c);
+						af = ((ActivityFacilitiesImpl) activityFacilities).createAndAddFacility(new IdImpl(id),c);
 						id++;
 						ActivityOptionImpl ao = af.createActivityOption(a.getType());
 						ao.setCapacity(1.0);
@@ -140,7 +141,7 @@ public class PersonAdaptPlanAndCreateFacilities extends AbstractPersonAlgorithm 
 						}
 					}
 					else {
-						af = activityFacilities.createAndAddFacility(new IdImpl(id),c);
+						af = ((ActivityFacilitiesImpl) activityFacilities).createAndAddFacility(new IdImpl(id),c);
 						id++;
 						ActivityOptionImpl ao = af.createActivityOption(a.getType());
 						ao.setCapacity(1.0);

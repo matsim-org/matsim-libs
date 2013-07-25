@@ -47,11 +47,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
-import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
@@ -231,11 +229,12 @@ public class AddExitLinksToNetwork {
 		/*
 		 * Create and add the rescue facility and an activity option ("rescue")
 		 */
-		ActivityFacility rescueFacility = ((ScenarioImpl)scenario).getActivityFacilities().createAndAddFacility(scenario.createId("rescueFacility"), rescueLink.getCoord());
+		ActivityFacility rescueFacility = scenario.getActivityFacilities().getFactory().createActivityFacility(scenario.createId("rescueFacility"), rescueLink.getCoord());
+		scenario.getActivityFacilities().addActivityFacility(rescueFacility);
 		((ActivityFacilityImpl)rescueFacility).setLinkId(((LinkImpl)rescueLink).getId());
 		
 		ActivityOption activityOption = ((ActivityFacilityImpl)rescueFacility).createActivityOption("rescue");
-		activityOption.addOpeningTime(new OpeningTimeImpl(OpeningTime.DayType.wk, 0*3600, 24*3600));
+		activityOption.addOpeningTime(new OpeningTimeImpl(0*3600, 24*3600));
 		activityOption.setCapacity(Double.MAX_VALUE);
 	}
 }

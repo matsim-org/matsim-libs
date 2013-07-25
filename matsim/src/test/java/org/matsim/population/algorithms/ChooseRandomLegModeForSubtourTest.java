@@ -20,6 +20,10 @@
 
 package org.matsim.population.algorithms;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,10 +31,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 
-import static org.junit.Assert.*;
 import org.junit.Rule;
 import org.junit.Test;
-
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -144,7 +146,7 @@ public class ChooseRandomLegModeForSubtourTest {
 	public void testSubTourMutationFacilitiesBased() {
 		Config config = utils.loadConfig(CONFIGFILE);
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
-		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
+		ActivityFacilitiesImpl facilities = (ActivityFacilitiesImpl) scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());
 		TripStructureAnalysisLayerOption tripStructureAnalysisLayer = TripStructureAnalysisLayerOption.facility;
 		this.testSubTourMutationToCar(facilities, tripStructureAnalysisLayer);

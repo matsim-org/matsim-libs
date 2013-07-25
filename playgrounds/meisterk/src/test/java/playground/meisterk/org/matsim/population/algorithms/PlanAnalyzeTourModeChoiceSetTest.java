@@ -37,7 +37,6 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
@@ -83,12 +82,12 @@ public class PlanAnalyzeTourModeChoiceSetTest extends MatsimTestCase {
 		// load data
 		log.info("Reading facilities xml file...");
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(this.config);
-		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
+		ActivityFacilities facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).readFile(this.config.facilities().getInputFile());
 		log.info("Reading facilities xml file...done.");
 
 		// run
-		this.runDemo(facilities, facilities, null);
+		this.runDemo((BasicLocations) facilities, facilities, null);
 
 	}
 

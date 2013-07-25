@@ -22,8 +22,8 @@ package playground.wrashid.lib.tools.facility;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -44,7 +44,7 @@ public class PrintInfoAboutFacilitiesOnALink {
 		ScenarioImpl scenario = (ScenarioImpl) GeneralLib.readScenario(plansFile, networkFile, facilititiesPath);
 
 		NetworkImpl network=(NetworkImpl) scenario.getNetwork();
-		ActivityFacilitiesImpl facilities=scenario.getActivityFacilities();
+		ActivityFacilities facilities=scenario.getActivityFacilities();
 				
 		for (Id facilityId:facilities.getFacilities().keySet()){
 			ActivityFacilityImpl facility=(ActivityFacilityImpl) facilities.getFacilities().get(facilityId);

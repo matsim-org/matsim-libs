@@ -54,7 +54,6 @@ import org.jfree.data.statistics.HistogramType;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -64,11 +63,11 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.contrib.parking.lib.obj.StringMatrix;
 import org.matsim.contrib.parking.lib.obj.StringMatrixFilter;
 import org.matsim.contrib.parking.lib.obj.list.Lists;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.api.internal.MatsimWriter;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.KmlNetworkWriter;
@@ -173,11 +172,11 @@ public class GeneralLib {
 	 * @param facilitiesFile
 	 * @return
 	 */
-	public static ActivityFacilitiesImpl readActivityFacilities(
+	public static ActivityFacilities readActivityFacilities(
 			String facilitiesFile) {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils
 				.createScenario(ConfigUtils.createConfig());
-		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
+		ActivityFacilities facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).readFile(facilitiesFile);
 		return facilities;
 	}
@@ -186,7 +185,7 @@ public class GeneralLib {
 	 * Write the facilities to the specified file.
 	 */
 	public static void writeActivityFacilities(
-			ActivityFacilitiesImpl facilities, String facilitiesFile) {
+			ActivityFacilities facilities, String facilitiesFile) {
 		new FacilitiesWriter(facilities).write(facilitiesFile);
 	}
 

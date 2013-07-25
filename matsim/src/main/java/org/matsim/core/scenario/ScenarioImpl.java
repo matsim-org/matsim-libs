@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -66,7 +67,7 @@ public class ScenarioImpl implements Scenario {
 	private final Config config;
 	private Network network;
 	private Population population;
-	private ActivityFacilitiesImpl facilities;
+	private ActivityFacilities facilities;
 
 	private final ConcurrentHashMap<String, Id> idMap = new ConcurrentHashMap<String, Id>();
 
@@ -135,7 +136,7 @@ public class ScenarioImpl implements Scenario {
 	}
 
 	@Override
-	public ActivityFacilitiesImpl getActivityFacilities() {
+	public ActivityFacilities getActivityFacilities() {
 		return this.facilities;
 	}
 

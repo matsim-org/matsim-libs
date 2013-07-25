@@ -137,7 +137,7 @@ public class ReadFromUrbansimParcelModelTest extends MatsimTestCase{
 		boolean zone3 = false; 
 		boolean zone4 = false;
 		
-		for( Entry<Id, ActivityFacility> entry : (zones.getFacilities()).entrySet() ){
+		for( Entry<Id, ? extends ActivityFacility> entry : (zones.getFacilities()).entrySet() ){
 			zone_ID = entry.getKey();
 			af = entry.getValue();
 			coord = af.getCoord();

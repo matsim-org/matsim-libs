@@ -5,11 +5,11 @@ import java.util.Iterator;
 
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.population.ActivityImpl;
@@ -39,7 +39,7 @@ public class CreatePlans1 {
 		Knowledges knowledges = scenario.getKnowledges();
 
 		// read facilities
-		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
+		ActivityFacilities facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).readFile("C:/data/SandboxCVS/ivt/studies/triangle/facilities/facilities.xml");
 
 

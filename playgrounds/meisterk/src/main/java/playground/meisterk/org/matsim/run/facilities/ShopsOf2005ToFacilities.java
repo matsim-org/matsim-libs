@@ -57,6 +57,7 @@ import net.opengis.kml._2.TimeSpanType;
 
 import org.apache.commons.io.FileUtils;
 import org.matsim.api.core.v01.Coord;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -1451,7 +1452,7 @@ public class ShopsOf2005ToFacilities {
 	private static void shopsToTXT(Config config) {
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		ActivityFacilitiesImpl shopsOf2005 = scenario.getActivityFacilities();
+		ActivityFacilities shopsOf2005 = scenario.getActivityFacilities();
 		shopsOf2005.setName("shopsOf2005");
 		ArrayList<String> txtLines = new ArrayList<String>();
 		ShopId shopId = null;
@@ -1489,7 +1490,7 @@ public class ShopsOf2005ToFacilities {
 		facilities_reader.readFile(config.facilities().getInputFile());
 		System.out.println("Reading facilities xml file...done.");
 
-		Iterator<ActivityFacility> facilityIterator = shopsOf2005.getFacilities().values().iterator();
+		Iterator<? extends ActivityFacility> facilityIterator = shopsOf2005.getFacilities().values().iterator();
 
 		while (facilityIterator.hasNext()) {
 
@@ -1607,7 +1608,7 @@ public class ShopsOf2005ToFacilities {
 		shopIconScales.put(SHOPS_OF_2005, 1.0);
 		shopIconScales.put(SHOPS_FROM_ENTERPRISE_CENSUS, 2.0);
 
-		ActivityFacilitiesImpl facilities = null;
+		ActivityFacilities facilities = null;
 		for (int dataSetIndex : new int[]{SHOPS_OF_2005/*, SHOPS_FROM_ENTERPRISE_CENSUS*/}) {
 			ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			facilities = scenario.getActivityFacilities();
@@ -1647,7 +1648,7 @@ public class ShopsOf2005ToFacilities {
 			shopIconLink.setHref("http://maps.google.com/mapfiles/kml/paddle/S.png");
 			System.out.println("Initializing KML...done.");
 
-			Iterator<ActivityFacility> facilityIterator = facilities.getFacilities().values().iterator();
+			Iterator<? extends ActivityFacility> facilityIterator = facilities.getFacilities().values().iterator();
 
 			while (facilityIterator.hasNext()) {
 				ActivityFacilityImpl facility = (ActivityFacilityImpl) facilityIterator.next();
@@ -1715,7 +1716,7 @@ public class ShopsOf2005ToFacilities {
 	private static void applyOpentimesToEnterpriseCensus(Config config) {
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
-		ActivityFacilitiesImpl facilities_input = scenario.getActivityFacilities();
+		ActivityFacilities facilities_input = scenario.getActivityFacilities();
 		facilities_input.setName("Switzerland based on Enterprise census 2000.");
 
 		// init algorithms

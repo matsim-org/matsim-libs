@@ -1,10 +1,9 @@
 package playground.ciarif.flexibletransports.preprocess.membership;
 
 import org.apache.log4j.Logger;
-import org.jfree.util.Log;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.ciarif.flexibletransports.data.FlexTransPersonImpl;
 
@@ -28,7 +27,7 @@ public class MembershipModel {
 	// calc methods
 	//////////////////////////////////////////////////////////////////////
 	
-	public MembershipModel(ScenarioImpl scenario) {
+	public MembershipModel(Scenario scenario) {
 			//this.scenario=scenario;
 		}
 	

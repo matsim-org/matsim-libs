@@ -23,9 +23,9 @@ package playground.meisterk.org.matsim.run.portland;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -61,11 +61,10 @@ public class GenerateDemand {
 		System.out.println("Reading network...done.");
 
 		System.out.println("Reading facilities...");
-		ActivityFacilitiesImpl facilityLayer = scenario.getActivityFacilities();
+		ActivityFacilities facilityLayer = scenario.getActivityFacilities();
 		FacilitiesReaderMatsimV1 facilities_reader = new FacilitiesReaderMatsimV1(scenario);
 		//facilities_reader.setValidating(false);
 		facilities_reader.readFile(config.facilities().getInputFile());
-		facilityLayer.printFacilitiesCount();
 		System.out.println("Reading facilities...done.");
 
 		System.out.println("Setting up plans objects...");

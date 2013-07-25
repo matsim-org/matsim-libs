@@ -20,12 +20,13 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
-import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.facilities.OpeningTime.DayType;
+import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -34,9 +35,7 @@ import org.matsim.core.utils.misc.Time;
 
 import others.sergioo.util.dataBase.DataBaseAdmin;
 import others.sergioo.util.dataBase.NoConnectionException;
-
 import playground.pieter.singapore.utils.FacilitiesToSQL;
-import playground.pieter.singapore.utils.Sample;
 
 public class InputDataCollection implements Serializable {
 	transient DataBaseAdmin dba;
@@ -292,16 +291,12 @@ public class InputDataCollection implements Serializable {
 //			only look at work activities
 			if(!activityType.startsWith("w_"))
 				continue;
-			TreeMap<Id, ActivityFacility> facilities = this.scenario
-					.getActivityFacilities().getFacilitiesForActivityType(
+			TreeMap<Id, ? extends ActivityFacility> facilities = ((ActivityFacilitiesImpl) this.scenario
+					.getActivityFacilities()).getFacilitiesForActivityType(
 							activityType);
-			Iterator<Entry<Id, ActivityFacility>> fi = facilities.entrySet()
-					.iterator();
-			while (fi.hasNext()) {
-				Entry<Id, ActivityFacility> e = fi.next();
+			for (Entry<Id, ? extends ActivityFacility> e : facilities.entrySet()) {
 				String currid = e.getKey().toString();
-				double currcap = e.getValue().getActivityOptions().get(activityType)
-						.getCapacity();
+				double currcap = e.getValue().getActivityOptions().get(activityType).getCapacity();
 //				TODO: check spatial join of facilities to subdgps
 //				there are a few facilities that  havent spatially joined properly, skip over them
 				try{
@@ -332,7 +327,7 @@ public class InputDataCollection implements Serializable {
 	
 	
 	private void addSecondaryActivityTypes() {
-		for (Entry<Id, ActivityFacility> facilityset : this.scenario
+		for (Entry<Id, ? extends ActivityFacility> facilityset : this.scenario
 				.getActivityFacilities().getFacilities().entrySet()) {
 			// get the land use for each facility
 			ActivityFacilityImpl facility = (ActivityFacilityImpl) facilityset
@@ -373,7 +368,7 @@ public class InputDataCollection implements Serializable {
 
 	private void createFacilityIdtoDescriptionLookup() {
 		inputLog.info("Creating facility ID to land use type or description lookup table.");
-		Iterator<ActivityFacility> it = this.scenario.getActivityFacilities()
+		Iterator<? extends ActivityFacility> it = this.scenario.getActivityFacilities()
 				.getFacilities().values().iterator();
 		while (it.hasNext()) {
 			ActivityFacilityImpl f = (ActivityFacilityImpl) it.next();
@@ -384,8 +379,8 @@ public class InputDataCollection implements Serializable {
 	private void createLocationSamplers() {
 		inputLog.info("Creating weighted samplers for each activity type,\n indexing the relevant facility ids and their capacity for the particular activity.");
 		for (String activityType : this.mainActivityTypes) {
-			TreeMap<Id, ActivityFacility> facilities = this.scenario
-					.getActivityFacilities().getFacilitiesForActivityType(
+			TreeMap<Id, ActivityFacility> facilities = ((ActivityFacilitiesImpl) this.scenario
+					.getActivityFacilities()).getFacilitiesForActivityType(
 							activityType);
 			Iterator<Entry<Id, ActivityFacility>> fi = facilities.entrySet()
 					.iterator();
@@ -440,8 +435,7 @@ public class InputDataCollection implements Serializable {
 
 	private void getMainActivityTypes() {
 		inputLog.info("Listing the main activity types in the scenario.");
-		Iterator<ActivityFacility> fi = this.scenario.getActivityFacilities()
-				.getFacilities().values().iterator();
+		Iterator<? extends ActivityFacility> fi = this.scenario.getActivityFacilities().getFacilities().values().iterator();
 		while (fi.hasNext()) {
 			ActivityFacilityImpl f = (ActivityFacilityImpl) fi.next();
 			Set<String> actops = f.getActivityOptions().keySet();
@@ -479,8 +473,8 @@ public class InputDataCollection implements Serializable {
 			while (rs.next()) {
 				CoordImpl coord = new CoordImpl(rs.getDouble("longitude"),
 						rs.getDouble("latitude"));
-				ActivityFacilityImpl facility = scenario
-						.getActivityFacilities()
+				ActivityFacilityImpl facility = ((ActivityFacilitiesImpl) scenario
+						.getActivityFacilities())
 						.createAndAddFacility(
 								new IdImpl(new String("leisure_" + counter)),
 								TransformationFactory
@@ -498,8 +492,8 @@ public class InputDataCollection implements Serializable {
 					homeFacilitiesTable));
 
 			while (rs.next()) {
-				ActivityFacilityImpl facility = scenario
-						.getActivityFacilities().createAndAddFacility(
+				ActivityFacilityImpl facility = ((ActivityFacilitiesImpl) scenario
+						.getActivityFacilities()).createAndAddFacility(
 								new IdImpl(new String("home_"
 										+ rs.getInt("id_res_facility"))),
 								new CoordImpl(rs.getDouble("x_utm48n"), rs

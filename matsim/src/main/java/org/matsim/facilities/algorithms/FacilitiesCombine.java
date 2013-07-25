@@ -26,8 +26,8 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
@@ -83,7 +83,7 @@ public class FacilitiesCombine {
 	// run method
 	//////////////////////////////////////////////////////////////////////
 
-	public void run(final ActivityFacilitiesImpl facilities) {
+	public void run(final ActivityFacilities facilities) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 		System.out.println("      # facilities = " + facilities.getFacilities().size());
 
@@ -110,7 +110,7 @@ public class FacilitiesCombine {
 			}
 		}
 
-		Map<Id, ActivityFacility> fs = facilities.getFacilities();
+		Map<Id, ? extends ActivityFacility> fs = facilities.getFacilities();
 		fs.clear();
 
 		Iterator<TreeMap<Double,ActivityFacilityImpl>> t_it = facs.values().iterator();
@@ -119,7 +119,7 @@ public class FacilitiesCombine {
 			Iterator<ActivityFacilityImpl> ff_it = t.values().iterator();
 			while (ff_it.hasNext()) {
 				ActivityFacilityImpl ff = ff_it.next();
-				fs.put(ff.getId(),ff);
+				facilities.addActivityFacility(ff);
 			}
 		}
 

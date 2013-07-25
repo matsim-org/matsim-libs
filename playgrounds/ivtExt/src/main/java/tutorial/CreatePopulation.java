@@ -19,7 +19,6 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -172,16 +171,16 @@ public class CreatePopulation {
 		
 		if (activityType.equals("all")) {
 			facQuadTree = this.builFacQuadTree(
-					activityType, ((ScenarioImpl)scenario).getActivityFacilities().getFacilities());	
+					activityType, scenario.getActivityFacilities().getFacilities());	
 		}
 		else {
 			facQuadTree = this.builFacQuadTree(
-				activityType, ((ScenarioImpl)scenario).getActivityFacilities().getFacilitiesForActivityType(activityType));	
+				activityType, scenario.getActivityFacilities().getFacilitiesForActivityType(activityType));	
 		}
 		return facQuadTree;
 	}
 
-	private QuadTree<ActivityFacility> builFacQuadTree(String type, Map<Id,ActivityFacility> facilities_of_type) {
+	private QuadTree<ActivityFacility> builFacQuadTree(String type, Map<Id, ? extends ActivityFacility> facilities_of_type) {
 		log.info(" building " + type + " facility quad tree");
 		double minx = Double.POSITIVE_INFINITY;
 		double miny = Double.POSITIVE_INFINITY;

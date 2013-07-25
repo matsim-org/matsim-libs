@@ -1,3 +1,22 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.christoph.population;
 
 import java.io.IOException;
@@ -25,7 +44,7 @@ public class AddFacilitities2Population {
 		
 	public static void main(String[] args) {
 		try {
-			new AddFacilitities2Population(((ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig())));
+			new AddFacilitities2Population((ScenarioUtils.createScenario(ConfigUtils.createConfig())));
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -37,7 +56,7 @@ public class AddFacilitities2Population {
 		log.info("done.");
 		
 		log.info("Reading facilities file...");
-		new MatsimFacilitiesReader((ScenarioImpl)scenario).readFile(facilitiesFile);
+		new MatsimFacilitiesReader(scenario).readFile(facilitiesFile);
 		log.info("done.");
 		
 		log.info("Setting up plans objects...");
@@ -49,7 +68,7 @@ public class AddFacilitities2Population {
 		log.info("done.");
 		
 		log.info("Adding Facilities Selector...");
-		((PopulationImpl)scenario.getPopulation()).addAlgorithm(new PersonSetFacilities(((ScenarioImpl)scenario).getActivityFacilities()));
+		((PopulationImpl) scenario.getPopulation()).addAlgorithm(new PersonSetFacilities(scenario.getActivityFacilities()));
 		log.info("done.");
 		
 		log.info("Adding Knowledges setter...");

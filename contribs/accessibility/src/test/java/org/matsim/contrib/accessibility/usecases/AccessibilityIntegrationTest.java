@@ -40,12 +40,13 @@ import org.matsim.contrib.accessibility.gis.SpatialGrid;
 import org.matsim.contrib.accessibility.interfaces.SpatialGridDataExchangeInterface;
 import org.matsim.contrib.accessibility.utils.CreateTestNetwork;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestUtils;
@@ -63,7 +64,7 @@ public class AccessibilityIntegrationTest {
 
 	@Test
 	public void testWithBoundingBox() {
-		Config config = ConfigUtils.createConfig() ;
+		Config config = ConfigUtils.createConfig();
 		
 		// test values to define bounding box.
 		// these values usually come from a config file
@@ -71,35 +72,36 @@ public class AccessibilityIntegrationTest {
 		double max = 100.;
 
 		final AccessibilityConfigGroup acm = new AccessibilityConfigGroup();
-		config.addModule( acm ) ;
-		acm.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBox.toString()) ;
-		acm.setBoundingBoxBottom(min) ;
-		acm.setBoundingBoxTop(max) ;
-		acm.setBoundingBoxLeft(min) ;
-		acm.setBoundingBoxRight(max) ;
+		config.addModule( acm);
+		acm.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromBoundingBox.toString());
+		acm.setBoundingBoxBottom(min);
+		acm.setBoundingBoxTop(max);
+		acm.setBoundingBoxLeft(min);
+		acm.setBoundingBoxRight(max);
 		
 		// modify config according to needs
 		Network network = CreateTestNetwork.createTestNetwork();
 		String networkFile = utils.getOutputDirectory() +"network.xml";
 		new NetworkWriter(network).write(networkFile);
-		config.network().setInputFile( networkFile );
+		config.network().setInputFile( networkFile);
 
-		Controler controler = new Controler(config) ;
-		ControlerConfigGroup controlerCG = config.controler() ;
-		controlerCG.setLastIteration( 10 );
+		Controler controler = new Controler(config);
+		ControlerConfigGroup controlerCG = config.controler();
+		controlerCG.setLastIteration( 10);
 		controlerCG.setOutputDirectory(utils.getOutputDirectory());
 		
-		final ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario( config );
+		final ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario( config);
 		ScenarioUtils.loadScenario(sc);
 
 		
 		
 		// creating test opportunities (facilities)
-		ActivityFacilitiesImpl opportunities = sc.getActivityFacilities() ;
+		ActivityFacilities opportunities = sc.getActivityFacilities();
 		for ( Link link : sc.getNetwork().getLinks().values() ) {
-			Id id = sc.createId( link.getId().toString() ) ;
-			Coord coord = link.getCoord() ;
-			opportunities.createAndAddFacility(id, coord) ;
+			Id id = sc.createId( link.getId().toString());
+			Coord coord = link.getCoord();
+			ActivityFacility facility = opportunities.getFactory().createActivityFacility(id, coord);
+			opportunities.addActivityFacility(facility);
 		}
 		
 		PtMatrix ptMatrix = null ;
@@ -138,34 +140,35 @@ public class AccessibilityIntegrationTest {
 	
 	@Test
 	public void testWithExtentDeterminedByNetwork() {
-		Config config = ConfigUtils.createConfig() ;
+		Config config = ConfigUtils.createConfig();
 
 		final AccessibilityConfigGroup acm = new AccessibilityConfigGroup();
-		config.addModule( acm ) ;
-//		acm.setCellBasedAccessibilityNetwork(true) ;
+		config.addModule( acm);
+//		acm.setCellBasedAccessibilityNetwork(true);
 		// is now default
 		
 		// modify config according to needs
 		Network network = CreateTestNetwork.createTestNetwork();
 		String networkFile = utils.getOutputDirectory() +"network.xml";
 		new NetworkWriter(network).write(networkFile);
-		config.network().setInputFile( networkFile );
+		config.network().setInputFile( networkFile);
 
-		Controler controler = new Controler(config) ;
-		ControlerConfigGroup controlerCG = config.controler() ;
-		controlerCG.setLastIteration( 10 );
+		Controler controler = new Controler(config);
+		ControlerConfigGroup controlerCG = config.controler();
+		controlerCG.setLastIteration( 10);
 		controlerCG.setOutputDirectory(utils.getOutputDirectory());
 		
-		final ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario( config );
+		final ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario( config);
 		ScenarioUtils.loadScenario(sc);
 		
 
 		// creating test opportunities (facilities)
-		ActivityFacilitiesImpl opportunities = sc.getActivityFacilities() ;
+		ActivityFacilities opportunities = sc.getActivityFacilities();
 		for ( Link link : sc.getNetwork().getLinks().values() ) {
-			Id id = sc.createId( link.getId().toString() ) ;
-			Coord coord = link.getCoord() ;
-			opportunities.createAndAddFacility(id, coord) ;
+			Id id = sc.createId( link.getId().toString());
+			Coord coord = link.getCoord();
+			ActivityFacility facility = opportunities.getFactory().createActivityFacility(id, coord);
+			opportunities.addActivityFacility(facility);
 		}
 		
 //		controler.addControlerListener(new GridBasedAccessibilityControlerListener(...)); 
@@ -204,7 +207,7 @@ public class AccessibilityIntegrationTest {
 	@Test
 	public void testWithExtentDeterminedShapeFile() {
 		
-		Config config = ConfigUtils.createConfig() ;
+		Config config = ConfigUtils.createConfig();
 
 //		URL url = AccessibilityIntegrationTest.class.getClassLoader().getResource(new File(this.utils.getInputDirectory()).getAbsolutePath() + "shapeFile2.shp");
 		File f = new File(this.utils.getInputDirectory() + "shapeFile2.shp"); // shape file completely covers the road network
@@ -215,32 +218,33 @@ public class AccessibilityIntegrationTest {
 		}
 
 		final AccessibilityConfigGroup acm = new AccessibilityConfigGroup();
-		config.addModule( acm ) ;
-		acm.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromShapeFile.toString()) ;
-//		 acm.setShapeFileCellBasedAccessibility(url.getPath()) ; // yyyyyy todo
-		acm.setShapeFileCellBasedAccessibility(f.getAbsolutePath()) ;
+		config.addModule( acm);
+		acm.setAreaOfAccessibilityComputation(AreaOfAccesssibilityComputation.fromShapeFile.toString());
+//		 acm.setShapeFileCellBasedAccessibility(url.getPath()); // yyyyyy todo
+		acm.setShapeFileCellBasedAccessibility(f.getAbsolutePath());
 		
 		// modify config according to needs
 		Network network = CreateTestNetwork.createTestNetwork();
 		String networkFile = utils.getOutputDirectory() +"network.xml";
 		new NetworkWriter(network).write(networkFile);
-		config.network().setInputFile( networkFile );
+		config.network().setInputFile( networkFile);
 
-		Controler controler = new Controler(config) ;
-		ControlerConfigGroup controlerCG = config.controler() ;
-		controlerCG.setLastIteration( 10 );
+		Controler controler = new Controler(config);
+		ControlerConfigGroup controlerCG = config.controler();
+		controlerCG.setLastIteration( 10);
 		controlerCG.setOutputDirectory(utils.getOutputDirectory());
 		
-		final ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario( config );
+		final ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario( config);
 		ScenarioUtils.loadScenario(sc);
 		
 
 		// creating test opportunities (facilities)
-		ActivityFacilitiesImpl opportunities = sc.getActivityFacilities() ;
+		ActivityFacilities opportunities = sc.getActivityFacilities();
 		for ( Link link : sc.getNetwork().getLinks().values() ) {
-			Id id = sc.createId( link.getId().toString() ) ;
-			Coord coord = link.getCoord() ;
-			opportunities.createAndAddFacility(id, coord) ;
+			Id id = sc.createId( link.getId().toString());
+			Coord coord = link.getCoord();
+			ActivityFacility facility = opportunities.getFactory().createActivityFacility(id, coord);
+			opportunities.addActivityFacility(facility);
 		}
 		
 //		controler.addControlerListener(new GridBasedAccessibilityControlerListener(...)); 
@@ -320,29 +324,29 @@ public class AccessibilityIntegrationTest {
 			log.info("Evaluating resuts ...");
 			
 			if(this.usingFreeSpeedGrid)
-				Assert.assertTrue( freeSpeedGrid != null );
+				Assert.assertTrue( freeSpeedGrid != null);
 			else
-				Assert.assertTrue( freeSpeedGrid == null );
+				Assert.assertTrue( freeSpeedGrid == null);
 			
 			if(this.usingCarGrid)
-				Assert.assertTrue( carGrid != null );
+				Assert.assertTrue( carGrid != null);
 			else
-				Assert.assertTrue( carGrid == null );
+				Assert.assertTrue( carGrid == null);
 			
 			if(this.usingBikeGrid)
-				Assert.assertTrue( bikeGrid != null );
+				Assert.assertTrue( bikeGrid != null);
 			else
-				Assert.assertTrue( bikeGrid == null );
+				Assert.assertTrue( bikeGrid == null);
 			
 			if(this.usingWalkGrid)
-				Assert.assertTrue( walkGrid != null );
+				Assert.assertTrue( walkGrid != null);
 			else
-				Assert.assertTrue( walkGrid == null );
+				Assert.assertTrue( walkGrid == null);
 			
 			if(this.usingPtGrid)
-				Assert.assertTrue( ptGrid != null );
+				Assert.assertTrue( ptGrid != null);
 			else
-				Assert.assertTrue( ptGrid == null );
+				Assert.assertTrue( ptGrid == null);
 			
 			log.info("... done!");
 		}

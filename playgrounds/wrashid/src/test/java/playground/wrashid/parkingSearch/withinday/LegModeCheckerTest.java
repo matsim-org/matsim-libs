@@ -31,9 +31,10 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.api.experimental.facilities.ActivityFacilitiesFactory;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -44,7 +45,6 @@ import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.testcases.MatsimTestCase;
@@ -57,7 +57,7 @@ public class LegModeCheckerTest extends MatsimTestCase {
 		createNetwork(sc);
 		
 		PopulationFactory factory = sc.getPopulation().getFactory();
-		ActivityFacilitiesImpl facilities = ((ScenarioImpl) sc).getActivityFacilities();
+		ActivityFacilities facilities = sc.getActivityFacilities();
 		
 		Person person = factory.createPerson(sc.createId("1"));
 		Plan plan = factory.createPlan();
@@ -75,6 +75,7 @@ public class LegModeCheckerTest extends MatsimTestCase {
 		/*
 		 * Set activity durations and coordinates and create facilities
 		 */
+		ActivityFacilitiesFactory ffactory = facilities.getFactory();
 		for (PlanElement planElement : plan.getPlanElements()) {
 			if (planElement instanceof ActivityImpl) {
 				ActivityImpl activity = (ActivityImpl) planElement;
@@ -82,13 +83,15 @@ public class LegModeCheckerTest extends MatsimTestCase {
 				activity.setCoord(sc.getNetwork().getLinks().get(activity.getLinkId()).getCoord());
 				activity.setFacilityId(activity.getLinkId());
 				
-				ActivityFacilityImpl facility = (ActivityFacilityImpl) facilities.getFacilities().get(activity.getLinkId());
+				ActivityFacility facility = facilities.getFacilities().get(activity.getLinkId());
 				if (facility == null) {
-					facility = facilities.createAndAddFacility(activity.getLinkId(), activity.getCoord());
+					facility = ffactory.createActivityFacility(activity.getLinkId(), activity.getCoord());
+					facilities.addActivityFacility(facility);
 				}
 				ActivityOption activityOption = facility.getActivityOptions().get(activity.getType());
 				if (activityOption == null) {
-					facility.createActivityOption(activity.getType());
+					activityOption = ffactory.createActivityOption(activity.getType());
+					facility.addActivityOption(activityOption);
 				}
 			}
 		}

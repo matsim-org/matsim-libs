@@ -69,7 +69,7 @@ public class UrbanSimParcelCSVWriterListener implements SpatialGridDataExchangeI
 
 			log.info(numberOfParcels + " parcels are now processing ...");
 
-			Iterator<ActivityFacility> parcelIterator = this.parcels.getFacilities().values().iterator();
+			Iterator<? extends ActivityFacility> parcelIterator = this.parcels.getFacilities().values().iterator();
 			ProgressBar bar = new ProgressBar(numberOfParcels);
 			
 			// this iterates through all parcel coordinates ...

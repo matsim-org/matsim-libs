@@ -23,9 +23,9 @@ package playground.staheale.preprocess;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
@@ -58,7 +58,7 @@ public class AdaptFacilities {
 		System.out.println("Reading facilities xml file... ");
 		FacReader.readFile("./input/facilities.xml.gz");
 		System.out.println("Reading facilities xml file...done.");
-		ActivityFacilitiesImpl facilities = this.scenario.getActivityFacilities();
+		ActivityFacilities facilities = this.scenario.getActivityFacilities();
 		log.info("Number of facilities: " +facilities.getFacilities().size());
 
 		    for (ActivityFacility f : facilities.getFacilities().values()) {

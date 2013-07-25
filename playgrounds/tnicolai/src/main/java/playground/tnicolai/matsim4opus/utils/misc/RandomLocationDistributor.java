@@ -188,7 +188,7 @@ public class RandomLocationDistributor {
 			
 			ActivityFacilitiesImpl zones   = new ActivityFacilitiesImpl("urbansim zones");
 			readFromUrbanSim.readFacilitiesZones(zones);
-			Iterator<ActivityFacility> zoneIterator = zones.getFacilities().values().iterator();
+			Iterator<? extends ActivityFacility> zoneIterator = zones.getFacilities().values().iterator();
 			
 			while(zoneIterator.hasNext()){
 				ActivityFacility zone = zoneIterator.next();

@@ -31,11 +31,12 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.api.experimental.facilities.ActivityFacilitiesFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
-import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -267,15 +268,19 @@ public class HUPCControllerKTIzh extends KTIWithinDayControler  {
 			i++;
 		}
 		
+		ActivityFacilities facilities = this.scenarioData.getActivityFacilities();
+		ActivityFacilitiesFactory factory = facilities.getFactory();
 		for (Parking parking:parkings){
 			
-			ActivityFacility parkingFacility = this.scenarioData.getActivityFacilities().createAndAddFacility(parking.getId(), parking.getCoord());
+			ActivityFacility parkingFacility = factory.createActivityFacility(parking.getId(), parking.getCoord());
+			facilities.addActivityFacility(parkingFacility);
 			Link nearestLink = ((NetworkImpl)this.scenarioData.getNetwork()).getNearestLink(parking.getCoord());
 			
 			((ActivityFacilityImpl)parkingFacility).setLinkId(nearestLink.getId());
 			
-			ActivityOption activityOption = ((ActivityFacilityImpl)parkingFacility).createActivityOption("parking");
-			activityOption.addOpeningTime(new OpeningTimeImpl(OpeningTime.DayType.wk, 0*3600, 24*3600));
+			ActivityOption activityOption = factory.createActivityOption("parking");
+			parkingFacility.addActivityOption(activityOption);
+			activityOption.addOpeningTime(new OpeningTimeImpl(0*3600, 24*3600));
 			activityOption.setCapacity(Double.MAX_VALUE);
 		
 		}

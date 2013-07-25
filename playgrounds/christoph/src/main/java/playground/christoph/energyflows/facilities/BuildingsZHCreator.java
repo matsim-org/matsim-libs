@@ -31,22 +31,20 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.api.experimental.facilities.ActivityFacilitiesFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
-import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -232,16 +230,20 @@ public class BuildingsZHCreator {
 	}
 	
 	public void createFacilities() {
+		ActivityFacilities facilities = scenario.getActivityFacilities();
+		ActivityFacilitiesFactory factory = facilities.getFactory();
 		for (Entry<Id, BuildingData> entry :data.entrySet()) {
 			Id id = entry.getKey();
 			BuildingData building = entry.getValue();
 			
 			Coord coord = scenario.createCoord(building.x, building.y);
-			ActivityFacilityImpl facility = ((ScenarioImpl) scenario).getActivityFacilities().createAndAddFacility(id, coord);
+			ActivityFacility facility = factory.createActivityFacility(id, coord);
+			facilities.addActivityFacility(facility);
 
 			int capacity = building.getApartmentCapacity();
 			if (capacity > 0) {
-				ActivityOptionImpl activityOption = facility.createActivityOption("home");
+				ActivityOption activityOption = factory.createActivityOption("home");
+				facility.addActivityOption(activityOption);
 				activityOption.setCapacity(building.getApartmentCapacity() * 1.0);
 			}
 		}

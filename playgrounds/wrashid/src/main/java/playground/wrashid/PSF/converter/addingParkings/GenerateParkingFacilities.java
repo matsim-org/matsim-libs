@@ -1,12 +1,31 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.wrashid.PSF.converter.addingParkings;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 
 /*
  * For each activity, define a parking and facility (and home...)
@@ -20,11 +39,11 @@ public class GenerateParkingFacilities {
 	 * @param outputFacilitiesFile
 	 */
 	
-	public static void generateParkingFacilties(ScenarioImpl scenario) {
+	public static void generateParkingFacilties(Scenario scenario) {
 
 		// generate facilities
 
-		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
+		ActivityFacilities facilities = scenario.getActivityFacilities();
 
 		for (Person person : scenario.getPopulation().getPersons().values()) {
 
@@ -37,7 +56,8 @@ public class GenerateParkingFacilities {
 					
 					// add facility only, if it does not already exist
 					if (!facilities.getFacilities().containsKey(facilityId)){
-						ActivityFacilityImpl facility = facilities.createAndAddFacility(facilityId, act.getCoord());
+						ActivityFacilityImpl facility = (ActivityFacilityImpl) facilities.getFactory().createActivityFacility(facilityId, act.getCoord());
+						facilities.addActivityFacility(facility);
 						facility.createActivityOption(act.getType());
 						facility.createActivityOption("parkingArrival");
 						facility.createActivityOption("parkingDeparture");

@@ -28,8 +28,9 @@ import java.util.Iterator;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -38,18 +39,18 @@ import org.matsim.core.utils.io.IOUtils;
 
 public class AnalyzeFacilities {
 
-	private ActivityFacilitiesImpl facilities;
+	private ActivityFacilities facilities;
 	private final static Logger log = Logger.getLogger(AnalyzeFacilities.class);
 	
 	
 	public static void main(final String[] args) {
 
 		Gbl.startMeasurement();
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		
 		log.info("reading the facilities ...");
-		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
+		ActivityFacilities facilities = scenario.getActivityFacilities();
 		new FacilitiesReaderMatsimV1(scenario).readFile("input/facilities/facilities_KTIYear2.xml.gz");
 				
 		final AnalyzeFacilities analyzer = new AnalyzeFacilities();
@@ -57,7 +58,7 @@ public class AnalyzeFacilities {
 		Gbl.printElapsedTime();
 	}
 	
-	public void run(ActivityFacilitiesImpl facilities) {
+	public void run(ActivityFacilities facilities) {
 		this.facilities = facilities;
 		this.write("./output/facilities/");
 		log.info("finished");

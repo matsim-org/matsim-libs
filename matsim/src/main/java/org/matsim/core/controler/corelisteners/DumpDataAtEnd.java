@@ -29,7 +29,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.ShutdownListener;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.network.NetworkChangeEventsWriter;
 import org.matsim.core.network.NetworkFactoryImpl;
@@ -63,9 +62,9 @@ public class DumpDataAtEnd implements ShutdownListener {
 		// dump config
 		new ConfigWriter(scenarioData.getConfig()).write(controlerIO.getOutputFilename(Controler.FILENAME_CONFIG));
 		// dump facilities
-		ActivityFacilities facilities = ((ScenarioImpl) scenarioData).getActivityFacilities();
+		ActivityFacilities facilities = scenarioData.getActivityFacilities();
 		if (facilities != null) {
-			new FacilitiesWriter((ActivityFacilitiesImpl) facilities).write(controlerIO.getOutputFilename("output_facilities.xml.gz"));
+			new FacilitiesWriter(facilities).write(controlerIO.getOutputFilename("output_facilities.xml.gz"));
 		}
 		if (((NetworkFactoryImpl) scenarioData.getNetwork().getFactory()).isTimeVariant()) {
 			new NetworkChangeEventsWriter().write(controlerIO.getOutputFilename("output_change_events.xml.gz"),

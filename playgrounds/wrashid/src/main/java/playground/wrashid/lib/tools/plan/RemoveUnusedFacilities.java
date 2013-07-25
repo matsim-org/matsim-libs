@@ -23,18 +23,14 @@ import java.util.HashSet;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.parking.lib.GeneralLib;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.LegImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 
 
@@ -64,7 +60,7 @@ public class RemoveUnusedFacilities {
 			}
 		}
 		
-		ActivityFacilitiesImpl activityFacilities = scenario.getActivityFacilities();
+		ActivityFacilities activityFacilities = scenario.getActivityFacilities();
 		LinkedList<Id> notUsedFacilities=new LinkedList<Id>();
 		for (ActivityFacility facility:activityFacilities.getFacilities().values()){
 			if (!usedFacilities.contains(facility.getId())){

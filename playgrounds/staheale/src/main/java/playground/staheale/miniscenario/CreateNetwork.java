@@ -140,7 +140,7 @@ public class CreateNetwork {
 	private void addFacility(Link l, int facilityId) {
 		int idnumber = facilityId;
 		IdImpl id = new IdImpl(Integer.toString(facilityId));
-		this.scenario.getActivityFacilities().createAndAddFacility(id, l.getCoord());
+		this.scenario.getActivityFacilities().addActivityFacility(this.scenario.getActivityFacilities().getFactory().createActivityFacility(id, l.getCoord()));
 
 		Random random = new Random(4711+idnumber);
 		ActivityFacilityImpl facility = (ActivityFacilityImpl)(this.scenario.getActivityFacilities().getFacilities().get(id));

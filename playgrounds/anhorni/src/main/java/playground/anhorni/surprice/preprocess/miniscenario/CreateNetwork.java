@@ -25,12 +25,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
-import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkWriter;
@@ -126,30 +126,30 @@ public class CreateNetwork {
 	
 	private void addFacility(Link l, int facilityId) {				
 		IdImpl id = new IdImpl(Integer.toString(facilityId));
-		this.scenario.getActivityFacilities().createAndAddFacility(id, l.getCoord());
-		ActivityFacilityImpl facility = (ActivityFacilityImpl)(this.scenario.getActivityFacilities().getFacilities().get(id));
-		facility.createActivityOption("home");
-		facility.createActivityOption("work");
-		facility.createActivityOption("shop");
-		facility.createActivityOption("leisure");
+		ActivityFacility facility = this.scenario.getActivityFacilities().getFactory().createActivityFacility(id, l.getCoord());
+		this.scenario.getActivityFacilities().addActivityFacility(facility);
+		facility.addActivityOption(this.scenario.getActivityFacilities().getFactory().createActivityOption("home"));
+		facility.addActivityOption(this.scenario.getActivityFacilities().getFactory().createActivityOption("work"));
+		facility.addActivityOption(this.scenario.getActivityFacilities().getFactory().createActivityOption("shop"));
+		facility.addActivityOption(this.scenario.getActivityFacilities().getFactory().createActivityOption("leisure"));
 								
 		ActivityOptionImpl actOptionHome = (ActivityOptionImpl)facility.getActivityOptions().get("home");
-		OpeningTimeImpl opentimeHome = new OpeningTimeImpl(DayType.wk, 0.0 * 3600.0, 24.0 * 3600);
+		OpeningTimeImpl opentimeHome = new OpeningTimeImpl(0.0 * 3600.0, 24.0 * 3600);
 		actOptionHome.addOpeningTime(opentimeHome);
 		
 		ActivityOptionImpl actOptionWork = (ActivityOptionImpl)facility.getActivityOptions().get("work");
-		OpeningTimeImpl opentimeWork = new OpeningTimeImpl(DayType.wk, 6.0 * 3600.0, 20.0 * 3600);
+		OpeningTimeImpl opentimeWork = new OpeningTimeImpl(6.0 * 3600.0, 20.0 * 3600);
 		actOptionWork.addOpeningTime(opentimeWork);
 		
 		ActivityOptionImpl actOptionShop = (ActivityOptionImpl)facility.getActivityOptions().get("shop");
-		OpeningTimeImpl opentimeShop = new OpeningTimeImpl(DayType.wk, 7.5 * 3600.0, 18.5 * 3600);
+		OpeningTimeImpl opentimeShop = new OpeningTimeImpl(7.5 * 3600.0, 18.5 * 3600);
 		actOptionShop.addOpeningTime(opentimeShop);
 		
 		ActivityOptionImpl actOptionLeisure = (ActivityOptionImpl)facility.getActivityOptions().get("leisure");
-		OpeningTimeImpl opentimeLeisure = new OpeningTimeImpl(DayType.wk, 0.0 * 3600.0, 24.0 * 3600);
+		OpeningTimeImpl opentimeLeisure = new OpeningTimeImpl(0.0 * 3600.0, 24.0 * 3600);
 		actOptionLeisure.addOpeningTime(opentimeLeisure);
 		
-		facility.setLinkId(l.getId());
+		((ActivityFacilityImpl) facility).setLinkId(l.getId());
 	}
 			
 	private void addNodes(NetworkFactoryImpl networkFactory) {		

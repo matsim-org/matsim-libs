@@ -27,6 +27,7 @@ import java.util.PriorityQueue;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
@@ -39,14 +40,13 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.QuadTree;
 
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
@@ -107,8 +107,8 @@ public class LinkVolumeAnalyzer {
 		}
 
 		LinkedList<Id> peakHourFaciliyIds = new LinkedList<Id>();
-		ScenarioImpl scenario = (ScenarioImpl) GeneralLib.readScenario(plansFileName, networkFileName, facilitiesFileName);
-		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
+		Scenario scenario = GeneralLib.readScenario(plansFileName, networkFileName, facilitiesFileName);
+		ActivityFacilities facilities = scenario.getActivityFacilities();
 		for (Id peakHourLinkId : peakHourLinkIds) {
 			LinkedList<Id> agentIds = peakHourAgents.peakHourTravellingAgentLinkIds.get(peakHourLinkId);
 

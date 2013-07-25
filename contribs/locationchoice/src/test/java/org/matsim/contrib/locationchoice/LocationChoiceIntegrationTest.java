@@ -47,6 +47,7 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.mobsim.framework.Mobsim;
@@ -252,12 +253,14 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 				network.addLink(link) ;
 			}
 
-			ActivityFacility facility = scenario.getActivityFacilities().createAndAddFacility(new IdImpl(ii), coord);
+			ActivityFacility facility = scenario.getActivityFacilities().getFactory().createActivityFacility(new IdImpl(ii), coord);
+			scenario.getActivityFacilities().addActivityFacility(facility);
 			facility.addActivityOption(new ActivityOptionImpl("work"));
 		}
 
 		// create one additional facility for the initial activity:
-		ActivityFacilityImpl facility1 = scenario.getActivityFacilities().createAndAddFacility(new IdImpl(1), new CoordImpl(scale,0) );
+		ActivityFacility facility1 = scenario.getActivityFacilities().getFactory().createActivityFacility(new IdImpl(1), new CoordImpl(scale,0) );
+		scenario.getActivityFacilities().addActivityFacility(facility1);
 		facility1.addActivityOption(new ActivityOptionImpl("work"));
 		// (as soon as you set a scoring function that looks if activity types match opportunities at facilities, you can only use
 		// an activity type that indeed is at the facility)
@@ -272,11 +275,11 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		Node node1 = network.createAndAddNode(new IdImpl(1), new CoordImpl(0, 0));
 		Node node2 = network.createAndAddNode(new IdImpl(2), new CoordImpl(1000, 0));
 		Link link = network.createAndAddLink(new IdImpl(1), node1, node2, 1000, 10, 3600, 1);
-		ActivityFacilityImpl facility1 = scenario.getActivityFacilities().createAndAddFacility(new IdImpl(1), new CoordImpl(0, 500));
+		ActivityFacilityImpl facility1 = ((ActivityFacilitiesImpl) scenario.getActivityFacilities()).createAndAddFacility(new IdImpl(1), new CoordImpl(0, 500));
 		facility1.addActivityOption(new ActivityOptionImpl("initial-work"));
-		ActivityFacilityImpl facility2 = scenario.getActivityFacilities().createAndAddFacility(new IdImpl(2), new CoordImpl(0, 400));
+		ActivityFacilityImpl facility2 = ((ActivityFacilitiesImpl) scenario.getActivityFacilities()).createAndAddFacility(new IdImpl(2), new CoordImpl(0, 400));
 		facility2.addActivityOption(new ActivityOptionImpl("work"));
-		ActivityFacilityImpl facility3 = scenario.getActivityFacilities().createAndAddFacility(new IdImpl(3), new CoordImpl(0, 300));
+		ActivityFacilityImpl facility3 = ((ActivityFacilitiesImpl) scenario.getActivityFacilities()).createAndAddFacility(new IdImpl(3), new CoordImpl(0, 300));
 		facility3.addActivityOption(new ActivityOptionImpl("work"));
 
 		Person person = localCreatePopWOnePerson(scenario, link, facility1, 17.*60.*60.);
@@ -330,7 +333,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		}
 		plan.addLeg(population.getFactory().createLeg(TransportMode.car)) ;
 		{
-			Activity act = population.getFactory().createActivityFromCoord("work", scenario.getActivityFacilities().getLocation(facility1.getId()).getCoord() ) ;
+			Activity act = population.getFactory().createActivityFromCoord("work", scenario.getActivityFacilities().getFacilities().get(facility1.getId()).getCoord() ) ;
 			act.setEndTime(workActEndTime);
 			((ActivityImpl)act).setFacilityId(facility1.getId());
 			plan.addActivity(act) ;

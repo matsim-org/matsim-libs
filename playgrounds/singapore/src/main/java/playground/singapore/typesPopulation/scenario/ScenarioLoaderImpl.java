@@ -192,14 +192,12 @@ public class ScenarioLoaderImpl {
 	 * 
 	 */
 	@Deprecated
-	public void loadActivityFacilities() {
+	private void loadActivityFacilities() {
 		if ((this.config.facilities() != null) && (this.config.facilities().getInputFile() != null)) {
 			String facilitiesFileName = this.config.facilities().getInputFile();
 			log.info("loading facilities from " + facilitiesFileName);
 			try {
 				new MatsimFacilitiesReader(this.scenario).parse(facilitiesFileName);
-				
-				this.scenario.getActivityFacilities().printFacilitiesCount();
 			} catch (Exception e) {
 				throw new RuntimeException(e);
 			}

@@ -23,19 +23,15 @@ package playground.wrashid.lib.tools.facility;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-
-import playground.wrashid.lib.obj.IntegerValueHashMap;
-import playground.wrashid.lib.tools.kml.BasicPointVisualizer;
-import playground.wrashid.lib.tools.kml.Color;
 
 public class FacilityCapacitiesPerActivityType {
 
 	public static void main(String[] args) {
 		String facilitiesPath = "E:/svn/studies/switzerland/facilities/facilities.zrhCutC.xml.gz";
 
-		ActivityFacilitiesImpl facilities = GeneralLib.readActivityFacilities(facilitiesPath);
+		ActivityFacilities facilities = GeneralLib.readActivityFacilities(facilitiesPath);
 		
 		DoubleValueHashMap<String> activityTypeCapacities=new DoubleValueHashMap<String>();
 		

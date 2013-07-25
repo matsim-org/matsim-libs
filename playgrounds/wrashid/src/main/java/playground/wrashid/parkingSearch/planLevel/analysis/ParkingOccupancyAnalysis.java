@@ -6,7 +6,7 @@ import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingCapacity;
 import playground.wrashid.parkingSearch.planLevel.occupancy.ParkingOccupancyBins;
@@ -89,7 +89,7 @@ public class ParkingOccupancyAnalysis {
 		int numberOfParkings = parkingCapacity.getNumberOfParkings();
 		double[][] matrix = new double[numberOfParkings][98];
 
-		ArrayList<ActivityFacilityImpl> parkingFacilities = parkingCapacity
+		ArrayList<ActivityFacility> parkingFacilities = parkingCapacity
 				.getParkingFacilities();
 
 		// fill matrix data
@@ -133,7 +133,7 @@ public class ParkingOccupancyAnalysis {
 
 		double x_y_max = 10000000.0;
 
-		ArrayList<ActivityFacilityImpl> parkingFacilities = parkingCapacity
+		ArrayList<ActivityFacility> parkingFacilities = parkingCapacity
 				.getParkingFacilities();
 
 		for (int i = 0; i < parkingFacilities.size(); i++) {

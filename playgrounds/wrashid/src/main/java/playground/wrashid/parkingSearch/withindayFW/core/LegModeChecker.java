@@ -145,7 +145,7 @@ public class LegModeChecker extends AbstractPersonAlgorithm implements PlanAlgor
 				 * Get position of the car. We assume that the car is located at
 				 * the coordinate of the home location of an agent.
 				 */
-				Map<Id, ActivityFacility> facilities = ((ScenarioImpl)scenario).getActivityFacilities().getFacilities();
+				Map<Id, ? extends ActivityFacility> facilities = scenario.getActivityFacilities().getFacilities();
 				Coord carCoord = facilities.get(firstActivity.getFacilityId()).getCoord();
 				
 				/*

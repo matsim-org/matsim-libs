@@ -23,8 +23,8 @@ package org.matsim.core.facilities;
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.internal.MatsimSomeReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.xml.sax.Attributes;
@@ -58,7 +58,7 @@ public class MatsimFacilitiesReader extends MatsimXmlParser implements MatsimSom
 
 	private final static Logger log = Logger.getLogger(MatsimFacilitiesReader.class);
 	
-	private final ScenarioImpl scenario;
+	private final Scenario scenario;
 	private MatsimXmlParser delegate = null;
 
 	/**
@@ -66,7 +66,7 @@ public class MatsimFacilitiesReader extends MatsimXmlParser implements MatsimSom
 	 *
 	 * @param facilities The Facilities-object to store the facilities in.
 	 */
-	public MatsimFacilitiesReader(final ScenarioImpl scenario) {
+	public MatsimFacilitiesReader(final Scenario scenario) {
 		this.scenario = scenario;
 	}
 

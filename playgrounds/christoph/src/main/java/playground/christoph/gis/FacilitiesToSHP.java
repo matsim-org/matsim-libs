@@ -32,13 +32,12 @@ import org.geotools.referencing.crs.DefaultGeographicCRS;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -59,7 +58,7 @@ public class FacilitiesToSHP {
 
 	final private static Logger log = Logger.getLogger(FacilitiesToSHP.class);
 	
-	private ActivityFacilitiesImpl facilities;
+	private ActivityFacilities facilities;
 	private Set<String> activityOptions;
 	
 	private static String facilitiesFile = "../../matsim/mysimulations/kt-zurich/facilities/10pct/facilities.xml.gz";
@@ -69,13 +68,13 @@ public class FacilitiesToSHP {
 	private CoordinateReferenceSystem crs = DefaultGeographicCRS.WGS84;
 	
 	public static void main(String[] args) throws Exception {		
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new MatsimFacilitiesReader((ScenarioImpl)scenario).readFile(facilitiesFile);
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new MatsimFacilitiesReader(scenario).readFile(facilitiesFile);
 		new FacilitiesToSHP(scenario);
 	}
 	
 	public FacilitiesToSHP(Scenario scenario) throws Exception {
-		facilities = ((ScenarioImpl) scenario).getActivityFacilities();
+		facilities = scenario.getActivityFacilities();
 		
 		identifyActivityOptions();
 		

@@ -26,10 +26,9 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.facilities.Facility;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
-import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -51,7 +50,7 @@ public class PersonSetFacilities extends AbstractPersonAlgorithm implements Plan
 	private static final String LEISURE = "leisure";
 	private static final String TTA = "tta";
 	
-	private final ActivityFacilitiesImpl facilities;
+	private final ActivityFacilities facilities;
 	private QuadTree<Facility> homeQuadTree = null;
 	private QuadTree<Facility> shopQuadTree = null;
 	private QuadTree<Facility> work2QuadTree = null;
@@ -63,7 +62,7 @@ public class PersonSetFacilities extends AbstractPersonAlgorithm implements Plan
 	// constructors
 	//////////////////////////////////////////////////////////////////////
 
-	public PersonSetFacilities(final ActivityFacilitiesImpl facilities) {
+	public PersonSetFacilities(final ActivityFacilities facilities) {
 		super();
 		log.info("init " + this.getClass().getName() + " module...");
 		this.facilities = facilities;

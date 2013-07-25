@@ -23,6 +23,7 @@ import org.matsim.contrib.accessibility.utils.LeastCostPathTreeExtended;
 import org.matsim.contrib.accessibility.utils.NetworkUtil;
 import org.matsim.contrib.accessibility.utils.ProgressBar;
 import org.matsim.contrib.matrixbasedptrouter.PtMatrix;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
@@ -250,13 +251,13 @@ public abstract class AccessibilityControlerListenerImpl {
 	 * @param network giving the road network
 	 * @return the sum of disutilities Vjk, i.e. the disutilities to reach all opportunities k that are assigned to j from node j 
 	 */
-	final AggregateObject2NearestNode[] aggregatedOpportunities(final ActivityFacilitiesImpl opportunities, Network network){
+	final AggregateObject2NearestNode[] aggregatedOpportunities(final ActivityFacilities opportunities, Network network){
 	
 		log.info("Aggregating " + opportunities.getFacilities().size() + " opportunities with identical nearest node ...");
 		Map<Id, AggregateObject2NearestNode> opportunityClusterMap = new ConcurrentHashMap<Id, AggregateObject2NearestNode>();
 		ProgressBar bar = new ProgressBar( opportunities.getFacilities().size() );
 	
-		Iterator<ActivityFacility> oppIterator = opportunities.getFacilities().values().iterator();
+		Iterator<? extends ActivityFacility> oppIterator = opportunities.getFacilities().values().iterator();
 		
 		while(oppIterator.hasNext()){
 			
@@ -331,7 +332,7 @@ public abstract class AccessibilityControlerListenerImpl {
 
 		GeneralizedCostSum gcs = new GeneralizedCostSum();
 		
-		Iterator<ActivityFacility> mpIterator = mp.getFacilities().values().iterator();
+		Iterator<? extends ActivityFacility> mpIterator = mp.getFacilities().values().iterator();
 		
 		// this data structure condense measuring points (origins) that have the same nearest node on the network ...
 		Map<Id,ArrayList<ActivityFacility>> aggregatedMeasurementPointsV2 = new ConcurrentHashMap<Id, ArrayList<ActivityFacility>>();

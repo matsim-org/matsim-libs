@@ -6,7 +6,7 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.StringMatrix;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 
@@ -41,7 +41,7 @@ public class ParkingLots {
 
 	private static void collectStreetParkings(ArrayList<String> outputList) {
 		String streetParkings = Config.baseFolder + "../streetpark_facilities.xml";
-		ActivityFacilitiesImpl streetParkingFacilities = GeneralLib.readActivityFacilities(streetParkings);
+		ActivityFacilities streetParkingFacilities = GeneralLib.readActivityFacilities(streetParkings);
 
 		int totalCapacity = 0;
 		for (Id facilityId : streetParkingFacilities.getFacilities().keySet()) {

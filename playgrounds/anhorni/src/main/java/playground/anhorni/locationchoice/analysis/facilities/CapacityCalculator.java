@@ -22,8 +22,8 @@ package playground.anhorni.locationchoice.analysis.facilities;
 import java.util.Iterator;
 import java.util.TreeMap;
 
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityOption;
 
 public class CapacityCalculator {
@@ -155,16 +155,16 @@ public class CapacityCalculator {
 	private TreeMap<String, CapacityPerNOGAType> nogaLeisureFacilities = new TreeMap<String, CapacityPerNOGAType>();
 	
 	
-	public void calcCapacities(ActivityFacilitiesImpl facilities) {
+	public void calcCapacities(ActivityFacilities facilities) {
 		this.calculateCapacitiesPerType(facilities, nogaShopFacilities, NOGA_shop, "shop");
 		this.calculateCapacitiesPerType(facilities, nogaGroceryShopFacilities, NOGA_Grocery, "shop");
 		this.calculateCapacitiesPerType(facilities, nogaLeisureFacilities, NOGA_leisure, "leisure");
 	}
 	
 	
-	private void calculateCapacitiesPerType(ActivityFacilitiesImpl facilities, TreeMap<String, CapacityPerNOGAType> nogaFacilities,
+	private void calculateCapacitiesPerType(ActivityFacilities facilities, TreeMap<String, CapacityPerNOGAType> nogaFacilities,
 			String[] nogaTypes, String type) {
-		Iterator<ActivityFacility> facility_it = facilities.getFacilities().values().iterator();
+		Iterator<? extends ActivityFacility> facility_it = facilities.getFacilities().values().iterator();
 		while (facility_it.hasNext()) {
 			ActivityFacility facility = facility_it.next();	
 			

@@ -19,14 +19,14 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.utils.LeastCostPathTree;
 
 import playground.andreas.aas.modules.cellBasedAccessibility.constants.InternalConstants;
+import playground.andreas.aas.modules.cellBasedAccessibility.costcalculators.FreeSpeedTravelTimeCostCalculator;
+import playground.andreas.aas.modules.cellBasedAccessibility.costcalculators.TravelDistanceCalculator;
+import playground.andreas.aas.modules.cellBasedAccessibility.costcalculators.TravelTimeCostCalculator;
 import playground.andreas.aas.modules.cellBasedAccessibility.gis.GridUtils;
 import playground.andreas.aas.modules.cellBasedAccessibility.gis.SpatialGrid;
 import playground.andreas.aas.modules.cellBasedAccessibility.gis.Zone;
 import playground.andreas.aas.modules.cellBasedAccessibility.gis.ZoneLayer;
 import playground.andreas.aas.modules.cellBasedAccessibility.interpolation.Interpolation;
-import playground.andreas.aas.modules.cellBasedAccessibility.costcalculators.FreeSpeedTravelTimeCostCalculator;
-import playground.andreas.aas.modules.cellBasedAccessibility.costcalculators.TravelDistanceCalculator;
-import playground.andreas.aas.modules.cellBasedAccessibility.costcalculators.TravelTimeCostCalculator;
 import playground.andreas.aas.modules.cellBasedAccessibility.utils.helperObjects.AggregateObject2NearestNode;
 import playground.andreas.aas.modules.cellBasedAccessibility.utils.helperObjects.Benchmark;
 import playground.andreas.aas.modules.cellBasedAccessibility.utils.io.writer.AnalysisCellBasedAccessibilityCSVWriterV2;
@@ -314,7 +314,7 @@ public class CellBasedAccessibilityControlerListenerV3 extends AccessibilityCont
 			
 			log.info(numberOfParcels + " parcels are now processing ...");
 			
-			Iterator<ActivityFacility> parcelIterator = this.parcels.getFacilities().values().iterator();
+			Iterator<? extends ActivityFacility> parcelIterator = this.parcels.getFacilities().values().iterator();
 			ProgressBar bar = new ProgressBar( numberOfParcels );
 			
 			while(parcelIterator.hasNext()){

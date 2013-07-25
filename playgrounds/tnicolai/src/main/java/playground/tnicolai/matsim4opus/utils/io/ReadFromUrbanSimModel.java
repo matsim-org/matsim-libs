@@ -748,7 +748,7 @@ public class ReadFromUrbanSimModel {
 			
 			log.info( "Starting to read jobs table from " + filename );
 			
-			Map<Id, ActivityFacility> facilityMap = parcelsOrZones.getFacilities();
+			Map<Id, ? extends ActivityFacility> facilityMap = parcelsOrZones.getFacilities();
 			
 			try{
 				BufferedReader reader = IOUtils.getBufferedReader( filename );
@@ -803,7 +803,7 @@ public class ReadFromUrbanSimModel {
 	private void createJobParcel(final JobCounter cnt,
 			final List<SpatialReferenceObject> jobSampleList,
 			final List<SpatialReferenceObject> backupList,
-			final Map<Id, ActivityFacility> facilityMap, 
+			final Map<Id, ? extends ActivityFacility> facilityMap, 
 			final int indexJobID,
 			final int indexParcelID, 
 			final int indexZoneID,
@@ -839,7 +839,7 @@ public class ReadFromUrbanSimModel {
 	private void createJobZone(final JobCounter cnt,
 			final List<SpatialReferenceObject> jobSampleList,
 			final List<SpatialReferenceObject> backupList,
-			final Map<Id, ActivityFacility> facilityMap, 
+			final Map<Id, ? extends ActivityFacility> facilityMap, 
 			final int indexJobID,
 			final int indexZoneID,
 			final boolean isBackup, 

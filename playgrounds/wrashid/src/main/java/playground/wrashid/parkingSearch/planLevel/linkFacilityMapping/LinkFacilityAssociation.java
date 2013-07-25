@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -50,12 +51,12 @@ public class LinkFacilityAssociation {
 		init(facilities);
 	}
 
-	public LinkFacilityAssociation(ActivityFacilitiesImpl facilities, NetworkImpl network) {
+	public LinkFacilityAssociation(ActivityFacilities facilities, NetworkImpl network) {
 		this.network = network;
 		init(facilities);
 	}
 
-	private void init(ActivityFacilitiesImpl facilities) {
+	private void init(ActivityFacilities facilities) {
 		for (ActivityFacility facility : facilities.getFacilities().values()) {
 			addFacilityToHashMap((ActivityFacilityImpl) facility);
 		}

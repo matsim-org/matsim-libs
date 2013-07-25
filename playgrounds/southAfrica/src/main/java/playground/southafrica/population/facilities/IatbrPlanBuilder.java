@@ -249,7 +249,7 @@ public class IatbrPlanBuilder {
 					/* This should not be necessary, but is inconsistent with other containers. */
 					/* TODO Follow up with MATSim developers. */
 					if(!activityFacilities.getFacilities().containsKey(home.getId())){
-						activityFacilities.getFacilities().put(home.getId(), home);
+						activityFacilities.addActivityFacility(home);
 					}
 					facilityIdMap.put(closestBuilding, home.getId());
 				} else{

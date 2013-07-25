@@ -27,9 +27,9 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -37,33 +37,16 @@ import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.johannes.coopsim.analysis.ActTypeShareTask;
 import playground.johannes.coopsim.analysis.ActivityDurationTask;
-import playground.johannes.coopsim.analysis.ActivityLoadTask;
-import playground.johannes.coopsim.analysis.ArrivalTimeTask;
-import playground.johannes.coopsim.analysis.DepartureLoadTask;
-import playground.johannes.coopsim.analysis.DistanceArrivalTimeTask;
-import playground.johannes.coopsim.analysis.DurationArrivalTimeTask;
-import playground.johannes.coopsim.analysis.LegLoadTask;
-import playground.johannes.coopsim.analysis.ModeShareArrivalTask;
-import playground.johannes.coopsim.analysis.PersonAgeTask;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzer;
 import playground.johannes.coopsim.analysis.TrajectoryAnalyzerTaskComposite;
-import playground.johannes.coopsim.analysis.TripDistanceMean;
-import playground.johannes.coopsim.analysis.TripDistanceTask;
-import playground.johannes.coopsim.analysis.TripDistanceTaskLeisure;
-import playground.johannes.coopsim.analysis.TripDurationArrivalTime;
-import playground.johannes.coopsim.analysis.TripDurationTask;
 import playground.johannes.coopsim.pysical.Trajectory;
 import playground.johannes.coopsim.util.MatsimCoordUtils;
-import playground.johannes.mz2005.analysis.ActivityChainsTask;
 import playground.johannes.mz2005.analysis.TrajectoryPlanBuilder;
 import playground.johannes.mz2005.io.EscortData;
 import playground.johannes.mz2005.utils.FacilityFromActivity;
-import playground.johannes.mz2005.validate.AllowLegMode;
 import playground.johannes.mz2005.validate.RoundTrips;
 import playground.johannes.sna.gis.CRSUtils;
-import playground.johannes.socialnetworks.gis.WGS84DistanceCalculator;
 import playground.johannes.socialnetworks.graph.social.SocialPerson;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraph;
 import playground.johannes.socialnetworks.survey.ivt2009.graph.SocialSparseGraphBuilder;
@@ -96,7 +79,7 @@ public class Analyzer {
 		
 		MatsimFacilitiesReader facReader = new MatsimFacilitiesReader((ScenarioImpl) scenario);
 		facReader.readFile("/Users/jillenberger/Work/shared-svn/studies/schweiz-ivtch/baseCase/facilities/facilities.cg.xml");
-		ActivityFacilitiesImpl facilities = ((ScenarioImpl) scenario).getActivityFacilities();
+		ActivityFacilities facilities = ((ScenarioImpl) scenario).getActivityFacilities();
 		
 		FacilityFromActivity.createActivities(scenario.getPopulation(), facilities);
 		

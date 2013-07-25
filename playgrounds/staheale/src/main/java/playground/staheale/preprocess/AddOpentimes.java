@@ -26,15 +26,15 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
 //import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 //import org.matsim.api.core.v01.Coord;
-
-import org.apache.log4j.Logger;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 //import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 //import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
@@ -42,11 +42,10 @@ import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.facilities.OpeningTimeImpl;
-//import org.matsim.core.gbl.Gbl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.facilities.algorithms.AbstractFacilityAlgorithm;
+//import org.matsim.core.gbl.Gbl;
 
 
 /**
@@ -59,8 +58,8 @@ import org.matsim.facilities.algorithms.AbstractFacilityAlgorithm;
  */
 public class AddOpentimes extends AbstractFacilityAlgorithm {
 
-	private ScenarioImpl scenario;
-	private ActivityFacilitiesImpl shopsOf2005;
+	private Scenario scenario;
+	private ActivityFacilities shopsOf2005;
 	private final String shopsOf2005Filename = "input/facilities_shopsOf2005.xml";
 	private static final Logger log = Logger.getLogger(AddOpentimes.class);
 	//private TreeMap<Id, shopsOf2005> shops = new TreeMap<Id, shopsOf2005>();
@@ -73,7 +72,7 @@ public class AddOpentimes extends AbstractFacilityAlgorithm {
 	}
 
 	public void init() {
-		this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		log.info("Reading shops Of 2005 xml file... ");
 		FacilitiesReaderMatsimV1 facilities_reader = new FacilitiesReaderMatsimV1(this.scenario);
 		facilities_reader.readFile(this.shopsOf2005Filename);

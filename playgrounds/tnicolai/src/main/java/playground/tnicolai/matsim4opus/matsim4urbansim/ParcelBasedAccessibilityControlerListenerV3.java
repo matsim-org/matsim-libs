@@ -317,7 +317,7 @@ public class ParcelBasedAccessibilityControlerListenerV3 extends AccessibilityCo
 			
 			log.info(numberOfParcels + " parcels are now processing ...");
 			
-			Iterator<ActivityFacility> parcelIterator = this.parcels.getFacilities().values().iterator();
+			Iterator<? extends ActivityFacility> parcelIterator = this.parcels.getFacilities().values().iterator();
 			ProgressBar bar = new ProgressBar( numberOfParcels );
 			
 			while(parcelIterator.hasNext()){

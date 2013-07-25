@@ -28,6 +28,7 @@ import org.geotools.data.simple.SimpleFeatureIterator;
 import org.geotools.data.simple.SimpleFeatureSource;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -49,7 +50,7 @@ public class Shp2Facilities {
 	private static Collection<SimpleFeature> getPolygons(final SimpleFeatureSource n, final ScenarioImpl scenario) {
 		final Collection<SimpleFeature> polygons = new ArrayList<SimpleFeature>(); // not needed
 
-		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
+		ActivityFacilities facilities = scenario.getActivityFacilities();
 		facilities.setName("workplaces");
 		long cnt = 0 ;
 		
@@ -84,7 +85,7 @@ public class Shp2Facilities {
 			
 			Id id = new IdImpl( cnt ) ; cnt++ ;
 			
-			ActivityFacilityImpl facility = facilities.createAndAddFacility(id, coord ) ;
+			ActivityFacilityImpl facility = ((ActivityFacilitiesImpl) facilities).createAndAddFacility(id, coord ) ;
 			
 			facility.createActivityOption( (String) feature.getAttribute("LU_CODE") ) ;
 			facility.createActivityOption( (String) feature.getAttribute("LU_DESCRIP") ) ;

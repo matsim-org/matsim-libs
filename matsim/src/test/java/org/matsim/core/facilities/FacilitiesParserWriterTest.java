@@ -20,8 +20,9 @@
 
 package org.matsim.core.facilities;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.CRCChecksum;
 import org.matsim.examples.TriangleScenario;
@@ -47,7 +48,7 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 		super.tearDown();
 	}
 
-	private final void runModules(final ActivityFacilitiesImpl facilities) {
+	private final void runModules(final ActivityFacilities facilities) {
 		System.out.println("  running facilities modules... ");
 		new FacilitiesSummary().run(facilities);
 		new FacilitiesCalcMinDist().run(facilities);
@@ -68,8 +69,8 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 
 	
 		System.out.println("  reading facilites xml file independent of the world...");
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(this.config);
-		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
+		Scenario scenario = ScenarioUtils.createScenario(this.config);
+		ActivityFacilities facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).readFile(this.config.facilities().getInputFile());
 		System.out.println("  done.");
 
@@ -87,10 +88,10 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 	public void testParserWriter2() {
 		System.out.println("running testParserWriter2()...");
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(this.config);
+		Scenario scenario = ScenarioUtils.createScenario(this.config);
 	
 		System.out.println("  reading facilites xml file as a layer of the world...");
-		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
+		ActivityFacilities facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).readFile(this.config.facilities().getInputFile());
 		System.out.println("  done.");
 
@@ -108,10 +109,10 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 	public void testParserWriter3() {
 		System.out.println("running testParserWriter3()...");
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(this.config);
+		Scenario scenario = ScenarioUtils.createScenario(this.config);
 
 		System.out.println("  reading facilites xml file as a layer of the world...");
-		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
+		ActivityFacilities facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).readFile(this.config.facilities().getInputFile());
 		System.out.println("  done.");
 
@@ -129,10 +130,10 @@ public class FacilitiesParserWriterTest extends MatsimTestCase {
 	public void testParserWriter4() {
 		System.out.println("running testParserWriter4()...");
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(this.config);
+		Scenario scenario = ScenarioUtils.createScenario(this.config);
 
 		System.out.println("  reading facilites xml file as a layer of the world...");
-		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
+		ActivityFacilities facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).readFile(this.config.facilities().getInputFile());
 		System.out.println("  done.");
 

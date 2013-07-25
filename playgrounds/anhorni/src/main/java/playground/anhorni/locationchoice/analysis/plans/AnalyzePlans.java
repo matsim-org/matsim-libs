@@ -27,14 +27,15 @@ import java.util.List;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -43,7 +44,6 @@ import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.BarChart;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -54,9 +54,9 @@ import playground.anhorni.utils.Utils;
 
 public class AnalyzePlans {
 
-	private final ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+	private final Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 	private final Population plans = scenario.getPopulation();
-	private final ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
+	private final ActivityFacilities facilities = scenario.getActivityFacilities();
 	private final Network network = scenario.getNetwork();
 
 	String plansfilePath;
@@ -493,7 +493,7 @@ public class AnalyzePlans {
 		return plans;
 	}
 
-	public ActivityFacilitiesImpl getFacilities() {
+	public ActivityFacilities getFacilities() {
 		return facilities;
 	}
 

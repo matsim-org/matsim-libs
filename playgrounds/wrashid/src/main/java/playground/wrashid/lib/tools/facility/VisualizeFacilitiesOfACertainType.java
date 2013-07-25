@@ -23,11 +23,9 @@ package playground.wrashid.lib.tools.facility;
 import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.network.NetworkImpl;
 
 import playground.wrashid.lib.tools.kml.BasicPointVisualizer;
 import playground.wrashid.lib.tools.kml.Color;
@@ -44,7 +42,7 @@ public class VisualizeFacilitiesOfACertainType {
 		double scalingPercentage=0.01; // 1.0 means 100%
 		String outputKmlFile=GeneralLib.eclipseLocalTempPath + "/facilities.kml";
 		
-		ActivityFacilitiesImpl facilities = GeneralLib.readActivityFacilities(facilititiesPath);
+		ActivityFacilities facilities = GeneralLib.readActivityFacilities(facilititiesPath);
 		
 		BasicPointVisualizer basicPointVisualizer=new BasicPointVisualizer();
 		

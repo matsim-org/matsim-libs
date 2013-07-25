@@ -28,7 +28,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
-import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkWriter;
@@ -126,18 +125,21 @@ public class CreateNetwork {
 		int personsPerLocation = Integer.parseInt(config.findParam(LCEXP, "personsPerLoc"));
 				
 		IdImpl id = new IdImpl(Integer.toString(facilityId));
-		this.scenario.getActivityFacilities().createAndAddFacility(id, l.getCoord());
+		
+		this.scenario.getActivityFacilities().addActivityFacility(
+				this.scenario.getActivityFacilities().getFactory().createActivityFacility(id, l.getCoord()));
+		
 		ActivityFacilityImpl facility = (ActivityFacilityImpl)(this.scenario.getActivityFacilities().getFacilities().get(id));
 		facility.createActivityOption("shop");
 		facility.createActivityOption("home");
-		facility.getActivityOptions().get("shop").setCapacity((double) personsPerLocation * 0.5);
+		facility.getActivityOptions().get("shop").setCapacity(personsPerLocation * 0.5);
 				
 		ActivityOptionImpl actOptionShop = (ActivityOptionImpl)facility.getActivityOptions().get("shop");
-		OpeningTimeImpl opentimeShop = new OpeningTimeImpl(DayType.wk, 9.5 * 3600.0, 14.5 * 3600);
+		OpeningTimeImpl opentimeShop = new OpeningTimeImpl(9.5 * 3600.0, 14.5 * 3600);
 		actOptionShop.addOpeningTime(opentimeShop);
 		
 		ActivityOptionImpl actOptionHome = (ActivityOptionImpl)facility.getActivityOptions().get("home");
-		OpeningTimeImpl opentimeHome = new OpeningTimeImpl(DayType.wk, 0 * 3600.0, 24.0 * 3600);
+		OpeningTimeImpl opentimeHome = new OpeningTimeImpl(0 * 3600.0, 24.0 * 3600);
 		actOptionHome.addOpeningTime(opentimeHome);
 	}
 			

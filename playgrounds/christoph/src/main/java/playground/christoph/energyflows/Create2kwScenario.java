@@ -143,7 +143,9 @@ public class Create2kwScenario {
 		log.info("...done.");
 		
 		log.info("add new facilities...");
-		scenario.getActivityFacilities().getFacilities().putAll(zurichFacilities.getFacilities());
+		for (ActivityFacility f : zurichFacilities.getFacilities().values()) {
+			scenario.getActivityFacilities().addActivityFacility(f);
+		}
 		log.info("done.");
 
 		log.info("write facilities...");

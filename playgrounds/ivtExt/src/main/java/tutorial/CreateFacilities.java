@@ -15,7 +15,6 @@ import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.OpeningTimeImpl;
-import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -75,8 +74,8 @@ public class CreateFacilities {
 				Coord coord = new CoordImpl(Double.parseDouble(parts[index_xCoord]),
 						Double.parseDouble(parts[index_yCoord]));
 				
-				ActivityFacilityImpl facility = 
-					(ActivityFacilityImpl)((ScenarioImpl)this.scenario).getActivityFacilities().createAndAddFacility(new IdImpl(cnt), coord);
+				ActivityFacilityImpl facility = (ActivityFacilityImpl)this.scenario.getActivityFacilities().getFactory().createActivityFacility(new IdImpl(cnt), coord);
+				this.scenario.getActivityFacilities().addActivityFacility(facility);
 				
 				String types [] = parts[index_types].split(",");
  				for (int i = 0; i < types.length; i++) {
@@ -84,6 +83,7 @@ public class CreateFacilities {
 				}
 				cnt++;
 			}
+			bufferedReader.close();
 		} // end try
 		catch (IOException e) {
 			e.printStackTrace();
@@ -106,11 +106,11 @@ public class CreateFacilities {
 				Coord homeCoord = new CoordImpl(Double.parseDouble(parts[index_xHomeCoord]),
 						Double.parseDouble(parts[index_yHomeCoord]));
 				
-				ActivityFacility facility = ((ScenarioImpl)this.scenario).getActivityFacilities().createAndAddFacility(new IdImpl(startIndex + cnt), homeCoord);
+				ActivityFacility facility = this.scenario.getActivityFacilities().getFactory().createActivityFacility(new IdImpl(startIndex + cnt), homeCoord);
 				addActivityOption(facility, "home");
 				cnt++;
 			}
-			
+			bufferedReader.close();
 		} // end try
 		catch (IOException e) {
 			e.printStackTrace();
@@ -132,11 +132,11 @@ public class CreateFacilities {
 			opentime = null;
 		}
 		else if (type.equals("work")) {
-			opentime = new OpeningTimeImpl(DayType.wkday, 8.0 * 3600.0, 19.0 * 3600); //[[ 1 ]] opentime = null;
+			opentime = new OpeningTimeImpl(8.0 * 3600.0, 19.0 * 3600); //[[ 1 ]] opentime = null;
 		}
 		// home
 		else {
-			opentime = new OpeningTimeImpl(DayType.wk, 0.0 * 3600.0, 24.0 * 3600);
+			opentime = new OpeningTimeImpl(0.0 * 3600.0, 24.0 * 3600);
 		}
 		actOption.addOpeningTime(opentime);	
 	}

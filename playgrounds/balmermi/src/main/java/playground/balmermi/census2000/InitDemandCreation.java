@@ -20,10 +20,11 @@
 
 package playground.balmermi.census2000;
 
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
+import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.population.PopulationImpl;
@@ -71,8 +72,8 @@ public class InitDemandCreation {
 		World world = new World();
 
 		System.out.println("  reading facilities xml file... ");
-		sl.loadActivityFacilities();
-		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
+		new MatsimFacilitiesReader(scenario).parse(config.facilities().getInputFile());
+		ActivityFacilities facilities = scenario.getActivityFacilities();
 		System.out.println("  done.");
 
 		System.out.println("  reading matrices xml file... ");

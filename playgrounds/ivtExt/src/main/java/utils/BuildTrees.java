@@ -27,8 +27,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.utils.collections.QuadTree;
 
 public class BuildTrees {
 	
@@ -39,7 +39,7 @@ public class BuildTrees {
 		
 		if (activityType.equals("all")) {
 			facQuadTree = this.builFacQuadTree(
-					activityType, ((ScenarioImpl)scenario).getActivityFacilities().getFacilities());	
+					activityType, scenario.getActivityFacilities().getFacilities());	
 		}
 		else {
 			facQuadTree = this.builFacQuadTree(
@@ -57,7 +57,7 @@ public class BuildTrees {
 		return this.builFacQuadTree(mainType, facilities_of_type);
 	}
 	
-	private QuadTree<ActivityFacility> builFacQuadTree(String type, Map<Id,ActivityFacility> facilities_of_type) {
+	private QuadTree<ActivityFacility> builFacQuadTree(String type, Map<Id, ? extends ActivityFacility> facilities_of_type) {
 		Gbl.startMeasurement();
 		log.info(" building " + type + " facility quad tree");
 		double minx = Double.POSITIVE_INFINITY;

@@ -3,13 +3,14 @@ package playground.wrashid.PHEV.Triangle;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.population.ActivityImpl;
@@ -35,13 +36,13 @@ public class CreatePlans {
 		Config config = ConfigUtils.loadConfig(args[0]);
 //		config.plans().setOutputFile("C:/data/SandboxCVS/ivt/studies/wrashid/Energy and Transport/triangle/5000plan/plans.xml");
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		Scenario scenario = ScenarioUtils.createScenario(config);
 
 		Population plans = scenario.getPopulation();
-		Knowledges knowledges = scenario.getKnowledges();
+		Knowledges knowledges = ((ScenarioImpl) scenario).getKnowledges();
 
 		// read facilities
-		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
+		ActivityFacilities facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).readFile("C:/data/SandboxCVS/ivt/studies/wrashid/Energy and Transport/triangle/facilities/facilities.xml");
 
 

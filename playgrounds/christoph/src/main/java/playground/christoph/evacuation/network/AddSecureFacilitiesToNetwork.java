@@ -38,17 +38,15 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
-import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.LinkImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.vis.kml.KMZWriter;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
@@ -159,11 +157,12 @@ public class AddSecureFacilitiesToNetwork {
 			 * Create and add the rescue facility and add activity option ("rescue")
 			 */
 			String idString = "secureFacility" + link.getId();
-			ActivityFacility secureFacility = ((ScenarioImpl)scenario).getActivityFacilities().createAndAddFacility(scenario.createId(idString), link.getCoord());
+			ActivityFacility secureFacility = scenario.getActivityFacilities().getFactory().createActivityFacility(scenario.createId(idString), link.getCoord());
+			scenario.getActivityFacilities().addActivityFacility(secureFacility);
 			((ActivityFacilityImpl)secureFacility).setLinkId(((LinkImpl)link).getId());
 			
 			ActivityOption activityOption = ((ActivityFacilityImpl)secureFacility).createActivityOption("rescue");
-			activityOption.addOpeningTime(new OpeningTimeImpl(OpeningTime.DayType.wk, 0*3600, 24*3600));
+			activityOption.addOpeningTime(new OpeningTimeImpl(0*3600, 24*3600));
 			activityOption.setCapacity(Double.MAX_VALUE);
 		}
 	}

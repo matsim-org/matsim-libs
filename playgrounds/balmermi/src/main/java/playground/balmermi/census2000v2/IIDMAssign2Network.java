@@ -25,10 +25,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
@@ -38,11 +39,9 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.population.PopulationReader;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.balmermi.census2000v2.modules.PersonAssignToNetwork;
-import playground.balmermi.world.World;
 
 public class IIDMAssign2Network {
 
@@ -60,8 +59,8 @@ public class IIDMAssign2Network {
 
 		log.info("MATSim-DB: assignNetwork...");
 
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
-		World world = new World();
+		Scenario scenario = ScenarioUtils.createScenario(config);
+//		World world = new World();
 
 		//////////////////////////////////////////////////////////////////////
 
@@ -74,7 +73,7 @@ public class IIDMAssign2Network {
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  reading facilities xml file...");
-		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
+		ActivityFacilities facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());
 		log.info("  done.");
 

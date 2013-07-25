@@ -20,6 +20,7 @@
 package org.matsim.core.api.experimental.facilities;
 
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
@@ -28,10 +29,14 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 /**
  * Root class for activity facilities.
  *
- * @author mrieser / Senozon AG
+ * Maintainer: mrieser / Senozon AG
  */
 public interface ActivityFacilities extends MatsimToplevelContainer {
 
+	public String getName();
+
+	public void setName(String name);
+	
 	@Override
 	public ActivityFacilitiesFactory getFactory();
 
@@ -41,4 +46,9 @@ public interface ActivityFacilities extends MatsimToplevelContainer {
 
 	public ObjectAttributes getFacilityAttributes();
 
+	/* not sure if this method should be in the interface, but too many users seem to use and like it,
+	 * so there seems to be a need for it...   mrieser/jul13
+	 */
+	public TreeMap<Id, ActivityFacility> getFacilitiesForActivityType(final String actType);
+	
 }

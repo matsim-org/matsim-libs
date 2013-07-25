@@ -53,7 +53,7 @@ public class ZoneUtil {
 		assert( zones != null );
 		int numberOfZones = zones.getFacilities().values().size();
 		ZoneObject zoneArray[] = new ZoneObject[numberOfZones];
-		Iterator<ActivityFacility> zonesIterator = zones.getFacilities().values().iterator();
+		Iterator<? extends ActivityFacility> zonesIterator = zones.getFacilities().values().iterator();
 
 		int counter = 0;
 		while( zonesIterator.hasNext() ){

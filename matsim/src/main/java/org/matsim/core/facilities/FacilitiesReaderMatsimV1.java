@@ -18,14 +18,16 @@
  *                                                                         *
  * *********************************************************************** */
 
-
 package org.matsim.core.facilities;
 
 import java.util.Stack;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.api.experimental.facilities.ActivityFacilitiesFactory;
+import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.OpeningTime.DayType;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
@@ -45,12 +47,16 @@ public class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
 	private final static String CAPACITY = "capacity";
 	private final static String OPENTIME = "opentime";
 
-	private final ScenarioImpl scenario;
-	private ActivityFacilityImpl currfacility = null;
-	private ActivityOptionImpl curractivity = null;
+	private final Scenario scenario;
+	private final ActivityFacilities facilities;
+	private final ActivityFacilitiesFactory factory;
+	private ActivityFacility currfacility = null;
+	private ActivityOption curractivity = null;
 	
-	public FacilitiesReaderMatsimV1(final ScenarioImpl scenario) {
+	public FacilitiesReaderMatsimV1(final Scenario scenario) {
 		this.scenario = scenario;
+		this.facilities = scenario.getActivityFacilities();
+		this.factory = this.facilities.getFactory();
 	}
 
 	@Override
@@ -78,20 +84,22 @@ public class FacilitiesReaderMatsimV1 extends MatsimXmlParser {
 	}
 
 	private void startFacilities(final Attributes atts) {
-		this.scenario.getActivityFacilities().setName(atts.getValue("name"));
+		((ActivityFacilitiesImpl) this.facilities).setName(atts.getValue("name"));
 		if (atts.getValue("aggregation_layer") != null) {
 			Logger.getLogger(FacilitiesReaderMatsimV1.class).warn("aggregation_layer is deprecated.");
 		}
 	}
 	
 	private void startFacility(final Attributes atts) {
-		this.currfacility = this.scenario.getActivityFacilities().createAndAddFacility(this.scenario.createId(atts.getValue("id")), 
+		this.currfacility = this.factory.createActivityFacility(this.scenario.createId(atts.getValue("id")), 
 				this.scenario.createCoord(Double.parseDouble(atts.getValue("x")), Double.parseDouble(atts.getValue("y"))));
-		this.currfacility.setDesc(atts.getValue("desc"));
+		this.facilities.addActivityFacility(this.currfacility);
+		((ActivityFacilityImpl) this.currfacility).setDesc(atts.getValue("desc"));
 	}
 	
 	private void startActivity(final Attributes atts) {
-		this.curractivity = this.currfacility.createActivityOption(atts.getValue("type"));
+		this.curractivity = this.factory.createActivityOption(atts.getValue("type"));
+		this.currfacility.addActivityOption(this.curractivity);
 	}
 	
 	private void startCapacity(final Attributes atts) {

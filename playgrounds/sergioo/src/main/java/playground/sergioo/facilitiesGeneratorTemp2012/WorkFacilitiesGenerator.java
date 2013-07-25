@@ -30,9 +30,8 @@ import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.FacilitiesReaderMatsimV1;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.OpeningTime;
-import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.facilities.OpeningTime.DayType;
-import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -40,15 +39,14 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 
+import others.sergioo.util.algebra.MatrixND;
+import others.sergioo.util.algebra.MatrixNDImpl;
 import others.sergioo.util.dataBase.DataBaseAdmin;
 import others.sergioo.util.dataBase.NoConnectionException;
 import others.sergioo.util.fitting.FittingControl1D;
 import others.sergioo.util.fitting.FittingData;
 import others.sergioo.util.fitting.ProportionFittingControl1D;
 import others.sergioo.util.fitting.TotalFittingControl1D;
-
-import others.sergioo.util.algebra.MatrixND;
-import others.sergioo.util.algebra.MatrixNDImpl;
 
 public class WorkFacilitiesGenerator {
 
@@ -321,8 +319,8 @@ public class WorkFacilitiesGenerator {
 			allPostalCodes.put(resultZone.getInt(1),resultZone.getInt(2));
 		resultZone.close();
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		new FacilitiesReaderMatsimV1((ScenarioImpl) scenario).readFile(WORK_FACILITIES_FILE);
-		ActivityFacilitiesImpl facilities = ((ScenarioImpl) scenario).getActivityFacilities();
+		new FacilitiesReaderMatsimV1(scenario).readFile(WORK_FACILITIES_FILE);
+		ActivityFacilities facilities = scenario.getActivityFacilities();
 		Map<Integer, Double> totalsEZLinkZones = new HashMap<Integer, Double>();
 		BufferedReader reader = new BufferedReader(new FileReader("./data/facilities/Workplaces_440Zones.csv"));
 		String line = reader.readLine();
@@ -364,7 +362,7 @@ public class WorkFacilitiesGenerator {
 		new FacilitiesWriter(facilities).write(WORK_FACILITIES_FILE);
 		writeFacilitiesOnDatabase(facilities);
 	}
-	private static void writeFacilitiesOnDatabase(ActivityFacilitiesImpl facilities) throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NoConnectionException {
+	private static void writeFacilitiesOnDatabase(ActivityFacilities facilities) throws IOException, InstantiationException, IllegalAccessException, ClassNotFoundException, SQLException, NoConnectionException {
 		DataBaseAdmin dataBaseFacilities  = new DataBaseAdmin(new File("./data/facilities/DataBaseFacilities.properties"));
 		ResultSet numResult = dataBaseFacilities.executeQuery("SELECT COUNT(*) FROM Facilities");
 		numResult.next();

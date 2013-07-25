@@ -21,9 +21,8 @@ package org.matsim.contrib.parking.lib;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.StringMatrix;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.testcases.MatsimTestCase;
 
 
@@ -46,7 +45,7 @@ public class GeneralLibTest extends MatsimTestCase {
 	}
 
 	public void testReadWriteFacilities(){
-		ActivityFacilitiesImpl facilities=GeneralLib.readActivityFacilities("test/scenarios/equil/facilities.xml");
+		ActivityFacilities facilities=GeneralLib.readActivityFacilities("test/scenarios/equil/facilities.xml");
 
 		GeneralLib.writeActivityFacilities(facilities, getOutputDirectory() + "facilities.xml");
 

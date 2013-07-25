@@ -22,8 +22,8 @@ package org.matsim.facilities.algorithms;
 
 import java.util.Iterator;
 
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -34,7 +34,7 @@ public class FacilitiesSummary {
 		super();
 	}
 
-	public void run(ActivityFacilitiesImpl facilities) {
+	public void run(ActivityFacilities facilities) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 		int f_cnt = 0;
 		int act_cnt = 0;

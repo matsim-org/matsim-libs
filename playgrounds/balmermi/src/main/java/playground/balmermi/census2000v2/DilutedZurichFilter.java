@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -45,8 +44,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.population.filters.PersonIntersectAreaFilter;
-
-import playground.balmermi.world.World;
 
 public class DilutedZurichFilter {
 
@@ -65,7 +62,7 @@ public class DilutedZurichFilter {
 		log.info("MATSim-DB: filterDemand...");
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
-		World world = new World();
+//		World world = new World();
 
 		//////////////////////////////////////////////////////////////////////
 
@@ -78,7 +75,6 @@ public class DilutedZurichFilter {
 		//////////////////////////////////////////////////////////////////////
 
 		log.info("  reading facilities xml file...");
-		ActivityFacilitiesImpl facilities = scenario.getActivityFacilities();
 		new MatsimFacilitiesReader(scenario).readFile(config.facilities().getInputFile());
 		log.info("  done.");
 

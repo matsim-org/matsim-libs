@@ -33,17 +33,18 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
+import org.matsim.core.api.experimental.facilities.ActivityFacilitiesFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.FacilitiesWriter;
 import org.matsim.core.facilities.OpeningTime;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
@@ -64,14 +65,14 @@ public class Emme2FacilitiesCreator {
 	
 	private Scenario scenario;
 	private ZoneMapping zoneMapping;
-	private ActivityFacilitiesImpl activityFacilities;
+	private ActivityFacilities activityFacilities;
 	
 	private double capacity = 1000000.0;
 	
 	private int[] validLinkTypes = new int[] { 2, 3, 4, 5, 6, 9 };
 	
 	public static void main(String[] args) {
-		Scenario scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 		Emme2FacilitiesCreator facilitiesCreator = new Emme2FacilitiesCreator(scenario);
 		
@@ -103,7 +104,7 @@ public class Emme2FacilitiesCreator {
 	 * we could get two facilities with the same coordinate (from & to link). 
 	 */
 	public void createInternalFacilities() {
-		activityFacilities = ((ScenarioImpl)scenario).getActivityFacilities();
+		activityFacilities = scenario.getActivityFacilities();
 		
 		List<Integer> validTypes = new ArrayList<Integer>();
 		for (int type : validLinkTypes) validTypes.add(type);
@@ -144,8 +145,9 @@ public class Emme2FacilitiesCreator {
 			
 			Coord coord = new CoordImpl(centerX + unitVectorX, centerY + unitVectorY);
 			
-			ActivityFacilityImpl facility = activityFacilities.createAndAddFacility(id, coord);
-			facility.setLinkId(((LinkImpl)link).getId());
+			ActivityFacility facility = activityFacilities.getFactory().createActivityFacility(id, coord);
+			activityFacilities.addActivityFacility(facility);
+			((ActivityFacilityImpl) facility).setLinkId(((LinkImpl)link).getId());
 			
 			createAndAddActivityOptions(facility);
 			
@@ -208,7 +210,8 @@ public class Emme2FacilitiesCreator {
 				
 				Coord coord = new CoordImpl(centerX + unitVectorX, centerY + unitVectorY);
 				
-				facility = activityFacilities.createAndAddFacility(externalLink.getId(), coord);
+				facility = activityFacilities.getFactory().createActivityFacility(externalLink.getId(), coord);
+				activityFacilities.addActivityFacility(facility);
 				((ActivityFacilityImpl) facility).setLinkId(((LinkImpl)externalLink).getId());
 				
 				ActivityOptionImpl activityOption = ((ActivityFacilityImpl) facility).createActivityOption("tta");
@@ -234,7 +237,7 @@ public class Emme2FacilitiesCreator {
 	 * Religions Character -> ignore
 	 * Transportation -> work, leisure (airport, big train stations, etc.)
 	 */
-	private void createAndAddActivityOptions(ActivityFacilityImpl facility) {
+	private void createAndAddActivityOptions(ActivityFacility facility) {
 		boolean hasHome = false;
 		boolean hasWork = false;
 		boolean hasEducationUniversity = false;
@@ -265,49 +268,56 @@ public class Emme2FacilitiesCreator {
 		// "Shopping" activities - should be possible in every zone.
 		hasShopping = true;
 		
-		ActivityOptionImpl activityOption;
+		ActivityOption activityOption;
 		
 	
+		ActivityFacilitiesFactory factory = this.activityFacilities.getFactory();
 		
 		if (hasHome) {
-			activityOption = facility.createActivityOption("home");
-			activityOption.addOpeningTime(new OpeningTimeImpl(OpeningTime.DayType.wk, 0*3600, 24*3600));
+			activityOption = factory.createActivityOption("home");
+			facility.addActivityOption(activityOption);
+			activityOption.addOpeningTime(new OpeningTimeImpl(0*3600, 24*3600));
 			activityOption.setCapacity(capacity);			
 		}
 		
 		if (hasWork) {
-			activityOption = facility.createActivityOption("work");
-			activityOption.addOpeningTime(new OpeningTimeImpl(OpeningTime.DayType.wk, 8*3600, 18*3600));
+			activityOption = factory.createActivityOption("work");
+			facility.addActivityOption(activityOption);
+			activityOption.addOpeningTime(new OpeningTimeImpl(8*3600, 18*3600));
 			activityOption.setCapacity(capacity);			
 		}
 		
 		if (hasEducationUniversity) {
-			activityOption = facility.createActivityOption("education_university");
-			activityOption.addOpeningTime(new OpeningTimeImpl(OpeningTime.DayType.wk, 9*3600, 18*3600));
+			activityOption = factory.createActivityOption("education_university");
+			facility.addActivityOption(activityOption);
+			activityOption.addOpeningTime(new OpeningTimeImpl(9*3600, 18*3600));
 			activityOption.setCapacity(capacity);			
 		}
 		
 		if (hasEducationHighSchool) {
-			activityOption = facility.createActivityOption("education_highschool");
-			activityOption.addOpeningTime(new OpeningTimeImpl(OpeningTime.DayType.wk, 8*3600, 16*3600));
+			activityOption = factory.createActivityOption("education_highschool");
+			facility.addActivityOption(activityOption);
+			activityOption.addOpeningTime(new OpeningTimeImpl(8*3600, 16*3600));
 			activityOption.setCapacity(capacity);			
 		}
 
 		if (hasEducationElementarySchool) {
-			activityOption = facility.createActivityOption("education_elementaryschool");
-			activityOption.addOpeningTime(new OpeningTimeImpl(OpeningTime.DayType.wk, 8*3600, 14*3600));
+			activityOption = factory.createActivityOption("education_elementaryschool");
+			facility.addActivityOption(activityOption);
+			activityOption.addOpeningTime(new OpeningTimeImpl(8*3600, 14*3600));
 			activityOption.setCapacity(capacity);			
 		}
 		
 		if (hasShopping) {
-			activityOption = facility.createActivityOption("shopping");
-			activityOption.addOpeningTime(new OpeningTimeImpl(OpeningTime.DayType.wk, 9*3600, 19*3600));
+			activityOption = factory.createActivityOption("shopping");
+			activityOption.addOpeningTime(new OpeningTimeImpl(9*3600, 19*3600));
 			activityOption.setCapacity(capacity);
 		}
 
 		if (hasLeisure) {
-			activityOption = facility.createActivityOption("leisure");
-			activityOption.addOpeningTime(new OpeningTimeImpl(OpeningTime.DayType.wk, 6*3600, 22*3600));
+			activityOption = factory.createActivityOption("leisure");
+			facility.addActivityOption(activityOption);
+			activityOption.addOpeningTime(new OpeningTimeImpl(6*3600, 22*3600));
 			activityOption.setCapacity(capacity);			
 		}
 	}

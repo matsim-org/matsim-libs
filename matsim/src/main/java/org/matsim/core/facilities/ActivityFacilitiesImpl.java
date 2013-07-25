@@ -35,6 +35,10 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilitiesFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
+/**
+ * Maintainer: mrieser / Senozon AG
+ * @author balmermi
+ */
 public class ActivityFacilitiesImpl implements ActivityFacilities, BasicLocations {
 
 	//////////////////////////////////////////////////////////////////////
@@ -93,11 +97,11 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, BasicLocation
 	}
 
 	@Override
-	public final Map<Id, ActivityFacility> getFacilities() {
+	public final Map<Id, ? extends ActivityFacility> getFacilities() {
 		return this.facilities;
 	}
 
-	//Added 27.03.08 JH for random secondary location changes
+	@Override
 	public final TreeMap<Id, ActivityFacility> getFacilitiesForActivityType(final String act_type) {
 		TreeMap<Id,ActivityFacility> facs = new TreeMap<Id, ActivityFacility>();
 		Iterator<ActivityFacility> iter = this.facilities.values().iterator();
@@ -120,10 +124,12 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, BasicLocation
 		return getFacilities().get(locationId);
 	}
 
+	@Override
 	public String getName() {
 		return this.name;
 	}
 
+	@Override
 	public void setName(String name) {
 		this.name = name;
 	}
