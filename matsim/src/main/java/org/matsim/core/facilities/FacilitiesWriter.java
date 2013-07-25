@@ -20,105 +20,37 @@
 
 package org.matsim.core.facilities;
 
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.SortedSet;
-
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.internal.MatsimWriter;
-import org.matsim.core.utils.io.MatsimXmlWriter;
-import org.matsim.core.utils.misc.Counter;
-import org.matsim.core.utils.misc.FacilitiesUtils;
 
-public class FacilitiesWriter extends MatsimXmlWriter implements MatsimWriter {
+/**
+ * @author mrieser / Senozon AG
+ */
+public class FacilitiesWriter implements MatsimWriter {
 
-	private FacilitiesWriterHandler handler = null;
-	private final ActivityFacilitiesImpl facilities;
-	private String dtd;
-	private Counter counter = new Counter("[" + this.getClass().getSimpleName() + "] dumped facility # ");
-
-	//////////////////////////////////////////////////////////////////////
-	// constructors
-	//////////////////////////////////////////////////////////////////////
+	private final ActivityFacilities facilities;
 
 	/**
 	 * Creates a new FacilitiesWriter to write the specified facilities to the file.
 	 *
 	 * @param facilities
 	 */
-	public FacilitiesWriter(final ActivityFacilitiesImpl facilities) {
-		super();
+	public FacilitiesWriter(final ActivityFacilities facilities) {
 		this.facilities = facilities;
-		// always use newest version, currently v1
-		this.dtd = "http://www.matsim.org/files/dtd/facilities_v1.dtd";
-		this.handler = new FacilitiesWriterHandlerImplV1();
 	}
 
-	//////////////////////////////////////////////////////////////////////
-	// write methods
-	//////////////////////////////////////////////////////////////////////
-
+	/**
+	 * Writes the activity facilities in the current default format 
+	 * (currently facilities_v1.dtd). 
+	 */
 	@Override
 	public final void write(final String filename) {
-		this.writeOpenAndInit(filename);
-		for (ActivityFacility f : FacilitiesUtils.getSortedFacilities(this.facilities).values()) {
-			this.writeFacility((ActivityFacilityImpl) f);
-			counter.incCounter();
-		}
-		this.writeFinish();
-		counter.printCounter();
-		counter.reset();
+		new FacilitiesWriterV1(facilities).write(filename);
+	}
+	
+	public final void writeV1(final String filename) {
+		new FacilitiesWriterV1(facilities).write(filename);
 	}
 
-	private final void writeOpenAndInit(final String filename) {
-		try {
-			openFile(filename);
-			this.writeXmlHead();
-			this.writeDoctype("facilities", this.dtd);
-			this.handler.startFacilities(this.facilities, this.writer);
-			this.handler.writeSeparator(this.writer);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private final void writeFacility(final ActivityFacilityImpl f) {
-		try {
-			this.handler.startFacility(f, this.writer);
-			Iterator<ActivityOption> a_it = f.getActivityOptions().values().iterator();
-			while (a_it.hasNext()) {
-				ActivityOption a = a_it.next();
-				this.handler.startActivity((ActivityOptionImpl) a, this.writer);
-				this.handler.startCapacity((ActivityOptionImpl) a, this.writer);
-				this.handler.endCapacity(this.writer);
-				Iterator<SortedSet<OpeningTime>> o_set_it = ((ActivityOptionImpl) a).getOpeningTimes().values().iterator();
-				while (o_set_it.hasNext()) {
-					SortedSet<OpeningTime> o_set = o_set_it.next();
-					Iterator<OpeningTime> o_it = o_set.iterator();
-					while (o_it.hasNext()) {
-						OpeningTime o = o_it.next();
-						this.handler.startOpentime(o, this.writer);
-						this.handler.endOpentime(this.writer);
-					}
-				}
-				this.handler.endActivity(this.writer);
-			}
-			this.handler.endFacility(this.writer);
-			this.handler.writeSeparator(this.writer);
-			this.writer.flush();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-
-	private final void writeFinish() {
-		try {
-			this.handler.endFacilities(this.writer);
-			this.writer.flush();
-			this.writer.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
 
 }
