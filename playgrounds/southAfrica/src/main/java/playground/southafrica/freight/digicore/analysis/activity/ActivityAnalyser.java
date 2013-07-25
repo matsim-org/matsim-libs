@@ -26,14 +26,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 
+import playground.southafrica.freight.digicore.analysis.postClustering.ClusteredChainGenerator;
+import playground.southafrica.freight.digicore.containers.DigicoreActivity;
 import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
 import playground.southafrica.freight.digicore.utils.DigicoreUtils;
 import playground.southafrica.utilities.FileUtils;
@@ -89,6 +94,8 @@ public class ActivityAnalyser {
 	 * 		  following values apply:
 	 * 		  <ol>
 	 * 			<li> minor activity start time;
+	 * 			<li> percentage of all activities associated with a facility, i.e.
+	 * 				 having a facilityId; 
 	 * 		  </ol>
 	 * @param input the file containing {@link DigicoreVehicle} {@link Id}s that
 	 * 		  will be used as filter. If this is null, or the file is not 
@@ -125,13 +132,26 @@ public class ActivityAnalyser {
 		case 1:
 			runMinorActivityStartTimeAnalysis(vehicleFiles, output);
 			break;
+		case 2:
+			runActivitiesWithFacilityIdAnalysis(vehicleFiles, output);
 		default:
 			break;
 		}
 	}
 
 	
-	private void runMinorActivityStartTimeAnalysis(List<File> vehicles, String output){
+	/**
+	 * Method to analyse a start time distribution of all the `minor' 
+	 * {@link DigicoreActivity}s of given {@link DigicoreVehicle} files. The 
+	 * start time is expressed as the hour of the day. 
+	 * @param vehicles the list of {@link File}s that must be analysed. Each of
+	 * 		  these should point to a {@link File} from where a 
+	 * 		  {@link DigicoreVehicle} can be read.
+	 * @param output the file to where the start time distribution will be 
+	 *  	  written to. For each hour of the day, the total number of 
+	 *  	  activities that started in that hour will be written. 
+	 */
+	public void runMinorActivityStartTimeAnalysis(List<File> vehicles, String output){
 		LOG.info("Performing minor activity start time analysis (" + vehicles.size() + " vehicle files)");
 		Counter counter = new Counter("   vehicles completed # ");
 		List<ActivityStartTimeRunable> listOfJobs = new ArrayList<ActivityStartTimeRunable>(vehicles.size());
@@ -185,4 +205,75 @@ public class ActivityAnalyser {
 		
 		LOG.info("Done with minor activity start time analysis.");
 	}
+	
+	
+	/**
+	 * Method to calculate for each vehicle the percentage of its activities,
+	 * both major and minor, that are associated with a facility. That is, it 
+	 * has a facility Id. This analysis will only make sense on vehicle files
+	 * that have been produced from, for example, {@link ClusteredChainGenerator}  
+	 * @param vehicles the list of {@link File}s that must be analysed. Each of
+	 * 		  these should point to a {@link File} from where a 
+	 * 		  {@link DigicoreVehicle} can be read.
+	 * @param output the file to where the percentages, to 4 decimal places, 
+	 * 		  will be written. The output file is a comma-separated value (CSV)
+	 * 		  file with two columns: the first indicating the vehicle {@link Id}
+	 * 		  and the second the percentage of that vehicle's activities, over
+	 * 		  all activity chains, that are associated with a facility 
+	 * 		  {@link Id}.
+	 */
+	public void runActivitiesWithFacilityIdAnalysis(List<File> vehicles, String output){
+		LOG.info("Performing analysis on the percentage of activities with facility Ids (" + vehicles.size() + " vehicle files)");
+		Counter counter = new Counter("   vehicles completed # ");
+		List<Future<Tuple<Id, Double>>> listOfJobs = new ArrayList<Future<Tuple<Id,Double>>>();
+		
+		/* Execute the multi-threaded analysis. */
+		for(File file : vehicles){
+			ActivityWithFacilityIdCallable job = new ActivityWithFacilityIdCallable(file, counter);
+			Future<Tuple<Id, Double>> result = this.threadExecutor.submit(job);
+			listOfJobs.add(result);
+		}
+		
+		this.threadExecutor.shutdown();
+		while(!this.threadExecutor.isTerminated()){
+		}
+		counter.printCounter();
+		
+		/* Consolidate the output */
+		Map<Id, Double> map = new TreeMap<Id, Double>();
+		for(Future<Tuple<Id, Double>> job : listOfJobs){
+			Tuple<Id, Double> tuple = null;
+			try {
+				tuple = job.get();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Could get the results to consolidate from the multi-threaded run.");
+			} catch (ExecutionException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Could get the results to consolidate from the multi-threaded run.");
+			}
+			map.put(tuple.getFirst(), tuple.getSecond());
+		}
+		
+		/* Write the output to file. */
+		BufferedWriter bw = IOUtils.getBufferedWriter(output);
+		try{
+			for(Id id : map.keySet()){
+				bw.write(String.format("%s,%.4f\n", id.toString(), map.get(id)));
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Cannot write to " + output);
+		} finally{
+			try {
+				bw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Cannot close " + output);
+			}
+		}
+		
+		LOG.info("Done performing analysis on the percentage of activities with facility Ids.");
+	}
+	
 }
