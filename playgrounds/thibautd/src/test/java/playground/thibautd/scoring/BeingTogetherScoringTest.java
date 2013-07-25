@@ -366,6 +366,62 @@ public class BeingTogetherScoringTest {
 	}
 
 	@Test
+	public void testNoOverlapIfWrongAgent() throws Exception {
+		final Id ego = new IdImpl( "ego" );
+		final Id alter = new IdImpl( "alter" );
+		final Id other = new IdImpl( "tonny montana" );
+		
+		final Id linkId = new IdImpl( 1 );
+		final String type = "type";
+
+		final EventsFactory fact = EventsUtils.createEventsManager().getFactory();
+
+		final BeingTogetherScoring testee =
+			new BeingTogetherScoring(
+					new RejectAllFilter(),
+					new AcceptAllFilter(),
+					1,
+					ego,
+					Collections.singleton( alter ) );
+
+		testee.handleEvent(
+				fact.createActivityStartEvent(
+					0,
+					ego,
+					linkId,
+					null,
+					type) );
+		testee.handleEvent(
+				fact.createActivityStartEvent(
+					0,
+					other,
+					linkId,
+					null,
+					type) );
+		testee.handleEvent(
+				fact.createActivityEndEvent(
+					100,
+					ego,
+					linkId,
+					null,
+					type) );
+		testee.handleEvent(
+				fact.createActivityEndEvent(
+					100,
+					other,
+					linkId,
+					null,
+					type) );
+
+		Assert.assertEquals(
+				"unexpected overlap",
+				0,
+				testee.getScore(),
+				MatsimTestUtils.EPSILON);
+
+	}
+
+	@Test
 	public void testOvelapsOfLegs() throws Exception {
 		final Id ego = new IdImpl( "ego" );
 		final Id alter = new IdImpl( "alter" );
