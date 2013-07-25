@@ -236,9 +236,6 @@ public class ActivityAnalyser {
 		/* Execute the multi-threaded analysis. */
 		ExecutorService threadExecutor = Executors.newFixedThreadPool(numberOfThreads);
 		for(File file : vehicles){
-			/*TODO Remove after debugging. */
-			LOG.info("   --> " + file.getAbsolutePath());
-			
 			Callable<Tuple<Id, Double>> job = new ActivityWithFacilityIdCallable(file, counter);
 			Future<Tuple<Id, Double>> result = threadExecutor.submit(job);
 			listOfJobs.add(result);
