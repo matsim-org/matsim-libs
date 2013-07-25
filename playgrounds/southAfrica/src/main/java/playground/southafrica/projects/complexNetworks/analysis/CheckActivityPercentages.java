@@ -55,8 +55,8 @@ public class CheckActivityPercentages {
 				LOG.info("Executing chain modification for radius " + thisRadius + ", and pmin of " + thisPmin);
 				LOG.info("================================================================================");
 				/* Set configuration-specific filenames */
-				String vehicleFolder = sourceFolder + thisRadius + "_" + thisPmin + "/xml2/";
-				String outputFile = sourceFolder + thisRadius + "_" + thisPmin + "/" + thisRadius + "_" + thisPmin + "_percentageActivities.csv";
+				String vehicleFolder = String.format("%s%.0f_%d/xml2/", sourceFolder, thisRadius, thisPmin);
+				String outputFile = String.format("%s%.0f_%d/%.0f_%d_percentageActivities.csv", sourceFolder, thisRadius, thisPmin, thisRadius, thisPmin);
 				
 				/* Execute the analysis. Analysis '2' is the one calculating the
 				 * percentage of activities with a facility Id. */
