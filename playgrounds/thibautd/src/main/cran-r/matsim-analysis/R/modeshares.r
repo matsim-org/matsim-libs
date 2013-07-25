@@ -1,6 +1,7 @@
 plotshareevolution <- function(
 						   tripmodesharefile="tripModeShares.dat",
 						   dataframe=read.table( tripmodesharefile , header=T ) ,
+							the.colors=rainbow( length( unique( dataframe$mode ) ) ),
 							   ...) {
 	dataframe$mode <- as.factor( dataframe$mode )
 	modes <- unique( dataframe$mode )
@@ -33,7 +34,6 @@ plotshareevolution <- function(
 		 ...)
 
 	prev <- rep( 0 , length( cumulated.counts.per.mode[[ 1 ]] ) )
-	the.colors <- rainbow( length( modes ) )
 	for ( i in seq( 1 , length( modes ) ) ) {
 		the.counts <- cumulated.counts.per.mode[[ i ]]
 		the.mode <- names( cumulated.counts.per.mode[ i ] )
