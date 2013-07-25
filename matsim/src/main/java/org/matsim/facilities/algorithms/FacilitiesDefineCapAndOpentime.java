@@ -87,26 +87,26 @@ public class FacilitiesDefineCapAndOpentime {
 			while (a_it.hasNext()) {
 				ActivityOptionImpl a = (ActivityOptionImpl) a_it.next();
 				if (a.getType().equals("home")) {
-					a.setCapacity((double) (this.nof_persons/home_cnt));
+					a.setCapacity(this.nof_persons/home_cnt);
 					a.addOpeningTime(new OpeningTimeImpl(DayType.wk, TIME_0000, TIME_2400));
 				}
 				else if (a.getType().equals("work")) {
-					a.setCapacity((double) (this.nof_persons/work_cnt));
+					a.setCapacity(this.nof_persons/work_cnt);
 					a.addOpeningTime(new OpeningTimeImpl(DayType.wkday, TIME_0800, TIME_1800));
 				}
 				else if (a.getType().equals("education")) {
-					a.setCapacity((double) (this.nof_persons/educ_cnt));
+					a.setCapacity(this.nof_persons/educ_cnt);
 					a.addOpeningTime(new OpeningTimeImpl(DayType.wkday, TIME_0800, TIME_1200));
 					a.addOpeningTime(new OpeningTimeImpl(DayType.wkday, TIME_1300, TIME_1700));
 				}
 				else if (a.getType().equals("shop")) {
-					a.setCapacity((double) (this.nof_persons/shop_cnt));
+					a.setCapacity(this.nof_persons/shop_cnt);
 					a.addOpeningTime(new OpeningTimeImpl(DayType.wkday, TIME_0830, TIME_1200));
 					a.addOpeningTime(new OpeningTimeImpl(DayType.wkday, TIME_1330, TIME_2000));
 					a.addOpeningTime(new OpeningTimeImpl(DayType.sat, TIME_0900, TIME_1700));
 				}
 				else if (a.getType().equals("leisure")) {
-					a.setCapacity((double) (this.nof_persons/leis_cnt));
+					a.setCapacity(this.nof_persons/leis_cnt);
 					a.addOpeningTime(new OpeningTimeImpl(DayType.wkday, TIME_1700, TIME_2400));
 					a.addOpeningTime(new OpeningTimeImpl(DayType.wkend, TIME_2000, TIME_2400));
 				}

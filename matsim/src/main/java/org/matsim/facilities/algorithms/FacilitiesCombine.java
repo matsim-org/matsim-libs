@@ -61,7 +61,7 @@ public class FacilitiesCombine {
 				double cap2 = a2.getCapacity();
 				double cap = a.getCapacity();
 				if ((cap < Integer.MAX_VALUE) && (cap2 < Integer.MAX_VALUE)) { a2.setCapacity(cap + cap2); }
-				else { a2.setCapacity((double) Integer.MAX_VALUE); }
+				else { a2.setCapacity(Integer.MAX_VALUE); }
 			}
 			Iterator<SortedSet<OpeningTime>> ts_it = a.getOpeningTimes().values().iterator();
 			while (ts_it.hasNext()) {
