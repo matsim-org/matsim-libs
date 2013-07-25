@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.southafrica.projects.complexNetworks.tmp;
+package playground.southafrica.projects.complexNetworks.analysis;
 
 import org.apache.log4j.Logger;
 
