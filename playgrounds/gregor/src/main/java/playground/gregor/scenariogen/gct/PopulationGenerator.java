@@ -37,6 +37,11 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.scenario.ScenarioUtils;
 
+import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
+import playground.gregor.sim2d_v4.scenario.Sim2DConfigUtils;
+import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
+import playground.gregor.sim2d_v4.scenario.Sim2DScenarioUtils;
+
 public class PopulationGenerator {
 
 	static double terminal = 1.3 * 3.5 * 3600;
@@ -45,16 +50,22 @@ public class PopulationGenerator {
 
 	public static void main (String [] args) {
 		String config = "/Users/laemmel/devel/gct/input/config.xml";
+		String s2config = "/Users/laemmel/devel/gct/input/s2d_config.xml";
 
 
 		Config conf = ConfigUtils.loadConfig(config);
 		Scenario sc = ScenarioUtils.loadScenario(conf);
+		
+		Sim2DConfig s2conf = Sim2DConfigUtils.loadConfig(s2config);
+		Sim2DScenario s2sc = Sim2DScenarioUtils.loadSim2DScenario(s2conf);
+		s2sc.connect(sc);
+		
 
 		ArrayList<Link> sources = computeSources(sc);
 		ArrayList<Link> sinks = computeSinks(sc);
 		ArrayList<Link> counters = computeCounter(sc);
 		
-		int numPers = 700000;
+		int numPers = 375000;
 
 		Population pop = sc.getPopulation();
 		pop.getPersons().clear();
@@ -77,29 +88,37 @@ public class PopulationGenerator {
 //			boolean stre = false;
 			if (l.getCapacity() >= street) {
 				if (MatsimRandom.getRandom().nextDouble() > 0.33){
+					i--;
 					continue;
 				}
 //				stre  = MatsimRandom.getRandom().nextDouble() < 0.13;
 			} else if (l.getCapacity() >= terminal) {
 				if (MatsimRandom.getRandom().nextDouble() > 0.66){
+					i--;
 					continue;
 				}
 			} else {
+				i--;
 				continue;
 			}
-			Person pers = fac.createPerson(new IdImpl(id++));
-			pop.addPerson(pers);
-
-			Plan plan = fac.createPlan();
-			pers.addPlan(plan);
-
-			
-			Activity act0 = fac.createActivityFromLinkId("origin", l.getId());
 			double time;
 			do {
-				double offset = MatsimRandom.getRandom().nextGaussian()*2000;
+				double offset = MatsimRandom.getRandom().nextGaussian()*3600;
 				time = 9*3600+offset;
-			}while (time < 7*3600 || time > 18*3600);
+			}while (time < 6*3600 || time > 18*3600);
+			if (time > 8*3600) {
+				continue;
+			}
+			
+			
+			Person pers = fac.createPerson(new IdImpl(id++));
+			pop.addPerson(pers);
+			
+			Plan plan = fac.createPlan();
+			pers.addPlan(plan);
+			
+			
+			Activity act0 = fac.createActivityFromLinkId("origin", l.getId());
 //			time = Math.round(time);
 //			time -= time%60;
 //			time = 12*3600;
@@ -134,11 +153,11 @@ public class PopulationGenerator {
 
 			plan.addActivity(act1);
 
-			Leg leg1 = fac.createLeg("car");
-			plan.addLeg(leg1);
-
-			Activity act2 = fac.createActivityFromLinkId("origin", l.getId());
-			plan.addActivity(act2);
+//			Leg leg1 = fac.createLeg("car");
+//			plan.addLeg(leg1);
+//
+//			Activity act2 = fac.createActivityFromLinkId("origin", l.getId());
+//			plan.addActivity(act2);
 		}
 
 

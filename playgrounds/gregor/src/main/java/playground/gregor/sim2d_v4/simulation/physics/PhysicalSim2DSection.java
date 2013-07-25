@@ -110,6 +110,8 @@ public class PhysicalSim2DSection {
 		while (it.hasNext()) {
 			Sim2DAgent agent = it.next();
 
+
+			
 			double [] v = agent.getVelocity();
 			double dx = v[0] * this.timeStepSize;
 			double dy = v[1] * this.timeStepSize;
@@ -128,7 +130,6 @@ public class PhysicalSim2DSection {
 					Segment opening = this.openings[i];
 					double leftOfOpening = CGAL.isLeftOfLine(newXPosX, newXPosY, opening.x0, opening.y0, opening.x1, opening.y1);
 					if (leftOfOpening >= 0) {
-
 						double l0 = CGAL.isLeftOfLine(opening.x0, opening.y0,oldX,oldY,newXPosX,newXPosY);
 						double l1 = CGAL.isLeftOfLine(opening.x1, opening.y1,oldX,oldY,newXPosX,newXPosY);
 						if (l0*l1 < - CGAL.EPSILON) {

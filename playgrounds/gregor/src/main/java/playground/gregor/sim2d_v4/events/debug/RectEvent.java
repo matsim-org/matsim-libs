@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LineEvent.java
+ * RectEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -22,83 +22,42 @@ package playground.gregor.sim2d_v4.events.debug;
 
 import org.matsim.core.api.experimental.events.Event;
 
-import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.Segment;
+public class RectEvent extends Event {
 
-public class LineEvent extends Event {
-
-	private static final String TYPE = "LINE_EVENT";
+	private final double tx;
+	private final double ty;
+	private final double sx;
+	private final double sy;
 	
-	private final boolean isStatic;
-	private final Segment s;
+	private static final String EVENT_TYPE = "RECT_EVENT";
 
-	private final int r,g,b,a,minScale;
-
-	private final double dash;
-
-	private final double gap;
-	
-	public LineEvent(double time,Segment s, boolean isStatic) {
-		this(time, s, isStatic, 0, 0, 0, 255, 0);
-	}
-	
-	public LineEvent(double time, Segment s, boolean isStatic, int r, int g, int b, int a, int minScale) {
-
-		this(time, s, isStatic, r, g, b, a, minScale, 0, 0);
-	}
-	public LineEvent(double time, Segment s, boolean isStatic, int r, int g, int b, int a, int minScale, double dash, double gap) {
+	public RectEvent(double time, double tx, double ty, double sx, double sy) {
 		super(time);
-		this.s = s;
-		this.isStatic = isStatic;
-		this.r = r;
-		this.g = g;
-		this.b = b;
-		this.a = a;
-		this.minScale = minScale;
-		this.gap = gap;
-		this.dash = dash;
-		
+		this.tx = tx;
+		this.ty = ty;
+		this.sx = sx;
+		this.sy = sy;
 	}
 
 	@Override
 	public String getEventType() {
-		return TYPE;
+		return EVENT_TYPE;
 	}
-	
-	public Segment getSegment() {
-		return this.s;
-	}
-	
-	public boolean isStatic() {
-		return this.isStatic;
+	public double getTx() {
+		return this.tx;
 	}
 
-	public int getMinScale() {
-		return this.minScale;
+	public double getTy() {
+		return this.ty;
 	}
 
-	public int getA() {
-		return this.a;
+	public double getSx() {
+		return this.sx;
 	}
 
-	public int getB() {
-		return this.b;
+	public double getSy() {
+		return this.sy;
 	}
 
-	public int getG() {
-		return this.g;
-	}
-
-	public int getR() {
-		return this.r;
-	}
-	
-	public double getGap() {
-		return this.gap;
-		
-	}
-	
-	public double getDash() {
-		return this.dash;
-	}
 
 }

@@ -38,7 +38,7 @@ public class Sim2DAgent implements TwoDObject {
 	
 	//testing only
 	@Deprecated
-	private final double vCoeff = 1;//+MatsimRandom.getRandom().nextGaussian()*.1;;
+	private final double vCoeff = 1+Math.min(Math.max(-0.25, MatsimRandom.getRandom().nextGaussian()*.1),1.25);
 	
 //	private final double vStd
 	
@@ -214,5 +214,11 @@ public class Sim2DAgent implements TwoDObject {
 	@Override
 	public String toString() {
 		return "id: " + this.driver.getId() + " sec:" + this.currentPSec.getId() + " link:" + this.getCurrentLinkId();
+	}
+	
+	//DEBUG
+	void reDrawAgent(double time){
+		XYVxVyEventImpl e = new XYVxVyEventImpl(this.getId(), this.pos[0], this.pos[1], this.v[0], this.v[1], time);
+		this.pEnv.getEventsManager().processEvent(e);
 	}
 }

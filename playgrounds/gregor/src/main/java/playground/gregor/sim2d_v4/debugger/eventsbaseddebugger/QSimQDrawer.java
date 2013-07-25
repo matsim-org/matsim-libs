@@ -44,6 +44,7 @@ import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.network.NetworkImpl;
 
 import processing.core.PConstants;
+import processing.core.PVector;
 
 
 
@@ -79,7 +80,8 @@ public class QSimQDrawer implements VisDebuggerAdditionalDrawer, AgentDepartureE
 		
 		double x0 = l.getFromNode().getCoord().getX();
 		double y0 = l.getFromNode().getCoord().getY();
-
+		double x1 = l.getToNode().getCoord().getX();
+		double y1 = l.getToNode().getCoord().getY();
 		
 //		x0 += dy * width/2;
 //		x1 += dy * width/2;
@@ -89,8 +91,8 @@ public class QSimQDrawer implements VisDebuggerAdditionalDrawer, AgentDepartureE
 		info.width = width;
 		info.x0 = x0;
 		info.y0 = y0;
-		info.x1 = x0 + dy*width/2;
-		info.y1 = y0 - dx * width/2;
+		info.x1 = x1;
+		info.y1 = y1;
 		info.dx = dx;
 		info.dy = dy;
 		
@@ -103,6 +105,18 @@ public class QSimQDrawer implements VisDebuggerAdditionalDrawer, AgentDepartureE
 		}
 		
 		
+		double offsetX = dy * .075;
+		double offsetY = -dx * .075;
+		if (dx > 0) {
+			offsetX *= -1;
+			offsetY *= -1;
+		}
+		
+		
+		info.tx = x0+offsetX;
+		info.ty = y0+offsetY;
+		info.text = "0";
+		info.atan = atan;
 		this.links.add(info);
 		this.map.put(l.getId(), info);
 	}
@@ -112,38 +126,44 @@ public class QSimQDrawer implements VisDebuggerAdditionalDrawer, AgentDepartureE
 
 	@Override
 	public void draw(EventsBasedVisDebugger p) {
-		if (true)
-		return;
-		p.stroke(255);
+
+
+		
+		p.stroke(0);
 		p.ellipseMode(PConstants.RADIUS);
 //		p.strokeCap(PConstants.ROUND);
 		p.strokeCap(PConstants.SQUARE);
 		p.strokeWeight(.1f);
 		p.fill(0);
 		for (LinkInfo li : this.links) {
-			int lines = li.onLink/li.lanes+1;
-			if (li.onLink <= 0) {
-				continue;
-			}
-			double incr = li.length/lines;
-			double delta = incr;
-			while (delta < li.length) {
-				double x0 = li.x0 + delta*li.dx;
-				double x1 = li.x1 + delta*li.dx;
-				double y0 = li.y0 + delta*li.dy;
-				double y1 = li.y1 + delta*li.dy;
-				delta += incr;
-				p.strokeWeight((float)(.1*p.zoomer.getZoomScale()));
-				p.stroke(0,0);
-//				p.strokeCap(PConstants.ROUND);
-//				p.line((float)(x0+p.offsetX),(float)-(y0+p.offsetY),(float)(x1+p.offsetX),(float)-(y1+p.offsetY));
-				p.ellipseMode(PConstants.RADIUS);
-				p.ellipse((float)((x0+x1)/2 + p.offsetX), (float)-((y0+y1)/2 + p.offsetY), .35f, .35f);
-//				p.strokeCap(PConstants.SQUARE);
-//				p.stroke(0);
+//			p.line((float)(li.x0+p.offsetX),(float)-(li.y0+p.offsetY),(float)(li.x1+p.offsetX),(float)-(li.y1+p.offsetY));
+			p.fill(255);
+			p.rect((float)(li.x0+p.offsetX-li.dy*2-3*li.dx-.06),(float)-(li.y0+p.offsetY+li.dx*2-3*li.dy),(4),(4));
+			
+			
+////			int lines = li.onLink/li.lanes+1;
+//			if (li.onLink <= 0) {
+//				continue;
+//			}
+//			double incr = li.length/lines;
+//			double delta = incr;
+//			while (delta < li.length) {
+//				double x0 = li.x0 + delta*li.dx;
+//				double x1 = li.x1 + delta*li.dx;
+//				double y0 = li.y0 + delta*li.dy;
+//				double y1 = li.y1 + delta*li.dy;
+//				delta += incr;
 //				p.strokeWeight((float)(.1*p.zoomer.getZoomScale()));
-//				p.line((float)(x0+p.offsetX),(float)-(y0+p.offsetY),(float)(x1+p.offsetX),(float)-(y1+p.offsetY));
-			}
+//				p.stroke(0,0);
+////				p.strokeCap(PConstants.ROUND);
+////				p.line((float)(x0+p.offsetX),(float)-(y0+p.offsetY),(float)(x1+p.offsetX),(float)-(y1+p.offsetY));
+//				p.ellipseMode(PConstants.RADIUS);
+//				p.ellipse((float)((x0+x1)/2 + p.offsetX), (float)-((y0+y1)/2 + p.offsetY), .35f, .35f);
+////				p.strokeCap(PConstants.SQUARE);
+////				p.stroke(0);
+////				p.strokeWeight((float)(.1*p.zoomer.getZoomScale()));
+////				p.line((float)(x0+p.offsetX),(float)-(y0+p.offsetY),(float)(x1+p.offsetX),(float)-(y1+p.offsetY));
+//			}
 //			p.strokeWeight(li.width);
 //			p.stroke(0,0,0,255);
 //			p.line((float)(li.x0+p.offsetX),(float)-(li.y0+p.offsetY),(float)(li.x1+p.offsetX),(float)-(li.y1+p.offsetY));
@@ -154,6 +174,20 @@ public class QSimQDrawer implements VisDebuggerAdditionalDrawer, AgentDepartureE
 
 	@Override
 	public void drawText(EventsBasedVisDebugger p) {
+		if (p.zoomer.getZoomScale() < this.minScale ) {
+			return;
+		}
+		for (LinkInfo li : this.links) {
+		
+			float ts = (float) (10*p.zoomer.getZoomScale()/this.minScale);
+			p.textSize(ts);	
+			PVector cv = p.zoomer.getCoordToDisp(new PVector((float)(li.tx+p.offsetX-1),(float)-(li.ty+p.offsetY)));
+			p.fill(0,0,0,255);
+			li.text = li.onLink + "";
+			float w = p.textWidth(li.text);
+			p.textAlign(PConstants.LEFT);
+			p.text(li.text, cv.x-w/2, cv.y+ts/2);
+		}
 	}
 
 
@@ -162,6 +196,10 @@ public class QSimQDrawer implements VisDebuggerAdditionalDrawer, AgentDepartureE
 //
 //
 	private static final class LinkInfo {
+		public double tx;
+		public double ty;
+		public String text;
+		public double atan;
 		public double length;
 		public double laneWidth;
 		public double dy;

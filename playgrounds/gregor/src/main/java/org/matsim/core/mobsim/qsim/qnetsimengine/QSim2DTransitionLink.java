@@ -78,7 +78,7 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 		this.qLinkDelegate = qLinkImpl;
 		this.env = env;
 		this.agentBuilder = builder;
-		this.area = link.getLength() * link.getNumberOfLanes()/.71;
+		
 		
 		Iterator<? extends Link> it = link.getFromNode().getInLinks().values().iterator();
 		Link pred = it.next();
@@ -89,6 +89,7 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 //			throw new RuntimeException();
 //		}
 		this.qPred = this.qNetwork.getNetsimLink(pred.getId());
+		this.area = pred.getLength() * (pred.getCapacity()/1.3)/this.qNetwork.getNetwork().getCapacityPeriod();
 		init();
 	}
 
@@ -114,7 +115,8 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 		
 			Sim2DAgent agent = this.agentBuilder.buildAgent(veh,this.spawnX+MatsimRandom.getRandom().nextDouble()-.5,this.spawnY+MatsimRandom.getRandom().nextDouble()-.5, this.ta.getPhysicalEnvironment());
 			agent.setDesiredSpeed(this.getLink().getFreespeed());
-			this.ta.addAgentTransitionBuffer(agent,this.qPred.getAllVehicles().size()/this.area);
+			int v = this.qPred.getAllNonParkedVehicles().size();
+			this.ta.addAgentTransitionBuffer(agent,v/this.area);
 			double now = this.qNetwork.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 			this.qNetwork.simEngine.getMobsim().getEventsManager().processEvent(
 					new LinkEnterEvent(now, veh.getDriver().getId(),

@@ -49,10 +49,11 @@ public class KeyControl implements KeyListener {
 	//70185.26:29303.623x80.73036504912677 
 	//108827.0:45366.152x125.2392931869562 -- sections
 	//169010.61:70300.016x194.28724927013116 -- agents
+	//74350.62:40870.0x113.59573078181967 at key 1
 	private static final Zoom z = new Zoom();
 	static {
-		z.z = 194.28724927013116;
-		z.o = new PVector(169010.61f,70300.016f);
+		z.z = 113.59573078181967;
+		z.o = new PVector(74350.62f,40870.0f);
 	}
 	
 	public KeyControl(ZoomPan zoomer) {
@@ -87,6 +88,11 @@ public class KeyControl implements KeyListener {
 		} else if (e.getKeyChar() == 's'){
 			log.info("screenshot requested");
 			this.makeScreenshot  = true;
+		} else if (e.getKeyChar() == 'i') {
+			Zoom z = new Zoom();
+			z.o = this.zoomer.getPanOffset();
+			z.z = this.zoomer.getZoomScale();
+			log.info(z);
 		}
 		
 		//this works with Mac
@@ -164,9 +170,18 @@ public class KeyControl implements KeyListener {
 		public PVector o;
 		public double z;
 		
+		@Override
+		public String toString(){
+			return "zoom: " + this.z + " at: " + this.o.x + "," + this.o.y;
+		}
+		
 	}
 
 	public boolean isOneObjectWaitingAtScreenshotBarrier() {
 		return this.screenshotBarrier.getNumberWaiting() == 1;
+	}
+
+	public void requestScreenshot() {
+		this.makeScreenshot = true;
 	}
 }

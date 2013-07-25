@@ -42,10 +42,14 @@ import playground.gregor.sim2d_v4.events.Sim2DAgentDestructEvent;
 import playground.gregor.sim2d_v4.events.Sim2DAgentDestructEventHandler;
 import playground.gregor.sim2d_v4.events.XYVxVyEventImpl;
 import playground.gregor.sim2d_v4.events.XYVxVyEventsHandler;
+import playground.gregor.sim2d_v4.events.debug.ForceReDrawEvent;
+import playground.gregor.sim2d_v4.events.debug.ForceReDrawEventHandler;
 import playground.gregor.sim2d_v4.events.debug.LineEvent;
 import playground.gregor.sim2d_v4.events.debug.LineEventHandler;
 import playground.gregor.sim2d_v4.events.debug.NeighborsEvent;
 import playground.gregor.sim2d_v4.events.debug.NeighborsEventHandler;
+import playground.gregor.sim2d_v4.events.debug.RectEvent;
+import playground.gregor.sim2d_v4.events.debug.RectEventHandler;
 import playground.gregor.sim2d_v4.scenario.Section;
 import playground.gregor.sim2d_v4.scenario.Sim2DEnvironment;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
@@ -54,7 +58,7 @@ import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAgentConstructEventHandler, Sim2DAgentDestructEventHandler, NeighborsEventHandler, LineEventHandler{
+public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAgentConstructEventHandler, Sim2DAgentDestructEventHandler, NeighborsEventHandler, LineEventHandler, ForceReDrawEventHandler, RectEventHandler{
 
 	double time;
 	private final EventsBasedVisDebugger vis;
@@ -67,7 +71,7 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 	private final KeyControl keyControl;
 	
 	private final List<ClockedVisDebuggerAdditionalDrawer> drawers = new ArrayList<ClockedVisDebuggerAdditionalDrawer>();
-
+	
 	public EventBasedVisDebuggerEngine(Scenario sc) {
 		this.sc = sc;
 		this.dT = sc.getScenarioElement(Sim2DScenario.class).getSim2DConfig().getTimeStepSize();
@@ -132,7 +136,7 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 //					offset += 96;
 					this.vis.addPolygonStatic(x, y, 255-offset, 255-offset, 255-offset, 255, 0);
 
-//					this.vis.addTextStatic(p.getCentroid().getX(), p.getCentroid().getY(), sec.getId().toString(), 100);
+					this.vis.addTextStatic(p.getCentroid().getX(), p.getCentroid().getY(), sec.getId().toString(), 100);
 				}
 			}
 		}
@@ -178,7 +182,7 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 			this.time = event.getTime();
 		}
 		
-		this.vis.addLine(event.getX(), event.getY(), event.getX()+event.getVX(), event.getY()+event.getVY(), 0, 0, 0, 255, 100);
+		this.vis.addLine(event.getX(), event.getY(), event.getX()+event.getVX(), event.getY()+event.getVY(), 0, 0, 0, 255, 25);
 		double dx = event.getVY();
 		double dy = -event.getVX();
 		double length = Math.sqrt(dx*dx+dy*dy);
@@ -191,13 +195,13 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 		double y1 = y0 - dx*al -dy*al/4;
 		double x2 = x0 + dy*al +dx*al/4;
 		double y2 = y0 - dx*al +dy*al/4;
-		this.vis.addTriangle(x0, y0, x1, y1, x2, y2, 0, 0, 0, 255, 100, true);
+		this.vis.addTriangle(x0, y0, x1, y1, x2, y2, 0, 0, 0, 255, 25, true);
 		
 		CircleProperty cp = this.circleProperties.get(event.getPersonId());
+		
 		this.vis.addCircle(event.getX(),event.getY(),cp.rr,cp.r,cp.g,cp.b,cp.a,cp.minScale,cp.fill);
 		this.vis.addText(event.getX(),event.getY(), event.getPersonId().toString(), 200);
 		
-
 	}
 
 	private void update(double time2) {
@@ -215,12 +219,16 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 				e.printStackTrace();
 			}
 		}
+//		if (time2 > 1100 && time2 < 1120) {
+//			this.keyControl.requestScreenshot();
+//		}
+		
+		
 		this.vis.update(this.time);
 		this.lastUpdate = System.currentTimeMillis();
 		for (ClockedVisDebuggerAdditionalDrawer drawer : this.drawers){
 			drawer.update(this.lastUpdate);
 		}
-
 	}
 
 	private static final class CircleProperty {
@@ -253,10 +261,10 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 			g=0;
 			b=nr;
 		}
-		cp.r = r;
-		cp.g = g;
-		cp.b = b;
-		cp.a = 222;
+//		cp.r = r;
+//		cp.g = g;
+//		cp.b = b;
+//		cp.a = 222;
 		cp.r = nr;
 		cp.g = nr;
 		cp.b = nr;
@@ -320,11 +328,33 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 	public void handleEvent(LineEvent e) {
 
 		if (e.isStatic()) {
-			this.vis.addLineStatic(e.getSegment().x0, e.getSegment().y0, e.getSegment().x1, e.getSegment().y1, e.getR(), e.getG(), e.getB(), e.getA(), e.getMinScale());
+			if (e.getGap() == 0) {
+				this.vis.addLineStatic(e.getSegment().x0, e.getSegment().y0, e.getSegment().x1, e.getSegment().y1, e.getR(), e.getG(), e.getB(), e.getA(), e.getMinScale());
+			} else {
+				this.vis.addDashedLineStatic(e.getSegment().x0, e.getSegment().y0, e.getSegment().x1, e.getSegment().y1, e.getR(), e.getG(), e.getB(), e.getA(), e.getMinScale(),e.getDash(),e.getGap());
+				
+			}
 		} else {
-			this.vis.addLine(e.getSegment().x0, e.getSegment().y0, e.getSegment().x1, e.getSegment().y1, e.getR(), e.getG(), e.getB(), e.getA(), e.getMinScale());
+			if (e.getGap() == 0) {
+				this.vis.addLine(e.getSegment().x0, e.getSegment().y0, e.getSegment().x1, e.getSegment().y1, e.getR(), e.getG(), e.getB(), e.getA(), e.getMinScale());
+			} else {
+				this.vis.addDashedLine(e.getSegment().x0, e.getSegment().y0, e.getSegment().x1, e.getSegment().y1, e.getR(), e.getG(), e.getB(), e.getA(), e.getMinScale(),e.getDash(),e.getGap());
+				
+			}
 		}
 
+	}
+
+	@Override
+	public void handleEvent(ForceReDrawEvent event) {
+		update(event.getTime());
+		
+	}
+
+	@Override
+	public void handleEvent(RectEvent e) {
+		this.vis.addRect(e.getTx(),e.getTy(),e.getSx(),e.getSy(),255,255,255,255,0);
+		
 	}
 
 

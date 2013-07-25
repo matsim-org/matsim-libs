@@ -128,9 +128,9 @@ public class ORCAVelocityUpdater implements VelocityUpdater {
 		if (freeSpeed > v0) {
 			freeSpeed = v0;
 		}
-		
-//		double vS = freeSpeed;
-		double vS = v0;
+//		
+		double vS = freeSpeed;
+//		double vS = v0;
 //		vS = v0;
 		
 		dir[0] *= vS;

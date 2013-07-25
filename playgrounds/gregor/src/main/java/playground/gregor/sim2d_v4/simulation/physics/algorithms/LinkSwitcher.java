@@ -123,9 +123,9 @@ public class LinkSwitcher {// TODO more meaningful name for this class [gl April
 			targetLine.y1 = seg.y1 - w*li.dx;			
 			
 		} else {
-			//HACK July '13 [gl]
-			double cap = l.getCapacity();
-			double width = (cap/3600)/1.3;
+//			//HACK July '13 [gl]
+//			double cap = l.getCapacity();
+			double width = 5;//(cap)/1.3;
 			fl = new Segment();
 			fl.x0 = seg.x1 - width/2*li.dy;// + rX;
 			fl.y0 = seg.y1 + width/2*li.dx;// + rY;

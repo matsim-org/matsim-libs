@@ -44,7 +44,6 @@ import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.network.NetworkImpl;
 
 import processing.core.PConstants;
-import processing.core.PVector;
 
 
 
@@ -55,7 +54,8 @@ public class QSimDensityDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 	List<LinkInfo> links = new ArrayList<LinkInfo>();
 	Map<Id,LinkInfo> map = new HashMap<Id,LinkInfo>();
 
-	private final double minScale = 10;
+	private final double maxScale = 10;
+	private final double fadeOutScale = 1.6;
 	
 	public QSimDensityDrawer(Scenario sc) {
 		for (Link l : sc.getNetwork().getLinks().values()) {
@@ -120,12 +120,21 @@ public class QSimDensityDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 
 	@Override
 	public void draw(EventsBasedVisDebugger p) {
+//		if (p.zoomer.getZoomScale() >= this.maxScale ) {
+//			return;
+//		}
+		
+		float fade =1;
+		if (p.zoomer.getZoomScale() > this.fadeOutScale) {
+			fade = (float) (1 - (p.zoomer.getZoomScale()-this.fadeOutScale)/(this.maxScale - this.fadeOutScale));
+			fade = fade < .75f ? .75f : fade;
+		}
 		p.stroke(0);
 //		p.strokeCap(PConstants.ROUND);
 		p.strokeCap(PConstants.SQUARE);
 		for (LinkInfo li : this.links) {
 			p.strokeWeight(li.width);
-			p.stroke(li.r,li.g,li.b,li.a);
+			p.stroke(li.r,li.g,li.b,li.a * fade);
 			p.line((float)(li.x0+p.offsetX),(float)-(li.y0+p.offsetY),(float)(li.x1+p.offsetX),(float)-(li.y1+p.offsetY));
 		}
 //		p.strokeCap(PConstants.SQUARE);
@@ -135,19 +144,19 @@ public class QSimDensityDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 	@Override
 	public void drawText(EventsBasedVisDebugger p) {
 		
-		if (p.zoomer.getZoomScale() < this.minScale ) {
-			return;
-		}
-		for (LinkInfo li : this.links) {
-		
-			float ts = (float) (10*p.zoomer.getZoomScale()/this.minScale);
-			p.textSize(ts);	
-			PVector cv = p.zoomer.getCoordToDisp(new PVector((float)(li.tx+p.offsetX),(float)-(li.ty+p.offsetY)));
-			p.fill(0,0,0,255);
-			float w = p.textWidth(li.text);
-			p.textAlign(PConstants.LEFT);
-			p.text(li.text, cv.x-w/2, cv.y+ts/2);
-		}
+//		if (p.zoomer.getZoomScale() >= this.maxScale ) {
+//			return;
+//		}
+//		for (LinkInfo li : this.links) {
+//		
+//			float ts = (float) (10*p.zoomer.getZoomScale()/this.minScale);
+//			p.textSize(ts);	
+//			PVector cv = p.zoomer.getCoordToDisp(new PVector((float)(li.tx+p.offsetX),(float)-(li.ty+p.offsetY)));
+//			p.fill(0,0,0,255);
+//			float w = p.textWidth(li.text);
+//			p.textAlign(PConstants.LEFT);
+//			p.text(li.text, cv.x-w/2, cv.y+ts/2);
+//		}
 	}
 
 

@@ -22,7 +22,7 @@ package playground.gregor.sim2d_v4.debugger.eventsbaseddebugger;
 
 import processing.core.PImage;
 
-public class Branding implements VisDebuggerAdditionalDrawer{
+public class Branding implements VisDebuggerAdditionalDrawer, VisDebuggerOverlay{
 
 	private PImage logo;
 	private PImage contact;

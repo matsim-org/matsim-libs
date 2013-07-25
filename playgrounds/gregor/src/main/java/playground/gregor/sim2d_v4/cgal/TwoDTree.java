@@ -41,16 +41,15 @@ import com.vividsolutions.jts.geom.Envelope;
  * similar to de Berg et al (2000), Computational Geometry: Algorithms and Applications. Springer
  * The main differences are:
  * 	1. for small data sets (<128) data is stored in a list, since for small data sets a linear search is usually faster
- * 	2. the tree has a max depth to avoid stack overflow exceptions. If the max depth is reached for a region in the tree all data that
- * 	is subsequent inserted into this region will be stored in a list. This means the algorithm performs a linear search for the region in question if range search
- * 	is performed on it.  
+ * 	2. the tree has a max depth to avoid stack overflow exceptions. If the max depth has been reached for a region all 
+ * data subsequently inserted into this region is stored in a list. Thus, the algorithm retrieves data by linear search for those regions.  
  * @author laemmel
  *
  * @param <T>
  */
 public class TwoDTree<T extends TwoDObject> {
 
-	
+
 	private TwoDNode<T> root;
 
 	public TwoDTree(Envelope e) {
@@ -59,16 +58,17 @@ public class TwoDTree<T extends TwoDObject> {
 
 	public void buildTwoDTree(List<T> values) {
 		this.root.cache.clear();
+//		this.root.cache = new ArrayList<T>(10000);
 		this.root.left = null;
 		this.root.right = null;
-		this.root.maxDepth = 0;
+//		this.root.maxDepth = 0;
 		for (T val : values) {
 			insert(val);
 		}
-		this.root.maxDepth = 128;
-		if (values.size() > 128) {
-			this.root.split();
-		}
+//		this.root.maxDepth = 128;
+//		if (values.size() > 128) {
+//			this.root.split();
+//		}
 	}
 
 	public List<T> get(Envelope e) {
@@ -98,7 +98,7 @@ public class TwoDTree<T extends TwoDObject> {
 		private static final int cacheSize = 128;
 		private static final double EPSILON = 0.0001f; 
 		private int maxDepth = 128; 
-		
+
 		private final int depth;
 		private final Envelope envelope;
 		private TwoDNode<T> left = null;
@@ -112,7 +112,7 @@ public class TwoDTree<T extends TwoDObject> {
 			this.envelope = e;
 			if (this.depth >= this.maxDepth) {
 				log.warn("Maximum recursion depth reached! The region is: " + this.envelope + " Data inserted into this region will be stored in a linear list.");
-				
+
 			}
 		}
 
@@ -177,8 +177,13 @@ public class TwoDTree<T extends TwoDObject> {
 			}
 			return ret;
 		}
-		
+
 		void split() {
+			
+//			if (this.cache.size() < 128) {
+//				throw new RuntimeException("size was:" + this.cache.size());
+//			}
+			
 			final double minX = this.envelope.getMinX();
 			final double minY = this.envelope.getMinY();
 			final double maxX = this.envelope.getMaxX();
@@ -199,8 +204,8 @@ public class TwoDTree<T extends TwoDObject> {
 					log.warn("region to small can not split it!  The region is: " + this.envelope + " Data inserted into this region will be stored in a linear list.");
 					this.maxDepth = this.depth;
 				}
-				
-//				final double width = median - this.envelope.getMinX();
+
+				//				final double width = median - this.envelope.getMinX();
 				Envelope e1 = new Envelope(minX, median,  minY, maxY);
 				this.left = new TwoDNode<T>(e1, this.depth+1);
 				Envelope e2 = new Envelope(median,maxX, minY,maxY);
@@ -221,9 +226,9 @@ public class TwoDTree<T extends TwoDObject> {
 					log.warn("region to small can not split it!  The region is: " + this.envelope + " Data inserted into this region will be stored in a linear list.");
 					this.maxDepth = this.depth;
 				}
-				
-				
-//				final double height = this.envelope.getHeight();
+
+
+				//				final double height = this.envelope.getHeight();
 				Envelope e1 = new Envelope(minX, maxX,  minY, median);
 				this.left = new TwoDNode<T>(e1, this.depth+1);
 				Envelope e2 = new Envelope(minX ,maxX, median,maxY);
@@ -245,7 +250,7 @@ public class TwoDTree<T extends TwoDObject> {
 			this.internalNode = true;
 
 		}
-		
+
 		public Envelope getEnvelope() {
 			return this.envelope;
 		}
@@ -253,9 +258,16 @@ public class TwoDTree<T extends TwoDObject> {
 	}
 
 
+	public static void main(String [] args) {
+		for (int i = 10000; i <= 10000; i++) {
+			System.out.println(i);
+			run(i);
+		}
+	}
+	
 	//testing only!!
-	public static void main (String [] args) {
-		int TEST = 10000;
+	private static void run (int test) {
+		int TEST = test;
 		Envelope e = new Envelope(-100,100,-100,100);
 		List<TwoDObj> os = new ArrayList<TwoDObj>();
 		for (int i = 0; i < TEST; i++) {

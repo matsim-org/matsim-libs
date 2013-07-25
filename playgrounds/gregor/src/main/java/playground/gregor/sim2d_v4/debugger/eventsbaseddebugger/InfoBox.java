@@ -26,7 +26,7 @@ import org.matsim.core.utils.misc.Time;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
 import processing.core.PConstants;
 
-public class InfoBox implements ClockedVisDebuggerAdditionalDrawer {
+public class InfoBox implements ClockedVisDebuggerAdditionalDrawer, VisDebuggerOverlay {
 
 	private final EventBasedVisDebuggerEngine dbg;
 	private final double dT;

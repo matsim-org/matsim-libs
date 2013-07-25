@@ -30,11 +30,10 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.gregor.sim2d_v3.trafficmonitoring.MSATravelTimeCalculatorFactory;
-import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.Branding;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
-import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.GregorsOffice;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.QSimDensityDrawer;
+import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.QSimInfoBoxDrawer;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.SeeCasino;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.VoronoiDiagramDrawer;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
@@ -66,8 +65,8 @@ public class Sim2DRunner implements IterationStartsListener{
 		sc.addScenarioElement(sim2dsc);
 		sim2dsc.connect(sc);
 		
-		c.getQSimConfigGroup().setEndTime(15*3600);
-//		c.getQSimConfigGroup().setEndTime(5*60);
+//		c.getQSimConfigGroup().setEndTime(23*3600);
+		c.getQSimConfigGroup().setEndTime(5*60);
 
 		//offsets needed to convert to doubles later in program
 		double minX = Double.POSITIVE_INFINITY;
@@ -116,16 +115,19 @@ public class Sim2DRunner implements IterationStartsListener{
 			SeeCasino iCasion = new SeeCasino();
 			VoronoiDiagramDrawer v = new VoronoiDiagramDrawer();
 			dbg.addAdditionalDrawer(iBox);
-			dbg.addAdditionalDrawer(new Branding());
+//			dbg.addAdditionalDrawer(new Branding());
 			QSimDensityDrawer qDbg = new QSimDensityDrawer(sc);
+			QSimInfoBoxDrawer qDbg2 = new QSimInfoBoxDrawer(sc);
 			dbg.addAdditionalDrawer(qDbg);
-			dbg.addAdditionalDrawer(iCasion);
-			dbg.addAdditionalDrawer(new GregorsOffice());
-			dbg.addAdditionalDrawer(v);
+			dbg.addAdditionalDrawer(qDbg2);
+//			dbg.addAdditionalDrawer(iCasion);
+//			dbg.addAdditionalDrawer(new GregorsOffice());
+//			dbg.addAdditionalDrawer(v);
 			controller.getEvents().addHandler(dbg);
 			controller.getEvents().addHandler(qDbg);
-			controller.getEvents().addHandler(iCasion);
-			controller.getEvents().addHandler(v);
+			controller.getEvents().addHandler(qDbg2);
+//			controller.getEvents().addHandler(iCasion);
+//			controller.getEvents().addHandler(v);
 			
 		}
 

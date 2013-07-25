@@ -315,7 +315,7 @@ public class PhysicalSim2DEnvironment {
 		
 		//DEBUG
 		for ( Segment bo : ta.getObstacles()) {
-			this.eventsManager.processEvent(new LineEvent(0,bo,true,0,255,0,255,0));
+			this.eventsManager.processEvent(new LineEvent(0,bo,true,0,0,0,255,0));
 		}
 
 
