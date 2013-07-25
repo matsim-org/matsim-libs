@@ -1,0 +1,105 @@
+package playground.wrashid.lib.tools.events;
+
+import java.util.HashSet;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.AgentMoneyEvent;
+import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Event;
+import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.events.algorithms.EventWriterXML;
+
+
+public class FilterEventsOfSingleLink {
+
+	/**
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		String inputEventsFilePath="C:/data/workspace3/playgrounds/wrashid/events.xml/events.xml";
+		String outputEventsFilePath="C:/data/workspace3/playgrounds/wrashid/events.xml/events_filtered.xml";
+		EventsManager events = EventsUtils.createEventsManager();
+
+		EventsFilter eventsFilter = new EventsFilter(outputEventsFilePath, new IdImpl("l1"));
+
+		events.addHandler(eventsFilter);
+
+		MatsimEventsReader reader = new MatsimEventsReader(events);
+		reader.readFile(inputEventsFilePath);
+
+		eventsFilter.closeFile();
+
+	}
+	
+	private static class EventsFilter implements AgentDepartureEventHandler, AgentArrivalEventHandler,AgentWait2LinkEventHandler,LinkEnterEventHandler,LinkLeaveEventHandler {
+		private Id filterLinkId;
+		private EventWriterXML eventWriter;
+
+		public EventsFilter(String outputFileName, Id filterLinkId) {
+			eventWriter = new EventWriterXML(outputFileName);
+			this.filterLinkId = filterLinkId;
+		}
+		
+		public void closeFile(){
+			eventWriter.closeFile();
+		}
+
+		@Override
+		public void reset(int iteration) {
+			
+		}
+
+		@Override
+		public void handleEvent(AgentDepartureEvent event) {
+			if (event.getLinkId().toString().equalsIgnoreCase(filterLinkId.toString())){
+				eventWriter.handleEvent(event);
+			}
+		}
+
+		@Override
+		public void handleEvent(LinkLeaveEvent event) {
+			if (event.getLinkId().toString().equalsIgnoreCase(filterLinkId.toString())){
+				eventWriter.handleEvent(event);
+			}			
+		}
+
+		@Override
+		public void handleEvent(LinkEnterEvent event) {
+			if (event.getLinkId().toString().equalsIgnoreCase(filterLinkId.toString())){
+				eventWriter.handleEvent(event);
+			}			
+		}
+
+		@Override
+		public void handleEvent(AgentWait2LinkEvent event) {
+			if (event.getLinkId().toString().equalsIgnoreCase(filterLinkId.toString())){
+				eventWriter.handleEvent(event);
+			}			
+		}
+
+		@Override
+		public void handleEvent(AgentArrivalEvent event) {
+			if (event.getLinkId().toString().equalsIgnoreCase(filterLinkId.toString())){
+				eventWriter.handleEvent(event);
+			}			
+		}
+
+
+	}
+
+}
