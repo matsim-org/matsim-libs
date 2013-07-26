@@ -115,8 +115,9 @@ public class DigicoreNetworkBuilder {
 				long startMemory = Runtime.getRuntime().totalMemory();
 				
 				dfgb.buildNetwork(filter, fileList);
-				long endMemory = Runtime.getRuntime().totalMemory();
+
 				long endTime = System.currentTimeMillis();
+				long endMemory = Runtime.getRuntime().totalMemory();
 				LOG.info(String.format("Memory: radius - %.0f; pmin - %d; start - %d; end - %d; diff - %d", thisRadius, thisPmin, startMemory, endMemory, endMemory-startMemory));
 				LOG.info(String.format("Time: radius - %.0f; pmin - %d; ms - %d", thisRadius, thisPmin, endTime - startTime));
 				
