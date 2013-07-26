@@ -65,11 +65,12 @@ public class DigicoreNetworkBuilder {
 	 */
 	public static void main(String[] args) {
 		Header.printHeader(DigicoreNetworkBuilder.class.toString(), args);
+		LOG.info("Memory at start: " + Runtime.getRuntime().totalMemory());
 		
 		String inputfolder = args[0];
 		
 		/* These values should be set following Quintin's Design-of-Experiment inputs. */
-		double[] radii = {40, 35, 30, 25, 20, 15, 10};
+		double[] radii = {40, 35, 30, 25, 20, 15, 10, 5, 1};
 		int[] pmins = {1, 5, 10, 15, 20, 25};
 
 		/* Checks if a filter facility is provided. Either as a readable file,
@@ -109,8 +110,16 @@ public class DigicoreNetworkBuilder {
 				
 				DigicoreNetworkBuilder dfgb = new DigicoreNetworkBuilder();
 				
+				/* Gather some memory and time stats, and then build the network. */
+				long startTime = System.currentTimeMillis();
+				long startMemory = Runtime.getRuntime().totalMemory();
+				
 				dfgb.buildNetwork(filter, fileList);
-
+				long endMemory = Runtime.getRuntime().totalMemory();
+				long endTime = System.currentTimeMillis();
+				LOG.info(String.format("Memory: radius - %.0f; pmin - %d; start - %d; end - %d; diff - %d", thisRadius, thisPmin, startMemory, endMemory, endMemory-startMemory));
+				LOG.info(String.format("Time: radius - %.0f; pmin - %d; ms - %d", thisRadius, thisPmin, endTime - startTime));
+				
 				/* Write the output. */
 				DigicoreNetworkWriter dnw = new DigicoreNetworkWriter(dfgb.getNetwork());
 				try {
@@ -124,6 +133,10 @@ public class DigicoreNetworkBuilder {
 				} catch (IOException e) {
 					LOG.error("Couldn't write network order.");
 				}
+				
+				/* See if we can get the network file size. Write that to the console. */ 
+				File f = new File(networkFile);
+				LOG.info(String.format("File size: radius - %.0f; pmin - %d; size - %d", thisRadius, thisPmin, f.getTotalSpace()));
 			}
 		}
 				
