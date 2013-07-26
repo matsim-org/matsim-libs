@@ -46,6 +46,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactoryInternal;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.population.Desires;
 import org.matsim.pt.PtConstants;
 
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
@@ -326,7 +327,13 @@ public class RunCliquesWithHardCodedStrategies {
 				return new GenericFactory<PersonOverlapScorer, Id>() {
 						@Override
 						public PersonOverlapScorer create( final Id id ) {
-							final double typicalDuration = ((PersonImpl) population.getPersons().get( id )).getDesires().getActivityDuration( "leisure" );
+							final PersonImpl person = (PersonImpl) population.getPersons().get( id );
+							if ( person == null ) {
+								// eg transit agent
+								return new LinearOverlapScorer( 0 );
+							}
+							final Desires desires = person.getDesires();
+							final double typicalDuration = desires.getActivityDuration( "leisure" );
 							final double zeroDuration = typicalDuration * Math.exp( -10.0 / typicalDuration );
 							return new LogOverlapScorer(
 									scoringFunctionConf.getMarginalUtilityOfBeingTogether_s(),
