@@ -26,6 +26,7 @@ import java.util.List;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
@@ -37,6 +38,7 @@ import org.matsim.core.config.experimental.ReflectiveModule;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PersonImpl;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.MainModeIdentifier;
 import org.matsim.core.router.StageActivityTypesImpl;
@@ -50,6 +52,7 @@ import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
 import playground.ivt.kticompatibility.KtiPtRoutingModule;
 import playground.ivt.kticompatibility.KtiPtRoutingModule.KtiPtRoutingModuleInfo;
 import playground.thibautd.scoring.BeingTogetherScoring;
+import playground.thibautd.scoring.BeingTogetherScoring.LogOverlapScorer;
 import playground.thibautd.scoring.BeingTogetherScoring.LinearOverlapScorer;
 import playground.thibautd.scoring.BeingTogetherScoring.PersonOverlapScorer;
 import playground.thibautd.scoring.FireMoneyEventsForUtilityOfBeingTogether;
@@ -280,13 +283,9 @@ public class RunCliquesWithHardCodedStrategies {
 					controllerRegistry.getEvents(),
 					scoringFunctionConf.getActTypeFilterForJointScoring(),
 					scoringFunctionConf.getModeFilterForJointScoring(),
-					new GenericFactory<PersonOverlapScorer, Id>() {
-						@Override
-						public PersonOverlapScorer create( Id id ) {
-							return new LinearOverlapScorer(
-									scoringFunctionConf.getMarginalUtilityOfBeingTogether_s() );
-						}
-					},
+					getPersonOverlapScorerFactory(
+						scoringFunctionConf,
+						scenario.getPopulation() ),
 					scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney(),
 					toSocialNetwork( cliques ) );
 		controllerRegistry.getEvents().addHandler( socialScorer );
@@ -309,6 +308,35 @@ public class RunCliquesWithHardCodedStrategies {
 
 		// run it
 		controller.run();
+	}
+
+	private static GenericFactory<PersonOverlapScorer, Id> getPersonOverlapScorerFactory(
+			final ScoringFunctionConfigGroup scoringFunctionConf,
+			final Population population) {
+		switch ( scoringFunctionConf.getTogetherScoringForm() ) {
+			case linear:
+				return new GenericFactory<PersonOverlapScorer, Id>() {
+						@Override
+						public PersonOverlapScorer create( final Id id ) {
+							return new LinearOverlapScorer(
+									scoringFunctionConf.getMarginalUtilityOfBeingTogether_s() );
+						}
+					};
+			case logarithmic:
+				return new GenericFactory<PersonOverlapScorer, Id>() {
+						@Override
+						public PersonOverlapScorer create( final Id id ) {
+							final double typicalDuration = ((PersonImpl) population.getPersons().get( id )).getDesires().getActivityDuration( "leisure" );
+							final double zeroDuration = typicalDuration * Math.exp( -10.0 / typicalDuration );
+							return new LogOverlapScorer(
+									scoringFunctionConf.getMarginalUtilityOfBeingTogether_s(),
+									typicalDuration,
+									zeroDuration);
+						}
+					};
+			default:
+				throw new RuntimeException( ""+scoringFunctionConf.getTogetherScoringForm() );
+		}
 	}
 
 	private static SocialNetwork toSocialNetwork(
@@ -368,12 +396,17 @@ class ScoringFunctionConfigGroup extends ReflectiveModule {
 	public static final String GROUP_NAME = "scoringFunction";
 	private boolean useKtiScoring = false;
 	private double marginalUtilityOfBeingTogether_h = 0;
+
+	static enum TogetherScoringForm {
+		linear,
+		logarithmic;
+	}
+	private TogetherScoringForm togetherScoringForm = TogetherScoringForm.linear;
 	
 	static enum TogetherScoringType {
 		allModesAndActs,
 		leisureOnly;
 	}
-
 	private TogetherScoringType togetherScoringType = TogetherScoringType.allModesAndActs;
 
 	public ScoringFunctionConfigGroup() {
@@ -417,6 +450,20 @@ class ScoringFunctionConfigGroup extends ReflectiveModule {
 
 	public void setTogetherScoringType(final TogetherScoringType togetherScoringType) {
 		this.togetherScoringType = togetherScoringType;
+	}
+
+	@StringGetter( "togetherScoringForm" )
+	public TogetherScoringForm getTogetherScoringForm() {
+		return this.togetherScoringForm;
+	}
+
+	@StringSetter( "togetherScoringForm" )
+	public void setTogetherScoringForm(final String v) {
+		setTogetherScoringForm( TogetherScoringForm.valueOf( v ) );
+	}
+
+	public void setTogetherScoringForm(final TogetherScoringForm togetherScoringForm) {
+		this.togetherScoringForm = togetherScoringForm;
 	}
 
 	// I do not like so much this kind of "intelligent" method in Modules...
