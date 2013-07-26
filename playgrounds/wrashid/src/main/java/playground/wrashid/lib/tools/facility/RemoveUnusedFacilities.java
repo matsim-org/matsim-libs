@@ -64,7 +64,7 @@ public class RemoveUnusedFacilities {
 			}
 		}
 		
-		ActivityFacilitiesImpl activityFacilities = scenario.getActivityFacilities();
+		ActivityFacilitiesImpl activityFacilities = (ActivityFacilitiesImpl) scenario.getActivityFacilities();
 		LinkedList<Id> notUsedFacilities=new LinkedList<Id>();
 		for (ActivityFacility facility:activityFacilities.getFacilities().values()){
 			if (!usedFacilities.contains(facility.getId())){
