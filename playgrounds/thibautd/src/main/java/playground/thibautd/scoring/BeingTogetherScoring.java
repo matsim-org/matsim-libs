@@ -45,12 +45,13 @@ import playground.thibautd.utils.MapUtils.Factory;
  * @author thibautd
  */
 public class BeingTogetherScoring {
-	private final double marginalUtilityOfTime;
 	private final Id ego;
 	private final Set<Id> alters;
 
 	private final Filter actTypeFilter;
 	private final Filter modeFilter;
+
+	private final PersonOverlapScorer overlapScorer;
 
 	private final Interval activeTimeWindow;
 
@@ -115,10 +116,28 @@ public class BeingTogetherScoring {
 			final double marginalUtilityOfTime,
 			final Id ego,
 			final Collection<Id> alters) {
+		this(
+			startActiveWindow,
+			endActiveWindow,
+			actTypeFilter,
+			modeFilter,
+			new LinearOverlapScorer( marginalUtilityOfTime ),
+			ego,
+			alters);
+	}
+
+	public BeingTogetherScoring(
+			final double startActiveWindow,
+			final double endActiveWindow,
+			final Filter actTypeFilter,
+			final Filter modeFilter,
+			final PersonOverlapScorer overlapScorer,
+			final Id ego,
+			final Collection<Id> alters) {
 		this.actTypeFilter = actTypeFilter;
 		this.modeFilter = modeFilter;
 		this.activeTimeWindow = new Interval( startActiveWindow , endActiveWindow );
-		this.marginalUtilityOfTime = marginalUtilityOfTime;
+		this.overlapScorer = overlapScorer;
 		this.ego = ego;
 		this.alters = Collections.unmodifiableSet( new HashSet<Id>( alters ) );
 	}
@@ -127,20 +146,34 @@ public class BeingTogetherScoring {
 	// basic scoring
 	// /////////////////////////////////////////////////////////////////////////
 	public double getScore() {
-		double accumulatedTimePassedTogether = 0;
+		final Map<Id, Double> timePerSocialContact = new HashMap<Id, Double>();
+
 		for ( Map.Entry<Location, WrappedAroundIntervalSequence> e : intervalsForEgo.map.entrySet() ) {
 			final Location location = e.getKey();
 			final List<Interval> egoIntervals = e.getValue().getWrappedAroundSequence();
 
-			for ( IntervalsAtLocation locatedAlterIntervals : intervalsPerAlter.values() ) {
+			for (Map.Entry<Id, IntervalsAtLocation> e2 : intervalsPerAlter.entrySet() ) {
+				final Id alter = e2.getKey();
+				final IntervalsAtLocation locatedAlterIntervals = e2.getValue();
+
 				final WrappedAroundIntervalSequence seq = locatedAlterIntervals.map.get( location );
 				if ( seq == null ) continue;
 				final List<Interval> alterIntervals = seq.getWrappedAroundSequence();
-				accumulatedTimePassedTogether += calcOverlap( activeTimeWindow , egoIntervals , alterIntervals );
+
+				MapUtils.addToDouble(
+						alter,
+						timePerSocialContact,
+						0,
+						calcOverlap( activeTimeWindow , egoIntervals , alterIntervals ) );
 			}
 		}
 
-		return accumulatedTimePassedTogether * marginalUtilityOfTime;
+		double accumulatedUtility = 0;
+		for ( Map.Entry<Id, Double> idAndTime : timePerSocialContact.entrySet() ) {
+			accumulatedUtility += overlapScorer.getScore( idAndTime.getKey() , idAndTime.getValue() );
+		}
+
+		return accumulatedUtility;
 	}
 
 	private static double calcOverlap(
@@ -456,6 +489,49 @@ public class BeingTogetherScoring {
 		@Override
 		public boolean consider(final String typeOrMode) {
 			return false;
+		}
+	}
+
+	public static interface PersonOverlapScorer {
+		public double getScore(
+				Id alter,
+				double totalTimePassedTogether);
+	}
+
+	public static class LinearOverlapScorer implements PersonOverlapScorer {
+		private final double marginalUtility;
+
+		public LinearOverlapScorer(final double marginalUtility) {
+			this.marginalUtility = marginalUtility;
+		}
+
+		@Override
+		public double getScore(final Id alter, final double totalTimePassedTogether) {
+			return marginalUtility * totalTimePassedTogether;
+		}
+	}
+
+	public static class LogOverlapScorer implements PersonOverlapScorer {
+		private final double marginalUtility;
+		private final double typicalDuration;
+		private final double zeroDuration;
+
+		public LogOverlapScorer(
+				final double marginalUtility,
+				final double typicalDuration,
+				final double zeroDuration) {
+			this.marginalUtility = marginalUtility;
+			this.typicalDuration = typicalDuration;
+			this.zeroDuration = zeroDuration;
+		}
+
+		@Override
+		public double getScore(final Id alter, final double totalTimePassedTogether) {
+			final double log = marginalUtility * typicalDuration
+						* Math.log( totalTimePassedTogether / zeroDuration );
+			// penalizing being a short time with social contacts would make no sense,
+			// as it would be null again when no contact at all.
+			return log > 0 ? log : 0;
 		}
 	}
 }
