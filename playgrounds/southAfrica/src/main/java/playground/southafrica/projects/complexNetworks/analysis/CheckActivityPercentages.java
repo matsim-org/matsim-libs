@@ -45,7 +45,7 @@ public class CheckActivityPercentages {
 		String sourceFolder = args[0];
 		int numberOfThreads = Integer.parseInt(args[1]);
 		
-		double[] radii = {35, 30, 25, 20, 15, 10};
+		double[] radii = {40, 35, 30, 25, 20, 15, 10, 5, 1};
 		int[] pmins = {1, 5, 10, 15, 20, 25};
 		
 		ActivityAnalyser aa = new ActivityAnalyser(numberOfThreads);
