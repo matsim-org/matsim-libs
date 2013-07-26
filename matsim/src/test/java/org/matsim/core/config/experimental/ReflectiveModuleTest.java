@@ -30,6 +30,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.experimental.ReflectiveModule.InconsistentModuleException;
+import org.matsim.core.config.Module;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -199,6 +200,63 @@ public class ReflectiveModuleTest {
 		catch (InconsistentModuleException e) {
 			// gulp! swallow exception
 		}
+	}
+
+	@Test
+	public void testBehaviorWhenAcceptingUnknownParameters() {
+		final Module testee =
+			new ReflectiveModule( "name" , true ) {
+				@StringSetter( "field" )
+				public void setStuff(String s) {}
+
+				@StringGetter( "field" )
+				public Object getStuff() { return null; }
+			};
+
+		final String param = "my unknown param";
+		final String value = "my val";
+		testee.addParam( param , value );
+		Assert.assertEquals(
+				"unexpected stored value",
+				value,
+				testee.getValue( param ) );
+	}
+
+	@Test
+	public void testBehaviorWhenRejectingUnknownParameters() {
+		final Module testee =
+			new ReflectiveModule( "name" , false ) {
+				@StringSetter( "field" )
+				public void setStuff(String s) {}
+
+				@StringGetter( "field" )
+				public Object getStuff() { return null; }
+			};
+
+		final String param = "my unknown param";
+		final String value = "my val";
+		boolean gotExceptionAtAdd = false;
+		boolean gotExceptionAtGet = false;
+		try {
+			testee.addParam( param , value );
+		}
+		catch ( IllegalArgumentException e ) {
+			gotExceptionAtAdd = true;
+		}
+
+		try {
+			testee.getValue( param );
+		}
+		catch ( IllegalArgumentException e ) {
+			gotExceptionAtGet = true;
+		}
+
+		Assert.assertTrue(
+				"did not get exception when adding unkown param",
+				gotExceptionAtAdd );
+		Assert.assertTrue(
+				"did not get exception when getting unkown param",
+				gotExceptionAtGet );
 	}
 
 	private static void assertSame(
