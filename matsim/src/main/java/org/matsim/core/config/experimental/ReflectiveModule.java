@@ -60,6 +60,8 @@ public abstract class ReflectiveModule extends Module {
 	private static final Logger log =
 		Logger.getLogger(ReflectiveModule.class);
 
+	private final boolean storeUnknownParameters;
+
 	private final Map<String, Method> setters;
 	private final Map<String, Method> stringGetters;
 
@@ -67,7 +69,14 @@ public abstract class ReflectiveModule extends Module {
 	// Construction
 	// /////////////////////////////////////////////////////////////////////////
 	public ReflectiveModule(final String name) {
+		this( name , false );
+	}
+
+	public ReflectiveModule(
+			final String name,
+			final boolean storeUnknownParametersAsStrings) {
 		super(name);
+		this.storeUnknownParameters = storeUnknownParametersAsStrings;
 		setters = getSetters();
 		stringGetters = getStringGetters();
 
@@ -150,9 +159,15 @@ public abstract class ReflectiveModule extends Module {
 	public final void addParam(
 			final String param_name,
 			final String value) {
-		Method setter = setters.get( param_name );
+		final Method setter = setters.get( param_name );
 
 		if (setter == null) {
+			if ( !storeUnknownParameters ) {
+				throw new IllegalArgumentException(
+						"Module "+getName()+" of type "+getClass().getName()+
+						" doesn't accept unkown parameters. Parameter "+param_name+
+						" is not part of the valid parameters: "+setters.keySet() );
+			}
 			log.warn( "unknown parameter "+param_name+" for group "+getName()+". Here are the valid parameter names: "+setters.keySet() );
 			log.warn( "Only the string value will be remembered" );
 			super.addParam( param_name , value );
@@ -217,7 +232,7 @@ public abstract class ReflectiveModule extends Module {
 
 	@Override
 	public final String getValue(final String param_name) {
-		Method getter = stringGetters.get( param_name );
+		final Method getter = stringGetters.get( param_name );
 
 		try {
 			if (getter != null) {
@@ -232,12 +247,19 @@ public abstract class ReflectiveModule extends Module {
 
 				return value;
 			}
-
-			log.warn( "no getter found for param "+param_name+": trying parent method" );
-			return super.getValue( param_name );
 		} catch (Exception e) {
 			throw new RuntimeException( e );
 		}
+
+		if ( !storeUnknownParameters ) {
+			throw new IllegalArgumentException(
+					"Module "+getName()+" of type "+getClass().getName()+
+					" doesn't store unkown parameters. Parameter "+param_name+
+					" is not part of the valid parameters: "+stringGetters.keySet() );
+		}
+
+		log.warn( "no getter found for param "+param_name+": trying parent method" );
+		return super.getValue( param_name );
 	}
 
 	@Override
