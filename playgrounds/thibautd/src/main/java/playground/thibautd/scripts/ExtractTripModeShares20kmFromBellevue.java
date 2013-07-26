@@ -48,7 +48,6 @@ import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -104,7 +103,7 @@ public class ExtractTripModeShares20kmFromBellevue {
 		final String facilitiesFile = args.length > 3 ? args[ 3 ] : null;
 
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		if ( facilitiesFile != null ) new MatsimFacilitiesReader( (ScenarioImpl) scenario ).parse( facilitiesFile );
+		if ( facilitiesFile != null ) new MatsimFacilitiesReader( scenario ).parse( facilitiesFile );
 		if ( networkFile != null ) new MatsimNetworkReader( scenario ).parse( networkFile );
 		new MatsimPopulationReader( scenario ).parse( plansFile );
 

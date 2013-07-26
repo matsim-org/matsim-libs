@@ -38,7 +38,6 @@ import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.TripStructureUtils;
 import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.router.TripStructureUtils.Subtour;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.population.algorithms.PersonAlgorithm;
@@ -55,7 +54,7 @@ public class FixModeChainingPopulation {
 		final String facilitiesFile = args.length > 2 ? args[ 2 ] : null;
 
 		final Scenario scenario = ScenarioUtils.createScenario( ConfigUtils.createConfig() );
-		if ( facilitiesFile != null ) new MatsimFacilitiesReader( (ScenarioImpl) scenario ).parse( facilitiesFile );
+		if ( facilitiesFile != null ) new MatsimFacilitiesReader( scenario ).parse( facilitiesFile );
 		final PopulationImpl pop = (PopulationImpl) scenario.getPopulation();
 		pop.setIsStreaming( true );
 
