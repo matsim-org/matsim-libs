@@ -423,7 +423,7 @@ class ScoringFunctionConfigGroup extends ReflectiveModule {
 		return useKtiScoring;
 	}
 
-	@StringGetter( "marginalUtilityOfBeingTogether_s" )
+	@StringGetter( "marginalUtilityOfBeingTogether_h" )
 	public double getMarginalUtilityOfBeingTogether_h() {
 		return this.marginalUtilityOfBeingTogether_h;
 	}
@@ -432,7 +432,7 @@ class ScoringFunctionConfigGroup extends ReflectiveModule {
 		return this.marginalUtilityOfBeingTogether_h / 3600;
 	}
 
-	@StringSetter( "marginalUtilityOfBeingTogether_s" )
+	@StringSetter( "marginalUtilityOfBeingTogether_h" )
 	public void setMarginalUtilityOfBeingTogether_h(
 			double marginalUtilityOfBeingTogether_h) {
 		this.marginalUtilityOfBeingTogether_h = marginalUtilityOfBeingTogether_h;
