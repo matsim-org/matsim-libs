@@ -366,6 +366,84 @@ public class BeingTogetherScoringTest {
 	}
 
 	@Test
+	public void testNoOverlapIfPlanDoesNotComplete() throws Exception {
+		final Id ego = new IdImpl( "ego" );
+		final Id alter = new IdImpl( "alter" );
+		
+		final Id linkId = new IdImpl( 1 );
+		final String type1 = "type1";
+		final String type2 = "type2";
+
+		final EventsFactory fact = EventsUtils.createEventsManager().getFactory();
+
+		final BeingTogetherScoring testee =
+			new BeingTogetherScoring(
+					new AcceptAllFilter(),
+					new AcceptAllFilter(),
+					1,
+					ego,
+					Collections.singleton( alter ) );
+
+		// ego: go from 1 to 2 and do not complete
+		testee.handleEvent(
+				fact.createActivityEndEvent(
+					10,
+					ego,
+					linkId,
+					null,
+					type1) );
+		testee.handleEvent(
+				fact.createActivityStartEvent(
+					10,
+					ego,
+					linkId,
+					null,
+					type2) );
+
+		// alter: 1 to 2 back to 1.
+		testee.handleEvent(
+				fact.createActivityEndEvent(
+					20,
+					alter,
+					linkId,
+					null,
+					type1) );
+		testee.handleEvent(
+				fact.createActivityStartEvent(
+					20,
+					alter,
+					linkId,
+					null,
+					type2) );
+		testee.handleEvent(
+				fact.createActivityEndEvent(
+					30,
+					alter,
+					linkId,
+					null,
+					type2) );
+		testee.handleEvent(
+				fact.createActivityStartEvent(
+					30,
+					alter,
+					linkId,
+					null,
+					type1) );
+
+		// Two behaviors would be valid:
+		// - no overlap (consider undefined)
+		// - overlap for type 2 (consider ego performs 2 until the end of times)
+		// Here, consider no overlap (this seems the safest)
+		Assert.assertEquals(
+				"unexpected overlap",
+				0,
+				testee.getScore(),
+				MatsimTestUtils.EPSILON);
+
+	}
+
+
+	@Test
 	public void testNoOverlapIfWrongAgent() throws Exception {
 		final Id ego = new IdImpl( "ego" );
 		final Id alter = new IdImpl( "alter" );
