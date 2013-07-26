@@ -50,6 +50,8 @@ import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
 import playground.ivt.kticompatibility.KtiPtRoutingModule;
 import playground.ivt.kticompatibility.KtiPtRoutingModule.KtiPtRoutingModuleInfo;
 import playground.thibautd.scoring.BeingTogetherScoring;
+import playground.thibautd.scoring.BeingTogetherScoring.LinearOverlapScorer;
+import playground.thibautd.scoring.BeingTogetherScoring.PersonOverlapScorer;
 import playground.thibautd.scoring.FireMoneyEventsForUtilityOfBeingTogether;
 import playground.thibautd.scoring.KtiScoringFunctionFactoryWithJointModes;
 import playground.thibautd.socnetsim.cliques.config.CliquesConfigGroup;
@@ -81,6 +83,7 @@ import playground.thibautd.socnetsim.sharedvehicles.SharedVehicleUtils;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleBasedIncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
 import playground.thibautd.socnetsim.utils.JointScenarioUtils;
+import playground.thibautd.utils.GenericFactory;
 
 /**
  * @author thibautd
@@ -277,7 +280,13 @@ public class RunCliquesWithHardCodedStrategies {
 					controllerRegistry.getEvents(),
 					scoringFunctionConf.getActTypeFilterForJointScoring(),
 					scoringFunctionConf.getModeFilterForJointScoring(),
-					scoringFunctionConf.getMarginalUtilityOfBeingTogether_s(),
+					new GenericFactory<PersonOverlapScorer, Id>() {
+						@Override
+						public PersonOverlapScorer create( Id id ) {
+							return new LinearOverlapScorer(
+									scoringFunctionConf.getMarginalUtilityOfBeingTogether_s() );
+						}
+					},
 					scenario.getConfig().planCalcScore().getMarginalUtilityOfMoney(),
 					toSocialNetwork( cliques ) );
 		controllerRegistry.getEvents().addHandler( socialScorer );

@@ -44,9 +44,10 @@ import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.utils.misc.Time;
 
+import playground.thibautd.scoring.BeingTogetherScoring.PersonOverlapScorer;
 import playground.thibautd.scoring.BeingTogetherScoring.Filter;
-import playground.thibautd.scoring.BeingTogetherScoring.AcceptAllFilter;
 import playground.thibautd.socnetsim.population.SocialNetwork;
+import playground.thibautd.utils.GenericFactory;
 import playground.thibautd.utils.MapUtils;
 
 /**
@@ -57,7 +58,6 @@ public class FireMoneyEventsForUtilityOfBeingTogether implements
 		AgentDepartureEventHandler, AgentArrivalEventHandler,
 		AfterMobsimListener {
 
-	private final double marginalUtilityOfTime;
 	private final double marginalUtilityOfMoney;
 
 	private final Filter actTypeFilter;
@@ -66,32 +66,21 @@ public class FireMoneyEventsForUtilityOfBeingTogether implements
 	private final SocialNetwork socialNetwork;
 	private final Map<Id, BeingTogetherScoring> scorings = new HashMap<Id, BeingTogetherScoring>();
 
-	private final EventsManager events;
+	private final GenericFactory<PersonOverlapScorer, Id> scorerFactory;
 
-	public FireMoneyEventsForUtilityOfBeingTogether(
-			final EventsManager events,
-			final double marginalUtilityOfTime,
-			final double marginalUtilityOfMoney,
-			final SocialNetwork socialNetwork) {
-		this( events,
-				new AcceptAllFilter(),
-				new AcceptAllFilter(),
-				marginalUtilityOfTime,
-				marginalUtilityOfMoney,
-				socialNetwork );
-	}
+	private final EventsManager events;
 
 	public FireMoneyEventsForUtilityOfBeingTogether(
 			final EventsManager events,
 			final Filter actTypeFilter,
 			final Filter modeFilter,
-			final double marginalUtilityOfTime,
+			final GenericFactory<PersonOverlapScorer, Id> scorerFactory,
 			final double marginalUtilityOfMoney,
 			final SocialNetwork socialNetwork) {
 		this.actTypeFilter = actTypeFilter;
 		this.modeFilter = modeFilter;
 		this.events = events;
-		this.marginalUtilityOfTime = marginalUtilityOfTime;
+		this.scorerFactory = scorerFactory;
 		this.marginalUtilityOfMoney = marginalUtilityOfMoney;
 		this.socialNetwork = socialNetwork;
 	}
@@ -145,7 +134,7 @@ public class FireMoneyEventsForUtilityOfBeingTogether implements
 								return new BeingTogetherScoring(
 										actTypeFilter,
 										modeFilter,
-										marginalUtilityOfTime,
+										scorerFactory.create( finalId ),
 										finalId,
 										socialNetwork.getAlters( finalId ) );
 							}
@@ -173,6 +162,5 @@ public class FireMoneyEventsForUtilityOfBeingTogether implements
 						scoring.getScore() / marginalUtilityOfMoney ) );
 		}
 	}
-
 }
 

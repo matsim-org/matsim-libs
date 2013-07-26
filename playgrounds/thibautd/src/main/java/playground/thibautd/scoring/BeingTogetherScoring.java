@@ -109,6 +109,22 @@ public class BeingTogetherScoring {
 	}
 
 	public BeingTogetherScoring(
+			final Filter actTypeFilter,
+			final Filter modeFilter,
+			final PersonOverlapScorer scorer,
+			final Id ego,
+			final Collection<Id> alters) {
+		this( Double.NEGATIVE_INFINITY,
+				Double.POSITIVE_INFINITY,
+				actTypeFilter,
+				modeFilter,
+				scorer,
+				ego,
+				alters );
+	}
+
+
+	public BeingTogetherScoring(
 			final double startActiveWindow,
 			final double endActiveWindow,
 			final Filter actTypeFilter,
