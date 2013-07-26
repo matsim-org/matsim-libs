@@ -16,12 +16,12 @@ import org.matsim.core.population.LegImpl;
 public class RemoveNetworkInformationFromPlan {
 	public static void main(String[] args) {
 		
-		String inputPlansFile="C:/eTmp/census2000v2_8kmCut_10pct_no_network_info.xml.gz";
+		String inputPlansFile= "C:/data/parkingSearch/zurich/input/10pct_dil_1km_plans_ktiClean.xml.gz";
 		String inputNetworkFile="P:/Projekte/matsim/data/switzerland/networks/teleatlas-ivtcheu/network.xml.gz";
 		String inputFacilities="P:/Projekte/matsim/data/switzerland/facilities/facilities.xml.gz";
 		
 		
-		String outputPlansFile="H:/data/experiments/TRBAug2012/input/census2000v2_ZhCut8km_10pct_no_network_info.xml.gz";		
+		String outputPlansFile="C:/data/parkingSearch/zurich/input/10pct_dil_1km_plans_ktiClean_noNetworkInfo.xml.gz";		
 		
 		Scenario scenario= GeneralLib.readScenario(inputPlansFile, inputNetworkFile,inputFacilities);
 		

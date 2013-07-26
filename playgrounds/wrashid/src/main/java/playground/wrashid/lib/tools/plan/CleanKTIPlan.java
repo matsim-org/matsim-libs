@@ -17,11 +17,11 @@ public class CleanKTIPlan {
 
 	public static void main(String[] args) {
 
-		String inputPlansFile="C:/data/parkingSearch/zurich/input/plans.xml.gz";
+		String inputPlansFile="C:/data/parkingSearch/zurich/input/10pct_plans_kti.xml.gz";
 		String inputNetworkFile="C:/data/parkingSearch/zurich/input/network.xml.gz";
 		String inputFacilities="C:/data/parkingSearch/zurich/input/facilities.xml.gz";
 
-		String outputPlansFile = "C:/data/parkingSearch/zurich/input/plans_ktiClean.xml.gz";
+		String outputPlansFile = "C:/data/parkingSearch/zurich/input/10pct_plans_ktiClean.xml.gz";
 
 		Scenario scenario = GeneralLib.readScenario(inputPlansFile, inputNetworkFile, inputFacilities);
 

@@ -29,7 +29,7 @@ import playground.wrashid.lib.obj.IntegerValueHashMap;
 public class PrintStatisticsAboutFacilities {
 
 	public static void main(String[] args) {
-		String facilitiesPath = "P:/Projekte/matsim/data/switzerland/facilities/facilities.zrhCutC.xml.gz";
+		String facilitiesPath = "C:/data/parkingSearch/zurich/input/facilities.xml.gz";
 		ActivityFacilities facilities = GeneralLib.readActivityFacilities(facilitiesPath);
 
 		IntegerValueHashMap<String> actTypes=new IntegerValueHashMap<String>();

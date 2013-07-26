@@ -25,13 +25,14 @@ public class PlanExpander {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		String inputNetworkFile = "C:/data/workspace3/matsim/src/test/resources/test/scenarios/berlin/network.xml.gz";
-		String inputPlansFile = "C:/data/workspace3/matsim/src/test/resources/test/scenarios/berlin/plans_hwh_1pct.xml.gz";
-		int populationExpansionFactor = 100;
+		String inputPlansFile = "H:/data/cvs/ivt/studies/switzerland/plans/teleatlas-ivtcheu/census2000v2_dilZh30km_10pct/plans.xml.gz";
+		String inputNetworkFile = "H:/data/cvs/ivt/studies/switzerland/networks/teleatlas-ivtcheu/network.xml.gz";
+		String inputFacilitiesFile = "H:/data/cvs/ivt/studies/switzerland/facilities/facilities.xml.gz";
+		int populationExpansionFactor = 3;
 
-		String outputPlansFile = "C:/tmp/plans_hwh_100pct.xml.gz";
+		String outputPlansFile = "H:/data/experiments/msimoni/26July2013/plans_zurich_30pct.xml.gz";
 		Scenario scenario = GeneralLib.readScenario(inputPlansFile,
-				inputNetworkFile);
+				inputNetworkFile,inputFacilitiesFile);
 
 		Population population = scenario.getPopulation();
 

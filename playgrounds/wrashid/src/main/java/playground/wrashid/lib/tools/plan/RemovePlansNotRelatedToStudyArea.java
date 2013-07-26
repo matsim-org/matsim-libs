@@ -20,7 +20,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 public class RemovePlansNotRelatedToStudyArea {
 
 	public static void main(final String[] args) {
-		String inputPlansFile = "C:/data/parkingSearch/zurich/input/10pct_plans_ktiClean.xml";
+		String inputPlansFile = "C:/data/parkingSearch/zurich/input/1pml_plans_ktiClean.xml.gz";
 		String inputNetworkFile = "C:/data/parkingSearch/zurich/input/network.xml.gz";
 		String inputFacilities = "C:/data/parkingSearch/zurich/input/facilities.xml.gz";
 
@@ -28,7 +28,7 @@ public class RemovePlansNotRelatedToStudyArea {
 		double radiusInMeters = 1000;
 		boolean cut = false;
 
-		String outputPlansFile = "C:/data/parkingSearch/zurich/input/10pct_dil_1km_plans_ktiClean.xml";
+		String outputPlansFile = "C:/data/parkingSearch/zurich/input/1pml_dil_1km_plans_ktiClean.xml.gz";
 
 		Scenario scenario = GeneralLib.readScenario(inputPlansFile,
 				inputNetworkFile, inputFacilities);
