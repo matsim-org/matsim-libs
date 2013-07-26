@@ -99,6 +99,58 @@ public class MapUtils {
 		return coll;
 	}
 
+	public static <K> Double getDouble(
+			final K key,
+			final Map<K, Double> map,
+			final double initialValue) {
+		Double d = map.get( key );
+
+		if ( d == null ) {
+			d = initialValue;
+			map.put( key , d );
+		}
+
+		return d;
+	}
+
+	public static <K> double addToDouble(
+			final K key,
+			final Map<K, Double> map,
+			final double initialValue,
+			final double toAdd) {
+		final double newValue =
+			getDouble( key , map , initialValue ) +
+			toAdd;
+		map.put( key , newValue );
+		return newValue;
+	}
+
+	public static <K> Integer getInteger(
+			final K key,
+			final Map<K, Integer> map,
+			final int initialValue) {
+		Integer i = map.get( key );
+
+		if ( i == null ) {
+			i = initialValue;
+			map.put( key , i );
+		}
+
+		return i;
+	}
+
+	public static <K> double addToInteger(
+			final K key,
+			final Map<K, Integer> map,
+			final int initialValue,
+			final int toAdd) {
+		final int newValue =
+			getInteger( key , map , initialValue ) +
+			toAdd;
+		map.put( key , newValue );
+		return newValue;
+	}
+
 	public static interface Factory<T> {
 		public T create();
 	}
