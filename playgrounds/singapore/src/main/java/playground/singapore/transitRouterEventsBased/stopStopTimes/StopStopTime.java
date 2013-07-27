@@ -1,4 +1,4 @@
-package playground.singapore.transitRouterEventsBased;
+package playground.singapore.transitRouterEventsBased.stopStopTimes;
 
 import org.matsim.api.core.v01.Id;
 

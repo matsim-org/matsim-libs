@@ -18,20 +18,46 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.singapore.transitRouterEventsBased;
+package playground.singapore.transitRouterEventsBased.waitTimes;
 
 /**
- * Structure for saving waiting times
+ * Array implementation of the structure for saving wait times
  * 
  * @author sergioo
  */
 
-public interface WaitTimeData {
+public class WaitTimeDataArray implements WaitTimeData {
+
+	//Attributes
+	private double[] waitTimes;
+	private int[] numTimes;
+
+	//Constructors
+	public WaitTimeDataArray(int numSlots) {
+		waitTimes = new double[numSlots];
+		numTimes = new int[numSlots];
+		resetWaitTimes();
+	}
 
 	//Methods
-	void resetWaitTimes();
-	void addWaitTime(final int timeSlot, final double waitTime);
-	double getWaitTime(final int timeSlot);
-	int getNumData(final int timeSlot);
+	@Override
+	public void resetWaitTimes() {
+		for(int i=0; i<waitTimes.length; i++) {
+			waitTimes[i] = 0;
+			numTimes[i] = 0;
+		}
+	}
+	@Override
+	public synchronized void addWaitTime(int timeSlot, double waitTime) {
+		waitTimes[timeSlot] = (waitTimes[timeSlot]*numTimes[timeSlot]+waitTime)/++numTimes[timeSlot];
+	}
+	@Override
+	public double getWaitTime(int timeSlot) {
+		return waitTimes[timeSlot<waitTimes.length?timeSlot:(waitTimes.length-1)];
+	}
+	@Override
+	public int getNumData(int timeSlot) {
+		return numTimes[timeSlot<waitTimes.length?timeSlot:(waitTimes.length-1)];
+	}
 
 }

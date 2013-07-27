@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * WaitTimeCalculator.java
+ * WaitTime.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,  *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,46 +18,19 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.singapore.transitRouterEventsBased;
+package playground.singapore.transitRouterEventsBased.waitTimes;
+
+import org.matsim.api.core.v01.Id;
 
 /**
- * Array implementation of the structure for saving wait times
+ * Gives an average of the wait time of people for a line, route, stop and in a time of the day 
  * 
  * @author sergioo
  */
 
-public class WaitTimeDataArray implements WaitTimeData {
-
-	//Attributes
-	private double[] waitTimes;
-	private int[] numTimes;
-
-	//Constructors
-	public WaitTimeDataArray(int numSlots) {
-		waitTimes = new double[numSlots];
-		numTimes = new int[numSlots];
-		resetWaitTimes();
-	}
+public interface WaitTime {
 
 	//Methods
-	@Override
-	public void resetWaitTimes() {
-		for(int i=0; i<waitTimes.length; i++) {
-			waitTimes[i] = 0;
-			numTimes[i] = 0;
-		}
-	}
-	@Override
-	public synchronized void addWaitTime(int timeSlot, double waitTime) {
-		waitTimes[timeSlot] = (waitTimes[timeSlot]*numTimes[timeSlot]+waitTime)/++numTimes[timeSlot];
-	}
-	@Override
-	public double getWaitTime(int timeSlot) {
-		return waitTimes[timeSlot<waitTimes.length?timeSlot:(waitTimes.length-1)];
-	}
-	@Override
-	public int getNumData(int timeSlot) {
-		return numTimes[timeSlot<waitTimes.length?timeSlot:(waitTimes.length-1)];
-	}
+	public double getRouteStopWaitTime(Id line, Id route, Id stopId, double time);
 
 }

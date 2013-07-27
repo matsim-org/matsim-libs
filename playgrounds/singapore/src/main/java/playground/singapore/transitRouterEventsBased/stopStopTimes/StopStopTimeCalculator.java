@@ -1,4 +1,4 @@
-package playground.singapore.transitRouterEventsBased;
+package playground.singapore.transitRouterEventsBased.stopStopTimes;
 
 import java.util.HashMap;
 import java.util.HashSet;

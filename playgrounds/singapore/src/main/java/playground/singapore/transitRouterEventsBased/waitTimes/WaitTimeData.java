@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * WaitTime.java
+ * WaitTimeCalculator.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,  *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,19 +18,20 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.singapore.transitRouterEventsBased;
-
-import org.matsim.api.core.v01.Id;
+package playground.singapore.transitRouterEventsBased.waitTimes;
 
 /**
- * Gives an average of the wait time of people for a line, route, stop and in a time of the day 
+ * Structure for saving waiting times
  * 
  * @author sergioo
  */
 
-public interface WaitTime {
+public interface WaitTimeData {
 
 	//Methods
-	public double getRouteStopWaitTime(Id line, Id route, Id stopId, double time);
+	void resetWaitTimes();
+	void addWaitTime(final int timeSlot, final double waitTime);
+	double getWaitTime(final int timeSlot);
+	int getNumData(final int timeSlot);
 
 }

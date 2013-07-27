@@ -19,13 +19,15 @@
 
 package playground.singapore.transitRouterEventsBased;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.controler.Controler;
 import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
 
+import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTime;
+import playground.singapore.transitRouterEventsBased.vehicleOccupancy.VehicleOccupancy;
 import playground.singapore.transitRouterEventsBased.waitTimes.WaitTime;
 
 /**
@@ -33,26 +35,30 @@ import playground.singapore.transitRouterEventsBased.waitTimes.WaitTime;
  * 
  * @author sergioo
  */
-public class TransitRouterWWImplFactory implements TransitRouterFactory {
+public class TransitRouterWSVImplFactory implements TransitRouterFactory {
 
 	private final TransitRouterConfig config;
 	private final TransitRouterNetworkWW routerNetwork;
 	private final Network network;
-	private Controler controler;
+	private final Scenario scenario;
 	private final WaitTime waitTime;
+	private final StopStopTime stopStopTime;
+	private final VehicleOccupancy vehicleOccupancy;
 	
-	public TransitRouterWWImplFactory(final Controler controler, final WaitTime waitTime) {
-		this.config = new TransitRouterConfig(controler.getScenario().getConfig().planCalcScore(),
-				controler.getScenario().getConfig().plansCalcRoute(), controler.getScenario().getConfig().transitRouter(),
-				controler.getScenario().getConfig().vspExperimental());
-		this.network = controler.getNetwork();
-		this.controler = controler;
+	public TransitRouterWSVImplFactory(final Scenario scenario, final WaitTime waitTime, final StopStopTime stopStopTime, final VehicleOccupancy vehicleOccupancy) {
+		this.config = new TransitRouterConfig(scenario.getConfig().planCalcScore(),
+				scenario.getConfig().plansCalcRoute(), scenario.getConfig().transitRouter(),
+				scenario.getConfig().vspExperimental());
+		this.network = scenario.getNetwork();
+		routerNetwork = TransitRouterNetworkWW.createFromSchedule(network, scenario.getTransitSchedule(), this.config.beelineWalkConnectionDistance);
+		this.scenario = scenario;
 		this.waitTime = waitTime;
-		routerNetwork = TransitRouterNetworkWW.createFromSchedule(network, controler.getScenario().getTransitSchedule(), this.config.beelineWalkConnectionDistance);
+		this.stopStopTime = stopStopTime;
+		this.vehicleOccupancy = vehicleOccupancy;
 	}
 	@Override
 	public TransitRouter createTransitRouter() {
-		return new TransitRouterVariableImpl(config, new TransitRouterNetworkTravelTimeAndDisutilityWW(config, network, routerNetwork, controler.getLinkTravelTimes(), waitTime, controler.getConfig().travelTimeCalculator(), controler.getConfig().getQSimConfigGroup(), new PreparedTransitSchedule(controler.getScenario().getTransitSchedule())), routerNetwork, network);
+		return new TransitRouterVariableImpl(config, new TransitRouterNetworkTravelTimeAndDisutilityWSV(config, network, routerNetwork, waitTime, stopStopTime, vehicleOccupancy, scenario.getConfig().travelTimeCalculator(), scenario.getConfig().getQSimConfigGroup(), new PreparedTransitSchedule(scenario.getTransitSchedule())), routerNetwork, network);
 	}
 
 }

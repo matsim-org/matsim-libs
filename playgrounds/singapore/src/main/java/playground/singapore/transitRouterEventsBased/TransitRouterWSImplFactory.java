@@ -26,6 +26,9 @@ import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
 
+import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTime;
+import playground.singapore.transitRouterEventsBased.waitTimes.WaitTime;
+
 /**
  * Factory for the variable transit router
  * 
@@ -36,7 +39,9 @@ public class TransitRouterWSImplFactory implements TransitRouterFactory {
 	private final TransitRouterConfig config;
 	private final TransitRouterNetworkWW routerNetwork;
 	private final Network network;
-	private TransitRouterNetworkTravelTimeAndDisutilityWS transitRouterNetworkTravelTimeAndDisutilityWS;
+	private final Scenario scenario;
+	private final WaitTime waitTime;
+	private final StopStopTime stopStopTime;
 	
 	public TransitRouterWSImplFactory(final Scenario scenario, final WaitTime waitTime, final StopStopTime stopStopTime) {
 		this.config = new TransitRouterConfig(scenario.getConfig().planCalcScore(),
@@ -44,11 +49,13 @@ public class TransitRouterWSImplFactory implements TransitRouterFactory {
 				scenario.getConfig().vspExperimental());
 		this.network = scenario.getNetwork();
 		routerNetwork = TransitRouterNetworkWW.createFromSchedule(network, scenario.getTransitSchedule(), this.config.beelineWalkConnectionDistance);
-		transitRouterNetworkTravelTimeAndDisutilityWS = new TransitRouterNetworkTravelTimeAndDisutilityWS(config, network, routerNetwork, waitTime, stopStopTime, scenario.getConfig().travelTimeCalculator(), scenario.getConfig().getQSimConfigGroup(), new PreparedTransitSchedule(scenario.getTransitSchedule()));
+		this.scenario = scenario;
+		this.waitTime = waitTime;
+		this.stopStopTime = stopStopTime;
 	}
 	@Override
 	public TransitRouter createTransitRouter() {
-		return new TransitRouterVariableImpl(config, transitRouterNetworkTravelTimeAndDisutilityWS, routerNetwork, network);
+		return new TransitRouterVariableImpl(config, new TransitRouterNetworkTravelTimeAndDisutilityWS(config, network, routerNetwork, waitTime, stopStopTime, scenario.getConfig().travelTimeCalculator(), scenario.getConfig().getQSimConfigGroup(), new PreparedTransitSchedule(scenario.getTransitSchedule())), routerNetwork, network);
 	}
 
 }

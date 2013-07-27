@@ -1,4 +1,4 @@
-package playground.singapore.transitRouterEventsBased;
+package playground.singapore.transitRouterEventsBased.stopStopTimes;
 
 public class StopStopTimeDataArray implements StopStopTimeData {
 

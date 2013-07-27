@@ -18,22 +18,25 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.singapore.transitRouterEventsBased;
+package playground.singapore.transitRouterEventsBased.waitTimes;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
-import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
-import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
-import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
+import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -48,21 +51,25 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
  * @author sergioo
  */
 
-public class WaitTimeCalculator implements AgentDepartureEventHandler, PersonEntersVehicleEventHandler, TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler {
+public class WaitTimeStuckCalculator implements AgentDepartureEventHandler, PersonEntersVehicleEventHandler, AgentStuckEventHandler {
+	
+	//Constants
+	private final static String SEPARATOR = "===";
 
 	//Attributes
 	private final double timeSlot;
 	private final Map<Tuple<Id, Id>, Map<Id, WaitTimeData>> waitTimes = new HashMap<Tuple<Id, Id>, Map<Id, WaitTimeData>>(1000);
 	private final Map<Tuple<Id, Id>, Map<Id, double[]>> scheduledWaitTimes = new HashMap<Tuple<Id, Id>, Map<Id, double[]>>(1000);
 	private final Map<Id, Double> agentsWaitingData = new HashMap<Id, Double>();
-	private Map<Id, Tuple<Id, Id>> linesRoutesOfVehicle = new HashMap<Id, Tuple<Id, Id>>();
-	private Map<Id, Id> stopOfVehicle = new HashMap<Id, Id>();
-	
+	private final Map<Id, Integer> agentsCurrentLeg = new HashMap<Id, Integer>();
+	private final Population population;
+
 	//Constructors
-	public WaitTimeCalculator(final TransitSchedule transitSchedule, final Config config) {
-		this(transitSchedule, config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config.getQSimConfigGroup().getEndTime()-config.getQSimConfigGroup().getStartTime()));
+	public WaitTimeStuckCalculator(final Population population, final TransitSchedule transitSchedule, final Config config) {
+		this(population, transitSchedule, config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config.getQSimConfigGroup().getEndTime()-config.getQSimConfigGroup().getStartTime()));
 	}
-	public WaitTimeCalculator(final TransitSchedule transitSchedule, final int timeSlot, final int totalTime) {
+	public WaitTimeStuckCalculator(final Population population, final TransitSchedule transitSchedule, final int timeSlot, final int totalTime) {
+		this.population = population;
 		this.timeSlot = timeSlot;
 		for(TransitLine line:transitSchedule.getTransitLines().values())
 			for(TransitRoute route:line.getRoutes().values()) {
@@ -103,10 +110,12 @@ public class WaitTimeCalculator implements AgentDepartureEventHandler, PersonEnt
 	//Methods
 	public WaitTime getWaitTimes() {
 		return new WaitTime() {
+			
 			@Override
 			public double getRouteStopWaitTime(Id lineId, Id routeId, Id stopId, double time) {
-				return WaitTimeCalculator.this.getRouteStopWaitTime(lineId, routeId, stopId, time);
+				return WaitTimeStuckCalculator.this.getRouteStopWaitTime(lineId, routeId, stopId, time);
 			}
+		
 		};
 	}
 	private double getRouteStopWaitTime(Id lineId, Id routeId, Id stopId, double time) {
@@ -125,11 +134,16 @@ public class WaitTimeCalculator implements AgentDepartureEventHandler, PersonEnt
 			for(WaitTimeData waitTimeData:routeData.values())
 				waitTimeData.resetWaitTimes();
 		agentsWaitingData.clear();
-		linesRoutesOfVehicle.clear();
-		stopOfVehicle.clear();
+		agentsCurrentLeg.clear();
 	}
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
+		Integer currentLeg = agentsCurrentLeg.get(event.getPersonId());
+		if(currentLeg == null)
+			currentLeg = 0;
+		else
+			currentLeg++;
+		agentsCurrentLeg.put(event.getPersonId(), currentLeg);
 		if(event.getLegMode().equals("pt") && agentsWaitingData.get(event.getPersonId())==null)
 			agentsWaitingData.put(event.getPersonId(), event.getTime());
 		else if(agentsWaitingData.get(event.getPersonId())!=null)
@@ -139,22 +153,43 @@ public class WaitTimeCalculator implements AgentDepartureEventHandler, PersonEnt
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		Double startWaitingTime = agentsWaitingData.get(event.getPersonId());
 		if(startWaitingTime!=null) {
-			Tuple<Id, Id> lineRoute = linesRoutesOfVehicle.get(event.getVehicleId());
-			WaitTimeData data = waitTimes.get(lineRoute).get(stopOfVehicle.get(event.getVehicleId()));
-			data.addWaitTime((int) (startWaitingTime/timeSlot), event.getTime()-startWaitingTime);
-			agentsWaitingData.remove(event.getPersonId());
+			int legs = 0, currentLeg = agentsCurrentLeg.get(event.getPersonId());
+			PLAN_ELEMENTS:
+			for(PlanElement planElement:population.getPersons().get(event.getPersonId()).getSelectedPlan().getPlanElements())
+				if(planElement instanceof Leg) {
+					if(currentLeg==legs) {
+						String[] leg = ((GenericRoute)((Leg)planElement).getRoute()).getRouteDescription().split(SEPARATOR);
+						WaitTimeData data = waitTimes.get(new Tuple<Id, Id>(new IdImpl(leg[2]), new IdImpl(leg[3]))).get(new IdImpl(leg[1]));
+						data.addWaitTime((int) (startWaitingTime/timeSlot), event.getTime()-startWaitingTime);
+						agentsWaitingData.remove(event.getPersonId());
+						break PLAN_ELEMENTS;
+					}
+					else
+						legs++;
+				}
 		}
 	}
-
+	
 	@Override
-	public void handleEvent(VehicleArrivesAtFacilityEvent event) {
-		if(linesRoutesOfVehicle.get(event.getVehicleId())!=null)
-			stopOfVehicle.put(event.getVehicleId(), event.getFacilityId());
-	}
-
-	@Override
-	public void handleEvent(TransitDriverStartsEvent event) {
-		linesRoutesOfVehicle.put(event.getVehicleId(), new Tuple<Id, Id>(event.getTransitLineId(), event.getTransitRouteId()));
+	public void handleEvent(AgentStuckEvent event) {
+		Double startWaitingTime = agentsWaitingData.get(event.getPersonId());
+		if(startWaitingTime!=null) {
+			int legs = 0, currentLeg = agentsCurrentLeg.get(event.getPersonId());
+			PLAN_ELEMENTS:
+			for(PlanElement planElement:population.getPersons().get(event.getPersonId()).getSelectedPlan().getPlanElements())
+				if(planElement instanceof Leg) {
+					if(currentLeg==legs) {
+						String[] leg = ((GenericRoute)((Leg)planElement).getRoute()).getRouteDescription().split(SEPARATOR);
+						WaitTimeData data = waitTimes.get(new Tuple<Id, Id>(new IdImpl(leg[2]), new IdImpl(leg[3]))).get(new IdImpl(leg[1]));
+						if(data!=null)
+							data.addWaitTime((int) (startWaitingTime/timeSlot), event.getTime()-startWaitingTime);
+						agentsWaitingData.remove(event.getPersonId());
+						break PLAN_ELEMENTS;
+					}
+					else
+						legs++;
+				}
+		}
 	}
 
 }
