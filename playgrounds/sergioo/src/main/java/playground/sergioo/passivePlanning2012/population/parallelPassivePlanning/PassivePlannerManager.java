@@ -41,7 +41,7 @@ public class PassivePlannerManager extends Thread implements BeforeMobsimListene
 		}
 		
 		//Attributes
-		private final List<PlanningInfo> planners = new LinkedList<PlanningInfo>();
+		private final List<PlanningInfo> plannersInfo = new LinkedList<PlanningInfo>();
 		private Counter counter;
 		private boolean mobSimEnds = false;
 		private final TripRouter tripRouter;
@@ -52,10 +52,11 @@ public class PassivePlannerManager extends Thread implements BeforeMobsimListene
 			this.tripRouter = tripRouter;
 		}
 		public int getNumPlanners() {
-			return planners.size();
+			return plannersInfo.size();
 		}
 		public void addPlanner(SinglePlannerAgent planner, Id startFacilityId, Id endFacilityId) {
-			planners.add(new PlanningInfo(planner, startFacilityId, endFacilityId));
+			planner.setRouter(tripRouter);
+			plannersInfo.add(new PlanningInfo(planner, startFacilityId, endFacilityId));
 			counter.incCounter();
 		}
 		//Methods
@@ -66,15 +67,15 @@ public class PassivePlannerManager extends Thread implements BeforeMobsimListene
 		public void run() {
 			AtomicInteger i=new AtomicInteger();
 			while(true) {
-				if(!planners.isEmpty()) {
-					if(i.get()==planners.size())
+				if(!plannersInfo.isEmpty()) {
+					if(i.get()==plannersInfo.size())
 						i.set(0);
-					PlanningInfo plannerInfo = planners.get(i.getAndIncrement());
+					PlanningInfo plannerInfo = plannersInfo.get(i.getAndIncrement());
 					double endTime = ((Activity)plannerInfo.planner.getPlan().getPlanElements().get(plannerInfo.planner.getPlanElementIndex()-1)).getEndTime();
 					endTime += ((Leg)plannerInfo.planner.getPlan().getPlanElements().get(plannerInfo.planner.getPlanElementIndex())).getTravelTime();
 					double nowCopy=now;
-					if(nowCopy>endTime || plannerInfo.planner.planLegActivityLeg(nowCopy, plannerInfo.startFacilityId, endTime, plannerInfo.endFacilityId, tripRouter)) {
-						planners.remove(plannerInfo);
+					if(nowCopy>endTime || plannerInfo.planner.planLegActivityLeg(nowCopy, plannerInfo.startFacilityId, endTime, plannerInfo.endFacilityId)) {
+						plannersInfo.remove(plannerInfo);
 						i.decrementAndGet();
 						counter.decCounter();
 					}

@@ -302,8 +302,7 @@ public class MainWorkplaceCapacities {
 		/*Map<Integer, Double> tts = new HashMap<Integer, Double>();
 		for(int i=0; i<travelTimes.size(); i++)
 			if(travelTimes.get(i).get(8134)<36000)
-				tts.put(i, travelTimes.get(i).get(8134));
-		System.out.println();*/
+				tts.put(i, travelTimes.get(i).get(8134));*/
 		new WeigthsNetworkWindow("Weights", new NetworkPainter(network), weightsMap, dataMPAreas, stopsBase).setVisible(true);
 		System.out.println("Travel times done!");
 		/*Matrix2DImpl weights = new Matrix2DImpl(new int[]{dataMPAreas.size(),stopsBase.size()});

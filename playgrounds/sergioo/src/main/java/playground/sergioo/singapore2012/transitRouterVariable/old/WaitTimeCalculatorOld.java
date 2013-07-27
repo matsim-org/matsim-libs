@@ -42,8 +42,8 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
-import playground.sergioo.singapore2012.transitRouterVariable.WaitTimeData;
-import playground.sergioo.singapore2012.transitRouterVariable.WaitTimeDataArray;
+import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.WaitTimeData;
+import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.WaitTimeDataArray;
 
 /**
  * Save waiting times of agents while mobsim is running

@@ -25,6 +25,7 @@ public abstract class SinglePlannerAgentImpl implements SinglePlannerAgent {
 	protected AtomicInteger currentElementIndex = new AtomicInteger();
 	protected final Plan plan;
 	private PassivePlannerDriverAgent agent;
+	protected TripRouter tripRouter;
 	
 	//Constructors
 	public SinglePlannerAgentImpl(DecisionMaker[] decisionMakers, Plan plan, PassivePlannerDriverAgent agent) {
@@ -47,9 +48,13 @@ public abstract class SinglePlannerAgentImpl implements SinglePlannerAgent {
 		currentElementIndex.set(index);
 	}
 	@Override
-	public boolean planLegActivityLeg(double startTime, Id startFacilityId, double endTime, Id endFacilityId, TripRouter tripRouter) {
+	public void setRouter(TripRouter tripRouter) {
+		this.tripRouter = tripRouter;
+	}
+	@Override
+	public boolean planLegActivityLeg(double startTime, Id startFacilityId, double endTime, Id endFacilityId) {
 		((BasePersonImpl)plan.getPerson()).startPlanning();
-		List<? extends PlanElement> legActLeg = getLegActivityLeg(startTime, startFacilityId, endTime, endFacilityId, tripRouter);
+		List<? extends PlanElement> legActLeg = getLegActivityLeg(startTime, startFacilityId, endTime, endFacilityId);
 		if(legActLeg == null || legActLeg.size()==0)
 			return false;
 		else {
@@ -95,7 +100,7 @@ public abstract class SinglePlannerAgentImpl implements SinglePlannerAgent {
 			return !emptySpace;
 		}
 	}
-	protected abstract List<? extends PlanElement> getLegActivityLeg(double startTime, Id startFacilityId, double endTime, Id endFacilityId, TripRouter tripRouter);
+	protected abstract List<? extends PlanElement> getLegActivityLeg(double startTime, Id startFacilityId, double endTime, Id endFacilityId);
 	@Override
 	public void advanceToNextActivity(double now) {
 		agent.advanceToNextActivity(now);

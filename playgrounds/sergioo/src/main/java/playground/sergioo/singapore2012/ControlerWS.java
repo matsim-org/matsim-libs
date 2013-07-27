@@ -20,19 +20,22 @@
 
 package playground.sergioo.singapore2012;
 
-import java.util.HashSet;
+//import java.util.HashSet;
 
-import org.matsim.api.core.v01.Id;
+//import org.matsim.api.core.v01.Id;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
 
 //import playground.artemc.calibration.CalibrationStatsListener;
-import playground.sergioo.singapore2012.transitRouterVariable.StopStopTimeCalculator;
+
+
+
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterWSImplFactory;
-import playground.sergioo.singapore2012.transitRouterVariable.WaitTimeStuckCalculator;
+import playground.sergioo.singapore2012.transitRouterVariable.stopStopTimes.StopStopTimeCalculator;
+import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.WaitTimeStuckCalculator;
 
 
 /**
@@ -44,15 +47,16 @@ import playground.sergioo.singapore2012.transitRouterVariable.WaitTimeStuckCalcu
 public class ControlerWS {
 
 	public static void main(String[] args) {
-		Controler controler = new Controler(ScenarioUtils.loadScenario(ConfigUtils.loadConfig(args[0])));
+		Config config = ConfigUtils.createConfig();
+		ConfigUtils.loadConfig(config, args[0]);
+		Controler controler = new Controler(ScenarioUtils.loadScenario(config));
 		controler.setOverwriteFiles(true);
 		//controler.addControlerListener(new CalibrationStatsListener(controler.getEvents(), new String[]{args[1], args[2]}, 1, "Travel Survey (Benchmark)", "Red_Scheme", new HashSet<Id>()));
 		WaitTimeStuckCalculator waitTimeCalculator = new WaitTimeStuckCalculator(controler.getPopulation(), controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().getQSimConfigGroup().getEndTime()-controler.getConfig().getQSimConfigGroup().getStartTime()));
 		controler.getEvents().addHandler(waitTimeCalculator);
-		StopStopTimeCalculator stopStopTimeCalculator = new StopStopTimeCalculator(controler.getScenario().getTransitSchedule(), ((ScenarioImpl)controler.getScenario()).getVehicles(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().getQSimConfigGroup().getEndTime()-controler.getConfig().getQSimConfigGroup().getStartTime()));
+		StopStopTimeCalculator stopStopTimeCalculator = new StopStopTimeCalculator(controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().getQSimConfigGroup().getEndTime()-controler.getConfig().getQSimConfigGroup().getStartTime()));
 		controler.getEvents().addHandler(stopStopTimeCalculator);
-		TransitRouterWSImplFactory factory = new TransitRouterWSImplFactory(controler.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes());
-		controler.setTransitRouterFactory(factory);
+		controler.setTransitRouterFactory(new TransitRouterWSImplFactory(controler.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
 		controler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getScenario()));
 		controler.run();
 	}

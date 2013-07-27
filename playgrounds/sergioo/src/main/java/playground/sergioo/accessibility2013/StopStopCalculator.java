@@ -34,7 +34,7 @@ import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetwo
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkWW;
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkWW.TransitRouterNetworkNode;
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkWW.TransitRouterNetworkLink;
-import playground.sergioo.singapore2012.transitRouterVariable.WaitTimeStuckCalculator;
+import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.WaitTimeStuckCalculator;
 
 public class StopStopCalculator extends Thread{
 

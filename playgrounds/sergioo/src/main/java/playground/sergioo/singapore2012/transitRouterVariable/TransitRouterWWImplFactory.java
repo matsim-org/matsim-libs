@@ -21,24 +21,23 @@ package playground.sergioo.singapore2012.transitRouterVariable;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
+
+import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.WaitTime;
 
 /**
  * Factory for the variable transit router
  * 
  * @author sergioo
  */
-public class TransitRouterWWImplFactory implements TransitRouterFactory, AfterMobsimListener {
+public class TransitRouterWWImplFactory implements TransitRouterFactory {
 
 	private final TransitRouterConfig config;
 	private final TransitRouterNetworkWW routerNetwork;
 	private final Network network;
-	private TransitRouterNetworkTravelTimeAndDisutilityWW transitRouterNetworkTravelTimeAndDisutilityWW;
 	private Controler controler;
 	private final WaitTime waitTime;
 	
@@ -53,12 +52,7 @@ public class TransitRouterWWImplFactory implements TransitRouterFactory, AfterMo
 	}
 	@Override
 	public TransitRouter createTransitRouter() {
-		transitRouterNetworkTravelTimeAndDisutilityWW = new TransitRouterNetworkTravelTimeAndDisutilityWW(config, network, routerNetwork, controler.getLinkTravelTimes(), waitTime, controler.getConfig().travelTimeCalculator(), controler.getConfig().getQSimConfigGroup(), new PreparedTransitSchedule(controler.getScenario().getTransitSchedule()));
-		return new TransitRouterVariableImpl(config, transitRouterNetworkTravelTimeAndDisutilityWW, routerNetwork, network);
-	}
-	@Override
-	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		transitRouterNetworkTravelTimeAndDisutilityWW.initTravelTimes();
+		return new TransitRouterVariableImpl(config, new TransitRouterNetworkTravelTimeAndDisutilityWW(config, network, routerNetwork, controler.getLinkTravelTimes(), waitTime, controler.getConfig().travelTimeCalculator(), controler.getConfig().getQSimConfigGroup(), new PreparedTransitSchedule(controler.getScenario().getTransitSchedule())), routerNetwork, network);
 	}
 
 }

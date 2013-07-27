@@ -10,7 +10,8 @@ public interface SinglePlannerAgent {
 	public Plan getPlan();
 	public int getPlanElementIndex();
 	public void setPlanElementIndex(int index);
-	public boolean planLegActivityLeg(double startTime, Id startFacilityId, double endTime, Id endFacilityId, TripRouter tripRouter);
+	public void setRouter(TripRouter tripRouter);
+	public boolean planLegActivityLeg(double startTime, Id startFacilityId, double endTime, Id endFacilityId);
 	public void advanceToNextActivity(double now);
 
 }

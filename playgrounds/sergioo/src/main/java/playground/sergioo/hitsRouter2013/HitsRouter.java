@@ -22,7 +22,7 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkTravelTimeAndDisutilityWW;
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkWW;
-import playground.sergioo.singapore2012.transitRouterVariable.WaitTimeStuckCalculator;
+import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.WaitTimeStuckCalculator;
 
 public class HitsRouter {
 

@@ -38,7 +38,6 @@ public class RouteTree {
 		}
 		links[0].add(network.getLinks().get(new IdImpl(stops.get(stop).getLinkId())));
 		this.root = new StopRoutes(network, null, stop, numTransfers,finishedTrips,stops,activeStops,links);
-		System.out.println();
 	}
 	public Set<Link>[] getLinks() {
 		return links;

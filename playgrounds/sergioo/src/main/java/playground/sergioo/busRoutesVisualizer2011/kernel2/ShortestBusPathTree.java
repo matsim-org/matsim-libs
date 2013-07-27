@@ -67,8 +67,6 @@ public class ShortestBusPathTree {
 			links[0].add(scenario.getNetwork().getLinks().get(mainStop.getLinkId()));
 			int k=0, numAccessStops = 0, total = scenario.getTransitSchedule().getFacilities().size();
 			for(TransitStopFacility stop:scenario.getTransitSchedule().getFacilities().values()) {
-				if(stop.getId().equals(new IdImpl("16099")))
-					System.out.println();
 				List<Leg> legs = transitRouter.calcRoute(mainStop.getCoord(), stop.getCoord(), time, null);
 				if(legs==null)
 					continue;

@@ -278,8 +278,6 @@ public class WorkFacilitiesGenerator {
 				int total=0;
 				for(int t=0; t<dimensions[1]; t++)
 					total+=result.getElement(new int[]{f,t});
-				if(facility.getId().toString().equals("608784"))
-					System.out.println();
 				if(total>0) {
 					for(int o=0; o<total; o++) {
 						double random = Math.random()*totalQuantity;

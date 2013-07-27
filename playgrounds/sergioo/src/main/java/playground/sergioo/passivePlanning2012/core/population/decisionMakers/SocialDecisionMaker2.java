@@ -88,7 +88,7 @@ public class SocialDecisionMaker2 implements StartTimeDecisionMaker, EndTimeDeci
 		private String mode;
 	
 		//Methods
-		public void setMode(String mode) {
+		private void setMode(String mode) {
 			this.mode = mode;
 		}
 		@Override

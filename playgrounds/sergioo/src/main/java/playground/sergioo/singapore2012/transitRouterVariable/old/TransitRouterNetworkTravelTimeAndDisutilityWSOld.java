@@ -32,9 +32,9 @@ import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.vehicles.Vehicle;
 
-import playground.sergioo.singapore2012.transitRouterVariable.StopStopTime;
 import playground.sergioo.singapore2012.transitRouterVariable.old.TransitRouterNetworkWW.TransitRouterNetworkLink;
 import playground.sergioo.singapore2012.transitRouterVariable.old.TransitRouterNetworkWW.TransitRouterNetworkNode;
+import playground.sergioo.singapore2012.transitRouterVariable.stopStopTimes.StopStopTime;
 
 /**
  * TravelTime and TravelDisutility calculator to be used with the transit network used for transit routing.

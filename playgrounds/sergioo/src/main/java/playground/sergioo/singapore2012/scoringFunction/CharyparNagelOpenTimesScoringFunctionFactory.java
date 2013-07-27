@@ -35,16 +35,25 @@ import org.matsim.core.scoring.ScoringFunctionFactory;
  */
 public class CharyparNagelOpenTimesScoringFunctionFactory implements ScoringFunctionFactory {
 
-	private final CharyparNagelScoringParameters params;
-    private Scenario scenario;
+	private CharyparNagelScoringParameters params;
+    private final Scenario scenario;
+	private final PlanCalcScoreConfigGroup config;
 
     public CharyparNagelOpenTimesScoringFunctionFactory(final PlanCalcScoreConfigGroup config, final Scenario scenario) {
-		this.params = new CharyparNagelScoringParameters(config);
+		this.config = config;
 		this.scenario = scenario;
 	}
 
 	@Override
 	public ScoringFunction createNewScoringFunction(Plan plan) {
+		if (this.params == null) {
+			/* lazy initialization of params. not strictly thread safe, as different threads could
+			 * end up with different params-object, although all objects will have the same
+			 * values in them due to using the same config. Still much better from a memory performance
+			 * point of view than giving each ScoringFunction its own copy of the params.
+			 */
+			this.params = new CharyparNagelScoringParameters(this.config);
+		}
 		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelOpenTimesActivityScoring(plan, params, ((ScenarioImpl) scenario).getActivityFacilities()));
 		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, scenario.getNetwork()));

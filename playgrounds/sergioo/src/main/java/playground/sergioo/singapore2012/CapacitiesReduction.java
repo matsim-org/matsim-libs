@@ -118,8 +118,6 @@ public class CapacitiesReduction {
 			for(Id node:intersection)
 				for(Link link:scenario.getNetwork().getNodes().get(node).getInLinks().values())
 					if(!intersection.contains(link.getFromNode().getId()) && !noLinks.contains(link.getId())) {
-						/*if(link.getId().toString().equals("59240"))
-							System.out.println();*/
 						Id linkId = link.getId();
 						if(link.getId().toString().startsWith("fl")||link.getId().toString().startsWith("cl"))
 							linkId = new IdImpl(linkId.toString().substring(2, linkId.toString().length()));

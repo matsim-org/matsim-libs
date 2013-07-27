@@ -1,12 +1,10 @@
 package playground.sergioo.passivePlanning2012.core.population.decisionMakers;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.Collection;
 import java.util.List;
-import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
@@ -25,83 +23,27 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.households.Household;
 
 import playground.sergioo.passivePlanning2012.api.population.BasePerson;
+import playground.sergioo.passivePlanning2012.core.population.PlaceSharer;
 import playground.sergioo.passivePlanning2012.core.population.decisionMakers.types.EndTimeDecisionMaker;
 import playground.sergioo.passivePlanning2012.core.population.decisionMakers.types.ModeRouteDecisionMaker;
 import playground.sergioo.passivePlanning2012.core.population.decisionMakers.types.TypeOfActivityFacilityDecisionMaker;
 import playground.sergioo.passivePlanning2012.core.scenario.ScenarioSimplerNetwork;
 
-public class SocialDecisionMaker implements EndTimeDecisionMaker, TypeOfActivityFacilityDecisionMaker, ModeRouteDecisionMaker {
+public class SocialDecisionMaker extends PlaceSharer implements EndTimeDecisionMaker, TypeOfActivityFacilityDecisionMaker, ModeRouteDecisionMaker {
 
-	//Classes
-	private enum Period {
-	
-		EARLY_MORNING(0, 7*3600-1),
-		MORNING_PEAK(7*3600, 10*3600-1),
-		BEFORE_LUNCH(10*3600, 13*3600-1),
-		AFTER_LUNCH(13*3600, 18*3600-1),
-		EVENING_PEAK(18*3600, 21*3600-1),
-		NIGHT(21*3600, 24*3600-1);
-		
-		//Constants
-		private static final double PERIODS_TIME = 24*3600;
-		
-		//Attributes
-		private final double startTime;
-		private final double endTime;
-	
-		//Constructors
-		private Period(double startTime, double endTime) {
-			this.startTime = startTime;
-			this.endTime = endTime;
-		}
-		private static Period getPeriod(double time) {
-			for(Period period:Period.values())
-				if(period.isPeriod(time))
-					return period;
-			return null;
-		}
-		private boolean isPeriod(double time) {
-			time = time%PERIODS_TIME;
-			if(startTime<=time && time<=endTime)
-				return true;
-			return false;
-		}
-		private double getInterval() {
-			return endTime-startTime;
-		}
-	
-	}
-	private class KnownPlace {
-		
-		//Attributes
-		public Id facilityId;
-		public List<Tuple<Period, String>> timeTypes = new ArrayList<Tuple<Period, String>>();
-		
-		//Constructors
-		public KnownPlace(Id facilityId) {
-			this.facilityId = facilityId;
-		}
-		
-	}
-	
 	//Constants
 	private static final double MAXIMUM_SEARCHING_DISTANCE = 3000;
 	
 	//Attributes
 	private final ScenarioSimplerNetwork scenario;
 	private final Household household;
-	private final Set<SocialDecisionMaker> knownPeople = new HashSet<SocialDecisionMaker>();
-	private final Map<Id, KnownPlace> knownPlaces = new ConcurrentHashMap<Id, KnownPlace>();
-	private final Map<String, Map<Id, Double[]>> knownTravelTimes = new HashMap<String, Map<Id, Double[]>>();
-	private Set<String> modes;
-	private boolean carAvailability;
+	private final Set<String> modes;
+	private final boolean carAvailability;
 	
 	//Constructors
 	public SocialDecisionMaker(ScenarioSimplerNetwork scenario, boolean carAvailability, Household household, Set<String> modes) {
 		this.scenario = scenario;
 		this.household = household;
-		for(String mode:scenario.getConfig().plansCalcRoute().getNetworkModes())
-			knownTravelTimes.put(mode, new HashMap<Id, Double[]>());
 		this.carAvailability = carAvailability;
 		this.modes = modes;
 	}
@@ -109,25 +51,6 @@ public class SocialDecisionMaker implements EndTimeDecisionMaker, TypeOfActivity
 	//Methods
 	public Household getHousehold() {
 		return household;
-	}
-	public Set<SocialDecisionMaker> getKnownPeople() {
-		return knownPeople;
-	}
-	public void addKnownPerson(SocialDecisionMaker socialDecisionMaker) {
-		knownPeople.add(socialDecisionMaker);
-	}
-	public void addKnownPlace(Id facilityId, Double time, String typeOfActivity) {
-		KnownPlace knownPlace = knownPlaces.get(facilityId);
-		if(knownPlace==null) {
-			knownPlace = new KnownPlace(facilityId);
-			knownPlaces.put(facilityId, knownPlace);
-		}
-		knownPlace.timeTypes.add(new Tuple<Period, String>(Period.getPeriod(time), typeOfActivity));
-	}
-	public void setKnownTravelTime(double time, String mode, Id linkId, double travelTime) {
-		for(Period period:Period.values())
-			if(period.isPeriod(time))
-				knownTravelTimes.get(mode).get(linkId)[period.ordinal()] = travelTime;
 	}
 	public ScenarioSimplerNetwork getScenario() {
 		return scenario;
@@ -143,9 +66,10 @@ public class SocialDecisionMaker implements EndTimeDecisionMaker, TypeOfActivity
 				for(KnownPlace knownPlace:knownPlaces.values()) {
 					ActivityFacility facility = scenario.getActivityFacilities().getFacilities().get(knownPlace.facilityId);
 					if(CoordUtils.calcDistance(location, facility.getCoord())<maximumDistance)
-						for(Tuple<Period, String> types:knownPlace.timeTypes)
-							if(Period.getPeriod(time).equals(types.getFirst()))
-								options.add(new Tuple<String, Id>(types.getSecond(), knownPlace.facilityId));
+						for(Entry<Period, Collection<String>> types:knownPlace.timeTypes.entrySet())
+							if(Period.getPeriod(time).equals(types.getKey()))
+								for(String type:types.getValue())
+									options.add(new Tuple<String, Id>(type, knownPlace.facilityId));
 				}
 				maximumDistance *= 2;
 			}

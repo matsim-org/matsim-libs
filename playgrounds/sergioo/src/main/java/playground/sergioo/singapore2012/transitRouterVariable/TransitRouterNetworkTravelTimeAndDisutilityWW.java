@@ -38,6 +38,7 @@ import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.vehicles.Vehicle;
 
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkWW.TransitRouterNetworkLink;
+import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.WaitTime;
 
 /**
  * TravelTime and TravelDisutility calculator to be used with the transit network used for transit routing.
@@ -50,6 +51,7 @@ public class TransitRouterNetworkTravelTimeAndDisutilityWW extends TransitRouter
 	private final TravelTime travelTime;
 	private final WaitTime waitTime;
 	private final Map<Id, double[]> linkTravelTimes = new HashMap<Id, double[]>();
+	private final Map<Id, double[]> linkWaitingTimes = new HashMap<Id, double[]>();
 	private final double timeSlot;
 	private final int numSlots;
 	private double startTime;
@@ -75,13 +77,20 @@ public class TransitRouterNetworkTravelTimeAndDisutilityWW extends TransitRouter
 	void initTravelTimes() {
 		for(TransitRouterNetworkLink link:routerNetwork.getLinks().values())
 			if(link.route!=null) {
-				linkTravelTimes.put(link.getId(), new double[numSlots]);
+				double[] times = new double[numSlots];
 				for(int slot = 0; slot<numSlots; slot++) {
 					double linksTime = travelTime.getLinkTravelTime(network.getLinks().get(link.fromNode.stop.getStopFacility().getLinkId()), startTime+slot*timeSlot, null, null);
 					for(Id linkId:link.route.getRoute().getSubRoute(link.fromNode.stop.getStopFacility().getLinkId(), link.toNode.stop.getStopFacility().getLinkId()).getLinkIds())
 						linksTime += travelTime.getLinkTravelTime(network.getLinks().get(linkId), startTime+slot*timeSlot, null, null);
-					linkTravelTimes.get(link.getId())[slot] = linksTime;
+					times[slot] = linksTime;
 				}
+				linkTravelTimes.put(link.getId(), times);
+			}
+			else if(link.toNode.route!=null) {
+				double[] times = new double[numSlots];
+				for(int slot = 0; slot<numSlots; slot++)
+					times[slot] = waitTime.getRouteStopWaitTime(link.toNode.line.getId(), link.toNode.route.getId(), link.fromNode.stop.getStopFacility().getId(), startTime+slot*timeSlot);
+				linkWaitingTimes.put(link.getId(), times);
 			}
 	}
 	@Override
@@ -94,7 +103,7 @@ public class TransitRouterNetworkTravelTimeAndDisutilityWW extends TransitRouter
 			cachedTravelTime = linkTravelTimes.get(wrapped.getId())[time/timeSlot<numSlots?(int)(time/timeSlot):(numSlots-1)];
 		else if(wrapped.toNode.route!=null)
 			//wait link
-			cachedTravelTime = waitTime.getRouteStopWaitTime(wrapped.toNode.line, wrapped.toNode.route, wrapped.fromNode.stop.getStopFacility().getId(), time);
+			cachedTravelTime = linkWaitingTimes.get(wrapped.getId())[time/timeSlot<numSlots?(int)(time/timeSlot):(numSlots-1)];
 		else if(wrapped.fromNode.route==null)
 			//walking link
 			cachedTravelTime = wrapped.getLength()/this.config.getBeelineWalkSpeed();
@@ -114,7 +123,7 @@ public class TransitRouterNetworkTravelTimeAndDisutilityWW extends TransitRouter
 				       - link.getLength() * (this.config.getMarginalUtilityOfTravelDistancePt_utl_m()-2.7726/100000);
 		else if (wrapped.toNode.route!=null)
 			// it's a wait link
-			return -(cachedTravelDisutility?cachedTravelTime:waitTime.getRouteStopWaitTime(wrapped.toNode.line, wrapped.toNode.route, wrapped.fromNode.stop.getStopFacility().getId(), time)) * this.config.getMarginalUtilityOfWaitingPt_utl_s()
+			return -(cachedTravelDisutility?cachedTravelTime:linkWaitingTimes.get(wrapped.getId())[time/timeSlot<numSlots?(int)(time/timeSlot):(numSlots-1)]) * this.config.getMarginalUtilityOfWaitingPt_utl_s()
 					- this.config.getUtilityOfLineSwitch_utl();
 		else if(wrapped.fromNode.route==null)
 			// it's a transfer link (walk)
@@ -131,7 +140,7 @@ public class TransitRouterNetworkTravelTimeAndDisutilityWW extends TransitRouter
 				       - link.getLength() * (this.config.getMarginalUtilityOfTravelDistancePt_utl_m()-2.7726/100000);
 		else if (wrapped.toNode.route!=null)
 			// it's a wait link
-			return - waitTime.getRouteStopWaitTime(wrapped.toNode.line, wrapped.toNode.route, wrapped.fromNode.stop.getStopFacility().getId(), time) * this.config.getMarginalUtilityOfWaitingPt_utl_s()
+			return - linkWaitingTimes.get(wrapped.getId())[time/timeSlot<numSlots?(int)(time/timeSlot):(numSlots-1)] * this.config.getMarginalUtilityOfWaitingPt_utl_s()
 					- this.config.getUtilityOfLineSwitch_utl();
 		else if(wrapped.fromNode.route==null)
 			// it's a transfer link (walk)

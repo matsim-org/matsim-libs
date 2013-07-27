@@ -19,9 +19,9 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
-import playground.sergioo.singapore2012.transitRouterVariable.StopStopTime;
-import playground.sergioo.singapore2012.transitRouterVariable.StopStopTimeData;
-import playground.sergioo.singapore2012.transitRouterVariable.StopStopTimeDataArray;
+import playground.sergioo.singapore2012.transitRouterVariable.stopStopTimes.StopStopTime;
+import playground.sergioo.singapore2012.transitRouterVariable.stopStopTimes.StopStopTimeData;
+import playground.sergioo.singapore2012.transitRouterVariable.stopStopTimes.StopStopTimeDataArray;
 
 public class StopStopTimeCalculatorOld implements VehicleDepartsAtFacilityEventHandler, VehicleArrivesAtFacilityEventHandler {
 	
@@ -72,6 +72,10 @@ public class StopStopTimeCalculatorOld implements VehicleDepartsAtFacilityEventH
 			@Override
 			public double getStopStopTime(Id stopOId, Id stopDId, double time) {
 				return StopStopTimeCalculatorOld.this.getStopStopTime(stopOId, stopDId, time);
+			}
+			@Override
+			public double getStopStopTimeVariance(Id stopOId, Id stopDId, double time) {
+				return 0;
 			}
 		};
 	}

@@ -20,8 +20,8 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 import org.matsim.core.router.TripRouter;
 import org.matsim.households.PersonHouseholdMapping;
 
-import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.agents.PassivePlannerSocialAgentFactory;
-import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.agents.PassivePlannerTransitSocialAgentFactory;
+import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.agents.agenda.PassivePlannerTransitAgendaAgentFactory;
+import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.agents.social.PassivePlannerSocialAgentFactory;
 import playground.sergioo.passivePlanning2012.population.parallelPassivePlanning.PassivePlannerManager;
 
 public class PassivePlanningSocialFactory implements MobsimFactory {
@@ -67,7 +67,7 @@ public class PassivePlanningSocialFactory implements MobsimFactory {
 		PlanningEngine planningEngine = new PlanningEngine(passivePlannerManager);
 		qSim.addMobsimEngine(planningEngine);
 		qSim.addDepartureHandler(planningEngine);
-		ActivityEngine activityEngine = new ActivityEngine();
+		PassivePlanningActivityEngine activityEngine = new PassivePlanningActivityEngine();
 		qSim.addMobsimEngine(activityEngine);
 		qSim.addActivityHandler(activityEngine);
 		QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim);
@@ -77,7 +77,7 @@ public class PassivePlanningSocialFactory implements MobsimFactory {
 		qSim.addMobsimEngine(teleportationEngine);
 		AgentFactory agentFactory;
 		if(sc.getConfig().scenario().isUseTransit()) {
-			agentFactory = new PassivePlannerTransitSocialAgentFactory(qSim, passivePlannerManager, personHouseholdMapping);
+			agentFactory = new PassivePlannerTransitAgendaAgentFactory(qSim, passivePlannerManager, personHouseholdMapping);
 			TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
 			transitEngine.setUseUmlaeufe(true);
 			transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());

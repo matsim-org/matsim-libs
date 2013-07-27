@@ -20,17 +20,20 @@
 
 package playground.sergioo.singapore2012;
 
-import java.util.HashSet;
+//import java.util.HashSet;
 
-import org.matsim.api.core.v01.Id;
+//import org.matsim.api.core.v01.Id;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
 
+
+
 //import playground.artemc.calibration.CalibrationStatsListener;
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterWWImplFactory;
-import playground.sergioo.singapore2012.transitRouterVariable.WaitTimeStuckCalculator;
+import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.WaitTimeStuckCalculator;
 
 
 /**
@@ -42,14 +45,14 @@ import playground.sergioo.singapore2012.transitRouterVariable.WaitTimeStuckCalcu
 public class ControlerWW {
 
 	public static void main(String[] args) {
-		Controler controler = new Controler(ScenarioUtils.loadScenario(ConfigUtils.loadConfig(args[0])));
+		Config config = ConfigUtils.createConfig();
+		ConfigUtils.loadConfig(config, args[0]);
+		Controler controler = new Controler(ScenarioUtils.loadScenario(config));
 		controler.setOverwriteFiles(true);
 		//controler.addControlerListener(new CalibrationStatsListener(controler.getEvents(), new String[]{args[1], args[2]}, 1, "Travel Survey (Benchmark)", "Red_Scheme", new HashSet<Id>()));
 		WaitTimeStuckCalculator waitTimeCalculator = new WaitTimeStuckCalculator(controler.getPopulation(), controler.getScenario().getTransitSchedule(), controler.getConfig());
 		controler.getEvents().addHandler(waitTimeCalculator);
-		TransitRouterWWImplFactory factory = new TransitRouterWWImplFactory(controler, waitTimeCalculator.getWaitTimes());
-		controler.addControlerListener(factory);
-		controler.setTransitRouterFactory(factory);
+		controler.setTransitRouterFactory(new TransitRouterWWImplFactory(controler, waitTimeCalculator.getWaitTimes()));
 		controler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getScenario()));
 		controler.run();
 	}
