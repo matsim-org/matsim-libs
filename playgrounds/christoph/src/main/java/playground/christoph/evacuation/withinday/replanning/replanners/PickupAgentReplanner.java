@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.GenericRouteFactory;
@@ -40,8 +41,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 
-import playground.christoph.evacuation.controler.PrepareEvacuationScenario;
-import playground.christoph.evacuation.mobsim.OldPassengerDepartureHandler;
+import playground.christoph.evacuation.controler.EvacuationConstants;
 
 /**
  * 
@@ -50,8 +50,6 @@ import playground.christoph.evacuation.mobsim.OldPassengerDepartureHandler;
 public class PickupAgentReplanner extends WithinDayDuringLegReplanner {
 
 	private static final Logger log = Logger.getLogger(PickupAgentReplanner.class);
-	
-	public static final String activityType = "pickup";
 	
 	private final RouteFactory carRouteFactory;
 	private final RouteFactory rideRouteFactory;
@@ -96,11 +94,11 @@ public class PickupAgentReplanner extends WithinDayDuringLegReplanner {
 		 * Create new pickup activity.
 		 */
 		double departureTime = this.time + 60.0;
-		Activity waitForPickupActivity = scenario.getPopulation().getFactory().createActivityFromLinkId(activityType, currentLinkId);
-		waitForPickupActivity.setType(activityType);
+		Activity waitForPickupActivity = scenario.getPopulation().getFactory().createActivityFromLinkId(PassengerQNetsimEngine.PICKUP_ACTIVITY_TYPE, currentLinkId);
+		waitForPickupActivity.setType(PassengerQNetsimEngine.PICKUP_ACTIVITY_TYPE);
 		waitForPickupActivity.setStartTime(this.time);
 		waitForPickupActivity.setEndTime(departureTime);
-		String idString = currentLinkId.toString() + PrepareEvacuationScenario.pickupDropOffSuffix;
+		String idString = currentLinkId.toString() + EvacuationConstants.PICKUP_DROP_OFF_FACILITY_SUFFIX;
 		((ActivityImpl) waitForPickupActivity).setFacilityId(scenario.createId(idString));
 		((ActivityImpl) waitForPickupActivity).setCoord(scenario.getNetwork().getLinks().get(currentLinkId).getCoord());
 		
@@ -171,11 +169,11 @@ public class PickupAgentReplanner extends WithinDayDuringLegReplanner {
 		 * Create new pickup activity.
 		 */
 		double departureTime = this.time + 60.0;
-		Activity waitForPickupActivity = scenario.getPopulation().getFactory().createActivityFromLinkId(activityType, currentLinkId);
-		waitForPickupActivity.setType(activityType);
+		Activity waitForPickupActivity = scenario.getPopulation().getFactory().createActivityFromLinkId(PassengerQNetsimEngine.PICKUP_ACTIVITY_TYPE, currentLinkId);
+		waitForPickupActivity.setType(PassengerQNetsimEngine.PICKUP_ACTIVITY_TYPE);
 		waitForPickupActivity.setStartTime(this.time);
 		waitForPickupActivity.setEndTime(departureTime);
-		String idString = currentLinkId.toString() + PrepareEvacuationScenario.pickupDropOffSuffix;
+		String idString = currentLinkId.toString() + EvacuationConstants.PICKUP_DROP_OFF_FACILITY_SUFFIX;
 		((ActivityImpl) waitForPickupActivity).setFacilityId(scenario.createId(idString));
 		((ActivityImpl) waitForPickupActivity).setCoord(scenario.getNetwork().getLinks().get(currentLinkId).getCoord());
 				
@@ -184,7 +182,7 @@ public class PickupAgentReplanner extends WithinDayDuringLegReplanner {
 		 * Set mode to ride, then create route for the leg, then
 		 * set the mode to the correct value (ride_passenger).
 		 */
-		Leg ridePassengerLeg = scenario.getPopulation().getFactory().createLeg(OldPassengerDepartureHandler.passengerTransportMode);
+		Leg ridePassengerLeg = scenario.getPopulation().getFactory().createLeg(PassengerQNetsimEngine.PASSENGER_TRANSPORT_MODE);
 		ridePassengerLeg.setDepartureTime(departureTime);
 		Route ridePassengerRoute = rideRouteFactory.createRoute(currentLinkId, currentLeg.getRoute().getEndLinkId());
 		ridePassengerLeg.setRoute(ridePassengerRoute);

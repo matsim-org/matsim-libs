@@ -37,13 +37,13 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.internal.MatsimComparator;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.households.Household;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 
-import playground.christoph.evacuation.mobsim.OldPassengerDepartureHandler;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
 
 /**
@@ -268,7 +268,7 @@ public class ModeAvailabilityChecker {
 				}
 				
 				passengers.add(passengerId);
-				assignment.addTransportModeMapping(passengerId, OldPassengerDepartureHandler.passengerTransportMode);
+				assignment.addTransportModeMapping(passengerId, PassengerQNetsimEngine.PASSENGER_TRANSPORT_MODE);
 				seats--;
 			}
 			

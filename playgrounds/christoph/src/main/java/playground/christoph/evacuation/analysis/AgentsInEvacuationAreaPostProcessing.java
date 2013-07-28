@@ -48,6 +48,7 @@ import org.matsim.core.mobsim.framework.events.MobsimInitializedEventImpl;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
+import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculatorFactoryImpl;
@@ -61,7 +62,6 @@ import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.config.EvacuationConfigReader;
 import playground.christoph.evacuation.controler.PrepareEvacuationScenario;
 import playground.christoph.evacuation.mobsim.HouseholdsTracker;
-import playground.christoph.evacuation.mobsim.OldPassengerDepartureHandler;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataGrabber;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.mobsim.decisionmodel.EvacuationDecisionModel;
@@ -177,7 +177,7 @@ public class AgentsInEvacuationAreaPostProcessing {
 		transportModes.add(TransportMode.pt);
 		transportModes.add(TransportMode.ride);
 		transportModes.add(TransportMode.walk);
-		transportModes.add(OldPassengerDepartureHandler.passengerTransportMode);
+		transportModes.add(PassengerQNetsimEngine.PASSENGER_TRANSPORT_MODE);
 		
 		/*
 		 * Class to create dummy MobsimAfterSimStepEvents.

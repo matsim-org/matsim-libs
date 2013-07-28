@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -164,6 +165,7 @@ public class LegModeChecker extends AbstractPersonAlgorithm implements PlanAlgor
 					// if the route is null, create a new one
 					if (leg.getRoute() == null) {
 						adapted = true;
+						initRoute(plan, i);
 						this.editRoutes.replanFutureLegRoute(leg, plan.getPerson(), network, tripRouter);
 					}
 				}
@@ -173,6 +175,34 @@ public class LegModeChecker extends AbstractPersonAlgorithm implements PlanAlgor
 			// only car trips, therefore we don't have to adapt the plan
 			else return;
 		}
+	}
+	
+	private void initRoute(Plan plan, int legIndex) {
+		Leg leg = (Leg) plan.getPlanElements().get(legIndex);
+		
+		Activity previousActivity = null;
+		Activity nextActivity = null;
+		
+		for (int i = legIndex; i >= 0; i--) {
+			PlanElement planElement = plan.getPlanElements().get(i);
+			if (planElement instanceof Activity) {
+				previousActivity = (Activity) planElement;
+				break;
+			}
+		}
+		for (int i = legIndex; i < plan.getPlanElements().size(); i++) {
+			PlanElement planElement = plan.getPlanElements().get(i);
+			if (planElement instanceof Activity) {
+				nextActivity = (Activity) planElement;
+				break;
+			}
+		}
+		
+		/*
+		 * We can use a GenericRoute since only its start and end link ids are 
+		 * required before it is replaced.
+		 */
+		leg.setRoute(new GenericRouteImpl(previousActivity.getLinkId(), nextActivity.getLinkId()));
 	}
 
 	private void checkLegModes(Plan plan, Id initialLinkId, boolean toCar) {

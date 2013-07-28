@@ -99,6 +99,7 @@ public class VehiclesTracker implements MobsimInitializedListener,
 		this.reservedCapacities = new HashMap<Id, AtomicInteger>();
 	}
 	
+	@Deprecated
 	public JointDeparture createJointDeparture(Id linkId, Id vehicleId, Id driverId, 
 			Collection<Id> passengerIds) {
 		Id id = new IdImpl("jd" + jointDeparturesCounter++);

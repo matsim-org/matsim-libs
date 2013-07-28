@@ -112,7 +112,8 @@ public class PrepareScenarioControler extends KTIEnergyFlowsController implement
 		/*
 		 * Using a LegModeChecker to ensure that all agents' plans have valid mode chains.
 		 */
-		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory(), this.getLinkTravelTimes(), this.config.planCalcScore());
+		TravelDisutility travelDisutility = this.getTravelDisutilityFactory().createTravelDisutility(this.getLinkTravelTimes(), this.config.planCalcScore());
+		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, this.getLinkTravelTimes());
 		TripRouterFactory tripRouterFactory = new TripRouterFactoryBuilderWithDefaults().build(this.scenarioData);		
 		
 		legModeChecker = new LegModeChecker(tripRouterFactory.instantiateAndConfigureTripRouter(routingContext), this.getNetwork());
@@ -154,7 +155,7 @@ public class PrepareScenarioControler extends KTIEnergyFlowsController implement
 		 * Use a MobsimFactory which creates vehicles according to available vehicles per
 		 * household.
 		 */
-		MobsimFactory mobsimFactory = new EvacuationQSimFactory(null, null);
+		MobsimFactory mobsimFactory = new EvacuationQSimFactory(null, null, null);
 		this.setMobsimFactory(mobsimFactory);
 	}
 	

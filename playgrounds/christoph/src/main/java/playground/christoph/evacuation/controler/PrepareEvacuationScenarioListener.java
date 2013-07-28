@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PrepareEvacuationScenario.java
+ * PrepareEvacuationScenarioListener.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -67,22 +67,8 @@ import playground.christoph.evacuation.vehicles.AssignVehiclesToPlans;
 import playground.christoph.evacuation.vehicles.CreateVehiclesForHouseholds;
 import playground.christoph.evacuation.vehicles.HouseholdVehicleAssignmentReader;
 
-/**
- * Prepares a scenario to be used in an evacuation simulation.
- * <ul>
- * 	<li>adapt network capacities and speeds</li>
- * 	<li>connect facilities to network</li>
- *  <li>make network multi-modal</li>
- * 	<li>add exit links to network</li>
- *  <li>add secure facilities</li>
- * 	<li>add pickup and drop off facilities</li>
- *  <li>check mode chains (car availability)</li>
- *  <li>creates vehicles</li>
- *  <li>assign vehicles to population</li>
- * </ul>
- */
-public class PrepareEvacuationScenario {
-	
+public class PrepareEvacuationScenarioListener {
+
 	private final TravelDisutilityFactory travelDisutilityFactory = new TravelCostCalculatorFactoryImpl();
 	private final TravelTime travelTime = new FreeSpeedTravelTime();
 	
@@ -254,4 +240,5 @@ public class PrepareEvacuationScenario {
 		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, travelTime);
 		return tripRouterFactory.instantiateAndConfigureTripRouter(routingContext);
 	}
+
 }

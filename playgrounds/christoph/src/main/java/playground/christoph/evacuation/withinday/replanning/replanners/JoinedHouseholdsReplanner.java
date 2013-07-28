@@ -33,6 +33,7 @@ import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -43,7 +44,6 @@ import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 import org.matsim.withinday.utils.EditRoutes;
 
-import playground.christoph.evacuation.mobsim.OldPassengerDepartureHandler;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.mobsim.decisiondata.PersonDecisionData;
 import playground.christoph.evacuation.trafficmonitoring.SwissPTTravelTime;
@@ -134,7 +134,7 @@ public class JoinedHouseholdsReplanner extends WithinDayDuringActivityReplanner 
 		 * the router cannot handle it.
 		 */
 		Leg legToMeeting;
-		if (transportMode.equals(OldPassengerDepartureHandler.passengerTransportMode)) {
+		if (transportMode.equals(PassengerQNetsimEngine.PASSENGER_TRANSPORT_MODE)) {
 			legToMeeting = scenario.getPopulation().getFactory().createLeg(TransportMode.ride);
 		} else {
 			legToMeeting = scenario.getPopulation().getFactory().createLeg(transportMode);

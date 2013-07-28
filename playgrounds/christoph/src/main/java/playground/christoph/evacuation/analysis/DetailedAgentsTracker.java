@@ -83,6 +83,7 @@ import org.matsim.core.mobsim.framework.events.MobsimInitializedEventImpl;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
+import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -104,7 +105,6 @@ import playground.christoph.evacuation.events.PersonInformationEventImpl;
 import playground.christoph.evacuation.events.handler.PersonInformationEventHandler;
 import playground.christoph.evacuation.mobsim.AgentPosition;
 import playground.christoph.evacuation.mobsim.HouseholdsTracker;
-import playground.christoph.evacuation.mobsim.OldPassengerDepartureHandler;
 import playground.christoph.evacuation.mobsim.Tracker.Position;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataGrabber;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
@@ -114,8 +114,6 @@ import playground.christoph.evacuation.mobsim.decisionmodel.EvacuationDecisionMo
 import playground.christoph.evacuation.mobsim.decisionmodel.PanicModel;
 import playground.christoph.evacuation.mobsim.decisionmodel.PickupModel;
 import playground.christoph.evacuation.withinday.replanning.replanners.CurrentLegToMeetingPointReplanner;
-import playground.christoph.evacuation.withinday.replanning.replanners.DropOffAgentReplanner;
-import playground.christoph.evacuation.withinday.replanning.replanners.PickupAgentReplanner;
 import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -370,7 +368,7 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 		analyzedModes.add(TransportMode.pt);
 		analyzedModes.add(TransportMode.ride);
 		analyzedModes.add(TransportMode.walk);
-		analyzedModes.add(OldPassengerDepartureHandler.passengerTransportMode);
+		analyzedModes.add(PassengerQNetsimEngine.PASSENGER_TRANSPORT_MODE);
 		
 		/*
 		 * Class to create dummy MobsimAfterSimStepEvents.
@@ -553,8 +551,8 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 					
 					// ignore pick-up and drop-off activities
 					for (Activity activity : list) {
-						if (activity.getType().equals(PickupAgentReplanner.activityType)) continue;
-						else if (activity.getType().equals(DropOffAgentReplanner.activityType)) continue;
+						if (activity.getType().equals(PassengerQNetsimEngine.PICKUP_ACTIVITY_TYPE)) continue;
+						else if (activity.getType().equals(PassengerQNetsimEngine.DROP_OFF_ACTIVITY_TYPE)) continue;
 						
 						copy.add(activity);
 					}
@@ -652,8 +650,8 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 					
 					// ignore pick-up and drop-off activities
 					for (Activity activity : list) {
-						if (activity.getType().equals(PickupAgentReplanner.activityType)) continue;
-						else if (activity.getType().equals(DropOffAgentReplanner.activityType)) continue;
+						if (activity.getType().equals(PassengerQNetsimEngine.PICKUP_ACTIVITY_TYPE)) continue;
+						else if (activity.getType().equals(PassengerQNetsimEngine.DROP_OFF_ACTIVITY_TYPE)) continue;
 						
 						copy.add(activity);
 					}
@@ -804,8 +802,8 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 					
 					// ignore pick-up and drop-off activities
 					for (Activity activity : list) {
-						if (activity.getType().equals(PickupAgentReplanner.activityType)) continue;
-						else if (activity.getType().equals(DropOffAgentReplanner.activityType)) continue;
+						if (activity.getType().equals(PassengerQNetsimEngine.PICKUP_ACTIVITY_TYPE)) continue;
+						else if (activity.getType().equals(PassengerQNetsimEngine.DROP_OFF_ACTIVITY_TYPE)) continue;
 						
 						copy.add(activity);
 					}
@@ -903,8 +901,8 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 					
 					// ignore pick-up and drop-off activities
 					for (Activity activity : list) {
-						if (activity.getType().equals(PickupAgentReplanner.activityType)) continue;
-						else if (activity.getType().equals(DropOffAgentReplanner.activityType)) continue;
+						if (activity.getType().equals(PassengerQNetsimEngine.PICKUP_ACTIVITY_TYPE)) continue;
+						else if (activity.getType().equals(PassengerQNetsimEngine.DROP_OFF_ACTIVITY_TYPE)) continue;
 						
 						copy.add(activity);
 					}
@@ -1134,8 +1132,8 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 			modes.add(TransportMode.ride);
 			modes.add(TransportMode.pt);
 			modes.add(TransportMode.walk);
-			modes.add(OldPassengerDepartureHandler.passengerTransportMode);
-			modes.add(OldPassengerDepartureHandler.passengerTransportMode + "," + TransportMode.walk);
+			modes.add(PassengerQNetsimEngine.PASSENGER_TRANSPORT_MODE);
+			modes.add(PassengerQNetsimEngine.PASSENGER_TRANSPORT_MODE + "," + TransportMode.walk);
 			
 			List<String> modeHeaders = new ArrayList<String>();
 			List<String> modeValuesOverall = new ArrayList<String>();
@@ -1494,8 +1492,8 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 			modes.add(TransportMode.ride);
 			modes.add(TransportMode.pt);
 			modes.add(TransportMode.walk);
-			modes.add(OldPassengerDepartureHandler.passengerTransportMode);
-			modes.add(OldPassengerDepartureHandler.passengerTransportMode + "," + TransportMode.walk);
+			modes.add(PassengerQNetsimEngine.PASSENGER_TRANSPORT_MODE);
+			modes.add(PassengerQNetsimEngine.PASSENGER_TRANSPORT_MODE + "," + TransportMode.walk);
 						
 			List<String> modeHeaders = new ArrayList<String>();
 			List<String> modeValuesOverall = new ArrayList<String>();

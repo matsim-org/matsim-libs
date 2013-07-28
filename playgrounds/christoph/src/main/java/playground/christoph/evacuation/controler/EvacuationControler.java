@@ -25,13 +25,15 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.contrib.multimodal.router.MultimodalTripRouterFactory;
-import org.matsim.core.config.Module;
+import org.matsim.contrib.multimodal.tools.MultiModalNetworkCreator;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -47,6 +49,10 @@ import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTim
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureWriter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerDepartureHandler;
+import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
+import org.matsim.core.population.PopulationFactoryImpl;
+import org.matsim.core.population.routes.LinkNetworkRouteFactory;
+import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouterFactory;
@@ -56,13 +62,16 @@ import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalcula
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.FastAStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.TravelTimeFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.functions.OnlyTravelDependentScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.households.Household;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetwork;
@@ -98,7 +107,6 @@ import playground.christoph.evacuation.config.EvacuationConfigReader;
 import playground.christoph.evacuation.mobsim.EvacuationQSimFactory;
 import playground.christoph.evacuation.mobsim.HouseholdsTracker;
 import playground.christoph.evacuation.mobsim.LegModeChecker;
-import playground.christoph.evacuation.mobsim.OldPassengerDepartureHandler;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataGrabber;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
@@ -216,8 +224,27 @@ public class EvacuationControler extends WithinDayController implements
 	
 	static final Logger log = Logger.getLogger(EvacuationControler.class);
 
-	public EvacuationControler(String[] args) {
-		super(args);
+	/*
+	 * ===================================================================
+	 * main
+	 * ===================================================================
+	 */
+	public static void main(final String[] args) {
+		if ((args == null) || (args.length == 0)) {
+			System.out.println("No argument given!");
+			System.out.println("Usage: Controler config-file [dtd-file]");
+			System.out.println();
+		} else {
+			Config config = ConfigUtils.loadConfig(args[0], MultiModalConfigGroup.class, KtiConfigGroup.class);
+			final Controler controler = new EvacuationControler(config, args[1]);
+			controler.setOverwriteFiles(true);
+			controler.run();
+		}
+		System.exit(0);
+	}
+	
+	public EvacuationControler(Config config, String evacuationConfigFile) {
+		super(config);
 		
 		/*
 		 * Change the persons' plans. Doing so might simplify bug-tracking.
@@ -229,14 +256,9 @@ public class EvacuationControler extends WithinDayController implements
 		/*
 		 * Set ride_passenger mode in PassengerDepartureHandler
 		 */
-		PassengerDepartureHandler.passengerMode = OldPassengerDepartureHandler.passengerTransportMode;
+		PassengerDepartureHandler.passengerMode = PassengerQNetsimEngine.PASSENGER_TRANSPORT_MODE;
 		
-		/*
-		 * Create the empty object. They are filled in the loadData() method.
-		 */
-		this.ktiConfigGroup = new KtiConfigGroup();
-		
-		new EvacuationConfigReader().readFile(args[1]);
+		new EvacuationConfigReader().readFile(evacuationConfigFile);
 		EvacuationConfig.printConfig();
 		
 		// Use a Scoring Function, that only scores the travel times!
@@ -259,18 +281,6 @@ public class EvacuationControler extends WithinDayController implements
 		
 		// load data in super class
 		super.loadData();
-	
-		/*
-		 * The KTIConfigGroup is loaded as generic Module. We replace this
-		 * generic object with a KtiConfigGroup object and copy all its parameter.
-		 */
-		Module module = this.config.getModule(KtiConfigGroup.GROUP_NAME);
-		this.config.removeModule(KtiConfigGroup.GROUP_NAME);
-		this.config.addModule(this.ktiConfigGroup);
-		
-		for (Entry<String, String> entry : module.getParams().entrySet()) {
-			this.ktiConfigGroup.addParam(entry.getKey(), entry.getValue());
-		}
 
 		/*
 		 * If enabled, set the evacuation transit router factory here.
@@ -293,7 +303,7 @@ public class EvacuationControler extends WithinDayController implements
 			new TransitRouterNetworkReaderMatsimV1(scenarioData, routerNetwork).parse(EvacuationConfig.transitRouterFile);
 		}
 	}
-
+	
 	/*
 	 * When the Controller Startup Event is created, the EventsManager
 	 * has already been initialized. Therefore we can initialize now
@@ -309,19 +319,74 @@ public class EvacuationControler extends WithinDayController implements
 		// initialze plan router
 		super.setUp();
 		
+		MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) config.getModule(MultiModalConfigGroup.GROUP_NAME);
+		if (!NetworkUtils.isMultimodal(this.getNetwork())) {
+			new MultiModalNetworkCreator(multiModalConfigGroup).run(this.getNetwork());
+		}
+		
+		// ensure that NetworkRoutes are created for legs using one of the simulated modes
+		ModeRouteFactory routeFactory = ((PopulationFactoryImpl) scenarioData.getPopulation().getFactory()).getModeRouteFactory();
+		for (String mode : CollectionUtils.stringToSet(multiModalConfigGroup.getSimulatedModes())) {
+			routeFactory.setRouteFactory(mode, new LinkNetworkRouteFactory());
+		}
+		
+		/*
+		 * Use advanced walk-, bike and pt travel time calculators
+		 */
+		this.walkTravelTime = new WalkTravelTimeFactory(this.config.plansCalcRoute()).createTravelTime();
+		this.bikeTravelTime = new BikeTravelTimeFactory(this.config.plansCalcRoute()).createTravelTime();
+		
+		TravelTimeFactory ptFactory;
+		TravelTime nonEvacuationPTTravelTime = new PTTravelTimeFactory(this.config.plansCalcRoute(), this.getTravelTimeCollector(), walkTravelTime).createTravelTime();
+		if (EvacuationConfig.useTransitRouter) {
+			
+			TransitRouterConfig transitRouterConfig = new TransitRouterConfig(config.planCalcScore(),
+					config.plansCalcRoute(), config.transitRouter(), config.vspExperimental());
+			EvacuationTransitRouterFactory evacuationTransitRouterFactory = 
+					new EvacuationTransitRouterFactory(config, walkTravelTime, routerNetwork, transitRouterConfig);
+			
+			ptFactory = new PTTravelTimeEvacuationFactory(this.scenarioData, nonEvacuationPTTravelTime,
+					evacuationTransitRouterFactory, this.informedHouseholdsTracker);
+		} else {
+			ptFactory = new PTTravelTimeKTIEvacuationFactory(this.scenarioData, nonEvacuationPTTravelTime);
+			
+			/*
+			 * Update PT Travel time Matrices for evacuation routes (requires CoordAnalyzer)
+			 */
+			String stopsFile = this.getControlerIO().getOutputFilename("pt_evacuation_stops.shp");
+			String travelTimesFile = this.getControlerIO().getOutputFilename("pt_evacuation_times.shp");
+			((PTTravelTimeKTIEvacuationFactory) ptFactory).prepareMatrixForEvacuation(this.coordAnalyzer, stopsFile, travelTimesFile);
+
+		}
+		this.ptTravelTime = ptFactory.createTravelTime();
+		
+		
+		// Use the TravelTimeCollector as ride travel time estimator. 
+		this.rideTravelTime = new RideTravelTimeFactory(this.getTravelTimeCollector(), walkTravelTime).createTravelTime(); 
+
+		Map<String, TravelTime> travelTimes = new HashMap<String, TravelTime>();
+		travelTimes.put(TransportMode.walk, walkTravelTime);
+		travelTimes.put(TransportMode.bike, bikeTravelTime);
+		travelTimes.put(TransportMode.ride, rideTravelTime);
+		travelTimes.put(TransportMode.pt, ptTravelTime);
+		
 //		PlansLinkReferenceDumping planAlgo = new PlansLinkReferenceDumping();
 //		planAlgo.run(population);
 		
+		this.setWithinDayTripRouterFactory(new MultimodalTripRouterFactory(this.getScenario(), travelTimes, this.getTravelDisutilityFactory()));
+				
 		/*
 		 * Using a LegModeChecker to ensure that all agents' plans have valid mode chains.
 		 */
-		RoutingContext routingContext = new RoutingContextImpl(this.getTravelDisutilityFactory(), this.getLinkTravelTimes(), this.config.planCalcScore());
+		TravelDisutility travelDisutility = this.getTravelDisutilityFactory().createTravelDisutility(this.getLinkTravelTimes(), this.config.planCalcScore());
+		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, this.getLinkTravelTimes());
+
 		
 		LegModeChecker legModeChecker = new LegModeChecker(this.getWithinDayTripRouterFactory().instantiateAndConfigureTripRouter(routingContext), this.getNetwork());
 		legModeChecker.setValidNonCarModes(new String[]{TransportMode.walk, TransportMode.bike, TransportMode.pt});
 		legModeChecker.setToCarProbability(0.5);
 		legModeChecker.run(this.scenarioData.getPopulation());
-		legModeChecker.printStatistics();
+		legModeChecker.printStatistics();	
 		
 		/*
 		 * Prepare the scenario:
@@ -396,46 +461,6 @@ public class EvacuationControler extends WithinDayController implements
 		super.createAndInitTravelTimeCollector(collectedModes);
 		
 		/*
-		 * Use advanced walk-, bike and pt travel time calculators
-		 */
-		this.walkTravelTime = new WalkTravelTimeFactory(this.config.plansCalcRoute()).createTravelTime();
-		this.bikeTravelTime = new BikeTravelTimeFactory(this.config.plansCalcRoute()).createTravelTime();
-		
-		TravelTimeFactory ptFactory;
-		TravelTime nonEvacuationPTTravelTime = new PTTravelTimeFactory(this.config.plansCalcRoute(), this.getTravelTimeCollector(), walkTravelTime).createTravelTime();
-		if (EvacuationConfig.useTransitRouter) {
-			
-			TransitRouterConfig transitRouterConfig = new TransitRouterConfig(config.planCalcScore(),
-					config.plansCalcRoute(), config.transitRouter(), config.vspExperimental());
-			EvacuationTransitRouterFactory evacuationTransitRouterFactory = 
-					new EvacuationTransitRouterFactory(config, walkTravelTime, routerNetwork, transitRouterConfig);
-			
-			ptFactory = new PTTravelTimeEvacuationFactory(this.scenarioData, nonEvacuationPTTravelTime,
-					evacuationTransitRouterFactory, this.informedHouseholdsTracker);
-		} else {
-			ptFactory = new PTTravelTimeKTIEvacuationFactory(this.scenarioData, nonEvacuationPTTravelTime);
-			
-			/*
-			 * Update PT Travel time Matrices for evacuation routes (requires CoordAnalyzer)
-			 */
-			String stopsFile = this.getControlerIO().getOutputFilename("pt_evacuation_stops.shp");
-			String travelTimesFile = this.getControlerIO().getOutputFilename("pt_evacuation_times.shp");
-			((PTTravelTimeKTIEvacuationFactory) ptFactory).prepareMatrixForEvacuation(this.coordAnalyzer, stopsFile, travelTimesFile);
-
-		}
-		this.ptTravelTime = ptFactory.createTravelTime();
-		
-		
-		// Use the TravelTimeCollector as ride travel time estimator. 
-		this.rideTravelTime = new RideTravelTimeFactory(this.getTravelTimeCollector(), walkTravelTime).createTravelTime(); 
-
-		Map<String, TravelTime> travelTimes = new HashMap<String, TravelTime>();
-		travelTimes.put(TransportMode.walk, walkTravelTime);
-		travelTimes.put(TransportMode.bike, bikeTravelTime);
-		travelTimes.put(TransportMode.ride, rideTravelTime);
-		travelTimes.put(TransportMode.pt, ptTravelTime);
-
-		/*
 		 * Read household-vehicles-assignment files.
 		 */
 		this.householdVehicleAssignmentReader = new HouseholdVehicleAssignmentReader(this.scenarioData);
@@ -483,7 +508,7 @@ public class EvacuationControler extends WithinDayController implements
 		 * Use a MobsimFactory which creates vehicles according to available vehicles per
 		 * household and adds the replanning Manager as mobsim engine.
 		 */
-		MobsimFactory mobsimFactory = new EvacuationQSimFactory(this.getWithinDayEngine(), this.jointDepartureOrganizer);
+		MobsimFactory mobsimFactory = new EvacuationQSimFactory(this.getWithinDayEngine(), this.jointDepartureOrganizer, travelTimes);
 		this.setMobsimFactory(mobsimFactory);
 		
 		/*
@@ -495,7 +520,7 @@ public class EvacuationControler extends WithinDayController implements
 		analyzedModes.add(TransportMode.pt);
 		analyzedModes.add(TransportMode.ride);
 		analyzedModes.add(TransportMode.walk);
-		analyzedModes.add(OldPassengerDepartureHandler.passengerTransportMode);
+		analyzedModes.add(PassengerQNetsimEngine.PASSENGER_TRANSPORT_MODE);
 
 		/*
 		 * intialize analyse modules
@@ -725,51 +750,52 @@ public class EvacuationControler extends WithinDayController implements
 		TripRouterFactory delegateFactory = builder.build(this.scenarioData);
 		TripRouterFactory tripRouterFactory = new MultimodalTripRouterFactory(this.scenarioData, travelTimes, penaltyCostFactory);
 		
-		throw new RuntimeException("We have to find a way to set a custom LeastCostPathCalculatorFactory in the TripRouterFactory!");
+//		throw new RuntimeException("We have to find a way to set a custom LeastCostPathCalculatorFactory in the TripRouterFactory!");
 //		commented out the subsequent code...
 		
-//		RoutingContext routingContext = new RoutingContextImpl(penaltyCostFactory, carTravelTime, this.config.planCalcScore());
-//		
-//		/*
-//		 * During Activity Replanners
-//		 */
-//		this.currentActivityToMeetingPointReplannerFactory = new CurrentActivityToMeetingPointReplannerFactory(this.scenarioData, this.getWithinDayEngine(), this.decisionDataProvider, 
-//				this.modeAvailabilityChecker, (SwissPTTravelTime) ptTravelTime, tripRouterFactory, routingContext);
-//		this.currentActivityToMeetingPointReplannerFactory.addIdentifier(this.activityPerformingIdentifier);
-//		this.getWithinDayEngine().addTimedDuringActivityReplannerFactory(this.currentActivityToMeetingPointReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
-//		
-//		this.joinedHouseholdsReplannerFactory = new JoinedHouseholdsReplannerFactory(this.scenarioData, this.getWithinDayEngine(), decisionDataProvider,
-//				(JoinedHouseholdsIdentifier) joinedHouseholdsIdentifier, (SwissPTTravelTime) this.ptTravelTime, tripRouterFactory, routingContext);
-//		this.joinedHouseholdsReplannerFactory.addIdentifier(joinedHouseholdsIdentifier);
-//		this.getWithinDayEngine().addTimedDuringActivityReplannerFactory(this.joinedHouseholdsReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
-//
-//		/*
-//		 * During Leg Replanners
-//		 */
-//		this.currentLegToMeetingPointReplannerFactory = new CurrentLegToMeetingPointReplannerFactory(this.scenarioData, this.getWithinDayEngine(), decisionDataProvider, 
-//				tripRouterFactory, routingContext);
-//		this.currentLegToMeetingPointReplannerFactory.addIdentifier(this.legPerformingIdentifier);
-//		this.getWithinDayEngine().addTimedDuringLegReplannerFactory(this.currentLegToMeetingPointReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
-//
-//		this.dropOffAgentsReplannerFactory = new DropOffAgentReplannerFactory(this.scenarioData, this.getWithinDayEngine(), tripRouterFactory, routingContext);
-//		this.dropOffAgentsReplannerFactory.addIdentifier(this.agentsToDropOffIdentifier);
-//		this.getWithinDayEngine().addTimedDuringLegReplannerFactory(this.dropOffAgentsReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
-//		
-//		this.pickupAgentsReplannerFactory = new PickupAgentReplannerFactory(this.scenarioData, this.getWithinDayEngine());
-//		this.pickupAgentsReplannerFactory.addIdentifier(this.agentsToPickupIdentifier);
-//		this.getWithinDayEngine().addTimedDuringLegReplannerFactory(this.pickupAgentsReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
-//		
-//		this.duringLegRerouteReplannerFactory = new CurrentLegReplannerFactory(this.scenarioData, this.getWithinDayEngine(), tripRouterFactory, routingContext);
-//		this.duringLegRerouteReplannerFactory.addIdentifier(this.duringLegRerouteIdentifier);
-//		this.getWithinDayEngine().addTimedDuringLegReplannerFactory(this.duringLegRerouteReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
-//		
-//		
-//		/*
-//		 * Collect Replanners that can be disabled after all agents have been informed.
-//		 */
-//		this.initialReplannerFactories = new ArrayList<WithinDayReplannerFactory<?>>();
-//		this.initialReplannerFactories.add(this.currentActivityToMeetingPointReplannerFactory);
-//		this.initialReplannerFactories.add(this.currentLegToMeetingPointReplannerFactory);
+		TravelDisutility travelDisutility = penaltyCostFactory.createTravelDisutility(carTravelTime, scenarioData.getConfig().planCalcScore()); 
+		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, carTravelTime);
+		
+		/*
+		 * During Activity Replanners
+		 */
+		this.currentActivityToMeetingPointReplannerFactory = new CurrentActivityToMeetingPointReplannerFactory(this.scenarioData, this.getWithinDayEngine(), this.decisionDataProvider, 
+				this.modeAvailabilityChecker, (SwissPTTravelTime) ptTravelTime, tripRouterFactory, routingContext);
+		this.currentActivityToMeetingPointReplannerFactory.addIdentifier(this.activityPerformingIdentifier);
+		this.getWithinDayEngine().addTimedDuringActivityReplannerFactory(this.currentActivityToMeetingPointReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+		
+		this.joinedHouseholdsReplannerFactory = new JoinedHouseholdsReplannerFactory(this.scenarioData, this.getWithinDayEngine(), decisionDataProvider,
+				(JoinedHouseholdsIdentifier) joinedHouseholdsIdentifier, (SwissPTTravelTime) this.ptTravelTime, tripRouterFactory, routingContext);
+		this.joinedHouseholdsReplannerFactory.addIdentifier(joinedHouseholdsIdentifier);
+		this.getWithinDayEngine().addTimedDuringActivityReplannerFactory(this.joinedHouseholdsReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+
+		/*
+		 * During Leg Replanners
+		 */
+		this.currentLegToMeetingPointReplannerFactory = new CurrentLegToMeetingPointReplannerFactory(this.scenarioData, this.getWithinDayEngine(), decisionDataProvider, 
+				tripRouterFactory, routingContext);
+		this.currentLegToMeetingPointReplannerFactory.addIdentifier(this.legPerformingIdentifier);
+		this.getWithinDayEngine().addTimedDuringLegReplannerFactory(this.currentLegToMeetingPointReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+
+		this.dropOffAgentsReplannerFactory = new DropOffAgentReplannerFactory(this.scenarioData, this.getWithinDayEngine(), tripRouterFactory, routingContext);
+		this.dropOffAgentsReplannerFactory.addIdentifier(this.agentsToDropOffIdentifier);
+		this.getWithinDayEngine().addTimedDuringLegReplannerFactory(this.dropOffAgentsReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+		
+		this.pickupAgentsReplannerFactory = new PickupAgentReplannerFactory(this.scenarioData, this.getWithinDayEngine());
+		this.pickupAgentsReplannerFactory.addIdentifier(this.agentsToPickupIdentifier);
+		this.getWithinDayEngine().addTimedDuringLegReplannerFactory(this.pickupAgentsReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+		
+		this.duringLegRerouteReplannerFactory = new CurrentLegReplannerFactory(this.scenarioData, this.getWithinDayEngine(), tripRouterFactory, routingContext);
+		this.duringLegRerouteReplannerFactory.addIdentifier(this.duringLegRerouteIdentifier);
+		this.getWithinDayEngine().addTimedDuringLegReplannerFactory(this.duringLegRerouteReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+		
+		
+		/*
+		 * Collect Replanners that can be disabled after all agents have been informed.
+		 */
+		this.initialReplannerFactories = new ArrayList<WithinDayReplannerFactory<?>>();
+		this.initialReplannerFactories.add(this.currentActivityToMeetingPointReplannerFactory);
+		this.initialReplannerFactories.add(this.currentLegToMeetingPointReplannerFactory);
 	}
 
 	/*
@@ -791,24 +817,6 @@ public class EvacuationControler extends WithinDayController implements
 		travelTimes.put(TransportMode.pt, new FreeSpeedTravelTime());
 
 		return travelTimes;
-	}
-	
-	/*
-	 * ===================================================================
-	 * main
-	 * ===================================================================
-	 */
-	public static void main(final String[] args) {
-		if ((args == null) || (args.length == 0)) {
-			System.out.println("No argument given!");
-			System.out.println("Usage: Controler config-file [dtd-file]");
-			System.out.println();
-		} else {
-			final Controler controler = new EvacuationControler(args);
-			controler.setOverwriteFiles(true);
-			controler.run();
-		}
-		System.exit(0);
 	}
 	
 }

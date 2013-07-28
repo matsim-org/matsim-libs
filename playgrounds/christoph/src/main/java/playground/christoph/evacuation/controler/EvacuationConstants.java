@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PassengerDepartureHandler.java
+ * EvacuationConstants.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,10 +18,22 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.evacuation.mobsim;
+package playground.christoph.evacuation.controler;
 
-public class OldPassengerDepartureHandler {
+import org.matsim.core.api.internal.MatsimParameters;
 
-	public final static String passengerTransportMode = "ride_passenger";
+/**
+ * An abstract class containing some constants used for evacuations.
+ * 
+ * @author cdobler
+ */
+public abstract class EvacuationConstants implements MatsimParameters {
 
+	/**
+	* Marker for Facilities where agents can be picked up or dropped off. 
+	*/
+	public static final String PICKUP_DROP_OFF_FACILITY_SUFFIX = "_pickup_dropoff";
+
+	public static final String PICKUP_ACTIVITY = "pickup";
+	public static final String DROP_OFF_ACTIVITY = "dropoff";
 }

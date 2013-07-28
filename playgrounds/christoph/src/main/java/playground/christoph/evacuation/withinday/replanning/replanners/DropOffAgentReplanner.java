@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
@@ -41,8 +42,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.utils.EditRoutes;
 
-import playground.christoph.evacuation.controler.PrepareEvacuationScenario;
-import playground.christoph.evacuation.mobsim.OldPassengerDepartureHandler;
+import playground.christoph.evacuation.controler.EvacuationConstants;
 
 /**
  * 
@@ -51,9 +51,7 @@ import playground.christoph.evacuation.mobsim.OldPassengerDepartureHandler;
 public class DropOffAgentReplanner extends WithinDayDuringLegReplanner {
 
 	private static final Logger log = Logger.getLogger(DropOffAgentReplanner.class);
-	
-	public static final String activityType = "dropoff";
-	
+		
 	private final RouteFactory routeFactory;
 	private final TripRouter tripRouter;
 	private final EditRoutes editRoutes;
@@ -74,7 +72,7 @@ public class DropOffAgentReplanner extends WithinDayDuringLegReplanner {
 		
 		if (withinDayAgent.getMode().equals(TransportMode.car)) {
 			return replanDriver(withinDayAgent);
-		} else if (withinDayAgent.getMode().equals(OldPassengerDepartureHandler.passengerTransportMode)) {
+		} else if (withinDayAgent.getMode().equals(PassengerQNetsimEngine.PASSENGER_TRANSPORT_MODE)) {
 			return replanPassenger(withinDayAgent);
 		} else {
 			log.warn("Unexpected mode was found: " + withinDayAgent.getMode());
@@ -102,11 +100,11 @@ public class DropOffAgentReplanner extends WithinDayDuringLegReplanner {
 		 * At this point it is checked whether the vehicle should be parked at the link.
 		 */
 		double departureTime = this.time + 60.0;
-		Activity dropOffActivity = scenario.getPopulation().getFactory().createActivityFromLinkId(activityType, currentLinkId);
-		dropOffActivity.setType(activityType);
+		Activity dropOffActivity = scenario.getPopulation().getFactory().createActivityFromLinkId(PassengerQNetsimEngine.DROP_OFF_ACTIVITY_TYPE, currentLinkId);
+		dropOffActivity.setType(PassengerQNetsimEngine.DROP_OFF_ACTIVITY_TYPE);
 		dropOffActivity.setStartTime(this.time);
 		dropOffActivity.setEndTime(departureTime);
-		String idString = currentLinkId.toString() + PrepareEvacuationScenario.pickupDropOffSuffix;
+		String idString = currentLinkId.toString() + EvacuationConstants.PICKUP_DROP_OFF_FACILITY_SUFFIX;
 		((ActivityImpl) dropOffActivity).setFacilityId(scenario.createId(idString));
 		((ActivityImpl) dropOffActivity).setCoord(scenario.getNetwork().getLinks().get(currentLinkId).getCoord());
 			
@@ -182,11 +180,11 @@ public class DropOffAgentReplanner extends WithinDayDuringLegReplanner {
 		 * Create new drop off activity.
 		 */
 		double departureTime = this.time + 60.0;
-		Activity dropOffActivity = scenario.getPopulation().getFactory().createActivityFromLinkId(activityType, currentLinkId);
-		dropOffActivity.setType(activityType);
+		Activity dropOffActivity = scenario.getPopulation().getFactory().createActivityFromLinkId(PassengerQNetsimEngine.DROP_OFF_ACTIVITY_TYPE, currentLinkId);
+		dropOffActivity.setType(PassengerQNetsimEngine.DROP_OFF_ACTIVITY_TYPE);
 		dropOffActivity.setStartTime(this.time);
 		dropOffActivity.setEndTime(departureTime);
-		String idString = currentLinkId.toString() + PrepareEvacuationScenario.pickupDropOffSuffix;
+		String idString = currentLinkId.toString() + EvacuationConstants.PICKUP_DROP_OFF_FACILITY_SUFFIX;
 		((ActivityImpl) dropOffActivity).setFacilityId(scenario.createId(idString));
 		((ActivityImpl) dropOffActivity).setCoord(scenario.getNetwork().getLinks().get(currentLinkId).getCoord());
 				

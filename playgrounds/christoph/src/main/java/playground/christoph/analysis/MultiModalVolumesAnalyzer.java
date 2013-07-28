@@ -38,8 +38,7 @@ import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandle
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
-
-import playground.christoph.evacuation.mobsim.OldPassengerDepartureHandler;
+import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
 
 /**
  * Counts the number of vehicles and agents using non-motorized modes leaving a link, 
@@ -96,7 +95,7 @@ public class MultiModalVolumesAnalyzer implements LinkLeaveEventHandler, AgentDe
 					event.getVehicleId().toString() + " at time " + event.getTime() + "!");
 			
 			// get ride passenger mode
-			mode = OldPassengerDepartureHandler.passengerTransportMode;
+			mode = PassengerQNetsimEngine.PASSENGER_TRANSPORT_MODE;
 			volumes = modesVolumes.get(mode);
 			if (volumes == null) {
 				volumes = new int[this.maxSlotIndex + 1]; // initialized to 0 by default, according to JVM specs

@@ -47,6 +47,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlanRouter;
@@ -56,7 +57,6 @@ import org.matsim.households.Household;
 
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.mobsim.AgentPosition;
-import playground.christoph.evacuation.mobsim.OldPassengerDepartureHandler;
 import playground.christoph.evacuation.mobsim.Tracker.Position;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
@@ -472,7 +472,7 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 				} else continue;
 			}
 			else if (mode.equals(TransportMode.ride)) continue;
-			else if (mode.equals(OldPassengerDepartureHandler.passengerTransportMode)) continue;
+			else if (mode.equals(PassengerQNetsimEngine.PASSENGER_TRANSPORT_MODE)) continue;
 			else {
 				double tt = calculateTravelTime(evacuationPlanAlgo, entry.getKey(), hdd.getHomeLinkId(), toLinkId, mode, departureTime);
 				if (tt > nonVehicularTravelTime) nonVehicularTravelTime = tt;

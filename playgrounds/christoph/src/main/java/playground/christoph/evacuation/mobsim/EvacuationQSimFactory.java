@@ -20,8 +20,14 @@
 
 package playground.christoph.evacuation.mobsim;
 
+import java.util.Map;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
+import org.matsim.contrib.multimodal.simengine.MultiModalDepartureHandler;
+import org.matsim.contrib.multimodal.simengine.MultiModalSimEngine;
+import org.matsim.contrib.multimodal.simengine.MultiModalSimEngineFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.SimStepParallelEventsManagerImpl;
@@ -40,6 +46,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
 import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 
 /**
@@ -51,11 +58,13 @@ public class EvacuationQSimFactory implements MobsimFactory {
     
     private final WithinDayEngine withinDayEngine;
     private final JointDepartureOrganizer jointDepartureOrganizer;
+    private final Map<String, TravelTime> multiModalTravelTimes;
     
     public EvacuationQSimFactory(WithinDayEngine withinDayEngine,
-    		JointDepartureOrganizer jointDepartureOrganizer) {
+    		JointDepartureOrganizer jointDepartureOrganizer, Map<String, TravelTime> multiModalTravelTimes) {
     	this.withinDayEngine = withinDayEngine;
     	this.jointDepartureOrganizer = jointDepartureOrganizer;
+    	this.multiModalTravelTimes = multiModalTravelTimes;
     }
     
     @Override
@@ -68,15 +77,15 @@ public class EvacuationQSimFactory implements MobsimFactory {
 
         // Get number of parallel Threads
         int numOfThreads = conf.getNumberOfThreads();
-        QNetsimEngineFactory netsimEngFactory;
+        QNetsimEngineFactory netsimEngineFactory;
         if (numOfThreads > 1) {
         	if (!(eventsManager instanceof SimStepParallelEventsManagerImpl)) {
         		eventsManager = new SynchronizedEventsManagerImpl(eventsManager);        		
         	}
-            netsimEngFactory = new ParallelQNetsimEngineFactory();
+        	netsimEngineFactory = new ParallelQNetsimEngineFactory();
             log.info("Using parallel QSim with " + numOfThreads + " threads.");
         } else {
-            netsimEngFactory = new DefaultQSimEngineFactory();
+        	netsimEngineFactory = new DefaultQSimEngineFactory();
         }
 		QSim qSim = new QSim(sc, eventsManager);
 		
@@ -89,15 +98,15 @@ public class EvacuationQSimFactory implements MobsimFactory {
 		 * as well as its (super)VehicularDepartureHandler to the QSim.
 		 * The later one handles non-joint departures.
 		 */
-		PassengerQNetsimEngine netsimEngine = new PassengerQNetsimEngine(qSim,
-				MatsimRandom.getLocalInstance(), jointDepartureOrganizer); 
+		PassengerQNetsimEngine netsimEngine = new PassengerQNetsimEngine(qSim, MatsimRandom.getLocalInstance(), jointDepartureOrganizer);
 		qSim.addMobsimEngine(netsimEngine);
 		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
 		qSim.addDepartureHandler(netsimEngine.getVehicularDepartureHandler());
-		
-//		QNetsimEngine netsimEngine = netsimEngFactory.createQSimEngine(qSim, MatsimRandom.getRandom());
-//		qSim.addMobsimEngine(netsimEngine);
-//		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
+			
+		MultiModalSimEngine multiModalEngine = new MultiModalSimEngineFactory().createMultiModalSimEngine(qSim, this.multiModalTravelTimes);
+		qSim.addMobsimEngine(multiModalEngine);
+        MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) sc.getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
+        qSim.addDepartureHandler(new MultiModalDepartureHandler(multiModalEngine, multiModalConfigGroup));
 		
 		TeleportationEngine teleportationEngine = new TeleportationEngine();
 		qSim.addMobsimEngine(teleportationEngine);
@@ -106,14 +115,7 @@ public class EvacuationQSimFactory implements MobsimFactory {
         AgentSource agentSource = new EvacuationPopulationAgentSource(sc, agentFactory, qSim);
         qSim.addAgentSource(agentSource);
         
-        /*
-         * Once the ReplanningManager is a full MobsimEngine and performs
-         * the replanning in the doSimStep method, it has to be ensured that
-         * it is added as first mobsim engine to the QSim!
-         * So far, it is only added to be able to provide the InternalInterface
-         * to the replanners.
-         */
-        if (this.withinDayEngine != null) qSim.addMobsimEngine(withinDayEngine);
+        qSim.addMobsimEngine(withinDayEngine);
         
         return qSim;
     }

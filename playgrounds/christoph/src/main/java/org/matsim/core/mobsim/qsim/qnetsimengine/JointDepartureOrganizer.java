@@ -20,14 +20,14 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Leg;
 
 public class JointDepartureOrganizer {
 
@@ -43,57 +43,43 @@ public class JointDepartureOrganizer {
 	 * Package protected to allow test cases to check whether all departures have
 	 * been processed as expected. 
 	 */
-	/*package*/ final Map<Id, List<JointDeparture>> scheduledDepartures;	// agentId
+	/*package*/ final Map<Id, Map<Leg, JointDeparture>> scheduledDepartures;	// agentId
 
 	public JointDepartureOrganizer() {
 		// needs this to be thread-safe?
-		this.scheduledDepartures = new ConcurrentHashMap<Id, List<JointDeparture>>();
+		this.scheduledDepartures = new ConcurrentHashMap<Id, Map<Leg, JointDeparture>>();
 	}
 	
-	public List<JointDeparture> getJointDepartures(Id agentId) {
+	/*package*/ Map<Leg, JointDeparture> getJointDepartures(Id agentId) {
 		return this.scheduledDepartures.get(agentId);
+	}
+	
+	public JointDeparture getJointDepartureForLeg(Id agentId, Leg leg) {
+		Map<Leg, JointDeparture> map = this.scheduledDepartures.get(agentId);
+		if (map == null) return null;
+		else return map.get(leg);
+	}
+	
+	public JointDeparture removeJointDepartureForLeg(Id agentId, Leg leg) {
+		Map<Leg, JointDeparture> map = this.scheduledDepartures.get(agentId);
+		if (map == null) return null;
+		else return map.remove(leg);
 	}
 	
 	public JointDeparture createJointDeparture(Id id, Id linkId, Id vehicleId, Id driverId, 
 			Collection<Id> passengerIds) {		
 		JointDeparture jointDeparture = new JointDeparture(id, linkId, vehicleId, driverId, passengerIds);
 		
-		this.assignAgentToJointDeparture(driverId, jointDeparture);
-		for (Id passengerId : passengerIds) this.assignAgentToJointDeparture(passengerId, jointDeparture);
-		
 		return jointDeparture;
 	}
 	
-	/*package*/ void assignAgentToJointDeparture(Id agentId, JointDeparture jointDeparture) {
-		List<JointDeparture> jointDepartures = this.scheduledDepartures.get(agentId);
+	public void assignAgentToJointDeparture(Id agentId, Leg leg, JointDeparture jointDeparture) {
+		Map<Leg, JointDeparture> jointDepartures = this.scheduledDepartures.get(agentId);
 		if (jointDepartures == null) {
-			jointDepartures = new ArrayList<JointDeparture>();
+			jointDepartures = new HashMap<Leg, JointDeparture>();
 			this.scheduledDepartures.put(agentId, jointDepartures);
 		}
-		jointDepartures.add(jointDeparture);
-	}
-	
-	/*package*/ JointDeparture getJointDeparture(Id agentId) {
-		List<JointDeparture> jointDepartures = scheduledDepartures.get(agentId);
-		if (jointDepartures == null || jointDepartures.size() == 0) return null;
-		
-		/*
-		 * Return the first jointDeparture from the list which has not been processed.
-		 */
-		JointDeparture jointDeparture;
-		while (true) {
-			jointDeparture = jointDepartures.remove(0);
-			if (jointDeparture.isDeparted()) {
-				log.warn("Seems that agent " + agentId + 
-						" has missed departure " + jointDeparture.getId().toString() + 
-						" with vehicle " + jointDeparture.getVehicleId().toString() +
-						" on link " + jointDeparture.getLinkId().toString());
-				
-				// Return null if no non-departed JointDeparture is left.
-				if (jointDepartures.size() == 0) return null;
-			}
-			else return jointDeparture;
-		}
+		jointDepartures.put(leg, jointDeparture);
 	}
 	
 }

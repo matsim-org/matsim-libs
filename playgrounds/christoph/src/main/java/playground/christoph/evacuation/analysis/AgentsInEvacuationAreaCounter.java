@@ -60,12 +60,13 @@ import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
+import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
-import playground.christoph.evacuation.mobsim.OldPassengerDepartureHandler;
+import playground.christoph.evacuation.controler.EvacuationConstants;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.mobsim.decisionmodel.EvacuationDecisionModel.Participating;
 
@@ -188,7 +189,7 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 		Set<Id> passengerSet = null;
 		if (vehicleId != null) {
 			passengers = vehiclePassengersMap.get(vehicleId);
-			passengerSet = legAgentsInEvacuationArea.get(OldPassengerDepartureHandler.passengerTransportMode);
+			passengerSet = legAgentsInEvacuationArea.get(PassengerQNetsimEngine.PASSENGER_TRANSPORT_MODE);
 		}
 		
 		boolean wasAffected = set.contains(event.getPersonId()); 
@@ -217,7 +218,7 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 				this.leftByMode.put(event.getPersonId(), new Tuple<String, Double>(transportMode, event.getTime()));
 				if (passengers != null) {
 					for (Id passengerId : passengers) {
-						this.leftByMode.put(passengerId, new Tuple<String, Double>(OldPassengerDepartureHandler.passengerTransportMode, event.getTime()));
+						this.leftByMode.put(passengerId, new Tuple<String, Double>(PassengerQNetsimEngine.PASSENGER_TRANSPORT_MODE, event.getTime()));
 					}
 				}
 			}

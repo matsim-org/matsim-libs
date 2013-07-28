@@ -61,6 +61,7 @@ import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -511,8 +512,11 @@ public class SelectHouseholdMeetingPoint implements MobsimInitializedListener, M
 		
 		this.startBarrier = new CyclicBarrier(numOfThreads + 1);
 		this.endBarrier = new CyclicBarrier(numOfThreads + 1);
-		
-		RoutingContext routingContext = new RoutingContextImpl(disutilityFactory, this.travelTimes.get(TransportMode.car), this.scenario.getConfig().planCalcScore());
+
+		TravelTime travelTime = this.travelTimes.get(TransportMode.car);
+		TravelDisutility travelDisutility = this.disutilityFactory.createTravelDisutility(travelTime, this.scenario.getConfig().planCalcScore());
+				
+		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, travelTime);
 		
 		for (int i = 0; i < this.numOfThreads; i++) {
 			

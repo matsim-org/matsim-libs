@@ -30,9 +30,25 @@ import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 
+/*
+ * This has to extend the QNetsimEngine since the letVehicleArrive(...)
+ * method is not part of an Interface.
+ */
 public class PassengerQNetsimEngine extends QNetsimEngine {
 	
 //	private static final Logger log = Logger.getLogger(PassengerQNetsimEngine.class);
+	
+	
+	/**
+	 * Mode of passengers who are physically simulated.
+	 */
+	public static final String PASSENGER_TRANSPORT_MODE = "ride_passenger";
+	
+	/**
+	 * Pickup and dropoff activity types.
+	 */
+	public static final String PICKUP_ACTIVITY_TYPE = "pickup";
+	public static final String DROP_OFF_ACTIVITY_TYPE = "dropoff";
 	
 	private final DepartureHandler departureHandler;
 	
