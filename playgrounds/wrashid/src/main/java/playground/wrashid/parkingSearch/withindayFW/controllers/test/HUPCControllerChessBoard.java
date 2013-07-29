@@ -26,13 +26,12 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.multimodal.router.util.BikeTravelTime;
+import org.matsim.contrib.multimodal.router.util.UnknownTravelTime;
+import org.matsim.contrib.multimodal.router.util.WalkTravelTime;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.BikeTravelTimeOld;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTime;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTime;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTimeOld;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
@@ -68,13 +67,10 @@ public class HUPCControllerChessBoard extends WithinDayParkingController  {
 		// TravelTimeCollector for car mode
 
 		Map<String, TravelTime> travelTimes = new HashMap<String, TravelTime>();
-		travelTimes.put(TransportMode.walk, new WalkTravelTimeOld(this.config.plansCalcRoute()));
-		travelTimes.put(TransportMode.bike, new BikeTravelTimeOld(this.config.plansCalcRoute(),
-				new WalkTravelTimeOld(this.config.plansCalcRoute())));
-		travelTimes.put(TransportMode.ride, new RideTravelTime(this.getLinkTravelTimes(), 
-				new WalkTravelTimeOld(this.config.plansCalcRoute())));
-		travelTimes.put(TransportMode.pt, new PTTravelTime(this.config.plansCalcRoute(), 
-				this.getLinkTravelTimes(), new WalkTravelTimeOld(this.config.plansCalcRoute())));
+		travelTimes.put(TransportMode.walk, new WalkTravelTime(this.config.plansCalcRoute()));
+		travelTimes.put(TransportMode.bike, new BikeTravelTime(this.config.plansCalcRoute()));
+		travelTimes.put(TransportMode.ride, new UnknownTravelTime(TransportMode.ride, this.config.plansCalcRoute()));
+		travelTimes.put(TransportMode.pt, new UnknownTravelTime(TransportMode.pt, this.config.plansCalcRoute()));
 		travelTimes.put(TransportMode.car, super.getTravelTimeCollector());
 
 		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
