@@ -20,8 +20,8 @@ import playground.pieter.pseudosimulation.replanning.PSimPlanStrategyRegistrar;
 import playground.pieter.pseudosimulation.trafficinfo.PSimStopStopTimeCalculator;
 import playground.pieter.pseudosimulation.trafficinfo.PSimTravelTimeCalculator;
 import playground.pieter.pseudosimulation.trafficinfo.PSimWaitTimeCalculator;
-import playground.sergioo.singapore2012.transitRouterVariable.StopStopTimeCalculator;
-import playground.sergioo.singapore2012.transitRouterVariable.WaitTimeStuckCalculator;
+import playground.sergioo.singapore2012.transitRouterVariable.stopStopTimes.*;
+import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.*;
 
 /**
  * @author fouriep
@@ -71,7 +71,7 @@ public class PSimControler extends Controler{
 			this.getEvents().addHandler(waitTimeCalculator);
 			this.stopStopTimeCalculator = new PSimStopStopTimeCalculator(
 					this.getScenario().getTransitSchedule(),
-					((ScenarioImpl) this.getScenario()).getVehicles(), this
+					 this
 							.getConfig().travelTimeCalculator()
 							.getTraveltimeBinSize(), (int) (this.getConfig()
 							.getQSimConfigGroup().getEndTime() - this

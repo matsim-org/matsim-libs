@@ -55,7 +55,7 @@ import playground.pieter.singapore.utils.postgresql.travelcomponents.TravellerCh
 import playground.pieter.singapore.utils.postgresql.travelcomponents.Trip;
 
 /**
- * @author fouriep, wrashid
+ * @author fouriep, with liberal dollops of code lifted from wrashid's playground :) 
  *         <P>
  *         Track the average density and flow of vehicles and transit passengers
  *         inside a link.

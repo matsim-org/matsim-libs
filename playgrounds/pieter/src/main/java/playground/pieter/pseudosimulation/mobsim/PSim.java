@@ -58,8 +58,8 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import playground.pieter.pseudosimulation.controler.PSimControler;
 import playground.pieter.pseudosimulation.trafficinfo.PSimTravelTimeCalculator;
 import playground.pieter.pseudosimulation.util.CollectionUtils;
-import playground.sergioo.singapore2012.transitRouterVariable.StopStopTimeCalculator;
-import playground.sergioo.singapore2012.transitRouterVariable.WaitTimeStuckCalculator;
+import playground.sergioo.singapore2012.transitRouterVariable.stopStopTimes.*;
+import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.*;
 
 /**
  * @author illenberger 
@@ -228,8 +228,8 @@ public class PSim implements Mobsim {
 								Id dummyVehicleId = new IdImpl("dummy");
 								TransitLine line = transitLines.get(route.getLineId());
 								TransitRoute transitRoute = line.getRoutes().get(route.getRouteId());
-								travelTime += transitWaitTimeCalculator.getWaitTimes().getRouteStopWaitTime(line,
-										transitRoute, accessStopId, prevEndTime);
+								travelTime += transitWaitTimeCalculator.getWaitTimes().getRouteStopWaitTime(line.getId(),
+										transitRoute.getId(), accessStopId, prevEndTime);
 								eventQueue.add(new PersonEntersVehicleEvent(prevEndTime + travelTime, personId,
 										dummyVehicleId));
 								travelTime += findTransitTravelTime(route, prevEndTime + travelTime);

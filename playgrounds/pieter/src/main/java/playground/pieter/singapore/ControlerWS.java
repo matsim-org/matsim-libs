@@ -27,9 +27,9 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
 import org.matsim.pt.router.TransitRouterConfig;
 
-import playground.sergioo.singapore2012.transitRouterVariable.StopStopTimeCalculator;
+import playground.sergioo.singapore2012.transitRouterVariable.stopStopTimes.*;
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterWSImplFactory;
-import playground.sergioo.singapore2012.transitRouterVariable.WaitTimeStuckCalculator;
+import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.*;
 
 /**
  * A run Controler for a transit router that depends on the travel times and
@@ -58,7 +58,6 @@ public class ControlerWS {
 		controler.getEvents().addHandler(waitTimeCalculator);
 		StopStopTimeCalculator stopStopTimeCalculator = new StopStopTimeCalculator(
 				controler.getScenario().getTransitSchedule(),
-				((ScenarioImpl) controler.getScenario()).getVehicles(),
 				controler.getConfig().travelTimeCalculator()
 						.getTraveltimeBinSize(), (int) (controler.getConfig()
 						.getQSimConfigGroup().getEndTime() - controler
