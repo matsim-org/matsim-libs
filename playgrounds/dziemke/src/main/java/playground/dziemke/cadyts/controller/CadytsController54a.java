@@ -53,7 +53,7 @@ import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
 public class CadytsController54a {
-	private final static Logger log = Logger.getLogger(CadytsController44.class);
+	private final static Logger log = Logger.getLogger(CadytsController54a.class);
 	
 	public static void main(String[] args) {
 		final Config config = ConfigUtils.createConfig();

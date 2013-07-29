@@ -46,7 +46,7 @@ import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
 
 public class CadytsController64 {
-	private final static Logger log = Logger.getLogger(CadytsController44.class);
+	private final static Logger log = Logger.getLogger(CadytsController64.class);
 	
 	public static void main(String[] args) {
 		final Config config = ConfigUtils.createConfig();
