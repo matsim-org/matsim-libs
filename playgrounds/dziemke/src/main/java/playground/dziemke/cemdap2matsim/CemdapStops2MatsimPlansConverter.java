@@ -50,22 +50,22 @@ public class CemdapStops2MatsimPlansConverter {
 
 	private final static Logger log = Logger.getLogger(CemdapStops2MatsimPlansConverter.class);
 	private static boolean multiplePlans = true;
-	private static boolean addStayHomePlan = true;
+	private static boolean addStayHomePlan = false;
 
 	/**
 	 * @param args
 	 * @throws IOException 
 	 */
 	public static void main(String[] args) throws IOException {
-		String cemdapStopsFile = "D:/Workspace/CEMDAP_Test_Version/Output/30/stops.out1";
-		String cemdapStopsFile2 = "D:/Workspace/CEMDAP_Test_Version/Output/31/stops.out1";
-		String cemdapStopsFile3 = "D:/Workspace/CEMDAP_Test_Version/Output/32/stops.out1";
+		String cemdapStopsFile = "D:/Workspace/CEMDAP_Test_Version/Output/36/stops.out1";
+		String cemdapStopsFile2 = "D:/Workspace/CEMDAP_Test_Version/Output/37/stops.out1";
+		String cemdapStopsFile3 = "D:/Workspace/CEMDAP_Test_Version/Output/38/stops.out1";
 				
 		String tazShapeFile = "D:/Workspace/container/demand/input/shapefiles/gemeindenLOR_DHDN_GK4.shp";
 		String networkFile = "D:/Workspace/berlin/counts/iv_counts/network-base_ext.xml";
 		
 		Double popFraction = 1.0;
-		String outputBase = "D:/Workspace/container/demand/input/cemdap2matsim/13";
+		String outputBase = "D:/Workspace/container/demand/input/cemdap2matsim/16";
 
 		
 		// print input parameters
