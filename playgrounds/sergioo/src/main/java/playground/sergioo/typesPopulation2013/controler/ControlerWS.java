@@ -20,9 +20,9 @@
 
 package playground.sergioo.typesPopulation2013.controler;
 
-import java.util.HashSet;
+//import java.util.HashSet;
 
-import org.matsim.api.core.v01.Id;
+//import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -30,7 +30,7 @@ import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.StrategyManager;
 
-import playground.artemc.calibration.CalibrationStatsListener;
+//import playground.artemc.calibration.CalibrationStatsListener;
 import playground.sergioo.ptsim2013.qnetsimengine.PTQSimFactory;
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterWSImplFactory;
 import playground.sergioo.singapore2012.transitRouterVariable.stopStopTimes.StopStopTimeCalculator;
