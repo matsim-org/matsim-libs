@@ -23,13 +23,13 @@ package playground.gregor.sim2d_v3.controller;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
+import org.matsim.contrib.multimodal.router.util.WalkTravelTimeFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTimeOldFactory;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
 import org.matsim.core.router.IntermodalLeastCostPathCalculator;
@@ -99,7 +99,7 @@ public final class Controller2D extends Controler implements StartupListener {
 		
 		PlanRouterAdapter plansCalcRoute = new PlanRouterAdapter( this );
 		
-		TravelTime travelTime = new WalkTravelTimeOldFactory(config.plansCalcRoute()).createTravelTime();
+		TravelTime travelTime = new WalkTravelTimeFactory(config.plansCalcRoute()).createTravelTime();
 		LegRouter walk2DLegRouter = new Walk2DLegRouter(network, travelTime, (IntermodalLeastCostPathCalculator) plansCalcRoute.getLeastCostPathCalculator());
 		plansCalcRoute.addLegHandler("walk2d", walk2DLegRouter);
 		
