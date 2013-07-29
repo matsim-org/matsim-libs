@@ -5,10 +5,11 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.cadyts.car.CadytsCarScoring;
 import org.matsim.contrib.cadyts.car.CadytsContext;
-import org.matsim.contrib.cadyts.car.CadytsPlanChanger;
+import org.matsim.contrib.cadyts.car.CadytsExtendedExpBetaPlanChanger;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -20,6 +21,8 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyFactory;
 import org.matsim.core.replanning.PlanStrategyImpl;
+import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
+import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.scoring.ScoringFunctionFactory;
@@ -123,15 +126,23 @@ public class EquilController36 {
 		controler.getConfig().getModule("cadytsCar").addParam("startTime", "06:00:00");
 		controler.getConfig().getModule("cadytsCar").addParam("endTime", "07:00:00");
 						
-		// plan strategy
+//		// plan strategy
+//		controler.addPlanStrategyFactory("cadytsCar", new PlanStrategyFactory() {
+//			@Override
+//			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
+//				final CadytsPlanChanger planSelector = new CadytsPlanChanger(cContext);
+//				planSelector.setCadytsWeight(30.*scenario2.getConfig().planCalcScore().getBrainExpBeta());
+//				return new PlanStrategyImpl(planSelector);
+//			}
+//		});
+		
 		controler.addPlanStrategyFactory("cadytsCar", new PlanStrategyFactory() {
 			@Override
-			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
-				final CadytsPlanChanger planSelector = new CadytsPlanChanger(cContext);
-				planSelector.setCadytsWeight(30.*scenario2.getConfig().planCalcScore().getBrainExpBeta());
-				return new PlanStrategyImpl(planSelector);
+			public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
+				return new PlanStrategyImpl(new CadytsExtendedExpBetaPlanChanger(
+						scenario.getConfig().planCalcScore().getBrainExpBeta(), cContext));
 			}
-		});
+		} ) ;
 				
 		// scoring function
 		final CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(config.planCalcScore());
