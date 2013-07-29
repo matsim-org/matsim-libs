@@ -50,15 +50,11 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
+import org.matsim.contrib.multimodal.router.util.MultiModalTravelTimeFactory;
 import org.matsim.contrib.multimodal.tools.MultiModalNetworkCreator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.BikeTravelTimeOld;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTime;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTime;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.WalkTravelTimeOld;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.network.algorithms.NetworkCleaner;
@@ -347,18 +343,13 @@ public class PED12ScenarioGenZurich {
 	 */
 	private static void prepareZurichPopulation(Scenario scenario) {
 
-		Network network = scenario.getNetwork();
-		PlansCalcRouteConfigGroup configGroup = scenario.getConfig().plansCalcRoute();
-		Map<String, TravelTime> multiModalTravelTimes = new HashMap<String, TravelTime>();
-		multiModalTravelTimes.put(TransportMode.car, new FreeSpeedTravelTime());
-		multiModalTravelTimes.put(TransportMode.walk, new WalkTravelTimeOld(configGroup));
-		multiModalTravelTimes.put(TransportMode.bike, new BikeTravelTimeOld(configGroup,
-				new WalkTravelTimeOld(configGroup)));
-		multiModalTravelTimes.put(TransportMode.ride, new RideTravelTime(new FreeSpeedTravelTime(), 
-				new WalkTravelTimeOld(configGroup)));
-		multiModalTravelTimes.put(TransportMode.pt, new PTTravelTime(configGroup, 
-				new FreeSpeedTravelTime(), new WalkTravelTimeOld(configGroup)));
-	
+		Network network = scenario.getNetwork();		
+		MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) scenario.getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
+		multiModalConfigGroup.setSimulatedModes(TransportMode.bike + "," + TransportMode.pt + "," + TransportMode.ride + "," + TransportMode.walk);
+		
+		MultiModalTravelTimeFactory multiModalTravelTimeFactory = new MultiModalTravelTimeFactory(scenario.getConfig());
+		Map<String, TravelTime> multiModalTravelTimes = multiModalTravelTimeFactory.createTravelTimes();
+
 		Map<String, LegRouter> legRouters = createLegRouters(scenario.getConfig(), network, 
 				multiModalTravelTimes);
 
