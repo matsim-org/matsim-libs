@@ -44,8 +44,6 @@ import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTimeFactory;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.RideTravelTimeFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureWriter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerDepartureHandler;
@@ -336,33 +334,34 @@ public class EvacuationControler extends WithinDayController implements
 		this.walkTravelTime = new WalkTravelTimeFactory(this.config.plansCalcRoute()).createTravelTime();
 		this.bikeTravelTime = new BikeTravelTimeFactory(this.config.plansCalcRoute()).createTravelTime();
 		
-		TravelTimeFactory ptFactory;
-		TravelTime nonEvacuationPTTravelTime = new PTTravelTimeFactory(this.config.plansCalcRoute(), this.getTravelTimeCollector(), walkTravelTime).createTravelTime();
-		if (EvacuationConfig.useTransitRouter) {
-			
-			TransitRouterConfig transitRouterConfig = new TransitRouterConfig(config.planCalcScore(),
-					config.plansCalcRoute(), config.transitRouter(), config.vspExperimental());
-			EvacuationTransitRouterFactory evacuationTransitRouterFactory = 
-					new EvacuationTransitRouterFactory(config, walkTravelTime, routerNetwork, transitRouterConfig);
-			
-			ptFactory = new PTTravelTimeEvacuationFactory(this.scenarioData, nonEvacuationPTTravelTime,
-					evacuationTransitRouterFactory, this.informedHouseholdsTracker);
-		} else {
-			ptFactory = new PTTravelTimeKTIEvacuationFactory(this.scenarioData, nonEvacuationPTTravelTime);
-			
-			/*
-			 * Update PT Travel time Matrices for evacuation routes (requires CoordAnalyzer)
-			 */
-			String stopsFile = this.getControlerIO().getOutputFilename("pt_evacuation_stops.shp");
-			String travelTimesFile = this.getControlerIO().getOutputFilename("pt_evacuation_times.shp");
-			((PTTravelTimeKTIEvacuationFactory) ptFactory).prepareMatrixForEvacuation(this.coordAnalyzer, stopsFile, travelTimesFile);
-
-		}
-		this.ptTravelTime = ptFactory.createTravelTime();
-		
-		
-		// Use the TravelTimeCollector as ride travel time estimator. 
-		this.rideTravelTime = new RideTravelTimeFactory(this.getTravelTimeCollector(), walkTravelTime).createTravelTime(); 
+		// TODO: fix this.
+//		TravelTimeFactory ptFactory;
+//		TravelTime nonEvacuationPTTravelTime = new PTTravelTimeFactory(this.config.plansCalcRoute(), this.getTravelTimeCollector(), walkTravelTime).createTravelTime();
+//		if (EvacuationConfig.useTransitRouter) {
+//			
+//			TransitRouterConfig transitRouterConfig = new TransitRouterConfig(config.planCalcScore(),
+//					config.plansCalcRoute(), config.transitRouter(), config.vspExperimental());
+//			EvacuationTransitRouterFactory evacuationTransitRouterFactory = 
+//					new EvacuationTransitRouterFactory(config, walkTravelTime, routerNetwork, transitRouterConfig);
+//			
+//			ptFactory = new PTTravelTimeEvacuationFactory(this.scenarioData, nonEvacuationPTTravelTime,
+//					evacuationTransitRouterFactory, this.informedHouseholdsTracker);
+//		} else {
+//			ptFactory = new PTTravelTimeKTIEvacuationFactory(this.scenarioData, nonEvacuationPTTravelTime);
+//			
+//			/*
+//			 * Update PT Travel time Matrices for evacuation routes (requires CoordAnalyzer)
+//			 */
+//			String stopsFile = this.getControlerIO().getOutputFilename("pt_evacuation_stops.shp");
+//			String travelTimesFile = this.getControlerIO().getOutputFilename("pt_evacuation_times.shp");
+//			((PTTravelTimeKTIEvacuationFactory) ptFactory).prepareMatrixForEvacuation(this.coordAnalyzer, stopsFile, travelTimesFile);
+//
+//		}
+//		this.ptTravelTime = ptFactory.createTravelTime();
+//		
+//		
+//		// Use the TravelTimeCollector as ride travel time estimator. 
+//		this.rideTravelTime = new RideTravelTimeFactory(this.getTravelTimeCollector(), walkTravelTime).createTravelTime(); 
 
 		Map<String, TravelTime> travelTimes = new HashMap<String, TravelTime>();
 		travelTimes.put(TransportMode.walk, walkTravelTime);
