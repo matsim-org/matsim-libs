@@ -29,11 +29,11 @@ import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.PlanStrategyImpl;
 import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.modules.ReRoute;
+import org.matsim.core.replanning.modules.TripsToLegsModule;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
-import org.matsim.pt.router.TransitActsRemover;
 
 public class BestReplyLocationChoicePlanStrategy implements PlanStrategy {
 
@@ -46,7 +46,6 @@ public class BestReplyLocationChoicePlanStrategy implements PlanStrategy {
 		
 	@Override
 	public void run(Person person) {
-		new TransitActsRemover().run(person.getSelectedPlan()); // acts will be added in routing (?)
 		delegate.run(person);
 	}
 
@@ -72,6 +71,7 @@ public class BestReplyLocationChoicePlanStrategy implements PlanStrategy {
 		} else {
 			delegate = new PlanStrategyImpl(new ExpBetaPlanSelector(config.planCalcScore()));
 		}
+		delegate.addStrategyModule(new TripsToLegsModule(scenario.getConfig()));
 		delegate.addStrategyModule(new BestReplyDestinationChoice(lcContext, maxDcScoreWrapper.getPersonsMaxDCScoreUnscaled()));
 		delegate.addStrategyModule(new ReRoute(lcContext.getScenario()));
 		
