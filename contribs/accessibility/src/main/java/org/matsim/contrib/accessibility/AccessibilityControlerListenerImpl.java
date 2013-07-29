@@ -107,7 +107,7 @@ public abstract class AccessibilityControlerListenerImpl {
 	// * alternatively, use a more intelligent data structure in the sense of beta[car][TD].
 	// kai, jul'13
 
-	private boolean useRawSum	= false;
+	private boolean useRawSum	; //= false;
 	private double logitScaleParameter;
 	private double inverseOfLogitScaleParameter;
 	private double betaCarTT;		// in MATSim this is [utils/h]: cnScoringGroup.getTraveling_utils_hr() - cnScoringGroup.getPerforming_utils_hr() 
