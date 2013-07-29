@@ -185,7 +185,7 @@ public class MultiModalControlerListenerTest {
 		
 		String inputDir = this.utils.getClassInputDirectory();
 
-		Config config = ConfigUtils.loadConfig(inputDir + "config_berlin_multimodal.xml", MultiModalConfigGroup.class);
+		Config config = ConfigUtils.loadConfig(inputDir + "config_berlin_multimodal.xml", new MultiModalConfigGroup());
 		config.controler().setOutputDirectory(this.utils.getOutputDirectory());
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);

@@ -378,7 +378,7 @@ public class WithinDayParkingController implements StartupListener, ReplanningLi
 			System.out.println("Usage: Controler config-file [dtd-file]");
 			System.out.println("using default config");
 		}
-		Config config = ConfigUtils.loadConfig(args[0], MultiModalConfigGroup.class);
+		Config config = ConfigUtils.loadConfig(args[0], new MultiModalConfigGroup());
 		final Controler controler = new Controler(config);
 		controler.setOverwriteFiles(true);
 		

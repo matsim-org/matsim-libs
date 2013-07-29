@@ -233,7 +233,7 @@ public class EvacuationControler extends WithinDayController implements
 			System.out.println("Usage: Controler config-file [dtd-file]");
 			System.out.println();
 		} else {
-			Config config = ConfigUtils.loadConfig(args[0], MultiModalConfigGroup.class, KtiConfigGroup.class);
+			Config config = ConfigUtils.loadConfig(args[0], new MultiModalConfigGroup(), new KtiConfigGroup());
 			final Controler controler = new EvacuationControler(config, args[1]);
 			controler.setOverwriteFiles(true);
 			controler.run();

@@ -38,7 +38,7 @@ public class WithinDayParkingRunner {
 			System.out.println("Usage: Controler config-file [dtd-file]");
 			System.out.println("");
 		} else {
-			Config config = ConfigUtils.loadConfig(args[0], MultiModalConfigGroup.class);
+			Config config = ConfigUtils.loadConfig(args[0], new MultiModalConfigGroup());
 			Scenario scenario = ScenarioUtils.loadScenario(config);
 			
 			// if multi-modal simulation is enabled
