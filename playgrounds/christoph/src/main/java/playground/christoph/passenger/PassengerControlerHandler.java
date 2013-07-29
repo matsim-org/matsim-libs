@@ -41,7 +41,7 @@ import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
-import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureWriter;
+import org.matsim.core.mobsim.qsim.qnetsimengine.MissedJointDepartureWriter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.CollectionUtils;
@@ -66,7 +66,7 @@ public class PassengerControlerHandler implements StartupListener {
 	public void notifyStartup(StartupEvent event) {
 		
 		JointDepartureOrganizer jointDepartureOrganizer = new JointDepartureOrganizer();
-		JointDepartureWriter jointDepartureWriter = new JointDepartureWriter(jointDepartureOrganizer);
+		MissedJointDepartureWriter jointDepartureWriter = new MissedJointDepartureWriter(jointDepartureOrganizer);
 		event.getControler().addControlerListener(jointDepartureWriter);
 		
 		RideToRidePassengerContextProvider rideToRidePassengerContextProvider = new RideToRidePassengerContextProvider();

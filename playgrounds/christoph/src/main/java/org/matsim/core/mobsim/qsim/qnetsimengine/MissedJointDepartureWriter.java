@@ -28,42 +28,20 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
 
-public class JointDepartureWriter implements AfterMobsimListener, BeforeMobsimListener {
+public class MissedJointDepartureWriter implements AfterMobsimListener {
 
 	private static final String newLine = "\n";
-	private static String scheduledJointDeparturesFile = "scheduledJointDepartures.txt.gz";
 	private static String missedJointDeparturesFile = "missedJointDepartures.txt.gz";
 		
 	private final JointDepartureOrganizer jointDepartureOrganizer;
 	private BufferedWriter bufferedWriter;
 	
-	public JointDepartureWriter(JointDepartureOrganizer jointDepartureOrganizer) {
+	public MissedJointDepartureWriter(JointDepartureOrganizer jointDepartureOrganizer) {
 		this.jointDepartureOrganizer = jointDepartureOrganizer;
-	}
-	
-	public void writeDeparture(double time, JointDeparture jointDeparture) {
-		try {
-			bufferedWriter.write("[time=");
-			bufferedWriter.write(String.valueOf(time));
-			bufferedWriter.write("]");
-			bufferedWriter.write(jointDeparture.toString());
-			bufferedWriter.write(newLine);
-		} catch (IOException e) {
-			Gbl.errorMsg(e);
-		}
-	}
-	
-	@Override
-	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
-		String file = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), 
-				scheduledJointDeparturesFile);
-		bufferedWriter = IOUtils.getBufferedWriter(file);
 	}
 
 	@Override

@@ -45,7 +45,7 @@ import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
-import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureWriter;
+import org.matsim.core.mobsim.qsim.qnetsimengine.MissedJointDepartureWriter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerDepartureHandler;
 import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -185,7 +185,7 @@ public class EvacuationControler extends WithinDayController implements
 	protected AssignVehiclesToPlans assignVehiclesToPlans;
 	
 	protected JointDepartureOrganizer jointDepartureOrganizer;
-	protected JointDepartureWriter jointDepartureWriter;
+	protected MissedJointDepartureWriter jointDepartureWriter;
 	protected InformedHouseholdsTracker informedHouseholdsTracker;
 	protected SelectHouseholdMeetingPoint selectHouseholdMeetingPoint;
 	protected ModeAvailabilityChecker modeAvailabilityChecker;
@@ -429,7 +429,7 @@ public class EvacuationControler extends WithinDayController implements
 		this.getFixedOrderSimulationListener().addSimulationListener(householdsTracker);
 		
 		this.jointDepartureOrganizer = new JointDepartureOrganizer();
-		this.jointDepartureWriter = new JointDepartureWriter(this.jointDepartureOrganizer);
+		this.jointDepartureWriter = new MissedJointDepartureWriter(this.jointDepartureOrganizer);
 		this.addControlerListener(this.jointDepartureWriter);
 		
 		this.vehiclesTracker = new VehiclesTracker();
