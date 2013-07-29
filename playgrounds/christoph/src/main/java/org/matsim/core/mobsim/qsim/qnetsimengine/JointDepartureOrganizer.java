@@ -20,14 +20,16 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.core.basic.v01.IdImpl;
 
 public class JointDepartureOrganizer {
 
@@ -45,6 +47,8 @@ public class JointDepartureOrganizer {
 	 */
 	/*package*/ final Map<Id, Map<Leg, JointDeparture>> scheduledDepartures;	// agentId
 
+	private final AtomicInteger jointDepartureCounter = new AtomicInteger(0);
+	
 	public JointDepartureOrganizer() {
 		// needs this to be thread-safe?
 		this.scheduledDepartures = new ConcurrentHashMap<Id, Map<Leg, JointDeparture>>();
@@ -67,10 +71,21 @@ public class JointDepartureOrganizer {
 	}
 	
 	public JointDeparture createJointDeparture(Id id, Id linkId, Id vehicleId, Id driverId, 
-			Collection<Id> passengerIds) {		
+			Set<Id> passengerIds) {		
 		JointDeparture jointDeparture = new JointDeparture(id, linkId, vehicleId, driverId, passengerIds);
 		
 		return jointDeparture;
+	}
+	
+	public JointDeparture createJointDeparture(Id linkId, Id vehicleId, Id driverId, 
+			Set<Id> passengerIds) {		
+		JointDeparture jointDeparture = new JointDeparture(getNextId(), linkId, vehicleId, driverId, passengerIds);
+		
+		return jointDeparture;
+	}
+	
+	public Id getNextId() {
+		return new IdImpl("id" + jointDepartureCounter.getAndIncrement());
 	}
 	
 	public void assignAgentToJointDeparture(Id agentId, Leg leg, JointDeparture jointDeparture) {

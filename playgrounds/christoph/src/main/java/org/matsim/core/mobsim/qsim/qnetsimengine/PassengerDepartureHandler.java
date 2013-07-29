@@ -235,7 +235,8 @@ public class PassengerDepartureHandler implements DepartureHandler {
 		 */
 		jointDeparture.setDeparted();
 		
-		JointDepartureEvent event = new JointDepartureEvent(now, jointDeparture.getId());
+		JointDepartureEvent event = new JointDepartureEvent(now, jointDeparture.getId(), jointDeparture.getLinkId(),
+				jointDeparture.getDriverId(), jointDeparture.getVehicleId(), jointDeparture.getPassengerIds());
 		qNetsimEngine.getMobsim().getEventsManager().processEvent(event);
 		
 		/*

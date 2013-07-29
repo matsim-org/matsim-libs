@@ -20,10 +20,9 @@
 
 package playground.christoph.evacuation.withinday.replanning.identifiers;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -48,6 +47,7 @@ import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 
@@ -74,15 +74,18 @@ public class AgentsToDropOffIdentifier extends DuringLegIdentifier implements Li
 	private final Scenario scenario;
 	private final CoordAnalyzer coordAnalyzer;
 	private final VehiclesTracker vehiclesTracker;
+	private final JointDepartureOrganizer jointDepartureOrganizer;
 	
 	private final Map<Id, MobsimAgent> agents;
 	private final Set<Id> carLegPerformingAgents;
 	private final Set<Id> potentialDropOffVehicles;
 	
-	/*package*/ AgentsToDropOffIdentifier(Scenario scenario, CoordAnalyzer coordAnalyzer, VehiclesTracker vehiclesTracker) {
+	/*package*/ AgentsToDropOffIdentifier(Scenario scenario, CoordAnalyzer coordAnalyzer, VehiclesTracker vehiclesTracker,
+			JointDepartureOrganizer jointDepartureOrganizer) {
 		this.scenario = scenario;
 		this.coordAnalyzer = coordAnalyzer;
 		this.vehiclesTracker = vehiclesTracker;
+		this.jointDepartureOrganizer = jointDepartureOrganizer;
 
 		this.agents = new HashMap<Id, MobsimAgent>();
 		this.carLegPerformingAgents = new HashSet<Id>();
@@ -136,12 +139,12 @@ public class AgentsToDropOffIdentifier extends DuringLegIdentifier implements Li
 			 */
 			Id linkId = driver.getCurrentLinkId();
 			Id driverId = driver.getId();
-			List<Id> remainingPassengers = new ArrayList<Id>();
+			Set<Id> remainingPassengers = new LinkedHashSet<Id>();
 			for (PassengerAgent passenger : vehicle.getPassengers()) {
 				Id passengerId = passenger.getId();
 				if (!agentsLeaveVehicle.contains(passengerId)) remainingPassengers.add(passengerId);
 			}
-			this.vehiclesTracker.createJointDeparture(linkId, vehicleId, driverId, remainingPassengers);
+			this.jointDepartureOrganizer.createJointDeparture(linkId, vehicleId, driverId, remainingPassengers);
 		}
 		potentialDropOffVehicles.clear();
 		

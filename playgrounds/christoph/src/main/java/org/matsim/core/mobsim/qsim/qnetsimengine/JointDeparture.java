@@ -21,6 +21,7 @@
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.Collection;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 
@@ -34,11 +35,11 @@ public class JointDeparture {
 	private final Id linkId;
 	private final Id vehicleId;
 	private final Id driverId;
-	private final Collection<Id> passengerIds;
+	private final Set<Id> passengerIds;
 	
 	private boolean departed = false;
 	
-	/*package*/ JointDeparture(Id id, Id linkId, Id vehicleId, Id driverId, Collection<Id> passengerIds) {
+	/*package*/ JointDeparture(Id id, Id linkId, Id vehicleId, Id driverId, Set<Id> passengerIds) {
 		this.id = id;
 		this.linkId = linkId;
 		this.vehicleId = vehicleId;
@@ -75,7 +76,7 @@ public class JointDeparture {
 		return this.driverId;
 	}
 	
-	public Collection<Id> getPassengerIds() {
+	public Set<Id> getPassengerIds() {
 		return this.passengerIds;
 	}
 	

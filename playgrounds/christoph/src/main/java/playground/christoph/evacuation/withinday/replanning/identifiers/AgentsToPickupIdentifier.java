@@ -21,12 +21,12 @@
 package playground.christoph.evacuation.withinday.replanning.identifiers;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -62,6 +62,7 @@ import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.Tuple;
@@ -99,6 +100,7 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 	private final CoordAnalyzer coordAnalyzer;
 	private final VehiclesTracker vehiclesTracker;
 	private final TravelTime walkTravelTime;
+	private final JointDepartureOrganizer jointDepartureOrganizer;
 	
 	private final Map<Id, MobsimAgent> agents;
 	private final Map<Id, Double> earliestLinkLeaveTime;
@@ -116,12 +118,13 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 	private final Queue<Tuple<Double, MobsimAgent>> agentsLeaveLinkQueue = new PriorityQueue<Tuple<Double, MobsimAgent>>(30, new TravelTimeComparator());
 
 	/*package*/ AgentsToPickupIdentifier(Scenario scenario, CoordAnalyzer coordAnalyzer, VehiclesTracker vehiclesTracker, TravelTime walkTravelTime,
-			InformedAgentsTracker informedAgentsTracker, DecisionDataProvider decisionDataProvider) {
+			InformedAgentsTracker informedAgentsTracker, DecisionDataProvider decisionDataProvider, JointDepartureOrganizer jointDepartureOrganizer) {
 		this.scenario = scenario;
 		this.coordAnalyzer = coordAnalyzer;
 		this.vehiclesTracker = vehiclesTracker;
 		this.informedAgentsTracker = informedAgentsTracker;
 		this.walkTravelTime = walkTravelTime;
+		this.jointDepartureOrganizer = jointDepartureOrganizer;
 
 		this.agents = new HashMap<Id, MobsimAgent>();
 		this.earliestLinkLeaveTime = new HashMap<Id, Double>();
@@ -284,7 +287,7 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 						plannedDeparture.driverId = driverId;
 						plannedDeparture.linkId = linkId;
 						plannedDeparture.vehicleId = vehicleId;
-						plannedDeparture.passengerIds = new ArrayList<Id>();
+						plannedDeparture.passengerIds = new LinkedHashSet<Id>();
 						
 						/*
 						 * Check which existing passengers will stay in the vehicle
@@ -311,7 +314,7 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 		 * Create joint departures for all planned pickups
 		 */
 		for (PlannedDeparture pd : plannedDepartures.values()) {
-			this.vehiclesTracker.createJointDeparture(pd.linkId, pd.vehicleId, pd.driverId, pd.passengerIds);
+			this.jointDepartureOrganizer.createJointDeparture(pd.linkId, pd.vehicleId, pd.driverId, pd.passengerIds);
 		}
 		
 		return agentsToReplan;
@@ -428,7 +431,7 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier implements Lin
 		Id driverId;
 		Id linkId;
 		Id vehicleId;
-		List<Id> passengerIds;
+		Set<Id> passengerIds;
 	}
 	
 	private static class TravelTimeComparator implements Comparator<Tuple<Double, MobsimAgent>>, Serializable {

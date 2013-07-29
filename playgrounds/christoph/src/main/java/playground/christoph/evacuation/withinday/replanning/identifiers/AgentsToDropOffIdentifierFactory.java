@@ -21,6 +21,7 @@
 package playground.christoph.evacuation.withinday.replanning.identifiers;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifierFactory;
 
@@ -32,17 +33,20 @@ public class AgentsToDropOffIdentifierFactory extends DuringLegIdentifierFactory
 	private final Scenario scenario;
 	private final CoordAnalyzer coordAnalyzer;
 	private final VehiclesTracker vehiclesTracker;
+	private final JointDepartureOrganizer jointDepartureOrganizer;
 	
-	public AgentsToDropOffIdentifierFactory(Scenario scenario, CoordAnalyzer coordAnalyzer, VehiclesTracker vehiclesTracker) {
+	public AgentsToDropOffIdentifierFactory(Scenario scenario, CoordAnalyzer coordAnalyzer, VehiclesTracker vehiclesTracker,
+			JointDepartureOrganizer jointDepartureOrganizer) {
 		this.scenario = scenario;
 		this.coordAnalyzer = coordAnalyzer;
 		this.vehiclesTracker = vehiclesTracker;
+		this.jointDepartureOrganizer = jointDepartureOrganizer;
 	}
 	
 	@Override
 	public DuringLegIdentifier createIdentifier() {
 		DuringLegIdentifier identifier = new AgentsToDropOffIdentifier(scenario, coordAnalyzer.createInstance(), 
-				vehiclesTracker);
+				vehiclesTracker, jointDepartureOrganizer);
 		identifier.setIdentifierFactory(this);
 		this.addAgentFiltersToIdentifier(identifier);
 		return identifier;

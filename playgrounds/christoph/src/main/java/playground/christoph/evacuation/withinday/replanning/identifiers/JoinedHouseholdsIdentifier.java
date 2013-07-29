@@ -20,11 +20,10 @@
 
 package playground.christoph.evacuation.withinday.replanning.identifiers;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
@@ -37,7 +36,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
@@ -46,6 +44,7 @@ import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
+import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
@@ -89,6 +88,7 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 	private final HouseholdsTracker householdsTracker;
 	private final InformedHouseholdsTracker informedHouseholdsTracker;
 	private final DecisionDataProvider decisionDataProvider;
+	private final JointDepartureOrganizer jointDepartureOrganizer;
 	
 	private final DeterministicRNG rng;
 	private final Map<Id, HouseholdDeparture> householdDepartures;
@@ -106,7 +106,7 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 	public JoinedHouseholdsIdentifier(Scenario scenario, SelectHouseholdMeetingPoint selectHouseholdMeetingPoint,
 			CoordAnalyzer coordAnalyzer, VehiclesTracker vehiclesTracker, HouseholdsTracker householdsTracker,
 			InformedHouseholdsTracker informedHouseholdsTracker, ModeAvailabilityChecker modeAvailabilityChecker,
-			DecisionDataProvider decisionDataProvider) {
+			DecisionDataProvider decisionDataProvider, JointDepartureOrganizer jointDepartureOrganizer) {
 		this.households = ((ScenarioImpl) scenario).getHouseholds();
 		this.facilities = ((ScenarioImpl) scenario).getActivityFacilities();
 		this.selectHouseholdMeetingPoint = selectHouseholdMeetingPoint;
@@ -116,6 +116,7 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 		this.informedHouseholdsTracker = informedHouseholdsTracker;
 		this.modeAvailabilityChecker = modeAvailabilityChecker;
 		this.decisionDataProvider = decisionDataProvider;
+		this.jointDepartureOrganizer = jointDepartureOrganizer;
 		
 		this.rng = new DeterministicRNG(123654);
 		this.agentMapping = new HashMap<Id, PlanBasedWithinDayAgent>();
@@ -185,14 +186,14 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 		
 		for (Id driverId : driverIds) {
 			Id vehicleId = assignment.getDriverVehicleMap().get(driverId);
-			List<Id> passengerIds = new ArrayList<Id>();
+			Set<Id> passengerIds = new LinkedHashSet<Id>();
 			for (Entry<Id, Id> entry : assignment.getPassengerVehicleMap().entrySet()) {
 				if (entry.getValue().equals(vehicleId)) {
 					passengerIds.add(entry.getKey());
 				}
 			}
 			
-			this.vehiclesTracker.createJointDeparture(linkId, vehicleId, driverId, passengerIds);			
+			this.jointDepartureOrganizer.createJointDeparture(linkId, vehicleId, driverId, passengerIds);			
 		}
 	}
 	

@@ -62,7 +62,6 @@ import org.matsim.core.router.util.FastAStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.router.util.TravelTimeFactory;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.functions.OnlyTravelDependentScoringFunctionFactory;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
@@ -71,7 +70,6 @@ import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.households.Household;
-import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -109,7 +107,6 @@ import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataGrabber;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.mobsim.decisionmodel.DecisionModelRunner;
-import playground.christoph.evacuation.pt.EvacuationTransitRouterFactory;
 import playground.christoph.evacuation.pt.TransitRouterNetworkReaderMatsimV1;
 import playground.christoph.evacuation.router.LeastCostPathCalculatorSelectorFactory;
 import playground.christoph.evacuation.router.RandomCompassRouterFactory;
@@ -117,8 +114,6 @@ import playground.christoph.evacuation.router.util.AffectedAreaPenaltyCalculator
 import playground.christoph.evacuation.router.util.FuzzyTravelTimeEstimatorFactory;
 import playground.christoph.evacuation.router.util.PenaltyTravelCostFactory;
 import playground.christoph.evacuation.trafficmonitoring.BikeTravelTimeFactory;
-import playground.christoph.evacuation.trafficmonitoring.PTTravelTimeEvacuationFactory;
-import playground.christoph.evacuation.trafficmonitoring.PTTravelTimeKTIEvacuationFactory;
 import playground.christoph.evacuation.trafficmonitoring.SwissPTTravelTime;
 import playground.christoph.evacuation.trafficmonitoring.WalkTravelTimeFactory;
 import playground.christoph.evacuation.vehicles.AssignVehiclesToPlans;
@@ -437,7 +432,7 @@ public class EvacuationControler extends WithinDayController implements
 		this.jointDepartureWriter = new JointDepartureWriter(this.jointDepartureOrganizer);
 		this.addControlerListener(this.jointDepartureWriter);
 		
-		this.vehiclesTracker = new VehiclesTracker(jointDepartureOrganizer, this.jointDepartureWriter);
+		this.vehiclesTracker = new VehiclesTracker();
 		this.getEvents().addHandler(vehiclesTracker);
 		this.getFixedOrderSimulationListener().addSimulationListener(vehiclesTracker);
 		
@@ -672,7 +667,7 @@ public class EvacuationControler extends WithinDayController implements
 		
 		duringActivityFactory = new JoinedHouseholdsIdentifierFactory(this.scenarioData, this.selectHouseholdMeetingPoint, 
 				this.coordAnalyzer.createInstance(), this.vehiclesTracker, this.householdsTracker, this.informedHouseholdsTracker,
-				this.modeAvailabilityChecker.createInstance(), this.decisionDataProvider);
+				this.modeAvailabilityChecker.createInstance(), this.decisionDataProvider, this.jointDepartureOrganizer);
 		duringActivityFactory.addAgentFilterFactory(notInitialReplanningFilterFactory);
 		this.joinedHouseholdsIdentifier = duringActivityFactory.createIdentifier();
 		this.getFixedOrderSimulationListener().addSimulationListener((JoinedHouseholdsIdentifier) this.joinedHouseholdsIdentifier);
@@ -685,14 +680,14 @@ public class EvacuationControler extends WithinDayController implements
 		duringLegFactory.addAgentFilterFactory(initialReplanningFilterFactory);
 		this.legPerformingIdentifier = duringLegFactory.createIdentifier();
 
-		duringLegFactory = new AgentsToDropOffIdentifierFactory(this.scenarioData, this.coordAnalyzer, this.vehiclesTracker); 
+		duringLegFactory = new AgentsToDropOffIdentifierFactory(this.scenarioData, this.coordAnalyzer, this.vehiclesTracker, this.jointDepartureOrganizer); 
 		duringLegFactory.addAgentFilterFactory(notInitialReplanningFilterFactory);
 		this.agentsToDropOffIdentifier = duringLegFactory.createIdentifier();
 		this.getEvents().addHandler((AgentsToDropOffIdentifier) this.agentsToDropOffIdentifier);
 		this.getFixedOrderSimulationListener().addSimulationListener((AgentsToDropOffIdentifier) this.agentsToDropOffIdentifier);
 		
 		duringLegFactory = new AgentsToPickupIdentifierFactory(this.scenarioData, this.coordAnalyzer, this.vehiclesTracker, 
-				this.walkTravelTime, this.informedHouseholdsTracker, this.decisionDataProvider); 
+				this.walkTravelTime, this.informedHouseholdsTracker, this.decisionDataProvider, this.jointDepartureOrganizer); 
 		duringLegFactory.addAgentFilterFactory(notInitialReplanningFilterFactory);
 		this.agentsToPickupIdentifier = duringLegFactory.createIdentifier();
 		this.getEvents().addHandler((AgentsToPickupIdentifier) this.agentsToPickupIdentifier);

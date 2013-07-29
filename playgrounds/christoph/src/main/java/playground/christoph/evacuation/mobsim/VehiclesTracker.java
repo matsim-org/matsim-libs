@@ -41,18 +41,13 @@ import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.qnetsimengine.JointDeparture;
-import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
-import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureWriter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 
@@ -81,17 +76,8 @@ public class VehiclesTracker implements MobsimInitializedListener,
 	 * a seat when the picking up vehicle in on the same link.
 	 */
 	private final Map<Id, AtomicInteger> reservedCapacities;
-	
-	private final JointDepartureOrganizer jointDepartureOrganizer;
-	private final JointDepartureWriter jointDepartureWriter;
-	private MobsimTimer mobsimTimer;
-	
-	private int jointDeparturesCounter = 0;
-		
-	public VehiclesTracker(JointDepartureOrganizer jointDepartureOrganizer, JointDepartureWriter jointDepartureWriter) {
-		
-		this.jointDepartureOrganizer = jointDepartureOrganizer; 
-		this.jointDepartureWriter = jointDepartureWriter;
+			
+	public VehiclesTracker() {
 		
 		this.drivers = new HashSet<Id>();
 		this.vehicles = new HashMap<Id, MobsimVehicle>();	
@@ -99,14 +85,14 @@ public class VehiclesTracker implements MobsimInitializedListener,
 		this.reservedCapacities = new HashMap<Id, AtomicInteger>();
 	}
 	
-	@Deprecated
-	public JointDeparture createJointDeparture(Id linkId, Id vehicleId, Id driverId, 
-			Collection<Id> passengerIds) {
-		Id id = new IdImpl("jd" + jointDeparturesCounter++);
-		JointDeparture jointDeparture = this.jointDepartureOrganizer.createJointDeparture(id, linkId, vehicleId, driverId, passengerIds);
-		this.jointDepartureWriter.writeDeparture(this.mobsimTimer.getTimeOfDay(), jointDeparture);
-		return jointDeparture;
-	}
+//	private int jointDeparturesCounter = 0;
+//	@Deprecated
+//	public JointDeparture createJointDeparture(Id linkId, Id vehicleId, Id driverId, 
+//			Set<Id> passengerIds) {
+//		Id id = new IdImpl("jd" + jointDeparturesCounter++);
+//		JointDeparture jointDeparture = this.jointDepartureOrganizer.createJointDeparture(id, linkId, vehicleId, driverId, passengerIds);
+//		return jointDeparture;
+//	}
 	
 	public Id getVehicleLinkId(Id vehicleId) {
 		return this.vehicles.get(vehicleId).getCurrentLink().getId();
@@ -154,7 +140,6 @@ public class VehiclesTracker implements MobsimInitializedListener,
 	@Override
 	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 		QSim sim = (QSim) e.getQueueSimulation();
-		this.mobsimTimer = sim.getSimTimer();
 		
 		// collect all vehicles
 		for (NetsimLink netsimLink : sim.getNetsimNetwork().getNetsimLinks().values()) {

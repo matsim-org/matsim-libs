@@ -21,6 +21,7 @@
 package playground.christoph.evacuation.withinday.replanning.identifiers;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifierFactory;
@@ -37,21 +38,24 @@ public class AgentsToPickupIdentifierFactory extends DuringLegIdentifierFactory 
 	private final TravelTime travelTime;
 	private final InformedAgentsTracker informedAgentsTracker;
 	private final DecisionDataProvider decisionDataProvider;
+	private final JointDepartureOrganizer jointDepartureOrganizer;
 	
 	public AgentsToPickupIdentifierFactory(Scenario scenario, CoordAnalyzer coordAnalyzer, VehiclesTracker vehiclesTracker, 
-			TravelTime walkTravelTime, InformedAgentsTracker informedAgentsTracker, DecisionDataProvider decisionDataProvider) {
+			TravelTime walkTravelTime, InformedAgentsTracker informedAgentsTracker, DecisionDataProvider decisionDataProvider,
+			JointDepartureOrganizer jointDepartureOrganizer) {
 		this.scenario = scenario;
 		this.coordAnalyzer = coordAnalyzer;
 		this.vehiclesTracker = vehiclesTracker;
 		this.travelTime = walkTravelTime;
 		this.informedAgentsTracker = informedAgentsTracker;
 		this.decisionDataProvider = decisionDataProvider;
+		this.jointDepartureOrganizer = jointDepartureOrganizer;
 	}
 	
 	@Override
 	public DuringLegIdentifier createIdentifier() {
 		DuringLegIdentifier identifier = new AgentsToPickupIdentifier(scenario, coordAnalyzer.createInstance(), 
-				vehiclesTracker, travelTime, informedAgentsTracker, decisionDataProvider);
+				vehiclesTracker, travelTime, informedAgentsTracker, decisionDataProvider, jointDepartureOrganizer);
 		identifier.setIdentifierFactory(this);
 		this.addAgentFiltersToIdentifier(identifier);
 		return identifier;
