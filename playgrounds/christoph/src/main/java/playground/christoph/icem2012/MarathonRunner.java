@@ -61,7 +61,6 @@ import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.multimodalsimengine.router.util.PTTravelTimeFactory;
 import org.matsim.core.network.NodeImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteFactory;
@@ -776,9 +775,9 @@ public final class MarathonRunner implements StartupListener,
 		travelTimes.put(TransportMode.walk, new WalkTravelTimeFactory(this.scenario.getConfig().plansCalcRoute()).createTravelTime());
 		travelTimes.put("walk2d", new WalkTravelTimeFactory(this.scenario.getConfig().plansCalcRoute()).createTravelTime());
 		travelTimes.put(TransportMode.bike, new BikeTravelTimeFactory(this.scenario.getConfig().plansCalcRoute()).createTravelTime());
-		travelTimes.put(TransportMode.pt, new PTTravelTimeKTIEvacuationFactory(this.scenario, 
-					new PTTravelTimeFactory(this.scenario.getConfig().plansCalcRoute(), this.withinDayControlerListener.getTravelTimeCollector(), 
-							new WalkTravelTimeFactory(this.scenario.getConfig().plansCalcRoute()).createTravelTime()).createTravelTime()).createTravelTime());
+//		travelTimes.put(TransportMode.pt, new PTTravelTimeKTIEvacuationFactory(this.scenario, 
+//					new PTTravelTimeFactory(this.scenario.getConfig().plansCalcRoute(), this.withinDayControlerListener.getTravelTimeCollector(), 
+//							new WalkTravelTimeFactory(this.scenario.getConfig().plansCalcRoute()).createTravelTime()).createTravelTime()).createTravelTime());
 		
 //		// add time dependent penalties to travel costs within the affected area
 		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
