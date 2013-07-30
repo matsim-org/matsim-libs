@@ -20,14 +20,13 @@
 /**
  * 
  */
-package org.matsim.contrib.cadyts.pt;
+package org.matsim.contrib.cadyts.general;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.config.Config;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.ArbitraryEventScoring;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
 
@@ -35,18 +34,19 @@ import cadyts.calibrators.analytical.AnalyticalCalibrator;
  * @author nagel
  *
  */
-public class CadytsPtScoring implements ArbitraryEventScoring {
+public class CadytsPtScoring<T> implements ArbitraryEventScoring {
+	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(CadytsPtScoring.class);
 
 	private double score = 0. ;
-	private PtPlanToPlanStepBasedOnEvents ptPlanToPlanStep;
-	private AnalyticalCalibrator<TransitStopFacility> matsimCalibrator;
+	private PlansTranslator<T> ptPlanToPlanStep;
+	private AnalyticalCalibrator<T> matsimCalibrator;
 	private Plan plan;
 	private final double beta ;
 	private double weightOfCadytsCorrection = 1. ;
 
-	public CadytsPtScoring(final Plan plan, Config config, final CadytsContext context ) {
-		this.ptPlanToPlanStep = context.getPtStep() ;
+	public CadytsPtScoring(final Plan plan, Config config, final CadytsContextI<T> context ) {
+		this.ptPlanToPlanStep = context.getPlansTranslator() ;
 		this.matsimCalibrator = context.getCalibrator() ;
 		this.plan = plan ;
 		this.beta = config.planCalcScore().getBrainExpBeta() ;
@@ -54,7 +54,7 @@ public class CadytsPtScoring implements ArbitraryEventScoring {
 	
 	@Override
 	public void finish() {
-		cadyts.demand.Plan<TransitStopFacility> currentPlanSteps = this.ptPlanToPlanStep.getPlanSteps(plan);
+		cadyts.demand.Plan<T> currentPlanSteps = this.ptPlanToPlanStep.getPlanSteps(plan);
 		double currentPlanCadytsCorrection = this.matsimCalibrator.calcLinearPlanEffect(currentPlanSteps) / this.beta;
 		this.score = weightOfCadytsCorrection * currentPlanCadytsCorrection ;
 	}

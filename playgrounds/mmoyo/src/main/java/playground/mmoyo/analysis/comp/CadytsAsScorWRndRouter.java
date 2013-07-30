@@ -21,10 +21,10 @@ package playground.mmoyo.analysis.comp;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.cadyts.general.CadytsPtPlanChanger;
+import org.matsim.contrib.cadyts.general.CadytsPtScoring;
 import org.matsim.contrib.cadyts.pt.CadytsContext;
 import org.matsim.contrib.cadyts.pt.CadytsPtConfigGroup;
-import org.matsim.contrib.cadyts.pt.CadytsPtPlanChanger;
-import org.matsim.contrib.cadyts.pt.CadytsPtScoring;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;

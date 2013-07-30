@@ -1,0 +1,5 @@
+2013-07-30 17:23:29,111  WARN AbstractController$1:57 S H U T D O W N   ---   received unexpected shutdown request.
+2013-07-30 17:23:29,113 ERROR AbstractController$1:60 ERROR --- MATSim terminated with some error. Please check the output or the logfile with warnings and errors for hints.
+2013-07-30 17:23:29,114 ERROR AbstractController$1:61 ERROR --- results should not be used for further analysis.
+2013-07-30 17:23:29,114 ERROR AbstractController$1:62 S H U T D O W N   ---   unexpected shutdown request completed. 
+2013-07-30 17:23:29,116  WARN AbstractController$1:57 S H U T D O W N   ---   received unexpected shutdown request.

@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.cadyts.pt;
+package org.matsim.contrib.cadyts.general;
 
 import java.util.Map;
 
@@ -27,21 +27,20 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.selectors.PlanSelector;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * @author nagel
  */
-public class CadytsPtPlanChanger implements PlanSelector {
+public class CadytsPtPlanChanger<T> implements PlanSelector {
 
 	private final double beta ;
 	private double cadytsWeight = 1.0;
 
-	private CadytsContext cadytsContext;
+	private CadytsContextI<T> cadytsContext;
 
 	public static final String CADYTS_CORRECTION = "cadytsCorrection";
 
-	public CadytsPtPlanChanger(Scenario scenario, CadytsContext cadytsContext) {
+	public CadytsPtPlanChanger(Scenario scenario, CadytsContextI<T> cadytsContext) {
 		this.cadytsContext = cadytsContext;
 		this.beta = scenario.getConfig().planCalcScore().getBrainExpBeta() ;
 	}
@@ -63,11 +62,11 @@ public class CadytsPtPlanChanger implements PlanSelector {
 			return otherPlan;
 		}
 
-		cadyts.demand.Plan<TransitStopFacility> currentPlanSteps = this.cadytsContext.getPtStep().getPlanSteps(currentPlan);
+		cadyts.demand.Plan<T> currentPlanSteps = this.cadytsContext.getPlansTranslator().getPlanSteps(currentPlan);
 		double currentPlanCadytsCorrection = this.cadytsContext.getCalibrator().calcLinearPlanEffect(currentPlanSteps) / this.beta;
 		double currentScore = currentPlan.getScore().doubleValue() + cadytsWeight * currentPlanCadytsCorrection;
 
-		cadyts.demand.Plan<TransitStopFacility> otherPlanSteps = this.cadytsContext.getPtStep().getPlanSteps(otherPlan);
+		cadyts.demand.Plan<T> otherPlanSteps = this.cadytsContext.getPlansTranslator().getPlanSteps(otherPlan);
 		double otherPlanCadytsCorrection = this.cadytsContext.getCalibrator().calcLinearPlanEffect(otherPlanSteps) / this.beta;
 		double otherScore = otherPlan.getScore().doubleValue() + cadytsWeight * otherPlanCadytsCorrection;
 
@@ -80,7 +79,7 @@ public class CadytsPtPlanChanger implements PlanSelector {
 		double weight = Math.exp(0.5 * this.beta * (otherScore - currentScore));
 
 		Plan selectedPlan = currentPlan;
-		cadyts.demand.Plan<TransitStopFacility> selectedPlanSteps = currentPlanSteps;
+		cadyts.demand.Plan<T> selectedPlanSteps = currentPlanSteps;
 		if (MatsimRandom.getRandom().nextDouble() < 0.01 * weight) {
 			// as of now, 0.01 is hardcoded (proba to change when both scores are the same)
 			selectedPlan = otherPlan;
@@ -93,7 +92,7 @@ public class CadytsPtPlanChanger implements PlanSelector {
 		return selectedPlan;
 	}
 
-	void setCadytsWeight(double cadytsWeight) {
+	public void setCadytsWeight(double cadytsWeight) {
 		this.cadytsWeight = cadytsWeight;
 	}
 }

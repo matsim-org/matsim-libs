@@ -27,6 +27,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.cadyts.general.CadytsContextI;
+import org.matsim.contrib.cadyts.general.PlansTranslator;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -57,7 +59,8 @@ import cadyts.supply.SimResults;
  * @author nagel
  *
  */
-public class CadytsContext implements StartupListener, IterationEndsListener, BeforeMobsimListener, AfterMobsimListener {
+public class CadytsContext<T> implements StartupListener, IterationEndsListener, BeforeMobsimListener, AfterMobsimListener,
+CadytsContextI<T> {
 
 	private final static Logger log = Logger.getLogger(CadytsContext.class);
 
@@ -298,6 +301,7 @@ public class CadytsContext implements StartupListener, IterationEndsListener, Be
 				stringBuffer.append(VALUES);
 
 				boolean hasValues = false; // only prints stops with volumes > 0
+				@SuppressWarnings("deprecation")
 				int[] values = this.occupancyAnalyzer.getOccupancyVolumesForStop(stopId);
 
 				for (int ii = 0; ii < values.length; ii++) {
@@ -316,12 +320,12 @@ public class CadytsContext implements StartupListener, IterationEndsListener, Be
 
 	}
 
-	AnalyticalCalibrator<TransitStopFacility> getCalibrator() {
-		return calibrator;
+	public AnalyticalCalibrator<T> getCalibrator() {
+		return (AnalyticalCalibrator<T>) calibrator;
 	}
 
-	PtPlanToPlanStepBasedOnEvents getPtStep() {
-		return ptStep;
+	public PlansTranslator<T> getPlansTranslator() {
+		return (PlansTranslator<T>) ptStep;
 	}
 
 }
