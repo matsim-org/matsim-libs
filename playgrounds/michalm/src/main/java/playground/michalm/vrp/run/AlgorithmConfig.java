@@ -25,16 +25,25 @@ import static playground.michalm.vrp.run.OnlineDvrpLauncherUtils.TravelCostSourc
 import static playground.michalm.vrp.run.OnlineDvrpLauncherUtils.TravelTimeSource.*;
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.immediaterequest.*;
-import playground.michalm.vrp.run.OnlineDvrpLauncherUtils.*;
+import playground.michalm.vrp.run.OnlineDvrpLauncherUtils.TravelCostSource;
+import playground.michalm.vrp.run.OnlineDvrpLauncherUtils.TravelTimeSource;
 
 
 /*package*/class AlgorithmConfig
 {
     /*package*/static enum AlgorithmType
     {
-        NO_SCHEDULING, // only idle vehicles
-        ONE_TIME_SCHEDULING, // formerly "optimistic"
-        RE_SCHEDULING; // formerly "pessimistic"
+        NO_SCHEDULING("NOS"), // only idle vehicles
+        ONE_TIME_SCHEDULING("OTS"), // formerly "optimistic"
+        RE_SCHEDULING("RES"); // formerly "pessimistic"
+
+        /*package*/final String shortcut;
+
+
+        private AlgorithmType(String shortcut)
+        {
+            this.shortcut = shortcut;
+        }
     }
 
 
@@ -177,17 +186,20 @@ import playground.michalm.vrp.run.OnlineDvrpLauncherUtils.*;
 
 
     /*package*/ImmediateRequestTaxiOptimizer createTaxiOptimizer(VrpData data,
-            boolean destinationKnown)
+            boolean destinationKnown, boolean minimizePickupTripTime)
     {
         switch (algorithmType) {
             case NO_SCHEDULING:
-                return new NOSTaxiOptimizer(data, destinationKnown, this == NOS_STRAIGHT_LINE);
+                return new NOSTaxiOptimizer(data, destinationKnown, minimizePickupTripTime,
+                        this == NOS_STRAIGHT_LINE);
 
             case ONE_TIME_SCHEDULING:
-                return new OTSTaxiOptimizer(data, destinationKnown, optimizationPolicy);
+                return new OTSTaxiOptimizer(data, destinationKnown, minimizePickupTripTime,
+                        optimizationPolicy);
 
             case RE_SCHEDULING:
-                return new RESTaxiOptimizer(data, destinationKnown, optimizationPolicy);
+                return new RESTaxiOptimizer(data, destinationKnown, minimizePickupTripTime,
+                        optimizationPolicy);
 
             default:
                 throw new IllegalStateException();

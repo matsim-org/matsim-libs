@@ -67,6 +67,7 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
     /*package*/AlgorithmConfig algorithmConfig;
     /*package*/boolean destinationKnown;
     /*package*/boolean onlineVehicleTracker;
+    /*package*/boolean minimizePickupTripTime;
 
     /*package*/LegHistogram legHistogram;
     /*package*/MatsimVrpData data;
@@ -108,8 +109,9 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
         // algorithmConfig = AlgorithmConfig.RES_DRV_24_H;
         // algorithmConfig = AlgorithmConfig.RES_DRV_15_MIN;
 
-        destinationKnown = true;
-        onlineVehicleTracker = false;
+        destinationKnown = false;
+        onlineVehicleTracker = true;
+        minimizePickupTripTime = false;
 
         otfVis = !true;
 
@@ -159,6 +161,7 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
 
         destinationKnown = Boolean.valueOf(params.get("destinationKnown"));
         onlineVehicleTracker = Boolean.valueOf(params.get("onlineVehicleTracker"));
+        minimizePickupTripTime = Boolean.valueOf(params.get("minimizePickupTripTime"));
 
         otfVis = Boolean.valueOf(params.get("otfVis"));
 
@@ -184,7 +187,7 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
                 algorithmConfig.tcostSource, eventsFileName, depotsFileName);
 
         ImmediateRequestTaxiOptimizer optimizer = algorithmConfig.createTaxiOptimizer(
-                data.getVrpData(), destinationKnown);
+                data.getVrpData(), destinationKnown, minimizePickupTripTime);
         optimizer.setDelaySpeedupStats(delaySpeedupStats);
 
         QSim qSim = OnlineDvrpLauncherUtils.initQSim(data, optimizer, onlineVehicleTracker);

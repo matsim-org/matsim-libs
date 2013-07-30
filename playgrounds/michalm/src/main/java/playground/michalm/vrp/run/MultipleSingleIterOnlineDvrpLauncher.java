@@ -153,13 +153,14 @@ import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiEvaluator.TaxiEvaluation;
 
 
     private static void run(int configIdx, int runs, String paramFile, boolean destinationKnown,
-            boolean onlineVehicleTracker)
+            boolean onlineVehicleTracker, boolean minimizePickupTripTime)
         throws FileNotFoundException
     {
         MultipleSingleIterOnlineDvrpLauncher multiLauncher = new MultipleSingleIterOnlineDvrpLauncher(
                 paramFile);
 
-        String txt = "destination_" + destinationKnown + "_online_" + onlineVehicleTracker;
+        String txt = "DK_" + destinationKnown + "_VT_" + onlineVehicleTracker + "_TP_"
+                + minimizePickupTripTime;
 
         PrintWriter pw = new PrintWriter(multiLauncher.launcher.dirName + "stats_" + txt + ".out");
         PrintWriter pw2 = new PrintWriter(multiLauncher.launcher.dirName + "timeUpdates_" + txt
@@ -205,9 +206,11 @@ import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiEvaluator.TaxiEvaluation;
             throw new RuntimeException();
         }
 
-        run(configIdx, runs, paramFile, false, false);
-        run(configIdx, runs, paramFile, false, true);
-        run(configIdx, runs, paramFile, true, false);
-        run(configIdx, runs, paramFile, true, true);
+        //        run(configIdx, runs, paramFile, false, false);
+        //        run(configIdx, runs, paramFile, false, true);
+        //        run(configIdx, runs, paramFile, true, false);
+        //        run(configIdx, runs, paramFile, true, true);
+
+        run(configIdx, runs, paramFile, false, true, true);
     }
 }

@@ -36,16 +36,18 @@ public class OnlineDvrpLauncherUtils
 {
     public enum TravelTimeSource
     {
-        FREE_FLOW_SPEED(24 * 60 * 60), // no eventsFileName
-        EVENTS_24_H(24 * 60 * 60), // based on eventsFileName, with 24-hour time interval
-        EVENTS_15_MIN(15 * 60); // based on eventsFileName, with 15-minute time interval
+        FREE_FLOW_SPEED("FF", 24 * 60 * 60), // no eventsFileName
+        EVENTS_24_H("24H", 24 * 60 * 60), // based on eventsFileName, with 24-hour time interval
+        EVENTS_15_MIN("15M", 15 * 60); // based on eventsFileName, with 15-minute time interval
 
+        /*package*/final String shortcut;
         /*package*/final int travelTimeBinSize;
         /*package*/final int numSlots;
 
 
-        private TravelTimeSource(int travelTimeBinSize)
+        private TravelTimeSource(String shortcut, int travelTimeBinSize)
         {
+            this.shortcut = shortcut;
             this.travelTimeBinSize = travelTimeBinSize;
             this.numSlots = 24 * 60 * 60 / travelTimeBinSize;// to cover 24 hours
         }
