@@ -237,7 +237,7 @@ public class TransitDriverTest {
 		
 		VehicleType vehType = new VehicleTypeImpl(new IdImpl("busType"));
 		VehicleCapacity capacity = new VehicleCapacityImpl();
-		capacity.setSeats(Integer.valueOf(5));
+		capacity.setSeats(Integer.valueOf(4));
 		vehType.setCapacity(capacity);
 		Vehicle vehicle = new VehicleImpl(new IdImpl(1976), vehType);
 

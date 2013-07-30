@@ -36,24 +36,24 @@ import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
 
 /**
- * interface to the ``Q'' implementation of the MobsimVehicle.  
+ * interface to the ``Q'' implementation of the MobsimVehicle.
  * <p/>
  * Design thoughts:<ul>
- * <li> This needs to be public since the ``Q'' version of the 
- * vehicle is used by more than one package.  This interfaces should, however, not be used outside the relevant 
+ * <li> This needs to be public since the ``Q'' version of the
+ * vehicle is used by more than one package.  This interfaces should, however, not be used outside the relevant
  * netsimengines.  In particular, the information should not be used for visualization.  kai, nov'11
  * <li> Might be possible to make all methods in this hierarchy protected and just inherit to a QueueVehicle.  kai, nov'11
  * </ul>
- * 
+ *
  * @author nagel
  */
 
 public class QVehicle extends QItem implements MobsimVehicle {
 
 	private static final Logger log = Logger.getLogger(QVehicle.class);
-	
+
 	private static int warnCount = 0;
-	
+
 	private double earliestLinkExitTime = 0;
 	private DriverAgent driver = null;
 	protected Collection<PassengerAgent> passengers = null;
@@ -61,7 +61,7 @@ public class QVehicle extends QItem implements MobsimVehicle {
 	private Link currentLink = null;
 	private Vehicle vehicle;
 	private final int passengerCapacity;
-	
+
 	public QVehicle(final Vehicle basicVehicle) {
 		this.id = basicVehicle.getId();
 		this.vehicle = basicVehicle;
@@ -78,8 +78,10 @@ public class QVehicle extends QItem implements MobsimVehicle {
 				}
 			}
 		} else {
+			// do *not* subtract one for the driver! Most pt vehicles define the capacity without the driver.
+			// for private cars, think about if we should subtract one from the capacity if the driver is set?
 			this.passengerCapacity = capacity.getSeats().intValue() +
-					(capacity.getStandingRoom() == null ? 0 : capacity.getStandingRoom().intValue() )- 1; //the driver takes also the seat			
+					(capacity.getStandingRoom() == null ? 0 : capacity.getStandingRoom().intValue() );
 		}
 	}
 
@@ -89,16 +91,16 @@ public class QVehicle extends QItem implements MobsimVehicle {
 	// yy not sure if this needs to be publicly exposed
 
 	/**Design thoughts:<ul>
-	 * <li> I am fairly sure that this should not be publicly exposed.  As far as I can tell, it is used in order to 
-	 * figure out of a visualizer should make a vehicle "green" or "red".  But green or red should be related to 
-	 * vehicle speed, and the mobsim should figure that out, not the visualizer.  So something like "getCurrentSpeed" 
+	 * <li> I am fairly sure that this should not be publicly exposed.  As far as I can tell, it is used in order to
+	 * figure out of a visualizer should make a vehicle "green" or "red".  But green or red should be related to
+	 * vehicle speed, and the mobsim should figure that out, not the visualizer.  So something like "getCurrentSpeed"
 	 * seems to be a more useful option. kai, nov'11
 	 * <li> The problem is not only the speed, but also the positioning of the vehicle in the "asQueue" plotting method.
 	 * (Although, when thinking about it: Should be possible to obtain same result by using "getEarliestLinkExitTime()".
 	 * But I am not sure if that would really be a conceptual improvement ... linkEnterTime is, after all, a much more
 	 * "physical" quantity.)  kai, nov'11
 	 * <li> But maybe it should then go into MobsimVehicle?  kai, nov'11
-	 * <li> Also see comment under setLinkEnterTime().  kai, nov'11 
+	 * <li> Also see comment under setLinkEnterTime().  kai, nov'11
 	 * <li>removed this while refactoring the visualizer computations, dg jan'12</li>
 	 * </ul>
 	 */
@@ -146,17 +148,17 @@ public class QVehicle extends QItem implements MobsimVehicle {
 	public void setDriver(final DriverAgent driver) {
 		if (driver != null) {
 			if (this.driver != null && !this.driver.getId().equals(driver.getId())) {
-				throw new RuntimeException( "A driver (" + this.driver.getId() +") " + 
+				throw new RuntimeException( "A driver (" + this.driver.getId() +") " +
 						"is already set in vehicle " + this.getId() + ". " +
 						"Setting agent " + driver.getId().toString() + " is not possible!");
-			}			
+			}
 		}
 		// TODO: To make this check possible, we would need something like removeDriver().
 //		else {
 //			throw new RuntimeException( "Driver to be set in vehicle " + this.getId() +
 //					" is null!");
 //		}
-		
+
 		this.driver = driver;
 	}
 
@@ -184,12 +186,12 @@ public class QVehicle extends QItem implements MobsimVehicle {
 	public double getMaximumVelocity() {
 		return vehicle.getType().getMaximumVelocity();
 	}
-	
+
 	@Override
 	public Collection<? extends PassengerAgent> getPassengers() {
 		return Collections.unmodifiableCollection(this.passengers);
 	}
-	
+
 	@Override
 	public boolean addPassenger(PassengerAgent passenger) {
 		if (this.passengers.size() < this.passengerCapacity) {
@@ -202,7 +204,7 @@ public class QVehicle extends QItem implements MobsimVehicle {
 	public boolean removePassenger(PassengerAgent passenger) {
 		return this.passengers.remove(passenger);
 	}
-	
+
 	@Override
 	public int getPassengerCapacity() {
 		return this.passengerCapacity;
