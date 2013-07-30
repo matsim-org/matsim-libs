@@ -69,8 +69,8 @@ public class BseUCControler extends Controler {
 		// ctl.setWriteQGISFile(false);
 		
 		// 2013-04-21, switching off scoring
-		ZeroScoringFunctionFactory zeroScoringFunctionFactory = new ZeroScoringFunctionFactory();
-		ctl.setScoringFunctionFactory(zeroScoringFunctionFactory);
+//		ZeroScoringFunctionFactory zeroScoringFunctionFactory = new ZeroScoringFunctionFactory();
+//		ctl.setScoringFunctionFactory(zeroScoringFunctionFactory);
 		//	
 		
 		// new, testing 2013-03-14
