@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.cadyts.general.PlansTranslator;
 import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
 import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
 import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
@@ -46,8 +47,8 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import cadyts.demand.PlanBuilder;
 
-/*package*/ class PtPlanToPlanStepBasedOnEvents implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler,
-		PersonLeavesVehicleEventHandler, VehicleDepartsAtFacilityEventHandler {
+/*package*/ class PtPlanToPlanStepBasedOnEvents<T> implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler,
+		PersonLeavesVehicleEventHandler, VehicleDepartsAtFacilityEventHandler, PlansTranslator<T> {
 	private static final Logger log = Logger.getLogger(PtPlanToPlanStepBasedOnEvents.class);
 
 	private final Scenario sc;
@@ -76,14 +77,16 @@ import cadyts.demand.PlanBuilder;
 	private long plansFound = 0;
 	private long plansNotFound = 0;
 
-	final cadyts.demand.Plan<TransitStopFacility> getPlanSteps(final Plan plan) {
-		PlanBuilder<TransitStopFacility> planStepFactory = (PlanBuilder<TransitStopFacility>) plan.getCustomAttributes().get(STR_PLANSTEPFACTORY);
+	public final cadyts.demand.Plan<T> getPlanSteps(final Plan plan) {
+		@SuppressWarnings("unchecked") // getting stuff from custom attributes has to be untyped.  (Although I am not sure why it is necessary to put this
+		// there in the first place. kai, jul'13)
+		PlanBuilder<T> planStepFactory = (PlanBuilder<T>) plan.getCustomAttributes().get(STR_PLANSTEPFACTORY);
 		if (planStepFactory == null) {
 			this.plansNotFound++;
 			return null;
 		}
 		this.plansFound++;
-		final cadyts.demand.Plan<TransitStopFacility> planSteps = planStepFactory.getResult();
+		final cadyts.demand.Plan<T> planSteps = planStepFactory.getResult();
 		return planSteps;
 	}
 
