@@ -34,23 +34,13 @@ public abstract class ConfigUtils {
 		return config;
 	}
 
-	public static Config loadConfig(final String filename) throws UncheckedIOException {
-		Config config = new Config();
-		config.addCoreModules();
-		
-		new MatsimConfigReader(config).parse(filename);
-		
-		return config;
-	}
-
-	public static Config loadConfig(final String filename, Module customModule, Module... moreModules) throws UncheckedIOException {
+	public static Config loadConfig(final String filename, Module... customModules) throws UncheckedIOException {
 		Config config = new Config();
 		config.addCoreModules();
 
-		config.addModule(customModule);
-    for (Module module : moreModules) {
-        config.addModule(module);
-    }
+        for (Module customModule : customModules) {
+            config.addModule(customModule);
+        }
 
 		new MatsimConfigReader(config).parse(filename);
 
