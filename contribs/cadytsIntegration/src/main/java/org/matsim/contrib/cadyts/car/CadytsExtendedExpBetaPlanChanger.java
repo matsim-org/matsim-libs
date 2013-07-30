@@ -28,7 +28,7 @@ public final class CadytsExtendedExpBetaPlanChanger implements PlanSelector {
 	public Plan selectPlan(Person person) {
 		Plan selectedPlan = delegate.selectPlan(person) ;
 		cadyts.demand.Plan<Link> cadytsPlan = cContext.getPlanToPlanStepBasedOnEvents().getPlanSteps( selectedPlan ) ;
-		cContext.getAnalyticalCalibrator().addToDemand(cadytsPlan) ;
+		cContext.getCalibrator().addToDemand(cadytsPlan) ;
 		return selectedPlan ;
 	}
 	

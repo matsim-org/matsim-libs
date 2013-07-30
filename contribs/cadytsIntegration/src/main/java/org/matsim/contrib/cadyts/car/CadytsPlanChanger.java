@@ -71,7 +71,7 @@ public class CadytsPlanChanger implements PlanSelector {
 
 		PlanToPlanStepBasedOnEvents planToPlanStep = cadytsContext.getPlanToPlanStepBasedOnEvents();
 		
-		AnalyticalCalibrator<Link> matsimCalibrator = cadytsContext.getAnalyticalCalibrator();
+		AnalyticalCalibrator<Link> matsimCalibrator = cadytsContext.getCalibrator();
 		
 		cadyts.demand.Plan<Link> currentPlanSteps = planToPlanStep.getPlanSteps(currentPlan);
 		double currentPlanCadytsCorrection = matsimCalibrator.calcLinearPlanEffect(currentPlanSteps) / this.beta;

@@ -87,10 +87,6 @@ public class CadytsContext implements StartupListener, IterationEndsListener {
 		return this.ptStep;
 	}
 	
-	public AnalyticalCalibrator<Link> getAnalyticalCalibrator() {
-		return this.calibrator;
-	}
-	
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		
