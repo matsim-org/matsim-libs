@@ -74,7 +74,7 @@ CadytsContextI<T> {
 	private final Counts boardCounts = new Counts();
 	private final Counts alightCounts = new Counts();
 	private CadytsPtOccupancyAnalyzer cadytsPtOccupAnalyzer;
-	private PtPlanToPlanStepBasedOnEvents ptStep ;
+	private PtPlanToPlanStepBasedOnEvents<T> ptStep ;
 
 	private CadytsPtConfigGroup cadytsConfig;
 
@@ -99,7 +99,7 @@ CadytsContextI<T> {
 				cadytsConfig.getTimeBinSize());
 
 		// this collects events and generates cadyts plans from it
-		this.ptStep = new PtPlanToPlanStepBasedOnEvents(scenario, cadytsConfig.getCalibratedLines());
+		this.ptStep = new PtPlanToPlanStepBasedOnEvents<T>(scenario, cadytsConfig.getCalibratedLines());
 		events.addHandler(ptStep);
 
 		String occupancyCountsFilename = config.ptCounts().getOccupancyCountsFileName();
