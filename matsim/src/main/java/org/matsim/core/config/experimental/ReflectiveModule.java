@@ -36,13 +36,14 @@ import org.matsim.core.config.Module;
  * A module using reflection for easy implementation of config groups.
  * <br>
  * This class takes care of all the housekeeping tasks that you normally have
- * to manually implement when extending module (usually forgetting half of it).
+ * to manually implement when extending {@link Module} (usually forgetting half of it).
  * <br>
  * For each field in the xml file, just implement a setter taking a String,
- * and a getter returning a value which String representation must be written to
+ * a primitive data type or a "primitive wrapper" type (such as {@link Double}
+ * or {@link Integer},
+ * and a getter returning an Object which String representation must be written to
  * the xml file, and annotate them with the {@link StringSetter} and
- * {@link StringGetter} annotation
- * types.
+ * {@link StringGetter} annotation types.
  * <br>
  * Those annotations take a mandatory String argument, which is the parameter name
  * in the xml.
@@ -68,10 +69,25 @@ public abstract class ReflectiveModule extends Module {
 	// /////////////////////////////////////////////////////////////////////////
 	// Construction
 	// /////////////////////////////////////////////////////////////////////////
+	/**
+	 * Creates an instance which will crash if an unknown parameter name
+	 * is given.
+	 *
+	 * @param name the name of the module in the config file.
+	 */
 	public ReflectiveModule(final String name) {
 		this( name , false );
 	}
 
+	/**
+	 * Creates an instance, giving the choice on whether unknown parameter names result
+	 * in a crash or just in the parameter value being stored as a String.
+	 *
+	 * @param name the name of the module in the config file.
+	 * @param storeUnknownParametersAsStrings if true, when no annotated getter
+	 * or setter is found for a parameter name, the parameters are stored using
+	 * the default {@link Module} behavior. This is not that safe, so be careful.
+	 */
 	public ReflectiveModule(
 			final String name,
 			final boolean storeUnknownParametersAsStrings) {
