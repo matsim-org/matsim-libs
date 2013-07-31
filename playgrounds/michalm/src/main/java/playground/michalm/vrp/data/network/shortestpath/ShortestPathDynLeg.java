@@ -211,6 +211,13 @@ public class ShortestPathDynLeg
 
 
         @Override
+        public int getInitialEndTime()
+        {
+            return driveTask.getBeginTime() + shortestPath.accLinkTravelTimes[destinationLinkIdx];
+        }
+
+
+        @Override
         public void addListener(VehicleTrackerListener listener)
         {
             listeners.add(listener);
