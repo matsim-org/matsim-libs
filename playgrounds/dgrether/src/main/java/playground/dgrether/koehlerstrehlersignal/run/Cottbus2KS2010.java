@@ -37,7 +37,6 @@ import playground.dgrether.koehlerstrehlersignal.conversion.M2KS2010Converter;
 import playground.dgrether.koehlerstrehlersignal.demand.PopulationToOd;
 import playground.dgrether.koehlerstrehlersignal.demand.ZoneBuilder;
 import playground.dgrether.koehlerstrehlersignal.network.NetLanesSignalsShrinker;
-import playground.dgrether.signalsystems.cottbus.DgCottbusScenarioPaths;
 import playground.dgrether.utils.zones.DgZones;
 
 
@@ -63,12 +62,11 @@ public class Cottbus2KS2010 {
 		double matsimPopSampleSize = 1.0;
 		double ksModelCommoditySampleSize = 1.0;
 		double minCommodityFlow = 10.0;
-		String networkFilename = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network_wgs84_utm33n.xml.gz";
-		String lanesFilename = DgCottbusScenarioPaths.LANES_FILENAME;
+		String networkFilename = DgPaths.REPOS  + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network_wgs84_utm33n.xml.gz";
+		String lanesFilename = DgPaths.REPOS  + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/lanes.xml";
 		String signalSystemsFilename = DgPaths.REPOS +  "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_systems.xml";
-		String signalGroupsFilename = DgCottbusScenarioPaths.SIGNAL_GROUPS_FILENAME;
-		String signalControlFilename = DgCottbusScenarioPaths.SIGNAL_CONTROL_FIXEDTIME_FILENAME;
-		//TODO change to run1712 when finished
+		String signalGroupsFilename = DgPaths.REPOS +  "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_groups.xml";
+		String signalControlFilename = DgPaths.REPOS +  "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_control.xml";
 //		String populationFilename = DgPaths.REPOS + "runs-svn/run1292/1292.output_plans_sample.xml";
 		String populationFilename = DgPaths.REPOS + "runs-svn/run1712/1712.output_plans.xml.gz";
 		String name = "run run1712 output plans between 05:30 and 09:30";
