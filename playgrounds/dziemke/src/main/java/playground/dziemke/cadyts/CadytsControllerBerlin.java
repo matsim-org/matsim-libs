@@ -28,9 +28,9 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.cadyts.car.CadytsCarConfigGroup;
 import org.matsim.contrib.cadyts.car.CadytsCarScoring;
 import org.matsim.contrib.cadyts.car.CadytsContext;
+import org.matsim.contrib.cadyts.car.CadytsExtendedExpBetaPlanChanger;
 import org.matsim.contrib.cadyts.car.CadytsPlanChanger;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
@@ -52,38 +52,29 @@ import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
 import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
 import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
 
-public class CadytsController86 {
-	private final static Logger log = Logger.getLogger(CadytsController86.class);
+public class CadytsControllerBerlin {
+	private final static Logger log = Logger.getLogger(CadytsControllerBerlin.class);
 	
 	public static void main(String[] args) {
 		final Config config = ConfigUtils.createConfig();
 		
 		// global
+		//config.global().setRandomSeed(4711);
 		config.global().setCoordinateSystem("GK4");
 		
 		// network
 		String inputNetworkFile = "D:/Workspace/berlin/counts/iv_counts/network.xml";
 		config.network().setInputFile(inputNetworkFile);
-				
+		
 		// plans
 		String inputPlansFile = "D:/Workspace/container/demand/input/cemdap2matsim/16/plans.xml.gz";
-		config.plans().setInputFile(inputPlansFile);
-						
-//		// cadytsCar
-//		CadytsCarConfigGroup cadytsCarConfigGroup = new CadytsCarConfigGroup();
-//		// new
-//		cadytsCarConfigGroup.setStartTime(5*60*60);
-//		// end new
-//		
-//		// changed
-//		cadytsCarConfigGroup.setEndTime(22*60*60);
-//		// end changed
-//		
-//		cadytsCarConfigGroup.setUseBruteForce(false);
-//		config.addModule("ccc", cadytsCarConfigGroup);
+		config.plans().setInputFile(inputPlansFile);			
 		
 		// simulation
 		config.addSimulationConfigGroup(new SimulationConfigGroup());
+		//config.simulation().setStartTime(0);
+		//config.simulation().setEndTime(0);
+		//config.simulation().setSnapshotPeriod(60);
 		config.simulation().setFlowCapFactor(0.01);
 		config.simulation().setStorageCapFactor(0.02);
 						
@@ -94,8 +85,8 @@ public class CadytsController86 {
 		config.counts().setOutputFormat("all");
 				
 		// controller
-		String runId = "run_86";
-		String outputDirectory = "D:/Workspace/container/demand/output/run_86";
+		String runId = "run_88";
+		String outputDirectory = "D:/Workspace/container/demand/output/" + runId + "/";
 		config.controler().setRunId(runId);
 		config.controler().setOutputDirectory(outputDirectory);
 		config.controler().setFirstIteration(0);
@@ -103,30 +94,30 @@ public class CadytsController86 {
 		Set<EventsFileFormat> eventsFileFormats = Collections.unmodifiableSet(EnumSet.of(EventsFileFormat.xml));
 		config.controler().setEventsFileFormats(eventsFileFormats);
 		config.controler().setMobsim("queueSimulation");
+		// KAI: change to QSim
 		config.controler().setWritePlansInterval(50);
 		config.controler().setWriteEventsInterval(50);
+		//Set<String> snapshotFormat = Collections.emptySet();
+		Set<String> snapshotFormat = new HashSet<String>();
+		//snapshotFormat.add("otfvis");
+		config.controler().setSnapshotFormat(snapshotFormat);
 				
 		// strategy
-		StrategySettings strategySettings = new StrategySettings(new IdImpl(1));
-		strategySettings.setModuleName("ReRoute");
-		strategySettings.setProbability(1.0);
-		// new run_85
-		strategySettings.setDisableAfter(30);
-		config.strategy().addStrategySettings(strategySettings);
+//		StrategySettings strategySettings1 = new StrategySettings(new IdImpl(1));
+//		strategySettings1.setModuleName("ChangeExpBeta");
+//		strategySettings1.setProbability(0.9);
+//		config.strategy().addStrategySettings(strategySettings1);
 		
-//		StrategySettings strategySettings2 = new StrategySettings(new IdImpl(2));
-//		strategySettings2.setModuleName("ccc");
-//		strategySettings2.setProbability(1.0);
-//		config.strategy().addStrategySettings(strategySettings2);
+		StrategySettings strategySettings2 = new StrategySettings(new IdImpl(1));
+		strategySettings2.setModuleName("ReRoute");
+		strategySettings2.setProbability(1.0);
+		strategySettings2.setDisableAfter(30);
+		config.strategy().addStrategySettings(strategySettings2);
 		
-		// moved back here before run 56
-		StrategySettings stratSets = new StrategySettings(new IdImpl(2));
-		// stratSets.setModuleName("ccc");
-		stratSets.setModuleName("cadytsCar") ;
-		stratSets.setProbability(1.0) ;
-		// controler.getConfig().strategy().addStrategySettings(stratSets);
-		config.strategy().addStrategySettings(stratSets);
-		// end new 56
+		StrategySettings strategySetinngs3 = new StrategySettings(new IdImpl(2));
+		strategySetinngs3.setModuleName("cadytsCar") ;
+		strategySetinngs3.setProbability(1.0) ;
+		config.strategy().addStrategySettings(strategySetinngs3);
 		
 		config.strategy().setMaxAgentPlanMemorySize(5);
 		
@@ -150,48 +141,40 @@ public class CadytsController86 {
 		ActivityParams otherActivity = new ActivityParams("other");
 		otherActivity.setTypicalDuration(0.5*60*60);
 		config.planCalcScore().addActivityParams(otherActivity);
-				
 		
 		// start controller
 		final Controler controler = new Controler(config);
 		
+		// cadytsContext (and cadytsCarConfigGroup)
 		final CadytsContext cContext = new CadytsContext(controler.getConfig());
-		// new CadytsContext generates new CadytsCarConfigGroup with name "cadytsCar"
-		// accordingly use this name from now on
+		// CadytsContext generates new CadytsCarConfigGroup with name "cadytsCar"
 		controler.addControlerListener(cContext);
 		
-		// new 52
-//		StrategySettings stratSets = new StrategySettings(new IdImpl(2));
-//		// stratSets.setModuleName("ccc");
-//		stratSets.setModuleName("cadytsCar") ;
-//		stratSets.setProbability(1.0) ;
-//		controler.getConfig().strategy().addStrategySettings(stratSets);
-		// end new 52
-		
-		
-		// new 54
 		controler.getConfig().getModule("cadytsCar").addParam("startTime", "00:00:00");
 		controler.getConfig().getModule("cadytsCar").addParam("endTime", "24:00:00");
-		// end new 54
-				
 		
-		// controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
+		// old plan strategy
+//		controler.addPlanStrategyFactory("cadytsCar", new PlanStrategyFactory() {
+//			@Override
+//			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
+//				final CadytsPlanChanger planSelector = new CadytsPlanChanger(cContext);
+//				// setting cadyts weight very high = close to brute force
+//				planSelector.setCadytsWeight(0.*scenario2.getConfig().planCalcScore().getBrainExpBeta());
+//				return new PlanStrategyImpl(planSelector);
+//			}
+//		});
+		
+		// new plan strategy
 		controler.addPlanStrategyFactory("cadytsCar", new PlanStrategyFactory() {
 			@Override
-			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
-				final CadytsPlanChanger planSelector = new CadytsPlanChanger(cContext);
-				
-				// planSelector.setCadytsWeight(10.*scenario2.getConfig().planCalcScore().getBrainExpBeta());
-				planSelector.setCadytsWeight(0.*scenario2.getConfig().planCalcScore().getBrainExpBeta());
-				// set cadyts weight very high = close to brute force
-				
-				return new PlanStrategyImpl(planSelector);
+			public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
+				return new PlanStrategyImpl(new CadytsExtendedExpBetaPlanChanger(
+						scenario.getConfig().planCalcScore().getBrainExpBeta(), cContext));
 			}
-		});
+		} ) ;
 		
-		
+		// scoring function
 		final CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(config.planCalcScore());
-		
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 			@Override
 			public ScoringFunction createNewScoringFunction(Plan plan) {
@@ -202,8 +185,7 @@ public class CadytsController86 {
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
 				final CadytsCarScoring scoringFunction = new CadytsCarScoring(plan, config, cContext);
-				final double cadytsScoringWeight = 10.0;
-				// final double cadytsScoringWeight = 1.0;
+				final double cadytsScoringWeight = 20.0;
 				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight) ;
 				scoringFunctionAccumulator.addScoringFunction(scoringFunction );
 
@@ -211,8 +193,7 @@ public class CadytsController86 {
 			}
 		}) ;
 		
-		
-		// same as using my ZeroScoringFunctionFactroy
+		// zero scoring function
 //		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
 //			@Override
 //			public ScoringFunction createNewScoringFunction(Plan plan) {
@@ -220,9 +201,6 @@ public class CadytsController86 {
 //				return scoringFunctionAccumulator;
 //			}
 //		});
-		
-		
-//		controler.addControlerListener(new KaiAnalysisListener());
 		
 		controler.run();
 	}

@@ -12,7 +12,7 @@ import java.util.Map;
 
 public class VolumeDifferenceAnalyzer implements Runnable{
   
-	private String runId = "37e";
+	private String runId = "38h";
 	private String fileBase = "D:/Workspace/container/examples/equil/output/" + runId + "/";
 	private int numberOfIterations = 200;
 	
@@ -38,7 +38,7 @@ public class VolumeDifferenceAnalyzer implements Runnable{
 		
 		while (i <= lastIteration) {
 			// List <Counts> currentCounts = CountsReader.read(i, fileBase + "ITERS/it." + i + "/" + i + ".countscompareAWTV.txt");
-			String fileName = fileBase + "ITERS/it." + i + "/" + i + ".countscompareAWTV.txt";
+			String fileName = fileBase + "ITERS/it." + i + "/" + runId + "." + i + ".countscompareAWTV.txt";
 			Map <Integer, Double> count = new HashMap <Integer, Double>();
 			
 			BufferedReader reader = null;
