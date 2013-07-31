@@ -25,7 +25,7 @@ class Scenario2 { // Relationsbezogen_mit_generalisierten_Kosten
 			ValuesForAMode roadValues = nullfallForOD.getByMode(Mode.road) ;
 			{
 				// passenger traffic:
-				ValuesForAUserType pvValues = roadValues.getByDemandSegment(DemandSegment.PV_NON_COMMERCIAL) ;
+				Attributes pvValues = roadValues.getByDemandSegment(DemandSegment.PV_NON_COMMERCIAL) ;
 				pvValues.setByEntry( Attribute.XX, 2000. ) ; // number of persons
 				pvValues.setByEntry( Attribute.km, 41. ) ;
 				pvValues.setByEntry( Attribute.hrs, 0.43 ) ;

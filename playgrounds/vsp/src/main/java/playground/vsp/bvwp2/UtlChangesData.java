@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * UtilityChangesBVWP2003.java
+ * UtlChanges.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,44 +17,8 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.vsp.bvwp2;
 
-/**
- * 
- */
-package playground.vsp.bvwp;
-
-import playground.vsp.bvwp.Values.Attribute;
-
-
-
-/**
- * @author Ihab
- *
- */
- class UtilityChangesRuleOfHalf extends UtilityChanges {
-	
-		
-		@Override
-		UtlChangesData utlChangePerEntry(Attribute attribute,
-				double deltaAmount, double quantityNullfall, double quantityPlanfall, double margUtl) {
-
-		UtlChangesData utlChanges = new UtlChangesData() ;
-		
-		if ( deltaAmount > 0  && !attribute.equals(Attribute.costOfProduction)) {
-			// wir sind aufnehmend; es gilt die RoH
-			utlChanges.utl = (quantityPlanfall-quantityNullfall) * margUtl / 2. ;
-		} else {
-			utlChanges.utl = 0. ;
-		}
-
-		return utlChanges;
-	}
-
-	@Override
-	double computeImplicitUtility(Attributes econValues,
-			Attributes quantitiesNullfall,
-			Attributes quantitiesPlanfall) {
-		return 0;
-	}
-
+public class UtlChangesData {
+	double utl ;
 }

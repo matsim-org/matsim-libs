@@ -21,9 +21,9 @@
 /**
  * 
  */
-package playground.vsp.bvwp;
+package playground.vsp.bvwp2;
 
-import playground.vsp.bvwp.Values.Attribute;
+import playground.vsp.bvwp2.MultiDimensionalArray.Attribute;
 
 
 
@@ -31,7 +31,7 @@ import playground.vsp.bvwp.Values.Attribute;
  * @author Ihab
  *
  */
- class UtilityChangesRuleOfHalf extends UtilityChanges {
+ class UtilityChangesBVWP2003 extends UtilityChanges {
 	
 		
 		@Override
@@ -40,11 +40,11 @@ import playground.vsp.bvwp.Values.Attribute;
 
 		UtlChangesData utlChanges = new UtlChangesData() ;
 		
-		if ( deltaAmount > 0  && !attribute.equals(Attribute.costOfProduction)) {
-			// wir sind aufnehmend; es gilt die RoH
-			utlChanges.utl = (quantityPlanfall-quantityNullfall) * margUtl / 2. ;
+		if ( deltaAmount > 0 ) {
+			// wir sind aufnehmend; es zaehlt der Planfall:
+			utlChanges.utl = quantityPlanfall * margUtl ;
 		} else {
-			utlChanges.utl = 0. ;
+			utlChanges.utl = -quantityNullfall * margUtl ;
 		}
 
 		return utlChanges;

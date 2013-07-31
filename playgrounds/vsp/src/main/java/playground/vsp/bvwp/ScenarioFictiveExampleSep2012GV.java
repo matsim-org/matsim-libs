@@ -25,7 +25,7 @@ class ScenarioFictiveExampleSep2012GV { // Relationsbezogen_mit_generalisierten_
 			ValuesForAMode roadValues = nullfallForOD.getByMode(Mode.road) ;
 			{
 				// passenger traffic:
-				ValuesForAUserType valuesRoad = roadValues.getByDemandSegment(DemandSegment.GV) ;
+				Attributes valuesRoad = roadValues.getByDemandSegment(DemandSegment.GV) ;
 				valuesRoad.setByEntry( Attribute.XX, 3000. ) ; // number of persons
 				valuesRoad.setByEntry( Attribute.km, 38. ) ;
 				valuesRoad.setByEntry( Attribute.hrs, 0.3 ) ;
@@ -35,7 +35,7 @@ class ScenarioFictiveExampleSep2012GV { // Relationsbezogen_mit_generalisierten_
 			ValuesForAMode railValues = nullfallForOD.getByMode(Mode.rail) ;
 			{
 				// passenger traffic:
-				ValuesForAUserType valuesRail = railValues.getByDemandSegment(DemandSegment.GV) ;
+				Attributes valuesRail = railValues.getByDemandSegment(DemandSegment.GV) ;
 				valuesRail.setByEntry( Attribute.XX, 2000. ) ; // number of persons
 				valuesRail.setByEntry( Attribute.km, 41. ) ;
 				valuesRail.setByEntry( Attribute.hrs, 0.43 ) ; 

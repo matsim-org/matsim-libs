@@ -1,6 +1,6 @@
 package playground.vsp.bvwp;
 
-
+@Deprecated
 public class IllustrationAP200PV {
 
 	private static Values economicValues;

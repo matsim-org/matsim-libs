@@ -27,7 +27,7 @@ class Scenario1 {
 			}
 			{
 				// freight traffic:
-				ValuesForAUserType gvValues = roadValues.getByDemandSegment(DemandSegment.GV) ;
+				Attributes gvValues = roadValues.getByDemandSegment(DemandSegment.GV) ;
 				gvValues.setByEntry( Attribute.XX, 1000. ) ; // tons
 				gvValues.setByEntry( Attribute.km, 10. ) ;
 				gvValues.setByEntry( Attribute.hrs, 1. ) ;

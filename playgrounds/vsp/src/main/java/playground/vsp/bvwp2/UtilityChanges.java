@@ -1,18 +1,18 @@
-package playground.vsp.bvwp;
+package playground.vsp.bvwp2;
+
+import static playground.vsp.bvwp2.Key.makeKey;
 
 import org.matsim.api.core.v01.Id;
 
-import playground.vsp.bvwp.Values.Attribute;
-import playground.vsp.bvwp.Values.DemandSegment;
-import playground.vsp.bvwp.Values.Mode;
-
+import playground.vsp.bvwp2.MultiDimensionalArray.Attribute;
+import playground.vsp.bvwp2.MultiDimensionalArray.DemandSegment;
+import playground.vsp.bvwp2.MultiDimensionalArray.Mode;
 
 /**
  * Class that provides services.  To be maintained by ``programmers''.
  * 
  * @author nagel
  */
-@Deprecated
 abstract class UtilityChanges {
 	private static final String FMT_STRING = "%16s || %16.2f | %16.1f || %16.2f | %16.1f || %16.2f | %16.1f || %16.2f | %16.1f ||\n";
 	UtilityChanges() {
@@ -38,19 +38,22 @@ abstract class UtilityChanges {
 		for ( Id id : nullfall.getAllRelations() ) { // for all OD relations
 			Values nullfallForODRelation = nullfall.getByODRelation(id) ;
 			Values planfallForODRelation = planfall.getByODRelation(id) ;
-			for ( DemandSegment demandSegment : DemandSegment.values() ) { // for all types (e.g. PV or GV)
+			for ( DemandSegment segm : DemandSegment.values() ) { // for all types (e.g. PV or GV)
 
 				Mode improvedMode = autodetectImprovingMode(
 						nullfallForODRelation, planfallForODRelation,
-						demandSegment);
+						segm);
 
 				if ( improvedMode == null ) {
 					continue ; // means that in the demand segment, nothing has changed; goto next demand segment
 				}
-
-				Attributes econValuesImprovedMode = economicValues.getByMode(improvedMode).getByDemandSegment(demandSegment) ;
-				Attributes attributesNullfallImprovedMode = nullfallForODRelation.getByMode(improvedMode).getByDemandSegment(demandSegment) ;
-				Attributes attributesPlanfallImprovedMode = planfallForODRelation.getByMode(improvedMode).getByDemandSegment(demandSegment) ;
+				
+				Attributes econValuesImprovedMode = economicValues.getAttributes( improvedMode, segm ) ;
+				Attributes attributesNullfallImprovedMode = nullfallForODRelation.getAttributes(improvedMode, segm) ;
+				Attributes attributesPlanfallImprovedMode = planfallForODRelation.getAttributes(improvedMode, segm) ;
+//				ValuesForAUserType econValuesImprovedMode = economicValues.getByMode(improvedMode).getByDemandSegment(segm) ;
+//				ValuesForAUserType attributesNullfallImprovedMode = nullfallForODRelation.getByMode(improvedMode).getByDemandSegment(segm) ;
+//				ValuesForAUserType attributesPlanfallImprovedMode = planfallForODRelation.getByMode(improvedMode).getByDemandSegment(segm) ;
 
 				System.out.printf( "%16s || %16s | %16s || %16s | %16s || %16s | %16s || %16s | %16s ||\n",
 						"Attribut",
@@ -70,14 +73,21 @@ abstract class UtilityChanges {
 				html.write("... mal Menge") ; html.nextTableEntry() ;
 				html.write("Nutzen Diff") ; html.nextTableEntry() ;
 				html.write("... mal Menge") ; 
-				html.endTableRow() ;
+				html.endTableRow() ;				
 
 				for ( Mode mode : Mode.values() ) { // for all modes
-					Attributes econValues = economicValues.getByMode(mode).getByDemandSegment(demandSegment) ;
-					Attributes attributesNullfall = nullfallForODRelation.getByMode(mode).getByDemandSegment(demandSegment) ;
-					Attributes attributesPlanfall = planfallForODRelation.getByMode(mode).getByDemandSegment(demandSegment) ;
-					final double amountNullfall = attributesNullfall.getByEntry(Attribute.XX);
-					final double amountPlanfall = attributesPlanfall.getByEntry(Attribute.XX);
+
+					Attributes econValues = economicValues.getAttributes(mode, segm) ;
+					Attributes attributesNullfall = nullfallForODRelation.getAttributes(mode, segm) ;
+					Attributes attributesPlanfall = planfallForODRelation.getAttributes(mode, segm) ;
+//					ValuesForAUserType econValues = economicValues.getByMode(mode).getByDemandSegment(segm) ;
+//					ValuesForAUserType attributesNullfall = nullfallForODRelation.getByMode(mode).getByDemandSegment(segm) ;
+//					ValuesForAUserType attributesPlanfall = planfallForODRelation.getByMode(mode).getByDemandSegment(segm) ;
+					
+					final double amountNullfall = nullfallForODRelation.get( makeKey(mode, segm, Attribute.XX)) ;
+					final double amountPlanfall = planfallForODRelation.get( makeKey(mode, segm, Attribute.XX)) ;
+//					final double amountNullfall = attributesNullfall.getByEntry(Attribute.XX);
+//					final double amountPlanfall = attributesPlanfall.getByEntry(Attribute.XX);
 
 					if ( amountPlanfall!=0. || amountNullfall!=0. ) {
 						// (suppress output if this (relation,mode,demand_segment) is never used)
@@ -89,10 +99,10 @@ abstract class UtilityChanges {
 							double amountAltnutzer = amountNullfall ;
 
 							System.out.printf("%16s; %16s; %16s; verbleibender Verkehr: %16.1f Personen/Tonnen\n", 
-									id, mode, demandSegment, amountAltnutzer );
+									id, mode, segm, amountAltnutzer );
 							
 							html.beginTableMulticolumnRow() ;
-							html.write( id + "; " + demandSegment + "; " + mode + "; verbleibender Verkehr: " + amountAltnutzer + " Personen/Tonnen") ;
+							html.write( id + "; " + segm + "; " + mode + "; verbleibender Verkehr: " + amountAltnutzer + " Personen/Tonnen") ;
 							html.endTableRow() ;
 
 							utils = computeAndPrintValuesForAltnutzer(utils,
@@ -106,9 +116,9 @@ abstract class UtilityChanges {
 							// abgebend:
 
 							System.out.printf("%16s; %16s; %16s; wechselnder Verkehr: %16.1f Personen/Tonnen\n", 
-									id, mode, demandSegment, deltaAmounts ) ;
+									id, mode, segm, deltaAmounts ) ;
 							html.beginTableMulticolumnRow() ;
-							html.write( id + "; " + demandSegment + "; " + mode + "; wechselnder Verkehr: " + deltaAmounts + " Personen/Tonnen") ;
+							html.write( id + "; " + segm + "; " + mode + "; wechselnder Verkehr: " + deltaAmounts + " Personen/Tonnen") ;
 							html.endTableRow();
 							utils = computeAndPrintGivingOrReceiving(utils, econValues, attributesNullfall,
 									attributesPlanfall, deltaAmounts, html);
@@ -117,9 +127,9 @@ abstract class UtilityChanges {
 							
 							System.out.printf("%16s; %16s; %16s; " +
 									"wechselnder Verkehr: %16.1f Personen/Tonnen\n", 
-									id, improvedMode, demandSegment, -deltaAmounts ) ;
+									id, improvedMode, segm, -deltaAmounts ) ;
 							html.beginTableMulticolumnRow() ;
-							html.write( id + "; " + demandSegment + "; " + mode + "; wechselnder Verkehr: " + (-deltaAmounts) + " Personen/Tonnen") ;
+							html.write( id + "; " + segm + "; " + mode + "; wechselnder Verkehr: " + (-deltaAmounts) + " Personen/Tonnen") ;
 							html.endTableRow();
 
 							utils = computeAndPrintGivingOrReceiving(utils, econValuesImprovedMode,
@@ -180,8 +190,8 @@ abstract class UtilityChanges {
 		
 		html.endTable() ;
 
-//		html.endBody() ;
-//		html.endHtml() ;
+		html.endBody() ;
+		html.endHtml() ;
 	}
 
 	private double computeAndPrintGivingOrReceiving(double utils, Attributes econValues,
@@ -284,14 +294,16 @@ abstract class UtilityChanges {
 	}
 
 	private static Mode autodetectImprovingMode(Values nullfallForODRelation,
-			Values planfallForODRelation, DemandSegment demandSegment) {
+			Values planfallForODRelation, DemandSegment segm) {
 		// go through modes and determine the improved mode
 		Mode improvedMode = null ;
 		for ( Mode mode : Mode.values() ) { // for all modes
-			ValuesForAMode quantitiesNullfallByMode = nullfallForODRelation.getByMode(mode) ;
-			ValuesForAMode quantitiesPlanfallByMode = planfallForODRelation.getByMode(mode) ;
-			Attributes quantitiesNullfall = quantitiesNullfallByMode.getByDemandSegment(demandSegment) ;
-			Attributes quantitiesPlanfall = quantitiesPlanfallByMode.getByDemandSegment(demandSegment) ;
+//			ValuesForAMode quantitiesNullfallByMode = nullfallForODRelation.getByMode(mode) ;
+//			ValuesForAMode quantitiesPlanfallByMode = planfallForODRelation.getByMode(mode) ;
+//			Attributes quantitiesNullfall = quantitiesNullfallByMode.getByDemandSegment(demandSegment) ;
+//			Attributes quantitiesPlanfall = quantitiesPlanfallByMode.getByDemandSegment(demandSegment) ;
+			Attributes quantitiesNullfall = nullfallForODRelation.getAttributes(mode, segm) ;
+			Attributes quantitiesPlanfall = planfallForODRelation.getAttributes(mode, segm) ;
 			for ( Attribute attribute : Attribute.values() ) {
 				final double quantityNullfall = quantitiesNullfall.getByEntry(attribute);
 				final double quantityPlanfall = quantitiesPlanfall.getByEntry(attribute);

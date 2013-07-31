@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * UtilityChangesBVWP2003.java
+ * ValuesByODRelation.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,44 +17,50 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.vsp.bvwp2;
 
-/**
- * 
- */
-package playground.vsp.bvwp;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeMap;
 
-import playground.vsp.bvwp.Values.Attribute;
+import org.matsim.api.core.v01.Id;
 
 
-
-/**
- * @author Ihab
- *
- */
- class UtilityChangesRuleOfHalf extends UtilityChanges {
-	
-		
-		@Override
-		UtlChangesData utlChangePerEntry(Attribute attribute,
-				double deltaAmount, double quantityNullfall, double quantityPlanfall, double margUtl) {
-
-		UtlChangesData utlChanges = new UtlChangesData() ;
-		
-		if ( deltaAmount > 0  && !attribute.equals(Attribute.costOfProduction)) {
-			// wir sind aufnehmend; es gilt die RoH
-			utlChanges.utl = (quantityPlanfall-quantityNullfall) * margUtl / 2. ;
-		} else {
-			utlChanges.utl = 0. ;
+class ScenarioForEvalData {
+		private Map<Id,Values> values = new TreeMap<Id,Values>();
+		ScenarioForEvalData() {
+//			for ( Id id : values.keySet() ) {
+//				Values vals = new Values() ;
+//				values.put( id, vals ) ;
+//			}
 		}
-
-		return utlChanges;
+		ScenarioForEvalData createDeepCopy() {
+			ScenarioForEvalData nnn = new ScenarioForEvalData() ;
+			for ( Id id : values.keySet() ) {
+				Values oldValues = this.getByODRelation(id) ;
+				Values newValues = oldValues.createDeepCopy() ;
+				nnn.values.put( id, newValues ) ;
+			}
+			return nnn ;
+		}
+		Values getByODRelation( Id id ) {
+			return values.get(id) ;
+		}
+		void setValuesForODRelation( Id id , Values tmp ) {
+			values.put( id, tmp ) ;
+		}
+		Set<Id> getAllRelations() {
+			return Collections.unmodifiableSet(values.keySet()) ;
+		}
+		
+		public String toString() {
+			StringBuilder strb = new StringBuilder() ;
+			for ( Id id : values.keySet() ) {
+				strb.append( id + ": ") ;
+				Values vals = this.getByODRelation(id) ;
+				strb.append( vals.toString() ) ;
+			}
+			return strb.toString() ;
+		}
 	}
-
-	@Override
-	double computeImplicitUtility(Attributes econValues,
-			Attributes quantitiesNullfall,
-			Attributes quantitiesPlanfall) {
-		return 0;
-	}
-
-}

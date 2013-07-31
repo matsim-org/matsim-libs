@@ -31,6 +31,7 @@ import playground.vsp.bvwp.Values.Attribute;
  * @author Ihab
  *
  */
+@Deprecated
  class UtilityChangesBVWP2003 extends UtilityChanges {
 	
 		
@@ -51,9 +52,9 @@ import playground.vsp.bvwp.Values.Attribute;
 	}
 
 	@Override
-	double computeImplicitUtility(ValuesForAUserType econValues,
-			ValuesForAUserType quantitiesNullfall,
-			ValuesForAUserType quantitiesPlanfall) {
+	double computeImplicitUtility(Attributes econValues,
+			Attributes quantitiesNullfall,
+			Attributes quantitiesPlanfall) {
 		return 0;
 	}
 

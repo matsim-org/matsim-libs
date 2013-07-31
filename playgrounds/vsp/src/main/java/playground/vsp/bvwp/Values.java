@@ -25,6 +25,7 @@ import java.util.TreeMap;
 import playground.vsp.bvwp.Values.Attribute;
 import playground.vsp.bvwp.Values.DemandSegment;
 
+@Deprecated
 class Values {
 	/**
 	 * Design thoughts:<ul>
@@ -73,7 +74,7 @@ class Values {
 			ValuesForAMode valForMode = this.getByMode(mode) ;
 			for ( DemandSegment demandSegment : DemandSegment.values() ) {
 				str.append( "--> " + mode + "; " + demandSegment + " : " ) ;
-				ValuesForAUserType valByDemandSegment = valForMode.getByDemandSegment(demandSegment);
+				Attributes valByDemandSegment = valForMode.getByDemandSegment(demandSegment);
 				for ( Attribute attribute : Attribute.values() ) {
 					str.append( attribute.toString() + ": " + valByDemandSegment.getByEntry(attribute) + "; " ) ;
 				}
@@ -85,34 +86,36 @@ class Values {
 	}
 }
 
+@Deprecated
 class ValuesForAMode {
-	Map<DemandSegment,ValuesForAUserType> valuesByType = new TreeMap<DemandSegment,ValuesForAUserType>() ;
+	Map<DemandSegment,Attributes> valuesByType = new TreeMap<DemandSegment,Attributes>() ;
 	ValuesForAMode createDeepCopy( ) {
 		ValuesForAMode planfall = new ValuesForAMode() ;
 		for ( DemandSegment mode : DemandSegment.values() ) {
-			ValuesForAUserType old = this.getByDemandSegment(mode) ;
-			ValuesForAUserType tmp2 = old.createDeepCopy() ;
+			Attributes old = this.getByDemandSegment(mode) ;
+			Attributes tmp2 = old.createDeepCopy() ;
 			planfall.valuesByType.put( mode, tmp2 ) ;
 		}
 		return planfall ; 
 	}
 	ValuesForAMode() {
 		for ( DemandSegment mode : DemandSegment.values() ) {
-			ValuesForAUserType vals = new ValuesForAUserType() ;
+			Attributes vals = new Attributes() ;
 			valuesByType.put( mode, vals ) ;
 		}
 	}
-	ValuesForAUserType getByDemandSegment( DemandSegment demandSegment ) {
+	Attributes getByDemandSegment( DemandSegment demandSegment ) {
 			return valuesByType.get(demandSegment) ;
 	}
-	void setValuesForType( DemandSegment demandSegment, ValuesForAUserType values ) {
+	void setValuesForType( DemandSegment demandSegment, Attributes values ) {
 		valuesByType.put( demandSegment, values ) ;
 	}
 }
 
-class ValuesForAUserType {
+@Deprecated
+class Attributes {
 	Map<Attribute,Double> quantities = new TreeMap<Attribute,Double>() ;
-	ValuesForAUserType() {
+	Attributes() {
 		for ( Attribute attribute : Attribute.values() ) {
 			this.setByEntry( attribute, 0. ) ;
 		}
@@ -127,8 +130,8 @@ class ValuesForAUserType {
 		double tmp = quantities.get( attribute ) ;
 		quantities.put( attribute, tmp + dbl ) ;
 	}
-	ValuesForAUserType createDeepCopy() {
-		ValuesForAUserType newValues = new ValuesForAUserType() ;
+	Attributes createDeepCopy() {
+		Attributes newValues = new Attributes() ;
 		for ( Attribute attribute : Attribute.values() ) {
 			newValues.setByEntry( attribute, this.getByEntry(attribute) ) ;
 		}

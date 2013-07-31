@@ -20,14 +20,14 @@ class ScenarioForTest1 {
 			ValuesForAMode roadValues = nullfallForOD.getByMode(Mode.road) ;
 			{
 				// passenger traffic:
-				ValuesForAUserType pvValues = roadValues.getByDemandSegment(DemandSegment.PV_NON_COMMERCIAL) ;
+				Attributes pvValues = roadValues.getByDemandSegment(DemandSegment.PV_NON_COMMERCIAL) ;
 				pvValues.setByEntry( Attribute.XX, 1000. ) ; // number of persons
 				pvValues.setByEntry( Attribute.km, 10. ) ;
 				pvValues.setByEntry( Attribute.hrs, 1. ) ;
 			}
 			{
 				// freight traffic:
-				ValuesForAUserType gvValues = roadValues.getByDemandSegment(DemandSegment.GV) ;
+				Attributes gvValues = roadValues.getByDemandSegment(DemandSegment.GV) ;
 				gvValues.setByEntry( Attribute.XX, 1000. ) ; // tons
 				gvValues.setByEntry( Attribute.km, 10. ) ;
 				gvValues.setByEntry( Attribute.hrs, 1. ) ;

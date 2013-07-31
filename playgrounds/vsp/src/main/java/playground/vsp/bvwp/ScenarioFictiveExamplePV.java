@@ -25,7 +25,7 @@ class ScenarioFictiveExamplePV { // Relationsbezogen_mit_generalisierten_Kosten
 			ValuesForAMode roadValues = nullfallForOD.getByMode(Mode.road) ;
 			{
 				// passenger traffic:
-				ValuesForAUserType pvValuesRoad = roadValues.getByDemandSegment(DemandSegment.PV_NON_COMMERCIAL) ;
+				Attributes pvValuesRoad = roadValues.getByDemandSegment(DemandSegment.PV_NON_COMMERCIAL) ;
 				pvValuesRoad.setByEntry( Attribute.XX, 3000. ) ; // number of persons
 				pvValuesRoad.setByEntry( Attribute.km, 38. ) ;
 				pvValuesRoad.setByEntry( Attribute.hrs, 0.45 ) ;
@@ -35,7 +35,7 @@ class ScenarioFictiveExamplePV { // Relationsbezogen_mit_generalisierten_Kosten
 			ValuesForAMode railValues = nullfallForOD.getByMode(Mode.rail) ;
 			{
 				// passenger traffic:
-				ValuesForAUserType pvValuesRail = railValues.getByDemandSegment(DemandSegment.PV_NON_COMMERCIAL) ;
+				Attributes pvValuesRail = railValues.getByDemandSegment(DemandSegment.PV_NON_COMMERCIAL) ;
 				pvValuesRail.setByEntry( Attribute.XX, 2000. ) ; // number of persons
 				pvValuesRail.setByEntry( Attribute.km, 41. ) ;
 				pvValuesRail.setByEntry( Attribute.hrs, 0.43 ) ; 

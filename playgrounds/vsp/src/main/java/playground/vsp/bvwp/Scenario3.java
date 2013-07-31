@@ -25,7 +25,7 @@ class Scenario3 { // Relationsbezogen_mit_generalisierten_Kosten_GV
 			ValuesForAMode roadValues = nullfallForOD.getByMode(Mode.road) ;
 			{
 				// freight traffic:
-				ValuesForAUserType gvValues = roadValues.getByDemandSegment(DemandSegment.GV) ;
+				Attributes gvValues = roadValues.getByDemandSegment(DemandSegment.GV) ;
 				gvValues.setByEntry( Attribute.XX, 2000. ) ; // tons
 				gvValues.setByEntry( Attribute.km, 41. ) ;
 			}				

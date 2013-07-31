@@ -21,7 +21,7 @@ class ScenarioKarlsruheBaselGV {
 			{
 				ValuesForAMode valuesForAMode = nullfallForOD.getByMode(Mode.road) ;
 				{
-					ValuesForAUserType vv = valuesForAMode.getByDemandSegment(DemandSegment.GV) ;
+					Attributes vv = valuesForAMode.getByDemandSegment(DemandSegment.GV) ;
 					vv.setByEntry( Attribute.XX, 2.6e8 ) ; // number of tons.  Irrelevant dummy value.
 					vv.setByEntry( Attribute.km, 200. ) ;
 					vv.setByEntry( Attribute.hrs, 3. ) ;
@@ -39,7 +39,7 @@ class ScenarioKarlsruheBaselGV {
 			{
 				ValuesForAMode valuesForAMode = nullfallForOD.getByMode(Mode.rail) ;
 				{
-					ValuesForAUserType vv = valuesForAMode.getByDemandSegment(DemandSegment.GV) ;
+					Attributes vv = valuesForAMode.getByDemandSegment(DemandSegment.GV) ;
 					vv.setByEntry( Attribute.XX, 2.6e7 ) ; // number of tons
 					vv.setByEntry( Attribute.km, 200. ) ;
 					vv.setByEntry( Attribute.hrs, 10. ) ;
@@ -77,7 +77,7 @@ class ScenarioKarlsruheBaselGV {
 		{
 			ValuesForAMode valuesForAMode = planfallForOD.getByMode( Mode.rail ) ;
 			{
-				final ValuesForAUserType vv = valuesForAMode.getByDemandSegment(DemandSegment.GV);
+				final Attributes vv = valuesForAMode.getByDemandSegment(DemandSegment.GV);
 
 				// modify the travel times for the rail mode:
 				double deltaTtime = -6. ;

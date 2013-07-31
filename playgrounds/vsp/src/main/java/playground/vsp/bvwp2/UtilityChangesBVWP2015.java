@@ -21,9 +21,9 @@
 /**
  * 
  */
-package playground.vsp.bvwp;
+package playground.vsp.bvwp2;
 
-import playground.vsp.bvwp.Values.Attribute;
+import playground.vsp.bvwp2.MultiDimensionalArray.Attribute;
 
 
 
@@ -31,20 +31,25 @@ import playground.vsp.bvwp.Values.Attribute;
  * @author Ihab
  *
  */
- class UtilityChangesRuleOfHalf extends UtilityChanges {
-	
-		
-		@Override
-		UtlChangesData utlChangePerEntry(Attribute attribute,
-				double deltaAmount, double quantityNullfall, double quantityPlanfall, double margUtl) {
+class UtilityChangesBVWP2015 extends UtilityChanges {
+
+
+	@Override
+	UtlChangesData utlChangePerEntry(Attribute attribute,
+			double deltaAmount, double quantityNullfall, double quantityPlanfall, double margUtl) {
 
 		UtlChangesData utlChanges = new UtlChangesData() ;
-		
-		if ( deltaAmount > 0  && !attribute.equals(Attribute.costOfProduction)) {
-			// wir sind aufnehmend; es gilt die RoH
-			utlChanges.utl = (quantityPlanfall-quantityNullfall) * margUtl / 2. ;
-		} else {
+
+		if ( attribute.equals(Attribute.priceUser) ) {
+			// (Nutzerpreis hat keine Auswirkungen auf Resourcenverzehr!)
 			utlChanges.utl = 0. ;
+		} else {
+			if ( deltaAmount > 0 ) {
+				// wir sind aufnehmend; es zaehlt der Planfall:
+				utlChanges.utl = quantityPlanfall * margUtl ;
+			} else {
+				utlChanges.utl = -quantityNullfall * margUtl ;
+			}
 		}
 
 		return utlChanges;
@@ -54,7 +59,17 @@ import playground.vsp.bvwp.Values.Attribute;
 	double computeImplicitUtility(Attributes econValues,
 			Attributes quantitiesNullfall,
 			Attributes quantitiesPlanfall) {
-		return 0;
+		double sum = 0. ;
+		for ( Attribute attribute : Attribute.values() ) {
+			if ( attribute != Attribute.XX && attribute != Attribute.costOfProduction ) {
+				final double quantityPlanfall = quantitiesPlanfall.getByEntry(attribute);
+				final double quantityNullfall = quantitiesNullfall.getByEntry(attribute);
+				final double margUtl = econValues.getByEntry(attribute) ;
+
+				sum += - margUtl * (quantityPlanfall+quantityNullfall)/2. ;
+			}
+		}
+		return sum ;
 	}
 
 }

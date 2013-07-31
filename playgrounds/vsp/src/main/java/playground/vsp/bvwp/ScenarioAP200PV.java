@@ -25,7 +25,7 @@ class ScenarioAP200PV { // Relationsbezogen_mit_generalisierten_Kosten
 			ValuesForAMode roadValues = nullfallForOD.getByMode(Mode.road) ;
 			{
 				// passenger traffic:
-				ValuesForAUserType pvValuesRoad = roadValues.getByDemandSegment(DemandSegment.PV_NON_COMMERCIAL) ;
+				Attributes pvValuesRoad = roadValues.getByDemandSegment(DemandSegment.PV_NON_COMMERCIAL) ;
 				pvValuesRoad.setByEntry( Attribute.XX, 1000. ) ; // number of persons
 				pvValuesRoad.setByEntry( Attribute.km, 100. ) ;
 				pvValuesRoad.setByEntry( Attribute.hrs, 1. ) ;
@@ -35,7 +35,7 @@ class ScenarioAP200PV { // Relationsbezogen_mit_generalisierten_Kosten
 			ValuesForAMode railValues = nullfallForOD.getByMode(Mode.rail) ;
 			{
 				// passenger traffic:
-				ValuesForAUserType pvValuesRail = railValues.getByDemandSegment(DemandSegment.PV_NON_COMMERCIAL) ;
+				Attributes pvValuesRail = railValues.getByDemandSegment(DemandSegment.PV_NON_COMMERCIAL) ;
 				pvValuesRail.setByEntry( Attribute.XX, 10. ) ; // number of persons
 				pvValuesRail.setByEntry( Attribute.km, 100. ) ;
 				pvValuesRail.setByEntry( Attribute.hrs, 6. ) ;
