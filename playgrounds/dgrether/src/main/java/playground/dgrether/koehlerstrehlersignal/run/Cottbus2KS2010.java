@@ -48,17 +48,17 @@ public class Cottbus2KS2010 {
 
 	private static final Logger log = Logger.getLogger(Cottbus2KS2010.class);
 	
-	private static String shapeFileDirectoryName = "shapes/";
+	private static final String shapeFileDirectoryName = "shapes/";
 	
 	public static void main(String[] args) throws Exception {
 		// parameters
 		int cellsX = 5;
 		int cellsY = 5;
 		double boundingBoxOffset = 50.0;
-		double startTime = 5.5 * 3600.0;
-		double endTime = 9.5 * 3600.0;
-	//private static double startTime = 13.5 * 3600.0;
-	//private static double endTime = 18.5 * 3600.0;
+//		double startTime = 5.5 * 3600.0;
+//		double endTime = 9.5 * 3600.0;
+		double startTime = 13.5 * 3600.0;
+		double endTime = 18.5 * 3600.0;
 		double matsimPopSampleSize = 1.0;
 		double ksModelCommoditySampleSize = 1.0;
 		double minCommodityFlow = 10.0;
@@ -69,9 +69,10 @@ public class Cottbus2KS2010 {
 		String signalControlFilename = DgPaths.REPOS +  "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_control.xml";
 //		String populationFilename = DgPaths.REPOS + "runs-svn/run1292/1292.output_plans_sample.xml";
 		String populationFilename = DgPaths.REPOS + "runs-svn/run1712/1712.output_plans.xml.gz";
-		String name = "run run1712 output plans between 05:30 and 09:30";
+//		String name = "run run1712 output plans between 05:30 and 09:30";
+		String name = "run run1712 output plans between 13:30 and 18:30";
 		CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84_UTM33N);
-		final String outputDirectory = DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-07-19_test_10/";
+		final String outputDirectory = DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-07-31_minflow_10_evening_peak/";
 		String ksModelOutputFilename = "ks2010_model_";
 		ksModelOutputFilename += Double.toString(minCommodityFlow) + "_" + Double.toString(startTime) + ".xml";
 				
