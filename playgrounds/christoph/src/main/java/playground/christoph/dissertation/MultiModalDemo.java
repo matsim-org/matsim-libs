@@ -51,6 +51,8 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.analysis.christoph.ActivitiesAnalyzer;
 import org.matsim.contrib.analysis.christoph.TripsAnalyzer;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
+import org.matsim.contrib.multimodal.router.util.BikeTravelTimeFactory;
+import org.matsim.contrib.multimodal.router.util.WalkTravelTimeFactory;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
@@ -91,8 +93,6 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.christoph.evacuation.analysis.TravelTimesWriter;
-import playground.christoph.evacuation.trafficmonitoring.BikeTravelTimeFactory;
-import playground.christoph.evacuation.trafficmonitoring.WalkTravelTimeFactory;
 
 /**
  * Demonstrate the influence of age and gender on persons' walk speed.
