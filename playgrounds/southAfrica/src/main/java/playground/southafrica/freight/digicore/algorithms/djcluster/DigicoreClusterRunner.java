@@ -116,8 +116,7 @@ public class DigicoreClusterRunner {
 		log.info(" Clustering the points...");
 		
 		/* These values should be set following Quintin's Design-of-Experiment inputs. */
-//		double[] radii = {40, 35, 30, 25, 20, 15, 10};
-		double[] radii = {5, 1};
+		double[] radii = {1, 5, 10, 15, 20, 25, 30, 35, 40};
 		int[] pmins = {1, 5, 10, 15, 20, 25};
 
 		for(double thisRadius : radii){
@@ -220,6 +219,11 @@ public class DigicoreClusterRunner {
 
 
 	private void clusterPointLists(double radius, int minimumPoints, String outputFolder) throws Exception {
+		/* FIXME This counter checks how many facilities are ignored. 
+		 * This is because the concave hull algorithm still returns
+		 * empty geometries. */
+		int numberOfFacilitiesOmitted = 0;
+
 		File folder = new File(outputFolder);
 		if(folder.exists()){
 			log.warn("Facility points folder exists, and will be deleted. ");
@@ -282,6 +286,7 @@ public class DigicoreClusterRunner {
 							facilityAttributes.putAttribute(facilityId.toString(), "concaveHull", hull);
 						} else{
 							log.debug("Facility " + facilityId.toString() + " is not added. Hull is an empty geometry!");
+							numberOfFacilitiesOmitted++;
 						}
 					}
 								
@@ -322,7 +327,11 @@ public class DigicoreClusterRunner {
 			}				
 		}
 		
-		facilities.printFacilitiesCount();	
+		facilities.printFacilitiesCount();
+		
+		/*TODO Can remove after debugging. Report the number of
+		 * facilities that were ignored because of empty geometries. */
+		log.error("Facilities omitted: " + radius + "_" + minimumPoints + "(" + numberOfFacilitiesOmitted + ")");
 	}
 
 
