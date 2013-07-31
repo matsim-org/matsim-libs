@@ -23,6 +23,7 @@ package org.matsim.contrib.multimodal;
 import java.util.Collections;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.contrib.multimodal.router.DefaultDelegateFactory;
@@ -46,12 +47,22 @@ import org.matsim.pt.router.TransitRouterFactory;
 
 public class MultiModalControlerListener implements StartupListener {
 
+	private final static Logger log = Logger.getLogger(MultiModalControlerListener.class);
+	
 	private Map<String, TravelTime> multiModalTravelTimes;
 	
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		
 		Controler controler = event.getControler();
+		
+		if (!controler.getConfig().travelTimeCalculator().isFilterModes()) {
+			log.warn("Filtering analyzed modes is NOT enabled in the TravelTimeCalculatorConfigGroup. " +
+					"It is enabled since otherwise also link travel times of multi-modal legs would be " +
+					"taken into account! This message might be replaced by a RuntimeException in the future.");
+			controler.getConfig().travelTimeCalculator().setFilterModes(true);
+		}
+		
 		MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) controler.getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
 		
 		Map<Id, Double> linkSlopes = new LinkSlopesReader().getLinkSlopes(multiModalConfigGroup, controler.getNetwork());
