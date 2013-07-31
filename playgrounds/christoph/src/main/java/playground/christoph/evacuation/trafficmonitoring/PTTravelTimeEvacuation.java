@@ -35,9 +35,9 @@ import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.vehicles.Vehicle;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
+import playground.christoph.evacuation.mobsim.InformedAgentsTracker;
 import playground.christoph.evacuation.pt.EvacuationTransitRouter;
 import playground.christoph.evacuation.pt.EvacuationTransitRouterFactory;
-import playground.christoph.evacuation.withinday.replanning.identifiers.InformedAgentsTracker;
 
 public class PTTravelTimeEvacuation implements SwissPTTravelTime {
 

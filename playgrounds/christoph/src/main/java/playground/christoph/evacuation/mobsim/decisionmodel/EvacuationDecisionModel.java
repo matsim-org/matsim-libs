@@ -363,47 +363,47 @@ public class EvacuationDecisionModel implements HouseholdDecisionModel {
 		}
 	}
 	
-	/*
-	 * TODO: move this code to a test case.
-	 */
-	public static void main(String[] args) {
-		if (args.length == 0) return;
-		
-		Config config = ConfigUtils.loadConfig(args[0]);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		new EvacuationConfigReader().readFile(args[1]);
-
-		ObjectAttributes householdObjectAttributes = new ObjectAttributes();
-		new ObjectAttributesXmlReader(householdObjectAttributes).parse(EvacuationConfig.householdObjectAttributesFile);
-		
-		EvacuationConfig.evacuationTime = 0.0;
-		config.getQSimConfigGroup().setEndTime(1.0);
-		
-		Set<SimpleFeature> features = new HashSet<SimpleFeature>();
-		SHPFileUtil util = new SHPFileUtil();
-		for (String file : EvacuationConfig.evacuationArea) features.addAll(ShapeFileReader.getAllFeatures(file));
-		Geometry affectedArea = util.mergeGeometries(features);
-		
-		CoordAnalyzer coordAnalyzer = new CoordAnalyzer(affectedArea);
-		HouseholdsTracker householdsTracker = new HouseholdsTracker(scenario);
-		DecisionDataProvider decisionDataProvider = new DecisionDataProvider();
-		
-		/*
-		 * Create a DecisionDataGrabber and run notifyMobsimInitialized(...)
-		 * which inserts decision data into the DecisionDataProvider.
-		 */
-		DecisionDataGrabber decisionDataGrabber = new DecisionDataGrabber(scenario, decisionDataProvider, coordAnalyzer, 
-				householdsTracker, householdObjectAttributes);	
-//		decisionDataGrabber.notifyMobsimInitialized(null);
-		
-		Mobsim mobsim = new QSimFactory().createMobsim(scenario, EventsUtils.createEventsManager());
-		// SimulationListeners are fired in reverse order! Therefore add householdsTracker after decisionDataGrabber.
-		((QSim) mobsim).addQueueSimulationListeners(decisionDataGrabber);
-		((QSim) mobsim).addQueueSimulationListeners(householdsTracker);
-		mobsim.run();
-		
-		EvacuationDecisionModel model = new EvacuationDecisionModel(scenario, MatsimRandom.getLocalInstance(), decisionDataProvider);
-		model.runModel(((ScenarioImpl) scenario).getHouseholds());
-		model.printStatistics();		
-	}
+//	/*
+//	 * TODO: move this code to a test case.
+//	 */
+//	public static void main(String[] args) {
+//		if (args.length == 0) return;
+//		
+//		Config config = ConfigUtils.loadConfig(args[0]);
+//		Scenario scenario = ScenarioUtils.loadScenario(config);
+//		new EvacuationConfigReader().readFile(args[1]);
+//
+//		ObjectAttributes householdObjectAttributes = new ObjectAttributes();
+//		new ObjectAttributesXmlReader(householdObjectAttributes).parse(EvacuationConfig.householdObjectAttributesFile);
+//		
+//		EvacuationConfig.evacuationTime = 0.0;
+//		config.getQSimConfigGroup().setEndTime(1.0);
+//		
+//		Set<SimpleFeature> features = new HashSet<SimpleFeature>();
+//		SHPFileUtil util = new SHPFileUtil();
+//		for (String file : EvacuationConfig.evacuationArea) features.addAll(ShapeFileReader.getAllFeatures(file));
+//		Geometry affectedArea = util.mergeGeometries(features);
+//		
+//		CoordAnalyzer coordAnalyzer = new CoordAnalyzer(affectedArea);
+//		HouseholdsTracker householdsTracker = new HouseholdsTracker(scenario);
+//		DecisionDataProvider decisionDataProvider = new DecisionDataProvider();
+//		
+//		/*
+//		 * Create a DecisionDataGrabber and run notifyMobsimInitialized(...)
+//		 * which inserts decision data into the DecisionDataProvider.
+//		 */
+//		DecisionDataGrabber decisionDataGrabber = new DecisionDataGrabber(scenario, decisionDataProvider, coordAnalyzer, 
+//				householdsTracker, householdObjectAttributes);	
+////		decisionDataGrabber.notifyMobsimInitialized(null);
+//		
+//		Mobsim mobsim = new QSimFactory().createMobsim(scenario, EventsUtils.createEventsManager());
+//		// SimulationListeners are fired in reverse order! Therefore add householdsTracker after decisionDataGrabber.
+//		((QSim) mobsim).addQueueSimulationListeners(decisionDataGrabber);
+//		((QSim) mobsim).addQueueSimulationListeners(householdsTracker);
+//		mobsim.run();
+//		
+//		EvacuationDecisionModel model = new EvacuationDecisionModel(scenario, MatsimRandom.getLocalInstance(), decisionDataProvider);
+//		model.runModel(((ScenarioImpl) scenario).getHouseholds());
+//		model.printStatistics();		
+//	}
 }

@@ -47,7 +47,10 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.withinday.mobsim.WithinDayEngine;
+
+import playground.christoph.evacuation.config.EvacuationConfig;
 
 /**
  * @author cdobler
@@ -59,6 +62,8 @@ public class EvacuationQSimFactory implements MobsimFactory {
     private final WithinDayEngine withinDayEngine;
     private final JointDepartureOrganizer jointDepartureOrganizer;
     private final Map<String, TravelTime> multiModalTravelTimes;
+    
+    private int householdsInformerRNG = 132456;
     
     public EvacuationQSimFactory(WithinDayEngine withinDayEngine,
     		JointDepartureOrganizer jointDepartureOrganizer, Map<String, TravelTime> multiModalTravelTimes) {
@@ -74,7 +79,7 @@ public class EvacuationQSimFactory implements MobsimFactory {
         if (conf == null) {
             throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
         }
-
+        
         // Get number of parallel Threads
         int numOfThreads = conf.getNumberOfThreads();
         QNetsimEngineFactory netsimEngineFactory;
@@ -110,6 +115,10 @@ public class EvacuationQSimFactory implements MobsimFactory {
 		
 		TeleportationEngine teleportationEngine = new TeleportationEngine();
 		qSim.addMobsimEngine(teleportationEngine);
+		
+		qSim.addMobsimEngine(new HouseholdsInformer(((ScenarioImpl) sc).getHouseholds(), EvacuationConfig.informAgentsRayleighSigma, this.householdsInformerRNG));
+		// increase initial value in case additional iterations will be performed
+		this.householdsInformerRNG++;
 		
         AgentFactory agentFactory = new ExperimentalBasicWithindayAgentFactory(qSim);
         AgentSource agentSource = new EvacuationPopulationAgentSource(sc, agentFactory, qSim);

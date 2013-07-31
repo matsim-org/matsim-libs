@@ -23,21 +23,26 @@ package playground.christoph.evacuation.withinday.replanning.identifiers;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilter;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilterFactory;
 
+import playground.christoph.evacuation.mobsim.InformedAgentsTracker;
+import playground.christoph.evacuation.mobsim.ReplanningTracker;
 import playground.christoph.evacuation.withinday.replanning.identifiers.InformedAgentsFilter.FilterType;
 
 public class InformedAgentsFilterFactory implements AgentFilterFactory {
 
 	private final InformedAgentsTracker informedAgentsTracker;
+	private final ReplanningTracker replanningTracker;
 	private final FilterType filterType;
 	
-	public InformedAgentsFilterFactory(InformedAgentsTracker informedAgentsTracker, FilterType filterType) {
+	public InformedAgentsFilterFactory(InformedAgentsTracker informedAgentsTracker, ReplanningTracker replanningTracker,
+			FilterType filterType) {
 		this.informedAgentsTracker = informedAgentsTracker;
+		this.replanningTracker = replanningTracker;
 		this.filterType = filterType;
 	}
 	
 	@Override
 	public AgentFilter createAgentFilter() {
-		return new InformedAgentsFilter(informedAgentsTracker, filterType);
+		return new InformedAgentsFilter(informedAgentsTracker, replanningTracker, filterType);
 	}
 
 }

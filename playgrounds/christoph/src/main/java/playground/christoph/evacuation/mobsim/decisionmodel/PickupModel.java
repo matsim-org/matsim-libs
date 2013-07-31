@@ -249,39 +249,39 @@ public class PickupModel implements PersonDecisionModel {
 		}
 	}
 	
-	/*
-	 * TODO: move this code to a test case.
-	 */
-	public static void main(String[] args) {
-		if (args.length == 0) return;
-		
-		Config config = ConfigUtils.loadConfig(args[0]);
-		Scenario scenario = ScenarioUtils.loadScenario(config);
-		new EvacuationConfigReader().readFile(args[1]);
-		
-		ObjectAttributes householdObjectAttributes = new ObjectAttributes();
-		new ObjectAttributesXmlReader(householdObjectAttributes).parse(EvacuationConfig.householdObjectAttributesFile);
-		
-		Set<SimpleFeature> features = new HashSet<SimpleFeature>();
-		SHPFileUtil util = new SHPFileUtil();
-		for (String file : EvacuationConfig.evacuationArea) features.addAll(ShapeFileReader.getAllFeatures(file));
-		Geometry affectedArea = util.mergeGeometries(features);
-		
-		CoordAnalyzer coordAnalyzer = new CoordAnalyzer(affectedArea);
-		HouseholdsTracker householdsTracker = new HouseholdsTracker(scenario);
-		DecisionDataProvider decisionDataProvider = new DecisionDataProvider();
-		
-		/*
-		 * Create a DecisionDataGrabber and run notifyMobsimInitialized(...)
-		 * which inserts decision data into the DecisionDataProvider.
-		 */
-		DecisionDataGrabber decisionDataGrabber = new DecisionDataGrabber(scenario, decisionDataProvider, coordAnalyzer, 
-				householdsTracker, householdObjectAttributes);	
-		decisionDataGrabber.notifyMobsimInitialized(null);
-		
-		PickupModel pickupModel = new PickupModel(decisionDataProvider);
-		pickupModel.runModel(scenario.getPopulation());
-		pickupModel.printStatistics();
-	}
+//	/*
+//	 * TODO: move this code to a test case.
+//	 */
+//	public static void main(String[] args) {
+//		if (args.length == 0) return;
+//		
+//		Config config = ConfigUtils.loadConfig(args[0]);
+//		Scenario scenario = ScenarioUtils.loadScenario(config);
+//		new EvacuationConfigReader().readFile(args[1]);
+//		
+//		ObjectAttributes householdObjectAttributes = new ObjectAttributes();
+//		new ObjectAttributesXmlReader(householdObjectAttributes).parse(EvacuationConfig.householdObjectAttributesFile);
+//		
+//		Set<SimpleFeature> features = new HashSet<SimpleFeature>();
+//		SHPFileUtil util = new SHPFileUtil();
+//		for (String file : EvacuationConfig.evacuationArea) features.addAll(ShapeFileReader.getAllFeatures(file));
+//		Geometry affectedArea = util.mergeGeometries(features);
+//		
+//		CoordAnalyzer coordAnalyzer = new CoordAnalyzer(affectedArea);
+//		HouseholdsTracker householdsTracker = new HouseholdsTracker(scenario);
+//		DecisionDataProvider decisionDataProvider = new DecisionDataProvider();
+//		
+//		/*
+//		 * Create a DecisionDataGrabber and run notifyMobsimInitialized(...)
+//		 * which inserts decision data into the DecisionDataProvider.
+//		 */
+//		DecisionDataGrabber decisionDataGrabber = new DecisionDataGrabber(scenario, decisionDataProvider, coordAnalyzer, 
+//				householdsTracker, householdObjectAttributes);	
+//		decisionDataGrabber.notifyMobsimInitialized(null);
+//		
+//		PickupModel pickupModel = new PickupModel(decisionDataProvider);
+//		pickupModel.runModel(scenario.getPopulation());
+//		pickupModel.printStatistics();
+//	}
 
 }

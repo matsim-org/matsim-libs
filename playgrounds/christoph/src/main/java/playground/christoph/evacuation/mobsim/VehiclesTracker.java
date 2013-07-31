@@ -32,6 +32,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
@@ -60,6 +61,8 @@ public class VehiclesTracker implements MobsimInitializedListener,
 	LinkEnterEventHandler, LinkLeaveEventHandler, PersonLeavesVehicleEventHandler,
 	AgentDepartureEventHandler, AgentArrivalEventHandler {
 	
+	private final Network network;
+	
 	// currently active drivers
 	private final Set<Id> drivers;
 	
@@ -76,24 +79,17 @@ public class VehiclesTracker implements MobsimInitializedListener,
 	 * a seat when the picking up vehicle in on the same link.
 	 */
 	private final Map<Id, AtomicInteger> reservedCapacities;
-			
-	public VehiclesTracker() {
+	
+	public VehiclesTracker(Network network) {
+		
+		this.network = network;
 		
 		this.drivers = new HashSet<Id>();
 		this.vehicles = new HashMap<Id, MobsimVehicle>();	
 		this.enrouteVehiclesOnLink = new HashMap<Id, List<Id>>();
 		this.reservedCapacities = new HashMap<Id, AtomicInteger>();
 	}
-	
-//	private int jointDeparturesCounter = 0;
-//	@Deprecated
-//	public JointDeparture createJointDeparture(Id linkId, Id vehicleId, Id driverId, 
-//			Set<Id> passengerIds) {
-//		Id id = new IdImpl("jd" + jointDeparturesCounter++);
-//		JointDeparture jointDeparture = this.jointDepartureOrganizer.createJointDeparture(id, linkId, vehicleId, driverId, passengerIds);
-//		return jointDeparture;
-//	}
-	
+
 	public Id getVehicleLinkId(Id vehicleId) {
 		return this.vehicles.get(vehicleId).getCurrentLink().getId();
 	}
@@ -102,6 +98,7 @@ public class VehiclesTracker implements MobsimInitializedListener,
 		return this.enrouteVehiclesOnLink.get(linkId);
 	}
 	
+	@Deprecated
 	public int getFreeVehicleCapacity(Id vehicleId) {
 		
 		QVehicle vehicle = (QVehicle) this.vehicles.get(vehicleId);
@@ -124,19 +121,23 @@ public class VehiclesTracker implements MobsimInitializedListener,
 		reserved.incrementAndGet();
 	}
 	
+	@Deprecated
 	public MobsimVehicle getVehicle(Id vehicleId) {
 		return this.vehicles.get(vehicleId);
 	}
 	
+	@Deprecated
 	public MobsimDriverAgent getVehicleDriver(Id vehicleId) {
 		return this.vehicles.get(vehicleId).getDriver();
 	}
 	
+	@Deprecated
 	public Collection<? extends PassengerAgent> getVehiclePassengers(Id vehicleId) {
 		QVehicle vehicle = (QVehicle) this.vehicles.get(vehicleId);
 		return vehicle.getPassengers();
 	}
 	
+	@Deprecated
 	@Override
 	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 		QSim sim = (QSim) e.getQueueSimulation();
@@ -147,11 +148,6 @@ public class VehiclesTracker implements MobsimInitializedListener,
 				this.vehicles.put(mobsimVehicle.getId(), mobsimVehicle);
 			}
 		}
-				
-		// initialize some maps
-		for (Link link : sim.getNetsimNetwork().getNetwork().getLinks().values()) {
-			this.enrouteVehiclesOnLink.put(link.getId(), new ArrayList<Id>());
-		}
 	}
 	
 	@Override
@@ -160,6 +156,8 @@ public class VehiclesTracker implements MobsimInitializedListener,
 		 * If a person leaves a vehicle, the vehicle has to be parked on
 		 * the link and therefore has to be removed from the enroute list.
 		 */
+//		TODO: this is not true anymore... think about pt and passengers
+		
 		MobsimVehicle vehicle = this.vehicles.get(event.getVehicleId());
 		List<Id> vehicleIds = this.enrouteVehiclesOnLink.get(vehicle.getCurrentLink().getId());
 		vehicleIds.remove(vehicle.getId());
@@ -204,6 +202,11 @@ public class VehiclesTracker implements MobsimInitializedListener,
 		this.drivers.clear();
 		this.vehicles.clear();		
 		this.enrouteVehiclesOnLink.clear();
+		
+		// initialize some maps
+		for (Link link : network.getLinks().values()) {
+			this.enrouteVehiclesOnLink.put(link.getId(), new ArrayList<Id>());
+		}
 	}
 
 }

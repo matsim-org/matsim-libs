@@ -31,6 +31,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.contrib.multimodal.router.MultimodalTripRouterFactory;
+import org.matsim.contrib.multimodal.router.util.BikeTravelTimeFactory;
+import org.matsim.contrib.multimodal.router.util.WalkTravelTimeFactory;
 import org.matsim.contrib.multimodal.tools.MultiModalNetworkCreator;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -102,6 +104,7 @@ import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.config.EvacuationConfigReader;
 import playground.christoph.evacuation.mobsim.EvacuationQSimFactory;
 import playground.christoph.evacuation.mobsim.HouseholdsTracker;
+import playground.christoph.evacuation.mobsim.InformedHouseholdsTracker;
 import playground.christoph.evacuation.mobsim.LegModeChecker;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataGrabber;
@@ -113,9 +116,7 @@ import playground.christoph.evacuation.router.RandomCompassRouterFactory;
 import playground.christoph.evacuation.router.util.AffectedAreaPenaltyCalculator;
 import playground.christoph.evacuation.router.util.FuzzyTravelTimeEstimatorFactory;
 import playground.christoph.evacuation.router.util.PenaltyTravelCostFactory;
-import playground.christoph.evacuation.trafficmonitoring.BikeTravelTimeFactory;
 import playground.christoph.evacuation.trafficmonitoring.SwissPTTravelTime;
-import playground.christoph.evacuation.trafficmonitoring.WalkTravelTimeFactory;
 import playground.christoph.evacuation.vehicles.AssignVehiclesToPlans;
 import playground.christoph.evacuation.vehicles.CreateVehiclesForHouseholds;
 import playground.christoph.evacuation.vehicles.HouseholdVehicleAssignmentReader;
@@ -125,7 +126,6 @@ import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsTo
 import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsToPickupIdentifierFactory;
 import playground.christoph.evacuation.withinday.replanning.identifiers.InformedAgentsFilter.FilterType;
 import playground.christoph.evacuation.withinday.replanning.identifiers.InformedAgentsFilterFactory;
-import playground.christoph.evacuation.withinday.replanning.identifiers.InformedHouseholdsTracker;
 import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifier;
 import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifierFactory;
 import playground.christoph.evacuation.withinday.replanning.replanners.CurrentActivityToMeetingPointReplannerFactory;
@@ -420,8 +420,7 @@ public class EvacuationControler extends WithinDayController implements
 		
 		this.coordAnalyzer = new CoordAnalyzer(affectedArea);	
 		
-		this.informedHouseholdsTracker = new InformedHouseholdsTracker(this.scenarioData.getHouseholds(), 
-				this.scenarioData.getPopulation().getPersons().keySet(), this.getEvents(), EvacuationConfig.informAgentsRayleighSigma);
+		this.informedHouseholdsTracker = new InformedHouseholdsTracker(this.scenarioData.getPopulation(), this.scenarioData.getHouseholds());
 		this.getFixedOrderSimulationListener().addSimulationListener(informedHouseholdsTracker);
 		
 		this.householdsTracker = new HouseholdsTracker(this.scenarioData);
@@ -432,17 +431,14 @@ public class EvacuationControler extends WithinDayController implements
 		this.jointDepartureWriter = new MissedJointDepartureWriter(this.jointDepartureOrganizer);
 		this.addControlerListener(this.jointDepartureWriter);
 		
-		this.vehiclesTracker = new VehiclesTracker();
+		this.vehiclesTracker = new VehiclesTracker(scenarioData.getNetwork());
 		this.getEvents().addHandler(vehiclesTracker);
 		this.getFixedOrderSimulationListener().addSimulationListener(vehiclesTracker);
 		
-		this.decisionDataProvider = new DecisionDataProvider();
-		this.decisionDataGrabber = new DecisionDataGrabber(this.scenarioData, this.decisionDataProvider, this.coordAnalyzer.createInstance(), 
+		this.decisionDataGrabber = new DecisionDataGrabber(this.scenarioData, this.coordAnalyzer.createInstance(), 
 				this.householdsTracker, this.householdObjectAttributes);
-		this.getFixedOrderSimulationListener().addSimulationListener(this.decisionDataGrabber);
 				
-		this.decisionModelRunner = new DecisionModelRunner(this.scenarioData, this.decisionDataProvider);
-		this.getFixedOrderSimulationListener().addSimulationListener(this.decisionModelRunner);
+		this.decisionModelRunner = new DecisionModelRunner(this.scenarioData, this.decisionDataGrabber);
 		this.addControlerListener(this.decisionModelRunner);
 		
 		/*
@@ -644,8 +640,8 @@ public class EvacuationControler extends WithinDayController implements
 		/*
 		 * Initialize AgentFilters
 		 */
-		AgentFilterFactory initialReplanningFilterFactory = new InformedAgentsFilterFactory(this.informedHouseholdsTracker, FilterType.InitialReplanning);
-		AgentFilterFactory notInitialReplanningFilterFactory = new InformedAgentsFilterFactory(this.informedHouseholdsTracker, FilterType.NotInitialReplanning);
+		AgentFilterFactory initialReplanningFilterFactory = new InformedAgentsFilterFactory(this.informedHouseholdsTracker, null, FilterType.InitialReplanning);
+		AgentFilterFactory notInitialReplanningFilterFactory = new InformedAgentsFilterFactory(this.informedHouseholdsTracker, null, FilterType.NotInitialReplanning);
 		
 		Set<String> nonPTModes = new HashSet<String>();
 		nonPTModes.add(TransportMode.car);

@@ -54,6 +54,7 @@ import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.mobsim.HouseholdPosition;
 import playground.christoph.evacuation.mobsim.HouseholdsTracker;
+import playground.christoph.evacuation.mobsim.InformedHouseholdsTracker;
 import playground.christoph.evacuation.mobsim.Tracker.Position;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
@@ -281,7 +282,7 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 		/*
 		 * Get a Set of Ids of all households which have just been informed.
 		 */	
-		Queue<Id> informedHouseholds = this.informedHouseholdsTracker.getInformedHouseholdsInCurrentTimeStep();
+		Set<Id> informedHouseholds = this.informedHouseholdsTracker.getHouseholdsInformedInLastTimeStep();
 		for (Id householdId : informedHouseholds) {
 			HouseholdDecisionData hdd = this.decisionDataProvider.getHouseholdDecisionData(householdId);
 			HouseholdPosition householdPosition = hdd.getHouseholdPosition();

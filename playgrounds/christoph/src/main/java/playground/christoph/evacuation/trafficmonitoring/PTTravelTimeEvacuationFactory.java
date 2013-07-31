@@ -29,8 +29,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.TravelTimeFactory;
 
+import playground.christoph.evacuation.mobsim.InformedAgentsTracker;
 import playground.christoph.evacuation.pt.EvacuationTransitRouterFactory;
-import playground.christoph.evacuation.withinday.replanning.identifiers.InformedAgentsTracker;
 
 public class PTTravelTimeEvacuationFactory implements TravelTimeFactory {
 

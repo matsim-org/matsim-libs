@@ -46,14 +46,8 @@ public class MissedJointDepartureWriter implements AfterMobsimListener {
 
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
-		try {
-			bufferedWriter.flush();
-			bufferedWriter.close();
-		} catch (IOException e) {
-			Gbl.errorMsg(e);
-		}
 		
-		// Write second file containing all departures which have not been processed.
+		// Write file containing all departures which have not been processed.
 		Set<JointDeparture> missedDepartures = new LinkedHashSet<JointDeparture>();
 		for (Map<Leg, JointDeparture> jointDepartures : this.jointDepartureOrganizer.scheduledDepartures.values()) {
 			missedDepartures.addAll(jointDepartures.values());

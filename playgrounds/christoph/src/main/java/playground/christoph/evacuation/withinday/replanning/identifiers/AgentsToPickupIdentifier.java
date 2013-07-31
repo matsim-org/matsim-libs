@@ -70,6 +70,7 @@ import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifie
 
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.config.EvacuationConfig;
+import playground.christoph.evacuation.mobsim.InformedAgentsTracker;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.mobsim.decisionmodel.PickupModel.PickupDecision;

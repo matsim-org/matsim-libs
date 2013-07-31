@@ -22,32 +22,35 @@ package playground.christoph.evacuation.mobsim.decisionmodel;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
+import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataGrabber;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 
-public class DecisionModelRunner implements MobsimInitializedListener, AfterMobsimListener {
+public class DecisionModelRunner implements BeforeMobsimListener, AfterMobsimListener {
 
 	private final Scenario scenario;
+	private final DecisionDataGrabber decisionDataGrabber;
+	
 	private final DecisionDataProvider decisionDataProvider;
+	private final PanicModel panicModel;
+	private final PickupModel pickupModel;
+	private final EvacuationDecisionModel evacuationDecisionModel;
+	private final LatestAcceptedLeaveTimeModel latestAcceptedLeaveTimeModel;
 	
-	private PanicModel panicModel;
-	private PickupModel pickupModel;
-	private EvacuationDecisionModel evacuationDecisionModel;
-	private LatestAcceptedLeaveTimeModel latestAcceptedLeaveTimeModel;
-	
-	public DecisionModelRunner(Scenario scenario, DecisionDataProvider decisionDataProvider) {
+	public DecisionModelRunner(Scenario scenario, DecisionDataGrabber decisionDataGrabber) {
 		this.scenario = scenario;
-		this.decisionDataProvider = decisionDataProvider;
+		this.decisionDataGrabber = decisionDataGrabber;
 		
-		panicModel = new PanicModel(this.decisionDataProvider, EvacuationConfig.panicShare);
-		pickupModel = new PickupModel(this.decisionDataProvider);
-		evacuationDecisionModel = new EvacuationDecisionModel(this.scenario, MatsimRandom.getLocalInstance(), this.decisionDataProvider);
-		latestAcceptedLeaveTimeModel = new LatestAcceptedLeaveTimeModel(this.decisionDataProvider);
+		this.decisionDataProvider = new DecisionDataProvider();
+		this.panicModel = new PanicModel(this.decisionDataProvider, EvacuationConfig.panicShare);
+		this.pickupModel = new PickupModel(this.decisionDataProvider);
+		this.evacuationDecisionModel = new EvacuationDecisionModel(this.scenario, MatsimRandom.getLocalInstance(), this.decisionDataProvider);
+		this.latestAcceptedLeaveTimeModel = new LatestAcceptedLeaveTimeModel(this.decisionDataProvider);
 	}
 	
 	public EvacuationDecisionModel getEvacuationDecisionModel() {
@@ -57,9 +60,14 @@ public class DecisionModelRunner implements MobsimInitializedListener, AfterMobs
 	public LatestAcceptedLeaveTimeModel getLatestAcceptedLeaveTimeModel() {
 		return this.latestAcceptedLeaveTimeModel;
 	}
-	
+
 	@Override
-	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
+	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+		
+		/*
+		 * Grab decision data.
+		 */
+		this.decisionDataGrabber.grabDecisionData(this.decisionDataProvider);
 		
 		/*
 		 * Run panic model which decides which agents act rational and which panic.

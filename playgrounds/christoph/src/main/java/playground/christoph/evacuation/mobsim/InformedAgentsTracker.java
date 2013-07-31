@@ -18,23 +18,22 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.evacuation.withinday.replanning.identifiers;
+package playground.christoph.evacuation.mobsim;
 
 import java.text.DecimalFormat;
 import java.util.HashSet;
-import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
-import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
-import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.utils.misc.Time;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
+import playground.christoph.evacuation.events.PersonInformationEvent;
+import playground.christoph.evacuation.events.handler.PersonInformationEventHandler;
 
 /**
  * To simplify the decision making process, we assume that all members of a household
@@ -43,42 +42,31 @@ import playground.christoph.evacuation.config.EvacuationConfig;
  * 
  * @author cdobler
  */
-public abstract class InformedAgentsTracker implements MobsimBeforeSimStepListener, MobsimAfterSimStepListener {
+public abstract class InformedAgentsTracker implements PersonInformationEventHandler, MobsimAfterSimStepListener {
 	
 	static final Logger log = Logger.getLogger(InformedAgentsTracker.class);
 	
 	/* time since last "info" */
 	private int infoTime = 0;
-	private static final int INFO_PERIOD = 600;
+	/*package*/ static final int INFO_PERIOD = 300;
 	
 	/*package*/ final int totalAgents;
 	/*package*/ final Set<Id> informedAgents;
-	/*package*/ final Set<Id> notInformedAgents;
-	/*package*/ final Set<Id> toBeInitiallyReplannedAgents;
-	/*package*/ final Queue<Id> replannedAgentsInCurrentTimeStep;
 	
-	/*
-	 * This is true if all agents have been informed and have
-	 * performed an initial replanning. 
-	 */
 	private boolean allAgentsInformed = false;
 	
-	public InformedAgentsTracker(Set<Id> agentIds) {
+	public InformedAgentsTracker(Population population) {
 		this.informedAgents = new HashSet<Id>();
-		this.notInformedAgents = new HashSet<Id>(agentIds);
-		this.replannedAgentsInCurrentTimeStep = new ConcurrentLinkedQueue<Id>();
-		this.toBeInitiallyReplannedAgents = new HashSet<Id>();
 		
-		this.totalAgents = agentIds.size();
+		this.totalAgents = population.getPersons().size();
 	}
 
 	public boolean allAgentsInformed() {
 		return this.allAgentsInformed;
 	}
 	
-	public void informAgent(Id id) {
+	/*package*/ void informAgent(Id id) {
 		this.informedAgents.add(id);
-		this.notInformedAgents.remove(id);
 	}
 	
 	public boolean isAgentInformed(Id id) {
@@ -86,51 +74,22 @@ public abstract class InformedAgentsTracker implements MobsimBeforeSimStepListen
 		return this.informedAgents.contains(id);
 	}
 	
-	public boolean isAgentNotInformed(Id id) {
-		if (allAgentsInformed) return false;
-		return this.notInformedAgents.contains(id);
-	}
-	
-	public int getInformedAgentsCount() {
-		return this.informedAgents.size();
-	}
-	
-	public int getNotInformedAgentsCount() {
-		return this.notInformedAgents.size();
-	}
-	
 	public Set<Id> getInformedAgents() {
 		return this.informedAgents;
 	}
-	
-	public Set<Id> getNotInformedAgents() {
-		return this.notInformedAgents;
+		
+	@Override
+	public void reset(int iteration) {
+		this.informedAgents.clear();
 	}
-	
-	public boolean addToBeInitiallyReplannedAgent(Id id) {
-		return this.toBeInitiallyReplannedAgents.add(id);
-	}
-	
-	public boolean agentRequiresInitialReplanning(Id id) {
-		return this.toBeInitiallyReplannedAgents.contains(id);
-	}
-	
-	public Set<Id> getAgentsRequiringInitialReplanning() {
-		return this.toBeInitiallyReplannedAgents;
-	}
-	
-	/*
-	 * Collect all Agents that have been initially replanned in the
-	 * current time step. At the end of the time step, they are marked
-	 * as initially replanned. This avoids multiple replanners to
-	 * handle them in the same time step.
-	 */
-	public void setAgentInitiallyReplannedInCurrentTimeStep(Id id) {
-		this.replannedAgentsInCurrentTimeStep.add(id);
+
+	@Override
+	public void handleEvent(PersonInformationEvent event) {
+		this.informedAgents.add(event.getPersonId());
 	}
 	
 	@Override
-	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
+	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
 
 		// If all agents have already been informed, there is nothing left to do.
 		if (allAgentsInformed) return;
@@ -146,9 +105,7 @@ public abstract class InformedAgentsTracker implements MobsimBeforeSimStepListen
 		 * If all agents have been informed and have performed their initial
 		 * replanning, we set the marker variable to true.
 		 */
-		if (this.toBeInitiallyReplannedAgents.size() == 0 
-				&& this.informedAgents.size() == totalAgents 
-				&& this.notInformedAgents.size() == 0) {
+		if (this.informedAgents.size() == totalAgents) {
 			log.info("All agents have been informed at " + Time.writeTime(e.getSimulationTime()));
 			printStatistics(time);
 			this.allAgentsInformed = true;
@@ -156,32 +113,10 @@ public abstract class InformedAgentsTracker implements MobsimBeforeSimStepListen
 		}
 	}
 	
-	@Override
-	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
-		/*
-		 * Clear the list of agents who have been replanned in the time step.
-		 */
-		for (Id id : this.replannedAgentsInCurrentTimeStep) {
-			boolean removed = this.toBeInitiallyReplannedAgents.remove(id);
-			
-			// debug
-			if (!removed) {
-				log.warn("Initially replanned an agent which was not marked as to be! Time: " + e.getSimulationTime() + ", agentId: " + id.toString());
-			}
-		}
-		this.replannedAgentsInCurrentTimeStep.clear();
-		
-		// debug
-		if (this.toBeInitiallyReplannedAgents.size() > 0) {
-			log.warn("Found " + this.toBeInitiallyReplannedAgents.size() + " agents that should " +
-					"have been replanned initally but they were not!");
-		}
-	}
-	
 	private void printStatistics(double time) {
 		
 		int informed = this.informedAgents.size();
-		int notInformed = this.notInformedAgents.size();
+		int notInformed = this.totalAgents - informed;
 		
 		DecimalFormat df = new DecimalFormat("#.##");
 		

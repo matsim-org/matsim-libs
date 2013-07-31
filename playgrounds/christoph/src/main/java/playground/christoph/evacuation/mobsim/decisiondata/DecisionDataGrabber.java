@@ -23,8 +23,6 @@ package playground.christoph.evacuation.mobsim.decisiondata;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.households.Household;
@@ -40,18 +38,16 @@ import playground.christoph.evacuation.mobsim.HouseholdsTracker;
  * 
  * @author cdobler
  */
-public class DecisionDataGrabber implements MobsimInitializedListener {
+public class DecisionDataGrabber {
 
 	private final Scenario scenario;
 	private final CoordAnalyzer coordAnalyzer;
 	private final HouseholdsTracker householdsTracker;
-	private final DecisionDataProvider decisionDataProvider;
 	private final ObjectAttributes householdObjectAttributes;
 	
-	public DecisionDataGrabber(Scenario scenario, DecisionDataProvider decisionDataProvider, CoordAnalyzer coordAnalyzer, 
+	public DecisionDataGrabber(Scenario scenario, CoordAnalyzer coordAnalyzer, 
 			HouseholdsTracker householdsTracker, ObjectAttributes householdObjectAttributes) {
 		this.scenario = scenario;
-		this.decisionDataProvider = decisionDataProvider;
 		this.coordAnalyzer = coordAnalyzer;
 		this.householdsTracker = householdsTracker;
 		this.householdObjectAttributes = householdObjectAttributes;
@@ -60,19 +56,18 @@ public class DecisionDataGrabber implements MobsimInitializedListener {
 	/*
 	 * Initial data collection.
 	 */
-	@Override
-	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
+	public void grabDecisionData(DecisionDataProvider decisionDataProvider) {
 		
 		decisionDataProvider.reset();
 		
 		// create empty decision data objects
-		createDecisionData();
+		createDecisionData(decisionDataProvider);
 		
 		// collect decision data and fill data objects
-		collectDecisionData();
+		collectDecisionData(decisionDataProvider);
 	}
 	
-	private void createDecisionData() {
+	private void createDecisionData(DecisionDataProvider decisionDataProvider) {
 		for (Household household : ((ScenarioImpl) scenario).getHouseholds().getHouseholds().values()) {
 
 			Id householdId = household.getId();
@@ -91,7 +86,7 @@ public class DecisionDataGrabber implements MobsimInitializedListener {
 		}
 	}
 	
-	private void collectDecisionData() {
+	private void collectDecisionData(DecisionDataProvider decisionDataProvider) {
 		for (Household household : ((ScenarioImpl) scenario).getHouseholds().getHouseholds().values()) {
 
 			// ignore empty households
@@ -133,7 +128,7 @@ public class DecisionDataGrabber implements MobsimInitializedListener {
 
 			String homeFacilityIdString = this.householdObjectAttributes.getAttribute(household.getId().toString(), "homeFacilityId").toString();
 			Id homeFacilityId = this.scenario.createId(homeFacilityIdString);
-			ActivityFacility homeFacility = ((ScenarioImpl) this.scenario).getActivityFacilities().getFacilities().get(homeFacilityId);
+			ActivityFacility homeFacility = this.scenario.getActivityFacilities().getFacilities().get(homeFacilityId);
 			
 			HouseholdPosition householdPosition = this.householdsTracker.getHouseholdPosition(household.getId());
 			hdd.setHouseholdPosition(householdPosition);

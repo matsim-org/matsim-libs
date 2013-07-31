@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
@@ -72,6 +71,7 @@ import org.matsim.vehicles.Vehicle;
 
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.config.EvacuationConfig;
+import playground.christoph.evacuation.mobsim.InformedHouseholdsTracker;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.mobsim.decisiondata.HouseholdDecisionData;
@@ -80,7 +80,6 @@ import playground.christoph.evacuation.mobsim.decisionmodel.EvacuationDecisionMo
 import playground.christoph.evacuation.mobsim.decisionmodel.EvacuationDecisionModel.Participating;
 import playground.christoph.evacuation.mobsim.decisionmodel.LatestAcceptedLeaveTimeModel;
 import playground.christoph.evacuation.network.AddZCoordinatesToNetwork;
-import playground.christoph.evacuation.withinday.replanning.identifiers.InformedHouseholdsTracker;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -112,7 +111,7 @@ public class SelectHouseholdMeetingPoint implements MobsimInitializedListener, M
 	private final EvacuationDecisionModel evacuationDecisionModel;
 	private final LatestAcceptedLeaveTimeModel latestAcceptedLeaveTimeModel;
 	private final DecisionDataProvider decisionDataProvider;
-
+	
 	private TravelDisutilityFactory disutilityFactory;
 	private TripRouterFactory toHomeFacilityRouterFactory;
 	private TripRouterFactory fromHomeFacilityRouterFactory;
@@ -387,7 +386,7 @@ public class SelectHouseholdMeetingPoint implements MobsimInitializedListener, M
 		// otherwise meet and stay at home
 		else return this.decisionDataProvider.getHouseholdDecisionData(householdId).getHomeFacilityId();
 	}
-
+	
 	@Override
 	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 		
@@ -438,10 +437,8 @@ public class SelectHouseholdMeetingPoint implements MobsimInitializedListener, M
 						((SelectHouseholdMeetingPointRunner) runnable).setTime(time);
 					}
 					
-					Queue<Id> informedHouseholds = informedHouseholdsTracker.getInformedHouseholdsInCurrentTimeStep();
-					
 					// If no household was informed in the current time step, we don't have to trigger the runners.
-					if (informedHouseholds.size() == 0) {
+					if (this.informedHouseholdsTracker.getHouseholdsInformedInLastTimeStep().size() == 0) {
 //						log.info("No households informed in the current timestep.");
 						return;
 					}
@@ -450,7 +447,7 @@ public class SelectHouseholdMeetingPoint implements MobsimInitializedListener, M
 					int roundRobin = 0;
 					
 					Households households = ((ScenarioImpl) scenario).getHouseholds();
-					for (Id householdId : informedHouseholds) {
+					for (Id householdId : this.informedHouseholdsTracker.getHouseholdsInformedInLastTimeStep()) {
 						
 						Household household = households.getHouseholds().get(householdId);
 						
@@ -478,7 +475,7 @@ public class SelectHouseholdMeetingPoint implements MobsimInitializedListener, M
 					 * However, this seems to be not thread-safe. Therefore I moved it below the 
 					 * endBarrier.await() line. cdobler, jun'12.
 					 */
-					for (Id householdId : informedHouseholds) {
+					for (Id householdId : this.informedHouseholdsTracker.getHouseholdsInformedInLastTimeStep()) {
 						
 						Household household = households.getHouseholds().get(householdId);
 						
@@ -497,7 +494,7 @@ public class SelectHouseholdMeetingPoint implements MobsimInitializedListener, M
 						if (this.coordAnalyzer.isFacilityAffected(meetingFacility)) meetInsecure++;
 						else meetSecure++;
 					}
-				}			
+				}		
 			} catch (InterruptedException ex) {
 				Gbl.errorMsg(ex);
 			} catch (BrokenBarrierException ex) {

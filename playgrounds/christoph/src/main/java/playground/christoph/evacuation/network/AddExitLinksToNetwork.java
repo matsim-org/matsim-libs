@@ -47,6 +47,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
+import org.matsim.core.facilities.OpeningTime.DayType;
 import org.matsim.core.facilities.OpeningTimeImpl;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.LinkImpl;
@@ -234,7 +235,10 @@ public class AddExitLinksToNetwork {
 		((ActivityFacilityImpl)rescueFacility).setLinkId(((LinkImpl)rescueLink).getId());
 		
 		ActivityOption activityOption = ((ActivityFacilityImpl)rescueFacility).createActivityOption("rescue");
-		activityOption.addOpeningTime(new OpeningTimeImpl(0*3600, 24*3600));
+//		activityOption.addOpeningTime(new OpeningTimeImpl(0*3600, 24*3600));
+		OpeningTimeImpl openingTime = new OpeningTimeImpl(0*3600, 24*3600);
+		openingTime.setDay(DayType.wk);
+		activityOption.addOpeningTime(openingTime);
 		activityOption.setCapacity(Double.MAX_VALUE);
 	}
 }

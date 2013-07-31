@@ -27,6 +27,7 @@ import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIden
 
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.mobsim.HouseholdsTracker;
+import playground.christoph.evacuation.mobsim.InformedHouseholdsTracker;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.withinday.replanning.utils.ModeAvailabilityChecker;

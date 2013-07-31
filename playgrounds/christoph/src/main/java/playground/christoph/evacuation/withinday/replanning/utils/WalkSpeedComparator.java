@@ -31,15 +31,14 @@ import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.contrib.multimodal.router.util.WalkTravelTimeFactory;
 import org.matsim.core.api.internal.MatsimComparator;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.router.util.TravelTime;
-
-import playground.christoph.evacuation.core.utils.geometry.Coord3dImpl;
-import playground.christoph.evacuation.trafficmonitoring.WalkTravelTimeFactory;
+import org.matsim.core.utils.geometry.CoordImpl;
 
 /*
  * Compares walk speeds of people respecting their age, gender, etc.
@@ -53,13 +52,16 @@ public class WalkSpeedComparator implements Comparator<Id>, Serializable, Matsim
 	private final Map<Id, Double> travelTimesMap;
 	
 	public WalkSpeedComparator() {
-		travelTime = new WalkTravelTimeFactory(new PlansCalcRouteConfigGroup()).createTravelTime();
-		
+				
 		NetworkFactory factory = new NetworkFactoryImpl(NetworkImpl.createNetwork());
-		Node startNode = factory.createNode(new IdImpl("startNode"), new Coord3dImpl(0, 0, 0));
-		Node endNode = factory.createNode(new IdImpl("endNode"), new Coord3dImpl(1, 0, 0));
+		Node startNode = factory.createNode(new IdImpl("startNode"), new CoordImpl(0.0, 0.0));
+		Node endNode = factory.createNode(new IdImpl("endNode"), new CoordImpl(1.0, 0.0));
 		link = factory.createLink(new IdImpl("link"), startNode, endNode);
 		link.setLength(1.0);
+		
+		Map<Id, Double> linkSlopes = new HashMap<Id, Double>();
+		linkSlopes.put(link.getId(), 0.0);
+		travelTime = new WalkTravelTimeFactory(new PlansCalcRouteConfigGroup(), linkSlopes).createTravelTime();
 		
 		travelTimesMap = new HashMap<Id, Double>();
 	}

@@ -39,6 +39,8 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.contrib.multimodal.router.MultimodalTripRouterFactory;
+import org.matsim.contrib.multimodal.router.util.BikeTravelTimeFactory;
+import org.matsim.contrib.multimodal.router.util.WalkTravelTimeFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
@@ -100,18 +102,16 @@ import playground.christoph.evacuation.api.core.v01.Coord3d;
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.core.utils.geometry.Coord3dImpl;
 import playground.christoph.evacuation.mobsim.AgentsTracker;
+import playground.christoph.evacuation.mobsim.InformedHouseholdsTracker;
+import playground.christoph.evacuation.mobsim.ReplanningTracker;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.network.AddZCoordinatesToNetwork;
-import playground.christoph.evacuation.trafficmonitoring.BikeTravelTimeFactory;
-import playground.christoph.evacuation.trafficmonitoring.PTTravelTimeKTIEvacuationFactory;
 import playground.christoph.evacuation.trafficmonitoring.SwissPTTravelTime;
-import playground.christoph.evacuation.trafficmonitoring.WalkTravelTimeFactory;
 import playground.christoph.evacuation.withinday.replanning.identifiers.AffectedAgentsFilter;
 import playground.christoph.evacuation.withinday.replanning.identifiers.AffectedAgentsFilterFactory;
 import playground.christoph.evacuation.withinday.replanning.identifiers.InformedAgentsFilter;
 import playground.christoph.evacuation.withinday.replanning.identifiers.InformedAgentsFilterFactory;
-import playground.christoph.evacuation.withinday.replanning.identifiers.InformedHouseholdsTracker;
 import playground.christoph.evacuation.withinday.replanning.replanners.CurrentLegInitialReplannerFactory;
 import playground.christoph.evacuation.withinday.replanning.replanners.EndActivityAndEvacuateReplannerFactory;
 import playground.christoph.evacuation.withinday.replanning.replanners.ExtendCurrentActivityReplannerFactory;
@@ -152,6 +152,7 @@ public final class MarathonRunner implements StartupListener,
 	private Set<Id> affectedFacilities;
 	
 	private AgentsTracker agentsTracker;
+	private ReplanningTracker replanningTracker;
 	private InformedHouseholdsTracker informedHouseholdsTracker;
 	private VehiclesTracker vehiclesTracker;
 	private DecisionDataProvider decisionDataProvider;
@@ -405,13 +406,16 @@ public final class MarathonRunner implements StartupListener,
 		
 		createExitLinks(event.getControler());
 		
-		this.informedHouseholdsTracker = new InformedHouseholdsTracker(((ScenarioImpl) this.scenario).getHouseholds(), 
-				this.scenario.getPopulation().getPersons().keySet(), event.getControler().getEvents(), EvacuationConfig.informAgentsRayleighSigma);
+		this.informedHouseholdsTracker = new InformedHouseholdsTracker(this.scenario.getPopulation(), ((ScenarioImpl) this.scenario).getHouseholds());
 		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(informedHouseholdsTracker);
+		event.getControler().getEvents().addHandler(this.informedHouseholdsTracker);
 		
 		this.agentsTracker = new AgentsTracker(this.scenario);
 		event.getControler().getEvents().addHandler(agentsTracker);
 		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(agentsTracker);
+		
+		this.replanningTracker = new ReplanningTracker(this.informedHouseholdsTracker);
+		event.getControler().getEvents().addHandler(this.replanningTracker);
 		
 		// we do not use vehicles so far
 //		this.vehiclesTracker = new VehiclesTracker(this.getEvents());
@@ -713,10 +717,10 @@ public final class MarathonRunner implements StartupListener,
 		/*
 		 * Initialize AgentFilters
 		 */
-		InformedAgentsFilterFactory initialReplanningFilterFactory = new InformedAgentsFilterFactory((this.informedHouseholdsTracker), 
-				InformedAgentsFilter.FilterType.InitialReplanning);
-		InformedAgentsFilterFactory notInitialReplanningFilterFactory = new InformedAgentsFilterFactory((this.informedHouseholdsTracker),
-				InformedAgentsFilter.FilterType.NotInitialReplanning);
+		InformedAgentsFilterFactory initialReplanningFilterFactory = new InformedAgentsFilterFactory(this.informedHouseholdsTracker, 
+				this.replanningTracker, InformedAgentsFilter.FilterType.InitialReplanning);
+		InformedAgentsFilterFactory notInitialReplanningFilterFactory = new InformedAgentsFilterFactory(this.informedHouseholdsTracker,
+				this.replanningTracker, InformedAgentsFilter.FilterType.NotInitialReplanning);
 		
 		// use affected area
 //		AffectedAgentsFilterFactory affectedAgentsFilterFactory = new AffectedAgentsFilterFactory(this.scenarioData, this.agentsTracker,

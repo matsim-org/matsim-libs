@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * InformedHouseholdsTracker.java
+ * HouseholdsInformer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,23 +18,18 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.evacuation.withinday.replanning.identifiers;
+package playground.christoph.evacuation.mobsim;
 
 import java.io.Serializable;
 import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Queue;
-import java.util.Set;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.MatsimComparator;
-import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
+import org.matsim.core.mobsim.qsim.InternalInterface;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.misc.Time;
-
 import org.matsim.households.Household;
 import org.matsim.households.Households;
 
@@ -43,29 +38,34 @@ import playground.christoph.evacuation.events.HouseholdInformationEventImpl;
 import playground.christoph.evacuation.events.PersonInformationEventImpl;
 import playground.christoph.evacuation.utils.DeterministicRNG;
 
-public class InformedHouseholdsTracker extends InformedAgentsTracker {
+/**
+ * Informs the households which then start adapting their plans.
+ * 
+ * It is implemented as MobsimEngine since this simplifies the events handling in 
+ * other classes. The informed events are created during the "doSimStep(...)" phase. 
+ * The SimStepParallelEventsManager ensures, that all of them have been processed 
+ * before the AfterStimStepListeners are called.
+ * 
+ * @author cdobler
+ */
+public class HouseholdsInformer implements MobsimEngine {
 
-	/*package*/ final EventsManager eventsManager;
+	/*package*/ EventsManager eventsManager;
 	/*package*/ final int totalHouseholds;	// number of households with more than 0 members
 	/*package*/ final Households households;
-	/*package*/ final DeterministicRNG rng;
-	/*package*/ final Set<Id> informedHouseholds;
-	/*package*/ final Queue<Id> informedHouseholdsInCurrentTimeStep;
 	/*package*/ final PriorityBlockingQueue<Tuple<Id, Double>> informationTime;
-
 	/*package*/ final double sigma;
-	private boolean allHouseholdsInformed = false;
+	/*package*/ final int rngInitialValue;
+
+//	/*package*/ int rngInitialValue = 132456;
+	/*package*/ DeterministicRNG rng;
 	
-	public InformedHouseholdsTracker(Households households, Set<Id> agentIds, EventsManager eventsManager, double sigma) {
-		super(agentIds);
+	public HouseholdsInformer(Households households, double sigma, int rngInitialValue) {
 		
-		this.eventsManager = eventsManager;
 		this.households = households;
 		this.sigma = sigma;
-		this.informedHouseholdsInCurrentTimeStep = new ConcurrentLinkedQueue<Id>();
+		this.rngInitialValue = rngInitialValue;
 
-		this.rng = new DeterministicRNG(132456);
-		this.informedHouseholds = new HashSet<Id>();
 		this.informationTime = new PriorityBlockingQueue<Tuple<Id, Double>>(500, new InformationTimeComparator());
 
 		/*
@@ -75,21 +75,6 @@ public class InformedHouseholdsTracker extends InformedAgentsTracker {
 		int num = 0;
 		for (Household household : households.getHouseholds().values()) if (household.getMemberIds().size() > 0) num++;
 		totalHouseholds = num;
-		
-		selectInformationTimes(households);
-	}
-
-	public Queue<Id> getInformedHouseholdsInCurrentTimeStep() {
-		return informedHouseholdsInCurrentTimeStep;
-	}
-
-	public boolean allHouseholdsInformed() {
-		return this.allHouseholdsInformed;
-	}
-	
-	public boolean isHouseholdInformed(Id id) {
-		if (allHouseholdsInformed) return true;
-		return this.informedHouseholds.contains(id);
 	}
 
 	/*
@@ -119,7 +104,6 @@ public class InformedHouseholdsTracker extends InformedAgentsTracker {
 	 * So far use a Rayleigh Distribution with a sigma of 300. After 353s ~ 50%
 	 * of all households have been informed.
 	 */
-//	private final double sigma = 300;
 	private final double upperLimit = 0.999999;
 
 	private double calculateInformationDelay(Id householdId) {
@@ -132,53 +116,48 @@ public class InformedHouseholdsTracker extends InformedAgentsTracker {
 		return Math.floor(Math.sqrt(-2 * sigma*sigma * Math.log(1 - rand)));
 	}
 
+	/*
+	 * Calculate each households information time.
+	 */
 	@Override
-	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
-
-		if (this.allHouseholdsInformed && this.allAgentsInformed()) return;
-		
-		/*
-		 * If all households and agents have been informed
-		 */
-		if (this.informedHouseholds.size() == this.totalHouseholds && this.allAgentsInformed()) {
-			this.allHouseholdsInformed = true;
-			log.info("All households have been informed at " + Time.writeTime(e.getSimulationTime()));
-			return;
-		}
-		
-		/*
-		 * Clear the list of households who have been informed in the last time
-		 * step.
-		 */
-		this.informedHouseholds.addAll(this.informedHouseholdsInCurrentTimeStep);
-		this.informedHouseholdsInCurrentTimeStep.clear();
-
-		double time = e.getSimulationTime();
-
-		/*
-		 * Register households to be initially replanned.
-		 */
+	public void onPrepareSim() {
+		this.rng = new DeterministicRNG(rngInitialValue);
+		this.informationTime.clear();
+		selectInformationTimes(households);
+	}
+	
+	/*
+	 * Mark households as informed.
+	 */
+	@Override
+	public void doSimStep(double time) {
+	
 		while (this.informationTime.peek() != null) {
 			Tuple<Id, Double> tuple = informationTime.peek();
 			if (tuple.getSecond() <= time) {
 				this.informationTime.poll();
 				Household household = households.getHouseholds().get(tuple.getFirst());
-				informedHouseholdsInCurrentTimeStep.add(tuple.getFirst());
 				this.eventsManager.processEvent(new HouseholdInformationEventImpl(time, household.getId()));
 				
 				for (Id memberId : household.getMemberIds()) {
-					this.addToBeInitiallyReplannedAgent(memberId);
-					this.informAgent(memberId);
 					this.eventsManager.processEvent(new PersonInformationEventImpl(time, memberId));
 				}
 			} else {
 				break;
 			}
 		}
-
-		super.notifyMobsimBeforeSimStep(e);
 	}
 
+	@Override
+	public void afterSim() {
+		// Nothing to do here so far.
+	}
+
+	@Override
+	public void setInternalInterface(InternalInterface internalInterface) {
+		this.eventsManager = internalInterface.getMobsim().getEventsManager();
+	}
+	
 	private class InformationTimeComparator implements Comparator<Tuple<Id, Double>>, Serializable, MatsimComparator {
 
 		private static final long serialVersionUID = 1L;
@@ -193,5 +172,4 @@ public class InformedHouseholdsTracker extends InformedAgentsTracker {
 			return cmp;
 		}
 	}
-
 }

@@ -27,6 +27,7 @@ import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifie
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifierFactory;
 
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
+import playground.christoph.evacuation.mobsim.InformedAgentsTracker;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 

@@ -147,11 +147,10 @@ public class AgentsReturnHomePostProcessing {
 		 * Create a DecisionDataGrabber and run notifyMobsimInitialized(...)
 		 * which inserts decision data into the DecisionDataProvider.
 		 */
-		DecisionDataGrabber decisionDataGrabber = new DecisionDataGrabber(scenario, decisionDataProvider, coordAnalyzer, 
+		DecisionDataGrabber decisionDataGrabber = new DecisionDataGrabber(scenario, coordAnalyzer, 
 				householdsTracker, householdObjectAttributes);	
 		
 		householdsTracker.notifyMobsimInitialized(null);
-		decisionDataGrabber.notifyMobsimInitialized(null);
 		
 		// read people in panic from file
 		String panicFile = dummyInputController.getControlerIO().getIterationFilename(0, PanicModel.panicModelFile);
