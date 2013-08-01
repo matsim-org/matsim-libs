@@ -22,7 +22,6 @@ import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.droeder.southAfrica.old.run.PtSubModeControlerOld;
 import playground.droeder.southAfrica.run.PtSubModeControler;
 
 /**
@@ -39,7 +38,7 @@ public class ReRoutePtSubModeStrategy extends AbstractMultithreadedModule{
 	 */
 	public ReRoutePtSubModeStrategy(Controler c) {
 		super(c.getConfig().global());
-		if(!(c instanceof PtSubModeControler || c instanceof PtSubModeControlerOld)){
+		if(!(c instanceof PtSubModeControler)){
 			throw new IllegalArgumentException("If you want to use this replanning-strategy you are forced to use the PtSubModeControler(Old)...");
 		}
 		this.c = c;
