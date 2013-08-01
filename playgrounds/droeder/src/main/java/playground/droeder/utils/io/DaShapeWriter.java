@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.droeder.gis;
+package playground.droeder.utils.io;
 
 import java.util.ArrayList;
 import java.util.Collection;

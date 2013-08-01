@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.ptTutorial;
+package playground.droeder.extendPtTutorial;
 
 import java.io.File;
 
@@ -37,7 +37,7 @@ public class PtTutorialControler {
 		if(! new File("E:/sandbox/org.matsim/examples/pt-tutorial/scheduleWithBus.xml.gz").exists()){
 			ExtendPtTutorial.main(null);
 		}
-		Controler c = new Controler("E:/sandbox/org.matsim/examples/pt-tutorial/config.xml");
+		Controler c = new Controler("E:/sandbox/org.matsim/examples/pt-tutorial/configExtended.xml");
 		c.setOverwriteFiles(true);
 		c.run();
 	}

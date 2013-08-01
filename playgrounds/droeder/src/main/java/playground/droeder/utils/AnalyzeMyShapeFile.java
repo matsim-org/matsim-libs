@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.droeder.gis;
+package playground.droeder.utils;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -26,13 +26,20 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.log4j.Logger;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
 public class AnalyzeMyShapeFile {
+	private static final Logger log = Logger
+			.getLogger(AnalyzeMyShapeFile.class);
 	
 	public static void main(String[] args) throws IOException{
-		new AnalyzeMyShapeFile().run("E:/rsa/server/runs/jtlu2/cordon.shp");
+		if(args.length != 1){
+			log.error("nr of arguments not correct");
+			System.exit(-1);
+		}
+		new AnalyzeMyShapeFile().run(args[0]);
 	}
 	
 	private Map<Integer, Set<String>> values = new HashMap<Integer, Set<String>>();

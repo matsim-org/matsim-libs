@@ -41,7 +41,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 
-import playground.droeder.gis.DaShapeWriter;
+import playground.droeder.utils.io.DaShapeWriter;
 
 /**
  * @author droeder

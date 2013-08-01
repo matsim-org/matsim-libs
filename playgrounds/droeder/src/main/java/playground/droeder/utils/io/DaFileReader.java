@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder;
+package playground.droeder.utils.io;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;

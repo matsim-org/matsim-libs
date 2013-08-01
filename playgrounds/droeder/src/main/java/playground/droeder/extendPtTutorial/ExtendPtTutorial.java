@@ -16,18 +16,20 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.ptTutorial;
+package playground.droeder.extendPtTutorial;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.config.groups.SubtourModeChoiceConfigGroup;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -56,9 +58,18 @@ import org.matsim.vehicles.VehiclesFactory;
 public class ExtendPtTutorial {
 	
 	
-	private final static String DIR = "E:/sandbox/org.matsim/examples/pt-tutorial/";
+	private final static String DIR = "../../org.matsim/examples/pt-tutorial/";
 
+	/**
+	 * extends the default pt-tutorial (org.matsim/examples/pt-tutorial/) with a 
+	 * busline. THus, agents will switch lines. Furthermore the "TimeAllocationMutator"
+	 * and the "TripSubtourModeChoice" are added as additional strategies. For 
+	 * "TripSubtourModeChoice" TransportMode.ride is added as further option.
+	 * 
+	 * @param args
+	 */
 	public static void main(String[] args) {
+		System.out.println(System.getProperty("java.class.path"));
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().scenario().setUseTransit(true);
 		sc.getConfig().scenario().setUseVehicles(true);
@@ -132,15 +143,23 @@ public class ExtendPtTutorial {
 		c.transit().setVehiclesFile(DIR + "vehiclesWithBus.xml.gz");
 		c.network().setInputFile(DIR + "multimodalnetwork.xml");
 		c.plans().setInputFile(DIR + "population.xml");
-		c.controler().setOutputDirectory("E:/sandbox/org.matsim/output/pt-tutorial/");
+		c.controler().setOutputDirectory("../../org.matsim/output/pt-tutorial/");
+		c.controler().setLastIteration(10);
+		c.controler().setWriteEventsInterval(10);
+		c.controler().setWritePlansInterval(10);
+
 		c.strategy().setFractionOfIterationsToDisableInnovation(0.8);
-		if(c.strategy().getValue("Module_3").equals("TransitTimeAllocationMutator")){
-			c.strategy().addParam("Module_3", "TimeAllocationMutator");
+		c.strategy().addParam("Module_3", "TimeAllocationMutator");
+		c.strategy().addParam("Module_4", "TripSubtourModeChoice");
+		String[] modes = ((SubtourModeChoiceConfigGroup) c.getModule(SubtourModeChoiceConfigGroup.GROUP_NAME)).getModes();
+		String[] modes2 =  new String[modes.length +1];
+		for(int i = 0; i < modes.length; i++){
+			modes2[i] = modes[i];
 		}
-		if(c.strategy().getValue("Module_4").equals("TransitChangeLegMode")){
-			c.strategy().addParam("Module_4", "TripSubtourModeChoice");
-		}
-		new ConfigWriter(c).write(DIR + "config.xml");
+		modes2[modes.length] = TransportMode.ride;
+		((SubtourModeChoiceConfigGroup) c.getModule(SubtourModeChoiceConfigGroup.GROUP_NAME)).setModes(modes2);
+		
+		new ConfigWriter(c).write(DIR + "configExtended.xml");
 		
 	}	
 	
