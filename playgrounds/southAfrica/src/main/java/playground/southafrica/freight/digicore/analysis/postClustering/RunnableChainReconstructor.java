@@ -119,11 +119,12 @@ public class RunnableChainReconstructor implements Runnable {
 		if(inStudyArea){
 			DigicoreVehicleWriter dvw = new DigicoreVehicleWriter();
 			dvw.write(this.outputFolder + dv.getId().toString() + ".xml.gz", dv);		
+
+			/*FIXME Can remove this log messages if we can debug the odd low 
+			 * percentage of activities WITH facility IDs. */
+			log.debug("      --> Activities changed for vehicle " + dv.getId().toString() + ": " + changed + " of " + count + String.format("(%.4f)", ((double) changed)/((double) count)));
 		}
 		
-		/*FIXME Can remove this log messages if we can debug the odd low 
-		 * percentage of activities WITH facility IDs. */
-		log.debug("      --> Activities changed for vehicle " + dv.getId().toString() + ": " + changed + " of " + count + String.format("(%.4f)", ((double) changed)/((double) count)));
 		
 		threadCounter.incCounter();
 	}	
