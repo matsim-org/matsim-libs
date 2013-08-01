@@ -69,7 +69,6 @@ public class ExtendPtTutorial {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		System.out.println(System.getProperty("java.class.path"));
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().scenario().setUseTransit(true);
 		sc.getConfig().scenario().setUseVehicles(true);
