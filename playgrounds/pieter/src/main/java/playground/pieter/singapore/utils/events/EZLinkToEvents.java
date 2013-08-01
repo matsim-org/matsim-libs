@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Queue;
@@ -38,6 +39,8 @@ import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -47,10 +50,17 @@ import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.network.MatsimNetworkReader;
+import org.matsim.core.router.Dijkstra;
+import org.matsim.core.router.util.LeastCostPathCalculator.Path;
+import org.matsim.core.router.util.PreProcessDijkstra;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
+import org.matsim.vehicles.Vehicle;
 
 import others.sergioo.util.dataBase.DataBaseAdmin;
 import others.sergioo.util.dataBase.NoConnectionException;
@@ -69,9 +79,9 @@ public class EZLinkToEvents {
 		// equals.
 		public int compare(Id a, Id b) {
 			if (base.get(a) >= base.get(b)) {
-				return -1;
-			} else {
 				return 1;
+			} else {
+				return -1;
 			} // returning 0 would merge keys
 		}
 	}
@@ -104,6 +114,9 @@ public class EZLinkToEvents {
 			int arrivalTime;
 			int departureTime;
 			Id stopId;
+			//if the arrial event is triggered by alighting event, mark the stop event, and replace the arrival 
+			//time by the first tap-in time, if any tap-ins occurred
+			boolean arrivalTriggeredbyAlighting=true;
 
 			public StopEvent(int arrivalTime, int departureTime, Id stopId) {
 				super();
@@ -111,6 +124,13 @@ public class EZLinkToEvents {
 				this.departureTime = departureTime;
 				this.stopId = stopId;
 			}
+
+			@Override
+			public String toString() {
+
+				return "stop: " + stopId.toString() + ", time: " + arrivalTime + " - " + departureTime;
+			}
+
 		}
 
 		// Attributes
@@ -215,10 +235,11 @@ public class EZLinkToEvents {
 				}
 			}
 		}
+
 		public void determineStopsAndHandleRoutes(ResultSet resultSet) throws SQLException {
 			while (resultSet.next()) {
 				Passenger passenger;
-				int time = resultSet.getInt("time");
+				int time = resultSet.getInt("event_time");
 				Id stopId;
 				try {
 					String stoptext = resultSet.getString("stop_id");
@@ -226,32 +247,65 @@ public class EZLinkToEvents {
 				} catch (NullPointerException e) {
 					// stop is not in the schedule, skip this
 					// guy
-					System.out.println("stop "+resultSet.getString("stop_id")+" not in the schedule for bus "+this.toString());
+					System.out.println("stop " + resultSet.getString("stop_id") + " not in the schedule for bus "
+							+ this.toString());
 					continue;
 				}
 				try {
 					StopEvent candidateStopEvent = this.stopsVisited.floorEntry(time).getValue();
-					if (candidateStopEvent.stopId != stopId) {
-						this.stopsVisited.put(time, new StopEvent(time, time, stopId));
+					if (!candidateStopEvent.stopId.equals(stopId)) {
+						StopEvent stopEvent = new StopEvent(time, time, stopId);
+						double interStopSpeed = getInterStopSpeed(candidateStopEvent, stopEvent);
+						// if the speed between events is faster than
+						if (interStopSpeed <= 80) {
+							this.stopsVisited.put(time, stopEvent);
+						}else{
+							System.err.println(stopEvent.toString());
+						}
 					} else {
 						candidateStopEvent.departureTime = Math.max(time, candidateStopEvent.departureTime);
 					}
 				} catch (NullPointerException ne) {
 					this.stopsVisited.put(time, new StopEvent(time, time, stopId));
 				}
-		}
+			}
 			System.out.println(this.printStopsVisited());
 			System.out.println("\n\n\n");
 			eliminateDoubleStopEntries();
 			System.out.println(this.printStopsVisited());
 			assignStopsVisitedToRoutes();
-	}
+		}
+
+		private double getInterStopSpeed(StopEvent previousStopEvent, StopEvent nextStopEvent) {
+			double distance = getInterStopDistance(previousStopEvent.stopId, nextStopEvent.stopId);
+			double time = nextStopEvent.arrivalTime - previousStopEvent.departureTime;
+			return distance / time * 3.6;
+		}
+
+		private double getInterStopDistance(Id stopId, Id stopId2) {
+			Id longestRoute = this.filteredRouteSelection.last();
+			List<TransitRouteStop> stops = this.possibleRoutes.get(longestRoute).getStops();
+			Link fromLink = null;
+			Link toLink = null;
+			for (TransitRouteStop tss : stops) {
+				if (tss.getStopFacility().getId().equals(stopId))
+					fromLink = scenario.getNetwork().getLinks().get(tss.getStopFacility().getLinkId());
+				if (tss.getStopFacility().getId().equals(stopId2))
+					toLink = scenario.getNetwork().getLinks().get(tss.getStopFacility().getLinkId());
+			}
+			if (fromLink == null || toLink == null)
+				return Double.POSITIVE_INFINITY;
+			else
+				return shortestPathCalculator
+						.calcLeastCostPath(fromLink.getToNode(), toLink.getToNode(), 0, null, null).travelCost;
+
+		}
+
 		private void assignStopsVisitedToRoutes() {
 			indexSimilarities();
 		}
 
 		private void indexSimilarities() {
-			// TODO Auto-generated method stub
 
 		}
 
@@ -276,37 +330,37 @@ public class EZLinkToEvents {
 
 		@Override
 		public String toString() {
-			String out  = String.format("line %s, bus reg %s", this.transitLineId.toString(),this.vehicleId.toString());
+			String out = String.format("line %s, bus reg %s", this.transitLineId.toString(), this.vehicleId.toString());
 			return out;
 		}
 
-	
-
 	}
+
 	private class EZLinkRoute {
 		public EZLinkRoute(int direction, EZLinkLine ezLinkLine) {
 			super();
 			this.direction = direction;
 			this.line = ezLinkLine;
 		}
-		
+
 		int direction;
 		EZLinkLine line;
 		HashMap<Id, PTVehicle> buses = new HashMap<Id, EZLinkToEvents.PTVehicle>();
-		
+
 		public String toString() {
 			return (line.lineId.toString() + " : " + direction + " : " + buses.keySet() + "\n");
 		}
 	}
+
 	private class EZLinkLine {
 		public EZLinkLine(Id lineId) {
 			super();
 			this.lineId = lineId;
 		}
-		
+
 		Id lineId;
 		HashMap<Integer, EZLinkRoute> routes = new HashMap<Integer, EZLinkToEvents.EZLinkRoute>();
-		
+
 		public String toString() {
 			return (routes.values().toString());
 		}
@@ -326,6 +380,7 @@ public class EZLinkToEvents {
 	int eventTimeIndex = 0;
 	int[] eventTimes;
 	HashMap<String, Id> ezLinkStoptoMatsimStopLookup = new HashMap<String, Id>();
+	private Dijkstra shortestPathCalculator;
 
 	// constructors
 	public EZLinkToEvents(String databaseProperties, String transitSchedule, String networkFile,
@@ -346,6 +401,29 @@ public class EZLinkToEvents {
 		eventQueue = new LinkedList<Event>();
 		this.tripTableName = tripTableName;
 		this.stopLookupTableName = lookupTableName;
+		TravelDisutility travelMinCost = new TravelDisutility() {
+
+			@Override
+			public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
+				return getLinkMinimumTravelDisutility(link);
+			}
+
+			@Override
+			public double getLinkMinimumTravelDisutility(Link link) {
+				return link.getLength();
+			}
+		};
+		PreProcessDijkstra preProcessData = new PreProcessDijkstra();
+		preProcessData.run(scenario.getNetwork());
+		TravelTime timeFunction = new TravelTime() {
+
+			@Override
+			public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
+				return link.getLength() / link.getFreespeed();
+			}
+		};
+
+		shortestPathCalculator = new Dijkstra(scenario.getNetwork(), travelMinCost, timeFunction, preProcessData);
 
 	}
 
@@ -384,26 +462,48 @@ public class EZLinkToEvents {
 				continue;
 			if (ptVehicle.possibleRoutes == null)
 				continue;
-			String query = String.format("select * from (select card_id, boarding_stop_stn as stop_id, "
-					+ "(EXTRACT(epoch FROM (ride_start_time::TEXT)::interval)) as time," + "\'boarding\' as type"
-					+ " from %s where srvc_number = \'%s\' and direction = \'%d\' and bus_reg_num=\'%s\' " + "union"
-					+ "select card_id, alighting_stop_stn as stop_id, "
-					+ "((EXTRACT(epoch FROM (ride_start_time::TEXT)::interval)) + (60 * ride_time))::INT AS time,"
-					+ "\'alighting\' as type"
-					+ " from %s where srvc_number = \'%s\' and direction = \'%d\' and bus_reg_num=\'%s\'"
-					+ " where alighting_stop_stn is not null ) "
-					+ "order by time", tripTableName, ptVehicle.ezlinkLine.lineId.toString(),
-					ptVehicle.ezlinkRoute.direction, ptVehicle.vehicleId.toString());
-			ResultSet resultSet = dba.executeQuery(query);
-			ptVehicle.determineStopsAndHandleRoutes(resultSet);
-			query = String
-					.format("select card_id, boarding_stop_stn, alighting_stop_stn, (EXTRACT(epoch FROM (ride_start_time::TEXT)::interval)) as boarding_time,"
-							+ "((EXTRACT(epoch FROM (ride_start_time::TEXT)::interval)) + (60 * ride_time))::INT AS alighting_time"
-							+ " from %s where srvc_number = \'%s\' and direction = \'%d\' and bus_reg_num=\'%s\' order by boarding_time, alighting_time",
-							tripTableName, ptVehicle.ezlinkLine.lineId.toString(), ptVehicle.ezlinkRoute.direction,
-							ptVehicle.vehicleId.toString());
-			resultSet = dba.executeQuery(query);
-			ptVehicle.handlePassengers(resultSet);
+			try {
+				String query = String
+						.format("select * "
+								+ " from %s_board_alight_preprocess where srvc_number = \'%s\' and direction = \'%d\' and bus_reg_num=\'%s\' "
+								+ " order by event_time", tripTableName, ptVehicle.ezlinkLine.lineId.toString(),
+								ptVehicle.ezlinkRoute.direction, ptVehicle.vehicleId.toString());
+				ResultSet resultSet = dba.executeQuery(query);
+				ptVehicle.determineStopsAndHandleRoutes(resultSet);
+				query = String
+						.format("select *"
+								+ " from %s_passenger_preprocess where srvc_number = \'%s\' and direction = \'%d\' and bus_reg_num=\'%s\' order by boarding_time, alighting_time",
+								tripTableName, ptVehicle.ezlinkLine.lineId.toString(), ptVehicle.ezlinkRoute.direction,
+								ptVehicle.vehicleId.toString());
+				resultSet = dba.executeQuery(query);
+				ptVehicle.handlePassengers(resultSet);
+
+			} catch (SQLException se) {
+
+				String query = String
+						.format("create table %s_board_alight_preprocess as select * from (select card_id, boarding_stop_stn as stop_id, "
+								+ "(EXTRACT(epoch FROM (ride_start_time::TEXT)::interval)) as event_time,"
+								+ "\'boarding\' as type,"
+								+ "srvc_number, direction, bus_reg_num"
+								+ " from %s "
+								+ " union "
+								+ "select card_id, alighting_stop_stn as stop_id, "
+								+ "((EXTRACT(epoch FROM (ride_start_time::TEXT)::interval)) + (60 * ride_time))::INT AS event_time,"
+								+ "\'alighting\' as type, "
+								+ "srvc_number, direction, bus_reg_num"
+								+ " from %s "
+								+ " ) as prequery where event_time is not null order by event_time,srvc_number, direction, bus_reg_num",
+								tripTableName, tripTableName, tripTableName);
+				dba.executeStatement(query);
+				query = String
+						.format("create table %s_passenger_preprocess as select card_id, boarding_stop_stn, alighting_stop_stn, (EXTRACT(epoch FROM (ride_start_time::TEXT)::interval)) as boarding_time,"
+								+ "((EXTRACT(epoch FROM (ride_start_time::TEXT)::interval)) + (60 * ride_time))::INT AS alighting_time, "
+								+ "srvc_number, direction, bus_reg_num"
+								+ " from %s order by boarding_time, alighting_time,srvc_number, direction, bus_reg_num",
+								tripTableName, tripTableName);
+				dba.executeStatement(query);
+			}
+
 		}
 
 	}
