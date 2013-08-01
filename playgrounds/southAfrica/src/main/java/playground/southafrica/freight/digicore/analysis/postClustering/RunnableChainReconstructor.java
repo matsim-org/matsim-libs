@@ -48,6 +48,8 @@ public class RunnableChainReconstructor implements Runnable {
 	
 	@Override
 	public void run() {
+		int count = 0;
+		int changed = 0;
 		GeometryFactory gf = new GeometryFactory();
 		
 		DigicoreVehicleReader_v1 dvr = new DigicoreVehicleReader_v1();
@@ -96,6 +98,7 @@ public class RunnableChainReconstructor implements Runnable {
 								} else{
 									log.warn("The geometry is empty and has no centroid. Activity location not changed.");
 								}
+								changed++;
 							} else{
 								i++;
 							}
@@ -108,6 +111,7 @@ public class RunnableChainReconstructor implements Runnable {
 						}
 					}
 				}
+				count++;
 			}
 		}
 		
@@ -116,6 +120,10 @@ public class RunnableChainReconstructor implements Runnable {
 			DigicoreVehicleWriter dvw = new DigicoreVehicleWriter();
 			dvw.write(this.outputFolder + dv.getId().toString() + ".xml.gz", dv);		
 		}
+		
+		/*FIXME Can remove this log messages if we can debug the odd low 
+		 * percentage of activities WITH facility IDs. */
+		log.debug("      --> Activities changed for vehicle " + dv.getId().toString() + ": " + changed + " of " + count + String.format("(%.4f)", ((double) changed)/((double) count)));
 		
 		threadCounter.incCounter();
 	}	
