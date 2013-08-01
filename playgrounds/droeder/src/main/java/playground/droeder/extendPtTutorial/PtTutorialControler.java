@@ -34,10 +34,10 @@ public class PtTutorialControler {
 			.getLogger(PtTutorialControler.class);
 
 	public static void main(String[] args) {
-		if(! new File("E:/sandbox/org.matsim/examples/pt-tutorial/scheduleWithBus.xml.gz").exists()){
+		if(! new File("../../org.matsim/examples/pt-tutorial/configExtended.xml").exists()){
 			ExtendPtTutorial.main(null);
 		}
-		Controler c = new Controler("E:/sandbox/org.matsim/examples/pt-tutorial/configExtended.xml");
+		Controler c = new Controler("../../org.matsim/examples/pt-tutorial/configExtended.xml");
 		c.setOverwriteFiles(true);
 		c.run();
 	}
