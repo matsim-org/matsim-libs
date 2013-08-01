@@ -24,7 +24,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.Controler;
 
-import playground.droeder.southAfrica.old.routing.PtSubModeRouterFactoryOld;
 import playground.droeder.southAfrica.qSimHook.TransitSubModeQSimFactory;
 import playground.droeder.southAfrica.routing.PtSubModeRouterFactory;
 import playground.droeder.southAfrica.routing.PtSubModeTripRouterFactory;

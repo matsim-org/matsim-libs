@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.fareRouter.example;
+package playground.droeder.fareRouter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -49,19 +49,15 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
-import playground.droeder.fareRouter.TicketFactory;
-import playground.droeder.fareRouter.TicketMachineImpl;
-import playground.droeder.fareRouter.TransitFareTravelDisutility;
-
 /**
  * @author droeder
  *
  */
-public class RoutingTestScenario {
+class FareRoutingTestScenario {
 
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger
-			.getLogger(RoutingTestScenario.class);
+			.getLogger(FareRoutingTestScenario.class);
 
 	
 	public static void main(String[] args) {
@@ -87,6 +83,8 @@ public class RoutingTestScenario {
 		config.searchRadius = 501.;
 		config.extensionRadius = 0;
 		
+		
+		@SuppressWarnings("deprecation")
 		TransitRouterNetworkTravelTimeAndDisutility transitRouterNetworkTravelTimeAndDisutility = new TransitRouterNetworkTravelTimeAndDisutility(config);
 		
 		Map<String, Double> ticketType2fare = new HashMap<String, Double>();

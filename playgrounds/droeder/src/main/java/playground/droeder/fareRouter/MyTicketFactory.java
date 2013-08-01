@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.fareRouter.example;
+package playground.droeder.fareRouter;
 
 import java.util.Map;
 
@@ -25,16 +25,12 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
-import playground.droeder.fareRouter.Ticket;
-import playground.droeder.fareRouter.TicketFactory;
-import playground.droeder.fareRouter.TicketMachineImpl;
 
 /**
  * @author droeder
  *
  */
-public class MyTicketFactory implements TicketFactory{
-	@SuppressWarnings("unused")
+class MyTicketFactory implements TicketFactory{
 	
 	/**
 	 * use this tag to put a boolean to the persons custom-attributes

@@ -30,6 +30,8 @@ import playground.andreas.P2.stats.abtractPAnalysisModules.lineSetter.PtMode2Lin
 
 
 /**
+ * A helper-class, necessary to use the p2-module implemented by aneumann
+ * 
  * @author droeder
  *
  */

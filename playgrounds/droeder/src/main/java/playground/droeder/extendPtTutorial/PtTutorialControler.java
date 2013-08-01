@@ -27,7 +27,7 @@ import org.matsim.core.controler.Controler;
  * @author droeder
  *
  */
-public class PtTutorialControler {
+class PtTutorialControler {
 
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger

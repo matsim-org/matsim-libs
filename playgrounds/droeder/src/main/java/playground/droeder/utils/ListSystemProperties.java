@@ -16,41 +16,45 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.fareRouter;
+package playground.droeder.utils;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Person;
+import java.util.Enumeration;
+import java.util.Properties;
 
 
 /**
  * @author droeder
  *
  */
-interface TicketFactory {
-	
+class ListSystemProperties {
 
-	/**
-	 * @param routeId
-	 * @param lineId
-	 * @param person
-	 * @param time
-	 * @param expectedTravelTime
-	 * @return
-	 */
-	public Ticket createTicket(Id routeId, Id lineId, Person person, Double time, Double expectedTravelTime);
-	
-	/**
-	 * 
-	 * @param ticketToUpgrade
-	 * @param routeId
-	 * @param lineId
-	 * @param person
-	 * @param time
-	 * @param expectedTravelTime
-	 * @param travelledDistance
-	 * @return either the upgraded ticket or null if no update is possible
-	 */
-	public Ticket upgrade(Ticket ticketToUpgrade, Id routeId, Id lineId, Person person, Double time, Double expectedTravelTime, Double travelledDistance) ;
 
+	private ListSystemProperties() {
+
+	}
+	
+	public static void main(String[] args) {
+		Properties props = System.getProperties();
+		Enumeration<?> names = props.propertyNames();
+		int max = 0;
+		while (names.hasMoreElements()) {
+			String name = (String)names.nextElement();
+			name.trim();
+			if(name.length() > max){
+				max = name.length();
+			}
+		}
+		max += 2;
+		names = props.propertyNames();
+		while (names.hasMoreElements()) {
+			String name = (String)names.nextElement();
+			name.trim();
+			System.out.print(name);
+			for(int i = name.length(); i < max ; i++){
+				System.out.print(" ");
+			}
+			System.out.println("= " +System.getProperty(name));
+		}
+	}
 }
 

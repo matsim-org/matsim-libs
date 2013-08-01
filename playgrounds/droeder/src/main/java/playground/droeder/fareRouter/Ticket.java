@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.Id;
  * @author droeder
  *
  */
-public interface Ticket {
+interface Ticket {
 
 	/**
 	 * @return the fare on the first request or zero otherwise
