@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.southAfrica.qSimHook;
+package playground.droeder.ptSubModes.qSimHook;
 
 import java.util.List;
 
@@ -47,7 +47,6 @@ import playground.andreas.P2.hook.PTransitAgent;
  */
 public class TransitSubModeAgent extends PersonDriverAgentImpl implements MobsimDriverPassengerAgent{
 
-	@SuppressWarnings("unused")
 	private static final Logger log = Logger
 			.getLogger(TransitSubModeAgent.class);
 

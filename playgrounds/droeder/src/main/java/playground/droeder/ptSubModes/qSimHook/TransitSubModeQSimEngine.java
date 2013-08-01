@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.southAfrica.qSimHook;
+package playground.droeder.ptSubModes.qSimHook;
 
 import java.util.Set;
 

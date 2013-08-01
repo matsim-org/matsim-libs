@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.southAfrica.routing;
+package playground.droeder.ptSubModes.routing;
 
 import java.util.HashMap;
 import java.util.Map;

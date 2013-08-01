@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.droeder.southAfrica.routing;
+package playground.droeder.ptSubModes.routing;
 
 import java.util.ArrayList;
 import java.util.Collection;

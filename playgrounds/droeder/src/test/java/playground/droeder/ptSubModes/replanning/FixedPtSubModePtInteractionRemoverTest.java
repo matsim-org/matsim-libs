@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.southAfrica.replanning;
+package playground.droeder.ptSubModes.replanning;
 
 
 import org.junit.Assert;
@@ -33,7 +33,7 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
 import org.matsim.testcases.MatsimTestUtils;
 
-import playground.droeder.southAfrica.replanning.modules.PtSubModePtInteractionRemover;
+import playground.droeder.ptSubModes.replanning.modules.PtSubModePtInteractionRemover;
 
 /**
  * @author droeder

@@ -16,7 +16,7 @@ q * project: org.matsim.*
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.southAfrica.replanning;
+package playground.droeder.ptSubModes.replanning;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -37,9 +37,9 @@ import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
-import playground.droeder.southAfrica.replanning.modules.PtSubModePtInteractionRemoverStrategy;
-import playground.droeder.southAfrica.replanning.modules.ReRoutePtSubModeStrategy;
-import playground.droeder.southAfrica.replanning.modules.ReturnToOldModesStrategy;
+import playground.droeder.ptSubModes.replanning.modules.PtSubModePtInteractionRemoverStrategy;
+import playground.droeder.ptSubModes.replanning.modules.ReRoutePtSubModeStrategy;
+import playground.droeder.ptSubModes.replanning.modules.ReturnToOldModesStrategy;
 
 /**
  * @author droeder

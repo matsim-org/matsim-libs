@@ -16,34 +16,37 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.southAfrica.qSimHook;
+package playground.droeder.ptSubModes.replanning.modules;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.core.mobsim.qsim.interfaces.Netsim;
+import org.matsim.core.controler.Controler;
+import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.population.algorithms.PlanAlgorithm;
+
+import playground.droeder.southAfrica.PtSubModeControler;
 
 /**
  * @author droeder
  *
  */
-public class TransitSubModeAgentFactory implements AgentFactory{
-
-	@SuppressWarnings("unused")
-	private static final Logger log = Logger
-			.getLogger(TransitSubModeAgentFactory.class);
-	private boolean fixedMode;
-	private Netsim sim;
-
-	public TransitSubModeAgentFactory(Netsim simulation, boolean fixedMode) {
-		this.sim = simulation;
-		this.fixedMode = fixedMode;
+public class ReRoutePtSubModeStrategy extends AbstractMultithreadedModule{
+	private Controler c;
+	
+	/**
+	 * <code>PlanStrategyModule</code> which reroutes pt-legs and stores pt-submodes.
+	 * Aborts if the controler is not an instance of instance of <code>PtSubModeControler</code>
+	 * @param c
+	 */
+	public ReRoutePtSubModeStrategy(Controler c) {
+		super(c.getConfig().global());
+		if(!(c instanceof PtSubModeControler)){
+			throw new IllegalArgumentException("If you want to use this replanning-strategy you are forced to use the PtSubModeControler(Old)...");
+		}
+		this.c = c;
 	}
 
+	@SuppressWarnings("deprecation")
 	@Override
-	public MobsimAgent createMobsimAgentFromPerson(Person p) {
-		return TransitSubModeAgent.createAgent(p, this.sim, this.fixedMode);
+	public PlanAlgorithm getPlanAlgoInstance() {
+		return this.c.createRoutingAlgorithm();
 	}
 }
-

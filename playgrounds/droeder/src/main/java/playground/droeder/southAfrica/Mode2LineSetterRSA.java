@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.southAfrica.helper;
+package playground.droeder.southAfrica;
 
 import java.util.HashMap;
 import java.util.Map.Entry;

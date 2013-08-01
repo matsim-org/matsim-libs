@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.droeder.southAfrica.run;
+package playground.droeder.southAfrica;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -50,13 +50,12 @@ import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PScenarioImpl;
 import playground.andreas.P2.hook.PHook;
 import playground.andreas.P2.hook.PTransitRouterFactory;
-import playground.droeder.southAfrica.helper.Mode2LineSetterRSA;
-import playground.droeder.southAfrica.qSimHook.TransitSubModeQSimFactory;
-import playground.droeder.southAfrica.replanning.PlanStrategyReRoutePtFixedSubMode;
-import playground.droeder.southAfrica.replanning.modules.PtSubModePtInteractionRemoverStrategy;
-import playground.droeder.southAfrica.replanning.modules.ReRoutePtSubModeStrategy;
-import playground.droeder.southAfrica.replanning.modules.ReturnToOldModesStrategy;
-import playground.droeder.southAfrica.routing.PtSubModeTripRouterFactory;
+import playground.droeder.ptSubModes.qSimHook.TransitSubModeQSimFactory;
+import playground.droeder.ptSubModes.replanning.PlanStrategyReRoutePtFixedSubMode;
+import playground.droeder.ptSubModes.replanning.modules.PtSubModePtInteractionRemoverStrategy;
+import playground.droeder.ptSubModes.replanning.modules.ReRoutePtSubModeStrategy;
+import playground.droeder.ptSubModes.replanning.modules.ReturnToOldModesStrategy;
+import playground.droeder.ptSubModes.routing.PtSubModeTripRouterFactory;
 
 
 /**

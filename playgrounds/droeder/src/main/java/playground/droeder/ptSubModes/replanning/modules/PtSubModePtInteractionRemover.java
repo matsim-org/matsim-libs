@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.southAfrica.replanning.modules;
+package playground.droeder.ptSubModes.replanning.modules;
 
 import java.util.ArrayList;
 import java.util.List;
