@@ -37,9 +37,6 @@ import org.matsim.core.replanning.ReplanningContext;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
 
-import playground.droeder.ptSubModes.replanning.modules.PtSubModePtInteractionRemoverStrategy;
-import playground.droeder.ptSubModes.replanning.modules.ReRoutePtSubModeStrategy;
-import playground.droeder.ptSubModes.replanning.modules.ReturnToOldModesStrategy;
 
 /**
  * @author droeder

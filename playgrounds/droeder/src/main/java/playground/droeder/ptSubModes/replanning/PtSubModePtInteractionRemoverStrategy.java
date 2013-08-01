@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.ptSubModes.replanning.modules;
+package playground.droeder.ptSubModes.replanning;
 
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
@@ -26,7 +26,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  * @author droeder
  *
  */
-public class PtSubModePtInteractionRemoverStrategy extends AbstractMultithreadedModule {
+class PtSubModePtInteractionRemoverStrategy extends AbstractMultithreadedModule {
 	
 	/**
 	 * This class provides a strategy to remove pt-interactions from a plan, but changes the 

@@ -68,7 +68,7 @@ import org.matsim.vehicles.VehicleWriterV1;
  * @author droeder
  *
  */
-public class CreateTestScenario {
+class CreateTestScenario {
 	
 	
 	private static final String DIR = "E:/VSP/svn/droeder/southAfrica/test/input/";
@@ -79,11 +79,11 @@ public class CreateTestScenario {
 
 	private int numAgents = 2000;
 	
-	public CreateTestScenario(){
+	private CreateTestScenario(){
 		
 	}
 	
-	public void run(){
+	private void run(){
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
 		createNetwork(sc);

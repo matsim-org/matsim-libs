@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.ptSubModes.replanning.modules;
+package playground.droeder.ptSubModes.replanning;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,7 +35,7 @@ import org.matsim.pt.PtConstants;
  * @author droeder
  *
  */
-public class PtSubModePtInteractionRemover implements PlanAlgorithm {
+class PtSubModePtInteractionRemover implements PlanAlgorithm {
 	private static final Logger log = Logger
 			.getLogger(PtSubModePtInteractionRemover.class);
 	

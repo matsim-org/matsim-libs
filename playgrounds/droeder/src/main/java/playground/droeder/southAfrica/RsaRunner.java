@@ -20,28 +20,12 @@
 package playground.droeder.southAfrica;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.replanning.PlanStrategyModule;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.controler.events.IterationStartsEvent;
-import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.IterationStartsListener;
-import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
 import org.matsim.vis.otfvis.OTFFileWriterFactory;
@@ -51,10 +35,6 @@ import playground.andreas.P2.helper.PScenarioImpl;
 import playground.andreas.P2.hook.PHook;
 import playground.andreas.P2.hook.PTransitRouterFactory;
 import playground.droeder.ptSubModes.qSimHook.TransitSubModeQSimFactory;
-import playground.droeder.ptSubModes.replanning.PlanStrategyReRoutePtFixedSubMode;
-import playground.droeder.ptSubModes.replanning.modules.PtSubModePtInteractionRemoverStrategy;
-import playground.droeder.ptSubModes.replanning.modules.ReRoutePtSubModeStrategy;
-import playground.droeder.ptSubModes.replanning.modules.ReturnToOldModesStrategy;
 import playground.droeder.ptSubModes.routing.PtSubModeTripRouterFactory;
 
 

@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.ptSubModes.replanning.modules;
+package playground.droeder.ptSubModes.replanning;
 
 import java.util.List;
 import java.util.Map;
@@ -33,7 +33,7 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  * @author droeder
  *
  */
-public class ReturnToOldModesStrategy extends AbstractMultithreadedModule {
+class ReturnToOldModesStrategy extends AbstractMultithreadedModule {
 
 	private static final Logger log = Logger
 			.getLogger(ReturnToOldModesStrategy.class);

@@ -45,7 +45,7 @@ import playground.andreas.P2.hook.PTransitAgent;
  * except of getEnterTransitRoute(...) c&p from {@link TransitAgent} and {@link PTransitAgent} 
  *
  */
-public class TransitSubModeAgent extends PersonDriverAgentImpl implements MobsimDriverPassengerAgent{
+class TransitSubModeAgent extends PersonDriverAgentImpl implements MobsimDriverPassengerAgent{
 
 	private static final Logger log = Logger
 			.getLogger(TransitSubModeAgent.class);

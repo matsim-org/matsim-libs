@@ -33,7 +33,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
 import org.matsim.testcases.MatsimTestUtils;
 
-import playground.droeder.ptSubModes.replanning.modules.PtSubModePtInteractionRemover;
 
 /**
  * @author droeder

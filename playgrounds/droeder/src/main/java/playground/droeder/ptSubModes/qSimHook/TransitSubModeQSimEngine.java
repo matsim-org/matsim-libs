@@ -35,7 +35,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  * just changed handleDeparture-Method, but need to copy-paste handleAgentPTDeparture because it's private
  *
  */
-public class TransitSubModeQSimEngine extends TransitQSimEngine {
+class TransitSubModeQSimEngine extends TransitQSimEngine {
 	private static final Logger log = Logger
 			.getLogger(TransitSubModeQSimEngine.class);
 	private QSim qSim;

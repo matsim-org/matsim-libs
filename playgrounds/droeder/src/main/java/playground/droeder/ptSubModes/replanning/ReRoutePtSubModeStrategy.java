@@ -16,7 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.droeder.ptSubModes.replanning.modules;
+package playground.droeder.ptSubModes.replanning;
 
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
@@ -28,7 +28,7 @@ import playground.droeder.southAfrica.PtSubModeControler;
  * @author droeder
  *
  */
-public class ReRoutePtSubModeStrategy extends AbstractMultithreadedModule{
+class ReRoutePtSubModeStrategy extends AbstractMultithreadedModule{
 	private Controler c;
 	
 	/**
