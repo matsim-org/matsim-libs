@@ -162,7 +162,7 @@ public class TransitRouterVariableImpl implements TransitRouter {
 				//wait link
 				leg = new LegImpl(TransportMode.transit_walk);
 				walkDistance = CoordUtils.calcDistance(coord, l.toNode.stop.getStopFacility().getCoord()); 
-				walkWaitTime = walkDistance/this.config.getBeelineWalkSpeed()+ttCalculator.getLinkTravelTime(l, time+walkDistance/this.config.getBeelineWalkSpeed(), person, null);
+				walkWaitTime = walkDistance/this.config.getBeelineWalkSpeed()/*+ttCalculator.getLinkTravelTime(l, time+walkDistance/this.config.getBeelineWalkSpeed(), person, null)*/;
 				walkRoute = new GenericRouteImpl(stop==null?null:stop.getStopFacility().getLinkId(), l.toNode.stop.getStopFacility().getLinkId());
 				walkRoute.setDistance(walkDistance);
 				leg.setRoute(walkRoute);

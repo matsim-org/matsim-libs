@@ -7,17 +7,22 @@ import java.util.Set;
 import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleImpl;
 import org.matsim.vehicles.Vehicles;
@@ -58,8 +63,14 @@ public class StopStopTimeCalculatorTuple implements VehicleArrivesAtFacilityEven
 				for(Departure departure:route.getDepartures().values())
 					vehicleIds.add(departure.getVehicleId());
 			}
+		System.out.println(stopStopTimes.size());
 	}
-		
+	public static void main(String[] args) {
+		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		scenario.getConfig().scenario().setUseTransit(true);
+		new TransitScheduleReader(scenario).readFile(args[0]);
+		new StopStopTimeCalculatorTuple(scenario.getTransitSchedule(), 900, 30*3600);
+	}
 	//Methods
 	public StopStopTime getStopStopTimes() {
 		return new StopStopTime() {
