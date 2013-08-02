@@ -20,21 +20,35 @@
 
 package playground.christoph.evacuation.mobsim.decisionmodel;
 
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
+import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.households.Household;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
+import playground.christoph.evacuation.mobsim.InformedHouseholdsTracker;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataGrabber;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 
-public class DecisionModelRunner implements MobsimInitializedListener, AfterMobsimListener {
+/**
+ * 
+ * Is responsible for running the decision models. Depending on its type, a model can
+ * be run when the mobsim has been initialized or when a household has been informed. 
+ * 
+ * @author cdobler
+ */
+public class DecisionModelRunner implements MobsimInitializedListener, MobsimBeforeSimStepListener, AfterMobsimListener {
 
 	private final Scenario scenario;
 	private final DecisionDataGrabber decisionDataGrabber;
+	private final InformedHouseholdsTracker informedHouseholdsTracker;
 	
 	private final DecisionDataProvider decisionDataProvider;
 	private final PanicModel panicModel;
@@ -42,9 +56,11 @@ public class DecisionModelRunner implements MobsimInitializedListener, AfterMobs
 	private final EvacuationDecisionModel evacuationDecisionModel;
 	private final LatestAcceptedLeaveTimeModel latestAcceptedLeaveTimeModel;
 	
-	public DecisionModelRunner(Scenario scenario, DecisionDataGrabber decisionDataGrabber) {
+	public DecisionModelRunner(Scenario scenario, DecisionDataGrabber decisionDataGrabber,
+			InformedHouseholdsTracker informedHouseholdsTracker) {
 		this.scenario = scenario;
 		this.decisionDataGrabber = decisionDataGrabber;
+		this.informedHouseholdsTracker = informedHouseholdsTracker;
 		
 		this.decisionDataProvider = new DecisionDataProvider();
 		this.panicModel = new PanicModel(this.decisionDataProvider, EvacuationConfig.panicShare);
@@ -55,14 +71,6 @@ public class DecisionModelRunner implements MobsimInitializedListener, AfterMobs
 	
 	public DecisionDataProvider getDecisionDataProvider() {
 		return this.decisionDataProvider;
-	}
-	
-	public EvacuationDecisionModel getEvacuationDecisionModel() {
-		return this.evacuationDecisionModel;
-	}
-	
-	public LatestAcceptedLeaveTimeModel getLatestAcceptedLeaveTimeModel() {
-		return this.latestAcceptedLeaveTimeModel;
 	}
 	
 	/*
@@ -92,6 +100,21 @@ public class DecisionModelRunner implements MobsimInitializedListener, AfterMobs
 		 * EvacuationDecisionModel and LatestAcceptedLeaveTimeModel have to be run during the 
 		 * simulation when a household is informed.
 		 */
+	}
+	
+	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
+		
+		for (Id householdId : this.informedHouseholdsTracker.getHouseholdsInformedInLastTimeStep()) {
+			
+			Household household = ((ScenarioImpl) scenario).getHouseholds().getHouseholds().get(householdId);
+			
+			// ignore empty households
+			if (household.getMemberIds().size() == 0) continue;
+			
+			this.evacuationDecisionModel.runModel(household);
+			this.latestAcceptedLeaveTimeModel.runModel(household);
+		}
+
 	}
 	
 	@Override

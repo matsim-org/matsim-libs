@@ -60,9 +60,7 @@ import playground.christoph.evacuation.mobsim.MobsimDataProvider;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.mobsim.decisiondata.HouseholdDecisionData;
 import playground.christoph.evacuation.mobsim.decisionmodel.DecisionModelRunner;
-import playground.christoph.evacuation.mobsim.decisionmodel.EvacuationDecisionModel;
 import playground.christoph.evacuation.mobsim.decisionmodel.EvacuationDecisionModel.Participating;
-import playground.christoph.evacuation.mobsim.decisionmodel.LatestAcceptedLeaveTimeModel;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -88,8 +86,6 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 	private final ModeAvailabilityChecker modeAvailabilityChecker;
 	private final InformedHouseholdsTracker informedHouseholdsTracker;
 	private final int numOfThreads;
-	private final EvacuationDecisionModel evacuationDecisionModel;
-	private final LatestAcceptedLeaveTimeModel latestAcceptedLeaveTimeModel;
 	private final DecisionDataProvider decisionDataProvider;
 	private final MobsimDataProvider mobsimDataProvider;
 	
@@ -127,8 +123,6 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 		this.numOfThreads = this.scenario.getConfig().global().getNumberOfThreads();
 		this.allMeetingsPointsSelected = new AtomicBoolean(false);
 		this.decisionDataProvider = decisionModelRunner.getDecisionDataProvider();
-		this.evacuationDecisionModel = decisionModelRunner.getEvacuationDecisionModel();
-		this.latestAcceptedLeaveTimeModel = decisionModelRunner.getLatestAcceptedLeaveTimeModel();
 		
 		init();
 	}
@@ -170,7 +164,7 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 		HouseholdDecisionData hdd = decisionDataProvider.getHouseholdDecisionData(householdId);
 		
 		boolean householdParticipates;
-		Participating participating = this.decisionDataProvider.getHouseholdDecisionData(householdId).getParticipating();
+		Participating participating = hdd.getParticipating();
 		if (participating == Participating.TRUE) householdParticipates = true;
 		else if (participating == Participating.FALSE) householdParticipates = false;
 		else throw new RuntimeException("Households participation state is undefined: " + householdId.toString());
@@ -181,7 +175,7 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 			return rescueMeetingPointId;
 		}
 		// otherwise meet and stay at home
-		else return this.decisionDataProvider.getHouseholdDecisionData(householdId).getHomeFacilityId();
+		else return hdd.getHomeFacilityId();
 	}
 	
 	/*
@@ -217,9 +211,6 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 					log.info("Households meet at rescue facility: " + meetAtRescue);
 					log.info("Households meet at secure place:   " + meetSecure);
 					log.info("Households meet at insecure place: " + meetInsecure);
-					
-					this.evacuationDecisionModel.printStatistics();
-					this.latestAcceptedLeaveTimeModel.printStatistics();
 				} else {
 					// set current Time
 					for (Runnable runnable : this.runnables) {
@@ -242,9 +233,6 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 						
 						// ignore empty households
 						if (household.getMemberIds().size() == 0) continue;
-						
-						this.evacuationDecisionModel.runModel(household);
-						this.latestAcceptedLeaveTimeModel.runModel(household);
 												
 						((SelectHouseholdMeetingPointRunner) runnables[roundRobin % this.numOfThreads]).addHouseholdToCheck(household);
 						roundRobin++;

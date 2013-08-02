@@ -28,7 +28,6 @@ import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIden
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.mobsim.HouseholdsTracker;
 import playground.christoph.evacuation.mobsim.InformedHouseholdsTracker;
-import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.withinday.replanning.utils.ModeAvailabilityChecker;
 import playground.christoph.evacuation.withinday.replanning.utils.SelectHouseholdMeetingPoint;
@@ -38,7 +37,6 @@ public class JoinedHouseholdsIdentifierFactory extends DuringActivityIdentifierF
 	private final Scenario scenario;
 	private final SelectHouseholdMeetingPoint selectHouseholdMeetingPoint;
 	private final CoordAnalyzer coordAnalyzer;
-	private final VehiclesTracker vehiclesTracker;
 	private final HouseholdsTracker householdsTracker;
 	private final InformedHouseholdsTracker informedHouseholdsTracker;
 	private final ModeAvailabilityChecker modeAvailabilityChecker;
@@ -46,13 +44,12 @@ public class JoinedHouseholdsIdentifierFactory extends DuringActivityIdentifierF
 	private final JointDepartureOrganizer jointDepartureOrganizer;
 	
 	public JoinedHouseholdsIdentifierFactory(Scenario scenario,SelectHouseholdMeetingPoint selectHouseholdMeetingPoint, 
-			CoordAnalyzer coordAnalyzer, VehiclesTracker vehiclesTracker, HouseholdsTracker householdsTracker,
+			CoordAnalyzer coordAnalyzer, HouseholdsTracker householdsTracker,
 			InformedHouseholdsTracker informedHouseholdsTracker, ModeAvailabilityChecker modeAvailabilityChecker,
 			DecisionDataProvider decisionDataProvider, JointDepartureOrganizer jointDepartureOrganizer) {
 		this.scenario = scenario;
 		this.selectHouseholdMeetingPoint = selectHouseholdMeetingPoint;
 		this.coordAnalyzer = coordAnalyzer;
-		this.vehiclesTracker = vehiclesTracker;
 		this.householdsTracker = householdsTracker;
 		this.informedHouseholdsTracker = informedHouseholdsTracker;
 		this.modeAvailabilityChecker = modeAvailabilityChecker;
@@ -63,7 +60,7 @@ public class JoinedHouseholdsIdentifierFactory extends DuringActivityIdentifierF
 	@Override
 	public DuringActivityIdentifier createIdentifier() {
 		DuringActivityIdentifier identifier = new JoinedHouseholdsIdentifier(scenario, selectHouseholdMeetingPoint, 
-				coordAnalyzer.createInstance(), vehiclesTracker, householdsTracker, informedHouseholdsTracker, 
+				coordAnalyzer.createInstance(), householdsTracker, informedHouseholdsTracker, 
 				modeAvailabilityChecker.createInstance(), decisionDataProvider, jointDepartureOrganizer);
 		this.addAgentFiltersToIdentifier(identifier);
 		identifier.setIdentifierFactory(this);

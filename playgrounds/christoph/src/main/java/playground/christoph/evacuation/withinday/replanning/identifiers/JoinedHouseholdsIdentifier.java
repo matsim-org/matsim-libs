@@ -55,7 +55,6 @@ import playground.christoph.evacuation.mobsim.HouseholdPosition;
 import playground.christoph.evacuation.mobsim.HouseholdsTracker;
 import playground.christoph.evacuation.mobsim.InformedHouseholdsTracker;
 import playground.christoph.evacuation.mobsim.Tracker.Position;
-import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.mobsim.decisiondata.HouseholdDecisionData;
 import playground.christoph.evacuation.mobsim.decisionmodel.EvacuationDecisionModel.EvacuationDecision;
@@ -84,7 +83,6 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 	private final CoordAnalyzer coordAnalyzer;
 	private final SelectHouseholdMeetingPoint selectHouseholdMeetingPoint;
 	private final ModeAvailabilityChecker modeAvailabilityChecker;
-	private final VehiclesTracker vehiclesTracker;
 	private final HouseholdsTracker householdsTracker;
 	private final InformedHouseholdsTracker informedHouseholdsTracker;
 	private final DecisionDataProvider decisionDataProvider;
@@ -104,14 +102,13 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 	private final Map<Id, Id> driverVehicleMapping;
 	
 	public JoinedHouseholdsIdentifier(Scenario scenario, SelectHouseholdMeetingPoint selectHouseholdMeetingPoint,
-			CoordAnalyzer coordAnalyzer, VehiclesTracker vehiclesTracker, HouseholdsTracker householdsTracker,
+			CoordAnalyzer coordAnalyzer, HouseholdsTracker householdsTracker,
 			InformedHouseholdsTracker informedHouseholdsTracker, ModeAvailabilityChecker modeAvailabilityChecker,
 			DecisionDataProvider decisionDataProvider, JointDepartureOrganizer jointDepartureOrganizer) {
 		this.households = ((ScenarioImpl) scenario).getHouseholds();
 		this.facilities = ((ScenarioImpl) scenario).getActivityFacilities();
 		this.selectHouseholdMeetingPoint = selectHouseholdMeetingPoint;
 		this.coordAnalyzer = coordAnalyzer;
-		this.vehiclesTracker = vehiclesTracker;
 		this.householdsTracker = householdsTracker;
 		this.informedHouseholdsTracker = informedHouseholdsTracker;
 		this.modeAvailabilityChecker = modeAvailabilityChecker;

@@ -439,7 +439,7 @@ public class EvacuationControler extends WithinDayController implements
 		this.decisionDataGrabber = new DecisionDataGrabber(this.scenarioData, this.coordAnalyzer.createInstance(), 
 				this.householdsTracker, this.householdObjectAttributes);
 				
-		this.decisionModelRunner = new DecisionModelRunner(this.scenarioData, this.decisionDataGrabber);
+		this.decisionModelRunner = new DecisionModelRunner(this.scenarioData, this.decisionDataGrabber, this.informedHouseholdsTracker);
 		this.addControlerListener(this.decisionModelRunner);
 		
 		/*
@@ -664,7 +664,7 @@ public class EvacuationControler extends WithinDayController implements
 		this.activityPerformingIdentifier = duringActivityFactory.createIdentifier();
 		
 		duringActivityFactory = new JoinedHouseholdsIdentifierFactory(this.scenarioData, this.selectHouseholdMeetingPoint, 
-				this.coordAnalyzer.createInstance(), this.vehiclesTracker, this.householdsTracker, this.informedHouseholdsTracker,
+				this.coordAnalyzer.createInstance(), this.householdsTracker, this.informedHouseholdsTracker,
 				this.modeAvailabilityChecker.createInstance(), this.decisionDataProvider, this.jointDepartureOrganizer);
 		duringActivityFactory.addAgentFilterFactory(notInitialReplanningFilterFactory);
 		this.joinedHouseholdsIdentifier = duringActivityFactory.createIdentifier();
