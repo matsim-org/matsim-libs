@@ -106,6 +106,7 @@ import playground.christoph.evacuation.mobsim.EvacuationQSimFactory;
 import playground.christoph.evacuation.mobsim.HouseholdsTracker;
 import playground.christoph.evacuation.mobsim.InformedHouseholdsTracker;
 import playground.christoph.evacuation.mobsim.LegModeChecker;
+import playground.christoph.evacuation.mobsim.MobsimDataProvider;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataGrabber;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
@@ -472,7 +473,9 @@ public class EvacuationControler extends WithinDayController implements
 		 * ModeAvailabilityChecker to check which vehicles are available for
 		 * a household at a given facility.
 		 */
-		this.modeAvailabilityChecker = new ModeAvailabilityChecker(this.scenarioData, vehiclesTracker);
+		MobsimDataProvider mobsimDataProvider = new MobsimDataProvider();
+		this.getFixedOrderSimulationListener().addSimulationListener(mobsimDataProvider);
+		this.modeAvailabilityChecker = new ModeAvailabilityChecker(this.scenarioData, mobsimDataProvider);
 		
 		/*
 		 * Select a households meeting point respecting its members positions
@@ -574,10 +577,9 @@ public class EvacuationControler extends WithinDayController implements
 		// set the TravelTimeCollector for car mode
 		travelTimes.put(TransportMode.car, this.getTravelTimeCollector());
 	
-		this.selectHouseholdMeetingPoint = new SelectHouseholdMeetingPoint(this, travelTimes, 
-				this.vehiclesTracker, this.coordAnalyzer.createInstance(), this.affectedArea, 
-				this.modeAvailabilityChecker.createInstance(), this.informedHouseholdsTracker, this.decisionDataProvider,
-				this.decisionModelRunner);
+		this.selectHouseholdMeetingPoint = new SelectHouseholdMeetingPoint(scenarioData, travelTimes, 
+				this.coordAnalyzer.createInstance(), this.affectedArea, this.modeAvailabilityChecker.createInstance(), 
+				this.informedHouseholdsTracker, this.decisionModelRunner, null);
 		this.getFixedOrderSimulationListener().addSimulationListener(this.selectHouseholdMeetingPoint);
 	}
 	

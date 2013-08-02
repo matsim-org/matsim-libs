@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -32,12 +33,13 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
 
 /**
- * Provides Mobsim related data such as the QVehicles.
+ * Provides Mobsim related data such as the Agents or QVehicles.
  * 
  * @author cdobler
  */
 public class MobsimDataProvider implements MobsimInitializedListener {
 
+	private final Map<Id, MobsimAgent> agents = new HashMap<Id, MobsimAgent>(); 
 	private final Map<Id, MobsimVehicle> vehicles = new HashMap<Id, MobsimVehicle>();
 
 	private NetsimNetwork netsimNetwork;
@@ -48,6 +50,12 @@ public class MobsimDataProvider implements MobsimInitializedListener {
 		QSim sim = (QSim) e.getQueueSimulation();
 		this.netsimNetwork = sim.getNetsimNetwork();
 		
+		// collect all agents
+		this.agents.clear();
+		for (MobsimAgent mobsimAgent : sim.getAgents()) {
+			this.agents.put(mobsimAgent.getId(), mobsimAgent);
+		}
+		
 		// collect all vehicles
 		this.vehicles.clear();
 		for (NetsimLink netsimLink : netsimNetwork.getNetsimLinks().values()) {
@@ -55,6 +63,22 @@ public class MobsimDataProvider implements MobsimInitializedListener {
 				this.vehicles.put(mobsimVehicle.getId(), mobsimVehicle);
 			}
 		}
+	}
+	
+	public Map<Id, MobsimAgent> getAgents() {
+		return this.agents;
+	}
+	
+	public MobsimAgent getAgent(Id agentId) {
+		return this.agents.get(agentId);
+	}
+	
+	public Map<Id, MobsimVehicle> getVehicles() {
+		return this.vehicles;
+	}
+	
+	public MobsimVehicle getVehicle(Id vehicleId) {
+		return this.vehicles.get(vehicleId);
 	}
 	
 	public void getEnrouteVehiclesOnLink(Id linkId) {

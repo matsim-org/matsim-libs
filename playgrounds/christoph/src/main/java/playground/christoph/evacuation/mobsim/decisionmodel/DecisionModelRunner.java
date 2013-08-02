@@ -22,16 +22,16 @@ package playground.christoph.evacuation.mobsim.decisionmodel;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.events.AfterMobsimEvent;
-import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataGrabber;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 
-public class DecisionModelRunner implements BeforeMobsimListener, AfterMobsimListener {
+public class DecisionModelRunner implements MobsimInitializedListener, AfterMobsimListener {
 
 	private final Scenario scenario;
 	private final DecisionDataGrabber decisionDataGrabber;
@@ -53,6 +53,10 @@ public class DecisionModelRunner implements BeforeMobsimListener, AfterMobsimLis
 		this.latestAcceptedLeaveTimeModel = new LatestAcceptedLeaveTimeModel(this.decisionDataProvider);
 	}
 	
+	public DecisionDataProvider getDecisionDataProvider() {
+		return this.decisionDataProvider;
+	}
+	
 	public EvacuationDecisionModel getEvacuationDecisionModel() {
 		return this.evacuationDecisionModel;
 	}
@@ -60,9 +64,14 @@ public class DecisionModelRunner implements BeforeMobsimListener, AfterMobsimLis
 	public LatestAcceptedLeaveTimeModel getLatestAcceptedLeaveTimeModel() {
 		return this.latestAcceptedLeaveTimeModel;
 	}
-
+	
+	/*
+	 * This cannot be implemented as BeforeMobsimListener since the
+	 * DecisionDataGrabber need information from a HouseholdsTracker
+	 * which cannot be collected before the Mobsim has been initialized.
+	 */
 	@Override
-	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 		
 		/*
 		 * Grab decision data.
@@ -84,7 +93,7 @@ public class DecisionModelRunner implements BeforeMobsimListener, AfterMobsimLis
 		 * simulation when a household is informed.
 		 */
 	}
-
+	
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		

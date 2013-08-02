@@ -23,46 +23,25 @@ package playground.christoph.evacuation.mobsim.decisionmodel;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Random;
-import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
-import org.matsim.utils.objectattributes.ObjectAttributes;
-import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
-import org.opengis.feature.simple.SimpleFeature;
 
-import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.config.EvacuationConfig.EvacuationDecisionBehaviour;
 import playground.christoph.evacuation.config.EvacuationConfig.EvacuationReason;
 import playground.christoph.evacuation.config.EvacuationConfig.PreEvacuationTime;
-import playground.christoph.evacuation.config.EvacuationConfigReader;
-import playground.christoph.evacuation.mobsim.HouseholdsTracker;
-import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataGrabber;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.mobsim.decisiondata.HouseholdDecisionData;
-import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
-
-import com.vividsolutions.jts.geom.Geometry;
 
 public class EvacuationDecisionModel implements HouseholdDecisionModel {
 	
@@ -155,7 +134,7 @@ public class EvacuationDecisionModel implements HouseholdDecisionModel {
 		 * Check whether household is joined.
 		 */
 		Id householdId = household.getId();
-		boolean isJoined = this.decisionDataProvider.getHouseholdDecisionData(householdId).isJoined();
+		boolean isJoined = this.decisionDataProvider.getHouseholdDecisionData(householdId).getHouseholdPosition().isHouseholdJoined();
 			
 		/*
 		 * Calculate pickup decision for every household member. Then decide base on

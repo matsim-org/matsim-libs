@@ -21,65 +21,48 @@
 package playground.christoph.evacuation.withinday.replanning.utils;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.network.NetworkFactory;
-import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
-import org.matsim.contrib.multimodal.router.MultimodalTripRouterFactory;
-import org.matsim.contrib.multimodal.tools.MultiModalNetworkCreator;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.config.Config;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
-import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
-import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.vehicles.Vehicle;
 
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.config.EvacuationConfig;
+import playground.christoph.evacuation.controler.EvacuationTripRouterFactory;
 import playground.christoph.evacuation.mobsim.InformedHouseholdsTracker;
-import playground.christoph.evacuation.mobsim.VehiclesTracker;
+import playground.christoph.evacuation.mobsim.MobsimDataProvider;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.mobsim.decisiondata.HouseholdDecisionData;
 import playground.christoph.evacuation.mobsim.decisionmodel.DecisionModelRunner;
 import playground.christoph.evacuation.mobsim.decisionmodel.EvacuationDecisionModel;
 import playground.christoph.evacuation.mobsim.decisionmodel.EvacuationDecisionModel.Participating;
 import playground.christoph.evacuation.mobsim.decisionmodel.LatestAcceptedLeaveTimeModel;
-import playground.christoph.evacuation.network.AddZCoordinatesToNetwork;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -94,15 +77,12 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @author cdobler
  */
-public class SelectHouseholdMeetingPoint implements MobsimInitializedListener, MobsimBeforeSimStepListener {
+public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener {
 
 	private static final Logger log = Logger.getLogger(SelectHouseholdMeetingPoint.class);
 	
-	private final Controler controler;
 	private final Scenario scenario;
 	private final Map<String, TravelTime> travelTimes;
-	private final Map<Id, MobsimAgent> agents;
-	private final VehiclesTracker vehiclesTracker;
 	private final CoordAnalyzer coordAnalyzer;
 	private final Geometry affectedArea;
 	private final ModeAvailabilityChecker modeAvailabilityChecker;
@@ -111,6 +91,7 @@ public class SelectHouseholdMeetingPoint implements MobsimInitializedListener, M
 	private final EvacuationDecisionModel evacuationDecisionModel;
 	private final LatestAcceptedLeaveTimeModel latestAcceptedLeaveTimeModel;
 	private final DecisionDataProvider decisionDataProvider;
+	private final MobsimDataProvider mobsimDataProvider;
 	
 	private TravelDisutilityFactory disutilityFactory;
 	private TripRouterFactory toHomeFacilityRouterFactory;
@@ -131,231 +112,47 @@ public class SelectHouseholdMeetingPoint implements MobsimInitializedListener, M
 	private int meetSecure = 0;
 	private int meetInsecure = 0;
 	
-	public SelectHouseholdMeetingPoint(Controler controler, Map<String,TravelTime> travelTimes,
-			VehiclesTracker vehiclesTracker, CoordAnalyzer coordAnalyzer, Geometry affectedArea, 
-			ModeAvailabilityChecker modeAvailabilityChecker, InformedHouseholdsTracker informedHouseholdsTracker,
-			DecisionDataProvider decisionDataProvider, DecisionModelRunner decisionModelRunner) {
-		this.controler = controler;
+	public SelectHouseholdMeetingPoint(Scenario scenario, Map<String,TravelTime> travelTimes,
+			CoordAnalyzer coordAnalyzer, Geometry affectedArea, ModeAvailabilityChecker modeAvailabilityChecker, 
+			InformedHouseholdsTracker informedHouseholdsTracker, DecisionModelRunner decisionModelRunner, 
+			MobsimDataProvider mobsimDataProvider) {
+		this.scenario = scenario;
 		this.travelTimes = travelTimes;
-		this.vehiclesTracker = vehiclesTracker;
 		this.coordAnalyzer = coordAnalyzer;
 		this.affectedArea = affectedArea;
 		this.modeAvailabilityChecker = modeAvailabilityChecker;
 		this.informedHouseholdsTracker = informedHouseholdsTracker;
-		this.decisionDataProvider = decisionDataProvider;
+		this.mobsimDataProvider = mobsimDataProvider;
 		
-		this.scenario = this.controler.getScenario();
 		this.numOfThreads = this.scenario.getConfig().global().getNumberOfThreads();
 		this.allMeetingsPointsSelected = new AtomicBoolean(false);
+		this.decisionDataProvider = decisionModelRunner.getDecisionDataProvider();
 		this.evacuationDecisionModel = decisionModelRunner.getEvacuationDecisionModel();
 		this.latestAcceptedLeaveTimeModel = decisionModelRunner.getLatestAcceptedLeaveTimeModel();
-		this.agents = new HashMap<Id, MobsimAgent>();
 		
 		init();
 	}
 	
 	private void init() {
 		
-		Config config = scenario.getConfig();
-		
 		this.disutilityFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
+		TripRouterFactoryBuilderWithDefaults builder = new TripRouterFactoryBuilderWithDefaults();
+		LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = builder.createDefaultLeastCostPathCalculatorFactory(this.scenario);
+		TransitRouterFactory transitRouterFactory = null;
+		if (this.scenario.getConfig().scenario().isUseTransit()) transitRouterFactory = builder.createDefaultTransitRouter(this.scenario);
 		
-		this.toHomeFacilityRouterFactory = new MultimodalTripRouterFactory(this.scenario, this.travelTimes, disutilityFactory);
-				
-		/*
-		 * Create a subnetwork that only contains the Evacuation area plus some exit nodes.
-		 * This network is used to calculate estimated evacuation times starting from the 
-		 * home locations which are located inside the evacuation zone.
-		 */
-		Scenario subScenario = ScenarioUtils.createScenario(config);
-		new MatsimNetworkReader(subScenario).readFile(config.network().getInputFile());
-		Network subNetwork = subScenario.getNetwork();
-
-		/*
-		 * If enabled in config file, convert subNetwork to a multi-modal network.
-		 */
-        // TODO: Refactored out of core config
-        // Please just create and add the config group instead.
-        MultiModalConfigGroup multiModalConfigGroup1 = (MultiModalConfigGroup) this.scenario.getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
-        if (multiModalConfigGroup1 == null) {
-            multiModalConfigGroup1 = new MultiModalConfigGroup();
-            this.scenario.getConfig().addModule(multiModalConfigGroup1);
-        }
-        if (multiModalConfigGroup1.isCreateMultiModalNetwork()) {
-			log.info("Creating multi modal network.");
-            // TODO: Refactored out of core config
-            // Please just create and add the config group instead.
-            MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) this.scenario.getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
-            if (multiModalConfigGroup == null) {
-                multiModalConfigGroup = new MultiModalConfigGroup();
-                this.scenario.getConfig().addModule(multiModalConfigGroup);
-            }
-            new MultiModalNetworkCreator(multiModalConfigGroup).run(subNetwork);
-		}
+		this.toHomeFacilityRouterFactory = new EvacuationTripRouterFactory(this.scenario, this.travelTimes, 
+				this.disutilityFactory, leastCostPathCalculatorFactory, transitRouterFactory);
 		
-		/*
-		 * Adding z-coordinates to the network
-		 */
-		AddZCoordinatesToNetwork zCoordinateAdder = new AddZCoordinatesToNetwork(subScenario, EvacuationConfig.dhm25File, EvacuationConfig.srtmFile);
-		zCoordinateAdder.addZCoordinatesToNetwork();
-		
-		/*
-		 * Identify affected nodes.
-		 */
-		Set<Id> affectedNodes = new HashSet<Id>();
-		for (Node node : subNetwork.getNodes().values()) {
-			if (coordAnalyzer.isNodeAffected(node)) affectedNodes.add(node.getId());
-		}
-		log.info("Found " + affectedNodes.size() + " nodes inside affected area.");
-
-		/*
-		 * Identify buffered affected nodes.
-		 */
-		CoordAnalyzer bufferedCoordAnalyzer = this.defineBufferedArea();
-		Set<Id> bufferedAffectedNodes = new HashSet<Id>();
-		for (Node node : subNetwork.getNodes().values()) {
-			if (bufferedCoordAnalyzer.isNodeAffected(node) && !affectedNodes.contains(node.getId())) {
-				bufferedAffectedNodes.add(node.getId());
-			}
-		}
-		log.info("Found " + bufferedAffectedNodes.size() + " additional nodes inside buffered affected area.");
-		
-		/*
-		 * Identify link that cross the evacuation line and their start and
-		 * end nodes which are located right after the evacuation line.
-		 */
-		Set<Id> crossEvacuationLineNodes = new HashSet<Id>(bufferedAffectedNodes);
-		Set<Id> crossEvacuationLineLinks = new HashSet<Id>();
-		for (Link link : subNetwork.getLinks().values()) {
-			boolean fromNodeInside = affectedNodes.contains(link.getFromNode().getId());
-			boolean toNodeInside = affectedNodes.contains(link.getToNode().getId());
-			
-			if (fromNodeInside && !toNodeInside) {
-				crossEvacuationLineLinks.add(link.getId());
-				crossEvacuationLineNodes.add(link.getToNode().getId());
-			} else if (!fromNodeInside && toNodeInside) {
-				crossEvacuationLineLinks.add(link.getId());
-				crossEvacuationLineNodes.add(link.getFromNode().getId());
-			}
-		}
-		log.info("Found " + crossEvacuationLineLinks.size() + " links crossing the evacuation boarder.");
-		log.info("Found " + crossEvacuationLineNodes.size() + " nodes outside the evacuation boarder.");
-		
-		/*
-		 * Remove links and nodes.
-		 */
-		Set<Id> nodesToRemove = new HashSet<Id>();
-		for (Node node : subNetwork.getNodes().values()) {
-			if (!crossEvacuationLineNodes.contains(node.getId()) && !affectedNodes.contains(node.getId())) {
-				nodesToRemove.add(node.getId());
-			}
-		}
-		for (Id id : nodesToRemove) subNetwork.removeNode(id);	
-		log.info("Remaining nodes " + subNetwork.getNodes().size());
-		log.info("Remaining links " + subNetwork.getLinks().size());
-	
-		Set<String> transportModes = new HashSet<String>();
-		transportModes.add(TransportMode.bike);
-		transportModes.add(TransportMode.car);
-		transportModes.add(TransportMode.pt);
-		transportModes.add(TransportMode.walk);
-		
-		NetworkFactory networkFactory = subNetwork.getFactory();
-		Coord exitNode1Coord = subScenario.createCoord(EvacuationConfig.centerCoord.getX() + 50000.0, EvacuationConfig.centerCoord.getY() + 50000.0); 
-		Coord exitNode2Coord = subScenario.createCoord(EvacuationConfig.centerCoord.getX() + 50001.0, EvacuationConfig.centerCoord.getY() + 50001.0);
-		Node exitNode1 = networkFactory.createNode(subScenario.createId("exitNode1"), exitNode1Coord);
-		Node exitNode2 = networkFactory.createNode(subScenario.createId("exitNode2"), exitNode2Coord);
-		Link exitLink = networkFactory.createLink(subScenario.createId("exitLink"), exitNode1, exitNode2);
-		exitLink.setAllowedModes(transportModes);
-		exitLink.setLength(1.0);
-		subNetwork.addNode(exitNode1);
-		subNetwork.addNode(exitNode2);
-		subNetwork.addLink(exitLink);
-		
-		/*
-		 * Create exit links for links that cross the evacuation line.
-		 */
-		int i = 0;
-		for (Id id : crossEvacuationLineNodes) {
-			Node node = subNetwork.getNodes().get(id);
-			Link link = networkFactory.createLink(subScenario.createId("exitLink" + i), node, exitNode1);
-			link.setAllowedModes(transportModes);
-			link.setLength(1.0);
-			subNetwork.addLink(link);
-			i++;
-		}
-		
-		Map<String, TravelTime> tts = new HashMap<String, TravelTime>();
+		Scenario fromHomeScenario = new CreateEvacuationAreaSubScenario(this.scenario, this.coordAnalyzer, this.affectedArea, 
+				this.travelTimes.keySet()).createSubScenario();
+		Map<String, TravelTime> fromHomeTravelTimes = new HashMap<String, TravelTime>();
 		for (Entry<String, TravelTime> entry : this.travelTimes.entrySet()) {
-			tts.put(entry.getKey(), new TravelTimeWrapper(entry.getValue()));
-		}
-			
-		// use a ScenarioWrapper that returns the sub-network instead of the network
-		Scenario fromHomeScenario = new ScenarioWrapper(scenario, subNetwork);
-		this.fromHomeFacilityRouterFactory = new MultimodalTripRouterFactory(fromHomeScenario, this.travelTimes, disutilityFactory);
-	}
-
-
-	
-	/*
-	 * Identify facilities that are located inside the affected area. They
-	 * might be attached to links which are NOT affected. However, those links
-	 * still have to be included in the sub network.
-	 * The links themselves are secure, therefore we can directly connect them
-	 * to the exit node.
-	 */
-	private CoordAnalyzer defineBufferedArea() {
-	
-		double buffer = 0.0;
-		double dBuffer = 50.0;	// buffer increase per iteration
-		
-		/*
-		 * Identify not affected links where affected facilities are attached.
-		 */
-		Set<Link> links = new HashSet<Link>();
-		for (ActivityFacility facility : ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().values()) {
-			if (this.coordAnalyzer.isFacilityAffected(facility)) {
-				Id linkId = facility.getLinkId();
-				Link link = scenario.getNetwork().getLinks().get(linkId);
-				
-				if (!this.coordAnalyzer.isLinkAffected(link)) {
-					links.add(link);
-				}
-			}
+			fromHomeTravelTimes.put(entry.getKey(), new TravelTimeWrapper(entry.getValue()));
 		}
 		
-		/*
-		 * Increase the buffer until all links are included in the geometry.
-		 */
-		if (links.size() == 0) return this.coordAnalyzer;
-		else {
-			while (true) {
-				buffer += dBuffer;
-				Geometry geometry = this.affectedArea.buffer(buffer);
-				
-				CoordAnalyzer bufferedCoordAnalyzer = new CoordAnalyzer(geometry);
-				
-				boolean increaseBuffer = false;
-				for (Link link : links) {
-					/*
-					 * If the link and/or its from/to nodes is not affected, 
-					 * the buffer has to be increased.
-					 */
-					if (!bufferedCoordAnalyzer.isLinkAffected(link) ||
-							!bufferedCoordAnalyzer.isNodeAffected(link.getFromNode()) ||
-							!bufferedCoordAnalyzer.isNodeAffected(link.getToNode())) {
-						increaseBuffer = true;
-						break;
-					}
-				}
-				
-				if (!increaseBuffer) {
-					log.info("A buffer of  " + buffer + " was required to catch all links where affected" +
-							"facilities are attached to.");
-					return bufferedCoordAnalyzer;
-				}
-			}
-		}		
+		this.fromHomeFacilityRouterFactory = new EvacuationTripRouterFactory(fromHomeScenario, fromHomeTravelTimes, 
+				this.disutilityFactory, leastCostPathCalculatorFactory, transitRouterFactory); 
 	}
 	
 	/*
@@ -385,14 +182,6 @@ public class SelectHouseholdMeetingPoint implements MobsimInitializedListener, M
 		}
 		// otherwise meet and stay at home
 		else return this.decisionDataProvider.getHouseholdDecisionData(householdId).getHomeFacilityId();
-	}
-	
-	@Override
-	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
-		
-		this.agents.clear();
-		QSim sim = (QSim) e.getQueueSimulation();
-		for (MobsimAgent agent : sim.getAgents()) this.agents.put(agent.getId(), agent);
 	}
 	
 	/*
@@ -512,16 +301,20 @@ public class SelectHouseholdMeetingPoint implements MobsimInitializedListener, M
 
 		TravelTime travelTime = this.travelTimes.get(TransportMode.car);
 		TravelDisutility travelDisutility = this.disutilityFactory.createTravelDisutility(travelTime, this.scenario.getConfig().planCalcScore());
-				
 		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, travelTime);
+
+		// use a TravelTimeWrapper that returns a travel time of 1.0 second for exit links
+		TravelTime fromHomeTravelTime = new TravelTimeWrapper(travelTime);
+		TravelDisutility fromHomeTravelDisutility = this.disutilityFactory.createTravelDisutility(fromHomeTravelTime, this.scenario.getConfig().planCalcScore());
+		RoutingContext fromHomeRoutingContext = new RoutingContextImpl(fromHomeTravelDisutility, fromHomeTravelTime);
 		
 		for (int i = 0; i < this.numOfThreads; i++) {
 			
 			SelectHouseholdMeetingPointRunner runner = new SelectHouseholdMeetingPointRunner(scenario, 
 					toHomeFacilityRouterFactory.instantiateAndConfigureTripRouter(routingContext), 
-					fromHomeFacilityRouterFactory.instantiateAndConfigureTripRouter(routingContext), 
-					vehiclesTracker, coordAnalyzer.createInstance(), modeAvailabilityChecker.createInstance(), 
-					decisionDataProvider, agents, startBarrier, endBarrier, allMeetingsPointsSelected);
+					fromHomeFacilityRouterFactory.instantiateAndConfigureTripRouter(fromHomeRoutingContext), 
+					coordAnalyzer.createInstance(), mobsimDataProvider, modeAvailabilityChecker.createInstance(), 
+					decisionDataProvider, startBarrier, endBarrier, allMeetingsPointsSelected);
 			runner.setTime(time);
 			runnables[i] = runner; 
 					
@@ -551,71 +344,6 @@ public class SelectHouseholdMeetingPoint implements MobsimInitializedListener, M
 		public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
 			if (link.getId().toString().contains("exit")) return 1.0;
 			else return travelTime.getLinkTravelTime(link, time, person, vehicle);
-		}
-
-	}
-
-	/*
-	 * Returns a sub-network instead of the full network.
-	 */
-	private static class ScenarioWrapper implements Scenario {
-
-		private final Scenario scenario;
-		private final Network network;
-		
-		public ScenarioWrapper(Scenario scenario, Network network) {
-			this.scenario = scenario;
-			this.network = network;
-		}
-		
-		@Override
-		public Id createId(String id) {
-			return this.scenario.createId(id);
-		}
-
-		@Override
-		public Network getNetwork() {
-			return this.network;
-		}
-
-		@Override
-		public Population getPopulation() {
-			return this.scenario.getPopulation();
-		}
-
-		@Override
-		public TransitSchedule getTransitSchedule() {
-			return this.scenario.getTransitSchedule();
-		}
-		
-		@Override
-		public ActivityFacilities getActivityFacilities() {
-			return this.scenario.getActivityFacilities();
-		}
-
-		@Override
-		public Config getConfig() {
-			return this.scenario.getConfig();
-		}
-
-		@Override
-		public Coord createCoord(double x, double y) {
-			return this.scenario.createCoord(x, y);
-		}
-
-		@Override
-		public void addScenarioElement(Object o) {
-			this.scenario.addScenarioElement(o);
-		}
-
-		@Override
-		public boolean removeScenarioElement(Object o) {
-			return this.scenario.removeScenarioElement(o);
-		}
-
-		@Override
-		public <T> T getScenarioElement(Class<? extends T> klass) {
-			return this.scenario.getScenarioElement(klass);
 		}
 	}
 }

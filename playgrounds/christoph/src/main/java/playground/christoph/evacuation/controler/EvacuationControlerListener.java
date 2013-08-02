@@ -20,11 +20,14 @@
 
 package playground.christoph.evacuation.controler;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.multimodal.MultiModalControlerListener;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
@@ -32,6 +35,7 @@ import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
 import org.matsim.core.mobsim.qsim.qnetsimengine.MissedJointDepartureWriter;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -50,7 +54,9 @@ import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataGrabber;
 import playground.christoph.evacuation.mobsim.decisionmodel.DecisionModelRunner;
 import playground.christoph.evacuation.router.util.AffectedAreaPenaltyCalculator;
+import playground.christoph.evacuation.withinday.replanning.utils.ModeAvailabilityChecker;
 import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
+import playground.christoph.evacuation.withinday.replanning.utils.SelectHouseholdMeetingPoint;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -67,9 +73,10 @@ public class EvacuationControlerListener implements StartupListener {
 	private ReplanningTracker replanningTracker;
 	private MobsimDataProvider mobsimDataProvider;
 	private JointDepartureOrganizer jointDepartureOrganizer;
-	private MissedJointDepartureWriter jointDepartureWriter;
+	private MissedJointDepartureWriter missedJointDepartureWriter;
+	private VehiclesTracker vehiclesTracker;
 	private HouseholdsTracker householdsTracker;
-//	private VehiclesTracker vehiclesTracker;
+	private InformedHouseholdsTracker informedHouseholdsTracker;
 	private DecisionDataGrabber decisionDataGrabber;
 	private DecisionModelRunner decisionModelRunner;
 	
@@ -78,9 +85,8 @@ public class EvacuationControlerListener implements StartupListener {
 	private AffectedAreaPenaltyCalculator penaltyCalculator;
 	private Geometry affectedArea;
 	
-//	protected MissedJointDepartureWriter jointDepartureWriter;
-	private InformedHouseholdsTracker informedHouseholdsTracker;
-//	protected SelectHouseholdMeetingPoint selectHouseholdMeetingPoint;
+	private ModeAvailabilityChecker modeAvailabilityChecker;
+	private SelectHouseholdMeetingPoint selectHouseholdMeetingPoint;
 //	protected ModeAvailabilityChecker modeAvailabilityChecker;
 	
 	/*
@@ -131,13 +137,15 @@ public class EvacuationControlerListener implements StartupListener {
 	}
 	
 	private void initDataGrabbersAndProviders(Controler controler) {
-				
+		
+		Scenario scenario = controler.getScenario();
+		
 		this.mobsimDataProvider = new MobsimDataProvider();
 		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(mobsimDataProvider);
 		
 		this.jointDepartureOrganizer = new JointDepartureOrganizer();
-		this.jointDepartureWriter = new MissedJointDepartureWriter(this.jointDepartureOrganizer);
-		controler.addControlerListener(this.jointDepartureWriter);
+		this.missedJointDepartureWriter = new MissedJointDepartureWriter(this.jointDepartureOrganizer);
+		controler.addControlerListener(this.missedJointDepartureWriter);
 		
 		this.informedHouseholdsTracker = new InformedHouseholdsTracker(controler.getPopulation(),
 				((ScenarioImpl) controler.getScenario()).getHouseholds());
@@ -147,16 +155,34 @@ public class EvacuationControlerListener implements StartupListener {
 		this.replanningTracker = new ReplanningTracker(this.informedHouseholdsTracker);
 		controler.getEvents().addHandler(this.replanningTracker);
 		
-		this.householdsTracker = new HouseholdsTracker(controler.getScenario());
+		this.householdsTracker = new HouseholdsTracker(scenario);
 		controler.getEvents().addHandler(householdsTracker);
 		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(householdsTracker);
 		
-		this.decisionDataGrabber = new DecisionDataGrabber(controler.getScenario(), this.coordAnalyzer.createInstance(), 
+		this.decisionDataGrabber = new DecisionDataGrabber(scenario, this.coordAnalyzer.createInstance(), 
 				this.householdsTracker, this.householdObjectAttributes);		
-		this.decisionModelRunner = new DecisionModelRunner(controler.getScenario(), this.decisionDataGrabber);
+		this.decisionModelRunner = new DecisionModelRunner(scenario, this.decisionDataGrabber);
+		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(this.decisionModelRunner);
 		controler.addControlerListener(this.decisionModelRunner);
 		
 //		this.vehiclesTracker = new VehiclesTracker(controler.getNetwork());
 //		controler.getEvents().addHandler(vehiclesTracker);
+		
+		/*
+		 * ModeAvailabilityChecker to check which vehicles are available for
+		 * a household at a given facility.
+		 */
+		this.modeAvailabilityChecker = new ModeAvailabilityChecker(scenario, this.mobsimDataProvider);
+		
+		// workaround
+//		scenario.getConfig().scenario().setUseTransit(false);
+		
+		Map<String, TravelTime> travelTimes = new HashMap<String, TravelTime>();
+		travelTimes.putAll(this.multiModalControlerListener.getMultiModalTravelTimes());
+		travelTimes.put(TransportMode.car, this.withinDayControlerListener.getTravelTimeCollector());
+		this.selectHouseholdMeetingPoint = new SelectHouseholdMeetingPoint(scenario, travelTimes, 
+				this.coordAnalyzer.createInstance(), this.affectedArea, this.modeAvailabilityChecker.createInstance(), 
+				this.informedHouseholdsTracker, this.decisionModelRunner, this.mobsimDataProvider);
+		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(this.selectHouseholdMeetingPoint);
 	}
 }

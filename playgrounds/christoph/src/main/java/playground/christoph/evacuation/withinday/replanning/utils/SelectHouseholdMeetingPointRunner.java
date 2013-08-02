@@ -23,7 +23,6 @@ package playground.christoph.evacuation.withinday.replanning.utils;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
@@ -53,12 +52,13 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.households.Household;
 
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.mobsim.AgentPosition;
+import playground.christoph.evacuation.mobsim.MobsimDataProvider;
 import playground.christoph.evacuation.mobsim.Tracker.Position;
-import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.mobsim.decisiondata.HouseholdDecisionData;
 import playground.christoph.evacuation.mobsim.decisiondata.PersonDecisionData;
@@ -76,13 +76,12 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 	private static final Logger log = Logger.getLogger(SelectHouseholdMeetingPointRunner.class);
 		
 	private final Scenario scenario;
-	private final VehiclesTracker vehiclesTracker;
 	private final CoordAnalyzer coordAnalyzer;
+	private final MobsimDataProvider mobsimDataProvider;
 	private final ModeAvailabilityChecker modeAvailabilityChecker;
 	private final DecisionDataProvider decisionDataProvider;
-	private final TripRouter toHomeFacilityPlanAlgo;
-	private final TripRouter evacuationPlanAlgo;
-	private final Map<Id, MobsimAgent> agents;
+	private final TripRouter toHomeFacilityRouter;
+	private final TripRouter evacuationRouter;
 	
 	private final List<Household> householdsToCheck;
 	private double time;
@@ -93,24 +92,22 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 	private final Random random;
 	
 	public SelectHouseholdMeetingPointRunner(Scenario scenario, TripRouter toHomeFacilityRouter, 
-			TripRouter fromHomeFacilityRouter, VehiclesTracker vehiclesTracker, CoordAnalyzer coordAnalyzer, 
+			TripRouter fromHomeFacilityRouter, CoordAnalyzer coordAnalyzer, MobsimDataProvider mobsimDataProvider, 
 			ModeAvailabilityChecker modeAvailabilityChecker, DecisionDataProvider decisionDataProvider, 
-			Map<Id, MobsimAgent> agents, CyclicBarrier startBarrier, CyclicBarrier endBarrier, 
-			AtomicBoolean allMeetingsPointsSelected) {
+			CyclicBarrier startBarrier, CyclicBarrier endBarrier, AtomicBoolean allMeetingsPointsSelected) {
 		this.scenario = scenario;
-		this.vehiclesTracker = vehiclesTracker;
+		this.mobsimDataProvider = mobsimDataProvider;
 		this.coordAnalyzer = coordAnalyzer;
 		this.modeAvailabilityChecker = modeAvailabilityChecker;
 		this.decisionDataProvider = decisionDataProvider;
-		this.agents = agents;
 
 		this.startBarrier = startBarrier;
 		this.endBarrier = endBarrier;
 		this.allMeetingsPointsSelected = allMeetingsPointsSelected;
 		
 		this.random = MatsimRandom.getLocalInstance();
-		this.toHomeFacilityPlanAlgo = toHomeFacilityRouter;
-		this.evacuationPlanAlgo = fromHomeFacilityRouter;
+		this.toHomeFacilityRouter = toHomeFacilityRouter;
+		this.evacuationRouter = fromHomeFacilityRouter;
 		
 		this.householdsToCheck = new ArrayList<Household>();
 	}
@@ -372,7 +369,7 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 			 * the facility is attached to the network.
 			 */
 			// get the index of the currently performed activity in the selected plan
-			MobsimAgent mobsimAgent = agents.get(personId);
+			MobsimAgent mobsimAgent = this.mobsimDataProvider.getAgent(personId);
 			PlanAgent planAgent = (PlanAgent) mobsimAgent;
 			
 			PlanImpl executedPlan = (PlanImpl) planAgent.getSelectedPlan();
@@ -400,7 +397,7 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 			
 			Id vehicleId = agentPosition.getPositionId();
 			pdd.setAgentReturnHomeVehicleId(vehicleId);
-			fromLinkId = this.vehiclesTracker.getVehicleLinkId(vehicleId);
+			fromLinkId = this.mobsimDataProvider.getVehicle(vehicleId).getCurrentLink().getId();
 			
 			Link link = this.scenario.getNetwork().getLinks().get(fromLinkId);
 			pdd.setAffected(this.coordAnalyzer.isLinkAffected(link));
@@ -413,7 +410,7 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 		 * Calculate the travel time from the agents current position to its home facility.
 		 */
 		if (needsHomeRouting) {
-			double travelTime = calculateTravelTime(toHomeFacilityPlanAlgo, personId, fromLinkId, homeLinkId, mode, time);
+			double travelTime = calculateTravelTime(toHomeFacilityRouter, personId, fromLinkId, homeLinkId, mode, time);
 			pdd.setAgentReturnHomeTime(time + travelTime);
 		} else pdd.setAgentReturnHomeTime(time);
 		pdd.setAgentTransportMode(mode);
@@ -427,7 +424,7 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 		if (!pdd.isAffected()) pdd.setAgentDirectEvacuationTime(time);
 		else {
 			Id toLinkId = this.scenario.createId("exitLink");
-			double travelTime = calculateTravelTime(evacuationPlanAlgo, personId, fromLinkId, toLinkId, mode, time);
+			double travelTime = calculateTravelTime(evacuationRouter, personId, fromLinkId, toLinkId, mode, time);
 			pdd.setAgentDirectEvacuationTime(time + travelTime);
 		}
 	}
@@ -468,13 +465,13 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 			if (mode.equals(TransportMode.car)) {
 				// Calculate a car travel time only once since it should not be person dependent.
 				if (vehicularTravelTime == Double.MIN_VALUE) {
-					vehicularTravelTime = calculateTravelTime(evacuationPlanAlgo, entry.getKey(), hdd.getHomeLinkId(), toLinkId, mode, departureTime);
+					vehicularTravelTime = calculateTravelTime(evacuationRouter, entry.getKey(), hdd.getHomeLinkId(), toLinkId, mode, departureTime);
 				} else continue;
 			}
 			else if (mode.equals(TransportMode.ride)) continue;
 			else if (mode.equals(PassengerQNetsimEngine.PASSENGER_TRANSPORT_MODE)) continue;
 			else {
-				double tt = calculateTravelTime(evacuationPlanAlgo, entry.getKey(), hdd.getHomeLinkId(), toLinkId, mode, departureTime);
+				double tt = calculateTravelTime(evacuationRouter, entry.getKey(), hdd.getHomeLinkId(), toLinkId, mode, departureTime);
 				if (tt > nonVehicularTravelTime) nonVehicularTravelTime = tt;
 			}
 		}
@@ -506,9 +503,19 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 		
 		planRouter.run(plan);
 		
-		throw new RuntimeException("Check whether the trip router sets the travel times in the leg.");
+		// Cannot take the travel time from the Leg since the PlanRouter creates a new Leg Object.
+		double travelTime = 0.0;
+		for (PlanElement planElement : plan.getPlanElements()) {
+			if (planElement instanceof Leg) {
+				travelTime += ((Leg) planElement).getTravelTime();
+			}
+		}
+
+		if (travelTime == Time.UNDEFINED_TIME) {
+			throw new RuntimeException("Seems that the PlanRouter did not calculate a valid travel time.");			
+		}
 		
-//		return Math.round(leg.getTravelTime());
+		return Math.round(travelTime);
 	}
 	
 	/*

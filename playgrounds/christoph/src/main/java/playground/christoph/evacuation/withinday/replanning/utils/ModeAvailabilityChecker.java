@@ -44,7 +44,7 @@ import org.matsim.households.Household;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 
-import playground.christoph.evacuation.mobsim.VehiclesTracker;
+import playground.christoph.evacuation.mobsim.MobsimDataProvider;
 
 /**
  * Checks whether a car is available for an agent or not.
@@ -55,13 +55,13 @@ public class ModeAvailabilityChecker {
 
 	private final Scenario scenario;
 	private final Vehicles vehicles;
-	private final VehiclesTracker vehiclesTracker;
+	private final MobsimDataProvider mobsimDataProvider;
 	private final WalkSpeedComparator walkSpeedComparator;
 	
-	public ModeAvailabilityChecker(Scenario scenario, VehiclesTracker vehiclesTracker) {
+	public ModeAvailabilityChecker(Scenario scenario, MobsimDataProvider mobsimDataProvider) {
 		this.scenario = scenario;
 		this.vehicles = ((ScenarioImpl) scenario).getVehicles();
-		this.vehiclesTracker = vehiclesTracker;
+		this.mobsimDataProvider = mobsimDataProvider;
 		this.walkSpeedComparator = new WalkSpeedComparator();
 		
 		// initialize walkSpeedComparator
@@ -69,16 +69,16 @@ public class ModeAvailabilityChecker {
  	}
 
 	// only used when creating a new instance
-	private ModeAvailabilityChecker(Scenario scenario, VehiclesTracker vehiclesTracker, 
+	private ModeAvailabilityChecker(Scenario scenario, MobsimDataProvider mobsimDataProvider, 
 			WalkSpeedComparator walkSpeedComparator) {
 		this.scenario = scenario;
 		this.vehicles = ((ScenarioImpl) scenario).getVehicles();
-		this.vehiclesTracker = vehiclesTracker;
+		this.mobsimDataProvider = mobsimDataProvider;
 		this.walkSpeedComparator = walkSpeedComparator;		
 	}
 	
 	public ModeAvailabilityChecker createInstance() {
-		return new ModeAvailabilityChecker(scenario, vehiclesTracker, walkSpeedComparator);
+		return new ModeAvailabilityChecker(scenario, mobsimDataProvider, walkSpeedComparator);
 	}
 	
 	/**
@@ -116,7 +116,7 @@ public class ModeAvailabilityChecker {
 		List<Id> availableVehicles = new ArrayList<Id>();
 		
 		for (Id vehicleId : vehicles) {
-			MobsimVehicle vehicle = this.vehiclesTracker.getVehicle(vehicleId);
+			MobsimVehicle vehicle = this.mobsimDataProvider.getVehicle(vehicleId);
 			
 			// if the driver is null, the vehicle is parked 
 			boolean isParked = (vehicle.getDriver() == null);
@@ -152,7 +152,7 @@ public class ModeAvailabilityChecker {
 		// Check whether a vehicleId was found.
 		if (possibleVehicleId != null) {
 			
-			MobsimVehicle vehicle = this.vehiclesTracker.getVehicle(possibleVehicleId);
+			MobsimVehicle vehicle = this.mobsimDataProvider.getVehicle(possibleVehicleId);
 			
 			// if the driver is null, the vehicle is parked 
 			boolean isParked = (vehicle.getDriver() == null);

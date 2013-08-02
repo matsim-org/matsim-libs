@@ -26,7 +26,6 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Queue;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
@@ -288,7 +287,7 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 			HouseholdPosition householdPosition = hdd.getHouseholdPosition();
 			
 			// if the household is joined
-			if (hdd.isJoined()) {
+			if (hdd.getHouseholdPosition().isHouseholdJoined()) {
 				
 				// if the household is at a facility
 				if (householdPosition.getPositionType() == Position.FACILITY) {
@@ -340,7 +339,7 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 			/*
 			 * Check whether the household is joined.
 			 */
-			boolean isJoined = this.decisionDataProvider.getHouseholdDecisionData(householdId).isJoined();
+			boolean isJoined = this.decisionDataProvider.getHouseholdDecisionData(householdId).getHouseholdPosition().isHouseholdJoined();
 			boolean wasJoined = (householdDeparture != null);
 			if (isJoined) {
 				/*

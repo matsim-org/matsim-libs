@@ -38,18 +38,15 @@ import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
 import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
-import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
-import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
 
 import playground.christoph.evacuation.mobsim.Tracker.Position;
 
-public class HouseholdsTracker extends AgentsTracker implements 
-		MobsimBeforeSimStepListener, MobsimAfterSimStepListener {
+public class HouseholdsTracker extends AgentsTracker implements MobsimAfterSimStepListener {
 
 	static final Logger log = Logger.getLogger(HouseholdsTracker.class);
 	
@@ -158,16 +155,13 @@ public class HouseholdsTracker extends AgentsTracker implements
 	}
 	
 	@Override
-	public void notifyMobsimBeforeSimStep(MobsimBeforeSimStepEvent e) {
-		// clear list for the upcoming time-step
-		householdsToUpdate.clear();
-	}
-	
-	@Override
 	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
 		for (Id id : this.householdsToUpdate) {
 			householdPositions.get(id).update();
 		}
+		
+		// clear list for the upcoming time-step
+		householdsToUpdate.clear();
 		
 		if (e.getSimulationTime() >= this.infoTime) {
 			this.infoTime += INFO_PERIOD;

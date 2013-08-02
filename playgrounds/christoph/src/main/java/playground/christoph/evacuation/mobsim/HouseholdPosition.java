@@ -48,8 +48,6 @@ public class HouseholdPosition {
 		this.agentPositions.add(position);
 	}
 	
-	// use HouseholdDecisionData.isJoined() instead
-	@Deprecated
 	public boolean isHouseholdJoined() {
 		return this.joined;
 	}

@@ -30,6 +30,9 @@ import playground.christoph.evacuation.mobsim.decisionmodel.EvacuationDecisionMo
  * Data structure containing information used by a household for the decision
  * "evacuate directly vs. meet at home first".
  * 
+ * Contains only static information, i.e. stuff like a household's home facility id
+ * but no dynamic information like whether a household is currently joined. 
+ * 
  * @author cdobler
  */
 public class HouseholdDecisionData {
@@ -121,15 +124,6 @@ public class HouseholdDecisionData {
 	public void setHouseholdPosition(HouseholdPosition householdPosition) {
 		this.householdPosition = householdPosition;
 	}
-	
-	public boolean isJoined() {
-//		return isJoined;
-		return this.householdPosition.isHouseholdJoined();
-	}
-
-//	public void setJoined(boolean isJoined) {
-//		this.isJoined = isJoined;
-//	}
 
 	public boolean hasChildren() {
 		return hasChildren;

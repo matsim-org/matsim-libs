@@ -46,7 +46,7 @@ public class InformedHouseholdsTracker extends InformedAgentsTracker implements 
 	private int infoTime = 0;
 	private boolean allHouseholdsInformed = false;
 	
-	private Set<Id> informedInLastTimeStep;
+	private Set<Id> informedInLastTimeStep = new LinkedHashSet<Id>();
 	private Set<Id> informedInCurrentTimeStep = new LinkedHashSet<Id>();
 	
 	public InformedHouseholdsTracker(Population population, Households households) {
