@@ -29,6 +29,7 @@ public class AllTests {
 		TestSuite suite = new TestSuite("All tests for playground.southAfrica.freight.digicore.analysis");
 		
 		suite.addTest(playground.southAfrica.freight.digicore.analysis.geographicClassifier.AllTests.suite());
+		suite.addTest(playground.southAfrica.freight.digicore.analysis.postClustering.AllTests.suite());
 		
 		return suite;
 	}

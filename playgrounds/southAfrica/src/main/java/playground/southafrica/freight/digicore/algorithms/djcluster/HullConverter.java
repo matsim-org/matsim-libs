@@ -60,6 +60,7 @@ public class HullConverter implements AttributeConverter<Geometry> {
 		
 		/* Distinguish between points, lines and polygons. */
 		if(ca.length == 1){
+			ca[0] = list.get(0);
 			g = gf.createPoint(ca[0]);
 		} else if(ca.length == 2){
 			ca[0] = list.get(0);
