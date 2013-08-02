@@ -19,10 +19,12 @@
 package playground.droeder.ptSubModes.routing;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ControlerConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PopulationFactoryImpl;
@@ -38,6 +40,10 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.old.NetworkLegRouter;
 import org.matsim.core.router.old.PseudoTransitLegRouter;
 import org.matsim.core.router.old.TeleportationLegRouter;
+import org.matsim.core.router.util.AStarLandmarksFactory;
+import org.matsim.core.router.util.DijkstraFactory;
+import org.matsim.core.router.util.FastAStarLandmarksFactory;
+import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
@@ -72,10 +78,12 @@ public class PtSubModeTripRouterFactory implements TripRouterFactory{
 	/**
 	 * based on {@link TripRouterFactoryImpl}. Own Implementation is just necessary to add pt-submodes.
 	 * @param controler
+	 * @param transitRouterFactory 
 	 */
-	public PtSubModeTripRouterFactory(final Controler controler) {
+	public PtSubModeTripRouterFactory(final Controler controler, TransitRouterFactory transitRouterFactory) {
 		// TODO[dr] adapt changes from PTripRouterFactoryImpl constructor and createTripRouter, especially line 195. Should be fixed by now
 		this.controler = controler;
+		this.transitRouterFactory = transitRouterFactory;
 //		this.config = controler.getScenario().getConfig();
 //		this.network = controler.getScenario().getNetwork();
 //		this.travelDisutilityFactory = controler.getTravelDisutilityFactory();
@@ -94,10 +102,15 @@ public class PtSubModeTripRouterFactory implements TripRouterFactory{
 		this.network = controler.getScenario().getNetwork();
 		this.travelDisutilityFactory = controler.getTravelDisutilityFactory();
 		this.travelTime = controler.getLinkTravelTimes();
-		this.leastCostPathAlgorithmFactory = controler.getLeastCostPathCalculatorFactory();
+//        LeastCostPathCalculator routeAlgo =
+//                leastCostPathCalculatorFactory.createPathCalculator(
+//                        scenario.getNetwork(),
+//                        routingContext.getTravelDisutility(),
+//                        routingContext.getTravelTime());
+		this.leastCostPathAlgorithmFactory = createDefaultLeastCostPathCalculatorFactory(controler.getScenario());
 		this.modeRouteFactory = ((PopulationFactoryImpl) controler.getScenario().getPopulation().getFactory()).getModeRouteFactory();
 		this.populationFactory = controler.getScenario().getPopulation().getFactory();
-		this.transitRouterFactory = controler.getTransitRouterFactory();
+//		this.transitRouterFactory = controler.getTransitRouterFactory();
 		this.transitSchedule = controler.getScenario().getTransitSchedule();
 		
 		
@@ -194,6 +207,23 @@ public class PtSubModeTripRouterFactory implements TripRouterFactory{
 										routeConfigGroup.getBeelineDistanceFactor()))));
 		return tripRouter;
 		
+	}
+	
+	private LeastCostPathCalculatorFactory createDefaultLeastCostPathCalculatorFactory(Scenario scenario) {
+		Config config = scenario.getConfig();
+		if (config.controler().getRoutingAlgorithmType().equals(ControlerConfigGroup.RoutingAlgorithmType.Dijkstra)) {
+            return new DijkstraFactory();
+        } else if (config.controler().getRoutingAlgorithmType().equals(ControlerConfigGroup.RoutingAlgorithmType.AStarLandmarks)) {
+            return new AStarLandmarksFactory(
+                    scenario.getNetwork(), new FreespeedTravelTimeAndDisutility(config.planCalcScore()), config.global().getNumberOfThreads());
+        } else if (config.controler().getRoutingAlgorithmType().equals(ControlerConfigGroup.RoutingAlgorithmType.FastDijkstra)) {
+            return new FastDijkstraFactory();
+        } else if (config.controler().getRoutingAlgorithmType().equals(ControlerConfigGroup.RoutingAlgorithmType.FastAStarLandmarks)) {
+            return new FastAStarLandmarksFactory(
+                    scenario.getNetwork(), new FreespeedTravelTimeAndDisutility(config.planCalcScore()));
+        } else {
+            throw new IllegalStateException("Enumeration Type RoutingAlgorithmType was extended without adaptation of Controler!");
+        }
 	}
 
 }

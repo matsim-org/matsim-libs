@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2011 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,10 +16,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-
 package playground.droeder.southAfrica;
-
-import java.io.File;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.config.Config;
@@ -28,89 +25,89 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
-import org.matsim.vis.otfvis.OTFFileWriterFactory;
 
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PScenarioImpl;
 import playground.andreas.P2.hook.PHook;
 import playground.andreas.P2.hook.PTransitRouterFactory;
-import playground.droeder.ptSubModes.qSimHook.TransitSubModeQSimFactory;
+import playground.droeder.ptSubModes.PtSubModeControlerListener;
 import playground.droeder.ptSubModes.routing.PtSubModeTripRouterFactory;
-
 
 /**
  * @author droeder
  *
  */
-public class RsaRunner {
+public class RsaMain {
+
+	private static final Logger log = Logger.getLogger(RsaMain.class);
+
+	private RsaMain() {
+//		do not allow to instantiate this class
+	}
 	
+	private static String[] ARGS = {
+		"../../org.matsim/examples/pt-tutorial/configExtended.xml",
+		"true"
+	};
 	
-	private final static Logger log = Logger.getLogger(RsaRunner.class);
-	private static String CONFIGFILE = 
-			"E:/VSP/svn/droeder/southAfrica/test/configReRouteFixedSubMode.xml";
-//			"E:/rsa/test/configRSAtest.xml";
-	
-	private static boolean FIXEDSUBMODE = true;
-	
-	public static void main(final String[] args) {
-		String configFile = null;
-		Boolean fixedSubMode = null;
-		
+	public static void main(String[] args) {
+		String[] arguments = null;
+		PConfigGroup pConfig = null;
 		if(args.length == 0){
-			if(new File(CONFIGFILE).exists()){
-				configFile = CONFIGFILE;
-				fixedSubMode = FIXEDSUBMODE;
-			}else{
-				log.error("no config Found...");
-				System.exit(1);
-			}
+			log.warn("running testcase.");
+			arguments = ARGS;
+			pConfig = getTestPConfig();
 		}else if(args.length == 2){
-			configFile = args[0];
-			fixedSubMode = Boolean.parseBoolean(args[1]);
+			pConfig = new PConfigGroup();
+			arguments = args;
 		}else{
-			log.error("need 2 args (String:configFile Boolean:routeOnSameMode ...");
-			System.exit(1);
+			log.error("illegal number of arguments. Expecting [configFile, (boolean) fixedSubmode]");
+			System.exit(-1);
 		}
 		
-				
-		sim(configFile, fixedSubMode);
-		
-	}
+		String configFile = arguments[0];
+		boolean fixedSubMode = Boolean.getBoolean(arguments[1]);
 
-	
-	private static void sim(String conf, boolean fixedSubMode) {
-		
+		log.info("Class: " + RsaMain.class.getCanonicalName());
+		log.info("configFile: " + configFile);
+		log.info("fixedSubMode: " + fixedSubMode);
 		
 		Config config = new Config();
-		config.addModule(new PConfigGroup());
-		ConfigUtils.loadConfig(config, conf);
+		config.addModule(pConfig);
+		ConfigUtils.loadConfig(config, configFile);
 		
 		PScenarioImpl scenario = new PScenarioImpl(config);
 		ScenarioUtils.loadScenario(scenario);
 		
-//		Scenario scenario = ScenarioUtils.loadScenario(ConfigUtils.loadConfig(conf));
-	
-		Controler controler = new PtSubModeControler(scenario, fixedSubMode);
+		Controler controler = new Controler(scenario);
 		controler.setOverwriteFiles(true);
 		controler.setCreateGraphs(true);
 		
 		// manipulate config
 		// add "pt interaction" cause controler.init() is called too late and in a protected way
+		// actually I'm not sure if this is still necessary \\DR, jul '13
 		ActivityParams transitActivityParams = new ActivityParams(PtConstants.TRANSIT_ACTIVITY_TYPE);
 		transitActivityParams.setTypicalDuration(120.0);
 		scenario.getConfig().planCalcScore().addActivityParams(transitActivityParams);
 		
-		PHook pFact = new PHook(controler, new Mode2LineSetterRSA(), (PTransitRouterFactory) controler.getTransitRouterFactory(), null, PtSubModeTripRouterFactory.class);
-		controler.addControlerListener(pFact);		
+		PtSubModeControlerListener ptSubModeListener = new PtSubModeControlerListener(fixedSubMode);
+		PHook pHook = new PHook(controler, new Mode2LineSetterRSA(), ptSubModeListener.getTransitRouterFactory(), null, PtSubModeTripRouterFactory.class);
+		controler.addControlerListener(pHook);	
+		controler.addControlerListener(new PtSubModeControlerListener(fixedSubMode));
 		
-		//necessary because PHook overwrites setting, made in PtSubModeControler-c'tor
-		controler.setMobsimFactory(new TransitSubModeQSimFactory(fixedSubMode));
-		
-		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
-//		controler.setUseTripRouting(true);
-		// now always true.  kai, may'13
-
 		controler.run();
+		
 	}
-	
+
+	/**
+	 * @return
+	 */
+	private static PConfigGroup getTestPConfig() {
+		PConfigGroup pConfig = new PConfigGroup();
+		pConfig.addParam("gridSize", "499.0");
+		pConfig.addParam("useFranchise", "false");
+		pConfig.addParam("timeSlotSize", "600.0");
+		return pConfig;
+	}
 }
+

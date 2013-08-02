@@ -17,22 +17,23 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.droeder.southAfrica;
+package playground.droeder.southAfrica.deprecated;
 
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.Controler;
 
-import playground.droeder.ptSubModes.qSimHook.TransitSubModeQSimFactory;
-import playground.droeder.ptSubModes.routing.PtSubModeRouterFactory;
-import playground.droeder.ptSubModes.routing.PtSubModeTripRouterFactory;
-
 /**
+ * @deprecated, overriding of the {@link Controler} should no longer be necessary.
+ * For that reason this class provides no longer any functionality.
+ * 
  * @author droeder
- *
+ * 
  */
+@Deprecated
 public class PtSubModeControler extends Controler {
+	@SuppressWarnings("unused")
 	private static final Logger log = Logger
 			.getLogger(PtSubModeControler.class);
 	
@@ -43,14 +44,14 @@ public class PtSubModeControler extends Controler {
 	 */
 	public PtSubModeControler(String configFile, boolean routeOnSameMode) {
 		super(configFile);
-		log.warn("This controler uses not the default-implementation of public transport. make sure this is what you want!");
-		super.setTransitRouterFactory(new PtSubModeRouterFactory(this, routeOnSameMode));
-		//necessary for departure-handling
-		super.setMobsimFactory(new TransitSubModeQSimFactory(routeOnSameMode));
-		super.setTripRouterFactory(new PtSubModeTripRouterFactory(this));
-
-		throw new RuntimeException("overriding of the run() method is no longer possible.  if this is needed, " +
-		"please talk to me for alternatives.  There is also no test for this execution path, otherwise I might have tried fixing it myself. Thanks, kai, feb'13") ;
+//		log.warn("This controler uses not the default-implementation of public transport. make sure this is what you want!");
+//		super.setTransitRouterFactory(new PtSubModeRouterFactory(this, routeOnSameMode));
+//		//necessary for departure-handling
+//		super.setMobsimFactory(new TransitSubModeQSimFactory(routeOnSameMode));
+//		super.setTripRouterFactory(new PtSubModeTripRouterFactory(this));
+//
+//		throw new RuntimeException("overriding of the run() method is no longer possible.  if this is needed, " +
+//		"please talk to me for alternatives.  There is also no test for this execution path, otherwise I might have tried fixing it myself. Thanks, kai, feb'13") ;
 }
 	
 	/**
@@ -60,16 +61,16 @@ public class PtSubModeControler extends Controler {
 	 */
 	public PtSubModeControler(Scenario sc, boolean routeOnSameMode) {
 		super(sc);
-		log.warn("This controler uses not the default-implementation of public transport. make sure this is what you want!");
-		super.setTransitRouterFactory(new PtSubModeRouterFactory(this, routeOnSameMode));
-		//necessary for departure-handling
-		super.setMobsimFactory(new TransitSubModeQSimFactory(routeOnSameMode));
-		super.setTripRouterFactory(new PtSubModeTripRouterFactory(this));
-
-		throw new RuntimeException("overriding of the run() method is no longer possible.  if this is needed, " +
-		"please talk to me for alternatives.  There is also no test for this execution path, otherwise I might have tried fixing it myself. Thanks, kai, feb'13") ;
+//		log.warn("This controler uses not the default-implementation of public transport. make sure this is what you want!");
+//		super.setTransitRouterFactory(new PtSubModeRouterFactory(this, routeOnSameMode));
+//		//necessary for departure-handling
+//		super.setMobsimFactory(new TransitSubModeQSimFactory(routeOnSameMode));
+//		super.setTripRouterFactory(new PtSubModeTripRouterFactory(this));
+//
+//		throw new RuntimeException("overriding of the run() method is no longer possible.  if this is needed, " +
+//		"please talk to me for alternatives.  There is also no test for this execution path, otherwise I might have tried fixing it myself. Thanks, kai, feb'13") ;
 	}
-	
+//	
 //	@Override
 //	public void run(){
 //		if(!(super.getTripRouterFactory() instanceof PtSubModeTripRouterFactory)){
