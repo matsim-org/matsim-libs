@@ -109,20 +109,19 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 	private int meetInsecure = 0;
 	
 	public SelectHouseholdMeetingPoint(Scenario scenario, Map<String,TravelTime> travelTimes,
-			CoordAnalyzer coordAnalyzer, Geometry affectedArea, ModeAvailabilityChecker modeAvailabilityChecker, 
-			InformedHouseholdsTracker informedHouseholdsTracker, DecisionModelRunner decisionModelRunner, 
-			MobsimDataProvider mobsimDataProvider) {
+			CoordAnalyzer coordAnalyzer, Geometry affectedArea, InformedHouseholdsTracker informedHouseholdsTracker, 
+			DecisionModelRunner decisionModelRunner, MobsimDataProvider mobsimDataProvider) {
 		this.scenario = scenario;
 		this.travelTimes = travelTimes;
 		this.coordAnalyzer = coordAnalyzer;
 		this.affectedArea = affectedArea;
-		this.modeAvailabilityChecker = modeAvailabilityChecker;
 		this.informedHouseholdsTracker = informedHouseholdsTracker;
 		this.mobsimDataProvider = mobsimDataProvider;
 		
 		this.numOfThreads = this.scenario.getConfig().global().getNumberOfThreads();
 		this.allMeetingsPointsSelected = new AtomicBoolean(false);
 		this.decisionDataProvider = decisionModelRunner.getDecisionDataProvider();
+		this.modeAvailabilityChecker = new ModeAvailabilityChecker(this.scenario, this.mobsimDataProvider);
 		
 		init();
 	}

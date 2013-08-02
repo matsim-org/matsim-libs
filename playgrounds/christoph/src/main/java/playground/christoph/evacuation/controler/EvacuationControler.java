@@ -578,7 +578,7 @@ public class EvacuationControler extends WithinDayController implements
 		travelTimes.put(TransportMode.car, this.getTravelTimeCollector());
 	
 		this.selectHouseholdMeetingPoint = new SelectHouseholdMeetingPoint(scenarioData, travelTimes, 
-				this.coordAnalyzer.createInstance(), this.affectedArea, this.modeAvailabilityChecker.createInstance(), 
+				this.coordAnalyzer.createInstance(), this.affectedArea,
 				this.informedHouseholdsTracker, this.decisionModelRunner, null);
 		this.getFixedOrderSimulationListener().addSimulationListener(this.selectHouseholdMeetingPoint);
 	}

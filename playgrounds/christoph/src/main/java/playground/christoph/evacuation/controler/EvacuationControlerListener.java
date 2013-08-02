@@ -85,7 +85,7 @@ public class EvacuationControlerListener implements StartupListener {
 	private AffectedAreaPenaltyCalculator penaltyCalculator;
 	private Geometry affectedArea;
 	
-	private ModeAvailabilityChecker modeAvailabilityChecker;
+//	private ModeAvailabilityChecker modeAvailabilityChecker;
 	private SelectHouseholdMeetingPoint selectHouseholdMeetingPoint;
 //	protected ModeAvailabilityChecker modeAvailabilityChecker;
 	
@@ -172,7 +172,7 @@ public class EvacuationControlerListener implements StartupListener {
 		 * ModeAvailabilityChecker to check which vehicles are available for
 		 * a household at a given facility.
 		 */
-		this.modeAvailabilityChecker = new ModeAvailabilityChecker(scenario, this.mobsimDataProvider);
+//		this.modeAvailabilityChecker = new ModeAvailabilityChecker(scenario, this.mobsimDataProvider);
 		
 		// workaround
 //		scenario.getConfig().scenario().setUseTransit(false);
@@ -181,7 +181,7 @@ public class EvacuationControlerListener implements StartupListener {
 		travelTimes.putAll(this.multiModalControlerListener.getMultiModalTravelTimes());
 		travelTimes.put(TransportMode.car, this.withinDayControlerListener.getTravelTimeCollector());
 		this.selectHouseholdMeetingPoint = new SelectHouseholdMeetingPoint(scenario, travelTimes, 
-				this.coordAnalyzer.createInstance(), this.affectedArea, this.modeAvailabilityChecker.createInstance(), 
+				this.coordAnalyzer.createInstance(), this.affectedArea, 
 				this.informedHouseholdsTracker, this.decisionModelRunner, this.mobsimDataProvider);
 		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(this.selectHouseholdMeetingPoint);
 	}
