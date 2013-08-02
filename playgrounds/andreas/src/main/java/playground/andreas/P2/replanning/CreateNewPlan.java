@@ -90,7 +90,8 @@ public class CreateNewPlan extends AbstractPStrategyModule {
 			
 			TransitStopFacility stop1 = cooperative.getRouteProvider().getRandomTransitStop(cooperative.getCurrentIteration());
 			TransitStopFacility stop2 = cooperative.getRouteProvider().getRandomTransitStop(cooperative.getCurrentIteration());
-			
+
+			// using config-defaults this is an infinite loop \\ DR, aug'13
 			while (CoordUtils.calcDistance(stop1.getCoord(), stop2.getCoord()) < this.minStopDistance) {
 				stop2 = cooperative.getRouteProvider().getRandomTransitStop(cooperative.getCurrentIteration());
 			}
@@ -107,6 +108,8 @@ public class CreateNewPlan extends AbstractPStrategyModule {
 			newPlan.setStopsToBeServed(stopsToBeServed);
 			
 			newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan));
+
+			// this may lead to an infinite loop as well, especially for smaller networks \\ DR, aug'13
 		} while (cooperative.getFranchise().planRejected(newPlan));		
 
 		return newPlan;

@@ -73,15 +73,9 @@ public class PTripRouterFactoryImpl implements TripRouterFactory {
 	private final TransitRouterFactory transitRouterFactory;
 	private Scenario scenario;
 
-	public PTripRouterFactoryImpl(final Controler controler) {
+	public PTripRouterFactoryImpl(final Controler controler, TransitRouterFactory transitRouterFactory) {
 		this.controler = controler;
-		this.transitRouterFactory = new TransitRouterImplFactory(
-	            scenario.getTransitSchedule(),
-	            new TransitRouterConfig(
-	                    config.planCalcScore(),
-	                    config.plansCalcRoute(),
-	                    config.transitRouter(),
-	                    config.vspExperimental()));
+		this.transitRouterFactory = transitRouterFactory;
 	}
 
 

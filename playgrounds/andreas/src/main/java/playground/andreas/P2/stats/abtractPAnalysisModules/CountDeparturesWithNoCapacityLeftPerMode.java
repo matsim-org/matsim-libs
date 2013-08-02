@@ -70,7 +70,13 @@ public class CountDeparturesWithNoCapacityLeftPerMode extends AbstractPAnalyisMo
 	public void updateVehicles(Vehicles vehicles) {
 		this.vehId2VehicleCapacity = new HashMap<Id, Integer>();
 		for (Vehicle veh : vehicles.getVehicles().values()) {
-			this.vehId2VehicleCapacity.put(veh.getId(), new Integer(veh.getType().getCapacity().getSeats() + veh.getType().getCapacity().getStandingRoom() - 1));
+			Integer seats = veh.getType().getCapacity().getSeats();
+			Integer standing = veh.getType().getCapacity().getStandingRoom();
+			// setting these values is not mandatory. Thus, they maybe null \\DR, aug'13
+			this.vehId2VehicleCapacity.put(veh.getId(), 
+							((seats == null) ? 0 : seats) + 
+							((standing == null) ? 0 : standing)
+							- 1);
 		}
 	}
 	

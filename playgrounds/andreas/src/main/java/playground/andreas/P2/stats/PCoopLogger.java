@@ -161,10 +161,13 @@ public class PCoopLogger implements StartupListener, IterationEndsListener, Shut
 
 	@Override
 	public void notifyShutdown(final ShutdownEvent controlerShudownEvent) {
-		try {
-			this.pCoopLoggerWriter.close();
-		} catch (IOException e) {
-			e.printStackTrace();
+		// check if logging is activated. Otherwise you run into a null-pointer here \\DR aug'13
+		if(this.pConfig.getLogCoops()){
+			try {
+				this.pCoopLoggerWriter.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 }

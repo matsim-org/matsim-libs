@@ -72,7 +72,14 @@ public class AverageLoadPerDeparturePerMode extends AbstractPAnalyisModule imple
 	public void updateVehicles(Vehicles vehicles) {
 		this.vehId2VehicleCapacity = new HashMap<Id, Double>();
 		for (Vehicle veh : vehicles.getVehicles().values()) {
-			this.vehId2VehicleCapacity.put(veh.getId(), new Double(veh.getType().getCapacity().getSeats() + veh.getType().getCapacity().getStandingRoom() - 1.0));
+			Integer seats = veh.getType().getCapacity().getSeats();
+			Integer standing = veh.getType().getCapacity().getStandingRoom();
+			// setting these values is not mandatory. Thus, they maybe null \\DR, aug'13
+			this.vehId2VehicleCapacity.put(veh.getId(), 
+					new Double(
+							((seats == null) ? 0 : seats) + 
+							((standing == null) ? 0 : standing)
+							- 1.0));
 		}
 	}
 	

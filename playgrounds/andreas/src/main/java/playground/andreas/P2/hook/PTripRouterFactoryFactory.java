@@ -26,6 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryInternal;
+import org.matsim.pt.router.TransitRouterFactory;
 
 /**
  * Decide which {@link TripRouterFactoryInternal} to use.
@@ -37,24 +38,34 @@ public class PTripRouterFactoryFactory {
 
 	private final static Logger log = Logger.getLogger(PTripRouterFactoryFactory.class);
 
-	public static TripRouterFactory getTripRouterFactoryInstance(Controler controler, Class<? extends TripRouterFactory> tripRouterFactory){
+	public static TripRouterFactory getTripRouterFactoryInstance(Controler controler, Class<? extends TripRouterFactory> tripRouterFactory, PTransitRouterFactory pTransitRouterFactory){
 
 		if(tripRouterFactory == null){
 			// standard case
-			return new PTripRouterFactoryImpl(controler);
+			return new PTripRouterFactoryImpl(controler, pTransitRouterFactory);
 		} else {
 
 			TripRouterFactory factory;
 			try {
-				Class<?>[] args = new Class[1];
-				args[0] = Controler.class;
-				Constructor<? extends TripRouterFactory> c = null;
 				try{
+					Class<?>[] args = new Class[1];
+					args[0] = Controler.class;
+					Constructor<? extends TripRouterFactory> c = null;
 					c = tripRouterFactory.getConstructor(args);
 					factory = c.newInstance(controler);
-				} catch(NoSuchMethodException e){
-					throw new NoSuchMethodException("Cannot find Constructor in TripRouterFactory " + tripRouterFactory.getSimpleName() + " with single argument of type Controler. " +
-							"ABORT!\n" );
+				}catch(NoSuchMethodException e){
+					try {
+						Class<?>[] args = new Class[2];
+						args[0] = Controler.class;
+						args[1] = TransitRouterFactory.class;
+						Constructor<? extends TripRouterFactory> c = null;
+						c = tripRouterFactory.getConstructor(args);
+						factory = c.newInstance(controler, pTransitRouterFactory);
+					} catch (NoSuchMethodException ee) {
+						throw new NoSuchMethodException("Cannot find Constructor in TripRouterFactory " + tripRouterFactory.getSimpleName() + 
+								" with single argument of type Controler or arguments of type Controler and TransitRouterFactory. " +
+								"ABORT!\n" );
+					}
 				}
 				log.info("Loaded TripRouterFactory " + tripRouterFactory.getSimpleName() + "...");
 			} catch (InstantiationException e) {

@@ -82,7 +82,8 @@ public class PHook implements IterationStartsListener, StartupListener, ScoringL
 		if (this.pTransitRouterFactory == null) {
 			this.pTransitRouterFactory = new PTransitRouterFactory(pConfig.getPtEnabler());
 		}
-		controler.setTransitRouterFactory(this.pTransitRouterFactory);
+		// When setting a TransitRouterFactory and also a TripRouterFactory in the controler a RuntimeException is thrown.
+//		controler.setTransitRouterFactory(this.pTransitRouterFactory);
 		controler.setMobsimFactory(new PQSimFactory());
 		this.pVehiclesFactory = new PVehiclesFactory(pConfig);
 
@@ -95,7 +96,7 @@ public class PHook implements IterationStartsListener, StartupListener, ScoringL
 			}
 		}
 		
-		controler.setTripRouterFactory(PTripRouterFactoryFactory.getTripRouterFactoryInstance(controler, tripRouterFactory));
+		controler.setTripRouterFactory(PTripRouterFactoryFactory.getTripRouterFactoryInstance(controler, tripRouterFactory, pTransitRouterFactory));
 		this.statsManager = new StatsManager(controler, pConfig, this.pBox, lineSetter); 
 	}
 	
