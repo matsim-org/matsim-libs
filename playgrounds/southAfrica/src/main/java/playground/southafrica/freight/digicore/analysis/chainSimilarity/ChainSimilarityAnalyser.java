@@ -53,8 +53,22 @@ public class ChainSimilarityAnalyser {
 		String outputfolder = args[1];
 		int numberOfThreads = Integer.parseInt(args[2]);
 		
-		execute(xmlFolder, outputfolder, numberOfThreads);
-		
+		double[] radii = {1, 5, 10, 15, 20, 25, 30, 35, 40};
+		int[] pmins = {1, 5, 10, 15, 20, 25};
+		for(double thisRadius : radii){
+			for(int thisPmin : pmins){
+				/* Find configuration-specific filenames.*/
+				String thisInput = String.format("%s%.0f_%d/xml2/", xmlFolder, thisRadius, thisPmin);
+				String thisOutput = String.format("%s%.0f_%d/chainSimilarity/", xmlFolder, thisRadius, thisPmin);
+				
+				LOG.info("=======================================================================================");
+				LOG.info(String.format(" Performing chain similarity analysis for radius %.0f and pmin %d", thisRadius, thisPmin));
+				LOG.info("=======================================================================================");
+				
+				execute(thisInput, thisOutput, numberOfThreads);
+			}
+		}
+
 		Header.printFooter();
 	}
 	
