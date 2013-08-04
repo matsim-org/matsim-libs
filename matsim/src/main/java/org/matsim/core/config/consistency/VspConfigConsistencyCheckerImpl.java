@@ -60,6 +60,12 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 			System.out.flush() ;
 			log.error("found marginal utility of money < 0.  You almost certainly want a value > 0 here. " ) ;
 		}
+		// added aug'13:
+		if ( config.planCalcScore().getMarginalUtlOfWaiting_utils_hr() != 0. ) {
+			problem = true ;
+			System.out.flush() ;
+			log.error("found marginal utility of waiting != 0.  vsp default is setting this to 0. " ) ;
+		}
 		
 		if ( config.getQSimConfigGroup()!=null && config.getQSimConfigGroup().isRemoveStuckVehicles() ) {
 			problem = true ;
@@ -89,7 +95,7 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 		
 		// added before nov'12
 		if ( config.timeAllocationMutator().getMutationRange() < 7200 ) {
-//			problem = true ;
+			problem = true ;
 			System.out.flush() ;
 			log.warn("timeAllocationMutator mutationRange < 7200; vsp default is 7200.  This will be more strictly" +
 					" enforced in the future. This means you have to add the following lines to your config file: ") ;
@@ -100,7 +106,7 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 		
 		// added before nov'12
 		if ( !config.vspExperimental().isRemovingUnneccessaryPlanAttributes() ) {
-//			problem = true ;
+			problem = true ;
 			System.out.flush() ;
 			log.warn("You are not removing unnecessary plan attributes; vsp default is to do that.  This will be more strictly" +
 					" enforced in the future.") ;
@@ -122,7 +128,7 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 		
 		// added jan'13
 		if ( ActivityDurationInterpretation.minOfDurationAndEndTime.equals(vspConfig.getActivityDurationInterpretation() ) ) {
-			// problem = true ;
+			problem = true ;
 			System.out.flush() ;
 			log.warn("You are using ActivityDurationInterpretation " + vspConfig.getActivityDurationInterpretation() + " ; vsp default is to use " +
 					ActivityDurationInterpretation.tryEndTimeThenDuration + " .  This will be more strictly enforced in the future.  " +
@@ -136,7 +142,7 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 		
 		// use beta_brain=1 // added as of nov'12
 		if ( config.planCalcScore().getBrainExpBeta() != 1. ) {
-//			problem = true ;
+			problem = true ;
 			System.out.flush() ;
 			log.warn("You are using a brainExpBeta != 1; vsp default is 1.  (Different values may cause conceptual " +
 					"problems during paper writing.) This will be more strictly "
