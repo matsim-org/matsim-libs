@@ -91,7 +91,7 @@ public class MatsimVertexImpl
     @Override
     public String toString()
     {
-        return "Vertex_" + id;
+        return "Vertex_" + id + " @ Link_" + link.getId();
     }
 
 

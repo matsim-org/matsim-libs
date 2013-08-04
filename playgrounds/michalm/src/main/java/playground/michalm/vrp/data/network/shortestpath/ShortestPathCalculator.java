@@ -62,26 +62,26 @@ public class ShortestPathCalculator
             int count = path.links.size();
             Id[] ids = new Id[count + 2];
             int[] accLinkTravelTimes = new int[count + 2];
-            int accTT = 0;
+            double accTT = 0;
 
             ids[0] = fromLink.getId();
             accTT = 0;//we start at the end of fromLink
             //actually, in QSim it is usually 1 second
             //(when INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES is ON;
             //otherwise it may take even longer)
-            accLinkTravelTimes[0] = accTT;
+            accLinkTravelTimes[0] = (int)accTT;
 
             for (int i = 0; i < count; i++) {
                 Link link = path.links.get(i);
                 ids[i + 1] = link.getId();
                 accTT += travelTime.getLinkTravelTime(link, departureTime + accTT, null, null);
-                accLinkTravelTimes[i + 1] = accTT;
+                accLinkTravelTimes[i + 1] = (int)accTT;
             }
 
             ids[count + 1] = toLink.getId();
-            int toLinkEnterTime = departureTime + accTT;
+            int toLinkEnterTime = departureTime + (int)accTT;
             accTT += travelTime.getLinkTravelTime(toLink, toLinkEnterTime, null, null);
-            accLinkTravelTimes[count + 1] = accTT;
+            accLinkTravelTimes[count + 1] = (int)accTT;
 
             double cost = path.travelCost
                     + travelDisutility.getLinkTravelDisutility(toLink, toLinkEnterTime, null, null);
