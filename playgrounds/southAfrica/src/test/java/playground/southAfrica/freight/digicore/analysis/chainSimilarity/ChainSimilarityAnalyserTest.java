@@ -1,0 +1,133 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2013 by the members listed in the COPYING,     *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package playground.southAfrica.freight.digicore.analysis.chainSimilarity;
+
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
+
+import org.junit.Test;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.testcases.MatsimTestCase;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Polygon;
+
+import playground.southafrica.freight.digicore.analysis.chainSimilarity.ChainSimilarityAnalyser;
+import playground.southafrica.freight.digicore.containers.DigicoreActivity;
+import playground.southafrica.freight.digicore.containers.DigicoreChain;
+import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
+
+public class ChainSimilarityAnalyserTest extends MatsimTestCase {
+
+	@Test
+	public void testConstructor() {
+
+	}
+	
+	public void testGetBuffer(){
+		DigicoreVehicle vehicle = setupVehicle();
+		
+		/* Chain 1. */
+		DigicoreChain chain = vehicle.getChains().get(0);
+		Polygon p1 = (Polygon) ChainSimilarityAnalyser.getBuffer(chain, 0.5).getEnvelope();
+		List<Coordinate> list = getCoordinateList(p1.getCoordinates());
+		assertTrue("Coordinate (0,0) not in buffer.", list.contains(new Coordinate(0.0, 0.0)));
+		assertTrue("Coordinate (1,0) not in buffer.", list.contains(new Coordinate(1.0, 0.0)));
+		assertTrue("Coordinate (0,3) not in buffer.", list.contains(new Coordinate(0.0, 3.0)));
+		assertTrue("Coordinate (1,3) not in buffer.", list.contains(new Coordinate(1.0, 3.0)));
+		
+		/* Chain 2. */
+		chain = vehicle.getChains().get(1);
+		Polygon p2 = (Polygon) ChainSimilarityAnalyser.getBuffer(chain, 0.5).getEnvelope();
+		list = getCoordinateList(p2.getCoordinates());
+		assertTrue("Coordinate (0,2) not in buffer.", list.contains(new Coordinate(0.0, 2.0)));
+		assertTrue("Coordinate (3,2) not in buffer.", list.contains(new Coordinate(3.0, 2.0)));
+		assertTrue("Coordinate (0,3) not in buffer.", list.contains(new Coordinate(0.0, 3.0)));
+		assertTrue("Coordinate (3,3) not in buffer.", list.contains(new Coordinate(3.0, 3.0)));
+	}
+	
+	
+	public void testGetOverlapPercentage(){
+		DigicoreVehicle vehicle = setupVehicle();
+		
+		DigicoreChain chain1 = vehicle.getChains().get(0);
+		DigicoreChain chain2 = vehicle.getChains().get(1);
+		double buffer = 0.5;		
+
+		Geometry rectangle1 = ChainSimilarityAnalyser.getBuffer(chain1, buffer).getEnvelope();
+		Geometry rectangle2 = ChainSimilarityAnalyser.getBuffer(chain2, buffer).getEnvelope();
+		double percentage = ChainSimilarityAnalyser.getPercentageOfInterSectionToUnion(rectangle1, rectangle2);
+		assertEquals("Wrong overlap area.", 1.0/5.0, percentage);
+	}
+	
+	
+	private List<Coordinate> getCoordinateList(Coordinate[] array){
+		List<Coordinate> list = new ArrayList<Coordinate>();
+		for(int i = 0; i < array.length; i++){
+			list.add(array[i]);
+		}
+		return list;
+	}
+	
+	
+	/**
+	 * Set up a vehicle with two chains:
+	 * 
+	 * 3  (0.5, 2.5)
+	 *      ._______. a3 (2.5, 2.5)
+	 * 2    | a2
+	 *      |
+	 * 1    |
+	 *      . a1
+	 * 0  (0.5, 0.5)
+	 * 
+	 *    0   1   2   3
+	 * @return
+	 */
+	private DigicoreVehicle setupVehicle(){
+		DigicoreVehicle vehicle = new DigicoreVehicle(new IdImpl(1));
+		
+		/* Set up activities. */
+		DigicoreActivity a1 = new DigicoreActivity("test", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH);
+		a1.setCoord(new CoordImpl(0.5, 0.5));
+		DigicoreActivity a2 = new DigicoreActivity("test", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH);
+		a2.setCoord(new CoordImpl(0.5, 2.5));
+		DigicoreActivity a3 = new DigicoreActivity("test", TimeZone.getTimeZone("GMT+2"), Locale.ENGLISH);
+		a3.setCoord(new CoordImpl(2.5, 2.5));
+		
+		/* Set up chains. */
+		DigicoreChain c1 = new DigicoreChain();
+		c1.add(a1);
+		c1.add(a2);
+		DigicoreChain c2 = new DigicoreChain();
+		c2.add(a2);
+		c2.add(a3);
+		
+		vehicle.getChains().add(c1);
+		vehicle.getChains().add(c2);
+		return vehicle;
+	}
+
+}

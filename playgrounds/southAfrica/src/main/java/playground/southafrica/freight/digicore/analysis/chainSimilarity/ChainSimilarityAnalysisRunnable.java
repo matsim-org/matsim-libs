@@ -17,54 +17,70 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.southafrica.freight.digicore.analysis.activity;
+package playground.southafrica.freight.digicore.analysis.chainSimilarity;
 
+import java.io.BufferedWriter;
 import java.io.File;
-import java.util.concurrent.Callable;
+import java.io.IOException;
+import java.util.List;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.utils.collections.Tuple;
+import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Counter;
 
-import playground.southafrica.freight.digicore.containers.DigicoreActivity;
 import playground.southafrica.freight.digicore.containers.DigicoreChain;
-import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
 import playground.southafrica.freight.digicore.io.DigicoreVehicleReader_v1;
 
-public class ActivityWithFacilityIdCallable implements Callable<Tuple<Id, Double>> {
-	final private File vehicleFile; 
-	final private Counter counter;
-	final private Logger log = Logger.getLogger(ActivityWithFacilityIdCallable.class);
+public class ChainSimilarityAnalysisRunnable implements Runnable {
+	private final File vehicleFile;
+	private final File outputFolder;
+	private final Counter counter;
 	
-	public ActivityWithFacilityIdCallable(File vehicleFile, Counter counter) {
+	public ChainSimilarityAnalysisRunnable(File vehicleFile, File outputFolder, Counter counter) {
 		this.vehicleFile = vehicleFile;
+		this.outputFolder = outputFolder;
 		this.counter = counter;
 	}
 	
 	@Override
-	public Tuple<Id, Double> call() throws Exception {
-		/* Read the vehicle file. */
+	public void run() {
+		/* Read the vehicle. */
 		DigicoreVehicleReader_v1 dvr = new DigicoreVehicleReader_v1();
 		dvr.parse(this.vehicleFile.getAbsolutePath());
-		DigicoreVehicle vehicle = dvr.getVehicle();
+		List<DigicoreChain> chains = dvr.getVehicle().getChains();
 		
-		/* Calculate the percentage of activities with a facility Id. */
-		int activitiesWithId = 0;
-		int activitiesTotal = 0;
-		for(DigicoreChain chain : vehicle.getChains()){
-			for(DigicoreActivity activity : chain.getAllActivities()){
-				if(activity.getFacilityId() != null){
-					activitiesWithId++;
+		String outputFile = this.outputFolder.getAbsolutePath() + 
+				"/" + dvr.getVehicle().getId().toString() + ".csv";
+		BufferedWriter bw = IOUtils.getAppendingBufferedWriter(outputFile);
+		try{
+			bw.write("Chain,Chain,Overlap");
+			bw.newLine();
+			
+			/* Analyse each chain combination. */
+			for(int i = 0; i < chains.size()-1; i++){
+				for(int j = i+1; j < chains.size(); j++){
+					DigicoreChain chain1 = chains.get(i);
+					DigicoreChain chain2 = chains.get(j);
+					
+					/*TODO The buffer is hard coded as 100m. */
+					double overlap = ChainSimilarityAnalyser.getPercentageOverlap(chain1, chain2, 100);
+					
+					/* Write output. */
+					bw.write(String.format("%d,%d,%.6f\n", i, j, overlap));
 				}
-				activitiesTotal++;
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+			throw new RuntimeException("Cannot write to " + outputFile);
+		} finally{
+			try {
+				bw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+				throw new RuntimeException("Cannot close " + outputFile);
 			}
 		}
-		this.counter.incCounter();
 		
-		double percentage = ((double)activitiesWithId) / ((double)activitiesTotal);
-		Tuple<Id, Double> tuple = new Tuple<Id, Double>(vehicle.getId(), percentage);
-		return tuple;
+		counter.incCounter();
 	}
 
 }

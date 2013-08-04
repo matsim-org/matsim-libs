@@ -254,10 +254,10 @@ public class ActivityAnalyser {
 				tuple = job.get();
 			} catch (InterruptedException e) {
 				e.printStackTrace();
-				throw new RuntimeException("Could get the results to consolidate from the multi-threaded run.");
+				throw new RuntimeException("Could not get the results to consolidate from the multi-threaded run.");
 			} catch (ExecutionException e) {
 				e.printStackTrace();
-				throw new RuntimeException("Could get the results to consolidate from the multi-threaded run.");
+				throw new RuntimeException("Could not get the results to consolidate from the multi-threaded run.");
 			}
 			map.put(tuple.getFirst(), tuple.getSecond());
 		}
