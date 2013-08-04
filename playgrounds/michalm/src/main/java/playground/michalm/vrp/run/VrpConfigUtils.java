@@ -21,6 +21,7 @@ package playground.michalm.vrp.run;
 
 import org.matsim.core.config.*;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculatorConfigGroup;
 
 
 public class VrpConfigUtils
@@ -28,9 +29,10 @@ public class VrpConfigUtils
     public static Config createConfig()
     {
         Config config = ConfigUtils.createConfig();
-        QSimConfigGroup qSimConfig = new QSimConfigGroup();
-        config.addQSimConfigGroup(qSimConfig);
-        updateQSimConfigGroup(qSimConfig);
+        
+        updateQSimConfigGroup(config);
+        updateTravelTimeCalculatorConfigGroup(config);
+        
         return config;
     }
 
@@ -39,15 +41,10 @@ public class VrpConfigUtils
     {
         @SuppressWarnings("unchecked")
         Config config = ConfigUtils.loadConfig(filename);
-        QSimConfigGroup qSimConfig = config.getQSimConfigGroup();
 
-        if (qSimConfig == null) {
-            qSimConfig = new QSimConfigGroup();
-            config.addQSimConfigGroup(qSimConfig);
-        }
-
-        updateQSimConfigGroup(qSimConfig);
-        config.getQSimConfigGroup().setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
+        updateQSimConfigGroup(config);
+        updateTravelTimeCalculatorConfigGroup(config);
+        
         return config;
     }
 
@@ -56,12 +53,26 @@ public class VrpConfigUtils
      * Dynamic Taxi (and other VRP's) are designed for and validated against these QSimConfigGroup
      * settings only.
      */
-    private static void updateQSimConfigGroup(QSimConfigGroup qSimConfig)
+    private static void updateQSimConfigGroup(Config config)
     {
+        QSimConfigGroup qSimConfig = config.getQSimConfigGroup();
+
+        if (qSimConfig == null) {
+            qSimConfig = new QSimConfigGroup();
+            config.addQSimConfigGroup(qSimConfig);
+        }
+
         qSimConfig.setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
         qSimConfig.setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE);
         qSimConfig.setRemoveStuckVehicles(false);
         qSimConfig.setStartTime(0);
         qSimConfig.setSimStarttimeInterpretation(QSimConfigGroup.ONLY_USE_STARTTIME);
+    }
+    
+
+    private static void updateTravelTimeCalculatorConfigGroup(Config config)
+    {
+        TravelTimeCalculatorConfigGroup configGroup = config.travelTimeCalculator();
+        //configGroup.setTravelTimeGetterType("linearinterpolation");
     }
 }
