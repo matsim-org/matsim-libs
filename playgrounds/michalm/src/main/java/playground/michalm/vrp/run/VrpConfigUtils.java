@@ -29,10 +29,10 @@ public class VrpConfigUtils
     public static Config createConfig()
     {
         Config config = ConfigUtils.createConfig();
-        
+
         updateQSimConfigGroup(config);
         updateTravelTimeCalculatorConfigGroup(config);
-        
+
         return config;
     }
 
@@ -44,7 +44,7 @@ public class VrpConfigUtils
 
         updateQSimConfigGroup(config);
         updateTravelTimeCalculatorConfigGroup(config);
-        
+
         return config;
     }
 
@@ -68,11 +68,12 @@ public class VrpConfigUtils
         qSimConfig.setStartTime(0);
         qSimConfig.setSimStarttimeInterpretation(QSimConfigGroup.ONLY_USE_STARTTIME);
     }
-    
+
 
     private static void updateTravelTimeCalculatorConfigGroup(Config config)
     {
         TravelTimeCalculatorConfigGroup configGroup = config.travelTimeCalculator();
-        //configGroup.setTravelTimeGetterType("linearinterpolation");
+        configGroup.setTravelTimeGetterType("average");
+        // configGroup.setTravelTimeGetterType("linearinterpolation");
     }
 }
