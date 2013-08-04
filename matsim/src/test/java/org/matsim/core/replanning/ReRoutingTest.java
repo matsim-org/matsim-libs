@@ -47,6 +47,9 @@ public class ReRoutingTest extends MatsimTestCase {
 
 	/*package*/ static final Logger log = Logger.getLogger(ReRoutingTest.class);
 
+	/**
+	 * This test seems to have race conditions somewhere (i.e. it fails intermittently without code changes). kai, aug'13
+	 */
 	public void testReRouting() {
 		Config config = loadConfig(getInputDirectory() + "config.xml");
 		config.simulation().setTimeStepSize(10.0);
