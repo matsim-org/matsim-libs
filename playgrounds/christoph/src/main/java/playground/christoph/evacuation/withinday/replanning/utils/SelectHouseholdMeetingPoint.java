@@ -229,10 +229,7 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 					for (Id householdId : this.informedHouseholdsTracker.getHouseholdsInformedInLastTimeStep()) {
 						
 						Household household = households.getHouseholds().get(householdId);
-						
-						// ignore empty households
-						if (household.getMemberIds().size() == 0) continue;
-												
+													
 						((SelectHouseholdMeetingPointRunner) runnables[roundRobin % this.numOfThreads]).addHouseholdToCheck(household);
 						roundRobin++;
 					}
@@ -254,10 +251,7 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 					for (Id householdId : this.informedHouseholdsTracker.getHouseholdsInformedInLastTimeStep()) {
 						
 						Household household = households.getHouseholds().get(householdId);
-						
-						// ignore empty households
-						if (household.getMemberIds().size() == 0) continue;
-						
+												
 						HouseholdDecisionData hdd = this.decisionDataProvider.getHouseholdDecisionData(householdId);
 
 						Id homeFacilityId = hdd.getHomeFacilityId();

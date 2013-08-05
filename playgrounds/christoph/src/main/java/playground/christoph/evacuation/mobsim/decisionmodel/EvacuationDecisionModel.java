@@ -72,11 +72,6 @@ public class EvacuationDecisionModel implements HouseholdDecisionModel {
 				
 		HouseholdDecisionData hdd = this.decisionDataProvider.getHouseholdDecisionData(household.getId()); 
 		
-		if (household.getMemberIds().size() == 0) {
-//			hdd.setEvacuationDecision(EvacuationDecision.NEVER);
-			return;
-		}
-		
 		/*
 		 * If the EvacuationDecisionBehaviour is set to SHARE, only a subset of all households
 		 * (defined by the share parameter) evacuates. Otherwise a model is used to select the

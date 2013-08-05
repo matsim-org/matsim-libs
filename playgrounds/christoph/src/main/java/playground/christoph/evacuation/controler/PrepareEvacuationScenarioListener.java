@@ -20,8 +20,10 @@
 
 package playground.christoph.evacuation.controler;
 
+import java.util.Iterator;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -58,6 +60,7 @@ import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.households.Household;
+import org.matsim.households.Households;
 import org.matsim.pt.router.TransitRouterFactory;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
@@ -69,6 +72,8 @@ import playground.christoph.evacuation.vehicles.HouseholdVehicleAssignmentReader
 
 public class PrepareEvacuationScenarioListener {
 
+	private static final Logger log = Logger.getLogger(PrepareEvacuationScenarioListener.class);
+	
 	private final TravelDisutilityFactory travelDisutilityFactory = new TravelCostCalculatorFactoryImpl();
 	private final TravelTime travelTime = new FreeSpeedTravelTime();
 	
@@ -112,6 +117,12 @@ public class PrepareEvacuationScenarioListener {
 		 * With the new demand, this should not be necessary anymore!
 		 */
 		checkLegModes(scenario, createTripRouterInstance(scenario, tripRouterFactory));
+		
+		/*
+		 * Remove households without assigned members. They should not exist at all but
+		 * still some are there and confuse the analysis code.
+		 */
+		removeEmptyHouseholds(scenario);
 		
 		/*
 		 * Read household vehicles from files. Then create vehicles for the
@@ -183,6 +194,22 @@ public class PrepareEvacuationScenarioListener {
 		legModeChecker.setToCarProbability(0.5);
 		legModeChecker.run(scenario.getPopulation());
 		legModeChecker.printStatistics();	
+	}
+	
+	private void removeEmptyHouseholds(Scenario scenario) {
+		
+		Households households = ((ScenarioImpl) scenario).getHouseholds();
+		
+		int removed = 0;
+		Iterator<Household> iter = households.getHouseholds().values().iterator();
+		while (iter.hasNext()) {
+			Household household = iter.next();
+			if (household.getMemberIds().size() == 0) {
+				iter.remove();
+				removed++;
+			}
+		}
+		log.info("Removed " + removed + " households without any assigned member.");
 	}
 	
 	private void createVehicles(Scenario scenario) {

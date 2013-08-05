@@ -61,9 +61,7 @@ public class EvacuationPopulationAgentSource implements AgentSource {
         Vehicles vehicles = ((ScenarioImpl) scenario).getVehicles();
         
         for (Household household : ((ScenarioImpl) scenario).getHouseholds().getHouseholds().values()) {
-        	
-        	if (household.getMemberIds().size() == 0) continue;
-        	
+        	        	
         	for (Id personId : household.getMemberIds()) {
         		Person p = scenario.getPopulation().getPersons().get(personId);
         		MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson(p);

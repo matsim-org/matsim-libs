@@ -68,12 +68,10 @@ public class DecisionDataGrabber {
 	}
 	
 	private void createDecisionData(DecisionDataProvider decisionDataProvider) {
+		
 		for (Household household : ((ScenarioImpl) scenario).getHouseholds().getHouseholds().values()) {
 
 			Id householdId = household.getId();
-			
-			// ignore empty households
-			if (household.getMemberIds().size() == 0) continue;
 			
 			HouseholdDecisionData hdd = new HouseholdDecisionData(householdId);
 			decisionDataProvider.addHouseholdDecisionData(householdId, hdd);
@@ -87,10 +85,8 @@ public class DecisionDataGrabber {
 	}
 	
 	private void collectDecisionData(DecisionDataProvider decisionDataProvider) {
+		
 		for (Household household : ((ScenarioImpl) scenario).getHouseholds().getHouseholds().values()) {
-
-			// ignore empty households
-			if (household.getMemberIds().size() == 0) continue;
 			
 			// Check whether household has children and identify possible parents (= oldest male and female household members).
 			boolean hasChildren = false;

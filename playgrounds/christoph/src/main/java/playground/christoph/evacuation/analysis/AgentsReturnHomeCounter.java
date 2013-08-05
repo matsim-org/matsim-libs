@@ -123,8 +123,6 @@ public class AgentsReturnHomeCounter implements AgentDepartureEventHandler, Acti
 	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 		// set initial values in maps
 		for (Household household : ((ScenarioImpl) scenario).getHouseholds().getHouseholds().values()) {
-			// ignore households without members
-			if (household.getMemberIds().size() == 0) continue;
 			
 			Id homeFacilityId = this.decisionDataProvider.getHouseholdDecisionData(household.getId()).getHomeFacilityId();
 			for (Id personId : household.getMemberIds()) {

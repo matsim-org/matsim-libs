@@ -86,10 +86,7 @@ public class HouseholdsInformer implements MobsimEngine {
 	private void selectInformationTimes(Households households) {
 
 		for (Household household : households.getHouseholds().values()) {
-			
-			// skip households without members
-			if (household.getMemberIds().size() == 0) continue;
-			
+						
 			double delay = calculateInformationDelay(household.getId());
 
 			/*

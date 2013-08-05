@@ -108,9 +108,6 @@ public class DecisionModelRunner implements MobsimInitializedListener, MobsimBef
 			
 			Household household = ((ScenarioImpl) scenario).getHouseholds().getHouseholds().get(householdId);
 			
-			// ignore empty households
-			if (household.getMemberIds().size() == 0) continue;
-			
 			this.evacuationDecisionModel.runModel(household);
 			this.latestAcceptedLeaveTimeModel.runModel(household);
 		}

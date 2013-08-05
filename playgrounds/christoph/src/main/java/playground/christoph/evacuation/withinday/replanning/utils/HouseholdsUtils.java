@@ -141,10 +141,7 @@ public class HouseholdsUtils implements ActivityStartEventHandler, ActivityEndEv
 		householdInfoMap = new HashMap<Id, HouseholdInfo>();
 		personHouseholdInfoMap = new HashMap<Id, HouseholdInfo>();
 		
-		for(Household household : ((ScenarioImpl) scenario).getHouseholds().getHouseholds().values()) {
-
-			// ignore households without members
-			if (household.getMemberIds().size() == 0) continue;
+		for (Household household : ((ScenarioImpl) scenario).getHouseholds().getHouseholds().values()) {
 				
 			Person person = scenario.getPopulation().getPersons().get(household.getMemberIds().get(0));
 			Activity firstActivity = (Activity) person.getSelectedPlan().getPlanElements().get(0);

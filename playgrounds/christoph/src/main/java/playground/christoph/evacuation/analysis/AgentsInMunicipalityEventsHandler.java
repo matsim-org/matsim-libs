@@ -123,7 +123,6 @@ public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler,
 	
 	private void getResidents() {
 		for (Household household : ((ScenarioImpl) scenario).getHouseholds().getHouseholds().values()) {
-			if (household.getMemberIds().size() == 0) continue;
 			
 			boolean isAffected = this.isHouseholdAffected(household);
 			
