@@ -48,6 +48,9 @@
   	<repository>
    		<id>jsprit-snapshots</id>
    		<url>https://github.com/jsprit/mvn-rep/raw/master/snapshots</url>
+   		<snapshots>
+            <updatePolicy>always</updatePolicy>
+        </snapshots>
 	</repository>
 </repositories>
 	
