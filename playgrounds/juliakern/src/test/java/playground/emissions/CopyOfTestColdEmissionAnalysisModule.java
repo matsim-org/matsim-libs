@@ -49,7 +49,7 @@ import playground.vsp.emissions.types.HbefaVehicleCategory;
  * public: 
  * ceam module parameter - implicitly tested in calculateColdEmissionAndThrowEventTest, rescaleColdEmissionTest 
  * ceam - constructor, nothing to test 
- * reset - nothing to test? TODO Benjamin fragen
+ * reset - nothing to test
  * calculate cold emissions and throw event - calculateColdEmissionsAndThrowEventTest
  * 
  * private:
@@ -58,11 +58,9 @@ import playground.vsp.emissions.types.HbefaVehicleCategory;
  * convert string to tuple - implicitly tested in calculateColdEmissionAndThrowEventTest, rescaleColdEmissionTest
  */
 
-//TODO benjamin -> das runden der distanz und parkdauer auf ganzzahlige werte testen - calculate cold emissions?
-
 public class CopyOfTestColdEmissionAnalysisModule {
 
-	String passengercar= "PASSENGER_CAR", heavygoodsvehicle="HEAVY_GOODS_VEHICLE"; //erluabte strings fuer veh. categorie sind genau diese
+	String passengercar= "PASSENGER_CAR", heavygoodsvehicle="HEAVY_GOODS_VEHICLE"; 
 	Double startTime = 0.0, parkingDuration =1., accDistance = 1.;
 	// same values as int for table
 	int tableParkingDuration=1, tableAccDistance =1;
@@ -121,12 +119,10 @@ public class CopyOfTestColdEmissionAnalysisModule {
 		// -> use average table	
 		Collections.addAll(testCase4, passengercar, "", "", "", averageAverageFactor);		
 		// fifth case: cold emission factor not set
-		// TODO benjamin-> kann das passieren?
 		// wird wie 0.0 behandelt
 		Collections.addAll(testCase5, passengercar, pcpetrol, petrol, nullcase, .0);		
 		// sixth case: heavy goods vehicle 
 		// -> throw warning -> use detailed or average table for passenger cars
-		//TODO -> benjamin: kann ich die warnmeldung ueberpruefen?
 		Collections.addAll(testCase6, heavygoodsvehicle, pcpetrol, petrol, none, petrolFactor);
 		// seventh case: vehicleInfoForNoCase
 		

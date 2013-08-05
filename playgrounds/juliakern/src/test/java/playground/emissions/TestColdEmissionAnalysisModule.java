@@ -42,7 +42,9 @@ import playground.vsp.emissions.types.HbefaColdEmissionFactorKey;
 import playground.vsp.emissions.types.HbefaVehicleAttributes;
 import playground.vsp.emissions.types.HbefaVehicleCategory;
 
-/*
+/**
+ * @author julia
+ * 
  * test for playground.vsp.emissions.ColdEmissionAnalysisModule
  * 
  * ColdEmissionAnalysisModule (ceam) 

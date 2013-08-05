@@ -45,7 +45,6 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 	EmissionUtils emissionUtils;
 
 	public EmissionsPerLinkWarmEventHandler(double simulationEndTime, int noOfTimeBins){
-		System.out.println("number of time bins " + noOfTimeBins);
 		this.noOfTimeBins = noOfTimeBins;
 		this.timeBinSize = simulationEndTime / noOfTimeBins;
 		this.emissionUtils = new EmissionUtils();

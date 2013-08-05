@@ -40,6 +40,8 @@ public class TestEmissionsPerLinkWarmEventHandler {
 	 * test for playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkWarmEventHandler
 	 * or
 	 * 			playground.julia.scenarios.munich.analysis.nectar.EmissionPerLinkWarmEventHandler
+	 * 
+	 * @author Julia
 	 */
 	
 	/*
@@ -65,6 +67,7 @@ public class TestEmissionsPerLinkWarmEventHandler {
 	Map<WarmPollutant, Double> warmEmissions;
 	
 	WarmEmissionEvent event1, event2, event3, event4, event5, event6, event7;
+	
 	@Test
 	public void handleEventTest(){
 		
@@ -104,8 +107,7 @@ public class TestEmissionsPerLinkWarmEventHandler {
 		Assert.assertEquals(soValue, handler.getWarmEmissionsPerLinkAndTimeInterval().get(calulatedEndOfTimeInterval).get(linkId).get(WarmPollutant.SO2), MatsimTestUtils.EPSILON);
 		
 		// everything else should be zero or null or throw an exception
-		// es gibt keinen Eintrag unter dieser LinkId .... das soll vermutlich auch so sein. 
-		// ansonsten muesste fuer jedes Zeitintervall fuer jeden link eine leere map hinterlegt werden
+		// there is no entry for these link id, time and pollutant combinations -> throw exception
 		try{
 			handler.getWarmEmissionsPerLinkAndTimeInterval().get(0.0).get(linkId);
 		}catch(NullPointerException e){
@@ -169,7 +171,6 @@ public class TestEmissionsPerLinkWarmEventHandler {
 		event5 = new WarmEmissionEventImpl(timeOfEvent5, linkId2, vehicleId, null);
 		handler.handleEvent(event5);
 		// check event 5
-		System.out.println(handler.getWarmEmissionsPerLinkAndTimeInterval().get(simulationEndTime).get(linkId2));
 		for (WarmPollutant wp: WarmPollutant.values()){
 			Assert.assertEquals(0.0, handler.getWarmEmissionsPerLinkAndTimeInterval().get(intervalEndOfEvent5).get(linkId2).get(wp), MatsimTestUtils.EPSILON);
 		}		

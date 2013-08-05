@@ -110,7 +110,7 @@ public class EmissionsPerLinkWarmEventHandlerV1 implements WarmEmissionEventHand
 				warmEmissionsTotal.put(linkId, map);
 			}
 			
-			// get previous counts or set them to zero 
+			// get previous counts or initialize them as zero 
 			if(this.time2linkIdLeaveCount != null && this.time2linkIdLeaveCount.containsKey(endOfTimeInterval)){
 				countTotal.putAll(this.time2linkIdLeaveCount.get(endOfTimeInterval));	
 			}else{ // no counts so far - initialize as zero
@@ -165,7 +165,7 @@ public class EmissionsPerLinkWarmEventHandlerV1 implements WarmEmissionEventHand
 			this.time2linkIdLeaveCount.put(endOfTimeInterval, countTotal);
 		}
 		} // -- end of 'catch'
-		// do nothing if time of event is later than the simulation end
+		// do nothing if time of event is later than the simulation end TODO Benjamin: soll das so sein?
 	}
 
 	public Map<Double, Map<Id, Double>> getTime2linkIdLeaveCount() {

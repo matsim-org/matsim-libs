@@ -20,10 +20,7 @@
 
 package playground.emissions;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import junit.framework.Assert;
@@ -44,13 +41,16 @@ import playground.vsp.emissions.types.HbefaWarmEmissionFactor;
 import playground.vsp.emissions.types.HbefaWarmEmissionFactorKey;
 import playground.vsp.emissions.types.WarmPollutant;
 
-//TODO update doc
+/**
+ * @author julia
+ **/
+
 /*
  * test for playground.vsp.emissions.WarmEmissionAnalysisModule
  * 
  * WarmEmissionAnalysisModule (weam) 
- * public: 
- * weamParameter - testWarmEmissionAnalysisParameter, testWarmEmissionAnalysisModule_exceptions
+ * public methods and corresponding tests: 
+ * weamParameter - testWarmEmissionAnalysisParameter
  * throw warm EmissionEvent - testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent*, testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent_Exceptions
  * check vehicle info and calculate warm emissions -testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent*, testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent_Exceptions
  * get free flow occurences - testCounters*()
@@ -61,10 +61,10 @@ import playground.vsp.emissions.types.WarmPollutant;
  * get top go km couter - testCounters*()
  * get warm emission event counter - testCounters*()
  * 
- * private: //TODO werden die implizit getestet? sonst: tests schreiben
- * rescale warm emissions
- * calculate warm emissions
- * convert string 2 tuple
+ * private methods and corresponding tests: 
+ * rescale warm emissions - rescaleWarmEmissionsTest()
+ * calculate warm emissions - implicitly tested
+ * convert string 2 tuple - implicitly tested
  * 
  */
 
@@ -149,56 +149,23 @@ public class TestWarmEmissionAnalysisModule {
 	
 	@Test 
 	public void testWarmEmissionAnalysisParameter(){
-		WarmEmissionAnalysisModuleParameter weamp = new WarmEmissionAnalysisModuleParameter(null, null, null);
+		setUp();
+		WarmEmissionAnalysisModuleParameter weamp = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, avgHbefaWarmTable, null);
 		Assert.assertEquals(weamp.getClass(), WarmEmissionAnalysisModuleParameter.class);
-		//null als Konstructoreingabe erlaubt, exception erst bei Konstruction des WEAM
-		// soll das so sein? 
-		// koennten logger-warnungen/abort im weamParameter oder waem einbauen - ja TODO
-		// auch  mit assert moeglich
-		// dann diesen test anpassen
+		weamp = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, null, detailedHbefaWarmTable);
+		Assert.assertEquals(weamp.getClass(), WarmEmissionAnalysisModuleParameter.class);
 	}
 	
-	@Test
-	public void testWarmEmissionAnalysisModule_exceptions(){
+	//@Test
+	//public void testWarmEmissionAnalysisModule_exceptions(){
 		
-		/* test the constructor of warmEmissionAnalysisModule
-		 * WarmEmissionAnalysisModule(WarmEmissionAnalysisModuleParameter, EventsManager, EmissionEfficiencyFactor)
-		 * if all arguments or the WarmEmissionAnalysisModuleParameter or the EventsManager are 'null' -> throw exception
-		 * EmissionEfficiencyFactor = 'null' is allowed and therefor not tested here
+		/* out-dated 
+		 * the constructor aborts if either the 
+		 * warm emission analysis module parameter or
+		 * the events mangager is null
+		 * EmissionEfficiencyFactor = 'null' is allowed and therefore not tested here
 		 */
 		
-		setUp();
-		excep= false;
-		
-		WarmEmissionAnalysisModule weam2;
-		weamp = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, avgHbefaWarmTable, detailedHbefaWarmTable);
-		Double emissionEfficiencyFactor = 1.0;
-		EventsManager emissionEventManager = new HandlerToTestEmissionAnalysisModules();
-		
-		ArrayList<ArrayList> testCases = new ArrayList<ArrayList>();		
-		ArrayList<Object> testCase1= new ArrayList<Object>(), testCase2= new ArrayList<Object>(), testCase3= new ArrayList<Object>();
-		
-		Collections.addAll(testCase1, null, null, null);
-		Collections.addAll(testCase2, weamp, null, emissionEfficiencyFactor); //TODO abort
-		Collections.addAll(testCase3, null, emissionEventManager, emissionEfficiencyFactor);
-		
-		testCases.add(testCase1); 
-		// testCases.add(testCase2); // hier keinen Handler zu uebergeben wirft keine Fehler! TODO Test wieder hinzufuegen, wenn die methode korrigiert ist 
-		testCases.add(testCase3);  
-		
-		for(List<Object> tc: testCases){
-			try{
-				weam2 = new WarmEmissionAnalysisModule((WarmEmissionAnalysisModuleParameter)tc.get(0), (EventsManager)tc.get(1),(Double)tc.get(2));
-			}catch(NullPointerException e){
-				excep = true;
-			}catch(Exception f){
-				Assert.fail("something wrong with the test itself. This should not happen");
-				System.out.println(f.getMessage());
-			}
-			Assert.assertTrue("initilizing a warm emission analysis module with 'null' input should fail", excep);
-			excep= false;
-		}		
-	}
 	
 	@Test
 	public void testCheckVehicleInfoAndCalculateWarmEmissions_and_throwWarmEmissionEvent1(){
@@ -324,8 +291,6 @@ public class TestWarmEmissionAnalysisModule {
 		Assert.assertEquals(numberOfWarmPollutants*detailedZeroFactorFf*zeroLinklength/1000., HandlerToTestEmissionAnalysisModules.getSum(), MatsimTestUtils.EPSILON);
 		HandlerToTestEmissionAnalysisModules.reset(); warmEmissions.clear();
 		
-		// TODO warning - im em. module tab. konstruktion anguckene, dort evtl konsitenztest einbauen
-		
 	}
 	
 	@Test 
@@ -346,8 +311,6 @@ public class TestWarmEmissionAnalysisModule {
 		//avg<sg -> use sg factors 
 		warmEmissions= weam.checkVehicleInfoAndCalculateWarmEmissions(sgffPersonId, roadType, sgffDetailedFfSpeed/3.6, sgffLinklength, 2*sgffLinklength/sgffDetailedFfSpeed*3.6, sgffVehicleInformaition);
 		Assert.assertEquals(detailedSgffFactorSg*sgffLinklength/1000., warmEmissions.get(WarmPollutant.NO2), MatsimTestUtils.EPSILON);
-		
-		//TODO warning
 	}
 	
 	@Test
@@ -629,8 +592,6 @@ public class TestWarmEmissionAnalysisModule {
 		Double inconff = 30. * 1000;
 		Double inconffavgSpeed = petrolSpeedFf*2.2;
 		String inconffVehicleInformation = passengercar + ";"+petrolTechnology+";"+petrolSizeClass+";"+petrolConcept;
-		//TODO  inkonsistenter ff-speed wird nicht ueberprueft. darf das so bleiben? - gehoert ins emission module, kkonstruktion tabellen
-		// wenn ja: diese methode unnoetig -> dok, dann loeschen
 		
 		// average speed equals free flow speed from table
 		warmEmissions =weam.checkVehicleInfoAndCalculateWarmEmissions(inconffPersonId, roadType, inconffavgSpeed/3.6, inconff, inconff/petrolSpeedFf*3.6, inconffVehicleInformation);
@@ -650,7 +611,6 @@ public class TestWarmEmissionAnalysisModule {
 		Assert.assertEquals(1, weam.getWarmEmissionEventCounter());
 		
 		warmEmissions =weam.checkVehicleInfoAndCalculateWarmEmissions(inconffPersonId, roadType, inconffavgSpeed/3.6, inconff, 2*inconff/(petrolSpeedFf+petrolSpeedSg)*3.6, inconffVehicleInformation);
-		// TODO test ueberdenken nachdem emission module geaendert wurde
 	}
 	
 	@Test
@@ -662,9 +622,6 @@ public class TestWarmEmissionAnalysisModule {
 		Id tablePersonId = new IdImpl("person 8");
 		Double tableLinkLength= 30.*1000;
 		String tableVehicleInformation = passengercar + ";" + tableTechnology +";" + tableSizeClass+";"+tableConcept;
-		
-		//TODO : falls die sg-geschwindigkeit > ff-geschwindigkeit 
-		// wird das beim Erstellen der Tabelle ueberprueft?
 		
 		// ff < avg < sg - handled like free flow 
 		weam.checkVehicleInfoAndCalculateWarmEmissions(tablePersonId, roadType, tableffSpeed/3.6, tableLinkLength, 2* tableLinkLength/(tableffSpeed+tablesgSpeed)*3.6, tableVehicleInformation);

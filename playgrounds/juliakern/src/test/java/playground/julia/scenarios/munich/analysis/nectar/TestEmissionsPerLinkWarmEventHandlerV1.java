@@ -40,6 +40,8 @@ public class TestEmissionsPerLinkWarmEventHandlerV1 {
 	 * test for playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkWarmEventHandler
 	 * or
 	 * 			playground.julia.scenarios.munich.analysis.nectar.EmissionPerLinkWarmEventHandler
+	 * 
+	 * @author Julia
 	 */
 	
 	/*
@@ -104,8 +106,7 @@ public class TestEmissionsPerLinkWarmEventHandlerV1 {
 		Assert.assertEquals(soValue, handler.getWarmEmissionsPerLinkAndTimeInterval().get(calulatedEndOfTimeInterval).get(linkId).get(WarmPollutant.SO2), MatsimTestUtils.EPSILON);
 		
 		// everything else should be zero or null or throw an exception
-		// es gibt keinen Eintrag unter dieser LinkId .... das soll vermutlich auch so sein. 
-		// ansonsten muesste fuer jedes Zeitintervall fuer jeden link eine leere map hinterlegt werden
+		// there is no entry for these link id, time and pollutant combinations -> throw exception
 		try{
 			handler.getWarmEmissionsPerLinkAndTimeInterval().get(0.0).get(linkId);
 		}catch(NullPointerException e){

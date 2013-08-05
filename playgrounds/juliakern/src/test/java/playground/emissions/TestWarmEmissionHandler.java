@@ -24,33 +24,28 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
-//import playground.vsp.analysis.modules.emissionsAnalyzer.*;
 import playground.vsp.emissions.events.WarmEmissionEvent;
 import playground.vsp.emissions.events.WarmEmissionEventImpl;
 import playground.vsp.emissions.types.WarmPollutant;
 import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsPerPersonWarmEventHandler;
 
-//test for playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsPerPersonWarmEventHandler
+/**
+ * @author julia
+ * 
+ * test for playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsPerPersonWarmEventHandler
+ **/
 
 public class TestWarmEmissionHandler {
-	
-	@Test @Ignore
-	public final void testEmissionAnalyzer(){
 		
-	}
-	
 	@Test
 	public final void testEmissionPerPersonWarmEventHandler(){
 		
-		//TODO -> see as well generell questions at testcoldem. handler
 		EmissionsPerPersonWarmEventHandler handler = new EmissionsPerPersonWarmEventHandler();
-		// TODO verschieden uhrzeiten
 		
 		//create vehicles and links
 		IdImpl vehicle1 = new IdImpl("v1");
@@ -69,7 +64,7 @@ public class TestWarmEmissionHandler {
 				Map<WarmPollutant,Double> warmEm2 = new HashMap<WarmPollutant, Double>();
 				warmEm2.put(WarmPollutant.CO, 23.9);
 				warmEm2.put(WarmPollutant.PM, 18.1);
-				WarmEmissionEvent event2 = new WarmEmissionEventImpl(0., link1, vehicle2, warmEm2);
+				WarmEmissionEvent event2 = new WarmEmissionEventImpl(0.8, link1, vehicle2, warmEm2);
 				handler.handleEvent(event2);
 				
 		//third event: create and handle
@@ -80,14 +75,14 @@ public class TestWarmEmissionHandler {
 						
 		//fourth event: create and handle
 				Map<WarmPollutant,Double> warmEm4 = new HashMap<WarmPollutant, Double>();
-				WarmEmissionEvent event4 = new WarmEmissionEventImpl(0., link2, vehicle2, warmEm4);
+				WarmEmissionEvent event4 = new WarmEmissionEventImpl(20., link2, vehicle2, warmEm4);
 				handler.handleEvent(event4);
 				
 		//fifth event: create and handle
 				Map<WarmPollutant,Double> warmEm5 = new HashMap<WarmPollutant, Double>();
 				warmEm5.put(WarmPollutant.NOX, 19.8);
 				warmEm5.put(WarmPollutant.CO, 10.0);
-				WarmEmissionEvent event5 = new WarmEmissionEventImpl(0., link1, vehicle1, warmEm5);
+				WarmEmissionEvent event5 = new WarmEmissionEventImpl(55., link1, vehicle1, warmEm5);
 				handler.handleEvent(event5);
 				
 		Map<Id, Map<WarmPollutant, Double>> wepp = handler.getWarmEmissionsPerPerson();
