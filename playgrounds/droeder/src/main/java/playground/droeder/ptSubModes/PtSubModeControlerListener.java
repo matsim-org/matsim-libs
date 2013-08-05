@@ -46,7 +46,6 @@ public class PtSubModeControlerListener implements StartupListener{
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		Controler c = event.getControler();
-//		c.setTransitRouterFactory(routerFactory);
 		c.setMobsimFactory(new TransitSubModeQSimFactory(this.routeOnSameMode));
 		this.transitRouterFactory = new PtSubModeRouterFactory(c, this.routeOnSameMode);
 		c.setTripRouterFactory(new PtSubModeTripRouterFactory(c, transitRouterFactory));

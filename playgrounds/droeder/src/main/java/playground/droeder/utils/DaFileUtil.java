@@ -20,8 +20,6 @@ package playground.droeder.utils;
 
 import java.io.File;
 
-import javax.management.RuntimeErrorException;
-
 import org.apache.log4j.Logger;
 
 /**
@@ -30,7 +28,6 @@ import org.apache.log4j.Logger;
  */
 public class DaFileUtil {
 
-	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(DaFileUtil.class);
 
 	private DaFileUtil() {

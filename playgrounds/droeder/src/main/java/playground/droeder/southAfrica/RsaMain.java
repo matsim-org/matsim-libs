@@ -23,13 +23,13 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
 
 import playground.andreas.P2.helper.PConfigGroup;
 import playground.andreas.P2.helper.PScenarioImpl;
 import playground.andreas.P2.hook.PHook;
-import playground.andreas.P2.hook.PTransitRouterFactory;
 import playground.droeder.ptSubModes.PtSubModeControlerListener;
 import playground.droeder.ptSubModes.routing.PtSubModeTripRouterFactory;
 
@@ -37,7 +37,7 @@ import playground.droeder.ptSubModes.routing.PtSubModeTripRouterFactory;
  * @author droeder
  *
  */
-public class RsaMain {
+class RsaMain {
 
 	private static final Logger log = Logger.getLogger(RsaMain.class);
 
@@ -46,33 +46,45 @@ public class RsaMain {
 	}
 	
 	private static String[] ARGS = {
-		"../../org.matsim/examples/pt-tutorial/configExtended.xml",
+		"E:/VSP/svn/droeder/southAfrica/configNew.xml",
 		"true"
 	};
 	
 	public static void main(String[] args) {
+		OutputDirectoryLogging.catchLogEntries();
 		String[] arguments = null;
 		PConfigGroup pConfig = null;
+		boolean overwrite = false;
+		
+		// prepare the local testcase
 		if(args.length == 0){
-			log.warn("running testcase.");
+			log.warn("running testcase. Overwriting Files");
 			arguments = ARGS;
-			pConfig = getTestPConfig();
-		}else if(args.length == 2){
-			pConfig = new PConfigGroup();
+//			pConfig = createPconfigForTest();
+			overwrite = true;
+		}
+		// or run a ''real'' sim from command-line
+		else{
 			arguments = args;
-		}else{
+//			pConfig = new PConfigGroup();
+			overwrite =  false;
+		}
+		
+		// check number of arguments
+		if(!(arguments.length == 2)){
 			log.error("illegal number of arguments. Expecting [configFile, (boolean) fixedSubmode]");
 			System.exit(-1);
 		}
 		
 		String configFile = arguments[0];
-		boolean fixedSubMode = Boolean.getBoolean(arguments[1]);
+		boolean fixedSubMode = Boolean.parseBoolean(arguments[1]);
 
-		log.info("Class: " + RsaMain.class.getCanonicalName());
-		log.info("configFile: " + configFile);
-		log.info("fixedSubMode: " + fixedSubMode);
+		log.info("Class\t\t: " + RsaMain.class.getCanonicalName());
+		log.info("configFile\t: " + configFile);
+		log.info("fixedSubMode\t: " + fixedSubMode);
 		
 		Config config = new Config();
+		pConfig = new PConfigGroup();
 		config.addModule(pConfig);
 		ConfigUtils.loadConfig(config, configFile);
 		
@@ -80,7 +92,8 @@ public class RsaMain {
 		ScenarioUtils.loadScenario(scenario);
 		
 		Controler controler = new Controler(scenario);
-		controler.setOverwriteFiles(true);
+		// overwrite only the testCase
+		controler.setOverwriteFiles(overwrite);
 		controler.setCreateGraphs(true);
 		
 		// manipulate config
@@ -96,17 +109,17 @@ public class RsaMain {
 		controler.addControlerListener(new PtSubModeControlerListener(fixedSubMode));
 		
 		controler.run();
-		
 	}
 
 	/**
 	 * @return
 	 */
-	private static PConfigGroup getTestPConfig() {
+	private static PConfigGroup createPconfigForTest() {
 		PConfigGroup pConfig = new PConfigGroup();
 		pConfig.addParam("gridSize", "499.0");
 		pConfig.addParam("useFranchise", "false");
 		pConfig.addParam("timeSlotSize", "600.0");
+		pConfig.addParam("OperationMode", "taxi");
 		return pConfig;
 	}
 }

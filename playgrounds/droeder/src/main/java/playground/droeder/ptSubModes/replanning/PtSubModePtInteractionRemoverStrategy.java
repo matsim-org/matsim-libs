@@ -18,6 +18,7 @@
  * *********************************************************************** */
 package playground.droeder.ptSubModes.replanning;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.population.algorithms.PlanAlgorithm;
@@ -33,10 +34,10 @@ class PtSubModePtInteractionRemoverStrategy extends AbstractMultithreadedModule 
 	 * legmode of the "real" pt-leg not to <code>TransportMode.pt</code>. Instead it keeps the 
 	 * original mode
 	 * 
-	 * @param c
+	 * @param sc
 	 */
-	public PtSubModePtInteractionRemoverStrategy(Controler c){
-		super(c.getConfig().global());
+	public PtSubModePtInteractionRemoverStrategy(Scenario sc){
+		super(sc.getConfig().global());
 	}
 //
 	@Override

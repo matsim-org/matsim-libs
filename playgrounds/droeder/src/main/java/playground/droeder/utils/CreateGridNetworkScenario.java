@@ -57,7 +57,7 @@ class CreateGridNetworkScenario {
 
 	
 	private static final String[] ARGUMENTS = {
-		"[[outputdirectory]]"
+		null // [[outputdirectory]]
 	};
 	
 	@SuppressWarnings("serial")

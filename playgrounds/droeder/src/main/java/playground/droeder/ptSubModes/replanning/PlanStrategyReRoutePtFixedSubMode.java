@@ -25,12 +25,12 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
@@ -46,12 +46,12 @@ public class PlanStrategyReRoutePtFixedSubMode implements PlanStrategy {
 	private static final Logger log = Logger
 			.getLogger(PlanStrategyReRoutePtFixedSubMode.class);
 	
-	private Controler c;
 	private RandomPlanSelector selector;
 	private List<Plan> plans;
 	private List<PlanStrategyModule> modules;
-
+	private Scenario sc;
 	private Map<Id, List<String>> originalModes;
+
 	
 	public static final String ORIGINALLEGMODES = "originalLegModes";
 
@@ -59,10 +59,10 @@ public class PlanStrategyReRoutePtFixedSubMode implements PlanStrategy {
 	 * This Strategy reroutes every single leg, as <code>ReRoute</code> would do, but with
 	 * a special behavior for pt. As pt consists of many submodes (e.g. bus, train, ...) the 
 	 * rerouting is done within the submode defined in a leg.
-	 * @param c
+	 * @param sc
 	 */
-	public PlanStrategyReRoutePtFixedSubMode(Controler c){
-		this.c = c;
+	public PlanStrategyReRoutePtFixedSubMode(Scenario sc){
+		this.sc = sc;
 		this.selector = new RandomPlanSelector();
 		// call in constructor, because should be done only once...
 		this.storeOriginalLegModes();
@@ -100,14 +100,14 @@ public class PlanStrategyReRoutePtFixedSubMode implements PlanStrategy {
 		this.plans = new ArrayList<Plan>();
 		this.modules = new ArrayList<PlanStrategyModule>();
 		// TODO[dr] this module is maybe no longer necessary as the pt-routing infrastructure has changed
-		this.modules.add(new PtSubModePtInteractionRemoverStrategy(this.c));
-		this.modules.add(new ReturnToOldModesStrategy(this.c, this.originalModes));
-		this.modules.add(new ReRoutePtSubModeStrategy(this.c));
+		this.modules.add(new PtSubModePtInteractionRemoverStrategy(this.sc));
+		this.modules.add(new ReturnToOldModesStrategy(this.sc, this.originalModes));
+		this.modules.add(new ReRoutePtSubModeStrategy(this.sc, replanningContext));
 	}
 	
 	private void storeOriginalLegModes() {
 		this.originalModes = new HashMap<Id, List<String>>();
-		for(Person p: this.c.getScenario().getPopulation().getPersons().values()){
+		for(Person p: this.sc.getPopulation().getPersons().values()){
 			List<String> legModes = new ArrayList<String>();
 			for(PlanElement pe: p.getSelectedPlan().getPlanElements()){
 				if(pe instanceof Leg){

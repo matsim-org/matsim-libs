@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.controler.Controler;
@@ -39,8 +40,8 @@ class ReturnToOldModesStrategy extends AbstractMultithreadedModule {
 			.getLogger(ReturnToOldModesStrategy.class);
 	private Map<Id, List<String>> originalModes;
 
-	public ReturnToOldModesStrategy(Controler c, Map<Id, List<String>> originalModes) {
-		super(c.getConfig().global());
+	public ReturnToOldModesStrategy(Scenario sc, Map<Id, List<String>> originalModes) {
+		super(sc.getConfig().global());
 		this.originalModes = originalModes;
 	}
 

@@ -33,7 +33,7 @@ class ListSystemProperties {
 
 	}
 	
-	public static void main(String[] args) {
+	static void main(String[] args) {
 		Properties props = System.getProperties();
 		Enumeration<?> names = props.propertyNames();
 		int max = 0;

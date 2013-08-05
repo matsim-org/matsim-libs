@@ -30,21 +30,21 @@ import org.apache.log4j.Logger;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
-public class AnalyzeMyShapeFile {
+class AnalyzeMyShapeFile {
 	private static final Logger log = Logger
 			.getLogger(AnalyzeMyShapeFile.class);
 	
-	public static void main(String[] args) throws IOException{
+	static void main(String[] args) throws IOException{
 		if(args.length != 1){
 			log.error("nr of arguments not correct");
 			System.exit(-1);
 		}
-		new AnalyzeMyShapeFile().run(args[0]);
+		run(args[0]);
 	}
 	
-	private Map<Integer, Set<String>> values = new HashMap<Integer, Set<String>>();
 	
-	public void run(String shapeFile) throws IOException{
+	private static void run(String shapeFile) throws IOException{
+		Map<Integer, Set<String>> values = new HashMap<Integer, Set<String>>();
 		SimpleFeature ft = null;
 		for (SimpleFeature f : ShapeFileReader.getAllFeatures(shapeFile)) {
 			if (ft == null) {
@@ -52,19 +52,19 @@ public class AnalyzeMyShapeFile {
 			}
 			
 			for(int i = 0; i < f.getAttributeCount(); i++){
-				if(this.values.containsKey(i)){
-					if(!this.values.get(i).contains(f.getAttribute(i).toString()) && !(this.values.get(i).size() > 100)){
-						this.values.get(i).add(f.getAttribute(i).toString());
+				if(values.containsKey(i)){
+					if(!values.get(i).contains(f.getAttribute(i).toString()) && !(values.get(i).size() > 100)){
+						values.get(i).add(f.getAttribute(i).toString());
 					}
 				}else{
 					Set<String> temp = new TreeSet<String>();
 					temp.add(f.getAttribute(i).toString());
-					this.values.put(i, temp);
+					values.put(i, temp);
 				}
 			}
 		}
 		
-		for(Entry<Integer, Set<String>> e: this.values.entrySet()){
+		for(Entry<Integer, Set<String>> e: values.entrySet()){
 			System.out.print(e.getKey() + "\t");
 			for(String s : e.getValue()){
 				System.out.print(s + "\t");
@@ -77,5 +77,4 @@ public class AnalyzeMyShapeFile {
 			System.out.println();
 		}
 	}
-
 }
