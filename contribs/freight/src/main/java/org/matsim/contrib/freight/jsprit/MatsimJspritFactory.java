@@ -145,7 +145,6 @@ public class MatsimJspritFactory {
 	 * 
 	 * @param type
 	 * @return CarrierVehicleType
-	 * @see CarrierVehicleType, Type
 	 */
 	static CarrierVehicleType createCarrierVehicleType(VehicleType type){
 		CarrierVehicleType.Builder typeBuilder = CarrierVehicleType.Builder.newInstance(makeId(type.getTypeId()));
