@@ -61,7 +61,7 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 
 	@Override
 	public void handleEvent(WarmEmissionEvent event) {
-		Double time = event.getTime();
+		Double time = event.getTime(); // wenn time = 0.0 ist, wird das Event nicht registriert
 		Id linkId = event.getLinkId();
 		Map<WarmPollutant, Double> warmEmissionsOfEvent = event.getWarmEmissions();
 		double endOfTimeInterval = 0.0;
@@ -87,6 +87,7 @@ public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandle
 							
 							/*Is there a bug here?
 							See playground.fhuelsmann.emission.analysisForConcentration.EmissionsPerLinkWarmEventHandler.java*/
+							// TODO einzelne werte koennten null sein
 							warmEmissionsSoFar.put(pollutant, newValue);
 						}
 						warmEmissionsTotal.put(linkId, warmEmissionsSoFar);
