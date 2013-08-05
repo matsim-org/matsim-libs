@@ -21,6 +21,7 @@
 package playground.christoph.evacuation.withinday.replanning.utils;
 
 import java.io.Serializable;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,6 +43,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
 
 /*
  * Compares walk speeds of people respecting their age, gender, etc.
+ * Slow people are located at the front of the queue!
  */
 public class WalkSpeedComparator implements Comparator<Id>, Serializable, MatsimComparator {
 
@@ -75,6 +77,11 @@ public class WalkSpeedComparator implements Comparator<Id>, Serializable, Matsim
 		}
 	}
 	
+	// for a test case
+	/*package*/ Map<Id, Double> getTravelTimesMap() {
+		return Collections.unmodifiableMap(this.travelTimesMap);
+	}
+		
 	@Override
 	public int compare(Id id1, Id id2) {
 		double tt1 = travelTimesMap.get(id1);
