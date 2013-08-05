@@ -85,18 +85,38 @@ public class WarmEmissionAnalysisModule {
 			this.roadTypeMapping = roadTypeMapping;
 			this.avgHbefaWarmTable = avgHbefaWarmTable;
 			this.detailedHbefaWarmTable = detailedHbefaWarmTable;
+			// check if all needed tables are non-null
+			if(roadTypeMapping == null){
+				 logger.error("Road type mapping not set. Aborting...");
+				 System.exit(0);
+			}
+			if(avgHbefaWarmTable == null && detailedHbefaWarmTable == null){
+				 logger.error("Neither average nor detailed table vor Hbefa warm emissions set. Aborting...");
+				 System.exit(0);
+			}
 		}
 	}
 
 	public WarmEmissionAnalysisModule(
 			WarmEmissionAnalysisModuleParameter parameterObject,
 			EventsManager emissionEventsManager, Double emissionEfficiencyFactor) {
-
+		
+		if(parameterObject == null){
+			logger.error("No warm emission analysis module parameter set. Aborting...");
+			System.exit(0);
+		}
+		if(emissionEventsManager == null){
+			logger.error("Event manager not set. Please check the configuration of your scenario. Aborting..." );
+			System.exit(0);
+		}
 		this.roadTypeMapping = parameterObject.roadTypeMapping;
 		this.avgHbefaWarmTable = parameterObject.avgHbefaWarmTable;
 		this.detailedHbefaWarmTable = parameterObject.detailedHbefaWarmTable;
 		this.eventsManager = emissionEventsManager;
 		this.emissionEfficiencyFactor = emissionEfficiencyFactor;
+		
+
+		
 	}
 
 	public void reset() {
@@ -204,6 +224,7 @@ public class WarmEmissionAnalysisModule {
 		double freeFlowSpeed_kmh = freeVelocity * 3.6;
 		double averageSpeed_kmh = linkLength_km / travelTime_h;
 		
+		double freeFlowSpeedFromTable_kmh;
 		double stopGoSpeed_kmh;
 		double efFreeFlow_gpkm;
 		double efStopGo_gpkm;
@@ -219,11 +240,13 @@ public class WarmEmissionAnalysisModule {
 					stopGoSpeed_kmh = this.detailedHbefaWarmTable.get(keyStopAndGo).getSpeed();
 					efFreeFlow_gpkm = this.detailedHbefaWarmTable.get(keyFreeFlow).getWarmEmissionFactor();
 					efStopGo_gpkm = this.detailedHbefaWarmTable.get(keyStopAndGo).getWarmEmissionFactor();
+					freeFlowSpeedFromTable_kmh = this.detailedHbefaWarmTable.get(keyFreeFlow).getSpeed();
 
 				} else {
 					stopGoSpeed_kmh = this.avgHbefaWarmTable.get(keyStopAndGo).getSpeed();
 					efFreeFlow_gpkm = this.avgHbefaWarmTable.get(keyFreeFlow).getWarmEmissionFactor();
 					efStopGo_gpkm = this.avgHbefaWarmTable.get(keyStopAndGo).getWarmEmissionFactor();
+					freeFlowSpeedFromTable_kmh = this.avgHbefaWarmTable.get(keyFreeFlow).getSpeed();
 
 					if(vehAttributesNotSpecifiedCnt < maxWarnCnt) {
 						vehAttributesNotSpecifiedCnt++;
@@ -237,15 +260,25 @@ public class WarmEmissionAnalysisModule {
 				stopGoSpeed_kmh = this.avgHbefaWarmTable.get(keyStopAndGo).getSpeed();
 				efFreeFlow_gpkm = this.avgHbefaWarmTable.get(keyFreeFlow).getWarmEmissionFactor();
 				efStopGo_gpkm = this.avgHbefaWarmTable.get(keyStopAndGo).getWarmEmissionFactor();
-
+				freeFlowSpeedFromTable_kmh = this.avgHbefaWarmTable.get(keyFreeFlow).getSpeed();
 //				vehAttributesNotSpecified.add(personId);
 			}
 			
+			if(averageSpeed_kmh <= 0.0){
+				logger.warn("Average speed is somehow set to 0.0; please check consistency of your scenario!");
+				logger.info("Setting average speed for emission calculation to free flow speed...");
+				averageSpeed_kmh = freeFlowSpeed_kmh;
+			}
 			if ((averageSpeed_kmh - freeFlowSpeed_kmh) > 0.){
 				logger.warn("Average speed (" + averageSpeed_kmh + " kmh) is somehow higher than free flow speed (" + freeFlowSpeed_kmh + " kmh); please check consistency of your scenario!");
 				logger.info("Setting average speed for emission calculation to free flow speed...");
 				averageSpeed_kmh = freeFlowSpeed_kmh;
 //				throw new RuntimeException("Average speed is higher than free flow speed; this might produce negative warm emissions. Aborting...");
+			}
+			// check consistency of free flow speed (add 1.0 to avoid rounding errors)
+			if(freeFlowSpeedFromTable_kmh - freeFlowSpeed_kmh > 1.0 || freeFlowSpeedFromTable_kmh - freeFlowSpeed_kmh <-1.0){
+				logger.warn("The given free flow speed does not match the table's value. Please check consistency of your scenario!");
+				logger.info("Using given speed value to avoid negative emission values...");	
 			}
 			if((averageSpeed_kmh - freeFlowSpeed_kmh) > -1.) { // both speeds are assumed to be not very different > only freeFlow on link
 				generatedEmissions = linkLength_km * efFreeFlow_gpkm;
