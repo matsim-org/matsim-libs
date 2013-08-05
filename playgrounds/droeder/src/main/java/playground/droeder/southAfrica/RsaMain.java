@@ -106,7 +106,7 @@ class RsaMain {
 		PtSubModeControlerListener ptSubModeListener = new PtSubModeControlerListener(fixedSubMode);
 		PHook pHook = new PHook(controler, new Mode2LineSetterRSA(), ptSubModeListener.getTransitRouterFactory(), null, PtSubModeTripRouterFactory.class);
 		controler.addControlerListener(pHook);	
-		controler.addControlerListener(new PtSubModeControlerListener(fixedSubMode));
+		controler.addControlerListener(ptSubModeListener);
 		
 		controler.run();
 	}

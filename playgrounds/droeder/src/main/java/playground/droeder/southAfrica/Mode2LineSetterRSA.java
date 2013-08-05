@@ -35,13 +35,13 @@ import playground.andreas.P2.stats.abtractPAnalysisModules.lineSetter.PtMode2Lin
  * @author droeder
  *
  */
-public class Mode2LineSetterRSA implements PtMode2LineSetter {
+class Mode2LineSetterRSA implements PtMode2LineSetter {
 
 	private static final Logger log = Logger.getLogger(Mode2LineSetterRSA.class);
 	
 	private HashMap<Id, String> lineId2ptMode;
 
-	public Mode2LineSetterRSA() {
+	protected Mode2LineSetterRSA() {
 		log.info("enabled");
 	}
 
