@@ -65,7 +65,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  * changed lines are marked...
  * 
  */
-public class PtSubModeRouter implements TransitRouter {
+class PtSubModeRouter implements TransitRouter {
 
 	private final TransitRouterNetwork transitNetwork;
 

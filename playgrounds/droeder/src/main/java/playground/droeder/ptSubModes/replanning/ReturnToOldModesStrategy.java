@@ -39,7 +39,7 @@ class ReturnToOldModesStrategy extends AbstractMultithreadedModule {
 			.getLogger(ReturnToOldModesStrategy.class);
 	private Map<Id, List<String>> originalModes;
 
-	public ReturnToOldModesStrategy(Scenario sc, Map<Id, List<String>> originalModes) {
+	protected ReturnToOldModesStrategy(Scenario sc, Map<Id, List<String>> originalModes) {
 		super(sc.getConfig().global());
 		this.originalModes = originalModes;
 	}

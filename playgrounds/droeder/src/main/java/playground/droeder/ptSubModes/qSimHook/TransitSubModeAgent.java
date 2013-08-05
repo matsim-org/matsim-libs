@@ -54,7 +54,7 @@ class TransitSubModeAgent extends PersonDriverAgentImpl implements MobsimDriverP
 
 	private TransitSchedule transitSchedule;
 	
-	public static TransitSubModeAgent createAgent(Person p, Netsim sim, boolean fixedMode){
+	protected static TransitSubModeAgent createAgent(Person p, Netsim sim, boolean fixedMode){
 		return new TransitSubModeAgent(p, sim, fixedMode);
 	}
 

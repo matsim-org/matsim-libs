@@ -37,7 +37,7 @@ import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
  * @author droeder
  *
  */
-public class PtSubModeRouterSet implements TransitRouter{
+class PtSubModeRouterSet implements TransitRouter{
 	private static final Logger log = Logger
 			.getLogger(PtSubModeRouterSet.class);
 	

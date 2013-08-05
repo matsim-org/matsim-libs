@@ -35,7 +35,7 @@ class PtSubModePtInteractionRemoverStrategy extends AbstractMultithreadedModule 
 	 * 
 	 * @param sc
 	 */
-	public PtSubModePtInteractionRemoverStrategy(Scenario sc){
+	protected PtSubModePtInteractionRemoverStrategy(Scenario sc){
 		super(sc.getConfig().global());
 	}
 

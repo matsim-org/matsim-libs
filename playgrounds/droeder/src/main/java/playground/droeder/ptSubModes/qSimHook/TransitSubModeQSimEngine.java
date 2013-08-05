@@ -45,7 +45,7 @@ class TransitSubModeQSimEngine extends TransitQSimEngine {
 	/**
 	 * @param queueSimulation
 	 */
-	public TransitSubModeQSimEngine(QSim queueSimulation) {
+	protected TransitSubModeQSimEngine(QSim queueSimulation) {
 		super(queueSimulation);
 		this.qSim = queueSimulation;
 		this.schedule = queueSimulation.getScenario().getTransitSchedule();

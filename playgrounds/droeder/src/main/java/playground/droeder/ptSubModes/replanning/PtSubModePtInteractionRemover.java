@@ -39,7 +39,7 @@ class PtSubModePtInteractionRemover implements PlanAlgorithm {
 	private static final Logger log = Logger
 			.getLogger(PtSubModePtInteractionRemover.class);
 	
-	public PtSubModePtInteractionRemover(){
+	protected PtSubModePtInteractionRemover(){
 		//do nothing
 	}
 	

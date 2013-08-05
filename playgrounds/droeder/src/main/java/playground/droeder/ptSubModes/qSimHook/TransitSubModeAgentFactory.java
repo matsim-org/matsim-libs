@@ -28,7 +28,7 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
  * @author droeder
  *
  */
-public class TransitSubModeAgentFactory implements AgentFactory{
+class TransitSubModeAgentFactory implements AgentFactory{
 
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger
@@ -36,7 +36,7 @@ public class TransitSubModeAgentFactory implements AgentFactory{
 	private boolean fixedMode;
 	private Netsim sim;
 
-	public TransitSubModeAgentFactory(Netsim simulation, boolean fixedMode) {
+	protected TransitSubModeAgentFactory(Netsim simulation, boolean fixedMode) {
 		this.sim = simulation;
 		this.fixedMode = fixedMode;
 	}

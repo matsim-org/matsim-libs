@@ -37,7 +37,7 @@ class ReRoutePtSubModeStrategy extends AbstractMultithreadedModule{
 	 * Aborts if the controler is not an instance of instance of <code>PtSubModeControler</code>
 	 * @param sc
 	 */
-	public ReRoutePtSubModeStrategy(Scenario sc, ReplanningContext rc) {
+	protected ReRoutePtSubModeStrategy(Scenario sc, ReplanningContext rc) {
 		super(sc.getConfig().global());
 		this.rc = rc;
 	}
