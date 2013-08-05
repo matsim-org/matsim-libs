@@ -35,6 +35,8 @@ import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.mobsim.WithinDayQSimFactory;
+import org.matsim.withinday.trafficmonitoring.EarliestLinkExitTimeProvider;
+import org.matsim.withinday.trafficmonitoring.TransportModeProvider;
 
 public class LinkReplanningMapTest extends MatsimTestCase {
 
@@ -72,7 +74,15 @@ public class LinkReplanningMapTest extends MatsimTestCase {
 
 		@Override
 		public void notifyStartup(final StartupEvent event) {
-			LinkReplanningMap lrp = new LinkReplanningMap(event.getControler().getNetwork());
+			
+			TransportModeProvider transportModeProvider = new TransportModeProvider();
+			event.getControler().getEvents().addHandler(transportModeProvider);
+			
+			EarliestLinkExitTimeProvider earliestLinkExitTimeProvider = new EarliestLinkExitTimeProvider(
+					event.getControler().getScenario(), transportModeProvider);
+			event.getControler().getEvents().addHandler(earliestLinkExitTimeProvider);
+			
+			LinkReplanningMap lrp = new LinkReplanningMap(earliestLinkExitTimeProvider);
 			event.getControler().getEvents().addHandler(lrp);
 			MobsimListenerForTests listener = new MobsimListenerForTests(lrp);
 			FixedOrderSimulationListener fosl = new FixedOrderSimulationListener();

@@ -26,31 +26,35 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
+import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 
 public class LegPerformingIdentifier extends DuringLegIdentifier {
 
-	protected LinkReplanningMap linkReplanningMap;
+	private final LinkReplanningMap linkReplanningMap;
+	private final MobsimDataProvider mobsimDataProvider;
 	
 	// use the Factory!
-	/*package*/ LegPerformingIdentifier(LinkReplanningMap linkReplanningMap) {
+	/*package*/ LegPerformingIdentifier(LinkReplanningMap linkReplanningMap, MobsimDataProvider mobsimDataProvider) {
 		this.linkReplanningMap = linkReplanningMap;
+		this.mobsimDataProvider = mobsimDataProvider;
 	}
 	
 	@Override
 	public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
-		Set<Id> legPerformingAgents = new HashSet<Id>(linkReplanningMap.getLegPerformingAgents());
-		Map<Id, PlanBasedWithinDayAgent> mapping = linkReplanningMap.getPersonAgentMapping();
+		Set<Id> legPerformingAgents = new HashSet<Id>(this.linkReplanningMap.getLegPerformingAgents());
+		Map<Id, MobsimAgent> mapping = this.mobsimDataProvider.getAgents();
 
 		// apply filter to remove agents that should not be replanned
 		this.applyFilters(legPerformingAgents, time);
 		
 		// create set of PlanBasedWithinDayAgent
 		Set<PlanBasedWithinDayAgent> agentsToReplan = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
-		for (Id id : legPerformingAgents) agentsToReplan.add(mapping.get(id));
+		for (Id id : legPerformingAgents) agentsToReplan.add((PlanBasedWithinDayAgent) mapping.get(id));
 
 		return agentsToReplan;
 	}

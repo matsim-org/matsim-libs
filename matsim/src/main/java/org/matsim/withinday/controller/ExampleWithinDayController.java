@@ -152,7 +152,8 @@ public class ExampleWithinDayController implements StartupListener {
 		this.duringActivityReplannerFactory.addIdentifier(this.duringActivityIdentifier);
 		this.withinDayControlerListener.getWithinDayEngine().addDuringActivityReplannerFactory(this.duringActivityReplannerFactory);
 		
-		this.duringLegIdentifierFactory = new LeaveLinkIdentifierFactory(this.withinDayControlerListener.getLinkReplanningMap());
+		this.duringLegIdentifierFactory = new LeaveLinkIdentifierFactory(this.withinDayControlerListener.getLinkReplanningMap(),
+				this.withinDayControlerListener.getMobsimDataProvider());
 		this.duringLegProbabilityFilterFactory = new ProbabilityFilterFactory(this.pDuringLegReplanning);
 		this.duringLegIdentifierFactory.addAgentFilterFactory(this.duringLegProbabilityFilterFactory);
 		this.duringLegIdentifier = this.duringLegIdentifierFactory.createIdentifier();

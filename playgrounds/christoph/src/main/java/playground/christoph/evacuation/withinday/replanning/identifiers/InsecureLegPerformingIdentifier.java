@@ -29,8 +29,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
+import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 
@@ -42,19 +44,22 @@ public class InsecureLegPerformingIdentifier extends DuringLegIdentifier {
 	private static final Logger log = Logger.getLogger(InsecureLegPerformingIdentifier.class);
 	
 	private final LinkReplanningMap linkReplanningMap;
+	private final MobsimDataProvider mobsimDataProvider;
 	private final CoordAnalyzer coordAnalyzer;
 	private final Network network;	
 	
-	/*package*/ InsecureLegPerformingIdentifier(LinkReplanningMap linkReplanningMap, Network network, CoordAnalyzer coordAnalyzer) {
+	/*package*/ InsecureLegPerformingIdentifier(LinkReplanningMap linkReplanningMap, MobsimDataProvider mobsimDataProvider, 
+			Network network, CoordAnalyzer coordAnalyzer) {
 		this.linkReplanningMap = linkReplanningMap;
+		this.mobsimDataProvider = mobsimDataProvider;
 		this.network = network;
 		this.coordAnalyzer = coordAnalyzer;
 	}
 	
 	public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
 		
-		Set<Id> legPerformingAgents = new HashSet<Id>(linkReplanningMap.getLegPerformingAgents());
-		Map<Id, PlanBasedWithinDayAgent> mapping = linkReplanningMap.getPersonAgentMapping();
+		Set<Id> legPerformingAgents = new HashSet<Id>(this.linkReplanningMap.getLegPerformingAgents());
+		Map<Id, MobsimAgent> mapping = this.mobsimDataProvider.getAgents();
 		
 		// apply filter to remove agents that should not be replanned
 		this.applyFilters(legPerformingAgents, time);
@@ -62,7 +67,7 @@ public class InsecureLegPerformingIdentifier extends DuringLegIdentifier {
 		Set<PlanBasedWithinDayAgent> agentsToReplan = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());		
 		for (Id id : legPerformingAgents) {
 			
-			PlanBasedWithinDayAgent agent = mapping.get(id);
+			PlanBasedWithinDayAgent agent = (PlanBasedWithinDayAgent) mapping.get(id);
 			
 			Link currentLink = this.network.getLinks().get(agent.getCurrentLinkId());
 			boolean isAffected = this.coordAnalyzer.isLinkAffected(currentLink);

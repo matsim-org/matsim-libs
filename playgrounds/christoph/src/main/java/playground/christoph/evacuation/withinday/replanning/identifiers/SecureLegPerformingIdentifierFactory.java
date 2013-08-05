@@ -22,19 +22,23 @@ package playground.christoph.evacuation.withinday.replanning.identifiers;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 
 public class SecureLegPerformingIdentifierFactory extends DuringLegIdentifierFactory {
 
-	private LinkReplanningMap linkReplanningMap;
-	private Coord centerCoord;
-	private double secureDistance;
-	private Network network;
+	private final LinkReplanningMap linkReplanningMap;
+	private final MobsimDataProvider mobsimDataProvider;
+	private final Coord centerCoord;
+	private final double secureDistance;
+	private final Network network;
 	
-	public SecureLegPerformingIdentifierFactory(LinkReplanningMap linkReplanningMap, Network network, Coord centerCoord, double secureDistance) {
+	public SecureLegPerformingIdentifierFactory(LinkReplanningMap linkReplanningMap, MobsimDataProvider mobsimDataProvider, 
+			Network network, Coord centerCoord, double secureDistance) {
 		this.linkReplanningMap = linkReplanningMap;
+		this.mobsimDataProvider = mobsimDataProvider;
 		this.network = network;
 		this.centerCoord = centerCoord;
 		this.secureDistance = secureDistance;
@@ -42,7 +46,8 @@ public class SecureLegPerformingIdentifierFactory extends DuringLegIdentifierFac
 	
 	@Override
 	public DuringLegIdentifier createIdentifier() {
-		DuringLegIdentifier identifier = new SecureLegPerformingIdentifier(linkReplanningMap, network, centerCoord, secureDistance);
+		DuringLegIdentifier identifier = new SecureLegPerformingIdentifier(this.linkReplanningMap, this.mobsimDataProvider, 
+				this.network, this.centerCoord, this.secureDistance);
 		identifier.setIdentifierFactory(this);
 		this.addAgentFiltersToIdentifier(identifier);
 		return identifier;

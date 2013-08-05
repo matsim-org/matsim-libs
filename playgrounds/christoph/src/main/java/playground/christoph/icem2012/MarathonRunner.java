@@ -282,7 +282,7 @@ public final class MarathonRunner implements StartupListener,
 		 * Create and initialize replanning manager and replanning maps.
 		 */
 		Map<String, TravelTime> linkReplanningTravelTime = this.createLinkReplanningMapTravelTime();
-		this.withinDayControlerListener.getLinkReplanningTravelTimes().putAll(linkReplanningTravelTime);
+		this.withinDayControlerListener.addMultiModalTravelTimes(linkReplanningTravelTime);
 		
 		/*
 		 * Create the empty object. They are filled in the loadData() method.
@@ -753,12 +753,14 @@ public final class MarathonRunner implements StartupListener,
 		/*
 		 * During Leg Identifiers
 		 */
-		duringLegFactory = new LegPerformingIdentifierFactory(this.withinDayControlerListener.getLinkReplanningMap());
+		duringLegFactory = new LegPerformingIdentifierFactory(this.withinDayControlerListener.getLinkReplanningMap(),
+				this.withinDayControlerListener.getMobsimDataProvider());
 		duringLegFactory.addAgentFilterFactory(initialReplanningFilterFactory);
 		this.legPerformingIdentifier = duringLegFactory.createIdentifier();
 		
 		// replan all transport modes
-		duringLegFactory = new LeaveLinkIdentifierFactory(this.withinDayControlerListener.getLinkReplanningMap()); 
+		duringLegFactory = new LeaveLinkIdentifierFactory(this.withinDayControlerListener.getLinkReplanningMap(),
+				this.withinDayControlerListener.getMobsimDataProvider()); 
 		duringLegFactory.addAgentFilterFactory(notInitialReplanningFilterFactory);
 		this.duringLegRerouteIdentifier = duringLegFactory.createIdentifier();
 		this.duringLegRerouteIdentifier.addAgentFilter(new ProbabilityFilterFactory(EvacuationConfig.duringLegReroutingShare).createAgentFilter());

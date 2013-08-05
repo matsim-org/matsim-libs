@@ -20,6 +20,7 @@
 
 package org.matsim.withinday.replanning.identifiers;
 
+import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
@@ -27,14 +28,16 @@ import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 public class LeaveLinkIdentifierFactory extends DuringLegIdentifierFactory {
 
 	private final LinkReplanningMap linkReplanningMap;
+	private final MobsimDataProvider mobsimDataProvider;
 	
-	public LeaveLinkIdentifierFactory(LinkReplanningMap linkReplanningMap) {
+	public LeaveLinkIdentifierFactory(LinkReplanningMap linkReplanningMap, MobsimDataProvider mobsimDataProvider) {
 		this.linkReplanningMap = linkReplanningMap;
+		this.mobsimDataProvider = mobsimDataProvider;
 	}
 	
 	@Override
 	public DuringLegIdentifier createIdentifier() {
-		DuringLegIdentifier identifier = new LeaveLinkIdentifier(linkReplanningMap);
+		DuringLegIdentifier identifier = new LeaveLinkIdentifier(this.linkReplanningMap, this.mobsimDataProvider);
 		identifier.setIdentifierFactory(this);
 		this.addAgentFiltersToIdentifier(identifier);
 		return identifier;

@@ -39,6 +39,7 @@ import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalcula
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.withinday.controller.WithinDayControlerListener;
+import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.filter.CollectionAgentFilter;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilter;
@@ -117,9 +118,10 @@ public class CostNavigationRouteRunner implements MobsimInitializedListener, Aft
 		TravelTime travelTime = this.lookupTravelTime;
 		
 		OnlyTimeDependentTravelCostCalculatorFactory travelCostFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
-				
+		
 		LinkReplanningMap linkReplanningMap = this.withinDayControlerListener.getLinkReplanningMap();
-		this.duringLegIdentifier = new LeaveLinkIdentifierFactory(linkReplanningMap).createIdentifier();
+		MobsimDataProvider mobsimDataProvider = this.withinDayControlerListener.getMobsimDataProvider();
+		this.duringLegIdentifier = new LeaveLinkIdentifierFactory(linkReplanningMap, mobsimDataProvider).createIdentifier();
 		this.selector.addIdentifier(duringLegIdentifier, pDuringLegReplanning);
 		this.duringLegReplannerFactory = new CostNavigationRouteFactory(this.scenario, this.lookupNetwork, this.withinDayControlerListener.getWithinDayEngine(), 
 				costNavigationTravelTimeLogger, travelCostFactory, travelTime, this.withinDayControlerListener.getLeastCostPathCalculatorFactory());

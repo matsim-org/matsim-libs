@@ -21,44 +21,22 @@
 package org.matsim.withinday.replanning.identifiers.tools;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
-import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
-import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
-import org.matsim.core.mobsim.qsim.interfaces.Mobsim;
-import org.matsim.core.network.LinkImpl;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.withinday.trafficmonitoring.EarliestLinkExitTimeProvider;
 
 /**
  * This Module is used by a CurrentLegReplanner. It calculates the time
@@ -81,15 +59,12 @@ import org.matsim.core.router.util.TravelTime;
  * 
  * @author cdobler
  */
-public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventHandler, 
-		AgentArrivalEventHandler, AgentDepartureEventHandler, AgentWait2LinkEventHandler,
-		AgentStuckEventHandler, ActivityStartEventHandler, ActivityEndEventHandler, 
-		MobsimInitializedListener, MobsimAfterSimStepListener {
+public class LinkReplanningMap implements AgentStuckEventHandler, ActivityStartEventHandler, ActivityEndEventHandler, 
+		MobsimAfterSimStepListener {
 
 	private static final Logger log = Logger.getLogger(LinkReplanningMap.class);
 
-	private final Network network;
-	private final Map<String, TravelTime> multiModalTravelTime;
+	private final EarliestLinkExitTimeProvider earliestLinkExitTimeProvider;
 
 	/*
 	 * EXACT... replanning is scheduled for the current time step (time == replanning time)
@@ -99,131 +74,20 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 	private enum TimeFilterMode {
 		EXACT, RESTRICTED, UNRESTRICTED
 	}
-	
-	/*
-	 * Mapping between the PersonDriverAgents and the PersonIds.
-	 * The events only contain a PersonId.
-	 */
-	private final Map<Id, PlanBasedWithinDayAgent> personAgentMapping;	// PersonId, PersonDriverAgent
 
-	private final Map<Id, Double> replanningMap;	// PersonId, ReplanningTime
-	
-	private final Set<Id> enrouteAgents;
-	
 	private final Set<Id> legJustStartedAgents;
 	private double currentTime = 0.0;
-		
-	private final Map<Id, String> agentTransportModeMap;
 	
-	public LinkReplanningMap(Network network) {
-		this(network, null);
-		log.info("Note: no MultiModalTravelTime object given. Therefore use free speed car travel time as " +
-				"minimal link travel time for all modes.");
-	}
-	
-	public LinkReplanningMap(Network network, Map<String, TravelTime> multiModalTravelTime) {
+	public LinkReplanningMap(EarliestLinkExitTimeProvider earliestLinkExitTimeProvider) {
+
 		log.info("Note that the LinkReplanningMap has to be registered as an EventHandler and a SimulationListener!");
-
-		this.network = network;
-		this.multiModalTravelTime = multiModalTravelTime;
+		this. earliestLinkExitTimeProvider = earliestLinkExitTimeProvider;
 		
-		this.enrouteAgents = new HashSet<Id>();
 		this.legJustStartedAgents = new HashSet<Id>();
-		this.replanningMap = new HashMap<Id, Double>();
-		this.personAgentMapping = new HashMap<Id, PlanBasedWithinDayAgent>();
-		this.agentTransportModeMap = new HashMap<Id, String>();
-	}
-	
-	public Map<Id, PlanBasedWithinDayAgent> getPersonAgentMapping() {
-		return Collections.unmodifiableMap(this.personAgentMapping);
-	}
-	
-	@Override
-	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
-		Mobsim sim = (Mobsim) e.getQueueSimulation();
-		
-		personAgentMapping.clear();
-		if (sim instanceof QSim) {
-			for (MobsimAgent mobsimAgent : ((QSim)sim).getAgents()) {
-				if (mobsimAgent instanceof PlanBasedWithinDayAgent) {
-					PlanBasedWithinDayAgent withinDayAgent = (PlanBasedWithinDayAgent) mobsimAgent;
-					personAgentMapping.put(withinDayAgent.getId(), withinDayAgent);
-				}
-			}
-		}
-	}
-
-	// set the earliest possible leave link time as replanning time
-	@Override
-	public void handleEvent(LinkEnterEvent event) {
-		String mode = agentTransportModeMap.get(event.getPersonId());
-
-		double now = event.getTime();
-		Link link = network.getLinks().get(event.getLinkId());
-		
-		double departureTime;
-		if (this.multiModalTravelTime != null) {
-			Person person = this.personAgentMapping.get(event.getPersonId()).getSelectedPlan().getPerson();
-			double travelTime = multiModalTravelTime.get(mode).getLinkTravelTime(link, now, person, null);
-			departureTime = Math.floor(now + travelTime);				
-		} else {
-			departureTime = Math.floor((now + ((LinkImpl) link).getFreespeedTravelTime(now)));
-		}
-		
-		replanningMap.put(event.getPersonId(), departureTime);
-	}
-
-	@Override
-	public void handleEvent(LinkLeaveEvent event) {
-		replanningMap.remove(event.getPersonId());
-	}
-
-	@Override
-	public void handleEvent(AgentArrivalEvent event) {
-		replanningMap.remove(event.getPersonId());
-		agentTransportModeMap.remove(event.getPersonId());
-		enrouteAgents.remove(event.getPersonId());
-	}
-
-	/*
-	 * The agent has ended an activity and returns to the network.
-	 * We do a replanning so the agent can choose his next link.
-	 * 
-	 * We don't do this anymore since the agent is limited in its 
-	 * replanning capabilities on the link he is departing to. 
- 	 * It is e.g. not possible, to schedule a new activity there.
- 	 * Instead we create an entry in the replanning map that
- 	 * says that the agents should perform a replanning in the
- 	 * current time step. Doing so allows to identify the agent
- 	 * as performing a leg and being allowed to perform a restricted
- 	 * set of replanning operations.
-	 */
-	@Override
-	public void handleEvent(AgentDepartureEvent event) {
-		this.agentTransportModeMap.put(event.getPersonId(), event.getLegMode());
-		this.replanningMap.put(event.getPersonId(), event.getTime());
-		this.enrouteAgents.add(event.getPersonId());	
-	}
-
-	/*
-	 * Person is added directly to the Buffer Queue so we don't need a
-	 * time offset here.
-	 *
-	 * At the moment we use the DepartureEvent to add an Agent
-	 * to the replanningMap. Otherwise situations could occur where
-	 * an Agent is not performing an Activity but is also not
-	 * performing a Leg.
-	 */
-	@Override
-	public void handleEvent(AgentWait2LinkEvent event) {
-//		replanningMap.put(event.getPersonId(), new Tuple<Id, Double>(event.getLinkId(), event.getTime()));
 	}
 
 	@Override
 	public void handleEvent(AgentStuckEvent event) {
-		this.replanningMap.remove(event.getPersonId());
-		this.enrouteAgents.remove(event.getPersonId());
-		this.agentTransportModeMap.remove(event.getPersonId());
 		this.legJustStartedAgents.remove(event.getPersonId());
 	}
 	
@@ -257,10 +121,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 	@Override
 	public void reset(int iteration) {
 		currentTime = 0.0;
-		this.replanningMap.clear();
-		this.enrouteAgents.clear();
 		this.legJustStartedAgents.clear();
-		this.agentTransportModeMap.clear();
 	}
 	
 	/**
@@ -286,11 +147,11 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 	public Set<Id> getRestrictedReplanningAgents(final double time) {
 		return this.filterAgents(time, TimeFilterMode.RESTRICTED);
 	}
-		
+	
 	private Set<Id> filterAgents(final double time, final TimeFilterMode timeMode) {
 		Set<Id> set = new HashSet<Id>();
 		
-		Iterator<Entry<Id, Double>> entries = replanningMap.entrySet().iterator();
+		Iterator<Entry<Id, Double>> entries = this.earliestLinkExitTimeProvider.getEarliestLinkExitTimes().entrySet().iterator();
 		while (entries.hasNext()) {
 			Entry<Id, Double> entry = entries.next();
 			Id personId = entry.getKey();
@@ -318,7 +179,7 @@ public class LinkReplanningMap implements LinkEnterEventHandler, LinkLeaveEventH
 	 * some of them might be limited in the available replanning operations! 
 	 */
 	public Set<Id> getLegPerformingAgents() {
-		return Collections.unmodifiableSet(this.enrouteAgents);
+		return Collections.unmodifiableSet(this.earliestLinkExitTimeProvider.getEarliestLinkExitTimes().keySet());
 	}
 
 	/**

@@ -173,7 +173,8 @@ public class BurgdorfRunner implements StartupListener {
 		linkFilterFactory = new LinkFilterFactory(parkingDecisionLinks);
 		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(linkFilterFactory);
 		
-		duringLegFactory = new ParkingIdentifierFactory(this.withinDayControlerListener.getLinkReplanningMap());
+		duringLegFactory = new ParkingIdentifierFactory(this.withinDayControlerListener.getLinkReplanningMap(),
+				this.withinDayControlerListener.getMobsimDataProvider());
 		duringLegFactory.addAgentFilterFactory(visitorAgentFilterFactory);
 		duringLegFactory.addAgentFilterFactory(carLegAgentsFilterFactory);
 		duringLegFactory.addAgentFilterFactory(linkFilterFactory);

@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.evacuation.mobsim;
+package org.matsim.withinday.mobsim;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -79,12 +79,5 @@ public class MobsimDataProvider implements MobsimInitializedListener {
 	
 	public MobsimVehicle getVehicle(Id vehicleId) {
 		return this.vehicles.get(vehicleId);
-	}
-	
-	public void getEnrouteVehiclesOnLink(Id linkId) {
-				
-//		QLinkImpl qLink = (QLinkImpl) this.netsimNetwork.getNetsimLink(linkId);
-
-//		return this.enrouteVehiclesOnLink.get(linkId);
 	}
 }

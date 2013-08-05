@@ -23,11 +23,11 @@ package org.matsim.withinday.controller;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
@@ -42,12 +42,14 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.pt.router.TransitRouterFactory;
+import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.mobsim.WithinDayQSimFactory;
 import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
+import org.matsim.withinday.trafficmonitoring.EarliestLinkExitTimeProvider;
+import org.matsim.withinday.trafficmonitoring.TransportModeProvider;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollectorFactory;
 
@@ -71,6 +73,9 @@ public class WithinDayControlerListener implements StartupListener {
 	private Set<String> travelTimeCollectorModes = null;
 	private ActivityReplanningMap activityReplanningMap;
 	private LinkReplanningMap linkReplanningMap;
+	private MobsimDataProvider mobsimDataProvider;
+	private TransportModeProvider transportModeProvider;
+	private EarliestLinkExitTimeProvider earliestLinkExitTimeProvider;
 
 	private EventsManager eventsManager;
 	private Scenario scenario;
@@ -81,7 +86,7 @@ public class WithinDayControlerListener implements StartupListener {
 	private WithinDayEngine withinDayEngine;
 	private TripRouterFactory withinDayTripRouterFactory;
 	private final FixedOrderSimulationListener fosl = new FixedOrderSimulationListener();
-	private final Map<String, TravelTime> linkReplanningTravelTimes = new HashMap<String, TravelTime>();
+	private final Map<String, TravelTime> multiModalTravelTimes = new HashMap<String, TravelTime>();
 
 	/*
 	 * ===================================================================
@@ -129,8 +134,21 @@ public class WithinDayControlerListener implements StartupListener {
 		this.travelTimeCollectorModes = modes;
 	}
 	
-	public Map<String, TravelTime> getLinkReplanningTravelTimes() {
-		return this.linkReplanningTravelTimes;
+	public Map<String, TravelTime> getMultiModalTravelTimes() {
+		return Collections.unmodifiableMap(this.multiModalTravelTimes);
+	}
+	
+	public void addMultiModalTravelTimes(Map<String, TravelTime> multiModalTravelTimes) {
+		for (Entry<String, TravelTime> entry : multiModalTravelTimes.entrySet()) {
+			this.addMultiModalTravelTime(entry.getKey(), entry.getValue());
+		}
+	}
+	
+	public void addMultiModalTravelTime(String mode, TravelTime travelTime) {
+		if (locked) throw new RuntimeException(this.getClass().toString() + " configuration has already been locked!");
+		if (this.multiModalTravelTimes.put(mode, travelTime) != null) {
+			log.info("A previously used TravelTime object for mode " + mode + " was replaced.");
+		}
 	}
 	
 	public Set<String> getModesAnalyzedByTravelTimeCollector() {
@@ -151,6 +169,18 @@ public class WithinDayControlerListener implements StartupListener {
 	
 	public WithinDayEngine getWithinDayEngine() {
 		return this.withinDayEngine;
+	}
+	
+	public TransportModeProvider getTransportModeProvider() {
+		return this.transportModeProvider;
+	}
+	
+	public EarliestLinkExitTimeProvider getEarliestLinkExitTimeProvider() {
+		return this.earliestLinkExitTimeProvider;
+	}
+	
+	public MobsimDataProvider getMobsimDataProvider() {
+		return this.mobsimDataProvider;
 	}
 	
 	public void setWithinDayTripRouterFactory(TripRouterFactory tripRouterFactory) {
@@ -201,8 +231,11 @@ public class WithinDayControlerListener implements StartupListener {
 		if (this.numReplanningThreads == 0) {
 			this.numReplanningThreads = controler.getConfig().global().getNumberOfThreads();
 		} else log.info("Number of replanning threads has already been set - it is NOT overwritten!");
-		
+				
 		this.initWithinDayEngine(this.numReplanningThreads);
+		this.createAndInitTransportModeProvider();
+		this.createAndInitEarliestLinkExitTimeProvider();
+		this.createAndInitMobsimDataProvider();
 		this.createAndInitTravelTimeCollector();
 		this.createAndInitActivityReplanningMap();
 		this.createAndInitLinkReplanningMap();
@@ -264,24 +297,35 @@ public class WithinDayControlerListener implements StartupListener {
 		this.eventsManager.addHandler(travelTimeCollector);
 	}
 	
+	private void createAndInitTransportModeProvider() {
+		this.transportModeProvider = new TransportModeProvider();
+		this.eventsManager.addHandler(this.transportModeProvider);
+	}
+	
+	private void createAndInitEarliestLinkExitTimeProvider() {
+		if (this.multiModalTravelTimes.size() == 0) {
+			this.earliestLinkExitTimeProvider = new EarliestLinkExitTimeProvider(this.scenario, this.transportModeProvider);
+		} else {
+			this.earliestLinkExitTimeProvider = new EarliestLinkExitTimeProvider(this.scenario, this.transportModeProvider,
+					this.multiModalTravelTimes);
+		}
+		this.eventsManager.addHandler(this.earliestLinkExitTimeProvider);
+	}
+	
+	private void createAndInitMobsimDataProvider() {
+		this.mobsimDataProvider = new MobsimDataProvider();
+		this.getFixedOrderSimulationListener().addSimulationListener(this.mobsimDataProvider);
+	}
+	
 	private void createAndInitActivityReplanningMap() {
 		activityReplanningMap = new ActivityReplanningMap();
 		this.eventsManager.addHandler(activityReplanningMap);
 		fosl.addSimulationListener(activityReplanningMap);
 	}
-		
+	
 	private void createAndInitLinkReplanningMap() {
-		/*
-		 * If at least one TravelTime object has been registered, the LinkReplanningMap
-		 * has to be configured to run in multi-modal mode.
-		 * TODO: what happens if main mode is NOT car?
-		 */
-		if (this.linkReplanningTravelTimes.size() > 0) {
-			this.linkReplanningTravelTimes.put(TransportMode.car, new FreeSpeedTravelTime());
-			linkReplanningMap = new LinkReplanningMap(this.scenario.getNetwork(), this.linkReplanningTravelTimes);
-		} else linkReplanningMap = new LinkReplanningMap(this.scenario.getNetwork());
-		
+		this.linkReplanningMap = new LinkReplanningMap(this.earliestLinkExitTimeProvider);
 		this.eventsManager.addHandler(linkReplanningMap);
-		fosl.addSimulationListener(linkReplanningMap);
+		this.fosl.addSimulationListener(linkReplanningMap);
 	}
 }

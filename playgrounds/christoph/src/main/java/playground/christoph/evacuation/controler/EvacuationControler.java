@@ -78,6 +78,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.vehicles.VehicleWriterV1;
 import org.matsim.withinday.controller.WithinDayController;
+import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.replanning.identifiers.ActivityPerformingIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.LegPerformingIdentifierFactory;
@@ -106,7 +107,6 @@ import playground.christoph.evacuation.mobsim.EvacuationQSimFactory;
 import playground.christoph.evacuation.mobsim.HouseholdsTracker;
 import playground.christoph.evacuation.mobsim.InformedHouseholdsTracker;
 import playground.christoph.evacuation.mobsim.LegModeChecker;
-import playground.christoph.evacuation.mobsim.MobsimDataProvider;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataGrabber;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
@@ -639,6 +639,7 @@ public class EvacuationControler extends WithinDayController implements
 
 	protected void initIdentifiers() {
 		
+		MobsimDataProvider mobsimDataProvider = null;
 		/*
 		 * Initialize AgentFilters
 		 */
@@ -674,7 +675,7 @@ public class EvacuationControler extends WithinDayController implements
 		/*
 		 * During Leg Identifiers
 		 */
-		duringLegFactory = new LegPerformingIdentifierFactory(this.getLinkReplanningMap());
+		duringLegFactory = new LegPerformingIdentifierFactory(this.getLinkReplanningMap(), mobsimDataProvider);
 		duringLegFactory.addAgentFilterFactory(initialReplanningFilterFactory);
 		this.legPerformingIdentifier = duringLegFactory.createIdentifier();
 
@@ -695,7 +696,7 @@ public class EvacuationControler extends WithinDayController implements
 //		duringLegRerouteTransportModes.add(TransportMode.car);
 //		this.duringLegRerouteIdentifier = new LeaveLinkIdentifierFactory(this.getLinkReplanningMap(), duringLegRerouteTransportModes).createIdentifier();
 		// replan all transport modes except PT
-		duringLegFactory = new LeaveLinkIdentifierFactory(this.getLinkReplanningMap()); 
+		duringLegFactory = new LeaveLinkIdentifierFactory(this.getLinkReplanningMap(), mobsimDataProvider); 
 		duringLegFactory.addAgentFilterFactory(notInitialReplanningFilterFactory);
 		duringLegFactory.addAgentFilterFactory(nonPTLegAgentsFilterFactory);
 		duringLegFactory.addAgentFilterFactory(new ProbabilityFilterFactory(EvacuationConfig.duringLegReroutingShare));

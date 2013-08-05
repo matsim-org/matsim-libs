@@ -48,13 +48,11 @@ import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.mobsim.EvacuationQSimFactory;
 import playground.christoph.evacuation.mobsim.HouseholdsTracker;
 import playground.christoph.evacuation.mobsim.InformedHouseholdsTracker;
-import playground.christoph.evacuation.mobsim.MobsimDataProvider;
 import playground.christoph.evacuation.mobsim.ReplanningTracker;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataGrabber;
 import playground.christoph.evacuation.mobsim.decisionmodel.DecisionModelRunner;
 import playground.christoph.evacuation.router.util.AffectedAreaPenaltyCalculator;
-import playground.christoph.evacuation.withinday.replanning.utils.ModeAvailabilityChecker;
 import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
 import playground.christoph.evacuation.withinday.replanning.utils.SelectHouseholdMeetingPoint;
 
@@ -71,7 +69,6 @@ public class EvacuationControlerListener implements StartupListener {
 	 * Data collectors and providers
 	 */
 	private ReplanningTracker replanningTracker;
-	private MobsimDataProvider mobsimDataProvider;
 	private JointDepartureOrganizer jointDepartureOrganizer;
 	private MissedJointDepartureWriter missedJointDepartureWriter;
 	private VehiclesTracker vehiclesTracker;
@@ -139,10 +136,7 @@ public class EvacuationControlerListener implements StartupListener {
 	private void initDataGrabbersAndProviders(Controler controler) {
 		
 		Scenario scenario = controler.getScenario();
-		
-		this.mobsimDataProvider = new MobsimDataProvider();
-		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(mobsimDataProvider);
-		
+				
 		this.jointDepartureOrganizer = new JointDepartureOrganizer();
 		this.missedJointDepartureWriter = new MissedJointDepartureWriter(this.jointDepartureOrganizer);
 		controler.addControlerListener(this.missedJointDepartureWriter);
@@ -182,7 +176,7 @@ public class EvacuationControlerListener implements StartupListener {
 		travelTimes.put(TransportMode.car, this.withinDayControlerListener.getTravelTimeCollector());
 		this.selectHouseholdMeetingPoint = new SelectHouseholdMeetingPoint(scenario, travelTimes, 
 				this.coordAnalyzer.createInstance(), this.affectedArea, 
-				this.informedHouseholdsTracker, this.decisionModelRunner, this.mobsimDataProvider);
+				this.informedHouseholdsTracker, this.decisionModelRunner, this.withinDayControlerListener.getMobsimDataProvider());
 		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(this.selectHouseholdMeetingPoint);
 	}
 }

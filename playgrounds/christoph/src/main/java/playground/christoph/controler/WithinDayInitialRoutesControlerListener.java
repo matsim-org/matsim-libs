@@ -204,14 +204,16 @@ public class WithinDayInitialRoutesControlerListener implements StartupListener,
 		}
 
 		if (duringLegRerouting) {
-			duringLegFactory = new LeaveLinkIdentifierFactory(this.withinDayControlerListener.getLinkReplanningMap());
+			duringLegFactory = new LeaveLinkIdentifierFactory(this.withinDayControlerListener.getLinkReplanningMap(),
+					this.withinDayControlerListener.getMobsimDataProvider());
 			duringLegFactory.addAgentFilterFactory(carLegAgentsFilterFactory);
 			this.legPerformingIdentifier = duringLegFactory.createIdentifier();	
 			this.legPerformingIdentifier.addAgentFilter(new ProbabilityFilterFactory(this.duringLegReroutingShare).createAgentFilter());
 		}
 		
 		if (initialLegRerouting) {
-			startedLegFactory = new LegStartedIdentifierFactory(this.withinDayControlerListener.getLinkReplanningMap());
+			startedLegFactory = new LegStartedIdentifierFactory(this.withinDayControlerListener.getLinkReplanningMap(),
+					this.withinDayControlerListener.getMobsimDataProvider());
 			startedLegFactory.addAgentFilterFactory(carLegAgentsFilterFactory);
 			this.legStartedIdentifier = startedLegFactory.createIdentifier();			
 		}

@@ -20,6 +20,7 @@
 
 package playground.christoph.burgdorf.withinday.identifiers;
 
+import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifier;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
@@ -30,8 +31,8 @@ public class ParkingIdentifierFactory extends DuringLegIdentifierFactory {
 
 	private final LeaveLinkIdentifierFactory leaveLinkIdentifierFactory;
 	
-	public ParkingIdentifierFactory(LinkReplanningMap linkReplanningMap) {
-		this.leaveLinkIdentifierFactory = new LeaveLinkIdentifierFactory(linkReplanningMap);
+	public ParkingIdentifierFactory(LinkReplanningMap linkReplanningMap, MobsimDataProvider mobsimDataProvider) {
+		this.leaveLinkIdentifierFactory = new LeaveLinkIdentifierFactory(linkReplanningMap, mobsimDataProvider);
 	}
 	
 	@Override

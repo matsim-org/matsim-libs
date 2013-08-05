@@ -51,12 +51,12 @@ import org.matsim.households.Household;
 import org.matsim.households.Households;
 import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.withinday.mobsim.MobsimDataProvider;
 
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.controler.EvacuationTripRouterFactory;
 import playground.christoph.evacuation.mobsim.InformedHouseholdsTracker;
-import playground.christoph.evacuation.mobsim.MobsimDataProvider;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.mobsim.decisiondata.HouseholdDecisionData;
 import playground.christoph.evacuation.mobsim.decisionmodel.DecisionModelRunner;
@@ -249,9 +249,7 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 					 * endBarrier.await() line. cdobler, jun'12.
 					 */
 					for (Id householdId : this.informedHouseholdsTracker.getHouseholdsInformedInLastTimeStep()) {
-						
-						Household household = households.getHouseholds().get(householdId);
-												
+																		
 						HouseholdDecisionData hdd = this.decisionDataProvider.getHouseholdDecisionData(householdId);
 
 						Id homeFacilityId = hdd.getHomeFacilityId();

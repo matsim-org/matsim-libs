@@ -45,6 +45,8 @@ import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.mobsim.WithinDayQSimFactory;
 import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
+import org.matsim.withinday.trafficmonitoring.EarliestLinkExitTimeProvider;
+import org.matsim.withinday.trafficmonitoring.TransportModeProvider;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollector;
 import org.matsim.withinday.trafficmonitoring.TravelTimeCollectorFactory;
 
@@ -68,6 +70,8 @@ public abstract class WithinDayController extends Controler implements StartupLi
 	private Set<String> travelTimeCollectorModes = null;
 	private ActivityReplanningMap activityReplanningMap;
 	private LinkReplanningMap linkReplanningMap;
+	private TransportModeProvider transportModeProvider;
+	private EarliestLinkExitTimeProvider earliestLinkExitTimeProvider;
 
 	private boolean withinDayEngineInitialized = false;
 	private WithinDayEngine withinDayEngine;
@@ -161,12 +165,21 @@ public abstract class WithinDayController extends Controler implements StartupLi
 			return;
 		}
 		if (linkReplanningMap == null) {
-			linkReplanningMap = new LinkReplanningMap(this.network, travelTime);
+			linkReplanningMap = new LinkReplanningMap(this.earliestLinkExitTimeProvider);
 			this.getEvents().addHandler(linkReplanningMap);
 			fosl.addSimulationListener(linkReplanningMap);
 		}
 	}
-
+	
+	private void createAndInitTransportModeProvider() {
+		this.transportModeProvider = new TransportModeProvider();
+		this.getEvents().addHandler(this.transportModeProvider);
+	}
+	
+	private void createAndInitEarliestLinkExitTimeProvider() {
+		this.earliestLinkExitTimeProvider = new EarliestLinkExitTimeProvider(this.scenarioData, this.transportModeProvider);
+		this.getEvents().addHandler(this.earliestLinkExitTimeProvider);
+	}
 
 	public LinkReplanningMap getLinkReplanningMap() {
 		return this.linkReplanningMap;
@@ -240,6 +253,8 @@ public abstract class WithinDayController extends Controler implements StartupLi
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		this.initWithinDayEngine(this.numReplanningThreads);
+		this.createAndInitTransportModeProvider();
+		this.createAndInitEarliestLinkExitTimeProvider();
 		this.createAndInitTravelTimeCollector();
 		this.createAndInitActivityReplanningMap();
 		this.createAndInitLinkReplanningMap();

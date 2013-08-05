@@ -30,9 +30,11 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 import org.matsim.withinday.replanning.identifiers.tools.LinkReplanningMap;
 
@@ -42,13 +44,16 @@ public class SecureLegPerformingIdentifier extends DuringLegIdentifier {
 	
 	private static final Logger log = Logger.getLogger(SecureLegPerformingIdentifier.class);
 	
-	protected LinkReplanningMap linkReplanningMap;
-	protected Coord centerCoord;
-	protected double secureDistance;
-	protected Network network;
+	private final LinkReplanningMap linkReplanningMap;
+	private final MobsimDataProvider mobsimDataProvider;
+	private final Coord centerCoord;
+	private final double secureDistance;
+	private final Network network;
 	
-	/*package*/ SecureLegPerformingIdentifier(LinkReplanningMap linkReplanningMap, Network network, Coord centerCoord, double secureDistance) {
+	/*package*/ SecureLegPerformingIdentifier(LinkReplanningMap linkReplanningMap, MobsimDataProvider mobsimDataProvider,
+			Network network, Coord centerCoord, double secureDistance) {
 		this.linkReplanningMap = linkReplanningMap;
+		this.mobsimDataProvider = mobsimDataProvider;
 		this.network = network;
 		this.centerCoord = centerCoord;
 		this.secureDistance = secureDistance;
@@ -56,8 +61,8 @@ public class SecureLegPerformingIdentifier extends DuringLegIdentifier {
 	
 	public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
 		
-		Set<Id> legPerformingAgents = new HashSet<Id>(linkReplanningMap.getLegPerformingAgents());
-		Map<Id, PlanBasedWithinDayAgent> mapping = linkReplanningMap.getPersonAgentMapping();
+		Set<Id> legPerformingAgents = new HashSet<Id>(this.linkReplanningMap.getLegPerformingAgents());
+		Map<Id, MobsimAgent> mapping = this.mobsimDataProvider.getAgents();
 		
 		
 		// apply filter to remove agents that should not be replanned
@@ -67,7 +72,7 @@ public class SecureLegPerformingIdentifier extends DuringLegIdentifier {
 		
 		for (Id id : legPerformingAgents) {
 			
-			PlanBasedWithinDayAgent agent = mapping.get(id);
+			PlanBasedWithinDayAgent agent = (PlanBasedWithinDayAgent) mapping.get(id);
 			
 			/*
 			 * Remove the Agent from the list, if the current Link is in a insecure Area.

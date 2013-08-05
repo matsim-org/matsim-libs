@@ -43,8 +43,8 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.households.Household;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
+import org.matsim.withinday.mobsim.MobsimDataProvider;
 
-import playground.christoph.evacuation.mobsim.MobsimDataProvider;
 
 /**
  * Checks whether a car is available for an agent or not.
