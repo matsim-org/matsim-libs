@@ -46,6 +46,9 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleUtils;
 
 /**
  * This keeps track of the carrier during simulation.
@@ -239,15 +242,18 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 	 * @return list of plans
 	 * @see Plan, CarrierPlan
 	 */
-	public List<Plan> createFreightDriverPlans() {
+	List<MobSimVehicleRoute> createFreightDriverPlans() {
 		clear();
-		List<Plan> plans = new ArrayList<Plan>();
+		List<MobSimVehicleRoute> routes = new ArrayList<MobSimVehicleRoute>();
+//		List<Plan> plans = new ArrayList<Plan>();
 		if (carrier.getSelectedPlan() == null) {
-			return plans;
+			return routes;
 		}
 		for (ScheduledTour scheduledTour : carrier.getSelectedPlan().getScheduledTours()) {
 			Id driverId = createDriverId(scheduledTour.getVehicle());
+			CarrierVehicle carrierVehicle = scheduledTour.getVehicle();
 			Person driverPerson = createDriverPerson(driverId);
+			Vehicle vehicle = createVehicle(driverPerson,carrierVehicle);
 			CarrierDriverAgent carrierDriverAgent = new CarrierDriverAgent(this, driverId, scheduledTour, scoringFunction);
 			Plan plan = new PlanImpl();
 			Activity startActivity = new ActivityImpl(FreightConstants.START,scheduledTour.getVehicle().getLocation());
@@ -276,11 +282,17 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 			plan.addActivity(endActivity);
 			driverPerson.addPlan(plan);
 			plan.setPerson(driverPerson);
-			plans.add(plan);
+			MobSimVehicleRoute mobsimRoute = new MobSimVehicleRoute(plan, vehicle);
+			routes.add(mobsimRoute);
+//			plans.add(plan);
 			carrierDriverAgents.put(driverId, carrierDriverAgent);
 			driverTourMap.put(driverId, scheduledTour);
 		}
-		return plans;
+		return routes;
+	}
+
+	private Vehicle createVehicle(Person driverPerson, CarrierVehicle carrierVehicle) {
+		return VehicleUtils.getFactory().createVehicle(driverPerson.getId(), carrierVehicle.getVehicleType());
 	}
 
 	private void clear() {
@@ -300,8 +312,7 @@ class CarrierAgent implements ActivityStartEventHandler, ActivityEndEventHandler
 	}
 
 	private Id createDriverId(CarrierVehicle carrierVehicle) {
-		IdImpl id = new IdImpl("freight_" + carrier.getId() + "_veh_"
-				+ carrierVehicle.getVehicleId() + "_" + nextId);
+		IdImpl id = new IdImpl("freight_" + carrier.getId() + "_veh_" + carrierVehicle.getVehicleId() + "_" + nextId);
 		driverIds.add(id);
 		++nextId;
 		return id;

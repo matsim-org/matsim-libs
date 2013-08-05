@@ -45,22 +45,20 @@ public class CarrierCapabilities {
 		}
 		
 		public Builder addType(CarrierVehicleType type){
-			vehicleTypes.add(type);
-			typeIds.add(type.getId());
+			if(!typeIds.contains(type.getId())){
+				vehicleTypes.add(type);
+				typeIds.add(type.getId());
+			}
 			return this;
 		}
 		
 		public Builder addVehicle(CarrierVehicle carrierVehicle){
 			vehicles.add(carrierVehicle);
+			if(carrierVehicle.getVehicleType() != null) addType(carrierVehicle.getVehicleType());
 			return this;
 		}
 		
 		public CarrierCapabilities build(){
-//			for(CarrierVehicle v : vehicles) {
-//				CarrierVehicleType vehicleType = v.getVehicleType();
-//				if(vehicleType == null) throw new IllegalStateException("vehicleType is missing in vehicle " + v);
-//				if(!typeIds.contains(vehicleType.getId())) throw new IllegalStateException("typeId " + vehicleType.getId() + " is missing in type-collection.");
-//			}
 			return new CarrierCapabilities(this);
 		}
 		
@@ -78,7 +76,7 @@ public class CarrierCapabilities {
 		return new CarrierCapabilities();
 	}
 	
-	public CarrierCapabilities(){}
+	private CarrierCapabilities(){}
 	
 	private CarrierCapabilities(Builder builder){
 		this.carrierVehicles = builder.vehicles;

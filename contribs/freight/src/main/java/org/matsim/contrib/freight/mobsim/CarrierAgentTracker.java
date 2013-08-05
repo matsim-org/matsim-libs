@@ -8,7 +8,6 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.freight.carrier.Carrier;
 import org.matsim.contrib.freight.carrier.CarrierScoringFunctionFactory;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
@@ -69,13 +68,13 @@ public class CarrierAgentTracker implements ActivityStartEventHandler, ActivityE
 	 * @return collection of plans
 	 * @see Plan, CarrierPlan
 	 */
-	public Collection<Plan> createPlans() {
-		List<Plan> plans = new ArrayList<Plan>();
+	Collection<MobSimVehicleRoute> createPlans() {
+		List<MobSimVehicleRoute> vehicleRoutes = new ArrayList<MobSimVehicleRoute>();
 		for (CarrierAgent carrierAgent : carrierAgents) {
-			List<Plan> plansForCarrier = carrierAgent.createFreightDriverPlans();
-			plans.addAll(plansForCarrier);
+			List<MobSimVehicleRoute> plansForCarrier = carrierAgent.createFreightDriverPlans();
+			vehicleRoutes.addAll(plansForCarrier);
 		}
-		return plans;
+		return vehicleRoutes;
 	}
 
 	/**

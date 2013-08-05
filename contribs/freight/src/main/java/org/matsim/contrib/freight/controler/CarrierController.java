@@ -150,7 +150,7 @@ public class CarrierController implements StartupListener, ShutdownListener,Befo
 		mobsimFactory.setWithinDayActivityReScheduling(withinDayReSchedulingEnabled);
 		event.getControler().setMobsimFactory(mobsimFactory);
 		controler.getEvents().addHandler(carrierAgentTracker);
-		carrierAgentTracker.createPlans();
+//		carrierAgentTracker.createPlans();
 	}
 
 	@Override

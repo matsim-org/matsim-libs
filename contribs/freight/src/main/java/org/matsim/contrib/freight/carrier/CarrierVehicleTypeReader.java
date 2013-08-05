@@ -37,6 +37,8 @@ public class CarrierVehicleTypeReader extends MatsimXmlParser {
 	private EngineInformation currentEngineInfo;
 
 	private String currentCapacity;
+	
+	private String maxVelo;
 
 	public CarrierVehicleTypeReader(CarrierVehicleTypes carrierVehicleTypes) {
 		super();
@@ -70,6 +72,7 @@ public class CarrierVehicleTypeReader extends MatsimXmlParser {
 			EngineInformation engineInfo = new EngineInformationImpl(parseFuelType(fuelType), parseDouble(gasConsumption));
 			this.currentEngineInfo = engineInfo;
 		}
+		
 		if(name.equals("costInformation")){
 			String fix = atts.getValue("fix");
 			String perMeter = atts.getValue("perMeter");
@@ -109,6 +112,9 @@ public class CarrierVehicleTypeReader extends MatsimXmlParser {
 		if(name.equals("capacity")){
 			this.currentCapacity = content;
 		}
+		if(name.equals("maxVelocity")){
+			this.maxVelo = content;
+		}
 		if(name.equals("vehicleType")){
 			CarrierVehicleType.Builder typeBuilder = CarrierVehicleType.Builder.newInstance(currentTypeId);
 			if(currentDescription != null) typeBuilder.setDescription(currentDescription);
@@ -116,8 +122,8 @@ public class CarrierVehicleTypeReader extends MatsimXmlParser {
 //			if(currentCap != null) vehType.setFreightCapacity(currentCap);
 			if(currentVehicleCosts != null) typeBuilder.setVehicleCostInformation(currentVehicleCosts);
 			if(currentEngineInfo != null) typeBuilder.setEngineInformation(currentEngineInfo);
-			if(currentCapacity == null) throw new IllegalStateException("vehicleType.capacity is missing.");
-			typeBuilder.setCapacity(Integer.parseInt(currentCapacity));
+			if(currentCapacity != null) typeBuilder.setCapacity(Integer.parseInt(currentCapacity));
+			if(maxVelo != null) typeBuilder.setMaxVelocity(Double.parseDouble(maxVelo));
 			CarrierVehicleType vehType = typeBuilder.build();
 			carrierVehicleTypes.getVehicleTypes().put(vehType.getId(), vehType);
 			reset();

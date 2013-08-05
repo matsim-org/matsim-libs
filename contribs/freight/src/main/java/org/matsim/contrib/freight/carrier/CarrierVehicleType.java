@@ -1,7 +1,6 @@
 package org.matsim.contrib.freight.carrier;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.freight.carrier.CarrierVehicleType.VehicleCostInformation;
 import org.matsim.vehicles.EngineInformation;
 import org.matsim.vehicles.VehicleTypeImpl;
 
@@ -14,7 +13,7 @@ import org.matsim.vehicles.VehicleTypeImpl;
  * @author sschroeder
  *
  */
-public class CarrierVehicleType extends VehicleTypeImpl {
+public class CarrierVehicleType extends ForwardingVehicleType {
 
 	/**
 	 * A builder building the type.
@@ -43,40 +42,92 @@ public class CarrierVehicleType extends VehicleTypeImpl {
 		private String description;
 		private EngineInformation engineInfo;
 		private int capacity = 0;
+		private double maxVeloInMeterPerSeconds = Double.MAX_VALUE;
 		
-		public Builder(Id typeId){
+		
+		private Builder(Id typeId){
 			this.typeId = typeId;
 		}
 		
+		/**
+		 * Sets fixed costs of vehicle.
+		 * 
+		 * <p>By default it is 0.
+		 * @param fix
+		 * @return
+		 */
 		public Builder setFixCost(double fix){
 			this.fix = fix;
 			return this;
 		}
 		
+		/**
+		 * Sets costs per distance-unit.
+		 * 
+		 * <p>By default it is 1.
+		 * 
+		 * @param perDistanceUnit
+		 * @return
+		 */
 		public Builder setCostPerDistanceUnit(double perDistanceUnit){
 			this.perDistanceUnit = perDistanceUnit;
 			return this;
 		}
 		
+		/**
+		 * Sets costs per time-unit.
+		 * 
+		 * <p>By default it is 0.
+		 * 
+		 * @param perTimeUnit
+		 * @return
+		 */
 		public Builder setCostPerTimeUnit(double perTimeUnit){
 			this.perTimeUnit = perTimeUnit;
 			return this;
 		}
 		
+		/**
+		 * Sets description.
+		 * 
+		 * @param description
+		 * @return this builder
+		 */
 		public Builder setDescription(String description){
 			this.description = description;
 			return this;
 		}
 		
+		/**
+		 * Sets the capacity of vehicle-type.
+		 * 
+		 * <p>By defaul the capacity is 0.
+		 * 
+		 * @param capacity
+		 * @return this builder
+		 */
 		public Builder setCapacity(int capacity){
 			this.capacity = capacity;
 			return this;
 		}
 		
+		/**
+		 * Builds the type.
+		 * 
+		 * @return {@link CarrierVehicleType}
+		 */
 		public CarrierVehicleType build(){
 			return new CarrierVehicleType(this);
 		}
 
+		/**
+		 * Sets {@link VehicleCostInformation}
+		 * 
+		 * <p>The defaults are [fix=0.0][perDistanceUnit=1.0][perTimeUnit=0.0].
+		 * 
+		 * @param info
+		 * @return this builder
+		 */
 		public Builder setVehicleCostInformation(VehicleCostInformation info) {
 			fix = info.fix;
 			perDistanceUnit = info.perDistanceUnit;
@@ -84,8 +135,19 @@ public class CarrierVehicleType extends VehicleTypeImpl {
 			return this;
 		}
 
+		/**
+		 * Sets {@link EngineInformation}
+		 * 
+		 * @param engineInfo
+		 * @return this builder
+		 */
 		public Builder setEngineInformation(EngineInformation engineInfo) {
 			this.engineInfo = engineInfo;
+			return this;
+		}
+
+		public Builder setMaxVelocity(double veloInMeterPerSeconds) {
+			this.maxVeloInMeterPerSeconds  = veloInMeterPerSeconds;
 			return this;
 		}
 	}
@@ -105,24 +167,17 @@ public class CarrierVehicleType extends VehicleTypeImpl {
 
 	}
 
-	private VehicleCostInformation vehicleCostInformation = new VehicleCostInformation(0.0, 1.0, 0.0);
+	private VehicleCostInformation vehicleCostInformation;
 
 	private int capacity;
 	
-	private CarrierVehicleType(Id typeId) {
-		super(typeId);
-	}
-	
 	private CarrierVehicleType(Builder builder){
-		super(builder.typeId);
+		super(new VehicleTypeImpl(builder.typeId));
 		this.vehicleCostInformation = new VehicleCostInformation(builder.fix, builder.perDistanceUnit, builder.perTimeUnit);
-		if(builder.engineInfo != null) this.setEngineInformation(builder.engineInfo);
-		if(builder.description != null) this.setDescription(builder.description);
+		if(builder.engineInfo != null) super.setEngineInformation(builder.engineInfo);
+		if(builder.description != null) super.setDescription(builder.description);
 		capacity = builder.capacity;
-	}
-
-	public void setVehicleCostParams(VehicleCostInformation vehicleCosts) {
-		this.vehicleCostInformation = vehicleCosts;
+		super.setMaximumVelocity(builder.maxVeloInMeterPerSeconds);
 	}
 
 	/**

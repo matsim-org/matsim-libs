@@ -4,6 +4,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.Id;
 
 /**
@@ -14,6 +16,8 @@ import org.matsim.api.core.v01.Id;
  */
 public class Carriers {
 
+	private static Logger log = Logger.getLogger(Carriers.class);
+	
 	private Map<Id, Carrier> carriers = new HashMap<Id, Carrier>();
 
 	public Carriers(Collection<Carrier> carriers) {
@@ -32,6 +36,13 @@ public class Carriers {
 
 	public Map<Id, Carrier> getCarriers() {
 		return carriers;
+	}
+
+	public void addCarrier(Carrier carrier) {
+		if(!carriers.containsKey(carrier.getId())){
+			carriers.put(carrier.getId(), carrier);
+		}
+		else log.warn("carrier " + carrier.getId() + " already exists");
 	}
 
 }

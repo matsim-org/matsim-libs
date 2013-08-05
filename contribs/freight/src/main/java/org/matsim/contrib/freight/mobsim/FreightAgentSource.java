@@ -31,13 +31,13 @@ package org.matsim.contrib.freight.mobsim;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.matsim.api.core.v01.population.Plan;
+import org.apache.log4j.Logger;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
+import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleUtils;
-
 /**
  * Created by IntelliJ IDEA. User: zilske Date: 10/31/11 Time: 5:59 PM To change
  * this template use File | Settings | File Templates.
@@ -45,7 +45,9 @@ import org.matsim.vehicles.VehicleUtils;
  */
 class FreightAgentSource implements AgentSource {
 
-	private Collection<Plan> plans;
+	private static Logger log = Logger.getLogger(FreightAgentSource.class);
+	
+	private Collection<MobSimVehicleRoute> vehicleRoutes;
 	
 	private Collection<MobsimAgent> mobSimAgents;
 
@@ -53,8 +55,8 @@ class FreightAgentSource implements AgentSource {
 
 	private QSim qsim;
 
-	FreightAgentSource(Collection<Plan> plans, AgentFactory agentFactory, QSim qsim) {
-		this.plans = plans;
+	FreightAgentSource(Collection<MobSimVehicleRoute> vehicleRoutes, AgentFactory agentFactory, QSim qsim) {
+		this.vehicleRoutes = vehicleRoutes;
 		this.agentFactory = agentFactory;
 		this.qsim = qsim;
 		mobSimAgents = new ArrayList<MobsimAgent>();
@@ -62,10 +64,20 @@ class FreightAgentSource implements AgentSource {
 
 	@Override
 	public void insertAgentsIntoMobsim() {
-		for (Plan plan : plans) {
-			MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson(plan.getPerson());
+		for (MobSimVehicleRoute vRoute : vehicleRoutes) {
+			MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson(vRoute.getPlan().getPerson());
 			qsim.insertAgentIntoMobsim(agent);
-			qsim.createAndParkVehicleOnLink(VehicleUtils.getFactory().createVehicle(agent.getId(), VehicleUtils.getDefaultVehicleType()), agent.getCurrentLinkId());
+			Vehicle vehicle = null;
+			if(vRoute.getVehicle() == null){
+				vehicle = VehicleUtils.getFactory().createVehicle(agent.getId(), VehicleUtils.getDefaultVehicleType());
+				log.warn("vehicle for agent "+vRoute.getPlan().getPerson().getId() + " is missing. set default vehicle where maxVelocity is solely defined by link.speed.");
+			}
+			else if(vRoute.getVehicle().getType() == null){
+				vehicle = VehicleUtils.getFactory().createVehicle(agent.getId(), VehicleUtils.getDefaultVehicleType());
+				log.warn("vehicleType for agent "+vRoute.getPlan().getPerson().getId() + " is missing. set default vehicleType where maxVelocity is solely defined by link.speed.");
+			}
+			else vehicle = vRoute.getVehicle();
+			qsim.createAndParkVehicleOnLink(vehicle, agent.getCurrentLinkId());
 			mobSimAgents.add(agent);
 		}
 	}

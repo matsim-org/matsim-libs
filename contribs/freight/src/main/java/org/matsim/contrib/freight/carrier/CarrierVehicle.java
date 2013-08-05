@@ -45,17 +45,16 @@ public class CarrierVehicle {
 			return new Builder(vehicleId,locationId);
 		}
 		
-		private Id location;
+		private Id locationId;
 		private Id vehicleId;
 		private CarrierVehicleType type;
 		private Id typeId;
-		private int capacity = 0;
 		private double earliestStart = 0.0;
 		private double latestEnd = Integer.MAX_VALUE;
 		
 		
 		public Builder(Id vehicleId, Id locationId){
-			this.location = locationId;
+			this.locationId = locationId;
 			this.vehicleId = vehicleId;
 		}
 		
@@ -86,7 +85,7 @@ public class CarrierVehicle {
 		}
 	}
 	
-	private final Id location;
+	private final Id locationId;
 
 	private final Id vehicleId;
 	
@@ -94,34 +93,28 @@ public class CarrierVehicle {
 
 	private CarrierVehicleType vehicleType;
 
-	private int capacity;
-
-	private boolean active = true;
-
 	private double earliestStartTime;
 
 	private double latestEndTime;
 
 	private CarrierVehicle(final Id vehicleId, final Id location) {
 		this.vehicleId = vehicleId;
-		this.location = location;
-		capacity = 0;
+		this.locationId = location;
 		earliestStartTime = 0.0;
 		latestEndTime = Integer.MAX_VALUE;
 	}
 	
 	private CarrierVehicle(Builder builder){
 		vehicleId = builder.vehicleId;
-		location=builder.location;
+		locationId = builder.locationId;
 		vehicleType = builder.type;
-		capacity = builder.capacity;
 		earliestStartTime = builder.earliestStart;
 		latestEndTime = builder.latestEnd;
 		typeId = builder.typeId;
 	}
 
 	public Id getLocation() {
-		return location;
+		return locationId;
 	}
 
 	public Id getVehicleId() {
@@ -130,7 +123,7 @@ public class CarrierVehicle {
 	
 	@Override
 	public String toString() {
-		return vehicleId + " stationed at " + location;
+		return vehicleId + " stationed at " + locationId;
 	}
 
 	public CarrierVehicleType getVehicleType() {
