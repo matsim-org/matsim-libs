@@ -1,39 +1,40 @@
-package playground.sergioo.singapore2012.transitRouterVariable.vehicleOccupancy;
+package playground.sergioo.singapore2012.transitRouterVariable.old;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
-import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
 import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.config.Config;
-import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.qsim.pt.AbstractTransitDriver;
+import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
+import org.matsim.core.mobsim.qsim.pt.TransitVehicle;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.vehicles.VehicleCapacity;
-import org.matsim.vehicles.Vehicles;
 
-public class VehicleOccupancyCalculator implements VehicleDepartsAtFacilityEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, TransitDriverStartsEventHandler {
+import playground.sergioo.singapore2012.transitRouterVariable.vehicleOccupancy.VehicleOccupancy;
+import playground.sergioo.singapore2012.transitRouterVariable.vehicleOccupancy.VehicleOccupancyData;
+import playground.sergioo.singapore2012.transitRouterVariable.vehicleOccupancy.VehicleOccupancyDataArray;
+
+public class VehicleOccupancyCalculator implements VehicleDepartsAtFacilityEventHandler, TransitDriverStartsEventHandler {
 
 	private final Map<Tuple<Id, Id>, Map<Id, VehicleOccupancyData>> vehicleOccupancy = new HashMap<Tuple<Id, Id>, Map<Id, VehicleOccupancyData>>(1000);
 	private double timeSlot;
-	private Map<Id, Integer> ptVehicles = new HashMap<Id, Integer>();
-	private Map<Id, Integer> capacities = new HashMap<Id, Integer>();
+	private Map<Id, TransitVehicle> ptVehicles = new HashMap<Id, TransitVehicle>();
 	private Map<Id, Tuple<Id, Id>> linesRoutesOfVehicle = new HashMap<Id, Tuple<Id, Id>>();
-	private final Vehicles vehicles;
-	
+	private TransitQSimEngine transitQSimEngine;
+
 	//Constructors
-	public VehicleOccupancyCalculator(final TransitSchedule transitSchedule, final Vehicles vehicles, final Config config) {
-		this(transitSchedule, vehicles, config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config.getQSimConfigGroup().getEndTime()-config.getQSimConfigGroup().getStartTime()));
+	public VehicleOccupancyCalculator(final TransitSchedule transitSchedule, final Config config) {
+		this(transitSchedule, config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config.getQSimConfigGroup().getEndTime()-config.getQSimConfigGroup().getStartTime()));
 	}
-	public VehicleOccupancyCalculator(final TransitSchedule transitSchedule, final Vehicles vehicles, final int timeSlot, final int totalTime) {
+	public VehicleOccupancyCalculator(final TransitSchedule transitSchedule, final int timeSlot, final int totalTime) {
 		this.timeSlot = timeSlot;
 		for(TransitLine line:transitSchedule.getTransitLines().values())
 			for(TransitRoute route:line.getRoutes().values()) {
@@ -43,7 +44,6 @@ public class VehicleOccupancyCalculator implements VehicleDepartsAtFacilityEvent
 					routeMap.put(route.getStops().get(s).getStopFacility().getId(), new VehicleOccupancyDataArray((int) (totalTime/timeSlot)+1));
 				}
 			}
-		this.vehicles = vehicles;
 	}
 
 	//Methods
@@ -58,6 +58,9 @@ public class VehicleOccupancyCalculator implements VehicleDepartsAtFacilityEvent
 	private double getVehicleOccupancy(Id stopOId, Id lineId, Id routeId, double time) {
 		return vehicleOccupancy.get(new Tuple<Id, Id>(lineId, routeId)).get(stopOId).getVehicleOccupancy((int) (time/timeSlot));
 	}
+	public void setPtEngine(TransitQSimEngine transitQSimEngine) {
+		this.transitQSimEngine = transitQSimEngine;
+	}
 	@Override
 	public void reset(int iteration) {
 		for(Map<Id, VehicleOccupancyData> map:vehicleOccupancy.values())
@@ -67,32 +70,19 @@ public class VehicleOccupancyCalculator implements VehicleDepartsAtFacilityEvent
 	}
 	@Override
 	public void handleEvent(VehicleDepartsAtFacilityEvent event) {
-		Integer num = ptVehicles.get(event.getVehicleId());
-		if(num!=null) {
+		TransitVehicle transitVehicle = ptVehicles.get(event.getVehicleId());
+		if(transitVehicle!=null) {
 			VehicleOccupancyData vehicleOccupancyData = vehicleOccupancy.get(linesRoutesOfVehicle.get(event.getVehicleId())).get(event.getFacilityId());
 			if(vehicleOccupancyData!=null)
-				vehicleOccupancyData.addVehicleOccupancy((int) (event.getTime()/timeSlot), num/(double)capacities.get(event.getVehicleId()));
+				vehicleOccupancyData.addVehicleOccupancy((int) (event.getTime()/timeSlot), transitVehicle.getPassengers().size()/(double)transitVehicle.getPassengerCapacity());
 		}
 	}
 	@Override
-	public void handleEvent(PersonLeavesVehicleEvent event) {
-		Integer num = this.ptVehicles.get(event.getVehicleId());
-		if(num!=null)
-			this.ptVehicles.put(event.getVehicleId(), num-1);
-	}
-	@Override
-	public void handleEvent(PersonEntersVehicleEvent event) {
-		Integer num = this.ptVehicles.get(event.getVehicleId());
-		if(num!=null)
-			this.ptVehicles.put(event.getVehicleId(), num+1);
-	}
-	@Override
 	public void handleEvent(TransitDriverStartsEvent event) {
-		this.ptVehicles.put(event.getVehicleId(), 0);
-		VehicleCapacity vehicleCapacity = vehicles.getVehicles().get(event.getVehicleId()).getType().getCapacity();
-		this.capacities.put(event.getVehicleId(), vehicleCapacity.getSeats()+vehicleCapacity.getStandingRoom());
+		if(ptVehicles.isEmpty())
+			for(MobsimAgent mobsimAgent:transitQSimEngine.getPtDrivers())
+				this.ptVehicles.put(((AbstractTransitDriver)mobsimAgent).getVehicle().getId(), ((AbstractTransitDriver)mobsimAgent).getVehicle());
 		linesRoutesOfVehicle.put(event.getVehicleId(), new Tuple<Id, Id>(event.getTransitLineId(), event.getTransitRouteId()));
 	}
-	
 
 }

@@ -29,7 +29,6 @@ import java.util.Map;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -57,8 +56,7 @@ public class TransitRouterVariableImpl implements TransitRouter {
 	private final TransitRouterConfig config;
 	private final TransitRouterNetworkTravelTimeAndDisutility ttCalculator;
 
-	public TransitRouterVariableImpl(final TransitRouterConfig config,
-			final TransitRouterNetworkTravelTimeAndDisutility ttCalculator, final TransitRouterNetworkWW routerNetwork, final Network network) {
+	public TransitRouterVariableImpl(final TransitRouterConfig config, final TransitRouterNetworkTravelTimeAndDisutility ttCalculator, final TransitRouterNetworkWW routerNetwork) {
 		this.config = config;
 		this.transitNetwork = routerNetwork;
 		this.ttCalculator = ttCalculator;

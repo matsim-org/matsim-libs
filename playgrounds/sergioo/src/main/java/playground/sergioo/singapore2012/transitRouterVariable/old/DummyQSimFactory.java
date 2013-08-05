@@ -1,4 +1,4 @@
-package playground.sergioo.singapore2012.transitRouterVariable.vehicleOccupancy;
+package playground.sergioo.singapore2012.transitRouterVariable.old;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;

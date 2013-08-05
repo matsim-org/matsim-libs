@@ -46,35 +46,22 @@ import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.WaitTime
  * @author sergioo
  */
 public class TransitRouterNetworkTravelTimeAndDisutilityWW extends TransitRouterNetworkTravelTimeAndDisutility implements TravelDisutility {
-	
-	private Network network;
-	private final TravelTime travelTime;
-	private final WaitTime waitTime;
+
 	private final Map<Id, double[]> linkTravelTimes = new HashMap<Id, double[]>();
 	private final Map<Id, double[]> linkWaitingTimes = new HashMap<Id, double[]>();
 	private final double timeSlot;
 	private final int numSlots;
-	private double startTime;
-	private TransitRouterNetworkWW routerNetwork;
 	private Link previousLink;
 	private double previousTime;
 	private double cachedTravelTime;
-	
+
 	public TransitRouterNetworkTravelTimeAndDisutilityWW(final TransitRouterConfig config, Network network, TransitRouterNetworkWW routerNetwork, TravelTime travelTime, WaitTime waitTime, TravelTimeCalculatorConfigGroup tTConfigGroup, QSimConfigGroup qSimConfigGroup, PreparedTransitSchedule preparedTransitSchedule) {
 		this(config, network, routerNetwork, travelTime, waitTime, tTConfigGroup, qSimConfigGroup.getStartTime(), qSimConfigGroup.getEndTime(), preparedTransitSchedule);
 	}
 	public TransitRouterNetworkTravelTimeAndDisutilityWW(final TransitRouterConfig config, Network network, TransitRouterNetworkWW routerNetwork, TravelTime travelTime, WaitTime waitTime, TravelTimeCalculatorConfigGroup tTConfigGroup, double startTime, double endTime, PreparedTransitSchedule preparedTransitSchedule) {
 		super(config, preparedTransitSchedule);
-		this.network = network;
-		this.travelTime = travelTime;
-		this.waitTime = waitTime;
-		this.startTime = startTime;
 		timeSlot = tTConfigGroup.getTraveltimeBinSize();
 		numSlots = (int) ((endTime-startTime)/timeSlot);
-		this.routerNetwork = routerNetwork;
-		initTravelTimes();
-	}
-	void initTravelTimes() {
 		for(TransitRouterNetworkLink link:routerNetwork.getLinks().values())
 			if(link.route!=null) {
 				double[] times = new double[numSlots];
@@ -137,7 +124,7 @@ public class TransitRouterNetworkTravelTimeAndDisutilityWW extends TransitRouter
 		TransitRouterNetworkLink wrapped = (TransitRouterNetworkLink) link;
 		if (wrapped.route != null)
 			return - linkTravelTimes.get(wrapped.getId())[time/timeSlot<numSlots?(int)(time/timeSlot):(numSlots-1)] * this.config.getMarginalUtilityOfTravelTimePt_utl_s() 
-				       - link.getLength() * (this.config.getMarginalUtilityOfTravelDistancePt_utl_m()-2.7726/100000);
+					- link.getLength() * (this.config.getMarginalUtilityOfTravelDistancePt_utl_m()-2.7726/100000);
 		else if (wrapped.toNode.route!=null)
 			// it's a wait link
 			return - linkWaitingTimes.get(wrapped.getId())[time/timeSlot<numSlots?(int)(time/timeSlot):(numSlots-1)] * this.config.getMarginalUtilityOfWaitingPt_utl_s()
