@@ -199,6 +199,10 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
             events.addHandler(eventWriter);
         }
 
+        // TravelTimeCalculator calc = new TravelTimeCalculator(scenario.getNetwork(), scenario
+        // .getConfig().travelTimeCalculator());
+        // events.addHandler(calc);
+        //
         RunningVehicleRegister rvr = new RunningVehicleRegister();
         events.addHandler(rvr);
 
@@ -228,6 +232,85 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
                 throw new IllegalStateException();
             }
         }
+        //
+        // TravelTime ttCalc = calc.getLinkTravelTimes();
+        //
+        // Link link = scenario.getNetwork().getLinks().get(scenario.createId("379"));
+        // System.err.println("14000 ---> " + ttCalc.getLinkTravelTime(link, 14000, null, null));
+        // System.err.println("15000 ---> " + ttCalc.getLinkTravelTime(link, 15000, null, null));
+        // System.err.println("16000 ---> " + ttCalc.getLinkTravelTime(link, 16000, null, null));
+        //
+        // TravelDisutility tcCalc = new TimeAsTravelDisutility(ttCalc);
+        //
+        // LeastCostPathCalculator router = new Dijkstra(scenario.getNetwork(), tcCalc, ttCalc);
+        // ShortestPathCalculator shortestPathCalculator = new ShortestPathCalculator(router,
+        // ttCalc,
+        // tcCalc);
+        //
+        // SummaryStatistics aPrioriTPDiff = new SummaryStatistics();
+        // SummaryStatistics aPosterioriTPDiff = new SummaryStatistics();
+        // SummaryStatistics aPrioriTDDiff = new SummaryStatistics();
+        // SummaryStatistics aPosterioriTDDiff = new SummaryStatistics();
+        //
+        // for (Vehicle v : data.getVrpData().getVehicles()) {
+        // for (Task t : v.getSchedule().getTasks()) {
+        // if (t.getType() == TaskType.DRIVE) {
+        // DriveTask dt = (DriveTask)t;
+        // int beginTime = dt.getBeginTime();
+        // MatsimArc arc = (MatsimArc)dt.getArc();
+        //
+        // int actualDuration = dt.getEndTime() - beginTime;
+        //
+        // int aPrioriEstimation = arc.getTimeOnDeparture(beginTime);
+        //
+        // int aPosterioriEstimation = shortestPathCalculator.calculateShortestPath(arc
+        // .getFromVertex().getLink(), arc.getToVertex().getLink(), beginTime).travelTime;
+        //
+        // if (aPosterioriEstimation != 0) {
+        // if ( (actualDuration - aPosterioriEstimation) / aPosterioriEstimation > 1) {
+        // ShortestPath sp = shortestPathCalculator.calculateShortestPath(arc
+        // .getFromVertex().getLink(), arc.getToVertex().getLink(),
+        // beginTime);
+        //
+        // System.out.println(v.getId() + " : " + (beginTime / 3600) + " : "
+        // + Arrays.asList(sp.linkIds));
+        // }
+        // }
+        // else {
+        // if (actualDuration > 1) {
+        // ShortestPath sp = shortestPathCalculator.calculateShortestPath(arc
+        // .getFromVertex().getLink(), arc.getToVertex().getLink(),
+        // beginTime);
+        //
+        // System.out.println("0==" + v.getId() + " : " + (beginTime / 3600)
+        // + " : " + Arrays.asList(sp.linkIds));
+        // }
+        // }
+        //
+        // switch ( ((TaxiDriveTask)dt).getDriveType()) {
+        // case PICKUP:
+        // aPrioriTPDiff.addValue(actualDuration - aPrioriEstimation);
+        // aPosterioriTPDiff.addValue(actualDuration - aPosterioriEstimation);
+        // break;
+        //
+        // case DELIVERY:
+        // aPrioriTDDiff.addValue(actualDuration - aPrioriEstimation);
+        // aPosterioriTDDiff.addValue(actualDuration - aPosterioriEstimation);
+        // break;
+        //
+        // default:
+        // throw new RuntimeException();
+        // }
+        //
+        // }
+        // }
+        // }
+        //
+        // System.err.println("aPriori T_P: " + aPrioriTPDiff.getMean());
+        // System.err.println("aPosteriori T_P: " + aPosterioriTPDiff.getMean());
+        //
+        // System.err.println("aPriori T_D: " + aPrioriTDDiff.getMean());
+        // System.err.println("aPosteriori T_D: " + aPosterioriTDDiff.getMean());
     }
 
 

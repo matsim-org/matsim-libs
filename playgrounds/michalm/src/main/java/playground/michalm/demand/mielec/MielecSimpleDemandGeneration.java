@@ -40,7 +40,7 @@ public class MielecSimpleDemandGeneration
     public static void main(String[] args)
         throws ConfigurationException, IOException, SAXException, ParserConfigurationException
     {
-        String dirName = "D:\\PP-rad\\taxi\\mielec-2-peaks\\";
+        String dirName = "D:\\michalm\\2013_07\\mielec-2-peaks-new\\";
         String networkFile = dirName + "network.xml";
         String zonesXmlFile = dirName + "zones.xml";
         String zonesShpFile = dirName + "GIS\\zones_with_no_zone.SHP";
@@ -55,7 +55,7 @@ public class MielecSimpleDemandGeneration
         // double taxiProbability = 0;
 
         double hours = 1;
-        double[] flowCoeff = { 0.2, 0.2, 0.4, 0.8, 0.4, 0.2, 0.2 };
+        double[] flowCoeff = { 0.2, 0.2, 0.4, 0.6, 0.4, 0.2, 0.2 };
         double taxiProbability = 0.07;
 
         Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
@@ -68,18 +68,18 @@ public class MielecSimpleDemandGeneration
         double[][] odMatrix = Array2DReader.getDoubleArray(new File(odMatrixFile), zones.size());
         double[][] odMatrixTransposed = Array2DUtils.transponse(odMatrix);
 
-        double startTime = 0;
+        double startTime = 6 * 3600;
 
-        // morning peak
+        // symmetric morning peak
         for (int i = 0; i < flowCoeff.length; i++) {
-            dg.generateSinglePeriod(odMatrix, "dummy", "dummy", hours, flowCoeff[i],
+            dg.generateSinglePeriod(odMatrixTransposed, "dummy", "dummy", hours, flowCoeff[i],
                     taxiProbability, startTime);
             startTime += 3600 * hours;
         }
 
-        // symmetric evening peak
+        // evening peak
         for (int i = 0; i < flowCoeff.length; i++) {
-            dg.generateSinglePeriod(odMatrixTransposed, "dummy", "dummy", hours, flowCoeff[i],
+            dg.generateSinglePeriod(odMatrix, "dummy", "dummy", hours, flowCoeff[i],
                     taxiProbability, startTime);
             startTime += 3600 * hours;
         }
