@@ -220,13 +220,10 @@ class CreateGridNetworkScenario {
 		return sc.getPopulation();
 	}
 
-
-
 	private static class Relation{
 		
 		private Id from;
 		private Id to;
-		private String mode;
 		private double nr;
 		private double start = 8 * 3600;
 		private double end = 10 * 3600;
@@ -234,7 +231,6 @@ class CreateGridNetworkScenario {
 		public Relation(Id fromLink, Id toLink, String mode, double nrOfAgents){
 			this.from = fromLink;
 			this.to = toLink;
-			this.mode = mode;
 			this.nr = nrOfAgents;
 		}
 	
@@ -246,38 +242,10 @@ class CreateGridNetworkScenario {
 		}
 	
 		/**
-		 * @param from the from to set
-		 */
-		public void setFrom(Id from) {
-			this.from = from;
-		}
-	
-		/**
 		 * @return the to
 		 */
 		public Id getDestinationLinkId() {
 			return to;
-		}
-	
-		/**
-		 * @param to the to to set
-		 */
-		public void setTo(Id to) {
-			this.to = to;
-		}
-	
-		/**
-		 * @return the mode
-		 */
-		public String getMode() {
-			return mode;
-		}
-	
-		/**
-		 * @param mode the mode to set
-		 */
-		public void setMode(String mode) {
-			this.mode = mode;
 		}
 	
 		/**
@@ -288,24 +256,10 @@ class CreateGridNetworkScenario {
 		}
 	
 		/**
-		 * @param nr the nr to set
-		 */
-		public void setNr(double nr) {
-			this.nr = nr;
-		}
-	
-		/**
 		 * @return the start
 		 */
 		public double getStart() {
 			return start;
-		}
-	
-		/**
-		 * @param start the start to set
-		 */
-		public void setStart(double start) {
-			this.start = start;
 		}
 	
 		/**
@@ -314,17 +268,5 @@ class CreateGridNetworkScenario {
 		public double getEnd() {
 			return end;
 		}
-	
-		/**
-		 * @param end the end to set
-		 */
-		public void setEnd(double end) {
-			this.end = end;
-		}
-		
-		
-		
 	}
-	
-
 }

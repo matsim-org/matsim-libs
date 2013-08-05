@@ -111,16 +111,16 @@ class RsaMain {
 		controler.run();
 	}
 
-	/**
-	 * @return
-	 */
-	private static PConfigGroup createPconfigForTest() {
-		PConfigGroup pConfig = new PConfigGroup();
-		pConfig.addParam("gridSize", "499.0");
-		pConfig.addParam("useFranchise", "false");
-		pConfig.addParam("timeSlotSize", "600.0");
-		pConfig.addParam("OperationMode", "taxi");
-		return pConfig;
-	}
+//	/**
+//	 * @return
+//	 */
+//	private static PConfigGroup createPconfigForTest() {
+//		PConfigGroup pConfig = new PConfigGroup();
+//		pConfig.addParam("gridSize", "499.0");
+//		pConfig.addParam("useFranchise", "false");
+//		pConfig.addParam("timeSlotSize", "600.0");
+//		pConfig.addParam("OperationMode", "taxi");
+//		return pConfig;
+//	}
 }
 

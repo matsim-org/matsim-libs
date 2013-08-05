@@ -39,6 +39,13 @@ public class PtSubModeControlerListener implements StartupListener{
 	private boolean routeOnSameMode;
 	private PtSubModeRouterFactory transitRouterFactory;
 
+	/**
+	 *  Registers the main classes of the package ptSubModes to the controler. The package provides the functionality
+	 *  to route pt-plans on a previously choosen submode (e.g. an agent plans to use a bus, but not
+	 *  any other part of the pt-system), will definitely use a bus  (if there is one) and not any other vehicle.
+	 *  
+	 * @param routeOnSameMode, allow to use the default behavior when false
+	 */
 	public PtSubModeControlerListener(boolean routeOnSameMode) {
 		this.routeOnSameMode = routeOnSameMode;
 	}

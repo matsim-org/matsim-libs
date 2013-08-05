@@ -33,7 +33,6 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
-import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
@@ -43,7 +42,6 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import playground.andreas.P2.helper.PConfigGroup;
-import playground.andreas.P2.hook.PTransitAgent;
 import playground.andreas.P2.hook.PTransitRouterFactory;
 
 /**
@@ -84,7 +82,6 @@ public class PtSubModeRouterFactory extends PTransitRouterFactory implements Ite
 		//do nothing
 	}
 	
-	private PtSubModeRouterSet set;
 	@Override
 	public TransitRouter createTransitRouter() {
 		if(this.updateRouter){

@@ -19,7 +19,6 @@
 package playground.droeder.ptSubModes.replanning;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
@@ -39,26 +38,10 @@ class PtSubModePtInteractionRemoverStrategy extends AbstractMultithreadedModule 
 	public PtSubModePtInteractionRemoverStrategy(Scenario sc){
 		super(sc.getConfig().global());
 	}
-//
+
 	@Override
 	public PlanAlgorithm getPlanAlgoInstance() {
 		return new PtSubModePtInteractionRemover();
 	}
-
-//	@Override
-//	public void prepareReplanning() {
-//		
-//	}
-//
-//	@Override
-//	public void handlePlan(Plan plan) {
-//		new FixedPtSubModePtInteractionRemover().run(plan);
-//		
-//	}
-//
-//	@Override
-//	public void finishReplanning() {
-//		
-//	}
 
 }

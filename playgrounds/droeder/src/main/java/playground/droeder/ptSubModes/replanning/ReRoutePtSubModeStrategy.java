@@ -30,7 +30,6 @@ import org.matsim.population.algorithms.PlanAlgorithm;
  */
 class ReRoutePtSubModeStrategy extends AbstractMultithreadedModule{
 	
-	private Scenario sc;
 	private ReplanningContext rc;
 
 	/**
@@ -41,10 +40,6 @@ class ReRoutePtSubModeStrategy extends AbstractMultithreadedModule{
 	public ReRoutePtSubModeStrategy(Scenario sc, ReplanningContext rc) {
 		super(sc.getConfig().global());
 		this.rc = rc;
-//		if(!(sc instanceof PtSubModeControler)){
-//			throw new IllegalArgumentException("If you want to use this replanning-strategy you are forced to use the PtSubModeControler(Old)...");
-//		}
-//		this.sc = sc;
 	}
 
 	@Override
