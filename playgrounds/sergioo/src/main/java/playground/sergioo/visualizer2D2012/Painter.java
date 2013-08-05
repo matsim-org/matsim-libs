@@ -29,13 +29,18 @@ public abstract class Painter {
 		int[] screenPoint = layersPanel.getScreenXY(new double[]{coord.getX(), coord.getY()});
 		Shape circle = new Ellipse2D.Double(screenPoint[0]-pointSize,screenPoint[1]-pointSize,pointSize*2,pointSize*2);
 		g2.fill(circle);
+		g2.setColor(Color.DARK_GRAY);
+		g2.draw(circle);
 	}
 	protected void paintCross(Graphics2D g2, LayersPanel layersPanel, Coord coord, double pointSize, Color color) {
+		Stroke stroke= g2.getStroke();
 		g2.setColor(color);
 		g2.setStroke(new BasicStroke((float) (pointSize)));
 		int[] screenPoint = layersPanel.getScreenXY(new double[]{coord.getX(), coord.getY()});
 		g2.drawLine(screenPoint[0]-(int)pointSize, screenPoint[1], screenPoint[0]+(int)pointSize, screenPoint[1]);
 		g2.drawLine(screenPoint[0], screenPoint[1]-(int)pointSize, screenPoint[0], screenPoint[1]+(int)pointSize);
+		g2.setStroke(new BasicStroke((float) (pointSize)));
+		g2.setStroke(stroke);
 	}
 	protected void paintX(Graphics2D g2, LayersPanel layersPanel, Coord coord, double pointSize, Color color) {
 		g2.setColor(color);
