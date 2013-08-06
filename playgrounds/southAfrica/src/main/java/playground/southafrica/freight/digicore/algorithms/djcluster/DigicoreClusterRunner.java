@@ -80,14 +80,9 @@ public class DigicoreClusterRunner {
 	 * 		<li> the shapefile within which activities will be clustered. Activities
 	 * 			 outside the shapefile are ignored;
 	 * 		<li> field of the shapefile that will be used as identifier;
-	 * 		<li> radius parameter, <code>r</code> for the density clustering algorithm;
-	 * 		<li> minimum-number-of-points parameter, <code>p<SUB>e</SUB></code>, for 
-	 * 			 the density clustering algorithm;
 	 * 		<li> number of threads to use for the run;
-	 * 		<li> absolute path of the output file containing the MATSim facilities;
-	 * 		<li> absolute path of the output file containing the facility attributes; and
-	 * 		<li> absolute path of the output file containing the facilities in CSV 
-	 * 			 format for QGis.  
+	 * 		<li> absolute path of the output folder to which the facilities, 
+	 * 		     facility attributes, and the facility CSV file will be written.
 	 * </ol>
 	 * @param args
 	 */
@@ -126,7 +121,6 @@ public class DigicoreClusterRunner {
 				log.info("================================================================================");
 				log.info("Executing clustering for radius " + thisRadius + ", and pmin of " + thisPmin);
 				log.info("================================================================================");
-				
 				
 				/* Create configuration-specific filenames. */
 				String outputFolder = String.format("%s%.0f_%d/", outputFolderName, thisRadius, thisPmin);
@@ -331,7 +325,7 @@ public class DigicoreClusterRunner {
 		
 		/*TODO Can remove after debugging. Report the number of
 		 * facilities that were ignored because of empty geometries. */
-		log.error("Facilities omitted: " + radius + "_" + minimumPoints + "(" + numberOfFacilitiesOmitted + ")");
+		log.debug("Facilities omitted: " + radius + "_" + minimumPoints + "(" + numberOfFacilitiesOmitted + ")");
 	}
 
 
@@ -359,7 +353,7 @@ public class DigicoreClusterRunner {
 			minX = Math.min(minX, mz.getEnvelope().getCoordinates()[0].x);
 			maxX = Math.max(maxX, mz.getEnvelope().getCoordinates()[2].x);
 			minY = Math.min(minY, mz.getEnvelope().getCoordinates()[0].y);
-			maxY = Math.max(maxY, mz.getEnvelope().getCoordinates()[0].y);
+			maxY = Math.max(maxY, mz.getEnvelope().getCoordinates()[2].y);
 		}
 		QuadTree<MyZone> zoneQT = new QuadTree<MyZone>(minX, minY, maxX, maxY);
 		for(MyZone mz : zoneList){

@@ -38,6 +38,8 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.population.routes.GenericRoute;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.AStarLandmarks;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
@@ -123,6 +125,7 @@ public class PlanVktCalculatorRunnable implements Runnable {
 	private double getEstimatedVkt(Plan plan){
 		double vkt = 0;
 		for(int i = 0; i < plan.getPlanElements().size()-1; i+=2){
+			
 			/* Read the sequence of activity-leg-activity. */
 			Object a1 = plan.getPlanElements().get(i);
 			Node fromNode = null;
@@ -133,7 +136,7 @@ public class PlanVktCalculatorRunnable implements Runnable {
 			}
 			
 			Object l = plan.getPlanElements().get(i+1);
-			Leg leg = null;
+			LegImpl leg = null;
 			if(l instanceof Leg){
 				leg = (LegImpl) l;
 			} else{
@@ -151,6 +154,7 @@ public class PlanVktCalculatorRunnable implements Runnable {
 			
 			/* Check if a route exists. If so, use it, else estimate a new route. */
 			Route route = leg.getRoute();
+			
 			List<Link> listOfLegLinks = null;
 			if(route != null){
 				/* Use actual leg route. */
