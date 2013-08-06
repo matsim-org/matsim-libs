@@ -529,14 +529,16 @@ public class ConcaveHull {
 			return concaveHull;
 		} else{
 			LOG.warn("Could not create hull as the line segments do not form a closed ring.");
-			LOG.warn("   --> Returning an empty geometry");
 			LOG.warn("   --> Unique id for the group of points: " + facilityIdentifier);
 			LOG.warn("   --> Unique points (" + this.filteredPoints.getNumGeometries() + "):");
 			Coordinate[] ca = this.filteredPoints.getCoordinates();
 			for(Coordinate c : ca){
 				LOG.warn("       (" + c.x + ";" + c.y + ")");				
 			}
-			return this.geomFactory.createGeometryCollection(null);
+			
+			/* Create the convex hull. */
+			LOG.warn("   --> Returning the convex hull.");
+			return geomFactory.createMultiPoint(this.filteredPoints.getCoordinates()).convexHull();
 		}
 	}
 

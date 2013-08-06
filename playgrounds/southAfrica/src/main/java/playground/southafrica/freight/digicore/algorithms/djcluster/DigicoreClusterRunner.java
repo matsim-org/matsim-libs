@@ -78,7 +78,9 @@ public class DigicoreClusterRunner {
 	 * 		<li> absolute path of the folder containing the Digicore vehicle files,
 	 * 			 in XML-format;
 	 * 		<li> the shapefile within which activities will be clustered. Activities
-	 * 			 outside the shapefile are ignored;
+	 * 			 outside the shapefile are ignored. NOTE: It is actually recommended
+	 * 			 that smaller demarcation areas, such as the Geospatial Analysis 
+	 * 			 Platform (GAP) zones, be used.
 	 * 		<li> field of the shapefile that will be used as identifier;
 	 * 		<li> number of threads to use for the run;
 	 * 		<li> absolute path of the output folder to which the facilities, 

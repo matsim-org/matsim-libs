@@ -51,13 +51,16 @@ public class ClusteredChainGenerator {
 	 * <ul>
 	 * <li> args[0] = the absolute path of the folder containing the original 
 	 *                .xml.gz vehicle files;
-	 * <li> args[1] = the absolute path of the file containing facilities;
-	 * <li> args[2] = the absolute path of the file containing facility attributes.
-	 *                This file is necessary as it contains the points of the 
-	 *                concave hull describing the facility;
-	 * <li> args[3] = the absolute path of the output folder where the new files 
-	 *                should be written to.
-	 * <li> args[4] = the number of threads to use in the multithreaded parts
+	 * <li> args[1] = the absolute path of the folder containing the different 
+	 * 				  clustering configuration output folders;
+	 * <li> args[2] = the number of threads to use in the multithreaded parts
+	 * <li> args[3] = the absolute path of the shapefile of the study area. 
+	 * 				  only vehicles with at least one activity inside the area
+	 * 				  will be written out to the xml folder. NOTE: It is, to my
+	 * 				  current knowledge (JWJ, Aug 2013), NECESSARY to use the 
+	 * 				  shapefile of the entire area, and <i><b>not</b></i> a 
+	 * 				  smaller demarcation shapefile, for example the GAP sones.
+	 * <li> args[4] = the ID field for the shapefile.
 	 * </ul>
 	 * @throws IOException 
 	 */

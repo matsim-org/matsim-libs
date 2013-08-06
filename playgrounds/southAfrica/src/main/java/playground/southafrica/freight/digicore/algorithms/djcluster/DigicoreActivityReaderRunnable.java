@@ -87,22 +87,50 @@ public class DigicoreActivityReaderRunnable implements Runnable {
 			for(DigicoreActivity da : dc.getAllActivities()){
 				Point p = gf.createPoint(new Coordinate(da.getCoord().getX(), da.getCoord().getY()));
 
-				/* Get all the zones surrounding the point. */
-				Collection<MyZone> neighbourhood =  zoneQT.get(p.getX(), p.getY(), 10000);
-				boolean found = false;
-				Iterator<MyZone> iterator = neighbourhood.iterator();
-				while(iterator.hasNext() && !found){
-					MyZone mz = iterator.next();
-					if(mz.getEnvelope().contains(p)){
-						if(mz.contains(p)){
-							found = true;
-							map.get(mz.getId()).add(da.getCoord());
-							inCount++;
+				/* Get all the zones surrounding the point.
+				 *  
+				 * PROBLEM: If only the entire area is given, for example Nelson
+				 * Mandela Bay, and the single zone is put in the QT at its 
+				 * centroid location, only points surrounding the centroid will
+				 * be added. 
+				 * 
+				 * One way to solve this, albeit not very computationally 
+				 * efficient, is to check the number of MyZones in the QT. If 
+				 * only one, then check that one zone. Alternatively, follow 
+				 * the original procedure of looking for only the surrounding 
+				 * zones. */
+				if(zoneQT.size() > 1){
+					Collection<MyZone> neighbourhood =  zoneQT.get(p.getX(), p.getY(), 10000);
+					boolean found = false;
+					Iterator<MyZone> iterator = neighbourhood.iterator();
+					while(iterator.hasNext() && !found){
+						MyZone mz = iterator.next();
+						if(mz.getEnvelope().contains(p)){
+							if(mz.contains(p)){
+								found = true;
+								map.get(mz.getId()).add(da.getCoord());
+								inCount++;
+							}
 						}
 					}
-				}
-				if(!found){
-					outCount++;
+					if(!found){
+						outCount++;
+					}					
+				} else{
+					/* There is only ONE zone, i.e. the entire study area. 
+					 * Check ALL points in that zone. To make it computationally
+					 * a bit more efficient, first check the envelope. */
+					MyZone zone = zoneQT.get(p.getX(), p.getY());
+					if(zone.getEnvelope().contains(p)){
+						if(zone.contains(p)){
+							map.get(zone.getId()).add(da.getCoord());
+							inCount++;
+						} else{
+							outCount++;
+						}
+					} else{
+						outCount++;
+					}
 				}
 			}		
 		}
