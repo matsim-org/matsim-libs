@@ -185,27 +185,27 @@ public class ResultsPostProcessor
     {
         String dir = "d:\\PP-rad\\taxi\\mielec-2-peaks\\2013_07\\";
 
-//        String filename = "stats_DK_" + destinationKnown + "_VT_" + onlineVehicleTracker + "_TP_"
-//                + minimizePickupTripTime + ".out";
+        String filename = "stats_DK_" + destinationKnown + "_VT_" + onlineVehicleTracker + "_TP_"
+                + minimizePickupTripTime + ".out";
 
-        String filename = "stats_destination_" + destinationKnown + "_online_"
-                + onlineVehicleTracker + ".out";
+//        String filename = "stats_destination_" + destinationKnown + "_online_"
+//                + onlineVehicleTracker + ".out";
         
         experiments = new Experiment[12];
-        experiments[0] = new Experiment(301, 100);
-        experiments[1] = new Experiment(917, 100);
-        experiments[2] = new Experiment(1528, 100);
-        experiments[3] = new Experiment(2175, 100);
+        experiments[0] = new Experiment(316, 100);
+        experiments[1] = new Experiment(911, 100);
+        experiments[2] = new Experiment(1479, 100);
+        experiments[3] = new Experiment(2105, 100);
 
-        experiments[4] = new Experiment(301, 75);
-        experiments[5] = new Experiment(917, 75);
-        experiments[6] = new Experiment(1528, 75);
-        experiments[7] = new Experiment(2175, 75);
+        experiments[4] = new Experiment(316, 75);
+        experiments[5] = new Experiment(911, 75);
+        experiments[6] = new Experiment(1479, 75);
+        experiments[7] = new Experiment(2105, 75);
 
-        experiments[8] = new Experiment(301, 50);
-        experiments[9] = new Experiment(917, 50);
-        experiments[10] = new Experiment(1528, 50);
-        experiments[11] = new Experiment(2175, 50);
+        experiments[8] = new Experiment(316, 50);
+        experiments[9] = new Experiment(911, 50);
+        experiments[10] = new Experiment(1479, 50);
+        experiments[11] = new Experiment(2105, 50);
 
         allStats = new Stats[12][];
         allStats[0] = read(dir + "mielec-2-peaks-new-01-100\\" + filename, experiments[0]);
