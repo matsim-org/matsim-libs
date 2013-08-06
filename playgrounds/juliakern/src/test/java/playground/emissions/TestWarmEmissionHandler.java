@@ -35,9 +35,12 @@ import playground.vsp.emissions.types.WarmPollutant;
 import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsPerPersonWarmEventHandler;
 
 /**
- * @author julia
- * 
  * test for playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsPerPersonWarmEventHandler
+ * 
+ * create and handle some events for different link and vehicle id
+ * assert that all used pollutants are found in the corresponding maps but nothing else
+ * 
+ * @author julia 
  **/
 
 public class TestWarmEmissionHandler {

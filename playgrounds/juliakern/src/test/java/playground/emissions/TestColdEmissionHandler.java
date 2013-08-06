@@ -34,7 +34,14 @@ import playground.vsp.emissions.events.ColdEmissionEventImpl;
 import playground.vsp.emissions.types.ColdPollutant;
 import playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsPerPersonColdEventHandler;
 
-//test for playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsPerPersonColdEventHandler
+/**
+ * test for playground.vsp.analysis.modules.emissionsAnalyzer.EmissionsPerPersonColdEventHandler
+ * 
+ * create and handle some events for different link and vehicle id
+ * assert that all used pollutants are found in the corresponding maps but nothing else
+ * 
+ * @author julia
+ */
 
 public class TestColdEmissionHandler {
 	
@@ -93,6 +100,7 @@ public class TestColdEmissionHandler {
 		if(cepp.get(new IdImpl("v2")).containsKey(ColdPollutant.NOX))actualNOX2 = cepp.get(new IdImpl("v2")).get(ColdPollutant.NOX); 
 		if(cepp.get(new IdImpl("v2")).containsKey(ColdPollutant.PM))actualPM2 = cepp.get(new IdImpl("v2")).get(ColdPollutant.PM); 
 		
+		// assert that values were set correctly
 		Assert.assertEquals("CO of vehicle 1 should be 17.1 but was "+actualCO1, new Double(17.1), actualCO1, MatsimTestUtils.EPSILON);
 		Assert.assertEquals("NOX of vehicle 1 should be 44.1 but was "+actualNOX1, new Double(44.1), actualNOX1, MatsimTestUtils.EPSILON);
 		Assert.assertEquals("PM of vehicle 1 should be 0 but was " +actualPM1, new Double(0.0), actualPM1, MatsimTestUtils.EPSILON);
@@ -100,7 +108,13 @@ public class TestColdEmissionHandler {
 		Assert.assertEquals("NOX of vehicle 2 should be 0 but was " +actualNOX2 , new Double(0.0), actualNOX2, MatsimTestUtils.EPSILON);
 		Assert.assertEquals("PM of vehicle 2 should be 18.1 but was " +actualPM2, new Double(18.1), actualPM2, MatsimTestUtils.EPSILON);
 		
-		
+		// nothing else in the map
+		Assert.assertEquals("There should be two types of emissions in this map but " +
+				"there were " + cepp.get(new IdImpl("v1")).size()+".", 
+				2, cepp.get(new IdImpl("v1")).keySet().size());
+		Assert.assertEquals("There should be two types of emissions in this map but " +
+				"there were " + cepp.get(new IdImpl("v2")).size()+".",
+				2, cepp.get(new IdImpl("v2")).keySet().size());
 	}
 }
 	

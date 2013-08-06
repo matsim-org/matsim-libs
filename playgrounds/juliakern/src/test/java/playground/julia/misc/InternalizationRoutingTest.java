@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.misc;
+package playground.julia.misc;
 /*
 import java.util.HashMap;
 import java.util.HashSet;

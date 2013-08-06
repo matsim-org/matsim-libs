@@ -33,7 +33,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
-import playground.misc.HandlerToTestEmissionAnalysisModules;
+import playground.julia.misc.HandlerToTestEmissionAnalysisModules;
 import playground.vsp.emissions.ColdEmissionAnalysisModule;
 import playground.vsp.emissions.ColdEmissionAnalysisModule.ColdEmissionAnalysisModuleParameter;
 import playground.vsp.emissions.types.ColdPollutant;
@@ -48,16 +48,19 @@ import playground.vsp.emissions.types.HbefaVehicleCategory;
  * test for playground.vsp.emissions.ColdEmissionAnalysisModule
  * 
  * ColdEmissionAnalysisModule (ceam) 
- * public: 
+ * public methods and corresponding tests: 
  * ceam module parameter - implicitly tested in calculateColdEmissionAndThrowEventTest, rescaleColdEmissionTest 
  * ceam - constructor, nothing to test 
  * reset - nothing to test
  * calculate cold emissions and throw event - calculateColdEmissionsAndThrowEventTest
  * 
- * private:
+ * private methods and corresponding tests:
  * rescale cold emissions - rescaleColdEmissionsTest
  * calculate cold emissions - implicitly tested in calculateColdEmissionAndThrowEventTest, rescaleColdEmissionTest 
  * convert string to tuple - implicitly tested in calculateColdEmissionAndThrowEventTest, rescaleColdEmissionTest
+ * 
+ * in all cases the needed tables are created manually by the setUp() method
+ * see test methods for details on the particular test cases
  */
 
 public class TestColdEmissionAnalysisModule {
@@ -202,6 +205,7 @@ public class TestColdEmissionAnalysisModule {
 	@Test 
 	public void rescaleColdEmissionsTest() {
 		
+		// can not use the setUp method here because the efficiency factor is not null
 		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable = new HashMap<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor>();
 		Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable = new HashMap<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor>();
 		fillAverageTable(avgHbefaColdTable);
@@ -233,6 +237,7 @@ public class TestColdEmissionAnalysisModule {
 	}
 	
 	private void fillDetailedTable(Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> detailedHbefaColdTable) {
+		// create all needed and one unneeded entry for the detailed table
 		
 		HbefaVehicleAttributes vehAtt = new HbefaVehicleAttributes();
 		vehAtt.setHbefaTechnology(pcpetrol14);
@@ -313,6 +318,7 @@ for (ColdPollutant cp: ColdPollutant.values()) {
 	}
 	
 	private void fillAverageTable(
+			// create all needed and one unneeded entry for the average table
 			Map<HbefaColdEmissionFactorKey, HbefaColdEmissionFactor> avgHbefaColdTable) {
 			HbefaVehicleAttributes vehAtt = new HbefaVehicleAttributes();
 			

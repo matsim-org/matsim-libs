@@ -20,7 +20,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.misc;
+package playground.julia.misc;
 
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;

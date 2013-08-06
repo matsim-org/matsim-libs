@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.misc;
+package playground.julia.misc;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package playground.misc;
+package playground.julia.misc;
 
 public class CodeList {
 

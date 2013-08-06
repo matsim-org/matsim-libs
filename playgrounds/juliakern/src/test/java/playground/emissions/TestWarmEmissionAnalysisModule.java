@@ -31,7 +31,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
-import playground.misc.HandlerToTestEmissionAnalysisModules;
+import playground.julia.misc.HandlerToTestEmissionAnalysisModules;
 import playground.vsp.emissions.WarmEmissionAnalysisModule;
 import playground.vsp.emissions.WarmEmissionAnalysisModule.WarmEmissionAnalysisModuleParameter;
 import playground.vsp.emissions.types.HbefaTrafficSituation;
@@ -43,7 +43,7 @@ import playground.vsp.emissions.types.WarmPollutant;
 
 /**
  * @author julia
- **/
+ 
 
 /*
  * test for playground.vsp.emissions.WarmEmissionAnalysisModule
@@ -66,7 +66,10 @@ import playground.vsp.emissions.types.WarmPollutant;
  * calculate warm emissions - implicitly tested
  * convert string 2 tuple - implicitly tested
  * 
- */
+ * in all cases the needed tables are created manually by the setUp() method
+ * see test methods for details on the particular test cases
+ **/
+ 
 
 public class TestWarmEmissionAnalysisModule {
 	
@@ -484,12 +487,12 @@ public class TestWarmEmissionAnalysisModule {
 		setUp();
 		weam.reset();
 		
-		// ff und sg nicht im detailed table -> use average table
+		// ff und sg not part of the detailed table -> use average table
 		Id personId = new IdImpl("person4");
 		Double lpgLinkLength = 2000.*1000;
 		String lpgVehicleInformation = passengercar + ";"+ lpgTechnology+";"+lpgSizeClass+";"+lpgConcept;
 		
-		// free flow speed
+		// sub case: current speed equals free flow speed
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(personId, roadType, lpgFreeVelocity/3.6, 
 				lpgLinkLength, lpgLinkLength/lpgFreeVelocity*3.6, lpgVehicleInformation);
 		Assert.assertEquals(0, weam.getFractionOccurences());
@@ -501,7 +504,7 @@ public class TestWarmEmissionAnalysisModule {
 		Assert.assertEquals(1, weam.getWarmEmissionEventCounter());
 		weam.reset();
 		
-		// free flow speed
+		// sub case: current speed equals free flow speed
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(personId, roadType, lpgFreeVelocity/3.6, 
 				lpgLinkLength, lpgLinkLength/lpgSgVelocity*3.6, lpgVehicleInformation);
 		Assert.assertEquals(0, weam.getFractionOccurences());
@@ -524,7 +527,7 @@ public class TestWarmEmissionAnalysisModule {
 		Double pclinkLength= 20.*1000;
 		String pcVehicleInformation = passengercar + ";"+ pcTechnology + ";"+pcSizeClass+";"+pcConcept;
 		
-		//ff
+		// sub case: current speed equals free flow speed
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(pcPersonId, roadType, pcfreeVelocity/3.6, pclinkLength, pclinkLength/pcfreeVelocity*3.6, pcVehicleInformation);
 		Assert.assertEquals(0, weam.getFractionOccurences());
 		Assert.assertEquals(pclinkLength/1000, weam.getFreeFlowKmCounter(), MatsimTestUtils.EPSILON);
@@ -535,7 +538,7 @@ public class TestWarmEmissionAnalysisModule {
 		Assert.assertEquals(1, weam.getWarmEmissionEventCounter());
 		weam.reset();
 		
-		//sg
+		// sub case: current speed equals stop go speed
 		warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(pcPersonId, roadType, pcfreeVelocity/3.6, pclinkLength, pclinkLength/pcsgVelocity*3.6, pcVehicleInformation);
 		Assert.assertEquals(0, weam.getFractionOccurences());
 		Assert.assertEquals(0., weam.getFreeFlowKmCounter(), MatsimTestUtils.EPSILON);
@@ -558,7 +561,7 @@ public class TestWarmEmissionAnalysisModule {
 	Double dieselLinkLength= 200.*1000;
 	String dieselVehicleInformation = passengercar +";"+ dieselTechnology+ ";"+ dieselSizeClass+";"+dieselConcept;
 	
-	//ff
+	// sub case: current speed equals free flow speed
 	warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(dieselPersonId, roadType, dieselFreeVelocity/3.6, dieselLinkLength, dieselLinkLength/dieselFreeVelocity*3.6, dieselVehicleInformation);
 	Assert.assertEquals(0, weam.getFractionOccurences());
 	Assert.assertEquals(dieselLinkLength/1000., weam.getFreeFlowKmCounter(), MatsimTestUtils.EPSILON);
@@ -569,7 +572,7 @@ public class TestWarmEmissionAnalysisModule {
 	Assert.assertEquals(1, weam.getWarmEmissionEventCounter());
 	weam.reset();
 	
-	//sg
+	// sub case: current speed equals stop go speed
 	warmEmissions = weam.checkVehicleInfoAndCalculateWarmEmissions(dieselPersonId, roadType, dieselFreeVelocity/3.6, dieselLinkLength, dieselLinkLength/dieselSgVelocity*3.6, dieselVehicleInformation);
 	Assert.assertEquals(0, weam.getFractionOccurences());
 	Assert.assertEquals(0., weam.getFreeFlowKmCounter(), MatsimTestUtils.EPSILON);
@@ -634,7 +637,7 @@ public class TestWarmEmissionAnalysisModule {
 		Assert.assertEquals(1, weam.getWarmEmissionEventCounter());
 		weam.reset();
 		
-		// ff < sg < avg - handled like free flow as well - no additional test
+		// ff < sg < avg - handled like free flow as well - no additional test needed
 		// avg < ff < sg - handled like stop go 
 		weam.checkVehicleInfoAndCalculateWarmEmissions(tablePersonId, roadType, tableffSpeed/3.6, tableLinkLength, 2* tableLinkLength/(tableffSpeed)*3.6, tableVehicleInformation);
 		Assert.assertEquals(0, weam.getFractionOccurences());
@@ -699,6 +702,7 @@ public class TestWarmEmissionAnalysisModule {
 	
 	@Test 
 	public void rescaleWarmEmissionsTest() {
+		// can not use the setUp method here because the efficiency factor is not null
 		
 		// setup ----
 		Map<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor> avgHbefaWarmTable = new HashMap<HbefaWarmEmissionFactorKey, HbefaWarmEmissionFactor>();
@@ -716,7 +720,6 @@ public class TestWarmEmissionAnalysisModule {
 		WarmEmissionAnalysisModuleParameter weamParameter = new WarmEmissionAnalysisModuleParameter(roadTypeMapping, avgHbefaWarmTable, detailedHbefaWarmTable);
 		WarmEmissionAnalysisModule weam = new WarmEmissionAnalysisModule(weamParameter , emissionEventManager, rescaleF);
 		HandlerToTestEmissionAnalysisModules.reset();
-		
 		// ---- end of setup
 		
 		// case 3 - stop go entry in both tables, free flow entry in average table -> use average
