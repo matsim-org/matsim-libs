@@ -42,9 +42,7 @@ public class TestEmissionsPerLinkWarmEventHandler {
 	 * 			playground.julia.scenarios.munich.analysis.nectar.EmissionPerLinkWarmEventHandler
 	 * 
 	 * @author Julia
-	 */
-	
-	/*
+	 * 
 	 * initialize some events and handler them
 	 * assert that the respective values are set in the two maps
 	 * WarmEmissionsPerLinkAndTimeInterval and Time2LinkLeaveCount
