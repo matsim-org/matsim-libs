@@ -109,7 +109,26 @@ public class EZLinkToEvents {
 				return this.personId.compareTo(o.personId);
 			}
 		}
+		class CEPASTransaction implements Comparable<CEPASTransaction>{
+			Id personId;
+			public CEPASTransaction(Id personId, Id stopId, String type, int time) {
+				super();
+				this.personId = personId;
+				this.stopId = stopId;
+				this.type = type;
+				this.time = time;
+			}
 
+			Id stopId;			
+			String type;
+			int time;
+
+			@Override
+			public int compareTo(CEPASTransaction o) {
+				
+				return ((Integer)this.time).compareTo(o.time);
+			}
+		}
 		class StopEvent {
 			int arrivalTime;
 			int departureTime;
@@ -117,7 +136,7 @@ public class EZLinkToEvents {
 			//if the arrial event is triggered by alighting event, mark the stop event, and replace the arrival 
 			//time by the first tap-in time, if any tap-ins occurred
 			boolean arrivalTriggeredbyAlighting=true;
-
+			
 			public StopEvent(int arrivalTime, int departureTime, Id stopId) {
 				super();
 				this.arrivalTime = arrivalTime;
@@ -146,7 +165,9 @@ public class EZLinkToEvents {
 		TransitRoute currentRoute;
 		boolean in = false;
 		TreeMap<Integer, TreeSet<Passenger>> passengersbyAlightingTime = new TreeMap<Integer, TreeSet<Passenger>>();
+		TreeMap<Integer, TreeSet<Passenger>> passengersbyBoardingTime = new TreeMap<Integer, TreeSet<Passenger>>();
 		TreeMap<Integer, StopEvent> stopsVisited = new TreeMap<Integer, StopEvent>();
+		HashMap<Id,ArrayList<CEPASTransaction>> transactionTimesbyStopId = new HashMap<Id, ArrayList<CEPASTransaction>>();
 		int passengerCount = 0;
 		double distance;
 		Id firstStop;
@@ -233,9 +254,18 @@ public class EZLinkToEvents {
 					passengersForAlightingTime.add(passenger);
 					this.passengersbyAlightingTime.put(alightingTime, passengersForAlightingTime);
 				}
+				try {
+					TreeSet<Passenger> passengersForBoardingTime = this.passengersbyBoardingTime.get(boardingTime);
+					passengersForBoardingTime.add(passenger);
+				} catch (NullPointerException ne) {
+					TreeSet<Passenger> passengersForBoardingTime = new TreeSet<EZLinkToEvents.PTVehicle.Passenger>();
+					passengersForBoardingTime.add(passenger);
+					this.passengersbyBoardingTime.put(boardingTime, passengersForBoardingTime);
+				}
 			}
 		}
 
+		
 		public void determineStopsAndHandleRoutes(ResultSet resultSet) throws SQLException {
 			while (resultSet.next()) {
 				Passenger passenger;
@@ -466,7 +496,7 @@ public class EZLinkToEvents {
 				String query = String
 						.format("select * "
 								+ " from %s_board_alight_preprocess where srvc_number = \'%s\' and direction = \'%d\' and bus_reg_num=\'%s\' "
-								+ " order by event_time", tripTableName, ptVehicle.ezlinkLine.lineId.toString(),
+								+ " order by stop_id, event_time", tripTableName, ptVehicle.ezlinkLine.lineId.toString(),
 								ptVehicle.ezlinkRoute.direction, ptVehicle.vehicleId.toString());
 				ResultSet resultSet = dba.executeQuery(query);
 				ptVehicle.determineStopsAndHandleRoutes(resultSet);
@@ -492,15 +522,20 @@ public class EZLinkToEvents {
 								+ "\'alighting\' as type, "
 								+ "srvc_number, direction, bus_reg_num"
 								+ " from %s "
-								+ " ) as prequery where event_time is not null order by event_time,srvc_number, direction, bus_reg_num",
-								tripTableName, tripTableName, tripTableName);
+								+ " ) as prequery where event_time is not null order by srvc_number, direction, bus_reg_num, event_time;"
+								+ "alter table %s_board_alight_preprocess add column idx serial;"
+								+ "alter table %s_board_alight_preprocess add column deltatime int;"
+								
+								,
+								tripTableName, tripTableName, tripTableName,tripTableName);
 				dba.executeStatement(query);
 				query = String
 						.format("create table %s_passenger_preprocess as select card_id, boarding_stop_stn, alighting_stop_stn, (EXTRACT(epoch FROM (ride_start_time::TEXT)::interval)) as boarding_time,"
 								+ "((EXTRACT(epoch FROM (ride_start_time::TEXT)::interval)) + (60 * ride_time))::INT AS alighting_time, "
 								+ "srvc_number, direction, bus_reg_num"
-								+ " from %s order by boarding_time, alighting_time,srvc_number, direction, bus_reg_num",
-								tripTableName, tripTableName);
+								+ " from %s order by srvc_number, direction, bus_reg_num, boarding_time, alighting_time;"
+								+ "alter table %s_passenger_preprocess add column idx serial;",
+								tripTableName, tripTableName, tripTableName);
 				dba.executeStatement(query);
 			}
 
