@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.evacuation.withinday.replanning.identifiers;
+package playground.christoph.evacuation.withinday.replanning.identifiers.filters;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -29,12 +29,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilter;
 
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.mobsim.AgentPosition;
 import playground.christoph.evacuation.mobsim.AgentsTracker;
-import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.mobsim.Tracker.Position;
 
 public class AffectedAgentsFilter implements AgentFilter {
@@ -51,15 +51,15 @@ public class AffectedAgentsFilter implements AgentFilter {
 	
 	private final Scenario scenario;
 	private final AgentsTracker agentsTracker;
-	private final VehiclesTracker vehiclesTracker;
+	private final MobsimDataProvider mobsimDataProvider;
 	private final CoordAnalyzer coordAnalyzer;
 	private final FilterType filterType;
 	
-	public AffectedAgentsFilter(Scenario scenario, AgentsTracker agentsTracker, VehiclesTracker vehiclesTracker, 
+	public AffectedAgentsFilter(Scenario scenario, AgentsTracker agentsTracker, MobsimDataProvider mobsimDataProvider, 
 			CoordAnalyzer coordAnalyzer, FilterType filterType) {
 		this.scenario = scenario;
 		this.agentsTracker = agentsTracker;
-		this.vehiclesTracker = vehiclesTracker;
+		this.mobsimDataProvider = mobsimDataProvider;
 		this.coordAnalyzer = coordAnalyzer;
 		this.filterType = filterType;
 	}
@@ -76,16 +76,16 @@ public class AffectedAgentsFilter implements AgentFilter {
 			boolean affected = false;
 			if (positionType == Position.LINK) {
 				Id linkId = agentPosition.getPositionId();
-				Link link = scenario.getNetwork().getLinks().get(linkId);
-				affected = coordAnalyzer.isLinkAffected(link);
+				Link link = this.scenario.getNetwork().getLinks().get(linkId);
+				affected = this.coordAnalyzer.isLinkAffected(link);
 			} else if (positionType == Position.FACILITY) {
 				Id facilityId = agentPosition.getPositionId();
-				Facility facility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(facilityId);
-				affected = coordAnalyzer.isFacilityAffected(facility);
+				Facility facility = ((ScenarioImpl) this.scenario).getActivityFacilities().getFacilities().get(facilityId);
+				affected = this.coordAnalyzer.isFacilityAffected(facility);
 			} else if (positionType == Position.VEHICLE) {
-				Id linkId = vehiclesTracker.getVehicleLinkId(agentPosition.getPositionId());
-				Link link = scenario.getNetwork().getLinks().get(linkId);
-				affected = coordAnalyzer.isLinkAffected(link);
+				Id linkId = this.mobsimDataProvider.getVehicle(agentPosition.getPositionId()).getCurrentLink().getId();
+				Link link = this.scenario.getNetwork().getLinks().get(linkId);
+				affected = this.coordAnalyzer.isLinkAffected(link);
 			} else {
 				log.warn("Agent's position is undefined! Id: " + agentId);
 			}

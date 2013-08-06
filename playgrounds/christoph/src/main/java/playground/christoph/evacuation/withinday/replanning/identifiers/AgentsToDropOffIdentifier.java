@@ -21,39 +21,22 @@
 package playground.christoph.evacuation.withinday.replanning.identifiers;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
-import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
-import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
-
-import playground.christoph.evacuation.analysis.CoordAnalyzer;
-import playground.christoph.evacuation.config.EvacuationConfig;
-import playground.christoph.evacuation.mobsim.VehiclesTracker;
+import org.matsim.withinday.trafficmonitoring.LinkEnteredProvider;
 
 /**
  * Identifies agents that are passengers in a vehicle which has as different
@@ -68,49 +51,37 @@ import playground.christoph.evacuation.mobsim.VehiclesTracker;
  * 
  * @author cdobler
  */
-public class AgentsToDropOffIdentifier extends DuringLegIdentifier implements LinkEnterEventHandler,
-		AgentDepartureEventHandler, AgentArrivalEventHandler, AgentStuckEventHandler, MobsimInitializedListener {
+public class AgentsToDropOffIdentifier extends DuringLegIdentifier { 
 
-	private final Scenario scenario;
-	private final CoordAnalyzer coordAnalyzer;
-	private final VehiclesTracker vehiclesTracker;
+	private final MobsimDataProvider mobsimDataProvider;
+	private final LinkEnteredProvider linkEnteredProvider;
 	private final JointDepartureOrganizer jointDepartureOrganizer;
 	
-	private final Map<Id, MobsimAgent> agents;
-	private final Set<Id> carLegPerformingAgents;
-	private final Set<Id> potentialDropOffVehicles;
-	
-	/*package*/ AgentsToDropOffIdentifier(Scenario scenario, CoordAnalyzer coordAnalyzer, VehiclesTracker vehiclesTracker,
+	/*package*/ AgentsToDropOffIdentifier(MobsimDataProvider mobsimDataProvider, LinkEnteredProvider linkEnteredProvider,
 			JointDepartureOrganizer jointDepartureOrganizer) {
-		this.scenario = scenario;
-		this.coordAnalyzer = coordAnalyzer;
-		this.vehiclesTracker = vehiclesTracker;
+		this.mobsimDataProvider = mobsimDataProvider;
+		this.linkEnteredProvider = linkEnteredProvider;
 		this.jointDepartureOrganizer = jointDepartureOrganizer;
-
-		this.agents = new HashMap<Id, MobsimAgent>();
-		this.carLegPerformingAgents = new HashSet<Id>();
-		this.potentialDropOffVehicles = new HashSet<Id>();
 	}
 
 	public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
 		
+		// Get all agents that have just entered a new link.
+		Map<Id, Id> linkEnteredAgents = new HashMap<Id, Id>(linkEnteredProvider.getLinkEnteredAgentsInLastTimeStep());	
+		
+		// Apply filter to remove agents that should not be replanned.
+		this.applyFilters(linkEnteredAgents.keySet(), time);
+		
 		Set<PlanBasedWithinDayAgent> agentsToDropOff = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
 		
-		Set<Id> driverFilterSet = new HashSet<Id>();
 		Set<Id> agentsLeaveVehicle = new TreeSet<Id>();
-		for (Id vehicleId : potentialDropOffVehicles) {
-			QVehicle vehicle = (QVehicle) this.vehiclesTracker.getVehicle(vehicleId);
-			agentsLeaveVehicle.clear();
-			driverFilterSet.clear();
+		for (Entry<Id, Id> entry : linkEnteredAgents.entrySet()) {
 			
-			/*
-			 * If the link is very short (min travel time < 1 second), the vehicle is already 
-			 * in the outgoing buffer and therefore cannot stop at the current link anymore.
-			 * Probably "vehicle.getEarliestLinkExitTime() < time" would be also fine...
-			 */
-			if (vehicle.getEarliestLinkExitTime() <= time) {
-				continue;
-			}
+			Id driverId = entry.getKey();
+			Id linkId = entry.getValue();
+			
+			QVehicle vehicle = (QVehicle) this.mobsimDataProvider.getDriversVehicle(driverId);
+			agentsLeaveVehicle.clear();
 			
 			// identify passengers that have a different destination than the driver
 			MobsimDriverAgent driver = vehicle.getDriver();
@@ -122,79 +93,26 @@ public class AgentsToDropOffIdentifier extends DuringLegIdentifier implements Li
 			
 			if (agentsLeaveVehicle.size() == 0) continue;
 			
-			// Apply filter to driver
-			driverFilterSet.add(driver.getId());
-			this.applyFilters(driverFilterSet, time);
-			if (driverFilterSet.size() == 0) continue;	// driver was removed by the filter(s), so perform no replanning
-			
-			// Apply filter to remove agents that should not be replanned.
-			this.applyFilters(agentsLeaveVehicle, time);
-			
 			// add driver and remaining agents to replanning set
 			agentsToDropOff.add((PlanBasedWithinDayAgent) driver);
-			for (Id agentId : agentsLeaveVehicle) agentsToDropOff.add((PlanBasedWithinDayAgent) this.agents.get(agentId));
+			for (Id agentId : agentsLeaveVehicle) agentsToDropOff.add((PlanBasedWithinDayAgent) this.mobsimDataProvider.getAgent(agentId));
 			
 			/*
 			 * Create a JointDeparture where the passenger(s) is(are) dropped off.
 			 */
-			Id linkId = driver.getCurrentLinkId();
-			Id driverId = driver.getId();
+//			Id linkId = driver.getCurrentLinkId();
+//			Id driverId = driver.getId();
 			Set<Id> remainingPassengers = new LinkedHashSet<Id>();
 			for (PassengerAgent passenger : vehicle.getPassengers()) {
 				Id passengerId = passenger.getId();
 				if (!agentsLeaveVehicle.contains(passengerId)) remainingPassengers.add(passengerId);
 			}
-			this.jointDepartureOrganizer.createJointDeparture(linkId, vehicleId, driverId, remainingPassengers);
-		}
-		potentialDropOffVehicles.clear();
-		
+			this.jointDepartureOrganizer.createJointDeparture(linkId, vehicle.getId(), driverId, remainingPassengers);
+			
+			// TODO: assign JointDeparture to agents and update their other joint departures
+		}	
 		
 		return agentsToDropOff;
-	}
-
-	@Override
-	public void reset(int iteration) {
-		this.carLegPerformingAgents.clear();
-	}
-
-	@Override
-	public void handleEvent(LinkEnterEvent event) {
-		if (event.getTime() < EvacuationConfig.evacuationTime) return;
-		
-		if (this.carLegPerformingAgents.contains(event.getPersonId())) {
-			Link link = this.scenario.getNetwork().getLinks().get(event.getLinkId());
-			boolean isAffected = this.coordAnalyzer.isLinkAffected(link);
-			if (!isAffected) potentialDropOffVehicles.add(event.getVehicleId());
-		}
-	}
-
-	@Override
-	public void handleEvent(AgentStuckEvent event) {
-		this.carLegPerformingAgents.remove(event.getPersonId());
-	}
-
-	@Override
-	public void handleEvent(AgentArrivalEvent event) {
-		if (event.getLegMode().equals(TransportMode.car)) {
-			this.carLegPerformingAgents.remove(event.getPersonId());
-		}
-	}
-
-	@Override
-	public void handleEvent(AgentDepartureEvent event) {
-		if (event.getLegMode().equals(TransportMode.car)) {
-			this.carLegPerformingAgents.add(event.getPersonId());
-		}
-	}
-
-	@Override
-	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
-		QSim sim = (QSim) e.getQueueSimulation();
-
-		agents.clear();
-		for (MobsimAgent agent : (sim).getAgents()) {
-			agents.put(agent.getId(), agent);
-		}
 	}
 
 }

@@ -22,41 +22,64 @@ package playground.christoph.evacuation.withinday.replanning.identifiers;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.withinday.mobsim.MobsimDataProvider;
+import org.matsim.withinday.replanning.identifiers.filter.ActivityStartingFilterFactory;
+import org.matsim.withinday.replanning.identifiers.filter.TransportModeFilterFactory;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifierFactory;
+import org.matsim.withinday.trafficmonitoring.EarliestLinkExitTimeProvider;
 
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.mobsim.InformedAgentsTracker;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
+import playground.christoph.evacuation.withinday.replanning.identifiers.filters.AffectedAgentsFilterFactory;
+import playground.christoph.evacuation.withinday.replanning.identifiers.filters.InformedAgentsFilterFactory;
 
 public class AgentsToPickupIdentifierFactory extends DuringLegIdentifierFactory {
 
 	private final Scenario scenario;
 	private final CoordAnalyzer coordAnalyzer;
 	private final VehiclesTracker vehiclesTracker;
-	private final TravelTime travelTime;
+	private final MobsimDataProvider mobsimDataProvider;
+	private final EarliestLinkExitTimeProvider earliestLinkExitTimeProvider;
 	private final InformedAgentsTracker informedAgentsTracker;
 	private final DecisionDataProvider decisionDataProvider;
 	private final JointDepartureOrganizer jointDepartureOrganizer;
 	
 	public AgentsToPickupIdentifierFactory(Scenario scenario, CoordAnalyzer coordAnalyzer, VehiclesTracker vehiclesTracker, 
-			TravelTime walkTravelTime, InformedAgentsTracker informedAgentsTracker, DecisionDataProvider decisionDataProvider,
-			JointDepartureOrganizer jointDepartureOrganizer) {
+			MobsimDataProvider mobsimDataProvider, EarliestLinkExitTimeProvider earliestLinkExitTimeProvider, 
+			InformedAgentsTracker informedAgentsTracker, DecisionDataProvider decisionDataProvider,
+			JointDepartureOrganizer jointDepartureOrganizer, AffectedAgentsFilterFactory affectedAgentsFilterFactory,
+			TransportModeFilterFactory transportModeFilterFactory, InformedAgentsFilterFactory informedAgentsFilterFactory,
+			ActivityStartingFilterFactory activityStartingFilterFactory) {
 		this.scenario = scenario;
 		this.coordAnalyzer = coordAnalyzer;
 		this.vehiclesTracker = vehiclesTracker;
-		this.travelTime = walkTravelTime;
+		this.mobsimDataProvider = mobsimDataProvider;
+		this.earliestLinkExitTimeProvider = earliestLinkExitTimeProvider;
 		this.informedAgentsTracker = informedAgentsTracker;
 		this.decisionDataProvider = decisionDataProvider;
 		this.jointDepartureOrganizer = jointDepartureOrganizer;
+		
+		// remove agents which are not informed yet
+		this.addAgentFilterFactory(informedAgentsFilterFactory);
+		
+		// remove agents which not walking
+		this.addAgentFilterFactory(transportModeFilterFactory);
+		
+		// remove agents which are not traveling inside the affected area
+		this.addAgentFilterFactory(affectedAgentsFilterFactory);
+				
+		// remove agents that are going to end their leg on their current link
+		this.addAgentFilterFactory(activityStartingFilterFactory);
 	}
-	
+
 	@Override
 	public DuringLegIdentifier createIdentifier() {
-		DuringLegIdentifier identifier = new AgentsToPickupIdentifier(scenario, coordAnalyzer.createInstance(), 
-				vehiclesTracker, travelTime, informedAgentsTracker, decisionDataProvider, jointDepartureOrganizer);
+		DuringLegIdentifier identifier = new AgentsToPickupIdentifier(this.scenario, this.coordAnalyzer.createInstance(), 
+				this.vehiclesTracker, this.mobsimDataProvider, this.earliestLinkExitTimeProvider, this.informedAgentsTracker, 
+				this.decisionDataProvider, this.jointDepartureOrganizer);
 		identifier.setIdentifierFactory(this);
 		this.addAgentFiltersToIdentifier(identifier);
 		return identifier;

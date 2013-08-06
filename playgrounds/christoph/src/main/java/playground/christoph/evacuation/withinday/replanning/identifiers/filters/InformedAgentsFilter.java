@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.evacuation.withinday.replanning.identifiers;
+package playground.christoph.evacuation.withinday.replanning.identifiers.filters;
 
 import java.util.HashSet;
 import java.util.Iterator;

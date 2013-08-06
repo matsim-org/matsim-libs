@@ -82,6 +82,8 @@ import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.replanning.identifiers.ActivityPerformingIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.LegPerformingIdentifierFactory;
+import org.matsim.withinday.replanning.identifiers.filter.ActivityStartingFilterFactory;
+import org.matsim.withinday.replanning.identifiers.filter.EarliestLinkExitTimeFilterFactory;
 import org.matsim.withinday.replanning.identifiers.filter.ProbabilityFilterFactory;
 import org.matsim.withinday.replanning.identifiers.filter.TransportModeFilterFactory;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilterFactory;
@@ -93,6 +95,8 @@ import org.matsim.withinday.replanning.replanners.CurrentLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplannerFactory;
+import org.matsim.withinday.trafficmonitoring.EarliestLinkExitTimeProvider;
+import org.matsim.withinday.trafficmonitoring.LinkEnteredProvider;
 import org.opengis.feature.simple.SimpleFeature;
 
 import playground.christoph.evacuation.analysis.AgentsInEvacuationAreaActivityCounter;
@@ -121,14 +125,14 @@ import playground.christoph.evacuation.trafficmonitoring.SwissPTTravelTime;
 import playground.christoph.evacuation.vehicles.AssignVehiclesToPlans;
 import playground.christoph.evacuation.vehicles.CreateVehiclesForHouseholds;
 import playground.christoph.evacuation.vehicles.HouseholdVehicleAssignmentReader;
-import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsToDropOffIdentifier;
 import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsToDropOffIdentifierFactory;
-import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsToPickupIdentifier;
 import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsToPickupIdentifierFactory;
-import playground.christoph.evacuation.withinday.replanning.identifiers.InformedAgentsFilter.FilterType;
-import playground.christoph.evacuation.withinday.replanning.identifiers.InformedAgentsFilterFactory;
 import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifier;
 import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifierFactory;
+import playground.christoph.evacuation.withinday.replanning.identifiers.filters.AffectedAgentsFilter;
+import playground.christoph.evacuation.withinday.replanning.identifiers.filters.AffectedAgentsFilterFactory;
+import playground.christoph.evacuation.withinday.replanning.identifiers.filters.InformedAgentsFilter;
+import playground.christoph.evacuation.withinday.replanning.identifiers.filters.InformedAgentsFilterFactory;
 import playground.christoph.evacuation.withinday.replanning.replanners.CurrentActivityToMeetingPointReplannerFactory;
 import playground.christoph.evacuation.withinday.replanning.replanners.CurrentLegToMeetingPointReplannerFactory;
 import playground.christoph.evacuation.withinday.replanning.replanners.DropOffAgentReplannerFactory;
@@ -312,6 +316,8 @@ public class EvacuationControler extends WithinDayController implements
 		
 		// initialze plan router
 		super.setUp();
+
+		MobsimDataProvider mobsimDataProvider = new MobsimDataProvider();
 		
 		MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) config.getModule(MultiModalConfigGroup.GROUP_NAME);
 		if (!NetworkUtils.isMultimodal(this.getNetwork())) {
@@ -432,9 +438,8 @@ public class EvacuationControler extends WithinDayController implements
 		this.jointDepartureWriter = new MissedJointDepartureWriter(this.jointDepartureOrganizer);
 		this.addControlerListener(this.jointDepartureWriter);
 		
-		this.vehiclesTracker = new VehiclesTracker(scenarioData.getNetwork());
+		this.vehiclesTracker = new VehiclesTracker(scenarioData.getNetwork(), mobsimDataProvider);
 		this.getEvents().addHandler(vehiclesTracker);
-		this.getFixedOrderSimulationListener().addSimulationListener(vehiclesTracker);
 		
 		this.decisionDataGrabber = new DecisionDataGrabber(this.scenarioData, this.coordAnalyzer.createInstance(), 
 				this.householdsTracker, this.householdObjectAttributes);
@@ -473,7 +478,6 @@ public class EvacuationControler extends WithinDayController implements
 		 * ModeAvailabilityChecker to check which vehicles are available for
 		 * a household at a given facility.
 		 */
-		MobsimDataProvider mobsimDataProvider = new MobsimDataProvider();
 		this.getFixedOrderSimulationListener().addSimulationListener(mobsimDataProvider);
 		this.modeAvailabilityChecker = new ModeAvailabilityChecker(this.scenarioData, mobsimDataProvider);
 		
@@ -640,19 +644,31 @@ public class EvacuationControler extends WithinDayController implements
 	protected void initIdentifiers() {
 		
 		MobsimDataProvider mobsimDataProvider = null;
+		EarliestLinkExitTimeProvider earliestLinkExitTimeProvider = null;
+		LinkEnteredProvider linkEnteredProvider = null;
+		
 		/*
 		 * Initialize AgentFilters
 		 */
-		AgentFilterFactory initialReplanningFilterFactory = new InformedAgentsFilterFactory(this.informedHouseholdsTracker, null, FilterType.InitialReplanning);
-		AgentFilterFactory notInitialReplanningFilterFactory = new InformedAgentsFilterFactory(this.informedHouseholdsTracker, null, FilterType.NotInitialReplanning);
+		InformedAgentsFilterFactory initialReplanningFilterFactory = new InformedAgentsFilterFactory(this.informedHouseholdsTracker, null, 
+				InformedAgentsFilter.FilterType.InitialReplanning);
+		InformedAgentsFilterFactory notInitialReplanningFilterFactory = new InformedAgentsFilterFactory(this.informedHouseholdsTracker, null, 
+				InformedAgentsFilter.FilterType.NotInitialReplanning);
+		
+		AffectedAgentsFilterFactory affectedAgentsFilterFactory = new AffectedAgentsFilterFactory(this.scenarioData, this.householdsTracker, 
+				mobsimDataProvider, coordAnalyzer, AffectedAgentsFilter.FilterType.NotAffected);
+		TransportModeFilterFactory carOnlyTransportModeFilterFactory = new TransportModeFilterFactory(CollectionUtils.stringToSet(TransportMode.car), mobsimDataProvider);
+		TransportModeFilterFactory walkOnlyTransportModeFilterFactory = new TransportModeFilterFactory(CollectionUtils.stringToSet(TransportMode.walk), mobsimDataProvider);
+		
+		EarliestLinkExitTimeFilterFactory earliestLinkExitTimeFilterFactory = new EarliestLinkExitTimeFilterFactory(earliestLinkExitTimeProvider);
+		ActivityStartingFilterFactory activityStartingFilterFactory = new ActivityStartingFilterFactory(mobsimDataProvider);
 		
 		Set<String> nonPTModes = new HashSet<String>();
 		nonPTModes.add(TransportMode.car);
 		nonPTModes.add(TransportMode.ride);
 		nonPTModes.add(TransportMode.bike);
 		nonPTModes.add(TransportMode.walk);
-		AgentFilterFactory nonPTLegAgentsFilterFactory = new TransportModeFilterFactory(nonPTModes);
-		this.getMobsimListeners().add((TransportModeFilterFactory) nonPTLegAgentsFilterFactory);
+		AgentFilterFactory nonPTLegAgentsFilterFactory = new TransportModeFilterFactory(nonPTModes, mobsimDataProvider);
 		
 		DuringActivityIdentifierFactory duringActivityFactory;
 		DuringLegIdentifierFactory duringLegFactory;
@@ -670,7 +686,6 @@ public class EvacuationControler extends WithinDayController implements
 		duringActivityFactory.addAgentFilterFactory(notInitialReplanningFilterFactory);
 		this.joinedHouseholdsIdentifier = duringActivityFactory.createIdentifier();
 		this.getFixedOrderSimulationListener().addSimulationListener((JoinedHouseholdsIdentifier) this.joinedHouseholdsIdentifier);
-
 		
 		/*
 		 * During Leg Identifiers
@@ -679,18 +694,17 @@ public class EvacuationControler extends WithinDayController implements
 		duringLegFactory.addAgentFilterFactory(initialReplanningFilterFactory);
 		this.legPerformingIdentifier = duringLegFactory.createIdentifier();
 
-		duringLegFactory = new AgentsToDropOffIdentifierFactory(this.scenarioData, this.coordAnalyzer, this.vehiclesTracker, this.jointDepartureOrganizer); 
-		duringLegFactory.addAgentFilterFactory(notInitialReplanningFilterFactory);
+		duringLegFactory = new AgentsToDropOffIdentifierFactory(mobsimDataProvider, linkEnteredProvider, jointDepartureOrganizer, 
+				affectedAgentsFilterFactory, carOnlyTransportModeFilterFactory, notInitialReplanningFilterFactory, 
+				earliestLinkExitTimeFilterFactory);
 		this.agentsToDropOffIdentifier = duringLegFactory.createIdentifier();
-		this.getEvents().addHandler((AgentsToDropOffIdentifier) this.agentsToDropOffIdentifier);
-		this.getFixedOrderSimulationListener().addSimulationListener((AgentsToDropOffIdentifier) this.agentsToDropOffIdentifier);
-		
-		duringLegFactory = new AgentsToPickupIdentifierFactory(this.scenarioData, this.coordAnalyzer, this.vehiclesTracker, 
-				this.walkTravelTime, this.informedHouseholdsTracker, this.decisionDataProvider, this.jointDepartureOrganizer); 
+	
+		duringLegFactory = new AgentsToPickupIdentifierFactory(this.scenarioData, this.coordAnalyzer, this.vehiclesTracker,
+				mobsimDataProvider, earliestLinkExitTimeProvider, this.informedHouseholdsTracker, this.decisionDataProvider, 
+				this.jointDepartureOrganizer, affectedAgentsFilterFactory, walkOnlyTransportModeFilterFactory, notInitialReplanningFilterFactory, 
+				activityStartingFilterFactory); 
 		duringLegFactory.addAgentFilterFactory(notInitialReplanningFilterFactory);
 		this.agentsToPickupIdentifier = duringLegFactory.createIdentifier();
-		this.getEvents().addHandler((AgentsToPickupIdentifier) this.agentsToPickupIdentifier);
-		this.getFixedOrderSimulationListener().addSimulationListener((AgentsToPickupIdentifier) this.agentsToPickupIdentifier);
 		
 //		Set<String> duringLegRerouteTransportModes = new HashSet<String>();
 //		duringLegRerouteTransportModes.add(TransportMode.car);

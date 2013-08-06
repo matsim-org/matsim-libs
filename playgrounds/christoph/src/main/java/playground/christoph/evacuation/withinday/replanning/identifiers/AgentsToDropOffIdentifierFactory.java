@@ -20,33 +20,53 @@
 
 package playground.christoph.evacuation.withinday.replanning.identifiers;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
+import org.matsim.withinday.mobsim.MobsimDataProvider;
+import org.matsim.withinday.replanning.identifiers.filter.EarliestLinkExitTimeFilterFactory;
+import org.matsim.withinday.replanning.identifiers.filter.TransportModeFilterFactory;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifierFactory;
+import org.matsim.withinday.trafficmonitoring.LinkEnteredProvider;
 
-import playground.christoph.evacuation.analysis.CoordAnalyzer;
-import playground.christoph.evacuation.mobsim.VehiclesTracker;
+import playground.christoph.evacuation.withinday.replanning.identifiers.filters.AffectedAgentsFilterFactory;
+import playground.christoph.evacuation.withinday.replanning.identifiers.filters.InformedAgentsFilterFactory;
 
 public class AgentsToDropOffIdentifierFactory extends DuringLegIdentifierFactory {
 
-	private final Scenario scenario;
-	private final CoordAnalyzer coordAnalyzer;
-	private final VehiclesTracker vehiclesTracker;
+	private final MobsimDataProvider mobsimDataProvider;
+	private final LinkEnteredProvider linkEnteredProvider;
 	private final JointDepartureOrganizer jointDepartureOrganizer;
 	
-	public AgentsToDropOffIdentifierFactory(Scenario scenario, CoordAnalyzer coordAnalyzer, VehiclesTracker vehiclesTracker,
-			JointDepartureOrganizer jointDepartureOrganizer) {
-		this.scenario = scenario;
-		this.coordAnalyzer = coordAnalyzer;
-		this.vehiclesTracker = vehiclesTracker;
+	public AgentsToDropOffIdentifierFactory(MobsimDataProvider mobsimDataProvider, LinkEnteredProvider linkEnteredProvider, 
+			JointDepartureOrganizer jointDepartureOrganizer, AffectedAgentsFilterFactory affectedAgentsFilterFactory,
+			TransportModeFilterFactory transportModeFilterFactory, InformedAgentsFilterFactory informedAgentsFilterFactory,
+			EarliestLinkExitTimeFilterFactory earliestLinkExitTimeFilterFactory) {
+		this.mobsimDataProvider = mobsimDataProvider;
+		this.linkEnteredProvider = linkEnteredProvider;
 		this.jointDepartureOrganizer = jointDepartureOrganizer;
+		
+		// remove agents which are not informed yet
+		this.addAgentFilterFactory(informedAgentsFilterFactory);
+		
+		// remove agents which are not traveling by car
+		this.addAgentFilterFactory(transportModeFilterFactory);
+		
+		// remove agents which are not traveling inside the affected area
+		this.addAgentFilterFactory(affectedAgentsFilterFactory);
+		
+		/*
+		 *  Remove agents that cannot stop at their current link anymore. This can occur
+		 *  on very short links (min travel time < 1 second). Then, the vehicle might
+		 *  already be in the outgoing buffer.
+		 */
+		this.addAgentFilterFactory(earliestLinkExitTimeFilterFactory);
 	}
 	
 	@Override
 	public DuringLegIdentifier createIdentifier() {
-		DuringLegIdentifier identifier = new AgentsToDropOffIdentifier(scenario, coordAnalyzer.createInstance(), 
-				vehiclesTracker, jointDepartureOrganizer);
+		
+		DuringLegIdentifier identifier = new AgentsToDropOffIdentifier(this.mobsimDataProvider, this.linkEnteredProvider, 
+				this.jointDepartureOrganizer);
 		identifier.setIdentifierFactory(this);
 		this.addAgentFiltersToIdentifier(identifier);
 		return identifier;

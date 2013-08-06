@@ -219,7 +219,7 @@ public class CreateEvacuationAreaSubScenario {
 				}
 				
 				if (!increaseBuffer) {
-					log.info("A buffer of  " + buffer + " was required to catch all links where affected" +
+					log.info("A buffer of " + buffer + " was required to catch all links where affected " +
 							"facilities are attached to.");
 					return bufferedCoordAnalyzer;
 				}

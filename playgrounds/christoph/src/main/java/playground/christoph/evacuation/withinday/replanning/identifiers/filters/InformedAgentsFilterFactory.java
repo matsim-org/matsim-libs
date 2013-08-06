@@ -18,14 +18,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.evacuation.withinday.replanning.identifiers;
+package playground.christoph.evacuation.withinday.replanning.identifiers.filters;
 
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilter;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilterFactory;
 
 import playground.christoph.evacuation.mobsim.InformedAgentsTracker;
 import playground.christoph.evacuation.mobsim.ReplanningTracker;
-import playground.christoph.evacuation.withinday.replanning.identifiers.InformedAgentsFilter.FilterType;
+import playground.christoph.evacuation.withinday.replanning.identifiers.filters.InformedAgentsFilter.FilterType;
 
 public class InformedAgentsFilterFactory implements AgentFilterFactory {
 

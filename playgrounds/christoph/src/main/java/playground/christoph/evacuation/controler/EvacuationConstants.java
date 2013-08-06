@@ -34,6 +34,14 @@ public abstract class EvacuationConstants implements MatsimParameters {
 	*/
 	public static final String PICKUP_DROP_OFF_FACILITY_SUFFIX = "_pickup_dropoff";
 
+	/**
+	 * Pick-up and drop-off activities.
+	 */
 	public static final String PICKUP_ACTIVITY = "pickup";
 	public static final String DROP_OFF_ACTIVITY = "dropoff";
+	
+	/**
+	 * Activity which agents perform outside the evacuation area.
+	 */
+	public static final String RESCUE_ACTIVITY = "rescue";
 }

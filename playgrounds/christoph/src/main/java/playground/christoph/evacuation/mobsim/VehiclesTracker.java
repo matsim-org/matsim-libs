@@ -43,31 +43,25 @@ import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandle
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
-import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
-import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
-import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
+import org.matsim.withinday.mobsim.MobsimDataProvider;
 
 /**
  * Class that tracks vehicles.
  * 
  * @author cdobler
  */
-public class VehiclesTracker implements MobsimInitializedListener,
-	LinkEnterEventHandler, LinkLeaveEventHandler, PersonLeavesVehicleEventHandler,
+public class VehiclesTracker implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonLeavesVehicleEventHandler,
 	AgentDepartureEventHandler, AgentArrivalEventHandler {
+	
+	private final MobsimDataProvider mobsimDataProvider;
 	
 	private final Network network;
 	
 	// currently active drivers
 	private final Set<Id> drivers;
-	
-	// vehicles
-	private final Map<Id, MobsimVehicle> vehicles;
 	
 	// vehicles currently enroute on a given link
 	private final Map<Id, List<Id>> enrouteVehiclesOnLink;
@@ -80,18 +74,18 @@ public class VehiclesTracker implements MobsimInitializedListener,
 	 */
 	private final Map<Id, AtomicInteger> reservedCapacities;
 	
-	public VehiclesTracker(Network network) {
+	public VehiclesTracker(Network network, MobsimDataProvider mobsimDataProvider) {
 		
 		this.network = network;
+		this.mobsimDataProvider = mobsimDataProvider;
 		
 		this.drivers = new HashSet<Id>();
-		this.vehicles = new HashMap<Id, MobsimVehicle>();	
 		this.enrouteVehiclesOnLink = new HashMap<Id, List<Id>>();
 		this.reservedCapacities = new HashMap<Id, AtomicInteger>();
 	}
 
 	public Id getVehicleLinkId(Id vehicleId) {
-		return this.vehicles.get(vehicleId).getCurrentLink().getId();
+		return this.mobsimDataProvider.getVehicle(vehicleId).getCurrentLink().getId();
 	}
 	
 	public List<Id> getEnrouteVehiclesOnLink(Id linkId) {
@@ -101,7 +95,7 @@ public class VehiclesTracker implements MobsimInitializedListener,
 	@Deprecated
 	public int getFreeVehicleCapacity(Id vehicleId) {
 		
-		QVehicle vehicle = (QVehicle) this.vehicles.get(vehicleId);
+		QVehicle vehicle = (QVehicle) this.mobsimDataProvider.getVehicle(vehicleId);
 		
 		int passengerCapacity = vehicle.getPassengerCapacity();
 		int passengers = vehicle.getPassengers().size();
@@ -123,33 +117,15 @@ public class VehiclesTracker implements MobsimInitializedListener,
 	
 	@Deprecated
 	public MobsimVehicle getVehicle(Id vehicleId) {
-		return this.vehicles.get(vehicleId);
-	}
-	
-	@Deprecated
-	public MobsimDriverAgent getVehicleDriver(Id vehicleId) {
-		return this.vehicles.get(vehicleId).getDriver();
+		return this.mobsimDataProvider.getVehicle(vehicleId);
 	}
 	
 	@Deprecated
 	public Collection<? extends PassengerAgent> getVehiclePassengers(Id vehicleId) {
-		QVehicle vehicle = (QVehicle) this.vehicles.get(vehicleId);
+		QVehicle vehicle = (QVehicle)this.mobsimDataProvider.getVehicle(vehicleId);
 		return vehicle.getPassengers();
 	}
-	
-	@Deprecated
-	@Override
-	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
-		QSim sim = (QSim) e.getQueueSimulation();
 		
-		// collect all vehicles
-		for (NetsimLink netsimLink : sim.getNetsimNetwork().getNetsimLinks().values()) {
-			for (MobsimVehicle mobsimVehicle : netsimLink.getAllVehicles()) {
-				this.vehicles.put(mobsimVehicle.getId(), mobsimVehicle);
-			}
-		}
-	}
-	
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
 		/*
@@ -158,7 +134,7 @@ public class VehiclesTracker implements MobsimInitializedListener,
 		 */
 //		TODO: this is not true anymore... think about pt and passengers
 		
-		MobsimVehicle vehicle = this.vehicles.get(event.getVehicleId());
+		MobsimVehicle vehicle = this.mobsimDataProvider.getVehicle(event.getVehicleId());
 		List<Id> vehicleIds = this.enrouteVehiclesOnLink.get(vehicle.getCurrentLink().getId());
 		vehicleIds.remove(vehicle.getId());
 	}
@@ -200,7 +176,6 @@ public class VehiclesTracker implements MobsimInitializedListener,
 	@Override
 	public void reset(int iteration) {		
 		this.drivers.clear();
-		this.vehicles.clear();		
 		this.enrouteVehiclesOnLink.clear();
 		
 		// initialize some maps

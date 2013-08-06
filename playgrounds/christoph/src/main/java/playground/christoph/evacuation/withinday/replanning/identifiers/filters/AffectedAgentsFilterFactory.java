@@ -18,37 +18,36 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.evacuation.withinday.replanning.identifiers;
+package playground.christoph.evacuation.withinday.replanning.identifiers.filters;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilter;
+import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilterFactory;
 
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.mobsim.AgentsTracker;
-import playground.christoph.evacuation.mobsim.VehiclesTracker;
-import playground.christoph.evacuation.withinday.replanning.identifiers.AffectedAgentsFilter.FilterType;
+import playground.christoph.evacuation.withinday.replanning.identifiers.filters.AffectedAgentsFilter.FilterType;
 
 public class AffectedAgentsFilterFactory implements AgentFilterFactory {
 
 	private final Scenario scenario;
 	private final AgentsTracker agentsTracker;
-	private final VehiclesTracker vehiclesTracker;
+	private final MobsimDataProvider mobsimDataProvider;
 	private final CoordAnalyzer coordAnalyzer;
 	private final FilterType filterType;
 	
-	public AffectedAgentsFilterFactory(Scenario scenario, AgentsTracker agentsTracker, VehiclesTracker vehiclesTracker, 
+	public AffectedAgentsFilterFactory(Scenario scenario, AgentsTracker agentsTracker, MobsimDataProvider mobsimDataProvider, 
 			CoordAnalyzer coordAnalyzer, FilterType filterType) {
 		this.scenario = scenario;
 		this.agentsTracker = agentsTracker;
-		this.vehiclesTracker = vehiclesTracker;
+		this.mobsimDataProvider = mobsimDataProvider;
 		this.coordAnalyzer = coordAnalyzer;
 		this.filterType = filterType;
 	}
 	
 	@Override
-	public AgentFilter createAgentFilter() {
-		return new AffectedAgentsFilter(scenario, agentsTracker, vehiclesTracker, coordAnalyzer, filterType);
+	public AffectedAgentsFilter createAgentFilter() {
+		return new AffectedAgentsFilter(scenario, agentsTracker, mobsimDataProvider, coordAnalyzer, filterType);
 	}
 
 }

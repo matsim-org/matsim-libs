@@ -199,8 +199,8 @@ public class WithinDayInitialRoutesControlerListener implements StartupListener,
 		duringLegRerouteTransportModes.add(TransportMode.car);
 		
 		if (initialLegRerouting || duringLegRerouting) {
-			carLegAgentsFilterFactory = new TransportModeFilterFactory(duringLegRerouteTransportModes);
-			this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(carLegAgentsFilterFactory);
+			carLegAgentsFilterFactory = new TransportModeFilterFactory(duringLegRerouteTransportModes,
+					this.withinDayControlerListener.getMobsimDataProvider());
 		}
 
 		if (duringLegRerouting) {

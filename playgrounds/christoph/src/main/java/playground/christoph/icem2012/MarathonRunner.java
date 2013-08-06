@@ -104,14 +104,13 @@ import playground.christoph.evacuation.core.utils.geometry.Coord3dImpl;
 import playground.christoph.evacuation.mobsim.AgentsTracker;
 import playground.christoph.evacuation.mobsim.InformedHouseholdsTracker;
 import playground.christoph.evacuation.mobsim.ReplanningTracker;
-import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.network.AddZCoordinatesToNetwork;
 import playground.christoph.evacuation.trafficmonitoring.SwissPTTravelTime;
-import playground.christoph.evacuation.withinday.replanning.identifiers.AffectedAgentsFilter;
-import playground.christoph.evacuation.withinday.replanning.identifiers.AffectedAgentsFilterFactory;
-import playground.christoph.evacuation.withinday.replanning.identifiers.InformedAgentsFilter;
-import playground.christoph.evacuation.withinday.replanning.identifiers.InformedAgentsFilterFactory;
+import playground.christoph.evacuation.withinday.replanning.identifiers.filters.AffectedAgentsFilter;
+import playground.christoph.evacuation.withinday.replanning.identifiers.filters.AffectedAgentsFilterFactory;
+import playground.christoph.evacuation.withinday.replanning.identifiers.filters.InformedAgentsFilter;
+import playground.christoph.evacuation.withinday.replanning.identifiers.filters.InformedAgentsFilterFactory;
 import playground.christoph.evacuation.withinday.replanning.replanners.CurrentLegInitialReplannerFactory;
 import playground.christoph.evacuation.withinday.replanning.replanners.EndActivityAndEvacuateReplannerFactory;
 import playground.christoph.evacuation.withinday.replanning.replanners.ExtendCurrentActivityReplannerFactory;
@@ -154,7 +153,6 @@ public final class MarathonRunner implements StartupListener,
 	private AgentsTracker agentsTracker;
 	private ReplanningTracker replanningTracker;
 	private InformedHouseholdsTracker informedHouseholdsTracker;
-	private VehiclesTracker vehiclesTracker;
 	private DecisionDataProvider decisionDataProvider;
 	private KtiConfigGroup ktiConfigGroup;
 	
@@ -730,9 +728,9 @@ public final class MarathonRunner implements StartupListener,
 
 		// use buffered affected area
 		AffectedAgentsFilterFactory affectedAgentsFilterFactory = new AffectedAgentsFilterFactory(this.scenario, this.agentsTracker,
-				this.vehiclesTracker, this.bufferedCoordAnalyzer, AffectedAgentsFilter.FilterType.Affected);
+				this.withinDayControlerListener.getMobsimDataProvider(), this.bufferedCoordAnalyzer, AffectedAgentsFilter.FilterType.Affected);
 		AffectedAgentsFilterFactory notAffectedAgentsFilterFactory = new AffectedAgentsFilterFactory(this.scenario, this.agentsTracker,
-				this.vehiclesTracker, this.bufferedCoordAnalyzer, AffectedAgentsFilter.FilterType.NotAffected);
+				this.withinDayControlerListener.getMobsimDataProvider(), this.bufferedCoordAnalyzer, AffectedAgentsFilter.FilterType.NotAffected);
 		
 		DuringActivityIdentifierFactory duringActivityFactory;
 		DuringLegIdentifierFactory duringLegFactory;

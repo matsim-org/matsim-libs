@@ -165,13 +165,12 @@ public class BurgdorfRunner implements StartupListener {
 		}
 		visitorAgentFilterFactory = new CollectionAgentFilterFactory(visitorAgents);
 		
-		carLegAgentsFilterFactory = new TransportModeFilterFactory(duringLegRerouteTransportModes);
-		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(carLegAgentsFilterFactory);	
+		carLegAgentsFilterFactory = new TransportModeFilterFactory(duringLegRerouteTransportModes, 
+				this.withinDayControlerListener.getMobsimDataProvider());
 
 		Set<Id> parkingDecisionLinks = new HashSet<Id>();
 		for (String string : ParkingInfrastructure.parkingDecisionLinks) parkingDecisionLinks.add(scenario.createId(string));
-		linkFilterFactory = new LinkFilterFactory(parkingDecisionLinks);
-		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(linkFilterFactory);
+		linkFilterFactory = new LinkFilterFactory(parkingDecisionLinks, this.withinDayControlerListener.getMobsimDataProvider());
 		
 		duringLegFactory = new ParkingIdentifierFactory(this.withinDayControlerListener.getLinkReplanningMap(),
 				this.withinDayControlerListener.getMobsimDataProvider());

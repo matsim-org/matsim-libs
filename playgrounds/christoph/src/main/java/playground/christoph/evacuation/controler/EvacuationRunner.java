@@ -73,8 +73,14 @@ public class EvacuationRunner {
 			// create Controler Listeners; add them afterwards in a meaningful order
 			MultiModalControlerListener multiModalControlerListener = new MultiModalControlerListener();
 			WithinDayControlerListener withinDayControlerListener = new WithinDayControlerListener();
+			PreconfigureWithinDayControlerListener preconfigureWithinDayControlerListener = new PreconfigureWithinDayControlerListener(
+					withinDayControlerListener,multiModalControlerListener);
 			EvacuationControlerListener evacuationControlerListener = new EvacuationControlerListener(withinDayControlerListener,
 					multiModalControlerListener);
+			
+			// Analysis stuff
+			controler.addControlerListener(new ActivitiesAnalyzer());
+			controler.addControlerListener(new TripsAnalyzer());
 			
 			// Evacuation stuff
 			controler.addControlerListener(evacuationControlerListener);
@@ -82,10 +88,9 @@ public class EvacuationRunner {
 			// Within-day Replanning
 			withinDayControlerListener.setModesAnalyzedByTravelTimeCollector(CollectionUtils.stringToSet(TransportMode.car));
 			controler.addControlerListener(withinDayControlerListener);
-									
-			// Analysis
-			controler.addControlerListener(new ActivitiesAnalyzer());
-			controler.addControlerListener(new TripsAnalyzer());
+			
+			// pre-configure within-day controler listener with outcomes from the multi-modal controler listener
+			controler.addControlerListener(preconfigureWithinDayControlerListener);			
 			
 			// Configuration
 			controler.addControlerListener(multiModalControlerListener);
