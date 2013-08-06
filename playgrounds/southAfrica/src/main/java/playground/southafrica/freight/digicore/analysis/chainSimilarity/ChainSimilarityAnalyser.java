@@ -50,8 +50,7 @@ public class ChainSimilarityAnalyser {
 		Header.printHeader(ChainSimilarityAnalyser.class.toString(), args);
 		
 		String xmlFolder = args[0];
-		String outputfolder = args[1];
-		int numberOfThreads = Integer.parseInt(args[2]);
+		int numberOfThreads = Integer.parseInt(args[1]);
 		
 		double[] radii = {1, 5, 10, 15, 20, 25, 30, 35, 40};
 		int[] pmins = {1, 5, 10, 15, 20, 25};

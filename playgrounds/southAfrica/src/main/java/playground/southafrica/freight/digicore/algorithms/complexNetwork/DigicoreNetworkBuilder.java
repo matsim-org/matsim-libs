@@ -129,11 +129,11 @@ public class DigicoreNetworkBuilder {
 					LOG.error(e.getMessage());
 					LOG.error("Couldn't write network.");
 				}
-				try {
-					dnw.writeGraphOrderToFile(networkOrderFile);
-				} catch (IOException e) {
-					LOG.error("Couldn't write network order.");
-				}
+//				try {
+//					dnw.writeGraphOrderToFile(networkOrderFile);
+//				} catch (IOException e) {
+//					LOG.error("Couldn't write network order.");
+//				}
 				
 				/* See if we can get the network file size. Write that to the console. */ 
 				File f = new File(networkFile);

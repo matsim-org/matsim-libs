@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacilitiesFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
@@ -49,10 +48,12 @@ import playground.southafrica.freight.digicore.containers.DigicoreActivity;
 import playground.southafrica.freight.digicore.containers.DigicoreChain;
 import playground.southafrica.freight.digicore.containers.DigicoreFacility;
 import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
+import playground.southafrica.freight.digicore.io.DigicoreVehicleReader_v1;
 import playground.southafrica.freight.digicore.io.DigicoreVehicleWriter;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
 
 public class ClusteredChainGeneratorTest extends MatsimTestCase{
@@ -73,11 +74,13 @@ public class ClusteredChainGeneratorTest extends MatsimTestCase{
 		ActivityFacilities afs = sc.getActivityFacilities();
 		assertTrue("Facility 1 not in map.", afs.getFacilities().containsKey(new IdImpl("f1")));
 		assertTrue("Facility 2 not in map.", afs.getFacilities().containsKey(new IdImpl("f2")));
+		assertTrue("Facility 3 not in map.", afs.getFacilities().containsKey(new IdImpl("f3")));
 		
 		/* Check facility coordinates. */
 		assertEquals("Wrong centroid for f1", new CoordImpl(0.5, 5.5), afs.getFacilities().get(new IdImpl("f1")).getCoord());
 		assertEquals("Wrong centroid for f2", new CoordImpl((3.0 + 4.0 + 5.0)/3.0, (1.0 + 3.0 + 3.0)/3.0), afs.getFacilities().get(new IdImpl("f2")).getCoord());
-
+		assertEquals("Wrong centroid for f3", new CoordImpl(5.0, 6.0), afs.getFacilities().get(new IdImpl("f3")).getCoord());
+		
 		File facilityAttributeFile = new File(getClassInputDirectory() + "facilityAttributes.xml");
 		assertTrue("Facility attributes file does not exist.", facilityAttributeFile.exists());
 	}
@@ -115,10 +118,10 @@ public class ClusteredChainGeneratorTest extends MatsimTestCase{
 			fail("Should not catch an IOException.");
 		}
 		
-		assertEquals("Wrong number of facilities in QT.", 2, qt.get(3, 3, 10).size());
+		assertEquals("Wrong number of facilities in QT.", 3, qt.get(3, 3, 10).size());
 		assertEquals("Wrong facility", new IdImpl("f1"), qt.get(0, 6).getId());
 		assertEquals("Wrong facility", new IdImpl("f2"), qt.get(6, 0).getId());
-		
+		assertEquals("Wrong facility", new IdImpl("f3"), qt.get(5, 6).getId());
 	}
 	
 	public void testReconstructChains(){
@@ -137,6 +140,7 @@ public class ClusteredChainGeneratorTest extends MatsimTestCase{
 		String facilityAttributes = getClassInputDirectory() + "facilityAttributes.xml";
 		ObjectAttributes oa = new ObjectAttributes();
 		ObjectAttributesXmlReader oar = new ObjectAttributesXmlReader(oa);
+		oar.putAttributeConverter(Point.class, new HullConverter());
 		oar.putAttributeConverter(Polygon.class, new HullConverter());
 		oar.parse(facilityAttributes);
 		
@@ -155,6 +159,17 @@ public class ClusteredChainGeneratorTest extends MatsimTestCase{
 		} catch (IOException e) {
 			fail("Should not have any exceptions.");
 		}
+		
+		/* Check that the correct three activities do have facility Ids. */
+		DigicoreVehicleReader_v1 dvr = new DigicoreVehicleReader_v1();
+		dvr.parse(getClassInputDirectory() + "xml2/v1.xml.gz");
+		DigicoreChain chain = dvr.getVehicle().getChains().get(0);
+		assertNotNull("First activity must have an id.", chain.getAllActivities().get(0).getFacilityId());
+		assertEquals("First activity has wrong id.", new IdImpl("f1"), chain.getAllActivities().get(0).getFacilityId());
+		assertNotNull("Second activity must have an id.", chain.getAllActivities().get(2).getFacilityId());
+		assertEquals("Second activity has wrong id.", new IdImpl("f2"), chain.getAllActivities().get(2).getFacilityId());
+		assertNotNull("Third activity must have an id.", chain.getAllActivities().get(4).getFacilityId());
+		assertEquals("Third activity has wrong id.", new IdImpl("f3"), chain.getAllActivities().get(4).getFacilityId());
 	}
 	
 	
@@ -165,7 +180,7 @@ public class ClusteredChainGeneratorTest extends MatsimTestCase{
 	 * a1 -> a9 -> a8 -> a10 -> a11 
 	 * 
 	 * a1---a2               a11
-	 *  |    |
+	 *  |    |            facility 3
 	 * a3---a4
 	 * facility 1
 	 *             a10
@@ -219,6 +234,13 @@ public class ClusteredChainGeneratorTest extends MatsimTestCase{
 		facilities.addActivityFacility(f2);
 		attributes.putAttribute(f2.getId().toString(), "concaveHull", p2);
 		
+		Coordinate[] ca3 = new Coordinate[1];
+		ca3[0] = new Coordinate(a11.getCoord().getX(), a11.getCoord().getY());
+		Point p3 = gf.createPoint(ca3[0]);
+		ActivityFacility f3 = ff.createActivityFacility(new IdImpl("f3"), new CoordImpl(p3.getCentroid().getX(), p3.getCentroid().getY()));
+		facilities.addActivityFacility(f3);
+		attributes.putAttribute(f3.getId().toString(), "concaveHull", p3);
+		
 		/* Set up activity chain for the vehicle. */
 		DigicoreVehicle vehicle = new DigicoreVehicle(new IdImpl("v1"));
 		DigicoreChain chain = new DigicoreChain();
@@ -239,6 +261,7 @@ public class ClusteredChainGeneratorTest extends MatsimTestCase{
 		
 		/* Write facility attributes. */
 		ObjectAttributesXmlWriter oaw = new ObjectAttributesXmlWriter(attributes);
+		oaw.putAttributeConverter(Point.class, new HullConverter());
 		oaw.putAttributeConverter(Polygon.class, new HullConverter());
 		oaw.writeFile(getClassInputDirectory() + "facilityAttributes.xml");
 	}

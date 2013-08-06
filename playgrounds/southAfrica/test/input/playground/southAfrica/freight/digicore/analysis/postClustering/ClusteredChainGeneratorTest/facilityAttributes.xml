@@ -8,4 +8,7 @@
 	<object id="f2">
 		<attribute name="concaveHull" class="com.vividsolutions.jts.geom.Polygon">(3.0;3.0),(5.0;3.0),(4.0;1.0),(3.0;3.0)</attribute>
 	</object>
+	<object id="f3">
+		<attribute name="concaveHull" class="com.vividsolutions.jts.geom.Point">(5.0;6.0)</attribute>
+	</object>
 </objectAttributes>

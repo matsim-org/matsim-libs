@@ -60,7 +60,7 @@ public class RunnableChainReconstructor implements Runnable {
 			for(DigicoreActivity da : dc.getAllActivities()){
 				/* Convert activity coordinate to Point. */
 				Point dap = gf.createPoint(new Coordinate(da.getCoord().getX(), da.getCoord().getY()));
-				
+
 				/* Check if it is inside the study area. But only check if it 
 				 * has not already been flagged as inside the area. */
 				if(!inStudyArea){
@@ -68,12 +68,12 @@ public class RunnableChainReconstructor implements Runnable {
 						inStudyArea = true;
 					}
 				}
-				
+
 				/* Get all the facilities in a 1000m radius around the activity. */
 				Collection<DigicoreFacility> col = this.facilityTree.get(da.getCoord().getX(), da.getCoord().getY(), 1000);
 				List<DigicoreFacility> neighbours = new ArrayList<DigicoreFacility>(col.size());
 				neighbours.addAll(col);
-				
+
 				if(neighbours.size() > 0){
 					boolean found = false;
 					int i = 0;
@@ -83,11 +83,11 @@ public class RunnableChainReconstructor implements Runnable {
 						Object o = this.facilityAttributes.getAttribute(thisFacilityId.toString(), "concaveHull");
 						if(o instanceof Geometry){
 							g = (Geometry) o;
-							
+
 							/* Check if the activity is inside the geometry. */
 							if(g.covers(dap)){
 								found = true;
-								
+
 								/* Adapt the facility Id, as well as the coordinate. 
 								 * The coordinate will be the centroid of the hull
 								 * geometry. That is, NOT the weighted average of 
@@ -114,7 +114,7 @@ public class RunnableChainReconstructor implements Runnable {
 				count++;
 			}
 		}
-		
+
 		/* Write the (possibly) adapted vehicle to file. */
 		if(inStudyArea){
 			DigicoreVehicleWriter dvw = new DigicoreVehicleWriter();
@@ -122,10 +122,10 @@ public class RunnableChainReconstructor implements Runnable {
 
 			/*FIXME Can remove this log messages if we can debug the odd low 
 			 * percentage of activities WITH facility IDs. */
-			log.debug("      --> Activities changed for vehicle " + dv.getId().toString() + ": " + changed + " of " + count + String.format("(%.4f)", ((double) changed)/((double) count)));
+			log.debug("      --> Activities changed for vehicle " + dv.getId().toString() + ": " + changed + " of " + count + String.format(" (%.4f)", ((double) changed)/((double) count)));
 		}
-		
-		
+
+
 		threadCounter.incCounter();
 	}	
 }
