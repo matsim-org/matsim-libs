@@ -9,12 +9,13 @@ plot.score.evolution <-
 			 xlab="Iteration",
 			 ylab="Score",
 			 bty="n",
+			 the.lines=dataset$groupId == group,
+			 ylim=c(min( min[ the.lines ] ) , max( max[ the.lines ] )),
 			 ...) {
 	attach( dataset )
-	the.lines <- groupId == group
 	plot( iter[ the.lines ] , max[ the.lines ] , type="l" , col=col.max ,
-		 ylim=c(min( min[ the.lines ] ) , max( max[ the.lines ] )),
 		 xlab=xlab, ylab=ylab,
+		 ylim=ylim,
 		 bty=bty,
 		 ... )
 	lines( iter[ the.lines ] , min[ the.lines ] , col=col.min , ... )
