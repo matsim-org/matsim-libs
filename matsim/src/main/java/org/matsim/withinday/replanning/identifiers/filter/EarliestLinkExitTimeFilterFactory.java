@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LinkFilterFactory.java
+ * EarliestLinkExitTimeFilterFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,25 +20,20 @@
 
 package org.matsim.withinday.replanning.identifiers.filter;
 
-import java.util.Set;
-
-import org.matsim.api.core.v01.Id;
-import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilterFactory;
+import org.matsim.withinday.trafficmonitoring.EarliestLinkExitTimeProvider;
 
-public class LinkFilterFactory implements AgentFilterFactory {
+public class EarliestLinkExitTimeFilterFactory implements AgentFilterFactory {
 
-	private final Set<Id> links;
-	private final MobsimDataProvider mobsimDataProvider;
+	private final EarliestLinkExitTimeProvider earliestLinkExitTimeProvider;
 	
-	public LinkFilterFactory(Set<Id> links, MobsimDataProvider mobsimDataProvider) {
-		this.links = links;
-		this.mobsimDataProvider = mobsimDataProvider;
+	public EarliestLinkExitTimeFilterFactory(EarliestLinkExitTimeProvider earliestLinkExitTimeProvider) {
+		this.earliestLinkExitTimeProvider = earliestLinkExitTimeProvider;
 	}
 	
 	@Override
-	public LinkFilter createAgentFilter() {
-		return new LinkFilter(this.mobsimDataProvider.getAgents(), this.links);
+	public EarliestLinkExitTimeFilter createAgentFilter() {
+		return new EarliestLinkExitTimeFilter(earliestLinkExitTimeProvider);
 	}
 
 }

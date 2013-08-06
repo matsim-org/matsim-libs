@@ -20,10 +20,12 @@
 
 package org.matsim.withinday.mobsim;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
@@ -79,5 +81,23 @@ public class MobsimDataProvider implements MobsimInitializedListener {
 	
 	public MobsimVehicle getVehicle(Id vehicleId) {
 		return this.vehicles.get(vehicleId);
+	}
+	
+	public Collection<MobsimVehicle> getEnrouteVehiclesOnLink(Id linkId) {
+		return this.netsimNetwork.getNetsimLink(linkId).getAllNonParkedVehicles();
+	}
+	
+	public MobsimVehicle getDriversVehicle(Id driverId) {
+		MobsimAgent mobsimAgent = this.agents.get(driverId);
+		if (mobsimAgent == null) return null;
+		
+		DriverAgent driver = (DriverAgent) mobsimAgent;
+		return driver.getVehicle();
+	}
+	
+	public MobsimAgent getVehiclesDriver(Id vehicleId) {
+		MobsimVehicle mobsimVehicle = this.vehicles.get(vehicleId);
+		if (mobsimVehicle == null) return null;
+		else return mobsimVehicle.getDriver();
 	}
 }

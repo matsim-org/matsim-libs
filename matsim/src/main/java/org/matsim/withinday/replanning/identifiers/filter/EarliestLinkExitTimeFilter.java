@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LinkFilterFactory.java
+ * EarliestLinkExitTimeFilter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,25 +20,40 @@
 
 package org.matsim.withinday.replanning.identifiers.filter;
 
+import java.util.Iterator;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.withinday.mobsim.MobsimDataProvider;
-import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilterFactory;
+import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilter;
+import org.matsim.withinday.trafficmonitoring.EarliestLinkExitTimeProvider;
 
-public class LinkFilterFactory implements AgentFilterFactory {
+/**
+ * Remove all agents from the set that spent more time on a link that
+ * their minimal link travel time. Such agents are already in the QLinks'
+ * buffer and cannot stop at that link anymore.
+ * 
+ * @author cdobler
+ */
+public class EarliestLinkExitTimeFilter implements AgentFilter {
 
-	private final Set<Id> links;
-	private final MobsimDataProvider mobsimDataProvider;
+	private final EarliestLinkExitTimeProvider earliestLinkExitTimeProvider;
 	
-	public LinkFilterFactory(Set<Id> links, MobsimDataProvider mobsimDataProvider) {
-		this.links = links;
-		this.mobsimDataProvider = mobsimDataProvider;
+	// use the factory
+	/*package*/ EarliestLinkExitTimeFilter(EarliestLinkExitTimeProvider earliestLinkExitTimeProvider) {
+		this.earliestLinkExitTimeProvider = earliestLinkExitTimeProvider;
 	}
 	
 	@Override
-	public LinkFilter createAgentFilter() {
-		return new LinkFilter(this.mobsimDataProvider.getAgents(), this.links);
+	public void applyAgentFilter(Set<Id> set, double time) {
+		Iterator<Id> iter = set.iterator();
+		
+		while (iter.hasNext()) {
+			Id id = iter.next();
+			
+			Double earliestLinkExitTime = this.earliestLinkExitTimeProvider.getEarliestLinkExitTime(id);
+			if (earliestLinkExitTime == null) iter.remove();
+			else if (earliestLinkExitTime <= time) iter.remove();		
+		}
 	}
 
 }

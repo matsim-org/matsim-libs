@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LinkFilterFactory.java
+ * ActivityStartingFilter.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,25 +20,49 @@
 
 package org.matsim.withinday.replanning.identifiers.filter;
 
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.withinday.mobsim.MobsimDataProvider;
-import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilterFactory;
+import org.matsim.core.mobsim.framework.DriverAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilter;
 
-public class LinkFilterFactory implements AgentFilterFactory {
+/**
+ * Remove all agents from the set that are going to start an activity on
+ * their current link.
+ * 
+ * @author cdobler
+ */
+public class ActivityStartingFilter implements AgentFilter {
 
-	private final Set<Id> links;
-	private final MobsimDataProvider mobsimDataProvider;
+	private final Map<Id, MobsimAgent> agents;
 	
-	public LinkFilterFactory(Set<Id> links, MobsimDataProvider mobsimDataProvider) {
-		this.links = links;
-		this.mobsimDataProvider = mobsimDataProvider;
+	// use the factory
+	/*package*/ ActivityStartingFilter(Map<Id, MobsimAgent> agents) {
+		this.agents = agents;
 	}
 	
 	@Override
-	public LinkFilter createAgentFilter() {
-		return new LinkFilter(this.mobsimDataProvider.getAgents(), this.links);
+	public void applyAgentFilter(Set<Id> set, double time) {
+		Iterator<Id> iter = set.iterator();
+		
+		while (iter.hasNext()) {
+			Id id = iter.next();
+		
+			MobsimAgent agent = this.agents.get(id);
+			// check whether the agent is performing a leg
+			if (!(agent.getState() == MobsimAgent.State.LEG)) iter.remove();
+			
+			/*
+			 * Check whether the agent ends its leg on the current link. If
+			 * yes, remove the agent from the set.
+			 */
+			DriverAgent driver = (DriverAgent) agent;
+			Id nextLinkId = driver.chooseNextLinkId();
+			if (nextLinkId == null) iter.remove();
+		}
 	}
-
+	
 }

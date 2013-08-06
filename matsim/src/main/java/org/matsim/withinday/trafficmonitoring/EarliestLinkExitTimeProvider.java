@@ -21,7 +21,9 @@
 package org.matsim.withinday.trafficmonitoring;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
@@ -41,17 +43,25 @@ import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.misc.Time;
 
+/**
+ * Returns the time when an agent could leave a link if he can travel
+ * at free speed. After this time, the agent cannot stop on its current link
+ * anymore which influences its possible replanning operations.
+ * 
+ * @author cdobler
+ */
 public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, AgentArrivalEventHandler,
 		AgentDepartureEventHandler, AgentStuckEventHandler {
 
 	private static final Logger log = Logger.getLogger(EarliestLinkExitTimeProvider.class);
-		
+	
 	private final TransportModeProvider transportModeProvider;
 	private final Scenario scenario;
 	private final Map<String, TravelTime> multiModalTravelTimes;
 	private final TravelTime freeSpeedTravelTime;
 	
 	private final Map<Id, Double> earliestLinkExitTimes = new ConcurrentHashMap<Id, Double>();
+	private final Map<Double, Set<Id>> earliestLinkExitTimesPerTimeStep = new ConcurrentHashMap<Double, Set<Id>>();
 	
 	public EarliestLinkExitTimeProvider(Scenario scenario, TransportModeProvider transportModeProvider) {
 		this(scenario, transportModeProvider, null);
@@ -76,15 +86,26 @@ public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, Agen
 	public Map<Id, Double> getEarliestLinkExitTimes() {
 		return Collections.unmodifiableMap(this.earliestLinkExitTimes);
 	}
+
+	public Set<Id> getEarliestLinkExitTimesPerTimeStep(double time) {
+		Set<Id> set = this.earliestLinkExitTimesPerTimeStep.get(time);
+		if (set != null) return Collections.unmodifiableSet(set);
+		else return null;
+	}
+	
+	public Map<Double, Set<Id>> getEarliestLinkExitTimesPerTimeStep() {
+		return Collections.unmodifiableMap(this.earliestLinkExitTimesPerTimeStep);
+	}
 	
 	@Override
 	public void reset(int iteration) {
 		this.earliestLinkExitTimes.clear();
+		this.earliestLinkExitTimesPerTimeStep.clear();
 	}
 
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
-		this.earliestLinkExitTimes.remove(event.getPersonId());
+		this.removeEarliestLinkExitTimesAtTime(event.getPersonId());
 	}
 
 	@Override
@@ -111,16 +132,41 @@ public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, Agen
 			earliestExitTime = Math.floor(now + this.freeSpeedTravelTime.getLinkTravelTime(link, now, person, null));
 		}
 		
-		this.earliestLinkExitTimes.put(event.getPersonId(), earliestExitTime);
+		this.handleAddEarliestLinkExitTime(event.getPersonId(), earliestExitTime);
 	}
-
+	
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
-		this.earliestLinkExitTimes.put(event.getPersonId(), event.getTime());
+		this.handleAddEarliestLinkExitTime(event.getPersonId(), event.getTime());
 	}
 
 	@Override
 	public void handleEvent(AgentStuckEvent event) {
-		this.earliestLinkExitTimes.remove(event.getPersonId());
+		this.removeEarliestLinkExitTimesAtTime(event.getPersonId());
+	}
+	
+	private void handleAddEarliestLinkExitTime(Id agentId, double earliestExitTime) {
+		
+		this.earliestLinkExitTimes.put(agentId, earliestExitTime);
+				
+		Set<Id> earliestLinkExitTimesAtTime = this.earliestLinkExitTimesPerTimeStep.get(earliestExitTime);
+		if (earliestLinkExitTimesAtTime == null) {
+			earliestLinkExitTimesAtTime = new HashSet<Id>();
+			this.earliestLinkExitTimesPerTimeStep.put(earliestExitTime, earliestLinkExitTimesAtTime);
+		}
+		earliestLinkExitTimesAtTime.add(agentId);
+	}
+	
+	private void removeEarliestLinkExitTimesAtTime(Id agentId) {
+
+		Double earliestExitTime = this.earliestLinkExitTimes.remove(agentId);
+
+		if (earliestExitTime != null) {
+			Set<Id> earliestLinkExitTimesAtTime = this.earliestLinkExitTimesPerTimeStep.get(earliestExitTime);
+			if (earliestLinkExitTimesAtTime != null) {
+				this.earliestLinkExitTimesPerTimeStep.remove(agentId);
+				if (earliestLinkExitTimesAtTime.size() == 0) this.earliestLinkExitTimesPerTimeStep.remove(earliestLinkExitTimesAtTime);
+			}			
+		}
 	}
 }

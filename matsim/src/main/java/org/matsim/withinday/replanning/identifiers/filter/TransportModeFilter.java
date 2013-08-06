@@ -28,6 +28,15 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilter;
 
+/**
+ * Remove all agents from the set that...
+ * <ul>
+ * 	<li>do not perform a leg.</li>
+ * 	<li>do not use one of the modes included in the given set of modes.</li>
+ * </ul>
+ * 
+ * @author cdobler
+ */
 public class TransportModeFilter implements AgentFilter {
 
 	private final Map<Id, MobsimAgent> agents;

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TransportModeProvider.java
+ * LinkEnteredProvider.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,48 +20,69 @@
 
 package org.matsim.withinday.trafficmonitoring;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
+import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 
 /**
- * Returns an agent's current transport mode or null if the agent is performing an activity. 
+ * Returns all agents that have entered a new link in the last time step.
+ * Agents who just ended an activity are NOT included, since they...
+ * <ul>
+ * 	<li>do not produce a link entered event.</li>
+ * 	<li>are limited in their possible replanning operations.</li>
+ * </ul>
  * 
  * @author cdobler
  */
-public class TransportModeProvider implements AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler {
+public class LinkEnteredProvider implements LinkEnterEventHandler, AgentArrivalEventHandler, AgentStuckEventHandler,
+		MobsimAfterSimStepListener {
 
-	private final Map<Id, String> transportModes = new ConcurrentHashMap<Id, String>();
+	private Map<Id, Id> linkEnteredAgents = new ConcurrentHashMap<Id, Id>();	// <agentId, linkId>
+	private Map<Id, Id> lastTimeStepLinkEnteredAgents = new ConcurrentHashMap<Id, Id>();	// <agentId, linkId>
 	
-	public String getTransportMode(Id agentId) {
-		return this.transportModes.get(agentId);
+	public Map<Id, Id> getLinkEnteredAgentsInLastTimeStep() {
+		return Collections.unmodifiableMap(this.lastTimeStepLinkEnteredAgents);
 	}
 	
 	@Override
 	public void reset(int iteration) {
-		this.transportModes.clear();
+		this.linkEnteredAgents.clear();
+		this.lastTimeStepLinkEnteredAgents.clear();
 	}
 
 	@Override
 	public void handleEvent(AgentStuckEvent event) {
-		this.transportModes.remove(event.getPersonId());
+		this.linkEnteredAgents.remove(event.getPersonId());
 	}
 
-	@Override
-	public void handleEvent(AgentDepartureEvent event) {
-		this.transportModes.put(event.getPersonId(), event.getLegMode());
-	}
-
+	/*
+	 * Not sure whether the QSim allows an agent to enter a link and start an activity 
+	 * in the same time step. If not, this could be removed. 
+	 */
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
-		this.transportModes.remove(event.getPersonId());
+		this.linkEnteredAgents.remove(event.getPersonId());
+	}
+
+	@Override
+	public void handleEvent(LinkEnterEvent event) {
+		this.linkEnteredAgents.put(event.getPersonId(), event.getLinkId());
+	}
+
+	@Override
+	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
+		this.lastTimeStepLinkEnteredAgents = linkEnteredAgents;
+		this.linkEnteredAgents = new ConcurrentHashMap<Id, Id>();
 	}
 
 }

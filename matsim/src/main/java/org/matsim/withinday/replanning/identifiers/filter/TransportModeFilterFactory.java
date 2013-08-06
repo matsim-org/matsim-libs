@@ -20,40 +20,24 @@
 
 package org.matsim.withinday.replanning.identifiers.filter;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
-import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilterFactory;
 
-public class TransportModeFilterFactory implements AgentFilterFactory, MobsimInitializedListener {
+public class TransportModeFilterFactory implements AgentFilterFactory {
 
-	private final Map<Id, MobsimAgent> agents;
 	private final Set<String> modes;
+	private final MobsimDataProvider mobsimDataProvider;
 	
-	public TransportModeFilterFactory(Set<String> modes) {
+	public TransportModeFilterFactory(Set<String> modes, MobsimDataProvider mobsimDataProvider) {
 		this.modes = modes;
-		this.agents = new HashMap<Id, MobsimAgent>();
+		this.mobsimDataProvider = mobsimDataProvider;
 	}
 	
 	@Override
 	public TransportModeFilter createAgentFilter() {
-		return new TransportModeFilter(this.agents, this.modes);
-	}
-
-	@Override
-	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
-		this.agents.clear();
-		
-		QSim qSim = (QSim) e.getQueueSimulation();
-		for (MobsimAgent mobsimAgent : qSim.getAgents()) {
-			this.agents.put(mobsimAgent.getId(), mobsimAgent);
-		}
+		return new TransportModeFilter(this.mobsimDataProvider.getAgents(), this.modes);
 	}
 
 }

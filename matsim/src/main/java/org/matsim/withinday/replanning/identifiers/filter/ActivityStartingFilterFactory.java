@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LinkFilterFactory.java
+ * ActivityStartingFilterFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,25 +20,20 @@
 
 package org.matsim.withinday.replanning.identifiers.filter;
 
-import java.util.Set;
-
-import org.matsim.api.core.v01.Id;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.replanning.identifiers.interfaces.AgentFilterFactory;
 
-public class LinkFilterFactory implements AgentFilterFactory {
+public class ActivityStartingFilterFactory implements AgentFilterFactory {
 
-	private final Set<Id> links;
 	private final MobsimDataProvider mobsimDataProvider;
 	
-	public LinkFilterFactory(Set<Id> links, MobsimDataProvider mobsimDataProvider) {
-		this.links = links;
+	public ActivityStartingFilterFactory(MobsimDataProvider mobsimDataProvider) {
 		this.mobsimDataProvider = mobsimDataProvider;
 	}
 	
 	@Override
-	public LinkFilter createAgentFilter() {
-		return new LinkFilter(this.mobsimDataProvider.getAgents(), this.links);
+	public ActivityStartingFilter createAgentFilter() {
+		return new ActivityStartingFilter(mobsimDataProvider.getAgents());
 	}
 
 }
