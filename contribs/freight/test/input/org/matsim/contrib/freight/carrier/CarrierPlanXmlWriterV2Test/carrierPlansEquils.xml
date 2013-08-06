@@ -39,9 +39,9 @@
 			</capabilities>
 			
 			<services>
-				<service id="serv1" to="22" capacityDemand="30" start="0.0" end="72000.0" serviceDuration="3600.0"/>
-				<service id="serv2" to="22" capacityDemand="30" start="0.0" end="72000.0" serviceDuration="3600.0"/>
-				<service id="serv3" to="22" capacityDemand="30" start="0.0" end="72000.0" serviceDuration="3600.0"/>
+				<service id="serv1" to="22" capacityDemand="30" earliestStart="0.0" latestEnd="72000.0" serviceDuration="3600.0"/>
+				<service id="serv2" to="22" capacityDemand="30" earliestStart="0.0" latestEnd="72000.0" serviceDuration="3600.0"/>
+				<service id="serv3" to="22" capacityDemand="30" earliestStart="0.0" latestEnd="72000.0" serviceDuration="3600.0"/>
 			</services>
 			
 			<shipments>
