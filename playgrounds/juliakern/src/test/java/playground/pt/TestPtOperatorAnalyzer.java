@@ -62,7 +62,7 @@ public class TestPtOperatorAnalyzer {
 	//Variablennamen vs Werte
 	//init implizit testen
 	
-@Test 
+@Test @Ignore
 public final void testGetEventHandler(){
 	/*
 	//String netFilename = utils.getInputDirectory() + "network.xml"; //stimmt
