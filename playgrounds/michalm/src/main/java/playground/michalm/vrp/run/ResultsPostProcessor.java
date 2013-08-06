@@ -237,5 +237,10 @@ public class ResultsPostProcessor
         new ResultsPostProcessor().go(false, true, false);
         new ResultsPostProcessor().go(true, false, false);
         new ResultsPostProcessor().go(true, true, false);
+
+//        new ResultsPostProcessor().go(false, false, true);
+//        new ResultsPostProcessor().go(false, true, true);
+//        new ResultsPostProcessor().go(true, false, true);
+//        new ResultsPostProcessor().go(true, true, true);
     }
 }
