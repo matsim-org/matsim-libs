@@ -149,8 +149,8 @@ public class CarrierPlanXmlWriterV2 extends MatsimXmlWriter {
 			writer.write("id=\"" + s.getId().toString() + "\" ");
 			writer.write("to=\"" + s.getLocationLinkId() + "\" ");
 			writer.write("capacityDemand=\"" + s.getCapacityDemand() + "\" ");
-			writer.write("start=\"" + getTime(s.getServiceStartTimeWindow().getStart()) + "\" ");
-			writer.write("end=\"" + getTime(s.getServiceStartTimeWindow().getEnd()) + "\" ");
+			writer.write("earliestStart=\"" + getTime(s.getServiceStartTimeWindow().getStart()) + "\" ");
+			writer.write("latestEnd=\"" + getTime(s.getServiceStartTimeWindow().getEnd()) + "\" ");
 			writer.write("serviceDuration=\"" + getTime(s.getServiceDuration()) + "\"/>\n");
 		}
 		writer.write("\t\t\t</services>\n\n");

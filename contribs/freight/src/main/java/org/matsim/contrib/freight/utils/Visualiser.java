@@ -14,10 +14,13 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.events.algorithms.SnapshotGenerator;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.vis.otfvis.OTFClientLive;
+import org.matsim.vis.otfvis.OTFFileWriter;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
 public class Visualiser {
@@ -33,8 +36,38 @@ public class Visualiser {
 		this.scenario = scenario;
 	}
 	
-	public void visualise(Carriers carriers){
+	public void visualizeLive(Carriers carriers){
 		sim(carriers);
+	}
+	
+	public void makeMVI(Carriers carriers, String outfile, double snapshotInterval){
+		OTFFileWriter otfFileWriter = new OTFFileWriter(scenario, outfile);
+		
+		QSimConfigGroup qSimConfigGroup = new QSimConfigGroup();
+		config.addQSimConfigGroup(qSimConfigGroup);
+		CarrierAgentTracker carrierAgentTracker = new CarrierAgentTracker(carriers, scenario.getNetwork(), new CarrierScoringFunctionFactory() {
+			
+			@Override
+			public ScoringFunction createScoringFunction(Carrier carrier) {
+				return getNoScoring();
+			}
+			
+		});
+		
+		FreightQSimFactory mobsimFactory = new FreightQSimFactory(carrierAgentTracker);
+		mobsimFactory.setWithinDayActivityReScheduling(true);
+		
+		EventsManager events = EventsUtils.createEventsManager();
+		Mobsim mobsim = mobsimFactory.createMobsim(scenario, events);
+		
+		SnapshotGenerator visualizer = new SnapshotGenerator(scenario.getNetwork(), snapshotInterval, scenario.getConfig().getQSimConfigGroup());
+		visualizer.addSnapshotWriter(otfFileWriter);
+		events.addHandler(visualizer);
+		
+		mobsim.run();
+		
+		visualizer.finish();
+		otfFileWriter.finish();
 	}
 	
 	private void sim(Carriers carriers) {
@@ -58,6 +91,9 @@ public class Visualiser {
 		if(live){
 			OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(config, scenario, events, (QSim) mobsim);
 			OTFClientLive.run(config, server);
+		}
+		else{
+//			OTFVis.
 		}
 		mobsim.run();
 	}
