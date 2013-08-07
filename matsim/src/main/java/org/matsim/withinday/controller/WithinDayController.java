@@ -171,14 +171,10 @@ public abstract class WithinDayController extends Controler implements StartupLi
 		}
 	}
 	
-	private void createAndInitTransportModeProvider() {
-		this.transportModeProvider = new TransportModeProvider();
-		this.getEvents().addHandler(this.transportModeProvider);
-	}
-	
 	private void createAndInitEarliestLinkExitTimeProvider() {
-		this.earliestLinkExitTimeProvider = new EarliestLinkExitTimeProvider(this.scenarioData, this.transportModeProvider);
+		this.earliestLinkExitTimeProvider = new EarliestLinkExitTimeProvider(this.scenarioData);
 		this.getEvents().addHandler(this.earliestLinkExitTimeProvider);
+		this.earliestLinkExitTimeProvider.getTransportModeProvider();
 	}
 
 	public LinkReplanningMap getLinkReplanningMap() {
@@ -253,7 +249,6 @@ public abstract class WithinDayController extends Controler implements StartupLi
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		this.initWithinDayEngine(this.numReplanningThreads);
-		this.createAndInitTransportModeProvider();
 		this.createAndInitEarliestLinkExitTimeProvider();
 		this.createAndInitTravelTimeCollector();
 		this.createAndInitActivityReplanningMap();

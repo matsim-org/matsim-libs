@@ -28,6 +28,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
@@ -42,6 +43,7 @@ import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.mobsim.WithinDayEngine;
@@ -233,7 +235,6 @@ public class WithinDayControlerListener implements StartupListener {
 		} else log.info("Number of replanning threads has already been set - it is NOT overwritten!");
 				
 		this.initWithinDayEngine(this.numReplanningThreads);
-		this.createAndInitTransportModeProvider();
 		this.createAndInitEarliestLinkExitTimeProvider();
 		this.createAndInitMobsimDataProvider();
 		this.createAndInitTravelTimeCollector();
@@ -296,20 +297,22 @@ public class WithinDayControlerListener implements StartupListener {
 		fosl.addSimulationListener(travelTimeCollector);
 		this.eventsManager.addHandler(travelTimeCollector);
 	}
-	
-	private void createAndInitTransportModeProvider() {
-		this.transportModeProvider = new TransportModeProvider();
-		this.eventsManager.addHandler(this.transportModeProvider);
-	}
-	
+		
 	private void createAndInitEarliestLinkExitTimeProvider() {
 		if (this.multiModalTravelTimes.size() == 0) {
-			this.earliestLinkExitTimeProvider = new EarliestLinkExitTimeProvider(this.scenario, this.transportModeProvider);
+			this.earliestLinkExitTimeProvider = new EarliestLinkExitTimeProvider(this.scenario);
 		} else {
-			this.earliestLinkExitTimeProvider = new EarliestLinkExitTimeProvider(this.scenario, this.transportModeProvider,
-					this.multiModalTravelTimes);
+			/*
+			 * Use TravelTime objects from the multi-modal map but replace car travel time
+			 * (which is a TravelTimeCollector) with a FreeSpeedTravelTime object.
+			 */
+			Map<String, TravelTime> earliestLinkExitTravelTimes = new HashMap<String, TravelTime>();
+			earliestLinkExitTravelTimes.putAll(this.multiModalTravelTimes);
+			earliestLinkExitTravelTimes.put(TransportMode.car, new FreeSpeedTravelTime());
+			this.earliestLinkExitTimeProvider = new EarliestLinkExitTimeProvider(this.scenario, earliestLinkExitTravelTimes);
 		}
 		this.eventsManager.addHandler(this.earliestLinkExitTimeProvider);
+		this.transportModeProvider = this.earliestLinkExitTimeProvider.getTransportModeProvider();
 	}
 	
 	private void createAndInitMobsimDataProvider() {

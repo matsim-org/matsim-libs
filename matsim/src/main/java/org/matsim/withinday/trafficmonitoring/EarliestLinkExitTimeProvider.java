@@ -55,7 +55,14 @@ public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, Agen
 
 	private static final Logger log = Logger.getLogger(EarliestLinkExitTimeProvider.class);
 	
+	/*
+	 * We have to create an internal TransportModeProvider and delegate the events to it.
+	 * Otherwise, race conditions could occur since an it could not be guaranteed that an
+	 * external TransportModeProvider has processed all relevant events when this class
+	 * handles an event.
+	 */
 	private final TransportModeProvider transportModeProvider;
+	
 	private final Scenario scenario;
 	private final Map<String, TravelTime> multiModalTravelTimes;
 	private final TravelTime freeSpeedTravelTime;
@@ -63,18 +70,21 @@ public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, Agen
 	private final Map<Id, Double> earliestLinkExitTimes = new ConcurrentHashMap<Id, Double>();
 	private final Map<Double, Set<Id>> earliestLinkExitTimesPerTimeStep = new ConcurrentHashMap<Double, Set<Id>>();
 	
-	public EarliestLinkExitTimeProvider(Scenario scenario, TransportModeProvider transportModeProvider) {
-		this(scenario, transportModeProvider, null);
+	public EarliestLinkExitTimeProvider(Scenario scenario) {
+		this(scenario, null);
 		log.info("Note: no map containing TravelTime objects for all simulated modes is given. Therefore use free speed " +
 				"car travel time as minimal link travel time for all modes.");
 	}
 	
-	public EarliestLinkExitTimeProvider(Scenario scenario, TransportModeProvider transportModeProvider, 
-			Map<String, TravelTime> multiModalTravelTimes) {
-		this.transportModeProvider = transportModeProvider;
+	public EarliestLinkExitTimeProvider(Scenario scenario, Map<String, TravelTime> multiModalTravelTimes) {
 		this.scenario = scenario;
 		this.multiModalTravelTimes = multiModalTravelTimes;
+		this.transportModeProvider = new TransportModeProvider();
 		this.freeSpeedTravelTime = new FreeSpeedTravelTime();
+	}
+	
+	public TransportModeProvider getTransportModeProvider() {
+		return this.transportModeProvider;
 	}
 	
 	public double getEarliestLinkExitTime(Id agentId) {
@@ -99,12 +109,15 @@ public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, Agen
 	
 	@Override
 	public void reset(int iteration) {
+		this.transportModeProvider.reset(iteration);
+		
 		this.earliestLinkExitTimes.clear();
 		this.earliestLinkExitTimesPerTimeStep.clear();
 	}
 
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
+		this.transportModeProvider.handleEvent(event);
 		this.removeEarliestLinkExitTimesAtTime(event.getPersonId());
 	}
 
@@ -137,11 +150,13 @@ public class EarliestLinkExitTimeProvider implements LinkEnterEventHandler, Agen
 	
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
+		this.transportModeProvider.handleEvent(event);
 		this.handleAddEarliestLinkExitTime(event.getPersonId(), event.getTime());
 	}
 
 	@Override
 	public void handleEvent(AgentStuckEvent event) {
+		this.transportModeProvider.handleEvent(event);
 		this.removeEarliestLinkExitTimesAtTime(event.getPersonId());
 	}
 	
