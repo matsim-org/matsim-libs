@@ -48,15 +48,15 @@ public class MielecSimpleDemandGeneration
         String plansFile = dirName + "plans.xml";
         String idField = "NO";
 
-        String taxiFile = dirName + "taxiCustomers_07_pc.txt";
+        String taxiFile = dirName + "taxiCustomers_03_pc.txt";
 
         // double hours = 2;
         // double flowCoeff = 1;
         // double taxiProbability = 0;
 
         double hours = 1;
-        double[] flowCoeff = { 0.2, 0.2, 0.4, 0.6, 0.4, 0.2, 0.2 };
-        double taxiProbability = 0.07;
+        double[] flowCoeff = { 0.2, 0.4, 0.6, 0.8, 0.6, 0.4, 0.2 };
+        double taxiProbability = 0.03;
 
         Scenario scenario = ScenarioUtils.createScenario(VrpConfigUtils.createConfig());
         new MatsimNetworkReader(scenario).readFile(networkFile);
