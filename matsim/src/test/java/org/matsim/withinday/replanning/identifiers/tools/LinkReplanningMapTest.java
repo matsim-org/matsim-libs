@@ -36,7 +36,6 @@ import org.matsim.testcases.MatsimTestCase;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.mobsim.WithinDayQSimFactory;
 import org.matsim.withinday.trafficmonitoring.EarliestLinkExitTimeProvider;
-import org.matsim.withinday.trafficmonitoring.TransportModeProvider;
 
 public class LinkReplanningMapTest extends MatsimTestCase {
 
@@ -75,11 +74,8 @@ public class LinkReplanningMapTest extends MatsimTestCase {
 		@Override
 		public void notifyStartup(final StartupEvent event) {
 			
-			TransportModeProvider transportModeProvider = new TransportModeProvider();
-			event.getControler().getEvents().addHandler(transportModeProvider);
-			
 			EarliestLinkExitTimeProvider earliestLinkExitTimeProvider = new EarliestLinkExitTimeProvider(
-					event.getControler().getScenario(), transportModeProvider);
+					event.getControler().getScenario());
 			event.getControler().getEvents().addHandler(earliestLinkExitTimeProvider);
 			
 			LinkReplanningMap lrp = new LinkReplanningMap(earliestLinkExitTimeProvider);
