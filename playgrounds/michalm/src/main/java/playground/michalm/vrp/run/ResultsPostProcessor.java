@@ -1,7 +1,7 @@
 package playground.michalm.vrp.run;
 
 import java.io.*;
-import java.util.Scanner;
+import java.util.*;
 
 
 public class ResultsPostProcessor
@@ -20,12 +20,14 @@ public class ResultsPostProcessor
 
     private static class Experiment
     {
+        private final int demand;
         private final int reqs;
         private final int taxis;
 
 
-        public Experiment(int reqs, int taxis)
+        public Experiment(int demand, int reqs, int taxis)
         {
+            this.demand = demand;
             this.reqs = reqs;
             this.taxis = taxis;
         }
@@ -75,8 +77,8 @@ public class ResultsPostProcessor
     }
 
 
-    private Experiment[] experiments;
-    private Stats[][] allStats;
+    private List<Experiment> experiments;
+    private List<Stats[]> allStats;
 
 
     private Stats[] read(String file, Experiment experiment)
@@ -142,6 +144,11 @@ public class ResultsPostProcessor
         pw.println();
 
         for (int i = 0; i < AlgorithmConfig.ALL.length; i++) {
+
+            if (i == 2 || (i >= 5 && i <= 8) || (i >= 11 && i <= 14)) {
+                continue;
+            }
+
             AlgorithmConfig ac = AlgorithmConfig.ALL[i];
             pw.printf("%d\t%s", i, ac.algorithmType.shortcut);
 
@@ -184,44 +191,39 @@ public class ResultsPostProcessor
         throws FileNotFoundException
     {
         String dir = "d:\\PP-rad\\taxi\\mielec-2-peaks\\2013_07\\";
-
+        String subdirPrefix = "mielec-2-peaks-new-0";
         String filename = "stats_DK_" + destinationKnown + "_VT_" + onlineVehicleTracker + "_TP_"
                 + minimizePickupTripTime + ".out";
 
-//        String filename = "stats_destination_" + destinationKnown + "_online_"
-//                + onlineVehicleTracker + ".out";
-        
-        experiments = new Experiment[12];
-        experiments[0] = new Experiment(316, 100);
-        experiments[1] = new Experiment(911, 100);
-        experiments[2] = new Experiment(1479, 100);
-        experiments[3] = new Experiment(2105, 100);
+        //        experiments = new Experiment[12];
+        //        experiments[0] = new Experiment(1, 316, 100);
+        //        experiments[1] = new Experiment(3, 911, 100);
+        //        experiments[2] = new Experiment(5, 1479, 100);
+        //        experiments[3] = new Experiment(7, 2105, 100);
+        //
+        //        experiments[4] = new Experiment(1, 316, 75);
+        //        experiments[5] = new Experiment(3, 911, 75);
+        //        experiments[6] = new Experiment(5, 1479, 75);
+        //        experiments[7] = new Experiment(7, 2105, 75);
+        //
+        //        experiments[8] = new Experiment(1, 316, 50);
+        //        experiments[9] = new Experiment(3, 911, 50);
+        //        experiments[10] = new Experiment(5, 1479, 50);
+        //        experiments[11] = new Experiment(7, 2105, 50);
 
-        experiments[4] = new Experiment(316, 75);
-        experiments[5] = new Experiment(911, 75);
-        experiments[6] = new Experiment(1479, 75);
-        experiments[7] = new Experiment(2105, 75);
+        experiments = new ArrayList<Experiment>();
+        experiments.add(new Experiment(1, 406, 50));
+        experiments.add(new Experiment(2, 840, 50));
+        experiments.add(new Experiment(3, 1297, 50));
 
-        experiments[8] = new Experiment(316, 50);
-        experiments[9] = new Experiment(911, 50);
-        experiments[10] = new Experiment(1479, 50);
-        experiments[11] = new Experiment(2105, 50);
+        experiments.add(new Experiment(1, 406, 25));
+        experiments.add(new Experiment(2, 840, 25));
+        experiments.add(new Experiment(3, 1297, 25));
 
-        allStats = new Stats[12][];
-        allStats[0] = read(dir + "mielec-2-peaks-new-01-100\\" + filename, experiments[0]);
-        allStats[1] = read(dir + "mielec-2-peaks-new-03-100\\" + filename, experiments[1]);
-        allStats[2] = read(dir + "mielec-2-peaks-new-05-100\\" + filename, experiments[2]);
-        allStats[3] = read(dir + "mielec-2-peaks-new-07-100\\" + filename, experiments[3]);
-
-        allStats[4] = read(dir + "mielec-2-peaks-new-01-75\\" + filename, experiments[4]);
-        allStats[5] = read(dir + "mielec-2-peaks-new-03-75\\" + filename, experiments[5]);
-        allStats[6] = read(dir + "mielec-2-peaks-new-05-75\\" + filename, experiments[6]);
-        allStats[7] = read(dir + "mielec-2-peaks-new-07-75\\" + filename, experiments[7]);
-
-        allStats[8] = read(dir + "mielec-2-peaks-new-01-50\\" + filename, experiments[8]);
-        allStats[9] = read(dir + "mielec-2-peaks-new-03-50\\" + filename, experiments[9]);
-        allStats[10] = read(dir + "mielec-2-peaks-new-05-50\\" + filename, experiments[10]);
-        allStats[11] = read(dir + "mielec-2-peaks-new-07-50\\" + filename, experiments[11]);
+        allStats = new ArrayList<Stats[]>();
+        for (Experiment e : experiments) {
+            allStats.add(read(dir + subdirPrefix + e.demand + '-' + e.taxis + "\\" + filename, e));
+        }
 
         writeValues(dir + filename + ".T_W", "T_W");
         writeValues(dir + filename + ".T_P", "T_P");
@@ -238,9 +240,9 @@ public class ResultsPostProcessor
         new ResultsPostProcessor().go(true, false, false);
         new ResultsPostProcessor().go(true, true, false);
 
-//        new ResultsPostProcessor().go(false, false, true);
-//        new ResultsPostProcessor().go(false, true, true);
-//        new ResultsPostProcessor().go(true, false, true);
-//        new ResultsPostProcessor().go(true, true, true);
+        new ResultsPostProcessor().go(false, false, true);
+        new ResultsPostProcessor().go(false, true, true);
+        new ResultsPostProcessor().go(true, false, true);
+        new ResultsPostProcessor().go(true, true, true);
     }
 }
