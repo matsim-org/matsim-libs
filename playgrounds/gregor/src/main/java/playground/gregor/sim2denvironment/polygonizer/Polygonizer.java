@@ -23,7 +23,7 @@ package playground.gregor.sim2denvironment.polygonizer;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
-import playground.gregor.sim2d_v3.helper.gisdebug.GisDebugger;
+import playground.gregor.sim2denvironment.GisDebugger;
 
 import com.vividsolutions.jts.geom.Geometry;
 

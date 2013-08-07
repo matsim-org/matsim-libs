@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.sim2d_v3.simulation.floor.forces.deliberative.velocityobstacle;
+package playground.gregor.sim2denvironment;
 
 import java.util.ArrayList;
 import java.util.List;

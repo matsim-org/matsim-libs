@@ -29,7 +29,6 @@ import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.gregor.sim2d_v3.trafficmonitoring.MSATravelTimeCalculatorFactory;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.Branding;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
@@ -134,7 +133,7 @@ public class Sim2DRunner implements IterationStartsListener{
 
 		
 //		controller.setCreateGraphs(false);
-		controller.setTravelTimeCalculatorFactory(new MSATravelTimeCalculatorFactory());
+//		controller.setTravelTimeCalculatorFactory(new MSATravelTimeCalculatorFactory());
 		controller.run();
 	}
 

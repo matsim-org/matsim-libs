@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import playground.gregor.sim2d_v3.simulation.floor.forces.deliberative.velocityobstacle.Algorithms;
+import playground.gregor.sim2denvironment.Algorithms;
 import playground.gregor.sim2denvironment.approxdecomp.ApproxConvexDecomposer.PocketBridge;
 import playground.gregor.sim2denvironment.approxdecomp.Graph.Link;
 import playground.gregor.sim2denvironment.approxdecomp.Graph.Node;

@@ -9,7 +9,7 @@ import java.util.Set;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.QuadTree;
 
-import playground.gregor.sim2d_v3.helper.gisdebug.GisDebugger;
+import playground.gregor.sim2denvironment.GisDebugger;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;

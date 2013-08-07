@@ -26,7 +26,7 @@ import java.util.List;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.gregor.sim2d_v3.simulation.floor.forces.deliberative.velocityobstacle.Algorithms;
+import playground.gregor.sim2denvironment.Algorithms;
 import playground.gregor.sim2denvironment.approxdecomp.Graph.Link;
 import playground.gregor.sim2denvironment.approxdecomp.Graph.Node;
 
