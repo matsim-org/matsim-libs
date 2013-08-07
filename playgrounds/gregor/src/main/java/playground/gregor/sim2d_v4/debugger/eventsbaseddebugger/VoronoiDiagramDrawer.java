@@ -29,21 +29,28 @@ import playground.gregor.sim2d_v4.events.XYVxVyEventsHandler;
 import be.humphreys.simplevoronoi.GraphEdge;
 import be.humphreys.simplevoronoi.Voronoi;
 
-public class VoronoiDiagramDrawer implements XYVxVyEventsHandler, ClockedVisDebuggerAdditionalDrawer{
+public class VoronoiDiagramDrawer implements XYVxVyEventsHandler, ClockedVisDebuggerAdditionalDrawer, VisDebuggerOverlay{
 
 	List<Double> x = new ArrayList<Double>();
 	List<Double> y = new ArrayList<Double>();
 	private List<GraphEdge> d = null;
 	
-	private final double minZoom = 20;
+	private final double minZoom = 0;
 	@Override
 	public void draw(EventsBasedVisDebugger p) {
 		if (this.d == null || p.zoomer.getZoomScale() < this.minZoom) {
 			return;
 		}
 		
+//		p.fill(0);
+//		p.textSize((float) (16/p.zoomer.getZoomScale()));
+//		for (int i = 0; i < this.x.size(); i ++) {
+//			float tx = (float)(this.x.get(i) + p.offsetX);
+//			float ty = -(float)(this.y.get(i) + p.offsetY);
+//			p.text(i, tx, ty);
+//		}
+		
 		for (GraphEdge g : this.d) {
-			
 			float fx0 = (float)(g.x1 + p.offsetX);
 			float fx1 = (float)(g.x2 + p.offsetX);
 			float fy0 = -(float)(g.y1 + p.offsetY);
@@ -51,6 +58,9 @@ public class VoronoiDiagramDrawer implements XYVxVyEventsHandler, ClockedVisDebu
 			p.stroke(0);
 			p.strokeWeight((float) (.05));
 			p.line(fx0, fy0, fx1, fy1);
+//			String sites = g.site1 + " " + g.site2;
+//			p.text(sites, (fx0+fx1)/2,(fy0 + fy1)/2);
+			
 		}
 
 	}
@@ -84,31 +94,53 @@ public class VoronoiDiagramDrawer implements XYVxVyEventsHandler, ClockedVisDebu
 		if (this.x.size() < 1) {
 			return;
 		}
-		double [] x = new double[this.x.size()];
-		double [] y = new double[this.y.size()];
 		
 		double minX = Double.POSITIVE_INFINITY;
 		double minY = Double.POSITIVE_INFINITY;
 		double maxX = Double.NEGATIVE_INFINITY;
 		double maxY = Double.NEGATIVE_INFINITY;
+		for (int i = 0; i < this.x.size(); i++) {
+			double x = this.x.get(i);
+			double y = this.y.get(i);
+			if (x  < minX) {
+				minX = x;
+			}
+			if (x > maxX) {
+				maxX = x;
+			}
+			
+			if (y < minY) {
+				minY = y;
+			}
+			if (y > maxY) {
+				maxY = y;
+			}
+		}
 		
-		for (int i = 0; i < x.length; i++) {
+		
+		int xres = (int) (maxX-minX)/2;
+		int yres = (int) (maxY-minY)/2;
+		int s = (xres+1)*(yres+1);
+		double [] x = new double[this.x.size()+s];
+		double [] y = new double[this.y.size()+s];
+		int i = 0;
+		for (; i < this.x.size(); i++) {
 			x[i] = this.x.get(i);
 			y[i] = this.y.get(i);
+		}
+		
+		int loop =0;
+		for (double xx = minX; xx < maxX; xx += 2) {
+			double offset = 0;
+			if (loop % 2 == 0) {
+				offset = 1;
+			}
+			loop++;
+			for (double yy = minY; yy < maxY; yy += 2){
+				x[i]=xx+offset;
+				y[i++]=yy+offset;
+			}
 			
-			if (x[i] < minX) {
-				minX = x[i];
-			}
-			if (x[i] > maxX) {
-				maxX = x[i];
-			}
-			
-			if (y[i] < minY) {
-				minY = y[i];
-			}
-			if (y[i] > maxY) {
-				maxY = y[i];
-			}
 		}
 		
 		this.x.clear();

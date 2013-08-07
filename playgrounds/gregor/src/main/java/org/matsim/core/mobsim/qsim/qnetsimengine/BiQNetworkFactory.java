@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RectEvent.java
+ * BiQNetworkFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,51 +18,50 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.sim2d_v4.events.debug;
+package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import org.matsim.core.api.experimental.events.Event;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
-public class RectEvent extends Event {
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Node;
 
-	private final double tx;
-	private final double ty;
-	private final double sx;
-	private final double sy;
-	private final boolean fill;
+public class BiQNetworkFactory implements NetsimNetworkFactory<QNode, QLinkInternalI>{
 	
-	private static final String EVENT_TYPE = "RECT_EVENT";
+	private final Map<Id,BiPedQ> qs = new HashMap<Id,BiPedQ>();
+	private boolean sqr;
 
-	public RectEvent(double time, double tx, double ty, double sx, double sy,boolean fill) {
-		super(time);
-		this.tx = tx;
-		this.ty = ty;
-		this.sx = sx;
-		this.sy = sy;
-		this.fill = fill;
+	@Override
+	public QNode createNetsimNode(Node node, QNetwork network) {
+		return new QNode(node, network);
 	}
 
 	@Override
-	public String getEventType() {
-		return EVENT_TYPE;
-	}
-	public double getTx() {
-		return this.tx;
+	public QLinkInternalI createNetsimLink(Link link, QNetwork network,
+			QNode toQueueNode) {
+		
+		BiPedQ q = new BiPedQ(network,this.sqr);
+		Iterator<? extends Link> it = link.getToNode().getOutLinks().values().iterator();
+		while (it.hasNext()) {
+			Link rev = it.next();
+			if (rev.getToNode().equals(link.getFromNode())) {
+				BiPedQ revQ = this.qs.remove(rev.getId());
+				if (revQ != null) {
+					revQ.setRevQ(q);
+					q.setRevQ(revQ);
+				} else {
+					this.qs.put(link.getId(), q);
+				}
+				break;
+			}
+		}
+		QLinkImpl ret = new QLinkImpl(link, network, toQueueNode, q);
+		return ret;
 	}
 
-	public double getTy() {
-		return this.ty;
+	public void setSqr(boolean sqr) {
+		this.sqr = sqr;
 	}
-
-	public double getSx() {
-		return this.sx;
-	}
-
-	public double getSy() {
-		return this.sy;
-	}
-
-	public boolean getFill() {
-		return this.fill;
-	}
-
 }

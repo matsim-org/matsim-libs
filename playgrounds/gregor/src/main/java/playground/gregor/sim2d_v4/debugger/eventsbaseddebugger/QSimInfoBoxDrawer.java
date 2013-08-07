@@ -24,6 +24,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -42,7 +44,6 @@ import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.network.NetworkImpl;
 
 import processing.core.PConstants;
 import processing.core.PVector;
@@ -63,7 +64,7 @@ public class QSimInfoBoxDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 	//	private final double boxSize = 4;
 	private final double boxWidth = 4;
 	private final double boxLength = 5.5;
-	
+
 	double lastUpdate = 0;
 
 	public QSimInfoBoxDrawer(Scenario sc) {
@@ -80,13 +81,9 @@ public class QSimInfoBoxDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 			dx /= length;
 			dy /= length;
 			LinkInfo info = new LinkInfo();
-			info.id = l.getId();
-			info.slots = (int) ((l.getLength()/((NetworkImpl)sc.getNetwork()).getEffectiveCellSize())*l.getNumberOfLanes());
-			info.lanes = (int) l.getNumberOfLanes();
-			info.cellSize = l.getLength()/(info.slots/info.lanes);
-			info.laneWidth = width/info.lanes;
 			info.length = l.getLength();
 			info.area = l.getLength() * width;
+			info.id = l.getId();
 
 			double x0 = l.getFromNode().getCoord().getX();//+dy/2;
 			double y0 = l.getFromNode().getCoord().getY();//-dx/2;
@@ -99,13 +96,13 @@ public class QSimInfoBoxDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 			info.y0 = y0;
 			info.x1 = x1;
 			info.y1 = y1;
-			info.dx = dx;
-			info.dy = dy;
 			info.length = length;
+			info.fnd.put(0.01, 0.01);
 
 			//		if ()
 
 			double boxStart = info.length*1/2+.25;
+			//			double boxStart = info.length*1/2+.25-4;
 			double diff = length - (boxStart+this.boxLength);
 			if (diff < .5) {
 				double mv = .5 - diff;
@@ -200,7 +197,7 @@ public class QSimInfoBoxDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 			return;
 		}
 		for (LinkInfo li : this.links) {
-	
+
 			if (li.length < this.boxLength+1) {
 				continue;
 			}
@@ -227,7 +224,7 @@ public class QSimInfoBoxDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 			p.stroke(255);
 			p.fill(0, 0);
 			p.rect(0, 0, (float)(this.boxLength*p.zoomer.getZoomScale()), (float)(this.boxWidth*p.zoomer.getZoomScale()),round);
-//			p.rect(0, (float)(.19*p.zoomer.getZoomScale()),  (float)((this.boxLength)*p.zoomer.getZoomScale()),(float)((this.boxWidth-.19)*p.zoomer.getZoomScale()),0,0,round,round);
+			//			p.rect(0, (float)(.19*p.zoomer.getZoomScale()),  (float)((this.boxLength)*p.zoomer.getZoomScale()),(float)((this.boxWidth-.19)*p.zoomer.getZoomScale()),0,0,round,round);
 			p.fill(255);
 			p.stroke(0);
 			p.strokeWeight((float) (.1*p.zoomer.getZoomScale()));
@@ -279,7 +276,7 @@ public class QSimInfoBoxDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 				p.textSize(fs);
 				p.fill(0,0,0,255);
 				li.text = "#agents: "+li.onLink;
-				
+
 				float dty0 = (float) ((.5) * p.zoomer.getZoomScale())+fs;
 				if (li.atan > Math.PI/2 && li.atan < 1.5 * Math.PI) {
 					p.translate((float) (lx1+arrowLength*p.zoomer.getZoomScale()),(float) ((this.boxWidth-.5) * p.zoomer.getZoomScale())-fs);
@@ -287,16 +284,76 @@ public class QSimInfoBoxDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 				} else {
 					p.translate(lx0, 0);
 				}
-				
-				
+
+
 				p.text(li.text, 0, dty0);
 				float dty1 = (float) (dty0 + 1.5*fs);
 				p.text(li.dens, 0, dty1);
 				float dty2 = dty0 + 3*fs;
 				p.text(li.flowStr,0,dty2);
-				
 			}
 			p.popMatrix();
+			if (p.zoomer.getZoomScale() >= this.detailMinScale ) {
+				p.pushMatrix();
+//				p.translate(cv.x, cv.y);
+//				System.out.println(li.atan);
+				if (li.atan >= Math.PI) {
+					p.translate(cv.x, cv.y+(float)(this.boxWidth*p.zoomer.getZoomScale()));
+					p.rotate((float) li.atan);
+				} else {
+					p.translate(cv.x-(float)(this.boxLength*p.zoomer.getZoomScale()), cv.y);
+					p.rotate((float) li.atan);
+					p.rotate((float)Math.PI);
+					
+				}
+//				p.translate(0, (float)(this.boxWidth*p.zoomer.getZoomScale()));
+//				p.strokeWeight((float) (.2*p.zoomer.getZoomScale()));
+//				p.stroke(255);
+//				p.fill(0, 0);
+//				p.rect(0, 0, (float)(this.boxLength*p.zoomer.getZoomScale()), (float)(this.boxWidth*p.zoomer.getZoomScale()),round);
+//				//			p.rect(0, (float)(.19*p.zoomer.getZoomScale()),  (float)((this.boxLength)*p.zoomer.getZoomScale()),(float)((this.boxWidth-.19)*p.zoomer.getZoomScale()),0,0,round,round);
+//				p.fill(255);
+//				p.stroke(0);
+//				p.strokeWeight((float) (.1*p.zoomer.getZoomScale()));
+//				p.rect(0, 0, (float)(this.boxLength*p.zoomer.getZoomScale()), (float)(this.boxWidth*p.zoomer.getZoomScale()),round);
+//
+//				p.stroke(0);
+//				p.fill(0);
+				
+//				p.translate(0, (float)(this.boxWidth*p.zoomer.getZoomScale()));
+				
+				synchronized(li) {
+					float xOld = 0;
+					float yOld = 0;
+					
+					double max = 2*6;
+					p.stroke(192,0,0,255);
+					p.strokeWeight((float) (0.05*p.zoomer.getZoomScale()));
+					
+					for (Entry<Double, Double> e : li.fnd.entrySet()) {
+						
+						double x = this.boxLength*e.getKey()/max;
+						double y = -this.boxWidth*e.getValue()/1.3;
+						float fx = (float)(x*p.zoomer.getZoomScale());
+						float fy = (float)(y*p.zoomer.getZoomScale());
+//						p.fill(0);
+//						p.noSmooth();
+//						p.ellipse(fx, fy,(float)(0.01*p.zoomer.getZoomScale()),(float)(0.01*p.zoomer.getZoomScale()));
+						p.line(xOld, yOld, fx, fy);
+						xOld = fx;
+						yOld = fy;
+						
+
+					}
+
+
+				}
+				p.popMatrix();
+			}
+
+
+
+
 		}
 	}
 
@@ -306,26 +363,13 @@ public class QSimInfoBoxDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 	//
 	//
 	private static final class LinkInfo {
+		public Id id;
 		public double area;
 		public double ry0;
 		public double rx0;
-		public double boxStart;
-		public double tx;
-		public double ty;
 		public String text;
 		public double atan;
 		public double length;
-		public double laneWidth;
-		public double dy;
-		public double dx;
-		public double cellSize;
-		public int lanes;
-		public Id id;
-		public int r;
-		public int b;
-		public int g;
-		public int a = 255;
-		int slots;
 		float width;
 		double x0;
 		double x1;
@@ -334,8 +378,12 @@ public class QSimInfoBoxDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 		int onLink;
 		public String dens = "\u03C1= 0 m\u207B\u00B2";
 		public double flow;
-		public double avgFlow;
+		public double avgFlow = 0.;
 		public String flowStr = "J = 0.0 ms\u207B\u00B9";
+		public double avgDens = 0.;
+
+		private final TreeMap<Double, Double> fnd = new TreeMap<Double,Double>();
+		
 	}
 
 
@@ -349,8 +397,8 @@ public class QSimInfoBoxDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 			double dens = li.onLink/li.area;
 			int tmp0 = (int) dens;
 			int tmp1 = (int) (dens*100-tmp0*100);
-			
-			
+
+
 			li.dens = "\u03C1=" + tmp0 + "." + tmp1+" m\u207B\u00B2";
 		}
 
@@ -360,7 +408,7 @@ public class QSimInfoBoxDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		update(event);
-		
+
 		LinkInfo info = this.map.get(event.getLinkId());
 		if (info == null) {
 			return;
@@ -370,9 +418,9 @@ public class QSimInfoBoxDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 			double dens = info.onLink/info.area;
 			int tmp0 = (int) dens;
 			int tmp1 = (int) (dens*100-tmp0*100);
-			
+
 			info.flow++;
-			
+
 			info.dens = "\u03C1=" + tmp0 + "." + tmp1+" m\u207B\u00B2";
 		}
 
@@ -384,17 +432,24 @@ public class QSimInfoBoxDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 			double timeSpan = event.getTime()-this.lastUpdate;
 			for ( LinkInfo li : this.map.values()) {
 				synchronized(li) {
-					li.avgFlow = 0.5 * li.avgFlow + 0.5 * (li.flow/timeSpan)/li.width;
-					li.flow = 0;
+					li.avgFlow = 0.9 * li.avgFlow + 0.1 * (li.flow/timeSpan)/li.width;
 					int tmp0 = (int)li.avgFlow;
 					int tmp1 = (int)(li.avgFlow*100 - tmp0*100+.5);
 					li.flowStr = "J = "+ tmp0+"." + tmp1 +" ms\u207B\u00B9";
+
+					double dens = li.onLink/li.area;
+					li.avgDens = 0.9 * li.avgDens + 0.1 * dens;
+					
+					if (li.id.toString().contains("l5b") || li.id.toString().contains("l5b_rev")) {
+						li.fnd.put(li.avgDens*2, li.avgFlow);
+					}
+					li.flow = 0;
 				}
 			}
-			
+
 			this.lastUpdate = event.getTime();
 		}
-		
+
 	}
 
 
@@ -411,8 +466,8 @@ public class QSimInfoBoxDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 			double dens = info.onLink/info.area;
 			int tmp0 = (int) dens;
 			int tmp1 = (int) (dens*100-tmp0*100);
-			
-			
+
+
 			info.dens = "\u03C1=" + tmp0 + "." + tmp1+" m\u207B\u00B2";
 		}		
 	}
@@ -430,8 +485,8 @@ public class QSimInfoBoxDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 			double dens = info.onLink/info.area;
 			int tmp0 = (int) dens;
 			int tmp1 = (int) (dens*100-tmp0*100);
-			
-			
+
+
 			info.dens = "\u03C1=" + tmp0 + "." + tmp1+" m\u207B\u00B2";
 		}		
 	}
@@ -444,12 +499,12 @@ public class QSimInfoBoxDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 			return;
 		}
 		synchronized(info) {
-			info.onLink--;
+			//			info.onLink--;
 			double dens = info.onLink/info.area;
 			int tmp0 = (int) dens;
 			int tmp1 = (int) (dens*100-tmp0*100);
-			
-			
+
+
 			info.dens = "\u03C1=" + tmp0 + "." + tmp1+" m\u207B\u00B2";
 		}
 	}
@@ -463,15 +518,15 @@ public class QSimInfoBoxDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 		if (info == null) {
 			return;
 		}
-//		synchronized(info) {
-//			info.onLink--;
-//			double dens = info.onLink/info.area;
-//			int tmp0 = (int) dens;
-//			int tmp1 = (int) (dens*100-tmp0*100);
-//			
-//			
-//			info.dens = "\u03C1=" + tmp0 + "." + tmp1+" m\u207B\u00B2";
-//		}
+		//		synchronized(info) {
+		//			info.onLink--;
+		//			double dens = info.onLink/info.area;
+		//			int tmp0 = (int) dens;
+		//			int tmp1 = (int) (dens*100-tmp0*100);
+		//			
+		//			
+		//			info.dens = "\u03C1=" + tmp0 + "." + tmp1+" m\u207B\u00B2";
+		//		}
 	}
 
 
@@ -483,15 +538,15 @@ public class QSimInfoBoxDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 		if (info == null) {
 			return;
 		}
-//		synchronized(info) {
-//			info.onLink++;
-//			double dens = info.onLink/info.area;
-//			int tmp0 = (int) dens;
-//			int tmp1 = (int) (dens*100-tmp0*100);
-//			
-//			
-//			info.dens = "\u03C1=" + tmp0 + "." + tmp1+" m\u207B\u00B2";
-//		}		
+		//		synchronized(info) {
+		//			info.onLink++;
+		//			double dens = info.onLink/info.area;
+		//			int tmp0 = (int) dens;
+		//			int tmp1 = (int) (dens*100-tmp0*100);
+		//			
+		//			
+		//			info.dens = "\u03C1=" + tmp0 + "." + tmp1+" m\u207B\u00B2";
+		//		}		
 	}
 
 

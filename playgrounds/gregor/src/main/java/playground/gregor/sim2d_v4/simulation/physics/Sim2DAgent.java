@@ -38,7 +38,7 @@ public class Sim2DAgent implements TwoDObject {
 	
 	//testing only
 	@Deprecated
-	private final double vCoeff = 1+Math.min(Math.max(-0.25, MatsimRandom.getRandom().nextGaussian()*.1),1.25);
+	private final double vCoeff = 1;//+Math.min(Math.max(-0.25, MatsimRandom.getRandom().nextGaussian()*.1),1.25);
 	
 //	private final double vStd
 	
@@ -72,6 +72,8 @@ public class Sim2DAgent implements TwoDObject {
 	private VelocityUpdater vu;
 
 	private boolean emitPosEvents = true;
+
+	/*package*/ int ttl; //workaround - think about this [gl August '13]
 	
 	public Sim2DAgent(Scenario sc, QVehicle veh, double spawnX, double spawnY, LinkSwitcher ls, PhysicalSim2DEnvironment pEnv) {
 		this.pos[0] = spawnX;
@@ -114,6 +116,7 @@ public class Sim2DAgent implements TwoDObject {
 					veh.setCurrentLink(loResLink.getLink());
 					loResLink.addFromUpstream(veh);
 					this.hasLeft2DSim = true;
+					this.ttl = 1000;
 					this.pEnv.getEventsManager().processEvent(new LinkLeaveEvent(time, getId(), this.getCurrentLinkId(), this.veh.getId()));
 					this.notifyMoveOverNode(nextLinkId);
 				} else {
@@ -134,6 +137,15 @@ public class Sim2DAgent implements TwoDObject {
 			this.pEnv.getEventsManager().processEvent(e);
 		}
 		return true;
+	}
+	
+	public void moveGhost(double dx, double dy, double time) {
+		this.pos[0] += dx;
+		this.pos[1] += dy;
+		if (this.emitPosEvents) {
+			XYVxVyEventImpl e = new XYVxVyEventImpl(this.getId(), this.pos[0], this.pos[1], this.v[0], this.v[1], time);
+			this.pEnv.getEventsManager().processEvent(e);
+		}
 	}
 
 	public double[] getVelocity() {
@@ -186,6 +198,10 @@ public class Sim2DAgent implements TwoDObject {
 		this.v0 = v*this.vCoeff;
 		
 	}
+	
+	public double getDesiredSpeed() {
+		return this.v0;
+	}
 
 	public boolean hasLeft2DSim() {
 		return this.hasLeft2DSim ;
@@ -213,12 +229,16 @@ public class Sim2DAgent implements TwoDObject {
 	
 	@Override
 	public String toString() {
-		return "id: " + this.driver.getId() + " sec:" + this.currentPSec.getId() + " link:" + this.getCurrentLinkId();
+		return "id: " + this.driver.getId() + " sec:" + this.currentPSec.getId() + " link:" + this.getCurrentLinkId() + " pos:" + this.pos[0] + ":" + this.pos[1] ;
 	}
 	
 	//DEBUG
 	void reDrawAgent(double time){
 		XYVxVyEventImpl e = new XYVxVyEventImpl(this.getId(), this.pos[0], this.pos[1], this.v[0], this.v[1], time);
 		this.pEnv.getEventsManager().processEvent(e);
+	}
+
+	public double getActualSpeed() {
+		return Math.sqrt(this.v[0]*this.v[0]+this.v[1]*this.v[1]);
 	}
 }

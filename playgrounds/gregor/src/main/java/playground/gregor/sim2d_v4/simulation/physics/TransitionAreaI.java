@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * RectEvent.java
+ * TransitionAreaI.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,51 +18,16 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.sim2d_v4.events.debug;
+package playground.gregor.sim2d_v4.simulation.physics;
 
-import org.matsim.core.api.experimental.events.Event;
+public interface TransitionAreaI {
 
-public class RectEvent extends Event {
+	public abstract boolean hasBufferSpace();
 
-	private final double tx;
-	private final double ty;
-	private final double sx;
-	private final double sy;
-	private final boolean fill;
+	public abstract void addAgentTransitionBuffer(Sim2DAgent agent,
+			double linkDensity);
+
+	public abstract PhysicalSim2DEnvironment getPhysicalEnvironment();
 	
-	private static final String EVENT_TYPE = "RECT_EVENT";
-
-	public RectEvent(double time, double tx, double ty, double sx, double sy,boolean fill) {
-		super(time);
-		this.tx = tx;
-		this.ty = ty;
-		this.sx = sx;
-		this.sy = sy;
-		this.fill = fill;
-	}
-
-	@Override
-	public String getEventType() {
-		return EVENT_TYPE;
-	}
-	public double getTx() {
-		return this.tx;
-	}
-
-	public double getTy() {
-		return this.ty;
-	}
-
-	public double getSx() {
-		return this.sx;
-	}
-
-	public double getSy() {
-		return this.sy;
-	}
-
-	public boolean getFill() {
-		return this.fill;
-	}
 
 }

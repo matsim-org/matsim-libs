@@ -42,6 +42,8 @@ public final class HybridQSim2DNetworkFactory implements NetsimNetworkFactory<QN
 	private final Sim2DEngine hybridEngine;
 	private final Sim2DScenario s2dsc;
 	private final Sim2DAgentFactory agentBuilder;
+	
+	private final BiQNetworkFactory biQFac = new BiQNetworkFactory();
 
 	public HybridQSim2DNetworkFactory( Sim2DEngine e, Scenario sc, Sim2DAgentFactory builder) {
 		this.hybridEngine = e;
@@ -55,6 +57,18 @@ public final class HybridQSim2DNetworkFactory implements NetsimNetworkFactory<QN
 		boolean sim2DQTransitionLink = false;
 		boolean qSim2DTransitionLink = link.getAllowedModes().contains(TransportMode.walk2d);
 
+		
+//		QLinkInternalI qLink = 
+		QLinkInternalI qLink = null;
+		if (link.getId().toString().startsWith("mt")) {
+			qLink = new QLinkImpl(link, network, toQueueNode);
+		} else if (link.getId().toString().startsWith("t")) {
+			this.biQFac.setSqr(false);
+			qLink =this.biQFac.createNetsimLink(link, network, toQueueNode);
+		} else {
+			this.biQFac.setSqr(true);
+			qLink =this.biQFac.createNetsimLink(link, network, toQueueNode);
+		}
 		
 		if (qSim2DTransitionLink){
 			if (link.getFromNode().getOutLinks().size() > 1) {
@@ -77,18 +91,19 @@ public final class HybridQSim2DNetworkFactory implements NetsimNetworkFactory<QN
 
 		if (qSim2DTransitionLink) {
 			Sim2DEnvironment env = this.s2dsc.getSim2DEnvironment(link);
-			QSim2DTransitionLink hiResLink = new QSim2DTransitionLink(link, network, toQueueNode, this.hybridEngine, new QLinkImpl(link, network, toQueueNode), env, this.agentBuilder) ;
+			QSim2DTransitionLink hiResLink = new QSim2DTransitionLink(link, network, toQueueNode, this.hybridEngine, qLink, env, this.agentBuilder) ;
 			this.hybridEngine.registerHiResLink(hiResLink);
 			return hiResLink ;
 		} 
 		//		QLinkImpl ql = 
 		if (sim2DQTransitionLink) {
-			Sim2DQTransitionLink lowResLink = new Sim2DQTransitionLink(new QLinkImpl(link,network,toQueueNode));
+			Sim2DQTransitionLink lowResLink = new Sim2DQTransitionLink(qLink);
 			this.hybridEngine.registerLowResLink(lowResLink);
 			return lowResLink;
 		}
 
-		return new QLinkImpl(link, network, toQueueNode);
+//		return new QLinkImpl(link, network, toQueueNode);
+		return qLink;
 	}
 
 	@Override

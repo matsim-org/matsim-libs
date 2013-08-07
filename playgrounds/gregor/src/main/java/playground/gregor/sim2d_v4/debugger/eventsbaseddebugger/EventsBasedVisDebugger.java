@@ -21,6 +21,7 @@
 package playground.gregor.sim2d_v4.debugger.eventsbaseddebugger;
 
 import java.awt.BorderLayout;
+import java.awt.Font;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -66,7 +67,7 @@ public class EventsBasedVisDebugger extends PApplet {
 	
 	int dummy = 0;
 	
-//	private final FrameSaver fs = new FrameSaver("/Users/laemmel/tmp/processing/", "pdf", 0);
+//	private final FrameSaver fs = new FrameSaver("/Users/laemmel/tmp/processing/", "png", 10);
 	private final FrameSaver fs = null;
 	private String it;
 	public EventsBasedVisDebugger(Scenario sc) {
@@ -130,12 +131,12 @@ public class EventsBasedVisDebugger extends PApplet {
 
 	@Override
 	public void draw() {
-
+		Font f = this.getFont();
 		
 		boolean recording = false;
 		ZoomPan old = null; 
 		if (this.keyControl != null && this.keyControl.isScreenshotRequested() && this.keyControl.isOneObjectWaitingAtScreenshotBarrier()) {
-			beginRecord(PDF, "/Users/laemmel/tmp/processing/" + "sim2d_screenshot_at_" + this.time + ".pdf");
+			beginRecord(PDF, "/Users/laemmel/tmp/processing/" + "sim2d_screenshot_at_" + this.time + "_" + System.currentTimeMillis()+ ".pdf");
 			recording = true;
 			old = this.zoomer;
 			this.zoomer = new ZoomPan(this, this.recorder);
@@ -151,7 +152,7 @@ public class EventsBasedVisDebugger extends PApplet {
 		}
 		// This enables zooming/panning and should be in the draw method.
 		this.zoomer.transform();
-		background(128);	
+		background(255);	
 
 
 
@@ -159,7 +160,7 @@ public class EventsBasedVisDebugger extends PApplet {
 		for (int x = 0; x <= this.width; x += 128) {
 			for (int y = 0; y <= this.height+128; y += 128) {
 				PVector d = this.zoomer.getDispToCoord(new PVector(x,y));
-				coords.add(d);
+//				coords.add(d);
 			}
 		}
 		
@@ -171,9 +172,9 @@ public class EventsBasedVisDebugger extends PApplet {
 
 		synchronized (this.additionalDrawers) {
 			for (VisDebuggerAdditionalDrawer d : this.additionalDrawers) {
-//				if (d instanceof VoronoiDiagramDrawer) {
-//					continue;
-//				}
+				if (d instanceof VoronoiDiagramDrawer) {
+					continue;
+				}
 				d.draw(this);
 			}
 		}
@@ -227,14 +228,14 @@ public class EventsBasedVisDebugger extends PApplet {
 			}
 		}
 
-//		synchronized (this.additionalDrawers) {
-//			for (VisDebuggerAdditionalDrawer d : this.additionalDrawers) {
-//				if (d instanceof VoronoiDiagramDrawer) {
-//					
-//					d.draw(this);
-//				}
-//			}
-//		}
+		synchronized (this.additionalDrawers) {
+			for (VisDebuggerAdditionalDrawer d : this.additionalDrawers) {
+				if (d instanceof VoronoiDiagramDrawer) {
+					
+					d.draw(this);
+				}
+			}
+		}
 
 		//		System.out.println(this.zoomer.getDispToCoord(new PVector(this.width/2, this.height/2)));
 		//		popMatrix();
@@ -279,7 +280,7 @@ public class EventsBasedVisDebugger extends PApplet {
 		}
 
 		if (this.fs != null) {
-			this.fs.saveFrame(this, this.it+Time.writeTime(this.time, Time.TIMEFORMAT_HHMMSS));
+			this.fs.saveFrame(this, this.it+Time.writeTime(this.time, Time.TIMEFORMAT_HHMMSSDOTSS));
 		}
 
 	}
@@ -405,7 +406,7 @@ public class EventsBasedVisDebugger extends PApplet {
 			return;
 		}
 		
-		stroke(255,255);
+		stroke(0,255);
 		fill(r.r,r.g,r.b,r.a);
 		rect(r.tx,r.ty,r.sx,r.sy);
 	}
@@ -515,7 +516,7 @@ public class EventsBasedVisDebugger extends PApplet {
 	}
 	
 	public void addRect(double tx, double ty, double sx, double sy, int r,
-			int g, int b, int a, int minScale) {
+			int g, int b, int a, int minScale, boolean fill) {
 		Rect rect = new Rect();
 		rect.tx = (float) (tx + this.offsetX);
 		rect.ty = (float) -(ty + this.offsetY);
@@ -526,6 +527,7 @@ public class EventsBasedVisDebugger extends PApplet {
 		rect.g = g;
 		rect.b = b;
 		rect.minScale = minScale;
+		rect.fill = fill;
 		
 		addElement(rect);
 		
@@ -592,6 +594,7 @@ public class EventsBasedVisDebugger extends PApplet {
 	}
 
 	private static final class Rect {
+		public boolean fill;
 		float tx,ty,sx,sy;
 		int r,g,b,a, minScale = 0;
 	}

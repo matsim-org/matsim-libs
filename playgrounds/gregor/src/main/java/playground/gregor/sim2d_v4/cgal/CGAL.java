@@ -137,6 +137,18 @@ public abstract class CGAL {
 	}
 
 	/**
+	 * perp dot product of two 2d vectors
+	 * @param x0 the x-coordinate of the first vector
+	 * @param y0 the y-coordinate of the first vector
+	 * @param x1 the x-coordinate of the second vector
+	 * @param y1 the y-coordinate of the second vector
+	 * @return the dot product
+	 */
+	public static double perpDot(double x0, double y0, double x1, double y1) {
+		return x0 * y1 - y0  * x1;
+	}
+	
+	/**
 	 * determinant of 2x2 square matrix    
 	 * @param x0
 	 * @param x1

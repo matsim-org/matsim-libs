@@ -246,28 +246,42 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 		Sim2DAgent a = event.getSim2DAgent();
 		CircleProperty cp = new CircleProperty();
 		cp.rr = (float) a.getRadius();
-		int nr = a.getId().toString().hashCode()%100 + 100;//(3*255);
-		int r,g,b;
-		if (nr > 2*255) {
-			r= nr-2*255;
-			g =0;
-			b=64;
-		} else if (nr > 255) {
-			r=0;
-			g=nr-255;
-			b=64;
+		int nr = a.getId().toString().hashCode()%100;
+		if (a.getId().toString().contains("d") || a.getId().toString().contains("e")) {
+			cp.r = 255;
+			cp.g = 255-nr;
+			cp.b = 0;
+			cp.a = 255;
 		} else {
-			r=64;
-			g=0;
-			b=nr;
+			cp.r = 0;
+			cp.g = 255;
+			cp.b = 255-nr;
+			cp.a = 255;
 		}
-//		cp.r = r;
-//		cp.g = g;
-//		cp.b = b;
-//		cp.a = 222;
-		cp.r = nr;
-		cp.g = nr;
-		cp.b = nr;
+		
+		
+//		int nr = a.getId().toString().hashCode()%100 + 100;//(3*255);
+//		int r,g,b;
+//		if (nr > 2*255) {
+//			r= nr-2*255;
+//			g =0;
+//			b=64;
+//		} else if (nr > 255) {
+//			r=0;
+//			g=nr-255;
+//			b=64;
+//		} else {
+//			r=64;
+//			g=0;
+//			b=nr;
+//		}
+////		cp.r = r;
+////		cp.g = g;
+////		cp.b = b;
+////		cp.a = 222;
+//		cp.r = nr;
+//		cp.g = nr;
+//		cp.b = nr;
 		cp.a = 255;
 		//		cp.fill = false;
 		//		cp.r = 0;
@@ -347,13 +361,14 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 
 	@Override
 	public void handleEvent(ForceReDrawEvent event) {
+		this.keyControl.requestScreenshot();
 		update(event.getTime());
 		
 	}
 
 	@Override
 	public void handleEvent(RectEvent e) {
-		this.vis.addRect(e.getTx(),e.getTy(),e.getSx(),e.getSy(),255,255,255,255,0);
+		this.vis.addRect(e.getTx(),e.getTy(),e.getSx(),e.getSy(),255,255,255,255,0,e.getFill());
 		
 	}
 

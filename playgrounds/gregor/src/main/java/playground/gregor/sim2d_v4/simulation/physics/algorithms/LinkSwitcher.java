@@ -93,10 +93,15 @@ public class LinkSwitcher {// TODO more meaningful name for this class [gl April
 		li.dy = dy;
 
 		PhysicalSim2DSection pSec = this.pEnv.getPhysicalSim2DSectionAssociatedWithLinkId(currentLinkId);
-		if (pSec == null) {
-			System.out.println();
+//		if (pSec == null) {
+//			System.out.println();
+//		}
+		Segment fl = null;
+		if (pSec != null) {
+			fl = getTouchingSegment(seg, pSec.getOpenings());
 		}
-		Segment fl = getTouchingSegment(seg, pSec.getOpenings());
+		
+		
 		Segment targetLine = null;
 		//all polygons are clockwise oriented so we rotate to the right here 
 		//TODO find intersections with pSec!! [gl April '13]

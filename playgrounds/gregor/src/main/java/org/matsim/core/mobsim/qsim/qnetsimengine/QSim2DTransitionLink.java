@@ -40,7 +40,7 @@ import playground.gregor.sim2d_v4.scenario.Sim2DEnvironment;
 import playground.gregor.sim2d_v4.simulation.Sim2DAgentFactory;
 import playground.gregor.sim2d_v4.simulation.Sim2DEngine;
 import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
-import playground.gregor.sim2d_v4.simulation.physics.TransitionArea;
+import playground.gregor.sim2d_v4.simulation.physics.TransitionAreaI;
 
 public class QSim2DTransitionLink extends QLinkInternalI {
 
@@ -51,7 +51,7 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 	private final Link link;
 	private final Sim2DEngine sim2DEngine;
 
-	private final QLinkImpl qLinkDelegate;
+	private final QLinkInternalI qLinkDelegate;
 
 	private final boolean transferToSim2D = true;
 
@@ -60,7 +60,7 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 
 	private final Sim2DAgentFactory agentBuilder;
 
-	private TransitionArea ta;
+	private TransitionAreaI ta;
 
 	private double spawnX;
 
@@ -70,7 +70,7 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 
 	private final QLinkInternalI qPred;
 
-	QSim2DTransitionLink(Link link, QNetwork network, QNode toQueueNode, Sim2DEngine hybridEngine, QLinkImpl qLinkImpl, Sim2DEnvironment env, Sim2DAgentFactory builder) {
+	QSim2DTransitionLink(Link link, QNetwork network, QNode toQueueNode, Sim2DEngine hybridEngine, QLinkInternalI qLinkImpl, Sim2DEnvironment env, Sim2DAgentFactory builder) {
 		this.link = link;
 		this.qNetwork = network;
 		this.toQueueNode = toQueueNode;
@@ -426,7 +426,7 @@ public class QSim2DTransitionLink extends QLinkInternalI {
 	}
 
 	@Deprecated
-	public void createDepartureBox(TransitionArea psecBox, double spawnX,
+	public void createDepartureBox(TransitionAreaI psecBox, double spawnX,
 			double spawnY) {
 		this.ta = psecBox;
 		this.spawnX = spawnX;

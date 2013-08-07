@@ -41,7 +41,7 @@ import be.humphreys.simplevoronoi.Voronoi;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class TransitionArea extends PhysicalSim2DSection {
+public class TransitionArea extends PhysicalSim2DSection implements TransitionAreaI {
 
 
 	//experimental
@@ -65,7 +65,7 @@ public class TransitionArea extends PhysicalSim2DSection {
 		densSiteDistMapping.put(3.2106999999999997,0.8235645283785964);
 		densSiteDistMapping.put(3.74675,0.7412080755407368);
 		densSiteDistMapping.put(4.578200000000003,0.6670872679866631);
-		densSiteDistMapping.put(6.1715000000000035,0.6003785411879968);
+//		densSiteDistMapping.put(6.1715000000000035,0.6003785411879968);
 	}
 	
 
@@ -139,10 +139,18 @@ public class TransitionArea extends PhysicalSim2DSection {
 
 	}
 
+	/* (non-Javadoc)
+	 * @see playground.gregor.sim2d_v4.simulation.physics.TransitionAreaI#hasBufferSpace()
+	 */
+	@Override
 	public boolean hasBufferSpace() {
 		return this.transitionBuffer.size() < this.transitionBufferSize;
 	}
 
+	/* (non-Javadoc)
+	 * @see playground.gregor.sim2d_v4.simulation.physics.TransitionAreaI#addAgentTransitionBuffer(playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent, double)
+	 */
+	@Override
 	public void addAgentTransitionBuffer(Sim2DAgent agent, double linkDensity) {
 		
 		if (linkDensity > 5.3) { //TODO 
@@ -154,15 +162,18 @@ public class TransitionArea extends PhysicalSim2DSection {
 		
 		Entry<Double, Double> ceil = densSiteDistMapping.ceilingEntry(linkDensity);
 		double vDist;
+		double vDens;
 		if (ceil != null) {
 			vDist = ceil.getValue();
+			vDens = ceil.getKey();
 		} else  {
 			Entry<Double, Double> floor = densSiteDistMapping.floorEntry(linkDensity);
 			vDist = floor.getValue();
+			vDens = floor.getKey();
 		}
 		AgentInfo ai = new AgentInfo();
 		ai.agent = agent;
-		ai.density = Math.max(linkDensity, 0.001);
+		ai.density = Math.max(vDens, 0.001);
 		ai.vDist = vDist;
 		
 //		//DEBUG
@@ -372,8 +383,8 @@ public class TransitionArea extends PhysicalSim2DSection {
 				this.penv.getEventsManager().processEvent(new LineEvent(0, s, false,0,0,0,255,0));
 		}
 		
-		this.penv.getEventsManager().processEvent(new RectEvent(0,this.x3-.5,this.y3-.05,.45,3.9));
-		this.penv.getEventsManager().processEvent(new RectEvent(0,this.x1-.05,this.y3-.05,.45,3.9));
+		this.penv.getEventsManager().processEvent(new RectEvent(0,this.x3-.5,this.y3-.05,.45,3.9,false));
+		this.penv.getEventsManager().processEvent(new RectEvent(0,this.x1-.05,this.y3-.05,.45,3.9,false));
 		
 		this.penv.getEventsManager().processEvent(new LineEvent(0, constr0, false,0,0,0,255,0));
 		this.penv.getEventsManager().processEvent(new LineEvent(0, constr1, false,0,0,0,255,0));

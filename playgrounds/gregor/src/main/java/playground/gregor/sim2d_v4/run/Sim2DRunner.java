@@ -30,6 +30,7 @@ import org.matsim.core.controler.listener.IterationStartsListener;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.gregor.sim2d_v3.trafficmonitoring.MSATravelTimeCalculatorFactory;
+import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.Branding;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.EventBasedVisDebuggerEngine;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.InfoBox;
 import playground.gregor.sim2d_v4.debugger.eventsbaseddebugger.QSimDensityDrawer;
@@ -66,7 +67,7 @@ public class Sim2DRunner implements IterationStartsListener{
 		sim2dsc.connect(sc);
 		
 //		c.getQSimConfigGroup().setEndTime(23*3600);
-		c.getQSimConfigGroup().setEndTime(5*60);
+//		c.getQSimConfigGroup().setEndTime(5*60);
 
 		//offsets needed to convert to doubles later in program
 		double minX = Double.POSITIVE_INFINITY;
@@ -115,10 +116,10 @@ public class Sim2DRunner implements IterationStartsListener{
 			SeeCasino iCasion = new SeeCasino();
 			VoronoiDiagramDrawer v = new VoronoiDiagramDrawer();
 			dbg.addAdditionalDrawer(iBox);
-//			dbg.addAdditionalDrawer(new Branding());
+			dbg.addAdditionalDrawer(new Branding());
 			QSimDensityDrawer qDbg = new QSimDensityDrawer(sc);
 			QSimInfoBoxDrawer qDbg2 = new QSimInfoBoxDrawer(sc);
-			dbg.addAdditionalDrawer(qDbg);
+//			dbg.addAdditionalDrawer(qDbg);
 			dbg.addAdditionalDrawer(qDbg2);
 //			dbg.addAdditionalDrawer(iCasion);
 //			dbg.addAdditionalDrawer(new GregorsOffice());

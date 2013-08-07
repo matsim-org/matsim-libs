@@ -45,15 +45,11 @@ public class KeyControl implements KeyListener {
 	private boolean makeScreenshot = false;
 	
 	//static zoom
-	//32505.22:15830.94x76.88606195154944
-	//70185.26:29303.623x80.73036504912677 
-	//108827.0:45366.152x125.2392931869562 -- sections
-	//169010.61:70300.016x194.28724927013116 -- agents
-	//74350.62:40870.0x113.59573078181967 at key 1
+	//13189.192:7476.9673x20.593802448270605
 	private static final Zoom z = new Zoom();
 	static {
-		z.z = 113.59573078181967;
-		z.o = new PVector(74350.62f,40870.0f);
+		z.z = 20.593802448270605;
+		z.o = new PVector(13189.192f,7476.9673f);
 	}
 	
 	public KeyControl(ZoomPan zoomer) {

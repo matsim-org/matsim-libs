@@ -130,94 +130,94 @@ public class PhysicalSim2DEnvironment {
 
 	public void createAndAddPhysicalTransitionSection(
 			Sim2DQTransitionLink lowResLink, Section sec, Link pred) {
-//		Id id = sec.getId();
-//		PhysicalSim2DSection psec = this.psecs.get(id);
-//
-//		//find the corresponding opening
-//		Segment o = null;
-//		//1. try to find touching element
-//		double x0 = lowResLink.getLink().getFromNode().getCoord().getX();
-//		double y0 = lowResLink.getLink().getFromNode().getCoord().getY();
-//		double x1 = lowResLink.getLink().getToNode().getCoord().getX();
-//		double y1 = lowResLink.getLink().getToNode().getCoord().getY();
-//		for ( Segment po : psec.getOpenings()) {
-//			boolean touches = CGAL.isOnVector(x0, y0, po.x0, po.y0, po.x1, po.y1);
-//			if (touches) {
-//				double left2 = CGAL.isLeftOfLine(po.x0, po.y0, x0,y0,x1,y1);
-//				double left3 = CGAL.isLeftOfLine(po.x1, po.y1, x0,y0,x1,y1);
-//				if (left2*left3 < 0) {
-//					o = po;
-//					break;
-//				}
-//			}
-//		}
-//		if (o == null) {
-//			//2. not found! check for lowResLink opening intersection
-//			for ( Segment po : psec.getOpenings()) {
-//				double left0 = CGAL.isLeftOfLine(x0, y0, po.x0, po.y0, po.x1, po.y1);
-//				double left1 = CGAL.isLeftOfLine(x1, y1, po.x0, po.y0, po.x1, po.y1);
-//				if (left0*left1 < 0) {
-//					double left2 = CGAL.isLeftOfLine(po.x0, po.y0, x0,y0,x1,y1);
-//					double left3 = CGAL.isLeftOfLine(po.x1, po.y1, x0,y0,x1,y1);
-//					if (left2*left3 < 0) {
-//						o = po;
-//						break;
-//					}
-//				}
-//			}
-//			if (o == null) {
-//				//3. still not found! last chance, pred intersects opening
-//				double x2 = pred.getFromNode().getCoord().getX();
-//				double y2 = pred.getFromNode().getCoord().getY();
-//				for ( Segment po : psec.getOpenings()) {
-//					double left0 = CGAL.isLeftOfLine(x0, y0, po.x0, po.y0, po.x1, po.y1);
-//					double left1 = CGAL.isLeftOfLine(x2, y2, po.x0, po.y0, po.x1, po.y1);
-//					if (left0*left1 < 0) {
-//						double left2 = CGAL.isLeftOfLine(po.x0, po.y0, x0,y0,x2,y2);
-//						double left3 = CGAL.isLeftOfLine(po.x1, po.y1, x0,y0,x2,y2);
-//						if (left2*left3 < 0) {
-//							o = po;
-//							break;
-//						}
-//					}
-//				}
-//
-//			}
-//
-//		} // if o is still null then something is wrong! not checked here
-//
-//		Segment o1 = new Segment();
-//		o1.dx = -o.dy;
-//		o1.dy = o.dx;
-//		o1.x0 = o.x0;
-//		o1.y0 = o.y0;
-//		o1.x1 = o1.x0 + ARRIVAL_AREA_LENGTH * o1.dx;
-//		o1.y1 = o1.y0 + ARRIVAL_AREA_LENGTH * o1.dy;
-//		//		psec.getObstacles().add(o1);
-//
-//
-//		Segment o2 = new Segment();
-//		o2.dx = o.dy;
-//		o2.dy = -o.dx;
-//		o2.x0 = o.x1 - ARRIVAL_AREA_LENGTH * o2.dx;
-//		o2.y0 = o.y1 - ARRIVAL_AREA_LENGTH * o2.dy;
-//		o2.x1 = o.x1;
-//		o2.y1 = o.y1;
-//		//		psec.getObstacles().add(o2);
-//
-//		Segment o3 = new Segment();
-//		double l = lowResLink.getLink().getLength();
-//		o3.dx = o.dx;
-//		o3.dy = o.dy;
-//		o3.x0 = o.x0 + l*-o.dy;
-//		o3.y0 = o.y0 + l*o.dx;
-//		o3.x1 = o.x1 + l*-o.dy;
-//		o3.y1 = o.y1 + l*o.dx;
-//		if (l < ARRIVAL_AREA_LENGTH) {
-//			log.warn("2D/Q transition link:" + lowResLink.getLink().getId() + " is shorter than arrival area length. This might have negative side effects on the flow!");
-//		}
-//		//		psec.getObstacles().add(o3);
-//		lowResLink.setEndOfQueueLine(o3);
+		//		Id id = sec.getId();
+		//		PhysicalSim2DSection psec = this.psecs.get(id);
+		//
+		//		//find the corresponding opening
+		//		Segment o = null;
+		//		//1. try to find touching element
+		//		double x0 = lowResLink.getLink().getFromNode().getCoord().getX();
+		//		double y0 = lowResLink.getLink().getFromNode().getCoord().getY();
+		//		double x1 = lowResLink.getLink().getToNode().getCoord().getX();
+		//		double y1 = lowResLink.getLink().getToNode().getCoord().getY();
+		//		for ( Segment po : psec.getOpenings()) {
+		//			boolean touches = CGAL.isOnVector(x0, y0, po.x0, po.y0, po.x1, po.y1);
+		//			if (touches) {
+		//				double left2 = CGAL.isLeftOfLine(po.x0, po.y0, x0,y0,x1,y1);
+		//				double left3 = CGAL.isLeftOfLine(po.x1, po.y1, x0,y0,x1,y1);
+		//				if (left2*left3 < 0) {
+		//					o = po;
+		//					break;
+		//				}
+		//			}
+		//		}
+		//		if (o == null) {
+		//			//2. not found! check for lowResLink opening intersection
+		//			for ( Segment po : psec.getOpenings()) {
+		//				double left0 = CGAL.isLeftOfLine(x0, y0, po.x0, po.y0, po.x1, po.y1);
+		//				double left1 = CGAL.isLeftOfLine(x1, y1, po.x0, po.y0, po.x1, po.y1);
+		//				if (left0*left1 < 0) {
+		//					double left2 = CGAL.isLeftOfLine(po.x0, po.y0, x0,y0,x1,y1);
+		//					double left3 = CGAL.isLeftOfLine(po.x1, po.y1, x0,y0,x1,y1);
+		//					if (left2*left3 < 0) {
+		//						o = po;
+		//						break;
+		//					}
+		//				}
+		//			}
+		//			if (o == null) {
+		//				//3. still not found! last chance, pred intersects opening
+		//				double x2 = pred.getFromNode().getCoord().getX();
+		//				double y2 = pred.getFromNode().getCoord().getY();
+		//				for ( Segment po : psec.getOpenings()) {
+		//					double left0 = CGAL.isLeftOfLine(x0, y0, po.x0, po.y0, po.x1, po.y1);
+		//					double left1 = CGAL.isLeftOfLine(x2, y2, po.x0, po.y0, po.x1, po.y1);
+		//					if (left0*left1 < 0) {
+		//						double left2 = CGAL.isLeftOfLine(po.x0, po.y0, x0,y0,x2,y2);
+		//						double left3 = CGAL.isLeftOfLine(po.x1, po.y1, x0,y0,x2,y2);
+		//						if (left2*left3 < 0) {
+		//							o = po;
+		//							break;
+		//						}
+		//					}
+		//				}
+		//
+		//			}
+		//
+		//		} // if o is still null then something is wrong! not checked here
+		//
+		//		Segment o1 = new Segment();
+		//		o1.dx = -o.dy;
+		//		o1.dy = o.dx;
+		//		o1.x0 = o.x0;
+		//		o1.y0 = o.y0;
+		//		o1.x1 = o1.x0 + ARRIVAL_AREA_LENGTH * o1.dx;
+		//		o1.y1 = o1.y0 + ARRIVAL_AREA_LENGTH * o1.dy;
+		//		//		psec.getObstacles().add(o1);
+		//
+		//
+		//		Segment o2 = new Segment();
+		//		o2.dx = o.dy;
+		//		o2.dy = -o.dx;
+		//		o2.x0 = o.x1 - ARRIVAL_AREA_LENGTH * o2.dx;
+		//		o2.y0 = o.y1 - ARRIVAL_AREA_LENGTH * o2.dy;
+		//		o2.x1 = o.x1;
+		//		o2.y1 = o.y1;
+		//		//		psec.getObstacles().add(o2);
+		//
+		//		Segment o3 = new Segment();
+		//		double l = lowResLink.getLink().getLength();
+		//		o3.dx = o.dx;
+		//		o3.dy = o.dy;
+		//		o3.x0 = o.x0 + l*-o.dy;
+		//		o3.y0 = o.y0 + l*o.dx;
+		//		o3.x1 = o.x1 + l*-o.dy;
+		//		o3.y1 = o.y1 + l*o.dx;
+		//		if (l < ARRIVAL_AREA_LENGTH) {
+		//			log.warn("2D/Q transition link:" + lowResLink.getLink().getId() + " is shorter than arrival area length. This might have negative side effects on the flow!");
+		//		}
+		//		//		psec.getObstacles().add(o3);
+		//		lowResLink.setEndOfQueueLine(o3);
 
 
 		//		//DEBUG
@@ -287,8 +287,8 @@ public class PhysicalSim2DEnvironment {
 
 		GeometryFactory geofac = new GeometryFactory();
 		Coordinate c0 = new Coordinate(opening.x0,opening.y0);
-		Coordinate c1 = new Coordinate(opening.x0+3*bx,opening.y0+3*by);
-		Coordinate c2 = new Coordinate(opening.x1+3*bx,opening.y1+3*by);
+		Coordinate c1 = new Coordinate(opening.x0+5*bx,opening.y0+5*by);
+		Coordinate c2 = new Coordinate(opening.x1+5*bx,opening.y1+5*by);
 		Coordinate c3 = new Coordinate(opening.x1,opening.y1);
 
 		Coordinate [] coords = {c0,c1,c2,c3,c0};
@@ -297,7 +297,7 @@ public class PhysicalSim2DEnvironment {
 
 		Id hiResLinkId = hiResLink.getLink().getId();
 		Id boxId = this.sim2dsc.getMATSimScenario().createId(id.toString() + "_link" + hiResLinkId + "_dep_box_");
-		int [] openings = {3};
+		int [] openings = {3,1};
 		Id [] neighbors = {id};
 		int level = sec.getLevel();
 		Section s = this.env.createSection(boxId, p, openings, neighbors, level);
@@ -305,19 +305,34 @@ public class PhysicalSim2DEnvironment {
 		double spawnY = (c0.y+c2.y)/2;
 
 		double flowCap = hiResLink.getLink().getFromNode().getInLinks().values().iterator().next().getCapacity() / this.sim2dsc.getMATSimScenario().getNetwork().getCapacityPeriod();
-		TransitionArea ta = new TransitionArea(s,this.sim2dsc,this,(int) flowCap+1);
+		//		if (hiResLink.getLink().getId().toString().equals("l2d1")) {
+		TransitionAreaII ta = new TransitionAreaII(s,this.sim2dsc,this,(int) flowCap+1);
 		this.psecs.put(s.getId(),ta);
 
 
-		Segment o = ta.getOpenings()[0];
+		Segment o = ta.getOpenings()[1];
 		ta.putNeighbor(o,psec);
+		psec.putNeighbor(opening, ta);
 		hiResLink.createDepartureBox(ta,spawnX,spawnY);
-		
+
 		//DEBUG
 		for ( Segment bo : ta.getObstacles()) {
 			this.eventsManager.processEvent(new LineEvent(0,bo,true,0,0,0,255,0));
 		}
-
+		//		} else {
+		//			TransitionArea ta = new TransitionArea(s,this.sim2dsc,this,(int) flowCap+1);
+		//			this.psecs.put(s.getId(),ta);
+		//
+		//
+		//			Segment o = ta.getOpenings()[0];
+		//			ta.putNeighbor(o,psec);
+		//			hiResLink.createDepartureBox(ta,spawnX,spawnY);
+		//
+		//			//DEBUG
+		//			for ( Segment bo : ta.getObstacles()) {
+		//				this.eventsManager.processEvent(new LineEvent(0,bo,true,0,0,0,255,0));
+		//			}			
+		//		}
 
 	}
 
