@@ -56,15 +56,14 @@ class RsaMain {
 		PConfigGroup pConfig = null;
 		boolean overwrite = false;
 		
-		// prepare the local testcase
 		if(args.length == 0){
+			// prepare the local testcase
 			log.warn("running testcase. Overwriting Files");
 			arguments = ARGS;
 //			pConfig = createPconfigForTest();
 			overwrite = true;
-		}
-		// or run a ''real'' sim from command-line
-		else{
+		}else{
+			// or run a ''real'' sim from command-line
 			arguments = args;
 //			pConfig = new PConfigGroup();
 			overwrite =  false;
