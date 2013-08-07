@@ -56,7 +56,13 @@ public class BenchmarkPerformanceOfPassingEvents {
 
 		final long startWithFilter = System.nanoTime();
 		final MobsimFactory mobsimFactory = new QSimFactory();
+		log.info( "######################################################################" );
+		log.info( "## filter " );
+		log.info( "######################################################################" );
 		for ( int i=0; i < N_TRIES; i++ ) {
+			log.info( "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" );
+			log.info( "~~ filtered try "+i );
+			log.info( "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" );
 			final EventsToScore e2s =
 				new EventsToScore(
 						sc,
@@ -67,8 +73,14 @@ public class BenchmarkPerformanceOfPassingEvents {
 		}
 		final long endWithFilter = System.nanoTime();
 
+		log.info( "######################################################################" );
+		log.info( "## no filter " );
+		log.info( "######################################################################" );
 		final long startNoFilter = System.nanoTime();
 		for ( int i=0; i < N_TRIES; i++ ) {
+			log.info( "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" );
+			log.info( "~~ non filtered try "+i );
+			log.info( "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" );
 			final EventsToScoreNoFilter e2s =
 				new EventsToScoreNoFilter(
 						sc,
