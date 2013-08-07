@@ -681,12 +681,9 @@ public class EvacuationControler extends WithinDayController implements
 		this.activityPerformingIdentifier = duringActivityFactory.createIdentifier();
 		
 		duringActivityFactory = new JoinedHouseholdsIdentifierFactory(this.scenarioData, this.selectHouseholdMeetingPoint, 
-				this.coordAnalyzer.createInstance(), this.householdsTracker, this.informedHouseholdsTracker,
-				this.modeAvailabilityChecker.createInstance(), this.decisionDataProvider, this.jointDepartureOrganizer,
-				mobsimDataProvider);
+				this.modeAvailabilityChecker.createInstance(), this.jointDepartureOrganizer, mobsimDataProvider, null);
 		duringActivityFactory.addAgentFilterFactory(notInitialReplanningFilterFactory);
 		this.joinedHouseholdsIdentifier = duringActivityFactory.createIdentifier();
-		this.getFixedOrderSimulationListener().addSimulationListener((JoinedHouseholdsIdentifier) this.joinedHouseholdsIdentifier);
 		
 		/*
 		 * During Leg Identifiers

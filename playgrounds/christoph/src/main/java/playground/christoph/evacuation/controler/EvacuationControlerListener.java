@@ -66,6 +66,7 @@ import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.analysis.EvacuationTimePicture;
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.mobsim.EvacuationQSimFactory;
+import playground.christoph.evacuation.mobsim.HouseholdDepartureManager;
 import playground.christoph.evacuation.mobsim.HouseholdsTracker;
 import playground.christoph.evacuation.mobsim.InformedHouseholdsTracker;
 import playground.christoph.evacuation.mobsim.ReplanningTracker;
@@ -75,7 +76,6 @@ import playground.christoph.evacuation.mobsim.decisionmodel.DecisionModelRunner;
 import playground.christoph.evacuation.router.util.AffectedAreaPenaltyCalculator;
 import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsToDropOffIdentifierFactory;
 import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsToPickupIdentifierFactory;
-import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifier;
 import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifierFactory;
 import playground.christoph.evacuation.withinday.replanning.identifiers.filters.AffectedAgentsFilter;
 import playground.christoph.evacuation.withinday.replanning.identifiers.filters.AffectedAgentsFilterFactory;
@@ -106,6 +106,7 @@ public class EvacuationControlerListener implements StartupListener {
 	private DecisionDataGrabber decisionDataGrabber;
 	private DecisionModelRunner decisionModelRunner;
 	private LinkEnteredProvider linkEnteredProvider;
+	private HouseholdDepartureManager householdDepartureManager;
 	
 	/*
 	 * Geography related stuff
@@ -241,6 +242,10 @@ public class EvacuationControlerListener implements StartupListener {
 				this.coordAnalyzer.createInstance(), this.affectedArea, 
 				this.informedHouseholdsTracker, this.decisionModelRunner, this.withinDayControlerListener.getMobsimDataProvider());
 		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(this.selectHouseholdMeetingPoint);
+		controler.addControlerListener(this.selectHouseholdMeetingPoint);
+		
+		this.householdDepartureManager = new HouseholdDepartureManager(scenario, this.coordAnalyzer.createInstance(), 
+				this.householdsTracker, this.informedHouseholdsTracker, this.decisionModelRunner.getDecisionDataProvider());
 	}
 	
 	private void initAnalysisStuff(Controler controler) {
@@ -332,13 +337,10 @@ public class EvacuationControlerListener implements StartupListener {
 		this.activityPerformingIdentifier = duringActivityFactory.createIdentifier();
 		
 		duringActivityFactory = new JoinedHouseholdsIdentifierFactory(scenario, this.selectHouseholdMeetingPoint, 
-				this.coordAnalyzer.createInstance(), this.householdsTracker, this.informedHouseholdsTracker,
-				this.modeAvailabilityChecker.createInstance(), this.decisionModelRunner.getDecisionDataProvider(), 
-				this.jointDepartureOrganizer, mobsimDataProvider);
+				this.modeAvailabilityChecker.createInstance(), this.jointDepartureOrganizer, mobsimDataProvider, 
+				this.householdDepartureManager);
 		duringActivityFactory.addAgentFilterFactory(notInitialReplanningFilterFactory);
 		this.joinedHouseholdsIdentifier = duringActivityFactory.createIdentifier();
-		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(
-				(JoinedHouseholdsIdentifier) this.joinedHouseholdsIdentifier);
 		
 		/*
 		 * During Leg Identifiers

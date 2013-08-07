@@ -34,6 +34,10 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.controler.events.AfterMobsimEvent;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
+import org.matsim.core.controler.listener.AfterMobsimListener;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
@@ -47,6 +51,7 @@ import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
 import org.matsim.pt.router.TransitRouterFactory;
@@ -75,7 +80,8 @@ import com.vividsolutions.jts.geom.Geometry;
  * 
  * @author cdobler
  */
-public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener {
+public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener,
+	BeforeMobsimListener, AfterMobsimListener {
 
 	private static final Logger log = Logger.getLogger(SelectHouseholdMeetingPoint.class);
 	
@@ -178,7 +184,7 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 	}
 	
 	/*
-	 * If the evacuation starts in the current time step, define the
+	 * If the evacuation starts in the current time step, start defining the
 	 * household meeting points.
 	 */
 	@Override
@@ -190,7 +196,6 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 		if (this.allMeetingsPointsSelected.get()) return;
 		
 		double time = e.getSimulationTime();
-		if (time == EvacuationConfig.evacuationTime) initThreads(time);
 		
 		if (time >= EvacuationConfig.evacuationTime) {
 			try {
@@ -270,8 +275,18 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 			}	
 		}
 	}
+
+	@Override
+	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+		initThreads();
+	}
 	
-	private void initThreads(double time) {
+	@Override
+	public void notifyAfterMobsim(AfterMobsimEvent event) {
+		shutdownThreads();
+	}
+	
+	private void initThreads() {
 		threads = new Thread[this.numOfThreads];
 		runnables = new SelectHouseholdMeetingPointRunner[this.numOfThreads];
 		
@@ -294,7 +309,7 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 					fromHomeFacilityRouterFactory.instantiateAndConfigureTripRouter(fromHomeRoutingContext), 
 					coordAnalyzer.createInstance(), mobsimDataProvider, modeAvailabilityChecker.createInstance(), 
 					decisionDataProvider, startBarrier, endBarrier, allMeetingsPointsSelected);
-			runner.setTime(time);
+			runner.setTime(Time.UNDEFINED_TIME);
 			runnables[i] = runner; 
 					
 			Thread thread = new Thread(runner);
@@ -305,6 +320,14 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener 
 		
 		// start threads
 		for (Thread thread : threads) thread.start();
+	}
+	
+	private void shutdownThreads() {
+			try {
+				for (Thread thread : threads) thread.join();
+			} catch (InterruptedException e) {
+				Gbl.errorMsg(e);
+			}
 	}
 	
 	/*

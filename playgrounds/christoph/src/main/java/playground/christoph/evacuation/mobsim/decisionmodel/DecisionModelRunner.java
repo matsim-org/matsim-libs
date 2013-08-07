@@ -36,6 +36,7 @@ import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.mobsim.InformedHouseholdsTracker;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataGrabber;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
+import playground.christoph.evacuation.utils.DeterministicRNG;
 
 /**
  * 
@@ -55,6 +56,7 @@ public class DecisionModelRunner implements MobsimInitializedListener, MobsimBef
 	private final PickupModel pickupModel;
 	private final EvacuationDecisionModel evacuationDecisionModel;
 	private final LatestAcceptedLeaveTimeModel latestAcceptedLeaveTimeModel;
+	private final DepartureDelayModel departureDelayModel;
 	
 	public DecisionModelRunner(Scenario scenario, DecisionDataGrabber decisionDataGrabber,
 			InformedHouseholdsTracker informedHouseholdsTracker) {
@@ -67,6 +69,7 @@ public class DecisionModelRunner implements MobsimInitializedListener, MobsimBef
 		this.pickupModel = new PickupModel(this.decisionDataProvider);
 		this.evacuationDecisionModel = new EvacuationDecisionModel(this.scenario, MatsimRandom.getLocalInstance(), this.decisionDataProvider);
 		this.latestAcceptedLeaveTimeModel = new LatestAcceptedLeaveTimeModel(this.decisionDataProvider);
+		this.departureDelayModel = new DepartureDelayModel(new DeterministicRNG(123654), decisionDataProvider, 600.0);
 	}
 	
 	public DecisionDataProvider getDecisionDataProvider() {
@@ -111,30 +114,34 @@ public class DecisionModelRunner implements MobsimInitializedListener, MobsimBef
 			this.evacuationDecisionModel.runModel(household);
 			this.latestAcceptedLeaveTimeModel.runModel(household);
 		}
-
 	}
 	
 	@Override
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		
-		panicModel.printStatistics();
-		pickupModel.printStatistics();
-		evacuationDecisionModel.printStatistics();
-		latestAcceptedLeaveTimeModel.printStatistics();
+		this.panicModel.printStatistics();
+		this.pickupModel.printStatistics();
+		this.evacuationDecisionModel.printStatistics();
+		this.latestAcceptedLeaveTimeModel.printStatistics();
+		this.departureDelayModel.printStatistics();
 		
 		String panicModelFile = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), PanicModel.panicModelFile);
-		panicModel.writeDecisionsToFile(panicModelFile);
+		this.panicModel.writeDecisionsToFile(panicModelFile);
 		
 		String pickupModelFile = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), PickupModel.pickupModelFile);
-		pickupModel.writeDecisionsToFile(pickupModelFile);
+		this.pickupModel.writeDecisionsToFile(pickupModelFile);
 		
 		String evacuationDecisionModelFile = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), 
 				EvacuationDecisionModel.evacuationDecisionModelFile);
-		evacuationDecisionModel.writeDecisionsToFile(evacuationDecisionModelFile);
+		this.evacuationDecisionModel.writeDecisionsToFile(evacuationDecisionModelFile);
 		
 		String latestAcceptedLeaveTimeModelFile = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), 
 				LatestAcceptedLeaveTimeModel.latestAcceptedLeaveTimeFile);
-		latestAcceptedLeaveTimeModel.writeDecisionsToFile(latestAcceptedLeaveTimeModelFile);
+		this.latestAcceptedLeaveTimeModel.writeDecisionsToFile(latestAcceptedLeaveTimeModelFile);
+		
+		String departureDelayModelFile = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), 
+				DepartureDelayModel.departureDelayModelFile);
+		this.departureDelayModel.writeDecisionsToFile(departureDelayModelFile);
 	}
 	
 }

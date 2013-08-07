@@ -77,6 +77,11 @@ public class HouseholdDecisionData {
 	 */	
 	private double householdDirectEvacuationTime = Double.MAX_VALUE;
 	
+	/*
+	 * Time when a
+	 */
+	private double departureTimeDelay = Double.MAX_VALUE;
+	
 	public HouseholdDecisionData(Id householdId) {
 		this.householdId = householdId;
 	}
@@ -117,6 +122,14 @@ public class HouseholdDecisionData {
 		this.evacuationDecision = evacuationDecision;
 	}
 
+	public double getDepartureTimeDelay() {
+		return this.departureTimeDelay;
+	}
+	
+	public void setDepartureTimeDelay(double departureTimeDelay) {
+		this.departureTimeDelay = departureTimeDelay;
+	}
+	
 	public HouseholdPosition getHouseholdPosition() {
 		return householdPosition;
 	}

@@ -21,8 +21,10 @@
 package playground.christoph.evacuation.mobsim;
 
 import java.text.DecimalFormat;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -48,20 +50,23 @@ import playground.christoph.evacuation.mobsim.Tracker.Position;
 
 public class HouseholdsTracker extends AgentsTracker implements MobsimAfterSimStepListener {
 
-	static final Logger log = Logger.getLogger(HouseholdsTracker.class);
+	private static final Logger log = Logger.getLogger(HouseholdsTracker.class);
 	
 	/* time since last "info" */
 	private int infoTime = 0;
 	private static final int INFO_PERIOD = 3600;
 	
-	private final Set<Id> householdsToUpdate;
+	private Set<Id> joinedInLastTimeStep = new LinkedHashSet<Id>();
+	private Set<Id> updatedInLastTimeStep = new LinkedHashSet<Id>();
+	private Set<Id> updatedInCurrentTimeStep = new LinkedHashSet<Id>();
+	private final Set<Id> joinedHouseholds = new HashSet<Id>();
+	
 	private final Map<Id, Id> personHouseholdMap;
 	private final Map<Id, HouseholdPosition> householdPositions;
 	
 	public HouseholdsTracker(Scenario scenario) {
 		super(scenario);
 		
-		this.householdsToUpdate = new HashSet<Id>();
 		this.personHouseholdMap = new HashMap<Id, Id>();
 		this.householdPositions = new HashMap<Id, HouseholdPosition>();
 	}
@@ -71,65 +76,74 @@ public class HouseholdsTracker extends AgentsTracker implements MobsimAfterSimSt
 	}
 	
 	public HouseholdPosition getHouseholdPosition(Id householdId) {
-		return householdPositions.get(householdId);
+		return this.householdPositions.get(householdId);
 	}
-
-	public Set<Id> getHouseholdsToUpdate() {
-		return this.householdsToUpdate;
+	
+	public Set<Id> getJoinedHouseholds() {
+		return Collections.unmodifiableSet(this.joinedHouseholds);
+	}
+	
+	public Set<Id> getHouseholdsJoinedInLastTimeStep() {
+		return Collections.unmodifiableSet(this.joinedInLastTimeStep);
+	}
+	
+	public Set<Id> getHouseholdsUpdatedInLastTimeStep() {
+		return Collections.unmodifiableSet(this.updatedInLastTimeStep);
 	}
 	
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		super.handleEvent(event);
-		householdsToUpdate.add(this.personHouseholdMap.get(event.getPersonId()));
+		updatedInCurrentTimeStep.add(this.personHouseholdMap.get(event.getPersonId()));
 	}
 	
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		super.handleEvent(event);
-		householdsToUpdate.add(this.personHouseholdMap.get(event.getPersonId()));
+		updatedInCurrentTimeStep.add(this.personHouseholdMap.get(event.getPersonId()));
 	}
 	
 	@Override
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		super.handleEvent(event);
-		householdsToUpdate.add(this.personHouseholdMap.get(event.getPersonId()));
+		updatedInCurrentTimeStep.add(this.personHouseholdMap.get(event.getPersonId()));
 	}
 
 	@Override
 	public void handleEvent(PersonLeavesVehicleEvent event) {
 		super.handleEvent(event);
-		householdsToUpdate.add(this.personHouseholdMap.get(event.getPersonId()));
+		updatedInCurrentTimeStep.add(this.personHouseholdMap.get(event.getPersonId()));
 	}
 
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
 		super.handleEvent(event);
-		householdsToUpdate.add(this.personHouseholdMap.get(event.getPersonId()));
+		updatedInCurrentTimeStep.add(this.personHouseholdMap.get(event.getPersonId()));
 	}
 
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
 		super.handleEvent(event);
-		householdsToUpdate.add(this.personHouseholdMap.get(event.getPersonId()));
+		updatedInCurrentTimeStep.add(this.personHouseholdMap.get(event.getPersonId()));
 	}
 	
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
 		super.handleEvent(event);
-		householdsToUpdate.add(this.personHouseholdMap.get(event.getPersonId()));
+		updatedInCurrentTimeStep.add(this.personHouseholdMap.get(event.getPersonId()));
 	}
 	
 	@Override
 	public void handleEvent(ActivityEndEvent event) {
 		super.handleEvent(event);
-		householdsToUpdate.add(this.personHouseholdMap.get(event.getPersonId()));
+		updatedInCurrentTimeStep.add(this.personHouseholdMap.get(event.getPersonId()));
 	}
 
 	@Override
 	public void reset(int iteration) {
 		super.reset(iteration);
-		this.householdsToUpdate.clear();
+		this.updatedInCurrentTimeStep.clear();
+		this.updatedInLastTimeStep.clear();
 		this.personHouseholdMap.clear();
 		this.householdPositions.clear();
 	}
@@ -149,6 +163,8 @@ public class HouseholdsTracker extends AgentsTracker implements MobsimAfterSimSt
 			}
 			householdPosition.update();
 			
+			if (householdPosition.isHouseholdJoined()) this.joinedHouseholds.add(household.getId());
+			
 			// only observe household if its member size is > 0
 			if (household.getMemberIds().size() > 0) householdPositions.put(household.getId(), householdPosition);
 		}
@@ -156,13 +172,26 @@ public class HouseholdsTracker extends AgentsTracker implements MobsimAfterSimSt
 	
 	@Override
 	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
-		for (Id id : this.householdsToUpdate) {
-			householdPositions.get(id).update();
+		
+		this.joinedInLastTimeStep = new LinkedHashSet<Id>();
+		
+		for (Id householdId : this.updatedInCurrentTimeStep) {
+			HouseholdPosition householdPosition = householdPositions.get(householdId);
+			householdPosition.update();
+			if (householdPosition.isHouseholdJoined()) {
+				/*
+				 * If the set already contains the household, the "add" method returns false.
+				 * If the household was not joined, it is added to the joinedInLastTimeStep set.
+				 */
+				boolean wasJoined = !this.joinedHouseholds.add(householdId);
+				if(!wasJoined) this.joinedInLastTimeStep.add(householdId);
+			}
+			else this.joinedHouseholds.remove(householdId);
 		}
 		
-		// clear list for the upcoming time-step
-		householdsToUpdate.clear();
-		
+		this.updatedInLastTimeStep = this.updatedInCurrentTimeStep;
+		this.updatedInCurrentTimeStep = new LinkedHashSet<Id>();
+				
 		if (e.getSimulationTime() >= this.infoTime) {
 			this.infoTime += INFO_PERIOD;
 			this.printStatistics();
