@@ -39,7 +39,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
@@ -124,7 +123,7 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 			 * The agent is currently not at the Meeting Point. Therefore, we create a new Activity
 			 * which is located there. Additionally, we set a new end time for the current Activity.
 			 */		
-			ActivityFacility meetingFacility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(meetingPointId);
+			ActivityFacility meetingFacility = scenario.getActivityFacilities().getFacilities().get(meetingPointId);
 			Activity meetingActivity = scenario.getPopulation().getFactory().createActivityFromLinkId(activityType, meetingFacility.getLinkId());
 			((ActivityImpl) meetingActivity).setFacilityId(meetingPointId);
 			((ActivityImpl)meetingActivity).setCoord(meetingFacility.getCoord());

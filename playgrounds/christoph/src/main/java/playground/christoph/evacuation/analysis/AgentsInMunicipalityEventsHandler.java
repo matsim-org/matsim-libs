@@ -31,9 +31,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.zip.GZIPOutputStream;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.zip.GZIPOutputStream;
 
 import org.apache.log4j.Logger;
 import org.jfree.chart.ChartFactory;
@@ -156,7 +156,7 @@ public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler,
 				Activity activity = (Activity) person.getSelectedPlan().getPlanElements().get(0);
 
 				if (activity.getFacilityId() != null) {
-					ActivityFacility facility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(activity.getFacilityId());
+					ActivityFacility facility = scenario.getActivityFacilities().getFacilities().get(activity.getFacilityId());
 					return this.coordAnalyzer.isFacilityAffected(facility);
 				} else {
 					Link link = scenario.getNetwork().getLinks().get(activity.getLinkId());
@@ -300,7 +300,7 @@ public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler,
 		checkTime(event);
 		
 		Id facilityId = event.getFacilityId();
-		Facility facility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(facilityId);
+		Facility facility = scenario.getActivityFacilities().getFacilities().get(facilityId);
 		
 		boolean isInside = coordAnalyzer.isFacilityAffected(facility);
 		

@@ -20,31 +20,23 @@
 
 package playground.christoph.evacuation.mobsim;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
-import org.matsim.core.mobsim.framework.PassengerAgent;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
 
@@ -53,46 +45,31 @@ import org.matsim.withinday.mobsim.MobsimDataProvider;
  * 
  * @author cdobler
  */
-public class VehiclesTracker implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonLeavesVehicleEventHandler,
-	AgentDepartureEventHandler, AgentArrivalEventHandler {
+public class VehiclesTracker implements LinkEnterEventHandler, LinkLeaveEventHandler, 
+		AgentDepartureEventHandler, AgentArrivalEventHandler {
+	
+	private static final Logger log = Logger.getLogger(VehiclesTracker.class);
 	
 	private final MobsimDataProvider mobsimDataProvider;
-	
-	private final Network network;
 	
 	// currently active drivers
 	private final Set<Id> drivers;
 	
-	// vehicles currently enroute on a given link
-	private final Map<Id, List<Id>> enrouteVehiclesOnLink;
-	
 	/*
-	 * Reserved capacities for passengers planned to enter.
-	 * So far, we reserve seats only on link level, meaning
-	 * we assume that an agent which is picked up reserves
-	 * a seat when the picking up vehicle in on the same link.
+	 * Reserved capacities for passengers planned to enter. So far, we reserve seats only on 
+	 * link level, meaning we assume that an agent which is picked up reserves a seat when the 
+	 * picking up vehicle in on the same link.
 	 */
 	private final Map<Id, AtomicInteger> reservedCapacities;
 	
-	public VehiclesTracker(Network network, MobsimDataProvider mobsimDataProvider) {
+	public VehiclesTracker(MobsimDataProvider mobsimDataProvider) {
 		
-		this.network = network;
 		this.mobsimDataProvider = mobsimDataProvider;
 		
 		this.drivers = new HashSet<Id>();
-		this.enrouteVehiclesOnLink = new HashMap<Id, List<Id>>();
-		this.reservedCapacities = new HashMap<Id, AtomicInteger>();
-	}
-
-	public Id getVehicleLinkId(Id vehicleId) {
-		return this.mobsimDataProvider.getVehicle(vehicleId).getCurrentLink().getId();
+		this.reservedCapacities = new ConcurrentHashMap<Id, AtomicInteger>();
 	}
 	
-	public List<Id> getEnrouteVehiclesOnLink(Id linkId) {
-		return this.enrouteVehiclesOnLink.get(linkId);
-	}
-	
-	@Deprecated
 	public int getFreeVehicleCapacity(Id vehicleId) {
 		
 		QVehicle vehicle = (QVehicle) this.mobsimDataProvider.getVehicle(vehicleId);
@@ -114,31 +91,7 @@ public class VehiclesTracker implements LinkEnterEventHandler, LinkLeaveEventHan
 		AtomicInteger reserved = this.reservedCapacities.get(vehicleId);
 		reserved.incrementAndGet();
 	}
-	
-	@Deprecated
-	public MobsimVehicle getVehicle(Id vehicleId) {
-		return this.mobsimDataProvider.getVehicle(vehicleId);
-	}
-	
-	@Deprecated
-	public Collection<? extends PassengerAgent> getVehiclePassengers(Id vehicleId) {
-		QVehicle vehicle = (QVehicle)this.mobsimDataProvider.getVehicle(vehicleId);
-		return vehicle.getPassengers();
-	}
 		
-	@Override
-	public void handleEvent(PersonLeavesVehicleEvent event) {
-		/*
-		 * If a person leaves a vehicle, the vehicle has to be parked on
-		 * the link and therefore has to be removed from the enroute list.
-		 */
-//		TODO: this is not true anymore... think about pt and passengers
-		
-		MobsimVehicle vehicle = this.mobsimDataProvider.getVehicle(event.getVehicleId());
-		List<Id> vehicleIds = this.enrouteVehiclesOnLink.get(vehicle.getCurrentLink().getId());
-		vehicleIds.remove(vehicle.getId());
-	}
-	
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
 		if (TransportMode.car.equals(event.getLegMode())) {
@@ -157,31 +110,26 @@ public class VehiclesTracker implements LinkEnterEventHandler, LinkLeaveEventHan
 	public void handleEvent(LinkEnterEvent event) {
 		boolean isDriver = drivers.contains(event.getPersonId());
 		if (isDriver) {
-			List<Id> vehicleIds = this.enrouteVehiclesOnLink.get(event.getLinkId());
-			vehicleIds.add(event.getVehicleId());
-			
 			reservedCapacities.put(event.getVehicleId(), new AtomicInteger(0));
 		}
 	}
-	
+
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		boolean isDriver = drivers.contains(event.getPersonId());
 		if (isDriver) {
-			List<Id> vehicleIds = this.enrouteVehiclesOnLink.get(event.getLinkId());
-			vehicleIds.remove(event.getVehicleId());
+			AtomicInteger reservedCapacity = reservedCapacities.get(event.getVehicleId());
+			if (reservedCapacity != null && reservedCapacity.get() > 0) {
+				log.warn("Found reserved capacity of " + reservedCapacity.get() + " for vehicle " +
+						event.getVehicleId().toString() + ". Expected this to be 0.");
+			}
 		}
 	}
 	
 	@Override
 	public void reset(int iteration) {		
 		this.drivers.clear();
-		this.enrouteVehiclesOnLink.clear();
-		
-		// initialize some maps
-		for (Link link : network.getLinks().values()) {
-			this.enrouteVehiclesOnLink.put(link.getId(), new ArrayList<Id>());
-		}
+		this.reservedCapacities.clear();
 	}
 
 }

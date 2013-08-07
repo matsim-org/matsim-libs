@@ -22,6 +22,7 @@ package playground.christoph.evacuation.withinday.replanning.identifiers;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
+import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifierFactory;
 
@@ -42,11 +43,13 @@ public class JoinedHouseholdsIdentifierFactory extends DuringActivityIdentifierF
 	private final ModeAvailabilityChecker modeAvailabilityChecker;
 	private final DecisionDataProvider decisionDataProvider;
 	private final JointDepartureOrganizer jointDepartureOrganizer;
+	private final MobsimDataProvider mobsimDataProvider;
 	
 	public JoinedHouseholdsIdentifierFactory(Scenario scenario,SelectHouseholdMeetingPoint selectHouseholdMeetingPoint, 
 			CoordAnalyzer coordAnalyzer, HouseholdsTracker householdsTracker,
 			InformedHouseholdsTracker informedHouseholdsTracker, ModeAvailabilityChecker modeAvailabilityChecker,
-			DecisionDataProvider decisionDataProvider, JointDepartureOrganizer jointDepartureOrganizer) {
+			DecisionDataProvider decisionDataProvider, JointDepartureOrganizer jointDepartureOrganizer,
+			MobsimDataProvider mobsimDataProvider) {
 		this.scenario = scenario;
 		this.selectHouseholdMeetingPoint = selectHouseholdMeetingPoint;
 		this.coordAnalyzer = coordAnalyzer;
@@ -55,13 +58,14 @@ public class JoinedHouseholdsIdentifierFactory extends DuringActivityIdentifierF
 		this.modeAvailabilityChecker = modeAvailabilityChecker;
 		this.decisionDataProvider = decisionDataProvider;
 		this.jointDepartureOrganizer = jointDepartureOrganizer;
+		this.mobsimDataProvider = mobsimDataProvider;
 	}
 	
 	@Override
 	public DuringActivityIdentifier createIdentifier() {
 		DuringActivityIdentifier identifier = new JoinedHouseholdsIdentifier(scenario, selectHouseholdMeetingPoint, 
 				coordAnalyzer.createInstance(), householdsTracker, informedHouseholdsTracker, 
-				modeAvailabilityChecker.createInstance(), decisionDataProvider, jointDepartureOrganizer);
+				modeAvailabilityChecker.createInstance(), decisionDataProvider, jointDepartureOrganizer, mobsimDataProvider);
 		this.addAgentFiltersToIdentifier(identifier);
 		identifier.setIdentifierFactory(this);
 		return identifier;

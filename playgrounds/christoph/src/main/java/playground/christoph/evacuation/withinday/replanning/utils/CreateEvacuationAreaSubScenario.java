@@ -38,13 +38,12 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-
-import com.vividsolutions.jts.geom.Geometry;
 
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.config.EvacuationConfig;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 public class CreateEvacuationAreaSubScenario {
 
@@ -182,7 +181,7 @@ public class CreateEvacuationAreaSubScenario {
 		 * Identify not affected links where affected facilities are attached.
 		 */
 		Set<Link> links = new HashSet<Link>();
-		for (ActivityFacility facility : ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().values()) {
+		for (ActivityFacility facility : scenario.getActivityFacilities().getFacilities().values()) {
 			if (this.coordAnalyzer.isFacilityAffected(facility)) {
 				Id linkId = facility.getLinkId();
 				Link link = scenario.getNetwork().getLinks().get(linkId);

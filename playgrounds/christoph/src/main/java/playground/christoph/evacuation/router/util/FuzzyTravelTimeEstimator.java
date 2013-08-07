@@ -26,13 +26,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.vehicles.Vehicle;
+import org.matsim.withinday.mobsim.MobsimDataProvider;
 
 import playground.christoph.evacuation.mobsim.AgentPosition;
 import playground.christoph.evacuation.mobsim.AgentsTracker;
 import playground.christoph.evacuation.mobsim.Tracker.Position;
-import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.utils.DeterministicRNG;
 
 /**
@@ -51,7 +50,7 @@ public class FuzzyTravelTimeEstimator implements TravelTime {
 	private final Scenario scenario;
 	private final TravelTime travelTime;
 	private final AgentsTracker agentsTracker;
-	private final VehiclesTracker vehiclesTracker;
+	private final MobsimDataProvider mobsimDataProvider;
 	private final DistanceFuzzyFactorProvider distanceFuzzyFactorProvider;
 	private final DeterministicRNG rng;
 
@@ -68,11 +67,11 @@ public class FuzzyTravelTimeEstimator implements TravelTime {
 	private ThreadLocal<Boolean> fromLinkIsObservedCache;
 
 	/* package */FuzzyTravelTimeEstimator(Scenario scenario, TravelTime travelTime, AgentsTracker agentsTracker,
-			VehiclesTracker vehiclesTracker, DistanceFuzzyFactorProvider distanceFuzzyFactorProvider) {
+			MobsimDataProvider mobsimDataProvider, DistanceFuzzyFactorProvider distanceFuzzyFactorProvider) {
 		this.scenario = scenario;
 		this.travelTime = travelTime;
 		this.agentsTracker = agentsTracker;
-		this.vehiclesTracker = vehiclesTracker;
+		this.mobsimDataProvider = mobsimDataProvider;
 		this.distanceFuzzyFactorProvider = distanceFuzzyFactorProvider;
 		this.rng = new DeterministicRNG(213456);
 
@@ -152,9 +151,9 @@ public class FuzzyTravelTimeEstimator implements TravelTime {
 		if (positionType == Position.LINK) {
 			fromLinkId = agentPosition.getPositionId();
 		} else if (positionType == Position.FACILITY) {
-			fromLinkId = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(agentPosition.getPositionId()).getLinkId();
+			fromLinkId = scenario.getActivityFacilities().getFacilities().get(agentPosition.getPositionId()).getLinkId();
 		} else if (positionType == Position.VEHICLE) {
-			fromLinkId = vehiclesTracker.getVehicleLinkId(agentPosition.getPositionId());
+			fromLinkId = this.mobsimDataProvider.getVehicle(agentPosition.getPositionId()).getCurrentLink().getId();
 		} else {
 			log.warn("Agent's position is undefined! Id: " + this.pIdCache.get());
 			return 1.0;

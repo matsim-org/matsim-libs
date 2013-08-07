@@ -20,7 +20,6 @@
 
 package playground.christoph.evacuation.withinday.replanning.identifiers;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -35,18 +34,15 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
-import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
-import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
-import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
+import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
@@ -73,8 +69,7 @@ import playground.christoph.evacuation.withinday.replanning.utils.SelectHousehol
  *  
  *  @author cdobler
  */
-public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier implements 
-		MobsimInitializedListener, MobsimAfterSimStepListener {
+public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier implements MobsimAfterSimStepListener {
 
 	private static final Logger log = Logger.getLogger(JoinedHouseholdsIdentifier.class);
 	
@@ -87,10 +82,10 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 	private final InformedHouseholdsTracker informedHouseholdsTracker;
 	private final DecisionDataProvider decisionDataProvider;
 	private final JointDepartureOrganizer jointDepartureOrganizer;
+	private final MobsimDataProvider mobsimDataProvider;
 	
 	private final DeterministicRNG rng;
 	private final Map<Id, HouseholdDeparture> householdDepartures;
-	private final Map<Id, PlanBasedWithinDayAgent> agentMapping;
 	
 	/*
 	 * Maps to store information for the replanner.
@@ -104,9 +99,10 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 	public JoinedHouseholdsIdentifier(Scenario scenario, SelectHouseholdMeetingPoint selectHouseholdMeetingPoint,
 			CoordAnalyzer coordAnalyzer, HouseholdsTracker householdsTracker,
 			InformedHouseholdsTracker informedHouseholdsTracker, ModeAvailabilityChecker modeAvailabilityChecker,
-			DecisionDataProvider decisionDataProvider, JointDepartureOrganizer jointDepartureOrganizer) {
+			DecisionDataProvider decisionDataProvider, JointDepartureOrganizer jointDepartureOrganizer,
+			MobsimDataProvider mobsimDataProvider) {
 		this.households = ((ScenarioImpl) scenario).getHouseholds();
-		this.facilities = ((ScenarioImpl) scenario).getActivityFacilities();
+		this.facilities = scenario.getActivityFacilities();
 		this.selectHouseholdMeetingPoint = selectHouseholdMeetingPoint;
 		this.coordAnalyzer = coordAnalyzer;
 		this.householdsTracker = householdsTracker;
@@ -114,9 +110,9 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 		this.modeAvailabilityChecker = modeAvailabilityChecker;
 		this.decisionDataProvider = decisionDataProvider;
 		this.jointDepartureOrganizer = jointDepartureOrganizer;
+		this.mobsimDataProvider = mobsimDataProvider;
 		
 		this.rng = new DeterministicRNG(123654);
-		this.agentMapping = new HashMap<Id, PlanBasedWithinDayAgent>();
 		this.householdMeetingPointMapping = new ConcurrentHashMap<Id, Id>();
 		this.transportModeMapping = new ConcurrentHashMap<Id, String>();
 		this.driverVehicleMapping = new ConcurrentHashMap<Id, Id>();
@@ -173,7 +169,7 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 		this.applyFilters(agentIds, time);
 
 		Set<PlanBasedWithinDayAgent> agentsToReplan = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
-		for (Id agentId : agentIds) agentsToReplan.add(agentMapping.get(agentId));
+		for (Id agentId : agentIds) agentsToReplan.add((PlanBasedWithinDayAgent) this.mobsimDataProvider.getAgent(agentId));
 		
 		return agentsToReplan;
 	}
@@ -214,25 +210,7 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier impleme
 	public Map<Id, Id> getDriverVehicleMapping() {
 		return this.driverVehicleMapping;
 	}
-	
-	/*
-	 * Create a mapping between personIds and the agents in the mobsim.
-	 * 
-	 * Moreover ensure that the joinedHouseholds and householdDeparture
-	 * data structures are filled properly. When the simulation starts,
-	 * all households are joined at their home facility.
-	 */
-	@Override
-	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
-		QSim sim = (QSim) e.getQueueSimulation();
 
-		this.agentMapping.clear();
-		for (MobsimAgent mobsimAgent : sim.getAgents()) {
-			PlanBasedWithinDayAgent withinDayAgent = (PlanBasedWithinDayAgent) mobsimAgent;
-			agentMapping.put(withinDayAgent.getId(), withinDayAgent);				
-		}
-	}
-	
 	@Override
 	public void notifyMobsimAfterSimStep(MobsimAfterSimStepEvent e) {
 		

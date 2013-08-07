@@ -438,7 +438,7 @@ public class EvacuationControler extends WithinDayController implements
 		this.jointDepartureWriter = new MissedJointDepartureWriter(this.jointDepartureOrganizer);
 		this.addControlerListener(this.jointDepartureWriter);
 		
-		this.vehiclesTracker = new VehiclesTracker(scenarioData.getNetwork(), mobsimDataProvider);
+		this.vehiclesTracker = new VehiclesTracker(mobsimDataProvider);
 		this.getEvents().addHandler(vehiclesTracker);
 		
 		this.decisionDataGrabber = new DecisionDataGrabber(this.scenarioData, this.coordAnalyzer.createInstance(), 
@@ -524,7 +524,7 @@ public class EvacuationControler extends WithinDayController implements
 		 */
 		// Create txt and kmz files containing distribution of evacuation times. 
 		if (EvacuationConfig.createEvacuationTimePicture) {
-			evacuationTimePicture = new EvacuationTimePicture(scenarioData, coordAnalyzer.createInstance(), householdsTracker, vehiclesTracker);
+			evacuationTimePicture = new EvacuationTimePicture(scenarioData, coordAnalyzer.createInstance(), householdsTracker, mobsimDataProvider);
 			this.addControlerListener(evacuationTimePicture);
 			this.getFixedOrderSimulationListener().addSimulationListener(evacuationTimePicture);
 			this.events.addHandler(evacuationTimePicture);	
@@ -682,7 +682,8 @@ public class EvacuationControler extends WithinDayController implements
 		
 		duringActivityFactory = new JoinedHouseholdsIdentifierFactory(this.scenarioData, this.selectHouseholdMeetingPoint, 
 				this.coordAnalyzer.createInstance(), this.householdsTracker, this.informedHouseholdsTracker,
-				this.modeAvailabilityChecker.createInstance(), this.decisionDataProvider, this.jointDepartureOrganizer);
+				this.modeAvailabilityChecker.createInstance(), this.decisionDataProvider, this.jointDepartureOrganizer,
+				mobsimDataProvider);
 		duringActivityFactory.addAgentFilterFactory(notInitialReplanningFilterFactory);
 		this.joinedHouseholdsIdentifier = duringActivityFactory.createIdentifier();
 		this.getFixedOrderSimulationListener().addSimulationListener((JoinedHouseholdsIdentifier) this.joinedHouseholdsIdentifier);
@@ -726,11 +727,12 @@ public class EvacuationControler extends WithinDayController implements
 	 */
 	protected void initReplanners(QSim sim) {
 		
+		MobsimDataProvider mobsimDataProvider = null;
 		TravelTime carTravelTime = null;
 		
 		// if fuzzy travel times should be used
 		if (EvacuationConfig.useFuzzyTravelTimes) {
-			FuzzyTravelTimeEstimatorFactory fuzzyTravelTimeEstimatorFactory = new FuzzyTravelTimeEstimatorFactory(this.scenarioData, this.getTravelTimeCollector(), this.householdsTracker, this.vehiclesTracker);
+			FuzzyTravelTimeEstimatorFactory fuzzyTravelTimeEstimatorFactory = new FuzzyTravelTimeEstimatorFactory(this.scenarioData, this.getTravelTimeCollector(), this.householdsTracker, mobsimDataProvider);
 			carTravelTime = fuzzyTravelTimeEstimatorFactory.createTravelTime();
 		} else {
 			carTravelTime = this.getTravelTimeCollector();

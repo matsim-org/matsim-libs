@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileWriter;
@@ -100,7 +99,7 @@ public class PTTravelTimeKTIEvacuationFactory extends PTTravelTimeKTIFactory {
 		 */
 		log.info("creating additional entries in the PT travel time matrix...");
 		Id rescueFacilityId = scenario.createId("rescueFacility");
-		Id rescueLinkId = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(rescueFacilityId).getLinkId();
+		Id rescueLinkId = scenario.getActivityFacilities().getFacilities().get(rescueFacilityId).getLinkId();
 		Link rescueLink = scenario.getNetwork().getLinks().get(rescueLinkId);
 		municipalities.getLocations().put(rescueLinkId, rescueLink);
 		swissHaltestellen.addHaltestelle(scenario.createId("rescueHaltestelle"), 

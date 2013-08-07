@@ -86,7 +86,6 @@ import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -355,7 +354,7 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 			
 			agentLegs.put(personId, new ArrayList<Leg>());
 			
-			Facility homeFacility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(homeFacilityId);
+			Facility homeFacility = scenario.getActivityFacilities().getFacilities().get(homeFacilityId);
 			boolean isAffected = this.coordAnalyzer.isFacilityAffected(homeFacility);
 			if (isAffected) this.agentsInEvacuationArea.add(personId);
 		}
@@ -1759,7 +1758,7 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 			
 			if (agentPosition.getPositionId().equals(homeFacilityId)) A.add(personId);
 			else {
-				Facility facility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(agentPosition.getPositionId());
+				Facility facility = scenario.getActivityFacilities().getFacilities().get(agentPosition.getPositionId());
 				boolean isAffected = coordAnalyzer.isFacilityAffected(facility);
 				if (isAffected) B.add(personId);
 				else C.add(personId);
@@ -1874,7 +1873,7 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 		
 		activities.add(activity);
 		
-		Facility facility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(event.getFacilityId());
+		Facility facility = scenario.getActivityFacilities().getFacilities().get(event.getFacilityId());
 		
 		/*
 		 * Workaround for runs 01a to 32a. There, dummy facility are used for pickup activities. They are not included in the

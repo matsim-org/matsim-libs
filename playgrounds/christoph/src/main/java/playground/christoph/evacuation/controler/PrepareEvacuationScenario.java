@@ -148,7 +148,7 @@ public class PrepareEvacuationScenario {
 	
 	private void connectFacilitiesToLinks(Scenario scenario) {
 		
-		ActivityFacilities facilities = ((ScenarioImpl) scenario).getActivityFacilities();
+		ActivityFacilities facilities = scenario.getActivityFacilities();
 		new WorldConnectLocations(scenario.getConfig()).connectFacilitiesWithLinks(facilities, (NetworkImpl) scenario.getNetwork());
 	}
 	
@@ -170,7 +170,7 @@ public class PrepareEvacuationScenario {
 	
 	private void addPickupAndDropOffFacilities(Scenario scenario) {
 		
-		ActivityFacilities facilities = ((ScenarioImpl) scenario).getActivityFacilities();
+		ActivityFacilities facilities = scenario.getActivityFacilities();
 		for (Link link : scenario.getNetwork().getLinks().values()) {
 			/*
 			 * Create and add the pickup and drop off facility and add activity options ("pickup", "dropoff")

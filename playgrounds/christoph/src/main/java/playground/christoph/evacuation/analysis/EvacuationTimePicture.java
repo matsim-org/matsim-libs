@@ -66,17 +66,16 @@ import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.CH1903LV03toWGS84;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vis.kml.KMZWriter;
+import org.matsim.withinday.mobsim.MobsimDataProvider;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.mobsim.AgentPosition;
 import playground.christoph.evacuation.mobsim.AgentsTracker;
 import playground.christoph.evacuation.mobsim.Tracker.Position;
-import playground.christoph.evacuation.mobsim.VehiclesTracker;
 
 /**
  * Identifies persons who are inside (or cross) the evacuation area after the
@@ -99,7 +98,7 @@ public class EvacuationTimePicture implements AgentDepartureEventHandler, AgentA
 	private final Scenario scenario;
 	private final CoordAnalyzer coordAnalyzer;
 	private final AgentsTracker agentsTracker;
-	private final VehiclesTracker vehiclesTracker;
+	private final MobsimDataProvider mobsimDataProvider;
 
 	private final Map<Id, AgentInfo> agentInfos;
 	private final Set<Id> agentsToUpdate;
@@ -114,11 +113,11 @@ public class EvacuationTimePicture implements AgentDepartureEventHandler, AgentA
 	private boolean evacuationStarted = false;
 	
 	public EvacuationTimePicture(Scenario scenario, CoordAnalyzer coordAnalyzer, 
-			AgentsTracker agentsTracker, VehiclesTracker vehiclesTracker) {
+			AgentsTracker agentsTracker, MobsimDataProvider mobsimDataProvider) {
 		this.scenario = scenario;
 		this.coordAnalyzer = coordAnalyzer;
 		this.agentsTracker = agentsTracker;
-		this.vehiclesTracker = vehiclesTracker;
+		this.mobsimDataProvider = mobsimDataProvider;
 
 		this.agentInfos = new HashMap<Id, AgentInfo>();
 		this.agentsToUpdate = new HashSet<Id>();		
@@ -191,7 +190,7 @@ public class EvacuationTimePicture implements AgentDepartureEventHandler, AgentA
 					positionAtEvacuationStart.put(agentInfo.id, scenario.getNetwork().getLinks().get(positionId));
 				}
 				else if (positionType.equals(Position.FACILITY)) {
-					positionAtEvacuationStart.put(agentInfo.id, ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(positionId));
+					positionAtEvacuationStart.put(agentInfo.id, scenario.getActivityFacilities().getFacilities().get(positionId));
 				}
 				else log.warn("Found agent with an undefined initial position type. Type: " + positionType + ", AgentId: " + agentInfo.id);
 			}
@@ -337,7 +336,7 @@ public class EvacuationTimePicture implements AgentDepartureEventHandler, AgentA
 					/*
 					 * Use the link where the vehicle is currently located.
 					 */
-					Id linkId = this.vehiclesTracker.getVehicleLinkId(positionId);
+					Id linkId = this.mobsimDataProvider.getVehicle(positionId).getCurrentLink().getId();
 					Link link = scenario.getNetwork().getLinks().get(linkId);
 					boolean isAffected = coordAnalyzer.isLinkAffected(link);
 										
@@ -357,7 +356,7 @@ public class EvacuationTimePicture implements AgentDepartureEventHandler, AgentA
 					this.agentInfos.put(person.getId(), agentInfo);
 				}
 				else if (positionType.equals(Position.FACILITY)) {
-					ActivityFacility facility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(positionId);
+					ActivityFacility facility = scenario.getActivityFacilities().getFacilities().get(positionId);
 					boolean isAffected = coordAnalyzer.isFacilityAffected(facility);
 					
 					AgentInfo agentInfo = new AgentInfo();
@@ -412,7 +411,7 @@ public class EvacuationTimePicture implements AgentDepartureEventHandler, AgentA
 					/*
 					 * Use the link where the vehicle is currently located.
 					 */
-					Id linkId = this.vehiclesTracker.getVehicleLinkId(positionId);
+					Id linkId = this.mobsimDataProvider.getVehicle(positionId).getCurrentLink().getId();
 					Link link = scenario.getNetwork().getLinks().get(linkId);
 					isInsideArea = coordAnalyzer.isLinkAffected(link);
 					
@@ -433,7 +432,7 @@ public class EvacuationTimePicture implements AgentDepartureEventHandler, AgentA
 					else if (wasInsideArea && !isInsideArea) agentInfo.leftArea = e.getSimulationTime();					
 
 				} else if (positionType.equals(Position.FACILITY)) {
-					ActivityFacility facility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(positionId);
+					ActivityFacility facility = scenario.getActivityFacilities().getFacilities().get(positionId);
 					isInsideArea = coordAnalyzer.isFacilityAffected(facility);
 					
 					/* 

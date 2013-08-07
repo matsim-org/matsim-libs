@@ -42,7 +42,6 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
-import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.mobsim.decisionmodel.EvacuationDecisionModel.Participating;
@@ -112,7 +111,7 @@ public class AgentsInEvacuationAreaActivityCounter implements ActivityStartEvent
 
 				boolean isAffected = false;
 				if (activity.getFacilityId() != null) {
-					ActivityFacility facility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(activity.getFacilityId());
+					ActivityFacility facility = scenario.getActivityFacilities().getFacilities().get(activity.getFacilityId());
 					isAffected = this.coordAnalyzer.isFacilityAffected(facility);
 					
 					// we assume that each agents start its day at home
@@ -134,7 +133,7 @@ public class AgentsInEvacuationAreaActivityCounter implements ActivityStartEvent
 
 		boolean isAffected = false;
 		if (event.getFacilityId() != null) {
-			ActivityFacility facility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(event.getFacilityId());
+			ActivityFacility facility = scenario.getActivityFacilities().getFacilities().get(event.getFacilityId());
 			isAffected = this.coordAnalyzer.isFacilityAffected(facility);
 		} else {
 			Link link = scenario.getNetwork().getLinks().get(event.getLinkId());

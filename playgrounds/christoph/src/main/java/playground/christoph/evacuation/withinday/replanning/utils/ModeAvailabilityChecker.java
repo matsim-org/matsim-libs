@@ -47,7 +47,7 @@ import org.matsim.withinday.mobsim.MobsimDataProvider;
 
 
 /**
- * Checks whether a car is available for an agent or not.
+ * Checks whether a car is available for an agent (respectively a household) or not.
  * 
  * @author cdobler
  */
@@ -109,7 +109,7 @@ public class ModeAvailabilityChecker {
 	 * @return
 	 */
 	public List<Id> getAvailableCars(Household household, Id facilityId) {
-		ActivityFacility facility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(facilityId);
+		ActivityFacility facility = scenario.getActivityFacilities().getFacilities().get(facilityId);
 		
 		List<Id> vehicles = household.getVehicleIds();
 				

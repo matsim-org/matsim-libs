@@ -30,7 +30,6 @@ import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.TripRouter;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.utils.EditRoutes;
 import org.matsim.withinday.utils.ReplacePlanElements;
@@ -82,7 +81,7 @@ public class CurrentLegToMeetingPointReplanner extends WithinDayDuringLegReplann
 		PersonDecisionData pdd = decisionDataProvider.getPersonDecisionData(withinDayAgent.getId());
 		Id householdId = pdd.getHouseholdId();
 		Id meetingPointId = decisionDataProvider.getHouseholdDecisionData(householdId).getMeetingPointFacilityId(); 		
-		ActivityFacility meetingFacility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(meetingPointId);
+		ActivityFacility meetingFacility = scenario.getActivityFacilities().getFacilities().get(meetingPointId);
 		Activity meetingActivity = scenario.getPopulation().getFactory().createActivityFromLinkId(activityType, meetingFacility.getLinkId());
 		((ActivityImpl) meetingActivity).setFacilityId(meetingPointId);
 		((ActivityImpl)meetingActivity).setCoord(meetingFacility.getCoord());

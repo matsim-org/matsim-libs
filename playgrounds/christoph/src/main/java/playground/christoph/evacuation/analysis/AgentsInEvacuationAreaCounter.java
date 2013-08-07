@@ -61,12 +61,10 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
-import playground.christoph.evacuation.controler.EvacuationConstants;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.mobsim.decisionmodel.EvacuationDecisionModel.Participating;
 
@@ -162,7 +160,7 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 
 				boolean isAffected = false;
 				if (activity.getFacilityId() != null) {
-					ActivityFacility facility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(activity.getFacilityId());
+					ActivityFacility facility = scenario.getActivityFacilities().getFacilities().get(activity.getFacilityId());
 					isAffected = this.coordAnalyzer.isFacilityAffected(facility);
 				} else {
 					Link link = scenario.getNetwork().getLinks().get(activity.getLinkId());
@@ -242,7 +240,7 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 
 		boolean isAffected = false;
 		if (event.getFacilityId() != null) {
-			ActivityFacility facility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(event.getFacilityId());
+			ActivityFacility facility = scenario.getActivityFacilities().getFacilities().get(event.getFacilityId());
 			isAffected = this.coordAnalyzer.isFacilityAffected(facility);
 		} else {
 			Link link = scenario.getNetwork().getLinks().get(event.getLinkId());
