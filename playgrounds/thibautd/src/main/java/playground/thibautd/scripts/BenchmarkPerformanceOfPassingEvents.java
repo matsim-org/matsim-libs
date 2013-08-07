@@ -22,6 +22,10 @@ package playground.thibautd.scripts;
 import org.apache.log4j.Logger;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -31,7 +35,9 @@ import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.scoring.EventsToScore;
 import org.matsim.core.scoring.EventsToScoreNoFilter;
+import org.matsim.core.scoring.ScoringFunction;
 import org.matsim.core.scoring.functions.CharyparNagelScoringFunctionFactory;
+import org.matsim.core.scoring.ScoringFunctionFactory;
 
 /**
  * To test the performance of passing arbitrary events to scoring functions.
@@ -54,9 +60,7 @@ public class BenchmarkPerformanceOfPassingEvents {
 			final EventsToScore e2s =
 				new EventsToScore(
 						sc,
-						new CharyparNagelScoringFunctionFactory(
-							config.planCalcScore(),
-							sc.getNetwork() ) );
+						new DummySfFactory() );
 			final EventsManager events = EventsUtils.createEventsManager();
 			events.addHandler( e2s );
 			mobsimFactory.createMobsim( sc , events ).run();
@@ -68,9 +72,7 @@ public class BenchmarkPerformanceOfPassingEvents {
 			final EventsToScoreNoFilter e2s =
 				new EventsToScoreNoFilter(
 						sc,
-						new CharyparNagelScoringFunctionFactory(
-							config.planCalcScore(),
-							sc.getNetwork() ) );
+						new DummySfFactory() );
 			final EventsManager events = EventsUtils.createEventsManager();
 			events.addHandler( e2s );
 			mobsimFactory.createMobsim( sc , events ).run();
@@ -84,4 +86,48 @@ public class BenchmarkPerformanceOfPassingEvents {
 	}
 }
 
+class DummySfFactory implements ScoringFunctionFactory {
+	@Override
+	public ScoringFunction createNewScoringFunction(
+			final Plan plan) {
+		return new ScoringFunction() {
+			// dummy sf
+			double s = 0;
 
+			@Override
+			public void handleActivity(Activity activity) {
+				s++;
+			}
+
+			@Override
+			public void handleLeg(Leg leg) {
+				s++;
+			}
+
+			@Override
+			public void agentStuck(double time) {
+				s++;
+			}
+
+			@Override
+			public void addMoney(double amount) {
+				s++;
+			}
+
+			@Override
+			public void finish() {
+			}
+
+			@Override
+			public double getScore() {
+				return s;
+			}
+
+			@Override
+			public void handleEvent(Event event) {
+				// do stuff with event
+				s += event.getTime();
+			}
+		};
+	}
+}
