@@ -60,8 +60,8 @@ public class FunDiagramsWithPassing3modes implements LinkEnterEventHandler{
 	//The following three are an indication of when each mode has reached close speeds.
 	//PermanentRegimeTour is always the highest tour, cachedPRT the second highest.
 	private int permanentRegimeTour;
-	private int cachedPermanentRegimeTour;
-	private int cachedPermanentRegimeTour2;
+	//private int cachedPermanentRegimeTour;
+	//private int cachedPermanentRegimeTour2;
 	
 	private double permanentDensity;
 	private double permanentDensity_truck;//partial density: number of truck drivers divided by the TOTAL network length.
@@ -139,7 +139,7 @@ public class FunDiagramsWithPassing3modes implements LinkEnterEventHandler{
 		for (int i=0; i<FunDiagramsWithPassing3modes.NUMBER_OF_MEMORIZED_FLOWS; i++){
 			this.lastXFlows.add(0.);
 		}
-		
+		this.permanentRegimeTour = 0;
 		this.initializeGroupDependentVariables();
 	}
 	
@@ -154,6 +154,7 @@ public class FunDiagramsWithPassing3modes implements LinkEnterEventHandler{
 		this.flowTable.clear();
 		this.flowTime = new Double(0.);
 		this.lastXFlows.clear();
+		this.permanentRegimeTour = 0;
 		
 		this.resetGroupDependentVariables();
 	}
@@ -162,18 +163,22 @@ public class FunDiagramsWithPassing3modes implements LinkEnterEventHandler{
 		if (!(endRegime)){//If data is already extracted for that number of agents on the track
 		//it is just necessary to let them go home and carry on with their lives instead of running around.
 			Id personId = event.getPersonId();
+			//System.out.println("Detecting event from person : "+personId+".");
 			double pcu_person=0.;
 			
 			//Disaggregated data updating methods
 			String transportMode = (String) scenario.getPopulation().getPersons().get(personId).getCustomAttributes().get("transportMode");
 			//System.out.println("transportMode: "+transportMode);
 			if (transportMode.equals("truck")){
+				//System.out.println("Detecting truck event");
 				handleEvent_truck(event);
 				pcu_person = DreieckStreckeSzenario3modes.PCU_TRUCK;
 			} else if (transportMode.equals("med")) {
+				System.out.println("Detecting med event");
 				handleEvent_med(event);
 				pcu_person = DreieckStreckeSzenario3modes.PCU_MED;
 			} else if (transportMode.equals("fast")) {
+				//System.out.println("Detecting fast event");
 				handleEvent_fast(event);
 				pcu_person = DreieckStreckeSzenario3modes.PCU_FAST;
 			} else {
@@ -185,7 +190,7 @@ public class FunDiagramsWithPassing3modes implements LinkEnterEventHandler{
 			//Still performing some aggregated data collecting
 			int tourNumber;
 			double nowTime = event.getTime();
-			double networkLength = DreieckStreckeSzenario3modes.length * 3;
+			//double networkLength = DreieckStreckeSzenario3modes.length * 3;
 			
 			if (event.getLinkId().equals(studiedMeasuringPointLinkId)){	
 				
@@ -227,7 +232,7 @@ public class FunDiagramsWithPassing3modes implements LinkEnterEventHandler{
 						//This condition is not enough. Need to wait until the slowest mode has reached and totally completed tour permanentRegimeTour.
 						//This is guaranteed in handleEvent_mode for each mode.
 						
-						int numberOfDrivingAgents = this.tourNumberSpeed.get(this.permanentRegimeTour).getFirst();
+						//int numberOfDrivingAgents = this.tourNumberSpeed.get(this.permanentRegimeTour).getFirst();
 						
 						this.permanentDensity = this.permanentDensity_truck+this.permanentDensity_fast;//PCU/km
 					
@@ -301,16 +306,16 @@ public class FunDiagramsWithPassing3modes implements LinkEnterEventHandler{
 					if (!(this.permanentRegime_med)){
 						if (checkingForAgents_med == 0){
 							this.permanentRegime_med = true;//no agents driving, so this variable should always be true
-							this.cachedPermanentRegimeTour = 0;
-							this.cachedPermanentRegimeTour2 = 0;
+							//this.cachedPermanentRegimeTour = 0;
+							//this.cachedPermanentRegimeTour2 = 0;
 							log.info("Med permanent regime attained because of empty mode.");
 						}
 					}
 					if (!(this.permanentRegime_fast)){
 						if (checkingForAgents_fast == 0){
 							this.permanentRegime_fast = true;//no agents driving, so this variable should always be true
-							this.cachedPermanentRegimeTour = 0;//lowest value possible for initialization so it will not be considered.
-							this.cachedPermanentRegimeTour2 = 0;
+							//this.cachedPermanentRegimeTour = 0;//lowest value possible for initialization so it will not be considered.
+							//this.cachedPermanentRegimeTour2 = 0;
 							log.info("Fast permanent regime attained because of empty mode.");
 						}
 					}
@@ -321,8 +326,8 @@ public class FunDiagramsWithPassing3modes implements LinkEnterEventHandler{
 						double theOneBefore_truck = this.tourNumberSpeed_truck.get(tourNumber-2).getSecond();
 						if ((almostRelativeEqualDoubles(speed, previousLapSpeed_truck, 0.02)) && (almostRelativeEqualDoubles(previousLapSpeed_truck, theOneBefore_truck, 0.02))){
 							this.permanentRegime_truck=true;
-							log.info("Truck permanent regime attained.");
-							
+							log.info("Truck permanent regime attained at tour "+tourNumber+".");
+							/*
 							if ((permanentRegime_med) && (permanentRegime_fast)){
 								if (tourNumber>this.permanentRegimeTour){
 									this.cachedPermanentRegimeTour2 = this.cachedPermanentRegimeTour;
@@ -345,6 +350,10 @@ public class FunDiagramsWithPassing3modes implements LinkEnterEventHandler{
 								
 							} else {
 								this.permanentRegimeTour = tourNumber;
+							}*/
+							if (tourNumber>this.permanentRegimeTour){
+								this.permanentRegimeTour = tourNumber;
+								System.out.println("Updating permanentRegimeTour to tour: "+tourNumber+". Current average speed for truck is: "+speed+" m/s.");
 							}
 						}
 					}
@@ -414,6 +423,7 @@ public class FunDiagramsWithPassing3modes implements LinkEnterEventHandler{
 				if (!(this.tourNumberSpeed_truck.containsKey(tourNumber))){
 					this.tourNumberSpeed_truck.put(tourNumber,new Tuple<Integer,Double>(0,0.));
 					this.flowTime_truck = new Double(nowTime);
+					System.out.println("Initialization of tourNumberSpeed_truck. Should not be empty from now on.");
 				}
 			}
 			
@@ -446,6 +456,7 @@ public class FunDiagramsWithPassing3modes implements LinkEnterEventHandler{
 	
 	
 	private void handleEvent_med(LinkEnterEvent event){
+		System.out.println("handling a med event");
 		Id personId = event.getPersonId();
 		int tourNumber;
 		double nowTime = event.getTime();
@@ -479,16 +490,16 @@ public class FunDiagramsWithPassing3modes implements LinkEnterEventHandler{
 					if (!(this.permanentRegime_truck)){
 						if (checkingForAgents_truck == 0){
 							this.permanentRegime_truck = true;//no agents driving, so this variable should always be true
-							this.cachedPermanentRegimeTour = 0;
-							this.cachedPermanentRegimeTour2 = 0;
+							//this.cachedPermanentRegimeTour = 0;
+							//this.cachedPermanentRegimeTour2 = 0;
 							log.info("Truck permanent regime attained because of empty mode.");
 						}
 					}
 					if (!(this.permanentRegime_fast)){
 						if (checkingForAgents_fast == 0){
 							this.permanentRegime_fast = true;//no agents driving, so this variable should always be true
-							this.cachedPermanentRegimeTour = 0;
-							this.cachedPermanentRegimeTour2 = 0;
+							//this.cachedPermanentRegimeTour = 0;
+							//this.cachedPermanentRegimeTour2 = 0;
 							log.info("Fast permanent regime attained because of empty mode.");
 						}
 					}
@@ -500,7 +511,7 @@ public class FunDiagramsWithPassing3modes implements LinkEnterEventHandler{
 						if ((almostRelativeEqualDoubles(speed, previousLapSpeed_med, 0.02)) && (almostRelativeEqualDoubles(previousLapSpeed_med, theOneBefore_med, 0.02))){
 							this.permanentRegime_med=true;
 							log.info("Med permanent regime attained.");
-							
+							/*
 							if ((permanentRegime_truck) && (permanentRegime_fast)){
 								if (tourNumber>this.permanentRegimeTour){
 									this.cachedPermanentRegimeTour2 = this.cachedPermanentRegimeTour;
@@ -523,7 +534,11 @@ public class FunDiagramsWithPassing3modes implements LinkEnterEventHandler{
 								
 							} else {
 								this.permanentRegimeTour = tourNumber;
-							}						
+							}
+							*/
+							if (tourNumber>this.permanentRegimeTour){
+								this.permanentRegimeTour = tourNumber;
+							}
 						}	
 					}
 					//globally?
@@ -582,6 +597,7 @@ public class FunDiagramsWithPassing3modes implements LinkEnterEventHandler{
 					this.tourNumberSpeed_med.put(tourNumber,new Tuple<Integer,Double>(0,0.));
 			} else {
 				//First tour handling
+				System.out.println("Med first tour handling.");
 				tourNumber = 1;
 				this.personTour.put(personId, tourNumber);
 				this.lastSeenOnStudiedLinkEnter.put(personId, nowTime);
@@ -592,6 +608,7 @@ public class FunDiagramsWithPassing3modes implements LinkEnterEventHandler{
 				if (!(this.tourNumberSpeed_med.containsKey(tourNumber))){
 					this.tourNumberSpeed_med.put(tourNumber,new Tuple<Integer,Double>(0,0.));
 					this.flowTime_med = new Double(nowTime);
+					System.out.println("Initialization of tourNumberSpeed_med. Should not be empty from now on.");
 				}
 			}
 			
@@ -657,16 +674,16 @@ public class FunDiagramsWithPassing3modes implements LinkEnterEventHandler{
 					if (!(this.permanentRegime_truck)){
 						if (checkingForAgents_truck == 0){
 							this.permanentRegime_truck = true;//no agents driving, so this variable should always be true
-							this.cachedPermanentRegimeTour = 0;//lowest value possible for initialization so it will not be considered.
-							this.cachedPermanentRegimeTour2 = 0;
+							//this.cachedPermanentRegimeTour = 0;//lowest value possible for initialization so it will not be considered.
+							//this.cachedPermanentRegimeTour2 = 0;
 							log.info("Truck permanent regime attained because of empty mode.");
 						}
 					}
 					if (!(this.permanentRegime_med)){
 						if (checkingForAgents_med == 0){
 							this.permanentRegime_med = true;//no agents driving, so this variable should always be true
-							this.cachedPermanentRegimeTour = 0;//lowest value possible for initialization so it will not be considered.
-							this.cachedPermanentRegimeTour2 = 0;
+							//this.cachedPermanentRegimeTour = 0;//lowest value possible for initialization so it will not be considered.
+							//this.cachedPermanentRegimeTour2 = 0;
 							log.info("Med permanent regime attained because of empty mode.");
 						}
 					}
@@ -678,7 +695,7 @@ public class FunDiagramsWithPassing3modes implements LinkEnterEventHandler{
 						if ((almostRelativeEqualDoubles(speed, previousLapSpeed_fast, 0.02)) && (almostRelativeEqualDoubles(previousLapSpeed_fast, theOneBefore_fast, 0.02))){
 							this.permanentRegime_fast=true;
 							log.info("Fast permanent regime attained.");
-							
+							/*
 							if ((permanentRegime_truck) && (permanentRegime_med)){
 								if (tourNumber>this.permanentRegimeTour){
 									this.cachedPermanentRegimeTour2 = this.cachedPermanentRegimeTour;
@@ -700,6 +717,9 @@ public class FunDiagramsWithPassing3modes implements LinkEnterEventHandler{
 								}
 								
 							} else {
+								this.permanentRegimeTour = tourNumber;
+							}*/
+							if (tourNumber>this.permanentRegimeTour){
 								this.permanentRegimeTour = tourNumber;
 							}
 						}
@@ -770,6 +790,7 @@ public class FunDiagramsWithPassing3modes implements LinkEnterEventHandler{
 				if (!(this.tourNumberSpeed_fast.containsKey(tourNumber))){
 					this.tourNumberSpeed_fast.put(tourNumber,new Tuple<Integer,Double>(0,0.));
 					this.flowTime_fast = new Double(nowTime);
+					System.out.println("Initialization of tourNumberSpeed_fast. Should not be empty from now on.");
 				}
 			}
 			

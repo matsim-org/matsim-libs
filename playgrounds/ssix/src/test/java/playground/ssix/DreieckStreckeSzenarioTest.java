@@ -205,7 +205,7 @@ public class DreieckStreckeSzenarioTest {
 	public static double length = 433.33;//in m, length of one the triangle sides.
 	public static int NETWORK_CAPACITY = 2700;//in PCU/h
 	private static long NUMBER_OF_AGENTS = 500;
-	private static String OUTPUT_DIR = "Z:\\WinHome\\Desktop\\workspace2\\playgrounds\\ssix\\output\\data_Patna_cmsCarsBicycles_refined.txt";
+	private static String OUTPUT_DIR = "Z:\\WinHome\\Desktop\\workspace2\\playgrounds\\ssix\\output\\data_Patna_cmsCarsBikes_refined.txt";
 	
 	private static double FREESPEED = 60.;//in km/h, maximum authorized velocity on the track
 	private static double P_TRUCK = 0.5;//no need to worry much about those, are normalized when choosing effective transport mode
@@ -214,7 +214,7 @@ public class DreieckStreckeSzenarioTest {
 	protected static double PCU_TRUCK = 0.25;//PCUs of the different possible modes
 	protected static double PCU_MED = 1.;
 	protected static double PCU_FAST = 1.;
-	protected static double VMAX_TRUCK = 4.17;//maximum velocities of the vehicle types
+	protected static double VMAX_TRUCK = 16.67;//maximum velocities of the vehicle types
 	protected static double VMAX_MED = 12.;
 	protected static double VMAX_FAST = 16.67;
 	

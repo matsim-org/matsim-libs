@@ -424,8 +424,11 @@ public class DreieckStreckeSzenario3modes {
 		
 		if (mode.equals("constantModalSplit")){//This ModalSplit is dicted by P_TRUCK,P_MED and P_FAST
 			long n_trucks = new Double(n / ((1/PCU_TRUCK)+(1/PCU_MED)+(1/PCU_FAST)) * (1/PCU_TRUCK)).longValue();
+			System.out.println(n_trucks+" bicycles are going to be created.");
 			long n_med = new Double(n / ((1/PCU_TRUCK)+(1/PCU_MED)+(1/PCU_FAST)) * (1/PCU_MED)).longValue();
+			System.out.println(n_med+" bikes are going to be created.");
 			long n_fast = n - n_trucks - n_med;
+			System.out.println(n_fast+" cars are going to be created.");
 			createWantedPopulation(n_trucks,n_med,n_fast,2);
 		}
 		
@@ -535,7 +538,7 @@ public class DreieckStreckeSzenario3modes {
 			
 			} else if (i<(numberOfTrucks+numberOfMed)) {
 				transportMode = "med";
-				//System.out.println("A med was made.");
+				System.out.println("A med was made with Id : "+(i+1)+".");
 			
 			} else {
 				transportMode = "fast";
@@ -560,6 +563,7 @@ public class DreieckStreckeSzenario3modes {
 			
 			person.addPlan(plan);
 			population.addPerson(person);
+			System.out.println("Just added person : "+(i+1)+" to the scenario population.");
 		}
 	}
 	
@@ -702,8 +706,8 @@ public class DreieckStreckeSzenario3modes {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		writer.format(  "%s\t%s\t%s\t\t%s\t\t%s\t%s\t%s\t\t%s\t\t%s\t%s\t%s\t\t%s\t\t%s\t%s\t%s\n",	
-				     "n_bic","n_bik","n_car","k", "k_bic","k_bik","k_car", "q","q_bic","q_bik","q_car", "v","v_bic","v_bik","v_car");
+		writer.format(  "%s\t\t%s\t\t%s\t%s\t%s\t\t%s\t\t%s\t%s\t%s\t\t%s\t\t%s\t%s\t%s\n",	
+				     "n_agents","k", "k_bic","k_bik","k_car", "q","q_bic","q_bik","q_car", "v","v_bic","v_bik","v_car");
 		
 		//writer.format("%s\t%s\t%s\t%s\n",
 		//			  "n_bikes","n_cars","flow","speed");
