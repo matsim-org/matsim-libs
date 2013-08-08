@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.southAfrica.freight.digicore.analysis.chainSimilarity;
+package playground.southAfrica.freight.digicore.analysis.chain.chainSimilarity;
 
 
 import java.util.ArrayList;
@@ -34,12 +34,12 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Polygon;
 
-import playground.southafrica.freight.digicore.analysis.chainSimilarity.ChainSimilarityAnalyser;
+import playground.southafrica.freight.digicore.analysis.chain.chainSimilarity.geometric.GeometricChainSimilarityAnalyser;
 import playground.southafrica.freight.digicore.containers.DigicoreActivity;
 import playground.southafrica.freight.digicore.containers.DigicoreChain;
 import playground.southafrica.freight.digicore.containers.DigicoreVehicle;
 
-public class ChainSimilarityAnalyserTest extends MatsimTestCase {
+public class GeometricChainSimilarityAnalyserTest extends MatsimTestCase {
 
 	@Test
 	public void testConstructor() {
@@ -51,7 +51,7 @@ public class ChainSimilarityAnalyserTest extends MatsimTestCase {
 		
 		/* Chain 1. */
 		DigicoreChain chain = vehicle.getChains().get(0);
-		Polygon p1 = (Polygon) ChainSimilarityAnalyser.getBuffer(chain, 0.5).getEnvelope();
+		Polygon p1 = (Polygon) GeometricChainSimilarityAnalyser.getBuffer(chain, 0.5).getEnvelope();
 		List<Coordinate> list = getCoordinateList(p1.getCoordinates());
 		assertTrue("Coordinate (0,0) not in buffer.", list.contains(new Coordinate(0.0, 0.0)));
 		assertTrue("Coordinate (1,0) not in buffer.", list.contains(new Coordinate(1.0, 0.0)));
@@ -60,7 +60,7 @@ public class ChainSimilarityAnalyserTest extends MatsimTestCase {
 		
 		/* Chain 2. */
 		chain = vehicle.getChains().get(1);
-		Polygon p2 = (Polygon) ChainSimilarityAnalyser.getBuffer(chain, 0.5).getEnvelope();
+		Polygon p2 = (Polygon) GeometricChainSimilarityAnalyser.getBuffer(chain, 0.5).getEnvelope();
 		list = getCoordinateList(p2.getCoordinates());
 		assertTrue("Coordinate (0,2) not in buffer.", list.contains(new Coordinate(0.0, 2.0)));
 		assertTrue("Coordinate (3,2) not in buffer.", list.contains(new Coordinate(3.0, 2.0)));
@@ -76,9 +76,9 @@ public class ChainSimilarityAnalyserTest extends MatsimTestCase {
 		DigicoreChain chain2 = vehicle.getChains().get(1);
 		double buffer = 0.5;		
 
-		Geometry rectangle1 = ChainSimilarityAnalyser.getBuffer(chain1, buffer).getEnvelope();
-		Geometry rectangle2 = ChainSimilarityAnalyser.getBuffer(chain2, buffer).getEnvelope();
-		double percentage = ChainSimilarityAnalyser.getPercentageOfInterSectionToUnion(rectangle1, rectangle2);
+		Geometry rectangle1 = GeometricChainSimilarityAnalyser.getBuffer(chain1, buffer).getEnvelope();
+		Geometry rectangle2 = GeometricChainSimilarityAnalyser.getBuffer(chain2, buffer).getEnvelope();
+		double percentage = GeometricChainSimilarityAnalyser.getPercentageOfInterSectionToUnion(rectangle1, rectangle2);
 		assertEquals("Wrong overlap area.", 1.0/5.0, percentage);
 	}
 	

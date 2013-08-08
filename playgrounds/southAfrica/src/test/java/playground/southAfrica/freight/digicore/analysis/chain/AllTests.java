@@ -1,4 +1,4 @@
-package playground.southAfrica.freight.digicore.analysis.chainSimilarity;
+package playground.southAfrica.freight.digicore.analysis.chain;
 /* *********************************************************************** *
  * project: org.matsim.*
  * AllTests.java
@@ -26,9 +26,9 @@ import junit.framework.TestSuite;
 public class AllTests {
 	
 	public static Test suite(){
-		TestSuite suite = new TestSuite("All tests for playground.southAfrica.freight.digicore.analysis.chainSimilarity");
+		TestSuite suite = new TestSuite("All tests for playground.southAfrica.freight.digicore.analysis.chain");
 		
-		suite.addTestSuite(ChainSimilarityAnalyserTest.class);
+		suite.addTest(playground.southAfrica.freight.digicore.analysis.chain.chainSimilarity.AllTests.suite());
 		
 		return suite;
 	}
