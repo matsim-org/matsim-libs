@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.population.Person;
 
 import playground.christoph.evacuation.api.core.v01.Coord3d;
 import playground.christoph.evacuation.utils.DeterministicRNG;
-import playground.gregor.sim2d_v3.simulation.floor.VelocityCalculator;
+import playground.gregor.sim2d_v4.tmp.VelocityCalculator;
 
 public class MarathonVelocityCalculator implements VelocityCalculator {
 

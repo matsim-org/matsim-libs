@@ -34,7 +34,6 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
-import playground.gregor.sim2d_v3.random.XORShiftRandom;
 
 /*
  * Walk legs inside the affected area are converted to walk2d legs.

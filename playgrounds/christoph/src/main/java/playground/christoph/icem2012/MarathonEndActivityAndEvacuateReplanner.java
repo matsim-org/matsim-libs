@@ -33,7 +33,6 @@ import org.matsim.core.population.ActivityImpl;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 
 import playground.christoph.evacuation.withinday.replanning.replanners.EndActivityAndEvacuateReplanner;
-import playground.gregor.sim2d_v3.random.XORShiftRandom;
 
 /*
  * Switches the mode of walk evacuation legs to walk2d.

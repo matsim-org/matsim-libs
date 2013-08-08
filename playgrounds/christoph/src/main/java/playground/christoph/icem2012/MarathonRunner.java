@@ -115,12 +115,9 @@ import playground.christoph.evacuation.withinday.replanning.replanners.CurrentLe
 import playground.christoph.evacuation.withinday.replanning.replanners.EndActivityAndEvacuateReplannerFactory;
 import playground.christoph.evacuation.withinday.replanning.replanners.ExtendCurrentActivityReplannerFactory;
 import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
-import playground.gregor.sim2d_v3.events.XYDataWriter;
-import playground.gregor.sim2d_v3.helper.gisdebug.GisDebugger;
-import playground.gregor.sim2d_v3.scenario.ScenarioLoader2DImpl;
-import playground.gregor.sim2d_v3.simulation.HybridQ2DMobsimFactory;
-import playground.gregor.sim2d_v3.simulation.Sim2DDepartureHandler;
-import playground.gregor.sim2d_v3.simulation.Sim2DEngine;
+import playground.gregor.sim2d_v4.simulation.HybridQ2DMobsimFactory;
+import playground.gregor.sim2d_v4.simulation.Sim2DEngine;
+import playground.gregor.sim2denvironment.GisDebugger;
 import playground.meisterk.kti.config.KtiConfigGroup;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -330,8 +327,8 @@ public final class MarathonRunner implements StartupListener,
 			}
 		}
 		
-		ScenarioLoader2DImpl loader = new ScenarioLoader2DImpl(this.scenario);
-		loader.load2DScenario();
+//		ScenarioLoader2DImpl loader = new ScenarioLoader2DImpl(this.scenario);
+//		loader.load2DScenario();
 	}
 	
 	/*
@@ -355,8 +352,8 @@ public final class MarathonRunner implements StartupListener,
 			Sim2DEngine e = new Sim2DEngine(qSim);
 			this.sim2DEngine = e;
 			qSim.addMobsimEngine(e);
-			Sim2DDepartureHandler d = new Sim2DDepartureHandler(e);
-			qSim.addDepartureHandler(d);
+//			Sim2DDepartureHandler d = new Sim2DDepartureHandler(e);
+//			qSim.addDepartureHandler(d);
 			
 			return qSim;
 		}
@@ -391,10 +388,10 @@ public final class MarathonRunner implements StartupListener,
 		 */
 		event.getControler().setMobsimFactory(new CombiMobsimFactory(new WithinDayQSimFactory(this.withinDayControlerListener.getWithinDayEngine())));
 		
-		XYDataWriter xyDataWriter = new XYDataWriter();
-		event.getControler().getEvents().addHandler(xyDataWriter);
-		event.getControler().addControlerListener(xyDataWriter);
-		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(xyDataWriter);
+//		XYDataWriter xyDataWriter = new XYDataWriter();
+//		event.getControler().getEvents().addHandler(xyDataWriter);
+//		event.getControler().addControlerListener(xyDataWriter);
+//		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(xyDataWriter);
 		
 		readAffectedArea();
 		
