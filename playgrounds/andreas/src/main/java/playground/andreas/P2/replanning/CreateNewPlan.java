@@ -38,8 +38,11 @@ public class CreateNewPlan extends AbstractPStrategyModule {
 	
 	private final static Logger log = Logger.getLogger(CreateNewPlan.class);
 	public static final String STRATEGY_NAME = "CreateNewPlan";
+	
+	private final int maxNumberOfTries = 100;
+
 	private final double timeSlotSize;
-	private final double minStopDistance;
+	private final double minInitialStopDistance;
 	private TimeProvider timeProvider;
 
 	public CreateNewPlan(ArrayList<String> parameter) {
@@ -47,11 +50,11 @@ public class CreateNewPlan extends AbstractPStrategyModule {
 		if(parameter.size() != 2){
 			log.error("Wrong number of parameters. Will ignore: " + parameter);
 			log.error("Parameter 1: Time slot size for new start and end times");
-			log.error("Parameter 2: Grid size in meter");
+			log.error("Parameter 2: Min distance of the two initial stops");
 		}
 		
 		this.timeSlotSize = Double.parseDouble(parameter.get(0));
-		this.minStopDistance = 2 * Double.parseDouble(parameter.get(1));
+		this.minInitialStopDistance = Double.parseDouble(parameter.get(1));
 	}
 	
 	public void setTimeProvider(TimeProvider timeProvider){
@@ -62,7 +65,11 @@ public class CreateNewPlan extends AbstractPStrategyModule {
 	public PPlan run(Cooperative cooperative) {
 		PPlan newPlan;		
 		
+		int triesPerformed = 0;
+		
 		do {
+			triesPerformed++;
+			
 			// get a valid start time
 			double startTime = this.timeProvider.getRandomTimeInInterval(0 * 3600.0, 24 * 3600.0 - cooperative.getMinOperationTime());
 			double endTime = this.timeProvider.getRandomTimeInInterval(startTime + cooperative.getMinOperationTime(), 24 * 3600.0);
@@ -91,8 +98,7 @@ public class CreateNewPlan extends AbstractPStrategyModule {
 			TransitStopFacility stop1 = cooperative.getRouteProvider().getRandomTransitStop(cooperative.getCurrentIteration());
 			TransitStopFacility stop2 = cooperative.getRouteProvider().getRandomTransitStop(cooperative.getCurrentIteration());
 
-			// using config-defaults this is an infinite loop \\ DR, aug'13
-			while (CoordUtils.calcDistance(stop1.getCoord(), stop2.getCoord()) < this.minStopDistance) {
+			while (CoordUtils.calcDistance(stop1.getCoord(), stop2.getCoord()) < this.minInitialStopDistance) {
 				stop2 = cooperative.getRouteProvider().getRandomTransitStop(cooperative.getCurrentIteration());
 			}
 			
@@ -109,9 +115,13 @@ public class CreateNewPlan extends AbstractPStrategyModule {
 			
 			newPlan.setLine(cooperative.getRouteProvider().createTransitLine(cooperative.getId(), newPlan));
 
-			// this may lead to an infinite loop as well, especially for smaller networks \\ DR, aug'13
-		} while (cooperative.getFranchise().planRejected(newPlan));		
+		} while (cooperative.getFranchise().planRejected(newPlan) && triesPerformed < this.maxNumberOfTries);		
 
+		if(!(triesPerformed < this.maxNumberOfTries)){
+			log.warn("Exceeded the maximum number of tries (" + this.maxNumberOfTries + ") to find a new plan for operator " + cooperative.getId() + ". Returning null");
+			return null;
+		}
+		
 		return newPlan;
 	}
 

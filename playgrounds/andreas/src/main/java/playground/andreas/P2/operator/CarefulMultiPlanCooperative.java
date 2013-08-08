@@ -56,13 +56,16 @@ public class CarefulMultiPlanCooperative extends AbstractCooperative{
 		this.plans = new LinkedList<PPlan>();
 	}
 	
-	public void init(PRouteProvider pRouteProvider, PStrategy initialStrategy, int iteration, double initialBudget) {
-		super.init(pRouteProvider, initialStrategy, iteration, initialBudget);
-		this.buyAsManyVehiclesAsPossible();
-		this.plans.add(this.bestPlan);
-		this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() + this.numberOfVehiclesInReserve);
-		this.numberOfVehiclesInReserve = 0;
-		this.bestPlan = null;
+	public boolean init(PRouteProvider pRouteProvider, PStrategy initialStrategy, int iteration, double initialBudget) {
+		boolean initializedSuccessfully = super.init(pRouteProvider, initialStrategy, iteration, initialBudget);
+		if (initializedSuccessfully) {
+			this.buyAsManyVehiclesAsPossible();
+			this.plans.add(this.bestPlan);
+			this.bestPlan.setNVehicles(this.bestPlan.getNVehicles() + this.numberOfVehiclesInReserve);
+			this.numberOfVehiclesInReserve = 0;
+			this.bestPlan = null;
+		}
+		return initializedSuccessfully;
 	}
 	
 	@Override

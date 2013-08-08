@@ -84,15 +84,24 @@ public abstract class AbstractCooperative implements Cooperative{
 		this.franchise = franchise;
 	}
 
-	public void init(PRouteProvider pRouteProvider, PStrategy initialStrategy, int iteration, double initialBudget) {
+	public boolean init(PRouteProvider pRouteProvider, PStrategy initialStrategy, int iteration, double initialBudget) {
 		this.coopState = CoopState.PROSPECTING;
 		this.budget = initialBudget;
 		this.currentIteration = iteration;
 		this.routeProvider = pRouteProvider;
+		
 		this.bestPlan = initialStrategy.run(this);
+		if(this.bestPlan == null) {
+			// failed to provide a plan, abort intitialization
+			return false;
+		}
+		
 		this.testPlan = null;
 		this.numberOfPlansTried = 0;
 		this.numberOfVehiclesInReserve = 0;
+		
+		// everything went fine
+		return true;
 	}
 
 	public void score(TreeMap<Id, ScoreContainer> driverId2ScoreMap) {

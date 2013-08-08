@@ -77,6 +77,7 @@ public class PConfigGroup extends Module{
 	private static final String PRICE_PER_VEHICLE_SOLD = "pricePerVehicleSold";
 	private static final String START_WITH_24_HOURS = "startWith24Hours";
 	private static final String MIN_OPERATION_TIME = "minOperationTime";
+	private static final String MIN_INITIAL_STOP_DISTANCE = "minInitialStopDistance";
 	private static final String USEFRANCHISE = "useFranchise";
 	private static final String WRITESTATS_INTERVAL = "writeStatsInterval";
 	private static final String LOGCOOPS = "logCoops";
@@ -121,6 +122,7 @@ public class PConfigGroup extends Module{
 	private double costPerHour = 0.0;
 	private boolean startWith24Hours = false;
 	private double minOperationTime = 6 * 3600;
+	private double minInitialStopDistance = 0.0;
 	private double earningsPerBoardingPassenger = 0.0;
 	private double earningsPerKilometerAndPassenger = 0.50;
 	private double pricePerVehicleBought = 1000.0;
@@ -204,6 +206,8 @@ public class PConfigGroup extends Module{
 			this.startWith24Hours = Boolean.parseBoolean(value);
 		} else if (MIN_OPERATION_TIME.equals(key)){
 			this.minOperationTime = Double.parseDouble(value);
+		} else if (MIN_INITIAL_STOP_DISTANCE.equals(key)){
+			this.minInitialStopDistance = Double.parseDouble(value);
 		} else if (USEFRANCHISE.equals(key)){
 			this.useFranchise = Boolean.parseBoolean(value);
 		} else if (WRITESTATS_INTERVAL.equals(key)){
@@ -286,6 +290,7 @@ public class PConfigGroup extends Module{
 		map.put(PRICE_PER_VEHICLE_SOLD, Double.toString(this.pricePerVehicleSold));
 		map.put(START_WITH_24_HOURS, Boolean.toString(this.startWith24Hours));
 		map.put(MIN_OPERATION_TIME, Double.toString(this.minOperationTime));
+		map.put(MIN_INITIAL_STOP_DISTANCE, Double.toString(this.minInitialStopDistance));
 		map.put(USEFRANCHISE, Boolean.toString(this.useFranchise));
 		map.put(WRITESTATS_INTERVAL, Integer.toString(this.writeStatsInterval));
 		map.put(LOGCOOPS, Boolean.toString(this.logCoops));
@@ -341,6 +346,7 @@ public class PConfigGroup extends Module{
 		map.put(PRICE_PER_VEHICLE_SOLD, "price of one vehicle sold");
 		map.put(START_WITH_24_HOURS, "Initial plan will start operating 0-24 hours");
 		map.put(MIN_OPERATION_TIME, "min time of operation of each cooperative in seconds");
+		map.put(MIN_INITIAL_STOP_DISTANCE, "min distance the two initial stops of a new operator's first route should be apart. Default is zero.");
 		map.put(USEFRANCHISE, "Will use a franchise system if set to true");
 		map.put(WRITESTATS_INTERVAL, "number of iterations statistics will be plotted. Set to zero to turn this feature off. Set to infinity to turn off the plots, but write the statistics file anyway");
 		map.put(LOGCOOPS, "will log coops individually if set to true");
@@ -455,6 +461,10 @@ public class PConfigGroup extends Module{
 
 	public double getMinOperationTime() {
 		return this.minOperationTime;
+	}
+	
+	public double getMinInitialStopDistance() {
+		return this.minInitialStopDistance;
 	}
 	
 	public boolean getStartWith24Hours() {

@@ -50,10 +50,13 @@ public class MultiPlanCooperative extends AbstractCooperative{
 		this.plans = new LinkedList<PPlan>();
 	}
 	
-	public void init(PRouteProvider pRouteProvider, PStrategy initialStrategy, int iteration, double initialBudget) {
-		super.init(pRouteProvider, initialStrategy, iteration, initialBudget);
-		this.plans.add(this.bestPlan);
-		this.bestPlan = null;
+	public boolean init(PRouteProvider pRouteProvider, PStrategy initialStrategy, int iteration, double initialBudget) {
+		boolean initializedSuccessfully = super.init(pRouteProvider, initialStrategy, iteration, initialBudget);
+		if (initializedSuccessfully) {
+			this.plans.add(this.bestPlan);
+			this.bestPlan = null;
+		}
+		return initializedSuccessfully;
 	}
 	
 	@Override

@@ -42,7 +42,6 @@ import playground.andreas.P2.routeProvider.PRouteProviderFactory;
  */
 public class OperatorInitializer {
 	
-	@SuppressWarnings("unused")
 	private final static Logger log = Logger.getLogger(OperatorInitializer.class);
 	private PConfigGroup pConfig;
 	private CooperativeFactory cooperativeFactory;
@@ -61,7 +60,7 @@ public class OperatorInitializer {
 		} else {
 			ArrayList<String> parameter = new ArrayList<String>();
 			parameter.add(Double.toString(pConfig.getTimeSlotSize()));
-			parameter.add(Double.toString(pConfig.getGridSize()));
+			parameter.add(Double.toString(pConfig.getMinInitialStopDistance()));
 			this.initialStrategy = new CreateNewPlan(parameter);
 			((CreateNewPlan) this.initialStrategy).setTimeProvider(timeProvider);
 		}
@@ -86,18 +85,29 @@ public class OperatorInitializer {
 	 * @return
 	 */
 	public LinkedList<Cooperative> createAdditionalCooperatives(PStrategyManager pStrategyManager, int iteration, int numberOfNewCooperatives) {
-		LinkedList<Cooperative> initialCoops = new LinkedList<Cooperative>();
+		LinkedList<Cooperative> emptyCoops = new LinkedList<Cooperative>();
 		for (int i = 0; i < numberOfNewCooperatives; i++) {
 			Cooperative cooperative = this.cooperativeFactory.createNewCooperative(this.createNewIdForCooperative(iteration));
-			initialCoops.add(cooperative);
+			emptyCoops.add(cooperative);
 		}
 		
-		for (Cooperative cooperative : initialCoops) {
-			cooperative.init(this.routeProvider, this.initialStrategy, iteration, this.pConfig.getInitialBudget());
-			cooperative.replan(pStrategyManager, iteration);
+		LinkedList<Cooperative> initializedCoops = new LinkedList<Cooperative>();
+		int numberOfCoopsFailedToBeInitialized = 0;
+		for (Cooperative cooperative : emptyCoops) {
+			boolean initComplete = cooperative.init(this.routeProvider, this.initialStrategy, iteration, this.pConfig.getInitialBudget());
+			if (initComplete) {
+				cooperative.replan(pStrategyManager, iteration);
+				initializedCoops.add(cooperative);
+			} else {
+				numberOfCoopsFailedToBeInitialized++;
+			}
 		}
 		
-		return initialCoops;
+		if (numberOfCoopsFailedToBeInitialized > 0) {
+			log.warn(numberOfCoopsFailedToBeInitialized + " out of " + numberOfNewCooperatives + " operators could no be initialized. Proceeding with " + initializedCoops.size() + " new operators.");
+		}
+		
+		return initializedCoops;
 	}
 	
 	private Id createNewIdForCooperative(int iteration){
