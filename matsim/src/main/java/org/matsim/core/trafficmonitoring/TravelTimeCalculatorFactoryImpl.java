@@ -67,7 +67,7 @@ public class TravelTimeCalculatorFactoryImpl implements TravelTimeCalculatorFact
 		} else {
 			throw new RuntimeException(group.getTravelTimeGetterType() + " is unknown!");
 		}
-		travelTimeAggregator.setTravelTimeGetter(travelTimeGetter);
+		travelTimeAggregator.connectTravelTimeGetter(travelTimeGetter);
 		
 		return calculator;
 	}

@@ -98,7 +98,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		compareFile = getClassInputDirectory() + "link10_ttimes_linearinterpolation.txt";
 		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		aggregator = new OptimisticTravelTimeAggregator(numSlots, binSize);
-		aggregator.setTravelTimeGetter(new LinearInterpolatingTravelTimeGetter(numSlots, binSize));
+		aggregator.connectTravelTimeGetter(new LinearInterpolatingTravelTimeGetter(numSlots, binSize));
 		doTravelTimeCalculatorTest(scenario, new TravelTimeDataArrayFactory(scenario.getNetwork(), numSlots),
 				aggregator, binSize, compareFile, false);
 	}
@@ -134,7 +134,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		compareFile = getClassInputDirectory() + "link10_ttimes_linearinterpolation.txt";
 		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		aggregator = new OptimisticTravelTimeAggregator(numSlots, binSize);
-		aggregator.setTravelTimeGetter(new LinearInterpolatingTravelTimeGetter(numSlots, binSize));
+		aggregator.connectTravelTimeGetter(new LinearInterpolatingTravelTimeGetter(numSlots, binSize));
 		doTravelTimeCalculatorTest(scenario, new TravelTimeDataHashMapFactory(scenario.getNetwork()),
 				aggregator, binSize, compareFile, false);
 	}
@@ -170,7 +170,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		compareFile = getClassInputDirectory() + "link10_ttimes_pessimistic_linearinterpolation.txt";
 		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		aggregator = new PessimisticTravelTimeAggregator(binSize, numSlots);
-		aggregator.setTravelTimeGetter(new LinearInterpolatingTravelTimeGetter(numSlots, binSize));
+		aggregator.connectTravelTimeGetter(new LinearInterpolatingTravelTimeGetter(numSlots, binSize));
 		doTravelTimeCalculatorTest(scenario, new TravelTimeDataHashMapFactory(scenario.getNetwork()),
 				aggregator, binSize, compareFile, false);
 	}

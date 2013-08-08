@@ -30,10 +30,13 @@ public abstract class AbstractTravelTimeAggregator {
 		this.numSlots = numSlots;
 		this.travelTimeBinSize = travelTimeBinSize;
 
-		this.setTravelTimeGetter(new AveragingTravelTimeGetter()); // by default
+		this.connectTravelTimeGetter(new AveragingTravelTimeGetter()); // by default
 	}
 
-	public void setTravelTimeGetter(final TravelTimeGetter travelTimeGetter) {
+	/**
+	 * Naming this "connect" instead of "set" since it is a two-way pointer.  kai, aug'13
+	 */
+	public void connectTravelTimeGetter(final TravelTimeGetter travelTimeGetter) {
 		this.travelTimeGetter = travelTimeGetter;
 		travelTimeGetter.setTravelTimeAggregator(this);
 	}
