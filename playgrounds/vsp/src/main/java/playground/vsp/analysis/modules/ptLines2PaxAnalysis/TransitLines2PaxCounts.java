@@ -124,6 +124,95 @@ public class TransitLines2PaxCounts {
 		log.warn("NUMBER OF ROUTES ON DUPE LIST: "+dupeRoutes.size()+" WITH TOTAL ROUTES: "+this.routeList.size());
 		this.routeList.removeAll(dupeRoutes);
 	}
+
+	
+	private void createRouteSegments () {
+		Map<Integer, List<TransitRoute>> stops2routes = new HashMap<Integer, List<TransitRoute>>();
+		List<TransitRoute> dupeRoutes = new ArrayList<TransitRoute>();
+		List<TransitRoute> routeFragments = new ArrayList<TransitRoute>(); // Liste der Routenfragmente
+		int numberOfRoutes = this.routeList.size();
+//		put all TransitRoutes in map with number of stops as key 
+		for (int ii=0; ii<numberOfRoutes; ii++) {
+			TransitRoute tr = this.routeList.get(ii);
+			Integer numberOfStops = tr.getStops().size();
+			if (stops2routes.get(numberOfStops) == null) {
+				stops2routes.put(numberOfStops, new ArrayList<TransitRoute>());
+				stops2routes.get(numberOfStops).add(tr);
+			}
+			else {
+				stops2routes.get(numberOfStops).add(tr);
+			}
+		}
+		
+		for (Integer ns: stops2routes.keySet()) {
+			for (int jj=this.routeList.size(); jj>1; jj--) {
+				TransitRoute tr = this.routeList.get(jj-1);
+				int trLength = tr.getStops().size();
+				for (int kk=0; kk < trLength; kk++) {
+					
+					
+					TransitRoute tr2 = stops2routes.get(ns).get(kk);
+					int tr2Length = tr2.getStops().size();
+					
+					if ((tr.getId()!=tr2.getId())) {
+						
+						boolean createFragment = false;
+						
+						//Unterscheidung nötig: Routensegment am Anfang, Routensegment am Ende, Routensegment in der Mitte (=Hauptroute?)
+						
+						//erster Stop identisch --> vorwärts durchlaufen ab index 0
+						if (tr.getStops().get(0) == tr2.getStops().get(0)) {
+							
+							//wenn TR2 zu Ende und Stops mit TR identisch --> Route entfernen
+
+							for (int rr1=0; rr1 < tr2Length; ) {
+								if (tr.getStops().get(rr1) == tr2.getStops().get(rr1)) rr1++; //nichts tun, nur rr1 erhöhen
+								else if ((tr.getStops().get(rr1) != tr2.getStops().get(rr1)) && !createFragment) {
+							//Fragment erstellen sobald erster Stop nicht mehr in beiden Routen enthalen
+									createFragment = true;
+									//hier Fragment erstellen und ersten Stop hinzufügen
+									rr1++;
+								}
+								else if (createFragment) {
+									//hier weitere Stops zum Fragment hinzufügen
+									dupeRoutes.add(tr2);
+									rr1++;
+								}
+								else if (!createFragment && (rr1 == tr2Length-1)) {
+									//wenn bis Erreichen der Länge von tr2 alle Stops gleich sind --> rauswerfen
+									dupeRoutes.add(tr2);
+									rr1++;
+								}
+							}
+														
+						}
+						
+						//letzter Stop identisch --> vorwärts durchlaufen ab index von (erster Stop beider Routen)
+						else if (tr.getStops().get(trLength-1) == tr2.getStops().get(tr2Length-1)) {
+							
+							//Fragment erstellen ab TR.stopIndex(0) bis erstem identischen Stop
+							
+							//prüfen ob Rest identisch
+								//ja --> Route entfernen
+								//nein --> neues Fragment
+							
+						}
+						
+						//weder erster noch letzter identisch
+						else {
+							//TR durchlaufen und prüfen ob stop(index) in TR2 enthalten
+							
+							//wenn enthalten: vorwärts durchlaufen ab index von (erster Stop beider Routen) bis index (letzter Stop beider Routen)
+							//kein Fragment erstellen, wenn alle Stops in TR2 auch in TR enthalten sind und Reihenfolge stimmt
+						}
+						
+					}
+				
+				}
+			}
+		}
+		
+	}
 	
 	public class RouteSizeComparator implements Comparator<TransitRoute> {
 		public int compare(TransitRoute route1, TransitRoute route2) {
