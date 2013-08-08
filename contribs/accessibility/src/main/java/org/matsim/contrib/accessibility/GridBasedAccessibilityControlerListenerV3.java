@@ -123,6 +123,7 @@ implements ShutdownListener{
 	
 	private static final Logger log = Logger.getLogger(GridBasedAccessibilityControlerListenerV3.class);
 	private AnalysisCellBasedAccessibilityCSVWriterV2 accessibilityWriter;
+	private Network network;
 	
 	// ////////////////////////////////////////////////////////////////////
 	// constructors
@@ -156,7 +157,9 @@ implements ShutdownListener{
 		initAccessibilityParameters(config);
 		// aggregating facilities to their nearest node on the road network
 		this.aggregatedFacilities = aggregatedOpportunities(opportunities, network);
-		
+		// use network as global variable, otherwise another network might be used during 
+		// notifyShutDown(...) (network may be preprocessed, e.g. only car-links.)
+		this.network = network;
 		log.info(".. done initializing CellBasedAccessibilityControlerListenerV3");
 	}
 	
@@ -177,7 +180,7 @@ implements ShutdownListener{
 		
 		// get the controller and scenario
 		Controler controler = event.getControler();
-		NetworkImpl network = (NetworkImpl) controler.getNetwork();
+		NetworkImpl network = (NetworkImpl) this.network; //(NetworkImpl) controler.getNetwork();
 		
 		int benchmarkID = this.benchmark.addMeasure("cell-based accessibility computation");
 
