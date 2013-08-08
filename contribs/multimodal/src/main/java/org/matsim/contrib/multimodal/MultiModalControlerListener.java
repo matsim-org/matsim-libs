@@ -21,6 +21,7 @@
 package org.matsim.contrib.multimodal;
 
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
@@ -42,6 +43,7 @@ import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.util.FastDijkstraFactory;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.TravelTimeFactory;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.pt.router.TransitRouterFactory;
 
@@ -49,6 +51,9 @@ public class MultiModalControlerListener implements StartupListener {
 
 	private final static Logger log = Logger.getLogger(MultiModalControlerListener.class);
 	
+	private boolean locked = false;
+	
+	private final Map<String, TravelTimeFactory> additionalTravelTimeFactories = new LinkedHashMap<String, TravelTimeFactory>();
 	private Map<String, TravelTime> multiModalTravelTimes;
 	
 	@Override
@@ -66,7 +71,8 @@ public class MultiModalControlerListener implements StartupListener {
 		MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) controler.getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
 		
 		Map<Id, Double> linkSlopes = new LinkSlopesReader().getLinkSlopes(multiModalConfigGroup, controler.getNetwork());
-		MultiModalTravelTimeFactory multiModalTravelTimeFactory = new MultiModalTravelTimeFactory(controler.getConfig(), linkSlopes);
+		MultiModalTravelTimeFactory multiModalTravelTimeFactory = new MultiModalTravelTimeFactory(controler.getConfig(), linkSlopes, 
+				this.additionalTravelTimeFactories);
 		this.multiModalTravelTimes = multiModalTravelTimeFactory.createTravelTimes();	
 	
 		/*
@@ -103,6 +109,16 @@ public class MultiModalControlerListener implements StartupListener {
 		for (String mode : CollectionUtils.stringToSet(multiModalConfigGroup.getSimulatedModes())) {
 			routeFactory.setRouteFactory(mode, new LinkNetworkRouteFactory());
 		}
+		
+		// disable possibility to set additional factories
+		this.locked = true;
+	}
+	
+	public void addAdditionalTravelTimeFactory(String mode, TravelTimeFactory travelTimeFactory) {
+		if (locked) throw new RuntimeException(this.getClass().toString() + " configuration has already been locked!");
+		
+		boolean replaced = (this.additionalTravelTimeFactories.put(mode, travelTimeFactory) != null);
+		if (replaced) log.warn("Another factory for mode " + mode + " was found. It has been replaced!");
 	}
 	
 	public Map<String, TravelTime> getMultiModalTravelTimes() {

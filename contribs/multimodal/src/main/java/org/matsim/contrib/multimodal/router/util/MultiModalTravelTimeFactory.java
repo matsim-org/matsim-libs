@@ -42,15 +42,21 @@ public class MultiModalTravelTimeFactory implements MatsimFactory {
 	protected static final Logger log = Logger.getLogger(MultiModalTravelTimeFactory.class);
 	
 	private final Map<String, TravelTimeFactory> factories;
+	private final Map<String, TravelTimeFactory> additionalFactories;
 	private final Map<Id, Double> linkSlopes;
 	
 	public MultiModalTravelTimeFactory(Config config) {
-		this(config, null);
+		this(config, null, null);
+	}
+
+	public MultiModalTravelTimeFactory(Config config, Map<Id, Double> linkSlopes) {
+		this(config, linkSlopes, null);
 	}
 	
-	public MultiModalTravelTimeFactory(Config config, Map<Id, Double> linkSlopes) {
+	public MultiModalTravelTimeFactory(Config config, Map<Id, Double> linkSlopes, Map<String, TravelTimeFactory> additionalFactories) {
 		this.linkSlopes = linkSlopes;
 		this.factories = new LinkedHashMap<String, TravelTimeFactory>();
+		this.additionalFactories = additionalFactories;
 		
 		if (this.linkSlopes == null) {
 			log.warn("No slope information for the links available - travel time will only take agents age and gender into account!");
@@ -95,15 +101,17 @@ public class MultiModalTravelTimeFactory implements MatsimFactory {
 							"Agent specific attributes are not taken into account!");
 					factory = new UnknownTravelTimeFactory(mode, plansCalcRouteConfigGroup);
 					this.factories.put(mode, factory);
+				} else {
+					log.info("Found additional travel time factory from type " + factory.getClass().toString() +
+							" for mode " + mode + ".");
+					this.factories.put(mode, factory);
 				}
 			}
 		}
 	}
 	
-	/*
-	 * One might override this to add support for additional modes.
-	 */
-	protected TravelTimeFactory getTravelTimeFactory(String mode) {
-		return null;
+	private TravelTimeFactory getTravelTimeFactory(String mode) {
+		if (additionalFactories != null) return this.additionalFactories.get(mode);
+		else return null;
 	}
 }
