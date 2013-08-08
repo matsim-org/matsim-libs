@@ -269,14 +269,13 @@ public class QLinkLanesImpl extends AbstractQLink {
 		boolean activeWaitBuffer = false;
 		boolean lanesActive = false;
 		if (this.insertingWaitingVehiclesBeforeDrivingVehicles){
-			this.moveWaitToBuffer(now);
+			activeWaitBuffer = this.moveWaitToBuffer(now);
 			lanesActive = this.moveLanes(now);
 		}
 		else {
 			lanesActive = this.moveLanes(now);
-			this.moveWaitToBuffer(now);
+			activeWaitBuffer = this.moveWaitToBuffer(now);
 		}
-		activeWaitBuffer = this.moveWaitToBuffer(now);
 		this.active = lanesActive || activeWaitBuffer || (!this.waitingList.isEmpty());
 		return this.active;
 	}
