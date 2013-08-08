@@ -152,9 +152,9 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 		}
 
 		this.createAndAddSnapshotInfoForPassengers(positions, veh.getPassengers(), distanceFromFromNode, startCoord, 
-						endCoord, lengthOfCurve, euclideanLength, lane, speedValueBetweenZeroAndOne);
+				endCoord, lengthOfCurve, euclideanLength, lane, speedValueBetweenZeroAndOne);
 		// (this is deliberately first memorizing "pos" but then filling in the passengers first)
-		
+
 		positions.add(pos);
 	}
 	
@@ -197,8 +197,9 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 			laneInt += lane;
 		}
 		for (PassengerAgent passenger : passengers) {
+			int lanePos = laneInt - 2*cnt ;
 			AgentSnapshotInfo passengerPosition = snapshotInfoFactory.createAgentSnapshotInfo(passenger.getId(), startCoord, endCoord, 
-					distanceOnLink, laneInt, lengthOfCurve, euclideanLength);
+					distanceOnLink, lanePos, lengthOfCurve, euclideanLength);
 			passengerPosition.setColorValueBetweenZeroAndOne(speedValueBetweenZeroAndOne);
 			passengerPosition.setAgentState(AgentState.PERSON_OTHER_MODE); // in 2010, probably a passenger
 			positions.add(passengerPosition);
