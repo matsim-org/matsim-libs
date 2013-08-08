@@ -202,21 +202,21 @@ public class DreieckStreckeSzenarioTest {
 	
 	//CONFIGURATION: static variables used for aggregating configuration options
 	public static int subdivisionFactor=3;//all sides of the triangle will be divided into subdivisionFactor links
-	public static double length = 166.67;//in m, length of one the triangle sides.
+	public static double length = 433.33;//in m, length of one the triangle sides.
 	public static int NETWORK_CAPACITY = 2700;//in PCU/h
-	private static long NUMBER_OF_AGENTS = 160;
-	private static String OUTPUT_DIR = "Z:\\WinHome\\Desktop\\workspace2\\playgrounds\\ssix\\output\\data_Patna_MZ_corrected_10kmh.txt";
+	private static long NUMBER_OF_AGENTS = 500;
+	private static String OUTPUT_DIR = "Z:\\WinHome\\Desktop\\workspace2\\playgrounds\\ssix\\output\\data_Patna_cmsCarsBicycles_refined.txt";
 	
-	private static double FREESPEED = 50.;//in km/h, maximum authorized velocity on the track
-	private static double P_TRUCK = 0.85;//no need to worry much about those, are normalized when choosing effective transport mode
+	private static double FREESPEED = 60.;//in km/h, maximum authorized velocity on the track
+	private static double P_TRUCK = 0.5;//no need to worry much about those, are normalized when choosing effective transport mode
 	//private static double P_MED = 2.;
-	private static double P_FAST = 0.15;
+	private static double P_FAST = 0.5;
 	protected static double PCU_TRUCK = 0.25;//PCUs of the different possible modes
 	protected static double PCU_MED = 1.;
 	protected static double PCU_FAST = 1.;
-	protected static double VMAX_TRUCK = 4.16;//maximum velocities of the vehicle types
+	protected static double VMAX_TRUCK = 4.17;//maximum velocities of the vehicle types
 	protected static double VMAX_MED = 12.;
-	protected static double VMAX_FAST = 13.88;
+	protected static double VMAX_FAST = 16.67;
 	
 	private PrintStream writer;
 	
@@ -247,17 +247,17 @@ public class DreieckStreckeSzenarioTest {
 		dreieck.fillNetworkData();
 		
 		dreieck.openFile(OUTPUT_DIR);
-		
+		/*
 		for (int number_cars = 0; number_cars < 81; number_cars+=10){//8
 			for (int number_bikes = 0; number_bikes < 321 - number_cars; number_bikes+=20){//14
 				dreieck.runParam(number_bikes,number_cars);
 			}
 		}
-		dreieck.closeFile();//*/
-		/*
+		dreieck.closeFile();*/
+		///*
 		long number_of_iterations = NUMBER_OF_AGENTS + 1;//-10 if constantFastDensity... because 10 vehicles are already in the sim
-		for (long i = 0; i < number_of_iterations; i+=10){
-			dreieck.run(i, "onlyTruck");
+		for (long i = 0; i < number_of_iterations; i+=5){
+			dreieck.run(i, "constantModalSplit");
 		}
 		dreieck.closeFile();
 		//*/
@@ -421,8 +421,8 @@ public class DreieckStreckeSzenarioTest {
 	private void makePopulation(long n, String mode){
 		
 		if (mode.equals("constantModalSplit")){//This ModalSplit is dicted by P_TRUCK,P_MED and P_FAST
-			long n_trucks = new Double(n*P_TRUCK).longValue();
-			long n_med = 0;/*long n_med = new Double(n*P_MED).longValue();*/
+			long n_trucks = new Double(n / ((1/PCU_TRUCK)+(1/PCU_FAST)) * (1/PCU_TRUCK)).longValue();
+			long n_med = 0;
 			long n_fast = n - n_trucks - n_med;
 			createWantedPopulation(n_trucks,n_med,n_fast,2);
 		}
@@ -702,8 +702,8 @@ public class DreieckStreckeSzenarioTest {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		writer.format("%s\t%s\t\t%s\t\t%s\t\t%s\t\t\t%s\t\t%s\t%s\t\t%s\t\t%s\t\t%s\n",	
-				     "n_t", "n_f",  "k", "k_t","k_f", "q","q_t","q_f","v","v_t","v_f");
+		writer.format("%s\t\t%s\t\t%s\t\t%s\t\t\t%s\t\t%s\t%s\t\t%s\t\t%s\t\t%s\n",	
+				     "n_agents", "k", "k_t","k_f", "q","q_t","q_f","v","v_t","v_f");
 		
 		//writer.format("%s\t%s\t%s\t%s\n",
 		//			  "n_bikes","n_cars","flow","speed");
