@@ -16,16 +16,16 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.charts.XYLineChart;
 import org.matsim.core.utils.collections.Tuple;
 
-import playground.gregor.multidestpeds.densityestimation.DensityEstimatorFactory;
-import playground.gregor.multidestpeds.densityestimation.NNGaussianKernelEstimator;
-import playground.gregor.sim2d_v3.config.Sim2DConfigGroup;
-import playground.gregor.sim2d_v3.events.DoubleValueStringKeyAtCoordinateEvent;
-import playground.gregor.sim2d_v3.events.DoubleValueStringKeyAtCoordinateEventHandler;
-import playground.gregor.sim2d_v3.events.XYVxVyEvent;
-import playground.gregor.sim2d_v3.events.XYVxVyEventsFileReader;
-import playground.gregor.sim2d_v3.events.XYVxVyEventsHandler;
-import playground.gregor.sim2d_v3.scenario.ScenarioLoader2DImpl;
-import playground.gregor.sim2d_v3.simulation.floor.forces.deliberative.velocityobstacle.Algorithms;
+import playground.wdoering.oldstufffromgregor.Algorithms;
+import playground.wdoering.oldstufffromgregor.DensityEstimatorFactory;
+import playground.wdoering.oldstufffromgregor.DoubleValueStringKeyAtCoordinateEvent;
+import playground.wdoering.oldstufffromgregor.DoubleValueStringKeyAtCoordinateEventHandler;
+import playground.wdoering.oldstufffromgregor.NNGaussianKernelEstimator;
+import playground.wdoering.oldstufffromgregor.ScenarioLoader2DImpl;
+import playground.wdoering.oldstufffromgregor.Sim2DConfigGroup;
+import playground.wdoering.oldstufffromgregor.XYVxVyEvent;
+import playground.wdoering.oldstufffromgregor.XYVxVyEventsFileReader;
+import playground.wdoering.oldstufffromgregor.XYVxVyEventsHandler;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;

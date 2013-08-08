@@ -1,6 +1,7 @@
 package playground.wdoering.debugvisualization.controller;
 
-import playground.gregor.sim2d_v3.events.XYVxVyEventsFileReader;
+import playground.wdoering.oldstufffromgregor.XYVxVyEventsFileReader;
+
 
 
 public class XYVxVyEventThread implements Runnable

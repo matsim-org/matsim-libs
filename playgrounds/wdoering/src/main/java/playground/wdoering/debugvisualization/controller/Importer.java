@@ -41,10 +41,10 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import playground.gregor.sim2d_v3.events.XYVxVyEvent;
-import playground.gregor.sim2d_v3.events.XYVxVyEventsHandler;
 import playground.wdoering.debugvisualization.model.Agent;
 import playground.wdoering.debugvisualization.model.DataPoint;
+import playground.wdoering.oldstufffromgregor.XYVxVyEvent;
+import playground.wdoering.oldstufffromgregor.XYVxVyEventsHandler;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
@@ -71,7 +71,7 @@ public class Importer implements XYVxVyEventsHandler, LinkEnterEventHandler, Run
 	private ShapeFileReader shapeFileReader;
 	private double lastEventsTime = 0;
 	private double lastTime;
-	private double 	step = 0.066745068285285;
+	private final double 	step = 0.066745068285285;
 	
 	private ArrayList<Double> times;
 
@@ -492,16 +492,16 @@ public class Importer implements XYVxVyEventsHandler, LinkEnterEventHandler, Run
 			
 //			if (lastTime != event.getTime())
 			
-			if (times==null)
-				times = new ArrayList<Double>();
+			if (this.times==null)
+				this.times = new ArrayList<Double>();
 			
-			if (times.size() == 0)
-				times.add(event.getTime());
+			if (this.times.size() == 0)
+				this.times.add(event.getTime());
 			else
 			{
-				if ((times.indexOf(event.getTime())) == -1)
+				if ((this.times.indexOf(event.getTime())) == -1)
 				{
-					times.add(event.getTime());
+					this.times.add(event.getTime());
 					Thread.sleep(250); //////////////////////////////////////////////////// SLEEP /////////////////
 				}
 			}
@@ -537,7 +537,7 @@ public class Importer implements XYVxVyEventsHandler, LinkEnterEventHandler, Run
 		
 		
 		long currentTime = System.currentTimeMillis();
-		long diff = (long) ((step*1000) - (currentTime - this.lastTime))*2;
+		long diff = (long) ((this.step*1000) - (currentTime - this.lastTime))*2;
 		if (diff > 0) {
 			try {
 				

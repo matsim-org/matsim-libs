@@ -11,12 +11,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 
-import playground.gregor.sim2d_v3.events.XYVxVyEventsFileReader;
 import playground.wdoering.debugvisualization.gui.GUI;
 import playground.wdoering.debugvisualization.model.Agent;
 import playground.wdoering.debugvisualization.model.DataPoint;
 import playground.wdoering.debugvisualization.model.XYVxVyAgent;
 import playground.wdoering.debugvisualization.model.XYVxVyDataPoint;
+import playground.wdoering.oldstufffromgregor.XYVxVyEventsFileReader;
 
 import com.vividsolutions.jts.geom.Geometry;
 

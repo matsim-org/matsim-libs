@@ -86,7 +86,6 @@ import org.matsim.core.utils.geometry.transformations.GeotoolsTransformation;
 import org.matsim.core.utils.gis.ShapeFileReader;
 import org.opengis.feature.simple.SimpleFeature;
 
-import playground.gregor.sim2d_v3.events.XYVxVyEventsFileReader;
 import playground.wdoering.grips.evacuationanalysis.control.EventHandler;
 import playground.wdoering.grips.evacuationanalysis.control.EventReaderThread;
 import playground.wdoering.grips.evacuationanalysis.control.TiffExporter;
@@ -143,16 +142,16 @@ public class EvacuationAnalysis implements ActionListener{
 	private String itersOutputDir;
 	private boolean firstLoad;
 	private Mode mode = Mode.EVACUATION;
-	private ColorationMode colorationMode = ColorationMode.GREEN_YELLOW_RED;
+	private final ColorationMode colorationMode = ColorationMode.GREEN_YELLOW_RED;
 	private KeyPanel keyPanel;
 	private JLabel gridSizeLabel;
-	private String cellSizeText = " cell size: ";
-	private int k = 5;
-	private boolean useCalculateButton = false;
+	private final String cellSizeText = " cell size: ";
+	private final int k = 5;
+	private final boolean useCalculateButton = false;
 	private GeotoolsTransformation ctInverse;
 	public enum Unit { TIME, PEOPLE };
 	
-	private int exportSize = 1300;
+	private final int exportSize = 1300;
 
 	
 	
@@ -261,9 +260,9 @@ public class EvacuationAnalysis implements ActionListener{
 		this.controlPanel.setPreferredSize(new Dimension(360,220));
 		this.controlPanel.setSize(new Dimension(360,220));
 
-		this.blockPanel.add(graphPanel);
-		this.blockPanel.add(keyPanel);
-		this.blockPanel.add(controlPanel);
+		this.blockPanel.add(this.graphPanel);
+		this.blockPanel.add(this.keyPanel);
+		this.blockPanel.add(this.controlPanel);
 		this.blockPanel.setPreferredSize(new Dimension(360,700));
 		this.blockPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 	
@@ -319,7 +318,7 @@ public class EvacuationAnalysis implements ActionListener{
 			@Override
 			public void mouseReleased(MouseEvent arg0)
 			{
-				if (!useCalculateButton)
+				if (!EvacuationAnalysis.this.useCalculateButton)
 					runCalculation();
 			}
 			@Override
@@ -337,8 +336,8 @@ public class EvacuationAnalysis implements ActionListener{
 //		this.gridSizeSlider.addKeyListener(new TypeNumber());
 		this.gridSizeSlider.setPreferredSize(new Dimension(220,24));
 		
-		gridSizeLabel = new JLabel(cellSizeText + "200m ", SwingConstants.RIGHT);
-		gridSizeSelectionPanel.add(gridSizeLabel);
+		this.gridSizeLabel = new JLabel(this.cellSizeText + "200m ", SwingConstants.RIGHT);
+		gridSizeSelectionPanel.add(this.gridSizeLabel);
 		gridSizeSelectionPanel.add(this.gridSizeSlider);
 		
 		JPanel modeSelectionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
@@ -353,25 +352,25 @@ public class EvacuationAnalysis implements ActionListener{
 		JPanel calculateButtonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT)); 
 		calculateButtonPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 7));
 		calculateButtonPanel.add(new JLabel(""));
-		if (useCalculateButton)
-			calculateButtonPanel.add(calcButton);
+		if (this.useCalculateButton)
+			calculateButtonPanel.add(this.calcButton);
 		
 		calculateButtonPanel.setPreferredSize(new Dimension(220,40));
 		
 		JPanel transparencySliderPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		transparencySliderPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
-		transparencySlider = new JSlider(SwingConstants.HORIZONTAL, 1, 100, 50);
-		transparencySlider.addChangeListener(new ChangeListener() {
+		this.transparencySlider = new JSlider(SwingConstants.HORIZONTAL, 1, 100, 50);
+		this.transparencySlider.addChangeListener(new ChangeListener() {
 			@Override
 			public void stateChanged(ChangeEvent e) {
 				updateTransparency((((JSlider)e.getSource()).getValue())/100f);
 			}
 		});
-		transparencySlider.addMouseListener(new MouseListener() {
+		this.transparencySlider.addMouseListener(new MouseListener() {
 			@Override
 			public void mouseReleased(MouseEvent arg0)
 			{
-				if (!useCalculateButton)
+				if (!EvacuationAnalysis.this.useCalculateButton)
 					runCalculation();
 			}
 			@Override
@@ -383,9 +382,9 @@ public class EvacuationAnalysis implements ActionListener{
 			@Override
 			public void mouseClicked(MouseEvent arg0) {}
 		});
-		transparencySlider.setPreferredSize(new Dimension(220,24));
+		this.transparencySlider.setPreferredSize(new Dimension(220,24));
 		transparencySliderPanel.add(new JLabel(" cell transparency: ", SwingConstants.RIGHT));
-		transparencySliderPanel.add(transparencySlider);
+		transparencySliderPanel.add(this.transparencySlider);
 		
 		this.controlPanel.add(new JLabel(""));
 		this.controlPanel.add(iterationSelectionPanel);
@@ -424,7 +423,7 @@ public class EvacuationAnalysis implements ActionListener{
 	protected void updateCellSize(int value)
 	{
 		this.cellSize = value;
-		this.gridSizeLabel.setText(cellSizeText + value + "m* ");
+		this.gridSizeLabel.setText(this.cellSizeText + value + "m* ");
 		
 	}
 
@@ -448,11 +447,11 @@ public class EvacuationAnalysis implements ActionListener{
 		 */
 		if (e.getActionCommand() == "Save")
 		{
-			if (eventHandler!=null)
+			if (this.eventHandler!=null)
 			{
 				
-				jMapViewer.disableForSaving(true);
-				jMapViewer.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+				this.jMapViewer.disableForSaving(true);
+				this.jMapViewer.setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
 				
 				final JFileChooser fc = new JFileChooser();
 				fc.setCurrentDirectory(new File(System.getProperty("user.home")));
@@ -483,8 +482,8 @@ public class EvacuationAnalysis implements ActionListener{
 					//open file
 					File directory = fc.getSelectedFile();
 				
-					Rect boundingBox = eventHandler.getData().getBoundingBox();
-					double gridSize = eventHandler.getData().getCellSize();
+					Rect boundingBox = this.eventHandler.getData().getBoundingBox();
+					double gridSize = this.eventHandler.getData().getCellSize();
 					
 					Coord minValues = this.ctInverse.transform(new CoordImpl(boundingBox.minX-gridSize/2, boundingBox.minY-gridSize/2));
 					Coord maxValues = this.ctInverse.transform(new CoordImpl(boundingBox.maxX+gridSize/2, boundingBox.maxY+gridSize/2));
@@ -496,11 +495,11 @@ public class EvacuationAnalysis implements ActionListener{
 		
 					Envelope2D env = new Envelope2D(DefaultGeographicCRS.WGS84, westmost, soutmost, eastmost - westmost, northmost - soutmost);
 					
-					BufferedImage imgEvacuation = jMapViewer.getGridAsImage(Mode.EVACUATION, exportSize, exportSize);
-					BufferedImage imgClearing = jMapViewer.getGridAsImage(Mode.CLEARING, exportSize, exportSize);
-					BufferedImage imgUtilization = jMapViewer.getGridAsImage(Mode.UTILIZATION, exportSize, exportSize);
+					BufferedImage imgEvacuation = this.jMapViewer.getGridAsImage(Mode.EVACUATION, this.exportSize, this.exportSize);
+					BufferedImage imgClearing = this.jMapViewer.getGridAsImage(Mode.CLEARING, this.exportSize, this.exportSize);
+					BufferedImage imgUtilization = this.jMapViewer.getGridAsImage(Mode.UTILIZATION, this.exportSize, this.exportSize);
 					
-					String filePrefix = directory.toString()+ "/" + currentEventFile.getName()+ "_2_";
+					String filePrefix = directory.toString()+ "/" + this.currentEventFile.getName()+ "_2_";
 					
 					try{
 						TiffExporter.writeGEOTiff(env, filePrefix+Mode.EVACUATION+".tiff", imgEvacuation);
@@ -511,13 +510,13 @@ public class EvacuationAnalysis implements ActionListener{
 					}
 					finally
 					{
-						jMapViewer.disableForSaving(false);
-						jMapViewer.setCursor(Cursor.getDefaultCursor());
+						this.jMapViewer.disableForSaving(false);
+						this.jMapViewer.setCursor(Cursor.getDefaultCursor());
 					}
 				}
 				
-				jMapViewer.disableForSaving(false);
-				jMapViewer.setCursor(Cursor.getDefaultCursor());
+				this.jMapViewer.disableForSaving(false);
+				this.jMapViewer.setCursor(Cursor.getDefaultCursor());
 				
 				
 				
@@ -574,22 +573,22 @@ public class EvacuationAnalysis implements ActionListener{
 				this.itersOutputDir = this.sc.getConfig().getModule("controler").getValue("outputDirectory");
 				
 				//get all available events 
-				eventFiles = getAvailableEventFiles(this.itersOutputDir);
+				this.eventFiles = getAvailableEventFiles(this.itersOutputDir);
 				
 				//check if empty
-				if (eventFiles.isEmpty())
+				if (this.eventFiles.isEmpty())
 				{
 					JOptionPane.showMessageDialog(this.frame, "Could not find any event files", "Event files unavailable", JOptionPane.ERROR_MESSAGE);
 					return;
 				}
 				
-				currentEventFile = eventFiles.get(0);
+				this.currentEventFile = this.eventFiles.get(0);
 				
-				iterationsList.removeAllItems();
-				for (File eventFile : eventFiles)
+				this.iterationsList.removeAllItems();
+				for (File eventFile : this.eventFiles)
 				{
 					String shortenedFileName = eventFile.getName();
-					iterationsList.addItem(shortenedFileName);
+					this.iterationsList.addItem(shortenedFileName);
 				}
 				
 				//read events
@@ -616,32 +615,32 @@ public class EvacuationAnalysis implements ActionListener{
 		}
 		
 
-		if ((e.getActionCommand() == "changeIteration") && (!firstLoad)) 
+		if ((e.getActionCommand() == "changeIteration") && (!this.firstLoad)) 
 		{
-			System.out.println("(looking for \"" +iterationsList.getSelectedItem()+"\")");
-			File newFile = getEventPathFromName(""+iterationsList.getSelectedItem());
+			System.out.println("(looking for \"" +this.iterationsList.getSelectedItem()+"\")");
+			File newFile = getEventPathFromName(""+this.iterationsList.getSelectedItem());
 			
 			if (newFile!=null)
 			{
-				currentEventFile = newFile;
+				this.currentEventFile = newFile;
 				System.out.println("current event file: " + newFile.getAbsoluteFile());
 			}
 			
-			if (!useCalculateButton)
+			if (!this.useCalculateButton)
 				runCalculation();
 		}
 		
 		if (e.getActionCommand() == "changeMode")
 		{
-			if (modeList.getSelectedItem().toString().contains("evacuation"))
+			if (this.modeList.getSelectedItem().toString().contains("evacuation"))
 			{
 				setMode(Mode.EVACUATION);
 			}
-			else if (modeList.getSelectedItem().toString().contains("utilization"))
+			else if (this.modeList.getSelectedItem().toString().contains("utilization"))
 			{
 				setMode(Mode.UTILIZATION);
 			}
-			else if (modeList.getSelectedItem().toString().contains("clearing"))
+			else if (this.modeList.getSelectedItem().toString().contains("clearing"))
 			{
 				setMode(Mode.CLEARING);
 			}
@@ -654,7 +653,7 @@ public class EvacuationAnalysis implements ActionListener{
 	{
 		try
 		{
-			if (currentEventFile!=null)
+			if (this.currentEventFile!=null)
 			{
 				readEvents();
 				if (this.jMapViewer != null)
@@ -663,7 +662,7 @@ public class EvacuationAnalysis implements ActionListener{
 				}
 				
 				if (this.gridSizeLabel.getText().contains("*"))
-					this.gridSizeLabel.setText(cellSizeText  + (int)this.cellSize + "m ");
+					this.gridSizeLabel.setText(this.cellSizeText  + (int)this.cellSize + "m ");
 			}
 		}
 		finally
@@ -677,21 +676,21 @@ public class EvacuationAnalysis implements ActionListener{
 	{
 		this.mode = mode;
 		
-		if (jMapViewer!=null)
-			jMapViewer.setMode(mode);
+		if (this.jMapViewer!=null)
+			this.jMapViewer.setMode(mode);
 		
-		if (keyPanel!=null)
-			keyPanel.setMode(mode);
+		if (this.keyPanel!=null)
+			this.keyPanel.setMode(mode);
 		
 	}
 	
 	public Mode getMode() {
-		return mode;
+		return this.mode;
 	}
 
 	private File getEventPathFromName(String selectedItem)
 	{
-		for (File eventFile : eventFiles)
+		for (File eventFile : this.eventFiles)
 		{
 //			System.out.println("file " + eventFile.getAbsolutePath() + " - " + eventFile.getName());
 			if (eventFile.getName().equals(selectedItem))
@@ -702,32 +701,32 @@ public class EvacuationAnalysis implements ActionListener{
 
 	private void readEvents() {
 		
-		frame.getGlassPane().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
+		this.frame.getGlassPane().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.WAIT_CURSOR));
 		
 		//run event reader
-		runEventReader(currentEventFile);
+		runEventReader(this.currentEventFile);
 		
 		//initialize map viewer
 		if (this.jMapViewer == null)
 			loadMapView();
 		
 		//get data from eventhandler (if not null)
-		if (eventHandler!=null)
+		if (this.eventHandler!=null)
 		{
-			eventHandler.setColorationMode(this.colorationMode);
-			eventHandler.setTransparency(this.cellTransparency);
-			eventHandler.setK(k);
+			this.eventHandler.setColorationMode(this.colorationMode);
+			this.eventHandler.setTransparency(this.cellTransparency);
+			this.eventHandler.setK(this.k);
 			
 			//get data
-			EventData data = eventHandler.getData();
+			EventData data = this.eventHandler.getData();
 			
 			//update data in both the map viewer and the graphs
-			jMapViewer.updateEventData(data);
-			graphPanel.updateData(data);
-			keyPanel.updateData(data);
+			this.jMapViewer.updateEventData(data);
+			this.graphPanel.updateData(data);
+			this.keyPanel.updateData(data);
 		}
 
-		frame.getGlassPane().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
+		this.frame.getGlassPane().setCursor(java.awt.Cursor.getPredefinedCursor(java.awt.Cursor.DEFAULT_CURSOR));
 		
 		
 	}
@@ -1024,7 +1023,7 @@ public class EvacuationAnalysis implements ActionListener{
 
 	public Polygon getAreaPolygon()
 	{
-		return areaPolygon;
+		return this.areaPolygon;
 	}
 	
 	public void readShapeFile(String shapeFileString)
@@ -1047,7 +1046,7 @@ public class EvacuationAnalysis implements ActionListener{
 			GeometryFactory geofac = new GeometryFactory();
 			
 			LinearRing shell = geofac.createLinearRing(coords);
-			areaPolygon = geofac.createPolygon(shell, null);		
+			this.areaPolygon = geofac.createPolygon(shell, null);		
 			
 	}
 	
