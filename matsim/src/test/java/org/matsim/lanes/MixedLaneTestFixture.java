@@ -57,6 +57,7 @@ public class MixedLaneTestFixture {
 
 	public final ScenarioImpl sc;
 	public final Id id0, id1, id2, id3, id4;
+	public final Id link1FirstLaneId;
 	
 	public MixedLaneTestFixture(){
 		Config config = ConfigUtils.createConfig();
@@ -70,6 +71,7 @@ public class MixedLaneTestFixture {
 		id2 = sc.createId("2");
 		id3 = sc.createId("3");
 		id4 = sc.createId("4");
+		link1FirstLaneId = sc.createId("1.ol");
 
 		Network n = sc.getNetwork();
 		NetworkFactoryImpl nb = (NetworkFactoryImpl) n.getFactory();
@@ -101,7 +103,7 @@ public class MixedLaneTestFixture {
 		Link link1 = nb.createLink(id1, n.getNodes().get(id1), n.getNodes().get(id2));
 		link1.setLength(100.0);
 		link1.setFreespeed(10.0);
-		link1.setCapacity(7200.0); //no capacity restriction
+		link1.setCapacity(7200.0); 
 		link1.setNumberOfLanes(2.0);
 		n.addLink(link1);
 		Link link2 = nb.createLink(id2, n.getNodes().get(id2), n.getNodes().get(id3));
@@ -120,6 +122,7 @@ public class MixedLaneTestFixture {
 		LaneDefinitions lanes = this.sc.getLaneDefinitions11();
 		LaneDefinitionsFactory lb = lanes.getFactory();
 		Lane lane = lb.createLane(id1);
+		lane.setNumberOfRepresentedLanes(2.0);
 		lane.setStartsAtMeterFromLinkEnd(50.0);
 		lane.addToLinkId(id2);
 		lane.addToLinkId(id3);
@@ -163,6 +166,29 @@ public class MixedLaneTestFixture {
 		leg.setRoute(route);
 		plan.addLeg(leg);
 		plan.addActivity(pb.createActivityFromLinkId("h", id3));
+		p.addPlan(plan);
+		pop.addPerson(p);
+	}
+
+	
+	public void create1PersonFromLink1Population(){
+		//create population
+		Population pop = sc.getPopulation();
+		PopulationFactory pb = pop.getFactory();
+		//first person
+		Person p = pb.createPerson(id1);
+		Plan plan = pb.createPlan();
+		Activity act = pb.createActivityFromLinkId("h", id1);
+		act.setEndTime(3600.0);
+		plan.addActivity(act);
+		Leg leg = pb.createLeg(TransportMode.car);
+		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(id1, id2);
+		List<Id> routeList = new ArrayList<Id>();
+//		routeList.add(id1);
+		route.setLinkIds(id1, routeList, id2);
+		leg.setRoute(route);
+		plan.addLeg(leg);
+		plan.addActivity(pb.createActivityFromLinkId("h", id2));
 		p.addPlan(plan);
 		pop.addPerson(p);
 	}

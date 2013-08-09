@@ -23,19 +23,23 @@ import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.api.experimental.events.LaneEnterEvent;
+import org.matsim.core.api.experimental.events.LaneLeaveEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.handler.LaneEnterEventHandler;
+import org.matsim.core.events.handler.LaneLeaveEventHandler;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.lanes.data.v20.LaneData20;
+import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
 
 
-/**
- * 
- * @author dgrether
- *
- */
 public class MixedLaneTest {
 
 	private MixedLaneTestFixture fixture;
@@ -44,14 +48,118 @@ public class MixedLaneTest {
 	public void initFixture(){
 		fixture = new MixedLaneTestFixture();
 	}
+
+	/**
+	 * Ensures that the capacities of the lanes are correctly calculated by the fixture, i.e. the 
+	 * lanes1.1 to lanes2.0 conversion works as expected.
+	 * @author dgrether
+	 */
+	@Test
+	public void testFixture(){
+		LaneDefinitions20 lanes = this.fixture.sc.getScenarioElement(LaneDefinitions20.class);
+		Assert.assertNotNull(lanes);
+		Assert.assertNotNull(lanes.getLanesToLinkAssignments());
+		LanesToLinkAssignment20 lanesLink1 = lanes.getLanesToLinkAssignments().get(fixture.id1);
+		Assert.assertNotNull(lanesLink1);
+		Assert.assertEquals(2, lanesLink1.getLanes().size());
+		LaneData20 lane1ol = lanesLink1.getLanes().get(fixture.link1FirstLaneId);
+		Assert.assertNotNull(lane1ol);
+		Assert.assertEquals(100.0, lane1ol.getStartsAtMeterFromLinkEnd());
+		Assert.assertEquals(7200.0, lane1ol.getCapacityVehiclesPerHour());
+		Assert.assertEquals(2.0 , lane1ol.getNumberOfRepresentedLanes() );
+		Assert.assertEquals(fixture.id1 , lane1ol.getToLaneIds().get(0));
+		Assert.assertNull(lane1ol.getToLinkIds());
+		LaneData20 lane1 = lanesLink1.getLanes().get(fixture.id1);
+		Assert.assertNotNull(lane1);
+		Assert.assertEquals(50.0, lane1.getStartsAtMeterFromLinkEnd());
+		Assert.assertEquals(7200.0, lane1.getCapacityVehiclesPerHour());
+		Assert.assertEquals(2.0 , lane1.getNumberOfRepresentedLanes() );
+		Assert.assertEquals(2 , lane1.getToLinkIds().size());
+		Assert.assertNull(lane1.getToLaneIds());
+	}
+
+	
+	/**
+	 * Tests travel times for a single person that departs on a link that has lanes attached.
+	 * @author dgrether
+	 */
+	@Test
+	public void test1PersonStartingOnLane(){
+		fixture.create1PersonFromLink1Population();
+		
+		EventsManager events = EventsUtils.createEventsManager();
+		MixedLanesEventsHandler handler = new MixedLanesEventsHandler(this.fixture);
+		events.addHandler(handler);
+		QSim qsim = (QSim) new QSimFactory().createMobsim(this.fixture.sc, events);
+		qsim.run();
+		Assert.assertNotNull(handler.agentDepartureEvent);
+		Assert.assertEquals(3600.0, handler.agentDepartureEvent.getTime());
+
+		Assert.assertNull(handler.link1EnterEvent);
+
+		Assert.assertNull(handler.lane1olEnterEvent);
+		Assert.assertEquals(3600.0 + 1.0, handler.lane1olLeaveEvent.getTime());
+		Assert.assertEquals(3600.0 + 1.0, handler.lane1EnterEvent.getTime());
+		Assert.assertEquals(3600.0 + 7.0, handler.lane1LeaveEvent.getTime());
+		
+		Assert.assertNotNull(handler.link2Event);
+		Assert.assertEquals(this.fixture.id1, handler.link2Event.getPersonId());
+		Assert.assertEquals(3600.0 + 7.0, handler.link2Event.getTime());
+
+		Assert.assertNull(handler.link3Event);
+	}
+
+	
+	/**
+	 * Tests travel times for a single person that departs on a link that has lanes attached. 
+	 * In this test the capacities of the lanes are < 1 veh per second. This can reproduce 
+	 * the erroneous behavior reported by Stephan Rath on the users mailinglist at 08.08.2013.
+	 * 
+	 * @author dgrether
+	 */
+	@Test
+	public void test1PersonsStartingOnLaneCapacityRestriction(){
+		fixture.create1PersonFromLink1Population();
+		fixture.sc.getConfig().getQSimConfigGroup().setStartTime(3500.0);
+		fixture.sc.getConfig().getQSimConfigGroup().setEndTime(7200.0);
+		LaneDefinitions20 lanes = fixture.sc.getScenarioElement(LaneDefinitions20.class);
+		LaneData20 lane1 = lanes.getLanesToLinkAssignments().get(fixture.id1).getLanes().get(fixture.id1);
+		lane1.setCapacityVehiclesPerHour(1800.0);
+		LaneData20 lane1ol = lanes.getLanesToLinkAssignments().get(fixture.id1).getLanes().get(fixture.link1FirstLaneId);
+		lane1ol.setCapacityVehiclesPerHour(1800.0);
+		
+		
+		EventsManager events = EventsUtils.createEventsManager();
+		MixedLanesEventsHandler handler = new MixedLanesEventsHandler(this.fixture);
+		events.addHandler(handler);
+		QSim qsim = (QSim) new QSimFactory().createMobsim(this.fixture.sc, events);
+		qsim.run();
+		Assert.assertNotNull(handler.agentDepartureEvent);
+		Assert.assertEquals(3600.0, handler.agentDepartureEvent.getTime());
+
+		Assert.assertNull(handler.link1EnterEvent);
+
+		Assert.assertNull(handler.lane1olEnterEvent);
+		Assert.assertNotNull(handler.lane1olLeaveEvent);
+		Assert.assertEquals(3600.0 + 1.0, handler.lane1olLeaveEvent.getTime());
+		Assert.assertEquals(3600.0 + 1.0, handler.lane1EnterEvent.getTime());
+		Assert.assertEquals(3600.0 + 7.0, handler.lane1LeaveEvent.getTime());
+		
+		Assert.assertNotNull(handler.link2Event);
+		Assert.assertEquals(this.fixture.id1, handler.link2Event.getPersonId());
+		Assert.assertEquals(3600.0 + 7.0, handler.link2Event.getTime());
+
+		Assert.assertNull(handler.link3Event);
+	}
 	
 	
 	/**
 	 * Tests if one lane with 2 toLinks produces the correct traffic, i.e. one
-	 * agents arrives on each of the toLinks
+	 * person arrives on each of the toLinks at a specific time
+	 * @author dgrether
 	 */
 	@Test
-	public void testMixedLanes() {
+	public void testMixedLane2PersonsDriving() {
 		fixture.create2PersonPopulation();
 		EventsManager events = EventsUtils.createEventsManager();
 
@@ -62,34 +170,126 @@ public class MixedLaneTest {
 
 		QSim qsim = (QSim) new QSimFactory().createMobsim(this.fixture.sc, events);
 		qsim.run();
+		
+		Assert.assertNotNull(handler.agentDepartureEvent);
+		Assert.assertEquals(3600.0, handler.agentDepartureEvent.getTime());
 
-		Assert.assertTrue(handler.hasCollectedLink2Event);
-		Assert.assertTrue(handler.hasCollectedLink3Event );
+		Assert.assertNotNull(handler.link1EnterEvent);
+		Assert.assertEquals(3600.0 + 1.0, handler.link1EnterEvent.getTime());
+
+		Assert.assertEquals(3600.0 + 1.0, handler.lane1olEnterEvent.getTime());
+		Assert.assertEquals(3600.0 + 6.0, handler.lane1olLeaveEvent.getTime());
+		Assert.assertEquals(3600.0 + 6.0, handler.lane1EnterEvent.getTime());
+		Assert.assertEquals(3600.0 + 12.0, handler.lane1LeaveEvent.getTime());
+		
+		Assert.assertNotNull(handler.link2Event);
+		Assert.assertEquals(this.fixture.id1, handler.link2Event.getPersonId());
+		Assert.assertEquals(3600.0 + 12.0, handler.link2Event.getTime());
+
+		Assert.assertNotNull(handler.link3Event);
+		Assert.assertEquals(this.fixture.id2, handler.link3Event.getPersonId());
+		Assert.assertEquals(3600.0 + 12.0, handler.link3Event.getTime());
 	}
 
-	private static class MixedLanesEventsHandler implements LinkEnterEventHandler {
+	/**
+	 * Tests if a capacity restriction works as expected with the setup of the previous test. 
+	 * @author dgrether
+	 */
+	@Test
+	public void testMixedLane2AgentsDrivingCapacityRestriction() {
+		fixture.create2PersonPopulation();
+		LaneDefinitions20 lanes = fixture.sc.getScenarioElement(LaneDefinitions20.class);
+		LaneData20 lane1 = lanes.getLanesToLinkAssignments().get(fixture.id1).getLanes().get(fixture.id1);
+		lane1.setCapacityVehiclesPerHour(1800.0);
+		
+		EventsManager events = EventsUtils.createEventsManager();
 
-		boolean hasCollectedLink3Event = false;
-		boolean hasCollectedLink2Event = false;
+		MixedLanesEventsHandler handler = new MixedLanesEventsHandler(this.fixture);
+		events.addHandler(handler);
+
+		QSim qsim = (QSim) new QSimFactory().createMobsim(this.fixture.sc, events);
+		qsim.run();
+		
+		Assert.assertNotNull(handler.agentDepartureEvent);
+		Assert.assertEquals(3600.0, handler.agentDepartureEvent.getTime());
+
+		Assert.assertNotNull(handler.link1EnterEvent);
+		Assert.assertEquals(3600.0 + 1.0, handler.link1EnterEvent.getTime());
+
+		Assert.assertEquals(3600.0 + 1.0, handler.lane1olEnterEvent.getTime());
+		Assert.assertEquals(3600.0 + 6.0, handler.lane1olLeaveEvent.getTime());
+		Assert.assertEquals(3600.0 + 6.0, handler.lane1EnterEvent.getTime());
+		Assert.assertEquals(3600.0 + 14.0, handler.lane1LeaveEvent.getTime());
+		
+		Assert.assertNotNull(handler.link2Event);
+		Assert.assertEquals(this.fixture.id1, handler.link2Event.getPersonId());
+		Assert.assertEquals(3600.0 + 14.0, handler.link2Event.getTime());
+
+		Assert.assertNotNull(handler.link3Event);
+		Assert.assertEquals(this.fixture.id2, handler.link3Event.getPersonId());
+		Assert.assertEquals(3600.0 + 12.0, handler.link3Event.getTime());
+	}
+
+	
+	
+	private static class MixedLanesEventsHandler implements LaneEnterEventHandler, LinkEnterEventHandler, 
+		LaneLeaveEventHandler, AgentDepartureEventHandler {
+
+		LaneEnterEvent lane1olEnterEvent = null;
+		LaneLeaveEvent lane1olLeaveEvent = null;
+		LaneEnterEvent lane1EnterEvent = null;
+		LaneLeaveEvent lane1LeaveEvent = null;
+		LinkEnterEvent link2Event = null;
+		LinkEnterEvent link3Event = null;
+		LinkEnterEvent link1EnterEvent = null;
+		AgentDepartureEvent agentDepartureEvent = null;
 		private MixedLaneTestFixture fixture;
 
 		public MixedLanesEventsHandler(MixedLaneTestFixture fixture) {
 			this.fixture = fixture;
 		}
 
+		public void reset(int iteration) {}
+
+		@Override
+		public void handleEvent(AgentDepartureEvent event) {
+			agentDepartureEvent = event;
+		}
+		
 		public void handleEvent(LinkEnterEvent event) {
+			
 			if (event.getLinkId().equals(this.fixture.id2)){
-				Assert.assertEquals(this.fixture.id1, event.getPersonId());
-				hasCollectedLink2Event = true;
+				link2Event = event;
 			}
 			else if (event.getLinkId().equals(this.fixture.id3)){
-				Assert.assertEquals(this.fixture.id2, event.getPersonId());
-				hasCollectedLink3Event = true;
+				link3Event = event;
+			}
+			else if (event.getLinkId().equals(this.fixture.id1)){
+				link1EnterEvent = event;
 			}
 		}
 
-		public void reset(int iteration) {
+		@Override
+		public void handleEvent(LaneEnterEvent event) {
+			if (this.fixture.id1.equals(event.getLaneId())){
+				lane1EnterEvent = event;
+				System.err.println(event);
+			}
+			else if (this.fixture.link1FirstLaneId.equals((event.getLaneId()))){
+				lane1olEnterEvent = event;
+			}
 		}
+
+		@Override
+		public void handleEvent(LaneLeaveEvent event) {
+			if (this.fixture.id1.equals(event.getLaneId())){
+				lane1LeaveEvent = event;
+			}
+			else if (this.fixture.link1FirstLaneId.equals((event.getLaneId()))){
+				lane1olLeaveEvent = event;
+			}
+		}
+
 
 	}
 	
