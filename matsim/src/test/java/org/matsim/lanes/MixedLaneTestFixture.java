@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MixedLaneTest
+ * MixedLaneTestFixture
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2009 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,14 +17,11 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package org.matsim.signalsystems;
+package org.matsim.lanes;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import junit.framework.TestCase;
-
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
@@ -37,15 +34,9 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -56,43 +47,24 @@ import org.matsim.lanes.data.v11.LaneDefinitions;
 import org.matsim.lanes.data.v11.LaneDefinitionsFactory;
 import org.matsim.lanes.data.v11.LanesToLinkAssignment;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
-import org.matsim.signalsystems.data.SignalsData;
-import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
-import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
-import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
-import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsDataFactory;
 
 
 /**
- * Test if one lane with two toLanes produces the correct traffic, i.e. one
- * agents arrives on each of the toLinks
  * @author dgrether
  *
  */
-public class MixedLaneTest extends TestCase {
+public class MixedLaneTestFixture {
 
-	private static final Logger log = Logger.getLogger(MixedLaneTest.class);
-
-	private ScenarioImpl sc;
-	private Config c;
-  private Id id0, id1, id2, id3, id4;
-
-	@Override
-	protected void setUp() throws Exception {
-		super.setUp();
-		this.initScenario();
-	}
-
-	private void initScenario() {
+	public final ScenarioImpl sc;
+	public final Id id0, id1, id2, id3, id4;
+	
+	public MixedLaneTestFixture(){
 		Config config = ConfigUtils.createConfig();
 		config.scenario().setUseLanes(true);
-		config.scenario().setUseSignalSystems(true);
-		sc = (ScenarioImpl) ScenarioUtils.createScenario(config);
+		config.controler().setMobsim("qsim");
+		config .addQSimConfigGroup(new QSimConfigGroup());
 
-		this.c = this.sc.getConfig();
-		this.c.controler().setMobsim("qsim");
-		this.c.addQSimConfigGroup(new QSimConfigGroup());
-		this.c.addCoreModules();
+		sc = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		id0 = sc.createId("0");
 		id1 = sc.createId("1");
 		id2 = sc.createId("2");
@@ -102,39 +74,43 @@ public class MixedLaneTest extends TestCase {
 		Network n = sc.getNetwork();
 		NetworkFactoryImpl nb = (NetworkFactoryImpl) n.getFactory();
 
-		Coord coord = sc.createCoord(0.0, 0.0);
 		// create network
 		Node node = null;
+		Coord coord = sc.createCoord(0.0, 0.0);
 		node = nb.createNode(id0, coord);
 		n.addNode(node);
+		coord = sc.createCoord(100.0, 0.0);
 		node = nb.createNode(id1, coord);
 		n.addNode(node);
+		coord = sc.createCoord(200.0, 0.0);
 		node = nb.createNode(id2, coord);
 		n.addNode(node);
+		coord = sc.createCoord(200.0, 100.0);
 		node = nb.createNode(id3, coord);
 		n.addNode(node);
+		coord = sc.createCoord(200.0, -100.0);
 		node = nb.createNode(id4, coord);
 		n.addNode(node);
 
-		Link link0 = nb.createLink(id0, id0, id1);
+		Link link0 = nb.createLink(id0, n.getNodes().get(id0) , n.getNodes().get(id1));
 		link0.setLength(100.0);
 		link0.setFreespeed(10.0);
 		link0.setCapacity(7200.0);
 		link0.setNumberOfLanes(2.0);
 		n.addLink(link0);
-		Link link1 = nb.createLink(id1, id1, id2);
+		Link link1 = nb.createLink(id1, n.getNodes().get(id1), n.getNodes().get(id2));
 		link1.setLength(100.0);
 		link1.setFreespeed(10.0);
 		link1.setCapacity(7200.0); //no capacity restriction
 		link1.setNumberOfLanes(2.0);
 		n.addLink(link1);
-		Link link2 = nb.createLink(id2, id2, id3);
+		Link link2 = nb.createLink(id2, n.getNodes().get(id2), n.getNodes().get(id3));
 		link2.setLength(100.0);
 		link2.setFreespeed(10.0);
 		link2.setCapacity(7200.0);
 		link2.setNumberOfLanes(2.0);
 		n.addLink(link2);
-		Link link3 = nb.createLink(id3, id2, id4);
+		Link link3 = nb.createLink(id3, n.getNodes().get(id2), n.getNodes().get(id4));
 		link3.setLength(100.0);
 		link3.setFreespeed(10.0);
 		link3.setCapacity(7200.0);
@@ -153,48 +129,6 @@ public class MixedLaneTest extends TestCase {
 		LaneDefinitionsV11ToV20Conversion conversion = new LaneDefinitionsV11ToV20Conversion();
 		LaneDefinitions20 lanesV2 = conversion.convertTo20(lanes, this.sc.getNetwork());
 		this.sc.addScenarioElement(lanesV2);
-
-		//create signalsystems
-		SignalsData signalsData = this.sc.getScenarioElement(SignalsData.class);
-		SignalSystemsData signals = signalsData.getSignalSystemsData();
-		SignalSystemsDataFactory signalsFactory = signals.getFactory();
-		SignalSystemData system = signalsFactory.createSignalSystemData(id1);
-		signals.addSignalSystemData(system);
-		SignalData signal = signalsFactory.createSignalData(id2);
-		system.addSignalData(signal);
-		signal.addLaneId(id1);
-		signal.addTurningMoveRestriction(id2);
-		signal = signalsFactory.createSignalData(id3);
-		system.addSignalData(signal);
-		signal.addLaneId(id1);
-		signal.addTurningMoveRestriction(id3);
-		
-		//TODO continue here
-		
-//
-//		//create signal system config
-//		SignalSystemConfigurations signalConf = this.sc.getSignalSystemConfigurations();
-//		SignalSystemConfigurationsFactory signalConfb = signalConf.getFactory();
-//		SignalSystemConfiguration systemConf = signalConfb.createSignalSystemConfiguration(id1);
-//		PlanBasedSignalSystemControlInfo signalPlanControl = signalConfb.createPlanBasedSignalSystemControlInfo();
-//		SignalSystemPlan signalPlan = signalConfb.createSignalSystemPlan(id1);
-//		signalPlan.setCycleTime(60);
-//		SignalGroupSettings group2Settings = signalConfb.createSignalGroupSettings(id2);
-//		group2Settings.setRoughCast(0);
-//		group2Settings.setDropping(0);
-//		group2Settings.setInterGreenTimeDropping(0);
-//		group2Settings.setInterGreenTimeRoughcast(0);
-//		SignalGroupSettings group3Settings = signalConfb.createSignalGroupSettings(id3);
-//		group3Settings.setRoughCast(0);
-//		group3Settings.setDropping(1);
-//		group3Settings.setInterGreenTimeDropping(0);
-//		group3Settings.setInterGreenTimeRoughcast(0);
-//		//plug it together
-//		signalPlan.addLightSignalGroupConfiguration(group2Settings);
-//		signalPlan.addLightSignalGroupConfiguration(group3Settings);
-//		signalPlanControl.addPlan(signalPlan);
-//		systemConf.setSignalSystemControlInfo(signalPlanControl);
-//		signalConf.addSignalSystemConfiguration(systemConf);
 
 
 		//create population
@@ -231,58 +165,7 @@ public class MixedLaneTest extends TestCase {
 		p.addPlan(plan);
 		pop.addPerson(p);
 	}
-
-
-	public void testMixedLanes() {
-
-		EventsManager events = EventsUtils.createEventsManager();
-
-//		events.addHandler(new LogOutputEventHandler());
-
-		MixedLanesEventsHandler handler = new MixedLanesEventsHandler();
-		events.addHandler(handler);
-
-		QSim qsim = (QSim) new QSimFactory().createMobsim(this.sc, events);
-		qsim.run();
-
-		assertTrue(handler.hasCollectedLink2Event);
-		assertTrue(handler.hasCollectedLink3Event );
-	}
-
-	public void testMixedLanesAndSignals() {
-
-		EventsManager events = EventsUtils.createEventsManager();
-//		((EventsImpl)events).addHandler(new LogOutputEventHandler());
-
-		MixedLanesEventsHandler handler = new MixedLanesEventsHandler();
-		events.addHandler(handler);
-
-		QSim qsim = (QSim) new QSimFactory().createMobsim(this.sc, events);
-		qsim.run();
-
-		assertTrue(handler.hasCollectedLink2Event);
-		assertTrue(handler.hasCollectedLink3Event );
-	}
-
-	private class MixedLanesEventsHandler implements LinkEnterEventHandler {
-
-		boolean hasCollectedLink3Event = false;
-		boolean hasCollectedLink2Event = false;
-
-		public void handleEvent(LinkEnterEvent event) {
-			if (event.getLinkId().equals(id2)){
-				assertEquals(id1, event.getPersonId());
-				hasCollectedLink2Event = true;
-			}
-			else if (event.getLinkId().equals(id3)){
-				assertEquals(id2, event.getPersonId());
-				hasCollectedLink3Event = true;
-			}
-		}
-
-		public void reset(int iteration) {
-		}
-
-	}
-
+	
+	
+	
 }
