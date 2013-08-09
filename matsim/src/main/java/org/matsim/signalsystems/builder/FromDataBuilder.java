@@ -102,9 +102,11 @@ public class FromDataBuilder implements SignalSystemsModelBuilder{
 		SignalController controller = this.factory.createSignalSystemController(systemControlData.getControllerIdentifier());
 		controller.setSignalSystem(system);
 		system.setSignalSystemController(controller);
-		for (SignalPlanData planData : systemControlData.getSignalPlanData().values()){
-			SignalPlan plan = this.factory.createSignalPlan(planData);
-			controller.addPlan(plan);
+		if (systemControlData.getSignalPlanData() != null) { 
+			for (SignalPlanData planData : systemControlData.getSignalPlanData().values()){
+				SignalPlan plan = this.factory.createSignalPlan(planData);
+				controller.addPlan(plan);
+			}
 		}
 	}
 	
