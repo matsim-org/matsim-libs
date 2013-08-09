@@ -230,9 +230,9 @@ public class DreieckStreckeSzenario3modes {
 		Config config = ConfigUtils.createConfig();
 		config.addQSimConfigGroup(new QSimConfigGroup());
 		config.getQSimConfigGroup().setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE) ;
-		config.getQSimConfigGroup().setMainModes(Arrays.asList("fast"/*,"med"*/,"truck"));
+		config.getQSimConfigGroup().setMainModes(Arrays.asList("fast","med","truck"));
 		config.getQSimConfigGroup().setStuckTime(100*3600.);//allows to overcome maximal density regime
-		config.getQSimConfigGroup().setEndTime(16*3600);//allows to set agents to abort after getting the wanted data.
+		config.getQSimConfigGroup().setEndTime(14*3600);//allows to set agents to abort after getting the wanted data.
 									//TODO: is for actual network configurations correct, needs dependency on bigger network length 
 		
 		config.vspExperimental().addParam("vspDefaultsCheckingLevel", VspExperimentalConfigGroup.ABORT) ;
@@ -538,7 +538,7 @@ public class DreieckStreckeSzenario3modes {
 			
 			} else if (i<(numberOfTrucks+numberOfMed)) {
 				transportMode = "med";
-				System.out.println("A med was made with Id : "+(i+1)+".");
+				//System.out.println("A med was made with Id : "+(i+1)+".");
 			
 			} else {
 				transportMode = "fast";
@@ -563,7 +563,7 @@ public class DreieckStreckeSzenario3modes {
 			
 			person.addPlan(plan);
 			population.addPerson(person);
-			System.out.println("Just added person : "+(i+1)+" to the scenario population.");
+			//System.out.println("Just added person : "+(i+1)+" to the scenario population.");
 		}
 	}
 	

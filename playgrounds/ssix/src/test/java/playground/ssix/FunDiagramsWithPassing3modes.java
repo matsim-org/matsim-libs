@@ -174,7 +174,6 @@ public class FunDiagramsWithPassing3modes implements LinkEnterEventHandler{
 				handleEvent_truck(event);
 				pcu_person = DreieckStreckeSzenario3modes.PCU_TRUCK;
 			} else if (transportMode.equals("med")) {
-				System.out.println("Detecting med event");
 				handleEvent_med(event);
 				pcu_person = DreieckStreckeSzenario3modes.PCU_MED;
 			} else if (transportMode.equals("fast")) {
@@ -234,7 +233,7 @@ public class FunDiagramsWithPassing3modes implements LinkEnterEventHandler{
 						
 						//int numberOfDrivingAgents = this.tourNumberSpeed.get(this.permanentRegimeTour).getFirst();
 						
-						this.permanentDensity = this.permanentDensity_truck+this.permanentDensity_fast;//PCU/km
+						this.permanentDensity = this.permanentDensity_truck+this.permanentDensity_med+this.permanentDensity_fast;//PCU/km
 					
 						this.permanentAverageVelocity = this.tourNumberSpeed.get(this.permanentRegimeTour).getSecond();//m/s
 	
@@ -326,7 +325,7 @@ public class FunDiagramsWithPassing3modes implements LinkEnterEventHandler{
 						double theOneBefore_truck = this.tourNumberSpeed_truck.get(tourNumber-2).getSecond();
 						if ((almostRelativeEqualDoubles(speed, previousLapSpeed_truck, 0.02)) && (almostRelativeEqualDoubles(previousLapSpeed_truck, theOneBefore_truck, 0.02))){
 							this.permanentRegime_truck=true;
-							log.info("Truck permanent regime attained at tour "+tourNumber+".");
+							log.info("Truck permanent regime attained.");
 							/*
 							if ((permanentRegime_med) && (permanentRegime_fast)){
 								if (tourNumber>this.permanentRegimeTour){
@@ -423,7 +422,7 @@ public class FunDiagramsWithPassing3modes implements LinkEnterEventHandler{
 				if (!(this.tourNumberSpeed_truck.containsKey(tourNumber))){
 					this.tourNumberSpeed_truck.put(tourNumber,new Tuple<Integer,Double>(0,0.));
 					this.flowTime_truck = new Double(nowTime);
-					System.out.println("Initialization of tourNumberSpeed_truck. Should not be empty from now on.");
+					//System.out.println("Initialization of tourNumberSpeed_truck. Should not be empty from now on.");
 				}
 			}
 			
@@ -456,7 +455,6 @@ public class FunDiagramsWithPassing3modes implements LinkEnterEventHandler{
 	
 	
 	private void handleEvent_med(LinkEnterEvent event){
-		System.out.println("handling a med event");
 		Id personId = event.getPersonId();
 		int tourNumber;
 		double nowTime = event.getTime();
@@ -597,7 +595,7 @@ public class FunDiagramsWithPassing3modes implements LinkEnterEventHandler{
 					this.tourNumberSpeed_med.put(tourNumber,new Tuple<Integer,Double>(0,0.));
 			} else {
 				//First tour handling
-				System.out.println("Med first tour handling.");
+				//System.out.println("Med first tour handling.");
 				tourNumber = 1;
 				this.personTour.put(personId, tourNumber);
 				this.lastSeenOnStudiedLinkEnter.put(personId, nowTime);
@@ -608,7 +606,7 @@ public class FunDiagramsWithPassing3modes implements LinkEnterEventHandler{
 				if (!(this.tourNumberSpeed_med.containsKey(tourNumber))){
 					this.tourNumberSpeed_med.put(tourNumber,new Tuple<Integer,Double>(0,0.));
 					this.flowTime_med = new Double(nowTime);
-					System.out.println("Initialization of tourNumberSpeed_med. Should not be empty from now on.");
+					//System.out.println("Initialization of tourNumberSpeed_med. Should not be empty from now on.");
 				}
 			}
 			
@@ -790,7 +788,7 @@ public class FunDiagramsWithPassing3modes implements LinkEnterEventHandler{
 				if (!(this.tourNumberSpeed_fast.containsKey(tourNumber))){
 					this.tourNumberSpeed_fast.put(tourNumber,new Tuple<Integer,Double>(0,0.));
 					this.flowTime_fast = new Double(nowTime);
-					System.out.println("Initialization of tourNumberSpeed_fast. Should not be empty from now on.");
+					//System.out.println("Initialization of tourNumberSpeed_fast. Should not be empty from now on.");
 				}
 			}
 			
