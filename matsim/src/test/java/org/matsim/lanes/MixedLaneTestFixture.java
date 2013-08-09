@@ -129,8 +129,9 @@ public class MixedLaneTestFixture {
 		LaneDefinitionsV11ToV20Conversion conversion = new LaneDefinitionsV11ToV20Conversion();
 		LaneDefinitions20 lanesV2 = conversion.convertTo20(lanes, this.sc.getNetwork());
 		this.sc.addScenarioElement(lanesV2);
-
-
+	}
+	
+	public void create2PersonPopulation(){
 		//create population
 		Population pop = sc.getPopulation();
 		PopulationFactory pb = pop.getFactory();
@@ -141,10 +142,10 @@ public class MixedLaneTestFixture {
 		act.setEndTime(3600.0);
 		plan.addActivity(act);
 		Leg leg = pb.createLeg(TransportMode.car);
-		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(link0.getId(), link2.getId());
+		LinkNetworkRouteImpl route = new LinkNetworkRouteImpl(id0, id2);
 		List<Id> routeList = new ArrayList<Id>();
-		routeList.add(link1.getId());
-		route.setLinkIds(link0.getId(), routeList, link2.getId());
+		routeList.add(id1);
+		route.setLinkIds(id0, routeList, id2);
 		leg.setRoute(route);
 		plan.addLeg(leg);
 		plan.addActivity(pb.createActivityFromLinkId("h", id2));
@@ -157,8 +158,8 @@ public class MixedLaneTestFixture {
 		act.setEndTime(3600.0);
 		plan.addActivity(act);
 		leg = pb.createLeg(TransportMode.car);
-		route = new LinkNetworkRouteImpl(link0.getId(), link3.getId());
-		route.setLinkIds(link0.getId(), routeList, link3.getId());
+		route = new LinkNetworkRouteImpl(id0, id3);
+		route.setLinkIds(id3, routeList, id3);
 		leg.setRoute(route);
 		plan.addLeg(leg);
 		plan.addActivity(pb.createActivityFromLinkId("h", id3));

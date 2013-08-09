@@ -22,11 +22,11 @@ package org.matsim.signalsystems;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.lanes.MixedLaneTestFixture;
-import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsDataFactory;
+import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsDataImpl;
 
 
 /**
@@ -37,9 +37,10 @@ public class SignalsMixedLaneTestFixture {
 
 	public final ScenarioImpl sc;
 	public final Id id1, id2, id3;
+	private MixedLaneTestFixture delegate;
 
 	public SignalsMixedLaneTestFixture(){
-		MixedLaneTestFixture delegate = new MixedLaneTestFixture();
+		delegate = new MixedLaneTestFixture();
 		this.sc = delegate.sc;
 		id1 = delegate.id1;
 		id2 = delegate.id2;
@@ -47,8 +48,8 @@ public class SignalsMixedLaneTestFixture {
 		this.sc.getConfig().scenario().setUseSignalSystems(true);
 	
 		//create signalsystems
-		SignalsData signalsData = this.sc.getScenarioElement(SignalsData.class);
-		SignalSystemsData signals = signalsData.getSignalSystemsData();
+		SignalSystemsData signals = new SignalSystemsDataImpl();
+		this.sc.addScenarioElement(signals);
 		SignalSystemsDataFactory signalsFactory = signals.getFactory();
 		SignalSystemData system = signalsFactory.createSignalSystemData(delegate.id1);
 		signals.addSignalSystemData(system);
@@ -88,6 +89,10 @@ public class SignalsMixedLaneTestFixture {
 //		systemConf.setSignalSystemControlInfo(signalPlanControl);
 //		signalConf.addSignalSystemConfiguration(systemConf);
 		
+	}
+
+	public void create2PersonPopulation() {
+		this.delegate.create2PersonPopulation();
 	}
 	
 }

@@ -33,8 +33,7 @@ import org.matsim.core.mobsim.qsim.QSimFactory;
 
 
 /**
- * Test if one lane with two toLanes produces the correct traffic, i.e. one
- * agents arrives on each of the toLinks
+ * 
  * @author dgrether
  *
  */
@@ -53,7 +52,7 @@ public class SignalsMixedLaneTest {
 
 	@Test
 	public void testMixedLanesAndSignals() {
-
+		fixture.create2PersonPopulation();
 		EventsManager events = EventsUtils.createEventsManager();
 //		((EventsImpl)events).addHandler(new LogOutputEventHandler());
 
