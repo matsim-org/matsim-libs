@@ -37,8 +37,6 @@ public class NetworkFactoryImpl implements NetworkFactory {
 
 	private LinkFactory linkFactory = null;
 	
-//	private final Map<String, RouteFactory> routeFactories = new HashMap<String, RouteFactory>();
-//	private RouteFactory defaultFactory = new GenericRouteFactory();
 
 	private NetworkChangeEventFactory networkChangeEventFactory = new NetworkChangeEventFactoryImpl();
 
@@ -47,9 +45,6 @@ public class NetworkFactoryImpl implements NetworkFactory {
 	public NetworkFactoryImpl(final Network network) {
 		this.network = network;
 		this.linkFactory = new LinkFactoryImpl();
-//		this.routeFactories.put(TransportMode.car, new LinkNetworkRouteFactory());
-//		this.routeFactories.put(TransportMode.ride, new LinkNetworkRouteFactory());
-//		this.routeFactories.put(TransportMode.pt, new GenericRouteFactory());
 	}
 
 	@Override
@@ -59,9 +54,6 @@ public class NetworkFactoryImpl implements NetworkFactory {
 		return node ;
 	}
 
-	/*
-	 * TODO how to set other attributes of link consistently without invalidating time variant attributes
-	 */
 	@Override
 	public Link createLink(Id id, Node fromNode, Node toNode) {
 		return this.linkFactory.createLink(id, fromNode, toNode, this.network, 1.0, 1.0, 1.0, 1.0);
@@ -87,21 +79,6 @@ public class NetworkFactoryImpl implements NetworkFactory {
 		return this.linkFactory.createLink(id, from, to, network, length, freespeedTT, capacity, lanes);
 	}
 
-//	/**
-//	 * @param transportMode the transport mode the route should be for
-//	 * @param startLink the link where the route starts
-//	 * @param endLink the link where the route ends
-//	 * @return a new Route for the specified mode
-//	 *
-//	 * @see #setRouteFactory(String, RouteFactory)
-//	 */
-//	public Route createRoute(final String transportMode, final Id startLinkId, final Id endLinkId) {
-//		RouteFactory factory = this.routeFactories.get(transportMode);
-//		if (factory == null) {
-//			factory = this.defaultFactory;
-//		}
-//		return factory.createRoute(startLinkId, endLinkId);
-//	}
 
 	/**
 	 * @param time the time when the NetworkChangeEvent occurs
@@ -113,26 +90,6 @@ public class NetworkFactoryImpl implements NetworkFactory {
 		return this.networkChangeEventFactory.createNetworkChangeEvent(time);
 	}
 	
-//	/**
-//	 * Registers a {@link RouteFactory} for the specified mode. If <code>factory</code> is <code>null</code>,
-//	 * the existing entry for this <code>mode</code> will be deleted. If <code>mode</code> is <code>null</code>,
-//	 * then the default factory is set that is used if no specific RouteFactory for a mode is set.
-//	 *
-//	 * @param transportMode
-//	 * @param factory
-//	 */
-//	public void setRouteFactory(final String transportMode, final RouteFactory factory) {
-//		if (transportMode == null) {
-//			this.defaultFactory = factory;
-//		} else {
-//			if (factory == null) {
-//				this.routeFactories.remove(transportMode);
-//			} else {
-//				this.routeFactories.put(transportMode, factory);
-//			}
-//		}
-//	}
-
 	public void setLinkFactory(final LinkFactory factory) {
 		this.linkFactory = factory;
 	}
