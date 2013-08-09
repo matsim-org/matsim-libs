@@ -204,8 +204,8 @@ public class DreieckStreckeSzenario3modes {
 	public static int subdivisionFactor=3;//all sides of the triangle will be divided into subdivisionFactor links
 	public static double length = 433.33;//in m, length of one the triangle sides.
 	public static int NETWORK_CAPACITY = 2700;//in PCU/h
-	private static long NUMBER_OF_AGENTS = 500;
-	private static String OUTPUT_DIR = "Z:\\WinHome\\Desktop\\workspace2\\playgrounds\\ssix\\output\\data_Patna_3modes.txt";
+	private static long NUMBER_OF_AGENTS = 603;
+	private static String OUTPUT_DIR = "Z:\\WinHome\\Desktop\\workspace2\\playgrounds\\ssix\\output\\data_Patna_3modes_extension.txt";
 	
 	private static double FREESPEED = 60.;//in km/h, maximum authorized velocity on the track
 	private static double P_TRUCK = 1/3.;//no need to worry much about those, are normalized when choosing effective transport mode
@@ -258,7 +258,7 @@ public class DreieckStreckeSzenario3modes {
 		dreieck.closeFile();*/
 		///*
 		long number_of_iterations = NUMBER_OF_AGENTS + 1;//-10 if constantFastDensity... because 10 vehicles are already in the sim
-		for (long i = 0; i < number_of_iterations; i+=9){
+		for (long i = 504; i < number_of_iterations; i+=9){
 			dreieck.run(i, "constantModalSplit");
 		}
 		dreieck.closeFile();
