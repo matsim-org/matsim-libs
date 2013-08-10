@@ -327,7 +327,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 
 		if ( this.currentPlanElementIndex == this.getPlanElements().size()-1 ) {
 			if ( finalActHasDpTimeWrnCnt < 1 && departure!=Double.POSITIVE_INFINITY ) {
-				log.error( "last activity has end time < infty; setting it to infty") ;
+				log.error( "last activity of person driver agent id " + this.person.getId() + " has end time < infty; setting it to infty") ;
 				log.error( Gbl.ONLYONCE ) ;
 				finalActHasDpTimeWrnCnt++ ;
 			}
