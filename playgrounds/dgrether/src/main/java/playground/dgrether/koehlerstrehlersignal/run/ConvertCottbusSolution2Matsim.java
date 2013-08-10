@@ -107,6 +107,14 @@ public class ConvertCottbusSolution2Matsim {
 				DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-07-31_minflow_50_morning_peak/",
 				"ksm_50m_sol.txt"
 				));
+		input.add(new Tuple<String, String>(
+				DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-07-31_minflow_10_evening_peak/",
+				"ksm_10a_sol.txt"
+				));
+		input.add(new Tuple<String, String>(
+				DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-07-31_minflow_10_morning_peak/",
+				"ksm_10m_sol.txt"
+		));
 
 		
 		for (Tuple<String, String> i : input){
