@@ -39,7 +39,8 @@ public class CottbusLiveVis {
 //	private String config = inputDir + "cottbusConfig.xml";
 	private static final String oldCottbusConfig = inputDir + "originaldaten/config_dg_livevis.xml";
 	
-	public static final  String newCottbusConfig = inputDir + "cottbus_feb_fix/config_live_vis.xml";
+//	public static final  String newCottbusConfig = inputDir + "cottbus_feb_fix/config_live_vis.xml";
+	public static final String newCottbusConfig = "/media/data/work/repos/shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/config_live_vis_ks_optimization.xml";
 //	public static final  String newCottbusConfig = inputDir + "cottbus_feb_fix/config.xml";
 
 	private void run() {

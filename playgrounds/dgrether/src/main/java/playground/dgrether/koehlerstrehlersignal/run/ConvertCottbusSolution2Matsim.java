@@ -87,9 +87,9 @@ public class ConvertCottbusSolution2Matsim {
 	private void writeSignalControl(String directoryPath, String inputFilename, SignalsData signalsData) {
 		SignalsScenarioWriter writer = new SignalsScenarioWriter();
 		String basefilename = inputFilename.substring(0, inputFilename.lastIndexOf("."));
-		writer.setSignalSystemsOutputFilename(directoryPath + "signal_systems_optimized_" + basefilename + ".xml");
-		writer.setSignalGroupsOutputFilename(directoryPath + "signal_groups_optimized_" + basefilename + ".xml");
-		writer.setSignalControlOutputFilename(directoryPath + "signal_control_optimized_" + basefilename + ".xml");
+		writer.setSignalSystemsOutputFilename(directoryPath + "optimized_signal_systems_" + basefilename + ".xml");
+		writer.setSignalGroupsOutputFilename(directoryPath + "optimized_signal_groups_" + basefilename + ".xml");
+		writer.setSignalControlOutputFilename(directoryPath + "optimized_signal_control_" + basefilename + ".xml");
 		writer.writeSignalsData(signalsData);
 	}
 	
@@ -103,6 +103,11 @@ public class ConvertCottbusSolution2Matsim {
 						DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-07-31_minflow_50_evening_peak/",
 						"ksm_50a_sol.txt"
 						));
+		input.add(new Tuple<String, String>(
+				DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-07-31_minflow_50_morning_peak/",
+				"ksm_50m_sol.txt"
+				));
+
 		
 		for (Tuple<String, String> i : input){
 			new ConvertCottbusSolution2Matsim().convert(i.getFirst(), i.getSecond());
