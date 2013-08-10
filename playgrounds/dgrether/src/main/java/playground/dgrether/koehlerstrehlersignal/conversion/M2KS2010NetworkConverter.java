@@ -67,7 +67,7 @@ public class M2KS2010NetworkConverter {
 	private static final Logger log = Logger.getLogger(M2KS2010NetworkConverter.class);
 	
 	private Integer cycle = null;
-	private Id defaultProgramId = new IdImpl("4711");
+	public static final Id DEFAULT_PROGRAM_ID = new IdImpl("4711");
 
 	private DgKSNetwork dgNetwork;
 	private double timeInterval;
@@ -152,7 +152,7 @@ public class M2KS2010NetworkConverter {
 		for (Node node : net.getNodes().values()){
 			DgCrossing crossing = new DgCrossing(this.idConverter.convertNodeId2CrossingId(node.getId()));
 			ksNet.addCrossing(crossing);
-			DgProgram program = new DgProgram(this.defaultProgramId);
+			DgProgram program = new DgProgram(this.DEFAULT_PROGRAM_ID);
 			program.setCycle(this.cycle);
 			crossing.addProgram(program);
 		}
@@ -274,8 +274,8 @@ public class M2KS2010NetworkConverter {
 	private void createCrossing4SignalizedLink(DgCrossing crossing, Link link, DgCrossingNode inLinkToNode, Id backLinkId, 
 			LanesToLinkAssignment20 l2l, SignalSystemData system, SignalsData signalsData) {
 		//remove default program
-		if ( crossing.getPrograms().containsKey(this.defaultProgramId)) {
-			crossing.getPrograms().remove(this.defaultProgramId);
+		if ( crossing.getPrograms().containsKey(this.DEFAULT_PROGRAM_ID)) {
+			crossing.getPrograms().remove(this.DEFAULT_PROGRAM_ID);
 		}
 		//create program if not existing...
 		DgProgram program = null;
@@ -353,8 +353,8 @@ public class M2KS2010NetworkConverter {
 	private void createCrossing4NotSignalizedLink(DgCrossing crossing, Link link,
 			DgCrossingNode inLinkToNode, Id backLinkId, LanesToLinkAssignment20 l2l) {
 		DgProgram program = null;
-		if (crossing.getPrograms().containsKey(this.defaultProgramId)){
-			program = crossing.getPrograms().get(this.defaultProgramId);
+		if (crossing.getPrograms().containsKey(this.DEFAULT_PROGRAM_ID)){
+			program = crossing.getPrograms().get(this.DEFAULT_PROGRAM_ID);
 		}
 		else {
 			log.error("Link: " + link.getId() + " fromNode: " + link.getFromNode().getId() + " toNode: " + link.getToNode().getId());

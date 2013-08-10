@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * TestMain
+ * TestTestMain
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,31 +19,25 @@
  * *********************************************************************** */
 package playground.dgrether;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
-
+import org.matsim.lanes.MixedLaneTestFixture;
 
 
 /**
  * @author dgrether
  *
  */
-public class TestMain {
+public class TestTestMain {
 
-	public static void testVarArgs(String...strings) {
-		for (String s : strings)
-			System.out.println(s);
-	}
-	
-	public static void testVarArgsMain(String[] args) {
-		testVarArgs("hallo", "ihr", "penner");
-		testVarArgs("hallo");
-	}
-
-	public static void main(String[] args){
-		String config = "/media/data/work/matsim/examples/stephan_rath/testcase3/config.xml";
-//		Controler c = new Controler(config);
-//		c.run();
-		OTFVis.playConfig(config);
+	public static void main(String[] args) {
+		MixedLaneTestFixture fixture = new MixedLaneTestFixture();
+		fixture.create2PersonPopulation();
+		Scenario scenario = fixture.sc;
+		scenario.getConfig().otfVis().setScaleQuadTreeRect(true);
+		scenario.getConfig().getQSimConfigGroup().setNodeOffset(10.0);
+		scenario.getConfig().getQSimConfigGroup().setSnapshotStyle("queue");
+		OTFVis.playScenario(scenario);
 	}
 
 }

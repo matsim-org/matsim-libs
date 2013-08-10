@@ -26,15 +26,16 @@ import org.matsim.api.core.v01.Id;
 
 
 /**
+ * Data structure for the solution of a KS2010 traffic signal optimization
+ * 
  * @author dgrether
- *
  */
-public class DgSolutionCrossing {
+public class KS2010CrossingSolution {
 
 	private Id id = null;
 	private Map<Id, Integer> programIdOffsetMap = new HashMap<Id, Integer>();
 	
-	public DgSolutionCrossing(Id crossingId) {
+	public KS2010CrossingSolution(Id crossingId) {
 		this.id = crossingId;
 	}
 
@@ -46,8 +47,12 @@ public class DgSolutionCrossing {
 		return this.programIdOffsetMap;
 	}
 
-	public Id getId() {
+	public Id getCrossingId() {
 		return this.id;
+	}
+	
+	public void setCrossingId(Id id){
+		this.id = id;
 	}
 
 }

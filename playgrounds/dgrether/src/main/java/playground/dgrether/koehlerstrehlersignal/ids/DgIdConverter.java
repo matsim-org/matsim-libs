@@ -19,16 +19,24 @@
  * *********************************************************************** */
 package playground.dgrether.koehlerstrehlersignal.ids;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 
 
 /**
+ * The KS2010 model uses different and more ids than MATSim. 
+ * This class implements the symbolic conversion functions (String -> String). 
+ * Intern, a IdPool is used that holds a mapping from each String id to an integer. 
+ * The IdPool is required to prevent integer overflows on the cplex side. 
+ * 
  * @author dgrether
  *
  */
 public class DgIdConverter {
 
+	private static final Logger log = Logger.getLogger(DgIdConverter.class);
+	
 	private DgIdPool idPool;
 	
 	public DgIdConverter(DgIdPool idpool){
@@ -63,6 +71,15 @@ public class DgIdConverter {
 		return idPool.createId(idString);
 	}
 	
+	public Id convertCrossingId2NodeId(Id crossingId){
+		String sid = crossingId.toString();
+		if (sid.endsWith("77")){
+			Id  id = new IdImpl(sid.substring(0, sid.length() - 2));
+			return id;
+		}
+		throw new IllegalStateException("Can not convert " + sid + " to node id");
+	}
+	
 	public  Id convertLinkId2StreetId(Id linkId){
 		String idString = linkId.toString() + "88";
 		return idPool.createId(idString);
@@ -81,6 +98,12 @@ public class DgIdConverter {
 	public Id createFrom2ToId(Id from, Id to){
 		String idString = from + "44" + to;
 		return idPool.createId(idString);
+	}
+
+	public Id getSymbolicId(Integer crossingId) {
+		String idString = idPool.getStringId(crossingId);
+		log.debug("Matched " + Integer.toString(crossingId) + " -> " + idString);
+		return new IdImpl(idString);
 	}
 
 	

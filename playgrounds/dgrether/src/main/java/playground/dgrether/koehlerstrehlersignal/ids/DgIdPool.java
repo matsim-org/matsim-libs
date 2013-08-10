@@ -19,6 +19,7 @@
  * *********************************************************************** */
 package playground.dgrether.koehlerstrehlersignal.ids;
 
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.HashMap;
@@ -61,6 +62,12 @@ public class DgIdPool {
 		return i;
 	}
 	
+	public String getStringId(Integer intId) {
+		return this.intStringMap.get(intId);
+	}
+
+	
+	
 	public void writeToFile(String filename) {
 		BufferedWriter bw = IOUtils.getBufferedWriter(filename);
 		try {
@@ -74,8 +81,31 @@ public class DgIdPool {
 			}
 			bw.close();
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw new RuntimeException(e);
 		};
 	}
+	
+	public static DgIdPool readFromFile(String filename){
+		DgIdPool pool = new DgIdPool();
+		BufferedReader br = null;
+		try {
+			br = IOUtils.getBufferedReader(filename);
+			String line = br.readLine();
+			line = br.readLine();
+			while (line != null) {
+				String[] s = line.split("\t");
+				String idString = s[0].trim();
+				Integer idInt = Integer.valueOf(s[1].trim());
+				pool.ids.put(idString, idInt);
+				pool.intStringMap.put(idInt, idString);
+				line = br.readLine();
+			}
+			br.close();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+		return pool;
+	}
+
 	
 }

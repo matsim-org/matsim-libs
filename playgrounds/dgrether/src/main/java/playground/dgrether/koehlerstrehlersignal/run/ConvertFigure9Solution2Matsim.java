@@ -1,10 +1,10 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgKoehlerStrehler2010Solution2MatsimConverter
+ * ConvertFigure9Solution2Matsim
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2010 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,52 +17,43 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.koehlerstrehlersignal.solutionconverter;
+package playground.dgrether.koehlerstrehlersignal.run;
 
 import java.io.IOException;
-import java.util.Map;
+import java.util.List;
 
-import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.SignalsScenarioLoader;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalControlWriter20;
-import org.matsim.signalsystems.data.signalcontrol.v20.SignalPlanData;
-import org.matsim.signalsystems.data.signalcontrol.v20.SignalSystemControllerData;
 
 import playground.dgrether.DgPaths;
+import playground.dgrether.koehlerstrehlersignal.ids.DgIdPool;
+import playground.dgrether.koehlerstrehlersignal.solutionconverter.KS2010CrossingSolution;
+import playground.dgrether.koehlerstrehlersignal.solutionconverter.KS2010Solution2Matsim;
+import playground.dgrether.koehlerstrehlersignal.solutionconverter.KS2010SolutionXMLParser10;
 
 
 /**
+ * Script that was once used to convert the figure 9 test scenario results
+ * Will not work anymore, as id conversion must be reimplemented. 
+ * 
  * @author dgrether
  *
  */
-public class DgKoehlerStrehler2010Solution2MatsimConverter {
-	
-	private static final Logger log = Logger
-			.getLogger(DgKoehlerStrehler2010Solution2MatsimConverter.class);
-	
+public class ConvertFigure9Solution2Matsim {
 	private static final String MATSIM_CONFIG = DgPaths.STUDIESDG + "koehlerStrehler2010/config_signals.xml";
-//	private static final String SOLUTION_INPUT_FILENAME = DgPaths.STUDIESDG + "koehlerStrehler2010/solution_population_100_agents.xml";
-//	private static final String SIGNAL_CONTROL_OUTPUT_FILENAME = DgPaths.STUDIESDG + "koehlerStrehler2010/signal_control_solution_population_100_agents.xml";
-//	private static final String SOLUTION_INPUT_FILENAME = DgPaths.STUDIESDG + "koehlerStrehler2010/solution_figure9_from_matsim_population_800.sol";
-//	private static final String SIGNAL_CONTROL_OUTPUT_FILENAME = DgPaths.STUDIESDG + "koehlerStrehler2010/signal_control_solution_figure9_from_matsim_population_800.xml";
 	private static final String SOLUTION_INPUT_FILENAME = DgPaths.STUDIESDG + "koehlerStrehler2010/solution_figure9_from_matsim_population_800_50_50.sol";
 	private static final String SIGNAL_CONTROL_OUTPUT_FILENAME = DgPaths.STUDIESDG + "koehlerStrehler2010/signal_control_solution_figure9_from_matsim_population_800_50_50.xml";
-	
-	
-	
-	public DgKoehlerStrehler2010Solution2MatsimConverter(){}
-	
+
 	public void convert(String matsimConfig, String solutionInputFilename, String signalControlOutputFilename) throws IOException{
 		//load solution
-		DgSolutionParser solutionParser = new DgSolutionParser();
+		KS2010SolutionXMLParser10 solutionParser = new KS2010SolutionXMLParser10();
 		solutionParser.readFile(solutionInputFilename);
-		Map<Id, DgSolutionCrossing> solutionCrossingByIdMap = solutionParser.getSolutionCrossingByIdMap();
-		log.info("Read " + solutionCrossingByIdMap.size() + " solutions");
+		List<KS2010CrossingSolution> solutionCrossings = solutionParser.getSolutionCrossingByIdMap();
+		
 		//load config and signals
 		Config config = ConfigUtils.loadConfig(matsimConfig);
 		SignalsScenarioLoader signalsLoader = new SignalsScenarioLoader(config.signalSystems());
@@ -70,29 +61,18 @@ public class DgKoehlerStrehler2010Solution2MatsimConverter {
 		
 		//convert solution to signal plans
 		SignalControlData signalControl = signals.getSignalControlData();
-		//TODO modify matching in case of more complex scenarios
-		log.warn("Matching of signal system to node to solution might not be correct!");
-		for (SignalSystemControllerData controllerData : signalControl.getSignalSystemControllerDataBySystemId().values()){
-			log.debug("Processing control for signal system id : " + controllerData.getSignalSystemId());
-			DgSolutionCrossing solutionCrossing = solutionCrossingByIdMap.get(controllerData.getSignalSystemId());
-			log.debug("  solution crossing : " + solutionCrossing.getId());
-			for (SignalPlanData signalPlan : controllerData.getSignalPlanData().values()){
-				Integer offset = solutionCrossing.getProgramIdOffsetMap().get(signalPlan.getId());
-				log.debug("  processing plan: " + signalPlan.getId() + " offset: " + offset);
-				signalPlan.setOffset(offset);
-			}
-		}
+		DgIdPool idPool = null;
+		new KS2010Solution2Matsim(idPool).convertSolution(signalControl, solutionCrossings);
 		
 		SignalControlWriter20 signalControlWriter = new SignalControlWriter20(signalControl);
 		signalControlWriter.write(signalControlOutputFilename);
 	}
+
 	
-	/**
-	 * @param args
-	 * @throws IOException 
-	 */
 	public static void main(String[] args) throws IOException {
-		new DgKoehlerStrehler2010Solution2MatsimConverter().convert(MATSIM_CONFIG, SOLUTION_INPUT_FILENAME, SIGNAL_CONTROL_OUTPUT_FILENAME);
+		
+		
+		new ConvertFigure9Solution2Matsim().convert(MATSIM_CONFIG, SOLUTION_INPUT_FILENAME, SIGNAL_CONTROL_OUTPUT_FILENAME);
 	}
 
 }

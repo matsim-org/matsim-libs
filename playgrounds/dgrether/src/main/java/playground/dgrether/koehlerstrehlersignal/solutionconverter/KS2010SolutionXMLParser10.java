@@ -19,10 +19,11 @@
  * *********************************************************************** */
 package playground.dgrether.koehlerstrehlersignal.solutionconverter;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -33,7 +34,9 @@ import org.xml.sax.Attributes;
  * @author dgrether
  *
  */
-public class DgSolutionParser extends MatsimXmlParser {
+public class KS2010SolutionXMLParser10 extends MatsimXmlParser {
+	
+	private static final Logger log = Logger.getLogger(KS2010SolutionXMLParser10.class);
 	
 	/** A constant for the exactness when comparing doubles. */
 	private static final double EPSILON = 1e-10;
@@ -44,15 +47,16 @@ public class DgSolutionParser extends MatsimXmlParser {
 	private final static String NAME = "name";
 	private final static String VALUE = "value";
 	
-	private Map<Id, DgSolutionCrossing> solutionCrossingByIdMap = new HashMap<Id, DgSolutionCrossing>();
+	private List<KS2010CrossingSolution> solutionCrossingByIdMap = new ArrayList<KS2010CrossingSolution>();
 	
-	public Map<Id, DgSolutionCrossing> getSolutionCrossingByIdMap(){
+	public List<KS2010CrossingSolution> getSolutionCrossingByIdMap(){
 		return this.solutionCrossingByIdMap;
 	}
 	
 	public void readFile(final String filename) {
 		this.setValidating(false);
 		parse(filename);
+		log.info("Read " + solutionCrossingByIdMap.size() + " solutions");
 	}
 	
 	@Override
@@ -72,9 +76,9 @@ public class DgSolutionParser extends MatsimXmlParser {
 					String programString = nameParts[2];
 					int offsetSeconds = Integer.parseInt(nameParts[3]);
 					Id crossingId = new IdImpl(crossingString);
-					DgSolutionCrossing crossing = new DgSolutionCrossing(crossingId);
+					KS2010CrossingSolution crossing = new KS2010CrossingSolution(crossingId);
 					crossing.addOffset4Program(new IdImpl(programString), offsetSeconds);
-					this.solutionCrossingByIdMap.put(crossingId, crossing);
+					this.solutionCrossingByIdMap.add(crossing);
 				}
 			}
 		}

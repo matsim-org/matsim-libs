@@ -49,6 +49,11 @@ public class Cottbus2KS2010 {
 	private static final Logger log = Logger.getLogger(Cottbus2KS2010.class);
 	
 	private static final String shapeFileDirectoryName = "shapes/";
+
+	public 	static final String SIGNAL_SYSTEMS_FILENAME = DgPaths.REPOS +  "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_systems.xml";
+	public 	static final String SIGNAL_GROUPS_FILENAME = DgPaths.REPOS +  "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_groups.xml";
+	public 	static final String SIGNAL_CONTROL_FILENAME = DgPaths.REPOS +  "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_control.xml";
+
 	
 	public static void main(String[] args) throws Exception {
 		// parameters
@@ -64,9 +69,6 @@ public class Cottbus2KS2010 {
 		double minCommodityFlow = 50.0;
 		String networkFilename = DgPaths.REPOS  + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network_wgs84_utm33n.xml.gz";
 		String lanesFilename = DgPaths.REPOS  + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/lanes.xml";
-		String signalSystemsFilename = DgPaths.REPOS +  "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_systems.xml";
-		String signalGroupsFilename = DgPaths.REPOS +  "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_groups.xml";
-		String signalControlFilename = DgPaths.REPOS +  "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_control.xml";
 //		String populationFilename = DgPaths.REPOS + "runs-svn/run1292/1292.output_plans_sample.xml";
 		String populationFilename = DgPaths.REPOS + "runs-svn/run1712/1712.output_plans.xml.gz";
 		String name = "run run1712 output plans between 05:30 and 09:30";
@@ -79,7 +81,7 @@ public class Cottbus2KS2010 {
 		// run
 		OutputDirectoryLogging.initLoggingWithOutputDirectory(outputDirectory);
 		String shapeFileDirectory = createShapeFileDirectory(outputDirectory);
-		Scenario fullScenario = Cottbus2KS2010.loadScenario(networkFilename, populationFilename, lanesFilename, signalSystemsFilename, signalGroupsFilename, signalControlFilename);
+		Scenario fullScenario = Cottbus2KS2010.loadScenario(networkFilename, populationFilename, lanesFilename, SIGNAL_SYSTEMS_FILENAME, SIGNAL_GROUPS_FILENAME, SIGNAL_CONTROL_FILENAME);
 		
 		// reduce the size of the scenario
 		NetLanesSignalsShrinker scenarioShrinker = new NetLanesSignalsShrinker(fullScenario,  crs);
