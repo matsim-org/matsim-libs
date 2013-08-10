@@ -123,9 +123,9 @@ public class SignalsMorningEveningMergeTool {
 
 
 	public static void main(String[] args) {
-		String morningFolder =DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-07-31_minflow_50_morning_peak/";
-		String eveningFolder = DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-07-31_minflow_50_evening_peak/";
-		String outputDirectory = DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/testmerge/";
+		String morningFolder =DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-07-31_minflow_10_morning_peak/";
+		String eveningFolder = DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-07-31_minflow_10_evening_peak/";
+		String outputDirectory = DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-07-31_minflow_10/";
 		new SignalsMorningEveningMergeTool().merge(morningFolder, eveningFolder, outputDirectory);
 	}
 
