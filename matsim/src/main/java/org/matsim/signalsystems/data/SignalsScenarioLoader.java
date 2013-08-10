@@ -105,7 +105,7 @@ public class SignalsScenarioLoader {
 			systemsReader.readFile(this.signalConfig.getSignalSystemFile());
 		}
 		else {
-			log.info("Signals: No signal systems file set, can't load signal system base information!");
+			log.info("Signals: No signal systems file set, can't load signal systems information!");
 		}
 	}
 
