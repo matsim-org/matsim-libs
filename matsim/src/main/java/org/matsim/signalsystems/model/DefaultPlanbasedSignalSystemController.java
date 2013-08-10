@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.PriorityBlockingQueue;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 
 
@@ -38,7 +39,7 @@ import org.matsim.api.core.v01.Id;
  */
 public class DefaultPlanbasedSignalSystemController implements SignalController {
 	
-//	private static final Logger log = Logger.getLogger(DefaultPlanbasedSignalSystemController.class);
+	private static final Logger log = Logger.getLogger(DefaultPlanbasedSignalSystemController.class);
 	
 	public static final String IDENTIFIER = "DefaultPlanbasedSignalSystemController";
 	private Queue<SignalPlan> planQueue = null;
@@ -84,6 +85,7 @@ public class DefaultPlanbasedSignalSystemController implements SignalController 
 		SignalPlan nextPlan = this.planQueue.peek();
 		if (nextPlan != null && nextPlan.getStartTime() != null 
 				&& nextPlan.getStartTime() <= timeSeconds) {
+			log.info("Disabling signal control plan " + this.activePlan.getId() + " switching to control plan " + nextPlan.getId());
 			this.activePlan = nextPlan;
 			this.planQueue.poll();
 			
