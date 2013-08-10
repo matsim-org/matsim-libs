@@ -206,7 +206,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 				"factor, and storage capacity factor need to be set with diligence.  Needs to be a vehicular mode to make sense.") ;
 		map.put(INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES, 
 				"decides if waiting vehicles enter the network after or before the already driving vehicles were moved. Default: false") ; 
-		map.put(NODE_OFFSET, "Shortens a link's start and end point in the visualization.");
+		map.put(NODE_OFFSET, "Shortens a link in the visualization, i.e. its start and end point are moved into towards the center. Does not affect traffic flow. ");
 		map.put(LINK_WIDTH, "The (initial) width of the links of the network. Use positive floating point values.");
 		return map ;
 	}
