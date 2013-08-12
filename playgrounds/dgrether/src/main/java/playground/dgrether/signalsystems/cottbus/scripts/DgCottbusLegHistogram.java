@@ -48,12 +48,14 @@ public class DgCottbusLegHistogram {
 	private static final Logger log = Logger.getLogger(DgCottbusLegHistogram.class);
 	
 	public static void main(String[] args) {
-		String runDirectory = DgPaths.RUNSSVN + "run1293/";
-		String networkFile = runDirectory + "1293.output_network.xml.gz";
-		String outputDirectory = runDirectory + "ITERS/it.1000/";
-		String eventsFile = outputDirectory + "1293.1000.events.xml.gz";
-		String histoFile = outputDirectory + "1293.1000.cottbus_leg_histogram.txt";
-		String histoGraphicFile = outputDirectory + "1293.1000.cottbus_leg_histogram_all.png";
+		String runNumber = "1732";
+		String iterationNumber = "1000";
+		String runDirectory = DgPaths.RUNSSVN + "run" + runNumber + "/";
+		String networkFile = runDirectory + "" + runNumber + ".output_network.xml.gz";
+		String outputDirectory = runDirectory + "ITERS/it." + iterationNumber + "/";
+		String eventsFile = outputDirectory + "" + runNumber + "." + iterationNumber + ".events.xml.gz";
+		String histoFile = outputDirectory + "" + runNumber + "." + iterationNumber + ".cottbus_leg_histogram.txt";
+		String histoGraphicFile = outputDirectory + "" + runNumber + "." + iterationNumber + ".cottbus_leg_histogram_all.png";
 		String cottbusFeatureFile = DgPaths.REPOS
 				+ "shared-svn/studies/countries/de/brandenburg_gemeinde_kreisgrenzen/kreise/dlm_kreis.shp";
 		CoordinateReferenceSystem netCrs = MGC.getCRS(TransformationFactory.WGS84_UTM33N);

@@ -53,7 +53,10 @@ public class GeospatialEventTools {
 		this.network = net;
 		this.networkCrs = netCrs;
 		this.transformedFeatureGeometries = new ArrayList<Geometry>();
-
+	}
+	
+	public Network getNetwork() {
+		return this.network;
 	}
 
 	public boolean doFeaturesContainCoordinate(Coordinate coordinate) {
@@ -81,9 +84,12 @@ public class GeospatialEventTools {
 			this.transformedFeatureGeometries.add((Geometry) featureTuple.getSecond().getDefaultGeometry());
 		}
 	}
-
-	public boolean doFeaturesContainEvent(Id linkId) {
+	
+	public boolean doNetworkAndFeaturesContainLink(Id linkId) {
 		Link link = this.network.getLinks().get(linkId);
+		if (link == null) {
+			return false;
+		}
 		Coordinate coordinate = MGC.coord2Coordinate(link.getCoord());
 		return this.doFeaturesContainCoordinate(coordinate);
 	}

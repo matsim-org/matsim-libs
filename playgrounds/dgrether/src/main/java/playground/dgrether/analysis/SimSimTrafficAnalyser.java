@@ -179,8 +179,11 @@ public class SimSimTrafficAnalyser {
 		int i = 9;
 		double sumRelativeError = 0.0;
 		double relativeError = 0.0;
+		for (CountSimComparison csc : countSimComparisonList) {
+			log.error("hour: " + csc.getHour());
+		}
 		for (CountSimComparison csc : countSimComparisonList){
-			if (csc.getHour() != i - 9) throw new IllegalStateException("List not sorted correclty");
+			if (csc.getHour() != i - 8) throw new IllegalStateException("List not sorted correctly. csc.getHour() returns " +csc.getHour());
 			relativeError = csc.calculateRelativeError();
 			attribs[i] = relativeError;
 			sumRelativeError += relativeError;
@@ -191,7 +194,7 @@ public class SimSimTrafficAnalyser {
 		double difference = 0;
 		double sumDifference = 0;
 		for (CountSimComparison csc : countSimComparisonList){
-			if (csc.getHour() != i - 34) throw new IllegalStateException("List not sorted correclty");
+			if (csc.getHour() != i - 33) throw new IllegalStateException("List not sorted correctly");
 			difference = csc.getSimulationValue() - csc.getCountValue();
 			attribs[i] = difference;
 			sumDifference += difference;
@@ -257,10 +260,10 @@ public class SimSimTrafficAnalyser {
 //			linkstats2 = "/media/data/work/repos/runs-svn/run1217/ITERS/it.500/1217.500.linkstats.txt.gz";
 //			outfile = "/media/data/work/repos/runs-svn/run1217/ITERS/it.500/1216.500vs1217.500";
 
-			net = "/media/data/work/repos/runs-svn/run1217/1217.output_network.xml.gz";
-			linkstats1 = "/media/data/work/repos/runs-svn/run1217/ITERS/it.500/1217.500.linkstats.txt.gz";
-			linkstats2 = "/media/data/work/repos/runs-svn/run1218/ITERS/it.500/1218.500.linkstats.txt.gz";
-			outfile = "/media/data/work/repos/runs-svn/run1218/ITERS/it.500/1217.500vs1218.500";
+			net = "/media/data/work/repos/runs-svn/run1733/1733.output_network.xml.gz";
+			linkstats1 = "/media/data/work/repos/runs-svn/run1712/ITERS/it.1000/1712.1000.linkstats.txt.gz";
+			linkstats2 = "/media/data/work/repos/runs-svn/run1733/ITERS/it.1000/1733.1000.linkstats.txt.gz";
+			outfile = "/media/data/work/repos/runs-svn/run1733/ITERS/it.1000/1712.1000vs1733.1000";
 			
 			srs = TransformationFactory.WGS84_UTM33N;
 			

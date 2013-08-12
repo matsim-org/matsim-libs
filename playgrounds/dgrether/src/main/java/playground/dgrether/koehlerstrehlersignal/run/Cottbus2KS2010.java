@@ -23,10 +23,7 @@ import java.io.File;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryLogging;
-import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.misc.Time;
@@ -37,6 +34,7 @@ import playground.dgrether.koehlerstrehlersignal.conversion.M2KS2010Converter;
 import playground.dgrether.koehlerstrehlersignal.demand.PopulationToOd;
 import playground.dgrether.koehlerstrehlersignal.demand.ZoneBuilder;
 import playground.dgrether.koehlerstrehlersignal.network.NetLanesSignalsShrinker;
+import playground.dgrether.signalsystems.utils.DgScenarioUtils;
 import playground.dgrether.utils.zones.DgZones;
 
 
@@ -84,7 +82,7 @@ public class Cottbus2KS2010 {
 		// run
 		OutputDirectoryLogging.initLoggingWithOutputDirectory(outputDirectory);
 		String shapeFileDirectory = createShapeFileDirectory(outputDirectory);
-		Scenario fullScenario = Cottbus2KS2010.loadScenario(NETWORK_FILENAME, POPULTATION_FILENAME, LANES_FILENAME, SIGNAL_SYSTEMS_FILENAME, SIGNAL_GROUPS_FILENAME, SIGNAL_CONTROL_FILENAME);
+		Scenario fullScenario = DgScenarioUtils.loadScenario(NETWORK_FILENAME, POPULTATION_FILENAME, LANES_FILENAME, SIGNAL_SYSTEMS_FILENAME, SIGNAL_GROUPS_FILENAME, SIGNAL_CONTROL_FILENAME);
 		
 		// reduce the size of the scenario
 		NetLanesSignalsShrinker scenarioShrinker = new NetLanesSignalsShrinker(fullScenario,  CRS);
@@ -142,21 +140,6 @@ public class Cottbus2KS2010 {
 		File outdir = new File(shapeDir);
 		outdir.mkdir();
 		return shapeDir;
-	}
-	
-	public static Scenario loadScenario(String net, String pop, String lanesFilename, String signalsFilename,
-			String signalGroupsFilename, String signalControlFilename){
-		Config c2 = ConfigUtils.createConfig();
-		c2.scenario().setUseLanes(true);
-		c2.scenario().setUseSignalSystems(true);
-		c2.network().setInputFile(net);
-		c2.plans().setInputFile(pop);
-		c2.network().setLaneDefinitionsFile(lanesFilename);
-		c2.signalSystems().setSignalSystemFile(signalsFilename);
-		c2.signalSystems().setSignalGroupsFile(signalGroupsFilename);
-		c2.signalSystems().setSignalControlFile(signalControlFilename);
-		Scenario scenario = ScenarioUtils.loadScenario(c2);
-		return scenario;
 	}
 
 	

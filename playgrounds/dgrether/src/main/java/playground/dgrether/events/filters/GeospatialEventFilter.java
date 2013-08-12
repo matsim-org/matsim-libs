@@ -22,10 +22,7 @@ package playground.dgrether.events.filters;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.geotools.geometry.jts.JTS;
-import org.geotools.referencing.CRS;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
@@ -36,31 +33,30 @@ import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.geotools.MGC;
 import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
-import org.opengis.referencing.operation.MathTransform;
-import org.opengis.referencing.operation.TransformException;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import playground.dgrether.events.GeospatialEventTools;
+
 import com.vividsolutions.jts.geom.Geometry;
 
 
 /**
- * TODO make class use GeospatialEventTools
+ * @deprecated It is not a good idea to filter events directly by geospatial location. 
  * @author dgrether
  *
  */
+@Deprecated
 public class GeospatialEventFilter implements EventFilter {
 
 	private Network network;
 	private List<Tuple<CoordinateReferenceSystem, SimpleFeature>> featureTuples;
 	private CoordinateReferenceSystem networkCrs;
 	private List<Geometry> transformedFeatureGeometries;
+	private GeospatialEventTools geospatialTools;
 	
 	public GeospatialEventFilter(Network network){
-		this.network = network;
+		this.geospatialTools = new GeospatialEventTools(network, networkCrs);
 		this.featureTuples = new ArrayList<Tuple<CoordinateReferenceSystem, SimpleFeature>>();
 		this.transformedFeatureGeometries = new ArrayList<Geometry>();
 	}
@@ -71,31 +67,11 @@ public class GeospatialEventFilter implements EventFilter {
 	}
 	
 	public void addCrsFeatureTuple(Tuple<CoordinateReferenceSystem, SimpleFeature> featureTuple) {
-		this.featureTuples.add(featureTuple);
-		if ( !(this.networkCrs == null)){
-			MathTransform transformation;
-			try {
-				transformation = CRS.findMathTransform(featureTuple.getFirst(), this.networkCrs, true);
-				Geometry transformedFeatureGeometry = JTS.transform((Geometry) featureTuple.getSecond().getDefaultGeometry(), transformation);
-				this.transformedFeatureGeometries.add(transformedFeatureGeometry);
-			} catch (FactoryException e) {
-				e.printStackTrace();
-			} catch (TransformException e) {
-				e.printStackTrace();
-			}
-		}
-		else {
-			this.transformedFeatureGeometries.add((Geometry) featureTuple.getSecond().getDefaultGeometry());
-		}
+		this.geospatialTools.addCrsFeatureTuple(featureTuple);
 	}
 
-	
-	private boolean doFeaturesContainCoordinate(Coordinate coordinate) {
-		Geometry linkPoint = MGC.coordinate2Point(coordinate);
-		for (Geometry featureGeo : this.transformedFeatureGeometries){
-				return featureGeo.contains(linkPoint);
-		}
-		return false;
+	private boolean containsLink(Id linkId) {
+		return this.geospatialTools.doNetworkAndFeaturesContainLink(linkId);
 	}
 	
 	@Override
@@ -133,14 +109,7 @@ public class GeospatialEventFilter implements EventFilter {
 		}
 	}
 
-	private boolean containsLink(Id linkId) {
-		Link link = this.network.getLinks().get(linkId);
-		if (link != null){
-			Coordinate coordinate = MGC.coord2Coordinate(link.getCoord());
-			return this.doFeaturesContainCoordinate(coordinate);
-		}
-		return false;
-	}
+
 
 
 }

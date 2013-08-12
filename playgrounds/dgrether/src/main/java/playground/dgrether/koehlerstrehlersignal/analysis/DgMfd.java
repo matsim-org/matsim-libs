@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.koehlerstrehlersignal.figure9scenario;
+package playground.dgrether.koehlerstrehlersignal.analysis;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -99,7 +99,7 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Agen
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if (this.geospatialTools == null || this.geospatialTools.doFeaturesContainEvent(event.getLinkId())) {
+		if (this.geospatialTools == null || this.geospatialTools.doNetworkAndFeaturesContainLink(event.getLinkId())) {
 			if (! this.firstTimeSeenMap.containsKey(event.getPersonId())) {
 				this.firstTimeSeenMap.put(event.getPersonId(), event);
 			} 
@@ -108,7 +108,7 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Agen
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		if (this.geospatialTools == null || this.geospatialTools.doFeaturesContainEvent(event.getLinkId())) {
+		if (this.geospatialTools == null || this.geospatialTools.doNetworkAndFeaturesContainLink(event.getLinkId())) {
 			this.lastTimeSeenMap.put(event.getPersonId(), event);
 		}
 

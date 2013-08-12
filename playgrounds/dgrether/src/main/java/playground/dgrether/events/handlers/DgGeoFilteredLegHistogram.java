@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.dgrether.events.handlers;
 
+import java.awt.BasicStroke;
+import java.awt.Color;
 import java.awt.Font;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -94,14 +96,14 @@ public class DgGeoFilteredLegHistogram implements LinkEnterEventHandler, LinkLea
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		if (this.geospatialTools.doFeaturesContainEvent(event.getLinkId())){
+		if (this.geospatialTools.doNetworkAndFeaturesContainLink(event.getLinkId())){
 			this.lastTimeSeenMap.put(event.getPersonId(), event);
 		}
 	}
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if (this.geospatialTools.doFeaturesContainEvent(event.getLinkId())){
+		if (this.geospatialTools.doNetworkAndFeaturesContainLink(event.getLinkId())){
 			if (! this.firstTimeSeenMap.containsKey(event.getPersonId())) {
 				this.firstTimeSeenMap.put(event.getPersonId(), event);
 			} 
@@ -206,7 +208,14 @@ public class DgGeoFilteredLegHistogram implements LinkEnterEventHandler, LinkLea
     );
 
 		XYPlot plot = chart.getXYPlot();
+		plot.getRenderer().setSeriesStroke(0, new BasicStroke(2.0f));
+		plot.getRenderer().setSeriesStroke(1, new BasicStroke(2.0f));
+		plot.getRenderer().setSeriesStroke(2, new BasicStroke(2.0f));
+		plot.setBackgroundPaint(Color.white);
+		plot.setRangeGridlinePaint(Color.gray);  
+		plot.setDomainGridlinePaint(Color.gray);  
 
+		
 		final CategoryAxis axis1 = new CategoryAxis("hour");
 		axis1.setTickLabelFont(new Font("SansSerif", Font.PLAIN, 7));
 		plot.setDomainAxis(new NumberAxis("time"));

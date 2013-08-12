@@ -36,6 +36,7 @@ import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import playground.dgrether.DgPaths;
 import playground.dgrether.analysis.charts.DgTravelTimeCalculatorChart;
 import playground.dgrether.analysis.charts.utils.DgChartWriter;
+import playground.dgrether.koehlerstrehlersignal.analysis.DgMfd;
 import playground.dgrether.linkanalysis.DgCountPerIterationGraph;
 import playground.dgrether.linkanalysis.TTInOutflowEventHandler;
 
