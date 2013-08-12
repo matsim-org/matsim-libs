@@ -36,12 +36,12 @@ import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
+import playground.dgrether.analysis.categoryhistogram.CategoryHistogramWriter;
+import playground.dgrether.analysis.flightlhi.GeospatialLinkDepartureArrivalStuckEventFilter;
+import playground.dgrether.analysis.flightlhi.GeospatialLinkVehicleEventFilter;
+import playground.dgrether.analysis.flightlhi.LegModeHistogramImproved;
+import playground.dgrether.analysis.flightlhi.VehicleSeatsModeHistogramImproved;
 import playground.dgrether.events.EventsFilterManagerImpl;
-import air.analysis.categoryhistogram.CategoryHistogramWriter;
-import air.analysis.lhi.GeospatialLinkDepartureArrivalStuckEventFilter;
-import air.analysis.lhi.GeospatialLinkVehicleEventFilter;
-import air.analysis.lhi.LegModeHistogramImproved;
-import air.analysis.lhi.VehicleSeatsModeHistogramImproved;
 
 
 /**
