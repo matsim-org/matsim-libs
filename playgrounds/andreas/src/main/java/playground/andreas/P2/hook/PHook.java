@@ -96,7 +96,7 @@ public class PHook implements IterationStartsListener, StartupListener, ScoringL
 			}
 		}
 		
-		controler.setTripRouterFactory(PTripRouterFactoryFactory.getTripRouterFactoryInstance(controler, tripRouterFactory, pTransitRouterFactory));
+		controler.setTripRouterFactory(PTripRouterFactoryFactory.getTripRouterFactoryInstance(controler, tripRouterFactory, this.pTransitRouterFactory));
 		this.statsManager = new StatsManager(controler, pConfig, this.pBox, lineSetter); 
 	}
 	
