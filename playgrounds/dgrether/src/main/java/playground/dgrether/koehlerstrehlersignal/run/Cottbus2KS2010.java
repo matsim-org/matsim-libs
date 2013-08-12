@@ -50,9 +50,17 @@ public class Cottbus2KS2010 {
 	
 	private static final String shapeFileDirectoryName = "shapes/";
 
-	public 	static final String SIGNAL_SYSTEMS_FILENAME = DgPaths.REPOS +  "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_systems.xml";
-	public 	static final String SIGNAL_GROUPS_FILENAME = DgPaths.REPOS +  "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_groups.xml";
-	public 	static final String SIGNAL_CONTROL_FILENAME = DgPaths.REPOS +  "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_control.xml";
+	public 	static final String SIGNAL_SYSTEMS_FILENAME = DgPaths.REPOS +  "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_systems_no_13.xml";
+	public 	static final String SIGNAL_GROUPS_FILENAME = DgPaths.REPOS +  "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_groups_no_13.xml";
+	public 	static final String SIGNAL_CONTROL_FILENAME = DgPaths.REPOS +  "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_control_no_13.xml";
+
+	public static final String NETWORK_FILENAME = DgPaths.REPOS  + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network_wgs84_utm33n.xml.gz";
+
+	public static final String LANES_FILENAME = DgPaths.REPOS  + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/lanes.xml";
+
+	public static final String POPULTATION_FILENAME = DgPaths.REPOS + "runs-svn/run1722/1722.output_plans.xml.gz";
+
+	public static final CoordinateReferenceSystem CRS = MGC.getCRS(TransformationFactory.WGS84_UTM33N);
 
 	
 	public static void main(String[] args) throws Exception {
@@ -60,35 +68,30 @@ public class Cottbus2KS2010 {
 		int cellsX = 5;
 		int cellsY = 5;
 		double boundingBoxOffset = 50.0;
-		double startTime = 5.5 * 3600.0;
-		double endTime = 9.5 * 3600.0;
-//		double startTime = 13.5 * 3600.0;
-//		double endTime = 18.5 * 3600.0;
+//		double startTime = 5.5 * 3600.0;
+//		double endTime = 9.5 * 3600.0;
+		double startTime = 13.5 * 3600.0;
+		double endTime = 18.5 * 3600.0;
 		double matsimPopSampleSize = 1.0;
 		double ksModelCommoditySampleSize = 1.0;
-		double minCommodityFlow = 50.0;
-		String networkFilename = DgPaths.REPOS  + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network_wgs84_utm33n.xml.gz";
-		String lanesFilename = DgPaths.REPOS  + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/lanes.xml";
-//		String populationFilename = DgPaths.REPOS + "runs-svn/run1292/1292.output_plans_sample.xml";
-		String populationFilename = DgPaths.REPOS + "runs-svn/run1712/1712.output_plans.xml.gz";
-		String name = "run run1712 output plans between 05:30 and 09:30";
-//		String name = "run run1712 output plans between 13:30 and 18:30";
-		CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84_UTM33N);
-		final String outputDirectory = DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-07-31_minflow_50_morning_peak/";
+		double minCommodityFlow = 10.0;
+		//		String name = "run run1722 output plans between 05:30 and 09:30";
+		String name = "run run1722 output plans between 13:30 and 18:30";
+		final String outputDirectory = DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-08-12_minflow_10_evening_peak/";
 		String ksModelOutputFilename = "ks2010_model_";
 		ksModelOutputFilename += Double.toString(minCommodityFlow) + "_" + Double.toString(startTime) + ".xml";
 				
 		// run
 		OutputDirectoryLogging.initLoggingWithOutputDirectory(outputDirectory);
 		String shapeFileDirectory = createShapeFileDirectory(outputDirectory);
-		Scenario fullScenario = Cottbus2KS2010.loadScenario(networkFilename, populationFilename, lanesFilename, SIGNAL_SYSTEMS_FILENAME, SIGNAL_GROUPS_FILENAME, SIGNAL_CONTROL_FILENAME);
+		Scenario fullScenario = Cottbus2KS2010.loadScenario(NETWORK_FILENAME, POPULTATION_FILENAME, LANES_FILENAME, SIGNAL_SYSTEMS_FILENAME, SIGNAL_GROUPS_FILENAME, SIGNAL_CONTROL_FILENAME);
 		
 		// reduce the size of the scenario
-		NetLanesSignalsShrinker scenarioShrinker = new NetLanesSignalsShrinker(fullScenario,  crs);
+		NetLanesSignalsShrinker scenarioShrinker = new NetLanesSignalsShrinker(fullScenario,  CRS);
 		scenarioShrinker.shrinkScenario(outputDirectory, shapeFileDirectory, boundingBoxOffset);
 		
 		//create the zones (that are currently not used) but serve as container for the OD pairs
-		ZoneBuilder zoneBuilder = new ZoneBuilder(crs);
+		ZoneBuilder zoneBuilder = new ZoneBuilder(CRS);
 		DgZones zones = zoneBuilder.createAndWriteZones(scenarioShrinker.getShrinkedNetwork(), scenarioShrinker.getSignalsBoundingBox(),
 				cellsX, cellsY, shapeFileDirectory);
 		
@@ -96,14 +99,14 @@ public class Cottbus2KS2010 {
 		PopulationToOd pop2od = new PopulationToOd();
 		pop2od.setMatsimPopSampleSize(matsimPopSampleSize);
 		pop2od.setOriginalToSimplifiedLinkMapping(scenarioShrinker.getOriginalToSimplifiedLinkIdMatching());
-		pop2od.convertPopulation2OdPairs(zones, fullScenario.getNetwork(), fullScenario.getPopulation(), crs, 
+		pop2od.convertPopulation2OdPairs(zones, fullScenario.getNetwork(), fullScenario.getPopulation(), CRS, 
 				scenarioShrinker.getShrinkedNetwork(), scenarioShrinker.getSignalsBoundingBox(), 
 				startTime, endTime, shapeFileDirectory);
 		
 		
 		//convert to KoehlerStrehler2010 file format
 		M2KS2010Converter converter = new M2KS2010Converter(scenarioShrinker.getShrinkedNetwork(), 
-				scenarioShrinker.getShrinkedLanes(), scenarioShrinker.getShrinkedSignals(), crs);
+				scenarioShrinker.getShrinkedLanes(), scenarioShrinker.getShrinkedSignals(), CRS);
 		String description = createDescription(cellsX, cellsY, startTime, endTime, boundingBoxOffset, 
 				matsimPopSampleSize, ksModelCommoditySampleSize, minCommodityFlow);
 		converter.setKsModelCommoditySampleSize(ksModelCommoditySampleSize);
