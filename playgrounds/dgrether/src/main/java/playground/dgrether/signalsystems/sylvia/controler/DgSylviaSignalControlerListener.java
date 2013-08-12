@@ -19,6 +19,8 @@
  * *********************************************************************** */
 package playground.dgrether.signalsystems.sylvia.controler;
 
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.events.StartupEvent;
@@ -30,6 +32,8 @@ import org.matsim.lanes.data.v20.LaneDefinitions20;
 import org.matsim.signalsystems.builder.DefaultSignalModelFactory;
 import org.matsim.signalsystems.builder.FromDataBuilder;
 import org.matsim.signalsystems.controler.SignalsControllerListener;
+import org.matsim.signalsystems.data.SignalsData;
+import org.matsim.signalsystems.data.SignalsScenarioWriter;
 import org.matsim.signalsystems.mobsim.QSimSignalEngine;
 import org.matsim.signalsystems.mobsim.SignalEngine;
 import org.matsim.signalsystems.model.SignalSystemsManager;
@@ -81,9 +85,13 @@ public class DgSylviaSignalControlerListener implements SignalsControllerListene
 
 	@Override
 	public void notifyShutdown(ShutdownEvent event) {
-
+		this.writeData(event.getControler().getScenario(), event.getControler().getControlerIO());
 	}
-
+	
+	public void writeData(Scenario sc, OutputDirectoryHierarchy controlerIO){
+		SignalsData data = sc.getScenarioElement(SignalsData.class);
+		new SignalsScenarioWriter(controlerIO).writeSignalsData(data);
+	}
 	
 	
 }
