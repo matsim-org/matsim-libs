@@ -35,8 +35,12 @@ import org.matsim.core.population.PlanImpl;
  * </p>
  * <i>The class is, as its name states, experimental. Use at your own risk, and expect even 
  * less support than with other pieces of matsim. </i>
+ * 
+ * Made this class deprecated since it should be replaced by WithinDayAgentUtils. cdobler, aug'13
+ * 
  * @author nagel
  */
+@Deprecated
 public class ExperimentalBasicWithindayAgent extends PersonDriverAgentImpl implements PlanBasedWithinDayAgent {
 
 	public static ExperimentalBasicWithindayAgent createExperimentalBasicWithindayAgent(Person p, Netsim simulation) {

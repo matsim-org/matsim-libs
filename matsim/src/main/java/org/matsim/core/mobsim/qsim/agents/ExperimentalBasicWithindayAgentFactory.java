@@ -23,6 +23,13 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
+/**
+ * 
+ * Made this class deprecated since it should be replaced by WithinDayAgentUtils. cdobler, aug'13
+ * 
+ * @author cdobler
+ */
+@Deprecated
 public final class ExperimentalBasicWithindayAgentFactory implements AgentFactory {
 
 	private final Netsim simulation;

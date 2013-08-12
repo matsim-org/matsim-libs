@@ -27,7 +27,10 @@ import org.matsim.core.mobsim.framework.PlanAgent;
 /**
  * Interface for Agents with within-day functionality. Might get some
  * further methods like resetCaches(). cdobler, Nov'10
+ * 
+ * Made this class deprecated since it should be replaced by WithinDayAgentUtils. cdobler, aug'13
  */
+@Deprecated
 public interface PlanBasedWithinDayAgent extends MobsimAgent, PlanAgent {
 	// yyyyyy this should be renamed WithinDayPlanAgent!!!! kai, jun'11
 	
@@ -37,6 +40,6 @@ public interface PlanBasedWithinDayAgent extends MobsimAgent, PlanAgent {
 
 	public Integer getCurrentRouteLinkIdIndex();
 	
-	public Leg getCurrentLeg() ;
+	public Leg getCurrentLeg();
 
 }
