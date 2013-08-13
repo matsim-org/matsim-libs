@@ -28,12 +28,15 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
+import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 
 /**
  * @author sfuerbas (parts taken from droeder)
@@ -56,6 +59,7 @@ public class TransitLines2PaxCounts {
 	private List<TransitRouteStop> longestRoute_a;
 	private List<TransitRouteStop> longestRoute_b;
 	private List<TransitRoute> routeList;
+	private TransitScheduleFactory tsf;
 	
 	public TransitLines2PaxCounts (TransitLine tl, double countsInterval, int maxSlice) {
 		this.id = tl.getId();
@@ -67,6 +71,7 @@ public class TransitLines2PaxCounts {
 		this.interval = countsInterval;
 		this.maxSlice = maxSlice;
 		this.routeList = new ArrayList<TransitRoute>();
+		this.tsf = new TransitScheduleFactoryImpl();
 		for (TransitRoute tr : tl.getRoutes().values()) {
 			this.routeList.add(tr);
 			int numberOfStops = tr.getStops().size();
@@ -83,11 +88,13 @@ public class TransitLines2PaxCounts {
 			}
 		}	
 //		remove duplicate routes
-		cleanRouteList();
+//		cleanRouteList();
+		sortRoutesByNumberOfStops();
+		createRouteSegments();
 	}
 	
 	
-	public List<TransitRoute> getRoutesByNumberOfStops() {
+	public List<TransitRoute> sortRoutesByNumberOfStops() {
 		Collections.sort(this.routeList, new RouteSizeComparator());
 		return this.routeList;
 	}
@@ -115,7 +122,7 @@ public class TransitLines2PaxCounts {
 				TransitRoute tr = this.routeList.get(jj-1);
 				for (int kk=0; kk<stops2routes.get(ns).size(); kk++) {
 					TransitRoute tr2 = stops2routes.get(ns).get(kk);
-					if ((tr.getId()!=tr2.getId()) && (tr2.getStops().containsAll(tr.getStops()))) { 
+					if ((!dupeRoutes.contains(tr)) && (tr.getId()!=tr2.getId()) && (tr2.getStops().containsAll(tr.getStops()))) { 
 						dupeRoutes.add(tr);
 					}
 				}
@@ -127,61 +134,60 @@ public class TransitLines2PaxCounts {
 
 	
 	private void createRouteSegments () {
-		Map<Integer, List<TransitRoute>> stops2routes = new HashMap<Integer, List<TransitRoute>>();
+		List<TransitRoute> comparedRoutes = new ArrayList<TransitRoute>();
 		List<TransitRoute> dupeRoutes = new ArrayList<TransitRoute>();
 		List<TransitRoute> routeFragments = new ArrayList<TransitRoute>(); // Liste der Routenfragmente
 		int numberOfRoutes = this.routeList.size();
-//		put all TransitRoutes in map with number of stops as key 
-		for (int ii=0; ii<numberOfRoutes; ii++) {
-			TransitRoute tr = this.routeList.get(ii);
-			Integer numberOfStops = tr.getStops().size();
-			if (stops2routes.get(numberOfStops) == null) {
-				stops2routes.put(numberOfStops, new ArrayList<TransitRoute>());
-				stops2routes.get(numberOfStops).add(tr);
-			}
-			else {
-				stops2routes.get(numberOfStops).add(tr);
-			}
-		}
 		
-		for (Integer ns: stops2routes.keySet()) {
-			for (int jj=this.routeList.size(); jj>1; jj--) {
-				TransitRoute tr = this.routeList.get(jj-1);
+		for (int ii = 0; ii < numberOfRoutes; ii++) {
+				// Routen tr von lang nach kurz durchlaufen: Diese wird mit allen anderen verglichen
+				TransitRoute tr = this.routeList.get(ii);
 				int trLength = tr.getStops().size();
-				for (int kk=0; kk < trLength; kk++) {
-					
-					
-					TransitRoute tr2 = stops2routes.get(ns).get(kk);
+				for (int jj=numberOfRoutes-1; jj >= 0; jj--) {
+					//Für tr alle anderen Routen durchlaufen, andere Route = tr2, von kurz nach lang
+					TransitRoute tr2 = this.routeList.get(jj);
 					int tr2Length = tr2.getStops().size();
-					
-					if ((tr.getId()!=tr2.getId())) {
-						
+					//nur vergleichen, wenn wirklich unterschiedliche Routen vorliegen,
+					//tr noch nicht abgearbeitet ist und tr2 noch nicht als Duplikat einer anderen Route erkannt wurde
+					if (!comparedRoutes.contains(tr2) && !dupeRoutes.contains(tr2) && (tr.getId()!=tr2.getId())) {
 						boolean createFragment = false;
-						
+						List<TransitRouteStop> routeFragmentStopList = new ArrayList<TransitRouteStop>();
 						//Unterscheidung nötig: Routensegment am Anfang, Routensegment am Ende, Routensegment in der Mitte (=Hauptroute?)
 						
-						//erster Stop identisch --> vorwärts durchlaufen ab index 0
-						if (tr.getStops().get(0) == tr2.getStops().get(0)) {
-							
+						if (tr.getStops().get(0).equals(tr2.getStops().get(0))) {
 							//wenn TR2 zu Ende und Stops mit TR identisch --> Route entfernen
-
-							for (int rr1=0; rr1 < tr2Length; ) {
-								if (tr.getStops().get(rr1) == tr2.getStops().get(rr1)) rr1++; //nichts tun, nur rr1 erhöhen
-								else if ((tr.getStops().get(rr1) != tr2.getStops().get(rr1)) && !createFragment) {
-							//Fragment erstellen sobald erster Stop nicht mehr in beiden Routen enthalen
-									createFragment = true;
-									//hier Fragment erstellen und ersten Stop hinzufügen
-									rr1++;
+							for (int rr=0; rr < tr2Length; rr++) {
+								if (tr.getStops().get(rr).equals(tr2.getStops().get(rr))) {
+									 //nichts tun, nur rr1 erhöhen
+									if (rr == tr2Length-1) {
+										if (!dupeRoutes.contains(tr2)) dupeRoutes.add(tr2);
+									}
 								}
 								else if (createFragment) {
 									//hier weitere Stops zum Fragment hinzufügen
-									dupeRoutes.add(tr2);
-									rr1++;
+									if (!dupeRoutes.contains(tr2)) {
+										dupeRoutes.add(tr2);
+									}
+									routeFragmentStopList.add(tr2.getStops().get(rr));
+									//wenn letzter Stop von tr2 erreicht: Fragment-Route aus Stop-Liste erstellen
+									if (rr == tr2Length-1) {
+										Id fragmentId = new IdImpl(tr2.getId().toString()+"_"+routeFragments.size());
+										TransitRoute frag = this.tsf.createTransitRoute(fragmentId, tr2.getRoute(), routeFragmentStopList, tr2.getTransportMode());
+										routeFragments.add(frag);
+									}
 								}
-								else if (!createFragment && (rr1 == tr2Length-1)) {
+								else if (!createFragment && (rr == tr2Length-1)) {
 									//wenn bis Erreichen der Länge von tr2 alle Stops gleich sind --> rauswerfen
-									dupeRoutes.add(tr2);
-									rr1++;
+									if (!dupeRoutes.contains(tr2)) dupeRoutes.add(tr2);
+									
+								}
+								else if (!(tr.getStops().get(rr).equals(tr2.getStops().get(rr))) && !createFragment) {
+							//Fragment erstellen sobald erster Stop nicht mehr in beiden Routen enthalen
+									createFragment = true;
+									//hier Fragment erstellen und ersten Stop hinzufügen
+									routeFragmentStopList.add(tr2.getStops().get(rr-1));
+									routeFragmentStopList.add(tr2.getStops().get(rr));
+									
 								}
 							}
 														
@@ -205,13 +211,14 @@ public class TransitLines2PaxCounts {
 							//wenn enthalten: vorwärts durchlaufen ab index von (erster Stop beider Routen) bis index (letzter Stop beider Routen)
 							//kein Fragment erstellen, wenn alle Stops in TR2 auch in TR enthalten sind und Reihenfolge stimmt
 						}
-						
 					}
-				
+
 				}
+				comparedRoutes.add(tr);
+				System.out.println("FÜGE ROUTE TR ZU COMPARED HINZU");
 			}
-		}
-		
+		this.routeList.removeAll(dupeRoutes);
+		this.routeList.addAll(routeFragments);
 	}
 	
 	public class RouteSizeComparator implements Comparator<TransitRoute> {

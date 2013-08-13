@@ -107,11 +107,11 @@ public class PtLines2PaxAnalysis extends AbstractAnalyisModule {
 			}
 			w.write("\n");
 			// ...
-			log.info("Number of TransitRoutes to be written for "+typeOfOutput+": "+tl.getRoutesByNumberOfStops().size());
-			for(int i = 0; i < tl.getRoutesByNumberOfStops().size() ; i++){
+			log.info("Number of TransitRoutes to be written for "+typeOfOutput+": "+tl.sortRoutesByNumberOfStops().size());
+			for(int i = 0; i < tl.sortRoutesByNumberOfStops().size() ; i++){
 				w.write("\n");
-				TransitRoute tr = tl.getRoutesByNumberOfStops().get(i);
-				log.info("Writing output "+typeOfOutput+" for TransitRoute "+(i+1)+" of "+tl.getRoutesByNumberOfStops().size()+
+				TransitRoute tr = tl.sortRoutesByNumberOfStops().get(i);
+				log.info("Writing output "+typeOfOutput+" for TransitRoute "+(i+1)+" of "+tl.sortRoutesByNumberOfStops().size()+
 						" total routes, id = "+tr.getId()+" length = "+tr.getStops().size());
 				for (int noStops = 0; noStops < tr.getStops().size(); noStops++) {	
 					stopId = tr.getStops().get(noStops).getStopFacility().getId();
