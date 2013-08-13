@@ -25,11 +25,11 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.router.TripRouter;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
-import org.matsim.withinday.utils.EditRoutes;
 
 /*
  * The NextLegReplanner can be used while an Agent is performing an Activity. The
@@ -39,13 +39,10 @@ import org.matsim.withinday.utils.EditRoutes;
 public class NextLegReplanner extends WithinDayDuringActivityReplanner {
 
 	private final TripRouter tripRouter;
-	private final EditRoutes editRoutes;
-
 	
 	/*package*/ NextLegReplanner(Id id, Scenario scenario, InternalInterface internalInterface, TripRouter tripRouter) {
 		super(id, scenario, internalInterface);
 		this.tripRouter = tripRouter;
-		this.editRoutes = new EditRoutes();
 	}
 
 	/*
@@ -68,7 +65,8 @@ public class NextLegReplanner extends WithinDayDuringActivityReplanner {
 	@Override
 	public boolean doReplanning(PlanBasedWithinDayAgent withinDayAgent) {
 
-		Plan executedPlan = withinDayAgent.getSelectedPlan();
+		PlanAgent planAgent = (PlanAgent) withinDayAgent;
+		Plan executedPlan = planAgent.getSelectedPlan();
 
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
@@ -76,7 +74,7 @@ public class NextLegReplanner extends WithinDayDuringActivityReplanner {
 		/*
 		 *  Get the index of the current PlanElement
 		 */
-		int currentPlanElementIndex = withinDayAgent.getCurrentPlanElementIndex();
+		int currentPlanElementIndex = this.withinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
 
 		/*
 		 * Search next leg in the agent's plan

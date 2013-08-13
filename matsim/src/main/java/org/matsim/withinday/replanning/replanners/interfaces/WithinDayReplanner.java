@@ -24,8 +24,10 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.withinday.replanning.identifiers.interfaces.Identifier;
+import org.matsim.withinday.utils.EditRoutes;
 
 /*
  *	Each WithinDayReplanner needs one or more AgentsToReplanIdentifier
@@ -37,6 +39,8 @@ public abstract class WithinDayReplanner<T extends Identifier> {
 	protected final Id id;
 	protected final Scenario scenario;
 	protected final InternalInterface internalInterface;
+	protected final EditRoutes editRoutes;
+	protected final WithinDayAgentUtils withinDayAgentUtils;
 
 	protected double time = Time.UNDEFINED_TIME;
 
@@ -44,8 +48,15 @@ public abstract class WithinDayReplanner<T extends Identifier> {
 		this.id = id;
 		this.scenario = scenario;
 		this.internalInterface = internalInterface;
+		this.editRoutes = new EditRoutes();
+		this.withinDayAgentUtils = new WithinDayAgentUtils();
 	}
 	
+	/*
+	 * Planning to replace PlanBasedWithinDayAgent by MobsimAgent. Depending
+	 * on the kind of implementation, WithinDayAgentUtils then checks which 
+	 * replanning operations are allows/possible. cdobler, aug'13
+	 */
 	public abstract boolean doReplanning(PlanBasedWithinDayAgent withinDayAgent);
 	
 	public final Id getId() {

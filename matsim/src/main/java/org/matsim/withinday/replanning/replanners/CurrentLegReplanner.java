@@ -25,11 +25,11 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.router.TripRouter;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
-import org.matsim.withinday.utils.EditRoutes;
 
 /*
  * The CurrentLegReplanner can be used while an Agent travels from
@@ -49,12 +49,10 @@ import org.matsim.withinday.utils.EditRoutes;
 public class CurrentLegReplanner extends WithinDayDuringLegReplanner {
 
 	private final TripRouter tripRouter;
-	private final EditRoutes editRoutes;
 	
 	/*package*/ CurrentLegReplanner(Id id, Scenario scenario, InternalInterface internalInterface, TripRouter tripRouter) {
 		super(id, scenario, internalInterface);
 		this.tripRouter = tripRouter;
-		this.editRoutes = new EditRoutes();
 	}
 
 	/*
@@ -68,22 +66,23 @@ public class CurrentLegReplanner extends WithinDayDuringLegReplanner {
 	@Override
 	public boolean doReplanning(PlanBasedWithinDayAgent withinDayAgent) {
 
-		Plan executedPlan = withinDayAgent.getSelectedPlan();
+		PlanAgent planAgent = (PlanAgent) withinDayAgent;
+		Plan executedPlan = planAgent.getSelectedPlan();
 
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
 
-		PlanElement currentPlanElement = withinDayAgent.getCurrentPlanElement();
+		PlanElement currentPlanElement = planAgent.getCurrentPlanElement();
 		if (!(currentPlanElement instanceof Leg)) return false;
 		Leg currentLeg = (Leg) currentPlanElement;
-		int currentLinkIndex = withinDayAgent.getCurrentRouteLinkIdIndex();
+		int currentLinkIndex = this.withinDayAgentUtils.getCurrentRouteLinkIdIndex(withinDayAgent);
 
 		// new Route for current Leg
 		this.editRoutes.replanCurrentLegRoute(currentLeg, executedPlan.getPerson(), currentLinkIndex, this.time, 
 				scenario.getNetwork(), tripRouter); 
 
 		// Finally reset the cached Values of the PersonAgent - they may have changed!
-		withinDayAgent.resetCaches();
+		this.withinDayAgentUtils.resetCaches(withinDayAgent);
 
 		return true;
 	}
