@@ -20,6 +20,10 @@
 
 package playground.singapore.transitRouterEventsBased;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -47,21 +51,39 @@ public class TransitRouterNetworkTravelTimeAndDisutilityWSV extends TransitRoute
 	
 	private static final double NO_SIT_FACTOR = 1.2;
 	private static final double SIT_PERCENTAGE = 0.3;
-	private final WaitTime waitTime;
-	private final StopStopTime stopStopTime;
-	private final VehicleOccupancy vehicleOccupancy;
 	private Link previousLink;
 	private double previousTime;
 	private double cachedTravelTime;
+	private final Map<Id, double[]> linkTravelTimes = new HashMap<Id, double[]>();
+	private final Map<Id, double[]> linkWaitingTimes = new HashMap<Id, double[]>();
+	private final Map<Id, double[]> linkVehicleOccupancy = new HashMap<Id, double[]>();
+	private final int numSlots;
+	private final double timeSlot;
 	
-	public TransitRouterNetworkTravelTimeAndDisutilityWSV(final TransitRouterConfig config, Network network, TransitRouterNetworkWW routerNetwork, WaitTime waitTime, StopStopTime stopStopTime, VehicleOccupancy vehicleOccupancy, TravelTimeCalculatorConfigGroup tTConfigGroup, QSimConfigGroup qSimConfigGroup, PreparedTransitSchedule preparedTransitSchedule) {
-		this(config, network, routerNetwork, waitTime, stopStopTime, vehicleOccupancy, tTConfigGroup, qSimConfigGroup.getStartTime(), qSimConfigGroup.getEndTime(), preparedTransitSchedule);
+	public TransitRouterNetworkTravelTimeAndDisutilityWSV(final TransitRouterConfig config, TransitRouterNetworkWW routerNetwork, WaitTime waitTime, StopStopTime stopStopTime, VehicleOccupancy vehicleOccupancy, TravelTimeCalculatorConfigGroup tTConfigGroup, QSimConfigGroup qSimConfigGroup, PreparedTransitSchedule preparedTransitSchedule) {
+		this(config, routerNetwork, waitTime, stopStopTime, vehicleOccupancy, tTConfigGroup, qSimConfigGroup.getStartTime(), qSimConfigGroup.getEndTime(), preparedTransitSchedule);
 	}
-	public TransitRouterNetworkTravelTimeAndDisutilityWSV(final TransitRouterConfig config, Network network, TransitRouterNetworkWW routerNetwork, WaitTime waitTime, StopStopTime stopStopTime, VehicleOccupancy vehicleOccupancy, TravelTimeCalculatorConfigGroup tTConfigGroup, double startTime, double endTime, PreparedTransitSchedule preparedTransitSchedule) {
+	public TransitRouterNetworkTravelTimeAndDisutilityWSV(final TransitRouterConfig config, TransitRouterNetworkWW routerNetwork, WaitTime waitTime, StopStopTime stopStopTime, VehicleOccupancy vehicleOccupancy, TravelTimeCalculatorConfigGroup tTConfigGroup, double startTime, double endTime, PreparedTransitSchedule preparedTransitSchedule) {
 		super(config, preparedTransitSchedule);
-		this.waitTime = waitTime;
-		this.stopStopTime = stopStopTime;
-		this.vehicleOccupancy = vehicleOccupancy;
+		timeSlot = tTConfigGroup.getTraveltimeBinSize();
+		numSlots = (int) ((endTime-startTime)/timeSlot);
+		for(TransitRouterNetworkLink link:routerNetwork.getLinks().values())
+			if(link.route!=null) {
+				double[] times = new double[numSlots];
+				double[] occs = new double[numSlots];
+				for(int slot = 0; slot<numSlots; slot++) {
+					times[slot] = stopStopTime.getStopStopTime(link.fromNode.stop.getStopFacility().getId(), link.toNode.stop.getStopFacility().getId(), startTime+slot*timeSlot);
+					occs[slot] = vehicleOccupancy.getVehicleOccupancy(((TransitRouterNetworkNode)link.getFromNode()).stop.getStopFacility().getId(), link.toNode.line.getId(), link.toNode.route.getId(), startTime+slot*timeSlot);
+				}
+				linkTravelTimes.put(link.getId(), times);
+				linkVehicleOccupancy.put(link.getId(), occs);
+			}
+			else if(link.toNode.route!=null) {
+				double[] times = new double[numSlots];
+				for(int slot = 0; slot<numSlots; slot++)
+					times[slot] = waitTime.getRouteStopWaitTime(link.toNode.line.getId(), link.toNode.route.getId(), link.fromNode.stop.getStopFacility().getId(), startTime+slot*timeSlot);
+				linkWaitingTimes.put(link.getId(), times);
+			}		
 	}
 	
 	@Override
@@ -71,10 +93,10 @@ public class TransitRouterNetworkTravelTimeAndDisutilityWSV extends TransitRoute
 		TransitRouterNetworkLink wrapped = (TransitRouterNetworkLink) link;
 		if (wrapped.route != null)
 			//in line link
-			cachedTravelTime = stopStopTime.getStopStopTime(((TransitRouterNetworkNode)link.getFromNode()).stop.getStopFacility().getId(), ((TransitRouterNetworkNode)link.getToNode()).stop.getStopFacility().getId(), time);
+			cachedTravelTime = linkTravelTimes.get(wrapped.getId())[time/timeSlot<numSlots?(int)(time/timeSlot):(numSlots-1)];
 		else if(wrapped.toNode.route!=null)
 			//wait link
-			cachedTravelTime = waitTime.getRouteStopWaitTime(wrapped.toNode.line.getId(), wrapped.toNode.route.getId(), wrapped.fromNode.stop.getStopFacility().getId(), time);
+			cachedTravelTime = linkWaitingTimes.get(wrapped.getId())[time/timeSlot<numSlots?(int)(time/timeSlot):(numSlots-1)];
 		else if(wrapped.fromNode.route==null)
 			//walking link
 			cachedTravelTime = wrapped.getLength()/this.config.getBeelineWalkSpeed();
@@ -90,11 +112,11 @@ public class TransitRouterNetworkTravelTimeAndDisutilityWSV extends TransitRoute
 			cachedTravelDisutility = true;
 		TransitRouterNetworkLink wrapped = (TransitRouterNetworkLink) link;
 		if (wrapped.route != null)
-			return -(cachedTravelDisutility?cachedTravelTime:stopStopTime.getStopStopTime(((TransitRouterNetworkNode)link.getFromNode()).stop.getStopFacility().getId(), ((TransitRouterNetworkNode)link.getToNode()).stop.getStopFacility().getId(), time))*this.config.getMarginalUtilityOfTravelTimePt_utl_s()*vehicleOccupancy.getVehicleOccupancy(((TransitRouterNetworkNode)link.getFromNode()).stop.getStopFacility().getId(), wrapped.toNode.line.getId(), wrapped.toNode.route.getId(), time)>SIT_PERCENTAGE?NO_SIT_FACTOR:1
+			return -(cachedTravelDisutility?cachedTravelTime:linkTravelTimes.get(wrapped.getId())[time/timeSlot<numSlots?(int)(time/timeSlot):(numSlots-1)])*this.config.getMarginalUtilityOfTravelTimePt_utl_s()*linkVehicleOccupancy.get(wrapped.getId())[time/timeSlot<numSlots?(int)(time/timeSlot):(numSlots-1)]>SIT_PERCENTAGE?NO_SIT_FACTOR:1
 					- link.getLength() * (this.config.getMarginalUtilityOfTravelDistancePt_utl_m()-2.7726/100000);
 		else if (wrapped.toNode.route!=null)
 			// it's a wait link
-			return -(cachedTravelDisutility?cachedTravelTime:waitTime.getRouteStopWaitTime(wrapped.toNode.line.getId(), wrapped.toNode.route.getId(), wrapped.fromNode.stop.getStopFacility().getId(), time))*this.config.getMarginalUtilityOfWaitingPt_utl_s()
+			return -(cachedTravelDisutility?cachedTravelTime:linkWaitingTimes.get(wrapped.getId())[time/timeSlot<numSlots?(int)(time/timeSlot):(numSlots-1)])*this.config.getMarginalUtilityOfWaitingPt_utl_s()
 					- this.config.getUtilityOfLineSwitch_utl();
 		else if(wrapped.fromNode.route==null)
 			// it's a transfer link (walk)
@@ -107,15 +129,15 @@ public class TransitRouterNetworkTravelTimeAndDisutilityWSV extends TransitRoute
 	public double getLinkTravelDisutility(Link link, double time, Person person, Vehicle vehicle) {
 		TransitRouterNetworkLink wrapped = (TransitRouterNetworkLink) link;
 		if (wrapped.route != null)
-			return - stopStopTime.getStopStopTime(((TransitRouterNetworkNode)link.getFromNode()).stop.getStopFacility().getId(), ((TransitRouterNetworkNode)link.getToNode()).stop.getStopFacility().getId(), time) * this.config.getMarginalUtilityOfTravelTimePt_utl_s()*vehicleOccupancy.getVehicleOccupancy(((TransitRouterNetworkNode)link.getFromNode()).stop.getStopFacility().getId(), wrapped.toNode.line.getId(), wrapped.toNode.route.getId(), time)>SIT_PERCENTAGE?NO_SIT_FACTOR:1
-				       - link.getLength() * (this.config.getMarginalUtilityOfTravelDistancePt_utl_m()-2.7726/100000);
+			return - linkTravelTimes.get(wrapped.getId())[time/timeSlot<numSlots?(int)(time/timeSlot):(numSlots-1)]*this.config.getMarginalUtilityOfTravelTimePt_utl_s()*linkVehicleOccupancy.get(wrapped.getId())[time/timeSlot<numSlots?(int)(time/timeSlot):(numSlots-1)]>SIT_PERCENTAGE?NO_SIT_FACTOR:1
+					- link.getLength() * (this.config.getMarginalUtilityOfTravelDistancePt_utl_m()-2.7726/100000);
 		else if (wrapped.toNode.route!=null)
 			// it's a wait link
-			return - waitTime.getRouteStopWaitTime(wrapped.toNode.line.getId(), wrapped.toNode.route.getId(), wrapped.fromNode.stop.getStopFacility().getId(), time) * this.config.getMarginalUtilityOfWaitingPt_utl_s()
+			return - linkWaitingTimes.get(wrapped.getId())[time/timeSlot<numSlots?(int)(time/timeSlot):(numSlots-1)]*this.config.getMarginalUtilityOfWaitingPt_utl_s()
 					- this.config.getUtilityOfLineSwitch_utl();
 		else if(wrapped.fromNode.route==null)
 			// it's a transfer link (walk)
-			return -wrapped.getLength()/this.config.getBeelineWalkSpeed() * this.config.getMarginalUtilityOfTravelTimeWalk_utl_s();
+			return -wrapped.getLength()/this.config.getBeelineWalkSpeed()*this.config.getMarginalUtilityOfTravelTimeWalk_utl_s();
 		else
 			//inside link
 			return 0;
