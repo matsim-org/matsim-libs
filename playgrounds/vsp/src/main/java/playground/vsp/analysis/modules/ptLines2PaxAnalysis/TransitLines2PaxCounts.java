@@ -147,6 +147,9 @@ public class TransitLines2PaxCounts {
 					//Für tr alle anderen Routen durchlaufen, andere Route = tr2, von kurz nach lang
 					TransitRoute tr2 = this.routeList.get(jj);
 					int tr2Length = tr2.getStops().size();
+					if (tr2Length > trLength) {
+						continue;
+					}
 					//nur vergleichen, wenn wirklich unterschiedliche Routen vorliegen,
 					//tr noch nicht abgearbeitet ist und tr2 noch nicht als Duplikat einer anderen Route erkannt wurde
 					if (!comparedRoutes.contains(tr2) && !dupeRoutes.contains(tr2) && (tr.getId()!=tr2.getId())) {
@@ -215,7 +218,7 @@ public class TransitLines2PaxCounts {
 
 				}
 				comparedRoutes.add(tr);
-				System.out.println("FÜGE ROUTE TR ZU COMPARED HINZU");
+				System.out.println("FUEGE ROUTE TR ZU COMPARED HINZU");
 			}
 		this.routeList.removeAll(dupeRoutes);
 		this.routeList.addAll(routeFragments);
