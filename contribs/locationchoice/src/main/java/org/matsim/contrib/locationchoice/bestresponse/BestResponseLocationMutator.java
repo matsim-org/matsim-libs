@@ -181,7 +181,12 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		
 		for (ActivityFacility facility : list) {
 			if (this.sampler.sample(facility.getId(), plan.getPerson().getId())) { 
-				cs.addDestination(facility.getId());
+				
+				// only add destination if it can be reached with the chosen mode
+				String mode = ((PlanImpl)plan).getPreviousLeg(actToMove).getMode();			
+				if (this.lcContext.getScenario().getNetwork().getLinks().get(facility.getLinkId()).getAllowedModes().contains(mode)) {
+					cs.addDestination(facility.getId());
+				}
 			}
 		}
 		return cs;
