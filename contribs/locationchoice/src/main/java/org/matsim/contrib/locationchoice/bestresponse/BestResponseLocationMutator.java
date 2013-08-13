@@ -183,23 +183,24 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 			if (this.sampler.sample(facility.getId(), plan.getPerson().getId())) { 
 				
 				// only add destination if it can be reached with the chosen mode
-				String mode = ((PlanImpl)plan).getPreviousLeg(actToMove).getMode();			
-				if (this.lcContext.getScenario().getNetwork().getLinks().get(facility.getLinkId()).getAllowedModes().contains(mode)) {
+				String mode = ((PlanImpl)plan).getPreviousLeg(actToMove).getMode();	
+				
+				Id linkId = null;
+				// try to get linkId from facility, else get it from act. other options not allowed!
+				if (facility.getLinkId() != null) {
+					linkId = facility.getLinkId();
+				}
+				else {
+					linkId = actToMove.getLinkId();
+				}
+				
+				if (this.lcContext.getScenario().getNetwork().getLinks().get(linkId).getAllowedModes().contains(mode)) {
 					cs.addDestination(facility.getId());
 				}
+				
 			}
 		}
 		return cs;
-	}
-
-	private static void printTentativePlanToConsole(Plan plan) {
-		System.err.println("the acts of the tentative plan look as:" ) ;
-		for ( PlanElement pe2 : plan.getPlanElements() ) {
-			if ( pe2 instanceof Activity ) {
-				Activity act = (Activity) pe2 ;
-				System.err.println( act.toString() ) ;
-			}
-		}
 	}
 
 	private void setLocation(Activity act2, Id facilityId) {
