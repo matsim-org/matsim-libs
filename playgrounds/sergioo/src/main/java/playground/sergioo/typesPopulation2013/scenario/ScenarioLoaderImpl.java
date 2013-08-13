@@ -192,23 +192,18 @@ public class ScenarioLoaderImpl {
 	 * 
 	 */
 	@Deprecated
-	public void loadActivityFacilities() {
+	private void loadActivityFacilities() {
 		if ((this.config.facilities() != null) && (this.config.facilities().getInputFile() != null)) {
 			String facilitiesFileName = this.config.facilities().getInputFile();
 			log.info("loading facilities from " + facilitiesFileName);
-			new MatsimFacilitiesReader(this.scenario).parse(facilitiesFileName);
-			log.info("loaded " + this.scenario.getActivityFacilities().getFacilities().size() + " facilities from " + facilitiesFileName);
+			try {
+				new MatsimFacilitiesReader(this.scenario).parse(facilitiesFileName);
+			} catch (Exception e) {
+				throw new RuntimeException(e);
+			}
 		}
 		else {
 			log.info("no facilities file set in config, therefore not loading any facilities.  This is not a problem except if you are using facilities");
-		}
-		if ((this.config.facilities() != null) && (this.config.facilities().getInputFacilitiesAttributesFile() != null)) {
-			String facilitiesAttributesFileName = this.config.facilities().getInputFacilitiesAttributesFile();
-			log.info("loading facility attributes from " + facilitiesAttributesFileName);
-			new ObjectAttributesXmlReader(this.scenario.getActivityFacilities().getFacilityAttributes()).parse(facilitiesAttributesFileName);
-		}
-		else {
-			log.info("no facility-attributes file set in config, not loading any facility attributes");
 		}
 	}
 

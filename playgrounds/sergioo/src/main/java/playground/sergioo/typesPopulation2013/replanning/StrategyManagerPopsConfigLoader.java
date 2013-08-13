@@ -52,7 +52,7 @@ import playground.sergioo.typesPopulation2013.config.groups.StrategyPopsConfigGr
  * backwards-compatibility to the old StrategyManager where the complete class-
  * names were given in the configuration.
  *
- * @author mrieser
+ * @author mrieser, sergioo
  */
 public final class StrategyManagerPopsConfigLoader {
 

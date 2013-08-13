@@ -100,7 +100,7 @@ import org.matsim.core.utils.misc.Time;
 		out.write("\t<person id=\"");
 		out.write(p.getId().toString());
 		out.write("\"");
-		if (p instanceof PersonImplPops){
+		if (p instanceof PersonImplPops) {
 			PersonImplPops person = (PersonImplPops)p;
 			if (person.getPopulationId() != null && !person.getPopulationId().equals(PersonImplPops.DEFAULT_POP_ID)) {
 				out.write(" pop_id=\"");
