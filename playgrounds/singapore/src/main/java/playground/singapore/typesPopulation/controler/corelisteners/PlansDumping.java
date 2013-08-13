@@ -42,36 +42,14 @@ import playground.singapore.typesPopulation.population.PopulationWriter;
 public class PlansDumping implements BeforeMobsimListener {
 
 	static final private Logger log = Logger.getLogger(PlansDumping.class);
-	private Scenario sc ;
-	private int writePlansInterval, firstIteration ;
-	private IterationStopWatch stopwatch ;
-	private OutputDirectoryHierarchy controlerIO;
-
-	boolean calledViaOldConstructor = false ;
-
-	public PlansDumping(Scenario sc, int firstIteration, int writePlansInterval, IterationStopWatch stopwatch,
-			OutputDirectoryHierarchy controlerIO ) {
-		this.sc = sc ;
-		this.firstIteration = firstIteration ;
-		this.writePlansInterval = writePlansInterval ;
-		this.stopwatch = stopwatch ;
-		this.controlerIO = controlerIO ;
-	}
-
-	@Deprecated // use other contructor; do not assume that Controler object is accessible from here.  kai, jun'12
-	public PlansDumping() {
-		calledViaOldConstructor = true ;
-	}
 
 	@Override
 	public void notifyBeforeMobsim(final BeforeMobsimEvent event) {
-		if ( calledViaOldConstructor ) {
-			this.sc = event.getControler().getScenario() ;
-			this.firstIteration = event.getControler().getFirstIteration() ;
-			this.writePlansInterval = sc.getConfig().controler().getWritePlansInterval() ;
-			this.stopwatch = event.getControler().stopwatch ;
-			this.controlerIO = event.getControler().getControlerIO() ;
-		}
+		Scenario sc = event.getControler().getScenario() ;
+		int firstIteration = event.getControler().getFirstIteration() ;
+		int writePlansInterval = sc.getConfig().controler().getWritePlansInterval() ;
+		IterationStopWatch stopwatch = event.getControler().stopwatch ;
+		OutputDirectoryHierarchy controlerIO = event.getControler().getControlerIO() ;
 		if ((writePlansInterval > 0) && ((event.getIteration() % writePlansInterval== 0)
 				|| (event.getIteration() == (firstIteration + 1)))) {
 			stopwatch.beginOperation("dump all plans");
