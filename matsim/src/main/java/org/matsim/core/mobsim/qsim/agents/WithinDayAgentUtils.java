@@ -23,6 +23,7 @@ package org.matsim.core.mobsim.qsim.agents;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 
 /**
  * <p>
@@ -37,6 +38,13 @@ import org.matsim.api.core.v01.population.PlanElement;
  * protected methods from PlanBasedWithinDayAgent (this is possible since it is located
  * in the same package).
  * </p>
+ * <p>
+ * Up to now, all the methods get a MobsimAgent. Depending on which class implements
+ * the interface, the methods will perform their task or throw an exception if the
+ * given object does not support that operation. At the moment, only PersonDriverAgentImpl
+ * are supported but UmlaufDrivers should also be supported in the future (since UmlaufDriver
+ * does not extend PersonDriverAgentImpl the method signatures have been changed).
+ * </p>
  * <i>The class is experimental. Use at your own risk, and expect even 
  * less support than with other pieces of matsim.</i>
  * 
@@ -44,27 +52,52 @@ import org.matsim.api.core.v01.population.PlanElement;
  */
 public class WithinDayAgentUtils {
 
-	public final Integer getCurrentPlanElementIndex(PersonDriverAgentImpl agent) {
-		return agent.currentPlanElementIndex;
+	public final Integer getCurrentPlanElementIndex(MobsimAgent agent) {
+		if (agent instanceof PersonDriverAgentImpl) {
+			return ((PersonDriverAgentImpl) agent).currentPlanElementIndex;			
+		} else {
+			throw new RuntimeException("Sorry, agent is from type " + agent.getClass().toString() + 
+					" which does not support getCurrentPlanElementIndex(...). Aborting!");
+		}
 	}
 
-	public final Integer getCurrentRouteLinkIdIndex(PersonDriverAgentImpl agent) {
-		return agent.currentLinkIdIndex;
+	public final Integer getCurrentRouteLinkIdIndex(MobsimAgent agent) {
+		if (agent instanceof PersonDriverAgentImpl) {
+			return ((PersonDriverAgentImpl) agent).currentLinkIdIndex;			
+		} else {
+			throw new RuntimeException("Sorry, agent is from type " + agent.getClass().toString() + 
+					" which does not support getCurrentRouteLinkIdIndex(...). Aborting!");
+		}
 	}
 
-	public final void calculateAndSetDepartureTime(PersonDriverAgentImpl agent, Activity act) {
-		agent.calculateAndSetDepartureTime(act);
+	public final void calculateAndSetDepartureTime(MobsimAgent agent, Activity act) {
+		if (agent instanceof PersonDriverAgentImpl) {
+			((PersonDriverAgentImpl) agent).calculateAndSetDepartureTime(act);			
+		} else {
+			throw new RuntimeException("Sorry, agent is from type " + agent.getClass().toString() + 
+					" which does not support calculateAndSetDepartureTime(...). Aborting!");
+		}
 	}
 
-	public final void resetCaches(PersonDriverAgentImpl agent) {
-		agent.resetCaches();
+	public final void resetCaches(MobsimAgent agent) {
+		if (agent instanceof PersonDriverAgentImpl) {
+			((PersonDriverAgentImpl) agent).resetCaches();			
+		} else {
+			throw new RuntimeException("Sorry, agent is from type " + agent.getClass().toString() + 
+					" which does not support resetCaches(...). Aborting!");
+		}
 	}
 	
-	public final Leg getCurrentLeg(PersonDriverAgentImpl agent) {
-		PlanElement currentPlanElement = agent.getCurrentPlanElement();
-		if (!(currentPlanElement instanceof Leg)) {
-			return null;
+	public final Leg getCurrentLeg(MobsimAgent agent) {
+		if (agent instanceof PersonDriverAgentImpl) {
+			PlanElement currentPlanElement =  ((PersonDriverAgentImpl) agent).getCurrentPlanElement();
+			if (!(currentPlanElement instanceof Leg)) {
+				return null;
+			}
+			return (Leg) currentPlanElement;
+		} else {
+			throw new RuntimeException("Sorry, agent is from type " + agent.getClass().toString() + 
+					" which does not support getCurrentLeg(...). Aborting!");
 		}
-		return (Leg) currentPlanElement;
 	}
 }
