@@ -409,7 +409,7 @@ class ExternalControler {
 				String vehiclesFile = dir + "transitVehicles_headway" + headway + "_capacity" + capacity + ".xml";
 				
 				double length = (0.1184 * capacity + 5.2152);	// Data from Australian Transport Council
-				int busSeats = (int) (capacity * 1.) + 1; // plus one seat because a seat for the driver is expected
+				int busSeats = (int) (capacity * 1.);
 				int standingRoom = (int) (capacity * 0.); // for future functionality (e.g. disutility for standing in bus)
 				
 				VehiclesGenerator vg = new VehiclesGenerator();				
