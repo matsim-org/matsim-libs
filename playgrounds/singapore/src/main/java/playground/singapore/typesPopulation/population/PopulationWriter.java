@@ -24,7 +24,6 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.apache.log4j.Logger;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.internal.MatsimWriter;
@@ -35,7 +34,6 @@ import org.matsim.core.population.PopulationWriterHandler;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.PopulationUtils;
-import org.matsim.knowledges.Knowledges;
 import org.matsim.population.algorithms.PersonAlgorithm;
 
 public class PopulationWriter extends MatsimXmlWriter implements MatsimWriter, PersonAlgorithm {
@@ -45,8 +43,6 @@ public class PopulationWriter extends MatsimXmlWriter implements MatsimWriter, P
 
 	private PopulationWriterHandler handler = null;
 	private final Population population;
-	private Knowledges knowledges = null;
-	private final Network network;
 	private Counter counter = new Counter("[" + this.getClass().getSimpleName() + "] dumped person # ");
 
 	private final static Logger log = Logger.getLogger(PopulationWriter.class);
@@ -59,8 +55,8 @@ public class PopulationWriter extends MatsimXmlWriter implements MatsimWriter, P
 	 *
 	 * @param population the population to write to file
 	 */
-	public PopulationWriter(final Population population, final Network network) {
-		this(population, network, 1.0);
+	public PopulationWriter(final Population population) {
+		this(population, 1.0);
 	}
 
 	/**
@@ -72,17 +68,10 @@ public class PopulationWriter extends MatsimXmlWriter implements MatsimWriter, P
 	 * @param population the population to write to file
 	 * @param fraction of persons to write to the plans file
 	 */
-	public PopulationWriter(final Population population, final Network network, final double fraction) {
+	public PopulationWriter(final Population population, final double fraction) {
 		super();
 		this.population = population;
-		this.network = network;
 		this.write_person_fraction = fraction;
-		this.handler = new PopulationWriterHandlerImplPops();
-	}
-
-	public PopulationWriter(final Population pop, final Network network, final Knowledges knowledges) {
-		this(pop, network);
-		this.knowledges = knowledges;
 		this.handler = new PopulationWriterHandlerImplPops();
 	}
 

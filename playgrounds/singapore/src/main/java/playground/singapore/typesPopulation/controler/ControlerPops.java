@@ -53,6 +53,7 @@ public class ControlerPops extends Controler {
 		config.addModule(new StrategyPopsConfigGroup());
 		ConfigUtils.loadConfig(config, args[0]);
 		ControlerPops controler = new ControlerPops(ScenarioUtils.loadScenario(config));
+		controler.setOverwriteFiles(true);
 		controler.addCoreControlerListener(new PlansDumping());
 		controler.run();
 	}
