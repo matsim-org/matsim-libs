@@ -26,7 +26,9 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.StrategyManager;
+
 import playground.singapore.typesPopulation.config.groups.StrategyPopsConfigGroup;
+import playground.singapore.typesPopulation.controler.corelisteners.PlansDumping;
 import playground.singapore.typesPopulation.replanning.StrategyManagerPops;
 import playground.singapore.typesPopulation.replanning.StrategyManagerPopsConfigLoader;
 import playground.singapore.typesPopulation.scenario.ScenarioUtils;
@@ -51,6 +53,7 @@ public class ControlerPops extends Controler {
 		config.addModule(new StrategyPopsConfigGroup());
 		ConfigUtils.loadConfig(config, args[0]);
 		ControlerPops controler = new ControlerPops(ScenarioUtils.loadScenario(config));
+		controler.addCoreControlerListener(new PlansDumping(controler.getScenario(), controler.getFirstIteration(), config.controler().getWritePlansInterval(), controler.stopwatch, controler.getControlerIO()));
 		controler.run();
 	}
 	@Override
