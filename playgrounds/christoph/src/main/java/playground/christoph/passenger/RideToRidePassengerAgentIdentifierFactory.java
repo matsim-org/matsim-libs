@@ -22,28 +22,28 @@ package playground.christoph.passenger;
 
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
+import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.replanning.identifiers.interfaces.InitialIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.InitialIdentifierFactory;
-import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 
 public class RideToRidePassengerAgentIdentifierFactory extends InitialIdentifierFactory {
 
 	private final Network network;
-	private final ActivityReplanningMap activityReplanningMap;
+	private final MobsimDataProvider mobsimDataProvider;
 	private final RideToRidePassengerContextProvider rideToRidePassengerContextProvider;
 	private final JointDepartureOrganizer jointDepartureOrganizer;
 	
-	public RideToRidePassengerAgentIdentifierFactory(Network network, ActivityReplanningMap activityReplanningMap,
+	public RideToRidePassengerAgentIdentifierFactory(Network network, MobsimDataProvider mobsimDataProvider,
 			RideToRidePassengerContextProvider rideToRidePassengerContextProvider, JointDepartureOrganizer jointDepartureOrganizer) {
 		this.network = network;
-		this.activityReplanningMap = activityReplanningMap;
+		this.mobsimDataProvider = mobsimDataProvider;
 		this.rideToRidePassengerContextProvider = rideToRidePassengerContextProvider;
 		this.jointDepartureOrganizer = jointDepartureOrganizer;
 	}
 
 	@Override
 	public InitialIdentifier createIdentifier() {
-		return new RideToRidePassengerAgentIdentifier(this.network , this.activityReplanningMap, 
+		return new RideToRidePassengerAgentIdentifier(this.network , this.mobsimDataProvider, 
 				this.rideToRidePassengerContextProvider, this.jointDepartureOrganizer);
 	}
 

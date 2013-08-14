@@ -676,7 +676,7 @@ public class EvacuationControler extends WithinDayController implements
 		/*
 		 * During Activity Identifiers
 		 */
-		duringActivityFactory = new ActivityPerformingIdentifierFactory(this.getActivityReplanningMap());
+		duringActivityFactory = new ActivityPerformingIdentifierFactory(this.getActivityReplanningMap(), mobsimDataProvider);
 		duringActivityFactory.addAgentFilterFactory(initialReplanningFilterFactory);
 		this.activityPerformingIdentifier = duringActivityFactory.createIdentifier();
 		

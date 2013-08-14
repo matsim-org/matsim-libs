@@ -111,7 +111,7 @@ public class DemoRunner implements MobsimInitializedListener, StartupListener,
 				this.withinDayControlerListener.getTravelTimeCollector(), this.scenario.getConfig().planCalcScore()); 
 		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, this.withinDayControlerListener.getTravelTimeCollector());
 
-		this.initialIdentifier = new InitialIdentifierImplFactory(this.withinDayControlerListener.getActivityReplanningMap()).createIdentifier();
+		this.initialIdentifier = new InitialIdentifierImplFactory(this.withinDayControlerListener.getMobsimDataProvider()).createIdentifier();
 		this.initialReplannerFactory = new CreateEvacuationPlanReplannerFactory(this.scenario, this.withinDayControlerListener.getWithinDayEngine(),
 				this.withinDayControlerListener.getWithinDayTripRouterFactory(), routingContext);
 		this.initialReplannerFactory.addIdentifier(this.initialIdentifier);

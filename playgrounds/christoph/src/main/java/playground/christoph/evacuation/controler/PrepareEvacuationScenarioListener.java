@@ -37,6 +37,7 @@ import org.matsim.contrib.multimodal.router.util.MultiModalTravelTimeFactory;
 import org.matsim.contrib.multimodal.tools.MultiModalNetworkCreator;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.config.Config;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOption;
@@ -61,11 +62,15 @@ import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
 import org.matsim.households.Household;
 import org.matsim.households.Households;
+import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterFactory;
+import org.matsim.pt.router.TransitRouterImplFactory;
+import org.matsim.pt.router.TransitRouterNetwork;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.mobsim.LegModeChecker;
 import playground.christoph.evacuation.network.AddExitLinksToNetwork;
+import playground.christoph.evacuation.pt.TransitRouterNetworkReaderMatsimV1;
 import playground.christoph.evacuation.vehicles.AssignVehiclesToPlans;
 import playground.christoph.evacuation.vehicles.CreateVehiclesForHouseholds;
 import playground.christoph.evacuation.vehicles.HouseholdVehicleAssignmentReader;
@@ -77,9 +82,20 @@ public class PrepareEvacuationScenarioListener {
 	private final TravelDisutilityFactory travelDisutilityFactory = new TravelCostCalculatorFactoryImpl();
 	private final TravelTime travelTime = new FreeSpeedTravelTime();
 	
+	private TransitRouterNetwork transitRouterNetwork;
+	private TripRouterFactory tripRouterFactory;
+	
 	public void prepareScenario(Scenario scenario) {
 
-		TripRouterFactory tripRouterFactory = createTripRouterFactory(scenario);
+		/*
+		 * Read transit router network from file. 
+		 */
+		readTransitRouterNetwork(scenario);
+		
+		/*
+		 * Create trip router factory.
+		 */
+		createTripRouterFactory(scenario);
 		
 		/*
 		 * Adapt network capacities and speeds.
@@ -91,7 +107,7 @@ public class PrepareEvacuationScenarioListener {
 		 * Connect facilities to links.
 		 */
 		connectFacilitiesToLinks(scenario);
-
+		
 		/*
 		 * Create a multi-modal network
 		 */
@@ -153,12 +169,17 @@ public class PrepareEvacuationScenarioListener {
 		new AddExitLinksToNetwork(scenario).createExitLinks();
 	}
 	
+	private void readTransitRouterNetwork(Scenario scenario) {
+		transitRouterNetwork = new TransitRouterNetwork();
+		new TransitRouterNetworkReaderMatsimV1(scenario, transitRouterNetwork).parse(EvacuationConfig.transitRouterFile);
+	}
+	
 	private void createMultiModalNetwork(Scenario scenario) {
 		
 		MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) scenario.getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);
 		if (!NetworkUtils.isMultimodal(scenario.getNetwork())) {
 			new MultiModalNetworkCreator(multiModalConfigGroup).run(scenario.getNetwork());
-		}
+		}		
 	}
 	
 	private void addSecureFacilities(Scenario scenario) {
@@ -241,7 +262,7 @@ public class PrepareEvacuationScenarioListener {
 		assignVehiclesToPlans.printStatistics();
 	}
 	
-	private TripRouterFactory createTripRouterFactory(Scenario scenario) {
+	private void createTripRouterFactory(Scenario scenario) {
 		
 		MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) scenario.getConfig().getModule(MultiModalConfigGroup.GROUP_NAME);		
 		Map<Id, Double> linkSlopes = new LinkSlopesReader().getLinkSlopes(multiModalConfigGroup, scenario.getNetwork());
@@ -251,7 +272,13 @@ public class PrepareEvacuationScenarioListener {
 		TripRouterFactoryBuilderWithDefaults builder = new TripRouterFactoryBuilderWithDefaults();
 		LeastCostPathCalculatorFactory leastCostPathCalculatorFactory = builder.createDefaultLeastCostPathCalculatorFactory(scenario);
 		TransitRouterFactory transitRouterFactory = null;
-		if (scenario.getConfig().scenario().isUseTransit()) transitRouterFactory = builder.createDefaultTransitRouter(scenario);
+		if (scenario.getConfig().scenario().isUseTransit()) {
+//			transitRouterFactory = builder.createDefaultTransitRouter(scenario);
+			Config config = scenario.getConfig();
+	        TransitRouterConfig transitRouterConfig = new TransitRouterConfig(config.planCalcScore(), config.plansCalcRoute(),
+	        		config.transitRouter(), config.vspExperimental());
+	        transitRouterFactory = new TransitRouterImplFactory(scenario.getTransitSchedule(), transitRouterConfig, this.transitRouterNetwork);
+		}
 		
 		TripRouterFactory defaultDelegateFactory = new DefaultDelegateFactory(scenario, leastCostPathCalculatorFactory);
 		TripRouterFactory multiModalTripRouterFactory = new MultimodalTripRouterFactory(scenario, multiModalTravelTimes, 
@@ -259,7 +286,7 @@ public class PrepareEvacuationScenarioListener {
 		TripRouterFactory transitTripRouterFactory = new TransitTripRouterFactory(scenario, multiModalTripRouterFactory, 
 				transitRouterFactory);
 		
-		return transitTripRouterFactory;
+		this.tripRouterFactory = transitTripRouterFactory;
 	}
 	
 	private TripRouter createTripRouterInstance(Scenario scenario, TripRouterFactory tripRouterFactory) {

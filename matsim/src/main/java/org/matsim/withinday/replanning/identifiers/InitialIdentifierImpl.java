@@ -30,22 +30,22 @@ import java.util.TreeSet;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
+import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.replanning.identifiers.interfaces.InitialIdentifier;
-import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 
 public class InitialIdentifierImpl extends InitialIdentifier {
 
-	protected ActivityReplanningMap activityReplanningMap;
+	protected MobsimDataProvider mobsimDataProvider;
 
 	// use the Factory!
-	/*package*/ InitialIdentifierImpl(ActivityReplanningMap activityReplanningMap) {
-		this.activityReplanningMap = activityReplanningMap;
+	/*package*/ InitialIdentifierImpl(MobsimDataProvider mobsimDataProvider) {
+		this.mobsimDataProvider = mobsimDataProvider;
 	}
 	
 	@Override
 	public Set<MobsimAgent> getAgentsToReplan(double time) {
 		
-		Collection<MobsimAgent> mobsimAgents = new LinkedHashSet<MobsimAgent>(this.activityReplanningMap.getPersonAgentMapping().values()); 
+		Collection<MobsimAgent> mobsimAgents = new LinkedHashSet<MobsimAgent>(this.mobsimDataProvider.getAgents().values()); 
 		Set<MobsimAgent> agentsToReplan = new TreeSet<MobsimAgent>(new PersonAgentComparator());
 
 		/*

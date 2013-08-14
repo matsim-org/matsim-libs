@@ -28,22 +28,25 @@ import java.util.TreeSet;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
+import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 
 public class ActivityPerformingIdentifier extends DuringActivityIdentifier {
 	
 	protected ActivityReplanningMap activityReplanningMap;
+	protected MobsimDataProvider mobsimDataProvider;
 	
 	// use the Factory!
-	/*package*/ ActivityPerformingIdentifier(ActivityReplanningMap activityReplanningMap) {
+	/*package*/ ActivityPerformingIdentifier(ActivityReplanningMap activityReplanningMap, MobsimDataProvider mobsimDataProvider) {
 		this.activityReplanningMap = activityReplanningMap;
+		this.mobsimDataProvider = mobsimDataProvider;
 	}
 	
 	@Override
 	public Set<MobsimAgent> getAgentsToReplan(double time) {
 		Set<Id> activityPerformingAgents = new HashSet<Id>(activityReplanningMap.getActivityPerformingAgents());
-		Map<Id, MobsimAgent> mapping = activityReplanningMap.getPersonAgentMapping();
+		Map<Id, MobsimAgent> mapping = this.mobsimDataProvider.getAgents();
 
 		// apply filter to remove agents that should not be replanned
 		this.applyFilters(activityPerformingAgents, time);

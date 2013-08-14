@@ -735,12 +735,14 @@ public final class MarathonRunner implements StartupListener,
 		/*
 		 * During Activity Identifiers
 		 */
-		duringActivityFactory = new ActivityPerformingIdentifierFactory(this.withinDayControlerListener.getActivityReplanningMap());
+		duringActivityFactory = new ActivityPerformingIdentifierFactory(this.withinDayControlerListener.getActivityReplanningMap(),
+				this.withinDayControlerListener.getMobsimDataProvider());
 		duringActivityFactory.addAgentFilterFactory(affectedAgentsFilterFactory);
 		duringActivityFactory.addAgentFilterFactory(initialReplanningFilterFactory);
 		this.affectedActivityPerformingIdentifier = duringActivityFactory.createIdentifier();
 		
-		duringActivityFactory = new ActivityPerformingIdentifierFactory(this.withinDayControlerListener.getActivityReplanningMap());
+		duringActivityFactory = new ActivityPerformingIdentifierFactory(this.withinDayControlerListener.getActivityReplanningMap(),
+				this.withinDayControlerListener.getMobsimDataProvider());
 		duringActivityFactory.addAgentFilterFactory(notAffectedAgentsFilterFactory);
 		duringActivityFactory.addAgentFilterFactory(initialReplanningFilterFactory);
 		this.notAffectedActivityPerformingIdentifier = duringActivityFactory.createIdentifier();

@@ -54,8 +54,8 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 import org.matsim.core.utils.misc.Counter;
+import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.replanning.identifiers.interfaces.InitialIdentifier;
-import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 
 import playground.christoph.passenger.RideToRidePassengerContextProvider.RideToRidePassengerContext;
 
@@ -81,7 +81,7 @@ public class RideToRidePassengerAgentIdentifier extends InitialIdentifier {
 	private final Counter needAlternativeMode = new Counter("Found ride legs that have to be converted to other modes: ");
 	
 	private final Network network;
-	private final ActivityReplanningMap activityReplanningMap;
+	private final MobsimDataProvider mobsimDataProvider;
 	private final RideToRidePassengerContextProvider rideToRidePassengerContextProvider;
 	private final JointDepartureOrganizer jointDepartureOrganizer;
 	private final WithinDayAgentUtils withinDayAgentUtils;
@@ -89,11 +89,11 @@ public class RideToRidePassengerAgentIdentifier extends InitialIdentifier {
 	private TravelTime carTravelTime = new FreeSpeedTravelTime();
 	private TravelTime walkTravelTime = new WalkTravelTime(new PlansCalcRouteConfigGroup());
 	
-	public RideToRidePassengerAgentIdentifier(Network network, ActivityReplanningMap activityReplanningMap,
+	public RideToRidePassengerAgentIdentifier(Network network, MobsimDataProvider mobsimDataProvider,
 			RideToRidePassengerContextProvider rideToRidePassengerContextProvider, 
 			JointDepartureOrganizer jointDepartureOrganizer) {
 		this.network = network;
-		this.activityReplanningMap = activityReplanningMap;
+		this.mobsimDataProvider = mobsimDataProvider;
 		this.rideToRidePassengerContextProvider = rideToRidePassengerContextProvider;
 		this.jointDepartureOrganizer = jointDepartureOrganizer;
 		this.withinDayAgentUtils = new WithinDayAgentUtils();
@@ -107,7 +107,7 @@ public class RideToRidePassengerAgentIdentifier extends InitialIdentifier {
 		this.matchingCarTrips.reset();
 		this.needAlternativeMode.reset();
 		
-		Collection<MobsimAgent> mobsimAgents = new LinkedHashSet<MobsimAgent>(this.activityReplanningMap.getPersonAgentMapping().values()); 
+		Collection<MobsimAgent> mobsimAgents = new LinkedHashSet<MobsimAgent>(this.mobsimDataProvider.getAgents().values()); 
 		Set<MobsimAgent> agentsToReplan = new TreeSet<MobsimAgent>(new PersonAgentComparator());
 
 		for (MobsimAgent mobsimAgent : mobsimAgents) {

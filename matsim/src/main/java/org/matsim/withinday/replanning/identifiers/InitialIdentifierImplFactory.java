@@ -20,21 +20,21 @@
 
 package org.matsim.withinday.replanning.identifiers;
 
+import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.replanning.identifiers.interfaces.InitialIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.InitialIdentifierFactory;
-import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 
 public class InitialIdentifierImplFactory extends InitialIdentifierFactory {
 
-	private ActivityReplanningMap activityReplanningMap;
+	private MobsimDataProvider mobsimDataProvider;
 	
-	public InitialIdentifierImplFactory(ActivityReplanningMap activityReplanningMap) {
-		this.activityReplanningMap = activityReplanningMap;
+	public InitialIdentifierImplFactory(MobsimDataProvider mobsimDataProvider) {
+		this.mobsimDataProvider = mobsimDataProvider;
 	}
 	
 	@Override
 	public InitialIdentifier createIdentifier() {
-		InitialIdentifier identifier = new InitialIdentifierImpl(activityReplanningMap);
+		InitialIdentifier identifier = new InitialIdentifierImpl(mobsimDataProvider);
 		identifier.setIdentifierFactory(this);
 		this.addAgentFiltersToIdentifier(identifier);
 		return identifier;

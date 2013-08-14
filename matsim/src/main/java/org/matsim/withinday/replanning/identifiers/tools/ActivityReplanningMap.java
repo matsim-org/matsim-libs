@@ -108,11 +108,6 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 			this.activityEndTimes.put(mobsimAgent.getId(), activityEndTime);
 		}
 	}
-
-	@Deprecated
-	public Map<Id, MobsimAgent> getPersonAgentMapping() {
-		return Collections.unmodifiableMap(this.mobsimDataProvider.getAgents());
-	}
 	
 	/*
 	 * The Activity Start Events are thrown before the Activity Start has been handled

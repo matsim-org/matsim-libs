@@ -20,15 +20,20 @@
 
 package playground.christoph.evacuation.controler;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.multimodal.MultiModalControlerListener;
+import org.matsim.contrib.multimodal.router.MultimodalTripRouterFactory;
+import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -36,14 +41,28 @@ import org.matsim.core.mobsim.framework.MobsimFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
 import org.matsim.core.mobsim.qsim.qnetsimengine.MissedJointDepartureWriter;
 import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
+import org.matsim.core.router.RoutingContext;
+import org.matsim.core.router.RoutingContextImpl;
+import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
+import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
+import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
+import org.matsim.core.router.util.FastAStarLandmarksFactory;
+import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
+import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.matsim.pt.router.TransitRouterConfig;
+import org.matsim.pt.router.TransitRouterNetwork;
+import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.withinday.controller.WithinDayControlerListener;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
+import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.replanning.identifiers.ActivityPerformingIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.LegPerformingIdentifierFactory;
@@ -56,6 +75,10 @@ import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIden
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifierFactory;
+import org.matsim.withinday.replanning.replanners.CurrentLegReplannerFactory;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplannerFactory;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplannerFactory;
+import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplannerFactory;
 import org.matsim.withinday.trafficmonitoring.LinkEnteredProvider;
 import org.opengis.feature.simple.SimpleFeature;
 
@@ -72,15 +95,29 @@ import playground.christoph.evacuation.mobsim.InformedHouseholdsTracker;
 import playground.christoph.evacuation.mobsim.ReplanningTracker;
 import playground.christoph.evacuation.mobsim.VehiclesTracker;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataGrabber;
+import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.mobsim.decisionmodel.DecisionModelRunner;
+import playground.christoph.evacuation.pt.EvacuationTransitRouterFactory;
+import playground.christoph.evacuation.pt.TransitRouterNetworkReaderMatsimV1;
+import playground.christoph.evacuation.router.LeastCostPathCalculatorSelectorFactory;
+import playground.christoph.evacuation.router.RandomCompassRouterFactory;
 import playground.christoph.evacuation.router.util.AffectedAreaPenaltyCalculator;
+import playground.christoph.evacuation.router.util.FuzzyTravelTimeEstimatorFactory;
+import playground.christoph.evacuation.router.util.PenaltyTravelCostFactory;
+import playground.christoph.evacuation.trafficmonitoring.SwissPTTravelTime;
 import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsToDropOffIdentifierFactory;
 import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsToPickupIdentifierFactory;
+import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifier;
 import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifierFactory;
 import playground.christoph.evacuation.withinday.replanning.identifiers.filters.AffectedAgentsFilter;
 import playground.christoph.evacuation.withinday.replanning.identifiers.filters.AffectedAgentsFilterFactory;
 import playground.christoph.evacuation.withinday.replanning.identifiers.filters.InformedAgentsFilter;
 import playground.christoph.evacuation.withinday.replanning.identifiers.filters.InformedAgentsFilterFactory;
+import playground.christoph.evacuation.withinday.replanning.replanners.CurrentActivityToMeetingPointReplannerFactory;
+import playground.christoph.evacuation.withinday.replanning.replanners.CurrentLegToMeetingPointReplannerFactory;
+import playground.christoph.evacuation.withinday.replanning.replanners.DropOffAgentReplannerFactory;
+import playground.christoph.evacuation.withinday.replanning.replanners.JoinedHouseholdsReplannerFactory;
+import playground.christoph.evacuation.withinday.replanning.replanners.PickupAgentReplannerFactory;
 import playground.christoph.evacuation.withinday.replanning.utils.ModeAvailabilityChecker;
 import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
 import playground.christoph.evacuation.withinday.replanning.utils.SelectHouseholdMeetingPoint;
@@ -136,15 +173,29 @@ public class EvacuationControlerListener implements StartupListener {
 	private DuringLegIdentifier agentsToPickupIdentifier;
 	private DuringLegIdentifier duringLegRerouteIdentifier;
 	
-//	/*
-//	 * ReplannerFactories
-//	 */
-//	private WithinDayDuringActivityReplannerFactory currentActivityToMeetingPointReplannerFactory;
-//	private WithinDayDuringActivityReplannerFactory joinedHouseholdsReplannerFactory;
-//	private WithinDayDuringLegReplannerFactory currentLegToMeetingPointReplannerFactory;
-//	private WithinDayDuringLegReplannerFactory dropOffAgentsReplannerFactory;
-//	private WithinDayDuringLegReplannerFactory pickupAgentsReplannerFactory;
-//	private WithinDayDuringLegReplannerFactory duringLegRerouteReplannerFactory;
+	/*
+	 * ReplannerFactories
+	 */
+	private WithinDayDuringActivityReplannerFactory currentActivityToMeetingPointReplannerFactory;
+	private WithinDayDuringActivityReplannerFactory joinedHouseholdsReplannerFactory;
+	private WithinDayDuringLegReplannerFactory currentLegToMeetingPointReplannerFactory;
+	private WithinDayDuringLegReplannerFactory dropOffAgentsReplannerFactory;
+	private WithinDayDuringLegReplannerFactory pickupAgentsReplannerFactory;
+	private WithinDayDuringLegReplannerFactory duringLegRerouteReplannerFactory;
+	
+	/*
+	 * WithinDayTripRouter Stuff
+	 */
+	private Map<String, TravelTime> withinDayTravelTimes;
+	private TripRouterFactory withinDayTripRouterFactory;
+	private LeastCostPathCalculatorFactory withinDayLeastCostPathCalculatorFactory;
+	private TravelDisutilityFactory withinDayTravelDisutilityFactory;
+	
+	/*
+	 * Replanners that are used to adapt agent's plans for the first time. They can be disabled
+	 * after all agents have been informed and have adapted their plans.
+	 */
+	private List<WithinDayReplannerFactory<?>> initialReplannerFactories;
 	
 	/*
 	 * Data
@@ -170,7 +221,7 @@ public class EvacuationControlerListener implements StartupListener {
 		
 		this.initAnalysisStuff(event.getControler());
 		
-		this.initIdentifiers(event.getControler());
+		this.initReplanningStuff(event.getControler());
 		
 		/*
 		 * Use a MobsimFactory which creates vehicles according to available vehicles per
@@ -235,12 +286,11 @@ public class EvacuationControlerListener implements StartupListener {
 		// workaround
 //		scenario.getConfig().scenario().setUseTransit(false);
 		
-		Map<String, TravelTime> travelTimes = new HashMap<String, TravelTime>();
-		travelTimes.putAll(this.multiModalControlerListener.getMultiModalTravelTimes());
-		travelTimes.put(TransportMode.car, this.withinDayControlerListener.getTravelTimeCollector());
-		this.selectHouseholdMeetingPoint = new SelectHouseholdMeetingPoint(scenario, travelTimes, 
-				this.coordAnalyzer.createInstance(), this.affectedArea, 
-				this.informedHouseholdsTracker, this.decisionModelRunner, this.withinDayControlerListener.getMobsimDataProvider());
+		this.initWithinDayTravelTimes(controler);
+		
+		this.selectHouseholdMeetingPoint = new SelectHouseholdMeetingPoint(scenario, this.withinDayTravelTimes, 
+				this.coordAnalyzer.createInstance(), this.affectedArea, this.informedHouseholdsTracker, 
+				this.decisionModelRunner, this.withinDayControlerListener.getMobsimDataProvider());
 		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(this.selectHouseholdMeetingPoint);
 		controler.addControlerListener(this.selectHouseholdMeetingPoint);
 		
@@ -296,6 +346,71 @@ public class EvacuationControlerListener implements StartupListener {
 		}
 	}
 	
+	private void initWithinDayTravelTimes(Controler controler) {
+		
+		Scenario scenario = controler.getScenario();
+		
+		this.withinDayTravelTimes = new HashMap<String, TravelTime>();
+		withinDayTravelTimes.putAll(this.multiModalControlerListener.getMultiModalTravelTimes());
+		withinDayTravelTimes.put(TransportMode.car, this.withinDayControlerListener.getTravelTimeCollector());
+		
+		/*
+		 * If fuzzy travel times should be used, wrap each TravelTime into a
+		 * FuzzyTravelTime object.
+		 */
+		if (EvacuationConfig.useFuzzyTravelTimes) {
+			Map<String, TravelTime> fuzziedTravelTimes = new HashMap<String, TravelTime>();
+			for (Entry<String, TravelTime> entry : this.withinDayTravelTimes.entrySet()) {
+				String mode = entry.getKey();
+				TravelTime travelTime = entry.getValue();
+				FuzzyTravelTimeEstimatorFactory fuzzyTravelTimeEstimatorFactory = new FuzzyTravelTimeEstimatorFactory(scenario, 
+						travelTime, this.householdsTracker, this.withinDayControlerListener.getMobsimDataProvider());
+				TravelTime fuzziedTravelTime = fuzzyTravelTimeEstimatorFactory.createTravelTime();
+				fuzziedTravelTimes.put(mode, fuzziedTravelTime);
+			}
+			this.withinDayTravelTimes = fuzziedTravelTimes;
+		}
+	}
+	
+	private void initReplanningStuff(Controler controler) {
+		this.initWithinDayTripRouterFactory(controler);
+		this.initIdentifiers(controler);
+		this.initReplanners(controler);
+	}
+	
+	private void initWithinDayTripRouterFactory(Controler controler) {
+		
+		Config config = controler.getConfig();
+		Scenario scenario = controler.getScenario();
+		
+		/*
+		 * Add time dependent penalties to travel costs within the affected area.
+		 */
+		TravelDisutilityFactory costFactory = new OnlyTimeDependentTravelCostCalculatorFactory();
+		this.withinDayTravelDisutilityFactory = new PenaltyTravelCostFactory(costFactory, penaltyCalculator);
+		
+		LeastCostPathCalculatorFactory nonPanicFactory = new FastAStarLandmarksFactory(scenario.getNetwork(), 
+				new FreespeedTravelTimeAndDisutility(scenario.getConfig().planCalcScore()));
+		LeastCostPathCalculatorFactory panicFactory = new RandomCompassRouterFactory(EvacuationConfig.tabuSearch, 
+				EvacuationConfig.compassProbability);
+		this.withinDayLeastCostPathCalculatorFactory = new LeastCostPathCalculatorSelectorFactory(nonPanicFactory, panicFactory, 
+				this.decisionModelRunner.getDecisionDataProvider());
+		
+		new TransitScheduleReader(scenario).readFile(config.transit().getTransitScheduleFile());
+		TransitRouterNetwork routerNetwork = new TransitRouterNetwork();
+		new TransitRouterNetworkReaderMatsimV1(scenario, routerNetwork).parse(EvacuationConfig.transitRouterFile);
+		
+		TransitRouterConfig transitRouterConfig = new TransitRouterConfig(config.planCalcScore(),
+				config.plansCalcRoute(), config.transitRouter(), config.vspExperimental());
+		EvacuationTransitRouterFactory evacuationTransitRouterFactory = 
+				new EvacuationTransitRouterFactory(config, this.withinDayTravelTimes.get(TransportMode.walk), 
+						routerNetwork, transitRouterConfig);
+		
+		// TODO: EvacuationTransitRouterFactory is not a TransitRouterFactory so far!
+		this.withinDayTripRouterFactory = new EvacuationTripRouterFactory(scenario, this.withinDayTravelTimes, 
+				this.withinDayTravelDisutilityFactory, this.withinDayLeastCostPathCalculatorFactory, null);		
+	}
+	
 	private void initIdentifiers(Controler controler) {
 		
 		Scenario scenario = controler.getScenario();
@@ -332,7 +447,8 @@ public class EvacuationControlerListener implements StartupListener {
 		/*
 		 * During Activity Identifiers
 		 */
-		duringActivityFactory = new ActivityPerformingIdentifierFactory(this.withinDayControlerListener.getActivityReplanningMap());
+		duringActivityFactory = new ActivityPerformingIdentifierFactory(this.withinDayControlerListener.getActivityReplanningMap(), 
+				this.withinDayControlerListener.getMobsimDataProvider());
 		duringActivityFactory.addAgentFilterFactory(initialReplanningFilterFactory);
 		this.activityPerformingIdentifier = duringActivityFactory.createIdentifier();
 		
@@ -370,5 +486,64 @@ public class EvacuationControlerListener implements StartupListener {
 		duringLegFactory.addAgentFilterFactory(nonPTLegAgentsFilterFactory);
 		duringLegFactory.addAgentFilterFactory(new ProbabilityFilterFactory(EvacuationConfig.duringLegReroutingShare));
 		this.duringLegRerouteIdentifier = duringLegFactory.createIdentifier();
+	}
+	
+	/*
+	 * New Routers for the Replanning are used instead of using the controler's.
+	 * By doing this every person can use a personalized Router.
+	 */
+	private void initReplanners(Controler controler) {
+		
+		Scenario scenario = controler.getScenario();
+		WithinDayEngine withinDayEngine = this.withinDayControlerListener.getWithinDayEngine();
+		DecisionDataProvider decisionDataProvider = this.decisionModelRunner.getDecisionDataProvider();
+		TripRouterFactory tripRouterFactory = this.withinDayTripRouterFactory;	
+		
+		TravelDisutility travelDisutility = this.withinDayTravelDisutilityFactory.createTravelDisutility(
+				this.withinDayTravelTimes.get(TransportMode.car), scenario.getConfig().planCalcScore()); 
+		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, this.withinDayTravelTimes.get(TransportMode.car));
+		
+		/*
+		 * During Activity Replanners
+		 */
+//		this.currentActivityToMeetingPointReplannerFactory = new CurrentActivityToMeetingPointReplannerFactory(scenario, 
+//				withinDayEngine, decisionDataProvider, this.modeAvailabilityChecker, 
+//				(SwissPTTravelTime) ptTravelTime, tripRouterFactory, routingContext);
+//		this.currentActivityToMeetingPointReplannerFactory.addIdentifier(this.activityPerformingIdentifier);
+//		withinDayEngine.addTimedDuringActivityReplannerFactory(this.currentActivityToMeetingPointReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+		
+//		this.joinedHouseholdsReplannerFactory = new JoinedHouseholdsReplannerFactory(scenario, withinDayEngine, 
+//				decisionDataProvider,
+//				(JoinedHouseholdsIdentifier) joinedHouseholdsIdentifier, (SwissPTTravelTime) this.ptTravelTime, tripRouterFactory, routingContext);
+//		this.joinedHouseholdsReplannerFactory.addIdentifier(joinedHouseholdsIdentifier);
+//		withinDayEngine.addTimedDuringActivityReplannerFactory(this.joinedHouseholdsReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+
+		/*
+		 * During Leg Replanners
+		 */
+		this.currentLegToMeetingPointReplannerFactory = new CurrentLegToMeetingPointReplannerFactory(scenario, withinDayEngine,
+				decisionDataProvider, tripRouterFactory, routingContext);
+		this.currentLegToMeetingPointReplannerFactory.addIdentifier(this.legPerformingIdentifier);
+		withinDayEngine.addTimedDuringLegReplannerFactory(this.currentLegToMeetingPointReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+
+		this.dropOffAgentsReplannerFactory = new DropOffAgentReplannerFactory(scenario, withinDayEngine, tripRouterFactory, routingContext);
+		this.dropOffAgentsReplannerFactory.addIdentifier(this.agentsToDropOffIdentifier);
+		withinDayEngine.addTimedDuringLegReplannerFactory(this.dropOffAgentsReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+		
+		this.pickupAgentsReplannerFactory = new PickupAgentReplannerFactory(scenario, withinDayEngine);
+		this.pickupAgentsReplannerFactory.addIdentifier(this.agentsToPickupIdentifier);
+		withinDayEngine.addTimedDuringLegReplannerFactory(this.pickupAgentsReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+		
+		this.duringLegRerouteReplannerFactory = new CurrentLegReplannerFactory(scenario, withinDayEngine, tripRouterFactory, routingContext);
+		this.duringLegRerouteReplannerFactory.addIdentifier(this.duringLegRerouteIdentifier);
+		withinDayEngine.addTimedDuringLegReplannerFactory(this.duringLegRerouteReplannerFactory, EvacuationConfig.evacuationTime, Double.MAX_VALUE);
+		
+		
+		/*
+		 * Collect Replanners that can be disabled after all agents have been informed.
+		 */
+		this.initialReplannerFactories = new ArrayList<WithinDayReplannerFactory<?>>();
+		this.initialReplannerFactories.add(this.currentActivityToMeetingPointReplannerFactory);
+		this.initialReplannerFactories.add(this.currentLegToMeetingPointReplannerFactory);
 	}
 }

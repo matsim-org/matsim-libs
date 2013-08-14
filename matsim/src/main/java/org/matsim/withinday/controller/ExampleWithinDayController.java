@@ -134,7 +134,7 @@ public class ExampleWithinDayController implements StartupListener {
 				.createTravelDisutility(this.withinDayControlerListener.getTravelTimeCollector(), this.scenario.getConfig().planCalcScore());
 		RoutingContext routingContext = new RoutingContextImpl(travelDisutility, this.withinDayControlerListener.getTravelTimeCollector());
 		
-		this.initialIdentifierFactory = new InitialIdentifierImplFactory(this.withinDayControlerListener.getActivityReplanningMap());
+		this.initialIdentifierFactory = new InitialIdentifierImplFactory(this.withinDayControlerListener.getMobsimDataProvider());
 		this.initialProbabilityFilterFactory = new ProbabilityFilterFactory(this.pInitialReplanning);
 		this.initialIdentifierFactory.addAgentFilterFactory(this.initialProbabilityFilterFactory);
 		this.initialIdentifier = initialIdentifierFactory.createIdentifier();

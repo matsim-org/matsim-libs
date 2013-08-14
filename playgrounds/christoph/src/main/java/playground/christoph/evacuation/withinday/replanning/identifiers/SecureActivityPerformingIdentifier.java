@@ -33,6 +33,7 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 import org.matsim.core.utils.geometry.CoordUtils;
+import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 
@@ -43,21 +44,24 @@ public class SecureActivityPerformingIdentifier extends DuringActivityIdentifier
 	private static final Logger log = Logger.getLogger(SecureActivityPerformingIdentifier.class);
 	
 	protected ActivityReplanningMap activityReplanningMap;
+	protected MobsimDataProvider mobsimDataProvider;
 	protected Coord centerCoord;
 	protected double secureDistance;
 	protected WithinDayAgentUtils withinDayAgentUtils;
 	
 	// Only for Cloning.
-	/*package*/ SecureActivityPerformingIdentifier(ActivityReplanningMap activityReplanningMap, Coord centerCoord, double secureDistance) {
+	/*package*/ SecureActivityPerformingIdentifier(ActivityReplanningMap activityReplanningMap, 
+			MobsimDataProvider mobsimDataProvider, Coord centerCoord, double secureDistance) {
 		this.activityReplanningMap = activityReplanningMap;
+		this.mobsimDataProvider = mobsimDataProvider;
 		this.centerCoord = centerCoord;
 		this.secureDistance = secureDistance;
 		this.withinDayAgentUtils = new WithinDayAgentUtils();
 	}
 	
 	public Set<MobsimAgent> getAgentsToReplan(double time) {
-		Set<Id> activityPerformingAgents = activityReplanningMap.getActivityPerformingAgents();
-		Map<Id, MobsimAgent> mapping = activityReplanningMap.getPersonAgentMapping();
+		Set<Id> activityPerformingAgents = this.activityReplanningMap.getActivityPerformingAgents();
+		Map<Id, MobsimAgent> mapping = this.mobsimDataProvider.getAgents();
 		
 		// apply filter to remove agents that should not be replanned
 		this.applyFilters(activityPerformingAgents, time);

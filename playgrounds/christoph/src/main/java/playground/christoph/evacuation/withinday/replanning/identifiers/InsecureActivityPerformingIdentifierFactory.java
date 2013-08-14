@@ -21,25 +21,30 @@
 package playground.christoph.evacuation.withinday.replanning.identifiers;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifierFactory;
 import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 
 public class InsecureActivityPerformingIdentifierFactory extends DuringActivityIdentifierFactory {
 
-	private ActivityReplanningMap activityReplanningMap;
-	private Coord centerCoord;
-	private double secureDistance;
+	private final ActivityReplanningMap activityReplanningMap;
+	private final MobsimDataProvider mobsimDataProvider;
+	private final Coord centerCoord;
+	private final double secureDistance;
 	
-	public InsecureActivityPerformingIdentifierFactory(ActivityReplanningMap activityReplanningMap, Coord centerCoord, double secureDistance) {
+	public InsecureActivityPerformingIdentifierFactory(ActivityReplanningMap activityReplanningMap, 
+			MobsimDataProvider mobsimDataProvider, Coord centerCoord, double secureDistance) {
 		this.activityReplanningMap = activityReplanningMap;
+		this.mobsimDataProvider = mobsimDataProvider;
 		this.centerCoord = centerCoord;
 		this.secureDistance = secureDistance;
 	}
 	
 	@Override
 	public DuringActivityIdentifier createIdentifier() {
-		DuringActivityIdentifier identifier = new InsecureActivityPerformingIdentifier(activityReplanningMap, centerCoord, secureDistance);
+		DuringActivityIdentifier identifier = new InsecureActivityPerformingIdentifier(this.activityReplanningMap, 
+				this.mobsimDataProvider, this.centerCoord, this.secureDistance);
 		identifier.setIdentifierFactory(this);
 		this.addAgentFiltersToIdentifier(identifier);
 		return identifier;

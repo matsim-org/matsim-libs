@@ -73,8 +73,10 @@ public class EvacuationRunner {
 			// create Controler Listeners; add them afterwards in a meaningful order
 			MultiModalControlerListener multiModalControlerListener = new MultiModalControlerListener();
 			WithinDayControlerListener withinDayControlerListener = new WithinDayControlerListener();
+			PreconfigureMultiModalControlerListener preconfigureMultiModalControlerListener = new PreconfigureMultiModalControlerListener(
+					multiModalControlerListener);
 			PreconfigureWithinDayControlerListener preconfigureWithinDayControlerListener = new PreconfigureWithinDayControlerListener(
-					withinDayControlerListener,multiModalControlerListener);
+					withinDayControlerListener, multiModalControlerListener);
 			EvacuationControlerListener evacuationControlerListener = new EvacuationControlerListener(withinDayControlerListener,
 					multiModalControlerListener);
 			
@@ -94,7 +96,11 @@ public class EvacuationRunner {
 			
 			// Configuration
 			controler.addControlerListener(multiModalControlerListener);
-					
+			
+			// pre-configure multi-modal controler listener
+			controler.addControlerListener(preconfigureMultiModalControlerListener);			
+			
+			
 			controler.setOverwriteFiles(true);
 			controler.run();
 		}

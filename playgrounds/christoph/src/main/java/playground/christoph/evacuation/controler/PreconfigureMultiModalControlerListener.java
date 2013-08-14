@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PreconfigureWithinDayControlerListener.java
+ * PreconfigureMultiModalControlerListener.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,53 +20,33 @@
 
 package playground.christoph.evacuation.controler;
 
-import java.util.Map;
-
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.multimodal.MultiModalControlerListener;
-import org.matsim.contrib.multimodal.router.util.PersonalizedTravelTime;
+import org.matsim.contrib.multimodal.router.util.PersonalizedTravelTimeFactory;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
-import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
-import org.matsim.withinday.controller.WithinDayControlerListener;
 
 /**
- * Configures the WithinDayControlerListener with objects from the MultiModalControlerListener.
- * this is done after the MultiModalControlerListener has processed the StartupEvent but before
- * the event is processed by the WithinDayControlerListener.
+ * Configures the MultiModalControlerListener with additional TravelTimeFactories.
+ * This is done before the MultiModalControlerListener has processed the StartupEvent.
+ * 
+ * This is only a workaround until the PT integration into the code as well as into the
+ * model is done!
  * 
  * @author cdobler
  */
-public class PreconfigureWithinDayControlerListener implements StartupListener {
+public class PreconfigureMultiModalControlerListener implements StartupListener {
 
-	private final WithinDayControlerListener withinDayControlerListener;
 	private final MultiModalControlerListener multiModalControlerListener;
 	
-	public PreconfigureWithinDayControlerListener(WithinDayControlerListener withinDayControlerListener, 
-			MultiModalControlerListener multiModalControlerListener) {
-		this.withinDayControlerListener = withinDayControlerListener;
+	public PreconfigureMultiModalControlerListener(MultiModalControlerListener multiModalControlerListener) {
 		this.multiModalControlerListener = multiModalControlerListener;
 	}
 
 	@Override
 	public void notifyStartup(StartupEvent event) {
 		
-		/*
-		 * Set the TravelTime objects which are used to calculate agents' earliest link
-		 * exit times. For car trip, a free speed travel time calculator is used.
-		 */
-		Map<String, TravelTime> multiModalTravelTimes = this.multiModalControlerListener.getMultiModalTravelTimes();
-		this.withinDayControlerListener.addMultiModalTravelTimes(multiModalTravelTimes);
-		this.withinDayControlerListener.addMultiModalTravelTime(TransportMode.car, new FreeSpeedTravelTime());
-		
-		// workaround until PT is fully implemented
-		TravelTime ptTravelTime = multiModalTravelTimes.get(TransportMode.pt);
-		if (ptTravelTime instanceof PersonalizedTravelTime) {
-			for (Id personId : event.getControler().getPopulation().getPersons().keySet()) {
-				((PersonalizedTravelTime) ptTravelTime).setPersonSpeed(personId, 15.0);
-			}
-		}
+		this.multiModalControlerListener.addAdditionalTravelTimeFactory(TransportMode.pt, new PersonalizedTravelTimeFactory());
 	}
+	
 }
