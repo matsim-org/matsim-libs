@@ -29,7 +29,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
@@ -38,32 +39,34 @@ import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 public class ActivityEndIdentifier extends DuringActivityIdentifier {
 	
 	protected ActivityReplanningMap activityReplanningMap;
+	protected WithinDayAgentUtils withinDayAgentUtils;
 	
 	// use the Factory!
 	/*package*/ ActivityEndIdentifier(ActivityReplanningMap activityReplanningMap) {
 		this.activityReplanningMap = activityReplanningMap;
+		this.withinDayAgentUtils = new WithinDayAgentUtils();
 	}
 	
 	@Override
-	public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
+	public Set<MobsimAgent> getAgentsToReplan(double time) {
 		
-		Set<PlanBasedWithinDayAgent> endActivityAgents = activityReplanningMap.getActivityEndingAgents(time);
-		Set<PlanBasedWithinDayAgent> agentsToReplan = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
+		Set<MobsimAgent> endActivityAgents = activityReplanningMap.getActivityEndingAgents(time);
+		Set<MobsimAgent> agentsToReplan = new TreeSet<MobsimAgent>(new PersonAgentComparator());
 		
 		/*
 		 * Apply filter to remove agents that should not be replanned.
 		 * We need a workaround since applyFilters expects Ids and not Agents.
 		 */
 		Set<Id> agentIds = new HashSet<Id>();
-		for (PlanBasedWithinDayAgent agent : endActivityAgents) agentIds.add(agent.getId());
+		for (MobsimAgent agent : endActivityAgents) agentIds.add(agent.getId());
 		this.applyFilters(agentIds, time);
-		for (PlanBasedWithinDayAgent agent : endActivityAgents) {
+		for (MobsimAgent agent : endActivityAgents) {
 			if (agentIds.contains(agent.getId())) agentsToReplan.add(agent);
 		}
 		
-		Iterator<PlanBasedWithinDayAgent> iter = agentsToReplan.iterator();
+		Iterator<MobsimAgent> iter = agentsToReplan.iterator();
 		while(iter.hasNext()) {
-			PlanBasedWithinDayAgent withinDayAgent = iter.next();	
+			MobsimAgent withinDayAgent = iter.next();	
 						
 			/*
 			 * Check whether the next Leg has to be replanned.
@@ -72,7 +75,7 @@ public class ActivityEndIdentifier extends DuringActivityIdentifier {
 			 * next Activity with duration 0)
 			 */
 			// get executed plan
-			PlanImpl executedPlan = (PlanImpl)withinDayAgent.getSelectedPlan();
+			PlanImpl executedPlan = (PlanImpl) this.withinDayAgentUtils.getSelectedPlan(withinDayAgent);
 			
 			// If we don't have a selected plan
 			if (executedPlan == null) {
@@ -87,7 +90,7 @@ public class ActivityEndIdentifier extends DuringActivityIdentifier {
 			/*
 			 *  Get the current PlanElement and check if it is an Activity
 			 */
-			PlanElement currentPlanElement = withinDayAgent.getCurrentPlanElement();
+			PlanElement currentPlanElement = this.withinDayAgentUtils.getCurrentPlanElement(withinDayAgent);
 			if (currentPlanElement instanceof Activity) {
 				currentActivity = (Activity) currentPlanElement;
 			} else {

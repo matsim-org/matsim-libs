@@ -20,49 +20,43 @@
 
 package playground.christoph.parking.withinday.identifier;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 
 import playground.christoph.parking.core.mobsim.ParkingInfrastructure;
 import playground.christoph.parking.withinday.utils.ParkingAgentsTracker;
 
-public class ParkingSearchIdentifier extends DuringLegIdentifier implements MobsimInitializedListener {
+public class ParkingSearchIdentifier extends DuringLegIdentifier {
 	
 	private final ParkingAgentsTracker parkingAgentsTracker;
 	private final ParkingInfrastructure parkingInfrastructure;
-	private final Map<Id, PlanBasedWithinDayAgent> agents;
+	private final MobsimDataProvider mobsimDataProvider;
 	
-	public ParkingSearchIdentifier(ParkingAgentsTracker parkingAgentsTracker, ParkingInfrastructure parkingInfrastructure) {
+	public ParkingSearchIdentifier(ParkingAgentsTracker parkingAgentsTracker, ParkingInfrastructure parkingInfrastructure,
+			MobsimDataProvider mobsimDataProvider) {
 		this.parkingAgentsTracker = parkingAgentsTracker;
 		this.parkingInfrastructure = parkingInfrastructure;
-		
-		this.agents = new HashMap<Id, PlanBasedWithinDayAgent>();
+		this.mobsimDataProvider = mobsimDataProvider;
 	}
 	
 	@Override
-	public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
+	public Set<MobsimAgent> getAgentsToReplan(double time) {
 
 		/*
 		 * Get all agents that are searching and have entered a new link in the last
 		 * time step.
 		 */
 		Set<Id> linkEnteredAgents = this.parkingAgentsTracker.getLinkEnteredAgents();		
-		Set<PlanBasedWithinDayAgent> identifiedAgents = new HashSet<PlanBasedWithinDayAgent>();
+		Set<MobsimAgent> identifiedAgents = new HashSet<MobsimAgent>();
 		
 		for (Id agentId : linkEnteredAgents) {
-			PlanBasedWithinDayAgent agent = this.agents.get(agentId);
+			MobsimAgent agent = this.mobsimDataProvider.getAgent(agentId);
 			
 			/*
 			 * If the agent has not selected a parking facility yet.
@@ -111,12 +105,12 @@ public class ParkingSearchIdentifier extends DuringLegIdentifier implements Mobs
 		return identifiedAgents;
 	}
 	
-	private boolean acceptParking(PlanBasedWithinDayAgent agent, Id facilityId) {
+	private boolean acceptParking(MobsimAgent agent, Id facilityId) {
 		// TODO: allow the agent to refuse the parking
 		return true;
 	}
 	
-	private boolean isWillingToWaitForParking(PlanBasedWithinDayAgent agent, Id facilityId) {
+	private boolean isWillingToWaitForParking(MobsimAgent agent, Id facilityId) {
 		// TODO: add a behavioural model, that e.g. takes the facilities capacity into account
 		return true;
 	}
@@ -125,16 +119,8 @@ public class ParkingSearchIdentifier extends DuringLegIdentifier implements Mobs
 	 * If no parking is selected for the current agent, the agent requires
 	 * a replanning.
 	 */
-	private boolean requiresReplanning(PlanBasedWithinDayAgent agent) {
+	private boolean requiresReplanning(MobsimAgent agent) {
 		return parkingAgentsTracker.getSelectedParking(agent.getId()) == null;
-	}
-
-	@Override
-	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
-		this.agents.clear();
-		for (MobsimAgent agent : ((QSim) e.getQueueSimulation()).getAgents()) {
-			this.agents.put(agent.getId(), (ExperimentalBasicWithindayAgent) agent);
-		}
 	}
 
 }

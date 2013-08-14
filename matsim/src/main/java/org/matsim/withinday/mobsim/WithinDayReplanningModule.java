@@ -23,7 +23,7 @@ package org.matsim.withinday.mobsim;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.withinday.replanning.identifiers.interfaces.Identifier;
 import org.matsim.withinday.replanning.parallel.ParallelReplanner;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplannerFactory;
@@ -39,7 +39,7 @@ public abstract class WithinDayReplanningModule<T extends WithinDayReplannerFact
 			Id id = factory.getId();
 			
 			for (Identifier identifier : identifiers) {
-				for (PlanBasedWithinDayAgent withinDayAgent : identifier.getAgentsToReplan(time)) {					
+				for (MobsimAgent withinDayAgent : identifier.getAgentsToReplan(time)) {					
 					ReplanningTask replanningTask = new ReplanningTask(withinDayAgent, id);
 					this.parallelReplanner.addReplanningTask(replanningTask);
 				}

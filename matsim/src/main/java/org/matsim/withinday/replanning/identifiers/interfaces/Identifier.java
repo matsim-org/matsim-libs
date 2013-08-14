@@ -25,7 +25,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 
 /**
  * Identifies agents that need a replanning of their scheduled plan.
@@ -37,7 +37,7 @@ public abstract class Identifier {
 	private IdentifierFactory identifierFactory;
 	private final Set<AgentFilter> agentFilters = new LinkedHashSet<AgentFilter>();
 	
-	public abstract Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time);
+	public abstract Set<MobsimAgent> getAgentsToReplan(double time);
 	
 	public final void addAgentFilter(AgentFilter agentFilter) {
 		this.agentFilters.add(agentFilter);

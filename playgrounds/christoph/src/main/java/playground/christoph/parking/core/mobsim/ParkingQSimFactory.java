@@ -31,7 +31,7 @@ import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
-import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgentFactory;
+import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
@@ -103,7 +103,7 @@ public class ParkingQSimFactory implements MobsimFactory {
 		qSim.addMobsimEngine(this.withinDayEngine);
 		qSim.addMobsimEngine(this.parkingAgentsTracker);
 		
-		AgentFactory agentFactory = new ExperimentalBasicWithindayAgentFactory(qSim);
+		AgentFactory agentFactory = new DefaultAgentFactory(qSim);
 		
 		AgentSource agentSource = new ParkingAgentSource(sc, agentFactory, qSim, parkingInfrastructure, parkingRouterFactory);
 		qSim.addAgentSource(agentSource);

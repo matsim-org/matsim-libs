@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
@@ -56,7 +55,7 @@ public class InsecureLegPerformingIdentifier extends DuringLegIdentifier {
 		this.coordAnalyzer = coordAnalyzer;
 	}
 	
-	public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
+	public Set<MobsimAgent> getAgentsToReplan(double time) {
 		
 		Set<Id> legPerformingAgents = new HashSet<Id>(this.linkReplanningMap.getLegPerformingAgents());
 		Map<Id, MobsimAgent> mapping = this.mobsimDataProvider.getAgents();
@@ -64,10 +63,10 @@ public class InsecureLegPerformingIdentifier extends DuringLegIdentifier {
 		// apply filter to remove agents that should not be replanned
 		this.applyFilters(legPerformingAgents, time);
 		
-		Set<PlanBasedWithinDayAgent> agentsToReplan = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());		
+		Set<MobsimAgent> agentsToReplan = new TreeSet<MobsimAgent>(new PersonAgentComparator());		
 		for (Id id : legPerformingAgents) {
 			
-			PlanBasedWithinDayAgent agent = (PlanBasedWithinDayAgent) mapping.get(id);
+			MobsimAgent agent = mapping.get(id);
 			
 			Link currentLink = this.network.getLinks().get(agent.getCurrentLinkId());
 			boolean isAffected = this.coordAnalyzer.isLinkAffected(currentLink);

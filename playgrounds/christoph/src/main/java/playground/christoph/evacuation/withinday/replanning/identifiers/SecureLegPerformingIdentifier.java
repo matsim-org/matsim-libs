@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
@@ -59,7 +58,7 @@ public class SecureLegPerformingIdentifier extends DuringLegIdentifier {
 		this.secureDistance = secureDistance;
 	}
 	
-	public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
+	public Set<MobsimAgent> getAgentsToReplan(double time) {
 		
 		Set<Id> legPerformingAgents = new HashSet<Id>(this.linkReplanningMap.getLegPerformingAgents());
 		Map<Id, MobsimAgent> mapping = this.mobsimDataProvider.getAgents();
@@ -68,11 +67,11 @@ public class SecureLegPerformingIdentifier extends DuringLegIdentifier {
 		// apply filter to remove agents that should not be replanned
 		this.applyFilters(legPerformingAgents, time);
 		
-		Set<PlanBasedWithinDayAgent> agentsToReplan = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
+		Set<MobsimAgent> agentsToReplan = new TreeSet<MobsimAgent>(new PersonAgentComparator());
 		
 		for (Id id : legPerformingAgents) {
 			
-			PlanBasedWithinDayAgent agent = (PlanBasedWithinDayAgent) mapping.get(id);
+			MobsimAgent agent = mapping.get(id);
 			
 			/*
 			 * Remove the Agent from the list, if the current Link is in a insecure Area.

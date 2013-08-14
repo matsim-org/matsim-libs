@@ -30,7 +30,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -119,15 +118,16 @@ public class ParkAgentPaperStrategy implements FullParkingSearchStrategy {
 	public class ParkAgent {
 
 		boolean parkingFound = false;
-		private PlanBasedWithinDayAgent agent;
+		private MobsimAgent agent;
 		int stage = 1;
 		Id lastLinkHandled = null;
 		int numberOfFreeParking = 0;
 		int numberOfTotalParking = 0;
 		private double time;
 		private double stage3StartTime = 0;
-
-		public ParkAgent(PlanBasedWithinDayAgent agent) {
+		private WithinDayAgentUtils withinDayAgentUtils = new WithinDayAgentUtils();
+		
+		public ParkAgent(MobsimAgent agent) {
 			this.agent = agent;
 		}
 
@@ -171,13 +171,13 @@ public class ParkAgentPaperStrategy implements FullParkingSearchStrategy {
 
 		public double getDistanceToDestination() {
 			Link currentLink = scenarioData.getNetwork().getLinks().get(agent.getCurrentLinkId());
-			ActivityImpl destination = (ActivityImpl) agent.getSelectedPlan().getPlanElements().get(agent.getCurrentPlanElementIndex() + 3);
+			ActivityImpl destination = (ActivityImpl) this.withinDayAgentUtils.getSelectedPlan(agent).getPlanElements().get(this.withinDayAgentUtils.getCurrentPlanElementIndex(agent) + 3);
 			return GeneralLib.getDistance(currentLink.getCoord(), destination.getCoord());
 		}
 
 		private Link getNextLinkClosestToDestination() {
 			Link currentLink = scenarioData.getNetwork().getLinks().get(agent.getCurrentLinkId());
-			Coord destinationCoord = ((ActivityImpl) agent.getSelectedPlan().getPlanElements().get(agent.getCurrentPlanElementIndex() + 3)).getCoord();
+			Coord destinationCoord = ((ActivityImpl) this.withinDayAgentUtils.getSelectedPlan(agent).getPlanElements().get(this.withinDayAgentUtils.getCurrentPlanElementIndex(agent) + 3)).getCoord();
 			
 			Map<Id, ? extends Link> outLinks = currentLink.getToNode().getOutLinks();
 
@@ -224,9 +224,9 @@ public class ParkAgentPaperStrategy implements FullParkingSearchStrategy {
 		}
 
 		private boolean isCarAtEndOfCurrentRoute() {
-			Leg leg = agent.getCurrentLeg();
+			Leg leg = this.withinDayAgentUtils.getCurrentLeg(agent);
 
-			int routeIndex = agent.getCurrentRouteLinkIdIndex();
+			int routeIndex = this.withinDayAgentUtils.getCurrentRouteLinkIdIndex(agent);
 
 			NetworkRoute route = (NetworkRoute) leg.getRoute();
 
@@ -265,11 +265,11 @@ public class ParkAgentPaperStrategy implements FullParkingSearchStrategy {
 			if (getDistanceToDestination()>maxDistanceToDestination){
 				Id currentLinkId = agent.getCurrentLinkId();
 				
-				Leg leg = agent.getCurrentLeg();
+				Leg leg = this.withinDayAgentUtils.getCurrentLeg(agent);
 
 				//Link currentLink = this.network.getLinks().get(currentLinkId);
 
-				int routeIndex = agent.getCurrentRouteLinkIdIndex();
+				int routeIndex = this.withinDayAgentUtils.getCurrentRouteLinkIdIndex(agent);
 
 				NetworkRoute route = (NetworkRoute) leg.getRoute();
 
@@ -319,7 +319,7 @@ public class ParkAgentPaperStrategy implements FullParkingSearchStrategy {
 		}
 	}
 
-	private ParkAgent getParkAgent(PlanBasedWithinDayAgent agent) {
+	private ParkAgent getParkAgent(MobsimAgent agent) {
 		// TODO: perhaps also check, if correct leg.
 		if (!parkAgents.containsKey(agent.getId())) {
 			parkAgents.put(agent.getId(), new ParkAgent(agent));
@@ -329,7 +329,7 @@ public class ParkAgentPaperStrategy implements FullParkingSearchStrategy {
 		return parkAgent;
 	}
 
-	public void handleAgent(PlanBasedWithinDayAgent agent, double time) {
+	public void handleAgent(MobsimAgent agent, double time) {
 		ParkAgent parkAgent = getParkAgent(agent);
 		parkAgent.updateTime(time);
 

@@ -45,7 +45,7 @@ import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.withinday.events.ReplanningEvent;
 import org.matsim.withinday.events.handler.ReplanningEventHandler;
@@ -74,14 +74,14 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 	private NavigableSet<AgentEntry> activityPerformingAgents;	// PersonDriverAgentId
 	private Map<Id, Double> activityEndTimes;	// scheduled activity end times
 
-	private Set<PlanBasedWithinDayAgent> personAgentsToReplanActivityEndCache = null;
+	private Set<MobsimAgent> personAgentsToReplanActivityEndCache = null;
 	private double personAgentsToReplanActivityEndCacheTime = Double.NaN;
 
 	/*
 	 * Mapping between the PersonDriverAgents and the PersonIds.
 	 * The events only contain a PersonId.
 	 */
-	private Map<Id, PlanBasedWithinDayAgent> personAgentMapping;	// PersonId, PersonDriverAgent
+	private Map<Id, MobsimAgent> personAgentMapping;	// PersonId, PersonDriverAgent
 	
 	public ActivityReplanningMap() {
 		log.info("Note that the ActivityReplanningMap has to be registered as an EventHandler and a SimulationListener!");
@@ -89,7 +89,7 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 	}
 	
 	private void init() {
-		this.personAgentMapping = new HashMap<Id, PlanBasedWithinDayAgent>();
+		this.personAgentMapping = new HashMap<Id, MobsimAgent>();
 		this.activityPerformingAgents = new TreeSet<AgentEntry>(new AgentEntryComparator());
 		this.startingAgents = new HashSet<Id>();
 		this.activityEndTimes = new HashMap<Id, Double>();
@@ -111,11 +111,11 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 		init();
 
 		if (sim instanceof QSim) {
+			WithinDayAgentUtils withinDayAgentUtils = new WithinDayAgentUtils();
 			for (MobsimAgent mobsimAgent : ((QSim)sim).getAgents()) {
-				PlanBasedWithinDayAgent withinDayAgent = (PlanBasedWithinDayAgent) mobsimAgent;
-				this.personAgentMapping.put(withinDayAgent.getId(), withinDayAgent);
+				this.personAgentMapping.put(withinDayAgentUtils.getId(mobsimAgent), mobsimAgent);
 				
-				double activityEndTime = withinDayAgent.getActivityEndTime();
+				double activityEndTime = mobsimAgent.getActivityEndTime();
 				
 				// mark the agent as currently performing an Activity
 				this.activityPerformingAgents.add(new AgentEntry(mobsimAgent, activityEndTime));
@@ -127,7 +127,7 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 	}
 
 	@Deprecated
-	public Map<Id, PlanBasedWithinDayAgent> getPersonAgentMapping() {
+	public Map<Id, MobsimAgent> getPersonAgentMapping() {
 		return Collections.unmodifiableMap(this.personAgentMapping);
 	}
 	
@@ -213,7 +213,7 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 		if (activityEndTime != null) {
 			
 			// check whether the agent has changed its planned departure time
-			PlanBasedWithinDayAgent agent = this.personAgentMapping.get(event.getPersonId());
+			MobsimAgent agent = this.personAgentMapping.get(event.getPersonId());
 			if (activityEndTime != agent.getActivityEndTime()) {
 				/*
 				 * Update the agents entry in the activityPerformingAgents set.
@@ -243,12 +243,12 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 	 * Returns a List of all agents that are going to end their activity
 	 * in the current time step.
 	 */
-	public Set<PlanBasedWithinDayAgent> getActivityEndingAgents(double time) {
+	public Set<MobsimAgent> getActivityEndingAgents(double time) {
 		
 		if (time == this.personAgentsToReplanActivityEndCacheTime) return this.personAgentsToReplanActivityEndCache;
 		else {
 			// activityPerformingAgents is sorted, therefore we do not need a TreeSet here
-			this.personAgentsToReplanActivityEndCache = new LinkedHashSet<PlanBasedWithinDayAgent>();
+			this.personAgentsToReplanActivityEndCache = new LinkedHashSet<MobsimAgent>();
 			this.personAgentsToReplanActivityEndCacheTime = time;
 			
 			Iterator<AgentEntry> iter = this.activityPerformingAgents.iterator();
@@ -262,7 +262,7 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 				 * If time >= activityEndTime, the agent will depart in this time step.
 				 */
 				if (time >= activityEndTime) {
-					personAgentsToReplanActivityEndCache.add((PlanBasedWithinDayAgent) entry.agent);
+					personAgentsToReplanActivityEndCache.add(entry.agent);
 				}
 			}
 			

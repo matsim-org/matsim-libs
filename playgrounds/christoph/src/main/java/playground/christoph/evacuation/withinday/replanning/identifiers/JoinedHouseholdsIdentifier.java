@@ -32,7 +32,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -84,7 +84,7 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier {
 	}
 
 	@Override
-	public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
+	public Set<MobsimAgent> getAgentsToReplan(double time) {
 		
 		this.householdDepartureManager.handleHouseholdsStuff(time);
 		
@@ -139,8 +139,8 @@ public class JoinedHouseholdsIdentifier extends DuringActivityIdentifier {
 		// apply filter to remove agents that should not be replanned
 		this.applyFilters(agentIds, time);
 
-		Set<PlanBasedWithinDayAgent> agentsToReplan = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
-		for (Id agentId : agentIds) agentsToReplan.add((PlanBasedWithinDayAgent) this.mobsimDataProvider.getAgent(agentId));
+		Set<MobsimAgent> agentsToReplan = new TreeSet<MobsimAgent>(new PersonAgentComparator());
+		for (Id agentId : agentIds) agentsToReplan.add(this.mobsimDataProvider.getAgent(agentId));
 		
 		return agentsToReplan;
 	}

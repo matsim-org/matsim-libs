@@ -47,7 +47,7 @@ import org.matsim.contrib.multimodal.router.util.WalkTravelTime;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -84,6 +84,7 @@ public class RideToRidePassengerAgentIdentifier extends InitialIdentifier {
 	private final ActivityReplanningMap activityReplanningMap;
 	private final RideToRidePassengerContextProvider rideToRidePassengerContextProvider;
 	private final JointDepartureOrganizer jointDepartureOrganizer;
+	private final WithinDayAgentUtils withinDayAgentUtils;
 	
 	private TravelTime carTravelTime = new FreeSpeedTravelTime();
 	private TravelTime walkTravelTime = new WalkTravelTime(new PlansCalcRouteConfigGroup());
@@ -95,10 +96,11 @@ public class RideToRidePassengerAgentIdentifier extends InitialIdentifier {
 		this.activityReplanningMap = activityReplanningMap;
 		this.rideToRidePassengerContextProvider = rideToRidePassengerContextProvider;
 		this.jointDepartureOrganizer = jointDepartureOrganizer;
+		this.withinDayAgentUtils = new WithinDayAgentUtils();
 	}
 	
 	@Override
-	public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
+	public Set<MobsimAgent> getAgentsToReplan(double time) {
 
 		this.rideToRidePassengerContextProvider.reset();
 		
@@ -106,14 +108,13 @@ public class RideToRidePassengerAgentIdentifier extends InitialIdentifier {
 		this.needAlternativeMode.reset();
 		
 		Collection<MobsimAgent> mobsimAgents = new LinkedHashSet<MobsimAgent>(this.activityReplanningMap.getPersonAgentMapping().values()); 
-		Set<PlanBasedWithinDayAgent> agentsToReplan = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
+		Set<MobsimAgent> agentsToReplan = new TreeSet<MobsimAgent>(new PersonAgentComparator());
 
 		for (MobsimAgent mobsimAgent : mobsimAgents) {
-			PlanBasedWithinDayAgent agent = (PlanBasedWithinDayAgent) mobsimAgent;
 	
-			Collection<Leg> rideLegs = getModeLegs(agent, TransportMode.ride);
+			Collection<Leg> rideLegs = getModeLegs(mobsimAgent, TransportMode.ride);
 			
-			if (rideLegs.size() > 0) agentsToReplan.add(agent);
+			if (rideLegs.size() > 0) agentsToReplan.add(mobsimAgent);
 		}
 		
 		log.info("Found " + agentsToReplan.size() + " agents performing a ride trip.");
@@ -130,10 +131,10 @@ public class RideToRidePassengerAgentIdentifier extends InitialIdentifier {
 		return agentsToReplan;
 	}
 	
-	private Collection<Leg> getModeLegs(PlanBasedWithinDayAgent agent, String mode) {
+	private Collection<Leg> getModeLegs(MobsimAgent agent, String mode) {
 		
 		List<Leg> modeLegs = new ArrayList<Leg>();
-		for (PlanElement planElement : agent.getSelectedPlan().getPlanElements()) {
+		for (PlanElement planElement : this.withinDayAgentUtils.getSelectedPlan(agent).getPlanElements()) {
 			if (planElement instanceof Leg) {
 				Leg leg = (Leg) planElement;
 				if (leg.getMode().equals(mode)) modeLegs.add(leg);
@@ -142,19 +143,18 @@ public class RideToRidePassengerAgentIdentifier extends InitialIdentifier {
 		return modeLegs;
 	}
 
-	private Map<Id, Map<Integer, List<LinkLeft>>> calculateExpectedLinkLeaveTimes(Collection<MobsimAgent> mobsimAgents, Set<PlanBasedWithinDayAgent> agentsToReplan) {
+	private Map<Id, Map<Integer, List<LinkLeft>>> calculateExpectedLinkLeaveTimes(Collection<MobsimAgent> mobsimAgents, Set<MobsimAgent> agentsToReplan) {
 		
 		Map<Id, Map<Integer, List<LinkLeft>>> map = new HashMap<Id, Map<Integer, List<LinkLeft>>>();
 		
 		for (MobsimAgent mobsimAgent : mobsimAgents) {
-			PlanBasedWithinDayAgent agent = (PlanBasedWithinDayAgent) mobsimAgent;
 	
 			// skip agents with a ride trip
-			if (agentsToReplan.contains(agent)) continue;
+			if (agentsToReplan.contains(mobsimAgent)) continue;
 			
-			Person person = agent.getSelectedPlan().getPerson();
+			Person person = this.withinDayAgentUtils.getSelectedPlan(mobsimAgent).getPerson();
 			
-			Collection<Leg> carLegs = getModeLegs(agent, TransportMode.car);
+			Collection<Leg> carLegs = getModeLegs(mobsimAgent, TransportMode.car);
 			for (Leg leg : carLegs) {
 				double time = leg.getDepartureTime();
 				NetworkRoute route = (NetworkRoute) leg.getRoute();
@@ -162,13 +162,13 @@ public class RideToRidePassengerAgentIdentifier extends InitialIdentifier {
 				linkIds.addAll(route.getLinkIds());
 				if (linkIds.size() > 0 || !route.getStartLinkId().equals(route.getEndLinkId())) linkIds.add(route.getEndLinkId());
 				
-				this.getLinkLeftList(time, route.getStartLinkId(), map).add(new LinkLeft(time, agent, leg));
+				this.getLinkLeftList(time, route.getStartLinkId(), map).add(new LinkLeft(time, mobsimAgent, leg));
 				
 				for (Id linkId : linkIds) {
 					Link link = this.network.getLinks().get(linkId);
 					double linkTravelTime = this.carTravelTime.getLinkTravelTime(link, time, person, null);
 					time += linkTravelTime;
-					this.getLinkLeftList(time, route.getStartLinkId(), map).add(new LinkLeft(time, agent, leg));
+					this.getLinkLeftList(time, route.getStartLinkId(), map).add(new LinkLeft(time, mobsimAgent, leg));
 				}
 			}
 		}
@@ -205,7 +205,7 @@ public class RideToRidePassengerAgentIdentifier extends InitialIdentifier {
 		return binList;
 	}
 	
-	private void identifyMatchingCarLegs(Set<PlanBasedWithinDayAgent> agents, Map<Id, Map<Integer, List<LinkLeft>>> linkLeaveMap) {
+	private void identifyMatchingCarLegs(Set<MobsimAgent> agents, Map<Id, Map<Integer, List<LinkLeft>>> linkLeaveMap) {
 
 		int jdCounter = 0;
 		
@@ -216,9 +216,9 @@ public class RideToRidePassengerAgentIdentifier extends InitialIdentifier {
 		 */
 		Set<Leg> adaptedCarLegs = new HashSet<Leg>();
 		
-		for (PlanBasedWithinDayAgent agent : agents) {
+		for (MobsimAgent agent : agents) {
 			
-			Person person = agent.getSelectedPlan().getPerson();
+			Person person = this.withinDayAgentUtils.getSelectedPlan(agent).getPerson();
 			Collection<Leg> rideLegs = getModeLegs(agent, TransportMode.ride);
 			
 			for (Leg rideLeg : rideLegs) {
@@ -421,11 +421,11 @@ public class RideToRidePassengerAgentIdentifier extends InitialIdentifier {
 	
 	private static class PotentialCarLeg {
 		
-		private final PlanBasedWithinDayAgent carAgent;
+		private final MobsimAgent carAgent;
 		private final Leg leg;
 		private final double waitTime;
 		
-		public PotentialCarLeg(PlanBasedWithinDayAgent carAgent, Leg leg, double waitTime) {
+		public PotentialCarLeg(MobsimAgent carAgent, Leg leg, double waitTime) {
 			this.carAgent = carAgent;
 			this.leg = leg;
 			this.waitTime = waitTime;
@@ -474,10 +474,10 @@ public class RideToRidePassengerAgentIdentifier extends InitialIdentifier {
 	private static class LinkLeft {
 
 		private final double time;
-		private final PlanBasedWithinDayAgent agent;
+		private final MobsimAgent agent;
 		private final Leg leg;
 		
-		public LinkLeft(double time, PlanBasedWithinDayAgent agent, Leg leg) {
+		public LinkLeft(double time, MobsimAgent agent, Leg leg) {
 			this.time = time;
 			this.agent = agent;
 			this.leg = leg;

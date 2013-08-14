@@ -23,7 +23,7 @@ package playground.christoph.burgdorf.withinday.identifiers;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.withinday.replanning.identifiers.LeaveLinkIdentifier;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
 
@@ -39,15 +39,15 @@ public class ParkingIdentifier extends DuringLegIdentifier {
 	}
 	
 	@Override
-	public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
+	public Set<MobsimAgent> getAgentsToReplan(double time) {
 
 		/* 
 		 * Use leave link identifier to identify the agents.
 		 * Then select a parking space for them.
 		 */
-		Set<PlanBasedWithinDayAgent> agentsToReplan = leaveLinkIdentifier.getAgentsToReplan(time);
+		Set<MobsimAgent> agentsToReplan = leaveLinkIdentifier.getAgentsToReplan(time);
 		
-		for (PlanBasedWithinDayAgent agent : agentsToReplan) {
+		for (MobsimAgent agent : agentsToReplan) {
 			Id parkingId = ParkingInfrastructure.selectParking(agent.getCurrentLinkId());
 			ParkingInfrastructure.selectedParkings.put(agent.getId(), parkingId);
 		}

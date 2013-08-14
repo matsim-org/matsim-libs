@@ -43,16 +43,10 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
-import org.matsim.withinday.utils.EditRoutes;
 
-import playground.wrashid.artemis.smartCharging.ChargingTime;
-import playground.wrashid.parkingSearch.withindayFW.controllers.kti.HUPCControllerKTIzh;
 import playground.wrashid.parkingSearch.withindayFW.core.ParkingAgentsTracker;
-import playground.wrashid.parkingSearch.withindayFW.core.ParkingInfrastructure;
-import playground.wrashid.parkingSearch.withindayFW.core.ParkingStrategy;
 import playground.wrashid.parkingSearch.withindayFW.util.ActivityDurationEstimator;
 import playground.wrashid.parkingSearch.withindayFW.zhCity.ParkingInfrastructureZH;
 
@@ -60,9 +54,10 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 
 	private final ParkingAgentsTracker parkingAgentsTracker;
 	private final ParkingInfrastructureZH parkingInfrastructure;
-	private final Map<Id, PlanBasedWithinDayAgent> agents;
+	private final Map<Id, MobsimAgent> agents;
 	private double searchTimeEstimationConstant;
 	private double initialParkingSetRadiusInMeters;
+	private final WithinDayAgentUtils withinDayAgentUtils;
 
 	public HUPCIdentifier(ParkingAgentsTracker parkingAgentsTracker, ParkingInfrastructureZH parkingInfrastructure, Controler controler) {
 		this.parkingAgentsTracker = parkingAgentsTracker;
@@ -74,8 +69,8 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 		String initialParkingSetRadiusInMetersHUPCString = controler.getConfig().findParam("parking", "HUPCIdentifier.initialParkingSetRadiusInMeters");
 		initialParkingSetRadiusInMeters=Double.parseDouble(initialParkingSetRadiusInMetersHUPCString);
 		
-
-		this.agents = new HashMap<Id, PlanBasedWithinDayAgent>();
+		this.withinDayAgentUtils = new WithinDayAgentUtils();
+		this.agents = new HashMap<Id, MobsimAgent>();
 	}
 
 	/*
@@ -83,14 +78,14 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 	 * replanner.
 	 */
 	@Override
-	public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
+	public Set<MobsimAgent> getAgentsToReplan(double time) {
 		/*
 		 * Get all agents that are searching and have entered a new link in the
 		 * last time step.
 		 */
 		// Set<Id> linkEnteredAgents =
 		// this.parkingAgentsTracker.getLinkEnteredAgents();
-		Set<PlanBasedWithinDayAgent> identifiedAgents = new HashSet<PlanBasedWithinDayAgent>();
+		Set<MobsimAgent> identifiedAgents = new HashSet<MobsimAgent>();
 
 		Set<Id> searchingAgentsAssignedToThisIdentifier = this.parkingAgentsTracker.getActiveReplanningIdentifiers().getValueSet(
 				this);
@@ -104,14 +99,14 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 		
 
 		for (Id agentId : searchingAgentsAssignedToThisIdentifier) {
-			PlanBasedWithinDayAgent agent = this.agents.get(agentId);
+			MobsimAgent agent = this.agents.get(agentId);
 
 			Id personId = agent.getId();
-			Plan selectedPlan = agent.getSelectedPlan();
+			Plan selectedPlan = this.withinDayAgentUtils.getSelectedPlan(agent);
 			List<PlanElement> planElements = selectedPlan.getPlanElements();
-			Integer currentPlanElementIndex = agent.getCurrentPlanElementIndex();
+			Integer currentPlanElementIndex = this.withinDayAgentUtils.getCurrentPlanElementIndex(agent);
 
-			if (agents.get(personId).getCurrentPlanElementIndex() == 33) {
+			if (currentPlanElementIndex == 33) {
 
 				
 
@@ -276,10 +271,10 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 		DebugLib.traceAgent(personId, 23);
 		
 		
-		PlanBasedWithinDayAgent agent = this.agents.get(personId);
+		MobsimAgent agent = this.agents.get(personId);
 
-		List<PlanElement> planElements = agent.getSelectedPlan().getPlanElements();
-		Integer currentPlanElementIndex = agent.getCurrentPlanElementIndex();
+		List<PlanElement> planElements = this.withinDayAgentUtils.getSelectedPlan(agent).getPlanElements();
+		Integer currentPlanElementIndex = this.withinDayAgentUtils.getCurrentPlanElementIndex(agent);
 
 		for (int i = planElements.size() - 1; i > 0; i--) {
 			if (planElements.get(i) instanceof Leg) {
@@ -310,7 +305,7 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 	 * If no parking is selected for the current agent, the agent requires a
 	 * replanning.
 	 */
-	private boolean requiresReplanning(PlanBasedWithinDayAgent agent) {
+	private boolean requiresReplanning(MobsimAgent agent) {
 		return parkingAgentsTracker.getSelectedParking(agent.getId()) == null;
 	}
 
@@ -318,7 +313,7 @@ public class HUPCIdentifier extends DuringLegIdentifier implements MobsimInitial
 	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 		this.agents.clear();
 		for (MobsimAgent agent : ((QSim) e.getQueueSimulation()).getAgents()) {
-			this.agents.put(agent.getId(), (ExperimentalBasicWithindayAgent) agent);
+			this.agents.put(agent.getId(), agent);
 		}
 	}
 

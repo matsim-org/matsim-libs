@@ -154,8 +154,8 @@ public class WithinDayParkingControlerListener implements StartupListener, Repla
 	
 	private void initIdentifiers() {
 
-		this.randomSearchIdentifier = new ParkingSearchIdentifier(parkingAgentsTracker, parkingInfrastructure); 
-		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(this.randomSearchIdentifier);
+		this.randomSearchIdentifier = new ParkingSearchIdentifier(parkingAgentsTracker, parkingInfrastructure, 
+				this.withinDayControlerListener.getMobsimDataProvider());
 	}
 	
 	/*

@@ -28,7 +28,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDeparture;
 
 /**
@@ -69,7 +69,7 @@ public class RideToRidePassengerContextProvider {
 		/*package*/ Leg carLeg;
 		/*package*/ Link pickupLink;
 		/*package*/ Link dropOffLink;
-		/*package*/ PlanBasedWithinDayAgent carLegAgent;
+		/*package*/ MobsimAgent carLegAgent;
 		/*package*/ JointDeparture pickupDeparture;
 		
 		public RideToRidePassengerContext(Leg rideLeg) {

@@ -51,29 +51,29 @@ public class ParkingSearchIdentifier_v2 extends DuringLegIdentifier implements M
 	
 	private final ParkingAgentsTracker_v2 parkingAgentsTracker;
 	private final ParkingInfrastructure_v2 parkingInfrastructure;
-	private final Map<Id, PlanBasedWithinDayAgent> agents;
+	private final Map<Id, MobsimAgent> agents;
 	private final EventsManager eventsManager;
 	
 	public ParkingSearchIdentifier_v2(ParkingAgentsTracker_v2 parkingAgentsTracker_v2, ParkingInfrastructure parkingInfrastructure, 
 			LinkedList<FullParkingSearchStrategy> list, EventsManager eventsManager) {
 		this.parkingAgentsTracker = parkingAgentsTracker_v2;
 		this.parkingInfrastructure = (ParkingInfrastructure_v2) parkingInfrastructure;
-		this.agents = new HashMap<Id, PlanBasedWithinDayAgent>();
+		this.agents = new HashMap<Id, MobsimAgent>();
 		this.eventsManager = eventsManager;
 	}
 	
 	@Override
-	public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
+	public Set<MobsimAgent> getAgentsToReplan(double time) {
 
 		/*
 		 * Get all agents that are searching and have entered a new link in the last
 		 * time step.
 		 */
 		Set<Id> linkEnteredAgents = this.parkingAgentsTracker.getLinkEnteredAgents();		
-		Set<PlanBasedWithinDayAgent> identifiedAgents = new HashSet<PlanBasedWithinDayAgent>();
+		Set<MobsimAgent> identifiedAgents = new HashSet<MobsimAgent>();
 		
 		for (Id agentId : linkEnteredAgents) {
-			PlanBasedWithinDayAgent agent = this.agents.get(agentId);
+			MobsimAgent agent = this.agents.get(agentId);
 			
 			/*
 			 * If the agent has not selected a parking facility yet.
@@ -131,12 +131,12 @@ public class ParkingSearchIdentifier_v2 extends DuringLegIdentifier implements M
 		return identifiedAgents;
 	}
 	
-	private boolean acceptParking(PlanBasedWithinDayAgent agent, Id facilityId) {
+	private boolean acceptParking(MobsimAgent agent, Id facilityId) {
 		getParkingStrategyForCurrentLeg(agent).acceptParking(agent, facilityId);
 		return true;
 	}
 
-	private FullParkingSearchStrategy getParkingStrategyForCurrentLeg(PlanBasedWithinDayAgent agent) {
+	private FullParkingSearchStrategy getParkingStrategyForCurrentLeg(MobsimAgent agent) {
 		return this.parkingAgentsTracker.getParkingStrategyManager().getParkingStrategyForCurrentLeg(agent);
 	}
 	
@@ -144,7 +144,7 @@ public class ParkingSearchIdentifier_v2 extends DuringLegIdentifier implements M
 	 * If no parking is selected for the current agent, the agent requires
 	 * a replanning.
 	 */
-	private boolean requiresReplanning(PlanBasedWithinDayAgent agent) {
+	private boolean requiresReplanning(MobsimAgent agent) {
 		return parkingAgentsTracker.getSelectedParking(agent.getId()) == null;
 	}
 
@@ -152,7 +152,7 @@ public class ParkingSearchIdentifier_v2 extends DuringLegIdentifier implements M
 	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 		this.agents.clear();
 		for (MobsimAgent agent : ((QSim) e.getQueueSimulation()).getAgents()) {
-			this.agents.put(agent.getId(), (ExperimentalBasicWithindayAgent) agent);
+			this.agents.put(agent.getId(), agent);
 		}
 	}
 

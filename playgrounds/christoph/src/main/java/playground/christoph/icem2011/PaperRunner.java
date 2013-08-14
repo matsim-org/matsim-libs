@@ -40,9 +40,9 @@ import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkImpl;
@@ -305,10 +305,10 @@ public class PaperRunner implements StartupListener, MobsimBeforeSimStepListener
 		}	
 		
 		@Override
-		public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
-			Set<PlanBasedWithinDayAgent> agentsFromDelegate = delegate.getAgentsToReplan(time);
-			Set<PlanBasedWithinDayAgent> filteredAgents = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
-			for (PlanBasedWithinDayAgent agent : agentsFromDelegate) {
+		public Set<MobsimAgent> getAgentsToReplan(double time) {
+			Set<MobsimAgent> agentsFromDelegate = delegate.getAgentsToReplan(time);
+			Set<MobsimAgent> filteredAgents = new TreeSet<MobsimAgent>(new PersonAgentComparator());
+			for (MobsimAgent agent : agentsFromDelegate) {
 				if (replanningLinks.contains(agent.getCurrentLinkId())) filteredAgents.add(agent);
 			}
 			return filteredAgents;
@@ -331,10 +331,10 @@ public class PaperRunner implements StartupListener, MobsimBeforeSimStepListener
 		}	
 		
 		@Override
-		public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
-			Set<PlanBasedWithinDayAgent> agentsFromDelegate = delegate.getAgentsToReplan(time);
-			Set<PlanBasedWithinDayAgent> filteredAgents = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
-			for (PlanBasedWithinDayAgent agent : agentsFromDelegate) {
+		public Set<MobsimAgent> getAgentsToReplan(double time) {
+			Set<MobsimAgent> agentsFromDelegate = delegate.getAgentsToReplan(time);
+			Set<MobsimAgent> filteredAgents = new TreeSet<MobsimAgent>(new PersonAgentComparator());
+			for (MobsimAgent agent : agentsFromDelegate) {
 				if (replanningAgents.contains(agent.getId())) filteredAgents.add(agent);
 			}
 			return filteredAgents;

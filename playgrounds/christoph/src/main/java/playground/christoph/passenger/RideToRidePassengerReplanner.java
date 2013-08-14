@@ -164,7 +164,7 @@ public class RideToRidePassengerReplanner extends WithinDayInitialReplanner {
 	
 	private void adaptDriver(RideToRidePassengerContext context) {
 		
-		Plan plan = context.carLegAgent.getSelectedPlan();
+		Plan plan = this.withinDayAgentUtils.getSelectedPlan(context.carLegAgent);
 		Leg rideLeg = context.rideLeg;
 		Leg carLeg = context.carLeg;
 		NetworkRoute route = (NetworkRoute) carLeg.getRoute();

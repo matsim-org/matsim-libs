@@ -36,7 +36,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.mobsim.framework.HasPerson;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
@@ -94,7 +94,7 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier {
 		this.decisionDataProvider = decisionDataProvider;
 	}
 
-	public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
+	public Set<MobsimAgent> getAgentsToReplan(double time) {
 		
 		// Get all agents that could leave their current in this time step.
 		Set<Id> possibleLinkExitAgents = new HashSet<Id>(this.earliestLinkExitTimeProvider.getEarliestLinkExitTimesPerTimeStep(time));
@@ -102,7 +102,7 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier {
 		// Apply filter to remove agents that should not be replanned.
 		this.applyFilters(possibleLinkExitAgents, time);
 		
-		Set<PlanBasedWithinDayAgent> agentsToReplan = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
+		Set<MobsimAgent> agentsToReplan = new TreeSet<MobsimAgent>(new PersonAgentComparator());
 		Map<Id, PlannedDeparture> plannedDepartures = new HashMap<Id, PlannedDeparture>();
 		
 		for (Id agentId : possibleLinkExitAgents) {
@@ -110,7 +110,7 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier {
 			MobsimAgent passenger = this.mobsimDataProvider.getAgent(agentId);
 			
 			// check whether next activity type matches
-			Activity acivity = (Activity) ((PlanBasedWithinDayAgent) passenger).getNextPlanElement();
+			Activity acivity = (Activity) ((PlanAgent) passenger).getNextPlanElement();
 			if (!acivity.getType().equals(EvacuationConstants.RESCUE_ACTIVITY)) continue;
 			
 			/*
@@ -214,8 +214,8 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier {
 				 * connects the agent and the vehicle that will pick him up.
 				 * Also replan the driver which has to perform a pickup activity.
 				 */
-				agentsToReplan.add((PlanBasedWithinDayAgent) passenger);
-				agentsToReplan.add((PlanBasedWithinDayAgent) driver);
+				agentsToReplan.add(passenger);
+				agentsToReplan.add(driver);
 				
 				/*
 				 * Create a joint departure object

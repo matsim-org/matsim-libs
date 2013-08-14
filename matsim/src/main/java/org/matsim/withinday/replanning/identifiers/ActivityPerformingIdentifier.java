@@ -26,7 +26,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
@@ -41,15 +41,15 @@ public class ActivityPerformingIdentifier extends DuringActivityIdentifier {
 	}
 	
 	@Override
-	public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
+	public Set<MobsimAgent> getAgentsToReplan(double time) {
 		Set<Id> activityPerformingAgents = new HashSet<Id>(activityReplanningMap.getActivityPerformingAgents());
-		Map<Id, PlanBasedWithinDayAgent> mapping = activityReplanningMap.getPersonAgentMapping();
+		Map<Id, MobsimAgent> mapping = activityReplanningMap.getPersonAgentMapping();
 
 		// apply filter to remove agents that should not be replanned
 		this.applyFilters(activityPerformingAgents, time);
 		
 		// create set of PlanBasedWithinDayAgent
-		Set<PlanBasedWithinDayAgent> agentsToReplan = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
+		Set<MobsimAgent> agentsToReplan = new TreeSet<MobsimAgent>(new PersonAgentComparator());
 		for (Id id : activityPerformingAgents) agentsToReplan.add(mapping.get(id));
 				
 		return agentsToReplan;

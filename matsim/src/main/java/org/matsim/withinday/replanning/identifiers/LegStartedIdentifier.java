@@ -27,7 +27,6 @@ import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringLegIdentifier;
@@ -45,7 +44,7 @@ public class LegStartedIdentifier extends DuringLegIdentifier {
 	}
 	
 	@Override
-	public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
+	public Set<MobsimAgent> getAgentsToReplan(double time) {
 		Set<Id> legStartedAgents = new HashSet<Id>(this.linkReplanningMap.getLegStartedAgents());
 		Map<Id, MobsimAgent> mapping = this.mobsimDataProvider.getAgents();;
 
@@ -53,8 +52,8 @@ public class LegStartedIdentifier extends DuringLegIdentifier {
 		this.applyFilters(legStartedAgents, time);
 		
 		// create set of PlanBasedWithinDayAgent
-		Set<PlanBasedWithinDayAgent> agentsToReplan = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
-		for (Id id : legStartedAgents) agentsToReplan.add((PlanBasedWithinDayAgent) mapping.get(id));
+		Set<MobsimAgent> agentsToReplan = new TreeSet<MobsimAgent>(new PersonAgentComparator());
+		for (Id id : legStartedAgents) agentsToReplan.add(mapping.get(id));
 
 		return agentsToReplan;
 	}

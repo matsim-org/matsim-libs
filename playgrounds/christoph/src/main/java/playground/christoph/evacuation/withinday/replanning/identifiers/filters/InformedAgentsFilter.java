@@ -82,7 +82,7 @@ public class InformedAgentsFilter implements AgentFilter {
 	 * Removes agents from the set that are not informed yet or that have just 
 	 * been informed and therefore require an initial replanning.
 	 * 
-	 * @param set of PlanBasedWithinDayAgent
+	 * @param set of MobsimAgent
 	 */
 	/*package*/ void applyNotInitialReplanningFilter(Set<Id> set) {
 		

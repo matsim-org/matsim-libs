@@ -28,9 +28,9 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
 import org.matsim.core.mobsim.qsim.qnetsimengine.QVehicle;
@@ -64,7 +64,7 @@ public class AgentsToDropOffIdentifier extends DuringLegIdentifier {
 		this.jointDepartureOrganizer = jointDepartureOrganizer;
 	}
 
-	public Set<PlanBasedWithinDayAgent> getAgentsToReplan(double time) {
+	public Set<MobsimAgent> getAgentsToReplan(double time) {
 		
 		// Get all agents that have just entered a new link.
 		Map<Id, Id> linkEnteredAgents = new HashMap<Id, Id>(linkEnteredProvider.getLinkEnteredAgentsInLastTimeStep());	
@@ -72,7 +72,7 @@ public class AgentsToDropOffIdentifier extends DuringLegIdentifier {
 		// Apply filter to remove agents that should not be replanned.
 		this.applyFilters(linkEnteredAgents.keySet(), time);
 		
-		Set<PlanBasedWithinDayAgent> agentsToDropOff = new TreeSet<PlanBasedWithinDayAgent>(new PersonAgentComparator());
+		Set<MobsimAgent> agentsToDropOff = new TreeSet<MobsimAgent>(new PersonAgentComparator());
 		
 		Set<Id> agentsLeaveVehicle = new TreeSet<Id>();
 		for (Entry<Id, Id> entry : linkEnteredAgents.entrySet()) {
@@ -94,8 +94,8 @@ public class AgentsToDropOffIdentifier extends DuringLegIdentifier {
 			if (agentsLeaveVehicle.size() == 0) continue;
 			
 			// add driver and remaining agents to replanning set
-			agentsToDropOff.add((PlanBasedWithinDayAgent) driver);
-			for (Id agentId : agentsLeaveVehicle) agentsToDropOff.add((PlanBasedWithinDayAgent) this.mobsimDataProvider.getAgent(agentId));
+			agentsToDropOff.add(driver);
+			for (Id agentId : agentsLeaveVehicle) agentsToDropOff.add(this.mobsimDataProvider.getAgent(agentId));
 			
 			/*
 			 * Create a JointDeparture where the passenger(s) is(are) dropped off.
