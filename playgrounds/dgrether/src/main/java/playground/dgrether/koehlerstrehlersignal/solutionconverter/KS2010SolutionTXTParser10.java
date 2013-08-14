@@ -22,7 +22,9 @@ package playground.dgrether.koehlerstrehlersignal.solutionconverter;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -32,6 +34,7 @@ import org.matsim.core.utils.io.IOUtils;
 
 /**
  * @author dgrether
+ * @author tthunig
  *
  */
 public class KS2010SolutionTXTParser10 {
@@ -39,9 +42,11 @@ public class KS2010SolutionTXTParser10 {
 	private static final Logger log = Logger.getLogger(KS2010SolutionTXTParser10.class);
 	
 	private List<KS2010CrossingSolution> solutions;
-
+	private Map<Integer, Double> streetFlow;
+	
 	public void readFile(String filename) {
 		solutions = new ArrayList<KS2010CrossingSolution>();
+		streetFlow = new HashMap<Integer, Double>();
 		BufferedReader br = IOUtils.getBufferedReader(filename);
 		String line;
 		try {
@@ -66,11 +71,26 @@ public class KS2010SolutionTXTParser10 {
 		c.addOffset4Program(programId, offset);
 	}
 
+	private void parseStrasseLine(String line) {
+		String[] s = line.split(" ");
+		Integer streetId = Integer.valueOf(s[1]);
+		double commodityFlow = Double.valueOf(s[4]);
+		log.debug("Street " + streetId + " flow of one commodity " + commodityFlow);
+		if (!this.streetFlow.containsKey(streetId))
+			this.streetFlow.put(streetId, 0.0);
+		// add the flow of this commodity to the street flow
+		this.streetFlow.put(streetId, this.streetFlow.get(streetId) + commodityFlow);
+	}
+
 	private void processLine(String line) {
 		line = line.trim();
 		if (line.startsWith("Kreuzung ") && line.endsWith("zugewiesen bekommen.")) {
 			log.info("parsing line: " + line);
 			this.parseKreuzungLine(line);
+		}
+		if (line.startsWith("Strasse ")){
+			log.info("parsing line: " + line);
+			this.parseStrasseLine(line);
 		}
 		else {
 			log.warn("Ignoring line : " + line);
@@ -81,5 +101,8 @@ public class KS2010SolutionTXTParser10 {
 		return solutions;
 	}
 
+	public Map<Integer, Double> getStreetFlow() {
+		return streetFlow;
+	}
 	
 }
