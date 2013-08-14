@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.analysis;
+package playground.dgrether.analysis.eventsfilter;
 
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;

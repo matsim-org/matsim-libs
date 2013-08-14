@@ -53,10 +53,13 @@ public class PopulationToOd {
 		}
 		
 		//create some zones and match the population to them
-		DgMatsimPopulation2Links pop2zones = new DgMatsimPopulation2Links();
-		
-		pop2zones.convert2Links(fullNetwork, smallNetwork, this.originalToSimplifiedLinkIdMatching,
+		DgMatsimPopulation2Links pop2Links = new DgMatsimPopulation2Links();
+		pop2Links.convert2Links(fullNetwork, smallNetwork, this.originalToSimplifiedLinkIdMatching,
 				population, zones, signalsBoundingBox.getBoundingBox(), startTimeSec, endTimeSec);
+
+//		DgMatsimPopulation2Zones pop2Zones = new DgMatsimPopulation2Zones();
+//		pop2Zones.convert2Zones(fullNetwork, smallNetwork, originalToSimplifiedLinkIdMatching, 
+//				population, zones, signalsBoundingBox.getBoundingBox(), startTimeSec, endTimeSec);
 		
 		//write	 the matching to some files
 		DgZoneWriter zoneOdWriter = new DgZoneWriter(zones, crs);

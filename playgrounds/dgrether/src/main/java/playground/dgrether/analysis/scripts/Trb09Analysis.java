@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.analysis;
+package playground.dgrether.analysis.scripts;
 
 import org.apache.log4j.Logger;
 import org.jfree.chart.JFreeChart;

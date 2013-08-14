@@ -27,14 +27,11 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.signalsystems.data.SignalsScenarioWriter;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.geometry.BoundingBox;
 import org.opengis.referencing.FactoryException;
@@ -44,13 +41,13 @@ import org.opengis.referencing.operation.TransformException;
 
 import playground.dgrether.DgPaths;
 import playground.dgrether.analysis.NetworkFilter;
+import playground.dgrether.analysis.RunResultsLoader;
 import playground.dgrether.events.DgNetShrinkImproved;
 import playground.dgrether.events.EventsFilterManager;
 import playground.dgrether.events.EventsFilterManagerImpl;
 import playground.dgrether.events.filters.TimeEventFilter;
 import playground.dgrether.koehlerstrehlersignal.run.Cottbus2KS2010;
 import playground.dgrether.signalsystems.cottbus.CottbusUtils;
-import playground.dgrether.signalsystems.utils.DgScenarioUtils;
 
 import com.vividsolutions.jts.geom.Envelope;
 
@@ -107,29 +104,17 @@ public class DgAnalyseCottbusBasecase {
 			String runDirectory = DgPaths.REPOS + "runs-svn/run"+runId+"/";
 			outputDirectory = runDirectory;
 			
-			OutputDirectoryHierarchy outputDir = new OutputDirectoryHierarchy(runDirectory, runId, false, false);
-			String networkFilename = outputDir.getOutputFilename("output_network.xml.gz");
-			String eventsFilename = outputDir.getIterationFilename(iteration, "events.xml.gz");
-			String populationFilename = outputDir.getOutputFilename("output_plans.xml.gz");
-			String lanesFilename = outputDir.getOutputFilename("output_lanes.xml.gz");
-			String signalsystemsFilename = outputDir.getOutputFilename(SignalsScenarioWriter.FILENAME_SIGNAL_SYSTEMS);
-			String signalgroupsFilename = outputDir.getOutputFilename(SignalsScenarioWriter.FILENAME_SIGNAL_GROUPS);
-			String signalcontrolFilename = outputDir.getOutputFilename(SignalsScenarioWriter.FILENAME_SIGNAL_CONTROL);
-			String ambertimesFilename = outputDir.getOutputFilename(SignalsScenarioWriter.FILENAME_AMBER_TIMES);
-			
-			Scenario scenario = DgScenarioUtils.loadScenario(networkFilename, populationFilename, lanesFilename, 
-					signalsystemsFilename, signalgroupsFilename, signalcontrolFilename);
-			
+			RunResultsLoader runDir = new RunResultsLoader(runDirectory, runId);
 			
 			for (Extent extent : extents) {
 				for (TimeConfig time : times) {
 					NetworkFilter netFilter;
 					if (extent.envelope != null) {
-						Network net = new DgNetShrinkImproved().createSmallNetwork(scenario.getNetwork(), extent.envelope);
+						Network net = new DgNetShrinkImproved().createSmallNetwork(runDir.getNetwork(), extent.envelope);
 						netFilter = new NetworkFilter(net);
 					}
 					else {
-						netFilter = new NetworkFilter(scenario.getNetwork());
+						netFilter = new NetworkFilter(runDir.getNetwork());
 					}
 					
 					EventsFilterManager eventsManager = new EventsFilterManagerImpl();
@@ -142,7 +127,7 @@ public class DgAnalyseCottbusBasecase {
 					eventsManager.addHandler(avgTtSpeed);
 					
 					MatsimEventsReader reader = new MatsimEventsReader(eventsManager);
-					reader.readFile(eventsFilename);
+					reader.readFile(runDir.getEventsFilename(iteration));
 					double averageTT = avgTtSpeed.getTravelTime() / avgTtSpeed.getNumberOfPersons();
 					StringBuilder out = new StringBuilder(runId);
 					out.append("\t");
