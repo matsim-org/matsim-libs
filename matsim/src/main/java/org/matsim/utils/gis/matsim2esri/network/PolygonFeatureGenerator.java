@@ -70,6 +70,27 @@ public class PolygonFeatureGenerator implements FeatureGenerator{
 	public SimpleFeature getFeature(final Link link) {
 		double width = this.widthCalculator.getWidth(link);
 
+		Coordinate[] coords = createPolygonCoordsForLink(link, width);
+		Polygon p =  this.geofac.createPolygon(this.geofac.createLinearRing(coords), null);
+		Object [] attribs = new Object[9];
+		attribs[0] = p;
+		attribs[1] = link.getId().toString();
+		attribs[2] = link.getFromNode().getId().toString();
+		attribs[3] = link.getToNode().getId().toString();
+		attribs[4] = link.getLength();
+		attribs[5] = link.getFreespeed();
+		attribs[6] = link.getCapacity();
+		attribs[7] = link.getNumberOfLanes();
+		attribs[8] = width;
+
+		try {
+			return this.builder.buildFeature(null, attribs);
+		} catch (IllegalArgumentException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public static Coordinate[] createPolygonCoordsForLink(final Link link, double width) {
 		Coordinate from = MGC.coord2Coordinate(link.getFromNode().getCoord());
 		Coordinate to = MGC.coord2Coordinate(link.getToNode().getCoord());
 		double length = from.distance(to);
@@ -99,24 +120,7 @@ public class PolygonFeatureGenerator implements FeatureGenerator{
 		Coordinate from2 = new Coordinate(xfrom2,yfrom2);
 		Coordinate to2 = new Coordinate(xto2,yto2);
 
-		Polygon p = this.geofac.createPolygon(this.geofac.createLinearRing(new Coordinate[] {from, to, to2, from2, from}), null);
-		Object [] attribs = new Object[9];
-		attribs[0] = p;
-		attribs[1] = link.getId().toString();
-		attribs[2] = link.getFromNode().getId().toString();
-		attribs[3] = link.getToNode().getId().toString();
-		attribs[4] = link.getLength();
-		attribs[5] = link.getFreespeed();
-		attribs[6] = link.getCapacity();
-		attribs[7] = link.getNumberOfLanes();
-		attribs[8] = width;
-
-		try {
-			return this.builder.buildFeature(null, attribs);
-		} catch (IllegalArgumentException e) {
-			throw new RuntimeException(e);
-		}
-
+		return new Coordinate[] {from, to, to2, from2, from}; 
 	}
 
 }
