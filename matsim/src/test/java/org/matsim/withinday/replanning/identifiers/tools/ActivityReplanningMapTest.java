@@ -44,6 +44,7 @@ import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.testcases.MatsimTestCase;
 import org.matsim.withinday.events.ReplanningEvent;
+import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.mobsim.WithinDayQSimFactory;
 
@@ -91,10 +92,12 @@ public class ActivityReplanningMapTest extends MatsimTestCase {
 		
 		@Override
 		public void notifyStartup(final StartupEvent event) {
-			ActivityReplanningMap arp = new ActivityReplanningMap();
+			MobsimDataProvider mobsimDataProvider = new MobsimDataProvider();
+			ActivityReplanningMap arp = new ActivityReplanningMap(mobsimDataProvider);
 			event.getControler().getEvents().addHandler(arp);
 			MobsimListenerForTests listener = new MobsimListenerForTests(arp, withinDayEngine);
 			FixedOrderSimulationListener fosl = new FixedOrderSimulationListener();
+			fosl.addSimulationListener(mobsimDataProvider);
 			fosl.addSimulationListener(arp);
 			fosl.addSimulationListener(listener);
 			event.getControler().getMobsimListeners().add(fosl);

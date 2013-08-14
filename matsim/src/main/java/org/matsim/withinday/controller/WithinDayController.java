@@ -41,6 +41,7 @@ import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
+import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 import org.matsim.withinday.mobsim.WithinDayQSimFactory;
 import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
@@ -70,8 +71,8 @@ public abstract class WithinDayController extends Controler implements StartupLi
 	private Set<String> travelTimeCollectorModes = null;
 	private ActivityReplanningMap activityReplanningMap;
 	private LinkReplanningMap linkReplanningMap;
-	private TransportModeProvider transportModeProvider;
 	private EarliestLinkExitTimeProvider earliestLinkExitTimeProvider;
+	private MobsimDataProvider mobsimDataProvider;
 
 	private boolean withinDayEngineInitialized = false;
 	private WithinDayEngine withinDayEngine;
@@ -145,7 +146,7 @@ public abstract class WithinDayController extends Controler implements StartupLi
 			return;
 		}
 		if (activityReplanningMap == null) {
-			activityReplanningMap = new ActivityReplanningMap();
+			activityReplanningMap = new ActivityReplanningMap(this.mobsimDataProvider);
 			this.getEvents().addHandler(activityReplanningMap);
 			fosl.addSimulationListener(activityReplanningMap);
 		}
@@ -177,6 +178,11 @@ public abstract class WithinDayController extends Controler implements StartupLi
 		this.earliestLinkExitTimeProvider.getTransportModeProvider();
 	}
 
+	private void createAndInitMobsimDataProvider() {
+		this.mobsimDataProvider = new MobsimDataProvider();
+		this.getFixedOrderSimulationListener().addSimulationListener(this.mobsimDataProvider);
+	}
+	
 	public LinkReplanningMap getLinkReplanningMap() {
 		return this.linkReplanningMap;
 	}
@@ -250,6 +256,7 @@ public abstract class WithinDayController extends Controler implements StartupLi
 	public void notifyStartup(StartupEvent event) {
 		this.initWithinDayEngine(this.numReplanningThreads);
 		this.createAndInitEarliestLinkExitTimeProvider();
+		this.createAndInitMobsimDataProvider();
 		this.createAndInitTravelTimeCollector();
 		this.createAndInitActivityReplanningMap();
 		this.createAndInitLinkReplanningMap();

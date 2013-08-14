@@ -321,7 +321,7 @@ public class WithinDayControlerListener implements StartupListener {
 	}
 	
 	private void createAndInitActivityReplanningMap() {
-		activityReplanningMap = new ActivityReplanningMap();
+		activityReplanningMap = new ActivityReplanningMap(this.mobsimDataProvider);
 		this.eventsManager.addHandler(activityReplanningMap);
 		fosl.addSimulationListener(activityReplanningMap);
 	}

@@ -44,11 +44,9 @@ import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
-import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.withinday.events.ReplanningEvent;
 import org.matsim.withinday.events.handler.ReplanningEventHandler;
+import org.matsim.withinday.mobsim.MobsimDataProvider;
 
 /*
  * This Module is used by a NextLegReplanner. It calculates the time
@@ -63,33 +61,27 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 
 	private static final Logger log = Logger.getLogger(ActivityReplanningMap.class);
 
+	private final MobsimDataProvider mobsimDataProvider;
+	
 	/*
 	 * Agents that have started an Activity in the current Time Step.
 	 */
-	private Set<Id> startingAgents;	// PersonId
+	private final Set<Id> startingAgents;	// PersonId
 
 	/*
 	 * Contains the Agents that are currently performing an Activity.
 	 */
-	private NavigableSet<AgentEntry> activityPerformingAgents;	// PersonDriverAgentId
-	private Map<Id, Double> activityEndTimes;	// scheduled activity end times
+	private final NavigableSet<AgentEntry> activityPerformingAgents;	// PersonDriverAgentId
+	private final Map<Id, Double> activityEndTimes;	// scheduled activity end times
 
 	private Set<MobsimAgent> personAgentsToReplanActivityEndCache = null;
 	private double personAgentsToReplanActivityEndCacheTime = Double.NaN;
-
-	/*
-	 * Mapping between the PersonDriverAgents and the PersonIds.
-	 * The events only contain a PersonId.
-	 */
-	private Map<Id, MobsimAgent> personAgentMapping;	// PersonId, PersonDriverAgent
-	
-	public ActivityReplanningMap() {
+		
+	public ActivityReplanningMap(MobsimDataProvider mobsimDataProvider) {
 		log.info("Note that the ActivityReplanningMap has to be registered as an EventHandler and a SimulationListener!");
-		init();
-	}
-	
-	private void init() {
-		this.personAgentMapping = new HashMap<Id, MobsimAgent>();
+		
+		this.mobsimDataProvider = mobsimDataProvider;
+		
 		this.activityPerformingAgents = new TreeSet<AgentEntry>(new AgentEntryComparator());
 		this.startingAgents = new HashSet<Id>();
 		this.activityEndTimes = new HashMap<Id, Double>();
@@ -105,30 +97,21 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 	 */
 	@Override
 	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
-		
-		Netsim sim = (Netsim) e.getQueueSimulation();
 
-		init();
-
-		if (sim instanceof QSim) {
-			WithinDayAgentUtils withinDayAgentUtils = new WithinDayAgentUtils();
-			for (MobsimAgent mobsimAgent : ((QSim)sim).getAgents()) {
-				this.personAgentMapping.put(withinDayAgentUtils.getId(mobsimAgent), mobsimAgent);
-				
-				double activityEndTime = mobsimAgent.getActivityEndTime();
-				
-				// mark the agent as currently performing an Activity
-				this.activityPerformingAgents.add(new AgentEntry(mobsimAgent, activityEndTime));
-
-				// get the agent's activity end time
-				this.activityEndTimes.put(mobsimAgent.getId(), activityEndTime);
-			}
+		for (MobsimAgent mobsimAgent : this.mobsimDataProvider.getAgents().values()) {
+			
+			// get the agent's activity end time and mark it as currently performing an Activity
+			double activityEndTime = mobsimAgent.getActivityEndTime();
+			this.activityPerformingAgents.add(new AgentEntry(mobsimAgent, activityEndTime));
+			
+			// get the agent's activity end time
+			this.activityEndTimes.put(mobsimAgent.getId(), activityEndTime);
 		}
 	}
 
 	@Deprecated
 	public Map<Id, MobsimAgent> getPersonAgentMapping() {
-		return Collections.unmodifiableMap(this.personAgentMapping);
+		return Collections.unmodifiableMap(this.mobsimDataProvider.getAgents());
 	}
 	
 	/*
@@ -144,7 +127,7 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 		this.personAgentsToReplanActivityEndCacheTime = Double.NaN;
 		
 		for (Id id : startingAgents) {
-			MobsimAgent personAgent = personAgentMapping.get(id);
+			MobsimAgent personAgent = this.mobsimDataProvider.getAgent(id);
 
 			double now = e.getSimulationTime();
 			double departureTime = personAgent.getActivityEndTime();
@@ -213,7 +196,7 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 		if (activityEndTime != null) {
 			
 			// check whether the agent has changed its planned departure time
-			MobsimAgent agent = this.personAgentMapping.get(event.getPersonId());
+			MobsimAgent agent = this.mobsimDataProvider.getAgent(event.getPersonId());
 			if (activityEndTime != agent.getActivityEndTime()) {
 				/*
 				 * Update the agents entry in the activityPerformingAgents set.
@@ -272,9 +255,9 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 
 	@Override
 	public void reset(int iteration) {
-		this.activityPerformingAgents.clear();
+		this.startingAgents.clear();
 		this.activityEndTimes.clear();
-		this.personAgentMapping.clear();
+		this.activityPerformingAgents.clear();
 	}
 
 	private static class AgentEntry {
