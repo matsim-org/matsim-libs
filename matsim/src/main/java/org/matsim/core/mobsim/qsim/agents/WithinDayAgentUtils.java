@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
@@ -93,7 +94,7 @@ public class WithinDayAgentUtils {
 	
 	public final Leg getCurrentLeg(MobsimAgent agent) {
 		if (agent instanceof PlanAgent) {
-			PlanElement currentPlanElement =  ((PlanAgent) agent).getCurrentPlanElement();
+			PlanElement currentPlanElement = ((PlanAgent) agent).getCurrentPlanElement();
 			if (!(currentPlanElement instanceof Leg)) {
 				return null;
 			}
@@ -110,6 +111,15 @@ public class WithinDayAgentUtils {
 		} else {
 			throw new RuntimeException("Sorry, agent is from type " + agent.getClass().toString() + 
 					" which does not support getId(...). Aborting!");
+		}
+	}
+	
+	public final Plan getSelectedPlan(MobsimAgent agent) {
+		if (agent instanceof PlanAgent) {
+			return ((PlanAgent) agent).getSelectedPlan();
+		} else {
+			throw new RuntimeException("Sorry, agent is from type " + agent.getClass().toString() + 
+					" which does not support getSelectedPlan(...). Aborting!");
 		}
 	}
 }
