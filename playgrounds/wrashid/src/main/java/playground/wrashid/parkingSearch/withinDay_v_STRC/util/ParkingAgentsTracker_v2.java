@@ -26,8 +26,8 @@ import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 
 import playground.christoph.parking.core.mobsim.ParkingInfrastructure;
 import playground.christoph.parking.withinday.utils.ParkingAgentsTracker;
@@ -63,7 +63,7 @@ public class ParkingAgentsTracker_v2 extends ParkingAgentsTracker implements Ite
 	@Override
 	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
 		super.notifyMobsimInitialized(e);
-		for (PlanBasedWithinDayAgent agent:this.agents.values()){
+		for (MobsimAgent agent : this.agents.values()){
 			getParkingStrategyManager().prepareStrategiesForNewIteration(agent, controler.getIterationNumber());
 		}
 	}

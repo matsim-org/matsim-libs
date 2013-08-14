@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.router.TripRouter;
@@ -54,15 +55,15 @@ public class MarathonCurrentLegReplanner extends WithinDayDuringLegReplanner {
 		// If we don't have a valid PersonAgent
 		if (withinDayAgent == null) return false;
 
-		Plan executedPlan = withinDayAgent.getSelectedPlan();
+		Plan executedPlan = ((PlanAgent) withinDayAgent).getSelectedPlan();
 
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
 
-		int currentLinkIndex = withinDayAgent.getCurrentRouteLinkIdIndex();
+		int currentLinkIndex = this.withinDayAgentUtils.getCurrentRouteLinkIdIndex(withinDayAgent);
 
 		// for walk2d legs: switch mode to walk for routing
-		Leg currentLeg = withinDayAgent.getCurrentLeg();
+		Leg currentLeg = this.withinDayAgentUtils.getCurrentLeg(withinDayAgent);
 		boolean isWalk2d = currentLeg.getMode().equals("walk2d");
 		
 		// switch to walk mode for routing
@@ -80,7 +81,7 @@ public class MarathonCurrentLegReplanner extends WithinDayDuringLegReplanner {
 		}
 		
 		// Finally reset the cached Values of the PersonAgent - they may have changed!
-		withinDayAgent.resetCaches();
+		this.withinDayAgentUtils.resetCaches(withinDayAgent);
 
 		return true;
 	}

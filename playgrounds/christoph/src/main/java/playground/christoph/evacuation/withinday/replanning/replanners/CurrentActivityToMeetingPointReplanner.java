@@ -31,9 +31,9 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
-import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
@@ -162,6 +162,10 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 			
 			// if the person has to walk, we additionally try pt
 			if (transportMode.equals(TransportMode.walk)) {
+				Facility fromFacility = scenario.getActivityFacilities().getFacilities().get(currentActivity.getFacilityId());
+				Facility toFacility = scenario.getActivityFacilities().getFacilities().get(meetingActivity.getFacilityId());
+				this.tripRouter.calcRoute(TransportMode.pt, fromFacility, toFacility, this.time, executedPlan.getPerson());
+				
 				Tuple<Double, Coord> tuple = ptTravelTime.calcSwissPtTravelTime(currentActivity, meetingActivity, this.time, executedPlan.getPerson()); 
 				double travelTimePT = tuple.getFirst();
 				double travelTimeWalk = legToMeeting.getTravelTime();
@@ -196,18 +200,9 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 		 * Reschedule the currently performed Activity in the Mobsim - there
 		 * the activityEndsList has to be updated.
 		 */
-		// yyyy a method getMobsim in MobimAgent would be useful here. cdobler, Oct'10
-		// Intuitively I would agree.  We should think about where to set this so that, under normal circumstances,
-		// it can't become null.  kai, oct'10
-		if (withinDayAgent instanceof PersonDriverAgentImpl) {			
-			((ExperimentalBasicWithindayAgent) withinDayAgent).calculateAndSetDepartureTime(currentActivity);
-			this.internalInterface.rescheduleActivityEnd(withinDayAgent);
-			return true;
-		}
-		else {
-			log.warn("PersonAgent is no PersonDriverAgentImpl - the new departure time cannot be calculated!");
-			return false;
-		}	
+		((ExperimentalBasicWithindayAgent) withinDayAgent).calculateAndSetDepartureTime(currentActivity);
+		this.internalInterface.rescheduleActivityEnd(withinDayAgent);
+		return true;
 	}
 	
 	/**

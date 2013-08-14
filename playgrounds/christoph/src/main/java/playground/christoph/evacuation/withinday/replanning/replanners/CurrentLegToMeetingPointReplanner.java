@@ -72,8 +72,8 @@ public class CurrentLegToMeetingPointReplanner extends WithinDayDuringLegReplann
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
 
-		int currentLinkIndex = withinDayAgent.getCurrentRouteLinkIdIndex();
-		Activity nextActivity = (Activity) executedPlan.getPlanElements().get(withinDayAgent.getCurrentPlanElementIndex() + 1);
+		int currentLinkIndex = this.withinDayAgentUtils.getCurrentRouteLinkIdIndex(withinDayAgent);
+		Activity nextActivity = (Activity) executedPlan.getPlanElements().get(this.withinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent) + 1);
 		
 		/*
 		 * Create new Activity at the meeting point.
@@ -125,7 +125,7 @@ public class CurrentLegToMeetingPointReplanner extends WithinDayDuringLegReplann
 			 */
 			if (currentLinkIndex == 0) currentLinkIndex++;
 
-			Leg currentLeg = withinDayAgent.getCurrentLeg();
+			Leg currentLeg = this.withinDayAgentUtils.getCurrentLeg(withinDayAgent);
 			
 			// new Route for current Leg
 			this.editRoutes.relocateCurrentLegRoute(currentLeg, executedPlan.getPerson(), currentLinkIndex, 
@@ -140,7 +140,7 @@ public class CurrentLegToMeetingPointReplanner extends WithinDayDuringLegReplann
 //		}
 		
 		// Finally reset the cached Values of the PersonAgent - they may have changed!
-		withinDayAgent.resetCaches();
+		this.withinDayAgentUtils.resetCaches(withinDayAgent);
 		
 		return true;
 	}

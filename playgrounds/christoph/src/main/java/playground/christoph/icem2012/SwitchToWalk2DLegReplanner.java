@@ -59,10 +59,10 @@ public class SwitchToWalk2DLegReplanner extends WithinDayDuringLegReplanner {
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
 
-		int currentLegIndex = withinDayAgent.getCurrentPlanElementIndex();
+		int currentLegIndex = this.withinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
 
 		// for walk2d legs: switch mode to walk for routing
-		Leg currentLeg = withinDayAgent.getCurrentLeg();
+		Leg currentLeg = this.withinDayAgentUtils.getCurrentLeg(withinDayAgent);
 		boolean isWalk = currentLeg.getMode().equals(TransportMode.walk);
 		
 		// if it is a walk leg and the current link is affected, switch to walk 2d
@@ -119,7 +119,7 @@ public class SwitchToWalk2DLegReplanner extends WithinDayDuringLegReplanner {
 				plan.getPlanElements().add(currentLegIndex + 2, walk2DLeg);
 				
 				// Finally reset the cached Values of the PersonAgent - they may have changed!
-				withinDayAgent.resetCaches();
+				this.withinDayAgentUtils.resetCaches(withinDayAgent);
 			}
 		}
 

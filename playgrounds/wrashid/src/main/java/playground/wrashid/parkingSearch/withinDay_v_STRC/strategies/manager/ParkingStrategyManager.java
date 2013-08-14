@@ -27,13 +27,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.parking.lib.DebugLib;
-import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 
-import playground.christoph.parking.withinday.utils.ParkingAgentsTracker;
 import playground.wrashid.lib.obj.IntegerValueHashMap;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.FullParkingSearchStrategy;
 
@@ -42,6 +42,7 @@ public class ParkingStrategyManager {
 	private static final Logger log = Logger.getLogger(ParkingStrategyManager.class);
 	
 	double executionProbabilityOfBestStrategy=0.9;
+	WithinDayAgentUtils withinDayAgentUtils = new WithinDayAgentUtils();
 	LinkedList<FullParkingSearchStrategy> allStrategies;
 	HashMap<Id, HashMap<Integer,HashMap<Id,EvaluationContainer>>> strategyEvaluations=new HashMap<Id, HashMap<Integer,HashMap<Id,EvaluationContainer>>>();
 	// personId, legIndex, linkId
@@ -50,18 +51,18 @@ public class ParkingStrategyManager {
 		this.allStrategies = allStrategies;
 	}
 	
-	
 	// assumption on invocation: agent is driving!
-	public FullParkingSearchStrategy getParkingStrategyForCurrentLeg(PlanBasedWithinDayAgent agent){
-		Integer currentPlanElementIndex = agent.getCurrentPlanElementIndex();
-		Id nextActLinkId=((ActivityImpl) agent.getSelectedPlan().getPlanElements().get(currentPlanElementIndex+3)).getLinkId();
+	public FullParkingSearchStrategy getParkingStrategyForCurrentLeg(MobsimAgent agent){
+		Integer currentPlanElementIndex = this.withinDayAgentUtils.getCurrentPlanElementIndex(agent);
+		Id nextActLinkId=((ActivityImpl) ((PlanAgent) agent).getSelectedPlan().getPlanElements().get(currentPlanElementIndex+3)).getLinkId();
 		return strategyEvaluations.get(agent.getId()).get(currentPlanElementIndex).get(nextActLinkId).getCurrentSelectedStrategy().strategy;
 	}
 	
 	// TODO: this needs to be invoked at the starting of an iteration (when agent plans have been adapted already)
-	public void prepareStrategiesForNewIteration(PlanBasedWithinDayAgent agent, int currentIterationNumber){
+	public void prepareStrategiesForNewIteration(MobsimAgent ag, int currentIterationNumber){
 		Random random = MatsimRandom.getLocalInstance();
-		
+		PlanAgent agent = (PlanAgent) ag;
+		Id agentId = agent.getSelectedPlan().getPerson().getId();
 		for (int i=0;i<agent.getSelectedPlan().getPlanElements().size();i++){
 			PlanElement pe=agent.getSelectedPlan().getPlanElements().get(i);
 						
@@ -71,11 +72,11 @@ public class ParkingStrategyManager {
 				if (leg.getMode().equals(TransportMode.car)){
 					Id nextActLinkId=((ActivityImpl) agent.getSelectedPlan().getPlanElements().get(i+3)).getLinkId();
 				
-					HashMap<Integer, HashMap<Id, EvaluationContainer>> agentHashMap = strategyEvaluations.get(agent.getId());
+					HashMap<Integer, HashMap<Id, EvaluationContainer>> agentHashMap = strategyEvaluations.get(agentId);
 					
 					if (agentHashMap==null){
-						strategyEvaluations.put(agent.getId(), new HashMap<Integer, HashMap<Id,EvaluationContainer>>());
-						agentHashMap = strategyEvaluations.get(agent.getId());
+						strategyEvaluations.put(agentId, new HashMap<Integer, HashMap<Id,EvaluationContainer>>());
+						agentHashMap = strategyEvaluations.get(agentId);
 					}
 					
 					HashMap<Id, EvaluationContainer> legIndexHashMap = agentHashMap.get(i);
@@ -87,7 +88,7 @@ public class ParkingStrategyManager {
 					
 					if (legIndexHashMap.size()==0){
 						// initialize 
-						legIndexHashMap.put(nextActLinkId, createEvaulationContainerForAgentAtLeg(agent,i,currentIterationNumber));
+						legIndexHashMap.put(nextActLinkId, createEvaulationContainerForAgentAtLeg(ag,i,currentIterationNumber));
 					} else if (legIndexHashMap.size()==1){
 						Id linkIdInHM=null;
 						for (Id linkId:legIndexHashMap.keySet()){
@@ -109,12 +110,12 @@ public class ParkingStrategyManager {
 							}else {
 								// the activity location changed -> reset
 								legIndexHashMap.clear();
-								legIndexHashMap.put(nextActLinkId, createEvaulationContainerForAgentAtLeg(agent,i,currentIterationNumber));
+								legIndexHashMap.put(nextActLinkId, createEvaulationContainerForAgentAtLeg(ag,i,currentIterationNumber));
 							}
 						} else {
 							// the activity location changed -> reset
 							legIndexHashMap.clear();
-							legIndexHashMap.put(nextActLinkId, createEvaulationContainerForAgentAtLeg(agent,i,currentIterationNumber));
+							legIndexHashMap.put(nextActLinkId, createEvaulationContainerForAgentAtLeg(ag,i,currentIterationNumber));
 						}
 					} else {
 						DebugLib.stopSystemAndReportInconsistency("something went really wrong...");
@@ -140,7 +141,7 @@ public class ParkingStrategyManager {
 	
 	// TODO: program this properly, such that a module can be fit in here to decide, which strategies should be used
 	//
-	private EvaluationContainer createEvaulationContainerForAgentAtLeg(PlanBasedWithinDayAgent agent, int legIndex, int iterationNumber) {
+	private EvaluationContainer createEvaulationContainerForAgentAtLeg(MobsimAgent agent, int legIndex, int iterationNumber) {
 		EvaluationContainer evaluationContainer=new EvaluationContainer(allStrategies);
 		evaluationContainer.setLastIterationContainerUsed(iterationNumber);
 		return evaluationContainer;

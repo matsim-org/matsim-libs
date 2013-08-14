@@ -33,6 +33,8 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.ActivityImpl;
@@ -106,28 +108,28 @@ public class ParkingSearchReplanner extends WithinDayDuringLegReplanner {
 		 * and has been accepted. Now ensure that the agent's plan is still valid.
 		 */
 		else {
-			Leg leg = withinDayAgent.getCurrentLeg();
+			Leg leg = this.withinDayAgentUtils.getCurrentLeg(withinDayAgent);
 
-			int routeIndex = withinDayAgent.getCurrentRouteLinkIdIndex();
+			int routeIndex = this.withinDayAgentUtils.getCurrentRouteLinkIdIndex(withinDayAgent);
 
 			NetworkRoute route = (NetworkRoute) leg.getRoute();
 			
 			updateAgentsPlan(withinDayAgent, parkingFacilityId, route, routeIndex);
 		}
 
-		withinDayAgent.resetCaches();
+		this.withinDayAgentUtils.resetCaches(withinDayAgent);
 		return true;
 	}
 	
-	protected void updateAgentsPlan(PlanBasedWithinDayAgent withinDayAgent, Id parkingFacilityId, NetworkRoute route, int routeIndex) {
+	protected void updateAgentsPlan(MobsimAgent withinDayAgent, Id parkingFacilityId, NetworkRoute route, int routeIndex) {
 		
-		Plan plan = withinDayAgent.getSelectedPlan();
+		Plan plan = ((PlanAgent) withinDayAgent).getSelectedPlan();
 		Id currentLinkId = withinDayAgent.getCurrentLinkId();
 		
-		ActivityImpl parkingActivity = (ActivityImpl) withinDayAgent.getNextPlanElement();
+		ActivityImpl parkingActivity = (ActivityImpl) ((PlanAgent) withinDayAgent).getNextPlanElement();
 		ActivityFacility parkingFacility = ((ScenarioImpl) scenario).getActivityFacilities().getFacilities().get(parkingFacilityId);
 		
-		int currentPlanElementIndex = withinDayAgent.getCurrentPlanElementIndex();
+		int currentPlanElementIndex = this.withinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
 		
 		// check whether the walk leg from the parking to the actual facility has to be updated
 		boolean parkingFacilityWasChanged = false;

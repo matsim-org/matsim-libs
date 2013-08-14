@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.facilities.Facility;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.ActivityImpl;
@@ -67,13 +68,13 @@ public class CurrentLegInitialReplanner extends WithinDayDuringLegReplanner {
 		// If we don't have a valid WithinDayPersonAgent
 		if (withinDayAgent == null) return false;
 		
-		PlanImpl executedPlan = (PlanImpl)withinDayAgent.getSelectedPlan();
+		PlanImpl executedPlan = (PlanImpl) ((PlanAgent) withinDayAgent).getSelectedPlan();
 
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
 
-		int currentLinkIndex = withinDayAgent.getCurrentRouteLinkIdIndex();
-		Activity nextActivity = (Activity) executedPlan.getPlanElements().get(withinDayAgent.getCurrentPlanElementIndex() + 1);
+		int currentLinkIndex = this.withinDayAgentUtils.getCurrentRouteLinkIdIndex(withinDayAgent);
+		Activity nextActivity = (Activity) executedPlan.getPlanElements().get(this.withinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent) + 1);
 		nextActivity.setEndTime(Time.UNDEFINED_TIME);
 		Facility facility = ((ScenarioImpl) this.scenario).getActivityFacilities().getFacilities().get(nextActivity.getFacilityId());
 		boolean isAffected = coordAnalyzer.isFacilityAffected(facility);
@@ -96,7 +97,7 @@ public class CurrentLegInitialReplanner extends WithinDayDuringLegReplanner {
 			((ActivityImpl) nextActivity).setLinkId(scenario.createId("rescueLink"));
 			
 			// for walk2d legs: switch mode to walk for routing
-			Leg currentLeg = withinDayAgent.getCurrentLeg();
+			Leg currentLeg = this.withinDayAgentUtils.getCurrentLeg(withinDayAgent);
 			boolean isWalk2d = currentLeg.getMode().equals("walk2d");
 			
 			// switch to walk mode for routing
@@ -127,7 +128,7 @@ public class CurrentLegInitialReplanner extends WithinDayDuringLegReplanner {
 			route.setLinkIds(route.getStartLinkId(), newLinkIds, endLinkId);
 			
 			// Finally reset the cached Values of the PersonAgent - they may have changed!
-			withinDayAgent.resetCaches();
+			this.withinDayAgentUtils.resetCaches(withinDayAgent);
 		}
 		
 		return true;

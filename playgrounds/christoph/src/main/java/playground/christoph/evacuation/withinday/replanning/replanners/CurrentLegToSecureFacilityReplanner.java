@@ -28,6 +28,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.ActivityImpl;
@@ -78,13 +79,12 @@ public class CurrentLegToSecureFacilityReplanner extends WithinDayDuringLegRepla
 		// If we don't have a valid WithinDayPersonAgent
 		if (withinDayAgent == null) return false;
 
-		PlanImpl executedPlan = (PlanImpl)withinDayAgent.getSelectedPlan();
+		PlanImpl executedPlan = (PlanImpl) ((PlanAgent) withinDayAgent).getSelectedPlan();
 
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
 
-		int currentLegIndex = withinDayAgent.getCurrentPlanElementIndex();
-		Leg currentLeg = withinDayAgent.getCurrentLeg();
+		Leg currentLeg = this.withinDayAgentUtils.getCurrentLeg(withinDayAgent);
 		Activity nextActivity = executedPlan.getNextActivity(currentLeg);
 		
 		// If it is not a car Leg we don't replan it.
@@ -121,7 +121,7 @@ public class CurrentLegToSecureFacilityReplanner extends WithinDayDuringLegRepla
 			
 			new ReplacePlanElements().replaceActivity(executedPlan, nextActivity, rescueActivity);
 			
-			int currentLinkIndex = withinDayAgent.getCurrentRouteLinkIdIndex();
+			int currentLinkIndex = this.withinDayAgentUtils.getCurrentRouteLinkIdIndex(withinDayAgent);
 
 			// new Route for current Leg
 			this.editRoutes.relocateCurrentLegRoute(currentLeg, executedPlan.getPerson(), currentLinkIndex, rescueActivity.getLinkId(), currentLinkIndex, scenario.getNetwork(), tripRouter);
@@ -135,7 +135,7 @@ public class CurrentLegToSecureFacilityReplanner extends WithinDayDuringLegRepla
 		}
 		
 		// Finally reset the cached Values of the PersonAgent - they may have changed!
-		withinDayAgent.resetCaches();
+		this.withinDayAgentUtils.resetCaches(withinDayAgent);
 		
 		return true;
 	}
