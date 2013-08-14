@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * KnowledgeWithinDayQSimFactory.java
+ * WithinDayQSimFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -23,87 +23,40 @@ package org.matsim.withinday.mobsim;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.QSimConfigGroup;
-import org.matsim.core.events.SimStepParallelEventsManagerImpl;
-import org.matsim.core.events.SynchronizedEventsManagerImpl;
+import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
-import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.TeleportationEngine;
-import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
-import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
+import org.matsim.core.mobsim.qsim.QSimFactory;
 
-/*
- * Depending on the number of threads in the config file a
- * ParallelQSimEngine or a DefaultQSimEngine is used.
- */
 public class WithinDayQSimFactory implements MobsimFactory {
 
 	private static final Logger log = Logger.getLogger(WithinDayQSimFactory.class);
 
 	private final WithinDayEngine withinDayEngine;
+	private final MobsimFactory delegateFactory;
 	
 	public WithinDayQSimFactory(WithinDayEngine withinDayEngine) {
 		this.withinDayEngine = withinDayEngine;
+		this.delegateFactory = new QSimFactory();
 	}
 	
-    private static QSim createWithinDayQSim(final Scenario scenario, final EventsManager events) {
-        return createWithinDayQSim(scenario, events, new DefaultQSimEngineFactory());
-    }
-
-    private static QSim createWithinDayQSim(final Scenario scenario, final EventsManager events, QNetsimEngineFactory factory) {
-        QSim qSim1 = new QSim(scenario, events);
-		ActivityEngine activityEngine = new ActivityEngine();
-		qSim1.addMobsimEngine(activityEngine);
-		qSim1.addActivityHandler(activityEngine);
-		QNetsimEngine netsimEngine = factory.createQSimEngine(qSim1);
-		qSim1.addMobsimEngine(netsimEngine);
-		qSim1.addDepartureHandler(netsimEngine.getDepartureHandler());
-		TeleportationEngine teleportationEngine = new TeleportationEngine();
-		qSim1.addMobsimEngine(teleportationEngine);
-        if (scenario.getConfig().network().isTimeVariantNetwork()) {
-        	qSim1.addMobsimEngine(new NetworkChangeEventsEngine());		
-		}
-		QSim qSim = qSim1;
-        ExperimentalBasicWithindayAgentFactory agentFactory = new ExperimentalBasicWithindayAgentFactory(qSim);
-        PopulationAgentSource agentSource = new PopulationAgentSource(scenario.getPopulation(), agentFactory, qSim);
-        qSim.addAgentSource(agentSource);
-        return qSim;
-    }
-
+	public WithinDayQSimFactory(WithinDayEngine withinDayEngine, MobsimFactory delegateFactory) {
+		this.withinDayEngine = withinDayEngine;
+		this.delegateFactory = delegateFactory;
+	}
+	
     @Override
 	public QSim createMobsim(Scenario sc, EventsManager eventsManager) {
-		// Get number of parallel Threads
-		QSimConfigGroup conf = (QSimConfigGroup) sc.getConfig().getModule(QSimConfigGroup.GROUP_NAME);
-		  
-		int numOfThreads = 1;
-		if (conf != null) numOfThreads = conf.getNumberOfThreads();
-
-		QSim sim;
-		if (numOfThreads > 1) {
-			/*
-			 * A SimStepParallelEventsManagerImpl can handle concurrent events,
-			 * therefore we do not need a SynchronizedEventsManagerImpl wrapper.
-			 */
-        	if (!(eventsManager instanceof SimStepParallelEventsManagerImpl)) {
-        		eventsManager = new SynchronizedEventsManagerImpl(eventsManager);        		
-        	}
-			sim = createWithinDayQSim(sc, eventsManager, new ParallelQNetsimEngineFactory());
-			  			  
-			// Get number of parallel Threads
-			log.info("Using parallel QSim with " + numOfThreads + " parallel Threads.");
-		}
-		else {
-			sim = createWithinDayQSim(sc, eventsManager);
-		}
-		
-		sim.addMobsimEngine(withinDayEngine);
-		
-		return sim;
+    	
+    	Mobsim mobsim = this.delegateFactory.createMobsim(sc, eventsManager);
+    	
+    	if (mobsim instanceof QSim) {
+    		log.info("Adding WithinDayEngine to Mobsim.");
+    		((QSim) mobsim).addMobsimEngine(withinDayEngine);
+    		return (QSim) mobsim;
+    	} else {
+    		throw new RuntimeException("Delegate MobsimFactory create a Mobsim from type " + mobsim.getClass().toString() +
+    				". Aborting since a Mobsim from type QSim was expexted!");
+    	}
 	}
 }
