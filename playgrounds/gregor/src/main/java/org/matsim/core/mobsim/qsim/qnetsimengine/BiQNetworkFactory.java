@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.network.Node;
 public class BiQNetworkFactory implements NetsimNetworkFactory<QNode, QLinkInternalI>{
 	
 	private final Map<Id,BiPedQ> qs = new HashMap<Id,BiPedQ>();
-	private boolean sqr;
 
 	@Override
 	public QNode createNetsimNode(Node node, QNetwork network) {
@@ -42,7 +41,7 @@ public class BiQNetworkFactory implements NetsimNetworkFactory<QNode, QLinkInter
 	public QLinkInternalI createNetsimLink(Link link, QNetwork network,
 			QNode toQueueNode) {
 		
-		BiPedQ q = new BiPedQ(network,this.sqr);
+		BiPedQ q = new BiPedQ(network.simEngine.getMobsim().getSimTimer(),0.1);
 		Iterator<? extends Link> it = link.getToNode().getOutLinks().values().iterator();
 		while (it.hasNext()) {
 			Link rev = it.next();
@@ -57,11 +56,8 @@ public class BiQNetworkFactory implements NetsimNetworkFactory<QNode, QLinkInter
 				break;
 			}
 		}
-		QLinkImpl ret = new QLinkImpl(link, network, toQueueNode, q);
+		BiPedQLinkImpl ret = new BiPedQLinkImpl(link, network, toQueueNode, q);
 		return ret;
 	}
 
-	public void setSqr(boolean sqr) {
-		this.sqr = sqr;
-	}
 }

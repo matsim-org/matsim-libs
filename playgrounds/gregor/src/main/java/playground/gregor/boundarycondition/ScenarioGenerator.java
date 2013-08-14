@@ -152,12 +152,15 @@ public class ScenarioGenerator {
 		
 		QSimConfigGroup qsim = new QSimConfigGroup();
 		qsim.setEndTime(2*3600);
+//		qsim.setMainModes(Arrays.asList(new String[]{"walk"}));
+//		Collection<String> modes =  qsim.getMainMode();
+//		modes.add("walk");
 		c.addModule(qsim);
 		c.controler().setMobsim("hybridQ2D");
 		
 		c.global().setCoordinateSystem("EPSG:3395");
 		
-		createNetworkChangeEvents(sc);
+//		createNetworkChangeEvents(sc);
 		
 		
 		new ConfigWriter(c).write(inputDir+ "/config.xml");
@@ -177,7 +180,7 @@ public class ScenarioGenerator {
 	private static void createNetworkChangeEvents(Scenario sc) {
 		Collection<NetworkChangeEvent> events = new LinkedList<NetworkChangeEvent>();
 		NetworkChangeEventFactoryImpl fac = new NetworkChangeEventFactoryImpl();
-		double incr = (4*1.2)/10;
+		double incr = (4*1.2)/5;
 		double flowCap = incr;
 		for (double time = 0; time < 20*60; time += 120) {
 			NetworkChangeEvent e = fac.createNetworkChangeEvent(time);
@@ -236,7 +239,7 @@ public class ScenarioGenerator {
 			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("l3"));
 			plan.addActivity(act1);
 			pop.addPerson(pers);
-////			t += .5;
+			t += 1;
 //			if ((i+1)%(960) == 0) {
 //				t += 3*60+12;
 //			}
@@ -696,11 +699,11 @@ public class ScenarioGenerator {
 		l2.setLength(14);
 		l3.setLength(14);
 		
-		l0Rev.setLength(6);
+		l0Rev.setLength(14);
 		l1Rev.setLength(14);
 		l1bRev.setLength(30);
-		l2Rev.setLength(5);
-		l3Rev.setLength(1);
+		l2Rev.setLength(14);
+		l3Rev.setLength(14);
 		
 		l0.setAllowedModes(modes);
 		l1.setAllowedModes(modes);
@@ -806,11 +809,11 @@ public class ScenarioGenerator {
 		l2.setLength(14);
 		l3.setLength(14);
 		
-		l0Rev.setLength(6);
+		l0Rev.setLength(14);
 		l1Rev.setLength(14);
 		l1bRev.setLength(30);
-		l2Rev.setLength(5);
-		l3Rev.setLength(1);
+		l2Rev.setLength(14);
+		l3Rev.setLength(14);
 		
 		l0.setAllowedModes(modes);
 		l1.setAllowedModes(modes);
@@ -916,11 +919,11 @@ public class ScenarioGenerator {
 		l2.setLength(14);
 		l3.setLength(14);
 		
-		l0Rev.setLength(6);
+		l0Rev.setLength(14);
 		l1Rev.setLength(14);
 		l1bRev.setLength(30);
-		l2Rev.setLength(5);
-		l3Rev.setLength(1);
+		l2Rev.setLength(14);
+		l3Rev.setLength(14);
 		
 		l0.setAllowedModes(modes);
 		l1.setAllowedModes(modes);

@@ -56,18 +56,23 @@ public final class HybridQSim2DNetworkFactory implements NetsimNetworkFactory<QN
 	public QLinkInternalI createNetsimLink(final Link link, final QNetwork network, final QNode toQueueNode) {
 		boolean sim2DQTransitionLink = false;
 		boolean qSim2DTransitionLink = link.getAllowedModes().contains(TransportMode.walk2d);
-
+		
+//		QueueWithBuffer.HOLES = true;
 		
 //		QLinkInternalI qLink = 
 		QLinkInternalI qLink = null;
 		if (link.getId().toString().startsWith("mt")) {
 			qLink = new QLinkImpl(link, network, toQueueNode);
-		} else if (link.getId().toString().startsWith("t")) {
-			this.biQFac.setSqr(false);
-			qLink =this.biQFac.createNetsimLink(link, network, toQueueNode);
+//		} else if (link.getId().toString().equals("t_l5b")) {
+//			qLink = new BiPedQLinkImpl(link,network,toQueueNode);
+////			qLink = new QLinkImpl(link, network, toQueueNode);
+		}else if (link.getId().toString().startsWith("t")) {
+//			qLink = new QLinkImpl(link, network, toQueueNode);
+			qLink = this.biQFac.createNetsimLink(link, network, toQueueNode);
+//					this.biQFac.createNetsimLink(link, network, toQueueNode);
 		} else {
-			this.biQFac.setSqr(true);
-			qLink =this.biQFac.createNetsimLink(link, network, toQueueNode);
+//			qLink =this.biQFac.createNetsimLink(link, network, toQueueNode);
+			qLink = new QLinkImpl(link, network, toQueueNode);
 		}
 		
 		if (qSim2DTransitionLink){

@@ -37,11 +37,12 @@ public class BiPedQ extends AbstractQueue<QVehicle> implements VehicleQ<QVehicle
 
 	private final MobsimTimer timer;
 
-	private final boolean sqr;
+	private final double delay;
+
 	
-	public BiPedQ(QNetwork network, boolean sqr) {
-		this.timer = network.simEngine.getMobsim().getSimTimer();
-		this.sqr = sqr;
+	public BiPedQ(MobsimTimer timer, double delay) {
+		this.timer = timer;
+		this.delay = delay;
 	}
 
 	@Override
@@ -106,11 +107,11 @@ public class BiPedQ extends AbstractQueue<QVehicle> implements VehicleQ<QVehicle
 	}
 	
 	private double computeDelay(int interactions) {
-		if (this.sqr) {
-			return Math.pow(interactions*0.018,2);
-		} else {
-			return interactions*.15;
-		}
+//		if (this.sqr) {
+//			return Math.pow(interactions*0.018,2);
+//		} else {
+			return interactions*this.delay;
+//		}
 //		return 0;
 	}
 
