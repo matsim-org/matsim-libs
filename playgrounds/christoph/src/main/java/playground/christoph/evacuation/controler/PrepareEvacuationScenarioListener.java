@@ -277,7 +277,8 @@ public class PrepareEvacuationScenarioListener {
 			Config config = scenario.getConfig();
 	        TransitRouterConfig transitRouterConfig = new TransitRouterConfig(config.planCalcScore(), config.plansCalcRoute(),
 	        		config.transitRouter(), config.vspExperimental());
-	        transitRouterFactory = new TransitRouterImplFactory(scenario.getTransitSchedule(), transitRouterConfig, this.transitRouterNetwork);
+	        throw new RuntimeException("This feature is not yet implemented in TransitRouterImplFactory!");
+//	        transitRouterFactory = new TransitRouterImplFactory(scenario.getTransitSchedule(), transitRouterConfig, this.transitRouterNetwork);
 		}
 		
 		TripRouterFactory defaultDelegateFactory = new DefaultDelegateFactory(scenario, leastCostPathCalculatorFactory);
