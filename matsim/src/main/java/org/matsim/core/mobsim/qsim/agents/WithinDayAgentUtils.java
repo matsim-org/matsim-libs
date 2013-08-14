@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 
 /**
  * <p>
@@ -89,8 +90,8 @@ public class WithinDayAgentUtils {
 	}
 	
 	public final Leg getCurrentLeg(MobsimAgent agent) {
-		if (agent instanceof PersonDriverAgentImpl) {
-			PlanElement currentPlanElement =  ((PersonDriverAgentImpl) agent).getCurrentPlanElement();
+		if (agent instanceof PlanAgent) {
+			PlanElement currentPlanElement =  ((PlanAgent) agent).getCurrentPlanElement();
 			if (!(currentPlanElement instanceof Leg)) {
 				return null;
 			}
