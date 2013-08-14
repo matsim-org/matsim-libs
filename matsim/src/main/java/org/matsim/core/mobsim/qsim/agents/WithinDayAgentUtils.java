@@ -122,4 +122,13 @@ public class WithinDayAgentUtils {
 					" which does not support getSelectedPlan(...). Aborting!");
 		}
 	}
+	
+	public final PlanElement getCurrentPlanElement(MobsimAgent agent) {
+		if (agent instanceof PlanAgent) {
+			return ((PlanAgent) agent).getCurrentPlanElement();
+		} else {
+			throw new RuntimeException("Sorry, agent is from type " + agent.getClass().toString() + 
+					" which does not support getCurrentPlanElement(...). Aborting!");
+		}
+	}
 }
