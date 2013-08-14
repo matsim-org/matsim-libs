@@ -45,6 +45,9 @@ public class ZoneBuilder {
 		this.crs = crs;
 	}
 	
+	/**
+	 * 
+	 */
 	public DgZones createAndWriteZones(Network network, DgSignalsBoundingBox signalsBoundingBox, 
 			int cellsX, int cellsY, String shapeFileDirectory){
 		//create a grid

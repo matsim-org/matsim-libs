@@ -45,7 +45,7 @@ public class DgIdPool {
 	private Map<String, Integer> ids = new HashMap<String, Integer>();
 	private Map<Integer, String> intStringMap = new HashMap<Integer, String>();
 	
-	public Id createId(String idString){
+	public Id createId(String idString) {
 		Integer i = this.createIntegerId(idString);
 		return new IdImpl(Integer.toString(i));
 	}

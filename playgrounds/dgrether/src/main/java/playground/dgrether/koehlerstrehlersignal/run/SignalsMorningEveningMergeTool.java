@@ -84,7 +84,7 @@ public class SignalsMorningEveningMergeTool {
 				Id newId = new IdImpl(eplan.getId().toString() + "_e");
 				SignalPlanData newPlan = DgSignalsUtils.copySignalPlanData(eplan, newId, morningControl.getFactory());
 				newPlan.setStartTime(12.0 * 3600.0);
-				newPlan.setEndTime(22.0 * 3600.0);
+				newPlan.setEndTime((23.0 * 3600.0) + (59.0 * 60.0) + 59.0);
 				morningController.addSignalPlanData(newPlan);
 			}
 		}

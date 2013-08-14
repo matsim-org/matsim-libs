@@ -64,5 +64,14 @@ public class CottbusUtils {
 		}
 		return null;
 	}
+
+	public static Tuple<CoordinateReferenceSystem, SimpleFeature> loadFeature(String shapeFile) {
+		ShapeFileReader shapeReader = new ShapeFileReader();
+		Collection<SimpleFeature> features = shapeReader.readFileAndInitialize(shapeFile);
+		CoordinateReferenceSystem crs = shapeReader.getCoordinateSystem();
+		SimpleFeature feature = features.iterator().next();
+		return new Tuple<CoordinateReferenceSystem, SimpleFeature>(crs, feature);
+	}
+
 	
 }

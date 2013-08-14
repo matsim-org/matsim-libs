@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgScenarioUtils
+ * DgNetShrinkImproved
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,37 +17,27 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.utils;
+package playground.dgrether.events;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.network.filter.NetworkFilterManager;
+
+import playground.dgrether.EnvelopeLinkStartEndFilter;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**
  * @author dgrether
  *
  */
-public class DgScenarioUtils {
+public class DgNetShrinkImproved {
 
-	private static final boolean loadPopulation = true;
-	
-	public static Scenario loadScenario(String net, String pop, String lanesFilename, String signalsFilename,
-			String signalGroupsFilename, String signalControlFilename){
-		Config c2 = ConfigUtils.createConfig();
-		c2.scenario().setUseLanes(true);
-		c2.scenario().setUseSignalSystems(true);
-		c2.network().setInputFile(net);
-		if (loadPopulation){
-			c2.plans().setInputFile(pop);
-		}
-		c2.network().setLaneDefinitionsFile(lanesFilename);
-		c2.signalSystems().setSignalSystemFile(signalsFilename);
-		c2.signalSystems().setSignalGroupsFile(signalGroupsFilename);
-		c2.signalSystems().setSignalControlFile(signalControlFilename);
-		Scenario scenario = ScenarioUtils.loadScenario(c2);
-		return scenario;
+	public Network createSmallNetwork(Network net, Envelope envelope) {
+		NetworkFilterManager filterManager = new NetworkFilterManager(net);
+		filterManager.addLinkFilter(new EnvelopeLinkStartEndFilter(envelope));
+		Network newNetwork = filterManager.applyFilters();
+		return newNetwork;		
 	}
-
+	
 }

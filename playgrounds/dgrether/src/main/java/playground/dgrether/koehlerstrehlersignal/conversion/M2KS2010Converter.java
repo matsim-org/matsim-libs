@@ -111,14 +111,17 @@ public class M2KS2010Converter {
 
 		this.scaleCommodities(commodities);
 		
+		Set<DgCommodity> removedCommodities = new HashSet<DgCommodity>();
 		Set<Id> commoditiesToRemove = new HashSet<Id>();
+		double totalFlow = 0.0;
 		for (DgCommodity com : commodities.getCommodities().values()){
+			totalFlow += com.getFlow();
 			if (com.getFlow() < minCommodityFlow){
 				commoditiesToRemove.add(com.getId());
 			}
 		}
 		for (Id id : commoditiesToRemove){
-			commodities.getCommodities().remove(id);
+			removedCommodities.add(commodities.getCommodities().remove(id));
 			log.info("Removed commodity id " + id + " because flow is less than " + minCommodityFlow);
 		}
 		
@@ -127,7 +130,7 @@ public class M2KS2010Converter {
 		DgKS2010Router router = new DgKS2010Router();
 		List<Id> invalidCommodities = router.routeCommodities(newMatsimNetwork, commodities);
 		for (Id id : invalidCommodities) {
-			commodities.getCommodities().remove(id);
+			removedCommodities.add(commodities.getCommodities().remove(id));
 			log.warn("removed commodity id : " + id + " because it can not be routed on the network.");
 		}
 		log.info("testing routing again...");
@@ -143,14 +146,14 @@ public class M2KS2010Converter {
 		DgCommodityUtils.write2Shapefile(commodities, newMatsimNetwork, crs,  shapeFileDirectory + "commodities.shp");
 
 		new KS2010ModelWriter().write(ksNet, commodities, name, description, outputDirectory + filename);
-		writeStats(ksNet, commodities);
+		writeStats(ksNet, commodities, totalFlow, removedCommodities);
 		
 		idPool.writeToFile(outputDirectory + "id_conversions.txt");
 	}
 
 
 
-	private void writeStats( DgKSNetwork ksNet, DgCommodities commodities){
+	private void writeStats( DgKSNetwork ksNet, DgCommodities commodities, double totalFlow, Set<DgCommodity> removedCommodities){
 		log.info("Network: ");
 		log.info("  # Streets: " + ksNet.getStreets().size() );
 		log.info("  # Crossings: " + ksNet.getCrossings().size());
@@ -164,8 +167,23 @@ public class M2KS2010Converter {
 		log.info("  # Nodes: " + noNodes);
 		log.info("Commodities: ");
 		log.info("  # Commodities: " + commodities.getCommodities().size());
+		log.info("  # Commodities removed: " + removedCommodities.size());
+		log.info("Overall flow: " + totalFlow);
+		double removedFlow = 0.0;
+		String info = "";
+		for (DgCommodity com : removedCommodities){
+			removedFlow += com.getFlow();
+			info += comToString(com) + " ; ";
+		}
+		log.info("Removed flow: " + removedFlow + " %: "+ Double.toString(removedFlow/totalFlow * 100.0));
+		log.info("Removed Commodities : " );
+		log.info(info);
+		
 	}
 
+	public String comToString(DgCommodity com) {
+		return com.getId().toString() + " " + com.getFlow();
+	}
 	
 	public double getKsModelCommoditySampleSize() {
 		return ksModelCommoditySampleSize;

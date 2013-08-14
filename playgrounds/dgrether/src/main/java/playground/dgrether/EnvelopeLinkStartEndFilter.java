@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgScenarioUtils
+ * EnvelopeLinkStartEndFilter
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,37 +17,35 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.signalsystems.utils;
+package playground.dgrether;
 
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.network.filter.NetworkLinkFilter;
+import org.matsim.core.utils.geometry.geotools.MGC;
+
+import com.vividsolutions.jts.geom.Coordinate;
+import com.vividsolutions.jts.geom.Envelope;
 
 
 /**
  * @author dgrether
  *
  */
-public class DgScenarioUtils {
+public class EnvelopeLinkStartEndFilter implements NetworkLinkFilter {
 
-	private static final boolean loadPopulation = true;
-	
-	public static Scenario loadScenario(String net, String pop, String lanesFilename, String signalsFilename,
-			String signalGroupsFilename, String signalControlFilename){
-		Config c2 = ConfigUtils.createConfig();
-		c2.scenario().setUseLanes(true);
-		c2.scenario().setUseSignalSystems(true);
-		c2.network().setInputFile(net);
-		if (loadPopulation){
-			c2.plans().setInputFile(pop);
-		}
-		c2.network().setLaneDefinitionsFile(lanesFilename);
-		c2.signalSystems().setSignalSystemFile(signalsFilename);
-		c2.signalSystems().setSignalGroupsFile(signalGroupsFilename);
-		c2.signalSystems().setSignalControlFile(signalControlFilename);
-		Scenario scenario = ScenarioUtils.loadScenario(c2);
-		return scenario;
-	}
+			private Envelope boundingBox;
+			
+			public EnvelopeLinkStartEndFilter(Envelope envelope) {
+				this.boundingBox = envelope;
+			}
 
+			@Override
+			public boolean judgeLink(Link l) {
+				Coord linkStartCoord = l.getFromNode().getCoord();
+				Coord linkEndCoord = l.getToNode().getCoord();
+				Coordinate linkStartPoint = MGC.coord2Coordinate(linkStartCoord);
+				Coordinate linkEndPoint = MGC.coord2Coordinate(linkEndCoord);
+				return this.boundingBox.contains(linkStartPoint) || this.boundingBox.contains(linkEndPoint);
+			}
 }

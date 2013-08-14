@@ -85,6 +85,16 @@ public class DgIdConverter {
 		return idPool.createId(idString);
 	}
 
+	public Id convertStreetId2LinkId(Id streetId){
+		String sid = streetId.toString();
+		if (sid.endsWith("88")){
+			Id  id = new IdImpl(sid.substring(0, sid.length() - 2));
+			return id;
+		}
+		throw new IllegalStateException("Can not convert " + sid + " to link id");
+	}
+
+	
 	public Id createFromZone2ToZoneId(Id from, Id to){
 		String idString = from + "22" + to;
 		return idPool.createId(idString);

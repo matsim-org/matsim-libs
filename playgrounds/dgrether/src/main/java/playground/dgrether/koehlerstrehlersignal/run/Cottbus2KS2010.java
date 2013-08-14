@@ -72,10 +72,10 @@ public class Cottbus2KS2010 {
 		double endTime = 18.5 * 3600.0;
 		double matsimPopSampleSize = 1.0;
 		double ksModelCommoditySampleSize = 1.0;
-		double minCommodityFlow = 10.0;
+		double minCommodityFlow = 4.0;
 		//		String name = "run run1722 output plans between 05:30 and 09:30";
 		String name = "run run1722 output plans between 13:30 and 18:30";
-		final String outputDirectory = DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-08-12_minflow_10_evening_peak/";
+		final String outputDirectory = DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-08-14_test/";
 		String ksModelOutputFilename = "ks2010_model_";
 		ksModelOutputFilename += Double.toString(minCommodityFlow) + "_" + Double.toString(startTime) + ".xml";
 				
@@ -88,12 +88,12 @@ public class Cottbus2KS2010 {
 		NetLanesSignalsShrinker scenarioShrinker = new NetLanesSignalsShrinker(fullScenario,  CRS);
 		scenarioShrinker.shrinkScenario(outputDirectory, shapeFileDirectory, boundingBoxOffset);
 		
-		//create the zones (that are currently not used) but serve as container for the OD pairs
+		//create the geometry for zones. The geometry itsself is not used, but the object serves as container for the link -> link OD pairs
 		ZoneBuilder zoneBuilder = new ZoneBuilder(CRS);
 		DgZones zones = zoneBuilder.createAndWriteZones(scenarioShrinker.getShrinkedNetwork(), scenarioShrinker.getSignalsBoundingBox(),
 				cellsX, cellsY, shapeFileDirectory);
 		
-		// match population to the small network and convert to od 
+		// match population to the small network and convert to od, results are stored in the DgZones object
 		PopulationToOd pop2od = new PopulationToOd();
 		pop2od.setMatsimPopSampleSize(matsimPopSampleSize);
 		pop2od.setOriginalToSimplifiedLinkMapping(scenarioShrinker.getOriginalToSimplifiedLinkIdMatching());

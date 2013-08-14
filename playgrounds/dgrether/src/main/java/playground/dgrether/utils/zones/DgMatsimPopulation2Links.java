@@ -65,7 +65,7 @@ public class DgMatsimPopulation2Links {
 
 	private Map<Id, Id> originalToSimplifiedLinkIdMatching;
 	
-	public DgZones convert2Zones(Network network, Network smallNetwork, Map<Id, Id> originalToSimplifiedLinkIdMatching, Population pop, DgZones cells, 
+	public DgZones convert2Links(Network network, Network smallNetwork, Map<Id, Id> originalToSimplifiedLinkIdMatching, Population pop, DgZones cells, 
 			Envelope networkBoundingBox, double startTime, double endTime) {
 		this.fullNetwork = network;
 		this.smallNetwork = smallNetwork; 

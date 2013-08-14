@@ -48,7 +48,6 @@ public class PopulationToOd {
 			Network smallNetwork, DgSignalsBoundingBox signalsBoundingBox, 
 			double startTimeSec, double endTimeSec, String shapeFileDirectory){
 
-		//create some zones and map demand on the zones
 		if (matsimPopSampleSize != 1.0){
 			new DgPopulationSampler().samplePopulation(population, matsimPopSampleSize);
 		}
@@ -56,7 +55,7 @@ public class PopulationToOd {
 		//create some zones and match the population to them
 		DgMatsimPopulation2Links pop2zones = new DgMatsimPopulation2Links();
 		
-		pop2zones.convert2Zones(fullNetwork, smallNetwork, this.originalToSimplifiedLinkIdMatching,
+		pop2zones.convert2Links(fullNetwork, smallNetwork, this.originalToSimplifiedLinkIdMatching,
 				population, zones, signalsBoundingBox.getBoundingBox(), startTimeSec, endTimeSec);
 		
 		//write	 the matching to some files

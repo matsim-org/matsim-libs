@@ -40,9 +40,12 @@ import com.vividsolutions.jts.geom.Geometry;
 
 
 /**
+ * 
  * @author dgrether
+ * @deprecated use geotools directly for combinations of crs and geometry
  *
  */
+@Deprecated
 public class GeospatialEventTools {
 
 	private Network network;
