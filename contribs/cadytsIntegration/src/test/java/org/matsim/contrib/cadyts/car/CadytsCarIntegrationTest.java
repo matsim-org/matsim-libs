@@ -354,9 +354,9 @@ public class CadytsCarIntegrationTest {
 			DynamicData<Link> linkOffsets = offsetReader.read(linkOffsetFile);
 			
 			// TransitStopFacility stop2 = schedule.getFacilities().get(stopId2);
-			Link link11 = network.getLinks().get(new IdImpl("11"));
+			Link link11 = network.getLinks().get(locId11);
 			// TransitStopFacility stop10 = schedule.getFacilities().get(stopId10);
-			Link link19 = network.getLinks().get(new IdImpl("19"));
+			Link link19 = network.getLinks().get(locId19);
 			
 			//find first offset value different from null to compare. Useful to test with different time bin sizes
 			int binIndex=-1;
