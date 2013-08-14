@@ -127,6 +127,7 @@ public class PhysicalSim2DSection {
 					it.remove();
 					this.penv.getEventsManager().processEvent(new Sim2DAgentDestructEvent(time, agent));
 					log.warn("Agent: " + agent + " did not leave 2D sim orderly! There might be a bug!");
+					continue;
 				}
 				mv = true;
 			} else {
