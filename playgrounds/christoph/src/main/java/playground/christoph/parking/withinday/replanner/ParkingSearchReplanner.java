@@ -36,7 +36,6 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -82,7 +81,7 @@ public class ParkingSearchReplanner extends WithinDayDuringLegReplanner {
 	}
 
 	@Override
-	public boolean doReplanning(PlanBasedWithinDayAgent withinDayAgent) {
+	public boolean doReplanning(MobsimAgent withinDayAgent) {
 		
 		/*
 		 * If a parking has been selected, set it as destination and adapt the

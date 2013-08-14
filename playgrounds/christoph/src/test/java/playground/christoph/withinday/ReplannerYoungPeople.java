@@ -5,9 +5,9 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.TripRouter;
@@ -27,7 +27,7 @@ public class ReplannerYoungPeople extends WithinDayDuringLegReplanner {
 	}
 
 	@Override
-	public boolean doReplanning(PlanBasedWithinDayAgent withinDayAgent) {
+	public boolean doReplanning(MobsimAgent withinDayAgent) {
 
 		// If we don't have a valid personAgent
 		if (withinDayAgent == null) return false;

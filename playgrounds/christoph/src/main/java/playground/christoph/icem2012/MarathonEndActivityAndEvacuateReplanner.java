@@ -26,9 +26,11 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 
@@ -48,7 +50,7 @@ public class MarathonEndActivityAndEvacuateReplanner extends WithinDayDuringActi
 	}
 		
 	@Override
-	public boolean doReplanning(PlanBasedWithinDayAgent withinDayAgent) {		
+	public boolean doReplanning(MobsimAgent withinDayAgent) {		
 		
 		/*
 		 * This is ugly because we perform it for every agent instead of once per time step.
@@ -59,19 +61,21 @@ public class MarathonEndActivityAndEvacuateReplanner extends WithinDayDuringActi
 		boolean replanned = replanner.doReplanning(withinDayAgent);
 		
 		if (!replanned) return replanned;
+
+		Plan plan = ((PlanAgent) withinDayAgent).getSelectedPlan(); 
 		
-		for (int i = 0; i < withinDayAgent.getSelectedPlan().getPlanElements().size(); i++) {
-			PlanElement planElement = withinDayAgent.getSelectedPlan().getPlanElements().get(i);
+		for (int i = 0; i < plan.getPlanElements().size(); i++) {
+			PlanElement planElement = plan.getPlanElements().get(i);
 			if (planElement instanceof Activity) {
 				Activity activity = (Activity) planElement;
 				if (activity.getType().equals("rescue")) {
-					Leg legToRescue = (Leg) withinDayAgent.getSelectedPlan().getPlanElements().get(i - 1);
+					Leg legToRescue = (Leg) plan.getPlanElements().get(i - 1);
 
 					// use walk2d instead of walk
 					if (legToRescue.getMode().equals(TransportMode.walk)) {
 						legToRescue.setMode("walk2d");
 						
-						Activity currentActivity = (Activity) withinDayAgent.getCurrentPlanElement();
+						Activity currentActivity = (Activity) ((PlanAgent) withinDayAgent).getCurrentPlanElement();
 						/*
 						 * Adapt the activity's coordinate to a location close to the end node of the link
 						 * where it is performed at.

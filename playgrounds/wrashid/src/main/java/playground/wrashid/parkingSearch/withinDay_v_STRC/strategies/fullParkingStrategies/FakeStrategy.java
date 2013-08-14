@@ -19,20 +19,20 @@
 package playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.fullParkingStrategies;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 
 import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.FullParkingSearchStrategy;
 
 public class FakeStrategy implements FullParkingSearchStrategy {
 
 	@Override
-	public void applySearchStrategy(PlanBasedWithinDayAgent agent, double time) {
+	public void applySearchStrategy(MobsimAgent agent, double time) {
 		// TODO Auto-generated method stub
 		
 	}
 
 	@Override
-	public boolean acceptParking(PlanBasedWithinDayAgent agent, Id facilityId) {
+	public boolean acceptParking(MobsimAgent agent, Id facilityId) {
 		// TODO Auto-generated method stub
 		return false;
 	}

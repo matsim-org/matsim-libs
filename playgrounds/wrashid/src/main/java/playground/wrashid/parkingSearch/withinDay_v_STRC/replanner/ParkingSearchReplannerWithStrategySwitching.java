@@ -23,20 +23,17 @@ import java.util.LinkedList;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.routes.NetworkRoute;
 
 import playground.christoph.parking.core.mobsim.ParkingInfrastructure;
 import playground.christoph.parking.withinday.replanner.ParkingSearchReplanner;
-import playground.christoph.parking.withinday.replanner.strategy.NearestAvailableParkingSearch;
 import playground.christoph.parking.withinday.replanner.strategy.ParkingSearchStrategy;
-import playground.christoph.parking.withinday.replanner.strategy.RandomParkingSearch;
 import playground.christoph.parking.withinday.utils.ParkingAgentsTracker;
 import playground.christoph.parking.withinday.utils.ParkingRouter;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.FullParkingSearchStrategy;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.util.ParkingAgentsTracker_v2;
-import playground.wrashid.parkingSearch.withindayFW.core.ParkingStrategy;
 
 public class ParkingSearchReplannerWithStrategySwitching extends ParkingSearchReplanner {
 
@@ -61,7 +58,7 @@ public class ParkingSearchReplannerWithStrategySwitching extends ParkingSearchRe
 	}
 	
 	@Override
-	public boolean doReplanning(PlanBasedWithinDayAgent withinDayAgent) {
+	public boolean doReplanning(MobsimAgent withinDayAgent) {
 		
 		ParkingAgentsTracker_v2 parkingAgentsTracker_v2= (ParkingAgentsTracker_v2) parkingAgentsTracker;
 		
@@ -96,16 +93,16 @@ public class ParkingSearchReplannerWithStrategySwitching extends ParkingSearchRe
 		 * and has been accepted. Now ensure that the agent's plan is still valid.
 		 */
 		else {
-			Leg leg = withinDayAgent.getCurrentLeg();
+			Leg leg = this.withinDayAgentUtils.getCurrentLeg(withinDayAgent);
 
-			int routeIndex = withinDayAgent.getCurrentRouteLinkIdIndex();
+			int routeIndex = this.withinDayAgentUtils.getCurrentRouteLinkIdIndex(withinDayAgent);
 
 			NetworkRoute route = (NetworkRoute) leg.getRoute();
 			
 			updateAgentsPlan(withinDayAgent, parkingFacilityId, route, routeIndex);
 		}
 
-		withinDayAgent.resetCaches();
+		this.withinDayAgentUtils.resetCaches(withinDayAgent);
 		return true;
 	}
 

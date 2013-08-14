@@ -32,8 +32,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouter;
@@ -66,17 +66,18 @@ public class GPSNIReplanner extends WithinDayDuringLegReplanner {
 	}
 
 	@Override
-	public boolean doReplanning(PlanBasedWithinDayAgent withinDayAgent) {
+	public boolean doReplanning(MobsimAgent withinDayAgent) {
 
-		Plan plan = withinDayAgent.getSelectedPlan();
+		Plan plan = this.withinDayAgentUtils.getSelectedPlan(withinDayAgent);
 
-		Leg leg = withinDayAgent.getCurrentLeg();
+		Leg leg = this.withinDayAgentUtils.getCurrentLeg(withinDayAgent);
 
-		ActivityImpl activity = (ActivityImpl) withinDayAgent.getNextPlanElement();
+		ActivityImpl activity = (ActivityImpl) this.withinDayAgentUtils.getSelectedPlan(withinDayAgent).getPlanElements().
+				get(this.withinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent) + 1);
 		Id linkId = withinDayAgent.getCurrentLinkId();
 		Link link = scenario.getNetwork().getLinks().get(linkId);
 
-		int routeIndex = withinDayAgent.getCurrentRouteLinkIdIndex();
+		int routeIndex = this.withinDayAgentUtils.getCurrentRouteLinkIdIndex(withinDayAgent);
 
 		NetworkRoute route = (NetworkRoute) leg.getRoute();
 		Id startLink = route.getStartLinkId();
@@ -152,7 +153,7 @@ public class GPSNIReplanner extends WithinDayDuringLegReplanner {
 				 * machen, weil hier geht es ja nur um nicht ausgeführte Teile
 				 * des Plans.
 				 */
-				for (int i = withinDayAgent.getCurrentPlanElementIndex() + 2; i < plan.getPlanElements().size(); i++) {
+				for (int i = this.withinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent) + 2; i < plan.getPlanElements().size(); i++) {
 					PlanElement planElement = plan.getPlanElements().get(i);
 					if (planElement instanceof ActivityImpl) {
 						ActivityImpl a = (ActivityImpl) planElement;
@@ -186,14 +187,14 @@ public class GPSNIReplanner extends WithinDayDuringLegReplanner {
 
 				// update agent's route
 				this.editRoutes.relocateCurrentLegRoute(leg, plan.getPerson(), 
-						withinDayAgent.getCurrentRouteLinkIdIndex(), endLink, time, scenario.getNetwork(), tripRouter);			
+						this.withinDayAgentUtils.getCurrentRouteLinkIdIndex(withinDayAgent), endLink, time, scenario.getNetwork(), tripRouter);			
 
 				updateNextLeg = true;
 			}
 
 			// adapt next walk leg.
 			if (updateNextLeg) {
-				Leg nextLeg = (Leg) plan.getPlanElements().get(withinDayAgent.getCurrentPlanElementIndex() + 2);
+				Leg nextLeg = (Leg) plan.getPlanElements().get(this.withinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent) + 2);
 				this.editRoutes.relocateFutureLegRoute(nextLeg, endLink, nextLeg.getRoute().getEndLinkId(), 
 						plan.getPerson(), scenario.getNetwork(), tripRouter);
 			}
@@ -201,7 +202,7 @@ public class GPSNIReplanner extends WithinDayDuringLegReplanner {
 			InsertParkingActivities.updateNextParkingActivityIfNeededDuringDay(parkingAgentsTracker.getParkingInfrastructure()  , withinDayAgent , scenario, tripRouter);
 		}
 
-		withinDayAgent.resetCaches();
+		this.withinDayAgentUtils.resetCaches(withinDayAgent);
 		return true;
 	}
 

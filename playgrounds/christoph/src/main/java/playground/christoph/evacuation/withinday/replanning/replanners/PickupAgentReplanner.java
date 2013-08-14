@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
@@ -63,7 +62,7 @@ public class PickupAgentReplanner extends WithinDayDuringLegReplanner {
 	}
 
 	@Override
-	public boolean doReplanning(PlanBasedWithinDayAgent withinDayAgent) {
+	public boolean doReplanning(MobsimAgent withinDayAgent) {
 		
 		// If we don't have a valid WithinDayPersonAgent
 		if (withinDayAgent == null) return false;

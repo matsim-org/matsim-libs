@@ -19,14 +19,14 @@
 package playground.wrashid.parkingSearch.withinDay_v_STRC.strategies;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 
 public interface FullParkingSearchStrategy {
 
 	// in case parking not yet found
-	public void applySearchStrategy(PlanBasedWithinDayAgent agent, double time);
+	public void applySearchStrategy(MobsimAgent agent, double time);
 
-	public boolean acceptParking(PlanBasedWithinDayAgent agent, Id facilityId);
+	public boolean acceptParking(MobsimAgent agent, Id facilityId);
 	
 	public String getStrategyName(); 
 

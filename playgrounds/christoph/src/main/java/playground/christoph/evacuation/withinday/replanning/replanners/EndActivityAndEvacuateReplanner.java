@@ -30,8 +30,8 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -61,12 +61,12 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 	}
 	
 	@Override
-	public boolean doReplanning(PlanBasedWithinDayAgent withinDayAgent) {		
+	public boolean doReplanning(MobsimAgent withinDayAgent) {		
 		
 		// If we don't have a valid PersonAgent
 		if (withinDayAgent == null) return false;
 	
-		PlanImpl executedPlan = (PlanImpl)withinDayAgent.getSelectedPlan();
+		PlanImpl executedPlan = (PlanImpl) this.withinDayAgentUtils.getSelectedPlan(withinDayAgent);
 
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
@@ -76,7 +76,7 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 		/*
 		 *  Get the current PlanElement and check if it is an Activity
 		 */
-		PlanElement currentPlanElement = withinDayAgent.getCurrentPlanElement();
+		PlanElement currentPlanElement = this.withinDayAgentUtils.getCurrentPlanElement(withinDayAgent);
 		if (currentPlanElement instanceof Activity) {
 			currentActivity = (Activity) currentPlanElement;
 		} else return false;

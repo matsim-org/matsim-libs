@@ -27,8 +27,8 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
@@ -49,12 +49,12 @@ public class SwitchToWalk2DLegReplanner extends WithinDayDuringLegReplanner {
 	}
 
 	@Override
-	public boolean doReplanning(PlanBasedWithinDayAgent withinDayAgent) {
+	public boolean doReplanning(MobsimAgent withinDayAgent) {
 
 		// If we don't have a valid PersonAgent
 		if (withinDayAgent == null) return false;
 
-		Plan executedPlan = withinDayAgent.getSelectedPlan();
+		Plan executedPlan = this.withinDayAgentUtils.getSelectedPlan(withinDayAgent);
 
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
@@ -78,7 +78,7 @@ public class SwitchToWalk2DLegReplanner extends WithinDayDuringLegReplanner {
 			boolean isRescueLink = currentLinkId.toString().contains("rescue");
 			
 			if (!isRescueLink && isAffected) {
-				Plan plan = withinDayAgent.getSelectedPlan();
+				Plan plan = this.withinDayAgentUtils.getSelectedPlan(withinDayAgent);
 				NetworkRoute currentRoute = (NetworkRoute) currentLeg.getRoute();
 				
 				NetworkRoute subRoute = currentRoute.getSubRoute(currentRoute.getStartLinkId(), currentLinkId); 

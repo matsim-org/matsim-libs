@@ -33,8 +33,8 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouter;
@@ -67,23 +67,24 @@ public class RandomSearchReplanner extends WithinDayDuringLegReplanner {
 	}
 
 	@Override
-	public boolean doReplanning(PlanBasedWithinDayAgent withinDayAgent) {
+	public boolean doReplanning(MobsimAgent withinDayAgent) {
 
-		if (withinDayAgent.getCurrentPlanElementIndex() ==3){
+		if (this.withinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent) == 3){
 			DebugLib.traceAgent(withinDayAgent.getId(), 6);
 		}
 		
 		//EditPartialRoute editPartialRoute=new EditPartialRoute(scenario, routeAlgo);
 		
-		Plan plan = withinDayAgent.getSelectedPlan();
+		Plan plan = this.withinDayAgentUtils.getSelectedPlan(withinDayAgent);
 
-		Leg leg = withinDayAgent.getCurrentLeg();
+		Leg leg = this.withinDayAgentUtils.getCurrentLeg(withinDayAgent);
 
-		ActivityImpl activity = (ActivityImpl) withinDayAgent.getNextPlanElement();
+		int currentPlanElementIndex = this.withinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
+		ActivityImpl activity = (ActivityImpl) this.withinDayAgentUtils.getSelectedPlan(withinDayAgent).getPlanElements().get(currentPlanElementIndex + 1);
 		Id linkId = withinDayAgent.getCurrentLinkId();
 		Link link = scenario.getNetwork().getLinks().get(linkId);
 
-		int routeIndex = withinDayAgent.getCurrentRouteLinkIdIndex();
+		int routeIndex = this.withinDayAgentUtils.getCurrentRouteLinkIdIndex(withinDayAgent);
 
 		NetworkRoute route = (NetworkRoute) leg.getRoute();
 		Id startLink = route.getStartLinkId();
@@ -153,7 +154,7 @@ public class RandomSearchReplanner extends WithinDayDuringLegReplanner {
 
 				updateNextLeg = true;
 				
-				for (int i = withinDayAgent.getCurrentPlanElementIndex() + 2; i < plan.getPlanElements().size(); i++) {
+				for (int i = this.withinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent) + 2; i < plan.getPlanElements().size(); i++) {
 					PlanElement planElement = plan.getPlanElements().get(i);
 					if (planElement instanceof ActivityImpl) {
 						ActivityImpl a = (ActivityImpl) planElement;
@@ -201,28 +202,24 @@ public class RandomSearchReplanner extends WithinDayDuringLegReplanner {
 
 				// update agent's route
 				//route.setLinkIds(startLink, links, endLink);
-
-				if (withinDayAgent.getCurrentPlanElementIndex() ==3){
-					DebugLib.traceAgent(withinDayAgent.getId(), 9);
-				}
 				
 				// update agent's route
 //				editRoutes.replanCurrentLegRoute(plan, withinDayAgent.getCurrentPlanElementIndex(),
 //						withinDayAgent.getCurrentRouteLinkIdIndex(), routeAlgo, this.time);
 
 				this.editRoutes.relocateCurrentLegRoute(leg, plan.getPerson(), 
-						withinDayAgent.getCurrentRouteLinkIdIndex(), endLink, time, scenario.getNetwork(), tripRouter);			
+						this.withinDayAgentUtils.getCurrentRouteLinkIdIndex(withinDayAgent), endLink, time, scenario.getNetwork(), tripRouter);			
 				
 				updateNextLeg = true;
 			}
 
-			// update walk leg away from arriving pariking act
-			Leg nextLeg = (Leg) plan.getPlanElements().get(withinDayAgent.getCurrentPlanElementIndex() + 2);
+			// update walk leg away from arriving parking act
+			Leg nextLeg = (Leg) plan.getPlanElements().get(this.withinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent) + 2);
 			this.editRoutes.relocateFutureLegRoute(nextLeg, endLink, nextLeg.getRoute().getEndLinkId(), 
 					plan.getPerson(), scenario.getNetwork(), tripRouter);	
 		}
 
-		withinDayAgent.resetCaches();
+		this.withinDayAgentUtils.resetCaches(withinDayAgent);
 		return true;
 	}
 

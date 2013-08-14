@@ -19,11 +19,10 @@
 package playground.wrashid.parkingSearch.withinDay_v_STRC.strategies;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.christoph.parking.withinday.replanner.strategy.RandomParkingSearch;
-import playground.christoph.parking.withinday.utils.ParkingRouterFactory;
 import playground.wrashid.parkingSearch.withinDay_v_STRC.core.mobsim.ParkingInfrastructure_v2;
 
 public class GarageParkingStrategy implements FullParkingSearchStrategy{
@@ -38,12 +37,12 @@ public class GarageParkingStrategy implements FullParkingSearchStrategy{
 	}
 
 	@Override
-	public void applySearchStrategy(PlanBasedWithinDayAgent agent, double time) {
+	public void applySearchStrategy(MobsimAgent agent, double time) {
 		randomParkingSearch.applySearchStrategy(agent, time);
 	}
 
 	@Override
-	public boolean acceptParking(PlanBasedWithinDayAgent agent, Id facilityId) {
+	public boolean acceptParking(MobsimAgent agent, Id facilityId) {
 		String parkingType = parkingInfrastructure.getParkingTypes().get(facilityId);
 		
 		if (parkingType.equalsIgnoreCase("garageParking")){

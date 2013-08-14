@@ -19,7 +19,7 @@
 package playground.wrashid.parkingSearch.withinDay_v_STRC.strategies;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.wrashid.parkingSearch.withinDay_v_STRC.core.mobsim.ParkingInfrastructure_v2;
@@ -31,7 +31,7 @@ public class StreetParkingStrategy extends GarageParkingStrategy{
 	}
 
 	@Override
-	public boolean acceptParking(PlanBasedWithinDayAgent agent, Id facilityId) {
+	public boolean acceptParking(MobsimAgent agent, Id facilityId) {
 			String parkingType = parkingInfrastructure.getParkingTypes().get(facilityId);
 			
 			if (parkingType.equalsIgnoreCase("streetParking")){

@@ -35,7 +35,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
@@ -294,21 +295,22 @@ public class InsertParkingActivities implements PlanAlgorithm {
 	}
 	
 	public static void updateNextParkingActivityIfNeededDuringDay(ParkingInfrastructure pi,
-			PlanBasedWithinDayAgent withinDayAgent, Scenario sc, TripRouter tripRouter) {
+			MobsimAgent withinDayAgent, Scenario sc, TripRouter tripRouter) {
 		//EditPartialRoute editPartialRoute=new EditPartialRoute(sc, routeAlgo);
 		
 
 		EditRoutes editRoutes = new EditRoutes();
-
+		WithinDayAgentUtils withinDayAgentUtils = new WithinDayAgentUtils();
+		
 		Activity currentParkingArrivalAct = null;
 		Activity currentParkingDepartureAct = null;
 		ActivityImpl nextParkingArrivalAct = null;
 		ActivityImpl nextParkingDepartureAct = null;
 
-		Plan executedPlan = withinDayAgent.getSelectedPlan();
-		int currentPlanElemIndex = withinDayAgent.getCurrentPlanElementIndex();
+		Plan executedPlan = withinDayAgentUtils.getSelectedPlan(withinDayAgent);
+		int currentPlanElemIndex = withinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
 
-		List<PlanElement> planElements = withinDayAgent.getSelectedPlan().getPlanElements();
+		List<PlanElement> planElements = withinDayAgentUtils.getSelectedPlan(withinDayAgent).getPlanElements();
 		for (int i = currentPlanElemIndex; i < planElements.size(); i++) {
 			if (planElements.get(i) instanceof Activity) {
 				Activity act = (Activity) planElements.get(i);

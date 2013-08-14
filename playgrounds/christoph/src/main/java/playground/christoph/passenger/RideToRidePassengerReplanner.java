@@ -33,8 +33,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.Facility;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
 import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
 import org.matsim.core.population.ActivityImpl;
@@ -70,7 +70,7 @@ public class RideToRidePassengerReplanner extends WithinDayInitialReplanner {
 	}
 
 	@Override
-	public boolean doReplanning(PlanBasedWithinDayAgent withinDayAgent) {
+	public boolean doReplanning(MobsimAgent withinDayAgent) {
 		
 		Collection<RideToRidePassengerContext> collection = this.rideToRidePassengerContextProvider.removeContextCollection(withinDayAgent.getId());
 
@@ -86,7 +86,7 @@ public class RideToRidePassengerReplanner extends WithinDayInitialReplanner {
 		return true;
 	}
 	
-	private void rideToCar(PlanBasedWithinDayAgent agent, RideToRidePassengerContext context) {
+	private void rideToCar(MobsimAgent agent, RideToRidePassengerContext context) {
 		
 		adaptPassenger(agent, context);
 		
@@ -100,9 +100,9 @@ public class RideToRidePassengerReplanner extends WithinDayInitialReplanner {
 	}
 	
 
-	private void adaptPassenger(PlanBasedWithinDayAgent agent, RideToRidePassengerContext context) {
+	private void adaptPassenger(MobsimAgent agent, RideToRidePassengerContext context) {
 
-		Plan plan = agent.getSelectedPlan();
+		Plan plan = this.withinDayAgentUtils.getSelectedPlan(agent);
 		Leg rideLeg = context.rideLeg;
 		Route route = rideLeg.getRoute();
 		
@@ -246,9 +246,9 @@ public class RideToRidePassengerReplanner extends WithinDayInitialReplanner {
 		return networkRoute;
 	}
 	
-	private void rideToNonCar(PlanBasedWithinDayAgent agent, RideToRidePassengerContext context) {
+	private void rideToNonCar(MobsimAgent agent, RideToRidePassengerContext context) {
 		
-		Plan plan = agent.getSelectedPlan();
+		Plan plan = this.withinDayAgentUtils.getSelectedPlan(agent);
 		Leg rideLeg = context.rideLeg;
 		Route route = rideLeg.getRoute();
 		

@@ -35,8 +35,8 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.router.TripRouter;
@@ -69,11 +69,11 @@ public class HUPCReplanner extends WithinDayDuringLegReplanner {
 	}
 
 	@Override
-	public boolean doReplanning(PlanBasedWithinDayAgent withinDayAgent) {
+	public boolean doReplanning(MobsimAgent withinDayAgent) {
 		
-		Plan plan = withinDayAgent.getSelectedPlan();
+		Plan plan = this.withinDayAgentUtils.getSelectedPlan(withinDayAgent);
 		
-		int currentLegIndex = withinDayAgent.getCurrentPlanElementIndex();
+		int currentLegIndex = this.withinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
 
 		if (currentLegIndex == 33) {
 
@@ -119,16 +119,16 @@ public class HUPCReplanner extends WithinDayDuringLegReplanner {
 					plan.getPerson(), scenario.getNetwork(), tripRouter);
 		}
 
-		int currentLinkIndex = withinDayAgent.getCurrentRouteLinkIdIndex();
+		int currentLinkIndex = this.withinDayAgentUtils.getCurrentRouteLinkIdIndex(withinDayAgent);
 		
 		Route preRoute = ((LegImpl) plan.getPlanElements().get(currentLegIndex)).getRoute().clone();
 
-		this.editRoutes.relocateCurrentLegRoute(withinDayAgent.getCurrentLeg(), plan.getPerson(), currentLinkIndex, 
+		this.editRoutes.relocateCurrentLegRoute(this.withinDayAgentUtils.getCurrentLeg(withinDayAgent), plan.getPerson(), currentLinkIndex, 
 				parkingFacility.getLinkId(), time, scenario.getNetwork(), tripRouter);		
 		
 		Route postRoute = ((LegImpl) plan.getPlanElements().get(currentLegIndex)).getRoute();
 
-		withinDayAgent.resetCaches();
+		this.withinDayAgentUtils.resetCaches(withinDayAgent);
 		return true;
 	}
 
@@ -136,10 +136,10 @@ public class HUPCReplanner extends WithinDayDuringLegReplanner {
 		return secondParkingActIndex == null;
 	}
 
-	private Integer getSecondParkingActIndex(PlanBasedWithinDayAgent withinDayAgent) {
-		List<PlanElement> planElements = withinDayAgent.getSelectedPlan().getPlanElements();
+	private Integer getSecondParkingActIndex(MobsimAgent withinDayAgent) {
+		List<PlanElement> planElements = this.withinDayAgentUtils.getSelectedPlan(withinDayAgent).getPlanElements();
 
-		for (int i = withinDayAgent.getCurrentPlanElementIndex() + 2; i < planElements.size(); i++) {
+		for (int i = this.withinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent) + 2; i < planElements.size(); i++) {
 			if (planElements.get(i) instanceof Activity) {
 				Activity act = (Activity) planElements.get(i);
 				if (act.getType().equalsIgnoreCase("parking")) {

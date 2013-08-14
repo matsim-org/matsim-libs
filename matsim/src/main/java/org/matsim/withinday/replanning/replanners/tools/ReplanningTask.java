@@ -21,19 +21,19 @@
 package org.matsim.withinday.replanning.replanners.tools;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 
 public class ReplanningTask {
 
-	protected PlanBasedWithinDayAgent agentToReplan;
+	protected MobsimAgent agentToReplan;
 	protected Id withinDayReplannerId;
 	
-	public ReplanningTask(PlanBasedWithinDayAgent agentToReplan, Id withinDayReplannerId) {
+	public ReplanningTask(MobsimAgent agentToReplan, Id withinDayReplannerId) {
 		this.agentToReplan = agentToReplan;
 		this.withinDayReplannerId = withinDayReplannerId;
 	}
 	
-	public PlanBasedWithinDayAgent getAgentToReplan() {
+	public MobsimAgent getAgentToReplan() {
 		return this.agentToReplan;
 	}
 	

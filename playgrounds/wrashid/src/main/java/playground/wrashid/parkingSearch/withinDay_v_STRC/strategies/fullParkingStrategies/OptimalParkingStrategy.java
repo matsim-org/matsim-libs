@@ -18,14 +18,12 @@
  * *********************************************************************** */
 package playground.wrashid.parkingSearch.withinDay_v_STRC.strategies.fullParkingStrategies;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.PriorityQueue;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
@@ -34,7 +32,8 @@ import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.SortableMapObject;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 
@@ -54,6 +53,7 @@ public class OptimalParkingStrategy implements FullParkingSearchStrategy {
 	private ScenarioImpl scenarioData;
 	private ParkingAgentsTracker parkingAgentsTracker;
 	private ParkingInfrastructure_v2 parkInfrastructure_v2;
+	private WithinDayAgentUtils withinDayAgentUtils;
 
 	public OptimalParkingStrategy(ParkingRouter parkingRouter, ScenarioImpl scenarioData,
 			ParkingAgentsTracker parkingAgentsTracker, ParkingInfrastructure_v2 parkInfrastructure_v2) {
@@ -61,29 +61,29 @@ public class OptimalParkingStrategy implements FullParkingSearchStrategy {
 		this.scenarioData = scenarioData;
 		this.parkingAgentsTracker = parkingAgentsTracker;
 		this.parkInfrastructure_v2 = parkInfrastructure_v2;
-		
+		this.withinDayAgentUtils = new WithinDayAgentUtils();
 	}
 
 	@Override
-	public void applySearchStrategy(PlanBasedWithinDayAgent agent, double time) {
+	public void applySearchStrategy(MobsimAgent agent, double time) {
 		
 		
 		
 		Id currentLinkId = agent.getCurrentLinkId();
 
-		Leg leg = agent.getCurrentLeg();
+		Leg leg = this.withinDayAgentUtils.getCurrentLeg(agent);
 
 		NetworkRoute route = (NetworkRoute) leg.getRoute();
 
 		Id parkingFacilityId = parkingAgentsTracker.getSelectedParking(agent.getId());
 		Id parkingFacilityLinkId = parkInfrastructure_v2.getParkingFacilityLinkId(parkingFacilityId);
 
-		parkingRouter.adaptEndOfRoute(route, parkingFacilityLinkId, time, agent.getSelectedPlan().getPerson(), null,
+		parkingRouter.adaptEndOfRoute(route, parkingFacilityLinkId, time, this.withinDayAgentUtils.getSelectedPlan(agent).getPerson(), null,
 				TransportMode.car);
 	}
 
 	@Override
-	public boolean acceptParking(PlanBasedWithinDayAgent agent, Id facilityId) {
+	public boolean acceptParking(MobsimAgent agent, Id facilityId) {
 		return false;
 	}
 
@@ -93,13 +93,13 @@ public class OptimalParkingStrategy implements FullParkingSearchStrategy {
 		return "OptimalParkingStrategy";
 	}
 
-	public Id reserveBestParking(PlanBasedWithinDayAgent agent, ParkingAgentsTracker_v2 parkingAgentsTracker, double time) {
+	public Id reserveBestParking(MobsimAgent agent, ParkingAgentsTracker_v2 parkingAgentsTracker, double time) {
 		ParkingInfrastructure_v2 parkingInfrastructure = parkingAgentsTracker.getInfrastructure_v2();
 
 		Id personId = agent.getId();
-		Plan selectedPlan = agent.getSelectedPlan();
+		Plan selectedPlan = this.withinDayAgentUtils.getSelectedPlan(agent);
 		List<PlanElement> planElements = selectedPlan.getPlanElements();
-		Integer currentPlanElementIndex = agent.getCurrentPlanElementIndex();
+		Integer currentPlanElementIndex = this.withinDayAgentUtils.getCurrentPlanElementIndex(agent);
 
 		// get all parking within 1000m (of destination) or at least on parking,
 		// if that set is empty.
@@ -145,9 +145,9 @@ public class OptimalParkingStrategy implements FullParkingSearchStrategy {
 		return facilityId;
 	}
 
-	private boolean isLastParkingOfDay(PlanBasedWithinDayAgent agent) {
-		List<PlanElement> planElements = agent.getSelectedPlan().getPlanElements();
-		Integer currentPlanElementIndex = agent.getCurrentPlanElementIndex();
+	private boolean isLastParkingOfDay(MobsimAgent agent) {
+		List<PlanElement> planElements = this.withinDayAgentUtils.getSelectedPlan(agent).getPlanElements();
+		Integer currentPlanElementIndex = this.withinDayAgentUtils.getCurrentPlanElementIndex(agent);
 
 		for (int i = planElements.size() - 1; i > 0; i--) {
 			if (planElements.get(i) instanceof Leg) {

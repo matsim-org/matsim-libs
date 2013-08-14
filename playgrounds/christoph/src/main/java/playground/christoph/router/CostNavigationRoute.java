@@ -34,9 +34,9 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
@@ -73,7 +73,7 @@ public class CostNavigationRoute extends WithinDayDuringLegReplanner {
 	}
 	
 	@Override
-	public boolean doReplanning(PlanBasedWithinDayAgent withinDayAgent) {
+	public boolean doReplanning(MobsimAgent withinDayAgent) {
 
 		// If we don't have a valid PersonAgent
 		if (withinDayAgent == null) return false;
@@ -132,7 +132,7 @@ public class CostNavigationRoute extends WithinDayDuringLegReplanner {
 			Link lookupLink = this.network.getLinks().get(outLink.getId());
 			double outLinkCosts = this.travelDisutility.getLinkTravelDisutility(lookupLink, this.time, null, null);
 			
-			Path path = leastCostPathCalculator.calcLeastCostPath(outLink.getToNode(), endNode, this.time, withinDayAgent.getSelectedPlan().getPerson(), null);
+			Path path = leastCostPathCalculator.calcLeastCostPath(outLink.getToNode(), endNode, this.time, this.withinDayAgentUtils.getSelectedPlan(withinDayAgent).getPerson(), null);
 			paths.put(outLink.getId(), path);
 			double pathCosts = path.travelCost + outLinkCosts;
 			costs.put(outLink.getId(), pathCosts);

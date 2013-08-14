@@ -32,7 +32,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.utils.misc.Counter;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.withinday.events.ReplanningEvent;
@@ -161,7 +161,7 @@ public abstract class ReplanningRunnable implements Runnable {
 				// if no more elements are left in the queue, end while loop
 				if (replanningTask == null) break;
 
-				PlanBasedWithinDayAgent withinDayAgent = replanningTask.getAgentToReplan();
+				MobsimAgent withinDayAgent = replanningTask.getAgentToReplan();
 								
 				if (withinDayAgent == null) {
 					log.error("WithinDayAgent is null!");

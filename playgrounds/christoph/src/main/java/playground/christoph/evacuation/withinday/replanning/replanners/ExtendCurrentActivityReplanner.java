@@ -25,10 +25,8 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
-import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
@@ -49,18 +47,12 @@ public class ExtendCurrentActivityReplanner extends WithinDayDuringActivityRepla
 	}
 	
 	@Override
-	public boolean doReplanning(PlanBasedWithinDayAgent withinDayAgent) {		
+	public boolean doReplanning(MobsimAgent withinDayAgent) {		
 		
 		// If we don't have a valid WithinDayPersonAgent
 		if (withinDayAgent == null) return false;
-		
-		ExperimentalBasicWithindayAgent withinDayPersonAgent = null;
-		if (!(withinDayAgent instanceof ExperimentalBasicWithindayAgent)) return false;
-		else {
-			withinDayPersonAgent = (ExperimentalBasicWithindayAgent) withinDayAgent;
-		}
 	
-		PlanImpl executedPlan = (PlanImpl)withinDayAgent.getSelectedPlan();
+		PlanImpl executedPlan = (PlanImpl) this.withinDayAgentUtils.getSelectedPlan(withinDayAgent);
 
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
@@ -70,7 +62,7 @@ public class ExtendCurrentActivityReplanner extends WithinDayDuringActivityRepla
 		/*
 		 *  Get the current PlanElement and check if it is an Activity
 		 */
-		PlanElement currentPlanElement = withinDayPersonAgent.getCurrentPlanElement();
+		PlanElement currentPlanElement = this.withinDayAgentUtils.getCurrentPlanElement(withinDayAgent);
 		if (currentPlanElement instanceof Activity) {
 			currentActivity = (Activity) currentPlanElement;
 		} else return false;
@@ -101,7 +93,7 @@ public class ExtendCurrentActivityReplanner extends WithinDayDuringActivityRepla
 		 */
 		// yyyy a method getMobsim in MobimAgent would be useful here. cdobler, Oct'10
 		this.withinDayAgentUtils.calculateAndSetDepartureTime(withinDayAgent, currentActivity);
-		this.internalInterface.rescheduleActivityEnd(withinDayPersonAgent);
+		this.internalInterface.rescheduleActivityEnd(withinDayAgent);
 		return true;
 	}	
 }
