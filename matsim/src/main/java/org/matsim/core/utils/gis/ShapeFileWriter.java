@@ -27,6 +27,7 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.HashSet;
 
+import org.apache.log4j.Logger;
 import org.geotools.data.shapefile.ShapefileDataStore;
 import org.geotools.data.shapefile.ShapefileFeatureStore;
 import org.geotools.feature.DefaultFeatureCollections;
@@ -43,10 +44,13 @@ import org.opengis.feature.simple.SimpleFeatureType;
  */
 public class ShapeFileWriter implements MatsimSomeWriter {
 
+	private static final Logger log = Logger.getLogger(ShapeFileWriter.class);
+	
 	public static void writeGeometries(final Collection<SimpleFeature> features, final String filename) {
 		if (features.isEmpty()) {
 			throw new UncheckedIOException("Cannot write empty collection");
 		}
+		log.info("Writing shapefile to " + filename);
 		try {
 			URL fileURL = (new File(filename)).toURI().toURL();
 
