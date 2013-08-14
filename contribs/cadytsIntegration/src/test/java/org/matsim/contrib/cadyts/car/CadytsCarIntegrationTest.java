@@ -359,20 +359,20 @@ public class CadytsCarIntegrationTest {
 			Link link19 = network.getLinks().get(new IdImpl("19"));
 			
 			//find first offset value different from null to compare. Useful to test with different time bin sizes
-//			int binIndex=-1;
-//			boolean isZero;
-//			do {
-//				binIndex++;
-//				// isZero = (Math.abs(stopOffsets.getBinValue(stop2 , binIndex) - 0.0) < MatsimTestUtils.EPSILON);
-//				isZero = (Math.abs(stopOffsets.getBinValue(link19 , binIndex) - 0.0) < MatsimTestUtils.EPSILON);
-//			}while (isZero && binIndex<86400);
-//
-//			Assert.assertEquals("Wrong bin index for first link offset", 6, binIndex);
+			int binIndex=-1;
+			boolean isZero;
+			do {
+				binIndex++;
+				// isZero = (Math.abs(stopOffsets.getBinValue(stop2 , binIndex) - 0.0) < MatsimTestUtils.EPSILON);
+				isZero = (Math.abs(linkOffsets.getBinValue(link19 , binIndex) - 0.0) < MatsimTestUtils.EPSILON);
+			}while (isZero && binIndex<86400);
+
+			Assert.assertEquals("Wrong bin index for first link offset", 6, binIndex);
 			
 			// Assert.assertEquals("Wrong link offset of stop 10", 0.03515757824042241, stopOffsets.getBinValue(stop10 , binIndex), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("Wrong link offset of link 11", 0.0, linkOffsets.getBinValue(link11 , 6), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Wrong link offset of link 11", 0.0, linkOffsets.getBinValue(link11 , binIndex), MatsimTestUtils.EPSILON);
 			// Assert.assertEquals("Wrong link offset of stop 2", -0.011353248321030008, stopOffsets.getBinValue(stop2 , binIndex), MatsimTestUtils.EPSILON);
-			Assert.assertEquals("Wrong link offset of link 19", 0.0014707121641471912, linkOffsets.getBinValue(link19 , 6), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Wrong link offset of link 19", 0.0014707121641471912, linkOffsets.getBinValue(link19 , binIndex), MatsimTestUtils.EPSILON);
 		//}
 	}
 	

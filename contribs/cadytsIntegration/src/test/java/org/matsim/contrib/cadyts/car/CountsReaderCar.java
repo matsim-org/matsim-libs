@@ -70,7 +70,6 @@ public class CountsReaderCar {
 					// if (values[0].equals(this.STOP_ID_STRING_0)) {
 						//id = new IdImpl(values[1]);
 						Id id = new IdImpl(values[0]);
-						System.out.println(id);
 					//}
 					// else if (values[0].equals(this.HEAD_STRING_0)) {
 						// it does nothing, correct this condition
@@ -79,9 +78,7 @@ public class CountsReaderCar {
 							this.count.put(id, new TreeMap<String, double[]>());
 						}
 						// this.count.get(id).put(values[0],
-						System.out.println("value1 = " + values[1]);
-						System.out.println("value2 = " + values[2]);
-						System.out.println("value3 = " + values[3]);
+						
 						this.count.get(id).put(values[1],
 								// new double[] { Double.parseDouble(values[1]), Double.parseDouble(values[2]), Double.parseDouble(values[3]) });
 								new double[] { Double.parseDouble(values[2]), Double.parseDouble(values[3])});
