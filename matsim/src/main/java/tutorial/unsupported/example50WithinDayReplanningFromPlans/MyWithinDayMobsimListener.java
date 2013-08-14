@@ -36,7 +36,8 @@ import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
-import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
+import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
@@ -53,9 +54,11 @@ public class MyWithinDayMobsimListener implements MobsimBeforeSimStepListener {
 	
 	private TripRouter tripRouter;
 	private Scenario scenario;
+	private WithinDayAgentUtils withinDayAgentUtils;
 
 	MyWithinDayMobsimListener(TripRouter tripRouter) {
 		this.tripRouter = tripRouter;
+		this.withinDayAgentUtils = new WithinDayAgentUtils();
 	}
 
 	@Override
@@ -96,15 +99,14 @@ public class MyWithinDayMobsimListener implements MobsimBeforeSimStepListener {
 
 	}
 
-	private boolean doReplanning(MobsimAgent personAgent, Netsim mobsim ) {
+	private boolean doReplanning(MobsimAgent mobsimAgent, Netsim mobsim ) {
 		double now = mobsim.getSimTimer().getTimeOfDay() ;
 		
 		// preconditions:
-
-		if ( !(personAgent instanceof ExperimentalBasicWithindayAgent) ) {
+		if ( !(mobsimAgent instanceof PersonDriverAgentImpl) ) {
 			log.error("agent of wrong type; returning ... " ) ;
 		}
-		ExperimentalBasicWithindayAgent withindayAgent = (ExperimentalBasicWithindayAgent) personAgent ;
+		PersonDriverAgentImpl withindayAgent = (PersonDriverAgentImpl) mobsimAgent ;
 		
 		Plan plan = withindayAgent.getSelectedPlan() ;
 
@@ -122,7 +124,7 @@ public class MyWithinDayMobsimListener implements MobsimBeforeSimStepListener {
 		}
 		
 		List<PlanElement> planElements = plan.getPlanElements() ;
-		final Integer planElementsIndex = withindayAgent.getCurrentPlanElementIndex() ;
+		final Integer planElementsIndex = this.withinDayAgentUtils.getCurrentPlanElementIndex(withindayAgent);
 		
 		if ( !(planElements.get(planElementsIndex+1) instanceof Activity || !(planElements.get(planElementsIndex+2) instanceof Leg)) ) {
 			log.error( "this version of withinday replanning cannot deal with plans where legs and acts to not alternate; returning ...") ;
@@ -146,7 +148,7 @@ public class MyWithinDayMobsimListener implements MobsimBeforeSimStepListener {
 		
 		// new Route for current Leg.
 		ed.relocateCurrentLegRoute((Leg) plan.getPlanElements().get(planElementsIndex), withindayAgent.getPerson(), 
-				withindayAgent.getCurrentRouteLinkIdIndex(), linkId, now, scenario.getNetwork(), tripRouter);
+				this.withinDayAgentUtils.getCurrentRouteLinkIdIndex(withindayAgent), linkId, now, scenario.getNetwork(), tripRouter);
 		
 		// the route _from_ the modified activity also needs to be replanned:
 		Leg futureLeg = (Leg) plan.getPlanElements().get(planElementsIndex + 2);
@@ -157,7 +159,7 @@ public class MyWithinDayMobsimListener implements MobsimBeforeSimStepListener {
 		// =============================================================================================================
 		
 		// finally reset the cached Values of the PersonAgent - they may have changed!
-		withindayAgent.resetCaches();
+		this.withinDayAgentUtils.resetCaches(withindayAgent);
 		
 		return true;
 	}
