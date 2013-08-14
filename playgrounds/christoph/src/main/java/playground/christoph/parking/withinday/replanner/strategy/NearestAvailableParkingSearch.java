@@ -28,7 +28,9 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.vehicles.Vehicle;
 
@@ -42,15 +44,17 @@ public class NearestAvailableParkingSearch implements ParkingSearchStrategy {
 	private final Network network;
 	private final ParkingRouter parkingRouter;
 	private final ParkingInfrastructure parkingInfrastructure;
+	private final WithinDayAgentUtils withinDayAgentUtils;
 	
 	public NearestAvailableParkingSearch(Network network, ParkingRouter parkingRouter, ParkingInfrastructure parkingInfrastructure) {
 		this.network = network;
 		this.parkingRouter = parkingRouter;
 		this.parkingInfrastructure = parkingInfrastructure;
+		this.withinDayAgentUtils = new WithinDayAgentUtils();
 	}
 	
 	@Override
-	public void applySearchStrategy(PlanBasedWithinDayAgent agent, double time) {
+	public void applySearchStrategy(MobsimAgent agent, double time) {
 		
 		Id currentLinkId = agent.getCurrentLinkId();
 		Link currentLink = this.network.getLinks().get(currentLinkId);
@@ -58,10 +62,10 @@ public class NearestAvailableParkingSearch implements ParkingSearchStrategy {
 		ActivityFacility parkingFacility = this.parkingInfrastructure.getClosestFreeParkingFacility(currentLink.getCoord());
 		Id endLinkId = parkingFacility.getLinkId();
 		
-		Leg leg = agent.getCurrentLeg();
+		Leg leg = this.withinDayAgentUtils.getCurrentLeg(agent);
 		NetworkRoute route = (NetworkRoute) leg.getRoute();	
 		
-		Person person = agent.getSelectedPlan().getPerson();
+		Person person = ((PlanAgent) agent).getSelectedPlan().getPerson();
 		Vehicle vehicle = null;
 		parkingRouter.extendRoute(route, endLinkId, time, person, vehicle, TransportMode.car);
 	}

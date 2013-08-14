@@ -30,7 +30,8 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.population.routes.NetworkRoute;
 
 public class RandomParkingSearch implements ParkingSearchStrategy {
@@ -39,14 +40,16 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 	
 	private final Random random;
 	private final Network network;
+	private final WithinDayAgentUtils withinDayAgentUtils;
 	
 	public RandomParkingSearch(Network network) {
 		this.network = network;
 		this.random = MatsimRandom.getLocalInstance();
+		this.withinDayAgentUtils = new WithinDayAgentUtils();
 	}
 	
 	@Override
-	public void applySearchStrategy(PlanBasedWithinDayAgent agent, double time) {
+	public void applySearchStrategy(MobsimAgent agent, double time) {
 		
 		/*
 		 * Set seed in random number generator to create deterministic results.
@@ -56,14 +59,13 @@ public class RandomParkingSearch implements ParkingSearchStrategy {
 		Id currentLinkId = agent.getCurrentLinkId();
 		random.setSeed(currentLinkId.hashCode() + agent.getId().hashCode() + (long) time);
 		
-		Leg leg = agent.getCurrentLeg();
+		Leg leg = this.withinDayAgentUtils.getCurrentLeg(agent);
 
 		Link currentLink = this.network.getLinks().get(currentLinkId);
 
-		int routeIndex = agent.getCurrentRouteLinkIdIndex();
+		int routeIndex = this.withinDayAgentUtils.getCurrentRouteLinkIdIndex(agent);
 
 		NetworkRoute route = (NetworkRoute) leg.getRoute();
-
 		
 		Id startLink = route.getStartLinkId();
 		List<Id> links = new ArrayList<Id>(route.getLinkIds()); // create a copy that can be modified

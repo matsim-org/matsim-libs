@@ -31,8 +31,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
-import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayInitialReplanner;
@@ -63,7 +61,7 @@ public class CreateEvacuationPlanReplanner extends WithinDayInitialReplanner {
 		/*
 		 *  Get the index of the current PlanElement
 		 */
-		int currentPlanElementIndex = withinDayAgent.getCurrentPlanElementIndex();
+		int currentPlanElementIndex = this.withinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
 		
 		// if it is not the first activity which is being at home
 		if (currentPlanElementIndex > 0) return false;
@@ -97,14 +95,7 @@ public class CreateEvacuationPlanReplanner extends WithinDayInitialReplanner {
 		 * Reschedule the currently performed Activity in the Mobsim - there
 		 * the activityEndsList has to be updated.
 		 */
-		if (withinDayAgent instanceof PersonDriverAgentImpl) {	
-			((ExperimentalBasicWithindayAgent) withinDayAgent).calculateAndSetDepartureTime(currentActivity);
-			this.internalInterface.rescheduleActivityEnd(withinDayAgent);
-			return true;
-		}
-		else {
-			return false;
-		}
+		this.withinDayAgentUtils.calculateAndSetDepartureTime(withinDayAgent, currentActivity);
+		return true;
 	}
-
 }

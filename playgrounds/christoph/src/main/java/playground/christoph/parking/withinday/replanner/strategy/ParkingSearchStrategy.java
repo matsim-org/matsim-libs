@@ -20,9 +20,9 @@
 
 package playground.christoph.parking.withinday.replanner.strategy;
 
-import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 
 public interface ParkingSearchStrategy {
 
-	public void applySearchStrategy(PlanBasedWithinDayAgent agent, double time);
+	public void applySearchStrategy(MobsimAgent agent, double time);
 }

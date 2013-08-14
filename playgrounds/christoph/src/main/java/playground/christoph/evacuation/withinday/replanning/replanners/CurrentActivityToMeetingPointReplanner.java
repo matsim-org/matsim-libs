@@ -33,7 +33,6 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
@@ -200,7 +199,7 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 		 * Reschedule the currently performed Activity in the Mobsim - there
 		 * the activityEndsList has to be updated.
 		 */
-		((ExperimentalBasicWithindayAgent) withinDayAgent).calculateAndSetDepartureTime(currentActivity);
+		this.withinDayAgentUtils.calculateAndSetDepartureTime(withinDayAgent, currentActivity);
 		this.internalInterface.rescheduleActivityEnd(withinDayAgent);
 		return true;
 	}

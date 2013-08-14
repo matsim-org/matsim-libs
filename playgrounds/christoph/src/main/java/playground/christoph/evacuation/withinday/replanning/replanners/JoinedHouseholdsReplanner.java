@@ -30,8 +30,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
-import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
 import org.matsim.core.mobsim.qsim.agents.PlanBasedWithinDayAgent;
 import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
 import org.matsim.core.population.ActivityImpl;
@@ -200,15 +198,8 @@ public class JoinedHouseholdsReplanner extends WithinDayDuringActivityReplanner 
 		// yyyy a method getMobsim in MobimAgent would be useful here. cdobler, Oct'10
 		// Intuitively I would agree.  We should think about where to set this so that, under normal circumstances,
 		// it can't become null.  kai, oct'10
-		if (withinDayAgent instanceof PersonDriverAgentImpl) {			
-			((ExperimentalBasicWithindayAgent) withinDayAgent).calculateAndSetDepartureTime(currentActivity);
-			this.internalInterface.rescheduleActivityEnd(withinDayAgent);
-			return true;
-		}
-		else {
-			log.warn("PersonAgent is no PersonDriverAgentImpl - the new departure time cannot be calculated!");
-			return false;
-		}
+		this.withinDayAgentUtils.calculateAndSetDepartureTime(withinDayAgent, currentActivity);
+		this.internalInterface.rescheduleActivityEnd(withinDayAgent);
+		return true;
 	}
-
 }
