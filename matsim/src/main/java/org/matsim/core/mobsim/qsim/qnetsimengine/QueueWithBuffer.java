@@ -151,10 +151,10 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 		// kai/mz/amit, mar'12
 
 		if (remainingflowCap >= 1.0) {
-			remainingflowCap -= qLinkImpl.road.effectiveVehicleFlowConsumptionInPCU(veh); 
+			remainingflowCap -= effectiveVehicleFlowConsumptionInPCU(veh); 
 		}
 		else if (flowcap_accumulate >= 1.0) {
-			flowcap_accumulate -= qLinkImpl.road.effectiveVehicleFlowConsumptionInPCU(veh);
+			flowcap_accumulate -= effectiveVehicleFlowConsumptionInPCU(veh);
 		}
 		else {
 			throw new IllegalStateException("Buffer of link " + qLinkImpl.getLink().getId() + " has no space left!");

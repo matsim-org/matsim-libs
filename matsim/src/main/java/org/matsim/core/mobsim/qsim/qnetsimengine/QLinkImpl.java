@@ -73,7 +73,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 
 	final double length;
 
-	public QueueWithBuffer road ;
+	public QLaneI road;
 	
 	/**
 	 * A list containing all transit vehicles that are at a stop but not
@@ -102,8 +102,18 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		this.road = new QueueWithBuffer(this, vehicleQueue);
 		this.toQueueNode = toNode;
 		this.visdata = this.new VisDataImpl() ; // instantiating this here and not earlier so we can cache some things
-
-
+	}
+	
+	/** 
+	 * This constructor allows inserting a custom vehicle queue proper, e.g. to implement passing.
+	 * 
+	 */
+	public QLinkImpl(final Link link2, QNetwork network, final QNode toNode, final QLaneI road) {
+		super(link2, network) ;
+		this.length = this.getLink().getLength();
+		this.road = road;
+		this.toQueueNode = toNode;
+		this.visdata = this.new VisDataImpl() ; // instantiating this here and not earlier so we can cache some things
 	}
 
 	/* 
@@ -392,17 +402,17 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 
 	@Override
 	public void setSignalStateAllTurningMoves(SignalGroupState state) {
-		road.setSignalStateAllTurningMoves(state);
+		((SignalizeableItem) road).setSignalStateAllTurningMoves(state);
 	}
 
 	@Override
 	public void setSignalStateForTurningMove(SignalGroupState state, Id toLinkId) {
-		road.setSignalStateForTurningMove(state, toLinkId);
+		((SignalizeableItem) road).setSignalStateForTurningMove(state, toLinkId);
 	}
 
 	@Override
 	public void setSignalized(boolean isSignalized) {
-		road.setSignalized(isSignalized);
+		((SignalizeableItem) road).setSignalized(isSignalized);
 	}
 
 	/**
