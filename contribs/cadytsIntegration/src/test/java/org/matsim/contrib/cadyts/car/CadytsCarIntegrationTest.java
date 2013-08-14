@@ -354,9 +354,9 @@ public class CadytsCarIntegrationTest {
 			DynamicData<Link> linkOffsets = offsetReader.read(linkOffsetFile);
 			
 			// TransitStopFacility stop2 = schedule.getFacilities().get(stopId2);
-			Link link11 = network.getLinks().get(11);
+			Link link11 = network.getLinks().get(new IdImpl("11"));
 			// TransitStopFacility stop10 = schedule.getFacilities().get(stopId10);
-			Link link19 = network.getLinks().get(19);
+			Link link19 = network.getLinks().get(new IdImpl("19"));
 			
 			//find first offset value different from null to compare. Useful to test with different time bin sizes
 //			int binIndex=-1;
@@ -372,7 +372,7 @@ public class CadytsCarIntegrationTest {
 			// Assert.assertEquals("Wrong link offset of stop 10", 0.03515757824042241, stopOffsets.getBinValue(stop10 , binIndex), MatsimTestUtils.EPSILON);
 			Assert.assertEquals("Wrong link offset of link 11", 0.0, linkOffsets.getBinValue(link11 , 6), MatsimTestUtils.EPSILON);
 			// Assert.assertEquals("Wrong link offset of stop 2", -0.011353248321030008, stopOffsets.getBinValue(stop2 , binIndex), MatsimTestUtils.EPSILON);
-//			Assert.assertEquals("Wrong link offset of link 19", 0.0014707121641471912, linkOffsets.getBinValue(link19 , 6), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("Wrong link offset of link 19", 0.0014707121641471912, linkOffsets.getBinValue(link19 , 6), MatsimTestUtils.EPSILON);
 		//}
 	}
 	
