@@ -22,7 +22,7 @@ package playground.andreas.P2.routeProvider;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
@@ -51,7 +51,7 @@ public class RandomStopProvider {
 	private final static Logger log = Logger.getLogger(RandomStopProvider.class);
 	
 	private final double gridSize;
-	private HashMap<TransitStopFacility, Double> stops2Weight;
+	private LinkedHashMap<TransitStopFacility, Double> stops2Weight;
 	private double totalWeight = 0.0;
 	private int lastIteration;
 
@@ -71,12 +71,12 @@ public class RandomStopProvider {
 	}
 	
 	private void updateWeights(){
-		this.stops2Weight = new HashMap<TransitStopFacility, Double>();
+		this.stops2Weight = new LinkedHashMap<TransitStopFacility, Double>();
 		this.totalWeight = 0.0;
 		double numberOfActsInPlans = 0;
 		
 		// count acts for all grid nodes
-		HashMap<String, Integer> gridNodeId2ActsCountMap = new HashMap<String, Integer>();
+		LinkedHashMap<String, Integer> gridNodeId2ActsCountMap = new LinkedHashMap<String, Integer>();
 		for (Person person : this.population.getPersons().values()) {
 			for (PlanElement pE : person.getSelectedPlan().getPlanElements()) {
 				if (pE instanceof Activity) {
@@ -92,7 +92,7 @@ public class RandomStopProvider {
 		}
 		
 		// sort facilities for all grid nodes
-		HashMap<String, List<TransitStopFacility>> gridNodeId2StopsMap = new HashMap<String, List<TransitStopFacility>>();
+		LinkedHashMap<String, List<TransitStopFacility>> gridNodeId2StopsMap = new LinkedHashMap<String, List<TransitStopFacility>>();
 		for (TransitStopFacility stop : this.pStopsOnly.getFacilities().values()) {
 			String gridNodeId = GridNode.getGridNodeIdForCoord(stop.getCoord(), this.gridSize);
 			if (gridNodeId2StopsMap.get(gridNodeId) == null) {

@@ -20,7 +20,7 @@
 package playground.andreas.P2.replanning.modules.deprecated;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
@@ -41,8 +41,8 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.andreas.P2.operator.Cooperative;
-import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.replanning.AbstractPStrategyModule;
+import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.replanning.modules.ReduceStopsToBeServedRFare;
 
 /**
@@ -60,11 +60,11 @@ public class ReduceStopsToBeServed extends AbstractPStrategyModule implements Tr
 	
 	public static final String STRATEGY_NAME = "ReduceStopsToBeServed";
 	
-	private HashMap<Id,HashMap<Id,HashMap<Id,Integer>>> line2StartStop2EndStop2TripsMap = new HashMap<Id, HashMap<Id,HashMap<Id,Integer>>>();
+	private LinkedHashMap<Id,LinkedHashMap<Id,LinkedHashMap<Id,Integer>>> line2StartStop2EndStop2TripsMap = new LinkedHashMap<Id, LinkedHashMap<Id,LinkedHashMap<Id,Integer>>>();
 	
-	private HashMap<Id, Id> vehId2lineIdMap = new HashMap<Id, Id>();
-	private HashMap<Id, Id> vehId2stopIdMap = new HashMap<Id, Id>();	
-	private HashMap<Id, Id> personId2startStopId = new HashMap<Id, Id>();
+	private LinkedHashMap<Id, Id> vehId2lineIdMap = new LinkedHashMap<Id, Id>();
+	private LinkedHashMap<Id, Id> vehId2stopIdMap = new LinkedHashMap<Id, Id>();	
+	private LinkedHashMap<Id, Id> personId2startStopId = new LinkedHashMap<Id, Id>();
 	
 	private String pIdentifier;
 	
@@ -100,7 +100,7 @@ public class ReduceStopsToBeServed extends AbstractPStrategyModule implements Tr
 		return newPlan;
 	}
 
-	private ArrayList<TransitStopFacility> getStopsToBeServed(HashMap<Id,HashMap<Id,Integer>> startStop2EndStop2TripsMap, TransitLine line) {
+	private ArrayList<TransitStopFacility> getStopsToBeServed(LinkedHashMap<Id,LinkedHashMap<Id,Integer>> startStop2EndStop2TripsMap, TransitLine line) {
 		ArrayList<TransitStopFacility> tempStopsToBeServed = new ArrayList<TransitStopFacility>();
 		RecursiveStatsContainer stats = new RecursiveStatsContainer();
 		
@@ -110,7 +110,7 @@ public class ReduceStopsToBeServed extends AbstractPStrategyModule implements Tr
 		}
 		
 		// calculate standard deviation
-		for (HashMap<Id, Integer> endStop2TripsMap : startStop2EndStop2TripsMap.values()) {
+		for (LinkedHashMap<Id, Integer> endStop2TripsMap : startStop2EndStop2TripsMap.values()) {
 			for (Integer trips : endStop2TripsMap.values()) {
 				stats.handleNewEntry(trips.doubleValue());
 			}
@@ -125,7 +125,7 @@ public class ReduceStopsToBeServed extends AbstractPStrategyModule implements Tr
 		Set<Id> stopIdsAboveTreshold = new TreeSet<Id>();
 		
 		// Get all stops serving a demand above threshold
-		for (Entry<Id, HashMap<Id, Integer>> endStop2TripsMapEntry : startStop2EndStop2TripsMap.entrySet()) {
+		for (Entry<Id, LinkedHashMap<Id, Integer>> endStop2TripsMapEntry : startStop2EndStop2TripsMap.entrySet()) {
 			for (Entry<Id, Integer> tripEntry : endStop2TripsMapEntry.getValue().entrySet()) {
 				if (tripEntry.getValue().doubleValue() > sigmaTreshold) {
 					// ok - add the corresponding stops to the set
@@ -190,10 +190,10 @@ public class ReduceStopsToBeServed extends AbstractPStrategyModule implements Tr
 
 	@Override
 	public void reset(int iteration) {
-		this.line2StartStop2EndStop2TripsMap = new HashMap<Id, HashMap<Id,HashMap<Id,Integer>>>();
-		this.vehId2lineIdMap = new HashMap<Id, Id>();
-		this.vehId2stopIdMap = new HashMap<Id, Id>();	
-		this.personId2startStopId = new HashMap<Id, Id>();
+		this.line2StartStop2EndStop2TripsMap = new LinkedHashMap<Id, LinkedHashMap<Id,LinkedHashMap<Id,Integer>>>();
+		this.vehId2lineIdMap = new LinkedHashMap<Id, Id>();
+		this.vehId2stopIdMap = new LinkedHashMap<Id, Id>();	
+		this.personId2startStopId = new LinkedHashMap<Id, Id>();
 	}
 
 	@Override
@@ -202,12 +202,12 @@ public class ReduceStopsToBeServed extends AbstractPStrategyModule implements Tr
 			if(!event.getPersonId().toString().contains(this.pIdentifier)){
 				Id lineId = this.vehId2lineIdMap.get(event.getVehicleId());		
 				if (this.line2StartStop2EndStop2TripsMap.get(lineId) == null) {
-					this.line2StartStop2EndStop2TripsMap.put(lineId, new HashMap<Id, HashMap<Id,Integer>>());
+					this.line2StartStop2EndStop2TripsMap.put(lineId, new LinkedHashMap<Id, LinkedHashMap<Id,Integer>>());
 				}
 
 				Id startStop = this.personId2startStopId.get(event.getPersonId());
 				if (this.line2StartStop2EndStop2TripsMap.get(lineId).get(startStop) == null) {
-					this.line2StartStop2EndStop2TripsMap.get(lineId).put(startStop, new HashMap<Id,Integer>());
+					this.line2StartStop2EndStop2TripsMap.get(lineId).put(startStop, new LinkedHashMap<Id,Integer>());
 				}
 
 				Id endStop = this.vehId2stopIdMap.get(event.getVehicleId());

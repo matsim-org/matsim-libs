@@ -21,7 +21,7 @@ package playground.andreas.P2.replanning.modules;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map.Entry;
@@ -62,7 +62,7 @@ public class ReduceTimeServedRFare extends AbstractPStrategyModule implements St
 	private final boolean useFareAsWeight;
 	private boolean allowForSplitting;
 	
-	private HashMap<Id,HashMap<Integer,HashMap<Integer,Double>>> route2StartTimeSlot2EndTimeSlot2WeightMap = new HashMap<Id, HashMap<Integer,HashMap<Integer,Double>>>();
+	private LinkedHashMap<Id,LinkedHashMap<Integer,LinkedHashMap<Integer,Double>>> route2StartTimeSlot2EndTimeSlot2WeightMap = new LinkedHashMap<Id, LinkedHashMap<Integer,LinkedHashMap<Integer,Double>>>();
 	private TicketMachine ticketMachine;
 
 
@@ -115,7 +115,7 @@ public class ReduceTimeServedRFare extends AbstractPStrategyModule implements St
 	}
 
 
-	private Tuple<Double,Double> getTimeToBeServed(HashMap<Integer,HashMap<Integer,Double>> startSlot2EndSlot2TripsMap) {
+	private Tuple<Double,Double> getTimeToBeServed(LinkedHashMap<Integer,LinkedHashMap<Integer,Double>> startSlot2EndSlot2TripsMap) {
 		RecursiveStatsContainer stats = new RecursiveStatsContainer();
 		
 		if (startSlot2EndSlot2TripsMap == null) {
@@ -124,7 +124,7 @@ public class ReduceTimeServedRFare extends AbstractPStrategyModule implements St
 		}
 		
 		// calculate standard deviation
-		for (HashMap<Integer, Double> EndSlot2TripsMap : startSlot2EndSlot2TripsMap.values()) {
+		for (LinkedHashMap<Integer, Double> EndSlot2TripsMap : startSlot2EndSlot2TripsMap.values()) {
 			for (Double trips : EndSlot2TripsMap.values()) {
 				stats.handleNewEntry(trips.doubleValue());
 			}
@@ -139,7 +139,7 @@ public class ReduceTimeServedRFare extends AbstractPStrategyModule implements St
 		Set<Integer> slotsAboveTreshold = new TreeSet<Integer>();
 		
 		// Get all slots serving a demand above threshold
-		for (Entry<Integer, HashMap<Integer, Double>> endSlot2TripsMapEntry : startSlot2EndSlot2TripsMap.entrySet()) {
+		for (Entry<Integer, LinkedHashMap<Integer, Double>> endSlot2TripsMapEntry : startSlot2EndSlot2TripsMap.entrySet()) {
 			for (Entry<Integer, Double> tripEntry : endSlot2TripsMapEntry.getValue().entrySet()) {
 				if (tripEntry.getValue().doubleValue() > sigmaTreshold) {
 					// ok - add the corresponding slots to the set
@@ -245,7 +245,7 @@ public class ReduceTimeServedRFare extends AbstractPStrategyModule implements St
 	
 	@Override
 	public void reset(int iteration) {
-		this.route2StartTimeSlot2EndTimeSlot2WeightMap = new HashMap<Id, HashMap<Integer,HashMap<Integer,Double>>>();
+		this.route2StartTimeSlot2EndTimeSlot2WeightMap = new LinkedHashMap<Id, LinkedHashMap<Integer,LinkedHashMap<Integer,Double>>>();
 	}
 
 	@Override
@@ -255,11 +255,11 @@ public class ReduceTimeServedRFare extends AbstractPStrategyModule implements St
 		Integer endTimeSlot = this.getTimeSlotForTime(stageContainer.getTimeLeft());
 		
 		if (this.route2StartTimeSlot2EndTimeSlot2WeightMap.get(routeId) == null) {
-			this.route2StartTimeSlot2EndTimeSlot2WeightMap.put(routeId, new HashMap<Integer, HashMap<Integer,Double>>());
+			this.route2StartTimeSlot2EndTimeSlot2WeightMap.put(routeId, new LinkedHashMap<Integer, LinkedHashMap<Integer,Double>>());
 		}
 	
 		if (this.route2StartTimeSlot2EndTimeSlot2WeightMap.get(routeId).get(startTimeSlot) == null) {
-			this.route2StartTimeSlot2EndTimeSlot2WeightMap.get(routeId).put(startTimeSlot, new HashMap<Integer,Double>());
+			this.route2StartTimeSlot2EndTimeSlot2WeightMap.get(routeId).put(startTimeSlot, new LinkedHashMap<Integer,Double>());
 		}
 	
 		if (this.route2StartTimeSlot2EndTimeSlot2WeightMap.get(routeId).get(startTimeSlot).get(endTimeSlot) == null) {

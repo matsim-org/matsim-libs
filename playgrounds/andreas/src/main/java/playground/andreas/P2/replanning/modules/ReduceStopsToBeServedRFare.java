@@ -20,7 +20,7 @@
 package playground.andreas.P2.replanning.modules;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
@@ -58,7 +58,7 @@ public class ReduceStopsToBeServedRFare extends AbstractPStrategyModule implemen
 	private final boolean useFareAsWeight;
 
 	private TicketMachine ticketMachine;
-	private HashMap<Id,HashMap<Id,HashMap<Id,Double>>> route2StartStop2EndStop2WeightMap = new HashMap<Id, HashMap<Id,HashMap<Id,Double>>>();
+	private LinkedHashMap<Id,LinkedHashMap<Id,LinkedHashMap<Id,Double>>> route2StartStop2EndStop2WeightMap = new LinkedHashMap<Id, LinkedHashMap<Id,LinkedHashMap<Id,Double>>>();
 	
 	public ReduceStopsToBeServedRFare(ArrayList<String> parameter) {
 		super(parameter);
@@ -102,7 +102,7 @@ public class ReduceStopsToBeServedRFare extends AbstractPStrategyModule implemen
 		return newPlan;
 	}
 
-	private ArrayList<TransitStopFacility> getStopsToBeServed(HashMap<Id,HashMap<Id,Double>> startStop2EndStop2WeightMap, TransitRoute routeToOptimize) {
+	private ArrayList<TransitStopFacility> getStopsToBeServed(LinkedHashMap<Id,LinkedHashMap<Id,Double>> startStop2EndStop2WeightMap, TransitRoute routeToOptimize) {
 		ArrayList<TransitStopFacility> tempStopsToBeServed = new ArrayList<TransitStopFacility>();
 		RecursiveStatsContainer stats = new RecursiveStatsContainer();
 		
@@ -112,7 +112,7 @@ public class ReduceStopsToBeServedRFare extends AbstractPStrategyModule implemen
 		}
 		
 		// calculate standard deviation
-		for (HashMap<Id, Double> endStop2TripsMap : startStop2EndStop2WeightMap.values()) {
+		for (LinkedHashMap<Id, Double> endStop2TripsMap : startStop2EndStop2WeightMap.values()) {
 			for (Double trips : endStop2TripsMap.values()) {
 				stats.handleNewEntry(trips.doubleValue());
 			}
@@ -127,7 +127,7 @@ public class ReduceStopsToBeServedRFare extends AbstractPStrategyModule implemen
 		Set<Id> stopIdsAboveTreshold = new TreeSet<Id>();
 		
 		// Get all stops serving a demand above threshold
-		for (Entry<Id, HashMap<Id, Double>> endStop2TripsMapEntry : startStop2EndStop2WeightMap.entrySet()) {
+		for (Entry<Id, LinkedHashMap<Id, Double>> endStop2TripsMapEntry : startStop2EndStop2WeightMap.entrySet()) {
 			for (Entry<Id, Double> tripEntry : endStop2TripsMapEntry.getValue().entrySet()) {
 				if (tripEntry.getValue().doubleValue() > sigmaTreshold) {
 					// ok - add the corresponding stops to the set
@@ -174,7 +174,7 @@ public class ReduceStopsToBeServedRFare extends AbstractPStrategyModule implemen
 	
 	@Override
 	public void reset(int iteration) {
-		this.route2StartStop2EndStop2WeightMap = new HashMap<Id, HashMap<Id,HashMap<Id,Double>>>();
+		this.route2StartStop2EndStop2WeightMap = new LinkedHashMap<Id, LinkedHashMap<Id,LinkedHashMap<Id,Double>>>();
 	}
 
 	@Override
@@ -184,11 +184,11 @@ public class ReduceStopsToBeServedRFare extends AbstractPStrategyModule implemen
 		Id endStopId = stageContainer.getStopLeft();
 		
 		if (this.route2StartStop2EndStop2WeightMap.get(routeId) == null) {
-			this.route2StartStop2EndStop2WeightMap.put(routeId, new HashMap<Id, HashMap<Id,Double>>());
+			this.route2StartStop2EndStop2WeightMap.put(routeId, new LinkedHashMap<Id, LinkedHashMap<Id,Double>>());
 		}
 
 		if (this.route2StartStop2EndStop2WeightMap.get(routeId).get(startStopId) == null) {
-			this.route2StartStop2EndStop2WeightMap.get(routeId).put(startStopId, new HashMap<Id,Double>());
+			this.route2StartStop2EndStop2WeightMap.get(routeId).put(startStopId, new LinkedHashMap<Id,Double>());
 		}
 
 		if (this.route2StartStop2EndStop2WeightMap.get(routeId).get(startStopId).get(endStopId) == null) {

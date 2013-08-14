@@ -19,7 +19,7 @@
 
 package playground.andreas.P2.schedule;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -50,7 +50,7 @@ public class CreateStopsForAllCarLinks {
 	private final PConfigGroup pConfigGroup;
 	private TransitSchedule transitSchedule;
 
-	private HashMap<Id, TransitStopFacility> linkId2StopFacilityMap;
+	private LinkedHashMap<Id, TransitStopFacility> linkId2StopFacilityMap;
 	
 	public static TransitSchedule createStopsForAllCarLinks(Network network, PConfigGroup pConfigGroup){
 		return createStopsForAllCarLinks(network, pConfigGroup, null);
@@ -66,7 +66,7 @@ public class CreateStopsForAllCarLinks {
 		this.net = net;
 		this.pConfigGroup = pConfigGroup;
 		
-		this.linkId2StopFacilityMap = new HashMap<Id, TransitStopFacility>();
+		this.linkId2StopFacilityMap = new LinkedHashMap<Id, TransitStopFacility>();
 		
 		Set<Id> stopsWithoutLinkIds = new TreeSet<Id>();
 		

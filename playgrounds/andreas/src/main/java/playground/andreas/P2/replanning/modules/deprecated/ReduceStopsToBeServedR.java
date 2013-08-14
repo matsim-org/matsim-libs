@@ -20,7 +20,7 @@
 package playground.andreas.P2.replanning.modules.deprecated;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
@@ -40,8 +40,8 @@ import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import playground.andreas.P2.operator.Cooperative;
-import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.replanning.AbstractPStrategyModule;
+import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.replanning.modules.ReduceStopsToBeServedRFare;
 
 /**
@@ -61,11 +61,11 @@ public class ReduceStopsToBeServedR extends AbstractPStrategyModule implements T
 	
 	public static final String STRATEGY_NAME = "ReduceStopsToBeServedR";
 	
-	private HashMap<Id,HashMap<Id,HashMap<Id,Integer>>> route2StartStop2EndStop2TripsMap = new HashMap<Id, HashMap<Id,HashMap<Id,Integer>>>();
+	private LinkedHashMap<Id,LinkedHashMap<Id,LinkedHashMap<Id,Integer>>> route2StartStop2EndStop2TripsMap = new LinkedHashMap<Id, LinkedHashMap<Id,LinkedHashMap<Id,Integer>>>();
 	
-	private HashMap<Id, Id> vehId2routeIdMap = new HashMap<Id, Id>();
-	private HashMap<Id, Id> vehId2stopIdMap = new HashMap<Id, Id>();	
-	private HashMap<Id, Id> personId2startStopId = new HashMap<Id, Id>();
+	private LinkedHashMap<Id, Id> vehId2routeIdMap = new LinkedHashMap<Id, Id>();
+	private LinkedHashMap<Id, Id> vehId2stopIdMap = new LinkedHashMap<Id, Id>();	
+	private LinkedHashMap<Id, Id> personId2startStopId = new LinkedHashMap<Id, Id>();
 	
 	private String pIdentifier;
 	
@@ -115,7 +115,7 @@ public class ReduceStopsToBeServedR extends AbstractPStrategyModule implements T
 		return newPlan;
 	}
 
-	private ArrayList<TransitStopFacility> getStopsToBeServed(HashMap<Id,HashMap<Id,Integer>> startStop2EndStop2TripsMap, TransitRoute routeToOptimize) {
+	private ArrayList<TransitStopFacility> getStopsToBeServed(LinkedHashMap<Id,LinkedHashMap<Id,Integer>> startStop2EndStop2TripsMap, TransitRoute routeToOptimize) {
 		ArrayList<TransitStopFacility> tempStopsToBeServed = new ArrayList<TransitStopFacility>();
 		RecursiveStatsContainer stats = new RecursiveStatsContainer();
 		
@@ -125,7 +125,7 @@ public class ReduceStopsToBeServedR extends AbstractPStrategyModule implements T
 		}
 		
 		// calculate standard deviation
-		for (HashMap<Id, Integer> endStop2TripsMap : startStop2EndStop2TripsMap.values()) {
+		for (LinkedHashMap<Id, Integer> endStop2TripsMap : startStop2EndStop2TripsMap.values()) {
 			for (Integer trips : endStop2TripsMap.values()) {
 				stats.handleNewEntry(trips.doubleValue());
 			}
@@ -140,7 +140,7 @@ public class ReduceStopsToBeServedR extends AbstractPStrategyModule implements T
 		Set<Id> stopIdsAboveTreshold = new TreeSet<Id>();
 		
 		// Get all stops serving a demand above threshold
-		for (Entry<Id, HashMap<Id, Integer>> endStop2TripsMapEntry : startStop2EndStop2TripsMap.entrySet()) {
+		for (Entry<Id, LinkedHashMap<Id, Integer>> endStop2TripsMapEntry : startStop2EndStop2TripsMap.entrySet()) {
 			for (Entry<Id, Integer> tripEntry : endStop2TripsMapEntry.getValue().entrySet()) {
 				if (tripEntry.getValue().doubleValue() > sigmaTreshold) {
 					// ok - add the corresponding stops to the set
@@ -199,10 +199,10 @@ public class ReduceStopsToBeServedR extends AbstractPStrategyModule implements T
 
 	@Override
 	public void reset(int iteration) {
-		this.route2StartStop2EndStop2TripsMap = new HashMap<Id, HashMap<Id,HashMap<Id,Integer>>>();
-		this.vehId2routeIdMap = new HashMap<Id, Id>();
-		this.vehId2stopIdMap = new HashMap<Id, Id>();	
-		this.personId2startStopId = new HashMap<Id, Id>();
+		this.route2StartStop2EndStop2TripsMap = new LinkedHashMap<Id, LinkedHashMap<Id,LinkedHashMap<Id,Integer>>>();
+		this.vehId2routeIdMap = new LinkedHashMap<Id, Id>();
+		this.vehId2stopIdMap = new LinkedHashMap<Id, Id>();	
+		this.personId2startStopId = new LinkedHashMap<Id, Id>();
 	}
 
 	@Override
@@ -211,12 +211,12 @@ public class ReduceStopsToBeServedR extends AbstractPStrategyModule implements T
 			if(!event.getPersonId().toString().contains(this.pIdentifier)){
 				Id routeId = this.vehId2routeIdMap.get(event.getVehicleId());		
 				if (this.route2StartStop2EndStop2TripsMap.get(routeId) == null) {
-					this.route2StartStop2EndStop2TripsMap.put(routeId, new HashMap<Id, HashMap<Id,Integer>>());
+					this.route2StartStop2EndStop2TripsMap.put(routeId, new LinkedHashMap<Id, LinkedHashMap<Id,Integer>>());
 				}
 
 				Id startStop = this.personId2startStopId.get(event.getPersonId());
 				if (this.route2StartStop2EndStop2TripsMap.get(routeId).get(startStop) == null) {
-					this.route2StartStop2EndStop2TripsMap.get(routeId).put(startStop, new HashMap<Id,Integer>());
+					this.route2StartStop2EndStop2TripsMap.get(routeId).put(startStop, new LinkedHashMap<Id,Integer>());
 				}
 
 				Id endStop = this.vehId2stopIdMap.get(event.getVehicleId());

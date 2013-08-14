@@ -25,7 +25,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -72,7 +72,7 @@ public class CreatePStops{
 	private Geometry exclude;
 	private GeometryFactory factory;
 
-	private HashMap<Id, TransitStopFacility> linkId2StopFacilityMap;
+	private LinkedHashMap<Id, TransitStopFacility> linkId2StopFacilityMap;
 
 	private List<Integer> topoTypesForStops = null;
 
@@ -108,7 +108,7 @@ public class CreatePStops{
 		this.pConfigGroup = pConfigGroup;
 		this.factory = new GeometryFactory();
 		
-		this.linkId2StopFacilityMap = new HashMap<Id, TransitStopFacility>();
+		this.linkId2StopFacilityMap = new LinkedHashMap<Id, TransitStopFacility>();
 		
 		Set<Id> stopsWithoutLinkIds = new TreeSet<Id>();
 		

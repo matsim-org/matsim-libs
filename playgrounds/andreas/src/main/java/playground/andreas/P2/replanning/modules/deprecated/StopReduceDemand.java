@@ -20,7 +20,7 @@
 package playground.andreas.P2.replanning.modules.deprecated;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -53,8 +53,8 @@ public class StopReduceDemand extends AbstractPStrategyModule implements Vehicle
 	
 	public static final String STRATEGY_NAME = "StopReduceDemand";
 
-	private HashMap<Id, HashMap<Id, int[]>> lineId2stopId2DemandBoardingAlighting = new HashMap<Id, HashMap<Id, int[]>>();
-	private HashMap<Id, Id> vehId2stopId = new HashMap<Id, Id>();
+	private LinkedHashMap<Id, LinkedHashMap<Id, int[]>> lineId2stopId2DemandBoardingAlighting = new LinkedHashMap<Id, LinkedHashMap<Id, int[]>>();
+	private LinkedHashMap<Id, Id> vehId2stopId = new LinkedHashMap<Id, Id>();
 
 	private String pIdentifier;
 	
@@ -70,7 +70,7 @@ public class StopReduceDemand extends AbstractPStrategyModule implements Vehicle
 	public PPlan run(Cooperative cooperative) {
 		
 		ArrayList<TransitStopFacility> stopsToBeServed = new ArrayList<TransitStopFacility>();
-		HashMap<Id, int[]> stop2DemandMap = this.lineId2stopId2DemandBoardingAlighting.get(cooperative.getId());
+		LinkedHashMap<Id, int[]> stop2DemandMap = this.lineId2stopId2DemandBoardingAlighting.get(cooperative.getId());
 		
 		for (TransitRoute route : cooperative.getBestPlan().getLine().getRoutes().values()) {
 			TransitStopFacility firstStop = null;
@@ -112,8 +112,8 @@ public class StopReduceDemand extends AbstractPStrategyModule implements Vehicle
 
 	@Override
 	public void reset(int iteration) {
-		this.vehId2stopId = new HashMap<Id, Id>();
-		this.lineId2stopId2DemandBoardingAlighting = new HashMap<Id, HashMap<Id,int[]>>();
+		this.vehId2stopId = new LinkedHashMap<Id, Id>();
+		this.lineId2stopId2DemandBoardingAlighting = new LinkedHashMap<Id, LinkedHashMap<Id,int[]>>();
 	}
 
 	@Override
@@ -131,7 +131,7 @@ public class StopReduceDemand extends AbstractPStrategyModule implements Vehicle
 				Id vehId = event.getVehicleId();
 
 				if(this.lineId2stopId2DemandBoardingAlighting.get(lineId) == null){
-					this.lineId2stopId2DemandBoardingAlighting.put(lineId, new HashMap<Id, int[]>());
+					this.lineId2stopId2DemandBoardingAlighting.put(lineId, new LinkedHashMap<Id, int[]>());
 				}
 				
 				if(this.lineId2stopId2DemandBoardingAlighting.get(lineId).get(this.vehId2stopId.get(vehId)) == null){
@@ -151,7 +151,7 @@ public class StopReduceDemand extends AbstractPStrategyModule implements Vehicle
 				Id vehId = event.getVehicleId();
 
 				if(this.lineId2stopId2DemandBoardingAlighting.get(lineId) == null){
-					this.lineId2stopId2DemandBoardingAlighting.put(lineId, new HashMap<Id, int[]>());
+					this.lineId2stopId2DemandBoardingAlighting.put(lineId, new LinkedHashMap<Id, int[]>());
 				}
 				
 				if(this.lineId2stopId2DemandBoardingAlighting.get(lineId).get(this.vehId2stopId.get(vehId)) == null){

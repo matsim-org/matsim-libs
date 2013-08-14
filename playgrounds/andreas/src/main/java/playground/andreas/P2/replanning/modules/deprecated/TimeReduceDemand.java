@@ -20,7 +20,7 @@
 package playground.andreas.P2.replanning.modules.deprecated;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -52,9 +52,9 @@ public class TimeReduceDemand extends AbstractPStrategyModule implements Transit
 	public static final String STRATEGY_NAME = "TimeReduceDemand";
 	
 	private final int timeBinSize;
-	private HashMap<String, int[]> lineId2BoardingDemand = new HashMap<String, int[]>();
-	private HashMap<String, int[]> lineId2AlightingDemand = new HashMap<String, int[]>();
-	private HashMap<Id, Double> vehId2DepartureTime = new HashMap<Id, Double>();
+	private LinkedHashMap<String, int[]> lineId2BoardingDemand = new LinkedHashMap<String, int[]>();
+	private LinkedHashMap<String, int[]> lineId2AlightingDemand = new LinkedHashMap<String, int[]>();
+	private LinkedHashMap<Id, Double> vehId2DepartureTime = new LinkedHashMap<Id, Double>();
 
 	private String pIdentifier;
 	
@@ -116,9 +116,9 @@ public class TimeReduceDemand extends AbstractPStrategyModule implements Transit
 
 	@Override
 	public void reset(int iteration) {
-		this.lineId2BoardingDemand = new HashMap<String, int[]>();
-		this.lineId2AlightingDemand = new HashMap<String, int[]>();
-		this.vehId2DepartureTime = new HashMap<Id, Double>();
+		this.lineId2BoardingDemand = new LinkedHashMap<String, int[]>();
+		this.lineId2AlightingDemand = new LinkedHashMap<String, int[]>();
+		this.vehId2DepartureTime = new LinkedHashMap<Id, Double>();
 	}
 
 	@Override

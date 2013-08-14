@@ -20,7 +20,7 @@
 package playground.andreas.P2.replanning.modules.deprecated;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
@@ -37,8 +37,8 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 
 import playground.andreas.P2.operator.Cooperative;
-import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.replanning.AbstractPStrategyModule;
+import playground.andreas.P2.replanning.PPlan;
 import playground.andreas.P2.replanning.modules.ReduceTimeServedRFare;
 
 /**
@@ -58,10 +58,10 @@ public class ReduceTimeServed extends AbstractPStrategyModule implements Transit
 	private final double sigmaScale;
 	private final int timeBinSize;
 	
-	private HashMap<Id,HashMap<Integer,HashMap<Integer,Integer>>> line2StartTimeSlot2EndTimeSlot2TripsMap = new HashMap<Id, HashMap<Integer,HashMap<Integer,Integer>>>();
+	private LinkedHashMap<Id,LinkedHashMap<Integer,LinkedHashMap<Integer,Integer>>> line2StartTimeSlot2EndTimeSlot2TripsMap = new LinkedHashMap<Id, LinkedHashMap<Integer,LinkedHashMap<Integer,Integer>>>();
 	
-	private HashMap<Id, Id> vehId2lineIdMap = new HashMap<Id, Id>();
-	private HashMap<Id, Integer> personId2startTimeSlot = new HashMap<Id, Integer>();
+	private LinkedHashMap<Id, Id> vehId2lineIdMap = new LinkedHashMap<Id, Id>();
+	private LinkedHashMap<Id, Integer> personId2startTimeSlot = new LinkedHashMap<Id, Integer>();
 	
 	private String pIdentifier;
 	
@@ -100,7 +100,7 @@ public class ReduceTimeServed extends AbstractPStrategyModule implements Transit
 	}
 
 
-	private Tuple<Double,Double> getTimeToBeServed(HashMap<Integer,HashMap<Integer,Integer>> startSlot2EndSlot2TripsMap, TransitLine line) {
+	private Tuple<Double,Double> getTimeToBeServed(LinkedHashMap<Integer,LinkedHashMap<Integer,Integer>> startSlot2EndSlot2TripsMap, TransitLine line) {
 		RecursiveStatsContainer stats = new RecursiveStatsContainer();
 		
 		if (startSlot2EndSlot2TripsMap == null) {
@@ -109,7 +109,7 @@ public class ReduceTimeServed extends AbstractPStrategyModule implements Transit
 		}
 		
 		// calculate standard deviation
-		for (HashMap<Integer, Integer> EndSlot2TripsMap : startSlot2EndSlot2TripsMap.values()) {
+		for (LinkedHashMap<Integer, Integer> EndSlot2TripsMap : startSlot2EndSlot2TripsMap.values()) {
 			for (Integer trips : EndSlot2TripsMap.values()) {
 				stats.handleNewEntry(trips.doubleValue());
 			}
@@ -124,7 +124,7 @@ public class ReduceTimeServed extends AbstractPStrategyModule implements Transit
 		Set<Integer> slotsAboveTreshold = new TreeSet<Integer>();
 		
 		// Get all slots serving a demand above threshold
-		for (Entry<Integer, HashMap<Integer, Integer>> endSlot2TripsMapEntry : startSlot2EndSlot2TripsMap.entrySet()) {
+		for (Entry<Integer, LinkedHashMap<Integer, Integer>> endSlot2TripsMapEntry : startSlot2EndSlot2TripsMap.entrySet()) {
 			for (Entry<Integer, Integer> tripEntry : endSlot2TripsMapEntry.getValue().entrySet()) {
 				if (tripEntry.getValue().doubleValue() > sigmaTreshold) {
 					// ok - add the corresponding slots to the set
@@ -171,9 +171,9 @@ public class ReduceTimeServed extends AbstractPStrategyModule implements Transit
 
 	@Override
 	public void reset(int iteration) {
-		this.line2StartTimeSlot2EndTimeSlot2TripsMap = new HashMap<Id, HashMap<Integer,HashMap<Integer,Integer>>>();
-		this.vehId2lineIdMap = new HashMap<Id, Id>();
-		this.personId2startTimeSlot = new HashMap<Id, Integer>();
+		this.line2StartTimeSlot2EndTimeSlot2TripsMap = new LinkedHashMap<Id, LinkedHashMap<Integer,LinkedHashMap<Integer,Integer>>>();
+		this.vehId2lineIdMap = new LinkedHashMap<Id, Id>();
+		this.personId2startTimeSlot = new LinkedHashMap<Id, Integer>();
 	}
 
 	@Override
@@ -182,12 +182,12 @@ public class ReduceTimeServed extends AbstractPStrategyModule implements Transit
 			if(!event.getPersonId().toString().contains(this.pIdentifier)){
 				Id lineId = this.vehId2lineIdMap.get(event.getVehicleId());		
 				if (this.line2StartTimeSlot2EndTimeSlot2TripsMap.get(lineId) == null) {
-					this.line2StartTimeSlot2EndTimeSlot2TripsMap.put(lineId, new HashMap<Integer, HashMap<Integer,Integer>>());
+					this.line2StartTimeSlot2EndTimeSlot2TripsMap.put(lineId, new LinkedHashMap<Integer, LinkedHashMap<Integer,Integer>>());
 				}
 
 				Integer startTimeSlot = this.personId2startTimeSlot.get(event.getPersonId());
 				if (this.line2StartTimeSlot2EndTimeSlot2TripsMap.get(lineId).get(startTimeSlot) == null) {
-					this.line2StartTimeSlot2EndTimeSlot2TripsMap.get(lineId).put(startTimeSlot, new HashMap<Integer,Integer>());
+					this.line2StartTimeSlot2EndTimeSlot2TripsMap.get(lineId).put(startTimeSlot, new LinkedHashMap<Integer,Integer>());
 				}
 
 				Integer endTimeSlot = this.getTimeSlotForTime(event.getTime());

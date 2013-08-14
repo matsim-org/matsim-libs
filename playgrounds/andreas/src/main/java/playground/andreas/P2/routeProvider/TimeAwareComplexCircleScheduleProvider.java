@@ -21,8 +21,8 @@ package playground.andreas.P2.routeProvider;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -64,7 +64,7 @@ public class TimeAwareComplexCircleScheduleProvider implements PRouteProvider{
 	private LeastCostPathCalculator routingAlgo;
 	private TransitSchedule scheduleWithStopsOnly;
 	private RandomStopProvider randomStopProvider;
-	private HashMap<Id, TransitStopFacility> linkId2StopFacilityMap;
+	private LinkedHashMap<Id, TransitStopFacility> linkId2StopFacilityMap;
 	private double planningSpeedFactor;
 	
 	private TimeAwareComplexCircleScheduleProviderHandler handler;
@@ -84,7 +84,7 @@ public class TimeAwareComplexCircleScheduleProvider implements PRouteProvider{
 		((Dijkstra)this.routingAlgo).setModeRestriction(modes);
 		
 		// register all stops by their corresponding link id
-		this.linkId2StopFacilityMap = new HashMap<Id, TransitStopFacility>();
+		this.linkId2StopFacilityMap = new LinkedHashMap<Id, TransitStopFacility>();
 		for (TransitStopFacility stop : this.scheduleWithStopsOnly.getFacilities().values()) {
 			if (stop.getLinkId() == null) {
 				log.warn("There is a potential paratransit stop without a corresponding link id. Shouldn't be possible. Check stop " + stop.getId());

@@ -20,7 +20,7 @@
 package playground.andreas.P2.routeProvider;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -38,9 +38,9 @@ public class TimeAwareComplexCircleScheduleProviderHandler implements TransitDri
 	private final static Logger log = Logger.getLogger(TimeAwareComplexCircleScheduleProviderHandler.class);
 	
 	private String pIdentifier;
-	private HashMap<Id, TransitDriverStartsEvent> vehId2StartsEvent = new HashMap<Id, TransitDriverStartsEvent>();
-	private HashMap<Id, ArrayList<Double>> vehId2Offset = new HashMap<Id, ArrayList<Double>>();
-	private HashMap<Id, ArrayList<TinyStatsContainer>> routeId2StatsContrainerMap = new HashMap<Id, ArrayList<TinyStatsContainer>>();
+	private LinkedHashMap<Id, TransitDriverStartsEvent> vehId2StartsEvent = new LinkedHashMap<Id, TransitDriverStartsEvent>();
+	private LinkedHashMap<Id, ArrayList<Double>> vehId2Offset = new LinkedHashMap<Id, ArrayList<Double>>();
+	private LinkedHashMap<Id, ArrayList<TinyStatsContainer>> routeId2StatsContrainerMap = new LinkedHashMap<Id, ArrayList<TinyStatsContainer>>();
 
 	
 	public TimeAwareComplexCircleScheduleProviderHandler(String pIdentifier) {
@@ -49,9 +49,9 @@ public class TimeAwareComplexCircleScheduleProviderHandler implements TransitDri
 
 	@Override
 	public void reset(int iteration) {
-		this.vehId2StartsEvent = new HashMap<Id, TransitDriverStartsEvent>();
-		this.vehId2Offset = new HashMap<Id, ArrayList<Double>>();
-		this.routeId2StatsContrainerMap = new HashMap<Id, ArrayList<TinyStatsContainer>>();
+		this.vehId2StartsEvent = new LinkedHashMap<Id, TransitDriverStartsEvent>();
+		this.vehId2Offset = new LinkedHashMap<Id, ArrayList<Double>>();
+		this.routeId2StatsContrainerMap = new LinkedHashMap<Id, ArrayList<TinyStatsContainer>>();
 	}
 
 	@Override

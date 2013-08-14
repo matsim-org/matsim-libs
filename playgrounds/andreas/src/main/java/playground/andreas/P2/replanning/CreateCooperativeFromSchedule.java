@@ -20,7 +20,7 @@
 package playground.andreas.P2.replanning;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -60,16 +60,16 @@ public class CreateCooperativeFromSchedule implements PStrategy{
 	private CooperativeFactory cooperativeFactory;
 	private PRouteProvider routeProvider;
 	private PConfigGroup pConfig;
-	private HashMap<String, TransitStopFacility> originalStops;
+	private LinkedHashMap<String, TransitStopFacility> originalStops;
 	
-	private HashMap<Id, PPlan> lineId2PlanMap = new HashMap<Id, PPlan>();
+	private LinkedHashMap<Id, PPlan> lineId2PlanMap = new LinkedHashMap<Id, PPlan>();
 
 	public CreateCooperativeFromSchedule(CooperativeFactory cooperativeFactory, PRouteProvider routeProvider, PConfigGroup pConfig, TransitSchedule originalSchedule) {
 		this.cooperativeFactory = cooperativeFactory;
 		this.routeProvider = routeProvider;
 		this.pConfig = pConfig;
 		
-		this.originalStops = new HashMap<String, TransitStopFacility>();
+		this.originalStops = new LinkedHashMap<String, TransitStopFacility>();
 		for (TransitStopFacility stop : originalSchedule.getFacilities().values()) {
 			this.originalStops.put(stop.getId().toString(), stop);
 		}

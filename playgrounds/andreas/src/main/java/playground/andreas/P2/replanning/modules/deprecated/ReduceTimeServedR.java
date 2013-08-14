@@ -20,7 +20,7 @@
 package playground.andreas.P2.replanning.modules.deprecated;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeSet;
@@ -60,10 +60,10 @@ public class ReduceTimeServedR extends AbstractPStrategyModule implements Transi
 	private final double sigmaScale;
 	private final int timeBinSize;
 	
-	private HashMap<Id,HashMap<Integer,HashMap<Integer,Integer>>> route2StartTimeSlot2EndTimeSlot2TripsMap = new HashMap<Id, HashMap<Integer,HashMap<Integer,Integer>>>();
+	private LinkedHashMap<Id,LinkedHashMap<Integer,LinkedHashMap<Integer,Integer>>> route2StartTimeSlot2EndTimeSlot2TripsMap = new LinkedHashMap<Id, LinkedHashMap<Integer,LinkedHashMap<Integer,Integer>>>();
 	
-	private HashMap<Id, Id> vehId2routeIdMap = new HashMap<Id, Id>();
-	private HashMap<Id, Integer> personId2startTimeSlot = new HashMap<Id, Integer>();
+	private LinkedHashMap<Id, Id> vehId2routeIdMap = new LinkedHashMap<Id, Id>();
+	private LinkedHashMap<Id, Integer> personId2startTimeSlot = new LinkedHashMap<Id, Integer>();
 	
 	private String pIdentifier;
 	
@@ -116,7 +116,7 @@ public class ReduceTimeServedR extends AbstractPStrategyModule implements Transi
 	}
 
 
-	private Tuple<Double,Double> getTimeToBeServed(HashMap<Integer,HashMap<Integer,Integer>> startSlot2EndSlot2TripsMap) {
+	private Tuple<Double,Double> getTimeToBeServed(LinkedHashMap<Integer,LinkedHashMap<Integer,Integer>> startSlot2EndSlot2TripsMap) {
 		RecursiveStatsContainer stats = new RecursiveStatsContainer();
 		
 		if (startSlot2EndSlot2TripsMap == null) {
@@ -125,7 +125,7 @@ public class ReduceTimeServedR extends AbstractPStrategyModule implements Transi
 		}
 		
 		// calculate standard deviation
-		for (HashMap<Integer, Integer> EndSlot2TripsMap : startSlot2EndSlot2TripsMap.values()) {
+		for (LinkedHashMap<Integer, Integer> EndSlot2TripsMap : startSlot2EndSlot2TripsMap.values()) {
 			for (Integer trips : EndSlot2TripsMap.values()) {
 				stats.handleNewEntry(trips.doubleValue());
 			}
@@ -140,7 +140,7 @@ public class ReduceTimeServedR extends AbstractPStrategyModule implements Transi
 		Set<Integer> slotsAboveTreshold = new TreeSet<Integer>();
 		
 		// Get all slots serving a demand above threshold
-		for (Entry<Integer, HashMap<Integer, Integer>> endSlot2TripsMapEntry : startSlot2EndSlot2TripsMap.entrySet()) {
+		for (Entry<Integer, LinkedHashMap<Integer, Integer>> endSlot2TripsMapEntry : startSlot2EndSlot2TripsMap.entrySet()) {
 			for (Entry<Integer, Integer> tripEntry : endSlot2TripsMapEntry.getValue().entrySet()) {
 				if (tripEntry.getValue().doubleValue() > sigmaTreshold) {
 					// ok - add the corresponding slots to the set
@@ -183,9 +183,9 @@ public class ReduceTimeServedR extends AbstractPStrategyModule implements Transi
 
 	@Override
 	public void reset(int iteration) {
-		this.route2StartTimeSlot2EndTimeSlot2TripsMap = new HashMap<Id, HashMap<Integer,HashMap<Integer,Integer>>>();
-		this.vehId2routeIdMap = new HashMap<Id, Id>();
-		this.personId2startTimeSlot = new HashMap<Id, Integer>();
+		this.route2StartTimeSlot2EndTimeSlot2TripsMap = new LinkedHashMap<Id, LinkedHashMap<Integer,LinkedHashMap<Integer,Integer>>>();
+		this.vehId2routeIdMap = new LinkedHashMap<Id, Id>();
+		this.personId2startTimeSlot = new LinkedHashMap<Id, Integer>();
 	}
 
 	@Override
@@ -194,12 +194,12 @@ public class ReduceTimeServedR extends AbstractPStrategyModule implements Transi
 			if(!event.getPersonId().toString().contains(this.pIdentifier)){
 				Id routeId = this.vehId2routeIdMap.get(event.getVehicleId());		
 				if (this.route2StartTimeSlot2EndTimeSlot2TripsMap.get(routeId) == null) {
-					this.route2StartTimeSlot2EndTimeSlot2TripsMap.put(routeId, new HashMap<Integer, HashMap<Integer,Integer>>());
+					this.route2StartTimeSlot2EndTimeSlot2TripsMap.put(routeId, new LinkedHashMap<Integer, LinkedHashMap<Integer,Integer>>());
 				}
 
 				Integer startTimeSlot = this.personId2startTimeSlot.get(event.getPersonId());
 				if (this.route2StartTimeSlot2EndTimeSlot2TripsMap.get(routeId).get(startTimeSlot) == null) {
-					this.route2StartTimeSlot2EndTimeSlot2TripsMap.get(routeId).put(startTimeSlot, new HashMap<Integer,Integer>());
+					this.route2StartTimeSlot2EndTimeSlot2TripsMap.get(routeId).put(startTimeSlot, new LinkedHashMap<Integer,Integer>());
 				}
 
 				Integer endTimeSlot = this.getTimeSlotForTime(event.getTime());
