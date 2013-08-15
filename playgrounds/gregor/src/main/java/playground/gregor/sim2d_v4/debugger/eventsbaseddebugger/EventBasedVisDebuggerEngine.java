@@ -71,6 +71,7 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 	private final KeyControl keyControl;
 	
 	private final List<ClockedVisDebuggerAdditionalDrawer> drawers = new ArrayList<ClockedVisDebuggerAdditionalDrawer>();
+	private int nrAgents;
 	
 	public EventBasedVisDebuggerEngine(Scenario sc) {
 		this.sc = sc;
@@ -177,10 +178,13 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 
 	@Override
 	public void handleEvent(XYVxVyEventImpl event) {
+		
 		if (event.getTime() > this.time) {
 			update(this.time);
 			this.time = event.getTime();
 		}
+		
+		this.nrAgents++;
 		
 		this.vis.addLine(event.getX(), event.getY(), event.getX()+event.getVX(), event.getY()+event.getVY(), 0, 0, 0, 255, 25);
 		double dx = event.getVY();
@@ -228,7 +232,11 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 		this.lastUpdate = System.currentTimeMillis();
 		for (ClockedVisDebuggerAdditionalDrawer drawer : this.drawers){
 			drawer.update(this.lastUpdate);
+			if (drawer instanceof InfoBox) {
+				((InfoBox)drawer).setNrAgents(this.nrAgents);
+			}
 		}
+		this.nrAgents = 0;
 	}
 
 	private static final class CircleProperty {
@@ -370,6 +378,10 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 	public void handleEvent(RectEvent e) {
 		this.vis.addRect(e.getTx(),e.getTy(),e.getSx(),e.getSy(),255,255,255,255,0,e.getFill());
 		
+	}
+
+	public int getNrAgents() {
+		return this.nrAgents;
 	}
 
 

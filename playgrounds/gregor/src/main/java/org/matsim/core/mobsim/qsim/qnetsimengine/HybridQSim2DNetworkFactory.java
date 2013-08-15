@@ -61,18 +61,19 @@ public final class HybridQSim2DNetworkFactory implements NetsimNetworkFactory<QN
 		
 //		QLinkInternalI qLink = 
 		QLinkInternalI qLink = null;
-		if (link.getId().toString().startsWith("mt")) {
+		if (link.getId().toString().startsWith("t")) {
 			qLink = new QLinkImpl(link, network, toQueueNode);
-//		} else if (link.getId().toString().equals("t_l5b")) {
-//			qLink = new BiPedQLinkImpl(link,network,toQueueNode);
-////			qLink = new QLinkImpl(link, network, toQueueNode);
-		}else if (link.getId().toString().startsWith("t")) {
-//			qLink = new QLinkImpl(link, network, toQueueNode);
+		} else if (link.getId().toString().startsWith("t_l5b")) {
 			qLink = this.biQFac.createNetsimLink(link, network, toQueueNode);
-//					this.biQFac.createNetsimLink(link, network, toQueueNode);
+//			qLink = new QLinkImpl(link, network, toQueueNode);
+//		}else if (link.getId().toString().startsWith("t")) {
+////			qLink = new QLinkImpl(link, network, toQueueNode);
+//			qLink = this.biQFac.createNetsimLink(link, network, toQueueNode);
+////					this.biQFac.createNetsimLink(link, network, toQueueNode);
 		} else {
 //			qLink =this.biQFac.createNetsimLink(link, network, toQueueNode);
-			qLink = new QLinkImpl(link, network, toQueueNode);
+			qLink = this.biQFac.createNetsimLink(link, network, toQueueNode);
+//			qLink = new QLinkImpl(link, network, toQueueNode);
 		}
 		
 		if (qSim2DTransitionLink){

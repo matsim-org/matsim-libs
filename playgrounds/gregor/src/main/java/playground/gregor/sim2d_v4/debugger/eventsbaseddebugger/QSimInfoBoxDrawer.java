@@ -24,8 +24,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -58,7 +56,7 @@ public class QSimInfoBoxDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 	Map<Id,LinkInfo> map = new HashMap<Id,LinkInfo>();
 
 	private final double minScale = 1.6;
-	private final double detailMinScale = 15;
+	private final double detailMinScale = 150;
 	private final double fs = 1.5;
 
 	//	private final double boxSize = 4;
@@ -97,7 +95,6 @@ public class QSimInfoBoxDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 			info.x1 = x1;
 			info.y1 = y1;
 			info.length = length;
-			info.fnd.put(0.01, 0.01);
 
 			//		if ()
 
@@ -322,32 +319,6 @@ public class QSimInfoBoxDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 				
 //				p.translate(0, (float)(this.boxWidth*p.zoomer.getZoomScale()));
 				
-				synchronized(li) {
-					float xOld = 0;
-					float yOld = 0;
-					
-					double max = 2*6;
-					p.stroke(192,0,0,255);
-					p.strokeWeight((float) (0.05*p.zoomer.getZoomScale()));
-					
-					for (Entry<Double, Double> e : li.fnd.entrySet()) {
-						
-						double x = this.boxLength*e.getKey()/max;
-						double y = -this.boxWidth*e.getValue()/1.3;
-						float fx = (float)(x*p.zoomer.getZoomScale());
-						float fy = (float)(y*p.zoomer.getZoomScale());
-//						p.fill(0);
-//						p.noSmooth();
-//						p.ellipse(fx, fy,(float)(0.01*p.zoomer.getZoomScale()),(float)(0.01*p.zoomer.getZoomScale()));
-						p.line(xOld, yOld, fx, fy);
-						xOld = fx;
-						yOld = fy;
-						
-
-					}
-
-
-				}
 				p.popMatrix();
 			}
 
@@ -379,10 +350,9 @@ public class QSimInfoBoxDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 		public String dens = "\u03C1= 0 m\u207B\u00B2";
 		public double flow;
 		public double avgFlow = 0.;
-		public String flowStr = "J = 0.0 ms\u207B\u00B9";
+		public String flowStr = "J = 0.0 (ms)\u207B\u00B9";
 		public double avgDens = 0.;
 
-		private final TreeMap<Double, Double> fnd = new TreeMap<Double,Double>();
 		
 	}
 
@@ -435,14 +405,11 @@ public class QSimInfoBoxDrawer implements VisDebuggerAdditionalDrawer, AgentDepa
 					li.avgFlow = 0.9 * li.avgFlow + 0.1 * (li.flow/timeSpan)/li.width;
 					int tmp0 = (int)li.avgFlow;
 					int tmp1 = (int)(li.avgFlow*100 - tmp0*100+.5);
-					li.flowStr = "J = "+ tmp0+"." + tmp1 +" ms\u207B\u00B9";
+					li.flowStr = "J = "+ tmp0+"." + tmp1 +" (ms)\u207B\u00B9";
 
 					double dens = li.onLink/li.area;
 					li.avgDens = 0.9 * li.avgDens + 0.1 * dens;
 					
-					if (li.id.toString().contains("l5b") || li.id.toString().contains("l5b_rev")) {
-						li.fnd.put(li.avgDens*2, li.avgFlow);
-					}
 					li.flow = 0;
 				}
 			}

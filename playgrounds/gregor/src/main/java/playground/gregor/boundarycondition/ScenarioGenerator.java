@@ -76,6 +76,11 @@ public class ScenarioGenerator {
 	private static String inputDir = "/Users/laemmel/devel/simple/input";
 	private static String outputDir = "/Users/laemmel/devel/simple/output";
 	
+	
+	private static final boolean uni = false;
+	
+	private static final int nrAgents = 5000;
+	
 	public static void main(String [] args) {
 		Config c = ConfigUtils.createConfig();
 		Scenario sc = ScenarioUtils.createScenario(c);
@@ -83,7 +88,7 @@ public class ScenarioGenerator {
 //		createNetworkII(sc);
 		createNetworkIII(sc);
 		createNetworkIV(sc);
-		createNetworkV(sc);
+//		createNetworkV(sc);
 		
 		Sim2DConfig s2d = Sim2DConfigUtils.createConfig();
 		s2d.setTimeStepSize(0.04);
@@ -151,7 +156,7 @@ public class ScenarioGenerator {
 		
 		
 		QSimConfigGroup qsim = new QSimConfigGroup();
-		qsim.setEndTime(2*3600);
+		qsim.setEndTime(4*3600);
 //		qsim.setMainModes(Arrays.asList(new String[]{"walk"}));
 //		Collection<String> modes =  qsim.getMainMode();
 //		modes.add("walk");
@@ -160,7 +165,7 @@ public class ScenarioGenerator {
 		
 		c.global().setCoordinateSystem("EPSG:3395");
 		
-//		createNetworkChangeEvents(sc);
+		createNetworkChangeEvents(sc);
 		
 		
 		new ConfigWriter(c).write(inputDir+ "/config.xml");
@@ -170,7 +175,7 @@ public class ScenarioGenerator {
 		createPopulation(sc);
 		createPopulation2(sc);
 		createPopulationIV(sc);
-		createPopulationV(sc);
+//		createPopulationV(sc);
 		
 		Population pop = sc.getPopulation();
 		new PopulationWriter(pop, sc.getNetwork()).write(c.plans().getInputFile());
@@ -180,16 +185,16 @@ public class ScenarioGenerator {
 	private static void createNetworkChangeEvents(Scenario sc) {
 		Collection<NetworkChangeEvent> events = new LinkedList<NetworkChangeEvent>();
 		NetworkChangeEventFactoryImpl fac = new NetworkChangeEventFactoryImpl();
-		double incr = (4*1.2)/5;
+		double incr = (4*1.2)/40;
 		double flowCap = incr;
-		for (double time = 0; time < 20*60; time += 120) {
+		for (double time = 0; time < 80*60; time += 240) {
 			NetworkChangeEvent e = fac.createNetworkChangeEvent(time);
 			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l0")));
 			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l4")));
 			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("t_l4")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("mt_l4")));
+//			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("mt_l4")));
 			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("t_l7_rev")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("mt_l7_rev")));
+//			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("mt_l7_rev")));
 			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l3_rev")));
 			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l7_rev")));
 			ChangeValue cv = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE, flowCap);
@@ -197,22 +202,22 @@ public class ScenarioGenerator {
 			events.add(e);
 			flowCap += incr;
 		}
-		flowCap -= incr;
-		for (double time = 20*60; time < 40*60; time += 120) {
-			NetworkChangeEvent e = fac.createNetworkChangeEvent(time);
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l0")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l4")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("t_l4")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("mt_l4")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("t_l7_rev")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("mt_l7_rev")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l3_rev")));
-			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l7_rev")));
-			ChangeValue cv = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE, flowCap);
-			e.setFlowCapacityChange(cv);
-			events.add(e);
-			flowCap -= incr;
-		}
+//		flowCap -= incr;
+//		for (double time = 20*60; time < 40*60; time += 120) {
+//			NetworkChangeEvent e = fac.createNetworkChangeEvent(time);
+//			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l0")));
+//			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l4")));
+//			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("t_l4")));
+////			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("mt_l4")));
+//			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("t_l7_rev")));
+////			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("mt_l7_rev")));
+//			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l3_rev")));
+//			e.addLink(sc.getNetwork().getLinks().get(new IdImpl("l7_rev")));
+//			ChangeValue cv = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE, flowCap);
+//			e.setFlowCapacityChange(cv);
+//			events.add(e);
+//			flowCap -= incr;
+//		}
 		
 		new NetworkChangeEventsWriter().write(inputDir +"/networkChangeEvents.xml.gz", events);
 		sc.getConfig().network().setTimeVariantNetwork(true);
@@ -221,7 +226,6 @@ public class ScenarioGenerator {
 	}
 
 	private static void createPopulation(Scenario sc) {
-		int nrAgents = 5000;
 		Population pop = sc.getPopulation();
 		pop.getPersons().clear();
 		PopulationFactory fac = pop.getFactory();
@@ -239,12 +243,16 @@ public class ScenarioGenerator {
 			Activity act1 = fac.createActivityFromLinkId("destination", new IdImpl("l3"));
 			plan.addActivity(act1);
 			pop.addPerson(pers);
-			t += 1;
+//			t += 2;
 //			if ((i+1)%(960) == 0) {
 //				t += 3*60+12;
 //			}
 		}
-		for (int i = 2*nrAgents; i < 2*nrAgents; i++) {
+		
+		if (uni) {
+			return;
+		}
+		for (int i = nrAgents; i < 2*nrAgents; i++) {
 			Person pers = fac.createPerson(new IdImpl("d"+i));
 			Plan plan = fac.createPlan();
 			pers.addPlan(plan);
@@ -266,7 +274,6 @@ public class ScenarioGenerator {
 	}
 
 	private static void createPopulation2(Scenario sc) {
-		int nrAgents = 5000;
 		Population pop = sc.getPopulation();
 //		pop.getPersons().clear();
 		PopulationFactory fac = pop.getFactory();
@@ -288,6 +295,10 @@ public class ScenarioGenerator {
 //			if ((i+1)%(960) == 0) {
 //				t += 3*60+12;
 //			}
+		}
+		
+		if (uni) {
+			return;
 		}
 		
 		for (int i = nrAgents; i < 2*nrAgents; i++) {
@@ -312,7 +323,6 @@ public class ScenarioGenerator {
 	}
 	
 	private static void createPopulationIV(Scenario sc) {
-		int nrAgents = 5000;
 		Population pop = sc.getPopulation();
 //		pop.getPersons().clear();
 		PopulationFactory fac = pop.getFactory();
@@ -334,6 +344,10 @@ public class ScenarioGenerator {
 //			if ((i+1)%(960) == 0) {
 //				t += 3*60+12;
 //			}
+		}
+		
+		if (uni) {
+			return;
 		}
 		
 		for (int i = nrAgents; i < 2*nrAgents; i++) {
@@ -358,7 +372,7 @@ public class ScenarioGenerator {
 	}
 	
 	private static void createPopulationV(Scenario sc) {
-		int nrAgents = 5000;
+		
 		Population pop = sc.getPopulation();
 //		pop.getPersons().clear();
 		PopulationFactory fac = pop.getFactory();
@@ -380,6 +394,10 @@ public class ScenarioGenerator {
 //			if ((i+1)%(960) == 0) {
 //				t += 3*60+12;
 //			}
+		}
+		
+		if (uni) {
+			return;
 		}
 		
 		for (int i = nrAgents; i < 2*nrAgents; i++) {
@@ -437,8 +455,11 @@ public class ScenarioGenerator {
 		net.addNode(n1);
 		IdImpl id = new IdImpl("l2d0");
 		Link l = fac.createLink(id, n0, n1);
+		
+		double flow = 4 *1.2;
 		l.setFreespeed(1.34);
-		l.setLength(10);
+		l.setLength(30);
+		l.setCapacity(flow);;
 		Set<String> modes = new HashSet<String>();
 		modes.add("walk2d");modes.add("walk");modes.add("car");
 		l.setAllowedModes(modes);
@@ -449,6 +470,7 @@ public class ScenarioGenerator {
 		lRev.setFreespeed(1.34);
 		lRev.setLength(30);
 		lRev.setAllowedModes(modes);
+		lRev.setCapacity(flow);
 		net.addLink(lRev);
 		
 		net.setCapacityPeriod(1);
@@ -572,13 +594,13 @@ public class ScenarioGenerator {
 		l3Rev.setFreespeed(1.34);
 		
 		l0.setCapacity(flow);
-		l1.setCapacity(flow);
+		l1.setCapacity(flow/8);
 		l2.setCapacity(flow);
 		l3.setCapacity(flow);
 		
 		l0Rev.setCapacity(flow);
 		l1Rev.setCapacity(flow);
-		l2Rev.setCapacity(flow);
+		l2Rev.setCapacity(flow/8);
 		l3Rev.setCapacity(flow);
 		
 		double lanes = 4/0.71;

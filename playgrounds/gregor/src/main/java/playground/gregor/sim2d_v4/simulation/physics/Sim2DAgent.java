@@ -38,11 +38,11 @@ public class Sim2DAgent implements TwoDObject {
 	
 	//testing only
 	@Deprecated
-	private final double vCoeff = 1;//+Math.min(Math.max(-0.25, MatsimRandom.getRandom().nextGaussian()*.1),1.25);
+	private final double vCoeff = 1+Math.min(Math.max(-0.25, MatsimRandom.getRandom().nextGaussian()*.1),1.25);
 	
 //	private final double vStd
 	
-	private double v0 = 1.34;//*this.vCoeff;
+	private double v0 = 1.34*this.vCoeff;
 	
 	
 	private final double [] pos = {0,0};
@@ -142,10 +142,10 @@ public class Sim2DAgent implements TwoDObject {
 	public void moveGhost(double dx, double dy, double time) {
 		this.pos[0] += dx;
 		this.pos[1] += dy;
-		if (this.emitPosEvents) {
-			XYVxVyEventImpl e = new XYVxVyEventImpl(this.getId(), this.pos[0], this.pos[1], this.v[0], this.v[1], time);
-			this.pEnv.getEventsManager().processEvent(e);
-		}
+//		if (this.emitPosEvents) {
+//			XYVxVyEventImpl e = new XYVxVyEventImpl(this.getId(), this.pos[0], this.pos[1], this.v[0], this.v[1], time);
+//			this.pEnv.getEventsManager().processEvent(e);
+//		}
 	}
 
 	public double[] getVelocity() {

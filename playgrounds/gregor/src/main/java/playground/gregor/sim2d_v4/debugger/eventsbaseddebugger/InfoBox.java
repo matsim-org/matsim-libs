@@ -33,6 +33,7 @@ public class InfoBox implements ClockedVisDebuggerAdditionalDrawer, VisDebuggerO
 
 	private double last = 0;
 	private double speedup = 1;
+	private int nrAgents;
 	
 	public InfoBox(EventBasedVisDebuggerEngine dbg, Scenario sc) {
 		this.dbg = dbg;
@@ -66,15 +67,15 @@ public class InfoBox implements ClockedVisDebuggerAdditionalDrawer, VisDebuggerO
 		String stm = "time: " + tm;
 		float w = p.textWidth(stm);
 //		p.rect(5, 5, 5+15+w+round, 5+round+ts+round + ts + ts/2 + ts + ts/2,round);
-		p.rect(5, 5, 5+15+w+round, 5+round+ts+round,round);
+		p.rect(5, 5, 5+15+w+round, 5+round+ts+ round,round);
 		
 		p.fill(255);
 		p.textAlign(PConstants.LEFT);
 		p.text(stm, x, y);
-		double sph = this.speedup > .98 ? Math.round(this.speedup) : this.speedup;
+//		double sph = this.speedup > .98 ? Math.round(this.speedup) : this.speedup;
 //		String tt = Integer.toString(ttt);
 //		String dec = Integer.toString((int)((this.speedup-ttt)*100));
-//		p.text("speedup: " + sph , x, y+ts+ts/2);
+//		p.text("# 2D agents: " + this.nrAgents , x, y+ts+ts/2);
 //		p.text("fps: " + (int)(p.frameRate+.5) , x, y+ts+ts/2 + ts + ts/2);
 
 	}
@@ -87,6 +88,11 @@ public class InfoBox implements ClockedVisDebuggerAdditionalDrawer, VisDebuggerO
 		}
 		this.speedup = 0.99*this.speedup + 0.01 * (1000.*this.dT)/delta;
 		this.last = time;
+		
+	}
+
+	public void setNrAgents(int nrAgents) {
+		this.nrAgents = nrAgents;
 		
 	}
 

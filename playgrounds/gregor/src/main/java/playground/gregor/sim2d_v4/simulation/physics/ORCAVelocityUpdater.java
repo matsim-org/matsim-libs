@@ -123,7 +123,7 @@ public class ORCAVelocityUpdater implements VelocityUpdater {
 		
 		double perceivedSpace = computePerceivedSpace(dir,neighbors)+.19;
 		double tmp = (perceivedSpace*this.alpha)/(this.agent.getHeight()/this.normHeightDenom *(1+this.beta));
-		double freeSpeed = Math.max(.1, tmp*tmp);
+		double freeSpeed = Math.max(.15, tmp*tmp);
 //		
 		if (freeSpeed > v0) {
 			freeSpeed = v0;

@@ -32,6 +32,8 @@ public class BiQNetworkFactory implements NetsimNetworkFactory<QNode, QLinkInter
 	
 	private final Map<Id,BiPedQ> qs = new HashMap<Id,BiPedQ>();
 
+	private final Map<Id,BiPedQLinkImpl> qls = new HashMap<Id,BiPedQLinkImpl>();
+	
 	@Override
 	public QNode createNetsimNode(Node node, QNetwork network) {
 		return new QNode(node, network);
@@ -40,23 +42,33 @@ public class BiQNetworkFactory implements NetsimNetworkFactory<QNode, QLinkInter
 	@Override
 	public QLinkInternalI createNetsimLink(Link link, QNetwork network,
 			QNode toQueueNode) {
+		double delay = 0.2;
+		BiPedQ q = new BiPedQ(network.simEngine.getMobsim().getSimTimer(),delay);
 		
-		BiPedQ q = new BiPedQ(network.simEngine.getMobsim().getSimTimer(),0.1);
+		BiPedQLinkImpl ret = new BiPedQLinkImpl(link, network, toQueueNode, q,delay);
 		Iterator<? extends Link> it = link.getToNode().getOutLinks().values().iterator();
 		while (it.hasNext()) {
 			Link rev = it.next();
 			if (rev.getToNode().equals(link.getFromNode())) {
 				BiPedQ revQ = this.qs.remove(rev.getId());
+				BiPedQLinkImpl revQl = this.qls.remove(rev.getId());
 				if (revQ != null) {
 					revQ.setRevQ(q);
 					q.setRevQ(revQ);
+					BiPedQueueWithBuffer road = ret.getRoad();
+					BiPedQueueWithBuffer revRoad = revQl.getRoad();
+					road.setRevRoad(revRoad);
+					revRoad.setRevRoad(road);
+					
 				} else {
 					this.qs.put(link.getId(), q);
+					this.qls.put(link.getId(), ret);
+					
 				}
 				break;
 			}
 		}
-		BiPedQLinkImpl ret = new BiPedQLinkImpl(link, network, toQueueNode, q);
+		
 		return ret;
 	}
 

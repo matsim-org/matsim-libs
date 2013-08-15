@@ -67,7 +67,7 @@ public class EventsBasedVisDebugger extends PApplet {
 	
 	int dummy = 0;
 	
-//	private final FrameSaver fs = new FrameSaver("/Users/laemmel/tmp/processing/", "png", 10);
+//	private final FrameSaver fs = new FrameSaver("/Users/laemmel/tmp/processing/", "png", 5);
 	private final FrameSaver fs = null;
 	private String it;
 	public EventsBasedVisDebugger(Scenario sc) {

@@ -22,7 +22,9 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Queue;
 
 import org.apache.log4j.Logger;
@@ -86,11 +88,22 @@ SignalizeableItem, QLaneI {
 	private double usedStorageCapacity;
 	private double freespeedTravelTime;
 	private int nHolesMax;
+	private double inverseFlowCapacityPerTimeStep;
+	private BiPedQueueWithBuffer revRoad;
 
 
+	//change in buffer
+	private int newInBuffer = 0;
+	private final double delay;
+	
+	
+	
+	//HACK to remember the entertime - needed in order to compute the speed. 
+	//TODO repair! [GL August '13]
+	private final Map<QVehicle,Double> enterTimes = new HashMap<QVehicle, Double>();
 
-	BiPedQueueWithBuffer(QNetwork network, QLinkInternalI link, final VehicleQ<QVehicle> vehicleQueue){
-
+	BiPedQueueWithBuffer(QNetwork network, QLinkInternalI link, final VehicleQ<QVehicle> vehicleQueue, double delay){
+		this.delay = delay;
 
 
 		//		this.network = link.ne
@@ -208,12 +221,14 @@ SignalizeableItem, QLaneI {
 				* this.network.simEngine.getMobsim().getSimTimer().getSimTimestepSize()
 				* this.network.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().getFlowCapFactor();
 		this.flowCapacityPerTimeStepFractionalPart = this.flowCapacityPerTimeStep - (int) this.flowCapacityPerTimeStep;
+		this.inverseFlowCapacityPerTimeStep = 1.0 / this.flowCapacityPerTimeStep;
 	}
 	
 
 
 	@Override
 	public boolean doSimStep(final double now ) {
+		
 		this.moveLaneToBuffer(now);
 		return true ;
 	}
@@ -221,6 +236,7 @@ SignalizeableItem, QLaneI {
 	private void moveLaneToBuffer(double now) {
 		QVehicle veh;
 
+		this.newInBuffer = 0;
 		while ((veh = this.vehQueue.peek()) != null) {
 
 
@@ -292,6 +308,7 @@ SignalizeableItem, QLaneI {
 			// use the lastMovedTime that was (somehow) computed for that vehicle.)
 		}
 		this.link.getToNode().activateNode();
+		this.newInBuffer++;
 	}
 
 	private boolean hasFlowCapacityLeftAndBufferSpace() {
@@ -338,9 +355,16 @@ SignalizeableItem, QLaneI {
 
 		
 		//At this point BiPedQueueWithBuffer differs from QueueWithBuffer
+		
+		Double time = this.enterTimes.remove(veh);
+		double speed = 1.34;
+		if (time != null) {
+			speed = this.link.getLink().getLength() / (now-time);
+		}
 		Hole hole = new Hole() ;
-		double L = .26;//((NetworkImpl)this.network.getNetwork()).getEffectiveCellSize();//.26m
+		double L = .26;// + 0.53*speed;//((NetworkImpl)this.network.getNetwork()).getEffectiveCellSize();//.26m
 		double z = 2; //2s
+//		double LL = L + z*speed;
 		double v = L/z;
 		
 		double offset = this.link.getLink().getLength()/v;
@@ -366,24 +390,23 @@ SignalizeableItem, QLaneI {
 			return false ;
 		}
 		// at this point, storage is ok, so start checking holes:
-		QItem hole = this.holes.peek();
+		Hole hole = this.holes.peek();
 		if ( hole==null ) { // no holes available at all; in theory, this should not happen since covered by !storageOk
 			//			log.warn( " !hasSpace since no holes available ") ;
 			return false ;
 		}
 		
-		
-		
 		//TODO add interface time to earliest link exit time for hole
-		
-		if ( hole.getEarliestLinkExitTime() > now ) {
+		int conflicts = this.revRoad.getNewInBuffer();
+		double interfaceDelay = conflicts * this.delay;
+		hole.incrementDelay(interfaceDelay);
+//		hole.setEarliestLinkExitTime(hole.getEarliestLinkExitTime()+interfaceDelay);
+		if ( (hole.getEarliestLinkExitTime() + hole.getDelay()) > now ) {
 			//			log.warn( " !hasSpace since all hole arrival times lie in future ") ;
 			return false ;
 		}
 		return true ;
 	}
-
-
 	@Override
 	public void addFromUpstream(final QVehicle veh) {
 		double now = this.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
@@ -391,7 +414,7 @@ SignalizeableItem, QLaneI {
 		((BiPedQLinkImpl)this.link).activateLink();
 		//		linkEnterTimeMap.put(veh, now);
 		this.usedStorageCapacity += veh.getSizeInEquivalents();
-		double vehicleTravelTime = this.link.getLink().getLength() / veh.getMaximumVelocity();//TODO debug her!!!
+		double vehicleTravelTime = this.link.getLink().getLength() / veh.getMaximumVelocity();
 //		log.info(veh.getMaximumVelocity());
 
 		double linkTravelTime = Math.max(this.freespeedTravelTime, vehicleTravelTime);
@@ -405,8 +428,27 @@ SignalizeableItem, QLaneI {
 						this.link.getLink().getId(), veh.getId()));
 		if ( HOLES ) {
 			this.holes.poll();
+			Hole peak = this.holes.peek();
+			if (peak != null) {
+				double interfaceDelay = this.inverseFlowCapacityPerTimeStep;
+				int conflicts = this.revRoad.getBufferSize();
+				interfaceDelay += conflicts * this.delay;
+				peak.incrementDelay(interfaceDelay);
+			}		
 		}
+		
+		this.enterTimes.put(veh, now);
 	}
+
+	private int getNewInBuffer() {
+		final int ret = this.newInBuffer;
+		this.newInBuffer = 0;
+		return ret;
+	}
+
+
+
+
 
 	@Override
 	public boolean isNotOfferingVehicle() {
@@ -559,6 +601,7 @@ SignalizeableItem, QLaneI {
 
 	public class Hole extends QItem {
 		private double earliestLinkEndTime ;
+		private double delay = 0;
 
 		@Override
 		public double getEarliestLinkExitTime() {
@@ -569,6 +612,23 @@ SignalizeableItem, QLaneI {
 		public void setEarliestLinkExitTime(double earliestLinkEndTime) {
 			this.earliestLinkEndTime = earliestLinkEndTime;
 		}
+		
+		public double getDelay() {
+			return this.delay ;
+		}
+		
+		public void incrementDelay(double incr) {
+			this.delay += incr;
+		}
 	}
 
+
+	
+	/*package*/ void setRevRoad(BiPedQueueWithBuffer revRoad) {
+		this.revRoad = revRoad;
+	}
+
+	
+
+	
 }
