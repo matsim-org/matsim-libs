@@ -45,9 +45,9 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent.State;
+import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.PlanRouter;
 import org.matsim.core.router.TripRouter;
@@ -90,6 +90,7 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 	private final CyclicBarrier endBarrier;
 	private final AtomicBoolean allMeetingsPointsSelected;
 	private final Random random;
+	private final WithinDayAgentUtils withinDayAgentUtils;
 	
 	public SelectHouseholdMeetingPointRunner(Scenario scenario, TripRouter toHomeFacilityRouter, 
 			TripRouter fromHomeFacilityRouter, CoordAnalyzer coordAnalyzer, MobsimDataProvider mobsimDataProvider, 
@@ -108,6 +109,7 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 		this.random = MatsimRandom.getLocalInstance();
 		this.toHomeFacilityRouter = toHomeFacilityRouter;
 		this.evacuationRouter = fromHomeFacilityRouter;
+		this.withinDayAgentUtils = new WithinDayAgentUtils();
 		
 		this.householdsToCheck = new ArrayList<Household>();
 	}
@@ -370,12 +372,13 @@ public class SelectHouseholdMeetingPointRunner implements Runnable {
 			 */
 			// get the index of the currently performed activity in the selected plan
 			MobsimAgent mobsimAgent = this.mobsimDataProvider.getAgent(personId);
-			PlanAgent planAgent = (PlanAgent) mobsimAgent;
 			
-			PlanImpl executedPlan = (PlanImpl) planAgent.getSelectedPlan();
+			Plan executedPlan = this.withinDayAgentUtils.getSelectedPlan(mobsimAgent);
 			
-			Activity currentActivity = (Activity) planAgent.getCurrentPlanElement();
-			int currentActivityIndex = executedPlan.getActLegIndex(currentActivity);
+			if(!mobsimAgent.getState().equals(State.ACTIVITY)) {
+				throw new RuntimeException("Expected agent to perform an activity but this is not true. Aborting!");
+			}
+			int currentActivityIndex = this.withinDayAgentUtils.getCurrentPlanElementIndex(mobsimAgent);
 			
 			Id possibleVehicleId = getVehicleId(executedPlan);
 			mode = this.modeAvailabilityChecker.identifyTransportMode(currentActivityIndex, executedPlan, possibleVehicleId);
