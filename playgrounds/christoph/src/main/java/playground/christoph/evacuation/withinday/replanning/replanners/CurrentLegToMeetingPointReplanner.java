@@ -24,14 +24,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
-import org.matsim.withinday.utils.EditRoutes;
 import org.matsim.withinday.utils.ReplacePlanElements;
 
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
@@ -50,7 +49,6 @@ public class CurrentLegToMeetingPointReplanner extends WithinDayDuringLegReplann
 	
 	protected final DecisionDataProvider decisionDataProvider;
 	protected final TripRouter tripRouter;
-	private final EditRoutes editRoutes;
 	
 	/*package*/ CurrentLegToMeetingPointReplanner(Id id, Scenario scenario,
 			InternalInterface internalInterface, DecisionDataProvider decisionDataProvider,
@@ -58,7 +56,6 @@ public class CurrentLegToMeetingPointReplanner extends WithinDayDuringLegReplann
 		super(id, scenario, internalInterface);
 		this.decisionDataProvider = decisionDataProvider;
 		this.tripRouter = tripRouter;
-		this.editRoutes = new EditRoutes();
 	}
 
 	@Override
@@ -67,7 +64,7 @@ public class CurrentLegToMeetingPointReplanner extends WithinDayDuringLegReplann
 		// If we don't have a valid WithinDayPersonAgent
 		if (withinDayAgent == null) return false;
 		
-		PlanImpl executedPlan = (PlanImpl) this.withinDayAgentUtils.getSelectedPlan(withinDayAgent);
+		Plan executedPlan = this.withinDayAgentUtils.getSelectedPlan(withinDayAgent);
 
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
@@ -132,10 +129,10 @@ public class CurrentLegToMeetingPointReplanner extends WithinDayDuringLegReplann
 					meetingActivity.getLinkId(), time, scenario.getNetwork(), tripRouter);
 			
 			// Remove all legs and activities after the next activity.
-			int nextActivityIndex = executedPlan.getActLegIndex(meetingActivity);
+			int nextActivityIndex = executedPlan.getPlanElements().indexOf(meetingActivity);
 			
 			while (executedPlan.getPlanElements().size() - 1 > nextActivityIndex) {
-				executedPlan.removeActivity(executedPlan.getPlanElements().size() - 1);
+				executedPlan.getPlanElements().remove(executedPlan.getPlanElements().size() - 1);
 			}			
 //		}
 		

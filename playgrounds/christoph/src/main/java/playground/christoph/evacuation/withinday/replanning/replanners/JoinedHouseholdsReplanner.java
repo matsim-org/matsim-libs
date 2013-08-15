@@ -27,19 +27,18 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
-import org.matsim.withinday.utils.EditRoutes;
 
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.mobsim.decisiondata.PersonDecisionData;
@@ -63,7 +62,6 @@ public class JoinedHouseholdsReplanner extends WithinDayDuringActivityReplanner 
 	private final JoinedHouseholdsIdentifier identifier;
 	private final SwissPTTravelTime ptTravelTime;
 	private final TripRouter tripRouter;
-	private final EditRoutes editRoutes;
 	
 	public JoinedHouseholdsReplanner(Id id, Scenario scenario, InternalInterface internalInterface, 
 			DecisionDataProvider decisionDataProvider, JoinedHouseholdsIdentifier identifier,
@@ -73,7 +71,6 @@ public class JoinedHouseholdsReplanner extends WithinDayDuringActivityReplanner 
 		this.identifier = identifier;
 		this.ptTravelTime = ptTravelTime;
 		this.tripRouter = tripRouter;
-		this.editRoutes = new EditRoutes();
 	}
 
 	@Override
@@ -82,7 +79,7 @@ public class JoinedHouseholdsReplanner extends WithinDayDuringActivityReplanner 
 		// If we don't have a valid PersonAgent
 		if (withinDayAgent == null) return false;
 	
-		PlanImpl executedPlan = (PlanImpl) this.withinDayAgentUtils.getSelectedPlan(withinDayAgent);
+		Plan executedPlan = this.withinDayAgentUtils.getSelectedPlan(withinDayAgent);
 
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
@@ -143,8 +140,9 @@ public class JoinedHouseholdsReplanner extends WithinDayDuringActivityReplanner 
 		legToMeeting.setDepartureTime(newEndTime);
 		
 		// add new activity
-		int position = executedPlan.getActLegIndex(currentActivity) + 1;
-		executedPlan.insertLegAct(position, legToMeeting, meetingActivity);
+		int position = executedPlan.getPlanElements().indexOf(currentActivity) + 1;
+		executedPlan.getPlanElements().add(position, meetingActivity);
+		executedPlan.getPlanElements().add(position, legToMeeting);
 		
 		// calculate route for the leg to the rescue facility
 		this.editRoutes.relocateFutureLegRoute(legToMeeting, currentActivity.getLinkId(), meetingActivity.getLinkId(), 

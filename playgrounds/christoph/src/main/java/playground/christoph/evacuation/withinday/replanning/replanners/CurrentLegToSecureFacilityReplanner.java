@@ -29,16 +29,13 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
-import org.matsim.withinday.utils.EditRoutes;
 import org.matsim.withinday.utils.ReplacePlanElements;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
@@ -61,13 +58,11 @@ import playground.christoph.evacuation.config.EvacuationConfig;
 public class CurrentLegToSecureFacilityReplanner extends WithinDayDuringLegReplanner {
 
 	protected final TripRouter tripRouter;
-	protected final EditRoutes editRoutes;
 	
 	/*package*/ CurrentLegToSecureFacilityReplanner(Id id, Scenario scenario, InternalInterface internalInterface,
 			TripRouter tripRouter) {
 		super(id, scenario, internalInterface);
 		this.tripRouter = tripRouter;
-		this.editRoutes = new EditRoutes();
 	}
 
 	@Override
@@ -79,13 +74,14 @@ public class CurrentLegToSecureFacilityReplanner extends WithinDayDuringLegRepla
 		// If we don't have a valid WithinDayPersonAgent
 		if (withinDayAgent == null) return false;
 
-		PlanImpl executedPlan = (PlanImpl) ((PlanAgent) withinDayAgent).getSelectedPlan();
+		Plan executedPlan = this.withinDayAgentUtils.getSelectedPlan(withinDayAgent);
 
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
 
 		Leg currentLeg = this.withinDayAgentUtils.getCurrentLeg(withinDayAgent);
-		Activity nextActivity = executedPlan.getNextActivity(currentLeg);
+		int currentPlanElementIndex = this.withinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
+		Activity nextActivity = (Activity) executedPlan.getPlanElements().get(currentPlanElementIndex + 1);
 		
 		// If it is not a car Leg we don't replan it.
 //		if (!currentLeg.getMode().equals(TransportMode.car)) return false;
@@ -128,10 +124,10 @@ public class CurrentLegToSecureFacilityReplanner extends WithinDayDuringLegRepla
 		}
 		
 		// Remove all legs and activities after the next activity.
-		int nextActivityIndex = executedPlan.getActLegIndex(rescueActivity);
+		int nextActivityIndex = executedPlan.getPlanElements().indexOf(rescueActivity);
 		
 		while (executedPlan.getPlanElements().size() - 1 > nextActivityIndex) {
-			executedPlan.removeActivity(executedPlan.getPlanElements().size() - 1);
+			executedPlan.getPlanElements().remove(executedPlan.getPlanElements().size() - 1);
 		}
 		
 		// Finally reset the cached Values of the PersonAgent - they may have changed!

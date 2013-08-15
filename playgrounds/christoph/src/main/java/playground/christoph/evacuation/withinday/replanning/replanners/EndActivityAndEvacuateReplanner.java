@@ -28,19 +28,17 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimAgent.State;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
-import org.matsim.withinday.utils.EditRoutes;
 
 import playground.christoph.evacuation.trafficmonitoring.SwissPTTravelTime;
 
@@ -50,14 +48,12 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 	
 	private final SwissPTTravelTime ptTravelTime;
 	private final TripRouter tripRouter;
-	private final EditRoutes editRoutes;
 	
 	/*package*/ EndActivityAndEvacuateReplanner(Id id, Scenario scenario, InternalInterface internalInterface, 
 			SwissPTTravelTime ptTravelTime, TripRouter tripRouter) {
 		super(id, scenario, internalInterface);
 		this.ptTravelTime = ptTravelTime;
 		this.tripRouter = tripRouter;
-		this.editRoutes = new EditRoutes();
 	}
 	
 	@Override
@@ -66,40 +62,28 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 		// If we don't have a valid PersonAgent
 		if (withinDayAgent == null) return false;
 	
-		PlanImpl executedPlan = (PlanImpl) this.withinDayAgentUtils.getSelectedPlan(withinDayAgent);
+		Plan executedPlan = this.withinDayAgentUtils.getSelectedPlan(withinDayAgent);
 
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
 		
-		Activity currentActivity;
+		// check whether the agent is performing an activity
+		if (!withinDayAgent.getState().equals(State.ACTIVITY)) return false;
 		
-		/*
-		 *  Get the current PlanElement and check if it is an Activity
-		 */
-		PlanElement currentPlanElement = this.withinDayAgentUtils.getCurrentPlanElement(withinDayAgent);
-		if (currentPlanElement instanceof Activity) {
-			currentActivity = (Activity) currentPlanElement;
-		} else return false;
-				
-		/*
-		 * If the agent is already at the end of his scheduled plan then
-		 * the simulation counter has been decreased by one. We re-enable the
-		 * agent so we have to increase the counter again.
-		 */
-//		if (currentActivity.getEndTime() == Time.UNDEFINED_TIME) this.agentCounter.incLiving();
+		Activity currentActivity = (Activity) this.withinDayAgentUtils.getCurrentPlanElement(withinDayAgent);
 		
 		// Set the end time of the current activity to the current time.
 		currentActivity.setEndTime(this.time);
 		
 		// get the index of the currently performed activity in the selected plan
-		int currentActivityIndex = executedPlan.getActLegIndex(currentActivity);
+		int currentActivityIndex = this.withinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
 
 		// identify the TransportMode for the rescueLeg
 		String transportMode = identifyTransportMode(currentActivityIndex, executedPlan);
 		
 		// Remove all legs and activities after the current activity.
 		while (executedPlan.getPlanElements().size() - 1 > currentActivityIndex) {
-			executedPlan.removeActivity(executedPlan.getPlanElements().size() - 1);
+			executedPlan.getPlanElements().remove(executedPlan.getPlanElements().size() - 1);
 		}
 		
 		PopulationFactory factory = scenario.getPopulation().getFactory();
@@ -119,8 +103,9 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 		Leg legToRescue = factory.createLeg(transportMode);
 		
 		// add new activity
-		int position = executedPlan.getActLegIndex(currentActivity) + 1;
-		executedPlan.insertLegAct(position, legToRescue, rescueActivity);
+		int position = executedPlan.getPlanElements().indexOf(currentActivity) + 1;
+		executedPlan.getPlanElements().add(position, rescueActivity);
+		executedPlan.getPlanElements().add(position, legToRescue);
 		
 		// calculate route for the leg to the rescue facility
 		this.editRoutes.relocateFutureLegRoute(legToRescue, currentActivity.getLinkId(), rescueActivity.getLinkId(), 

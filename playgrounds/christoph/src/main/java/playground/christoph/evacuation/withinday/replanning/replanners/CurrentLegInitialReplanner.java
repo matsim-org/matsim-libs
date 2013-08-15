@@ -28,18 +28,16 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.framework.PlanAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
-import org.matsim.withinday.utils.EditRoutes;
 
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 
@@ -52,14 +50,12 @@ public class CurrentLegInitialReplanner extends WithinDayDuringLegReplanner {
 
 	private final CoordAnalyzer coordAnalyzer;
 	private final TripRouter tripRouter;
-	private final EditRoutes editRoutes;
 	
 	/*package*/ CurrentLegInitialReplanner(Id id, Scenario scenario, InternalInterface internalInterface,
 			CoordAnalyzer coordAnalyzer, TripRouter tripRouter) {
 		super(id, scenario, internalInterface);
 		this.coordAnalyzer = coordAnalyzer;
 		this.tripRouter = tripRouter;
-		this.editRoutes = new EditRoutes();
 	}
 
 	@Override
@@ -68,7 +64,7 @@ public class CurrentLegInitialReplanner extends WithinDayDuringLegReplanner {
 		// If we don't have a valid WithinDayPersonAgent
 		if (withinDayAgent == null) return false;
 		
-		PlanImpl executedPlan = (PlanImpl) ((PlanAgent) withinDayAgent).getSelectedPlan();
+		Plan executedPlan = this.withinDayAgentUtils.getSelectedPlan(withinDayAgent);
 
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
@@ -80,9 +76,9 @@ public class CurrentLegInitialReplanner extends WithinDayDuringLegReplanner {
 		boolean isAffected = coordAnalyzer.isFacilityAffected(facility);
 		
 		// Remove all legs and activities after the next activity.
-		int nextActivityIndex = executedPlan.getActLegIndex(nextActivity);
+		int nextActivityIndex = executedPlan.getPlanElements().indexOf(nextActivity);
 		while (executedPlan.getPlanElements().size() - 1 > nextActivityIndex) {
-			executedPlan.removeActivity(executedPlan.getPlanElements().size() - 1);
+			executedPlan.getPlanElements().remove(executedPlan.getPlanElements().size() - 1);
 		}
 		
 		/*

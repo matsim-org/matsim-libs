@@ -35,14 +35,12 @@ import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
-import org.matsim.withinday.utils.EditRoutes;
 
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.mobsim.decisiondata.PersonDecisionData;
@@ -59,7 +57,6 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 	protected final ModeAvailabilityChecker modeAvailabilityChecker;
 	protected final SwissPTTravelTime ptTravelTime;
 	protected final TripRouter tripRouter;
-	protected final EditRoutes editRoutes;
 	
 	/*package*/ CurrentActivityToMeetingPointReplanner(Id id, Scenario scenario,
 			InternalInterface internalInterface, DecisionDataProvider decisionDataProvider,
@@ -70,7 +67,6 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 		this.modeAvailabilityChecker = modeAvailabilityChecker;
 		this.ptTravelTime = ptTravelTime;
 		this.tripRouter = tripRouter;
-		this.editRoutes = new EditRoutes();
 	}
 	
 	@Override
@@ -79,7 +75,7 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 		// If we don't have a valid PersonAgent
 		if (withinDayAgent == null) return false;
 	
-		PlanImpl executedPlan = (PlanImpl) this.withinDayAgentUtils.getSelectedPlan(withinDayAgent);
+		Plan executedPlan = this.withinDayAgentUtils.getSelectedPlan(withinDayAgent);
 
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
@@ -95,7 +91,7 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 			currentActivity = (Activity) currentPlanElement;
 			
 			// get the index of the currently performed activity in the selected plan
-			currentActivityIndex = executedPlan.getActLegIndex(currentActivity);
+			currentActivityIndex = this.withinDayAgentUtils.getCurrentPlanElementIndex(withinDayAgent);
 		} else return false;
 				
 		/*
@@ -115,7 +111,7 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 			
 			// Remove all legs and activities after the next activity.
 			while (executedPlan.getPlanElements().size() - 1 > currentActivityIndex) {
-				executedPlan.removeActivity(executedPlan.getPlanElements().size() - 1);
+				executedPlan.getPlanElements().remove(executedPlan.getPlanElements().size() - 1);
 			}
 		} else {
 			/*
@@ -148,12 +144,13 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 			 */
 			// Remove all legs and activities after the current activity.
 			while (executedPlan.getPlanElements().size() - 1 > currentActivityIndex) {
-				executedPlan.removeActivity(executedPlan.getPlanElements().size() - 1);
+				executedPlan.getPlanElements().remove(executedPlan.getPlanElements().size() - 1);
 			}
 			
 			// add new activity
-			int position = executedPlan.getActLegIndex(currentActivity) + 1;
-			executedPlan.insertLegAct(position, legToMeeting, meetingActivity);
+			int position = executedPlan.getPlanElements().indexOf(currentActivity) + 1;
+			executedPlan.getPlanElements().add(position, meetingActivity);
+			executedPlan.getPlanElements().add(position, legToMeeting);
 			
 			// calculate route for the leg to the rescue facility using the identified mode
 			this.editRoutes.relocateFutureLegRoute(legToMeeting, currentActivity.getLinkId(), meetingActivity.getLinkId(), 

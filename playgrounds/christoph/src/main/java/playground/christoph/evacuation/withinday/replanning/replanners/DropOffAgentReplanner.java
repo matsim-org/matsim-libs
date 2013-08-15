@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
@@ -41,7 +42,6 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.population.routes.RouteFactory;
 import org.matsim.core.router.TripRouter;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
-import org.matsim.withinday.utils.EditRoutes;
 
 import playground.christoph.evacuation.controler.EvacuationConstants;
 
@@ -55,14 +55,12 @@ public class DropOffAgentReplanner extends WithinDayDuringLegReplanner {
 		
 	private final RouteFactory routeFactory;
 	private final TripRouter tripRouter;
-	private final EditRoutes editRoutes;
 	
 	/*package*/ DropOffAgentReplanner(Id id, Scenario scenario, InternalInterface internalInterface,
 			TripRouter tripRouter) {
 		super(id, scenario, internalInterface);
 		this.tripRouter = tripRouter;
 		this.routeFactory = new LinkNetworkRouteFactory();
-		this.editRoutes = new EditRoutes();
 	}
 
 	@Override
@@ -83,7 +81,7 @@ public class DropOffAgentReplanner extends WithinDayDuringLegReplanner {
 	
 	private boolean replanDriver(MobsimAgent withinDayAgent) {
 		
-		PlanImpl executedPlan = (PlanImpl) ((PlanAgent) withinDayAgent).getSelectedPlan();
+		Plan executedPlan = this.withinDayAgentUtils.getSelectedPlan(withinDayAgent);
 		
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;

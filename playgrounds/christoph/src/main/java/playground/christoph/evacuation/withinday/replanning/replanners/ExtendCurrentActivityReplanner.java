@@ -24,10 +24,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 
@@ -52,7 +52,7 @@ public class ExtendCurrentActivityReplanner extends WithinDayDuringActivityRepla
 		// If we don't have a valid WithinDayPersonAgent
 		if (withinDayAgent == null) return false;
 	
-		PlanImpl executedPlan = (PlanImpl) this.withinDayAgentUtils.getSelectedPlan(withinDayAgent);
+		Plan executedPlan = this.withinDayAgentUtils.getSelectedPlan(withinDayAgent);
 
 		// If we don't have an executed plan
 		if (executedPlan == null) return false;
@@ -81,10 +81,10 @@ public class ExtendCurrentActivityReplanner extends WithinDayDuringActivityRepla
 		currentActivity.setEndTime(Time.UNDEFINED_TIME);
 				
 		// Remove all legs and activities after the current activity.
-		int currentActivityIndex = executedPlan.getActLegIndex(currentActivity);
+		int currentActivityIndex = executedPlan.getPlanElements().indexOf(currentActivity);
 		
 		while (executedPlan.getPlanElements().size() - 1 > currentActivityIndex) {
-			executedPlan.removeActivity(executedPlan.getPlanElements().size() - 1);
+			executedPlan.getPlanElements().remove(executedPlan.getPlanElements().size() - 1);
 		}
 	
 		/*
