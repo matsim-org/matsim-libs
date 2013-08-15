@@ -49,7 +49,9 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.analysis.christoph.ActivitiesAnalyzer;
+import org.matsim.contrib.analysis.christoph.TravelTimesWriter;
 import org.matsim.contrib.analysis.christoph.TripsAnalyzer;
+import org.matsim.contrib.multimodal.MultiModalControlerListener;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.contrib.multimodal.router.util.BikeTravelTimeFactory;
 import org.matsim.contrib.multimodal.router.util.WalkTravelTimeFactory;
@@ -65,10 +67,8 @@ import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
-import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.gbl.Gbl;
@@ -92,7 +92,6 @@ import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
-import playground.christoph.evacuation.analysis.TravelTimesWriter;
 
 /**
  * Demonstrate the influence of age and gender on persons' walk speed.
@@ -169,8 +168,8 @@ public class MultiModalDemo {
         multiModalConfigGroup.setDropNonCarRoutes(false);
         multiModalConfigGroup.setNumberOfThreads(1);
         multiModalConfigGroup.setMultiModalSimulationEnabled(true);
-        multiModalConfigGroup.setSimulatedModes(TransportMode.car + "," + TransportMode.bike + "," + TransportMode.walk);
-			
+        multiModalConfigGroup.setSimulatedModes(TransportMode.bike + "," + TransportMode.walk);
+		
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(numIterations);
 		config.controler().setMobsim(ControlerConfigGroup.MobsimType.qsim.toString());
@@ -209,6 +208,10 @@ public class MultiModalDemo {
 		
 		Controler controler = new MultiModalDemoControler(scenario);
 		controler.setOverwriteFiles(true);
+		
+		// Multi-modal simulation
+		MultiModalControlerListener multiModalControlerListener = new MultiModalControlerListener();
+		controler.addControlerListener(multiModalControlerListener);
 		
 		// TravelTimeAnalyzer
 		TravelTimeAnalyzer travelTimeAnalyzer = new TravelTimeAnalyzer(scenario);
@@ -251,33 +254,9 @@ public class MultiModalDemo {
 		});
 		
 		// car travel times writer
-		controler.addControlerListener(new AfterMobsimListener() {
-
-			@Override
-			public void notifyAfterMobsim(AfterMobsimEvent event) {
-				TravelTimesWriter travelTimesWriter = new TravelTimesWriter(event.getControler().getLinkTravelTimes(), 
-						event.getControler().getNetwork(), event.getControler().getConfig().travelTimeCalculator());
-				travelTimesWriter.collectTravelTimes();
+		TravelTimesWriter travelTimesWriter = new TravelTimesWriter(true, false);
+		controler.addControlerListener(travelTimesWriter);
 				
-				OutputDirectoryHierarchy controlerIO = event.getControler().getControlerIO();
-				int iteration = event.getIteration();
-				
-				String absoluteFile = TravelTimesWriter.travelTimesAbsoluteFile;
-				String relativeFile = TravelTimesWriter.travelTimesRelativeFile;
-				if (absoluteFile.toLowerCase().endsWith(".gz")) {
-					absoluteFile = absoluteFile.substring(0, absoluteFile.length() - 3);
-				}
-				if (relativeFile.toLowerCase().endsWith(".gz")) {
-					relativeFile = relativeFile.substring(0, relativeFile.length() - 3);
-				}
-				
-				String absoluteTravelTimesFile = controlerIO.getIterationFilename(iteration, absoluteFile);
-				String relativeTravelTimesFile = controlerIO.getIterationFilename(iteration, relativeFile);
-				travelTimesWriter.writeAbsoluteTravelTimes(absoluteTravelTimesFile);
-				travelTimesWriter.writeRelativeTravelTimes(relativeTravelTimesFile);				
-			}
-		});
-		
 		controler.run();
 		
 		calculatePopulationStatistics(scenario);
@@ -444,6 +423,10 @@ public class MultiModalDemo {
 		Controler controler = new MultiModalDemoControler(sc);
 		controler.setOverwriteFiles(true);
 		
+		// Multi-modal simulation
+		MultiModalControlerListener multiModalControlerListener = new MultiModalControlerListener();
+		controler.addControlerListener(multiModalControlerListener);
+		
 		TravelTimeAnalyzer travelTimeAnalyzer = new TravelTimeAnalyzer(sc);
 		controler.getEvents().addHandler(travelTimeAnalyzer);
 		controler.addControlerListener(travelTimeAnalyzer);
@@ -480,6 +463,10 @@ public class MultiModalDemo {
 		// create routes
 		Controler controler = new MultiModalDemoControler(sc);
 		controler.setOverwriteFiles(true);
+		
+		// Multi-modal simulation
+		MultiModalControlerListener multiModalControlerListener = new MultiModalControlerListener();
+		controler.addControlerListener(multiModalControlerListener);
 		
 		TravelTimeAnalyzer travelTimeAnalyzer = new TravelTimeAnalyzer(sc);
 		controler.getEvents().addHandler(travelTimeAnalyzer);
@@ -692,6 +679,7 @@ public class MultiModalDemo {
 		protected void setUp() {
 			super.setUp();
 			
+			TravelTime carTravelTime = this.getLinkTravelTimes();
 			TravelTime bikeTravelTime = new BikeTravelTimeFactory(this.config.plansCalcRoute()).createTravelTime();
 			TravelTime walkTravelTime = new WalkTravelTimeFactory(this.config.plansCalcRoute()).createTravelTime();
 			
@@ -703,6 +691,7 @@ public class MultiModalDemo {
 			
 			Map<String, TravelTime> travelTimes = new HashMap<String, TravelTime>();
 			
+			travelTimes.put(TransportMode.car, carTravelTime);
 			travelTimes.put(TransportMode.bike, bikeTravelTime);
 			travelTimes.put(TransportMode.walk, walkTravelTime);
 			

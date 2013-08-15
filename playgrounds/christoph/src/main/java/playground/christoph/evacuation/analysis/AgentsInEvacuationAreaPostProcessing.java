@@ -28,6 +28,7 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.analysis.christoph.TravelTimesWriter;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -228,8 +229,8 @@ public class AgentsInEvacuationAreaPostProcessing {
 		/*
 		 * Write car travel times
 		 */
-		TravelTimesWriter travelTimesWriter = new TravelTimesWriter(travelTime.getLinkTravelTimes(), scenario.getNetwork(), config.travelTimeCalculator());
-		travelTimesWriter.collectTravelTimes();
+		TravelTimesWriter travelTimesWriter = new TravelTimesWriter();
+//		travelTimesWriter.collectTravelTimes();
 		
 		String absoluteTravelTimesFile = dummyOutputController.getControlerIO().getIterationFilename(0, TravelTimesWriter.travelTimesAbsoluteFile);
 		String relativeTravelTimesFile = dummyOutputController.getControlerIO().getIterationFilename(0, TravelTimesWriter.travelTimesRelativeFile);

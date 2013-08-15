@@ -29,6 +29,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.contrib.analysis.christoph.TravelTimesWriter;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.contrib.multimodal.router.MultimodalTripRouterFactory;
 import org.matsim.contrib.multimodal.router.util.BikeTravelTimeFactory;
@@ -104,7 +105,6 @@ import playground.christoph.evacuation.analysis.AgentsInEvacuationAreaCounter;
 import playground.christoph.evacuation.analysis.AgentsReturnHomeCounter;
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.analysis.EvacuationTimePicture;
-import playground.christoph.evacuation.analysis.TravelTimesWriter;
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.config.EvacuationConfigReader;
 import playground.christoph.evacuation.mobsim.EvacuationQSimFactory;
@@ -622,18 +622,18 @@ public class EvacuationControler extends WithinDayController implements
 	public void notifyAfterMobsim(AfterMobsimEvent event) {
 		
 		// write car travel times
-		TravelTimesWriter travelTimesWriter = new TravelTimesWriter(this.getLinkTravelTimes(), this.getNetwork(), config.travelTimeCalculator());
-		travelTimesWriter.collectTravelTimes();
+		TravelTimesWriter travelTimesWriter = new TravelTimesWriter();
+//		travelTimesWriter.collectTravelTimes(this.travelTimeCalculator, this.getNetwork());
 		
-		String absoluteTravelTimesFile = this.getControlerIO().getIterationFilename(0, TravelTimesWriter.travelTimesAbsoluteFile);
-		String relativeTravelTimesFile = this.getControlerIO().getIterationFilename(0, TravelTimesWriter.travelTimesRelativeFile);
-		travelTimesWriter.writeAbsoluteTravelTimes(absoluteTravelTimesFile);
-		travelTimesWriter.writeRelativeTravelTimes(relativeTravelTimesFile);
-		
-		String absoluteSHPTravelTimesFile = this.getControlerIO().getIterationFilename(0, TravelTimesWriter.travelTimesAbsoluteSHPFile);
-		String relativeSHPTravelTimesFile = this.getControlerIO().getIterationFilename(0, TravelTimesWriter.travelTimesRelativeSHPFile);
-		travelTimesWriter.writeAbsoluteSHPTravelTimes(absoluteSHPTravelTimesFile, MGC.getCRS(config.global().getCoordinateSystem()), true);
-		travelTimesWriter.writeRelativeSHPTravelTimes(relativeSHPTravelTimesFile, MGC.getCRS(config.global().getCoordinateSystem()), true);
+//		String absoluteTravelTimesFile = this.getControlerIO().getIterationFilename(0, TravelTimesWriter.travelTimesAbsoluteFile);
+//		String relativeTravelTimesFile = this.getControlerIO().getIterationFilename(0, TravelTimesWriter.travelTimesRelativeFile);
+//		travelTimesWriter.writeAbsoluteTravelTimes(absoluteTravelTimesFile);
+//		travelTimesWriter.writeRelativeTravelTimes(relativeTravelTimesFile);
+//		
+//		String absoluteSHPTravelTimesFile = this.getControlerIO().getIterationFilename(0, TravelTimesWriter.travelTimesAbsoluteSHPFile);
+//		String relativeSHPTravelTimesFile = this.getControlerIO().getIterationFilename(0, TravelTimesWriter.travelTimesRelativeSHPFile);
+//		travelTimesWriter.writeAbsoluteSHPTravelTimes(absoluteSHPTravelTimesFile, MGC.getCRS(config.global().getCoordinateSystem()), true);
+//		travelTimesWriter.writeRelativeSHPTravelTimes(relativeSHPTravelTimesFile, MGC.getCRS(config.global().getCoordinateSystem()), true);
 		
 //		householdsUtils.printStatistics();
 //		householdsUtils.printClosingStatistics();
