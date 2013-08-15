@@ -64,8 +64,8 @@ import utilities.misc.DynamicData;
 import cadyts.measurements.SingleLinkMeasurement;
 
 /**
- * This is a modified copy of CadytsCarIntegrationTest (which is used for the cadyts pt integration)
- * in order to realize an according test for the cadyts car integration.
+ * This is a modified copy of CadytsIntegrationTest (which is used for the cadyts pt integration)
+ * in order to establish an according test for the cadyts car integration.
  * At this stage all original pt code is still included here, but outcommeted, to make the adaptations
  * from pt to car well traceable in case of any errors.
  */
