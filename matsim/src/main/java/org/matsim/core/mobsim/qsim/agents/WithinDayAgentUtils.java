@@ -20,8 +20,6 @@
 
 package org.matsim.core.mobsim.qsim.agents;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
@@ -102,15 +100,6 @@ public class WithinDayAgentUtils {
 		} else {
 			throw new RuntimeException("Sorry, agent is from type " + agent.getClass().toString() + 
 					" which does not support getCurrentLeg(...). Aborting!");
-		}
-	}
-	
-	public final Id getId(MobsimAgent agent) {
-		if (agent instanceof Identifiable) {
-			return ((Identifiable) agent).getId();			
-		} else {
-			throw new RuntimeException("Sorry, agent is from type " + agent.getClass().toString() + 
-					" which does not support getId(...). Aborting!");
 		}
 	}
 	
