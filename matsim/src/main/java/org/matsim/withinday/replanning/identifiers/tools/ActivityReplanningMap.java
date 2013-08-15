@@ -25,7 +25,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.NavigableSet;
 import java.util.Set;
@@ -74,7 +74,7 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 	private final NavigableSet<AgentEntry> activityPerformingAgents;	// PersonDriverAgentId
 	private final Map<Id, Double> activityEndTimes;	// scheduled activity end times
 
-	private Set<MobsimAgent> personAgentsToReplanActivityEndCache = null;
+	private Map<Id, MobsimAgent> personAgentsToReplanActivityEndCache = null;
 	private double personAgentsToReplanActivityEndCacheTime = Double.NaN;
 		
 	public ActivityReplanningMap(MobsimDataProvider mobsimDataProvider) {
@@ -219,14 +219,14 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 	
 	/*
 	 * Returns a List of all agents that are going to end their activity
-	 * in the current time step.
+	 * in the given time step or will have already ended it (e.g. if the time is in the future).
 	 */
-	public Set<MobsimAgent> getActivityEndingAgents(double time) {
+	public Map<Id, MobsimAgent> getActivityEndingAgents(double time) {
 		
 		if (time == this.personAgentsToReplanActivityEndCacheTime) return this.personAgentsToReplanActivityEndCache;
 		else {
-			// activityPerformingAgents is sorted, therefore we do not need a TreeSet here
-			this.personAgentsToReplanActivityEndCache = new LinkedHashSet<MobsimAgent>();
+			// activityPerformingAgents is sorted, therefore we do not need a TreeMap here
+			this.personAgentsToReplanActivityEndCache = new LinkedHashMap<Id, MobsimAgent>();
 			this.personAgentsToReplanActivityEndCacheTime = time;
 			
 			Iterator<AgentEntry> iter = this.activityPerformingAgents.iterator();
@@ -240,7 +240,7 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 				 * If time >= activityEndTime, the agent will depart in this time step.
 				 */
 				if (time >= activityEndTime) {
-					personAgentsToReplanActivityEndCache.add(entry.agent);
+					personAgentsToReplanActivityEndCache.put(entry.agent.getId(), entry.agent);
 				}
 			}
 			

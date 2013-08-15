@@ -51,7 +51,7 @@ public class ActivityPerformingIdentifier extends DuringActivityIdentifier {
 		// apply filter to remove agents that should not be replanned
 		this.applyFilters(activityPerformingAgents, time);
 		
-		// create set of PlanBasedWithinDayAgent
+		// create set of agents to be replanned
 		Set<MobsimAgent> agentsToReplan = new TreeSet<MobsimAgent>(new PersonAgentComparator());
 		for (Id id : activityPerformingAgents) agentsToReplan.add(mapping.get(id));
 				

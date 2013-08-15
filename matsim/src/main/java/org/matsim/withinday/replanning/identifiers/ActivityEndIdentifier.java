@@ -20,19 +20,15 @@
 
 package org.matsim.withinday.replanning.identifiers;
 
-import java.util.HashSet;
-import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.agents.WithinDayAgentUtils;
 import org.matsim.core.mobsim.qsim.comparators.PersonAgentComparator;
-import org.matsim.core.population.PlanImpl;
 import org.matsim.withinday.replanning.identifiers.interfaces.DuringActivityIdentifier;
 import org.matsim.withinday.replanning.identifiers.tools.ActivityReplanningMap;
 
@@ -50,100 +46,25 @@ public class ActivityEndIdentifier extends DuringActivityIdentifier {
 	@Override
 	public Set<MobsimAgent> getAgentsToReplan(double time) {
 		
-		Set<MobsimAgent> endActivityAgents = activityReplanningMap.getActivityEndingAgents(time);
+		Map<Id, MobsimAgent> activityEndingAgents = new LinkedHashMap<Id, MobsimAgent>(activityReplanningMap.getActivityEndingAgents(time));
+
+		// apply filter to remove agents that should not be replanned
+		this.applyFilters(activityEndingAgents.keySet(), time);
+		
+		// create set of agents to be replanned 
 		Set<MobsimAgent> agentsToReplan = new TreeSet<MobsimAgent>(new PersonAgentComparator());
+		for (MobsimAgent mobsimAgent : activityEndingAgents.values()) agentsToReplan.add(mobsimAgent);
 		
 		/*
-		 * Apply filter to remove agents that should not be replanned.
-		 * We need a workaround since applyFilters expects Ids and not Agents.
+		 * Here was lots of additional code that identified agents which ended their activity, then
+		 * performed a leg starting and ending on the same link and then performed an activity with
+		 * duration of 0 seconds. Such agents then start the leg after the next activity in the next
+		 * time step. As a result, that leg was not replanned. However, Performing this check should
+		 * be implemented at another place (i.e. in a replanner or in a module that ensure that each
+		 * activity has a duration of at least one second).
+		 * 
+		 * cdobler, aug'13
 		 */
-		Set<Id> agentIds = new HashSet<Id>();
-		for (MobsimAgent agent : endActivityAgents) agentIds.add(agent.getId());
-		this.applyFilters(agentIds, time);
-		for (MobsimAgent agent : endActivityAgents) {
-			if (agentIds.contains(agent.getId())) agentsToReplan.add(agent);
-		}
-		
-		Iterator<MobsimAgent> iter = agentsToReplan.iterator();
-		while(iter.hasNext()) {
-			MobsimAgent withinDayAgent = iter.next();	
-						
-			/*
-			 * Check whether the next Leg has to be replanned.
-			 * 
-			 * Additionally check some special cases (next Leg on the same Link,
-			 * next Activity with duration 0)
-			 */
-			// get executed plan
-			PlanImpl executedPlan = (PlanImpl) this.withinDayAgentUtils.getSelectedPlan(withinDayAgent);
-			
-			// If we don't have a selected plan
-			if (executedPlan == null) {
-				iter.remove();
-				continue;
-			}
-			
-			Activity currentActivity;
-			Leg nextLeg;
-			Activity nextActivity;
-
-			/*
-			 *  Get the current PlanElement and check if it is an Activity
-			 */
-			PlanElement currentPlanElement = this.withinDayAgentUtils.getCurrentPlanElement(withinDayAgent);
-			if (currentPlanElement instanceof Activity) {
-				currentActivity = (Activity) currentPlanElement;
-			} else {
-				iter.remove();
-				continue;
-			}
-			
-			nextLeg = executedPlan.getNextLeg(currentActivity);
-			if (nextLeg == null) {
-				iter.remove();
-				continue;
-			}
-			
-			nextActivity = executedPlan.getNextActivity(nextLeg);
-			
-			/*
-			 * By default we replan the leg after the current Activity, but there are
-			 * some exclusions.
-			 * 
-			 * If the next Activity takes place at the same Link we don't have to 
-			 * replan the next leg.
-			 * BUT: if the next Activity has a duration of 0 seconds we have to replan
-			 * the leg after that Activity.
-			 */
-			boolean removeAgent = false;
-			while (nextLeg.getRoute().getStartLinkId().equals(nextLeg.getRoute().getEndLinkId())) {
-				/*
-				 *  If the next Activity has a duration > 0 we don't have to replan
-				 *  the leg after that Activity now - it will be scheduled later.
-				 */
-				if (nextActivity.getEndTime() > time) {	
-					removeAgent = true;
-					break;
-				}				
-			
-				nextLeg = executedPlan.getNextLeg(nextActivity);
-				if (nextLeg == null) {
-					removeAgent = true;
-					break;
-				}
-				nextActivity = executedPlan.getNextActivity(nextLeg);
-			}
-			
-			/*
-			 * If no "next" leg to replan has been found - remove Agent from list.
-			 */
-			if (removeAgent) {
-				iter.remove();
-				continue;
-			}
-			
-			// If the agent has not been removed from the Set yet, it will be replanned.
-		}
 		
 		return agentsToReplan;
 	}

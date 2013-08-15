@@ -46,7 +46,7 @@ public class LegStartedIdentifier extends DuringLegIdentifier {
 	@Override
 	public Set<MobsimAgent> getAgentsToReplan(double time) {
 		Set<Id> legStartedAgents = new HashSet<Id>(this.linkReplanningMap.getLegStartedAgents());
-		Map<Id, MobsimAgent> mapping = this.mobsimDataProvider.getAgents();;
+		Map<Id, MobsimAgent> mapping = this.mobsimDataProvider.getAgents();
 
 		// apply filter to remove agents that should not be replanned
 		this.applyFilters(legStartedAgents, time);
