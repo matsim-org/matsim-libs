@@ -58,6 +58,8 @@ import playground.vsp.analysis.modules.AbstractAnalyisModule;
 import playground.vsp.analysis.modules.act2mode.ActivityToModeAnalysis;
 import playground.vsp.analysis.modules.boardingAlightingCount.BoardingAlightingCountAnalyzer;
 import playground.vsp.analysis.modules.ptAccessibility.PtAccessibility;
+import playground.vsp.analysis.modules.ptCircuityAnalyzer.PtCircuityAnalyzer;
+import playground.vsp.analysis.modules.ptLines2PaxAnalysis.PtLines2PaxAnalysis;
 import playground.vsp.analysis.modules.ptPaxVolumes.PtPaxVolumesAnalyzer;
 import playground.vsp.analysis.modules.ptPaxVolumes.PtPaxVolumesHandler;
 import playground.vsp.analysis.modules.ptRoutes2paxAnalysis.PtRoutes2PaxAnalysis;
@@ -159,8 +161,16 @@ public class AnalysisRunner {
 		TransitSchedule2Shp transitSchedule2Shp = new TransitSchedule2Shp(sc, targetCoordinateSystem);
 		analyzer.addAnalysisModule(transitSchedule2Shp);
 		
+		// still beta
+		PtCircuityAnalyzer circuityAnalyzer = new PtCircuityAnalyzer(sc, ((ScenarioImpl) sc).getVehicles());
+		analyzer.addAnalysisModule(circuityAnalyzer);
+		
 		PtRoutes2PaxAnalysis ptRoutes2PaxAnalysis = new PtRoutes2PaxAnalysis(sc.getTransitSchedule().getTransitLines(), ((ScenarioImpl) sc).getVehicles(), 3600.0, 24);
 		analyzer.addAnalysisModule(ptRoutes2PaxAnalysis);
+		
+		// still beta
+		PtLines2PaxAnalysis ptLines2PaxAnalysis = new PtLines2PaxAnalysis(sc.getTransitSchedule().getTransitLines(), ((ScenarioImpl) sc).getVehicles(), 3600.0, 24);
+		analyzer.addAnalysisModule(ptLines2PaxAnalysis);
 
 		TransitVehicleVolumeAnalyzer transitVehicleVolumeAnalyzer = new TransitVehicleVolumeAnalyzer(sc, 3600., targetCoordinateSystem);
 		analyzer.addAnalysisModule(transitVehicleVolumeAnalyzer);
