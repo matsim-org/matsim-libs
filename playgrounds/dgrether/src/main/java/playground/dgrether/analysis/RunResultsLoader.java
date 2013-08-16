@@ -104,6 +104,22 @@ public class RunResultsLoader {
 		nr.readFile(path);
 		return sc.getNetwork();
 	}
+
+	public final String getIterationPath(int iteration) {
+		return outputDir.getIterationPath(iteration);
+	}
+
+	public final String getIterationFilename(int iteration, String filename) {
+		return outputDir.getIterationFilename(iteration, filename);
+	}
+
+	public final String getOutputFilename(String filename) {
+		return outputDir.getOutputFilename(filename);
+	}
+
+	public String getOutputPath() {
+		return outputDir.getOutputPath();
+	}
 	
 	
 	

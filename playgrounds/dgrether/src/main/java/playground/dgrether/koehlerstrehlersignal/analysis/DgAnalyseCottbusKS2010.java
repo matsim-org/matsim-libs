@@ -29,11 +29,14 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
+import org.matsim.analysis.VolumesAnalyzer;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
+import org.matsim.counts.CountSimComparison;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.geometry.BoundingBox;
 import org.opengis.referencing.FactoryException;
@@ -44,6 +47,8 @@ import org.opengis.referencing.operation.TransformException;
 import playground.dgrether.DgPaths;
 import playground.dgrether.analysis.NetworkFilter;
 import playground.dgrether.analysis.RunResultsLoader;
+import playground.dgrether.analysis.simsimanalyser.CountsShapefileWriter;
+import playground.dgrether.analysis.simsimanalyser.SimSimCountsAnalysis;
 import playground.dgrether.events.DgNetShrinkImproved;
 import playground.dgrether.events.EventsFilterManager;
 import playground.dgrether.events.EventsFilterManagerImpl;
@@ -54,10 +59,9 @@ import playground.dgrether.signalsystems.cottbus.CottbusUtils;
 import com.vividsolutions.jts.geom.Envelope;
 
 
-public class DgAnalyseCottbusBasecase {
+public class DgAnalyseCottbusKS2010 {
 
-
-	private static final Logger log = Logger.getLogger(DgAnalyseCottbusBasecase.class);
+	private static final Logger log = Logger.getLogger(DgAnalyseCottbusKS2010.class);
 
 	private static class TimeConfig {
 		String name;
@@ -74,6 +78,7 @@ public class DgAnalyseCottbusBasecase {
 		String runId;
 		String remark;
 		public boolean baseCase = false;
+		public Integer iteration;
 	}
 	
 	private static class Result {
@@ -87,6 +92,8 @@ public class DgAnalyseCottbusBasecase {
 		public double numberOfPersons;
 		public double travelTimePercent;
 		public double personsDelta;
+		public VolumesAnalyzer volumes;
+		public Network network;
 		
 	}
 	
@@ -138,14 +145,25 @@ public class DgAnalyseCottbusBasecase {
 				r.travelTimePercent = r.travelTime / baseResult.travelTime * 100.0;
 				r.personsDelta = r.numberOfPersons - baseResult.numberOfPersons;
 //			}
-			
+				this.createSimSimComparison(baseResult, r);
 		}
+	}
+	
+	private void createSimSimComparison(Result baseResult, Result result) {
+		SimSimCountsAnalysis countsAnalysis = new SimSimCountsAnalysis();
+		Map<Id, List<CountSimComparison>> countSimCompMap = countsAnalysis.createCountSimComparisonByLinkId(result.network, baseResult.volumes, result.volumes);
+		String shapeBase = baseResult.runInfo.runId + "_it_" + baseResult.runInfo.iteration + "_vs_";
+		shapeBase += result.runInfo.runId + "_it_" + result.runInfo.iteration + "_simsimcomparison.shp";
+		String shapefile = result.runLoader.getIterationFilename(result.runInfo.iteration, shapeBase);
+		new CountsShapefileWriter(result.network, Cottbus2KS2010.CRS).writeShape(shapefile, countSimCompMap);
 	}
 	
 	private void writeFile(String file) {
 		List<String> lines = new ArrayList<String>();
 		StringBuilder header = new StringBuilder();
 		header.append("runId");
+		header.append("\t");
+		header.append("Iteration");
 		header.append("\t");
 		header.append("run?");
 		header.append("\t");
@@ -157,7 +175,9 @@ public class DgAnalyseCottbusBasecase {
 		header.append("\t");
 		header.append("travel time [hh:mm:ss]");
 		header.append("\t");
-		header.append("delta travel time");
+		header.append("delta travel time [s]");
+		header.append("\t");
+		header.append("delta travel time [hh:mm:ss]");
 		header.append("\t");
 		header.append("delta travel time [%]");
 		header.append("\t");
@@ -171,6 +191,8 @@ public class DgAnalyseCottbusBasecase {
 		for (Result r : results.getResults()) {
 			StringBuilder out = new StringBuilder();
 			out.append(r.runInfo.runId);
+			out.append("\t");		
+			out.append(Integer.toString(r.runInfo.iteration));
 			out.append("\t");
 			out.append(r.runInfo.remark);
 			out.append("\t");
@@ -183,6 +205,8 @@ public class DgAnalyseCottbusBasecase {
 			out.append(Time.writeTime(r.travelTime));
 			out.append("\t");
 			out.append(Double.toString(r.travelTimeDelta));
+			out.append("\t");
+			out.append(Time.writeTime(r.travelTimeDelta));
 			out.append("\t");
 			out.append(Double.toString(r.travelTimePercent));
 			out.append("\t");
@@ -198,7 +222,6 @@ public class DgAnalyseCottbusBasecase {
 		
 		BufferedWriter bw = IOUtils.getBufferedWriter(file);
 		try {
-			bw.write(header.toString());
 			log.info("Result");
 			for (String l : lines) {
 				System.out.println(l);
@@ -217,7 +240,7 @@ public class DgAnalyseCottbusBasecase {
 	// Leg histogram, see DgCottbusLegHistogram or LHI
 	// Traffic difference qgis
 
-	private void calculateResults(List<RunInfo> runInfos, int iteration, List<TimeConfig> times, List<Extent> extents) {
+	private void calculateResults(List<RunInfo> runInfos, List<TimeConfig> times, List<Extent> extents) {
 		for (RunInfo runInfo: runInfos) {
 			String runId = runInfo.runId;
 			String runDirectory = DgPaths.REPOS + "runs-svn/run"+runId+"/";
@@ -226,18 +249,21 @@ public class DgAnalyseCottbusBasecase {
 			for (Extent extent : extents) {
 				for (TimeConfig time : times) {
 					NetworkFilter netFilter;
+					Network net; 
 					if (extent.envelope != null) {
-						Network net = new DgNetShrinkImproved().createSmallNetwork(runDir.getNetwork(), extent.envelope);
-						netFilter = new NetworkFilter(net);
+						net = new DgNetShrinkImproved().createSmallNetwork(runDir.getNetwork(), extent.envelope);
 					}
 					else {
-						netFilter = new NetworkFilter(runDir.getNetwork());
+						net = runDir.getNetwork();
 					}
+					netFilter = new NetworkFilter(net);
+					
 					Result result = new Result();
 					result.runInfo = runInfo;
 					result.runLoader = runDir;
 					result.extent = extent;
 					result.timeConfig = time;
+					result.network = net;
 					results.addResult(result);
 					
 					EventsFilterManager eventsManager = new EventsFilterManagerImpl();
@@ -249,10 +275,13 @@ public class DgAnalyseCottbusBasecase {
 					DgAverageTravelTimeSpeed avgTtSpeed = new DgAverageTravelTimeSpeed(netFilter);
 					eventsManager.addHandler(avgTtSpeed);
 					
+					VolumesAnalyzer volumes = new VolumesAnalyzer(3600, 24 * 3600, net);
+					eventsManager.addHandler(volumes);
+					
 					MatsimEventsReader reader = new MatsimEventsReader(eventsManager);
-					reader.readFile(runDir.getEventsFilename(iteration));
+					reader.readFile(runDir.getEventsFilename(runInfo.iteration));
 
-
+					result.volumes = volumes;
 					result.travelTime = avgTtSpeed.getTravelTime();
 					result.numberOfPersons = avgTtSpeed.getNumberOfPersons();
 					
@@ -285,6 +314,7 @@ public class DgAnalyseCottbusBasecase {
 		ri.runId = "1712";
 		ri.remark = "base case";
 		ri.baseCase  = true;
+		ri.iteration = 1000;
 		l.add(ri);
 //		ri = new RunInfo();
 //		ri.runId = "1730";
@@ -296,10 +326,12 @@ public class DgAnalyseCottbusBasecase {
 //		l.add(ri);
 		ri = new RunInfo();
 		ri.runId = "1732";
+		ri.iteration = 0;
 		ri.remark = "continue 1712, com > 50";
 		l.add(ri);
 		ri = new RunInfo();
 		ri.runId = "1733";
+		ri.iteration = 0;
 		ri.remark  = "continue 1712, com > 10";
 		l.add(ri);
 		return l;
@@ -358,15 +390,14 @@ public class DgAnalyseCottbusBasecase {
 	}
 
 	public static void main(String[] args) {
-		int iteration = 1000;
 		List<RunInfo> runIds = createRunsIdList();
 		List<TimeConfig> times = createTimeConfig();
 		List<Extent> extents = createExtentList();
-		DgAnalyseCottbusBasecase ana = new DgAnalyseCottbusBasecase();
-		ana.calculateResults(runIds, iteration, times, extents);
+		DgAnalyseCottbusKS2010 ana = new DgAnalyseCottbusKS2010();
+		ana.calculateResults(runIds, times, extents);
 		ana.analyseResults();
 		String outputDirectory = DgPaths.SHAREDSVN + "projects/cottbus/cb2ks2010/results/";
-		String outputFilename = outputDirectory + "2013-08-16_travel_times_extent.txt";
+		String outputFilename = outputDirectory + "2013-08-16_travel_times_extent_it_0.txt";
 		ana.writeFile(outputFilename);
 
 	}

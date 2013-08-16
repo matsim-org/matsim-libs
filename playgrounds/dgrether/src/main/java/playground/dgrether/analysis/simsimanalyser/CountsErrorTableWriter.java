@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgAnalizeCottbusSignalRuns
+ * CountsErrorTableWriter
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,20 +17,34 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.dgrether.koehlerstrehlersignal.analysis;
+package playground.dgrether.analysis.simsimanalyser;
+
+import java.util.List;
+
+import org.matsim.counts.ComparisonErrorStatsCalculator;
+import org.matsim.counts.CountSimComparison;
+
+import playground.dgrether.utils.DoubleArrayTableWriter;
 
 
 /**
  * @author dgrether
  *
  */
-public class DgAnalyseCottbusSignalRuns {
+public class CountsErrorTableWriter {
 
-	public static void main(String[] args) {
-		String runNumber = "1732";
-		String iterationNumber = "1000";
-		
-		
+	public void writeErrorTable(List<CountSimComparison> countSimComp, String outfile){
+		ComparisonErrorStatsCalculator errorStats = new ComparisonErrorStatsCalculator(countSimComp);
+
+		double[] hours = new double[24];
+		for (int i = 1; i < 25; i++) {
+			hours[i-1] = i;
+		}
+		DoubleArrayTableWriter tableWriter = new DoubleArrayTableWriter();
+		tableWriter.addColumn(hours);
+		tableWriter.addColumn(errorStats.getMeanRelError());
+		tableWriter.writeFile(outfile + "errortable.txt");
 	}
 
+	
 }

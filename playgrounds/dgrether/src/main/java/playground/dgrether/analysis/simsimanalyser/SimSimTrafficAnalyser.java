@@ -19,17 +19,12 @@
 package playground.dgrether.analysis.simsimanalyser;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.analysis.CalcLinkStats;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
@@ -42,16 +37,13 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.counts.ComparisonErrorStatsCalculator;
 import org.matsim.counts.CountSimComparison;
-import org.matsim.counts.CountSimComparisonImpl;
 import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.dgrether.analysis.eventsfilter.FeatureNetworkLinkCenterCoordFilter;
 import playground.dgrether.signalsystems.cottbus.CottbusUtils;
-import playground.dgrether.utils.DoubleArrayTableWriter;
 
 
 /**
@@ -61,13 +53,8 @@ public class SimSimTrafficAnalyser {
 
 	private static final Logger log = Logger.getLogger(SimSimTrafficAnalyser.class);
 
+	private SimSimCountsAnalysis countsAna; 
 	
-	private CalcLinkStats loadLinkStats(Network network, String linkAttributes) {
-		CalcLinkStats linkStats = new CalcLinkStats(network);
-		linkStats.readFile(linkAttributes);
-		return linkStats;
-	}
-
 	private Network loadNetwork(String networkFile){
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		scenario.getConfig().network().setInputFile(networkFile);
@@ -77,53 +64,10 @@ public class SimSimTrafficAnalyser {
 	}
 	
 	
-	private Map<Id, List<CountSimComparison>> createCountSimComparison(Network network, VolumesAnalyzer vaCounts, VolumesAnalyzer vaSim){
-		Map<Id, List<CountSimComparison>> countSimComp = new HashMap<Id, List<CountSimComparison>>(network.getLinks().size());
-
-		for (Link l : network.getLinks().values()) {
-			double[] volumesCounts = vaCounts.getVolumesPerHourForLink(l.getId());
-			double[] volumesSim = vaSim.getVolumesPerHourForLink(l.getId());
-
-			if ((volumesCounts.length == 0) || (volumesSim.length == 0)) {
-				log.warn("No volumes for link: " + l.getId().toString());
-				continue;
-			}
-			ArrayList<CountSimComparison> cscList = new ArrayList<CountSimComparison>();
-			countSimComp.put(l.getId(), cscList);
-			for (int hour = 1; hour <= 24; hour++) {
-				double countValue=volumesCounts[hour-1];
-				double simValue=volumesSim[hour-1];
-				countSimComp.get(l.getId()).add(new CountSimComparisonImpl(l.getId(), hour, countValue, simValue));
-			}
-			//sort the list
-			Collections.sort(cscList, new Comparator<CountSimComparison>() {
-				@Override
-				public int compare(CountSimComparison c1, CountSimComparison c2) {
-					return new Integer(c1.getHour()).compareTo(c2.getHour());
-				}
-			});
-		}
-		return countSimComp;
-	}
 	
 	private void writeKML(Network network, List<CountSimComparison> countSimComp, String outfile, String srs){
-		CountSimComparisonKMLWriter kmlWriter = new CountSimComparisonKMLWriter(
-				countSimComp, network, TransformationFactory.getCoordinateTransformation(srs, TransformationFactory.WGS84));
-		kmlWriter.writeFile(outfile);
 	}
 	
-	private void writeErrorTable(List<CountSimComparison> countSimComp, String outfile){
-		ComparisonErrorStatsCalculator errorStats = new ComparisonErrorStatsCalculator(countSimComp);
-
-		double[] hours = new double[24];
-		for (int i = 1; i < 25; i++) {
-			hours[i-1] = i;
-		}
-		DoubleArrayTableWriter tableWriter = new DoubleArrayTableWriter();
-		tableWriter.addColumn(hours);
-		tableWriter.addColumn(errorStats.getMeanRelError());
-		tableWriter.writeFile(outfile + "errortable.txt");
-	}
 	
 	private VolumesAnalyzer loadVolumes(Network network , String eventsFile){
 		VolumesAnalyzer va = new VolumesAnalyzer(3600, 24 * 3600, network);
@@ -142,7 +86,9 @@ public class SimSimTrafficAnalyser {
 		CoordinateReferenceSystem networkSrs = MGC.getCRS(srs);
 		
 		Network filteredNetwork = this.applyNetworkFilter(network, networkSrs);
-		Map<Id, List<CountSimComparison>> countSimCompMap = this.createCountSimComparison(filteredNetwork, vaCounts, vaSim);
+		
+		SimSimCountsAnalysis countsAnalysis = new SimSimCountsAnalysis();
+		Map<Id, List<CountSimComparison>> countSimCompMap = countsAnalysis.createCountSimComparisonByLinkId(filteredNetwork, vaCounts, vaSim);
 		
 		new CountsShapefileWriter(filteredNetwork, networkSrs).writeShape(outfile, countSimCompMap);
 
@@ -151,9 +97,11 @@ public class SimSimTrafficAnalyser {
 			countSimComp.addAll(list);
 		}
 		
-		this.writeKML(filteredNetwork, countSimComp, outfile, srs);
+		CountSimComparisonKMLWriter kmlWriter = new CountSimComparisonKMLWriter(
+				countSimComp, network, TransformationFactory.getCoordinateTransformation(srs, TransformationFactory.WGS84));
+		kmlWriter.writeFile(outfile);
 
-		this.writeErrorTable(countSimComp, outfile);
+		new CountsErrorTableWriter().writeErrorTable(countSimComp, outfile);
 
 
 	}
