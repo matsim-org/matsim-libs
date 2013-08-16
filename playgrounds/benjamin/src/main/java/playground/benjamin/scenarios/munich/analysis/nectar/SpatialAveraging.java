@@ -71,10 +71,10 @@ public class SpatialAveraging {
 	final double scalingFactor = 100.;
 	private final static String runNumber1 = "baseCase";
 	private final static String runDirectory1 = "../../runs-svn/detEval/latsis/output/output_baseCase_ctd_newCode/";
-//	private final static String runNumber2 = "zone30";
-//	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_zone30/";
-	private final static String runNumber2 = "pricing";
-	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_pricing_newCode/";
+	private final static String runNumber2 = "zone30";
+	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_zone30/";
+//	private final static String runNumber2 = "pricing";
+//	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_pricing_newCode/";
 	private final String netFile1 = runDirectory1 + "output_network.xml.gz";
 	private final String munichShapeFile = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
 
@@ -124,7 +124,7 @@ public class SpatialAveraging {
 	final boolean calculateRelativeChange = false;
 	
 	Map<Double, Map<Id, Map<String, Double>>> time2EmissionMapToAnalyze_g = new HashMap<Double, Map<Id,Map<String,Double>>>();
-	Map<Double, Map<Id, Map<String, Double>>> time2EmissionMapToAnalyze_gPerVkm = new HashMap<Double, Map<Id,Map<String,Double>>>();;
+//	Map<Double, Map<Id, Map<String, Double>>> time2EmissionMapToAnalyze_gPerVkm = new HashMap<Double, Map<Id,Map<String,Double>>>();;
 	Map<Double, Map<Id, Double>> time2DemandMapToAnalyze_vkm = new HashMap<Double, Map<Id,Double>>();
 
 	private void run() throws IOException{
@@ -149,7 +149,7 @@ public class SpatialAveraging {
 
 		if(baseCaseOnly){
 			time2EmissionMapToAnalyze_g = scaleToFullSample(time2EmissionsTotalFilledAndFiltered1);
-			time2EmissionMapToAnalyze_gPerVkm = calculateGPerVkm(time2EmissionsTotalFilledAndFiltered1, time2CountsPerLinkFilledAndFiltered1);
+//			time2EmissionMapToAnalyze_gPerVkm = calculateGPerVkm(time2EmissionsTotalFilledAndFiltered1, time2CountsPerLinkFilledAndFiltered1);
 			time2DemandMapToAnalyze_vkm = calculateVkm(time2CountsPerLinkFilledAndFiltered1);
 			outPathStub = runDirectory1 + "analysis/spatialAveraging/" + runNumber1 + "." + lastIteration1;
 		} else {
@@ -176,25 +176,39 @@ public class SpatialAveraging {
 		}
 
 		Map<Double, double[][]> time2Emissions_g = new HashMap<Double, double[][]>();
-		Map<Double, double[][]> time2Emissions_gPerVkm = new HashMap<Double, double[][]>();
 		Map<Double, double[][]> time2Demand_vkm = new HashMap<Double, double[][]>();
+		Map<Double, double[][]> time2Emissions_gPerVkm = new HashMap<Double, double[][]>();
 		for(double endOfTimeInterval : time2DemandMapToAnalyze_vkm.keySet()){
-			double[][] emissions_g = performSpatialAveragingForEmissions(time2EmissionMapToAnalyze_g, endOfTimeInterval, AveragingMethod.PERSQKM);
+			
+			double[][] emissions_g = performSpatialAveragingForEmissions(endOfTimeInterval);
 			writeRoutput(emissions_g, outPathStub + ".Routput." + pollutant2analyze.toString() + ".g." + endOfTimeInterval + ".txt");
 			
-			double[][] emissions_gPerVkm = performSpatialAveragingForEmissions(time2EmissionMapToAnalyze_gPerVkm, endOfTimeInterval, AveragingMethod.AVERAGE);
-			writeRoutput(emissions_gPerVkm, outPathStub + ".Routput." + pollutant2analyze.toString() + ".gPerVkm." + endOfTimeInterval + ".txt");
-			
-			double[][] demand_vkm = performSpatialAveragingForDemand(time2DemandMapToAnalyze_vkm, endOfTimeInterval);
+			double[][] demand_vkm = performSpatialAveragingForDemand(endOfTimeInterval);
 			writeRoutput(demand_vkm, outPathStub + ".Routput.Demand.vkm" + "." + endOfTimeInterval + ".txt");
 			
+			double[][] emissions_gPerVkm = calculateAverage(emissions_g, demand_vkm);
+			writeRoutput(emissions_gPerVkm, outPathStub + ".Routput." + pollutant2analyze.toString() + ".gPerVkm." + endOfTimeInterval + ".txt");
+			
 			time2Emissions_g.put(endOfTimeInterval, emissions_g);
-			time2Emissions_gPerVkm.put(endOfTimeInterval, emissions_gPerVkm);
 			time2Demand_vkm.put(endOfTimeInterval, demand_vkm);
+			time2Emissions_gPerVkm.put(endOfTimeInterval, emissions_gPerVkm);
 		}
 //		writeGISoutput(time2Demand_vkm, outPathStub + ".GISoutput.Demand.vkm.movie.shp");
 //		writeGISoutput(time2Emissions_g, outPathStub +  ".GISoutput." + pollutant2analyze.toString() + ".g.movie.shp");
 //		writeGISoutput(time2Emissions_gPerVkm, outPathStub +  ".GISoutput." + pollutant2analyze.toString() + ".gPerVkm.movie.shp");
+	}
+
+	private double[][] calculateAverage(double[][] emissions_g,
+			double[][] demand_vkm) {
+		double [][] results = new double [noOfXbins][noOfYbins];
+		for(int xIndex = 0; xIndex<noOfXbins; xIndex++){
+			for(int yIndex = 0; yIndex < noOfYbins; yIndex++){
+				if(demand_vkm[xIndex][yIndex]>0.0){
+					results[xIndex][yIndex] = emissions_g[xIndex][yIndex]/demand_vkm[xIndex][yIndex]; 
+				}
+			}
+		}
+		return results;
 	}
 
 	private Map<Double, Map<Id, Map<String, Double>>> scaleToFullSample(
@@ -335,39 +349,63 @@ public class SpatialAveraging {
 		logger.info("Finished writing output for R to " + outputPathForR);
 	}
 
-	private double[][] getResults(
-				double[][] sumOfweightedValuesForCell,
-				double[][] sumOfweightsForCell,
-				AveragingMethod avm) {
-			
-			double[][] results = new double[noOfXbins][noOfYbins];
-			final double area_in_smoothing_circle_sqkm = (Math.PI * this.smoothingRadius_m * this.smoothingRadius_m) / (1000. * 1000.);
-	//		final double area_in_cell_sqkm = (xMax-xMin)/noOfXbins * (yMax-yMin)/noOfYbins / 1000. / 1000. ;
-			for(int xIndex = 0; xIndex < noOfXbins; xIndex++){
-				for(int yIndex = 0; yIndex < noOfYbins; yIndex++){
-					
-					if(avm.equals(AveragingMethod.AVERAGE)){
-						/* Average value for cell
-						 * Values NEED to be non-additive (e.g. g/vkm, ...)  */
-						results[xIndex][yIndex] = sumOfweightedValuesForCell[xIndex][yIndex] / sumOfweightsForCell[xIndex][yIndex] ;
-					} else if(avm.equals(AveragingMethod.PERSQKM)){
-						/* Sum over values for cell normalized to "per sqkm" (dependent on calcluateWeightOfLinkForCell)
-						 * Values NEED to be additive (e.g. vkm, g, counts, ...)
-						 * Make sure coordinate system is metric */
-						
-	//					results[xIndex][yIndex] = sumOfweightedValuesForCell[xIndex][yIndex] / area_in_cell_sqkm  ;
-						results[xIndex][yIndex] = sumOfweightedValuesForCell[xIndex][yIndex] / area_in_smoothing_circle_sqkm;
-					}
-				}
-			}
-			return results;
-		}
+	private double[][] getResults(double[][] sumOfweightedValuesForCell) {
+		double[][] results = new double[noOfXbins][noOfYbins];
+		final double area_in_smoothing_circle_sqkm = (Math.PI * this.smoothingRadius_m * this.smoothingRadius_m) / (1000. * 1000.);
+		//		final double area_in_cell_sqkm = (xMax-xMin)/noOfXbins * (yMax-yMin)/noOfYbins / 1000. / 1000. ;
+		for(int xIndex = 0; xIndex < noOfXbins; xIndex++){
+			for(int yIndex = 0; yIndex < noOfYbins; yIndex++){
+				/* Sum over values for cell normalized to "per sqkm" (dependent on calcluateWeightOfLinkForCell)
+				 * Values NEED to be additive (e.g. vkm, g, counts, ...)
+				 * Make sure coordinate system is metric */
 
-	private double[][] performSpatialAveragingForEmissions(
-			Map<Double, Map<Id, Map<String, Double>>> time2EmissionMapToAnalyze,
-			double endOfTimeInterval, AveragingMethod avm) {
-		
-		Map<Id, Map<String, Double>> emissionMapToAnalyze = time2EmissionMapToAnalyze.get(endOfTimeInterval);
+				// results[xIndex][yIndex] = sumOfweightedValuesForCell[xIndex][yIndex] / area_in_cell_sqkm  ;
+				results[xIndex][yIndex] = sumOfweightedValuesForCell[xIndex][yIndex] / area_in_smoothing_circle_sqkm;
+			}
+		}
+		return results;
+	}
+	
+//	private double[][] getWeightedAverageResults(
+//			double[][] sumOfweightedValuesForCell,
+//			double[][] sumOfweightsForCell){
+//		double [][] results = new double[noOfXbins][noOfYbins];
+//		for(int xIndex= 0; xIndex < noOfXbins; xIndex++){
+//			for(int yIndex = 0; yIndex < noOfYbins; yIndex++){
+//				results[xIndex][yIndex]= calculateweightedAverageForCell(xIndex, yIndex, sumOfweightedValuesForCell, sumOfweightsForCell);
+//			}
+//		}
+//		return results;
+//	}
+//
+//	private double calculateweightedAverageForCell(int xIndexOfCell, int yIndexOfCell,
+//			double[][] sumOfweightedValuesForCell,
+//			double[][] sumOfweightsForCell) {
+//			double weightedSumOfWeightedValues =0.;
+//			double weightedSumOfWeights =0;
+//			
+//			double x1 = findCellCentroid(xIndexOfCell, yIndexOfCell).getX();
+//			double y1 = findCellCentroid(xIndexOfCell, yIndexOfCell).getY();
+//			
+//			for(int xIndex= 0; xIndex < noOfXbins; xIndex++){
+//				for(int yIndex = 0; yIndex < noOfYbins; yIndex++){
+//					
+//					double x2 = findCellCentroid(xIndex, yIndex).getX();
+//					double y2 = findCellCentroid(xIndex, yIndex).getY();
+//					
+//					double distanceSquared = (x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1);
+//					double smoothingfactor = Math.exp((-distanceSquared) / (smoothingRadius_m * smoothingRadius_m));
+//					
+//					weightedSumOfWeightedValues = weightedSumOfWeightedValues + sumOfweightedValuesForCell[xIndex][yIndex] * smoothingfactor;
+//					weightedSumOfWeights = weightedSumOfWeights + sumOfweightsForCell[xIndex][yIndex] * smoothingfactor;
+//					
+//				}
+//			}
+//		return weightedSumOfWeightedValues/weightedSumOfWeights;
+//	}
+
+	private double[][] performSpatialAveragingForEmissions(double endOfTimeInterval) {
+		Map<Id, Map<String, Double>> emissionMapToAnalyze = time2EmissionMapToAnalyze_g.get(endOfTimeInterval);
 		double[][] sumOfweightsForCell = new double[noOfXbins][noOfYbins];
 		double[][] sumOfweightedValuesForCell = new double[noOfXbins][noOfYbins];
 
@@ -382,25 +420,17 @@ public class SpatialAveraging {
 
 					double value = emissionMapToAnalyze.get(linkId).get(pollutant2analyze);
 					double weightOfLinkForCell = calculateWeightOfLinkForCell(xLink, yLink, cellCentroid.getX(), cellCentroid.getY());
-					sumOfweightsForCell[xIndex][yIndex] += weightOfLinkForCell;
+//					sumOfweightsForCell[xIndex][yIndex] += weightOfLinkForCell;
 					sumOfweightedValuesForCell[xIndex][yIndex] += weightOfLinkForCell * value;
 				}
 			}
 		}
-		double[][] results; 
-		if(avm.equals(AveragingMethod.AVERAGE)){
-		results = getResults(sumOfweightedValuesForCell, sumOfweightsForCell, AveragingMethod.AVERAGE);
-		} else {
-			results = getResults(sumOfweightedValuesForCell, sumOfweightsForCell, AveragingMethod.PERSQKM);
-		}
+		double[][] results = getResults(sumOfweightedValuesForCell);
 		return results;
 	}
 
-	private double[][] performSpatialAveragingForDemand(
-			Map<Double, Map<Id, Double>> time2DemandMapToAnalyze,
-			double endOfTimeInterval) {
-		
-		Map<Id, Double> demandMapToAnalyze = time2DemandMapToAnalyze.get(endOfTimeInterval);
+	private double[][] performSpatialAveragingForDemand(double endOfTimeInterval) {
+		Map<Id, Double> demandMapToAnalyze = time2DemandMapToAnalyze_vkm.get(endOfTimeInterval);
 		double[][] sumOfweightsForCell = new double[noOfXbins][noOfYbins];
 		double[][] sumOfweightedValuesForCell = new double[noOfXbins][noOfYbins];
 
@@ -414,12 +444,12 @@ public class SpatialAveraging {
 					Coord cellCentroid = findCellCentroid(xIndex, yIndex);
 					double value = demandMapToAnalyze.get(linkId);
 					double weightOfLinkForCell = calculateWeightOfLinkForCell(xLink, yLink, cellCentroid.getX(), cellCentroid.getY());
-					sumOfweightsForCell[xIndex][yIndex] += weightOfLinkForCell;
+//					sumOfweightsForCell[xIndex][yIndex] += weightOfLinkForCell;
 					sumOfweightedValuesForCell[xIndex][yIndex] += weightOfLinkForCell * value;
 				}
 			}
 		}
-		double[][] results = getResults(sumOfweightedValuesForCell, sumOfweightsForCell, AveragingMethod.PERSQKM);
+		double[][] results = getResults(sumOfweightedValuesForCell);
 		return results;
 	}
 
@@ -572,7 +602,7 @@ public class SpatialAveraging {
 				absoluteEmissionDifference_gPerVkm.put(linkId, absoluteEmissionDifferencePerLink_gPerVkm);
 			}
 			this.time2EmissionMapToAnalyze_g.put(endOfTimeInterval, absoluteEmissionDifference_g);
-			this.time2EmissionMapToAnalyze_gPerVkm.put(endOfTimeInterval, absoluteEmissionDifference_gPerVkm);
+//			this.time2EmissionMapToAnalyze_gPerVkm.put(endOfTimeInterval, absoluteEmissionDifference_gPerVkm);
 		}
 	}
 
@@ -775,7 +805,7 @@ public class SpatialAveraging {
 		new SpatialAveraging().run();
 	}
 	
-	protected enum AveragingMethod{
-		AVERAGE, PERSQKM
-	}
+//	protected enum AveragingMethod{
+//		AVERAGE, PERSQKM
+//	}
 }
