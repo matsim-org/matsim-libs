@@ -65,6 +65,10 @@ public class PopGenerator {
 		networkFilename = outputDir + "network_cross.xml";
 		nPersonsPerHour = 1000;
 		PopGenerator.createPopCross(networkFilename, nPersonsPerHour, outputDir + "pop_cross.xml.gz");
+		
+		networkFilename = outputDir + "network_corridor.xml";
+		nPersonsPerHour = 1000;
+		PopGenerator.createPopVirginiaCorridor(networkFilename, nPersonsPerHour, outputDir + "pop_corridor_1000.xml.gz");
 	}
 
 	private static void createPopCross(String networkFilename, int nPersonsPerHour, String outFilename) {
@@ -284,6 +288,23 @@ public class PopGenerator {
 		createPersons(rnd, pop, nPersonsPerHour, node5Coord, node2Coord, 6, 10);
 						
 		new PopulationWriter(pop, null).write(outFilename);
+	}
+	
+	private static void createPopVirginiaCorridor(String networkFilename, int nPersonsPerHour, String outFilename) {
+		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		new MatsimNetworkReader(sc).readFile(networkFilename);
+		Population pop = sc.getPopulation();
+		
+		MatsimRandom.reset(4711);
+		Random rnd = MatsimRandom.getLocalInstance();
+		
+		Coord node1Coord = sc.getNetwork().getNodes().get(new IdImpl("1")).getCoord();
+		Coord node2Coord = sc.getNetwork().getNodes().get(new IdImpl("2")).getCoord();
+		
+		// create trips from node 1 to node 2, 7-9
+		createPersons(rnd, pop, nPersonsPerHour, node1Coord, node2Coord, 7, 9);
+		
+		new PopulationWriter(pop, null).write(outFilename);		
 	}
 
 	private static void createPersons(Random rnd, Population pop, int nPersonsPerHour, Coord fromCoord, Coord toCoord, int departureIntervalStart, int departureIntervalEnd) {
