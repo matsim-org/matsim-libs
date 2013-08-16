@@ -35,7 +35,6 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
-import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -43,14 +42,14 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
-import org.matsim.core.api.experimental.events.Event;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.GenericEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
@@ -64,63 +63,41 @@ import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandle
 import org.matsim.core.api.experimental.events.handler.GenericEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.facilities.Facility;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
-import org.matsim.core.events.EventsReaderXMLv1;
-import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.handler.BasicEventHandler;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.gbl.Gbl;
-import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
-import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEventImpl;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
-import org.matsim.core.mobsim.framework.events.MobsimInitializedEventImpl;
-import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
-import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
-import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
-import org.matsim.utils.objectattributes.ObjectAttributes;
-import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
-import org.opengis.feature.simple.SimpleFeature;
+import org.matsim.households.Household;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
-import playground.christoph.evacuation.config.EvacuationConfigReader;
-import playground.christoph.evacuation.controler.PrepareEvacuationScenario;
 import playground.christoph.evacuation.events.PersonInformationEvent;
 import playground.christoph.evacuation.events.PersonInformationEventImpl;
 import playground.christoph.evacuation.events.handler.PersonInformationEventHandler;
 import playground.christoph.evacuation.mobsim.AgentPosition;
 import playground.christoph.evacuation.mobsim.HouseholdsTracker;
 import playground.christoph.evacuation.mobsim.Tracker.Position;
-import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataGrabber;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.mobsim.decisiondata.HouseholdDecisionData;
-import playground.christoph.evacuation.mobsim.decisionmodel.EvacuationDecisionModel;
 import playground.christoph.evacuation.mobsim.decisionmodel.EvacuationDecisionModel.EvacuationDecision;
-import playground.christoph.evacuation.mobsim.decisionmodel.PanicModel;
-import playground.christoph.evacuation.mobsim.decisionmodel.PickupModel;
 import playground.christoph.evacuation.withinday.replanning.replanners.CurrentLegToMeetingPointReplanner;
-import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
-
-import com.vividsolutions.jts.geom.Geometry;
 
 public class DetailedAgentsTracker implements GenericEventHandler, PersonInformationEventHandler,
 		AgentDepartureEventHandler, AgentArrivalEventHandler, AgentWait2LinkEventHandler, LinkEnterEventHandler,
 		ActivityStartEventHandler, ActivityEndEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
-		AgentStuckEventHandler {
+		AgentStuckEventHandler, MobsimInitializedListener, IterationEndsListener {
 
 	static final Logger log = Logger.getLogger(DetailedAgentsTracker.class);
 	
@@ -193,15 +170,12 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 	 */
 	private final Map<Id, List<Activity>> agentActivities = new HashMap<Id, List<Activity>>();
 	private final Map<Id, List<Leg>> agentLegs = new HashMap<Id, List<Leg>>();
-		
-	private final CoordAnalyzer coordAnalyzer;
+	
+	private final Scenario scenario;
 	private final HouseholdsTracker householdsTracker;
 	private final DecisionDataProvider decisionDataProvider;
-	
-	private final Config config;
-	private final Scenario scenario;
-	private final EventsManager eventsManager;
-	
+	private final CoordAnalyzer coordAnalyzer;
+		
 	private final List<String> headers = new ArrayList<String>();
 	private final List<String> values = new ArrayList<String>();
 	
@@ -210,185 +184,297 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 	private final String outputModesFile = "evacuationDecisionModes.txt";
 	private final String outputDetailsFile = "evacuationDecisionDetailed.txt";
 	
-	public static void main(String[] args) {
-
-		Logger root = Logger.getRootLogger();
-		root.setLevel(Level.ALL);
+	public DetailedAgentsTracker(Scenario scenario, HouseholdsTracker householdsTracker,
+			DecisionDataProvider decisionDataProvider, CoordAnalyzer coordAnalyzer) {
 		
-		String configFile;
-		String evacuationConfigFile;
-		String outputPath;
-		
-//		configFile = "../../matsim/mysimulations/census2000V2/output_10pct_evac/evac.1.output_config.xml";
-//		evacuationConfigFile = "../../matsim/mysimulations/census2000V2/config_evacuation.xml";
-//		outputPath = "../../matsim/mysimulations/census2000V2/output_10pct_evac/";
-		
-//		configFile = "/data/matsim/cdobler/sandbox00/results_goesgen/output_census2000V2_goesgen_evacuation_DoE_run_33/config.xml";
-//		evacuationConfigFile = "/data/matsim/cdobler/sandbox00/results_goesgen/output_census2000V2_goesgen_evacuation_DoE_run_33/config_evacuation_run_33.xml";
-//		outputPath = "/data/matsim/cdobler/sandbox00/results_goesgen/output_census2000V2_goesgen_evacuation_DoE_run_33/";
-		
-		if (args.length != 3) return;
-		else {
-			configFile = args[0];
-			evacuationConfigFile = args[1];
-			outputPath = args[2];
-		}
-
-		new DetailedAgentsTracker(configFile, evacuationConfigFile, outputPath);
+		this.scenario = scenario;
+		this.householdsTracker = householdsTracker;
+		this.decisionDataProvider = decisionDataProvider;
+		this.coordAnalyzer = coordAnalyzer;
 	}
 	
-	public DetailedAgentsTracker(String configFile, String evacuationConfigFile, String outputPath) {
-		
-		config = ConfigUtils.loadConfig(configFile);
-		
-		// ensure vehicles are not loaded (in an output config file, "useVehicles" is set to true, but we do not need them)
-		config.scenario().setUseVehicles(false);
-		
-		scenario = ScenarioUtils.loadScenario(config);
-		eventsManager = EventsUtils.createEventsManager();
-				
-		new EvacuationConfigReader().readFile(evacuationConfigFile);
-		EvacuationConfig.printConfig();
-		
-		// load household object attributes
-		ObjectAttributes householdObjectAttributes = new ObjectAttributes();
-		new ObjectAttributesXmlReader(householdObjectAttributes).parse(EvacuationConfig.householdObjectAttributesFile);
-		
-		/*
-		 * Prepare the scenario:
-		 * 	- connect facilities to network
-		 * 	- add exit links to network
-		 * 	- add pickup facilities
-		 *  - add z Coordinates to network
-		 */
-		new PrepareEvacuationScenario().prepareScenario(scenario);
-		
-		/*
-		 * Create two OutputDirectoryHierarchies that point to the analyzed run's output directory.
-		 * Since we do not want to overwrite existing results we add an additional prefix
-		 * to the re-created outputs.
-		 */
-//		DummyController dummyInputController = new DummyController(scenario, outputPath);
-		OutputDirectoryHierarchy dummyInputDirectoryHierarchy;
-		if (outputPath == null) outputPath = scenario.getConfig().controler().getOutputDirectory();
-		if (outputPath.endsWith("/")) {
-			outputPath = outputPath.substring(0, outputPath.length() - 1);
-		}
-		if (scenario.getConfig().controler().getRunId() != null) {
-			dummyInputDirectoryHierarchy = new OutputDirectoryHierarchy(outputPath, scenario.getConfig().controler().getRunId(), true);
-		} else {
-			dummyInputDirectoryHierarchy = new OutputDirectoryHierarchy(outputPath, null, true);
-		}
-		
-		// add another string to the runId to not overwrite old files
-		String runId = scenario.getConfig().controler().getRunId();
-		scenario.getConfig().controler().setRunId(runId + ".postprocessed");
-//		DummyController dummyOutputController = new DummyController(scenario, outputPath);
-		OutputDirectoryHierarchy dummyOutputDirectoryHierarchy;
-		if (outputPath == null) outputPath = scenario.getConfig().controler().getOutputDirectory();
-		if (outputPath.endsWith("/")) {
-			outputPath = outputPath.substring(0, outputPath.length() - 1);
-		}
-		if (scenario.getConfig().controler().getRunId() != null) {
-			dummyOutputDirectoryHierarchy = new OutputDirectoryHierarchy(outputPath, scenario.getConfig().controler().getRunId(), true);
-		} else {
-			dummyOutputDirectoryHierarchy = new OutputDirectoryHierarchy(outputPath, null, true);
-		}
-		
-		List<MobsimListener> mobsimListeners = new ArrayList<MobsimListener>();
-		
-		Set<SimpleFeature> features = new HashSet<SimpleFeature>();
-		SHPFileUtil util = new SHPFileUtil();
-		for (String file : EvacuationConfig.evacuationArea) {
-			features.addAll(ShapeFileReader.getAllFeatures(file));		
-		}
-		Geometry affectedArea = util.mergeGeometries(features);
-		
-		coordAnalyzer = new CoordAnalyzer(affectedArea);
+	@Override
+	public void reset(int iteration) {
+		// nothing to do here
+	}
 
-		householdsTracker = new HouseholdsTracker(scenario);
-		decisionDataProvider = new DecisionDataProvider();
+	/*
+	 * PersonInformationEvent are not part of MATSim's default events. Therefore,
+	 * the events file parser creates GenericEvents instead. Here, they are replaced
+	 * with PersonInformationEvents.
+	 */
+	@Override
+	public void handleEvent(GenericEvent event) {
+		if (event.getEventType().equals(PersonInformationEvent.EVENT_TYPE)) {
+			String personIdString = event.getAttributes().get(PersonInformationEvent.ATTRIBUTE_PERSON);
+			Id personId = scenario.createId(personIdString);
+			handleEvent(new PersonInformationEventImpl(event.getTime(), personId));
+		}
+	}
+
+	@Override
+	public void handleEvent(PersonInformationEvent event) {
+		Id personId = event.getPersonId();
 		
-		/*
-		 * Create a DecisionDataGrabber and run notifyMobsimInitialized(...)
-		 * which inserts decision data into the DecisionDataProvider.
-		 */
-		DecisionDataGrabber decisionDataGrabber = new DecisionDataGrabber(scenario, coordAnalyzer, 
-				householdsTracker, householdObjectAttributes);	
+		informedAgents.add(personId);
+		informationTime.put(personId, event.getTime());
 		
-		householdsTracker.notifyMobsimInitialized(null);
-		
-		// read people in panic from file
-		String panicFile = dummyInputDirectoryHierarchy.getIterationFilename(0, PanicModel.panicModelFile);
-		PanicModel panicModel = new PanicModel(decisionDataProvider, EvacuationConfig.panicShare);
-		panicModel.readDecisionsFromFile(panicFile);
-		panicModel.printStatistics();
-		
-		// read pickup behavior from file
-		String pickupFile = dummyInputDirectoryHierarchy.getIterationFilename(0, PickupModel.pickupModelFile);
-		PickupModel pickupModel = new PickupModel(decisionDataProvider);
-		pickupModel.readDecisionsFromFile(pickupFile);
-		pickupModel.printStatistics();
-		
-		// read evacuation decisions from file
-		String evacuationDecisionFile = dummyInputDirectoryHierarchy.getIterationFilename(0, EvacuationDecisionModel.evacuationDecisionModelFile);
-		EvacuationDecisionModel evacuationDecisionModel = new EvacuationDecisionModel(scenario, MatsimRandom.getLocalInstance(), decisionDataProvider);
-		evacuationDecisionModel.readDecisionsFromFile(evacuationDecisionFile);
-		evacuationDecisionModel.printStatistics();
-		
-		// initialize agentActivities and agentLegs maps and set of affected agents
-		for (Id personId : scenario.getPopulation().getPersons().keySet()) {
+		AgentPosition agentPosition = householdsTracker.getAgentPosition(personId);
+		Position position = agentPosition.getPositionType();
+		if (position == Position.FACILITY) {
 			Id householdId = householdsTracker.getPersonsHouseholdId(personId);
 			HouseholdDecisionData hdd = decisionDataProvider.getHouseholdDecisionData(householdId);
-			
-			Id homeLinkId = hdd.getHomeLinkId();
 			Id homeFacilityId = hdd.getHomeFacilityId();
-            ActivityImpl firstActivity = new ActivityImpl("home".intern(), homeLinkId);
-            firstActivity.setFacilityId(homeFacilityId);
-            firstActivity.setStartTime(0.0);
-            firstActivity.setEndTime(Time.UNDEFINED_TIME);
+			
+			if (agentPosition.getPositionId().equals(homeFacilityId)) A.add(personId);
+			else {
+				Facility facility = scenario.getActivityFacilities().getFacilities().get(agentPosition.getPositionId());
+				boolean isAffected = coordAnalyzer.isFacilityAffected(facility);
+				if (isAffected) B.add(personId);
+				else C.add(personId);
+			}
+		} else if (position == Position.LINK) {
+			Link link = scenario.getNetwork().getLinks().get(agentPosition.getPositionId());
+			boolean isAffected = coordAnalyzer.isLinkAffected(link);
+			if (isAffected) B.add(personId);
+			else C.add(personId);
+		} else if (position == Position.VEHICLE) {
+			Id linkId = vehiclePositions.get(agentPosition.getPositionId());
+			
+			// If the vehicle has not been used so far, it is parked at the households home facility link.
+			if (linkId == null) {
+				Id householdId = householdsTracker.getPersonsHouseholdId(personId);
+				HouseholdDecisionData hdd = decisionDataProvider.getHouseholdDecisionData(householdId);
+				linkId = hdd.getHomeLinkId();
+			}
+				
+			Link link = scenario.getNetwork().getLinks().get(linkId);		
+			boolean isAffected = coordAnalyzer.isLinkAffected(link);
+			if (isAffected) B.add(personId);
+			else C.add(personId);
+		} else {
+			log.warn("Undefined position of agent " + personId + " at time " + event.getTime());
+		}
 
-            List<Activity> activities = new ArrayList<Activity>();
-            activities.add(firstActivity);
-			agentActivities.put(personId, activities);
-			
-			agentLegs.put(personId, new ArrayList<Leg>());
-			
-			Facility homeFacility = scenario.getActivityFacilities().getFacilities().get(homeFacilityId);
-			boolean isAffected = this.coordAnalyzer.isFacilityAffected(homeFacility);
-			if (isAffected) this.agentsInEvacuationArea.add(personId);
+	}
+
+	@Override
+	public void handleEvent(AgentDepartureEvent event) {
+		Id personId = event.getPersonId();
+		
+		if (event.getLegMode().equals(TransportMode.car)) {
+			this.enrouteDrivers.add(personId);
+		}
+//		this.enrouteDrivers.remove(event.getPersonId());
+		
+		List<Leg> legs = agentLegs.get(personId);
+		
+		LegImpl leg = new LegImpl(event.getLegMode());
+        leg.setDepartureTime(event.getTime());
+        leg.setArrivalTime(Time.UNDEFINED_TIME);
+		
+		legs.add(leg);
+	}
+	
+	@Override
+	public void handleEvent(AgentArrivalEvent event) {
+		Id personId = event.getPersonId();
+
+		this.enrouteDrivers.remove(event.getPersonId());
+//		if (event.getLegMode().equals(TransportMode.car)) {
+//			this.enrouteDrivers.add(personId);
+//		}
+		
+		List<Leg> legs = agentLegs.get(personId);
+		
+		// If the agent is not informed yet, remove entries from the list.
+		if (!informedAgents.contains(event.getPersonId())) legs.clear();
+		else {
+			LegImpl leg = (LegImpl) legs.get(legs.size() - 1);
+			leg.setArrivalTime(event.getTime());			
+		}
+	}
+	
+	@Override
+	public void handleEvent(AgentWait2LinkEvent event) {
+		if (this.enrouteDrivers.contains(event.getPersonId())) {
+			vehiclePositions.put(event.getVehicleId(), event.getLinkId());
+			if (event.getVehicleId() == null) log.warn("null vehicleId was found!");			
+		}
+	}
+	
+	@Override
+	public void handleEvent(LinkEnterEvent event) {
+		
+		Id personId = event.getPersonId();
+		Id vehicleId = event.getVehicleId();
+		Id linkId = event.getLinkId();
+		
+		boolean isDriver = this.enrouteDrivers.contains(personId);
+		if (isDriver) {
+			vehiclePositions.put(vehicleId, linkId);
+			if (event.getVehicleId() == null) log.warn("null vehicleId was found!");
 		}
 		
-		// Create the set of analyzed modes.
-		Set<String> analyzedModes = new HashSet<String>();
-		analyzedModes.add(TransportMode.bike);
-		analyzedModes.add(TransportMode.car);
-		analyzedModes.add(TransportMode.pt);
-		analyzedModes.add(TransportMode.ride);
-		analyzedModes.add(TransportMode.walk);
-		analyzedModes.add(PassengerQNetsimEngine.PASSENGER_TRANSPORT_MODE);
+		Link link = scenario.getNetwork().getLinks().get(linkId);
+		boolean wasAffected = this.agentsInEvacuationArea.contains(personId);
+		boolean isAffected = this.coordAnalyzer.isLinkAffected(link);
+				
+		checkAndUpdateAffected(personId, event.getTime(), wasAffected, isAffected);
 		
-		/*
-		 * Class to create dummy MobsimAfterSimStepEvents.
-		 * Has to be added as first Listener to the EventsManager!
-		 */
-		AfterSimStepEventsCreator afterSimStepEventsCreator = new AfterSimStepEventsCreator(mobsimListeners);
-		eventsManager.addHandler(afterSimStepEventsCreator);
-		
-		eventsManager.addHandler(householdsTracker);
-		eventsManager.addHandler(this);
-		
-		// MobsimInitializedListener
-		MobsimInitializedEvent<Mobsim> mobsimInitializedEvent = new MobsimInitializedEventImpl<Mobsim>(null);
-		for(MobsimListener mobsimListener : mobsimListeners) {
-			if (mobsimListener instanceof MobsimInitializedListener) {
-				((MobsimInitializedListener) mobsimListener).notifyMobsimInitialized(mobsimInitializedEvent);
+		// if its a driver, also adapt passengers
+		if (isDriver) {
+			Collection<Id> passengers = this.vehiclePassengers.get(event.getVehicleId());
+			for (Id passengerId : passengers) {
+				checkAndUpdateAffected(passengerId, event.getTime(), wasAffected, isAffected);
 			}
 		}
+	}
+	
+	@Override
+	public void handleEvent(ActivityStartEvent event) {
+		Id personId = event.getPersonId();
+		List<Activity> activities = agentActivities.get(personId);
+				
+        ActivityImpl activity = new ActivityImpl(event.getActType(), event.getLinkId());
+        activity.setFacilityId(event.getFacilityId());
+        activity.setStartTime(event.getTime());
+        activity.setEndTime(Time.UNDEFINED_TIME);
+		
+		activities.add(activity);
+		
+		Facility facility = scenario.getActivityFacilities().getFacilities().get(event.getFacilityId());
+		
+		/*
+		 * Workaround for runs 01a to 32a. There, dummy facility are used for pickup activities. They are not included in the
+		 * facilities file and therefore would produce a null pointer exception. Therefore, we ignore those events.
+		 */
+		if (facility == null) {
+			String facilityIdString = event.getFacilityId().toString();
+			if (facilityIdString.contains("_pickup")) return;
+		}
+		
+		boolean isAffected = this.coordAnalyzer.isFacilityAffected(facility);
+		boolean wasAffected = this.agentsInEvacuationArea.contains(event.getPersonId());
+		
+		checkAndUpdateAffected(personId, event.getTime(), wasAffected, isAffected);
+	}
 
-		String eventsFile = dummyInputDirectoryHierarchy.getIterationFilename(0, Controler.FILENAME_EVENTS_XML);
-		new EventsReaderXMLv1(eventsManager).parse(eventsFile);
+	@Override
+	public void handleEvent(ActivityEndEvent event) {
+		Id personId = event.getPersonId();
+		List<Activity> activities = agentActivities.get(personId);
+		
+		// If the agent is not informed yet, remove entries from the list.
+		if (!informedAgents.contains(event.getPersonId())) activities.clear();
+		else {
+			Activity activity = activities.get(activities.size() - 1);
+			activity.setEndTime(event.getTime());			
+		}
+		
+		Link link = scenario.getNetwork().getLinks().get(event.getLinkId());
+		boolean isAffected = this.coordAnalyzer.isLinkAffected(link);
+		boolean wasAffected = this.agentsInEvacuationArea.contains(event.getPersonId());
+		
+		checkAndUpdateAffected(personId, event.getTime(), wasAffected, isAffected);
+	}
+	
+	@Override
+	public void handleEvent(PersonEntersVehicleEvent event) {
+		Collection<Id> agentsInVehicle = this.vehiclePassengers.get(event.getVehicleId());
+		if (agentsInVehicle == null) {
+			agentsInVehicle = new LinkedHashSet<Id>();
+			this.vehiclePassengers.put(event.getVehicleId(), agentsInVehicle);
+		}
+		agentsInVehicle.add(event.getPersonId());
+		
+		if (this.enrouteDrivers.contains(event.getPersonId())) this.driverVehicles.put(event.getPersonId(), event.getVehicleId());
+	}
+	
+	@Override
+	public void handleEvent(PersonLeavesVehicleEvent event) {
+		Collection<Id> agentsInVehicle = this.vehiclePassengers.get(event.getVehicleId());
+		agentsInVehicle.remove(event.getPersonId());
+		
+		this.driverVehicles.remove(event.getVehicleId());
+	}
 
+	@Override
+	public void handleEvent(AgentStuckEvent event) {
+		this.stuckAgents.add(event.getPersonId());
+		
+		/*
+		 * Seems that stuck events have not been created for passengers. Therefore,
+		 * mark them manually as stuck. 
+		 */
+		if (this.enrouteDrivers.contains(event.getPersonId())) {
+			Id vehicleId = this.driverVehicles.remove(event.getPersonId());
+			Collection<Id> agentsInVehicle = this.vehiclePassengers.get(vehicleId);
+			this.stuckAgents.addAll(agentsInVehicle);
+		}
+	}
+	
+	private void checkAndUpdateAffected(Id personId, double time, boolean wasAffected, boolean isAffected) {	
+		if (wasAffected && !isAffected) {
+			this.leftEvacuationAreaTime.put(personId, time);
+			this.agentsInEvacuationArea.remove(personId);
+		}
+		else if (!wasAffected && isAffected) {
+			this.leftEvacuationAreaTime.remove(personId);
+			this.agentsInEvacuationArea.add(personId);
+		}
+	}
+	
+	/*
+	 * This cannot be implemented as a BeforeMobsimListener since the 
+	 * DecisionDataProvider cannot provide any data at that time. 
+	 * 
+	 */
+	@Override
+	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
+		
+		this.agentActivities.clear();
+		this.agentLegs.clear();
+		
+		// initialize agentActivities and agentLegs maps and set of affected agents
+		for (Household household : ((ScenarioImpl) this.scenario).getHouseholds().getHouseholds().values()) {
+			
+			Id householdId = household.getId(); 
+			HouseholdDecisionData hdd = this.decisionDataProvider.getHouseholdDecisionData(householdId);
+			Id homeLinkId = hdd.getHomeLinkId();
+			Id homeFacilityId = hdd.getHomeFacilityId();
+			Facility homeFacility = this.scenario.getActivityFacilities().getFacilities().get(homeFacilityId);
+			boolean isAffected = this.coordAnalyzer.isFacilityAffected(homeFacility);
+			
+			for (Id personId : household.getMemberIds()) {
+				Person person = scenario.getPopulation().getPersons().get(personId);
+				Plan plan = person.getSelectedPlan();				
+				
+				ActivityImpl firstActivity = new ActivityImpl(((Activity) plan.getPlanElements().get(0)).getType(), homeLinkId);
+				firstActivity.setFacilityId(homeFacilityId);
+				firstActivity.setStartTime(0.0);
+				firstActivity.setEndTime(Time.UNDEFINED_TIME);
+				
+				List<Activity> activities = new ArrayList<Activity>();
+				activities.add(firstActivity);
+				agentActivities.put(personId, activities);
+				
+				agentLegs.put(personId, new ArrayList<Leg>());
+				
+				if (isAffected) this.agentsInEvacuationArea.add(personId);
+				
+			}
+			
+		}
+	}
+	
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		
+		this.analyzeResultsAndWriteFiles(event.getControler().getControlerIO());
+	}
+	
+	public void analyzeResultsAndWriteFiles(OutputDirectoryHierarchy outputDirectoryHierarchy) {
 		/*
 		 * Create results.
 		 */
@@ -399,13 +485,13 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 		/*
 		 * Write results to files.
 		 */
-		String countsFileName = dummyOutputDirectoryHierarchy.getIterationFilename(0, outputCountsFile);
-		String timesFileName = dummyOutputDirectoryHierarchy.getIterationFilename(0, outputTimesFile);
-		String modesFileName = dummyOutputDirectoryHierarchy.getIterationFilename(0, outputModesFile);
-		String detailsFileName = dummyOutputDirectoryHierarchy.getIterationFilename(0, outputDetailsFile);
+		String countsFileName = outputDirectoryHierarchy.getIterationFilename(0, outputCountsFile);
+		String timesFileName = outputDirectoryHierarchy.getIterationFilename(0, outputTimesFile);
+		String modesFileName = outputDirectoryHierarchy.getIterationFilename(0, outputModesFile);
+		String detailsFileName = outputDirectoryHierarchy.getIterationFilename(0, outputDetailsFile);
 		writeResultsToFiles(countsFileName, timesFileName, modesFileName, detailsFileName);
 	}
-
+	
 	private void analyzeA() {
 		/*
 		 * Split A into agents who's home facility is affected and is not affected.
@@ -1721,269 +1807,6 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 			Gbl.errorMsg(e);
 		}
 
-	}
-	
-	@Override
-	public void reset(int iteration) {
-		// nothing to do here
-	}
-
-	/*
-	 * PersonInformationEvent are not part of MATSim's default events. Therefore,
-	 * the events file parser creates GenericEvents instead. Here, they are replaced
-	 * with PersonInformationEvents.
-	 */
-	@Override
-	public void handleEvent(GenericEvent event) {
-		if (event.getEventType().equals(PersonInformationEvent.EVENT_TYPE)) {
-			String personIdString = event.getAttributes().get(PersonInformationEvent.ATTRIBUTE_PERSON);
-			Id personId = scenario.createId(personIdString);
-			handleEvent(new PersonInformationEventImpl(event.getTime(), personId));
-		}
-	}
-
-	@Override
-	public void handleEvent(PersonInformationEvent event) {
-		Id personId = event.getPersonId();
-		
-		informedAgents.add(personId);
-		informationTime.put(personId, event.getTime());
-		
-		AgentPosition agentPosition = householdsTracker.getAgentPosition(personId);
-		Position position = agentPosition.getPositionType();
-		if (position == Position.FACILITY) {
-			Id householdId = householdsTracker.getPersonsHouseholdId(personId);
-			HouseholdDecisionData hdd = decisionDataProvider.getHouseholdDecisionData(householdId);
-			Id homeFacilityId = hdd.getHomeFacilityId();
-			
-			if (agentPosition.getPositionId().equals(homeFacilityId)) A.add(personId);
-			else {
-				Facility facility = scenario.getActivityFacilities().getFacilities().get(agentPosition.getPositionId());
-				boolean isAffected = coordAnalyzer.isFacilityAffected(facility);
-				if (isAffected) B.add(personId);
-				else C.add(personId);
-			}
-		} else if (position == Position.LINK) {
-			Link link = scenario.getNetwork().getLinks().get(agentPosition.getPositionId());
-			boolean isAffected = coordAnalyzer.isLinkAffected(link);
-			if (isAffected) B.add(personId);
-			else C.add(personId);
-		} else if (position == Position.VEHICLE) {
-			Id linkId = vehiclePositions.get(agentPosition.getPositionId());
-			
-			// If the vehicle has not been used so far, it is parked at the households home facility link.
-			if (linkId == null) {
-				Id householdId = householdsTracker.getPersonsHouseholdId(personId);
-				HouseholdDecisionData hdd = decisionDataProvider.getHouseholdDecisionData(householdId);
-				linkId = hdd.getHomeLinkId();
-			}
-				
-			Link link = scenario.getNetwork().getLinks().get(linkId);		
-			boolean isAffected = coordAnalyzer.isLinkAffected(link);
-			if (isAffected) B.add(personId);
-			else C.add(personId);
-		} else {
-			log.warn("Undefined position of agent " + personId + " at time " + event.getTime());
-		}
-
-	}
-
-	@Override
-	public void handleEvent(AgentDepartureEvent event) {
-		Id personId = event.getPersonId();
-		
-		if (event.getLegMode().equals(TransportMode.car)) {
-			this.enrouteDrivers.add(personId);
-		}
-//		this.enrouteDrivers.remove(event.getPersonId());
-		
-		List<Leg> legs = agentLegs.get(personId);
-		
-		LegImpl leg = new LegImpl(event.getLegMode());
-        leg.setDepartureTime(event.getTime());
-        leg.setArrivalTime(Time.UNDEFINED_TIME);
-		
-		legs.add(leg);
-	}
-	
-	@Override
-	public void handleEvent(AgentArrivalEvent event) {
-		Id personId = event.getPersonId();
-
-		this.enrouteDrivers.remove(event.getPersonId());
-//		if (event.getLegMode().equals(TransportMode.car)) {
-//			this.enrouteDrivers.add(personId);
-//		}
-		
-		List<Leg> legs = agentLegs.get(personId);
-		
-		// If the agent is not informed yet, remove entries from the list.
-		if (!informedAgents.contains(event.getPersonId())) legs.clear();
-		else {
-			LegImpl leg = (LegImpl) legs.get(legs.size() - 1);
-			leg.setArrivalTime(event.getTime());			
-		}
-	}
-	
-	@Override
-	public void handleEvent(AgentWait2LinkEvent event) {
-		if (this.enrouteDrivers.contains(event.getPersonId())) {
-			vehiclePositions.put(event.getVehicleId(), event.getLinkId());
-			if (event.getVehicleId() == null) log.warn("null vehicleId was found!");			
-		}
-	}
-	
-	@Override
-	public void handleEvent(LinkEnterEvent event) {
-		
-		Id personId = event.getPersonId();
-		Id vehicleId = event.getVehicleId();
-		Id linkId = event.getLinkId();
-		
-		boolean isDriver = this.enrouteDrivers.contains(personId);
-		if (isDriver) {
-			vehiclePositions.put(vehicleId, linkId);
-			if (event.getVehicleId() == null) log.warn("null vehicleId was found!");
-		}
-		
-		Link link = scenario.getNetwork().getLinks().get(linkId);
-		boolean wasAffected = this.agentsInEvacuationArea.contains(personId);
-		boolean isAffected = this.coordAnalyzer.isLinkAffected(link);
-				
-		checkAndUpdateAffected(personId, event.getTime(), wasAffected, isAffected);
-		
-		// if its a driver, also adapt passengers
-		if (isDriver) {
-			Collection<Id> passengers = this.vehiclePassengers.get(event.getVehicleId());
-			for (Id passengerId : passengers) {
-				checkAndUpdateAffected(passengerId, event.getTime(), wasAffected, isAffected);
-			}
-		}
-	}
-	
-	@Override
-	public void handleEvent(ActivityStartEvent event) {
-		Id personId = event.getPersonId();
-		List<Activity> activities = agentActivities.get(personId);
-				
-        ActivityImpl activity = new ActivityImpl(event.getActType(), event.getLinkId());
-        activity.setFacilityId(event.getFacilityId());
-        activity.setStartTime(event.getTime());
-        activity.setEndTime(Time.UNDEFINED_TIME);
-		
-		activities.add(activity);
-		
-		Facility facility = scenario.getActivityFacilities().getFacilities().get(event.getFacilityId());
-		
-		/*
-		 * Workaround for runs 01a to 32a. There, dummy facility are used for pickup activities. They are not included in the
-		 * facilities file and therefore would produce a null pointer exception. Therefore, we ignore those events.
-		 */
-		if (facility == null) {
-			String facilityIdString = event.getFacilityId().toString();
-			if (facilityIdString.contains("_pickup")) return;
-		}
-		
-		boolean isAffected = this.coordAnalyzer.isFacilityAffected(facility);
-		boolean wasAffected = this.agentsInEvacuationArea.contains(event.getPersonId());
-		
-		checkAndUpdateAffected(personId, event.getTime(), wasAffected, isAffected);
-	}
-
-	@Override
-	public void handleEvent(ActivityEndEvent event) {
-		Id personId = event.getPersonId();
-		List<Activity> activities = agentActivities.get(personId);
-		
-		// If the agent is not informed yet, remove entries from the list.
-		if (!informedAgents.contains(event.getPersonId())) activities.clear();
-		else {
-			Activity activity = activities.get(activities.size() - 1);
-			activity.setEndTime(event.getTime());			
-		}
-		
-		Link link = scenario.getNetwork().getLinks().get(event.getLinkId());
-		boolean isAffected = this.coordAnalyzer.isLinkAffected(link);
-		boolean wasAffected = this.agentsInEvacuationArea.contains(event.getPersonId());
-		
-		checkAndUpdateAffected(personId, event.getTime(), wasAffected, isAffected);
-	}
-	
-	@Override
-	public void handleEvent(PersonEntersVehicleEvent event) {
-		Collection<Id> agentsInVehicle = this.vehiclePassengers.get(event.getVehicleId());
-		if (agentsInVehicle == null) {
-			agentsInVehicle = new LinkedHashSet<Id>();
-			this.vehiclePassengers.put(event.getVehicleId(), agentsInVehicle);
-		}
-		agentsInVehicle.add(event.getPersonId());
-		
-		if (this.enrouteDrivers.contains(event.getPersonId())) this.driverVehicles.put(event.getPersonId(), event.getVehicleId());
-	}
-	
-	@Override
-	public void handleEvent(PersonLeavesVehicleEvent event) {
-		Collection<Id> agentsInVehicle = this.vehiclePassengers.get(event.getVehicleId());
-		agentsInVehicle.remove(event.getPersonId());
-		
-		this.driverVehicles.remove(event.getVehicleId());
-	}
-
-	@Override
-	public void handleEvent(AgentStuckEvent event) {
-		this.stuckAgents.add(event.getPersonId());
-		
-		/*
-		 * Seems that stuck events have not been created for passengers. Therefore,
-		 * mark them manually as stuck. 
-		 */
-		if (this.enrouteDrivers.contains(event.getPersonId())) {
-			Id vehicleId = this.driverVehicles.remove(event.getPersonId());
-			Collection<Id> agentsInVehicle = this.vehiclePassengers.get(vehicleId);
-			this.stuckAgents.addAll(agentsInVehicle);
-		}
-	}
-	
-	private void checkAndUpdateAffected(Id personId, double time, boolean wasAffected, boolean isAffected) {	
-		if (wasAffected && !isAffected) {
-			this.leftEvacuationAreaTime.put(personId, time);
-			this.agentsInEvacuationArea.remove(personId);
-		}
-		else if (!wasAffected && isAffected) {
-			this.leftEvacuationAreaTime.remove(personId);
-			this.agentsInEvacuationArea.add(personId);
-		}
-	}
-	
-	private static class AfterSimStepEventsCreator implements BasicEventHandler {
-		
-		private final List<MobsimListener> mobsimListeners;
-		private double lastSimStep = 0.0; 
-		
-		public AfterSimStepEventsCreator(List<MobsimListener> mobsimListeners) {
-			this.mobsimListeners = mobsimListeners;
-		}
-		
-		@Override
-		public void handleEvent(Event event) {
-			double time = event.getTime();
-			while (time > lastSimStep) {
-				MobsimAfterSimStepEvent<Mobsim> e = new MobsimAfterSimStepEventImpl<Mobsim>(null, lastSimStep);
-				
-				for(MobsimListener mobsimListener : mobsimListeners) {
-					if (mobsimListener instanceof MobsimAfterSimStepListener) {
-						((MobsimAfterSimStepListener) mobsimListener).notifyMobsimAfterSimStep(e);
-					}
-				}
-				
-				lastSimStep++;
-			}
-		}
-		
-		@Override
-		public void reset(int iteration) {
-			// nothing to do here
-		}		
 	}
 
 }

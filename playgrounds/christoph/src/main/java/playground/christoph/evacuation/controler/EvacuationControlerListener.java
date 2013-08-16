@@ -32,7 +32,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.multimodal.MultiModalControlerListener;
-import org.matsim.contrib.multimodal.router.MultimodalTripRouterFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
@@ -44,7 +43,6 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingContextImpl;
 import org.matsim.core.router.TripRouterFactory;
-import org.matsim.core.router.TripRouterFactoryBuilderWithDefaults;
 import org.matsim.core.router.costcalculators.FreespeedTravelTimeAndDisutility;
 import org.matsim.core.router.costcalculators.OnlyTimeDependentTravelCostCalculatorFactory;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
@@ -86,6 +84,7 @@ import playground.christoph.evacuation.analysis.AgentsInEvacuationAreaActivityCo
 import playground.christoph.evacuation.analysis.AgentsInEvacuationAreaCounter;
 import playground.christoph.evacuation.analysis.AgentsReturnHomeCounter;
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
+import playground.christoph.evacuation.analysis.DetailedAgentsTracker;
 import playground.christoph.evacuation.analysis.EvacuationTimePicture;
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.mobsim.EvacuationQSimFactory;
@@ -104,19 +103,15 @@ import playground.christoph.evacuation.router.RandomCompassRouterFactory;
 import playground.christoph.evacuation.router.util.AffectedAreaPenaltyCalculator;
 import playground.christoph.evacuation.router.util.FuzzyTravelTimeEstimatorFactory;
 import playground.christoph.evacuation.router.util.PenaltyTravelCostFactory;
-import playground.christoph.evacuation.trafficmonitoring.SwissPTTravelTime;
 import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsToDropOffIdentifierFactory;
 import playground.christoph.evacuation.withinday.replanning.identifiers.AgentsToPickupIdentifierFactory;
-import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifier;
 import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHouseholdsIdentifierFactory;
 import playground.christoph.evacuation.withinday.replanning.identifiers.filters.AffectedAgentsFilter;
 import playground.christoph.evacuation.withinday.replanning.identifiers.filters.AffectedAgentsFilterFactory;
 import playground.christoph.evacuation.withinday.replanning.identifiers.filters.InformedAgentsFilter;
 import playground.christoph.evacuation.withinday.replanning.identifiers.filters.InformedAgentsFilterFactory;
-import playground.christoph.evacuation.withinday.replanning.replanners.CurrentActivityToMeetingPointReplannerFactory;
 import playground.christoph.evacuation.withinday.replanning.replanners.CurrentLegToMeetingPointReplannerFactory;
 import playground.christoph.evacuation.withinday.replanning.replanners.DropOffAgentReplannerFactory;
-import playground.christoph.evacuation.withinday.replanning.replanners.JoinedHouseholdsReplannerFactory;
 import playground.christoph.evacuation.withinday.replanning.replanners.PickupAgentReplannerFactory;
 import playground.christoph.evacuation.withinday.replanning.utils.ModeAvailabilityChecker;
 import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
@@ -162,6 +157,7 @@ public class EvacuationControlerListener implements StartupListener {
 	private AgentsReturnHomeCounter agentsReturnHomeCounter;
 	private AgentsInEvacuationAreaCounter agentsInEvacuationAreaCounter;
 	private AgentsInEvacuationAreaActivityCounter agentsInEvacuationAreaActivityCounter;
+	private DetailedAgentsTracker detailedAgentsTracker;
 	
 	/*
 	 * Identifiers
@@ -221,7 +217,7 @@ public class EvacuationControlerListener implements StartupListener {
 		
 		this.initAnalysisStuff(event.getControler());
 		
-		this.initReplanningStuff(event.getControler());
+//		this.initReplanningStuff(event.getControler());
 		
 		/*
 		 * Use a MobsimFactory which creates vehicles according to available vehicles per
@@ -317,33 +313,39 @@ public class EvacuationControlerListener implements StartupListener {
 		if (EvacuationConfig.createEvacuationTimePicture) {
 			evacuationTimePicture = new EvacuationTimePicture(scenario, this.coordAnalyzer.createInstance(), this.householdsTracker, 
 					this.withinDayControlerListener.getMobsimDataProvider());
-			controler.addControlerListener(evacuationTimePicture);
-			this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(evacuationTimePicture);
-			controler.getEvents().addHandler(evacuationTimePicture);	
+			controler.addControlerListener(this.evacuationTimePicture);
+			this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(this.evacuationTimePicture);
+			controler.getEvents().addHandler(this.evacuationTimePicture);	
 		}
 		
 		// Create and add an AgentsInEvacuationAreaCounter.
 		if (EvacuationConfig.countAgentsInEvacuationArea) {
 			double scaleFactor = 1 / scenario.getConfig().getQSimConfigGroup().getFlowCapFactor();
 			
-			agentsInEvacuationAreaCounter = new AgentsInEvacuationAreaCounter(scenario, analyzedModes, coordAnalyzer.createInstance(), 
+			agentsInEvacuationAreaCounter = new AgentsInEvacuationAreaCounter(scenario, analyzedModes, this.coordAnalyzer.createInstance(), 
 					this.decisionModelRunner.getDecisionDataProvider(), scaleFactor);
-			controler.addControlerListener(agentsInEvacuationAreaCounter);
-			this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(agentsInEvacuationAreaCounter);
-			controler.getEvents().addHandler(agentsInEvacuationAreaCounter);
+			controler.addControlerListener(this.agentsInEvacuationAreaCounter);
+			this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(this.agentsInEvacuationAreaCounter);
+			controler.getEvents().addHandler(this.agentsInEvacuationAreaCounter);
 			
-			agentsInEvacuationAreaActivityCounter = new AgentsInEvacuationAreaActivityCounter(scenario, coordAnalyzer.createInstance(), 
+			agentsInEvacuationAreaActivityCounter = new AgentsInEvacuationAreaActivityCounter(scenario, this.coordAnalyzer.createInstance(), 
 					this.decisionModelRunner.getDecisionDataProvider(), scaleFactor);
-			controler.addControlerListener(agentsInEvacuationAreaActivityCounter);
-			this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(agentsInEvacuationAreaActivityCounter);
-			controler.getEvents().addHandler(agentsInEvacuationAreaActivityCounter);
+			controler.addControlerListener(this.agentsInEvacuationAreaActivityCounter);
+			this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(this.agentsInEvacuationAreaActivityCounter);
+			controler.getEvents().addHandler(this.agentsInEvacuationAreaActivityCounter);
 			
-			this.agentsReturnHomeCounter = new AgentsReturnHomeCounter(scenario, analyzedModes, coordAnalyzer.createInstance(), 
+			this.agentsReturnHomeCounter = new AgentsReturnHomeCounter(scenario, analyzedModes, this.coordAnalyzer.createInstance(), 
 					this.decisionModelRunner.getDecisionDataProvider(), scaleFactor);
 			controler.addControlerListener(this.agentsReturnHomeCounter);
-			this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(agentsReturnHomeCounter);
-			controler.getEvents().addHandler(agentsReturnHomeCounter);
+			this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(this.agentsReturnHomeCounter);
+			controler.getEvents().addHandler(this.agentsReturnHomeCounter);
 		}
+		
+		this.detailedAgentsTracker = new DetailedAgentsTracker(scenario, this.householdsTracker, 
+				this.decisionModelRunner.getDecisionDataProvider(), this.coordAnalyzer);
+		controler.addControlerListener(this.detailedAgentsTracker);
+		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(this.detailedAgentsTracker);
+		controler.getEvents().addHandler(this.detailedAgentsTracker);
 	}
 	
 	private void initWithinDayTravelTimes(Controler controler) {
@@ -418,10 +420,10 @@ public class EvacuationControlerListener implements StartupListener {
 		/*
 		 * Initialize AgentFilters
 		 */
-		InformedAgentsFilterFactory initialReplanningFilterFactory = new InformedAgentsFilterFactory(this.informedHouseholdsTracker, null, 
-				InformedAgentsFilter.FilterType.InitialReplanning);
-		InformedAgentsFilterFactory notInitialReplanningFilterFactory = new InformedAgentsFilterFactory(this.informedHouseholdsTracker, null, 
-				InformedAgentsFilter.FilterType.NotInitialReplanning);
+		InformedAgentsFilterFactory initialReplanningFilterFactory = new InformedAgentsFilterFactory(this.informedHouseholdsTracker, 
+				this.replanningTracker, InformedAgentsFilter.FilterType.InitialReplanning);
+		InformedAgentsFilterFactory notInitialReplanningFilterFactory = new InformedAgentsFilterFactory(this.informedHouseholdsTracker, 
+				this.replanningTracker, InformedAgentsFilter.FilterType.NotInitialReplanning);
 		
 		AffectedAgentsFilterFactory affectedAgentsFilterFactory = new AffectedAgentsFilterFactory(scenario, this.householdsTracker, 
 				mobsimDataProvider, coordAnalyzer, AffectedAgentsFilter.FilterType.NotAffected);

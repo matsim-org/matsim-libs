@@ -96,13 +96,20 @@ public class AgentsToPickupIdentifier extends DuringLegIdentifier {
 
 	public Set<MobsimAgent> getAgentsToReplan(double time) {
 		
-		// Get all agents that could leave their current in this time step.
-		Set<Id> possibleLinkExitAgents = new HashSet<Id>(this.earliestLinkExitTimeProvider.getEarliestLinkExitTimesPerTimeStep(time));
+		Set<MobsimAgent> agentsToReplan = new TreeSet<MobsimAgent>(new PersonAgentComparator());
+		
+		/*
+		 * Get all agents that could leave their current in this time step. If no agent
+		 * can leave its current link, null is returned. As a result, the empty agentsToReplan
+		 * set is returned.
+		 */
+		Set<Id> set = this.earliestLinkExitTimeProvider.getEarliestLinkExitTimesPerTimeStep(time);
+		if (set == null) return agentsToReplan;
+		Set<Id> possibleLinkExitAgents = new HashSet<Id>(set);
 
 		// Apply filter to remove agents that should not be replanned.
 		this.applyFilters(possibleLinkExitAgents, time);
 		
-		Set<MobsimAgent> agentsToReplan = new TreeSet<MobsimAgent>(new PersonAgentComparator());
 		Map<Id, PlannedDeparture> plannedDepartures = new HashMap<Id, PlannedDeparture>();
 		
 		for (Id agentId : possibleLinkExitAgents) {

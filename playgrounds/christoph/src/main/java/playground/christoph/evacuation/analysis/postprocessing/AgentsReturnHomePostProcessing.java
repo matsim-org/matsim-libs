@@ -18,7 +18,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.evacuation.analysis;
+package playground.christoph.evacuation.analysis.postprocessing;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -55,6 +55,8 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.opengis.feature.simple.SimpleFeature;
 
+import playground.christoph.evacuation.analysis.AgentsReturnHomeCounter;
+import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.config.EvacuationConfigReader;
 import playground.christoph.evacuation.controler.PrepareEvacuationScenario;

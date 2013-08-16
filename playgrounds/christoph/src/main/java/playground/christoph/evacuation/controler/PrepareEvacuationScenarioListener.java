@@ -90,7 +90,7 @@ public class PrepareEvacuationScenarioListener {
 		/*
 		 * Read transit router network from file. 
 		 */
-		readTransitRouterNetwork(scenario);
+//		readTransitRouterNetwork(scenario);
 		
 		/*
 		 * Create trip router factory.
