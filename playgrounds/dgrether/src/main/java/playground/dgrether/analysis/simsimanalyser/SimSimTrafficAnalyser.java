@@ -77,23 +77,23 @@ public class SimSimTrafficAnalyser {
 	}
 	
 	
-	private Map<Id, List<CountSimComparison>> createCountSimComparison(Network network, VolumesAnalyzer va1, VolumesAnalyzer va2){
+	private Map<Id, List<CountSimComparison>> createCountSimComparison(Network network, VolumesAnalyzer vaCounts, VolumesAnalyzer vaSim){
 		Map<Id, List<CountSimComparison>> countSimComp = new HashMap<Id, List<CountSimComparison>>(network.getLinks().size());
 
 		for (Link l : network.getLinks().values()) {
-			double[] volumes = va1.getVolumesPerHourForLink(l.getId());
-			double[] volumes2 = va2.getVolumesPerHourForLink(l.getId());
+			double[] volumesCounts = vaCounts.getVolumesPerHourForLink(l.getId());
+			double[] volumesSim = vaSim.getVolumesPerHourForLink(l.getId());
 
-			if ((volumes.length == 0) || (volumes2.length == 0)) {
+			if ((volumesCounts.length == 0) || (volumesSim.length == 0)) {
 				log.warn("No volumes for link: " + l.getId().toString());
 				continue;
 			}
 			ArrayList<CountSimComparison> cscList = new ArrayList<CountSimComparison>();
 			countSimComp.put(l.getId(), cscList);
 			for (int hour = 1; hour <= 24; hour++) {
-				double sim1Value=volumes[hour-1];
-				double sim2Value=volumes2[hour-1];
-				countSimComp.get(l.getId()).add(new CountSimComparisonImpl(l.getId(), hour, sim1Value, sim2Value));
+				double countValue=volumesCounts[hour-1];
+				double simValue=volumesSim[hour-1];
+				countSimComp.get(l.getId()).add(new CountSimComparisonImpl(l.getId(), hour, countValue, simValue));
 			}
 			//sort the list
 			Collections.sort(cscList, new Comparator<CountSimComparison>() {
@@ -134,15 +134,15 @@ public class SimSimTrafficAnalyser {
 		return va;
 	}
 	
-	public void runAnalysis(String networkFile, String eventsFile1, String eventsFile2, String srs, String outfile) {
+	public void runAnalysis(String networkFile, String eventsFileCounts, String eventsFileSim, String srs, String outfile) {
 		Network network = this.loadNetwork(networkFile);
-		VolumesAnalyzer va1 = loadVolumes(network, eventsFile1);
-		VolumesAnalyzer va2 = loadVolumes(network, eventsFile2);
+		VolumesAnalyzer vaCounts = loadVolumes(network, eventsFileCounts);
+		VolumesAnalyzer vaSim = loadVolumes(network, eventsFileSim);
 		
 		CoordinateReferenceSystem networkSrs = MGC.getCRS(srs);
 		
 		Network filteredNetwork = this.applyNetworkFilter(network, networkSrs);
-		Map<Id, List<CountSimComparison>> countSimCompMap = this.createCountSimComparison(filteredNetwork, va1, va2);
+		Map<Id, List<CountSimComparison>> countSimCompMap = this.createCountSimComparison(filteredNetwork, vaCounts, vaSim);
 		
 		new CountsShapefileWriter(filteredNetwork, networkSrs).writeShape(outfile, countSimCompMap);
 
@@ -151,7 +151,7 @@ public class SimSimTrafficAnalyser {
 			countSimComp.addAll(list);
 		}
 		
-//		this.writeKML(filteredNetwork, countSimComp, outfile, srs);
+		this.writeKML(filteredNetwork, countSimComp, outfile, srs);
 
 		this.writeErrorTable(countSimComp, outfile);
 
@@ -178,38 +178,38 @@ public class SimSimTrafficAnalyser {
 	 */
 	public static void main(String[] args) {
 		String net = null;
-		String linkstats1 = null;
-		String linkstats2 = null;
+		String eventsFileCountValues = null;
+		String eventsFileSimValues = null;
 		String outfile = null;
 		String srs = null;
 
 		if (args == null || args.length == 0){
-//			net = "/media/data/work/repos/runs-svn/run1216/1216.output_network.xml.gz";
-//			linkstats1 = "/media/data/work/repos/runs-svn/run1216/ITERS/it.500/1216.500.linkstats.txt.gz";
-//			linkstats2 = "/media/data/work/repos/runs-svn/run1217/ITERS/it.500/1217.500.linkstats.txt.gz";
-//			outfile = "/media/data/work/repos/runs-svn/run1217/ITERS/it.500/1216.500vs1217.500";
-
-			net = "/media/data/work/repos/runs-svn/run1733/1733.output_network.xml.gz";
-			linkstats1 = "/media/data/work/repos/runs-svn/run1712/ITERS/it.1000/1712.1000.events.xml.gz";
-			linkstats2 = "/media/data/work/repos/runs-svn/run1733/ITERS/it.1000/1733.1000.events.xml.gz";
-			outfile = "/media/data/work/repos/runs-svn/run1733/ITERS/it.1000/1712.1000vs1733.1000";
+//			net = "/media/data/work/repos/runs-svn/run1733/1733.output_network.xml.gz";
+//			eventsFileCountValues = "/media/data/work/repos/runs-svn/run1712/ITERS/it.1000/1712.1000.events.xml.gz";
+//			eventsFileSimValues = "/media/data/work/repos/runs-svn/run1733/ITERS/it.1000/1733.1000.events.xml.gz";
+//			outfile = "/media/data/work/repos/runs-svn/run1733/ITERS/it.1000/1712.1000vs1733.1000";
+//	
 			
+			net = "/media/data/work/repos/runs-svn/run1722/1722.output_network.xml.gz";
+			eventsFileCountValues = "/media/data/work/repos/runs-svn/run1722/ITERS/it.1000/1722.1000.events.xml.gz";
+			eventsFileSimValues = "/media/data/work/repos/runs-svn/run1740/ITERS/it.2000/1740.2000.events.xml.gz";
+			outfile = "/media/data/work/repos/runs-svn/run1740/ITERS/it.2000/1722.1000vs1740.2000";
+//
 			srs = TransformationFactory.WGS84_UTM33N;
 			
 			
 		}
 		else {
 			net = args[0];
-			linkstats1 = args[1];
-			linkstats2 = args[2];
+			eventsFileCountValues = args[1];
+			eventsFileSimValues = args[2];
 			outfile = args[3];
 			srs = args[4];
 		}
 
-		String kreisShape = "/media/data/work/repos/shared-svn/studies/countries/de/brandenburg_gemeinde_kreisgrenzen/kreise/dlm_kreis.shp";
 
 		SimSimTrafficAnalyser analyser = new SimSimTrafficAnalyser();
-		analyser.runAnalysis(net, linkstats1, linkstats2, srs, outfile);
+		analyser.runAnalysis(net, eventsFileCountValues, eventsFileSimValues, srs, outfile);
 	}
 
 }

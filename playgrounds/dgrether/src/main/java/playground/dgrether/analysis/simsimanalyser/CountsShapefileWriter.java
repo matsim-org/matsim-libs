@@ -90,7 +90,7 @@ public class CountsShapefileWriter {
 	}
 	
 	private SimpleFeature createFeature(Link link, GeometryFactory geofac, PolygonFeatureFactory factory, List<CountSimComparison> countSimComparisonList) {
-		Coordinate[] coords = PolygonFeatureGenerator.createPolygonCoordsForLink(link, 10.0);
+		Coordinate[] coords = PolygonFeatureGenerator.createPolygonCoordsForLink(link, 20.0);
 //		coords = new Coordinate[] {MGC.coord2Coordinate(link.getFromNode().getCoord()), MGC.coord2Coordinate(link.getToNode().getCoord())};
 		
 		Object [] attribs = new Object[59];

@@ -22,7 +22,9 @@ package playground.dgrether.koehlerstrehlersignal.analysis;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.geotools.geometry.jts.JTS;
@@ -71,16 +73,79 @@ public class DgAnalyseCottbusBasecase {
 	private static class RunInfo {
 		String runId;
 		String remark;
+		public boolean baseCase = false;
 	}
 	
-	//Average traveltime
-	// Average speed
-	// Macroscopic fundamental diagram
-	// Leg histogram, see DgCottbusLegHistogram or LHI
-	// Traffic difference qgis
+	private static class Result {
+		public RunInfo runInfo;
+		public RunResultsLoader runLoader;
+		public Extent extent;
+		public TimeConfig timeConfig;
+		public double travelTime;
+		public double travelTimeDelta;
+		public double averageTravelTime;
+		public double numberOfPersons;
+		public double travelTimePercent;
+		public double personsDelta;
+		
+	}
+	
+	private static class Results {
+		private Map<RunInfo, Map<Extent, Map<TimeConfig,Result>>> resultMap = new HashMap();  
+		
+		private void addResult(Result result) {
+			Map<Extent, Map<TimeConfig, Result>> m = resultMap.get(result.runInfo);
+			if (m == null) {
+				m = new HashMap();
+				resultMap.put(result.runInfo, m);
+			}
+			Map<TimeConfig, Result> m2 = m.get(result.extent);
+			if (m2 == null) {
+				m2 = new HashMap();
+				m.put(result.extent, m2);
+			}
+			m2.put(result.timeConfig, result);
+		}
+		
+		public List<Result> getResults() {
+			List<Result> ret = new ArrayList<Result>();
+			for (Map<Extent, Map<TimeConfig, Result>> m : resultMap.values()) {
+				for (Map<TimeConfig, Result> m2 : m.values()) {
+					ret.addAll(m2.values());
+				}
+			}
+			return ret;
+		}
+		
+	}
+	
+	private Results results = new Results(); 
 
-	private static void analyse(List<RunInfo> runInfos, int iteration, List<TimeConfig> times, List<Extent> extents) {
-		StringBuilder header = new StringBuilder("runId");
+	
+	private void analyseResults() {
+		Map<Extent, Map<TimeConfig, Result>> baseCase = null;
+		for (RunInfo r : results.resultMap.keySet()) {
+			if (r.baseCase) {
+				baseCase = results.resultMap.get(r);
+			}
+		}
+		for (Result r : results.getResults()) {
+			double averageTT = r.travelTime / r.numberOfPersons;
+			r.averageTravelTime = averageTT;
+//			if (! r.runInfo.baseCase) {
+				Result baseResult = baseCase.get(r.extent).get(r.timeConfig);
+				r.travelTimeDelta = r.travelTime - baseResult.travelTime;
+				r.travelTimePercent = r.travelTime / baseResult.travelTime * 100.0;
+				r.personsDelta = r.numberOfPersons - baseResult.numberOfPersons;
+//			}
+			
+		}
+	}
+	
+	private void writeFile(String file) {
+		List<String> lines = new ArrayList<String>();
+		StringBuilder header = new StringBuilder();
+		header.append("runId");
 		header.append("\t");
 		header.append("run?");
 		header.append("\t");
@@ -92,66 +157,46 @@ public class DgAnalyseCottbusBasecase {
 		header.append("\t");
 		header.append("travel time [hh:mm:ss]");
 		header.append("\t");
-		header.append("average travel time");
+		header.append("delta travel time");
+		header.append("\t");
+		header.append("delta travel time [%]");
 		header.append("\t");
 		header.append("number of drivers");
 		header.append("\t");
-		List<String> lines = new ArrayList<String>();
+		header.append("delta drivers");
+		header.append("\t");
+		header.append("average travel time");
+		header.append("\t");
 		lines.add(header.toString());
-		String outputDirectory = null;
-		for (RunInfo runInfo: runInfos) {
-			String runId = runInfo.runId;
-			String runDirectory = DgPaths.REPOS + "runs-svn/run"+runId+"/";
-			outputDirectory = runDirectory;
-			
-			RunResultsLoader runDir = new RunResultsLoader(runDirectory, runId);
-			
-			for (Extent extent : extents) {
-				for (TimeConfig time : times) {
-					NetworkFilter netFilter;
-					if (extent.envelope != null) {
-						Network net = new DgNetShrinkImproved().createSmallNetwork(runDir.getNetwork(), extent.envelope);
-						netFilter = new NetworkFilter(net);
-					}
-					else {
-						netFilter = new NetworkFilter(runDir.getNetwork());
-					}
-					
-					EventsFilterManager eventsManager = new EventsFilterManagerImpl();
-					TimeEventFilter tef = new TimeEventFilter();
-					tef.setStartTime(time.startTime);
-					tef.setEndTime(time.endTime);
-					eventsManager.addFilter(tef);
-					
-					DgAverageTravelTimeSpeed avgTtSpeed = new DgAverageTravelTimeSpeed(netFilter);
-					eventsManager.addHandler(avgTtSpeed);
-					
-					MatsimEventsReader reader = new MatsimEventsReader(eventsManager);
-					reader.readFile(runDir.getEventsFilename(iteration));
-					double averageTT = avgTtSpeed.getTravelTime() / avgTtSpeed.getNumberOfPersons();
-					StringBuilder out = new StringBuilder(runId);
-					out.append("\t");
-					out.append(runInfo.remark);
-					out.append("\t");
-					out.append(extent.name);
-					out.append("\t");
-					out.append(time.name);
-					out.append("\t");
-					out.append(Double.toString(avgTtSpeed.getTravelTime()));
-					out.append("\t");
-					out.append(Time.writeTime(avgTtSpeed.getTravelTime()));
-					out.append("\t");
-					out.append(Double.toString(averageTT));
-					out.append("\t");
-					out.append(Double.toString(avgTtSpeed.getNumberOfPersons()));
-					lines.add(out.toString());
-					log.info(out.toString());
-					log.info("Total travel time : " + avgTtSpeed.getTravelTime() + " Average tt: " + averageTT + " number of persons: " + avgTtSpeed.getNumberOfPersons());
-				}
-			}
+		for (Result r : results.getResults()) {
+			StringBuilder out = new StringBuilder();
+			out.append(r.runInfo.runId);
+			out.append("\t");
+			out.append(r.runInfo.remark);
+			out.append("\t");
+			out.append(r.extent.name);
+			out.append("\t");
+			out.append(r.timeConfig.name);
+			out.append("\t");
+			out.append(Double.toString(r.travelTime));
+			out.append("\t");
+			out.append(Time.writeTime(r.travelTime));
+			out.append("\t");
+			out.append(Double.toString(r.travelTimeDelta));
+			out.append("\t");
+			out.append(Double.toString(r.travelTimePercent));
+			out.append("\t");
+			out.append(Double.toString(r.numberOfPersons));
+			out.append("\t");
+			out.append(Double.toString(r.personsDelta));
+			out.append("\t");
+			out.append(Double.toString(r.averageTravelTime));
+			out.append("\t");
+				lines.add(out.toString());
+			log.info(out.toString());
 		}
-		String outputFilename = outputDirectory + "travel_times_extent.txt";
-		BufferedWriter bw = IOUtils.getBufferedWriter(outputFilename);
+		
+		BufferedWriter bw = IOUtils.getBufferedWriter(file);
 		try {
 			bw.write(header.toString());
 			log.info("Result");
@@ -164,8 +209,60 @@ public class DgAnalyseCottbusBasecase {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		log.info("Analysis completed.");
 	}
+	
+	//Average traveltime
+	// Average speed
+	// Macroscopic fundamental diagram
+	// Leg histogram, see DgCottbusLegHistogram or LHI
+	// Traffic difference qgis
+
+	private void calculateResults(List<RunInfo> runInfos, int iteration, List<TimeConfig> times, List<Extent> extents) {
+		for (RunInfo runInfo: runInfos) {
+			String runId = runInfo.runId;
+			String runDirectory = DgPaths.REPOS + "runs-svn/run"+runId+"/";
+			RunResultsLoader runDir = new RunResultsLoader(runDirectory, runId);
+			
+			for (Extent extent : extents) {
+				for (TimeConfig time : times) {
+					NetworkFilter netFilter;
+					if (extent.envelope != null) {
+						Network net = new DgNetShrinkImproved().createSmallNetwork(runDir.getNetwork(), extent.envelope);
+						netFilter = new NetworkFilter(net);
+					}
+					else {
+						netFilter = new NetworkFilter(runDir.getNetwork());
+					}
+					Result result = new Result();
+					result.runInfo = runInfo;
+					result.runLoader = runDir;
+					result.extent = extent;
+					result.timeConfig = time;
+					results.addResult(result);
+					
+					EventsFilterManager eventsManager = new EventsFilterManagerImpl();
+					TimeEventFilter tef = new TimeEventFilter();
+					tef.setStartTime(time.startTime);
+					tef.setEndTime(time.endTime);
+					eventsManager.addFilter(tef);
+					
+					DgAverageTravelTimeSpeed avgTtSpeed = new DgAverageTravelTimeSpeed(netFilter);
+					eventsManager.addHandler(avgTtSpeed);
+					
+					MatsimEventsReader reader = new MatsimEventsReader(eventsManager);
+					reader.readFile(runDir.getEventsFilename(iteration));
+
+
+					result.travelTime = avgTtSpeed.getTravelTime();
+					result.numberOfPersons = avgTtSpeed.getNumberOfPersons();
+					
+					log.info("Total travel time : " + avgTtSpeed.getTravelTime() + " number of persons: " + avgTtSpeed.getNumberOfPersons());
+				}
+			}
+		}
+		log.info("Calculated results.");
+	}
+
 
 	private static List<TimeConfig> createTimeConfig(){
 		TimeConfig morning = new TimeConfig();
@@ -187,15 +284,16 @@ public class DgAnalyseCottbusBasecase {
 		RunInfo ri = new RunInfo();
 		ri.runId = "1712";
 		ri.remark = "base case";
+		ri.baseCase  = true;
 		l.add(ri);
-		ri = new RunInfo();
-		ri.runId = "1730";
-		ri.remark = "from scratch, com > 50";
-		l.add(ri);
-		ri = new RunInfo();
-		ri.runId = "1731";
-		ri.remark  = "from scratch, com > 10";
-		l.add(ri);
+//		ri = new RunInfo();
+//		ri.runId = "1730";
+//		ri.remark = "from scratch, com > 50";
+//		l.add(ri);
+//		ri = new RunInfo();
+//		ri.runId = "1731";
+//		ri.remark  = "from scratch, com > 10";
+//		l.add(ri);
 		ri = new RunInfo();
 		ri.runId = "1732";
 		ri.remark = "continue 1712, com > 50";
@@ -264,6 +362,14 @@ public class DgAnalyseCottbusBasecase {
 		List<RunInfo> runIds = createRunsIdList();
 		List<TimeConfig> times = createTimeConfig();
 		List<Extent> extents = createExtentList();
-		analyse(runIds, iteration, times, extents);
+		DgAnalyseCottbusBasecase ana = new DgAnalyseCottbusBasecase();
+		ana.calculateResults(runIds, iteration, times, extents);
+		ana.analyseResults();
+		String outputDirectory = DgPaths.SHAREDSVN + "projects/cottbus/cb2ks2010/results/";
+		String outputFilename = outputDirectory + "2013-08-16_travel_times_extent.txt";
+		ana.writeFile(outputFilename);
+
 	}
+
+
 }
