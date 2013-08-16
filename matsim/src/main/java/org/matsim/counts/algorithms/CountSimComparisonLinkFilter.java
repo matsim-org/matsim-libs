@@ -38,7 +38,6 @@ import org.matsim.counts.CountSimComparison;
  */
 public class CountSimComparisonLinkFilter {
 
-	//private final List<List<CountSimComparison>> countSimComparisonLinkMap;
 	private Hashtable<Id, List<CountSimComparison>> countSimComparisonLinkMap;
 	
 	/**

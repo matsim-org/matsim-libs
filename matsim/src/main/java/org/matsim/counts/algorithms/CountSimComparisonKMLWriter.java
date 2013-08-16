@@ -221,7 +221,7 @@ public class CountSimComparisonKMLWriter extends CountSimComparisonWriter {
 	 */
 	@Override
 	public void writeFile(final String filename) {
-
+		log.info("Writing google earth file to " + filename);
 		// init kml
 		this.mainKml = kmlObjectFactory.createKmlType();
 		this.mainDoc = kmlObjectFactory.createDocumentType();
