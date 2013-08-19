@@ -166,6 +166,14 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 	 */
 	@Override
 	public Id chooseNextLinkId() {
+		
+		// Please, let's try, amidst all checking and caching, to have this method return the same thing
+		// if it is called several times in a row. Otherwise, you get Heisenbugs.
+		// I just fixed a situation where this method would give a warning about a bad route and return null
+		// the first time it is called, and happily return a link id when called the second time.
+		
+		// michaz 2013-08
+		
 		if (this.cachedNextLinkId != null) {
 			return this.cachedNextLinkId;
 		}
@@ -198,10 +206,12 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 			return null; // vehicle is at the end of its route
 		}
 
-		this.cachedNextLinkId = this.cachedRouteLinkIds.get(this.currentLinkIdIndex); //save time in later calls, if link is congested
+
+		Id nextLinkId = this.cachedRouteLinkIds.get(this.currentLinkIdIndex);
 		Link currentLink = this.simulation.getScenario().getNetwork().getLinks().get(this.currentLinkId);
-		Link nextLink = this.simulation.getScenario().getNetwork().getLinks().get(this.cachedNextLinkId);
+		Link nextLink = this.simulation.getScenario().getNetwork().getLinks().get(nextLinkId);
 		if (currentLink.getToNode().equals(nextLink.getFromNode())) {
+			this.cachedNextLinkId = nextLinkId; //save time in later calls, if link is congested
 			return this.cachedNextLinkId;
 		}
 		log.warn(this + " [no link to next routenode found: routeindex= " + this.currentLinkIdIndex + " ]");

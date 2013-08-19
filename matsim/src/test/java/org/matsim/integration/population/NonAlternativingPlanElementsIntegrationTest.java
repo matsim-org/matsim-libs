@@ -216,7 +216,7 @@ public class NonAlternativingPlanElementsIntegrationTest {
 		home1.setEndTime(7.0 * 3600);
 
 		Leg leg1 = pf.createLeg("walk");
-		leg1.setRoute(new GenericRouteImpl(new IdImpl(1), new IdImpl(14)));
+		leg1.setRoute(new GenericRouteImpl(new IdImpl(1), new IdImpl(21)));
 
 		Activity work = pf.createActivityFromLinkId("w", new IdImpl(21));
 		work.setEndTime(17.0 * 3600);

@@ -66,7 +66,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	// static variables (no problem with memory)
 	final static Logger log = Logger.getLogger(QLinkImpl.class);
 	private static final Comparator<QVehicle> VEHICLE_EXIT_COMPARATOR = new QVehicleEarliestLinkExitTimeComparator();
-	
+
 	/**
 	 * Reference to the QueueNode which is at the end of each QueueLink instance
 	 */
@@ -79,7 +79,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	final double length;
 
 	public QLaneI road;
-	
+
 	/**
 	 * A list containing all transit vehicles that are at a stop but not
 	 * blocking other traffic on the lane.
@@ -108,7 +108,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		this.toQueueNode = toNode;
 		this.visdata = this.new VisDataImpl() ; // instantiating this here and not earlier so we can cache some things
 	}
-	
+
 	/** 
 	 * This constructor allows inserting a custom vehicle queue proper, e.g. to implement passing.
 	 * 
@@ -187,10 +187,6 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 			if (veh == null) {
 				return;
 			}
-			
-//			System.out.flush() ;
-//			log.warn("veh: " + veh.getId() + " with driver " + veh.getDriver().getId() ) ;
-//			System.err.flush() ;
 
 			this.network.simEngine.getMobsim().getEventsManager().processEvent(
 					new AgentWait2LinkEvent(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId())
@@ -199,17 +195,16 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 			if ( this.addTransitToStopQueue(now, veh) ) {
 				continue ;
 			}
-			
-			if (veh.getDriver() instanceof TransitDriverAgent) {
-				if ( veh.getDriver().chooseNextLinkId() == null) {
-					// This is *not* so that transit drivers with two stops on one link can go to their second stop, as
-					// a previous comment indicated. (All stops on this link are already processed in the previous step)
-					// It is so that transit drivers who enter this link even though it is _the only link on their route_
-					// (normal people don't do that) get a chance to end their trip on this link and not be moved to
-					// the buffer (where they would not be able to stop anymore)!
-					road.addTransitSlightlyUpstreamOfStop(veh) ;
-					continue;
-				}
+
+			if (veh.getDriver().chooseNextLinkId() == null) {
+				// If the driver wants to stop on this link, give them a special treatment.
+				// addFromWait doesn't work here, because after that, they cannot stop anymore.
+				// This is required by transit drivers (hence the method name) who enter this link even though it is the only link on their route.
+				// (Normal agents don't do that). 
+				// I deliberately removed the condition that this is a TransitDriver, because I don't think it can
+				// hurt to allow all vehicles the same special case if it needs to be there at all. michaz 2013-08
+				road.addTransitSlightlyUpstreamOfStop(veh) ;
+				continue;
 			}
 
 			road.addFromWait(veh, now);
@@ -225,7 +220,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 					double delay = driver.handleTransitStop(stop, now);
 					if (delay > 0.0) {
 						// yy removing this condition makes at least one test fail.  I still think we could discuss doing this. kai, jun'13
-						
+
 						veh.setEarliestLinkExitTime(now + delay);
 						// add it to the stop queue: vehicle that is not yet on the road will never block
 						transitVehicleStopQueue.add(veh);
@@ -267,8 +262,8 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		}
 	}
 
-	
-	
+
+
 	HandleTransitStopResult handleTransitStop(final double now, final QVehicle veh, final MobsimDriverAgent driver) {
 		if (driver instanceof TransitDriverAgent) {
 			TransitDriverAgent transitDriver = (TransitDriverAgent) veh.getDriver();
@@ -279,8 +274,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 					veh.setEarliestLinkExitTime(now + delay);
 					// (if the vehicle is not removed from the queue in the following lines, then this will effectively block the lane
 					if (!stop.getIsBlockingLane()) {
-						transitVehicleStopQueue.add(veh); // and add it to the stop queue
-			//			
+						transitVehicleStopQueue.add(veh); 
 						// transit vehicle which is removed to the transit stop space
 						return HandleTransitStopResult.accepted;
 					} else {
@@ -442,7 +436,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		@Override
 		public Collection<AgentSnapshotInfo> getAgentSnapshotInfo( Collection<AgentSnapshotInfo> positions) {
 			AgentSnapshotInfoBuilder snapshotInfoBuilder = QLinkImpl.this.network.simEngine.getAgentSnapshotInfoBuilder();
-			
+
 			VisData roadVisData = road.getVisData() ;
 
 			((QueueWithBuffer.VisDataImpl)roadVisData).setOtfLink( otfLink ) ;
