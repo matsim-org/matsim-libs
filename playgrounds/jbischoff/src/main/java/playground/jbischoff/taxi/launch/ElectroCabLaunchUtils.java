@@ -203,6 +203,7 @@ public class ElectroCabLaunchUtils {
 		optimizer.setRankMode(false);
 		optimizer.setIdleRankMode(true);
 		boolean ALLCARSELECTRIC = true;
+		
 
 		Scenario scenario = data.getScenario();
 		EventsManager events = EventsUtils.createEventsManager();
@@ -234,7 +235,7 @@ public class ElectroCabLaunchUtils {
 				scenario.getNetwork());
 		depotArrivalDepartureCharger = new DepotArrivalDepartureCharger(
 				elvehicles);
-		taxiCustomerWaitTimeAnalyser = new TaxiCustomerWaitTimeAnalyser();
+		taxiCustomerWaitTimeAnalyser = new TaxiCustomerWaitTimeAnalyser(scenario);
 
 		handlerGroup.addHandler(travelDistanceEvaluator);
 		handlerGroup.addHandler(energyConsumptionTracker);
@@ -300,6 +301,7 @@ public class ElectroCabLaunchUtils {
 		System.out.println("writing energy consumption stats directory to "
 				+ dirname);
 		depotArrivalDepartureCharger.getSoCLog().writeToFiles(dirname);
+		depotArrivalDepartureCharger.getChargeLog().writeToFiles(dirname);
 		String dist = travelDistanceEvaluator
 				.writeTravelDistanceStatsToFiles(dirname
 						+ "travelDistanceStats.txt");

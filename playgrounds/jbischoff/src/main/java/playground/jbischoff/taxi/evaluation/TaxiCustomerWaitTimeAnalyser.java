@@ -28,8 +28,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
 
+import org.geotools.filter.expression.ThisPropertyAccessorFactory;
+import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
@@ -48,9 +53,16 @@ public class TaxiCustomerWaitTimeAnalyser implements
 
 	private Map<Id,Double> taxicalltime;
 	private List<Double> totalWaitTime;
-	public TaxiCustomerWaitTimeAnalyser() {
-
+	private Map<Id,Double> linkWaitTime;
+	private Map<Id,Long> linkWaitPeople;
+	private Map<Id,Id> linkAg;
+	private Scenario scenario; 
+	public TaxiCustomerWaitTimeAnalyser(Scenario scen) {
+			this.scenario= scen;
 			this.taxicalltime = new HashMap<Id,Double>();
+			this.linkWaitTime = new TreeMap<Id,Double>();
+			this.linkWaitPeople = new HashMap<Id, Long>();
+			this.linkAg = new HashMap<Id, Id>();
 			this.totalWaitTime=new ArrayList<Double>();
 			}
 
@@ -66,12 +78,23 @@ public class TaxiCustomerWaitTimeAnalyser implements
 		this.totalWaitTime.add(waitingtime);
 		this.taxicalltime.remove(event.getPersonId());
 		
+		double linkWait=waitingtime;
+		if (this.linkWaitTime.containsKey(this.linkAg.get(event.getPersonId()))) linkWait = linkWait + this.linkWaitTime.get(this.linkAg.get(event.getPersonId())); 
+		this.linkWaitTime.put(this.linkAg.get(event.getPersonId()), linkWait);
+		this.linkAg.remove(event.getPersonId());
+		
 	}
 
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
 		if (!event.getLegMode().equals(TaxiModeDepartureHandler.TAXI_MODE)) return;
 		this.taxicalltime.put(event.getPersonId(),event.getTime());
+		this.linkAg.put(event.getPersonId(), event.getLinkId());
+		
+		long people = 0;;
+		if (linkWaitPeople.containsKey(event.getLinkId())) people = linkWaitPeople.get(event.getLinkId());
+		people++;
+		linkWaitPeople.put(event.getLinkId(), people);
 				
 	}
 	public double calculateAverageWaitTime(){
@@ -102,6 +125,19 @@ public class TaxiCustomerWaitTimeAnalyser implements
 			bw.write("total taxi trips\taverage wait Time\tMinimum Wait Time\tMaximum Wait Time\n");
 			String output =this.totalWaitTime.size()+"\t"+Math.round(this.calculateAverageWaitTime())+"\t"+Math.round(this.returnMinWaitTime())+"\t"+Math.round(this.returnMaxWaitTime());
 			bw.write(output);
+			bw.newLine();
+			
+			
+			bw.flush();
+			bw.close();
+			
+			bw = new BufferedWriter(new FileWriter(new File(waitstatsFile+"linkWait.txt")));
+			for (Entry<Id,Double> e:this.linkWaitTime.entrySet()){
+				Coord coord = scenario.getNetwork().getLinks().get(e.getKey()).getCoord();
+				bw.write(e.getKey()+"\t"+coord.getX() +"\t"+coord.getY()+"\t"+e.getValue()+"\t"+this.linkWaitPeople.get(e.getKey()));
+				bw.newLine();
+			}
+			
 			bw.flush();
 			bw.close();
 			return output;

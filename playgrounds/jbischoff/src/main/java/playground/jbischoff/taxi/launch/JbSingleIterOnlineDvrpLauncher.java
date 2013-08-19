@@ -95,16 +95,18 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
         netFileName = dirName + "network.xml";
         
 //        electricStatsDir = dirName +"electric_nodepots\\";
-//        electricStatsDir = dirName +"electric_idledepots\\";
+        electricStatsDir = dirName +"electric_idledepots\\";
 //        electricStatsDir = dirName +"electric_depots\\";
 //        electricStatsDir = dirName +"gas_nodepots\\";
 //      electricStatsDir = dirName +"gas_idledepots\\";
 //      electricStatsDir = dirName +"gas_depots\\";
-        electricStatsDir = dirName +"electric_9\\";
+//        electricStatsDir = dirName +"modifiedDispatch_SL\\";
+//        electricStatsDir = dirName +"1charger\\";
+
 
         plansFileName = dirName + "20.plans.xml.gz";
 
-        taxiCustomersFileName = dirName + "taxiCustomers_09_pc.txt";
+        taxiCustomersFileName = dirName + "taxiCustomers_05_pc.txt";
         // taxiCustomersFileName = dirName + "taxiCustomers_10_pc.txt";
 
         depotsFileName = dirName + "depots-5_taxis-50.xml";
@@ -245,10 +247,10 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
     	
         JbSingleIterOnlineDvrpLauncher launcher;
         launcher = new JbSingleIterOnlineDvrpLauncher();
-        launcher.goIncreasedDemand(11);
+//        launcher.goIncreasedDemand(11);
        
-//        launcher.go(0);
-//        launcher.generateOutput();
+        launcher.go(0);
+        launcher.generateOutput();
     }
 
 

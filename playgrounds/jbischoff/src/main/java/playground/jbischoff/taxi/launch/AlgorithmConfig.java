@@ -189,7 +189,7 @@ import playground.jbischoff.taxi.optimizer.rank.RankTaxiOptimizer;
     {
         switch (algorithmType) {
             case NO_SCHEDULING:
-                return new NOSRankTaxiOptimizer(data,destinationKnown, this == NOS_FREE_FLOW);
+                return new NOSRankTaxiOptimizer(data,destinationKnown,true);
             default:
                 throw new IllegalStateException();
         }
