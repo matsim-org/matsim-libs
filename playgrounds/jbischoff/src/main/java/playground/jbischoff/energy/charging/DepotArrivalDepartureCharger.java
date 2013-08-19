@@ -18,34 +18,49 @@ import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandle
 
 import org.matsim.core.basic.v01.IdImpl;
 
+import playground.jbischoff.energy.log.ChargeLogRow;
+import playground.jbischoff.energy.log.ChargerLog;
 import playground.jbischoff.energy.log.SoCLog;
 import playground.jbischoff.energy.log.SocLogRow;
 
 public class DepotArrivalDepartureCharger implements AgentArrivalEventHandler,
 		AgentDepartureEventHandler {
 
-	private List<Id> depotLocations;
+	private HashMap<Id,Integer> depotLocations;
+	private HashMap<Id,Integer> currentChargerOccupation;
 	private HashMap<Id, Vehicle> vehicles;
+	
 	private HashMap<Id, Double> arrivalTimes;
 	private HashMap<Id, Double> socUponArrival;
+	private HashMap<Id,Id> arrivalLinks;
+	private HashMap<Id,Id> chargingVehicles;
+	
 	private final double MINIMUMCHARGETIME = 120.;
 	private final double POWERINKW = 50.0; // max charge for Nissan Leaf
+//	private final double POWERINKW = 22.0; // max charge at standard Berlin Charger
+	private final int DEPOTCHARGERAMOUNT = 10; //amount of chargers at each depot location
+	
 	private final double MINIMUMSOCFORDEPARTURE = 5.;
 	private static final Logger log = Logger
 			.getLogger(DepotArrivalDepartureCharger.class);
 	private final double NEEDSTORETURNTORANKSOC = 6.;
 	private SoCLog soCLog;
-
+	private ChargerLog chargerLog;
 	public DepotArrivalDepartureCharger(HashMap<Id, Vehicle> vehicles) {
 		this.vehicles = vehicles;
 		this.arrivalTimes = new HashMap<Id, Double>();
 		this.socUponArrival = new HashMap<Id, Double>();
 		this.soCLog = new SoCLog();
+		this.arrivalLinks = new HashMap<Id, Id>();
+		this.chargingVehicles=new HashMap<Id, Id>();
+		this.chargerLog = new ChargerLog();
 	}
 
 	@Override
 	public void reset(int iteration) {
 		this.arrivalTimes.clear();
+		this.soCLog.reset();
+		this.chargerLog.reset();
 	}
 
 	public void doSimStep(double time) {
@@ -81,9 +96,11 @@ public class DepotArrivalDepartureCharger implements AgentArrivalEventHandler,
 		// " new SoC: " +
 		// (((BatteryElectricVehicle)this.vehicles.get(event.getPersonId())).getSocInJoules()/3600/1000)
 		// );
+		this.removeVehicleFromCharger(event.getPersonId());
 
 		this.arrivalTimes.remove(event.getPersonId());
 		this.socUponArrival.remove(event.getPersonId());
+		this.arrivalLinks.remove(event.getPersonId());
 
 	}
 
@@ -101,39 +118,83 @@ public class DepotArrivalDepartureCharger implements AgentArrivalEventHandler,
 						((BatteryElectricVehicle) this.vehicles.get(event
 								.getPersonId())).getSocInJoules());
 		this.arrivalTimes.put(event.getPersonId(), event.getTime());
+		this.arrivalLinks.put(event.getPersonId(), event.getLinkId());
 
 	}
 
 	private void chargeAllVehiclesInDepots(double time, double duration) {
 
 		for (Entry<Id, Double> e : arrivalTimes.entrySet()) {
+			
 			double chargeWatt = duration * POWERINKW * 1000;
 			if (time - e.getValue() < MINIMUMCHARGETIME)
 				continue;
 			if (((BatteryElectricVehicle) this.vehicles.get(e.getKey()))
 					.getSocInJoules() >= ((BatteryElectricVehicle) this.vehicles
 					.get(e.getKey())).getUsableBatteryCapacityInJoules() * 0.8)
-				continue;
-
-			// max charge = 80% of usable battery according to CHAdeMO
+				// max charge = 80% of usable battery according to CHAdeMO
+			
+				{
+				removeVehicleFromCharger(e.getKey());
+				continue;	
+				}
+			if (!isConnectedToCharger(e.getKey()) ){
+				if (chargerHasFreeSpaceForVehicle(e.getKey())) addVehicleToCharger(e.getKey());
+			}	
+			if (isConnectedToCharger(e.getKey())){
+				
 			if (((BatteryElectricVehicle) this.vehicles.get(e.getKey()))
 					.getSocInJoules() + chargeWatt >= ((BatteryElectricVehicle) this.vehicles
 					.get(e.getKey())).getUsableBatteryCapacityInJoules() * 0.8) {
-				chargeWatt = ((BatteryElectricVehicle) this.vehicles.get(e
-						.getKey())).getUsableBatteryCapacityInJoules()
-						* .8
-						- ((BatteryElectricVehicle) this.vehicles.get(e
-								.getKey())).getSocInJoules();
+				chargeWatt = ((BatteryElectricVehicle) this.vehicles.get(e.getKey())).getUsableBatteryCapacityInJoules()* .8- ((BatteryElectricVehicle) this.vehicles.get(e.getKey())).getSocInJoules();
 			}
-			((BatteryElectricVehicle) this.vehicles.get(e.getKey()))
-					.chargeBattery(chargeWatt);
-			// log.info("Charged v"+e.getKey()+" with" + (chargeWatt/1000.)
-			// +" kW");
+			((BatteryElectricVehicle) this.vehicles.get(e.getKey())).chargeBattery(chargeWatt);
+			// log.info("Charged v"+e.getKey()+" with" + (chargeWatt/1000.)+" kW");
 
+			}
 		}
 
 	}
+	
+	private void addVehicleToCharger(Id vehicleId)
+	{
+		Id linkId = this.arrivalLinks.get(vehicleId);
+		this.chargingVehicles.put(vehicleId, linkId);
+		int occ = this.currentChargerOccupation.get(linkId);
+		occ++;
+		this.currentChargerOccupation.put(linkId, occ);
+		log.info("Added vehicle "+vehicleId+ "to Charger "+linkId+" load: "+occ);
+		
+	}
 
+	private void removeVehicleFromCharger(Id vehicleId)
+	{
+		if (chargingVehicles.containsKey(vehicleId)){
+		Id linkId = this.arrivalLinks.get(vehicleId);
+		int occ = this.currentChargerOccupation.get(linkId);
+		occ--;
+		this.currentChargerOccupation.put(linkId, occ);
+		chargingVehicles.remove(vehicleId);
+		log.info("Removed vehicle "+vehicleId+ "to Charger "+linkId+" load: "+occ);
+
+		}
+		
+	}
+	private boolean isConnectedToCharger(Id vehicleId){
+	
+		return chargingVehicles.containsKey(vehicleId);
+	}
+	
+	
+	
+	private boolean chargerHasFreeSpaceForVehicle(Id vehicleId){
+		boolean result = false;
+		Id linkId = this.arrivalLinks.get(vehicleId);
+		int occ= this.currentChargerOccupation.get(linkId);
+		int max= this.depotLocations.get(linkId);
+		if (occ<max) result= true;
+		return result;
+	}
 	public void refreshLog(double time) {
 		List<Double> currentSoc = new ArrayList<Double>();
 
@@ -160,10 +221,21 @@ public class DepotArrivalDepartureCharger implements AgentArrivalEventHandler,
 			double average = socs / currentSoc.size();
 			this.soCLog.add(new SocLogRow(new IdImpl("ave"), time, average, 0));
 		}
+		for (Entry<Id,Integer> e : this.currentChargerOccupation.entrySet()){
+			double rocc = (double) e.getValue() / (double) this.depotLocations.get(e.getKey());
+			this.chargerLog.add(new ChargeLogRow(e.getKey(), time, e.getValue(), rocc));
+		}
 	}
 
 	public void setDepotLocations(List<Id> depots) {
-		this.depotLocations = depots;
+		this.depotLocations = new HashMap<Id, Integer>();
+		this.currentChargerOccupation = new HashMap<Id, Integer>();
+		for (Id did : depots){
+			
+			this.depotLocations.put(did, DEPOTCHARGERAMOUNT);
+			this.currentChargerOccupation.put(did, 0);
+		}
+		
 	}
 
 	private boolean isMonitoredVehicle(Id agentId) {
@@ -171,7 +243,7 @@ public class DepotArrivalDepartureCharger implements AgentArrivalEventHandler,
 	}
 
 	private boolean isAtDepotLocation(Id linkId) {
-		return (this.depotLocations.contains(linkId));
+		return (this.depotLocations.containsKey(linkId));
 	}
 
 	private boolean isBatteryElectricVehicle(Id agentId) {
@@ -180,6 +252,9 @@ public class DepotArrivalDepartureCharger implements AgentArrivalEventHandler,
 
 	public SoCLog getSoCLog() {
 		return soCLog;
+	}
+	public ChargerLog getChargeLog(){
+		return chargerLog;
 	}
 
 	public boolean isChargedForTask(Id carId) {
@@ -202,12 +277,17 @@ public class DepotArrivalDepartureCharger implements AgentArrivalEventHandler,
 
 		if (this.vehicles.containsKey(carId))
 			if (isBatteryElectricVehicle(carId))
-				if (((BatteryElectricVehicle) this.vehicles.get(carId))
-						.getSocInJoules() < this.NEEDSTORETURNTORANKSOC * 3600 * 1000) {
+				if (((BatteryElectricVehicle) this.vehicles.get(carId)).getSocInJoules() < this.NEEDSTORETURNTORANKSOC * 3600 * 1000) {
 					lackOfSoc = true;
 				}
 
 		return lackOfSoc;
+	}
+
+	public double getVehicleSoc(Id carId) {
+		if ((this.vehicles.containsKey(carId))&&(isBatteryElectricVehicle(carId)))
+				return ((BatteryElectricVehicle) this.vehicles.get(carId)).getSocInJoules();
+		else return 0;
 	}
 
 }
