@@ -29,6 +29,7 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.collections.Tuple;
+import org.matsim.counts.CountSimComparison;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.SignalsScenarioLoader;
 import org.matsim.signalsystems.data.SignalsScenarioWriter;
@@ -52,22 +53,14 @@ public class ConvertCottbusSolution2Matsim {
 		KS2010SolutionTXTParser10  solutionParser = new KS2010SolutionTXTParser10();
 		solutionParser.readFile(directory + inputFile);
 		
+		DgIdPool idPool = DgIdPool.readFromFile(directory + "id_conversions.txt");
 		
+		SignalsData signalsData = loadSignalsData(directory);
+
 		List<KS2010CrossingSolution> solutionCrossings = solutionParser.getSolutionCrossings();
 
-		DgIdPool idPool = DgIdPool.readFromFile(directory + "id_conversions.txt");
-		SignalsData signalsData = loadSignalsData(directory);
-		
 		convertSignals(solutionCrossings, idPool, signalsData);
-		
-		writeSignalControl(directory, inputFile, signalsData);
-		
-		DgIdConverter dgIdConverter = new DgIdConverter(idPool);
-		
-		Map<Integer, Double> ks2010StreetIdFlow = solutionParser.getStreetFlow();
-		
-		convertFlow(idPool, dgIdConverter, ks2010StreetIdFlow);
-		
+		writeSignalControl(directory, inputFile, signalsData);		
 	}
 
 	private void convertSignals(List<KS2010CrossingSolution> solutionCrossings,
@@ -81,20 +74,6 @@ public class ConvertCottbusSolution2Matsim {
 		removeSignalSystems(signalsData, new IdImpl("13"));
 	}
 
-	private void convertFlow(DgIdPool idPool, DgIdConverter dgIdConverter,
-			Map<Integer, Double> ks2010StreetIdFlow) {
-		// convert ks2010_id to matsim_id in the unsimplified network
-		Map<Id, Double> matsimLinkIdFlow = new HashMap<Id, Double>();
-		for (Integer intStreetId : ks2010StreetIdFlow.keySet()){
-			String stringStreetId = idPool.getStringId(intStreetId);
-			Id linkId = dgIdConverter.convertStreetId2LinkId(new IdImpl(stringStreetId));
-			// assign the flow to all links that belongs to the simplified link
-			String[] unsimplifiedLinks = linkId.toString().split("-");
-			for (int i=0; i<unsimplifiedLinks.length; i++)
-				matsimLinkIdFlow.put(new IdImpl(unsimplifiedLinks[i]), ks2010StreetIdFlow.get(intStreetId));
-		}
-	}
-	
 	private void removeSignalSystems(SignalsData signalData, Id...ids) {
 		for (Id id : ids) {
 			signalData.getSignalSystemsData().getSignalSystemData().remove(id);
@@ -102,7 +81,6 @@ public class ConvertCottbusSolution2Matsim {
 			signalData.getSignalControlData().getSignalSystemControllerDataBySystemId().remove(id);
 		}
 	}
-	
 
 	private SignalsData loadSignalsData(String directory) {
 		Config config = ConfigUtils.createConfig(); 
@@ -113,8 +91,6 @@ public class ConvertCottbusSolution2Matsim {
 		SignalsData signals = signalsLoader.loadSignalsData();
 		return signals;
 	}
-
-
 
 	private void writeSignalControl(String directoryPath, String inputFilename, SignalsData signalsData) {
 		SignalsScenarioWriter writer = new SignalsScenarioWriter();
@@ -147,11 +123,6 @@ public class ConvertCottbusSolution2Matsim {
 				DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-07-31_minflow_10_morning_peak/",
 				"ksm_10m_sol.txt"
 		));
-//		input.add(new Tuple<String, String>(
-//						"C:/Users/Atany/Desktop/SHK/SVN/projects_cottbus/cb2ks2010/2013-07-31_minflow_50_evening_peak/",
-//						"ksm_50a_sol.txt"
-//						));
-
 		
 		for (Tuple<String, String> i : input){
 			new ConvertCottbusSolution2Matsim().convert(i.getFirst(), i.getSecond());
