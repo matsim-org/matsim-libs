@@ -869,12 +869,6 @@ public final class QLane extends AbstractQLane implements QLaneI, Identifiable, 
 		throw new UnsupportedOperationException() ;
 	}
 
-	@Override
-	public QVehicle removeVehicleFromQueue(double now) {
-		// TODO Auto-generated method stub
-		throw new UnsupportedOperationException() ;
-	}
-
 }
 
 

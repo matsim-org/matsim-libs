@@ -348,8 +348,7 @@ SignalizeableItem, QLaneI {
 		return this.storageCapacity;
 	}
 
-	@Override
-	public QVehicle removeVehicleFromQueue(double now) {
+	private QVehicle removeVehicleFromQueue(double now) {
 		QVehicle veh = this.vehQueue.poll();
 		this.usedStorageCapacity --; //peds = veh.getSizeInEquivalents();
 

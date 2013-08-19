@@ -58,6 +58,11 @@ import org.matsim.vis.snapshotwriters.VisData;
  */
 public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 
+	public enum HandleTransitStopResult {
+		continue_driving, rehandle, accepted
+
+	}
+
 	// static variables (no problem with memory)
 	final static Logger log = Logger.getLogger(QLinkImpl.class);
 	private static final Comparator<QVehicle> VEHICLE_EXIT_COMPARATOR = new QVehicleEarliestLinkExitTimeComparator();
@@ -195,22 +200,13 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 				continue ;
 			}
 			
-			// * a newly departing transit vehicle comes via wait, as all other vehicles.
-			// * if it has a stop on its first link, AND there is a passenger waiting, the vehicle is now in the transit stop queue
-			// and all is well.
-			// * if it did, however, not take a passenger on board, it is now here.  From here, it will depart like a normal vehicle,
-			// which is too far downstream to be able to stop a second time on this link.
-			// need to do something against that:
 			if (veh.getDriver() instanceof TransitDriverAgent) {
-				if ( veh.getDriver().chooseNextLinkId().equals(veh.getDriver().getCurrentLinkId())) {
-
-// this was the old logic.  It is now jun'13, maybe delete after jun'14 (or even earlier).			
-//					if ( veh.getDriver().chooseNextLinkId() == null || veh.getDriver().chooseNextLinkId().equals(veh.getDriver().getCurrentLinkId())) {
-//					veh.getDriver().endLegAndComputeNextState(now);
-//					this.addParkedVehicle(veh);
-//					this.network.simEngine.internalInterface.arrangeNextAgentState(veh.getDriver()) ;
-//					this.makeVehicleAvailableToNextDriver(veh, now);
-					
+				if ( veh.getDriver().chooseNextLinkId() == null) {
+					// This is *not* so that transit drivers with two stops on one link can go to their second stop, as
+					// a previous comment indicated. (All stops on this link are already processed in the previous step)
+					// It is so that transit drivers who enter this link even though it is _the only link on their route_
+					// (normal people don't do that) get a chance to end their trip on this link and not be moved to
+					// the buffer (where they would not be able to stop anymore)!
 					road.addTransitSlightlyUpstreamOfStop(veh) ;
 					continue;
 				}
@@ -271,32 +267,38 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		}
 	}
 
-	boolean handleTransitStop(final double now, final QVehicle veh, final MobsimDriverAgent driver) {
-		boolean handled = false;
-		// handle transit driver if necessary
+	
+	
+	HandleTransitStopResult handleTransitStop(final double now, final QVehicle veh, final MobsimDriverAgent driver) {
 		if (driver instanceof TransitDriverAgent) {
 			TransitDriverAgent transitDriver = (TransitDriverAgent) veh.getDriver();
 			TransitStopFacility stop = transitDriver.getNextTransitStop();
 			if ((stop != null) && (stop.getLinkId().equals(getLink().getId()))) {
 				double delay = transitDriver.handleTransitStop(stop, now);
 				if (delay > 0.0) {
-
 					veh.setEarliestLinkExitTime(now + delay);
 					// (if the vehicle is not removed from the queue in the following lines, then this will effectively block the lane
-
 					if (!stop.getIsBlockingLane()) {
-//						this.road.vehQueue.poll(); // remove the bus from the queue
-						this.road.removeVehicleFromQueue(now) ;
 						transitVehicleStopQueue.add(veh); // and add it to the stop queue
+			//			
+						// transit vehicle which is removed to the transit stop space
+						return HandleTransitStopResult.accepted;
+					} else {
+						// transit vehicle which blocks its lane by getting its exit time increased
+						return HandleTransitStopResult.rehandle;
 					}
+				} else {
+					// transit vehicle which instantaneously delivered passangers
+					return HandleTransitStopResult.rehandle;
 				}
-				/* start over: either this veh is still first in line,
-				 * but has another stop on this link, or on another link, then it is moved on
-				 */
-				handled = true;
+			} else {
+				// transit vehicle which either arrives or continues driving
+				return HandleTransitStopResult.continue_driving;
 			}
+		} else {
+			// not a transit vehicle
+			return HandleTransitStopResult.continue_driving;
 		}
-		return handled;
 	}
 
 	@Override

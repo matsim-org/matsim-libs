@@ -84,10 +84,5 @@ interface QLaneI {
 	 * Needs to be added _upstream_ of the regular stop location so that a possible second stop on the link can also be served.
 	 */
 	void addTransitSlightlyUpstreamOfStop(final QVehicle veh);
-	
-	/**
-	 * needs more thinking, but better than direct access to the queue data structure.
-	 */
-	QVehicle removeVehicleFromQueue(final double now) ;
 
 }

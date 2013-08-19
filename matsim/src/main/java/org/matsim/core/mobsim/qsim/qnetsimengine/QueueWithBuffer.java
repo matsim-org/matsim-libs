@@ -33,7 +33,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl.HandleTransitStopResult;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -191,7 +191,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 	public final void updateRemainingFlowCapacity() {
 		remainingflowCap = flowCapacityPerTimeStep;
 		//				if (this.thisTimeStepGreen && this.flowcap_accumulate < 1.0 && this.hasBufferSpaceLeft()) {
-		if (thisTimeStepGreen && flowcap_accumulate < 1.0 && qLinkImpl.isNotOfferingVehicle() ) {
+		if (thisTimeStepGreen && flowcap_accumulate < 1.0 && isNotOfferingVehicle() ) {
 			flowcap_accumulate += flowCapacityPerTimeStepFractionalPart;
 		}
 	}
@@ -318,18 +318,19 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 			}
 			MobsimDriverAgent driver = veh.getDriver();
 
-			if ( qLinkImpl.handleTransitStop(now, veh, driver) ) {
-				continue ;
-			}
+			HandleTransitStopResult handleTransitStop = qLinkImpl.handleTransitStop(now, veh, driver);
+			if (handleTransitStop == HandleTransitStopResult.accepted) {
+				// vehicle has been accepted into the transit vehicle queue of the link.
+				removeVehicleFromQueue(now) ;
+				continue;
+			} else if (handleTransitStop == HandleTransitStopResult.rehandle) {
+				continue;
+			} else if (handleTransitStop == HandleTransitStopResult.continue_driving) {
+				// Do nothing, but go on.. 
+			} 
 
 			// Check if veh has reached destination:
-			if ((qLinkImpl.getLink().getId().equals(driver.getDestinationLinkId())) && (driver.chooseNextLinkId() == null)) {
-				// (1) we want to be able to have vehicles drive in circles. Thus, as long as they still have a next link,
-				// they continue, even if here is their ultimate destination.
-				// (2) On the other hand, we do not want to rely ONLY on the route plan since technically an agent does not
-				// need to know the next link here already (this might be more picky than necessary; presumably,
-				// it started out as the first condition, and then the second was added to allow driving in circles.)
-				// kai, jun'13
+			if ((driver.chooseNextLinkId() == null)) {
 				letVehicleArrive(now, veh);
 				continue;
 			}
@@ -339,21 +340,12 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 				return;
 			}
 
-			if (driver instanceof TransitDriverAgent) {
-				if (driver.chooseNextLinkId() == null || driver.chooseNextLinkId().equals(driver.getCurrentLinkId())) {
-					// transit drivers sometimes have weaker requirements to arrive
-
-					letVehicleArrive(now,veh) ;
-					continue;
-				}
-			}
 			addFromWait(veh, now);
 			removeVehicleFromQueue(now);
 		} // end while
 	}
 
-	@Override
-	public QVehicle removeVehicleFromQueue(final double now) {
+	private QVehicle removeVehicleFromQueue(final double now) {
 		QVehicle veh = vehQueue.poll();
 		usedStorageCapacity -= veh.getSizeInEquivalents();
 		if ( QueueWithBuffer.HOLES ) {

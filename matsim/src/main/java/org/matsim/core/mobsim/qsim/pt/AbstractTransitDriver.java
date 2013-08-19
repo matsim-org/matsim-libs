@@ -105,6 +105,14 @@ public abstract class AbstractTransitDriver implements TransitDriverAgent, PlanA
 			return linkIds.get(this.nextLinkIndex);
 		}
 		if (this.nextLinkIndex == linkIds.size()) {
+			if (linkIds.size() == 0 && netR.getStartLinkId().equals(netR.getEndLinkId())) {
+				// unfortunate exception for the unlikely but legal and test-covered case where a whole transit line
+				// takes place on a single link.
+				// would not need to be here if a route were simply a list of linkIds to traverse, with 1 being an allowed length.
+				// this used to return endLinkId, which would then require a transit-specific extra case for arriving vehicles
+				// in QLinkImpl, which was even worse.
+				return null;
+			}
 			return netR.getEndLinkId();
 		}
 		assertAllStopsServed();
