@@ -20,12 +20,11 @@
 package playground.andreas.virginia;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
-
-import playground.andreas.P2.helper.PScenarioImpl;
 
 
 /**
@@ -47,8 +46,7 @@ public class VControler{
 		Config config = new Config();
 		ConfigUtils.loadConfig(config, args[0]);
 		
-		PScenarioImpl scenario = new PScenarioImpl(config);
-		ScenarioUtils.loadScenario(scenario);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
 		Controler controler = new Controler(scenario);
 		
 //		controler.setOverwriteFiles(true);
