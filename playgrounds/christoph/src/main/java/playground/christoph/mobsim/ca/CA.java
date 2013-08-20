@@ -81,6 +81,7 @@ public class CA implements MobsimEngine {
 	private final double endTime;
 	private final Random random;
 	
+	private InternalInterface internalInterface;
 	private double currentTime = Time.UNDEFINED_TIME;
 	private Map<Id, CAAgent> agents;
 	private PriorityQueue<CAAgent> waitingForSimulationQueue;
@@ -287,6 +288,7 @@ public class CA implements MobsimEngine {
 
 					// change agent's state from activity to leg
 					agent.getMobsimAgent().endActivityAndComputeNextState(this.currentTime);
+//					this.simEngine.internalInterface.arrangeNextAgentState(agent);
 					
 					this.caServer.addAgentToWaitingQueue(link.getToNode().getId(), agent);
 					
@@ -352,7 +354,8 @@ public class CA implements MobsimEngine {
 	// returns true of the node can be de-activated
 	public boolean updateNode(CANode node) {
 		CAAgent agent = node.getAgent();
-		CALink link = agent.getNextLink(node.getId());
+		Id linkId = agent.chooseNextLinkId();
+		CALink link = (CALink) this.network.getNetsimLink(linkId);
 		// if the agent's next link is null, we assume that its leg end on the current node
 		if (link == null) {
 			node.setAgent(null);
@@ -380,7 +383,7 @@ public class CA implements MobsimEngine {
 //      end 
 	public void updateLinks() {
 		// TODO: this is not random anymore
-		for (Id linkId : this.caServer.getLinkQueuesKeys()) {
+		for (Id linkId : this.caServer.getActiveLinkIds()) {
 			this.updateLink(linkId);
 		}
 		this.caServer.finishLinks(this.network);
@@ -596,7 +599,6 @@ public class CA implements MobsimEngine {
 
 	@Override
 	public void setInternalInterface(InternalInterface internalInterface) {
-		// TODO Auto-generated method stub
-		
+		this.internalInterface = internalInterface;
 	}
 }

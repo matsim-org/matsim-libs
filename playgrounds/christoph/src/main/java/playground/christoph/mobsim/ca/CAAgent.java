@@ -29,11 +29,13 @@ import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.gbl.MatsimRandom;
+import org.matsim.core.mobsim.framework.DriverAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetwork;
 import org.matsim.core.utils.geometry.CoordUtils;
 
-public class CAAgent {
+public class CAAgent implements DriverAgent {
 
 	private MobsimAgent mobsimAgent;
 	private CAParkingLot parkingLot;
@@ -44,7 +46,7 @@ public class CAAgent {
 	private CARoute routeAway;
 	private ParkingDecision parkingDecisionType;
 	private Id linkMemoryLastVisitedNodeId;
-	private NetsimNetwork infrastructure;	// TODO: rename this
+	private NetsimNetwork network;
 	private RouteChoice routeChooser;
 	private Random random;
 	
@@ -64,7 +66,7 @@ public class CAAgent {
 	
 	public CAAgent(MobsimAgent agent, NetsimNetwork network) {
 		this.mobsimAgent = agent;
-		this.infrastructure = network;
+		this.network = network;
 		
 		this.random = MatsimRandom.getLocalInstance();
 		this.routeChooser = new RandomRouteChoice();
@@ -171,24 +173,29 @@ public class CAAgent {
 //          %DEBUG
 //          %link
 //      end
-	public CALink getNextLink(Id currentNodeId) {
+
+	@Override
+	public Id chooseNextLinkId() {
+		
+		Id currentLinkId = this.getMobsimAgent().getCurrentLinkId();
+		Id currentNodeId = this.network.getNetsimLink(currentLinkId).getLink().getToNode().getId();
 		
 		//either give next link on the route to destination or give next link for parking search
 		CALink link = null;
 		
 		// agent has not yet started parking search -> follow routeTo
 		if (this.startTimeSearchingForParking < 0 && !this.transit) {
-			link = this.routeTo.getNextLink(currentNodeId, this.infrastructure);
+			link = this.routeTo.getNextLink(currentNodeId, this.network);
 		} else {
 			// agent has left parking lot and is now on the way back home -> follow routeAway
 			if (this.parkTime > 0 || this.transit) {
-				link = this.routeAway.getNextLink(currentNodeId, this.infrastructure); 
+				link = this.routeAway.getNextLink(currentNodeId, this.network); 
 			} else { // agent searches a parking lot
-				CANode destination = (CANode) this.infrastructure.getNetsimNode(this.getDestinationNodeId());
-				CANode currentNode = (CANode) this.infrastructure.getNetsimNode(currentNodeId);
+				CANode destination = (CANode) this.network.getNetsimNode(this.getDestinationNodeId());
+				CANode currentNode = (CANode) this.network.getNetsimNode(currentNodeId);
 				
 				// added to stop agent's route at its destination
-				if (destination == currentNode) return link;
+				if (destination == currentNode) return null;
 				
 				List<CALink> linkAlternatives = new ArrayList<CALink>();
 				for (CALink l : currentNode.getFromLinks()) linkAlternatives.add(l);
@@ -211,7 +218,7 @@ public class CAAgent {
 			}
 		}
 		
-		return link;
+		return link.getId();
 	}
 	
 //      function [isSearching] = isSearching(this, currentTime)
@@ -319,7 +326,7 @@ public class CAAgent {
 //          node = this.destinationNode;
 //      end
 	public Id getDestinationNodeId() {
-		return this.infrastructure.getNetsimLink(this.mobsimAgent.getDestinationLinkId()).getLink().getToNode().getId();
+		return this.network.getNetsimLink(this.mobsimAgent.getDestinationLinkId()).getLink().getToNode().getId();
 //		return this.destinationNodeId;
 	}
 		
@@ -367,7 +374,7 @@ public class CAAgent {
 //      end
 	public double getDistance2Destination(CAParkingLot parkingLot) {
 		// returns crow-fly distance to destination from a given parking lot
-		CANode destination = this.getDestination(this.infrastructure);
+		CANode destination = this.getDestination(this.network);
 //		distanceToDestination = SUtils().length(destination, parkingLot);		
 		double distanceToDestination = CoordUtils.calcDistance(destination.getCoord(), parkingLot.getCoord());
 		return distanceToDestination;
@@ -525,7 +532,7 @@ public class CAAgent {
 //      end
 	public CANode getDestination(NetsimNetwork infrastructure) {
 		// cast NetsimNode to CANode
-		return (CANode) this.infrastructure.getNetsimNode(this.getDestinationNodeId());
+		return (CANode) this.network.getNetsimNode(this.getDestinationNodeId());
 	}
 	
 //      function isSearching = tryStartSearching(this, currentTime)   
@@ -562,7 +569,7 @@ public class CAAgent {
 			return isSearching;
 		}
 		
-		double distanceToDestination = CoordUtils.calcDistance(this.getDestination(this.infrastructure).getCoord(), this.cell.getCoord());
+		double distanceToDestination = CoordUtils.calcDistance(this.getDestination(this.network).getCoord(), this.cell.getCoord());
 		// agent has not yet parked
 		if (this.parkTime < 0) {
 			//agent wants to start searching now
@@ -583,5 +590,41 @@ public class CAAgent {
 		Object position;
 		int nrOccupiedSpaces;
 		int size;
+	}
+
+	@Override
+	public Id getCurrentLinkId() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Id getDestinationLinkId() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void setVehicle(MobsimVehicle veh) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public MobsimVehicle getVehicle() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Id getPlannedVehicleId() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void notifyMoveOverNode(Id newLinkId) {
+		// TODO Auto-generated method stub
+		
 	}
 }

@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +47,7 @@ public class CAServer {
 //    removeKeys = {};
 //end
 	private final List<CANode> occupiedNodes = new LinkedList<CANode>();
-	private final Map<Id, IQueue> occupiedLinkCells_Queue = new HashMap<Id, IQueue>();
+	private final Set<Id> activeLinks = new LinkedHashSet<Id>();
 	private final Map<Id, IQueue> waitingForNodes_Queue = new HashMap<Id, IQueue>();
 	
 	private final Set<Id> removeKeys = new HashSet<Id>();
@@ -88,12 +89,8 @@ public class CAServer {
 //      this.leaveNode(link.getFromNode());
 //  end
 	public void enterLink(CALink link, CANode fromNode, CAAgent agent) {
-		IQueue queue = this.occupiedLinkCells_Queue.get(link.getId());
-		if (queue == null) {
-			queue = new IQueue(new LinkedList<CAAgent>());
-			this.occupiedLinkCells_Queue.put(link.getId(), queue);
-		}
-		queue.addElement(agent);
+		// ensure that link is active
+		this.activeLinks.add(link.getId());
 //		this.leaveNode(fromNode);
 	}
 	
@@ -144,15 +141,15 @@ public class CAServer {
 //      keys = this.occupiedLinkCells_Queue.keys();
 //      key = keys{index};
 //  end
-	public Set<Id> getLinkQueuesKeys() {
-		return this.occupiedLinkCells_Queue.keySet();
+	public Set<Id> getActiveLinkIds() {
+		return this.activeLinks;
 	}
 	
 //  function [s] = getLinkQueuesSize(this)
 //      s = this.occupiedLinkCells_Queue.Count;
 //  end
 	public int getLinkQueuesSize() {
-		return this.occupiedLinkCells_Queue.size();
+		return this.activeLinks.size();
 	}
 	
 //  function [s] = getOccupiedNodesSize(this)
@@ -165,9 +162,9 @@ public class CAServer {
 //  function [queue] = getLinkAgentQueue(this, key)
 //      queue = this.occupiedLinkCells_Queue(key);
 //  end
-	public IQueue getLinkAgentQueue(Id linkId) {
-		return this.occupiedLinkCells_Queue.get(linkId);
-	}
+//	public IQueue getLinkAgentQueue(Id linkId) {
+//		return this.occupiedLinkCells_Queue.get(linkId);
+//	}
 	
 //  function [queue] = getNodeAgentQueue(this, key)
 //      queue = this.waitingForNodes_Queue(key);
@@ -205,8 +202,9 @@ public class CAServer {
 //      end
 //      removeKeyIndices = [];
 //  end
+	// de-active links without agents present 
 	public void finishLinks(CANetwork network) {
-		Iterator<Id> iter = this.occupiedLinkCells_Queue.keySet().iterator();
+		Iterator<Id> iter = this.activeLinks.iterator();
 		while (iter.hasNext()) {
 			Id linkId = iter.next();
 			CALink link = (CALink) network.getNetsimLink(linkId);
