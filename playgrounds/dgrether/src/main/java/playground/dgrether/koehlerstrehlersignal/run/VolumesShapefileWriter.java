@@ -85,9 +85,9 @@ public class VolumesShapefileWriter{
 		builder.addAttribute("lanes", Double.class);
 		builder.addAttribute("visWidth", Double.class);
 		builder.addAttribute("type", String.class);
-		builder.addAttribute("ks2010Volume", Double.class);
-		builder.addAttribute("matsimVolume", Double.class);
-		builder.addAttribute("absdif", Double.class);
+		builder.addAttribute("ks2010Flow", Double.class);
+		builder.addAttribute("matsimFlow", Double.class);
+		builder.addAttribute("matsim-ks", Double.class);
 		return builder.create();
 	}
 	

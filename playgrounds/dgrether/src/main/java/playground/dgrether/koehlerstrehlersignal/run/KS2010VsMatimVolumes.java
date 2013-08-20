@@ -158,31 +158,9 @@ public class KS2010VsMatimVolumes {
 			String outputFile) {
 
 		CoordinateReferenceSystem networkSrs = MGC.getCRS(srs);
-
-//		Network filteredNetwork = applyNetworkFilter(ks2010Network, networkSrs);
-//
-//		new VolumesShapefileWriter(filteredNetwork, networkSrs).writeShape(
-//				outputFile, ks2010Volumes, matsimVolumes);
 		
 		new VolumesShapefileWriter(ks2010Network, networkSrs).writeShape(
 				outputFile, ks2010Volumes, matsimVolumes);
-	}
-
-	private static Network applyNetworkFilter(Network network,
-			CoordinateReferenceSystem networkSrs) {
-		// log.info("Filtering network...");
-		// log.info("Nr links in original network: " +
-		// network.getLinks().size());
-		NetworkFilterManager netFilter = new NetworkFilterManager(network);
-		Tuple<CoordinateReferenceSystem, SimpleFeature> cottbusFeatureTuple = CottbusUtils
-				.loadCottbusFeature("/media/data/work/repos/shared-svn/studies/countries/de/brandenburg_gemeinde_kreisgrenzen/kreise/dlm_kreis.shp");
-		FeatureNetworkLinkCenterCoordFilter filter = new FeatureNetworkLinkCenterCoordFilter(
-				networkSrs, cottbusFeatureTuple.getSecond(),
-				cottbusFeatureTuple.getFirst());
-		netFilter.addLinkFilter(filter);
-		Network fn = netFilter.applyFilters();
-		// log.info("Nr of links in filtered network: " + fn.getLinks().size());
-		return fn;
 	}
 
 	/**
@@ -191,44 +169,48 @@ public class KS2010VsMatimVolumes {
 	public static void main(String[] args) {
 		List<Tuple<String, String>> input = new ArrayList<Tuple<String, String>>();
 		input.add(new Tuple<String, String>("50", "morning"));
-//		input.add(new Tuple<String, String>("50", "evening"));
-//		input.add(new Tuple<String, String>("10", "morning"));
-//		input.add(new Tuple<String, String>("10", "evening"));
+		input.add(new Tuple<String, String>("50", "evening"));
+		input.add(new Tuple<String, String>("10", "morning"));
+		input.add(new Tuple<String, String>("10", "evening"));
 
-		// TODO check run number
-		String runNumber = "1722";
-		
 		for (Tuple<String, String> i : input) {
 
-			String ksSolutionDirectory = "C:/Users/Atany/Desktop/SHK/SVN/projects_cottbus/cb2ks2010/2013-07-31_minflow_" + i.getFirst() + "_" + i.getSecond() + "_peak/";
-			String matsimRunDirectory = "C:/Users/Atany/Desktop/SHK/SVN/run" + runNumber + "/";
-//			String ksSolutionDirectory = DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-07-31_minflow_" + i.getFirst() + "_" + i.getSecond() + "_peak/";
-//			String matsimRunDirectory = DgPaths.REPOS + "runs-svn/run" + runNumber + "/";
-			
 			String ksSolutionFile;
 			// start and end time of the respective peak in hours
-			// TODO check times
 			int startTime;
 			int endTime;
 			
 			if (i.getSecond().equals("evening")){
 				ksSolutionFile = "ksm_" + i.getFirst() + "a_sol.txt";
 				startTime = 13;
-				endTime = 24;
+				endTime = 19;
 			}
-			else{
+			else{ // equals morning
 				ksSolutionFile = "ksm_" + i.getFirst() + "m_sol.txt";
-				startTime = 0;
-				endTime = 13;
+				startTime = 5;
+				endTime = 10;
 			}
 
+			String runNumber;
 			// KS2010 demands proportion of the matsim demand
 			double scalingFactor;
-			if (i.getFirst().equals("50"))
-				scalingFactor = 0.55;
-			else
-				scalingFactor = 0.27;
-
+			
+			if (i.getFirst().equals("50")){
+				scalingFactor = 0.55; //TODO
+				runNumber = "1732"; //TODO
+			}
+			else{ // equals 10
+				scalingFactor = 0.27; //TODO
+				runNumber = "1733"; //TODO
+			}
+			
+			String ksSolutionDirectory = "C:/Users/Atany/Desktop/SHK/SVN/projects_cottbus/cb2ks2010/2013-07-31_minflow_"  //TODO
+					+ i.getFirst() + "_" + i.getSecond() + "_peak/";
+			String matsimRunDirectory = "C:/Users/Atany/Desktop/SHK/SVN/runs-svn/run" + runNumber + "/";
+//			String ksSolutionDirectory = DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-07-31_minflow_"  //TODO
+//				+ i.getFirst() + "_" + i.getSecond() + "_peak/";
+//			String matsimRunDirectory = DgPaths.REPOS + "runs-svn/run" + runNumber + "/";
+			
 			// unsimplified networks
 			String matsimNetworkFile = matsimRunDirectory + runNumber + ".output_network.xml.gz";
 			String ks2010NetworkFile = ksSolutionDirectory + "network_small_clean.xml.gz";
@@ -236,7 +218,7 @@ public class KS2010VsMatimVolumes {
 			String srs = TransformationFactory.WGS84_UTM33N;
 
 			// TODO change outputDirectory?
-			String outputFile = ksSolutionDirectory + "shapes/KS2010VsMatsimRun" + runNumber + "FlowVolumes";
+			String outputFile = ksSolutionDirectory + "shapes/KS2010_" + i.getFirst() + "_" + i.getSecond() + "_peak" + "VsMatsimRun" + runNumber + "FlowVolumes";
 
 			
 			Network matsimNetwork = loadNetwork(matsimNetworkFile);
