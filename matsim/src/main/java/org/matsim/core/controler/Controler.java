@@ -164,7 +164,6 @@ public class Controler extends AbstractController {
 	private CalcLegTimes legTimes = null;
 	private VolumesAnalyzer volumes = null;
 
-	private boolean createGraphs = true;
 	protected boolean scenarioLoaded = false;
 	private PlansScoring plansScoring = null;
 	private ScoreStats scoreStats = null;
@@ -406,11 +405,11 @@ public class Controler extends AbstractController {
 		// zz vote for clearControlerListeners(). dg, may'13
 
 		// optional: LegHistogram
-		this.addControlerListener(new LegHistogramListener(this.events, this.createGraphs));
+		this.addControlerListener(new LegHistogramListener(this.events, this.config.controler().isCreateGraphs()));
 
 		// optional: score stats
 		this.scoreStats = new ScoreStats(this.population,
-				this.getControlerIO().getOutputFilename(FILENAME_SCORESTATS), this.createGraphs);
+				this.getControlerIO().getOutputFilename(FILENAME_SCORESTATS), this.config.controler().isCreateGraphs());
 		this.addControlerListener(this.scoreStats);
 
 		// load counts, if requested
