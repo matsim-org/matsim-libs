@@ -23,6 +23,7 @@ package org.matsim.withinday.utils;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.utils.misc.PopulationUtils.UnmodifiablePlan;
 
 /**
  * Only the PlanElements are changed - further Steps
@@ -34,9 +35,14 @@ import org.matsim.api.core.v01.population.Plan;
 public class ReplacePlanElements {
 
 	public boolean replaceActivity(Plan plan, Activity oldActivity, Activity newActivity) {
+		
 		if (plan == null) return false;
 		if (oldActivity == null) return false;
 		if (newActivity == null) return false;
+		
+		if (plan instanceof UnmodifiablePlan) {
+			throw new RuntimeException("Plan is from type " + plan.getClass().toString() + " which cannot be modified. Aborting!");
+		}
 		
 		int index = plan.getPlanElements().indexOf(oldActivity);
 		// yyyy I can't say how safe this is.  There is no guarantee that the same entry is not used twice in the plan.  This will in
@@ -61,9 +67,14 @@ public class ReplacePlanElements {
 	}
 	
 	public boolean replaceLeg(Plan plan, Leg oldLeg, Leg newLeg) {
+		
 		if (plan == null) return false;
 		if (oldLeg == null) return false;
 		if (newLeg == null) return false;
+		
+		if (plan instanceof UnmodifiablePlan) {
+			throw new RuntimeException("Plan is from type " + plan.getClass().toString() + " which cannot be modified. Aborting!");
+		}
 		
 		int index = plan.getPlanElements().indexOf(oldLeg);
 		// yyyy I can't say how safe this is.  There is no guarantee that the same entry is not used twice in the plan.  This will in

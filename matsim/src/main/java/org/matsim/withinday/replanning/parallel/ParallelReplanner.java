@@ -20,6 +20,7 @@
 
 package org.matsim.withinday.replanning.parallel;
 
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
@@ -28,6 +29,7 @@ import java.util.Set;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -67,6 +69,8 @@ public abstract class ParallelReplanner<T extends WithinDayReplannerFactory<? ex
 	protected String replannerName;
 	protected int roundRobin = 0;
 	private int lastRoundRobin = 0;
+	protected AtomicBoolean hadException;
+	protected ExceptionHandler uncaughtExceptionHandler;
 	protected CyclicBarrier timeStepStartBarrier;
 	protected CyclicBarrier betweenReplannerBarrier;
 	protected CyclicBarrier timeStepEndBarrier;
@@ -121,11 +125,16 @@ public abstract class ParallelReplanner<T extends WithinDayReplannerFactory<? ex
 			}			
 		}
 		
+		this.hadException = new AtomicBoolean(false);
+		this.uncaughtExceptionHandler = new ExceptionHandler(this.hadException, this.timeStepStartBarrier, 
+				this.betweenReplannerBarrier, this.timeStepEndBarrier);
+		
 		Thread[] replanningThreads = new Thread[numOfThreads];
 		
 		// initialize threads
 		for (int i = 0; i < numOfThreads; i++) {
 			Thread replanningThread = new Thread(replanningRunnables[i]);
+			Thread.setDefaultUncaughtExceptionHandler(this.uncaughtExceptionHandler);
 			replanningThread.setName(replannerName + i);
 			replanningThreads[i] = replanningThread;
 		}
@@ -267,4 +276,38 @@ public abstract class ParallelReplanner<T extends WithinDayReplannerFactory<? ex
 		}
 				
 	}	// InternalReplanningThread
+	
+	/**
+	 * @author mrieser
+	 */
+	private static class ExceptionHandler implements UncaughtExceptionHandler {
+
+		private final AtomicBoolean hadException;
+		private final CyclicBarrier timeStepStartBarrier;
+		private final CyclicBarrier betweenReplannerBarrier;
+		private final CyclicBarrier timeStepEndBarrier;
+
+		public ExceptionHandler(final AtomicBoolean hadException, CyclicBarrier timeStepStartBarrier,
+				CyclicBarrier betweenReplannerBarrier, CyclicBarrier timeStepEndBarrier) {
+			this.hadException = hadException;
+			this.timeStepStartBarrier = timeStepStartBarrier;
+			this.betweenReplannerBarrier = betweenReplannerBarrier;
+			this.timeStepEndBarrier = timeStepEndBarrier;
+		}
+
+		@Override
+		public void uncaughtException(Thread t, Throwable e) {
+			this.hadException.set(true);
+			log.error("Thread " + t.getName() + " died with exception while replanning.", e);
+
+			/*
+			 * By reseting the barriers, they will throw a BrokenBarrierException
+			 * which again will stop the events processing threads.
+			 */
+			this.timeStepStartBarrier.reset();
+			this.betweenReplannerBarrier.reset();
+			this.timeStepEndBarrier.reset();
+		}
+
+	}
 }
