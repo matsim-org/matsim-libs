@@ -124,7 +124,7 @@ public class CadytsCarConfigGroup extends Module {
 		params.put(REGRESSION_INERTIA, Double.toString(getRegressionInertia()));
 		params.put(MIN_FLOW_STDDEV, Double.toString(getMinFlowStddev_vehPerHour()));
 		params.put(FREEZE_ITERATION, Integer.toString(getFreezeIteration()));
-		params.put(PREPARATORY_ITERATIONS, Integer.toString(getFreezeIteration()));
+		params.put(PREPARATORY_ITERATIONS, Integer.toString(getPreparatoryIterations()));
 		params.put(VARIANCE_SCALE, Double.toString(getVarianceScale()));
 		params.put(USE_BRUTE_FORCE, Boolean.toString(useBruteForce()));
 		params.put(WRITE_ANALYSIS_FILE, Boolean.toString(isWriteAnalysisFile()));
