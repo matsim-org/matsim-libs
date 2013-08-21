@@ -68,6 +68,7 @@ import org.matsim.contrib.grips.jxmapviewerhelper.TileFactoryBuilder;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.controler.PlanStrategyRegistrar;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -556,11 +557,11 @@ public class EvacuationPTLinesEditor implements ActionListener{
 		
 		//settings to activate pt simulation
 		config.strategy().addParam("maxAgentPlanMemorySize", "3");
-		config.strategy().addParam("Module_1", "ReRoute");
+		config.strategy().addParam("Module_1", PlanStrategyRegistrar.Names.ReRoute.toString());
 		config.strategy().addParam("ModuleProbability_1", "0.1");
-		config.strategy().addParam("Module_2", "ChangeExpBeta");
+		config.strategy().addParam("Module_2", PlanStrategyRegistrar.Selector.ChangeExpBeta.toString());
 		config.strategy().addParam("ModuleProbability_2", "0.8");
-		config.strategy().addParam("Module_3", "TransitChangeLegMode");
+		config.strategy().addParam("Module_3", PlanStrategyRegistrar.Names.ChangeLegMode.toString());
 		config.strategy().addParam("ModuleProbability_3", "0.4");
 		config.strategy().addParam("ModuleDisableAfterIteration_3", "50");
 //		config.strategy().addParam("Module_4", "TransitTimeAllocationMutator");
