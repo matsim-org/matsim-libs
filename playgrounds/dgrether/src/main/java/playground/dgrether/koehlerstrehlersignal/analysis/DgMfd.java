@@ -30,49 +30,40 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.geometry.geotools.MGC;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.referencing.crs.CoordinateReferenceSystem;
-
-import playground.dgrether.events.GeospatialEventTools;
 
 
 /**
  * @author dgrether
  *
  */
-public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandler, AgentStuckEventHandler{
+public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandler, AgentStuckEventHandler, AgentDepartureEventHandler {
 	
 	private static final Logger log = Logger.getLogger(DgMfd.class);
 	
-	private double startTime = 0.0;
-	private double endTime = 3600.0 * 1.0 + 5 * 60.0;
-	private double binSizeSeconds = 5 * 60.0;
-	private Map<Id, LinkEnterEvent> firstTimeSeenMap = new HashMap<Id, LinkEnterEvent>();
+	private double binSizeSeconds = 1.0 * 60.0;
+	private Map<Id, Double> firstTimeSeenMap = new HashMap<Id, Double>();
 	private Map<Id, LinkLeaveEvent> lastTimeSeenMap = new HashMap<Id, LinkLeaveEvent>();
 	private int iteration = 0;
-	private Scenario scenario;
+	private Network network;
 	private double networkLength;
-	private int currentBinIndex;
-	private GeospatialEventTools geospatialTools = null;
 	private Data data = new Data();
-	private double vehicleSize = 7.5;
+	private double vehicleSize = 7.5 * 1.0/0.7;
 
 	
-	public DgMfd(Scenario scenario){
-		this.scenario = scenario;
+	public DgMfd(Network network){
+		this.network = network;
 		this.networkLength =  this.calcNetworkLength();
 	}
 
@@ -85,30 +76,28 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Agen
 	}
 
 	
-	public void addCrsFeatureTuple(Tuple<CoordinateReferenceSystem, SimpleFeature> cottbusFeatureTuple) {
-		if (this.geospatialTools == null) {
-			CoordinateReferenceSystem netcrs = MGC.getCRS(this.scenario.getConfig().global().getCoordinateSystem());
-			if (netcrs == null){
-				throw new IllegalStateException("Cannot get CRS");
-			}
-			this.geospatialTools = new GeospatialEventTools(this.scenario.getNetwork(), netcrs);
-		}
-		this.geospatialTools.addCrsFeatureTuple(cottbusFeatureTuple);
-	}
-	
-
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if (this.geospatialTools == null || this.geospatialTools.doNetworkAndFeaturesContainLink(event.getLinkId())) {
+		if (this.network.getLinks().containsKey(event.getLinkId())) {
 			if (! this.firstTimeSeenMap.containsKey(event.getPersonId())) {
-				this.firstTimeSeenMap.put(event.getPersonId(), event);
+				this.firstTimeSeenMap.put(event.getPersonId(), event.getTime());
 			} 
+		}
+		else if (this.firstTimeSeenMap.containsKey(event.getPersonId())){
+			this.handleLeaveNetworkOrArrivalOrStuck(event.getPersonId());
+		}
+	}
+	
+	@Override
+	public void handleEvent(AgentDepartureEvent event) {
+		if (this.network.getLinks().containsKey(event.getLinkId())){
+			this.firstTimeSeenMap.put(event.getPersonId(), event.getTime());
 		}
 	}
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		if (this.geospatialTools == null || this.geospatialTools.doNetworkAndFeaturesContainLink(event.getLinkId())) {
+		if (this.network.getLinks().containsKey(event.getLinkId())) {
 			this.lastTimeSeenMap.put(event.getPersonId(), event);
 		}
 
@@ -116,28 +105,28 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Agen
 	
 	@Override
 	public void handleEvent(AgentStuckEvent event) {
-		this.handleArrivalOrStuck(event, event.getPersonId());		
+		this.handleLeaveNetworkOrArrivalOrStuck(event.getPersonId());		
 	}
 	
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
-		this.handleArrivalOrStuck(event, event.getPersonId());
+		this.handleLeaveNetworkOrArrivalOrStuck(event.getPersonId());
 	}
 
 	
-	private void handleArrivalOrStuck(Event event, Id personId) {
-		LinkEnterEvent firstEvent = this.firstTimeSeenMap.remove(personId);
+	private void handleLeaveNetworkOrArrivalOrStuck(Id personId) {
+		Double firstEvent = this.firstTimeSeenMap.remove(personId);
 		LinkLeaveEvent lastEvent = this.lastTimeSeenMap.remove(personId);
 		
 		if (firstEvent != null && lastEvent != null){
-			int index = getBinIndex(firstEvent.getTime());
+			int index = getBinIndex(firstEvent);
 			this.data.incrementDepartures(index);
 			index = getBinIndex(lastEvent.getTime());
 			this.data.incrementArrivals(index);
 		}
-		else {
-			log.warn("No first or last event found for person id: " + personId);
-		}
+//		else {
+//			log.warn("No first or last event found for person id: " + personId);
+//		}
 	}
 
 	
@@ -150,8 +139,8 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Agen
 	
 	private double calcNetworkLength() {
 		double length = 0.0;
-		for (Link l : this.scenario.getNetwork().getLinks().values()){
-			length += l.getLength() * l.getNumberOfLanes();
+		for (Link l : this.network.getLinks().values()){
+			length += (l.getLength() * l.getNumberOfLanes());
 		}
 		return length / 1000.0;
 	}
@@ -170,31 +159,39 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Agen
 	}
 	
 	public void write(final PrintStream stream) {
-		String header  = "slot\ttime\tdepartures\tarrivals\ten-route\tdensity";
+		String header  = "slot\ttime[s]\thour\tdepartures\tarrivals\ten-route\tdensity[veh/km]\tnetworkLength[km]";
 		stream.println(header);
 		double density = 0.0;
-		double departures = 0;
-		double arrivals = 0;
+		Integer arnew = 0;
+		Integer depnew = 0;
 		double noVehicles = 0;
-		for (Entry<Integer, Integer> e :  this.data.getArrivalsBySlot().entrySet()){
-			departures = this.data.getDeparturesBySlot().get(e.getKey());
-			arrivals = e.getValue();
-			noVehicles = noVehicles + departures - arrivals;
+		for (Entry<Integer, Integer> e :  this.data.getDeparturesBySlot().entrySet()){
+			arnew = this.data.getArrivalsBySlot().get(e.getKey());
+			if (arnew == null) {
+				arnew = 0;
+			}
+			depnew = e.getValue();
+			noVehicles = noVehicles + depnew - arnew ;
 			density = noVehicles * this.vehicleSize / this.networkLength;
-
+			double timeSec = e.getKey() * this.binSizeSeconds;
+			int hour = (int) (timeSec / 3600);	
+			
 			StringBuffer line = new StringBuffer();
 			line.append(e.getKey());
 			line.append("\t");
-			line.append(e.getKey()*this.binSizeSeconds);
+			line.append(timeSec);
 			line.append("\t");
-			line.append(departures);
+			line.append(hour);
 			line.append("\t");
-			line.append(arrivals);
+			line.append(depnew);
+			line.append("\t");
+			line.append(arnew);
 			line.append("\t");
 			line.append(noVehicles);
 			line.append("\t");
 			line.append(density);
 			line.append("\t");
+			line.append(networkLength);
 			
 			stream.println(line.toString());
 		}

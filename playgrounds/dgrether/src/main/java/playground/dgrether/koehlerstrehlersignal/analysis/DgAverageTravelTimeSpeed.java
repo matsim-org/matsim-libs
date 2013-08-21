@@ -25,12 +25,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-
-import playground.dgrether.analysis.NetworkFilter;
 
 
 /**
@@ -39,13 +38,13 @@ import playground.dgrether.analysis.NetworkFilter;
  */
 public class DgAverageTravelTimeSpeed implements LinkEnterEventHandler, LinkLeaveEventHandler {
 
-	private NetworkFilter geotools;
+	private Network network;
 	private Map<Id, LinkEnterEvent> linkEnterByPerson;
 	private Set<Id> seenPersonIds;
 	private double travelTime;
 
-	public DgAverageTravelTimeSpeed(NetworkFilter geotools) {
-		this.geotools = geotools;
+	public DgAverageTravelTimeSpeed(Network network) {
+		this.network = network;
 		this.reset(0);
 	}
 
@@ -58,7 +57,7 @@ public class DgAverageTravelTimeSpeed implements LinkEnterEventHandler, LinkLeav
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		if (geotools.networkContainsLink(event.getLinkId())) {
+		if (network.getLinks().containsKey(event.getLinkId())) {
 			LinkEnterEvent linkEnterEvent = this.linkEnterByPerson.remove(event.getPersonId());
 			if (linkEnterEvent != null) {
 				this.travelTime += event.getTime() - linkEnterEvent.getTime();
@@ -68,7 +67,7 @@ public class DgAverageTravelTimeSpeed implements LinkEnterEventHandler, LinkLeav
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if (geotools.networkContainsLink(event.getLinkId())) {
+		if (network.getLinks().containsKey(event.getLinkId())) {
 			this.linkEnterByPerson.put(event.getPersonId(), event);
 			this.seenPersonIds.add(event.getPersonId());
 		}
