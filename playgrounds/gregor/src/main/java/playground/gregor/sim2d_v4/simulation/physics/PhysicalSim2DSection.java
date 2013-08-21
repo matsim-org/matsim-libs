@@ -29,12 +29,15 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.core.gbl.Gbl;
 
 import playground.gregor.sim2d_v4.cgal.CGAL;
 import playground.gregor.sim2d_v4.cgal.TwoDTree;
+import playground.gregor.sim2d_v4.cgal.VoronoiDensity.VoronoiCell;
 import playground.gregor.sim2d_v4.events.Sim2DAgentDestructEvent;
 import playground.gregor.sim2d_v4.scenario.Section;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
+import playground.gregor.sim2d_v4.simulation.physics.algorithms.PhysicalSim2DSectionVoronoiDensity;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -42,6 +45,8 @@ import com.vividsolutions.jts.geom.Envelope;
 public class PhysicalSim2DSection {
 
 	private static final Logger log = Logger.getLogger(PhysicalSim2DSection.class);
+
+	private static int leaveNotOrderlyCnt = 0;
 
 	private final Section sec;
 
@@ -67,6 +72,10 @@ public class PhysicalSim2DSection {
 
 	private int numOpenings;
 
+	private List<VoronoiCell> cells;
+
+	private final PhysicalSim2DSectionVoronoiDensity densityMap;
+
 
 	//	private VisDebugger debugger;
 
@@ -78,6 +87,7 @@ public class PhysicalSim2DSection {
 		Envelope e = this.sec.getPolygon().getEnvelopeInternal();
 		this.agentTwoDTree = new TwoDTree<Sim2DAgent>(new Envelope(e.getMinX(),e.getMaxX(),e.getMinY(),e.getMaxY()));
 		init();
+		this.densityMap = new PhysicalSim2DSectionVoronoiDensity(this);
 	}
 
 	public int getNumberOfAllAgents() {
@@ -94,9 +104,34 @@ public class PhysicalSim2DSection {
 		this.agents.addAll(this.inBuffer);
 		this.inBuffer.clear();
 		this.agentTwoDTree.buildTwoDTree(this.agents);
+		this.densityMap.buildDensityMap();
 		Iterator<Sim2DAgent> it = this.agents.iterator();
+//
+//		if (this.agents.size() > 0) {
+//			double [] x = new double[this.agents.size()];
+//			double [] y = new double[this.agents.size()];
+//			for (int i = 0; i < this.agents.size(); i++){
+//				x[i] = this.agents.get(i).getPos()[0];
+//				y[i] = this.agents.get(i).getPos()[1];
+//			}
+//			VoronoiDensity vd = new VoronoiDensity(0.01, -5, -4, 45, 4);
+//			this.cells = vd.computeVoronoiDensityFast(x, y);
+//		}
+//		int idx = 0;
 		while (it.hasNext()) {
 			Sim2DAgent agent = it.next();
+
+//			VoronoiCell cell = this.cells.get(idx);
+//			idx++;
+//
+//			if (cell.area < 20 && cell.area > 0) {
+//				double rho = 1/cell.area+0.1;
+//				double freeSpeed = Math.max(0.001, 1.34 * (1 - Math.exp(-1.913*(1/rho-1/5.4))));
+//
+//				agent.setDesiredSpeed(freeSpeed);
+//			}
+
+
 			updateAgent(agent, time);
 		}
 	}
@@ -126,7 +161,14 @@ public class PhysicalSim2DSection {
 				if (agent.ttl-- <= 0) {
 					it.remove();
 					this.penv.getEventsManager().processEvent(new Sim2DAgentDestructEvent(time, agent));
-					log.warn("Agent: " + agent + " did not leave 2D sim orderly! There might be a bug!");
+					if (leaveNotOrderlyCnt < 10) {
+						log.warn("Agent: " + agent + " did not leave 2D sim orderly! There might be a bug!");
+						leaveNotOrderlyCnt++;
+						if (leaveNotOrderlyCnt == 10) {
+							log.warn(Gbl.FUTURE_SUPPRESSED);
+						}
+
+					}
 					continue;
 				}
 				mv = true;

@@ -31,7 +31,6 @@ import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.Segment;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.DesiredDirectionCalculator;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.Neighbors;
-import playground.gregor.sim2d_v4.simulation.physics.algorithms.Obstacles;
 import playground.gregor.sim2d_v4.simulation.physics.orca.ORCALine;
 import playground.gregor.sim2d_v4.simulation.physics.orca.ORCALineAgent;
 import playground.gregor.sim2d_v4.simulation.physics.orca.ORCALineEnvironment;
@@ -50,10 +49,8 @@ public class ORCAVelocityUpdater implements VelocityUpdater {
 
 	private final double tau = 1.f;
 
-	private PhysicalSim2DSection psec;
 
 	private final Neighbors ncalc;
-	private final Obstacles obst = new Obstacles();
 	private final ORCASolver solver = new ORCASolver();
 	//	private VisDebugger debugger;
 	private final double dT;
@@ -67,6 +64,9 @@ public class ORCAVelocityUpdater implements VelocityUpdater {
 	private final double alpha = 1.57 + MatsimRandom.getRandom().nextGaussian()*.15;
 	private final double normHeightDenom = 1.72;
 	private final double beta = .9 + MatsimRandom.getRandom().nextGaussian()*.2;
+	
+	
+	private static final boolean voronoiApproach = true;
 
 	public ORCAVelocityUpdater(DesiredDirectionCalculator dd, Neighbors ncalc, Sim2DConfig conf, Sim2DAgent agent) {
 		this.ncalc = ncalc;
@@ -79,11 +79,30 @@ public class ORCAVelocityUpdater implements VelocityUpdater {
 
 	@Override
 	public void updateVelocity(double time) {
+		
+
 
 		List<ORCALine> constr = new ArrayList<ORCALine>();
 		for (Segment seg : this.agent.getPSec().getObstacles()) {
 			ORCALineEnvironment ol = new ORCALineEnvironment(this, seg, this.tau);
 			constr.add(ol);
+			
+//			if (this.agent.getId().toString().equals("b7975")) {
+//				
+//				double x0 = ol.getPointX()+this.agent.getPos()[0];
+//				double y0 = ol.getPointY()+this.agent.getPos()[1];
+//				double x1 = x0 + 5*ol.getDirectionX();
+//				double y1 = y0 + 5*ol.getDirectionY();
+//				x0 -=  5*ol.getDirectionX();
+//				y0 -= 5*ol.getDirectionY();
+//				Segment s = new Segment();
+//				s.x0 = x0;
+//				s.x1 = x1;
+//				s.y0 = y0;
+//				s.y1 = y1;
+//				this.agent.getPSec().getPhysicalEnvironment().getEventsManager().processEvent(new LineEvent(time, s, false,255,0,0,255,0));
+////				System.out.println("stop");
+//			}
 
 		}
 
@@ -96,13 +115,25 @@ public class ORCAVelocityUpdater implements VelocityUpdater {
 //				}
 //			}
 //		}
+		final double[] dir = this.dd.computeDesiredDirection();
+//		double orthoX = this.agent.getPos()[0]-dir[1];
+//		double orthoY = this.agent.getPos()[1]+dir[0];
+
 		List<Tuple<Double, Sim2DAgent>> neighbors = this.ncalc.getNeighbors(time);
 		for (Tuple<Double, Sim2DAgent> neighbor : neighbors) {
 //			if (this.debugger != null && ( getId().toString().equals("r876"))){//&& neighbor.getSecond().getId().toString().equals("r5")) {
 //				ORCALine ol = new ORCALineAgent(this, neighbor, this.tau,this.debugger);
 //				constr.add(ol);				
 //			} else {
+			
+//			double lft = CGAL.isLeftOfLine(neighbor.getSecond().getPos()[0], neighbor.getSecond().getPos()[1], this.agent.getPos()[0], this.agent.getPos()[1], orthoX, orthoY);
+//			if (lft > 0) {
+//				continue;
+//			}
+			
 			ORCALine ol = new ORCALineAgent(this, neighbor, this.tau);
+			
+			
 			constr.add(ol);
 //			}
 //			if (this.getId().toString().equals("r996") && this.debugger != null){
@@ -117,20 +148,56 @@ public class ORCAVelocityUpdater implements VelocityUpdater {
 
 		
 		
-		final double[] dir = this.dd.computeDesiredDirection();
+
 		
 		double v0 = this.agent.getV0();
+		double freeSpeed = v0;
 		
-		double perceivedSpace = computePerceivedSpace(dir,neighbors)+.19;
-		double tmp = (perceivedSpace*this.alpha)/(this.agent.getHeight()/this.normHeightDenom *(1+this.beta));
-		double freeSpeed = Math.max(.15, tmp*tmp);
-//		
-		if (freeSpeed > v0) {
-			freeSpeed = v0;
-		}
-//		
+//		if (voronoiApproach) {
+//			double x = this.agent.getPos()[0];
+//			double y = this.agent.getPos()[1];
+//			VoronoiDensity vd = new VoronoiDensity(0.01, x-10,y-10,x+10,y+10);
+//			double [] xx = new double [neighbors.size()+1];
+//			double [] yy = new double [neighbors.size()+1];
+//			int idx = 0;
+//			for (Tuple<Double, Sim2DAgent> n : neighbors){
+//				Sim2DAgent nA = n.getSecond();
+//				xx[idx] = nA.getPos()[0];
+//				yy[idx] = nA.getPos()[1];
+//				idx++;
+//			}
+//			xx[idx] = x;
+//			yy[idx] = y;
+//			List<VoronoiCell> cc = vd.computeVoronoiDensity(xx, yy);
+//			
+//
+//			VoronoiCell cell = cc.get(idx);
+////			for (GraphEdge e : cell.edges) {
+////				Segment s = new Segment();
+////				s.x0 = e.x1;
+////				s.x1 = e.x2;
+////				s.y0 = e.y1;
+////				s.y1 = e.y2;
+////				this.agent.getPSec().getPhysicalEnvironment().getEventsManager().processEvent(new LineEvent(time, s, false));
+////			}
+//			
+//			if (cell.area < 10 && cell.area > 0) {
+//				double rho = 1/cell.area;
+//				freeSpeed = 1.34 * (1 - Math.exp(-1.913*(1/rho-1/5.4)));
+////				System.out.println(freeSpeed);
+//			}
+//			
+//		} else {
+//			double perceivedSpace = computePerceivedSpace(dir,neighbors)+0.18;
+//			double tmp = (perceivedSpace*this.alpha)/(this.agent.getHeight()/this.normHeightDenom *(1+this.beta));
+//			freeSpeed = Math.max(tmp*tmp,0.15);
+//		}
+//		if (freeSpeed > v0) {
+//			freeSpeed = v0;
+//		}
+//		System.out.println(v0);
 		double vS = freeSpeed;
-//		double vS = v0;
+//		double vS = v0;             
 //		vS = v0;
 		
 		dir[0] *= vS;
@@ -149,7 +216,7 @@ public class ORCAVelocityUpdater implements VelocityUpdater {
 //		}
 		
 		
-		this.solver.run(constr, dir, vS, new double []{v[0],v[1]});
+		this.solver.run(constr, dir, 2, new double []{v[0],v[1]});
 		
 		
 
@@ -160,6 +227,21 @@ public class ORCAVelocityUpdater implements VelocityUpdater {
 		
 		v[0] = dir[0];
 		v[1] = dir[1];
+		
+//		if (this.agent.getId().toString().equals("b7975")) {
+//			
+//			double x0 = this.agent.getPos()[0];
+//			double y0 = this.agent.getPos()[1];
+//			double x1 = x0 + v[0];
+//			double y1 = y0 + v[1];
+//			Segment s = new Segment();
+//			s.x0 = x0;
+//			s.x1 = x1;
+//			s.y0 = y0;
+//			s.y1 = y1;
+//			this.agent.getPSec().getPhysicalEnvironment().getEventsManager().processEvent(new LineEvent(time, s, false,0,0,255,255,0));
+////			System.out.println("stop");
+//		}
 
 //		if (this.debugger != null &&  getId().toString().equals("r876")){
 //			this.debugger.addLine(this.pos[0], this.pos[1], this.pos[0]+this.v[0], this.pos[1]+this.v[1], 0, 255, 0, 255, 0);
@@ -176,14 +258,20 @@ public class ORCAVelocityUpdater implements VelocityUpdater {
 //		if (this.agent.getId().toString().equals("b939")) {
 //			System.out.println("got you!");
 //		}
-		
+//		double orthoX = this.agent.getPos()[0]-dir[1];
+//		double orthoY = this.agent.getPos()[1]+dir[0];
+	
 		for (Tuple<Double, Sim2DAgent> n : neighbors) {
 			
 			final Sim2DAgent nA = n.getSecond();
 //			if (this.agent.getId().toString().equals("b884") && nA.getId().toString().equals("b939")) {
 //				System.out.println("got you!");
 //			}
-			
+//			double lft = CGAL.isLeftOfLine(nA.getPos()[0], nA.getPos()[1], this.agent.getPos()[0], this.agent.getPos()[1], orthoX, orthoY);
+//			if (lft > 0) {
+//				continue;
+//			}
+	
 			
 			double dx = (nA.getPos()[0] - this.agent.getPos()[0]);
 			double dy = (nA.getPos()[1] - this.agent.getPos()[1]);
@@ -199,8 +287,8 @@ public class ORCAVelocityUpdater implements VelocityUpdater {
 			double delta = (1 + this.beta)*normHeight*this.vmaxSqrt/(2*this.alpha);
 			
 			double dotProd = CGAL.dot(dir[0], dir[1], dx, dy);
-//			double directionalPenalty = .15*delta*(1-dotProd);
-			double directionalPenalty = delta*(1-dotProd);
+			double directionalPenalty = .15*delta*(1-dotProd);
+//			double directionalPenalty = delta*(1-dotProd);
 			effectiveDist += directionalPenalty;
 			
 			//orientation penalty
@@ -230,6 +318,11 @@ public class ORCAVelocityUpdater implements VelocityUpdater {
 
 	public double[] getVelocity() {
 		return this.agent.getVelocity();
+	}
+	
+	@Override
+	public String toString() {
+		return this.agent.toString();
 	}
 
 }

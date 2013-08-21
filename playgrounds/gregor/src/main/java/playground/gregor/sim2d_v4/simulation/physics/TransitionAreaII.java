@@ -221,7 +221,7 @@ public class TransitionAreaII extends PhysicalSim2DSection  implements Transitio
 				x[i] = this.agents.get(i).getPos()[0];
 				y[i] = this.agents.get(i).getPos()[1];
 			}
-			Voronoi v = new Voronoi(.7f);//TODO
+			Voronoi v = new Voronoi(.6);//TODO
 
 			LinkedList<GraphEdge> vd = (LinkedList<GraphEdge>) v.generateVoronoi(x, y, this.minX, this.maxX, this.minY, this.maxY);//TODO
 
@@ -404,8 +404,17 @@ public class TransitionAreaII extends PhysicalSim2DSection  implements Transitio
 						ds += n0.getActualSpeed();
 					}
 					ds /= 3;
-					a.setDesiredSpeed(ds);
+//					a.setDesiredSpeed(ds);
 					a.updateVelocity(time);
+//					double v0 = a.getV0();
+					double[] vv = a.getVelocity();
+					double mag = Math.sqrt(vv[0]*vv[0]+vv[1]*vv[1]);
+					vv[0] /= mag;
+					vv[1] /= mag;
+					vv[0] *= ds;
+					vv[1] *=ds;
+					
+					
 					this.agents.add(a);
 					//					debug(vd, x, y, time);
 					it.remove();

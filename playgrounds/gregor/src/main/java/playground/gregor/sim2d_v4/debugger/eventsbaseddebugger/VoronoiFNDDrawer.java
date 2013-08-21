@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LinkFNDDrawer.java
+ * VoronoiFNDDrawer.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,79 +20,64 @@
 
 package playground.gregor.sim2d_v4.debugger.eventsbaseddebugger;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.utils.collections.QuadTree;
 
-import playground.gregor.boundarycondition.ScenarioGenerator;
+import playground.gregor.sim2d_v4.cgal.CGAL;
+import playground.gregor.sim2d_v4.cgal.VoronoiDensity;
+import playground.gregor.sim2d_v4.cgal.VoronoiDensity.VoronoiCell;
+import playground.gregor.sim2d_v4.events.XYVxVyEventImpl;
+import playground.gregor.sim2d_v4.events.XYVxVyEventsHandler;
 import processing.core.PConstants;
 import processing.core.PVector;
+import be.humphreys.simplevoronoi.GraphEdge;
+
+import com.vividsolutions.jts.geom.Envelope;
+
+public class VoronoiFNDDrawer implements XYVxVyEventsHandler, VisDebuggerAdditionalDrawer, VisDebuggerOverlay{
+
+	double time = -1;
 
 
-public class LinkFNDDrawer implements VisDebuggerAdditionalDrawer,
-LinkEnterEventHandler, LinkLeaveEventHandler {
+	private final Map<Id,Double> velocities = new HashMap<Id,Double>();
 
+	private final List<VoronoiCell> currentCells = new ArrayList<VoronoiCell>();
+	private final List<VoronoiCell> newCells = new ArrayList<VoronoiCell>();
 
-	private static Set<Id> linkIds = new HashSet<Id>();
+	private final QuadTree<XYVxVyEventImpl> quadTree; 
+
+	//linear list --> slow --> should be a QuadTree 
+	private static List<Envelope> envelopes = new ArrayList<Envelope>();
 	static {
-//		linkIds.add(new IdImpl("l1"));
-//		linkIds.add(new IdImpl("l2d0"));
-//		linkIds.add(new IdImpl("l2"));
-//		linkIds.add(new IdImpl("l5b"));
-//		linkIds.add(new IdImpl("l5"));
-//		linkIds.add(new IdImpl("l6"));
-//		linkIds.add(new IdImpl("t_l5b"));
-//		linkIds.add(new IdImpl("t_l5"));
-//		linkIds.add(new IdImpl("t_l6"));
+		Envelope e = new Envelope(15,25,-2,2);
+		envelopes.add(e);
+
 	}
 
+	private final LinkPair lp;
 
+	public VoronoiFNDDrawer() {
+		this.quadTree = new QuadTree<XYVxVyEventImpl>(1, -2, 35, 2);
+		this.lp = new LinkPair();
 
-	private final Map<Id,LinkPair> linkPairs = new HashMap<Id,LinkPair>();
+		double x = 20;
+		double y = 0;
+		double dx = 1;
+		double dy = 0;
+		//		dx /= lp.length;
+		//		dy /= lp.length;
 
-	public LinkFNDDrawer(Scenario sc) {
+		this.lp.x = x - 3*dy + 0.25*dx;
+		this.lp.y = y + 3*dx + 0.25*dy;
 
-		for (Id id : linkIds) {
-			Link l = sc.getNetwork().getLinks().get(id);
-			Link rev = null;
-			for (Link ll : l.getToNode().getOutLinks().values()) {
-				if (ll.getToNode() == l.getFromNode()) {
-					rev = ll;
-					break;
-				}
-			}
-			LinkPair lp = new LinkPair();
-			lp.length = l.getLength();
-			lp.area = l.getCapacity() /ScenarioGenerator.SEPC_FLOW*lp.length;
-
-			double x = l.getCoord().getX();
-			double y = l.getCoord().getY();
-			double dx = l.getToNode().getCoord().getX() - l.getFromNode().getCoord().getX();
-			double dy = l.getToNode().getCoord().getY() - l.getFromNode().getCoord().getY();
-			dx /= lp.length;
-			dy /= lp.length;
-			
-			lp.x = x - 3*dy + 0.25*dx;
-			lp.y = y + 3*dx + 0.25*dy;
-
-			lp.x1 = x - 3*dy - 5.25*dx;
-			lp.y1 = y + 3*dx - 5.25*dy;
-			
-			this.linkPairs.put(l.getId(), lp);
-			this.linkPairs.put(rev.getId(), lp);
-
-		}
-
+		this.lp.x1 = x - 3*dy - 5.25*dx;
+		this.lp.y1 = y + 3*dx - 5.25*dy;
 
 	}
 
@@ -103,57 +88,128 @@ LinkEnterEventHandler, LinkLeaveEventHandler {
 	}
 
 	@Override
-	public void handleEvent(LinkLeaveEvent event) {
-		LinkPair lp = this.linkPairs.get(event.getLinkId());
-		if (lp != null) {
-			lp.onLink--;
-			AgentInfo ai = lp.agentsOnLink.remove(event.getPersonId());
-
-			double density = lp.onLink/lp.area;
-//			if (Math.abs(density-ai.density) <  0.1) {
-				ai.density += density;
-				ai.density /= 2;
-				double tt = event.getTime() - ai.enterTime;
-				double speed = lp.length/tt;
-				double flow = ai.density * speed;
-				synchronized (lp.dataPoints) {
-					double frac = ai.density - ((int)ai.density);
-					frac = ((int)(frac*50))/50.;
-					double rndDens = ((int)ai.density)+frac;
-					DataPoint dp = lp.dataPoints.get(rndDens);
-					if (dp == null) {
-						dp = new DataPoint();
-						lp.dataPoints.put(rndDens,dp);
-					}
-					dp.density = (dp.cnt/(dp.cnt+1.)) * dp.density + (1./(dp.cnt+1.)) * ai.density;
-					dp.flow = (dp.cnt/(dp.cnt+1.)) * dp.flow + (1./(dp.cnt+1.)) * flow;
-					dp.speed = (dp.cnt/(dp.cnt+1.)) * dp.speed + (1./(dp.cnt+1.)) * speed;
-				}
-//			}
+	public void handleEvent(XYVxVyEventImpl event) {
+		if (event.getTime() > this.time) {
+			processFrame();
+			this.time = event.getTime();
 		}
+
+		if (event.getX() <= 1|| event.getX() >= 35 || event.getY() <= -2 || event.getY() >= 2) {
+			return;
+		}
+		this.quadTree.put(event.getX(), event.getY(), event);
+
 
 	}
 
-	@Override
-	public void handleEvent(LinkEnterEvent event) {
-		LinkPair lp = this.linkPairs.get(event.getLinkId());
-		if (lp != null) {
-			lp.onLink++;
-			AgentInfo ai = new AgentInfo();
-			ai.enterTime = event.getTime();
-			ai.density = lp.onLink/lp.area;
-			
-			if (event.getLinkId().toString().contains("rev")) {
-				ai.discount =128;
+	private void processFrame() {
+		for (Envelope e : envelopes) {
+			List<XYVxVyEventImpl> events = new ArrayList<XYVxVyEventImpl>();
+			this.quadTree.get(e.getMinX(), e.getMinY(), e.getMaxX(), e.getMaxY(), events);
+
+			if (events.size() > 1) {
+				processEnvelope(events,e);
 			}
-			lp.agentsOnLink.put(event.getPersonId(), ai);
-			
-
 		}
+
+		synchronized(this.currentCells) {
+			this.currentCells.clear();
+			this.currentCells.addAll(this.newCells);
+			this.newCells.clear();
+		}
+
+		this.quadTree.clear();
 	}
+
+	private void processEnvelope(List<XYVxVyEventImpl> events, Envelope e) {
+		double [] x = new double [events.size()];
+		double [] y = new double [events.size()];
+
+
+		for (int i = 0; i < events.size(); i++) {
+			x[i] = events.get(i).getX();
+			y[i] = events.get(i).getY();
+		}
+
+		
+		VoronoiDensity vd = new VoronoiDensity(CGAL.EPSILON, e.getMinX(),e.getMinY(),e.getMaxX(),e.getMaxY());
+		List<VoronoiCell> cells = vd.computeVoronoiDensity(x, y);
+
+		double area = 0;
+		int p = 0;
+		int cnt = 0;
+		double v = 0;
+		double j = 0;
+		for (VoronoiCell c : cells) {
+			if (!Double.isInfinite(c.area)) {
+				area += c.area;
+				p++;
+				XYVxVyEventImpl ee = events.get(cnt);
+				double vx = ee.getVX();
+				double vy = ee.getVY();
+				Double vv = this.velocities.get(ee.getPersonId());
+				if (vv == null) {
+					vv = vx;
+					this.velocities.put(ee.getPersonId(), vv);
+				} else {
+					vv = 0.9*vv + 0.1*vx;
+					this.velocities.put(ee.getPersonId(), vv);
+				}
+				double cv = Math.abs(vv);//Math.sqrt(vx*vx+vy*vy);
+				v += cv*c.area;
+				j += (cv * 1/c.area)*c.area;
+			}
+			cnt++;
+		}
+
+		double rho = p/area;
+		v /= area;
+		j /= area;
+		//		System.out.println("rho: " + rho + "  v: " + v + "  j: " + j);
+
+		
+		
+		synchronized (this.lp.dataPoints) {
+			double roundRho = (int)rho + ((int)(50*rho))/50.;
+			
+			DataPoint dp = this.lp.dataPoints.get(roundRho);
+			if (dp == null) {
+				dp = new DataPoint();
+				this.lp.dataPoints.put(roundRho, dp);
+			}
+			
+			dp.density = dp.cnt/(dp.cnt+1.) * dp.density + 1./(dp.cnt+1)*rho;
+			dp.speed = dp.cnt/(dp.cnt+1.) * dp.speed + 1./(dp.cnt+1)*v;
+			dp.flow = dp.cnt/(dp.cnt+1.) * dp.flow + 1./(dp.cnt+1)*j;
+			dp.cnt++;
+
+			
+		}
+		this.newCells.addAll(cells);
+
+	}
+
 
 	@Override
 	public void draw(EventsBasedVisDebugger p) {
+		p.strokeWeight(.05f);
+		p.stroke(255,0,0,128);
+		synchronized (this.currentCells) {
+			for (VoronoiCell c : this.currentCells) {
+				if (Double.isInfinite(c.area)) {
+					continue;
+				}
+				for (GraphEdge e : c.edges) {
+
+					float x0 = (float) (e.x1 + p.offsetX);
+					float y0 = -(float) (e.y1 + p.offsetY);
+					float x1 = (float) (e.x2 + p.offsetX);
+					float y1 = -(float) (e.y2 + p.offsetY);
+					p.line(x0, y0, x1, y1);
+
+				}
+			}
+		}
 
 	}
 
@@ -167,19 +223,29 @@ LinkEnterEventHandler, LinkLeaveEventHandler {
 		p.textSize(fs);;
 		p.textAlign(PConstants.CENTER);
 		p.strokeWeight(sz);
-		for (LinkPair lp : this.linkPairs.values()) {
-			synchronized (lp.dataPoints) {
-				
-				
-				drawFlowFND(p,lp,fs,sz);
-				drawSpeedFND(p,lp,fs,sz);
-		
 
-			}
+//		synchronized(this.currentCells) {
+//			for (VoronoiCell c : this.currentCells) {
+//				//				if (c) {
+//				//					continue;
+//				//				}
+//				float x = (float) (c.x + p.offsetX);
+//				float y = -(float) (c.y + p.offsetY);
+//				PVector cv = p.zoomer.getCoordToDisp(new PVector(x, y));
+//				p.text(c.area+"", cv.x, cv.y);
+//
+//			}
+//		}
+//		long start = System.nanoTime();
+
+		synchronized (this.lp.dataPoints) {
+			drawSpeedFND(p, this.lp, fs, sz);
+			drawFlowFND(p, this.lp, fs, sz);
 		}
-
-
+//		long stop = System.nanoTime();
+//		System.out.println("took: " + ((stop-start)/1000) + "  points:" + this.lp.dataPoints.size());
 	}
+
 
 	private void drawSpeedFND(EventsBasedVisDebugger p, LinkPair lp, float fs,
 			float sz) {
@@ -198,16 +264,16 @@ LinkEnterEventHandler, LinkLeaveEventHandler {
 		float yheight = -(float) (2.5*1.5 * p.zoomer.getZoomScale());
 		p.line(0, 0, 0, yheight);
 		p.triangle(arrow/3, yheight, 0, yheight-arrow, -arrow/3, yheight);
-		
+
 		for (int i = 1; i < 5; i ++) {
 			float x = (float) (i * p.zoomer.getZoomScale());
 			p.line(x, 0, x, arrow);
 			p.text(i, x, arrow+fs);
 		}
-		
+
 		float x = (float) (5 * p.zoomer.getZoomScale());
 		p.text("\u03C1 in m\u207B\u00B2", x, arrow+fs);
-//		
+		//		
 		for (int i = 1; i <= 1.5; i++) {
 			float y = -(float)(2.5 * i * p.zoomer.getZoomScale());
 			p.line(0, y, -arrow, y);
@@ -217,7 +283,7 @@ LinkEnterEventHandler, LinkLeaveEventHandler {
 		float y = -(float)(2.5 * 1.5 * p.zoomer.getZoomScale());
 		float len = p.textWidth("v in ms\u207B\u00B9");
 		p.text("v in ms\u207B\u00B9",-arrow-len,y+fs/4);
-		
+
 		p.stroke(0,0);
 		p.fill(0,0,255,255);
 		for (DataPoint ai : lp.dataPoints.values()) {
@@ -225,7 +291,7 @@ LinkEnterEventHandler, LinkLeaveEventHandler {
 			p.ellipse((float)(ai.density*p.zoomer.getZoomScale()),(float)-(2.5*ai.speed*p.zoomer.getZoomScale()), sz, sz);
 		}
 		p.popMatrix();
-		
+
 	}
 
 	private void drawFlowFND(EventsBasedVisDebugger p, LinkPair lp, float fs,
@@ -245,16 +311,16 @@ LinkEnterEventHandler, LinkLeaveEventHandler {
 		float yheight = -(float) (1.5*2.5 * p.zoomer.getZoomScale());
 		p.line(0, 0, 0, yheight);
 		p.triangle(arrow/3, yheight, 0, yheight-arrow, -arrow/3, yheight);
-		
+
 		for (int i = 1; i < 5; i ++) {
 			float x = (float) (i * p.zoomer.getZoomScale());
 			p.line(x, 0, x, arrow);
 			p.text(i, x, arrow+fs);
 		}
-		
+
 		float x = (float) (5 * p.zoomer.getZoomScale());
 		p.text("\u03C1 in m\u207B\u00B2", x, arrow+fs);
-//		
+		//		
 		for (int i = 1; i <= 2.5; i++) {
 			float y = -(float)(1.5 * i * p.zoomer.getZoomScale());
 			p.line(0, y, -arrow, y);
@@ -264,39 +330,15 @@ LinkEnterEventHandler, LinkLeaveEventHandler {
 		float y = -(float)(1.5 * 2.5 * p.zoomer.getZoomScale());
 		float len = p.textWidth("J in (ms)\u207B\u00B9");
 		p.text("J in (ms)\u207B\u00B9",-arrow-len,y+fs/4);
-		
+
 		p.stroke(0,0);
-		
+
 		for (DataPoint ai : lp.dataPoints.values()) {
 			p.fill(0,255-ai.discount,0,255);
 			p.ellipse((float)(ai.density*p.zoomer.getZoomScale()),(float)-(1.5*ai.flow*p.zoomer.getZoomScale()), sz, sz);
 		}
 		p.popMatrix();
-		
-	}
 
-	private static final class LinkPair {
-
-		public double x1;
-		public double y1;
-		public double x;
-		public double y;
-		public double area;
-		public double length;
-		public int onLink;
-		public Map<Double,DataPoint> dataPoints = new TreeMap<Double,DataPoint>();
-		public final Map<Id,AgentInfo> agentsOnLink = new HashMap<Id,AgentInfo>();
-
-
-	}
-
-	private static final class AgentInfo {
-
-		public int discount = 0;
-		public double flow;
-		public double speed;
-		public double density;
-		double enterTime;
 	}
 
 	private static final class DataPoint {
@@ -306,5 +348,16 @@ LinkEnterEventHandler, LinkLeaveEventHandler {
 		int discount;
 		
 		int cnt = 0;
+	}
+
+	private static final class LinkPair {
+
+		public double x1;
+		public double y1;
+		public double x;
+		public double y;
+		public Map<Double,DataPoint> dataPoints = new TreeMap<Double,DataPoint>();
+
+
 	}
 }

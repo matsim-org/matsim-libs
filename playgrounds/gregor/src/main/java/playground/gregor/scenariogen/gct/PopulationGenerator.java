@@ -106,9 +106,9 @@ public class PopulationGenerator {
 				double offset = MatsimRandom.getRandom().nextGaussian()*3600;
 				time = 9*3600+offset;
 			}while (time < 6*3600 || time > 18*3600);
-			if (time > 8*3600) {
-				continue;
-			}
+//			if (time > 8*3600) {
+//				continue;
+//			}
 			
 			
 			Person pers = fac.createPerson(new IdImpl(id++));
@@ -153,11 +153,11 @@ public class PopulationGenerator {
 
 			plan.addActivity(act1);
 
-//			Leg leg1 = fac.createLeg("car");
-//			plan.addLeg(leg1);
-//
-//			Activity act2 = fac.createActivityFromLinkId("origin", l.getId());
-//			plan.addActivity(act2);
+			Leg leg1 = fac.createLeg("car");
+			plan.addLeg(leg1);
+
+			Activity act2 = fac.createActivityFromLinkId("origin", l.getId());
+			plan.addActivity(act2);
 		}
 
 

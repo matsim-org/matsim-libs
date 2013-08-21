@@ -135,7 +135,7 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 					MatsimRandom.getRandom().setSeed((int)(100*x[0])+coords.length);
 					int offset = MatsimRandom.getRandom().nextInt(10)*15;
 //					offset += 96;
-					this.vis.addPolygonStatic(x, y, 255-offset, 255-offset, 255-offset, 255, 0);
+					this.vis.addPolygonStatic(x, y, 255-offset, 255-offset, 255-offset, 0, 0);
 
 					this.vis.addTextStatic(p.getCentroid().getX(), p.getCentroid().getY(), sec.getId().toString(), 100);
 				}

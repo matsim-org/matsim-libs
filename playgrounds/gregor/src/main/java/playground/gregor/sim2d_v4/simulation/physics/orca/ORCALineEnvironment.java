@@ -20,16 +20,23 @@
 
 package playground.gregor.sim2d_v4.simulation.physics.orca;
 
+import org.apache.log4j.Logger;
+import org.matsim.core.gbl.Gbl;
+
 import playground.gregor.sim2d_v4.cgal.CGAL;
 import playground.gregor.sim2d_v4.simulation.physics.ORCAVelocityUpdater;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.Segment;
 
 public class ORCALineEnvironment implements ORCALine {
+	
+	private static final Logger log = Logger.getLogger(ORCALineEnvironment.class);
 
 	private double pointX;
 	private double pointY;
 	private double directionX;
 	private double directionY;
+	
+	private static int penetrationCnt = 0;
 
 	public ORCALineEnvironment(ORCAVelocityUpdater orcaAgent, Segment seg, double tau) {
 		construct(orcaAgent,seg,tau);
@@ -43,7 +50,13 @@ public class ORCALineEnvironment implements ORCALine {
 		
 		final double posX = orcaAgent.getPos()[0];
 		final double posY = orcaAgent.getPos()[1];
-				
+		
+
+//		if (dist < 0){
+//			System.out.println(dist + " " );
+//			
+//		}
+		
 		//here we have two possible orientations of the ORCA line, either it runs parallel to the line segment
 		//or it is a tangent on Minkowski sum circle that is closer to the point of origin
 		//1. check whether line segment is responsible
@@ -86,6 +99,19 @@ public class ORCALineEnvironment implements ORCALine {
 			
 			this.directionX = -yn;
 			this.directionY = xn;
+			double dist = CGAL.signDistPointLine(posX, posY, seg.x0, seg.y0, seg.dx, seg.dy)-.19; 
+			if (dist < 0) {
+				this.pointX += (dist-0.1) * this.directionY;
+				this.pointY += -(dist-0.1) * this.directionX;
+				
+				if (penetrationCnt < 10) {
+					log.warn("Agent: " + orcaAgent + " is penetrating all wall. This is a bug! As a workaround ORCALine has been moved inward! Needs to be fixed! [GL August '13]");
+					penetrationCnt++;
+					if (penetrationCnt == 10) {
+						log.warn(Gbl.FUTURE_SUPPRESSED);
+					}
+				}
+			}
 		} else {//circle
 			//1. determine which side
 			double sqrDist0 = xpBpA0 * xpBpA0  + ypBpA0 * ypBpA0;
@@ -109,6 +135,8 @@ public class ORCALineEnvironment implements ORCALine {
 			this.directionY = xn;
 			
 		}
+		
+
 				
 	}
 

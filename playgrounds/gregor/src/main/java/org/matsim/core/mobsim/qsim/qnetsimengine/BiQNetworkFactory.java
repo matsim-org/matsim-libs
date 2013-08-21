@@ -42,7 +42,7 @@ public class BiQNetworkFactory implements NetsimNetworkFactory<QNode, QLinkInter
 	@Override
 	public QLinkInternalI createNetsimLink(Link link, QNetwork network,
 			QNode toQueueNode) {
-		double delay = 0.2;
+		double delay = 0.25;
 		BiPedQ q = new BiPedQ(network.simEngine.getMobsim().getSimTimer(),delay);
 		
 		BiPedQLinkImpl ret = new BiPedQLinkImpl(link, network, toQueueNode, q,delay);
