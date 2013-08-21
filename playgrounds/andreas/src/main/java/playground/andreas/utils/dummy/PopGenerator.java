@@ -52,23 +52,24 @@ public class PopGenerator {
 		String networkFilename = outputDir + "network_corridor.xml";
 		int nPersonsPerHour = 1000;
 		
-		PopGenerator.createPopT1(networkFilename, nPersonsPerHour, outputDir + "pop_corr_t_1.xml.gz");
-		PopGenerator.createPopT2(networkFilename, nPersonsPerHour, outputDir + "pop_corr_t_2.xml.gz");
-		PopGenerator.createPopT3(networkFilename, nPersonsPerHour, outputDir + "pop_corr_t_3.xml.gz");
-		PopGenerator.createPopT4(networkFilename, nPersonsPerHour, outputDir + "pop_corr_t_4.xml.gz");
-		
-		PopGenerator.createPopS1(networkFilename, nPersonsPerHour, outputDir + "pop_corr_s_1.xml.gz");
-		PopGenerator.createPopS2(networkFilename, nPersonsPerHour, outputDir + "pop_corr_s_2.xml.gz");
-		PopGenerator.createPopS3(networkFilename, nPersonsPerHour, outputDir + "pop_corr_s_3.xml.gz");
-		PopGenerator.createPopS4(networkFilename, nPersonsPerHour, outputDir + "pop_corr_s_4.xml.gz");
-		
-		networkFilename = outputDir + "network_cross.xml";
-		nPersonsPerHour = 1000;
-		PopGenerator.createPopCross(networkFilename, nPersonsPerHour, outputDir + "pop_cross.xml.gz");
+//		PopGenerator.createPopT1(networkFilename, nPersonsPerHour, outputDir + "pop_corr_t_1.xml.gz");
+//		PopGenerator.createPopT2(networkFilename, nPersonsPerHour, outputDir + "pop_corr_t_2.xml.gz");
+//		PopGenerator.createPopT3(networkFilename, nPersonsPerHour, outputDir + "pop_corr_t_3.xml.gz");
+//		PopGenerator.createPopT4(networkFilename, nPersonsPerHour, outputDir + "pop_corr_t_4.xml.gz");
+//		
+//		PopGenerator.createPopS1(networkFilename, nPersonsPerHour, outputDir + "pop_corr_s_1.xml.gz");
+//		PopGenerator.createPopS2(networkFilename, nPersonsPerHour, outputDir + "pop_corr_s_2.xml.gz");
+//		PopGenerator.createPopS3(networkFilename, nPersonsPerHour, outputDir + "pop_corr_s_3.xml.gz");
+//		PopGenerator.createPopS4(networkFilename, nPersonsPerHour, outputDir + "pop_corr_s_4.xml.gz");
+//		
+//		networkFilename = outputDir + "network_cross.xml";
+//		nPersonsPerHour = 1000;
+//		PopGenerator.createPopCross(networkFilename, nPersonsPerHour, outputDir + "pop_cross.xml.gz");
 		
 		networkFilename = outputDir + "network_corridor.xml";
 		nPersonsPerHour = 1000;
-		PopGenerator.createPopVirginiaCorridor(networkFilename, nPersonsPerHour, outputDir + "pop_corridor_1000.xml.gz");
+		PopGenerator.createPopVirginiaCorridor(networkFilename, nPersonsPerHour, outputDir + "pop_corridor_1000.xml.gz", 7, 9);
+		PopGenerator.createPopVirginiaCorridor(networkFilename, nPersonsPerHour, outputDir + "pop_corridor_1000_short.xml.gz", 7, 8);
 	}
 
 	private static void createPopCross(String networkFilename, int nPersonsPerHour, String outFilename) {
@@ -290,7 +291,7 @@ public class PopGenerator {
 		new PopulationWriter(pop, null).write(outFilename);
 	}
 	
-	private static void createPopVirginiaCorridor(String networkFilename, int nPersonsPerHour, String outFilename) {
+	private static void createPopVirginiaCorridor(String networkFilename, int nPersonsPerHour, String outFilename, int departureIntervalStart, int departureIntervalEnd) {
 		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		new MatsimNetworkReader(sc).readFile(networkFilename);
 		Population pop = sc.getPopulation();
@@ -301,8 +302,8 @@ public class PopGenerator {
 		Coord node1Coord = sc.getNetwork().getNodes().get(new IdImpl("1")).getCoord();
 		Coord node2Coord = sc.getNetwork().getNodes().get(new IdImpl("2")).getCoord();
 		
-		// create trips from node 1 to node 2, 7-9
-		createPersons(rnd, pop, nPersonsPerHour, node1Coord, node2Coord, 7, 9);
+		// create trips from node 1 to node 2
+		createPersons(rnd, pop, nPersonsPerHour, node1Coord, node2Coord, departureIntervalStart, departureIntervalEnd);
 		
 		new PopulationWriter(pop, null).write(outFilename);		
 	}
@@ -316,15 +317,15 @@ public class PopGenerator {
 			Person person = pop.getFactory().createPerson(new IdImpl(nPersonsCreated));
 			Plan plan = pop.getFactory().createPlan();
 			
-			Activity h = pop.getFactory().createActivityFromCoord("h", fromCoord);
-			h.setEndTime(departureIntervalStart * 3600.0 + rnd.nextDouble() * (departureIntervalEnd - departureIntervalStart) * 3600.0);
-			plan.addActivity(h);
+			Activity h1 = pop.getFactory().createActivityFromCoord("h", fromCoord);
+			h1.setEndTime(departureIntervalStart * 3600.0 + rnd.nextDouble() * (departureIntervalEnd - departureIntervalStart) * 3600.0);
+			plan.addActivity(h1);
 
 			Leg leg = pop.getFactory().createLeg("pt");
 			plan.addLeg(leg);
 
-			Activity w = pop.getFactory().createActivityFromCoord("w", toCoord);
-			plan.addActivity(w);
+			Activity h2 = pop.getFactory().createActivityFromCoord("h", toCoord);
+			plan.addActivity(h2);
 
 			person.addPlan(plan);
 			pop.addPerson(person);
