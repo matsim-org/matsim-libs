@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.controler.PlanStrategyRegistrar;
 import org.matsim.core.network.NetworkChangeEvent;
 import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.core.network.NetworkChangeEventFactory;
@@ -127,13 +128,19 @@ public class ConfigIO
 		
 		//settings to activate pt simulation
 		config.strategy().addParam("maxAgentPlanMemorySize", "3");
-		config.strategy().addParam("Module_1", "ReRoute");
+		config.strategy().addParam("Module_1", PlanStrategyRegistrar.Names.ReRoute.toString());
 		config.strategy().addParam("ModuleProbability_1", "0.1");
-		config.strategy().addParam("Module_2", "ChangeExpBeta");
+		config.strategy().addParam("Module_2", PlanStrategyRegistrar.Selector.ChangeExpBeta.toString());
 		config.strategy().addParam("ModuleProbability_2", "0.8");
-		config.strategy().addParam("Module_3", "TransitChangeLegMode");
+		config.strategy().addParam("Module_3", PlanStrategyRegistrar.Names.ChangeLegMode.toString());
 		config.strategy().addParam("ModuleProbability_3", "0.4");
 		config.strategy().addParam("ModuleDisableAfterIteration_3", "50");
+		
+		
+		
+		config.strategy().addParam("fractionOfIterationsToDisableInnovation", "0.8");
+		
+		
 //		config.strategy().addParam("Module_4", "TransitTimeAllocationMutator");
 //		config.strategy().addParam("ModuleProbability_4", "0.3");
 

@@ -197,6 +197,8 @@ public class EvacuationAnalysis extends AbstractModule {
 				JOptionPane.showMessageDialog(this.controller.getParentComponent(), "Could not find any event files", "Event files unavailable", JOptionPane.ERROR_MESSAGE);
 				return;
 			}
+			else
+				this.toolBox.getOpenOTFVisBtn().setEnabled(true);
 		}
 		if ((graphPanel == null) || (keyPanel == null)) {
 			graphPanel = ((EAToolBox) getToolBox()).getGraphPanel();

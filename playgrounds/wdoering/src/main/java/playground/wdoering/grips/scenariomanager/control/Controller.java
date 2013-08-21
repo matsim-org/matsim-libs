@@ -852,6 +852,10 @@ public class Controller {
 	}
 
 	public boolean openMastimConfig() {
+		
+//		if (1==1)
+//			return openMastimConfig(new File("c:/temp/!matsimfiles/fostercityca/output/config.xml"));
+		
 		DefaultOpenDialog openDialog = new DefaultOpenDialog(this, "xml", locale.infoMatsimFile(), true);
 		int returnValue = openDialog.showOpenDialog(this.getParentComponent());
 

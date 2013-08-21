@@ -92,6 +92,7 @@ public class EAToolBox extends AbstractToolBox
 	private JPanel compositePanel;
 	private JButton saveButton;
 	private JButton openBtn;
+	private JButton openOTFVisBtn;
 	private JPanel blockPanel;
 	private Scenario sc;
 	private String configFile;
@@ -183,6 +184,14 @@ public class EAToolBox extends AbstractToolBox
 		this.calcButton.addActionListener(this);
 		this.calcButton.setPreferredSize(new Dimension(100, 20));
 		this.calcButton.setSize(new Dimension(100, 24));
+		
+		this.openOTFVisBtn = new JButton("OTFVis");
+		this.openOTFVisBtn.setEnabled(false);
+		this.openOTFVisBtn.addActionListener(this);
+		this.openOTFVisBtn.setPreferredSize(new Dimension(100, 20));
+		this.openOTFVisBtn.setSize(new Dimension(100, 24));
+		
+		
 
 		JPanel iterationSelectionPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
 		iterationSelectionPanel.setBorder(BorderFactory.createEmptyBorder(2, 2, 2, 2));
@@ -334,6 +343,7 @@ public class EAToolBox extends AbstractToolBox
 			panel.add(this.openBtn);
 		
 		panel.add(this.saveButton);
+		panel.add(this.openOTFVisBtn);
 
 		this.openBtn.addActionListener(this);
 		this.saveButton.addActionListener(this);
@@ -483,7 +493,7 @@ public class EAToolBox extends AbstractToolBox
 		 * Open MATSim config file.
 		 * 
 		 */
-		if (e.getActionCommand() == "Open")
+		else if (e.getActionCommand() == "Open")
 		{
 			final JFileChooser fc = new JFileChooser();
 
@@ -543,15 +553,16 @@ public class EAToolBox extends AbstractToolBox
 			}
 		}
 
-		if (e.getActionCommand() == "calculate")
+		else if (e.getActionCommand() == "calculate")
 		{
 			this.module.runCalculation();
 		}
 
-		if ((e.getActionCommand() == "changeIteration") && (!firstLoad))
+		else if ((e.getActionCommand() == "changeIteration") && (!firstLoad))
 		{
 			System.out.println("(looking for \"" + iterationsList.getSelectedItem() + "\")");
 			File newFile = this.module.getEventPathFromName("" + iterationsList.getSelectedItem());
+			int index = iterationsList.getSelectedIndex();
 
 			if (newFile != null)
 			{
@@ -561,12 +572,28 @@ public class EAToolBox extends AbstractToolBox
 
 			if (!useCalculateButton)
 				this.module.runCalculation();
+			
+			iterationsList.setSelectedIndex(index);
 		}
 
-		if (e.getActionCommand() == "changeMode")
+		else if (e.getActionCommand() == "changeMode")
 		{
 			this.module.setMode((Mode) modeList.getSelectedItem());
+			
 
+		}
+		else if (e.getActionCommand() == "OTFVis")
+		{
+			System.out.println("not implemented yet");
+//			Thread thread = new Thread(new Runnable() {
+//				
+//				@Override
+//				public void run() {
+//					new org.matsim.contrib.grips.visualization.OTFVisVisualization(controller.getMatsimConfigFile(),30,controller.getWMS(),controller.getWMSLayer()).run();
+//				}
+//			});
+//			
+//			thread.run();
 		}
 
 	}
@@ -825,6 +852,10 @@ public class EAToolBox extends AbstractToolBox
 	{
 		this.firstLoad = b;
 		
+	}
+	
+	public JButton getOpenOTFVisBtn() {
+		return openOTFVisBtn;
 	}
 
 
