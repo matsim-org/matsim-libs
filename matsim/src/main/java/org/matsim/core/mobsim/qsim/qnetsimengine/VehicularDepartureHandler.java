@@ -50,7 +50,7 @@ class VehicularDepartureHandler implements DepartureHandler {
 	VehicularDepartureHandler(QNetsimEngine qNetsimEngine, VehicleBehavior vehicleBehavior) {
 		this.qNetsimEngine = qNetsimEngine;
 		this.vehicleBehavior = vehicleBehavior;
-		this.transportModes = qNetsimEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().getMainMode() ;
+		this.transportModes = qNetsimEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().getMainModes();
 	}
 
 	@Override
@@ -58,12 +58,12 @@ class VehicularDepartureHandler implements DepartureHandler {
 		if (this.transportModes.contains(agent.getMode())) {
 			if ( agent instanceof MobsimDriverAgent ) {
 				handleCarDeparture(now, (MobsimDriverAgent)agent, linkId);
-				return true ;
+				return true;
 			} else {
-				throw new UnsupportedOperationException("wrong agent type to depart on a network mode") ;
+				throw new UnsupportedOperationException("wrong agent type to depart on a network mode");
 			}
 		}
-		return false ;
+		return false;
 	}
 
 	private void handleCarDeparture(double now, MobsimDriverAgent agent, Id linkId) {
