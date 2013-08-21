@@ -35,8 +35,8 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
-import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
@@ -66,7 +66,7 @@ public class PopulationAgentSourceWithVehicles implements AgentSource {
 		this.agentFactory = agentFactory;
 		this.qsim = qsim;  
 		this.modeVehicleTypes = new HashMap<String, VehicleType>();
-		this.mainModes = qsim.getScenario().getConfig().getQSimConfigGroup().getMainMode();
+		this.mainModes = qsim.getScenario().getConfig().getQSimConfigGroup().getMainModes();
 		for (String mode : mainModes) {
 			modeVehicleTypes.put(mode, VehicleUtils.getDefaultVehicleType());
 		}

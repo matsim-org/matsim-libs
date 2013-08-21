@@ -172,7 +172,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		map.put(TRAFFIC_DYNAMICS, getTrafficDynamics());
 		map.put(SIM_STARTTIME_INTERPRETATION, getSimStarttimeInterpretation());
 		map.put(VEHICLE_BEHAVIOR, getVehicleBehavior());
-		map.put(MAIN_MODE, CollectionUtils.setToString(new HashSet<String>(getMainMode()))) ;
+		map.put(MAIN_MODE, CollectionUtils.setToString(new HashSet<String>(getMainModes()))) ;
 		map.put(INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES, String.valueOf( isInsertingWaitingVehiclesBeforeDrivingVehicles() ) ) ;
 		map.put(NODE_OFFSET, Double.toString(this.getNodeOffset()));
 		
@@ -349,7 +349,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		this.mainModes = mainModes;
 	}
 
-	public Collection<String> getMainMode() {
+	public Collection<String> getMainModes() {
 		return mainModes;
 	}
 

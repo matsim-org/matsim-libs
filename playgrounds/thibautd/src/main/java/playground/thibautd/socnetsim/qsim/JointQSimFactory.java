@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -61,9 +60,9 @@ public class JointQSimFactory implements MobsimFactory {
             throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
         }
 
-		if ( !conf.getMainMode().contains( JointActingTypes.DRIVER ) ) {
+		if ( !conf.getMainModes().contains( JointActingTypes.DRIVER ) ) {
 			log.warn( "adding the driver mode as a main mode in the config at "+getClass()+" initialisation!" );
-			final List<String> ms = new ArrayList<String>( conf.getMainMode() );
+			final List<String> ms = new ArrayList<String>( conf.getMainModes() );
 			ms.add( JointActingTypes.DRIVER );
 			conf.setMainModes( ms );
 		}

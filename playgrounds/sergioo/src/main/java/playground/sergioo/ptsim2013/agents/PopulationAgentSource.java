@@ -53,7 +53,7 @@ public class PopulationAgentSource implements AgentSource {
 		this.agentFactory = agentFactory;
 		this.qsim = qsim;  
 		this.modeVehicleTypes = new HashMap<String, VehicleType>();
-		this.mainModes = qsim.getScenario().getConfig().getQSimConfigGroup().getMainMode();
+		this.mainModes = qsim.getScenario().getConfig().getQSimConfigGroup().getMainModes();
 		for (String mode : mainModes) {
 			modeVehicleTypes.put(mode, VehicleUtils.getDefaultVehicleType());
 		}

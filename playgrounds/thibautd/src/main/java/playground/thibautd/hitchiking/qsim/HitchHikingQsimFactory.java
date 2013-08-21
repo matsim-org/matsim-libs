@@ -71,7 +71,7 @@ public class HitchHikingQsimFactory implements MobsimFactory {
         }
 
 		// make sure we simulate car pooling!
-		Collection<String> mainModes = conf.getMainMode();
+		Collection<String> mainModes = conf.getMainModes();
 		if (!mainModes.contains( HitchHikingConstants.DRIVER_MODE )) {
 			List<String> ms = new ArrayList<String>(mainModes);
 			ms.add( HitchHikingConstants.DRIVER_MODE );

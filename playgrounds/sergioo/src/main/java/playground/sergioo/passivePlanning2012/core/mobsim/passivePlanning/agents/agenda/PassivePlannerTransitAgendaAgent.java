@@ -40,7 +40,7 @@ public class PassivePlannerTransitAgendaAgent extends PassivePlannerTransitAgent
 	public PassivePlannerTransitAgendaAgent(final BasePerson basePerson, final Netsim simulation, final PassivePlannerManager passivePlannerManager, final Household household, Set<String> modes) {
 		super(basePerson, simulation, passivePlannerManager);
 		boolean carAvailability = false;
-		Collection<String> mainModes = simulation.getScenario().getConfig().getQSimConfigGroup().getMainMode();
+		Collection<String> mainModes = simulation.getScenario().getConfig().getQSimConfigGroup().getMainModes();
 		for(PlanElement planElement:basePerson.getBasePlan().getPlanElements())
 			if(planElement instanceof Leg)
 				if(mainModes.contains(((Leg)planElement).getMode()))
