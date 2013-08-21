@@ -48,15 +48,15 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 	private static final String STUCK_TIME = "stuckTime";
 	private static final String REMOVE_STUCK_VEHICLES = "removeStuckVehicles";
 	private static final String NUMBER_OF_THREADS = "numberOfThreads";
-	private static final String TRAFFIC_DYNAMICS = "trafficDynamics" ;
-	private static final String SIM_STARTTIME_INTERPRETATION = "simStarttimeInterpretation" ;
+	private static final String TRAFFIC_DYNAMICS = "trafficDynamics";
+	private static final String SIM_STARTTIME_INTERPRETATION = "simStarttimeInterpretation";
 	private static final String VEHICLE_BEHAVIOR = "vehicleBehavior";
 
-	public static final String TRAFF_DYN_QUEUE = "queue" ;
-	public static final String TRAFF_DYN_W_HOLES = "withHolesExperimental" ;
+	public static final String TRAFF_DYN_QUEUE = "queue";
+	public static final String TRAFF_DYN_W_HOLES = "withHolesExperimental";
 
-	public static final String MAX_OF_STARTTIME_AND_EARLIEST_ACTIVITY_END = "maxOfStarttimeAndEarliestActivityEnd" ;
-	public static final String ONLY_USE_STARTTIME = "onlyUseStarttime" ;
+	public static final String MAX_OF_STARTTIME_AND_EARLIEST_ACTIVITY_END = "maxOfStarttimeAndEarliestActivityEnd";
+	public static final String ONLY_USE_STARTTIME = "onlyUseStarttime";
 
 	public static final String VEHICLE_BEHAVIOR_TELEPORT = "teleport";
 	public static final String VEHICLE_BEHAVIOR_WAIT = "wait";
@@ -73,25 +73,25 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 	private double stuckTime = 100;
 	private boolean removeStuckVehicles = true;
 	private int numberOfThreads = 1;
-	private String trafficDynamics = TRAFF_DYN_QUEUE ;
-	private String simStarttimeInterpretation = MAX_OF_STARTTIME_AND_EARLIEST_ACTIVITY_END ;
+	private String trafficDynamics = TRAFF_DYN_QUEUE;
+	private String simStarttimeInterpretation = MAX_OF_STARTTIME_AND_EARLIEST_ACTIVITY_END;
 	private String vehicleBehavior = VEHICLE_BEHAVIOR_TELEPORT;
 	
 	// ---
 
 	private static final String SNAPSHOT_STYLE = "snapshotStyle";
-	public static final String SNAPSHOT_EQUI_DIST = "equiDist" ;
-	public static final String SNAPSHOT_AS_QUEUE = "queue" ;
-	private String snapshotStyle = SNAPSHOT_EQUI_DIST ;
+	public static final String SNAPSHOT_EQUI_DIST = "equiDist";
+	public static final String SNAPSHOT_AS_QUEUE = "queue";
+	private String snapshotStyle = SNAPSHOT_EQUI_DIST;
 	
 	// ---
 	
-	private static final String MAIN_MODE = "mainMode" ;
-	private Collection<String> mainModes = Arrays.asList(TransportMode.car) ;
+	private static final String MAIN_MODE = "mainMode";
+	private Collection<String> mainModes = Arrays.asList(TransportMode.car);
 	
 	// ---
-	private static final String INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES = "insertingWaitingVehiclesBeforeDrivingVehicles" ;
-	private boolean insertingWaitingVehiclesBeforeDrivingVehicles = false ;
+	private static final String INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES = "insertingWaitingVehiclesBeforeDrivingVehicles";
+	private boolean insertingWaitingVehiclesBeforeDrivingVehicles = false;
 
 	private double nodeOffset = 0;
 	private float linkWidth = 30;
@@ -106,7 +106,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		if (START_TIME.equals(key)) {
 			setStartTime(Time.parseTime(value));
 		} else if ( INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES.equals(key) ) {
-			setInsertingWaitingVehiclesBeforeDrivingVehicles(Boolean.parseBoolean(value)) ;
+			setInsertingWaitingVehiclesBeforeDrivingVehicles(Boolean.parseBoolean(value));
 		} else if (END_TIME.equals(key)) {
 			setEndTime(Time.parseTime(value));
 		} else if (TIME_STEP_SIZE.equals(key)) {
@@ -126,20 +126,20 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		} else if (NUMBER_OF_THREADS.equals(key)){
 		  setNumberOfThreads(Integer.parseInt(value)); 
 		} else if (TRAFFIC_DYNAMICS.equals(key)) {
-			setTrafficDynamics(value) ;
+			setTrafficDynamics(value);
 		} else if (SIM_STARTTIME_INTERPRETATION.equals(key)) {
-			setSimStarttimeInterpretation(value) ;
+			setSimStarttimeInterpretation(value);
 		} else if (VEHICLE_BEHAVIOR.equals(key)) {
 			setVehicleBehavior(value);
 		} else if (MAIN_MODE.equals(key)) {
-			setMainModes(Arrays.asList(value.split(","))) ;
+			setMainModes(Arrays.asList(value.split(",")));
 		} else if ("writeSnapshotsInterval".equals(key)) {
 			log.error("The config entry `writeSnapshotsInterval' was removed from the qsim config group. " +
 					"It is now in the controler config group; please move it there.  Aborting ...");
 			throw new IllegalArgumentException(key);
 		} else if ( "snapshotFormat".equals(key) ) {
 			log.error( "The config entry `snapshotFormat' was removed from the qsim config group. " +
-					"It is now in the controler config group; please move it there.  Aborting ...") ;
+					"It is now in the controler config group; please move it there.  Aborting ...");
 			throw new IllegalArgumentException(key);
 		} else if (NODE_OFFSET.equalsIgnoreCase(key)){
 			this.nodeOffset = Double.parseDouble(value);
@@ -153,7 +153,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 
 	@Override
 	public final String getValue(final String key) {
-		throw new RuntimeException("Please don't use `getValue' for QSimConfigGroup; use direct getters instead.  kai, dec'10") ;
+		throw new RuntimeException("Please don't use `getValue' for QSimConfigGroup; use direct getters instead.  kai, dec'10");
 	}
 
 	@Override
@@ -172,8 +172,8 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		map.put(TRAFFIC_DYNAMICS, getTrafficDynamics());
 		map.put(SIM_STARTTIME_INTERPRETATION, getSimStarttimeInterpretation());
 		map.put(VEHICLE_BEHAVIOR, getVehicleBehavior());
-		map.put(MAIN_MODE, CollectionUtils.setToString(new HashSet<String>(getMainModes()))) ;
-		map.put(INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES, String.valueOf( isInsertingWaitingVehiclesBeforeDrivingVehicles() ) ) ;
+		map.put(MAIN_MODE, CollectionUtils.setToString(new HashSet<String>(getMainModes())));
+		map.put(INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES, String.valueOf( isInsertingWaitingVehiclesBeforeDrivingVehicles() ) );
 		map.put(NODE_OFFSET, Double.toString(this.getNodeOffset()));
 		
 		return map;
@@ -183,31 +183,31 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 	/* package */ final static String REMOVE_STUCK_VEHICLES_STRING=
 		"Boolean. `true': stuck vehicles are removed, aborting the plan; `false': stuck vehicles are forced into the next link. `false' is probably the better choice.";
 	/* package */ final static String STUCK_TIME_STRING=
-		"time in seconds.  Time after which the frontmost vehicle on a link is called `stuck' if it does not move." ;
+		"time in seconds.  Time after which the frontmost vehicle on a link is called `stuck' if it does not move.";
 
 	@Override
 	public final Map<String, String> getComments() {
 		Map<String,String> map = super.getComments();
 		map.put(SNAPSHOT_STYLE,"snapshotStyle: `equiDist' (vehicles equidistant on link) or `queue' (vehicles queued at end of link) or `withHolesExperimental' (experimental!!)");
 		map.put(NUMBER_OF_THREADS, "Use number of threads > 1 for parallel version using the specified number of threads");
-		map.put(REMOVE_STUCK_VEHICLES, REMOVE_STUCK_VEHICLES_STRING ) ;
-		map.put(STUCK_TIME, STUCK_TIME_STRING ) ;
+		map.put(REMOVE_STUCK_VEHICLES, REMOVE_STUCK_VEHICLES_STRING );
+		map.put(STUCK_TIME, STUCK_TIME_STRING );
 		map.put(TRAFFIC_DYNAMICS, "`"
 				+ TRAFF_DYN_QUEUE + "' for the standard queue model, `"
-				+ TRAFF_DYN_W_HOLES + "' (experimental!!) for the queue model with holes") ;
+				+ TRAFF_DYN_W_HOLES + "' (experimental!!) for the queue model with holes");
 		map.put(SIM_STARTTIME_INTERPRETATION, "`"
 				+ MAX_OF_STARTTIME_AND_EARLIEST_ACTIVITY_END + "' (default behavior) or `"
-				+ ONLY_USE_STARTTIME + "'" ) ;
+				+ ONLY_USE_STARTTIME + "'" );
 		map.put(VEHICLE_BEHAVIOR, "Defines what happens if an agent wants to depart, but the specified vehicle is not available. " +
 				"One of: " + VEHICLE_BEHAVIOR_TELEPORT + ", " + VEHICLE_BEHAVIOR_WAIT + ", " + VEHICLE_BEHAVIOR_EXCEPTION);
 		map.put(MAIN_MODE, "Defines which mode should be the qsim `main' (=congested) mode. Technically, this is the mode that " +
 				"the departure handler of the netsimengine handles.  Effective cell size, effective lane width, flow capacity " +
-				"factor, and storage capacity factor need to be set with diligence.  Needs to be a vehicular mode to make sense.") ;
+				"factor, and storage capacity factor need to be set with diligence.  Needs to be a vehicular mode to make sense.");
 		map.put(INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES, 
-				"decides if waiting vehicles enter the network after or before the already driving vehicles were moved. Default: false") ; 
+				"decides if waiting vehicles enter the network after or before the already driving vehicles were moved. Default: false"); 
 		map.put(NODE_OFFSET, "Shortens a link in the visualization, i.e. its start and end point are moved into towards the center. Does not affect traffic flow. ");
 		map.put(LINK_WIDTH, "The (initial) width of the links of the network. Use positive floating point values.");
-		return map ;
+		return map;
 	}
 	/* direct access */
 
@@ -304,19 +304,19 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 	}
 
 	public void setTrafficDynamics(final String str) {
-		this.trafficDynamics = str ;
+		this.trafficDynamics = str;
 		if ( !TRAFF_DYN_QUEUE.equals(this.trafficDynamics) && !TRAFF_DYN_W_HOLES.equals(this.trafficDynamics) ) {
 			log.warn("The trafficDynamics \"" + str + "\" is ot one of the known ones. "
-					+ "See comment in config dump in log file for allowed styles." ) ;
+					+ "See comment in config dump in log file for allowed styles." );
 		}
 	}
 
 	public String getTrafficDynamics() {
-		return this.trafficDynamics ;
+		return this.trafficDynamics;
 	}
 
 	public int getNumberOfThreads() {
-		return this.numberOfThreads ;
+		return this.numberOfThreads;
 	}
 
 
@@ -333,7 +333,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 		if ( !MAX_OF_STARTTIME_AND_EARLIEST_ACTIVITY_END.equals(str)
 				&& !ONLY_USE_STARTTIME.equals(str) ) {
 			log.warn("The simStarttimeInterpretation '" + str + "' is not one of the known ones. "
-					+ "See comment in config dump in log file for allowed styles.") ;
+					+ "See comment in config dump in log file for allowed styles.");
 		}
 	}
 
@@ -354,7 +354,7 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 	}
 
 	public boolean isInsertingWaitingVehiclesBeforeDrivingVehicles() {
-		return this.insertingWaitingVehiclesBeforeDrivingVehicles  ;
+		return this.insertingWaitingVehiclesBeforeDrivingVehicles;
 	}
 
 	public void setInsertingWaitingVehiclesBeforeDrivingVehicles(boolean val) {
