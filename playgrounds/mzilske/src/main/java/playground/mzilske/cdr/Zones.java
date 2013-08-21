@@ -1,44 +1,33 @@
 package playground.mzilske.cdr;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
-import org.geotools.data.shapefile.ShpFiles;
-import org.geotools.data.shapefile.shp.ShapefileException;
-import org.geotools.data.shapefile.shp.ShapefileReader;
-import org.geotools.geometry.jts.JTS;
-import org.geotools.referencing.CRS;
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.opengis.geometry.MismatchedDimensionException;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.operation.TransformException;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.basic.v01.IdImpl;
+
+import playground.mzilske.util.ReadableQuadTree;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryCollection;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.MultiPoint;
-import com.vividsolutions.jts.geom.MultiPolygon;
 import com.vividsolutions.jts.geom.Point;
 import com.vividsolutions.jts.geom.Polygon;
-import com.vividsolutions.jts.geom.prep.PreparedGeometry;
-import com.vividsolutions.jts.geom.prep.PreparedGeometryFactory;
 import com.vividsolutions.jts.operation.distance.DistanceOp;
 import com.vividsolutions.jts.triangulate.VoronoiDiagramBuilder;
 
 public class Zones {
 
 	public Map<String, CellTower> cellTowers = new HashMap<String, CellTower>();
+	
+	public ReadableQuadTree<CellTower> quadTree;
 	
 	private Map<Coordinate, Geometry> siteToCell;
 
@@ -53,6 +42,11 @@ public class Zones {
 
 	public Zones(Map<String, CellTower> cellTowerMap) {
 		this.cellTowers.putAll(cellTowerMap);
+		Map<CellTower, Coord> coords = new HashMap<CellTower, Coord>();
+		for (CellTower cellTower : cellTowerMap.values()) {
+			coords.put(cellTower, cellTower.coord);
+		}
+		quadTree = new ReadableQuadTree<CellTower>(coords);
 	}
 
 	private void voronoiStatistics() {
@@ -76,40 +70,40 @@ public class Zones {
 	}
 
 
-	private Geometry getIvoryCoast() {
-		try {
-			ShapefileReader r = new ShapefileReader(new ShpFiles("/Users/zilske/d4d/10m-admin-0-countries/ci.shp"), true, true);
-			Geometry shape = (Geometry)r.nextRecord().shape(); // do stuff 
-			r.close();
-			return JTS.transform(shape, CRS.findMathTransform(MGC.getCRS(TransformationFactory.WGS84), MGC.getCRS("EPSG:3395"),true)) ;
-		} catch (ShapefileException e) {
-			throw new RuntimeException(e);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		} catch (MismatchedDimensionException e) {
-			throw new RuntimeException(e);
-		} catch (TransformException e) {
-			throw new RuntimeException(e);
-		} catch (FactoryException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	private void getLinksCrossingCells(Network network) {
-
-		GeometryCollection clippedCells = new MultiPolygon(unrolledCells.toArray(new Polygon[]{}),gf);
-		Set<Link> linksCrossingCells = new HashSet<Link>();
-		PreparedGeometry preparedCells = PreparedGeometryFactory.prepare(clippedCells.getBoundary());
-		for (Link link : network.getLinks().values()) {
-			if (preparedCells.intersects(gf.createLineString(new Coordinate[]{
-					new Coordinate(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY()), 
-					new Coordinate(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY())
-			}))) {
-				linksCrossingCells.add(link);
-			}
-			System.out.println("Links crossing cells: " + linksCrossingCells.size() + " of " + network.getLinks().size());
-		}
-	}
+//	private Geometry getIvoryCoast() {
+//		try {
+//			ShapefileReader r = new ShapefileReader(new ShpFiles("/Users/zilske/d4d/10m-admin-0-countries/ci.shp"), true, true);
+//			Geometry shape = (Geometry)r.nextRecord().shape(); // do stuff 
+//			r.close();
+//			return JTS.transform(shape, CRS.findMathTransform(MGC.getCRS(TransformationFactory.WGS84), MGC.getCRS("EPSG:3395"),true)) ;
+//		} catch (ShapefileException e) {
+//			throw new RuntimeException(e);
+//		} catch (IOException e) {
+//			throw new RuntimeException(e);
+//		} catch (MismatchedDimensionException e) {
+//			throw new RuntimeException(e);
+//		} catch (TransformException e) {
+//			throw new RuntimeException(e);
+//		} catch (FactoryException e) {
+//			throw new RuntimeException(e);
+//		}
+//	}
+//
+//	private void getLinksCrossingCells(Network network) {
+//
+//		GeometryCollection clippedCells = new MultiPolygon(unrolledCells.toArray(new Polygon[]{}),gf);
+//		Set<Link> linksCrossingCells = new HashSet<Link>();
+//		PreparedGeometry preparedCells = PreparedGeometryFactory.prepare(clippedCells.getBoundary());
+//		for (Link link : network.getLinks().values()) {
+//			if (preparedCells.intersects(gf.createLineString(new Coordinate[]{
+//					new Coordinate(link.getFromNode().getCoord().getX(), link.getFromNode().getCoord().getY()), 
+//					new Coordinate(link.getToNode().getCoord().getX(), link.getToNode().getCoord().getY())
+//			}))) {
+//				linksCrossingCells.add(link);
+//			}
+//			System.out.println("Links crossing cells: " + linksCrossingCells.size() + " of " + network.getLinks().size());
+//		}
+//	}
 
 	public void buildCells() {
 		
@@ -169,8 +163,28 @@ public class Zones {
 			}
 		}
 		for(String cellWithoutCalls : cellsWithoutCalls) {
+			System.out.println(cellWithoutCalls + " ///");
 			cellTowers.remove(cellWithoutCalls);
 		}
+	}
+
+	public Id locate(Coord coord) {
+//		double dist = Double.POSITIVE_INFINITY;
+//		CellTower shortest = null;
+//		for (CellTower cellTower : cellTowers.values()) {
+//			double thisDist = CoordUtils.calcDistance(coord, cellTower.coord);
+//			if (thisDist < dist) {
+//				shortest = cellTower;
+//				dist = thisDist;
+//			}
+//		}
+		
+		CellTower shortest = quadTree.get(coord.getX(), coord.getY());
+		
+		if (shortest == null) {
+			System.out.println("Huch.");
+		}
+		return new IdImpl(shortest.id);
 	}
 
 

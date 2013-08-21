@@ -9,13 +9,15 @@ import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 
 
-interface LinkToZoneResolver {
-	
-	public Id resolveLinkToZone(Id linkId);
-	
-}
+
 
 public class ZoneTracker implements LinkEnterEventHandler {
+	
+	public interface LinkToZoneResolver {
+		
+		public Id resolveLinkToZone(Id linkId);
+		
+	}
 	
 	private EventsManager eventsManager;
 	
@@ -33,6 +35,10 @@ public class ZoneTracker implements LinkEnterEventHandler {
 	@Override
 	public void reset(int iteration) {
 		// Not resetting delegate EventsManager here. Not my job.
+	}
+	
+	public Id getZoneForPerson(Id personId) {
+		return personInZone.get(personId);
 	}
 
 	@Override

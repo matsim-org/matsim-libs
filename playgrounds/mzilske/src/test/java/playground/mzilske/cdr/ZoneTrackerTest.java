@@ -11,6 +11,8 @@ import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
 
+import playground.mzilske.cdr.ZoneTracker.LinkToZoneResolver;
+
 public class ZoneTrackerTest {
 	
 	

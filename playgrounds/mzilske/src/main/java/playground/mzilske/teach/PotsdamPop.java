@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationWriter;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -50,12 +49,20 @@ import com.vividsolutions.jts.geom.Point;
 
 public class PotsdamPop implements Runnable {
 
-	private static final String PLANS_FILE = "input/plans.xml";
+	private static final String PLANS_FILE = "input/potsdam/plans.xml";
 
-	private static final String FILENAME = "../../brandenburg_gemeinde_kreisgrenzen/kreise/dlm_kreis_with_berlin.shp";
+	private static final String FILENAME = "/Users/michaelzilske/Downloads/bb_und_be/dlm_kreise.shp";
 
-	private static Coord drawRandomPointFromGeometry(Geometry g) {
-		Random rnd = new Random();
+	private Random rnd;
+
+	public PotsdamPop(Scenario scenario2, long seed) {
+		this.scenario = scenario2;
+		this.rnd = new Random(seed);;
+	}
+
+
+
+	private Coord drawRandomPointFromGeometry(Geometry g) {
 		Point p;
 		double x, y;
 		do {
@@ -108,8 +115,7 @@ public class PotsdamPop implements Runnable {
 
 
 	public static void main(String[] args) {
-		PotsdamPop potsdamPop = new PotsdamPop();
-		potsdamPop.readShapeFile();
+		PotsdamPop potsdamPop = new PotsdamPop(ScenarioUtils.createScenario(ConfigUtils.createConfig()), 4711);
 		potsdamPop.run();
 	}
 
@@ -123,7 +129,7 @@ public class PotsdamPop implements Runnable {
 
 	@Override
 	public void run() {
-		scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		readShapeFile();
 		population = scenario.getPopulation();
 		for (Relation relation : relations) {
 			int quantity = scale(getCarQuantityOut(relation.workTripsPerDay));
@@ -153,7 +159,6 @@ public class PotsdamPop implements Runnable {
 
 	private int scale(int quantityOut) {
 		int scaled = (int) (quantityOut * 0.01);
-		System.out.println("scaled: " + scaled);
 		return scaled;
 	}
 
@@ -226,14 +231,14 @@ public class PotsdamPop implements Runnable {
 	}
 
 	private double calculateNormallyDistributedTime(int i) {
-		Random random = new Random();
 		//draw two random numbers [0;1] from uniform distribution
-		double r1 = random.nextDouble();
-		double r2 = random.nextDouble();
+		double r1 = rnd.nextDouble();
+		double r2 = rnd.nextDouble();
 		//Box-Muller-Method in order to get a normally distributed variable
 		double normal = Math.cos(2 * Math.PI * r1) * Math.sqrt(-2 * Math.log(r2));
 		//linear transformation in order to optain N[i,7200²]
 		double endTimeInSec = i + 120 * 60 * normal ;
+		endTimeInSec = Math.max(endTimeInSec, 0.0);
 		return endTimeInSec;
 	}
 

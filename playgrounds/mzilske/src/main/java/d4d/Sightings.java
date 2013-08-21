@@ -9,6 +9,6 @@ public class Sightings {
 		this.sightings = sightings.iterator();
 	}
 
-	Iterator<Sighting> sightings;
+	public Iterator<Sighting> sightings;
 
 }
