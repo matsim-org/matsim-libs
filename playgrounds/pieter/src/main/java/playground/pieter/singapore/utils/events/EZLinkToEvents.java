@@ -262,8 +262,7 @@ public class EZLinkToEvents {
 
 			@Override
 			public int compareTo(PtVehicleDwellEvent o) {
-
-				return Integer.compare(arrivalTime, o.arrivalTime);
+				return (this.arrivalTime < o.arrivalTime) ? -1 : ((this.arrivalTime == o.arrivalTime) ? 0 : 1);
 			}
 
 		}
