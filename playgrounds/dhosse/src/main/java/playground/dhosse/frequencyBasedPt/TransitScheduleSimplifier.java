@@ -145,7 +145,7 @@ public class TransitScheduleSimplifier{
 				mergedTransitRoute = factory.createTransitRoute(new IdImpl(id),
 					newRoute, newStops, TransportMode.pt);
 			
-				mergeDepartures(mergedTransitRoute.getStops().get(0), mergedTransitRoute);
+				mergeDepartures(mergedTransitRoute.getStops().get(0), mergedTransitRoute,listOfRoutes);
 
 				//add merged transit route to the transit line
 				transitLine.addRoute(mergedTransitRoute);
@@ -270,7 +270,7 @@ public class TransitScheduleSimplifier{
 					
 						mergedRoutesCounter++;
 					
-						mergeDepartures(start,mergedTransitRoute);
+						mergeDepartures(start,mergedTransitRoute,listOfRoutes);
 				
 						transitLine.addRoute(mergedTransitRoute);
 					
@@ -550,10 +550,12 @@ public class TransitScheduleSimplifier{
 	 * @param mergedTransitRoute the new transit route
 	 */
 	private static void mergeDepartures(TransitRouteStop startTransitRouteStop,
-			TransitRoute mergedTransitRoute) {
+			TransitRoute mergedTransitRoute,String[] listOfTransitRoutes) {
 
-		all:for(TransitRoute transitRoute : transitRoutes.values()){
+		all:for(int i = 0; i < listOfTransitRoutes.length; i++){
 
+			TransitRoute transitRoute = transitRoutes.get(new IdImpl(listOfTransitRoutes[i]));
+			
 			if(transitRoute.getStops().contains(transitRoute.getStop(startTransitRouteStop.getStopFacility()))&&!transitRoute.getId().toString().contains("merged")){
 
 				for(TransitRouteStop stop : mergedTransitRoute.getStops())
