@@ -70,7 +70,7 @@ public class SightingsEngine implements MobsimEngine {
 	}
 
 	private void handleNetworkChangeEvents(final double time) {
-		while ((this.sightingsQueue.size() > 0) && (this.sightingsQueue.peek().getDateTime() <= time)) {
+		while ((this.sightingsQueue.size() > 0) && (this.sightingsQueue.peek().getTime() <= time)) {
 			Sighting event = this.sightingsQueue.poll();
 			Id linkId = agentLocator.locations.get(event.getAgentId());
 			if (linkId != null) { // vielleicht sind wir noch nie gesehen worden

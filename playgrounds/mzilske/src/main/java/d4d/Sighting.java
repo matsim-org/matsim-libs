@@ -16,7 +16,7 @@ public class Sighting extends Event {
 		
 		@Override
 		public int compare(Sighting o1, Sighting o2) {
-			return Double.compare(o1.getDateTime(), o2.getDateTime());
+			return Double.compare(o1.getTime(), o2.getTime());
 		}
 		
 	}
@@ -24,10 +24,6 @@ public class Sighting extends Event {
 	private long dateTime;
 	private String cellTowerId;
 	private Id agentId;
-
-	public long getDateTime() {
-		return dateTime * 1000;
-	}
 
 	public Sighting(Id agentId, long timeInSeconds, String cellTowerId) {
 		super(timeInSeconds);

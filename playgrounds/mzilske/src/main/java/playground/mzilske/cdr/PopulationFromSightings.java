@@ -54,7 +54,7 @@ public class PopulationFromSightings {
 				Coord coord = new CoordImpl(p.getX(), p.getY());
 				Activity activity = scenario.getPopulation().getFactory().createActivityFromCoord("sighting", coord);
 				cellsOfSightings.put(activity, cellTower);
-				activity.setEndTime(sighting.getDateTime());
+				activity.setEndTime(sighting.getTime());
 				Id personId = sightingsPerPerson.getKey();
 				Person person = scenario.getPopulation().getPersons().get(personId);
 				if (person == null) {

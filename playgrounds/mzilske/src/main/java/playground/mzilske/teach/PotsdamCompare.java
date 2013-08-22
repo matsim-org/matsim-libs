@@ -14,7 +14,10 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -83,7 +86,30 @@ public class PotsdamCompare {
 
 		List<Sighting> sightings = callProcess.getSightings();
 
-		final ScenarioImpl scenario2 = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		runSimulationFromSightings(cellularCoverage, sightings);
+
+	}
+
+	public static void runSimulationFromSightings(final Zones cellularCoverage,
+			List<Sighting> sightings) throws FileNotFoundException {
+		Config config = ConfigUtils.createConfig();
+		ActivityParams sightingParam = new ActivityParams("sighting");
+		// sighting.setOpeningTime(0.0);
+		// sighting.setClosingTime(0.0);
+		sightingParam.setTypicalDuration(30.0 * 60);
+		config.planCalcScore().addActivityParams(sightingParam);
+		config.planCalcScore().setTraveling_utils_hr(-6);
+		config.planCalcScore().setPerforming_utils_hr(0);
+		config.planCalcScore().setTravelingOther_utils_hr(-6);
+		config.planCalcScore().setConstantCar(0);
+		config.planCalcScore().setMonetaryDistanceCostRateCar(0);
+		QSimConfigGroup tmp = new QSimConfigGroup();
+		tmp.setFlowCapFactor(0.01);
+		tmp.setStorageCapFactor(0.01);
+		tmp.setRemoveStuckVehicles(false);
+		tmp.setEndTime(24*60*60);
+		config.addQSimConfigGroup(tmp);
+		final ScenarioImpl scenario2 = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario2).readFile("input/potsdam/network.xml");
 
 		
@@ -110,8 +136,8 @@ public class PotsdamCompare {
 		PopulationFromSightings.preparePopulation(scenario2, cellularCoverage, allSightings);
 
 		Controler controler = new Controler(scenario2);
+		controler.setOverwriteFiles(true);
 		controler.run();
-
 	}
 
 	public static int[] getVolumesForLink(VolumesAnalyzer volumesAnalyzer1, Link link) {
