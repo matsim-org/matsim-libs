@@ -121,15 +121,11 @@ public class SpatialAveraging {
 	final double smoothingRadius_m = 500.;
 	final double smoothinRadiusSquared_m = smoothingRadius_m * smoothingRadius_m;
 	final String pollutant2analyze = WarmPollutant.NO2.toString();
-	final boolean baseCaseOnly = true;
+	final boolean baseCaseOnly = false;
 	
 //	Map<Double, Map<Id, Map<String, Double>>> time2EmissionMapToAnalyze_g = new HashMap<Double, Map<Id,Map<String,Double>>>();
 //	Map<Double, Map<Id, Double>> time2DemandMapToAnalyze_vkm = new HashMap<Double, Map<Id,Double>>();
 
-//	private final Map<Double, double[][]> time2weightedEmissions1 = new HashMap<Double, double[][]>();
-//	private final Map<Double, double[][]> time2weightedEmissions2 = new HashMap<Double, double[][]>();
-//	private final Map<Double, double[][]> time2weightedDemand1 = new HashMap<Double, double[][]>();
-//	private final Map<Double, double[][]> time2weightedDemand2 = new HashMap<Double, double[][]>();
 
 	private void run() throws IOException{
 		this.simulationEndTime = getEndTime(configFile1);
@@ -156,12 +152,21 @@ public class SpatialAveraging {
 		Map<Double, double[][]> time2weightedDemand1 = fillWeightedDemandValues(time2CountsPerLinkFilledAndFiltered1);
 
 		if(baseCaseOnly){
+			outPathStub = runDirectory1 + "analysis/spatialAveraging/" + runNumber1 + "." + lastIteration1;
 			
+			time2weightedEmissions1 = scale(time2weightedEmissions1);
+			time2weightedDemand1 = scale(time2weightedDemand1);
+			Map<Double, double[][]> time2SpecificEmissions = calculateSpecificEmissions(time2weightedEmissions1, time2weightedDemand1);
 			
+			for( double endOfTimeInterval: time2weightedEmissions1.keySet()){
+				writeRoutput(time2weightedEmissions1.get(endOfTimeInterval), outPathStub + ".Routput." + pollutant2analyze.toString() + ".g." + endOfTimeInterval + ".txt");
+				writeRoutput(time2weightedDemand1.get(endOfTimeInterval), outPathStub + ".Routput.Demand.vkm" + "." + endOfTimeInterval + ".txt");
+				writeRoutput(time2SpecificEmissions.get(endOfTimeInterval), outPathStub+ ".Routput." + pollutant2analyze + ".gPerVkm" + endOfTimeInterval + ".txt");
+			}
 			
 //			time2EmissionMapToAnalyze_g = scaleToFullSample(time2EmissionsTotalFilledAndFiltered1);
 //			time2DemandMapToAnalyze_vkm = calculateVkm(time2CountsPerLinkFilledAndFiltered1);
-			outPathStub = runDirectory1 + "analysis/spatialAveraging/" + runNumber1 + "." + lastIteration1;
+			
 		} else {
 			processEmissions(emissionFile2);
 			Map<Double, Map<Id, Map<WarmPollutant, Double>>> time2WarmEmissionsTotal2 = this.warmHandler.getWarmEmissionsPerLinkAndTimeInterval();
@@ -324,6 +329,39 @@ public class SpatialAveraging {
 		return time2absoluteDifferences;
 	}
 
+	private Map<Double, double[][]> scale(Map<Double, double[][]> time2weightedValues){
+		Map<Double, double[][]> time2scaledValues = new HashMap<Double, double[][]>();
+		
+		for(Double endOfTimeInterval : time2weightedValues.keySet()){
+			double [][] unscaledValues = time2weightedValues.get(endOfTimeInterval);
+			double [][] scaledValues = new double[noOfXbins][noOfYbins];
+			for(int xIndex = 0; xIndex<noOfXbins; xIndex++){
+				for(int yIndex = 0; yIndex<noOfYbins; yIndex++){
+					scaledValues[xIndex][yIndex]= this.scalingFactor*unscaledValues[xIndex][yIndex];
+				}
+			}
+			time2scaledValues.put(endOfTimeInterval, scaledValues);
+		}
+		return time2scaledValues;
+	}
+	
+	private Map<Double, double[][]> calculateSpecificEmissions(
+			Map<Double, double[][]> time2weightedEmissions,
+			Map<Double, double[][]> time2weightedDemand) {
+		
+		Map<Double, double[][]> time2specificEmissions = new HashMap<Double, double[][]>();
+		for( Double endOfTimeInterval : time2weightedEmissions.keySet()){
+			double [][] specificEmissions = new double[noOfXbins][noOfYbins];
+			for(int xIndex = 0; xIndex<noOfXbins; xIndex++){
+				for(int yIndex = 0; yIndex<noOfYbins; yIndex++){
+					specificEmissions[xIndex][yIndex] = time2weightedEmissions.get(endOfTimeInterval)[xIndex][yIndex]/time2weightedDemand.get(endOfTimeInterval)[xIndex][yIndex];
+				}
+			}
+			time2specificEmissions.put(endOfTimeInterval, specificEmissions);
+		}
+		return time2specificEmissions;
+	}
+	
 	private Map<Double, Map<Id, Map<String, Double>>> scaleToFullSample(
 			Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFilledAndFiltered) {
 		Map<Double, Map<Id, Map<String, Double>>> time2EmissionsTotalFilledAndFilteredScaled = new HashMap<Double, Map<Id,Map<String,Double>>>();
