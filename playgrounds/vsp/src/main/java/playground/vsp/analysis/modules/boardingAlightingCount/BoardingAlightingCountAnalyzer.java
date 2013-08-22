@@ -117,7 +117,6 @@ public class BoardingAlightingCountAnalyzer extends AbstractAnalyisModule{
 	 * 
 	 */
 	private Map<Id, Double> createTotals(Counts counts, String name) {
-		//TODO[dr] create HeatMaps for timeslots
 		// count totals
 		Map<Id, Double> totals = new HashMap<Id, Double>();
 		Double total;

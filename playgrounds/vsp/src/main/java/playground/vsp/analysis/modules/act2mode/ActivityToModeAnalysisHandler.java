@@ -83,7 +83,6 @@ public class ActivityToModeAnalysisHandler implements
 
 	@Override
 	public void reset(int iteration) {
-		// TODO[dr] Auto-generated method stub
 
 	}
 	
