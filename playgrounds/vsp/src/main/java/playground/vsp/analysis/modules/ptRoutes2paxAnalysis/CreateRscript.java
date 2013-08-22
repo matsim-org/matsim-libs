@@ -33,6 +33,8 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 
+import playground.vsp.analysis.modules.ptLines2PaxAnalysis.TransitLines2PaxCounts;
+
 /**
  * @author droeder
  *
@@ -72,6 +74,27 @@ public class CreateRscript {
 			}
 		}
 		
+		BufferedWriter w = IOUtils.getBufferedWriter(outDir + "plotAll.bat");
+		try {
+			w.write(
+					b.toString()
+				);
+			w.flush();
+			w.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	// created for use with PtLines2PaxAnalysis, fuerbas
+	public static void createScriptFromTransitLines2PaxCounts (TransitLines2PaxCounts tl2c, String outDir) {
+		readScript(outDir);
+		heatmapScript(outDir);
+		StringBuffer b = new StringBuffer();
+		for (int r = 0; r < tl2c.getRouteList().size(); r++) {
+			createRouteScript(tl2c.getId(), tl2c.getRouteList().get(r).getId(), outDir);
+			b.append(tl2c.getId() + "--" + tl2c.getRouteList().get(r).getId().toString() + ".R\n");
+		}
 		BufferedWriter w = IOUtils.getBufferedWriter(outDir + "plotAll.bat");
 		try {
 			w.write(
