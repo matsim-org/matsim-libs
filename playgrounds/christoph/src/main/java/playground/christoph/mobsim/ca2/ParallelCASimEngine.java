@@ -206,14 +206,14 @@ class ParallelCASimEngine extends CASimEngine {
 
 		for (NetsimNode node : this.getMobsim().getNetsimNetwork().getNetsimNodes().values()) {
 			CASimEngine simEngine = engines[roundRobin % this.numOfThreads];
-			super.getMultiModalQNodeExtension(node.getNode().getId()).setMultiModalSimEngine(simEngine);
+			super.getCANode(node.getNode().getId()).setMultiModalSimEngine(simEngine);
 		
 			/*
 			 * Assign each link to its in-node to ensure that they are processed by the same
 			 * thread which should avoid running into some race conditions.
 			 */
 			for (Link l : node.getNode().getOutLinks().values()) {
-				super.getMultiModalQLinkExtension(l.getId()).setCASimEngine(simEngine);
+				super.getCALink(l.getId()).setCASimEngine(simEngine);
 			}
 			
 			roundRobin++;

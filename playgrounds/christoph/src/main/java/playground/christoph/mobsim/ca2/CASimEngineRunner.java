@@ -132,15 +132,15 @@ public class CASimEngineRunner extends CASimEngine implements Runnable {
 	 * Use the map from the ParallelMultiModalSimEngine. This is a read-only access,
 	 * therefore this should be thread-safe.
 	 */
-	/*package*/ CANode getMultiModalQNodeExtension(Id nodeId) {
-		return multiModalSimEngine.getMultiModalQNodeExtension(nodeId);
+	/*package*/ CANode getCANode(Id nodeId) {
+		return multiModalSimEngine.getCANode(nodeId);
 	}
 
 	/*
 	 * Use the map from the ParallelMultiModalSimEngine. This is a read-only access,
 	 * therefore this should be thread-safe.
 	 */
-	/*package*/ CALink getMultiModalQLinkExtension(Id linkId) {
-		return multiModalSimEngine.getMultiModalQLinkExtension(linkId);
+	/*package*/ CALink getCALink(Id linkId) {
+		return multiModalSimEngine.getCALink(linkId);
 	}
 }

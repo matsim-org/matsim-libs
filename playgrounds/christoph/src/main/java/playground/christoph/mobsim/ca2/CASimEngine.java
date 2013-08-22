@@ -97,13 +97,13 @@ public class CASimEngine implements MobsimEngine, NetworkElementActivator {
 		
 		for (NetsimLink link : qSim.getNetsimNetwork().getNetsimLinks().values()) {
 			Id toNodeId = link.getLink().getToNode().getId();
-			CALink extension = new CALink(link.getLink(), this, getMultiModalQNodeExtension(toNodeId),
+			CALink extension = new CALink(link.getLink(), this, getCANode(toNodeId),
 					this.spatialResolution, timeStep);
 			links.put(link.getLink().getId(), extension);
 		}
 		
 		for (NetsimNode node : qSim.getNetsimNetwork().getNetsimNodes().values()) {
-			CANode extension = getMultiModalQNodeExtension(node.getNode().getId());
+			CANode extension = getCANode(node.getNode().getId());
 			extension.init();
 		}
 		
@@ -203,11 +203,11 @@ public class CASimEngine implements MobsimEngine, NetworkElementActivator {
 		return activeNodes.size();
 	}
 
-	/*package*/ CANode getMultiModalQNodeExtension(Id nodeId) {
+	/*package*/ CANode getCANode(Id nodeId) {
 		return nodes.get(nodeId);
 	}
 
-	/*package*/ CALink getMultiModalQLinkExtension(Id linkId) {
+	/*package*/ CALink getCALink(Id linkId) {
 		return links.get(linkId);
 	}
 	

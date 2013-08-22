@@ -1,6 +1,7 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Cell.java
+
+ * VXYEventsHandler.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,66 +18,12 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package playground.christoph.mobsim.ca2.events;
 
-package playground.christoph.mobsim.ca2;
+import org.matsim.core.events.handler.EventHandler;
 
-import org.matsim.api.core.v01.Coord;
-import org.matsim.core.mobsim.framework.MobsimAgent;
+public interface VXYEventsHandler extends EventHandler {
 
-public class Cell {
+	public void handleEvent(VXYEvent event);
 
-	private MobsimAgent agentInCell;
-
-	private final int id;
-	private final Coord coord;
-	private final double length;
-	
-	public Cell(int id, Coord coord, double length) {
-		this.id = id;
-		this.coord = coord;
-		this.length = length;
-		
-		this.agentInCell = null;
-	}
-	
-	public int getId() {
-		return this.id;
-	}
-	
-	public Coord getCoord() {
-		return this.coord;
-	}
-	
-	public boolean setAgent(MobsimAgent agent) {
-		if (this.agentInCell != null && agentInCell != null) {
-			throw new RuntimeException("Agent " + agent.getId() + " tries to enter cell "
-					+ this.id + " which is already occupied by agent " + this.agentInCell.toString() +
-					". Aborting!");
-		}
-		this.agentInCell = agent;
-		return true;
-	}
-	
-	public void reset() {
-		this.agentInCell = null;
-	}
-
-	public double getLength() {
-		return this.length;
-	}
-        
-	public MobsimAgent getAgent() {
-		return this.agentInCell;
-	}
-	
-	public boolean hasAgent() {
-		return this.agentInCell != null;
-	}
-	
-	public String toString() {
-		return "[id=" + this.getId() + "]" +
-		"[length=" + this.length + "]" +
-		"[x=" + this.coord.getX() + "]" +
-		"[y=" + this.coord.getY() + "]";
-	}
 }

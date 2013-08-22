@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * MultiModalQNodeExtension.java
+ * VXYEvent.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,14 +18,66 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.christoph.mobsim.ca2;
+package playground.christoph.mobsim.ca2.events;
 
-import org.matsim.core.mobsim.framework.MobsimAgent;
+import java.util.Map;
 
-public class AgentMoveOverNodeContext {
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.Event;
+
+public class VXYEvent extends Event {
+
+	public static final String EVENT_TYPE = "VXYEvent";
+	public static final String ATTRIBUTE_X = "x";
+	public static final String ATTRIBUTE_Y = "y";
+	public static final String ATTRIBUTE_V = "v";
 	
-	public MobsimAgent mobsimAgent;
-	public Cell currentCell;
-	public double currentSpeed;
-	public double remainingTravelTime;
+	public static final String ATTRIBUTE_PERSON = "person";
+
+	private final double v;
+	private final double x;
+	private final double y;
+	private final Id personId;
+
+	public VXYEvent(Id id, double v, double x, double y, double time) {
+		super(time);
+		this.personId = id;
+		this.v = v;
+		this.x = x;
+		this.y = y;
+	}
+
+	@Override
+	public Map<String, String> getAttributes() {
+		Map<String, String> attr = super.getAttributes();
+		attr.put(ATTRIBUTE_PERSON, this.personId.toString());
+		attr.put(ATTRIBUTE_V, Double.toString(this.v));
+		attr.put(ATTRIBUTE_X, Double.toString(this.x));
+		attr.put(ATTRIBUTE_Y, Double.toString(this.y));
+
+		return attr;
+	}
+	
+	public double getV() {
+		return this.v;
+	}
+	
+	public double getX() {
+		return this.x;
+	}
+
+	public double getY() {
+		return this.y;
+	}
+
+
+	public Id getPersonId() {
+		return this.personId;
+	}
+
+	@Override
+	public String getEventType() {
+		return EVENT_TYPE;
+	}
+	
 }

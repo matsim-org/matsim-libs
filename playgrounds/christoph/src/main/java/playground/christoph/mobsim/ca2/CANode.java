@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * CANodeExtension.java
+ * CANode.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -39,7 +39,7 @@ public class CANode {
 	private final CALink[] inLinksArrayCache;
 	
 	/*
-	 * Is set to "true" if the MultiModalNodeExtension has active inLinks.
+	 * Is set to "true" if the CANode has active inLinks.
 	 */
 	protected AtomicBoolean isActive = new AtomicBoolean(false);
 	
@@ -54,7 +54,7 @@ public class CANode {
 	/*package*/ void init() {
 		int i = 0;
 		for (Link link : node.getInLinks().values()) {
-			this.inLinksArrayCache[i] = simEngine.getMultiModalQLinkExtension(link.getId());
+			this.inLinksArrayCache[i] = simEngine.getCALink(link.getId());
 			i++;
 		}
 	}
@@ -70,7 +70,7 @@ public class CANode {
 		 */
 		boolean agentsWaitingAtInLinks = false;
 		for (CALink link : this.inLinksArrayCache) {
-			if(link.hasWaitingToLeaveAgents()) {
+			if(link.hasWaitingToLeaveAgents(now)) {
 				agentsWaitingAtInLinks = true;
 				break;
 			}
@@ -89,10 +89,17 @@ public class CANode {
 		 * At the moment we do not simulate capacities in the additional
 		 * modes. Therefore we move all agents over the node.
 		 */
-		for (CALink link : this.inLinksArrayCache) {			
+		for (CALink link : this.inLinksArrayCache) {
 			AgentMoveOverNodeContext context = null;
-			while (link.isAcceptingFromUpstream() && (context = link.getNextWaitingAgent(now)) != null ) {
-				this.moveAgentOverNode(context, now);
+			int outFlowCapacity = link.getOutFlowCapacity(now);
+//			while (link.isAcceptingFromUpstream() && outFlowCapacity > 0 && (context = link.getNextWaitingAgent(now)) != null) {
+			while (outFlowCapacity > 0 && (context = link.getNextWaitingAgent(now)) != null) {
+				/*
+				 * Try moving the agent over the node. This will fail if the agent's
+				 * next link has no free space. In this case stop moving agents.
+				 */
+				if (this.moveAgentOverNode(context, now)) outFlowCapacity++;
+				else break;
 			}
 		}
 		
@@ -110,9 +117,9 @@ public class CANode {
 		}
 	}
 	
-	private void checkNextLinkSemantics(Link currentLink, Link nextLink, MobsimAgent personAgent){
+	private void checkNextLinkSemantics(Link currentLink, Link nextLink, MobsimAgent mobsimAgent){
 		if (currentLink.getToNode() != nextLink.getFromNode()) {
-	      throw new RuntimeException("Cannot move PersonAgent " + personAgent.getId() +
+	      throw new RuntimeException("Cannot move MobsimAgent " + mobsimAgent.getId() +
 	          " from link " + currentLink.getId() + " to link " + nextLink.getId());
 	   	}
 	}
@@ -136,25 +143,36 @@ public class CANode {
 		Link currentLink = currentQLink.getLink();
 		
 		if (nextLinkId != null) {
-			NetsimLink nextQLink = this.simEngine.getMobsim().getNetsimNetwork().getNetsimLinks().get(nextLinkId);			
+			NetsimLink nextQLink = this.simEngine.getMobsim().getNetsimNetwork().getNetsimLinks().get(nextLinkId);
 			Link nextLink = nextQLink.getLink();
 			
 			this.checkNextLinkSemantics(currentLink, nextLink, mobsimAgent);
 			
-			// move Agent over the Node
-			((MobsimDriverAgent) mobsimAgent).notifyMoveOverNode(nextLinkId);
-			simEngine.getMultiModalQLinkExtension(nextLinkId).addAgentFromIntersection(context, now);
+			CALink nextCALink = this.simEngine.getCALink(nextLinkId);
+			if (nextCALink.isAcceptingFromUpstream()) {
+				// move Agent over the Node
+				((MobsimDriverAgent) mobsimAgent).notifyMoveOverNode(nextLinkId);
+				nextCALink.addAgentFromIntersection(context, now);
+				
+				// remove AgentContext object from agent's last link
+				CALink currentCALink = this.simEngine.getCALink(currentLinkId);
+				currentCALink.remveAgentContext(mobsimAgent.getId());
+				
+				// clear agent's cell on last link
+				context.currentCell.reset();
+				return true;
+			} else return false;
+						
 		}
 		// --> nextLink == null
-		else
-		{
+		else {
 			this.simEngine.getMobsim().getAgentCounter().decLiving();
 			this.simEngine.getMobsim().getAgentCounter().incLost();
 			log.error(
 					"Agent has no or wrong route! agentId=" + mobsimAgent.getId()
 					+ " currentLink=" + currentLink.getId().toString()
 					+ ". The agent is removed from the simulation.");			
+			return true;
 		}
-		return true;
 	}
 }

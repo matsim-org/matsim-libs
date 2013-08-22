@@ -55,7 +55,7 @@ public class CADepartureHandler implements DepartureHandler {
 	
 	private void handleMultiModalDeparture(double now, MobsimDriverAgent personAgent, Id linkId) {
 		
-		CALink extension = simEngine.getMultiModalQLinkExtension(linkId);
+		CALink extension = simEngine.getCALink(linkId);
 		
 		if ((personAgent.getDestinationLinkId().equals(linkId)) && (personAgent.chooseNextLinkId() == null)) {
 			personAgent.endLegAndComputeNextState(now);
