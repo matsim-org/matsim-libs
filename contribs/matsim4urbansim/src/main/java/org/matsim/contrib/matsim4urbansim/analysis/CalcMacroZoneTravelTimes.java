@@ -50,7 +50,6 @@ public class CalcMacroZoneTravelTimes implements AgentDepartureEventHandler,
 												ActivityStartEventHandler,
 												ActivityEndEventHandler{
 
-	@SuppressWarnings("unused")
 	private static final Logger log = Logger
 			.getLogger(CalcMacroZoneTravelTimes.class);
 	private HashMap<Id, LegStore> legStore;
@@ -78,7 +77,6 @@ public class CalcMacroZoneTravelTimes implements AgentDepartureEventHandler,
 
 	@Override
 	public void reset(int iteration) {
-		// TODO[dr] Auto-generated method stub
 
 	}
 
