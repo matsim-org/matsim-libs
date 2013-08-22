@@ -53,7 +53,7 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 @Deprecated
 public class DistanceAnalysis {
-	//TODO debugging
+	//TODO [dr]debugging
 	private static final Logger log = Logger.getLogger(DistanceAnalysis.class);
 	
 	private DistAnalysisHandler eventsHandler;
