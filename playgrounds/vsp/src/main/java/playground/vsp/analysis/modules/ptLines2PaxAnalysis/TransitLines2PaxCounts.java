@@ -84,7 +84,9 @@ public class TransitLines2PaxCounts {
 				}
 			}
 		}	
-//		cleanRouteList();
+		sortRoutesByNumberOfStops();
+		createRouteSegments();
+		// execute twice to ensure all added fragment duplicates are detected and removed
 		sortRoutesByNumberOfStops();
 		createRouteSegments();
 	}
@@ -224,14 +226,13 @@ public class TransitLines2PaxCounts {
 											}
 										}
 										else {
-											log.error("FRAGMENT MUSS EVTL ERSTELLT WERDEN, ROUTEN IM OUTPUT MANUELL PRUEFEN");
+											log.error("Fragment may need to be created, check output manually for now.");
 										}
 									}
 								}
 							}
 							log.info("Does not fit into current route scheme: "+"tr ID: "+tr.getId()+" with length: "+trLength+" and tr2 ID: "+tr2.getId()+" with length: "+tr2Length);
 							if (!noFittingSchemeRoutes.contains(tr2)) noFittingSchemeRoutes.add(tr2);
-							log.info("ANZAHL STOPS TR: "+tr.getStops().size()+" ANZAHL STOPS TR2: "+tr2.getStops().size());
 						}
 					}
 

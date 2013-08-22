@@ -86,15 +86,12 @@ public class PtLines2PaxAnalysis extends AbstractAnalyisModule {
 		String dir;
 		for(TransitLines2PaxCounts tl2c: this.handler.getLinesPaxCounts().values()){
 			dir = outputFolder + tl2c.getId().toString() + "--";
-//			for "all longest" route = route with most stops write line files
 			writeLineFiles(dir, tl2c, this.lines.get(tl2c.getId()));
 		}
-		CreateRscript.createScript(this.lines, outputFolder);
 	}
 	
-//	works with simplistic example
 	
-	private void writeCounts2File(TransitLines2PaxCounts tl, Integer maxSlice, Counts counts, String file, String typeOfOutput) {
+	private void writeCounts2File(TransitRoute tl, Integer maxSlice, Counts counts, String file, String typeOfOutput) {
 		BufferedWriter w = IOUtils.getBufferedWriter(file);
 		Id stopId; 
 		Count c;
@@ -106,13 +103,7 @@ public class PtLines2PaxAnalysis extends AbstractAnalyisModule {
 				w.write(";" + String.valueOf(i));
 			}
 			w.write("\n");
-			// ...
-			log.info("Number of TransitRoutes to be written for "+typeOfOutput+": "+tl.getRouteList().size());
-			for(int i = 0; i < tl.getRouteList().size() ; i++){
-				w.write("\n");
-				TransitRoute tr = tl.getRouteList().get(i);
-				log.info("Writing output "+typeOfOutput+" for TransitRoute "+(i+1)+" of "+tl.getRouteList().size()+
-						" total routes, id = "+tr.getId()+" length = "+tr.getStops().size());
+				TransitRoute tr = tl;
 				for (int noStops = 0; noStops < tr.getStops().size(); noStops++) {	
 					stopId = tr.getStops().get(noStops).getStopFacility().getId();
 					c = counts.getCount(stopId);
@@ -124,7 +115,6 @@ public class PtLines2PaxAnalysis extends AbstractAnalyisModule {
 					}
 					w.write("\n");
 				}
-			}
 			w.flush();
 			w.close();
 		} catch (IOException e) {
@@ -133,11 +123,14 @@ public class PtLines2PaxAnalysis extends AbstractAnalyisModule {
 	}
 	
 	private void writeLineFiles(String dir, TransitLines2PaxCounts tl2c, TransitLine tl) {
-		writeCounts2File(tl2c, tl2c.getMaxSlice(), tl2c.getAlighting(), dir + tl2c.getId().toString() + "--alighting.csv", "alighting");
-		writeCounts2File(tl2c, tl2c.getMaxSlice(), tl2c.getBoarding(), dir + tl2c.getId().toString() + "--boarding.csv", "boarding");
-		writeCounts2File(tl2c, tl2c.getMaxSlice(), tl2c.getCapacity(), dir + tl2c.getId().toString() + "--capacity.csv", "capacity");
-		writeCounts2File(tl2c, tl2c.getMaxSlice(), tl2c.getOccupancy(), dir + tl2c.getId().toString() + "--occupancy.csv", "occupancy");
-		writeCounts2File(tl2c, tl2c.getMaxSlice(), tl2c.getTotalPax(), dir + tl2c.getId().toString() + "--totalPax.csv", "totalPax");
+		for(int i = 0; i < tl2c.getRouteList().size() ; i++){
+			writeCounts2File(tl2c.getRouteList().get(i), tl2c.getMaxSlice(), tl2c.getAlighting(), dir + tl2c.getRouteList().get(i).getId().toString() + "--alighting.csv", "alighting");
+			writeCounts2File(tl2c.getRouteList().get(i), tl2c.getMaxSlice(), tl2c.getBoarding(), dir + tl2c.getRouteList().get(i).getId().toString() + "--boarding.csv", "boarding");
+			writeCounts2File(tl2c.getRouteList().get(i), tl2c.getMaxSlice(), tl2c.getCapacity(), dir + tl2c.getRouteList().get(i).getId().toString() + "--capacity.csv", "capacity");
+			writeCounts2File(tl2c.getRouteList().get(i), tl2c.getMaxSlice(), tl2c.getOccupancy(), dir + tl2c.getRouteList().get(i).getId().toString() + "--occupancy.csv", "occupancy");
+			writeCounts2File(tl2c.getRouteList().get(i), tl2c.getMaxSlice(), tl2c.getTotalPax(), dir + tl2c.getRouteList().get(i).getId().toString() + "--totalPax.csv", "totalPax");
+		}
+		CreateRscript.createScriptFromTransitLines2PaxCounts(tl2c, dir);
 	}
 	
 
