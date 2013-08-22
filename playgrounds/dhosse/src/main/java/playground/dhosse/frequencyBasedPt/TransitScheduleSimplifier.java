@@ -52,6 +52,7 @@ public class TransitScheduleSimplifier{
 	private static List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 	
 	private static int mergedRoutesCounter = 0;
+	private static int routesCounter = 0;
 	
 	private static boolean isMergeTouching = false;
 	
@@ -86,7 +87,9 @@ public class TransitScheduleSimplifier{
 			TransitLine transitLine = transitLineIterator.next();
 		
 			transitRoutes = transitLine.getRoutes();
-		
+			
+			routesCounter += transitRoutes.size();
+			
 			TransitRoute refTransitRoute = null;
 		
 			TransitRoute mergedTransitRoute;
@@ -124,8 +127,10 @@ public class TransitScheduleSimplifier{
 				}
 			
 				//if the new id equals the old one, there are no routes to be merged...
-				if(id.equals(refTransitRoute.getId().toString()))
+				if(id.equals(refTransitRoute.getId().toString())){
+					mergedRoutesCounter++;
 					continue;
+				}
 			
 				if(factory == null)
 					factory = new TransitScheduleFactoryImpl();
@@ -144,6 +149,7 @@ public class TransitScheduleSimplifier{
 
 				//add merged transit route to the transit line
 				transitLine.addRoute(mergedTransitRoute);
+				mergedRoutesCounter++;
 			
 				for(int i=0;i<listOfRoutes.length;i++){
 				
@@ -155,6 +161,11 @@ public class TransitScheduleSimplifier{
 			}
 		
 		}
+		
+		log.info("number of initial transit routes: " + routesCounter);
+		String diff = routesCounter > mergedRoutesCounter ? Integer.toString(mergedRoutesCounter - routesCounter) 
+				: "+"+Integer.toString(mergedRoutesCounter - routesCounter);
+		log.info("number of merged transit routes: " + mergedRoutesCounter + " ( " + diff + " )");
 		
 		log.info("writing simplified transit schedule to " + outputDirectory);
 		
