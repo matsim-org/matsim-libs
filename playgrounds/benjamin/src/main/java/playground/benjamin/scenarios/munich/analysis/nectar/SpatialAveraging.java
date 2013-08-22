@@ -20,6 +20,7 @@
 package playground.benjamin.scenarios.munich.analysis.nectar;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -190,6 +191,12 @@ public class SpatialAveraging {
 //				calculateSpecificEmissionDifferences(time2EmissionsTotalFilledAndFiltered1, time2EmissionsTotalFilledAndFiltered2, time2CountsPerLinkFilledAndFiltered1, time2CountsPerLinkFilledAndFiltered2);
 				outPathStub = runDirectory1 + "analysis/spatialAveraging/" + runNumber2 + "." + lastIteration2 + "-" + runNumber1 + "." + lastIteration1 + ".absoluteDelta";
 			}
+		}
+		
+		// make sure outpath directory exists
+		File outPathDir = new File(outPathStub);
+		if (!outPathDir.exists()){
+			outPathDir.mkdirs();
 		}
 
 		Map<Double, double[][]> time2Emissions_g = new HashMap<Double, double[][]>();
@@ -438,6 +445,7 @@ public class SpatialAveraging {
 
 	private void writeRoutput(double[][] results, String outputPathForR) {
 		try {
+			
 			BufferedWriter buffW = new BufferedWriter(new FileWriter(outputPathForR));
 			String valueString = new String();
 			valueString = "\t";
