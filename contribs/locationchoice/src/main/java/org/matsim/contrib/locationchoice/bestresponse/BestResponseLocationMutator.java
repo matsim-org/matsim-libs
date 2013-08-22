@@ -206,7 +206,16 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 	private void setLocation(Activity act2, Id facilityId) {
 		ActivityImpl act = (ActivityImpl) act2 ;
 		act.setFacilityId(facilityId);
-		act.setLinkId(((NetworkImpl) this.scenario.getNetwork()).getNearestLink(this.facilities.getFacilities().get(facilityId).getCoord()).getId());
+		
+		Id linkId = null;
+		// try to get linkId from facility, else get it from coords. other options not allowed!
+		if (this.facilities.getFacilities().get(facilityId).getLinkId() != null) {
+			linkId = this.facilities.getFacilities().get(facilityId).getLinkId();
+		}
+		else {
+			linkId = ((NetworkImpl) this.scenario.getNetwork()).getNearestLink(this.facilities.getFacilities().get(facilityId).getCoord()).getId();
+		}	
+		act.setLinkId(linkId);
 		act.setCoord(this.facilities.getFacilities().get(facilityId).getCoord());
 	}
 	
