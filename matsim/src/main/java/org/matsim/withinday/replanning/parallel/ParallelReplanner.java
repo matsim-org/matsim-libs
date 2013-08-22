@@ -171,6 +171,15 @@ public abstract class ParallelReplanner<T extends WithinDayReplannerFactory<? ex
 		if (lastRoundRobin == roundRobin) return;
 		else lastRoundRobin = roundRobin;
 
+		/*
+		 * If an exception occurred, at least one of the events replanning threads
+		 * has crashed. Therefore the remaining threads would get stuck at the
+		 * CyclicBarrier.
+		 */
+		if (hadException.get()) {
+			return;
+		}
+		
 		try {
 			// set current time
 			for (ReplanningRunnable replanningRunnable : replanningRunnables) {
@@ -190,6 +199,11 @@ public abstract class ParallelReplanner<T extends WithinDayReplannerFactory<? ex
 
 	public final void afterSim() {
 
+		if (this.hadException.get()) {
+			throw new RuntimeException("Exception while replanning. " +
+					"Cannot guarantee that all replanning operations have been fully processed.");
+		}
+		
 		// reset counters
 		roundRobin = 0;
 		lastRoundRobin = 0;
