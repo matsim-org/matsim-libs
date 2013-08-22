@@ -99,7 +99,7 @@ public class PlanStrategyReRoutePtFixedSubMode implements PlanStrategy {
 	public void init(ReplanningContext replanningContext) {
 		this.plans = new ArrayList<Plan>();
 		this.modules = new ArrayList<PlanStrategyModule>();
-		// TODO[dr] this module is maybe no longer necessary as the pt-routing infrastructure has changed
+		// TODO this module is maybe no longer necessary as the pt-routing infrastructure has changed
 		this.modules.add(new PtSubModePtInteractionRemoverStrategy(this.sc));
 		this.modules.add(new ReturnToOldModesStrategy(this.sc, this.originalModes));
 		this.modules.add(new ReRoutePtSubModeStrategy(this.sc, replanningContext));

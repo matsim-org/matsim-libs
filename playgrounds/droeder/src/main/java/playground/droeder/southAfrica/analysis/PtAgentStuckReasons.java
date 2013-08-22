@@ -163,7 +163,6 @@ class PtAgentStuckReasons extends AbstractAnalyisModule {
 
 		@Override
 		public void reset(int iteration) {
-			// TODO[dr] Auto-generated method stub
 			
 		}
 

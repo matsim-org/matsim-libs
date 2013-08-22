@@ -78,7 +78,7 @@ public class TransitFareTravelDisutility implements TransitTravelDisutility {
 		}else {
 			// we already bought a ticket
 			t = (Ticket) o;
-			// TODO[dr] implement the distance calculation
+			// TODO implement the distance calculation
 			Double travelledDistance = 0.;
 			// check if it is valid
 			if(!this.ticketMachine.isValid(t, l.getRoute().getId(), l.getLine().getId(), time, expTravelTime, travelledDistance)){

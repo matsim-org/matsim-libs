@@ -58,7 +58,7 @@ import org.matsim.vehicles.VehiclesFactory;
 class ExtendPtTutorial {
 	
 	
-	private final static String DIR = "../../org.matsim/examples/pt-tutorial/";
+	private final static String DIR = "E:/sandbox/org.matsim/examples/pt-tutorial/";
 
 	/**
 	 * extends the default pt-tutorial (org.matsim/examples/pt-tutorial/) with a 

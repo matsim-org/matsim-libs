@@ -139,7 +139,7 @@ public class PreProcessor {
 //		}};
 //		simpli.setNodesToMerge(nodeTypesToMerge);
 //		simpli.run(sc.getNetwork(), sc.getTransitSchedule());
-//		// TODO[dr] this is just a hack, because otherwise this link is a sink after simplifying!!!
+//		// TODO this is just a hack, because otherwise this link is a sink after simplifying!!!
 //		sc.getNetwork().getLinks().get(new IdImpl("74239-74241")).setToNode(sc.getNetwork().getNodes().get(new IdImpl("944504976")));
 //		//################
 //		TransitSchedule schedule = TransitScheduleCleaner.removeAllRoutesWithMissingLinksFromSchedule(sc.getTransitSchedule(), sc.getNetwork());

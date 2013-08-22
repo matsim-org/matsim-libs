@@ -81,7 +81,6 @@ public class PtSubModeTripRouterFactory implements TripRouterFactory{
 	 * @param transitRouterFactory 
 	 */
 	public PtSubModeTripRouterFactory(final Controler controler, TransitRouterFactory transitRouterFactory) {
-		// TODO[dr] adapt changes from PTripRouterFactoryImpl constructor and createTripRouter, especially line 195. Should be fixed by now
 		this.controler = controler;
 		this.transitRouterFactory = transitRouterFactory;
 //		this.config = controler.getScenario().getConfig();

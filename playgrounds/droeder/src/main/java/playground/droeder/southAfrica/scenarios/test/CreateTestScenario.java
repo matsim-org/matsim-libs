@@ -449,7 +449,7 @@ class CreateTestScenario {
 			}
 			l = pFac.createLeg(mode);
 			
-			//TODO[dr] problems if loopLinks are used... maybe because of QLinkImpl line 306ff
+			//TODO problems if loopLinks are used... maybe because of QLinkImpl line 306ff
 			h1 = pFac.createActivityFromLinkId("h", sc.createId("B3-A"));
 			((ActivityImpl) h1).setCoord(sc.getNetwork().getLinks().get(h1.getLinkId()).getToNode().getCoord());
 			h1.setEndTime(end1);

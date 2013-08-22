@@ -26,14 +26,14 @@ import java.util.Properties;
  * @author droeder
  *
  */
-class ListSystemProperties {
+public class ListSystemProperties {
 
 
 	private ListSystemProperties() {
 
 	}
 	
-	static void main(String[] args) {
+	public static void main(String[] args) {
 		Properties props = System.getProperties();
 		Enumeration<?> names = props.propertyNames();
 		int max = 0;
