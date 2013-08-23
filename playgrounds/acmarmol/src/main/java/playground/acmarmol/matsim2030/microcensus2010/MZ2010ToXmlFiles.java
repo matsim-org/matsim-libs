@@ -408,25 +408,3 @@ public class MZ2010ToXmlFiles {
 
 	}//end main		
 }
-
-	
-	
-	
-	
-	
-	
-	
-
-		
-
-		
-	
-
-	
-		
-
-		
-
-	
-	
-
