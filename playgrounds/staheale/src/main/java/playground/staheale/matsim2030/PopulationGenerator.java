@@ -34,10 +34,10 @@ public class PopulationGenerator {
 
 	public static void main(String[] args) throws Exception {
 		PopulationGenerator populationGenerator = new PopulationGenerator();
-		populationGenerator.run();
+		populationGenerator.run(args);
 	}
 
-	public void run() throws Exception {
+	public void run(String[] args) throws Exception {
 		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population population = sc.getPopulation();
 		
@@ -53,13 +53,19 @@ public class PopulationGenerator {
 		// ------------------- read in population ----------------------------
 		log.info("Reading plans...");	
 		MatsimPopulationReader PlansReader = new MatsimPopulationReader(sc); 
-		PlansReader.readFile("./input/population.13.xml");
+		String filename = "./input/population.13.xml";
+		if (args.length > 0)
+			filename = args[0];
+		PlansReader.readFile(filename);
 		log.info("Reading plans...done.");
 		log.info("population size is " +population.getPersons().size());
 
 		// ------------------- read in weight csv file -----------------------
 		log.info("Reading weight csv file...");		
-		File file = new File("./input/mzp-cal.csv");
+		String pathname = "./input/mzp-cal.csv";
+		if (args.length > 1)
+			pathname = args[1];
+		File file = new File(pathname);
 		BufferedReader bufRdr = new BufferedReader(new FileReader(file));
 		String curr_line = bufRdr.readLine();
 		log.info("Start line iteration through weight csv file");

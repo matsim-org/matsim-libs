@@ -58,10 +58,10 @@ public class AdvancedPopulationGenerator {
 
 	public static void main(String[] args) throws Exception {
 		AdvancedPopulationGenerator advancedPopGenerator = new AdvancedPopulationGenerator();
-		advancedPopGenerator.run();
+		advancedPopGenerator.run(args);
 	}
 
-	public void run() throws Exception {
+	public void run(String[] args) throws Exception {
 		Scenario sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Population mz_population = sc.getPopulation();
 
@@ -98,7 +98,10 @@ public class AdvancedPopulationGenerator {
 
 		log.info("Reading MZ plans...");	
 		MatsimPopulationReader PlansReader = new MatsimPopulationReader(sc); 
-		PlansReader.readFile("./input/population.15.xml"); //contains also agents without a plan, activity types HWELS
+		String filename = "./input/population.15.xml";
+		if (args.length > 0)
+			filename = args[0];
+		PlansReader.readFile(filename); //contains also agents without a plan, activity types HWELS
 		log.info("Reading MZ plans...done.");
 		log.info("MZ population size is " +mz_population.getPersons().size());
 
