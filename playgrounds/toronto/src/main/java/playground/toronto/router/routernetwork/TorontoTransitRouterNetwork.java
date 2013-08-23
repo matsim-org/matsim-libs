@@ -1,4 +1,4 @@
-package playground.toronto.router;
+package playground.toronto.router.routernetwork;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,6 +15,7 @@ import org.matsim.core.utils.misc.Counter;
 import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
+import org.matsim.pt.transitSchedule.TransitRouteImpl;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
@@ -30,11 +31,14 @@ public class TorontoTransitRouterNetwork  {
 	public static String WALK_MODE_NAME = "Walk"; //The string name of the mode which indicates physical walk links (i.e., long horizontal walk connections between routes)
 	
 	/**
-	 * <p>Creates a special Toronto TRN from a given base network and schedule. In-line links are handled the same but transfer links
+	 * <p>Creates a special "Toronto" {@link TransitRouterNetwork} from a given base network and schedule. In-line links are handled the same but transfer links
 	 * between lines at stops are handled differently. Instead of using nearby stops for connections, connections are only made 
 	 * between stops which 'touch' at the same network node. To compensate for this strict condition, the network is assumed to
 	 * contain special 'override' transfer links, flagged by those links which permit a 'walk' or 'transfer' mode (see the static
 	 * {@code TRANSFER_MODE_NAME} and {@code WALK_MODE_NAME} for defaults). </p>
+	 * 
+	 * <p>Transfers between {@link TransitRoute}s belonging to the same {@link TransitLine} are disabled. In the future, some code
+	 * will be written to permit intra-line transfers at stops of confluence.</p>
 	 * 
 	 * <p>Two different transfer override types are recognized: WALK and TRANSFER. Walk links are assumed to be mostly horizontal
 	 * physical paths between two nodes. Transfer links are assumed to be virtual transfers, possibly involving vertical movement;
@@ -44,7 +48,7 @@ public class TorontoTransitRouterNetwork  {
 	 * @param schedule The {@link TransitSchedule} to build from
 	 * @param transferPenalty The length used on all transfer links.
 	 * @return A {@link TransitRouterNetwork} for routing transit trips.
-	 * @throws NetworkFormattingException
+	 * @throws NetworkFormattingException If a referenced ID cannot be found
 	 * 
 	 * @author pkucirek
 	 */
@@ -54,11 +58,14 @@ public class TorontoTransitRouterNetwork  {
 	}
 	
 	/**
-	 * <p>Creates a special Toronto TRN from a given base network and schedule. In-line links are handled the same but transfer links
+	 * <p>Creates a special "Toronto" {@link TransitRouterNetwork} from a given base network and schedule. In-line links are handled the same but transfer links
 	 * between lines at stops are handled differently. Instead of using nearby stops for connections, connections are only made 
 	 * between stops which 'touch' at the same network node. To compensate for this strict condition, the network is assumed to
 	 * contain special 'override' transfer links, flagged by those links which permit a 'walk' or 'transfer' mode (see the static
 	 * {@code TRANSFER_MODE_NAME} and {@code WALK_MODE_NAME} for defaults). </p>
+	 * 
+	 * <p>Transfers between {@link TransitRoute}s belonging to the same {@link TransitLine} are disabled. In the future, some code
+	 * will be written to permit intra-line transfers at stops of confluence.</p>
 	 * 
 	 * <p>Two different transfer override types are recognized: WALK and TRANSFER. Walk links are assumed to be mostly horizontal
 	 * physical paths between two nodes. Transfer links are assumed to be virtual transfers, possibly involving vertical movement;
@@ -70,7 +77,7 @@ public class TorontoTransitRouterNetwork  {
 	 * @param transferMode The name of the transfer mode
 	 * @param transferPenalty The length used on all transfer links.
 	 * @return A {@link TransitRouterNetwork} for routing transit trips.
-	 * @throws NetworkFormattingException
+	 * @throws NetworkFormattingException If a referenced ID cannot be found
 	 * 
 	 * @author pkucirek
 	 */
@@ -130,6 +137,8 @@ public class TorontoTransitRouterNetwork  {
 			}
 		}
 		
+		network.finishInit();
+		
 		//Create the base node-to-node connectivity mapping
 		for (Node node : baseNetwork.getNodes().values()){
 			HashSet<Link> transferLinks = new HashSet<Link>();
@@ -150,8 +159,12 @@ public class TorontoTransitRouterNetwork  {
 
 			//Connect together all stops incident at a single node
 			for (TransitRouterNetworkNode fromNode : entry.getValue()){
+				if (fromNode.getInLinks().size() == 0) continue;
 				for (TransitRouterNetworkNode toNode : entry.getValue()){
 					if (fromNode == toNode) continue; //Don't create loops
+					if (toNode.getOutLinks().size() == 0) continue;
+					if (fromNode.line == toNode.line) continue; //Don't connect two routes belonging to the same line
+					if (fromNode.route == toNode.route) continue; //Or the same route
 					//double length = CoordUtils.calcDistance(fromNode.getCoord(), toNode.getCoord());
 					network.createLink(fromNode, toNode, null, null);
 					linkCounter.incCounter();
@@ -167,15 +180,17 @@ public class TorontoTransitRouterNetwork  {
 				Node baseToNode = baseConnection.getToNode();
 				
 				if (!baseToRouterNodeMap.containsKey(baseToNode)){
-					//log.warn("Could not add transfer links to node " + baseToNode.getId().toString() + " as it has " +
-					//		"no transit stops incident.");
-					continue;
+					continue; //Skips. The code can reach this point if a walk or transfer link has been made to a node
+						//which does not have any stops incident.
 				}
 				
 				List<TransitRouterNetworkNode> toTrnStops = baseToRouterNodeMap.get(baseToNode);
 				
 				for (TransitRouterNetworkNode fromNode : entry.getValue()){ //For each stop mapped to this node
 					for (TransitRouterNetworkNode toNode : toTrnStops){ //For each stop mapped to the other node
+						
+						if (fromNode.line == toNode.line) continue;
+						if (fromNode.route == toNode.route) continue; 
 						
 						//TODO set transfer link length once that option becomes available.
 						/*

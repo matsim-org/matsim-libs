@@ -19,6 +19,7 @@
 
 package playground.toronto.router;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
@@ -26,6 +27,11 @@ import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
+
+import playground.toronto.exceptions.NetworkFormattingException;
+import playground.toronto.router.calculators.TorontoTransitRouterNetworkTravelTimeAndDisutility;
+import playground.toronto.router.calculators.TransitDataCache;
+import playground.toronto.router.routernetwork.TorontoTransitRouterNetworkImprovedEfficiency;
 
 /**
  * @author pkucirek
@@ -42,8 +48,8 @@ public class TorontoTransitRouterImplFactory implements TransitRouterFactory {
 	
 	private final TransitDataCache cache;
 
-	public TorontoTransitRouterImplFactory(final TransitSchedule schedule, final TransitRouterConfig config, TransitDataCache cache, double bus,
-			double streetcar, double subway) {
+	public TorontoTransitRouterImplFactory(final Network network, final TransitSchedule schedule, final TransitRouterConfig config, TransitDataCache cache, double bus,
+			double streetcar, double subway) throws NetworkFormattingException {
 		this.busPenalty = bus;
 		this.streetcarPenalty = streetcar;
 		this.subwayPenalty = subway;
@@ -51,7 +57,8 @@ public class TorontoTransitRouterImplFactory implements TransitRouterFactory {
 		
 		this.schedule = schedule;
 		this.config = config;
-		this.routerNetwork = TransitRouterNetwork.createFromSchedule(this.schedule, this.config.beelineWalkConnectionDistance);
+		this.routerNetwork = TorontoTransitRouterNetworkImprovedEfficiency.createTorontoTransitRouterNetwork(network, schedule, 0.0); 
+				//TransitRouterNetwork.createFromSchedule(this.schedule, this.config.beelineWalkConnectionDistance);
 	}
 
 	@Override

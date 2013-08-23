@@ -1,5 +1,6 @@
 package playground.toronto.router;
 
+import org.matsim.api.core.v01.network.Network;
 import org.matsim.pt.router.PreparedTransitSchedule;
 import org.matsim.pt.router.TransitRouter;
 import org.matsim.pt.router.TransitRouterConfig;
@@ -8,8 +9,13 @@ import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
+import playground.toronto.exceptions.NetworkFormattingException;
+import playground.toronto.router.calculators.TransitDataCache;
+import playground.toronto.router.calculators.IterativeTransitTimeAndDisutility;
+import playground.toronto.router.routernetwork.TorontoTransitRouterNetworkImprovedEfficiency;
+
 /**
- * Builds a {@link TransitRouter} using {@link UpgradedTransitNetworkTravelTimeAndDisutility} as its calculators;
+ * Builds a {@link TransitRouter} using {@link IterativeTransitTimeAndDisutility} as its calculators;
  * 
  * @author pkucirek
  *
@@ -21,16 +27,16 @@ public class UpgradedTransitRouterFactory implements TransitRouterFactory{
 	private final TransitSchedule schedule;
 	private final TransitRouterNetwork routerNetwork;
 	
-	public UpgradedTransitRouterFactory(TransitRouterConfig config, TransitSchedule schedule, TransitDataCache data) {
+	public UpgradedTransitRouterFactory(Network network, TransitRouterConfig config, TransitSchedule schedule, TransitDataCache data) throws NetworkFormattingException {
 		this.config = config;
 		this.cache = data;
 		this.schedule = schedule;
-		this.routerNetwork = TransitRouterNetwork.createFromSchedule(schedule, config.beelineWalkConnectionDistance);
+		this.routerNetwork = TorontoTransitRouterNetworkImprovedEfficiency.createTorontoTransitRouterNetwork(network, schedule, 0.1);
 	}
 	
 	@Override
 	public TransitRouter createTransitRouter() {
-		UpgradedTransitNetworkTravelTimeAndDisutility calc =  new UpgradedTransitNetworkTravelTimeAndDisutility(cache, config);
+		IterativeTransitTimeAndDisutility calc =  new IterativeTransitTimeAndDisutility(cache, config);
 			
 		return new TransitRouterImpl(
 				config, 

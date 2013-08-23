@@ -18,16 +18,14 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.toronto.router;
+package playground.toronto.router.calculators;
 
-
-
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkNode;
 import org.matsim.vehicles.Vehicle;
+
 
 /**
  * Cost calculator with mode-based differential boarding penalties. These boarding penalties are standard
@@ -35,7 +33,7 @@ import org.matsim.vehicles.Vehicle;
  * 
  * @author pkucirek
  */
-public class TorontoTransitRouterNetworkTravelTimeAndDisutility extends UpgradedTransitNetworkTravelTimeAndDisutility {
+public class TorontoTransitRouterNetworkTravelTimeAndDisutility extends IterativeTransitTimeAndDisutility {
 
 	private final double busWeight;
 	private final double subwayWeight;
@@ -63,11 +61,11 @@ public class TorontoTransitRouterNetworkTravelTimeAndDisutility extends Upgraded
 				TransitRouterNetworkNode toStop = (TransitRouterNetworkNode) link.getToNode();
 				String mode = toStop.route.getTransportMode();
 				
-				if (mode.equals("Bus") || mode.equals("bus") || mode.equals("BUS")){
+				if (mode.toUpperCase().equals("BUS")){
 					return cost - this.busWeight;
-				}else if (mode.equals("Streetcar") || mode.equals("streetcar") || mode.equals("tram") || mode.equals("TRAM")){
+				}else if (mode.toUpperCase().equals("TRAM") || mode.toUpperCase().equals("STREETCAR")){
 					return cost - this.streetcarWeight;
-				}else if (mode.equals("Subway") || mode.equals("subway") || mode.equals("SUBWAY")){
+				}else if (mode.toUpperCase().equals("SUBWAY")){
 					return cost - this.subwayWeight;
 				}else{
 					return cost;

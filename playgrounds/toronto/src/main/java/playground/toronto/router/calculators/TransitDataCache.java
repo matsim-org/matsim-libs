@@ -1,7 +1,8 @@
-package playground.toronto.router;
+package playground.toronto.router.calculators;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
@@ -37,6 +38,7 @@ import org.matsim.pt.transitSchedule.api.TransitSchedule;
 public class TransitDataCache implements TransitDriverStartsEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler {
 
 	private static final Logger log = Logger.getLogger(TransitDataCache.class);
+	private int noStopRecordWarningCount = 0;
 	
 	private Map<Id, Id[]> vehInfo; //vehicleId, line-route
 	private final TransitSchedule schedule;
@@ -61,7 +63,7 @@ public class TransitDataCache implements TransitDriverStartsEventHandler, Vehicl
 		this.vehInfo = new HashMap<Id, Id[]>();
 		this.vehicleDepartureCache = new HashMap<Id, Tuple<TransitRouteStop,Double>>();
 		
-		this.init();
+		this.init2();
 	}
 	
 	
@@ -80,13 +82,13 @@ public class TransitDataCache implements TransitDriverStartsEventHandler, Vehicl
 		for (TransitLine line: this.schedule.getTransitLines().values()){
 			for (TransitRoute route : line.getRoutes().values()){				
 				Map<Id, TransitRouteStop> stopFacilityMap = new HashMap<Id, TransitRouteStop>();
-				
-				TransitRouteStop prevStop = null;			
-				
-				for (TransitRouteStop stop : route.getStops()){				
+								
+				TransitRouteStop prevStop = null;
+								
+				for (TransitRouteStop stop : route.getStops()){					
 					stopFacilityMap.put(stop.getStopFacility().getId(), stop); //Memorizes the backwards mapping from stop facility to transit route stop.
 					
-					//For all stops except the first, store the travel time to the next stop.
+					//For all stops except the last, store the travel time to the next stop.
 					Double travelTime = null;
 					TreeMap<Double,Double> prevStopTimes = null;
 					if (prevStop != null) {
@@ -94,11 +96,12 @@ public class TransitDataCache implements TransitDriverStartsEventHandler, Vehicl
 						
 						if (travelTime < 0){
 							log.error("Found negative travel time IN SCHEDULE for line " + line.getId()
-									+ " route " + route.getId() + "!", new IOException());
+									+ " route " + route.getId() + ", between stops " + prevStop.getStopFacility().getId() +
+									" and " + stop.getStopFacility().getId(), new IOException());
 						}
 						
 						prevStopTimes = new TreeMap<Double, Double>();
-						prevStopTimes.put(0.0, travelTime);//Because the travel time is constant, map the time to '0'
+						prevStopTimes.put(0.0, travelTime);//Because the scheduled travel time is constant, map the time to '0' (there will be no more entries)
 						this.defaultTravelTimes.put(prevStop, prevStopTimes);
 						this.updatedTravelTimes.put(prevStop, prevStopTimes);
 					}
@@ -109,9 +112,14 @@ public class TransitDataCache implements TransitDriverStartsEventHandler, Vehicl
 						stopDepartures.add(d.getDepartureTime() + stop.getDepartureOffset());
 					}				
 					this.defaultDepartures.put(stop, stopDepartures);
+					this.updatedDepartures.put(stop, stopDepartures);
 					
 					prevStop = stop;
 				}
+				 //Remove the last stop from the default departures since no departure should ever occur from the last stop.
+				//this.defaultDepartures.remove(prevStop);
+				//this.updatedDepartures.remove(prevStop);
+				
 				this.routeStops.put(route, stopFacilityMap);
 			}
 		}
@@ -121,9 +129,106 @@ public class TransitDataCache implements TransitDriverStartsEventHandler, Vehicl
 		this.departures = new HashMap<TransitRouteStop, TreeSet<Double>>();
 		this.departures.putAll(defaultDepartures);
 		
+		int checksum = this.getCheckSum(schedule);
+		int timeSize = this.travelTimes.size();
+		int defTimesSize = this.defaultTravelTimes.size();
+		int upTimesSize = this.defaultTravelTimes.size();
+		int depsSize = this.departures.size();
+		int defDepsSize = this.defaultDepartures.size();
+		int upDepsSize = this.updatedDepartures.size();
+		
 		log.info("Transit data cache built.");
 	}
 
+	
+	private void init2(){
+		log.info("Building initial transit data cache from transit schedule...");
+		
+		//loads the initial schedule data into the maps
+		//also creates the initial mapping to go from stopFacilityId to TransitRouteStop
+		this.routeStops = new HashMap<TransitRoute, Map<Id,TransitRouteStop>>();
+		this.defaultDepartures = new HashMap<TransitRouteStop, TreeSet<Double>>();
+		this.defaultTravelTimes = new HashMap<TransitRouteStop, TreeMap<Double,Double>>();
+
+		for (TransitLine line: this.schedule.getTransitLines().values()){
+			for (TransitRoute route : line.getRoutes().values()){				
+				Map<Id, TransitRouteStop> stopFacilityMap = new HashMap<Id, TransitRouteStop>();
+				
+				TransitRouteStop prevStop = null;
+				for (TransitRouteStop nextStop : route.getStops()){
+					stopFacilityMap.put(nextStop.getStopFacility().getId(), nextStop); //Memorizes the backwards mapping from stop facility to transit route stop.
+					
+					if (prevStop != null){
+						//Store the departure times
+						TreeSet<Double> departures = new TreeSet<Double>();
+						for (Departure dep : route.getDepartures().values()){
+							departures.add(prevStop.getDepartureOffset() + dep.getDepartureTime());
+						}
+						this.defaultDepartures.put(prevStop, departures);
+						
+						//Store the travel time
+						double travelTime = nextStop.getArrivalOffset() - prevStop.getDepartureOffset();
+						if (travelTime < 0){
+							log.error("Found negative travel time IN SCHEDULE for line " + line.getId()
+									+ " route " + route.getId() + ", between stops " + prevStop.getStopFacility().getId() +
+									" and " + nextStop.getStopFacility().getId(), new IOException());
+						}
+						TreeMap<Double, Double> prevStopTimes = new TreeMap<Double, Double>();
+						prevStopTimes.put(0.0, travelTime);//Because the scheduled travel time is constant, map the time to '0' (there will be no more entries)
+						this.defaultTravelTimes.put(prevStop, prevStopTimes);
+					}
+					
+					prevStop = nextStop;
+				}
+				
+				this.routeStops.put(route, stopFacilityMap);
+			}
+		}
+		
+		this.departures = new HashMap<TransitRouteStop, TreeSet<Double>>();
+		this.travelTimes = new HashMap<TransitRouteStop, TreeMap<Double,Double>>();
+		this.updatedDepartures = new HashMap<TransitRouteStop, TreeSet<Double>>();
+		this.updatedTravelTimes = new HashMap<TransitRouteStop, TreeMap<Double,Double>>();
+		this.departures.putAll(defaultDepartures);
+		this.travelTimes.putAll(defaultTravelTimes);
+		this.updatedDepartures.putAll(defaultDepartures);
+		this.updatedTravelTimes.putAll(defaultTravelTimes);
+		
+		log.info("Transit data cache built.");
+		
+	}
+	
+	private int getCheckSum(TransitSchedule schedule){
+		int totalStops = 0;
+		for (TransitLine line : schedule.getTransitLines().values()){
+			for (TransitRoute route : line.getRoutes().values()){
+				totalStops += route.getStops().size() - 1;
+			}
+		}
+		
+		return totalStops;
+	}
+	
+	private void checkMaps(){
+		HashSet<TransitRouteStop> noDepStops = new HashSet<TransitRouteStop>();
+		HashSet<TransitRouteStop> noTimeStops = new HashSet<TransitRouteStop>();
+		for (TransitLine line : schedule.getTransitLines().values()){
+			for (TransitRoute route : line.getRoutes().values()){
+				for (int i = 0; i < route.getStops().size() - 1; i++){
+					TransitRouteStop stop = route.getStops().get(i);
+					
+					if (! this.defaultDepartures.containsKey(stop))
+						noDepStops.add(stop);
+					if (!this.defaultTravelTimes.containsKey(stop))
+						noTimeStops.add(stop);
+				}
+			}
+		}
+		
+		log.warn(noDepStops.size() + " stops were somehow not mapped in departures, " + noTimeStops.size() + " stops were somehow not mapped in times.");
+		
+	}
+	
 	
 	private TransitRouteStop getVehicleStop(Id vehicleId, Id facilityId){
 		Id[] signature = this.vehInfo.get(vehicleId);
@@ -137,13 +242,13 @@ public class TransitDataCache implements TransitDriverStartsEventHandler, Vehicl
 	 * 
 	 * @param stop The {@link TransitRouteStop} of interest.
 	 * @param now The current time (eg, 9:00AM)
-	 * @return The next available departure time for the {@link TransitRoute} of interest (eg, 9:03AM), 2*MIDNIGHT if no such dpearture is found.
+	 * @return The next available departure time for the {@link TransitRoute} of interest (eg, 9:03AM), 2*MIDNIGHT if no such departure is found.
 	 */
 	public double getNextDepartureTime(final TransitRouteStop stop,final double now){
 		
 		Double e = this.departures.get(stop).ceiling(now);
 		if (e == null){ //no departures were found after this time.
-			return 2 * Time.MIDNIGHT;
+			return Double.POSITIVE_INFINITY;
 		}
 		return e;
 	}
@@ -157,9 +262,10 @@ public class TransitDataCache implements TransitDriverStartsEventHandler, Vehicl
 	 * @param stop The {@link TransitRouteStop} of interest.
 	 * @param now The current time.
 	 * @return The travel time to the next stop on the route, based on the current time or closest match to the current time.
+	 * @throws Exception 
 	 */
 	public double getCurrentTravelTime(final TransitRouteStop stop, double now){
-		
+				
 		Entry<Double, Double> t = this.travelTimes.get(stop).floorEntry(now);
 		if (t == null){ //current time is lower than lowest key, therefore get the lowest entry. Wait times are not handled here.
 			t = this.defaultTravelTimes.get(stop).firstEntry();
@@ -198,6 +304,7 @@ public class TransitDataCache implements TransitDriverStartsEventHandler, Vehicl
 	public void reset(int iteration) {
 		this.vehicleDepartureCache.clear();
 		this.vehInfo.clear();
+		this.noStopRecordWarningCount= 0;
 		
 		//Flush old maps, replaces them with new ones. 		
 		this.departures.clear();
@@ -213,7 +320,7 @@ public class TransitDataCache implements TransitDriverStartsEventHandler, Vehicl
 			if (this.departures.get(key) == null){
 				//For some reason no actual departures were recorded
 				Id lineId = null; Id routeId = null; boolean k = false;
-				for (TransitLine line : this.schedule.getTransitLines().values()){
+				for (TransitLine line : this.schedule.getTransitLines().values()){ //Find the line & route because there's no backwards mapping.
 					if (k) break;
 					for (TransitRoute route : line.getRoutes().values()){
 						if (route.getStops().contains(key)){
@@ -224,10 +331,47 @@ public class TransitDataCache implements TransitDriverStartsEventHandler, Vehicl
 						}
 					}
 				}
-				//log.warn("No departures were recorded for line " + lineId + " route " + routeId + " at stop " 
-						//+ key.getStopFacility().getId() + "! TransitDataCache is using scheduled departure times for this stop. This could cause problems!");
+				if (this.noStopRecordWarningCount++ < 40){
+					log.warn("No departures were recorded for line " + lineId + " route " + routeId + " at stop " 
+						+ key.getStopFacility().getId() + "! TransitDataCache is using scheduled departure times for this stop. This could cause problems!");
+				}
+				else if (this.noStopRecordWarningCount == 40){
+					log.warn("No departures were recorded for line " + lineId + " route " + routeId + " at stop " 
+							+ key.getStopFacility().getId() + "! TransitDataCache is using scheduled departure times for this stop. This could cause problems!");
+					log.warn("Future warnings are supressed.");
+				}
 				this.departures.put(key, this.defaultDepartures.get(key));
 			}
+			
+			if (this.travelTimes.get(key) == null){
+				//For some reason no actual travel times were recorded
+				Id lineId = null; Id routeId = null; boolean k = false;
+				for (TransitLine line : this.schedule.getTransitLines().values()){ //Find the line & route because there's no backwards mapping.
+					if (k) break;
+					for (TransitRoute route : line.getRoutes().values()){
+						if (route.getStops().contains(key)){
+							lineId = line.getId();
+							routeId = route.getId();
+							k=true;
+							break;
+						}
+					}
+				}
+				if (this.noStopRecordWarningCount++ < 40){
+					log.warn("No travel times were recorded for line " + lineId + " route " + routeId + " at stop " 
+						+ key.getStopFacility().getId() + "! TransitDataCache is using scheduled travel times for this stop. This could cause problems!");
+				}
+				else if (this.noStopRecordWarningCount == 40){
+					log.warn("No travel times were recorded for line " + lineId + " route " + routeId + " at stop " 
+							+ key.getStopFacility().getId() + "! TransitDataCache is using scheduled travel times for this stop. This could cause problems!");
+					log.warn("Future warnings are supressed.");
+				}
+				this.travelTimes.put(key, this.defaultTravelTimes.get(key));
+			}
+		}
+		
+		if (noStopRecordWarningCount > 0){
+			log.warn(this.noStopRecordWarningCount + " transit route stops were not visited during the previous iteratino.");
 		}
 	}
 
