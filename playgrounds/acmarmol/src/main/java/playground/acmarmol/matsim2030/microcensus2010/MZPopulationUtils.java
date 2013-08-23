@@ -1246,55 +1246,57 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 		
 			Plan plan = person.getSelectedPlan();
 			
-			if(plan!=null){
-				for(PlanElement pe: plan.getPlanElements()){
+			if(plan==null)
+				continue;
+			
+			for(PlanElement pe: plan.getPlanElements()){
+				
+				if(pe instanceof Activity){
 					
-					if(pe instanceof Activity){
-						
-						ActivityImpl act = (ActivityImpl) pe;
-						String type = act.getType();
-						
-						if(type.contains(MZConstants.WORK)
-								||type.contains(MZConstants.BUSINESS)
-								||type.contains(MZConstants.DIENSTFAHRT))
-						{act.setType(MZConstants.WORK);}
-						
-						else if(type.contains(MZConstants.LEISURE)
-								||type.contains(MZConstants.ACCOMPANYING_CHILDREN)
-								|| type.contains(MZConstants.ACCOMPANYING_NOT_CHILDREN)
-								|| type.contains(MZConstants.ERRANDS)
-								|| type.contains(MZConstants.OTHER)
-								|| type.contains(MZConstants.FOREIGN_PROPERTY)
-								|| type.contains(MZConstants.ACCOMPANYING)
-								|| type.contains(MZConstants.OVERNIGHT)
-								|| type.contains(MZConstants.PSEUDOETAPPE))
-						{act.setType(MZConstants.LEISURE);}
-						
-						//////////////////////////////////////////////////////////////////////
-						// code added by staheale
-						
-						else if(type.contains(MZConstants.BORDER.concat(": ").concat(MZConstants.SHOPPING))){
-							act.setType(MZConstants.SHOPPING);
-						}
-						
-						else if(type.contains(MZConstants.BORDER.concat(": ").concat(MZConstants.HOME))){
-							act.setType(MZConstants.HOME);
-						}
-						
-						else if(type.contains(MZConstants.BORDER.concat(": ").concat(MZConstants.EDUCATION))){
-							act.setType(MZConstants.EDUCATION);
-						}
-						
-						else if(type.contains(MZConstants.AIRPORT.concat(": ").concat(MZConstants.SHOPPING))){
-							act.setType(MZConstants.SHOPPING);
-						}
-						
-						else if(type.contains(MZConstants.AIRPORT.concat(": ").concat(MZConstants.HOME))){
-							act.setType(MZConstants.HOME);
-						}
-						
-						//////////////////////////////////////////////////////////////////////
-						
+					ActivityImpl act = (ActivityImpl) pe;
+					String type = act.getType();
+					
+					if(type.contains(MZConstants.WORK)
+							||type.contains(MZConstants.BUSINESS)
+							||type.contains(MZConstants.DIENSTFAHRT))
+					{act.setType(MZConstants.WORK);}
+					
+					else if(type.contains(MZConstants.LEISURE)
+							||type.contains(MZConstants.ACCOMPANYING_CHILDREN)
+							|| type.contains(MZConstants.ACCOMPANYING_NOT_CHILDREN)
+							|| type.contains(MZConstants.ERRANDS)
+							|| type.contains(MZConstants.OTHER)
+							|| type.contains(MZConstants.FOREIGN_PROPERTY)
+							|| type.contains(MZConstants.ACCOMPANYING)
+							|| type.contains(MZConstants.OVERNIGHT)
+							|| type.contains(MZConstants.PSEUDOETAPPE))
+					{act.setType(MZConstants.LEISURE);}
+					
+					//////////////////////////////////////////////////////////////////////
+					// code added by staheale
+					
+					else if(type.contains(MZConstants.BORDER.concat(": ").concat(MZConstants.SHOPPING))){
+						act.setType(MZConstants.SHOPPING);
+					}
+					
+					else if(type.contains(MZConstants.BORDER.concat(": ").concat(MZConstants.HOME))){
+						act.setType(MZConstants.HOME);
+					}
+					
+					else if(type.contains(MZConstants.BORDER.concat(": ").concat(MZConstants.EDUCATION))){
+						act.setType(MZConstants.EDUCATION);
+					}
+					
+					else if(type.contains(MZConstants.AIRPORT.concat(": ").concat(MZConstants.SHOPPING))){
+						act.setType(MZConstants.SHOPPING);
+					}
+					
+					else if(type.contains(MZConstants.AIRPORT.concat(": ").concat(MZConstants.HOME))){
+						act.setType(MZConstants.HOME);
+					}
+					
+					//////////////////////////////////////////////////////////////////////
+					
 //						else if(type.contains(MZConstants.SHOPPING))
 //						{act.setType(MZConstants.SHOPPING);}
 //						
@@ -1303,11 +1305,9 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 //						
 //						else if(type.contains(MZConstants.HOME))
 //						{act.setType(MZConstants.HOME);}
-						
-					}
-					
 					
 				}
+				
 				
 			}
 		
