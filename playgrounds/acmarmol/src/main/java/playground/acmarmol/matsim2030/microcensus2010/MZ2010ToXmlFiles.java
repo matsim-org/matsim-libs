@@ -394,6 +394,18 @@ public class MZ2010ToXmlFiles {
 
 
 //////////////////////////////////////////////////////////////////////
+
+
+
+		System.out.println("-----------------------------------------------------------------------------------------------------------");
+		log.info("removing duplicate activities of the same type...");
+		MZPopulationUtils.removeDuplicateActivities(population);
+		new PopulationWriter(population, null).write(outputBase+"population.16.xml");
+		System.out.println("  done.");
+
+
+
+//////////////////////////////////////////////////////////////////////
 		
 		
 		System.out.println("-----------------------------------------------------------------------------------------------------------");
