@@ -1166,7 +1166,7 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 
 //////////////////////////////////////////////////////////////////////	
 	
-public static void recodeActivityTypesHWELS(Population population){
+	public static void recodeActivityTypesHWELS(Population population){
 		
 		for(Person person: population.getPersons().values()){
 		
@@ -1211,6 +1211,14 @@ public static void recodeActivityTypesHWELS(Population population){
 							act.setType(MZConstants.EDUCATION);
 						}
 						
+						else if(type.contains(MZConstants.AIRPORT.concat(": ").concat(MZConstants.SHOPPING))){
+							act.setType(MZConstants.SHOPPING);
+						}
+						
+						else if(type.contains(MZConstants.AIRPORT.concat(": ").concat(MZConstants.HOME))){
+							act.setType(MZConstants.HOME);
+						}
+						
 						//////////////////////////////////////////////////////////////////////
 						
 //						else if(type.contains(MZConstants.SHOPPING))
@@ -1231,5 +1239,5 @@ public static void recodeActivityTypesHWELS(Population population){
 		
 		}
 	}
-//////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////
 }
