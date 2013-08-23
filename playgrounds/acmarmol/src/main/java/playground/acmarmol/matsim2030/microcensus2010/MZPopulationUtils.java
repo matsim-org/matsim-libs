@@ -27,6 +27,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutionException;
@@ -47,6 +48,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;
@@ -1241,76 +1243,58 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 	}
 	//////////////////////////////////////////////////////////////////////
 
+	@SuppressWarnings("deprecation")
 	public static void removeDuplicateActivities(Population population) {
-		for(Person person: population.getPersons().values()){
-		
+		for (Person person : population.getPersons().values()) {
+
 			Plan plan = person.getSelectedPlan();
-			
-			if(plan==null)
+
+			if (plan == null)
 				continue;
 			
-			for(PlanElement pe: plan.getPlanElements()){
+			Stack<PlanElement> newPlanElements = new Stack<PlanElement>();
+			
+			ActivityImpl prevAct = null;
+			
+			List<PlanElement> planElements = plan.getPlanElements();
+			for (PlanElement pe : planElements) {
 				
-				if(pe instanceof Activity){
+				PlanElement newPe = pe;
+
+				if (pe instanceof Activity) {
 					
 					ActivityImpl act = (ActivityImpl) pe;
-					String type = act.getType();
 					
-					if(type.contains(MZConstants.WORK)
-							||type.contains(MZConstants.BUSINESS)
-							||type.contains(MZConstants.DIENSTFAHRT))
-					{act.setType(MZConstants.WORK);}
-					
-					else if(type.contains(MZConstants.LEISURE)
-							||type.contains(MZConstants.ACCOMPANYING_CHILDREN)
-							|| type.contains(MZConstants.ACCOMPANYING_NOT_CHILDREN)
-							|| type.contains(MZConstants.ERRANDS)
-							|| type.contains(MZConstants.OTHER)
-							|| type.contains(MZConstants.FOREIGN_PROPERTY)
-							|| type.contains(MZConstants.ACCOMPANYING)
-							|| type.contains(MZConstants.OVERNIGHT)
-							|| type.contains(MZConstants.PSEUDOETAPPE))
-					{act.setType(MZConstants.LEISURE);}
-					
-					//////////////////////////////////////////////////////////////////////
-					// code added by staheale
-					
-					else if(type.contains(MZConstants.BORDER.concat(": ").concat(MZConstants.SHOPPING))){
-						act.setType(MZConstants.SHOPPING);
+					if (prevAct != null) {
+						String type = act.getType();
+						
+						if (type.equals(prevAct.getType())) {
+							PlanElement leg = newPlanElements.pop();
+							assert(leg instanceof Leg);
+							PlanElement prevActPopped = newPlanElements.pop();
+							assert(prevActPopped == prevAct);
+							
+							// Choose activity with longest duration
+							if (act.getEndTime() - act.getStartTime() > prevAct.getEndTime() - prevAct.getStartTime())
+								act.setStartTime(prevAct.getStartTime());
+							else {
+								prevAct.setEndTime(act.getEndTime());
+								act = prevAct;
+							}
+							
+							newPe = act;
+						}
 					}
 					
-					else if(type.contains(MZConstants.BORDER.concat(": ").concat(MZConstants.HOME))){
-						act.setType(MZConstants.HOME);
-					}
-					
-					else if(type.contains(MZConstants.BORDER.concat(": ").concat(MZConstants.EDUCATION))){
-						act.setType(MZConstants.EDUCATION);
-					}
-					
-					else if(type.contains(MZConstants.AIRPORT.concat(": ").concat(MZConstants.SHOPPING))){
-						act.setType(MZConstants.SHOPPING);
-					}
-					
-					else if(type.contains(MZConstants.AIRPORT.concat(": ").concat(MZConstants.HOME))){
-						act.setType(MZConstants.HOME);
-					}
-					
-					//////////////////////////////////////////////////////////////////////
-					
-//						else if(type.contains(MZConstants.SHOPPING))
-//						{act.setType(MZConstants.SHOPPING);}
-//						
-//						else if(type.contains(MZConstants.EDUCATION))
-//						{act.setType(MZConstants.EDUCATION);}
-//						
-//						else if(type.contains(MZConstants.HOME))
-//						{act.setType(MZConstants.HOME);}
-					
+					prevAct = act;
 				}
 				
-				
+				newPlanElements.add(newPe);
 			}
-		
+			
+			planElements.clear();
+			planElements.addAll(newPlanElements);
+
 		}
 	}
 }
