@@ -87,14 +87,18 @@ public class CreateRscript {
 	}
 	
 	// created for use with PtLines2PaxAnalysis, fuerbas
-	public static void createScriptFromTransitLines2PaxCounts (TransitLines2PaxCounts tl2c, String outDir) {
+	public static void createScriptFromTransitLines2PaxCounts (Map<Id,TransitLines2PaxCounts> tl2c, String outDir) {
 		readScript(outDir);
 		heatmapScript(outDir);
 		StringBuffer b = new StringBuffer();
-		for (int r = 0; r < tl2c.getRouteList().size(); r++) {
-			createRouteScript(tl2c.getId(), tl2c.getRouteList().get(r).getId(), outDir);
-			b.append(tl2c.getId() + "--" + tl2c.getRouteList().get(r).getId().toString() + ".R\n");
+		
+		for(TransitLines2PaxCounts l: tl2c.values()){
+			for(TransitRoute r: l.getRouteList()){
+				createRouteScript(l.getId(), r.getId(), outDir);
+				b.append(l.getId().toString() + "--" + r.getId().toString() + ".R\n");
+			}
 		}
+
 		BufferedWriter w = IOUtils.getBufferedWriter(outDir + "plotAll.bat");
 		try {
 			w.write(

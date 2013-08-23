@@ -83,11 +83,12 @@ public class PtLines2PaxAnalysis extends AbstractAnalyisModule {
 
 	@Override
 	public void writeResults(String outputFolder) {
-		String dir;
+		String dir = outputFolder;
 		for(TransitLines2PaxCounts tl2c: this.handler.getLinesPaxCounts().values()){
-			dir = outputFolder + tl2c.getId().toString() + "--";
+//			dir = outputFolder + tl2c.getId().toString() + "--";
 			writeLineFiles(dir, tl2c, this.lines.get(tl2c.getId()));
 		}
+		CreateRscript.createScriptFromTransitLines2PaxCounts(this.handler.getLinesPaxCounts(), dir);
 	}
 	
 	
@@ -130,18 +131,18 @@ public class PtLines2PaxAnalysis extends AbstractAnalyisModule {
 			writeCounts2File(tl2c.getRouteList().get(i), tl2c.getMaxSlice(), tl2c.getOccupancy(), dir + tl2c.getRouteList().get(i).getId().toString() + "--occupancy.csv", "occupancy");
 			writeCounts2File(tl2c.getRouteList().get(i), tl2c.getMaxSlice(), tl2c.getTotalPax(), dir + tl2c.getRouteList().get(i).getId().toString() + "--totalPax.csv", "totalPax");
 		}
-		CreateRscript.createScriptFromTransitLines2PaxCounts(tl2c, dir);
 	}
 	
 
 	public static void main(String[] args) {
-		String dir = "Z:\\WinHome\\workspace\\PtRoutes2PaxAna_Daten\\schedule\\";
+//		String dir = "Z:\\WinHome\\workspace\\PtRoutes2PaxAna_Daten\\schedule\\";
+		String dir = "/home/soeren/workspace/PtLines2Pax/";
 		VspAnalyzer analyzer = new VspAnalyzer(dir, dir + "tut_10min_0.0.events.xml.gz");
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		sc.getConfig().scenario().setUseTransit(true);
 		sc.getConfig().scenario().setUseVehicles(true);
-//		new TransitScheduleReader(sc).readFile(dir + "tut_10min_0.0.transitSchedule.xml.gz");
-		new TransitScheduleReader(sc).readFile(dir + "tut_10min_0.0.transitSchedule_1.xml");	//for testing
+		new TransitScheduleReader(sc).readFile(dir + "tut_10min_0.0.transitSchedule.xml.gz");
+//		new TransitScheduleReader(sc).readFile(dir + "tut_10min_0.0.transitSchedule_1.xml");	//for testing
 		new VehicleReaderV1(((ScenarioImpl) sc).getVehicles()).readFile(dir + "tut_10min_0.0.vehicles.xml.gz");
 		PtLines2PaxAnalysis ptLinesPax = new PtLines2PaxAnalysis(sc.getTransitSchedule().getTransitLines(), ((ScenarioImpl) sc).getVehicles(), 3600, 24);
 		analyzer.addAnalysisModule(ptLinesPax);
