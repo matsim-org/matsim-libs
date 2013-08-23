@@ -22,9 +22,10 @@ import org.matsim.pt.router.TransitRouterFactory;
 
 import playground.toronto.analysis.handlers.AgentTripChainHandler;
 import playground.toronto.analysis.handlers.AggregateBoardingsOverTimePeriodHandler;
+import playground.toronto.exceptions.NetworkFormattingException;
 import playground.toronto.router.TorontoTransitRouterImplFactory;
-import playground.toronto.router.TransitDataCache;
 import playground.toronto.router.UpgradedTransitRouterFactory;
+import playground.toronto.router.calculators.TransitDataCache;
 
 public class UpgradedRunToronto {
 
@@ -32,8 +33,9 @@ public class UpgradedRunToronto {
 	
 	/**
 	 * @param args
+	 * @throws NetworkFormattingException 
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws NetworkFormattingException {
 		
 		//-----LOAD THE CONFIG FILE & SCENARIO--------------------------------------------------
 		String file;
@@ -73,14 +75,18 @@ public class UpgradedRunToronto {
 		TransitRouterConfig trConfig = new TransitRouterConfig(config);
 		TransitDataCache transitDataCache = new TransitDataCache(scenario.getTransitSchedule());
 		TransitRouterFactory trFactory;
+		
+		//Branch: if mode-specific boarding costs are specified, use a different calculator.
 		if (config.getModule("boardingcosts") != null){
+			log.info("Boarding costs module detected. Configuring MATSim to allow mode-specific boarding costs");
 			double busWeight = Double.parseDouble(config.getParam("boardingcosts", "busPenalty"));
 			double tramWeight = Double.parseDouble(config.getParam("boardingcosts", "streetcarPenalty"));
 			double subwayWeight = Double.parseDouble(config.getParam("boardingcosts", "subwayPenalty"));
-			trFactory = new TorontoTransitRouterImplFactory(scenario.getTransitSchedule(), trConfig, 
+			trFactory = new TorontoTransitRouterImplFactory(scenario.getNetwork() ,scenario.getTransitSchedule(), trConfig, 
 					transitDataCache, busWeight, tramWeight, subwayWeight);
 		}else{
-			trFactory = new UpgradedTransitRouterFactory(trConfig, scenario.getTransitSchedule(), transitDataCache);
+			log.info("Configuring Toronto Transit Router");
+			trFactory = new UpgradedTransitRouterFactory(scenario.getNetwork(), trConfig, scenario.getTransitSchedule(), transitDataCache);
 		}
 		controller.setTransitRouterFactory(trFactory);
 		
@@ -88,9 +94,8 @@ public class UpgradedRunToronto {
 		if (config.getModule("precongest") != null){
 			EventsManager em = EventsUtils.createEventsManager();
 			em.addHandler(transitDataCache);
-			log.info("Pre-loading transit data from earlier run...");
+			log.info("Pre-congestion module detected. Pre-loading transit data from earlier run...");
 			new MatsimEventsReader(em).readFile(config.getParam("precongest", "eventsFile"));
-			//transitDataCache.reset(0); //I think this is not necessary
 			log.info("Pre-loading complete.");
 		}
 		
@@ -98,13 +103,22 @@ public class UpgradedRunToronto {
 		controller.getEvents().addHandler(transitDataCache);
 		
 		AggregateBoardingsOverTimePeriodHandler morningBoardings = 
-				new AggregateBoardingsOverTimePeriodHandler(0.0, Time.parseTime("08:59:59"));
+				new AggregateBoardingsOverTimePeriodHandler(Time.convertHHMMInteger(600), Time.convertHHMMInteger(859));
 		
+		AggregateBoardingsOverTimePeriodHandler middayBoardings = 
+				new AggregateBoardingsOverTimePeriodHandler(Time.convertHHMMInteger(900), Time.convertHHMMInteger(1459));
+		
+		AggregateBoardingsOverTimePeriodHandler afternoonBoardings = 
+				new AggregateBoardingsOverTimePeriodHandler(Time.convertHHMMInteger(1500), Time.convertHHMMInteger(1759));
+		
+		AggregateBoardingsOverTimePeriodHandler allDayBoardings = 
+				new AggregateBoardingsOverTimePeriodHandler();
+		
+		controller.getEvents().addHandler(allDayBoardings);
 		controller.getEvents().addHandler(morningBoardings);
-		
-		AgentTripChainHandler tripsHandler = new AgentTripChainHandler();
-		controller.getEvents().addHandler(tripsHandler);
-		
+		controller.getEvents().addHandler(middayBoardings);
+		controller.getEvents().addHandler(afternoonBoardings);		
+	
 		
 		//-----RUN-------------------------------------------------
 		controller.run();
