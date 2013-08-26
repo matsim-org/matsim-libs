@@ -37,7 +37,7 @@ import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
 import org.matsim.pt.transitSchedule.api.TransitLine;
-import org.matsim.pt.transitSchedule.api.TransitRoute;
+import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.Vehicles;
@@ -47,21 +47,20 @@ import playground.vsp.analysis.modules.AbstractAnalyisModule;
 import playground.vsp.analysis.modules.ptRoutes2paxAnalysis.CreateRscript;
 
 /**
- * @author fuerbas after droeder
+ * @author aneumann, fuerbas after droeder
  *
  */
 
 public class PtLines2PaxAnalysis extends AbstractAnalyisModule {
 
-	private static final Logger log = Logger
-			.getLogger(PtLines2PaxAnalysis.class);
+	@SuppressWarnings("unused")
+	private static final Logger log = Logger.getLogger(PtLines2PaxAnalysis.class);
+	private final String SEP = "--";
 	private PtLines2PaxAnalysisHandler handler;
-	private Map<Id, TransitLine> lines;
 	
 	public PtLines2PaxAnalysis(Map<Id, TransitLine> lines, Vehicles vehicles, double interval, int maxSlices) {
 		super(PtLines2PaxAnalysis.class.getSimpleName());
 		this.handler = new PtLines2PaxAnalysisHandler(interval, maxSlices, lines, vehicles);
-		this.lines = lines;
 	}
 
 	@Override
@@ -73,49 +72,46 @@ public class PtLines2PaxAnalysis extends AbstractAnalyisModule {
 
 	@Override
 	public void preProcessData() {
-
+		// nothing to do here
 	}
 
 	@Override
 	public void postProcessData() {
-
+		// nothing to do here
 	}
 
 	@Override
 	public void writeResults(String outputFolder) {
 		String dir = outputFolder;
 		for(TransitLines2PaxCounts tl2c: this.handler.getLinesPaxCounts().values()){
-//			dir = outputFolder + tl2c.getId().toString() + "--";
-			writeLineFiles(dir, tl2c, this.lines.get(tl2c.getId()));
+			writeLineFiles(dir, tl2c);
 		}
 		CreateRscript.createScriptFromTransitLines2PaxCounts(this.handler.getLinesPaxCounts(), dir);
 	}
 	
-	
-	private void writeCounts2File(TransitRoute tl, Integer maxSlice, Counts counts, String file, String typeOfOutput) {
-		BufferedWriter w = IOUtils.getBufferedWriter(file);
-		Id stopId; 
-		Count c;
-		Volume v;
+	private void writeCounts2File(List<TransitRouteStop> transitRouteStops, int maxSlice, Counts counts, String outputFilename) {
+		BufferedWriter w = IOUtils.getBufferedWriter(outputFilename);
 		try {
 			//create header
 			w.write("index;stopId;name");
-			for(int i = 0; i < (maxSlice + 1); i++){
+			for(int i = 0; i <= maxSlice; i++){
 				w.write(";" + String.valueOf(i));
 			}
 			w.write("\n");
-				TransitRoute tr = tl;
-				for (int noStops = 0; noStops < tr.getStops().size(); noStops++) {	
-					stopId = tr.getStops().get(noStops).getStopFacility().getId();
-					c = counts.getCount(stopId);
-					w.write(String.valueOf(noStops) + ";" + c.getCsId() + ";" + tr.getStops().get(noStops).getStopFacility().getName());
-					for(int j = 0; j < (maxSlice + 1); j++){
-						v = c.getVolume(j);
-						String value = (v == null) ? "--" : String.valueOf(v.getValue());
-						w.write(";" + value);
-					}
-					w.write("\n");
+			
+			for (int noStops = 0; noStops < transitRouteStops.size(); noStops++) {	
+				Id stopId = transitRouteStops.get(noStops).getStopFacility().getId();
+				Count count = counts.getCount(stopId);
+				w.write(String.valueOf(noStops) + ";" + count.getCsId() + ";" + transitRouteStops.get(noStops).getStopFacility().getName());
+				
+				for(int j = 0; j <= maxSlice; j++){
+					Volume volume = count.getVolume(j);
+					String value = (volume == null) ? this.SEP : String.valueOf(volume.getValue());
+					w.write(";" + value);
 				}
+				w.write("\n");
+			}
+			
 			w.flush();
 			w.close();
 		} catch (IOException e) {
@@ -123,16 +119,18 @@ public class PtLines2PaxAnalysis extends AbstractAnalyisModule {
 		}
 	}
 	
-	private void writeLineFiles(String dir, TransitLines2PaxCounts tl2c, TransitLine tl) {
+	private void writeLineFiles(String dir, TransitLines2PaxCounts tl2c) {
 		for(int i = 0; i < tl2c.getRouteList().size() ; i++){
-			writeCounts2File(tl2c.getRouteList().get(i), tl2c.getMaxSlice(), tl2c.getAlighting(), dir + tl2c.getRouteList().get(i).getId().toString() + "--alighting.csv", "alighting");
-			writeCounts2File(tl2c.getRouteList().get(i), tl2c.getMaxSlice(), tl2c.getBoarding(), dir + tl2c.getRouteList().get(i).getId().toString() + "--boarding.csv", "boarding");
-			writeCounts2File(tl2c.getRouteList().get(i), tl2c.getMaxSlice(), tl2c.getCapacity(), dir + tl2c.getRouteList().get(i).getId().toString() + "--capacity.csv", "capacity");
-			writeCounts2File(tl2c.getRouteList().get(i), tl2c.getMaxSlice(), tl2c.getOccupancy(), dir + tl2c.getRouteList().get(i).getId().toString() + "--occupancy.csv", "occupancy");
-			writeCounts2File(tl2c.getRouteList().get(i), tl2c.getMaxSlice(), tl2c.getTotalPax(), dir + tl2c.getRouteList().get(i).getId().toString() + "--totalPax.csv", "totalPax");
+			List<TransitRouteStop> transitRouteStops = tl2c.getRouteList().get(i).getStops();
+			int maxSlice = tl2c.getMaxSlice().intValue();
+			String filePrefix = dir + tl2c.getId() + this.SEP + tl2c.getRouteList().get(i).getId().toString();
+			writeCounts2File(transitRouteStops, maxSlice, tl2c.getAlighting(), filePrefix + this.SEP + "alighting.csv");
+			writeCounts2File(transitRouteStops, maxSlice, tl2c.getBoarding(), filePrefix + this.SEP + "boarding.csv");
+			writeCounts2File(transitRouteStops, maxSlice, tl2c.getCapacity(), filePrefix + this.SEP + "capacity.csv");
+			writeCounts2File(transitRouteStops, maxSlice, tl2c.getOccupancy(), filePrefix + this.SEP + "occupancy.csv");
+			writeCounts2File(transitRouteStops, maxSlice, tl2c.getTotalPax(), filePrefix + this.SEP + "totalPax.csv");
 		}
 	}
-	
 
 	public static void main(String[] args) {
 //		String dir = "Z:\\WinHome\\workspace\\PtRoutes2PaxAna_Daten\\schedule\\";
@@ -148,5 +146,4 @@ public class PtLines2PaxAnalysis extends AbstractAnalyisModule {
 		analyzer.addAnalysisModule(ptLinesPax);
 		analyzer.run();
 	}
-
 }
