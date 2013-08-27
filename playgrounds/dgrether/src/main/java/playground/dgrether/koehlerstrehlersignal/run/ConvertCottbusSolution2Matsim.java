@@ -20,22 +20,18 @@
 package playground.dgrether.koehlerstrehlersignal.run;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.counts.CountSimComparison;
 import org.matsim.signalsystems.data.SignalsData;
 import org.matsim.signalsystems.data.SignalsScenarioLoader;
 import org.matsim.signalsystems.data.SignalsScenarioWriter;
 
 import playground.dgrether.DgPaths;
-import playground.dgrether.koehlerstrehlersignal.ids.DgIdConverter;
 import playground.dgrether.koehlerstrehlersignal.ids.DgIdPool;
 import playground.dgrether.koehlerstrehlersignal.solutionconverter.KS2010CrossingSolution;
 import playground.dgrether.koehlerstrehlersignal.solutionconverter.KS2010Solution2Matsim;
@@ -107,23 +103,32 @@ public class ConvertCottbusSolution2Matsim {
 	 */
 	public static void main(String[] args) {
 		List<Tuple<String, String>> input= new ArrayList<Tuple<String, String>>();
+//		input.add(new Tuple<String, String>(
+//						DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-07-31_minflow_50_evening_peak/",
+//						"ksm_50a_sol.txt"
+//						));
+//		input.add(new Tuple<String, String>(
+//				DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-07-31_minflow_50_morning_peak/",
+//				"ksm_50m_sol.txt"
+//				));
+//		input.add(new Tuple<String, String>(
+//				DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-07-31_minflow_10_evening_peak/",
+//				"ksm_10a_sol.txt"
+//				));
+//		input.add(new Tuple<String, String>(
+//				DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-07-31_minflow_10_morning_peak/",
+//				"ksm_10m_sol.txt"
+//		));
+
 		input.add(new Tuple<String, String>(
-						DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-07-31_minflow_50_evening_peak/",
-						"ksm_50a_sol.txt"
-						));
-		input.add(new Tuple<String, String>(
-				DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-07-31_minflow_50_morning_peak/",
-				"ksm_50m_sol.txt"
-				));
-		input.add(new Tuple<String, String>(
-				DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-07-31_minflow_10_evening_peak/",
+				DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-08-12_minflow_10_evening_peak/",
 				"ksm_10a_sol.txt"
 				));
 		input.add(new Tuple<String, String>(
-				DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-07-31_minflow_10_morning_peak/",
+				DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-08-12_minflow_10_morning_peak/",
 				"ksm_10m_sol.txt"
 		));
-		
+
 		for (Tuple<String, String> i : input){
 			new ConvertCottbusSolution2Matsim().convert(i.getFirst(), i.getSecond());
 		}

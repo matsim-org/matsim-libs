@@ -77,6 +77,7 @@ public class KS2010Solution2Matsim {
 				int offset = solution.getProgramIdOffsetMap().get(programId);
 				offset = offset * scale;
 				plan.setOffset(offset);
+				log.info("SignalSystem Id " + controllerData.getSignalSystemId() + " Offset: " + offset);
 			}
 		}
 	}
