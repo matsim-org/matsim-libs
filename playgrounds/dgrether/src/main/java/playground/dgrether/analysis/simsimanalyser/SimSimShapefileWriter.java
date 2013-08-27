@@ -44,13 +44,13 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * @author dgrether
  *
  */
-public class CountsShapefileWriter {
+public class SimSimShapefileWriter {
 
-	private static final Logger log = Logger.getLogger(CountsShapefileWriter.class);
+	private static final Logger log = Logger.getLogger(SimSimShapefileWriter.class);
 	private Network network;
 	private CoordinateReferenceSystem crs;
 	
-	public CountsShapefileWriter(Network network, CoordinateReferenceSystem crs) {
+	public SimSimShapefileWriter(Network network, CoordinateReferenceSystem crs) {
 		this.network = network; 
 		this.crs = crs;
 	}
@@ -86,26 +86,16 @@ public class CountsShapefileWriter {
 		builder.addAttribute("type", String.class);
 		String diff = runId2+"-"+runId;
 		for (int i = 0; i < 24; i++){
-			builder.addAttribute("re h " + (i + 1), Double.class);
-		}
-		builder.addAttribute("re 24h", Double.class);
-		for (int i = 0; i < 24; i++){
-			builder.addAttribute("h_" + (i + 1)+diff, Double.class);
+			builder.addAttribute("h" + (i + 1)+"_"+diff, Double.class);
 		}
 		builder.addAttribute("24h_"+diff, Double.class);
-		for (int i = 0; i < 24; i++){
-			builder.addAttribute("h_" + (i + 1)+"w"+diff, Double.class);
-		}
-		builder.addAttribute("24h_"+"w"+diff, Double.class);
 		
 		return builder.create();
 	}
 	
 	private SimpleFeature createFeature(Link link, GeometryFactory geofac, PolygonFeatureFactory factory, List<CountSimComparison> countSimComparisonList) {
 		Coordinate[] coords = PolygonFeatureGenerator.createPolygonCoordsForLink(link, 20.0);
-//		coords = new Coordinate[] {MGC.coord2Coordinate(link.getFromNode().getCoord()), MGC.coord2Coordinate(link.getToNode().getCoord())};
-		
-		Object [] attribs = new Object[84];
+		Object [] attribs = new Object[34];
 		attribs[0] = link.getId().toString();
 		attribs[1] = link.getFromNode().getId().toString();
 		attribs[2] = link.getToNode().getId().toString();
@@ -117,42 +107,31 @@ public class CountsShapefileWriter {
 		attribs[8] = ((LinkImpl) link).getType();
 		int i = 9;
 		double sumRelativeError = 0.0;
+		double sumRelErrorCount = 0.0;
 		double relativeError = 0.0;
-//		for (CountSimComparison csc : countSimComparisonList) {
-//			log.error("hour: " + csc.getHour());
-//		}
 		for (CountSimComparison csc : countSimComparisonList){
 			if (csc.getHour() != i - 8) throw new IllegalStateException("List not sorted correctly. csc.getHour() returns " +csc.getHour());
-			relativeError = csc.calculateRelativeError();
+			if (csc.getCountValue() == 0.0) {
+				relativeError = - csc.getSimulationValue();
+			}
+			if (csc.getSimulationValue() == 0.0) {
+				relativeError = - csc.getCountValue();
+			}
+			if (csc.getSimulationValue() == 0.0 && csc.getCountValue() == 0.0) {
+				relativeError = -1.0;
+			}
+			if (csc.getSimulationValue() != 0.0 && csc.getCountValue() != 0.0) {
+				relativeError = csc.getSimulationValue() / csc.getCountValue();
+			}
 			attribs[i] = relativeError;
-			sumRelativeError += relativeError;
+			if (relativeError > 0.0) {
+				sumRelativeError += relativeError;
+				sumRelErrorCount++;
+			}
 			i++;
 		}
-		attribs[33] = sumRelativeError / 24.0;
-		i = 34;
-		double difference = 0;
-		double sumDifference = 0;
-		for (CountSimComparison csc : countSimComparisonList){
-			if (csc.getHour() != i - 33) throw new IllegalStateException("List not sorted correctly");
-			difference = csc.getSimulationValue() - csc.getCountValue();
-			attribs[i] = difference;
-			sumDifference += difference;
-			i++;
-		}
-		attribs[58] = sumDifference;
-
-		i = 59;
-		double weightedDifference = 0;
-		double sumWeightedDifference = 0;
-		for (CountSimComparison csc : countSimComparisonList){
-			if (csc.getHour() != i - 58) throw new IllegalStateException("List not sorted correctly");
-			weightedDifference = csc.getSimulationValue() - csc.getCountValue();
-			weightedDifference /= link.getCapacity();
-			attribs[i] = weightedDifference;
-			sumWeightedDifference += weightedDifference;
-			i++;
-		}
-		attribs[83] = sumWeightedDifference;
+		attribs[33] = sumRelativeError / sumRelErrorCount;
+		
 
 		
 		return factory.createPolygon(coords, attribs, link.getId().toString());

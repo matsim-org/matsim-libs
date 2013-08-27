@@ -21,6 +21,7 @@ package playground.dgrether.koehlerstrehlersignal.analysis;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,6 +33,7 @@ import org.geotools.referencing.CRS;
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
@@ -47,10 +49,12 @@ import org.opengis.referencing.operation.TransformException;
 import playground.dgrether.DgPaths;
 import playground.dgrether.analysis.RunResultsLoader;
 import playground.dgrether.analysis.simsimanalyser.CountsShapefileWriter;
-import playground.dgrether.analysis.simsimanalyser.SimSimCountsAnalysis;
+import playground.dgrether.analysis.simsimanalyser.SimSimAnalysis;
+import playground.dgrether.analysis.simsimanalyser.SimSimShapefileWriter;
 import playground.dgrether.events.DgNetShrinkImproved;
 import playground.dgrether.events.EventsFilterManager;
 import playground.dgrether.events.EventsFilterManagerImpl;
+import playground.dgrether.events.InMemoryEventsManager;
 import playground.dgrether.events.filters.TimeEventFilter;
 import playground.dgrether.koehlerstrehlersignal.run.Cottbus2KS2010;
 import playground.dgrether.signalsystems.cottbus.CottbusUtils;
@@ -139,14 +143,14 @@ public class DgAnalyseCottbusKS2010 {
 		for (Result r : results.getResults()) {
 			double averageTT = r.travelTime / r.numberOfPersons;
 			r.averageTravelTime = averageTT;
-//			if (! r.runInfo.baseCase) {
-				Result baseResult = baseCase.get(r.extent).get(r.timeConfig);
-				r.travelTimeDelta = r.travelTime - baseResult.travelTime;
-				r.travelTimePercent = r.travelTime / baseResult.travelTime * 100.0;
-				r.personsDelta = r.numberOfPersons - baseResult.numberOfPersons;
-//			}
-				this.createSimSimComparison(baseResult, r);
-				this.writeMfd(r);
+			Result baseResult = baseCase.get(r.extent).get(r.timeConfig);
+			r.travelTimeDelta = r.travelTime - baseResult.travelTime;
+			r.travelTimePercent = r.travelTime / baseResult.travelTime * 100.0;
+			r.personsDelta = r.numberOfPersons - baseResult.numberOfPersons;
+			if (! r.runInfo.baseCase) {
+				this.createAndWriteSimSimComparison(baseResult, r);
+			}
+			this.writeMfd(r);
 		}
 	}
 	
@@ -155,13 +159,19 @@ public class DgAnalyseCottbusKS2010 {
 		result.mfd.writeFile(filename);
 	}
 	
-	private void createSimSimComparison(Result baseResult, Result result) {
-		SimSimCountsAnalysis countsAnalysis = new SimSimCountsAnalysis();
+	private void createAndWriteSimSimComparison(Result baseResult, Result result) {
+		SimSimAnalysis countsAnalysis = new SimSimAnalysis();
 		Map<Id, List<CountSimComparison>> countSimCompMap = countsAnalysis.createCountSimComparisonByLinkId(result.network, baseResult.volumes, result.volumes);
 		String shapeBase = baseResult.runInfo.runId + "_it_" + baseResult.runInfo.iteration + "_vs_";
-		shapeBase += result.runInfo.runId + "_it_" + result.runInfo.iteration + "_simsimcomparison.shp";
-		String shapefile = result.runLoader.getIterationFilename(result.runInfo.iteration, shapeBase);
-		new CountsShapefileWriter(result.network, Cottbus2KS2010.CRS).writeShape(shapefile, countSimCompMap);
+		shapeBase += result.runInfo.runId + "_it_" + result.runInfo.iteration;
+		
+		String shapefile = shapeBase + "_simcountcomparison";
+		shapefile = result.runLoader.getIterationFilename(result.runInfo.iteration, shapefile);
+		new CountsShapefileWriter(result.network, Cottbus2KS2010.CRS).writeShape(shapefile + ".shp", countSimCompMap, baseResult.runInfo.runId, result.runInfo.runId);
+
+		shapefile = shapeBase + "_simsimcomparison";
+		shapefile = result.runLoader.getIterationFilename(result.runInfo.iteration, shapefile);
+		new SimSimShapefileWriter(result.network, Cottbus2KS2010.CRS).writeShape(shapefile + ".shp", countSimCompMap, baseResult.runInfo.runId, result.runInfo.runId);
 	}
 	
 	private void writeAverageTravelTimesToFile(String file) {
@@ -206,21 +216,21 @@ public class DgAnalyseCottbusKS2010 {
 			out.append("\t");
 			out.append(r.timeConfig.name);
 			out.append("\t");
-			out.append(Double.toString(r.travelTime));
+			out.append(formatDouble(r.travelTime));
 			out.append("\t");
 			out.append(Time.writeTime(r.travelTime));
 			out.append("\t");
-			out.append(Double.toString(r.travelTimeDelta));
+			out.append(formatDouble(r.travelTimeDelta));
 			out.append("\t");
 			out.append(Time.writeTime(r.travelTimeDelta));
 			out.append("\t");
-			out.append(Double.toString(r.travelTimePercent));
+			out.append(formatDouble(r.travelTimePercent));
 			out.append("\t");
-			out.append(Double.toString(r.numberOfPersons));
+			out.append(formatDouble(r.numberOfPersons));
 			out.append("\t");
-			out.append(Double.toString(r.personsDelta));
+			out.append(formatDouble(r.personsDelta));
 			out.append("\t");
-			out.append(Double.toString(r.averageTravelTime));
+			out.append(formatDouble(r.averageTravelTime));
 			out.append("\t");
 				lines.add(out.toString());
 			log.info(out.toString());
@@ -240,6 +250,11 @@ public class DgAnalyseCottbusKS2010 {
 		}
 	}
 	
+	private String formatDouble(double d){
+		DecimalFormat format = new DecimalFormat("#.#");
+		return format.format(d);
+	}
+	
 	//Average traveltime
 	// Average speed
 	// Macroscopic fundamental diagram
@@ -251,6 +266,11 @@ public class DgAnalyseCottbusKS2010 {
 			String runId = runInfo.runId;
 			String runDirectory = DgPaths.REPOS + "runs-svn/run"+runId+"/";
 			RunResultsLoader runDir = new RunResultsLoader(runDirectory, runId);
+
+			InMemoryEventsManager inMemoryEvents = new InMemoryEventsManager();
+			MatsimEventsReader reader = new MatsimEventsReader(inMemoryEvents);
+			reader.readFile(runDir.getEventsFilename(runInfo.iteration));
+
 			
 			for (Extent extent : extents) {
 				Network net; 
@@ -285,8 +305,9 @@ public class DgAnalyseCottbusKS2010 {
 					DgMfd mfd = new DgMfd(net);
 					eventsManager.addHandler(mfd);
 					
-					MatsimEventsReader reader = new MatsimEventsReader(eventsManager);
-					reader.readFile(runDir.getEventsFilename(runInfo.iteration));
+					for (Event e : inMemoryEvents.getEvents()){
+						eventsManager.processEvent(e);
+					}
 
 					result.volumes = volumes;
 					result.travelTime = avgTtSpeed.getTravelTime();
@@ -303,53 +324,54 @@ public class DgAnalyseCottbusKS2010 {
 
 	private static List<TimeConfig> createTimeConfig(){
 		TimeConfig morning = new TimeConfig();
-		morning.startTime = 5.5 * 3600.0;
-		morning.endTime  = 9.5 * 3600.0;
+		morning.startTime = 5.0 * 3600.0;
+		morning.endTime  = 10.0 * 3600.0;
 		morning.name = "morning";
 		TimeConfig evening = new TimeConfig();
-		evening.startTime = 13.5 * 3600.0;
-		evening.endTime = 18.5 * 3600.0;
+		evening.startTime = 13.0 * 3600.0;
+		evening.endTime = 20.0 * 3600.0;
 		evening.name = "afternoon";
 		TimeConfig all = new TimeConfig();
 		all.startTime = 0.0;
 		all.endTime = 24.0 * 3600.0;
 		all.name = "all_day";
 		List<TimeConfig> list = new ArrayList<TimeConfig>();
-//		list.add(morning);
-//		list.add(evening);
+		list.add(morning);
+		list.add(evening);
 		list.add(all);
 		return list;
 	}
 
 	private static List<RunInfo> createRunsIdList(){
 		List<RunInfo> l = new ArrayList<RunInfo>();
-		RunInfo ri = new RunInfo();
+		RunInfo ri = null;
+		
+//		ri = new RunInfo();
 //		ri.runId = "1712";
 //		ri.remark = "base case";
 //		ri.baseCase  = true;
 //		ri.iteration = 1000;
 //		l.add(ri);
-//		ri.runId = "1298";
+		
+//		ri = new RunInfo();
+//		ri.runId = "1722";
 //		ri.remark = "base_case";
 //		ri.baseCase  = true;
 //		ri.iteration = 1000;
 //		l.add(ri);
+
 //		ri = new RunInfo();
-//		ri.runId = "1299";
-//		ri.remark = "sylvia";
+//		ri.runId = "1726";
+//		ri.remark = "base_case_more_learning";
+//		ri.baseCase = true;
 //		ri.iteration = 1000;
 //		l.add(ri);
-
-		ri.runId = "1722";
-		ri.remark = "base_case";
-		ri.baseCase  = true;
-		ri.iteration = 1000;
-		l.add(ri);
-
-		ri.runId = "1726";
-		ri.remark = "base_case_new";
-		ri.iteration = 1000;
-		l.add(ri);
+//		
+//		ri = new RunInfo();
+//		ri.runId = "1727";
+//		ri.remark = "base_case_new";
+//		ri.iteration = 2000;
+//		l.add(ri);
 
 		
 		//		ri = new RunInfo();
@@ -360,21 +382,60 @@ public class DgAnalyseCottbusKS2010 {
 //		ri.runId = "1731";
 //		ri.remark  = "from scratch, com > 10";
 //		l.add(ri);
-//		ri = new RunInfo();
-//		ri.runId = "1732";
-//		ri.iteration = 1000;
-//		ri.remark = "continue 1712, com > 50";
-//		l.add(ri);
-//		ri = new RunInfo();
-//		ri.runId = "1733";
-//		ri.iteration = 1000;
-//		ri.remark  = "continue 1712, com > 10";
-//		l.add(ri);
+
+		ri = new RunInfo();
+		ri.runId = "1734";
+		ri.baseCase = true;
+		ri.iteration = 1000;
+		ri.remark  = "base case, continue 1712";
+		l.add(ri);
+		
+		ri = new RunInfo();
+		ri.runId = "1732";
+		ri.iteration = 1000;
+		ri.remark = "continue 1712, com > 50";
+		l.add(ri);
+		
+		ri = new RunInfo();
+		ri.runId = "1733";
+		ri.iteration = 1000;
+		ri.remark  = "continue 1712, com > 10";
+		l.add(ri);
+		
+		
 //		ri = new RunInfo();
 //		ri.runId = "1740";
 //		ri.iteration = 2000;
+////		ri.baseCase = true;
 //		ri.remark  = "continue base case 1722 for 1000 iterations";
 //		l.add(ri);
+//
+//		ri = new RunInfo();
+//		ri.runId = "1741";
+//		ri.iteration = 2000;
+//		ri.remark  = "sylvia: continue base case 1722 for 1000 iterations";
+//		l.add(ri);
+//
+//		ri = new RunInfo();
+//		ri.runId = "1742";
+//		ri.iteration = 1000;
+//		ri.remark  = "start it 0: continue base case 1722 for 1000 iterations";
+//		l.add(ri);
+
+//		ri = new RunInfo();
+//		ri.runId = "1743";
+//		ri.iteration = 2000;
+//		ri.baseCase = true;
+//		ri.remark  = "continue base case 1726 for 1000 iterations";
+//		l.add(ri);
+//
+//		ri = new RunInfo();
+//		ri.runId = "1744";
+//		ri.iteration = 1000;
+//		ri.remark  = "start it 0: continue base case 1726 for 1000 iterations";
+//		l.add(ri);
+
+		
 		return l;
 	}
 
@@ -438,7 +499,7 @@ public class DgAnalyseCottbusKS2010 {
 		ana.calculateResults(runIds, times, extents);
 		ana.analyseResults();
 		String outputDirectory = DgPaths.SHAREDSVN + "projects/cottbus/cb2ks2010/results/";
-		String outputFilename = outputDirectory + "2013-08-20_travel_times_extent_base_case_only.txt";
+		String outputFilename = outputDirectory + "2013-08-26_travel_times_extent_1732_1733_1734.txt";
 		ana.writeAverageTravelTimesToFile(outputFilename);
 
 	}

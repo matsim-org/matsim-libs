@@ -90,7 +90,7 @@ public class SimSimTrafficAnalyser {
 		SimSimCountsAnalysis countsAnalysis = new SimSimCountsAnalysis();
 		Map<Id, List<CountSimComparison>> countSimCompMap = countsAnalysis.createCountSimComparisonByLinkId(filteredNetwork, vaCounts, vaSim);
 		
-		new CountsShapefileWriter(filteredNetwork, networkSrs).writeShape(outfile, countSimCompMap);
+		new CountsShapefileWriter(filteredNetwork, networkSrs).writeShape(outfile + ".shp", countSimCompMap);
 
 		List<CountSimComparison> countSimComp = new ArrayList<CountSimComparison>();
 		for (List<CountSimComparison> list : countSimCompMap.values()){

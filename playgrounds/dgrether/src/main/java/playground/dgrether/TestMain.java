@@ -19,7 +19,8 @@
  * *********************************************************************** */
 package playground.dgrether;
 
-import org.matsim.contrib.otfvis.OTFVis;
+import java.text.DecimalFormat;
+
 
 
 
@@ -38,12 +39,21 @@ public class TestMain {
 		testVarArgs("hallo", "ihr", "penner");
 		testVarArgs("hallo");
 	}
+	
+	public static void testNumberFormat(){
+		double d = 312380980328479.5;
+		System.out.println(Double.toString(d));
+		DecimalFormat f = new DecimalFormat("#.#");
+		System.out.println(f.format(d));
+	}
+	
 
 	public static void main(String[] args){
 		String config = "/media/data/work/matsim/examples/stephan_rath/testcase3/config.xml";
 //		Controler c = new Controler(config);
 //		c.run();
-		OTFVis.playConfig(config);
+//		OTFVis.playConfig(config);
+		testNumberFormat();
 	}
 
 }

@@ -26,8 +26,12 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 
@@ -36,7 +40,7 @@ import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
  * @author dgrether
  *
  */
-public class DgAverageTravelTimeSpeed implements LinkEnterEventHandler, LinkLeaveEventHandler {
+public class DgAverageTravelTimeSpeed implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandler, AgentStuckEventHandler{
 
 	private Network network;
 	private Map<Id, LinkEnterEvent> linkEnterByPerson;
@@ -72,6 +76,17 @@ public class DgAverageTravelTimeSpeed implements LinkEnterEventHandler, LinkLeav
 			this.seenPersonIds.add(event.getPersonId());
 		}
 	}
+
+	@Override
+	public void handleEvent(AgentStuckEvent event) {
+		this.linkEnterByPerson.remove(event.getPersonId());
+	}
+
+	@Override
+	public void handleEvent(AgentArrivalEvent event) {
+		this.linkEnterByPerson.remove(event.getPersonId());		
+	}
+
 	
 	public double getTravelTime() {
 		return travelTime;
@@ -80,5 +95,6 @@ public class DgAverageTravelTimeSpeed implements LinkEnterEventHandler, LinkLeav
 	public double getNumberOfPersons(){
 		return this.seenPersonIds.size();
 	}
+
 
 }

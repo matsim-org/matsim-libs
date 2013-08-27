@@ -45,10 +45,12 @@ import com.vividsolutions.jts.geom.MultiPoint;
 
 
 /**
+ * Writes the Cottbus signal systems to a shape file containing points at signalized nodes.
+ * 
  * @author dgrether
  *
  */
-public class DgCottbusSignals2PointLayer {
+public class DgCottbusSignals2PointLayerShape {
 
 	public static void main(String[] args) throws Exception {
 		ScenarioImpl sc = CottbusUtils.loadCottbusScenrio(true);
@@ -70,7 +72,7 @@ public class DgCottbusSignals2PointLayer {
 			SimpleFeature feature = builder.buildFeature(null, new Object[]{multiPoint, systemId.toString()});
 			multiPointFeatures.add(feature);
 		}
-		ShapeFileWriter.writeGeometries(multiPointFeatures, DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_system_shape/signal_systems.shp");
+		ShapeFileWriter.writeGeometries(multiPointFeatures, DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/shape_files/signal_systems/signal_systems_no_13.shp");
 	}
 
 	private static SimpleFeatureBuilder createMultiPointSignalSystemFeatureBuilder(CoordinateReferenceSystem crs) {
