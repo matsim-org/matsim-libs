@@ -77,7 +77,7 @@ public class KtiScoringFunctionFactoryWithJointModes implements ScoringFunctionF
 					scenario.getNetwork()));
 		scoringFunctionAccumulator.addScoringFunction(
 				new ElementalCharyparNagelLegScoringFunction(
-					JointActingTypes.DRIVER,
+					JointActingTypes.PASSENGER,
 					new LegScoringParameters(
 						params.constantCar,
 						params.marginalUtilityOfTraveling_s,
