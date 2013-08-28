@@ -11,7 +11,6 @@ import org.matsim.pt.router.CustomDataManager;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterImpl;
 import org.matsim.pt.router.TransitRouterNetwork.TransitRouterNetworkLink;
-import org.matsim.pt.router.TransitRouterNetworkTravelTimeCostTest;
 import org.matsim.pt.router.TransitTravelDisutility;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.vehicles.Vehicle;
@@ -20,7 +19,7 @@ import playground.toronto.transitfares.deprecated.FareCalculator;
 import playground.toronto.transitfares.deprecated.NullFareCalculator;
 
 /**
- * <p>Iterative {@link TransitRouterNetworkTravelTimeCostTest} calculator for transit, which utilizes the {@link TransitDataCache} to
+ * <p>Iterative {@link TransitRouterNetworkTravelTimeCost} calculator for transit, which utilizes the {@link TransitDataCache} to
  * calculate times as-executed in the previous iteration. Also includes the effects of fares through the use of the {@link FareCalculator}
  * (which by default is set to the <code>NullFareCalculator</code> which always returns '0'.</p>
  * 
