@@ -15,7 +15,7 @@ import org.matsim.pt.transitSchedule.TransitScheduleReaderV1;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import playground.toronto.exceptions.NetworkFormattingException;
-import playground.toronto.router.TorontoTransitRouterNetwork;
+import playground.toronto.router.routernetwork.TorontoTransitRouterNetwork;
 
 import com.vividsolutions.jts.util.Assert;
 
