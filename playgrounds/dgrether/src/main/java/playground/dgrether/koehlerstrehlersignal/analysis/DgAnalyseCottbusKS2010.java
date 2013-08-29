@@ -130,7 +130,12 @@ public class DgAnalyseCottbusKS2010 {
 		
 	}
 	
-	private Results results = new Results(); 
+	private Results results = new Results();
+	private boolean useInMemoryEvents; 
+
+	private void setUseInMemoryEvents(boolean useInMemoryEvents) {
+		this.useInMemoryEvents = useInMemoryEvents;
+	}
 
 	
 	private void analyseResults() {
@@ -266,10 +271,13 @@ public class DgAnalyseCottbusKS2010 {
 			String runId = runInfo.runId;
 			String runDirectory = DgPaths.REPOS + "runs-svn/run"+runId+"/";
 			RunResultsLoader runDir = new RunResultsLoader(runDirectory, runId);
-
-			InMemoryEventsManager inMemoryEvents = new InMemoryEventsManager();
-			MatsimEventsReader reader = new MatsimEventsReader(inMemoryEvents);
-			reader.readFile(runDir.getEventsFilename(runInfo.iteration));
+			
+			InMemoryEventsManager inMemoryEvents = null;
+			if (useInMemoryEvents) {
+				inMemoryEvents = new InMemoryEventsManager();
+				MatsimEventsReader reader = new MatsimEventsReader(inMemoryEvents);
+				reader.readFile(runDir.getEventsFilename(runInfo.iteration));
+			}
 
 			
 			for (Extent extent : extents) {
@@ -305,8 +313,14 @@ public class DgAnalyseCottbusKS2010 {
 					DgMfd mfd = new DgMfd(net);
 					eventsManager.addHandler(mfd);
 					
-					for (Event e : inMemoryEvents.getEvents()){
-						eventsManager.processEvent(e);
+					if (useInMemoryEvents){
+						for (Event e : inMemoryEvents.getEvents()){
+							eventsManager.processEvent(e);
+						}
+					}
+					else {
+						MatsimEventsReader reader = new MatsimEventsReader(eventsManager);
+						reader.readFile(runDir.getEventsFilename(runInfo.iteration));
 					}
 
 					result.volumes = volumes;
@@ -359,7 +373,20 @@ public class DgAnalyseCottbusKS2010 {
 //		ri.baseCase  = true;
 //		ri.iteration = 1000;
 //		l.add(ri);
+//
+//		ri = new RunInfo();
+//		ri.runId = "1724";
+//		ri.remark = "0.5 flow cap";
+//		ri.iteration = 1000;
+//		l.add(ri);
+//
+//		ri = new RunInfo();
+//		ri.runId = "1725";
+//		ri.remark = "0.3 flow cap";
+//		ri.iteration = 1000;
+//		l.add(ri);
 
+		
 //		ri = new RunInfo();
 //		ri.runId = "1726";
 //		ri.remark = "base_case_more_learning";
@@ -383,33 +410,53 @@ public class DgAnalyseCottbusKS2010 {
 //		ri.remark  = "from scratch, com > 10";
 //		l.add(ri);
 
-		ri = new RunInfo();
-		ri.runId = "1734";
-		ri.baseCase = true;
-		ri.iteration = 1000;
-		ri.remark  = "base case, continue 1712";
-		l.add(ri);
-		
-		ri = new RunInfo();
-		ri.runId = "1732";
-		ri.iteration = 1000;
-		ri.remark = "continue 1712, com > 50";
-		l.add(ri);
-		
-		ri = new RunInfo();
-		ri.runId = "1733";
-		ri.iteration = 1000;
-		ri.remark  = "continue 1712, com > 10";
-		l.add(ri);
+//		ri = new RunInfo();
+//		ri.runId = "1734";
+//		ri.baseCase = true;
+//		ri.iteration = 1000;
+//		ri.remark  = "base case, continue 1712";
+//		l.add(ri);
+//		
+//		ri = new RunInfo();
+//		ri.runId = "1732";
+//		ri.iteration = 1000;
+//		ri.remark = "continue 1712, com > 50";
+//		l.add(ri);
+//		
+//		ri = new RunInfo();
+//		ri.runId = "1733";
+//		ri.iteration = 1000;
+//		ri.remark  = "continue 1712, com > 10";
+//		l.add(ri);
 		
 		
 //		ri = new RunInfo();
 //		ri.runId = "1740";
 //		ri.iteration = 2000;
-////		ri.baseCase = true;
-//		ri.remark  = "continue base case 1722 for 1000 iterations";
+//		ri.baseCase = true;
+//		ri.remark  = "base case 1722 it 2000";
 //		l.add(ri);
 //
+//		ri = new RunInfo();
+//		ri.runId = "1735";
+//		ri.iteration = 2000;
+//		ri.remark = "continue 1712, com > 50";
+//		l.add(ri);
+//
+//		ri = new RunInfo();
+//		ri.runId = "1736";
+//		ri.iteration = 2000;
+//		ri.remark  = "continue 1712, com > 10";
+//		l.add(ri);
+//
+//		ri = new RunInfo();
+//		ri.runId = "1737";
+//		ri.iteration = 2000;
+//		ri.remark  = "continue 1712, com > 10, new";
+//		l.add(ri);
+		
+		
+		//
 //		ri = new RunInfo();
 //		ri.runId = "1741";
 //		ri.iteration = 2000;
@@ -436,6 +483,31 @@ public class DgAnalyseCottbusKS2010 {
 //		l.add(ri);
 
 		
+		ri = new RunInfo();
+		ri.runId = "1745";
+		ri.iteration = 2000;
+		ri.baseCase = true;
+		ri.remark  = "base case 1712 it 2000";
+		l.add(ri);
+
+		ri = new RunInfo();
+		ri.runId = "1746";
+		ri.iteration = 2000;
+		ri.remark = "continue 1712, com > 10";
+		l.add(ri);
+
+		ri = new RunInfo();
+		ri.runId = "1747";
+		ri.iteration = 2000;
+		ri.remark  = "continue 1712, com > 50";
+		l.add(ri);
+
+		ri = new RunInfo();
+		ri.runId = "1748";
+		ri.iteration = 2000;
+		ri.remark  = "sylvia: continue base case 1712 for 1000 iterations";
+		l.add(ri);
+
 		return l;
 	}
 
@@ -496,13 +568,15 @@ public class DgAnalyseCottbusKS2010 {
 		List<TimeConfig> times = createTimeConfig();
 		List<Extent> extents = createExtentList();
 		DgAnalyseCottbusKS2010 ana = new DgAnalyseCottbusKS2010();
+		ana.setUseInMemoryEvents(true);
 		ana.calculateResults(runIds, times, extents);
 		ana.analyseResults();
 		String outputDirectory = DgPaths.SHAREDSVN + "projects/cottbus/cb2ks2010/results/";
-		String outputFilename = outputDirectory + "2013-08-26_travel_times_extent_1732_1733_1734.txt";
+		String outputFilename = outputDirectory + "2013-08-28_travel_times_extent_1722_1724_1725.txt";
 		ana.writeAverageTravelTimesToFile(outputFilename);
 
 	}
+
 
 
 }
