@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BikeSharingFacilities.java
+ * BikeSharingFacilityImpl.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -19,49 +19,71 @@
  * *********************************************************************** */
 package eu.eunoiaproject.bikesharing.scenario;
 
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.internal.MatsimToplevelContainer;
 
 /**
  * @author thibautd
  */
-public class BikeSharingFacilities implements MatsimToplevelContainer {
-	private final Map<Id, BikeSharingFacility> facilities =
-		new LinkedHashMap<Id, BikeSharingFacility>();
-	private final Map<Id, BikeSharingFacility> unmodifiableFacilities =
-		Collections.unmodifiableMap( facilities );
+public class BikeSharingFacilityImpl implements BikeSharingFacility {
+	private final Coord coord;
+	private final Id id;
+	private final Id linkId;
+	private final int capacity;
+	private final int initialNumberOfBikes;
 
-	public void addFacility( final BikeSharingFacility facility ) {
-		facilities.put( facility.getId() , facility );
+	private final Map<String, Object> customAttributes = new LinkedHashMap<String, Object>();
+
+	public BikeSharingFacilityImpl(
+			final Id id,
+			final Coord coord,
+			final Id linkId,
+			final int capacity,
+			final int initialNumberOfBikes) {
+		this.id = id;
+		this.coord = coord;
+		this.linkId = linkId;
+		this.capacity = capacity;
+		this.initialNumberOfBikes = initialNumberOfBikes;
 	}
 
-	public Map<Id, BikeSharingFacility> getFacilities() {
-		return unmodifiableFacilities;
+	// /////////////////////////////////////////////////////////////////////////
+	// facility interface
+	// /////////////////////////////////////////////////////////////////////////
+	@Override
+	public Coord getCoord() {
+		return coord;
 	}
 
 	@Override
-	public BikeSharingFacilitiesFactory getFactory() {
-		return new BikeSharingFacilitiesFactory() {
-			@Override
-			public BikeSharingFacility createBikeSharingFacility(
-					final Id id,
-					final Coord coord,
-					final Id linkId,
-					final int capacity,
-					final int initialNumberOfBikes) {
-				return new BikeSharingFacilityImpl(
-							id,
-							coord,
-							linkId,
-							capacity,
-							initialNumberOfBikes);
-			}
-		};
+	public Id getId() {
+		return id;
+	}
+
+	@Override
+	public Map<String, Object> getCustomAttributes() {
+		return customAttributes;
+	}
+
+	@Override
+	public Id getLinkId() {
+		return linkId;
+	}
+
+	// /////////////////////////////////////////////////////////////////////////
+	// specific methods
+	// /////////////////////////////////////////////////////////////////////////
+	@Override
+	public int getCapacity() {
+		return capacity;
+	}
+
+	@Override
+	public int getInitialNumberOfBikes() {
+		return initialNumberOfBikes;
 	}
 }
 

@@ -19,70 +19,13 @@
  * *********************************************************************** */
 package eu.eunoiaproject.bikesharing.scenario;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.facilities.Facility;
 
 /**
  * @author thibautd
  */
-public class BikeSharingFacility implements Facility {
-	private final Coord coord;
-	private final Id id;
-	private final Id linkId;
-	private final int capacity;
-	private final int initialNumberOfBikes;
-
-	private final Map<String, Object> customAttributes = new LinkedHashMap<String, Object>();
-
-	public BikeSharingFacility(
-			final Id id,
-			final Coord coord,
-			final Id linkId,
-			final int capacity,
-			final int initialNumberOfBikes) {
-		this.id = id;
-		this.coord = coord;
-		this.linkId = linkId;
-		this.capacity = capacity;
-		this.initialNumberOfBikes = initialNumberOfBikes;
-	}
-
-	// /////////////////////////////////////////////////////////////////////////
-	// facility interface
-	// /////////////////////////////////////////////////////////////////////////
-	@Override
-	public Coord getCoord() {
-		return coord;
-	}
-
-	@Override
-	public Id getId() {
-		return id;
-	}
-
-	@Override
-	public Map<String, Object> getCustomAttributes() {
-		return customAttributes;
-	}
-
-	@Override
-	public Id getLinkId() {
-		return linkId;
-	}
-
-	// /////////////////////////////////////////////////////////////////////////
-	// specific methods
-	// /////////////////////////////////////////////////////////////////////////
-	public int getCapacity() {
-		return capacity;
-	}
-
-	public int getInitialNumberOfBikes() {
-		return initialNumberOfBikes;
-	}
+public interface BikeSharingFacility extends Facility {
+	public int getCapacity();
+	public int getInitialNumberOfBikes();
 }
 
