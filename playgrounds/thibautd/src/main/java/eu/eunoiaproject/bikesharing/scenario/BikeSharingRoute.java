@@ -21,6 +21,7 @@ package eu.eunoiaproject.bikesharing.scenario;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Route;
+import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.population.routes.GenericRouteImpl;
 
 /**
@@ -30,6 +31,16 @@ public class BikeSharingRoute implements Route {
 	private final Route routeDelegate;
 	private final Id originStation;
 	private final Id destinationStation;
+
+	public BikeSharingRoute(
+			final Facility originStation,
+			final Facility destinationStation) {
+		this( new GenericRouteImpl(
+					originStation.getLinkId(),
+					destinationStation.getLinkId() ) ,
+				originStation.getId(),
+				destinationStation.getId() );
+	}
 
 	public BikeSharingRoute(
 			final Id originStation,
