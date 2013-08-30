@@ -19,14 +19,24 @@
 
 package playground.christoph.withinday;
 
+import org.junit.Rule;
+import org.junit.Test;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.config.Config;
-import org.matsim.testcases.MatsimTestCase;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.testcases.MatsimTestUtils;
 
-public class EquilTest extends MatsimTestCase {
+public class EquilTest {
 
-	public void testScenario(){
-		Config config = this.loadConfig(this.getInputDirectory() + "config.xml");
+	@Rule 
+	public MatsimTestUtils utils = new MatsimTestUtils();
+	
+	@Test
+	public void testScenario() {
+		
+		String inputDir = this.utils.getClassInputDirectory();
+		Config config = ConfigUtils.loadConfig(inputDir + "testScenario/config.xml");
+
         // TODO: Refactored out of core config
         // Please just create and add the config group instead.
         MultiModalConfigGroup multiModalConfigGroup = (MultiModalConfigGroup) config.getModule(MultiModalConfigGroup.GROUP_NAME);
@@ -35,7 +45,9 @@ public class EquilTest extends MatsimTestCase {
             config.addModule(multiModalConfigGroup);
         }
         multiModalConfigGroup.setMultiModalSimulationEnabled(true);
-		MyWithinDayControler.start(config);
+		
+        // disabled running the controler until within-day refactoring has been completed!
+//        MyWithinDayControler.start(config);
 	}
 
 }
