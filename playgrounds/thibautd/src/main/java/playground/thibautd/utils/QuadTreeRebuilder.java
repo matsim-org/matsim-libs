@@ -33,6 +33,7 @@ import org.matsim.core.utils.geometry.CoordImpl;
  * @author thibautd
  */
 public class QuadTreeRebuilder<T> {
+	private double EPSILON = 1E-7;
 	private double minX = Double.POSITIVE_INFINITY;
 	private double minY = Double.POSITIVE_INFINITY;
 	private double maxX = Double.NEGATIVE_INFINITY;
@@ -48,16 +49,28 @@ public class QuadTreeRebuilder<T> {
 
 	private void buildQuadTree() {
 		this.quadTree = new QuadTree<T>(
-				minX - 1E-7 ,
-				minY - 1E-7 ,
-				maxX + 1E-7 ,
-				maxY + 1E-7 );
+				minX - EPSILON ,
+				minY - EPSILON ,
+				maxX + EPSILON ,
+				maxY + EPSILON );
 
 		for ( Tuple< Coord , T > element : elements ) {
-			quadTree.put(
-					element.getFirst().getX(),
-					element.getFirst().getY(),
-					element.getSecond() );
+			try {
+				quadTree.put(
+						element.getFirst().getX(),
+						element.getFirst().getY(),
+						element.getSecond() );
+			}
+			catch ( Exception e ) {
+				// if insertion fail, give more informative error message.
+				throw new RuntimeException( "problem at inserting "
+						+element+" with bounds"
+						+" minX="+minX
+						+" minY="+minY
+						+" maxX="+maxX
+						+" maxY="+maxY ,
+						e );
+			}
 		}
 	}
 
@@ -80,10 +93,10 @@ public class QuadTreeRebuilder<T> {
 	}
 
 	private boolean inBounds(final Coord coord) {
-		return coord.getX() > minX &&
-			coord.getX() < maxX &&
-			coord.getY() > minY &&
-			coord.getY() < maxY ;
+		return coord.getX() > minX + EPSILON &&
+			coord.getX() < maxX - EPSILON &&
+			coord.getY() > minY + EPSILON &&
+			coord.getY() < maxY - EPSILON ;
 	}
 }
 
