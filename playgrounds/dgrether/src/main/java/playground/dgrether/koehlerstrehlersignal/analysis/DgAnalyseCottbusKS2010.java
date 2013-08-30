@@ -440,6 +440,19 @@ public class DgAnalyseCottbusKS2010 {
 //		ri.remark  = "continue 1712, com > 10";
 //		l.add(ri);
 		
+////
+//		ri = new RunInfo();
+//		ri.runId = "1735";
+//		ri.iteration = 1500;
+//		ri.remark = "continue 1722, com > 50";
+//		l.add(ri);
+//
+//		ri = new RunInfo();
+//		ri.runId = "1736";
+//		ri.iteration = 1500;
+//		ri.remark  = "continue 1722, com > 10";
+//		l.add(ri);
+//
 		
 //		ri = new RunInfo();
 //		ri.runId = "1740";
@@ -449,31 +462,37 @@ public class DgAnalyseCottbusKS2010 {
 //		l.add(ri);
 //
 //		ri = new RunInfo();
-//		ri.runId = "1735";
-//		ri.iteration = 2000;
-//		ri.remark = "continue 1712, com > 50";
-//		l.add(ri);
-//
-//		ri = new RunInfo();
-//		ri.runId = "1736";
-//		ri.iteration = 2000;
-//		ri.remark  = "continue 1712, com > 10";
-//		l.add(ri);
-//
-//		ri = new RunInfo();
 //		ri.runId = "1737";
 //		ri.iteration = 2000;
-//		ri.remark  = "continue 1712, com > 10, new";
+//		ri.remark  = "continue 1722, com > 10, new";
 //		l.add(ri);
-		
-		
-		//
+////		
 //		ri = new RunInfo();
 //		ri.runId = "1741";
 //		ri.iteration = 2000;
 //		ri.remark  = "sylvia: continue base case 1722 for 1000 iterations";
 //		l.add(ri);
-//
+
+		ri = new RunInfo();
+		ri.runId = "1900";
+		ri.iteration = 1500;
+		ri.baseCase = true;
+		ri.remark  = "base case 1722 it 2000, no time choice";
+		l.add(ri);
+
+		ri = new RunInfo();
+		ri.runId = "1901";
+		ri.iteration = 1500;
+		ri.remark  = "continue 1722, com > 10, new, no time choice";
+		l.add(ri);
+
+		ri = new RunInfo();
+		ri.runId = "1902";
+		ri.iteration = 1500;
+		ri.remark  = "sylvia: continue base case 1722 for 1000 iterations, no time choice";
+		l.add(ri);
+		
+		
 //		ri = new RunInfo();
 //		ri.runId = "1742";
 //		ri.iteration = 1000;
@@ -519,25 +538,57 @@ public class DgAnalyseCottbusKS2010 {
 //		ri.remark  = "sylvia: continue base case 1712 for 1000 iterations";
 //		l.add(ri);
 		
-		ri = new RunInfo();
-		ri.runId = "1740";
-		ri.iteration = 2000;
-		ri.baseCase = true;
-		ri.remark  = "base case 1722 it 2000";
-		l.add(ri);
+//		ri = new RunInfo();
+//		ri.runId = "1745";
+//		ri.iteration = 2000;
+//		ri.baseCase = true;
+//		ri.remark  = "base case 1712 it 2000";
+//		l.add(ri);
+//
+//		ri = new RunInfo();
+//		ri.runId = "1746";
+//		ri.iteration = 2000;
+//		ri.remark = "continue 1712, com > 10";
+//		l.add(ri);
+//
+//		ri = new RunInfo();
+//		ri.runId = "1747";
+//		ri.iteration = 2000;
+//		ri.remark  = "continue 1712, com > 50";
+//		l.add(ri);
+//
+//		ri = new RunInfo();
+//		ri.runId = "1748";
+//		ri.iteration = 2000;
+//		ri.remark  = "sylvia: continue base case 1712 for 1000 iterations";
+//		l.add(ri);
 
-		ri = new RunInfo();
-		ri.runId = "1737";
-		ri.iteration = 2000;
-		ri.remark = "continue 1722, com > 10";
-		l.add(ri);
+//		ri = new RunInfo();
+//		ri.runId = "1722";
+//		ri.iteration = 1000;
+//		ri.baseCase = true;
+//		ri.remark  = "base case, 0.7 cap";
+//		l.add(ri);
+//		
+//		ri = new RunInfo();
+//		ri.runId = "1940";
+//		ri.iteration = 1000;
+//		ri.remark  = "base case, 0.5 cap";
+//		l.add(ri);
+//
+//		ri = new RunInfo();
+//		ri.runId = "1941";
+//		ri.iteration = 1000;
+//		ri.remark  = "base case, 0.3 cap";
+//		l.add(ri);
+//
+//		ri = new RunInfo();
+//		ri.runId = "1942";
+//		ri.iteration = 1000;
+//		ri.remark  = "base case, 0.1 cap";
+//		l.add(ri);
 
-		ri = new RunInfo();
-		ri.runId = "1741";
-		ri.iteration = 2000;
-		ri.remark  = "sylvia: continue base case 1722 for 1000 iterations";
-		l.add(ri);
-
+		
 		return l;
 	}
 
