@@ -26,6 +26,9 @@ import java.util.Map;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimToplevelContainer;
+import org.matsim.core.utils.collections.QuadTree;
+
+import playground.thibautd.utils.QuadTreeRebuilder;
 
 /**
  * @author thibautd
@@ -36,12 +39,22 @@ public class BikeSharingFacilities implements MatsimToplevelContainer {
 	private final Map<Id, BikeSharingFacility> unmodifiableFacilities =
 		Collections.unmodifiableMap( facilities );
 
+	private final QuadTreeRebuilder<BikeSharingFacility> quadTreeBuilder = new QuadTreeRebuilder<BikeSharingFacility>();
+
 	public void addFacility( final BikeSharingFacility facility ) {
 		facilities.put( facility.getId() , facility );
+		quadTreeBuilder.put( facility.getCoord() , facility );
 	}
 
 	public Map<Id, BikeSharingFacility> getFacilities() {
 		return unmodifiableFacilities;
+	}
+
+	/**
+	 * may not always return the same instance!
+	 */
+	public QuadTree<BikeSharingFacility> getCurrentQuadTree() {
+		return quadTreeBuilder.getQuadTree();
 	}
 
 	@Override
