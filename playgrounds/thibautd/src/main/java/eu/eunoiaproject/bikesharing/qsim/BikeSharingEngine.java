@@ -40,6 +40,10 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 
 import eu.eunoiaproject.bikesharing.BikeSharingConstants;
+import eu.eunoiaproject.bikesharing.events.AgentStartsWaitingForBikeEvent;
+import eu.eunoiaproject.bikesharing.events.AgentStartsWaitingForFreeBikeSlotEvent;
+import eu.eunoiaproject.bikesharing.events.AgentStopsWaitingForBikeEvent;
+import eu.eunoiaproject.bikesharing.events.AgentStopsWaitingForFreeBikeSlotEvent;
 import eu.eunoiaproject.bikesharing.qsim.BikeSharingManager.BikeSharingManagerListener;
 import eu.eunoiaproject.bikesharing.scenario.BikeSharingRoute;
 
@@ -91,6 +95,12 @@ public class BikeSharingEngine implements DepartureHandler, MobsimEngine {
 						agent,
 						facilityInNewState.getLinkId() );
 				if ( !departed ) throw new RuntimeException( "agent "+agent+" could not depart from "+facilityInNewState );
+
+				internalInterface.getMobsim().getEventsManager().processEvent(
+						new AgentStopsWaitingForBikeEvent(
+							internalInterface.getMobsim().getSimTimer().getTimeOfDay(),
+							agent.getId() ) );
+
 			}
 		}
 
@@ -101,10 +111,16 @@ public class BikeSharingEngine implements DepartureHandler, MobsimEngine {
 
 			while ( facilityInNewState.getNumberOfBikes() < facilityInNewState.getCapacity() && !waitingAgents.isEmpty() ) {
 				final MobsimAgent agent = waitingAgents.remove();
+
 				makeAgentArrive(
 						internalInterface.getMobsim().getSimTimer().getTimeOfDay(),
 						agent,
 						facilityInNewState );
+
+				internalInterface.getMobsim().getEventsManager().processEvent(
+						new AgentStopsWaitingForFreeBikeSlotEvent(
+							internalInterface.getMobsim().getSimTimer().getTimeOfDay(),
+							agent.getId() ) );
 			}
 		}
 	}
@@ -120,6 +136,11 @@ public class BikeSharingEngine implements DepartureHandler, MobsimEngine {
 			}
 			else {
 				addAgentToWaitingList( agent , arrivalFacility , agentsWaitingForArrivalPerStation );
+
+				internalInterface.getMobsim().getEventsManager().processEvent(
+						new AgentStartsWaitingForFreeBikeSlotEvent(
+							internalInterface.getMobsim().getSimTimer().getTimeOfDay(),
+							agent.getId() ) );
 			}
 		}
 	}
@@ -198,6 +219,11 @@ public class BikeSharingEngine implements DepartureHandler, MobsimEngine {
 		}
 
 		addAgentToWaitingList( agent , departureFacility , agentsWaitingForDeparturePerStation );
+
+		internalInterface.getMobsim().getEventsManager().processEvent(
+				new AgentStartsWaitingForBikeEvent(
+					internalInterface.getMobsim().getSimTimer().getTimeOfDay(),
+					agent.getId() ) );
 
 		return true;
 	}
