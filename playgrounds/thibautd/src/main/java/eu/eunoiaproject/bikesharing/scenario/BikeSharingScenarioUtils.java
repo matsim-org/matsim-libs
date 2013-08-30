@@ -24,8 +24,11 @@ import java.util.Arrays;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.Module;
 import org.matsim.core.scenario.ScenarioUtils;
+
+import eu.eunoiaproject.bikesharing.BikeSharingConstants;
 
 /**
  * Provides helper methods to load a bike sharing scenario.
@@ -40,9 +43,20 @@ public class BikeSharingScenarioUtils {
 	public static Config loadConfig( final String fileName , final Module... additionalModules ) {
 		final Module[] modules = Arrays.copyOf( additionalModules , additionalModules.length + 1 );
 		modules[ modules.length - 1 ] = new BikeSharingConfigGroup();
-		return ConfigUtils.loadConfig(
+		final Config config = ConfigUtils.loadConfig(
 				fileName,
 				modules );
+
+		if ( config.planCalcScore().getActivityParams( BikeSharingConstants.INTERACTION_TYPE ) == null ) {
+			// not so nice...
+			final ActivityParams params = new ActivityParams( BikeSharingConstants.INTERACTION_TYPE );
+			params.setTypicalDuration( 120 );
+			params.setOpeningTime( 0 );
+			params.setClosingTime( 0 );
+			config.planCalcScore().addActivityParams( params );
+		}
+
+		return config;
 	}
 
 	public static Scenario loadScenario( final Config config ) {
