@@ -213,6 +213,8 @@ public class DgAnalyseCottbusKS2010 {
 		header.append("\t");
 		header.append("total delay[s]");
 		header.append("\t");
+		header.append("total delay[hh:mm:ss]");
+		header.append("\t");
 		header.append("delta total delay");
 		header.append("\t");
 		lines.add(header.toString());
@@ -245,6 +247,8 @@ public class DgAnalyseCottbusKS2010 {
 			out.append(formatDouble(r.averageTravelTime));
 			out.append("\t");
 			out.append(formatDouble(r.totalDelay));
+			out.append("\t");
+			out.append(Time.writeTime(r.totalDelay));
 			out.append("\t");
 			out.append(formatDouble(r.deltaTotalDelay));
 			out.append("\t");
@@ -481,20 +485,20 @@ public class DgAnalyseCottbusKS2010 {
 
 		ri = new RunInfo();
 		ri.runId = "1900";
-		ri.iteration = 1500;
+		ri.iteration = 2000;
 		ri.baseCase = true;
 		ri.remark  = "base case 1722 it 2000, no time choice";
 		l.add(ri);
 
 		ri = new RunInfo();
 		ri.runId = "1901";
-		ri.iteration = 1500;
+		ri.iteration = 2000;
 		ri.remark  = "continue 1722, com > 10, new, no time choice";
 		l.add(ri);
 
 		ri = new RunInfo();
 		ri.runId = "1902";
-		ri.iteration = 1500;
+		ri.iteration = 2000;
 		ri.remark  = "sylvia: continue base case 1722 for 1000 iterations, no time choice";
 		l.add(ri);
 		
@@ -664,7 +668,7 @@ public class DgAnalyseCottbusKS2010 {
 		ana.analyseResults();
 		String outputDirectory = DgPaths.SHAREDSVN + "projects/cottbus/cb2ks2010/results/";
 //		String outputDirectory = "C:/Users/Atany/Desktop/SHK/SVN/shared-svn/projects/cottbus/cb2ks2010/results/";
-		String outputFilename = outputDirectory + "2013-08-28_travel_times_extent_1740_1737_1741.txt";
+		String outputFilename = outputDirectory + "2013-08-30_travel_times_extent_1900_1901_1902.txt";
 		ana.writeAverageTravelTimesToFile(outputFilename);
 
 	}
