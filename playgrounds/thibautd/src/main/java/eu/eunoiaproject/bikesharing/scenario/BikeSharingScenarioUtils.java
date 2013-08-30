@@ -1,0 +1,62 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * BikeSharingScenarioUtils.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+package eu.eunoiaproject.bikesharing.scenario;
+
+import java.util.Arrays;
+
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.Module;
+import org.matsim.core.scenario.ScenarioUtils;
+
+/**
+ * Provides helper methods to load a bike sharing scenario.
+ * Using this class is by no means necessary, but simplifies
+ * the writing of scripts.
+ *
+ * @author thibautd
+ */
+public class BikeSharingScenarioUtils {
+	private  BikeSharingScenarioUtils() {}
+
+	public static Config loadConfig( final String fileName , final Module... additionalModules ) {
+		final Module[] modules = Arrays.copyOf( additionalModules , additionalModules.length + 1 );
+		modules[ modules.length - 1 ] = new BikeSharingConfigGroup();
+		return ConfigUtils.loadConfig(
+				fileName,
+				modules );
+	}
+
+	public static Scenario loadScenario( final Config config ) {
+		final Scenario sc = ScenarioUtils.loadScenario( config );
+
+		final BikeSharingConfigGroup confGroup = (BikeSharingConfigGroup)
+			config.getModule( BikeSharingConfigGroup.GROUP_NAME );
+		new BikeSharingFacilitiesReader( sc ).parse( confGroup.getFacilitiesFile() );
+
+		return sc;
+	}
+
+	public static Scenario loadScenario( final String configFile , final Module... modules ) {
+		return loadScenario( loadConfig( configFile , modules) );
+	}
+}
+
