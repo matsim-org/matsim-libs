@@ -47,7 +47,11 @@ public class QuadTreeRebuilder<T> {
 	}
 
 	private void buildQuadTree() {
-		this.quadTree = new QuadTree<T>( minX , minY , maxX , maxY );
+		this.quadTree = new QuadTree<T>(
+				minX - 1E-7 ,
+				minY - 1E-7 ,
+				maxX + 1E-7 ,
+				maxY + 1E-7 );
 
 		for ( Tuple< Coord , T > element : elements ) {
 			quadTree.put(
