@@ -39,6 +39,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.counts.CountSimComparison;
+import org.matsim.signalsystems.data.SignalsData;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.geometry.BoundingBox;
 import org.opengis.referencing.FactoryException;
@@ -98,7 +99,7 @@ public class DgAnalyseCottbusKS2010 {
 		public VolumesAnalyzer volumes;
 		public Network network;
 		public DgMfd mfd;
-		
+		public double totalDelay;
 	}
 	
 	private static class Results {
@@ -208,6 +209,8 @@ public class DgAnalyseCottbusKS2010 {
 		header.append("\t");
 		header.append("average travel time");
 		header.append("\t");
+		header.append("total delay");
+		header.append("\t");
 		lines.add(header.toString());
 		for (Result r : results.getResults()) {
 			StringBuilder out = new StringBuilder();
@@ -236,6 +239,8 @@ public class DgAnalyseCottbusKS2010 {
 			out.append(formatDouble(r.personsDelta));
 			out.append("\t");
 			out.append(formatDouble(r.averageTravelTime));
+			out.append("\t");
+			out.append(formatDouble(r.totalDelay));
 			out.append("\t");
 				lines.add(out.toString());
 			log.info(out.toString());
@@ -270,6 +275,7 @@ public class DgAnalyseCottbusKS2010 {
 		for (RunInfo runInfo: runInfos) {
 			String runId = runInfo.runId;
 			String runDirectory = DgPaths.REPOS + "runs-svn/run"+runId+"/";
+//			String runDirectory = "C:/Users/Atany/Desktop/SHK/SVN/runs-svn/run"+runId+"/";
 			RunResultsLoader runDir = new RunResultsLoader(runDirectory, runId);
 			
 			InMemoryEventsManager inMemoryEvents = null;
@@ -313,6 +319,10 @@ public class DgAnalyseCottbusKS2010 {
 					DgMfd mfd = new DgMfd(net);
 					eventsManager.addHandler(mfd);
 					
+					SignalsData signals = runDir.getSignals();
+					TotalDelay totalDelay = new TotalDelay(net, signals);
+					eventsManager.addHandler(totalDelay);
+					
 					if (useInMemoryEvents){
 						for (Event e : inMemoryEvents.getEvents()){
 							eventsManager.processEvent(e);
@@ -327,6 +337,7 @@ public class DgAnalyseCottbusKS2010 {
 					result.travelTime = avgTtSpeed.getTravelTime();
 					result.numberOfPersons = avgTtSpeed.getNumberOfPersons();
 					result.mfd = mfd;
+					result.totalDelay = totalDelay.getTotalDelay();
 					
 					log.info("Total travel time : " + avgTtSpeed.getTravelTime() + " number of persons: " + avgTtSpeed.getNumberOfPersons());
 				}
@@ -483,29 +494,48 @@ public class DgAnalyseCottbusKS2010 {
 //		l.add(ri);
 
 		
+//		ri = new RunInfo();
+//		ri.runId = "1745";
+//		ri.iteration = 2000;
+//		ri.baseCase = true;
+//		ri.remark  = "base case 1712 it 2000";
+//		l.add(ri);
+//
+//		ri = new RunInfo();
+//		ri.runId = "1746";
+//		ri.iteration = 2000;
+//		ri.remark = "continue 1712, com > 10";
+//		l.add(ri);
+//
+//		ri = new RunInfo();
+//		ri.runId = "1747";
+//		ri.iteration = 2000;
+//		ri.remark  = "continue 1712, com > 50";
+//		l.add(ri);
+//
+//		ri = new RunInfo();
+//		ri.runId = "1748";
+//		ri.iteration = 2000;
+//		ri.remark  = "sylvia: continue base case 1712 for 1000 iterations";
+//		l.add(ri);
+		
 		ri = new RunInfo();
-		ri.runId = "1745";
+		ri.runId = "1740";
 		ri.iteration = 2000;
 		ri.baseCase = true;
-		ri.remark  = "base case 1712 it 2000";
+		ri.remark  = "base case 1722 it 2000";
 		l.add(ri);
 
 		ri = new RunInfo();
-		ri.runId = "1746";
+		ri.runId = "1737";
 		ri.iteration = 2000;
-		ri.remark = "continue 1712, com > 10";
+		ri.remark = "continue 1722, com > 10";
 		l.add(ri);
 
 		ri = new RunInfo();
-		ri.runId = "1747";
+		ri.runId = "1741";
 		ri.iteration = 2000;
-		ri.remark  = "continue 1712, com > 50";
-		l.add(ri);
-
-		ri = new RunInfo();
-		ri.runId = "1748";
-		ri.iteration = 2000;
-		ri.remark  = "sylvia: continue base case 1712 for 1000 iterations";
+		ri.remark  = "sylvia: continue base case 1722 for 1000 iterations";
 		l.add(ri);
 
 		return l;
@@ -539,6 +569,8 @@ public class DgAnalyseCottbusKS2010 {
 		List<Extent> l = new ArrayList<Extent>();
 		String filterFeatureFilename = DgPaths.REPOS
 				+ "shared-svn/studies/countries/de/brandenburg_gemeinde_kreisgrenzen/kreise/dlm_kreis.shp";
+//		String filterFeatureFilename = "C:/Users/Atany/Desktop/SHK/SVN/"
+//				+ "shared-svn/studies/countries/de/brandenburg_gemeinde_kreisgrenzen/kreise/dlm_kreis.shp";
 		Tuple<CoordinateReferenceSystem, SimpleFeature> featureTuple = CottbusUtils.loadCottbusFeature(filterFeatureFilename);
 		Envelope env = getTransformedEnvelope(featureTuple);
 		Extent e = new Extent();
@@ -548,6 +580,8 @@ public class DgAnalyseCottbusKS2010 {
 		
 		filterFeatureFilename = DgPaths.REPOS
 				+ "shared-svn/projects/cottbus/cb2ks2010/2013-07-31_minflow_10_evening_peak/shapes/bounding_box.shp";
+//		filterFeatureFilename = "C:/Users/Atany/Desktop/SHK/SVN/"
+//				+ "shared-svn/projects/cottbus/cb2ks2010/2013-07-31_minflow_10_evening_peak/shapes/bounding_box.shp";
 		featureTuple = CottbusUtils.loadFeature(filterFeatureFilename);
 		
 		env = getTransformedEnvelope(featureTuple);
@@ -572,7 +606,8 @@ public class DgAnalyseCottbusKS2010 {
 		ana.calculateResults(runIds, times, extents);
 		ana.analyseResults();
 		String outputDirectory = DgPaths.SHAREDSVN + "projects/cottbus/cb2ks2010/results/";
-		String outputFilename = outputDirectory + "2013-08-28_travel_times_extent_1722_1724_1725.txt";
+//		String outputDirectory = "C:/Users/Atany/Desktop/SHK/SVN/shared-svn/projects/cottbus/cb2ks2010/results/";
+		String outputFilename = outputDirectory + "2013-08-28_travel_times_extent_1740_1737_1741.txt";
 		ana.writeAverageTravelTimesToFile(outputFilename);
 
 	}

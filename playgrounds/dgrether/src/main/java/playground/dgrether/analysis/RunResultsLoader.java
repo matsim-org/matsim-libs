@@ -31,8 +31,15 @@ import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
+import org.matsim.lanes.data.MatsimLaneDefinitionsReader;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
+import org.matsim.lanes.data.v20.LaneDefinitionsReader20;
+import org.matsim.signalsystems.data.SignalsData;
+import org.matsim.signalsystems.data.SignalsScenarioLoader;
+import org.matsim.signalsystems.data.SignalsScenarioWriter;
 import org.matsim.signalsystems.data.signalsystems.v20.SignalSystemsData;
+
+import playground.dgrether.signalsystems.utils.DgScenarioUtils;
 
 
 /**
@@ -48,7 +55,7 @@ public class RunResultsLoader {
 	private Network network;
 	private Population population;
 	private LaneDefinitions20 lanes;
-	private SignalSystemsData signals;
+	private SignalsData signals;
 	
 	public RunResultsLoader(String path, String runId) {
 		this.directory = path;
@@ -76,6 +83,16 @@ public class RunResultsLoader {
 		}
 		return this.network;
 	}
+
+	private Network loadNetwork(String path) {
+		//Why we have to do all this, we simply want to read a file
+		Config c = ConfigUtils.createConfig(); 
+		c.network().setInputFile(path);
+		Scenario sc = ScenarioUtils.createScenario(c);
+		MatsimNetworkReader nr = new MatsimNetworkReader(sc);
+		nr.readFile(path);
+		return sc.getNetwork();
+	}
 	
 	public Population getPopulation(){
 		if (this.population == null) {
@@ -94,15 +111,42 @@ public class RunResultsLoader {
 		pr.readFile(path);
 		return sc.getPopulation();
 	}
-
-	private Network loadNetwork(String path) {
-		//Why we have to do all this, we simply want to read a file
-		Config c = ConfigUtils.createConfig(); 
-		c.network().setInputFile(path);
+	
+	//untested
+	public LaneDefinitions20 getLanes() {
+		if (this.lanes == null){
+			String lf = this.outputDir.getOutputFilename(Controler.FILENAME_LANES);
+			this.lanes = this.loadLanes(lf);
+		}
+		return this.lanes;
+	}
+	
+	private LaneDefinitions20 loadLanes(String path) {
+		Config c = ConfigUtils.createConfig();
+		c.scenario().setUseLanes(true);
 		Scenario sc = ScenarioUtils.createScenario(c);
-		MatsimNetworkReader nr = new MatsimNetworkReader(sc);
-		nr.readFile(path);
-		return sc.getNetwork();
+		MatsimLaneDefinitionsReader reader = new MatsimLaneDefinitionsReader(sc);
+		reader.readFile(path);
+		return sc.getScenarioElement(LaneDefinitions20.class);
+	}
+	
+	public SignalsData getSignals() {
+		if (this.signals == null) {
+			String systemsfile = this.outputDir.getOutputFilename(SignalsScenarioWriter.FILENAME_SIGNAL_SYSTEMS );
+			String groupsfile = this.outputDir.getOutputFilename(SignalsScenarioWriter.FILENAME_SIGNAL_GROUPS);
+			String controlfile = this.outputDir.getOutputFilename(SignalsScenarioWriter.FILENAME_SIGNAL_CONTROL);
+			this.signals = loadSignals(systemsfile, groupsfile, controlfile);
+		}
+		return this.signals;
+	}
+
+	private SignalsData loadSignals(String systemspath, String groupspath, String controlpath) {
+		Config c = ConfigUtils.createConfig(); 
+		c.signalSystems().setSignalSystemFile(systemspath);
+		c.signalSystems().setSignalGroupsFile(groupspath);
+		c.signalSystems().setSignalControlFile(controlpath);
+		SignalsScenarioLoader loader = new SignalsScenarioLoader(c.signalSystems());
+		return loader.loadSignalsData();
 	}
 
 	public final String getIterationPath(int iteration) {
