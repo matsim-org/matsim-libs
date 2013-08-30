@@ -36,7 +36,7 @@ import eu.eunoiaproject.bikesharing.scenario.BikeSharingFacilitiesWriter;
  */
 public class GenerateRandomBikeSharingFacilities {
 	private static final double P_ACCEPT_LINK = 0.5;
-	private static final int MAX_CAPACITY = 100;
+	private static final int MAX_CAPACITY = 10;
 
 	public static void main(final String[] args) {
 		final String networkFile = args[ 0 ];
