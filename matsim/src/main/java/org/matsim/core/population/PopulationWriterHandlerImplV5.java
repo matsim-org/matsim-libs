@@ -23,6 +23,8 @@ package org.matsim.core.population;
 import java.io.BufferedWriter;
 import java.io.IOException;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -41,6 +43,10 @@ import org.matsim.core.utils.misc.Time;
  * @author balmermi
  */
 /*package*/ class PopulationWriterHandlerImplV5 implements PopulationWriterHandler {
+	private static final Logger log = Logger.getLogger( PopulationWriterHandlerImplV5.class );
+
+	private static final int MAX_WARN_UNKNOWN_ROUTE = 10;
+	private int countWarnUnkownRoute = 0;
 
 	@Override
 	public void writeHeaderAndStartElement(final BufferedWriter out) throws IOException {
@@ -74,8 +80,22 @@ import org.matsim.core.utils.misc.Time;
 					// route
 					Route route = leg.getRoute();
 					if (route != null) {
-						this.startRoute(route, out);
-						this.endRoute(out);
+						if ( route instanceof GenericRoute ) {
+							this.startGenericRoute( (GenericRoute) route, out);
+							this.endRoute(out);
+						}
+						else if ( route instanceof NetworkRoute ) {
+							this.startNetworkRoute( (NetworkRoute) route, out);
+							this.endRoute(out);
+						}
+						else if ( countWarnUnkownRoute < MAX_WARN_UNKNOWN_ROUTE ) {
+							log.warn( getClass().getSimpleName()+" can only write routes implementing NetworkRoute or GenericRoute."
+									+" This is not the case for route type "+route.getClass().getName()
+									+". Such routes will not be written to file." );
+							if ( ++countWarnUnkownRoute == MAX_WARN_UNKNOWN_ROUTE ) {
+								log.warn( "Future occurences of this warning for this file will not be shown." );
+							}
+						}
 					}
 					this.endLeg(out);
 				}
@@ -228,36 +248,34 @@ import org.matsim.core.utils.misc.Time;
 		out.write("\t\t\t</leg>\n");
 	}
 
-	private void startRoute(final Route route, final BufferedWriter out) throws IOException {
+	private void startGenericRoute(final GenericRoute route, final BufferedWriter out) throws IOException {
+		out.write("\t\t\t\t<route ");
+		out.write("type=\"");
+		out.write( route.getRouteType() );
+		out.write("\">");
+		String rd = route.getRouteDescription();
+		if (rd != null) {
+			out.write(rd);
+		}
+	}
+
+	private void startNetworkRoute(final NetworkRoute nr, final BufferedWriter out) throws IOException {
 		out.write("\t\t\t\t<route ");
 
-		if (route instanceof GenericRoute) {
-			out.write("type=\"");
-			out.write(((GenericRoute) route).getRouteType());
-			out.write("\">");
-			String rd = ((GenericRoute) route).getRouteDescription();
-			if (rd != null) {
-				out.write(rd);
-			}
+		if ( nr.getVehicleId()!=null ) {
+			out.write("vehicleRefId=\""+ nr.getVehicleId() +"\" ") ;
 		}
-		else if (route instanceof NetworkRoute) {
-			NetworkRoute nr = (NetworkRoute) route;
-			
-			if ( nr.getVehicleId()!=null ) {
-				out.write("vehicleRefId=\""+ nr.getVehicleId() +"\" ") ;
-			}
-			
-			out.write("type=\"links\">");
-			out.write(nr.getStartLinkId().toString());
-			for (Id linkId : nr.getLinkIds()) {
-				out.write(" ");
-				out.write(linkId.toString());
-			}
-			// If the start links equals the end link additionally check if its is a round trip. 
-			if (!nr.getEndLinkId().equals(nr.getStartLinkId()) || nr.getLinkIds().size() > 0) {
-				out.write(" ");
-				out.write(nr.getEndLinkId().toString());
-			}
+
+		out.write("type=\"links\">");
+		out.write(nr.getStartLinkId().toString());
+		for (Id linkId : nr.getLinkIds()) {
+			out.write(" ");
+			out.write(linkId.toString());
+		}
+		// If the start links equals the end link additionally check if its is a round trip. 
+		if (!nr.getEndLinkId().equals(nr.getStartLinkId()) || nr.getLinkIds().size() > 0) {
+			out.write(" ");
+			out.write(nr.getEndLinkId().toString());
 		}
 	}
 
