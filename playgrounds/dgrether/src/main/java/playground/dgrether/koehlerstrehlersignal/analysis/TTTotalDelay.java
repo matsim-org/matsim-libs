@@ -45,14 +45,14 @@ import playground.dgrether.signalsystems.utils.DgSignalsUtils;
  * @author tthunig
  *
  */
-public class TotalDelay implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandler, AgentStuckEventHandler{
+public class TTTotalDelay implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandler, AgentStuckEventHandler{
 
 	private Network network;
 	private Set<Id> signalizedLinks;
 	private Map<Id, LinkEnterEvent> linkEnterByPerson;
 	private double totalDelay;
 
-	public TotalDelay(Network network, SignalsData signals) {
+	public TTTotalDelay(Network network, SignalsData signals) {
 		this.network = network;
 		
 		Map<Id, Set<Id>> signalsToLinks = DgSignalsUtils.calculateSignalizedLinksPerSystem(signals.getSignalSystemsData());
@@ -73,7 +73,7 @@ public class TotalDelay implements LinkEnterEventHandler, LinkLeaveEventHandler,
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		//calculate total delay for signalized links, so the delay caused by the signals
-		if (network.getLinks().containsKey(event.getLinkId()) && this.signalizedLinks.contains(event.getLinkId())) {
+		if (this.signalizedLinks.contains(event.getLinkId())) {
 			LinkEnterEvent linkEnterEvent = this.linkEnterByPerson.remove(event.getPersonId());
 			Link link = this.network.getLinks().get(event.getLinkId());
 			double freespeedTravelTime = link.getLength()/link.getFreespeed();
@@ -85,7 +85,7 @@ public class TotalDelay implements LinkEnterEventHandler, LinkLeaveEventHandler,
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if (network.getLinks().containsKey(event.getLinkId()) && this.signalizedLinks.contains(event.getLinkId())) {
+		if (this.signalizedLinks.contains(event.getLinkId())) {
 			this.linkEnterByPerson.put(event.getPersonId(), event);
 		}
 	}

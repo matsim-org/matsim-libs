@@ -100,6 +100,7 @@ public class DgAnalyseCottbusKS2010 {
 		public Network network;
 		public DgMfd mfd;
 		public double totalDelay;
+		public double deltaTotalDelay;
 	}
 	
 	private static class Results {
@@ -153,6 +154,7 @@ public class DgAnalyseCottbusKS2010 {
 			r.travelTimeDelta = r.travelTime - baseResult.travelTime;
 			r.travelTimePercent = r.travelTime / baseResult.travelTime * 100.0;
 			r.personsDelta = r.numberOfPersons - baseResult.numberOfPersons;
+			r.deltaTotalDelay = r.totalDelay - baseResult.totalDelay;
 			if (! r.runInfo.baseCase) {
 				this.createAndWriteSimSimComparison(baseResult, r);
 			}
@@ -209,7 +211,9 @@ public class DgAnalyseCottbusKS2010 {
 		header.append("\t");
 		header.append("average travel time");
 		header.append("\t");
-		header.append("total delay");
+		header.append("total delay[s]");
+		header.append("\t");
+		header.append("delta total delay");
 		header.append("\t");
 		lines.add(header.toString());
 		for (Result r : results.getResults()) {
@@ -242,7 +246,9 @@ public class DgAnalyseCottbusKS2010 {
 			out.append("\t");
 			out.append(formatDouble(r.totalDelay));
 			out.append("\t");
-				lines.add(out.toString());
+			out.append(formatDouble(r.deltaTotalDelay));
+			out.append("\t");
+			lines.add(out.toString());
 			log.info(out.toString());
 		}
 		
@@ -320,7 +326,7 @@ public class DgAnalyseCottbusKS2010 {
 					eventsManager.addHandler(mfd);
 					
 					SignalsData signals = runDir.getSignals();
-					TotalDelay totalDelay = new TotalDelay(net, signals);
+					TTTotalDelay totalDelay = new TTTotalDelay(net, signals);
 					eventsManager.addHandler(totalDelay);
 					
 					if (useInMemoryEvents){
