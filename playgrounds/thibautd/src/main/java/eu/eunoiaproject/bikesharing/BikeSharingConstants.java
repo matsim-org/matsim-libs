@@ -24,5 +24,6 @@ package eu.eunoiaproject.bikesharing;
  */
 public class BikeSharingConstants {
 	public static final String MODE = "bikeSharing";
+	public static final String INTERACTION_TYPE = "bikeSharing_interaction";
 }
 
