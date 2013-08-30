@@ -27,6 +27,11 @@ import org.matsim.core.api.internal.MatsimFactory;
  * @author thibautd
  */
 public interface BikeSharingFacilitiesFactory extends MatsimFactory {
-	public BikeSharingFacility createBikeSharingFacility( Id id, Coord coord , Id linkId , int capacity );
+	public BikeSharingFacility createBikeSharingFacility(
+			Id id,
+			Coord coord,
+			Id linkId,
+			int capacity,
+			int initialNumberOfBikes );
 }
 

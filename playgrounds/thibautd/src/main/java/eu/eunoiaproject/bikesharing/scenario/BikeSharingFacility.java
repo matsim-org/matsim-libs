@@ -34,6 +34,7 @@ public class BikeSharingFacility implements Facility {
 	private final Id id;
 	private final Id linkId;
 	private final int capacity;
+	private final int initialNumberOfBikes;
 
 	private final Map<String, Object> customAttributes = new LinkedHashMap<String, Object>();
 
@@ -41,11 +42,13 @@ public class BikeSharingFacility implements Facility {
 			final Id id,
 			final Coord coord,
 			final Id linkId,
-			final int capacity) {
+			final int capacity,
+			final int initialNumberOfBikes) {
 		this.id = id;
 		this.coord = coord;
 		this.linkId = linkId;
 		this.capacity = capacity;
+		this.initialNumberOfBikes = initialNumberOfBikes;
 	}
 
 	// /////////////////////////////////////////////////////////////////////////
@@ -76,6 +79,10 @@ public class BikeSharingFacility implements Facility {
 	// /////////////////////////////////////////////////////////////////////////
 	public int getCapacity() {
 		return capacity;
+	}
+
+	public int getInitialNumberOfBikes() {
+		return initialNumberOfBikes;
 	}
 }
 

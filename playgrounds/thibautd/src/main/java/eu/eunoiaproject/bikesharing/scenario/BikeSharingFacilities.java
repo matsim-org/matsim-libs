@@ -52,12 +52,14 @@ public class BikeSharingFacilities implements MatsimToplevelContainer {
 					final Id id,
 					final Coord coord,
 					final Id linkId,
-					final int capacity) {
+					final int capacity,
+					final int initialNumberOfBikes) {
 				return new BikeSharingFacility(
 							id,
 							coord,
 							linkId,
-							capacity);
+							capacity,
+							initialNumberOfBikes);
 			}
 		};
 	}
