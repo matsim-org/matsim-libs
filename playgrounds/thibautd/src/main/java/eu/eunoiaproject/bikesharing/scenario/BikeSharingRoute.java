@@ -22,15 +22,17 @@ package eu.eunoiaproject.bikesharing.scenario;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.facilities.Facility;
+import org.matsim.core.basic.v01.IdImpl;
+import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.GenericRouteImpl;
 
 /**
  * @author thibautd
  */
-public class BikeSharingRoute implements Route {
+public class BikeSharingRoute implements GenericRoute {
 	private final Route routeDelegate;
-	private final Id originStation;
-	private final Id destinationStation;
+	private Id originStation;
+	private Id destinationStation;
 
 	public BikeSharingRoute(
 			final Facility originStation,
@@ -114,6 +116,31 @@ public class BikeSharingRoute implements Route {
 
 	public Id getDestinationStation() {
 		return destinationStation;
+	}
+
+	// /////////////////////////////////////////////////////////////////////////
+	// generic route (necessary for IO)
+	@Override
+	public void setRouteDescription(
+			final Id startLinkId,
+			final String routeDescription,
+			final Id endLinkId) {
+		this.routeDelegate.setStartLinkId( startLinkId );
+		this.routeDelegate.setEndLinkId( endLinkId );
+		final String[] stations = routeDescription.trim().split( " " );
+		if ( stations.length != 2 ) throw new IllegalArgumentException( routeDescription );
+		this.originStation = new IdImpl( stations[ 0 ] );
+		this.destinationStation = new IdImpl( stations[ 1 ] );
+	}
+
+	@Override
+	public String getRouteDescription() {
+		return originStation+" "+destinationStation;
+	}
+
+	@Override
+	public String getRouteType() {
+		return "bikeSharing";
 	}
 }
 
