@@ -25,6 +25,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.MatsimXmlParser;
+import org.matsim.core.utils.misc.Counter;
 import org.xml.sax.Attributes;
 
 /**
@@ -34,6 +35,7 @@ public class BikeSharingFacilitiesReader extends MatsimXmlParser {
 	private final Scenario scenario;
 
 	private BikeSharingFacilities facilities;
+	private Counter counter;
 
 	public BikeSharingFacilitiesReader(final Scenario scenario) {
 		// TODO: dtd
@@ -48,8 +50,10 @@ public class BikeSharingFacilitiesReader extends MatsimXmlParser {
 			final Stack<String> context) {
 		if ( name.equals( "bikeSharingFacilities" ) ) {
 			facilities = new BikeSharingFacilities();
+			counter = new Counter( "reading bike sharing facility # " );
 		}
 		if ( name.equals( "bikeSharingFacility" ) ) {
+			counter.incCounter();
 			final String idString = atts.getValue( "id" );
 			final String x = atts.getValue( "x" );
 			final String y = atts.getValue( "y" );
@@ -75,6 +79,7 @@ public class BikeSharingFacilitiesReader extends MatsimXmlParser {
 			final String content,
 			final Stack<String> context) {
 		if ( name.equals( "bikeSharingFacilities" ) ) {
+			counter.printCounter();
 			scenario.addScenarioElement( facilities );
 		}
 	}

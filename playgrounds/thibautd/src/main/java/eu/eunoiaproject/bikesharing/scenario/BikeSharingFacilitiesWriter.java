@@ -23,13 +23,19 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.log4j.Logger;
+
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
+import org.matsim.core.utils.misc.Counter;
 
 /**
  * @author thibautd
  */
 public class BikeSharingFacilitiesWriter extends MatsimXmlWriter {
+	private static final Logger log =
+		Logger.getLogger(BikeSharingFacilitiesWriter.class);
+
 	private final BikeSharingFacilities facilities;
 
 	public BikeSharingFacilitiesWriter( final BikeSharingFacilities facilities ) {
@@ -37,12 +43,16 @@ public class BikeSharingFacilitiesWriter extends MatsimXmlWriter {
 	}
 
 	public void write(final String fileName) {
+		log.info( "writing bike sharing facilities in file "+fileName );
 		openFile( fileName );
 		writeXmlHead();
 		writeStartTag( "bikeSharingFacilities" , Collections.<Tuple<String, String>>emptyList() );
+		final Counter counter = new Counter( "writing bike sharing facility # " );
 		for ( BikeSharingFacility f : facilities.getFacilities().values() ) {
+			counter.incCounter();
 			writeFacility( f );
 		}
+		counter.printCounter();
 		writeEndTag( "bikeSharingFacilities" );
 		close();
 	}
