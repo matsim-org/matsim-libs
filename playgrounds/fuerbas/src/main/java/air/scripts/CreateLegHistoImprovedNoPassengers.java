@@ -83,9 +83,9 @@ public class CreateLegHistoImprovedNoPassengers {
 					OutputDirectoryHierarchy out = new OutputDirectoryHierarchy(rundir, runId, false, false);
 					String eventsFilename = out.getIterationFilename(it, "events.xml.gz");
 					String pngOutputLegHisto = out.getIterationFilename(it, "leg_histogram_improved_de");
-					String txtOutputLegHisto = pngOutputLegHisto + ".csv";
+					String txtOutputLegHisto = pngOutputLegHisto;
 					String pngOutputSeatsHisto = out.getIterationFilename(it, "seats_histogram_improved_de");
-					String txtOutputSeatsHisto = pngOutputSeatsHisto + ".csv";
+					String txtOutputSeatsHisto = pngOutputSeatsHisto;
 
 					// seats over time data
 					EventsFilterManagerImpl eventsManager = new EventsFilterManagerImpl();
