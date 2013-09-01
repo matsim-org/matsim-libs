@@ -60,7 +60,7 @@ public class CategoryHistogramWriter {
 	public void writeCsv(CategoryHistogram histo, String filename){
 		PrintStream stream;
 		try {
-			stream = new PrintStream(new File(filename));
+			stream = new PrintStream(new File(filename + ".csv"));
 		} catch (FileNotFoundException e) {
 			throw new IllegalArgumentException("Filename " + filename + " is not found", e);
 		}
@@ -79,7 +79,7 @@ public class CategoryHistogramWriter {
 		stream.print("\n");
 
 		Map<String, Integer> enRouteMap = new HashMap<String, Integer>();
-		for (int i = this.getFirstIndex(histo) - 2; i <= histo.getLastIndex() + 2; i++) {
+		for (int i = (histo.getFirstIndex() - 2); i <= histo.getLastIndex() + 2; i++) {
 			int seconds = i * histo.getBinSizeSeconds();
 			stream.print(Time.writeTime(seconds));
 			stream.print("\t");
@@ -111,14 +111,6 @@ public class CategoryHistogramWriter {
 		}
 	}
 	
-	private int getFirstIndex(CategoryHistogram histo){
-		int first = histo.getFirstIndex();
-		if (first >= 2) {
-			first -= 2;
-		}
-		return first;
-	}
-	
 	public JFreeChart getGraphic(final CategoryHistogram histo, final String modeName) {
 		this.checkIndex(histo);
 		final XYSeriesCollection xyData = new XYSeriesCollection();
@@ -126,7 +118,7 @@ public class CategoryHistogramWriter {
 		final XYSeries arrivalsSerie = new XYSeries(this.arrivalsName, false, true);
 		final XYSeries onRouteSerie = new XYSeries(this.enRouteName, false, true);
 		Integer enRoute = 0;
-		for (int i = this.getFirstIndex(histo) - 2 ; i <= histo.getLastIndex() + 2; i++) {
+		for (int i = histo.getFirstIndex() - 2 ; i <= histo.getLastIndex() + 2; i++) {
 			int departures = histo.getDepartures(modeName, i);
 			int arrivals = histo.getArrivals(modeName, i);
 			int stuck = histo.getAbort(modeName, i);
@@ -158,9 +150,9 @@ public class CategoryHistogramWriter {
 		axis1.setTickLabelFont(new Font("SansSerif", Font.PLAIN, 7));
 		plot.setDomainAxis(new NumberAxis("time"));
 		
-		plot.getRenderer().setSeriesStroke(0, new BasicStroke(2.0f));
-		plot.getRenderer().setSeriesStroke(1, new BasicStroke(2.0f));
-		plot.getRenderer().setSeriesStroke(2, new BasicStroke(2.0f));
+		plot.getRenderer().setSeriesStroke(0, new BasicStroke(1.0f));
+		plot.getRenderer().setSeriesStroke(1, new BasicStroke(1.0f));
+		plot.getRenderer().setSeriesStroke(2, new BasicStroke(1.0f));
 		plot.setBackgroundPaint(Color.white);
 		plot.setRangeGridlinePaint(Color.gray);  
 		plot.setDomainGridlinePaint(Color.gray);  

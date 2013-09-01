@@ -24,7 +24,6 @@ import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -166,19 +165,22 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Agen
 		Integer arnew = 0;
 		Integer depnew = 0;
 		double noVehicles = 0;
-		for (Entry<Integer, Integer> e :  this.data.getDeparturesBySlot().entrySet()){
-			arnew = this.data.getArrivalsBySlot().get(e.getKey());
+		for (int slot = this.data.getFirstSlot() - 2; slot <= this.data.getLastSlot() + 2; slot++) {
+			arnew = this.data.getArrivalsBySlot().get(slot);
 			if (arnew == null) {
 				arnew = 0;
 			}
-			depnew = e.getValue();
+			depnew = this.data.getDeparturesBySlot().get(slot);
+			if (depnew == null) {
+				depnew = 0;
+			}
 			noVehicles = noVehicles + depnew - arnew ;
 			density = (noVehicles) / this.networkLengthKm;
-			double timeSec = e.getKey() * binSizeSeconds;
+			double timeSec = slot * binSizeSeconds;
 			int hour = (int) (timeSec / 3600);	
 			
 			StringBuffer line = new StringBuffer();
-			line.append(e.getKey());
+			line.append(slot);
 			line.append("\t");
 			line.append(timeSec);
 			line.append("\t");
@@ -202,14 +204,34 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Agen
 		
 		private SortedMap<Integer, Integer> arrivalsBySlot = new TreeMap<Integer, Integer>();
 		private SortedMap<Integer, Integer> departuresBySlot = new TreeMap<Integer, Integer>();
+		Integer firstSlot = null;
+		Integer lastSlot = null;
 		
 		public Data() {}
+
+		public Integer getFirstSlot(){
+			return firstSlot;
+		}
+		
+		public Integer getLastSlot(){
+			return lastSlot;
+		}
+		
+		private void checkSlot(Integer slot){
+			if (firstSlot == null || slot < firstSlot) {
+				firstSlot = slot;
+			}
+			if (lastSlot == null ||  slot > lastSlot) {
+				lastSlot = slot;
+			}
+		}
 		
 		public void incrementArrivals(Integer slot){
 			if (! this.arrivalsBySlot.containsKey(slot)){
 				this.arrivalsBySlot.put(slot, 0);
 			}
 			this.arrivalsBySlot.put(slot, (this.arrivalsBySlot.get(slot) + 1));
+			this.checkSlot(slot);
 		}
 		
 		public void incrementDepartures(Integer slot) {
@@ -217,11 +239,14 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Agen
 				this.departuresBySlot.put(slot, 0);
 			}
 			this.departuresBySlot.put(slot, (this.departuresBySlot.get(slot) + 1));
+			this.checkSlot(slot);
 		}
 		
 		public void reset(){
 			this.arrivalsBySlot.clear();
 			this.departuresBySlot.clear();
+			this.lastSlot = null;
+			this.firstSlot = null;
 		}
 
 		

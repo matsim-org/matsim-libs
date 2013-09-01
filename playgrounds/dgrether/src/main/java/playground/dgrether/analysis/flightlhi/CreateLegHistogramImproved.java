@@ -114,11 +114,11 @@ public class CreateLegHistogramImproved {
 			OutputDirectoryHierarchy out = new OutputDirectoryHierarchy(rundir, runId, false, false);
 			String eventsFilename = out.getIterationFilename(it, "events.xml.gz");
 			String pngOutputLegHisto = out.getIterationFilename(it, "leg_histogram_improved_de");
-			String txtOutputLegHisto = pngOutputLegHisto + ".csv";
+			String txtOutputLegHisto = pngOutputLegHisto;
 			String pngOutputSeatsHisto = out.getIterationFilename(it, "seats_histogram_improved_de");
-			String txtOutputSeatsHisto = pngOutputSeatsHisto + ".csv";
+			String txtOutputSeatsHisto = pngOutputSeatsHisto ;
 			String pngOutputInVehHisto = out.getIterationFilename(it, "in_vehicle_histogram_improved_de");
-			String txtOutputInVehHisto = pngOutputInVehHisto + ".csv";
+			String txtOutputInVehHisto = pngOutputInVehHisto;
 
 			// Persons in vehicle over time data
 			EventsFilterManager eventsManager = new EventsFilterManagerImpl();

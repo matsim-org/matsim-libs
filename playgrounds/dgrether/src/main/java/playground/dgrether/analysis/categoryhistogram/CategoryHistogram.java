@@ -98,18 +98,20 @@ public final class CategoryHistogram {
 
 	private int getBinIndex(final double time) {
 		int bin = (int)(time / this.getBinSizeSeconds());
-		if (this.getFirstIndex() == null){
+		if (this.getFirstIndex() == null || this.getFirstIndex() > bin){
 			this.firstIndex = bin;
 		}
-		this.lastIndex = bin;
+		if (this.lastIndex == null || this.lastIndex < bin) {
+			this.lastIndex = bin;
+		}
 		return bin;
 	}
 
-	private CategoryHistogramData getDataForCategory(final String legMode) {
-		CategoryHistogramData categoryData = this.data.get(legMode);
+	private CategoryHistogramData getDataForCategory(final String category) {
+		CategoryHistogramData categoryData = this.data.get(category);
 		if (categoryData == null) {
-			categoryData = new CategoryHistogramData(); // +1 for all times out of our range
-			this.data.put(legMode, categoryData);
+			categoryData = new CategoryHistogramData(); 
+			this.data.put(category, categoryData);
 		}
 		return categoryData;
 	}
