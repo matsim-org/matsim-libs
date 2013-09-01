@@ -48,6 +48,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -204,8 +205,9 @@ public class DreieckStreckeSzenarioTest {
 	public static int subdivisionFactor=3;//all sides of the triangle will be divided into subdivisionFactor links
 	public static double length = 222.22;//in m, length of one the triangle sides.
 	public static int NETWORK_CAPACITY = 2700;//in PCU/h
-	private static long NUMBER_OF_AGENTS = 100;
-	private static String OUTPUT_DIR = "Z:\\WinHome\\Desktop\\workspace2\\playgrounds\\ssix\\output\\data_Patna_onlyCars.txt";
+	private static long NUMBER_OF_AGENTS = 400;
+	private static String OUTPUT_DIR = "C:\\Users\\Simon\\Juno\\workspace-new\\playgrounds\\ssix\\output\\data_Patna_onlyBikes.txt";
+	private static String OUTPUT_EVENTS = "C:\\Users\\Simon\\Juno\\workspace-new\\playgrounds\\ssix\\output\\data_Patna_onlyBikes_events.xml";
 	
 	private static double FREESPEED = 60.;//in km/h, maximum authorized velocity on the track
 	private static double P_TRUCK = 0.5;//no need to worry much about those, are normalized when choosing effective transport mode
@@ -213,7 +215,7 @@ public class DreieckStreckeSzenarioTest {
 	private static double P_FAST = 0.5;
 	protected static double PCU_TRUCK = 0.25;//PCUs of the different possible modes
 	protected static double PCU_MED = 1.;
-	protected static double PCU_FAST = 1.;
+	protected static double PCU_FAST = 0.25;
 	protected static double VMAX_TRUCK = 16.67;//maximum velocities of the vehicle types
 	protected static double VMAX_MED = 12.;
 	protected static double VMAX_FAST = 16.67;
@@ -256,7 +258,7 @@ public class DreieckStreckeSzenarioTest {
 		dreieck.closeFile();*/
 		///*
 		long number_of_iterations = NUMBER_OF_AGENTS + 1;//-10 if constantFastDensity... because 10 vehicles are already in the sim
-		for (long i = 0; i < number_of_iterations; i+=1){
+		for (long i = 0; i < number_of_iterations; i+=12){
 			dreieck.run(i, "onlyFast");
 		}
 		dreieck.closeFile();
@@ -307,6 +309,7 @@ public class DreieckStreckeSzenarioTest {
 		
 		FunDiagramsWithPassing fundi3 = new FunDiagramsWithPassing(this.scenario);
 		events.addHandler(fundi3);
+		events.addHandler(new EventWriterXML(OUTPUT_EVENTS));
 		
 		runqsim(events);
 		
