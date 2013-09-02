@@ -203,11 +203,11 @@ public class DreieckStreckeSzenarioTest {
 	
 	//CONFIGURATION: static variables used for aggregating configuration options
 	public static int subdivisionFactor=3;//all sides of the triangle will be divided into subdivisionFactor links
-	public static double length = 222.22;//in m, length of one the triangle sides.
+	public static double length = 444.44;//in m, length of one the triangle sides.
 	public static int NETWORK_CAPACITY = 2700;//in PCU/h
-	private static long NUMBER_OF_AGENTS = 400;
-	private static String OUTPUT_DIR = "C:\\Users\\Simon\\Juno\\workspace-new\\playgrounds\\ssix\\output\\data_Patna_onlyBikes.txt";
-	private static String OUTPUT_EVENTS = "C:\\Users\\Simon\\Juno\\workspace-new\\playgrounds\\ssix\\output\\data_Patna_onlyBikes_events.xml";
+	private static long NUMBER_OF_AGENTS = 500;
+	private static String OUTPUT_DIR = "C:\\Users\\Simon\\Juno\\workspace-new\\playgrounds\\ssix\\output\\data_Patna_carBikes_alternativeSpeed.txt";
+	private static String OUTPUT_EVENTS = "C:\\Users\\Simon\\Juno\\workspace-new\\playgrounds\\ssix\\output\\data_Patna_carBikes_alternativeSpeed_events.xml";
 	
 	private static double FREESPEED = 60.;//in km/h, maximum authorized velocity on the track
 	private static double P_TRUCK = 0.5;//no need to worry much about those, are normalized when choosing effective transport mode
@@ -215,7 +215,7 @@ public class DreieckStreckeSzenarioTest {
 	private static double P_FAST = 0.5;
 	protected static double PCU_TRUCK = 0.25;//PCUs of the different possible modes
 	protected static double PCU_MED = 1.;
-	protected static double PCU_FAST = 0.25;
+	protected static double PCU_FAST = 1.;
 	protected static double VMAX_TRUCK = 16.67;//maximum velocities of the vehicle types
 	protected static double VMAX_MED = 12.;
 	protected static double VMAX_FAST = 16.67;
@@ -258,8 +258,8 @@ public class DreieckStreckeSzenarioTest {
 		dreieck.closeFile();*/
 		///*
 		long number_of_iterations = NUMBER_OF_AGENTS + 1;//-10 if constantFastDensity... because 10 vehicles are already in the sim
-		for (long i = 0; i < number_of_iterations; i+=12){
-			dreieck.run(i, "onlyFast");
+		for (long i = 0; i < number_of_iterations; i+=15){
+			dreieck.run(i, "constantModalSplit");
 		}
 		dreieck.closeFile();
 		//*/
