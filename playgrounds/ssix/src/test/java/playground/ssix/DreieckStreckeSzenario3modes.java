@@ -48,6 +48,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -205,7 +206,8 @@ public class DreieckStreckeSzenario3modes {
 	public static double length = 433.33;//in m, length of one the triangle sides.
 	public static int NETWORK_CAPACITY = 2700;//in PCU/h
 	private static long NUMBER_OF_AGENTS = 603;
-	private static String OUTPUT_DIR = "Z:\\WinHome\\Desktop\\workspace2\\playgrounds\\ssix\\output\\data_Patna_3modes_extension.txt";
+	private static String OUTPUT_DIR = "C:\\Users\\Simon\\Juno\\workspace-new\\playgrounds\\ssix\\output\\data_Patna_3modes_alternativeSpeed.txt";
+	private static String OUTPUT_EVENTS = "C:\\Users\\Simon\\Juno\\workspace-new\\playgrounds\\ssix\\output\\data_Patna_3modes_alternativeSpeed_events.xml";
 	
 	private static double FREESPEED = 60.;//in km/h, maximum authorized velocity on the track
 	private static double P_TRUCK = 1/3.;//no need to worry much about those, are normalized when choosing effective transport mode
@@ -258,7 +260,7 @@ public class DreieckStreckeSzenario3modes {
 		dreieck.closeFile();*/
 		///*
 		long number_of_iterations = NUMBER_OF_AGENTS + 1;//-10 if constantFastDensity... because 10 vehicles are already in the sim
-		for (long i = 504; i < number_of_iterations; i+=9){
+		for (long i = 0; i < number_of_iterations; i+=18){
 			dreieck.run(i, "constantModalSplit");
 		}
 		dreieck.closeFile();
@@ -309,6 +311,7 @@ public class DreieckStreckeSzenario3modes {
 		
 		FunDiagramsWithPassing3modes fundi4 = new FunDiagramsWithPassing3modes(this.scenario);
 		events.addHandler(fundi4);
+		events.addHandler(new EventWriterXML(OUTPUT_EVENTS));
 		
 		runqsim(events);
 		

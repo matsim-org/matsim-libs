@@ -102,6 +102,10 @@ public class FunDiagramsWithPassing3modes implements LinkEnterEventHandler{
 	private Map<Integer,Tuple<Integer,Double>> tourNumberSpeed_truck;
 	private Map<Integer,Tuple<Integer,Double>> tourNumberSpeed_med;
 	private Map<Integer,Tuple<Integer,Double>> tourNumberSpeed_fast;
+	private List<Double> speedTable;
+	private List<Double> speedTable_truck;
+	private List<Double> speedTable_med;
+	private List<Double> speedTable_fast;
 	
 	private List<Double> flowTable;//Flows on node 0 for the last 3600s (counted every second)
 	private List<Double> flowTable_truck;
@@ -141,6 +145,16 @@ public class FunDiagramsWithPassing3modes implements LinkEnterEventHandler{
 		}
 		this.permanentRegimeTour = 0;
 		this.initializeGroupDependentVariables();
+		this.speedTable = new LinkedList<Double>();
+		this.speedTable_truck = new LinkedList<Double>();
+		this.speedTable_med = new LinkedList<Double>();
+		this.speedTable_fast = new LinkedList<Double>();
+		for (int i=0; i<10; i++){
+			this.speedTable.add(0.);
+			this.speedTable_truck.add(0.);
+			this.speedTable_med.add(0.);
+			this.speedTable_fast.add(0.);
+		}
 	}
 	
 	public void reset(int iteration){
@@ -155,8 +169,12 @@ public class FunDiagramsWithPassing3modes implements LinkEnterEventHandler{
 		this.flowTime = new Double(0.);
 		this.lastXFlows.clear();
 		this.permanentRegimeTour = 0;
+		this.speedTable.clear();
 		
 		this.resetGroupDependentVariables();
+		this.speedTable_truck.clear();
+		this.speedTable_med.clear();
+		this.speedTable_fast.clear();
 	}
 	
 	public void handleEvent(LinkEnterEvent event){
@@ -234,8 +252,12 @@ public class FunDiagramsWithPassing3modes implements LinkEnterEventHandler{
 						//int numberOfDrivingAgents = this.tourNumberSpeed.get(this.permanentRegimeTour).getFirst();
 						
 						this.permanentDensity = this.permanentDensity_truck+this.permanentDensity_med+this.permanentDensity_fast;//PCU/km
-					
-						this.permanentAverageVelocity = this.tourNumberSpeed.get(this.permanentRegimeTour).getSecond();//m/s
+						
+						double sum=0;
+						for (int i=0; i<10; i++){
+							sum += this.speedTable.get(i).doubleValue();
+						}
+						this.permanentAverageVelocity = sum / 10;//m/s
 	
 						if (almostAbsoluteEqualDoubles(this.lastXFlows.get(0),this.lastXFlows.get(FunDiagramsWithPassing3modes.NUMBER_OF_MEMORIZED_FLOWS-1),1.)){
 							log.info("Simulation successful.\n" +
@@ -298,6 +320,12 @@ public class FunDiagramsWithPassing3modes implements LinkEnterEventHandler{
 				this.tourNumberSpeed.put(tourNumber, newNumberSpeed);
 				this.tourNumberSpeed_truck.put(tourNumber, newNumberSpeed_truck);
 				
+				for (int i=8; i>=0; i--){
+					this.speedTable.set(i+1, this.speedTable.get(i).doubleValue());
+					this.speedTable_truck.set(i+1, this.speedTable_truck.get(i).doubleValue());
+				}
+				this.speedTable.set(0, speed);
+				this.speedTable_truck.set(0, speed);
 				
 				//Checking for permanentRegime, in the mode and globally
 				if (tourNumber>2){
@@ -481,6 +509,12 @@ public class FunDiagramsWithPassing3modes implements LinkEnterEventHandler{
 				this.tourNumberSpeed.put(tourNumber, newNumberSpeed);
 				this.tourNumberSpeed_med.put(tourNumber, newNumberSpeed_med);
 				
+				for (int i=8; i>=0; i--){
+					this.speedTable.set(i+1, this.speedTable.get(i).doubleValue());
+					this.speedTable_med.set(i+1, this.speedTable_med.get(i).doubleValue());
+				}
+				this.speedTable.set(0, speed);
+				this.speedTable_med.set(0, speed);
 				
 				//Checking for permanentRegime, in the mode and globally
 				if (tourNumber>2){
@@ -665,6 +699,12 @@ public class FunDiagramsWithPassing3modes implements LinkEnterEventHandler{
 				this.tourNumberSpeed.put(tourNumber, newNumberSpeed);
 				this.tourNumberSpeed_fast.put(tourNumber, newNumberSpeed_fast);
 				
+				for (int i=8; i>=0; i--){
+					this.speedTable.set(i+1, this.speedTable.get(i).doubleValue());
+					this.speedTable_fast.set(i+1, this.speedTable_fast.get(i).doubleValue());
+				}
+				this.speedTable.set(0, speed);
+				this.speedTable_fast.set(0, speed);
 				
 				//Checking for permanentRegime, in the mode and globally
 				if (tourNumber>2){//>=3 because I want to compare actual speed with *2* previous speeds
@@ -1011,17 +1051,32 @@ public class FunDiagramsWithPassing3modes implements LinkEnterEventHandler{
 			this.permanentDensity_fast = N_fast*DreieckStreckeSzenario3modes.PCU_FAST/networkLength*1000;
 			
 			if (this.tourNumberSpeed_truck.size() != 0){
-				this.permanentAverageVelocity_truck = this.tourNumberSpeed_truck.get(this.permanentRegimeTour).getSecond();//m/s
+				//this.permanentAverageVelocity_truck = this.tourNumberSpeed_truck.get(this.permanentRegimeTour).getSecond();//m/s
+				double sum =0;
+				for (int i=0; i<10; i++){
+					sum += this.speedTable_truck.get(i);
+				}
+				this.permanentAverageVelocity_truck = sum / 10;
 			} else {
 				this.permanentAverageVelocity_truck = 0.;
 			}
 			if (this.tourNumberSpeed_med.size() != 0){
-				this.permanentAverageVelocity_med = this.tourNumberSpeed_med.get(this.permanentRegimeTour).getSecond();//m/s
+				//this.permanentAverageVelocity_med = this.tourNumberSpeed_med.get(this.permanentRegimeTour).getSecond();//m/s
+				double sum =0;
+				for (int i=0; i<10; i++){
+					sum += this.speedTable_med.get(i);
+				}
+				this.permanentAverageVelocity_med = sum / 10;
 			} else {
 				this.permanentAverageVelocity_med = 0.;
 			}
 			if (this.tourNumberSpeed_fast.size() != 0){
-				this.permanentAverageVelocity_fast = this.tourNumberSpeed_fast.get(this.permanentRegimeTour).getSecond();//m/s
+				//this.permanentAverageVelocity_fast = this.tourNumberSpeed_fast.get(this.permanentRegimeTour).getSecond();//m/s
+				double sum =0;
+				for (int i=0; i<10; i++){
+					sum += this.speedTable_fast.get(i);
+				}
+				this.permanentAverageVelocity_fast = sum / 10;
 			} else {
 				this.permanentAverageVelocity_fast = 0.;
 			}
