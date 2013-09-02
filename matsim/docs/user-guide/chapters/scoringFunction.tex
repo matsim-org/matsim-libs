@@ -93,7 +93,7 @@ In this situation, the activity that follows the trip is cut short by  $\Delta t
 \end{itemize}
 Overall: The (linearized) utility change caused by longer travel is
 \[
-( - \beta_{perf} + \beta_{tt} ) * \Delta t \ .
+( - \beta_{perf} + \beta_{tt} ) \cdot \Delta t \ .
 \]
 
 
@@ -209,18 +209,18 @@ As a next step, an infrastructure to compare MATSim simulations with  real world
 
 The  so-called "Charypar-Nagel scoring function" is used in many  MATSim  studies. It is called that way because there is an ancient paper   where this scoring function was introduced.
 
-It uses a logarithmic utility of time for activities: U = beta * t\_x *  ln(x/t\_0) . I sometimes call t\_x the "typical duration".
+It uses a logarithmic utility of time for activities: $U = \beta \cdot t_x \cdot  \ln(x/t_0)$ . I sometimes call $t_x$ the ``typical duration''.
 
 The first derivative of U is beta at the typical duration:
 \begin{itemize}
 	\item 
-\begin{verbatim}
-dU/dx = beta * t_x / x
-\end{verbatim}
+$\displaystyle
+\frac{dU}{dx} = \beta \cdot t_x / x
+$
 	\item 
-\begin{verbatim}
-dU/dx(x=t_x) = beta
-\end{verbatim}
+$\displaystyle
+\left. \frac{dU}{dx}\right|_{x=t_x} = \beta
+$
 \end{itemize}
 
 Interpretation: marginal utility of duration at "typical duration" is indep of activity type. (*)
@@ -228,104 +228,100 @@ Interpretation: marginal utility of duration at "typical duration" is indep of a
 The second derivative of U at the typical duration is
 \begin{itemize}
 	\item 
-\begin{verbatim}
-d^2U/dx^2 = - beta * t_x / x^2
-\end{verbatim}
+$\displaystyle
+\frac{d^2U}{dx^2} = - \beta \cdot t_x / x^2
+$
 	\item 
-\begin{verbatim}
-d^2U/dx^2(x=t_x) = - beta / t_x
-\end{verbatim}
+$\displaystyle
+\left. \frac{d^2U}{dx^2} \right|_{x=t_x} = - \beta / t_x
+$
 \end{itemize}
 
-An  important consequence of this is that there is no separate  free  parameter to calibrate the curvature (= 2nd derivative) at the  typical  duration: beta needs to be the same across all activities, and  t\_x is  given by (*).
+An  important consequence of this is that there is no separate  free  parameter to calibrate the curvature (= 2nd derivative) at the  typical  duration: $\beta$ needs to be the same across all activities, and  $t_x$ is  given by (*).
 
-A second consequence is that t\_0 is largely  irrelevant. It  shifts the function up and down, i.e. it determines how  much you lose  if you drop an activity completely.
+A second consequence is that $t_0$ is largely  irrelevant. It  shifts the function up and down, i.e.\ it determines how  much you lose  if you drop an activity completely.
 
+In the  original paper (and in most of MATSim), $t_0$ is set to $t_x \cdot   \exp(-10h/t_x)$ . This has the (intended) consequence that all  activities  have the same utility contribution at their typical  duration:
+\[
+U = \beta \cdot t_x \cdot \ln( x / t_x / \exp(-10h/t_x) ) 
+%
+= \beta \cdot t_x \cdot [ \ln( x/t_x ) + 10h/t_x ]
+\]
+which   is, at $x=t_x$,
+\[
+= \beta \cdot t_x \cdot [ 0 + 10h/t_x ] = \beta \cdot  10h \ . 
+\]
+With  our usual $\beta = 6Eu/h$, this results in $60Eu$ per  activity.
 
-
-In the  original paper (and in most of MATSim), t\_0 is set to t\_x *   exp(-10h/t\_x) . This has the (intended) consequence that all  activities  have the same utility contribution at their typical  duration:
-\begin{verbatim}
-U = beta * t_x * ln( x / t_x / exp(-10h/t_x) ) = beta * t_x * [ ln( x/t_x ) + 10h/t_x ]
-\end{verbatim}
-
-which   is, at x=t\_x: = beta * t\_x * [ 0 + 10h/t\_x ] = beta *  10h . With  our usual beta = 6Eu/h, this results in 60Eu per  activity.
-
-The slope at U=0, i.e. at x=t\_0, is
-\begin{verbatim}
-(beta * t_x / t_x) * exp( 10h/t_x) = beta * exp( 10h/t_x )
-\end{verbatim}
-
-which \emph{de}creases with increasing t\_x. This means that activities with larger typical duration are \emph{easier} to drop completely.
+The slope at $U=0$, i.e.\ at $x=t_0$, is
+\[
+(\beta \cdot t_x / t_x) \cdot \exp( 10h/t_x) = \beta \cdot \exp( 10h/t_x )
+\]
+which \emph{de}creases with increasing $t_x$. This means that activities with larger typical duration are \emph{easier} to drop completely.
 
 In the end, this makes sense: Since the additional score of any activity is the same, the score \emph{per time} is smallest for activities with long typical durations. Therefore, it makes sense to drop them first.
 
 But practically, this is probably not desired behavior, since it would first drop the home activity from a daily plan.
 
-Overall, therefore: \emph{\textbf{In my opinion, the current utility function does not work for activity dropping.}}
+Overall, therefore: \myemph{In my opinion, the current utility function does not work for activity dropping.}
 
+---
 
-
-An  alternative, never tested since activity dropping was never  tested with  this utl fct, would to to recognize that U'(t\_0) = beta *  t\_x / t\_0 ,  i.e. \emph{increasing}\emph{slope} with \emph{decreasing}  t\_0.  That is, high priority activities should have t\_0 such that  t\_x/t\_0 is  large (large slope = hard to drop). Activities of the  same priority  should have t\_0 such that t\_x/t\_0 is the same between  those activities.  Overall, something like
-\begin{verbatim}
+An  alternative, never tested since activity dropping was never  tested with  this utl fct, would be to recognize that $U'(t_0) = \beta \cdot  t_x / t_0$ ,  i.e.\ \emph{increasing} \emph{slope} with \emph{decreasing}  $t_0$.  That is, high priority activities should have $t_0$ such that  $t_x/t_0$ is  large (large slope = hard to drop). Activities of the  same priority  should have $t_0$ such that $t_x/t_0$ is the same between  those activities.  Overall, something like
+\[
 weight \propto t_x/t_0
-
-\end{verbatim}
-
+\]
 or
-\begin{verbatim}
+\[
 t_0 \propto t_x/weight
-\end{verbatim}
-
+\]
 where large weight implies a large importance of the activity.
 
 This  was, as said, never tried, since activity dropping was never   systematically tried. It also does not fix the problem, discussed   later, that different activities might have different resistance  against  making them shorter; since this is U'', this is -beta/t\_x  with the  above utl fct: activities are shortened proportional to their  typical  duration.
 
-
+---
 
 To make matters worse, there is currently the  convention that  negative values of U are set to zero. This is done  since we need  useable values for negative durations (since they may  happen at the  "stitching together" of the last to the first activity of a  day), and  if we give those a "very negative" score, then the utl at t=0  cannot be  even smaller than this.
 
-This has, however, the  unfortunate consequence that the "drift  direction" of the adaptive  algorithm, once an activity duration has  gone below t\_0, goes to zero  duration.
+This has, however, the  unfortunate consequence that the ``drift  direction'' of the adaptive  algorithm, once an activity duration has  gone below $t_0$, goes to zero  duration.
 
-
+\section{Outlook}
 
 Outlook: What would we want for our next generation utl function? Some wishes from my perspective:
 \begin{itemize}
 	\item Curvature at typical duration can be calibrated
-	\item Slope at U=0 can be calibrated
+	\item Slope at $U=0$ can be calibrated
 	\item Utl function extends in meaningful way to negative durations (this would fix the arbitrary handling that we currently employ)
 \end{itemize}
 
-
-
-In  my view, a polynomial of second degree would be worth trying. As  usual,  there are several ways to set this up. One way is to  expand around the  typical duration:
-\begin{verbatim}
-U(t_x + eps) = U(t_x) + eps * U'(t_x) + eps^2 * U''(t_x)/2
-\end{verbatim}
-
+In  my view, a polynomial of second degree would be worth trying.\footnote{%
+%
+As  usual,  there are several ways to set this up. One way is to  expand around the  typical duration:
+\[
+U(t_x + \epsilon) = U(t_x) + \epsilon \cdot U'(t_x) + \epsilon^2 * U''(t_x)/2
+\]
 or
-\begin{verbatim}
-U(x) = U(t_x) + (x-t_x) * U'(t_x) + (x-t_x)^2 * U''(t_x)/2
-\end{verbatim}
-
-with   t\_x = typical duration, U'(t\_x) = beta = marg utl at typ dur, U''(t\_x)  =  curvature at typ dur ("priority"), and U(t\_x) = "base value of act"   (which could be something like beta*t\_x ).
-
-
-
+\[
+U(x) = U(t_x) + (x-t_x) \cdot U'(t_x) + (x-t_x)^2 * U''(t_x)/2
+\]
+with $t_x =$ typical duration, $U'(t_x) = \beta =$ marg utl at typ dur, $U''(t\_x) =$  curvature at typ dur (``priority''), and $U(t\_x) =$ ``base value of act'' (which could be something like $\beta \cdot t_x$ ).
+\\
+---
+\\
 Another way (having the parabola going through (0,0)) would be
-\begin{verbatim}
+\[
 U(x) = - a x ( x - c ) = - a x^2 + a c x
-\end{verbatim}
-\begin{verbatim}
+\]
+\[
 U'(x) = - 2 a x + a c
-\end{verbatim}
-\begin{verbatim}
-prio = U'(x=0) = a c , i.e. c = prio/a .
-\end{verbatim}
-\begin{verbatim}
-beta = U'(x=t_x) = - 2 a t_x + prio, i.e. a = (prio - beta)/2t_x
-\end{verbatim}
-
-
+\]
+\[
+prio = U'(x=0) = a c , i.e.\ c = prio/a .
+\]
+\[
+\beta = U'(x=t_x) = - 2 a t_x + prio \hbox{, i.e.\ } a = (prio - \beta)/2t_x
+\]
+}
 
 There is other work (e.g. by Joh) that should be looked at.
 
