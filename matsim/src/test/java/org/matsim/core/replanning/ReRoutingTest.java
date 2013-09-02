@@ -21,7 +21,6 @@
 package org.matsim.core.replanning;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 import java.util.EnumSet;
 import java.util.LinkedList;
@@ -31,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
+import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -47,11 +47,9 @@ public class ReRoutingTest extends MatsimTestCase {
 
 	/*package*/ static final Logger log = Logger.getLogger(ReRoutingTest.class);
 
-	/**
-	 * This test seems to have race conditions somewhere (i.e. it fails intermittently without code changes). kai, aug'13
-	 */
-	public void testReRouting() {
-		Config config = loadConfig(getInputDirectory() + "config.xml");
+	
+	private Scenario loadScenario() {
+		Config config = loadConfig(getClassInputDirectory() + "config.xml");
 		config.simulation().setTimeStepSize(10.0);
 		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.txt));
 
@@ -62,12 +60,34 @@ public class ReRoutingTest extends MatsimTestCase {
 		 */
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		PopulationUtils.sortPersons(scenario.getPopulation());
+		return scenario;
+	}
+	
+	public void testReRoutingDijkstra() {
+		Scenario scenario = this.loadScenario();
+		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.Dijkstra);
 		TestControler controler = new TestControler(scenario);
 		controler.setCreateGraphs(false);
 		controler.setDumpDataAtEnd(false);
 		controler.run();
-
-		String inputEvents = getInputDirectory() + "0.events.txt.gz";
+		this.evaluate();
+	}
+	
+	/**
+	 * This test seems to have race conditions somewhere (i.e. it fails intermittently without code changes). kai, aug'13
+	 */
+	public void testReRouting() {
+		Scenario scenario = this.loadScenario();
+		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.AStarLandmarks);
+		TestControler controler = new TestControler(scenario);
+		controler.setCreateGraphs(false);
+		controler.setDumpDataAtEnd(false);
+		controler.run();
+		this.evaluate();
+	}
+		
+	private void evaluate() {
+		String inputEvents = getClassInputDirectory() + "0.events.txt.gz";
 		String outputEvents = getOutputDirectory() + "ITERS/it.0/0.events.txt.gz";
 		assertTrue("different event files", EventsFileComparator.compare(inputEvents, outputEvents) == EventsFileComparator.CODE_FILES_ARE_EQUAL);
 		
@@ -92,7 +112,6 @@ public class ReRoutingTest extends MatsimTestCase {
 			}
 
 		}
-		
 		assertEquals("different plans files", originalCheckSum, revisedCheckSum);
 	}
 	
