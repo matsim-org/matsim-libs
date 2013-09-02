@@ -33,6 +33,7 @@ import org.matsim.core.replanning.modules.SelectPathSizeLogitStrategyFactory;
 import org.matsim.core.replanning.modules.SelectRandomStrategyFactory;
 import org.matsim.core.replanning.modules.SubtourModeChoiceStrategyFactory;
 import org.matsim.core.replanning.modules.TimeAllocationMutatorPlanStrategyFactory;
+import org.matsim.core.replanning.modules.TimeAllocationMutatorReRoutePlanStrategyFactory;
 import org.matsim.core.replanning.modules.TripSubtourModeChoiceStrategyFactory;
 
 
@@ -58,6 +59,7 @@ public class PlanStrategyRegistrar {
 		// at least once).
 		register.register(Names.ReRoute.toString(), new ReRoutePlanStrategyFactory());		
 		register.register(Names.TimeAllocationMutator.toString(), new TimeAllocationMutatorPlanStrategyFactory());
+		register.register("TimeAllocationMutator_ReRoute", new TimeAllocationMutatorReRoutePlanStrategyFactory());
 		register.register(Names.ChangeLegMode.toString(), new ChangeLegModeStrategyFactory());
 		register.register("ChangeSingleLegMode", new ChangeSingleLegModeStrategyFactory());
 		register.register("ChangeSingleTripMode", new ChangeSingleTripModeStrategyFactory());
