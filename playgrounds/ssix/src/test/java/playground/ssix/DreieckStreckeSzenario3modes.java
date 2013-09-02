@@ -203,7 +203,7 @@ public class DreieckStreckeSzenario3modes {
 	
 	//CONFIGURATION: static variables used for aggregating configuration options
 	public static int subdivisionFactor=3;//all sides of the triangle will be divided into subdivisionFactor links
-	public static double length = 433.33;//in m, length of one the triangle sides.
+	public static double length = 444.44;//in m, length of one the triangle sides.
 	public static int NETWORK_CAPACITY = 2700;//in PCU/h
 	private static long NUMBER_OF_AGENTS = 603;
 	private static String OUTPUT_DIR = "C:\\Users\\Simon\\Juno\\workspace-new\\playgrounds\\ssix\\output\\data_Patna_3modes_alternativeSpeed.txt";
