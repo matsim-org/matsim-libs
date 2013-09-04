@@ -43,7 +43,13 @@ public class WeightsConfigGroup extends ReflectiveModule {
 	private String locationChoiceActivityType = "leisure";
 	private double locationChoice = -1;
 	private String weightAttribute = null;
-	private boolean useWeightedScoreSum = false;
+
+	public static enum GroupScoringType {
+		sum,
+		weightedSum,
+		min;
+	}
+	private GroupScoringType groupScoringType = GroupScoringType.sum;
 
 	public static enum Synchro {
 		dynamic, none, all;
@@ -265,14 +271,17 @@ public class WeightsConfigGroup extends ReflectiveModule {
 		this.weightAttribute = weightAttribute;
 	}
 
-	@StringGetter( "useWeightedSelection" )
-	public boolean isUseWeightedScoreSum() {
-		return this.useWeightedScoreSum;
+	@StringGetter( "groupScoringType" )
+	public GroupScoringType getGroupScoringType() {
+		return this.groupScoringType;
 	}
 
-	@StringSetter( "useWeightedSelection" )
-	public void setUseWeightedScoreSum(boolean useWeightedScoreSum) {
-		this.useWeightedScoreSum = useWeightedScoreSum;
+	@StringSetter( "groupScoringType" )
+	private void setgetGroupScoringType(final String groupScoringType) {
+		this.setgetGroupScoringType( GroupScoringType.valueOf( groupScoringType ) );
 	}
 
+	public void setgetGroupScoringType(final GroupScoringType groupScoringType) {
+		this.groupScoringType = groupScoringType;
+	}
 }

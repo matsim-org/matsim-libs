@@ -77,9 +77,12 @@ import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.modules.AbstractMultithreadedGenericStrategyModule;
 import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanAlgorithm.PlanLinkIdentifier;
 import playground.thibautd.socnetsim.replanning.selectors.EmptyIncompatiblePlansIdentifierFactory;
-import playground.thibautd.socnetsim.replanning.selectors.InverseScoreWeight;
-import playground.thibautd.socnetsim.replanning.selectors.LowestScoreSumSelectorForRemoval;
+import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
 import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
+import playground.thibautd.socnetsim.replanning.selectors.InverseScoreWeight;
+import playground.thibautd.socnetsim.replanning.selectors.LowestScoreOfJointPlanWeight;
+import playground.thibautd.socnetsim.replanning.selectors.LowestScoreSumSelectorForRemoval;
+import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector.WeightCalculator;
 import playground.thibautd.socnetsim.replanning.selectors.WeightedWeight;
 import playground.thibautd.socnetsim.router.JointTripRouterFactory;
 import playground.thibautd.socnetsim.run.WeightsConfigGroup.Synchro;
@@ -267,16 +270,9 @@ public class RunCliquesWithHardCodedStrategies {
 		// create strategy manager
 		final GroupStrategyManager strategyManager =
 			new GroupStrategyManager( 
-					weights.isUseWeightedScoreSum() ?
-						new HighestWeightSelector(
-							true ,
-							controllerRegistry.getIncompatiblePlansIdentifierFactory(),
-							new WeightedWeight(
-								new InverseScoreWeight(),
-								weights.getWeightAttributeName(),
-								scenario.getPopulation().getPersonAttributes()  )) :
-						new LowestScoreSumSelectorForRemoval(
-							controllerRegistry.getIncompatiblePlansIdentifierFactory()),
+					getSelectorForRemoval(
+						weights,
+						controllerRegistry),
 					strategyRegistry,
 					config.strategy().getMaxAgentPlanMemorySize());
 
@@ -319,6 +315,41 @@ public class RunCliquesWithHardCodedStrategies {
 
 		// run it
 		controller.run();
+	}
+
+	private static GroupLevelPlanSelector getSelectorForRemoval(
+			final WeightsConfigGroup weights,
+			final ControllerRegistry controllerRegistry) {
+		switch ( weights.getGroupScoringType() ) {
+			case weightedSum:
+				return new HighestWeightSelector(
+						true ,
+						controllerRegistry.getIncompatiblePlansIdentifierFactory(),
+						new WeightedWeight(
+							new InverseScoreWeight(),
+							weights.getWeightAttributeName(),
+							controllerRegistry.getScenario().getPopulation().getPersonAttributes()  ));
+			case sum:
+				return new LowestScoreSumSelectorForRemoval(
+						controllerRegistry.getIncompatiblePlansIdentifierFactory());
+			case min:
+				final WeightCalculator baseWeight =
+					new LowestScoreOfJointPlanWeight(
+							controllerRegistry.getJointPlans());
+				return new HighestWeightSelector(
+						true ,
+						controllerRegistry.getIncompatiblePlansIdentifierFactory(),
+						new WeightCalculator() {
+							@Override
+							public double getWeight(
+									final Plan indivPlan,
+									final ReplanningGroup replanningGroup) {
+								return -baseWeight.getWeight( indivPlan , replanningGroup );
+							}
+						});
+			default:
+				throw new RuntimeException( "unkown: "+weights.getGroupScoringType() );
+		}
 	}
 
 	private static GenericFactory<PersonOverlapScorer, Id> getPersonOverlapScorerFactory(

@@ -117,23 +117,36 @@ public class RunUtils {
 					controllerRegistry ),
 				weights.getModeMutationWeight(),
 				weights.getDisableInnovationAfterIter());
-		if ( weights.isUseWeightedScoreSum() ) {
-			strategyRegistry.addStrategy(
-					GroupPlanStrategyFactory.createWeightedSelectExpBeta(
-						weights.getWeightAttributeName(),
-						controllerRegistry.getScenario().getPopulation().getPersonAttributes(),
-						controllerRegistry.getIncompatiblePlansIdentifierFactory(),
-						config ),
-					weights.getLogitSelectionWeight(),
-					-1);
-		}
-		else {
-			strategyRegistry.addStrategy(
-					GroupPlanStrategyFactory.createSelectExpBeta(
+		switch ( weights.getGroupScoringType() ) {
+			case weightedSum:
+				strategyRegistry.addStrategy(
+						GroupPlanStrategyFactory.createWeightedSelectExpBeta(
+							weights.getWeightAttributeName(),
+							controllerRegistry.getScenario().getPopulation().getPersonAttributes(),
 							controllerRegistry.getIncompatiblePlansIdentifierFactory(),
 							config ),
-					weights.getLogitSelectionWeight(),
-					-1);
+						weights.getLogitSelectionWeight(),
+						-1);
+				break;
+			case sum:
+				strategyRegistry.addStrategy(
+						GroupPlanStrategyFactory.createSelectExpBeta(
+								controllerRegistry.getIncompatiblePlansIdentifierFactory(),
+								config ),
+						weights.getLogitSelectionWeight(),
+						-1);
+				break;
+			case min:
+				strategyRegistry.addStrategy(
+						GroupPlanStrategyFactory.createMinSelectExpBeta(
+							controllerRegistry.getJointPlans(),
+							controllerRegistry.getIncompatiblePlansIdentifierFactory(),
+							config ),
+						weights.getLogitSelectionWeight(),
+						-1);
+				break;
+			default:
+				throw new RuntimeException( "unkown: "+weights.getGroupScoringType() );
 		}
 		strategyRegistry.addStrategy(
 				GroupPlanStrategyFactory.createTourVehicleAllocation(

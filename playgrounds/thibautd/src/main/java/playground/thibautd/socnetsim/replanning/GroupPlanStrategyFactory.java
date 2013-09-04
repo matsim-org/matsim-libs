@@ -41,6 +41,7 @@ import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlanFactory;
+import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.replanning.modules.AbstractMultithreadedGenericStrategyModule;
 import playground.thibautd.socnetsim.replanning.modules.JointPlanMergingModule;
@@ -53,6 +54,7 @@ import playground.thibautd.socnetsim.replanning.selectors.highestweightselection
 import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.replanning.selectors.LogitSumSelector;
 import playground.thibautd.socnetsim.replanning.selectors.LogitWeight;
+import playground.thibautd.socnetsim.replanning.selectors.LowestScoreOfJointPlanWeight;
 import playground.thibautd.socnetsim.replanning.selectors.RandomGroupLevelSelector;
 import playground.thibautd.socnetsim.replanning.selectors.WeightedWeight;
 import playground.thibautd.socnetsim.sharedvehicles.replanning.AllocateVehicleToPlansInGroupPlanModule;
@@ -287,7 +289,20 @@ public class GroupPlanStrategyFactory {
 							config.planCalcScore().getBrainExpBeta()),
 						 weightAttributeName,
 						 personAttributes ) ) );
-		}
+	}
+
+	public static GroupPlanStrategy createMinSelectExpBeta(
+			final JointPlans jointPlans,
+			final IncompatiblePlansIdentifierFactory incompFact,
+			final Config config) {
+		return new GroupPlanStrategy(
+				 new HighestWeightSelector(
+					 incompFact ,
+					 new LogitWeight(
+						new LowestScoreOfJointPlanWeight( jointPlans ),
+						MatsimRandom.getLocalInstance(),
+						config.planCalcScore().getBrainExpBeta()) ));
+	}
 
 	public static GroupPlanStrategy createSubtourModeChoice(
 			final ControllerRegistry registry) {
