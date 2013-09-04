@@ -19,13 +19,11 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning.selectors;
 
-import org.matsim.api.core.v01.population.Plan;
 
 import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
-import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector.WeightCalculator;
 
 /**
  * @author thibautd
@@ -38,16 +36,7 @@ public class LowestScoreSumSelectorForRemoval implements GroupLevelPlanSelector 
 		delegate = new HighestWeightSelector(
 				true ,
 				incompFact,
-				new WeightCalculator() {
-					@Override
-					public double getWeight(
-							final Plan indivPlan,
-							final ReplanningGroup group) {
-						Double score = indivPlan.getScore();
-						// if there is a plan without score, select it
-						return score == null ? Double.POSITIVE_INFINITY : -score;
-					}
-				});
+				new InverseScoreWeight());
 	}
 
 	@Override

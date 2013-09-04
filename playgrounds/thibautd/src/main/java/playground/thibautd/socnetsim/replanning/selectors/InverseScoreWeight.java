@@ -1,10 +1,9 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * LogitSumSelector.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,43 +16,21 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package playground.thibautd.socnetsim.replanning.selectors;
 
-import java.util.Random;
+import org.matsim.api.core.v01.population.Plan;
 
-import org.apache.log4j.Logger;
-
-import playground.thibautd.socnetsim.population.JointPlans;
-import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
-import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
+import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector.WeightCalculator;
 
-/**
- * A selector which draws gumbel-distributed scores for individual plans.
- * Without joint plan, this results in logit marginals for the selection for
- * each agent.
- *
- * @author thibautd
- */
-public class LogitSumSelector implements GroupLevelPlanSelector {
-	static final Logger log =
-		Logger.getLogger(LogitSumSelector.class);
-
-	private final GroupLevelPlanSelector delegate;
-
-	public LogitSumSelector(
-			final Random random,
-			final IncompatiblePlansIdentifierFactory incompFact,
-			final double scaleParameter) {
-		this.delegate = new HighestWeightSelector( incompFact , new LogitWeight( random , scaleParameter ) );
-	}
-	
+public class InverseScoreWeight implements WeightCalculator {
 	@Override
-	public GroupPlans selectPlans(
-			final JointPlans jointPlans,
+	public double getWeight(
+			final Plan indivPlan,
 			final ReplanningGroup group) {
-		return delegate.selectPlans( jointPlans , group);
+		Double score = indivPlan.getScore();
+		// if there is a plan without score, select it
+		return score == null ? Double.POSITIVE_INFINITY : -score;
 	}
-
 }
-

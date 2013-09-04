@@ -19,13 +19,11 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning.selectors;
 
-import org.matsim.api.core.v01.population.Plan;
 
 import playground.thibautd.socnetsim.population.JointPlans;
 import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
-import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector.WeightCalculator;
 
 /**
  * @author thibautd
@@ -35,25 +33,14 @@ public class HighestScoreSumSelector implements GroupLevelPlanSelector {
 	
 	public HighestScoreSumSelector(
 			final IncompatiblePlansIdentifierFactory fact) {
-		delegate = new HighestWeightSelector( fact , new Weight() );
+		delegate = new HighestWeightSelector( fact , new ScoreWeight() );
 	}
 
 	// for tests
 	HighestScoreSumSelector(
 			final IncompatiblePlansIdentifierFactory fact,
 			final boolean blocking) {
-		delegate = new HighestWeightSelector( blocking , fact , new Weight() );
-	}
-
-	private static class Weight implements WeightCalculator {
-		@Override
-		public double getWeight(
-				final Plan indivPlan,
-				final ReplanningGroup group) {
-			Double score = indivPlan.getScore();
-			// if there are unscored plan, one of them is selected
-			return score == null ? Double.POSITIVE_INFINITY : score;
-		}
+		delegate = new HighestWeightSelector( blocking , fact , new ScoreWeight() );
 	}
 
 	@Override
