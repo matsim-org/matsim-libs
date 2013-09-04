@@ -42,6 +42,8 @@ public class WeightsConfigGroup extends ReflectiveModule {
 	private boolean useLimitedVehicles = true;
 	private String locationChoiceActivityType = "leisure";
 	private double locationChoice = -1;
+	private String weightAttribute = null;
+	private boolean useWeightedScoreSum = false;
 
 	public static enum Synchro {
 		dynamic, none, all;
@@ -251,6 +253,26 @@ public class WeightsConfigGroup extends ReflectiveModule {
 	@StringSetter( "locationChoice" )
 	public void setLocationChoice(final double locationChoice) {
 		this.locationChoice = locationChoice;
+	}
+
+	@StringGetter( "weightAttributeName" )
+	public String getWeightAttributeName() {
+		return this.weightAttribute;
+	}
+
+	@StringSetter( "weightAttributeName" )
+	public void setWeightAttributeName(String weightAttribute) {
+		this.weightAttribute = weightAttribute;
+	}
+
+	@StringGetter( "useWeightedSelection" )
+	public boolean isUseWeightedScoreSum() {
+		return this.useWeightedScoreSum;
+	}
+
+	@StringSetter( "useWeightedSelection" )
+	public void setUseWeightedScoreSum(boolean useWeightedScoreSum) {
+		this.useWeightedScoreSum = useWeightedScoreSum;
 	}
 
 }

@@ -117,12 +117,24 @@ public class RunUtils {
 					controllerRegistry ),
 				weights.getModeMutationWeight(),
 				weights.getDisableInnovationAfterIter());
-		strategyRegistry.addStrategy(
-				GroupPlanStrategyFactory.createSelectExpBeta(
+		if ( weights.isUseWeightedScoreSum() ) {
+			strategyRegistry.addStrategy(
+					GroupPlanStrategyFactory.createWeightedSelectExpBeta(
+						weights.getWeightAttributeName(),
+						controllerRegistry.getScenario().getPopulation().getPersonAttributes(),
 						controllerRegistry.getIncompatiblePlansIdentifierFactory(),
 						config ),
-				weights.getLogitSelectionWeight(),
-				-1);
+					weights.getLogitSelectionWeight(),
+					-1);
+		}
+		else {
+			strategyRegistry.addStrategy(
+					GroupPlanStrategyFactory.createSelectExpBeta(
+							controllerRegistry.getIncompatiblePlansIdentifierFactory(),
+							config ),
+					weights.getLogitSelectionWeight(),
+					-1);
+		}
 		strategyRegistry.addStrategy(
 				GroupPlanStrategyFactory.createTourVehicleAllocation(
 					controllerRegistry ),

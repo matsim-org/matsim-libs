@@ -31,6 +31,7 @@ import org.matsim.core.router.TripRouterFactoryInternal;
 import org.matsim.core.trafficmonitoring.DepartureDelayAverageCalculator;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.population.algorithms.TripsToLegsAlgorithm;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.thibautd.router.PlanRoutingAlgorithmFactory;
 import playground.thibautd.router.replanning.BlackListedTimeAllocationMutator;
@@ -48,9 +49,12 @@ import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanAlgori
 import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanModule;
 import playground.thibautd.socnetsim.replanning.modules.SynchronizeCoTravelerPlansModule;
 import playground.thibautd.socnetsim.replanning.selectors.EmptyIncompatiblePlansIdentifierFactory;
+import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
 import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.replanning.selectors.LogitSumSelector;
+import playground.thibautd.socnetsim.replanning.selectors.LogitWeight;
 import playground.thibautd.socnetsim.replanning.selectors.RandomGroupLevelSelector;
+import playground.thibautd.socnetsim.replanning.selectors.WeightedWeight;
 import playground.thibautd.socnetsim.sharedvehicles.replanning.AllocateVehicleToPlansInGroupPlanModule;
 import playground.thibautd.socnetsim.sharedvehicles.replanning.AllocateVehicleToSubtourModule;
 import playground.thibautd.socnetsim.sharedvehicles.replanning.OptimizeVehicleAllocationAtTourLevelModule;
@@ -268,6 +272,22 @@ public class GroupPlanStrategyFactory {
 					incompFact,
 					config.planCalcScore().getBrainExpBeta()) );
 	}
+
+	public static GroupPlanStrategy createWeightedSelectExpBeta(
+			final String weightAttributeName,
+			final ObjectAttributes personAttributes,
+			final IncompatiblePlansIdentifierFactory incompFact,
+			final Config config) {
+		return new GroupPlanStrategy(
+				 new HighestWeightSelector(
+					 incompFact ,
+					 new WeightedWeight(
+						 new LogitWeight(
+							MatsimRandom.getLocalInstance(),
+							config.planCalcScore().getBrainExpBeta()),
+						 weightAttributeName,
+						 personAttributes ) ) );
+		}
 
 	public static GroupPlanStrategy createSubtourModeChoice(
 			final ControllerRegistry registry) {

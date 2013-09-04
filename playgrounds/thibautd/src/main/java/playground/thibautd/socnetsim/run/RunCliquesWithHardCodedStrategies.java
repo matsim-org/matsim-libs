@@ -77,8 +77,10 @@ import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.modules.AbstractMultithreadedGenericStrategyModule;
 import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanAlgorithm.PlanLinkIdentifier;
 import playground.thibautd.socnetsim.replanning.selectors.EmptyIncompatiblePlansIdentifierFactory;
+import playground.thibautd.socnetsim.replanning.selectors.InverseScoreWeight;
 import playground.thibautd.socnetsim.replanning.selectors.LowestScoreSumSelectorForRemoval;
 import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
+import playground.thibautd.socnetsim.replanning.selectors.WeightedWeight;
 import playground.thibautd.socnetsim.router.JointTripRouterFactory;
 import playground.thibautd.socnetsim.run.WeightsConfigGroup.Synchro;
 import playground.thibautd.socnetsim.sharedvehicles.HouseholdBasedVehicleRessources;
@@ -265,7 +267,15 @@ public class RunCliquesWithHardCodedStrategies {
 		// create strategy manager
 		final GroupStrategyManager strategyManager =
 			new GroupStrategyManager( 
-					new LowestScoreSumSelectorForRemoval(
+					weights.isUseWeightedScoreSum() ?
+						new HighestWeightSelector(
+							true ,
+							controllerRegistry.getIncompatiblePlansIdentifierFactory(),
+							new WeightedWeight(
+								new InverseScoreWeight(),
+								weights.getWeightAttributeName(),
+								scenario.getPopulation().getPersonAttributes()  )) :
+						new LowestScoreSumSelectorForRemoval(
 							controllerRegistry.getIncompatiblePlansIdentifierFactory()),
 					strategyRegistry,
 					config.strategy().getMaxAgentPlanMemorySize());
