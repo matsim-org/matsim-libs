@@ -93,10 +93,9 @@ public class FlexibleCellNode {
 		 * TODO: add logic that selects links based on their capacity!
 		 */
 		for (FlexibleCellLink link : this.inLinksArrayCache) {
-			double rand = this.random.nextDouble();
-			int outFlowCapacity = link.getOutFlowCapacity(now, rand);
+
 //			while (link.isAcceptingFromUpstream() && outFlowCapacity > 0 && (context = link.getNextWaitingAgent(now)) != null) {
-			while (outFlowCapacity > 0 && link.hasWaitingToLeaveAgents(now)) {
+			while (link.hasWaitingToLeaveAgents(now)) {
 				
 				// peek next svehicleCell
 				VehicleCell vehicleCell = link.getNextWaitingVehicle(now);
@@ -104,8 +103,7 @@ public class FlexibleCellNode {
 				 * Try moving the agent over the node. This will fail if the agent's
 				 * next link has no free space. In this case stop moving agents.
 				 */
-				if (this.moveAgentOverNode(vehicleCell, now)) outFlowCapacity++;
-				else break;
+				if (!this.moveAgentOverNode(vehicleCell, now)) break;
 			}
 		}
 		

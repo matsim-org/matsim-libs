@@ -34,7 +34,6 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 
 import playground.christoph.mobsim.flexiblecells.events.VXYEvent;
 import playground.christoph.mobsim.flexiblecells.velocitymodels.GippsModel;
-import playground.christoph.mobsim.flexiblecells.velocitymodels.LeutzbachModel;
 import playground.christoph.mobsim.flexiblecells.velocitymodels.VelocityModel;
 
 public class FlexibleCellLink {
@@ -61,14 +60,7 @@ public class FlexibleCellLink {
 	private final double vehicleLength;	// so far hard-coded
 	private final double minSpaceCellLength;	// min space between two vehicles
 	private final double maxOutflowDistance;
-	
-	/*
-	 * If e.g. 1.5 vehicles can leave the link within a time step, then
-	 * minOutFlowPerTimeStep is 1 and outFlowFractionPerTimeStep is 0.5
-	 */
-	private final int minOutFlowPerTimeStep;
-	private final double outFlowFractionPerTimeStep;
-	
+		
 	private final VelocityModel velocityModel;
 	
 	/*
@@ -105,13 +97,9 @@ public class FlexibleCellLink {
 		this.timeStep = timeStep;
 
 //		this.velocityModel = new LeutzbachModel(this.timeStep);
-		this.velocityModel = new GippsModel();
-		
+		this.velocityModel = new GippsModel();	
 		
 		this.maxOutflowDistance = Math.min(this.link.getLength(), this.link.getFreespeed() * this.timeStep);
-		
-		this.minOutFlowPerTimeStep = (int) Math.floor(link.getCapacity() * this.timeStep / 3600.0);
-		this.outFlowFractionPerTimeStep = (link.getCapacity() * this.timeStep / 3600.0) - this.minOutFlowPerTimeStep;
 		
 		double dx = this.link.getToNode().getCoord().getX() - this.link.getFromNode().getCoord().getX();
 		double dy = this.link.getToNode().getCoord().getY() - this.link.getFromNode().getCoord().getY();
@@ -158,12 +146,6 @@ public class FlexibleCellLink {
 				else return false;
 			}
 		} else return false;
-	}
-	
-	/*package*/ int getOutFlowCapacity(double now, double random) {
-		
-		if (random < this.outFlowFractionPerTimeStep) return this.minOutFlowPerTimeStep + 1;
-		else return this.minOutFlowPerTimeStep;
 	}
 	
 	/*

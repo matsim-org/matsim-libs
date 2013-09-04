@@ -68,7 +68,6 @@ public class RunDemo {
 	private static String path = "../../matsim/mysimulations/CA/";
 	private static int populationSize = 200;
 	private static double timeStepSize = 0.25;
-	private static final double capacityFactor = 100;
 	
 	public static void main(String[] args) {
 		
@@ -86,42 +85,56 @@ public class RunDemo {
 		
 		NetworkFactory networkFactory = scenario.getNetwork().getFactory();
 		
-		Node n0 = networkFactory.createNode(scenario.createId("n0"), scenario.createCoord(   0.0, 0.0));
-		Node n1 = networkFactory.createNode(scenario.createId("n1"), scenario.createCoord(1000.0, 0.0));
-		Node n2 = networkFactory.createNode(scenario.createId("n2"), scenario.createCoord(2000.0, 0.0));
-		Node n3 = networkFactory.createNode(scenario.createId("n3"), scenario.createCoord(3000.0, 0.0));
-		Node n4 = networkFactory.createNode(scenario.createId("n4"), scenario.createCoord(4000.0, 0.0));
+		Node n0 = networkFactory.createNode(scenario.createId("n0"), scenario.createCoord(   0.0,    0.0));
+		Node n1 = networkFactory.createNode(scenario.createId("n1"), scenario.createCoord(1000.0,    0.0));
+		Node n2 = networkFactory.createNode(scenario.createId("n2"), scenario.createCoord(2000.0,    0.0));
+		Node n3 = networkFactory.createNode(scenario.createId("n3"), scenario.createCoord(3000.0,    0.0));
+		Node n4 = networkFactory.createNode(scenario.createId("n4"), scenario.createCoord(4000.0,    0.0));
+		Node n5 = networkFactory.createNode(scenario.createId("n5"), scenario.createCoord(5000.0,    0.0));
+		Node n6 = networkFactory.createNode(scenario.createId("n6"), scenario.createCoord(4000.0, 1000.0));
 		
 		scenario.getNetwork().addNode(n0);
 		scenario.getNetwork().addNode(n1);
 		scenario.getNetwork().addNode(n2);
 		scenario.getNetwork().addNode(n3);
 		scenario.getNetwork().addNode(n4);
+		scenario.getNetwork().addNode(n5);
+		scenario.getNetwork().addNode(n6);
 		
 		Link l0 = networkFactory.createLink(scenario.createId("l0"), n0, n1);
 		Link l1 = networkFactory.createLink(scenario.createId("l1"), n1, n2);
 		Link l2 = networkFactory.createLink(scenario.createId("l2"), n2, n3);
 		Link l3 = networkFactory.createLink(scenario.createId("l3"), n3, n4);
+		Link l4 = networkFactory.createLink(scenario.createId("l4"), n4, n5);
+		Link l5 = networkFactory.createLink(scenario.createId("l5"), n4, n6);
 		
 		l0.setLength(1000.0);
 		l1.setLength(1000.0);
 		l2.setLength(1000.0);
 		l3.setLength(1000.0);
+		l4.setLength(1000.0);
+		l5.setLength(1000.0);
 
 		l0.setFreespeed(120.0/3.6);	// allow many vehicle to leave link in one time-step for backspill
 		l1.setFreespeed(50.0/3.6);
 		l2.setFreespeed(20.0/3.6);
 		l3.setFreespeed(50.0/3.6);
+		l4.setFreespeed(50.0/3.6);
+		l5.setFreespeed(50.0/3.6);
 		
-		l0.setCapacity(4000.0 * capacityFactor);	// allow many vehicle to leave link in one time-step for backspill
-		l1.setCapacity(2000.0 * capacityFactor);
-		l2.setCapacity(500.0 * capacityFactor);
-		l3.setCapacity(2000.0 * capacityFactor);
+		l0.setCapacity(4000.0);	// allow many vehicle to leave link in one time-step for backspill
+		l1.setCapacity(2000.0);
+		l2.setCapacity(500.0);
+		l3.setCapacity(2000.0);
+		l4.setCapacity(2000.0);
+		l5.setCapacity(2000.0);
 		
 		scenario.getNetwork().addLink(l0);
 		scenario.getNetwork().addLink(l1);
 		scenario.getNetwork().addLink(l2);
 		scenario.getNetwork().addLink(l3);
+		scenario.getNetwork().addLink(l4);
+		scenario.getNetwork().addLink(l5);
 		
 		new NetworkWriter(scenario.getNetwork()).write(path + "network.xml");
 	}
@@ -131,18 +144,23 @@ public class RunDemo {
 		PopulationFactory populationFactory = scenario.getPopulation().getFactory();
 		
 		for (int i = 0; i < populationSize; i++) {
+			Id fromLinkId = scenario.createId("l0");
+			Id endLinkId;
+			if (MatsimRandom.getRandom().nextBoolean()) endLinkId = scenario.createId("l4");
+			else endLinkId = scenario.createId("l5");
 			Person p0 = populationFactory.createPerson(scenario.createId("p" + i));
 			Plan plan = populationFactory.createPlan();
-			Activity from = populationFactory.createActivityFromLinkId("home", scenario.createId("l0"));
+			Activity from = populationFactory.createActivityFromLinkId("home", fromLinkId);
 			from.setStartTime(0.0);
 			from.setEndTime(8.0*3600 + Math.round(MatsimRandom.getRandom().nextDouble() * 600));
 			Leg leg = populationFactory.createLeg(TransportMode.walk);
 			List<Id> linkIds = new ArrayList<Id>();
 			linkIds.add(scenario.createId("l1"));
 			linkIds.add(scenario.createId("l2"));
-			Route route = new LinkNetworkRouteImpl(scenario.createId("l0"), linkIds, scenario.createId("l3"));
+			linkIds.add(scenario.createId("l3"));
+			Route route = new LinkNetworkRouteImpl(scenario.createId("l0"), linkIds, endLinkId);
 			leg.setRoute(route);
-			Activity to = populationFactory.createActivityFromLinkId("home", scenario.createId("l3"));
+			Activity to = populationFactory.createActivityFromLinkId("home", endLinkId);
 			plan.addActivity(from);
 			plan.addLeg(leg);
 			plan.addActivity(to);
