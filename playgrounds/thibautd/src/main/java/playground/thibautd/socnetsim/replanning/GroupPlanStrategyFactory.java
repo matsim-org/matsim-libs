@@ -54,6 +54,7 @@ import playground.thibautd.socnetsim.replanning.selectors.highestweightselection
 import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifierFactory;
 import playground.thibautd.socnetsim.replanning.selectors.LogitSumSelector;
 import playground.thibautd.socnetsim.replanning.selectors.LogitWeight;
+import playground.thibautd.socnetsim.replanning.selectors.LossWeight;
 import playground.thibautd.socnetsim.replanning.selectors.LowestScoreOfJointPlanWeight;
 import playground.thibautd.socnetsim.replanning.selectors.RandomGroupLevelSelector;
 import playground.thibautd.socnetsim.replanning.selectors.WeightedWeight;
@@ -300,6 +301,21 @@ public class GroupPlanStrategyFactory {
 					 incompFact ,
 					 new LogitWeight(
 						new LowestScoreOfJointPlanWeight( jointPlans ),
+						MatsimRandom.getLocalInstance(),
+						config.planCalcScore().getBrainExpBeta()) ));
+	}
+
+	public static GroupPlanStrategy createMinLossSelectExpBeta(
+			final JointPlans jointPlans,
+			final IncompatiblePlansIdentifierFactory incompFact,
+			final Config config) {
+		return new GroupPlanStrategy(
+				 new HighestWeightSelector(
+					 incompFact ,
+					 new LogitWeight(
+						new LowestScoreOfJointPlanWeight(
+							new LossWeight(),
+							jointPlans ),
 						MatsimRandom.getLocalInstance(),
 						config.planCalcScore().getBrainExpBeta()) ));
 	}
