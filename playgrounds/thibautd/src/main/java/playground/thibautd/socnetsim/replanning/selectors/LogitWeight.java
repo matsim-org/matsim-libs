@@ -27,12 +27,21 @@ import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector.WeightCalculator;
 
 public class LogitWeight implements WeightCalculator {
+	private final WeightCalculator baseWeight;
 	private final Random random;
 	private final double scaleParameter;
 	
 	public LogitWeight(
 			final Random random,
 			final double scale) {
+		this( new ScoreWeight() , random , scale );
+	}
+
+	public LogitWeight(
+			final WeightCalculator baseWeight,
+			final Random random,
+			final double scale) {
+		this.baseWeight = baseWeight;
 		this.random = random;
 		this.scaleParameter = scale;
 	}
@@ -41,9 +50,7 @@ public class LogitWeight implements WeightCalculator {
 	public double getWeight(
 			final Plan indivPlan,
 			final ReplanningGroup group) {
-		final Double score = indivPlan.getScore();
-		if (score == null) return Double.POSITIVE_INFINITY;
-		return score + nextErrorTerm();
+		return baseWeight.getWeight( indivPlan , group ) + nextErrorTerm();
 	}
 
 	private double nextErrorTerm() {
