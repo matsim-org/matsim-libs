@@ -30,11 +30,19 @@ import playground.thibautd.socnetsim.replanning.selectors.highestweightselection
  * @author thibautd
  */
 public class LowestScoreOfJointPlanWeight implements WeightCalculator {
-	private final WeightCalculator baseWeight = new ScoreWeight();
+	private final WeightCalculator baseWeight;
 	private final JointPlans jointPlans;
+
 
 	public LowestScoreOfJointPlanWeight(
 			final JointPlans jointPlans) {
+		this( new ScoreWeight() , jointPlans );
+	}
+
+	public LowestScoreOfJointPlanWeight(
+			final WeightCalculator baseWeight,
+			final JointPlans jointPlans) {
+		this.baseWeight = baseWeight;
 		this.jointPlans = jointPlans;
 	}
 
