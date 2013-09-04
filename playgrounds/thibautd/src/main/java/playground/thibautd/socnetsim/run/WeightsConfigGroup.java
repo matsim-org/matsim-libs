@@ -47,7 +47,8 @@ public class WeightsConfigGroup extends ReflectiveModule {
 	public static enum GroupScoringType {
 		sum,
 		weightedSum,
-		min;
+		min,
+		minLoss;
 	}
 	private GroupScoringType groupScoringType = GroupScoringType.sum;
 

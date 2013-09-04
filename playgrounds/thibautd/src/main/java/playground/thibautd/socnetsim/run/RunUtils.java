@@ -145,6 +145,15 @@ public class RunUtils {
 						weights.getLogitSelectionWeight(),
 						-1);
 				break;
+			case minLoss:
+				strategyRegistry.addStrategy(
+						GroupPlanStrategyFactory.createMinLossSelectExpBeta(
+							controllerRegistry.getJointPlans(),
+							controllerRegistry.getIncompatiblePlansIdentifierFactory(),
+							config ),
+						weights.getLogitSelectionWeight(),
+						-1);
+				break;
 			default:
 				throw new RuntimeException( "unkown: "+weights.getGroupScoringType() );
 		}

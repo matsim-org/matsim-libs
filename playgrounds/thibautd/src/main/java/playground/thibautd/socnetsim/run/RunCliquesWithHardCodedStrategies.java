@@ -80,6 +80,7 @@ import playground.thibautd.socnetsim.replanning.selectors.EmptyIncompatiblePlans
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
 import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
 import playground.thibautd.socnetsim.replanning.selectors.InverseScoreWeight;
+import playground.thibautd.socnetsim.replanning.selectors.LossWeight;
 import playground.thibautd.socnetsim.replanning.selectors.LowestScoreOfJointPlanWeight;
 import playground.thibautd.socnetsim.replanning.selectors.LowestScoreSumSelectorForRemoval;
 import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector.WeightCalculator;
@@ -333,8 +334,26 @@ public class RunCliquesWithHardCodedStrategies {
 				return new LowestScoreSumSelectorForRemoval(
 						controllerRegistry.getIncompatiblePlansIdentifierFactory());
 			case min:
+				{ // scope to avoid errors with baseWeight in next case.
 				final WeightCalculator baseWeight =
 					new LowestScoreOfJointPlanWeight(
+							controllerRegistry.getJointPlans());
+				return new HighestWeightSelector(
+						true ,
+						controllerRegistry.getIncompatiblePlansIdentifierFactory(),
+						new WeightCalculator() {
+							@Override
+							public double getWeight(
+									final Plan indivPlan,
+									final ReplanningGroup replanningGroup) {
+								return -baseWeight.getWeight( indivPlan , replanningGroup );
+							}
+						});
+				}
+			case minLoss:
+				final WeightCalculator baseWeight =
+					new LowestScoreOfJointPlanWeight(
+							new LossWeight(),
 							controllerRegistry.getJointPlans());
 				return new HighestWeightSelector(
 						true ,
