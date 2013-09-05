@@ -20,6 +20,7 @@
 package playground.dgrether;
 
 import java.text.DecimalFormat;
+import java.util.regex.Matcher;
 
 
 
@@ -45,8 +46,21 @@ public class TestMain {
 		System.out.println(Double.toString(d));
 		DecimalFormat f = new DecimalFormat("#.#");
 		System.out.println(f.format(d));
+		f = new DecimalFormat("#.00");
+		System.out.println(f.format(d));
+		f = new DecimalFormat("#");
+		System.out.println(f.format(d));
+	
 	}
 	
+	private static void testReplaceAll() {
+		String test = "aasdf_asdf";
+		String test2 = test.replaceAll("_", Matcher.quoteReplacement(" "));
+		System.out.println(test2);
+		test = "asladfj % afddasjal";
+		test2 = test.replaceAll("%", Matcher.quoteReplacement("\\%"));
+		System.out.println(test2);
+	}
 
 	public static void main(String[] args){
 		String config = "/media/data/work/matsim/examples/stephan_rath/testcase3/config.xml";
@@ -54,6 +68,8 @@ public class TestMain {
 //		c.run();
 //		OTFVis.playConfig(config);
 		testNumberFormat();
+//		testReplaceAll();
 	}
+
 
 }
