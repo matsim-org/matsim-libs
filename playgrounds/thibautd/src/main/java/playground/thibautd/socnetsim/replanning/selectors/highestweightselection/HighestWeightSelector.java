@@ -40,6 +40,7 @@ import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 import playground.thibautd.socnetsim.replanning.selectors.GroupLevelPlanSelector;
 import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifier;
 import playground.thibautd.socnetsim.replanning.selectors.IncompatiblePlansIdentifierFactory;
+import playground.thibautd.socnetsim.replanning.selectors.WeightCalculator;
 
 /**
  * Selects the plan combination with the highest (implementation specific)
@@ -70,23 +71,6 @@ public final class HighestWeightSelector implements GroupLevelPlanSelector {
 		this.incompFactory = incompFactory;
 	}
 	
-	public static interface WeightCalculator {
-		/**
-		 * Defines the weight of a plan, used for selection.
-		 * The method is called once for each plan: it is not required that
-		 * the method returns the same result if called twice with the same
-		 * arguments (ie it can return a random number).
-		 *
-		 * @param indivPlan the plan to weight
-		 * @param replanningGroup the group for which plans are being selected.
-		 * Selectors using "niching" measures may need this. No modifications should
-		 * be done to the group.
-		 */
-		public double getWeight(
-				final Plan indivPlan,
-				final ReplanningGroup replanningGroup);
-	}
-
 	// /////////////////////////////////////////////////////////////////////////
 	// interface and abstract method
 	// /////////////////////////////////////////////////////////////////////////

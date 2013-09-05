@@ -22,7 +22,6 @@ package playground.thibautd.socnetsim.replanning.selectors;
 import org.matsim.api.core.v01.population.Plan;
 
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
-import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector.WeightCalculator;
 
 public class InverseScoreWeight implements WeightCalculator {
 	@Override

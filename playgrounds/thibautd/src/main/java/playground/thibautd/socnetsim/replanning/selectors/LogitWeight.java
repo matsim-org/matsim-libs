@@ -24,7 +24,6 @@ import java.util.Random;
 import org.matsim.api.core.v01.population.Plan;
 
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
-import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector.WeightCalculator;
 
 public class LogitWeight implements WeightCalculator {
 	private final WeightCalculator baseWeight;

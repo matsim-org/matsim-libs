@@ -1,6 +1,5 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * WeightedWeight.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,40 +16,26 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+
 package playground.thibautd.socnetsim.replanning.selectors;
 
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.thibautd.socnetsim.replanning.grouping.ReplanningGroup;
 
-/**
- * @author thibautd
- */
-public class WeightedWeight implements WeightCalculator {
-	private final WeightCalculator delegate;
-
-	private final String weightAttribute;
-	private final ObjectAttributes personAttributes;
-
-	public WeightedWeight(
-			final WeightCalculator delegate,
-			final String weightAttribute,
-			final ObjectAttributes personAttributes) {
-		this.delegate = delegate;
-		this.weightAttribute = weightAttribute;
-		this.personAttributes = personAttributes;
-	}
-
-	@Override
+public interface WeightCalculator {
+	/**
+	 * Defines the weight of a plan, used for selection.
+	 * The method is called once for each plan: it is not required that
+	 * the method returns the same result if called twice with the same
+	 * arguments (ie it can return a random number).
+	 *
+	 * @param indivPlan the plan to weight
+	 * @param replanningGroup the group for which plans are being selected.
+	 * Selectors using "niching" measures may need this. No modifications should
+	 * be done to the group.
+	 */
 	public double getWeight(
 			final Plan indivPlan,
-			final ReplanningGroup replanningGroup) {
-		final Double weight = (Double)
-			personAttributes.getAttribute(
-				indivPlan.getPerson().getId().toString(),
-				weightAttribute );
-		return (weight == null ? 1 : weight.doubleValue()) * delegate.getWeight( indivPlan , replanningGroup );
-	}
+			final ReplanningGroup replanningGroup);
 }
-
