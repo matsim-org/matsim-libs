@@ -200,6 +200,7 @@ public class RunCliquesWithHardCodedStrategies {
 					.withScoringFunctionFactory(
 							scoringFunctionConf.isUseKtiScoring() ?
 							new KtiScoringFunctionFactoryWithJointModes(
+								scoringFunctionConf.getAdditionalUtilityOfBeingDriver_s(),
 								new StageActivityTypesImpl(
 										Arrays.asList(
 												PtConstants.TRANSIT_ACTIVITY_TYPE,
@@ -463,6 +464,7 @@ class ScoringFunctionConfigGroup extends ReflectiveModule {
 	public static final String GROUP_NAME = "scoringFunction";
 	private boolean useKtiScoring = false;
 	private double marginalUtilityOfBeingTogether_h = 0;
+	private double additionalUtilityOfBeingDriver_h = 0;
 
 	static enum TogetherScoringForm {
 		linear,
@@ -517,6 +519,21 @@ class ScoringFunctionConfigGroup extends ReflectiveModule {
 
 	public void setTogetherScoringType(final TogetherScoringType togetherScoringType) {
 		this.togetherScoringType = togetherScoringType;
+	}
+
+	@StringGetter( "additionalUtilityOfBeingDriver_h" )
+	public double getAdditionalUtilityOfBeingDriver_h() {
+		return this.additionalUtilityOfBeingDriver_h;
+	}
+
+	public double getAdditionalUtilityOfBeingDriver_s() {
+		return this.additionalUtilityOfBeingDriver_h / 3600.;
+	}
+
+	@StringSetter( "additionalUtilityOfBeingDriver_h" )
+	public void setAdditionalUtilityOfBeingDriver_h(
+			double additionalUtilityOfBeingDriver_h) {
+		this.additionalUtilityOfBeingDriver_h = additionalUtilityOfBeingDriver_h;
 	}
 
 	@StringGetter( "togetherScoringForm" )
