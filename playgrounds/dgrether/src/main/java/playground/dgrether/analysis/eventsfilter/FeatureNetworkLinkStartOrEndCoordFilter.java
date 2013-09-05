@@ -36,7 +36,7 @@ import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * @author dgrether
- * @deprecated duplicated transformation, Envelope is already JTS
+ * @deprecated duplicated transformation, Envelope is already JTS, use EnvelopeLinkStartEndFilter
  */
 @Deprecated
 public class FeatureNetworkLinkStartOrEndCoordFilter implements NetworkLinkFilter {

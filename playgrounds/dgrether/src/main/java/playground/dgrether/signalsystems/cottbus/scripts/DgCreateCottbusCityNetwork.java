@@ -28,6 +28,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.geometry.BoundingBox;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.dgrether.DgPaths;
@@ -50,13 +52,22 @@ public class DgCreateCottbusCityNetwork {
 		String boundingBoxShape = DgPaths.REPOS + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/shape_files/signal_systems/cottbus_city_bounding_box.shp";
 		ShapeFileReader shapeReader = new ShapeFileReader();
 		shapeReader.readFileAndInitialize(boundingBoxShape);
-		Envelope env = shapeReader.getBounds();
+		SimpleFeature f = shapeReader.getFeatureSet().iterator().next();
+		BoundingBox bb = f.getBounds();
+		Envelope env = new Envelope(bb.getMinX(), bb.getMaxX(), bb.getMinY(), bb.getMaxY());
+//		Envelope env = shapeReader.getBounds();
 		
-		String fullNetwork = DgPaths.REPOS  + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network_wgs84_utm33n.xml.gz";
+		String fullNetworkFilename = DgPaths.REPOS  + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/network_wgs84_utm33n.xml.gz";
 		Scenario sc = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader netReader = new MatsimNetworkReader(sc);
-		netReader.readFile(fullNetwork);
-
+		netReader.readFile(fullNetworkFilename);
+		Network network = sc.getNetwork();
+		
+		CoordinateReferenceSystem netcrs = MGC.getCRS(TransformationFactory.WGS84_UTM33N);
+		
+//		NetworkFilterManager filterManager = new NetworkFilterManager(network);
+//		filterManager.addLinkFilter(new FeatureNetworkLinkStartOrEndCoordFilter(netcrs, env, shapeReader.getCoordinateSystem() ));
+//		Network cottbusCityNet = filterManager.applyFilters();
 		
 		DgNetShrinkImproved netShrink = new DgNetShrinkImproved();
 		Network cottbusCityNet = netShrink.createSmallNetwork(sc.getNetwork(), env);
@@ -65,8 +76,7 @@ public class DgCreateCottbusCityNetwork {
 		NetworkWriter netWriter = new NetworkWriter(cottbusCityNet);
 		netWriter.write(cityNetwork + ".xml.gz");
 		
-		CoordinateReferenceSystem crs = MGC.getCRS(TransformationFactory.WGS84_UTM33N);
-		DgNetworkUtils.writeNetwork2Shape(cottbusCityNet, crs, cityNetwork);
+		DgNetworkUtils.writeNetwork2Shape(cottbusCityNet, netcrs, cityNetwork);
 
 	}
 
