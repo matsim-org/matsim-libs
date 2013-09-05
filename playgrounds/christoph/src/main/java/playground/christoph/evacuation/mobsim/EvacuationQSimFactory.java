@@ -41,11 +41,9 @@ import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgentFactory;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.JointDepartureOrganizer;
-import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelPassengerQNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.withinday.mobsim.WithinDayEngine;
@@ -80,18 +78,6 @@ public class EvacuationQSimFactory implements MobsimFactory {
             throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
         }
         
-        // Get number of parallel Threads
-        int numOfThreads = conf.getNumberOfThreads();
-        QNetsimEngineFactory netsimEngineFactory;
-        if (numOfThreads > 1) {
-        	if (!(eventsManager instanceof SimStepParallelEventsManagerImpl)) {
-        		eventsManager = new SynchronizedEventsManagerImpl(eventsManager);        		
-        	}
-        	netsimEngineFactory = new ParallelQNetsimEngineFactory();
-            log.info("Using parallel QSim with " + numOfThreads + " threads.");
-        } else {
-        	netsimEngineFactory = new DefaultQSimEngineFactory();
-        }
 		QSim qSim = new QSim(sc, eventsManager);
 		
 		ActivityEngine activityEngine = new ActivityEngine();
@@ -103,10 +89,24 @@ public class EvacuationQSimFactory implements MobsimFactory {
 		 * as well as its (super)VehicularDepartureHandler to the QSim.
 		 * The later one handles non-joint departures.
 		 */
-		PassengerQNetsimEngine netsimEngine = new PassengerQNetsimEngine(qSim, MatsimRandom.getLocalInstance(), jointDepartureOrganizer);
-		qSim.addMobsimEngine(netsimEngine);
-		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
-		qSim.addDepartureHandler(netsimEngine.getVehicularDepartureHandler());
+		// Get number of parallel Threads
+		int numOfThreads = conf.getNumberOfThreads();
+		if (numOfThreads > 1) {
+			if (!(eventsManager instanceof SimStepParallelEventsManagerImpl)) {
+				eventsManager = new SynchronizedEventsManagerImpl(eventsManager);        		
+			}
+			ParallelPassengerQNetsimEngine netsimEngine = new ParallelPassengerQNetsimEngine(qSim, MatsimRandom.getLocalInstance(), jointDepartureOrganizer);
+			qSim.addMobsimEngine(netsimEngine);
+			qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
+			qSim.addDepartureHandler(netsimEngine.getVehicularDepartureHandler());
+
+			log.info("Using parallel PassengerQSim with " + numOfThreads + " threads.");
+		} else {
+			PassengerQNetsimEngine netsimEngine = new PassengerQNetsimEngine(qSim, MatsimRandom.getLocalInstance(), jointDepartureOrganizer);
+			qSim.addMobsimEngine(netsimEngine);
+			qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
+			qSim.addDepartureHandler(netsimEngine.getVehicularDepartureHandler());
+		}
 			
 		MultiModalSimEngine multiModalEngine = new MultiModalSimEngineFactory().createMultiModalSimEngine(qSim, this.multiModalTravelTimes);
 		qSim.addMobsimEngine(multiModalEngine);
