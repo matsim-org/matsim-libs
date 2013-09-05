@@ -67,6 +67,8 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.households.Household;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
+import playground.christoph.evacuation.controler.EvacuationConstants;
+
 import com.vividsolutions.jts.geom.Geometry;
 
 public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, 
@@ -129,7 +131,8 @@ public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler,
 			if (isAffected) {
 				// mark household as resident household and add it to the HHTP map
 				residentHouseholds.add(household.getId());
-				int HHTP = Integer.valueOf(String.valueOf(householdObjectAttributes.getAttribute(household.getId().toString(), "HHTP")));
+				int HHTP = Integer.valueOf(String.valueOf(householdObjectAttributes.getAttribute(household.getId().toString(),
+						EvacuationConstants.HOUSEHOLD_HHTP)));
 				List<Id> list = residentHouseholdHHTPs.get(HHTP);
 				if (list == null) {
 					list = new ArrayList<Id>();

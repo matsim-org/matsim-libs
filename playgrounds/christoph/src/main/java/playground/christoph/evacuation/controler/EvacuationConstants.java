@@ -44,4 +44,13 @@ public abstract class EvacuationConstants implements MatsimParameters {
 	 * Activity which agents perform outside the evacuation area.
 	 */
 	public static final String RESCUE_ACTIVITY = "rescue";
+	
+	/**
+	 * Household object attributes
+	 */
+	public static final String HOUSEHOLD_HHTP = "HHTP";
+	public static final String HOUSEHOLD_HOMEFACILITYID = "homeFacilityId";
+	public static final String HOUSEHOLD_MUNICIPALITY = "municipality";
+	public static final String HOUSEHOLD_X_COORDINATE = "x";
+	public static final String HOUSEHOLD_Y_COORDINATE = "y";
 }

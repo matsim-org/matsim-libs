@@ -29,6 +29,7 @@ import org.matsim.households.Household;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
+import playground.christoph.evacuation.controler.EvacuationConstants;
 import playground.christoph.evacuation.mobsim.AgentPosition;
 import playground.christoph.evacuation.mobsim.HouseholdPosition;
 import playground.christoph.evacuation.mobsim.HouseholdsTracker;
@@ -122,7 +123,8 @@ public class DecisionDataGrabber {
 			
 			HouseholdDecisionData hdd = decisionDataProvider.getHouseholdDecisionData(household.getId());			
 
-			String homeFacilityIdString = this.householdObjectAttributes.getAttribute(household.getId().toString(), "homeFacilityId").toString();
+			String homeFacilityIdString = this.householdObjectAttributes.getAttribute(household.getId().toString(), 
+					EvacuationConstants.HOUSEHOLD_HOMEFACILITYID).toString();
 			Id homeFacilityId = this.scenario.createId(homeFacilityIdString);
 			ActivityFacility homeFacility = this.scenario.getActivityFacilities().getFacilities().get(homeFacilityId);
 			

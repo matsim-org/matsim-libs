@@ -40,6 +40,8 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 
+import playground.christoph.evacuation.controler.EvacuationConstants;
+
 /**
  * @author cdobler
  */
@@ -76,7 +78,7 @@ public class EvacuationPopulationAgentSource implements AgentSource {
         	}
 
         	// get household's home facility
-			String homeFacilityIdString = this.householdObjectAttributes.getAttribute(household.getId().toString(), "homeFacilityId").toString();
+			String homeFacilityIdString = this.householdObjectAttributes.getAttribute(household.getId().toString(), EvacuationConstants.HOUSEHOLD_HOMEFACILITYID).toString();
 			Id homeFacilityId = this.scenario.createId(homeFacilityIdString);
 			ActivityFacility homeFacility = this.scenario.getActivityFacilities().getFacilities().get(homeFacilityId);
         	        	
