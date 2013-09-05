@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 
@@ -54,7 +53,7 @@ public class PersonPrepareForSim extends AbstractPersonAlgorithm {
 
 	private final PlanAlgorithm router;
 	private final XY2Links xy2links;
-	private final Network  network;
+	private final Network network;
 
 	private static final Logger log = Logger.getLogger(PersonPrepareForSim.class);
 
@@ -71,13 +70,7 @@ public class PersonPrepareForSim extends AbstractPersonAlgorithm {
 			modes.add(TransportMode.car);
 			filter.filter(net, modes);
 		}
-		if ( scenario instanceof ScenarioImpl ) {
-			// yy not great.  but I found it such that it would always a ScenarioImpl, which is unnecessary since XY2Links can
-			// handle activity facilities being a null reference.  kai, jun'12
-			this.xy2links = new XY2Links(net, ((ScenarioImpl)scenario).getActivityFacilities());
-		} else {
-			this.xy2links = new XY2Links(net, null );
-		}
+		this.xy2links = new XY2Links(net, scenario.getActivityFacilities());
 	}
 	
 	@Deprecated

@@ -22,6 +22,7 @@ package org.matsim.population.algorithms;
 
 import java.util.List;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -31,7 +32,6 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
-import org.matsim.core.scenario.ScenarioImpl;
 
 /**
  * Assigns each activity in a plan a link where the activity takes place
@@ -57,7 +57,7 @@ public class XY2Links extends AbstractPersonAlgorithm implements PlanAlgorithm {
 		hasFacilities = (facilities != null);
 	}
 
-	public XY2Links(final ScenarioImpl scenario) {
+	public XY2Links(final Scenario scenario) {
 		this(scenario.getNetwork(), scenario.getActivityFacilities());
 	}
 	
