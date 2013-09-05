@@ -39,6 +39,7 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegR
 import org.matsim.withinday.utils.ReplacePlanElements;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
+import playground.christoph.evacuation.controler.EvacuationConstants;
 
 /*
  * If an Agent performs a Leg in the secure area (or at least the
@@ -107,8 +108,8 @@ public class CurrentLegToSecureFacilityReplanner extends WithinDayDuringLegRepla
 			/*
 			 * Now we add a new Activity at the rescue facility.
 			 */
-			rescueActivity = scenario.getPopulation().getFactory().createActivityFromLinkId("secure", nextLink.getId());
-			String idString = "secureFacility" + nextLink.getId();
+			rescueActivity = scenario.getPopulation().getFactory().createActivityFromLinkId(EvacuationConstants.SECURE_ACTIVITY, nextLink.getId());
+			String idString = EvacuationConstants.SECURE_FACILITY + nextLink.getId();
 			((ActivityImpl)rescueActivity).setFacilityId(scenario.createId(idString));
 			rescueActivity.setEndTime(Time.UNDEFINED_TIME);
 			

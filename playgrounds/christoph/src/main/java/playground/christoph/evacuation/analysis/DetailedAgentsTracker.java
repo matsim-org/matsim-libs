@@ -63,7 +63,6 @@ import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandle
 import org.matsim.core.api.experimental.events.handler.GenericEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.facilities.Facility;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -83,6 +82,7 @@ import org.matsim.core.utils.misc.Time;
 import org.matsim.households.Household;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
+import playground.christoph.evacuation.controler.EvacuationConstants;
 import playground.christoph.evacuation.events.PersonInformationEvent;
 import playground.christoph.evacuation.events.PersonInformationEventImpl;
 import playground.christoph.evacuation.events.handler.PersonInformationEventHandler;
@@ -92,7 +92,6 @@ import playground.christoph.evacuation.mobsim.Tracker.Position;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.mobsim.decisiondata.HouseholdDecisionData;
 import playground.christoph.evacuation.mobsim.decisionmodel.EvacuationDecisionModel.EvacuationDecision;
-import playground.christoph.evacuation.withinday.replanning.replanners.CurrentLegToMeetingPointReplanner;
 
 public class DetailedAgentsTracker implements GenericEventHandler, PersonInformationEventHandler,
 		AgentDepartureEventHandler, AgentArrivalEventHandler, AgentWait2LinkEventHandler, LinkEnterEventHandler,
@@ -675,7 +674,7 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 							double endHomeActivityTime = Double.MAX_VALUE;
 							for (int i = copy.size() - 1; i >= 0; i--) {
 								Activity activity = copy.get(i);
-								if (activity.getType().equals(CurrentLegToMeetingPointReplanner.activityType)) {
+								if (activity.getType().equals(EvacuationConstants.MEET_ACTIVITY)) {
 									endHomeActivityTime = activity.getEndTime();
 									this.returnHomeTimes.put(personId, activity.getStartTime());
 									foundHomeActivity = true;
@@ -761,7 +760,7 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 						double endHomeActivityTime = Double.MAX_VALUE;
 						for (int i = copy.size() - 1; i >= 0; i--) {
 							Activity activity = copy.get(i);
-							if (activity.getType().equals(CurrentLegToMeetingPointReplanner.activityType)) {
+							if (activity.getType().equals(EvacuationConstants.MEET_ACTIVITY)) {
 								endHomeActivityTime = activity.getEndTime();
 								this.returnHomeTimes.put(personId, activity.getStartTime());
 								foundHomeActivity = true;
@@ -926,7 +925,7 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 							double endHomeActivityTime = Double.MAX_VALUE;
 							for (int i = copy.size() - 1; i >= 0; i--) {
 								Activity activity = copy.get(i);
-								if (activity.getType().equals(CurrentLegToMeetingPointReplanner.activityType)) {
+								if (activity.getType().equals(EvacuationConstants.MEET_ACTIVITY)) {
 									endHomeActivityTime = activity.getEndTime();
 									this.returnHomeTimes.put(personId, activity.getStartTime());
 									foundHomeActivity = true;
@@ -1012,7 +1011,7 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 						double endHomeActivityTime = Double.MAX_VALUE;
 						for (int i = copy.size() - 1; i >= 0; i--) {
 							Activity activity = copy.get(i);
-							if (activity.getType().equals(CurrentLegToMeetingPointReplanner.activityType)) {
+							if (activity.getType().equals(EvacuationConstants.MEET_ACTIVITY)) {
 								endHomeActivityTime = activity.getEndTime();
 								this.returnHomeTimes.put(personId, activity.getStartTime());
 								foundHomeActivity = true;

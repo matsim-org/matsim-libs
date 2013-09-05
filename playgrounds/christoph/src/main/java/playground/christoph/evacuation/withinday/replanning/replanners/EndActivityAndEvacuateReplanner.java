@@ -40,6 +40,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 
+import playground.christoph.evacuation.controler.EvacuationConstants;
 import playground.christoph.evacuation.trafficmonitoring.SwissPTTravelTime;
 
 public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityReplanner {
@@ -93,10 +94,11 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 		 * We add no endtime therefore the activity will last until the end of
 		 * the simulation.
 		 */
-		Activity rescueActivity = factory.createActivityFromLinkId("rescue", scenario.createId("rescueLink"));
-		((ActivityImpl)rescueActivity).setFacilityId(scenario.createId("rescueFacility"));
+		Activity rescueActivity = factory.createActivityFromLinkId(EvacuationConstants.RESCUE_ACTIVITY, 
+				scenario.createId(EvacuationConstants.RESCUE_LINK));
+		((ActivityImpl)rescueActivity).setFacilityId(scenario.createId(EvacuationConstants.RESCUE_FACILITY));
 		
-		Coord rescueCoord = ((ScenarioImpl)scenario).getActivityFacilities().getFacilities().get(scenario.createId("rescueFacility")).getCoord();
+		Coord rescueCoord = ((ScenarioImpl)scenario).getActivityFacilities().getFacilities().get(scenario.createId(EvacuationConstants.RESCUE_FACILITY)).getCoord();
 		((ActivityImpl)rescueActivity).setCoord(rescueCoord);
 		
 		// create a leg using the identified transport mode
@@ -124,7 +126,7 @@ public class EndActivityAndEvacuateReplanner extends WithinDayDuringActivityRepl
 		if (route.getLinkIds().size() > 1) {
 			endLinkId = route.getLinkIds().get(route.getLinkIds().size() - 2);			
 		} else endLinkId = route.getStartLinkId();
-		((ActivityImpl) rescueActivity).setFacilityId(scenario.createId("rescueFacility" + endLinkId.toString()));
+		((ActivityImpl) rescueActivity).setFacilityId(scenario.createId(EvacuationConstants.RESCUE_FACILITY + endLinkId.toString()));
 		((ActivityImpl) rescueActivity).setLinkId(endLinkId);
 		NetworkRoute subRoute2 = route.getSubRoute(route.getStartLinkId(), endLinkId);
 		legToRescue.setRoute(subRoute2);

@@ -42,6 +42,7 @@ import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 
+import playground.christoph.evacuation.controler.EvacuationConstants;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.mobsim.decisiondata.PersonDecisionData;
 import playground.christoph.evacuation.trafficmonitoring.SwissPTTravelTime;
@@ -50,8 +51,6 @@ import playground.christoph.evacuation.withinday.replanning.utils.ModeAvailabili
 public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActivityReplanner {
 	
 	private static final Logger log = Logger.getLogger(CurrentActivityToMeetingPointReplanner.class);
-	
-	private static final String activityType = "meetHousehold";
 	
 	protected final DecisionDataProvider decisionDataProvider;
 	protected final ModeAvailabilityChecker modeAvailabilityChecker;
@@ -105,7 +104,7 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 		Id meetingPointId = decisionDataProvider.getHouseholdDecisionData(householdId).getMeetingPointFacilityId(); 
 		
 		if (currentActivity.getFacilityId().equals(meetingPointId)) {
-			currentActivity.setType(activityType);
+			currentActivity.setType(EvacuationConstants.MEET_ACTIVITY);
 			currentActivity.setMaximumDuration(Time.UNDEFINED_TIME);
 			currentActivity.setEndTime(Double.POSITIVE_INFINITY);
 			
@@ -119,7 +118,7 @@ public class CurrentActivityToMeetingPointReplanner extends WithinDayDuringActiv
 			 * which is located there. Additionally, we set a new end time for the current Activity.
 			 */		
 			ActivityFacility meetingFacility = scenario.getActivityFacilities().getFacilities().get(meetingPointId);
-			Activity meetingActivity = scenario.getPopulation().getFactory().createActivityFromLinkId(activityType, meetingFacility.getLinkId());
+			Activity meetingActivity = scenario.getPopulation().getFactory().createActivityFromLinkId(EvacuationConstants.MEET_ACTIVITY, meetingFacility.getLinkId());
 			((ActivityImpl) meetingActivity).setFacilityId(meetingPointId);
 			((ActivityImpl)meetingActivity).setCoord(meetingFacility.getCoord());
 			meetingActivity.setEndTime(Double.POSITIVE_INFINITY);

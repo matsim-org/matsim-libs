@@ -40,6 +40,7 @@ import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringActivityReplanner;
 
+import playground.christoph.evacuation.controler.EvacuationConstants;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.mobsim.decisiondata.PersonDecisionData;
 import playground.christoph.evacuation.trafficmonitoring.SwissPTTravelTime;
@@ -55,8 +56,6 @@ import playground.christoph.evacuation.withinday.replanning.identifiers.JoinedHo
 public class JoinedHouseholdsReplanner extends WithinDayDuringActivityReplanner {
 
 	private static final Logger log = Logger.getLogger(JoinedHouseholdsReplanner.class);
-	
-	public static final String activityType = "rescue";
 	
 	private final DecisionDataProvider decisionDataProvider;
 	private final JoinedHouseholdsIdentifier identifier;
@@ -112,7 +111,8 @@ public class JoinedHouseholdsReplanner extends WithinDayDuringActivityReplanner 
 		 * which is located there. Additionally, we set a new end time for the current Activity.
 		 */
 		ActivityFacility meetingFacility = scenario.getActivityFacilities().getFacilities().get(meetingPointId);
-		Activity meetingActivity = scenario.getPopulation().getFactory().createActivityFromLinkId(activityType, meetingFacility.getLinkId());
+		Activity meetingActivity = scenario.getPopulation().getFactory().createActivityFromLinkId(
+				EvacuationConstants.RESCUE_ACTIVITY, meetingFacility.getLinkId());
 		((ActivityImpl) meetingActivity).setFacilityId(meetingPointId);
 		((ActivityImpl)meetingActivity).setCoord(meetingFacility.getCoord());
 		meetingActivity.setEndTime(Double.POSITIVE_INFINITY);

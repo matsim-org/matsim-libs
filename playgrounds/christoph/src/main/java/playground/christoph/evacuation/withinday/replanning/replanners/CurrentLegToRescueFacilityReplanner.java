@@ -37,6 +37,7 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegR
 import org.matsim.withinday.utils.ReplacePlanElements;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
+import playground.christoph.evacuation.controler.EvacuationConstants;
 
 public class CurrentLegToRescueFacilityReplanner extends WithinDayDuringLegReplanner {
 
@@ -72,11 +73,12 @@ public class CurrentLegToRescueFacilityReplanner extends WithinDayDuringLegRepla
 		/*
 		 * Create new Activity at the rescue facility.
 		 */
-		Activity rescueActivity = scenario.getPopulation().getFactory().createActivityFromLinkId("rescue", scenario.createId("rescueLink"));
-		((ActivityImpl)rescueActivity).setFacilityId(scenario.createId("rescueFacility"));
+		Activity rescueActivity = scenario.getPopulation().getFactory().createActivityFromLinkId(EvacuationConstants.RESCUE_ACTIVITY, 
+				scenario.createId(EvacuationConstants.RESCUE_LINK));
+		((ActivityImpl)rescueActivity).setFacilityId(scenario.createId(EvacuationConstants.RESCUE_FACILITY));
 		rescueActivity.setEndTime(Time.UNDEFINED_TIME);
 
-		Coord rescueCoord = ((ScenarioImpl)scenario).getActivityFacilities().getFacilities().get(scenario.createId("rescueFacility")).getCoord();
+		Coord rescueCoord = ((ScenarioImpl)scenario).getActivityFacilities().getFacilities().get(scenario.createId(EvacuationConstants.RESCUE_FACILITY)).getCoord();
 		((ActivityImpl)rescueActivity).setCoord(rescueCoord);
 		
 		/*

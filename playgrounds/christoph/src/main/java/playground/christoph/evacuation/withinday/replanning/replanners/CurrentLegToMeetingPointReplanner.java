@@ -33,6 +33,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.withinday.replanning.replanners.interfaces.WithinDayDuringLegReplanner;
 import org.matsim.withinday.utils.ReplacePlanElements;
 
+import playground.christoph.evacuation.controler.EvacuationConstants;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.mobsim.decisiondata.PersonDecisionData;
 
@@ -44,8 +45,6 @@ import playground.christoph.evacuation.mobsim.decisiondata.PersonDecisionData;
  * @author cdobler
  */
 public class CurrentLegToMeetingPointReplanner extends WithinDayDuringLegReplanner {
-
-	public static final String activityType = "meetHousehold";
 	
 	protected final DecisionDataProvider decisionDataProvider;
 	protected final TripRouter tripRouter;
@@ -79,7 +78,7 @@ public class CurrentLegToMeetingPointReplanner extends WithinDayDuringLegReplann
 		Id householdId = pdd.getHouseholdId();
 		Id meetingPointId = decisionDataProvider.getHouseholdDecisionData(householdId).getMeetingPointFacilityId(); 		
 		ActivityFacility meetingFacility = scenario.getActivityFacilities().getFacilities().get(meetingPointId);
-		Activity meetingActivity = scenario.getPopulation().getFactory().createActivityFromLinkId(activityType, meetingFacility.getLinkId());
+		Activity meetingActivity = scenario.getPopulation().getFactory().createActivityFromLinkId(EvacuationConstants.MEET_ACTIVITY, meetingFacility.getLinkId());
 		((ActivityImpl) meetingActivity).setFacilityId(meetingPointId);
 		((ActivityImpl)meetingActivity).setCoord(meetingFacility.getCoord());
 		meetingActivity.setEndTime(Double.POSITIVE_INFINITY);
