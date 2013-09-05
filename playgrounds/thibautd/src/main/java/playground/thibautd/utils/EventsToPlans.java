@@ -51,13 +51,27 @@ public class EventsToPlans implements ActivityStartEventHandler, ActivityEndEven
 	private boolean locked = false;
 	private final Map<Id, Plan> agentsPlans = new HashMap<Id, Plan>();
 
+	public static interface IdFilter {
+		public boolean accept(final Id id);
+	}
+
 	public EventsToPlans() {
+		this( new IdFilter() {
+			@Override
+			public boolean accept(final Id id) {
+				return true;
+			}
+		});
+	}
+
+	public EventsToPlans(final IdFilter filter) {
 		eventsToActivities.setActivityHandler(
 				new ActivityHandler() {
 					@Override
 					public void handleActivity(
 							final Id agentId,
 							final Activity activity) {
+						if ( !filter.accept( agentId ) ) return;
 						final Plan plan =
 							MapUtils.getArbitraryObject(
 								agentId,
@@ -77,6 +91,7 @@ public class EventsToPlans implements ActivityStartEventHandler, ActivityEndEven
 					public void handleLeg(
 							final Id agentId,
 							final Leg leg) {
+						if ( !filter.accept( agentId ) ) return;
 						final Plan plan =
 							MapUtils.getArbitraryObject(
 								agentId,
