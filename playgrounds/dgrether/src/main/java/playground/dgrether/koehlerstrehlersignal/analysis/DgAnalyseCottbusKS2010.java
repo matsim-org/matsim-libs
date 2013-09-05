@@ -724,7 +724,7 @@ public class DgAnalyseCottbusKS2010 {
 		String cityNetwork = DgPaths.REPOS  + "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/cottbus_city_network/network_city_wgs84_utm33n.xml.gz";
 		Scenario sc2 = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		MatsimNetworkReader netReader2= new MatsimNetworkReader(sc2);
-		netReader.readFile(cityNetwork);
+		netReader2.readFile(cityNetwork);
 		e = new Extent();
 		e.name = "city";
 		e.network = sc2.getNetwork();
