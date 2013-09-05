@@ -46,6 +46,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelPassengerQNetsimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioImpl;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.withinday.mobsim.WithinDayEngine;
 
 import playground.christoph.evacuation.config.EvacuationConfig;
@@ -58,14 +59,16 @@ public class EvacuationQSimFactory implements MobsimFactory {
     private final static Logger log = Logger.getLogger(EvacuationQSimFactory.class);
     
     private final WithinDayEngine withinDayEngine;
+    private final ObjectAttributes householdObjectAttributes;
     private final JointDepartureOrganizer jointDepartureOrganizer;
     private final Map<String, TravelTime> multiModalTravelTimes;
     
     private int householdsInformerRNG = 132456;
     
-    public EvacuationQSimFactory(WithinDayEngine withinDayEngine,
+    public EvacuationQSimFactory(WithinDayEngine withinDayEngine, ObjectAttributes householdObjectAttributes,
     		JointDepartureOrganizer jointDepartureOrganizer, Map<String, TravelTime> multiModalTravelTimes) {
     	this.withinDayEngine = withinDayEngine;
+    	this.householdObjectAttributes = householdObjectAttributes;
     	this.jointDepartureOrganizer = jointDepartureOrganizer;
     	this.multiModalTravelTimes = multiModalTravelTimes;
     }
@@ -121,7 +124,7 @@ public class EvacuationQSimFactory implements MobsimFactory {
 		this.householdsInformerRNG++;
 		
         AgentFactory agentFactory = new ExperimentalBasicWithindayAgentFactory(qSim);
-        AgentSource agentSource = new EvacuationPopulationAgentSource(sc, agentFactory, qSim);
+        AgentSource agentSource = new EvacuationPopulationAgentSource(sc, agentFactory, qSim, this.householdObjectAttributes);
         qSim.addAgentSource(agentSource);
         
         qSim.addMobsimEngine(withinDayEngine);

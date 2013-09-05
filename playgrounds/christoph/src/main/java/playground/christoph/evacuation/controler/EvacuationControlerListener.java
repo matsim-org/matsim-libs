@@ -224,7 +224,7 @@ public class EvacuationControlerListener implements StartupListener {
 		 * household and adds the replanning Manager as mobsim engine.
 		 */
 		MobsimFactory mobsimFactory = new EvacuationQSimFactory(this.withinDayControlerListener.getWithinDayEngine(), 
-				this.jointDepartureOrganizer, this.multiModalControlerListener.getMultiModalTravelTimes());
+				this.householdObjectAttributes, this.jointDepartureOrganizer, this.multiModalControlerListener.getMultiModalTravelTimes());
 		event.getControler().setMobsimFactory(mobsimFactory);
 	}
 

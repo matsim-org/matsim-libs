@@ -505,7 +505,8 @@ public class EvacuationControler extends WithinDayController implements
 		 * Use a MobsimFactory which creates vehicles according to available vehicles per
 		 * household and adds the replanning Manager as mobsim engine.
 		 */
-		MobsimFactory mobsimFactory = new EvacuationQSimFactory(this.getWithinDayEngine(), this.jointDepartureOrganizer, travelTimes);
+		MobsimFactory mobsimFactory = new EvacuationQSimFactory(this.getWithinDayEngine(), this.householdObjectAttributes, 
+				this.jointDepartureOrganizer, travelTimes);
 		this.setMobsimFactory(mobsimFactory);
 		
 		/*
