@@ -20,9 +20,7 @@
 package playground.dgrether.koehlerstrehlersignal.analysis;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -35,9 +33,6 @@ import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.signalsystems.data.SignalsData;
-
-import playground.dgrether.signalsystems.utils.DgSignalsUtils;
 
 
 /**
@@ -48,19 +43,11 @@ import playground.dgrether.signalsystems.utils.DgSignalsUtils;
 public class TTTotalDelay implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandler, AgentStuckEventHandler{
 
 	private Network network;
-	private Set<Id> signalizedLinks;
 	private Map<Id, LinkEnterEvent> linkEnterByPerson;
 	private double totalDelay;
 
-	public TTTotalDelay(Network network, SignalsData signals) {
+	public TTTotalDelay(Network network) {
 		this.network = network;
-		
-		Map<Id, Set<Id>> signalsToLinks = DgSignalsUtils.calculateSignalizedLinksPerSystem(signals.getSignalSystemsData());
-		this.signalizedLinks = new HashSet<Id>();
-		for (Set<Id> linkSet : signalsToLinks.values()){
-			this.signalizedLinks.addAll(linkSet);
-		}
-		
 		this.reset(0);
 	}
 
@@ -73,7 +60,7 @@ public class TTTotalDelay implements LinkEnterEventHandler, LinkLeaveEventHandle
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		//calculate total delay for signalized links, so the delay caused by the signals
-		if (this.signalizedLinks.contains(event.getLinkId())) {
+		if (this.network.getLinks().containsKey(event.getLinkId())) {
 			LinkEnterEvent linkEnterEvent = this.linkEnterByPerson.remove(event.getPersonId());
 			Link link = this.network.getLinks().get(event.getLinkId());
 			double freespeedTravelTime = link.getLength()/link.getFreespeed();
@@ -85,7 +72,7 @@ public class TTTotalDelay implements LinkEnterEventHandler, LinkLeaveEventHandle
 
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
-		if (this.signalizedLinks.contains(event.getLinkId())) {
+		if (this.network.getLinks().containsKey(event.getLinkId())) {
 			this.linkEnterByPerson.put(event.getPersonId(), event);
 		}
 	}

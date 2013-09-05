@@ -46,6 +46,8 @@ public class DgAverageTravelTimeSpeed implements LinkEnterEventHandler, LinkLeav
 	private Map<Id, LinkEnterEvent> linkEnterByPerson;
 	private Set<Id> seenPersonIds;
 	private double travelTime;
+	private double distance;
+	private double numberOfTrips;
 
 	public DgAverageTravelTimeSpeed(Network network) {
 		this.network = network;
@@ -57,6 +59,8 @@ public class DgAverageTravelTimeSpeed implements LinkEnterEventHandler, LinkLeav
 		this.linkEnterByPerson = new HashMap<Id, LinkEnterEvent>();
 		this.seenPersonIds = new HashSet<Id>();
 		this.travelTime = 0.0;
+		this.distance = 0.0;
+		this.numberOfTrips = 0.0;
 	}
 
 	@Override
@@ -65,6 +69,7 @@ public class DgAverageTravelTimeSpeed implements LinkEnterEventHandler, LinkLeav
 			LinkEnterEvent linkEnterEvent = this.linkEnterByPerson.remove(event.getPersonId());
 			if (linkEnterEvent != null) {
 				this.travelTime += event.getTime() - linkEnterEvent.getTime();
+				this.distance += network.getLinks().get(event.getLinkId()).getLength();
 			}
 		}
 	}
@@ -84,6 +89,9 @@ public class DgAverageTravelTimeSpeed implements LinkEnterEventHandler, LinkLeav
 
 	@Override
 	public void handleEvent(AgentArrivalEvent event) {
+		if (this.seenPersonIds.contains(event.getPersonId())){
+			this.numberOfTrips++;
+		}
 		this.linkEnterByPerson.remove(event.getPersonId());		
 	}
 
@@ -94,6 +102,14 @@ public class DgAverageTravelTimeSpeed implements LinkEnterEventHandler, LinkLeav
 	
 	public double getNumberOfPersons(){
 		return this.seenPersonIds.size();
+	}
+	
+	public double getDistanceMeter(){
+		return this.distance;
+	}
+	
+	public double getNumberOfTrips(){
+		return this.numberOfTrips;
 	}
 
 
