@@ -36,7 +36,7 @@ public class PotsdamRun implements Runnable {
 		homeParams.setTypicalDuration(16*60*60);
 		config.planCalcScore().addActivityParams(homeParams);
 		config.controler().setFirstIteration(0);
-		config.controler().setLastIteration(10);
+		config.controler().setLastIteration(0);
 		StrategySettings stratSets = new StrategySettings(new IdImpl("1"));
 		stratSets.setModuleName("ReRoute");
 		stratSets.setProbability(0.2);
@@ -50,8 +50,8 @@ public class PotsdamRun implements Runnable {
 		config.strategy().addStrategySettings(stratSets);
 		
 		QSimConfigGroup tmp = new QSimConfigGroup();
-		tmp.setFlowCapFactor(0.01);
-		tmp.setStorageCapFactor(0.01);
+		tmp.setFlowCapFactor(100);
+		tmp.setStorageCapFactor(100);
 		tmp.setRemoveStuckVehicles(false);
 		tmp.setEndTime(24*60*60);
 		config.addQSimConfigGroup(tmp);
@@ -67,7 +67,7 @@ public class PotsdamRun implements Runnable {
 		
 		
 
-		config.controler().setOutputDirectory("output37");
+		config.controler().setOutputDirectory("output-homogeneous-37");
 		
 		final Controler controller = new Controler(scenario);
 		controller.setOverwriteFiles(true);

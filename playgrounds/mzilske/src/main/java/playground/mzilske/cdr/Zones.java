@@ -107,16 +107,16 @@ public class Zones {
 
 	public void buildCells() {
 		
-		contractCells();
+	//	contractCells();
 
 		unrolledCells = new ArrayList<Polygon>();
 
 		VoronoiDiagramBuilder vdb = new VoronoiDiagramBuilder();
 		Collection<Point> coords = new ArrayList<Point>();
 		for (CellTower cellTower : cellTowers.values()) {
-			if (cellTower.nSightings == 0) {
-				throw new RuntimeException();
-			}
+//			if (cellTower.nSightings == 0) {
+//				throw new RuntimeException();
+//			}
 			coords.add(gf.createPoint(coordinate(cellTower)));
 		}
 		sites = new MultiPoint(coords.toArray(new Point[]{}), gf);
@@ -182,7 +182,7 @@ public class Zones {
 		CellTower shortest = quadTree.get(coord.getX(), coord.getY());
 		
 		if (shortest == null) {
-			System.out.println("Huch.");
+			throw new RuntimeException();
 		}
 		return new IdImpl(shortest.id);
 	}

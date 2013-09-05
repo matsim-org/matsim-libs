@@ -75,16 +75,16 @@ public class PotsdamPop implements Runnable {
 	}
 
 	public static enum Relation {
-		P_B(12054000, 11000000, 13281), 
-		P_PM(12054000,12069000, 5981), 
-		P_HVL(12054000,12063000, 764), 
-		P_BRB(12054000,12051000, 509), 
-		P_TF(12054000, 12072000, 1624), 
-		P_P(12054000, 12054000, 28863),
-		B_P(11000000, 12054000, 13014),
-		PM_P(12069000, 12054000, 13847),
-		HVL_P(12063000, 12054000, 2515),
-		BRB_P(12051000, 12054000, 1680),
+//		P_B(12054000, 11000000, 13281),
+//		P_PM(12054000,12069000, 5981), 
+//		P_HVL(12054000,12063000, 764), 
+//		P_BRB(12054000,12051000, 509), 
+//		P_TF(12054000, 12072000, 1624), 
+//		P_P(12054000, 12054000, 28863),
+//		B_P(11000000, 12054000, 13014),
+//		PM_P(12069000, 12054000, 13847),
+//		HVL_P(12063000, 12054000, 2515),
+//		BRB_P(12051000, 12054000, 1680),
 		TF_P(12072000, 12054000, 2966);
 
 		public final int source_zone;
@@ -189,7 +189,7 @@ public class PotsdamPop implements Runnable {
 			plan.addLeg(createPtLeg());
 			plan.addActivity(createWork(workLocation));
 			plan.addLeg(createPtLeg());
-			plan.addActivity(createHome(homeLocation));
+			plan.addActivity(createHome2(homeLocation));
 			person.addPlan(plan);
 			population.addPerson(person);
 		}
@@ -207,16 +207,23 @@ public class PotsdamPop implements Runnable {
 
 	private Activity createWork(Coord workLocation) {
 		Activity activity = population.getFactory().createActivityFromCoord("work", workLocation);
-		activity.setEndTime(calculateNormallyDistributedTime(19*60*60));
+		activity.setEndTime(17.5*60*60);
+		// activity.setEndTime(calculateNormallyDistributedTime(19*60*60));
 		return activity;
 	}
 
 	private Activity createHome(Coord homeLocation) {
 		Activity activity = population.getFactory().createActivityFromCoord("home", homeLocation);
-		activity.setEndTime(calculateNormallyDistributedTime(7*60*60));
+		activity.setEndTime(9.5*60*60);
+		// activity.setEndTime(calculateNormallyDistributedTime(7*60*60));
 		return activity;
 	}
 
+	private Activity createHome2(Coord homeLocation) {
+		Activity activity = population.getFactory().createActivityFromCoord("home", homeLocation);
+		return activity;
+	}
+	
 	private Coord shoot(int id) {
 		Geometry g = zoneGeometries.get(id);
 		if (g == null) {

@@ -16,6 +16,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -44,16 +45,14 @@ public class PopulationFromSightings {
 	private static Random rnd = MatsimRandom.getRandom();
 	
 	public static void readSampleWithOneRandomPointForEachSightingInNewCell(Scenario scenario, Zones zones, final Map<Id, List<Sighting>> sightings) throws FileNotFoundException {
-		Map<Activity, CellTower> cellsOfSightings;
-		cellsOfSightings = new HashMap<Activity, CellTower>();
+		Map<Activity, String> cellsOfSightings;
+		cellsOfSightings = new HashMap<Activity, String>();
 		for (Entry<Id, List<Sighting>> sightingsPerPerson : sightings.entrySet()) {
 			for (Sighting sighting : sightingsPerPerson.getValue()) {
-				CellTower cellTower = zones.cellTowers.get(sighting.getCellTowerId());
-				Geometry cell = cellTower.cell;
-				Point p = getRandomPointInFeature(rnd, cell);
-				Coord coord = new CoordImpl(p.getX(), p.getY());
-				Activity activity = scenario.getPopulation().getFactory().createActivityFromCoord("sighting", coord);
-				cellsOfSightings.put(activity, cellTower);
+				String zoneId = sighting.getCellTowerId();
+				Activity activity = createActivityInZone(scenario, zones,
+						zoneId);
+				cellsOfSightings.put(activity, zoneId);
 				activity.setEndTime(sighting.getTime());
 				Id personId = sightingsPerPerson.getKey();
 				Person person = scenario.getPopulation().getPersons().get(personId);
@@ -64,14 +63,30 @@ public class PopulationFromSightings {
 					scenario.getPopulation().addPerson(person);
 				} else {
 					Activity lastActivity = (Activity) person.getSelectedPlan().getPlanElements().get(person.getSelectedPlan().getPlanElements().size()-1);
-					if (cellTower != cellsOfSightings.get(lastActivity)) {
+					if ( !(zoneId.equals(cellsOfSightings.get(lastActivity))) ) {
 						Leg leg = scenario.getPopulation().getFactory().createLeg("unknown");
 						person.getSelectedPlan().addLeg(leg);
 						person.getSelectedPlan().addActivity(activity);
+					} else {
+						lastActivity.setEndTime(sighting.getTime());
 					}
 				}
 			}
 		}
+	}
+
+//	public static Activity createActivityInZone(Scenario scenario, Zones zones, String zoneId) {
+//		CellTower cellTower = zones.cellTowers.get(zoneId);
+//		Geometry cell = cellTower.cell;
+//		Point p = getRandomPointInFeature(rnd, cell);
+//		Coord coord = new CoordImpl(p.getX(), p.getY());
+//		Activity activity = scenario.getPopulation().getFactory().createActivityFromCoord("sighting", coord);
+//		return activity;
+//	}
+	
+	public static Activity createActivityInZone(Scenario scenario, Zones zones, String zoneId) {
+		Activity activity = scenario.getPopulation().getFactory().createActivityFromLinkId("sighting", new IdImpl(zoneId));
+		return activity;
 	}
 	
 	public static void preparePopulation(final ScenarioImpl scenario, final Zones zones, final Map<Id, List<Sighting>> allSightings) {
