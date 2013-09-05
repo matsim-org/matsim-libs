@@ -47,6 +47,9 @@ public class KtiScoringFunctionFactoryWithJointModes implements ScoringFunctionF
 	private final CharyparNagelScoringParameters params;
 	private final Scenario scenario;
 
+	// basically to compensate for utility transfers
+	private final double additionalMarginalUtilOfBeingDriver;
+
 	private static final double UTIL_OF_NOT_PERF = -1000;
 
 	public KtiScoringFunctionFactoryWithJointModes(
@@ -54,6 +57,21 @@ public class KtiScoringFunctionFactoryWithJointModes implements ScoringFunctionF
 			final KtiLikeScoringConfigGroup ktiConfig,
 			final PlanCalcScoreConfigGroup config,
 			final Scenario scenario) {
+		this( 0,
+			typesNotToScore,
+			ktiConfig,
+			config,
+			scenario);
+	}
+
+
+	public KtiScoringFunctionFactoryWithJointModes(
+			final double additionalMarginalUtilityOfBeingDriver,
+			final StageActivityTypes typesNotToScore,
+			final KtiLikeScoringConfigGroup ktiConfig,
+			final PlanCalcScoreConfigGroup config,
+			final Scenario scenario) {
+		this.additionalMarginalUtilOfBeingDriver = additionalMarginalUtilityOfBeingDriver;
 		this.scenario = scenario;
 		this.params = new CharyparNagelScoringParameters(config);
 		this.delegate = new KtiLikeActivitiesScoringFunctionFactory(
@@ -72,8 +90,10 @@ public class KtiScoringFunctionFactoryWithJointModes implements ScoringFunctionF
 		scoringFunctionAccumulator.addScoringFunction(
 				new ElementalCharyparNagelLegScoringFunction(
 					JointActingTypes.DRIVER,
-					LegScoringParameters.createForCar(
-						params ),
+					new LegScoringParameters(
+						params.constantCar,
+						params.marginalUtilityOfTraveling_s + additionalMarginalUtilOfBeingDriver,
+						params.marginalUtilityOfDistanceCar_m ),
 					scenario.getNetwork()));
 		scoringFunctionAccumulator.addScoringFunction(
 				new ElementalCharyparNagelLegScoringFunction(
