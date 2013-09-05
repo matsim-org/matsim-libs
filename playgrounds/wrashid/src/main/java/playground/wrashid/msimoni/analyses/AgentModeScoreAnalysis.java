@@ -1,5 +1,6 @@
 package playground.wrashid.msimoni.analyses;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Map;
@@ -49,13 +50,14 @@ public class AgentModeScoreAnalysis {
 	 */
 	public static void main(String[] args) {
 		
-		String networkFile = "C:/data/workspace3/matsim/output/equil/output_network.xml.gz";
-		String eventsFile = "C:/data/workspace3/matsim/output/equil/ITERS/it.10/10.events.xml.gz";
-		String plansFile = "C:/data/workspace3/matsim/output/equil/output_plans.xml.gz";
+		String networkFile = "\\\\kosrae.ethz.ch\\ivt-home\\simonimi\\thesis\\JDEQSIM_tests\\tests\\output_no_pricing_v5_subtours_JDEQSim_working\\output_network.xml.gz";
+		String eventsFile = "H:/thesis/pricing_tests/output_no_pricing_v5_subtours_JDEQSim_squeeze150_VC12pct_spreadtoll3/ITERS/it.50/50.events.xml.gz";
+		String plansFile = "H:/thesis/pricing_tests/output_no_pricing_v5_subtours_JDEQSim_squeeze150_VC12pct_spreadtoll3" +
+				"/output_plans.xml.gz";
 		
-		Coord center = new CoordImpl(-25000.0, 0.0); 
+		Coord center = new CoordImpl(682548.0, 247525.5); 
 
-		double radiusInMeters = 500000;
+		double radiusInMeters = 1500;
 		
 		Scenario scenario = GeneralLib.readScenario(plansFile, networkFile);
 		Map<Id, Link> links = LinkSelector.selectLinks(scenario.getNetwork(), center, radiusInMeters, 0.0);
@@ -84,13 +86,21 @@ public class AgentModeScoreAnalysis {
 			
 			boolean hasOutSideCordonActivity=false;
 			boolean hasInsideCordonActivity=false;
+			
+			ArrayList<Activity> a = new ArrayList<Activity>();
+			
 			for (PlanElement pe:selectedPlan.getPlanElements()){
 				if (pe instanceof Activity){
 					Coord coordAct = ((Activity) pe).getCoord();
 					if (GeneralLib.getDistance(center, coordAct)>=radiusInMeters){
 						hasOutSideCordonActivity=true;
+						
+						
 					} else {
-						hasInsideCordonActivity=true;
+						hasInsideCordonActivity = true;
+						
+						a.add((Activity) pe);
+						
 					}
 				}
 			}
@@ -99,7 +109,18 @@ public class AgentModeScoreAnalysis {
 				cordonEntered=1;
 			}
 			
-			System.out.println(p.getId() + "\t" + selectedPlan.getScore() + "\t" + firstActvityCoordinate.getX() + "\t" + firstActvityCoordinate.getY() + "\t" + cordonEntered + "\t" + modeUsedForEnteringCordonIsCar);
+			if (cordonEntered == 0)
+				System.out.println(p.getId() + "\t" + selectedPlan.getScore() + "\t" + firstActvityCoordinate.getX() + "\t" + firstActvityCoordinate.getY() + "\t" + cordonEntered + "\t" + modeUsedForEnteringCordonIsCar + "\t" +"0");
+			else {
+				if (a.size() != 0)
+					for (Activity ac:a) {
+						System.out.println(p.getId() + "\t" + selectedPlan.getScore() + "\t" + firstActvityCoordinate.getX() + "\t" + firstActvityCoordinate.getY() + "\t" + cordonEntered + "\t" + modeUsedForEnteringCordonIsCar + "\t" + ac.getType());
+
+					}
+				else 
+					System.out.println(p.getId() + "\t" + selectedPlan.getScore() + "\t" + firstActvityCoordinate.getX() + "\t" + firstActvityCoordinate.getY() + "\t" + cordonEntered + "\t" + modeUsedForEnteringCordonIsCar + "\t" + "0");
+
+			}
 		}
 		
 	}
