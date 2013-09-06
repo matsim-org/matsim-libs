@@ -58,6 +58,7 @@ import playground.thibautd.socnetsim.replanning.selectors.LossWeight;
 import playground.thibautd.socnetsim.replanning.selectors.LowestScoreOfJointPlanWeight;
 import playground.thibautd.socnetsim.replanning.selectors.RandomGroupLevelSelector;
 import playground.thibautd.socnetsim.replanning.selectors.WeightedWeight;
+import playground.thibautd.socnetsim.replanning.selectors.whoisthebossselector.WhoIsTheBossSelector;
 import playground.thibautd.socnetsim.sharedvehicles.replanning.AllocateVehicleToPlansInGroupPlanModule;
 import playground.thibautd.socnetsim.sharedvehicles.replanning.AllocateVehicleToSubtourModule;
 import playground.thibautd.socnetsim.sharedvehicles.replanning.OptimizeVehicleAllocationAtTourLevelModule;
@@ -290,6 +291,18 @@ public class GroupPlanStrategyFactory {
 							config.planCalcScore().getBrainExpBeta()),
 						 weightAttributeName,
 						 personAttributes ) ) );
+	}
+
+	public static GroupPlanStrategy createWhoIsTheBossSelectExpBeta(
+			final IncompatiblePlansIdentifierFactory incompFact,
+			final Config config) {
+		return new GroupPlanStrategy(
+				 new WhoIsTheBossSelector(
+					 MatsimRandom.getLocalInstance(),
+					 incompFact ,
+					 new LogitWeight(
+						MatsimRandom.getLocalInstance(),
+						config.planCalcScore().getBrainExpBeta()) ) );
 	}
 
 	public static GroupPlanStrategy createMinSelectExpBeta(
