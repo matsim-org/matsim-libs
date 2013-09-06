@@ -58,7 +58,7 @@ public class WhoIsTheBossSelectorTest {
 
 	@Before
 	public void enableTrace() {
-		// Logger.getLogger(WhoIsTheBossSelector.class).setLevel( Level.TRACE );
+		if ( false ) Logger.getLogger(WhoIsTheBossSelector.class).setLevel( Level.TRACE );
 	}
 
 	@Test
