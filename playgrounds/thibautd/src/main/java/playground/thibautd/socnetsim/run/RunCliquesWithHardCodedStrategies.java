@@ -85,6 +85,7 @@ import playground.thibautd.socnetsim.replanning.selectors.LowestScoreOfJointPlan
 import playground.thibautd.socnetsim.replanning.selectors.LowestScoreSumSelectorForRemoval;
 import playground.thibautd.socnetsim.replanning.selectors.WeightCalculator;
 import playground.thibautd.socnetsim.replanning.selectors.WeightedWeight;
+import playground.thibautd.socnetsim.replanning.selectors.whoisthebossselector.WhoIsTheBossSelector;
 import playground.thibautd.socnetsim.router.JointTripRouterFactory;
 import playground.thibautd.socnetsim.run.WeightsConfigGroup.Synchro;
 import playground.thibautd.socnetsim.sharedvehicles.HouseholdBasedVehicleRessources;
@@ -367,6 +368,12 @@ public class RunCliquesWithHardCodedStrategies {
 								return -baseWeight.getWeight( indivPlan , replanningGroup );
 							}
 						});
+			case whoIsTheBoss:
+				return new WhoIsTheBossSelector(
+						true ,
+						MatsimRandom.getLocalInstance(),
+						controllerRegistry.getIncompatiblePlansIdentifierFactory(),
+						new InverseScoreWeight() );
 			default:
 				throw new RuntimeException( "unkown: "+weights.getGroupScoringType() );
 		}

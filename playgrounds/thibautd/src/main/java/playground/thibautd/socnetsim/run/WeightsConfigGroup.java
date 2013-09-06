@@ -48,7 +48,8 @@ public class WeightsConfigGroup extends ReflectiveModule {
 		sum,
 		weightedSum,
 		min,
-		minLoss;
+		minLoss,
+		whoIsTheBoss;
 	}
 	private GroupScoringType groupScoringType = GroupScoringType.sum;
 

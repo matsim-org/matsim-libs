@@ -154,6 +154,15 @@ public class RunUtils {
 						weights.getLogitSelectionWeight(),
 						-1);
 				break;
+			case whoIsTheBoss:
+				strategyRegistry.addStrategy(
+						GroupPlanStrategyFactory.createWhoIsTheBossSelectExpBeta(
+							controllerRegistry.getIncompatiblePlansIdentifierFactory(),
+							config ),
+						weights.getLogitSelectionWeight(),
+						-1);
+				break;
+
 			default:
 				throw new RuntimeException( "unkown: "+weights.getGroupScoringType() );
 		}
