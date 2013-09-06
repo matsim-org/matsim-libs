@@ -38,6 +38,9 @@ public class AStarLandmarksFactory implements LeastCostPathCalculatorFactory {
 		processNetwork(network, fsttc, numberOfThreads);
 	}
 
+	/**
+	 * @deprecated this should be a private method
+	 */
 	public void processNetwork(Network network, final TravelDisutility fsttc, final int numberOfThreads) {
 		synchronized (this) {
 				this.preProcessData = new PreProcessLandmarks(fsttc);
