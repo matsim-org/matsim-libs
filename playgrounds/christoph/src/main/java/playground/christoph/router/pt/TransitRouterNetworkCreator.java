@@ -151,15 +151,17 @@ public class TransitRouterNetworkCreator {
 		// which is not at the very start, so the quadtree data structure cannot be updated as
 		// links come in. mrieser, dec'10
 		log.info("add transfer links");
-
+		
 		List<Tuple<TransitRouterNetworkNode, TransitRouterNetworkNode>> toBeAdded = new LinkedList<Tuple<TransitRouterNetworkNode, TransitRouterNetworkNode>>();
 		// connect all transfer nodes with walking links if they're located less than beelineWalkConnectionDistance from each other
-		for (TransitRouterNetworkNode node : transferNodes) {
-			Coord coord = node.getCoord();
-			Collection<TransitRouterNetworkNode> nearestTransferNodes = transferNodesQuadTree.get(coord.getX(), coord.getX(), maxBeelineWalkConnectionDistance);
-			for (TransitRouterNetworkNode node2 : nearestTransferNodes) {
-				// do not yet add them to the network, as this would change in/out-links
-				toBeAdded.add(new Tuple<TransitRouterNetworkNode, TransitRouterNetworkNode>(node, node2));				
+		for (TransitRouterNetworkNode fromNode : transferNodes) {
+			Coord fromCoord = fromNode.getCoord();
+			Collection<TransitRouterNetworkNode> nearestTransferNodes = transferNodesQuadTree.get(fromCoord.getX(), fromCoord.getY(), maxBeelineWalkConnectionDistance);
+			for (TransitRouterNetworkNode toNode : nearestTransferNodes) {
+				if (fromNode != toNode) {
+					// do not yet add them to the network, as this would change in/out-links
+					toBeAdded.add(new Tuple<TransitRouterNetworkNode, TransitRouterNetworkNode>(fromNode, toNode));
+				}
 			}
 		}
 		log.info(toBeAdded.size() + " transfer links to be added.");
