@@ -146,10 +146,8 @@ public class DetailedAgentsTrackerPostProcessing {
 	private static HouseholdsTracker initHouseholdsTracker(Scenario scenario) {
 		
 		HouseholdsTracker householdsTracker = new HouseholdsTracker(scenario);
-		
-		// this is okay since the HouseholdsTracker does not use any information from the event
-		householdsTracker.notifyMobsimInitialized(null);
-		
+		householdsTracker.notifyBeforeMobsim(null);
+				
 		return householdsTracker;
 	}
 	

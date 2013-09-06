@@ -407,7 +407,7 @@ public final class MarathonRunner implements StartupListener,
 		
 		this.agentsTracker = new AgentsTracker(this.scenario);
 		event.getControler().getEvents().addHandler(agentsTracker);
-		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(agentsTracker);
+		event.getControler().addControlerListener(agentsTracker);
 		
 		this.replanningTracker = new ReplanningTracker(this.informedHouseholdsTracker);
 		event.getControler().getEvents().addHandler(this.replanningTracker);

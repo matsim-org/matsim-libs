@@ -198,6 +198,8 @@ public class EvacuationControlerListener implements StartupListener {
 	 */
 	private ObjectAttributes householdObjectAttributes;
 	
+	private final FixedOrderControlerListener fixedOrderControlerListener = new FixedOrderControlerListener();
+	
 	public EvacuationControlerListener(WithinDayControlerListener withinDayControlerListener, 
 			MultiModalControlerListener multiModalControlerListener) {
 		this.withinDayControlerListener = withinDayControlerListener;
@@ -207,6 +209,9 @@ public class EvacuationControlerListener implements StartupListener {
 	@Override
 	public void notifyStartup(StartupEvent event) {
 
+		// register FixedOrderControlerListener
+		event.getControler().addControlerListener(this.fixedOrderControlerListener);
+		
 		// load household object attributes
 		this.householdObjectAttributes = new ObjectAttributes();
 		new ObjectAttributesXmlReader(this.householdObjectAttributes).parse(EvacuationConfig.householdObjectAttributesFile);
@@ -247,10 +252,10 @@ public class EvacuationControlerListener implements StartupListener {
 	private void initDataGrabbersAndProviders(Controler controler) {
 		
 		Scenario scenario = controler.getScenario();
-				
+		
 		this.jointDepartureOrganizer = new JointDepartureOrganizer();
 		this.missedJointDepartureWriter = new MissedJointDepartureWriter(this.jointDepartureOrganizer);
-		controler.addControlerListener(this.missedJointDepartureWriter);
+		this.fixedOrderControlerListener.addControlerListener(this.missedJointDepartureWriter);
 		
 		this.informedHouseholdsTracker = new InformedHouseholdsTracker(controler.getPopulation(),
 				((ScenarioImpl) controler.getScenario()).getHouseholds());
@@ -261,14 +266,15 @@ public class EvacuationControlerListener implements StartupListener {
 		controler.getEvents().addHandler(this.replanningTracker);
 		
 		this.householdsTracker = new HouseholdsTracker(scenario);
-		controler.getEvents().addHandler(householdsTracker);
+		controler.getEvents().addHandler(this.householdsTracker);
+		this.fixedOrderControlerListener.addControlerListener(this.householdsTracker);
 		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(householdsTracker);
 		
 		this.decisionDataGrabber = new DecisionDataGrabber(scenario, this.coordAnalyzer.createInstance(), 
 				this.householdsTracker, this.householdObjectAttributes);		
 		this.decisionModelRunner = new DecisionModelRunner(scenario, this.decisionDataGrabber, this.informedHouseholdsTracker);
 		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(this.decisionModelRunner);
-		controler.addControlerListener(this.decisionModelRunner);
+		this.fixedOrderControlerListener.addControlerListener(this.decisionModelRunner);
 		
 		this.vehiclesTracker = new VehiclesTracker(this.withinDayControlerListener.getMobsimDataProvider());
 		controler.getEvents().addHandler(vehiclesTracker);
@@ -288,7 +294,7 @@ public class EvacuationControlerListener implements StartupListener {
 				this.coordAnalyzer.createInstance(), this.affectedArea, this.informedHouseholdsTracker, 
 				this.decisionModelRunner, this.withinDayControlerListener.getMobsimDataProvider());
 		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(this.selectHouseholdMeetingPoint);
-		controler.addControlerListener(this.selectHouseholdMeetingPoint);
+		this.fixedOrderControlerListener.addControlerListener(this.selectHouseholdMeetingPoint);
 		
 		this.householdDepartureManager = new HouseholdDepartureManager(scenario, this.coordAnalyzer.createInstance(), 
 				this.householdsTracker, this.informedHouseholdsTracker, this.decisionModelRunner.getDecisionDataProvider());
@@ -324,26 +330,26 @@ public class EvacuationControlerListener implements StartupListener {
 			
 			agentsInEvacuationAreaCounter = new AgentsInEvacuationAreaCounter(scenario, analyzedModes, this.coordAnalyzer.createInstance(), 
 					this.decisionModelRunner.getDecisionDataProvider(), scaleFactor);
-			controler.addControlerListener(this.agentsInEvacuationAreaCounter);
+			this.fixedOrderControlerListener.addControlerListener(this.agentsInEvacuationAreaCounter);
 			this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(this.agentsInEvacuationAreaCounter);
 			controler.getEvents().addHandler(this.agentsInEvacuationAreaCounter);
 			
 			agentsInEvacuationAreaActivityCounter = new AgentsInEvacuationAreaActivityCounter(scenario, this.coordAnalyzer.createInstance(), 
 					this.decisionModelRunner.getDecisionDataProvider(), scaleFactor);
-			controler.addControlerListener(this.agentsInEvacuationAreaActivityCounter);
+			this.fixedOrderControlerListener.addControlerListener(this.agentsInEvacuationAreaActivityCounter);
 			this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(this.agentsInEvacuationAreaActivityCounter);
 			controler.getEvents().addHandler(this.agentsInEvacuationAreaActivityCounter);
 			
 			this.agentsReturnHomeCounter = new AgentsReturnHomeCounter(scenario, analyzedModes, this.coordAnalyzer.createInstance(), 
 					this.decisionModelRunner.getDecisionDataProvider(), scaleFactor);
-			controler.addControlerListener(this.agentsReturnHomeCounter);
+			this.fixedOrderControlerListener.addControlerListener(this.agentsReturnHomeCounter);
 			this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(this.agentsReturnHomeCounter);
 			controler.getEvents().addHandler(this.agentsReturnHomeCounter);
 		}
 		
 		this.detailedAgentsTracker = new DetailedAgentsTracker(scenario, this.householdsTracker, 
 				this.decisionModelRunner.getDecisionDataProvider(), this.coordAnalyzer);
-		controler.addControlerListener(this.detailedAgentsTracker);
+		this.fixedOrderControlerListener.addControlerListener(this.detailedAgentsTracker);
 		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(this.detailedAgentsTracker);
 		controler.getEvents().addHandler(this.detailedAgentsTracker);
 	}

@@ -144,6 +144,7 @@ public class AgentsInEvacuationAreaPostProcessing {
 		CoordAnalyzer coordAnalyzer = new CoordAnalyzer(affectedArea);
 
 		HouseholdsTracker householdsTracker = new HouseholdsTracker(scenario);
+		householdsTracker.notifyBeforeMobsim(null);
 		DecisionDataProvider decisionDataProvider = new DecisionDataProvider();
 		
 		/*
@@ -153,7 +154,6 @@ public class AgentsInEvacuationAreaPostProcessing {
 		DecisionDataGrabber decisionDataGrabber = new DecisionDataGrabber(scenario, coordAnalyzer, 
 				householdsTracker, householdObjectAttributes);	
 		
-		householdsTracker.notifyMobsimInitialized(null);
 		
 		// read people in panic from file
 		String panicFile = dummyInputController.getControlerIO().getIterationFilename(0, PanicModel.panicModelFile);

@@ -43,17 +43,17 @@ import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
-import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 
 import playground.christoph.evacuation.mobsim.Tracker.Position;
 
 public class AgentsTracker implements AgentDepartureEventHandler, AgentArrivalEventHandler,
 		ActivityStartEventHandler, ActivityEndEventHandler, 
 		PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, 
-		LinkEnterEventHandler, LinkLeaveEventHandler, MobsimInitializedListener {
+		LinkEnterEventHandler, LinkLeaveEventHandler, BeforeMobsimListener {
 
 	/*package*/ final Scenario scenario;
 	/*package*/ final Map<Id, AgentPosition> agentPositions;
@@ -121,9 +121,13 @@ public class AgentsTracker implements AgentDepartureEventHandler, AgentArrivalEv
 	public void reset(int iteration) {
 		this.agentPositions.clear();
 	}
-
+	
 	@Override
-	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
+	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+		initializeAgentPositions();
+	}
+	
+	private void initializeAgentPositions() {
 		this.agentPositions.clear();
 		
 		for (Person person : scenario.getPopulation().getPersons().values()) {
@@ -137,5 +141,4 @@ public class AgentsTracker implements AgentDepartureEventHandler, AgentArrivalEv
 			this.agentPositions.put(person.getId(), agentPosition);
 		}
 	}
-	
 }

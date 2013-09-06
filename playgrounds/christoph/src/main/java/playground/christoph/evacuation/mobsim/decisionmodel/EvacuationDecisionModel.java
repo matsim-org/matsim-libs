@@ -40,6 +40,7 @@ import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.config.EvacuationConfig.EvacuationDecisionBehaviour;
 import playground.christoph.evacuation.config.EvacuationConfig.EvacuationReason;
 import playground.christoph.evacuation.config.EvacuationConfig.PreEvacuationTime;
+import playground.christoph.evacuation.mobsim.HouseholdPosition;
 import playground.christoph.evacuation.mobsim.decisiondata.DecisionDataProvider;
 import playground.christoph.evacuation.mobsim.decisiondata.HouseholdDecisionData;
 
@@ -128,9 +129,11 @@ public class EvacuationDecisionModel implements HouseholdDecisionModel {
 		/*
 		 * Check whether household is joined.
 		 */
-		Id householdId = household.getId();
-		boolean isJoined = this.decisionDataProvider.getHouseholdDecisionData(householdId).getHouseholdPosition().isHouseholdJoined();
-			
+//		Id householdId = household.getId();
+//		boolean isJoined = this.decisionDataProvider.getHouseholdDecisionData(householdId).getHouseholdPosition().isHouseholdJoined();
+		HouseholdPosition hp = hdd.getHouseholdPosition();
+		boolean isJoined = hp.isHouseholdJoined();
+		
 		/*
 		 * Calculate pickup decision for every household member. Then decide base on
 		 * a monte carlo simulation.

@@ -432,6 +432,7 @@ public class EvacuationControler extends WithinDayController implements
 		
 		this.householdsTracker = new HouseholdsTracker(this.scenarioData);
 		this.getEvents().addHandler(householdsTracker);
+		this.addControlerListener(this.householdsTracker);
 		this.getFixedOrderSimulationListener().addSimulationListener(householdsTracker);
 		
 		this.jointDepartureOrganizer = new JointDepartureOrganizer();

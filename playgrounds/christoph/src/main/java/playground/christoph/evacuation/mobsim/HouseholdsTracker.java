@@ -39,8 +39,8 @@ import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
 import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
-import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.households.Household;
@@ -148,8 +148,14 @@ public class HouseholdsTracker extends AgentsTracker implements MobsimAfterSimSt
 		this.householdPositions.clear();
 	}
 	
-	public void notifyMobsimInitialized(MobsimInitializedEvent e) {
-		super.notifyMobsimInitialized(e);
+	@Override
+	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+		super.notifyBeforeMobsim(event);
+		
+		initializeHouseholdPositions();
+	}
+	
+	private void initializeHouseholdPositions() {
 		
 		Households households = ((ScenarioImpl) scenario).getHouseholds();
 		for (Household household : households.getHouseholds().values()) {
