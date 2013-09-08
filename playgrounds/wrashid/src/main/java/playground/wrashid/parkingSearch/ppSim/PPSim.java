@@ -139,7 +139,7 @@ public class PPSim implements Mobsim{
 			eventsManager.processEvent(event);
 			
 			time+=leg.getTravelTime();
-			// TODO: auch öv, etc. übernehmen.
+			// TODO: auch oev, etc. uebernehmen.
 			// bzw. non relevant for parking search.
 			
 			Id endLinkId = leg.getRoute().getEndLinkId();
