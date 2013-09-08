@@ -1,11 +1,10 @@
-package playground.wrashid.parkingSearch.ppSim;
+package playground.wrashid.parkingSearch.ppSim.jdepSim;
 
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
@@ -20,20 +19,16 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.mobsim.framework.Mobsim;
-import org.matsim.core.mobsim.jdeqsim.SimulationParameters;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.utils.misc.Time;
 
-// TODO: make parallel!
-// TODO: read tt matrix
-// TODO: make event ordering work properly (such that times are sorted)
-public class PPSim implements Mobsim{
+public class JDEPSim implements Mobsim{
 
 	private Scenario sc;
 	private EventsManager eventsManager;
 
-	public PPSim(Scenario sc, EventsManager eventsManager){
+	public JDEPSim(Scenario sc, EventsManager eventsManager){
 		this.sc = sc;
 		this.eventsManager = eventsManager;
 	}
@@ -45,11 +40,9 @@ public class PPSim implements Mobsim{
 			
 			ActivityImpl ai= (ActivityImpl) p.getSelectedPlan().getPlanElements().get(0);
 			
-			
-			
 			// process first activity
 			double time=ai.getEndTime();
-			event = new ActivityEndEvent(ai.getEndTime(), p.getId(), ai.getLinkId(), ai.getFacilityId(), ai.getType());
+			event = new ActivityEndEvent(time, p.getId(), ai.getLinkId(), ai.getFacilityId(), ai.getType());
 			eventsManager.processEvent(event);
 
 			int planElemSize = p.getSelectedPlan().getPlanElements().size();
@@ -156,5 +149,4 @@ public class PPSim implements Mobsim{
 		return 100;
 	}
 	
-
 }
