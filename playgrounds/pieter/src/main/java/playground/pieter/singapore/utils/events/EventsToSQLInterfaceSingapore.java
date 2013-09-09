@@ -41,6 +41,8 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.sql.SQLException;
 import java.util.Properties;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 
 public class EventsToSQLInterfaceSingapore extends JFrame {
 
@@ -110,6 +112,18 @@ public class EventsToSQLInterfaceSingapore extends JFrame {
 		contentPane.add(lblFillFromProperties, gbc_lblFillFromProperties);
 
 		eventsToSQLPropertiesFileComponent = new JTextField();
+		eventsToSQLPropertiesFileComponent.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if(e.getKeyChar()=='\n'){
+					File defaultPropertiesFile = new File(
+							eventsToSQLPropertiesFileComponent.getText());
+					eventsToSQLPropertiesFileComponent
+							.setText(defaultPropertiesFile.getPath());
+					loadDefaultProperties(defaultPropertiesFile);
+				}
+			}
+		});
 		eventsToSQLPropertiesFileComponent.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {

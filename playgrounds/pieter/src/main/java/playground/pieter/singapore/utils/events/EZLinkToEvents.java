@@ -404,7 +404,7 @@ public class EZLinkToEvents {
 					sb.append(String.format("%s\t%s\t%s\t%s\t%06d\tarrival\t%f\n%s\t%s\t%s\t%s\t%06d\tdeparture\t%f\n", 
 							this.ezlinkLine.lineId.toString(),this.ezlinkRoute.direction,this.vehicleId.toString(),
 							stopEvent.stopId,
-							stopEvent.arrivalTime, getInterStopSpeed(prevStop, stopEvent), 
+							stopEvent.arrivalTime, getInterDwellEventSpeed(prevStop, stopEvent), 
 							this.ezlinkLine.lineId.toString(),this.ezlinkRoute.direction,this.vehicleId.toString(),
 							stopEvent.stopId,
 							stopEvent.departureTime, 0.0));
@@ -516,10 +516,16 @@ public class EZLinkToEvents {
 							dwellEvent.findTrueDwellTime();
 						}
 						dwellEvent = new PtVehicleDwellEvent(transaction.time, transaction.time, stopId);
-						dwellEvent.transactions.add(transaction);
 					} else {
-						dwellEvent.transactions.add(transaction);
 						dwellEvent.departureTime = transaction.time;
+					}
+					dwellEvent.transactions.add(transaction);
+					if(transaction.type.equals(CEPASTransactionType.boarding)){
+						transaction.passenger.boardingStopEvent=dwellEvent;
+					}else{
+						if(transaction.passenger != null){
+							transaction.passenger.alightingStopEvent=dwellEvent;
+						}
 					}
 				}
 				for (PtVehicleDwellEvent stopEvent1 : dwellEvents) {
@@ -528,10 +534,8 @@ public class EZLinkToEvents {
 
 			}
 			System.out.println(this.printStopsVisited());
-			// assignDwellEventsToRoutes();
-			// adjustDwellEventTimingsAccordingToInterStopSpeeds();
 		}
-
+		
 		private void adjustDwellEventTimingsAccordingToInterStopSpeeds() {
 			// TODO Auto-generated method stub
 
@@ -789,9 +793,9 @@ public class EZLinkToEvents {
 		// assignStopsVisitedToRoutes();
 		// }
 
-		private double getInterStopSpeed(PtVehicleDwellEvent previousStopEvent, PtVehicleDwellEvent nextStopEvent) {
-			double distance = getInterStopDistance(previousStopEvent.stopId, nextStopEvent.stopId);
-			double time = nextStopEvent.arrivalTime - previousStopEvent.departureTime;
+		private double getInterDwellEventSpeed(PtVehicleDwellEvent previousDwellEvent, PtVehicleDwellEvent nextDwellEvent) {
+			double distance = getInterStopDistance(previousDwellEvent.stopId, nextDwellEvent.stopId);
+			double time = nextDwellEvent.arrivalTime - previousDwellEvent.departureTime;
 			double speed=distance / time * 3.6;
 			if(speed<0){
 				return -1;
@@ -1004,8 +1008,8 @@ public class EZLinkToEvents {
 				// ignore
 //				if (!ptVehicle.vehicleId.toString().equals("8819"))
 //					continue;
-//				if (!ptVehicle.vehicleId.toString().equals("8225"))
-//				continue;
+				if (!ptVehicle.vehicleId.toString().equals("8225"))
+				continue;
 				if (ptVehicle.unsortedRoutes == null)
 					continue;
 				// line 812 does a double loop on itself, currently can't cope
@@ -1035,12 +1039,12 @@ public class EZLinkToEvents {
 				ptVehicle.handlePassengers(resultSet);
 				ptVehicle.assignRouteScoresByNumberOfTransactions();
 				ptVehicle.createDwellEventsFromTransactions();
-				// ptVehicle.interpolateDwellEvents();
+				ptVehicle.interpolateDwellEvents();
 
-				writer.write(ptVehicle.printStopsVisited());
-				vehicles++;
-				if(vehicles>1000)
-					break;
+//				writer.write(ptVehicle.printStopsVisited());
+//				vehicles++;
+//				if(vehicles>1000)
+//					break;
 			}
 			writer.close();
 		} catch (SQLException se) {
