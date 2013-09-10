@@ -85,7 +85,7 @@ interface QLaneI extends QNetsimObject {
 	 */
 	void addTransitSlightlyUpstreamOfStop(final QVehicle veh);
 	
-	void changeRawFlowCapacityPerSecond( final double val, final double now ) ;
+	void changeUnscaledFlowCapacityPerSecond( final double val, final double now ) ;
 
 
 }

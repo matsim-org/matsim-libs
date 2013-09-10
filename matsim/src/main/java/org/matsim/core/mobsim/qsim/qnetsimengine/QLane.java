@@ -39,7 +39,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.LaneEnterEvent;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
 import org.matsim.core.api.internal.MatsimComparator;
-import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.lanes.data.v20.LaneData20;
@@ -114,32 +113,32 @@ public final class QLane extends QueueWithBuffer implements Identifiable {
 		return this.laneData.getId();
 	}
 
-	@Override
-	void calculateFlowCapacity(final double time) {
-		this.flowCapacityPerTimeStep = ((LinkImpl)this.qLink.getLink()).getFlowCapacity(time);
-		if (this.laneData != null) {
-			/*
-			 * Without lanes a Link has a flow capacity that describes the flow on a certain number of
-			 * lanes. If lanes are given the following is assumed:
-			 *
-			 * Flow of a Lane is given by the flow of the link divided by the number of lanes represented by the link.
-			 *
-			 * A Lane may represent one or more lanes in reality. This is given by the attribute numberOfRepresentedLanes
-			 * of the Lane definition. The flow of a lane is scaled by this number.
-			 *
-			 */
-//			double queueLinksNumberOfRepresentedLanes = this.qLink.getLink().getNumberOfLanes(time);
-//			this.simulatedFlowCapacity = this.simulatedFlowCapacity/queueLinksNumberOfRepresentedLanes
-//			* this.laneData.getNumberOfRepresentedLanes();
-			this.flowCapacityPerTimeStep = this.laneData.getCapacityVehiclesPerHour() /  3600.0;
-		}
-		// we need the flow capcity per sim-tick and multiplied with flowCapFactor
-		this.flowCapacityPerTimeStep = this.flowCapacityPerTimeStep 
-				* this.qLink.network.simEngine.getMobsim().getSimTimer().getSimTimestepSize()
-				* this.qLink.network.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().getFlowCapFactor();
-		this.inverseFlowCapacityPerTimeStep = 1.0 / this.flowCapacityPerTimeStep;
-		this.flowCapacityPerTimeStepFractionalPart = this.flowCapacityPerTimeStep - (int) this.flowCapacityPerTimeStep;
-	}
+//	@Override
+//	void calculateFlowCapacity(final double time) {
+//		this.flowCapacityPerTimeStep = ((LinkImpl)this.qLink.getLink()).getFlowCapacity(time);
+//		if (this.laneData != null) {
+//			/*
+//			 * Without lanes a Link has a flow capacity that describes the flow on a certain number of
+//			 * lanes. If lanes are given the following is assumed:
+//			 *
+//			 * Flow of a Lane is given by the flow of the link divided by the number of lanes represented by the link.
+//			 *
+//			 * A Lane may represent one or more lanes in reality. This is given by the attribute numberOfRepresentedLanes
+//			 * of the Lane definition. The flow of a lane is scaled by this number.
+//			 *
+//			 */
+////			double queueLinksNumberOfRepresentedLanes = this.qLink.getLink().getNumberOfLanes(time);
+////			this.simulatedFlowCapacity = this.simulatedFlowCapacity/queueLinksNumberOfRepresentedLanes
+////			* this.laneData.getNumberOfRepresentedLanes();
+//			this.flowCapacityPerTimeStep = this.laneData.getCapacityVehiclesPerHour() /  3600.0;
+//		}
+//		// we need the flow capcity per sim-tick and multiplied with flowCapFactor
+//		this.flowCapacityPerTimeStep = this.flowCapacityPerTimeStep 
+//				* this.qLink.network.simEngine.getMobsim().getSimTimer().getSimTimestepSize()
+//				* this.qLink.network.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().getFlowCapFactor();
+//		this.inverseFlowCapacityPerTimeStep = 1.0 / this.flowCapacityPerTimeStep;
+//		this.flowCapacityPerTimeStepFractionalPart = this.flowCapacityPerTimeStep - (int) this.flowCapacityPerTimeStep;
+//	}
 
 	@Override
 	void calculateStorageCapacity(final double time) {
@@ -430,11 +429,6 @@ public final class QLane extends QueueWithBuffer implements Identifiable {
 
 	void setOTFLane(VisLane otfLane) {
 		this.visData.visLane = otfLane;
-	}
-
-	@Override
-	public void addTransitSlightlyUpstreamOfStop(final QVehicle veh) {
-		throw new UnsupportedOperationException() ;
 	}
 
 }

@@ -175,7 +175,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 	public final void addFromWait(final QVehicle veh, final double now) {
 		addToBuffer(veh, now);
 	}
-	private void addToBuffer(final QVehicle veh, final double now) {
+	private final void addToBuffer(final QVehicle veh, final double now) {
 		// yy might make sense to just accumulate to "zero" and go into negative when something is used up.
 		// kai/mz/amit, mar'12
 
@@ -206,7 +206,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 		return this.hasFlowCapacityLeftAndBufferSpace() ;
 	}
 
-	final boolean hasFlowCapacityLeftAndBufferSpace() {
+	private final boolean hasFlowCapacityLeftAndBufferSpace() {
 		return (
 				usedBufferStorageCapacity < bufferStorageCapacity 
 				&& 
@@ -222,7 +222,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 		}
 	}
 
-	void calculateFlowCapacity(final double time) {
+	private final void calculateFlowCapacity(final double time) {
 //		flowCapacityPerTimeStep = ((LinkImpl)qLink.getLink()).getFlowCapacity(time);
 		flowCapacityPerTimeStep = this.rawFlowCapacity_s ;
 		// we need the flow capacity per sim-tick and multiplied with flowCapFactor
@@ -373,7 +373,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 		} // end while
 	}
 
-	final QVehicle removeVehicleFromQueue(final double now) {
+	private final QVehicle removeVehicleFromQueue(final double now) {
 		QVehicle veh = vehQueue.poll();
 		usedStorageCapacity -= veh.getSizeInEquivalents();
 		if ( QueueWithBuffer.HOLES ) {
@@ -385,7 +385,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 		return veh ;
 	}
 
-	final void letVehicleArrive(final double now, QVehicle veh) {
+	private final void letVehicleArrive(final double now, QVehicle veh) {
 		qLink.addParkedVehicle(veh);
 		network.simEngine.letVehicleArrive(veh);
 		qLink.makeVehicleAvailableToNextDriver(veh, now);
@@ -393,12 +393,13 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 		removeVehicleFromQueue( now ) ;
 	}
 
-	final double effectiveVehicleFlowConsumptionInPCU( QVehicle veh ) {
+	private final double effectiveVehicleFlowConsumptionInPCU( QVehicle veh ) {
+		//  yyyy inline! (not used consistently anyways)
 		return veh.getSizeInEquivalents();
 	}
 
-	public final int vehInQueueCount() {
-		// called by one test case
+	final int vehInQueueCount() {
+		// called by test cases
 		return vehQueue.size();
 	}
 
@@ -591,7 +592,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 	 * Needs to be added _upstream_ of the regular stop location so that a possible second stop on the link can also be served.
 	 */
 	@Override
-	public void addTransitSlightlyUpstreamOfStop( final QVehicle veh) {
+	public final void addTransitSlightlyUpstreamOfStop( final QVehicle veh) {
 		this.vehQueue.addFirst(veh) ;
 	}
 
@@ -611,7 +612,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 	}
 	
 	@Override
-	public final void changeRawFlowCapacityPerSecond( final double val, final double now ) {
+	public final void changeUnscaledFlowCapacityPerSecond( final double val, final double now ) {
 		this.rawFlowCapacity_s = val ;
 		// be defensive:
 		this.recalcTimeVariantAttributes(now);

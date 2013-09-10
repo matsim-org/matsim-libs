@@ -259,7 +259,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	@Override
 	public void recalcTimeVariantAttributes(double now) {
 
-		road.changeRawFlowCapacityPerSecond(((LinkImpl)this.link).getFlowCapacity(now), now);
+		road.changeUnscaledFlowCapacityPerSecond(((LinkImpl)this.link).getFlowCapacity(now), now);
 
 		road.recalcTimeVariantAttributes(now);
 	}
