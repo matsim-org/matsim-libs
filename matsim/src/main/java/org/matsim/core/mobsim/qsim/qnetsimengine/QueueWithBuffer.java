@@ -129,6 +129,12 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 
 	// (still) private:
 	private VisData visData = new VisDataImpl() ;
+	/**
+	 * This flag indicates whether the QLane is the first lane on the link or one
+	 * of the subsequent lanes.
+	 */
+	boolean isFirstLane = true ;
+	double endsAtMetersFromLinkEnd = 0. ;
 
 	QueueWithBuffer(AbstractQLink qLinkImpl,  final VehicleQ<QVehicle> vehicleQueue ) {
 		this(qLinkImpl, vehicleQueue,  qLinkImpl.getLink().getId() ) ;
@@ -325,13 +331,21 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 	 * @param now
 	 *          The current time.
 	 */
-	void moveLaneToBuffer(final double now) {
+	final void moveLaneToBuffer(final double now) {
 		QVehicle veh;
 
 		while ((veh = vehQueue.peek()) != null) {
-			if (veh.getEarliestLinkExitTime() > now){
+			//we have an original QueueLink behaviour
+			if ((veh.getEarliestLinkExitTime() > now) && this.isFirstLane && (this.endsAtMetersFromLinkEnd == 0.0)){
 				return;
 			}
+			//this is the aneumann PseudoLink behaviour
+			else if (Math.floor(veh.getEarliestLinkExitTime()) > now){
+				return;
+			}
+//			if (veh.getEarliestLinkExitTime() > now){
+//				return;
+//			}
 			MobsimDriverAgent driver = veh.getDriver();
 
 			HandleTransitStopResult handleTransitStop = qLink.handleTransitStop(now, veh, driver);

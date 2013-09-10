@@ -29,8 +29,6 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.PriorityQueue;
-import java.util.Queue;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
@@ -41,8 +39,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.LaneEnterEvent;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
 import org.matsim.core.api.internal.MatsimComparator;
-import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.core.mobsim.qsim.comparators.QVehicleEarliestLinkExitTimeComparator;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.collections.Tuple;
@@ -69,22 +65,11 @@ public final class QLane extends QueueWithBuffer implements Identifiable {
 
 	private static final Logger log = Logger.getLogger(QLane.class);
 
-	private static final Comparator<QVehicle> VEHICLE_EXIT_COMPARATOR = new QVehicleEarliestLinkExitTimeComparator();
-	// yyyyyy needs to go since this interacts with the configurable veh queue !!!!! kai, sep'13	
-	
 	/**
 	 * This collection contains all Lanes downstream, if null it is the last lane
 	 * within a QueueLink.
 	 */
 	private List<QLane> toLanes = null;
-
-	/**
-	 * This flag indicates whether the QLane is the first lane on the link or one
-	 * of the subsequent lanes.
-	 */
-	private final boolean isFirstLane;
-
-	private double endsAtMetersFromLinkEnd = Double.NaN;
 
 	/**
 	 * Contains all Link instances which are reachable from this lane
@@ -94,12 +79,6 @@ public final class QLane extends QueueWithBuffer implements Identifiable {
 	private final LaneData20 laneData;
 
 	private Map<Id, List<QLane>> toLinkToQLanesMap = null;
-
-	/**
-	 * A list containing all transit vehicles that are at a stop but not
-	 * blocking other traffic on the lane.
-	 */
-	private final Queue<QVehicle> transitVehicleStopQueue = new PriorityQueue<QVehicle>(5, VEHICLE_EXIT_COMPARATOR);
 
 	private VisDataImpl visData = new VisDataImpl() ;
 	
@@ -129,10 +108,8 @@ public final class QLane extends QueueWithBuffer implements Identifiable {
 		this.visData = new VisDataImpl();
 	}
 
-
 	@Override
 	public Id getId(){
-		// same as getLane().getId().  kai, aug'10
 		// lane has its own id.  kai, jun'13
 		return this.laneData.getId();
 	}
@@ -211,138 +188,9 @@ public final class QLane extends QueueWithBuffer implements Identifiable {
 		return this.thisTimeStepGreen ;
 	}
 
-	/**
-	 *  move vehicles from lane to buffer.  Includes possible 
-	 *  vehicle arrival, if this is the first lane on the link.
-	 *
-	 * @param now
-	 *          The current time.
-	 */
-	@Override 
-	void moveLaneToBuffer(final double now) {
-		QVehicle veh;
-
-//		this.moveTransitToQueue(now);
-		// handle regular traffic
-		while ((veh = this.vehQueue.peek()) != null) {
-			//we have an original QueueLink behaviour
-			if ((veh.getEarliestLinkExitTime() > now) && this.isFirstLane && (this.endsAtMetersFromLinkEnd == 0.0)){
-				return;
-			}
-			//this is the aneumann PseudoLink behaviour
-			else if (Math.floor(veh.getEarliestLinkExitTime()) > now){
-				return;
-			}
-
-			MobsimDriverAgent driver = veh.getDriver();
-
-//			boolean handled = this.handleTransitStop(now, veh, driver);
-			boolean handled = false ;
-
-			if (!handled) {
-				// Check if veh has reached destination:
-				if ((this.qLink.getLink().getId().equals(driver.getDestinationLinkId())) && (driver.chooseNextLinkId() == null)) {
-//					this.qLink.addParkedVehicle(veh);
-//					this.qLink.network.simEngine.letVehicleArrive(veh);
-//					this.qLink.makeVehicleAvailableToNextDriver(veh, now);
-//					// remove _after_ processing the arrival to keep link active
-//					this.vehQueue.poll();
-//					this.usedStorageCapacity -= veh.getSizeInEquivalents();
-					this.letVehicleArrive(now, veh);
-					continue;
-				}
-
-				/* is there still room left in the buffer, or is it overcrowded from the
-				 * last time steps? */
-				if (!isAcceptingFromWait()) {
-					return;
-				}
-
-				if (this.remainingflowCap >= 1.0) {
-					this.remainingflowCap--;
-				}
-				else if (this.flowcap_accumulate >= 1.0) {
-					this.flowcap_accumulate--;
-				}
-				else {
-					throw new IllegalStateException("Buffer of link " + this.qLink.getLink().getId() + " has no space left!");
-				}
-				this.buffer.add(veh);
-				this.usedBufferStorageCapacity += veh.getSizeInEquivalents() ;
-				if (this.buffer.size() == 1) {
-					this.bufferLastMovedTime = now;
-				}
-				this.qLink.getToNode().activateNode();
-				this.vehQueue.poll();
-				this.usedStorageCapacity -= veh.getSizeInEquivalents();
-			}
-		} // end while
-	}
-
-	/*
-	private boolean handleTransitStop(final double now, final QVehicle veh,
-			final MobsimDriverAgent driver) {
-		boolean handled = false;
-		// handle transit driver if necessary
-		if (driver instanceof TransitDriverAgent) {
-			TransitDriverAgent transitDriver = (TransitDriverAgent) veh.getDriver();
-			TransitStopFacility stop = transitDriver.getNextTransitStop();
-			if ((stop != null) && (stop.getLinkId().equals(qLink.getLink().getId()))) {
-				double delay = transitDriver.handleTransitStop(stop, now);
-				if (delay > 0.0) {
-
-					veh.setEarliestLinkExitTime(now + delay);
-					// (if the vehicle is not removed from the queue in the following lines, then this will effectively block the lane
-
-					if (!stop.getIsBlockingLane()) {
-						this.vehQueue.poll(); // remove the bus from the queue
-						transitVehicleStopQueue.add(veh); // and add it to the stop queue
-					}
-				}
-//			    start over: either this veh is still first in line,
-//				but has another stop on this link, or on another link, then it is moved on
-				handled = true;
-			}
-		}
-		return handled;
-	}
-	*/
-
-	/**
-	 * This method
-	 * moves transit vehicles from the stop queue directly to the front of the
-	 * "queue" of the QLink. An advantage is that this will observe flow
-	 * capacity restrictions. 
-	 */
-	/*
-	private void moveTransitToQueue(final double now) {
-		QVehicle veh;
-		// handle transit traffic in stop queue
-		List<QVehicle> departingTransitVehicles = null;
-		while ((veh = transitVehicleStopQueue.peek()) != null) {
-			// there is a transit vehicle.
-			if (veh.getEarliestLinkExitTime() > now) {
-				break;
-			}
-			if (departingTransitVehicles == null) {
-				departingTransitVehicles = new LinkedList<QVehicle>();
-			}
-			departingTransitVehicles.add(transitVehicleStopQueue.poll());
-		}
-		if (departingTransitVehicles != null) {
-			// add all departing transit vehicles at the front of the vehQueue
-			ListIterator<QVehicle> iter = departingTransitVehicles.listIterator(departingTransitVehicles.size());
-			while (iter.hasPrevious()) {
-				this.vehQueue.addFirst(iter.previous());
-			}
-		}
-	}
-	*/
-
-	@Override
-	public boolean isActive() {
+	@Override public boolean isActive() {
 		boolean active = (this.flowcap_accumulate < 1.0) || (!this.vehQueue.isEmpty())
-		|| (!this.isNotOfferingVehicle()) || (!this.transitVehicleStopQueue.isEmpty());
+		|| (!this.isNotOfferingVehicle()) /*|| (!this.transitVehicleStopQueue.isEmpty()) */;
 		return active;
 	}
 
@@ -457,38 +305,7 @@ public final class QLane extends QueueWithBuffer implements Identifiable {
 				< this.bufferStorageCapacity) && ((this.remainingflowCap >= 1.0)
 				|| (this.flowcap_accumulate >= 1.0)));
 	}
-	 /*
-	@Override
-	public QVehicle popFirstVehicle() {
-		double now = this.qLink.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
-		QVehicle veh = this.buffer.poll();
-		this.usedBufferStorageCapacity -= veh.getSizeInEquivalents() ;
-		this.bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
-		if (this.generatingEvents) {
-			this.qLink.network.simEngine.getMobsim().getEventsManager().processEvent(new LaneLeaveEvent(
-					now, veh.getDriver().getId(), this.qLink.getLink().getId(), this.getId()
-			));
-		}
-		this.qLink.network.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEvent(
-				now, veh.getDriver().getId(), this.qLink.getLink().getId(), veh.getId()
-		));
-		return veh;
-	}
-	*/
-	/**
-	 * @return Returns a collection of all vehicles (driving, parking, in buffer,
-	 *         ...) on the link.
-	 */
-	/*
-	 @Override
-	public Collection<MobsimVehicle> getAllVehicles() {
-		Collection<MobsimVehicle> vehicles = new ArrayList<MobsimVehicle>();
-		vehicles.addAll(this.transitVehicleStopQueue);
-		vehicles.addAll(this.vehQueue);
-		vehicles.addAll(this.buffer);
-		return vehicles;
-	}
-	*/
+
 	 void setGeneratingEvents(final boolean fireLaneEvents) {
 		this.generatingEvents = fireLaneEvents;
 	}
