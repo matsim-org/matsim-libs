@@ -202,7 +202,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 	}
 
 	@Override
-	public boolean isAcceptingFromWait() {
+	public final boolean isAcceptingFromWait() {
 		return this.hasFlowCapacityLeftAndBufferSpace() ;
 	}
 
@@ -394,7 +394,6 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 	}
 
 	final double effectiveVehicleFlowConsumptionInPCU( QVehicle veh ) {
-		//		return Math.min(1.0, veh.getSizeInEquivalents() ) ;
 		return veh.getSizeInEquivalents();
 	}
 
@@ -404,9 +403,9 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 	}
 
 	@Override
-	public boolean isActive() {
+	public final boolean isActive() {
 		return (this.flowcap_accumulate < 1.0) // still accumulating, thus active 
-				|| (!this.vehQueue.isEmpty()) ;
+				|| (!this.vehQueue.isEmpty()) || (!this.isNotOfferingVehicle()) ;
 	}
 
 	@Override
@@ -537,7 +536,6 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 			qLink.network.simEngine.getMobsim().getAgentCounter().decLiving();
 		}
 		vehQueue.clear();
-		//		linkEnterTimeMap.clear();
 
 		for (QVehicle veh : buffer) {
 			qLink.network.simEngine.getMobsim().getEventsManager().processEvent(

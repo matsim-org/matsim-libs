@@ -187,13 +187,15 @@ public final class QLane extends QueueWithBuffer implements Identifiable {
 	boolean isThisTimeStepGreen(){
 		return this.thisTimeStepGreen ;
 	}
-
+	/*
 	@Override public boolean isActive() {
 		boolean active = (this.flowcap_accumulate < 1.0) || (!this.vehQueue.isEmpty())
-		|| (!this.isNotOfferingVehicle()) /*|| (!this.transitVehicleStopQueue.isEmpty()) */;
+		|| (!this.isNotOfferingVehicle()) 
+		// || (!this.transitVehicleStopQueue.isEmpty())
+		;
 		return active;
 	}
-
+	*/
 
 	/** called from framework, do everything related to link movement here
 	 *
@@ -297,20 +299,21 @@ public final class QLane extends QueueWithBuffer implements Identifiable {
 	/**
 	 * @return <code>true</code> if there are less vehicles in buffer than the flowCapacity's ceil
 	 */
-	 @Override
-	 public boolean isAcceptingFromWait() {
+	/*
+	 @Override public boolean isAcceptingFromWait() {
 		return ((
 //				this.buffer.size()
 				this.usedBufferStorageCapacity
 				< this.bufferStorageCapacity) && ((this.remainingflowCap >= 1.0)
 				|| (this.flowcap_accumulate >= 1.0)));
 	}
+	*/
 
 	 void setGeneratingEvents(final boolean fireLaneEvents) {
 		this.generatingEvents = fireLaneEvents;
 	}
 
-	 void addToLane(final QLane lane) {
+	 void addAToLane(final QLane lane) {
 		 // this is needed since the movement from one lane to the next is done internally. kai, jun'13
 		if (this.toLanes == null) {
 			this.toLanes = new LinkedList<QLane>();
