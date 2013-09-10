@@ -108,7 +108,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 	/**
 	 * Holds all vehicles that are ready to cross the outgoing intersection
 	 */
-	Queue<QVehicle> buffer = new LinkedList<QVehicle>() ;
+	 Queue<QVehicle> buffer = new LinkedList<QVehicle>() ;
 	/**
 	 * null if the link is not signalized
 	 */
@@ -173,10 +173,9 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 
 	@Override
 	public final void addFromWait(final QVehicle veh, final double now) {
-		// We are trying to modify this so it also works for vehicles different from size one.  The idea is that vehicles
-		// _larger_ than size one can move as soon as at least one unit of flow or storage capacity is available.  
-		// kai/mz/amit, mar'12
-
+		addToBuffer(veh, now);
+	}
+	private void addToBuffer(final QVehicle veh, final double now) {
 		// yy might make sense to just accumulate to "zero" and go into negative when something is used up.
 		// kai/mz/amit, mar'12
 
@@ -363,7 +362,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 				return;
 			}
 
-			addFromWait(veh, now);
+			addToBuffer(veh, now);
 			removeVehicleFromQueue(now);
 		} // end while
 	}

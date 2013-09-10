@@ -294,6 +294,7 @@ public final class QLane extends QueueWithBuffer implements Identifiable, Signal
 					throw new IllegalStateException("Buffer of link " + this.qLink.getLink().getId() + " has no space left!");
 				}
 				this.buffer.add(veh);
+				this.usedBufferStorageCapacity += veh.getSizeInEquivalents() ;
 				if (this.buffer.size() == 1) {
 					this.bufferLastMovedTime = now;
 				}
@@ -417,6 +418,7 @@ public final class QLane extends QueueWithBuffer implements Identifiable, Signal
 			if (toQueueLane != null) {
 				if (toQueueLane.isAcceptingFromUpstream()) {
 					this.buffer.poll();
+					this.usedBufferStorageCapacity -= veh.getSizeInEquivalents() ;
 					this.qLink.network.simEngine.getMobsim().getEventsManager().processEvent(
 							new LaneLeaveEvent(now, veh.getDriver().getId(), this.qLink.getLink().getId(), this.getId()));
 //					toQueueLane.addFromPreviousLane(veh);
@@ -475,7 +477,10 @@ public final class QLane extends QueueWithBuffer implements Identifiable, Signal
 	 */
 	 @Override
 	 public boolean isAcceptingFromWait() {
-		return ((this.buffer.size() < this.bufferStorageCapacity) && ((this.remainingflowCap >= 1.0)
+		return ((
+//				this.buffer.size()
+				this.usedBufferStorageCapacity
+				< this.bufferStorageCapacity) && ((this.remainingflowCap >= 1.0)
 				|| (this.flowcap_accumulate >= 1.0)));
 	}
 
@@ -483,6 +488,7 @@ public final class QLane extends QueueWithBuffer implements Identifiable, Signal
 	public QVehicle popFirstVehicle() {
 		double now = this.qLink.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 		QVehicle veh = this.buffer.poll();
+		this.usedBufferStorageCapacity -= veh.getSizeInEquivalents() ;
 		this.bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
 		if (this.generatingEvents) {
 			this.qLink.network.simEngine.getMobsim().getEventsManager().processEvent(new LaneLeaveEvent(
