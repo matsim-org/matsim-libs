@@ -117,7 +117,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 	private VisData visData = new VisDataImpl() ;
 	private static int congDensWarnCnt2 = 0;
 	private static int congDensWarnCnt = 0;
-	private static int spaceCapWarningCount = 0;
+	static int spaceCapWarningCount = 0;
 	static boolean HOLES = false ; // can be set from elsewhere in package, but not from outside.  kai, nov'10
 
 	QueueWithBuffer(AbstractQLink qLinkImpl,  final VehicleQ<QVehicle> vehicleQueue ) {

@@ -79,12 +79,9 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 
 	private static final Logger log = Logger.getLogger(QLane.class);
 
-	private static int spaceCapWarningCount = 0;
-
 	private static final Comparator<QVehicle> VEHICLE_EXIT_COMPARATOR = new QVehicleEarliestLinkExitTimeComparator();
-
-	private final Map<QVehicle, Double> laneEnterTimeMap = new HashMap<QVehicle, Double>();
-
+	// yyyyyy needs to go since this interacts with the configurable veh queue !!!!! kai, sep'13	
+	
 	/**
 	 * This collection contains all Lanes downstream, if null it is the last lane
 	 * within a QueueLink.
@@ -484,7 +481,6 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 
 	private void add(final QVehicle veh, final double now) {
 		this.vehQueue.add(veh);
-		this.laneEnterTimeMap.put(veh, now);
 		this.usedStorageCapacity += veh.getSizeInEquivalents();
 		if (this.generatingEvents) {
 			this.qLink.network.simEngine.getMobsim().getEventsManager()
@@ -497,7 +493,6 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 
 	@Override
 	public void addFromWait(final QVehicle veh, final double now) {
-		this.laneEnterTimeMap.put(veh, now);
 		this.addToBuffer(veh, now);
 	}
 	
@@ -532,7 +527,6 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 		double now = this.qLink.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 		QVehicle veh = this.buffer.poll();
 		this.bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
-		this.laneEnterTimeMap.remove(veh);
 		if (this.generatingEvents) {
 			this.qLink.network.simEngine.getMobsim().getEventsManager().processEvent(new LaneLeaveEvent(
 					now, veh.getDriver().getId(), this.qLink.getLink().getId(), this.getId()
@@ -569,49 +563,6 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 	@Override
 	public boolean isAcceptingFromUpstream() {
 		return this.usedStorageCapacity < getStorageCapacity();
-	}
-
-	@Override
-	public double getStorageCapacity() {
-		// only for tests
-		return this.storageCapacity;
-	}
-
-	@Override
-	public void clearVehicles() {
-		double now = this.qLink.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
-
-		for (QVehicle veh : this.vehQueue) {
-			this.qLink.network.simEngine.getMobsim().getEventsManager().processEvent(
-					new AgentStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
-			this.qLink.network.simEngine.getMobsim().getAgentCounter().incLost();
-			this.qLink.network.simEngine.getMobsim().getAgentCounter().decLiving();
-		}
-		this.vehQueue.clear();
-		this.laneEnterTimeMap.clear();
-		
-		for (QVehicle veh : this.buffer) {
-			this.qLink.network.simEngine.getMobsim().getEventsManager().processEvent(
-					new AgentStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
-			this.qLink.network.simEngine.getMobsim().getAgentCounter().incLost();
-			this.qLink.network.simEngine.getMobsim().getAgentCounter().decLiving();
-		}
-		this.buffer.clear();
-
-	}
-
-	// search for vehicleId..
-	@Override
-	public QVehicle getVehicle(final Id id) {
-		for (QVehicle veh : this.vehQueue) {
-			if (veh.getId().equals(id))
-				return veh;
-		}
-		for (QVehicle veh : this.buffer) {
-			if (veh.getId().equals(id))
-				return veh;
-		}
-		return null;
 	}
 
 	/**
