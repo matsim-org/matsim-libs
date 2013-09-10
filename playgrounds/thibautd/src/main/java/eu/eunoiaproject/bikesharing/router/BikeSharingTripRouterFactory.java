@@ -32,6 +32,7 @@ import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripRouterFactory;
 
 import eu.eunoiaproject.bikesharing.BikeSharingConstants;
+import eu.eunoiaproject.bikesharing.scenario.BikeSharingConfigGroup;
 import eu.eunoiaproject.bikesharing.scenario.BikeSharingFacilities;
 
 /**
@@ -59,11 +60,14 @@ public class BikeSharingTripRouterFactory implements TripRouterFactory {
 	public TripRouter instantiateAndConfigureTripRouter(final RoutingContext iterationContext) {
 		final TripRouter router = delegate.instantiateAndConfigureTripRouter(iterationContext);
 
+		final BikeSharingConfigGroup configGroup = (BikeSharingConfigGroup)
+			scenario.getConfig().getModule( BikeSharingConfigGroup.GROUP_NAME );
 		router.setRoutingModule(
 				BikeSharingConstants.MODE,
 				new BikeSharingRoutingModule(
 					MatsimRandom.getLocalInstance(),
 					scenario.getScenarioElement( BikeSharingFacilities.class ),
+					configGroup.getSearchRadius(),
 					scenario.getConfig().plansCalcRoute()) );
 
 		final MainModeIdentifier defaultModeIdentifier = router.getMainModeIdentifier();

@@ -28,6 +28,7 @@ public class BikeSharingConfigGroup extends ReflectiveModule {
 	public static final String GROUP_NAME = "bikeSharing";
 
 	private String facilitiesFile = null;
+	private double searchRadius = 500;
 
 	public BikeSharingConfigGroup() {
 		super( GROUP_NAME );
@@ -43,5 +44,14 @@ public class BikeSharingConfigGroup extends ReflectiveModule {
 		this.facilitiesFile = facilitiesFile;
 	}
 
+	@StringGetter( "searchRadius" )
+	public double getSearchRadius() {
+		return this.searchRadius;
+	}
+
+	@StringSetter( "searchRadius" )
+	public void setSearchRadius(double searchRadius) {
+		this.searchRadius = searchRadius;
+	}
 }
 

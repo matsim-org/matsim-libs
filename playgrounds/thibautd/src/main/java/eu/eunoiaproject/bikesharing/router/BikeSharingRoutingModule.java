@@ -51,20 +51,21 @@ import eu.eunoiaproject.bikesharing.scenario.BikeSharingRoute;
 public class BikeSharingRoutingModule implements RoutingModule {
 	private final StageActivityTypes stageTypes = new StageActivityTypesImpl( BikeSharingConstants.INTERACTION_TYPE );
 
-	// TODO make configurable
-	private static final double SEARCH_RADIUS = 500;
 
 	private final Random random;
 	private final BikeSharingFacilities bikeSharingFacilities;
 	private final PlansCalcRouteConfigGroup config;
+	private final double searchRadius;
 
 	public BikeSharingRoutingModule(
 			final Random random,
 			final BikeSharingFacilities bikeSharingFacilities,
+			final double searchRadius,
 			final PlansCalcRouteConfigGroup config ) {
 		this.random = random;
 		this.bikeSharingFacilities = bikeSharingFacilities;
 		this.config = config;
+		this.searchRadius = searchRadius;
 	}
 
 	@Override
@@ -136,7 +137,7 @@ public class BikeSharingRoutingModule implements RoutingModule {
 			bikeSharingFacilities.getCurrentQuadTree().get(
 					facility.getCoord().getX(),
 					facility.getCoord().getY(),
-					SEARCH_RADIUS );
+					searchRadius );
 		return stationsInRadius.isEmpty() ?
 			bikeSharingFacilities.getCurrentQuadTree().get(
 					facility.getCoord().getX(),
