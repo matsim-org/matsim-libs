@@ -36,6 +36,16 @@ import org.matsim.vehicles.Vehicle;
 
 
 /**
+ * When plugged into the transit router, will switch to a different, randomly generated combination of
+ * marginal utilities every time it is called for a new agent.
+ * <p/>
+ * Comments:<ul>
+ * <li> In the literature, they seem to use log-normal distributions for the tastes.  (Makes sense
+ * since it addresse the symmetry problem which I am addressing ad-hoc.) [M. K. Anderson, hEART'13]
+ * kai, sep'13
+ * <li> People seem to use "gamma distributions for the error term" ("double stochastic assignment").
+ * Not sure what that does, if we need it, etc.  [M. K. Anderson, hEART'13] kai, sep'13
+ * </ul>
  * @author kai
  * @author dgrether
  *
