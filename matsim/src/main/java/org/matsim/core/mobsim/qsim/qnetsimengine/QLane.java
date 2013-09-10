@@ -156,7 +156,8 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 		this.flowcap_accumulate = (this.flowCapacityPerTimeStepFractionalPart == 0.0 ? 0.0 : 1.0);
 	}
 
-	private void calculateFlowCapacity(final double time) {
+	@Override
+	void calculateFlowCapacity(final double time) {
 		this.flowCapacityPerTimeStep = ((LinkImpl)this.qLink.getLink()).getFlowCapacity(time);
 		if (this.laneData != null) {
 			/*
@@ -182,8 +183,8 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 		this.flowCapacityPerTimeStepFractionalPart = this.flowCapacityPerTimeStep - (int) this.flowCapacityPerTimeStep;
 	}
 
-
-	private void calculateStorageCapacity(final double time) {
+	@Override
+	void calculateStorageCapacity(final double time) {
 		double storageCapFactor = this.qLink.network.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().getStorageCapFactor();
 		this.bufferStorageCapacity = (int) Math.ceil(this.flowCapacityPerTimeStep);
 

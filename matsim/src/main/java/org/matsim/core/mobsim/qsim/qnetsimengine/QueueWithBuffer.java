@@ -216,7 +216,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 		}
 	}
 
-	private void calculateFlowCapacity(final double time) {
+	void calculateFlowCapacity(final double time) {
 //		flowCapacityPerTimeStep = ((LinkImpl)qLink.getLink()).getFlowCapacity(time);
 		flowCapacityPerTimeStep = this.rawFlowCapacity_s ;
 		// we need the flow capacity per sim-tick and multiplied with flowCapFactor
@@ -227,7 +227,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 		flowCapacityPerTimeStepFractionalPart = flowCapacityPerTimeStep - (int) flowCapacityPerTimeStep;
 	}
 
-	private void calculateStorageCapacity(final double time) {
+	void calculateStorageCapacity(final double time) {
 		double storageCapFactor = network.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().getStorageCapFactor();
 		bufferStorageCapacity = (int) Math.ceil(flowCapacityPerTimeStep);
 
@@ -561,7 +561,6 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 		return this.visData  ;
 	}
 
-
 	@Override
 	public final QVehicle getFirstVehicle() {
 		return this.buffer.peek() ;
@@ -594,6 +593,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 		// be defensive:
 		this.recalcTimeVariantAttributes(now);
 	}
+	
 	@Override
 	public final void changeRawFlowCapacityPerSecond( final double val, final double now ) {
 		this.rawFlowCapacity_s = val ;
