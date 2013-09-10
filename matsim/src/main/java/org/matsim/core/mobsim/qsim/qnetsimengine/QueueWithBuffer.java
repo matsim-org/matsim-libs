@@ -343,9 +343,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 			else if (Math.floor(veh.getEarliestLinkExitTime()) > now){
 				return;
 			}
-//			if (veh.getEarliestLinkExitTime() > now){
-//				return;
-//			}
+
 			MobsimDriverAgent driver = veh.getDriver();
 
 			HandleTransitStopResult handleTransitStop = qLink.handleTransitStop(now, veh, driver);
