@@ -40,17 +40,14 @@ import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.LaneEnterEvent;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.internal.MatsimComparator;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.comparators.QVehicleEarliestLinkExitTimeComparator;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.lanes.data.v20.LaneData20;
 import org.matsim.lanes.vis.VisLane;
-import org.matsim.signalsystems.mobsim.SignalizeableItem;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.VisData;
 
@@ -66,7 +63,7 @@ import org.matsim.vis.snapshotwriters.VisData;
  * @author aneumann
  * @author mrieser
  */
-public final class QLane extends QueueWithBuffer implements Identifiable, SignalizeableItem {
+public final class QLane extends QueueWithBuffer implements Identifiable {
 	// this has public material without any kind of interface since it is accessed via qLink.get*Lane*() (in some not-yet-finalized
 	// syntax).  kai, aug'10
 
@@ -483,7 +480,7 @@ public final class QLane extends QueueWithBuffer implements Identifiable, Signal
 				< this.bufferStorageCapacity) && ((this.remainingflowCap >= 1.0)
 				|| (this.flowcap_accumulate >= 1.0)));
 	}
-
+	 /*
 	@Override
 	public QVehicle popFirstVehicle() {
 		double now = this.qLink.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
@@ -500,12 +497,13 @@ public final class QLane extends QueueWithBuffer implements Identifiable, Signal
 		));
 		return veh;
 	}
-
+	*/
 	/**
 	 * @return Returns a collection of all vehicles (driving, parking, in buffer,
 	 *         ...) on the link.
 	 */
-	@Override
+	/*
+	 @Override
 	public Collection<MobsimVehicle> getAllVehicles() {
 		Collection<MobsimVehicle> vehicles = new ArrayList<MobsimVehicle>();
 		vehicles.addAll(this.transitVehicleStopQueue);
@@ -513,7 +511,7 @@ public final class QLane extends QueueWithBuffer implements Identifiable, Signal
 		vehicles.addAll(this.buffer);
 		return vehicles;
 	}
-
+	*/
 	 void setGeneratingEvents(final boolean fireLaneEvents) {
 		this.generatingEvents = fireLaneEvents;
 	}

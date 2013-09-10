@@ -25,8 +25,10 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.core.api.experimental.events.LaneLeaveEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.gbl.Gbl;
@@ -94,15 +96,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 	 * according to the free travel speed of the link
 	 */
 	 VehicleQ<QVehicle> vehQueue;
-	/**
-	 * This needs to be a ConcurrentHashMap because it can be accessed concurrently from
-	 * two different threads via addFromIntersection(...) and popFirstVehicle().
-	 * <p/>
-	 * Design thoughts: <ul>
-	 * <li> yyyy The _only_ place where this is needed is visualization.  I am, however, convinced that we can also get this from
-	 * earliest link exit time. kai, jun'13
-	 */
-	//	Map<QVehicle, Double> linkEnterTimeMap = new ConcurrentHashMap<QVehicle, Double>() ;
+
 	double storageCapacity;
 	double usedStorageCapacity;
 	/**
@@ -466,7 +460,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 	}
 
 	@Override
-	public Collection<MobsimVehicle> getAllVehicles() {
+	public final Collection<MobsimVehicle> getAllVehicles() {
 		Collection<MobsimVehicle> vehicles = new ArrayList<MobsimVehicle>();
 		vehicles.addAll(vehQueue);
 		vehicles.addAll(buffer);
@@ -474,19 +468,19 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 	}
 
 	@Override
-	public QVehicle popFirstVehicle() {
+	public final QVehicle popFirstVehicle() {
 		double now = qLink.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 		QVehicle veh = buffer.poll();
 		usedBufferStorageCapacity = usedBufferStorageCapacity - veh.getSizeInEquivalents();
 		bufferLastMovedTime = now; // just in case there is another vehicle in the buffer that is now the new front-most
-		//		linkEnterTimeMap.remove(veh);
-
-		//		Assert.assertTrue( veh != null ) ;
-		//		Assert.assertTrue( veh.getDriver() != null ) ;
-		//		Assert.assertTrue( this.getLink() != null ) ;
-
-		qLink.network.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEvent(now, veh.getDriver().getId(), 
-				this.id, veh.getId()));
+		if (this.generatingEvents) {
+			this.qLink.network.simEngine.getMobsim().getEventsManager().processEvent(new LaneLeaveEvent(
+					now, veh.getDriver().getId(), this.qLink.getLink().getId(), this.getId()
+			));
+		}
+		qLink.network.simEngine.getMobsim().getEventsManager().processEvent(new LinkLeaveEvent(
+				now, veh.getDriver().getId(), this.id, veh.getId()
+		));
 		return veh;
 	}
 
@@ -611,6 +605,12 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 		this.rawFlowCapacity_s = val ;
 		// be defensive:
 		this.recalcTimeVariantAttributes(now);
+	}
+	
+	Id getId() {
+		// need this so we can generate lane events although we do not need them here. kai, sep'13
+		// yyyy would probably be better to have this as a final variable set during construction. kai, sep'13
+		return this.qLink.link.getId() ;
 	}
 
 	static class Hole extends QItem {
