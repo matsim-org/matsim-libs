@@ -142,7 +142,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 	}
 
 	@Override
-	public void addFromWait(final QVehicle veh, final double now) {
+	public final void addFromWait(final QVehicle veh, final double now) {
 		// We are trying to modify this so it also works for vehicles different from size one.  The idea is that vehicles
 		// _larger_ than size one can move as soon as at least one unit of flow or storage capacity is available.  
 		// kai/mz/amit, mar'12

@@ -310,7 +310,20 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 					return;
 				}
 
-				addToBuffer(veh, now);
+				if (this.remainingflowCap >= 1.0) {
+					this.remainingflowCap--;
+				}
+				else if (this.flowcap_accumulate >= 1.0) {
+					this.flowcap_accumulate--;
+				}
+				else {
+					throw new IllegalStateException("Buffer of link " + this.qLink.getLink().getId() + " has no space left!");
+				}
+				this.buffer.add(veh);
+				if (this.buffer.size() == 1) {
+					this.bufferLastMovedTime = now;
+				}
+				this.qLink.getToNode().activateNode();
 				this.vehQueue.poll();
 				this.usedStorageCapacity -= veh.getSizeInEquivalents();
 			}
@@ -484,30 +497,6 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 		
 	}
 	
-	
-
-	@Override
-	public void addFromWait(final QVehicle veh, final double now) {
-		this.addToBuffer(veh, now);
-	}
-	
-	 private void addToBuffer(final QVehicle veh, final double now) {
-		if (this.remainingflowCap >= 1.0) {
-			this.remainingflowCap--;
-		}
-		else if (this.flowcap_accumulate >= 1.0) {
-			this.flowcap_accumulate--;
-		}
-		else {
-			throw new IllegalStateException("Buffer of link " + this.qLink.getLink().getId() + " has no space left!");
-		}
-		this.buffer.add(veh);
-		if (this.buffer.size() == 1) {
-			this.bufferLastMovedTime = now;
-		}
-		this.qLink.getToNode().activateNode();
-	}
-
 	/**
 	 * @return <code>true</code> if there are less vehicles in buffer than the flowCapacity's ceil
 	 */
