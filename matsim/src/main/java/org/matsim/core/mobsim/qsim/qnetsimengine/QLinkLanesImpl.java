@@ -312,7 +312,8 @@ public class QLinkLanesImpl extends AbstractQLink {
 			movedAtLeastOne = true;
 			this.network.simEngine.getMobsim().getEventsManager().processEvent(
 					new AgentWait2LinkEvent(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId()));
-			boolean handled = this.firstLane.addTransitToStopQueue(now, veh);
+//			boolean handled = this.firstLane.addTransitToStopQueue(now, veh);
+			boolean handled = false ;
 			if (!handled) {
 				this.firstLane.addFromWait(veh, now);
 			}

@@ -228,6 +228,7 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 		return this.thisTimeStepGreen ;
 	}
 
+	/*
 	boolean addTransitToStopQueue(final double now, final QVehicle veh) {
 		if (veh.getDriver() instanceof TransitDriverAgent) {
 			TransitDriverAgent driver = (TransitDriverAgent) veh.getDriver();
@@ -248,6 +249,7 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 		}
 		return false;
 	}
+	*/
 
 	/**
 	 *  move vehicles from lane to buffer.  Includes possible 
@@ -259,7 +261,7 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 	private void moveLaneToBuffer(final double now) {
 		QVehicle veh;
 
-		this.moveTransitToQueue(now);
+//		this.moveTransitToQueue(now);
 		// handle regular traffic
 		while ((veh = this.vehQueue.peek()) != null) {
 			//we have an original QueueLink behaviour
@@ -273,7 +275,8 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 
 			MobsimDriverAgent driver = veh.getDriver();
 
-			boolean handled = this.handleTransitStop(now, veh, driver);
+//			boolean handled = this.handleTransitStop(now, veh, driver);
+			boolean handled = false ;
 
 			if (!handled) {
 				// Check if veh has reached destination:
@@ -313,6 +316,7 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 		} // end while
 	}
 
+	/*
 	private boolean handleTransitStop(final double now, final QVehicle veh,
 			final MobsimDriverAgent driver) {
 		boolean handled = false;
@@ -332,14 +336,14 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 						transitVehicleStopQueue.add(veh); // and add it to the stop queue
 					}
 				}
-				/* start over: either this veh is still first in line,
-				 * but has another stop on this link, or on another link, then it is moved on
-				 */
+//			    start over: either this veh is still first in line,
+//				but has another stop on this link, or on another link, then it is moved on
 				handled = true;
 			}
 		}
 		return handled;
 	}
+	*/
 
 	/**
 	 * This method
@@ -347,6 +351,7 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 	 * "queue" of the QLink. An advantage is that this will observe flow
 	 * capacity restrictions. 
 	 */
+	/*
 	private void moveTransitToQueue(final double now) {
 		QVehicle veh;
 		// handle transit traffic in stop queue
@@ -369,6 +374,7 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 			}
 		}
 	}
+	*/
 
 	@Override
 	public boolean isActive() {
