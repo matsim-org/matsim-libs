@@ -197,7 +197,7 @@ public class RandomizedTransitRouterTravelTimeAndDisutility  extends TransitRout
 				System.out.println("personId: " + person.getId() +
 						"; margUtlOfTimeWlk_h: " + this.localMarginalUtilityOfTravelTimeWalk_utl_s*3600. +
 						"; utlOfLineSwitch: " + this.localUtilityOfLineSwitch_utl +
-						"; margUtlOfWait_h: " + this.localMarginalUtilityOfTravelTimeWalk_utl_s*3600. + 
+						"; margUtlOfWait_h: " + this.localMarginalUtilityOfWaitingPt_utl_s*3600. + 
 						"; margUtlOfTimePt_h: " + this.localMarginalUtilityOfTravelTimePt_utl_s*3600. ) ;
 			}
 		}

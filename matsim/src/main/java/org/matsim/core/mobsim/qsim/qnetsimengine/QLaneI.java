@@ -38,7 +38,7 @@ import org.matsim.vis.snapshotwriters.VisData;
  * @author nagel
  *
  */
-interface QLaneI {
+interface QLaneI extends QNetsimObject {
 	
 	boolean doSimStep( final double now ) ;
 	

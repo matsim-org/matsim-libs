@@ -122,6 +122,12 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 	static int congDensWarnCnt = 0;
 	static int spaceCapWarningCount = 0;
 	static boolean HOLES = false ; // can be set from elsewhere in package, but not from outside.  kai, nov'10
+	/**
+	 * LaneEvents should only be fired if there is more than one QueueLane on a QueueLink
+	 * because the LaneEvents are identical with LinkEnter/LeaveEvents otherwise.
+	 * Possibly set to "true" in QLane .
+	 */
+	boolean generatingEvents = false;
 	
 	// get properties no longer from qlink, but have them by yourself:
 	double length = Double.NaN ;
@@ -157,6 +163,11 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 				this.holes.add(hole) ;
 			}
 			// yyyyyy this does, once more, not work with variable vehicle sizes.  kai, may'13
+		}
+		
+		if ( this.network.simEngine.getMobsim().getSimTimer().getSimTimestepSize()<1.) {
+			throw new RuntimeException("yyyy This will produce weird results because in at least one place "
+					+ "(addFromUpstream(...)) everything is pulled to integer values.  Aborting ...") ;
 		}
 	}
 
@@ -321,7 +332,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 	 * @param now
 	 *          The current time.
 	 */
-	private void moveLaneToBuffer(final double now) {
+	void moveLaneToBuffer(final double now) {
 		QVehicle veh;
 
 		while ((veh = vehQueue.peek()) != null) {
@@ -357,7 +368,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 		} // end while
 	}
 
-	private QVehicle removeVehicleFromQueue(final double now) {
+	final QVehicle removeVehicleFromQueue(final double now) {
 		QVehicle veh = vehQueue.poll();
 		usedStorageCapacity -= veh.getSizeInEquivalents();
 		if ( QueueWithBuffer.HOLES ) {
@@ -369,7 +380,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 		return veh ;
 	}
 
-	private void letVehicleArrive(final double now, QVehicle veh) {
+	final void letVehicleArrive(final double now, QVehicle veh) {
 		qLink.addParkedVehicle(veh);
 		network.simEngine.letVehicleArrive(veh);
 		qLink.makeVehicleAvailableToNextDriver(veh, now);
@@ -377,7 +388,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 		removeVehicleFromQueue( now ) ;
 	}
 
-	private double effectiveVehicleFlowConsumptionInPCU( QVehicle veh ) {
+	final double effectiveVehicleFlowConsumptionInPCU( QVehicle veh ) {
 		//		return Math.min(1.0, veh.getSizeInEquivalents() ) ;
 		return veh.getSizeInEquivalents();
 	}
@@ -537,12 +548,17 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 	public void addFromUpstream(final QVehicle veh) {
 		double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 		qLink.activateLink();
-		//		linkEnterTimeMap.put(veh, now);
 		usedStorageCapacity += veh.getSizeInEquivalents();
 		double vehicleTravelTime = this.length / veh.getMaximumVelocity();
 		double linkTravelTime = Math.max(freespeedTravelTime, vehicleTravelTime);
 		double earliestExitTime = now + linkTravelTime;
+
 		earliestExitTime = Math.floor(earliestExitTime);
+		// yyyy I have no idea why this is in here.  Supposedly pulls the link travel times to "second"
+		// values, but I don't see why this has to be, and worse, it is wrong when the time step is
+		// not one second.  And obviously dangerous if someone tries sub-second time steps.
+		// kai, sep'13
+		
 		veh.setEarliestLinkExitTime(earliestExitTime);
 		veh.setCurrentLink(qLink.getLink());
 		vehQueue.add(veh);

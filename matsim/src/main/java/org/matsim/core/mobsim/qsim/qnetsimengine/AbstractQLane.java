@@ -48,7 +48,7 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
  * @author dgrether
  */
 @Deprecated // see comment above
-abstract class AbstractQLane {
+abstract class AbstractQLane implements QNetsimObject {
 	
 	abstract boolean doSimStep(final double now) ;
 	

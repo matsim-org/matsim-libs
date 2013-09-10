@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Queue;
@@ -39,7 +38,6 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.LaneEnterEvent;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
@@ -47,18 +45,12 @@ import org.matsim.core.api.internal.MatsimComparator;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.comparators.QVehicleEarliestLinkExitTimeComparator;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QueueWithBuffer.VisDataImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.collections.Tuple;
-import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.data.v20.LaneData20;
 import org.matsim.lanes.vis.VisLane;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-import org.matsim.signalsystems.mobsim.DefaultSignalizeableItem;
 import org.matsim.signalsystems.mobsim.SignalizeableItem;
-import org.matsim.signalsystems.model.SignalGroupState;
 import org.matsim.vis.snapshotwriters.AgentSnapshotInfo;
 import org.matsim.vis.snapshotwriters.VisData;
 
@@ -74,7 +66,7 @@ import org.matsim.vis.snapshotwriters.VisData;
  * @author aneumann
  * @author mrieser
  */
-public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable, SignalizeableItem {
+public final class QLane extends QueueWithBuffer implements Identifiable, SignalizeableItem {
 	// this has public material without any kind of interface since it is accessed via qLink.get*Lane*() (in some not-yet-finalized
 	// syntax).  kai, aug'10
 
@@ -103,12 +95,6 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 	private final Set<Id> destinationLinkIds = new LinkedHashSet<Id>();
 
 	private final LaneData20 laneData;
-
-	/**
-	 * LaneEvents should only be fired if there is more than one QueueLane on a QueueLink
-	 * because the LaneEvents are identical with LinkEnter/LeaveEvents otherwise.
-	 */
-	private boolean generatingEvents = false;
 
 	private Map<Id, List<QLane>> toLinkToQLanesMap = null;
 
@@ -258,7 +244,8 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 	 * @param now
 	 *          The current time.
 	 */
-	private void moveLaneToBuffer(final double now) {
+	@Override 
+	void moveLaneToBuffer(final double now) {
 		QVehicle veh;
 
 //		this.moveTransitToQueue(now);
@@ -281,12 +268,13 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 			if (!handled) {
 				// Check if veh has reached destination:
 				if ((this.qLink.getLink().getId().equals(driver.getDestinationLinkId())) && (driver.chooseNextLinkId() == null)) {
-					this.qLink.addParkedVehicle(veh);
-					this.qLink.network.simEngine.letVehicleArrive(veh);
-					this.qLink.makeVehicleAvailableToNextDriver(veh, now);
-					// remove _after_ processing the arrival to keep link active
-					this.vehQueue.poll();
-					this.usedStorageCapacity -= veh.getSizeInEquivalents();
+//					this.qLink.addParkedVehicle(veh);
+//					this.qLink.network.simEngine.letVehicleArrive(veh);
+//					this.qLink.makeVehicleAvailableToNextDriver(veh, now);
+//					// remove _after_ processing the arrival to keep link active
+//					this.vehQueue.poll();
+//					this.usedStorageCapacity -= veh.getSizeInEquivalents();
+					this.letVehicleArrive(now, veh);
 					continue;
 				}
 
@@ -465,7 +453,8 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 
 		earliestExitTime +=  veh.getEarliestLinkExitTime() - Math.floor(veh.getEarliestLinkExitTime());
 		// (yy this is what makes it pass the tests but I don't see why this is correct. kai, jun'13)
-		
+		// (I now think that this is some fractional leftover from an earlier lane. kai, sep'13)  
+
 		if ( this.meterFromLinkEnd == 0.0 ) {
 //			/* It's a QLane that is directly connected to a QNode,
 //			 * so we have to floor the freeLinkTravelTime in order the get the same
@@ -473,19 +462,14 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 			earliestExitTime = Math.floor(earliestExitTime);
 		}
 		veh.setEarliestLinkExitTime(earliestExitTime);
-		this.add(veh, now);
-	}
-
-	private void add(final QVehicle veh, final double now) {
 		this.vehQueue.add(veh);
 		this.usedStorageCapacity += veh.getSizeInEquivalents();
 		if (this.generatingEvents) {
 			this.qLink.network.simEngine.getMobsim().getEventsManager()
 			.processEvent(new LaneEnterEvent(now, veh.getDriver().getId(), this.qLink.getLink().getId(), this.getId()));
 		}
-		
 	}
-	
+
 	/**
 	 * @return <code>true</code> if there are less vehicles in buffer than the flowCapacity's ceil
 	 */
