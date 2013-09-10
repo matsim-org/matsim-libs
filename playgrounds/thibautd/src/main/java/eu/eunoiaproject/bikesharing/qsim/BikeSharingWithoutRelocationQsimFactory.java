@@ -92,6 +92,8 @@ public class BikeSharingWithoutRelocationQsimFactory implements MobsimFactory {
 					bikeSharingManager );
 		qSim.addDepartureHandler( bikeSharingEngine );
 		qSim.addMobsimEngine( bikeSharingEngine );
+
+		bikeSharingManager.addListener( new FacilityStateChangeRepeater( qSim ) );
 		// here ends the modified part.
 		//
 		// A relocation strategy could be added here,
