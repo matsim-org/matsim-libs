@@ -113,33 +113,40 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 	 * null if the link is not signalized
 	 */
 	DefaultSignalizeableItem qSignalizedItem = null ;
-	private double congestedDensity_veh_m;
-	private int nHolesMax;
+	double congestedDensity_veh_m;
+	int nHolesMax;
 	final AbstractQLink qLink;
-	private final QNetwork network ;
-	private VisData visData = new VisDataImpl() ;
-	private final double length;
+	final QNetwork network ;
 	final Id id;
-	private static int congDensWarnCnt2 = 0;
-	private static int congDensWarnCnt = 0;
+	static int congDensWarnCnt2 = 0;
+	static int congDensWarnCnt = 0;
 	static int spaceCapWarningCount = 0;
 	static boolean HOLES = false ; // can be set from elsewhere in package, but not from outside.  kai, nov'10
+	
+	// get properties no longer from qlink, but have them by yourself:
+	double length = Double.NaN ;
+
+	// (still) private:
+	private VisData visData = new VisDataImpl() ;
 
 	QueueWithBuffer(AbstractQLink qLinkImpl,  final VehicleQ<QVehicle> vehicleQueue ) {
 		this(qLinkImpl, vehicleQueue,  qLinkImpl.getLink().getId() ) ;
 	}
 	QueueWithBuffer(AbstractQLink qLinkImpl,  final VehicleQ<QVehicle> vehicleQueue, Id id ) {
 		this.id = id ;
-		this.length = qLinkImpl.getLink().getLength() ;	
 		this.qLink = qLinkImpl;
 		this.network = qLinkImpl.network ;
 		this.vehQueue = vehicleQueue ;
+		
+		this.length = qLinkImpl.getLink().getLength() ;	
 
 		freespeedTravelTime = this.length / qLinkImpl.getLink().getFreespeed();
 		if (Double.isNaN(freespeedTravelTime)) {
 			throw new IllegalStateException("Double.NaN is not a valid freespeed travel time for a link. Please check the attributes length and freespeed!");
 		}
-		calculateCapacities();
+		this.calculateFlowCapacity(Time.UNDEFINED_TIME);
+		this.calculateStorageCapacity(Time.UNDEFINED_TIME);
+		flowcap_accumulate = (flowCapacityPerTimeStepFractionalPart == 0.0 ? 0.0 : 1.0);
 
 		if ( QueueWithBuffer.HOLES ) {
 			for ( int ii=0 ; ii<this.getStorageCapacity(); ii++ ) {
@@ -202,16 +209,9 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 	@Override
 	public final void updateRemainingFlowCapacity() {
 		remainingflowCap = flowCapacityPerTimeStep;
-		//				if (this.thisTimeStepGreen && this.flowcap_accumulate < 1.0 && this.hasBufferSpaceLeft()) {
 		if (thisTimeStepGreen && flowcap_accumulate < 1.0 && isNotOfferingVehicle() ) {
 			flowcap_accumulate += flowCapacityPerTimeStepFractionalPart;
 		}
-	}
-
-	private void calculateCapacities() {
-		this.calculateFlowCapacity(Time.UNDEFINED_TIME);
-		this.calculateStorageCapacity(Time.UNDEFINED_TIME);
-		flowcap_accumulate = (flowCapacityPerTimeStepFractionalPart == 0.0 ? 0.0 : 1.0);
 	}
 
 	private void calculateFlowCapacity(final double time) {
@@ -579,6 +579,16 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 	@Override
 	public final void setSignalized( final boolean isSignalized) {
 		qSignalizedItem  = new DefaultSignalizeableItem(qLink.getLink().getToNode().getOutLinks().keySet());
+	}
+
+	final void changeLength(final double laneLengthMeters, double now) {
+		this.length = laneLengthMeters;
+		this.freespeedTravelTime = this.length / this.qLink.getLink().getFreespeed();
+		if (Double.isNaN(this.freespeedTravelTime)) {
+			throw new IllegalStateException("Double.NaN is not a valid freespeed travel time for a lane. Please check the attributes lane length and freespeed of link!");
+		}
+		// be defensive:
+		this.recalcTimeVariantAttributes(now);
 	}
 
 	static class Hole extends QItem {

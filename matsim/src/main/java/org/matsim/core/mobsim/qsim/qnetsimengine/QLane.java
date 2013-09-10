@@ -48,6 +48,7 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.comparators.QVehicleEarliestLinkExitTimeComparator;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QueueWithBuffer.VisDataImpl;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.collections.Tuple;
@@ -88,15 +89,11 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 	 */
 	private List<QLane> toLanes = null;
 
-	/*package*/ private VisDataImpl visData; // different VisDataImpl!!!
-
 	/**
 	 * This flag indicates whether the QLane is the first lane on the link or one
 	 * of the subsequent lanes.
 	 */
 	private final boolean isFirstLane;
-
-	private double length = Double.NaN;
 
 	private double meterFromLinkEnd = Double.NaN;
 
@@ -121,9 +118,10 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 	 */
 	private final Queue<QVehicle> transitVehicleStopQueue = new PriorityQueue<QVehicle>(5, VEHICLE_EXIT_COMPARATOR);
 
+	private VisDataImpl visData = new VisDataImpl() ;
+	
 	/*package*/ QLane(final NetsimLink ql, LaneData20 laneData, boolean isFirstLaneOnLink) {
 		super( (AbstractQLink) ql, new FIFOVehicleQ() ) ;
-//		this.qLink = (AbstractQLink) ql; // yyyy needs to be of correct, but should be made typesafe.  kai, aug'10
 		this.isFirstLane = isFirstLaneOnLink;
 		this.laneData = laneData;
 	}
@@ -177,8 +175,9 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 			this.flowCapacityPerTimeStep = this.laneData.getCapacityVehiclesPerHour() /  3600.0;
 		}
 		// we need the flow capcity per sim-tick and multiplied with flowCapFactor
-		this.flowCapacityPerTimeStep = this.flowCapacityPerTimeStep * this.qLink.network.simEngine.getMobsim().getSimTimer().getSimTimestepSize()
-		* this.qLink.network.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().getFlowCapFactor();
+		this.flowCapacityPerTimeStep = this.flowCapacityPerTimeStep 
+				* this.qLink.network.simEngine.getMobsim().getSimTimer().getSimTimestepSize()
+				* this.qLink.network.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().getFlowCapFactor();
 		this.inverseFlowCapacityPerTimeStep = 1.0 / this.flowCapacityPerTimeStep;
 		this.flowCapacityPerTimeStepFractionalPart = this.flowCapacityPerTimeStep - (int) this.flowCapacityPerTimeStep;
 	}
@@ -223,14 +222,6 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 		this.freespeedTravelTime = this.length / this.qLink.getLink().getFreespeed(now);
 		calculateFlowCapacity(now);
 		calculateStorageCapacity(now);
-	}
-
-	void setLaneLength(final double laneLengthMeters) {
-		this.length = laneLengthMeters;
-		this.freespeedTravelTime = this.length / this.qLink.getLink().getFreespeed();
-		if (Double.isNaN(this.freespeedTravelTime)) {
-			throw new IllegalStateException("Double.NaN is not a valid freespeed travel time for a lane. Please check the attributes lane length and freespeed of link!");
-		}
 	}
 
 	void setEndsAtMetersFromLinkEnd(final double meters) {

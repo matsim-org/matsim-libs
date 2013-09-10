@@ -35,6 +35,7 @@ import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
+import org.matsim.core.utils.misc.Time;
 import org.matsim.lanes.data.v20.LaneData20;
 import org.matsim.lanes.data.v20.LaneData20MeterFromLinkEndComparator;
 import org.matsim.lanes.data.v20.LanesToLinkAssignment20;
@@ -201,7 +202,7 @@ public class QLinkLanesImpl extends AbstractQLink {
 				lastQLane.setEndsAtMetersFromLinkEnd(0.0);
 				this.toNodeQueueLanes.add(lastQLane);
 			}
-			lastQLane.setLaneLength(laneLength);
+			lastQLane.changeLength(laneLength, Time.UNDEFINED_TIME );
 		}
 
 		//fill toLinks
