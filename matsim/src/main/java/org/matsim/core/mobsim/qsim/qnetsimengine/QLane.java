@@ -84,7 +84,7 @@ public final class QLane extends QueueWithBuffer implements Identifiable {
 	 */
 	private final boolean isFirstLane;
 
-	private double meterFromLinkEnd = Double.NaN;
+	private double endsAtMetersFromLinkEnd = Double.NaN;
 
 	/**
 	 * Contains all Link instances which are reachable from this lane
@@ -200,39 +200,16 @@ public final class QLane extends QueueWithBuffer implements Identifiable {
 	}
 
 	void setEndsAtMetersFromLinkEnd(final double meters) {
-		this.meterFromLinkEnd = meters;
+		this.endsAtMetersFromLinkEnd = meters;
 	}
 
 	double getEndsAtMeterFromLinkEnd(){
-		return this.meterFromLinkEnd;
+		return this.endsAtMetersFromLinkEnd;
 	}
 
 	boolean isThisTimeStepGreen(){
 		return this.thisTimeStepGreen ;
 	}
-
-	/*
-	boolean addTransitToStopQueue(final double now, final QVehicle veh) {
-		if (veh.getDriver() instanceof TransitDriverAgent) {
-			TransitDriverAgent driver = (TransitDriverAgent) veh.getDriver();
-			while (true) {
-				TransitStopFacility stop = driver.getNextTransitStop();
-				if ((stop != null) && (stop.getLinkId().equals(qLink.getLink().getId()))) {
-					double delay = driver.handleTransitStop(stop, now);
-					if (delay > 0.0) {
-						veh.setEarliestLinkExitTime(now + delay);
-						// add it to the stop queue, can do this as the waitQueue is also non-blocking anyway
-						transitVehicleStopQueue.add(veh);
-						return true;
-					}
-				} else {
-					return false;
-				}
-			}
-		}
-		return false;
-	}
-	*/
 
 	/**
 	 *  move vehicles from lane to buffer.  Includes possible 
@@ -249,7 +226,7 @@ public final class QLane extends QueueWithBuffer implements Identifiable {
 		// handle regular traffic
 		while ((veh = this.vehQueue.peek()) != null) {
 			//we have an original QueueLink behaviour
-			if ((veh.getEarliestLinkExitTime() > now) && this.isFirstLane && (this.meterFromLinkEnd == 0.0)){
+			if ((veh.getEarliestLinkExitTime() > now) && this.isFirstLane && (this.endsAtMetersFromLinkEnd == 0.0)){
 				return;
 			}
 			//this is the aneumann PseudoLink behaviour
@@ -454,7 +431,7 @@ public final class QLane extends QueueWithBuffer implements Identifiable {
 		// (yy this is what makes it pass the tests but I don't see why this is correct. kai, jun'13)
 		// (I now think that this is some fractional leftover from an earlier lane. kai, sep'13)  
 
-		if ( this.meterFromLinkEnd == 0.0 ) {
+		if ( this.endsAtMetersFromLinkEnd == 0.0 ) {
 //			/* It's a QLane that is directly connected to a QNode,
 //			 * so we have to floor the freeLinkTravelTime in order the get the same
 //			 * results compared to the old mobSim */
