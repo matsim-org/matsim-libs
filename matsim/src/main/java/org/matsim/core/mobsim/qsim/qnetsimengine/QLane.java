@@ -139,6 +139,10 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 				}
 			}
 		}
+		
+		this.flowcap_accumulate = (this.flowCapacityPerTimeStepFractionalPart == 0.0 ? 0.0 : 1.0);
+		// (needs to be re-done since flow cap changes after this was done for the first time)
+		
 		this.visData = new VisDataImpl();
 	}
 
@@ -148,12 +152,6 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 		// same as getLane().getId().  kai, aug'10
 		// lane has its own id.  kai, jun'13
 		return this.laneData.getId();
-	}
-
-	void calculateCapacities() {
-		calculateFlowCapacity(Time.UNDEFINED_TIME);
-		calculateStorageCapacity(Time.UNDEFINED_TIME);
-		this.flowcap_accumulate = (this.flowCapacityPerTimeStepFractionalPart == 0.0 ? 0.0 : 1.0);
 	}
 
 	@Override
@@ -216,13 +214,6 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 			}
 			this.storageCapacity = tempStorageCapacity;
 		}
-	}
-
-	@Override
-	public void recalcTimeVariantAttributes(final double now) {
-		this.freespeedTravelTime = this.length / this.qLink.getLink().getFreespeed(now);
-		calculateFlowCapacity(now);
-		calculateStorageCapacity(now);
 	}
 
 	void setEndsAtMetersFromLinkEnd(final double meters) {
@@ -515,15 +506,6 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 	}
 
 	/**
-	 * @return <code>true</code> if there are less vehicles in buffer + vehQueue (=
-	 *         the whole link), than there is space for vehicles.
-	 */
-	@Override
-	public boolean isAcceptingFromUpstream() {
-		return this.usedStorageCapacity < getStorageCapacity();
-	}
-
-	/**
 	 * @return Returns a collection of all vehicles (driving, parking, in buffer,
 	 *         ...) on the link.
 	 */
@@ -535,8 +517,6 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 		vehicles.addAll(this.buffer);
 		return vehicles;
 	}
-
-
 
 	 void setGeneratingEvents(final boolean fireLaneEvents) {
 		this.generatingEvents = fireLaneEvents;
@@ -659,18 +639,6 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 
 	void setOTFLane(VisLane otfLane) {
 		this.visData.visLane = otfLane;
-	}
-
-	final boolean hasFlowCapacityLeftAndBufferSpace() {
-		return (
-				hasBufferSpaceLeft() 
-				&& 
-				((this.remainingflowCap >= 1.0) || (this.flowcap_accumulate >= 1.0))
-				);
-	}
-
-	private boolean hasBufferSpaceLeft() {
-		return usedBufferStorageCapacity < this.bufferStorageCapacity;
 	}
 
 	@Override

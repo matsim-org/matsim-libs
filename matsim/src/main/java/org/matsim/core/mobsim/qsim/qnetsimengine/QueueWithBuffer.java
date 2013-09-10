@@ -191,18 +191,14 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 		// also in the original QLane code.  kai, sep'13
 	}
 
-	private boolean hasBufferSpaceLeft() {
-		return usedBufferStorageCapacity < bufferStorageCapacity;
-	}
-
 	@Override
 	public boolean isAcceptingFromWait() {
 		return this.hasFlowCapacityLeftAndBufferSpace() ;
 	}
 
-	private final boolean hasFlowCapacityLeftAndBufferSpace() {
+	final boolean hasFlowCapacityLeftAndBufferSpace() {
 		return (
-				hasBufferSpaceLeft() 
+				usedBufferStorageCapacity < bufferStorageCapacity 
 				&& 
 				((remainingflowCap >= 1.0) || (flowcap_accumulate >= 1.0))
 				);
@@ -411,14 +407,15 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 	}
 
 	@Override
-	public boolean isAcceptingFromUpstream() {
+	public final boolean isAcceptingFromUpstream() {
 		double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
 
 		boolean storageOk = usedStorageCapacity < storageCapacity ;
 		if ( !QueueWithBuffer.HOLES ) {
 			return storageOk ;
 		}
-		// continue only if HOLES
+		// (continue only if HOLES)
+		
 		if ( !storageOk ) {
 			return false ;
 		}
@@ -436,7 +433,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 	}
 
 	@Override
-	public void recalcTimeVariantAttributes( final double now) {
+	public final void recalcTimeVariantAttributes( final double now) {
 		freespeedTravelTime = this.length / qLink.getLink().getFreespeed(now);
 		if (Double.isNaN(freespeedTravelTime)) {
 			throw new IllegalStateException("Double.NaN is not a valid freespeed travel time for a link. Please check the attributes length and freespeed!");

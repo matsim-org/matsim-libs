@@ -208,7 +208,8 @@ public class QLinkLanesImpl extends AbstractQLink {
 		//fill toLinks
 		while (!laneStack.isEmpty()){
 			QLane qLane = laneStack.pop();
-			qLane.calculateCapacities();
+//			qLane.calculateCapacities();
+			qLane.recalcTimeVariantAttributes(Time.UNDEFINED_TIME);
 			if (qLane.getToLanes() == null || (qLane.getToLanes().isEmpty())) {
 				for (Id toLinkId : qLane.getLaneData().getToLinkIds()){
 					qLane.addDestinationLink(toLinkId);
