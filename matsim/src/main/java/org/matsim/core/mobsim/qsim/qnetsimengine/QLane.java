@@ -241,11 +241,6 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 		return this.meterFromLinkEnd;
 	}
 
-	@Override
-	public boolean isNotOfferingVehicle() {
-		return this.buffer.isEmpty();
-	}
-
 	boolean isThisTimeStepGreen(){
 		return this.thisTimeStepGreen ;
 	}
@@ -539,24 +534,6 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 	}
 
 	/**
-	 * This method returns the normalized capacity of the link, i.e. the capacity
-	 * of vehicles per second. It is considering the capacity reduction factors
-	 * set in the config and the simulation's tick time.
-	 *
-	 * @return the flow capacity of this link per second, scaled by the config
-	 *         values and in relation to the SimulationTimer's simticktime.
-	 */
-	@Override
-	public double getSimulatedFlowCapacity() {
-		return this.flowCapacityPerTimeStep;
-	}
-
-	@Override
-	public QVehicle getFirstVehicle() {
-		return this.buffer.peek();
-	}
-
-	/**
 	 * @return <code>true</code> if there are less vehicles in buffer + vehQueue (=
 	 *         the whole link), than there is space for vehicles.
 	 */
@@ -615,41 +592,8 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 		return this.length;
 	}
 
-	@Override
-	public double getLastMovementTimeOfFirstVehicle() {
-		return this.bufferLastMovedTime;
-	}
-
-	@Override
-	public boolean hasGreenForToLink(final Id toLinkId){
-		if (this.qSignalizedItem != null){
-			return this.qSignalizedItem.isLinkGreenForToLink(toLinkId);
-		}
-		return true; //the lane is not signalized and thus always green
-	}
-
 	 LaneData20 getLaneData() {
 		return this.laneData;
-	}
-
-	@Override
-	public void setSignalStateAllTurningMoves(final SignalGroupState state) {
-		this.qSignalizedItem.setSignalStateAllTurningMoves(state);
-		this.thisTimeStepGreen = this.qSignalizedItem.isLinkGreen();
-	}
-
-	@Override
-	public void setSignalStateForTurningMove( final SignalGroupState state, final Id toLinkId) {
-		if (!this.qLink.getToNode().getNode().getOutLinks().containsKey(toLinkId)){
-			throw new IllegalArgumentException("ToLink " + toLinkId + " is not reachable from QLane Id " + this.getId() + " on QLink " + this.qLink.getLink().getId());
-		}
-		this.qSignalizedItem.setSignalStateForTurningMove(state, toLinkId);
-		this.thisTimeStepGreen = this.qSignalizedItem.isLinkGreen();
-	}
-
-	@Override
-	public void setSignalized(final boolean isSignalized) {
-		this.qSignalizedItem = new DefaultSignalizeableItem(this.qLink.getLink().getToNode().getOutLinks().keySet());
 	}
 
 	/**
@@ -735,15 +679,6 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 	void setOTFLane(VisLane otfLane) {
 		this.visData.visLane = otfLane;
 	}
-
-	@Override
-	public final void updateRemainingFlowCapacity() {
-			this.remainingflowCap = this.flowCapacityPerTimeStep;
-	//				if (this.thisTimeStepGreen && this.flowcap_accumulate < 1.0 && this.hasBufferSpaceLeft()) {
-			if (this.thisTimeStepGreen && this.flowcap_accumulate < 1.0 && this.isNotOfferingVehicle() ) {
-				this.flowcap_accumulate += this.flowCapacityPerTimeStepFractionalPart;
-			}
-		}
 
 	final boolean hasFlowCapacityLeftAndBufferSpace() {
 		return (

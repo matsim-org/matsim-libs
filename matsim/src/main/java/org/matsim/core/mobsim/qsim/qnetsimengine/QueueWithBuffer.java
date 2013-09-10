@@ -188,7 +188,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 	}
 
 	@Override
-	public void updateRemainingFlowCapacity() {
+	public final void updateRemainingFlowCapacity() {
 		remainingflowCap = flowCapacityPerTimeStep;
 		//				if (this.thisTimeStepGreen && this.flowcap_accumulate < 1.0 && this.hasBufferSpaceLeft()) {
 		if (thisTimeStepGreen && flowcap_accumulate < 1.0 && isNotOfferingVehicle() ) {
@@ -370,7 +370,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 		return veh.getSizeInEquivalents();
 	}
 
-	public int vehInQueueCount() {
+	public final int vehInQueueCount() {
 		// called by one test case
 		return vehQueue.size();
 	}
@@ -382,7 +382,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 	}
 
 	@Override
-	public void setSignalStateAllTurningMoves( final SignalGroupState state) {
+	public final void setSignalStateAllTurningMoves( final SignalGroupState state) {
 		qSignalizedItem.setSignalStateAllTurningMoves(state);
 
 		thisTimeStepGreen  = qSignalizedItem.isLinkGreen();
@@ -390,7 +390,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 	}
 
 	@Override
-	public double getSimulatedFlowCapacity() {
+	public final double getSimulatedFlowCapacity() {
 		return this.flowCapacityPerTimeStep;
 	}
 
@@ -427,7 +427,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 	}
 
 	@Override
-	public QVehicle getVehicle(final Id vehicleId) {
+	public final QVehicle getVehicle(final Id vehicleId) {
 		for (QVehicle veh : this.vehQueue) {
 			if (veh.getId().equals(vehicleId))
 				return veh;
@@ -464,7 +464,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 	}
 
 	@Override
-	public void setSignalStateForTurningMove( final SignalGroupState state, final Id toLinkId) {
+	public final void setSignalStateForTurningMove( final SignalGroupState state, final Id toLinkId) {
 		if (!qLink.getToNode().getNode().getOutLinks().containsKey(toLinkId)){
 			throw new IllegalArgumentException("ToLink " + toLinkId + " is not reachable from QLink Id " + qLink.getLink().getId());
 		}
@@ -476,7 +476,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 	}
 
 	@Override
-	public boolean hasGreenForToLink(final Id toLinkId) {
+	public final boolean hasGreenForToLink(final Id toLinkId) {
 		if (qSignalizedItem != null){
 			return qSignalizedItem.isLinkGreenForToLink(toLinkId);
 		}
@@ -484,17 +484,17 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 	}
 
 	@Override
-	public double getStorageCapacity() {
+	public final double getStorageCapacity() {
 		return storageCapacity;
 	}
 
 	@Override
-	public boolean isNotOfferingVehicle() {
+	public final boolean isNotOfferingVehicle() {
 		return buffer.isEmpty();
 	}
 	
 	@Override
-	public void clearVehicles() {
+	public final void clearVehicles() {
 		double now = qLink.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 
 		for (QVehicle veh : vehQueue) {
@@ -544,12 +544,12 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 
 
 	@Override
-	public QVehicle getFirstVehicle() {
+	public final QVehicle getFirstVehicle() {
 		return this.buffer.peek() ;
 	}
 
 	@Override
-	public double getLastMovementTimeOfFirstVehicle() {
+	public final double getLastMovementTimeOfFirstVehicle() {
 		return this.bufferLastMovedTime ;
 	}
 	
@@ -562,7 +562,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 	}
 
 	@Override
-	public void setSignalized( final boolean isSignalized) {
+	public final void setSignalized( final boolean isSignalized) {
 		qSignalizedItem  = new DefaultSignalizeableItem(qLink.getLink().getToNode().getOutLinks().keySet());
 	}
 
