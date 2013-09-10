@@ -198,31 +198,6 @@ public final class QLane extends QueueWithBuffer implements Identifiable {
 		return movedAtLeastOne;
 	}
 
-	@Override
-	public void addFromUpstream(final QVehicle veh ){
-		double now = this.qLink.network.simEngine.internalInterface.getMobsim().getSimTimer().getTimeOfDay() ;
-
-		double earliestExitTime = now + this.freespeedTravelTime;
-
-		earliestExitTime +=  veh.getEarliestLinkExitTime() - Math.floor(veh.getEarliestLinkExitTime());
-		// (yy this is what makes it pass the tests but I don't see why this is correct. kai, jun'13)
-		// (I now think that this is some fractional leftover from an earlier lane. kai, sep'13)  
-
-		if ( this.endsAtMetersFromLinkEnd == 0.0 ) {
-//			/* It's a QLane that is directly connected to a QNode,
-//			 * so we have to floor the freeLinkTravelTime in order the get the same
-//			 * results compared to the old mobSim */
-			earliestExitTime = Math.floor(earliestExitTime);
-		}
-		veh.setEarliestLinkExitTime(earliestExitTime);
-		this.vehQueue.add(veh);
-		this.usedStorageCapacity += veh.getSizeInEquivalents();
-		if (this.generatingEvents) {
-			this.qLink.network.simEngine.getMobsim().getEventsManager()
-			.processEvent(new LaneEnterEvent(now, veh.getDriver().getId(), this.qLink.getLink().getId(), this.getId()));
-		}
-	}
-
 	 void setGeneratingEvents(final boolean fireLaneEvents) {
 		this.generatingEvents = fireLaneEvents;
 	}

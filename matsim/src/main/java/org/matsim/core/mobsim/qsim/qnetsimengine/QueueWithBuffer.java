@@ -547,7 +547,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 	}
 
 	@Override
-	public void addFromUpstream(final QVehicle veh) {
+	public final void addFromUpstream(final QVehicle veh) {
 		// 2nd) need to get the different behavior from lane pulled over here.  test.
 		// final) remove method in QLane. test.
 		double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
