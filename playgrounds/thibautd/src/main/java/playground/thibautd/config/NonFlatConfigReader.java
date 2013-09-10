@@ -57,7 +57,7 @@ public class NonFlatConfigReader extends MatsimXmlParser {
 					m );
 		}
 		if ( name.equals( PARAMETER_SET ) ) {
-			final Module m = ((NonFlatModule) moduleStack.getFirst()).createParameterSet( atts.getValue( TYPE ) );
+			final Module m = ((NonFlatModule) moduleStack.getFirst()).createAndAddParameterSet( atts.getValue( TYPE ) );
 			moduleStack.addFirst( m );
 		}
 		if ( name.equals( PARAMETER ) ) {
