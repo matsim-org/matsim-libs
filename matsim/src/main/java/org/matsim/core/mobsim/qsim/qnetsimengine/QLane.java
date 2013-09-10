@@ -85,14 +85,13 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 
 	private final Map<QVehicle, Double> laneEnterTimeMap = new HashMap<QVehicle, Double>();
 
-	private final AbstractQLink qLink;
 	/**
 	 * This collection contains all Lanes downstream, if null it is the last lane
 	 * within a QueueLink.
 	 */
 	private List<QLane> toLanes = null;
 
-	/*package*/ private VisDataImpl visdata;
+	/*package*/ private VisDataImpl visData; // different VisDataImpl!!!
 
 	/**
 	 * This flag indicates whether the QLane is the first lane on the link or one
@@ -117,8 +116,6 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 	 */
 	private boolean generatingEvents = false;
 
-	private DefaultSignalizeableItem qSignalizedItem;
-
 	private Map<Id, List<QLane>> toLinkToQLanesMap = null;
 
 	/**
@@ -129,7 +126,7 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 
 	/*package*/ QLane(final NetsimLink ql, LaneData20 laneData, boolean isFirstLaneOnLink) {
 		super( (AbstractQLink) ql, new FIFOVehicleQ() ) ;
-		this.qLink = (AbstractQLink) ql; // yyyy needs to be of correct, but should be made typesafe.  kai, aug'10
+//		this.qLink = (AbstractQLink) ql; // yyyy needs to be of correct, but should be made typesafe.  kai, aug'10
 		this.isFirstLane = isFirstLaneOnLink;
 		this.laneData = laneData;
 	}
@@ -147,7 +144,7 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 				}
 			}
 		}
-		this.visdata = new VisDataImpl();
+		this.visData = new VisDataImpl();
 	}
 
 
@@ -785,7 +782,7 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 	}
 
 	void setOTFLane(VisLane otfLane) {
-		this.visdata.visLane = otfLane;
+		this.visData.visLane = otfLane;
 	}
 
 	@Override
@@ -811,7 +808,7 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 
 	@Override
 	public VisDataImpl getVisData() {
-		return visdata;
+		return visData;
 	}
 
 	@Override
