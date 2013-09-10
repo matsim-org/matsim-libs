@@ -33,7 +33,7 @@ import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl.HandleTransitStopResult;
+import org.matsim.core.mobsim.qsim.qnetsimengine.AbstractQLink.HandleTransitStopResult;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.misc.NetworkUtils;
@@ -64,33 +64,33 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 	 * buffer. This value is updated each time step by a call to
 	 * {@link #updateBufferCapacity(double)}.
 	 */
-	private double remainingflowCap = 0.0 ;
+	double remainingflowCap = 0.0 ;
 	/**
 	 * Stores the accumulated fractional parts of the flow capacity. See also
 	 * flowCapFraction.
 	 */
-	private double flowcap_accumulate = 1.0 ;
+	double flowcap_accumulate = 1.0 ;
 	/**
 	 * true, i.e. green, if the link is not signalized
 	 */
-	private boolean thisTimeStepGreen = true ;
-	private double inverseFlowCapacityPerTimeStep;
-	private double flowCapacityPerTimeStepFractionalPart;
+	boolean thisTimeStepGreen = true ;
+	double inverseFlowCapacityPerTimeStep;
+	double flowCapacityPerTimeStepFractionalPart;
 	/**
 	 * The number of vehicles able to leave the buffer in one time step (usually 1s).
 	 */
-	private double flowCapacityPerTimeStep;
-	private int bufferStorageCapacity;
-	private double usedBufferStorageCapacity = 0.0 ;
+	double flowCapacityPerTimeStep;
+	int bufferStorageCapacity;
+	double usedBufferStorageCapacity = 0.0 ;
 	private Queue<QueueWithBuffer.Hole> holes = new LinkedList<QueueWithBuffer.Hole>();
-	private double freespeedTravelTime = Double.NaN;
+	double freespeedTravelTime = Double.NaN;
 	/** the last timestep the front-most vehicle in the buffer was moved. Used for detecting dead-locks. */
-	private double bufferLastMovedTime = Time.UNDEFINED_TIME ;
+	double bufferLastMovedTime = Time.UNDEFINED_TIME ;
 	/**
 	 * The list of vehicles that have not yet reached the end of the link
 	 * according to the free travel speed of the link
 	 */
-	private  VehicleQ<QVehicle> vehQueue;
+	 VehicleQ<QVehicle> vehQueue;
 	/**
 	 * This needs to be a ConcurrentHashMap because it can be accessed concurrently from
 	 * two different threads via addFromIntersection(...) and popFirstVehicle().
@@ -100,19 +100,19 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 	 * earliest link exit time. kai, jun'13
 	 */
 	//	Map<QVehicle, Double> linkEnterTimeMap = new ConcurrentHashMap<QVehicle, Double>() ;
-	private double storageCapacity;
-	private double usedStorageCapacity;
+	double storageCapacity;
+	double usedStorageCapacity;
 	/**
 	 * Holds all vehicles that are ready to cross the outgoing intersection
 	 */
-	private Queue<QVehicle> buffer = new LinkedList<QVehicle>() ;
+	Queue<QVehicle> buffer = new LinkedList<QVehicle>() ;
 	/**
 	 * null if the link is not signalized
 	 */
 	private DefaultSignalizeableItem qSignalizedItem = null ;
 	private double congestedDensity_veh_m;
 	private int nHolesMax;
-	private final QLinkImpl qLinkImpl;
+	private final AbstractQLink qLinkImpl;
 	private final QNetwork network ;
 	private VisData visData = new VisDataImpl() ;
 	private static int congDensWarnCnt2 = 0;
@@ -120,12 +120,12 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 	private static int spaceCapWarningCount = 0;
 	static boolean HOLES = false ; // can be set from elsewhere in package, but not from outside.  kai, nov'10
 
-	QueueWithBuffer(QLinkImpl qLinkImpl,  final VehicleQ<QVehicle> vehicleQueue ) {
+	QueueWithBuffer(AbstractQLink qLinkImpl,  final VehicleQ<QVehicle> vehicleQueue ) {
 		this.qLinkImpl = qLinkImpl;
 		this.network = qLinkImpl.network ;
 		this.vehQueue = vehicleQueue ;
 
-		freespeedTravelTime = qLinkImpl.length / qLinkImpl.getLink().getFreespeed();
+		freespeedTravelTime = qLinkImpl.getLink().getLength() / qLinkImpl.getLink().getFreespeed();
 		if (Double.isNaN(freespeedTravelTime)) {
 			throw new IllegalStateException("Double.NaN is not a valid freespeed travel time for a link. Please check the attributes length and freespeed!");
 		}
@@ -175,7 +175,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 	}
 
 	@Override
-	public final boolean isAcceptingFromWait() {
+	public boolean isAcceptingFromWait() {
 		return this.hasFlowCapacityLeftAndBufferSpace() ;
 	}
 
@@ -188,7 +188,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 	}
 
 	@Override
-	public final void updateRemainingFlowCapacity() {
+	public void updateRemainingFlowCapacity() {
 		remainingflowCap = flowCapacityPerTimeStep;
 		//				if (this.thisTimeStepGreen && this.flowcap_accumulate < 1.0 && this.hasBufferSpaceLeft()) {
 		if (thisTimeStepGreen && flowcap_accumulate < 1.0 && isNotOfferingVehicle() ) {
@@ -218,7 +218,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 
 		double numberOfLanes = qLinkImpl.getLink().getNumberOfLanes(time);
 		// first guess at storageCapacity:
-		storageCapacity = (qLinkImpl.length * numberOfLanes)
+		storageCapacity = (qLinkImpl.getLink().getLength() * numberOfLanes)
 				/ ((NetworkImpl) network.simEngine.getMobsim().getScenario().getNetwork()).getEffectiveCellSize() * storageCapFactor;
 
 		// storage capacity needs to be at least enough to handle the cap_per_time_step:
@@ -421,7 +421,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 
 	@Override
 	public void recalcTimeVariantAttributes( final double now) {
-		freespeedTravelTime = qLinkImpl.length / qLinkImpl.getLink().getFreespeed(now);
+		freespeedTravelTime = qLinkImpl.getLink().getLength() / qLinkImpl.getLink().getFreespeed(now);
 		calculateFlowCapacity(now);
 		calculateStorageCapacity(now);
 	}
@@ -522,7 +522,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 		qLinkImpl.activateLink();
 		//		linkEnterTimeMap.put(veh, now);
 		usedStorageCapacity += veh.getSizeInEquivalents();
-		double vehicleTravelTime = qLinkImpl.length / veh.getMaximumVelocity();
+		double vehicleTravelTime = qLinkImpl.getLink().getLength() / veh.getMaximumVelocity();
 		double linkTravelTime = Math.max(freespeedTravelTime, vehicleTravelTime);
 		double earliestExitTime = now + linkTravelTime;
 		earliestExitTime = Math.floor(earliestExitTime);
@@ -629,7 +629,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 					QueueWithBuffer.this.inverseFlowCapacityPerTimeStep, now, link.getFreespeed());
 			if (this.otfLink != null){
 				snapshotInfoBuilder.createAndAddVehiclePosition(positions, this.otfLink.getLinkStartCoord(), this.otfLink.getLinkEndCoord(), 
-						QueueWithBuffer.this.qLinkImpl.length, this.otfLink.getEuklideanDistance(), veh, 
+						QueueWithBuffer.this.qLinkImpl.getLink().getLength(), this.otfLink.getEuklideanDistance(), veh, 
 						lastDistanceFromFromNode, lane, speedValue);
 			}
 			else {

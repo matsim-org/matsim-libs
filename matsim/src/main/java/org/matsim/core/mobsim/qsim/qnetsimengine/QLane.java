@@ -73,7 +73,7 @@ import org.matsim.vis.snapshotwriters.VisData;
  * @author aneumann
  * @author mrieser
  */
-public final class QLane extends AbstractQLane implements QLaneI, Identifiable, SignalizeableItem {
+public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable, SignalizeableItem {
 	// this has public material without any kind of interface since it is accessed via qLink.get*Lane*() (in some not-yet-finalized
 	// syntax).  kai, aug'10
 
@@ -83,25 +83,7 @@ public final class QLane extends AbstractQLane implements QLaneI, Identifiable, 
 
 	private static final Comparator<QVehicle> VEHICLE_EXIT_COMPARATOR = new QVehicleEarliestLinkExitTimeComparator();
 
-	/**
-	 * The list of vehicles that have not yet reached the end of the link
-	 * according to the free travel speed of the link
-	 */
-	/*package*/ private final LinkedList<QVehicle> vehQueue = new LinkedList<QVehicle>();
-
 	private final Map<QVehicle, Double> laneEnterTimeMap = new HashMap<QVehicle, Double>();
-
-	/**
-	 * Holds all vehicles that are ready to cross the outgoing intersection
-	 */
-	/*package*/ final Queue<QVehicle> buffer = new LinkedList<QVehicle>();
-
-	private double storageCapacity;
-
-	private double usedStorageCapacity;
-
-	/** the last timestep the front-most vehicle in the buffer was moved. Used for detecting dead-locks. */
-	private double bufferLastMovedTime = Time.UNDEFINED_TIME;
 
 	private final AbstractQLink qLink;
 	/**
@@ -119,8 +101,6 @@ public final class QLane extends AbstractQLane implements QLaneI, Identifiable, 
 	private final boolean isFirstLane;
 
 	private double length = Double.NaN;
-
-	private double freespeedTravelTime = Double.NaN;
 
 	private double meterFromLinkEnd = Double.NaN;
 
@@ -147,38 +127,8 @@ public final class QLane extends AbstractQLane implements QLaneI, Identifiable, 
 	 */
 	private final Queue<QVehicle> transitVehicleStopQueue = new PriorityQueue<QVehicle>(5, VEHICLE_EXIT_COMPARATOR);
 
-	/**
-	 * The remaining integer part of the flow capacity available in one time step to move vehicles into the
-	 * buffer. This value is updated each time step by a call to
-	 * {@link #updateBufferCapacity(double)}.
-	 */
-	double remainingflowCap = 0.0;
-
-	/**
-	 * Stores the accumulated fractional parts of the flow capacity. See also
-	 * flowCapFraction.
-	 */
-	double flowcap_accumulate = 1.0;
-
-	/**
-	 * true, i.e. green, if the link is not signalized
-	 */
-	boolean thisTimeStepGreen = true;
-
-	double inverseFlowCapacityPerTimeStep;
-
-	double flowCapacityPerTimeStepFractionalPart;
-
-	/**
-	 * The number of vehicles able to leave the buffer in one time step (usually 1s).
-	 */
-	double flowCapacityPerTimeStep;
-
-	int bufferStorageCapacity;
-
-	double usedBufferStorageCapacity = 0.0;
-
 	/*package*/ QLane(final NetsimLink ql, LaneData20 laneData, boolean isFirstLaneOnLink) {
+		super( (AbstractQLink) ql, new FIFOVehicleQ() ) ;
 		this.qLink = (AbstractQLink) ql; // yyyy needs to be of correct, but should be made typesafe.  kai, aug'10
 		this.isFirstLane = isFirstLaneOnLink;
 		this.laneData = laneData;

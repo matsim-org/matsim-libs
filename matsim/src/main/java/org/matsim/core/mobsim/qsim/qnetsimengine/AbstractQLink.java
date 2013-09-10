@@ -45,6 +45,8 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
 import org.matsim.core.mobsim.qsim.comparators.QVehicleEarliestLinkExitTimeComparator;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
+import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * 
@@ -55,6 +57,13 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
  *
  */
 abstract class AbstractQLink extends QLinkInternalI {
+
+	public enum HandleTransitStopResult {
+		continue_driving, rehandle, accepted
+	
+	}
+
+	private static final Comparator<QVehicle> VEHICLE_EXIT_COMPARATOR = new QVehicleEarliestLinkExitTimeComparator();
 
 	private static Logger log = Logger.getLogger(AbstractQLink.class);
 	
@@ -89,6 +98,12 @@ abstract class AbstractQLink extends QLinkInternalI {
 	NetElementActivator netElementActivator;
 
 	/*package*/ final boolean insertingWaitingVehiclesBeforeDrivingVehicles;
+
+	/**
+	 * A list containing all transit vehicles that are at a stop but not
+	 * blocking other traffic on the lane.
+	 */
+	protected final Queue<QVehicle> transitVehicleStopQueue = new PriorityQueue<QVehicle>(5, VEHICLE_EXIT_COMPARATOR);
 
 	
 	AbstractQLink(Link link, QNetwork network) {
@@ -381,5 +396,36 @@ abstract class AbstractQLink extends QLinkInternalI {
 		Set<MobsimAgent> set = passengersWaitingForCars.get(vehicleId);
 		if (set != null) return Collections.unmodifiableSet(set);
 		else return null;
+	}
+
+	protected HandleTransitStopResult handleTransitStop(final double now, final QVehicle veh, final MobsimDriverAgent driver) {
+		if (driver instanceof TransitDriverAgent) {
+			TransitDriverAgent transitDriver = (TransitDriverAgent) veh.getDriver();
+			TransitStopFacility stop = transitDriver.getNextTransitStop();
+			if ((stop != null) && (stop.getLinkId().equals(getLink().getId()))) {
+				double delay = transitDriver.handleTransitStop(stop, now);
+				if (delay > 0.0) {
+					veh.setEarliestLinkExitTime(now + delay);
+					// (if the vehicle is not removed from the queue in the following lines, then this will effectively block the lane
+					if (!stop.getIsBlockingLane()) {
+						transitVehicleStopQueue.add(veh); 
+						// transit vehicle which is removed to the transit stop space
+						return HandleTransitStopResult.accepted;
+					} else {
+						// transit vehicle which blocks its lane by getting its exit time increased
+						return HandleTransitStopResult.rehandle;
+					}
+				} else {
+					// transit vehicle which instantaneously delivered passangers
+					return HandleTransitStopResult.rehandle;
+				}
+			} else {
+				// transit vehicle which either arrives or continues driving
+				return HandleTransitStopResult.continue_driving;
+			}
+		} else {
+			// not a transit vehicle
+			return HandleTransitStopResult.continue_driving;
+		}
 	}
 }

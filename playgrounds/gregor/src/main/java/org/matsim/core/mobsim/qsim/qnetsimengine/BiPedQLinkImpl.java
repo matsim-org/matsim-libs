@@ -22,15 +22,11 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
-import java.util.PriorityQueue;
-import java.util.Queue;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
-import org.matsim.core.mobsim.qsim.comparators.QVehicleEarliestLinkExitTimeComparator;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
 import org.matsim.signalsystems.mobsim.SignalizeableItem;
@@ -42,8 +38,6 @@ public class BiPedQLinkImpl extends AbstractQLink implements SignalizeableItem {
 
 	// static variables (no problem with memory)
 	final static Logger log = Logger.getLogger(BiPedQLinkImpl.class);
-	private static final Comparator<QVehicle> VEHICLE_EXIT_COMPARATOR = new QVehicleEarliestLinkExitTimeComparator();
-	
 	/**
 	 * Reference to the QueueNode which is at the end of each QueueLink instance
 	 */
@@ -56,14 +50,6 @@ public class BiPedQLinkImpl extends AbstractQLink implements SignalizeableItem {
 
 	public BiPedQueueWithBuffer road ;
 	
-	/**
-	 * A list containing all transit vehicles that are at a stop but not
-	 * blocking other traffic on the lane.
-	 */
-	private final Queue<QVehicle> transitVehicleStopQueue = new PriorityQueue<QVehicle>(5, VEHICLE_EXIT_COMPARATOR);
-
-
-
 	/** 
 	 * This constructor allows inserting a custom vehicle queue proper, e.g. to implement passing.
 	 * 
