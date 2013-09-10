@@ -101,10 +101,6 @@ public class NonFlatConfigWriter extends MatsimXmlWriter {
 				writer.write("\t\t<"+PARAMETER+" name=\"" + entry.getKey() + "\" value=\"" + entry.getValue() + "\" />");
 				writer.newLine();
 			}
-			writer.write( indent );
-			writer.write("\t</"+moduleTag+">");
-			writer.newLine();
-			writer.newLine();
 
 			if ( module instanceof NonFlatModule ) {
 				for ( Map.Entry<String, Collection<Module>> entry : ((NonFlatModule) module).getParameterSets().entrySet() ) {
@@ -118,6 +114,12 @@ public class NonFlatConfigWriter extends MatsimXmlWriter {
 					}
 				}
 			}
+
+			writer.write( indent );
+			writer.write("\t</"+moduleTag+">");
+			writer.newLine();
+			writer.newLine();
+
 		} catch (IOException e) {
 			throw new UncheckedIOException(e);
 		}

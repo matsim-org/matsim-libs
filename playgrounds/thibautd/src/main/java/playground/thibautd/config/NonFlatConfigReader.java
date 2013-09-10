@@ -61,7 +61,7 @@ public class NonFlatConfigReader extends MatsimXmlParser {
 			moduleStack.addFirst( m );
 		}
 		if ( name.equals( PARAMETER ) ) {
-			if ( !atts.getValue( VALUE ).equals( "null" ) ) {
+			if ( !atts.getValue( VALUE ).equalsIgnoreCase( "null" ) ) {
 				moduleStack.getFirst().addParam(
 						atts.getValue( NAME ),
 						atts.getValue( VALUE ) );
