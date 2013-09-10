@@ -422,9 +422,11 @@ SignalizeableItem, QLaneI {
 		veh.setEarliestLinkExitTime(earliestExitTime);
 		veh.setCurrentLink(this.link.getLink());
 		this.vehQueue.add(veh);
-		this.network.simEngine.getMobsim().getEventsManager().processEvent(
-				new LinkEnterEvent(now, veh.getDriver().getId(),
-						this.link.getLink().getId(), veh.getId()));
+//		this.network.simEngine.getMobsim().getEventsManager().processEvent(
+//				new LinkEnterEvent(now, veh.getDriver().getId(),
+//						this.link.getLink().getId(), veh.getId()));
+		// this event _should_ now be thrown in the calling class (QLinkImpl).  don't know
+		// if you are using that.  kai, sep'13
 		if ( HOLES ) {
 			this.holes.poll();
 			Hole peak = this.holes.peek();

@@ -27,6 +27,7 @@ import java.util.Queue;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.core.api.experimental.events.LaneEnterEvent;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
@@ -182,10 +183,10 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 		// kai/mz/amit, mar'12
 
 		if (remainingflowCap >= 1.0) {
-			remainingflowCap -= effectiveVehicleFlowConsumptionInPCU(veh); 
+			remainingflowCap -= veh.getSizeInEquivalents(); 
 		}
 		else if (flowcap_accumulate >= 1.0) {
-			flowcap_accumulate -= effectiveVehicleFlowConsumptionInPCU(veh);
+			flowcap_accumulate -= veh.getSizeInEquivalents();
 		}
 		else {
 			throw new IllegalStateException("Buffer of link " + this.id + " has no space left!");
@@ -395,11 +396,6 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 		removeVehicleFromQueue( now ) ;
 	}
 
-	private final double effectiveVehicleFlowConsumptionInPCU( QVehicle veh ) {
-		//  yyyy inline! (not used consistently anyways)
-		return veh.getSizeInEquivalents();
-	}
-
 	final int vehInQueueCount() {
 		// called by test cases
 		return vehQueue.size();
@@ -552,7 +548,6 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 
 	@Override
 	public void addFromUpstream(final QVehicle veh) {
-		// 1st) need to get the Link event one level up.  test.
 		// 2nd) need to get the different behavior from lane pulled over here.  test.
 		// final) remove method in QLane. test.
 		double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
@@ -562,12 +557,22 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 		double linkTravelTime = Math.max(freespeedTravelTime, vehicleTravelTime);
 		double earliestExitTime = now + linkTravelTime;
 
-		earliestExitTime = Math.floor(earliestExitTime);
-		// yyyy I have no idea why this is in here.  Supposedly pulls the link travel times to "second"
-		// values, but I don't see why this has to be, and worse, it is wrong when the time step is
-		// not one second.  And obviously dangerous if someone tries sub-second time steps.
-		// kai, sep'13
-		
+		earliestExitTime +=  veh.getEarliestLinkExitTime() - Math.floor(veh.getEarliestLinkExitTime());
+		// (yy this is what makes it pass the tests but I don't see why this is correct. kai, jun'13)
+		// (I now think that this is some fractional leftover from an earlier lane. kai, sep'13)
+		// (I also think it is never triggered for regular lanes since there the numbers are integerized (see below). kai, sep'13)
+
+		if ( this.endsAtMetersFromLinkEnd == 0.0 ) {
+//			/* It's a QLane that is directly connected to a QNode,
+//			 * so we have to floor the freeLinkTravelTime in order the get the same
+//			 * results compared to the old mobSim */
+			earliestExitTime = Math.floor(earliestExitTime);
+			// yyyy I have no idea why this is in here.  Supposedly pulls the link travel times to "second"
+			// values, but I don't see why this has to be, and worse, it is wrong when the time step is
+			// not one second.  And obviously dangerous if someone tries sub-second time steps.
+			// kai, sep'13
+		}
+
 		veh.setEarliestLinkExitTime(earliestExitTime);
 		veh.setCurrentLink(qLink.getLink());
 		vehQueue.add(veh);
@@ -577,10 +582,14 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 		// for addFromUpstream it is thrown in the calling class.  Found it in this way QLane.  Overall,
 		// it might make sense to move _all_ link events into the calling classes; also, the problem 
 		// looks easier to fix here than for the QLinkLanesImpl. For those reason, I am
-		// here adapting to the QLane inconsistency.  May cause problems with other plugins (like Gregor's).
+		// here adapting to the QLane inconsistency.  yyyyyy May cause problems with other plugins (like Gregor's).
 		// kai, sep'13
 		if ( QueueWithBuffer.HOLES ) {
 			holes.poll();
+		}
+		if (this.generatingEvents) {
+			this.qLink.network.simEngine.getMobsim().getEventsManager()
+			.processEvent(new LaneEnterEvent(now, veh.getDriver().getId(), this.qLink.getLink().getId(), this.getId()));
 		}
 	}
 
