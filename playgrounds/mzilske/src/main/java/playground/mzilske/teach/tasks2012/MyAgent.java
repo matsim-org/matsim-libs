@@ -148,7 +148,7 @@ public class MyAgent implements MobsimDriverAgent {
 				// there must be something wrong. Maybe the route is too short, or something else, we don't know...
 				log.error("The vehicle with driver " + delegate.getPerson().getId() + ", currently on link " + this.currentLinkId.toString()
 						+ ", is at the end of its route, but has not yet reached its destination link " + this.cachedDestinationLinkId.toString());
-				// yyyyyy personally, I would throw some kind of abort event here.  kai, aug'10
+				//  personally, I would throw some kind of abort event here.  kai, aug'10
 			}
 			return null; // vehicle is at the end of its route
 		}

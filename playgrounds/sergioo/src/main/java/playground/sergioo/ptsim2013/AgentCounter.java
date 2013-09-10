@@ -87,6 +87,6 @@ class AgentCounter implements AgentCounterI {
 	public final void decLiving() {living.decrementAndGet();}
 //	@Override
 //	public final void decLiving(final int count) {living.decrementAndGet();}
-//	// yyyyyy does this work (`count' never used)??? kai, feb'12
+//	//  does this work (`count' never used)??? kai, feb'12
 
 }

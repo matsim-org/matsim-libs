@@ -360,7 +360,7 @@ public class TravelDistanceStats implements StartupListener, IterationEndsListen
 						planTravelDistance += RouteUtils.calcDistance((NetworkRoute) leg.getRoute(), this.network);
 						numberOfLegs++;
 					}
-					// yyyyyy Seems that this averages only over routes of type NetworkRoute.  This is, minimally, not consistent with what we had before
+					//  Seems that this averages only over routes of type NetworkRoute.  This is, minimally, not consistent with what we had before
 					// (average over ALL modes).  kai/benjamin, apr'10
 				}
 			}

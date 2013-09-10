@@ -233,13 +233,13 @@ public class PTQLink implements NetsimLink {
 				hole.setEarliestLinkExitTime( Double.NEGATIVE_INFINITY ) ;
 				this.holes.add(hole) ;
 			}
-			// yyyyyy this does, once more, not work with variable vehicle sizes.  kai, may'13
+			//  this does, once more, not work with variable vehicle sizes.  kai, may'13
 		}
 		
 	}
 
 	/* 
-	 * yyyyyy There are two "active" functionalities (see isActive()).  It probably still works, but it does not look like
+	 *  There are two "active" functionalities (see isActive()).  It probably still works, but it does not look like
 	 * it is intended this way.  kai, nov'11
 	 */
 	void activateLink() {
@@ -629,7 +629,7 @@ public class PTQLink implements NetsimLink {
 
 				addToBuffer(veh, now);
 				//				this.linkEnterTimeMap.put(veh, now);
-				// (yyyyyy really??  kai, jan'11)
+				// ( really??  kai, jan'11)
 			}
 		}
 	}

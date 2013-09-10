@@ -65,7 +65,7 @@ public class BiPedQLinkImpl extends AbstractQLink implements SignalizeableItem {
 	}
 
 	/* 
-	 * yyyyyy There are two "active" functionalities (see isActive()).  It probably still works, but it does not look like
+	 *  There are two "active" functionalities (see isActive()).  It probably still works, but it does not look like
 	 * it is intended this way.  kai, nov'11
 	 */
 	@Override

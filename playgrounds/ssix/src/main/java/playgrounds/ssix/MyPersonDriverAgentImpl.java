@@ -194,7 +194,7 @@ public class MyPersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Pl
 				// there must be something wrong. Maybe the route is too short, or something else, we don't know...
 				log.error("The vehicle with driver " + this.getPerson().getId() + ", currently on link " + this.currentLinkId.toString()
 						+ ", is at the end of its route, but has not yet reached its destination link " + this.cachedDestinationLinkId.toString());
-				// yyyyyy personally, I would throw some kind of abort event here.  kai, aug'10
+				//  personally, I would throw some kind of abort event here.  kai, aug'10
 			}
 			return null; // vehicle is at the end of its route
 		}
@@ -206,7 +206,7 @@ public class MyPersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Pl
 			return this.cachedNextLinkId;
 		}
 		log.warn(this + " [no link to next routenode found: routeindex= " + this.currentLinkIdIndex + " ]");
-		// yyyyyy personally, I would throw some kind of abort event here.  kai, aug'10
+		//  personally, I would throw some kind of abort event here.  kai, aug'10
 		return null;
 	}
 
@@ -378,7 +378,7 @@ public class MyPersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Pl
 
 	@Override
 	public final double getActivityEndTime() {
-		// yyyyyy I don't think there is any guarantee that this entry is correct after an activity end re-scheduling.  kai, oct'10
+		//  I don't think there is any guarantee that this entry is correct after an activity end re-scheduling.  kai, oct'10
 		return this.activityEndTime;
 	}
 

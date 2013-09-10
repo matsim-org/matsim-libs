@@ -145,7 +145,7 @@ public class PTQNetsimEngine extends NetElementActivator implements MobsimEngine
 		}
 		dpHandler = new PTVehicularDepartureHandler(this, vehicleBehavior);
 
-		// yyyyyy I am quite sceptic if the following should stay since it does not work.  kai, feb'11
+		//  I am quite sceptic if the following should stay since it does not work.  kai, feb'11
 		if ( "queue".equals( sim.getScenario().getConfig().getQSimConfigGroup().getTrafficDynamics() ) ) {
 			PTQLink.HOLES=false ;
 		} else if ( "withHolesExperimental".equals( sim.getScenario().getConfig().getQSimConfigGroup().getTrafficDynamics() ) ) {
