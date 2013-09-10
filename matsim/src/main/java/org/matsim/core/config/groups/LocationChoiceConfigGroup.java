@@ -238,7 +238,7 @@ public class LocationChoiceConfigGroup extends Module {
 				setTravelSpeed_pt("5.0");
 			}
 			else {
-				setTravelSpeed_car(value);
+				setTravelSpeed_pt(value);
 			}
 		} else if (MAX_RECURSIONS.equals(key)) {
 			if (Double.parseDouble(value) < 0.0) {
