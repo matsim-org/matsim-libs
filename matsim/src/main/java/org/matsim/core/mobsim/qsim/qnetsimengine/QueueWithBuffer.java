@@ -126,12 +126,11 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 	static boolean HOLES = false ; // can be set from elsewhere in package, but not from outside.  kai, nov'10
 
 	QueueWithBuffer(AbstractQLink qLinkImpl,  final VehicleQ<QVehicle> vehicleQueue ) {
-		this(qLinkImpl, vehicleQueue, qLinkImpl.getLink().getLength(), qLinkImpl.getLink().getId() ) ;
+		this(qLinkImpl, vehicleQueue,  qLinkImpl.getLink().getId() ) ;
 	}
-	QueueWithBuffer(AbstractQLink qLinkImpl,  final VehicleQ<QVehicle> vehicleQueue,
-				double length, Id id ) {
+	QueueWithBuffer(AbstractQLink qLinkImpl,  final VehicleQ<QVehicle> vehicleQueue, Id id ) {
 		this.id = id ;
-		this.length = length ;	
+		this.length = qLinkImpl.getLink().getLength() ;	
 		this.qLink = qLinkImpl;
 		this.network = qLinkImpl.network ;
 		this.vehQueue = vehicleQueue ;
@@ -435,6 +434,9 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 	@Override
 	public void recalcTimeVariantAttributes( final double now) {
 		freespeedTravelTime = this.length / qLink.getLink().getFreespeed(now);
+		if (Double.isNaN(freespeedTravelTime)) {
+			throw new IllegalStateException("Double.NaN is not a valid freespeed travel time for a link. Please check the attributes length and freespeed!");
+		}
 		calculateFlowCapacity(now);
 		calculateStorageCapacity(now);
 	}
