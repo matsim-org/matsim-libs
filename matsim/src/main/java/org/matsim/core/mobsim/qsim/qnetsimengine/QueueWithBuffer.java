@@ -341,6 +341,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 				return;
 			}
 			//this is the aneumann PseudoLink behaviour
+			// yyyy ????  If anything, this should be resolved at entry (addFromUpstream). kai, sep'13
 			else if (Math.floor(veh.getEarliestLinkExitTime()) > now){
 				return;
 			}
@@ -551,6 +552,9 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 
 	@Override
 	public void addFromUpstream(final QVehicle veh) {
+		// 1st) need to get the Link event one level up.  test.
+		// 2nd) need to get the different behavior from lane pulled over here.  test.
+		// final) remove method in QLane. test.
 		double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 		qLink.activateLink();
 		usedStorageCapacity += veh.getSizeInEquivalents();
@@ -567,8 +571,14 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 		veh.setEarliestLinkExitTime(earliestExitTime);
 		veh.setCurrentLink(qLink.getLink());
 		vehQueue.add(veh);
-		qLink.network.simEngine.getMobsim().getEventsManager().processEvent(
-				new LinkEnterEvent(now, veh.getDriver().getId(), this.id, veh.getId()));
+//		qLink.network.simEngine.getMobsim().getEventsManager().processEvent(
+//				new LinkEnterEvent(now, veh.getDriver().getId(), this.id, veh.getId()));
+		// yy it is a bit inconsistent that the link event in popFirstVehicle is thrown in this class, but
+		// for addFromUpstream it is thrown in the calling class.  Found it in this way QLane.  Overall,
+		// it might make sense to move _all_ link events into the calling classes; also, the problem 
+		// looks easier to fix here than for the QLinkLanesImpl. For those reason, I am
+		// here adapting to the QLane inconsistency.  May cause problems with other plugins (like Gregor's).
+		// kai, sep'13
 		if ( QueueWithBuffer.HOLES ) {
 			holes.poll();
 		}

@@ -202,7 +202,7 @@ public final class QLane extends QueueWithBuffer implements Identifiable {
 	public void addFromUpstream(final QVehicle veh ){
 		double now = this.qLink.network.simEngine.internalInterface.getMobsim().getSimTimer().getTimeOfDay() ;
 
-		double earliestExitTime = (now + this.freespeedTravelTime);
+		double earliestExitTime = now + this.freespeedTravelTime;
 
 		earliestExitTime +=  veh.getEarliestLinkExitTime() - Math.floor(veh.getEarliestLinkExitTime());
 		// (yy this is what makes it pass the tests but I don't see why this is correct. kai, jun'13)

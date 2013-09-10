@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
 import org.matsim.core.network.LinkImpl;
@@ -127,6 +128,10 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	@Override
 	final void addFromUpstream(final QVehicle veh) {
 		road.addFromUpstream(veh);
+		double now = this.network.simEngine.getMobsim().getSimTimer().getTimeOfDay() ;
+		this.network.simEngine.getMobsim().getEventsManager().processEvent(
+				new LinkEnterEvent(now, veh.getDriver().getId(), this.link.getId(), veh.getId()));
+
 	}
 
 	@Override
