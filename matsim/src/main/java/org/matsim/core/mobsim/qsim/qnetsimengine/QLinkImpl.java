@@ -22,21 +22,17 @@ package org.matsim.core.mobsim.qsim.qnetsimengine;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.PriorityQueue;
-import java.util.Queue;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
-import org.matsim.core.mobsim.framework.MobsimDriverAgent;
-import org.matsim.core.mobsim.qsim.comparators.QVehicleEarliestLinkExitTimeComparator;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
+import org.matsim.core.network.LinkImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.IdentityTransformation;
 import org.matsim.lanes.vis.VisLaneModelBuilder;
@@ -60,7 +56,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 
 	// static variables (no problem with memory)
 	final static Logger log = Logger.getLogger(QLinkImpl.class);
-	private static final Comparator<QVehicle> VEHICLE_EXIT_COMPARATOR = new QVehicleEarliestLinkExitTimeComparator();
+//	private static final Comparator<QVehicle> VEHICLE_EXIT_COMPARATOR = new QVehicleEarliestLinkExitTimeComparator();
 
 	/**
 	 * Reference to the QueueNode which is at the end of each QueueLink instance
@@ -262,6 +258,9 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 
 	@Override
 	public void recalcTimeVariantAttributes(double now) {
+
+		road.changeRawFlowCapacityPerSecond(((LinkImpl)this.link).getFlowCapacity(now), now);
+
 		road.recalcTimeVariantAttributes(now);
 	}
 

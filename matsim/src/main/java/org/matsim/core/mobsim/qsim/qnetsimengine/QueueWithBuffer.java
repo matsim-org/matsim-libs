@@ -125,6 +125,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 	
 	// get properties no longer from qlink, but have them by yourself:
 	double length = Double.NaN ;
+	double rawFlowCapacity_s = Double.NaN ;
 
 	// (still) private:
 	private VisData visData = new VisDataImpl() ;
@@ -139,6 +140,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 		this.vehQueue = vehicleQueue ;
 		
 		this.length = qLinkImpl.getLink().getLength() ;	
+		this.rawFlowCapacity_s = ((LinkImpl)qLinkImpl.getLink()).getFlowCapacity() ;
 
 		freespeedTravelTime = this.length / qLinkImpl.getLink().getFreespeed();
 		if (Double.isNaN(freespeedTravelTime)) {
@@ -215,7 +217,8 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 	}
 
 	private void calculateFlowCapacity(final double time) {
-		flowCapacityPerTimeStep = ((LinkImpl)qLink.getLink()).getFlowCapacity(time);
+//		flowCapacityPerTimeStep = ((LinkImpl)qLink.getLink()).getFlowCapacity(time);
+		flowCapacityPerTimeStep = this.rawFlowCapacity_s ;
 		// we need the flow capacity per sim-tick and multiplied with flowCapFactor
 		flowCapacityPerTimeStep = flowCapacityPerTimeStep
 				* network.simEngine.getMobsim().getSimTimer().getSimTimestepSize()
@@ -264,7 +267,8 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 			//
 			// Alternative would be to have link entry capacity constraint.  This, however, does not work so well with the
 			// current "parallel" logic, where capacity constraints are modeled only on the link.  kai, nov'10
-			double bnFlowCap_s = ((LinkImpl)qLink.link).getFlowCapacity() ;
+//			double bnFlowCap_s = ((LinkImpl)qLink.link).getFlowCapacity() ;
+			double bnFlowCap_s = this.rawFlowCapacity_s ;
 
 			// ( c * n_cells - cap * L ) / (L * c) = (n_cells/L - cap/c) ;
 			congestedDensity_veh_m = storageCapacity/this.length - (bnFlowCap_s*3600.)/(15.*1000) ;
@@ -587,6 +591,12 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 		if (Double.isNaN(this.freespeedTravelTime)) {
 			throw new IllegalStateException("Double.NaN is not a valid freespeed travel time for a lane. Please check the attributes lane length and freespeed of link!");
 		}
+		// be defensive:
+		this.recalcTimeVariantAttributes(now);
+	}
+	@Override
+	public final void changeRawFlowCapacityPerSecond( final double val, final double now ) {
+		this.rawFlowCapacity_s = val ;
 		// be defensive:
 		this.recalcTimeVariantAttributes(now);
 	}

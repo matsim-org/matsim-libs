@@ -40,12 +40,14 @@ import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
  * <li> Triggered by a recent bug fix, I started moving some of the joint material up to the present class. kai, jun'13
  * <li> It is in fact the <i> downstream </i> end that needs to be the same between QLinkImpl and QLane ... since QNode uses 
  * those to extract vehicles into the intersection.  On the upstream side, however, vehicles are always given to the link.
+ * <li> Looks like this is now replicated/made redundant by QLaneI.  Delete ... kai, sep'13
  * </ul>
  * Please read the docu of QBufferItem, QLane, QLinkInternalI (arguably to be renamed
  * into something like AbstractQLink) and QLinkImpl jointly. kai, nov'11
  * 
  * @author dgrether
  */
+@Deprecated // see comment above
 abstract class AbstractQLane {
 	
 	abstract boolean doSimStep(final double now) ;
