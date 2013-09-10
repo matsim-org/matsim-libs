@@ -183,7 +183,6 @@ public class TransitScheduleSimplifier{
 	 * @param outputDirectory the destination folder for the simplified transit schedule file
 	 * @return the simplified transit schedule
 	 */
-	@SuppressWarnings("unused")
 	private TransitSchedule mergeTouchingTransitRoutes(Scenario scenario, String outputDirectory){
 		
 		final String UNDERLINE = "_";
