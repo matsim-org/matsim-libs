@@ -629,6 +629,22 @@ SignalizeableItem, QLaneI {
 		this.revRoad = revRoad;
 	}
 
+
+
+	@Override
+	public void changeUnscaledFlowCapacityPerSecond(double val, double now) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
+
+
+	@Override
+	public void changeEffectiveNumberOfLanes(double val, double now) {
+		// TODO Auto-generated method stub
+		throw new RuntimeException("not implemented") ;
+	}
+
 	
 
 	

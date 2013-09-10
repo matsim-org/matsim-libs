@@ -36,10 +36,8 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.LaneEnterEvent;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
 import org.matsim.core.api.internal.MatsimComparator;
-import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.lanes.data.v20.LaneData20;
 import org.matsim.lanes.vis.VisLane;
@@ -51,7 +49,7 @@ import org.matsim.vis.snapshotwriters.VisData;
  * A QueueLane has no own active state and only offers isActive() for a
  * stateless check for activation, a QueueLink is active as long as at least one
  * of its QueueLanes is active.  [[hm.  I my intuition, either it does have a state (active or not), or it doesn't. kai]]
- *
+ * <p/>
  *
  * @author dgrether based on prior QueueLink implementations of
  * @author dstrippgen
@@ -61,6 +59,8 @@ import org.matsim.vis.snapshotwriters.VisData;
 public final class QLane extends QueueWithBuffer implements Identifiable {
 	// this has public material without any kind of interface since it is accessed via qLink.get*Lane*() (in some not-yet-finalized
 	// syntax).  kai, aug'10
+	// yyyy This should almost certainly use composition/delegation instead of inheritance.  kai, sep'13
+	// yyyy The VisDataImpl still has significant code overlap with QueueWithBuffer. kai, sep'13
 
 	private static final Logger log = Logger.getLogger(QLane.class);
 
