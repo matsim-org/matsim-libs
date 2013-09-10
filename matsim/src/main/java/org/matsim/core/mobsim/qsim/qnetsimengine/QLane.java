@@ -152,6 +152,12 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 		return this.laneData.getId();
 	}
 
+	void calculateCapacities() {
+		calculateFlowCapacity(Time.UNDEFINED_TIME);
+		calculateStorageCapacity(Time.UNDEFINED_TIME);
+		this.flowcap_accumulate = (this.flowCapacityPerTimeStepFractionalPart == 0.0 ? 0.0 : 1.0);
+	}
+
 	private void calculateFlowCapacity(final double time) {
 		this.flowCapacityPerTimeStep = ((LinkImpl)this.qLink.getLink()).getFlowCapacity(time);
 		if (this.laneData != null) {
@@ -225,12 +231,6 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 		if (Double.isNaN(this.freespeedTravelTime)) {
 			throw new IllegalStateException("Double.NaN is not a valid freespeed travel time for a lane. Please check the attributes lane length and freespeed of link!");
 		}
-	}
-
-	void calculateCapacities() {
-		calculateFlowCapacity(Time.UNDEFINED_TIME);
-		calculateStorageCapacity(Time.UNDEFINED_TIME);
-		this.flowcap_accumulate = (this.flowCapacityPerTimeStepFractionalPart == 0.0 ? 0.0 : 1.0);
 	}
 
 	void setEndsAtMetersFromLinkEnd(final double meters) {
@@ -679,11 +679,6 @@ public final class QLane extends QueueWithBuffer implements QLaneI, Identifiable
 
 	private boolean hasBufferSpaceLeft() {
 		return usedBufferStorageCapacity < this.bufferStorageCapacity;
-	}
-
-	@Override
-	public VisDataImpl getVisData() {
-		return visData;
 	}
 
 	@Override

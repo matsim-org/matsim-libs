@@ -211,7 +211,8 @@ public class VisLaneModelBuilder {
 				return lane;
 			}
 		}
-		throw new IllegalArgumentException("QLane Id " + laneId + " on link Id " + link.getLink().getId() + "  not found. Check configuration!");
+		throw new IllegalArgumentException("QLane Id " + laneId + " on link Id " + 
+				link.getLink().getId() + "  not found. Check configuration!");
 	}
 	
 
