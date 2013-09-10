@@ -203,8 +203,12 @@ public class QLinkLanesImpl extends AbstractQLink {
 				this.toNodeQueueLanes.add(lastQLane);
 			}
 			lastQLane.changeLength(laneLength, Time.UNDEFINED_TIME );
-			double val = lastQLane.getLaneData().getCapacityVehiclesPerHour() / 3600. ;
-			lastQLane.changeUnscaledFlowCapacityPerSecond(val, Time.UNDEFINED_TIME );
+			double cap = lastQLane.getLaneData().getCapacityVehiclesPerHour() / 3600. ;
+			lastQLane.changeUnscaledFlowCapacityPerSecond(cap, Time.UNDEFINED_TIME );
+
+			double nLanes = lastQLane.getLaneData().getNumberOfRepresentedLanes() ;
+			lastQLane.changeEffectiveNumberOfLanes(nLanes, Time.UNDEFINED_TIME );
+			// (not covered by a test, I think.  kai, sep'13)
 		}
 
 		//fill toLinks

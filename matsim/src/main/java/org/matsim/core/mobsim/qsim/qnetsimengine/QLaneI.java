@@ -87,5 +87,6 @@ interface QLaneI extends QNetsimObject {
 	
 	void changeUnscaledFlowCapacityPerSecond( final double val, final double now ) ;
 
+	void changeEffectiveNumberOfLanes( final double val, final double now ) ;
 
 }

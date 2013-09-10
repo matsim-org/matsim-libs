@@ -25,7 +25,6 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
@@ -125,7 +124,8 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 	
 	// get properties no longer from qlink, but have them by yourself:
 	double length = Double.NaN ;
-	double rawFlowCapacity_s = Double.NaN ;
+	double unscaledFlowCapacity_s = Double.NaN ;
+	double effectiveNumberOfLanes = Double.NaN ;
 
 	// (still) private:
 	private VisData visData = new VisDataImpl() ;
@@ -146,7 +146,8 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 		this.vehQueue = vehicleQueue ;
 		
 		this.length = qLinkImpl.getLink().getLength() ;	
-		this.rawFlowCapacity_s = ((LinkImpl)qLinkImpl.getLink()).getFlowCapacity() ;
+		this.unscaledFlowCapacity_s = ((LinkImpl)qLinkImpl.getLink()).getFlowCapacity() ;
+		this.effectiveNumberOfLanes = qLinkImpl.getLink().getNumberOfLanes() ;
 
 		freespeedTravelTime = this.length / qLinkImpl.getLink().getFreespeed();
 		if (Double.isNaN(freespeedTravelTime)) {
@@ -175,6 +176,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 	public final void addFromWait(final QVehicle veh, final double now) {
 		addToBuffer(veh, now);
 	}
+	
 	private final void addToBuffer(final QVehicle veh, final double now) {
 		// yy might make sense to just accumulate to "zero" and go into negative when something is used up.
 		// kai/mz/amit, mar'12
@@ -224,7 +226,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 
 	private final void calculateFlowCapacity(final double time) {
 //		flowCapacityPerTimeStep = ((LinkImpl)qLink.getLink()).getFlowCapacity(time);
-		flowCapacityPerTimeStep = this.rawFlowCapacity_s ;
+		flowCapacityPerTimeStep = this.unscaledFlowCapacity_s ;
 		// we need the flow capacity per sim-tick and multiplied with flowCapFactor
 		flowCapacityPerTimeStep = flowCapacityPerTimeStep
 				* network.simEngine.getMobsim().getSimTimer().getSimTimestepSize()
@@ -233,13 +235,12 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 		flowCapacityPerTimeStepFractionalPart = flowCapacityPerTimeStep - (int) flowCapacityPerTimeStep;
 	}
 
-	void calculateStorageCapacity(final double time) {
+	private final void calculateStorageCapacity(final double time) {
 		double storageCapFactor = network.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().getStorageCapFactor();
 		bufferStorageCapacity = (int) Math.ceil(flowCapacityPerTimeStep);
 
-		double numberOfLanes = qLink.getLink().getNumberOfLanes(time);
 		// first guess at storageCapacity:
-		storageCapacity = (this.length * numberOfLanes)
+		storageCapacity = (this.length * this.effectiveNumberOfLanes)
 				/ ((NetworkImpl) network.simEngine.getMobsim().getScenario().getNetwork()).getEffectiveCellSize() * storageCapFactor;
 
 		// storage capacity needs to be at least enough to handle the cap_per_time_step:
@@ -274,7 +275,7 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 			// Alternative would be to have link entry capacity constraint.  This, however, does not work so well with the
 			// current "parallel" logic, where capacity constraints are modeled only on the link.  kai, nov'10
 //			double bnFlowCap_s = ((LinkImpl)qLink.link).getFlowCapacity() ;
-			double bnFlowCap_s = this.rawFlowCapacity_s ;
+			double bnFlowCap_s = this.unscaledFlowCapacity_s ;
 
 			// ( c * n_cells - cap * L ) / (L * c) = (n_cells/L - cap/c) ;
 			congestedDensity_veh_m = storageCapacity/this.length - (bnFlowCap_s*3600.)/(15.*1000) ;
@@ -607,14 +608,21 @@ class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI
 		if (Double.isNaN(this.freespeedTravelTime)) {
 			throw new IllegalStateException("Double.NaN is not a valid freespeed travel time for a lane. Please check the attributes lane length and freespeed of link!");
 		}
-		// be defensive:
+		// be defensive (might now be called twice):
 		this.recalcTimeVariantAttributes(now);
 	}
 	
 	@Override
 	public final void changeUnscaledFlowCapacityPerSecond( final double val, final double now ) {
-		this.rawFlowCapacity_s = val ;
-		// be defensive:
+		this.unscaledFlowCapacity_s = val ;
+		// be defensive (might now be called twice):
+		this.recalcTimeVariantAttributes(now);
+	}
+	
+	@Override
+	public final void changeEffectiveNumberOfLanes( final double val, final double now ) {
+		this.effectiveNumberOfLanes = val ;
+		// be defensive (might now be called twice):
 		this.recalcTimeVariantAttributes(now);
 	}
 	

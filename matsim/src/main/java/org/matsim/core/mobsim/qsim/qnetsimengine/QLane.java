@@ -113,68 +113,6 @@ public final class QLane extends QueueWithBuffer implements Identifiable {
 		return this.laneData.getId();
 	}
 
-//	@Override
-//	void calculateFlowCapacity(final double time) {
-//		this.flowCapacityPerTimeStep = ((LinkImpl)this.qLink.getLink()).getFlowCapacity(time);
-//		if (this.laneData != null) {
-//			/*
-//			 * Without lanes a Link has a flow capacity that describes the flow on a certain number of
-//			 * lanes. If lanes are given the following is assumed:
-//			 *
-//			 * Flow of a Lane is given by the flow of the link divided by the number of lanes represented by the link.
-//			 *
-//			 * A Lane may represent one or more lanes in reality. This is given by the attribute numberOfRepresentedLanes
-//			 * of the Lane definition. The flow of a lane is scaled by this number.
-//			 *
-//			 */
-////			double queueLinksNumberOfRepresentedLanes = this.qLink.getLink().getNumberOfLanes(time);
-////			this.simulatedFlowCapacity = this.simulatedFlowCapacity/queueLinksNumberOfRepresentedLanes
-////			* this.laneData.getNumberOfRepresentedLanes();
-//			this.flowCapacityPerTimeStep = this.laneData.getCapacityVehiclesPerHour() /  3600.0;
-//		}
-//		// we need the flow capcity per sim-tick and multiplied with flowCapFactor
-//		this.flowCapacityPerTimeStep = this.flowCapacityPerTimeStep 
-//				* this.qLink.network.simEngine.getMobsim().getSimTimer().getSimTimestepSize()
-//				* this.qLink.network.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().getFlowCapFactor();
-//		this.inverseFlowCapacityPerTimeStep = 1.0 / this.flowCapacityPerTimeStep;
-//		this.flowCapacityPerTimeStepFractionalPart = this.flowCapacityPerTimeStep - (int) this.flowCapacityPerTimeStep;
-//	}
-
-	@Override
-	void calculateStorageCapacity(final double time) {
-		double storageCapFactor = this.qLink.network.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().getStorageCapFactor();
-		this.bufferStorageCapacity = (int) Math.ceil(this.flowCapacityPerTimeStep);
-
-		double numberOfLanes = this.qLink.getLink().getNumberOfLanes(time);
-		if (this.laneData != null) {
-			numberOfLanes = this.laneData.getNumberOfRepresentedLanes();
-		}
-		// first guess at storageCapacity:
-		this.storageCapacity = (this.length * numberOfLanes)
-		/ ((NetworkImpl) ((QLinkLanesImpl)this.qLink).network.simEngine.getMobsim().getScenario().getNetwork()).getEffectiveCellSize() * storageCapFactor;
-
-		// storage capacity needs to be at least enough to handle the cap_per_time_step:
-		this.storageCapacity = Math.max(this.storageCapacity, this.bufferStorageCapacity);
-
-		/*
-		 * If speed on link is relatively slow, then we need MORE cells than the
-		 * above spaceCap to handle the flowCap. Example: Assume freeSpeedTravelTime
-		 * (aka freeTravelDuration) is 2 seconds. Than I need the spaceCap TWO times
-		 * the flowCap to handle the flowCap.
-		 */
-		double tempStorageCapacity = this.freespeedTravelTime * this.flowCapacityPerTimeStep;
-		if (this.storageCapacity < tempStorageCapacity) {
-			if (spaceCapWarningCount <= 10) {
-				log.warn("Lane " + this.getId() + " on Link " + this.qLink.getLink().getId() + " too small: enlarge storage capcity from: " + this.storageCapacity + " Vehicles to: " + tempStorageCapacity + " Vehicles.  This is not fatal, but modifies the traffic flow dynamics.");
-				if (spaceCapWarningCount == 10) {
-					log.warn("Additional warnings of this type are suppressed.");
-				}
-				spaceCapWarningCount++;
-			}
-			this.storageCapacity = tempStorageCapacity;
-		}
-	}
-
 	void setEndsAtMetersFromLinkEnd(final double meters) {
 		this.endsAtMetersFromLinkEnd = meters;
 	}
@@ -186,15 +124,6 @@ public final class QLane extends QueueWithBuffer implements Identifiable {
 	boolean isThisTimeStepGreen(){
 		return this.thisTimeStepGreen ;
 	}
-	/*
-	@Override public boolean isActive() {
-		boolean active = (this.flowcap_accumulate < 1.0) || (!this.vehQueue.isEmpty())
-		|| (!this.isNotOfferingVehicle()) 
-		// || (!this.transitVehicleStopQueue.isEmpty())
-		;
-		return active;
-	}
-	*/
 
 	/** called from framework, do everything related to link movement here
 	 *
@@ -229,7 +158,6 @@ public final class QLane extends QueueWithBuffer implements Identifiable {
 		}
 		return retLane;
 	}
-
 
 	private boolean moveBufferToNextLane(final double now) {
 		boolean movedAtLeastOne = false;
@@ -294,19 +222,6 @@ public final class QLane extends QueueWithBuffer implements Identifiable {
 			.processEvent(new LaneEnterEvent(now, veh.getDriver().getId(), this.qLink.getLink().getId(), this.getId()));
 		}
 	}
-
-	/**
-	 * @return <code>true</code> if there are less vehicles in buffer than the flowCapacity's ceil
-	 */
-	/*
-	 @Override public boolean isAcceptingFromWait() {
-		return ((
-//				this.buffer.size()
-				this.usedBufferStorageCapacity
-				< this.bufferStorageCapacity) && ((this.remainingflowCap >= 1.0)
-				|| (this.flowcap_accumulate >= 1.0)));
-	}
-	*/
 
 	 void setGeneratingEvents(final boolean fireLaneEvents) {
 		this.generatingEvents = fireLaneEvents;
