@@ -77,6 +77,7 @@ public class NonFlatConfigWriter extends MatsimXmlWriter {
 		Map<String, String> comments = module.getComments();
 
 		try {
+			writer.newLine();
 			writer.write( indent );
 			writer.write("\t<"+moduleTag);
 			writer.write(" "+moduleNameAtt+"=\"" + moduleName + "\" >");
@@ -117,7 +118,6 @@ public class NonFlatConfigWriter extends MatsimXmlWriter {
 
 			writer.write( indent );
 			writer.write("\t</"+moduleTag+">");
-			writer.newLine();
 			writer.newLine();
 
 		} catch (IOException e) {
