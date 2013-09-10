@@ -86,7 +86,8 @@ public class RandomizedTransitRouterTravelTimeAndDisutility  extends TransitRout
 		this.localMarginalUtilityOfTravelDistancePt_utl_m = routerConfig.getMarginalUtilityOfTravelDistancePt_utl_m();
 		this.localMarginalUtilityOfTravelTimePt_utl_s = routerConfig.getMarginalUtilityOfTravelTimePt_utl_s() ;
 		this.localMarginalUtilityOfTravelTimeWalk_utl_s = routerConfig.getMarginalUtilityOfTravelTimeWalk_utl_s() ;
-		this.localMarginalUtilityOfWaitingPt_utl_s = routerConfig.getMarginalUtilityOfTravelTimePt_utl_s() ;
+//		this.localMarginalUtilityOfWaitingPt_utl_s = routerConfig.getMarginalUtilityOfTravelTimePt_utl_s() ;
+		this.localMarginalUtilityOfWaitingPt_utl_s = routerConfig.getMarginalUtilityOfWaitingPt_utl_s() ;
 		this.localUtilityOfLineSwitch_utl = routerConfig.getUtilityOfLineSwitch_utl() ;
 	}
 	public String getDataCollectionString( DataCollection item ) {
