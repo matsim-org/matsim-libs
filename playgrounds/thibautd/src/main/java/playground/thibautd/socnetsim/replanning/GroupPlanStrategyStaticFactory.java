@@ -39,8 +39,8 @@ import playground.thibautd.socnetsim.replanning.strategies.GroupWhoIsTheBossSele
  * Provides factory methods to create standard strategies.
  * @author thibautd
  */
-public class GroupPlanStrategyFactoryRegistry {
-	private GroupPlanStrategyFactoryRegistry() {}
+public class GroupPlanStrategyStaticFactory {
+	private GroupPlanStrategyStaticFactory() {}
 
 	// /////////////////////////////////////////////////////////////////////////
 	// strategies
