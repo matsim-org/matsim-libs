@@ -269,7 +269,7 @@ public class RunCliquesWithHardCodedStrategies {
 
 		// init strategies
 		final GroupStrategyRegistry strategyRegistry = new GroupStrategyRegistry();
-		RunUtils.loadStrategyRegistry( strategyRegistry , controllerRegistry );
+		RunUtils.loadStrategyRegistryFromWeightsConfigGroup( strategyRegistry , controllerRegistry );
 
 		// create strategy manager
 		final GroupStrategyManager strategyManager =

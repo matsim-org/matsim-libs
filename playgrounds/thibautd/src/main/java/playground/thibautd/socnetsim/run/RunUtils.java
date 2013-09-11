@@ -54,7 +54,10 @@ import playground.thibautd.socnetsim.controller.ImmutableJointController;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifier;
+import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryRegistry;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyStaticFactory;
+import playground.thibautd.socnetsim.replanning.GroupReplanningConfigGroup;
+import playground.thibautd.socnetsim.replanning.GroupReplanningConfigGroup.StrategyParameterSet;
 import playground.thibautd.socnetsim.replanning.GroupStrategyManager;
 import playground.thibautd.socnetsim.replanning.GroupStrategyRegistry;
 import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanAlgorithm.PlanLinkIdentifier;
@@ -83,7 +86,8 @@ public class RunUtils {
 					jointRouterFactory );
 	}
 
-	public static void loadStrategyRegistry(
+	@Deprecated
+	public static void loadStrategyRegistryFromWeightsConfigGroup(
 			final GroupStrategyRegistry strategyRegistry,
 			final ControllerRegistry controllerRegistry) {
 		final Config config = controllerRegistry.getScenario().getConfig();
@@ -185,6 +189,26 @@ public class RunUtils {
 				weights.getLocationChoiceWeight(),
 				weights.getDisableInnovationAfterIter());
 
+	}
+
+	public static void loadStrategyRegistryFromGroupStrategyConfigGroup(
+			final GroupStrategyRegistry strategyRegistry,
+			final ControllerRegistry controllerRegistry) {
+		final Config config = controllerRegistry.getScenario().getConfig();
+		final GroupReplanningConfigGroup weights = (GroupReplanningConfigGroup) config.getModule( GroupReplanningConfigGroup.GROUP_NAME );
+
+		final GroupPlanStrategyFactoryRegistry factories = new GroupPlanStrategyFactoryRegistry();
+
+		for ( StrategyParameterSet set : weights.getStrategyParameterSets() ) {
+			strategyRegistry.addStrategy(
+					factories.getFactory(
+						set.getStrategyName() ).createStrategy(
+							controllerRegistry ),
+					set.getWeight(),
+					set.isInnovative() ?
+						weights.getDisableInnovationAfterIter() :
+						-1 );
+		}
 	}
 
 	public static void loadDefaultAnalysis(
