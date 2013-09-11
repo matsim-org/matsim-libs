@@ -19,74 +19,66 @@
 
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-import java.util.Collection;
-
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.vis.snapshotwriters.VisData;
 
 /**
- * Interface for the "QLanes" which make up the "QLinks".
+ * Essentially an interface, but since I do not want the methods public for the time being, it is incarnated as an abstract class.
  * <p/>
- * Design comments:<ul>
- * <li> This is now public as all java interfaces.  But it should not be possible to access the QLane from outside this package. kai, jun'13
- * <li> This has some commonalities with the QLink methods such as adding from upstream and removing to downstream.  This used to 
- * be standardized by AbstractQLane, but the interface cannot derive from the Abstract class, and I do not (yet) want to make the methods
- * in AbstractQLane public because then anyone who has access to the QLink can add vehicles which I do not want.  kai, jun'13
- * </ul> 
+ * Interface for QLanes, which (can) make up the QLinks.
  * 
  * @author nagel
  *
  */
-interface QLaneI extends QNetsimObject {
+abstract class QLaneInternalI extends QInternalI {
 	
-	boolean doSimStep( final double now ) ;
+//	boolean doSimStep( final double now ) ;
 	
-	void addFromWait( final QVehicle veh, final double now);
+	abstract void addFromWait( final QVehicle veh, final double now);
 
-	boolean isAcceptingFromWait();
+	abstract boolean isAcceptingFromWait();
 
-	void updateRemainingFlowCapacity();
+	abstract void updateRemainingFlowCapacity();
 
 //	int vehInQueueCount();
 
-	boolean isActive();
+	abstract boolean isActive();
 
-	double getSimulatedFlowCapacity();
+	abstract double getSimulatedFlowCapacity();
 
-	boolean isAcceptingFromUpstream();
+//	boolean isAcceptingFromUpstream();
 
-	void recalcTimeVariantAttributes(final double now);
+	abstract void recalcTimeVariantAttributes(final double now);
 
-	QVehicle getVehicle( final Id vehicleId);
+	abstract QVehicle getVehicle( final Id vehicleId);
 
-	Collection<MobsimVehicle> getAllVehicles();
+//	Collection<MobsimVehicle> getAllVehicles();
 
-	QVehicle popFirstVehicle();
+//	QVehicle popFirstVehicle();
 
-	boolean hasGreenForToLink( final Id toLinkId);
+//	boolean hasGreenForToLink( final Id toLinkId);
 
-	double getStorageCapacity();
+	abstract double getStorageCapacity();
 
-	boolean isNotOfferingVehicle();
+//	boolean isNotOfferingVehicle();
 
-	void clearVehicles();
+//	void clearVehicles();
 
-	void addFromUpstream(final QVehicle veh);
+//	void addFromUpstream(final QVehicle veh);
 
-	VisData getVisData();
+	abstract VisData getVisData();
 
-	QVehicle getFirstVehicle();
+//	QVehicle getFirstVehicle();
 
-	double getLastMovementTimeOfFirstVehicle();
+//	double getLastMovementTimeOfFirstVehicle();
 
 	/**
 	 * Needs to be added _upstream_ of the regular stop location so that a possible second stop on the link can also be served.
 	 */
-	void addTransitSlightlyUpstreamOfStop(final QVehicle veh);
+	abstract void addTransitSlightlyUpstreamOfStop(final QVehicle veh);
 	
-	void changeUnscaledFlowCapacityPerSecond( final double val, final double now ) ;
+	abstract void changeUnscaledFlowCapacityPerSecond( final double val, final double now ) ;
 
-	void changeEffectiveNumberOfLanes( final double val, final double now ) ;
+	abstract void changeEffectiveNumberOfLanes( final double val, final double now ) ;
 
 }

@@ -62,7 +62,7 @@ import org.matsim.vis.snapshotwriters.VisData;
  * 
  * @author nagel
  */
-class QueueWithBuffer extends AbstractQLane implements SignalizeableItem, QLaneI {
+class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem {
 
 	/**
 	 * The remaining integer part of the flow capacity available in one time step to move vehicles into the

@@ -47,8 +47,8 @@ import org.matsim.vis.snapshotwriters.VisData;
  * @author laemmel
  *
  */
-public class BiPedQueueWithBuffer extends AbstractQLane implements
-SignalizeableItem, QLaneI {
+public class BiPedQueueWithBuffer extends QLaneInternalI implements
+SignalizeableItem {
 
 
 

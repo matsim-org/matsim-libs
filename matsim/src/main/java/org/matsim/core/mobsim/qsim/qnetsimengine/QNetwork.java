@@ -39,7 +39,7 @@ import org.matsim.vis.snapshotwriters.VisLink;
  * @author dgrether
  */
 
-public class QNetwork implements NetsimNetwork, QNetsimObject {
+public class QNetwork implements NetsimNetwork {
 
 	private final Map<Id, QLinkInternalI> links;
 

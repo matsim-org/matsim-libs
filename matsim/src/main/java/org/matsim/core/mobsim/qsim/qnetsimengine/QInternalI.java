@@ -1,9 +1,10 @@
 /* *********************************************************************** *
- * project: org.matsim.*												   *
+ * project: org.matsim.*
+ * QBufferItem
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2008 by the members listed in the COPYING,        *
+ * copyright       : (C) 2010 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -18,12 +19,39 @@
  * *********************************************************************** */
 package org.matsim.core.mobsim.qsim.qnetsimengine;
 
-/**
- * Marker interface for objects related to the qnetsimengine package.
- * 
- * @author nagel
- *
- */
-public interface QNetsimObject {
+import java.util.Collection;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+
+
+/**
+ * Essentially an interface, but since I do not want the methods public for the time being, it is incarnated as an abstract class.  
+ * <p/>
+ * Contains the logic which is joint between QLane and QLink.  Some of this may eventually go ...
+ * 
+ * @author dgrether, nagel
+ */
+abstract class QInternalI {
+	
+	abstract boolean doSimStep(final double now) ;
+	
+	abstract void clearVehicles() ;
+	
+	abstract Collection<MobsimVehicle> getAllVehicles() ;
+	
+	abstract void addFromUpstream(final QVehicle veh);
+	
+	abstract boolean isNotOfferingVehicle();
+
+	abstract QVehicle popFirstVehicle();
+
+	abstract QVehicle getFirstVehicle();
+
+	abstract double getLastMovementTimeOfFirstVehicle();
+
+	abstract boolean hasGreenForToLink(final Id toLinkId);
+	
+	abstract boolean isAcceptingFromUpstream();
+	
 }

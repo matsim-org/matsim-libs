@@ -28,14 +28,19 @@ import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 
 /**
- * 
- * Please read the docu AbstractQLane and QLinkImpl jointly. kai, nov'11
- * 
+ * Essentially an interface, but since I do not want the methods public for the time being, it is incarnated as an abstract class.
+ * <p/>
+ * Contains all the logic for the QLinks which make up the QNetwork.
+ * <p/>
+ * My current intuition is that the QSim and even the QNetsimEngine are now more general, and could deal with more general links and nodes.
+ * However, the links and nodes need to work together.  The QLinks are, in consequence, those links which (are simple enough
+ * to) work together with the QNodes.  
+ * (The somewhat separate logic for QLinkLanesImpl in QNodes is already an exception to this, and optimally it should be removed.)
  * 
  * @author nagel
  *
  */
-abstract class QLinkInternalI extends AbstractQLane implements NetsimLink {
+abstract class QLinkInternalI extends QInternalI implements NetsimLink {
 	
 
 	abstract QNode getToNode() ;
@@ -86,7 +91,7 @@ abstract class QLinkInternalI extends AbstractQLane implements NetsimLink {
 	/**
 	 * this is for driver agents who want to depart but their car is not (yet) there.  Subject to design change.
 	 */
-	abstract void registerDriverAgentWaitingForCar(MobsimDriverAgent agent) ;
+	abstract void registerDriverAgentWaitingForCar(final MobsimDriverAgent agent) ;
 	
 	/**
 	 * this is for driver agents who want to depart but not all passengers are (yet) there.  Subject to design change.

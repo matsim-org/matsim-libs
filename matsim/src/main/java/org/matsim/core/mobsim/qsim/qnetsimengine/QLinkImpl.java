@@ -70,7 +70,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 
 	final double length;
 
-	public QLaneI road;
+	public QLaneInternalI road;
 
 	/**
 	 * Initializes a QueueLink with one QueueLane.
@@ -98,7 +98,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 	 * This constructor allows inserting a custom vehicle queue proper, e.g. to implement passing.
 	 * 
 	 */
-	public QLinkImpl(final Link link2, QNetwork network, final QNode toNode, final QLaneI road) {
+	public QLinkImpl(final Link link2, QNetwork network, final QNode toNode, final QLaneInternalI road) {
 		super(link2, network) ;
 		this.length = this.getLink().getLength();
 		this.road = road;
