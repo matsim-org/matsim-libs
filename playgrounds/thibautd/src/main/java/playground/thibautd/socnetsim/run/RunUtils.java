@@ -54,7 +54,7 @@ import playground.thibautd.socnetsim.controller.ImmutableJointController;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.replanning.grouping.FixedGroupsIdentifier;
-import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactory;
+import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryRegistry;
 import playground.thibautd.socnetsim.replanning.GroupStrategyManager;
 import playground.thibautd.socnetsim.replanning.GroupStrategyRegistry;
 import playground.thibautd.socnetsim.replanning.modules.RecomposeJointPlanAlgorithm.PlanLinkIdentifier;
@@ -90,37 +90,37 @@ public class RunUtils {
 		final WeightsConfigGroup weights = (WeightsConfigGroup) config.getModule( WeightsConfigGroup.GROUP_NAME );
 
 		strategyRegistry.addStrategy(
-				GroupPlanStrategyFactory.createReRoute(
+				GroupPlanStrategyFactoryRegistry.createReRoute(
 					controllerRegistry ),
 				weights.getReRouteWeight(),
 				weights.getDisableInnovationAfterIter());
 		strategyRegistry.addStrategy(
-				GroupPlanStrategyFactory.createTimeAllocationMutator(
+				GroupPlanStrategyFactoryRegistry.createTimeAllocationMutator(
 					weights.getInitialTimeMutationTemperature(),
 					controllerRegistry ),
 				weights.getTimeMutationWeight(),
 				weights.getDisableInnovationAfterIter());
 		if (weights.getJtmOptimizes()) {
 			strategyRegistry.addStrategy(
-					GroupPlanStrategyFactory.createCliqueJointTripMutator( controllerRegistry ),
+					GroupPlanStrategyFactoryRegistry.createCliqueJointTripMutator( controllerRegistry ),
 					weights.getJointTripMutationWeight(),
 				weights.getDisableInnovationAfterIter());
 		}
 		else {
 			strategyRegistry.addStrategy(
-					GroupPlanStrategyFactory.createNonOptimizingCliqueJointTripMutator( controllerRegistry ),
+					GroupPlanStrategyFactoryRegistry.createNonOptimizingCliqueJointTripMutator( controllerRegistry ),
 					weights.getJointTripMutationWeight(),
 				weights.getDisableInnovationAfterIter());
 		}
 		strategyRegistry.addStrategy(
-				GroupPlanStrategyFactory.createSubtourModeChoice(
+				GroupPlanStrategyFactoryRegistry.createSubtourModeChoice(
 					controllerRegistry ),
 				weights.getModeMutationWeight(),
 				weights.getDisableInnovationAfterIter());
 		switch ( weights.getGroupScoringType() ) {
 			case weightedSum:
 				strategyRegistry.addStrategy(
-						GroupPlanStrategyFactory.createWeightedSelectExpBeta(
+						GroupPlanStrategyFactoryRegistry.createWeightedSelectExpBeta(
 							weights.getWeightAttributeName(),
 							controllerRegistry.getScenario().getPopulation().getPersonAttributes(),
 							controllerRegistry.getIncompatiblePlansIdentifierFactory(),
@@ -130,7 +130,7 @@ public class RunUtils {
 				break;
 			case sum:
 				strategyRegistry.addStrategy(
-						GroupPlanStrategyFactory.createSelectExpBeta(
+						GroupPlanStrategyFactoryRegistry.createSelectExpBeta(
 								controllerRegistry.getIncompatiblePlansIdentifierFactory(),
 								config ),
 						weights.getLogitSelectionWeight(),
@@ -138,7 +138,7 @@ public class RunUtils {
 				break;
 			case min:
 				strategyRegistry.addStrategy(
-						GroupPlanStrategyFactory.createMinSelectExpBeta(
+						GroupPlanStrategyFactoryRegistry.createMinSelectExpBeta(
 							controllerRegistry.getJointPlans(),
 							controllerRegistry.getIncompatiblePlansIdentifierFactory(),
 							config ),
@@ -147,7 +147,7 @@ public class RunUtils {
 				break;
 			case minLoss:
 				strategyRegistry.addStrategy(
-						GroupPlanStrategyFactory.createMinLossSelectExpBeta(
+						GroupPlanStrategyFactoryRegistry.createMinLossSelectExpBeta(
 							controllerRegistry.getJointPlans(),
 							controllerRegistry.getIncompatiblePlansIdentifierFactory(),
 							config ),
@@ -156,7 +156,7 @@ public class RunUtils {
 				break;
 			case whoIsTheBoss:
 				strategyRegistry.addStrategy(
-						GroupPlanStrategyFactory.createWhoIsTheBossSelectExpBeta(
+						GroupPlanStrategyFactoryRegistry.createWhoIsTheBossSelectExpBeta(
 							controllerRegistry.getIncompatiblePlansIdentifierFactory(),
 							config ),
 						weights.getLogitSelectionWeight(),
@@ -167,27 +167,27 @@ public class RunUtils {
 				throw new RuntimeException( "unkown: "+weights.getGroupScoringType() );
 		}
 		strategyRegistry.addStrategy(
-				GroupPlanStrategyFactory.createTourVehicleAllocation(
+				GroupPlanStrategyFactoryRegistry.createTourVehicleAllocation(
 					controllerRegistry ),
 				weights.getTourLevelReallocateVehicleWeight(),
 				weights.getDisableInnovationAfterIter());
 		strategyRegistry.addStrategy(
-				GroupPlanStrategyFactory.createGroupPlanVehicleAllocation(
+				GroupPlanStrategyFactoryRegistry.createGroupPlanVehicleAllocation(
 					controllerRegistry ),
 				weights.getPlanLevelReallocateVehicleWeight(),
 				weights.getDisableInnovationAfterIter());
 		strategyRegistry.addStrategy(
-				GroupPlanStrategyFactory.createOptimizingTourVehicleAllocation(
+				GroupPlanStrategyFactoryRegistry.createOptimizingTourVehicleAllocation(
 					controllerRegistry ),
 				weights.getTourLevelOptimizeVehicleWeight(),
 				weights.getDisableInnovationAfterIter());
 		strategyRegistry.addStrategy(
-				GroupPlanStrategyFactory.createRandomJointPlansRecomposer(
+				GroupPlanStrategyFactoryRegistry.createRandomJointPlansRecomposer(
 					controllerRegistry ),
 				weights.getRecomposeJointPlansRandomlyWeight(),
 				weights.getDisableInnovationAfterIter());
 		strategyRegistry.addStrategy(
-				GroupPlanStrategyFactory.createActivityInGroupLocationChoice(
+				GroupPlanStrategyFactoryRegistry.createActivityInGroupLocationChoice(
 					weights.getLocationChoiceActivityType(),
 					controllerRegistry ),
 				weights.getLocationChoiceWeight(),
