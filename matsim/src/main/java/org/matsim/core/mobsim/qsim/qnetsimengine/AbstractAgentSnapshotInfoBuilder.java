@@ -192,7 +192,7 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 			double lengthOfCurve, double euclideanLength, Integer lane, double speedValueBetweenZeroAndOne)
 	{
 		int cnt = passengers.size();
-		int laneInt = 2*cnt;
+		int laneInt = 2*(cnt+1);
 		if (lane != null){
 			laneInt += lane;
 		}
