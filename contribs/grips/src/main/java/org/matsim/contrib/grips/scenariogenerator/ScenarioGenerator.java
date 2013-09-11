@@ -28,11 +28,11 @@ import org.geotools.feature.IllegalAttributeException;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.grips.algorithms.FeatureTransformer;
-import org.matsim.contrib.grips.config.GripsConfigModule;
-import org.matsim.contrib.grips.events.InfoEvent;
+import org.matsim.contrib.grips.control.algorithms.FeatureTransformer;
 import org.matsim.contrib.grips.experimental.CustomizedOsmNetworkReader;
 import org.matsim.contrib.grips.io.GripsConfigDeserializer;
+import org.matsim.contrib.grips.model.config.GripsConfigModule;
+import org.matsim.contrib.grips.model.events.InfoEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -75,6 +75,7 @@ import com.vividsolutions.jts.geom.Polygon;
  * @author laemmel
  *
  */
+@SuppressWarnings("deprecation")
 public class ScenarioGenerator {
 
 
@@ -209,6 +210,7 @@ public class ScenarioGenerator {
 
 	}
 
+	@SuppressWarnings("unused")
 	private void generateAndSaveNetworkChangeEvents(Scenario sc) {
 		throw new RuntimeException("This has to be done during network generation. The reason is that at this stage the mapping between original link ids (e.g. from osm) to generated matsim link ids is forgotten!");
 
@@ -326,6 +328,7 @@ public class ScenarioGenerator {
 		// for now grips evacuation area meta format is ESRI Shape with no validation etc.
 		// TODO switch to gml by writing a  xsd + corresponding parser. may be geotools is our friend her? The xsd has to make sure that the evacuation area consists of one and only one
 		// polygon
+		@SuppressWarnings("rawtypes")
 		FeatureSource fs = ShapeFileReader.readDataFile(gcm.getEvacuationAreaFileName());
 		SimpleFeature ft = null;
 		try {

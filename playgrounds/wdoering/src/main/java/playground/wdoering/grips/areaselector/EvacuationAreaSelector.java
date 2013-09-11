@@ -40,9 +40,9 @@ import javax.swing.filechooser.FileFilter;
 
 import org.apache.log4j.Logger;
 import org.jdesktop.swingx.mapviewer.TileFactory;
-import org.matsim.contrib.grips.config.GripsConfigModule;
 import org.matsim.contrib.grips.io.GripsConfigDeserializer;
 import org.matsim.contrib.grips.jxmapviewerhelper.TileFactoryBuilder;
+import org.matsim.contrib.grips.model.config.GripsConfigModule;
 
 public class EvacuationAreaSelector implements ActionListener{
 

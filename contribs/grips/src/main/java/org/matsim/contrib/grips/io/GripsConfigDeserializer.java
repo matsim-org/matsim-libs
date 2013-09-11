@@ -30,8 +30,8 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.grips.config.GripsConfigModule;
 import org.matsim.contrib.grips.io.jaxb.gripsconfig.GripsConfigType;
+import org.matsim.contrib.grips.model.config.GripsConfigModule;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlParser;
 import org.matsim.core.utils.io.UncheckedIOException;
@@ -77,6 +77,7 @@ public class GripsConfigDeserializer extends MatsimJaxbXmlParser{
 			}
 			log.info("starting unmarshalling " + filename);
 			stream = IOUtils.getInputStream(filename);
+			@SuppressWarnings("unchecked")
 			JAXBElement<GripsConfigType> el = (JAXBElement<GripsConfigType>)u.unmarshal(stream);
 			gct =  el.getValue(); 
 		} catch (IOException e) {

@@ -31,7 +31,7 @@ import org.jdesktop.swingx.mapviewer.GeoPosition;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.contrib.grips.algorithms.PolygonalCircleApproximation;
+import org.matsim.contrib.grips.control.algorithms.PolygonalCircleApproximation;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -64,7 +64,7 @@ public class ShapeToStreetSnapperThreadWrapper implements Runnable {
 	private ShapeToStreetSnapper snapper;
 	private Scenario sc;
 	private GeoPosition center;
-	private MyMapViewer mapViewer;
+//	private MyMapViewer mapViewer;
 	private final String net;
 	private final EvacuationAreaSelector evacuationAreaSelector;
 
@@ -134,8 +134,8 @@ public class ShapeToStreetSnapperThreadWrapper implements Runnable {
 		}
 		
 		this.setPolygon(p);
-		this.mapViewer.repaint();
-		this.evacuationAreaSelector.setSaveButtonEnabled(true);
+//		this.mapViewer.repaint();
+//		this.evacuationAreaSelector.setSaveButtonEnabled(true);
 		
 	}
 
@@ -149,7 +149,7 @@ public class ShapeToStreetSnapperThreadWrapper implements Runnable {
 	}
 	
 	public synchronized void setCoordinates(GeoPosition c0, GeoPosition c1) {
-		this.evacuationAreaSelector.setSaveButtonEnabled(false);
+//		this.evacuationAreaSelector.setSaveButtonEnabled(false);
 		this.p = null;
 		this.c0 = c0;
 		this.c1 = c1;
@@ -157,7 +157,7 @@ public class ShapeToStreetSnapperThreadWrapper implements Runnable {
 	}
 	
 	public synchronized void reset() {
-		this.evacuationAreaSelector.setSaveButtonEnabled(false);
+//		this.evacuationAreaSelector.setSaveButtonEnabled(false);
 		this.p = null;
 	}
 
@@ -165,10 +165,10 @@ public class ShapeToStreetSnapperThreadWrapper implements Runnable {
 		return this.center;
 	}
 
-	public void setView(MyMapViewer myMapViewer) {
-		this.mapViewer = myMapViewer;
-		
-	}
+//	public void setView(MyMapViewer myMapViewer) {
+//		this.mapViewer = myMapViewer;
+//		
+//	}
 	
 	public synchronized void savePolygon(String dest) {
 		if (!dest.endsWith("shp")) {

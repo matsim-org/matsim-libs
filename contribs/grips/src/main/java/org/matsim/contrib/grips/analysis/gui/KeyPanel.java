@@ -31,13 +31,13 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.grips.analysis.EvacuationAnalysis;
-import org.matsim.contrib.grips.analysis.EvacuationAnalysis.Mode;
-import org.matsim.contrib.grips.analysis.EvacuationAnalysis.Unit;
+import org.matsim.contrib.grips.model.Constants.Mode;
+import org.matsim.contrib.grips.model.Constants.Unit;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.Tuple;
 
-public class KeyPanel extends AbstractDataPanel {
+public class KeyPanel extends AbstractDataPanel
+{
 
 	/**
 	 * 
@@ -45,9 +45,8 @@ public class KeyPanel extends AbstractDataPanel {
 	private static final long serialVersionUID = 1L;
 	private Mode mode;
 
-	// TODO: GRAPH graph;
-
-	public KeyPanel(Mode mode, int width, int height) {
+	public KeyPanel(Mode mode, int width, int height)
+	{
 		this.setPanelSize(width, height);
 		this.mode = mode;
 
@@ -55,7 +54,8 @@ public class KeyPanel extends AbstractDataPanel {
 	}
 
 	@Override
-	public void drawDataPanel() {
+	public void drawDataPanel()
+	{
 
 		if (this.data == null)
 			return;
@@ -71,19 +71,25 @@ public class KeyPanel extends AbstractDataPanel {
 		JLabel[] colorLabels = new JLabel[k];
 		JLabel[] valueLabels = new JLabel[k];
 
-		for (int i = 0; i < k; i++) {
-			if (mode.equals(Mode.EVACUATION)) {
+		for (int i = 0; i < k; i++)
+		{
+			if (mode.equals(Mode.EVACUATION))
+			{
 				classColor[i] = this.data.getEvacuationTimeVisData().getAttribute((IdImpl) clusters.get(i).getFirst());
-
-				classVal[i] = EvacuationAnalysis.getReadableTime(clusters.get(i).getSecond(), Unit.TIME);
-			} else if (mode.equals(Mode.CLEARING)) {
-				classColor[i] = this.data.getClearingTimeVisData().getAttribute((IdImpl) clusters.get(i).getFirst());
-				classVal[i] = EvacuationAnalysis.getReadableTime(clusters.get(i).getSecond(), Unit.TIME);
-			} else {
-				classColor[i] = this.data.getLinkUtilizationVisData().getAttribute((IdImpl) clusters.get(i).getFirst()).getSecond();
-				classVal[i] = EvacuationAnalysis.getReadableTime(clusters.get(i).getSecond(), Unit.PEOPLE);
+				classVal[i] = getReadableTime(clusters.get(i).getSecond(), Unit.TIME);
+				
 			}
-
+			else if (mode.equals(Mode.CLEARING))
+			{
+				classColor[i] = this.data.getClearingTimeVisData().getAttribute((IdImpl) clusters.get(i).getFirst());
+				classVal[i] = getReadableTime(clusters.get(i).getSecond(), Unit.TIME);
+				
+			}
+			else
+			{
+				classColor[i] = this.data.getLinkUtilizationVisData().getAttribute((IdImpl) clusters.get(i).getFirst()).getSecond();
+				classVal[i] = getReadableTime(clusters.get(i).getSecond(), Unit.PEOPLE);
+			}
 
 		}
 
@@ -94,7 +100,8 @@ public class KeyPanel extends AbstractDataPanel {
 
 		GridBagConstraints c = new GridBagConstraints();
 
-		for (int i = 0; i < k; i++) {
+		for (int i = 0; i < k; i++)
+		{
 			colorLabels[i] = new JLabel(" ");
 			colorLabels[i].setOpaque(true);
 			colorLabels[i].setBackground(classColor[i]);
@@ -124,8 +131,41 @@ public class KeyPanel extends AbstractDataPanel {
 		this.setPreferredSize(new Dimension(this.width, this.height));
 
 	}
+	
+	public static String getReadableTime(double value, Unit unit) {
+		if (unit.equals(Unit.PEOPLE))
+			return " " + (int) value + " people";
 
-	public void setMode(Mode mode) {
+		double minutes = 0;
+		double hours = 0;
+		double seconds = 0;
+
+		if (value < 0d)
+			return "";
+		else {
+			if (value / 60 > 1d) // check if minutes need to be displayed
+			{
+				if (value / 3600 > 1d) // check if hours need to be displayed
+				{
+					hours = Math.floor(value / 3600);
+					minutes = Math.floor((value - hours * 3600) / 60);
+					seconds = Math.floor((value - (hours * 3600) - (minutes * 60)));
+					return " > " + (int) hours + "h, " + (int) minutes + "m, " + (int) seconds + "s";
+				} else {
+					minutes = Math.floor(value / 60);
+					seconds = Math.floor((value - (minutes * 60)));
+					return " > " + (int) minutes + "m, " + (int) seconds + "s";
+
+				}
+
+			} else {
+				return " > " + (int) seconds + "s";
+			}
+		}
+	}
+
+	public void setMode(Mode mode)
+	{
 		this.mode = mode;
 		drawDataPanel();
 	}

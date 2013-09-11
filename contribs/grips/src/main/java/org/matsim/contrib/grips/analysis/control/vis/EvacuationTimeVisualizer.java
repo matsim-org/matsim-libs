@@ -24,12 +24,12 @@ import java.awt.Color;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.grips.analysis.EvacuationAnalysis.Mode;
 import org.matsim.contrib.grips.analysis.control.Clusterizer;
 import org.matsim.contrib.grips.analysis.data.AttributeData;
 import org.matsim.contrib.grips.analysis.data.Cell;
 import org.matsim.contrib.grips.analysis.data.ColorationMode;
 import org.matsim.contrib.grips.analysis.data.EventData;
+import org.matsim.contrib.grips.model.Constants.Mode;
 import org.matsim.core.utils.collections.Tuple;
 
 public class EvacuationTimeVisualizer {
@@ -78,7 +78,6 @@ public class EvacuationTimeVisualizer {
 
 		for (Cell cell : cells) {
 			double arrivalTime = cell.getMedianArrivalTime();
-			// System.out.println(cellTimeSum);
 
 			if (arrivalTime < clusterValues.get(0)) {
 				coloration.setAttribute(cell.getId(), Coloration.getColor(0, colorationMode, cellTransparency));

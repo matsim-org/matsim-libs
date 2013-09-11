@@ -21,10 +21,10 @@
 package org.matsim.contrib.grips.io;
 
 import org.junit.Test;
-import org.matsim.contrib.grips.config.GripsConfigModule;
 import org.matsim.contrib.grips.io.jaxb.gripsconfig.DepartureTimeDistributionType;
 import org.matsim.contrib.grips.io.jaxb.gripsconfig.DistributionType;
 import org.matsim.contrib.grips.io.jaxb.gripsconfig.ObjectFactory;
+import org.matsim.contrib.grips.model.config.GripsConfigModule;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.testcases.MatsimTestCase;
 

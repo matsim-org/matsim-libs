@@ -20,7 +20,7 @@
 
 package org.matsim.contrib.grips.analysis.gui;
 
-import  org.matsim.contrib.grips.analysis.data.EventData;
+import org.matsim.contrib.grips.analysis.data.EventData;
 
 public interface DataPanelInterface {
 	

@@ -38,10 +38,10 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.contrib.grips.algorithms.FeatureTransformer;
-import org.matsim.contrib.grips.config.GripsConfigModule;
+import org.matsim.contrib.grips.control.algorithms.FeatureTransformer;
 import org.matsim.contrib.grips.io.jaxb.gripsconfig.DepartureTimeDistributionType;
 import org.matsim.contrib.grips.io.jaxb.gripsconfig.DistributionType;
+import org.matsim.contrib.grips.model.config.GripsConfigModule;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
@@ -62,7 +62,6 @@ public class PopulationFromESRIShapeFileGenerator {
 	private static final Logger log = Logger.getLogger(PopulationFromESRIShapeFileGenerator.class);
 
 	private static final int RAND_SAMPLES = 1000; // the number of random numbers generated for the lookup table
-	private static final double CUTOFF = 1.0; // 
 
 	private final String populationShapeFile;
 	protected final Scenario scenario;

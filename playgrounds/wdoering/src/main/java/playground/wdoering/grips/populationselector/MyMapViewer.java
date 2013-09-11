@@ -41,8 +41,9 @@ import java.util.Map;
 import org.geotools.referencing.CRS;
 import org.jdesktop.swingx.JXMapViewer;
 import org.jdesktop.swingx.mapviewer.GeoPosition;
-import org.matsim.contrib.grips.algorithms.PolygonalCircleApproximation;
-import org.matsim.contrib.grips.config.ToolConfig;
+import org.matsim.contrib.grips.control.algorithms.PolygonalCircleApproximation;
+import org.matsim.contrib.grips.model.config.ToolConfig;
+
 import playground.wdoering.grips.populationselector.PopulationAreaSelector;
 import org.matsim.core.utils.geometry.geotools.MGC;
 import org.opengis.referencing.FactoryException;

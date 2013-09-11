@@ -21,7 +21,7 @@
 package playground.gregor.grips.complexscenariogenerator;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.grips.config.GripsConfigModule;
+import org.matsim.contrib.grips.model.config.GripsConfigModule;
 import org.matsim.contrib.grips.scenariogenerator.ScenarioGenerator;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.population.PopulationWriter;

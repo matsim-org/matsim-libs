@@ -26,7 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.grips.analysis.EvacuationAnalysis.Mode;
+import org.matsim.contrib.grips.model.Constants.Mode;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.collections.Tuple;

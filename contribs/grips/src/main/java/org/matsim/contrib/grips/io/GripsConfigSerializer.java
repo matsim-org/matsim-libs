@@ -30,12 +30,12 @@ import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
 
 import org.apache.log4j.Logger;
-import org.matsim.contrib.grips.config.GripsConfigModule;
 import org.matsim.contrib.grips.io.jaxb.gripsconfig.DepartureTimeDistributionType;
 import org.matsim.contrib.grips.io.jaxb.gripsconfig.FileType;
 import org.matsim.contrib.grips.io.jaxb.gripsconfig.GripsConfigType;
 import org.matsim.contrib.grips.io.jaxb.gripsconfig.MainTrafficTypeType;
 import org.matsim.contrib.grips.io.jaxb.gripsconfig.ObjectFactory;
+import org.matsim.contrib.grips.model.config.GripsConfigModule;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.MatsimJaxbXmlWriter;
 
