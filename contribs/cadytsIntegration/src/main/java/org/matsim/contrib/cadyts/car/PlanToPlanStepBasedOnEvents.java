@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.cadyts.general.PlansTranslator;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
@@ -39,7 +40,7 @@ import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 
 import cadyts.demand.PlanBuilder;
 
-/*package*/ class PlanToPlanStepBasedOnEvents implements LinkLeaveEventHandler, 
+/*package*/ class PlanToPlanStepBasedOnEvents implements PlansTranslator, LinkLeaveEventHandler, 
 		AgentDepartureEventHandler, AgentArrivalEventHandler {
 	
 	private static final Logger log = Logger.getLogger(PlanToPlanStepBasedOnEvents.class);
@@ -68,7 +69,8 @@ import cadyts.demand.PlanBuilder;
 	private long plansFound = 0;
 	private long plansNotFound = 0;
 
-	final cadyts.demand.Plan<Link> getPlanSteps(final Plan plan) {
+	@Override
+	public final cadyts.demand.Plan<Link> getPlanSteps(final Plan plan) {
 		PlanBuilder<Link> planStepFactory = (PlanBuilder<Link>) plan.getCustomAttributes().get(STR_PLANSTEPFACTORY);
 		if (planStepFactory == null) {
 			this.plansNotFound++;

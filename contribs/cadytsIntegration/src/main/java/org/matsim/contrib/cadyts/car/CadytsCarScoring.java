@@ -50,7 +50,7 @@ public class CadytsCarScoring implements ArbitraryEventScoring {
 
 	public CadytsCarScoring(final Plan plan, Config config, final CadytsContext context ) {
 		// this.ptPlanToPlanStep = context.getPtStep() ;
-		this.planToPlanStep = context.getPlanToPlanStepBasedOnEvents();
+		this.planToPlanStep = context.getPlansTranslator();
 		this.matsimCalibrator = context.getCalibrator() ;
 		this.plan = plan ;
 		this.beta = config.planCalcScore().getBrainExpBeta() ;

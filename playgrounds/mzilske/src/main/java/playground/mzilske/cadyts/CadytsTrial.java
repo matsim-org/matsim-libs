@@ -5,7 +5,7 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.cadyts.car.CadytsContext;
-import org.matsim.contrib.cadyts.car.CadytsPlanChanger;
+import org.matsim.contrib.cadyts.general.CadytsPlanChanger;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -69,7 +69,7 @@ public class CadytsTrial {
 		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
-				return new PlanStrategyImpl(new CadytsPlanChanger(context));
+				return new PlanStrategyImpl(new CadytsPlanChanger(scenario2,context));
 			}} ) ;
 		controler.setCreateGraphs(false);
 		controler.setDumpDataAtEnd(true);

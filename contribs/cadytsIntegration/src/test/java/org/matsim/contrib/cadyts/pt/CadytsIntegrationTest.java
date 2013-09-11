@@ -30,7 +30,7 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.cadyts.general.CadytsPtPlanChanger;
+import org.matsim.contrib.cadyts.general.CadytsPlanChanger;
 import org.matsim.contrib.cadyts.general.CadytsPtScoring;
 import org.matsim.contrib.cadyts.utils.CalibrationStatReader;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -91,7 +91,7 @@ public class CadytsIntegrationTest {
 		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
-				return new PlanStrategyImpl(new CadytsPtPlanChanger(scenario2, context));
+				return new PlanStrategyImpl(new CadytsPlanChanger(scenario2, context));
 			}} ) ;
 		
 		controler.setCreateGraphs(false);
@@ -145,7 +145,7 @@ public class CadytsIntegrationTest {
 		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
-				final CadytsPtPlanChanger planSelector = new CadytsPtPlanChanger(scenario2, cContext);
+				final CadytsPlanChanger planSelector = new CadytsPlanChanger(scenario2, cContext);
 				planSelector.setCadytsWeight(0.) ;
 				// weight 0 is correct: this is only in order to use getCalibrator().addToDemand.
 				// would certainly be cleaner (and less confusing) to write a separate method for this.  (But how?)
@@ -306,7 +306,7 @@ public class CadytsIntegrationTest {
 		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
-				final CadytsPtPlanChanger planSelector = new CadytsPtPlanChanger( scenario2, context);
+				final CadytsPlanChanger planSelector = new CadytsPlanChanger( scenario2, context);
 				planSelector.setCadytsWeight(beta*30.) ;
 				return new PlanStrategyImpl(planSelector);
 			}} ) ;
@@ -450,7 +450,7 @@ public class CadytsIntegrationTest {
 		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
-				final CadytsPtPlanChanger planSelector = new CadytsPtPlanChanger(scenario2, context);
+				final CadytsPlanChanger planSelector = new CadytsPlanChanger(scenario2, context);
 				planSelector.setCadytsWeight(beta*30.) ;
 				return new PlanStrategyImpl(planSelector);
 			}} ) ;

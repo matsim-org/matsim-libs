@@ -21,7 +21,7 @@ package playground.mmoyo.randomizerPtRouter;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.cadyts.general.CadytsPtPlanChanger;
+import org.matsim.contrib.cadyts.general.CadytsPlanChanger;
 import org.matsim.contrib.cadyts.general.CadytsPtScoring;
 import org.matsim.contrib.cadyts.pt.CadytsContext;
 import org.matsim.contrib.cadyts.pt.CadytsPtConfigGroup;
@@ -123,7 +123,7 @@ public class CadytsScoringFunctionAndRndRouterLauncher {
 		controler.addPlanStrategyFactory("myCadyts", new PlanStrategyFactory() {
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
-				final CadytsPtPlanChanger planSelector = new CadytsPtPlanChanger(scenario2, cContext);
+				final CadytsPlanChanger planSelector = new CadytsPlanChanger(scenario2, cContext);
 //				planSelector.setCadytsWeight(0.0) ;
 				return new PlanStrategyImpl(planSelector);
 			}

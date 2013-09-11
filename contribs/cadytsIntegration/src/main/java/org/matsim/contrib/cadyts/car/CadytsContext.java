@@ -29,6 +29,7 @@ import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.cadyts.general.CadytsContextI;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -47,7 +48,7 @@ import cadyts.supply.SimResults;
  * {@link PlanStrategy Plan Strategy} used for replanning in MATSim which uses Cadyts to
  * select plans that better match to given occupancy counts.
  */
-public class CadytsContext implements StartupListener, IterationEndsListener {
+public class CadytsContext implements CadytsContextI, StartupListener, IterationEndsListener {
 
 	private final static Logger log = Logger.getLogger(CadytsContext.class);
 
@@ -83,7 +84,7 @@ public class CadytsContext implements StartupListener, IterationEndsListener {
 		this.writeAnalysisFile = cadytsConfig.isWriteAnalysisFile();
 	}
 
-	public PlanToPlanStepBasedOnEvents getPlanToPlanStepBasedOnEvents() {
+	public PlanToPlanStepBasedOnEvents getPlansTranslator() {
 		return this.ptStep;
 	}
 	
@@ -128,7 +129,8 @@ public class CadytsContext implements StartupListener, IterationEndsListener {
 	/**
 	 * for testing purposes only
 	 */
-	/*package*/ AnalyticalCalibrator<Link> getCalibrator() {
+	@Override
+	public AnalyticalCalibrator<Link> getCalibrator() {
 		return this.calibrator;
 	}
 

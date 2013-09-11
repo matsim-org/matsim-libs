@@ -31,7 +31,7 @@ import org.matsim.core.replanning.selectors.PlanSelector;
 /**
  * @author nagel
  */
-public class CadytsPtPlanChanger<T> implements PlanSelector {
+public class CadytsPlanChanger<T> implements PlanSelector {
 
 	private final double beta ;
 	private double cadytsWeight = 1.0;
@@ -40,7 +40,7 @@ public class CadytsPtPlanChanger<T> implements PlanSelector {
 
 	public static final String CADYTS_CORRECTION = "cadytsCorrection";
 
-	public CadytsPtPlanChanger(Scenario scenario, CadytsContextI<T> cadytsContext) {
+	public CadytsPlanChanger(Scenario scenario, CadytsContextI<T> cadytsContext) {
 		this.cadytsContext = cadytsContext;
 		this.beta = scenario.getConfig().planCalcScore().getBrainExpBeta() ;
 	}
@@ -71,10 +71,10 @@ public class CadytsPtPlanChanger<T> implements PlanSelector {
 		double otherScore = otherPlan.getScore().doubleValue() + cadytsWeight * otherPlanCadytsCorrection;
 
 		Map<String,Object> planAttributes = currentPlan.getCustomAttributes() ;
-		planAttributes.put(CadytsPtPlanChanger.CADYTS_CORRECTION,currentPlanCadytsCorrection) ;
+		planAttributes.put(CadytsPlanChanger.CADYTS_CORRECTION,currentPlanCadytsCorrection) ;
 
 		Map<String,Object> planAttributesOther = otherPlan.getCustomAttributes() ;
-		planAttributesOther.put(CadytsPtPlanChanger.CADYTS_CORRECTION,otherPlanCadytsCorrection) ;
+		planAttributesOther.put(CadytsPlanChanger.CADYTS_CORRECTION,otherPlanCadytsCorrection) ;
 
 		double weight = Math.exp(0.5 * this.beta * (otherScore - currentScore));
 

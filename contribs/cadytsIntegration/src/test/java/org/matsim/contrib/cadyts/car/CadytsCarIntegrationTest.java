@@ -32,6 +32,8 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.cadyts.general.CadytsExtendedExpBetaPlanChanger;
+import org.matsim.contrib.cadyts.general.CadytsPlanChanger;
 import org.matsim.contrib.cadyts.utils.CalibrationStatReader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
@@ -108,8 +110,7 @@ public class CadytsCarIntegrationTest {
 		controler.addPlanStrategyFactory("ccc", new PlanStrategyFactory() {
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario2, EventsManager events2) {
-				// return new PlanStrategyImpl(new CadytsPtPlanChanger(scenario2, context));
-				return new PlanStrategyImpl(new CadytsPlanChanger(context));
+				return new PlanStrategyImpl(new CadytsPlanChanger(scenario2,context));
 			}} ) ;
 		
 		controler.setCreateGraphs(false);
