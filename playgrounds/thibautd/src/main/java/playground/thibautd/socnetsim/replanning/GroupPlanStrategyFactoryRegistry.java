@@ -29,6 +29,7 @@ import playground.thibautd.socnetsim.replanning.strategies.GroupOptimizingTourVe
 import playground.thibautd.socnetsim.replanning.strategies.GroupPlanVehicleAllocationFactory;
 import playground.thibautd.socnetsim.replanning.strategies.GroupRandomJointPlanRecomposerFactory;
 import playground.thibautd.socnetsim.replanning.strategies.GroupReRouteFactory;
+import playground.thibautd.socnetsim.replanning.strategies.GroupSelectExpBetaFactory;
 import playground.thibautd.socnetsim.replanning.strategies.GroupSubtourModeChoiceFactory;
 import playground.thibautd.socnetsim.replanning.strategies.GroupTimeAllocationMutatorFactory;
 import playground.thibautd.socnetsim.replanning.strategies.GroupTourVehicleAllocationFactory;
@@ -53,6 +54,7 @@ public class GroupPlanStrategyFactoryRegistry {
 		// XXX c'tor needs parameters
 		// addFactory( "ActivityInGroupLocationChoice" , new ActivityInGroupLocationChoiceFactory( type ) );
 
+		addFactory( "SelectExpBeta" , new GroupSelectExpBetaFactory() );
 		// XXX c'tor needs parameters
 		// addFactory( "WeightedSelectExpBeta" , new GroupWeightedSelectExpBetaFactory() );
 		addFactory( "WhoIsTheBossSelectExpBeta" , new GroupWhoIsTheBossSelectExpBetaFactory() );
