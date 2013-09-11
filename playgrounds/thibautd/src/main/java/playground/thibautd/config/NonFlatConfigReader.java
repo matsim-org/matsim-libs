@@ -56,16 +56,20 @@ public class NonFlatConfigReader extends MatsimXmlParser {
 					config.createModule( atts.getValue( NAME ) ) :
 					m );
 		}
-		if ( name.equals( PARAMETER_SET ) ) {
+		else if ( name.equals( PARAMETER_SET ) ) {
 			final Module m = ((NonFlatModule) moduleStack.getFirst()).createAndAddParameterSet( atts.getValue( TYPE ) );
 			moduleStack.addFirst( m );
 		}
-		if ( name.equals( PARAMETER ) ) {
+		else if ( name.equals( PARAMETER ) ) {
 			if ( !atts.getValue( VALUE ).equalsIgnoreCase( "null" ) ) {
 				moduleStack.getFirst().addParam(
 						atts.getValue( NAME ),
 						atts.getValue( VALUE ) );
 			}
+		}
+		else if ( !name.equals( "config" ) ) {
+			// XXX this is the job of a dtd!
+			throw new IllegalArgumentException( "unkown tag "+name );
 		}
 	}
 
