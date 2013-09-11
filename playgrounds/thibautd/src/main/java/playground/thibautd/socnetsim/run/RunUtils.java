@@ -122,43 +122,35 @@ public class RunUtils {
 				strategyRegistry.addStrategy(
 						GroupPlanStrategyFactoryRegistry.createWeightedSelectExpBeta(
 							weights.getWeightAttributeName(),
-							controllerRegistry.getScenario().getPopulation().getPersonAttributes(),
-							controllerRegistry.getIncompatiblePlansIdentifierFactory(),
-							config ),
+							controllerRegistry ),
 						weights.getLogitSelectionWeight(),
 						-1);
 				break;
 			case sum:
 				strategyRegistry.addStrategy(
 						GroupPlanStrategyFactoryRegistry.createSelectExpBeta(
-								controllerRegistry.getIncompatiblePlansIdentifierFactory(),
-								config ),
+								controllerRegistry ),
 						weights.getLogitSelectionWeight(),
 						-1);
 				break;
 			case min:
 				strategyRegistry.addStrategy(
 						GroupPlanStrategyFactoryRegistry.createMinSelectExpBeta(
-							controllerRegistry.getJointPlans(),
-							controllerRegistry.getIncompatiblePlansIdentifierFactory(),
-							config ),
+							controllerRegistry ),
 						weights.getLogitSelectionWeight(),
 						-1);
 				break;
 			case minLoss:
 				strategyRegistry.addStrategy(
 						GroupPlanStrategyFactoryRegistry.createMinLossSelectExpBeta(
-							controllerRegistry.getJointPlans(),
-							controllerRegistry.getIncompatiblePlansIdentifierFactory(),
-							config ),
+							controllerRegistry ),
 						weights.getLogitSelectionWeight(),
 						-1);
 				break;
 			case whoIsTheBoss:
 				strategyRegistry.addStrategy(
 						GroupPlanStrategyFactoryRegistry.createWhoIsTheBossSelectExpBeta(
-							controllerRegistry.getIncompatiblePlansIdentifierFactory(),
-							config ),
+							controllerRegistry ),
 						weights.getLogitSelectionWeight(),
 						-1);
 				break;
