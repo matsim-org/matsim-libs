@@ -1,35 +1,52 @@
 package playground.michalm.vrp.run;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map.Entry;
 
 import org.matsim.analysis.LegHistogram;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.*;
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.qsim.*;
-import org.matsim.core.mobsim.qsim.agents.*;
-import org.matsim.core.mobsim.qsim.qnetsimengine.*;
+import org.matsim.core.mobsim.qsim.ActivityEngine;
+import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.TeleportationEngine;
+import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
+import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
+import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.router.util.*;
+import org.matsim.core.router.util.TravelDisutility;
+import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
 import pl.poznan.put.util.lang.TimeDiscretizer;
 import pl.poznan.put.vrp.dynamic.data.VrpData;
-import pl.poznan.put.vrp.dynamic.data.model.*;
+import pl.poznan.put.vrp.dynamic.data.model.Customer;
+import pl.poznan.put.vrp.dynamic.data.model.Request;
 import pl.poznan.put.vrp.dynamic.data.network.ArcFactory;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiOptimizer;
 import playground.michalm.demand.ODDemandGenerator;
 import playground.michalm.vrp.data.MatsimVrpData;
 import playground.michalm.vrp.data.file.DepotReader;
-import playground.michalm.vrp.data.network.*;
-import playground.michalm.vrp.data.network.router.*;
+import playground.michalm.vrp.data.network.MatsimVrpGraph;
+import playground.michalm.vrp.data.network.MatsimVrpGraphCreator;
+import playground.michalm.vrp.data.network.router.DistanceAsTravelDisutility;
+import playground.michalm.vrp.data.network.router.TimeAsTravelDisutility;
+import playground.michalm.vrp.data.network.router.TravelTimeCalculators;
 import playground.michalm.vrp.data.network.shortestpath.MatsimArcFactories;
-import playground.michalm.vrp.taxi.*;
+import playground.michalm.vrp.taxi.TaxiAgentSource;
+import playground.michalm.vrp.taxi.TaxiModeDepartureHandler;
+import playground.michalm.vrp.taxi.TaxiSimEngine;
 
 
 public class OnlineDvrpLauncherUtils
@@ -85,7 +102,25 @@ public class OnlineDvrpLauncherUtils
             Leg leg = (Leg)person.getSelectedPlan().getPlanElements().get(1);
             leg.setMode(TaxiModeDepartureHandler.TAXI_MODE);
         }
-
+        
+// replacing the above fore loop by the code below will remove	 the non-taxicab passengers from the simulation.
+// was, for example, useful for a "freight-like" demo.
+//        Collection<Id> normalPersons = new ArrayList<Id>() ;
+//        for ( Entry<Id, ? extends Person> entry : scenario.getPopulation().getPersons().entrySet() ) {
+//        	Person person = entry.getValue() ;
+//        	if ( taxiCustomerIds.contains( person.getId().toString() ) ) {
+//              Leg leg = (Leg)person.getSelectedPlan().getPlanElements().get(1);
+//              leg.setMode(TaxiModeDepartureHandler.TAXI_MODE);
+//        	} else {
+//        		normalPersons.add( person.getId() ) ;
+//        	}
+//        }
+//        System.err.println( " population size before deletion: " + scenario.getPopulation().getPersons().size() );
+//        for ( Id id : normalPersons ) {
+//        	scenario.getPopulation().getPersons().remove(id) ;
+//        }
+//        System.err.println( " population size after deletion: " + scenario.getPopulation().getPersons().size() );
+        
         return scenario;
     }
 
