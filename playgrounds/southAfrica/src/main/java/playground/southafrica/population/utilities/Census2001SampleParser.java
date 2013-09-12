@@ -456,6 +456,12 @@ public class Census2001SampleParser {
 			// TODO Auto-generated method stub
 			return null;
 		}
+
+		@Override
+		public ObjectAttributes getHouseholdAttributes() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 		
 	}
 
