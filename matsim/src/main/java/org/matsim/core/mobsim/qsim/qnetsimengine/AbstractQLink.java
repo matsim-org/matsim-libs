@@ -49,9 +49,8 @@ import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
- * 
- * Please read the docu AbstractQLane and QLinkImpl jointly. kai, nov'11
- * 
+ * QLinkInternalI is the interface; this here is an abstract class that contains implementation
+ * of non-traffic-dynamics "infrastructure" provided by the link, such as parking or the logic for transit.
  * 
  * @author nagel
  *
