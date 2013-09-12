@@ -73,7 +73,15 @@ public class ScenarioLoaderImplTest {
 		Config config = this.util.loadConfig(this.util.getClassInputDirectory() + "facilityAttributesConfig.xml");
 		config.facilities().addParam("inputFacilityAttributesFile", this.util.getClassInputDirectory() + "facilityAttributes.xml");
 		Scenario scenario = ScenarioUtils.loadScenario(config);
-		Assert.assertEquals("world", ((ScenarioImpl) scenario).getActivityFacilities().getFacilityAttributes().getAttribute("1", "hello"));
+		Assert.assertEquals("world", scenario.getActivityFacilities().getFacilityAttributes().getAttribute("1", "hello"));
 	}
 
+	@Test
+	public void testLoadScenario_loadHouseholdAttributes() {
+		Config config = this.util.loadConfig(this.util.getClassInputDirectory() + "householdAttributesConfig.xml");
+		config.scenario().setUseHouseholds(true);
+		config.households().addParam("inputHouseholdAttributesFile", this.util.getClassInputDirectory() + "householdAttributes.xml");
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		Assert.assertEquals("world", ((ScenarioImpl) scenario).getHouseholds().getHouseholdAttributes().getAttribute("1", "hello"));
+	}
 }

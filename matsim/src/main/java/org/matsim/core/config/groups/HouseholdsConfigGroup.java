@@ -32,10 +32,11 @@ public class HouseholdsConfigGroup extends Module {
 
 	public static final String GROUP_NAME = "households";
 
-
 	private static final String INPUT_FILE= "inputFile";
+	private static final String INPUT_HOUSEHOLD_ATTRIBUTES_FILE = "inputHouseholdAttributesFile";
 
 	private String inputFile = null;
+	private String inputHouseholdAttributesFile = null;
 
 	public HouseholdsConfigGroup() {
 		super(GROUP_NAME);
@@ -45,14 +46,19 @@ public class HouseholdsConfigGroup extends Module {
 	public String getValue(final String key) {
 		if (INPUT_FILE.equals(key)) {
 			return getInputFile();
+		} else if (INPUT_HOUSEHOLD_ATTRIBUTES_FILE.equals(key)) {
+			return getInputHouseholdAttributesFile();
+		} else {
+			throw new IllegalArgumentException(key);			
 		}
-		throw new IllegalArgumentException(key);
 	}
 
 	@Override
 	public void addParam(final String key, final String value) {
 		if (INPUT_FILE.equals(key)) {
 			setInputFile(value);
+		} else if (INPUT_HOUSEHOLD_ATTRIBUTES_FILE.equals(key)) {
+			setInputHouseholdAttributesFile(value);
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -62,16 +68,25 @@ public class HouseholdsConfigGroup extends Module {
 	public final TreeMap<String, String> getParams() {
 		TreeMap<String, String> map = new TreeMap<String, String>();
 		addParameterToMap(map, INPUT_FILE);
+		addParameterToMap(map, INPUT_HOUSEHOLD_ATTRIBUTES_FILE);
 		return map;
 	}
 
 	/* direct access */
-
-
+	
 	public String getInputFile() {
 		return this.inputFile;
 	}
+	
 	public void setInputFile(final String inputFile) {
 		this.inputFile = inputFile;
+	}
+	
+	public String getInputHouseholdAttributesFile() {
+		return this.inputHouseholdAttributesFile;
+	}
+
+	public void setInputHouseholdAttributesFile(String inputHouseholdAttributesFile) {
+		this.inputHouseholdAttributesFile = inputHouseholdAttributesFile;
 	}
 }

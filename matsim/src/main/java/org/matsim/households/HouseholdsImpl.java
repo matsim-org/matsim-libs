@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.utils.objectattributes.ObjectAttributes;
 
 
 /**
@@ -38,6 +39,7 @@ public class HouseholdsImpl implements Households{
 
 	private Map<Id, Household> households;
 	
+	private final ObjectAttributes householdAttributes = new ObjectAttributes();
 	
 	public HouseholdsImpl(){
 		this.households = new HashMap<Id, Household>();
@@ -74,6 +76,11 @@ public class HouseholdsImpl implements Households{
 	@Override
 	public Map<Id, Household> getHouseholds() {
 		return this.households;
+	}
+
+	@Override
+	public ObjectAttributes getHouseholdAttributes() {
+		return this.householdAttributes;
 	}
 
 }

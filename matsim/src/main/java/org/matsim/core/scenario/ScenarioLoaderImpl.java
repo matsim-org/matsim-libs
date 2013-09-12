@@ -250,6 +250,14 @@ public class ScenarioLoaderImpl {
 		else {
 			log.info("no households file set in config or feature disabled, not able to load anything");
 		}
+		if ((this.config.households() != null) && (this.config.households().getInputHouseholdAttributesFile() != null)) {
+			String householdAttributesFileName = this.config.households().getInputHouseholdAttributesFile();
+			log.info("loading household attributes from " + householdAttributesFileName);
+			new ObjectAttributesXmlReader(this.scenario.getHouseholds().getHouseholdAttributes()).parse(householdAttributesFileName);
+		}
+		else {
+			log.info("no household-attributes file set in config, not loading any household attributes");
+		}
 	}
 
 	private void loadTransit() throws UncheckedIOException {
