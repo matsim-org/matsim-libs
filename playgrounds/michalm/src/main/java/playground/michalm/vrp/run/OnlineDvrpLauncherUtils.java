@@ -27,7 +27,7 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
+import org.matsim.core.trafficmonitoring.*;
 
 import pl.poznan.put.util.lang.TimeDiscretizer;
 import pl.poznan.put.vrp.dynamic.data.VrpData;
@@ -71,7 +71,7 @@ public class OnlineDvrpLauncherUtils
     }
 
 
-    public enum TravelCostSource
+    public enum TravelDisutilitySource
     {
         TIME, // travel time
         DISTANCE; // travel distance
@@ -128,39 +128,41 @@ public class OnlineDvrpLauncherUtils
     /**
      * Mandatory
      */
-    public static MatsimVrpData initMatsimVrpData(Scenario scenario, TravelTimeSource ttimeSource,
-            TravelCostSource tcostSource, String eventsFileName, String depotsFileName)
+    public static MatsimVrpData initMatsimVrpData(Scenario scenario, TravelTimeCalculator travelTimeCalculator,
+            TravelTimeSource ttimeSource, TravelDisutilitySource tdisSource, String eventsFileName,
+            String depotsFileName)
     {
-        int travelTimeBinSize = ttimeSource.travelTimeBinSize;
-        int numSlots = ttimeSource.numSlots;
+        TravelTime travelTime;
+        if (travelTimeCalculator == null) {
+            switch (ttimeSource) {
+                case FREE_FLOW_SPEED:
+                    travelTime = new FreeSpeedTravelTime();
+                    break;
 
-        scenario.getConfig().travelTimeCalculator().setTraveltimeBinSize(travelTimeBinSize);
+                case EVENTS_15_MIN:
+                case EVENTS_24_H:
+                    scenario.getConfig().travelTimeCalculator()
+                            .setTraveltimeBinSize(ttimeSource.travelTimeBinSize);
+                    travelTime = TravelTimeCalculators.createTravelTimeFromEvents(eventsFileName,
+                            scenario);
+                    break;
 
-        TravelTime ttimeCalc;
-        TravelDisutility tcostCalc;
-
-        switch (ttimeSource) {
-            case FREE_FLOW_SPEED:
-                ttimeCalc = new FreeSpeedTravelTime();
-                break;
-
-            case EVENTS_15_MIN:
-            case EVENTS_24_H:
-                ttimeCalc = TravelTimeCalculators.createTravelTimeFromEvents(eventsFileName,
-                        scenario);
-                break;
-
-            default:
-                throw new IllegalArgumentException();
+                default:
+                    throw new IllegalArgumentException();
+            }
+        }
+        else {
+            travelTime = travelTimeCalculator.getLinkTravelTimes();
         }
 
-        switch (tcostSource) {
+        TravelDisutility travelDisutility;
+        switch (tdisSource) {
             case DISTANCE:
-                tcostCalc = new DistanceAsTravelDisutility();
+                travelDisutility = new DistanceAsTravelDisutility();
                 break;
 
             case TIME:
-                tcostCalc = new TimeAsTravelDisutility(ttimeCalc);
+                travelDisutility = new TimeAsTravelDisutility(travelTime);
                 break;
 
             default:
@@ -168,9 +170,10 @@ public class OnlineDvrpLauncherUtils
         }
 
         Network network = scenario.getNetwork();
-        TimeDiscretizer timeDiscretizer = new TimeDiscretizer(travelTimeBinSize, numSlots);
-        ArcFactory arcFactory = MatsimArcFactories.createArcFactory(network, ttimeCalc, tcostCalc,
-                timeDiscretizer, false);
+        TimeDiscretizer timeDiscretizer = new TimeDiscretizer(ttimeSource.travelTimeBinSize,
+                ttimeSource.numSlots);
+        ArcFactory arcFactory = MatsimArcFactories.createArcFactory(network, travelTime,
+                travelDisutility, timeDiscretizer, false);
 
         MatsimVrpGraph graph;
         try {

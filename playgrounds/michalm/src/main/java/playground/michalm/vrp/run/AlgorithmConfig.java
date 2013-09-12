@@ -21,11 +21,11 @@ package playground.michalm.vrp.run;
 
 import static pl.poznan.put.vrp.dynamic.optimizer.taxi.immediaterequest.TaxiOptimizationPolicy.*;
 import static playground.michalm.vrp.run.AlgorithmConfig.AlgorithmType.*;
-import static playground.michalm.vrp.run.OnlineDvrpLauncherUtils.TravelCostSource.*;
+import static playground.michalm.vrp.run.OnlineDvrpLauncherUtils.TravelDisutilitySource.*;
 import static playground.michalm.vrp.run.OnlineDvrpLauncherUtils.TravelTimeSource.*;
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.immediaterequest.*;
-import playground.michalm.vrp.run.OnlineDvrpLauncherUtils.TravelCostSource;
+import playground.michalm.vrp.run.OnlineDvrpLauncherUtils.TravelDisutilitySource;
 import playground.michalm.vrp.run.OnlineDvrpLauncherUtils.TravelTimeSource;
 
 
@@ -170,16 +170,16 @@ import playground.michalm.vrp.run.OnlineDvrpLauncherUtils.TravelTimeSource;
     };
 
     /*package*/final TravelTimeSource ttimeSource;
-    /*package*/final TravelCostSource tcostSource;
+    /*package*/final TravelDisutilitySource tdisSource;
     /*package*/final AlgorithmType algorithmType;
     /*package*/final TaxiOptimizationPolicy optimizationPolicy;
 
 
-    /*package*/AlgorithmConfig(TravelTimeSource ttimeSource, TravelCostSource tcostSource,
+    /*package*/AlgorithmConfig(TravelTimeSource ttimeSource, TravelDisutilitySource tdisSource,
             AlgorithmType algorithmType, TaxiOptimizationPolicy optimizationPolicy)
     {
         this.ttimeSource = ttimeSource;
-        this.tcostSource = tcostSource;
+        this.tdisSource = tdisSource;
         this.algorithmType = algorithmType;
         this.optimizationPolicy = optimizationPolicy;
     }

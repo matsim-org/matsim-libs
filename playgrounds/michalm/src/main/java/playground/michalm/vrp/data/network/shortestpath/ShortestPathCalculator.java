@@ -62,13 +62,12 @@ public class ShortestPathCalculator
             int count = path.links.size();
             Id[] ids = new Id[count + 2];
             int[] accLinkTravelTimes = new int[count + 2];
-            double accTT = 0;
 
             ids[0] = fromLink.getId();
-            accTT = 0;//we start at the end of fromLink
-            //actually, in QSim it is usually 1 second
+            double accTT = 1.;//we start at the end of fromLink
+            //actually, in QSim, it usually takes 1 second to move over the first node
             //(when INSERTING_WAITING_VEHICLES_BEFORE_DRIVING_VEHICLES is ON;
-            //otherwise it may take even longer)
+            //otherwise it may take even much longer)
             accLinkTravelTimes[0] = (int)accTT;
 
             for (int i = 0; i < count; i++) {

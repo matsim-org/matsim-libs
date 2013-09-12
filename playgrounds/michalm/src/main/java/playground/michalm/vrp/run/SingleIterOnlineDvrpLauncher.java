@@ -29,6 +29,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.OTFVisConfigGroup.ColoringScheme;
 import org.matsim.core.events.algorithms.*;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.vis.otfvis.*;
 
 import pl.poznan.put.util.jfreechart.ChartUtils;
@@ -72,6 +73,8 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
     /*package*/LegHistogram legHistogram;
     /*package*/MatsimVrpData data;
     /*package*/TaxiDelaySpeedupStats delaySpeedupStats;
+
+    /*package*/TravelTimeCalculator travelTimeCalculator;
 
 
     /*package*/SingleIterOnlineDvrpLauncher()
@@ -181,14 +184,14 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
     /**
      * Can be called several times (1 call == 1 simulation)
      */
-    /*package*/void go()
+    /*package*/void go(boolean warmup)
     {
-        data = OnlineDvrpLauncherUtils.initMatsimVrpData(scenario, algorithmConfig.ttimeSource,
-                algorithmConfig.tcostSource, eventsFileName, depotsFileName);
+        data = OnlineDvrpLauncherUtils.initMatsimVrpData(scenario, travelTimeCalculator,
+                algorithmConfig.ttimeSource, algorithmConfig.tdisSource, eventsFileName,
+                depotsFileName);
 
         ImmediateRequestTaxiOptimizer optimizer = algorithmConfig.createTaxiOptimizer(
                 data.getVrpData(), destinationKnown, minimizePickupTripTime);
-        optimizer.setDelaySpeedupStats(delaySpeedupStats);
 
         QSim qSim = OnlineDvrpLauncherUtils.initQSim(data, optimizer, onlineVehicleTracker);
         EventsManager events = qSim.getEventsManager();
@@ -199,10 +202,18 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
             events.addHandler(eventWriter);
         }
 
-        // TravelTimeCalculator calc = new TravelTimeCalculator(scenario.getNetwork(), scenario
-        // .getConfig().travelTimeCalculator());
-        // events.addHandler(calc);
-        //
+        if (warmup) {
+            if (travelTimeCalculator == null) {
+                travelTimeCalculator = new TravelTimeCalculator(scenario.getNetwork(), scenario
+                        .getConfig().travelTimeCalculator());
+            }
+
+            events.addHandler(travelTimeCalculator);
+        }
+        else {
+            optimizer.setDelaySpeedupStats(delaySpeedupStats);
+        }
+
         RunningVehicleRegister rvr = new RunningVehicleRegister();
         events.addHandler(rvr);
 
@@ -232,7 +243,7 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
                 throw new IllegalStateException();
             }
         }
-        //
+
         // TravelTime ttCalc = calc.getLinkTravelTimes();
         //
         // Link link = scenario.getNetwork().getLinks().get(scenario.createId("379"));
@@ -346,7 +357,7 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
             throw new RuntimeException();
         }
 
-        launcher.go();
+        launcher.go(false);
         launcher.generateOutput();
     }
 }

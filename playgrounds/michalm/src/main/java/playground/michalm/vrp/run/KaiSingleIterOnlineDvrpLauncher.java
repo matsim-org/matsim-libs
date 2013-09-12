@@ -25,7 +25,7 @@ package playground.michalm.vrp.run;
     {
         String file = "./shared-svn/projects/maciejewski/input/mielec-2-peaks/params.in";
         SingleIterOnlineDvrpLauncher launcher = new SingleIterOnlineDvrpLauncher(file);
-        launcher.go();
+        launcher.go(false);
         launcher.generateOutput();
     }
 }

@@ -26,6 +26,7 @@ import org.matsim.core.gbl.MatsimRandom;
 
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
 import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiEvaluator.TaxiEvaluation;
+import playground.michalm.vrp.run.OnlineDvrpLauncherUtils.TravelTimeSource;
 
 
 /*package*/class MultipleSingleIterOnlineDvrpLauncher
@@ -71,6 +72,8 @@ import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiEvaluator.TaxiEvaluation;
         SummaryStatistics passengerWaitTime = new SummaryStatistics();
         SummaryStatistics maxPassengerWaitTime = new SummaryStatistics();
 
+        boolean warmup = false;
+
         switch (configIdx) {
             case 0:
             case 1:
@@ -80,6 +83,11 @@ import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiEvaluator.TaxiEvaluation;
             case 10:
             case 15:
             case 16:
+
+                if (launcher.algorithmConfig.ttimeSource != TravelTimeSource.FREE_FLOW_SPEED) {
+                    warmup = true;
+                }
+
                 // run as many times as requested
                 break;
 
@@ -88,9 +96,16 @@ import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiEvaluator.TaxiEvaluation;
                 runs = 0;
         }
 
+        if (warmup) {
+            for (int i = 0; i < runs; i += 4) {
+                MatsimRandom.reset(RANDOM_SEEDS[i]);
+                launcher.go(true);
+            }
+        }
+
         for (int i = 0; i < runs; i++) {
             MatsimRandom.reset(RANDOM_SEEDS[i]);
-            launcher.go();
+            launcher.go(false);
             TaxiEvaluation evaluation = (TaxiEvaluation)new TaxiEvaluator()
                     .evaluateVrp(launcher.data.getVrpData());
 
@@ -123,7 +138,7 @@ import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiEvaluator.TaxiEvaluation;
                 (int)taxiWaitTime.getMin(),//
                 (int)taxiOverTime.getMin(),//
                 (int)passengerWaitTime.getMin(),//
-                (int)passengerWaitTime.getMin());
+                (int)maxPassengerWaitTime.getMin());
         pw.printf("Max\t%d\t%d\t%d\t%d\t%d\t%d\t%d\t%d\n",//
                 (int)taxiPickupDriveTime.getMax(),//
                 (int)taxiDeliveryDriveTime.getMax(),//
@@ -132,7 +147,7 @@ import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiEvaluator.TaxiEvaluation;
                 (int)taxiWaitTime.getMax(),//
                 (int)taxiOverTime.getMax(),//
                 (int)passengerWaitTime.getMax(),//
-                (int)passengerWaitTime.getMax());
+                (int)maxPassengerWaitTime.getMax());
         pw.printf("StdDev\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\t%.2f\n",
                 taxiPickupDriveTime.getStandardDeviation(),//
                 taxiDeliveryDriveTime.getStandardDeviation(),//
@@ -141,7 +156,7 @@ import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiEvaluator.TaxiEvaluation;
                 taxiWaitTime.getStandardDeviation(),//
                 taxiOverTime.getStandardDeviation(),//
                 passengerWaitTime.getStandardDeviation(),//
-                passengerWaitTime.getStandardDeviation());
+                maxPassengerWaitTime.getStandardDeviation());
 
         // the endTime of the simulation??? --- time of last served request
 
@@ -151,6 +166,8 @@ import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiEvaluator.TaxiEvaluation;
             delaySpeedupStats.printStats(pw2, configIdx + "");
             delaySpeedupStats.clearStats();
         }
+
+        launcher.travelTimeCalculator = null;
     }
 
 

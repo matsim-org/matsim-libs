@@ -6,17 +6,17 @@ import java.util.*;
 
 public class ResultsPostProcessor
 {
-    //    0   PickupT DeliveryT   ServiceT    CruiseT WaitT   OverT   PassengerWaitT  MaxPassengerWaitT
-    //    Mean    280159,85   867978,15   261000,00   0,00    7230862,00  0,00    280166,45   1053,90
-    //    Min 275199  865726  261000  0   7224940 0   275199  275199
-    //    Max 284150  870788  261000  0   7236939 0   284150  284150
-    //    StdDev  2266,09 1425,12 0,00    0,00    2915,95 0,00    2272,45 2272,45
+    // 0 PickupT DeliveryT ServiceT CruiseT WaitT OverT PassengerWaitT MaxPassengerWaitT
+    // Mean 280159,85 867978,15 261000,00 0,00 7230862,00 0,00 280166,45 1053,90
+    // Min 275199 865726 261000 0 7224940 0 275199 275199
+    // Max 284150 870788 261000 0 7236939 0 284150 284150
+    // StdDev 2266,09 1425,12 0,00 0,00 2915,95 0,00 2272,45 2272,45
     //
-    //    1   PickupT DeliveryT   ServiceT    CruiseT WaitT   OverT   PassengerWaitT  MaxPassengerWaitT
-    //    Mean    263303,85   867941,05   261000,00   0,00    7247755,10  0,00    263322,25   973,45
-    //    Min 258881  865937  261000  0   7239965 0   258881  258881
-    //    Max 268763  871056  261000  0   7251583 0   268935  268935
-    //    StdDev  2618,62 1299,13 0,00    0,00    3298,15 0,00    2643,21 2643,21
+    // 1 PickupT DeliveryT ServiceT CruiseT WaitT OverT PassengerWaitT MaxPassengerWaitT
+    // Mean 263303,85 867941,05 261000,00 0,00 7247755,10 0,00 263322,25 973,45
+    // Min 258881 865937 261000 0 7239965 0 258881 258881
+    // Max 268763 871056 261000 0 7251583 0 268935 268935
+    // StdDev 2618,62 1299,13 0,00 0,00 3298,15 0,00 2643,21 2643,21
 
     private static class Experiment
     {
@@ -36,13 +36,13 @@ public class ResultsPostProcessor
 
     private static class Stats
     {
-        private static final int TIME_WINDOW = 14 * 3600;//for the time being...:-/
+        private static final int TIME_WINDOW = 14 * 3600;// for the time being...:-/
 
-        //============
+        // ============
 
         private Experiment experiment;
 
-        //============
+        // ============
 
         private double pickupT;
         private double deliveryT;
@@ -53,7 +53,7 @@ public class ResultsPostProcessor
         private double passengerWaitT;
         private double maxPassengerWaitT;
 
-        //============
+        // ============
 
         private double T_W;
         private double T_W_MAX;
@@ -100,8 +100,8 @@ public class ResultsPostProcessor
         Stats stats = new Stats();
         stats.experiment = experiment;
 
-        sc.nextLine();//header
-        sc.next();//row header: "Mean"
+        sc.nextLine();// header
+        sc.next();// row header: "Mean"
 
         stats.pickupT = sc.nextDouble();
         stats.deliveryT = sc.nextDouble();
@@ -112,11 +112,11 @@ public class ResultsPostProcessor
         stats.passengerWaitT = sc.nextDouble();
         stats.maxPassengerWaitT = sc.nextDouble();
 
-        sc.nextLine();//Mean (the rest of the line)
-        sc.nextLine();//Min
-        sc.nextLine();//Max
-        sc.nextLine();//StdDev
-        sc.nextLine();//empty line (separator)
+        sc.nextLine();// Mean (the rest of the line)
+        sc.nextLine();// Min
+        sc.nextLine();// Max
+        sc.nextLine();// StdDev
+        sc.nextLine();// empty line (separator)
 
         if (Double.isNaN(stats.pickupT)) {
             return null;
@@ -136,7 +136,7 @@ public class ResultsPostProcessor
         pw.printf("%s\t", field);
 
         for (Experiment e : experiments) {
-            double ratio = e.reqs / e.taxis;
+            double ratio = (double)e.reqs / e.taxis;
             pw.printf("\t%f", ratio);
 
         }
@@ -162,6 +162,9 @@ public class ResultsPostProcessor
 
                 if ("T_W".equals(field)) {
                     value = stats[i].T_W;
+                }
+                else if ("T_W_MAX".equals(field)) {
+                    value = stats[i].T_W_MAX;
                 }
                 else if ("T_P".equals(field)) {
                     value = stats[i].T_P;
@@ -190,35 +193,27 @@ public class ResultsPostProcessor
             boolean minimizePickupTripTime)
         throws FileNotFoundException
     {
-        String dir = "d:\\PP-rad\\taxi\\mielec-2-peaks\\2013_07\\";
-        String subdirPrefix = "mielec-2-peaks-new-0";
+        String dir = "d:\\michalm\\2013_07\\";
+        String subdirPrefix = "mielec-2-peaks-new-";
         String filename = "stats_DK_" + destinationKnown + "_VT_" + onlineVehicleTracker + "_TP_"
                 + minimizePickupTripTime + ".out";
 
-        //        experiments = new Experiment[12];
-        //        experiments[0] = new Experiment(1, 316, 100);
-        //        experiments[1] = new Experiment(3, 911, 100);
-        //        experiments[2] = new Experiment(5, 1479, 100);
-        //        experiments[3] = new Experiment(7, 2105, 100);
-        //
-        //        experiments[4] = new Experiment(1, 316, 75);
-        //        experiments[5] = new Experiment(3, 911, 75);
-        //        experiments[6] = new Experiment(5, 1479, 75);
-        //        experiments[7] = new Experiment(7, 2105, 75);
-        //
-        //        experiments[8] = new Experiment(1, 316, 50);
-        //        experiments[9] = new Experiment(3, 911, 50);
-        //        experiments[10] = new Experiment(5, 1479, 50);
-        //        experiments[11] = new Experiment(7, 2105, 50);
-
         experiments = new ArrayList<Experiment>();
-        experiments.add(new Experiment(1, 406, 50));
-        experiments.add(new Experiment(2, 840, 50));
-        experiments.add(new Experiment(3, 1297, 50));
+        experiments.add(new Experiment(10, 406, 50));
+        experiments.add(new Experiment(15, 636, 50));
+        experiments.add(new Experiment(20, 840, 50));
+        experiments.add(new Experiment(25, 1069, 50));
+        experiments.add(new Experiment(30, 1297, 50));
+        experiments.add(new Experiment(35, 1506, 50));
+        experiments.add(new Experiment(40, 1719, 50));
 
-        experiments.add(new Experiment(1, 406, 25));
-        experiments.add(new Experiment(2, 840, 25));
-        experiments.add(new Experiment(3, 1297, 25));
+        experiments.add(new Experiment(10, 406, 25));
+        experiments.add(new Experiment(15, 636, 25));
+        experiments.add(new Experiment(20, 840, 25));
+        experiments.add(new Experiment(25, 1069, 25));
+        experiments.add(new Experiment(30, 1297, 25));
+        experiments.add(new Experiment(35, 1506, 25));
+        experiments.add(new Experiment(40, 1719, 25));
 
         allStats = new ArrayList<Stats[]>();
         for (Experiment e : experiments) {
@@ -226,6 +221,7 @@ public class ResultsPostProcessor
         }
 
         writeValues(dir + filename + ".T_W", "T_W");
+        writeValues(dir + filename + ".T_W_MAX", "T_W_MAX");
         writeValues(dir + filename + ".T_P", "T_P");
         writeValues(dir + filename + ".T_W_T_P", "T_W-T_P");
         writeValues(dir + filename + ".R_NI", "R_NI");

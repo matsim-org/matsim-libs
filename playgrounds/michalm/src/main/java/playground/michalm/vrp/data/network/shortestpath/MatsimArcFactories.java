@@ -29,12 +29,12 @@ import pl.poznan.put.vrp.dynamic.data.network.ArcFactory;
 
 public class MatsimArcFactories
 {
-    public static ArcFactory createArcFactory(Network network, TravelTime ttimeCalc,
-            TravelDisutility tcostCalc, TimeDiscretizer timeDiscretizer, boolean preciseArc)
+    public static ArcFactory createArcFactory(Network network, TravelTime travelTime,
+            TravelDisutility travelDisutility, TimeDiscretizer timeDiscretizer, boolean preciseArc)
     {
-        LeastCostPathCalculator router = new Dijkstra(network, tcostCalc, ttimeCalc);
+        LeastCostPathCalculator router = new Dijkstra(network, travelDisutility, travelTime);
         ShortestPathCalculator shortestPathCalculator = new ShortestPathCalculator(router,
-                ttimeCalc, tcostCalc);
+                travelTime, travelDisutility);
 
         return preciseArc
                 ? //
