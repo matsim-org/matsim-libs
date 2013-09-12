@@ -49,10 +49,9 @@ import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.framework.listeners.MobsimListener;
 import org.matsim.core.mobsim.qsim.qnetsimengine.PassengerQNetsimEngine;
+import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.utils.objectattributes.ObjectAttributes;
-import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.opengis.feature.simple.SimpleFeature;
 
 import playground.christoph.evacuation.analysis.AgentsReturnHomeCounter;
@@ -104,10 +103,6 @@ public class AgentsReturnHomePostProcessing {
 		new EvacuationConfigReader().readFile(evacuationConfigFile);
 		EvacuationConfig.printConfig();
 		
-		// load household object attributes
-		ObjectAttributes householdObjectAttributes = new ObjectAttributes();
-		new ObjectAttributesXmlReader(householdObjectAttributes).parse(EvacuationConfig.householdObjectAttributesFile);
-		
 		/*
 		 * Prepare the scenario:
 		 * 	- connect facilities to network
@@ -151,7 +146,7 @@ public class AgentsReturnHomePostProcessing {
 		 * which inserts decision data into the DecisionDataProvider.
 		 */
 		DecisionDataGrabber decisionDataGrabber = new DecisionDataGrabber(scenario, coordAnalyzer, 
-				householdsTracker, householdObjectAttributes);
+				householdsTracker, ((ScenarioImpl) scenario).getHouseholds().getHouseholdAttributes());
 		
 		// read people in panic from file
 		String panicFile = dummyInputController.getControlerIO().getIterationFilename(0, PanicModel.panicModelFile);

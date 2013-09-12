@@ -56,8 +56,6 @@ import org.matsim.core.utils.gis.ShapeFileReader;
 import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetwork;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
-import org.matsim.utils.objectattributes.ObjectAttributes;
-import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 import org.matsim.withinday.controller.WithinDayControlerListener;
 import org.matsim.withinday.mobsim.MobsimDataProvider;
 import org.matsim.withinday.mobsim.WithinDayEngine;
@@ -196,7 +194,6 @@ public class EvacuationControlerListener implements StartupListener {
 	/*
 	 * Data
 	 */
-	private ObjectAttributes householdObjectAttributes;
 	
 	private final FixedOrderControlerListener fixedOrderControlerListener = new FixedOrderControlerListener();
 	
@@ -213,8 +210,8 @@ public class EvacuationControlerListener implements StartupListener {
 		event.getControler().addControlerListener(this.fixedOrderControlerListener);
 		
 		// load household object attributes
-		this.householdObjectAttributes = new ObjectAttributes();
-		new ObjectAttributesXmlReader(this.householdObjectAttributes).parse(EvacuationConfig.householdObjectAttributesFile);
+//		this.householdObjectAttributes = new ObjectAttributes();
+//		new ObjectAttributesXmlReader(this.householdObjectAttributes).parse(EvacuationConfig.householdObjectAttributesFile);
 		
 		this.initGeographyStuff(event.getControler().getScenario());
 		
@@ -228,8 +225,10 @@ public class EvacuationControlerListener implements StartupListener {
 		 * Use a MobsimFactory which creates vehicles according to available vehicles per
 		 * household and adds the replanning Manager as mobsim engine.
 		 */
+		Scenario scenario = event.getControler().getScenario();
 		MobsimFactory mobsimFactory = new EvacuationQSimFactory(this.withinDayControlerListener.getWithinDayEngine(), 
-				this.householdObjectAttributes, this.jointDepartureOrganizer, this.multiModalControlerListener.getMultiModalTravelTimes());
+				((ScenarioImpl) scenario).getHouseholds().getHouseholdAttributes(), this.jointDepartureOrganizer, 
+				this.multiModalControlerListener.getMultiModalTravelTimes());
 		event.getControler().setMobsimFactory(mobsimFactory);
 	}
 
@@ -271,7 +270,7 @@ public class EvacuationControlerListener implements StartupListener {
 		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(householdsTracker);
 		
 		this.decisionDataGrabber = new DecisionDataGrabber(scenario, this.coordAnalyzer.createInstance(), 
-				this.householdsTracker, this.householdObjectAttributes);		
+				this.householdsTracker, ((ScenarioImpl) scenario).getHouseholds().getHouseholdAttributes());		
 		this.decisionModelRunner = new DecisionModelRunner(scenario, this.decisionDataGrabber, this.informedHouseholdsTracker);
 		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(this.decisionModelRunner);
 		this.fixedOrderControlerListener.addControlerListener(this.decisionModelRunner);
