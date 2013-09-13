@@ -57,6 +57,7 @@ public class TaxiCustomerWaitTimeAnalyser implements
 	private Map<Id,Long> linkWaitPeople;
 	private Map<Id,Id> linkAg;
 	private Scenario scenario; 
+	private List<WaitTimeLogRow> waitTimes;
 	public TaxiCustomerWaitTimeAnalyser(Scenario scen) {
 			this.scenario= scen;
 			this.taxicalltime = new HashMap<Id,Double>();
@@ -64,8 +65,40 @@ public class TaxiCustomerWaitTimeAnalyser implements
 			this.linkWaitPeople = new HashMap<Id, Long>();
 			this.linkAg = new HashMap<Id, Id>();
 			this.totalWaitTime=new ArrayList<Double>();
+			this.waitTimes=new ArrayList<WaitTimeLogRow>();
 			}
 
+	
+	public class WaitTimeLogRow implements Comparable<WaitTimeLogRow>{
+		private Double time;
+		private Id agentId;
+		private Id linkId;
+		private double waitTime;
+		
+		public WaitTimeLogRow(double time, Id agent, Id link, double waitTime){
+			this.time= time;
+			this.agentId=agent;
+			this.linkId=link;
+			this.waitTime=waitTime;
+		}
+		public double getTime(){
+			return time;
+		}
+		
+		public String toString(){
+			
+			return(this.time+"\t"+this.agentId+"\t"+this.linkId+"\t"+this.waitTime);
+		}
+
+		@Override
+		public int compareTo(WaitTimeLogRow arg0) {
+			return this.time.compareTo(arg0.getTime());
+		}
+		
+		
+	}
+	
+	
 	@Override
 	public void reset(int iteration) {
 
@@ -76,11 +109,13 @@ public class TaxiCustomerWaitTimeAnalyser implements
 		if (!this.taxicalltime.containsKey(event.getPersonId())) return;
 		double waitingtime = event.getTime() - this.taxicalltime.get(event.getPersonId()) ;
 		this.totalWaitTime.add(waitingtime);
-		this.taxicalltime.remove(event.getPersonId());
 		
 		double linkWait=waitingtime;
 		if (this.linkWaitTime.containsKey(this.linkAg.get(event.getPersonId()))) linkWait = linkWait + this.linkWaitTime.get(this.linkAg.get(event.getPersonId())); 
 		this.linkWaitTime.put(this.linkAg.get(event.getPersonId()), linkWait);
+
+		this.waitTimes.add(new WaitTimeLogRow(event.getTime(), event.getPersonId(), this.linkAg.get(event.getPersonId()),waitingtime));
+		this.taxicalltime.remove(event.getPersonId());
 		this.linkAg.remove(event.getPersonId());
 		
 	}
@@ -135,6 +170,16 @@ public class TaxiCustomerWaitTimeAnalyser implements
 			for (Entry<Id,Double> e:this.linkWaitTime.entrySet()){
 				Coord coord = scenario.getNetwork().getLinks().get(e.getKey()).getCoord();
 				bw.write(e.getKey()+"\t"+coord.getX() +"\t"+coord.getY()+"\t"+e.getValue()+"\t"+this.linkWaitPeople.get(e.getKey()));
+				bw.newLine();
+			}
+			
+			bw.flush();
+			bw.close();
+			
+			bw = new BufferedWriter(new FileWriter(new File(waitstatsFile+"agentWaitTimes.txt")));
+			for (WaitTimeLogRow wtlr : this.waitTimes)
+			{
+				bw.append(wtlr.toString());
 				bw.newLine();
 			}
 			

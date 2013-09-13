@@ -2,8 +2,12 @@ package playground.jbischoff.energy.charging;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
@@ -26,19 +30,19 @@ import playground.jbischoff.energy.log.SocLogRow;
 public class DepotArrivalDepartureCharger implements AgentArrivalEventHandler,
 		AgentDepartureEventHandler {
 
-	private HashMap<Id,Integer> depotLocations;
-	private HashMap<Id,Integer> currentChargerOccupation;
-	private HashMap<Id, Vehicle> vehicles;
+	private Map<Id,Integer> depotLocations;
+	private Map<Id,Integer> currentChargerOccupation;
+	private Map<Id, Vehicle> vehicles;
 	
-	private HashMap<Id, Double> arrivalTimes;
-	private HashMap<Id, Double> socUponArrival;
-	private HashMap<Id,Id> arrivalLinks;
-	private HashMap<Id,Id> chargingVehicles;
+	private Map<Id, Double> arrivalTimes;
+	private Map<Id, Double> socUponArrival;
+	private Map<Id,Id> arrivalLinks;
+	private Map<Id,Id> chargingVehicles;
 	
 	private final double MINIMUMCHARGETIME = 120.;
-	private final double POWERINKW = 50.0; // max charge for Nissan Leaf
-//	private final double POWERINKW = 22.0; // max charge at standard Berlin Charger
-	private final int DEPOTCHARGERAMOUNT = 10; //amount of chargers at each depot location
+//	private final double POWERINKW = 50.0; // max charge for Nissan Leaf
+	private final double POWERINKW = 22.0; // max charge at standard Berlin Charger
+	private final int DEPOTCHARGERAMOUNT = 1; //amount of chargers at each depot location
 	
 	private final double MINIMUMSOCFORDEPARTURE = 5.;
 	private static final Logger log = Logger
@@ -48,7 +52,7 @@ public class DepotArrivalDepartureCharger implements AgentArrivalEventHandler,
 	private ChargerLog chargerLog;
 	public DepotArrivalDepartureCharger(HashMap<Id, Vehicle> vehicles) {
 		this.vehicles = vehicles;
-		this.arrivalTimes = new HashMap<Id, Double>();
+		this.arrivalTimes = new LinkedHashMap<Id, Double>();
 		this.socUponArrival = new HashMap<Id, Double>();
 		this.soCLog = new SoCLog();
 		this.arrivalLinks = new HashMap<Id, Id>();
@@ -123,10 +127,9 @@ public class DepotArrivalDepartureCharger implements AgentArrivalEventHandler,
 	}
 
 	private void chargeAllVehiclesInDepots(double time, double duration) {
-
+		double chargeWatt = duration * POWERINKW * 1000;
+				
 		for (Entry<Id, Double> e : arrivalTimes.entrySet()) {
-			
-			double chargeWatt = duration * POWERINKW * 1000;
 			if (time - e.getValue() < MINIMUMCHARGETIME)
 				continue;
 			if (((BatteryElectricVehicle) this.vehicles.get(e.getKey()))
@@ -139,7 +142,8 @@ public class DepotArrivalDepartureCharger implements AgentArrivalEventHandler,
 				continue;	
 				}
 			if (!isConnectedToCharger(e.getKey()) ){
-				if (chargerHasFreeSpaceForVehicle(e.getKey())) addVehicleToCharger(e.getKey());
+				if (chargerHasFreeSpaceForVehicle(e.getKey()) )
+					addVehicleToCharger(e.getKey());
 			}	
 			if (isConnectedToCharger(e.getKey())){
 				

@@ -125,6 +125,7 @@ public class ElectroCabLaunchUtils {
 					.get(scenario.createId(id));
 			Leg leg = (Leg) person.getSelectedPlan().getPlanElements().get(1);
 			leg.setMode(TaxiModeDepartureHandler.TAXI_MODE);
+			
 		}
 
 		return scenario;

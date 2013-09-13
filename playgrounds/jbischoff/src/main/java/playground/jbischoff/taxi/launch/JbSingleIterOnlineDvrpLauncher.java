@@ -95,13 +95,14 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
         netFileName = dirName + "network.xml";
         
 //        electricStatsDir = dirName +"electric_nodepots\\";
-        electricStatsDir = dirName +"electric_idledepots\\";
+//        electricStatsDir = dirName +"electric_idledepots\\";
 //        electricStatsDir = dirName +"electric_depots\\";
 //        electricStatsDir = dirName +"gas_nodepots\\";
 //      electricStatsDir = dirName +"gas_idledepots\\";
 //      electricStatsDir = dirName +"gas_depots\\";
 //        electricStatsDir = dirName +"modifiedDispatch_SL\\";
 //        electricStatsDir = dirName +"1charger\\";
+      electricStatsDir = dirName +"1slow_fifo\\";
 
 
         plansFileName = dirName + "20.plans.xml.gz";
