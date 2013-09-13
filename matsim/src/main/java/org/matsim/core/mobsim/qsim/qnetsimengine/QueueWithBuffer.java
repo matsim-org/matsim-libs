@@ -69,7 +69,7 @@ class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem {
 	 * buffer. This value is updated each time step by a call to
 	 * {@link #updateBufferCapacity(double)}.
 	 */
-	double remainingflowCap = 0.0 ;
+	private double remainingflowCap = 0.0 ;
 	/**
 	 * Stores the accumulated fractional parts of the flow capacity. See also
 	 * flowCapFraction.
@@ -84,37 +84,37 @@ class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem {
 	/**
 	 * The number of vehicles able to leave the buffer in one time step (usually 1s).
 	 */
-	double flowCapacityPerTimeStep;
+	private double flowCapacityPerTimeStep;
 	int bufferStorageCapacity;
 	double usedBufferStorageCapacity = 0.0 ;
 	private Queue<QueueWithBuffer.Hole> holes = new LinkedList<QueueWithBuffer.Hole>();
 	double freespeedTravelTime = Double.NaN;
 	/** the last timestep the front-most vehicle in the buffer was moved. Used for detecting dead-locks. */
-	double bufferLastMovedTime = Time.UNDEFINED_TIME ;
+	private double bufferLastMovedTime = Time.UNDEFINED_TIME ;
 	/**
 	 * The list of vehicles that have not yet reached the end of the link
 	 * according to the free travel speed of the link
 	 */
-	 VehicleQ<QVehicle> vehQueue;
+	VehicleQ<QVehicle> vehQueue;
 
 	double storageCapacity;
 	double usedStorageCapacity;
 	/**
 	 * Holds all vehicles that are ready to cross the outgoing intersection
 	 */
-	 Queue<QVehicle> buffer = new LinkedList<QVehicle>() ;
+	Queue<QVehicle> buffer = new LinkedList<QVehicle>() ;
 	/**
 	 * null if the link is not signalized
 	 */
-	DefaultSignalizeableItem qSignalizedItem = null ;
-	double congestedDensity_veh_m;
-	int nHolesMax;
+	private DefaultSignalizeableItem qSignalizedItem = null ;
+	private double congestedDensity_veh_m;
+	private int nHolesMax;
 	final AbstractQLink qLink;
-	final QNetwork network ;
-	final Id id;
-	static int congDensWarnCnt2 = 0;
-	static int congDensWarnCnt = 0;
-	static int spaceCapWarningCount = 0;
+	private final QNetwork network ;
+	private final Id id;
+	private static int congDensWarnCnt2 = 0;
+	private static int congDensWarnCnt = 0;
+	private static int spaceCapWarningCount = 0;
 	static boolean HOLES = false ; // can be set from elsewhere in package, but not from outside.  kai, nov'10
 	/**
 	 * LaneEvents should only be fired if there is more than one QueueLane on a QueueLink
@@ -125,8 +125,8 @@ class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem {
 	
 	// get properties no longer from qlink, but have them by yourself:
 	double length = Double.NaN ;
-	double unscaledFlowCapacity_s = Double.NaN ;
-	double effectiveNumberOfLanes = Double.NaN ;
+	private double unscaledFlowCapacity_s = Double.NaN ;
+	private double effectiveNumberOfLanes = Double.NaN ;
 
 	// (still) private:
 	private VisData visData = new VisDataImpl() ;
