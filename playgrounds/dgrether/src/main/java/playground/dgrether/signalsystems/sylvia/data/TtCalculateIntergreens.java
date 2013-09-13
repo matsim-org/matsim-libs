@@ -42,6 +42,7 @@ import org.matsim.signalsystems.data.signalcontrol.v20.SignalGroupSettingsData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalPlanData;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalSystemControllerData;
 
+import playground.dgrether.DgPaths;
 import playground.dgrether.signalsystems.utils.DgSignalGroupSettingsDataOnsetComparator;
 
 /**
@@ -311,13 +312,13 @@ public class TtCalculateIntergreens {
 	
 	
 	public static void main(String[] args){
-		// String signalControlFile = DgPaths.REPOS +
-		// "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_control.xml";
-		// String intergreensOutFile = DgPaths.REPOS +
-		// "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_control_intergreens.xml";
+		 String signalControlFile = DgPaths.REPOS +
+		 "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_control.xml";
+		 String intergreensOutFile = DgPaths.REPOS +
+		 "shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_control_intergreens.xml";
 
-		String signalControlFile = "C:/Users/Atany/Desktop/SHK/SVN/shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_control.xml";
-		String intergreensOutFile = "C:/Users/Atany/Desktop/SHK/SVN/shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_control_intergreens.xml";
+//		String signalControlFile = "C:/Users/Atany/Desktop/SHK/SVN/shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_control.xml";
+//		String intergreensOutFile = "C:/Users/Atany/Desktop/SHK/SVN/shared-svn/studies/dgrether/cottbus/cottbus_feb_fix/signal_control_intergreens.xml";
 
 		new TtCalculateIntergreens().calculateIntergreens(signalControlFile,
 				intergreensOutFile);
