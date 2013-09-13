@@ -700,11 +700,6 @@ class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem {
 				AgentSnapshotInfoBuilder snapshotInfoBuilder, double now, double lastDistanceFromFromNode, Link link,
 				double spacing, double freespeedTraveltime, QVehicle veh)
 		{
-			//					double travelTime = Double.POSITIVE_INFINITY ;
-			//					if ( QLinkImpl.this.road.linkEnterTimeMap.get(veh) != null ) {
-			//						// (otherwise the vehicle has never entered from an intersection)
-			//						travelTime = now - QLinkImpl.this.road.linkEnterTimeMap.get(veh);
-			//					}
 			double remainingTravelTime = veh.getEarliestLinkExitTime() - now ;
 			lastDistanceFromFromNode = snapshotInfoBuilder.calculateDistanceOnVectorFromFromNode2(QueueWithBuffer.this.length, spacing, 
 					lastDistanceFromFromNode, now, freespeedTraveltime, remainingTravelTime);

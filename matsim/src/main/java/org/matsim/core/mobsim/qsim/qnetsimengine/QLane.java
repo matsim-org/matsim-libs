@@ -254,19 +254,20 @@ public final class QLane extends QueueWithBuffer implements Identifiable {
 			
 			double numberOfVehiclesDriving = QLane.this.buffer.size() + QLane.this.vehQueue.size();
 			if (numberOfVehiclesDriving > 0) {
-//				log.error("vehicle positions for link: " + QLane.this.getQLink().getLink().getId() + " lane: " + QLane.this.getId());
 				double now = QLane.this.qLink.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
-				double lastDistanceFromFromNode = Double.NaN;
 				Link link = QLane.this.qLink.getLink();
 				double spacing = snapshotInfoBuilder.calculateVehicleSpacing(QLane.this.length, numberOfVehiclesDriving,
 						QLane.this.storageCapacity, QLane.this.bufferStorageCapacity); 
 				double freespeedTraveltime = QLane.this.freespeedTravelTime;
 				
+				double lastDistanceFromFromNode = Double.NaN;
 				for (QVehicle veh : QLane.this.buffer){
-					lastDistanceFromFromNode = this.createAndAddVehiclePositionAndReturnDistance(positions, snapshotInfoBuilder, now, lastDistanceFromFromNode, link, spacing, freespeedTraveltime, veh);
+					lastDistanceFromFromNode = this.createAndAddVehiclePositionAndReturnDistance(positions, snapshotInfoBuilder, now, 
+							lastDistanceFromFromNode, link, spacing, freespeedTraveltime, veh);
 				}
 				for (QVehicle veh : QLane.this.vehQueue) {
-					lastDistanceFromFromNode = this.createAndAddVehiclePositionAndReturnDistance(positions, snapshotInfoBuilder, now, lastDistanceFromFromNode, link, spacing, freespeedTraveltime, veh);
+					lastDistanceFromFromNode = this.createAndAddVehiclePositionAndReturnDistance(positions, snapshotInfoBuilder, now, 
+							lastDistanceFromFromNode, link, spacing, freespeedTraveltime, veh);
 				}
 			}
 			return positions;
@@ -275,12 +276,11 @@ public final class QLane extends QueueWithBuffer implements Identifiable {
 		private double createAndAddVehiclePositionAndReturnDistance(final Collection<AgentSnapshotInfo> positions,
 				AgentSnapshotInfoBuilder snapshotInfoBuilder, double now, double lastDistanceFromFromNode, Link link,
 				double spacing, double freespeedTraveltime, QVehicle veh){
-//			double travelTime = now - QLane.this.laneEnterTimeMap.get(veh);
 			double remainingTravelTime = veh.getEarliestLinkExitTime() - now ;
 			lastDistanceFromFromNode = snapshotInfoBuilder.calculateDistanceOnVectorFromFromNode2(QLane.this.length, spacing, 
 					lastDistanceFromFromNode, now, freespeedTraveltime, remainingTravelTime);
-			double speedValue = snapshotInfoBuilder.calcSpeedValueBetweenZeroAndOne(veh, QLane.this.getInverseSimulatedFlowCapacity(), now, link.getFreespeed());
-//			log.error("  speed: " + speedValue + " distance: " + lastDistanceFromFromNode + " lane " + lane + " flow cap: " + QLane.this.simulatedFlowCapacity);
+			double speedValue = snapshotInfoBuilder.calcSpeedValueBetweenZeroAndOne(veh, 
+					QLane.this.getInverseSimulatedFlowCapacity(), now, link.getFreespeed());
 			if (this.visLane.getNumberOfLanes() < 2.0){
 				snapshotInfoBuilder.createAndAddVehiclePosition(positions, this.visLane.getStartCoord(), this.visLane.getEndCoord(), 
 						QLane.this.length, this.visLane.getEuklideanDistance(), veh, 
