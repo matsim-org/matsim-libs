@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BinaryMinHeapTest.java
+ * MinHeapTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -27,11 +27,13 @@ import org.apache.log4j.Logger;
 /**
  * @author cdobler
  */
-public class BinaryMinHeapTest extends TestCase {
-	protected static final Logger log = Logger.getLogger(BinaryMinHeapTest.class);
+public class MinHeapTest extends TestCase {
+	
+	protected static final Logger log = Logger.getLogger(MinHeapTest.class);
 	
 	protected static class DummyHeapEntry implements HeapEntry {
-		int index = 0;
+		
+		final int index;
 		
 		public DummyHeapEntry(int index) {
 			this.index = index;
@@ -40,6 +42,11 @@ public class BinaryMinHeapTest extends TestCase {
 		@Override
 		public int getArrayIndex() {
 			return index;
+		}
+		
+		@Override
+		public String toString() {
+			return String.valueOf(this.index);
 		}
 	}
 

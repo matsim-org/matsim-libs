@@ -28,10 +28,9 @@ import java.util.LinkedList;
 /**
  * @author cdobler
  */
-public class BinaryMinHeapFunctionalityTest extends MinHeapTest {
-	
+public class PairingMinHeapFunctionalityTest extends MinHeapTest {
 	public void testAdd() {
-		MinHeap<HeapEntry> pq = new BinaryMinHeap<HeapEntry>(10);
+		MinHeap<HeapEntry> pq = new PairingMinHeap<HeapEntry>(10);
 		assertEquals(0, pq.size());
 		pq.add(new DummyHeapEntry(0), 1.0);
 		assertEquals(1, pq.size());
@@ -58,7 +57,7 @@ public class BinaryMinHeapFunctionalityTest extends MinHeapTest {
 	}
 
 	public void testPoll() {
-		MinHeap<DummyHeapEntry> pq = new BinaryMinHeap<DummyHeapEntry>(10);
+		MinHeap<DummyHeapEntry> pq = new PairingMinHeap<DummyHeapEntry>(10);
 		DummyHeapEntry entry0 = new DummyHeapEntry(5);
 		DummyHeapEntry entry1 = new DummyHeapEntry(3);
 		DummyHeapEntry entry2 = new DummyHeapEntry(6);
@@ -87,7 +86,7 @@ public class BinaryMinHeapFunctionalityTest extends MinHeapTest {
 	}
 	
 	public void testPoll2() {
-		MinHeap<DummyHeapEntry> pq = new BinaryMinHeap<DummyHeapEntry>(10);
+		MinHeap<DummyHeapEntry> pq = new PairingMinHeap<DummyHeapEntry>(10);
 		DummyHeapEntry entry0 = new DummyHeapEntry(0);
 		DummyHeapEntry entry1 = new DummyHeapEntry(1);
 		DummyHeapEntry entry2 = new DummyHeapEntry(2);
@@ -116,7 +115,7 @@ public class BinaryMinHeapFunctionalityTest extends MinHeapTest {
 	}
 
 	public void testIterator() {
-		MinHeap<HeapEntry> pq = new BinaryMinHeap<HeapEntry>(10);
+		MinHeap<HeapEntry> pq = new PairingMinHeap<HeapEntry>(10);
 		DummyHeapEntry entry0 = new DummyHeapEntry(5);
 		DummyHeapEntry entry1 = new DummyHeapEntry(3);
 		DummyHeapEntry entry2 = new DummyHeapEntry(6);
@@ -133,7 +132,7 @@ public class BinaryMinHeapFunctionalityTest extends MinHeapTest {
 	}
 
 	public void testIterator_ConcurrentModification_add() {
-		MinHeap<HeapEntry> pq = new BinaryMinHeap<HeapEntry>(10);
+		MinHeap<HeapEntry> pq = new PairingMinHeap<HeapEntry>(10);
 		DummyHeapEntry entry0 = new DummyHeapEntry(5);
 		DummyHeapEntry entry1 = new DummyHeapEntry(3);
 		DummyHeapEntry entry2 = new DummyHeapEntry(6);
@@ -160,7 +159,7 @@ public class BinaryMinHeapFunctionalityTest extends MinHeapTest {
 	}
 
 	public void testIterator_ConcurrentModification_poll() {
-		MinHeap<HeapEntry> pq = new BinaryMinHeap<HeapEntry>(10);
+		MinHeap<HeapEntry> pq = new PairingMinHeap<HeapEntry>(10);
 		DummyHeapEntry entry0 = new DummyHeapEntry(5);
 		DummyHeapEntry entry1 = new DummyHeapEntry(3);
 		DummyHeapEntry entry2 = new DummyHeapEntry(6);
@@ -235,7 +234,7 @@ public class BinaryMinHeapFunctionalityTest extends MinHeapTest {
 	}
 
 	public void testRemove() {
-		MinHeap<DummyHeapEntry> pq = new BinaryMinHeap<DummyHeapEntry>(10);
+		MinHeap<DummyHeapEntry> pq = new PairingMinHeap<DummyHeapEntry>(10);
 		DummyHeapEntry entry0 = new DummyHeapEntry(5);
 		DummyHeapEntry entry1 = new DummyHeapEntry(3);
 		DummyHeapEntry entry2 = new DummyHeapEntry(6);
@@ -281,7 +280,7 @@ public class BinaryMinHeapFunctionalityTest extends MinHeapTest {
 	}
 
 	public void testRemoveAndAdd_LowerPriority() {
-		MinHeap<DummyHeapEntry> pq = new BinaryMinHeap<DummyHeapEntry>(10);
+		MinHeap<DummyHeapEntry> pq = new PairingMinHeap<DummyHeapEntry>(10);
 		DummyHeapEntry entry0 = new DummyHeapEntry(5);
 		DummyHeapEntry entry1 = new DummyHeapEntry(3);
 		DummyHeapEntry entry2 = new DummyHeapEntry(6);
@@ -304,7 +303,7 @@ public class BinaryMinHeapFunctionalityTest extends MinHeapTest {
 
 	// increase priority -> decrease key since it is a min-heap
 	public void testIncreasePriority() {
-		MinHeap<DummyHeapEntry> pq = new BinaryMinHeap<DummyHeapEntry>(10);
+		MinHeap<DummyHeapEntry> pq = new PairingMinHeap<DummyHeapEntry>(10);
 		DummyHeapEntry entry0 = new DummyHeapEntry(5);
 		DummyHeapEntry entry1 = new DummyHeapEntry(3);
 		DummyHeapEntry entry2 = new DummyHeapEntry(6);
@@ -339,7 +338,7 @@ public class BinaryMinHeapFunctionalityTest extends MinHeapTest {
 	}
 	
 	public void testRemoveAndAdd_HigherPriority() {
-		MinHeap<DummyHeapEntry> pq = new BinaryMinHeap<DummyHeapEntry>(10);
+		MinHeap<DummyHeapEntry> pq = new PairingMinHeap<DummyHeapEntry>(10);
 		DummyHeapEntry entry0 = new DummyHeapEntry(5);
 		DummyHeapEntry entry1 = new DummyHeapEntry(3);
 		DummyHeapEntry entry2 = new DummyHeapEntry(6);
@@ -361,15 +360,18 @@ public class BinaryMinHeapFunctionalityTest extends MinHeapTest {
 	}
 
 	public void testEqualCosts() {
-		MinHeap<DummyHeapEntry> pq = new BinaryMinHeap<DummyHeapEntry>(10);
+		MinHeap<DummyHeapEntry> pq = new PairingMinHeap<DummyHeapEntry>(10);
 		DummyHeapEntry entry0 = new DummyHeapEntry(0);
 		DummyHeapEntry entry1 = new DummyHeapEntry(1);
 		DummyHeapEntry entry2 = new DummyHeapEntry(2);
 		DummyHeapEntry entry3 = new DummyHeapEntry(4);
 		pq.add(entry2, 5.0);
 		pq.add(entry3, 5.0);
+		assertEqualsHE(entry2, pq.peek());
 		pq.add(entry1, 5.0);
+		assertEqualsHE(entry1, pq.peek());
 		pq.add(entry0, 5.0);
+		assertEqualsHE(entry0, pq.peek());
 		assertEqualsHE(entry0, pq.remove());
 		assertEqualsHE(entry1, pq.remove());
 		assertEqualsHE(entry2, pq.remove());
@@ -378,7 +380,7 @@ public class BinaryMinHeapFunctionalityTest extends MinHeapTest {
 	}
 
 	public void testOddOrder() {
-		MinHeap<DummyHeapEntry> pq = new BinaryMinHeap<DummyHeapEntry>(10);
+		MinHeap<DummyHeapEntry> pq = new PairingMinHeap<DummyHeapEntry>(10);
 		DummyHeapEntry entry0 = new DummyHeapEntry(0);
 		DummyHeapEntry entry1 = new DummyHeapEntry(1);
 		DummyHeapEntry entry2 = new DummyHeapEntry(2);

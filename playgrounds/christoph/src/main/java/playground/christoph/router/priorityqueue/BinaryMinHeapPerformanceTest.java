@@ -33,7 +33,7 @@ import org.matsim.core.gbl.MatsimRandom;
 /**
  * @author muelleki
  */
-public class BinaryMinHeapPerformanceTest extends BinaryMinHeapTest {
+public class BinaryMinHeapPerformanceTest extends MinHeapTest {
 	private class TestThread extends Thread {
 		static final int ITERS = 500000;
 		static final int OUTDEGREE = 3;

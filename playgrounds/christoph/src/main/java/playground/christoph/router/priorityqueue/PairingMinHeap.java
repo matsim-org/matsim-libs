@@ -65,6 +65,7 @@ public class PairingMinHeap<E extends HeapEntry> implements MinHeap<E> {
 		root = null;
 		size = 0;
 		
+		// is this necessary?
 		for (int i = 0; i < size; i++) {
 			data[i] = null;
 		}
@@ -82,7 +83,9 @@ public class PairingMinHeap<E extends HeapEntry> implements MinHeap<E> {
 
 		// if the element is already present in the queue, return false
 		final int index = e.getArrayIndex();
-		if (this.data[index] != null) return false;
+		if (this.data[index] != null) {
+			return false;
+		}
 			
 		this.data[index] = e;
 		this.costs[index] = priority;
@@ -256,19 +259,23 @@ public class PairingMinHeap<E extends HeapEntry> implements MinHeap<E> {
 	private E compareAndLink(E first, E second) {
 		if (second == null) return first;
 		
-		int firstIndex = first.getArrayIndex();
-		int secondIndex = second.getArrayIndex();
+		final int firstIndex = first.getArrayIndex();
+		final int secondIndex = second.getArrayIndex();
 
 		double firstPriority = costs[firstIndex];
 		double secondPriority = costs[secondIndex];
 		
+		boolean secondPriorityIsSmaller = false;
+		
 		// if priorities are equal, sort by array indices
 		if (firstPriority == secondPriority) {
-			if (firstIndex < secondIndex) firstPriority -= Double.MIN_VALUE;
-			else secondPriority -= Double.MIN_NORMAL;
-		}
+//			if (firstIndex < secondIndex) firstPriority -= 1;
+//			else secondPriority -= 1;
+			if (secondIndex < firstIndex) secondPriorityIsSmaller = true;
+		} else secondPriorityIsSmaller = (secondPriority < firstPriority);
 		
-		if (secondPriority < firstPriority) {
+//		if (secondPriority < firstPriority) {
+		if (secondPriorityIsSmaller) {
 		
             // Attach first as leftmost child of second
             this.prev[secondIndex] = this.prev[firstIndex];
@@ -383,15 +390,15 @@ public class PairingMinHeap<E extends HeapEntry> implements MinHeap<E> {
 		
 		@Override
 		public boolean hasNext() {
-			return (index < lastEntry);
+			return (index <= lastEntry);
 		}
 
 		@Override
 		public E next() {
 			if (!hasNext()) throw new NoSuchElementException();
 			while (index <= lastEntry) {
-				index++;
 				E value = array[index];
+				index++;
 				if (value != null) return value;				
 			}
 			throw new NoSuchElementException();
