@@ -61,40 +61,42 @@ import com.vividsolutions.jts.util.Assert;
 public class SpatialAveragingWelfare {
 	private static final Logger logger = Logger.getLogger(SpatialAveragingWelfare.class);
 
-//	final double scalingFactor = 100.;
-//	private final static String runNumber1 = "baseCase";
-//	private final static String runDirectory1 = "../../runs-svn/detEval/latsis/output/output_baseCase_ctd_newCode/";
-////	private final static String runNumber2 = "zone30";
-////	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_zone30/";
+	final double scalingFactor = 100.;
+	private final static String runNumber1 = "baseCase";
+	private final static String runDirectory1 = "../../runs-svn/detEval/latsis/output/output_baseCase_ctd_newCode/";
+	private final static String runNumber2 = "zone30";
+	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_zone30/";
 //	private final static String runNumber2 = "pricing";
 //	private final static String runDirectory2 = "../../runs-svn/detEval/latsis/output/output_policyCase_pricing_newCode/";
-//	private final String netFile1 = runDirectory1 + "output_network.xml.gz";
-//	private final String munichShapeFile = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
+	private final String netFile1 = runDirectory1 + "output_network.xml.gz";
+	private final String munichShapeFile = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
 //
-//	private static String configFile1 = runDirectory1 + "output_config.xml.gz";
-//	private final static Integer lastIteration1 = getLastIteration(configFile1);
-//	private static String configFile2 = runDirectory1 + "output_config.xml.gz";
-//	private final static Integer lastIteration2 = getLastIteration(configFile2);
+	private static String configFile1 = runDirectory1 + "output_config.xml.gz";
+	private final static Integer lastIteration1 = getLastIteration(configFile1);
+	private static String configFile2 = runDirectory1 + "output_config.xml.gz";
+	private final static Integer lastIteration2 = getLastIteration(configFile2);
 //	private final String emissionFile1 = runDirectory1 + "ITERS/it." + lastIteration1 + "/" + lastIteration1 + ".emission.events.xml.gz";
 //	private final String emissionFile2 = runDirectory2 + "ITERS/it." + lastIteration2 + "/" + lastIteration2 + ".emission.events.xml.gz";
+	private final String plansFile1 = runDirectory1 + "output_plans.xml.gz";
+	private final String plansFile2 = runDirectory2 + "output_plans.xml.gz";
 	
-	final double scalingFactor = 10.; //TODO scalingFactor????
-	private final static String runNumber1 = "981";
-	private final static String runNumber2 = "983";
-	private final static String runDirectory1 = "../../runs-svn/run" + runNumber1 + "/";
-	private final static String runDirectory2 = "../../runs-svn/run" + runNumber2 + "/";
-	private final String netFile1 = runDirectory1 + runNumber1 + ".output_network.xml.gz";
-	private final String munichShapeFile = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
+//	final double scalingFactor = 10.;
+//	private final static String runNumber1 = "981";
+//	private final static String runNumber2 = "983";
+//	private final static String runDirectory1 = "../../runs-svn/run" + runNumber1 + "/";
+//	private final static String runDirectory2 = "../../runs-svn/run" + runNumber2 + "/";
+//	private final String netFile1 = runDirectory1 + runNumber1 + ".output_network.xml.gz";
+//	private final String munichShapeFile = "../../detailedEval/Net/shapeFromVISUM/urbanSuburban/cityArea.shp";
 
-	private static String configFile1 = runDirectory1 + runNumber1 + ".output_config.xml.gz";
-	private final static Integer lastIteration1 = getLastIteration(configFile1);
-	private final String plansFile1 = runDirectory1 + runNumber1 + ".output_plans.xml";
-	private final String plansFile2 = runDirectory2 + runNumber2 + ".output_plans.xml.gz";
+//	private static String configFile1 = runDirectory1 + runNumber1 + ".output_config.xml.gz";
+//	private final static Integer lastIteration1 = getLastIteration(configFile1);
+//	private final String plansFile1 = runDirectory1 + runNumber1 + ".output_plans.xml";
+//	private final String plansFile2 = runDirectory2 + runNumber2 + ".output_plans.xml.gz";
 
 	Network network;
 	Collection<SimpleFeature> featuresInMunich;
 	double simulationEndTime;
-	String outPathStub;
+	String outPathStub = runDirectory1 + "analysis/welfare/";
 
 	final CoordinateReferenceSystem targetCRS = MGC.getCRS("EPSG:20004");
 	static double xMin = 4452550.25;
@@ -113,6 +115,8 @@ public class SpatialAveragingWelfare {
 
 	private double[][] weights = new double[noOfXbins][noOfYbins];
 
+	private double epsilon = Math.pow(10., -5.);
+
 	private void run() throws IOException{
 		
 		//initialize scenario, set outpath, read plans file
@@ -122,8 +126,7 @@ public class SpatialAveragingWelfare {
 		this.featuresInMunich = ShapeFileReader.getAllFeatures(munichShapeFile);
 		Config config = scenario.getConfig();
 		
-		outPathStub = runDirectory1 + runNumber1 + "." + lastIteration1;
-		String outPath = outPathStub + "_Routput_" + "UserBenefits.txt";
+		String outPath = outPathStub + runNumber1 + "_Routput_" + "UserBenefits.txt";
 		
 		MatsimPopulationReader mpr = new MatsimPopulationReader(scenario);
 		mpr.readFile(plansFile1);
@@ -135,21 +138,26 @@ public class SpatialAveragingWelfare {
 		logger.info("Starting user benefits calculation.");
 		UserBenefitsCalculator ubc = new UserBenefitsCalculator(config, WelfareMeasure.LOGSUM);
 		ubc.calculateUtility_money(pop);
+		logger.info("There were " + ubc.getNoValidPlanCnt() + " unvalid plans.");
 		
 		Map<Id, Double> personId2Utility = ubc.getPersonId2Utility();
-		logger.info("Finished user benefits calculation.");
+		logger.info("Finished user benefits calculation for " + runNumber1 + ".");
 		
 		double [][] userBenefits = fillUserBenefits(personId2Utility, pop);
-		logger.info("Finished averaging.");
+		logger.info("Finished averaging for " + runNumber1 + ".");
 		double [][] average = calculateAverage(userBenefits, weights);
 		
 		// write results to text files
 		writeRoutput(userBenefits, outPath + ".txt");
-		writeRoutput(weights, outPathStub+"_Routput_"+"UserBenefitWeights.txt");
-		writeRoutput(average, outPathStub+"_Routput_"+"AverageUserBenefits.txt");
+		writeRoutput(weights, outPathStub+"BaseCase_Routput_"+"UserBenefitWeights.txt");
+		writeRoutput(average, outPathStub+"BaseCase_Routput_"+"AverageUserBenefits.txt");
 		
 		// 
 		if(compareToBaseCase){
+			// make a copy of old weights
+			double [][] weightsBaseCase = new double[noOfXbins][noOfYbins];
+			copyWeights(weightsBaseCase);
+			
 			// initialize scenario for comparison case
 			Scenario scenario2 = loadScenario(netFile1);
 			Config config2 = scenario2.getConfig();
@@ -163,9 +171,10 @@ public class SpatialAveragingWelfare {
 			logger.info("Starting user benefits calculation.");
 			UserBenefitsCalculator ubc2 = new UserBenefitsCalculator(config2, WelfareMeasure.LOGSUM);
 			ubc2.calculateUtility_money(pop2);
+			logger.info("There were " + ubc2.getNoValidPlanCnt() + " unvalid plans.");
 			
 			Map<Id, Double> personId2Utility2 = ubc2.getPersonId2Utility();
-			System.out.println("Finished user benefits calculation.");
+			logger.info("Finished user benefits calculation for " + runNumber2 +".");
 			
 			// calculate differences base case <-> comparison case
 			Map<Id, Double> absoluteDifferences = new HashMap<Id, Double>();
@@ -178,15 +187,17 @@ public class SpatialAveragingWelfare {
 					logger.warn("Person " + id.toString() +" does not appear in the second scenario.");
 				}
 			}
-			double [][] userBenefitDifferences = fillUserBenefits(absoluteDifferences, pop);
+			double [][] userBenefitDifferences = fillUserBenefits(absoluteDifferences, pop);			
 			average = calculateAverage(userBenefitDifferences, weights);
+			// should be zero
+			double [][] weightsDifferences = calculateDifferences(weightsBaseCase, weights);
 			
 			// set output paths and write results to text files
-			String outPath2 = outPathStub + "_Routput_" + "UserBenefitsDifferences.txt";
-			String outPath3 = outPathStub + "_Routput_" + "UserBenefitsCountsDifferences.txt";
-			String outPath4 = outPathStub + "_Routput_" + "UserBenefitsAverageDifferences.txt";
+			String outPath2 = outPathStub + runNumber2 + "_Routput_" + "UserBenefitsDifferences.txt";
+			String outPath3 = outPathStub + runNumber2 +  "_Routput_" + "UserBenefitsCountsDifferences.txt";
+			String outPath4 = outPathStub + runNumber2 + "_Routput_" + "UserBenefitsAverageDifferences.txt";
 			writeRoutput(userBenefitDifferences, outPath2);
-			writeRoutput(weights, outPath3);
+			writeRoutput(weightsDifferences, outPath3); // should be zero
 			writeRoutput(average, outPath4);
 		}
 		
@@ -194,6 +205,31 @@ public class SpatialAveragingWelfare {
 
 	}
 	
+	private double[][] calculateDifferences(double[][] weightsBaseCase,
+			double[][] weights2) {
+		
+		double [][] diff = new double[noOfXbins][noOfYbins];
+		for(int xIndex = 0; xIndex<noOfXbins; xIndex++){
+			for(int yIndex = 0; yIndex<noOfYbins; yIndex++){
+				diff[xIndex][yIndex]= weights2[xIndex][yIndex]-weightsBaseCase[xIndex][yIndex];
+				if(diff[xIndex][yIndex]>epsilon  || diff[xIndex][yIndex]<-epsilon){
+					logger.warn("weights should not be different but are for zell (" + xIndex
+							+ "," + yIndex + ")." );
+				}
+			}
+		}
+		return diff;
+	}
+
+	private void copyWeights(double[][] weightsBaseCase) {
+		for(int xIndex = 0; xIndex<noOfXbins; xIndex++){
+			for(int yIndex = 0; yIndex<noOfYbins; yIndex++){
+				weightsBaseCase[xIndex][yIndex] = new Double(weights[xIndex][yIndex]);
+			}
+		}
+		
+	}
+
 	private double[][] calculateAverage(double[][] userBenefits,
 			double[][] weights2) {
 		double[][] average = new double [noOfXbins][noOfYbins];
@@ -209,11 +245,9 @@ public class SpatialAveragingWelfare {
 
 	private void writeRoutput(double[][] results, String outputPathForR) {
 		try {
-			logger.info(outputPathForR);
 			BufferedWriter buffW = new BufferedWriter(new FileWriter(outputPathForR));
 			String valueString = new String();
 			valueString = "\t";
-			logger.info("routput 2");
 			
 			//x-coordinates as first row
 			for(int xIndex = 0; xIndex < results.length; xIndex++){
@@ -255,7 +289,7 @@ public class SpatialAveragingWelfare {
 			}
 		}
 		int count =1;
-		for(Id personId : personId2Utility.keySet()){ // das hier braucht so lange. 
+		for(Id personId : personId2Utility.keySet()){ 
 			
 				if(count%1000==0)logger.info("count = " + count);
 				Person person = pop.getPersons().get(personId);
