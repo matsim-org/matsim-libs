@@ -32,10 +32,6 @@ import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
 
-import com.mysql.jdbc.StringUtils;
-
-
-
 import playground.vsp.emissions.events.ColdEmissionEventImpl;
 import playground.vsp.emissions.types.ColdPollutant;
 import playground.vsp.emissions.types.HbefaColdEmissionFactor;
