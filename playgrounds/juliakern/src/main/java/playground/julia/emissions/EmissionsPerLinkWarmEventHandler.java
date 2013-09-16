@@ -34,8 +34,8 @@ import playground.vsp.emissions.utils.EmissionUtils;
  * @author benjamin, julia
  *
  */
-public class EmissionsPerLinkWarmEventHandlerV0 implements WarmEmissionEventHandler{
-	private static final Logger logger = Logger.getLogger(EmissionsPerLinkWarmEventHandlerV0.class);
+public class EmissionsPerLinkWarmEventHandler implements WarmEmissionEventHandler{
+	private static final Logger logger = Logger.getLogger(EmissionsPerLinkWarmEventHandler.class);
 
 	Map<Double, Map<Id, Map<WarmPollutant, Double>>> time2warmEmissionsTotal = new HashMap<Double, Map<Id, Map<WarmPollutant, Double>>>();
 	Map<Double, Map<Id, Double>> time2linkIdLeaveCount = new HashMap<Double, Map<Id,Double>>();
@@ -44,7 +44,7 @@ public class EmissionsPerLinkWarmEventHandlerV0 implements WarmEmissionEventHand
 	final double timeBinSize;
 	EmissionUtils emissionUtils;
 
-	public EmissionsPerLinkWarmEventHandlerV0(double simulationEndTime, int noOfTimeBins){
+	public EmissionsPerLinkWarmEventHandler(double simulationEndTime, int noOfTimeBins){
 		this.noOfTimeBins = noOfTimeBins;
 		this.timeBinSize = simulationEndTime / noOfTimeBins;
 		this.emissionUtils = new EmissionUtils();

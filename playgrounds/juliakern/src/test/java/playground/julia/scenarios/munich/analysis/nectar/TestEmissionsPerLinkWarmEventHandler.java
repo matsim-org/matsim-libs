@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
-import playground.julia.emissions.EmissionsPerLinkWarmEventHandlerV0;
+import playground.julia.emissions.EmissionsPerLinkWarmEventHandler;
 import playground.vsp.emissions.events.WarmEmissionEvent;
 import playground.vsp.emissions.events.WarmEmissionEventImpl;
 import playground.vsp.emissions.types.WarmPollutant;
@@ -69,7 +69,7 @@ public class TestEmissionsPerLinkWarmEventHandler {
 	@Test
 	public void handleEventTest(){
 		
-		EmissionsPerLinkWarmEventHandlerV0 handler = new EmissionsPerLinkWarmEventHandlerV0(simulationEndTime, noOfTimeBins);
+		EmissionsPerLinkWarmEventHandler handler = new EmissionsPerLinkWarmEventHandler(simulationEndTime, noOfTimeBins);
 		
 		// initialize event 1
 		// time of the event is 5.0 -> its interval end should be 6.666...

@@ -20,47 +20,33 @@
 package playground.julia.welfare;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.SortedMap;
-import java.util.SortedSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.events.EventsUtils;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.gis.PointFeatureFactory;
 import org.matsim.core.utils.gis.ShapeFileReader;
-import org.matsim.core.utils.gis.ShapeFileWriter;
-import org.matsim.core.utils.misc.Time;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.vsp.emissions.events.EmissionEventsReader;
-import playground.vsp.emissions.types.ColdPollutant;
-import playground.vsp.emissions.types.WarmPollutant;
-import playground.vsp.emissions.utils.EmissionUtils;
 import playground.vsp.analysis.modules.userBenefits.*;
 
 import com.vividsolutions.jts.geom.Coordinate;
@@ -92,7 +78,7 @@ public class SpatialAveragingWelfare {
 //	private final String emissionFile1 = runDirectory1 + "ITERS/it." + lastIteration1 + "/" + lastIteration1 + ".emission.events.xml.gz";
 //	private final String emissionFile2 = runDirectory2 + "ITERS/it." + lastIteration2 + "/" + lastIteration2 + ".emission.events.xml.gz";
 	
-	final double scalingFactor = 10.;
+	final double scalingFactor = 10.; //TODO scalingFactor????
 	private final static String runNumber1 = "981";
 	private final static String runNumber2 = "983";
 	private final static String runDirectory1 = "../../runs-svn/run" + runNumber1 + "/";
@@ -102,19 +88,11 @@ public class SpatialAveragingWelfare {
 
 	private static String configFile1 = runDirectory1 + runNumber1 + ".output_config.xml.gz";
 	private final static Integer lastIteration1 = getLastIteration(configFile1);
-	private static String configFile2 = runDirectory1 + runNumber1 + ".output_config.xml.gz";
-	private final static Integer lastIteration2 = getLastIteration(configFile2);
-	//private final String emissionFile1 = runDirectory1 + "ITERS/it." + lastIteration1 + "/" + runNumber1 + "." + lastIteration1 + ".emission.events.xml.gz";
-	//private final String emissionFile2 = runDirectory2 + "ITERS/it." + lastIteration2 + "/" + runNumber2 + "." + lastIteration2 + ".emission.events.xml.gz";
 	private final String plansFile1 = runDirectory1 + runNumber1 + ".output_plans.xml";
 	private final String plansFile2 = runDirectory2 + runNumber2 + ".output_plans.xml.gz";
 
 	Network network;
 	Collection<SimpleFeature> featuresInMunich;
-	//EmissionUtils emissionUtils = new EmissionUtils();
-//	EmissionsPerLinkWarmEventHandler warmHandler;
-//	EmissionsPerLinkColdEventHandler coldHandler;
-	//SortedSet<String> listOfPollutants;
 	double simulationEndTime;
 	String outPathStub;
 
@@ -123,39 +101,35 @@ public class SpatialAveragingWelfare {
 	static double xMax = 4479483.33;
 	static double yMin = 5324955.00;
 	static double yMax = 5345696.81;
+	
+	final double area_in_smoothing_circle_sqkm = (Math.PI * this.smoothingRadius_m * this.smoothingRadius_m) / (1000. * 1000.);
 
 	final int noOfTimeBins = 1;
 	final int noOfXbins = 160;
 	final int noOfYbins = 120;
 	final double smoothingRadius_m = 500.;
 	final double smoothinRadiusSquared_m = smoothingRadius_m * smoothingRadius_m;
-	final String pollutant2analyze = WarmPollutant.NO2.toString();
 	final boolean compareToBaseCase = true;
 
 	private double[][] weights = new double[noOfXbins][noOfYbins];
-	
-//	Map<Double, Map<Id, Map<String, Double>>> time2EmissionMapToAnalyze_g = new HashMap<Double, Map<Id,Map<String,Double>>>();
-//	Map<Double, Map<Id, Double>> time2DemandMapToAnalyze_vkm = new HashMap<Double, Map<Id,Double>>();
-
 
 	private void run() throws IOException{
+		
+		//initialize scenario, set outpath, read plans file
 		this.simulationEndTime = getEndTime(configFile1);
-		//this.listOfPollutants = emissionUtils.getListOfPollutants();
 		Scenario scenario = loadScenario(netFile1);
 		this.network = scenario.getNetwork();		
 		this.featuresInMunich = ShapeFileReader.getAllFeatures(munichShapeFile);
 		Config config = scenario.getConfig();
 		
-		//TODO verzeichnisse anlegen, pfad entsprechend umlegen
 		outPathStub = runDirectory1 + runNumber1 + "." + lastIteration1;
 		String outPath = outPathStub + "_Routput_" + "UserBenefits.txt";
-//		double [][]empty = new double[noOfXbins][noOfYbins];
-//		writeRoutput(empty, outPath);
 		
 		MatsimPopulationReader mpr = new MatsimPopulationReader(scenario);
 		mpr.readFile(plansFile1);
 		logger.info("Finished reading the plans file " + plansFile1);
 		
+		// create population and calculate user benefit for base case
 		Population pop = scenario.getPopulation();
 		
 		logger.info("Starting user benefits calculation.");
@@ -169,18 +143,21 @@ public class SpatialAveragingWelfare {
 		logger.info("Finished averaging.");
 		double [][] average = calculateAverage(userBenefits, weights);
 		
+		// write results to text files
 		writeRoutput(userBenefits, outPath + ".txt");
 		writeRoutput(weights, outPathStub+"_Routput_"+"UserBenefitWeights.txt");
 		writeRoutput(average, outPathStub+"_Routput_"+"AverageUserBenefits.txt");
 		
-		
+		// 
 		if(compareToBaseCase){
+			// initialize scenario for comparison case
 			Scenario scenario2 = loadScenario(netFile1);
 			Config config2 = scenario2.getConfig();
 			MatsimPopulationReader mpr2 = new MatsimPopulationReader(scenario2);
 			mpr2.readFile(plansFile2);
 			logger.info("Finished reading the plans file " + plansFile2);
 			
+			// create population and calculate user benefit for comparison case
 			Population pop2 = scenario2.getPopulation();
 			
 			logger.info("Starting user benefits calculation.");
@@ -190,6 +167,7 @@ public class SpatialAveragingWelfare {
 			Map<Id, Double> personId2Utility2 = ubc2.getPersonId2Utility();
 			System.out.println("Finished user benefits calculation.");
 			
+			// calculate differences base case <-> comparison case
 			Map<Id, Double> absoluteDifferences = new HashMap<Id, Double>();
 			for(Id id: personId2Utility.keySet()){
 				if (personId2Utility2.containsKey(id)) {
@@ -203,6 +181,7 @@ public class SpatialAveragingWelfare {
 			double [][] userBenefitDifferences = fillUserBenefits(absoluteDifferences, pop);
 			average = calculateAverage(userBenefitDifferences, weights);
 			
+			// set output paths and write results to text files
 			String outPath2 = outPathStub + "_Routput_" + "UserBenefitsDifferences.txt";
 			String outPath3 = outPathStub + "_Routput_" + "UserBenefitsCountsDifferences.txt";
 			String outPath4 = outPathStub + "_Routput_" + "UserBenefitsAverageDifferences.txt";
@@ -296,12 +275,10 @@ public class SpatialAveragingWelfare {
 				count++;
 		}
 		
-		final double area_in_smoothing_circle_sqkm = (Math.PI * this.smoothingRadius_m * this.smoothingRadius_m) / (1000. * 1000.);
-		
 		for(int xIndex = 0; xIndex<noOfXbins; xIndex++){
 			for(int yIndex = 0; yIndex<noOfYbins; yIndex++){
-				weightedBenefits[xIndex][yIndex]/=area_in_smoothing_circle_sqkm;
-				weights[xIndex][yIndex]/=area_in_smoothing_circle_sqkm;
+				weightedBenefits[xIndex][yIndex]=weightedBenefits[xIndex][yIndex]*scalingFactor/area_in_smoothing_circle_sqkm;
+				weights[xIndex][yIndex]= weights[xIndex][yIndex]*scalingFactor/area_in_smoothing_circle_sqkm;
 			}
 		}
 		return weightedBenefits;
@@ -317,7 +294,7 @@ public class SpatialAveragingWelfare {
 					double weightForCurrentBin = calculateWeightOfLinkForCell(homeCoord.getX(), homeCoord.getY(), cellCentroid.getX(), cellCentroid.getY());
 					if (value != null) {
 						weightedBenefits[xIndex][yIndex] += weightForCurrentBin * value;
-						weights[xIndex][yIndex]+= value;
+						weights[xIndex][yIndex]+= weightForCurrentBin;
 					}else{
 						logger.warn("current value is null");
 					}
@@ -325,22 +302,6 @@ public class SpatialAveragingWelfare {
 				}
 			}
 		return weightedBenefits;
-	}
-
-	private Map<Double, double[][]> scale(Map<Double, double[][]> time2weightedValues){
-		Map<Double, double[][]> time2scaledValues = new HashMap<Double, double[][]>();
-		
-		for(Double endOfTimeInterval : time2weightedValues.keySet()){
-			double [][] unscaledValues = time2weightedValues.get(endOfTimeInterval);
-			double [][] scaledValues = new double[noOfXbins][noOfYbins];
-			for(int xIndex = 0; xIndex<noOfXbins; xIndex++){
-				for(int yIndex = 0; yIndex<noOfYbins; yIndex++){
-					scaledValues[xIndex][yIndex] = this.scalingFactor * unscaledValues[xIndex][yIndex];
-				}
-			}
-			time2scaledValues.put(endOfTimeInterval, scaledValues);
-		}
-		return time2scaledValues;
 	}
 	
 	private boolean isInMunich(Coord cellCentroid) {
@@ -373,16 +334,6 @@ public class SpatialAveragingWelfare {
 		return Math.exp((-distanceSquared) / (smoothinRadiusSquared_m));
 	}
 	
-//	private double calculateWeightOfLinkForCell(double x1, double y1, double x2, double y2) {
-//		// check if x and y values are in the same cell:
-//		if ( mapXCoordToBin(x1) == mapXCoordToBin(x2) ) {
-//			if ( mapYCoordToBin(y1) == mapYCoordToBin(y2) ) {
-//				return 1. ;
-//			}
-//		}
-//		return 0. ;
-//	}
-
 	private double findBinCenterY(int yIndex) {
 		double yBinCenter = yMin + ((yIndex + .5) / noOfYbins) * (yMax - yMin);
 		Assert.equals(mapYCoordToBin(yBinCenter), yIndex);
@@ -413,10 +364,6 @@ public class SpatialAveragingWelfare {
 		double relativePositionX = ((xCoord - xMin) / (xMax - xMin) * noOfXbins); // gives the relative position along the x-range
 		return (int) relativePositionX; // returns the number of the bin [0..n-1]
 	}
-
-	
-
-
 
 	private Scenario loadScenario(String netFile) {
 		Config config = ConfigUtils.createConfig();

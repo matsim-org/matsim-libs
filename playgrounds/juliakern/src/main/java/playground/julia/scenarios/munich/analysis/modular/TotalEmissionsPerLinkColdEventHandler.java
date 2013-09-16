@@ -79,7 +79,7 @@ public class TotalEmissionsPerLinkColdEventHandler implements ColdEmissionEventH
 							ColdPollutant pollutant = entry.getKey();
 							Double eventValue = entry.getValue();
 							
-							Double previousValue = coldEmissionsSoFar.get(pollutant);
+							Double previousValue = coldEmissionsSoFar.get(pollutant); // TODO was, wenn das null ist?
 							Double newValue = previousValue + eventValue;
 							coldEmissionsSoFar.put(pollutant, newValue);
 						}
