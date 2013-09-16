@@ -36,7 +36,6 @@ import org.matsim.core.replanning.modules.ExternalModule;
 import org.matsim.core.replanning.selectors.BestPlanSelector;
 import org.matsim.core.replanning.selectors.ExpBetaPlanChanger;
 import org.matsim.core.replanning.selectors.ExpBetaPlanSelector;
-import org.matsim.core.replanning.selectors.KeepSelected;
 import org.matsim.core.replanning.selectors.PathSizeLogitSelector;
 import org.matsim.core.replanning.selectors.PlanSelector;
 import org.matsim.core.replanning.selectors.RandomPlanSelector;
@@ -67,9 +66,9 @@ public final class StrategyManagerConfigLoader {
 		Config config = controler.getConfig();
 		manager.setMaxPlansPerAgent(config.strategy().getMaxAgentPlanMemorySize());
 		
-		int globalInnovationDisableAfter = (int) ( (config.controler().getLastIteration() - config.controler().getFirstIteration()) 
-				* config.strategy().getFractionOfIterationsToDisableInnovation() + config.controler().getFirstIteration() ) ;
-		Logger.getLogger("blabla").info( "global innovation switch of after iteration: " + globalInnovationDisableAfter ) ;
+		int globalInnovationDisableAfter = (int) ((config.controler().getLastIteration() - config.controler().getFirstIteration()) 
+				* config.strategy().getFractionOfIterationsToDisableInnovation() + config.controler().getFirstIteration());
+		log.info("global innovation switch off after iteration: " + globalInnovationDisableAfter);
 
 		for (StrategyConfigGroup.StrategySettings settings : config.strategy().getStrategySettings()) {
 			double rate = settings.getProbability();
@@ -117,28 +116,28 @@ public final class StrategyManagerConfigLoader {
 				}
 			}
 		}
-		String name = config.strategy().getPlanSelectorForRemoval() ;
+		String name = config.strategy().getPlanSelectorForRemoval();
 		if ( name != null ) {
 			// yyyy ``manager'' has a default setting.  I do not want to override this here except when it is configured.
 			// Presumably, this is not the desired approach and the default should be in the config file?  kai, feb'12
 			PlanSelector planSelector = null ;
 			if ( name.equals("WorstPlanSelector") ) { 
-				planSelector = new WorstPlanForRemovalSelector() ; 
+				planSelector = new WorstPlanForRemovalSelector(); 
 			} else if ( name.equals("SelectRandom") ) {
-				planSelector = new RandomPlanSelector() ;
+				planSelector = new RandomPlanSelector();
 			} else if ( name.equals("SelectExpBeta") ) {
-				planSelector = new ExpBetaPlanSelector( - config.planCalcScore().getBrainExpBeta() ) ;
+				planSelector = new ExpBetaPlanSelector( - config.planCalcScore().getBrainExpBeta());
 				// yyyy this will select _good_ plans for removal--?
 			} else if ( name.equals("ChangeExpBeta") ) {
-				planSelector = new ExpBetaPlanChanger( - config.planCalcScore().getBrainExpBeta() ) ;
+				planSelector = new ExpBetaPlanChanger( - config.planCalcScore().getBrainExpBeta());
 				// yyyy this will select _good_ plans for removal--?
 				// yyyy might just use -beta as parameter??
 			} else if ( name.equals("BestPlanSelector") ) {
-				planSelector = new BestPlanSelector() ;
+				planSelector = new BestPlanSelector();
 				// yyyy this will select _good_ plans for removal--?
 			} else if ( name.equals("PathSizeLogitSelector") ) {
 				planSelector = new PathSizeLogitSelector(config.planCalcScore().getPathSizeLogitBeta(), -config.planCalcScore().getBrainExpBeta(), 
-						controler.getScenario().getNetwork() ) ;
+						controler.getScenario().getNetwork());
 				// yyyy this will select good? bad? plans for removal--?
 			} else {
 				throw new RuntimeException("Unknown 'plan selector for removal'.");
