@@ -14,4 +14,5 @@
 		<egressTime secondsPerPerson="0.75"/>
 	</vehicleType>
 	<vehicle id="veh_1" type="type_1"/>
+	<vehicle id="veh_2" type="type_1"/>
 </vehicleDefinitions>
