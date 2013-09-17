@@ -97,7 +97,7 @@ public class EmissionsPerLinkColdEventHandler implements ColdEmissionEventHandle
 	
 	public Map<ColdPollutant, Double> getListEmissionValues(Double time, Id linkId){
 		if(time2coldEmissionsTotal.get(time).get(linkId)!=null)return time2coldEmissionsTotal.get(time).get(linkId);
-		return null; //TODO return sth else? empty list?
+		return null; 
 	}
 	
 	public Double getEmissionValue(Double time, Id linkId, ColdPollutant wp){
