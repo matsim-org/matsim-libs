@@ -33,10 +33,12 @@ import playground.vsp.emissions.utils.EmissionUtils;
 
 /**
  * @author benjamin
- *
+ * 
  */
-public class EmissionsPerLinkColdEventHandler implements ColdEmissionEventHandler{
-	private static final Logger logger = Logger.getLogger(EmissionsPerLinkColdEventHandler.class);
+public class EmissionsPerLinkColdEventHandler implements
+		ColdEmissionEventHandler {
+	private static final Logger logger = Logger
+			.getLogger(EmissionsPerLinkColdEventHandler.class);
 
 	Map<Double, Map<Id, Map<ColdPollutant, Double>>> time2coldEmissionsTotal = new HashMap<Double, Map<Id, Map<ColdPollutant, Double>>>();
 
@@ -44,7 +46,8 @@ public class EmissionsPerLinkColdEventHandler implements ColdEmissionEventHandle
 	final double timeBinSize;
 	EmissionUtils emissionUtils;
 
-	public EmissionsPerLinkColdEventHandler(double simulationEndTime, int noOfTimeBins) {
+	public EmissionsPerLinkColdEventHandler(double simulationEndTime,
+			int noOfTimeBins) {
 		this.noOfTimeBins = noOfTimeBins;
 		this.timeBinSize = simulationEndTime / noOfTimeBins;
 		this.emissionUtils = new EmissionUtils();
@@ -53,43 +56,52 @@ public class EmissionsPerLinkColdEventHandler implements ColdEmissionEventHandle
 	@Override
 	public void reset(int iteration) {
 		this.time2coldEmissionsTotal.clear();
-		logger.info("Resetting cold emission aggregation to " + this.time2coldEmissionsTotal);
+		logger.info("Resetting cold emission aggregation to "
+				+ this.time2coldEmissionsTotal);
 	}
 
 	@Override
 	public void handleEvent(ColdEmissionEvent event) {
 		Double time = event.getTime();
 		Id linkId = event.getLinkId();
-		Map<ColdPollutant, Double> coldEmissionsOfEvent = event.getColdEmissions();
+		Map<ColdPollutant, Double> coldEmissionsOfEvent = event
+				.getColdEmissions();
 		double endOfTimeInterval = 0.0;
 
-		for(int i = 0; i < this.noOfTimeBins; i++){
-			if(time > i * this.timeBinSize && time <= (i + 1) * this.timeBinSize){
-				endOfTimeInterval = (i + 1) * this.timeBinSize;
-				Map<Id, Map<ColdPollutant, Double>> coldEmissionsTotal = new HashMap<Id, Map<ColdPollutant, Double>>();
+		int numberOfInterval = (int) Math.ceil(time / timeBinSize);
+		if (numberOfInterval == 0)
+			numberOfInterval = 1; // only happens if time = 0.0
+		endOfTimeInterval = numberOfInterval * timeBinSize;
 
-				if(this.time2coldEmissionsTotal.get(endOfTimeInterval) != null){
-					coldEmissionsTotal = this.time2coldEmissionsTotal.get(endOfTimeInterval);
+		Map<Id, Map<ColdPollutant, Double>> coldEmissionsTotal = new HashMap<Id, Map<ColdPollutant, Double>>();
 
-					if(coldEmissionsTotal.get(linkId) != null){
-						Map<ColdPollutant, Double> coldEmissionsSoFar = coldEmissionsTotal.get(linkId);
-						for(Entry<ColdPollutant, Double> entry : coldEmissionsOfEvent.entrySet()){
-							ColdPollutant pollutant = entry.getKey();
-							Double eventValue = entry.getValue();
-							
-							Double previousValue = coldEmissionsSoFar.get(pollutant);
-							Double newValue = previousValue + eventValue;
-							coldEmissionsSoFar.put(pollutant, newValue);
-						}
-						coldEmissionsTotal.put(linkId, coldEmissionsSoFar);
-					} else {
-						coldEmissionsTotal.put(linkId, coldEmissionsOfEvent);
+		if (endOfTimeInterval < this.noOfTimeBins * this.timeBinSize+1) {
+			if (this.time2coldEmissionsTotal.get(endOfTimeInterval) != null) {
+				coldEmissionsTotal = this.time2coldEmissionsTotal
+						.get(endOfTimeInterval);
+
+				if (coldEmissionsTotal.get(linkId) != null) {
+					Map<ColdPollutant, Double> coldEmissionsSoFar = coldEmissionsTotal
+							.get(linkId);
+					for (Entry<ColdPollutant, Double> entry : coldEmissionsOfEvent
+							.entrySet()) {
+						ColdPollutant pollutant = entry.getKey();
+						Double eventValue = entry.getValue();
+
+						Double previousValue = coldEmissionsSoFar
+								.get(pollutant);
+						Double newValue = previousValue + eventValue;
+						coldEmissionsSoFar.put(pollutant, newValue);
 					}
+					coldEmissionsTotal.put(linkId, coldEmissionsSoFar);
 				} else {
 					coldEmissionsTotal.put(linkId, coldEmissionsOfEvent);
 				}
-				this.time2coldEmissionsTotal.put(endOfTimeInterval, coldEmissionsTotal);
+			} else {
+				coldEmissionsTotal.put(linkId, coldEmissionsOfEvent);
 			}
+			this.time2coldEmissionsTotal.put(endOfTimeInterval,
+					coldEmissionsTotal);
 		}
 	}
 
