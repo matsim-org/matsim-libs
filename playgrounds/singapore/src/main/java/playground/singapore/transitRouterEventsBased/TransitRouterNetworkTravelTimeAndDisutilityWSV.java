@@ -25,7 +25,6 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.router.util.TravelDisutility;
@@ -36,6 +35,7 @@ import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.vehicles.Vehicle;
 
+import playground.singapore.scoring.SingaporeFareScoring;
 import playground.singapore.transitRouterEventsBased.TransitRouterNetworkWW.TransitRouterNetworkLink;
 import playground.singapore.transitRouterEventsBased.TransitRouterNetworkWW.TransitRouterNetworkNode;
 import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTime;
@@ -113,7 +113,7 @@ public class TransitRouterNetworkTravelTimeAndDisutilityWSV extends TransitRoute
 		TransitRouterNetworkLink wrapped = (TransitRouterNetworkLink) link;
 		if (wrapped.route != null)
 			return -(cachedTravelDisutility?cachedTravelTime:linkTravelTimes.get(wrapped.getId())[time/timeSlot<numSlots?(int)(time/timeSlot):(numSlots-1)])*this.config.getMarginalUtilityOfTravelTimePt_utl_s()*linkVehicleOccupancy.get(wrapped.getId())[time/timeSlot<numSlots?(int)(time/timeSlot):(numSlots-1)]>SIT_PERCENTAGE?NO_SIT_FACTOR:1
-					- link.getLength() * (this.config.getMarginalUtilityOfTravelDistancePt_utl_m()-2.7726/100000);
+					- link.getLength() * (this.config.getMarginalUtilityOfTravelDistancePt_utl_m()+SingaporeFareScoring.DISTANCE_FARE_RATE);
 		else if (wrapped.toNode.route!=null)
 			// it's a wait link
 			return -(cachedTravelDisutility?cachedTravelTime:linkWaitingTimes.get(wrapped.getId())[time/timeSlot<numSlots?(int)(time/timeSlot):(numSlots-1)])*this.config.getMarginalUtilityOfWaitingPt_utl_s()
@@ -130,7 +130,7 @@ public class TransitRouterNetworkTravelTimeAndDisutilityWSV extends TransitRoute
 		TransitRouterNetworkLink wrapped = (TransitRouterNetworkLink) link;
 		if (wrapped.route != null)
 			return - linkTravelTimes.get(wrapped.getId())[time/timeSlot<numSlots?(int)(time/timeSlot):(numSlots-1)]*this.config.getMarginalUtilityOfTravelTimePt_utl_s()*linkVehicleOccupancy.get(wrapped.getId())[time/timeSlot<numSlots?(int)(time/timeSlot):(numSlots-1)]>SIT_PERCENTAGE?NO_SIT_FACTOR:1
-					- link.getLength() * (this.config.getMarginalUtilityOfTravelDistancePt_utl_m()-2.7726/100000);
+					- link.getLength() * (this.config.getMarginalUtilityOfTravelDistancePt_utl_m()+SingaporeFareScoring.DISTANCE_FARE_RATE);
 		else if (wrapped.toNode.route!=null)
 			// it's a wait link
 			return - linkWaitingTimes.get(wrapped.getId())[time/timeSlot<numSlots?(int)(time/timeSlot):(numSlots-1)]*this.config.getMarginalUtilityOfWaitingPt_utl_s()

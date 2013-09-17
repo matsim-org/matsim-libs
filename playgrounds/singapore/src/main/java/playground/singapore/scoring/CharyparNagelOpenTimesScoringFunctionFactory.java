@@ -1,0 +1,69 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ * CharyparNagelOpenTimesScoringFunctionFactory.java
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2007 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
+package playground.singapore.scoring;
+
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Plan;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.scoring.ScoringFunction;
+import org.matsim.core.scoring.ScoringFunctionAccumulator;
+import org.matsim.core.scoring.ScoringFunctionFactory;
+import org.matsim.core.scoring.functions.CharyparNagelAgentStuckScoring;
+import org.matsim.core.scoring.functions.CharyparNagelLegScoring;
+import org.matsim.core.scoring.functions.CharyparNagelMoneyScoring;
+import org.matsim.core.scoring.functions.CharyparNagelScoringParameters;
+
+/**
+ * Generates {@link CharyparNagelOpenTimesActivityScoring}s.
+ * 
+ * @author meisterk
+ */
+public class CharyparNagelOpenTimesScoringFunctionFactory implements ScoringFunctionFactory {
+
+	private CharyparNagelScoringParameters params = null;
+    private Scenario scenario;
+	private PlanCalcScoreConfigGroup config;
+
+    public CharyparNagelOpenTimesScoringFunctionFactory(final PlanCalcScoreConfigGroup config, final Scenario scenario) {
+    	this.config = config;
+		this.scenario = scenario;
+	}
+
+	@Override
+	public ScoringFunction createNewScoringFunction(Plan plan) {
+		if (this.params == null) {
+			/* lazy initialization of params. not strictly thread safe, as different threads could
+			 * end up with different params-object, although all objects will have the same
+			 * values in them due to using the same config. Still much better from a memory performance
+			 * point of view than giving each ScoringFunction its own copy of the params.
+			 */
+			this.params = new CharyparNagelScoringParameters(this.config);
+		}
+		ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelOpenTimesActivityScoring(plan, params, scenario.getActivityFacilities()));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelLegScoring(params, scenario.getNetwork()));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelMoneyScoring(params));
+		scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
+		scoringFunctionAccumulator.addScoringFunction(new SingaporeFareScoring(plan, scenario.getTransitSchedule(), scenario.getNetwork()));
+		return scoringFunctionAccumulator;
+	}
+
+}

@@ -37,6 +37,7 @@ import org.matsim.pt.router.TransitRouterConfig;
 import org.matsim.pt.router.TransitRouterNetworkTravelTimeAndDisutility;
 import org.matsim.vehicles.Vehicle;
 
+import playground.singapore.scoring.SingaporeFareScoring;
 import playground.singapore.transitRouterEventsBased.TransitRouterNetworkWW.TransitRouterNetworkLink;
 import playground.singapore.transitRouterEventsBased.waitTimes.WaitTime;
 
@@ -107,7 +108,7 @@ public class TransitRouterNetworkTravelTimeAndDisutilityWW extends TransitRouter
 		TransitRouterNetworkLink wrapped = (TransitRouterNetworkLink) link;
 		if (wrapped.route != null)
 			return -(cachedTravelDisutility?cachedTravelTime:linkTravelTimes.get(wrapped.getId())[time/timeSlot<numSlots?(int)(time/timeSlot):(numSlots-1)]) * this.config.getMarginalUtilityOfTravelTimePt_utl_s() 
-				       - link.getLength() * (this.config.getMarginalUtilityOfTravelDistancePt_utl_m()-2.7726/100000);
+				       - link.getLength() * (this.config.getMarginalUtilityOfTravelDistancePt_utl_m()+SingaporeFareScoring.DISTANCE_FARE_RATE);
 		else if (wrapped.toNode.route!=null)
 			// it's a wait link
 			return -(cachedTravelDisutility?cachedTravelTime:linkWaitingTimes.get(wrapped.getId())[time/timeSlot<numSlots?(int)(time/timeSlot):(numSlots-1)]) * this.config.getMarginalUtilityOfWaitingPt_utl_s()
@@ -124,7 +125,7 @@ public class TransitRouterNetworkTravelTimeAndDisutilityWW extends TransitRouter
 		TransitRouterNetworkLink wrapped = (TransitRouterNetworkLink) link;
 		if (wrapped.route != null)
 			return - linkTravelTimes.get(wrapped.getId())[time/timeSlot<numSlots?(int)(time/timeSlot):(numSlots-1)] * this.config.getMarginalUtilityOfTravelTimePt_utl_s() 
-					- link.getLength() * (this.config.getMarginalUtilityOfTravelDistancePt_utl_m()-2.7726/100000);
+					- link.getLength() * (this.config.getMarginalUtilityOfTravelDistancePt_utl_m()+SingaporeFareScoring.DISTANCE_FARE_RATE);
 		else if (wrapped.toNode.route!=null)
 			// it's a wait link
 			return - linkWaitingTimes.get(wrapped.getId())[time/timeSlot<numSlots?(int)(time/timeSlot):(numSlots-1)] * this.config.getMarginalUtilityOfWaitingPt_utl_s()

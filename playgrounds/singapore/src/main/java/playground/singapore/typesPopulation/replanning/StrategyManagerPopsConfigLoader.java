@@ -46,7 +46,7 @@ import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 
 import playground.singapore.typesPopulation.config.groups.StrategyPopsConfigGroup;
 import playground.singapore.typesPopulation.config.groups.StrategyPopsConfigGroup.StrategySettings;
-import playground.singapore.typesPopulation.controler.ControlerPops;
+import playground.singapore.typesPopulation.population.PersonImplPops;
 
 /**
  * Loads the strategy modules specified in the config-file. This class offers
@@ -63,15 +63,16 @@ public final class StrategyManagerPopsConfigLoader {
 
 	private static int externalCounter = 0;
 
-	public static void load(final ControlerPops controler, final StrategyManagerPops manager) {
+	public static void load(final Controler controler, final StrategyManagerPops manager) {
 		PlanStrategyRegistrar planStrategyFactoryRegistrar = new PlanStrategyRegistrar();
 		PlanStrategyFactoryRegister planStrategyFactoryRegister = planStrategyFactoryRegistrar.getFactoryRegister();
 		load(controler, manager, planStrategyFactoryRegister);
 	}
 
-	public static void load(final ControlerPops controler, final StrategyManagerPops manager, PlanStrategyFactoryRegister planStrategyFactoryRegister) {
+	public static void load(final Controler controler, final StrategyManagerPops manager, PlanStrategyFactoryRegister planStrategyFactoryRegister) {
 		Config config = controler.getConfig();
 		StrategyPopsConfigGroup strategyPops = (StrategyPopsConfigGroup) config.getModule(StrategyPopsConfigGroup.GROUP_NAME);
+		manager.setMaxPlansPerAgent(0);
 		for(String populationId:strategyPops.getPopulationIds()) {
 			manager.setMaxPlansPerAgent(strategyPops.getMaxAgentPlanMemorySize(populationId), new IdImpl(populationId));
 			
@@ -156,7 +157,7 @@ public final class StrategyManagerPopsConfigLoader {
 		}
 	}
 
-	private static PlanStrategy loadStrategy(final ControlerPops controler, final String name, final StrategySettings settings, PlanStrategyFactoryRegister planStrategyFactoryRegister) {
+	private static PlanStrategy loadStrategy(final Controler controler, final String name, final StrategySettings settings, PlanStrategyFactoryRegister planStrategyFactoryRegister) {
 		// Special cases, scheduled to go away.
 		if (name.equals(LOCATION_CHOICE)) {
 			PlanStrategy strategy = tryToLoadPlanStrategyByName(controler, "org.matsim.contrib.locationchoice.LocationChoicePlanStrategy");
@@ -179,7 +180,7 @@ public final class StrategyManagerPopsConfigLoader {
 	} 
 
 
-	private static PlanStrategy tryToLoadPlanStrategyByName(final ControlerPops controler, final String name) {
+	private static PlanStrategy tryToLoadPlanStrategyByName(final Controler controler, final String name) {
 		PlanStrategy strategy;
 		//classes loaded by name must not be part of the matsim core
 		if (name.startsWith("org.matsim.") && !name.startsWith("org.matsim.contrib.")) {

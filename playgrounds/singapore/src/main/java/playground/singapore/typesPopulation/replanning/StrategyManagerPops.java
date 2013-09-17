@@ -8,7 +8,10 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.controler.events.BeforeMobsimEvent;
+import org.matsim.core.controler.listener.BeforeMobsimListener;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.PlanStrategy;
 import org.matsim.core.replanning.ReplanningContext;
@@ -18,7 +21,7 @@ import org.matsim.core.replanning.selectors.WorstPlanForRemovalSelector;
 
 import playground.singapore.typesPopulation.population.PersonImplPops;
 
-public class StrategyManagerPops extends StrategyManager {
+public class StrategyManagerPops extends StrategyManager implements BeforeMobsimListener {
 	
 	private final Map<Id, ArrayList<PlanStrategy>> strategies = new HashMap<Id, ArrayList<PlanStrategy>>();
 	private final Map<Id, ArrayList<Double>> weights = new HashMap<Id, ArrayList<Double>>();
@@ -35,7 +38,7 @@ public class StrategyManagerPops extends StrategyManager {
 	public PlanStrategy chooseStrategy(final Person person) {
 		double rnd = MatsimRandom.getRandom().nextDouble() * this.totalWeights.get(((PersonImplPops)person).getPopulationId());
 		double sum = 0.0;
-		for (int i = 0, max = this.weights.size(); i < max; i++) {
+		for (int i = 0, max = this.weights.get(((PersonImplPops)person).getPopulationId()).size(); i < max; i++) {
 			sum += this.weights.get(((PersonImplPops)person).getPopulationId()).get(i).doubleValue();
 			if (rnd <= sum) {
 				return this.strategies.get(((PersonImplPops)person).getPopulationId()).get(i);
@@ -175,6 +178,39 @@ public class StrategyManagerPops extends StrategyManager {
 	public final void setPlanSelectorForRemoval(final PlanSelector planSelector, Id populationId) {
 		Logger.getLogger(this.getClass()).info("setting PlanSelectorForRemoval to " + planSelector.getClass() ) ;
 		this.removalPlanSelector.put(populationId, planSelector);
+	}
+	
+	public int getMaxPlansPerAgent(Id popId) {
+		return maxPlansPerAgent.get(popId);
+	}
+	
+	@Override
+	public void notifyBeforeMobsim(BeforeMobsimEvent event) {
+		for (Person person : event.getControler().getPopulation().getPersons().values()) {
+			int max = getMaxPlansPerAgent(((PersonImplPops)person).getPopulationId());
+			if (max>0 && person.getPlans().size()>max)
+				removePlans((PersonImplPops) person, max);
+		}
+	}
+
+	private void removePlans(PersonImplPops person, int maxNumberOfPlans) {
+		while (person.getPlans().size() > maxNumberOfPlans) {
+			PlanSelector selector = removalPlanSelector.get(person.getPopulationId());
+			if(selector == null) {
+				selector = new WorstPlanForRemovalSelector();
+				removalPlanSelector.put(person.getPopulationId(), selector);
+			}
+			Plan plan = selector.selectPlan(person);
+			person.getPlans().remove(plan);
+			if (plan == person.getSelectedPlan()) {
+				final Plan newPlanToSelect = person.getRandomPlan();
+				if ( newPlanToSelect == null ) {
+					throw new IllegalStateException("could not find a plan to select for person "+person);
+				}
+				person.setSelectedPlan( newPlanToSelect );
+			}
+			afterRemovePlanHook( plan ) ;
+		}
 	}
 
 }

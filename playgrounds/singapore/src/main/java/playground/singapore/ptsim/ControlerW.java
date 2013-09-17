@@ -18,54 +18,47 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.singapore.typesPopulation.controler;
+package playground.singapore.ptsim;
 
-import org.matsim.api.core.v01.Scenario;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.replanning.StrategyManager;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.MatsimEventsReader;
+import org.matsim.core.scenario.ScenarioUtils;
 
-import playground.singapore.typesPopulation.config.groups.StrategyPopsConfigGroup;
-import playground.singapore.typesPopulation.controler.corelisteners.PlansDumping;
-import playground.singapore.typesPopulation.replanning.StrategyManagerPops;
-import playground.singapore.typesPopulation.replanning.StrategyManagerPopsConfigLoader;
-import playground.singapore.typesPopulation.scenario.ScenarioUtils;
+import playground.singapore.ptsim.qnetsimengine.PTQSimFactory;
+import playground.singapore.transitRouterEventsBased.stopStopTimes.StopStopTimeCalculator;
+
 
 /**
- * A run Controler for running many types of population
+ * A run Controler for a transit router that depends on the travel times and wait times
  * 
  * @author sergioo
  */
 
-public class ControlerPops extends Controler {
+public class ControlerW {
 
-	public ControlerPops(Config config) {
-		super(config);
-	}
-	public ControlerPops(Scenario scenario) {
-		super(scenario);
-	}
-	public static void main(String[] args) {
+	public static void main(String[] args) throws FileNotFoundException, IOException, ClassNotFoundException {
 		Config config = ConfigUtils.createConfig();
-		config.removeModule(StrategyConfigGroup.GROUP_NAME);
-		config.addModule(new StrategyPopsConfigGroup());
 		ConfigUtils.loadConfig(config, args[0]);
-		ControlerPops controler = new ControlerPops(ScenarioUtils.loadScenario(config));
+		Controler controler = new Controler(ScenarioUtils.loadScenario(config));
+		if(args.length>1) {
+			StopStopTimeCalculator stopStopTimeCalculatorEvents = new StopStopTimeCalculator(controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().getQSimConfigGroup().getEndTime()-controler.getConfig().getQSimConfigGroup().getStartTime()));
+			EventsManager eventsManager = EventsUtils.createEventsManager(controler.getConfig());
+			eventsManager.addHandler(stopStopTimeCalculatorEvents);
+			(new MatsimEventsReader(eventsManager)).readFile(args[1]);
+			controler.setMobsimFactory(new PTQSimFactory(stopStopTimeCalculatorEvents.getStopStopTimes()));
+		}
+		else
+			controler.setMobsimFactory(new PTQSimFactory());
 		controler.setOverwriteFiles(true);
-		controler.addCoreControlerListener(new PlansDumping());
+		//controler.addControlerListener(new CalibrationStatsListener(controler.getEvents(), new String[]{args[1], args[2]}, 1, "Travel Survey (Benchmark)", "Red_Scheme", new HashSet<Id>()));
 		controler.run();
-	}
-	@Override
-	/**
-	 * @return A fully initialized StrategyManager for the plans replanning.
-	 */
-	protected StrategyManager loadStrategyManager() {
-		StrategyManagerPops manager = new StrategyManagerPops();
-		addControlerListener(manager);
-		StrategyManagerPopsConfigLoader.load(this, manager);
-		return manager;
 	}
 	
 }
