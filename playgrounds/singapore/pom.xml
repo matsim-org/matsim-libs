@@ -8,4 +8,20 @@
   <groupId>playground</groupId>
   <artifactId>singapore</artifactId>
   <name>singapore</name>
+  <dependencies>
+  	<dependency>
+  		<groupId>org.apache.commons</groupId>
+  		<artifactId>commons-math</artifactId>
+  	</dependency>
+  	<dependency>
+  		<groupId>org.matsim.contrib</groupId>
+  		<artifactId>locationchoice</artifactId>
+  		<version>0.6.0-SNAPSHOT</version>
+  	</dependency>
+  	<dependency>
+  		<groupId>playground</groupId>
+  		<artifactId>artemc</artifactId>
+  		<version>0.6.0-SNAPSHOT</version>
+  	</dependency>
+  </dependencies>
 </project>
