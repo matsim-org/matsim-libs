@@ -44,7 +44,6 @@ import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
-
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -61,8 +60,17 @@ import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
+import org.matsim.pt.transitSchedule.api.TransitSchedule;
+import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
+import org.matsim.vehicles.Vehicle;
+import org.matsim.vehicles.VehicleCapacity;
+import org.matsim.vehicles.VehicleReaderV1;
+import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehicleType.DoorOperationMode;
+import org.matsim.vehicles.VehicleUtils;
+import org.matsim.vehicles.Vehicles;
 
 public class MarginalCostPricingPtHandlerTest  {
 
@@ -97,8 +105,8 @@ public class MarginalCostPricingPtHandlerTest  {
    	 	
 		Config config = utils.loadConfig(null);
 		
-		String scheduleFile = utils.getInputDirectory() + "transitscheduleEmpty.xml";
-		String vehiclesFile = utils.getInputDirectory() + "transitVehicles.xml";
+//		String scheduleFile = utils.getInputDirectory() + "transitscheduleEmpty.xml";
+//		String vehiclesFile = utils.getInputDirectory() + "transitVehicles.xml";
 		
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -107,8 +115,8 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 		config.scenario().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
-		config.transit().setTransitScheduleFile(scheduleFile);
-		config.transit().setVehiclesFile(vehiclesFile);
+//		config.transit().setTransitScheduleFile(scheduleFile);
+//		config.transit().setVehiclesFile(vehiclesFile);
 		
 		ActivityParams hParams = new ActivityParams("h");
 		hParams.setTypicalDuration(3600.);
@@ -117,11 +125,14 @@ public class MarginalCostPricingPtHandlerTest  {
 		wParams.setTypicalDuration(3600.);
 		config.planCalcScore().addActivityParams(wParams);
 		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
-	
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
+
 		setPopulationTestInVehicleDelay01(scenario);
-		setScheduleTestInVehicleDelay01(scenario);
+		fillSchedule01(scenario);
+		fillVehicle01(scenario);
 		setNetworkOneWay(scenario);
+		
+//		new VehicleReaderV1((scenario).getVehicles()).readFile(scenario.getConfig().transit().getVehiclesFile());
 	
 		Controler controler = new Controler(scenario);
 		
@@ -197,6 +208,31 @@ public class MarginalCostPricingPtHandlerTest  {
 		//*******************************************************************************************
 		
      }
+
+	private void fillVehicle01(ScenarioImpl scenario) {
+		Vehicles veh = scenario.getVehicles();
+
+		Id vehTypeId1 = new IdImpl("type_1");
+		Id vehId1 = new IdImpl("veh_1");
+
+		VehicleType type = veh.getFactory().createVehicleType(vehTypeId1);
+		VehicleCapacity cap = veh.getFactory().createVehicleCapacity();
+		cap.setSeats(50);
+		cap.setStandingRoom(0);
+		type.setCapacity(cap);
+		type.setLength(10);
+		type.setAccessTime(1.0);
+		type.setEgressTime(0.75);
+		type.setDoorOperationMode(DoorOperationMode.serial);
+		
+		type.setMaximumVelocity(8.33);
+		type.setPcuEquivalents(7.5);
+		
+		veh.getVehicleTypes().put(vehTypeId1, type); 
+		
+		Vehicle vehicle = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
+		veh.getVehicles().put(vehId1, vehicle);
+	}
 
 	//one agent from start (stop 1) to finish (stop 6)
 	//another agent gets on (stop 2)
@@ -2171,6 +2207,98 @@ public class MarginalCostPricingPtHandlerTest  {
 		scenario.getTransitSchedule().addStopFacility(StopFacility4);
 		scenario.getTransitSchedule().addStopFacility(StopFacility5);
 		scenario.getTransitSchedule().addStopFacility(StopFacility6);
+		
+	}
+	
+	private void fillSchedule01(ScenarioImpl scenario) {
+		TransitSchedule schedule = scenario.getTransitSchedule();
+		
+		TransitScheduleFactory sf = schedule.getFactory();
+		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
+		
+		Id Stop1 = new IdImpl("Stop1Id");
+		Id Stop2 = new IdImpl("Stop2Id");
+		Id Stop3 = new IdImpl("Stop3Id");
+		Id Stop4 = new IdImpl("Stop4Id");
+		Id Stop5 = new IdImpl("Stop5Id");
+		Id Stop6 = new IdImpl("Stop6Id");
+		TransitStopFacility StopFacility1;
+		TransitStopFacility StopFacility2;
+		TransitStopFacility StopFacility3;
+		TransitStopFacility StopFacility4;
+		TransitStopFacility StopFacility5;
+		TransitStopFacility StopFacility6;	
+		StopFacility1 = sf.createTransitStopFacility(Stop1, new CoordImpl (500., 0.), true);
+		StopFacility1.setLinkId(linkId1);
+		StopFacility2 = sf.createTransitStopFacility(Stop2, new CoordImpl (1000., 0.), true);
+		StopFacility2.setLinkId(linkId2);
+		StopFacility3 = sf.createTransitStopFacility(Stop3, new CoordImpl (1500., 0.), true);
+		StopFacility3.setLinkId(linkId3);
+		StopFacility4 = sf.createTransitStopFacility(Stop4, new CoordImpl (2000., 0.), true);
+		StopFacility4.setLinkId(linkId4);
+		StopFacility5 = sf.createTransitStopFacility(Stop5, new CoordImpl (2500., 0.), true);
+		StopFacility5.setLinkId(linkId5);
+		StopFacility6 = sf.createTransitStopFacility(Stop6, new CoordImpl (3000., 0.), true);
+		StopFacility6.setLinkId(linkId6);
+		
+		TransitLine TransitLine1 = null;
+		Id Line1 = new IdImpl("line1Id");
+		TransitLine1 = sf.createTransitLine(Line1);
+		
+		List<Id> lineIds = new ArrayList<Id>();
+		lineIds.add(Line1);
+		
+		Id Route1 = new IdImpl("Route1Id");
+		NetworkRoute NetworkRoute1 = null;
+		NetworkRoute1 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId6);
+		List<Id> LinkIds = new ArrayList<Id>();
+		LinkIds.add(linkId2);
+		LinkIds.add(linkId3);
+		LinkIds.add(linkId4);
+		LinkIds.add(linkId5);
+		NetworkRoute1.setLinkIds(linkId1, LinkIds, linkId6);
+		
+		TransitRouteStop TRStop1;
+		TransitRouteStop TRStop2;
+		TransitRouteStop TRStop3;
+		TransitRouteStop TRStop4;
+		TransitRouteStop TRStop5;
+		TransitRouteStop TRStop6;
+		TRStop1 = sf.createTransitRouteStop(StopFacility1, 0.0, 0.0);
+		TRStop2 = sf.createTransitRouteStop(StopFacility2, 60.0, 60.0);
+		TRStop3 = sf.createTransitRouteStop(StopFacility3, 120.0, 120.0);
+		TRStop4 = sf.createTransitRouteStop(StopFacility4, 180.0, 180.0);
+		TRStop5 = sf.createTransitRouteStop(StopFacility5, 240.0, 240.0);
+		TRStop6 = sf.createTransitRouteStop(StopFacility6, 300.0, 300.0);
+		
+		List<TransitRouteStop> Stops = new ArrayList<TransitRouteStop>();
+		Stops.add(TRStop1);
+		Stops.add(TRStop2);
+		Stops.add(TRStop3);
+		Stops.add(TRStop4);
+		Stops.add(TRStop5);
+		Stops.add(TRStop6);
+		
+		TransitRoute TransitRoute1 = null;
+		TransitRoute1 = sf.createTransitRoute(Route1, NetworkRoute1, Stops, "pt");
+		
+		Departure Departure1 = null;
+		Id DepartureId1 = new IdImpl("DepartureId_1");
+		Departure1 = sf.createDeparture(DepartureId1, 200);
+		Id veh_1 = new IdImpl("veh_1");
+		Departure1.setVehicleId(veh_1);
+		
+		TransitRoute1.addDeparture(Departure1);
+		
+		TransitLine1.addRoute(TransitRoute1);
+		
+		schedule.addTransitLine(TransitLine1);
+		schedule.addStopFacility(StopFacility1);
+		schedule.addStopFacility(StopFacility2);
+		schedule.addStopFacility(StopFacility3);
+		schedule.addStopFacility(StopFacility4);
+		schedule.addStopFacility(StopFacility5);
+		schedule.addStopFacility(StopFacility6);
 		
 	}
 	
