@@ -1,4 +1,4 @@
-package playground.sergioo.eventAnalysisTools2012.backwards;
+package playground.sergioo.eventAnalysisTools2013.backwards;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -68,8 +68,8 @@ public class BackwardsWindow extends LayersWindow implements PersonAlgorithm {
 			}
 			i++;
 		}
-		this.stationsPainterA = stationsPainters[stationsPainters.length-2];
-		this.stationsPainterB = stationsPainters[stationsPainters.length-1];
+		this.stationsPainterA = stationsPainters[0];
+		this.stationsPainterB = stationsPainters[1];
 		layersPanels.put(PanelIds.ONE, panel);
 		this.setLayout(new BorderLayout());
 		this.add(panel, BorderLayout.CENTER);
@@ -191,9 +191,9 @@ public class BackwardsWindow extends LayersWindow implements PersonAlgorithm {
 		BackwardsWindow window = new BackwardsWindow(new TransitRoute[]{routeA, routeB, routeC, routeD, routeE, routeF, routeG, routeH}, args, new StationsPainter[]{stationsPainterA, stationsPainterB, stationsPainterC, stationsPainterD, stationsPainterE, stationsPainterF, stationsPainterG, stationsPainterH}, panel);
 		((PopulationImpl)scenario.getPopulation()).setIsStreaming(true);
 		((PopulationImpl)scenario.getPopulation()).addAlgorithm(window);
-		//new MatsimPopulationReader(scenario).readFile(args[2]);
+		new MatsimPopulationReader(scenario).readFile(args[2]);
 		printWriter.close();
-		BufferedReader reader = new BufferedReader(new FileReader("./data/coordsBack.txt"));
+		/*BufferedReader reader = new BufferedReader(new FileReader("./data/coordsBack.txt"));
 		String line = reader.readLine();
 		while(line!=null) {
 			String[] parts = line.split(" ");
@@ -215,7 +215,7 @@ public class BackwardsWindow extends LayersWindow implements PersonAlgorithm {
 				stationsPainterF.increaseSize(new CoordImpl(Double.parseDouble(parts[1]), Double.parseDouble(parts[2])));
 			line = reader.readLine();
 		}
-		reader.close();
+		reader.close();*/
 		window.setVisible(true);
 	}
 

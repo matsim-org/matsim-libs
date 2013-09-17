@@ -1,4 +1,4 @@
-package playground.sergioo.eventAnalysisTools2012.backwards;
+package playground.sergioo.eventAnalysisTools2013.backwards;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -33,7 +33,7 @@ public class CircleLegendPainter extends Painter {
 	@Override
 	public void paint(Graphics2D g2, LayersPanel layersPanel) {
 		for(int i=0; i<values.length; i++) {
-			paintCircle(g2, layersPanel, new CoordImpl(coord.getX()+Math.pow(i,0.9)*2*distance, coord.getY()), Math.sqrt(values[i])*scale, color);
+			paintCircle(g2, layersPanel, new CoordImpl(coord.getX()+Math.pow(i,0.9)*2*distance, coord.getY()), (int)(Math.sqrt(values[i])*scale), color);
 			int[] screenPoint = layersPanel.getScreenXY(new double[]{coord.getX()+Math.pow(i,0.9)*2*distance, coord.getY()-distance});
 			g2.setFont(new Font("Times New Roman", Font.PLAIN, 32));
 			g2.drawString(DecimalFormat.getIntegerInstance().format(values[i]), screenPoint[0]-10, screenPoint[1]+20);

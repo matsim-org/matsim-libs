@@ -1,6 +1,5 @@
 package playground.sergioo.passivePlanning2012.core.population;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,6 +12,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.matsim.api.core.v01.Id;
 
 public abstract class PlaceSharer {
+	
 	protected enum Period {
 		
 		EARLY_MORNING(0, 7*3600-1),
@@ -47,17 +47,37 @@ public abstract class PlaceSharer {
 			return false;
 		}
 	
-	}
-	protected class KnownPlace {
+	}	
+	public class KnownPlace {
 		
 		//Attributes
-		public Id facilityId;
-		public SortedMap<Period, Collection<String>> timeTypes = new TreeMap<Period, Collection<String>>();
-		protected SortedMap<Period, Map<Id, Double>> travelTimes = new TreeMap<Period, Map<Id, Double>>();
+		private Id facilityId;
+		private SortedMap<Period, Set<String>> timeTypes = new TreeMap<Period, Set<String>>();
+		protected Map<String, SortedMap<Period, Map<Id, Double>>> travelTimes = new HashMap<String, SortedMap<Period, Map<Id, Double>>>();
 		
 		//Constructors
 		private KnownPlace(Id facilityId) {
 			this.facilityId = facilityId;
+		}
+		
+		public Id getFacilityId() {
+			return facilityId;
+		}
+
+		public Set<String> getActivityTypes(double time) {
+			return timeTypes.get(Period.getPeriod(time));
+		}
+		public double getTravelTime(String mode, double startTime, Id destinationId) {
+			SortedMap<Period, Map<Id, Double>> timess = travelTimes.get(mode);
+			if(timess!=null) {
+				Map<Id, Double> times = timess.get(Period.getPeriod(startTime));
+				if(times!=null) {
+					Double time = times.get(destinationId);
+					if(time!=null)
+						return time;
+				}
+			}
+			return -1;
 		}
 		
 	}
@@ -71,20 +91,26 @@ public abstract class PlaceSharer {
 	public void addKnownPerson(PlaceSharer placeSharer) {
 		knownPeople.add(placeSharer);
 	}
+	public Collection<KnownPlace> getKnownPlaces() {
+		return knownPlaces.values();
+	}
+	public KnownPlace getKnownPlace(Id facilityId) {
+		return knownPlaces.get(facilityId);
+	}
 	public void addKnownPlace(Id facilityId, double startTime, String typeOfActivity) {
 		KnownPlace knownPlace = knownPlaces.get(facilityId);
 		if(knownPlace==null) {
 			knownPlace = new KnownPlace(facilityId);
 			knownPlaces.put(facilityId, knownPlace);
 		}
-		Collection<String> types = knownPlace.timeTypes.get(Period.getPeriod(startTime));
+		Set<String> types = knownPlace.timeTypes.get(Period.getPeriod(startTime));
 		if(types==null) {
-			types = new ArrayList<String>();
+			types = new HashSet<String>();
 			knownPlace.timeTypes.put(Period.getPeriod(startTime), types);
 		}
 		types.add(typeOfActivity);
 	}
-	public void addKnownTravelTime(Id oFacilityId, Id dFacilityId, double startTime, double travelTime) {
+	public void addKnownTravelTime(Id oFacilityId, Id dFacilityId, String mode, double startTime, double travelTime) {
 		KnownPlace knownPlaceO = knownPlaces.get(oFacilityId);
 		if(knownPlaceO==null) {
 			knownPlaceO = new KnownPlace(oFacilityId);
@@ -95,10 +121,15 @@ public abstract class PlaceSharer {
 			knownPlaceD = new KnownPlace(dFacilityId);
 			knownPlaces.put(dFacilityId, knownPlaceD);
 		}
-		Map<Id, Double> times = knownPlaceO.travelTimes.get(Period.getPeriod(startTime));
+		SortedMap<Period, Map<Id, Double>> timess = knownPlaceO.travelTimes.get(mode);
+		if(timess==null) {
+			timess = new TreeMap<PlaceSharer.Period, Map<Id,Double>>();
+			knownPlaceO.travelTimes.put(mode, timess);
+		}
+		Map<Id, Double> times = timess.get(Period.getPeriod(startTime));
 		if(times==null) {
 			times = new ConcurrentHashMap<Id, Double>();
-			knownPlaceO.travelTimes.put(Period.getPeriod(startTime), times);
+			timess.put(Period.getPeriod(startTime), times);
 		}
 		times.put(dFacilityId, travelTime);
 	}
@@ -106,9 +137,9 @@ public abstract class PlaceSharer {
 		for(PlaceSharer placeSharer:knownPeople)
 			placeSharer.addKnownPlace(facilityId, startTime, type);
 	}
-	public void shareKnownTravelTime(Id oFacilityId, Id dFacilityId, double startTime, double travelTime) {
+	public void shareKnownTravelTime(Id oFacilityId, Id dFacilityId, String mode, double startTime, double travelTime) {
 		for(PlaceSharer placeSharer:knownPeople)
-			placeSharer.addKnownTravelTime(oFacilityId, dFacilityId, startTime, travelTime);
+			placeSharer.addKnownTravelTime(oFacilityId, dFacilityId, mode, startTime, travelTime);
 	}
 
 }

@@ -55,7 +55,7 @@ public class PointsPersonPainter extends Painter {
 	public void paint(Graphics2D g2, LayersPanel layersPanel) {
 		double maxSize = 10;
 		for(PointPerson point:points)
-			paintCircle(g2, layersPanel, new CoordImpl(point.getElement(0),point.getElement(1)), (point.getWeight()*Math.random())*maxSize/(maxWeight-minWeight), color);
+			paintCircle(g2, layersPanel, new CoordImpl(point.getElement(0),point.getElement(1)), (int)((point.getWeight()*Math.random())*maxSize/(maxWeight-minWeight)), color);
 	}
 
 }

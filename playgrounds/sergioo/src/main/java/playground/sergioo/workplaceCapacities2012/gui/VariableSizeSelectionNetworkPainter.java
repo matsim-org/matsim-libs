@@ -103,7 +103,7 @@ public class VariableSizeSelectionNetworkPainter extends NetworkPainter {
 				Double weight = linkWeights.get(link.getId());
 				if(weight!=null && weight>min) {
 					float proportion = (float)((weight-minLinkWeight)/(maxLinkWeight-minLinkWeight));
-					paintCircle(g2, layersPanel, link.getToNode().getCoord(), proportion*maxSize, JetColor.getJetColor(proportion, 127));
+					paintCircle(g2, layersPanel, link.getToNode().getCoord(), (int)(proportion*maxSize), JetColor.getJetColor(proportion, 127));
 				}
 			}
 			for(Node node:networkPainterManager.getSelectedNodes())

@@ -2,12 +2,12 @@ package playground.sergioo.singapore2012.transitLocationChoice;
 
 import java.util.HashSet;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.contrib.locationchoice.DestinationChoice;
-import org.matsim.core.controler.Controler;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.network.algorithms.TransportModeNetworkFilter;
 import org.matsim.core.replanning.PlanStrategy;
@@ -24,26 +24,26 @@ public class TransitLocationChoiceStrategy implements PlanStrategy {
 	
 	private PlanStrategyImpl delegate;
 	
-	public TransitLocationChoiceStrategy(final Controler controler) {
-		String planSelector = controler.getConfig().locationchoice().getPlanSelector();
+	public TransitLocationChoiceStrategy(final Scenario scenario) {
+		String planSelector = scenario.getConfig().locationchoice().getPlanSelector();
 		if (planSelector.equals("BestScore")) {
 			delegate = new PlanStrategyImpl(new BestPlanSelector());
 		} else if (planSelector.equals("ChangeExpBeta")) {
-			delegate = new PlanStrategyImpl(new ExpBetaPlanChanger(controler.getConfig().planCalcScore().getBrainExpBeta()));
+			delegate = new PlanStrategyImpl(new ExpBetaPlanChanger(scenario.getConfig().planCalcScore().getBrainExpBeta()));
 		} else if (planSelector.equals("SelectRandom")) {
 			delegate = new PlanStrategyImpl(new RandomPlanSelector());
 		} else {
-			delegate = new PlanStrategyImpl(new ExpBetaPlanSelector(controler.getConfig().planCalcScore()));
+			delegate = new PlanStrategyImpl(new ExpBetaPlanSelector(scenario.getConfig().planCalcScore()));
 		}
-		addStrategyModule(new TransitActsRemoverStrategy(controler.getConfig()));
-		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(controler.getNetwork());
+		addStrategyModule(new TransitActsRemoverStrategy(scenario.getConfig()));
+		TransportModeNetworkFilter filter = new TransportModeNetworkFilter(scenario.getNetwork());
 		Network net = NetworkImpl.createNetwork();
 		HashSet<String> modes = new HashSet<String>();
 		modes.add(TransportMode.car);
 		filter.filter(net, modes);
-		addStrategyModule(new DestinationChoice(controler.getScenario()));
-		addStrategyModule(new TimeAllocationMutator(controler.getConfig()));
-		addStrategyModule(new ReRoute(controler.getScenario()));
+		addStrategyModule(new DestinationChoice(scenario));
+		addStrategyModule(new TimeAllocationMutator(scenario.getConfig()));
+		addStrategyModule(new ReRoute(scenario));
 	}
 	
 	public void addStrategyModule(PlanStrategyModule module) {

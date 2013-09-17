@@ -1,9 +1,7 @@
 package playground.sergioo.passivePlanning2012.core.population.decisionMakers;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
@@ -64,12 +62,10 @@ public class SocialDecisionMaker extends PlaceSharer implements EndTimeDecisionM
 			//Known places
 			while(options.size()==0) {
 				for(KnownPlace knownPlace:knownPlaces.values()) {
-					ActivityFacility facility = scenario.getActivityFacilities().getFacilities().get(knownPlace.facilityId);
+					ActivityFacility facility = scenario.getActivityFacilities().getFacilities().get(knownPlace.getFacilityId());
 					if(CoordUtils.calcDistance(location, facility.getCoord())<maximumDistance)
-						for(Entry<Period, Collection<String>> types:knownPlace.timeTypes.entrySet())
-							if(Period.getPeriod(time).equals(types.getKey()))
-								for(String type:types.getValue())
-									options.add(new Tuple<String, Id>(type, knownPlace.facilityId));
+						for(String type:knownPlace.getActivityTypes(time))
+							options.add(new Tuple<String, Id>(type, knownPlace.getFacilityId()));
 				}
 				maximumDistance *= 2;
 			}

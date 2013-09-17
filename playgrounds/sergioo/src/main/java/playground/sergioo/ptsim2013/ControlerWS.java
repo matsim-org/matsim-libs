@@ -64,8 +64,7 @@ public class ControlerWS {
 		controler.getEvents().addHandler(waitTimeCalculator);
 		StopStopTimeCalculator stopStopTimeCalculator = new StopStopTimeCalculator(controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().getQSimConfigGroup().getEndTime()-controler.getConfig().getQSimConfigGroup().getStartTime()));
 		controler.getEvents().addHandler(stopStopTimeCalculator);
-		TransitRouterWSImplFactory factory = new TransitRouterWSImplFactory(controler.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes());
-		controler.setTransitRouterFactory(factory);
+		controler.setTransitRouterFactory(new TransitRouterWSImplFactory(controler.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
 		controler.run();
 	}
 	

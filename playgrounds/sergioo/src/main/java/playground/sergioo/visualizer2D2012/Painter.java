@@ -24,13 +24,65 @@ public abstract class Painter {
 		int[] screenPointB = layersPanel.getScreenXY(pointB);
 		g2.drawLine(screenPointA[0], screenPointA[1],screenPointB[0],screenPointB[1]);
 	}
-	protected void paintCircle(Graphics2D g2, LayersPanel layersPanel, Coord coord, double pointSize, Color color) {
+	protected void paintCircle(Graphics2D g2, LayersPanel layersPanel, Coord coord, int pointSize, Color color) {
 		g2.setColor(color);
 		int[] screenPoint = layersPanel.getScreenXY(new double[]{coord.getX(), coord.getY()});
 		Shape circle = new Ellipse2D.Double(screenPoint[0]-pointSize,screenPoint[1]-pointSize,pointSize*2,pointSize*2);
 		g2.fill(circle);
-		g2.setColor(Color.DARK_GRAY);
+		
+	}
+	protected void paintCircumference(Graphics2D g2, LayersPanel layersPanel, Coord coord, int pointSize, Color color) {
+		g2.setColor(color);
+		int[] screenPoint = layersPanel.getScreenXY(new double[]{coord.getX(), coord.getY()});
+		Shape circle = new Ellipse2D.Double(screenPoint[0]-pointSize,screenPoint[1]-pointSize,pointSize*2,pointSize*2);
 		g2.draw(circle);
+	}
+	protected void paintCircularRegion(Graphics2D g2, LayersPanel layersPanel, Coord coord, int pointSize, double initialAngle, double finalAngle, Color color) {
+		int numPoints = 50;
+		g2.setColor(color);
+		if(initialAngle>finalAngle) {
+			double angle = initialAngle;
+			initialAngle = finalAngle;
+			finalAngle = angle;
+		}
+		int[] screenPoint = layersPanel.getScreenXY(new double[]{coord.getX(), coord.getY()});
+		int[] x = new int[numPoints+1];
+		int[] y = new int[numPoints+1];
+		double diff = (finalAngle-initialAngle)/(numPoints-1);
+		for(int i=0; i<numPoints; i++) {
+			double angle = initialAngle + i*diff;
+			x[i] = screenPoint[0] + (int) (pointSize*Math.cos(angle));
+			y[i] = screenPoint[1] - (int) (pointSize*Math.sin(angle));
+		}
+		x[numPoints] = screenPoint[0];
+		y[numPoints] = screenPoint[1];
+		Shape region = new Polygon(x, y, numPoints+1);
+		g2.fill(region);
+		g2.setColor(new Color(color.getRed()/2,color.getGreen()/2,color.getBlue()/2));
+		g2.draw(region);
+	}
+	protected void paintCircularRegion(Graphics2D g2, LayersPanel layersPanel, Coord coord, int pointSize, double initialAngle, double finalAngle, int numPoints, Color color) {
+		g2.setColor(color);
+		if(initialAngle>finalAngle) {
+			double angle = initialAngle;
+			initialAngle = finalAngle;
+			finalAngle = angle;
+		}
+		int[] x = new int[numPoints+1];
+		int[] y = new int[numPoints+1];
+		double diff = (finalAngle-initialAngle)/(numPoints-1);
+		for(int i=0; i<numPoints; i++) {
+			double angle = initialAngle + i*diff;
+			x[i] = (int) (pointSize*Math.cos(angle));
+			y[i] = (int) (-pointSize*Math.sin(angle));
+		}
+		int[] screenPoint = layersPanel.getScreenXY(new double[]{coord.getX(), coord.getY()});
+		x[numPoints] = screenPoint[0];
+		y[numPoints] = screenPoint[1];
+		Shape region = new Polygon(x, y, numPoints+1);
+		g2.fill(region);
+		g2.setColor(new Color(color.getRed()/2,color.getGreen()/2,color.getBlue()/2));
+		g2.draw(region);
 	}
 	protected void paintCross(Graphics2D g2, LayersPanel layersPanel, Coord coord, double pointSize, Color color) {
 		Stroke stroke= g2.getStroke();

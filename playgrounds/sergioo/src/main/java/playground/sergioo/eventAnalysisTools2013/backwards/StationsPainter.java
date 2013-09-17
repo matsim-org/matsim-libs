@@ -1,4 +1,4 @@
-package playground.sergioo.eventAnalysisTools2012.backwards;
+package playground.sergioo.eventAnalysisTools2013.backwards;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -37,7 +37,7 @@ public class StationsPainter extends Painter {
 	public void paint(Graphics2D g2, LayersPanel layersPanel) {
 		for(Entry<Coord, Double> point:points.entrySet()) {
 			paintCross(g2, layersPanel, point.getKey(), 3, color);
-			paintCircle(g2, layersPanel, point.getKey(), Math.sqrt(point.getValue())*scale, color);
+			paintCircle(g2, layersPanel, point.getKey(), (int)(Math.sqrt(point.getValue())*scale), color);
 		}
 	}
 

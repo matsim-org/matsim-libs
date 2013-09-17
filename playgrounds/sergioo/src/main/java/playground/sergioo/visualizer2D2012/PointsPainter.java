@@ -52,7 +52,7 @@ public class PointsPainter extends Painter {
 	public void paint(Graphics2D g2, LayersPanel layersPanel) {
 		if(type.equals(TypePoint.O))
 			for(Coord point:points)
-				paintCircle(g2, layersPanel, point, pointSize, color);
+				paintCircle(g2, layersPanel, point, (int)pointSize, color);
 		else
 			for(Coord point:points)
 				paintX(g2, layersPanel, point, pointSize, color);

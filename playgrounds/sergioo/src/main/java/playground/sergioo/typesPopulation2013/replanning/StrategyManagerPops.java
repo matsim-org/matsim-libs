@@ -35,7 +35,7 @@ public class StrategyManagerPops extends StrategyManager {
 	public PlanStrategy chooseStrategy(final Person person) {
 		double rnd = MatsimRandom.getRandom().nextDouble() * this.totalWeights.get(((PersonImplPops)person).getPopulationId());
 		double sum = 0.0;
-		for (int i = 0, max = this.weights.size(); i < max; i++) {
+		for (int i = 0, max = this.weights.get(((PersonImplPops)person).getPopulationId()).size(); i < max; i++) {
 			sum += this.weights.get(((PersonImplPops)person).getPopulationId()).get(i).doubleValue();
 			if (rnd <= sum) {
 				return this.strategies.get(((PersonImplPops)person).getPopulationId()).get(i);

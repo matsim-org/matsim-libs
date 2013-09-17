@@ -45,6 +45,9 @@ public class Agenda {
 		public Distribution getDuration() {
 			return duration;
 		}
+		public void substractCurrentPerformedTime(double duration2) {
+			this.currentPerformedTime -= currentPerformedTime;
+		}
 		
 	}
 	
@@ -52,7 +55,12 @@ public class Agenda {
 	private final Map<String, AgendaElement> elements = new HashMap<String, AgendaElement>();
 	
 	//Methods
-	public void addElement(AgendaElement element) {
+	public void addElement(String type, Distribution numHourWeek, Distribution duration) {
+		AgendaElement element = new AgendaElement(type, numHourWeek, duration); 
+		elements.put(element.getType(), element);
+	}
+	public void addElement(String type, double meanNumHourWeek, double sdNumHourWeek, double meanDuration, double sdDuration) {
+		AgendaElement element = new AgendaElement(type, meanNumHourWeek, sdNumHourWeek, meanDuration, sdDuration); 
 		elements.put(element.getType(), element);
 	}
 	public Map<String, AgendaElement> getElements() {

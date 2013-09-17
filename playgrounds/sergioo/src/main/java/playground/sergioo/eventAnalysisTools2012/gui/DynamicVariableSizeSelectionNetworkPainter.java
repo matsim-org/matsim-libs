@@ -123,7 +123,7 @@ public class DynamicVariableSizeSelectionNetworkPainter extends DynamicNetworkPa
 				Double weight = weights.get(link.getId());
 				if(weight!=null && weight>min) {
 					float proportion = (float)((weight-minLinkWeight)/(maxLinkWeight-minLinkWeight));
-					paintCircle(g2, layersPanel, link.getToNode().getCoord(), proportion*maxSize, JetColor.getJetColor(proportion, 0.5f));
+					paintCircle(g2, layersPanel, link.getToNode().getCoord(), (int)(proportion*maxSize), JetColor.getJetColor(proportion, 0.5f));
 				}
 			}
 			for(Node node:dynamicNetworkPainterManager.getSelectedNodes())
