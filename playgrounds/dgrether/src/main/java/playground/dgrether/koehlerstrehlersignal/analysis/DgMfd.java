@@ -56,14 +56,16 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Agen
 	
 	private Map<Id, Double> firstTimeSeenMap = new HashMap<Id, Double>();
 	private Map<Id, LinkLeaveEvent> lastTimeSeenMap = new HashMap<Id, LinkLeaveEvent>();
+	private Map<Id, LinkEnterEvent> enterEventByPersonIdMap = new HashMap<Id, LinkEnterEvent>();
 	private Network network;
 	private double networkLengthKm;
-	private Data data = new Data();
+	private Data data;
 
 	
 	public DgMfd(Network network){
 		this.network = network;
 		this.networkLengthKm =  this.calcNetworkLengthKm();
+		this.data = new Data(networkLengthKm);
 	}
 
 	@Override
@@ -80,7 +82,8 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Agen
 		if (this.network.getLinks().containsKey(event.getLinkId())) {
 			if (! personIdAlreadySeen) {
 				this.firstTimeSeenMap.put(event.getPersonId(), event.getTime());
-			} 
+			}
+			this.enterEventByPersonIdMap.put(event.getPersonId(), event);
 		}
 		else {
 			if (personIdAlreadySeen){
@@ -98,8 +101,16 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Agen
 
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
-		if (this.network.getLinks().containsKey(event.getLinkId())) {
+		Link link = this.network.getLinks().get(event.getLinkId());
+		if (link != null) {
 			this.lastTimeSeenMap.put(event.getPersonId(), event);
+			int slot = this.getBinIndex(event.getTime());
+			this.data.incrementFlow(slot, link);
+			LinkEnterEvent enterEvent = this.enterEventByPersonIdMap.get(event.getPersonId());
+			if (enterEvent != null) {
+				double velocity = link.getLength() / (event.getTime() - enterEvent.getTime());
+				this.data.addVelocity(slot, link, velocity);
+			}
 		}
 	}
 	
@@ -158,27 +169,34 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Agen
 		stream.close();
 	}
 	
+	public void completedEventsHandling() {
+		this.data.completedEventsHandling();
+	}
+	
 	public void write(final PrintStream stream) {
-		String header  = "slot\ttime[s]\thour\tdepartures\tarrivals\ten-route\tdensity[veh/km]\tnetworkLength[km]";
+		String header  = "slot\ttime[s]\thour\tdepartures\tarrivals\ten-route\tdensity[veh/km]\tspaceMeanFlow\tspaceMeanSpeed\tnetworkLength[km]";
 		stream.println(header);
 		double density = 0.0;
 		Integer arnew = 0;
 		Integer depnew = 0;
 		double noVehicles = 0;
 		for (int slot = this.data.getFirstSlot() - 2; slot <= this.data.getLastSlot() + 2; slot++) {
-			arnew = this.data.getArrivalsBySlot().get(slot);
-			if (arnew == null) {
-				arnew = 0;
+			SlotData slotData = this.data.getSlotData().get(slot);
+			if (slotData == null) {
+				slotData = new SlotData();
 			}
-			depnew = this.data.getDeparturesBySlot().get(slot);
-			if (depnew == null) {
-				depnew = 0;
-			}
+			arnew = slotData.arrivals;
+//			if (arnew == null) {
+//				arnew = 0;
+//			}
+			depnew = slotData.departures;
+//			if (depnew == null) {
+//				depnew = 0;
+//			}
 			noVehicles = noVehicles + depnew - arnew ;
 			density = (noVehicles) / this.networkLengthKm;
 			double timeSec = slot * binSizeSeconds;
 			int hour = (int) (timeSec / 3600);	
-			
 			StringBuffer line = new StringBuffer();
 			line.append(slot);
 			line.append("\t");
@@ -194,21 +212,83 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Agen
 			line.append("\t");
 			line.append(density);
 			line.append("\t");
+			line.append(slotData.spaceMeanFlow);
+			line.append("\t");
+			line.append(slotData.spaceMeanSpeed);
+			line.append("\t");
 			line.append(networkLengthKm);
 			
 			stream.println(line.toString());
 		}
 	}
+
+	
+	private static class SlotData {
+		Integer arrivals = 0;
+		Integer departures = 0;
+		Double spaceMeanSpeed = 0.0;
+		Double spaceMeanFlow = 0.0;
+	}
 	
 	private static class Data {
 		
-		private SortedMap<Integer, Integer> arrivalsBySlot = new TreeMap<Integer, Integer>();
-		private SortedMap<Integer, Integer> departuresBySlot = new TreeMap<Integer, Integer>();
-		Integer firstSlot = null;
-		Integer lastSlot = null;
+//		private SortedMap<Integer, Integer> arrivalsBySlot = new TreeMap<Integer, Integer>();
+//		private SortedMap<Integer, Integer> departuresBySlot = new TreeMap<Integer, Integer>();
+		private SortedMap<Integer, LinksData> linksBySlot = new TreeMap<Integer, LinksData>();
+		private SortedMap<Integer, SlotData> dataBySlot = new TreeMap<Integer, SlotData>();
+		private Integer firstSlot = null;
+		private Integer lastSlot = null;
+		private double networkLengthKm;
 		
-		public Data() {}
+		
+		public Data(double networkLengthKm) {
+			this.networkLengthKm = networkLengthKm;
+		}
 
+		public void completedEventsHandling() {
+			for (int slot = getFirstSlot(); slot <= getLastSlot(); slot++) {
+				SlotData slotData = this.getSlotData().get(slot);
+				if (slotData == null) {
+					slotData = new SlotData();
+					this.getSlotData().put(slot, slotData);
+				}
+				double spaceMeanSpeed = this.calcSpaceMeanSpeed(slot);
+				double spaceMeanFlow = this.calcSpaceMeanFlow(slot);
+				slotData.spaceMeanFlow = spaceMeanFlow;
+				slotData.spaceMeanSpeed = spaceMeanSpeed;
+			}
+			linksBySlot.clear();
+		}
+
+		private double calcSpaceMeanSpeed(int slot) {
+			LinksData linksData = getLinksDataBySlot().get(slot);
+			double sum = 0.0;
+			if (linksData != null) {
+				for (LinkData ld : linksData.linkData.values()){
+					if (ld.velocitySum > 0.0) {
+//						sum += ld.velocitySum / ld.velocityCount;
+						sum += (ld.velocityCount / ld.velocitySum);
+					}
+				}
+				sum = sum / linksData.linkData.values().size();
+			}
+			return sum;
+		}
+
+		private double calcSpaceMeanFlow(int slot) {
+			LinksData linksData = getLinksDataBySlot().get(slot);
+			double sum = 0.0;
+			if (linksData != null) {
+				for (LinkData ld : linksData.linkData.values()){
+					double lengthMeter = ld.link.getLength() * ld.link.getNumberOfLanes();
+					sum += ld.flow * lengthMeter;
+				}
+				return sum / (networkLengthKm  * 1000.0);
+			}
+			return 0.0;
+		}
+
+		
 		public Integer getFirstSlot(){
 			return firstSlot;
 		}
@@ -224,43 +304,94 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Agen
 			if (lastSlot == null ||  slot > lastSlot) {
 				lastSlot = slot;
 			}
-		}
-		
-		public void incrementArrivals(Integer slot){
-			if (! this.arrivalsBySlot.containsKey(slot)){
-				this.arrivalsBySlot.put(slot, 0);
+			if (! this.dataBySlot.containsKey(slot)) {
+				this.dataBySlot.put(slot, new SlotData());
 			}
-			this.arrivalsBySlot.put(slot, (this.arrivalsBySlot.get(slot) + 1));
+
+		}
+		public void incrementArrivals(Integer slot){
 			this.checkSlot(slot);
+			this.dataBySlot.get(slot).arrivals++;
 		}
 		
 		public void incrementDepartures(Integer slot) {
-			if (! this.departuresBySlot.containsKey(slot)){
-				this.departuresBySlot.put(slot, 0);
-			}
-			this.departuresBySlot.put(slot, (this.departuresBySlot.get(slot) + 1));
 			this.checkSlot(slot);
+			this.dataBySlot.get(slot).departures++;
 		}
 		
+		public void incrementFlow(Integer slot, Link l){
+			this.checkSlot(slot);
+			this.checkLinkData(slot, l);
+			this.linksBySlot.get(slot).incrementFlow(l);
+		}
+
+		public void addVelocity(Integer slot, Link l, double v) {
+			this.checkSlot(slot);
+			this.checkLinkData(slot, l);
+			this.linksBySlot.get(slot).addVelocity(l, v);
+		}
+
+		private void checkLinkData(Integer slot, Link l) {
+			if (! this.linksBySlot.containsKey(slot)){
+				this.linksBySlot.put(slot, new LinksData());
+			}
+		}
+		
+		
 		public void reset(){
-			this.arrivalsBySlot.clear();
-			this.departuresBySlot.clear();
+			this.linksBySlot.clear();
 			this.lastSlot = null;
 			this.firstSlot = null;
 		}
 
 		
-		public Map<Integer, Integer> getArrivalsBySlot() {
-			return arrivalsBySlot;
+		
+		public SortedMap<Integer, SlotData> getSlotData() {
+			return this.dataBySlot;
 		}
 
-		
-		public Map<Integer, Integer> getDeparturesBySlot() {
-			return departuresBySlot;
+		public Map<Integer, LinksData> getLinksDataBySlot(){
+			return this.linksBySlot;
 		}
 		
 	}
 	
+	private static class LinkData {
+		Link link;
+		Double flow = null;
+		Double velocitySum = null;
+		Double velocityCount = null;
+		
+		public LinkData(Link l) {
+			link = l;
+			flow = 0.0;
+			velocitySum = 0.0;
+			velocityCount = 0.0;
+		}
+		
+	}
 	
+	private static class LinksData {
+
+		private Map<Id, LinkData> linkData = new HashMap<Id, LinkData>();
+		
+		public void incrementFlow(Link l) {
+			this.checkLinkData(l);
+			linkData.get(l.getId()).flow++;
+		}
+
+		public void addVelocity(Link l, double v) {
+			this.checkLinkData(l);
+			linkData.get(l.getId()).velocitySum += (1/v);
+			linkData.get(l.getId()).velocityCount++;
+		}
+		
+		private void checkLinkData(Link l){
+			if (! linkData.containsKey(l.getId())){
+				linkData.put(l.getId(), new LinkData(l));
+			}
+		}
+		
+	}
 
 }

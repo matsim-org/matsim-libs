@@ -75,7 +75,7 @@ public class Cottbus2KS2010 {
 		double minCommodityFlow = 10.0;
 		//		String name = "run run1722 output plans between 05:30 and 09:30";
 		String name = "run run1722 output plans between 13:30 and 18:30";
-		final String outputDirectory = DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-08-14_test/";
+		final String outputDirectory = DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-09-09_test/";
 		String ksModelOutputFilename = "ks2010_model_";
 		ksModelOutputFilename += Double.toString(minCommodityFlow) + "_" + Double.toString(startTime) + ".xml";
 				

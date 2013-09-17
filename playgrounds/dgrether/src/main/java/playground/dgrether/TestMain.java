@@ -61,14 +61,23 @@ public class TestMain {
 		test2 = test.replaceAll("%", Matcher.quoteReplacement("\\%"));
 		System.out.println(test2);
 	}
+	
+	private static void testRound(){
+		double d = 0.5;
+		System.out.println(Math.round(d));
+		d = -0.5;
+		System.out.println(Math.round(d));
+	}
 
 	public static void main(String[] args){
 		String config = "/media/data/work/matsim/examples/stephan_rath/testcase3/config.xml";
 //		Controler c = new Controler(config);
 //		c.run();
 //		OTFVis.playConfig(config);
-		testNumberFormat();
+//		testNumberFormat();
 //		testReplaceAll();
+		testRound();
+		
 	}
 
 
