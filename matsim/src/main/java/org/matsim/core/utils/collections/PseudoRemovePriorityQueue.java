@@ -45,7 +45,7 @@ import java.util.PriorityQueue;
  *
  * @author mrieser
  */
-public class PseudoRemovePriorityQueue<E> {
+public class PseudoRemovePriorityQueue<E> implements RouterPriorityQueue<E> {
 
 	private final PriorityQueue<PseudoEntry<E>> delegate;
 	/*package*/ final Map<E, PseudoEntry<E>> lastEntry;
@@ -62,6 +62,7 @@ public class PseudoRemovePriorityQueue<E> {
 	 * @param priority
 	 * @return <tt>true</tt> if the element was added to the collection.
 	 */
+	@Override
 	public boolean add(final E o, final double priority) {
 		if (o == null) {
       throw new NullPointerException();
@@ -78,12 +79,13 @@ public class PseudoRemovePriorityQueue<E> {
 	}
 
 	/**
-   * Retrieves and removes the head of this queue, or <tt>null</tt>
-   * if this queue is empty.
-   *
-   * @return the head of this queue, or <tt>null</tt> if this
-   *         queue is empty.
-   */
+	 * Retrieves and removes the head of this queue, or <tt>null</tt>
+	 * if this queue is empty.
+	 *
+	 * @return the head of this queue, or <tt>null</tt> if this
+	 *         queue is empty.
+	 */
+	@Override
 	public E poll() {
 		PseudoEntry<E> entry = this.delegate.poll();
 		while ((entry != null) && (!entry.valid)) {
@@ -97,12 +99,13 @@ public class PseudoRemovePriorityQueue<E> {
 	}
 
 	/**
-   * Removes a single instance of the specified element from this
-   * queue, if it is present.
-   *
-   * @return <tt>true</tt> if the queue contained the specified
-   *         element.
-   */
+	 * Removes a single instance of the specified element from this
+	 * queue, if it is present.
+	 *
+	 * @return <tt>true</tt> if the queue contained the specified
+	 *         element.
+	 */
+	@Override
 	public boolean remove(final E o) {
 		PseudoEntry<E> entry = this.lastEntry.remove(o);
 		if ((entry != null) && (entry.valid)) {
@@ -113,16 +116,51 @@ public class PseudoRemovePriorityQueue<E> {
 	}
 
 	/**
-   * Returns the number of elements in this priority queue.  If the collection
-   * contains more than <tt>Integer.MAX_VALUE</tt> elements, returns
-   * <tt>Integer.MAX_VALUE</tt>.
-   *
-   * @return the number of elements in this collection.
-   */
+	 * Returns the number of elements in this priority queue.  If the collection
+	 * contains more than <tt>Integer.MAX_VALUE</tt> elements, returns
+	 * <tt>Integer.MAX_VALUE</tt>.
+	 *
+	 * @return the number of elements in this collection.
+	 */
+	@Override
 	public int size() {
     return this.lastEntry.size();
 	}
 
+	@Override
+	public E peek() {
+		PseudoEntry<E> entry = this.delegate.peek();
+		while ((entry != null) && (!entry.valid)) {
+			this.delegate.poll();
+			entry = this.delegate.peek();
+		}
+		if (entry == null) {
+			return null;
+		}
+		return entry.value;
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return this.lastEntry.isEmpty();
+	}
+
+	@Override
+	public boolean decreaseKey(E value, double priority) {
+		/*
+		 * PriorityQueue does not support decreaseKey method. Therefore remove and re-add
+		 * the object.
+		 */
+		this.remove(value);
+		return this.add(value, priority);
+	}
+
+	@Override
+	public void reset() {
+		this.delegate.clear();
+		this.lastEntry.clear();
+	}
+	
 	/**
 	 * Returns an iterator over the elements in this queue. The iterator
 	 * does not return the elements in any particular order. Removing
@@ -130,6 +168,7 @@ public class PseudoRemovePriorityQueue<E> {
 	 *
 	 * @return an iterator over the elements in this queue.
 	 */
+	@Override
 	public Iterator<E> iterator() {
 		return new Iterator<E>() {
 
@@ -170,4 +209,5 @@ public class PseudoRemovePriorityQueue<E> {
 			return Double.compare(o1.priority, o2.priority);
 		}
 	}
+
 }

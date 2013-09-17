@@ -266,6 +266,59 @@ public class PseudoRemovePriorityQueueTest extends TestCase {
 		assertNull(pq.poll());
 	}
 
+	public void testDecreaseKey() {
+//		PseudoRemovePriorityQueue<Integer> pq = new PseudoRemovePriorityQueue<Integer>(10);
+//		pq.add(Integer.valueOf(5), 5.0);
+//		pq.add(Integer.valueOf(3), 3.0);
+//		pq.add(Integer.valueOf(6), 6.0);
+//
+//		assertEquals(3, pq.size());
+//
+//		// test removing an element and adding it with higher priority (=lower value)
+////		pq.remove(Integer.valueOf(5));
+////		assertEquals(2, pq.size());
+////		pq.add(Integer.valueOf(5), 2.5);
+//		pq.decreaseKey(Integer.valueOf(5), 2.5);
+//		assertEquals(3, pq.size());
+//		assertEquals(Integer.valueOf(5), pq.poll());
+//		assertEquals(Integer.valueOf(3), pq.poll());
+//		assertEquals(Integer.valueOf(6), pq.poll());
+//		assertNull(pq.poll());
+		
+		PseudoRemovePriorityQueue<Integer> pq = new PseudoRemovePriorityQueue<Integer>(10);
+		Integer entry0 = new Integer(5);
+		Integer entry1 = new Integer(3);
+		Integer entry2 = new Integer(6);
+		pq.add(entry0, 5.0);
+		pq.add(entry1, 3.0);
+		pq.add(entry2, 6.0);
+
+		assertEquals(3, pq.size());
+
+		// test decreasing an element by increasing priority (=lower value)
+		pq.decreaseKey(entry0, 2);
+		assertEquals(3, pq.size());
+		assertEquals(entry0, pq.poll());
+		assertEquals(entry1, pq.poll());
+		assertEquals(entry2, pq.poll());
+		assertNull(pq.poll());
+		
+		/*
+		 * Add two elements with the same priority, then add one with a
+		 * lower priority and increase its priority. 
+		 */
+		pq.add(entry0, 5.0);
+		pq.add(entry1, 5.0);
+		pq.add(entry2, 6.0);
+		assertEquals(3, pq.size());
+		pq.decreaseKey(entry2, 4.0);
+		assertEquals(3, pq.size());
+		assertEquals(entry2, pq.poll());
+		assertEquals(entry1, pq.poll());
+		assertEquals(entry0, pq.poll());
+		assertNull(pq.poll());
+	}
+	
 	private int iteratorElementCount(final Iterator<?> iterator) {
 		int cnt = 0;
 		while (iterator.hasNext()) {
