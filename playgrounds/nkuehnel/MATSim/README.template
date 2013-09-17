@@ -1,0 +1,95 @@
+README 
+======
+
+This is a template project structure for a JOSM plugin.
+
+Layout
+======
++--- src                                source of your plugin
+  |- images                             images your plugin needs
+  |- resources                          resources your plugin needs
+
+  README                                README for your plugin
+
+  GPL-v2.0.txt                          GPL version 2 license text
+  GPL-v3.0.txt                          GPL version 3 license text
+  
+  README.template                       this file 
+  
+  
+Build
+=====  
+A JOSM plugin is built as a single jar. We use ant to build.
+
+See build.xml in this directory and update the plugin specific properties in the
+configuration section.
+
+To get an command overview run
+    > ant help
+
+To build the plugin run
+    > ant  dist
+
+To install the generated plugin locally (in you default plugin directory) run
+    > ant  install
+
+The generated plugin jar is not automatically available in JOSMs plugin configuration
+dialog. You have to check it in first.
+
+Use the ant target 'publish' to check in the plugin and make it available to other
+JOSM users:
+    set the properties commit.message and plugin.main.version
+and run
+    > ant  publish
+
+Maintaining versions
+====================
+There are two versions maintained with each plugin:
+   1) the main version
+      This is the lowest JOSM version required by this plugin.
+      You have to manually set the plugins main version in the build script.
+      Set the property plugin.main.version in build.xml accordingly. 
+
+   2) the build version
+      The build version is unique for every build of the plugin. It is equal
+      to the SVN revision of your plugin directory. 
+
+ Both the main version and the build version are included in properties of the plugins
+ manifest:
+    Plugin-Version      the build version
+    Plugin-Mainversion  the main version
+
+ JOSM automatically detects whether a plugin needs to be upgraded. It compares the build
+ version of the currently installed plugin jar with the build version of the plugin jar in 
+ the SVN. The main version is irrelevant for this process.  
+ 
+ Making your plugin available to JOSM users
+ ===========================================
+ When a plugin jar is checked into SVN a script updates the plugins list on the JOSM wiki:
+   http://josm.openstreetmap.de/wiki/Plugins
+ JOSM retrieves the list of available plugins and their build versions from this list.
+
+            commit      publish               read
+                       meta data              meta data 
+      Build  ==>  SVN  =======>  JOSM Wiki   <======= JOSM 
+                   ^ 
+                   ==================================
+                            fetch current plugin jar 
+ 
+ Note that you have to manually publish (commit) your plugin jar. There is no nightly build
+ in place. Everything else (pulishing meta data, updating plugins in the client) is then handled 
+ by automatic processes. 
+
+See also
+========
+* Developing Plugins 
+  http://josm.openstreetmap.de/wiki/DevelopersGuide/DevelopingPlugins
+  
+* List of JOSM Plugins
+  http://josm.openstreetmap.de/wiki/Plugins
+  
+  
+ 
+     
+
+ 
