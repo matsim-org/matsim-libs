@@ -32,6 +32,7 @@ import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
+import org.matsim.core.utils.collections.RouterPriorityQueue;
 import org.matsim.vehicles.Vehicle;
 
 
@@ -126,7 +127,7 @@ public class BackwardDijkstraMultipleDestinations extends Dijkstra {
 	}
 
 	@Override
-	protected void relaxNode(final Node outNode, final Node toNode, final PseudoRemovePriorityQueue<Node> pendingNodes) {
+	protected void relaxNode(final Node outNode, final Node toNode, final RouterPriorityQueue<Node> pendingNodes) {
 
 		DijkstraNodeData outData = getData(outNode);
 		double currTime = outData.getTime();
@@ -168,7 +169,7 @@ public class BackwardDijkstraMultipleDestinations extends Dijkstra {
 
 	@Override
 	protected boolean addToPendingNodes(final Link l, final Node n,
-			final PseudoRemovePriorityQueue<Node> pendingNodes, double currTime,
+			final RouterPriorityQueue<Node> pendingNodes, double currTime,
 			final double currCost, final Node toNode) {
 
 		// bw: travel time has to be negative while costs are still positive
@@ -207,7 +208,7 @@ public class BackwardDijkstraMultipleDestinations extends Dijkstra {
 
 	@Override
 	protected void visitNode(final Node n, final DijkstraNodeData data,
-			final PseudoRemovePriorityQueue<Node> pendingNodes, final double time, final double cost,
+			final RouterPriorityQueue<Node> pendingNodes, final double time, final double cost,
 			final Link outLink) {		
 		data.visit(outLink, cost, time, this.iterationID);
 		

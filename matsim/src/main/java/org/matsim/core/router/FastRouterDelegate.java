@@ -24,7 +24,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.NodeData;
 import org.matsim.core.router.util.PreProcessDijkstra;
-import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
+import org.matsim.core.utils.collections.RouterPriorityQueue;
 
 /**
  * This class is used by the faster implementations of the Dijkstra, AStarEuclidean and
@@ -51,7 +51,7 @@ import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
 	 * the routing network in an array instead of a map. Therefore we have
 	 * to iterate over an array instead of over a map. 
 	 */
-	/*package*/ void relaxNode(final Node outNode, final Node toNode, final PseudoRemovePriorityQueue<Node> pendingNodes);	
+	/*package*/ void relaxNode(final Node outNode, final Node toNode, final RouterPriorityQueue<Node> pendingNodes);	
 
 	/*
 	 * The NodeData is taken from the RoutingNetworkNode and not from a map.

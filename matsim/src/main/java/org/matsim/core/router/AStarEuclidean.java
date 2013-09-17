@@ -31,7 +31,7 @@ import org.matsim.core.router.util.DijkstraNodeData;
 import org.matsim.core.router.util.PreProcessEuclidean;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
+import org.matsim.core.utils.collections.RouterPriorityQueue;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 
@@ -149,7 +149,7 @@ public class AStarEuclidean extends Dijkstra {
 	 *            The time we start routing.
 	 */
 	@Override
-	protected void initFromNode(final Node fromNode, final Node toNode, final double startTime, final PseudoRemovePriorityQueue<Node> pendingNodes) {
+	protected void initFromNode(final Node fromNode, final Node toNode, final double startTime, final RouterPriorityQueue<Node> pendingNodes) {
 		AStarNodeData data = getData(fromNode);
 		visitNode(fromNode, data, pendingNodes, startTime, 0, null);
 		data.setExpectedRemainingCost(estimateRemainingTravelCost(fromNode, toNode));
@@ -157,7 +157,7 @@ public class AStarEuclidean extends Dijkstra {
 
 	@Override
 	protected
-	boolean addToPendingNodes(final Link l, final Node n, final PseudoRemovePriorityQueue<Node> pendingNodes,
+	boolean addToPendingNodes(final Link l, final Node n, final RouterPriorityQueue<Node> pendingNodes,
 			final double currTime, final double currCost, final Node toNode) {
 
 		double travelTime = this.timeFunction.getLinkTravelTime(l, currTime, getPerson(), getVehicle());
@@ -190,7 +190,7 @@ public class AStarEuclidean extends Dijkstra {
 	 * @param outLink The link from which we came visiting n.
 	 */
 	private void visitNode(final Node n, final AStarNodeData data,
-			final PseudoRemovePriorityQueue<Node> pendingNodes, final double time, final double cost,
+			final RouterPriorityQueue<Node> pendingNodes, final double time, final double cost,
 			final double expectedRemainingCost, final Link outLink) {
 		data.setExpectedRemainingCost(expectedRemainingCost);
 		visitNode(n, data, pendingNodes, time, cost, outLink);

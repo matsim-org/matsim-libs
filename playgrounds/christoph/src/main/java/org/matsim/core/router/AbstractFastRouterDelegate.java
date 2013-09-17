@@ -30,7 +30,7 @@ import org.matsim.core.router.util.NodeDataFactory;
 import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.RoutingNetworkLink;
 import org.matsim.core.router.util.RoutingNetworkNode;
-import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
+import org.matsim.core.utils.collections.RouterPriorityQueue;
 
 /*package*/ abstract class AbstractFastRouterDelegate implements FastRouterDelegate {
 
@@ -70,7 +70,7 @@ import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
 	}
 	
 	@Override
-	public void relaxNode(final Node outNode, final Node toNode, final PseudoRemovePriorityQueue<Node> pendingNodes) {
+	public void relaxNode(final Node outNode, final Node toNode, final RouterPriorityQueue<Node> pendingNodes) {
 
 		RoutingNetworkNode routingNetworkNode = (RoutingNetworkNode) outNode;
 		NodeData outData = getData(routingNetworkNode);

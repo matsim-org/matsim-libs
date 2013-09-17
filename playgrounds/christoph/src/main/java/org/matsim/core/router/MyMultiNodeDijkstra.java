@@ -35,7 +35,7 @@ import org.matsim.core.router.util.DijkstraNodeData;
 import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
+import org.matsim.core.utils.collections.RouterPriorityQueue;
 import org.matsim.core.utils.geometry.CoordImpl;
 
 public class MyMultiNodeDijkstra extends Dijkstra {
@@ -60,7 +60,7 @@ public class MyMultiNodeDijkstra extends Dijkstra {
 	}
 	
 	@Override
-	/*package*/ Node searchLogic(final Node fromNode, final Node toNode, final PseudoRemovePriorityQueue<Node> pendingNodes) {
+	/*package*/ Node searchLogic(final Node fromNode, final Node toNode, final RouterPriorityQueue<Node> pendingNodes) {
 		
 		// If it is an imaginary node...
 		if (toNode instanceof ImaginaryNode) {
@@ -142,7 +142,7 @@ public class MyMultiNodeDijkstra extends Dijkstra {
 	 */
 	@Override
 	/*package*/ void initFromNode(final Node fromNode, final Node toNode, final double startTime,
-			final PseudoRemovePriorityQueue<Node> pendingNodes) {
+			final RouterPriorityQueue<Node> pendingNodes) {
 		
 		// If it is an imaginary node, we relax it.
 		if (fromNode instanceof ImaginaryNode) {			
@@ -152,7 +152,7 @@ public class MyMultiNodeDijkstra extends Dijkstra {
 		else super.initFromNode(fromNode, toNode, startTime, pendingNodes);
 	}
 	
-	protected void relaxImaginaryNode(final ImaginaryNode outNode, final PseudoRemovePriorityQueue<Node> pendingNodes,
+	protected void relaxImaginaryNode(final ImaginaryNode outNode, final RouterPriorityQueue<Node> pendingNodes,
 			final double currTime) {
 		
 		double currCost = 0.0;	// should be 0

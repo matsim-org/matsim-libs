@@ -30,7 +30,7 @@ import org.matsim.core.router.util.AStarNodeData;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
+import org.matsim.core.utils.collections.RouterPriorityQueue;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
@@ -125,7 +125,7 @@ public class AStarLandmarks extends AStarEuclidean {
 	}
 
 	@Override
-	protected void relaxNode(final Node outNode, final Node toNode, final PseudoRemovePriorityQueue<Node> pendingNodes) {
+	protected void relaxNode(final Node outNode, final Node toNode, final RouterPriorityQueue<Node> pendingNodes) {
 		this.controlCounter++;
 		if (this.controlCounter == controlInterval) {
 			int newLandmarkIndex = checkToAddLandmark(outNode, toNode);
@@ -221,7 +221,7 @@ public class AStarLandmarks extends AStarEuclidean {
 	 * @param pendingNodes The nodes visited so far.
 	 */
 	/*package*/ void updatePendingNodes(final int newLandmarkIndex,
-			final Node toNode, final PseudoRemovePriorityQueue<Node> pendingNodes) {
+			final Node toNode, final RouterPriorityQueue<Node> pendingNodes) {
 		Iterator<Node> it = pendingNodes.iterator();
 		PreProcessLandmarks.LandmarksData toRole = getPreProcessData(toNode);
 		ArrayList<Double> newEstRemTravCosts = new ArrayList<Double>();

@@ -36,6 +36,7 @@ import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
+import org.matsim.core.utils.collections.RouterPriorityQueue;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
 
@@ -217,7 +218,7 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 			this.deadEndEntryNode = getPreProcessData(toNode).getDeadEndEntryNode();
 		}
 
-		PseudoRemovePriorityQueue<Node> pendingNodes = new PseudoRemovePriorityQueue<Node>(500);
+		RouterPriorityQueue<Node> pendingNodes = new PseudoRemovePriorityQueue<Node>(500);
 		initFromNode(fromNode, toNode, startTime, pendingNodes);
 
 		Node foundToNode = searchLogic(fromNode, toNode, pendingNodes);
@@ -238,7 +239,7 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 	 * Returns the last node of the path. By default this is the to-node.
 	 * The MultiNodeDijkstra returns the cheapest of all given to-nodes.
 	 */
-	/*package*/ Node searchLogic(final Node fromNode, final Node toNode, final PseudoRemovePriorityQueue<Node> pendingNodes) {
+	/*package*/ Node searchLogic(final Node fromNode, final Node toNode, final RouterPriorityQueue<Node> pendingNodes) {
 		
 		boolean stillSearching = true;
 		
@@ -306,7 +307,7 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 	 *            The pending nodes so far.
 	 */
 	/*package*/ void initFromNode(final Node fromNode, final Node toNode, final double startTime,
-			final PseudoRemovePriorityQueue<Node> pendingNodes) {
+			final RouterPriorityQueue<Node> pendingNodes) {
 		DijkstraNodeData data = getData(fromNode);
 		visitNode(fromNode, data, pendingNodes, startTime, 0, null);
 	}
@@ -322,7 +323,7 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 	 * @param pendingNodes
 	 *            The set of pending nodes so far.
 	 */
-	protected void relaxNode(final Node outNode, final Node toNode, final PseudoRemovePriorityQueue<Node> pendingNodes) {
+	protected void relaxNode(final Node outNode, final Node toNode, final RouterPriorityQueue<Node> pendingNodes) {
 
 		DijkstraNodeData outData = getData(outNode);
 		double currTime = outData.getTime();
@@ -344,7 +345,7 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 	 * Logic that was previously located in the relaxNode(...) method. 
 	 * By doing so, the FastDijkstra can overwrite relaxNode without copying the logic. 
 	 */
-	/*package*/ void relaxNodeLogic(final Link l, final PseudoRemovePriorityQueue<Node> pendingNodes,
+	/*package*/ void relaxNodeLogic(final Link l, final RouterPriorityQueue<Node> pendingNodes,
 			final double currTime, final double currCost, final Node toNode,
 			final PreProcessDijkstra.DeadEndData ddOutData) {
 		if (this.pruneDeadEnds) {
@@ -391,7 +392,7 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 	 * 		(e.g. when the same node already has an earlier visiting time).
 	 */
 	protected boolean addToPendingNodes(final Link l, final Node n,
-			final PseudoRemovePriorityQueue<Node> pendingNodes, final double currTime,
+			final RouterPriorityQueue<Node> pendingNodes, final double currTime,
 			final double currCost, final Node toNode) {
 
 		double travelTime = this.timeFunction.getLinkTravelTime(l, currTime, person, vehicle);
@@ -448,7 +449,7 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 	 *            The link from which we came visiting n.
 	 */
 	void revisitNode(final Node n, final DijkstraNodeData data,
-			final PseudoRemovePriorityQueue<Node> pendingNodes, final double time, final double cost,
+			final RouterPriorityQueue<Node> pendingNodes, final double time, final double cost,
 			final Link outLink) {
 		pendingNodes.remove(n);
 
@@ -474,7 +475,7 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 	 *            The node from which we came visiting n.
 	 */
 	protected void visitNode(final Node n, final DijkstraNodeData data,
-			final PseudoRemovePriorityQueue<Node> pendingNodes, final double time, final double cost,
+			final RouterPriorityQueue<Node> pendingNodes, final double time, final double cost,
 			final Link outLink) {
 		data.visit(outLink, cost, time, getIterationId());
 		pendingNodes.add(n, getPriority(data));

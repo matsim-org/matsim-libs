@@ -28,7 +28,7 @@ import org.matsim.core.router.MyMultiNodeDijkstra;
 import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
+import org.matsim.core.utils.collections.RouterPriorityQueue;
 import org.matsim.vehicles.Vehicle;
 
 /*
@@ -71,7 +71,7 @@ public class TransitMultiNodeDijkstra extends MyMultiNodeDijkstra {
 	 */
 	@Override
 	protected boolean addToPendingNodes(final Link l, final Node n,
-			final PseudoRemovePriorityQueue<Node> pendingNodes, final double currTime,
+			final RouterPriorityQueue<Node> pendingNodes, final double currTime,
 			final double currCost, final Node toNode) {
 
 		this.customDataManager.initForLink(l);

@@ -30,7 +30,7 @@ import org.matsim.core.router.util.RoutingNetwork;
 import org.matsim.core.router.util.RoutingNetworkNode;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
+import org.matsim.core.utils.collections.RouterPriorityQueue;
 import org.matsim.vehicles.Vehicle;
 
 /**
@@ -95,7 +95,7 @@ public class FastDijkstra extends Dijkstra {
 	 * to iterate over an array instead of over a map. 
 	 */
 	@Override
-	protected void relaxNode(final Node outNode, final Node toNode, final PseudoRemovePriorityQueue<Node> pendingNodes) {
+	protected void relaxNode(final Node outNode, final Node toNode, final RouterPriorityQueue<Node> pendingNodes) {
 		fastRouter.relaxNode(outNode, toNode, pendingNodes);
 	}
 	
