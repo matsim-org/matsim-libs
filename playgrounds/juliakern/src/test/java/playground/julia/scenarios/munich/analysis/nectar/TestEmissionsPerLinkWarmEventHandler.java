@@ -38,8 +38,6 @@ public class TestEmissionsPerLinkWarmEventHandler {
 
 	/**
 	 * test for playground.benjamin.scenarios.munich.analysis.nectar.EmissionsPerLinkWarmEventHandler
-	 * or
-	 * 			playground.julia.scenarios.munich.analysis.nectar.EmissionPerLinkWarmEventHandler
 	 * 
 	 * @author Julia
 	 * 
