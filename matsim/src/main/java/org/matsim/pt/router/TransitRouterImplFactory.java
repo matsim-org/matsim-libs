@@ -1,5 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
+ * TransitRouterImplFactory.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -41,7 +42,7 @@ public class TransitRouterImplFactory implements TransitRouterFactory {
 	@Override
 	public TransitRouter createTransitRouter() {
 		TransitRouterNetworkTravelTimeAndDisutility ttCalculator = new TransitRouterNetworkTravelTimeAndDisutility(this.config, this.preparedTransitSchedule);
-		return new TransitRouterImpl(this.config, new PreparedTransitSchedule(schedule), this.routerNetwork, ttCalculator, ttCalculator);
+		return new TransitRouterImpl(this.config, this.preparedTransitSchedule, this.routerNetwork, ttCalculator, ttCalculator);
 	}
 	
 }
