@@ -186,13 +186,7 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Agen
 				slotData = new SlotData();
 			}
 			arnew = slotData.arrivals;
-//			if (arnew == null) {
-//				arnew = 0;
-//			}
 			depnew = slotData.departures;
-//			if (depnew == null) {
-//				depnew = 0;
-//			}
 			noVehicles = noVehicles + depnew - arnew ;
 			density = (noVehicles) / this.networkLengthKm;
 			double timeSec = slot * binSizeSeconds;
@@ -231,9 +225,6 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Agen
 	}
 	
 	private static class Data {
-		
-//		private SortedMap<Integer, Integer> arrivalsBySlot = new TreeMap<Integer, Integer>();
-//		private SortedMap<Integer, Integer> departuresBySlot = new TreeMap<Integer, Integer>();
 		private SortedMap<Integer, LinksData> linksBySlot = new TreeMap<Integer, LinksData>();
 		private SortedMap<Integer, SlotData> dataBySlot = new TreeMap<Integer, SlotData>();
 		private Integer firstSlot = null;
@@ -337,14 +328,11 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Agen
 			}
 		}
 		
-		
 		public void reset(){
 			this.linksBySlot.clear();
 			this.lastSlot = null;
 			this.firstSlot = null;
 		}
-
-		
 		
 		public SortedMap<Integer, SlotData> getSlotData() {
 			return this.dataBySlot;
@@ -353,7 +341,6 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Agen
 		public Map<Integer, LinksData> getLinksDataBySlot(){
 			return this.linksBySlot;
 		}
-		
 	}
 	
 	private static class LinkData {
@@ -368,7 +355,6 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Agen
 			velocitySum = 0.0;
 			velocityCount = 0.0;
 		}
-		
 	}
 	
 	private static class LinksData {
