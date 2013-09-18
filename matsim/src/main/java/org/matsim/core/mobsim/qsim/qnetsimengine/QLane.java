@@ -242,38 +242,39 @@ public final class QLane extends QueueWithBuffer implements Identifiable {
 	 *
 	 * @author dgrether
 	 */
-	class VisDataImpl implements VisData {
+	class VisDataImpl extends QueueWithBuffer.VisDataImpl {
 		VisLane visLane ;
 		
 		VisDataImpl(){
 		}
 		
-		@Override
-		public Collection<AgentSnapshotInfo> getAgentSnapshotInfo( final Collection<AgentSnapshotInfo> positions) {
-			AgentSnapshotInfoBuilder snapshotInfoBuilder = QLane.this.qLink.network.simEngine.getAgentSnapshotInfoBuilder();
-			
-			double numberOfVehiclesDriving = QLane.this.buffer.size() + QLane.this.vehQueue.size();
-			if (numberOfVehiclesDriving > 0) {
-				double now = QLane.this.qLink.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
-				Link link = QLane.this.qLink.getLink();
-				double spacing = snapshotInfoBuilder.calculateVehicleSpacing(QLane.this.length, numberOfVehiclesDriving,
-						QLane.this.storageCapacity, QLane.this.bufferStorageCapacity); 
-				double freespeedTraveltime = QLane.this.freespeedTravelTime;
-				
-				double lastDistanceFromFromNode = Double.NaN;
-				for (QVehicle veh : QLane.this.buffer){
-					lastDistanceFromFromNode = this.createAndAddVehiclePositionAndReturnDistance(positions, snapshotInfoBuilder, now, 
-							lastDistanceFromFromNode, link, spacing, freespeedTraveltime, veh);
-				}
-				for (QVehicle veh : QLane.this.vehQueue) {
-					lastDistanceFromFromNode = this.createAndAddVehiclePositionAndReturnDistance(positions, snapshotInfoBuilder, now, 
-							lastDistanceFromFromNode, link, spacing, freespeedTraveltime, veh);
-				}
-			}
-			return positions;
-		}
+//		@Override
+//		public Collection<AgentSnapshotInfo> getAgentSnapshotInfo( final Collection<AgentSnapshotInfo> positions) {
+//			AgentSnapshotInfoBuilder snapshotInfoBuilder = QLane.this.qLink.network.simEngine.getAgentSnapshotInfoBuilder();
+//			
+//			double numberOfVehiclesDriving = QLane.this.buffer.size() + QLane.this.vehQueue.size();
+//			if (numberOfVehiclesDriving > 0) {
+//				double now = QLane.this.qLink.network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
+//				Link link = QLane.this.qLink.getLink();
+//				double spacing = snapshotInfoBuilder.calculateVehicleSpacing(QLane.this.length, numberOfVehiclesDriving,
+//						QLane.this.storageCapacity, QLane.this.bufferStorageCapacity); 
+//				double freespeedTraveltime = QLane.this.freespeedTravelTime;
+//				
+//				double lastDistanceFromFromNode = Double.NaN;
+//				for (QVehicle veh : QLane.this.buffer){
+//					lastDistanceFromFromNode = this.createAndAddVehiclePositionAndReturnDistance(positions, snapshotInfoBuilder, now, 
+//							lastDistanceFromFromNode, link, spacing, freespeedTraveltime, veh);
+//				}
+//				for (QVehicle veh : QLane.this.vehQueue) {
+//					lastDistanceFromFromNode = this.createAndAddVehiclePositionAndReturnDistance(positions, snapshotInfoBuilder, now, 
+//							lastDistanceFromFromNode, link, spacing, freespeedTraveltime, veh);
+//				}
+//			}
+//			return positions;
+//		}
 		
-		private double createAndAddVehiclePositionAndReturnDistance(final Collection<AgentSnapshotInfo> positions,
+		@Override
+		double createAndAddVehiclePositionAndReturnDistance(final Collection<AgentSnapshotInfo> positions,
 				AgentSnapshotInfoBuilder snapshotInfoBuilder, double now, double lastDistanceFromFromNode, Link link,
 				double spacing, double freespeedTraveltime, QVehicle veh){
 			double remainingTravelTime = veh.getEarliestLinkExitTime() - now ;

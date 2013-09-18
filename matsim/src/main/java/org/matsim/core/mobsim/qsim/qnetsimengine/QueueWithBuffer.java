@@ -671,7 +671,7 @@ class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem {
 		private VisLinkWLanes otfLink;
 
 		@Override
-		public Collection<AgentSnapshotInfo> getAgentSnapshotInfo(Collection<AgentSnapshotInfo> positions) {
+		public final Collection<AgentSnapshotInfo> getAgentSnapshotInfo(Collection<AgentSnapshotInfo> positions) {
 			AgentSnapshotInfoBuilder snapshotInfoBuilder = QueueWithBuffer.this.network.simEngine.getAgentSnapshotInfoBuilder();
 
 			double numberOfVehiclesDriving = QueueWithBuffer.this.buffer.size() + QueueWithBuffer.this.vehQueue.size();
@@ -696,7 +696,7 @@ class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem {
 			return positions ;
 		}
 
-		private double createAndAddVehiclePositionAndReturnDistance(final Collection<AgentSnapshotInfo> positions,
+		 double createAndAddVehiclePositionAndReturnDistance(final Collection<AgentSnapshotInfo> positions,
 				AgentSnapshotInfoBuilder snapshotInfoBuilder, double now, double lastDistanceFromFromNode, Link link,
 				double spacing, double freespeedTraveltime, QVehicle veh)
 		{
