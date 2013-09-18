@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PointerRoutingNetworkNode.java
+ * MinHeap.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,22 +18,10 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.router.util;
+package org.matsim.core.router.priorityqueue;
 
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.router.priorityqueue.HasIndex;
+import org.matsim.core.utils.collections.RouterPriorityQueue;
 
-public class ArrayRoutingNetworkNode extends AbstractRoutingNetworkNode implements HasIndex {
+public interface MinHeap<E extends HasIndex> extends RouterPriorityQueue<E> {
 
-	final int arrayIndex;
-	
-	/*package*/ ArrayRoutingNetworkNode(Node node, int numOutLinks, int arrayIndex) {
-		super(node, numOutLinks);
-		this.arrayIndex = arrayIndex;
-	}
-	
-	@Override
-	public int getArrayIndex() {
-		return this.arrayIndex;
-	}
 }

@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PointerRoutingNetworkNode.java
+ * HasIndex.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,22 +18,21 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.core.router.util;
+package org.matsim.core.router.priorityqueue;
 
-import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.router.priorityqueue.HasIndex;
+/**
+ * An interface to mark classes that enumerate their objects. Each index
+ * should be unique and can e.g. be used to lookup values in an array. This feature
+ * is used in some classed due to performance reasons since a lookup in an array
+ * is much faster than in a map.
+ * 
+ * @see ArrayRoutingNetwork
+ * @see ArrayRoutingNetworkNode
+ * @see BinaryMinHeap
+ * 
+ * @author cdobler
+ */
+public interface HasIndex {
 
-public class ArrayRoutingNetworkNode extends AbstractRoutingNetworkNode implements HasIndex {
-
-	final int arrayIndex;
-	
-	/*package*/ ArrayRoutingNetworkNode(Node node, int numOutLinks, int arrayIndex) {
-		super(node, numOutLinks);
-		this.arrayIndex = arrayIndex;
-	}
-	
-	@Override
-	public int getArrayIndex() {
-		return this.arrayIndex;
-	}
+	public int getArrayIndex();
 }
