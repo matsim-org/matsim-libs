@@ -2,29 +2,23 @@
  * 
  */
 package josmMatsimPlugin;
-import java.io.File;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.Properties;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.core.utils.io.OsmNetworkReader;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.openstreetmap.josm.Main;
 import org.openstreetmap.josm.gui.PleaseWaitRunnable;
 import org.openstreetmap.josm.gui.layer.Layer;
 import org.openstreetmap.josm.gui.layer.OsmDataLayer;
 import org.openstreetmap.josm.io.OsmTransferException;
-import org.openstreetmap.josm.io.OsmWriter;
-import org.openstreetmap.josm.io.OsmWriterFactory;
 import org.xml.sax.SAXException;
 
 /**
@@ -36,7 +30,6 @@ public class ExportTask extends PleaseWaitRunnable
 {
 	static Properties matsimConvertProperties = new Properties();
 	static String targetSystem="WGS84";
-	static boolean keepOriginal=false;
 	public ExportTask()
 	{
 		super("matsimexport");
@@ -84,7 +77,6 @@ public class ExportTask extends PleaseWaitRunnable
 		CoordinateTransformation ct = TransformationFactory
 				.getCoordinateTransformation(TransformationFactory.WGS84,
 						targetSystem);
-		
 		
 		JosmMATSimWriter writer = new JosmMATSimWriter(net, ct, true);
 		writer.writeLayer((OsmDataLayer) layer);

@@ -115,10 +115,10 @@ public class MATSimExportDialog extends JPanel {
         
         originalData.addActionListener(new ActionListener(){
             public void actionPerformed(java.awt.event.ActionEvent e){
-            	if (originalData.isSelected())
-            		ExportTask.keepOriginal=true;
-            	else
-            		ExportTask.keepOriginal=false;
+//            	if (originalData.isSelected())
+//            		ExportTask.keepOriginal=true;
+//            	else
+//            		ExportTask.keepOriginal=false;
             }
         });
     }

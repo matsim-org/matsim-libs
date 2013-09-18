@@ -44,11 +44,11 @@ public class JosmMATSimWriter implements PrimitiveVisitor, MatsimWriter
 {
 	private final static Logger log = Logger.getLogger(JosmMATSimWriter.class);
 
-	private final Map<Long, OsmNode> nodes = new HashMap<Long, OsmNode>();
-	private final Map<Long, OsmWay> ways = new HashMap<Long, OsmWay>();
-
 	private Network network;
 	private CoordinateTransformation transform;
+	
+	private final Map<Long, OsmNode> nodes = new HashMap<Long, OsmNode>();
+	private final Map<Long, OsmWay> ways = new HashMap<Long, OsmWay>();
 
 	final Counter nodeCounter = new Counter("node ");
 	final Counter wayCounter = new Counter("way ");
@@ -56,7 +56,6 @@ public class JosmMATSimWriter implements PrimitiveVisitor, MatsimWriter
 	private final Set<String> unknownHighways = new HashSet<String>();
 	private final Set<String> unknownMaxspeedTags = new HashSet<String>();
 	private final Set<String> unknownLanesTags = new HashSet<String>();
-
 	private boolean scaleMaxSpeed = false;
 
 	private final static String TAG_LANES = "lanes";
@@ -65,7 +64,7 @@ public class JosmMATSimWriter implements PrimitiveVisitor, MatsimWriter
 	private final static String TAG_JUNCTION = "junction";
 	private final static String TAG_ONEWAY = "oneway";
 	private final static String[] ALL_TAGS = new String[]
-	{ TAG_LANES, TAG_HIGHWAY, TAG_MAXSPEED, TAG_JUNCTION, TAG_ONEWAY };
+			{ TAG_LANES, TAG_HIGHWAY, TAG_MAXSPEED, TAG_JUNCTION, TAG_ONEWAY };
 
 	final Map<String, OsmHighwayDefaults> highwayDefaults = new HashMap<String, OsmHighwayDefaults>();
 	final List<OsmFilter> hierarchyLayers = new ArrayList<OsmFilter>();
@@ -96,8 +95,6 @@ public class JosmMATSimWriter implements PrimitiveVisitor, MatsimWriter
 		}
 	}
 	
-	
-
 	/**
 	 * Sets defaults for converting OSM highway paths into MATSim links, assuming it is no oneway road.
 	 *
@@ -113,8 +110,6 @@ public class JosmMATSimWriter implements PrimitiveVisitor, MatsimWriter
 	public void setHighwayDefaults(final int hierarchy , final String highwayType, final double lanes, final double freespeed, final double freespeedFactor, final double laneCapacity_vehPerHour) {
 		setHighwayDefaults(hierarchy, highwayType, lanes, freespeed, freespeedFactor, laneCapacity_vehPerHour, false);
 	}
-	
-	
 	
 	/**
 	 * Sets defaults for converting OSM highway paths into MATSim links.
@@ -132,10 +127,6 @@ public class JosmMATSimWriter implements PrimitiveVisitor, MatsimWriter
 		this.highwayDefaults.put(highwayType, new OsmHighwayDefaults(hierarchy, lanes, freespeed, freespeedFactor, laneCapacity_vehPerHour, oneway));
 	}
 	
-	
-	
-	
-
 	public void writeLayer(OsmDataLayer layer)
 	{
 		writeContent(layer.data);
@@ -147,7 +138,7 @@ public class JosmMATSimWriter implements PrimitiveVisitor, MatsimWriter
 	 * @param ds
 	 *            The dataset to write
 	 */
-	public void writeContent(DataSet ds)
+	private void writeContent(DataSet ds)
 	{
 		writeNodes(ds.getNodes());
 		writeWays(ds.getWays());
@@ -161,7 +152,7 @@ public class JosmMATSimWriter implements PrimitiveVisitor, MatsimWriter
 	 *            The nodes to write
 	 * @since 5737
 	 */
-	public void writeNodes(Collection<Node> nodes)
+	private void writeNodes(Collection<Node> nodes)
 	{
 		for (Node n : sortById(nodes))
 		{
@@ -179,7 +170,7 @@ public class JosmMATSimWriter implements PrimitiveVisitor, MatsimWriter
 	 *            The ways to write
 	 * @since 5737
 	 */
-	public void writeWays(Collection<Way> ways)
+	private void writeWays(Collection<Way> ways)
 	{
 		for (Way w : sortById(ways))
 		{
@@ -203,9 +194,7 @@ public class JosmMATSimWriter implements PrimitiveVisitor, MatsimWriter
 		Long id = n.getUniqueId();
 		double lat = n.getCoor().lat();
 		double lon = n.getCoor().lon();
-		this.nodes.put(
-				id,
-				new OsmNode(id, this.transform
+		this.nodes.put(id, new OsmNode(id, this.transform
 						.transform(new CoordImpl(lon, lat))));
 		this.nodeCounter.incCounter();
 	}
@@ -221,7 +210,6 @@ public class JosmMATSimWriter implements PrimitiveVisitor, MatsimWriter
 		{
 			way.nodes.add(w.getNodeId(i));
 		}
-
 		for (String tag : ALL_TAGS)
 		{
 			for (String ref : w.getKeys().keySet())
@@ -233,7 +221,6 @@ public class JosmMATSimWriter implements PrimitiveVisitor, MatsimWriter
 				}
 			}
 		}
-
 		this.ways.put(id, way);
 	}
 
