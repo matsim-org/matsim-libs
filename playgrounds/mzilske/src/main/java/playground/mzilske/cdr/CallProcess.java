@@ -75,7 +75,9 @@ public class CallProcess implements ActivityStartEventHandler, ActivityEndEventH
 		}
 		Sighting sighting = new Sighting(personId, (long) time, cellId);
 		sightings.add(sighting);
-		eventsManager.processEvent(sighting);
+		if (eventsManager != null) {
+			eventsManager.processEvent(sighting);
+		}
 	}
 
 	public List<Sighting>  getSightings() {
@@ -99,7 +101,7 @@ public class CallProcess implements ActivityStartEventHandler, ActivityEndEventH
 
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
-		call(event.getTime(), event.getPersonId());
+		 call(event.getTime(), event.getPersonId());
 	}
 
 }

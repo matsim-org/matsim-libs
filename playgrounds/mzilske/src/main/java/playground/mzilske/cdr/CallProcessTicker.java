@@ -1,4 +1,4 @@
-package playground.mzilske.teach;
+package playground.mzilske.cdr;
 
 import java.util.ArrayList;
 
@@ -32,18 +32,24 @@ public class CallProcessTicker implements BasicEventHandler {
 
 	@Override
 	public void handleEvent(Event event) {
-		while (event.getTime() > currentTime) {
+		while (currentTime < event.getTime() - 1) {
 			currentTime = currentTime + 1.0;
 			for(Steppable steppable : steppables) {
 				steppable.doSimStep(currentTime);
 			}
 		}
-
 		delegateEventsManager.processEvent(event);
 	}
 	
 	public void addSteppable(Steppable steppable) {
 		steppables.add(steppable);
+	}
+
+	public void finish() {
+		currentTime = currentTime + 1.0;
+		for(Steppable steppable : steppables) {
+			steppable.doSimStep(currentTime);
+		}
 	}
 
 }

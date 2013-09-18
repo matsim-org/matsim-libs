@@ -28,7 +28,6 @@ import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.mzilske.cdr.ZoneTracker.LinkToZoneResolver;
-import playground.mzilske.teach.CallProcessTicker;
 import d4d.Sighting;
 
 public class PotsdamCompare {
@@ -52,7 +51,7 @@ public class PotsdamCompare {
 
 	private static final int TIME_BIN_SIZE = 60*60;
 	private static final int MAX_TIME = 24 * TIME_BIN_SIZE - 1;
-	private static final int dailyRate = 3;
+	private static final int dailyRate = 200;
 	
 
 	public static void main(String[] args) throws FileNotFoundException {
@@ -93,7 +92,7 @@ public class PotsdamCompare {
 		
 		
 		ZoneTracker zoneTracker = new ZoneTracker(events, linkToZoneResolver, initialPersonInZone);
-		CallProcess callProcess = new CallProcess(events, scenario.getPopulation(), zoneTracker, dailyRate);
+		CallProcess callProcess = new CallProcess(null, scenario.getPopulation(), zoneTracker, dailyRate);
 		ticker.addHandler(zoneTracker);
 
 		ticker.addHandler(callProcess);
@@ -103,6 +102,8 @@ public class PotsdamCompare {
 		events.addHandler(volumesAnalyzer1);
 
 		new MatsimEventsReader(events).readFile("output-homogeneous-37/ITERS/it.0/0.events.xml.gz");
+		ticker.finish();
+		
 		callProcess.dump();
 
 
@@ -143,7 +144,7 @@ public class PotsdamCompare {
 				if (diff != 0) {
 					System.out.println(Arrays.toString(volumesForLink1));
 					System.out.println(Arrays.toString(volumesForLink2));
-					System.out.println("===");
+					System.out.println("=== " + link.getId());
 				}
 			}
 		}
