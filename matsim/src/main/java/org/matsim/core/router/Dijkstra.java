@@ -451,10 +451,12 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 	void revisitNode(final Node n, final DijkstraNodeData data,
 			final RouterPriorityQueue<Node> pendingNodes, final double time, final double cost,
 			final Link outLink) {
-		pendingNodes.remove(n);
-
 		data.visit(outLink, cost, time, getIterationId());
-		pendingNodes.add(n, getPriority(data));
+		pendingNodes.decreaseKey(n, getPriority(data));
+//		pendingNodes.remove(n);
+//
+//		data.visit(outLink, cost, time, getIterationId());
+//		pendingNodes.add(n, getPriority(data));
 	}
 
 	/**
