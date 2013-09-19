@@ -20,9 +20,11 @@
 
 package org.matsim.core.config.groups;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Module;
 
 /**
@@ -40,7 +42,9 @@ public class CountsConfigGroup extends Module {
 	private static final String COUNTSSCALEFACTOR = "countsScaleFactor";
 	private static final String WRITECOUNTSINTERVAL = "writeCountsInterval";
 	private static final String AVERAGECOUNTSOVERITERATIONS = "averageCountsOverIterations";
-
+	private static final String ANALYZEDMODES = "analyzedModes";
+	private static final String FILTERMODES = "filterModes";
+	
 	private String outputFormat = "txt";
 
 	/**
@@ -65,6 +69,9 @@ public class CountsConfigGroup extends Module {
 	private int writeCountsInterval = 10;
 	private int averageCountsOverIterations = 5;
 
+	private String analyzedModes = TransportMode.car;
+	private boolean filterModes = false;
+	
 	public CountsConfigGroup() {
 		super(GROUP_NAME);
 	}
@@ -88,6 +95,10 @@ public class CountsConfigGroup extends Module {
 			return Integer.toString(getWriteCountsInterval());
 		} else if (AVERAGECOUNTSOVERITERATIONS.equals(key)) {
 			return Integer.toString(getAverageCountsOverIterations());
+		} else if (ANALYZEDMODES.equals(key)){
+			return getAnalyzedModes();
+		} else if (FILTERMODES.equals(key)){
+			return Boolean.toString(isFilterModes());
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -113,6 +124,10 @@ public class CountsConfigGroup extends Module {
 			this.setWriteCountsInterval(Integer.parseInt(value));
 		} else if (AVERAGECOUNTSOVERITERATIONS.equals(key)) {
 			this.setAverageCountsOverIterations(Integer.parseInt(value));
+		} else if (ANALYZEDMODES.equals(key)){
+			this.setAnalyzedModes(value);
+		} else if (FILTERMODES.equals(key)){
+			this.setFilterModes(Boolean.parseBoolean(value));
 		} else {
 			throw new IllegalArgumentException(key);
 		}
@@ -128,6 +143,8 @@ public class CountsConfigGroup extends Module {
 		this.addParameterToMap(map, COUNTSSCALEFACTOR);
 		this.addParameterToMap(map, WRITECOUNTSINTERVAL);
 		this.addParameterToMap(map, AVERAGECOUNTSOVERITERATIONS);
+		map.put(ANALYZEDMODES, getValue(ANALYZEDMODES));
+		map.put(FILTERMODES, getValue(FILTERMODES));
 		return map;
 	}
 	
@@ -152,6 +169,9 @@ public class CountsConfigGroup extends Module {
 		comments.put(WRITECOUNTSINTERVAL, "Specifies how often the counts comparison should be calculated and written.");
 		comments.put(AVERAGECOUNTSOVERITERATIONS, "Specifies over how many iterations the link volumes should be averaged that are used for the " +
 				"counts comparison. Use 1 or 0 to only use the link volumes of a single iteration. This values cannot be larger than the value specified for " + WRITECOUNTSINTERVAL);
+		comments.put(ANALYZEDMODES, "Transport modes that will be respected for the counts comparison. 'car' is default, which " +
+				"includes also bussed from the pt simulation module. Use this parameter in combination with 'filterModes' = true!");
+		comments.put(FILTERMODES, "If true, link counts from legs performed on modes not included in the 'analyzedModes' parameter are ignored.");
 		return comments;
 	}
 
@@ -215,5 +235,21 @@ public class CountsConfigGroup extends Module {
 	
 	public void setAverageCountsOverIterations(int averageCountsOverIterations) {
 		this.averageCountsOverIterations = averageCountsOverIterations;
+	}
+	
+	public boolean isFilterModes() {
+		return this.filterModes;
+	}
+	
+	public void setFilterModes(final boolean filterModes) {
+		this.filterModes = filterModes;
+	}
+	
+	public String getAnalyzedModes() {
+		return this.analyzedModes;
+	}
+	
+	public void setAnalyzedModes(final String analyzedModes) {
+		this.analyzedModes = analyzedModes.toLowerCase(Locale.ROOT);
 	}
 }

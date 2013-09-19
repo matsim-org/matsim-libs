@@ -23,6 +23,7 @@ package org.matsim.counts;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
@@ -32,6 +33,7 @@ import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.controler.listener.StartupListener;
+import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.counts.algorithms.CountSimComparisonKMLWriter;
 import org.matsim.counts.algorithms.CountSimComparisonTableWriter;
@@ -50,11 +52,13 @@ public class CountControlerListener implements StartupListener, IterationEndsLis
 	private final CountsConfigGroup config;
 	private final Counts counts;
 	private final Map<Id, double[]> linkStats = new HashMap<Id, double[]>();
+	private final Set<String> analyzedModes;
 	private int iterationsUsed = 0;
 
 	public CountControlerListener(final CountsConfigGroup config) {
 		this.config = config;
 		this.counts = new Counts();
+		this.analyzedModes = CollectionUtils.stringToSet(config.getAnalyzedModes());
 	}
 
 	@Override
@@ -153,10 +157,26 @@ public class CountControlerListener implements StartupListener, IterationEndsLis
 		for (Map.Entry<Id, double[]> e : this.linkStats.entrySet()) {
 			Id linkId = e.getKey();
 			double[] volumesPerHour = e.getValue(); 
-			double[] newVolume = volumes.getVolumesPerHourForLink(linkId);
+			double[] newVolume = getVolumesPerHourForLink(volumes, linkId); 
 			for (int i = 0; i < 24; i++) {
 				volumesPerHour[i] += newVolume[i];
 			}
+		}
+	}
+	
+	private double[] getVolumesPerHourForLink(final VolumesAnalyzer volumes, final Id linkId) {
+		if (this.config.isFilterModes()) {
+			double[] newVolume = new double[24];
+			for (String mode : this.analyzedModes) {
+				double[] volumesForMode = volumes.getVolumesPerHourForLink(linkId, mode);
+				if (volumesForMode == null) continue;
+				for (int i = 0; i < 24; i++) {
+					newVolume[i] += volumesForMode[i];
+				}
+			}
+			return newVolume;
+		} else {
+			return volumes.getVolumesPerHourForLink(linkId);
 		}
 	}
 	

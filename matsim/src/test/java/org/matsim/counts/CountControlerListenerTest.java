@@ -28,6 +28,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.basic.v01.IdImpl;
@@ -302,6 +304,74 @@ public class CountControlerListenerTest {
 		Assert.assertEquals(6.5, getVolume(config.controler().getOutputDirectory() + "ITERS/it.6/6.countscompareAWTV.txt"), 1e-8);
 	}
 	
+	@Test
+	public void testFilterAnalyzedModes() throws IOException {
+		Config config = this.util.loadConfig(null);
+		config.network().setInputFile("test/scenarios/triangle/network.xml");	// network file which is used by the counts file
+		
+		CountsConfigGroup cConfig = config.counts();
+		
+		cConfig.setWriteCountsInterval(3);
+		cConfig.setAverageCountsOverIterations(2);
+		cConfig.setOutputFormat("txt");
+		cConfig.setCountsFileName("test/scenarios/triangle/counts.xml"); // just any file to activate the counts feature
+		
+		config.controler().setMobsim("dummy");
+		config.controler().setFirstIteration(0);
+		config.controler().setLastIteration(3);
+
+		// create and run controler
+		Controler controler = new Controler(ScenarioUtils.loadScenario(config));
+		controler.addMobsimFactory("dummy", new DummyMobsim2Factory());
+		controler.setCreateGraphs(false);
+		controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setWriteEventsInterval(0);
+		config.controler().setWritePlansInterval(0);
+		controler.run();
+		Assert.assertEquals(150, getVolume(config.controler().getOutputDirectory() + "ITERS/it.3/3.countscompareAWTV.txt"), 1e-8);
+		
+		// enable modes filtering and count only car
+		cConfig.setAnalyzedModes(TransportMode.car);
+		cConfig.setFilterModes(true);
+		controler = new Controler(ScenarioUtils.loadScenario(config));
+		controler.setOverwriteFiles(true);
+		controler.addMobsimFactory("dummy", new DummyMobsim2Factory());
+		controler.setCreateGraphs(false);
+		controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setWriteEventsInterval(0);
+		config.controler().setWritePlansInterval(0);
+		controler.run();
+		Assert.assertEquals(100, getVolume(config.controler().getOutputDirectory() + "ITERS/it.3/3.countscompareAWTV.txt"), 1e-8);
+
+		// enable modes filtering and count only walk
+		cConfig.setAnalyzedModes(TransportMode.walk);
+		cConfig.setFilterModes(true);
+		controler = new Controler(ScenarioUtils.loadScenario(config));
+		controler.setOverwriteFiles(true);
+		controler.addMobsimFactory("dummy", new DummyMobsim2Factory());
+		controler.setCreateGraphs(false);
+		controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setWriteEventsInterval(0);
+		config.controler().setWritePlansInterval(0);
+		controler.run();
+		Assert.assertEquals(50, getVolume(config.controler().getOutputDirectory() + "ITERS/it.3/3.countscompareAWTV.txt"), 1e-8);
+		
+		// enable modes filtering and count only bike
+		cConfig.setAnalyzedModes(TransportMode.bike);
+		cConfig.setFilterModes(true);
+		controler = new Controler(ScenarioUtils.loadScenario(config));
+		controler.setOverwriteFiles(true);
+		controler.addMobsimFactory("dummy", new DummyMobsim2Factory());
+		controler.setCreateGraphs(false);
+		controler.setDumpDataAtEnd(false);
+		controler.getConfig().controler().setWriteEventsInterval(0);
+		config.controler().setWritePlansInterval(0);
+		controler.run();
+		Assert.assertEquals(0, getVolume(config.controler().getOutputDirectory() + "ITERS/it.3/3.countscompareAWTV.txt"), 1e-8);
+
+
+	}
+	
 	private double getVolume(final String filename) throws IOException {
 		BufferedReader reader = IOUtils.getBufferedReader(filename);
 		reader.readLine(); // header
@@ -320,6 +390,7 @@ public class CountControlerListenerTest {
 			this.eventsManager = eventsManager;
 			this.nOfEvents = nOfEvents;
 		}
+		
 		@Override
 		public void run() {
 			Id linkId = new IdImpl("100");
@@ -335,6 +406,35 @@ public class CountControlerListenerTest {
 		public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
 			return new DummyMobsim(eventsManager, count++);
 		}
+	}
+	
+	private static class DummyMobsim2 implements Mobsim {
+		private final EventsManager eventsManager;
+		public DummyMobsim2(EventsManager eventsManager) {
+			this.eventsManager = eventsManager;
+		}
 		
+		@Override
+		public void run() {
+			Id linkId = new IdImpl("100");
+			for (int i = 0; i < 100; i++) {
+				Id agentId = new IdImpl(i);
+				this.eventsManager.processEvent(new AgentDepartureEvent(60.0, agentId, linkId, TransportMode.car));
+				this.eventsManager.processEvent(new LinkLeaveEvent(60.0, agentId, linkId, null));
+			}
+			for (int i = 100; i < 150; i++) {
+				Id agentId = new IdImpl(i);
+				this.eventsManager.processEvent(new AgentDepartureEvent(60.0, agentId, linkId, TransportMode.walk));
+				this.eventsManager.processEvent(new LinkLeaveEvent(60.0, agentId, linkId, null));
+			}
+		}
+	}
+	
+	private static class DummyMobsim2Factory implements MobsimFactory {
+		
+		@Override
+		public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
+			return new DummyMobsim2(eventsManager);
+		}
 	}
 }
