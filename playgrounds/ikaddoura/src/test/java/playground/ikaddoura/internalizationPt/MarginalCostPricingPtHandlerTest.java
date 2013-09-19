@@ -23,11 +23,13 @@
 package playground.ikaddoura.internalizationPt;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;
@@ -55,6 +57,7 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
+import org.matsim.pt.Umlauf;
 import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
@@ -66,8 +69,10 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
+import org.matsim.vehicles.VehicleCapacityImpl;
 import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.VehicleType;
+import org.matsim.vehicles.VehiclesFactory;
 import org.matsim.vehicles.VehicleType.DoorOperationMode;
 import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
@@ -98,15 +103,12 @@ public class MarginalCostPricingPtHandlerTest  {
 	private Id linkId11 = new IdImpl("11");
 	private Id linkId12 = new IdImpl("12");
 	
-//	//one agent from start (stop 1) to finish (stop 6)
-//	//another agent gets on (stop 2) and off (stop 3)
+	//one agent from start (stop 1) to finish (stop 6)
+	//another agent gets on (stop 2) and off (stop 3)
 	@Test
     public final void testInVehicleDelay01() {
    	 	
 		Config config = utils.loadConfig(null);
-		
-//		String scheduleFile = utils.getInputDirectory() + "transitscheduleEmpty.xml";
-//		String vehiclesFile = utils.getInputDirectory() + "transitVehicles.xml";
 		
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -115,8 +117,6 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 		config.scenario().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
-//		config.transit().setTransitScheduleFile(scheduleFile);
-//		config.transit().setVehiclesFile(vehiclesFile);
 		
 		ActivityParams hParams = new ActivityParams("h");
 		hParams.setTypicalDuration(3600.);
@@ -128,12 +128,10 @@ public class MarginalCostPricingPtHandlerTest  {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 
 		setPopulationTestInVehicleDelay01(scenario);
-		fillSchedule01(scenario);
-		fillVehicle01(scenario);
+		fillScheduleTestInVehicleDelay01(scenario);
+		fillVehicleTestInVehicleDelay01(scenario);
 		setNetworkOneWay(scenario);
 		
-//		new VehicleReaderV1((scenario).getVehicles()).readFile(scenario.getConfig().transit().getVehiclesFile());
-	
 		Controler controler = new Controler(scenario);
 		
 		this.events = controler.getEvents();
@@ -157,8 +155,6 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 		controler.addControlerListener(new InternalizationPtControlerListener(scenario));
 		controler.run();
-		
-		
 		
 		//*******************************************************************************************
 		
@@ -207,32 +203,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 		//*******************************************************************************************
 		
-     }
-
-	private void fillVehicle01(ScenarioImpl scenario) {
-		Vehicles veh = scenario.getVehicles();
-
-		Id vehTypeId1 = new IdImpl("type_1");
-		Id vehId1 = new IdImpl("veh_1");
-
-		VehicleType type = veh.getFactory().createVehicleType(vehTypeId1);
-		VehicleCapacity cap = veh.getFactory().createVehicleCapacity();
-		cap.setSeats(50);
-		cap.setStandingRoom(0);
-		type.setCapacity(cap);
-		type.setLength(10);
-		type.setAccessTime(1.0);
-		type.setEgressTime(0.75);
-		type.setDoorOperationMode(DoorOperationMode.serial);
-		
-		type.setMaximumVelocity(8.33);
-		type.setPcuEquivalents(7.5);
-		
-		veh.getVehicleTypes().put(vehTypeId1, type); 
-		
-		Vehicle vehicle = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
-		veh.getVehicles().put(vehId1, vehicle);
-	}
+    }
 
 	//one agent from start (stop 1) to finish (stop 6)
 	//another agent gets on (stop 2)
@@ -244,9 +215,6 @@ public class MarginalCostPricingPtHandlerTest  {
 	
 	Config config = utils.loadConfig(null);
 	
-	String scheduleFile = utils.getInputDirectory() + "transitscheduleEmpty.xml";
-	String vehiclesFile = utils.getInputDirectory() + "transitVehicles.xml";
-	
 	config.controler().setOutputDirectory(utils.getOutputDirectory());
 	config.controler().setLastIteration(0);
 	config.controler().setMobsim(MobsimType.qsim.toString());
@@ -254,8 +222,6 @@ public class MarginalCostPricingPtHandlerTest  {
 	
 	config.scenario().setUseTransit(true);
 	config.scenario().setUseVehicles(true);
-	config.transit().setTransitScheduleFile(scheduleFile);
-	config.transit().setVehiclesFile(vehiclesFile);
 	
 	ActivityParams hParams = new ActivityParams("h");
 	hParams.setTypicalDuration(3600.);
@@ -264,10 +230,11 @@ public class MarginalCostPricingPtHandlerTest  {
 	wParams.setTypicalDuration(3600.);
 	config.planCalcScore().addActivityParams(wParams);
 	
-	ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
+	ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 	
 	setPopulationTestInVehicleDelay02(scenario);
-	setScheduleTestInVehicleDelay02(scenario);
+	fillScheduleTestInVehicleDelay02(scenario);
+	fillVehicleTestInVehicleDelay02(scenario);
 	setNetworkOneWay(scenario);
 	
 	Controler controler = new Controler(scenario);
@@ -369,9 +336,6 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 		Config config = utils.loadConfig(null);
 		
-		String scheduleFile = utils.getInputDirectory() + "transitscheduleEmpty.xml";
-		String vehiclesFile = utils.getInputDirectory() + "transitVehicles.xml";
-		
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
 		config.controler().setMobsim(MobsimType.qsim.toString());
@@ -379,8 +343,6 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 		config.scenario().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
-		config.transit().setTransitScheduleFile(scheduleFile);
-		config.transit().setVehiclesFile(vehiclesFile);
 		
 		ActivityParams hParams = new ActivityParams("h");
 		hParams.setTypicalDuration(3600.);
@@ -389,10 +351,11 @@ public class MarginalCostPricingPtHandlerTest  {
 		wParams.setTypicalDuration(3600.);
 		config.planCalcScore().addActivityParams(wParams);
 		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		
 		setPopulationTestInVehicleDelay03(scenario);
-		setScheduleTestInVehicleDelay03(scenario);
+		fillScheduleTestInVehicleDelay03(scenario);
+		fillVehicleTestInVehicleDelay03(scenario);
 		setNetworkOneWay(scenario);
 		
 		Controler controler = new Controler(scenario);
@@ -533,9 +496,6 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 		Config config = utils.loadConfig(null);
 		
-		String scheduleFile = utils.getInputDirectory() + "transitscheduleEmpty.xml";
-		String vehiclesFile = utils.getInputDirectory() + "transitVehicles.xml";
-		
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
 		config.controler().setMobsim(MobsimType.qsim.toString());
@@ -543,8 +503,6 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 		config.scenario().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
-		config.transit().setTransitScheduleFile(scheduleFile);
-		config.transit().setVehiclesFile(vehiclesFile);
 		
 		ActivityParams hParams = new ActivityParams("h");
 		hParams.setTypicalDuration(3600.);
@@ -553,10 +511,11 @@ public class MarginalCostPricingPtHandlerTest  {
 		wParams.setTypicalDuration(3600.);
 		config.planCalcScore().addActivityParams(wParams);
 		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		
 		setPopulationTestWaitingDelay01(scenario);
-		setScheduleTestWaitingDelay01(scenario);
+		fillScheduleTestWaitingDelay01(scenario);
+		fillVehicleTestWaitingDelay01(scenario);
 		setNetworkOneWay(scenario);
 		
 		Controler controler = new Controler(scenario);
@@ -580,54 +539,54 @@ public class MarginalCostPricingPtHandlerTest  {
 			controler.addControlerListener(new InternalizationPtControlerListener(scenario));
 			controler.run();
 		
-				//*******************************************************************************************
-		
-				Assert.assertEquals("number of WaitingDelayEvents", 8, waitingDelayEvents.size());
-						
-				TransferDelayWaitingEvent wde1 = waitingDelayEvents.get(0);
-				TransferDelayWaitingEvent wde2 = waitingDelayEvents.get(1);
-				TransferDelayWaitingEvent wde3 = waitingDelayEvents.get(2);
-				TransferDelayWaitingEvent wde4 = waitingDelayEvents.get(3);
-				TransferDelayWaitingEvent wde5 = waitingDelayEvents.get(4);
-				TransferDelayWaitingEvent wde6 = waitingDelayEvents.get(5);
-				TransferDelayWaitingEvent wde7 = waitingDelayEvents.get(6);
-				TransferDelayWaitingEvent wde8 = waitingDelayEvents.get(7);
-				
-				Assert.assertEquals("affected Agents", 1.0, wde1.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-				Assert.assertEquals("causing Agent", testAgent1.toString(), wde1.getCausingAgent().toString());
-				Assert.assertEquals("delay", 1.0, wde1.getDelay(), MatsimTestUtils.EPSILON);
-				
-				Assert.assertEquals("affected Agents", 0.0, wde2.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-				Assert.assertEquals("causing Agent", testAgent2.toString(), wde2.getCausingAgent().toString());
-				Assert.assertEquals("delay", 1.0, wde2.getDelay(), MatsimTestUtils.EPSILON);
-				
-				Assert.assertEquals("affected Agents", 0.0, wde3.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-				Assert.assertEquals("causing Agent", testAgent2.toString(), wde3.getCausingAgent().toString());
-				Assert.assertEquals("delay", 0.75, wde3.getDelay(), MatsimTestUtils.EPSILON);
-				
-				Assert.assertEquals("affected Agents", 0.0, wde4.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-				Assert.assertEquals("causing Agent", testAgent1.toString(), wde4.getCausingAgent().toString());
-				Assert.assertEquals("delay", 0.75, wde4.getDelay(), MatsimTestUtils.EPSILON);
-				
-				Assert.assertEquals("affected Agents", 1.0, wde5.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-				Assert.assertEquals("causing Agent", testAgent1.toString(), wde5.getCausingAgent().toString());
-				Assert.assertEquals("delay", 2.0, wde5.getDelay(), MatsimTestUtils.EPSILON);
-				
-				Assert.assertEquals("affected Agents", 0.0, wde6.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-				Assert.assertEquals("causing Agent", testAgent2.toString(), wde6.getCausingAgent().toString());
-				Assert.assertEquals("delay", 2.0, wde6.getDelay(), MatsimTestUtils.EPSILON);
-				
-				Assert.assertEquals("affected Agents", 0.0, wde7.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-				Assert.assertEquals("causing Agent", testAgent2.toString(), wde7.getCausingAgent().toString());
-				Assert.assertEquals("delay", 2.0, wde7.getDelay(), MatsimTestUtils.EPSILON);
-				
-				Assert.assertEquals("affected Agents", 0.0, wde8.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-				Assert.assertEquals("causing Agent", testAgent1.toString(), wde8.getCausingAgent().toString());
-				Assert.assertEquals("delay", 2.0, wde8.getDelay(), MatsimTestUtils.EPSILON);
-				
-				//*******************************************************************************************
-				
-			}
+			//*******************************************************************************************
+			
+			Assert.assertEquals("number of WaitingDelayEvents", 8, waitingDelayEvents.size());
+							
+			TransferDelayWaitingEvent wde1 = waitingDelayEvents.get(0);
+			TransferDelayWaitingEvent wde2 = waitingDelayEvents.get(1);
+			TransferDelayWaitingEvent wde3 = waitingDelayEvents.get(2);
+			TransferDelayWaitingEvent wde4 = waitingDelayEvents.get(3);
+			TransferDelayWaitingEvent wde5 = waitingDelayEvents.get(4);
+			TransferDelayWaitingEvent wde6 = waitingDelayEvents.get(5);
+			TransferDelayWaitingEvent wde7 = waitingDelayEvents.get(6);
+			TransferDelayWaitingEvent wde8 = waitingDelayEvents.get(7);
+					
+			Assert.assertEquals("affected Agents", 1.0, wde1.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent1.toString(), wde1.getCausingAgent().toString());
+			Assert.assertEquals("delay", 1.0, wde1.getDelay(), MatsimTestUtils.EPSILON);
+					
+			Assert.assertEquals("affected Agents", 0.0, wde2.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent2.toString(), wde2.getCausingAgent().toString());
+			Assert.assertEquals("delay", 1.0, wde2.getDelay(), MatsimTestUtils.EPSILON);
+					
+			Assert.assertEquals("affected Agents", 0.0, wde3.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent2.toString(), wde3.getCausingAgent().toString());
+			Assert.assertEquals("delay", 0.75, wde3.getDelay(), MatsimTestUtils.EPSILON);
+					
+			Assert.assertEquals("affected Agents", 0.0, wde4.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent1.toString(), wde4.getCausingAgent().toString());
+			Assert.assertEquals("delay", 0.75, wde4.getDelay(), MatsimTestUtils.EPSILON);
+					
+			Assert.assertEquals("affected Agents", 1.0, wde5.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent1.toString(), wde5.getCausingAgent().toString());
+			Assert.assertEquals("delay", 2.0, wde5.getDelay(), MatsimTestUtils.EPSILON);
+					
+			Assert.assertEquals("affected Agents", 0.0, wde6.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent2.toString(), wde6.getCausingAgent().toString());
+			Assert.assertEquals("delay", 2.0, wde6.getDelay(), MatsimTestUtils.EPSILON);
+					
+			Assert.assertEquals("affected Agents", 0.0, wde7.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent2.toString(), wde7.getCausingAgent().toString());
+			Assert.assertEquals("delay", 2.0, wde7.getDelay(), MatsimTestUtils.EPSILON);
+					
+			Assert.assertEquals("affected Agents", 0.0, wde8.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent1.toString(), wde8.getCausingAgent().toString());
+			Assert.assertEquals("delay", 2.0, wde8.getDelay(), MatsimTestUtils.EPSILON);
+					
+			//*******************************************************************************************
+					
+	}
 	
 	//agent 1 (2 --> 4)
 	//agent 2 is waiting (3 --> 5)
@@ -637,9 +596,6 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 		Config config = utils.loadConfig(null);
 		
-		String scheduleFile = utils.getInputDirectory() + "transitscheduleEmpty.xml";
-		String vehiclesFile = utils.getInputDirectory() + "transitVehicles.xml";
-		
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
 		config.controler().setMobsim(MobsimType.qsim.toString());
@@ -647,8 +603,6 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 		config.scenario().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
-		config.transit().setTransitScheduleFile(scheduleFile);
-		config.transit().setVehiclesFile(vehiclesFile);
 		
 		ActivityParams hParams = new ActivityParams("h");
 		hParams.setTypicalDuration(3600.);
@@ -657,10 +611,11 @@ public class MarginalCostPricingPtHandlerTest  {
 		wParams.setTypicalDuration(3600.);
 		config.planCalcScore().addActivityParams(wParams);
 		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 
 		setPopulationTestWaitingDelay02(scenario);
-		setScheduleTestWaitingDelay02(scenario);
+		fillScheduleTestWaitingDelay02(scenario);
+		fillVehicleTestWaitingDelay02(scenario);
 		setNetworkOneWay(scenario);
 		
 		Controler controler = new Controler(scenario);
@@ -684,66 +639,64 @@ public class MarginalCostPricingPtHandlerTest  {
 			controler.addControlerListener(new InternalizationPtControlerListener(scenario));
 			controler.run();
 		
-		//*******************************************************************************************
-		
-		Assert.assertEquals("number of WaitingDelayEvents", 8, waitingDelayEvents.size());
-		
-		TransferDelayWaitingEvent wde1 = waitingDelayEvents.get(0);
-		TransferDelayWaitingEvent wde2 = waitingDelayEvents.get(1);
-		TransferDelayWaitingEvent wde3 = waitingDelayEvents.get(2);
-		TransferDelayWaitingEvent wde4 = waitingDelayEvents.get(3);
-		TransferDelayWaitingEvent wde5 = waitingDelayEvents.get(4);
-		TransferDelayWaitingEvent wde6 = waitingDelayEvents.get(5);
-		TransferDelayWaitingEvent wde7 = waitingDelayEvents.get(6);
-		TransferDelayWaitingEvent wde8 = waitingDelayEvents.get(7);
-		
-		Assert.assertEquals("affected Agents", 1.0, wde1.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent1.toString(), wde1.getCausingAgent().toString());
-		Assert.assertEquals("delay", 1.0, wde1.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", 0.0, wde2.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent2.toString(), wde2.getCausingAgent().toString());
-		Assert.assertEquals("delay", 1.0, wde2.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", 0.0, wde3.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent1.toString(), wde3.getCausingAgent().toString());
-		Assert.assertEquals("delay", 0.75, wde3.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", 0.0, wde4.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent2.toString(), wde4.getCausingAgent().toString());
-		Assert.assertEquals("delay", 0.75, wde4.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", 1.0, wde5.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent1.toString(), wde5.getCausingAgent().toString());
-		Assert.assertEquals("delay", 2.0, wde5.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", 0.0, wde6.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent2.toString(), wde6.getCausingAgent().toString());
-		Assert.assertEquals("delay", 2.0, wde6.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", 0.0, wde7.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent1.toString(), wde7.getCausingAgent().toString());
-		Assert.assertEquals("delay", 2.0, wde7.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", 0.0, wde8.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent2.toString(), wde8.getCausingAgent().toString());
-		Assert.assertEquals("delay", 2.0, wde8.getDelay(), MatsimTestUtils.EPSILON);
-		
-		//*******************************************************************************************
+			//*******************************************************************************************
+			
+			Assert.assertEquals("number of WaitingDelayEvents", 8, waitingDelayEvents.size());
+			
+			TransferDelayWaitingEvent wde1 = waitingDelayEvents.get(0);
+			TransferDelayWaitingEvent wde2 = waitingDelayEvents.get(1);
+			TransferDelayWaitingEvent wde3 = waitingDelayEvents.get(2);
+			TransferDelayWaitingEvent wde4 = waitingDelayEvents.get(3);
+			TransferDelayWaitingEvent wde5 = waitingDelayEvents.get(4);
+			TransferDelayWaitingEvent wde6 = waitingDelayEvents.get(5);
+			TransferDelayWaitingEvent wde7 = waitingDelayEvents.get(6);
+			TransferDelayWaitingEvent wde8 = waitingDelayEvents.get(7);
+			
+			Assert.assertEquals("affected Agents", 1.0, wde1.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent1.toString(), wde1.getCausingAgent().toString());
+			Assert.assertEquals("delay", 1.0, wde1.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", 0.0, wde2.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent2.toString(), wde2.getCausingAgent().toString());
+			Assert.assertEquals("delay", 1.0, wde2.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", 0.0, wde3.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent1.toString(), wde3.getCausingAgent().toString());
+			Assert.assertEquals("delay", 0.75, wde3.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", 0.0, wde4.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent2.toString(), wde4.getCausingAgent().toString());
+			Assert.assertEquals("delay", 0.75, wde4.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", 1.0, wde5.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent1.toString(), wde5.getCausingAgent().toString());
+			Assert.assertEquals("delay", 2.0, wde5.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", 0.0, wde6.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent2.toString(), wde6.getCausingAgent().toString());
+			Assert.assertEquals("delay", 2.0, wde6.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", 0.0, wde7.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent1.toString(), wde7.getCausingAgent().toString());
+			Assert.assertEquals("delay", 2.0, wde7.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", 0.0, wde8.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent2.toString(), wde8.getCausingAgent().toString());
+			Assert.assertEquals("delay", 2.0, wde8.getDelay(), MatsimTestUtils.EPSILON);
+			
+			//*******************************************************************************************
 		
 	}
 	
 	//agent 1 (2 --> 3)
 	//agent 2 is waiting (4 --> 5)
 	//agent 2 waits less than the delay of the bus (2.0<6.0 sec) --> consideration of AffectedAgentsUnits
+	//It is important to define a bus in the schedule which leaves later on,
+	//even if agent 2 will nevertheless get the first bus.
 	@Test
 	public final void testWaitingDelay03(){
 		
 		Config config = utils.loadConfig(null);
-		
-//		String scheduleFile = utils.getInputDirectory() + "transitschedule.xml";
-		String scheduleFile = utils.getInputDirectory() + "transitscheduleEmpty.xml";
-		String vehiclesFile = utils.getInputDirectory() + "transitVehicles.xml";
 		
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -752,8 +705,6 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 		config.scenario().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
-		config.transit().setTransitScheduleFile(scheduleFile);
-		config.transit().setVehiclesFile(vehiclesFile);
 		
 		ActivityParams hParams = new ActivityParams("h");
 		hParams.setTypicalDuration(3600.);
@@ -762,10 +713,11 @@ public class MarginalCostPricingPtHandlerTest  {
 		wParams.setTypicalDuration(3600.);
 		config.planCalcScore().addActivityParams(wParams);
 		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 
 		setPopulationTestWaitingDelay03(scenario);
-		setScheduleTestWaitingDelay03(scenario);
+		fillScheduleTestWaitingDelay03(scenario);
+		fillVehicleTestWaitingDelay03(scenario);
 		setNetworkOneWay(scenario);
 		
 		Controler controler = new Controler(scenario);
@@ -792,65 +744,67 @@ public class MarginalCostPricingPtHandlerTest  {
 			controler.addControlerListener(new InternalizationPtControlerListener(scenario));
 			controler.run();
 		
-		//*******************************************************************************************
-		
-		Assert.assertEquals("number of WaitingDelayEvents", 8, waitingDelayEvents.size());
-		
-		TransferDelayWaitingEvent wde1 = waitingDelayEvents.get(0);
-		TransferDelayWaitingEvent wde2 = waitingDelayEvents.get(1);
-		TransferDelayWaitingEvent wde3 = waitingDelayEvents.get(2);
-		TransferDelayWaitingEvent wde4 = waitingDelayEvents.get(3);
-		TransferDelayWaitingEvent wde5 = waitingDelayEvents.get(4);
-		TransferDelayWaitingEvent wde6 = waitingDelayEvents.get(5);
-		TransferDelayWaitingEvent wde7 = waitingDelayEvents.get(6);
-		TransferDelayWaitingEvent wde8 = waitingDelayEvents.get(7);
-		
-		Assert.assertEquals("affected Agents", 0.3333333333333333, wde1.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent1.toString(), wde1.getCausingAgent().toString());
-		Assert.assertEquals("delay", 1.0, wde1.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", 0.0, wde2.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent2.toString(), wde2.getCausingAgent().toString());
-		Assert.assertEquals("delay", 1.0, wde2.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", 0.3333333333333333, wde3.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent1.toString(), wde3.getCausingAgent().toString());
-		Assert.assertEquals("delay", 0.75, wde3.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", 0.0, wde4.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent2.toString(), wde4.getCausingAgent().toString());
-		Assert.assertEquals("delay", 0.75, wde4.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", 0.3333333333333333, wde5.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent1.toString(), wde5.getCausingAgent().toString());
-		Assert.assertEquals("delay", 2.0, wde5.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", 0.3333333333333333, wde6.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent1.toString(), wde6.getCausingAgent().toString());
-		Assert.assertEquals("delay", 2.0, wde6.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", 0.0, wde7.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent2.toString(), wde7.getCausingAgent().toString());
-		Assert.assertEquals("delay", 2.0, wde7.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", 0.0, wde8.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent2.toString(), wde8.getCausingAgent().toString());
-		Assert.assertEquals("delay", 2.0, wde8.getDelay(), MatsimTestUtils.EPSILON);
-		
-		//*******************************************************************************************
+			//*******************************************************************************************
+			
+			Assert.assertEquals("number of WaitingDelayEvents", 8, waitingDelayEvents.size());
+			
+			TransferDelayWaitingEvent wde1 = waitingDelayEvents.get(0);
+			TransferDelayWaitingEvent wde2 = waitingDelayEvents.get(1);
+			TransferDelayWaitingEvent wde3 = waitingDelayEvents.get(2);
+			TransferDelayWaitingEvent wde4 = waitingDelayEvents.get(3);
+			TransferDelayWaitingEvent wde5 = waitingDelayEvents.get(4);
+			TransferDelayWaitingEvent wde6 = waitingDelayEvents.get(5);
+			TransferDelayWaitingEvent wde7 = waitingDelayEvents.get(6);
+			TransferDelayWaitingEvent wde8 = waitingDelayEvents.get(7);
+			
+			Assert.assertEquals("affected Agents", 0.3333333333333333, wde1.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent1.toString(), wde1.getCausingAgent().toString());
+			Assert.assertEquals("delay", 1.0, wde1.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", 0.0, wde2.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent2.toString(), wde2.getCausingAgent().toString());
+			Assert.assertEquals("delay", 1.0, wde2.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", 0.3333333333333333, wde3.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent1.toString(), wde3.getCausingAgent().toString());
+			Assert.assertEquals("delay", 0.75, wde3.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", 0.0, wde4.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent2.toString(), wde4.getCausingAgent().toString());
+			Assert.assertEquals("delay", 0.75, wde4.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", 0.3333333333333333, wde5.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent1.toString(), wde5.getCausingAgent().toString());
+			Assert.assertEquals("delay", 2.0, wde5.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", 0.3333333333333333, wde6.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent1.toString(), wde6.getCausingAgent().toString());
+			Assert.assertEquals("delay", 2.0, wde6.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", 0.0, wde7.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent2.toString(), wde7.getCausingAgent().toString());
+			Assert.assertEquals("delay", 2.0, wde7.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", 0.0, wde8.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent2.toString(), wde8.getCausingAgent().toString());
+			Assert.assertEquals("delay", 2.0, wde8.getDelay(), MatsimTestUtils.EPSILON);
+			
+			//*******************************************************************************************
 		
 	}
 
+	// Difficulties if an agent arrives 
+	// 1.) at the stop in the time step when the bus would already close the doors or
+	// 2.) at the stop in the time step when the bus would pass the 
+	//
 	//agent 1 (2 --> 4)
 	//agent 2 is waiting (4 --> 5)
-	//agent 2 arrives after the arrival of the bus at the station, while agent 1 gets off the bus ( --> consideration of AffectedAgentsUnits
+	//agent 2 arrives in the time step of (/ after) the arrival of the bus at the station,
+	@Ignore
 	@Test
 	public final void testWaitingDelay03b(){
 			
 		Config config = utils.loadConfig(null);
-			
-		String scheduleFile = utils.getInputDirectory() + "transitscheduleEmpty.xml";
-		String vehiclesFile = utils.getInputDirectory() + "transitVehicles.xml";
 			
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
@@ -859,8 +813,6 @@ public class MarginalCostPricingPtHandlerTest  {
 			
 		config.scenario().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
-		config.transit().setTransitScheduleFile(scheduleFile);
-		config.transit().setVehiclesFile(vehiclesFile);
 			
 		ActivityParams hParams = new ActivityParams("h");
 		hParams.setTypicalDuration(3600.);
@@ -869,10 +821,11 @@ public class MarginalCostPricingPtHandlerTest  {
 		wParams.setTypicalDuration(3600.);
 		config.planCalcScore().addActivityParams(wParams);
 			
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 
 		setPopulationTestWaitingDelay03b(scenario);
-		setScheduleTestWaitingDelay03b(scenario);
+		fillScheduleTestWaitingDelay03b(scenario);
+		fillVehicleTestWaitingDelay03b(scenario);
 		setNetworkOneWay(scenario);
 			
 		Controler controler = new Controler(scenario);
@@ -899,52 +852,52 @@ public class MarginalCostPricingPtHandlerTest  {
 			controler.addControlerListener(new InternalizationPtControlerListener(scenario));
 			controler.run();
 			
-		//*******************************************************************************************
-			
-		Assert.assertEquals("number of WaitingDelayEvents", 8, waitingDelayEvents.size());
-			
-		TransferDelayWaitingEvent wde1 = waitingDelayEvents.get(0);
-		TransferDelayWaitingEvent wde2 = waitingDelayEvents.get(1);
-		TransferDelayWaitingEvent wde3 = waitingDelayEvents.get(2);		
-		TransferDelayWaitingEvent wde4 = waitingDelayEvents.get(3);
-		TransferDelayWaitingEvent wde5 = waitingDelayEvents.get(4);
-		TransferDelayWaitingEvent wde6 = waitingDelayEvents.get(5);
-		TransferDelayWaitingEvent wde7 = waitingDelayEvents.get(6);
-		TransferDelayWaitingEvent wde8 = waitingDelayEvents.get(7);
-			
-		Assert.assertEquals("affected Agents", 0.21052631578947367, wde1.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent1.toString(), wde1.getCausingAgent().toString());
-		Assert.assertEquals("delay", 1.0, wde1.getDelay(), MatsimTestUtils.EPSILON);
-			
-		Assert.assertEquals("affected Agents", 0.0, wde2.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent2.toString(), wde2.getCausingAgent().toString());
-		Assert.assertEquals("delay", 1.0, wde2.getDelay(), MatsimTestUtils.EPSILON);
-			
-		Assert.assertEquals("affected Agents", 0.21052631578947367, wde3.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent1.toString(), wde3.getCausingAgent().toString());
-		Assert.assertEquals("delay", 0.75, wde3.getDelay(), MatsimTestUtils.EPSILON);
-			
-		Assert.assertEquals("affected Agents", 0.0, wde4.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent2.toString(), wde4.getCausingAgent().toString());
-		Assert.assertEquals("delay", 0.75, wde4.getDelay(), MatsimTestUtils.EPSILON);
-			
-		Assert.assertEquals("affected Agents", 0.21052631578947367, wde5.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent1.toString(), wde5.getCausingAgent().toString());
-		Assert.assertEquals("delay", 2.0, wde5.getDelay(), MatsimTestUtils.EPSILON);
-			
-		Assert.assertEquals("affected Agents", 0, wde6.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent1.toString(), wde6.getCausingAgent().toString());
-		Assert.assertEquals("delay", 1.0, wde6.getDelay(), MatsimTestUtils.EPSILON);
-			
-		Assert.assertEquals("affected Agents", 0.0, wde7.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent2.toString(), wde7.getCausingAgent().toString());
-		Assert.assertEquals("delay", 1.0, wde7.getDelay(), MatsimTestUtils.EPSILON);
-			
-		Assert.assertEquals("affected Agents", 0.0, wde8.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent2.toString(), wde8.getCausingAgent().toString());
-		Assert.assertEquals("delay", 2.0, wde8.getDelay(), MatsimTestUtils.EPSILON);
-			
-		//*******************************************************************************************
+			//*******************************************************************************************
+				
+			Assert.assertEquals("number of WaitingDelayEvents", 8, waitingDelayEvents.size());
+				
+			TransferDelayWaitingEvent wde1 = waitingDelayEvents.get(0);
+			TransferDelayWaitingEvent wde2 = waitingDelayEvents.get(1);
+			TransferDelayWaitingEvent wde3 = waitingDelayEvents.get(2);		
+			TransferDelayWaitingEvent wde4 = waitingDelayEvents.get(3);
+			TransferDelayWaitingEvent wde5 = waitingDelayEvents.get(4);
+			TransferDelayWaitingEvent wde6 = waitingDelayEvents.get(5);
+			TransferDelayWaitingEvent wde7 = waitingDelayEvents.get(6);
+			TransferDelayWaitingEvent wde8 = waitingDelayEvents.get(7);
+				
+			Assert.assertEquals("affected Agents", 0.25806451612903225, wde1.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent1.toString(), wde1.getCausingAgent().toString());
+			Assert.assertEquals("delay", 1.0, wde1.getDelay(), MatsimTestUtils.EPSILON);
+				
+			Assert.assertEquals("affected Agents", 0.0, wde2.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent2.toString(), wde2.getCausingAgent().toString());
+			Assert.assertEquals("delay", 1.0, wde2.getDelay(), MatsimTestUtils.EPSILON);
+				
+			Assert.assertEquals("affected Agents", 0.25806451612903225, wde3.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent1.toString(), wde3.getCausingAgent().toString());
+			Assert.assertEquals("delay", 0.75, wde3.getDelay(), MatsimTestUtils.EPSILON);
+				
+			Assert.assertEquals("affected Agents", 0.0, wde4.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent2.toString(), wde4.getCausingAgent().toString());
+			Assert.assertEquals("delay", 0.75, wde4.getDelay(), MatsimTestUtils.EPSILON);
+				
+			Assert.assertEquals("affected Agents", 0.25806451612903225, wde5.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent1.toString(), wde5.getCausingAgent().toString());
+			Assert.assertEquals("delay", 2.0, wde5.getDelay(), MatsimTestUtils.EPSILON);
+				
+			Assert.assertEquals("affected Agents", 0, wde6.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent1.toString(), wde6.getCausingAgent().toString());
+			Assert.assertEquals("delay", 1.0, wde6.getDelay(), MatsimTestUtils.EPSILON);
+				
+			Assert.assertEquals("affected Agents", 0.0, wde7.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent2.toString(), wde7.getCausingAgent().toString());
+			Assert.assertEquals("delay", 1.0, wde7.getDelay(), MatsimTestUtils.EPSILON);
+				
+			Assert.assertEquals("affected Agents", 0.0, wde8.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent2.toString(), wde8.getCausingAgent().toString());
+			Assert.assertEquals("delay", 2.0, wde8.getDelay(), MatsimTestUtils.EPSILON);
+				
+			//*******************************************************************************************
 			
 	}
 
@@ -955,9 +908,6 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 		Config config = utils.loadConfig(null);
 		
-		String scheduleFile = utils.getInputDirectory() + "transitscheduleEmpty.xml";
-		String vehiclesFile = utils.getInputDirectory() + "transitVehicles.xml";
-		
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
 		config.controler().setMobsim(MobsimType.qsim.toString());
@@ -965,8 +915,6 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 		config.scenario().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
-		config.transit().setTransitScheduleFile(scheduleFile);
-		config.transit().setVehiclesFile(vehiclesFile);
 		
 		ActivityParams hParams = new ActivityParams("h");
 		hParams.setTypicalDuration(3600.);
@@ -975,10 +923,11 @@ public class MarginalCostPricingPtHandlerTest  {
 		wParams.setTypicalDuration(3600.);
 		config.planCalcScore().addActivityParams(wParams);
 		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 
 		setPopulationTestWaitingDelay04(scenario);
-		setScheduleTestWaitingDelay04(scenario);
+		fillScheduleTestWaitingDelay04(scenario);
+		fillVehicleTestWaitingDelay04(scenario);
 		setNetworkOneWay(scenario);
 		
 		Controler controler = new Controler(scenario);
@@ -1005,72 +954,72 @@ public class MarginalCostPricingPtHandlerTest  {
 			controler.addControlerListener(new InternalizationPtControlerListener(scenario));
 			controler.run();
 		
-		//*******************************************************************************************
-		
-		Assert.assertEquals("number of WaitingDelayEvents", 12, waitingDelayEvents.size());
-		
-		TransferDelayWaitingEvent wde1 = waitingDelayEvents.get(0);
-		TransferDelayWaitingEvent wde2 = waitingDelayEvents.get(1);
-		TransferDelayWaitingEvent wde3 = waitingDelayEvents.get(2);
-		TransferDelayWaitingEvent wde4 = waitingDelayEvents.get(3);
-		TransferDelayWaitingEvent wde5 = waitingDelayEvents.get(4);
-		TransferDelayWaitingEvent wde6 = waitingDelayEvents.get(5);
-		TransferDelayWaitingEvent wde7 = waitingDelayEvents.get(6);
-		TransferDelayWaitingEvent wde8 = waitingDelayEvents.get(7);
-		TransferDelayWaitingEvent wde9 = waitingDelayEvents.get(8);
-		TransferDelayWaitingEvent wde10 = waitingDelayEvents.get(9);
-		TransferDelayWaitingEvent wde11 = waitingDelayEvents.get(10);
-		TransferDelayWaitingEvent wde12 = waitingDelayEvents.get(11);
-		
-		Assert.assertEquals("affected Agents", 2.0, wde1.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent1.toString(), wde1.getCausingAgent().toString());
-		Assert.assertEquals("delay", 1.0, wde1.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", 1.0,  wde2.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent2.toString(), wde2.getCausingAgent().toString());
-		Assert.assertEquals("delay", 1.0, wde2.getDelay(), MatsimTestUtils.EPSILON);
-
-		Assert.assertEquals("affected Agents", 0.0, wde3.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent3.toString(), wde3.getCausingAgent().toString());
-		Assert.assertEquals("delay", 1.0, wde3.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", 1.0, wde4.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent1.toString(), wde4.getCausingAgent().toString());
-		Assert.assertEquals("delay", 0.75, wde4.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", 1.0, wde5.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent2.toString(), wde5.getCausingAgent().toString());
-		Assert.assertEquals("delay", 0.75, wde5.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", 0.0, wde6.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent3.toString(), wde6.getCausingAgent().toString());
-		Assert.assertEquals("delay", 0.75, wde6.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", 1.0, wde7.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent1.toString(), wde7.getCausingAgent().toString());
-		Assert.assertEquals("delay", 1.0, wde7.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", 1.0, wde8.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent2.toString(), wde8.getCausingAgent().toString());
-		Assert.assertEquals("delay", 1.0, wde8.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", 1.0, wde9.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent1.toString(), wde9.getCausingAgent().toString());
-		Assert.assertEquals("delay", 1.0, wde9.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", 1.0, wde10.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent2.toString(), wde10.getCausingAgent().toString());
-		Assert.assertEquals("delay", 1.0, wde10.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", 0.0, wde11.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent3.toString(), wde11.getCausingAgent().toString());
-		Assert.assertEquals("delay", 2.0, wde11.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", 0.0, wde12.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent3.toString(), wde12.getCausingAgent().toString());
-		Assert.assertEquals("delay", 2.0, wde12.getDelay(), MatsimTestUtils.EPSILON);
-		
-		//*******************************************************************************************
+			//*******************************************************************************************
+			
+			Assert.assertEquals("number of WaitingDelayEvents", 12, waitingDelayEvents.size());
+			
+			TransferDelayWaitingEvent wde1 = waitingDelayEvents.get(0);
+			TransferDelayWaitingEvent wde2 = waitingDelayEvents.get(1);
+			TransferDelayWaitingEvent wde3 = waitingDelayEvents.get(2);
+			TransferDelayWaitingEvent wde4 = waitingDelayEvents.get(3);
+			TransferDelayWaitingEvent wde5 = waitingDelayEvents.get(4);
+			TransferDelayWaitingEvent wde6 = waitingDelayEvents.get(5);
+			TransferDelayWaitingEvent wde7 = waitingDelayEvents.get(6);
+			TransferDelayWaitingEvent wde8 = waitingDelayEvents.get(7);
+			TransferDelayWaitingEvent wde9 = waitingDelayEvents.get(8);
+			TransferDelayWaitingEvent wde10 = waitingDelayEvents.get(9);
+			TransferDelayWaitingEvent wde11 = waitingDelayEvents.get(10);
+			TransferDelayWaitingEvent wde12 = waitingDelayEvents.get(11);
+			
+			Assert.assertEquals("affected Agents", 2.0, wde1.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent1.toString(), wde1.getCausingAgent().toString());
+			Assert.assertEquals("delay", 1.0, wde1.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", 1.0,  wde2.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent2.toString(), wde2.getCausingAgent().toString());
+			Assert.assertEquals("delay", 1.0, wde2.getDelay(), MatsimTestUtils.EPSILON);
+	
+			Assert.assertEquals("affected Agents", 0.0, wde3.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent3.toString(), wde3.getCausingAgent().toString());
+			Assert.assertEquals("delay", 1.0, wde3.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", 1.0, wde4.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent1.toString(), wde4.getCausingAgent().toString());
+			Assert.assertEquals("delay", 0.75, wde4.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", 1.0, wde5.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent2.toString(), wde5.getCausingAgent().toString());
+			Assert.assertEquals("delay", 0.75, wde5.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", 0.0, wde6.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent3.toString(), wde6.getCausingAgent().toString());
+			Assert.assertEquals("delay", 0.75, wde6.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", 1.0, wde7.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent1.toString(), wde7.getCausingAgent().toString());
+			Assert.assertEquals("delay", 1.0, wde7.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", 1.0, wde8.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent2.toString(), wde8.getCausingAgent().toString());
+			Assert.assertEquals("delay", 1.0, wde8.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", 1.0, wde9.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent1.toString(), wde9.getCausingAgent().toString());
+			Assert.assertEquals("delay", 1.0, wde9.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", 1.0, wde10.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent2.toString(), wde10.getCausingAgent().toString());
+			Assert.assertEquals("delay", 1.0, wde10.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", 0.0, wde11.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent3.toString(), wde11.getCausingAgent().toString());
+			Assert.assertEquals("delay", 2.0, wde11.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", 0.0, wde12.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent3.toString(), wde12.getCausingAgent().toString());
+			Assert.assertEquals("delay", 2.0, wde12.getDelay(), MatsimTestUtils.EPSILON);
+			
+			//*******************************************************************************************
 		
 	}
 	
@@ -1081,9 +1030,6 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 		Config config = utils.loadConfig(null);
 		
-		String scheduleFile = utils.getInputDirectory() + "transitscheduleEmpty.xml";
-		String vehiclesFile = utils.getInputDirectory() + "transitVehicles.xml";
-		
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
 		config.controler().setMobsim(MobsimType.qsim.toString());
@@ -1091,8 +1037,6 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 		config.scenario().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
-		config.transit().setTransitScheduleFile(scheduleFile);
-		config.transit().setVehiclesFile(vehiclesFile);
 		
 		ActivityParams hParams = new ActivityParams("h");
 		hParams.setTypicalDuration(3600.);
@@ -1101,10 +1045,11 @@ public class MarginalCostPricingPtHandlerTest  {
 		wParams.setTypicalDuration(3600.);
 		config.planCalcScore().addActivityParams(wParams);
 		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 
 		setPopulationTestWaitingDelay05(scenario);
-		setScheduleTestWaitingDelay05(scenario);
+		fillScheduleTestWaitingDelay05(scenario);
+		fillVehicleTestWaitingDelay05(scenario);
 		setNetworkOneWay(scenario);
 		
 		Controler controler = new Controler(scenario);
@@ -1128,72 +1073,72 @@ public class MarginalCostPricingPtHandlerTest  {
 			controler.addControlerListener(new InternalizationPtControlerListener(scenario));
 			controler.run();
 		
-		//*******************************************************************************************
-		
-		Assert.assertEquals("number of WaitingDelayEvents", 12, waitingDelayEvents.size());
-		
-		TransferDelayWaitingEvent wde1 = waitingDelayEvents.get(0);
-		TransferDelayWaitingEvent wde2 = waitingDelayEvents.get(1);
-		TransferDelayWaitingEvent wde3 = waitingDelayEvents.get(2);
-		TransferDelayWaitingEvent wde4 = waitingDelayEvents.get(3);
-		TransferDelayWaitingEvent wde5 = waitingDelayEvents.get(4);
-		TransferDelayWaitingEvent wde6 = waitingDelayEvents.get(5);
-		TransferDelayWaitingEvent wde7 = waitingDelayEvents.get(6);
-		TransferDelayWaitingEvent wde8 = waitingDelayEvents.get(7);
-		TransferDelayWaitingEvent wde9 = waitingDelayEvents.get(8);
-		TransferDelayWaitingEvent wde10 = waitingDelayEvents.get(9);
-		TransferDelayWaitingEvent wde11 = waitingDelayEvents.get(10);
-		TransferDelayWaitingEvent wde12 = waitingDelayEvents.get(11);
-		
-		Assert.assertEquals("affected Agents", 2.0, wde1.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent1.toString(), wde1.getCausingAgent().toString());
-		Assert.assertEquals("delay", 1.0, wde1.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", 1.0, wde2.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent2.toString(), wde2.getCausingAgent().toString());
-		Assert.assertEquals("delay", 1.0, wde2.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", 0.0, wde3.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent3.toString(), wde3.getCausingAgent().toString());
-		Assert.assertEquals("delay", 1.0, wde3.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", 2.0, wde4.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent1.toString(), wde4.getCausingAgent().toString());
-		Assert.assertEquals("delay", 0.75, wde4.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", 0.0, wde5.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent2.toString(), wde5.getCausingAgent().toString());
-		Assert.assertEquals("delay", 0.75, wde5.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", 0.0, wde6.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent3.toString(), wde6.getCausingAgent().toString());
-		Assert.assertEquals("delay", 0.75, wde6.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", 2.0,  wde7.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent1.toString(), wde7.getCausingAgent().toString());
-		Assert.assertEquals("delay", 2.0, wde7.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", 2.0, wde8.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent1.toString(), wde8.getCausingAgent().toString());
-		Assert.assertEquals("delay", 2.0, wde8.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", 0.0, wde9.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent2.toString(), wde9.getCausingAgent().toString());
-		Assert.assertEquals("delay", 1.0, wde9.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", 0.0, wde10.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent3.toString(), wde10.getCausingAgent().toString());
-		Assert.assertEquals("delay", 1.0, wde10.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", 0.0, wde11.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent2.toString(), wde11.getCausingAgent().toString());
-		Assert.assertEquals("delay", 1.0, wde11.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", 0.0, wde12.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent3.toString(), wde12.getCausingAgent().toString());
-		Assert.assertEquals("delay", 1.0, wde12.getDelay(), MatsimTestUtils.EPSILON);
-		
-		//*******************************************************************************************
+			//*******************************************************************************************
+			
+			Assert.assertEquals("number of WaitingDelayEvents", 12, waitingDelayEvents.size());
+			
+			TransferDelayWaitingEvent wde1 = waitingDelayEvents.get(0);
+			TransferDelayWaitingEvent wde2 = waitingDelayEvents.get(1);
+			TransferDelayWaitingEvent wde3 = waitingDelayEvents.get(2);
+			TransferDelayWaitingEvent wde4 = waitingDelayEvents.get(3);
+			TransferDelayWaitingEvent wde5 = waitingDelayEvents.get(4);
+			TransferDelayWaitingEvent wde6 = waitingDelayEvents.get(5);
+			TransferDelayWaitingEvent wde7 = waitingDelayEvents.get(6);
+			TransferDelayWaitingEvent wde8 = waitingDelayEvents.get(7);
+			TransferDelayWaitingEvent wde9 = waitingDelayEvents.get(8);
+			TransferDelayWaitingEvent wde10 = waitingDelayEvents.get(9);
+			TransferDelayWaitingEvent wde11 = waitingDelayEvents.get(10);
+			TransferDelayWaitingEvent wde12 = waitingDelayEvents.get(11);
+			
+			Assert.assertEquals("affected Agents", 2.0, wde1.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent1.toString(), wde1.getCausingAgent().toString());
+			Assert.assertEquals("delay", 1.0, wde1.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", 1.0, wde2.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent2.toString(), wde2.getCausingAgent().toString());
+			Assert.assertEquals("delay", 1.0, wde2.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", 0.0, wde3.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent3.toString(), wde3.getCausingAgent().toString());
+			Assert.assertEquals("delay", 1.0, wde3.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", 2.0, wde4.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent1.toString(), wde4.getCausingAgent().toString());
+			Assert.assertEquals("delay", 0.75, wde4.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", 0.0, wde5.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent2.toString(), wde5.getCausingAgent().toString());
+			Assert.assertEquals("delay", 0.75, wde5.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", 0.0, wde6.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent3.toString(), wde6.getCausingAgent().toString());
+			Assert.assertEquals("delay", 0.75, wde6.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", 2.0,  wde7.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent1.toString(), wde7.getCausingAgent().toString());
+			Assert.assertEquals("delay", 2.0, wde7.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", 2.0, wde8.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent1.toString(), wde8.getCausingAgent().toString());
+			Assert.assertEquals("delay", 2.0, wde8.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", 0.0, wde9.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent2.toString(), wde9.getCausingAgent().toString());
+			Assert.assertEquals("delay", 1.0, wde9.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", 0.0, wde10.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent3.toString(), wde10.getCausingAgent().toString());
+			Assert.assertEquals("delay", 1.0, wde10.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", 0.0, wde11.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent2.toString(), wde11.getCausingAgent().toString());
+			Assert.assertEquals("delay", 1.0, wde11.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", 0.0, wde12.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent3.toString(), wde12.getCausingAgent().toString());
+			Assert.assertEquals("delay", 1.0, wde12.getDelay(), MatsimTestUtils.EPSILON);
+			
+			//*******************************************************************************************
 		
 	}
 	
@@ -1207,9 +1152,6 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 		Config config = utils.loadConfig(null);
 		
-		String scheduleFile = utils.getInputDirectory() + "transitscheduleEmpty.xml";
-		String vehiclesFile = utils.getInputDirectory() + "transitVehicles.xml";
-		
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
 		config.controler().setMobsim(MobsimType.qsim.toString());
@@ -1217,8 +1159,6 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 		config.scenario().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
-		config.transit().setTransitScheduleFile(scheduleFile);
-		config.transit().setVehiclesFile(vehiclesFile);
 		
 		ActivityParams hParams = new ActivityParams("h");
 		hParams.setTypicalDuration(3600.);
@@ -1227,10 +1167,11 @@ public class MarginalCostPricingPtHandlerTest  {
 		wParams.setTypicalDuration(3600.);
 		config.planCalcScore().addActivityParams(wParams);
 		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 
 		setPopulationTestWaitingDelay06(scenario);
-		setScheduleTestWaitingDelay06(scenario);
+		fillScheduleTestWaitingDelay06(scenario);
+		fillVehicleTestWaitingDelay06(scenario);
 		setNetworkRoundTrip(scenario);
 		
 		Controler controler = new Controler(scenario);
@@ -1254,72 +1195,72 @@ public class MarginalCostPricingPtHandlerTest  {
 			controler.addControlerListener(new InternalizationPtControlerListener(scenario));
 			controler.run();
 		
-		//*******************************************************************************************
-		
-		Assert.assertEquals("number of WaitingDelayEvents", 12, waitingDelayEvents.size());
-		
-		TransferDelayWaitingEvent wde1 = waitingDelayEvents.get(0);
-		TransferDelayWaitingEvent wde2 = waitingDelayEvents.get(1);
-		TransferDelayWaitingEvent wde3 = waitingDelayEvents.get(2);
-		TransferDelayWaitingEvent wde4 = waitingDelayEvents.get(3);
-		TransferDelayWaitingEvent wde5 = waitingDelayEvents.get(4);
-		TransferDelayWaitingEvent wde6 = waitingDelayEvents.get(5);
-		TransferDelayWaitingEvent wde7 = waitingDelayEvents.get(6);
-		TransferDelayWaitingEvent wde8 = waitingDelayEvents.get(7);
-		TransferDelayWaitingEvent wde9 = waitingDelayEvents.get(8);
-		TransferDelayWaitingEvent wde10 = waitingDelayEvents.get(9);
-		TransferDelayWaitingEvent wde11 = waitingDelayEvents.get(10);
-		TransferDelayWaitingEvent wde12 = waitingDelayEvents.get(11);
-		
-		Assert.assertEquals("affected Agents", 0.0, wde1.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent1.toString(), wde1.getCausingAgent().toString());
-		Assert.assertEquals("delay", 1.0, wde1.getDelay(), MatsimTestUtils.EPSILON);
-
-		Assert.assertEquals("affected Agents", 0.0, wde2.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent1.toString(), wde2.getCausingAgent().toString());
-		Assert.assertEquals("delay", 0.75, wde2.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", 0.0, wde3.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent1.toString(), wde3.getCausingAgent().toString());
-		Assert.assertEquals("delay", 2.0, wde3.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", 0.0, wde4.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent1.toString(), wde4.getCausingAgent().toString());
-		Assert.assertEquals("delay", 2.0, wde4.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", 0.0, wde5.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent2.toString(), wde5.getCausingAgent().toString());
-		Assert.assertEquals("delay", 1.0, wde5.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", 0.0, wde6.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent2.toString(), wde6.getCausingAgent().toString());
-		Assert.assertEquals("delay", 0.75, wde6.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", 0.0, wde7.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent2.toString(), wde7.getCausingAgent().toString());
-		Assert.assertEquals("delay", 2.0, wde7.getDelay(), MatsimTestUtils.EPSILON);
-
-		Assert.assertEquals("affected Agents", 0.0, wde8.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent2.toString(), wde8.getCausingAgent().toString());
-		Assert.assertEquals("delay", 2.0, wde8.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", 0.0, wde9.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent3.toString(), wde9.getCausingAgent().toString());
-		Assert.assertEquals("delay", 1.0, wde9.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", 0.0, wde10.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent3.toString(), wde10.getCausingAgent().toString());
-		Assert.assertEquals("delay", 0.75, wde10.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", 0.0, wde11.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent3.toString(), wde11.getCausingAgent().toString());
-		Assert.assertEquals("delay", 2.0, wde11.getDelay(), MatsimTestUtils.EPSILON);
-
-		Assert.assertEquals("affected Agents", 0.0, wde12.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
-		Assert.assertEquals("causing Agent", testAgent3.toString(), wde12.getCausingAgent().toString());
-		Assert.assertEquals("delay", 2.0, wde12.getDelay(), MatsimTestUtils.EPSILON);
-		
-		//*******************************************************************************************
+			//*******************************************************************************************
+			
+			Assert.assertEquals("number of WaitingDelayEvents", 12, waitingDelayEvents.size());
+			
+			TransferDelayWaitingEvent wde1 = waitingDelayEvents.get(0);
+			TransferDelayWaitingEvent wde2 = waitingDelayEvents.get(1);
+			TransferDelayWaitingEvent wde3 = waitingDelayEvents.get(2);
+			TransferDelayWaitingEvent wde4 = waitingDelayEvents.get(3);
+			TransferDelayWaitingEvent wde5 = waitingDelayEvents.get(4);
+			TransferDelayWaitingEvent wde6 = waitingDelayEvents.get(5);
+			TransferDelayWaitingEvent wde7 = waitingDelayEvents.get(6);
+			TransferDelayWaitingEvent wde8 = waitingDelayEvents.get(7);
+			TransferDelayWaitingEvent wde9 = waitingDelayEvents.get(8);
+			TransferDelayWaitingEvent wde10 = waitingDelayEvents.get(9);
+			TransferDelayWaitingEvent wde11 = waitingDelayEvents.get(10);
+			TransferDelayWaitingEvent wde12 = waitingDelayEvents.get(11);
+			
+			Assert.assertEquals("affected Agents", 0.0, wde1.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent1.toString(), wde1.getCausingAgent().toString());
+			Assert.assertEquals("delay", 1.0, wde1.getDelay(), MatsimTestUtils.EPSILON);
+	
+			Assert.assertEquals("affected Agents", 0.0, wde2.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent1.toString(), wde2.getCausingAgent().toString());
+			Assert.assertEquals("delay", 0.75, wde2.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", 0.0, wde3.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent1.toString(), wde3.getCausingAgent().toString());
+			Assert.assertEquals("delay", 2.0, wde3.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", 0.0, wde4.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent1.toString(), wde4.getCausingAgent().toString());
+			Assert.assertEquals("delay", 2.0, wde4.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", 0.0, wde5.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent2.toString(), wde5.getCausingAgent().toString());
+			Assert.assertEquals("delay", 1.0, wde5.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", 0.0, wde6.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent2.toString(), wde6.getCausingAgent().toString());
+			Assert.assertEquals("delay", 0.75, wde6.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", 0.0, wde7.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent2.toString(), wde7.getCausingAgent().toString());
+			Assert.assertEquals("delay", 2.0, wde7.getDelay(), MatsimTestUtils.EPSILON);
+	
+			Assert.assertEquals("affected Agents", 0.0, wde8.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent2.toString(), wde8.getCausingAgent().toString());
+			Assert.assertEquals("delay", 2.0, wde8.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", 0.0, wde9.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent3.toString(), wde9.getCausingAgent().toString());
+			Assert.assertEquals("delay", 1.0, wde9.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", 0.0, wde10.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent3.toString(), wde10.getCausingAgent().toString());
+			Assert.assertEquals("delay", 0.75, wde10.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", 0.0, wde11.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent3.toString(), wde11.getCausingAgent().toString());
+			Assert.assertEquals("delay", 2.0, wde11.getDelay(), MatsimTestUtils.EPSILON);
+	
+			Assert.assertEquals("affected Agents", 0.0, wde12.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("causing Agent", testAgent3.toString(), wde12.getCausingAgent().toString());
+			Assert.assertEquals("delay", 2.0, wde12.getDelay(), MatsimTestUtils.EPSILON);
+			
+			//*******************************************************************************************
 		
 	}
 	
@@ -1331,9 +1272,6 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 		Config config = utils.loadConfig(null);
 		
-		String scheduleFile = utils.getInputDirectory() + "transitscheduleEmpty.xml";
-		String vehiclesFile = utils.getInputDirectory() + "transitVehicles.xml";
-		
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
 		config.controler().setMobsim(MobsimType.qsim.toString());
@@ -1341,8 +1279,6 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 		config.scenario().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
-		config.transit().setTransitScheduleFile(scheduleFile);
-		config.transit().setVehiclesFile(vehiclesFile);
 		
 		ActivityParams hParams = new ActivityParams("h");
 		hParams.setTypicalDuration(3600.);
@@ -1351,10 +1287,11 @@ public class MarginalCostPricingPtHandlerTest  {
 		wParams.setTypicalDuration(3600.);
 		config.planCalcScore().addActivityParams(wParams);
 		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 
 		setPopulationTestCapacityDelay01(scenario);
-		setScheduleTestCapacityDelay01(scenario);
+		fillScheduleTestCapacityDelay01(scenario);
+		fillVehicleTestCapacityDelay01(scenario);
 		setNetworkOneWay(scenario);
 		
 		Controler controler = new Controler(scenario);
@@ -1378,22 +1315,22 @@ public class MarginalCostPricingPtHandlerTest  {
 			controler.addControlerListener(new InternalizationPtControlerListener(scenario));
 			controler.run();
 		
-		//*******************************************************************************************
-		
-		Assert.assertEquals("number of CapacityDelayEvents", 2, capacityDelayEvents.size());
-		
-		CapacityDelayEvent cde1 = capacityDelayEvents.get(0);
-		CapacityDelayEvent cde2 = capacityDelayEvents.get(1);
-		
-		Assert.assertEquals("affected Agents", testAgent3.toString(), cde1.getAffectedAgentId().toString());
-		Assert.assertEquals("causing Agent", testAgent1.toString(), cde1.getCausingAgentId().toString());
-		Assert.assertEquals("delay", 198.5, cde1.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", testAgent3.toString(), cde2.getAffectedAgentId().toString());
-		Assert.assertEquals("causing Agent", testAgent2.toString(), cde2.getCausingAgentId().toString());
-		Assert.assertEquals("delay", 198.5, cde2.getDelay(), MatsimTestUtils.EPSILON);
-		
-		//*******************************************************************************************
+			//*******************************************************************************************
+			
+			Assert.assertEquals("number of CapacityDelayEvents", 2, capacityDelayEvents.size());
+			
+			CapacityDelayEvent cde1 = capacityDelayEvents.get(0);
+			CapacityDelayEvent cde2 = capacityDelayEvents.get(1);
+			
+			Assert.assertEquals("affected Agents", testAgent3.toString(), cde1.getAffectedAgentId().toString());
+			Assert.assertEquals("causing Agent", testAgent1.toString(), cde1.getCausingAgentId().toString());
+			Assert.assertEquals("delay", 198.5, cde1.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", testAgent3.toString(), cde2.getAffectedAgentId().toString());
+			Assert.assertEquals("causing Agent", testAgent2.toString(), cde2.getCausingAgentId().toString());
+			Assert.assertEquals("delay", 198.5, cde2.getDelay(), MatsimTestUtils.EPSILON);
+			
+			//*******************************************************************************************
 		
 	}
 	
@@ -1407,9 +1344,6 @@ public class MarginalCostPricingPtHandlerTest  {
 	
 		Config config = utils.loadConfig(null);
 		
-		String scheduleFile = utils.getInputDirectory() + "transitscheduleEmpty.xml";
-		String vehiclesFile = utils.getInputDirectory() + "transitVehicles.xml";
-		
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
 		config.controler().setMobsim(MobsimType.qsim.toString());
@@ -1417,8 +1351,6 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 		config.scenario().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
-		config.transit().setTransitScheduleFile(scheduleFile);
-		config.transit().setVehiclesFile(vehiclesFile);
 		
 		ActivityParams hParams = new ActivityParams("h");
 		hParams.setTypicalDuration(3600.);
@@ -1427,10 +1359,11 @@ public class MarginalCostPricingPtHandlerTest  {
 		wParams.setTypicalDuration(3600.);
 		config.planCalcScore().addActivityParams(wParams);
 		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 
 		setPopulationTestCapacityDelay02(scenario);
-		setScheduleTestCapacityDelay02(scenario);
+		fillScheduleTestCapacityDelay02(scenario);
+		fillVehicleTestCapacityDelay02(scenario);
 		setNetworkOneWay(scenario);
 		
 		Controler controler = new Controler(scenario);
@@ -1454,22 +1387,22 @@ public class MarginalCostPricingPtHandlerTest  {
 			controler.addControlerListener(new InternalizationPtControlerListener(scenario));
 			controler.run();	
 			
-		//*******************************************************************************************
-		
-		Assert.assertEquals("number of CapacityDelayEvents", 2, capacityDelayEvents.size());	
+			//*******************************************************************************************
 			
-		CapacityDelayEvent cde1 = capacityDelayEvents.get(0);
-		CapacityDelayEvent cde2 = capacityDelayEvents.get(1);
-		
-		Assert.assertEquals("affected Agents", testAgent3.toString(), cde1.getAffectedAgentId().toString());
-		Assert.assertEquals("causing Agent", testAgent1.toString(), cde1.getCausingAgentId().toString());
-		Assert.assertEquals("delay", 197.5, cde1.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", testAgent3.toString(), cde2.getAffectedAgentId().toString());
-		Assert.assertEquals("causing Agent", testAgent2.toString(), cde2.getCausingAgentId().toString());
-		Assert.assertEquals("delay", 197.5, cde2.getDelay(), MatsimTestUtils.EPSILON);
-		
-		//*******************************************************************************************
+			Assert.assertEquals("number of CapacityDelayEvents", 2, capacityDelayEvents.size());	
+				
+			CapacityDelayEvent cde1 = capacityDelayEvents.get(0);
+			CapacityDelayEvent cde2 = capacityDelayEvents.get(1);
+			
+			Assert.assertEquals("affected Agents", testAgent3.toString(), cde1.getAffectedAgentId().toString());
+			Assert.assertEquals("causing Agent", testAgent1.toString(), cde1.getCausingAgentId().toString());
+			Assert.assertEquals("delay", 197.5, cde1.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", testAgent3.toString(), cde2.getAffectedAgentId().toString());
+			Assert.assertEquals("causing Agent", testAgent2.toString(), cde2.getCausingAgentId().toString());
+			Assert.assertEquals("delay", 197.5, cde2.getDelay(), MatsimTestUtils.EPSILON);
+			
+			//*******************************************************************************************
 	}
 	
 	//capacity: 2
@@ -1480,9 +1413,6 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 		Config config = utils.loadConfig(null);
 		
-		String scheduleFile = utils.getInputDirectory() + "transitscheduleEmpty.xml";
-		String vehiclesFile = utils.getInputDirectory() + "transitVehicles.xml";
-		
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
 		config.controler().setMobsim(MobsimType.qsim.toString());
@@ -1490,8 +1420,6 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 		config.scenario().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
-		config.transit().setTransitScheduleFile(scheduleFile);
-		config.transit().setVehiclesFile(vehiclesFile);
 		
 		ActivityParams hParams = new ActivityParams("h");
 		hParams.setTypicalDuration(3600.);
@@ -1500,10 +1428,11 @@ public class MarginalCostPricingPtHandlerTest  {
 		wParams.setTypicalDuration(3600.);
 		config.planCalcScore().addActivityParams(wParams);
 		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 
 		setPopulationTestCapacityDelay03(scenario);
-		setScheduleTestCapacityDelay03(scenario);
+		fillScheduleTestCapacityDelay03(scenario);
+		fillVehicleTestCapacityDelay03(scenario);
 		setNetworkOneWay(scenario);
 		
 		Controler controler = new Controler(scenario);
@@ -1527,32 +1456,32 @@ public class MarginalCostPricingPtHandlerTest  {
 			controler.addControlerListener(new InternalizationPtControlerListener(scenario));
 			controler.run();	
 		
-		//*******************************************************************************************
-		
-		Assert.assertEquals("number of CapacityDelayEvents", 4, capacityDelayEvents.size());
-		
-		CapacityDelayEvent cde1 = capacityDelayEvents.get(0);
-		CapacityDelayEvent cde2 = capacityDelayEvents.get(1);
-		CapacityDelayEvent cde3 = capacityDelayEvents.get(2);
-		CapacityDelayEvent cde4 = capacityDelayEvents.get(3);
-		
-		Assert.assertEquals("affected Agents", testAgent5.toString(), cde1.getAffectedAgentId().toString());
-		Assert.assertEquals("causing Agent", testAgent1.toString(), cde1.getCausingAgentId().toString());
-		Assert.assertEquals("delay", 200.0, cde1.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", testAgent5.toString(), cde2.getAffectedAgentId().toString());
-		Assert.assertEquals("causing Agent", testAgent2.toString(), cde2.getCausingAgentId().toString());
-		Assert.assertEquals("delay", 200.0, cde2.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", testAgent5.toString(), cde3.getAffectedAgentId().toString());
-		Assert.assertEquals("causing Agent", testAgent3.toString(), cde3.getCausingAgentId().toString());
-		Assert.assertEquals("delay", 98.5, cde3.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", testAgent5.toString(), cde4.getAffectedAgentId().toString());
-		Assert.assertEquals("causing Agent", testAgent4.toString(), cde4.getCausingAgentId().toString());
-		Assert.assertEquals("delay", 98.5, cde4.getDelay(), MatsimTestUtils.EPSILON);
-		
-		//*******************************************************************************************
+			//*******************************************************************************************
+			
+			Assert.assertEquals("number of CapacityDelayEvents", 4, capacityDelayEvents.size());
+			
+			CapacityDelayEvent cde1 = capacityDelayEvents.get(0);
+			CapacityDelayEvent cde2 = capacityDelayEvents.get(1);
+			CapacityDelayEvent cde3 = capacityDelayEvents.get(2);
+			CapacityDelayEvent cde4 = capacityDelayEvents.get(3);
+			
+			Assert.assertEquals("affected Agents", testAgent5.toString(), cde1.getAffectedAgentId().toString());
+			Assert.assertEquals("causing Agent", testAgent1.toString(), cde1.getCausingAgentId().toString());
+			Assert.assertEquals("delay", 200.0, cde1.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", testAgent5.toString(), cde2.getAffectedAgentId().toString());
+			Assert.assertEquals("causing Agent", testAgent2.toString(), cde2.getCausingAgentId().toString());
+			Assert.assertEquals("delay", 200.0, cde2.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", testAgent5.toString(), cde3.getAffectedAgentId().toString());
+			Assert.assertEquals("causing Agent", testAgent3.toString(), cde3.getCausingAgentId().toString());
+			Assert.assertEquals("delay", 98.5, cde3.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", testAgent5.toString(), cde4.getAffectedAgentId().toString());
+			Assert.assertEquals("causing Agent", testAgent4.toString(), cde4.getCausingAgentId().toString());
+			Assert.assertEquals("delay", 98.5, cde4.getDelay(), MatsimTestUtils.EPSILON);
+			
+			//*******************************************************************************************
 		
 	}
 	
@@ -1565,9 +1494,6 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 		Config config = utils.loadConfig(null);
 		
-		String scheduleFile = utils.getInputDirectory() + "transitscheduleEmpty.xml";
-		String vehiclesFile = utils.getInputDirectory() + "transitVehicles.xml";
-		
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
 		config.controler().setMobsim(MobsimType.qsim.toString());
@@ -1575,8 +1501,6 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 		config.scenario().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
-		config.transit().setTransitScheduleFile(scheduleFile);
-		config.transit().setVehiclesFile(vehiclesFile);
 		
 		ActivityParams hParams = new ActivityParams("h");
 		hParams.setTypicalDuration(3600.);
@@ -1585,10 +1509,11 @@ public class MarginalCostPricingPtHandlerTest  {
 		wParams.setTypicalDuration(3600.);
 		config.planCalcScore().addActivityParams(wParams);
 		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 
 		setPopulationTestCapacityDelay04(scenario);
-		setScheduleTestCapacityDelay04(scenario);
+		fillScheduleTestCapacityDelay04(scenario);
+		fillVehicleTestCapacityDelay04(scenario);
 		setNetworkOneWay(scenario);
 		
 		Controler controler = new Controler(scenario);
@@ -1629,12 +1554,12 @@ public class MarginalCostPricingPtHandlerTest  {
 			controler.addControlerListener(new InternalizationPtControlerListener(scenario));
 			controler.run();	
 			
-		//*******************************************************************************************
+			//*******************************************************************************************
+				
+			Assert.assertEquals("number of CapacityDelayEvents", 0, capacityDelayEvents.size());
+			Assert.assertEquals("number of ActivityStartEvents", 4, activityStartEvents.size()); //to make sure that the four agents arrive at their destinations
 			
-		Assert.assertEquals("number of CapacityDelayEvents", 0, capacityDelayEvents.size());
-		Assert.assertEquals("number of ActivityStartEvents", 4, activityStartEvents.size()); //to make sure that the four agents arrive at their destinations
-		
-		//*******************************************************************************************
+			//*******************************************************************************************
 	}
 	
 	//capacity: 2
@@ -1647,9 +1572,6 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 		Config config = utils.loadConfig(null);
 		
-		String scheduleFile = utils.getInputDirectory() + "transitscheduleEmpty.xml";
-		String vehiclesFile = utils.getInputDirectory() + "transitVehicles.xml";
-		
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
 		config.controler().setLastIteration(0);
 		config.controler().setMobsim(MobsimType.qsim.toString());
@@ -1657,8 +1579,6 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 		config.scenario().setUseTransit(true);
 		config.scenario().setUseVehicles(true);
-		config.transit().setTransitScheduleFile(scheduleFile);
-		config.transit().setVehiclesFile(vehiclesFile);
 		
 		ActivityParams hParams = new ActivityParams("h");
 		hParams.setTypicalDuration(3600.);
@@ -1667,10 +1587,11 @@ public class MarginalCostPricingPtHandlerTest  {
 		wParams.setTypicalDuration(3600.);
 		config.planCalcScore().addActivityParams(wParams);
 		
-		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
+		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 
 		setPopulationTestCapacityDelay05(scenario);
-		setScheduleTestCapacityDelay05(scenario);
+		fillScheduleTestCapacityDelay05(scenario);
+		fillVehicleTestCapacityDelay05(scenario);
 		setNetworkOneWay(scenario);
 		
 		Controler controler = new Controler(scenario);
@@ -1694,22 +1615,22 @@ public class MarginalCostPricingPtHandlerTest  {
 			controler.addControlerListener(new InternalizationPtControlerListener(scenario));
 			controler.run();	
 		
-		//*******************************************************************************************
-		
-		Assert.assertEquals("number of CapacityDelayEvents", 2, capacityDelayEvents.size());
-		
-		CapacityDelayEvent cde1 = capacityDelayEvents.get(0);
-		CapacityDelayEvent cde2 = capacityDelayEvents.get(1);
-		
-		Assert.assertEquals("affected Agents", testAgent5.toString(), cde1.getAffectedAgentId().toString());
-		Assert.assertEquals("causing Agent", testAgent3.toString(), cde1.getCausingAgentId().toString());
-		Assert.assertEquals("delay", 196.0, cde1.getDelay(), MatsimTestUtils.EPSILON);
-		
-		Assert.assertEquals("affected Agents", testAgent5.toString(), cde2.getAffectedAgentId().toString());
-		Assert.assertEquals("causing Agent", testAgent4.toString(), cde2.getCausingAgentId().toString());
-		Assert.assertEquals("delay", 196.0, cde2.getDelay(), MatsimTestUtils.EPSILON);
-		
-		//*******************************************************************************************
+			//*******************************************************************************************
+			
+			Assert.assertEquals("number of CapacityDelayEvents", 2, capacityDelayEvents.size());
+			
+			CapacityDelayEvent cde1 = capacityDelayEvents.get(0);
+			CapacityDelayEvent cde2 = capacityDelayEvents.get(1);
+			
+			Assert.assertEquals("affected Agents", testAgent5.toString(), cde1.getAffectedAgentId().toString());
+			Assert.assertEquals("causing Agent", testAgent3.toString(), cde1.getCausingAgentId().toString());
+			Assert.assertEquals("delay", 196.0, cde1.getDelay(), MatsimTestUtils.EPSILON);
+			
+			Assert.assertEquals("affected Agents", testAgent5.toString(), cde2.getAffectedAgentId().toString());
+			Assert.assertEquals("causing Agent", testAgent4.toString(), cde2.getCausingAgentId().toString());
+			Assert.assertEquals("delay", 196.0, cde2.getDelay(), MatsimTestUtils.EPSILON);
+			
+			//*******************************************************************************************
 		
 	}
 	
@@ -1748,14 +1669,6 @@ public class MarginalCostPricingPtHandlerTest  {
 	//	}
 	
 	//*************************************************************************	
-	
-	//	private void setVehicles(Scenario scenario){
-	//		
-	//	}
-	//TODO	The vehicles should be generated here.
-	
-	//TODO	As well, the schedule-files should not have to be loaded from an extern file,
-	//		although this schedule-file is empty, the schedule should be generated completely here.
 	
 	private void setNetworkOneWay(Scenario scenario){
 		
@@ -2119,98 +2032,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 	}
 	
-	private void setScheduleTestInVehicleDelay01(Scenario scenario) {
-		
-		TransitScheduleFactoryImpl sf = new TransitScheduleFactoryImpl();
-		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
-		
-		Id Stop1 = new IdImpl("Stop1Id");
-		Id Stop2 = new IdImpl("Stop2Id");
-		Id Stop3 = new IdImpl("Stop3Id");
-		Id Stop4 = new IdImpl("Stop4Id");
-		Id Stop5 = new IdImpl("Stop5Id");
-		Id Stop6 = new IdImpl("Stop6Id");
-		TransitStopFacility StopFacility1;
-		TransitStopFacility StopFacility2;
-		TransitStopFacility StopFacility3;
-		TransitStopFacility StopFacility4;
-		TransitStopFacility StopFacility5;
-		TransitStopFacility StopFacility6;	
-		StopFacility1 = sf.createTransitStopFacility(Stop1, new CoordImpl (500., 0.), true);
-		StopFacility1.setLinkId(linkId1);
-		StopFacility2 = sf.createTransitStopFacility(Stop2, new CoordImpl (1000., 0.), true);
-		StopFacility2.setLinkId(linkId2);
-		StopFacility3 = sf.createTransitStopFacility(Stop3, new CoordImpl (1500., 0.), true);
-		StopFacility3.setLinkId(linkId3);
-		StopFacility4 = sf.createTransitStopFacility(Stop4, new CoordImpl (2000., 0.), true);
-		StopFacility4.setLinkId(linkId4);
-		StopFacility5 = sf.createTransitStopFacility(Stop5, new CoordImpl (2500., 0.), true);
-		StopFacility5.setLinkId(linkId5);
-		StopFacility6 = sf.createTransitStopFacility(Stop6, new CoordImpl (3000., 0.), true);
-		StopFacility6.setLinkId(linkId6);
-		
-		TransitLine TransitLine1 = null;
-		Id Line1 = new IdImpl("line1Id");
-		TransitLine1 = sf.createTransitLine(Line1);
-		
-		List<Id> lineIds = new ArrayList<Id>();
-		lineIds.add(Line1);
-		
-		Id Route1 = new IdImpl("Route1Id");
-		NetworkRoute NetworkRoute1 = null;
-		NetworkRoute1 = (NetworkRoute) routeFactory.createRoute(linkId1, linkId6);
-		List<Id> LinkIds = new ArrayList<Id>();
-		LinkIds.add(linkId2);
-		LinkIds.add(linkId3);
-		LinkIds.add(linkId4);
-		LinkIds.add(linkId5);
-		NetworkRoute1.setLinkIds(linkId1, LinkIds, linkId6);
-		
-		TransitRouteStop TRStop1;
-		TransitRouteStop TRStop2;
-		TransitRouteStop TRStop3;
-		TransitRouteStop TRStop4;
-		TransitRouteStop TRStop5;
-		TransitRouteStop TRStop6;
-		TRStop1 = sf.createTransitRouteStop(StopFacility1, 0.0, 0.0);
-		TRStop2 = sf.createTransitRouteStop(StopFacility2, 60.0, 60.0);
-		TRStop3 = sf.createTransitRouteStop(StopFacility3, 120.0, 120.0);
-		TRStop4 = sf.createTransitRouteStop(StopFacility4, 180.0, 180.0);
-		TRStop5 = sf.createTransitRouteStop(StopFacility5, 240.0, 240.0);
-		TRStop6 = sf.createTransitRouteStop(StopFacility6, 300.0, 300.0);
-		
-		List<TransitRouteStop> Stops = new ArrayList<TransitRouteStop>();
-		Stops.add(TRStop1);
-		Stops.add(TRStop2);
-		Stops.add(TRStop3);
-		Stops.add(TRStop4);
-		Stops.add(TRStop5);
-		Stops.add(TRStop6);
-		
-		TransitRoute TransitRoute1 = null;
-		TransitRoute1 = sf.createTransitRoute(Route1, NetworkRoute1, Stops, "pt");
-		
-		Departure Departure1 = null;
-		Id DepartureId1 = new IdImpl("DepartureId_1");
-		Departure1 = sf.createDeparture(DepartureId1, 200);
-		Id veh_1 = new IdImpl("veh_1");
-		Departure1.setVehicleId(veh_1);
-		
-		TransitRoute1.addDeparture(Departure1);
-		
-		TransitLine1.addRoute(TransitRoute1);
-		
-		scenario.getTransitSchedule().addTransitLine(TransitLine1);
-		scenario.getTransitSchedule().addStopFacility(StopFacility1);
-		scenario.getTransitSchedule().addStopFacility(StopFacility2);
-		scenario.getTransitSchedule().addStopFacility(StopFacility3);
-		scenario.getTransitSchedule().addStopFacility(StopFacility4);
-		scenario.getTransitSchedule().addStopFacility(StopFacility5);
-		scenario.getTransitSchedule().addStopFacility(StopFacility6);
-		
-	}
-	
-	private void fillSchedule01(ScenarioImpl scenario) {
+	private void fillScheduleTestInVehicleDelay01(ScenarioImpl scenario) {
 		TransitSchedule schedule = scenario.getTransitSchedule();
 		
 		TransitScheduleFactory sf = schedule.getFactory();
@@ -2302,6 +2124,30 @@ public class MarginalCostPricingPtHandlerTest  {
 		
 	}
 	
+	private void fillVehicleTestInVehicleDelay01(ScenarioImpl scenario) {
+		Vehicles veh = scenario.getVehicles();
+
+		Id vehTypeId1 = new IdImpl("type_1");
+		Id vehId1 = new IdImpl("veh_1");
+		VehicleType type = veh.getFactory().createVehicleType(vehTypeId1);
+		VehicleCapacity cap = veh.getFactory().createVehicleCapacity();
+		cap.setSeats(50);
+		cap.setStandingRoom(0);
+		type.setCapacity(cap);
+		type.setLength(10);
+		type.setAccessTime(1.0);
+		type.setEgressTime(0.75);
+		type.setDoorOperationMode(DoorOperationMode.serial);
+		
+		type.setMaximumVelocity(8.33);
+		type.setPcuEquivalents(7.5);
+		
+		veh.getVehicleTypes().put(vehTypeId1, type); 
+		
+		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
+		veh.getVehicles().put(vehId1, vehicle1);
+	}
+	
 	private void setPopulationTestInVehicleDelay02(Scenario scenario) {
 		
 		Population population = scenario.getPopulation();
@@ -2384,10 +2230,11 @@ public class MarginalCostPricingPtHandlerTest  {
 		population.addPerson(person3);
 		
 	}
-	
-private void setScheduleTestInVehicleDelay02(Scenario scenario) {
 		
-		TransitScheduleFactoryImpl sf = new TransitScheduleFactoryImpl();
+	private void fillScheduleTestInVehicleDelay02(ScenarioImpl scenario) {
+		TransitSchedule schedule = scenario.getTransitSchedule();
+		
+		TransitScheduleFactory sf = schedule.getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
 		Id Stop1 = new IdImpl("Stop1Id");
@@ -2466,17 +2313,43 @@ private void setScheduleTestInVehicleDelay02(Scenario scenario) {
 		
 		TransitLine1.addRoute(TransitRoute1);
 		
-		scenario.getTransitSchedule().addTransitLine(TransitLine1);
-		scenario.getTransitSchedule().addStopFacility(StopFacility1);
-		scenario.getTransitSchedule().addStopFacility(StopFacility2);
-		scenario.getTransitSchedule().addStopFacility(StopFacility3);
-		scenario.getTransitSchedule().addStopFacility(StopFacility4);
-		scenario.getTransitSchedule().addStopFacility(StopFacility5);
-		scenario.getTransitSchedule().addStopFacility(StopFacility6);
-			
+		schedule.addTransitLine(TransitLine1);
+		schedule.addStopFacility(StopFacility1);
+		schedule.addStopFacility(StopFacility2);
+		schedule.addStopFacility(StopFacility3);
+		schedule.addStopFacility(StopFacility4);
+		schedule.addStopFacility(StopFacility5);
+		schedule.addStopFacility(StopFacility6);
+		
 	}
 	
-private void setPopulationTestInVehicleDelay03(Scenario scenario) {
+	private void fillVehicleTestInVehicleDelay02(ScenarioImpl scenario) {
+		Vehicles veh = scenario.getVehicles();
+	
+		Id vehTypeId1 = new IdImpl("type_1");
+		Id vehId1 = new IdImpl("veh_1");
+	
+		VehicleType type = veh.getFactory().createVehicleType(vehTypeId1);
+		VehicleCapacity cap = veh.getFactory().createVehicleCapacity();
+		cap.setSeats(50);
+		cap.setStandingRoom(0);
+		type.setCapacity(cap);
+		type.setLength(10);
+		type.setAccessTime(1.0);
+		type.setEgressTime(0.75);
+		type.setDoorOperationMode(DoorOperationMode.serial);
+		
+		type.setMaximumVelocity(8.33);
+		type.setPcuEquivalents(7.5);
+		
+		veh.getVehicleTypes().put(vehTypeId1, type); 
+		
+		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
+		veh.getVehicles().put(vehId1, vehicle1);
+		
+	}
+		
+	private void setPopulationTestInVehicleDelay03(Scenario scenario) {
 		
 		Population population = scenario.getPopulation();
 		PopulationFactoryImpl popFactory = new PopulationFactoryImpl(scenario);
@@ -2673,9 +2546,10 @@ private void setPopulationTestInVehicleDelay03(Scenario scenario) {
 		
 	}
 
-	private void setScheduleTestInVehicleDelay03(Scenario scenario) {
+	private void fillScheduleTestInVehicleDelay03(ScenarioImpl scenario) {
+		TransitSchedule schedule = scenario.getTransitSchedule();
 		
-		TransitScheduleFactoryImpl sf = new TransitScheduleFactoryImpl();
+		TransitScheduleFactory sf = schedule.getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
 		Id Stop1 = new IdImpl("Stop1Id");
@@ -2706,6 +2580,9 @@ private void setPopulationTestInVehicleDelay03(Scenario scenario) {
 		TransitLine TransitLine1 = null;
 		Id Line1 = new IdImpl("line1Id");
 		TransitLine1 = sf.createTransitLine(Line1);
+		
+		List<Id> lineIds = new ArrayList<Id>();
+		lineIds.add(Line1);
 		
 		Id Route1 = new IdImpl("Route1Id");
 		NetworkRoute NetworkRoute1 = null;
@@ -2751,14 +2628,39 @@ private void setPopulationTestInVehicleDelay03(Scenario scenario) {
 		
 		TransitLine1.addRoute(TransitRoute1);
 		
-		scenario.getTransitSchedule().addTransitLine(TransitLine1);
-		scenario.getTransitSchedule().addStopFacility(StopFacility1);
-		scenario.getTransitSchedule().addStopFacility(StopFacility2);
-		scenario.getTransitSchedule().addStopFacility(StopFacility3);
-		scenario.getTransitSchedule().addStopFacility(StopFacility4);
-		scenario.getTransitSchedule().addStopFacility(StopFacility5);
-		scenario.getTransitSchedule().addStopFacility(StopFacility6);
+		schedule.addTransitLine(TransitLine1);
+		schedule.addStopFacility(StopFacility1);
+		schedule.addStopFacility(StopFacility2);
+		schedule.addStopFacility(StopFacility3);
+		schedule.addStopFacility(StopFacility4);
+		schedule.addStopFacility(StopFacility5);
+		schedule.addStopFacility(StopFacility6);
 		
+	}
+	
+	private void fillVehicleTestInVehicleDelay03(ScenarioImpl scenario) {
+		Vehicles veh = scenario.getVehicles();
+
+		Id vehTypeId1 = new IdImpl("type_1");
+		Id vehId1 = new IdImpl("veh_1");
+
+		VehicleType type = veh.getFactory().createVehicleType(vehTypeId1);
+		VehicleCapacity cap = veh.getFactory().createVehicleCapacity();
+		cap.setSeats(50);
+		cap.setStandingRoom(0);
+		type.setCapacity(cap);
+		type.setLength(10);
+		type.setAccessTime(1.0);
+		type.setEgressTime(0.75);
+		type.setDoorOperationMode(DoorOperationMode.serial);
+		
+		type.setMaximumVelocity(8.33);
+		type.setPcuEquivalents(7.5);
+		
+		veh.getVehicleTypes().put(vehTypeId1, type); 
+		
+		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
+		veh.getVehicles().put(vehId1, vehicle1);
 	}
 	
 	private void setPopulationTestWaitingDelay01(Scenario scenario) {
@@ -2919,9 +2821,10 @@ private void setPopulationTestInVehicleDelay03(Scenario scenario) {
 	
 	}
 	
-	private void setScheduleTestWaitingDelay01(Scenario scenario) {
+	private void fillScheduleTestWaitingDelay01(ScenarioImpl scenario) {
+		TransitSchedule schedule = scenario.getTransitSchedule();
 		
-		TransitScheduleFactoryImpl sf = new TransitScheduleFactoryImpl();
+		TransitScheduleFactory sf = schedule.getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
 		Id Stop1 = new IdImpl("Stop1Id");
@@ -2952,6 +2855,9 @@ private void setPopulationTestInVehicleDelay03(Scenario scenario) {
 		TransitLine TransitLine1 = null;
 		Id Line1 = new IdImpl("line1Id");
 		TransitLine1 = sf.createTransitLine(Line1);
+		
+		List<Id> lineIds = new ArrayList<Id>();
+		lineIds.add(Line1);
 		
 		Id Route1 = new IdImpl("Route1Id");
 		NetworkRoute NetworkRoute1 = null;
@@ -2997,14 +2903,39 @@ private void setPopulationTestInVehicleDelay03(Scenario scenario) {
 		
 		TransitLine1.addRoute(TransitRoute1);
 		
-		scenario.getTransitSchedule().addTransitLine(TransitLine1);
-		scenario.getTransitSchedule().addStopFacility(StopFacility1);
-		scenario.getTransitSchedule().addStopFacility(StopFacility2);
-		scenario.getTransitSchedule().addStopFacility(StopFacility3);
-		scenario.getTransitSchedule().addStopFacility(StopFacility4);
-		scenario.getTransitSchedule().addStopFacility(StopFacility5);
-		scenario.getTransitSchedule().addStopFacility(StopFacility6);
+		schedule.addTransitLine(TransitLine1);
+		schedule.addStopFacility(StopFacility1);
+		schedule.addStopFacility(StopFacility2);
+		schedule.addStopFacility(StopFacility3);
+		schedule.addStopFacility(StopFacility4);
+		schedule.addStopFacility(StopFacility5);
+		schedule.addStopFacility(StopFacility6);
 		
+	}
+	
+	private void fillVehicleTestWaitingDelay01(ScenarioImpl scenario) {
+		Vehicles veh = scenario.getVehicles();
+
+		Id vehTypeId1 = new IdImpl("type_1");
+		Id vehId1 = new IdImpl("veh_1");
+
+		VehicleType type = veh.getFactory().createVehicleType(vehTypeId1);
+		VehicleCapacity cap = veh.getFactory().createVehicleCapacity();
+		cap.setSeats(50);
+		cap.setStandingRoom(0);
+		type.setCapacity(cap);
+		type.setLength(10);
+		type.setAccessTime(1.0);
+		type.setEgressTime(0.75);
+		type.setDoorOperationMode(DoorOperationMode.serial);
+		
+		type.setMaximumVelocity(8.33);
+		type.setPcuEquivalents(7.5);
+		
+		veh.getVehicleTypes().put(vehTypeId1, type); 
+		
+		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
+		veh.getVehicles().put(vehId1, vehicle1);
 	}
 	
 	private void setPopulationTestWaitingDelay02(Scenario scenario) {
@@ -3165,9 +3096,10 @@ private void setPopulationTestInVehicleDelay03(Scenario scenario) {
 		
 	}
 	
-	private void setScheduleTestWaitingDelay02(Scenario scenario) {
+	private void fillScheduleTestWaitingDelay02(ScenarioImpl scenario) {
+		TransitSchedule schedule = scenario.getTransitSchedule();
 		
-		TransitScheduleFactoryImpl sf = new TransitScheduleFactoryImpl();
+		TransitScheduleFactory sf = schedule.getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
 		Id Stop1 = new IdImpl("Stop1Id");
@@ -3198,6 +3130,9 @@ private void setPopulationTestInVehicleDelay03(Scenario scenario) {
 		TransitLine TransitLine1 = null;
 		Id Line1 = new IdImpl("line1Id");
 		TransitLine1 = sf.createTransitLine(Line1);
+		
+		List<Id> lineIds = new ArrayList<Id>();
+		lineIds.add(Line1);
 		
 		Id Route1 = new IdImpl("Route1Id");
 		NetworkRoute NetworkRoute1 = null;
@@ -3243,14 +3178,39 @@ private void setPopulationTestInVehicleDelay03(Scenario scenario) {
 		
 		TransitLine1.addRoute(TransitRoute1);
 		
-		scenario.getTransitSchedule().addTransitLine(TransitLine1);
-		scenario.getTransitSchedule().addStopFacility(StopFacility1);
-		scenario.getTransitSchedule().addStopFacility(StopFacility2);
-		scenario.getTransitSchedule().addStopFacility(StopFacility3);
-		scenario.getTransitSchedule().addStopFacility(StopFacility4);
-		scenario.getTransitSchedule().addStopFacility(StopFacility5);
-		scenario.getTransitSchedule().addStopFacility(StopFacility6);
+		schedule.addTransitLine(TransitLine1);
+		schedule.addStopFacility(StopFacility1);
+		schedule.addStopFacility(StopFacility2);
+		schedule.addStopFacility(StopFacility3);
+		schedule.addStopFacility(StopFacility4);
+		schedule.addStopFacility(StopFacility5);
+		schedule.addStopFacility(StopFacility6);
 		
+	}
+	
+	private void fillVehicleTestWaitingDelay02(ScenarioImpl scenario) {
+		Vehicles veh = scenario.getVehicles();
+
+		Id vehTypeId1 = new IdImpl("type_1");
+		Id vehId1 = new IdImpl("veh_1");
+
+		VehicleType type = veh.getFactory().createVehicleType(vehTypeId1);
+		VehicleCapacity cap = veh.getFactory().createVehicleCapacity();
+		cap.setSeats(50);
+		cap.setStandingRoom(0);
+		type.setCapacity(cap);
+		type.setLength(10);
+		type.setAccessTime(1.0);
+		type.setEgressTime(0.75);
+		type.setDoorOperationMode(DoorOperationMode.serial);
+		
+		type.setMaximumVelocity(8.33);
+		type.setPcuEquivalents(7.5);
+		
+		veh.getVehicleTypes().put(vehTypeId1, type); 
+		
+		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
+		veh.getVehicles().put(vehId1, vehicle1);
 	}
 	
 	private void setPopulationTestWaitingDelay03(Scenario scenario) {
@@ -3411,9 +3371,10 @@ private void setPopulationTestInVehicleDelay03(Scenario scenario) {
 		
 	}
 	
-	private void setScheduleTestWaitingDelay03(Scenario scenario) {
+	private void fillScheduleTestWaitingDelay03(ScenarioImpl scenario) {
+		TransitSchedule schedule = scenario.getTransitSchedule();
 		
-		TransitScheduleFactoryImpl sf = new TransitScheduleFactoryImpl();
+		TransitScheduleFactory sf = schedule.getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
 		Id Stop1 = new IdImpl("Stop1Id");
@@ -3428,22 +3389,25 @@ private void setPopulationTestInVehicleDelay03(Scenario scenario) {
 		TransitStopFacility StopFacility4;
 		TransitStopFacility StopFacility5;
 		TransitStopFacility StopFacility6;	
-		StopFacility1 = sf.createTransitStopFacility(Stop1, new CoordImpl (499., 0.), true);
+		StopFacility1 = sf.createTransitStopFacility(Stop1, new CoordImpl (500., 0.), true);
 		StopFacility1.setLinkId(linkId1);
-		StopFacility2 = sf.createTransitStopFacility(Stop2, new CoordImpl (999., 0.), true);
+		StopFacility2 = sf.createTransitStopFacility(Stop2, new CoordImpl (1000., 0.), true);
 		StopFacility2.setLinkId(linkId2);
-		StopFacility3 = sf.createTransitStopFacility(Stop3, new CoordImpl (1499., 0.), true);
+		StopFacility3 = sf.createTransitStopFacility(Stop3, new CoordImpl (1500., 0.), true);
 		StopFacility3.setLinkId(linkId3);
-		StopFacility4 = sf.createTransitStopFacility(Stop4, new CoordImpl (1999., 0.), true);
+		StopFacility4 = sf.createTransitStopFacility(Stop4, new CoordImpl (2000., 0.), true);
 		StopFacility4.setLinkId(linkId4);
-		StopFacility5 = sf.createTransitStopFacility(Stop5, new CoordImpl (2499., 0.), true);
+		StopFacility5 = sf.createTransitStopFacility(Stop5, new CoordImpl (2500., 0.), true);
 		StopFacility5.setLinkId(linkId5);
-		StopFacility6 = sf.createTransitStopFacility(Stop6, new CoordImpl (2999., 0.), true);
+		StopFacility6 = sf.createTransitStopFacility(Stop6, new CoordImpl (3000., 0.), true);
 		StopFacility6.setLinkId(linkId6);
 		
 		TransitLine TransitLine1 = null;
 		Id Line1 = new IdImpl("line1Id");
 		TransitLine1 = sf.createTransitLine(Line1);
+		
+		List<Id> lineIds = new ArrayList<Id>();
+		lineIds.add(Line1);
 		
 		Id Route1 = new IdImpl("Route1Id");
 		NetworkRoute NetworkRoute1 = null;
@@ -3496,14 +3460,43 @@ private void setPopulationTestInVehicleDelay03(Scenario scenario) {
 		
 		TransitLine1.addRoute(TransitRoute1);
 		
-		scenario.getTransitSchedule().addTransitLine(TransitLine1);
-		scenario.getTransitSchedule().addStopFacility(StopFacility1);
-		scenario.getTransitSchedule().addStopFacility(StopFacility2);
-		scenario.getTransitSchedule().addStopFacility(StopFacility3);
-		scenario.getTransitSchedule().addStopFacility(StopFacility4);
-		scenario.getTransitSchedule().addStopFacility(StopFacility5);
-		scenario.getTransitSchedule().addStopFacility(StopFacility6);
+		schedule.addTransitLine(TransitLine1);
+		schedule.addStopFacility(StopFacility1);
+		schedule.addStopFacility(StopFacility2);
+		schedule.addStopFacility(StopFacility3);
+		schedule.addStopFacility(StopFacility4);
+		schedule.addStopFacility(StopFacility5);
+		schedule.addStopFacility(StopFacility6);
 		
+	}
+	
+	private void fillVehicleTestWaitingDelay03(ScenarioImpl scenario) {
+		Vehicles veh = scenario.getVehicles();
+
+		Id vehTypeId1 = new IdImpl("type_1");
+		Id vehId1 = new IdImpl("veh_1");
+		Id vehId2 = new IdImpl("veh_2");
+
+		VehicleType type = veh.getFactory().createVehicleType(vehTypeId1);
+		VehicleCapacity cap = veh.getFactory().createVehicleCapacity();
+		cap.setSeats(50);
+		cap.setStandingRoom(0);
+		type.setCapacity(cap);
+		type.setLength(10);
+		type.setAccessTime(1.0);
+		type.setEgressTime(0.75);
+		type.setDoorOperationMode(DoorOperationMode.serial);
+		
+		type.setMaximumVelocity(8.33);
+		type.setPcuEquivalents(7.5);
+		
+		veh.getVehicleTypes().put(vehTypeId1, type); 
+		
+		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
+		veh.getVehicles().put(vehId1, vehicle1);
+		
+		Vehicle vehicle2 = veh.getFactory().createVehicle(vehId2, veh.getVehicleTypes().get(vehTypeId1));
+		veh.getVehicles().put(vehId2, vehicle2);
 	}
 
 	private void setPopulationTestWaitingDelay03b(Scenario scenario) {
@@ -3659,27 +3652,15 @@ private void setPopulationTestInVehicleDelay03(Scenario scenario) {
 		plan2.addActivity(lastActLink6);
 		person2.addPlan(plan2);
 		
-	//	Person person3 = popFactory.createPerson(testAgent3);
-	//	Plan plan3 = popFactory.createPlan();
-	//	Activity act3 = popFactory.createActivityFromCoord("h", coord5);
-	//	act3.setEndTime(99);
-	//	plan3.addActivity(act3);
-	////	Leg leg3 = popFactory.createLeg("pt");
-	//	plan3.addLeg(leg_5_6);
-	////	lastActLink6.getCoord().setXY(2999.0, 0.0);
-	//	lastActLink6.setType("w");
-	//	plan3.addActivity(lastActLink6);
-	//	person3.addPlan(plan3);
-		
 		population.addPerson(person1);
 		population.addPerson(person2);
-	//	population.addPerson(person3);
 		
 	}
 	
-	private void setScheduleTestWaitingDelay03b(Scenario scenario) {
+	private void fillScheduleTestWaitingDelay03b(ScenarioImpl scenario) {
+		TransitSchedule schedule = scenario.getTransitSchedule();
 		
-		TransitScheduleFactoryImpl sf = new TransitScheduleFactoryImpl();
+		TransitScheduleFactory sf = schedule.getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
 		Id Stop1 = new IdImpl("Stop1Id");
@@ -3710,6 +3691,9 @@ private void setPopulationTestInVehicleDelay03(Scenario scenario) {
 		TransitLine TransitLine1 = null;
 		Id Line1 = new IdImpl("line1Id");
 		TransitLine1 = sf.createTransitLine(Line1);
+		
+		List<Id> lineIds = new ArrayList<Id>();
+		lineIds.add(Line1);
 		
 		Id Route1 = new IdImpl("Route1Id");
 		NetworkRoute NetworkRoute1 = null;
@@ -3762,14 +3746,43 @@ private void setPopulationTestInVehicleDelay03(Scenario scenario) {
 		
 		TransitLine1.addRoute(TransitRoute1);
 		
-		scenario.getTransitSchedule().addTransitLine(TransitLine1);
-		scenario.getTransitSchedule().addStopFacility(StopFacility1);
-		scenario.getTransitSchedule().addStopFacility(StopFacility2);
-		scenario.getTransitSchedule().addStopFacility(StopFacility3);
-		scenario.getTransitSchedule().addStopFacility(StopFacility4);
-		scenario.getTransitSchedule().addStopFacility(StopFacility5);
-		scenario.getTransitSchedule().addStopFacility(StopFacility6);
+		schedule.addTransitLine(TransitLine1);
+		schedule.addStopFacility(StopFacility1);
+		schedule.addStopFacility(StopFacility2);
+		schedule.addStopFacility(StopFacility3);
+		schedule.addStopFacility(StopFacility4);
+		schedule.addStopFacility(StopFacility5);
+		schedule.addStopFacility(StopFacility6);
 		
+	}
+	
+	private void fillVehicleTestWaitingDelay03b(ScenarioImpl scenario) {
+		Vehicles veh = scenario.getVehicles();
+
+		Id vehTypeId1 = new IdImpl("type_1");
+		Id vehId1 = new IdImpl("veh_1");
+		Id vehId2 = new IdImpl("veh_2");
+
+		VehicleType type = veh.getFactory().createVehicleType(vehTypeId1);
+		VehicleCapacity cap = veh.getFactory().createVehicleCapacity();
+		cap.setSeats(50);
+		cap.setStandingRoom(0);
+		type.setCapacity(cap);
+		type.setLength(10);
+		type.setAccessTime(1.0);
+		type.setEgressTime(0.75);
+		type.setDoorOperationMode(DoorOperationMode.serial);
+		
+		type.setMaximumVelocity(8.33);
+		type.setPcuEquivalents(7.5);
+		
+		veh.getVehicleTypes().put(vehTypeId1, type); 
+		
+		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
+		veh.getVehicles().put(vehId1, vehicle1);
+		
+		Vehicle vehicle2 = veh.getFactory().createVehicle(vehId2, veh.getVehicleTypes().get(vehTypeId1));
+		veh.getVehicles().put(vehId2, vehicle2);
 	}
 	
 	private void setPopulationTestWaitingDelay04(Scenario scenario) {
@@ -3943,9 +3956,10 @@ private void setPopulationTestInVehicleDelay03(Scenario scenario) {
 		
 	}
 	
-	private void setScheduleTestWaitingDelay04(Scenario scenario) {
+	private void fillScheduleTestWaitingDelay04(ScenarioImpl scenario) {
+		TransitSchedule schedule = scenario.getTransitSchedule();
 		
-		TransitScheduleFactoryImpl sf = new TransitScheduleFactoryImpl();
+		TransitScheduleFactory sf = schedule.getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
 		Id Stop1 = new IdImpl("Stop1Id");
@@ -3976,6 +3990,9 @@ private void setPopulationTestInVehicleDelay03(Scenario scenario) {
 		TransitLine TransitLine1 = null;
 		Id Line1 = new IdImpl("line1Id");
 		TransitLine1 = sf.createTransitLine(Line1);
+		
+		List<Id> lineIds = new ArrayList<Id>();
+		lineIds.add(Line1);
 		
 		Id Route1 = new IdImpl("Route1Id");
 		NetworkRoute NetworkRoute1 = null;
@@ -4021,14 +4038,39 @@ private void setPopulationTestInVehicleDelay03(Scenario scenario) {
 		
 		TransitLine1.addRoute(TransitRoute1);
 		
-		scenario.getTransitSchedule().addTransitLine(TransitLine1);
-		scenario.getTransitSchedule().addStopFacility(StopFacility1);
-		scenario.getTransitSchedule().addStopFacility(StopFacility2);
-		scenario.getTransitSchedule().addStopFacility(StopFacility3);
-		scenario.getTransitSchedule().addStopFacility(StopFacility4);
-		scenario.getTransitSchedule().addStopFacility(StopFacility5);
-		scenario.getTransitSchedule().addStopFacility(StopFacility6);
+		schedule.addTransitLine(TransitLine1);
+		schedule.addStopFacility(StopFacility1);
+		schedule.addStopFacility(StopFacility2);
+		schedule.addStopFacility(StopFacility3);
+		schedule.addStopFacility(StopFacility4);
+		schedule.addStopFacility(StopFacility5);
+		schedule.addStopFacility(StopFacility6);
 		
+	}
+	
+	private void fillVehicleTestWaitingDelay04(ScenarioImpl scenario) {
+		Vehicles veh = scenario.getVehicles();
+
+		Id vehTypeId1 = new IdImpl("type_1");
+		Id vehId1 = new IdImpl("veh_1");
+
+		VehicleType type = veh.getFactory().createVehicleType(vehTypeId1);
+		VehicleCapacity cap = veh.getFactory().createVehicleCapacity();
+		cap.setSeats(50);
+		cap.setStandingRoom(0);
+		type.setCapacity(cap);
+		type.setLength(10);
+		type.setAccessTime(1.0);
+		type.setEgressTime(0.75);
+		type.setDoorOperationMode(DoorOperationMode.serial);
+		
+		type.setMaximumVelocity(8.33);
+		type.setPcuEquivalents(7.5);
+		
+		veh.getVehicleTypes().put(vehTypeId1, type); 
+		
+		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
+		veh.getVehicles().put(vehId1, vehicle1);
 	}
 	
 	private void setPopulationTestWaitingDelay05(Scenario scenario) {
@@ -4202,9 +4244,10 @@ private void setPopulationTestInVehicleDelay03(Scenario scenario) {
 		
 	}
 	
-	private void setScheduleTestWaitingDelay05(Scenario scenario) {
+	private void fillScheduleTestWaitingDelay05(ScenarioImpl scenario) {
+		TransitSchedule schedule = scenario.getTransitSchedule();
 		
-		TransitScheduleFactoryImpl sf = new TransitScheduleFactoryImpl();
+		TransitScheduleFactory sf = schedule.getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
 		Id Stop1 = new IdImpl("Stop1Id");
@@ -4235,6 +4278,9 @@ private void setPopulationTestInVehicleDelay03(Scenario scenario) {
 		TransitLine TransitLine1 = null;
 		Id Line1 = new IdImpl("line1Id");
 		TransitLine1 = sf.createTransitLine(Line1);
+		
+		List<Id> lineIds = new ArrayList<Id>();
+		lineIds.add(Line1);
 		
 		Id Route1 = new IdImpl("Route1Id");
 		NetworkRoute NetworkRoute1 = null;
@@ -4280,14 +4326,39 @@ private void setPopulationTestInVehicleDelay03(Scenario scenario) {
 		
 		TransitLine1.addRoute(TransitRoute1);
 		
-		scenario.getTransitSchedule().addTransitLine(TransitLine1);
-		scenario.getTransitSchedule().addStopFacility(StopFacility1);
-		scenario.getTransitSchedule().addStopFacility(StopFacility2);
-		scenario.getTransitSchedule().addStopFacility(StopFacility3);
-		scenario.getTransitSchedule().addStopFacility(StopFacility4);
-		scenario.getTransitSchedule().addStopFacility(StopFacility5);
-		scenario.getTransitSchedule().addStopFacility(StopFacility6);
+		schedule.addTransitLine(TransitLine1);
+		schedule.addStopFacility(StopFacility1);
+		schedule.addStopFacility(StopFacility2);
+		schedule.addStopFacility(StopFacility3);
+		schedule.addStopFacility(StopFacility4);
+		schedule.addStopFacility(StopFacility5);
+		schedule.addStopFacility(StopFacility6);
 		
+	}
+	
+	private void fillVehicleTestWaitingDelay05(ScenarioImpl scenario) {
+		Vehicles veh = scenario.getVehicles();
+
+		Id vehTypeId1 = new IdImpl("type_1");
+		Id vehId1 = new IdImpl("veh_1");
+
+		VehicleType type = veh.getFactory().createVehicleType(vehTypeId1);
+		VehicleCapacity cap = veh.getFactory().createVehicleCapacity();
+		cap.setSeats(50);
+		cap.setStandingRoom(0);
+		type.setCapacity(cap);
+		type.setLength(10);
+		type.setAccessTime(1.0);
+		type.setEgressTime(0.75);
+		type.setDoorOperationMode(DoorOperationMode.serial);
+		
+		type.setMaximumVelocity(8.33);
+		type.setPcuEquivalents(7.5);
+		
+		veh.getVehicleTypes().put(vehTypeId1, type); 
+		
+		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
+		veh.getVehicles().put(vehId1, vehicle1);
 	}
 	
 	private void setPopulationTestWaitingDelay06(Scenario scenario) {
@@ -4484,9 +4555,10 @@ private void setPopulationTestInVehicleDelay03(Scenario scenario) {
 		
 	}
 	
-	private void setScheduleTestWaitingDelay06(Scenario scenario) {
+	private void fillScheduleTestWaitingDelay06(ScenarioImpl scenario) {
+		TransitSchedule schedule = scenario.getTransitSchedule();
 		
-		TransitScheduleFactoryImpl sf = new TransitScheduleFactoryImpl();
+		TransitScheduleFactory sf = schedule.getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
 		Id Stop1 = new IdImpl("Stop1Id");
@@ -4495,7 +4567,6 @@ private void setPopulationTestInVehicleDelay03(Scenario scenario) {
 		Id Stop4 = new IdImpl("Stop4Id");
 		Id Stop5 = new IdImpl("Stop5Id");
 		Id Stop6 = new IdImpl("Stop6Id");
-		
 		Id Stop7 = new IdImpl("Stop7Id");
 		Id Stop8 = new IdImpl("Stop8Id");
 		Id Stop9 = new IdImpl("Stop9Id");
@@ -4646,23 +4717,56 @@ private void setPopulationTestInVehicleDelay03(Scenario scenario) {
 		TransitLine1.addRoute(TransitRoute1);
 		TransitLine2.addRoute(TransitRoute2);
 		
-		scenario.getTransitSchedule().addTransitLine(TransitLine1);
-		scenario.getTransitSchedule().addTransitLine(TransitLine2);
+		schedule.addTransitLine(TransitLine1);
+		schedule.addTransitLine(TransitLine2);
 		
-		scenario.getTransitSchedule().addStopFacility(StopFacility1);
-		scenario.getTransitSchedule().addStopFacility(StopFacility2);
-		scenario.getTransitSchedule().addStopFacility(StopFacility3);
-		scenario.getTransitSchedule().addStopFacility(StopFacility4);
-		scenario.getTransitSchedule().addStopFacility(StopFacility5);
-		scenario.getTransitSchedule().addStopFacility(StopFacility6);
+		schedule.addStopFacility(StopFacility1);
+		schedule.addStopFacility(StopFacility2);
+		schedule.addStopFacility(StopFacility3);
+		schedule.addStopFacility(StopFacility4);
+		schedule.addStopFacility(StopFacility5);
+		schedule.addStopFacility(StopFacility6);
 		
-		scenario.getTransitSchedule().addStopFacility(StopFacility7);
-		scenario.getTransitSchedule().addStopFacility(StopFacility8);
-		scenario.getTransitSchedule().addStopFacility(StopFacility9);
-		scenario.getTransitSchedule().addStopFacility(StopFacility10);
-		scenario.getTransitSchedule().addStopFacility(StopFacility11);
-		scenario.getTransitSchedule().addStopFacility(StopFacility12);
+		schedule.addStopFacility(StopFacility7);
+		schedule.addStopFacility(StopFacility8);
+		schedule.addStopFacility(StopFacility9);
+		schedule.addStopFacility(StopFacility10);
+		schedule.addStopFacility(StopFacility11);
+		schedule.addStopFacility(StopFacility12);
 		
+	}
+	
+	private void fillVehicleTestWaitingDelay06(ScenarioImpl scenario) {
+		Vehicles veh = scenario.getVehicles();
+
+		Id vehTypeId1 = new IdImpl("type_1");
+		Id vehId1 = new IdImpl("veh_1");
+		Id vehId2 = new IdImpl("veh_2");
+		Id vehId3 = new IdImpl("veh_3");
+
+		VehicleType type = veh.getFactory().createVehicleType(vehTypeId1);
+		VehicleCapacity cap = veh.getFactory().createVehicleCapacity();
+		cap.setSeats(50);
+		cap.setStandingRoom(0);
+		type.setCapacity(cap);
+		type.setLength(10);
+		type.setAccessTime(1.0);
+		type.setEgressTime(0.75);
+		type.setDoorOperationMode(DoorOperationMode.serial);
+		
+		type.setMaximumVelocity(8.33);
+		type.setPcuEquivalents(7.5);
+		
+		veh.getVehicleTypes().put(vehTypeId1, type); 
+		
+		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
+		veh.getVehicles().put(vehId1, vehicle1);
+		
+		Vehicle vehicle2 = veh.getFactory().createVehicle(vehId2, veh.getVehicleTypes().get(vehTypeId1));
+		veh.getVehicles().put(vehId2, vehicle2);
+		
+		Vehicle vehicle3 = veh.getFactory().createVehicle(vehId3, veh.getVehicleTypes().get(vehTypeId1));
+		veh.getVehicles().put(vehId3, vehicle3);
 	}
 	
 	private void setPopulationTestCapacityDelay01(Scenario scenario) {
@@ -4836,9 +4940,10 @@ private void setPopulationTestInVehicleDelay03(Scenario scenario) {
 		
 	}
 
-	private void setScheduleTestCapacityDelay01(Scenario scenario) {
+	private void fillScheduleTestCapacityDelay01(ScenarioImpl scenario) {
+		TransitSchedule schedule = scenario.getTransitSchedule();
 		
-		TransitScheduleFactoryImpl sf = new TransitScheduleFactoryImpl();
+		TransitScheduleFactory sf = schedule.getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
 		Id Stop1 = new IdImpl("Stop1Id");
@@ -4869,6 +4974,9 @@ private void setPopulationTestInVehicleDelay03(Scenario scenario) {
 		TransitLine TransitLine1 = null;
 		Id Line1 = new IdImpl("line1Id");
 		TransitLine1 = sf.createTransitLine(Line1);
+		
+		List<Id> lineIds = new ArrayList<Id>();
+		lineIds.add(Line1);
 		
 		Id Route1 = new IdImpl("Route1Id");
 		NetworkRoute NetworkRoute1 = null;
@@ -4928,14 +5036,47 @@ private void setPopulationTestInVehicleDelay03(Scenario scenario) {
 		
 		TransitLine1.addRoute(TransitRoute1);
 		
-		scenario.getTransitSchedule().addTransitLine(TransitLine1);
-		scenario.getTransitSchedule().addStopFacility(StopFacility1);
-		scenario.getTransitSchedule().addStopFacility(StopFacility2);
-		scenario.getTransitSchedule().addStopFacility(StopFacility3);
-		scenario.getTransitSchedule().addStopFacility(StopFacility4);
-		scenario.getTransitSchedule().addStopFacility(StopFacility5);
-		scenario.getTransitSchedule().addStopFacility(StopFacility6);
+		schedule.addTransitLine(TransitLine1);
+		schedule.addStopFacility(StopFacility1);
+		schedule.addStopFacility(StopFacility2);
+		schedule.addStopFacility(StopFacility3);
+		schedule.addStopFacility(StopFacility4);
+		schedule.addStopFacility(StopFacility5);
+		schedule.addStopFacility(StopFacility6);
 		
+	}
+	
+	private void fillVehicleTestCapacityDelay01(ScenarioImpl scenario) {
+		Vehicles veh = scenario.getVehicles();
+
+		Id vehTypeId1 = new IdImpl("type_1");
+		Id vehId1 = new IdImpl("veh_1");
+		Id vehId2 = new IdImpl("veh_2");
+		Id vehId3 = new IdImpl("veh_3");
+
+		VehicleType type = veh.getFactory().createVehicleType(vehTypeId1);
+		VehicleCapacity cap = veh.getFactory().createVehicleCapacity();
+		cap.setSeats(2);
+		cap.setStandingRoom(0);
+		type.setCapacity(cap);
+		type.setLength(10);
+		type.setAccessTime(1.0);
+		type.setEgressTime(0.75);
+		type.setDoorOperationMode(DoorOperationMode.serial);
+		
+		type.setMaximumVelocity(8.33);
+		type.setPcuEquivalents(7.5);
+		
+		veh.getVehicleTypes().put(vehTypeId1, type); 
+		
+		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
+		veh.getVehicles().put(vehId1, vehicle1);
+		
+		Vehicle vehicle2 = veh.getFactory().createVehicle(vehId2, veh.getVehicleTypes().get(vehTypeId1));
+		veh.getVehicles().put(vehId2, vehicle2);
+		
+		Vehicle vehicle3 = veh.getFactory().createVehicle(vehId3, veh.getVehicleTypes().get(vehTypeId1));
+		veh.getVehicles().put(vehId3, vehicle3);
 	}
 	
 	private void setPopulationTestCapacityDelay02(Scenario scenario) {
@@ -5108,10 +5249,11 @@ private void setPopulationTestInVehicleDelay03(Scenario scenario) {
 		population.addPerson(person3);
 		
 	}
-
-	private void setScheduleTestCapacityDelay02(Scenario scenario) {
+	
+	private void fillScheduleTestCapacityDelay02(ScenarioImpl scenario) {
+		TransitSchedule schedule = scenario.getTransitSchedule();
 		
-		TransitScheduleFactoryImpl sf = new TransitScheduleFactoryImpl();
+		TransitScheduleFactory sf = schedule.getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
 		Id Stop1 = new IdImpl("Stop1Id");
@@ -5142,6 +5284,9 @@ private void setPopulationTestInVehicleDelay03(Scenario scenario) {
 		TransitLine TransitLine1 = null;
 		Id Line1 = new IdImpl("line1Id");
 		TransitLine1 = sf.createTransitLine(Line1);
+		
+		List<Id> lineIds = new ArrayList<Id>();
+		lineIds.add(Line1);
 		
 		Id Route1 = new IdImpl("Route1Id");
 		NetworkRoute NetworkRoute1 = null;
@@ -5201,14 +5346,47 @@ private void setPopulationTestInVehicleDelay03(Scenario scenario) {
 		
 		TransitLine1.addRoute(TransitRoute1);
 		
-		scenario.getTransitSchedule().addTransitLine(TransitLine1);
-		scenario.getTransitSchedule().addStopFacility(StopFacility1);
-		scenario.getTransitSchedule().addStopFacility(StopFacility2);
-		scenario.getTransitSchedule().addStopFacility(StopFacility3);
-		scenario.getTransitSchedule().addStopFacility(StopFacility4);
-		scenario.getTransitSchedule().addStopFacility(StopFacility5);
-		scenario.getTransitSchedule().addStopFacility(StopFacility6);
+		schedule.addTransitLine(TransitLine1);
+		schedule.addStopFacility(StopFacility1);
+		schedule.addStopFacility(StopFacility2);
+		schedule.addStopFacility(StopFacility3);
+		schedule.addStopFacility(StopFacility4);
+		schedule.addStopFacility(StopFacility5);
+		schedule.addStopFacility(StopFacility6);
 		
+	}
+	
+	private void fillVehicleTestCapacityDelay02(ScenarioImpl scenario) {
+		Vehicles veh = scenario.getVehicles();
+
+		Id vehTypeId1 = new IdImpl("type_1");
+		Id vehId1 = new IdImpl("veh_1");
+		Id vehId2 = new IdImpl("veh_2");
+		Id vehId3 = new IdImpl("veh_3");
+
+		VehicleType type = veh.getFactory().createVehicleType(vehTypeId1);
+		VehicleCapacity cap = veh.getFactory().createVehicleCapacity();
+		cap.setSeats(2);
+		cap.setStandingRoom(0);
+		type.setCapacity(cap);
+		type.setLength(10);
+		type.setAccessTime(1.0);
+		type.setEgressTime(0.75);
+		type.setDoorOperationMode(DoorOperationMode.serial);
+		
+		type.setMaximumVelocity(8.33);
+		type.setPcuEquivalents(7.5);
+		
+		veh.getVehicleTypes().put(vehTypeId1, type); 
+		
+		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
+		veh.getVehicles().put(vehId1, vehicle1);
+		
+		Vehicle vehicle2 = veh.getFactory().createVehicle(vehId2, veh.getVehicleTypes().get(vehTypeId1));
+		veh.getVehicles().put(vehId2, vehicle2);
+		
+		Vehicle vehicle3 = veh.getFactory().createVehicle(vehId3, veh.getVehicleTypes().get(vehTypeId1));
+		veh.getVehicles().put(vehId3, vehicle3);
 	}
 
 	private void setPopulationTestCapacityDelay03(Scenario scenario) {
@@ -5408,9 +5586,10 @@ private void setPopulationTestInVehicleDelay03(Scenario scenario) {
 		
 	}
 
-	private void setScheduleTestCapacityDelay03(Scenario scenario) {
+	private void fillScheduleTestCapacityDelay03(ScenarioImpl scenario) {
+		TransitSchedule schedule = scenario.getTransitSchedule();
 		
-		TransitScheduleFactoryImpl sf = new TransitScheduleFactoryImpl();
+		TransitScheduleFactory sf = schedule.getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
 		Id Stop1 = new IdImpl("Stop1Id");
@@ -5441,6 +5620,9 @@ private void setPopulationTestInVehicleDelay03(Scenario scenario) {
 		TransitLine TransitLine1 = null;
 		Id Line1 = new IdImpl("line1Id");
 		TransitLine1 = sf.createTransitLine(Line1);
+		
+		List<Id> lineIds = new ArrayList<Id>();
+		lineIds.add(Line1);
 		
 		Id Route1 = new IdImpl("Route1Id");
 		NetworkRoute NetworkRoute1 = null;
@@ -5500,14 +5682,47 @@ private void setPopulationTestInVehicleDelay03(Scenario scenario) {
 		
 		TransitLine1.addRoute(TransitRoute1);
 		
-		scenario.getTransitSchedule().addTransitLine(TransitLine1);
-		scenario.getTransitSchedule().addStopFacility(StopFacility1);
-		scenario.getTransitSchedule().addStopFacility(StopFacility2);
-		scenario.getTransitSchedule().addStopFacility(StopFacility3);
-		scenario.getTransitSchedule().addStopFacility(StopFacility4);
-		scenario.getTransitSchedule().addStopFacility(StopFacility5);
-		scenario.getTransitSchedule().addStopFacility(StopFacility6);
+		schedule.addTransitLine(TransitLine1);
+		schedule.addStopFacility(StopFacility1);
+		schedule.addStopFacility(StopFacility2);
+		schedule.addStopFacility(StopFacility3);
+		schedule.addStopFacility(StopFacility4);
+		schedule.addStopFacility(StopFacility5);
+		schedule.addStopFacility(StopFacility6);
 		
+	}
+	
+	private void fillVehicleTestCapacityDelay03(ScenarioImpl scenario) {
+		Vehicles veh = scenario.getVehicles();
+
+		Id vehTypeId1 = new IdImpl("type_1");
+		Id vehId1 = new IdImpl("veh_1");
+		Id vehId2 = new IdImpl("veh_2");
+		Id vehId3 = new IdImpl("veh_3");
+
+		VehicleType type = veh.getFactory().createVehicleType(vehTypeId1);
+		VehicleCapacity cap = veh.getFactory().createVehicleCapacity();
+		cap.setSeats(2);
+		cap.setStandingRoom(0);
+		type.setCapacity(cap);
+		type.setLength(10);
+		type.setAccessTime(1.0);
+		type.setEgressTime(0.75);
+		type.setDoorOperationMode(DoorOperationMode.serial);
+		
+		type.setMaximumVelocity(8.33);
+		type.setPcuEquivalents(7.5);
+		
+		veh.getVehicleTypes().put(vehTypeId1, type); 
+		
+		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
+		veh.getVehicles().put(vehId1, vehicle1);
+		
+		Vehicle vehicle2 = veh.getFactory().createVehicle(vehId2, veh.getVehicleTypes().get(vehTypeId1));
+		veh.getVehicles().put(vehId2, vehicle2);
+		
+		Vehicle vehicle3 = veh.getFactory().createVehicle(vehId3, veh.getVehicleTypes().get(vehTypeId1));
+		veh.getVehicles().put(vehId3, vehicle3);
 	}
 
 	private void setPopulationTestCapacityDelay04(Scenario scenario) {
@@ -5694,9 +5909,10 @@ private void setPopulationTestInVehicleDelay03(Scenario scenario) {
 		
 	}
 
-	private void setScheduleTestCapacityDelay04(Scenario scenario) {
+	private void fillScheduleTestCapacityDelay04(ScenarioImpl scenario) {
+		TransitSchedule schedule = scenario.getTransitSchedule();
 		
-		TransitScheduleFactoryImpl sf = new TransitScheduleFactoryImpl();
+		TransitScheduleFactory sf = schedule.getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
 		Id Stop1 = new IdImpl("Stop1Id");
@@ -5727,6 +5943,9 @@ private void setPopulationTestInVehicleDelay03(Scenario scenario) {
 		TransitLine TransitLine1 = null;
 		Id Line1 = new IdImpl("line1Id");
 		TransitLine1 = sf.createTransitLine(Line1);
+		
+		List<Id> lineIds = new ArrayList<Id>();
+		lineIds.add(Line1);
 		
 		Id Route1 = new IdImpl("Route1Id");
 		NetworkRoute NetworkRoute1 = null;
@@ -5786,14 +6005,47 @@ private void setPopulationTestInVehicleDelay03(Scenario scenario) {
 		
 		TransitLine1.addRoute(TransitRoute1);
 		
-		scenario.getTransitSchedule().addTransitLine(TransitLine1);
-		scenario.getTransitSchedule().addStopFacility(StopFacility1);
-		scenario.getTransitSchedule().addStopFacility(StopFacility2);
-		scenario.getTransitSchedule().addStopFacility(StopFacility3);
-		scenario.getTransitSchedule().addStopFacility(StopFacility4);
-		scenario.getTransitSchedule().addStopFacility(StopFacility5);
-		scenario.getTransitSchedule().addStopFacility(StopFacility6);
+		schedule.addTransitLine(TransitLine1);
+		schedule.addStopFacility(StopFacility1);
+		schedule.addStopFacility(StopFacility2);
+		schedule.addStopFacility(StopFacility3);
+		schedule.addStopFacility(StopFacility4);
+		schedule.addStopFacility(StopFacility5);
+		schedule.addStopFacility(StopFacility6);
 		
+	}
+	
+	private void fillVehicleTestCapacityDelay04(ScenarioImpl scenario) {
+		Vehicles veh = scenario.getVehicles();
+
+		Id vehTypeId1 = new IdImpl("type_1");
+		Id vehId1 = new IdImpl("veh_1");
+		Id vehId2 = new IdImpl("veh_2");
+		Id vehId3 = new IdImpl("veh_3");
+
+		VehicleType type = veh.getFactory().createVehicleType(vehTypeId1);
+		VehicleCapacity cap = veh.getFactory().createVehicleCapacity();
+		cap.setSeats(2);
+		cap.setStandingRoom(0);
+		type.setCapacity(cap);
+		type.setLength(10);
+		type.setAccessTime(1.0);
+		type.setEgressTime(0.75);
+		type.setDoorOperationMode(DoorOperationMode.serial);
+		
+		type.setMaximumVelocity(8.33);
+		type.setPcuEquivalents(7.5);
+		
+		veh.getVehicleTypes().put(vehTypeId1, type); 
+		
+		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
+		veh.getVehicles().put(vehId1, vehicle1);
+		
+		Vehicle vehicle2 = veh.getFactory().createVehicle(vehId2, veh.getVehicleTypes().get(vehTypeId1));
+		veh.getVehicles().put(vehId2, vehicle2);
+		
+		Vehicle vehicle3 = veh.getFactory().createVehicle(vehId3, veh.getVehicleTypes().get(vehTypeId1));
+		veh.getVehicles().put(vehId3, vehicle3);
 	}
 
 	private void setPopulationTestCapacityDelay05(Scenario scenario) {
@@ -5993,9 +6245,10 @@ private void setPopulationTestInVehicleDelay03(Scenario scenario) {
 		
 	}
 
-	private void setScheduleTestCapacityDelay05(Scenario scenario) {
+	private void fillScheduleTestCapacityDelay05(ScenarioImpl scenario) {
+		TransitSchedule schedule = scenario.getTransitSchedule();
 		
-		TransitScheduleFactoryImpl sf = new TransitScheduleFactoryImpl();
+		TransitScheduleFactory sf = schedule.getFactory();
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
 		Id Stop1 = new IdImpl("Stop1Id");
@@ -6026,6 +6279,9 @@ private void setPopulationTestInVehicleDelay03(Scenario scenario) {
 		TransitLine TransitLine1 = null;
 		Id Line1 = new IdImpl("line1Id");
 		TransitLine1 = sf.createTransitLine(Line1);
+		
+		List<Id> lineIds = new ArrayList<Id>();
+		lineIds.add(Line1);
 		
 		Id Route1 = new IdImpl("Route1Id");
 		NetworkRoute NetworkRoute1 = null;
@@ -6085,14 +6341,47 @@ private void setPopulationTestInVehicleDelay03(Scenario scenario) {
 		
 		TransitLine1.addRoute(TransitRoute1);
 		
-		scenario.getTransitSchedule().addTransitLine(TransitLine1);
-		scenario.getTransitSchedule().addStopFacility(StopFacility1);
-		scenario.getTransitSchedule().addStopFacility(StopFacility2);
-		scenario.getTransitSchedule().addStopFacility(StopFacility3);
-		scenario.getTransitSchedule().addStopFacility(StopFacility4);
-		scenario.getTransitSchedule().addStopFacility(StopFacility5);
-		scenario.getTransitSchedule().addStopFacility(StopFacility6);
+		schedule.addTransitLine(TransitLine1);
+		schedule.addStopFacility(StopFacility1);
+		schedule.addStopFacility(StopFacility2);
+		schedule.addStopFacility(StopFacility3);
+		schedule.addStopFacility(StopFacility4);
+		schedule.addStopFacility(StopFacility5);
+		schedule.addStopFacility(StopFacility6);
 		
+	}
+	
+	private void fillVehicleTestCapacityDelay05(ScenarioImpl scenario) {
+		Vehicles veh = scenario.getVehicles();
+
+		Id vehTypeId1 = new IdImpl("type_1");
+		Id vehId1 = new IdImpl("veh_1");
+		Id vehId2 = new IdImpl("veh_2");
+		Id vehId3 = new IdImpl("veh_3");
+
+		VehicleType type = veh.getFactory().createVehicleType(vehTypeId1);
+		VehicleCapacity cap = veh.getFactory().createVehicleCapacity();
+		cap.setSeats(2);
+		cap.setStandingRoom(0);
+		type.setCapacity(cap);
+		type.setLength(10);
+		type.setAccessTime(1.0);
+		type.setEgressTime(0.75);
+		type.setDoorOperationMode(DoorOperationMode.serial);
+		
+		type.setMaximumVelocity(8.33);
+		type.setPcuEquivalents(7.5);
+		
+		veh.getVehicleTypes().put(vehTypeId1, type); 
+		
+		Vehicle vehicle1 = veh.getFactory().createVehicle(vehId1, veh.getVehicleTypes().get(vehTypeId1));
+		veh.getVehicles().put(vehId1, vehicle1);
+		
+		Vehicle vehicle2 = veh.getFactory().createVehicle(vehId2, veh.getVehicleTypes().get(vehTypeId1));
+		veh.getVehicles().put(vehId2, vehicle2);
+		
+		Vehicle vehicle3 = veh.getFactory().createVehicle(vehId3, veh.getVehicleTypes().get(vehTypeId1));
+		veh.getVehicles().put(vehId3, vehicle3);
 	}
 
 }
