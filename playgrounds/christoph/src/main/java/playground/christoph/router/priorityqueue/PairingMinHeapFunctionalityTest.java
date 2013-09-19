@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * BinaryMinHeapTest.java
+ * PairingMinHeapFunctionalityTest.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -25,37 +25,49 @@ import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+import org.apache.log4j.Logger;
+import org.junit.Assert;
+import org.junit.Test;
+import org.matsim.core.router.priorityqueue.HasIndex;
+import org.matsim.core.router.priorityqueue.MinHeap;
+
 /**
  * @author cdobler
  */
-public class PairingMinHeapFunctionalityTest extends MinHeapTest {
+public class PairingMinHeapFunctionalityTest {
+	
+	private final static Logger log = Logger.getLogger(PairingMinHeapFunctionalityTest.class);
+	
+	@Test
 	public void testAdd() {
-		MinHeap<HeapEntry> pq = new PairingMinHeap<HeapEntry>(10);
-		assertEquals(0, pq.size());
+		MinHeap<HasIndex> pq = new PairingMinHeap<HasIndex>(10);
+		Assert.assertEquals(0, pq.size());
 		pq.add(new DummyHeapEntry(0), 1.0);
-		assertEquals(1, pq.size());
+		Assert.assertEquals(1, pq.size());
 		pq.add(new DummyHeapEntry(1), 2.0);
-		assertEquals(2, pq.size());
+		Assert.assertEquals(2, pq.size());
 		pq.add(new DummyHeapEntry(2), 2.0); // different element with same priority
-		assertEquals(3, pq.size());
+		Assert.assertEquals(3, pq.size());
 		pq.add(new DummyHeapEntry(2), 3.0); // same element with different priority
-		assertEquals(3, pq.size());      	// should not be added!
-		assertEquals(3, iteratorElementCount(pq.iterator()));
+		Assert.assertEquals(3, pq.size());      	// should not be added!
+		Assert.assertEquals(3, iteratorElementCount(pq.iterator()));
 	}
 
+	@Test
 	public void testAdd_Null() {
-		MinHeap<HeapEntry> pq = new BinaryMinHeap<HeapEntry>(10);
+		MinHeap<HasIndex> pq = new PairingMinHeap<HasIndex>(10);
 		try {
 			pq.add(null, 1.0);
-			fail("missing NullPointerException.");
+			Assert.fail("missing NullPointerException.");
 		}
 		catch (NullPointerException e) {
 			log.info("catched expected exception. ", e);
 		}
-		assertEquals(0, pq.size());
-		assertEquals(0, iteratorElementCount(pq.iterator()));
+		Assert.assertEquals(0, pq.size());
+		Assert.assertEquals(0, iteratorElementCount(pq.iterator()));
 	}
 
+	@Test
 	public void testPoll() {
 		MinHeap<DummyHeapEntry> pq = new PairingMinHeap<DummyHeapEntry>(10);
 		DummyHeapEntry entry0 = new DummyHeapEntry(5);
@@ -68,25 +80,26 @@ public class PairingMinHeapFunctionalityTest extends MinHeapTest {
 		pq.add(entry0, 5.0);
 		pq.add(entry1, 3.0);
 		pq.add(entry2, 6.0);
-		assertEquals(3, pq.size());
-		assertEqualsHE(entry1, pq.remove());
-		assertEquals(2, pq.size());
+		Assert.assertEquals(3, pq.size());
+		assertEqualsHE(entry1, pq.poll());
+		Assert.assertEquals(2, pq.size());
 
 		pq.add(entry3, 1.0);
 		pq.add(entry4, 4.0);
 		pq.add(entry5, 9.0);
-		assertEquals(5, pq.size());
-		assertEqualsHE(entry3, pq.remove());
-		assertEqualsHE(entry4, pq.remove());
-		assertEqualsHE(entry0, pq.remove());
-		assertEqualsHE(entry2, pq.remove());
-		assertEqualsHE(entry5, pq.remove());
-		assertEquals(0, pq.size());
-		assertNull(pq.remove());
+		Assert.assertEquals(5, pq.size());
+		assertEqualsHE(entry3, pq.poll());
+		assertEqualsHE(entry4, pq.poll());
+		assertEqualsHE(entry0, pq.poll());
+		assertEqualsHE(entry2, pq.poll());
+		assertEqualsHE(entry5, pq.poll());
+		Assert.assertEquals(0, pq.size());
+		Assert.assertNull(pq.poll());
 	}
 	
+	@Test
 	public void testPoll2() {
-		MinHeap<DummyHeapEntry> pq = new PairingMinHeap<DummyHeapEntry>(10);
+		MinHeap<HasIndex> pq = new PairingMinHeap<HasIndex>(10);
 		DummyHeapEntry entry0 = new DummyHeapEntry(0);
 		DummyHeapEntry entry1 = new DummyHeapEntry(1);
 		DummyHeapEntry entry2 = new DummyHeapEntry(2);
@@ -97,25 +110,26 @@ public class PairingMinHeapFunctionalityTest extends MinHeapTest {
 		pq.add(entry0, 5.0);
 		pq.add(entry1, 3.0);
 		pq.add(entry2, 6.0);
-		assertEquals(3, pq.size());
-		assertEqualsHE(entry1, pq.remove());
-		assertEquals(2, pq.size());
+		Assert.assertEquals(3, pq.size());
+		assertEqualsHE(entry1, pq.poll());
+		Assert.assertEquals(2, pq.size());
 
 		pq.add(entry3, 1.0);
 		pq.add(entry4, 4.0);
 		pq.add(entry5, 9.0);
-		assertEquals(5, pq.size());
-		assertEqualsHE(entry3, pq.remove());
-		assertEqualsHE(entry4, pq.remove());
-		assertEqualsHE(entry0, pq.remove());
-		assertEqualsHE(entry2, pq.remove());
-		assertEqualsHE(entry5, pq.remove());
-		assertEquals(0, pq.size());
-		assertNull(pq.remove());
+		Assert.assertEquals(5, pq.size());
+		assertEqualsHE(entry3, pq.poll());
+		assertEqualsHE(entry4, pq.poll());
+		assertEqualsHE(entry0, pq.poll());
+		assertEqualsHE(entry2, pq.poll());
+		assertEqualsHE(entry5, pq.poll());
+		Assert.assertEquals(0, pq.size());
+		Assert.assertNull(pq.poll());
 	}
 
+	@Test
 	public void testIterator() {
-		MinHeap<HeapEntry> pq = new PairingMinHeap<HeapEntry>(10);
+		MinHeap<HasIndex> pq = new PairingMinHeap<HasIndex>(10);
 		DummyHeapEntry entry0 = new DummyHeapEntry(5);
 		DummyHeapEntry entry1 = new DummyHeapEntry(3);
 		DummyHeapEntry entry2 = new DummyHeapEntry(6);
@@ -123,16 +137,17 @@ public class PairingMinHeapFunctionalityTest extends MinHeapTest {
 		pq.add(entry0, 5.0);
 		pq.add(entry1, 3.0);
 		pq.add(entry2, 6.0);
-		Collection<HeapEntry> coll = getIteratorCollection(pq.iterator());
-		assertEquals(3, coll.size());
-		assertTrue(coll.contains(entry0));
-		assertTrue(coll.contains(entry1));
-		assertTrue(coll.contains(entry2));
-		assertFalse(coll.contains(entry3));
+		Collection<HasIndex> coll = getIteratorCollection(pq.iterator());
+		Assert.assertEquals(3, coll.size());
+		Assert.assertTrue(coll.contains(entry0));
+		Assert.assertTrue(coll.contains(entry1));
+		Assert.assertTrue(coll.contains(entry2));
+		Assert.assertFalse(coll.contains(entry3));
 	}
 
+	@Test
 	public void testIterator_ConcurrentModification_add() {
-		MinHeap<HeapEntry> pq = new PairingMinHeap<HeapEntry>(10);
+		MinHeap<HasIndex> pq = new PairingMinHeap<HasIndex>(10);
 		DummyHeapEntry entry0 = new DummyHeapEntry(5);
 		DummyHeapEntry entry1 = new DummyHeapEntry(3);
 		DummyHeapEntry entry2 = new DummyHeapEntry(6);
@@ -140,101 +155,105 @@ public class PairingMinHeapFunctionalityTest extends MinHeapTest {
 		pq.add(entry0, 5.0);
 		pq.add(entry1, 3.0);
 		pq.add(entry2, 6.0);
-		Iterator<HeapEntry> iter = pq.iterator();
-		assertTrue(iter.hasNext());
-		assertNotNull(iter.next());
+		Iterator<HasIndex> iter = pq.iterator();
+		Assert.assertTrue(iter.hasNext());
+		Assert.assertNotNull(iter.next());
 
 		pq.add(entry3, 4.0);
-		assertTrue(iter.hasNext());
+		Assert.assertTrue(iter.hasNext());
 		try {
 			iter.next();
-			fail("missing ConcurrentModificationException");
+			Assert.fail("missing ConcurrentModificationException");
 		}
 		catch (ConcurrentModificationException e) {
 			log.info("catched expected exception.", e);
 		}
 		iter = pq.iterator(); // but a new iterator must work again
-		assertTrue(iter.hasNext());
-		assertNotNull(iter.next());
+		Assert.assertTrue(iter.hasNext());
+		Assert.assertNotNull(iter.next());
 	}
 
+	@Test
 	public void testIterator_ConcurrentModification_poll() {
-		MinHeap<HeapEntry> pq = new PairingMinHeap<HeapEntry>(10);
+		MinHeap<HasIndex> pq = new PairingMinHeap<HasIndex>(10);
 		DummyHeapEntry entry0 = new DummyHeapEntry(5);
 		DummyHeapEntry entry1 = new DummyHeapEntry(3);
 		DummyHeapEntry entry2 = new DummyHeapEntry(6);
 		pq.add(entry0, 5.0);
 		pq.add(entry1, 3.0);
 		pq.add(entry2, 6.0);
-		Iterator<HeapEntry> iter = pq.iterator();
-		assertTrue(iter.hasNext());
-		assertNotNull(iter.next());
+		Iterator<HasIndex> iter = pq.iterator();
+		Assert.assertTrue(iter.hasNext());
+		Assert.assertNotNull(iter.next());
 
-		pq.remove();
-		assertTrue(iter.hasNext());
+		pq.poll();
+		Assert.assertTrue(iter.hasNext());
 		try {
 			iter.next();
-			fail("missing ConcurrentModificationException");
+			Assert.fail("missing ConcurrentModificationException");
 		}
 		catch (ConcurrentModificationException e) {
 			log.info("catched expected exception.", e);
 		}
 		iter = pq.iterator(); // but a new iterator must work again
-		assertTrue(iter.hasNext());
-		assertNotNull(iter.next());
+		Assert.assertTrue(iter.hasNext());
+		Assert.assertNotNull(iter.next());
 	}
 
+	@Test
 	public void testIterator_ConcurrentModification_remove() {
-		MinHeap<HeapEntry> pq = new BinaryMinHeap<HeapEntry>(10);
+		MinHeap<HasIndex> pq = new PairingMinHeap<HasIndex>(10);
 		DummyHeapEntry entry0 = new DummyHeapEntry(5);
 		DummyHeapEntry entry1 = new DummyHeapEntry(3);
 		DummyHeapEntry entry2 = new DummyHeapEntry(6);
 		pq.add(entry0, 5.0);
 		pq.add(entry1, 3.0);
 		pq.add(entry2, 6.0);
-		Iterator<HeapEntry> iter = pq.iterator();
-		assertTrue(iter.hasNext());
-		assertNotNull(iter.next());
+		Iterator<HasIndex> iter = pq.iterator();
+		Assert.assertTrue(iter.hasNext());
+		Assert.assertNotNull(iter.next());
 
-		assertTrue(pq.remove(entry0));
-		assertTrue(iter.hasNext());
+		Assert.assertTrue(pq.remove(entry0));
+		Assert.assertTrue(iter.hasNext());
 		try {
 			iter.next();
-			fail("missing ConcurrentModificationException");
+			Assert.fail("missing ConcurrentModificationException");
 		}
 		catch (ConcurrentModificationException e) {
 			log.info("catched expected exception.", e);
 		}
 		iter = pq.iterator(); // but a new iterator must work again
-		assertTrue(iter.hasNext());
-		assertNotNull(iter.next());
-		assertFalse(pq.remove(entry0)); // cannot be removed, so it's no change
-		assertTrue(iter.hasNext());
-		assertNotNull(iter.next());
+		Assert.assertTrue(iter.hasNext());
+		Assert.assertNotNull(iter.next());
+		Assert.assertFalse(pq.remove(entry0)); // cannot be removed, so it's no change
+		Assert.assertTrue(iter.hasNext());
+		Assert.assertNotNull(iter.next());
 	}
 
+	@Test
 	public void testIterator_RemoveUnsupported() {
-		MinHeap<HeapEntry> pq = new BinaryMinHeap<HeapEntry>(10);
+		MinHeap<HasIndex> pq = new PairingMinHeap<HasIndex>(10);
 		DummyHeapEntry entry0 = new DummyHeapEntry(5);
 		DummyHeapEntry entry1 = new DummyHeapEntry(3);
 		DummyHeapEntry entry2 = new DummyHeapEntry(6);
 		pq.add(entry0, 5.0);
 		pq.add(entry1, 3.0);
 		pq.add(entry2, 6.0);
-		Iterator<HeapEntry> iter = pq.iterator();
-		assertTrue(iter.hasNext());
-		assertNotNull(iter.next());
+		Iterator<HasIndex> iter = pq.iterator();
+		Assert.assertTrue(iter.hasNext());
+		Assert.assertNotNull(iter.next());
 		try {
 			iter.remove();
-			fail("missing UnsupportedOperationException");
+			Assert.fail("missing UnsupportedOperationException");
 		}
 		catch (UnsupportedOperationException e) {
 			log.info("catched expected exception.", e);
 		}
 	}
 
+	@Test
 	public void testRemove() {
-		MinHeap<DummyHeapEntry> pq = new PairingMinHeap<DummyHeapEntry>(10);
+		MinHeap<HasIndex> pq = new PairingMinHeap<HasIndex>(10);
 		DummyHeapEntry entry0 = new DummyHeapEntry(5);
 		DummyHeapEntry entry1 = new DummyHeapEntry(3);
 		DummyHeapEntry entry2 = new DummyHeapEntry(6);
@@ -243,42 +262,43 @@ public class PairingMinHeapFunctionalityTest extends MinHeapTest {
 		pq.add(entry1, 3.0);
 		pq.add(entry2, 6.0);
 
-		Collection<DummyHeapEntry> coll = getIteratorCollection(pq.iterator());
-		assertEquals(3, coll.size());
-		assertTrue(coll.contains(entry0));
-		assertTrue(coll.contains(entry1));
-		assertTrue(coll.contains(entry2));
-		assertFalse(coll.contains(entry3));
+		Collection<HasIndex> coll = getIteratorCollection(pq.iterator());
+		Assert.assertEquals(3, coll.size());
+		Assert.assertTrue(coll.contains(entry0));
+		Assert.assertTrue(coll.contains(entry1));
+		Assert.assertTrue(coll.contains(entry2));
+		Assert.assertFalse(coll.contains(entry3));
 
 		// remove some element
-		assertTrue(pq.remove(entry0));
-		assertEquals(2, pq.size());
+		Assert.assertTrue(pq.remove(entry0));
+		Assert.assertEquals(2, pq.size());
 		coll = getIteratorCollection(pq.iterator());
-		assertEquals(2, coll.size());
-		assertFalse(coll.contains(entry0));
-		assertTrue(coll.contains(entry1));
-		assertTrue(coll.contains(entry2));
+		Assert.assertEquals(2, coll.size());
+		Assert.assertFalse(coll.contains(entry0));
+		Assert.assertTrue(coll.contains(entry1));
+		Assert.assertTrue(coll.contains(entry2));
 
 		// remove the same element again
-		assertFalse(pq.remove(entry0));
-		assertEquals(2, pq.size());
+		Assert.assertFalse(pq.remove(entry0));
+		Assert.assertEquals(2, pq.size());
 		coll = getIteratorCollection(pq.iterator());
-		assertEquals(2, coll.size());
+		Assert.assertEquals(2, coll.size());
 
 		// remove null
-		assertFalse(pq.remove(null));
-		assertEquals(2, pq.size());
+		Assert.assertFalse(pq.remove(null));
+		Assert.assertEquals(2, pq.size());
 		coll = getIteratorCollection(pq.iterator());
-		assertEquals(2, coll.size());
-		assertTrue(coll.contains(entry1));
-		assertTrue(coll.contains(entry2));
+		Assert.assertEquals(2, coll.size());
+		Assert.assertTrue(coll.contains(entry1));
+		Assert.assertTrue(coll.contains(entry2));
 
 		// now poll the pq and ensure, no removed element is returned
-		assertEqualsHE(entry1, pq.remove());
-		assertEqualsHE(entry2, pq.remove());
-		assertNull(pq.remove());
+		assertEqualsHE(entry1, pq.poll());
+		assertEqualsHE(entry2, pq.poll());
+		Assert.assertNull(pq.poll());
 	}
 
+	@Test
 	public void testRemoveAndAdd_LowerPriority() {
 		MinHeap<DummyHeapEntry> pq = new PairingMinHeap<DummyHeapEntry>(10);
 		DummyHeapEntry entry0 = new DummyHeapEntry(5);
@@ -288,19 +308,20 @@ public class PairingMinHeapFunctionalityTest extends MinHeapTest {
 		pq.add(entry1, 3.0);
 		pq.add(entry2, 6.0);
 
-		assertEquals(3, pq.size());
+		Assert.assertEquals(3, pq.size());
 
 		// test removing an element and adding it with lower priority (=higher value)
 		pq.remove(entry0);
-		assertEquals(2, pq.size());
+		Assert.assertEquals(2, pq.size());
 		pq.add(entry0, 7.0);
-		assertEquals(3, pq.size());
-		assertEqualsHE(entry1, pq.remove());
-		assertEqualsHE(entry2, pq.remove());
-		assertEqualsHE(entry0, pq.remove());
-		assertNull(pq.remove());
+		Assert.assertEquals(3, pq.size());
+		assertEqualsHE(entry1, pq.poll());
+		assertEqualsHE(entry2, pq.poll());
+		assertEqualsHE(entry0, pq.poll());
+		Assert.assertNull(pq.poll());
 	}
 
+	@Test
 	// increase priority -> decrease key since it is a min-heap
 	public void testIncreasePriority() {
 		MinHeap<DummyHeapEntry> pq = new PairingMinHeap<DummyHeapEntry>(10);
@@ -311,15 +332,15 @@ public class PairingMinHeapFunctionalityTest extends MinHeapTest {
 		pq.add(entry1, 3.0);
 		pq.add(entry2, 6.0);
 
-		assertEquals(3, pq.size());
+		Assert.assertEquals(3, pq.size());
 
 		// test decreasing an element by increasing priority (=lower value)
 		pq.decreaseKey(entry0, 2);
-		assertEquals(3, pq.size());
-		assertEqualsHE(entry0, pq.remove());
-		assertEqualsHE(entry1, pq.remove());
-		assertEqualsHE(entry2, pq.remove());
-		assertNull(pq.remove());
+		Assert.assertEquals(3, pq.size());
+		assertEqualsHE(entry0, pq.poll());
+		assertEqualsHE(entry1, pq.poll());
+		assertEqualsHE(entry2, pq.poll());
+		Assert.assertNull(pq.poll());
 		
 		/*
 		 * Add two elements with the same priority, then add one with a
@@ -328,17 +349,18 @@ public class PairingMinHeapFunctionalityTest extends MinHeapTest {
 		pq.add(entry0, 5.0);
 		pq.add(entry1, 5.0);
 		pq.add(entry2, 6.0);
-		assertEquals(3, pq.size());
+		Assert.assertEquals(3, pq.size());
 		pq.decreaseKey(entry2, 4.0);
-		assertEquals(3, pq.size());
-		assertEqualsHE(entry2, pq.remove());
-		assertEqualsHE(entry1, pq.remove());
-		assertEqualsHE(entry0, pq.remove());
-		assertNull(pq.remove());
+		Assert.assertEquals(3, pq.size());
+		assertEqualsHE(entry2, pq.poll());
+		assertEqualsHE(entry1, pq.poll());
+		assertEqualsHE(entry0, pq.poll());
+		Assert.assertNull(pq.poll());
 	}
 	
+	@Test
 	public void testRemoveAndAdd_HigherPriority() {
-		MinHeap<DummyHeapEntry> pq = new PairingMinHeap<DummyHeapEntry>(10);
+		MinHeap<HasIndex> pq = new PairingMinHeap<HasIndex>(10);
 		DummyHeapEntry entry0 = new DummyHeapEntry(5);
 		DummyHeapEntry entry1 = new DummyHeapEntry(3);
 		DummyHeapEntry entry2 = new DummyHeapEntry(6);
@@ -346,21 +368,22 @@ public class PairingMinHeapFunctionalityTest extends MinHeapTest {
 		pq.add(entry1, 3.0);
 		pq.add(entry2, 6.0);
 
-		assertEquals(3, pq.size());
+		Assert.assertEquals(3, pq.size());
 
 		// test removing an element and adding it with higher priority (=lower value)
 		pq.remove(entry0);
-		assertEquals(2, pq.size());
+		Assert.assertEquals(2, pq.size());
 		pq.add(entry0, 2.5);
-		assertEquals(3, pq.size());
-		assertEqualsHE(entry0, pq.remove());
-		assertEqualsHE(entry1, pq.remove());
-		assertEqualsHE(entry2, pq.remove());
-		assertNull(pq.remove());
+		Assert.assertEquals(3, pq.size());
+		assertEqualsHE(entry0, pq.poll());
+		assertEqualsHE(entry1, pq.poll());
+		assertEqualsHE(entry2, pq.poll());
+		Assert.assertNull(pq.poll());
 	}
 
+	@Test
 	public void testEqualCosts() {
-		MinHeap<DummyHeapEntry> pq = new PairingMinHeap<DummyHeapEntry>(10);
+		MinHeap<HasIndex> pq = new PairingMinHeap<HasIndex>(10);
 		DummyHeapEntry entry0 = new DummyHeapEntry(0);
 		DummyHeapEntry entry1 = new DummyHeapEntry(1);
 		DummyHeapEntry entry2 = new DummyHeapEntry(2);
@@ -372,15 +395,16 @@ public class PairingMinHeapFunctionalityTest extends MinHeapTest {
 		assertEqualsHE(entry1, pq.peek());
 		pq.add(entry0, 5.0);
 		assertEqualsHE(entry0, pq.peek());
-		assertEqualsHE(entry0, pq.remove());
-		assertEqualsHE(entry1, pq.remove());
-		assertEqualsHE(entry2, pq.remove());
-		assertEqualsHE(entry3, pq.remove());
-		assertNull(pq.remove());
+		assertEqualsHE(entry0, pq.poll());
+		assertEqualsHE(entry1, pq.poll());
+		assertEqualsHE(entry2, pq.poll());
+		assertEqualsHE(entry3, pq.poll());
+		Assert.assertNull(pq.poll());
 	}
 
+	@Test
 	public void testOddOrder() {
-		MinHeap<DummyHeapEntry> pq = new PairingMinHeap<DummyHeapEntry>(10);
+		MinHeap<HasIndex> pq = new PairingMinHeap<HasIndex>(10);
 		DummyHeapEntry entry0 = new DummyHeapEntry(0);
 		DummyHeapEntry entry1 = new DummyHeapEntry(1);
 		DummyHeapEntry entry2 = new DummyHeapEntry(2);
@@ -389,11 +413,11 @@ public class PairingMinHeapFunctionalityTest extends MinHeapTest {
 		pq.add(entry3, 3.0);
 		pq.add(entry1, 1.0);
 		pq.add(entry2, 2.0);
-		assertEqualsHE(entry0, pq.remove());
-		assertEqualsHE(entry1, pq.remove());
-		assertEqualsHE(entry2, pq.remove());
-		assertEqualsHE(entry3, pq.remove());
-		assertNull(pq.remove());
+		assertEqualsHE(entry0, pq.poll());
+		assertEqualsHE(entry1, pq.poll());
+		assertEqualsHE(entry2, pq.poll());
+		assertEqualsHE(entry3, pq.poll());
+		Assert.assertNull(pq.poll());
 	}
 
 	private int iteratorElementCount(final Iterator<?> iterator) {
@@ -412,6 +436,29 @@ public class PairingMinHeapFunctionalityTest extends MinHeapTest {
 		}
 		return list;
 	}
+	
+	private void assertEqualsHE(HasIndex e1, HasIndex e2) {
+		Assert.assertEquals(e1.getArrayIndex(), e2.getArrayIndex());
+		Assert.assertEquals(e1, e2);
+	}
+		
+	private static class DummyHeapEntry implements HasIndex {
+		
+		final int index;
+		
+		public DummyHeapEntry(int index) {
+			this.index = index;
+		}
+		
+		@Override
+		public int getArrayIndex() {
+			return index;
+		}
+		
+		@Override
+		public String toString() {
+			return String.valueOf(this.index);
+		}
+	}
 }
-
 

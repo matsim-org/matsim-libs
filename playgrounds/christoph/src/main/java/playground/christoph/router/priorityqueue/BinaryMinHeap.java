@@ -23,12 +23,15 @@ package playground.christoph.router.priorityqueue;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
+import org.matsim.core.router.priorityqueue.HasIndex;
+import org.matsim.core.router.priorityqueue.MinHeap;
+
 /**
  * @author cdobler
  *
  * @param <E> the type of elements held in this collection
  */
-public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
+public final class BinaryMinHeap<E extends HasIndex> implements MinHeap<E> {
 
 	/**
 	 * Each HeapEntry contains a final integer value that points to a
@@ -64,12 +67,12 @@ public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 	private final int FANOUT;
 
 	public BinaryMinHeap(int size) {
-		this(size, 6);
+		this(size, 2);
 	}
 
 	@SuppressWarnings("unchecked")
 	public BinaryMinHeap(int size, int fanout) {
-		this.data = (E[]) new HeapEntry[size];
+		this.data = (E[]) new HasIndex[size];
 
 		this.costs = new double[size];
 		for (int i = 0; i < costs.length; i++) {
@@ -150,7 +153,7 @@ public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 	 * @return the head of this queue, or <tt>null</tt> if this queue is empty.
 	 */
 	@Override
-	public E remove() {
+	public E poll() {
 		E minValue;
 		if (isEmpty())
 			return null;
@@ -293,7 +296,7 @@ public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 				// Move entry to heap's top and then remove the heap's head.
 				boolean decreasedKey = decreaseKey(value, Double.MIN_VALUE);
 				if (decreasedKey && data[0] == value) {
-					this.remove();
+					this.poll();
 					return true;
 				} else {
 					if (debug) {
@@ -362,7 +365,7 @@ public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 	
 	private void check() {
 		int i = 0;
-		for (HeapEntry entry : data) {
+		for (HasIndex entry : data) {
 			i++;
 			if (i > heapSize) break;
 			if (entry == null) continue;
@@ -392,27 +395,31 @@ public final class BinaryMinHeap<E extends HeapEntry> implements MinHeap<E> {
 		indices[entry.getArrayIndex()] = indexTarget;
 	}
 
-	private void swapData(int index1, int index2) {
-
-		// swap HeapEntries
-		E entry1 = data[index1];
-		E entry2 = data[index2];
-		data[index1] = entry2;
-		data[index2] = entry1;
-		
-		// swap costs
-		double tmpCost = costs[index1];
-		costs[index1] = costs[index2];
-		costs[index2] = tmpCost;
-		
-		// swap indices
-		indices[entry1.getArrayIndex()] = index2;
-		indices[entry2.getArrayIndex()] = index1;
-	}
+//	private void swapData(int index1, int index2) {
+//
+//		// swap HeapEntries
+//		E entry1 = data[index1];
+//		E entry2 = data[index2];
+//		data[index1] = entry2;
+//		data[index2] = entry1;
+//		
+//		// swap costs
+//		double tmpCost = costs[index1];
+//		costs[index1] = costs[index2];
+//		costs[index2] = tmpCost;
+//		
+//		// swap indices
+//		indices[entry1.getArrayIndex()] = index2;
+//		indices[entry2.getArrayIndex()] = index1;
+//	}
 
 	private int getLeftChildIndex(int nodeIndex) {
 		return FANOUT * nodeIndex + 1;
 	}
+	
+//	private int getRightChildIndex(int nodeIndex) {
+//		return FANOUT * nodeIndex + 2;
+//	}
 
 	private int getParentIndex(int nodeIndex) {
 		return (nodeIndex - 1) / FANOUT;

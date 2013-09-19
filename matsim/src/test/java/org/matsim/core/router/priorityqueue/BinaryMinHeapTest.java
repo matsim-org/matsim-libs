@@ -36,34 +36,42 @@ public class BinaryMinHeapTest {
 	
 	protected static final Logger log = Logger.getLogger(BinaryMinHeapTest.class);
 	
+	private int maxElements = 10;
+	
 	@Test
 	public void testAdd() {
-		testAdd(true);
-		testAdd(false);
+		testAdd(createMinHeap(true));
+		testAdd(createMinHeap(false));
+		testAdd(createWrappedMinHeap(true));
+		testAdd(createWrappedMinHeap(false));
 	}
+	
+	private void testAdd(MinHeap<HasIndex> pq) {
+		DummyHeapEntry entry0 = new DummyHeapEntry(5);
+		DummyHeapEntry entry1 = new DummyHeapEntry(3);
+		DummyHeapEntry entry2 = new DummyHeapEntry(6);
 		
-	private void testAdd(boolean classicalRemove) {
-		MinHeap<HasIndex> pq = createMinHeap(classicalRemove);
 		Assert.assertEquals(0, pq.size());
-		pq.add(new DummyHeapEntry(0), 1.0);
+		pq.add(entry0, 1.0);
 		Assert.assertEquals(1, pq.size());
-		pq.add(new DummyHeapEntry(1), 2.0);
+		pq.add(entry1, 2.0);
 		Assert.assertEquals(2, pq.size());
-		pq.add(new DummyHeapEntry(2), 2.0); // different element with same priority
+		pq.add(entry2, 2.0); // different element with same priority
 		Assert.assertEquals(3, pq.size());
-		pq.add(new DummyHeapEntry(2), 3.0); // same element with different priority
+		pq.add(entry2, 3.0); // same element with different priority
 		Assert.assertEquals(3, pq.size());      	// should not be added!
 		Assert.assertEquals(3, iteratorElementCount(pq.iterator()));
 	}
 
 	@Test
 	public void testAdd_Null() {
-		testAdd_Null(true);
-		testAdd_Null(false);
+		testAdd_Null(createMinHeap(true));
+		testAdd_Null(createMinHeap(false));
+		testAdd_Null(createWrappedMinHeap(true));
+		testAdd_Null(createWrappedMinHeap(false));
 	}
 	
-	private void testAdd_Null(boolean classicalRemove) {
-		MinHeap<HasIndex> pq = createMinHeap(classicalRemove);
+	private void testAdd_Null(MinHeap<HasIndex> pq) {
 		try {
 			pq.add(null, 1.0);
 			Assert.fail("missing NullPointerException.");
@@ -77,12 +85,13 @@ public class BinaryMinHeapTest {
 
 	@Test
 	public void testPoll() {
-		testPoll(true);
-		testPoll(false);
+		testPoll(createMinHeap(true));
+		testPoll(createMinHeap(false));
+		testPoll(createWrappedMinHeap(true));
+		testPoll(createWrappedMinHeap(false));
 	}
 	
-	private void testPoll(boolean classicalRemove) {
-		MinHeap<HasIndex> pq = createMinHeap(classicalRemove);
+	private void testPoll(MinHeap<HasIndex> pq) {
 		DummyHeapEntry entry0 = new DummyHeapEntry(5);
 		DummyHeapEntry entry1 = new DummyHeapEntry(3);
 		DummyHeapEntry entry2 = new DummyHeapEntry(6);
@@ -112,12 +121,14 @@ public class BinaryMinHeapTest {
 	
 	@Test
 	public void testPoll2() {
-		testPoll2(true);
-		testPoll2(false);
+		testPoll2(createMinHeap(true));
+		testPoll2(createMinHeap(false));
+		testPoll2(createWrappedMinHeap(true));
+		testPoll2(createWrappedMinHeap(false));
+		
 	}
 	
-	private void testPoll2(boolean classicalRemove) {
-		MinHeap<HasIndex> pq = createMinHeap(classicalRemove);
+	private void testPoll2(MinHeap<HasIndex> pq) {
 		DummyHeapEntry entry0 = new DummyHeapEntry(0);
 		DummyHeapEntry entry1 = new DummyHeapEntry(1);
 		DummyHeapEntry entry2 = new DummyHeapEntry(2);
@@ -147,12 +158,13 @@ public class BinaryMinHeapTest {
 
 	@Test
 	public void testIterator() {
-		testIterator(true);
-		testIterator(false);
+		testIterator(createMinHeap(true));
+		testIterator(createMinHeap(false));
+		testIterator(createWrappedMinHeap(true));
+		testIterator(createWrappedMinHeap(false));
 	}
 	
-	private void testIterator(boolean classicalRemove) {
-		MinHeap<HasIndex> pq = createMinHeap(classicalRemove);
+	private void testIterator(MinHeap<HasIndex> pq) {
 		DummyHeapEntry entry0 = new DummyHeapEntry(5);
 		DummyHeapEntry entry1 = new DummyHeapEntry(3);
 		DummyHeapEntry entry2 = new DummyHeapEntry(6);
@@ -160,7 +172,7 @@ public class BinaryMinHeapTest {
 		pq.add(entry0, 5.0);
 		pq.add(entry1, 3.0);
 		pq.add(entry2, 6.0);
-		Collection<HasIndex> coll = getIteratorCollection(pq.iterator());
+		Collection<?> coll = getIteratorCollection(pq.iterator());
 		Assert.assertEquals(3, coll.size());
 		Assert.assertTrue(coll.contains(entry0));
 		Assert.assertTrue(coll.contains(entry1));
@@ -170,12 +182,13 @@ public class BinaryMinHeapTest {
 
 	@Test
 	public void testIterator_ConcurrentModification_add() {
-		testIterator_ConcurrentModification_add(true);
-		testIterator_ConcurrentModification_add(false);
+		testIterator_ConcurrentModification_add(createMinHeap(true));
+		testIterator_ConcurrentModification_add(createMinHeap(false));
+		testIterator_ConcurrentModification_add(createWrappedMinHeap(true));
+		testIterator_ConcurrentModification_add(createWrappedMinHeap(false));
 	}
 	
-	private void testIterator_ConcurrentModification_add(boolean classicalRemove) {
-		MinHeap<HasIndex> pq = createMinHeap(classicalRemove);
+	private void testIterator_ConcurrentModification_add(MinHeap<HasIndex> pq) {
 		DummyHeapEntry entry0 = new DummyHeapEntry(5);
 		DummyHeapEntry entry1 = new DummyHeapEntry(3);
 		DummyHeapEntry entry2 = new DummyHeapEntry(6);
@@ -183,7 +196,7 @@ public class BinaryMinHeapTest {
 		pq.add(entry0, 5.0);
 		pq.add(entry1, 3.0);
 		pq.add(entry2, 6.0);
-		Iterator<HasIndex> iter = pq.iterator();
+		Iterator<?> iter = pq.iterator();
 		Assert.assertTrue(iter.hasNext());
 		Assert.assertNotNull(iter.next());
 
@@ -203,19 +216,20 @@ public class BinaryMinHeapTest {
 
 	@Test
 	public void testIterator_ConcurrentModification_poll() {
-		testIterator_ConcurrentModification_poll(true);
-		testIterator_ConcurrentModification_poll(false);
+		testIterator_ConcurrentModification_poll(createMinHeap(true));
+		testIterator_ConcurrentModification_poll(createMinHeap(false));
+		testIterator_ConcurrentModification_poll(createWrappedMinHeap(true));
+		testIterator_ConcurrentModification_poll(createWrappedMinHeap(false));
 	}
 	
-	private void testIterator_ConcurrentModification_poll(boolean classicalRemove) {
-		MinHeap<HasIndex> pq = createMinHeap(classicalRemove);
+	private void testIterator_ConcurrentModification_poll(MinHeap<HasIndex> pq) {
 		DummyHeapEntry entry0 = new DummyHeapEntry(5);
 		DummyHeapEntry entry1 = new DummyHeapEntry(3);
 		DummyHeapEntry entry2 = new DummyHeapEntry(6);
 		pq.add(entry0, 5.0);
 		pq.add(entry1, 3.0);
 		pq.add(entry2, 6.0);
-		Iterator<HasIndex> iter = pq.iterator();
+		Iterator<?> iter = pq.iterator();
 		Assert.assertTrue(iter.hasNext());
 		Assert.assertNotNull(iter.next());
 
@@ -235,19 +249,20 @@ public class BinaryMinHeapTest {
 
 	@Test
 	public void testIterator_ConcurrentModification_remove() {
-		testIterator_ConcurrentModification_remove(true);
-		testIterator_ConcurrentModification_remove(false);
+		testIterator_ConcurrentModification_remove(createMinHeap(true));
+		testIterator_ConcurrentModification_remove(createMinHeap(false));
+		testIterator_ConcurrentModification_remove(createWrappedMinHeap(true));
+		testIterator_ConcurrentModification_remove(createWrappedMinHeap(false));
 	}
 	
-	private void testIterator_ConcurrentModification_remove(boolean classicalRemove) {
-		MinHeap<HasIndex> pq = createMinHeap(classicalRemove);
+	private void testIterator_ConcurrentModification_remove(MinHeap<HasIndex> pq) {
 		DummyHeapEntry entry0 = new DummyHeapEntry(5);
 		DummyHeapEntry entry1 = new DummyHeapEntry(3);
 		DummyHeapEntry entry2 = new DummyHeapEntry(6);
 		pq.add(entry0, 5.0);
 		pq.add(entry1, 3.0);
 		pq.add(entry2, 6.0);
-		Iterator<HasIndex> iter = pq.iterator();
+		Iterator<?> iter = pq.iterator();
 		Assert.assertTrue(iter.hasNext());
 		Assert.assertNotNull(iter.next());
 
@@ -270,19 +285,20 @@ public class BinaryMinHeapTest {
 
 	@Test
 	public void testIterator_RemoveUnsupported() {
-		testIterator_RemoveUnsupported(true);
-		testIterator_RemoveUnsupported(false);
+		testIterator_RemoveUnsupported(createMinHeap(true));
+		testIterator_RemoveUnsupported(createMinHeap(false));
+		testIterator_RemoveUnsupported(createWrappedMinHeap(true));
+		testIterator_RemoveUnsupported(createWrappedMinHeap(false));
 	}
 	
-	private void testIterator_RemoveUnsupported(boolean classicalRemove) {
-		MinHeap<HasIndex> pq = createMinHeap(classicalRemove);
+	private void testIterator_RemoveUnsupported(MinHeap<HasIndex> pq) {
 		DummyHeapEntry entry0 = new DummyHeapEntry(5);
 		DummyHeapEntry entry1 = new DummyHeapEntry(3);
 		DummyHeapEntry entry2 = new DummyHeapEntry(6);
 		pq.add(entry0, 5.0);
 		pq.add(entry1, 3.0);
 		pq.add(entry2, 6.0);
-		Iterator<HasIndex> iter = pq.iterator();
+		Iterator<?> iter = pq.iterator();
 		Assert.assertTrue(iter.hasNext());
 		Assert.assertNotNull(iter.next());
 		try {
@@ -296,12 +312,13 @@ public class BinaryMinHeapTest {
 
 	@Test
 	public void testRemove() {
-		testRemove(true);
-		testRemove(false);
+		testRemove(createMinHeap(true));
+		testRemove(createMinHeap(false));
+		testRemove(createWrappedMinHeap(true));
+		testRemove(createWrappedMinHeap(false));
 	}
 	
-	private void testRemove(boolean classicalRemove) {
-		MinHeap<HasIndex> pq = createMinHeap(classicalRemove);
+	private void testRemove(MinHeap<HasIndex> pq) {
 		DummyHeapEntry entry0 = new DummyHeapEntry(5);
 		DummyHeapEntry entry1 = new DummyHeapEntry(3);
 		DummyHeapEntry entry2 = new DummyHeapEntry(6);
@@ -310,7 +327,7 @@ public class BinaryMinHeapTest {
 		pq.add(entry1, 3.0);
 		pq.add(entry2, 6.0);
 
-		Collection<HasIndex> coll = getIteratorCollection(pq.iterator());
+		Collection<?> coll = getIteratorCollection(pq.iterator());
 		Assert.assertEquals(3, coll.size());
 		Assert.assertTrue(coll.contains(entry0));
 		Assert.assertTrue(coll.contains(entry1));
@@ -348,12 +365,13 @@ public class BinaryMinHeapTest {
 
 	@Test
 	public void testRemoveAndAdd_LowerPriority() {
-		testRemoveAndAdd_LowerPriority(true);
-		testRemoveAndAdd_LowerPriority(false);
+		testRemoveAndAdd_LowerPriority(createMinHeap(true));
+		testRemoveAndAdd_LowerPriority(createMinHeap(false));
+		testRemoveAndAdd_LowerPriority(createWrappedMinHeap(true));
+		testRemoveAndAdd_LowerPriority(createWrappedMinHeap(false));
 	}
 	
-	private void testRemoveAndAdd_LowerPriority(boolean classicalRemove) {
-		MinHeap<HasIndex> pq = createMinHeap(classicalRemove);
+	private void testRemoveAndAdd_LowerPriority(MinHeap<HasIndex> pq) {
 		DummyHeapEntry entry0 = new DummyHeapEntry(5);
 		DummyHeapEntry entry1 = new DummyHeapEntry(3);
 		DummyHeapEntry entry2 = new DummyHeapEntry(6);
@@ -377,19 +395,32 @@ public class BinaryMinHeapTest {
 	@Test
 	// increase priority -> decrease key since it is a min-heap
 	public void testIncreasePriority() {
-		testIncreasePriority(true);
-		testIncreasePriority(false);
+		testIncreasePriority(createMinHeap(true));
+		testIncreasePriority(createMinHeap(false));
+		testIncreasePriority(createWrappedMinHeap(true));
+		testIncreasePriority(createWrappedMinHeap(false));
 	}
 	
-	private void testIncreasePriority(boolean classicalRemove) {
-		MinHeap<HasIndex> pq = createMinHeap(classicalRemove);
+	private void testIncreasePriority(MinHeap<HasIndex> pq) {
 		DummyHeapEntry entry0 = new DummyHeapEntry(5);
 		DummyHeapEntry entry1 = new DummyHeapEntry(3);
 		DummyHeapEntry entry2 = new DummyHeapEntry(6);
+
+		/*
+		 * Only for WrappedBinaryMinHeap: ensure that the indices are in the same order
+		 * as used above for the array based implementation.
+		 */
+		if (pq instanceof WrappedBinaryMinHeap) {
+			pq.add(entry1, Double.MAX_VALUE);
+			pq.add(entry0, Double.MAX_VALUE);
+			pq.add(entry2, Double.MAX_VALUE);
+			while(!pq.isEmpty()) pq.poll();
+		}
+		
 		pq.add(entry0, 5.0);
 		pq.add(entry1, 3.0);
 		pq.add(entry2, 6.0);
-
+		
 		Assert.assertEquals(3, pq.size());
 
 		// test decreasing an element by increasing priority (=lower value)
@@ -418,12 +449,13 @@ public class BinaryMinHeapTest {
 	
 	@Test
 	public void testRemoveAndAdd_HigherPriority() {
-		testRemoveAndAdd_HigherPriority(true);
-		testRemoveAndAdd_HigherPriority(false);
+		testRemoveAndAdd_HigherPriority(createMinHeap(true));
+		testRemoveAndAdd_HigherPriority(createMinHeap(false));
+		testRemoveAndAdd_HigherPriority(createWrappedMinHeap(true));
+		testRemoveAndAdd_HigherPriority(createWrappedMinHeap(false));
 	}
 	
-	private void testRemoveAndAdd_HigherPriority(boolean classicalRemove) {
-		MinHeap<HasIndex> pq = createMinHeap(classicalRemove);
+	private void testRemoveAndAdd_HigherPriority(MinHeap<HasIndex> pq) {
 		DummyHeapEntry entry0 = new DummyHeapEntry(5);
 		DummyHeapEntry entry1 = new DummyHeapEntry(3);
 		DummyHeapEntry entry2 = new DummyHeapEntry(6);
@@ -446,16 +478,30 @@ public class BinaryMinHeapTest {
 
 	@Test
 	public void testEqualCosts() {
-		testEqualCosts(true);
-		testEqualCosts(false);
+		testEqualCosts(createMinHeap(true));
+		testEqualCosts(createMinHeap(false));
+		testEqualCosts(createWrappedMinHeap(true));
+		testEqualCosts(createWrappedMinHeap(false));
 	}
 	
-	private void testEqualCosts(boolean classicalRemove) {
-		MinHeap<HasIndex> pq = createMinHeap(classicalRemove);
+	private void testEqualCosts(MinHeap<HasIndex> pq) {
 		DummyHeapEntry entry0 = new DummyHeapEntry(0);
 		DummyHeapEntry entry1 = new DummyHeapEntry(1);
 		DummyHeapEntry entry2 = new DummyHeapEntry(2);
 		DummyHeapEntry entry3 = new DummyHeapEntry(4);
+		
+		/*
+		 * Only for WrappedBinaryMinHeap: ensure that the indices are in the same order
+		 * as used above for the array based implementation.
+		 */
+		if (pq instanceof WrappedBinaryMinHeap) {
+			pq.add(entry0, Double.MAX_VALUE);
+			pq.add(entry1, Double.MAX_VALUE);
+			pq.add(entry2, Double.MAX_VALUE);
+			pq.add(entry3, Double.MAX_VALUE);
+			while(!pq.isEmpty()) pq.poll();
+		}
+		
 		pq.add(entry2, 5.0);
 		pq.add(entry3, 5.0);
 		pq.add(entry1, 5.0);
@@ -474,12 +520,13 @@ public class BinaryMinHeapTest {
 
 	@Test
 	public void testEqualCosts2() {
-		testEqualCosts2(true);
-		testEqualCosts2(false);
+		testEqualCosts2(createMinHeap(true));
+		testEqualCosts2(createMinHeap(false));
+		testEqualCosts2(createWrappedMinHeap(true));
+		testEqualCosts2(createWrappedMinHeap(false));
 	}
 	
-	private void testEqualCosts2(boolean classicalRemove) {
-		MinHeap<HasIndex> pq = createMinHeap(classicalRemove);
+	private void testEqualCosts2(MinHeap<HasIndex> pq) {
 		DummyHeapEntry entry0 = new DummyHeapEntry(0);
 		DummyHeapEntry entry1 = new DummyHeapEntry(1);
 		DummyHeapEntry entry2 = new DummyHeapEntry(2);
@@ -490,6 +537,25 @@ public class BinaryMinHeapTest {
 		DummyHeapEntry entry7 = new DummyHeapEntry(7);
 		DummyHeapEntry entry8 = new DummyHeapEntry(8);
 		DummyHeapEntry entry9 = new DummyHeapEntry(9);
+				
+		/*
+		 * Only for WrappedBinaryMinHeap: ensure that the indices are in the same order
+		 * as used above for the array based implementation.
+		 */
+		if (pq instanceof WrappedBinaryMinHeap) {
+			pq.add(entry0, Double.MAX_VALUE);
+			pq.add(entry1, Double.MAX_VALUE);
+			pq.add(entry2, Double.MAX_VALUE);
+			pq.add(entry3, Double.MAX_VALUE);
+			pq.add(entry4, Double.MAX_VALUE);
+			pq.add(entry5, Double.MAX_VALUE);
+			pq.add(entry6, Double.MAX_VALUE);
+			pq.add(entry7, Double.MAX_VALUE);
+			pq.add(entry8, Double.MAX_VALUE);
+			pq.add(entry9, Double.MAX_VALUE);
+			while(!pq.isEmpty()) pq.poll();
+		}
+		
 		pq.add(entry3, 5.0);
 		pq.add(entry7, 5.0);
 		pq.add(entry2, 5.0);
@@ -515,12 +581,13 @@ public class BinaryMinHeapTest {
 	
 	@Test
 	public void testExceedCapacity() {
-		testExceedCapacity(true);
-		testEqualCosts2(false);
+		testExceedCapacity(createMinHeap(true));
+		testExceedCapacity(createMinHeap(false));
+		testExceedCapacity(createWrappedMinHeap(true));
+		testExceedCapacity(createWrappedMinHeap(false));
 	}
 	
-	private void testExceedCapacity(boolean classicalRemove) {
-		MinHeap<HasIndex> pq = createMinHeap(classicalRemove);
+	private void testExceedCapacity(MinHeap<HasIndex> pq) {
 		DummyHeapEntry entry0 = new DummyHeapEntry(0);
 		DummyHeapEntry entry1 = new DummyHeapEntry(1);
 		DummyHeapEntry entry2 = new DummyHeapEntry(2);
@@ -555,12 +622,13 @@ public class BinaryMinHeapTest {
 	
 	@Test
 	public void testOddOrder() {
-		testOddOrder(true);
-		testOddOrder(false);
+		testOddOrder(createMinHeap(true));
+		testOddOrder(createMinHeap(false));
+		testOddOrder(createWrappedMinHeap(true));
+		testOddOrder(createWrappedMinHeap(false));
 	}
 	
-	private void testOddOrder(boolean classicalRemove) {
-		MinHeap<HasIndex> pq = createMinHeap(classicalRemove);
+	private void testOddOrder(MinHeap<HasIndex> pq) {
 		DummyHeapEntry entry0 = new DummyHeapEntry(0);
 		DummyHeapEntry entry1 = new DummyHeapEntry(1);
 		DummyHeapEntry entry2 = new DummyHeapEntry(2);
@@ -577,10 +645,15 @@ public class BinaryMinHeapTest {
 	}
 	
 	private MinHeap<HasIndex> createMinHeap(boolean classicalRemove) {
-		BinaryMinHeap<HasIndex> pq = new BinaryMinHeap<HasIndex>(10, BinaryMinHeap.defaultFanout, classicalRemove);
+		MinHeap<HasIndex> pq = new BinaryMinHeap<HasIndex>(maxElements, BinaryMinHeap.defaultFanout, classicalRemove);
 		return pq;
 	}
 
+	private MinHeap<HasIndex> createWrappedMinHeap(boolean classicalRemove) {
+		MinHeap<HasIndex> pq = new WrappedBinaryMinHeap<HasIndex>(maxElements, BinaryMinHeap.defaultFanout, classicalRemove);
+		return pq;
+	}
+	
 	private int iteratorElementCount(final Iterator<?> iterator) {
 		int cnt = 0;
 		while (iterator.hasNext()) {

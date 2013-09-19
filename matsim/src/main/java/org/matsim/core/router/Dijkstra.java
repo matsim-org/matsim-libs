@@ -73,7 +73,7 @@ import org.matsim.vehicles.Vehicle;
  * </p>
  * 
  * <h2>Important note</h2>
- * This class is NOT threadsafe!
+ * This class is NOT thread-safe!
  *
  * @see org.matsim.core.router.util.PreProcessDijkstra
  * @see org.matsim.core.router.AStarEuclidean
@@ -207,10 +207,11 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 	 * @see org.matsim.core.router.util.LeastCostPathCalculator#calcLeastCostPath(org.matsim.core.network.Node,
 	 *      org.matsim.core.network.Node, double)
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
 	public Path calcLeastCostPath(final Node fromNode, final Node toNode, final double startTime, final Person person, final Vehicle vehicle) {
 
-		augmentIterationId(); // this call makes the class not threadsafe
+		augmentIterationId(); // this call makes the class not thread-safe
 		this.person = person;
 		this.vehicle = vehicle;
 
@@ -218,7 +219,7 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 			this.deadEndEntryNode = getPreProcessData(toNode).getDeadEndEntryNode();
 		}
 
-		RouterPriorityQueue<Node> pendingNodes = new PseudoRemovePriorityQueue<Node>(500);
+		RouterPriorityQueue<Node> pendingNodes = (RouterPriorityQueue<Node>) createRouterPriorityQueue();
 		initFromNode(fromNode, toNode, startTime, pendingNodes);
 
 		Node foundToNode = searchLogic(fromNode, toNode, pendingNodes);
@@ -233,6 +234,13 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 		}
 	}
 
+	/**
+	 * Allow replacing the RouterPriorityQueue.
+	 */
+	/*package*/ RouterPriorityQueue<? extends Node> createRouterPriorityQueue() {
+		return new PseudoRemovePriorityQueue<Node>(500);
+	}
+	
 	/**
 	 * Logic that was previously located in the calcLeastCostPath(...) method.
 	 * Can be overwritten in the MultiModalDijkstra.

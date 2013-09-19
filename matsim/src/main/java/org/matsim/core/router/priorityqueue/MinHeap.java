@@ -22,6 +22,6 @@ package org.matsim.core.router.priorityqueue;
 
 import org.matsim.core.utils.collections.RouterPriorityQueue;
 
-public interface MinHeap<E extends HasIndex> extends RouterPriorityQueue<E> {
+public interface MinHeap<E> extends RouterPriorityQueue<E> {
 
 }

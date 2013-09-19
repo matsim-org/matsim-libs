@@ -20,15 +20,19 @@
 
 package playground.christoph.router.priorityqueue;
 
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
+
+import org.matsim.core.router.priorityqueue.HasIndex;
+import org.matsim.core.router.priorityqueue.MinHeap;
 
 /**
  * Implements an array-based pairing heap, based on code from Mark Allen Weiss.
  * 
  * @author cdobler
  */
-public class PairingMinHeap<E extends HeapEntry> implements MinHeap<E> {
+public class PairingMinHeap<E extends HasIndex> implements MinHeap<E> {
 	
 	// The tree array for combineSiblings
 	private final E[] treeArray;
@@ -49,21 +53,24 @@ public class PairingMinHeap<E extends HeapEntry> implements MinHeap<E> {
 	private E root;
 	private int size;
 	
+	private transient int modCount;
+	
 	/**
 	 * Construct the pairing heap.
 	 */
 	@SuppressWarnings("unchecked")
 	public PairingMinHeap(int size) {
-		this.treeArray = (E[]) new HeapEntry[size];
+		this.treeArray = (E[]) new HasIndex[size];
 		
-		this.data = (E[]) new HeapEntry[size];
+		this.data = (E[]) new HasIndex[size];
 		this.costs = new double[size];
-		this.leftChild = (E[]) new HeapEntry[size];
-		this.nextSibling = (E[]) new HeapEntry[size];
-		this.prev = (E[]) new HeapEntry[size];
+		this.leftChild = (E[]) new HasIndex[size];
+		this.nextSibling = (E[]) new HasIndex[size];
+		this.prev = (E[]) new HasIndex[size];
 		
 		root = null;
 		size = 0;
+		modCount = 0;
 		
 		// is this necessary?
 		for (int i = 0; i < size; i++) {
@@ -86,7 +93,8 @@ public class PairingMinHeap<E extends HeapEntry> implements MinHeap<E> {
 		if (this.data[index] != null) {
 			return false;
 		}
-			
+		modCount++;
+		
 		this.data[index] = e;
 		this.costs[index] = priority;
 		
@@ -116,8 +124,10 @@ public class PairingMinHeap<E extends HeapEntry> implements MinHeap<E> {
 	 * @return the head of this queue, or <tt>null</tt> if this
 	 *         queue is empty.
 	 */
-	public E remove() {
+	public E poll() {
 		if (isEmpty()) return null;
+		
+		modCount++;
 		
 		E x = peek();
 		int index = x.getArrayIndex();
@@ -155,7 +165,8 @@ public class PairingMinHeap<E extends HeapEntry> implements MinHeap<E> {
 			// Move entry to heap's top and then remove the heap's head.
 			boolean decreasedKey = decreaseKey(value, Double.MIN_VALUE);
 			if (decreasedKey && this.peek() == value) {
-				this.remove();
+				this.poll();
+				this.modCount++;
 				return true;
 			} else return false;
 		}
@@ -233,6 +244,7 @@ public class PairingMinHeap<E extends HeapEntry> implements MinHeap<E> {
 	public void reset() {
 		root = null;
 		size = 0;
+		modCount = 0;
 		
 		for (int i = 0; i < data.length; i++) {
 			E e = this.data[i];
@@ -364,13 +376,18 @@ public class PairingMinHeap<E extends HeapEntry> implements MinHeap<E> {
 	
 	private final class ArrayIterator implements Iterator<E> {
 
+		private final int expectedModCount = modCount;
+		
 		private final E[] array;
 		private int lastEntry = 0;
 		private int index = 0;
 		
 		public ArrayIterator(final E[] array, int heapSize) {
 			this.array = array;
-			if (heapSize <= 0) lastEntry = 0;
+			if (heapSize <= 0) {
+				lastEntry = 0;
+				index = 1;	// ensure that hasNext() returns false for empty heap
+			}
 			
 			/*
 			 * Find the last entry in the array. Use to compare
@@ -395,6 +412,7 @@ public class PairingMinHeap<E extends HeapEntry> implements MinHeap<E> {
 
 		@Override
 		public E next() {
+			this.checkForComodification();
 			if (!hasNext()) throw new NoSuchElementException();
 			while (index <= lastEntry) {
 				E value = array[index];
@@ -407,6 +425,10 @@ public class PairingMinHeap<E extends HeapEntry> implements MinHeap<E> {
 		@Override
 		public void remove() {
 			throw new UnsupportedOperationException("Not supported operation!");
+		}
+		
+		private void checkForComodification() {
+			if (modCount != expectedModCount) throw new ConcurrentModificationException();
 		}
 	}
 

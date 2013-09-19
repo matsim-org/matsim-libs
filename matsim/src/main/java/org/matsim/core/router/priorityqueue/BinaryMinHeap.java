@@ -4,7 +4,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -30,13 +30,25 @@ import java.util.NoSuchElementException;
  *
  * @param <E> the type of elements held in this collection
  */
-public final class BinaryMinHeap<E extends HasIndex> implements MinHeap<E> {
-
+public class BinaryMinHeap<E extends HasIndex> implements MinHeap<E> {
+	
 	/**
 	 * Each HeapEntry contains a final integer value that points to a
 	 * position in the indices array. The value in the indices array points
 	 * to the position in the data and costs arrays where the HeapEntry
 	 * is currently located.
+	 * 
+	 * 	 * data objects, their indices and costs:	A(0, 5), B(1, 6), C(2, 7), D(3, 8)
+	 * 
+	 * 			[A][B][C][D]
+	 * indices:	[3][0][1][2]
+	 * 
+	 * data:	[B][C][D][A]
+	 * costs:	[6][7][8][5]
+	 * 
+	 * Example: 
+	 * Index of object A is 0. entry in indices array at position 0 is 3.
+	 * Therefore, the object is at index 3 in the data array.
 	 */
 	private final E[] data;
 	final double[] costs;
@@ -66,41 +78,35 @@ public final class BinaryMinHeap<E extends HasIndex> implements MinHeap<E> {
 
 	/*package*/ static final int defaultFanout = 6;
 	
-	public BinaryMinHeap(int size) {
-		this(size, defaultFanout, false);
+	public BinaryMinHeap(int maxSize) {
+		this(maxSize, defaultFanout, false);
 	}
 
 	@SuppressWarnings("unchecked")
-	public BinaryMinHeap(int size, int fanout, boolean classicalRemove) {
-		this.data = (E[]) new HasIndex[size];
+	public BinaryMinHeap(int maxSize, int fanout, boolean classicalRemove) {
+		this.fanout = fanout;
+		this.classicalRemove = classicalRemove;
 
-		this.costs = new double[size];
+		this.data = (E[]) new HasIndex[maxSize];
+
+		this.costs = new double[maxSize];
 		for (int i = 0; i < costs.length; i++) {
 			costs[i] = Double.MAX_VALUE;
 		}
 
-		this.indices = new int[size];
+		this.indices = new int[maxSize];
 		for (int i = 0; i < indices.length; i++) {
 			indices[i] = -1;
 		}
 		this.heapSize = 0;
 		this.modCount = 0;
-
-		this.fanout = fanout;
-		this.classicalRemove = classicalRemove;
-	}
-	
-	/**
-	 * @return the fan-out of the heap
-	 */
-	/*package*/ int getFanout() {
-		return this.fanout;
 	}
 
 	/**
 	 * Resets the queue to its initial state.
 	 */
-	public void reset() {		
+	@Override
+	public void reset() {
 		/*
 		 * For a small number of remaining entries in the heap, only removing
 		 * them might be faster than overwriting all entries. However, when doing so,
@@ -108,7 +114,7 @@ public final class BinaryMinHeap<E extends HasIndex> implements MinHeap<E> {
 		 */
 		if (heapSize < indices.length / 10) {
 			for (int i = 0; i < heapSize; i++) {
-				indices[data[i].getArrayIndex()] = -1;
+				indices[this.getIndex(data[i])] = -1;
 			}			
 		} else {
 			for (int i = 0; i < indices.length; i++) {
@@ -150,15 +156,15 @@ public final class BinaryMinHeap<E extends HasIndex> implements MinHeap<E> {
 			if (classicalRemove) {
 				data[0] = data[heapSize - 1];
 				costs[0] = costs[heapSize - 1];
-				indices[data[0].getArrayIndex()] = 0;
-				indices[minValue.getArrayIndex()] = -1;
+				indices[this.getIndex(data[0])] = 0;
+				indices[this.getIndex(minValue)] = -1;
 
 				heapSize--;
 				if (heapSize > 0) siftDown(0);
 			} else {
 				siftDownUp(0);
 
-				indices[minValue.getArrayIndex()] = -1;
+				indices[this.getIndex(minValue)] = -1;
 			}
 			return minValue;
 		}
@@ -179,7 +185,7 @@ public final class BinaryMinHeap<E extends HasIndex> implements MinHeap<E> {
 
 	/*
 	 * Used by alternative remove() approach. The costs have been set to
-	 * Double.MAX_VALUE. Therefore we only have to compare the nodes children.
+	 * Double.MAX_VALUE. Therefore we only have to compare the node's children.
 	 */
 	private int removeSiftDown(int nodeIndex) {
 		while(true) {
@@ -197,7 +203,7 @@ public final class BinaryMinHeap<E extends HasIndex> implements MinHeap<E> {
 				 */
 				double rightCosts = costs[rightChildIndex];
 				if (leftCosts >= rightCosts && 
-						(leftCosts > rightCosts || data[leftChildIndex].getArrayIndex() > data[rightChildIndex].getArrayIndex())) {
+						(leftCosts > rightCosts || this.getIndex(data[leftChildIndex]) > this.getIndex(data[rightChildIndex]))) {
 					leftChildIndex = rightChildIndex;
 					leftCosts = rightCosts;
 				}
@@ -241,14 +247,17 @@ public final class BinaryMinHeap<E extends HasIndex> implements MinHeap<E> {
 	@Override
 	public boolean add(E value, double priority) {
 		
-		if (heapSize == data.length) throw new RuntimeException("Heap's underlying storage is overflow!");
-
-		this.modCount++;
+		if (value == null) {
+			throw new NullPointerException("null values are not supported!");
+		}
 		
 		// if the element is already present in the queue, return false
-		if (indices[value.getArrayIndex()] >= 0) {
+		if (indices[this.getIndex(value)] >= 0) {
 			return false;
-		} else {
+		} else {			
+			if (heapSize == data.length) throw new RuntimeException("Heap's underlying storage is overflow!");			
+			
+			this.modCount++;
 			siftUp(heapSize, value, priority);
 			heapSize++;			
 			return true;
@@ -262,6 +271,7 @@ public final class BinaryMinHeap<E extends HasIndex> implements MinHeap<E> {
 	 * @return <tt>true</tt> if the queue contained the specified
 	 *         element.
 	 */
+	@Override
 	public boolean remove(E value) {
 		
 		if (value == null) return false;
@@ -270,7 +280,7 @@ public final class BinaryMinHeap<E extends HasIndex> implements MinHeap<E> {
 		 * Check the elements index. "-1" means that the element is not
 		 * present in the heap. 
 		 */
-		int index = indices[value.getArrayIndex()];
+		int index = indices[this.getIndex(value)];
 		if (index < 0) {
 			return false;
 		} else {
@@ -285,7 +295,7 @@ public final class BinaryMinHeap<E extends HasIndex> implements MinHeap<E> {
 				siftDownUp(index);
 
 				// index has changed, therefore we cannot use "index" again
-				indices[value.getArrayIndex()] = -1;
+				indices[this.getIndex(value)] = -1;
 				this.modCount++;
 				return true;
 			}
@@ -303,7 +313,7 @@ public final class BinaryMinHeap<E extends HasIndex> implements MinHeap<E> {
 	public boolean decreaseKey(E value, double cost) {
 
 		// If the element is not yet present in the heap, simply add it.
-		int index = indices[value.getArrayIndex()];
+		int index = indices[this.getIndex(value)];
 		if (index < 0) {
 			return this.add(value, cost);
 		}
@@ -316,14 +326,15 @@ public final class BinaryMinHeap<E extends HasIndex> implements MinHeap<E> {
 		if (oldCost < cost) return false;
 
 		// update costs in array
-		siftUp(index, data[index], cost);
+		siftUp(index, value, cost);
 		return true;
 	}
 
 	/**
 	 * Returns an iterator over the elements in this queue. The iterator
-	 * does not return the elements in any particular order. Removing
-	 * elements is not supported via the iterator.
+	 * does NOT return the elements sorted by their priority. However,
+	 * their order should be deterministic since the underlying array is. 
+	 * Removing elements is not supported via the iterator.
 	 *
 	 * @return an iterator over the elements in this queue.
 	 */
@@ -331,7 +342,7 @@ public final class BinaryMinHeap<E extends HasIndex> implements MinHeap<E> {
 	public Iterator<E> iterator() {
 		return new ArrayIterator(data, heapSize);
 	}
-		
+	
 	private void copyData(int indexTarget, int indexSource) {
 		// copy HeapEntries
 		E entry = data[indexSource];
@@ -341,7 +352,7 @@ public final class BinaryMinHeap<E extends HasIndex> implements MinHeap<E> {
 		costs[indexTarget] = costs[indexSource];
 
 		// copy indices
-		indices[entry.getArrayIndex()] = indexTarget;
+		indices[this.getIndex(entry)] = indexTarget;
 	}
 
 	private int getLeftChildIndex(int nodeIndex) {
@@ -356,19 +367,17 @@ public final class BinaryMinHeap<E extends HasIndex> implements MinHeap<E> {
 		while (index > 0) {
 			int parentIndex = getParentIndex(index);
 			double parentCost = costs[parentIndex];
-			if (newCost > parentCost)
-				break;
-			if (newCost == parentCost && newEntry.getArrayIndex() > data[parentIndex].getArrayIndex())
-				break;
+			if (newCost > parentCost) break;
+			if (newCost == parentCost && this.getIndex(newEntry) > this.getIndex(data[parentIndex])) break;
 			this.copyData(index, parentIndex);
 			
 			// for next iteration
 			index = parentIndex;
 		}
 
-		data[index] = newEntry;
+		data[index] = newEntry;			
 		costs[index] = newCost;
-		indices[newEntry.getArrayIndex()] = index;
+		indices[this.getIndex(newEntry)] = index;
 	}
 
 	private void siftDown(int nodeIndex) {
@@ -388,7 +397,7 @@ public final class BinaryMinHeap<E extends HasIndex> implements MinHeap<E> {
 			 */
 			double childCosts = costs[childIndex];
 			if (childCosts <= minCosts) {
-				if (childCosts < minCosts || data[childIndex].getArrayIndex() < data[minIndex].getArrayIndex()) {
+				if (childCosts < minCosts || this.getIndex(data[childIndex]) < this.getIndex(data[minIndex])) {
 					minIndex = childIndex;
 					minCosts = childCosts;
 				}
@@ -401,7 +410,6 @@ public final class BinaryMinHeap<E extends HasIndex> implements MinHeap<E> {
 		}
 	}
 	
-
 	private void swapData(int index1, int index2) {
 
 		// swap HeapEntries
@@ -416,8 +424,12 @@ public final class BinaryMinHeap<E extends HasIndex> implements MinHeap<E> {
 		costs[index2] = tmpCost;
 		
 		// swap indices
-		indices[entry1.getArrayIndex()] = index2;
-		indices[entry2.getArrayIndex()] = index1;
+		indices[this.getIndex(entry1)] = index2;
+		indices[this.getIndex(entry2)] = index1;
+	}
+	
+	private int getIndex(HasIndex value) {
+		return value.getArrayIndex();
 	}
 	
 	private final class ArrayIterator implements Iterator<E> {
