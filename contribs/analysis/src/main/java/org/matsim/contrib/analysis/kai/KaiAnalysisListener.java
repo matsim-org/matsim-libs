@@ -32,6 +32,8 @@ import org.matsim.core.controler.listener.StartupListener;
  *
  */
 public class KaiAnalysisListener implements StartupListener, AfterMobsimListener {
+	// NOTE: My excel opens tab-separated txt files directly (from the command line).  It does not do this with comma-separated or semicolon-separated.
+	// So tab-separated is the way to go. kai, sep'13
 	
 	MyCalcLegTimes calcLegTimes = null ;
 	
