@@ -136,7 +136,6 @@ public class TtCalculateIntergreens {
 		Set<SignalGroupSettingsData> allGreenSignals = this
 				.removeAllGreenSignalGroupSettings(groupSettingsList,
 						signalSystemCycleTime);
-		// TODO ?! sollen all green signals auch intergreens bekommen?
 
 		// make a copy and sort by signal group onsets
 		ArrayList<SignalGroupSettingsData> sortedGroupSettingsList = new ArrayList<SignalGroupSettingsData>();
