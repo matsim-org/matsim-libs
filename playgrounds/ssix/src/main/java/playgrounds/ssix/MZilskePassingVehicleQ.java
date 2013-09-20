@@ -1,4 +1,4 @@
-package playground.ssix;
+package playgrounds.ssix;
 
 import java.util.AbstractQueue;
 import java.util.Comparator;

@@ -18,14 +18,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.ssix;
+package playgrounds.ssix;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-
-import playgrounds.ssix.FundamentalDiagrams;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -34,6 +32,7 @@ import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.Tuple;
+
 
 /* A class supposed to go attached to the DreieckStreckeSzenario class (with passing).
  * It aims at analyzing the flow of events in order to detect:
@@ -44,7 +43,7 @@ import org.matsim.core.utils.collections.Tuple;
 
 public class FunDiagramsWithPassing3modes implements LinkEnterEventHandler{
 	
-	private static final Logger log = Logger.getLogger(FundamentalDiagrams.class);
+	private static final Logger log = Logger.getLogger(FunDiagramsWithPassing3modes.class);
 	
 	private static final int NUMBER_OF_MEMORIZED_FLOWS = 20;
 	
