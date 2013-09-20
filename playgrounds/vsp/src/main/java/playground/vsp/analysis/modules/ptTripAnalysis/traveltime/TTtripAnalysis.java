@@ -55,6 +55,9 @@ public class TTtripAnalysis extends AbstractAnalyisModule{
 	private Collection<String> ptModes;
 	private Population population;
 	
+	// currently, sep '13, for me (dr) this analysis does not work.
+	// was trying to use it with an extended pt-tutorial, see 
+	// playground.droeder.extendPtTutorial.ExtendPtTutorial#main (r25647)
 	/**
 	 * 
 	 * @param ptModes, the modes specified in the {@link TransitConfigGroup}
