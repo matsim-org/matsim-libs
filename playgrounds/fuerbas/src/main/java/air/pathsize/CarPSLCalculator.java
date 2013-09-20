@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgNumberOfLineSwitchAnalysis
+ * CarPSLCalculator
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,21 +17,20 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package air.scripts;
+package air.pathsize;
 
-import air.analysis.DgFlightLineSwitchEventHandler;
+import java.util.List;
 
 
 /**
  * @author dgrether
  *
  */
-public class DgNumberOfLineSwitchAnalysis {
+public class CarPSLCalculator implements PSLCalculator {
 
-	public static void main(String[] args) {
-		String events = "/home/dgrether/data/work/repos/runs-svn/run1854/ITERS/it.600/1854.600.events.xml.gz";
-//		String events = "/home/dgrether/data/work/repos/runs-svn/run1865/ITERS/it.600/1865.600.events.xml.gz";
-		new DgFlightLineSwitchEventHandler().calcLineswitch(events);
+	@Override
+	public void calculatePSLValues(List<PSLPlanData> planData) {
+		throw new UnsupportedOperationException("Car mode psl not implemented, yet");
 	}
 
 }

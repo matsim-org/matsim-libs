@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgNumberOfLineSwitchAnalysis
+ * PSLCalculator
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,21 +17,27 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package air.scripts;
+package air.pathsize;
 
-import air.analysis.DgFlightLineSwitchEventHandler;
+import java.util.List;
 
 
 /**
+ * Interface for user specific calculators of overlap and plan weight to be used in PathSizeLogitSelector
  * @author dgrether
  *
  */
-public class DgNumberOfLineSwitchAnalysis {
+public interface PSLCalculator {
 
-	public static void main(String[] args) {
-		String events = "/home/dgrether/data/work/repos/runs-svn/run1854/ITERS/it.600/1854.600.events.xml.gz";
-//		String events = "/home/dgrether/data/work/repos/runs-svn/run1865/ITERS/it.600/1865.600.events.xml.gz";
-		new DgFlightLineSwitchEventHandler().calcLineswitch(events);
-	}
-
+	/**
+	 * Should calculate and set three values for all elements of the List:
+	 * <ul>
+	 * 	<li>The overall length of the plan that serves as norm for the length of each leg.</li>
+	 * <li>The weight, see default implementations for examples.</li>
+	 * </ul>
+	 * 
+	 * @param planData List containing PlanData instances, MainMode and Legs are already calculated. 
+	 */
+	public void calculatePSLValues(List<PSLPlanData> planData);
+	
 }

@@ -39,6 +39,7 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
+import org.matsim.core.population.PlanImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -58,7 +59,8 @@ public class CtPopulationGenerator {
 	private static final Logger log = Logger.getLogger(CtPopulationGenerator.class);
 	private double startTimeUtcSeconds;
 	private double durationAirportOpen;
-	private boolean createOtherModePlan = false;
+	private boolean createAlternativeModePlan = false;
+	private boolean writePlanType = false;
 	
 	public CtPopulationGenerator(double startTimeUtcSeconds, double durationAirportOpen){
 		this.startTimeUtcSeconds = startTimeUtcSeconds;
@@ -151,7 +153,7 @@ public class CtPopulationGenerator {
 
 				Plan plan = this.createPlan(populationFactory, fromLink, destinationLink, random, "pt");
 				person.addPlan(plan);
-				if (this.createOtherModePlan) {
+				if (this.createAlternativeModePlan) {
 					plan = this.createPlan(populationFactory, fromLink, destinationLink, random, "train");
 					person.addPlan(plan);
 				}
@@ -183,17 +185,24 @@ public class CtPopulationGenerator {
 		ActivityImpl destinationActivity = (ActivityImpl) populationFactory.createActivityFromLinkId("home", destinationLink.getId());
 		destinationActivity.setCoord(destinationLink.getCoord());
 		plan.addActivity(destinationActivity);
+		if (this.writePlanType){
+			((PlanImpl) plan).setType(legmode);
+		}
 		return plan;
 	}
 
 	
 	public boolean isCreateOtherModePlan() {
-		return createOtherModePlan;
+		return createAlternativeModePlan;
 	}
 
 	
-	public void setCreateOtherModePlan(boolean createOtherModePlan) {
-		this.createOtherModePlan = createOtherModePlan;
+	public void setCreateAlternativeModePlan(boolean createOtherModePlan) {
+		this.createAlternativeModePlan = createOtherModePlan;
+	}
+
+	public void setWritePlanType(boolean writePlanType) {
+		this.writePlanType = writePlanType;
 	}
 
 	

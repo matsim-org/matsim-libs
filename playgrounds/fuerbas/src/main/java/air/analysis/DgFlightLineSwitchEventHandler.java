@@ -57,7 +57,7 @@ public class DgFlightLineSwitchEventHandler implements ActivityEndEventHandler {
 			ptinteractions++;
 			this.personIdPtInteractionMap.put(event.getPersonId(), ptinteractions);
 			if (ptinteractions > 3){
-				log.debug(event.getPersonId().toString() + " 5 pt interacts...");
+				log.debug("Person " + event.getPersonId().toString() +  " has " + ptinteractions + "  interacts...");
 			}
 		}
 	}

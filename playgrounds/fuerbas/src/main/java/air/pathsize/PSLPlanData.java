@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * DgNumberOfLineSwitchAnalysis
+ * PSLPlanDataData
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -17,21 +17,73 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package air.scripts;
+package air.pathsize;
 
-import air.analysis.DgFlightLineSwitchEventHandler;
+import java.util.ArrayList;
+import java.util.List;
 
-
+import org.matsim.api.core.v01.population.Leg;
+import org.matsim.api.core.v01.population.Plan;
 /**
+ * Parts of this data container can be removed when model is stable. Meanwhile they may help for debugging.
  * @author dgrether
- *
  */
-public class DgNumberOfLineSwitchAnalysis {
+public class PSLPlanData {
 
-	public static void main(String[] args) {
-		String events = "/home/dgrether/data/work/repos/runs-svn/run1854/ITERS/it.600/1854.600.events.xml.gz";
-//		String events = "/home/dgrether/data/work/repos/runs-svn/run1865/ITERS/it.600/1865.600.events.xml.gz";
-		new DgFlightLineSwitchEventHandler().calcLineswitch(events);
+	private int id;
+	private Plan plan;
+	private String mainMode;
+	private List<Leg> mainModeLegs = new ArrayList<Leg>();
+	private double pslValue;
+	private double length;
+	private double weight;
+
+	public PSLPlanData(int id, Plan plan) {
+		this.id = id;
+		this.plan = plan;
 	}
 
+	public int getId() {
+		return id;
+	}
+
+	public Plan getPlan() {
+		return plan;
+	}
+
+	public String getMainMode() {
+		return mainMode;
+	}
+
+	public void setMainMode(String mainMode) {
+		this.mainMode = mainMode;
+	}
+
+	public List<Leg> getLegsOfMainMode() {
+		return mainModeLegs;
+	}
+
+	public double getPslValue() {
+		return pslValue;
+	}
+
+	public void setPslValue(double pslValue) {
+		this.pslValue = pslValue;
+	}
+
+	public double getLength() {
+		return length;
+	}
+
+	public void setLength(double length) {
+		this.length = length;
+	}
+
+	public double getWeight() {
+		return weight;
+	}
+
+	public void setWeight(double weight) {
+		this.weight = weight;
+	}
 }

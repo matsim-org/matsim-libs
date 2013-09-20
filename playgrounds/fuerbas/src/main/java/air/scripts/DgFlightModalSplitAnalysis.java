@@ -60,11 +60,17 @@ public class DgFlightModalSplitAnalysis {
 				//		"1858",
 				//		"1859",
 				//		
-				"1860",
-				"1861",
-				"1862",
-				"1863",
-				"1864"
+//				"1860",
+//				"1861",
+//				"1862",
+//				"1863",
+//				"1864"
+				
+				"1871",
+				"1872",
+				"1873",
+				"1874",
+				"1875"
 		};
 		String iteration = "600";
 		List<String> results = new ArrayList<String>();
