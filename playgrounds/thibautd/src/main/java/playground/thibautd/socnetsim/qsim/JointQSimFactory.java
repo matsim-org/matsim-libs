@@ -35,7 +35,6 @@ import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.TeleportationEngine;
-import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
@@ -104,10 +103,7 @@ public class JointQSimFactory implements MobsimFactory {
 		final TeleportationEngine teleportationEngine = new TeleportationEngine();
 		qSim.addMobsimEngine( teleportationEngine );
 
-		// create agent factory
-        AgentFactory agentFactory;
         if (sc.getConfig().scenario().isUseTransit()) {
-            agentFactory = new TransitAgentFactory(qSim);
             TransitQSimEngine transitEngine = new TransitQSimEngine(qSim);
             transitEngine.setUseUmlaeufe(true);
             transitEngine.setTransitStopHandlerFactory(new ComplexTransitStopHandlerFactory());
@@ -115,13 +111,12 @@ public class JointQSimFactory implements MobsimFactory {
             qSim.addAgentSource(transitEngine);
             qSim.addMobsimEngine(transitEngine);
         }
-		else {
-            agentFactory = new DefaultAgentFactory(qSim);
-        }
         
 		final PassengerUnboardingAgentFactory passAgentFactory =
 					new PassengerUnboardingAgentFactory(
-						agentFactory,
+						sc.getConfig().scenario().isUseTransit() ?
+							new TransitAgentFactory(qSim) :
+							new DefaultAgentFactory(qSim) ,
 						netsimEngine);
         final AgentSource agentSource =
 			new PopulationAgentSourceWithVehicles(
