@@ -88,8 +88,8 @@ public class FlightControllerPSRemove {
 	
 	public static void main(String[] args) {
 //		String configFilePath  = "/media/data/work/repos/shared-svn/studies/countries/eu/flight/dg_oag_flight_model_2_runways_3600vph_one_line/air_config.xml";
-		String configFilePath = "/media/data/work/repos/shared-svn/studies/countries/eu/flight/flight_one_line_mode_choice/air_config_mode_choice_ps_remove.xml";
-//		String configFilePath = args[0];
+//		String configFilePath = "/media/data/work/repos/shared-svn/studies/countries/eu/flight/flight_one_line_mode_choice/air_config_mode_choice_ps_remove.xml";
+		String configFilePath = args[0];
 		Config config = ConfigUtils.loadConfig(configFilePath);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		FlightControllerPSRemove ctrl = new FlightControllerPSRemove();
