@@ -80,6 +80,8 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 
 	private double infoTime = 0;
 	
+	private LinkSpeedCalculator linkSpeedCalculator = new DefaultLinkSpeedCalculator();
+	
 	/*package*/ InternalInterface internalInterface = null ;
 	@Override
 	public void setInternalInterface( InternalInterface internalInterface) {
@@ -323,4 +325,12 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 		this.internalInterface.arrangeNextAgentState(driver);
 	}
 
+	public void setLinkSpeedCalculator(LinkSpeedCalculator linkSpeedCalculator) {
+		this.linkSpeedCalculator = linkSpeedCalculator;
+	}
+	
+	public LinkSpeedCalculator getLinkSpeedCalculator() {
+		return this.linkSpeedCalculator;
+	}
+	
 }

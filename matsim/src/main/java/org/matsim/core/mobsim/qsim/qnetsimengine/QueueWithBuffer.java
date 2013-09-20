@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.LaneEnterEvent;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
@@ -553,7 +552,7 @@ class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem {
 		double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 		qLink.activateLink();
 		usedStorageCapacity += veh.getSizeInEquivalents();
-		double vehicleTravelTime = this.length / veh.getMaximumVelocity();
+		double vehicleTravelTime = this.length / this.network.simEngine.getLinkSpeedCalculator().getMaximumVelocity(veh, this.qLink.link, now);
 		double linkTravelTime = Math.max(freespeedTravelTime, vehicleTravelTime);
 		double earliestExitTime = now + linkTravelTime;
 
