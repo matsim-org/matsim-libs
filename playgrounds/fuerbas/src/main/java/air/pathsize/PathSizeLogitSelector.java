@@ -175,6 +175,8 @@ public final class PathSizeLogitSelector implements PlanSelector {
 			if (plan.getScore() == null || 
 					Double.isInfinite(plan.getScore()) || 
 					Double.isNaN(plan.getScore())) {
+				log.debug("Person: " + person);
+				log.debug("Plan: " + plan);
 				throw new IllegalStateException("Too many unscored plans in choice set of person " + person.getId());
 			}
 			if (plan.getScore() > maxScore) {
