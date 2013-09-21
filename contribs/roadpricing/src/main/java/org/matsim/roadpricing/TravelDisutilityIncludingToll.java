@@ -39,6 +39,7 @@ public class TravelDisutilityIncludingToll implements TravelDisutility {
 	private final TollRouterBehaviour tollCostHandler;
 	private final TravelDisutility normalTravelDisutility;
 	private double marginalUtilityOfMoney;
+	private static int utlOfMoneyWrnCnt = 0 ;
 
 	public TravelDisutilityIncludingToll(final TravelDisutility normalTravelDisutility, final RoadPricingScheme scheme, Config config) {
 		this.scheme = scheme;
@@ -57,7 +58,8 @@ public class TravelDisutilityIncludingToll implements TravelDisutility {
 			throw new IllegalArgumentException("RoadPricingScheme of type \"" + scheme.getType() + "\" is not supported.");
 		}
 		this.marginalUtilityOfMoney = config.planCalcScore().getMarginalUtilityOfMoney() ;
-		if ( this.marginalUtilityOfMoney != 1. ) {
+		if ( utlOfMoneyWrnCnt < 1 && this.marginalUtilityOfMoney != 1. ) {
+			utlOfMoneyWrnCnt ++ ;
 			Logger.getLogger(this.getClass()).warn("There are no test cases for marginalUtilityOfMoney != 1.  Please write one " +
 					"and delete this message.  kai, apr'13 ") ;
 		}

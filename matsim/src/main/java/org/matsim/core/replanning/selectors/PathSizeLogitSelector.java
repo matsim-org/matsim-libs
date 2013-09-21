@@ -72,7 +72,7 @@ public final class PathSizeLogitSelector implements PlanSelector {
 
 		// - now calculate the weights
 		WeightsContainer wc = new WeightsContainer(person.getPlans());
-		calcPSLWeights(person.getPlans(), wc, network);
+		calcPSLWeights(person.getPlans(), wc);
 
 		// choose a random number over interval [0,sumWeights[
 		double selnum = wc.sumWeights*MatsimRandom.getRandom().nextDouble();
@@ -90,7 +90,7 @@ public final class PathSizeLogitSelector implements PlanSelector {
 	}
 
 	//updates the path size logit weights
-	private void calcPSLWeights(final List<? extends Plan> plans, final WeightsContainer wc, Network network) {
+	private void calcPSLWeights(final List<? extends Plan> plans, final WeightsContainer wc) {
 		// ("plans" is the list of plans of a single person)
 
 		wc.maxScore = Double.NEGATIVE_INFINITY;
