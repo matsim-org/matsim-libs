@@ -44,7 +44,7 @@ import org.matsim.core.utils.misc.RouteUtils;
  *
  * @author laemmel
  */
-public final class PathSizeLogitSelector implements PlanSelector {
+public final class PathSizeLogitSelector extends AbstractSelector {
 
 	private final double pathSizeLogitExponent;
 	private final double logitScaleFactor;
@@ -60,37 +60,9 @@ public final class PathSizeLogitSelector implements PlanSelector {
 		this( config.getPathSizeLogitBeta(), config.getBrainExpBeta(), network ) ;
 	}
 
-	@Override
-	public Plan selectPlan(final Person person) {
-
-		// First check if there are any unscored plans
-		Plan selectedPlan = ((PersonImpl) person).getRandomUnscoredPlan();
-		if (selectedPlan != null) return selectedPlan;
-		// Okay, no unscored plans...
-
-		// Build the weights of all plans
-
-		// - now calculate the weights
-		WeightsContainer wc = new WeightsContainer(person.getPlans());
-		calcPSLWeights(person.getPlans(), wc);
-
-		// choose a random number over interval [0,sumWeights[
-		double selnum = wc.sumWeights*MatsimRandom.getRandom().nextDouble();
-		int idx = 0;
-		for (Plan plan : person.getPlans()) {
-			selnum -= wc.weights[idx];
-			if (selnum <= 0.0) {
-				return plan;
-			}
-			idx++;
-		}
-
-		// this case should never happen, except a person has no plans at all.
-		return null;
-	}
-
 	//updates the path size logit weights
-	private void calcPSLWeights(final List<? extends Plan> plans, final WeightsContainer wc) {
+	@Override
+	protected void calcWeights(final List<? extends Plan> plans, final WeightsContainer wc) {
 		// ("plans" is the list of plans of a single person)
 
 		double maxScore = Double.NEGATIVE_INFINITY;
@@ -196,11 +168,4 @@ public final class PathSizeLogitSelector implements PlanSelector {
 		wc.sumWeights = sumweight;
 	}
 
-	private static class WeightsContainer {
-		double[] weights;
-		double sumWeights;
-		WeightsContainer(final List<? extends Plan> plans) {
-			this.weights = new double[plans.size()];
-		}
-	}
 }
