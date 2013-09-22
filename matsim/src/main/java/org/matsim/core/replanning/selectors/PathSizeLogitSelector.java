@@ -23,6 +23,8 @@ package org.matsim.core.replanning.selectors;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
@@ -44,7 +46,7 @@ import org.matsim.core.utils.misc.RouteUtils;
  *
  * @author laemmel
  */
-public final class PathSizeLogitSelector extends AbstractSelector {
+public final class PathSizeLogitSelector extends AbstractPlanSelector {
 
 	private final double pathSizeLogitExponent;
 	private final double logitScaleFactor;
@@ -62,8 +64,10 @@ public final class PathSizeLogitSelector extends AbstractSelector {
 
 	//updates the path size logit weights
 	@Override
-	protected void calcWeights(final List<? extends Plan> plans, final WeightsContainer wc) {
+	protected Map<Plan,Double> calcWeights(final List<? extends Plan> plans ) {
 		// ("plans" is the list of plans of a single person)
+		
+		Map<Plan,Double> weights = new HashMap<Plan,Double>() ;
 
 		double maxScore = Double.NEGATIVE_INFINITY;
 
@@ -73,6 +77,7 @@ public final class PathSizeLogitSelector extends AbstractSelector {
 		HashMap<Integer,Double> planLength = new HashMap<Integer, Double>();
 		// (a data structure that memorizes the total travel distance of each plan)
 		// (yyyy is it obvious that no two plans can have the same hash code?  what happens if they do?  kai, oct'12)
+		// (why not just <Plan,Double>?????)
 		
 		//this gets the choice sets C_n
 		//TODO [GL] since the lack of information in Route(),
@@ -107,8 +112,6 @@ public final class PathSizeLogitSelector extends AbstractSelector {
 			planLength.put(plan.hashCode(), pathSize);
 		}
 
-		double sumweight = 0;
-		int idx = 0;
 		for (Plan plan : plans) {
 
 			double tmp = 0;
@@ -161,11 +164,10 @@ public final class PathSizeLogitSelector extends AbstractSelector {
 			// (yy how can weight become negative?? kai, oct'12) 
 
 			// the weight is memorized; the sum of all weights in computed.  Choice will be based on those weights
-			wc.weights[idx] = weight;
-			sumweight += weight;
-			idx++;
+			weights.put( plan, weight) ;
 		}
-		wc.sumWeights = sumweight;
+		
+		return weights ;
 	}
 
 }
