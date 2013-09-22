@@ -93,7 +93,7 @@ public final class PathSizeLogitSelector implements PlanSelector {
 	private void calcPSLWeights(final List<? extends Plan> plans, final WeightsContainer wc) {
 		// ("plans" is the list of plans of a single person)
 
-		wc.maxScore = Double.NEGATIVE_INFINITY;
+		double maxScore = Double.NEGATIVE_INFINITY;
 
 		HashMap<Id, ArrayList<Double>> linksInTime = new HashMap<Id, ArrayList<Double>>();
 		// (a data structure that memorizes possible leg start times for link utilization (??))
@@ -107,7 +107,7 @@ public final class PathSizeLogitSelector implements PlanSelector {
 		//the very first and the very last link of a path will be ignored - gl
 		for (Plan plan : plans) {
 
-			if (plan.getScore() > wc.maxScore) wc.maxScore = plan.getScore();
+			if (plan.getScore() > maxScore) maxScore = plan.getScore();
 
 			double pathSize = 0;
 			double currentEndTime = 0.0;
@@ -169,7 +169,7 @@ public final class PathSizeLogitSelector implements PlanSelector {
 			double PSi = Math.pow(tmp/planLength.get(plan.hashCode()), this.pathSizeLogitExponent);
 			
 			double weight;
-			if (Double.isInfinite(wc.maxScore)) {
+			if (Double.isInfinite(maxScore)) {
 				// (isInfinite(x) also returns true when x==-Infinity) 
 				
 				// likely that wc.maxScore == -Infinity, and thus plan.getScoreAsPrimitiveType() also == -Infinity, handle it like any other case where getScore() == maxScore
@@ -180,7 +180,7 @@ public final class PathSizeLogitSelector implements PlanSelector {
 				// (or NaN or null or something similar).  In this case, plans are simply weighted by their PSi, so that 
 				// overlapping plans get less weight than very different plans. kai, oct'12)
 			} else {
-				weight = Math.exp(this.logitScaleFactor * (plan.getScore() - wc.maxScore))*PSi;
+				weight = Math.exp(this.logitScaleFactor * (plan.getScore() - maxScore))*PSi;
 				// (this is essentially $PSi * exp( tau * score )$, the "-wc.maxScore" is (presumably) the computational trick
 				// to avoid overflow)
 			}
@@ -199,7 +199,6 @@ public final class PathSizeLogitSelector implements PlanSelector {
 	private static class WeightsContainer {
 		double[] weights;
 		double sumWeights;
-		double maxScore;
 		WeightsContainer(final List<? extends Plan> plans) {
 			this.weights = new double[plans.size()];
 		}
