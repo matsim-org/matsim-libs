@@ -88,6 +88,8 @@ public class TravelTimeCollector implements TravelTime,
 	// Trips with no Activity on the current Link
 	private Map<Id, TripBin> regularActiveTrips; // PersonId
 	private Map<Id, TravelTimeInfo> travelTimeInfos; // LinkId
+	
+	private TravelTimeInfoProvider travelTimeInfoProvider;
 
 	// Links that are changed by network change events
 	private Map<Double, Collection<Link>> changedLinks;
@@ -135,15 +137,22 @@ public class TravelTimeCollector implements TravelTime,
 	}
 
 	private void init() {
-		regularActiveTrips = new HashMap<Id, TripBin>();
-		travelTimeInfos = new ConcurrentHashMap<Id, TravelTimeInfo>();
-		changedLinks = new HashMap<Double, Collection<Link>>();
-		agentsToFilter = new HashSet<Id>();
-		
+		this.regularActiveTrips = new HashMap<Id, TripBin>();
+		this.travelTimeInfos = new ConcurrentHashMap<Id, TravelTimeInfo>();
+		this.changedLinks = new HashMap<Double, Collection<Link>>();
+		this.agentsToFilter = new HashSet<Id>();
+				
 		for (Link link : this.network.getLinks().values()) {
 			TravelTimeInfo travelTimeInfo = new TravelTimeInfo();
-			travelTimeInfos.put(link.getId(), travelTimeInfo);
+			this.travelTimeInfos.put(link.getId(), travelTimeInfo);
 		}
+		/*
+		 * If no RoutingNetwork is used, ArrayBasedTravelTimeInfoProvider uses 
+		 * a MapBasedTravelTimeInfoProvider as fall back solution. This increases 
+		 * routing times of a AStarLandmarks router by ~5%.
+		 */
+//		this.travelTimeInfoProvider = new MapBasedTravelTimeInfoProvider(this.travelTimeInfos);
+		this.travelTimeInfoProvider = new ArrayBasedTravelTimeInfoProvider(this.travelTimeInfos, this.network);
 		
 		/*
 		 * If the network is time variant, we have to update the link parameters
@@ -168,9 +177,17 @@ public class TravelTimeCollector implements TravelTime,
 		}		
 	}
 
+	public void setTravelTimeInfoProvider(TravelTimeInfoProvider travelTimeInfoProvider) {
+		this.travelTimeInfoProvider = travelTimeInfoProvider;
+	}
+	
+	public TravelTimeInfoProvider getTravelTimeInfoProvider() {
+		return this.travelTimeInfoProvider;
+	}
+	
 	@Override
 	public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-		return travelTimeInfos.get(link.getId()).travelTime;
+		return this.travelTimeInfoProvider.getTravelTimeData(link).travelTime;
 	}
 
 	@Override
@@ -207,7 +224,7 @@ public class TravelTimeCollector implements TravelTime,
 
 			double tripTime = tripBin.leaveTime - tripBin.enterTime;
 
-			TravelTimeInfo travelTimeInfo = travelTimeInfos.get(linkId);
+			TravelTimeInfo travelTimeInfo = this.travelTimeInfoProvider.getTravelTimeData(linkId);
 			travelTimeInfo.tripBins.add(tripBin);
 			travelTimeInfo.addedTravelTimes += tripTime;
 			travelTimeInfo.addedTrips++;
@@ -271,7 +288,7 @@ public class TravelTimeCollector implements TravelTime,
 		for (Link link : this.network.getLinks().values()) {
 			double freeSpeedTravelTime = link.getLength() / link.getFreespeed(Time.UNDEFINED_TIME);
 
-			TravelTimeInfo travelTimeInfo = travelTimeInfos.get(link.getId());
+			TravelTimeInfo travelTimeInfo = this.travelTimeInfoProvider.getTravelTimeData(link);
 			travelTimeInfo.travelTime = freeSpeedTravelTime;
 			travelTimeInfo.init(freeSpeedTravelTime);
 		}
@@ -288,7 +305,7 @@ public class TravelTimeCollector implements TravelTime,
 		if (links != null) {
 			for (Link link : links) {
 				double freeSpeedTravelTime = link.getLength() / link.getFreespeed(e.getSimulationTime());
-				TravelTimeInfo travelTimeInfo = travelTimeInfos.get(link.getId());
+				TravelTimeInfo travelTimeInfo = this.travelTimeInfoProvider.getTravelTimeData(link);
 				travelTimeInfo.init(freeSpeedTravelTime);
 				travelTimeInfo.checkActiveState();	// ensure that the estimated link travel time is updated
 			}
@@ -348,7 +365,7 @@ public class TravelTimeCollector implements TravelTime,
 		double leaveTime;
 	}
 
-	private static class TravelTimeInfo {
+	/*package*/ static class TravelTimeInfo {
 
 		UpdateMeanTravelTimesRunnable runnable;
 		List<TripBin> tripBins = new ArrayList<TripBin>();
