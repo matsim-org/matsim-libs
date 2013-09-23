@@ -21,7 +21,6 @@ package air.pathsize;
 
 import java.util.List;
 
-import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
@@ -33,7 +32,7 @@ import org.matsim.pt.routes.ExperimentalTransitRoute;
  */
 public class PtPSLCalculator implements PSLCalculator {
 
-	private static final Logger log = Logger.getLogger(PtPSLCalculator.class);
+//	private static final Logger log = Logger.getLogger(PtPSLCalculator.class);
 	
 	@Override
 	public void calculatePSLValues(List<PSLPlanData> plans) {
@@ -42,18 +41,14 @@ public class PtPSLCalculator implements PSLCalculator {
 		}
 		for (PSLPlanData plan : plans) {
 			double pslValue = 0.0;
-			log.debug("Plan length: " + plan.getLength());
 			for (Leg leg : plan.getLegsOfMainMode()) {
 				double weight = leg.getTravelTime() / plan.getLength();
-				log.debug("Leg traveltime: " + leg.getTravelTime());
 				double overlap = calcPtOverlap(plan, leg, plans);
 				if (overlap == 0.0) {
-					log.warn("Overlap of 0.0, replacing by 1.0");
 					overlap = 1.0;
 				}
 				pslValue += weight * 1.0/overlap;
 			}
-			log.debug("Psl value : " + pslValue);
 			plan.setPslValue(pslValue);
 		}		
 	}
@@ -71,14 +66,11 @@ public class PtPSLCalculator implements PSLCalculator {
 			}
 			for (Leg otherLeg : otherPlan.getLegsOfMainMode()) {
 				ExperimentalTransitRoute otherTransitRoute = (ExperimentalTransitRoute) otherLeg.getRoute();
-				log.warn(otherTransitRoute.getRouteDescription());
-				log.debug(transitRoute.getRouteDescription());
 				if (transitRoute.getRouteDescription().equals(otherTransitRoute.getRouteDescription())) {
 					overlap++;
 				}
 			}
 		}
-		log.debug("overlap: " + overlap);
 		return overlap;
 	}
 
@@ -87,7 +79,6 @@ public class PtPSLCalculator implements PSLCalculator {
 		for (Leg l : plan.getLegsOfMainMode()){
 			length += l.getTravelTime();
 		}
-		log.debug("setting plan length to : " + length);
 		plan.setLength(length);
 	}
 

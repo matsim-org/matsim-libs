@@ -32,7 +32,7 @@ import org.matsim.core.population.routes.GenericRoute;
  */
 public class GenericModePSLCalculator implements PSLCalculator {
 
-	private static final Logger log = Logger.getLogger(GenericModePSLCalculator.class);
+//	private static final Logger log = Logger.getLogger(GenericModePSLCalculator.class);
 
 	public void calculatePSLValues(List<PSLPlanData> plans) {
 		for (PSLPlanData plan : plans) {
@@ -41,17 +41,13 @@ public class GenericModePSLCalculator implements PSLCalculator {
 		for (PSLPlanData plan : plans) {
 			double pslValue = 0.0;
 			for (Leg leg : plan.getLegsOfMainMode()) {
-				log.debug("leg traveltime: " + leg.getTravelTime());
 				double weight = leg.getTravelTime() / plan.getLength();
 				double overlap = calcGenericOverlap(plan, leg, plans);
-				log.debug("generic overlap " + overlap + " length " + plan.getLength());
 				if (overlap == 0.0) {
-					log.warn("Overlap of 0.0, replacing by 1.0");
 					overlap = 1.0;
 				}
 				pslValue += weight * 1.0/overlap;
 			}
-			log.debug("Generic plan psl value : " + pslValue);
 			plan.setPslValue(pslValue);
 		}		
 	}
