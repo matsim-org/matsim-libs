@@ -26,6 +26,21 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.signalsystems.data.signalcontrol.v20.SignalGroupSettingsData;
 
+/**
+ * container for overlapping signal group settings
+ * 
+ * there are two kinds of phase definitions:
+ * unsimplified phases
+ * 		this kind of phase contains all overlapping signals for each signal in the phase
+ * 		i.e. different phases cannot overlap each other
+ * simplified phases
+ * 		its phase end is defined by the dropping of the largest setting starting at the phase starting time
+ *  	different phases of this kind cannot overlap each other
+ * 
+ * @author dgrether
+ * @author tthunig
+ *
+ */
 final class DgPhase {
 		
 		private static final Logger log = Logger.getLogger(DgPhase.class);
@@ -41,6 +56,12 @@ final class DgPhase {
 			this.off = phaseDrop;
 		}
 
+		public DgPhase(Integer phaseOn, Integer phaseDrop,
+				Map<Id, SignalGroupSettingsData> phaseSignals) {
+			this(phaseOn, phaseDrop);
+			this.signalGroupSettingsByGroupId = phaseSignals;
+		}
+	
 		public void setPhaseStartSecond(Integer on){
 			this.on = on;
 		}
@@ -57,6 +78,11 @@ final class DgPhase {
 			return this.off;
 		}
 		
+		public void setSignalGroupSettingsByGroupId(
+				Map<Id, SignalGroupSettingsData> signalGroupSettingsByGroupId) {
+			this.signalGroupSettingsByGroupId = signalGroupSettingsByGroupId;
+		}
+
 		public void addSignalGroupSettingsData(SignalGroupSettingsData settings) {
 			log.debug("  adding settings to phase: " + settings.getSignalGroupId() + " on: " + settings.getOnset() + " drop " + settings.getDropping());
 			if (settings.getOnset() < this.on || settings.getDropping() > off){
