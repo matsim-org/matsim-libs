@@ -23,7 +23,6 @@ package org.matsim.core.config.groups;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.internal.MatsimParameters;
@@ -48,7 +47,7 @@ public class StrategyConfigGroup extends Module {
 	private static final String EXTERNAL_EXE_TMP_FILE_ROOT_DIR = "ExternalExeTmpFileRootDir";
 	private static final String EXTERNAL_EXE_TIME_OUT = "ExternalExeTimeOut";
 
-	private int maxAgentPlanMemorySize = 0;
+	private int maxAgentPlanMemorySize = 5;
 	private String externalExeConfigTemplate = null;
 	private String externalExeTmpFileRootDir = null;
 	private long externalExeTimeOut = 3600;
