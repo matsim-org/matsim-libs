@@ -52,8 +52,8 @@ public class SimulationConfigGroup extends Module implements MobsimConfigGroupI 
 	private String snapshotStyle = "equiDist"; // currently supported: queue, equiDist
 	private double flowCapFactor = 1.0;
 	private double stroageCapFactor = 1.0;
-	private double stuckTime = 100;
-	private boolean removeStuckVehicles = true;
+	private double stuckTime = 10;
+	private boolean removeStuckVehicles = false;
 	private String externalExe = null;
 	private int timeOut = 3600;
 

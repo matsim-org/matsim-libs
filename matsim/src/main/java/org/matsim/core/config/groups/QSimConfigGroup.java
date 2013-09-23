@@ -70,8 +70,8 @@ public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
 	private double snapshotPeriod = 0; // off, no snapshots
 	private double flowCapFactor = 1.0;
 	private double storageCapFactor = 1.0;
-	private double stuckTime = 100;
-	private boolean removeStuckVehicles = true;
+	private double stuckTime = 10;
+	private boolean removeStuckVehicles = false;
 	private int numberOfThreads = 1;
 	private String trafficDynamics = TRAFF_DYN_QUEUE;
 	private String simStarttimeInterpretation = MAX_OF_STARTTIME_AND_EARLIEST_ACTIVITY_END;

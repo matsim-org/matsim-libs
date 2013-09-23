@@ -51,6 +51,8 @@ public class ReRoutingTest extends MatsimTestCase {
 	private Scenario loadScenario() {
 		Config config = loadConfig(getClassInputDirectory() + "config.xml");
 		config.simulation().setTimeStepSize(10.0);
+		config.simulation().setStuckTime(100.0);
+		config.simulation().setRemoveStuckVehicles(true);
 		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.txt));
 
 		/*
