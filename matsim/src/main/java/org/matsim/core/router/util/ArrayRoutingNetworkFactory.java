@@ -33,7 +33,8 @@ public class ArrayRoutingNetworkFactory extends AbstractRoutingNetworkFactory {
 	
 	private final static Logger log = Logger.getLogger(ArrayRoutingNetworkFactory.class);
 	
-	private int arrayIndexCounter;
+	private int nodeArrayIndexCounter;
+	private int linkArrayIndexCounter;
 	
 	public ArrayRoutingNetworkFactory(PreProcessDijkstra preProcessData) {
 		super(preProcessData);
@@ -41,7 +42,8 @@ public class ArrayRoutingNetworkFactory extends AbstractRoutingNetworkFactory {
 	
 	@Override
 	public ArrayRoutingNetwork createRoutingNetwork(Network network) {
-		arrayIndexCounter = 0;
+		this.nodeArrayIndexCounter = 0;
+		this.linkArrayIndexCounter = 0;
 		
 		ArrayRoutingNetwork routingNetwork = new ArrayRoutingNetwork(network);
 		
@@ -76,7 +78,7 @@ public class ArrayRoutingNetworkFactory extends AbstractRoutingNetworkFactory {
 		if (preProcessData != null) {
 			if (preProcessData.containsData()) {
 				for (RoutingNetworkNode node : routingNetwork.getNodes().values()) {
-					node.setDeadEndData(preProcessData.getNodeData(node.getNode()));				
+					node.setDeadEndData(preProcessData.getNodeData(node.getNode()));
 				}
 			}
 		}
@@ -86,16 +88,12 @@ public class ArrayRoutingNetworkFactory extends AbstractRoutingNetworkFactory {
 
 	@Override
 	public ArrayRoutingNetworkNode createRoutingNetworkNode(Node node, int numOutLinks) {
-		ArrayRoutingNetworkNode routingNetworkNode = new ArrayRoutingNetworkNode(node, 
-				numOutLinks, arrayIndexCounter);
-		arrayIndexCounter++;
-		return routingNetworkNode;
+		return new ArrayRoutingNetworkNode(node, numOutLinks, nodeArrayIndexCounter++);
 	}
 
 	@Override
 	public ArrayRoutingNetworkLink createRoutingNetworkLink(Link link,
 			RoutingNetworkNode fromNode, RoutingNetworkNode toNode) {
-		return new ArrayRoutingNetworkLink(link, fromNode, toNode);
+		return new ArrayRoutingNetworkLink(link, fromNode, toNode, linkArrayIndexCounter++);
 	}
-
 }

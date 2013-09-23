@@ -21,10 +21,19 @@
 package org.matsim.core.router.util;
 
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.core.router.priorityqueue.HasIndex;
 
-public class ArrayRoutingNetworkLink extends AbstractRoutingNetworkLink {
+public class ArrayRoutingNetworkLink extends AbstractRoutingNetworkLink implements HasIndex {
 
-	/*package*/ ArrayRoutingNetworkLink(Link link, RoutingNetworkNode fromNode, RoutingNetworkNode toNode) {
+	final int arrayIndex;
+	
+	/*package*/ ArrayRoutingNetworkLink(Link link, RoutingNetworkNode fromNode, RoutingNetworkNode toNode, int arrayIndex) {
 		super(link, fromNode, toNode);
+		this.arrayIndex = arrayIndex;
+	}
+	
+	@Override
+	public int getArrayIndex() {
+		return this.arrayIndex;
 	}
 }
