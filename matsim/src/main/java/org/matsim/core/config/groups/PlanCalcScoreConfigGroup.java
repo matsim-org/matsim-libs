@@ -99,7 +99,7 @@ public class PlanCalcScoreConfigGroup extends Module {
 	}
 
 	private double learningRate = 1.0;
-	private double brainExpBeta = 2.0;
+	private double brainExpBeta = 1.0;
 	private double pathSizeLogitBeta = 1.0;
 	private double lateArrival = -18.0;
 	private double earlyDeparture = -0.0;
