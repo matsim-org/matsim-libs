@@ -37,7 +37,7 @@ public class DetourScorer implements ActivityScoring , LegScoring {
 	private static class MutableFields {
 		private Leg lastLeg = null;
 		private double accumulatedScore = 0;
-		private boolean lastActivityWasDropOff = true;
+		private boolean lastActivityWasDropOff = false;
 	}
 
 	private MutableFields fields = new MutableFields();
@@ -86,6 +86,8 @@ public class DetourScorer implements ActivityScoring , LegScoring {
 	}
 
 	@Override
-	public void endActivity(final double time, final Activity act) {}
+	public void endActivity(final double time, final Activity act) {
+		fields.lastActivityWasDropOff = act.getType().equals( JointActingTypes.DROP_OFF );
+	}
 }
 
