@@ -187,6 +187,9 @@ public class MultiModalControlerListenerTest {
 
 		Config config = ConfigUtils.loadConfig(inputDir + "config_berlin_multimodal.xml", new MultiModalConfigGroup());
 		config.controler().setOutputDirectory(this.utils.getOutputDirectory());
+
+		config.getQSimConfigGroup().setRemoveStuckVehicles(true);
+		config.getQSimConfigGroup().setStuckTime(100.0);
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 
