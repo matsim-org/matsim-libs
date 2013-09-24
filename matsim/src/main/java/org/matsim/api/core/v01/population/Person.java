@@ -40,5 +40,7 @@ public interface Person extends Identifiable, Customizable{
 	public boolean addPlan(final Plan p);
 
 	public Plan getSelectedPlan();
+	
+	public void setSelectedPlan(final Plan selectedPlan);
 
 }

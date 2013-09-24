@@ -83,6 +83,7 @@ public class PersonImpl implements Person {
 		return p;
 	}
 
+	@Override
 	public final void setSelectedPlan(final Plan selectedPlan) {
 		if (selectedPlan != null && !plans.contains( selectedPlan )) {
 			throw new IllegalStateException("The plan to be set as selected is not null nor stored in the person's plans");
