@@ -244,7 +244,6 @@ public class TtCalculateSimplifiedIntergreens {
 			// phase completed
 			DgPhase phase = new DgPhase(phaseOn, phaseDrop, phaseSignals);
 			this.sortedPhasesByOnset.add(phase);
-//			TODO simplify overlapping phases (and shift signals) // nicht noetig oder? siehe kommentar unten beim naechsten todo
 			
 			// fill signalGroupIdToPhaseMapping with simplified phases
 			for (Id signalId : phaseSignals.keySet()) {
@@ -354,9 +353,7 @@ public class TtCalculateSimplifiedIntergreens {
 			if (cycleTimeCrossed) {
 				intergreen += signalSystemCycleTime;
 			}
-			// intergreens to overlapping signals from different phases should be zero
-			// TODO ist das ok so? es werden signals nicht verschoben, sondern intergreens nur von ueberlappenden korrigiert
-				// zb an signal system 17 besprechen
+			// intergreens between overlapping signals from different phases should be zero
 			if (intergreen < 0){
 				intergreen = 0;
 			}
