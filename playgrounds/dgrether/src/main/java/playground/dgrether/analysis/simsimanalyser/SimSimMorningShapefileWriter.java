@@ -88,22 +88,22 @@ public class SimSimMorningShapefileWriter {
 		for (int i = 5; i < 10; i++){
 			builder.addAttribute("h" + (i + 1)+"_"+diff, Double.class);
 		}
-		builder.addAttribute("mean_"+diff, Double.class);
+		builder.addAttribute("sum_"+diff, Double.class);
 		// flow difference / capacity  for the morning peak
 		for (int i = 5; i < 10; i++){
 			builder.addAttribute("h" + (i + 1)+"/c_"+diff, Double.class);
 		}
-		builder.addAttribute("mean/c_"+diff, Double.class);
+		builder.addAttribute("sum/c_"+diff, Double.class);
 		// flow difference * link length  for the morning peak
 		for (int i = 5; i < 10; i++){
 			builder.addAttribute("h" + (i + 1)+"*l_"+diff, Double.class);
 		}
-		builder.addAttribute("mean*l_"+diff, Double.class);
+		builder.addAttribute("sum*l_"+diff, Double.class);
 		// flow difference / link length  for the morning peak
 		for (int i = 5; i < 10; i++){
 			builder.addAttribute("h" + (i + 1)+"/l_"+diff, Double.class);
 		}
-		builder.addAttribute("mean/l_"+diff, Double.class);
+		builder.addAttribute("sum/l_"+diff, Double.class);
 		
 		return builder.create();
 	}
