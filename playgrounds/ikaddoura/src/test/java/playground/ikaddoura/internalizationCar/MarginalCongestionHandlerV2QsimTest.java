@@ -1458,6 +1458,8 @@ public class MarginalCongestionHandlerV2QsimTest {
 		qSimConfigGroup.setFlowCapFactor(1.0);
 		qSimConfigGroup.setStorageCapFactor(1.0);
 		qSimConfigGroup.setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
+		qSimConfigGroup.setRemoveStuckVehicles(true);
+		qSimConfigGroup.setStuckTime(100.0);
 		config.addQSimConfigGroup(qSimConfigGroup);
 		Scenario scenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
 	
@@ -1562,6 +1564,8 @@ public class MarginalCongestionHandlerV2QsimTest {
 		qSimConfigGroup.setFlowCapFactor(1.0);
 		qSimConfigGroup.setStorageCapFactor(1.0);
 		qSimConfigGroup.setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
+		qSimConfigGroup.setRemoveStuckVehicles(true);
+		qSimConfigGroup.setStuckTime(100.0);
 		config.addQSimConfigGroup(qSimConfigGroup);
 		Scenario scenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
 	
@@ -1635,6 +1639,8 @@ public class MarginalCongestionHandlerV2QsimTest {
 		qSimConfigGroup.setFlowCapFactor(1.0);
 		qSimConfigGroup.setStorageCapFactor(1.0);
 		qSimConfigGroup.setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
+		qSimConfigGroup.setRemoveStuckVehicles(true);
+		qSimConfigGroup.setStuckTime(100.0);
 		config.addQSimConfigGroup(qSimConfigGroup);
 		Scenario scenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
 	
@@ -1717,6 +1723,8 @@ public class MarginalCongestionHandlerV2QsimTest {
 		qSimConfigGroup.setFlowCapFactor(1.0);
 		qSimConfigGroup.setStorageCapFactor(1.0);
 		qSimConfigGroup.setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
+		qSimConfigGroup.setRemoveStuckVehicles(true);
+		qSimConfigGroup.setStuckTime(100.0);
 		config.addQSimConfigGroup(qSimConfigGroup);
 		Scenario scenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
 	
