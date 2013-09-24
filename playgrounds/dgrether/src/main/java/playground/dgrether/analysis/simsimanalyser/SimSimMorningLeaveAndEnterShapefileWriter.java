@@ -44,27 +44,28 @@ import com.vividsolutions.jts.geom.GeometryFactory;
  * @author tthunig
  *
  */
-public class SimSimMorningShapefileWriter {
+public class SimSimMorningLeaveAndEnterShapefileWriter {
 
-	private static final Logger log = Logger.getLogger(SimSimMorningShapefileWriter.class);
+	private static final Logger log = Logger.getLogger(SimSimMorningLeaveAndEnterShapefileWriter.class);
 	private Network network;
 	private CoordinateReferenceSystem crs;
 	
-	public SimSimMorningShapefileWriter(Network network, CoordinateReferenceSystem crs) {
+	public SimSimMorningLeaveAndEnterShapefileWriter(Network network, CoordinateReferenceSystem crs) {
 		this.network = network; 
 		this.crs = crs;
 	}
 
-	public void writeShape(String outfile, Map<Id, List<CountSimComparison>> countSimLinkLeaveCompMap){
-		this.writeShape(outfile, countSimLinkLeaveCompMap, "sim", "count");
+	public void writeShape(String outfile, Map<Id, List<CountSimComparison>> countSimLinkLeaveCompMap, Map<Id, List<CountSimComparison>> countSimLinkEnterCompMap){
+		this.writeShape(outfile, countSimLinkLeaveCompMap, countSimLinkEnterCompMap, "sim", "count");
 	}
 
-	public void writeShape(String outfile, Map<Id, List<CountSimComparison>> countSimLinkLeaveCompMap, String runId, String runId2) {
+	public void writeShape(String outfile, Map<Id, List<CountSimComparison>> countSimLinkLeaveCompMap,
+			Map<Id, List<CountSimComparison>> countSimLinkEnterCompMap, String runId, String runId2) {
 		PolygonFeatureFactory factory = createFeatureType(this.crs, runId, runId2);
 		GeometryFactory geofac = new GeometryFactory();
 		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
 		for (Link link : this.network.getLinks().values()) {
-			features.add(this.createFeature(link, geofac, factory, countSimLinkLeaveCompMap.get(link.getId())));
+			features.add(this.createFeature(link, geofac, factory, countSimLinkLeaveCompMap.get(link.getId()), countSimLinkEnterCompMap.get(link.getId())));
 		}
 		ShapeFileWriter.writeGeometries(features, outfile);
 	}
@@ -84,33 +85,14 @@ public class SimSimMorningShapefileWriter {
 		builder.addAttribute("visWidth", Double.class);
 		builder.addAttribute("type", String.class);
 		String diff = "2-1"; //runId2+"-"+runId;
-		// flow difference  for the morning peak
-		for (int i = 5; i < 10; i++){
-			builder.addAttribute("h" + (i + 1)+"_"+diff, Double.class);
-		}
-		builder.addAttribute("mean_"+diff, Double.class);
-		// flow difference / capacity  for the morning peak
-		for (int i = 5; i < 10; i++){
-			builder.addAttribute("h" + (i + 1)+"/c_"+diff, Double.class);
-		}
-		builder.addAttribute("mean/c_"+diff, Double.class);
-		// flow difference * link length  for the morning peak
-		for (int i = 5; i < 10; i++){
-			builder.addAttribute("h" + (i + 1)+"*l_"+diff, Double.class);
-		}
-		builder.addAttribute("mean*l_"+diff, Double.class);
-		// flow difference / link length  for the morning peak
-		for (int i = 5; i < 10; i++){
-			builder.addAttribute("h" + (i + 1)+"/l_"+diff, Double.class);
-		}
-		builder.addAttribute("mean/l_"+diff, Double.class);
+		builder.addAttribute("dens_"+diff, Double.class);
 		
 		return builder.create();
 	}
 	
-	private SimpleFeature createFeature(Link link, GeometryFactory geofac, PolygonFeatureFactory factory, List<CountSimComparison> countSimLinkLeaveComparisonList) {
+	private SimpleFeature createFeature(Link link, GeometryFactory geofac, PolygonFeatureFactory factory, List<CountSimComparison> countSimLinkLeaveComparisonList, List<CountSimComparison> countSimLinkEnterComparisonList) {
 		Coordinate[] coords = PolygonFeatureGenerator.createPolygonCoordsForLink(link, 20.0);
-		Object [] attribs = new Object[33];
+		Object [] attribs = new Object[10]; 
 		attribs[0] = link.getId().toString();
 		attribs[1] = link.getFromNode().getId().toString();
 		attribs[2] = link.getToNode().getId().toString();
@@ -120,31 +102,22 @@ public class SimSimMorningShapefileWriter {
 		attribs[6] = link.getNumberOfLanes();
 		attribs[7] = link.getNumberOfLanes();
 		attribs[8] = ((LinkImpl) link).getType();
-		int i = 9;
-		double sumAbsLinkLeaveDif = 0.0;
-		double absLinkLeaveDif = 0.0;
-		for (CountSimComparison csc : countSimLinkLeaveComparisonList){			
-			// analyse only the morning peak, i.e. between 5 a.m. and 10 a.m.
-			if (csc.getHour() >= 6 && csc.getHour() < 11){
-				// csc contains the number of link leave events in the time period between csc.getHour()-1 and csc.getHour()
-				absLinkLeaveDif = csc.getSimulationValue() - csc.getCountValue();
+		
+		double density = 0.0;
+		int numberOfTimebins = 11*(60/5) - 6*(60/5);
+		
+		for (int timebin = 6*(60/5); timebin < 11*(60/5); timebin++){
+			CountSimComparison linkEnterCountsForTimebin = countSimLinkEnterComparisonList.get(timebin);
+			double linkEnterDif = linkEnterCountsForTimebin.getSimulationValue() - linkEnterCountsForTimebin.getCountValue();
+			CountSimComparison linkLeaveCountsForTimebin = countSimLinkEnterComparisonList.get(timebin);
+			double linkLeaveDif = linkLeaveCountsForTimebin.getSimulationValue() - linkLeaveCountsForTimebin.getCountValue();
 			
-				attribs[i] = absLinkLeaveDif;
-				attribs[i+6] = (absLinkLeaveDif/link.getCapacity())*100; // in percent
-				attribs[i+12] = absLinkLeaveDif*link.getLength();
-				//density, i.e mean flow difference per second of the current time period divided by the link length in km
-				attribs[i+18] = (absLinkLeaveDif/3600)/(link.getLength()/1000); //TODO incorrect
-				sumAbsLinkLeaveDif += absLinkLeaveDif;
-			
-				i++;
-			}
+			int timebinNumber = timebin - 6*(60/5);
+			density += (numberOfTimebins - timebinNumber) * (linkEnterDif - linkLeaveDif);
 		}
-		attribs[14] = sumAbsLinkLeaveDif; // attribs[14] = (sumAbsLinkLeaveDif/5);
-		// mean (error/capacity) in percent per hour, i.e flow difference of the morning peak divided by the maximal link capacity in this time period
-		attribs[20] = (sumAbsLinkLeaveDif/(link.getCapacity()*5))*100;
-		attribs[26] = sumAbsLinkLeaveDif*link.getLength(); //attribs[26] = (sumAbsLinkLeaveDif/5)*link.getLength();
-		// density, i.e. mean flow difference per second of the morning peak divided by the link length in km
-		attribs[32] = (sumAbsLinkLeaveDif/(5*60*60))/(link.getLength()/1000); //TODO incorrect
+		
+		density = (density/numberOfTimebins)/link.getLength();
+		attribs[9] = density;
 		
 		return factory.createPolygon(coords, attribs, link.getId().toString());
 	}
