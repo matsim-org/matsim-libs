@@ -108,9 +108,10 @@ public abstract class BuildingEnergyMain {
 			if(event.getIteration() == event.getControler().getConfig().controler().getLastIteration()){
 				analyzer.run(event.getControler().getPopulation());
 				String path = event.getControler().getControlerIO().getOutputPath() + System.getProperty("file.separator");
-				analyzer.dumpData(path);
-				calcWriteDistanceDistribution(analyzer.getTraveller(), path + "distanceShare.csv.gz");
-				calcAndWriteTTDistribution(analyzer.getTraveller(), path + "ttShare.csv.gz");
+				String prefix = event.getControler().getConfig().controler().getRunId() + ".";
+				analyzer.dumpData(path, prefix);
+				calcWriteDistanceDistribution(analyzer.getTraveller(), path + prefix + "distanceShare.csv.gz");
+				calcAndWriteTTDistribution(analyzer.getTraveller(), path + prefix + "ttShare.csv.gz");
 			}
 		}
 		

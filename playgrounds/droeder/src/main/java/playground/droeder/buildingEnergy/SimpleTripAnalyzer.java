@@ -41,14 +41,15 @@ import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandle
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
 
 /**
  * A simple analysis-class for a very basic MATSim-Scenario, i.e it should be used 
- * with physical simulation of car-trips only. All other modes should be teleported. Thus,
- * this class will throw a runtime-exception when ``useTransit''is true in scenario. 
+ * with physical simulation of car-trips only. All other modes must be teleported. Thus,
+ * this class will throw a runtime-exception when {@link ScenarioConfigGroup#isUseTransit()} is true. 
  * 
  * @author droeder
  *
@@ -173,8 +174,9 @@ class SimpleTripAnalyzer extends AbstractPersonAlgorithm
 	/**
 	 * @param outputPath
 	 */
-	void dumpData(String outputPath) {
-		BufferedWriter w = IOUtils.getBufferedWriter(outputPath + System.getProperty("file.separator") + "trips.csv.gz");
+	void dumpData(String outputPath, String fileprefix) {
+		BufferedWriter w = IOUtils.getBufferedWriter(outputPath + System.getProperty("file.separator") + 
+				fileprefix + "trips.csv.gz");
 		try {
 			w.write(Traveller.HEADER + "\n");
 			for(Traveller t : traveller.values()){
