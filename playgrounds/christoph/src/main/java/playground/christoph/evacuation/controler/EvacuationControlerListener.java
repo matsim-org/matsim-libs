@@ -29,6 +29,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.apache.log4j.Logger;
+import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.multimodal.MultiModalControlerListener;
@@ -78,12 +79,14 @@ import org.matsim.withinday.replanning.replanners.interfaces.WithinDayReplannerF
 import org.matsim.withinday.trafficmonitoring.LinkEnteredProvider;
 import org.opengis.feature.simple.SimpleFeature;
 
+import playground.christoph.analysis.PassengerVolumesAnalyzer;
 import playground.christoph.evacuation.analysis.AgentsInEvacuationAreaActivityCounter;
 import playground.christoph.evacuation.analysis.AgentsInEvacuationAreaCounter;
 import playground.christoph.evacuation.analysis.AgentsReturnHomeCounter;
 import playground.christoph.evacuation.analysis.CoordAnalyzer;
 import playground.christoph.evacuation.analysis.DetailedAgentsTracker;
 import playground.christoph.evacuation.analysis.EvacuationTimePicture;
+import playground.christoph.evacuation.analysis.LinkVolumesWriter;
 import playground.christoph.evacuation.config.EvacuationConfig;
 import playground.christoph.evacuation.mobsim.EvacuationQSimFactory;
 import playground.christoph.evacuation.mobsim.HouseholdDepartureManager;
@@ -156,6 +159,7 @@ public class EvacuationControlerListener implements StartupListener {
 	private AgentsInEvacuationAreaCounter agentsInEvacuationAreaCounter;
 	private AgentsInEvacuationAreaActivityCounter agentsInEvacuationAreaActivityCounter;
 	private DetailedAgentsTracker detailedAgentsTracker;
+	private LinkVolumesWriter linkVolumesWriter;
 	
 	/*
 	 * Identifiers
@@ -351,6 +355,14 @@ public class EvacuationControlerListener implements StartupListener {
 		this.fixedOrderControlerListener.addControlerListener(this.detailedAgentsTracker);
 		this.withinDayControlerListener.getFixedOrderSimulationListener().addSimulationListener(this.detailedAgentsTracker);
 		controler.getEvents().addHandler(this.detailedAgentsTracker);
+		
+		int timeSlice = 900;
+		int maxTime = 36 * 3600;
+		VolumesAnalyzer volumesAnalyzer = new PassengerVolumesAnalyzer(timeSlice, maxTime, scenario.getNetwork());
+		controler.getEvents().addHandler(volumesAnalyzer);
+		double scaleFactor = 1 / scenario.getConfig().getQSimConfigGroup().getFlowCapFactor();
+		this.linkVolumesWriter = new LinkVolumesWriter(volumesAnalyzer, scenario.getNetwork(), timeSlice, maxTime, scaleFactor, true);
+		this.fixedOrderControlerListener.addControlerListener(this.linkVolumesWriter);
 	}
 	
 	private void initWithinDayTravelTimes(Controler controler) {

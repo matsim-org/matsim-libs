@@ -30,6 +30,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
+import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -40,6 +41,8 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
+import org.matsim.core.controler.events.IterationEndsEvent;
+import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.Gbl;
@@ -51,11 +54,11 @@ import org.matsim.core.utils.io.IOUtils;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import playground.christoph.analysis.MultiModalVolumesAnalyzer;
+import playground.christoph.analysis.PassengerVolumesAnalyzer;
 
 import com.vividsolutions.jts.geom.Coordinate;
 
-public class LinkVolumesWriter {
+public class LinkVolumesWriter implements IterationEndsListener {
 
 	private final static Logger log = Logger.getLogger(LinkVolumesWriter.class);
 	
@@ -67,7 +70,7 @@ public class LinkVolumesWriter {
 	public static final String newLine = "\n";
 	public static final String delimiter = "\t";
 	
-	private final MultiModalVolumesAnalyzer volumesAnalyzer;
+	private final VolumesAnalyzer volumesAnalyzer;
 	private final Network network;
 	private final int maxTime;
 //	private final int timeSlice;
@@ -75,6 +78,8 @@ public class LinkVolumesWriter {
 	private final double scaleFactor;
 	private final boolean ignoreExitLinks;
 	
+	private String crsString = "EPSG:21781";
+
 	public static void main(String[] args) {
 		
 //		String runId = "evac.1";
@@ -114,13 +119,12 @@ public class LinkVolumesWriter {
 		}
 		dummyOutputDirectoryHierarchy = new OutputDirectoryHierarchy(outputPath, runId + ".postprocessed", true);
 		
+		EventsManager eventsManager = EventsUtils.createEventsManager();
 		int timeSlice = 900;
 		int maxTime = 36 * 3600;
-		MultiModalVolumesAnalyzer volumesAnalyzer = new MultiModalVolumesAnalyzer(timeSlice, maxTime, scenario.getNetwork());
-		
-		EventsManager eventsManager = EventsUtils.createEventsManager();
+		VolumesAnalyzer volumesAnalyzer = new PassengerVolumesAnalyzer(timeSlice, maxTime, scenario.getNetwork());
 		eventsManager.addHandler(volumesAnalyzer);
-		
+				
 		String eventsFile = dummyInputDirectoryHierarchy.getIterationFilename(0, Controler.FILENAME_EVENTS_XML);
 		new EventsReaderXMLv1(eventsManager).parse(eventsFile);
 		
@@ -142,14 +146,12 @@ public class LinkVolumesWriter {
 		log.info("done.");
 	}
 	
-	public LinkVolumesWriter(MultiModalVolumesAnalyzer volumesAnalyzer, Network network, int timeslice, int maxTime, double scaleFactor, boolean ignoreExitLinks) {
+	public LinkVolumesWriter(VolumesAnalyzer volumesAnalyzer, Network network, int timeslice, int maxTime, double scaleFactor, boolean ignoreExitLinks) {
 		this.volumesAnalyzer = volumesAnalyzer;
 		this.network = network;
-//		this.timeSlice = timeslice;
 		this.maxTime = maxTime;
 		this.scaleFactor = scaleFactor;
 		this.ignoreExitLinks = ignoreExitLinks;
-//		this.numSlots = (maxTime / this.timeSlice) + 1;
 	}
 	
 	public void writeAbsoluteVolumes(final String file) {
@@ -232,8 +234,6 @@ public class LinkVolumesWriter {
 				if (string.contains("rescue") || string.contains("exit")) continue;
 			}
 			
-			Map<String, double[]> linkVolumes = this.volumesAnalyzer.getVolumesPerHourForLink(link.getId());
-			
 			for (String mode : writers.keySet()) {
 				BufferedWriter writer = writers.get(mode);
 				writer.write(link.getId().toString());
@@ -244,9 +244,9 @@ public class LinkVolumesWriter {
 				writer.write(delimiter);
 				writer.write(String.valueOf(link.getFreespeed()));
 				
-				double[] modeVolumes = linkVolumes.get(mode);
 				int hours = (int) (this.maxTime / 3600.0);
-//				for (int i = 0; i < this.numSlots; i++) {		
+				double[] modeVolumes = this.volumesAnalyzer.getVolumesPerHourForLink(link.getId(), mode);
+				
 				for (int i = 0; i < hours; i++) {
 					writer.write(delimiter);
 					double volume = 0.0;
@@ -329,8 +329,6 @@ public class LinkVolumesWriter {
 				if (string.contains("rescue") || string.contains("exit")) continue;
 			}
 			
-			Map<String, double[]> linkVolumes = this.volumesAnalyzer.getVolumesPerHourForLink(link.getId());
-			
 			for (String mode : map.keySet()) {
 				
 				Collection<SimpleFeature> features = map.get(mode);
@@ -342,9 +340,9 @@ public class LinkVolumesWriter {
 				attributes[1] = link.getCapacity();
 				attributes[2] = link.getLength();
 				attributes[3] = link.getFreespeed();
-								
-				double[] modeVolumes = linkVolumes.get(mode);
-//				for (int i = 0; i < this.numSlots; i++) {
+				
+				double[] modeVolumes = this.volumesAnalyzer.getVolumesPerHourForLink(link.getId(), mode);
+
 				for (int i = 0; i < hours; i++) {
 					
 					double volume = 0.0;
@@ -373,5 +371,33 @@ public class LinkVolumesWriter {
 	 */
 	private Coordinate coord2Coordinate(final Coord coord) {
 		return new Coordinate(coord.getX(), coord.getY());
+	}
+	
+	public String getCrsString() {
+		return crsString;
+	}
+
+	public void setCrsString(String crsString) {
+		this.crsString = crsString;
+	}
+	
+	/*
+	 * Write results to files.
+	 */
+	@Override
+	public void notifyIterationEnds(IterationEndsEvent event) {
+		OutputDirectoryHierarchy outputDirectoryHierarchy = event.getControler().getControlerIO();
+		
+		log.info("Writing results to files...");
+		String absoluteVolumesFileName = outputDirectoryHierarchy.getIterationFilename(0, linkVolumesAbsoluteFile);
+		String relativeVolumesFileName = outputDirectoryHierarchy.getIterationFilename(0, linkVolumesRelativeFile);
+		String absoluteVolumesSHPFileName = outputDirectoryHierarchy.getIterationFilename(0, linkVolumesAbsoluteSHPFile);
+		String relativeVolumesSHPFileName = outputDirectoryHierarchy.getIterationFilename(0, linkVolumesRelativeSHPFile);
+		
+		this.writeAbsoluteVolumes(absoluteVolumesFileName);
+		this.writeRelativeVolumes(relativeVolumesFileName);
+		this.writeAbsoluteSHPVolumes(absoluteVolumesSHPFileName, MGC.getCRS(crsString));
+		this.writeRelativeSHPVolumes(relativeVolumesSHPFileName, MGC.getCRS(crsString));
+		log.info("done.");
 	}
 }

@@ -22,11 +22,11 @@ package playground.christoph.analysis;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
+import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -51,7 +51,7 @@ public class CalcNetworkCapacityUtilization {
 	private final Scenario scenario;
 	private final boolean analyzeAllLinks;
 	private final Set<Id> analyzedLinks;
-	private MultiModalVolumesAnalyzer volumesAnalyzer;
+	private VolumesAnalyzer volumesAnalyzer;
 	
 	public static void main(String[] args) throws IOException {
 
@@ -212,7 +212,7 @@ public class CalcNetworkCapacityUtilization {
 		
 		int timeSlice = 900;
 		int maxTime = hours * 3600;
-		this.volumesAnalyzer = new MultiModalVolumesAnalyzer(timeSlice, maxTime, scenario.getNetwork());
+		this.volumesAnalyzer = new VolumesAnalyzer(timeSlice, maxTime, scenario.getNetwork());
 	}
 	
 	public void parseEventsFile(String eventsFile, String outputFile) throws IOException {
@@ -236,9 +236,7 @@ public class CalcNetworkCapacityUtilization {
 		
 		double sumAvgCarUtilization = 0.0;
 		for (Id linkId : linkIds) {
-			Map<String, double[]> linkVolumes = this.volumesAnalyzer.getVolumesPerHourForLink(linkId);
-			
-			double[] carVolumes = linkVolumes.get(TransportMode.car);
+			double[] carVolumes = this.volumesAnalyzer.getVolumesPerHourForLink(linkId, TransportMode.car);
 			
 			Link link = scenario.getNetwork().getLinks().get(linkId);
 			double capacity = link.getCapacity();
