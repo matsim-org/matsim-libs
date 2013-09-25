@@ -1,52 +1,43 @@
 package playground.michalm.vrp.run;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map.Entry;
+import java.io.*;
+import java.util.*;
+
+import javax.swing.SwingUtilities;
 
 import org.matsim.analysis.LegHistogram;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.population.Person;
+import org.matsim.api.core.v01.population.*;
+import org.matsim.contrib.dvrp.data.MatsimVrpData;
+import org.matsim.contrib.dvrp.data.file.DepotReader;
+import org.matsim.contrib.dvrp.data.network.*;
+import org.matsim.contrib.dvrp.data.network.router.*;
+import org.matsim.contrib.dvrp.data.network.shortestpath.MatsimArcFactories;
+import org.matsim.contrib.dvrp.run.VrpConfigUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.qsim.ActivityEngine;
-import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.core.mobsim.qsim.TeleportationEngine;
-import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
-import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
-import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
-import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
+import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
+import org.matsim.core.mobsim.qsim.*;
+import org.matsim.core.mobsim.qsim.agents.*;
+import org.matsim.core.mobsim.qsim.qnetsimengine.*;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.MatsimPopulationReader;
-import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
+import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.*;
+import org.matsim.vis.otfvis.OTFClientControl;
+import org.matsim.vis.otfvis.gui.OTFQueryControl;
+import org.matsim.vis.otfvis.opengl.queries.QueryAgentPlan;
 
 import pl.poznan.put.util.lang.TimeDiscretizer;
 import pl.poznan.put.vrp.dynamic.data.VrpData;
-import pl.poznan.put.vrp.dynamic.data.model.Customer;
-import pl.poznan.put.vrp.dynamic.data.model.Request;
+import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.network.ArcFactory;
-import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiOptimizer;
+import pl.poznan.put.vrp.dynamic.taxi.TaxiOptimizer;
 import playground.michalm.demand.ODDemandGenerator;
-import playground.michalm.vrp.data.MatsimVrpData;
-import playground.michalm.vrp.data.file.DepotReader;
-import playground.michalm.vrp.data.network.MatsimVrpGraph;
-import playground.michalm.vrp.data.network.MatsimVrpGraphCreator;
-import playground.michalm.vrp.data.network.router.DistanceAsTravelDisutility;
-import playground.michalm.vrp.data.network.router.TimeAsTravelDisutility;
-import playground.michalm.vrp.data.network.router.TravelTimeCalculators;
-import playground.michalm.vrp.data.network.shortestpath.MatsimArcFactories;
-import playground.michalm.vrp.taxi.TaxiAgentSource;
-import playground.michalm.vrp.taxi.TaxiModeDepartureHandler;
-import playground.michalm.vrp.taxi.TaxiSimEngine;
+import playground.michalm.vrp.*;
 
 
 public class OnlineDvrpLauncherUtils
@@ -238,5 +229,35 @@ public class OnlineDvrpLauncherUtils
             legHistogram.writeGraphic(histogramOutDirName + "legHistogram_" + legMode + ".png",
                     legMode);
         }
+    }
+    
+    
+    /**
+     * All fleet vehicles are selected (i.e. presented in circles)
+     * 
+     * @param qSim
+     * @param vrpData
+     */
+    public static void initQueryHandler(QSim qSim, final VrpData vrpData)
+    {
+        qSim.addQueueSimulationListeners(new MobsimInitializedListener() {
+            public void notifyMobsimInitialized(
+                    @SuppressWarnings("rawtypes") MobsimInitializedEvent e)
+            {
+                SwingUtilities.invokeLater(new Runnable() {
+                    public void run()
+                    {
+                        OTFQueryControl control = (OTFQueryControl)OTFClientControl.getInstance()
+                                .getMainOTFDrawer().getQueryHandler();
+
+                        for (Vehicle v : vrpData.getVehicles()) {
+                            QueryAgentPlan query = new QueryAgentPlan();
+                            query.setId(v.getName());
+                            control.createQuery(query);
+                        }
+                    }
+                });
+            }
+        });
     }
 }

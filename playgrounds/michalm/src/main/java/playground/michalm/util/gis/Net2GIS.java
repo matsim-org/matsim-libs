@@ -23,12 +23,11 @@ import java.util.Arrays;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.dvrp.run.VrpConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.utils.gis.matsim2esri.network.*;
-
-import playground.michalm.vrp.run.VrpConfigUtils;
 
 
 public class Net2GIS

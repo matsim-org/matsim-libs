@@ -19,12 +19,12 @@
 
 package playground.michalm.vrp.run;
 
-import static pl.poznan.put.vrp.dynamic.optimizer.taxi.immediaterequest.TaxiOptimizationPolicy.*;
+import static pl.poznan.put.vrp.dynamic.taxi.immediaterequest.TaxiOptimizationPolicy.*;
 import static playground.michalm.vrp.run.AlgorithmConfig.AlgorithmType.*;
 import static playground.michalm.vrp.run.OnlineDvrpLauncherUtils.TravelDisutilitySource.*;
 import static playground.michalm.vrp.run.OnlineDvrpLauncherUtils.TravelTimeSource.*;
 import pl.poznan.put.vrp.dynamic.data.VrpData;
-import pl.poznan.put.vrp.dynamic.optimizer.taxi.immediaterequest.*;
+import pl.poznan.put.vrp.dynamic.taxi.immediaterequest.*;
 import playground.michalm.vrp.run.OnlineDvrpLauncherUtils.TravelDisutilitySource;
 import playground.michalm.vrp.run.OnlineDvrpLauncherUtils.TravelTimeSource;
 

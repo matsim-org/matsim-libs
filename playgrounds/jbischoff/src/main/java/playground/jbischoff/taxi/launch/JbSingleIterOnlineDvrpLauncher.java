@@ -19,35 +19,27 @@
 
 package playground.jbischoff.taxi.launch;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.*;
+import java.util.*;
 
 import org.matsim.analysis.LegHistogram;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.dvrp.data.MatsimVrpData;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.events.algorithms.EventWriter;
-import org.matsim.core.events.algorithms.EventWriterXML;
+import org.matsim.core.events.algorithms.*;
 import org.matsim.core.mobsim.qsim.QSim;
-import org.matsim.vis.otfvis.OTFClientLive;
-import org.matsim.vis.otfvis.OnTheFlyServer;
+import org.matsim.vis.otfvis.*;
 
 import pl.poznan.put.util.jfreechart.ChartUtils;
-import pl.poznan.put.vrp.dynamic.data.model.Request;
+import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.model.Request.ReqStatus;
-import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiDelaySpeedupStats;
-import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiEvaluator;
+import pl.poznan.put.vrp.dynamic.taxi.*;
 import playground.jbischoff.taxi.evaluation.ScheduleChartUtils;
 import playground.jbischoff.taxi.optimizer.rank.NOSRankTaxiOptimizer;
 import playground.michalm.util.gis.Schedules2GIS;
 import playground.michalm.vrp.RunningVehicleRegister;
-import playground.michalm.vrp.data.MatsimVrpData;
-import playground.michalm.vrp.otfvis.OTFLiveUtils;
+import playground.michalm.vrp.run.OnlineDvrpLauncherUtils;
 /**
  * 
  * 
@@ -190,7 +182,7 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
         events.addHandler(rvr);
 
         if (otfVis) { // OFTVis visualization
-            OTFLiveUtils.initQueryHandler(qSim, data.getVrpData());
+            OnlineDvrpLauncherUtils.initQueryHandler(qSim, data.getVrpData());
             OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(),
                     scenario, qSim.getEventsManager(), qSim);
             OTFClientLive.run(scenario.getConfig(), server);

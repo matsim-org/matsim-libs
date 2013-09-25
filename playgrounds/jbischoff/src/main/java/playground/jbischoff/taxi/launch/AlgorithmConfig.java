@@ -19,12 +19,12 @@
 
 package playground.jbischoff.taxi.launch;
 
-import static pl.poznan.put.vrp.dynamic.optimizer.taxi.immediaterequest.TaxiOptimizationPolicy.*;
+import static pl.poznan.put.vrp.dynamic.taxi.immediaterequest.TaxiOptimizationPolicy.*;
 import static playground.jbischoff.taxi.launch.AlgorithmConfig.AlgorithmType.*;
 import static playground.jbischoff.taxi.launch.ElectroCabLaunchUtils.TravelCostSource.*;
 import static playground.jbischoff.taxi.launch.ElectroCabLaunchUtils.TravelTimeSource.*;
 import pl.poznan.put.vrp.dynamic.data.VrpData;
-import pl.poznan.put.vrp.dynamic.optimizer.taxi.immediaterequest.*;
+import pl.poznan.put.vrp.dynamic.taxi.immediaterequest.*;
 import playground.jbischoff.taxi.launch.ElectroCabLaunchUtils.TravelCostSource;
 import playground.jbischoff.taxi.launch.ElectroCabLaunchUtils.TravelTimeSource;
 import playground.jbischoff.taxi.optimizer.rank.NOSRankTaxiOptimizer;

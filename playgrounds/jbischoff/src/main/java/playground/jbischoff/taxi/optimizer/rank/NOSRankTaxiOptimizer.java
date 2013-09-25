@@ -29,7 +29,7 @@ import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
 import pl.poznan.put.vrp.dynamic.data.schedule.Task.TaskType;
 import pl.poznan.put.vrp.dynamic.data.schedule.impl.WaitTaskImpl;
-import pl.poznan.put.vrp.dynamic.optimizer.taxi.schedule.TaxiDriveTask;
+import pl.poznan.put.vrp.dynamic.taxi.schedule.TaxiDriveTask;
 import playground.jbischoff.energy.charging.DepotArrivalDepartureCharger;
 import playground.jbischoff.taxi.rank.BackToRankTask;
 

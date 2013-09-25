@@ -27,6 +27,7 @@ import javax.naming.ConfigurationException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.*;
+import org.matsim.contrib.dvrp.run.VrpConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.gis.ShapeFileReader;
@@ -37,7 +38,6 @@ import playground.michalm.demand.*;
 import playground.michalm.demand.DefaultActivityGenerator.GeometryProvider;
 import playground.michalm.demand.DefaultActivityGenerator.PointAcceptor;
 import playground.michalm.util.visum.VisumODMatrixReader;
-import playground.michalm.vrp.run.VrpConfigUtils;
 
 import com.vividsolutions.jts.geom.*;
 

@@ -24,12 +24,12 @@ import java.util.*;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.dvrp.run.VrpConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
 
 import playground.michalm.util.gis.PolygonBasedFilter;
-import playground.michalm.vrp.run.VrpConfigUtils;
 
 import com.google.common.base.Predicate;
 import com.vividsolutions.jts.geom.Geometry;

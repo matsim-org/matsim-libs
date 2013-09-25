@@ -24,15 +24,14 @@ import java.util.*;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.contrib.dvrp.data.network.router.*;
+import org.matsim.contrib.dvrp.run.VrpConfigUtils;
 import org.matsim.core.network.*;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.*;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
-
-import playground.michalm.vrp.data.network.router.*;
-import playground.michalm.vrp.run.VrpConfigUtils;
 
 
 public class InterZoneDistanceCalculator

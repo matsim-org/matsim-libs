@@ -24,6 +24,7 @@ import java.util.*;
 
 import org.matsim.analysis.LegHistogram;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.dvrp.data.MatsimVrpData;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.OTFVisConfigGroup.ColoringScheme;
@@ -36,12 +37,10 @@ import pl.poznan.put.util.jfreechart.ChartUtils;
 import pl.poznan.put.vrp.dynamic.chart.ScheduleChartUtils;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.model.Request.ReqStatus;
-import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
-import pl.poznan.put.vrp.dynamic.optimizer.taxi.immediaterequest.ImmediateRequestTaxiOptimizer;
+import pl.poznan.put.vrp.dynamic.taxi.*;
+import pl.poznan.put.vrp.dynamic.taxi.immediaterequest.ImmediateRequestTaxiOptimizer;
 import playground.michalm.util.gis.Schedules2GIS;
 import playground.michalm.vrp.RunningVehicleRegister;
-import playground.michalm.vrp.data.MatsimVrpData;
-import playground.michalm.vrp.otfvis.OTFLiveUtils;
 
 
 /*package*/class SingleIterOnlineDvrpLauncher
@@ -219,7 +218,7 @@ import playground.michalm.vrp.otfvis.OTFLiveUtils;
 
         if (otfVis) { // OFTVis visualization
             scenario.getConfig().otfVis().setColoringScheme(ColoringScheme.taxicab);
-            OTFLiveUtils.initQueryHandler(qSim, data.getVrpData());
+            OnlineDvrpLauncherUtils.initQueryHandler(qSim, data.getVrpData());
             OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(),
                     scenario, qSim.getEventsManager(), qSim);
             OTFClientLive.run(scenario.getConfig(), server);

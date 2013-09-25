@@ -18,11 +18,6 @@
 		<!--dependency> <groupId>org.geotools</groupId> <artifactId>gt2-postgis</artifactId> 
 			<version>2.3.5</version> </dependency -->
 		<dependency>
-			<groupId>commons-primitives</groupId>
-			<artifactId>commons-primitives</artifactId>
-			<version>1.0</version>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-math3</artifactId>
 			<version>3.1.1</version>
@@ -73,74 +68,12 @@
 			<version>1.7</version>
 		</dependency>
 		
-		
-		<!-- ============== standard option ============== -->
 		<dependency>
-			<groupId>pl.poznan.put.michalm</groupId>
-			<artifactId>util</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/lib/util-0.0.1-SNAPSHOT.jar</systemPath>
-		</dependency>
-		<dependency>
-			<groupId>pl.poznan.put.michalm</groupId>
-			<artifactId>gandalf</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/lib/gandalf-0.0.1-SNAPSHOT.jar</systemPath>
-		</dependency>
-		<dependency>
-			<groupId>pl.poznan.put.michalm</groupId>
-			<artifactId>vrp</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-			<scope>system</scope>
-			<systemPath>${basedir}/lib/vrp-0.0.1-SNAPSHOT.jar</systemPath>
-		</dependency>
-		<!-- ============== standard option ============== -->
-
-		
-		<!-- ============== alternative option ============== -->
-		<!-- only when UTIL, GANDALF and VRP maven projects are created -->
-		<!-- exclusions used to simulate the SYSTEM scope --> 
-	    <!-- (see the dependencies in the standard option) -->
-		<!-- dependency>
-			<groupId>pl.poznan.put.michalm</groupId>
-			<artifactId>util</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<groupId>org.matsim.contrib</groupId>
+			<artifactId>dvrp</artifactId>
+			<version>0.6.0-SNAPSHOT</version>
 			<scope>compile</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>*</groupId>
-					<artifactId>*</artifactId>
-				</exclusion>
-			</exclusions>
 		</dependency>
-		<dependency>
-			<groupId>pl.poznan.put.michalm</groupId>
-			<artifactId>gandalf</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-			<scope>compile</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>*</groupId>
-					<artifactId>*</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>pl.poznan.put.michalm</groupId>
-			<artifactId>vrp</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-			<scope>compile</scope>
-			<exclusions>
-				<exclusion>
-					<groupId>*</groupId>
-					<artifactId>*</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency -->
-		<!-- ============== alternative option ============== -->
-		
 		
 		<dependency>
 			<groupId>org.matsim.contrib</groupId>

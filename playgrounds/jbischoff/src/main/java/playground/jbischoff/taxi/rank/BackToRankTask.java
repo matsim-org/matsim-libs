@@ -21,7 +21,7 @@ package playground.jbischoff.taxi.rank;
 
 import pl.poznan.put.vrp.dynamic.data.network.Arc;
 import pl.poznan.put.vrp.dynamic.data.schedule.DriveTask;
-import pl.poznan.put.vrp.dynamic.optimizer.taxi.schedule.TaxiDriveTask;
+import pl.poznan.put.vrp.dynamic.taxi.schedule.TaxiDriveTask;
 /**
  * 
  * 

@@ -24,12 +24,11 @@ import java.util.*;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.*;
+import org.matsim.contrib.dvrp.run.VrpConfigUtils;
 import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.algorithms.NetworkCleaner;
 import org.matsim.core.scenario.ScenarioUtils;
-
-import playground.michalm.vrp.run.VrpConfigUtils;
 
 import com.vividsolutions.jts.geom.Geometry;
 

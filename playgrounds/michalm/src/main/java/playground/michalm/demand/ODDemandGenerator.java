@@ -27,6 +27,7 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.contrib.dvrp.run.VrpConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.xml.sax.SAXException;
@@ -34,7 +35,6 @@ import org.xml.sax.SAXException;
 import pl.poznan.put.util.array2d.Array2DReader;
 import pl.poznan.put.util.random.*;
 import playground.michalm.demand.Zone.Type;
-import playground.michalm.vrp.run.VrpConfigUtils;
 
 import com.google.common.collect.Lists;
 

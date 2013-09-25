@@ -26,6 +26,7 @@ import javax.naming.ConfigurationException;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.*;
+import org.matsim.contrib.dvrp.run.VrpConfigUtils;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.xml.sax.SAXException;
@@ -33,7 +34,6 @@ import org.xml.sax.SAXException;
 import pl.poznan.put.util.array2d.Array2DReader;
 import pl.poznan.put.util.random.RandomUtils;
 import playground.michalm.demand.*;
-import playground.michalm.vrp.run.VrpConfigUtils;
 
 
 public class PoznanSimpleDemandGeneration

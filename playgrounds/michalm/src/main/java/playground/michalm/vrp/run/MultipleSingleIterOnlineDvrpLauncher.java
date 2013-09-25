@@ -24,8 +24,8 @@ import java.io.*;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.matsim.core.gbl.MatsimRandom;
 
-import pl.poznan.put.vrp.dynamic.optimizer.taxi.*;
-import pl.poznan.put.vrp.dynamic.optimizer.taxi.TaxiEvaluator.TaxiEvaluation;
+import pl.poznan.put.vrp.dynamic.taxi.*;
+import pl.poznan.put.vrp.dynamic.taxi.TaxiEvaluator.TaxiEvaluation;
 import playground.michalm.vrp.run.OnlineDvrpLauncherUtils.TravelTimeSource;
 
 

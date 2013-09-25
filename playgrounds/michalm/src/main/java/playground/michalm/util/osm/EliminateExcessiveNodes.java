@@ -4,10 +4,9 @@ import java.util.*;
 
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.*;
+import org.matsim.contrib.dvrp.run.VrpConfigUtils;
 import org.matsim.core.network.*;
 import org.matsim.core.scenario.ScenarioUtils;
-
-import playground.michalm.vrp.run.VrpConfigUtils;
 
 
 /**

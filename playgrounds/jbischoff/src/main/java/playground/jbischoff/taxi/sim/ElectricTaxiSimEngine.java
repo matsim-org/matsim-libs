@@ -19,12 +19,12 @@
 
 package playground.jbischoff.taxi.sim;
 
+import org.matsim.contrib.dvrp.data.MatsimVrpData;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
 import playground.jbischoff.energy.charging.DepotArrivalDepartureCharger;
 import playground.jbischoff.taxi.optimizer.rank.RankTaxiOptimizer;
-import playground.michalm.vrp.data.MatsimVrpData;
-import playground.michalm.vrp.taxi.TaxiSimEngine;
+import playground.michalm.vrp.TaxiSimEngine;
 /**
  * 
  * 
