@@ -46,6 +46,7 @@ public class DepotGenerator
 
         PrintWriter pw = new PrintWriter(new File(depotsFilename));
         pw.println("<?xml version=\"1.0\" ?>");
+        //TODO change the URL
         pw.println("<!DOCTYPE depots SYSTEM \"http://www.man.poznan.pl/~michalm/matsim/depots_v1.dtd\">");
         pw.println();
 
