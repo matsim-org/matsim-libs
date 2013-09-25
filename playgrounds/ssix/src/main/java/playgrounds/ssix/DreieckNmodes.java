@@ -22,9 +22,12 @@ package playgrounds.ssix;
 
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Random;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
@@ -33,18 +36,37 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.api.core.v01.population.Activity;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.api.core.v01.population.Population;
+import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup;
+import org.matsim.core.events.EventsUtils;
+import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
+import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.mobsim.qsim.TeleportationEngine;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
+import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
+import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
+import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimNetworkFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QLinkImpl;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngine;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNetwork;
+import org.matsim.core.mobsim.qsim.qnetsimengine.QNode;
+import org.matsim.core.population.routes.LinkNetworkRouteImpl;
+import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.misc.PopulationUtils;
 import org.matsim.vehicles.VehicleCapacity;
@@ -52,13 +74,13 @@ import org.matsim.vehicles.VehicleCapacityImpl;
 import org.matsim.vehicles.VehicleType;
 import org.matsim.vehicles.VehicleUtils;
 
-//import
-
 /**
  * @author ssix
  */
 
 public class DreieckNmodes {
+	
+	//private static Integer[] TEST_DISTRIBUTION = {1,1,2};
 
 	private static final Logger log = Logger.getLogger(DreieckNmodes.class);
 	
@@ -123,7 +145,7 @@ public class DreieckNmodes {
 		@Override
 		public Id chooseNextLinkId() {
 			if (!(goHome)){
-				Id forcedLeftTurnLinkId = new IdImpl((long)(3*DreieckStreckeSzenario3modes.subdivisionFactor - 1));
+				Id forcedLeftTurnLinkId = new IdImpl((long)(3*DreieckNmodes.subdivisionFactor - 1));
 				if (!(delegate.getCurrentLinkId().equals(forcedLeftTurnLinkId))){
 					return delegate.chooseNextLinkId();
 				}
@@ -132,13 +154,13 @@ public class DreieckNmodes {
 				delegate.setCurrentLinkIdIndex(0);
 				return afterLeftTurnLinkId;
 			}
-			Id forcedStraightForwardLinkId = new IdImpl((long)(DreieckStreckeSzenario3modes.subdivisionFactor - 1));
+			Id forcedStraightForwardLinkId = new IdImpl((long)(DreieckNmodes.subdivisionFactor - 1));
 			if (!(delegate.getCurrentLinkId().equals(forcedStraightForwardLinkId))){
 				return delegate.chooseNextLinkId();
 			}
-			Id afterGoingStraightForwardLinkId = new IdImpl((long)(3*DreieckStreckeSzenario3modes.subdivisionFactor));
+			Id afterGoingStraightForwardLinkId = new IdImpl((long)(3*DreieckNmodes.subdivisionFactor));
 			delegate.setCachedNextLinkId(afterGoingStraightForwardLinkId);
-			delegate.setCurrentLinkIdIndex(3*DreieckStreckeSzenario3modes.subdivisionFactor);//This does work quite well so far and allows to end simulation.
+			delegate.setCurrentLinkIdIndex(3*DreieckNmodes.subdivisionFactor);//This does work quite well so far and allows to end simulation.
 			return afterGoingStraightForwardLinkId;
 		}
 
@@ -221,7 +243,7 @@ public class DreieckNmodes {
 		// to me (kn).
 		this.scenario = ScenarioUtils.createScenario(config);
 		
-		//Initializing modeData objects//TODO does not function well.
+		//Initializing modeData objects//TODO: should be initialized when instancing FundamentalDiagrams
 		this.modesData = new HashMap<Id, ModeData>();
 		for (int i=0; i < NUMBER_OF_MODES; i++){
 			Id modeId = new IdImpl(NAMES[i]);
@@ -240,10 +262,43 @@ public class DreieckNmodes {
 		DreieckNmodes dreieck = new DreieckNmodes(NETWORK_CAPACITY);
 		dreieck.fillNetworkData();
 		dreieck.openFile(OUTPUT_DIR);
-		//TODO: run somewhat
+		//dreieck.singleRun(Arrays.asList(TEST_DISTRIBUTION));
 		dreieck.closeFile();
 	}
 	
+	private void parametricRunAccordingToDistribution(List<Integer> maxAgentDistribution, List<Integer> steps){
+		//Check for size
+		if ((maxAgentDistribution.size() != NUMBER_OF_MODES) || (steps.size() != NUMBER_OF_MODES)){ throw new RuntimeException("There should be as many number and/or steps in the two given lists as there are modes in the simulation.");}
+		
+		List<List<Integer>> pointsToRun = this.createPointsToRun(maxAgentDistribution, steps);
+		for ( int i=0; i<pointsToRun.size(); i++){
+			List<Integer> pointToRun = pointsToRun.get(i);
+			this.singleRun(pointToRun);
+		}
+	}
+	
+	private List<List<Integer>> createPointsToRun(List<Integer> maxValues, List<Integer> steps) {
+		// TODO Not easy at all
+		return null;
+	}
+	
+	private void singleRun(List<Integer> pointToRun) {
+		this.createWantedPopulation(pointToRun, 2);
+		
+		EventsManager events = EventsUtils.createEventsManager();
+		
+		FundamentalDiagramsNmodes fundiN = new FundamentalDiagramsNmodes(this.scenario, this.modesData);
+		events.addHandler(fundiN);
+		events.addHandler(new EventWriterXML(OUTPUT_EVENTS));
+		
+		Netsim qSim = createModifiedQSim(this.scenario, events);
+		
+		qSim.run();
+		
+		//TODO: writer.doSomething
+		
+	}
+
 	private void fillNetworkData(){
 		Network network = scenario.getNetwork();
 		int capMax = 100*networkCapacity;
@@ -331,6 +386,60 @@ public class DreieckNmodes {
 		//writer.write("./output/dreieck_network.xml");
 	}
 	
+	private void createWantedPopulation(List<Integer> agentDistribution, int sekundenAbstand){
+		Population population = scenario.getPopulation();
+		
+		population.getPersons().clear();
+		
+		long numberOfPeople = 0;
+		for (int i=0; i<agentDistribution.size(); i++){
+			numberOfPeople += agentDistribution.get(i);
+		}
+		
+		for (long i = 0; i<numberOfPeople; i++){
+			
+			Person person = population.getFactory().createPerson(new IdImpl(i+1));
+			Map<String, Object> customMap = person.getCustomAttributes();
+			
+			Plan plan = population.getFactory().createPlan();
+			plan.addActivity(createHome(sekundenAbstand, i+1, numberOfPeople));
+			
+			//Assigning mode
+			String transportMode="";
+			boolean modeFound = false;
+			int j=0; int sum=0;
+			while (!(modeFound)){
+				sum += agentDistribution.get(j);
+				if (i<sum){
+					transportMode = DreieckNmodes.NAMES[j];
+					modeFound = true;
+					System.out.println("A "+DreieckNmodes.NAMES[j]+" was made.");
+				}
+				j++;
+			}
+			customMap.put("transportMode", transportMode);
+			Leg leg = population.getFactory().createLeg(transportMode);
+			
+			//Handy route definition for making the agents stay on the track
+			final Id startLinkId = new IdImpl(-1);
+			final Id endLinkId = new IdImpl(3*subdivisionFactor);
+			List<Id> routeDescription = new ArrayList<Id>();
+			for (long k=0; k<3*subdivisionFactor;k++){
+				routeDescription.add(new IdImpl(k));
+			}
+			NetworkRoute route = new LinkNetworkRouteImpl(startLinkId, endLinkId);
+			route.setLinkIds(startLinkId, routeDescription, endLinkId);
+			leg.setRoute(route);
+			//end of route definition
+			plan.addLeg(leg);
+			plan.addActivity(createWork());
+			
+			person.addPlan(plan);
+			population.addPerson(person);
+			//System.out.println("Just added person : "+(i+1)+" to the scenario population.");
+		}
+	}
+
 	
 	
 	
@@ -345,11 +454,69 @@ public class DreieckNmodes {
 	
 	
 	
-	
-	
-	
-	
-	
+	private Netsim createModifiedQSim(Scenario sc, EventsManager events) {
+		//From QSimFactory inspired code
+		QSimConfigGroup conf = sc.getConfig().getQSimConfigGroup();
+        if (conf == null) {
+            throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
+        }
+        /**/
+        QSim qSim = new QSim(sc, events);
+        ActivityEngine activityEngine = new ActivityEngine();
+		qSim.addMobsimEngine(activityEngine);
+		qSim.addActivityHandler(activityEngine);
+		
+		//First modification: Mobsim needs to create queue links with mzilske's passing queue
+		QNetsimEngine netsimEngine = new QNetsimEngineFactory() {
+			
+			@Override
+			public QNetsimEngine createQSimEngine(Netsim sim) {
+				NetsimNetworkFactory<QNode, QLinkImpl> netsimNetworkFactory = new NetsimNetworkFactory<QNode, QLinkImpl>() {
+
+					@Override
+					public QLinkImpl createNetsimLink(final Link link, final QNetwork network, final QNode toQueueNode) {
+						return new QLinkImpl(link, network, toQueueNode, new MZilskePassingVehicleQ());
+					}
+
+					@Override
+					public QNode createNetsimNode(final Node node, QNetwork network) {
+						return new QNode(node, network);
+					}
+
+
+				};
+				return new QNetsimEngine((QSim) sim, netsimNetworkFactory) ;
+			}
+		}.createQSimEngine(qSim);
+		////////////////////////////////////////////////////////
+		
+		qSim.addMobsimEngine(netsimEngine);
+		qSim.addDepartureHandler(netsimEngine.getDepartureHandler());
+		TeleportationEngine teleportationEngine = new TeleportationEngine();
+		qSim.addMobsimEngine(teleportationEngine);
+        
+		//Second modification: Mobsim needs to create my own used agents
+		AgentFactory agentFactory = new MyAgentFactory(qSim);
+		///////////////////////////////////////////////////////
+		
+		if (sc.getConfig().network().isTimeVariantNetwork()) {
+			qSim.addMobsimEngine(new NetworkChangeEventsEngine());		
+		}
+        PopulationAgentSource agentSource = new PopulationAgentSource(sc.getPopulation(), agentFactory, qSim);
+        
+        //Third modification: Mobsim needs to know the different vehicle types (and their respective speeds)
+        Map<String, VehicleType> modeVehicleTypes = new HashMap<String, VehicleType>();
+        for (int i=0; i<modesData.size(); i++){
+        	String id = modesData.get(new IdImpl(NAMES[i])).getModeId().toString();
+        	VehicleType vT = modesData.get(new IdImpl(NAMES[i])).getVehicleType();
+        	modeVehicleTypes.put(id, vT);
+        }
+        agentSource.setModeVehicleTypes(modeVehicleTypes);
+        //////////////////////////////////////////////////////
+        
+        qSim.addAgentSource(agentSource);
+        return qSim;
+	}
 	
 	private void openFile(String dir) {
 		try {
@@ -357,7 +524,13 @@ public class DreieckNmodes {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		writer.print("agents_count\t\tk\t");
+		writer.print("n\t");
+		for (int i=0; i < NUMBER_OF_MODES; i++){
+			String str = this.modesData.get(new IdImpl(NAMES[i])).getModeId().toString().substring(0, 3);
+			String strn = "n_"+str;
+			writer.print(strn+"\t");
+		}
+		writer.print("\tk\t");
 		for (int i=0; i < NUMBER_OF_MODES; i++){
 			String str = this.modesData.get(new IdImpl(NAMES[i])).getModeId().toString().substring(0, 3);
 			String strk = "k_"+str;
@@ -380,6 +553,31 @@ public class DreieckNmodes {
 	
 	private void closeFile() {
 		writer.close();
+	}
+	
+	private Activity createHome(int sekundenFrequenz, long identifier, long numberOfPeople){
+		Id homeLinkId = new IdImpl(-1);
+		Activity activity = scenario.getPopulation().getFactory().createActivityFromLinkId("home", homeLinkId);
+		
+		Random r = new Random();
+		/*Method 1: The order of leaving people is guaranteed by the minimum time step between people: first person 1 leaves, then 2, then 3 etc...
+		long plannedEndTime = 6*3600 + (identifier-1)*sekundenFrequenz;
+		double endTime = plannedEndTime - sekundenFrequenz/2.0 + r.nextDouble()*sekundenFrequenz;
+		*/
+		///*Method 2: With the expected frequency, the maximal departure time is computed and people are randomly departing within this huge time chunk.
+		long TimeChunkSize = numberOfPeople * sekundenFrequenz;
+		double endTime = 6 * 3600 + r.nextDouble() * TimeChunkSize; 
+		//*/
+		//NB:Method 2 is significantly better for the quality of fundamental diagrams;
+		activity.setEndTime(endTime);
+		
+		return activity;
+	}
+	
+	private Activity createWork(){
+		Id workLinkId = new IdImpl(3*DreieckNmodes.subdivisionFactor);
+		Activity activity = scenario.getPopulation().getFactory().createActivityFromLinkId("work", workLinkId);
+		return activity;
 	}
 	
 	private double calculateLength(Node from, Node to){

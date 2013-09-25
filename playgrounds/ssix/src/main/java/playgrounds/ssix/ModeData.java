@@ -20,6 +20,7 @@
 
 package playgrounds.ssix;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -36,23 +37,19 @@ import org.matsim.vehicles.VehicleType;
 
 public class ModeData {
 	
-	public Id modeId;
-	private VehicleType vehicleType;
-
+	private Id modeId;
+	private VehicleType vehicleType;//TODO Ensure all methods can work without a specific vehicle type (needed for storing global data)
+									//TODO Maybe keeping global data in the EventHandler can be smart (ssix, 25.09.13)
 	public int numberOfAgents;
 	private Map<Id,Double> lastSeenOnStudiedLinkEnter;
+	private int speedTableSize;
 	private List<Double> speedTable;
 	private Double flowTime;
 	private List<Double> flowTable;
 	
-	/*public ModeData(){
-		
-	}*/
-	
 	public ModeData(Id id, VehicleType vT){
 		this.modeId = id;
 		this.vehicleType = vT;
-		this.initDynamicVariables();
 	}
 	
 	public void handle(LinkEnterEvent e){
@@ -72,7 +69,31 @@ public class ModeData {
 	}
 	
 	private void initDynamicVariables() {
-		// TODO Auto-generated method stub
+		// TODO Ensure numberOfAgents for each mode has been initialized at this point
+		this.decideSpeedTableSize();
+		this.speedTable = new LinkedList<Double>();
+		for (int i=0; i<this.speedTableSize; i++){
+			this.speedTable.add(0.);
+		}
+		
+		this.flowTime = 0.;
+		this.flowTable = new LinkedList<Double>();
+		for (int i=0; i<3600; i++){
+			this.flowTable.add(0.);
+		}
+	}
+
+	private void decideSpeedTableSize() {
+		//Ensures a significant speed sampling for every mode size
+		if (this.numberOfAgents >= 100) {
+			this.speedTableSize = 50;
+		} else if (this.numberOfAgents >= 60) {
+			this.speedTableSize = 30;
+		} else if (this.numberOfAgents >= 20) {
+			this.speedTableSize = 20;
+		} else {
+			this.speedTableSize = this.numberOfAgents;
+		}
 	}
 
 	@Override

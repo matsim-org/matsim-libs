@@ -34,7 +34,8 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.Tuple;
 
 
-/* A class supposed to go attached to the DreieckStreckeSzenario class (with passing).
+/**
+ *  A class supposed to go attached to the DreieckStreckeSzenario class (with passing).
  * It aims at analyzing the flow of events in order to detect:
  * The permanent regime of the system and the following searched values:
  * the permanent flow, the permanent density and the permanent average 
