@@ -84,6 +84,7 @@
 		<module>accessibility</module>
 		<module>analysis</module>
 		<module>cadytsIntegration</module>
+		<module>dvrp</module>
 		<module>evacuation</module>
 		<module>freight</module>
 		<module>gtfs2matsimtransitschedule</module>
