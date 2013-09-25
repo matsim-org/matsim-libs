@@ -30,8 +30,9 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsPlanChanger;
-import org.matsim.contrib.cadyts.general.CadytsPtScoring;
+import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.contrib.cadyts.utils.CalibrationStatReader;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
@@ -164,7 +165,7 @@ public class CadytsIntegrationTest {
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelActivityScoring(params)) ;
 				scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));
 
-				final CadytsPtScoring scoringFunction = new CadytsPtScoring(plan,config, cContext);
+				final CadytsScoring scoringFunction = new CadytsScoring(plan,config, cContext);
 				scoringFunction.setWeightOfCadytsCorrection(beta*30.) ;
 				scoringFunctionAccumulator.addScoringFunction(scoringFunction );
 
@@ -438,7 +439,7 @@ public class CadytsIntegrationTest {
 		stratSets.setProbability(1.) ;
 		config.strategy().addStrategySettings(stratSets) ;
 		
-		CadytsPtConfigGroup cConfig = (CadytsPtConfigGroup) config.getModule(CadytsPtConfigGroup.GROUP_NAME) ;
+		CadytsConfigGroup cConfig = (CadytsConfigGroup) config.getModule(CadytsConfigGroup.GROUP_NAME) ;
 		cConfig.setTimeBinSize(7200) ;
 		
 		// ---
@@ -690,18 +691,18 @@ public class CadytsIntegrationTest {
 			params.setTypicalDuration(8*60*60.) ;
 		}
 		// ---
-		Module cadytsPtConfig = config.createModule(CadytsPtConfigGroup.GROUP_NAME ) ;
+		Module cadytsPtConfig = config.createModule(CadytsConfigGroup.GROUP_NAME ) ;
 		
-		cadytsPtConfig.addParam(CadytsPtConfigGroup.START_TIME, "04:00:00") ;
-		cadytsPtConfig.addParam(CadytsPtConfigGroup.END_TIME, "20:00:00" ) ;
-		cadytsPtConfig.addParam(CadytsPtConfigGroup.REGRESSION_INERTIA, "0.95") ;
-		cadytsPtConfig.addParam(CadytsPtConfigGroup.USE_BRUTE_FORCE, "true") ;
-		cadytsPtConfig.addParam(CadytsPtConfigGroup.MIN_FLOW_STDDEV, "8") ;
-		cadytsPtConfig.addParam(CadytsPtConfigGroup.PREPARATORY_ITERATIONS, "1") ;
-		cadytsPtConfig.addParam(CadytsPtConfigGroup.TIME_BIN_SIZE, "3600") ;
-		cadytsPtConfig.addParam(CadytsPtConfigGroup.CALIBRATED_LINES, "M44,M43") ;
+		cadytsPtConfig.addParam(CadytsConfigGroup.START_TIME, "04:00:00") ;
+		cadytsPtConfig.addParam(CadytsConfigGroup.END_TIME, "20:00:00" ) ;
+		cadytsPtConfig.addParam(CadytsConfigGroup.REGRESSION_INERTIA, "0.95") ;
+		cadytsPtConfig.addParam(CadytsConfigGroup.USE_BRUTE_FORCE, "true") ;
+		cadytsPtConfig.addParam(CadytsConfigGroup.MIN_FLOW_STDDEV, "8") ;
+		cadytsPtConfig.addParam(CadytsConfigGroup.PREPARATORY_ITERATIONS, "1") ;
+		cadytsPtConfig.addParam(CadytsConfigGroup.TIME_BIN_SIZE, "3600") ;
+		cadytsPtConfig.addParam(CadytsConfigGroup.CALIBRATED_LINES, "M44,M43") ;
 		
-		CadytsPtConfigGroup ccc = new CadytsPtConfigGroup() ;
+		CadytsConfigGroup ccc = new CadytsConfigGroup() ;
 		config.addModule(ccc) ;
 		
 		

@@ -19,7 +19,7 @@
 
 package playground.mmoyo.analysis.comp;
 
-import org.matsim.contrib.cadyts.pt.CadytsPtConfigGroup;
+import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -46,7 +46,7 @@ public class ControlerLauncher {
 		controler.setOverwriteFiles(true);
 		
 		//add analyzer for specific bus line and stop Zone conversion
-		CadytsPtConfigGroup ccc = new CadytsPtConfigGroup() ;
+		CadytsConfigGroup ccc = new CadytsConfigGroup() ;
 		controler.getConfig().addModule(ccc) ;
 		CtrlListener4configurableOcuppAnalysis ctrlListener4configurableOcuppAnalysis = new CtrlListener4configurableOcuppAnalysis(controler);
 		ctrlListener4configurableOcuppAnalysis.setStopZoneConversion(false); 

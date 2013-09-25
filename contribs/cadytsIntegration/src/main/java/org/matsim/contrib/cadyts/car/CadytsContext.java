@@ -29,6 +29,7 @@ import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsContextI;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
@@ -58,7 +59,7 @@ public class CadytsContext implements CadytsContextI, StartupListener, Iteration
 	private final double countsScaleFactor;
 	private final Counts counts = new Counts();
 	private final boolean writeAnalysisFile;
-	private final CadytsCarConfigGroup cadytsConfig;
+	private final CadytsConfigGroup cadytsConfig;
 	
 	private AnalyticalCalibrator<Link> calibrator;
 	private PlanToPlanStepBasedOnEvents ptStep;
@@ -68,7 +69,7 @@ public class CadytsContext implements CadytsContextI, StartupListener, Iteration
 		
 		this.countsScaleFactor = config.counts().getCountsScaleFactor();
 		
-		this.cadytsConfig = new CadytsCarConfigGroup();
+		this.cadytsConfig = new CadytsConfigGroup();
 		config.addModule(cadytsConfig);
 		// addModule() also initializes the config group with the values read from the config file
 		cadytsConfig.setWriteAnalysisFile(true);
@@ -79,7 +80,7 @@ public class CadytsContext implements CadytsContextI, StartupListener, Iteration
 		Set<Id> countedLinks = new TreeSet<Id>();
 		for (Id id : this.counts.getCounts().keySet()) countedLinks.add(id);
 		
-		cadytsConfig.setCalibratedLinks(countedLinks);
+		cadytsConfig.setCalibratedItems(countedLinks);
 		
 		this.writeAnalysisFile = cadytsConfig.isWriteAnalysisFile();
 	}
@@ -98,7 +99,7 @@ public class CadytsContext implements CadytsContextI, StartupListener, Iteration
 		this.simResults = new SimResultsContainerImpl(volumesAnalyzer, this.countsScaleFactor);
 		
 		// this collects events and generates cadyts plans from it
-		this.ptStep = new PlanToPlanStepBasedOnEvents(scenario, cadytsConfig.getCalibratedLinks());
+		this.ptStep = new PlanToPlanStepBasedOnEvents(scenario, cadytsConfig.getCalibratedItems());
 		event.getControler().getEvents().addHandler(ptStep);
 
 		// build the calibrator. This is a static method, and in consequence has no side effects

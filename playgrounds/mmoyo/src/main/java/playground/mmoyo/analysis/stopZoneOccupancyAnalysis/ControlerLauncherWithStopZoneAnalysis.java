@@ -19,7 +19,7 @@
 
 package playground.mmoyo.analysis.stopZoneOccupancyAnalysis;
 
-import org.matsim.contrib.cadyts.pt.CadytsPtConfigGroup;
+import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -40,7 +40,7 @@ public class ControlerLauncherWithStopZoneAnalysis {
 		final Controler controler = new Controler(config);
 		controler.setOverwriteFiles(true);
 		
-		CadytsPtConfigGroup ccg = new CadytsPtConfigGroup() ;
+		CadytsConfigGroup ccg = new CadytsConfigGroup() ;
 		config.addModule(ccg) ;
 		
 		//add analyzer for specific bus line and stop Zone conversion

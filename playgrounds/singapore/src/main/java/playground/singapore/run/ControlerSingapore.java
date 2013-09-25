@@ -46,6 +46,9 @@ public class ControlerSingapore extends Controler {
 		controler.getEvents().addHandler(stopStopTimeCalculator);
 		controler.setTransitRouterFactory(new TransitRouterWSImplFactory(controler.getScenario(), waitTimeCalculator.getWaitTimes(), stopStopTimeCalculator.getStopStopTimes()));
 		controler.setScoringFunctionFactory(new CharyparNagelOpenTimesScoringFunctionFactory(controler.getConfig().planCalcScore(), controler.getScenario()));
+		// comment: I would argue that when you add waitTime/stopTime to the router, you also need to adapt the scoring function accordingly.
+		// kai, sep'13
+		
 		controler.setMobsimFactory(new PTQSimFactory());
 		controler.run();
 	}

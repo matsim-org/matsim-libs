@@ -22,10 +22,10 @@ package playground.mmoyo.taste_variations.oldCode;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsPlanChanger;
-import org.matsim.contrib.cadyts.general.CadytsPtScoring;
+import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.contrib.cadyts.pt.CadytsContext;
-import org.matsim.contrib.cadyts.pt.CadytsPtConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -87,7 +87,7 @@ public class Controler_launcher {
 		config.strategy().addStrategySettings(stratSets);
 		}
 		//create cadyts context
-		CadytsPtConfigGroup ccc = new CadytsPtConfigGroup() ;
+		CadytsConfigGroup ccc = new CadytsConfigGroup() ;
 		config.addModule(ccc) ;
 		final CadytsContext cContext = new CadytsContext( config ) ;
 		
@@ -107,7 +107,7 @@ public class Controler_launcher {
 		//set scoring functions
 		final CharyparNagelScoringParameters params = new CharyparNagelScoringParameters(config.planCalcScore()); //M
 		//final boolean useBruteForce =Boolean.parseBoolean(config.getParam("cadytsPt", "useBruteForce")); 
-		CadytsPtConfigGroup cptcg = (CadytsPtConfigGroup) controler.getConfig().getModule(CadytsPtConfigGroup.GROUP_NAME);
+		CadytsConfigGroup cptcg = (CadytsConfigGroup) controler.getConfig().getModule(CadytsConfigGroup.GROUP_NAME);
 		final boolean useBruteForce = Boolean.parseBoolean(cptcg.getParams().get("useBruteForce"));
 		
 		controler.setScoringFunctionFactory(new ScoringFunctionFactory() {
@@ -122,7 +122,7 @@ public class Controler_launcher {
 					scoringFunctionAccumulator.addScoringFunction(new CharyparNagelAgentStuckScoring(params));	
 				}
 				
-				final CadytsPtScoring scoringFunction = new CadytsPtScoring(plan,config, cContext);
+				final CadytsScoring scoringFunction = new CadytsScoring(plan,config, cContext);
 				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight) ;
 				scoringFunctionAccumulator.addScoringFunction(scoringFunction );
 	 

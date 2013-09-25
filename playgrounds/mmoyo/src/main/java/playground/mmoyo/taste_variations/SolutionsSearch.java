@@ -21,10 +21,10 @@ package playground.mmoyo.taste_variations;
 
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsPlanChanger;
-import org.matsim.contrib.cadyts.general.CadytsPtScoring;
+import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.contrib.cadyts.pt.CadytsContext;
-import org.matsim.contrib.cadyts.pt.CadytsPtConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -116,7 +116,7 @@ public class SolutionsSearch {
 		config.strategy().addStrategySettings(stratSets2);
 		}
 		//create cadyts context
-		CadytsPtConfigGroup ccc = new CadytsPtConfigGroup() ;
+		CadytsConfigGroup ccc = new CadytsConfigGroup() ;
 		config.addModule(ccc) ;
 		ccc.setPreparatoryIterations(rndRouterIterations);
 		ccc.setUseBruteForce(true);
@@ -141,7 +141,7 @@ public class SolutionsSearch {
 			@Override
 			public ScoringFunction createNewScoringFunction(Plan plan) {
 				ScoringFunctionAccumulator scoringFunctionAccumulator = new ScoringFunctionAccumulator();
-				final CadytsPtScoring scoringFunction = new CadytsPtScoring(plan,config, cContext);
+				final CadytsScoring scoringFunction = new CadytsScoring(plan,config, cContext);
 				scoringFunction.setWeightOfCadytsCorrection(cadytsScoringWeight) ;
 				scoringFunctionAccumulator.addScoringFunction(scoringFunction );
 				return scoringFunctionAccumulator;

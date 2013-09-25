@@ -27,6 +27,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsContextI;
 import org.matsim.contrib.cadyts.general.PlansTranslator;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -76,13 +77,13 @@ CadytsContextI<T> {
 	private CadytsPtOccupancyAnalyzer cadytsPtOccupAnalyzer;
 	private PtPlanToPlanStepBasedOnEvents<T> ptStep ;
 
-	private CadytsPtConfigGroup cadytsConfig;
+	private CadytsConfigGroup cadytsConfig;
 
 	private final Config config;
 
 	public CadytsContext(Config config) {
 		this.config = config;
-		cadytsConfig = (CadytsPtConfigGroup) config.getModule(CadytsPtConfigGroup.GROUP_NAME);
+		cadytsConfig = (CadytsConfigGroup) config.getModule(CadytsConfigGroup.GROUP_NAME);
 	}
 
 	@Override
@@ -92,14 +93,14 @@ CadytsContextI<T> {
 
 
 
-		this.cadytsPtOccupAnalyzer = new CadytsPtOccupancyAnalyzer(cadytsConfig.getCalibratedLines(), cadytsConfig.getTimeBinSize() );
+		this.cadytsPtOccupAnalyzer = new CadytsPtOccupancyAnalyzer(cadytsConfig.getCalibratedItems(), cadytsConfig.getTimeBinSize() );
 		events.addHandler(this.cadytsPtOccupAnalyzer);
 
 		this.simResults = new SimResultsContainerImpl(this.cadytsPtOccupAnalyzer, config.ptCounts().getCountsScaleFactor(), 
 				cadytsConfig.getTimeBinSize());
 
 		// this collects events and generates cadyts plans from it
-		this.ptStep = new PtPlanToPlanStepBasedOnEvents<T>(scenario, cadytsConfig.getCalibratedLines());
+		this.ptStep = new PtPlanToPlanStepBasedOnEvents<T>(scenario, cadytsConfig.getCalibratedItems());
 		events.addHandler(ptStep);
 
 		String occupancyCountsFilename = config.ptCounts().getOccupancyCountsFileName();
@@ -122,7 +123,7 @@ CadytsContextI<T> {
 		if (isActiveInThisIteration(it, event.getControler())) {
 			// Get all stations of all analyzed lines and invoke the method write to get all information of them
 			Set<Id> stopIds = new HashSet<Id>();
-			for (Id lineId : this.cadytsConfig.getCalibratedLines()) {
+			for (Id lineId : this.cadytsConfig.getCalibratedItems()) {
 				TransitLine line = event.getControler().getScenario().getTransitSchedule().getTransitLines().get(lineId);
 				for (TransitRoute route : line.getRoutes().values()) {
 					for (TransitRouteStop stop : route.getStops()) {

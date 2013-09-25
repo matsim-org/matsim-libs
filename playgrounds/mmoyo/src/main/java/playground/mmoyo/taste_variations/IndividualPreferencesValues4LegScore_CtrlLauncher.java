@@ -27,7 +27,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.contrib.cadyts.pt.CadytsPtConfigGroup;
+import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -58,7 +58,7 @@ public class IndividualPreferencesValues4LegScore_CtrlLauncher {
 		final Controler controler = new Controler(scn);
 		controler.setOverwriteFiles(true);
 		
-		CadytsPtConfigGroup ccc = new CadytsPtConfigGroup() ;
+		CadytsConfigGroup ccc = new CadytsConfigGroup() ;
 		controler.getConfig().addModule(ccc) ;
 		
 		//Add an event handler and special leg scoring that calculates pt legs distances because the normal CharyparNagelLegScoring does not handle them

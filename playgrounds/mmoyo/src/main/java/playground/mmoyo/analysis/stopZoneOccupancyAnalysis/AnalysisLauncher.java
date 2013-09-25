@@ -22,7 +22,7 @@ package playground.mmoyo.analysis.stopZoneOccupancyAnalysis;
 import java.io.File;
 
 import org.apache.commons.lang.math.NumberUtils;
-import org.matsim.contrib.cadyts.pt.CadytsPtConfigGroup;
+import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -51,11 +51,11 @@ public class AnalysisLauncher {
 		
 		//load calibrated lines and TimeBinSize from config
 		final Config config = ConfigUtils.loadConfig(configFile);
-		CadytsPtConfigGroup cadytsConfig = new CadytsPtConfigGroup();
+		CadytsConfigGroup cadytsConfig = new CadytsConfigGroup();
 		config.addModule(cadytsConfig);
 		
 		//read events
-		ConfigurableOccupancyAnalyzer occupancyAnalyzerAllDay = new ConfigurableOccupancyAnalyzer(cadytsConfig.getCalibratedLines(), cadytsConfig.getTimeBinSize());
+		ConfigurableOccupancyAnalyzer occupancyAnalyzerAllDay = new ConfigurableOccupancyAnalyzer(cadytsConfig.getCalibratedItems(), cadytsConfig.getTimeBinSize());
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(occupancyAnalyzerAllDay);
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);

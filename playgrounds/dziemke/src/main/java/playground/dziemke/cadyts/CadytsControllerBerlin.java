@@ -30,7 +30,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.cadyts.car.CadytsCarScoring;
 import org.matsim.contrib.cadyts.car.CadytsContext;
-import org.matsim.contrib.cadyts.general.CadytsExtendedExpBetaPlanChanger;
+import org.matsim.contrib.cadyts.general.ExpBetaPlanChangerWithCadytsPlanRegistration;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -167,7 +167,7 @@ public class CadytsControllerBerlin {
 		controler.addPlanStrategyFactory("cadytsCar", new PlanStrategyFactory() {
 			@Override
 			public PlanStrategy createPlanStrategy(Scenario scenario, EventsManager eventsManager) {
-				return new PlanStrategyImpl(new CadytsExtendedExpBetaPlanChanger(
+				return new PlanStrategyImpl(new ExpBetaPlanChangerWithCadytsPlanRegistration(
 						scenario.getConfig().planCalcScore().getBrainExpBeta(), cContext));
 			}
 		} ) ;

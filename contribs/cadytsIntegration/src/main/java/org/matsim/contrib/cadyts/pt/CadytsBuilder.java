@@ -23,6 +23,7 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.counts.Count;
@@ -46,7 +47,7 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 	}
 
 	/*package*/ static AnalyticalCalibrator<TransitStopFacility> buildCalibrator(final Scenario sc, final Counts occupCounts ) {
-		CadytsPtConfigGroup cadytsPtConfig = (CadytsPtConfigGroup) sc.getConfig().getModule(CadytsPtConfigGroup.GROUP_NAME);
+		CadytsConfigGroup cadytsPtConfig = (CadytsConfigGroup) sc.getConfig().getModule(CadytsConfigGroup.GROUP_NAME);
 
 		//get timeBinSize_s and validate it
 		int timeBinSize_s = cadytsPtConfig.getTimeBinSize();

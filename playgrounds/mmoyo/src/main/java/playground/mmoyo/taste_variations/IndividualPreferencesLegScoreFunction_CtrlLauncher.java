@@ -28,7 +28,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.contrib.cadyts.pt.CadytsPtConfigGroup;
+import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.PersonImpl;
@@ -60,7 +60,7 @@ public class IndividualPreferencesLegScoreFunction_CtrlLauncher {
 		final Controler controler = new Controler(scn);
 		controler.setOverwriteFiles(true);
 		
-		CadytsPtConfigGroup ccc = new CadytsPtConfigGroup() ;
+		CadytsConfigGroup ccc = new CadytsConfigGroup() ;
 		controler.getConfig().addModule(ccc) ;
 		
 		

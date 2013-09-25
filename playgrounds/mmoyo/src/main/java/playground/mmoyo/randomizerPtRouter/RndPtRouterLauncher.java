@@ -20,9 +20,9 @@
 package playground.mmoyo.randomizerPtRouter;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsPlanChanger;
 import org.matsim.contrib.cadyts.pt.CadytsContext;
-import org.matsim.contrib.cadyts.pt.CadytsPtConfigGroup;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -74,7 +74,7 @@ public class RndPtRouterLauncher {
 		
 		Config config = ConfigUtils.loadConfig(configFile) ;
 		
-		CadytsPtConfigGroup ccc = new CadytsPtConfigGroup() ;
+		CadytsConfigGroup ccc = new CadytsConfigGroup() ;
 		config.addModule(ccc) ;
 		
 		int lastStrategyIdx = config.strategy().getStrategySettings().size() ;
