@@ -99,6 +99,12 @@ public class DgKS2010Router {
 		public Plan getSelectedPlan() {
 			return null;
 		}
+
+		@Override
+		public void setSelectedPlan(Plan selectedPlan) {
+			// TODO Auto-generated method stub
+			
+		}
 		
 	};
 	
