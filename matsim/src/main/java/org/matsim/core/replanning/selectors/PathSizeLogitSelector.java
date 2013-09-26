@@ -82,6 +82,8 @@ public final class PathSizeLogitSelector extends AbstractPlanSelector {
 		//this gets the choice sets C_n
 		//TODO [GL] since the lack of information in Route(),
 		//the very first and the very last link of a path will be ignored - gl
+		//dg, 09-2013: as first and last link are equal for all routes between to activities this is no major issue
+
 		for (Plan plan : plans) {
 
 			if (plan.getScore() > maxScore) maxScore = plan.getScore();
