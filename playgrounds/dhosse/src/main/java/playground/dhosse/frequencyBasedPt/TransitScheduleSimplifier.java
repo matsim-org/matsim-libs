@@ -136,6 +136,7 @@ public class TransitScheduleSimplifier{
 				//split new id in order to access the original routes
 				String[] listOfRoutes = id.split(UNDERLINE);
 			
+//				NetworkRoute newRoute = refTransitRoute.getRoute();
 				NetworkRoute newRoute = computeNetworkRoute(scenario.getNetwork(), refTransitRoute);
 			
 				List<TransitRouteStop> newStops = computeNewRouteProfile(factory, refTransitRoute, transitRoutes, listOfRoutes, newRoute, null);
@@ -320,8 +321,10 @@ public class TransitScheduleSimplifier{
 	private static NetworkRoute computeNetworkRoute(Network network, TransitRoute transitRoute) {
 		
 		List<Id> routeLinkIds = new ArrayList<Id>();
+		
 		double startOffset = Double.MAX_VALUE;
 		double endOffset = Double.MIN_VALUE;
+		
 		TransitRouteStop start = null;
 		TransitRouteStop end = null;
 		
@@ -338,50 +341,60 @@ public class TransitScheduleSimplifier{
 		
 		Id startLinkId = start.getStopFacility().getLinkId();
 		Id endLinkId = end.getStopFacility().getLinkId();
+		int cnt = 0;
 		
 		routeLinkIds.add(transitRoute.getRoute().getStartLinkId());
-		
-		for(Id linkId : transitRoute.getRoute().getLinkIds())
-			routeLinkIds.add(linkId);
-		
+		routeLinkIds.addAll(transitRoute.getRoute().getLinkIds());
 		routeLinkIds.add(transitRoute.getRoute().getEndLinkId());
 		
-		int startIndex = routeLinkIds.indexOf(startLinkId);
-		int endIndex = routeLinkIds.indexOf(endLinkId);
+		boolean started = false, ended = false;
 		
 		for(int i = 0; i < routeLinkIds.size(); i++){
-			if(routeLinkIds.indexOf(routeLinkIds.get(i)) < startIndex)
-				routeLinkIds.remove(routeLinkIds.get(i));
-			if(routeLinkIds.indexOf(routeLinkIds.get(i)) > endIndex)
-				routeLinkIds.remove(routeLinkIds.get(i));
+			
+			if(routeLinkIds.get(i).equals(startLinkId)){
+				started = true;
+				cnt++;
+			}
+			if(!started||ended)
+				routeLinkIds.remove(i);
+			
+			if(routeLinkIds.get(i).equals(endLinkId)&&cnt > 1){
+//				if(startLinkId.equals(endLinkId)){
+//					if(cnt > 1)
+//						ended = true;
+//				}
+				ended = true;
+			}
+			
 		}
 		
-		
-//		//get the start and the end link ids from the first and the last transit route stop
-//		Id startLinkId = transitRoute.getStops().get(0).getStopFacility().getLinkId();
-//		Id endLinkId = transitRoute.getStops().get(transitRoute.getStops().size()-1).getStopFacility().getLinkId();
+//		for(int i = 0; i < routeLinkIds.size(); i++){
 //		
-//		//if the initial network route doesn't contain the link id of the first stop it is added as first link
-//		if(!transitRoute.getRoute().getLinkIds().contains(startLinkId))
-//			routeLinkIds.add(startLinkId);
-//		//if the initial network route contains the start link id
-//		//set start index at the position of the start link id inside the initial network route
-//		else{
-//			startIndex = transitRoute.getRoute().getLinkIds().indexOf(startLinkId);
-//			routeLinkIds.add(transitRoute.getRoute().getLinkIds().get(startIndex));
-//			startIndex++;
+//			if(startLinkId.equals(endLinkId)){
+//				
+//				if(routeLinkIds.get(i).equals(startLinkId)&&cnt<1){
+//					started = true;
+//					cnt++;
+//				}
+//				if(!started||ended)
+//					routeLinkIds.remove(i);
+//				
+//				if(routeLinkIds.get(i).equals(endLinkId)&&cnt>0){
+//					ended = true;
+//				}
+//				
+//			}else{
+//			if(routeLinkIds.get(i).equals(startLinkId))
+//				started = true;
+//			if(!started || ended)
+//				routeLinkIds.remove(i);
+//			if(routeLinkIds.get(i).equals(endLinkId))
+//				ended = true;
+//			}
+////			if(routeLinkIds.get(i)!=null)
+////				System.out.println(routeLinkIds.get(i) + "\t" + started + "\t" + ended);
+//			
 //		}
-//		
-//		//add all link ids of the initial network route to the new route as long as the end link is not reached yet
-//		for(int i = startIndex; i < transitRoute.getRoute().getLinkIds().size() ; i++){
-//			routeLinkIds.add(transitRoute.getRoute().getLinkIds().get(i));
-//			if(transitRoute.getRoute().getLinkIds().get(i).equals(endLinkId))
-//				break;
-//		}
-//		
-//		//if the new network route doesn't contain the end link so far, add it
-//		if(!routeLinkIds.contains(endLinkId))
-//			routeLinkIds.add(endLinkId);
 		
 		return RouteUtils.createNetworkRoute(routeLinkIds, network);
 		
@@ -572,11 +585,6 @@ public class TransitScheduleSimplifier{
 			TransitRoute transitRoute = transitRoutes.get(new IdImpl(listOfTransitRoutes[i]));
 			
 			if(mergedTransitRouteContainsTransitRouteStops(mergedTransitRoute, transitRoute, startTransitRouteStop)){
-//			if(transitRoute.getStops().contains(transitRoute.getStop(startTransitRouteStop.getStopFacility()))&&!transitRoute.getId().toString().contains("merged")){
-//
-//				for(TransitRouteStop stop : mergedTransitRoute.getStops())
-//					if(!transitRoute.getStops().contains(transitRoute.getStop(stop.getStopFacility())))
-//						continue all;
 				
 				for(Departure departure : transitRoute.getDepartures().values()){
 				
