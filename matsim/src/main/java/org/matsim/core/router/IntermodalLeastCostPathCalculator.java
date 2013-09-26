@@ -28,7 +28,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator;
 public interface IntermodalLeastCostPathCalculator extends LeastCostPathCalculator {
 
 	/**
-	 * Restricts the router to only use links that have at least on of the given modes set as allowed.
+	 * Restricts the router to only use links that have at least one of the given modes set as allowed.
 	 * Set to <code>null</code> to disable any restrictions, i.e. to use all available modes.
 	 *
 	 * @param modeRestriction {@link TransportMode}s that can be used to find a route
