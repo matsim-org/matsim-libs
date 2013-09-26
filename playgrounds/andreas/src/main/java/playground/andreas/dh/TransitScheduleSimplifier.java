@@ -1,9 +1,6 @@
 package playground.andreas.dh;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -23,13 +20,12 @@ import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitScheduleFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * 
- * Simplifies a given transit schedule by merging transit routes.
+ * Simplifies a given transit schedule by merging its transit routes.
  * 
  * @author dhosse
  *
@@ -37,48 +33,51 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  */
 public class TransitScheduleSimplifier{
 	
-	private static Logger log = Logger.getLogger(TransitScheduleSimplifier.class);
+//	private final Comparator<TransitRouteStop> arrivalOffsetComparator = new Comparator<TransitRouteStop>() {
+//
+//		@Override
+//		public int compare(TransitRouteStop o1, TransitRouteStop o2) {
+//			return Double.compare(o1.getArrivalOffset(), o2.getArrivalOffset());
+//		}
+//	};
 	
-	private static final String UNDERLINE = "__";
-	
-	private static TransitSchedule schedule = null;
-	
-	private static Map<Id,TransitRoute> transitRoutes = null;
-	
-	private static Network network = null;
-	
-	private static TransitScheduleFactory factory = null;
-	
-	private static List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
-	
-	private static int mergedRoutesCounter = 0;
-	private static int routesCounter = 0;
-	
-	private static boolean isMergeTouching = false;
-	
-	private static Comparator<TransitRouteStop> arrivalOffsetComparator = new Comparator<TransitRouteStop>() {
-
-		@Override
-		public int compare(TransitRouteStop o1, TransitRouteStop o2) {
-			return Double.compare(o1.getArrivalOffset(), o2.getArrivalOffset());
-		}
-	};
+	public static TransitSchedule simplifyTransitSchedule(Scenario scenario, String outputDirectory){
+		
+		return new TransitScheduleSimplifier().mergeEqualTransitRoutes(scenario, outputDirectory);
+		
+	}
 	
 	/**
 	 * Simplifies a transit schedule by merging transit routes within a transit line with equal route profiles.
+	 * The simplified schedule is also written into a new file.
 	 * 
 	 * @param scenario the scenario containing the transit schedule to simplify
 	 * @param outputDirectory the destination folder for the simplified transit schedule file
+	 * @return the simplified transit schedule
 	 */
-	public static void mergeEqualTransitRoutes(Scenario scenario, String outputDirectory) {
+	private TransitSchedule mergeEqualTransitRoutes(final Scenario scenario, String outputDirectory) {
+
+		final Logger log = Logger.getLogger(TransitScheduleSimplifier.class);
 		
 		log.info("starting simplify method for given transit schedule...");
 		log.info("equal transit routes within a transit line will be merged...");
+		
+		final String UNDERLINE = "__";
 
-		schedule = scenario.getTransitSchedule();
-		network = scenario.getNetwork();
+		TransitScheduleFactoryImpl factory = new TransitScheduleFactoryImpl();
+		
+		TransitSchedule schedule = scenario.getTransitSchedule();
 		
 		Map<Id,TransitLine> transitLines = schedule.getTransitLines();
+		
+		TransitSchedule mergedSchedule = factory.createTransitSchedule();
+		
+		//add all stop facilities of the originial schedule to the new one
+		for(TransitStopFacility stop : schedule.getFacilities().values())
+			mergedSchedule.addStopFacility(stop);
+			
+		int routesCounter = 0;
+		int mergedRoutesCounter = 0;
 		
 		Iterator<TransitLine> transitLineIterator = transitLines.values().iterator();
 		
@@ -86,13 +85,15 @@ public class TransitScheduleSimplifier{
 			
 			TransitLine transitLine = transitLineIterator.next();
 		
-			transitRoutes = transitLine.getRoutes();
-			
-			routesCounter += transitRoutes.size();
+			Map<Id,TransitRoute> transitRoutes = transitLine.getRoutes();
 			
 			TransitRoute refTransitRoute = null;
 		
-			TransitRoute mergedTransitRoute;
+			TransitLine mergedTransitLine = factory.createTransitLine(transitLine.getId());
+			
+			TransitRoute mergedTransitRoute = null;
+			
+			routesCounter += transitRoutes.size();
 		
 			//add all transit routes of this transit line to a queue
 			PriorityQueue<Id> uncheckedRoutes = new PriorityQueue<Id>();
@@ -101,8 +102,7 @@ public class TransitScheduleSimplifier{
 			//iterate over all transit routes
 			while(uncheckedRoutes.size() > 0){
 			
-				mergedTransitRoute = null;
-				//make the current transit route the reference for the equal method
+				//make the current transit route the reference for the equality test
 				refTransitRoute = transitRoutes.get(uncheckedRoutes.remove());
 			
 				String id = refTransitRoute.getId().toString();
@@ -110,56 +110,50 @@ public class TransitScheduleSimplifier{
 				//check all other transit routes, except for the reference route
 				for(Id transitRouteId : transitRoutes.keySet()){
 				
-					if(transitRouteId.equals(refTransitRoute.getId()))
-						continue;
+					if(!transitRouteId.equals(refTransitRoute.getId())){
 			
-					TransitRoute transitRoute = transitRoutes.get(transitRouteId);
+						TransitRoute transitRoute = transitRoutes.get(transitRouteId);
 				
-					//if the route profiles are equal, "mark" current transit route by adding it to an id array
-					if(routeProfilesEqual(transitRoute,refTransitRoute)){
+						//if the route profiles are equal, "mark" current transit route by adding it to a string array
+						if(routeProfilesEqual(transitRoute, refTransitRoute)){
 					
-						id += UNDERLINE+transitRoute.getId().toString();
+							id += UNDERLINE+transitRoute.getId().toString();
 					
-						uncheckedRoutes.remove(transitRoute.getId());
+							uncheckedRoutes.remove(transitRoute.getId());
 					
+						}
 					}
 				
 				}
 			
 				//if the new id equals the old one, there are no routes to be merged...
 				if(id.equals(refTransitRoute.getId().toString())){
+					mergedTransitLine.addRoute(refTransitRoute);
 					mergedRoutesCounter++;
 					continue;
 				}
 			
-				if(factory == null)
-					factory = new TransitScheduleFactoryImpl();
-
 				//split new id in order to access the original routes
 				String[] listOfRoutes = id.split(UNDERLINE);
 			
-				NetworkRoute newRoute = computeNetworkRoute(refTransitRoute);
+				NetworkRoute newRoute = computeNetworkRoute(scenario.getNetwork(), refTransitRoute);
 			
-				List<TransitRouteStop> newStops = computeNewRouteProfile(listOfRoutes,newRoute);
+				List<TransitRouteStop> newStops = computeNewRouteProfile(factory, refTransitRoute, transitRoutes, listOfRoutes, newRoute, null);
+				compareRouteProfiles(refTransitRoute.getStops(), newStops);
 				
 				mergedTransitRoute = factory.createTransitRoute(new IdImpl(id),
 					newRoute, newStops, TransportMode.pt);
-			
-				mergeDepartures(mergedTransitRoute.getStops().get(0), mergedTransitRoute,listOfRoutes);
+				
+				mergeDepartures(factory, transitRoutes, mergedTransitRoute.getStops().get(0), mergedTransitRoute, listOfRoutes);
 
 				//add merged transit route to the transit line
-				transitLine.addRoute(mergedTransitRoute);
+				mergedTransitLine.addRoute(mergedTransitRoute);
 				mergedRoutesCounter++;
 			
-				for(int i=0;i<listOfRoutes.length;i++){
-				
-					//remove transitRoutes that have been merged from the transit schedule
-					transitLine.removeRoute(transitLine.getRoutes().get(new IdImpl(listOfRoutes[i])));
-				
-				}
-			
 			}
-		
+			
+			mergedSchedule.addTransitLine(mergedTransitLine);
+			
 		}
 		
 		log.info("number of initial transit routes: " + routesCounter);
@@ -169,12 +163,26 @@ public class TransitScheduleSimplifier{
 		
 		log.info("writing simplified transit schedule to " + outputDirectory);
 		
-		new TransitScheduleWriter(schedule).writeFile(outputDirectory);
+		new TransitScheduleWriter(mergedSchedule).writeFile(outputDirectory);
 		
 		log.info("... done.");
 		
+		return mergedSchedule;
+		
 	}
 	
+	private void compareRouteProfiles(List<TransitRouteStop> stops,
+			List<TransitRouteStop> newStops) {
+		
+		for(TransitRouteStop stop : stops){
+			
+			if(stops.indexOf(stop) != newStops.indexOf(stop))
+				newStops.set(stops.indexOf(stop), stop);
+			
+		}
+		
+	}
+
 	/**
 	 * Simplifies a transit schedule by merging transit routes within a transit line with touching route profiles.
 	 * The initial transit routes are split into sections on which they overlap. A new section is created if the number
@@ -182,18 +190,25 @@ public class TransitScheduleSimplifier{
 	 * 
 	 * @param scenario the scenario containing the transit schedule to simplify
 	 * @param outputDirectory the destination folder for the simplified transit schedule file
+	 * @return the simplified transit schedule
 	 */
-	public static void mergeTouchingTransitRoutes(Scenario scenario, String outputDirectory){
+	private TransitSchedule mergeTouchingTransitRoutes(Scenario scenario, String outputDirectory){
+		
+		final String UNDERLINE = "__";
+		
+		Logger log = Logger.getLogger(TransitScheduleSimplifier.class);
 		
 		log.info("starting simplify method for given transit schedule...");
 		log.info("transit routes within a transit line that overlap at least at one stop facility will be merged...");
 		
-		isMergeTouching = true;
+		TransitScheduleFactoryImpl factory = new TransitScheduleFactoryImpl();
+		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
 		
-		schedule = scenario.getTransitSchedule();
-		network = scenario.getNetwork();
+		TransitSchedule schedule = scenario.getTransitSchedule();
 		
 		Map<Id,TransitLine> transitLines = schedule.getTransitLines();
+		
+		int mergedRoutesCounter = 0;
 		
 		Iterator<TransitLine> transitLineIterator = transitLines.values().iterator();
 		
@@ -201,7 +216,7 @@ public class TransitScheduleSimplifier{
 		
 			TransitLine transitLine = transitLineIterator.next();
 			
-			transitRoutes = transitLine.getRoutes();
+			Map<Id,TransitRoute> transitRoutes = transitLine.getRoutes();
 		
 			TransitRoute refTransitRoute = null;
 		
@@ -210,14 +225,13 @@ public class TransitScheduleSimplifier{
 			PriorityQueue<Id> uncheckedRoutes = new PriorityQueue<Id>();
 			uncheckedRoutes.addAll(transitRoutes.keySet());
 		
-			List<TransitRouteStop> stopsEqual;
+			List<TransitRouteStop> stopsEqual = new ArrayList<TransitRouteStop>();
 		
 			//iterate over all transit routes
 			while(uncheckedRoutes.size() > 0){
 			
 				stops.clear();
-				stopsEqual = new ArrayList<TransitRouteStop>();
-			
+				
 				mergedTransitRoute = null;
 				//make current transit route the reference route
 				refTransitRoute = transitRoutes.get(uncheckedRoutes.remove());
@@ -252,17 +266,14 @@ public class TransitScheduleSimplifier{
 			
 				String[] listOfRoutes = id.split(UNDERLINE);
 			
-				if(factory == null)
-					factory = new TransitScheduleFactoryImpl();
-			
 				while(stops.size() > 0){
 
 					//create new network routes and afterwards new route profiles and transit routes
-					List<NetworkRoute> newRoutes = computeNetworkRoutesByTransitRouteStops(listOfRoutes);
+					List<NetworkRoute> newRoutes = computeNetworkRoutesByTransitRouteStops(scenario.getNetwork(), transitRoutes, listOfRoutes);
 				
 					for(NetworkRoute networkRoute : newRoutes){
 					
-						List<TransitRouteStop> newStops = computeNewRouteProfile(listOfRoutes,networkRoute);
+						List<TransitRouteStop> newStops = computeNewRouteProfile(factory, refTransitRoute, transitRoutes, listOfRoutes,networkRoute, stops);
 					
 						TransitRouteStop start = newStops.get(0);
 					
@@ -270,7 +281,7 @@ public class TransitScheduleSimplifier{
 					
 						mergedRoutesCounter++;
 					
-						mergeDepartures(start,mergedTransitRoute,listOfRoutes);
+						mergeDepartures(factory, transitRoutes, start,mergedTransitRoute,listOfRoutes);
 				
 						transitLine.addRoute(mergedTransitRoute);
 					
@@ -292,6 +303,8 @@ public class TransitScheduleSimplifier{
 		
 		log.info("... done.");
 		
+		return null;
+		
 	}
 
 	/**
@@ -304,36 +317,71 @@ public class TransitScheduleSimplifier{
 	 * @param transitRoute the reference transit route
 	 * @return the simplified network route
 	 */
-	private static NetworkRoute computeNetworkRoute(TransitRoute transitRoute) {
+	private static NetworkRoute computeNetworkRoute(Network network, TransitRoute transitRoute) {
 		
 		List<Id> routeLinkIds = new ArrayList<Id>();
-		int startIndex = 0;
+		double startOffset = Double.MAX_VALUE;
+		double endOffset = Double.MIN_VALUE;
+		TransitRouteStop start = null;
+		TransitRouteStop end = null;
 		
-		//get the start and the end link ids from the first and the last transit route stop
-		Id startLinkId = transitRoute.getStops().get(0).getStopFacility().getLinkId();
-		Id endLinkId = transitRoute.getStops().get(transitRoute.getStops().size()-1).getStopFacility().getLinkId();
-		
-		//if the initial network route doesn't contain the link id of the first stop it is added as first link
-		if(!transitRoute.getRoute().getLinkIds().contains(startLinkId))
-			routeLinkIds.add(startLinkId);
-		//if the initial network route contains the start link id
-		//set start index at the position of the start link id inside the initial network route
-		else{
-			startIndex = transitRoute.getRoute().getLinkIds().indexOf(startLinkId);
-			routeLinkIds.add(transitRoute.getRoute().getLinkIds().get(startIndex));
-			startIndex++;
+		for(TransitRouteStop stop : transitRoute.getStops()){
+			if(stop.getArrivalOffset() < startOffset){
+				startOffset = stop.getArrivalOffset();
+				start = stop;
+			}
+			if(stop.getArrivalOffset() > endOffset){
+				endOffset = stop.getArrivalOffset();
+				end = stop;
+			}
 		}
 		
-		//add all link ids of the initial network route to the new route as long as the end link is not reached yet
-		for(int i = startIndex; i < transitRoute.getRoute().getLinkIds().size() ; i++){
-			routeLinkIds.add(transitRoute.getRoute().getLinkIds().get(i));
-			if(transitRoute.getRoute().getLinkIds().get(i).equals(endLinkId))
-				break;
+		Id startLinkId = start.getStopFacility().getLinkId();
+		Id endLinkId = end.getStopFacility().getLinkId();
+		
+		routeLinkIds.add(transitRoute.getRoute().getStartLinkId());
+		
+		for(Id linkId : transitRoute.getRoute().getLinkIds())
+			routeLinkIds.add(linkId);
+		
+		routeLinkIds.add(transitRoute.getRoute().getEndLinkId());
+		
+		int startIndex = routeLinkIds.indexOf(startLinkId);
+		int endIndex = routeLinkIds.indexOf(endLinkId);
+		
+		for(int i = 0; i < routeLinkIds.size(); i++){
+			if(routeLinkIds.indexOf(routeLinkIds.get(i)) < startIndex)
+				routeLinkIds.remove(routeLinkIds.get(i));
+			if(routeLinkIds.indexOf(routeLinkIds.get(i)) > endIndex)
+				routeLinkIds.remove(routeLinkIds.get(i));
 		}
 		
-		//if the new network route doesn't contain the end link so far, add it
-		if(!routeLinkIds.contains(endLinkId))
-			routeLinkIds.add(endLinkId);
+		
+//		//get the start and the end link ids from the first and the last transit route stop
+//		Id startLinkId = transitRoute.getStops().get(0).getStopFacility().getLinkId();
+//		Id endLinkId = transitRoute.getStops().get(transitRoute.getStops().size()-1).getStopFacility().getLinkId();
+//		
+//		//if the initial network route doesn't contain the link id of the first stop it is added as first link
+//		if(!transitRoute.getRoute().getLinkIds().contains(startLinkId))
+//			routeLinkIds.add(startLinkId);
+//		//if the initial network route contains the start link id
+//		//set start index at the position of the start link id inside the initial network route
+//		else{
+//			startIndex = transitRoute.getRoute().getLinkIds().indexOf(startLinkId);
+//			routeLinkIds.add(transitRoute.getRoute().getLinkIds().get(startIndex));
+//			startIndex++;
+//		}
+//		
+//		//add all link ids of the initial network route to the new route as long as the end link is not reached yet
+//		for(int i = startIndex; i < transitRoute.getRoute().getLinkIds().size() ; i++){
+//			routeLinkIds.add(transitRoute.getRoute().getLinkIds().get(i));
+//			if(transitRoute.getRoute().getLinkIds().get(i).equals(endLinkId))
+//				break;
+//		}
+//		
+//		//if the new network route doesn't contain the end link so far, add it
+//		if(!routeLinkIds.contains(endLinkId))
+//			routeLinkIds.add(endLinkId);
 		
 		return RouteUtils.createNetworkRoute(routeLinkIds, network);
 		
@@ -347,7 +395,7 @@ public class TransitScheduleSimplifier{
 	 * @param listOfRoutes the id list of all touching transit routes
 	 * @return a list of network routes for the merged transit routes
 	 */
-	private static List<NetworkRoute> computeNetworkRoutesByTransitRouteStops(String[] listOfRoutes) {
+	private static List<NetworkRoute> computeNetworkRoutesByTransitRouteStops(Network network, Map<Id,TransitRoute> transitRoutes, String[] listOfRoutes) {
 		
 		List<NetworkRoute> newNetworkRoutes = new ArrayList<NetworkRoute>();
 		
@@ -418,7 +466,7 @@ public class TransitScheduleSimplifier{
 							transitRoutesContaining = containing;
 						}
 						else{
-							newNetworkRoutes.add(RouteUtils.createNetworkRoute(routeLinkIds, network));//TODO check: config: umsteigezeit = 0!, taucht route in dijkstra auf = ja!!??
+							newNetworkRoutes.add(RouteUtils.createNetworkRoute(routeLinkIds, network));
 							transitRoutesContaining = containing;
 							
 							for(int i=0;i<routeLinkIds.size()-1;i++)
@@ -464,103 +512,71 @@ public class TransitScheduleSimplifier{
 		
 	}
 
-
-//	private static List<TransitRouteStop> computeNewTransitRouteStops(String[] listOfRoutes, Map<Id, TransitRoute> transitRoutes) {
-//		
-//		Map<TransitStopFacility,Double> arrivalOffsets = new HashMap<TransitStopFacility,Double>();
-//		Map<TransitStopFacility,Double> departureOffsets = new HashMap<TransitStopFacility,Double>();
-//		
-//		Map<TransitStopFacility,Integer> arrivalCounter = new HashMap<TransitStopFacility,Integer>();
-//		Map<TransitStopFacility,Integer> departureCounter = new HashMap<TransitStopFacility,Integer>();
-//		
-//		List<TransitRouteStop> newStops = new ArrayList<TransitRouteStop>();
-//		
-//		for(int i = 0; i< listOfRoutes.length; i++){
-//			
-//			TransitRoute transitRoute = transitRoutes.get(new IdImpl(listOfRoutes[i]));
-//			
-//			for(TransitRouteStop stop : transitRoute.getStops()){
-//				
-//				if(!arrivalOffsets.containsKey(stop.getStopFacility())){
-//					arrivalOffsets.put(stop.getStopFacility(), stop.getArrivalOffset());
-//					arrivalCounter.put(stop.getStopFacility(), 1);
-//				} else{
-//					
-//					double arrivalOffset = ( arrivalOffsets.get(stop.getStopFacility()) * arrivalCounter.get(stop.getStopFacility()) +
-//							stop.getArrivalOffset() ) / ( arrivalCounter.get(stop.getStopFacility()) + 1 );
-//					arrivalOffsets.put(stop.getStopFacility(), arrivalOffset);
-//					arrivalCounter.put(stop.getStopFacility(), arrivalCounter.get(stop.getStopFacility())+1);
-//					
-//				}
-//				
-//				if(!departureOffsets.containsKey(stop.getStopFacility())){
-//					departureOffsets.put(stop.getStopFacility(), stop.getDepartureOffset());
-//					departureCounter.put(stop.getStopFacility(), 1);
-//				} else{
-//					
-//					double departureOffset = ( departureOffsets.get(stop.getStopFacility()) * departureCounter.get(stop.getStopFacility()) +
-//							stop.getDepartureOffset() ) / ( departureCounter.get(stop.getStopFacility()) + 1 );
-//					departureOffsets.put(stop.getStopFacility(), departureOffset);
-//					departureCounter.put(stop.getStopFacility(), departureCounter.get(stop.getStopFacility())+1);
-//
-//				}
-//				
-//			}
-//			
-//		}
-//		
-//		for( TransitStopFacility stop : arrivalOffsets.keySet() ){
-//			TransitRouteStop newStop = factory.createTransitRouteStop(stop, arrivalOffsets.get(stop), departureOffsets.get(stop));
-//			newStop.setAwaitDepartureTime(true);
-//			newStops.add(newStop);
-//		}
-//		
-//		Collections.sort(newStops,transitRouteStopComparator);
-//		
-//		return newStops;
-//		
-//	}
-
-//	private static void mergeDepartures(String[] listOfRoutes, TransitRoute mergedTransitRoute, Map<Id,TransitRoute> transitRoutes) {
-//		
-//		for(int i = 0; i < listOfRoutes.length; i++){
-//			
-//			TransitRoute transitRoute = transitRoutes.get(new IdImpl(listOfRoutes[i]));
-//			
-//			for(Departure departure : transitRoute.getDepartures().values()){
-//				
-//				String departureId = (String) (mergedTransitRoute.getDepartures().size() < 10 ?
-//						"0"+Integer.toString(mergedTransitRoute.getDepartures().size()) :
-//							Integer.toString(mergedTransitRoute.getDepartures().size()));
-//				Departure dep = factory.createDeparture(new IdImpl(departureId), departure.getDepartureTime());
-//				dep.setVehicleId(departure.getVehicleId());
-//				
-//				mergedTransitRoute.addDeparture(dep);
-//				
-//			}
-//			
-//		}
-//		
-//	}
 	
+	/**
+	 * 
+	 * Creates a new route profile for a simplified transit route.
+	 * The arrival and departure offsets of each stop are merged to
+	 * get the average travel time to and stop time for all routes at that stop.
+	 * 
+	 * @param newRoute the new network route
+	 * @return merged route profile
+	 */
+	private List<TransitRouteStop> computeNewRouteProfile(TransitScheduleFactoryImpl factory,
+			TransitRoute refTransitRoute, Map<Id,TransitRoute> transitRoutes, String[] listOfRoutes,NetworkRoute newRoute,
+			List<TransitRouteStop> stops){
+		
+		List<TransitRouteStop> newStops = new ArrayList<TransitRouteStop>();
+		
+		for(int i = 0; i < refTransitRoute.getStops().size(); i++){
+			
+			double arrivalOffset = 0;
+			int arrCounter = 0;
+			double departureOffset = 0;
+			int depCounter = 0;
+			
+			for(int j = 0; j < listOfRoutes.length; j++){
+				
+				TransitRouteStop stop = transitRoutes.get(new IdImpl(listOfRoutes[j])).getStops().get(i);
+				arrivalOffset += stop.getArrivalOffset();
+				arrCounter++;
+				departureOffset += stop.getDepartureOffset();
+				depCounter++;
+				
+			}
+			
+			TransitRouteStop newStop = factory.createTransitRouteStop(refTransitRoute.getStops().get(i).getStopFacility(), arrivalOffset/arrCounter,
+					departureOffset/depCounter);
+			
+			newStop.setAwaitDepartureTime(refTransitRoute.getStops().get(i).isAwaitDepartureTime());
+			
+			newStops.add(newStop);
+			
+		}
+		
+		return newStops;
+		
+	}
+
 	/**
 	 * Merges the departures of all transit routes that are to be merged.
 	 * 
 	 * @param startTransitRouteStop the first stop of the new transit route
 	 * @param mergedTransitRoute the new transit route
 	 */
-	private static void mergeDepartures(TransitRouteStop startTransitRouteStop,
+	private void mergeDepartures(TransitScheduleFactoryImpl factory, Map<Id,TransitRoute> transitRoutes, TransitRouteStop startTransitRouteStop,
 			TransitRoute mergedTransitRoute,String[] listOfTransitRoutes) {
 
-		all:for(int i = 0; i < listOfTransitRoutes.length; i++){
+		for(int i = 0; i < listOfTransitRoutes.length; i++){
 
 			TransitRoute transitRoute = transitRoutes.get(new IdImpl(listOfTransitRoutes[i]));
 			
-			if(transitRoute.getStops().contains(transitRoute.getStop(startTransitRouteStop.getStopFacility()))&&!transitRoute.getId().toString().contains("merged")){
-
-				for(TransitRouteStop stop : mergedTransitRoute.getStops())
-					if(!transitRoute.getStops().contains(transitRoute.getStop(stop.getStopFacility())))
-						continue all;
+			if(mergedTransitRouteContainsTransitRouteStops(mergedTransitRoute, transitRoute, startTransitRouteStop)){
+//			if(transitRoute.getStops().contains(transitRoute.getStop(startTransitRouteStop.getStopFacility()))&&!transitRoute.getId().toString().contains("merged")){
+//
+//				for(TransitRouteStop stop : mergedTransitRoute.getStops())
+//					if(!transitRoute.getStops().contains(transitRoute.getStop(stop.getStopFacility())))
+//						continue all;
 				
 				for(Departure departure : transitRoute.getDepartures().values()){
 				
@@ -583,118 +599,13 @@ public class TransitScheduleSimplifier{
 	}
 
 	/**
-	 * 
-	 * Creates a new route profile for a simplified transit route.
-	 * The arrival and departure offsets of each stop are also merged to
-	 * get the average travel and stop time for all routes to that stop.
-	 * 
-	 * @param newRoute the new network route
-	 * @return
-	 */
-	private static List<TransitRouteStop> computeNewRouteProfile(String[] listOfRoutes,NetworkRoute newRoute){
-		
-		Map<TransitStopFacility,Double> arrivalOffsets = new HashMap<TransitStopFacility,Double>();
-		Map<TransitStopFacility,Double> departureOffsets = new HashMap<TransitStopFacility,Double>();
-		
-		Map<TransitStopFacility,Integer> arrivalCounter = new HashMap<TransitStopFacility,Integer>();
-		Map<TransitStopFacility,Integer> departureCounter = new HashMap<TransitStopFacility,Integer>();
-		
-		List<TransitRouteStop> stops2Remove = new ArrayList<TransitRouteStop>();
-		
-		List<TransitRouteStop> newStops = new ArrayList<TransitRouteStop>();
-		
-		for(int i=0; i < listOfRoutes.length; i++){
-			
-			TransitRoute transitRoute = transitRoutes.get(new IdImpl(listOfRoutes[i]));
-			
-			for(TransitRouteStop stop : transitRoute.getStops()){
-				
-				Id linkId = stop.getStopFacility().getLinkId();
-				
-				if(newRoute.getLinkIds().contains(linkId)||linkId.equals(newRoute.getStartLinkId())||linkId.equals(newRoute.getEndLinkId())){
-		
-					//if the current route stop has not yet been visited add it to the collection of arrival offsets
-					//else compute the average arrival offset of the contained routes and the new one
-					if(!arrivalOffsets.containsKey(stop.getStopFacility())){
-						arrivalOffsets.put(stop.getStopFacility(), stop.getArrivalOffset());
-						arrivalCounter.put(stop.getStopFacility(), 1);
-					} else{
-						
-						double arrivalOffset = ( arrivalOffsets.get(stop.getStopFacility()) * arrivalCounter.get(stop.getStopFacility()) +
-								stop.getArrivalOffset() ) / ( arrivalCounter.get(stop.getStopFacility()) + 1 );
-						arrivalOffsets.put(stop.getStopFacility(), arrivalOffset);
-						arrivalCounter.put(stop.getStopFacility(), arrivalCounter.get(stop.getStopFacility())+1);
-						
-					}
-					
-					//same as arrival offsets
-					if(!departureOffsets.containsKey(stop.getStopFacility())){
-						departureOffsets.put(stop.getStopFacility(), stop.getDepartureOffset());
-						departureCounter.put(stop.getStopFacility(), 1);
-					} else{
-						
-						double departureOffset = ( departureOffsets.get(stop.getStopFacility()) * departureCounter.get(stop.getStopFacility()) +
-								stop.getDepartureOffset() ) / ( departureCounter.get(stop.getStopFacility()) + 1 );
-						departureOffsets.put(stop.getStopFacility(), departureOffset);
-						departureCounter.put(stop.getStopFacility(), departureCounter.get(stop.getStopFacility())+1);
-
-					}
-					
-					if(!stops2Remove.contains(stop))
-						stops2Remove.add(stop);
-					
-				}
-				
-			}
-			
-		}
-		
-		double arrivalOffset = 0.;
-		TransitRouteStop initialStop = null;
-		
-		//create new transit route stops and add them
-		for( TransitStopFacility stop : arrivalOffsets.keySet() ){
-			
-			TransitRouteStop newStop = null;
-			
-			if(stop.getLinkId().equals(newRoute.getStartLinkId())){
-				arrivalOffset = arrivalOffsets.get(stop);
-				newStop = factory.createTransitRouteStop(stop, 0., departureOffsets.get(stop) - arrivalOffset);
-				newStop.setAwaitDepartureTime(true);
-			} else{
-				
-				for(TransitRouteStop routeStop : stops2Remove)
-					if(routeStop.getStopFacility().equals(stop))
-						initialStop = routeStop;
-				
-//				if(stop.getLinkId().equals(newRoute.getEndLinkId()))
-//					newStop = factory.createTransitRouteStop(stop, arrivalOffsets.get(stop) - arrivalOffset, arrivalOffsets.get(stop) - arrivalOffset);
-				/*else*/ newStop = factory.createTransitRouteStop(stop, arrivalOffsets.get(stop) - arrivalOffset, departureOffsets.get(stop) - arrivalOffset);
-				newStop.setAwaitDepartureTime(initialStop.isAwaitDepartureTime());
-			}
-			
-			
-			newStops.add(newStop);
-		}
-		
-		//remove visited stops for they are not contained in any other transit route
-		for(TransitRouteStop stop : stops2Remove)
-			stops.remove(stop);
-		
-		Collections.sort(newStops,arrivalOffsetComparator);
-		
-		return newStops;
-		
-	}
-
-	/**
 	 * Compares the route profiles of two given transit routes for equality.
 	 * 
 	 * @param transitRoute
 	 * @param transitRoute2
 	 * @return true if the route profiles are equal, false if not
 	 */
-	private static boolean routeProfilesEqual(TransitRoute transitRoute,
+	private boolean routeProfilesEqual(TransitRoute transitRoute,
 			TransitRoute transitRoute2) {
 		
 		if(transitRoute.getStops().size() != transitRoute2.getStops().size())
@@ -717,7 +628,7 @@ public class TransitScheduleSimplifier{
 	 * @param refTransitRoute
 	 * @return an empty list if the transit routes do not overlap, else the collection of the stops that both transit routes contain
 	 */
-	private static List<TransitRouteStop> routeProfilesTouch(TransitRoute transitRoute,
+	private List<TransitRouteStop> routeProfilesTouch(TransitRoute transitRoute,
 			TransitRoute refTransitRoute) {
 		
 		List<TransitRouteStop> stops = new ArrayList<TransitRouteStop>();
@@ -728,6 +639,22 @@ public class TransitScheduleSimplifier{
 		}
 		
 		return stops;
+	}
+	
+	private boolean mergedTransitRouteContainsTransitRouteStops(TransitRoute mergedTransitRoute, TransitRoute transitRoute, TransitRouteStop start){
+		
+		if(!transitRoute.getStops().contains(transitRoute.getStop(start.getStopFacility()))||transitRoute.getId().toString().contains("merged"))
+			return false;
+		
+		for(TransitRouteStop stop : mergedTransitRoute.getStops()){
+			
+			if(!transitRoute.getStops().contains(transitRoute.getStop(stop.getStopFacility())))
+				return false;
+			
+		}
+		
+		return true;
+		
 	}
 
 }
