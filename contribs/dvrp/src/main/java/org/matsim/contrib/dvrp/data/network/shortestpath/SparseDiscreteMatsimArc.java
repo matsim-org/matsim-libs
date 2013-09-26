@@ -21,8 +21,8 @@ package org.matsim.contrib.dvrp.data.network.shortestpath;
 
 import org.matsim.contrib.dvrp.data.network.*;
 
-import pl.poznan.put.util.lang.TimeDiscretizer;
 import pl.poznan.put.vrp.dynamic.data.network.*;
+import pl.poznan.put.vrp.dynamic.util.TimeDiscretizer;
 
 
 /**

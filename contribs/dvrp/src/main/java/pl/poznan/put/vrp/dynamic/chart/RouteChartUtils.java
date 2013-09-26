@@ -1,0 +1,209 @@
+package pl.poznan.put.vrp.dynamic.chart;
+
+import java.awt.*;
+import java.util.*;
+import java.util.List;
+
+import org.jfree.chart.*;
+import org.jfree.chart.axis.NumberAxis;
+import org.jfree.chart.labels.XYItemLabelGenerator;
+import org.jfree.chart.plot.*;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.data.xy.XYDataset;
+
+import pl.poznan.put.vrp.dynamic.data.VrpData;
+import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
+import pl.poznan.put.vrp.dynamic.data.schedule.*;
+import pl.poznan.put.vrp.dynamic.data.schedule.Task.TaskStatus;
+
+
+/**
+ * @author michalm
+ */
+public class RouteChartUtils
+{
+    public static JFreeChart chartVertices(VrpData data)
+    {
+        VertexDataset nData = new VertexDataset();
+        nData.addSeries("Depot", VertexSources.createFromLocalizables(data.getDepots()));
+        nData.addSeries("Customers", VertexSources.createFromLocalizables(data.getCustomers()));
+
+        JFreeChart chart = ChartFactory.createXYLineChart("Vertices", "X", "Y", nData,
+                PlotOrientation.VERTICAL, true, true, false);
+
+        XYPlot plot = (XYPlot)chart.getPlot();
+        plot.setRangeGridlinesVisible(false);
+        plot.setDomainGridlinesVisible(false);
+
+        NumberAxis yAxis = (NumberAxis)plot.getRangeAxis();
+        yAxis.setAutoRangeIncludesZero(false);
+
+        XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer)plot.getRenderer();
+        renderer.setSeriesShapesVisible(0, true);
+        renderer.setSeriesLinesVisible(0, false);
+        renderer.setSeriesShapesVisible(1, true);
+        renderer.setSeriesLinesVisible(1, false);
+
+        return chart;
+    }
+
+
+    public static JFreeChart chartRoutes(VrpData data)
+    {
+        VertexDataset nData = new VertexDataset();
+        nData.addSeries("Depot", VertexSources.createFromLocalizables(data.getDepots()));
+
+        List<Vehicle> vehicles = data.getVehicles();
+        for (int i = 0; i < vehicles.size(); i++) {
+            Schedule schedule = vehicles.get(i).getSchedule();
+            nData.addSeries(Integer.toString(i), VertexSources.createVertexSource(schedule));
+        }
+
+        JFreeChart chart = ChartFactory.createXYLineChart("Routes", "X", "Y", nData,
+                PlotOrientation.VERTICAL, true, true, false);
+
+        XYPlot plot = (XYPlot)chart.getPlot();
+        plot.setRangeGridlinesVisible(false);
+        plot.setDomainGridlinesVisible(false);
+        plot.setBackgroundPaint(Color.white);
+
+        NumberAxis yAxis = (NumberAxis)plot.getRangeAxis();
+        yAxis.setAutoRangeIncludesZero(false);
+
+        XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer)plot.getRenderer();
+        renderer.setSeriesShapesVisible(0, true);
+        renderer.setSeriesLinesVisible(0, false);
+        renderer.setSeriesItemLabelsVisible(0, true);
+
+        renderer.setBaseItemLabelGenerator(new XYItemLabelGenerator() {
+            public String generateLabel(XYDataset dataset, int series, int item)
+            {
+                return ((VertexDataset)dataset).getText(series, item);
+            }
+        });
+
+        for (int i = 1; i <= vehicles.size(); i++) {
+            renderer.setSeriesShapesVisible(i, true);
+            renderer.setSeriesLinesVisible(i, true);
+            renderer.setSeriesItemLabelsVisible(i, true);
+        }
+
+        return chart;
+    }
+
+
+    public static JFreeChart chartRoutesByStatus(VrpData data)
+    {
+        VertexDataset nData = new VertexDataset();
+        nData.addSeries("Depot", VertexSources.createFromLocalizables(data.getDepots()));
+
+        List<Vehicle> vehicles = data.getVehicles();
+        for (int i = 0; i < vehicles.size(); i++) {
+            Schedule schedule = vehicles.get(i).getSchedule();
+            Map<TaskStatus, VertexSource> vsByStatus = createVertexSourceByStatus(schedule);
+            nData.addSeries(i + "-PR", vsByStatus.get(TaskStatus.PERFORMED));
+            nData.addSeries(i + "-ST", vsByStatus.get(TaskStatus.STARTED));
+            nData.addSeries(i + "-PL", vsByStatus.get(TaskStatus.PLANNED));
+        }
+
+        String title = "Time " + data.getTime();
+        JFreeChart chart = ChartFactory.createXYLineChart(title, "X", "Y", nData,
+                PlotOrientation.VERTICAL, false, true, false);
+
+        XYPlot plot = (XYPlot)chart.getPlot();
+        plot.setRangeGridlinesVisible(false);
+        plot.setDomainGridlinesVisible(false);
+        plot.setBackgroundPaint(Color.white);
+
+        NumberAxis yAxis = (NumberAxis)plot.getRangeAxis();
+        yAxis.setAutoRangeIncludesZero(false);
+
+        XYLineAndShapeRenderer renderer = (XYLineAndShapeRenderer)plot.getRenderer();
+        renderer.setSeriesShapesVisible(0, true);
+        renderer.setSeriesLinesVisible(0, false);
+        renderer.setSeriesItemLabelsVisible(0, true);
+
+        renderer.setBaseItemLabelGenerator(new LabelGenerator());
+
+        Paint[] paints = DefaultDrawingSupplier.DEFAULT_PAINT_SEQUENCE;
+        Shape[] shapes = DefaultDrawingSupplier.DEFAULT_SHAPE_SEQUENCE;
+
+        for (int i = 0; i < vehicles.size(); i++) {
+            int s = 3 * i;
+
+            renderer.setSeriesItemLabelsVisible(s + 1, true);
+            renderer.setSeriesItemLabelsVisible(s + 2, true);
+            renderer.setSeriesItemLabelsVisible(s + 3, true);
+
+            renderer.setSeriesShapesVisible(s + 1, true);
+            renderer.setSeriesShapesVisible(s + 2, true);
+            renderer.setSeriesShapesVisible(s + 3, true);
+
+            renderer.setSeriesLinesVisible(s + 1, true);
+            renderer.setSeriesLinesVisible(s + 2, true);
+            renderer.setSeriesLinesVisible(s + 3, true);
+
+            renderer.setSeriesPaint(s + 1, paints[ (i + 1) % paints.length]);
+            renderer.setSeriesPaint(s + 2, paints[ (i + 1) % paints.length]);
+            renderer.setSeriesPaint(s + 3, paints[ (i + 1) % paints.length]);
+
+            renderer.setSeriesShape(s + 1, shapes[ (i + 1) % shapes.length]);
+            renderer.setSeriesShape(s + 2, shapes[ (i + 1) % shapes.length]);
+            renderer.setSeriesShape(s + 3, shapes[ (i + 1) % shapes.length]);
+
+            renderer.setSeriesStroke(s + 2, new BasicStroke(3));
+            renderer.setSeriesStroke(s + 3, new BasicStroke(1, BasicStroke.CAP_ROUND,
+                    BasicStroke.JOIN_ROUND, 1, new float[] { 5f, 5f }, 0));
+        }
+
+        return chart;
+    }
+
+
+    private static Map<TaskStatus, VertexSource> createVertexSourceByStatus(Schedule schedule)
+    {
+        Iterator<DriveTask> taskIter = Schedules.createDriveTaskIter(schedule);
+
+        // creating lists of DriveTasks
+        Map<TaskStatus, List<DriveTask>> taskListByStatus = new EnumMap<TaskStatus, List<DriveTask>>(
+                TaskStatus.class);
+
+        for (TaskStatus ts : TaskStatus.values()) {
+            taskListByStatus.put(ts, new ArrayList<DriveTask>());
+        }
+
+        while (taskIter.hasNext()) {
+            DriveTask t = taskIter.next();
+            taskListByStatus.get(t.getStatus()).add(t);
+        }
+
+        // creating VertexSources
+        Map<TaskStatus, VertexSource> vertexSourceByStatus = new EnumMap<TaskStatus, VertexSource>(
+                TaskStatus.class);
+
+        for (TaskStatus ts : TaskStatus.values()) {
+            vertexSourceByStatus.put(ts,
+                    VertexSources.createFromDriveTasks(taskListByStatus.get(ts)));
+        }
+
+        return vertexSourceByStatus;
+    }
+
+
+    private static class LabelGenerator
+        implements XYItemLabelGenerator
+    {
+        public String generateLabel(XYDataset dataset, int series, int item)
+        {
+            if (series == 0) {
+                return "D";
+            }
+
+            if (item == 0) {
+                return null;
+            }
+
+            return ((VertexDataset)dataset).getText(series, item);
+        }
+    }
+}

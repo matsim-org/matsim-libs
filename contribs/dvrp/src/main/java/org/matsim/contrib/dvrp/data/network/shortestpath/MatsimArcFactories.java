@@ -23,8 +23,8 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.util.*;
 
-import pl.poznan.put.util.lang.TimeDiscretizer;
 import pl.poznan.put.vrp.dynamic.data.network.ArcFactory;
+import pl.poznan.put.vrp.dynamic.util.TimeDiscretizer;
 
 
 public class MatsimArcFactories
