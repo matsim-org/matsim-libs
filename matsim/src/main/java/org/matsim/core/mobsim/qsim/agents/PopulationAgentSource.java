@@ -61,7 +61,6 @@ public class PopulationAgentSource implements AgentSource {
 	public void insertAgentsIntoMobsim() {
 		for (Person p : population.getPersons().values()) {
 			MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson(p);
-			qsim.insertAgentIntoMobsim(agent);
 			Plan plan = p.getSelectedPlan();
 			Set<String> seenModes = new HashSet<String>();
 			for (PlanElement planElement : plan.getPlanElements()) {
@@ -76,6 +75,11 @@ public class PopulationAgentSource implements AgentSource {
 					}
 				}
 			}
+			// When the agent is inserted, it immediately starts its first activity, and
+			// possibly ends it (if it is 0-duration or if the simulation start time is later than
+			// the activity end time), so the action really starts here!
+			// E.g. the vehicle must already be in place at this point.
+			qsim.insertAgentIntoMobsim(agent);
 		}
 	}
 
