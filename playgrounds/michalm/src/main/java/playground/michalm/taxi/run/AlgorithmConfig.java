@@ -17,16 +17,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.vrp.run;
+package playground.michalm.taxi.run;
 
-import static pl.poznan.put.vrp.dynamic.taxi.immediaterequest.TaxiOptimizationPolicy.*;
-import static playground.michalm.vrp.run.AlgorithmConfig.AlgorithmType.*;
-import static playground.michalm.vrp.run.OnlineDvrpLauncherUtils.TravelDisutilitySource.*;
-import static playground.michalm.vrp.run.OnlineDvrpLauncherUtils.TravelTimeSource.*;
+import static playground.michalm.taxi.optimizer.immediaterequest.TaxiOptimizationPolicy.*;
+import static playground.michalm.taxi.run.AlgorithmConfig.AlgorithmType.*;
+import static playground.michalm.taxi.run.OnlineDvrpLauncherUtils.TravelDisutilitySource.*;
+import static playground.michalm.taxi.run.OnlineDvrpLauncherUtils.TravelTimeSource.*;
 import pl.poznan.put.vrp.dynamic.data.VrpData;
-import pl.poznan.put.vrp.dynamic.taxi.immediaterequest.*;
-import playground.michalm.vrp.run.OnlineDvrpLauncherUtils.TravelDisutilitySource;
-import playground.michalm.vrp.run.OnlineDvrpLauncherUtils.TravelTimeSource;
+import playground.michalm.taxi.optimizer.immediaterequest.*;
+import playground.michalm.taxi.run.OnlineDvrpLauncherUtils.*;
 
 
 /*package*/class AlgorithmConfig

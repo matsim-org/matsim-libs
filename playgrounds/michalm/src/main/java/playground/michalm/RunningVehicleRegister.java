@@ -17,22 +17,55 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.vrp;
+package playground.michalm;
 
-import org.matsim.contrib.dvrp.data.network.shortestpath.ShortestPathDynLeg;
+import java.util.*;
 
-import pl.poznan.put.vrp.dynamic.data.schedule.DriveTask;
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.api.experimental.events.*;
+import org.matsim.core.api.experimental.events.handler.*;
+import org.matsim.core.events.handler.EventHandler;
 
 
-public class TaxiLeg
-    extends ShortestPathDynLeg
+public class RunningVehicleRegister
+    implements EventHandler, AgentDepartureEventHandler, AgentStuckEventHandler,
+    AgentArrivalEventHandler
 {
-    public TaxiLeg(DriveTask driveTask)
+    private Map<Id, AgentDepartureEvent> runningAgentsMap = new HashMap<Id, AgentDepartureEvent>();
+
+
+    @Override
+    public void handleEvent(AgentDepartureEvent event)
     {
-        super(driveTask);
+        runningAgentsMap.put(event.getPersonId(), event);
     }
 
 
-    public void endLeg(double now)
-    {}
+    @Override
+    public void handleEvent(AgentArrivalEvent event)
+    {
+        runningAgentsMap.remove(event.getPersonId());
+    }
+
+
+    @Override
+    public void handleEvent(AgentStuckEvent event)
+    {
+        //throw new RuntimeException();
+        System.err.println("AgentStuckEvent:");
+        System.err.println(event);
+    }
+
+
+    public Set<Id> getRunningAgentIds()
+    {
+        return runningAgentsMap.keySet();
+    }
+
+
+    @Override
+    public void reset(int iteration)
+    {
+        runningAgentsMap.clear();
+    }
 }

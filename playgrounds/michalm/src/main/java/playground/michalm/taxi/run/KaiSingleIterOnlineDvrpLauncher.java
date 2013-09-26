@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.vrp.run;
+package playground.michalm.taxi.run;
 
 /*package*/class KaiSingleIterOnlineDvrpLauncher
 {

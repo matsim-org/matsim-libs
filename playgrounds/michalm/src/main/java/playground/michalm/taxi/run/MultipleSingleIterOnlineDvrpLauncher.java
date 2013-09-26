@@ -17,16 +17,16 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.vrp.run;
+package playground.michalm.taxi.run;
 
 import java.io.*;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.matsim.core.gbl.MatsimRandom;
 
-import pl.poznan.put.vrp.dynamic.taxi.*;
-import pl.poznan.put.vrp.dynamic.taxi.TaxiEvaluator.TaxiEvaluation;
-import playground.michalm.vrp.run.OnlineDvrpLauncherUtils.TravelTimeSource;
+import playground.michalm.taxi.optimizer.*;
+import playground.michalm.taxi.optimizer.TaxiEvaluator.TaxiEvaluation;
+import playground.michalm.taxi.run.OnlineDvrpLauncherUtils.TravelTimeSource;
 
 
 /*package*/class MultipleSingleIterOnlineDvrpLauncher

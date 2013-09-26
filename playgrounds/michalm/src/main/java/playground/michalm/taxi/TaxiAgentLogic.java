@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.vrp;
+package playground.michalm.taxi;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
@@ -32,7 +32,7 @@ import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
 import pl.poznan.put.vrp.dynamic.data.online.VehicleTrackerListener;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
-import pl.poznan.put.vrp.dynamic.taxi.schedule.TaxiDriveTask;
+import playground.michalm.taxi.optimizer.schedule.TaxiDriveTask;
 
 
 public class TaxiAgentLogic

@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.vrp;
+package playground.michalm.taxi;
 
 import java.util.*;
 
@@ -30,7 +30,7 @@ import org.matsim.core.mobsim.qsim.interfaces.*;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
-import pl.poznan.put.vrp.dynamic.taxi.TaxiOptimizer;
+import playground.michalm.taxi.optimizer.TaxiOptimizer;
 
 
 public class TaxiSimEngine

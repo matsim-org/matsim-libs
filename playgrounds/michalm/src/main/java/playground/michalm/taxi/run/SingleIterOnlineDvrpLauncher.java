@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.vrp.run;
+package playground.michalm.taxi.run;
 
 import java.io.*;
 import java.util.*;
@@ -37,10 +37,10 @@ import pl.poznan.put.util.jfreechart.ChartUtils;
 import pl.poznan.put.vrp.dynamic.chart.ScheduleChartUtils;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.model.Request.ReqStatus;
-import pl.poznan.put.vrp.dynamic.taxi.*;
-import pl.poznan.put.vrp.dynamic.taxi.immediaterequest.ImmediateRequestTaxiOptimizer;
+import playground.michalm.RunningVehicleRegister;
+import playground.michalm.taxi.optimizer.*;
+import playground.michalm.taxi.optimizer.immediaterequest.ImmediateRequestTaxiOptimizer;
 import playground.michalm.util.gis.Schedules2GIS;
-import playground.michalm.vrp.RunningVehicleRegister;
 
 
 /*package*/class SingleIterOnlineDvrpLauncher

@@ -1,4 +1,4 @@
-package playground.michalm.vrp.run;
+package playground.michalm.taxi.run;
 
 import java.io.*;
 import java.util.*;
@@ -31,13 +31,13 @@ import org.matsim.vis.otfvis.OTFClientControl;
 import org.matsim.vis.otfvis.gui.OTFQueryControl;
 import org.matsim.vis.otfvis.opengl.queries.QueryAgentPlan;
 
-import pl.poznan.put.util.lang.TimeDiscretizer;
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.network.ArcFactory;
-import pl.poznan.put.vrp.dynamic.taxi.TaxiOptimizer;
+import pl.poznan.put.vrp.dynamic.util.TimeDiscretizer;
 import playground.michalm.demand.ODDemandGenerator;
-import playground.michalm.vrp.*;
+import playground.michalm.taxi.*;
+import playground.michalm.taxi.optimizer.TaxiOptimizer;
 
 
 public class OnlineDvrpLauncherUtils

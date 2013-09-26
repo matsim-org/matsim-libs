@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.vrp;
+package playground.michalm.taxi;
 
 import org.matsim.contrib.dvrp.dynagent.DynActivity;
 
