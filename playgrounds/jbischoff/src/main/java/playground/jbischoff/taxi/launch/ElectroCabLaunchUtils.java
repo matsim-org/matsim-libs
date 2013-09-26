@@ -47,17 +47,17 @@ import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.FreeSpeedTravelTime;
 
-import pl.poznan.put.util.lang.TimeDiscretizer;
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.network.ArcFactory;
+import pl.poznan.put.vrp.dynamic.util.TimeDiscretizer;
 import playground.jbischoff.energy.charging.DepotArrivalDepartureCharger;
 import playground.jbischoff.energy.vehicles.BatteryElectricVehicleImpl;
 import playground.jbischoff.taxi.evaluation.*;
 import playground.jbischoff.taxi.optimizer.rank.NOSRankTaxiOptimizer;
 import playground.jbischoff.taxi.sim.ElectricTaxiSimEngine;
 import playground.michalm.demand.ODDemandGenerator;
-import playground.michalm.vrp.*;
+import playground.michalm.taxi.*;
 
 /**
  * 

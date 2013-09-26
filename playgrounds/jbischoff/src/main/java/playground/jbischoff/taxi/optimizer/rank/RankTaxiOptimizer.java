@@ -32,10 +32,10 @@ import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
 import pl.poznan.put.vrp.dynamic.data.schedule.Task.TaskType;
 import pl.poznan.put.vrp.dynamic.data.schedule.impl.*;
-import pl.poznan.put.vrp.dynamic.taxi.*;
-import pl.poznan.put.vrp.dynamic.taxi.schedule.TaxiDriveTask;
 import playground.jbischoff.energy.charging.DepotArrivalDepartureCharger;
 import playground.jbischoff.taxi.rank.BackToRankTask;
+import playground.michalm.taxi.optimizer.*;
+import playground.michalm.taxi.optimizer.schedule.TaxiDriveTask;
 
 /**
  * The main assumption: Requests are scheduled at the last request in the

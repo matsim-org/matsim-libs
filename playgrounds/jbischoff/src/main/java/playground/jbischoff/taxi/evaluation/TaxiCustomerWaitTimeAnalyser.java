@@ -40,7 +40,7 @@ import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 
-import playground.michalm.vrp.TaxiModeDepartureHandler;
+import playground.michalm.taxi.TaxiModeDepartureHandler;
 /**
  * 
  * 

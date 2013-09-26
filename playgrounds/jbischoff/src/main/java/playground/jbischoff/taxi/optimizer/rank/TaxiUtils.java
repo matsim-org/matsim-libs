@@ -6,7 +6,7 @@ import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
 import pl.poznan.put.vrp.dynamic.data.schedule.Task.TaskType;
-import pl.poznan.put.vrp.dynamic.taxi.schedule.TaxiDriveTask;
+import playground.michalm.taxi.optimizer.schedule.TaxiDriveTask;
 
 
 public class TaxiUtils

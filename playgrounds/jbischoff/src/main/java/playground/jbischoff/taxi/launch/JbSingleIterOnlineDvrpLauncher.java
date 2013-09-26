@@ -34,12 +34,12 @@ import org.matsim.vis.otfvis.*;
 import pl.poznan.put.util.jfreechart.ChartUtils;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.model.Request.ReqStatus;
-import pl.poznan.put.vrp.dynamic.taxi.*;
 import playground.jbischoff.taxi.evaluation.ScheduleChartUtils;
 import playground.jbischoff.taxi.optimizer.rank.NOSRankTaxiOptimizer;
+import playground.michalm.RunningVehicleRegister;
+import playground.michalm.taxi.optimizer.*;
+import playground.michalm.taxi.run.OnlineDvrpLauncherUtils;
 import playground.michalm.util.gis.Schedules2GIS;
-import playground.michalm.vrp.RunningVehicleRegister;
-import playground.michalm.vrp.run.OnlineDvrpLauncherUtils;
 /**
  * 
  * 

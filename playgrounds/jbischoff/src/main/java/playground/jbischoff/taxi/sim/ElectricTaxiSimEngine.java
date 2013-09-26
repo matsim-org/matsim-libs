@@ -24,7 +24,7 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
 import playground.jbischoff.energy.charging.DepotArrivalDepartureCharger;
 import playground.jbischoff.taxi.optimizer.rank.RankTaxiOptimizer;
-import playground.michalm.vrp.TaxiSimEngine;
+import playground.michalm.taxi.TaxiSimEngine;
 /**
  * 
  * 
