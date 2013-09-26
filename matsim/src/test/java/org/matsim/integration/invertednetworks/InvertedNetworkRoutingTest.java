@@ -134,7 +134,7 @@ public class InvertedNetworkRoutingTest {
 	}
 
 	@Test
-	@Ignore
+//	@Ignore
 	public final void testModesNotInvertedNetworkRouting() {
 		Fixture f = new Fixture(true, false, false);
 		f.scenario.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory());
