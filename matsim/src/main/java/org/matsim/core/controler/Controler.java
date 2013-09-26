@@ -479,6 +479,10 @@ public class Controler extends AbstractController {
 			tripRouterFactory = tripRouterFactoryBuilder.build(scenarioData);
 
 			// Special case
+			/* dg 09-2013: I do not see the "special" case for link to link routing. Compared to the other "special cases" that are considered 
+			* in TripRouterFactoryImpl explicitly, creating a inverted network (a line graph for routing) considering turning move restrictions
+			* during construction of the graph used for routing seems to be conceptually straight forward to be used with 
+			* shortest path algorithms. */
 			if (this.getScenario().getConfig().controler().isLinkToLinkRoutingEnabled()) {
 				tripRouterFactory = new LinkToLinkTripRouterFactory(
 						getScenario(),
