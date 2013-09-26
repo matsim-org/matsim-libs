@@ -182,7 +182,6 @@ import playground.michalm.util.gis.Schedules2GIS;
         events.addHandler(rvr);
 
         if (otfVis) { // OFTVis visualization
-            OnlineDvrpLauncherUtils.initQueryHandler(qSim, data.getVrpData());
             OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(),
                     scenario, qSim.getEventsManager(), qSim);
             OTFClientLive.run(scenario.getConfig(), server);

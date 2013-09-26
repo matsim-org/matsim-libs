@@ -230,34 +230,4 @@ public class OnlineDvrpLauncherUtils
                     legMode);
         }
     }
-    
-    
-    /**
-     * All fleet vehicles are selected (i.e. presented in circles)
-     * 
-     * @param qSim
-     * @param vrpData
-     */
-    public static void initQueryHandler(QSim qSim, final VrpData vrpData)
-    {
-        qSim.addQueueSimulationListeners(new MobsimInitializedListener() {
-            public void notifyMobsimInitialized(
-                    @SuppressWarnings("rawtypes") MobsimInitializedEvent e)
-            {
-                SwingUtilities.invokeLater(new Runnable() {
-                    public void run()
-                    {
-                        OTFQueryControl control = (OTFQueryControl)OTFClientControl.getInstance()
-                                .getMainOTFDrawer().getQueryHandler();
-
-                        for (Vehicle v : vrpData.getVehicles()) {
-                            QueryAgentPlan query = new QueryAgentPlan();
-                            query.setId(v.getName());
-                            control.createQuery(query);
-                        }
-                    }
-                });
-            }
-        });
-    }
 }

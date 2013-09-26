@@ -218,7 +218,6 @@ import playground.michalm.util.gis.Schedules2GIS;
 
         if (otfVis) { // OFTVis visualization
             scenario.getConfig().otfVis().setColoringScheme(ColoringScheme.taxicab);
-            OnlineDvrpLauncherUtils.initQueryHandler(qSim, data.getVrpData());
             OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(),
                     scenario, qSim.getEventsManager(), qSim);
             OTFClientLive.run(scenario.getConfig(), server);
