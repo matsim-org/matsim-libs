@@ -136,7 +136,7 @@ public class TransitScheduleSimplifier{
 				//split new id in order to access the original routes
 				String[] listOfRoutes = id.split(UNDERLINE);
 			
-				NetworkRoute newRoute = computeNetworkRoute(scenario.getNetwork(), refTransitRoute);
+				NetworkRoute newRoute = refTransitRoute.getRoute();//computeNetworkRoute(scenario.getNetwork(), refTransitRoute);
 			
 				List<TransitRouteStop> newStops = computeNewRouteProfile(factory, refTransitRoute, transitRoutes, listOfRoutes, newRoute, null);
 				compareRouteProfiles(refTransitRoute.getStops(), newStops);
