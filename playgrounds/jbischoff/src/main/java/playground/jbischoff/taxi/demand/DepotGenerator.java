@@ -19,15 +19,9 @@
 
 package playground.jbischoff.taxi.demand;
 
-import java.io.*;
-import java.util.Set;
-
-import org.matsim.api.core.v01.*;
-import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.scenario.ScenarioUtils;
-
-import pl.poznan.put.util.random.*;
-import playground.michalm.vrp.run.VrpConfigUtils;
+import java.io.File;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 
 public class DepotGenerator
