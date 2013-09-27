@@ -38,6 +38,7 @@ import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
+import org.matsim.core.utils.collections.RouterPriorityQueue;
 import org.matsim.vehicles.Vehicle;
 
 
@@ -115,7 +116,7 @@ public class MultiNodeDijkstra /*extends Dijkstra*/ {
 		}
 	}
 
-	
+	@SuppressWarnings("unchecked")
 	public Path calcLeastCostPath(final Map<Node, InitialNode> fromNodes, final Map<Node, InitialNode> toNodes, final Person person) {
 		this.person = person;
 		this.customDataManager.reset();
@@ -124,7 +125,7 @@ public class MultiNodeDijkstra /*extends Dijkstra*/ {
 
 		augmentIterationId();
 
-		PseudoRemovePriorityQueue<Node> pendingNodes = new PseudoRemovePriorityQueue<Node>(500);
+		RouterPriorityQueue<Node> pendingNodes = (RouterPriorityQueue<Node>) createRouterPriorityQueue();
 		for (Map.Entry<Node, InitialNode> entry : fromNodes.entrySet()) {
 			DijkstraNodeData data = getData(entry.getKey());
 			visitNode(entry.getKey(), data, pendingNodes, entry.getValue().initialTime, entry.getValue().initialCost, null);
@@ -185,6 +186,13 @@ public class MultiNodeDijkstra /*extends Dijkstra*/ {
 	}
 	
 	/**
+	 * Allow replacing the RouterPriorityQueue.
+	 */
+	/*package*/ RouterPriorityQueue<? extends Node> createRouterPriorityQueue() {
+		return new PseudoRemovePriorityQueue<Node>(500);
+	}
+	
+	/**
 	 * Inserts the given Node n into the pendingNodes queue and updates its time
 	 * and cost information.
 	 *
@@ -202,7 +210,7 @@ public class MultiNodeDijkstra /*extends Dijkstra*/ {
 	 *            The node from which we came visiting n.
 	 */
 	protected void visitNode(final Node n, final DijkstraNodeData data,
-			final PseudoRemovePriorityQueue<Node> pendingNodes, final double time, final double cost,
+			final RouterPriorityQueue<Node> pendingNodes, final double time, final double cost,
 			final Link outLink) {
 		data.visit(outLink, cost, time, getIterationId());
 		pendingNodes.add(n, getPriority(data));
@@ -219,7 +227,7 @@ public class MultiNodeDijkstra /*extends Dijkstra*/ {
 	 * @param pendingNodes
 	 *            The set of pending nodes so far.
 	 */
-	protected void relaxNode(final Node outNode, final Node toNode, final PseudoRemovePriorityQueue<Node> pendingNodes) {
+	protected void relaxNode(final Node outNode, final Node toNode, final RouterPriorityQueue<Node> pendingNodes) {
 
 		DijkstraNodeData outData = getData(outNode);
 		double currTime = outData.getTime();
@@ -233,7 +241,7 @@ public class MultiNodeDijkstra /*extends Dijkstra*/ {
 	 * Logic that was previously located in the relaxNode(...) method. 
 	 * By doing so, the FastDijkstra can overwrite relaxNode without copying the logic. 
 	 */
-	/*package*/ void relaxNodeLogic(final Link l, final PseudoRemovePriorityQueue<Node> pendingNodes,
+	/*package*/ void relaxNodeLogic(final Link l, final RouterPriorityQueue<Node> pendingNodes,
 			final double currTime, final double currCost, final Node toNode,
 			final PreProcessDijkstra.DeadEndData ddOutData) {
 				addToPendingNodes(l, l.getToNode(), pendingNodes, currTime, currCost, toNode);
@@ -259,7 +267,7 @@ public class MultiNodeDijkstra /*extends Dijkstra*/ {
 	 * 		(e.g. when the same node already has an earlier visiting time).
 	 */
 	protected boolean addToPendingNodes(final Link l, final Node n,
-			final PseudoRemovePriorityQueue<Node> pendingNodes, final double currTime,
+			final RouterPriorityQueue<Node> pendingNodes, final double currTime,
 			final double currCost, final Node toNode) {
 
 		this.customDataManager.initForLink(l);
@@ -300,7 +308,7 @@ public class MultiNodeDijkstra /*extends Dijkstra*/ {
 	 *            The link from which we came visiting n.
 	 */
 	void revisitNode(final Node n, final DijkstraNodeData data,
-			final PseudoRemovePriorityQueue<Node> pendingNodes, final double time, final double cost,
+			final RouterPriorityQueue<Node> pendingNodes, final double time, final double cost,
 			final Link outLink) {
 		pendingNodes.remove(n);
 
