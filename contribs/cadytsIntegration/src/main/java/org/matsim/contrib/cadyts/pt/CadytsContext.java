@@ -163,6 +163,8 @@ CadytsContextI<T> {
 	// private methods & pure delegate methods only below this line
 
 	private static boolean isActiveInThisIteration(final int iter, final Controler controler) {
+		// yy is this maybe just confused?  It looks to me like this is using its own counting algorithm anyways, so there should be no
+		// reliance on such config parameters.  Maybe a leftover from an older version??? kai, sep'13
 		return (iter % controler.getConfig().ptCounts().getPtCountsInterval() == 0);
 	}
 

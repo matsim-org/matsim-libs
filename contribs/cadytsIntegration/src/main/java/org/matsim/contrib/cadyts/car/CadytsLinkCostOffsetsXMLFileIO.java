@@ -28,7 +28,7 @@ import utilities.misc.DynamicDataXMLFileIO;
 /**
  * Enables cadyts to persist the cost offsets to file.
  */
-public class CadytsLinkCostOffsetsXMLFileIO extends DynamicDataXMLFileIO<Link> {
+class CadytsLinkCostOffsetsXMLFileIO extends DynamicDataXMLFileIO<Link> {
 
 	private static final long serialVersionUID = 1L;
 	private final Network network;

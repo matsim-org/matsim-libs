@@ -48,8 +48,12 @@ import cadyts.supply.SimResults;
 
 /**
  * Collects occupancy data of transit-line stations
+ * <p/>
+ * This is probably similar to code elsewhere.  However, it makes some sense to keep this here since the correct workings of cadyts 
+ * (obviously) depends on the fact that the counts are actually what it thinks, and so it makes sense to decouple this from the upstream
+ * counting method and leave it here. kai, sep'13 
  */
-public class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler,
+class CadytsPtOccupancyAnalyzer implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler,
 		PersonLeavesVehicleEventHandler, VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler 
 		, SimResults<TransitStopFacility> {
 
