@@ -33,6 +33,10 @@ public class Main {
 		Controler ctrl = new Controler(args) ;
 		
 		ctrl.setTripRouterFactory(new InvertedNetworkForCarsRouterFactoryImpl(ctrl.getScenario(), ctrl.getTravelDisutilityFactory()));
+		
+		
+		ctrl.run();
+		
 	}
 
 }
