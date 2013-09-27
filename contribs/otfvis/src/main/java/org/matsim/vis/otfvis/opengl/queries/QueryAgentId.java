@@ -85,7 +85,7 @@ public class QueryAgentId extends AbstractQuery {
 			double yDist = xy.getY() - this.y;
 			if (this.width == 0) {
 				// search for NEAREST agent to given POINT
-				dist = Math.sqrt(xDist*xDist + yDist*yDist);
+				dist = Math.sqrt(xDist*xDist + yDist*yDist);//"dist_2 = xDist*xDist + yDist*yDist" will work here (no need for "sqrt"), michalm
 				if(dist < minDist){
 					minDist = dist;
 					this.result.agentIds.clear();
