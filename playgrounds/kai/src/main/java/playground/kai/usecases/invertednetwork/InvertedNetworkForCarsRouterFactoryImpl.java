@@ -26,28 +26,32 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.router.DefaultTripRouterFactoryImpl;
-import org.matsim.core.router.TripRouterFactory;
 import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripRouterFactory;
+import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
 
 /**
  * @author thomas
  *
  */
 public class InvertedNetworkForCarsRouterFactoryImpl implements TripRouterFactory {
-	private static final Logger log = Logger.getLogger(InvertedNetworkForCarsRouterFactoryImpl.class);
-
 
 
 	private TripRouterFactory delegate;
 
 	private Scenario scenario;
 
+
+
+	private TravelDisutilityFactory tdf;
+
 //	private boolean firstCall = true;
 	
-	public InvertedNetworkForCarsRouterFactoryImpl(final Scenario scenario ) {
+	public InvertedNetworkForCarsRouterFactoryImpl(final Scenario scenario, TravelDisutilityFactory tdf ) {
 		this.delegate = DefaultTripRouterFactoryImpl.createRichTripRouterFactoryImpl(scenario);
 		this.scenario = scenario;
+		this.tdf = tdf ;
 	}
 	
 	@Override
@@ -56,7 +60,7 @@ public class InvertedNetworkForCarsRouterFactoryImpl implements TripRouterFactor
 		TripRouter tripRouter = this.delegate.instantiateAndConfigureTripRouter(iterationContext);
 
 		// add alternative module for car routing
-		tripRouter.setRoutingModule(TransportMode.car, new InvertedRoutingModule(this.scenario,iterationContext) );
+		tripRouter.setRoutingModule(TransportMode.car, new InvertedRoutingModule(this.scenario,this.tdf) );
 		
 		return tripRouter;
 	}

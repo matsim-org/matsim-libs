@@ -32,7 +32,7 @@ public class Main {
 	public static void main(String[] args) {
 		Controler ctrl = new Controler(args) ;
 		
-		ctrl.setTripRouterFactory(new InvertedNetworkForCarsRouterFactoryImpl(ctrl.getScenario()));
+		ctrl.setTripRouterFactory(new InvertedNetworkForCarsRouterFactoryImpl(ctrl.getScenario(), ctrl.getTravelDisutilityFactory()));
 	}
 
 }

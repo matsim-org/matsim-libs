@@ -27,18 +27,13 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.Facility;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.router.Dijkstra;
 import org.matsim.core.router.LegRouterWrapper;
-import org.matsim.core.router.RoutingContext;
 import org.matsim.core.router.RoutingModule;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.costcalculators.TravelTimeAndDistanceBasedTravelDisutility;
 import org.matsim.core.router.old.NetworkLegRouter;
-import org.matsim.core.router.util.DijkstraFactory;
-import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
 import org.matsim.vehicles.Vehicle;
@@ -51,11 +46,11 @@ class InvertedRoutingModule implements RoutingModule {
 
 	LegRouterWrapper router ;
 	
-	InvertedRoutingModule(Scenario sc, RoutingContext context ) {
+	InvertedRoutingModule(Scenario sc, TravelDisutilityFactory tdf ) {
 		
 		TravelTime travelTime = null ; // new TravelTimeForInvertedNetwork() ;
 
-		TravelDisutility travelDisutility = new TravelTimeAndDistanceBasedTravelDisutility(
+		TravelDisutility travelDisutility = tdf.createTravelDisutility(
 				travelTime, sc.getConfig().planCalcScore() 
 				) ;
 		
