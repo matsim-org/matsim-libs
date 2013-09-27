@@ -39,7 +39,6 @@ import org.matsim.core.population.PopulationFactoryImpl;
 import org.matsim.core.population.routes.ModeRouteFactory;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.costcalculators.TravelDisutilityFactory;
-import org.matsim.core.router.util.AStarLandmarksFactory;
 import org.matsim.core.router.util.LeastCostPathCalculator;
 import org.matsim.core.router.util.LeastCostPathCalculator.Path;
 import org.matsim.core.router.util.LeastCostPathCalculatorFactory;
@@ -47,7 +46,6 @@ import org.matsim.core.router.util.LinkToLinkTravelTime;
 import org.matsim.core.router.util.NetworkInverter;
 import org.matsim.core.router.util.NetworkTurnInfoBuilder;
 import org.matsim.core.router.util.TravelDisutility;
-import org.matsim.core.router.util.TravelTime;
 import org.matsim.core.router.util.TravelTimesInvertedNetProxy;
 import org.matsim.core.utils.misc.RouteUtils;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
@@ -89,12 +87,6 @@ public class InvertedNetworkLegRouter implements LegRouter {
 		NetworkInverter networkInverter = new NetworkInverter(network, allowedInLinkTurnInfoMap);
 		this.invertedNetwork = networkInverter.getInvertedNetwork();
 
-		if (leastCostPathCalcFactory instanceof AStarLandmarksFactory) {
-			throw new IllegalStateException(
-					"Link to link routing is not available for AStarLandmarks routing,"
-							+ " use the Dijkstra or AStar router instead. ");
-		}
-
 		TravelTimesInvertedNetProxy travelTimesProxy = new TravelTimesInvertedNetProxy(network, travelTimes);
 		TravelDisutility travelCost = travelCostCalculatorFactory.createTravelDisutility(
 				travelTimesProxy, cnScoringGroup);
@@ -107,7 +99,7 @@ public class InvertedNetworkLegRouter implements LegRouter {
 		Map<Id, List<TurnInfo>> allowedInLinkTurnInfoMap = new HashMap<Id, List<TurnInfo>>();
 
 		NetworkTurnInfoBuilder netTurnInfoBuilder = new NetworkTurnInfoBuilder();
-		netTurnInfoBuilder.createAndAddTurnInfo(allowedInLinkTurnInfoMap, this.network);
+		netTurnInfoBuilder.createAndAddTurnInfo(TransportMode.car, allowedInLinkTurnInfoMap, this.network);
 
 		if (sc.getConfig().scenario().isUseLanes()) {
 			LaneDefinitions20 ld =  sc.getScenarioElement(LaneDefinitions20.class);

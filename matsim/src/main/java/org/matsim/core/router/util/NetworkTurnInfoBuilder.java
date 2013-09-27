@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
@@ -39,12 +40,12 @@ import org.matsim.core.network.algorithms.NetworkExpandNode.TurnInfo;
  */
 public class NetworkTurnInfoBuilder {
 
-//	private static final Logger log = Logger.getLogger(NetworkTurnInfoBuilder.class);
+	private static final Logger log = Logger.getLogger(NetworkTurnInfoBuilder.class);
 	/**
 	 * Creates a List of TurnInfo objects for every existing link of the network. If the links have mode attributes set,
 	 * those are considered in TurnInfo creation.
 	 */
-	public void createAndAddTurnInfo(Map<Id, List<TurnInfo>> inLinkTurnInfoMap, Network network) {
+	public void createAndAddTurnInfo(String mode, Map<Id, List<TurnInfo>> inLinkTurnInfoMap, Network network) {
 		TurnInfo turnInfo = null;
 		Set<String> modes = null;
 		List<TurnInfo> turnInfosForInLink = null;
@@ -57,9 +58,10 @@ public class NetworkTurnInfoBuilder {
 				}
 
 				for (Link outLink : node.getOutLinks().values()) {
-					if (!inLink.getAllowedModes().isEmpty() && !outLink.getAllowedModes().isEmpty()) {
-						modes = this.calculateCommonModes(inLink, outLink);
-						if (!modes.isEmpty()) { // make shure that there is at least one common mode
+					if (! inLink.getAllowedModes().isEmpty() && ! outLink.getAllowedModes().isEmpty()) {
+						if (inLink.getAllowedModes().contains(mode) && outLink.getAllowedModes().contains(mode)) {
+							modes = new HashSet<String>();
+							modes.add(mode);
 							turnInfo = new TurnInfo(inLink.getId(), outLink.getId(), modes);
 							turnInfosForInLink.add(turnInfo);
 						}
@@ -93,12 +95,7 @@ public class NetworkTurnInfoBuilder {
 					TurnInfo restrictionForOutlink = this.getTurnInfoForOutlinkId(
 							restrictingTurnInfos, allowedForOutlink.getToLinkId());
 					if (restrictionForOutlink == null) { // there is no turn at all allowed from the inLink to the outLink
-//						log.error("allowedForOutlink: " + allowedForOutlink.getToLinkId() + " " +  allowedForOutlink);
 						allowedInLinkTurnInfoMap.get(inLinkId).remove(allowedForOutlink);
-//						log.error("still allowed: ");
-//						for (TurnInfo ti : allowedInLinkTurnInfoMap.get(inLinkId)){
-//							log.error("  " + ti.getToLinkId());
-//						}
 					}
 					else { // turns are restricted to some modes or allowed without any mode information
 						if (restrictionForOutlink.getModes() != null && allowedForOutlink.getModes() != null){
@@ -139,14 +136,5 @@ public class NetworkTurnInfoBuilder {
 		return modes;
 	}
 
-	private Set<String> calculateCommonModes(Link inLink, Link outLink) {
-		Set<String> modes = new HashSet<String>();
-		for (String mode : inLink.getAllowedModes()) {
-			if (outLink.getAllowedModes().contains(mode)) {
-				modes.add(mode);
-			}
-		}
-		return modes;
-	}
 
 }

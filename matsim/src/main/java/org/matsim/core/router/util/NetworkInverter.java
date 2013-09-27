@@ -62,10 +62,10 @@ public class NetworkInverter {
 			for (Link inLink : node.getInLinks().values()) {
 				for (Link outLink : node.getOutLinks().values()) {
 					List<TurnInfo> turnInfos = this.inLinkTurnInfoMap.get(inLink.getId());
-						TurnInfo ti = turnInfoBuilder.getTurnInfoForOutlinkId(turnInfos, outLink.getId());
-						if (ti != null){
-							numberOfLinksGenerated = this.createInvertedLink(inLink, outLink, numberOfLinksGenerated, ti.getModes());
-						}
+					TurnInfo ti = turnInfoBuilder.getTurnInfoForOutlinkId(turnInfos, outLink.getId());
+					if (ti != null){
+						numberOfLinksGenerated = this.createInvertedLink(inLink, outLink, numberOfLinksGenerated, ti.getModes());
+					}
 				}
 			}
 		}
@@ -86,6 +86,7 @@ public class NetworkInverter {
 				outLink.getCapacity(),
 				outLink.getNumberOfLanes());
 		link.setAllowedModes(modes);
+//		log.error("created inverted link " + link.getId() + " from " + inLink.getId() + " to " + outLink.getId() + " with modes " + modes);
 		((LinkImpl) link).setType(((LinkImpl) outLink).getType());
 		return numberOfLinksGenerated + 1;
 	}

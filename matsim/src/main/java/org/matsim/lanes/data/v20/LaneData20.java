@@ -28,9 +28,9 @@ import org.matsim.api.core.v01.Id;
  * The position is specified via the distance the lane starts measured from the downstream node
  * of the link and the ids of the downstream lanes. If the distance to the downstream node equals the link length, this
  * implies that this is the most upstream (first) lane on a link. More than one first lane is permitted. If the first or
- * any other lane shall model more than one lane that exists in the reality to be modelled, increase the number of represented lanes attribute.
+ * any other lane shall model more than one lane that exists in the reality to be modeled, increase the number of represented lanes attribute.
  * 
- * For an easy modelling use the v11 lane model and the conversion class in the package.
+ * For an easy modeling use the v11 lane model and the conversion class in the package.
  * 
  * @author dgrether
  * 

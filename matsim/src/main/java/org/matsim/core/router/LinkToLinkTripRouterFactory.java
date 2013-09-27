@@ -62,7 +62,6 @@ public class LinkToLinkTripRouterFactory implements TripRouterFactory {
 	public TripRouter instantiateAndConfigureTripRouter(RoutingContext iterationContext) {
 		TripRouter instance = delegate.instantiateAndConfigureTripRouter(iterationContext);
 
-		//Note that the inverted network is created once per thread
 		InvertedNetworkLegRouter invertedNetLegRouter =
 			new InvertedNetworkLegRouter(
 					scenario,

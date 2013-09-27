@@ -26,7 +26,6 @@ import java.util.Set;
 
 import junit.framework.Assert;
 
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
@@ -48,7 +47,9 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
+import org.matsim.core.controler.PlanStrategyRegistrar;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -113,9 +114,35 @@ public class InvertedNetworkRoutingTest {
 		c.run();
 		Assert.assertTrue("No traffic on link", testHandler.hadTrafficOnLink25);
 	}
+	
+	@Test
+	public final void testSignalsInvertedNetworkRoutingIterations() {
+		Fixture f = new Fixture(false, false, true);
+		f.scenario.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory());
+		f.scenario.getConfig().controler().setLastIteration(1);
+		SignalsData signalsData = f.scenario.getScenarioElement(SignalsData.class);
+		SignalPlanData signalPlan = signalsData.getSignalControlData().getSignalSystemControllerDataBySystemId().get(f.getId(2)).getSignalPlanData().get(f.getId(1));
+		signalPlan.setCycleTime(500);
+		signalPlan.getSignalGroupSettingsDataByGroupId().get(f.getId(2)).setOnset(0);
+		signalPlan.getSignalGroupSettingsDataByGroupId().get(f.getId(2)).setDropping(5);
+		SignalData sd = signalsData.getSignalSystemsData().getSignalSystemData().get(f.getId(2)).getSignalData().get(f.getId(1));
+		sd.addTurningMoveRestriction(f.getId(23));
+		Controler c = new Controler(f.scenario);
+		c.setDumpDataAtEnd(false);
+		c.setCreateGraphs(false);
+		final TestEventHandler testHandler = new TestEventHandler();
+		c.addControlerListener(new StartupListener(){
+			@Override
+			public void notifyStartup(StartupEvent event) {
+				event.getControler().getEvents().addHandler(testHandler);
+			}
+		});
+		c.run();
+		Assert.assertTrue("No traffic on link", testHandler.hadTrafficOnLink25);
+	}
+	
 
 	@Test
-	@Ignore
 	public final void testModesInvertedNetworkRouting() {
 		Fixture f = new Fixture(true, false, false);
 		f.scenario.getConfig().controler().setOutputDirectory(testUtils.getOutputDirectory());
@@ -169,6 +196,7 @@ public class InvertedNetworkRoutingTest {
 				this.hadTrafficOnLink25 = true;
 			}
 		}
+
 	}
 	
 	
@@ -191,6 +219,8 @@ public class InvertedNetworkRoutingTest {
 	 *    			^
 	 *    			|
 	 *				(1)
+	 *				  |
+	 *				(0)
 	 * </pre>
 	 *
 	 * @author dgrether
@@ -208,6 +238,14 @@ public class InvertedNetworkRoutingTest {
 			config.global().setNumberOfThreads(1);
 			config.addQSimConfigGroup(new QSimConfigGroup());
 			config.getQSimConfigGroup().setRemoveStuckVehicles(false);
+			config.getQSimConfigGroup().setStuckTime(10000.0);
+			config.getQSimConfigGroup().setStartTime(0.0);
+			config.getQSimConfigGroup().setSimStarttimeInterpretation(QSimConfigGroup.ONLY_USE_STARTTIME);
+			StrategySettings stratSets = new StrategySettings(new IdImpl(1));
+			stratSets.setModuleName(PlanStrategyRegistrar.Names.ReRoute.toString());
+			stratSets.setProbability(1.0);
+			config.strategy().addStrategySettings(stratSets);
+			config.planCalcScore().setTraveling_utils_hr(-1200.0);
 			ActivityParams params = new ActivityParams("home");
 			params.setTypicalDuration(24.0 * 3600.0);
 			config.planCalcScore().addActivityParams(params);
@@ -217,9 +255,11 @@ public class InvertedNetworkRoutingTest {
 			this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 			createNetwork();
 			if (doCreateLanes){
+				config.scenario().setUseLanes(true);
 				createLanes();
 			}
 			if (doCreateSignals){
+				config.scenario().setUseSignalSystems(true);
 				createSignals();
 			}
 			if (doCreateModes){
@@ -241,6 +281,7 @@ public class InvertedNetworkRoutingTest {
 			SignalGroupsData sgd = signalsData.getSignalGroupsData();
 			SignalGroupsDataFactory fsg = sgd.getFactory();
 			SignalGroupData sg = fsg.createSignalGroupData(getId(2), getId(2));
+			sg.addSignalId(getId(1));
 			sgd.addSignalGroupData(sg);
 			SignalControlData scd = signalsData.getSignalControlData();
 			SignalControlDataFactory fsc = scd.getFactory();
@@ -293,6 +334,8 @@ public class InvertedNetworkRoutingTest {
 			NetworkFactory f = network.getFactory();
 			Node n;
 			Link l;
+			n = f.createNode(getId(0), scenario.createCoord(0, -300));
+			network.addNode(n);
 			n = f.createNode(getId(1), scenario.createCoord(0, 0));
 			network.addNode(n);
 			n = f.createNode(getId(2), scenario.createCoord(0, 300));
@@ -305,6 +348,11 @@ public class InvertedNetworkRoutingTest {
 			network.addNode(n);
 			n = f.createNode(getId(6), scenario.createCoord(0, 600));
 			network.addNode(n);
+			l = f.createLink(getId(01), network.getNodes().get(getId(0)), network.getNodes().get(getId(1)));
+			l.setLength(300.0);
+			l.setFreespeed(10.0);
+			l.setCapacity(3600.0);
+			network.addLink(l);
 			l = f.createLink(getId(12), network.getNodes().get(getId(1)), network.getNodes().get(getId(2)));
 			l.setLength(300.0);
 			l.setFreespeed(10.0);
@@ -312,7 +360,7 @@ public class InvertedNetworkRoutingTest {
 			network.addLink(l);
 			l = f.createLink(getId(23), network.getNodes().get(getId(2)), network.getNodes().get(getId(3)));
 			l.setLength(300.0);
-			l.setFreespeed(10.0);
+			l.setFreespeed(20.0);
 			l.setCapacity(3600.0);
 			network.addLink(l);
 			l = f.createLink(getId(34), network.getNodes().get(getId(3)), network.getNodes().get(getId(4)));
@@ -344,8 +392,8 @@ public class InvertedNetworkRoutingTest {
 			pop.addPerson(p);
 			Plan plan = f.createPlan();
 			p.addPlan(plan);
-			Activity act = f.createActivityFromLinkId("home", getId(12));
-			act.setEndTime(0.0);
+			Activity act = f.createActivityFromLinkId("home", getId(01));
+			act.setEndTime(2000.0);
 			plan.addActivity(act);
 			Leg leg = f.createLeg(TransportMode.car);
 			plan.addLeg(leg);
