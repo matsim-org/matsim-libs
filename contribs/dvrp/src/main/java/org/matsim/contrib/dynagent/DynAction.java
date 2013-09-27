@@ -17,22 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.dynagent;
+package org.matsim.contrib.dynagent;
 
-import org.matsim.api.core.v01.Id;
-
-
-public interface DynLeg
-    extends DynAction
-{
-    void movedOverNode(Id oldLinkId, Id newLinkId, int time);
-
-
-    Id getCurrentLinkId();
-
-
-    Id getNextLinkId();
-
-
-    Id getDestinationLinkId();
-}
+public interface DynAction
+{}

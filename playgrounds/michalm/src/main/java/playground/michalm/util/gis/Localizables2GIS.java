@@ -19,21 +19,16 @@
 
 package playground.michalm.util.gis;
 
-import java.io.IOException;
 import java.util.*;
 
 import org.matsim.core.utils.geometry.geotools.MGC;
-import org.matsim.core.utils.geometry.transformations.TransformationFactory;
 import org.matsim.core.utils.gis.*;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
-import pl.poznan.put.vrp.dynamic.data.VrpData;
-import pl.poznan.put.vrp.dynamic.data.file.LacknerReader;
-import pl.poznan.put.vrp.dynamic.data.model.Customer;
 import pl.poznan.put.vrp.dynamic.data.model.Localizable;
 import pl.poznan.put.vrp.dynamic.data.network.Vertex;
-import pl.poznan.put.vrp.dynamic.data.network.VertexImpl;
+
 import com.vividsolutions.jts.geom.Coordinate;
 
 
@@ -85,38 +80,5 @@ public class Localizables2GIS<T extends Localizable>
     			addAttribute("ID", Integer.class).
     			addAttribute("Name", String.class).
     			create();
-    }
-
-
-    public static void main(String[] args)
-        throws IOException
-    {
-        String dirName;
-        String vrpDirName;
-        String vrpStaticFileName;
-        String outFileNameCust;
-
-        if (args.length == 1 && args[0].equals("test")) {// for testing
-            dirName = "d:\\PP-dyplomy\\2010_11-mgr\\burkat_andrzej\\siec2\\";
-            vrpDirName = dirName + "dvrp\\";
-            vrpStaticFileName = "A102.txt";
-            outFileNameCust = vrpDirName + "customers.shp";
-        }
-        else if (args.length == 4) {
-            dirName = args[0];
-            vrpDirName = dirName + args[1];
-            vrpStaticFileName = args[2];
-            outFileNameCust = vrpDirName + args[3];
-        }
-        else {
-            throw new IllegalArgumentException("Incorrect program arguments: "
-                    + Arrays.toString(args));
-        }
-
-        VrpData data = LacknerReader.parseStaticFile(vrpDirName, vrpStaticFileName,
-                VertexImpl.getBuilder());
-        String coordSystem = TransformationFactory.WGS84_UTM33N;
-
-        new Localizables2GIS<Customer>(data.getCustomers(), outFileNameCust, coordSystem).write();
     }
 }

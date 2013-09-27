@@ -19,7 +19,7 @@
 
 package org.matsim.contrib.dvrp.data.model;
 
-import org.matsim.contrib.dvrp.dynagent.DynAgentLogic;
+import org.matsim.contrib.dynagent.DynAgentLogic;
 
 import pl.poznan.put.vrp.dynamic.data.model.*;
 

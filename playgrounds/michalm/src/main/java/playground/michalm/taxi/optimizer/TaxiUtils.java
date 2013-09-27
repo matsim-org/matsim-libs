@@ -74,8 +74,6 @@ public class TaxiUtils
             return false;
         }
 
-        //TODO vrp library should be "MATSim free"; here, however, some MATSim-related hacks
-        //have been introduced!!!
         if (currentTask.getType() == TaskType.WAIT && delay >= 2) {
             // there can be a lag between a change in the schedule (WAIT->OTHER)
             // because activity ends (here, WAIT end) are handled only at the beginning of

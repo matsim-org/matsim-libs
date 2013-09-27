@@ -17,7 +17,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.dynagent;
+package org.matsim.contrib.dynagent;
 
-public interface DynAction
-{}
+public interface DynAgentLogic
+{
+    DynActivity init(DynAgent agent);
+
+
+    DynAgent getDynAgent();
+
+
+    DynAction computeNextAction(DynAction oldAction, double now);
+}

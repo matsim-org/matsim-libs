@@ -17,12 +17,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.dynagent;
+package org.matsim.contrib.dynagent;
 
-import org.matsim.api.core.v01.population.Plan;
-
-
-public interface DynPlanFactory
+public interface DynActivity
+    extends DynAction
 {
-    Plan create(DynAgent agent);
+    String getActivityType();
+
+
+    double getEndTime();
 }

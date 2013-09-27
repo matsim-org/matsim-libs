@@ -26,7 +26,7 @@ import org.matsim.contrib.dvrp.data.MatsimVrpData;
 import org.matsim.contrib.dvrp.data.model.DynAgentVehicle;
 import org.matsim.contrib.dvrp.data.network.MatsimVertex;
 import org.matsim.contrib.dvrp.data.schedule.VrpSchedulePlanFactory;
-import org.matsim.contrib.dvrp.dynagent.*;
+import org.matsim.contrib.dynagent.*;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.vehicles.VehicleUtils;

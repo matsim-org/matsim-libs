@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.dynagent;
+package org.matsim.contrib.dynagent;
 
 import java.util.Iterator;
 

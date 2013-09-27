@@ -17,22 +17,12 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi;
+package org.matsim.contrib.dynagent;
 
-import org.matsim.contrib.dvrp.data.network.shortestpath.ShortestPathDynLeg;
-
-import pl.poznan.put.vrp.dynamic.data.schedule.DriveTask;
+import org.matsim.api.core.v01.population.Plan;
 
 
-public class TaxiLeg
-    extends ShortestPathDynLeg
+public interface DynPlanFactory
 {
-    public TaxiLeg(DriveTask driveTask)
-    {
-        super(driveTask);
-    }
-
-
-    public void endLeg(double now)
-    {}
+    Plan create(DynAgent agent);
 }

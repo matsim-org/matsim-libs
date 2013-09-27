@@ -23,7 +23,9 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.dvrp.data.model.MobsimAgentCustomer;
 import org.matsim.contrib.dvrp.data.network.MatsimVrpGraph;
+import org.matsim.contrib.dvrp.data.network.shortestpath.ShortestPathDynLeg;
 import org.matsim.contrib.dvrp.dynagent.*;
+import org.matsim.contrib.dynagent.*;
 import org.matsim.core.api.experimental.events.*;
 import org.matsim.core.mobsim.framework.*;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
@@ -130,7 +132,7 @@ public class TaxiAgentLogic
                 return createServeActivity((ServeTask)task, now);
 
             case WAIT:
-                return TaxiTaskActivity.createWaitActivity((WaitTask)task);
+                return StayTaskActivity.createWaitActivity((WaitTask)task);
 
             default:
                 throw new IllegalStateException();
@@ -171,10 +173,11 @@ public class TaxiAgentLogic
     // ========================================================================================
 
     // picking-up a passenger
-    private TaxiTaskActivity createServeActivity(ServeTask task, double now)
+    private StayTaskActivity createServeActivity(ServeTask task, double now)
     {
         // serve the customer
-        MobsimAgent passenger = ((MobsimAgentCustomer)task.getRequest().getCustomer()).getPassenger();
+        MobsimAgent passenger = ((MobsimAgentCustomer)task.getRequest().getCustomer())
+                .getPassenger();
         Id currentLinkId = passenger.getCurrentLinkId();
 
         if (currentLinkId != agent.getCurrentLinkId()) {
@@ -205,7 +208,7 @@ public class TaxiAgentLogic
                             + "for the simulation the agent is now not in the vehicle");
         }
 
-        return TaxiTaskActivity.createServeActivity(task);
+        return StayTaskActivity.createServeActivity(task);
     }
 
 
@@ -264,4 +267,19 @@ public class TaxiAgentLogic
 
         return taxiLeg;
     }
+
+
+    private static class TaxiLeg
+        extends ShortestPathDynLeg
+    {
+        public TaxiLeg(DriveTask driveTask)
+        {
+            super(driveTask);
+        }
+
+
+        public void endLeg(double now)
+        {}
+    }
+
 }

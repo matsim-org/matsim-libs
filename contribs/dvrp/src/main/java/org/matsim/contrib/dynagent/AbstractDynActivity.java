@@ -1,4 +1,4 @@
-package org.matsim.contrib.dvrp.dynagent;
+package org.matsim.contrib.dynagent;
 
 public abstract class AbstractDynActivity
     implements DynActivity

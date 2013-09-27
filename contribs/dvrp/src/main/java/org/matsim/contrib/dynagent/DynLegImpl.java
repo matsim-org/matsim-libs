@@ -17,15 +17,72 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.dynagent;
+package org.matsim.contrib.dynagent;
 
-public interface DynAgentLogic
+import java.util.List;
+
+import org.matsim.api.core.v01.Id;
+import org.matsim.core.population.routes.NetworkRoute;
+
+
+public class DynLegImpl
+    implements DynLeg
 {
-    DynActivity init(DynAgent agent);
+    private final NetworkRoute route;
+    private int currentLinkIdx;
 
 
-    DynAgent getDynAgent();
+    public DynLegImpl(NetworkRoute route)
+    {
+        this.route = route;
+        currentLinkIdx = -1;
+    }
 
 
-    DynAction computeNextAction(DynAction oldAction, double now);
+    @Override
+    public void movedOverNode(Id oldLinkId, Id newLinkId, int time)
+    {
+        currentLinkIdx++;
+    }
+
+
+    @Override
+    public Id getCurrentLinkId()
+    {
+        if (currentLinkIdx == -1) {
+            return route.getStartLinkId();
+        }
+
+        List<Id> linkIds = route.getLinkIds();
+
+        if (currentLinkIdx == linkIds.size()) {
+            return route.getEndLinkId();
+        }
+
+        return linkIds.get(currentLinkIdx);
+    }
+
+
+    @Override
+    public Id getNextLinkId()
+    {
+        List<Id> linkIds = route.getLinkIds();
+
+        if (currentLinkIdx == linkIds.size()) {
+            return null;
+        }
+
+        if (currentLinkIdx == linkIds.size() - 1) {
+            return route.getEndLinkId();
+        }
+
+        return linkIds.get(currentLinkIdx + 1);
+    }
+
+
+    @Override
+    public Id getDestinationLinkId()
+    {
+        return route.getEndLinkId();
+    }
 }

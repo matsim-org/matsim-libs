@@ -21,7 +21,7 @@ package org.matsim.contrib.dvrp.data.schedule;
 
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.dvrp.data.MatsimVrpData;
-import org.matsim.contrib.dvrp.dynagent.*;
+import org.matsim.contrib.dynagent.*;
 
 import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
 

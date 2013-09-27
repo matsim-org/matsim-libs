@@ -17,13 +17,29 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.dynagent;
+package org.matsim.contrib.dynagent;
 
-public interface DynActivity
-    extends DynAction
+/**
+ * endTime is not subject to change
+ * 
+ * @author michalm
+ */
+public class StaticDynActivity
+    extends AbstractDynActivity
 {
-    String getActivityType();
+    private final double endTime;
 
 
-    double getEndTime();
+    public StaticDynActivity(String activityType, double endTime)
+    {
+        super(activityType);
+        this.endTime = endTime;
+    }
+
+
+    @Override
+    public double getEndTime()
+    {
+        return endTime;
+    }
 }

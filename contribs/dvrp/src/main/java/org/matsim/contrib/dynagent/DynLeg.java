@@ -17,49 +17,22 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi;
+package org.matsim.contrib.dynagent;
 
-import org.matsim.contrib.dvrp.dynagent.DynActivity;
-
-import pl.poznan.put.vrp.dynamic.data.schedule.*;
+import org.matsim.api.core.v01.Id;
 
 
-class TaxiTaskActivity
-    implements DynActivity
+public interface DynLeg
+    extends DynAction
 {
-    private StayTask stayTask;
-    private String activityType;
+    void movedOverNode(Id oldLinkId, Id newLinkId, int time);
 
 
-    TaxiTaskActivity(String activityType, StayTask stayTask)
-    {
-        this.activityType = activityType;
-        this.stayTask = stayTask;
-    }
+    Id getCurrentLinkId();
 
 
-    @Override
-    public double getEndTime()
-    {
-        return stayTask.getEndTime();
-    }
+    Id getNextLinkId();
 
 
-    @Override
-    public String getActivityType()
-    {
-        return activityType;
-    }
-
-
-    static TaxiTaskActivity createServeActivity(ServeTask serveTask)
-    {
-        return new TaxiTaskActivity("ServeTask" + serveTask.getRequest().getId(), serveTask);
-    }
-
-
-    static TaxiTaskActivity createWaitActivity(WaitTask waitTask)
-    {
-        return new TaxiTaskActivity("WaitTask", waitTask);
-    }
+    Id getDestinationLinkId();
 }

@@ -17,7 +17,7 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.dynagent;
+package org.matsim.contrib.dynagent;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.*;
