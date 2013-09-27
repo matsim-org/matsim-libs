@@ -38,7 +38,7 @@ import playground.jbischoff.taxi.evaluation.ScheduleChartUtils;
 import playground.jbischoff.taxi.optimizer.rank.NOSRankTaxiOptimizer;
 import playground.michalm.RunningVehicleRegister;
 import playground.michalm.taxi.optimizer.*;
-import playground.michalm.taxi.run.OnlineDvrpLauncherUtils;
+import playground.michalm.taxi.run.TaxiLauncherUtils;
 import playground.michalm.util.gis.Schedules2GIS;
 /**
  * 

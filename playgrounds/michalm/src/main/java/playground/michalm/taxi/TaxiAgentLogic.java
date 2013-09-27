@@ -23,7 +23,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.dvrp.data.model.MobsimAgentCustomer;
 import org.matsim.contrib.dvrp.data.network.MatsimVrpGraph;
-import org.matsim.contrib.dvrp.data.network.shortestpath.ShortestPathDynLeg;
 import org.matsim.contrib.dvrp.dynagent.*;
 import org.matsim.contrib.dynagent.*;
 import org.matsim.core.api.experimental.events.*;

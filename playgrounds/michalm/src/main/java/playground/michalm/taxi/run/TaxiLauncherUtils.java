@@ -3,8 +3,6 @@ package playground.michalm.taxi.run;
 import java.io.*;
 import java.util.*;
 
-import javax.swing.SwingUtilities;
-
 import org.matsim.analysis.LegHistogram;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
@@ -17,8 +15,6 @@ import org.matsim.contrib.dvrp.data.network.shortestpath.MatsimArcFactories;
 import org.matsim.contrib.dvrp.run.VrpConfigUtils;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
-import org.matsim.core.mobsim.framework.listeners.MobsimInitializedListener;
 import org.matsim.core.mobsim.qsim.*;
 import org.matsim.core.mobsim.qsim.agents.*;
 import org.matsim.core.mobsim.qsim.qnetsimengine.*;
@@ -27,9 +23,6 @@ import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.router.util.*;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.trafficmonitoring.*;
-import org.matsim.vis.otfvis.OTFClientControl;
-import org.matsim.vis.otfvis.gui.OTFQueryControl;
-import org.matsim.vis.otfvis.opengl.queries.QueryAgentPlan;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
@@ -40,7 +33,7 @@ import playground.michalm.taxi.*;
 import playground.michalm.taxi.optimizer.TaxiOptimizer;
 
 
-public class OnlineDvrpLauncherUtils
+public class TaxiLauncherUtils
 {
     public enum TravelTimeSource
     {
@@ -93,25 +86,25 @@ public class OnlineDvrpLauncherUtils
             Leg leg = (Leg)person.getSelectedPlan().getPlanElements().get(1);
             leg.setMode(TaxiModeDepartureHandler.TAXI_MODE);
         }
-        
-// replacing the above fore loop by the code below will remove	 the non-taxicab passengers from the simulation.
-// was, for example, useful for a "freight-like" demo.
-//        Collection<Id> normalPersons = new ArrayList<Id>() ;
-//        for ( Entry<Id, ? extends Person> entry : scenario.getPopulation().getPersons().entrySet() ) {
-//        	Person person = entry.getValue() ;
-//        	if ( taxiCustomerIds.contains( person.getId().toString() ) ) {
-//              Leg leg = (Leg)person.getSelectedPlan().getPlanElements().get(1);
-//              leg.setMode(TaxiModeDepartureHandler.TAXI_MODE);
-//        	} else {
-//        		normalPersons.add( person.getId() ) ;
-//        	}
-//        }
-//        System.err.println( " population size before deletion: " + scenario.getPopulation().getPersons().size() );
-//        for ( Id id : normalPersons ) {
-//        	scenario.getPopulation().getPersons().remove(id) ;
-//        }
-//        System.err.println( " population size after deletion: " + scenario.getPopulation().getPersons().size() );
-        
+
+        // replacing the above fore loop by the code below will remove	 the non-taxicab passengers from the simulation.
+        // was, for example, useful for a "freight-like" demo.
+        //        Collection<Id> normalPersons = new ArrayList<Id>() ;
+        //        for ( Entry<Id, ? extends Person> entry : scenario.getPopulation().getPersons().entrySet() ) {
+        //        	Person person = entry.getValue() ;
+        //        	if ( taxiCustomerIds.contains( person.getId().toString() ) ) {
+        //              Leg leg = (Leg)person.getSelectedPlan().getPlanElements().get(1);
+        //              leg.setMode(TaxiModeDepartureHandler.TAXI_MODE);
+        //        	} else {
+        //        		normalPersons.add( person.getId() ) ;
+        //        	}
+        //        }
+        //        System.err.println( " population size before deletion: " + scenario.getPopulation().getPersons().size() );
+        //        for ( Id id : normalPersons ) {
+        //        	scenario.getPopulation().getPersons().remove(id) ;
+        //        }
+        //        System.err.println( " population size after deletion: " + scenario.getPopulation().getPersons().size() );
+
         return scenario;
     }
 
@@ -119,9 +112,9 @@ public class OnlineDvrpLauncherUtils
     /**
      * Mandatory
      */
-    public static MatsimVrpData initMatsimVrpData(Scenario scenario, TravelTimeCalculator travelTimeCalculator,
-            TravelTimeSource ttimeSource, TravelDisutilitySource tdisSource, String eventsFileName,
-            String depotsFileName)
+    public static MatsimVrpData initMatsimVrpData(Scenario scenario,
+            TravelTimeCalculator travelTimeCalculator, TravelTimeSource ttimeSource,
+            TravelDisutilitySource tdisSource, String eventsFileName, String depotsFileName)
     {
         TravelTime travelTime;
         if (travelTimeCalculator == null) {

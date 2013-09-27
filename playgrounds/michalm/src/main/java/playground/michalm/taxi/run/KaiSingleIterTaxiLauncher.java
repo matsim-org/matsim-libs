@@ -19,12 +19,12 @@
 
 package playground.michalm.taxi.run;
 
-/*package*/class KaiSingleIterOnlineDvrpLauncher
+/*package*/class KaiSingleIterTaxiLauncher
 {
     public static void main(String... args)
     {
         String file = "./shared-svn/projects/maciejewski/input/mielec-2-peaks/params.in";
-        SingleIterOnlineDvrpLauncher launcher = new SingleIterOnlineDvrpLauncher(file);
+        SingleIterTaxiLauncher launcher = new SingleIterTaxiLauncher(file);
         launcher.go(false);
         launcher.generateOutput();
     }

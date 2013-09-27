@@ -43,7 +43,7 @@ import playground.michalm.taxi.optimizer.immediaterequest.ImmediateRequestTaxiOp
 import playground.michalm.util.gis.Schedules2GIS;
 
 
-/*package*/class SingleIterOnlineDvrpLauncher
+/*package*/class SingleIterTaxiLauncher
 {
     /*package*/final String dirName;
     /*package*/final String netFileName;
@@ -76,7 +76,7 @@ import playground.michalm.util.gis.Schedules2GIS;
     /*package*/TravelTimeCalculator travelTimeCalculator;
 
 
-    /*package*/SingleIterOnlineDvrpLauncher()
+    /*package*/SingleIterTaxiLauncher()
     {
         dirName = "D:\\PP-rad\\taxi\\mielec-2-peaks\\";
         netFileName = dirName + "network.xml";
@@ -125,12 +125,12 @@ import playground.michalm.util.gis.Schedules2GIS;
 
         writeSimEvents = !true;
 
-        scenario = OnlineDvrpLauncherUtils.initMatsimData(netFileName, plansFileName,
+        scenario = TaxiLauncherUtils.initMatsimData(netFileName, plansFileName,
                 taxiCustomersFileName);
     }
 
 
-    /*package*/SingleIterOnlineDvrpLauncher(String paramFile)
+    /*package*/SingleIterTaxiLauncher(String paramFile)
     {
         Scanner scanner;
         try {
@@ -175,7 +175,7 @@ import playground.michalm.util.gis.Schedules2GIS;
 
         writeSimEvents = Boolean.valueOf(params.get("writeSimEvents"));
 
-        scenario = OnlineDvrpLauncherUtils.initMatsimData(netFileName, plansFileName,
+        scenario = TaxiLauncherUtils.initMatsimData(netFileName, plansFileName,
                 taxiCustomersFileName);
     }
 
@@ -185,14 +185,14 @@ import playground.michalm.util.gis.Schedules2GIS;
      */
     /*package*/void go(boolean warmup)
     {
-        data = OnlineDvrpLauncherUtils.initMatsimVrpData(scenario, travelTimeCalculator,
+        data = TaxiLauncherUtils.initMatsimVrpData(scenario, travelTimeCalculator,
                 algorithmConfig.ttimeSource, algorithmConfig.tdisSource, eventsFileName,
                 depotsFileName);
 
         ImmediateRequestTaxiOptimizer optimizer = algorithmConfig.createTaxiOptimizer(
                 data.getVrpData(), destinationKnown, minimizePickupTripTime);
 
-        QSim qSim = OnlineDvrpLauncherUtils.initQSim(data, optimizer, onlineVehicleTracker);
+        QSim qSim = TaxiLauncherUtils.initQSim(data, optimizer, onlineVehicleTracker);
         EventsManager events = qSim.getEventsManager();
 
         EventWriter eventWriter = null;
@@ -337,19 +337,19 @@ import playground.michalm.util.gis.Schedules2GIS;
         ChartUtils.showFrame(ScheduleChartUtils.chartSchedule(data.getVrpData()));
 
         if (outHistogram) {
-            OnlineDvrpLauncherUtils.writeHistograms(legHistogram, histogramOutDirName);
+            TaxiLauncherUtils.writeHistograms(legHistogram, histogramOutDirName);
         }
     }
 
 
     public static void main(String... args)
     {
-        SingleIterOnlineDvrpLauncher launcher;
+        SingleIterTaxiLauncher launcher;
         if (args.length == 0) {
-            launcher = new SingleIterOnlineDvrpLauncher();
+            launcher = new SingleIterTaxiLauncher();
         }
         else if (args.length == 1) {
-            launcher = new SingleIterOnlineDvrpLauncher(args[0]);
+            launcher = new SingleIterTaxiLauncher(args[0]);
         }
         else {
             throw new RuntimeException();

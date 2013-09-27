@@ -26,22 +26,22 @@ import org.matsim.core.gbl.MatsimRandom;
 
 import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.optimizer.TaxiEvaluator.TaxiEvaluation;
-import playground.michalm.taxi.run.OnlineDvrpLauncherUtils.TravelTimeSource;
+import playground.michalm.taxi.run.TaxiLauncherUtils.TravelTimeSource;
 
 
-/*package*/class MultipleSingleIterOnlineDvrpLauncher
+/*package*/class MultipleSingleIterTaxiLauncher
 {
     private static final int[] RANDOM_SEEDS = { 463, 467, 479, 487, 491, 499, 503, 509, 521, 523,
             541, 547, 557, 563, 569, 571, 577, 587, 593, 599, 601, 607, 613, 617, 619, 631, 641,
             643, 647, 653 };
 
-    private final SingleIterOnlineDvrpLauncher launcher;
+    private final SingleIterTaxiLauncher launcher;
     private final TaxiDelaySpeedupStats delaySpeedupStats;
 
 
-    /*package*/MultipleSingleIterOnlineDvrpLauncher(String paramFile)
+    /*package*/MultipleSingleIterTaxiLauncher(String paramFile)
     {
-        launcher = new SingleIterOnlineDvrpLauncher(paramFile);
+        launcher = new SingleIterTaxiLauncher(paramFile);
         delaySpeedupStats = new TaxiDelaySpeedupStats();
         launcher.delaySpeedupStats = delaySpeedupStats;
     }
@@ -175,7 +175,7 @@ import playground.michalm.taxi.run.OnlineDvrpLauncherUtils.TravelTimeSource;
             boolean onlineVehicleTracker, boolean minimizePickupTripTime)
         throws FileNotFoundException
     {
-        MultipleSingleIterOnlineDvrpLauncher multiLauncher = new MultipleSingleIterOnlineDvrpLauncher(
+        MultipleSingleIterTaxiLauncher multiLauncher = new MultipleSingleIterTaxiLauncher(
                 paramFile);
 
         String txt = "DK_" + destinationKnown + "_VT_" + onlineVehicleTracker + "_TP_"

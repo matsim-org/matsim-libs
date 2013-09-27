@@ -17,12 +17,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.data.network.shortestpath;
+package org.matsim.contrib.dvrp.dynagent;
 
 import java.util.*;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.dvrp.data.network.*;
+import org.matsim.contrib.dvrp.data.network.shortestpath.ShortestPath;
 import org.matsim.contrib.dynagent.DynLeg;
 
 import pl.poznan.put.vrp.dynamic.data.network.Vertex;

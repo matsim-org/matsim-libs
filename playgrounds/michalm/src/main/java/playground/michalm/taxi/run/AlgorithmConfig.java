@@ -21,11 +21,11 @@ package playground.michalm.taxi.run;
 
 import static playground.michalm.taxi.optimizer.immediaterequest.TaxiOptimizationPolicy.*;
 import static playground.michalm.taxi.run.AlgorithmConfig.AlgorithmType.*;
-import static playground.michalm.taxi.run.OnlineDvrpLauncherUtils.TravelDisutilitySource.*;
-import static playground.michalm.taxi.run.OnlineDvrpLauncherUtils.TravelTimeSource.*;
+import static playground.michalm.taxi.run.TaxiLauncherUtils.TravelDisutilitySource.*;
+import static playground.michalm.taxi.run.TaxiLauncherUtils.TravelTimeSource.*;
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import playground.michalm.taxi.optimizer.immediaterequest.*;
-import playground.michalm.taxi.run.OnlineDvrpLauncherUtils.*;
+import playground.michalm.taxi.run.TaxiLauncherUtils.*;
 
 
 /*package*/class AlgorithmConfig
