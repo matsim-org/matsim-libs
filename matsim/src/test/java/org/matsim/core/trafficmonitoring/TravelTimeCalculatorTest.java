@@ -30,6 +30,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import junit.framework.Assert;
 
 import org.apache.log4j.Logger;
+import org.junit.Ignore;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
@@ -511,6 +512,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 	 * Tests the example in the comment to TravelTimeCalculator.consolidateData()
 	 * @author dgrether
 	 */
+	@Ignore
 	public void testLongTravelTimeInEmptySlotShortBinsSimultaneousLinkEnter() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
