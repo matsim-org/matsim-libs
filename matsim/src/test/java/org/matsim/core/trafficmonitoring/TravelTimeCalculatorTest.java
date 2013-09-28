@@ -513,7 +513,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 	 * @author dgrether
 	 */
 	@Ignore
-	public void testLongTravelTimeInEmptySlotShortBinsSimultaneousLinkEnter() {
+	public void estLongTravelTimeInEmptySlotShortBinsSimultaneousLinkEnter() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 
 		Network network = scenario.getNetwork();
