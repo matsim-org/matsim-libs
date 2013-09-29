@@ -82,4 +82,11 @@ public class PlanToDynAgentLogicAdapter
             throw new IllegalStateException();
         }
     }
+
+
+    @Override
+    public void actionPossiblyChanged()
+    {
+        //do nothing -- all data are constant
+    }
 }

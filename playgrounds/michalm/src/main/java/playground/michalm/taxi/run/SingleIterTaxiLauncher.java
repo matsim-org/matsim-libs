@@ -24,20 +24,27 @@ import java.util.*;
 
 import org.matsim.analysis.LegHistogram;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.contrib.dvrp.VrpSimEngine;
 import org.matsim.contrib.dvrp.data.MatsimVrpData;
+import org.matsim.contrib.dvrp.data.network.MatsimVrpGraph;
+import org.matsim.contrib.dvrp.run.VrpLauncherUtils;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.OTFVisConfigGroup.ColoringScheme;
 import org.matsim.core.events.algorithms.*;
 import org.matsim.core.mobsim.qsim.QSim;
+import org.matsim.core.router.util.*;
 import org.matsim.core.trafficmonitoring.TravelTimeCalculator;
 import org.matsim.vis.otfvis.*;
 
 import pl.poznan.put.util.jfreechart.ChartUtils;
 import pl.poznan.put.vrp.dynamic.chart.ScheduleChartUtils;
+import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.model.Request.ReqStatus;
 import playground.michalm.RunningVehicleRegister;
+import playground.michalm.demand.ODDemandGenerator;
+import playground.michalm.taxi.*;
 import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.optimizer.immediaterequest.ImmediateRequestTaxiOptimizer;
 import playground.michalm.util.gis.Schedules2GIS;
@@ -77,6 +84,7 @@ import playground.michalm.util.gis.Schedules2GIS;
 
 
     /*package*/SingleIterTaxiLauncher()
+        throws IOException
     {
         dirName = "D:\\PP-rad\\taxi\\mielec-2-peaks\\";
         netFileName = dirName + "network.xml";
@@ -125,12 +133,14 @@ import playground.michalm.util.gis.Schedules2GIS;
 
         writeSimEvents = !true;
 
-        scenario = TaxiLauncherUtils.initMatsimData(netFileName, plansFileName,
-                taxiCustomersFileName);
+        scenario = VrpLauncherUtils.initScenario(netFileName, plansFileName);
+        List<String> passengerIds = ODDemandGenerator.readTaxiCustomerIds(taxiCustomersFileName);
+        VrpLauncherUtils.convertLegModes(passengerIds, TaxiRequestCreator.MODE, scenario);
     }
 
 
     /*package*/SingleIterTaxiLauncher(String paramFile)
+        throws IOException
     {
         Scanner scanner;
         try {
@@ -175,8 +185,9 @@ import playground.michalm.util.gis.Schedules2GIS;
 
         writeSimEvents = Boolean.valueOf(params.get("writeSimEvents"));
 
-        scenario = TaxiLauncherUtils.initMatsimData(netFileName, plansFileName,
-                taxiCustomersFileName);
+        scenario = VrpLauncherUtils.initScenario(netFileName, plansFileName);
+        List<String> passengerIds = ODDemandGenerator.readTaxiCustomerIds(taxiCustomersFileName);
+        VrpLauncherUtils.convertLegModes(passengerIds, TaxiRequestCreator.MODE, scenario);
     }
 
 
@@ -185,14 +196,32 @@ import playground.michalm.util.gis.Schedules2GIS;
      */
     /*package*/void go(boolean warmup)
     {
-        data = TaxiLauncherUtils.initMatsimVrpData(scenario, travelTimeCalculator,
-                algorithmConfig.ttimeSource, algorithmConfig.tdisSource, eventsFileName,
-                depotsFileName);
+        TravelTime travelTime = VrpLauncherUtils.initTravelTime(scenario, travelTimeCalculator,
+                algorithmConfig.ttimeSource, eventsFileName);
 
-        ImmediateRequestTaxiOptimizer optimizer = algorithmConfig.createTaxiOptimizer(
-                data.getVrpData(), destinationKnown, minimizePickupTripTime);
+        TravelDisutility travelDisutility = VrpLauncherUtils.initTravelDisutility(
+                algorithmConfig.tdisSource, travelTime);
 
-        QSim qSim = TaxiLauncherUtils.initQSim(data, optimizer, onlineVehicleTracker);
+        MatsimVrpGraph graph = VrpLauncherUtils.initMatsimVrpGraph(scenario,
+                algorithmConfig.ttimeSource, travelTime, travelDisutility, depotsFileName);
+
+        VrpData vrpData = VrpLauncherUtils.initVrpData(scenario, graph, depotsFileName);
+
+        MatsimVrpData data = new MatsimVrpData(vrpData, scenario);
+
+        ImmediateRequestTaxiOptimizer optimizer = algorithmConfig.createTaxiOptimizer(vrpData,
+                destinationKnown, minimizePickupTripTime);
+
+        QSim qSim = VrpLauncherUtils.initQSim(scenario);
+
+        VrpSimEngine vrpSimEngine = VrpLauncherUtils.initVrpSimEngine(qSim, data, optimizer);
+
+        VrpLauncherUtils.initAgentSources(qSim, data, vrpSimEngine, new TaxiActionCreator(
+                vrpSimEngine), onlineVehicleTracker);
+
+        VrpLauncherUtils.initDepartureHandler(qSim, data, vrpSimEngine, new TaxiRequestCreator(
+                vrpData), TaxiRequestCreator.MODE);
+
         EventsManager events = qSim.getEventsManager();
 
         EventWriter eventWriter = null;
@@ -337,12 +366,13 @@ import playground.michalm.util.gis.Schedules2GIS;
         ChartUtils.showFrame(ScheduleChartUtils.chartSchedule(data.getVrpData()));
 
         if (outHistogram) {
-            TaxiLauncherUtils.writeHistograms(legHistogram, histogramOutDirName);
+            VrpLauncherUtils.writeHistograms(legHistogram, histogramOutDirName);
         }
     }
 
 
     public static void main(String... args)
+        throws IOException
     {
         SingleIterTaxiLauncher launcher;
         if (args.length == 0) {

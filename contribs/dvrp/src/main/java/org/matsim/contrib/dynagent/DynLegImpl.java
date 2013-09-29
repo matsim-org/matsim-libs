@@ -85,4 +85,9 @@ public class DynLegImpl
     {
         return route.getEndLinkId();
     }
+
+
+    @Override
+    public void endAction(double now)
+    {}
 }

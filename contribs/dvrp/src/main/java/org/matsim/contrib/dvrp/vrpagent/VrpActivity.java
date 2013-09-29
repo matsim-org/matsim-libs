@@ -17,40 +17,42 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer.immediaterequest;
+package org.matsim.contrib.dvrp.vrpagent;
 
-import pl.poznan.put.vrp.dynamic.data.VrpData;
-import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
+import org.matsim.contrib.dynagent.DynActivity;
+
+import pl.poznan.put.vrp.dynamic.data.schedule.StayTask;
 
 
-public class OTSTaxiOptimizer
-    extends ImmediateRequestTaxiOptimizer
+public class VrpActivity
+    implements DynActivity
 {
-    private final TaxiOptimizationPolicy optimizationPolicy;
+    private StayTask stayTask;
+    private String activityType;
 
 
-    public OTSTaxiOptimizer(VrpData data, boolean destinationKnown, boolean minimizePickupTripTime,
-            TaxiOptimizationPolicy optimizationPolicy)
+    public VrpActivity(String activityType, StayTask stayTask)
     {
-        super(data, destinationKnown, minimizePickupTripTime);
-        this.optimizationPolicy = optimizationPolicy;
+        this.activityType = activityType;
+        this.stayTask = stayTask;
     }
 
 
     @Override
-    protected boolean shouldOptimizeBeforeNextTask(Vehicle vehicle, boolean scheduleUpdated)
+    public double getEndTime()
     {
-        if (!scheduleUpdated) {// no changes
-            return false;
-        }
-
-        return optimizationPolicy.shouldOptimize(vehicle.getSchedule().getCurrentTask());
+        return stayTask.getEndTime();
     }
 
 
     @Override
-    protected boolean shouldOptimizeAfterNextTask(Vehicle vehicle, boolean scheduleUpdated)
+    public String getActivityType()
     {
-        return false;
+        return activityType;
     }
+
+
+    @Override
+    public void endAction(double now)
+    {}
 }

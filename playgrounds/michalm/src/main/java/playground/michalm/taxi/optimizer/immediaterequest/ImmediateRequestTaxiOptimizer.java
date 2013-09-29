@@ -1,11 +1,32 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.michalm.taxi.optimizer.immediaterequest;
 
 import java.util.List;
 
+import org.matsim.contrib.dvrp.optimizer.VrpOptimizerWithOnlineTracking;
+
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
 import pl.poznan.put.vrp.dynamic.data.network.*;
-import pl.poznan.put.vrp.dynamic.data.online.*;
+import pl.poznan.put.vrp.dynamic.data.online.VehicleTracker;
 import pl.poznan.put.vrp.dynamic.data.schedule.*;
 import pl.poznan.put.vrp.dynamic.data.schedule.Schedule.ScheduleStatus;
 import pl.poznan.put.vrp.dynamic.data.schedule.Task.TaskType;
@@ -26,7 +47,7 @@ import playground.michalm.taxi.optimizer.schedule.TaxiDriveTask;
  */
 public abstract class ImmediateRequestTaxiOptimizer
     extends AbstractTaxiOptimizer
-    implements VehicleTrackerListener
+    implements VrpOptimizerWithOnlineTracking
 {
     protected static class VehicleDrive
     {
@@ -236,7 +257,7 @@ public abstract class ImmediateRequestTaxiOptimizer
         }
 
         // return delay != 0;//works only for offline vehicle tracking
-        
+
         //since we can change currentTask.endTime continuously, it is hard to determine
         //what endTime was at the moment of last reoptimization (triggered by other vehicles or
         //requests)
@@ -347,12 +368,14 @@ public abstract class ImmediateRequestTaxiOptimizer
 
 
     @Override
-    public void nextPositionReached(VehicleTracker vehicleTracker)
+    public boolean nextPositionReached(VehicleTracker vehicleTracker)
     {
         DriveTask dt = vehicleTracker.getDriveTask();
         dt.setEndTime(vehicleTracker.predictEndTime(data.getTime()));
 
         Schedule schedule = dt.getSchedule();
         updatePlannedTasks(schedule);
+
+        return false;
     }
 }

@@ -19,9 +19,13 @@
 
 package playground.michalm.taxi.run;
 
+import java.io.IOException;
+
+
 /*package*/class KaiSingleIterTaxiLauncher
 {
     public static void main(String... args)
+        throws IOException
     {
         String file = "./shared-svn/projects/maciejewski/input/mielec-2-peaks/params.in";
         SingleIterTaxiLauncher launcher = new SingleIterTaxiLauncher(file);

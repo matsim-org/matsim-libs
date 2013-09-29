@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,34 +17,25 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.data.model;
-
-import org.matsim.contrib.dynagent.DynAgentLogic;
+package org.matsim.contrib.dvrp.optimizer;
 
 import pl.poznan.put.vrp.dynamic.data.model.*;
 
 
-public class DynAgentVehicle
-    extends VehicleImpl
+public interface VrpOptimizer
 {
-    private DynAgentLogic agentLogic;
+    void init();
 
 
-    public DynAgentVehicle(int id, String name, Depot depot, int capacity, double cost, int t0,
-            int t1, int timeLimit)
-    {
-        super(id, name, depot, capacity, cost, t0, t1, timeLimit);
-    }
+    /**
+     * This function can be generalized (in the future) to encompass request modification,
+     * cancellation etc. See:
+     * {@link org.matsim.contrib.dvrp.VrpSimEngine#requestSubmitted(Request, double)}
+     */
+    //return boolean? ("has anything change?" true/false)
+    void requestSubmitted(Request request);
 
 
-    public DynAgentLogic getAgentLogic()
-    {
-        return agentLogic;
-    }
-
-
-    public void setAgentLogic(DynAgentLogic agentLogic)
-    {
-        this.agentLogic = agentLogic;
-    }
+    //return boolean? ("has anything change?" true/false)
+    void nextTask(Vehicle vehicle);
 }

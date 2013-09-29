@@ -17,11 +17,13 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi;
+package org.matsim.contrib.dvrp;
 
 import java.util.*;
 
 import org.matsim.contrib.dvrp.data.MatsimVrpData;
+import org.matsim.contrib.dvrp.optimizer.*;
+import org.matsim.contrib.dynagent.DynAgentLogic;
 import org.matsim.core.mobsim.framework.MobsimTimer;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimBeforeSimStepListener;
@@ -30,23 +32,23 @@ import org.matsim.core.mobsim.qsim.interfaces.*;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import pl.poznan.put.vrp.dynamic.data.model.*;
-import playground.michalm.taxi.optimizer.TaxiOptimizer;
+import pl.poznan.put.vrp.dynamic.data.online.VehicleTracker;
 
 
-public class TaxiSimEngine
+public class VrpSimEngine
     implements MobsimEngine, MobsimBeforeSimStepListener
 {
     private final VrpData vrpData;
     protected final MobsimTimer simTimer;
 
-    private final TaxiOptimizer optimizer;
+    private final VrpOptimizer optimizer;
 
-    private final List<TaxiAgentLogic> agentLogics = new ArrayList<TaxiAgentLogic>();
+    private final List<DynAgentLogic> agentLogics = new ArrayList<DynAgentLogic>();
 
     private InternalInterface internalInterface;
 
 
-    public TaxiSimEngine(Netsim netsim, MatsimVrpData data, TaxiOptimizer optimizer)
+    public VrpSimEngine(Netsim netsim, MatsimVrpData data, VrpOptimizer optimizer)
     {
         this.simTimer = netsim.getSimTimer();
         this.optimizer = optimizer;
@@ -55,13 +57,7 @@ public class TaxiSimEngine
     }
 
 
-    /*package*/TaxiOptimizer getOptimizer()
-    {
-        return optimizer;
-    }
-
-
-    /*package*/InternalInterface getInternalInterface()
+    public InternalInterface getInternalInterface()
     {
         return internalInterface;
     }
@@ -93,9 +89,14 @@ public class TaxiSimEngine
     }
 
 
-    public void taxiRequestSubmitted(Request request, double now)
+    /**
+     * This function can be generalized (in the future) to encompass request modification,
+     * cancellation etc. See:
+     * {@link org.matsim.contrib.dvrp.optimizer.VrpOptimizer#requestSubmitted(Request)}
+     */
+    public void requestSubmitted(Request request, double now)
     {
-        optimizer.taxiRequestSubmitted(request);
+        optimizer.requestSubmitted(request);
         notifyAgentLogics();
     }
 
@@ -104,6 +105,17 @@ public class TaxiSimEngine
     {
         optimizer.nextTask(vrpVehicle);
         notifyAgentLogics();
+    }
+
+
+    public void nextPositionReached(VehicleTracker vehicleTracker)
+    {
+        boolean scheduleChanged = ((VrpOptimizerWithOnlineTracking)optimizer)
+                .nextPositionReached(vehicleTracker);
+
+        if (scheduleChanged) {
+            notifyAgentLogics();
+        }
     }
 
 
@@ -122,19 +134,19 @@ public class TaxiSimEngine
 
     protected void notifyAgentLogics()
     {
-        for (TaxiAgentLogic a : agentLogics) {
-            a.schedulePossiblyChanged();
+        for (DynAgentLogic a : agentLogics) {
+            a.actionPossiblyChanged();
         }
     }
 
 
-    public void addAgentLogic(TaxiAgentLogic agentLogic)
+    public void addAgentLogic(DynAgentLogic agentLogic)
     {
         agentLogics.add(agentLogic);
     }
 
 
-    public void removeAgentLogic(TaxiAgentLogic agentLogic)
+    public void removeAgentLogic(DynAgentLogic agentLogic)
     {
         agentLogics.remove(agentLogic);
     }

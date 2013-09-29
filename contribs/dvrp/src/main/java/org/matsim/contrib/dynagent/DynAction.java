@@ -20,4 +20,6 @@
 package org.matsim.contrib.dynagent;
 
 public interface DynAction
-{}
+{
+    void endAction(double now);
+}

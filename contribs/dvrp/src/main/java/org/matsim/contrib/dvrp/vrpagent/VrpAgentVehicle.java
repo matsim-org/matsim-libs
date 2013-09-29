@@ -17,53 +17,42 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.data.model;
+package org.matsim.contrib.dvrp.vrpagent;
 
-import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.contrib.dynagent.DynAgent;
 
-import pl.poznan.put.vrp.dynamic.data.model.Customer;
-import pl.poznan.put.vrp.dynamic.data.network.Vertex;
+import pl.poznan.put.vrp.dynamic.data.model.*;
+import pl.poznan.put.vrp.dynamic.data.schedule.Task;
 
 
-public class MobsimAgentCustomer
-    implements Customer
+public class VrpAgentVehicle
+    extends VehicleImpl
 {
-    private int id;
-    private Vertex vertex;
-    private MobsimAgent passenger;
+    private VrpAgentLogic agentLogic;
 
 
-    public MobsimAgentCustomer(int id, Vertex vertex, MobsimAgent passenger)
+    public VrpAgentVehicle(int id, String name, Depot depot, int capacity, double cost, int t0,
+            int t1, int timeLimit)
     {
-        this.id = id;
-        this.vertex = vertex;
-        this.passenger = passenger;
+        super(id, name, depot, capacity, cost, t0, t1, timeLimit);
     }
 
 
-    @Override
-    public int getId()
+    public VrpAgentLogic getAgentLogic()
     {
-        return id;
+        return agentLogic;
     }
 
 
-    @Override
-    public String getName()
+    public void setAgentLogic(VrpAgentLogic agentLogic)
     {
-        return passenger.getId().toString();
+        this.agentLogic = agentLogic;
     }
 
 
-    @Override
-    public Vertex getVertex()
+    public static DynAgent getAgent(Task task)
     {
-        return vertex;
-    }
-
-
-    public MobsimAgent getPassenger()
-    {
-        return passenger;
+        VrpAgentVehicle vehicle = (VrpAgentVehicle)task.getSchedule().getVehicle();
+        return vehicle.getAgentLogic().getDynAgent();
     }
 }

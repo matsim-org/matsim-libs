@@ -19,12 +19,12 @@
 
 package playground.jbischoff.taxi.sim;
 
+import org.matsim.contrib.dvrp.VrpSimEngine;
 import org.matsim.contrib.dvrp.data.MatsimVrpData;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
 import playground.jbischoff.energy.charging.DepotArrivalDepartureCharger;
 import playground.jbischoff.taxi.optimizer.rank.RankTaxiOptimizer;
-import playground.michalm.taxi.TaxiSimEngine;
 /**
  * 
  * 
@@ -32,7 +32,7 @@ import playground.michalm.taxi.TaxiSimEngine;
  * @author jbischoff
  *
  */
-public class ElectricTaxiSimEngine extends TaxiSimEngine {
+public class ElectricTaxiSimEngine extends VrpSimEngine {
 	private DepotArrivalDepartureCharger dac;
 	private RankTaxiOptimizer optimizer;
 

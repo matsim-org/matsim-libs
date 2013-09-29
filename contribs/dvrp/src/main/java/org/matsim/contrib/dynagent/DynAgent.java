@@ -112,6 +112,8 @@ public class DynAgent
 
     private void computeNextAction(DynAction oldDynAction, double now)
     {
+        oldDynAction.endAction(now);
+        
         state = null;// !!! this is important
         dynActivity = null;
         dynLeg = null;

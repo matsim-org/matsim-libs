@@ -22,8 +22,8 @@ package org.matsim.contrib.dvrp.data.file;
 import java.util.*;
 
 import org.matsim.api.core.v01.*;
-import org.matsim.contrib.dvrp.data.model.DynAgentVehicle;
 import org.matsim.contrib.dvrp.data.network.MatsimVrpGraph;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentVehicle;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
 
@@ -119,7 +119,7 @@ public class DepotReader
         int t1 = getInt(atts, "t1", 24 * 60 * 60);
         int tLimit = getInt(atts, "tLimit", t1 - t0);
 
-        vehicles.add(new DynAgentVehicle(id, name, currentDepot, capacity, cost, t0, t1, tLimit));
+        vehicles.add(new VrpAgentVehicle(id, name, currentDepot, capacity, cost, t0, t1, tLimit));
     }
 
 

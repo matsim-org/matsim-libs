@@ -31,7 +31,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.TreeMap;
 
-import org.geotools.filter.expression.ThisPropertyAccessorFactory;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -40,7 +39,7 @@ import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 
-import playground.michalm.taxi.TaxiModeDepartureHandler;
+import playground.michalm.taxi.TaxiRequestCreator;
 /**
  * 
  * 
@@ -122,7 +121,7 @@ public class TaxiCustomerWaitTimeAnalyser implements
 
 	@Override
 	public void handleEvent(AgentDepartureEvent event) {
-		if (!event.getLegMode().equals(TaxiModeDepartureHandler.TAXI_MODE)) return;
+		if (!event.getLegMode().equals(TaxiRequestCreator.MODE)) return;
 		this.taxicalltime.put(event.getPersonId(),event.getTime());
 		this.linkAg.put(event.getPersonId(), event.getLinkId());
 		

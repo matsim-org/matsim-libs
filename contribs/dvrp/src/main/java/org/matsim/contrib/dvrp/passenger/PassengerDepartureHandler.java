@@ -17,32 +17,40 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi;
-
-import java.util.List;
+package org.matsim.contrib.dvrp.passenger;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.dvrp.VrpSimEngine;
 import org.matsim.contrib.dvrp.data.MatsimVrpData;
-import org.matsim.contrib.dvrp.data.model.MobsimAgentCustomer;
 import org.matsim.contrib.dvrp.data.network.*;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 
-import pl.poznan.put.vrp.dynamic.data.model.*;
+import pl.poznan.put.vrp.dynamic.data.model.Request;
 
 
-public class TaxiModeDepartureHandler
+public class PassengerDepartureHandler
     implements DepartureHandler
 {
-    public static final String TAXI_MODE = "taxi";
-
-    private MatsimVrpData data;
-    private TaxiSimEngine taxiSimEngine;
-
-
-    public TaxiModeDepartureHandler(TaxiSimEngine taxiSimEngine, MatsimVrpData data)
+    public interface RequestCreator
     {
-        this.taxiSimEngine = taxiSimEngine;
+        Request createRequest(MobsimAgent agent, MatsimVertex fromVertex, MatsimVertex toVertex,
+                double now);
+    }
+
+
+    private final String mode;
+    private final RequestCreator requestCreator;
+    private final MatsimVrpData data;
+    private final VrpSimEngine vrpSimEngine;
+
+
+    public PassengerDepartureHandler(String mode, RequestCreator requestCreator,
+            VrpSimEngine vrpSimEngine, MatsimVrpData data)
+    {
+        this.mode = mode;
+        this.requestCreator = requestCreator;
+        this.vrpSimEngine = vrpSimEngine;
         this.data = data;
     }
 
@@ -50,28 +58,16 @@ public class TaxiModeDepartureHandler
     @Override
     public boolean handleDeparture(double now, MobsimAgent agent, Id linkId)
     {
-        if (agent.getMode().equals(TAXI_MODE)) {
+        if (agent.getMode().equals(mode)) {
             MatsimVrpGraph vrpGraph = data.getMatsimVrpGraph();
             MatsimVertex fromVertex = vrpGraph.getVertex(linkId);
             Id toLinkId = agent.getDestinationLinkId();
             MatsimVertex toVertex = vrpGraph.getVertex(toLinkId);
 
-            List<Customer> customers = data.getVrpData().getCustomers();
-            List<Request> requests = data.getVrpData().getRequests();
+            Request request = requestCreator.createRequest(agent, fromVertex, toVertex, now);
 
-            // agent -> customerId -> Customer
-            int id = requests.size();
-            Customer customer = new MobsimAgentCustomer(id, fromVertex, agent);// TODO
-            int duration = 120; // approx. 120 s for entering the taxi
-            int t0 = (int)now;
-            int t1 = t0 + 0; // hardcoded values!
-            Request request = new RequestImpl(id, customer, fromVertex, toVertex, 1, 1, duration,
-                    t0, t1, false);
-            customers.add(customer);
-            requests.add(request);
-
-            taxiSimEngine.getInternalInterface().registerAdditionalAgentOnLink(agent);
-            taxiSimEngine.taxiRequestSubmitted(request, now);
+            vrpSimEngine.getInternalInterface().registerAdditionalAgentOnLink(agent);
+            vrpSimEngine.requestSubmitted(request, now);
 
             return true;
         }

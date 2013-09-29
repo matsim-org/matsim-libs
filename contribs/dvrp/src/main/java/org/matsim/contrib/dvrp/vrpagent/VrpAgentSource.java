@@ -17,15 +17,16 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi;
+package org.matsim.contrib.dvrp.vrpagent;
 
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.dvrp.VrpSimEngine;
 import org.matsim.contrib.dvrp.data.MatsimVrpData;
-import org.matsim.contrib.dvrp.data.model.DynAgentVehicle;
 import org.matsim.contrib.dvrp.data.network.MatsimVertex;
 import org.matsim.contrib.dvrp.data.schedule.VrpSchedulePlanFactory;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentLogic.ActionCreator;
 import org.matsim.contrib.dynagent.*;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -34,28 +35,31 @@ import org.matsim.vehicles.VehicleUtils;
 import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
 
 
-public class TaxiAgentSource
+public class VrpAgentSource
     implements AgentSource
 {
+    private final ActionCreator nextActionCreator;
+
     private final MatsimVrpData data;
-    private final TaxiSimEngine taxiSimEngine;
+    private final VrpSimEngine vrpSimEngine;
 
     private final boolean onlineVehicleTracker;
     private final boolean isAgentWithPlan;
 
 
-    public TaxiAgentSource(MatsimVrpData data, TaxiSimEngine vrpSimEngine,
-            boolean onlineVehicleTracker)
+    public VrpAgentSource(ActionCreator nextActionCreator, MatsimVrpData data,
+            VrpSimEngine vrpSimEngine, boolean onlineVehicleTracker)
     {
-        this(data, vrpSimEngine, onlineVehicleTracker, false);
+        this(nextActionCreator, data, vrpSimEngine, onlineVehicleTracker, false);
     }
 
 
-    public TaxiAgentSource(MatsimVrpData data, TaxiSimEngine taxiSimEngine,
-            boolean onlineVehicleTracker, boolean isAgentWithPlan)
+    public VrpAgentSource(ActionCreator nextActionCreator, MatsimVrpData data,
+            VrpSimEngine vrpSimEngine, boolean onlineVehicleTracker, boolean isAgentWithPlan)
     {
+        this.nextActionCreator = nextActionCreator;
         this.data = data;
-        this.taxiSimEngine = taxiSimEngine;
+        this.vrpSimEngine = vrpSimEngine;
 
         this.onlineVehicleTracker = onlineVehicleTracker;
         this.isAgentWithPlan = isAgentWithPlan;
@@ -65,21 +69,24 @@ public class TaxiAgentSource
     @Override
     public void insertAgentsIntoMobsim()
     {
-        QSim qSim = (QSim)taxiSimEngine.getInternalInterface().getMobsim();
+        QSim qSim = (QSim)vrpSimEngine.getInternalInterface().getMobsim();
         List<Vehicle> vehicles = data.getVrpData().getVehicles();
 
         for (Vehicle vrpVeh : vehicles) {
-            TaxiAgentLogic taxiAgentLogic = new TaxiAgentLogic(vrpVeh, taxiSimEngine,
-                    data.getMatsimVrpGraph(), onlineVehicleTracker);
-            taxiSimEngine.addAgentLogic(taxiAgentLogic);
+            VrpAgentLogic vrpAgentLogic = new VrpAgentLogic(nextActionCreator,
+                    (VrpAgentVehicle)vrpVeh);
 
-            ((DynAgentVehicle)vrpVeh).setAgentLogic(taxiAgentLogic);
+            if (onlineVehicleTracker) {
+                vrpAgentLogic.enableOnlineTracking(vrpSimEngine, data.getMatsimVrpGraph());
+            }
+
+            vrpSimEngine.addAgentLogic(vrpAgentLogic);
 
             Id id = data.getScenario().createId(vrpVeh.getName());
             Id startLinkId = ((MatsimVertex)vrpVeh.getDepot().getVertex()).getLink().getId();
 
-            DynAgent taxiAgent = new DynAgent(id, startLinkId,
-                    taxiSimEngine.getInternalInterface(), taxiAgentLogic);
+            DynAgent taxiAgent = new DynAgent(id, startLinkId, vrpSimEngine.getInternalInterface(),
+                    vrpAgentLogic);
 
             if (isAgentWithPlan) {
                 qSim.insertAgentIntoMobsim(new DynAgentWithPlan(taxiAgent,

@@ -17,40 +17,15 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer.immediaterequest;
+package org.matsim.contrib.dvrp.optimizer;
 
-import pl.poznan.put.vrp.dynamic.data.VrpData;
-import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
+import pl.poznan.put.vrp.dynamic.data.online.VehicleTracker;
 
-
-public class OTSTaxiOptimizer
-    extends ImmediateRequestTaxiOptimizer
+public interface VrpOptimizerWithOnlineTracking
+    extends VrpOptimizer
 {
-    private final TaxiOptimizationPolicy optimizationPolicy;
-
-
-    public OTSTaxiOptimizer(VrpData data, boolean destinationKnown, boolean minimizePickupTripTime,
-            TaxiOptimizationPolicy optimizationPolicy)
-    {
-        super(data, destinationKnown, minimizePickupTripTime);
-        this.optimizationPolicy = optimizationPolicy;
-    }
-
-
-    @Override
-    protected boolean shouldOptimizeBeforeNextTask(Vehicle vehicle, boolean scheduleUpdated)
-    {
-        if (!scheduleUpdated) {// no changes
-            return false;
-        }
-
-        return optimizationPolicy.shouldOptimize(vehicle.getSchedule().getCurrentTask());
-    }
-
-
-    @Override
-    protected boolean shouldOptimizeAfterNextTask(Vehicle vehicle, boolean scheduleUpdated)
-    {
-        return false;
-    }
+    /**
+     * @return true if reoptimization has been performed
+     */
+    boolean nextPositionReached(VehicleTracker vehicleTracker);
 }

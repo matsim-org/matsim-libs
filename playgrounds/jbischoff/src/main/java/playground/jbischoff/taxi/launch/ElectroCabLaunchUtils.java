@@ -26,12 +26,15 @@ import org.matsim.analysis.LegHistogram;
 import org.matsim.api.core.v01.*;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.*;
+import org.matsim.contrib.dvrp.VrpSimEngine;
 import org.matsim.contrib.dvrp.data.MatsimVrpData;
 import org.matsim.contrib.dvrp.data.file.DepotReader;
 import org.matsim.contrib.dvrp.data.network.*;
 import org.matsim.contrib.dvrp.data.network.router.*;
 import org.matsim.contrib.dvrp.data.network.shortestpath.MatsimArcFactories;
+import org.matsim.contrib.dvrp.passenger.PassengerDepartureHandler;
 import org.matsim.contrib.dvrp.run.VrpConfigUtils;
+import org.matsim.contrib.dvrp.vrpagent.VrpAgentSource;
 import org.matsim.contrib.transEnergySim.controllers.EventHandlerGroup;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.*;
 import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.ricardoFaria2012.EnergyConsumptionModelRicardoFaria2012;
@@ -120,7 +123,7 @@ public class ElectroCabLaunchUtils {
 			Person person = scenario.getPopulation().getPersons()
 					.get(scenario.createId(id));
 			Leg leg = (Leg) person.getSelectedPlan().getPlanElements().get(1);
-			leg.setMode(TaxiModeDepartureHandler.TAXI_MODE);
+			leg.setMode(TaxiRequestCreator.MODE);
 			
 		}
 
@@ -256,16 +259,17 @@ public class ElectroCabLaunchUtils {
 
 		optimizer.addDepotArrivalCharger(depotArrivalDepartureCharger);
 
-		TaxiSimEngine taxiSimEngine = new ElectricTaxiSimEngine(qSim, data,
+		VrpSimEngine taxiSimEngine = new ElectricTaxiSimEngine(qSim, data,
 				optimizer, depotArrivalDepartureCharger);
 		qSim.addMobsimEngine(taxiSimEngine);
 
 		qSim.addAgentSource(new PopulationAgentSource(scenario.getPopulation(),
 				new DefaultAgentFactory(qSim), qSim));
-		qSim.addAgentSource(new TaxiAgentSource(data, taxiSimEngine, false));
-		qSim.addDepartureHandler(new TaxiModeDepartureHandler(taxiSimEngine,
-				data));
-
+        qSim.addAgentSource(new VrpAgentSource(new TaxiActionCreator(taxiSimEngine), data,
+                taxiSimEngine, false));
+        qSim.addDepartureHandler(new PassengerDepartureHandler(TaxiRequestCreator.MODE,
+                new TaxiRequestCreator(data.getVrpData()), taxiSimEngine, data));
+ 
 		// chargeUponDepotArrival = new ChargeUponDepotArrival(elvehicles);
 		// chargeUponDepotArrival.setDepotLocations(this.depotReader.getDepotLinks());
 

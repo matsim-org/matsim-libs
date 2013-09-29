@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,40 +17,59 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer.immediaterequest;
+package org.matsim.contrib.dvrp.passenger;
 
-import pl.poznan.put.vrp.dynamic.data.VrpData;
-import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+
+import pl.poznan.put.vrp.dynamic.data.model.*;
+import pl.poznan.put.vrp.dynamic.data.network.Vertex;
 
 
-public class OTSTaxiOptimizer
-    extends ImmediateRequestTaxiOptimizer
+public class PassengerCustomer
+    implements Customer
 {
-    private final TaxiOptimizationPolicy optimizationPolicy;
+    private int id;
+    private Vertex vertex;
+    private MobsimAgent passenger;
 
 
-    public OTSTaxiOptimizer(VrpData data, boolean destinationKnown, boolean minimizePickupTripTime,
-            TaxiOptimizationPolicy optimizationPolicy)
+    public PassengerCustomer(int id, Vertex vertex, MobsimAgent passenger)
     {
-        super(data, destinationKnown, minimizePickupTripTime);
-        this.optimizationPolicy = optimizationPolicy;
+        this.id = id;
+        this.vertex = vertex;
+        this.passenger = passenger;
     }
 
 
     @Override
-    protected boolean shouldOptimizeBeforeNextTask(Vehicle vehicle, boolean scheduleUpdated)
+    public int getId()
     {
-        if (!scheduleUpdated) {// no changes
-            return false;
-        }
-
-        return optimizationPolicy.shouldOptimize(vehicle.getSchedule().getCurrentTask());
+        return id;
     }
 
 
     @Override
-    protected boolean shouldOptimizeAfterNextTask(Vehicle vehicle, boolean scheduleUpdated)
+    public String getName()
     {
-        return false;
+        return passenger.getId().toString();
+    }
+
+
+    @Override
+    public Vertex getVertex()
+    {
+        return vertex;
+    }
+
+
+    public MobsimAgent getPassenger()
+    {
+        return passenger;
+    }
+    
+    
+    public static MobsimAgent getPassenger(Request request)
+    {
+        return ((PassengerCustomer)request.getCustomer()).getPassenger();
     }
 }

@@ -19,13 +19,16 @@
 
 package playground.michalm.taxi.run;
 
+import static org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource.*;
+import static org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource.*;
 import static playground.michalm.taxi.optimizer.immediaterequest.TaxiOptimizationPolicy.*;
 import static playground.michalm.taxi.run.AlgorithmConfig.AlgorithmType.*;
-import static playground.michalm.taxi.run.TaxiLauncherUtils.TravelDisutilitySource.*;
-import static playground.michalm.taxi.run.TaxiLauncherUtils.TravelTimeSource.*;
+
+import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelDisutilitySource;
+import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
+
 import pl.poznan.put.vrp.dynamic.data.VrpData;
 import playground.michalm.taxi.optimizer.immediaterequest.*;
-import playground.michalm.taxi.run.TaxiLauncherUtils.*;
 
 
 /*package*/class AlgorithmConfig

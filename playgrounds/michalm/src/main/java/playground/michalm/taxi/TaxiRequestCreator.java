@@ -3,7 +3,7 @@
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ * copyright       : (C) 2012 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -17,40 +17,50 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.michalm.taxi.optimizer.immediaterequest;
+package playground.michalm.taxi;
+
+import java.util.List;
+
+import org.matsim.contrib.dvrp.data.network.MatsimVertex;
+import org.matsim.contrib.dvrp.passenger.*;
+import org.matsim.core.mobsim.framework.MobsimAgent;
 
 import pl.poznan.put.vrp.dynamic.data.VrpData;
-import pl.poznan.put.vrp.dynamic.data.model.Vehicle;
+import pl.poznan.put.vrp.dynamic.data.model.*;
 
 
-public class OTSTaxiOptimizer
-    extends ImmediateRequestTaxiOptimizer
+public class TaxiRequestCreator
+    implements PassengerDepartureHandler.RequestCreator
 {
-    private final TaxiOptimizationPolicy optimizationPolicy;
+    public static final String MODE = "taxi";
+
+    private final VrpData vrpData;
 
 
-    public OTSTaxiOptimizer(VrpData data, boolean destinationKnown, boolean minimizePickupTripTime,
-            TaxiOptimizationPolicy optimizationPolicy)
+    public TaxiRequestCreator(VrpData vrpData)
     {
-        super(data, destinationKnown, minimizePickupTripTime);
-        this.optimizationPolicy = optimizationPolicy;
+        this.vrpData = vrpData;
     }
 
 
     @Override
-    protected boolean shouldOptimizeBeforeNextTask(Vehicle vehicle, boolean scheduleUpdated)
+    public Request createRequest(MobsimAgent agent, MatsimVertex fromVertex, MatsimVertex toVertex,
+            double now)
     {
-        if (!scheduleUpdated) {// no changes
-            return false;
-        }
+        List<Customer> customers = vrpData.getCustomers();
+        List<Request> requests = vrpData.getRequests();
 
-        return optimizationPolicy.shouldOptimize(vehicle.getSchedule().getCurrentTask());
-    }
+        // agent -> customerId -> Customer
+        int id = requests.size();
+        Customer customer = new PassengerCustomer(id, fromVertex, agent);// TODO
+        int duration = 120; // approx. 120 s for entering the taxi
+        int t0 = (int)now;
+        int t1 = t0 + 0; // hardcoded values!
+        Request request = new RequestImpl(id, customer, fromVertex, toVertex, 1, 1, duration, t0,
+                t1, false);
+        customers.add(customer);
+        requests.add(request);
 
-
-    @Override
-    protected boolean shouldOptimizeAfterNextTask(Vehicle vehicle, boolean scheduleUpdated)
-    {
-        return false;
+        return request;
     }
 }

@@ -28,4 +28,7 @@ public interface DynAgentLogic
 
 
     DynAction computeNextAction(DynAction oldAction, double now);
+
+
+    void actionPossiblyChanged();
 }

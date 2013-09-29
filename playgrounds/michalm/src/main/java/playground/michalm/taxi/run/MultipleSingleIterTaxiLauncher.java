@@ -22,11 +22,11 @@ package playground.michalm.taxi.run;
 import java.io.*;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.matsim.contrib.dvrp.run.VrpLauncherUtils.TravelTimeSource;
 import org.matsim.core.gbl.MatsimRandom;
 
 import playground.michalm.taxi.optimizer.*;
 import playground.michalm.taxi.optimizer.TaxiEvaluator.TaxiEvaluation;
-import playground.michalm.taxi.run.TaxiLauncherUtils.TravelTimeSource;
 
 
 /*package*/class MultipleSingleIterTaxiLauncher
@@ -40,6 +40,7 @@ import playground.michalm.taxi.run.TaxiLauncherUtils.TravelTimeSource;
 
 
     /*package*/MultipleSingleIterTaxiLauncher(String paramFile)
+        throws IOException
     {
         launcher = new SingleIterTaxiLauncher(paramFile);
         delaySpeedupStats = new TaxiDelaySpeedupStats();
@@ -173,10 +174,9 @@ import playground.michalm.taxi.run.TaxiLauncherUtils.TravelTimeSource;
 
     private static void run(int configIdx, int runs, String paramFile, boolean destinationKnown,
             boolean onlineVehicleTracker, boolean minimizePickupTripTime)
-        throws FileNotFoundException
+        throws IOException
     {
-        MultipleSingleIterTaxiLauncher multiLauncher = new MultipleSingleIterTaxiLauncher(
-                paramFile);
+        MultipleSingleIterTaxiLauncher multiLauncher = new MultipleSingleIterTaxiLauncher(paramFile);
 
         String txt = "DK_" + destinationKnown + "_VT_" + onlineVehicleTracker + "_TP_"
                 + minimizePickupTripTime;
@@ -204,7 +204,7 @@ import playground.michalm.taxi.run.TaxiLauncherUtils.TravelTimeSource;
 
     // args: configIdx runs
     public static void main(String... args)
-        throws FileNotFoundException
+        throws IOException
     {
         String paramFile;
         if (args.length == 2) {

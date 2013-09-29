@@ -17,24 +17,23 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.dvrp.dynagent;
-
-import java.util.*;
+package org.matsim.contrib.dvrp.vrpagent;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.contrib.dvrp.VrpSimEngine;
 import org.matsim.contrib.dvrp.data.network.*;
 import org.matsim.contrib.dvrp.data.network.shortestpath.ShortestPath;
 import org.matsim.contrib.dynagent.DynLeg;
 
 import pl.poznan.put.vrp.dynamic.data.network.Vertex;
-import pl.poznan.put.vrp.dynamic.data.online.*;
+import pl.poznan.put.vrp.dynamic.data.online.VehicleTracker;
 import pl.poznan.put.vrp.dynamic.data.schedule.DriveTask;
 
 
 /**
  * ASSUMPTION: A vehicle enters and exits links at their ends (link.getToNode())
  */
-public class ShortestPathDynLeg
+public class VrpDynLeg
     implements DynLeg
 {
     private final ShortestPath shortestPath;
@@ -49,7 +48,7 @@ public class ShortestPathDynLeg
     private OnlineVehicleTracker onlineVehicleTracker;
 
 
-    public ShortestPathDynLeg(DriveTask driveTask)
+    public VrpDynLeg(DriveTask driveTask)
     {
         beginTime = driveTask.getBeginTime();
 
@@ -61,12 +60,14 @@ public class ShortestPathDynLeg
 
 
     public void initOnlineVehicleTracker(DriveTask driveTask, MatsimVrpGraph graph,
-            VehicleTrackerListener listener)
+            VrpSimEngine vrpSimEngine)
     {
         if (onlineVehicleTracker == null) {
-            onlineVehicleTracker = new OnlineVehicleTracker(driveTask, graph);
+            onlineVehicleTracker = new OnlineVehicleTracker(driveTask, graph, vrpSimEngine);
             driveTask.setVehicleTracker(onlineVehicleTracker);
-            onlineVehicleTracker.addListener(listener);
+        }
+        else {
+            throw new IllegalStateException();
         }
     }
 
@@ -107,24 +108,30 @@ public class ShortestPathDynLeg
     }
 
 
+    @Override
+    public void endAction(double now)
+    {}
+
+
     private class OnlineVehicleTracker
         implements VehicleTracker
     {
         private final DriveTask driveTask;
         private final MatsimVrpGraph vrpGraph;
+        private final VrpSimEngine vrpSimEngine;
 
         private int timeAtLastNode = beginTime;
         private int delayAtLastNode = 0;
 
         private int expectedLinkTravelTime = shortestPath.accLinkTravelTimes[0];
 
-        private List<VehicleTrackerListener> listeners = new ArrayList<VehicleTrackerListener>();
 
-
-        public OnlineVehicleTracker(DriveTask driveTask, MatsimVrpGraph vrpGraph)
+        public OnlineVehicleTracker(DriveTask driveTask, MatsimVrpGraph vrpGraph,
+                VrpSimEngine vrpSimEngine)
         {
             this.driveTask = driveTask;
             this.vrpGraph = vrpGraph;
+            this.vrpSimEngine = vrpSimEngine;
         }
 
 
@@ -139,9 +146,7 @@ public class ShortestPathDynLeg
             expectedLinkTravelTime = shortestPath.accLinkTravelTimes[currentLinkIdx]
                     - expectedTimeEnRoute;
 
-            for (VehicleTrackerListener l : listeners) {
-                l.nextPositionReached(this);
-            }
+            vrpSimEngine.nextPositionReached(this);
         }
 
 
@@ -215,20 +220,6 @@ public class ShortestPathDynLeg
         public int getInitialEndTime()
         {
             return driveTask.getBeginTime() + shortestPath.accLinkTravelTimes[destinationLinkIdx];
-        }
-
-
-        @Override
-        public void addListener(VehicleTrackerListener listener)
-        {
-            listeners.add(listener);
-        }
-
-
-        @Override
-        public void removeListener(VehicleTrackerListener listener)
-        {
-            listeners.remove(listener);
         }
     }
 }
