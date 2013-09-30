@@ -46,7 +46,9 @@ public class TestMain {
 		System.out.println(Double.toString(d));
 		DecimalFormat f = new DecimalFormat("#.#");
 		System.out.println(f.format(d));
-		f = new DecimalFormat("#.00");
+		f = new DecimalFormat("#0.00");
+		System.out.println(f.format(d));
+		d = 0.34;
 		System.out.println(f.format(d));
 		f = new DecimalFormat("#");
 		System.out.println(f.format(d));
@@ -68,16 +70,24 @@ public class TestMain {
 		d = -0.5;
 		System.out.println(Math.round(d));
 	}
+	
+	private static void testSplit(){
+		String modes = "car, pt";
+		System.out.println(modes.split(","));
+		System.out.println(modes.split(";")[0]);
+		modes = "car";
+		System.out.println(modes.split(",")[0]);
+	}
 
 	public static void main(String[] args){
 		String config = "/media/data/work/matsim/examples/stephan_rath/testcase3/config.xml";
 //		Controler c = new Controler(config);
 //		c.run();
 //		OTFVis.playConfig(config);
-//		testNumberFormat();
+		testNumberFormat();
 //		testReplaceAll();
-		testRound();
-		
+//		testRound();
+//		testSplit();
 	}
 
 

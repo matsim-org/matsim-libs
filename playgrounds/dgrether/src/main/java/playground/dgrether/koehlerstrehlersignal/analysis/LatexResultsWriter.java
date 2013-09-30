@@ -31,7 +31,6 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 
 import playground.dgrether.koehlerstrehlersignal.analysis.DgAnalyseCottbusKS2010.Result;
-import playground.dgrether.koehlerstrehlersignal.analysis.DgAnalyseCottbusKS2010.Results;
 
 
 /**
@@ -56,34 +55,35 @@ class LatexResultsWriter {
 //		header.append(separator);
 //		header.append("travel time [s]");
 //		header.append(separator);
-		header.append("travel time [hh:mm]");
+		header.append("$tt$ [hh:mm]");
 		header.append(separator);
 //		header.append("delta travel time [s]");
 //		header.append(separator);
 //		header.append("delta travel time [hh:mm:ss]");
 //		header.append(separator);
-		header.append("travel time [%]");
+		header.append("$\\Delta$ $tt$ [%]");
 		header.append(separator);
-//		header.append("total delay [s]");
-//		header.append(separator);
-		header.append("total delay [hh:mm]");
+
+		header.append("$v$ [km/h]");
 		header.append(separator);
-//		header.append("delta total delay [hh:mm:ss]");
-//		header.append(separator);
-		header.append("delay [%]");
+		header.append("$\\Delta$ $v$ [%]");
 		header.append(separator);
+
 		
-		header.append("distance travelled [km]");
+		header.append("veh km [km]");
 		header.append(separator);
 //		header.append("delta distance[km]");
 //		header.append(separator);
-		header.append("distance travelled [%]");
-
-//		header.append("speed[km/h]");
+		header.append("$\\Delta$ veh km [%]");
+		header.append(separator);
+		
+//		header.append("total delay [s]");
 //		header.append(separator);
-//		header.append("delta speed [km/h]");
+		header.append("delay [hh:mm]");
+		header.append(separator);
+//		header.append("delta total delay [hh:mm:ss]");
 //		header.append(separator);
-
+		header.append("$\\Delta$ delay [%]");
 		header.append("\t\\\\");
 		
 
@@ -112,6 +112,19 @@ class LatexResultsWriter {
 //		out.append(separator);
 		out.append(formatDouble(r.travelTimePercent));
 		out.append(separator);
+
+		out.append(formatDouble(r.speedKmH));
+		out.append(separator);
+		out.append(formatDouble(r.deltaSpeedKmH));
+		out.append(separator);
+
+		out.append(formatDoubleInt((r.distanceMeter/1000.0)));
+		out.append(separator);
+//		out.append(formatDouble((r.deltaDistance/1000.0)));
+//		out.append(separator);
+		out.append(formatDouble(r.distancePercent));
+		out.append(separator);
+		
 //		out.append(formatDouble(r.totalDelay));
 //		out.append(separator);
 		out.append(Time.writeTime(r.totalDelay, Time.TIMEFORMAT_HHMM));
@@ -119,18 +132,9 @@ class LatexResultsWriter {
 //		out.append(Time.writeTime(r.deltaTotalDelay));
 //		out.append(separator);
 		out.append(formatDouble(r.delayPercent));
-		out.append(separator);
-		
-		out.append(formatDoubleInt((r.distanceMeter/1000.0)));
-		out.append(separator);
-//		out.append(formatDouble((r.deltaDistance/1000.0)));
 //		out.append(separator);
-		out.append(formatDouble(r.distancePercent));
 		
-		//		out.append(separator);
-//		out.append(formatDouble(r.speedKmH));
-//		out.append(separator);
-//		out.append(formatDouble(r.deltaSpeedKmH));
+		
 		out.append("\t\\\\");
 		
 
@@ -138,12 +142,12 @@ class LatexResultsWriter {
 	}
 	
 	
-	void writeResultsTable(Results results, String file) {
+	void writeResultsTable(List<Result> results, String file) {
 		List<String> lines = new ArrayList<String>();
 		String separator = "\t&\t";
 		String header = createHeader(separator);
 		lines.add(header.toString());
-		for (Result r : results.getResults()) {
+		for (Result r : results) {
 			String line = createLine(separator, r);
 			lines.add(line);
 			log.info(line);
@@ -179,7 +183,7 @@ class LatexResultsWriter {
 	
 	
 	private String formatDouble(double d){
-		DecimalFormat format = new DecimalFormat("#.00");
+		DecimalFormat format = new DecimalFormat("#0.00");
 		return format.format(d);
 	}
 	

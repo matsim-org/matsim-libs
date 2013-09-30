@@ -94,7 +94,7 @@ public class DgFigure9Runner {
 		
 		c.addControlerListener(new StartupListener() {
 			public void notifyStartup(StartupEvent e) {
-				mfdHandler = new DgMfd(e.getControler().getScenario().getNetwork());
+				mfdHandler = new DgMfd(e.getControler().getScenario().getNetwork(), 1.0);
 				e.getControler().getEvents().addHandler(handler23);
 				e.getControler().getEvents().addHandler(handler27);
 				e.getControler().getEvents().addHandler(handler54);

@@ -51,8 +51,8 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Agen
 	
 	private static final Logger log = Logger.getLogger(DgMfd.class);
 	
-	private static final double binSizeSeconds = 1.0 * 60.0;
-	private static final double vehicleSize = 7.5 * (1.0/0.7);
+	private static final double binSizeSeconds = 5.0 * 60.0;
+	private static final double vehicleSize = 7.5;
 	
 	private Map<Id, Double> firstTimeSeenMap = new HashMap<Id, Double>();
 	private Map<Id, LinkLeaveEvent> lastTimeSeenMap = new HashMap<Id, LinkLeaveEvent>();
@@ -60,11 +60,13 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Agen
 	private Network network;
 	private double networkLengthKm;
 	private Data data;
+	private double storagecap;
 
 	
-	public DgMfd(Network network){
+	public DgMfd(Network network, double storagecap){
 		this.network = network;
 		this.networkLengthKm =  this.calcNetworkLengthKm();
+		this.storagecap = storagecap;
 		this.data = new Data(networkLengthKm);
 	}
 
@@ -108,8 +110,8 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Agen
 			this.data.incrementFlow(slot, link);
 			LinkEnterEvent enterEvent = this.enterEventByPersonIdMap.get(event.getPersonId());
 			if (enterEvent != null) {
-				double velocity = link.getLength() / (event.getTime() - enterEvent.getTime());
-				this.data.addVelocity(slot, link, velocity);
+				double tt = (event.getTime() - enterEvent.getTime());
+				this.data.addTravelTimeSeconds(slot, link, tt);
 			}
 		}
 	}
@@ -128,6 +130,7 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Agen
 	private void handleLeaveNetworkOrArrival(Id personId) {
 		Double firstEvent = this.firstTimeSeenMap.remove(personId);
 		LinkLeaveEvent lastEvent = this.lastTimeSeenMap.remove(personId);
+		this.enterEventByPersonIdMap.remove(personId);
 		
 		if (firstEvent != null && lastEvent != null){
 			int index = getBinIndex(firstEvent);
@@ -140,13 +143,9 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Agen
 //		}
 	}
 
-	
-	
 	private int getBinIndex(double time){
 		return (int)(time / binSizeSeconds);
 	}
-	
-
 	
 	private double calcNetworkLengthKm() {
 		double length = 0.0;
@@ -174,12 +173,13 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Agen
 	}
 	
 	public void write(final PrintStream stream) {
-		String header  = "slot\ttime[s]\thour\tdepartures\tarrivals\ten-route\tdensity[veh/km]\tspaceMeanFlow\tspaceMeanSpeed\tnetworkLength[km]";
+		String header  = "slot\ttime[s]\thour\tdepartures\tarrivals\ten-route\tdensity[veh/km]\tspaceMeanFlow\tspaceMeanSpeed[km/h]\tnormalizedDensity\tnetworkLength[km]";
 		stream.println(header);
 		double density = 0.0;
 		Integer arnew = 0;
 		Integer depnew = 0;
 		double noVehicles = 0;
+		double densityNorm = 0.0;
 		for (int slot = this.data.getFirstSlot() - 2; slot <= this.data.getLastSlot() + 2; slot++) {
 			SlotData slotData = this.data.getSlotData().get(slot);
 			if (slotData == null) {
@@ -189,6 +189,7 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Agen
 			depnew = slotData.departures;
 			noVehicles = noVehicles + depnew - arnew ;
 			density = (noVehicles) / this.networkLengthKm;
+			densityNorm = (noVehicles) / ((this.networkLengthKm*1000.0 / vehicleSize) * this.storagecap);
 			double timeSec = slot * binSizeSeconds;
 			int hour = (int) (timeSec / 3600);	
 			StringBuffer line = new StringBuffer();
@@ -208,7 +209,9 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Agen
 			line.append("\t");
 			line.append(slotData.spaceMeanFlow);
 			line.append("\t");
-			line.append(slotData.spaceMeanSpeed);
+			line.append(slotData.spaceMeanSpeedMeterPerSecond*3.6);
+			line.append("\t");
+			line.append(densityNorm);
 			line.append("\t");
 			line.append(networkLengthKm);
 			
@@ -220,7 +223,7 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Agen
 	private static class SlotData {
 		Integer arrivals = 0;
 		Integer departures = 0;
-		Double spaceMeanSpeed = 0.0;
+		Double spaceMeanSpeedMeterPerSecond = 0.0;
 		Double spaceMeanFlow = 0.0;
 	}
 	
@@ -235,7 +238,7 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Agen
 		public Data(double networkLengthKm) {
 			this.networkLengthKm = networkLengthKm;
 		}
-
+		
 		public void completedEventsHandling() {
 			for (int slot = getFirstSlot(); slot <= getLastSlot(); slot++) {
 				SlotData slotData = this.getSlotData().get(slot);
@@ -243,27 +246,25 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Agen
 					slotData = new SlotData();
 					this.getSlotData().put(slot, slotData);
 				}
-				double spaceMeanSpeed = this.calcSpaceMeanSpeed(slot);
+				double spaceMeanSpeed = this.calcSpaceMeanSpeedMeterPersSecond(slot);
 				double spaceMeanFlow = this.calcSpaceMeanFlow(slot);
 				slotData.spaceMeanFlow = spaceMeanFlow;
-				slotData.spaceMeanSpeed = spaceMeanSpeed;
+				slotData.spaceMeanSpeedMeterPerSecond = spaceMeanSpeed;
 			}
 			linksBySlot.clear();
 		}
 
-		private double calcSpaceMeanSpeed(int slot) {
+		private double calcSpaceMeanSpeedMeterPersSecond(int slot) {
 			LinksData linksData = getLinksDataBySlot().get(slot);
-			double sum = 0.0;
+			double sumDistance = 0.0;
+			double sumTraveltime = 0.0;
 			if (linksData != null) {
 				for (LinkData ld : linksData.linkData.values()){
-					if (ld.velocitySum > 0.0) {
-//						sum += ld.velocitySum / ld.velocityCount;
-						sum += (ld.velocityCount / ld.velocitySum);
-					}
+					sumDistance += ld.distanceSum;
+					sumTraveltime += ld.travelTimeSecondsSum;
 				}
-				sum = sum / linksData.linkData.values().size();
 			}
-			return sum;
+			return sumDistance / sumTraveltime;
 		}
 
 		private double calcSpaceMeanFlow(int slot) {
@@ -316,10 +317,10 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Agen
 			this.linksBySlot.get(slot).incrementFlow(l);
 		}
 
-		public void addVelocity(Integer slot, Link l, double v) {
+		public void addTravelTimeSeconds(Integer slot, Link l, double tt) {
 			this.checkSlot(slot);
 			this.checkLinkData(slot, l);
-			this.linksBySlot.get(slot).addVelocity(l, v);
+			this.linksBySlot.get(slot).addTravelTimeSeconds(l, tt);
 		}
 
 		private void checkLinkData(Integer slot, Link l) {
@@ -346,14 +347,14 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Agen
 	private static class LinkData {
 		Link link;
 		Double flow = null;
-		Double velocitySum = null;
-		Double velocityCount = null;
+		Double travelTimeSecondsSum = null;
+		Double distanceSum = null;
 		
 		public LinkData(Link l) {
 			link = l;
 			flow = 0.0;
-			velocitySum = 0.0;
-			velocityCount = 0.0;
+			travelTimeSecondsSum = 0.0;
+			distanceSum = 0.0;
 		}
 	}
 	
@@ -366,10 +367,10 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Agen
 			linkData.get(l.getId()).flow++;
 		}
 
-		public void addVelocity(Link l, double v) {
+		public void addTravelTimeSeconds(Link l, double tt) {
 			this.checkLinkData(l);
-			linkData.get(l.getId()).velocitySum += (1/v);
-			linkData.get(l.getId()).velocityCount++;
+			linkData.get(l.getId()).travelTimeSecondsSum += tt;
+			linkData.get(l.getId()).distanceSum += l.getLength();
 		}
 		
 		private void checkLinkData(Link l){

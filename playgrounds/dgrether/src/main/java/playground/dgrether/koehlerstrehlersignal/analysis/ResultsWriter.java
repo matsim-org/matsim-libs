@@ -84,6 +84,7 @@ class ResultsWriter {
 		header.append("delta speed [km/h]");
 		header.append(separator);
 		
+		
 		header.append("noTrips");
 		header.append(separator);
 		header.append("delta noTrips");

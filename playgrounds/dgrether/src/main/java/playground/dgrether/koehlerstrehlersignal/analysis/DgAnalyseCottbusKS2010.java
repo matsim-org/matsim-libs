@@ -25,6 +25,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.geotools.geometry.jts.JTS;
@@ -58,7 +59,6 @@ import playground.dgrether.DgPaths;
 import playground.dgrether.analysis.RunResultsLoader;
 import playground.dgrether.analysis.categoryhistogram.CategoryHistogramWriter;
 import playground.dgrether.analysis.flightlhi.LegModeHistogramImproved;
-import playground.dgrether.analysis.simsimanalyser.CountsShapefileWriter;
 import playground.dgrether.analysis.simsimanalyser.SimSimAnalysis;
 import playground.dgrether.analysis.simsimanalyser.SimSimShapefileWriter;
 import playground.dgrether.events.EventsFilterManager;
@@ -84,14 +84,16 @@ public class DgAnalyseCottbusKS2010 {
 	static class Extent {
 		String name;
 		Envelope envelope;
-		public Network network;
+		Network network;
 	}
 
 	static class RunInfo {
 		String runId;
 		String remark;
-		public boolean baseCase = false;
-		public Integer iteration;
+		boolean baseCase = false;
+		Integer iteration;
+		double flowcap = 0.7;
+		double storagecap = 0.7;
 	}
 
 	static class Result {
@@ -149,6 +151,22 @@ public class DgAnalyseCottbusKS2010 {
 			return ret;
 		}
 
+		public Map<Extent, List<Result>> getResultsByExtent() {
+			Map<Extent, List<Result>> ret = new HashMap<Extent, List<Result>>();
+			for (Map<Extent, Map<TimeConfig, Result>> m : resultMap.values()) {
+				for (Entry<Extent, Map<TimeConfig, Result>>  m2 : m.entrySet()) {
+					if (! ret.containsKey(m2.getKey())) {
+						ret.put(m2.getKey(), new ArrayList<Result>());
+					}
+					for (Result r : m2.getValue().values()) {
+						ret.get(m2.getKey()).add(r);
+						Collections.sort(ret.get(m2.getKey()), new ResultComparator());
+					}
+				}
+			}
+			return ret;
+		}
+
 	}
 	
 	static class ResultComparator implements Comparator<Result>{
@@ -166,7 +184,7 @@ public class DgAnalyseCottbusKS2010 {
 	}
 
 	private Results results = new Results();
-	private boolean useInMemoryEvents; 
+	private boolean useInMemoryEvents;
 
 	private void setUseInMemoryEvents(boolean useInMemoryEvents) {
 		this.useInMemoryEvents = useInMemoryEvents;
@@ -177,7 +195,11 @@ public class DgAnalyseCottbusKS2010 {
 		r.averageTravelTime = averageTT;
 		r.speedKmH = (r.distanceMeter/ r.travelTime) * 3.6;
 
-	}
+	}		
+	
+	
+	
+
 
 	private void compareWithBaseCaseResult(Result r, Result baseResult){
 		r.travelTimeDelta = r.travelTime - baseResult.travelTime;
@@ -206,7 +228,7 @@ public class DgAnalyseCottbusKS2010 {
 			compareWithBaseCaseResult(r, baseResult);
 			
 			if (! r.runInfo.baseCase) {
-//				this.createAndWriteSimSimComparison(baseResult, r);
+				this.createAndWriteSimSimComparison(baseResult, r);
 				log.warn("sim sim compare currently disabled");
 			}
 
@@ -234,8 +256,8 @@ public class DgAnalyseCottbusKS2010 {
 		shapeBase += result.runInfo.runId + "_it_" + result.runInfo.iteration;
 
 		String shapefile = shapeBase + "_simcountcomparison";
-		shapefile = result.runLoader.getIterationFilename(result.runInfo.iteration, shapefile);
-		new CountsShapefileWriter(result.network, Cottbus2KS2010.CRS).writeShape(shapefile + ".shp", countSimCompMap, baseResult.runInfo.runId, result.runInfo.runId);
+//		shapefile = result.runLoader.getIterationFilename(result.runInfo.iteration, shapefile);
+//		new CountsShapefileWriter(result.network, Cottbus2KS2010.CRS).writeShape(shapefile + ".shp", countSimCompMap, baseResult.runInfo.runId, result.runInfo.runId);
 
 		shapefile = shapeBase + "_simsimcomparison";
 		shapefile = result.runLoader.getIterationFilename(result.runInfo.iteration, shapefile);
@@ -294,7 +316,7 @@ public class DgAnalyseCottbusKS2010 {
 					VolumesAnalyzer volumes = new VolumesAnalyzer(3600, 24 * 3600, net);
 					eventsManager.addHandler(volumes);
 
-					DgMfd mfd = new DgMfd(net);
+					DgMfd mfd = new DgMfd(net, runInfo.storagecap);
 					eventsManager.addHandler(mfd);
 
 					TTTotalDelay totalDelay = new TTTotalDelay(net);
@@ -345,8 +367,8 @@ public class DgAnalyseCottbusKS2010 {
 		all.endTime = 24.0 * 3600.0;
 		all.name = "all_day";
 		List<TimeConfig> list = new ArrayList<TimeConfig>();
-				list.add(morning);
-				list.add(evening);
+//		list.add(morning);
+//		list.add(evening);
 		list.add(all);
 		return list;
 	}
@@ -457,14 +479,14 @@ public class DgAnalyseCottbusKS2010 {
 		ri.iteration = 2000;
 		ri.remark  = "continue 1712, com > 50, routes only";
 		ri.remark = "optimization, commodities > 50";
-//		l.add(ri);
+		l.add(ri);
 		//
 		ri = new RunInfo();
 		ri.runId = "1913";
 		ri.iteration = 2000;
 		ri.remark  = "continue 1712, sylvia, routes only";
 		ri.remark = "traffic-actuated control";
-//		l.add(ri);
+		l.add(ri);
 	}
 
 	private static void add1712BaseCaseNoChoice(List<RunInfo> l){
@@ -575,7 +597,7 @@ public class DgAnalyseCottbusKS2010 {
 		l.add(ri);
 	}
 
-	private static void add1940FlowCapacityRuns(List<RunInfo> l){
+	private static void addReduceFlowCapacityRunsNoIterations(List<RunInfo> l){
 		RunInfo ri = null;
 		ri = new RunInfo();
 		ri.runId = "1940";
@@ -645,19 +667,19 @@ public class DgAnalyseCottbusKS2010 {
 		ri.runId = "1951";
 		ri.iteration = 1000;
 		ri.remark  = "iterated base case, 0.4 flow storage cap";
-//		l.add(ri);
+		l.add(ri);
 
 		ri = new RunInfo();
 		ri.runId = "1952";
 		ri.iteration = 1000;
 		ri.remark  = "iterated base case, 0.3 flow storage cap";
-//		l.add(ri);
+		l.add(ri);
 		
 }
 	
 	
 
-	private static void addFlowCapacityRunsRoutesOnlyIterated(List<RunInfo> l){
+	private static void addReduceFlowCapacityRunsIterationsRoutesOnlyFromBaseCase(List<RunInfo> l){
 		RunInfo ri = null;
 		ri = new RunInfo();
 		ri.runId = "1900";
@@ -725,7 +747,7 @@ public class DgAnalyseCottbusKS2010 {
 		l.add(ri);
 	}
 
-	private static void add1724FromScratchFlowCapRuns(List<RunInfo> l){
+	private static void addReduceFlowCapacityRunsIterationsFromScratch(List<RunInfo> l){
 		RunInfo ri = null;
 		ri = new RunInfo();
 		ri.runId = "1722";
@@ -869,12 +891,11 @@ public class DgAnalyseCottbusKS2010 {
 		e = new Extent();
 		e.name = "city";
 		e.network = sc2.getNetwork();
-//		l.add(e);
+		l.add(e);
 
 		e = new Extent();
 		e.name = "all";
 		l.add(e);
-
 		return l;
 	}
 
@@ -918,23 +939,23 @@ public class DgAnalyseCottbusKS2010 {
 		RunInfo ri = null;
 //		add1740vs1745BaseCaseAnalysis(l);
 //		add1712BaseCaseAnalysis(l);
-//		add1712BaseCaseNoChoice(l);
-		add1712BaseCaseRoutesOnlyRuns(l);
 		
-//				add1712BaseCaseRoutesTimesRuns(l);
-//		add1722BaseCaseAnalysis(l);
-		
-//		add1724FromScratchFlowCapRuns(l);
+		add1712BaseCaseNoChoice(l);
+//		add1712BaseCaseRoutesOnlyRuns(l);
+//		add1712BaseCaseRoutesTimesRuns(l);
+
+				//		add1722BaseCaseAnalysis(l);
 
 //				add1722BaseCaseRoutesOnlyRuns(l);
 //				add1722BaseCaseRoutesTimesRuns(l);
 		//		add1726BaseCaseLongRerouteRuns(l);
 		//		add1722BaseCaseButKsModelBasedOn1712Runs(l);
 		
-//		add1940FlowCapacityRuns(l);
+//		addReduceFlowCapacityRunsNoIterations(l);
+//		addReduceFlowCapacityRunsIterationsFromScratch(l);
+//		addReduceFlowCapacityRunsIterationsRoutesOnlyFromBaseCase(l);
 //		addStorageCapacityRuns(l);
 //		addFlowStorageCapacityRuns(l);
-//		addFlowCapacityRunsRoutesOnlyIterated(l);
 		return l;
 	}
 	
@@ -947,7 +968,7 @@ public class DgAnalyseCottbusKS2010 {
 		String timesString = createTimesString(times);
 		List<Extent> extents = createExtentList();
 		String extentString = createExtentString(extents);
-		String outputFilename = outputDirectory + "2013-09-05_analysis" + runIdsString + "_" +  timesString + extentString;
+		String outputFilename = outputDirectory + "2013-09-29_analysis" + runIdsString + "_" +  timesString;
 		System.out.println(outputFilename);
 //		System.exit(0);
 		DgAnalyseCottbusKS2010 ana = new DgAnalyseCottbusKS2010();
@@ -955,8 +976,11 @@ public class DgAnalyseCottbusKS2010 {
 		ana.calculateResults(runIds, times, extents);
 		ana.analyseResults();
 		//		String outputDirectory = "C:/Users/Atany/Desktop/SHK/SVN/shared-svn/projects/cottbus/cb2ks2010/results/";
-		new ResultsWriter().writeResultsTable(ana.results, outputFilename +".txt");
-		new LatexResultsWriter().writeResultsTable(ana.results, outputFilename + ".tex");
+		new ResultsWriter().writeResultsTable(ana.results, outputFilename + extentString +".txt");
+		Map<Extent, List<Result>> resultsByExtent = ana.results.getResultsByExtent();
+		for (Entry<Extent, List<Result>> extent : resultsByExtent.entrySet()) {
+			new LatexResultsWriter().writeResultsTable(extent.getValue(), outputFilename + extent.getKey().name + ".tex");
+		}
 		log.info("Output written to " + outputFilename);
 
 	}

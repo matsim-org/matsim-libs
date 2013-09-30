@@ -43,10 +43,10 @@ import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 public class DgAverageTravelTimeSpeed implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandler, AgentStuckEventHandler{
 
 	private Network network;
-	private Map<Id, LinkEnterEvent> linkEnterByPerson;
+	private Map<Id, Double> networkEnterTimeByPersonId;
 	private Set<Id> seenPersonIds;
-	private double travelTime;
-	private double distance;
+	private double sumTravelTime;
+	private double sumDistance;
 	private double numberOfTrips;
 
 	public DgAverageTravelTimeSpeed(Network network) {
@@ -56,35 +56,36 @@ public class DgAverageTravelTimeSpeed implements LinkEnterEventHandler, LinkLeav
 
 	@Override
 	public void reset(int iteration) {
-		this.linkEnterByPerson = new HashMap<Id, LinkEnterEvent>();
+		this.networkEnterTimeByPersonId = new HashMap<Id, Double>();
 		this.seenPersonIds = new HashSet<Id>();
-		this.travelTime = 0.0;
-		this.distance = 0.0;
+		this.sumTravelTime = 0.0;
+		this.sumDistance = 0.0;
 		this.numberOfTrips = 0.0;
 	}
 
+	
 	@Override
 	public void handleEvent(LinkLeaveEvent event) {
 		if (network.getLinks().containsKey(event.getLinkId())) {
-			LinkEnterEvent linkEnterEvent = this.linkEnterByPerson.remove(event.getPersonId());
+			Double linkEnterEvent = this.networkEnterTimeByPersonId.remove(event.getPersonId());
 			if (linkEnterEvent != null) {
-				this.travelTime += event.getTime() - linkEnterEvent.getTime();
-				this.distance += network.getLinks().get(event.getLinkId()).getLength();
+				this.sumTravelTime += event.getTime() - linkEnterEvent;
+				this.sumDistance += network.getLinks().get(event.getLinkId()).getLength();
 			}
 		}
 	}
-
+	
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		if (network.getLinks().containsKey(event.getLinkId())) {
-			this.linkEnterByPerson.put(event.getPersonId(), event);
+			this.networkEnterTimeByPersonId.put(event.getPersonId(), event.getTime());
 			this.seenPersonIds.add(event.getPersonId());
 		}
 	}
 
 	@Override
 	public void handleEvent(AgentStuckEvent event) {
-		this.linkEnterByPerson.remove(event.getPersonId());
+		this.networkEnterTimeByPersonId.remove(event.getPersonId());
 	}
 
 	@Override
@@ -92,12 +93,12 @@ public class DgAverageTravelTimeSpeed implements LinkEnterEventHandler, LinkLeav
 		if (this.seenPersonIds.contains(event.getPersonId())){
 			this.numberOfTrips++;
 		}
-		this.linkEnterByPerson.remove(event.getPersonId());		
+		this.networkEnterTimeByPersonId.remove(event.getPersonId());		
 	}
 
 	
 	public double getTravelTime() {
-		return travelTime;
+		return sumTravelTime;
 	}
 	
 	public double getNumberOfPersons(){
@@ -105,7 +106,7 @@ public class DgAverageTravelTimeSpeed implements LinkEnterEventHandler, LinkLeav
 	}
 	
 	public double getDistanceMeter(){
-		return this.distance;
+		return this.sumDistance;
 	}
 	
 	public double getNumberOfTrips(){

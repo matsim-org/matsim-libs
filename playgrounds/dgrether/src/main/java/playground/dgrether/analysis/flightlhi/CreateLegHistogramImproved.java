@@ -83,12 +83,27 @@ public class CreateLegHistogramImproved {
 //			new Tuple<String, Integer>("1863", 1),
 //			new Tuple<String, Integer>("1864", 1)
 				
-			new Tuple<String, Integer>("1865", 600),
-			new Tuple<String, Integer>("1866", 600),
-			new Tuple<String, Integer>("1867", 600),
-			new Tuple<String, Integer>("1868", 600),
-			new Tuple<String, Integer>("1869", 600),
-			new Tuple<String, Integer>("1870", 600),
+//			new Tuple<String, Integer>("1865", 600),
+//			new Tuple<String, Integer>("1866", 600),
+//			new Tuple<String, Integer>("1867", 600),
+//			new Tuple<String, Integer>("1868", 600),
+//			new Tuple<String, Integer>("1869", 600),
+//			new Tuple<String, Integer>("1870", 600),
+
+			new Tuple<String, Integer>("1876", 600),
+			new Tuple<String, Integer>("1877", 600),
+			new Tuple<String, Integer>("1878", 600),
+			new Tuple<String, Integer>("1879", 600),
+			new Tuple<String, Integer>("1880", 600),
+			new Tuple<String, Integer>("1881", 600),
+				
+				
+//			new Tuple<String, Integer>("1882", 600), //path size mode choice 2011 daten
+//			new Tuple<String, Integer>("1883", 600),
+//			new Tuple<String, Integer>("1884", 600),
+//			new Tuple<String, Integer>("1885", 600),
+//			new Tuple<String, Integer>("1886", 600),
+
 		};
 
 		String vehiclesFile = "/home/dgrether/data/work/repos/shared-svn/studies/countries/eu/flight/dg_oag_tuesday_flight_model_2_runways_airport_capacities_www_storage_restriction/flight_transit_vehicles.xml";
