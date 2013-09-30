@@ -40,73 +40,101 @@ import playground.wrashid.PSF2.vehicle.vehicleFleet.Vehicle;
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
 /**
- * The goal is to output the parking times and energy consumptions based on a events file.
+ * The goal is to output the parking times and energy consumptions based on a
+ * events file.
  * 
- * The output format is:
- * agentId, startParking, endParking, linkId (where parked), actTypeOfActivity, energyConsumptionsInJoules (for previous trip).
+ * The output format is: agentId, startParking, endParking, linkId (where
+ * parked), actTypeOfActivity, energyConsumptionsInJoules (for previous trip).
+ * 
  * @author wrashid
- *
+ * 
  */
 
 public class ExportParkingTimesAndEnergyConsumptions {
 
 	public static void main(String[] args) {
-		
-		String eventsFile="E:/pikelot/swiss run dobler/output_census2000V2_10pct_kti_run5/ITERS/it.100/kti.2.100.events.xml.gz";
-		String networkFile="E:/svn/studies/switzerland/networks/teleatlas-ivtcheu/network.xml.gz";
+
+		String eventsFile = "C:/tmp2/matsim2030/run.3.90.events.xml.gz";
+		String networkFile = "C:/tmp2/matsim2030/multimodalNetwork2010final.xml.gz";
 		EventsManager events = EventsUtils.createEventsManager();
 
-		
-		
 		ParkingTimesPlugin parkingTimesPlugin = new ParkingTimesPlugin();
-		
-		//addActivityFilter(parkingTimesPlugin);
-		
+
+		// addActivityFilter(parkingTimesPlugin);
+
 		events.addHandler(parkingTimesPlugin);
-		
+
 		EnergyConsumptionPlugin energyConsumptionPlugin = getEnergyConsumptionPlugin(networkFile);
-		
+
 		events.addHandler(energyConsumptionPlugin);
-		
-		//EventsReaderTXTv1 reader = new EventsReaderTXTv1(events);
-		
-		//reader.readFile(eventsFile);
-		
+
+		// EventsReaderTXTv1 reader = new EventsReaderTXTv1(events);
+
+		// reader.readFile(eventsFile);
+
 		EventsReaderXMLv1 reader = new EventsReaderXMLv1(events);
 		reader.parse(eventsFile);
-		
+
 		parkingTimesPlugin.closeLastAndFirstParkingIntervals();
-		
-		printParkingTimesAndEnergyConsumptionTable(parkingTimesPlugin, energyConsumptionPlugin);
+
+		printParkingTimesAndEnergyConsumptionTable(parkingTimesPlugin,
+				energyConsumptionPlugin);
 	}
 
 	private static void addActivityFilter(ParkingTimesPlugin parkingTimesPlugin) {
-		LinkedList<String> actTypesFilter=new LinkedList<String>();
+		LinkedList<String> actTypesFilter = new LinkedList<String>();
 		actTypesFilter.add("w");
 		parkingTimesPlugin.setActTypesFilter(actTypesFilter);
 	}
 
-	private static void printParkingTimesAndEnergyConsumptionTable(ParkingTimesPlugin parkingTimesPlugin,
+	private static void printParkingTimesAndEnergyConsumptionTable(
+			ParkingTimesPlugin parkingTimesPlugin,
 			EnergyConsumptionPlugin energyConsumptionPlugin) {
-		System.out.println("agentId\tstartParking\tendParking\tlinkId\tactType\tenergyConsumptionsInJoules\ttripLengthInMeters");
-		for (Id personId: parkingTimesPlugin.getParkingTimeIntervals().getKeySet()){
-			LinkedList<ParkingIntervalInfo> parkingIntervals = parkingTimesPlugin.getParkingTimeIntervals().get(personId);
-			LinkedList<Double> energyConsumptionOfLegs = energyConsumptionPlugin.getEnergyConsumptionOfLegs().get(personId);
-			LinkedList<Double> tripLengthOfLegs = energyConsumptionPlugin.getTripLengthOfLegsInMeters().get(personId);
-			
-			for (int i=0;i<parkingIntervals.size();i++){
-				System.out.println(personId + "\t" + GeneralLib.projectTimeWithin24Hours(parkingIntervals.get(i).getArrivalTime()) + "\t" + GeneralLib.projectTimeWithin24Hours(parkingIntervals.get(i).getDepartureTime()) + "\t" + parkingIntervals.get(i).getLinkId() + "\t" + parkingIntervals.get(i).getActTypeOfFirstActDuringParking() + "\t"  + energyConsumptionOfLegs.get(i) + "\t" + tripLengthOfLegs.get(i));
+		System.out
+				.println("agentId\tstartParking\tendParking\tlinkId\tactType\tenergyConsumptionsInJoules\ttripLengthInMeters");
+		for (Id personId : parkingTimesPlugin.getParkingTimeIntervals()
+				.getKeySet()) {
+			LinkedList<ParkingIntervalInfo> parkingIntervals = parkingTimesPlugin
+					.getParkingTimeIntervals().get(personId);
+			LinkedList<Double> energyConsumptionOfLegs = energyConsumptionPlugin
+					.getEnergyConsumptionOfLegs().get(personId);
+			LinkedList<Double> tripLengthOfLegs = energyConsumptionPlugin
+					.getTripLengthOfLegsInMeters().get(personId);
+
+			for (int i = 0; i < parkingIntervals.size(); i++) {
+				if (!personId.toString().contains("pt")) {
+					System.out.println(personId
+							+ "\t"
+							+ GeneralLib
+									.projectTimeWithin24Hours(parkingIntervals
+											.get(i).getArrivalTime())
+							+ "\t"
+							+ GeneralLib
+									.projectTimeWithin24Hours(parkingIntervals
+											.get(i).getDepartureTime())
+							+ "\t"
+							+ parkingIntervals.get(i).getLinkId()
+							+ "\t"
+							+ parkingIntervals.get(i)
+									.getActTypeOfFirstActDuringParking() + "\t"
+							+ energyConsumptionOfLegs.get(i) + "\t"
+							+ tripLengthOfLegs.get(i));
+				}
 			}
 		}
 	}
 
-	private static EnergyConsumptionPlugin getEnergyConsumptionPlugin(String networkFile) {
-		EnergyConsumptionModel energyConsumptionModel = new EnergyConsumptionModelPSL(140);
-		LinkedListValueHashMap<Id, Vehicle> vehicles=new LinkedListValueHashMap<Id, Vehicle>();
-		vehicles.put(Vehicle.getPlaceholderForUnmappedPersonIds(), new PlugInHybridElectricVehicle(new IdImpl(1)));
-		Network network=GeneralLib.readNetwork(networkFile);
-		EnergyConsumptionPlugin energyConsumptionPlugin = new EnergyConsumptionPlugin(energyConsumptionModel,vehicles,network);
+	private static EnergyConsumptionPlugin getEnergyConsumptionPlugin(
+			String networkFile) {
+		EnergyConsumptionModel energyConsumptionModel = new EnergyConsumptionModelPSL(
+				140);
+		LinkedListValueHashMap<Id, Vehicle> vehicles = new LinkedListValueHashMap<Id, Vehicle>();
+		vehicles.put(Vehicle.getPlaceholderForUnmappedPersonIds(),
+				new PlugInHybridElectricVehicle(new IdImpl(1)));
+		Network network = GeneralLib.readNetwork(networkFile);
+		EnergyConsumptionPlugin energyConsumptionPlugin = new EnergyConsumptionPlugin(
+				energyConsumptionModel, vehicles, network);
 		return energyConsumptionPlugin;
 	}
-	
+
 }
