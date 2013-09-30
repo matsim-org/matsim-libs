@@ -247,7 +247,17 @@ public class PassengerDepartureHandler implements DepartureHandler {
 
 			driver.endLegAndComputeNextState(now);
 			
-			this.qNetsimEngine.internalInterface.arrangeNextAgentState(driver);
+			/*
+			 * With commit 25974, agents can end activities immediately after starting them,
+			 * resulting in a activity duration of 0 seconds. For such activities,
+			 * agent.endActivityAndComputeNextState(...) is called from ActivityEngine.handleActivity(...),
+			 * and not anymore from ActivityEngine.doSimStep(...). As a result of this change,
+			 * the endActivityAndComputeNextState(...) method is called earlier. Passengers have not
+			 * left the car before the driver's activity is ended.
+			 * Therefore, we have to allow passengers to leave the car before we cann arrange the
+			 * driver's next state.
+			 */
+//			this.qNetsimEngine.internalInterface.arrangeNextAgentState(driver);
 			
 			/*
 			 * Check for each passenger whether it has arrived at its destination link.
@@ -275,6 +285,11 @@ public class PassengerDepartureHandler implements DepartureHandler {
 				leavingPassenger.endLegAndComputeNextState(now);
 				this.qNetsimEngine.internalInterface.arrangeNextAgentState(leavingPassenger);
 			}
+			
+			/*
+			 * Moved this line here due to changes from With commit 25974.
+			 */
+			this.qNetsimEngine.internalInterface.arrangeNextAgentState(driver);
 		} else {
 			// regular departure
 			qlink.removeParkedVehicle(vehicle.getId());
