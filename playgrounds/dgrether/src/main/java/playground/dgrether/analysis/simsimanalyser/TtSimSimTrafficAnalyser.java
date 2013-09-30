@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -50,8 +51,6 @@ import playground.dgrether.signalsystems.cottbus.CottbusUtils;
 public class TtSimSimTrafficAnalyser {
 
 	private static final Logger log = Logger.getLogger(TtSimSimTrafficAnalyser.class);
-
-	private SimSimCountsAnalysis countsAna; 
 	
 	private Network loadNetwork(String networkFile){
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
@@ -62,9 +61,8 @@ public class TtSimSimTrafficAnalyser {
 	}
 	
 	
-	private TtVolumesAnalyzer loadVolumes(Network network , String eventsFile){
-//		TtVolumesAnalyzer va = new TtVolumesAnalyzer(3600, 24 * 3600, network); // one time bin corresponds to one hour
-		TtVolumesAnalyzer va = new TtVolumesAnalyzer(60*5, 24 * 3600, network); // one time bin corresponds to five minutes
+	private VolumesAnalyzer loadVolumes(Network network , String eventsFile){
+		VolumesAnalyzer va = new VolumesAnalyzer(3600, 24 * 3600, network); // one time bin corresponds to one hour
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(va);
 		MatsimEventsReader reader = new MatsimEventsReader(events);
@@ -74,33 +72,17 @@ public class TtSimSimTrafficAnalyser {
 	
 	public void runAnalysis(String networkFile, String eventsFileCounts, String eventsFileSim, String srs, String outfile) {
 		Network network = this.loadNetwork(networkFile);
-		TtVolumesAnalyzer vaCounts = loadVolumes(network, eventsFileCounts);
-		TtVolumesAnalyzer vaSim = loadVolumes(network, eventsFileSim);
+		VolumesAnalyzer vaCounts = loadVolumes(network, eventsFileCounts);
+		VolumesAnalyzer vaSim = loadVolumes(network, eventsFileSim);
 		
 		CoordinateReferenceSystem networkSrs = MGC.getCRS(srs);
 		
 		Network filteredNetwork = this.applyNetworkFilter(network, networkSrs);
 		
-		TtSimSimAnalysis countsAnalysis = new TtSimSimAnalysis();
-		Map<Id, List<CountSimComparison>> countSimLinkLeaveCompMap = countsAnalysis.createCountSimLinkLeaveComparisonByLinkId(filteredNetwork, vaCounts, vaSim);
-		Map<Id, List<CountSimComparison>> countSimLinkEnterCompMap = countsAnalysis.createCountSimLinkEnterComparisonByLinkId(filteredNetwork, vaCounts, vaSim);
+		SimSimAnalysis countsAnalysis = new SimSimAnalysis();
+		Map<Id, List<CountSimComparison>> countSimLinkLeaveCompMap = countsAnalysis.createCountSimComparisonByLinkId(filteredNetwork, vaCounts, vaSim);
 		
-		new SimSimMorningLeaveAndEnterShapefileWriter(filteredNetwork, networkSrs).writeShape(outfile + ".shp", countSimLinkLeaveCompMap, countSimLinkEnterCompMap);
-//		new SimSimMorningShapefileWriter(filteredNetwork, networkSrs).writeShape(outfile + ".shp", countSimLinkLeaveCompMap); // old version
-
-		
-//		List<CountSimComparison> countSimComp = new ArrayList<CountSimComparison>();
-//		for (List<CountSimComparison> list : countSimCompMap.values()){
-//			countSimComp.addAll(list);
-//		}
-//		
-//		CountSimComparisonKMLWriter kmlWriter = new CountSimComparisonKMLWriter(
-//				countSimComp, network, TransformationFactory.getCoordinateTransformation(srs, TransformationFactory.WGS84));
-//		kmlWriter.writeFile(outfile);
-//
-//		new CountsErrorTableWriter().writeErrorTable(countSimComp, outfile);
-
-
+		new SimSimMorningShapefileWriter(filteredNetwork, networkSrs).writeShape(outfile + ".shp", countSimLinkLeaveCompMap);
 	}
 
 
@@ -131,21 +113,14 @@ public class TtSimSimTrafficAnalyser {
 		if (args == null || args.length == 0){
 			
 			String runNr1 = "1910";
-			String runNr2 = "1913";
-						
-			net = DgPaths.REPOS + "runs-svn/run"+runNr1+"/"+runNr1+".output_network.xml.gz";
-			eventsFileCountValues = DgPaths.REPOS + "runs-svn/run"+runNr1+"/ITERS/it.2000/"+runNr1+".2000.events.xml.gz";
-			eventsFileSimValues = DgPaths.REPOS + "runs-svn/run"+runNr2+"/ITERS/it.2000/"+runNr2+".2000.events.xml.gz";
-			outfile = DgPaths.REPOS + "runs-svn/run"+runNr1+"/shapefiles/"+runNr1+".2000vs"+runNr2+".2000_densityPer5min";
+			String runNr2 = "1912";
 			
-//			net = "C:/Users/Atany/Desktop/SHK/SVN/runs-svn/run"+runNr1+"/"+runNr1+".output_network.xml.gz";
-//			eventsFileCountValues = "C:/Users/Atany/Desktop/SHK/SVN/runs-svn/run"+runNr1+"/ITERS/it.2000/"+runNr1+".2000.events.xml.gz";
-//			eventsFileSimValues = "C:/Users/Atany/Desktop/SHK/SVN/runs-svn/run"+runNr2+"/ITERS/it.2000/"+runNr2+".2000.events.xml.gz";
-//			outfile = "C:/Users/Atany/Desktop/SHK/SVN/runs-svn/run"+runNr1+"/shapefiles/"+runNr1+".2000vs"+runNr2+".2000_densityPer5min";
+			net = "C:/Users/Atany/Desktop/SHK/SVN/runs-svn/run"+runNr1+"/"+runNr1+".output_network.xml.gz";
+			eventsFileCountValues = "C:/Users/Atany/Desktop/SHK/SVN/runs-svn/run"+runNr1+"/ITERS/it.2000/"+runNr1+".2000.events.xml.gz";
+			eventsFileSimValues = "C:/Users/Atany/Desktop/SHK/SVN/runs-svn/run"+runNr2+"/ITERS/it.2000/"+runNr2+".2000.events.xml.gz";
+			outfile = "C:/Users/Atany/Desktop/SHK/SVN/runs-svn/run"+runNr1+"/shapefiles/"+runNr2+".2000-"+runNr1+".2000_morningPeakAnalysis";
 
-			srs = TransformationFactory.WGS84_UTM33N;
-			
-			
+			srs = TransformationFactory.WGS84_UTM33N;			
 		}
 		else {
 			net = args[0];
@@ -154,7 +129,6 @@ public class TtSimSimTrafficAnalyser {
 			outfile = args[3];
 			srs = args[4];
 		}
-
 
 		TtSimSimTrafficAnalyser analyser = new TtSimSimTrafficAnalyser();
 		analyser.runAnalysis(net, eventsFileCountValues, eventsFileSimValues, srs, outfile);

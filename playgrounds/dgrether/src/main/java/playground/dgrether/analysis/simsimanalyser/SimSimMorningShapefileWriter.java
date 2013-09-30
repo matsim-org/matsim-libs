@@ -99,18 +99,13 @@ public class SimSimMorningShapefileWriter {
 			builder.addAttribute("h" + (i + 1)+"*l_"+diff, Double.class);
 		}
 		builder.addAttribute("sum*l_"+diff, Double.class);
-		// flow difference / link length  for the morning peak
-		for (int i = 5; i < 10; i++){
-			builder.addAttribute("h" + (i + 1)+"/l_"+diff, Double.class);
-		}
-		builder.addAttribute("sum/l_"+diff, Double.class);
 		
 		return builder.create();
 	}
 	
 	private SimpleFeature createFeature(Link link, GeometryFactory geofac, PolygonFeatureFactory factory, List<CountSimComparison> countSimLinkLeaveComparisonList) {
 		Coordinate[] coords = PolygonFeatureGenerator.createPolygonCoordsForLink(link, 20.0);
-		Object [] attribs = new Object[33];
+		Object [] attribs = new Object[27];
 		attribs[0] = link.getId().toString();
 		attribs[1] = link.getFromNode().getId().toString();
 		attribs[2] = link.getToNode().getId().toString();
@@ -132,19 +127,15 @@ public class SimSimMorningShapefileWriter {
 				attribs[i] = absLinkLeaveDif;
 				attribs[i+6] = (absLinkLeaveDif/link.getCapacity())*100; // in percent
 				attribs[i+12] = absLinkLeaveDif*link.getLength();
-				//density, i.e mean flow difference per second of the current time period divided by the link length in km
-				attribs[i+18] = (absLinkLeaveDif/3600)/(link.getLength()/1000); //TODO incorrect
 				sumAbsLinkLeaveDif += absLinkLeaveDif;
 			
 				i++;
 			}
 		}
-		attribs[14] = sumAbsLinkLeaveDif; // attribs[14] = (sumAbsLinkLeaveDif/5);
+		attribs[14] = sumAbsLinkLeaveDif; // C: meanAbsLinkLeaveDif = sumAbsLinkLeaveDif/5
 		// mean (error/capacity) in percent per hour, i.e flow difference of the morning peak divided by the maximal link capacity in this time period
 		attribs[20] = (sumAbsLinkLeaveDif/(link.getCapacity()*5))*100;
-		attribs[26] = sumAbsLinkLeaveDif*link.getLength(); //attribs[26] = (sumAbsLinkLeaveDif/5)*link.getLength();
-		// density, i.e. mean flow difference per second of the morning peak divided by the link length in km
-		attribs[32] = (sumAbsLinkLeaveDif/(5*60*60))/(link.getLength()/1000); //TODO incorrect
+		attribs[26] = sumAbsLinkLeaveDif*link.getLength(); // alternative: meanAbsLinkLeaveDif*link.getLength();
 		
 		return factory.createPolygon(coords, attribs, link.getId().toString());
 	}
