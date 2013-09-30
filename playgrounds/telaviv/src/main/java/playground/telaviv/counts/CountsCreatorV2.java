@@ -66,7 +66,7 @@ public class CountsCreatorV2 {
 	private String networkFile = TelAvivConfig.basePath + "/network/network.xml";
 //	private String countsFile = TelAvivConfig.basePath + "/counts/linkflows1000.csv";
 //	private String countsFile = TelAvivConfig.basePath + "./counts/selected_flows.csv";
-	private String countsFile = TelAvivConfig.basePath + "/counts/Traffic_counts_V2.csv";
+	private String countsFile = TelAvivConfig.basePath + "/counts/Traffic_counts_V2-revised_2013-09.csv";
 	private String outFile = TelAvivConfig.basePath + "/counts/counts.xml";
 
 	private Scenario scenario;
@@ -101,10 +101,10 @@ public class CountsCreatorV2 {
 			}
 		}
 
-		List<Emme2CountV2> emme2Counts = new CountsFileParserV2(countsFile).readFile();
+		List<CountV2> emme2Counts = new CountsFileParserV2(countsFile).readFile();
 		
 		Counter counter = new Counter("Count stations mapped to MATSim network: #");
-		for (Emme2CountV2 emme2Count : emme2Counts) {
+		for (CountV2 emme2Count : emme2Counts) {
 			Id fromNodeId = scenario.createId(String.valueOf(emme2Count.inode));
 			Id toNodeId = scenario.createId(String.valueOf(emme2Count.jnode));
 
@@ -129,7 +129,10 @@ public class CountsCreatorV2 {
 				count.createVolume(emme2Count.hour, emme2Count.value);
 				
 				if (link.getCapacity() < emme2Count.value) {
-					log.warn("Links capacity is exceeded. Link " + link.getId() + ", capacity=" + link.getCapacity() +
+					log.warn("Links capacity is exceeded. Link " + link.getId() + 
+							" (from Node " + link.getFromNode().getId() +
+							" to Node " + link.getToNode().getId() + ")" +
+							", capacity=" + link.getCapacity() +
 							", count value=" + emme2Count.value + " in hour " + emme2Count.hour);
 				}
 				
@@ -142,7 +145,7 @@ public class CountsCreatorV2 {
 		new CountsWriter(counts).write(outFile);
 	}
 
-	private Link searchLink(Emme2CountV2 emme2Count, Node fromNode, Node toNode) {
+	private Link searchLink(CountV2 emme2Count, Node fromNode, Node toNode) {
 		for (Link link : fromNode.getOutLinks().values()) {
 			if (link.getToNode().getId().equals(toNode.getId())) {
 				return link;
@@ -235,7 +238,7 @@ public class CountsCreatorV2 {
 	 * represent turning conditions. In that case we try to find
 	 * the new created link that fits best to the original one.
 	 */
-	private Link searchTransformedLink(Emme2CountV2 emme2Count, Node fromNode, Node toNode) {
+	private Link searchTransformedLink(CountV2 emme2Count, Node fromNode, Node toNode) {
 		List<Node> possibleFromNodes = new ArrayList<Node>();
 		List<Node> possibleToNodes = new ArrayList<Node>();
 		List<Link> possibleLinks = new ArrayList<Link>();

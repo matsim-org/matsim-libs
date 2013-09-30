@@ -39,8 +39,8 @@ public class CountsFileParserV2 {
 		this.inFile = inFile;
 	}
 	
-	public List<Emme2CountV2> readFile() {
-		List<Emme2CountV2> counts = new ArrayList<Emme2CountV2>();
+	public List<CountV2> readFile() {
+		List<CountV2> counts = new ArrayList<CountV2>();
 		
 		FileInputStream fis = null;
 		InputStreamReader isr = null;
@@ -53,20 +53,19 @@ public class CountsFileParserV2 {
 			
 			// skip first Line
 			br.readLine();
-			 
+			
 			String line;
 			while((line = br.readLine()) != null) {
-				Emme2CountV2 emme2Count = new Emme2CountV2();
+				CountV2 countV2 = new CountV2();
 				
 				String[] cols = line.split(separator);
 				
-				emme2Count.inode = parseInteger(cols[0]);
-				emme2Count.jnode = parseInteger(cols[1]);
-				emme2Count.hour = parseInteger(cols[2]);
-				emme2Count.value = parseInteger(cols[3]);
-				
-								
-				counts.add(emme2Count);
+				countV2.inode = parseInteger(cols[0]);
+				countV2.jnode = parseInteger(cols[1]);
+				countV2.hour = parseInteger(cols[2]);
+				countV2.value = parseInteger(cols[3]);
+												
+				counts.add(countV2);
 			}
 			
 			br.close();

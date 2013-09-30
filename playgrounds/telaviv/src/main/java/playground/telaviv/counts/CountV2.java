@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Emme2CountV2.java
+ * CountV2.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -20,7 +20,11 @@
 
 package playground.telaviv.counts;
 
-public class Emme2CountV2 {
+/*
+ * This class was called Emme2CountV2 previously. However, in fact it was not related
+ * to the Tel Aviv Emme2 model. The input data was taken from real world traffic counts.
+ */
+public class CountV2 {
 
 	public int inode;
 	public int jnode;
