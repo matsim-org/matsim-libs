@@ -50,7 +50,7 @@ public class FunDiagramsWithPassing3modes implements LinkEnterEventHandler{
 	
 	private Scenario scenario;
 	
-	private Id studiedMeasuringPointLinkId = new IdImpl(0);
+	private static Id studiedMeasuringPointLinkId = new IdImpl(0);
 	
 	private boolean permanentRegime;
 	private boolean permanentRegime_truck;

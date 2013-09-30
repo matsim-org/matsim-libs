@@ -209,11 +209,13 @@ public class DreieckNmodes {
 	private static String OUTPUT_EVENTS = "Z:\\WinHome\\Desktop\\workspace2\\playgrounds\\ssix\\output\\events_test.xml";
 	
 	private static double FREESPEED = 60.;						//in km/h, maximum authorized velocity on the track
-	private static int NUMBER_OF_MODES = 3;
-	private static String[] NAMES= {"bicycles","bikes","cars"};	//identification of the different modes
+	public static int NUMBER_OF_MODES = 3;
+	public static String[] NAMES= {"bicycles","bikes","cars"};	//identification of the different modes
 	private static Double[] Probabilities = {1/3., 1/3., 1/3.}; //modal split
 	private static Double[] Pcus = {0.25, 0.25, 1.}; 			//PCUs of the different possible modes
 	private static Double[] Speeds = {4.17, 16.67, 16.67};		//maximum velocities of the vehicle types, in m/s
+	private static Integer[] MaxAgentDistribution = {80,320,320};
+	private static Integer[] Steps = {20,40,40};
 	
 	private PrintStream writer;
 	private Scenario scenario;
@@ -259,9 +261,22 @@ public class DreieckNmodes {
 	}
 	
 	public static void main(String[] args) {
+		/*Integer[] testMax = {4,3,2};
+		Integer[] testSteps = {2,1,2};
+		Integer[] testPoint = {0,0,0};
+		BinaryAdditionModule test = new BinaryAdditionModule(Arrays.asList(testMax), Arrays.asList(testSteps), testPoint);
+		int numberOfAdditions = 23;
+		for (int i=0; i<numberOfAdditions; i++){
+			test.add1();
+			Integer[] point = test.getPoint();
+			System.out.println(point[0].intValue()+" "+point[1].intValue()+" "+point[2].intValue());
+		}*/
+		
+		
 		DreieckNmodes dreieck = new DreieckNmodes(NETWORK_CAPACITY);
 		dreieck.fillNetworkData();
 		dreieck.openFile(OUTPUT_DIR);
+		dreieck.parametricRunAccordingToDistribution(Arrays.asList(MaxAgentDistribution), Arrays.asList(Steps));
 		//dreieck.singleRun(Arrays.asList(TEST_DISTRIBUTION));
 		dreieck.closeFile();
 	}
@@ -278,12 +293,31 @@ public class DreieckNmodes {
 	}
 	
 	private List<List<Integer>> createPointsToRun(List<Integer> maxValues, List<Integer> steps) {
-		// TODO Not easy at all
-		return null;
+		//calculate number of points and creating starting point:
+		int numberOfPoints = 1; 
+		Integer[] startingPoint = new Integer[maxValues.size()];
+		for (int i=0; i<maxValues.size(); i++){
+			numberOfPoints *=  ( (maxValues.get(i).intValue() / steps.get(i).intValue()) + 1);
+			startingPoint[i] = new Integer(0);
+		}
+		//Actually going through the n-dimensional grid
+		BinaryAdditionModule iterationModule = new BinaryAdditionModule(maxValues, steps, startingPoint);
+		List<List<Integer>> pointsToRun = new ArrayList<List<Integer>>();
+		pointsToRun.add(Arrays.asList(startingPoint));
+		for (int i=0; i<numberOfPoints-1; i++){
+			iterationModule.add1();
+			pointsToRun.add(Arrays.asList(iterationModule.getPoint()));
+			//String point = Arraytostring(iterationModule.getPoint());
+			//System.out.println("Just added point "+point+"to the collection.");
+		}
+		return pointsToRun;
 	}
 	
 	private void singleRun(List<Integer> pointToRun) {
 		this.createWantedPopulation(pointToRun, 2);
+		for (int i=0; i<NAMES.length; i++){
+			this.modesData.get(new IdImpl(NAMES[i])).setnumberOfAgents(pointToRun.get(i).intValue());
+		}
 		
 		EventsManager events = EventsUtils.createEventsManager();
 		
@@ -413,7 +447,7 @@ public class DreieckNmodes {
 				if (i<sum){
 					transportMode = DreieckNmodes.NAMES[j];
 					modeFound = true;
-					System.out.println("A "+DreieckNmodes.NAMES[j]+" was made.");
+					//System.out.println("A "+DreieckNmodes.NAMES[j]+" was made.");
 				}
 				j++;
 			}
@@ -588,4 +622,14 @@ public class DreieckNmodes {
 		return Math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1));
 	}
 
+	/*
+	private String Arraytostring(Integer[] list){
+		int n = list.length;
+		String str = "";
+		for (int i=0; i<n; i++){
+			str += list[i].intValue();
+			str += " ";
+		}
+		return str;
+	}*/
 }

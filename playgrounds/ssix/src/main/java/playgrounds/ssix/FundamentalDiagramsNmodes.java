@@ -46,9 +46,9 @@ public class FundamentalDiagramsNmodes implements LinkEnterEventHandler {
 	private Map<Id, ModeData> modesData;
 	private ModeData globalData;
 	
-	private Id studiedMeasuringPointLinkId = new IdImpl(0);
+	public static Id studiedMeasuringPointLinkId = new IdImpl(0);
 	
-	private boolean speedStability;
+	
 	private boolean permanentRegime;
 	private double permanentDensity;
 	private double permanentAverageVelocity;
@@ -57,6 +57,12 @@ public class FundamentalDiagramsNmodes implements LinkEnterEventHandler {
 	public FundamentalDiagramsNmodes(Scenario sc, Map<Id, ModeData> modesData){
 		this.scenario =  sc;
 		this.modesData = modesData;
+		for (int i=0; i<DreieckNmodes.NUMBER_OF_MODES; i++){
+			this.modesData.get(new IdImpl(DreieckNmodes.NAMES[i])).initDynamicVariables();
+		}
+		this.globalData = new ModeData();
+		this.globalData.setnumberOfAgents(sc.getPopulation().getPersons().size());
+		this.globalData.initDynamicVariables();
 	}
 
 	@Override
@@ -68,6 +74,30 @@ public class FundamentalDiagramsNmodes implements LinkEnterEventHandler {
 	@Override
 	public void handleEvent(LinkEnterEvent event) {
 		// TODO Auto-generated method stub
+		Id personId = event.getPersonId();
+		double pcu_person = 0.;
+		
+		//Disaggregated data updating methods
+		Id transportMode = new IdImpl( (String) scenario.getPopulation().getPersons().get(personId).getCustomAttributes().get("transportMode"));
+		this.modesData.get(transportMode).handle(event);//TODO adjust this if necessary
+		pcu_person = this.modesData.get(transportMode).getVehicleType().getPcuEquivalents();
+		
+		//Aggregated data update
+		double nowTime = event.getTime();
+		if (event.getLinkId().equals(studiedMeasuringPointLinkId)){	
+			//Updating global data
+			this.globalData.updateFlow(nowTime, pcu_person);
+			this.globalData.updateSpeed(nowTime, personId);
+			this.globalData.checkSpeedStability();
+			
+			boolean stableModes = true;
+			for (int i=0; i<DreieckNmodes.NUMBER_OF_MODES; i++){
+				if (!(this.modesData.get(new IdImpl(DreieckNmodes.NAMES[i])).isSpeedStable())){
+					stableModes = false;
+				}
+			}
+			
+		}
 		
 	}
 	

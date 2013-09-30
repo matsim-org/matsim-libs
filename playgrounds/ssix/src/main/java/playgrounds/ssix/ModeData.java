@@ -23,6 +23,7 @@ package playgrounds.ssix;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
@@ -39,37 +40,104 @@ public class ModeData {
 	
 	private Id modeId;
 	private VehicleType vehicleType;//TODO Ensure all methods can work without a specific vehicle type (needed for storing global data)
-									//TODO Maybe keeping global data in the EventHandler can be smart (ssix, 25.09.13)
+									//      Maybe keeping global data in the EventHandler can be smart (ssix, 25.09.13)
+									//		Sofar programmed to contain also global data (ssix, 30.09.13)
 	public int numberOfAgents;
-	private Map<Id,Double> lastSeenOnStudiedLinkEnter;
+	
+	private Map<Id,Double> lastSeenOnStudiedLinkEnter;//records last entry time for every person, but also useful for getting actual number of people in the simulation
 	private int speedTableSize;
 	private List<Double> speedTable;
 	private Double flowTime;
 	private List<Double> flowTable;
+	private boolean speedStability;
+	
+	public ModeData(){}
 	
 	public ModeData(Id id, VehicleType vT){
 		this.modeId = id;
 		this.vehicleType = vT;
 	}
 	
-	public void handle(LinkEnterEvent e){
+	public void handle(LinkEnterEvent event){
 		//TODO
+		if (event.getLinkId().equals(FundamentalDiagramsNmodes.studiedMeasuringPointLinkId)){
+			Id personId = event.getPersonId();
+			double nowTime = event.getTime();
+			
+			//Updating flow, speed
+			this.updateFlow(nowTime, this.vehicleType.getPcuEquivalents());
+			this.updateSpeed(nowTime, personId);
+			
+			//Checking for speed stability
+			this.checkSpeedStability();
+		}
 	}
 	
-	public VehicleType getVehicleType(){
-		return this.vehicleType;
+	//Utility methods
+	public void updateFlow(double nowTime, double pcu_person) {
+		if (nowTime == this.flowTime.doubleValue()){//Still measuring the flow of the same second
+			Double nowFlow = this.flowTable.get(0);
+			this.flowTable.set(0, nowFlow.doubleValue()+pcu_person);
+		} else {//Need to offset the current data in order to update
+			int timeDifference = (int) (nowTime-this.flowTime.doubleValue());
+			if (timeDifference<3600){
+				for (int i=3599-timeDifference; i>=0; i--){
+					this.flowTable.set(i+timeDifference, this.flowTable.get(i).doubleValue());
+				}
+				if (timeDifference > 1){
+					for (int i = 1; i<timeDifference; i++){
+						this.flowTable.set(i, 0.);
+					}
+				}
+				this.flowTable.set(0, pcu_person);
+			} else {
+				flowTableReset();
+			}
+			this.flowTime = new Double(nowTime);
+		}
 	}
 	
-	public Id getModeId(){
-		return this.modeId;
+	public void updateSpeed(double nowTime, Id personId){
+		if (this.lastSeenOnStudiedLinkEnter.containsKey(personId)){
+			double lastSeenTime = lastSeenOnStudiedLinkEnter.get(personId);
+			double speed = DreieckNmodes.length * 3 / (nowTime-lastSeenTime);//in m/s!!
+			for (int i=speedTableSize-2; i>=0; i--){
+				this.speedTable.set(i+1, this.speedTable.get(i).doubleValue());
+			}
+			this.speedTable.set(0, speed);
+			
+			this.lastSeenOnStudiedLinkEnter.put(personId,nowTime);
+		} else {
+			this.lastSeenOnStudiedLinkEnter.put(personId, nowTime);
+		}
 	}
 	
-	public void setnumberOfAgents(int n){
-		this.numberOfAgents = n;
+	public void checkSpeedStability(){
+		double relativeDeviances = 0.;
+		double averageSpeed = 0;
+		for (int i=0; i<this.speedTableSize; i++){
+			averageSpeed += this.speedTable.get(i).doubleValue();
+		}
+		averageSpeed /= this.speedTableSize;
+		for (int i=0; i<this.speedTableSize; i++){
+			relativeDeviances += Math.pow( ((this.speedTable.get(i).doubleValue() - averageSpeed) / averageSpeed) , 2);
+		}
+		relativeDeviances /= DreieckNmodes.NUMBER_OF_MODES;//taking dependence on number of modes away
+		if (relativeDeviances < 0.0001){
+			this.speedStability = true;
+		}
+		this.speedStability = false;
 	}
 	
-	private void initDynamicVariables() {
-		// TODO Ensure numberOfAgents for each mode has been initialized at this point
+	public boolean isSpeedStable(){
+		if (speedStability){
+			return true;
+		}
+		return false;
+	}
+	
+	public void initDynamicVariables() {
+		//numberOfAgents for each mode should be initialized at this point
 		this.decideSpeedTableSize();
 		this.speedTable = new LinkedList<Double>();
 		for (int i=0; i<this.speedTableSize; i++){
@@ -81,6 +149,8 @@ public class ModeData {
 		for (int i=0; i<3600; i++){
 			this.flowTable.add(0.);
 		}
+		this.speedStability = false;
+		this.lastSeenOnStudiedLinkEnter = new TreeMap<Id,Double>();
 	}
 
 	private void decideSpeedTableSize() {
@@ -95,7 +165,7 @@ public class ModeData {
 			this.speedTableSize = this.numberOfAgents;
 		}
 	}
-
+	
 	@Override
 	public String toString(){
 		VehicleType vT = this.vehicleType;
@@ -103,4 +173,22 @@ public class ModeData {
 		return str;
 	}
 
+	private void flowTableReset() {
+		for (int i=0; i<3600; i++){
+			this.flowTable.set(i, 0.);
+		}
+	}
+	
+	//Getters/Setters
+	public VehicleType getVehicleType(){
+		return this.vehicleType;
+	}
+	
+	public Id getModeId(){
+		return this.modeId;
+	}
+	
+	public void setnumberOfAgents(int n){
+		this.numberOfAgents = n;
+	}
 }
