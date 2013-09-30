@@ -123,8 +123,8 @@ public class KS2010VsMatimVolumes {
 				double aggregatedFlow = 0;
 				for (int i = startTime; i < endTime; i++)
 					aggregatedFlow += volumes[i];
-				// scale matsim flow volumes to the KS2010 demand
-				aggregatedFlow *= scalingFactor;
+//				// scale matsim flow volumes to the KS2010 demand
+//				aggregatedFlow *= scalingFactor;
 
 				matsimVolumes.put(l.getId(), aggregatedFlow);
 			}
@@ -155,12 +155,12 @@ public class KS2010VsMatimVolumes {
 
 	private static void writeFlowVolumesShp(Network ks2010Network, String srs,
 			Map<Id, Double> ks2010Volumes, Map<Id, Double> matsimVolumes,
-			String outputFile) {
+			String outputFile, double scalingFactor) {
 
 		CoordinateReferenceSystem networkSrs = MGC.getCRS(srs);
 		
 		new VolumesShapefileWriter(ks2010Network, networkSrs).writeShape(
-				outputFile, ks2010Volumes, matsimVolumes);
+				outputFile, ks2010Volumes, matsimVolumes, scalingFactor);
 	}
 
 	/**
@@ -197,27 +197,26 @@ public class KS2010VsMatimVolumes {
 			
 			if (i.getFirst().equals("50")){
 				scalingFactor = 0.55; //TODO
-				runNumber = "1732"; //TODO
+				runNumber = "1912"; //TODO
 			}
 			else{ // equals 10
 				scalingFactor = 0.27; //TODO
-				runNumber = "1733"; //TODO
+				runNumber = "1911"; //TODO
 			}
 			
-			String ksSolutionDirectory = "C:/Users/Atany/Desktop/SHK/SVN/projects_cottbus/cb2ks2010/2013-07-31_minflow_"  //TODO
+			String ksSolutionDirectory = "C:/Users/Atany/Desktop/SHK/SVN/shared-svn/projects/cottbus/cb2ks2010/2013-07-31_minflow_"
 					+ i.getFirst() + "_" + i.getSecond() + "_peak/";
 			String matsimRunDirectory = "C:/Users/Atany/Desktop/SHK/SVN/runs-svn/run" + runNumber + "/";
-//			String ksSolutionDirectory = DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-07-31_minflow_"  //TODO
+//			String ksSolutionDirectory = DgPaths.REPOS + "shared-svn/projects/cottbus/cb2ks2010/2013-07-31_minflow_"
 //				+ i.getFirst() + "_" + i.getSecond() + "_peak/";
 //			String matsimRunDirectory = DgPaths.REPOS + "runs-svn/run" + runNumber + "/";
 			
 			// unsimplified networks
 			String matsimNetworkFile = matsimRunDirectory + runNumber + ".output_network.xml.gz";
 			String ks2010NetworkFile = ksSolutionDirectory + "network_small_clean.xml.gz";
-			String matsimEventsFile = matsimRunDirectory + "ITERS/it.1000/" + runNumber + ".1000.events.xml.gz";
+			String matsimEventsFile = matsimRunDirectory + "ITERS/it.2000/" + runNumber + ".2000.events.xml.gz";
 			String srs = TransformationFactory.WGS84_UTM33N;
 
-			// TODO change outputDirectory?
 			String outputFile = ksSolutionDirectory + "shapes/KS2010_" + i.getFirst() + "_" + i.getSecond() + "_peak" + "VsMatsimRun" + runNumber + "FlowVolumes";
 
 			
@@ -231,7 +230,7 @@ public class KS2010VsMatimVolumes {
 					scalingFactor);
 
 			writeFlowVolumesShp(ks2010Network, srs, ks2010Volumes,
-					matsimVolumes, outputFile);
+					matsimVolumes, outputFile, scalingFactor);
 		}
 
 	}

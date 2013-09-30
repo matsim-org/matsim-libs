@@ -54,7 +54,7 @@ public class VolumesShapefileWriter{
 		this.crs = crs;
 	}
 
-	public void writeShape(String outfile, Map<Id, Double> ks2010Volumes, Map<Id, Double> matsimVolumes){
+	public void writeShape(String outfile, Map<Id, Double> ks2010Volumes, Map<Id, Double> matsimVolumes, double scalingFactor){
 		PolygonFeatureFactory factory = createFeatureType(this.crs);
 		GeometryFactory geofac = new GeometryFactory();
 		Collection<SimpleFeature> features = new ArrayList<SimpleFeature>();
@@ -67,7 +67,7 @@ public class VolumesShapefileWriter{
 			if (matsimVolumes.containsKey(link.getId()))
 				matsimLinkVolume = matsimVolumes.get(link.getId());
 			
-			features.add(this.createFeature(link, geofac, factory, ks2010LinkVolume, matsimLinkVolume));
+			features.add(this.createFeature(link, geofac, factory, ks2010LinkVolume, matsimLinkVolume, scalingFactor));
 		}
 		ShapeFileWriter.writeGeometries(features, outfile + ".shp");
 	}
@@ -86,16 +86,19 @@ public class VolumesShapefileWriter{
 		builder.addAttribute("visWidth", Double.class);
 		builder.addAttribute("type", String.class);
 		builder.addAttribute("ks2010Flow", Double.class);
+		builder.addAttribute("scaledKsFl", Double.class);
 		builder.addAttribute("matsimFlow", Double.class);
-		builder.addAttribute("matsim-ks", Double.class);
+		builder.addAttribute("mats-scaKs", Double.class);
 		return builder.create();
 	}
 	
-	private SimpleFeature createFeature(Link link, GeometryFactory geofac, PolygonFeatureFactory factory, double ks2010Volume, double matsimVolume) {
+	private SimpleFeature createFeature(Link link, GeometryFactory geofac, PolygonFeatureFactory factory, double ks2010Volume, double matsimVolume, double scalingFactor) {
 		Coordinate[] coords = PolygonFeatureGenerator.createPolygonCoordsForLink(link, 20.0);
 //		coords = new Coordinate[] {MGC.coord2Coordinate(link.getFromNode().getCoord()), MGC.coord2Coordinate(link.getToNode().getCoord())};
 		
-		Object [] attribs = new Object[12];
+		double scaledKs2010Volume = ks2010Volume * (1+scalingFactor);
+		
+		Object [] attribs = new Object[13];
 		attribs[0] = link.getId().toString();
 		attribs[1] = link.getFromNode().getId().toString();
 		attribs[2] = link.getToNode().getId().toString();
@@ -106,8 +109,9 @@ public class VolumesShapefileWriter{
 		attribs[7] = link.getNumberOfLanes();
 		attribs[8] = ((LinkImpl) link).getType();
 		attribs[9] = ks2010Volume;
-		attribs[10] = matsimVolume;
-		attribs[11] = matsimVolume - ks2010Volume;
+		attribs[10] = scaledKs2010Volume;
+		attribs[11] = matsimVolume;
+		attribs[12] = matsimVolume - scaledKs2010Volume;
 			
 		return factory.createPolygon(coords, attribs, link.getId().toString());
 	}
