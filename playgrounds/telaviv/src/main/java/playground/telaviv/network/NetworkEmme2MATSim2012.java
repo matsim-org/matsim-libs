@@ -136,7 +136,7 @@ public class NetworkEmme2MATSim2012 {
 	private static String ITM = "EPSG:2039";	// network coding String
 	
 	private static String nodesFile = TelAvivConfig.basePath + "/network/nodes.csv";
-	private static String linksFile = TelAvivConfig.basePath + "/network/links.csv";
+	private static String linksFile = TelAvivConfig.basePath + "/network/links_updated-revised_2013-09.csv";
 	private static String maneuversFile = TelAvivConfig.basePath + "/network/turns.csv";
 	private static String outFileWGS84 = TelAvivConfig.basePath + "/network/network_WGS84.xml";
 	private static String outFileITM = TelAvivConfig.basePath + "/network/network.xml";

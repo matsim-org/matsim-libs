@@ -26,6 +26,7 @@ import org.matsim.core.replanning.StrategyManager;
 import org.matsim.core.replanning.StrategyManagerConfigLoader;
 import org.matsim.core.scoring.functions.CharyparNagelOpenTimesScoringFunctionFactory;
 import org.matsim.facilities.algorithms.WorldConnectLocations;
+import org.matsim.roadpricing.RoadPricing;
 
 import playground.telaviv.core.mobsim.qsim.TTAQSimFactory;
 import playground.telaviv.replanning.TTAStrategyManager;
@@ -74,6 +75,9 @@ public final class TelAvivControler extends Controler {
 			System.out.println();
 		} else {
 			final Controler controler = new TelAvivControler(args);
+			
+			// add road pricing contrib
+			controler.addControlerListener(new RoadPricing());
 			
 			// use an adapted MobsimFactory
 			controler.setMobsimFactory(new TTAQSimFactory());
