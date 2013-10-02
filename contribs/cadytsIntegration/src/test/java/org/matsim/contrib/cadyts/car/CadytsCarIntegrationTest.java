@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Plan;
+import org.matsim.contrib.cadyts.general.CadytsCostOffsetsXMLFileIO;
 import org.matsim.contrib.cadyts.general.CadytsScoring;
 import org.matsim.contrib.cadyts.general.ExpBetaPlanChangerWithCadytsPlanRegistration;
 import org.matsim.contrib.cadyts.general.CadytsPlanChanger;
@@ -350,8 +351,11 @@ public class CadytsCarIntegrationTest {
 			// final TransitSchedule schedule = controler.getScenario().getTransitSchedule();
 			final Network network = controler.getScenario().getNetwork();
 			String linkOffsetFile = outputDir + "ITERS/it." + lastIteration + "/" + lastIteration + ".linkCostOffsets.xml";
+
 			// CadytsPtLinkCostOffsetsXMLFileIO offsetReader = new CadytsPtLinkCostOffsetsXMLFileIO (schedule);
-			CadytsLinkCostOffsetsXMLFileIO offsetReader = new CadytsLinkCostOffsetsXMLFileIO(network);
+//			CadytsLinkCostOffsetsXMLFileIO offsetReader = new CadytsLinkCostOffsetsXMLFileIO(network);
+			CadytsCostOffsetsXMLFileIO<Link> offsetReader = new CadytsCostOffsetsXMLFileIO<Link>(new LinkLookUp(network));
+
 			// DynamicData<TransitStopFacility> stopOffsets = offsetReader.read(linkOffsetFile);
 			DynamicData<Link> linkOffsets = offsetReader.read(linkOffsetFile);
 			

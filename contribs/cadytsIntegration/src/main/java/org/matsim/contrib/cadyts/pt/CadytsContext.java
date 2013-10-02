@@ -27,8 +27,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.cadyts.general.CadytsBuilder;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsContextI;
+import org.matsim.contrib.cadyts.general.CadytsCostOffsetsXMLFileIO;
 import org.matsim.contrib.cadyts.general.PlansTranslator;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
@@ -107,7 +109,7 @@ CadytsContextI<T> {
 		new MatsimCountsReader(this.occupCounts).readFile(occupancyCountsFilename);
 
 		// build the calibrator. This is a static method, and in consequence has no side effects
-		this.calibrator = CadytsBuilder.buildCalibrator(scenario, this.occupCounts );
+		this.calibrator = CadytsBuilder.buildCalibrator(scenario, this.occupCounts, new TransitStopFacilityLookUp(scenario) );
 
 	}
 
@@ -151,7 +153,8 @@ CadytsContextI<T> {
 		// write some output
 		String filename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), LINKOFFSET_FILENAME);
 		try {
-			new CadytsPtLinkCostOffsetsXMLFileIO(event.getControler().getScenario().getTransitSchedule()).write(filename, this.calibrator.getLinkCostOffsets());
+			new CadytsCostOffsetsXMLFileIO<TransitStopFacility>(new TransitStopFacilityLookUp(event.getControler().getScenario()))  
+			   .write(filename, this.calibrator.getLinkCostOffsets());
 		} catch (IOException e) {
 			log.error("Could not write link cost offsets!", e);
 		}

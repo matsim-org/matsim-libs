@@ -77,6 +77,7 @@ import cadyts.demand.PlanBuilder;
 	private long plansFound = 0;
 	private long plansNotFound = 0;
 
+	@Override
 	public final cadyts.demand.Plan<T> getPlanSteps(final Plan plan) {
 		@SuppressWarnings("unchecked") // getting stuff from custom attributes has to be untyped.  (Although I am not sure why it is necessary to put this
 		// there in the first place. kai, jul'13)
@@ -91,8 +92,8 @@ import cadyts.demand.PlanBuilder;
 	}
 
 	@Override
-	public void reset(final int iteration) {
-		this.iteration = iteration;
+	public void reset(final int it) {
+		this.iteration = it;
 
 		log.warn("found " + this.plansFound + " out of " + (this.plansFound + this.plansNotFound) + " ("
 				+ (100. * this.plansFound / (this.plansFound + this.plansNotFound)) + "%)");

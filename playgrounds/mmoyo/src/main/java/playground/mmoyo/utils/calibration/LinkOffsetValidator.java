@@ -1,7 +1,8 @@
 package playground.mmoyo.utils.calibration;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.cadyts.pt.CadytsPtLinkCostOffsetsXMLFileIO;
+import org.matsim.contrib.cadyts.general.CadytsCostOffsetsXMLFileIO;
+import org.matsim.contrib.cadyts.pt.TransitStopFacilityLookUp;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
@@ -25,7 +26,10 @@ public class LinkOffsetValidator {
 		DataLoader dataLoader= new DataLoader();
 		TransitSchedule schedule = dataLoader.readTransitSchedule(trScheduleFile);
 
-		CadytsPtLinkCostOffsetsXMLFileIO reader = new CadytsPtLinkCostOffsetsXMLFileIO (schedule);
+//		CadytsPtLinkCostOffsetsXMLFileIO reader = new CadytsPtLinkCostOffsetsXMLFileIO (schedule);
+		CadytsCostOffsetsXMLFileIO<TransitStopFacility> reader 
+		   = new CadytsCostOffsetsXMLFileIO<TransitStopFacility> (new TransitStopFacilityLookUp(schedule));
+
 		DynamicData<TransitStopFacility> stopOffsets = reader.read(linkCostOffsetFilePath);
 
 		/////create a PtBseOccupancyAnalyzer with simulated occupancy values

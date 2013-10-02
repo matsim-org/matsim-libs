@@ -17,10 +17,9 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.cadyts.car;
+package org.matsim.contrib.cadyts.general;
 
-import org.matsim.api.core.v01.network.Link;
-import org.matsim.api.core.v01.network.Network;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.core.basic.v01.IdImpl;
 
 import utilities.misc.DynamicDataXMLFileIO;
@@ -28,24 +27,23 @@ import utilities.misc.DynamicDataXMLFileIO;
 /**
  * Enables cadyts to persist the cost offsets to file.
  */
-class CadytsLinkCostOffsetsXMLFileIO extends DynamicDataXMLFileIO<Link> {
+public final class CadytsCostOffsetsXMLFileIO<T extends Identifiable> extends DynamicDataXMLFileIO<T> {
 
 	private static final long serialVersionUID = 1L;
-	private final Network network;
+	private LookUp<T> lookUp;
 
-	public CadytsLinkCostOffsetsXMLFileIO(final Network network) {
+	public CadytsCostOffsetsXMLFileIO(final LookUp<T> lookUp ) {
 		super();
-		this.network = network;
+		this.lookUp = lookUp ;
 	}
 
 	@Override
-	protected Link attrValue2key(final String linkIdString) {
-		Link link = this.network.getLinks().get(new IdImpl(linkIdString));
-		return link;
+	protected T attrValue2key(final String stopId) {
+		return this.lookUp.lookUp(new IdImpl(stopId)) ;
 	}
 
 	@Override
-	protected String key2attrValue(final Link key) {
+	protected String key2attrValue(final T key) {
 		return key.getId().toString();
 	}
 

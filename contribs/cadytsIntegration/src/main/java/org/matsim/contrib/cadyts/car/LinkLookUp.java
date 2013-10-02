@@ -1,9 +1,9 @@
 /* *********************************************************************** *
- * project: org.matsim.*
+ * project: org.matsim.*												   *
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
- * copyright       : (C) 2012 by the members listed in the COPYING,        *
+ * copyright       : (C) 2008 by the members listed in the COPYING,        *
  *                   LICENSE and WARRANTY file.                            *
  * email           : info at matsim dot org                                *
  *                                                                         *
@@ -16,37 +16,33 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
+package org.matsim.contrib.cadyts.car;
 
-package org.matsim.contrib.cadyts.pt;
-
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
-
-import utilities.misc.DynamicDataXMLFileIO;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.cadyts.general.LookUp;
 
 /**
- * Enables cadyts to persist the cost offsets to file.
+ * @author nagel
+ *
  */
-public class CadytsPtLinkCostOffsetsXMLFileIO extends DynamicDataXMLFileIO<TransitStopFacility> {
+class LinkLookUp implements LookUp<Link>{
+	
+	private Network network;
 
-	private static final long serialVersionUID = 1L;
-	private final TransitSchedule schedule;
-
-	public CadytsPtLinkCostOffsetsXMLFileIO(final TransitSchedule schedule) {
-		super();
-		this.schedule = schedule;
+	LinkLookUp( Scenario sc ) {
+		this.network = sc.getNetwork();
 	}
-
-	@Override
-	protected TransitStopFacility attrValue2key(final String stopId) {
-		TransitStopFacility stop = this.schedule.getFacilities().get(new IdImpl(stopId));
-		return stop;
+	
+	LinkLookUp( Network net ) {
+		this.network = net ;
 	}
-
+	
 	@Override
-	protected String key2attrValue(final TransitStopFacility key) {
-		return key.getId().toString();
+	public Link lookUp( Id id ) {
+		return this.network.getLinks().get( id ) ;
 	}
 
 }

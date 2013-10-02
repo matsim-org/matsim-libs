@@ -29,8 +29,10 @@ import org.matsim.analysis.VolumesAnalyzer;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
+import org.matsim.contrib.cadyts.general.CadytsBuilder;
 import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.contrib.cadyts.general.CadytsContextI;
+import org.matsim.contrib.cadyts.general.CadytsCostOffsetsXMLFileIO;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -49,7 +51,7 @@ import cadyts.supply.SimResults;
  * {@link PlanStrategy Plan Strategy} used for replanning in MATSim which uses Cadyts to
  * select plans that better match to given occupancy counts.
  */
-public class CadytsContext implements CadytsContextI, StartupListener, IterationEndsListener {
+public class CadytsContext implements CadytsContextI<Link>, StartupListener, IterationEndsListener {
 
 	private final static Logger log = Logger.getLogger(CadytsContext.class);
 
@@ -85,6 +87,7 @@ public class CadytsContext implements CadytsContextI, StartupListener, Iteration
 		this.writeAnalysisFile = cadytsConfig.isWriteAnalysisFile();
 	}
 
+	@Override
 	public PlanToPlanStepBasedOnEvents getPlansTranslator() {
 		return this.ptStep;
 	}
@@ -103,7 +106,7 @@ public class CadytsContext implements CadytsContextI, StartupListener, Iteration
 		event.getControler().getEvents().addHandler(ptStep);
 
 		// build the calibrator. This is a static method, and in consequence has no side effects
-		this.calibrator = CadytsBuilder.buildCalibrator(scenario, this.counts /*, cadytsConfig.getTimeBinSize()*/);
+		this.calibrator = CadytsBuilder.buildCalibrator(scenario, this.counts , new LinkLookUp(scenario) /*, cadytsConfig.getTimeBinSize()*/);
 	}
 	
 	@Override
@@ -121,7 +124,9 @@ public class CadytsContext implements CadytsContextI, StartupListener, Iteration
 		// write some output
 		String filename = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), LINKOFFSET_FILENAME);
 		try {
-			new CadytsLinkCostOffsetsXMLFileIO(event.getControler().getScenario().getNetwork()).write(filename, this.calibrator.getLinkCostOffsets());
+//			new CadytsLinkCostOffsetsXMLFileIO(event.getControler().getScenario().getNetwork())
+			new CadytsCostOffsetsXMLFileIO<Link>(new LinkLookUp(event.getControler().getScenario()))
+   			   .write(filename, this.calibrator.getLinkCostOffsets());
 		} catch (IOException e) {
 			log.error("Could not write link cost offsets!", e);
 		}

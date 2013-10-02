@@ -17,20 +17,17 @@
  *                                                                         *
  * *********************************************************************** */
 
-package org.matsim.contrib.cadyts.pt;
+package org.matsim.contrib.cadyts.general;
 
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.contrib.cadyts.general.CadytsConfigGroup;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.counts.Count;
 import org.matsim.counts.Counts;
 import org.matsim.counts.Volume;
-import org.matsim.pt.transitSchedule.api.TransitSchedule;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 import cadyts.calibrators.analytical.AnalyticalCalibrator;
 import cadyts.measurements.SingleLinkMeasurement;
@@ -40,13 +37,13 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
  * @author nagel
  * @author mrieser
  */
-/*package*/ final class CadytsBuilder {
+public final class CadytsBuilder {
 
 	private CadytsBuilder() {
 		// private Constructor, should not be instantiated
 	}
 
-	/*package*/ static AnalyticalCalibrator<TransitStopFacility> buildCalibrator(final Scenario sc, final Counts occupCounts ) {
+	public static <T> AnalyticalCalibrator<T> buildCalibrator(final Scenario sc, final Counts occupCounts, LookUp<T> lookUp ) {
 		CadytsConfigGroup cadytsPtConfig = (CadytsConfigGroup) sc.getConfig().getModule(CadytsConfigGroup.GROUP_NAME);
 
 		//get timeBinSize_s and validate it
@@ -63,7 +60,7 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 			throw new RuntimeException("CadytsPt requires counts-data.");
 		}
 		
-		AnalyticalCalibrator<TransitStopFacility> matsimCalibrator = new AnalyticalCalibrator<TransitStopFacility>(
+		AnalyticalCalibrator<T> matsimCalibrator = new AnalyticalCalibrator<T>(
 				sc.getConfig().controler().getOutputDirectory() + "/cadyts.log",
 				MatsimRandom.getLocalInstance().nextLong(),timeBinSize_s
 				 ) ;
@@ -80,13 +77,12 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 		int arEndTime_s = cadytsPtConfig.getEndTime() ;
 		// (this version gets directly the startTime and endTime directly in seconds from the cadytsPtConfig) 
 		
-		TransitSchedule schedule = sc.getTransitSchedule();
 		
 		int multiple = timeBinSize_s / 3600 ; // e.g. "3" when timeBinSize_s = 3*3600 = 10800
 
 		//add counts data into calibrator
 		for (Map.Entry<Id, Count> entry : occupCounts.getCounts().entrySet()) {
-			TransitStopFacility stop = schedule.getFacilities().get(entry.getKey());
+			T item = lookUp.lookUp(entry.getKey()) ;
 			int timeBinIndex = 0 ; // starting with zero which is different from the counts file!!!
 			int startTimeOfBin_s = -1 ;
 			double val_passager_h = -1 ;
@@ -100,7 +96,7 @@ import cadyts.measurements.SingleLinkMeasurement.TYPE;
 					int endTimeOfBin_s   = volume.getHourOfDayStartingWithOne()*3600 - 1 ;
 					if (startTimeOfBin_s >= arStartTime_s && endTimeOfBin_s <= arEndTime_s) {    //add volumes for each bin to calibrator
 						double val = val_passager_h/multiple ;
-						matsimCalibrator.addMeasurement(stop, startTimeOfBin_s, endTimeOfBin_s, val, 
+						matsimCalibrator.addMeasurement(item, startTimeOfBin_s, endTimeOfBin_s, val, 
 								SingleLinkMeasurement.TYPE.FLOW_VEH_H);
 //								SingleLinkMeasurement.TYPE.COUNT_VEH);
 						// changed this from FLOW_VEH_H to COUNT_VEH on 30/jul/2012 since this is no longer "hourly".  
