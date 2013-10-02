@@ -39,10 +39,8 @@ import org.matsim.core.scenario.ScenarioUtils;
 public class Ganglinie {
 
 	public static void main(String[] args) {
-		String networkFilename = "/Volumes/Data/projects/sviDosierungsanlagen/scenarios/release/kreuzlingen2011c_local/output_MATSim/output_network.xml.gz";
-		String populationFilename = "/Volumes/Data/projects/sviDosierungsanlagen/scenarios/release/kreuzlingen2011c_local/output_MATSim/output_plans.xml.gz";
-//		String networkFilename = "/Volumes/Data/projects/sviDosierungsanlagen/scenarios/output_ohne36_2/output_network.xml.gz";
-//		String populationFilename = "/Volumes/Data/projects/sviDosierungsanlagen/scenarios/output_ohne36_2/output_plans.xml.gz";
+		String networkFilename = "/Volumes/Data/projects/sviDosierungsanlagen/scenarios/output_ohne36_10/output_network.xml.gz";
+		String populationFilename = "/Volumes/Data/projects/sviDosierungsanlagen/scenarios/output_mit36_10/70.plans.xml.gz";
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		
