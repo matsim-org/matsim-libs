@@ -77,7 +77,6 @@ public class PopulationAgentSourceWithVehicles implements AgentSource {
 		final Set<Id> alreadyParked = new HashSet<Id>();
 		for (Person p : population.getPersons().values()) {
 			final MobsimAgent agent = this.agentFactory.createMobsimAgentFromPerson(p);
-			qsim.insertAgentIntoMobsim(agent);
 			final Plan plan = p.getSelectedPlan();
 			for (PlanElement planElement : plan.getPlanElements()) {
 				if (planElement instanceof Leg) {
@@ -98,6 +97,9 @@ public class PopulationAgentSourceWithVehicles implements AgentSource {
 					}
 				}
 			}
+			// this MUST be the last action, because stuff already happens at
+			// insertion (even if run was not called yet...)
+			qsim.insertAgentIntoMobsim(agent);
 		}
 	}
 
