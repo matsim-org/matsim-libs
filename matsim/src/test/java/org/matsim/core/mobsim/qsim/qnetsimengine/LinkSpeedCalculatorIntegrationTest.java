@@ -121,7 +121,6 @@ public class LinkSpeedCalculatorIntegrationTest {
 		f.events.addHandler(collector);
 		f.events.addHandler(new EventsLogger());
 
-		// Use a vehicle link speed of 20.0. Note: the link is itself limited to 10.0
 		QSim qsim = configureQSim(f, new CustomLinkSpeedCalculator(20.0));
 		qsim.run();
 		
@@ -136,9 +135,8 @@ public class LinkSpeedCalculatorIntegrationTest {
 		Assert.assertEquals("1", lle.getPersonId().toString());
 		Assert.assertEquals("2", lle.getLinkId().toString());
 		
-		// the link has a default of 10 length units per seconds, so our faster speed should be overruled by the mobsim with the default
-		// by default, the link takes 10 seconds to travel along, plus 1 second in the buffer, makes total of 11 seconds
-		Assert.assertEquals(11, lle.getTime() - lee.getTime(), 1e-8);
+		// the link should take 5 seconds to travel along, plus 1 second in the buffer, makes total of 6 seconds
+		Assert.assertEquals(6, lle.getTime() - lee.getTime(), 1e-8);
 	}
 	
 	private QSim configureQSim(Fixture f, LinkSpeedCalculator linkSpeedCalculator) {

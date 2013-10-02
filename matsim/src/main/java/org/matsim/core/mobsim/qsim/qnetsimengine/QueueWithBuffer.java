@@ -552,8 +552,7 @@ class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem {
 		double now = network.simEngine.getMobsim().getSimTimer().getTimeOfDay();
 		qLink.activateLink();
 		usedStorageCapacity += veh.getSizeInEquivalents();
-		double vehicleTravelTime = this.length / this.network.simEngine.getLinkSpeedCalculator().getMaximumVelocity(veh, this.qLink.link, now);
-		double linkTravelTime = Math.max(freespeedTravelTime, vehicleTravelTime);
+		double linkTravelTime = this.length / this.network.simEngine.getLinkSpeedCalculator().getMaximumVelocity(veh, this.qLink.link, now);
 		double earliestExitTime = now + linkTravelTime;
 
 		earliestExitTime +=  veh.getEarliestLinkExitTime() - Math.floor(veh.getEarliestLinkExitTime());
