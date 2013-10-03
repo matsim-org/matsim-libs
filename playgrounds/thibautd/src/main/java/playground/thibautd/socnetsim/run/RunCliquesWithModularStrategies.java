@@ -83,6 +83,7 @@ import playground.thibautd.socnetsim.replanning.selectors.InverseScoreWeight;
 import playground.thibautd.socnetsim.replanning.selectors.LossWeight;
 import playground.thibautd.socnetsim.replanning.selectors.LowestScoreOfJointPlanWeight;
 import playground.thibautd.socnetsim.replanning.selectors.LowestScoreSumSelectorForRemoval;
+import playground.thibautd.socnetsim.replanning.selectors.ParetoWeight;
 import playground.thibautd.socnetsim.replanning.selectors.WeightCalculator;
 import playground.thibautd.socnetsim.replanning.selectors.WeightedWeight;
 import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
@@ -382,6 +383,12 @@ public class RunCliquesWithModularStrategies {
 						MatsimRandom.getLocalInstance(),
 						controllerRegistry.getIncompatiblePlansIdentifierFactory(),
 						new InverseScoreWeight() );
+			case pareto:
+				return new HighestWeightSelector(
+						true ,
+						controllerRegistry.getIncompatiblePlansIdentifierFactory(),
+						new ParetoWeight(
+							new InverseScoreWeight() ) );
 			default:
 				throw new RuntimeException( "unkown: "+weights.getGroupScoringType() );
 		}

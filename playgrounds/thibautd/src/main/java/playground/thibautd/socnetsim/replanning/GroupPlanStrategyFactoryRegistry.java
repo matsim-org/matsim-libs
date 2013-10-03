@@ -34,6 +34,7 @@ import playground.thibautd.socnetsim.replanning.strategies.GroupSubtourModeChoic
 import playground.thibautd.socnetsim.replanning.strategies.GroupTimeAllocationMutatorFactory;
 import playground.thibautd.socnetsim.replanning.strategies.GroupTourVehicleAllocationFactory;
 import playground.thibautd.socnetsim.replanning.strategies.GroupWhoIsTheBossSelectExpBetaFactory;
+import playground.thibautd.socnetsim.replanning.strategies.ParetoExpBetaFactory;
 
 /**
  * @author thibautd
@@ -60,6 +61,7 @@ public class GroupPlanStrategyFactoryRegistry {
 		addFactory( "WhoIsTheBossSelectExpBeta" , new GroupWhoIsTheBossSelectExpBetaFactory() );
 		addFactory( "MinSelectExpBeta" , new GroupMinSelectExpBetaFactory() );
 		addFactory( "MinLossSelectExpBeta" , new GroupMinLossSelectExpBetaFactory() );
+		addFactory( "ParetoSelectExpBeta" , new ParetoExpBetaFactory() );
 	}
 
 	public GroupPlanStrategyFactory getFactory( final String name ) {

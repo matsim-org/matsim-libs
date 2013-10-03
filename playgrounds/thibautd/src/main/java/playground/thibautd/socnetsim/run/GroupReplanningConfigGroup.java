@@ -89,7 +89,8 @@ public class GroupReplanningConfigGroup extends ReflectiveNonFlatModule {
 		weightedSum,
 		min,
 		minLoss,
-		whoIsTheBoss;
+		whoIsTheBoss,
+		pareto;
 	}
 	private GroupScoringType groupScoringType = GroupScoringType.sum;
 
