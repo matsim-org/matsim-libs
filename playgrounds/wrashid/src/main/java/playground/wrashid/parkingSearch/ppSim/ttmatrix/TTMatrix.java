@@ -1,9 +1,60 @@
 package playground.wrashid.parkingSearch.ppSim.ttmatrix;
 
-import org.matsim.api.core.v01.Id;
+import java.util.ArrayList;
+import java.util.HashMap;
 
-public interface TTMatrix {
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.network.Link;
+import org.matsim.api.core.v01.network.Network;
+import org.matsim.contrib.parking.lib.obj.StringMatrix;
+
+public class  TTMatrix {
 	
-	double getTravelTime(double time, Id linkId);
+	protected int timeBinSizeInSeconds;
+	protected int simulatedTimePeriod;
+	protected HashMap<Id, double[]> linkTravelTimes;
+	protected static Network network;
+	
+	public double getTravelTime(double time, Id linkId) {
+		double travelTime;
+
+		int timeBinIndex = (int) (Math.round(time) / timeBinSizeInSeconds);
+		Link link = network.getLinks().get(linkId);
+
+		if (!linkTravelTimes.containsKey(linkId)) {
+			double minTravelTime = link.getLength() / link.getFreespeed();
+			travelTime = minTravelTime;
+		} else {
+			travelTime = linkTravelTimes.get(linkId)[timeBinIndex];
+		}
+
+		return travelTime;
+	}
+	
+	protected int getNumberOfBins(){
+		return simulatedTimePeriod/timeBinSizeInSeconds + 1;
+	}
+	
+	public void writeTTMatrixToFile(String outputFile){
+		StringMatrix sm=new StringMatrix();
+		
+		ArrayList<String> row=new ArrayList<String>();
+		row.add("firstColumn=linkId");
+		row.add("simulatedTimePeriod=" +simulatedTimePeriod);
+		row.add("timeBinSizeInSeconds=" + timeBinSizeInSeconds);
+		sm.addRow(row);
+		
+		for (Id linkId:linkTravelTimes.keySet()){
+			row=new ArrayList<String>();
+			double[] ds = linkTravelTimes.get(linkId);
+			row.add(linkId.toString());
+			for (int i=0;i<ds.length;i++){
+				row.add(Double.toString(ds[i]));
+			}	
+			sm.addRow(row);
+		}
+		
+		sm.writeMatrix(outputFile);
+	}
 
 }
