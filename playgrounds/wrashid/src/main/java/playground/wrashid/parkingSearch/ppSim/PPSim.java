@@ -69,7 +69,7 @@ public class PPSim implements Mobsim{
 			eventsManager.processEvent(event);
 			
 		}
-		eventsManager.finishProcessing();
+		
 	}
 	
 	private double simulateActivity(Activity act, double arrivalTime, Id personId){

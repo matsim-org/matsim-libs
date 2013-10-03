@@ -21,8 +21,10 @@ import org.matsim.core.events.EventsUtils;
 public class TTMatrixFromEvents extends TTMatrix {
 
 	public static void main(String[] args) {
-		String eventsFile="C:/data/parkingSearch/chessboard/output/ITERS/it.50/50.events.xml.gz";
-		String networkFile="C:/data/parkingSearch/chessboard/output/output_network.xml.gz";
+		//String eventsFile="C:/data/parkingSearch/chessboard/output/ITERS/it.50/50.events.xml.gz";
+		//String networkFile="C:/data/parkingSearch/chessboard/output/output_network.xml.gz";
+		String eventsFile="H:/data/experiments/TRBAug2011/runs/ktiRun24/output/ITERS/it.50/50.events.xml.gz";
+		String networkFile="H:/data/experiments/TRBAug2011/runs/ktiRun24/output/output_network.xml.gz";
 		TTMatrixFromEvents tTMatrixFromEvents=new TTMatrixFromEvents(24*3600,900, eventsFile, networkFile);
 		tTMatrixFromEvents.writeTTMatrixToFile("c:/tmp2/table.txt");
 	}
