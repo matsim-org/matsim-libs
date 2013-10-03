@@ -33,13 +33,11 @@ import playground.thibautd.socnetsim.replanning.selectors.ParetoWeight;
  */
 public class ParetoExpBetaFactory implements GroupPlanStrategyFactory {
 
-
 	@Override
 	public GroupPlanStrategy createStrategy(
 			final ControllerRegistry registry) {
 		return new GroupPlanStrategy(
 				new HighestWeightSelector(
-						true ,
 						registry.getIncompatiblePlansIdentifierFactory(),
 						new ParetoWeight(
 							new LogitWeight(
