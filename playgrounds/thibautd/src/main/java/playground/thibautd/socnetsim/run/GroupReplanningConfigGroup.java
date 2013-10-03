@@ -17,7 +17,7 @@
  *   See also COPYING, LICENSE and WARRANTY file                           *
  *                                                                         *
  * *********************************************************************** */
-package playground.thibautd.socnetsim.replanning;
+package playground.thibautd.socnetsim.run;
 
 import java.util.Collection;
 
