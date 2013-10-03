@@ -59,6 +59,7 @@ plotshareevolution.nonstacked <- function(
 						   dataframe=read.table( tripmodesharefile , header=T ) ,
 						   cols=rainbow( length( unique( dataframe$mode ) ) ),
 						   legendpos="topright",
+						   ymin=0,
 							   ...) {
 	modes <- unique( dataframe$mode )
 	plot( dataframe$iter[ dataframe$mode == modes[ 1 ] ],
@@ -69,7 +70,7 @@ plotshareevolution.nonstacked <- function(
 		 type="l",
 		 bty="n",
 		 xlim=c(min( dataframe$iter ) , max( dataframe$iter ) ),
-		 ylim=c(0, max( dataframe$nTrips )),
+		 ylim=c(0, max( c(ymin, dataframe$nTrips) )),
 		 col=cols[ 1 ],
 		 ...)
 	for ( i in seq(2,length(modes)) ) {
