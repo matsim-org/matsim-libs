@@ -24,35 +24,29 @@ import java.util.Random;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
-import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.utils.objectattributes.ObjectAttributes;
 import org.matsim.utils.objectattributes.ObjectAttributesUtils;
 
 public class DestinationScoring { 
 	//As the random number generator is re-seeded here anyway, we do not need a rng given from outside!
 	private Random rnd = new Random();
-	private ActivityFacilities facilities;
 	private Config config;
-	private ObjectAttributes facilitiesKValues;
-	private ObjectAttributes personsKValues;
+	private double[] facilitiesKValuesArray;
+	private double[] personsKValuesArray;
 	private ScaleEpsilon scaleEpsilon;
 	private DestinationChoiceBestResponseContext lcContext;
 		
 	public DestinationScoring(DestinationChoiceBestResponseContext lcContext) {
-		this.facilities = ((ScenarioImpl)lcContext.getScenario()).getActivityFacilities();
 		this.config = lcContext.getScenario().getConfig();
-		this.facilitiesKValues = lcContext.getFacilitiesKValues();
-		this.personsKValues = lcContext.getPersonsKValues();
+		this.facilitiesKValuesArray = lcContext.getFacilitiesKValuesArray();
+		this.personsKValuesArray = lcContext.getPersonsKValuesArray();
 		this.scaleEpsilon = lcContext.getScaleEpsilon();
 		this.lcContext = lcContext;
 	}
-				
+	
 	public double getDestinationScore(PlanImpl plan, ActivityImpl act, double fVar) {
 		double score = 0.0;
 		if (this.scaleEpsilon.isFlexibleType(act.getType())) {
@@ -96,10 +90,9 @@ public class DestinationScoring {
 	private double getEpsilonAlternative(Id facilityId, PersonImpl person, int actIndex) {
 		/*
 		 * k values are uniform in [0..1[, see class ReadOrCreateKVals.
-		 */
-		ActivityFacility facility = this.facilities.getFacilities().get(facilityId);		
-		double kf = (Double) this.facilitiesKValues.getAttribute(facility.getId().toString(), "k");
-		double kp = (Double) this.personsKValues.getAttribute(person.getId().toString(), "k");
+		 */		
+		double kf = this.facilitiesKValuesArray[this.lcContext.getFacilityIndex(facilityId)];
+		double kp = this.personsKValuesArray[this.lcContext.getPersonIndex(person.getId())]; 
 		
 		/* generate another stable random number for the activity
 		 * TODO: check if there is enough randomness with this seed

@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
+import org.matsim.contrib.locationchoice.BestReplyDestinationChoice.ActivityFacilityWithIndex;
 import org.matsim.contrib.locationchoice.bestresponse.PlanTimesAdapter.ApproximationLevel;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.ScaleEpsilon;
 import org.matsim.contrib.locationchoice.timegeography.RecursiveLocationMutator;
@@ -36,7 +37,6 @@ import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.contrib.locationchoice.utils.PlanUtils;
 import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
@@ -56,14 +56,21 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 	private ReplanningContext replanningContext;
 	private DestinationChoiceBestResponseContext lcContext;
 
+	/*
+	 * This is not nice! We hide the object of the super-super class since
+	 * it expects a QuadTreeRing<ActivityFacility>. Find a better solution for this...
+	 * cdobler, oct'13.
+	 */
+	protected TreeMap<String, QuadTreeRing<ActivityFacilityWithIndex>> quadTreesOfType;
+	
 	public BestResponseLocationMutator(
-			TreeMap<String, QuadTreeRing<ActivityFacility>> quad_trees,
+			TreeMap<String, QuadTreeRing<ActivityFacilityWithIndex>> quad_trees,
 			TreeMap<String, ActivityFacilityImpl []> facilities_of_type,
 			ObjectAttributes personsMaxDCScoreUnscaled, DestinationChoiceBestResponseContext lcContext,
 			DestinationSampler sampler,
 			ReplanningContext replanningContext) {
-		
-		super(lcContext.getScenario(), replanningContext.getTripRouter(), quad_trees, facilities_of_type, null);
+		// TODO: first null argument should be quad_trees...
+		super(lcContext.getScenario(), replanningContext.getTripRouter(), null, facilities_of_type, null);
 		this.facilities = lcContext.getScenario().getActivityFacilities();
 		this.personsMaxDCScoreUnscaled = personsMaxDCScoreUnscaled;
 		this.scaleEpsilon = lcContext.getScaleEpsilon();
@@ -71,6 +78,8 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		this.sampler = sampler;
 		this.replanningContext = replanningContext ;
 		this.lcContext = lcContext;
+		
+		this.quadTreesOfType = quad_trees;
 	}
 
 	@Override
@@ -151,8 +160,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 					// yy why? kai, feb'13
 
 					final Id choice = cs.getWeightedRandomChoice(
-							actlegIndex, this.facilities, scoringFunction, plan, replanningContext,
-							(Double) this.lcContext.getPersonsKValues().getAttribute(plan.getPerson().getId().toString(), "k"));
+							actlegIndex, this.facilities, scoringFunction, plan, replanningContext, this.lcContext.getPersonsKValuesArray()[personIndex]);
 
 					this.setLocation(actToMove, choice);	
 					
@@ -177,11 +185,12 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		ChoiceSet cs = new ChoiceSet(travelTimeApproximationLevel, scenario);
 
 		final String convertedType = this.actTypeConverter.convertType(actToMove.getType());
-		Collection<ActivityFacility> list = this.quadTreesOfType.get(convertedType).get( center.getX(), center.getY(), maxRadius );
+		Collection<ActivityFacilityWithIndex> list = this.quadTreesOfType.get(convertedType).get( center.getX(), center.getY(), maxRadius );
 		
 		
-		for (ActivityFacility facility : list) {
-			int facilityIndex = this.lcContext.getFacilityIndex(facility.getId());
+		for (ActivityFacilityWithIndex facility : list) {
+//			int facilityIndex = this.lcContext.getFacilityIndex(facility.getId());
+			int facilityIndex = facility.getArrayIndex();
 			if (this.sampler.sample(facilityIndex, personIndex)) { 
 				
 				// only add destination if it can be reached with the chosen mode
@@ -284,5 +293,4 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		}
 		return maxDistance;
 	}
-
 }

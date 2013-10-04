@@ -19,25 +19,32 @@
 
 package org.matsim.contrib.locationchoice;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.Vector;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.locationchoice.bestresponse.BestResponseLocationMutator;
-import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
+import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
 import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
 import org.matsim.contrib.locationchoice.utils.TreesBuilder;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.groups.LocationChoiceConfigGroup;
 import org.matsim.core.facilities.ActivityFacilityImpl;
+import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
+import org.matsim.core.router.priorityqueue.HasIndex;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -52,7 +59,7 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 	private static final Logger log = Logger.getLogger(BestReplyDestinationChoice.class);
 	private ObjectAttributes personsMaxEpsUnscaled;
 	private DestinationSampler sampler;
-	protected TreeMap<String, QuadTreeRing<ActivityFacility>> quadTreesOfType = new TreeMap<String, QuadTreeRing<ActivityFacility>>();
+	protected TreeMap<String, QuadTreeRing<ActivityFacilityWithIndex>> quadTreesOfType = new TreeMap<String, QuadTreeRing<ActivityFacilityWithIndex>>();
 	protected TreeMap<String, ActivityFacilityImpl []> facilitiesOfType = new TreeMap<String, ActivityFacilityImpl []>();
 	private final Scenario scenario;
 	private DestinationChoiceBestResponseContext lcContext;
@@ -90,7 +97,34 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 		treesBuilder.setActTypeConverter(this.lcContext.getConverter());
 		treesBuilder.createTrees(facilities);
 		this.facilitiesOfType = treesBuilder.getFacilitiesOfType();
-		this.quadTreesOfType = treesBuilder.getQuadTreesOfType();
+//		this.quadTreesOfType = treesBuilder.getQuadTreesOfType();
+		
+		/*
+		 * Create a copy of the treesBuilder.getQuadTreesOfType() outcome where the
+		 * ActivityFacility objects are replaced by ActivityFacilityWithIndex objects. 
+		 */
+		Map<Id, ActivityFacilityWithIndex> map = new HashMap<Id, ActivityFacilityWithIndex>();
+		for (ActivityFacility activityFacility : facilities.getFacilities().values()) {
+			int index = this.lcContext.getFacilityIndex(activityFacility.getId());
+			map.put(activityFacility.getId(), new ActivityFacilityWithIndex(activityFacility, index));
+		}
+		
+		TreeMap<String, QuadTreeRing<ActivityFacility>> quadTree = treesBuilder.getQuadTreesOfType();
+		for (Entry<String, QuadTreeRing<ActivityFacility>> entry : quadTree.entrySet()) {
+			String key = entry.getKey();
+			 QuadTreeRing<ActivityFacility> value = entry.getValue();
+			 
+			 double minX = value.getMinEasting();
+			 double maxX = value.getMaxEasting();
+			 double minY = value.getMinNorthing();
+			 double maxY = value.getMaxNorthing();
+			 QuadTreeRing<ActivityFacilityWithIndex> quadTreeRing = new QuadTreeRing<ActivityFacilityWithIndex>(minX, minY, maxX, maxY);
+			 for (ActivityFacility activityFacility : value.values()) {
+				 quadTreeRing.put(activityFacility.getCoord().getX(), activityFacility.getCoord().getY(), map.get(activityFacility.getId()));
+			 }
+			 
+			 this.quadTreesOfType.put(key, quadTreeRing);
+		}
 	}
 
 	@Override
@@ -104,11 +138,61 @@ public class BestReplyDestinationChoice extends AbstractMultithreadedModule {
 	}
 
 	@Override
-	public final PlanAlgorithm getPlanAlgoInstance() {		
+	public final PlanAlgorithm getPlanAlgoInstance() {
+		
+		
+		
 		// this one corresponds to the "frozen epsilon" paper(s)
 		// the random number generators are re-seeded anyway in the dc module. So we do not need a MatsimRandom instance here
 		this.planAlgoInstances.add(new BestResponseLocationMutator(this.quadTreesOfType, this.facilitiesOfType, this.personsMaxEpsUnscaled, 
 				this.lcContext, this.sampler, this.getReplanningContext()));
 		return this.planAlgoInstances.get(this.planAlgoInstances.size()-1);
+	}
+	
+
+	public static final class ActivityFacilityWithIndex implements ActivityFacility, HasIndex {
+
+		private final ActivityFacility activityFacility;
+		private final int index;
+		
+		public ActivityFacilityWithIndex(ActivityFacility activityFacility, int index) {
+			this.activityFacility = activityFacility;
+			this.index = index;
+		}
+		
+		@Override
+		public Id getLinkId() {
+			return this.activityFacility.getLinkId();
+		}
+
+		@Override
+		public Coord getCoord() {
+			return this.activityFacility.getCoord();
+		}
+
+		@Override
+		public Id getId() {
+			return this.activityFacility.getId();
+		}
+
+		@Override
+		public Map<String, Object> getCustomAttributes() {
+			return this.activityFacility.getCustomAttributes();
+		}
+
+		@Override
+		public int getArrayIndex() {
+			return this.index;
+		}
+
+		@Override
+		public Map<String, ActivityOption> getActivityOptions() {
+			return this.activityFacility.getActivityOptions();
+		}
+
+		@Override
+		public void addActivityOption(ActivityOption option) {
+			this.activityFacility.addActivityOption(option);
+		}
 	}
 }

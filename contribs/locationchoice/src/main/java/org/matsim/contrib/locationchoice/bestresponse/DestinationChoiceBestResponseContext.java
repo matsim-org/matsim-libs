@@ -22,6 +22,7 @@
  */
 package org.matsim.contrib.locationchoice.bestresponse;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -167,13 +168,13 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 		return (this.arekValsRead == 0);
 	}
 
-	public ObjectAttributes getPersonsKValues() {
-		return personsKValues;
-	}
+//	public ObjectAttributes getPersonsKValues() {
+//		return personsKValues;
+//	}
 	
-	public ObjectAttributes getFacilitiesKValues() {
-		return facilitiesKValues;
-	}
+//	public ObjectAttributes getFacilitiesKValues() {
+//		return facilitiesKValues;
+//	}
 
 	public double[] getPersonsKValuesArray() {
 		return personsKValuesArray;
@@ -183,8 +184,16 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 		return facilitiesKValuesArray;
 	}
 
+	public Map<Id, Integer> getPersonIndices() {
+		return Collections.unmodifiableMap(this.personIndices);
+	}
+	
 	public int getPersonIndex(Id id) {
 		return this.personIndices.get(id);
+	}
+	
+	public Map<Id, Integer> getFacilityIndices() {
+		return Collections.unmodifiableMap(this.facilityIndices);
 	}
 	
 	public int getFacilityIndex(Id id) {
