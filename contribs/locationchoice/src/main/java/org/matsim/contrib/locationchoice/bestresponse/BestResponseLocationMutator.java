@@ -35,21 +35,20 @@ import org.matsim.contrib.locationchoice.timegeography.RecursiveLocationMutator;
 import org.matsim.contrib.locationchoice.utils.ActTypeConverter;
 import org.matsim.contrib.locationchoice.utils.PlanUtils;
 import org.matsim.contrib.locationchoice.utils.QuadTreeRing;
+import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
-import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
 import org.matsim.core.replanning.ReplanningContext;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scoring.ScoringFunctionAccumulator;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
 public final class BestResponseLocationMutator extends RecursiveLocationMutator {
-	private final ActivityFacilitiesImpl facilities;
+	private final ActivityFacilities facilities;
 	private final ObjectAttributes personsMaxDCScoreUnscaled;
 	private final ScaleEpsilon scaleEpsilon;
 	private final ActTypeConverter actTypeConverter;
@@ -65,7 +64,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 			ReplanningContext replanningContext) {
 		
 		super(lcContext.getScenario(), replanningContext.getTripRouter(), quad_trees, facilities_of_type, null);
-		this.facilities = (ActivityFacilitiesImpl) ((ScenarioImpl) lcContext.getScenario()).getActivityFacilities();
+		this.facilities = lcContext.getScenario().getActivityFacilities();
 		this.personsMaxDCScoreUnscaled = personsMaxDCScoreUnscaled;
 		this.scaleEpsilon = lcContext.getScaleEpsilon();
 		this.actTypeConverter = lcContext.getConverter();
@@ -89,7 +88,8 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		((PlanImpl)bestPlan).copyFrom(plan);
 
 		// this will probably generate an improved bestPlan (?):
-		this.handleActivities(plan, bestPlan);
+		int personIndex = this.lcContext.getPersonIndex(plan.getPerson().getId());
+		this.handleActivities(plan, bestPlan, personIndex);
 
 		// copy the best plan into replanned plan
 		// making a deep copy
@@ -99,7 +99,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		super.resetRoutes(plan);
 	}
 
-	private void handleActivities(Plan plan, final Plan bestPlan) {
+	private void handleActivities(Plan plan, final Plan bestPlan, int personIndex) {
 		int tmp = Integer.parseInt(scenario.getConfig().locationchoice().getTravelTimeApproximationLevel());
 		ApproximationLevel travelTimeApproximationLevel ;
 		if ( tmp==0 ) {
@@ -142,7 +142,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 					double y = (actPre.getCoord().getY() + actPost.getCoord().getY()) / 2.0;
 					Coord center = new CoordImpl(x,y);
 
-					ChoiceSet cs = createChoiceSetFromCircle(plan, travelTimeApproximationLevel, actToMove, maxRadius, center);
+					ChoiceSet cs = createChoiceSetFromCircle(plan, personIndex, travelTimeApproximationLevel, actToMove, maxRadius, center);
 					
 //					System.err.println("ChoiceSet cs:\n" + cs.toString() ) ;
 
@@ -170,7 +170,7 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		}		
 	}
 
-	private ChoiceSet createChoiceSetFromCircle(Plan plan,
+	private ChoiceSet createChoiceSetFromCircle(Plan plan, int personIndex,
 			ApproximationLevel travelTimeApproximationLevel,
 			final Activity actToMove, double maxRadius, Coord center) {
 
@@ -179,8 +179,10 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		final String convertedType = this.actTypeConverter.convertType(actToMove.getType());
 		Collection<ActivityFacility> list = this.quadTreesOfType.get(convertedType).get( center.getX(), center.getY(), maxRadius );
 		
+		
 		for (ActivityFacility facility : list) {
-			if (this.sampler.sample(facility.getId(), plan.getPerson().getId())) { 
+			int facilityIndex = this.lcContext.getFacilityIndex(facility.getId());
+			if (this.sampler.sample(facilityIndex, personIndex)) { 
 				
 				// only add destination if it can be reached with the chosen mode
 				String mode = ((PlanImpl)plan).getPreviousLeg(actToMove).getMode();	
@@ -282,4 +284,5 @@ public final class BestResponseLocationMutator extends RecursiveLocationMutator 
 		}
 		return maxDistance;
 	}
+
 }

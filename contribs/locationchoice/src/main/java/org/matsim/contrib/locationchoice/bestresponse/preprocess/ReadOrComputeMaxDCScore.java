@@ -72,7 +72,8 @@ public class ReadOrComputeMaxDCScore {
 	}
 	
 	private void computeMaxDCScore() {			
-		DestinationSampler sampler = new DestinationSampler(this.lcContext.getPersonsKValues(), this.lcContext.getFacilitiesKValues(), this.config.locationchoice());
+		DestinationSampler sampler = new DestinationSampler(this.lcContext.getPersonsKValuesArray(), 
+				this.lcContext.getFacilitiesKValuesArray(), this.config.locationchoice());
 				
 		log.info("Computing max epsilon ... for " + this.scenario.getPopulation().getPersons().size() + " persons");
 		for (String actType : this.scaleEpsilon.getFlexibleTypes()) {

@@ -22,7 +22,9 @@
  */
 package org.matsim.contrib.locationchoice.bestresponse;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
@@ -60,6 +62,11 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 	private ObjectAttributes prefsAttributes = new ObjectAttributes();
 	TreeMap<Id, FacilityPenalty> facilityPenalties = new TreeMap<Id, FacilityPenalty>();
 
+	private double[] facilitiesKValuesArray;
+	private double[] personsKValuesArray;
+	private Map<Id, Integer> facilityIndices;
+	private Map<Id, Integer> personIndices;
+		
 	public DestinationChoiceBestResponseContext(Scenario scenario) {
 		this.scenario = scenario;	
 		log.info("dc context created but not yet initialized");
@@ -76,6 +83,7 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 		this.readOrCreateKVals(Long.parseLong(this.scenario.getConfig().locationchoice().getRandomSeed()));
 		this.readFacilitesAttributesAndBetas();
 		this.readPrefs();
+		
 		log.info("dc context initialized");
 	}
 	
@@ -84,6 +92,24 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 		this.arekValsRead = computer.run();
 		this.personsKValues = computer.getPersonsKValues();
 		this.facilitiesKValues = computer.getFacilitiesKValues();
+		
+		this.personIndices = new HashMap<Id, Integer>();
+		this.personsKValuesArray = new double[this.scenario.getPopulation().getPersons().size()];
+		int personIndex = 0;
+		for (Id personId : this.scenario.getPopulation().getPersons().keySet()) {
+			this.personIndices.put(personId, personIndex);
+			this.personsKValuesArray[personIndex] = (Double) this.personsKValues.getAttribute(personId.toString(), "k");
+			personIndex++;
+		}		
+		
+		this.facilityIndices = new HashMap<Id, Integer>();
+		this.facilitiesKValuesArray = new double[this.scenario.getActivityFacilities().getFacilities().size()];
+		int facilityIndex = 0;
+		for (Id facilityId : this.scenario.getActivityFacilities().getFacilities().keySet()) {
+			this.facilityIndices.put(facilityId, facilityIndex);
+			this.facilitiesKValuesArray[facilityIndex] = (Double) this.facilitiesKValues.getAttribute(facilityId.toString(), "k");
+			facilityIndex++;
+		}
 	}
 	
 	private void readFacilitesAttributesAndBetas() {
@@ -149,6 +175,22 @@ public class DestinationChoiceBestResponseContext implements MatsimToplevelConta
 		return facilitiesKValues;
 	}
 
+	public double[] getPersonsKValuesArray() {
+		return personsKValuesArray;
+	}
+	
+	public double[] getFacilitiesKValuesArray() {
+		return facilitiesKValuesArray;
+	}
+
+	public int getPersonIndex(Id id) {
+		return this.personIndices.get(id);
+	}
+	
+	public int getFacilityIndex(Id id) {
+		return this.facilityIndices.get(id);
+	}
+	
 	public ObjectAttributes getPersonsBetas() {
 		return personsBetas;
 	}

@@ -55,6 +55,7 @@ public class ComputeMaxDCScorePlanAlgo implements PlanAlgorithm {
 	@Override
 	public void run(Plan plan) {
 		Person p = plan.getPerson();
+		int personIndex = this.lcContext.getPersonIndex(p.getId());
 		double maxDCScore = 0.0;		
 		/*
 		 * Find the max dc score of all activities of this.type.
@@ -67,7 +68,8 @@ public class ComputeMaxDCScorePlanAlgo implements PlanAlgorithm {
 			
 					for (Facility f : typedFacilities.values()) {
 						//check if facility is sampled
-						if (!this.sampler.sample(f.getId(), plan.getPerson().getId())) continue;
+						int facilityIndex = this.lcContext.getFacilityIndex(f.getId());
+						if (!this.sampler.sample(facilityIndex, personIndex)) continue;
 						
 						ActivityImpl act = new ActivityImpl(type, new IdImpl(1));
 						act.setFacilityId(f.getId());

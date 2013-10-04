@@ -19,9 +19,7 @@
 
 package org.matsim.contrib.locationchoice.bestresponse;
 
-import org.matsim.api.core.v01.Id;
 import org.matsim.core.config.groups.LocationChoiceConfigGroup;
-import org.matsim.utils.objectattributes.ObjectAttributes;
 
 /**
  * Chooses a stable sample of facilities for every person 
@@ -39,28 +37,26 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
  */
 public class DestinationSampler {
 	
-	private ObjectAttributes facilitiesKValues;
-	private ObjectAttributes personsKValues;
+	private double[] facilitiesKValues;
+	private double[] personsKValues;
 	double samplePercent = 100.0;
 	
-	public DestinationSampler(ObjectAttributes personsKValues, ObjectAttributes facilitiesKValues,  
+	public DestinationSampler(double[] personsKValues, double[] facilitiesKValues,  
 			LocationChoiceConfigGroup config) {
 		this.facilitiesKValues = facilitiesKValues;
 		this.personsKValues = personsKValues;
 		this.samplePercent = Double.parseDouble(config.getDestinationSamplePercent());
 	}
-		
-	public boolean sample(Id facilityId, Id personId) { 
+	
+	public boolean sample(int facilityIndex, int personIndex) { 
 		
 		if (Math.ceil(this.samplePercent) == 100) return true;		
 				
 		// assign the person randomly but frozen a number between 0 and 100/samplePercent:
-		int personValue = (int)Math.floor(100.0 / samplePercent * 
-				(Double) this.personsKValues.getAttribute(personId.toString(), "k"));
+		int personValue = (int)Math.floor(100.0 / samplePercent * this.personsKValues[personIndex]);
 		
 		// assign the facility randomly but frozen a number between 0 and 100/samplePercent:
-		int facilityValue = (int)Math.floor(100.0 / samplePercent * 
-				(Double) this.facilitiesKValues.getAttribute(facilityId.toString(), "k"));
+		int facilityValue = (int)Math.floor(100.0 / samplePercent * this.facilitiesKValues[facilityIndex]);
 		
 		// return true if the facility has the same number as the person. This will happen for samplePercent of all facilities:
 		return (facilityValue == personValue);		
