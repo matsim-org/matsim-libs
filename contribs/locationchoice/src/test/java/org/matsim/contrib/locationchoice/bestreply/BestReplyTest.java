@@ -19,6 +19,7 @@ public class BestReplyTest extends MatsimTestCase {
 	
 	private static final Logger log = Logger.getLogger(BestReplyTest.class);
 	
+	@Override
 	protected void setUp() throws Exception {
 		super.setUp();
 		this.init();
@@ -26,9 +27,11 @@ public class BestReplyTest extends MatsimTestCase {
 		
 	public void testSampler() {
 		DestinationSampler sampler = new DestinationSampler(
-				context.getPersonsKValues(), context.getFacilitiesKValues(), scenario.getConfig().locationchoice());
-		assertTrue(sampler.sample(new IdImpl(1), new IdImpl(1)));
-		assertTrue(!sampler.sample(new IdImpl(1), new IdImpl(2)));
+				context.getPersonsKValuesArray(), context.getFacilitiesKValuesArray(), scenario.getConfig().locationchoice());
+		assertTrue(sampler.sample(context.getFacilityIndex(new IdImpl(1)), context.getPersonIndex(new IdImpl(1))));
+		assertTrue(!sampler.sample(context.getFacilityIndex(new IdImpl(1)), context.getPersonIndex(new IdImpl(2))));
+//		assertTrue(sampler.sample(new IdImpl(1), new IdImpl(1)));
+//		assertTrue(!sampler.sample(new IdImpl(1), new IdImpl(2)));
 	}
 	
 	public void init() {
