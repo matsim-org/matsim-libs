@@ -78,7 +78,7 @@ public class ActivitiesHandler {
 		// check if demand = v1
 		if (tentries[0].length() == 1) {
 			this.converter = new ActTypeConverter(true);
-			Logger.getLogger(this.getClass()).error("LocationChoice uses an activity type converter that only uses the first letter of every activity type. " +
+			Logger.getLogger(this.getClass()).warn("LocationChoice uses an activity type converter that only uses the first letter of every activity type. " +
 					"For example, `shopping' and `school' may be treated as the same activity.  Make sure this is what you want.") ; // kai, jan'13
 		}
 		else {
