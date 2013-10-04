@@ -26,11 +26,10 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
+import org.matsim.contrib.locationchoice.BestReplyDestinationChoice.ActivityFacilityWithIndex;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
+import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.DestinationScoring;
-import org.matsim.core.api.experimental.facilities.ActivityFacility;
-import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.PlanImpl;
@@ -38,12 +37,12 @@ import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class ComputeMaxDCScorePlanAlgo implements PlanAlgorithm {
 	private String type;
-	private TreeMap<Id, ActivityFacility> typedFacilities;
+	private TreeMap<Id, ActivityFacilityWithIndex> typedFacilities;
 	private DestinationScoring scorer;
 	private DestinationSampler sampler;
 	private DestinationChoiceBestResponseContext lcContext;
-			
-	public ComputeMaxDCScorePlanAlgo(String type, TreeMap<Id, ActivityFacility> typedFacilities,
+	
+	public ComputeMaxDCScorePlanAlgo(String type, TreeMap<Id, ActivityFacilityWithIndex> typedFacilities,
 			DestinationScoring scorer, DestinationSampler sampler, DestinationChoiceBestResponseContext lcContext) {		
 		this.type = type;
 		this.typedFacilities = typedFacilities;
@@ -66,9 +65,9 @@ public class ComputeMaxDCScorePlanAlgo implements PlanAlgorithm {
 			if (pe instanceof Activity) {					
 				if (this.lcContext.getConverter().convertType(((Activity) pe).getType()).equals(type)) {
 			
-					for (Facility f : typedFacilities.values()) {
+					for (ActivityFacilityWithIndex f : typedFacilities.values()) {
 						//check if facility is sampled
-						int facilityIndex = this.lcContext.getFacilityIndex(f.getId());
+						int facilityIndex = f.getArrayIndex();
 						if (!this.sampler.sample(facilityIndex, personIndex)) continue;
 						
 						ActivityImpl act = new ActivityImpl(type, new IdImpl(1));

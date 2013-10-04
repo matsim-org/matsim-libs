@@ -19,21 +19,22 @@
 
 package org.matsim.contrib.locationchoice.bestresponse.preprocess;
 
+import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
+import org.matsim.contrib.locationchoice.BestReplyDestinationChoice.ActivityFacilityWithIndex;
 import org.matsim.contrib.locationchoice.bestresponse.DestinationChoiceBestResponseContext;
+import org.matsim.contrib.locationchoice.bestresponse.DestinationSampler;
 import org.matsim.contrib.locationchoice.bestresponse.scoring.DestinationScoring;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;
-import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 public class ComputeMaxDCScoreMultiThreatedModule extends AbstractMultithreadedModule {	
 	private String type;
-	private TreeMap<Id, ActivityFacility> typedFacilities;
+	private TreeMap<Id, ActivityFacilityWithIndex> typedFacilities;
 	private DestinationChoiceBestResponseContext lcContext;
 	private static final Logger log = Logger.getLogger(ComputeMaxDCScoreMultiThreatedModule.class);
 	private DestinationSampler sampler;
@@ -42,8 +43,18 @@ public class ComputeMaxDCScoreMultiThreatedModule extends AbstractMultithreadedM
 		super(lcContext.getScenario().getConfig().global().getNumberOfThreads());
 		this.type = type;
 		this.lcContext = lcContext;
-		this.typedFacilities = ((ScenarioImpl) lcContext.getScenario()).
-				getActivityFacilities().getFacilitiesForActivityType(lcContext.getConverter().convertType(type));
+
+		/*
+		 * Get ActivityFacilies for type and then replace them with ActivityFacilityWithIndex
+		 * objects due to performance reasons.
+		 */
+		Map<Id, ActivityFacility> map = lcContext.getScenario().getActivityFacilities().getFacilitiesForActivityType(lcContext.getConverter().convertType(type));
+		this.typedFacilities = new TreeMap<Id, ActivityFacilityWithIndex>();
+		for (ActivityFacility activityFacility : map.values()) {
+			int index = this.lcContext.getFacilityIndex(activityFacility.getId());
+			this.typedFacilities.put(activityFacility.getId(),new ActivityFacilityWithIndex(activityFacility, index));
+		}
+		
 		if (this.typedFacilities.size() == 0) {
 			log.warn("There are no facilities for type : " + type);
 		} 
