@@ -1,11 +1,15 @@
 package playground.toronto.sotr.routernetwork2;
 
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 public abstract class RoutingLink {
 	
 	protected RoutingNode fromNode;
 	protected RoutingNode toNode;
+	
+	protected HashSet<RoutingLink> prohibitedOutgoingTurns;
 	
 	/**
 	 * The pending cost to the tail of this link
@@ -25,6 +29,8 @@ public abstract class RoutingLink {
 	public RoutingLink(RoutingNode fromNode, RoutingNode toNode){
 		this.fromNode = fromNode;
 		this.toNode = toNode;
+		
+		this.prohibitedOutgoingTurns = new HashSet<RoutingLink>();
 		
 		reset();
 	}
@@ -50,33 +56,45 @@ public abstract class RoutingLink {
 			public Iterator<RoutingLink> iterator() {
 				return new Iterator<RoutingLink>() {	
 					
-					RoutingLink nextLink;
+					boolean _hasNext = true;
 					
 					@Override
 					public void remove() { throw new UnsupportedOperationException(); }
 					
 					@Override
 					public RoutingLink next() {
-						return nextLink;
+						if (base.hasNext()){
+							RoutingLink nextLink = base.next();
+							
+							while (prohibitedOutgoingTurns.contains(nextLink)){
+								if (base.hasNext()){nextLink = base.next();}
+								else{ 
+									_hasNext = false;
+									throw new NoSuchElementException();
+								}
+							}
+							
+							if (allowUTurns) return nextLink; //If u-turns are permitted, no need to skip u-turned links
+							
+							while (nextLink.getToNode() == fromNode){
+								if (base.hasNext()){nextLink = base.next();}
+								else{
+									_hasNext = false;
+									throw new NoSuchElementException();
+								}
+							}
+							return nextLink;
+						}
+						_hasNext = false;
+						throw new NoSuchElementException();
 					}
 					
 					@Override
 					public boolean hasNext() {
-						if (base.hasNext()){
-							nextLink = base.next();
-							if (allowUTurns) return true; //If u-turns are permitted, no need to skip u-turned links
-							
-							while (nextLink.getToNode() == fromNode){
-								if (base.hasNext()){nextLink = base.next();}
-								else{ return false;}
-							}
-							return true;
-						}
-						return false;
+						return _hasNext;
 					}
 				};
 			}
 		};
 	}
-	
 }

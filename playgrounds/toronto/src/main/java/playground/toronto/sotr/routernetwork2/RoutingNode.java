@@ -17,7 +17,10 @@ public class RoutingNode {
 	
 	protected List<RoutingLink> outgoingLinks;
 	protected Coord coord;
-	protected List<TransitStopFacility> stops;
+	
+	protected RoutingNode(Coord coord){
+		this.coord = coord;
+	}
 	
 	public Iterable<RoutingLink> getOutgoingLinks(){
 		return this.outgoingLinks;

@@ -16,7 +16,6 @@ import playground.toronto.sotr.config.SOTRConfig;
 import playground.toronto.sotr.routernetwork.SOTRNetwork;
 import playground.toronto.sotr.routernetwork.SOTRNode;
 import playground.toronto.sotr.routernetwork2.RoutingLink;
-import playground.toronto.sotr.routernetwork2.RoutingNetworkDelegate;
 import playground.toronto.sotr.routernetwork2.RoutingNode;
 
 /**
@@ -28,7 +27,7 @@ public class SOTRMultiNodeDijkstra {
 	
 	private SOTRTimeCalculator2 timeCalc;
 	private SOTRDisutilityCalculator2 costCalc;
-	private RoutingNetworkDelegate network;
+	private playground.toronto.sotr.routernetwork2.RoutingNetwork.RoutingNetworkDelegate network;
 	
 	public List<RoutingLink> calculateLeastCostPath(final RoutingNode ORIGIN, final RoutingLink DESTINATION, final Person person, final double departureTime) {
 		
@@ -36,14 +35,12 @@ public class SOTRMultiNodeDijkstra {
 		//Due to the fact that link pending costs & times are to the tail (not head) of links, the destination is
 		//actually a link.
 		
-		this.reset();
-		
-		PseudoRemovePriorityQueue<RoutingLink> pendingLinks = new PseudoRemovePriorityQueue<RoutingLink>(network.getSize());
+		PseudoRemovePriorityQueue<RoutingLink> pendingLinks = new PseudoRemovePriorityQueue<RoutingLink>(network.getNumberOfLinks());
 		for (RoutingLink link : ORIGIN.getOutgoingLinks()){
 			link.pendingCost = 0;
 			link.pendingTime = departureTime;
 		}
-		for (RoutingLink link : network.getLinks()){
+		for (RoutingLink link : network.iterLinks()){
 			pendingLinks.add(link, link.pendingCost);
 		}
 		
@@ -61,7 +58,7 @@ public class SOTRMultiNodeDijkstra {
 			double linkTime = timeCalc.getLinkTravelTime(currentLink, now, person, null);
 			double linkCost = costCalc.getLinkTravelDisutility(currentLink, now, person, null);
 			
-			//Quick check, just in case. Were this C#, I'd put a compiler IF statement to only compile this if debugging.
+			//Quick check, just in case. Were this C#, I'd put a compiler #IF statement to only compile this if debugging.
 			if (linkTime < 0) { Log.error("Fatal Error: travel time was negative", new Exception());}
 			if (linkCost < 0) { Log.error("Fatal Error: travel cost was negative", new Exception());}
 
@@ -78,19 +75,15 @@ public class SOTRMultiNodeDijkstra {
 					nextLink.pendingTime = turnTime + linkTime + now;
 					nextLink.previousLink = currentLink;
 					
-					pendingLinks.add(nextLink, nextLink.pendingCost); //Update the queue
+					pendingLinks.add(nextLink, nextLink.pendingCost); //Update nextLink's position in the queue
 				}
 			}
 			
-			pendingLinks.remove(currentLink);
+			//pendingLinks.remove(currentLink); //Not needed, poll() removes the link
 		}
 		
 		Log.warn("Could not find a route!");
 		return null;
-	}
-	
-	private void reset(){
-		network.reset();
 	}
 	
 	private List<RoutingLink> constructPath(RoutingLink DESTINATION){

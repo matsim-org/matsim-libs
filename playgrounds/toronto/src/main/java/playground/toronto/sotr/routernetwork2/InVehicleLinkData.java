@@ -16,14 +16,14 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
  */
 public class InVehicleLinkData {
 	
-	private final TransitStopFacility fromStop;
-	private final TransitStopFacility toStop;
+	private final StopGroupFacility fromStop;
+	private final StopGroupFacility toStop;
 	private final TransitRoute route;
 	private final TreeSet<Double> departures;
 	private final TreeMap<Double, Double> travelTimes;
 	private final double defaultTravelTime; //Scheduled travel time. Should never change for the life of this object.
 	
-	public InVehicleLinkData(final TransitRoute route, final TransitStopFacility fromStop, final TransitStopFacility toStop,
+	public InVehicleLinkData(final TransitRoute route, final StopGroupFacility fromStop, final StopGroupFacility toStop,
 			final double defaultTravelTime){
 		this.route = route;
 		this.fromStop = fromStop;
@@ -34,8 +34,8 @@ public class InVehicleLinkData {
 		this.defaultTravelTime = defaultTravelTime;
 	}
 	
-	public TransitStopFacility getFromStop(){ return this.fromStop;}
-	public TransitStopFacility getToStop() { return this.toStop;}
+	public StopGroupFacility getFromStop(){ return this.fromStop;}
+	public StopGroupFacility getToStop() { return this.toStop;}
 	public TransitRoute getRoute() { return this.route; }
 	public TreeSet<Double> getDepartures() { return this.departures; }
 	public TreeMap<Double, Double> getTravelTimes() {return this.travelTimes; }
