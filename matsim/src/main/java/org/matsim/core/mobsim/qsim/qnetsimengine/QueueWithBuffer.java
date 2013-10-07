@@ -354,7 +354,9 @@ class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem {
 				removeVehicleFromQueue(now) ;
 				continue;
 			} else if (handleTransitStop == HandleTransitStopResult.rehandle) {
-				continue;
+				continue; // yy why "continue", and not "break" or "return"?  Seems to me that this
+				// is currently only working because qLink.handleTransitStop(...) also increases the
+				// earliestLinkExitTime for the present vehicle.  kai, oct'13
 			} else if (handleTransitStop == HandleTransitStopResult.continue_driving) {
 				// Do nothing, but go on.. 
 			} 
