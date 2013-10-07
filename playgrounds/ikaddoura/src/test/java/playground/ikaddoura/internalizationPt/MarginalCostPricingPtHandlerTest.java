@@ -693,6 +693,7 @@ public class MarginalCostPricingPtHandlerTest  {
 	//agent 2 waits less than the delay of the bus (2.0<6.0 sec) --> consideration of AffectedAgentsUnits
 	//It is important to define a bus in the schedule which leaves later on,
 	//even if agent 2 will nevertheless get the first bus.
+	@Ignore
 	@Test
 	public final void testWaitingDelay03(){
 		
