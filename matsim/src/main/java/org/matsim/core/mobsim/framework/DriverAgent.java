@@ -21,6 +21,7 @@
 package org.matsim.core.mobsim.framework;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 
 /**
  * Design comments:<ul>
@@ -31,7 +32,7 @@ import org.matsim.api.core.v01.Id;
  * @author nagel
  *
  */
-public interface DriverAgent extends PassengerAgent {
+public interface DriverAgent extends Identifiable, NetworkAgent, VehicleUsingAgent {
 
 	/**
 	 * @return The next link the vehicle will drive on, or null if an error has happened.

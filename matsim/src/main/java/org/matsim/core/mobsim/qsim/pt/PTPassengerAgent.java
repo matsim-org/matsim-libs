@@ -34,7 +34,7 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 /**
  * @author mrieser
  */
-public interface PTPassengerAgent extends PassengerAgent, Identifiable {
+public interface PTPassengerAgent extends PassengerAgent {
 
 	/**
 	 * Informs a passenger waiting at a stop that a transit line

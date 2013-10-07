@@ -26,6 +26,7 @@ import java.util.ListIterator;
 import java.util.Queue;
 
 import org.matsim.api.core.v01.Coord;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.network.Link;
@@ -67,9 +68,9 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 	public int positionVehiclesFromWaitingList(final Collection<AgentSnapshotInfo> positions,
 			final Link link, int cnt2, final Queue<QVehicle> waitingList) {
 		for (QVehicle veh : waitingList) {
-			Collection<PassengerAgent> peopleInVehicle = getPeopleInVehicle(veh);
+			Collection<Identifiable> peopleInVehicle = getPeopleInVehicle(veh);
 			boolean first = true;
-			for (PassengerAgent passenger : peopleInVehicle) {
+			for (Identifiable passenger : peopleInVehicle) {
 				cnt2++ ;
 				AgentSnapshotInfo passengerPosition = snapshotInfoFactory.createAgentSnapshotInfo(passenger.getId(), link, 0.9*link.getLength(), cnt2); // for the time being, same position as facilities
 				if (passenger.getId().toString().startsWith("pt")) {
@@ -108,11 +109,11 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 	public int positionVehiclesFromTransitStop(final Collection<AgentSnapshotInfo> positions, Link link, Queue<QVehicle> transitVehicleStopQueue, int cnt2 ) {
 		if (transitVehicleStopQueue.size() > 0) {
 			for (QVehicle veh : transitVehicleStopQueue) {
-				List<PassengerAgent> peopleInVehicle = getPeopleInVehicle(veh);
+				List<Identifiable> peopleInVehicle = getPeopleInVehicle(veh);
 				boolean last = false ;
 				cnt2 += peopleInVehicle.size() ;
-				for ( ListIterator<PassengerAgent> it = peopleInVehicle.listIterator( peopleInVehicle.size() ) ; it.hasPrevious(); ) {
-					PassengerAgent passenger = it.previous();
+				for ( ListIterator<Identifiable> it = peopleInVehicle.listIterator( peopleInVehicle.size() ) ; it.hasPrevious(); ) {
+					Identifiable passenger = it.previous();
 					if ( !it.hasPrevious() ) {
 						last = true ;
 					}
@@ -215,8 +216,8 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 	 * @param transitQueueLaneFeature
 	 * @return All the people in this vehicle. If there is more than one, the first entry is the driver.
 	 */
-	protected List<PassengerAgent> getPeopleInVehicle(QVehicle vehicle) {
-		ArrayList<PassengerAgent> people = new ArrayList<PassengerAgent>();
+	protected List<Identifiable> getPeopleInVehicle(QVehicle vehicle) {
+		ArrayList<Identifiable> people = new ArrayList<Identifiable>();
 		people.add(vehicle.getDriver());
 //		if (vehicle instanceof TransitVehicle) {
 //			for (PassengerAgent passenger : ((TransitVehicle) vehicle).getPassengers()) {
