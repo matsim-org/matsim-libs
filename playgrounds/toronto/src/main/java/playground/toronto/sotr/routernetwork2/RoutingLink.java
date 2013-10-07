@@ -4,12 +4,16 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-public abstract class RoutingLink {
+import org.matsim.core.router.priorityqueue.HasIndex;
+
+public abstract class RoutingLink implements HasIndex {
 	
 	protected RoutingNode fromNode;
 	protected RoutingNode toNode;
 	
 	protected HashSet<RoutingLink> prohibitedOutgoingTurns;
+	
+	protected int index;
 	
 	/**
 	 * The pending cost to the tail of this link
@@ -31,6 +35,7 @@ public abstract class RoutingLink {
 		this.toNode = toNode;
 		
 		this.prohibitedOutgoingTurns = new HashSet<RoutingLink>();
+		this.index = -1; //This only gets set a meaningful value if it's created by the RoutingNetworkDelegate
 		
 		reset();
 	}
@@ -41,12 +46,18 @@ public abstract class RoutingLink {
 		this.previousLink = null;
 	}
 	
+	@Override
+	public int getArrayIndex(){
+		return index;
+	}
+	
 	/**
 	 * Returns an iterator for outgoing turns.
 	 * 
 	 * @param allowUTurns True if U-Turns are permitted
 	 * @return
 	 */
+
 	public Iterable<RoutingLink> getOutgoingTurns(final boolean allowUTurns){
 		
 		final Iterator<RoutingLink> base = this.toNode.outgoingLinks.iterator();

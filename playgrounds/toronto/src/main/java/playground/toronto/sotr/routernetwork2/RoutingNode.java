@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * Represents a node in the routing graph. Each <code>RoutingNode</code> is a meeting

@@ -4,7 +4,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 
 import org.matsim.pt.transitSchedule.api.TransitRoute;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 
 /**
  * A (hopefully) thread-safe container of in-vehicle link data (departure times, travel times) used in

@@ -5,16 +5,10 @@ import java.util.List;
 
 import org.jfree.util.Log;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
+import org.matsim.core.router.priorityqueue.BinaryMinHeap;
 
-import playground.toronto.sotr.calculators.ISOTRDisutilityCalculator;
-import playground.toronto.sotr.calculators.ISOTRTimeCalculator;
 import playground.toronto.sotr.calculators.SOTRDisutilityCalculator2;
 import playground.toronto.sotr.calculators.SOTRTimeCalculator2;
-import playground.toronto.sotr.config.SOTRConfig;
-import playground.toronto.sotr.routernetwork.SOTRNetwork;
-import playground.toronto.sotr.routernetwork.SOTRNode;
 import playground.toronto.sotr.routernetwork2.RoutingLink;
 import playground.toronto.sotr.routernetwork2.RoutingNode;
 
@@ -35,7 +29,8 @@ public class SOTRMultiNodeDijkstra {
 		//Due to the fact that link pending costs & times are to the tail (not head) of links, the destination is
 		//actually a link.
 		
-		PseudoRemovePriorityQueue<RoutingLink> pendingLinks = new PseudoRemovePriorityQueue<RoutingLink>(network.getNumberOfLinks());
+		BinaryMinHeap<RoutingLink> pendingLinks = new BinaryMinHeap<RoutingLink>(network.getNumberOfLinks());
+		
 		for (RoutingLink link : ORIGIN.getOutgoingLinks()){
 			link.pendingCost = 0;
 			link.pendingTime = departureTime;
@@ -75,11 +70,9 @@ public class SOTRMultiNodeDijkstra {
 					nextLink.pendingTime = turnTime + linkTime + now;
 					nextLink.previousLink = currentLink;
 					
-					pendingLinks.add(nextLink, nextLink.pendingCost); //Update nextLink's position in the queue
+					pendingLinks.decreaseKey(nextLink, nextLink.pendingCost); //Update nextLink's position in the queue
 				}
 			}
-			
-			//pendingLinks.remove(currentLink); //Not needed, poll() removes the link
 		}
 		
 		Log.warn("Could not find a route!");

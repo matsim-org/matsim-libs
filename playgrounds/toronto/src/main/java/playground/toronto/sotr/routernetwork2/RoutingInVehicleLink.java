@@ -12,7 +12,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
  */
 public class RoutingInVehicleLink extends RoutingLink {
 	
-	private final InVehicleLinkData data;
+	protected final InVehicleLinkData data;
 	
 	public RoutingInVehicleLink(RoutingNode fromNode, RoutingNode toNode, InVehicleLinkData data){
 		super(fromNode, toNode);
