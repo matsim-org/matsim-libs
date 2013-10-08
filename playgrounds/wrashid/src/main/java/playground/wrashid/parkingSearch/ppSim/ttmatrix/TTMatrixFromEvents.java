@@ -6,8 +6,10 @@ import java.util.HashMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.GeneralLib;
@@ -21,12 +23,12 @@ import org.matsim.core.events.EventsUtils;
 public class TTMatrixFromEvents extends TTMatrix {
 
 	public static void main(String[] args) {
-		//String eventsFile="C:/data/parkingSearch/chessboard/output/ITERS/it.50/50.events.xml.gz";
-		//String networkFile="C:/data/parkingSearch/chessboard/output/output_network.xml.gz";
-		String eventsFile="H:/data/experiments/TRBAug2011/runs/ktiRun24/output/ITERS/it.50/50.events.xml.gz";
-		String networkFile="H:/data/experiments/TRBAug2011/runs/ktiRun24/output/output_network.xml.gz";
-		TTMatrixFromEvents tTMatrixFromEvents=new TTMatrixFromEvents(24*3600,900, eventsFile, networkFile);
-		tTMatrixFromEvents.writeTTMatrixToFile("c:/tmp2/table.txt");
+		String eventsFile="C:/data/parkingSearch/psim/berlin/ITERS/it.50/50.events.xml.gz";
+		String networkFile="C:/data/parkingSearch/psim/berlin/output_network.xml.gz";
+		//String eventsFile="H:/data/experiments/TRBAug2011/runs/ktiRun24/output/ITERS/it.50/50.events.xml.gz";
+		//String networkFile="H:/data/experiments/TRBAug2011/runs/ktiRun24/output/output_network.xml.gz";
+		TTMatrixFromEvents tTMatrixFromEvents=new TTMatrixFromEvents(24*3600,60, eventsFile, networkFile);
+		tTMatrixFromEvents.writeTTMatrixToFile("C:/data/parkingSearch/psim/berlin/ITERS/it.50/50.60secBin.ttMatrix.txt");
 	}
 	
 	TTMatrixFromEvents(int simulatedTimePeriod,int timeBinSizeInSeconds, String eventsFile, String networkFile) {
@@ -52,7 +54,7 @@ public class TTMatrixFromEvents extends TTMatrix {
 
 	
 
-	private class TTMatrixTimesHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
+	private class TTMatrixTimesHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, Wait2LinkEventHandler {
 
 		private HashMap<Id, double[]> linkTravelTimes;
 		private HashMap<Id, int[]> numberOfSamples;
@@ -77,7 +79,7 @@ public class TTMatrixFromEvents extends TTMatrix {
 					} else {
 						ds[i]/=numberOfSamples.get(linkId)[i];
 					}
-					System.out.println(link.getFreespeed() + " -> " + link.getLength()/ds[i]);
+					//System.out.println(link.getFreespeed() + " -> " + link.getLength()/ds[i]);
 				}
 			}
 			return linkTravelTimes;
@@ -112,6 +114,11 @@ public class TTMatrixFromEvents extends TTMatrix {
 
 		@Override
 		public void handleEvent(LinkEnterEvent event) {
+			agentEnterLinkTime.put(event.getPersonId(), event.getTime());
+		}
+
+		@Override
+		public void handleEvent(Wait2LinkEvent event) {
 			agentEnterLinkTime.put(event.getPersonId(), event.getTime());
 		}
 

@@ -65,35 +65,80 @@ public class AgentEventMessage extends Message {
 		Event event = null;
 	
 		Leg leg = (LegImpl) person.getSelectedPlan().getPlanElements().get(planElementIndex);
+		ActivityImpl prevAct = (ActivityImpl) person.getSelectedPlan().getPlanElements().get(planElementIndex-1);
 		ActivityImpl nextAct = (ActivityImpl) person.getSelectedPlan().getPlanElements().get(planElementIndex+1);
 	
 		if (leg.getMode().equalsIgnoreCase(TransportMode.car)){
+			
 			List<Id> linkIds = ((LinkNetworkRouteImpl)leg.getRoute()).getLinkIds();
-			Id linkId = linkIds.get(currentLinkIndex);
 			
 			boolean endOfLegReached = currentLinkIndex==linkIds.size()-1;
 			
 			if (endOfLegReached){
-				processEndOfLegReached(leg, nextAct);
+				processEndOfLegCarMode(leg, nextAct);
 				
 			} else {
+				Id currentLinkId=null;
+				if (currentLinkIndex==-1){
+					currentLinkId=prevAct.getLinkId();
+				} else {
+					currentLinkId = linkIds.get(currentLinkIndex);
+				}
+				
+				event=new LinkLeaveEvent(getMessageArrivalTime(),person.getId(),currentLinkId,person.getId());
+				eventsManager.processEvent(event);
+				
 				currentLinkIndex++;
-				event=new LinkLeaveEvent(getMessageArrivalTime(),person.getId(),linkId,person.getId());
+				currentLinkId = linkIds.get(currentLinkIndex);
+				
+				event=new LinkEnterEvent(getMessageArrivalTime(),person.getId(),currentLinkId,person.getId());
 				eventsManager.processEvent(event);
 				
-				event=new LinkEnterEvent(getMessageArrivalTime(),person.getId(),linkIds.get(currentLinkIndex),person.getId());
-				eventsManager.processEvent(event);
-				
-				setMessageArrivalTime(getMessageArrivalTime()+ttMatrix.getTravelTime(getMessageArrivalTime(), linkId));
+				setMessageArrivalTime(getMessageArrivalTime()+ttMatrix.getTravelTime(getMessageArrivalTime(), currentLinkId));
 				messageQueue.schedule(this);
 			}
 		} else {
-			processEndOfLegReached(leg, nextAct);
+			processEndOfLegNonCarMode(leg, nextAct);
 		}
 		
 	}
+	
+	private void processEndOfLegCarMode(Leg leg, ActivityImpl nextAct) {
+		Event event;
+		
+		List<Id> linkIds = ((LinkNetworkRouteImpl)leg.getRoute()).getLinkIds();
+		Id currentLinkId=null;
+		if (currentLinkIndex==-1){
+			currentLinkId=((LinkNetworkRouteImpl)leg.getRoute()).getStartLinkId();
+		} else {
+			currentLinkId = linkIds.get(currentLinkIndex);
+		}
+		
+		event=new LinkLeaveEvent(getMessageArrivalTime(),person.getId(),currentLinkId,person.getId());
+		eventsManager.processEvent(event);
+		
+		event=new LinkEnterEvent(getMessageArrivalTime(),person.getId(),nextAct.getLinkId(),person.getId());
+		eventsManager.processEvent(event);
+		
+		event = new PersonArrivalEvent(getMessageArrivalTime(),person.getId(),nextAct.getLinkId() , leg.getMode());
+		eventsManager.processEvent(event);
+		
+		planElementIndex++;
+		boolean isLastActivity = planElementIndex==person.getSelectedPlan().getPlanElements().size()-1;
+		
+		event = new ActivityStartEvent(getMessageArrivalTime(),person.getId(), nextAct.getLinkId(), nextAct.getFacilityId(), nextAct.getType());
+		eventsManager.processEvent(event);
+		
+		
+		if (!isLastActivity){
+			double endTimeOfActivity = getEndTimeOfActivity(nextAct,getMessageArrivalTime());
 
-	private void processEndOfLegReached(Leg leg, ActivityImpl nextAct) {
+			setMessageArrivalTime(endTimeOfActivity);
+			messageQueue.schedule(this);
+		}
+	}
+
+	private void processEndOfLegNonCarMode(Leg leg, ActivityImpl nextAct) {
 		Event event;
 		event = new PersonArrivalEvent(getMessageArrivalTime(),person.getId(),nextAct.getLinkId() , leg.getMode());
 		eventsManager.processEvent(event);
@@ -114,42 +159,24 @@ public class AgentEventMessage extends Message {
 	}
 
 	private void handleActivityEndEvent() {
-		
 			Event event = null;
 			Id personId = person.getId();
-			ActivityImpl ai = (ActivityImpl) person.getSelectedPlan().getPlanElements().get(this.planElementIndex);
+			ActivityImpl curAct = (ActivityImpl) person.getSelectedPlan().getPlanElements().get(this.planElementIndex);
+			ActivityImpl nextAct = (ActivityImpl) person.getSelectedPlan().getPlanElements().get(planElementIndex+2);
+			
 			// process first activity
-			event = new ActivityEndEvent(getMessageArrivalTime(), personId, ai.getLinkId(), ai.getFacilityId(), ai.getType());
+			event = new ActivityEndEvent(getMessageArrivalTime(), personId, curAct.getLinkId(), curAct.getFacilityId(), curAct.getType());
 			eventsManager.processEvent(event);
-
-			
-			
 
 			int nextLegIndex = this.planElementIndex + 1;
 			Leg leg = (LegImpl) person.getSelectedPlan().getPlanElements().get(nextLegIndex);
-			
 
 			if (leg.getMode().equalsIgnoreCase(TransportMode.car)) {
 				event = new PersonDepartureEvent(getMessageArrivalTime(), personId, leg.getRoute().getStartLinkId(), leg.getMode());
 				eventsManager.processEvent(event);
 
-				List<Id> linkIds = ((LinkNetworkRouteImpl) leg.getRoute()).getLinkIds();
-
-				boolean departureAndArrivalNotOnSameLink = linkIds.size() > 0;
-				if (departureAndArrivalNotOnSameLink) {
-					event = new Wait2LinkEvent(getMessageArrivalTime(), personId, leg.getRoute().getStartLinkId(), personId);
-					eventsManager.processEvent(event);
-					currentLinkIndex = 0;
-					Id linkId = linkIds.get(currentLinkIndex);
-
-					event = new LinkEnterEvent(getMessageArrivalTime(), personId, linkId, personId);
-					eventsManager.processEvent(event);
-					
-					planElementIndex++;
-					
-					setMessageArrivalTime(getMessageArrivalTime() + ttMatrix.getTravelTime(getMessageArrivalTime(), linkId));
-					messageQueue.schedule(this);
-				} else {
+				boolean departureAndArrivalOnSameLink = curAct.getLinkId().toString().equalsIgnoreCase(nextAct.getLinkId().toString());
+				if (departureAndArrivalOnSameLink) {
 					planElementIndex++;
 					planElementIndex++;
 					ActivityImpl act= (ActivityImpl) person.getSelectedPlan().getPlanElements().get(planElementIndex);
@@ -170,9 +197,22 @@ public class AgentEventMessage extends Message {
 						setMessageArrivalTime(endTimeOfActivity);
 						messageQueue.schedule(this);
 					}
+					
+					
+				} else {
+					event = new Wait2LinkEvent(getMessageArrivalTime(), personId, leg.getRoute().getStartLinkId(), personId);
+					eventsManager.processEvent(event);
+					currentLinkIndex = -1;
+					Id linkId = curAct.getLinkId();
+
+					planElementIndex++;
+					
+					setMessageArrivalTime(getMessageArrivalTime() + ttMatrix.getTravelTime(getMessageArrivalTime(), linkId));
+					messageQueue.schedule(this);
 				}
 			} else {
 				// TODO: use proper mode travel time here
+				// or read from plan, if it is already there...
 				
 				event = new PersonDepartureEvent(getMessageArrivalTime(), personId, leg.getRoute().getStartLinkId(), leg.getMode());
 				eventsManager.processEvent(event);
