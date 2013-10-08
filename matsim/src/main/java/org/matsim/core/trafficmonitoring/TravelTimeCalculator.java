@@ -61,14 +61,12 @@ import org.matsim.vehicles.Vehicle;
  * as that one does not use any memory to time bins where no traffic occurred. By default,
  * {@link TravelTimeDataArray} is used.
  * 
- * 
  * @author dgrether
  * @author mrieser
  */
-public class TravelTimeCalculator
-implements LinkEnterEventHandler, LinkLeaveEventHandler, 
-PersonDepartureEventHandler, PersonArrivalEventHandler, VehicleArrivesAtFacilityEventHandler, TransitDriverStartsEventHandler, 
-PersonStuckEventHandler {
+public class TravelTimeCalculator implements LinkEnterEventHandler, LinkLeaveEventHandler, 
+	PersonDepartureEventHandler, PersonArrivalEventHandler, VehicleArrivesAtFacilityEventHandler, TransitDriverStartsEventHandler, 
+	PersonStuckEventHandler {
 
 	private static final String ERROR_STUCK_AND_LINKTOLINK = "Using the stuck feature with turning move travel times is not available. As the next link of a stucked" +
 			"agent is not known the turning move travel time cannot be calculated!";
@@ -83,6 +81,8 @@ PersonStuckEventHandler {
 
 	private Map<Tuple<Id, Id>, DataContainer> linkToLinkData;
 
+	private final DataContainerProvider dataContainerProvider;
+	
 	private final Map<Id, LinkEnterEvent> linkEnterEvents;
 
 	private final Map<Id, Id> transitVehicleDriverMapping;
@@ -96,8 +96,8 @@ PersonStuckEventHandler {
 
 	private final boolean calculateLinkToLinkTravelTimes;
 
-	private TravelTimeDataFactory ttDataFactory = null; 
-
+	private TravelTimeDataFactory ttDataFactory = null;
+		
 	public TravelTimeCalculator(final Network network, TravelTimeCalculatorConfigGroup ttconfigGroup) {
 		this(network, ttconfigGroup.getTraveltimeBinSize(), 30*3600, ttconfigGroup); // default: 30 hours at most
 	}
@@ -113,7 +113,10 @@ PersonStuckEventHandler {
 		this.filterAnalyzedModes = ttconfigGroup.isFilterModes();
 		if (this.calculateLinkTravelTimes){
 			this.linkData = new ConcurrentHashMap<Id, DataContainer>((int) (network.getLinks().size() * 1.4));
-		}
+
+	//		this.dataContainerProvider = new MapBasedDataContainerProvider(linkData, ttDataFactory);
+			this.dataContainerProvider = new ArrayBasedDataContainerProvider(linkData, ttDataFactory, network);
+		} else this.dataContainerProvider = null;
 		if (this.calculateLinkToLinkTravelTimes){
 			// assume that every link has 2 outgoing links as default
 			this.linkToLinkData = new ConcurrentHashMap<Tuple<Id, Id>, DataContainer>((int) (network.getLinks().size() * 1.4 * 2));
@@ -122,7 +125,7 @@ PersonStuckEventHandler {
 		this.transitVehicleDriverMapping = new ConcurrentHashMap<Id, Id>();
 		this.agentsToFilter = new HashSet<Id>();
 		this.analyzedModes = CollectionUtils.stringToSet(ttconfigGroup.getAnalyzedModes());
-
+	
 		this.reset(0);
 	}
 
@@ -147,7 +150,7 @@ PersonStuckEventHandler {
 		if (this.calculateLinkTravelTimes) {
 			LinkEnterEvent oldEvent = this.linkEnterEvents.get(e.getPersonId());
 			if (oldEvent != null) {
-				DataContainer data = getTravelTimeData(e.getLinkId(), true);
+				DataContainer data = this.dataContainerProvider.getTravelTimeData(e.getLinkId(), true);
 				this.aggregator.addTravelTime(data.ttData, oldEvent.getTime(), e.getTime());
 				data.needsConsolidation = true;
 			}
@@ -194,7 +197,7 @@ PersonStuckEventHandler {
 	public void handleEvent(PersonStuckEvent event) {
 		LinkEnterEvent e = this.linkEnterEvents.remove(event.getPersonId());
 		if (e != null) {
-			DataContainer data = getTravelTimeData(e.getLinkId(), true);
+			DataContainer data = this.dataContainerProvider.getTravelTimeData(e.getLinkId(), true);
 			data.needsConsolidation = true;
 			this.aggregator.addStuckEventTravelTime(data.ttData, e.getTime(), event.getTime());
 			if (this.calculateLinkToLinkTravelTimes){
@@ -215,15 +218,6 @@ PersonStuckEventHandler {
 		}
 		return data;
 	}
-
-	private DataContainer getTravelTimeData(final Id linkId, final boolean createIfMissing) {
-		DataContainer data = this.linkData.get(linkId);
-		if ((null == data) && createIfMissing) {
-			data = new DataContainer(this.ttDataFactory.createTravelTimeData(linkId));
-			this.linkData.put(linkId, data);
-		}
-		return data;
-	}
 	
 	@Deprecated
 	/**
@@ -234,9 +228,10 @@ PersonStuckEventHandler {
 		return doGetLinkTravelTime(linkId, time);
 	}
 
+	@Deprecated
 	private double doGetLinkTravelTime(final Id linkId, final double time) {
 		if (this.calculateLinkTravelTimes) {
-			DataContainer data = getTravelTimeData(linkId, true);
+			DataContainer data = this.dataContainerProvider.getTravelTimeData(linkId, true);
 			if (data.needsConsolidation) {
 				consolidateData(data);
 			}
@@ -246,18 +241,28 @@ PersonStuckEventHandler {
 				"if calculation is switched off by config option!");
 	}
 
+	private double doGetLinkTravelTime(final Link link, final double time) {
+		if (this.calculateLinkTravelTimes) {
+			DataContainer data = this.dataContainerProvider.getTravelTimeData(link, true);
+			if (data.needsConsolidation) {
+				consolidateData(data);
+			}
+			return this.aggregator.getTravelTime(data.ttData, time); 
+		}
+		throw new IllegalStateException("No link travel time is available " +
+				"if calculation is switched off by config option!");
+	}
 	
 	@Deprecated
 	/**
 	 * 
 	 * @deprecated Use getLinkToLinkTravelTimes()
 	 */
-	public double getLinkToLinkTravelTime(final Id fromLinkId, final Id toLinkId, double time){
+	public double getLinkToLinkTravelTime(final Id fromLinkId, final Id toLinkId, double time) {
 		return doGetLinkToLinkTravelTime(fromLinkId, toLinkId, time);
 	}
 
-	private double doGetLinkToLinkTravelTime(final Id fromLinkId,
-			final Id toLinkId, double time) {
+	private double doGetLinkToLinkTravelTime(final Id fromLinkId, final Id toLinkId, double time) {
 		if (!this.calculateLinkToLinkTravelTimes) {
 			throw new IllegalStateException("No link to link travel time is available " +
 					"if calculation is switched off by config option!");      
@@ -367,7 +372,7 @@ PersonStuckEventHandler {
 		return this.timeSlice;
 	}
 
-	private static class DataContainer {
+	/*package*/ static class DataContainer {
 		/*package*/ final TravelTimeData ttData;
 		/*package*/ volatile boolean needsConsolidation = false;
 
@@ -381,7 +386,7 @@ PersonStuckEventHandler {
 
 			@Override
 			public double getLinkTravelTime(Link link, double time, Person person, Vehicle vehicle) {
-				return TravelTimeCalculator.this.doGetLinkTravelTime(link.getId(), time);
+				return TravelTimeCalculator.this.doGetLinkTravelTime(link, time);
 			}
 
 		};
