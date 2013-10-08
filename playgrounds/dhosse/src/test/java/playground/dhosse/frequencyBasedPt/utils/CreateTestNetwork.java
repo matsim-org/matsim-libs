@@ -11,9 +11,10 @@ import org.matsim.core.utils.geometry.CoordImpl;
 
 public class CreateTestNetwork {
 	
-	public static String createTestNetwork(String dir){
+	public static NetworkImpl createTestNetwork(String dir){
 		
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
+		
 		NetworkImpl network = (NetworkImpl)scenario.getNetwork();
 		
 		double speed50 = 50/3.6;
@@ -48,9 +49,9 @@ public class CreateTestNetwork {
 		network.createAndAddLink(new IdImpl(13), node7, node5, 150., speed50, 1800., 1.);
 		network.createAndAddLink(new IdImpl(14), node5, node7, 150., speed50, 1800., 1.);
 		
-		new NetworkWriter(network).write(dir + "/network.xml");
+		new NetworkWriter(network).write(dir + "network.xml");
 		
-		return dir+"/network.xml";
+		return network;
 		
 	}
 
