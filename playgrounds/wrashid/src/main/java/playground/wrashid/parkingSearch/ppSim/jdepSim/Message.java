@@ -12,7 +12,7 @@ public abstract class Message implements Comparable<Message> {
 	static MessageQueue messageQueue;
 	Person person;
 	static EventsManager eventsManager;
-	TTMatrix ttMatrix;
+	static TTMatrix ttMatrix;
 	
 	
 	public static final int PRIORITY_END_ACT_MESSAGE = 250;

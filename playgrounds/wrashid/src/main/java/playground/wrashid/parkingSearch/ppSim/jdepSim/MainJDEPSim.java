@@ -21,6 +21,7 @@ package playground.wrashid.parkingSearch.ppSim.jdepSim;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.matsim.analysis.LegHistogram;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
@@ -49,13 +50,20 @@ public class MainJDEPSim {
 		EventWriterXML eventsWriter = new EventWriterXML(
 				"events.xml");
 		eventsManager.addHandler(eventsWriter);
-
+		LegHistogram lh=new LegHistogram(300);
+		eventsManager.addHandler(lh);
+		
+		
 		eventsManager.resetHandlers(0);
 		eventsWriter.init("events.xml");
+		
 
+		//Mobsim sim = new JDEPSim(scenario, eventsManager);
 		Mobsim sim = new PPSim(scenario, eventsManager);
+		
 		sim.run();
 		eventsManager.finishProcessing();
+		lh.writeGraphic("legHistogram.png");
 		eventsWriter.reset(0);
 
 	}
