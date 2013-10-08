@@ -75,6 +75,16 @@ public class ReRoutingTest extends MatsimTestCase {
 		controler.run();
 		this.evaluate();
 	}
+
+	public void testReRoutingFastDijkstra() {
+		Scenario scenario = this.loadScenario();
+		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.FastDijkstra);
+		TestControler controler = new TestControler(scenario);
+		controler.setCreateGraphs(false);
+		controler.setDumpDataAtEnd(false);
+		controler.run();
+		this.evaluate();
+	}
 	
 	/**
 	 * This test seems to have race conditions somewhere (i.e. it fails intermittently without code changes). kai, aug'13
@@ -88,7 +98,17 @@ public class ReRoutingTest extends MatsimTestCase {
 		controler.run();
 		this.evaluate();
 	}
-		
+	
+	public void testReRoutingFast() {
+		Scenario scenario = this.loadScenario();
+		scenario.getConfig().controler().setRoutingAlgorithmType(RoutingAlgorithmType.FastAStarLandmarks);
+		TestControler controler = new TestControler(scenario);
+		controler.setCreateGraphs(false);
+		controler.setDumpDataAtEnd(false);
+		controler.run();
+		this.evaluate();
+	}
+	
 	private void evaluate() {
 		String inputEvents = getClassInputDirectory() + "0.events.txt.gz";
 		String outputEvents = getOutputDirectory() + "ITERS/it.0/0.events.txt.gz";
@@ -119,19 +139,19 @@ public class ReRoutingTest extends MatsimTestCase {
 	}
 	
 	// Helper method for get the file content
-	    private static List<String> fileToLines(String filename) {
-	            List<String> lines = new LinkedList<String>();
-	            String line = "";
-	            try {
-	                    BufferedReader in = IOUtils.getBufferedReader(filename);
-	                    while ((line = in.readLine()) != null) {
-	                            lines.add(line);
-	                    }
-	            } catch (IOException e) {
-	                    e.printStackTrace();
-	            }
-	            return lines;
-	    }
+	private static List<String> fileToLines(String filename) {
+		List<String> lines = new LinkedList<String>();
+		String line = "";
+		try {
+			BufferedReader in = IOUtils.getBufferedReader(filename);
+			while ((line = in.readLine()) != null) {
+				lines.add(line);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return lines;
+	}
 
 
 	static public class TestControler extends Controler {
