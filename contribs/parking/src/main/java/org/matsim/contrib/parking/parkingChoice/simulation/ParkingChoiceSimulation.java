@@ -19,12 +19,12 @@
 
 package org.matsim.contrib.parking.parkingChoice.simulation;
 
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 
-public class ParkingChoiceSimulation implements AgentDepartureEventHandler, ActivityStartEventHandler{
+public class ParkingChoiceSimulation implements PersonDepartureEventHandler, ActivityStartEventHandler{
 
 	
 	
@@ -41,7 +41,7 @@ public class ParkingChoiceSimulation implements AgentDepartureEventHandler, Acti
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		// TODO Auto-generated method stub
 		
 	}

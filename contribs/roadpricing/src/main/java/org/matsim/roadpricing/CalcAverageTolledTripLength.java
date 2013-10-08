@@ -24,12 +24,12 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 
 /**
@@ -38,7 +38,7 @@ import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
  *
  * @author mrieser
  */
-public class CalcAverageTolledTripLength implements LinkEnterEventHandler, AgentArrivalEventHandler {
+public class CalcAverageTolledTripLength implements LinkEnterEventHandler, PersonArrivalEventHandler {
 	private static final Logger log = Logger.getLogger(CalcAverageTolledTripLength.class);
 
 	private double sumLength = 0.0;
@@ -85,7 +85,7 @@ public class CalcAverageTolledTripLength implements LinkEnterEventHandler, Agent
 	}
 
 	@Override
-	public void handleEvent(final AgentArrivalEvent event) {
+	public void handleEvent(final PersonArrivalEvent event) {
 		// at arrival of the agent ...
 		
 		// get the accumulated "tolled" length from the agent

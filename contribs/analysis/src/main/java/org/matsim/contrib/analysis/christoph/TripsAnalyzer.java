@@ -31,10 +31,10 @@ import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -56,7 +56,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
  * 
  * @author cdobler
  */
-public class TripsAnalyzer implements AgentDepartureEventHandler, AgentArrivalEventHandler,
+public class TripsAnalyzer implements PersonDepartureEventHandler, PersonArrivalEventHandler,
 		StartupListener, IterationEndsListener, ShutdownListener {
 
 	public static String defaultTripsFileName = "tripCounts";
@@ -124,7 +124,7 @@ public class TripsAnalyzer implements AgentDepartureEventHandler, AgentArrivalEv
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		
 		Double departureTime = departureTimes.remove(event.getPersonId());
 		if (departureTime == null) throw new RuntimeException("No departure time for agent " + event.getPersonId() + " was found!");
@@ -136,7 +136,7 @@ public class TripsAnalyzer implements AgentDepartureEventHandler, AgentArrivalEv
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		departureTimes.put(event.getPersonId(), event.getTime());
 	}
 

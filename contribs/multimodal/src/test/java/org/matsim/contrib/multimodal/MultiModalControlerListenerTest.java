@@ -30,6 +30,12 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -40,12 +46,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.contrib.multimodal.tools.PrepareMultiModalScenario;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -272,8 +272,8 @@ public class MultiModalControlerListenerTest {
 		return person;
 	}
 	
-	private static class LinkModeChecker implements LinkLeaveEventHandler, AgentDepartureEventHandler,
-			AgentArrivalEventHandler {
+	private static class LinkModeChecker implements LinkLeaveEventHandler, PersonDepartureEventHandler,
+			PersonArrivalEventHandler {
 
 		int arrivalCount = 0;
 		int linkLeftCount = 0;
@@ -308,7 +308,7 @@ public class MultiModalControlerListenerTest {
 		}
 		
 		@Override
-		public void handleEvent(AgentDepartureEvent event) {
+		public void handleEvent(PersonDepartureEvent event) {
 			this.modes.put(event.getPersonId(), event.getLegMode());
 			this.departures.put(event.getPersonId(), event.getTime());
 		}
@@ -332,7 +332,7 @@ public class MultiModalControlerListenerTest {
 		}
 
 		@Override
-		public void handleEvent(AgentArrivalEvent event) {
+		public void handleEvent(PersonArrivalEvent event) {
 			this.arrivalCount++;
 			String mode = this.modes.remove(event.getPersonId());
 			

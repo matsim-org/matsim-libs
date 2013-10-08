@@ -30,16 +30,16 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -55,7 +55,7 @@ import org.matsim.core.utils.io.UncheckedIOException;
  * <p/>
  * yyyy This is a prototype, which might replace the original class since it is more useful for some practical things.  kai, jul'11 
  */
-public class MyCalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEventHandler {
+public class MyCalcLegTimes implements PersonDepartureEventHandler, PersonArrivalEventHandler {
 	
 	private final static Logger log = Logger.getLogger(MyCalcLegTimes.class);
 	
@@ -129,7 +129,7 @@ public class MyCalcLegTimes implements AgentDepartureEventHandler, AgentArrivalE
 	}
 
 	@Override
-	public void handleEvent(final AgentDepartureEvent event) {
+	public void handleEvent(final PersonDepartureEvent event) {
 		this.agentDepartures.put(event.getPersonId(), event.getTime());
 		Integer cnt = this.agentLegs.get(event.getPersonId());
 		if (cnt == null) {
@@ -142,7 +142,7 @@ public class MyCalcLegTimes implements AgentDepartureEventHandler, AgentArrivalE
 	private static int noCoordCnt;
 	
 	@Override
-	public void handleEvent(final AgentArrivalEvent event) {
+	public void handleEvent(final PersonArrivalEvent event) {
 		Double depTime = this.agentDepartures.remove(event.getPersonId());
 		Person agent = this.population.getPersons().get(event.getPersonId());
 		if (depTime != null && agent != null) {

@@ -1,8 +1,8 @@
 package org.matsim.contrib.freight.events;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.contrib.freight.carrier.CarrierShipment;
-import org.matsim.core.api.experimental.events.Event;
 
 /**
  * This informs the world that a shipment has been delivered.

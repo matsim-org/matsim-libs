@@ -23,8 +23,8 @@
 package org.matsim.contrib.cadyts.general;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.config.Config;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.ArbitraryEventScoring;
 

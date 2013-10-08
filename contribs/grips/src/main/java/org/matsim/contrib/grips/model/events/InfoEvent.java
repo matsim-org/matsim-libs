@@ -19,7 +19,7 @@
  * *********************************************************************** */
 package org.matsim.contrib.grips.model.events;
 
-import org.matsim.core.api.experimental.events.Event;
+import org.matsim.api.core.v01.events.Event;
 
 public class InfoEvent extends Event {
 	public static final String EVENT_TYPE = "InfoEvent";

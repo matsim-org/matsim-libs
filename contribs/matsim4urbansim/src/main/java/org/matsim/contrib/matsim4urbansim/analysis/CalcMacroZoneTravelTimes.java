@@ -26,15 +26,15 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.io.IOUtils;
@@ -45,8 +45,8 @@ import org.matsim.matrices.Matrix;
  * @author droeder
  *
  */
-public class CalcMacroZoneTravelTimes implements AgentDepartureEventHandler,
-												AgentArrivalEventHandler,
+public class CalcMacroZoneTravelTimes implements PersonDepartureEventHandler,
+												PersonArrivalEventHandler,
 												ActivityStartEventHandler,
 												ActivityEndEventHandler{
 
@@ -122,7 +122,7 @@ public class CalcMacroZoneTravelTimes implements AgentDepartureEventHandler,
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		// check if agents exists...
 		if(!this.legStore.containsKey(event.getPersonId())) return;
 		this.legStore.get(event.getPersonId()).setDepTime(event.getTime());
@@ -130,7 +130,7 @@ public class CalcMacroZoneTravelTimes implements AgentDepartureEventHandler,
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		// check if agents exists...
 		if(!this.legStore.containsKey(event.getPersonId())) return;
 		this.legStore.get(event.getPersonId()).setArrTime(event.getTime());

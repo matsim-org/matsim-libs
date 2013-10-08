@@ -23,6 +23,12 @@ import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
@@ -35,12 +41,6 @@ import org.matsim.contrib.transEnergySim.chargingInfrastructure.stationary.Charg
 import org.matsim.contrib.transEnergySim.controllers.AddHandlerAtStartupControler;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 import org.matsim.contrib.transEnergySim.vehicles.api.AbstractVehicleWithBattery;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -59,7 +59,7 @@ import org.matsim.core.network.NetworkImpl;
  * @author wrashid
  * 
  */
-public class ChargingUponArrival implements ActivityStartEventHandler, AgentArrivalEventHandler, AgentDepartureEventHandler,
+public class ChargingUponArrival implements ActivityStartEventHandler, PersonArrivalEventHandler, PersonDepartureEventHandler,
 		AfterMobsimListener, StartupListener {
 
 	// TODO: add location filter, which should be adressable through config and
@@ -125,7 +125,7 @@ public class ChargingUponArrival implements ActivityStartEventHandler, AgentArri
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		if (!isVehicleWithBattery(event.getPersonId())) {
 			return;
 		}
@@ -193,7 +193,7 @@ public class ChargingUponArrival implements ActivityStartEventHandler, AgentArri
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		if (!isVehicleWithBattery(event.getPersonId())) {
 			return;
 		}
@@ -209,15 +209,15 @@ public class ChargingUponArrival implements ActivityStartEventHandler, AgentArri
 		return vehicles.get(personId) instanceof AbstractVehicleWithBattery;
 	}
 
-	private void updatePreviousCarArrivalLinkId(AgentArrivalEvent event) {
+	private void updatePreviousCarArrivalLinkId(PersonArrivalEvent event) {
 		previousCarArrivalLinkId.put(event.getPersonId(), event.getLinkId());
 	}
 
-	private void updateCarArrivalTime(AgentArrivalEvent event) {
+	private void updateCarArrivalTime(PersonArrivalEvent event) {
 		previousCarArrivalTime.put(event.getPersonId(), event.getTime());
 	}
 
-	private void initFirstActivityAfterCarArrival(AgentArrivalEvent event) {
+	private void initFirstActivityAfterCarArrival(PersonArrivalEvent event) {
 		firstActivityTypeAfterCarArrival.remove(event.getPersonId());
 		firstFacilityIdAfterCarArrival.remove(event.getPersonId());
 	}

@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.core.api.experimental.events.SignalGroupStateChangedEvent;
-import org.matsim.core.events.handler.SignalGroupStateChangedEventHandler;
+import org.matsim.core.api.experimental.events.handler.SignalGroupStateChangedEventHandler;
 
 
 /**

@@ -23,6 +23,14 @@ import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.DebugLib;
@@ -36,14 +44,6 @@ import org.matsim.contrib.transEnergySim.vehicles.api.BatteryElectricVehicle;
 import org.matsim.contrib.transEnergySim.vehicles.api.InductivlyChargable;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
 import org.matsim.contrib.transEnergySim.vehicles.api.AbstractVehicleWithBattery;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -54,8 +54,8 @@ import org.matsim.core.controler.listener.StartupListener;
  * @author wrashid
  * 
  */
-public class InductiveStreetCharger implements AgentDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler,
-		AgentArrivalEventHandler, StartupListener {
+public class InductiveStreetCharger implements PersonDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler,
+		PersonArrivalEventHandler, StartupListener {
 
 	private DoubleValueHashMap<Id> chargableStreets;
 	private ChargingOutputLog log;
@@ -88,7 +88,7 @@ public class InductiveStreetCharger implements AgentDepartureEventHandler, LinkE
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		if (ignoreAgent(event.getPersonId(), event.getLinkId())) {
 			return;
 		}
@@ -102,7 +102,7 @@ public class InductiveStreetCharger implements AgentDepartureEventHandler, LinkE
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		if (ignoreAgent(event.getPersonId(), event.getLinkId())) {
 			return;
 		}

@@ -23,6 +23,14 @@ import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.GeneralLib;
@@ -32,14 +40,6 @@ import org.matsim.contrib.transEnergySim.analysis.energyConsumption.EnergyConsum
 import org.matsim.contrib.transEnergySim.vehicles.api.AbstractVehicleWithBattery;
 import org.matsim.contrib.transEnergySim.vehicles.api.BatteryElectricVehicle;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 
 /**
@@ -61,8 +61,8 @@ import org.matsim.core.basic.v01.IdImpl;
  * 
  */
 
-public class EnergyConsumptionTracker implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentDepartureEventHandler,
-		AgentArrivalEventHandler {
+public class EnergyConsumptionTracker implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonDepartureEventHandler,
+		PersonArrivalEventHandler {
 
 	private EnergyConsumptionOutputLog log;
 
@@ -94,14 +94,14 @@ public class EnergyConsumptionTracker implements LinkEnterEventHandler, LinkLeav
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		if (event.getLegMode().equals(TransportMode.car)) {
 			handleEnergyConsumption(event.getPersonId(), event.getLinkId(), event.getTime());
 		}
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		if (event.getLegMode().equals(TransportMode.car)) {
 			Id personId = event.getPersonId();
 			
