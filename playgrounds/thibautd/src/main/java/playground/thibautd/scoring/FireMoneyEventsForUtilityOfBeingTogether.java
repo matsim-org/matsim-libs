@@ -25,23 +25,23 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.Event;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
-import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.internal.HasPersonId;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.utils.misc.Time;
 
 import playground.thibautd.scoring.BeingTogetherScoring.PersonOverlapScorer;
@@ -55,7 +55,7 @@ import playground.thibautd.utils.MapUtils;
  */
 public class FireMoneyEventsForUtilityOfBeingTogether implements
 		PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, ActivityStartEventHandler, ActivityEndEventHandler,
-		AgentDepartureEventHandler, AgentArrivalEventHandler,
+		PersonDepartureEventHandler, PersonArrivalEventHandler,
 		AfterMobsimListener {
 
 	private final double marginalUtilityOfMoney;
@@ -111,12 +111,12 @@ public class FireMoneyEventsForUtilityOfBeingTogether implements
 	}
 
 	@Override
-	public void handleEvent(final AgentArrivalEvent event) {
+	public void handleEvent(final PersonArrivalEvent event) {
 		transmitEventToRelevantPersons( event );
 	}
 
 	@Override
-	public void handleEvent(final AgentDepartureEvent event) {
+	public void handleEvent(final PersonDepartureEvent event) {
 		transmitEventToRelevantPersons( event );
 	}
 

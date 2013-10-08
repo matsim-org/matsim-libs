@@ -25,15 +25,15 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
-import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;
@@ -51,7 +51,7 @@ import playground.sergioo.singapore2012.transitRouterVariable.waitTimes.WaitTime
  * @author sergioo
  */
 
-public class WaitTimeCalculatorOld implements AgentDepartureEventHandler, PersonEntersVehicleEventHandler, AgentStuckEventHandler {
+public class WaitTimeCalculatorOld implements PersonDepartureEventHandler, PersonEntersVehicleEventHandler, PersonStuckEventHandler {
 	
 	//Constants
 	private final static String SEPARATOR = "===";
@@ -129,7 +129,7 @@ public class WaitTimeCalculatorOld implements AgentDepartureEventHandler, Person
 		agentsCurrentLeg.clear();
 	}
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		Integer currentLeg = agentsCurrentLeg.get(event.getPersonId());
 		if(currentLeg == null)
 			currentLeg = 0;
@@ -185,7 +185,7 @@ public class WaitTimeCalculatorOld implements AgentDepartureEventHandler, Person
 	}*/
 	
 	@Override
-	public void handleEvent(AgentStuckEvent event) {
+	public void handleEvent(PersonStuckEvent event) {
 		Double startWaitingTime = agentsWaitingData.get(event.getPersonId());
 		if(startWaitingTime!=null) {
 			int legs = 0, currentLeg = agentsCurrentLeg.get(event.getPersonId());

@@ -14,18 +14,18 @@ import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
-import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
@@ -37,7 +37,7 @@ import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
  * @author sergioo
  *
  */
-public class TimeDistributionStage implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, AgentDepartureEventHandler, ActivityStartEventHandler {
+public class TimeDistributionStage implements TransitDriverStartsEventHandler, PersonEntersVehicleEventHandler, PersonDepartureEventHandler, ActivityStartEventHandler {
 
 	//Private classes
 	private class PTVehicle {
@@ -111,7 +111,7 @@ public class TimeDistributionStage implements TransitDriverStartsEventHandler, P
 		chain.times.add(event.getTime()-chain.lastTime);
 	}
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		TravellerChain chain = chains.get(event.getPersonId());
 		if(chain == null) {
 			chain = new TravellerChain();

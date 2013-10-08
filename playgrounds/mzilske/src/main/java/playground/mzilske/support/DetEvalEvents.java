@@ -1,12 +1,12 @@
 package playground.mzilske.support;
 
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 
-public class DetEvalEvents implements AgentDepartureEventHandler {
+public class DetEvalEvents implements PersonDepartureEventHandler {
 	
 	public static void main(String[] args) {
 		EventsManager em = EventsUtils.createEventsManager();
@@ -21,7 +21,7 @@ public class DetEvalEvents implements AgentDepartureEventHandler {
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		System.out.println(event.getLegMode());
 	}
 

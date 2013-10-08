@@ -23,7 +23,7 @@
 package playground.ikaddoura.internalizationCar;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.experimental.events.AgentMoneyEvent;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.scenario.ScenarioImpl;
 
@@ -59,7 +59,7 @@ public class MarginalCostPricingCarHandler implements MarginalCongestionEventHan
 	@Override
 	public void handleEvent(MarginalCongestionEvent event) {
 		double amount = event.getDelay() / 3600 * this.vtts_car;
-		AgentMoneyEvent moneyEvent = new AgentMoneyEvent(event.getTime(), event.getCausingAgentId(), amount);
+		PersonMoneyEvent moneyEvent = new PersonMoneyEvent(event.getTime(), event.getCausingAgentId(), amount);
 		this.events.processEvent(moneyEvent);
 	}
 

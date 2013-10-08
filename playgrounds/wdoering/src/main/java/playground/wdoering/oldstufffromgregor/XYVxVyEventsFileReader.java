@@ -21,14 +21,14 @@ package playground.wdoering.oldstufffromgregor;
 
 import java.util.Stack;
 
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.Event;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.utils.io.MatsimXmlParser;
@@ -77,14 +77,14 @@ public class XYVxVyEventsFileReader extends MatsimXmlParser {
 			this.events.processEvent(this.builder.getFactory().createActivityEndEvent(time, new IdImpl(atts.getValue(ActivityEndEvent.ATTRIBUTE_PERSON)), new IdImpl(atts.getValue(ActivityEndEvent.ATTRIBUTE_LINK)), atts.getValue(ActivityEndEvent.ATTRIBUTE_FACILITY) == null ? null : new IdImpl(atts.getValue(ActivityEndEvent.ATTRIBUTE_FACILITY)), atts.getValue(ActivityEndEvent.ATTRIBUTE_ACTTYPE)));
 		} else if (ActivityStartEvent.EVENT_TYPE.equals(eventType)) {
 			this.events.processEvent(this.builder.getFactory().createActivityStartEvent(time, new IdImpl(atts.getValue(ActivityStartEvent.ATTRIBUTE_PERSON)), new IdImpl(atts.getValue(ActivityStartEvent.ATTRIBUTE_LINK)), atts.getValue(ActivityStartEvent.ATTRIBUTE_FACILITY) == null ? null : new IdImpl(atts.getValue(ActivityStartEvent.ATTRIBUTE_FACILITY)), atts.getValue(ActivityStartEvent.ATTRIBUTE_ACTTYPE)));
-		} else if (AgentArrivalEvent.EVENT_TYPE.equals(eventType)) {
-			String legMode = atts.getValue(AgentArrivalEvent.ATTRIBUTE_LEGMODE);
+		} else if (PersonArrivalEvent.EVENT_TYPE.equals(eventType)) {
+			String legMode = atts.getValue(PersonArrivalEvent.ATTRIBUTE_LEGMODE);
 			String mode = legMode == null ? null : legMode.intern();
-			this.events.processEvent(this.builder.getFactory().createAgentArrivalEvent(time, new IdImpl(atts.getValue(AgentArrivalEvent.ATTRIBUTE_PERSON)), new IdImpl(atts.getValue(AgentArrivalEvent.ATTRIBUTE_LINK)), mode));
-		} else if (AgentDepartureEvent.EVENT_TYPE.equals(eventType)) {
-			String legMode = atts.getValue(AgentDepartureEvent.ATTRIBUTE_LEGMODE);
+			this.events.processEvent(this.builder.getFactory().createAgentArrivalEvent(time, new IdImpl(atts.getValue(PersonArrivalEvent.ATTRIBUTE_PERSON)), new IdImpl(atts.getValue(PersonArrivalEvent.ATTRIBUTE_LINK)), mode));
+		} else if (PersonDepartureEvent.EVENT_TYPE.equals(eventType)) {
+			String legMode = atts.getValue(PersonDepartureEvent.ATTRIBUTE_LEGMODE);
 			String mode = legMode == null ? null : legMode.intern();
-			this.events.processEvent(this.builder.getFactory().createAgentDepartureEvent(time, new IdImpl(atts.getValue(AgentDepartureEvent.ATTRIBUTE_PERSON)), new IdImpl(atts.getValue(AgentDepartureEvent.ATTRIBUTE_LINK)), mode));
+			this.events.processEvent(this.builder.getFactory().createAgentDepartureEvent(time, new IdImpl(atts.getValue(PersonDepartureEvent.ATTRIBUTE_PERSON)), new IdImpl(atts.getValue(PersonDepartureEvent.ATTRIBUTE_LINK)), mode));
 		} else if (XYVxVyEventImpl.EVENT_TYPE.equals(eventType)) {
 			String x = atts.getValue(XYVxVyEventImpl.ATTRIBUTE_X);
 			String y = atts.getValue(XYVxVyEventImpl.ATTRIBUTE_Y);

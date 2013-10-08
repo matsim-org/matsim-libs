@@ -25,7 +25,7 @@ import java.util.Collections;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.Event;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.geometry.CoordImpl;

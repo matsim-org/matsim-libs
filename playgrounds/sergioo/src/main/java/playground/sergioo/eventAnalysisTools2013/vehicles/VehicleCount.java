@@ -18,23 +18,23 @@ import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.statistics.HistogramDataset;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.Wait2LinkEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
-public class VehicleCount implements Wait2LinkEventHandler, AgentArrivalEventHandler  {
+public class VehicleCount implements Wait2LinkEventHandler, PersonArrivalEventHandler  {
 
 	/*private static Map<Id, Integer>[] numCars;
 	private static Map<Id, Integer>[] numCarsCh;
@@ -140,7 +140,7 @@ public class VehicleCount implements Wait2LinkEventHandler, AgentArrivalEventHan
 	}*/
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		int slot = (int)event.getTime()/timeInterval;
 		if(slot==numCars.length)
 			slot--;

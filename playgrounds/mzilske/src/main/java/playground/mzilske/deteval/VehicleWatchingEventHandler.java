@@ -8,14 +8,14 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
-import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
-import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 
-public class VehicleWatchingEventHandler implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, AgentStuckEventHandler {
+public class VehicleWatchingEventHandler implements PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, PersonStuckEventHandler {
 
 	private static Logger logger = Logger.getLogger(VehicleWatchingEventHandler.class);
 	
@@ -53,7 +53,7 @@ public class VehicleWatchingEventHandler implements PersonEntersVehicleEventHand
 	}
 
 	@Override
-	public void handleEvent(AgentStuckEvent event) {
+	public void handleEvent(PersonStuckEvent event) {
 		List<Integer> stuckHistory = person2stuckIterations.get(event.getPersonId());
 		if (stuckHistory == null) {
 			stuckHistory = new ArrayList<Integer>();

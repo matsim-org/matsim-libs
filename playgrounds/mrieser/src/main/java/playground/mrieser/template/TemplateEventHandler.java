@@ -20,14 +20,14 @@
 
 package playground.mrieser.template;
 
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 
-public class TemplateEventHandler implements AgentDepartureEventHandler {
+public class TemplateEventHandler implements PersonDepartureEventHandler {
 
 	private int counter = 0;
 	
-	public void handleEvent(final AgentDepartureEvent event) {
+	public void handleEvent(final PersonDepartureEvent event) {
 		this.counter++;
 	}
 

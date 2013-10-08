@@ -29,14 +29,14 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
-import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
@@ -144,8 +144,8 @@ public class ParkedVehiclesToXYData implements BasicEventHandler {
 		}
 		
 		// check whether the agent's mode is observed
-		else if (event instanceof AgentDepartureEvent) {
-			AgentDepartureEvent agentDepartureEvent = (AgentDepartureEvent) event;
+		else if (event instanceof PersonDepartureEvent) {
+			PersonDepartureEvent agentDepartureEvent = (PersonDepartureEvent) event;
 			if (agentDepartureEvent.getLegMode().equals(TransportMode.car)) {
 				observedAgents.put(agentDepartureEvent.getPersonId(), agentDepartureEvent.getLinkId());
 			}

@@ -27,12 +27,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentMoneyEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
-import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
-import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 
 /**
  * @author Ihab
@@ -59,7 +59,7 @@ public class ConstantFareHandler implements PersonEntersVehicleEventHandler, Tra
 			if (fareForTrip == 0.){
 				// not processing zero money events
 			} else {
-				AgentMoneyEvent moneyEvent = new AgentMoneyEvent(event.getTime(), event.getPersonId(), fareForTrip);
+				PersonMoneyEvent moneyEvent = new PersonMoneyEvent(event.getTime(), event.getPersonId(), fareForTrip);
 				this.events.processEvent(moneyEvent);
 			}
 		}

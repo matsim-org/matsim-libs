@@ -21,8 +21,8 @@ package playground.wrashid.parkingSearch.withinDay_v_STRC.util;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -86,7 +86,7 @@ public class ParkingAgentsTracker_v2 extends ParkingAgentsTracker implements Ite
 	}
 	
 	@Override
-    public void handleEvent(AgentDepartureEvent event) {
+    public void handleEvent(PersonDepartureEvent event) {
     	super.handleEvent(event);
     	
     	Id personId = event.getPersonId();

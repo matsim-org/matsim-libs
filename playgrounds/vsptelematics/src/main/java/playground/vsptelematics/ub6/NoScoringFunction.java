@@ -19,10 +19,10 @@
  * *********************************************************************** */
 package playground.vsptelematics.ub6;
 
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.scoring.ScoringFunction;
 
 
@@ -94,7 +94,7 @@ public class NoScoringFunction implements ScoringFunction {
 	}
 
 	/**
-	 * @see org.matsim.core.scoring.ScoringFunction#handleEvent(org.matsim.core.api.experimental.events.Event)
+	 * @see org.matsim.core.scoring.ScoringFunction#handleEvent(org.matsim.api.core.v01.events.Event)
 	 */
 	@Override
 	public void handleEvent(Event event) {

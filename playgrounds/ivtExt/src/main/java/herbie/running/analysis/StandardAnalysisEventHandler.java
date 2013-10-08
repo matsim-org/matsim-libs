@@ -1,27 +1,30 @@
 package herbie.running.analysis;
 
 import java.util.TreeMap;
+
 import herbie.running.population.algorithms.AbstractClassifiedFrequencyAnalysis;
+
 import org.apache.commons.math.stat.Frequency;
 import org.apache.commons.math.stat.StatUtils;
 import org.apache.commons.math.util.ResizableDoubleArray;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
+
 import utils.Bins;
 
 public class StandardAnalysisEventHandler extends AbstractClassifiedFrequencyAnalysis  
-	implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandler, 
-	AgentDepartureEventHandler, IterationEndsListener{
+	implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler, 
+	PersonDepartureEventHandler, IterationEndsListener{
 
 	private final TreeMap<Id, Double> agentDepartures = new TreeMap<Id, Double>();
 	
@@ -51,7 +54,7 @@ public class StandardAnalysisEventHandler extends AbstractClassifiedFrequencyAna
 	}
 	
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		
 		
 		// trip durations
@@ -85,7 +88,7 @@ public class StandardAnalysisEventHandler extends AbstractClassifiedFrequencyAna
 	}
 	
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		// trip durations
 		this.agentDepartures.put(event.getPersonId(), event.getTime());
 	}

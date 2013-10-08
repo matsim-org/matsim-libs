@@ -20,8 +20,8 @@
 package playground.andreas.P2.scoring.operator;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
-import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 
 /**
  *

@@ -22,34 +22,40 @@ package playground.michalm;
 import java.util.*;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.core.api.experimental.events.*;
 import org.matsim.core.api.experimental.events.handler.*;
 import org.matsim.core.events.handler.EventHandler;
 
 
 public class RunningVehicleRegister
-    implements EventHandler, AgentDepartureEventHandler, AgentStuckEventHandler,
-    AgentArrivalEventHandler
+    implements EventHandler, PersonDepartureEventHandler, PersonStuckEventHandler,
+    PersonArrivalEventHandler
 {
-    private Map<Id, AgentDepartureEvent> runningAgentsMap = new HashMap<Id, AgentDepartureEvent>();
+    private Map<Id, PersonDepartureEvent> runningAgentsMap = new HashMap<Id, PersonDepartureEvent>();
 
 
     @Override
-    public void handleEvent(AgentDepartureEvent event)
+    public void handleEvent(PersonDepartureEvent event)
     {
         runningAgentsMap.put(event.getPersonId(), event);
     }
 
 
     @Override
-    public void handleEvent(AgentArrivalEvent event)
+    public void handleEvent(PersonArrivalEvent event)
     {
         runningAgentsMap.remove(event.getPersonId());
     }
 
 
     @Override
-    public void handleEvent(AgentStuckEvent event)
+    public void handleEvent(PersonStuckEvent event)
     {
         //throw new RuntimeException();
         System.err.println("AgentStuckEvent:");

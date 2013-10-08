@@ -24,19 +24,19 @@ import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 
 import playground.wrashid.PSF.ParametersPSF;
 import playground.wrashid.PSF.energy.charging.ChargingTimes;
@@ -62,7 +62,7 @@ import playground.wrashid.lib.obj.TwoHashMapsConcatenated;
  * 
  * @author wrashid
  */
-public class ActivityIntervalTracker_NonParallelizableHandler implements ActivityStartEventHandler, AgentDepartureEventHandler,
+public class ActivityIntervalTracker_NonParallelizableHandler implements ActivityStartEventHandler, PersonDepartureEventHandler,
 		LinkEnterEventHandler {
 
 	// personId, time
@@ -126,7 +126,7 @@ public class ActivityIntervalTracker_NonParallelizableHandler implements Activit
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		Id personId = event.getPersonId();
 
 		
@@ -136,7 +136,7 @@ public class ActivityIntervalTracker_NonParallelizableHandler implements Activit
 		initializeLegModeDetection(event);
 	}
 
-	private void initializeLegModeDetection(AgentDepartureEvent event) {
+	private void initializeLegModeDetection(PersonDepartureEvent event) {
 		stillBeforeFristEnterLinkEvent.put(event.getPersonId(), true);
 
 		mostRecentLegMode.put(event.getPersonId(), "unknown");

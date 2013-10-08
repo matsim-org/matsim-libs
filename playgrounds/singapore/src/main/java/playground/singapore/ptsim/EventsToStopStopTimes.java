@@ -3,17 +3,17 @@ package playground.singapore.ptsim;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
+import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.handler.BasicEventHandler;
-import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
-import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
 
 public class EventsToStopStopTimes implements VehicleArrivesAtFacilityEventHandler, PersonLeavesVehicleEventHandler {
 

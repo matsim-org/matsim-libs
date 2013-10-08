@@ -24,7 +24,7 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.core.events.handler.EventHandler;
 
 import playground.vsp.analysis.modules.AbstractAnalyisModule;
@@ -69,7 +69,7 @@ public class GetStuckEventsAndPlans extends AbstractAnalyisModule{
 	@Override
 	public void postProcessData() {
 		ArrayList<Id> stuckAgents = new ArrayList<Id>();
-		for(AgentStuckEvent e: this.stuckEventHandler.getEvents()){
+		for(PersonStuckEvent e: this.stuckEventHandler.getEvents()){
 			stuckAgents.add(e.getPersonId());
 		}
 		this.plans = new GetPlansSubset(this.sc, stuckAgents, false);

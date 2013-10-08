@@ -22,14 +22,14 @@ package playground.mmoyo.utils;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 	
 /** Reads and event file and counts stuck and aborted vehicles and agents */
-public class StuckAndAbortedAgentFinder implements AgentStuckEventHandler{
+public class StuckAndAbortedAgentFinder implements PersonStuckEventHandler{
 		private Map <String, Integer> mode_stuckNum_map = new TreeMap <String, Integer>();		
 		final String strNull = "null";
 		
@@ -39,7 +39,7 @@ public class StuckAndAbortedAgentFinder implements AgentStuckEventHandler{
 		}
 		
 		@Override
-		public void handleEvent(AgentStuckEvent event) {
+		public void handleEvent(PersonStuckEvent event) {
 			String mode = event.getLegMode();
 			if (mode==null){mode = strNull;}
 			if (!mode_stuckNum_map.keySet().contains(mode)){

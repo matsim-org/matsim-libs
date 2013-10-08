@@ -24,7 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.Event;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.utils.collections.CollectionUtils;
 
 public class JointDepartureEvent extends Event {

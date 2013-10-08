@@ -27,16 +27,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 
 /**
  * @author Ihab
  *
  */
-public class DepartureArrivalEventHandler implements AgentDepartureEventHandler, AgentArrivalEventHandler{
+public class DepartureArrivalEventHandler implements PersonDepartureEventHandler, PersonArrivalEventHandler{
 	private int numberOfPtLegs;
 	private int numberOfCarLegs;
 	private int numberOfWalkLegs; // Walk, not Transit Walk!
@@ -54,7 +54,7 @@ public class DepartureArrivalEventHandler implements AgentDepartureEventHandler,
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		if(event.getLegMode().toString().equals("pt")){
 			this.numberOfPtLegs++;			
 		}
@@ -93,7 +93,7 @@ public class DepartureArrivalEventHandler implements AgentDepartureEventHandler,
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		
 		if(event.getLegMode().toString().equals("car") && event.getPersonId().toString().contains("bus")){ // either a bus or a car
 			if (this.personID2lastArrivalTime.containsKey(event.getPersonId())){

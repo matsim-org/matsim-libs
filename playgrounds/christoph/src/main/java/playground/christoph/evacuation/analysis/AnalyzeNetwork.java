@@ -29,16 +29,16 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.Controler;
@@ -58,8 +58,8 @@ import playground.christoph.evacuation.withinday.replanning.utils.SHPFileUtil;
 
 import com.vividsolutions.jts.geom.Geometry;
 
-public class AnalyzeNetwork implements AgentDepartureEventHandler, AgentArrivalEventHandler, 
-	LinkLeaveEventHandler, AgentStuckEventHandler {
+public class AnalyzeNetwork implements PersonDepartureEventHandler, PersonArrivalEventHandler, 
+	LinkLeaveEventHandler, PersonStuckEventHandler {
 
 	private static final Logger log = Logger.getLogger(AnalyzeNetwork.class);
 	
@@ -216,7 +216,7 @@ public class AnalyzeNetwork implements AgentDepartureEventHandler, AgentArrivalE
 	}
 
 	@Override
-	public void handleEvent(AgentStuckEvent event) {
+	public void handleEvent(PersonStuckEvent event) {
 		this.enRouteCarAgents.remove(event.getPersonId());
 	}
 
@@ -233,12 +233,12 @@ public class AnalyzeNetwork implements AgentDepartureEventHandler, AgentArrivalE
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		this.enRouteCarAgents.remove(event.getPersonId());
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		if (event.getLegMode().equals(TransportMode.car)) {
 			this.enRouteCarAgents.add(event.getPersonId());
 		}

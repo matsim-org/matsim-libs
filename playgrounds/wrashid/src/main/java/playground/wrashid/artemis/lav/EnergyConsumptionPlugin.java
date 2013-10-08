@@ -24,19 +24,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.Wait2LinkEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.Wait2LinkEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 
 import playground.wrashid.lib.obj.LinkedListValueHashMap;
 
@@ -51,7 +51,7 @@ import playground.wrashid.lib.obj.LinkedListValueHashMap;
  * 
  */
 public class EnergyConsumptionPlugin implements LinkEnterEventHandler, LinkLeaveEventHandler, Wait2LinkEventHandler,
-		AgentArrivalEventHandler {
+		PersonArrivalEventHandler {
 
 	private EnergyConsumptionModelLAV_v1 energyConsumptionModel;
 
@@ -130,7 +130,7 @@ public class EnergyConsumptionPlugin implements LinkEnterEventHandler, LinkLeave
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		if (isValidArrivalEventWithCar(event.getPersonId(), event.getLinkId())) {
 			updateEnergyConsumptionOfLeg(event.getPersonId(), event.getTime(), event.getLinkId());
 

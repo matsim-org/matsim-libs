@@ -25,8 +25,8 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.core.api.experimental.events.AgentMoneyEvent;
-import org.matsim.core.api.experimental.events.Event;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
@@ -49,10 +49,10 @@ public class SanralIntegrationTest {
 		em.addHandler(ec);
 //		new MatsimEventsReader(em).readFile(utils.getOutputDirectory() + "ITERS/it.0/0.events.txt.gz");
 		new MatsimEventsReader(em).readFile(utils.getOutputDirectory() + "ITERS/it.0/0.events.xml.gz");
-		List<AgentMoneyEvent> events = new ArrayList<AgentMoneyEvent>();
+		List<PersonMoneyEvent> events = new ArrayList<PersonMoneyEvent>();
 		for (Event e : ec.getEvents()) {
-			if (e instanceof AgentMoneyEvent) {
-				events.add((AgentMoneyEvent) e);
+			if (e instanceof PersonMoneyEvent) {
+				events.add((PersonMoneyEvent) e);
 			}
 		}
 

@@ -25,12 +25,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.core.utils.collections.Tuple;
 
 
@@ -39,9 +39,9 @@ import org.matsim.core.utils.collections.Tuple;
  * @author dgrether
  *
  */
-public class DgFlightModalSplitEventHandler implements AgentDepartureEventHandler, AgentArrivalEventHandler, AgentStuckEventHandler {
+public class DgFlightModalSplitEventHandler implements PersonDepartureEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler {
 
-	private Map<Id, AgentDepartureEvent> id2depEventMap;
+	private Map<Id, PersonDepartureEvent> id2depEventMap;
 	private Map<Tuple<Id, Id>, ModalSplitData> resultsByOdPair;
 	private Set<Id> processedPersonIds;
 	private int numberOfPtTrips;
@@ -59,7 +59,7 @@ public class DgFlightModalSplitEventHandler implements AgentDepartureEventHandle
 	
 	@Override
 	public void reset(int iteration) {
-		this.id2depEventMap = new HashMap<Id, AgentDepartureEvent>();
+		this.id2depEventMap = new HashMap<Id, PersonDepartureEvent>();
 		this.resultsByOdPair = new HashMap<Tuple<Id, Id>, ModalSplitData>();
 		this.processedPersonIds = new HashSet<Id>();
 		this.numberOfPtTrips = 0;
@@ -68,16 +68,16 @@ public class DgFlightModalSplitEventHandler implements AgentDepartureEventHandle
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		if (this.checkLegMode(event.getLegMode())) {
 			this.id2depEventMap.put(event.getPersonId(), event);
 		}
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		if (this.checkLegMode(event.getLegMode())) {
-			AgentDepartureEvent departureEvent = this.id2depEventMap.get(event.getPersonId());
+			PersonDepartureEvent departureEvent = this.id2depEventMap.get(event.getPersonId());
 			ModalSplitData result = this.getOrCreateResultEntry(departureEvent.getLinkId(), event.getLinkId());
 			if (event.getLegMode().equals("pt")) {
 				result.pt++;
@@ -99,7 +99,7 @@ public class DgFlightModalSplitEventHandler implements AgentDepartureEventHandle
 		}
 	}
 
-	public void handleEvent(AgentStuckEvent event) {
+	public void handleEvent(PersonStuckEvent event) {
 		if (this.checkLegMode(event.getLegMode())) {
 			this.numberOfStuckTrips++;
 			if (this.processedPersonIds.contains(event.getPersonId())) {

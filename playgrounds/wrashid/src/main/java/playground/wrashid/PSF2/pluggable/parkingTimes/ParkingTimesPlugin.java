@@ -24,19 +24,19 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.contrib.parking.lib.DebugLib;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.Wait2LinkEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.Wait2LinkEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
@@ -56,7 +56,7 @@ import playground.wrashid.lib.obj.LinkedListValueHashMap;
  * 
  */
 
-public class ParkingTimesPlugin implements Wait2LinkEventHandler, AgentArrivalEventHandler, LinkEnterEventHandler,
+public class ParkingTimesPlugin implements Wait2LinkEventHandler, PersonArrivalEventHandler, LinkEnterEventHandler,
 		ActivityStartEventHandler {
 
 	// agent Id, linked list of parkingInterval
@@ -124,7 +124,7 @@ public class ParkingTimesPlugin implements Wait2LinkEventHandler, AgentArrivalEv
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		if (isValidArrivalEventWithCar(event.getPersonId(), event.getLinkId())) {
 			ParkingIntervalInfo parkingIntervalInfo = new ParkingIntervalInfo();
 			parkingIntervalInfo.setArrivalTime(event.getTime());

@@ -5,14 +5,14 @@ import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.list.Lists;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -42,7 +42,7 @@ public class CordonLineCrossingLog {
 		
 	}
 	
-	private static class CordonVolumeCounter implements LinkEnterEventHandler, AgentDepartureEventHandler {
+	private static class CordonVolumeCounter implements LinkEnterEventHandler, PersonDepartureEventHandler {
 
 		IntegerValueHashMap<Id> currentLegIndex=new IntegerValueHashMap<Id>(-1);
 		private ScenarioImpl scenarioImpl;
@@ -98,7 +98,7 @@ public class CordonLineCrossingLog {
 		}
 
 		@Override
-		public void handleEvent(AgentDepartureEvent event) {
+		public void handleEvent(PersonDepartureEvent event) {
 			currentLegIndex.incrementBy(event.getPersonId(),2);
 			previousLinkCoordinate.put(event.getPersonId(), null);
 			lastLegIndexRegisteredForCrossing.put(event.getPersonId(), -1);

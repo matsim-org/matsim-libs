@@ -22,10 +22,10 @@ package playground.wrashid.parkingSearch.withindayFW.parkingTracker;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 
-public class CaptureFirstCarDepartureTimeOfDay implements AgentDepartureEventHandler {
+public class CaptureFirstCarDepartureTimeOfDay implements PersonDepartureEventHandler {
 
 	HashMap<Id, Double> firstCarDepartureTime;
 	
@@ -43,7 +43,7 @@ public class CaptureFirstCarDepartureTimeOfDay implements AgentDepartureEventHan
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		Id personId = event.getPersonId();
 		if (!firstCarDepartureTime.containsKey(personId)){
 			firstCarDepartureTime.put(personId, event.getTime());

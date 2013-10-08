@@ -8,9 +8,9 @@ import junit.framework.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.core.api.experimental.events.EventsFactory;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
 import org.matsim.core.basic.v01.IdImpl;
 
 public class AgentId2DepartureDelayAtStopMapTest {
@@ -40,9 +40,9 @@ public class AgentId2DepartureDelayAtStopMapTest {
         
 //        create Events
         
-        AgentDepartureEvent event3 = ef.createAgentDepartureEvent(2.9*3600, persId1, linkId3, TransportMode.pt);
+        PersonDepartureEvent event3 = ef.createAgentDepartureEvent(2.9*3600, persId1, linkId3, TransportMode.pt);
 		handler.handleEvent(event3);
-		AgentDepartureEvent event4 = ef.createAgentDepartureEvent(2.1*3600, persId2, linkId1, TransportMode.pt);
+		PersonDepartureEvent event4 = ef.createAgentDepartureEvent(2.1*3600, persId2, linkId1, TransportMode.pt);
 		handler.handleEvent(event4);
         
         PersonEntersVehicleEvent event1 = ef.createPersonEntersVehicleEvent(2.9*3600, persId1, vehId1);

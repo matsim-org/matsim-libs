@@ -5,17 +5,17 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 
 import playground.wrashid.artemis.lav.EnergyConsumptionRegressionModel.EnergyConsumptionModelRow;
@@ -44,7 +44,7 @@ import playground.wrashid.artemis.smartCharging.SmartCharger;
  * @author wrashid
  * 
  */
-public class Charger implements ActivityStartEventHandler, AgentArrivalEventHandler, AgentDepartureEventHandler {
+public class Charger implements ActivityStartEventHandler, PersonArrivalEventHandler, PersonDepartureEventHandler {
 
 	private HashMap<Id, String> firstActTypeDuringParking;
 	private HashMap<Id, Id> carParkedAtLink;
@@ -198,7 +198,7 @@ public class Charger implements ActivityStartEventHandler, AgentArrivalEventHand
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		if (isChargableVehicle(event.getPersonId()) && event.getLegMode().equalsIgnoreCase("car")) {
 			lastArrivalTime.put(event.getPersonId(), event.getTime());
 			carParkedAtLink.put(event.getPersonId(), event.getLinkId());
@@ -206,7 +206,7 @@ public class Charger implements ActivityStartEventHandler, AgentArrivalEventHand
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		Id personId = event.getPersonId();
 
 		if (isChargableVehicle(personId) && event.getLegMode().equalsIgnoreCase("car")) {

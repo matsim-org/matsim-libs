@@ -1,7 +1,7 @@
 package playground.pieter.pseudosimulation.trafficinfo;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 import org.matsim.vehicles.Vehicles;

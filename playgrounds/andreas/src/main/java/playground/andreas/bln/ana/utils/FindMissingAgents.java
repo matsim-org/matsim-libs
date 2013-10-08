@@ -5,19 +5,19 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.Event;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.EventHandler;
 
-public class FindMissingAgents implements EventHandler, AgentDepartureEventHandler, AgentArrivalEventHandler, AgentStuckEventHandler {
+public class FindMissingAgents implements EventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler {
 	
 	private final static Logger log = Logger.getLogger(FindMissingAgents.class);
 	
@@ -55,7 +55,7 @@ public class FindMissingAgents implements EventHandler, AgentDepartureEventHandl
 	}
 
 	@Override
-	public void handleEvent(AgentStuckEvent event) {
+	public void handleEvent(PersonStuckEvent event) {
 		if(this.agentsOnTour.get(event.getPersonId().toString())!= null){
 			this.agentsOnTour.remove(event.getPersonId().toString());	
 			this.numberOfStuckedAgents++;
@@ -72,7 +72,7 @@ public class FindMissingAgents implements EventHandler, AgentDepartureEventHandl
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 //		if(!event.getPersonId().toString().contains("pt_veh_")){
 			if(this.agentsOnTour.get(event.getPersonId().toString()) == null){
 				this.agentsOnTour.put(event.getPersonId().toString(), event);
@@ -84,7 +84,7 @@ public class FindMissingAgents implements EventHandler, AgentDepartureEventHandl
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		if(this.agentsOnTour.get(event.getPersonId().toString()) == null){
 			log.warn("agent " + event.getPersonId().toString() + " arrives, but wasn't on tour");
 		} else {

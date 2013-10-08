@@ -20,26 +20,26 @@
 
 package playground.jjoubert.CommercialModel.Listeners;
 
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 
-public class MyCommercialLegHistogramBuilder implements AgentDepartureEventHandler, AgentArrivalEventHandler, AgentStuckEventHandler{
+public class MyCommercialLegHistogramBuilder implements PersonDepartureEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler{
 
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		// TODO Auto-generated method stub
 		
 	}
 
-	public void handleEvent(AgentStuckEvent event) {
+	public void handleEvent(PersonStuckEvent event) {
 		// TODO Auto-generated method stub
 		
 	}

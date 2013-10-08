@@ -11,23 +11,23 @@ import javax.swing.JFrame;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.sergioo.eventAnalysisTools2012.gui.VariableSizeSelectionNetworkPainter;
 import playground.sergioo.visualizer2D2012.networkVisualizer.SimpleNetworkWindow;
 
-public class PublicTranportTeleportAnalizer implements AgentDepartureEventHandler, AgentArrivalEventHandler, PersonEntersVehicleEventHandler {
+public class PublicTranportTeleportAnalizer implements PersonDepartureEventHandler, PersonArrivalEventHandler, PersonEntersVehicleEventHandler {
 
 	//Classes
 	private class PTStage {
@@ -55,14 +55,14 @@ public class PublicTranportTeleportAnalizer implements AgentDepartureEventHandle
 		}
 	}
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		if(event.equals("pt")) {
 			PTStage stage = publicTransportStages.get(event.getPersonId()).get(publicTransportStages.get(event.getPersonId()).size()-1);
 			stage.finishTravelInstant = event.getTime();
 		}
 	}
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		if(event.getLegMode().equals("pt")) {
 			List<PTStage> stages = publicTransportStages.get(event.getPersonId());
 			if(stages==null) {

@@ -28,16 +28,16 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 
 /**
  * @author Ihab
  *
  */
-public class DepartureArrivalEventHandler implements TransitDriverStartsEventHandler, AgentDepartureEventHandler {
+public class DepartureArrivalEventHandler implements TransitDriverStartsEventHandler, PersonDepartureEventHandler {
 	private int numberOfPtLegs;
 	private int numberOfCarLegs;
 	private int numberOfWalkLegs; // TransitWalk
@@ -66,7 +66,7 @@ public class DepartureArrivalEventHandler implements TransitDriverStartsEventHan
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		if(event.getLegMode().toString().equals(TransportMode.pt)){
 			this.numberOfPtLegs++;			
 		}

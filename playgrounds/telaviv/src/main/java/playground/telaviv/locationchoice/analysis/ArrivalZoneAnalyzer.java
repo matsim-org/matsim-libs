@@ -31,11 +31,11 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderTXTv1;
 import org.matsim.core.events.EventsUtils;
@@ -49,7 +49,7 @@ import org.opengis.feature.simple.SimpleFeature;
 
 import playground.telaviv.zones.ZoneMapping;
 
-public class ArrivalZoneAnalyzer implements AgentArrivalEventHandler {
+public class ArrivalZoneAnalyzer implements PersonArrivalEventHandler {
 
 	private static final Logger log = Logger.getLogger(ArrivalZoneAnalyzer.class);
 	
@@ -206,7 +206,7 @@ public class ArrivalZoneAnalyzer implements AgentArrivalEventHandler {
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		Person person = scenario.getPopulation().getPersons().get(event.getPersonId()); 
 		int activityNum = activityCounter.get(event.getPersonId());
 		activityNum = activityNum + 2;

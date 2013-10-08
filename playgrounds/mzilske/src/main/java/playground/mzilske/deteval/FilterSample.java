@@ -4,11 +4,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PopulationWriter;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -37,7 +37,7 @@ public class FilterSample {
 		String outputPlansFile = "../../run951/951.filtered_plans.xml.gz";
 
 		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
-		events.addHandler(new AgentStuckEventHandler() {
+		events.addHandler(new PersonStuckEventHandler() {
 			
 			@Override
 			public void reset(int iteration) {
@@ -45,7 +45,7 @@ public class FilterSample {
 			}
 			
 			@Override
-			public void handleEvent(AgentStuckEvent event) {
+			public void handleEvent(PersonStuckEvent event) {
 				personIds.add(event.getPersonId());
 			}
 		});

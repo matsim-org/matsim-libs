@@ -27,18 +27,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 
 /**
  * @author Ihab
  *
  */
-public class PtLegHandler implements PersonEntersVehicleEventHandler, AgentDepartureEventHandler, AgentArrivalEventHandler {
+public class PtLegHandler implements PersonEntersVehicleEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler {
 	private Map <Id, Double> personId2WaitingTime = new HashMap<Id, Double>();
 	private Map <Id, Double> personId2PersonEntersVehicleTime = new HashMap<Id, Double>();
 	private Map <Id, Double> personId2AgentDepartureTime = new HashMap<Id, Double>();
@@ -81,14 +81,14 @@ public class PtLegHandler implements PersonEntersVehicleEventHandler, AgentDepar
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		if (event.getLegMode().toString().equals("pt")){
 			personId2AgentDepartureTime.put(event.getPersonId(), event.getTime());
 		}
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		
 		if (event.getLegMode().toString().equals("pt")){
 			double inVehicleTime = 0;

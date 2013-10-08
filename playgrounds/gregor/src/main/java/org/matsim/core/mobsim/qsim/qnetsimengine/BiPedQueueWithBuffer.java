@@ -29,9 +29,9 @@ import java.util.Queue;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
@@ -495,7 +495,7 @@ SignalizeableItem {
 
 		for (QVehicle veh : this.vehQueue) {
 			this.network.simEngine.getMobsim().getEventsManager().processEvent(
-					new AgentStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
+					new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
 			this.network.simEngine.getMobsim().getAgentCounter().incLost();
 			this.network.simEngine.getMobsim().getAgentCounter().decLiving();
 		}
@@ -504,7 +504,7 @@ SignalizeableItem {
 
 		for (QVehicle veh : this.buffer) {
 			this.network.simEngine.getMobsim().getEventsManager().processEvent(
-					new AgentStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
+					new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
 			this.network.simEngine.getMobsim().getAgentCounter().incLost();
 			this.network.simEngine.getMobsim().getAgentCounter().decLiving();
 		}

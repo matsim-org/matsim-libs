@@ -7,16 +7,16 @@ import java.util.LinkedList;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.network.NetworkImpl;
@@ -60,7 +60,7 @@ public class AgentGenerator {
 	}
 }
 
-class MyEventHandler implements LinkEnterEventHandler, AgentDepartureEventHandler, AgentArrivalEventHandler,
+class MyEventHandler implements LinkEnterEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler,
 		ActivityStartEventHandler {
 
 	private final NetworkImpl network;
@@ -89,7 +89,7 @@ class MyEventHandler implements LinkEnterEventHandler, AgentDepartureEventHandle
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		Id personId = event.getPersonId();
 		if (event.getLegMode().equalsIgnoreCase("car") && Config.isInsideStudyArea(event.getLinkId())) {
 			if (!agentsInStudyArea.containsKey(personId)) {
@@ -105,7 +105,7 @@ class MyEventHandler implements LinkEnterEventHandler, AgentDepartureEventHandle
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		Id personId = event.getPersonId();
 		if (event.getLegMode().equalsIgnoreCase("car") && Config.isInsideStudyArea(event.getLinkId())) {
 			if (!agentsInStudyArea.containsKey(personId)) {

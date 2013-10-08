@@ -28,25 +28,25 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
-import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
-import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
-import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
-import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.pt.PtConstants;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
@@ -69,8 +69,8 @@ public class IndividualPTvaluesFromEvents implements	PersonEntersVehicleEventHan
 																			PersonLeavesVehicleEventHandler,
 																			VehicleArrivesAtFacilityEventHandler, 
 																			TransitDriverStartsEventHandler, 
-																			AgentArrivalEventHandler,
-																			AgentDepartureEventHandler,
+																			PersonArrivalEventHandler,
+																			PersonDepartureEventHandler,
 																			ActivityStartEventHandler{
 	
 	private final static Logger log = Logger.getLogger(IndividualPTvaluesFromEvents.class);
@@ -115,7 +115,7 @@ public class IndividualPTvaluesFromEvents implements	PersonEntersVehicleEventHan
     }
     
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {	//to calculate transitWalk time
+	public void handleEvent(PersonDepartureEvent event) {	//to calculate transitWalk time
 		if (this.transitDrivers.contains(event.getPersonId())){
 			return; // ignore transit drivers 
 		}
@@ -140,7 +140,7 @@ public class IndividualPTvaluesFromEvents implements	PersonEntersVehicleEventHan
 	}
 	
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {							//to calculate transitWalk time
+	public void handleEvent(PersonArrivalEvent event) {							//to calculate transitWalk time
 		if (this.transitDrivers.contains(event.getPersonId())){
 			return; // ignore transit drivers 
 		}

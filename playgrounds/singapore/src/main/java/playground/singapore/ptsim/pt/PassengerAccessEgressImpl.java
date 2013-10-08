@@ -25,9 +25,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.core.api.experimental.events.BoardingDeniedEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;

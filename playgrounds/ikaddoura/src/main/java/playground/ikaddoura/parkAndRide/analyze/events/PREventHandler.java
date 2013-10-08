@@ -30,21 +30,21 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 
 /**
  * @author Ihab
  *
  */
-public class PREventHandler implements LinkEnterEventHandler, ActivityEndEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler {
+public class PREventHandler implements LinkEnterEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, PersonStuckEventHandler {
 	private Network network;
 	private Map<Id, Integer> linkId2cars = new HashMap<Id, Integer>();
 	private Map<Id, Integer> linkId2prActs = new HashMap<Id, Integer>();
@@ -120,7 +120,7 @@ public class PREventHandler implements LinkEnterEventHandler, ActivityEndEventHa
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		if(event.getPersonId().toString().contains("person")){
 			if (event.getLegMode().toString().equals(TransportMode.pt)){
 				this.ptLegs++;
@@ -132,7 +132,7 @@ public class PREventHandler implements LinkEnterEventHandler, ActivityEndEventHa
 	}
 
 	@Override
-	public void handleEvent(AgentStuckEvent event) {
+	public void handleEvent(PersonStuckEvent event) {
 		stuckEvents++;
 	}
 	

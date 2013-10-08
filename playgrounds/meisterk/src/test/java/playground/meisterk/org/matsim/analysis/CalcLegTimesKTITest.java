@@ -25,11 +25,11 @@ import java.io.PrintStream;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
@@ -95,24 +95,24 @@ public class CalcLegTimesKTITest extends MatsimTestCase {
 		LegImpl leg = new LegImpl(TransportMode.car);
 		Id linkId = link.getId();
 
-		events.processEvent(new AgentDepartureEvent(Time.parseTime("06:00:00"), personId, linkId, leg.getMode()));
-		events.processEvent(new AgentArrivalEvent(Time.parseTime("06:30:00"), personId, linkId, leg.getMode()));
+		events.processEvent(new PersonDepartureEvent(Time.parseTime("06:00:00"), personId, linkId, leg.getMode()));
+		events.processEvent(new PersonArrivalEvent(Time.parseTime("06:30:00"), personId, linkId, leg.getMode()));
 
 		assertEquals(1, testee.getNumberOfModes());
 		assertEquals(1, testee.getNumberOfLegs(TransportMode.car, timeBins[5], timeBins[6]));
 		assertEquals(1, testee.getNumberOfLegs(TransportMode.car, timeBins[6], timeBins[5]));
 
 		leg.setMode(TransportMode.pt);
-		events.processEvent(new AgentDepartureEvent(Time.parseTime("06:00:00"), personId, linkId, leg.getMode()));
-		events.processEvent(new AgentArrivalEvent(Time.parseTime("06:00:01"), personId, linkId, leg.getMode()));
+		events.processEvent(new PersonDepartureEvent(Time.parseTime("06:00:00"), personId, linkId, leg.getMode()));
+		events.processEvent(new PersonArrivalEvent(Time.parseTime("06:00:01"), personId, linkId, leg.getMode()));
 
 		assertEquals(2, testee.getNumberOfModes());
 		assertEquals(1, testee.getNumberOfLegs(TransportMode.pt, timeBins[0], timeBins[1]));
 		assertEquals(1, testee.getNumberOfLegs(TransportMode.pt, timeBins[1], timeBins[0]));
 
 		leg.setMode(TransportMode.car);
-		events.processEvent(new AgentDepartureEvent(Time.parseTime("06:00:00"), personId, linkId, leg.getMode()));
-		events.processEvent(new AgentArrivalEvent(Time.parseTime("06:00:00"), personId, linkId, leg.getMode()));
+		events.processEvent(new PersonDepartureEvent(Time.parseTime("06:00:00"), personId, linkId, leg.getMode()));
+		events.processEvent(new PersonArrivalEvent(Time.parseTime("06:00:00"), personId, linkId, leg.getMode()));
 
 		assertEquals(3, testee.getNumberOfLegs());
 		assertEquals(2, testee.getNumberOfLegs(TransportMode.car));

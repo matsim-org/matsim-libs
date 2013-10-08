@@ -31,12 +31,12 @@ import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -49,8 +49,8 @@ import org.matsim.core.utils.io.UncheckedIOException;
  * 
  * @author cdobler
  */
-public class MeanTravelTimeCalculator implements AgentArrivalEventHandler, AgentDepartureEventHandler,
-AgentStuckEventHandler, IterationEndsListener, ShutdownListener  {
+public class MeanTravelTimeCalculator implements PersonArrivalEventHandler, PersonDepartureEventHandler,
+PersonStuckEventHandler, IterationEndsListener, ShutdownListener  {
 
 	protected Scenario scenario;
 	protected Set<String> transportModes;
@@ -91,7 +91,7 @@ AgentStuckEventHandler, IterationEndsListener, ShutdownListener  {
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		double departureTime = currentLegs.get(event.getPersonId());
 		double travelTime = event.getTime() - departureTime;
 
@@ -101,12 +101,12 @@ AgentStuckEventHandler, IterationEndsListener, ShutdownListener  {
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		currentLegs.put(event.getPersonId(), event.getTime());
 	}
 
 	@Override
-	public void handleEvent(AgentStuckEvent event) {
+	public void handleEvent(PersonStuckEvent event) {
 		currentLegs.remove(event.getPersonId());
 	}
 

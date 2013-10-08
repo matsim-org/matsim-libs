@@ -24,12 +24,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 
 import playground.christoph.events.EventHandlerInstance;
 
@@ -40,7 +40,7 @@ import playground.christoph.events.EventHandlerInstance;
  * Counts the number of vehicles departed, arrived or got stuck per time bin
  * based on events.
  */
-public class LegHistogramInstance implements EventHandlerInstance, AgentDepartureEventHandler, AgentArrivalEventHandler, AgentStuckEventHandler {
+public class LegHistogramInstance implements EventHandlerInstance, PersonDepartureEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler {
 
 	private final int binSize;
 	private final int nofBins;
@@ -71,7 +71,7 @@ public class LegHistogramInstance implements EventHandlerInstance, AgentDepartur
 	/* Implementation of EventHandler-Interfaces */
 
 	@Override
-	public void handleEvent(final AgentDepartureEvent event) {
+	public void handleEvent(final PersonDepartureEvent event) {
 		int index = getBinIndex(event.getTime());
 		this.allModesData.countsDep[index]++;
 		if (event.getLegMode() != null) {
@@ -81,7 +81,7 @@ public class LegHistogramInstance implements EventHandlerInstance, AgentDepartur
 	}
 
 	@Override
-	public void handleEvent(final AgentArrivalEvent event) {
+	public void handleEvent(final PersonArrivalEvent event) {
 		int index = getBinIndex(event.getTime());
 		this.allModesData.countsArr[index]++;
 		if (event.getLegMode() != null) {
@@ -91,7 +91,7 @@ public class LegHistogramInstance implements EventHandlerInstance, AgentDepartur
 	}
 
 	@Override
-	public void handleEvent(final AgentStuckEvent event) {
+	public void handleEvent(final PersonStuckEvent event) {
 		int index = getBinIndex(event.getTime());
 		this.allModesData.countsStuck[index]++;
 		if (event.getLegMode() != null) {

@@ -11,19 +11,19 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.PtConstants;
@@ -33,7 +33,7 @@ import org.matsim.pt.transitSchedule.api.TransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRouteStop;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
-public class EWLine implements ActivityEndEventHandler, AgentDepartureEventHandler, PersonEntersVehicleEventHandler, AgentArrivalEventHandler {
+public class EWLine implements ActivityEndEventHandler, PersonDepartureEventHandler, PersonEntersVehicleEventHandler, PersonArrivalEventHandler {
 
 	//Classes
 	private class EWTrip {
@@ -75,7 +75,7 @@ public class EWLine implements ActivityEndEventHandler, AgentDepartureEventHandl
 		}
 	}
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		EWTrip trip = ewAgentsTravelling.get(event.getPersonId());
 		if(trip!=null && event.getLegMode().equals("pt")) {
 			SEARCHING:
@@ -108,7 +108,7 @@ public class EWLine implements ActivityEndEventHandler, AgentDepartureEventHandl
 		}
 	}
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		EWTrip trip = ewAgentsTravelling.get(event.getPersonId());
 		if(trip!=null) {
 			if(event.getLegMode().equals("pt")) {

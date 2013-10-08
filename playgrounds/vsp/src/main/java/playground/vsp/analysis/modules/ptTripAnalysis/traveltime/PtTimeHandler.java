@@ -22,7 +22,7 @@ package playground.vsp.analysis.modules.ptTripAnalysis.traveltime;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.core.api.experimental.events.Event;
+import org.matsim.api.core.v01.events.Event;
 
 
 /**

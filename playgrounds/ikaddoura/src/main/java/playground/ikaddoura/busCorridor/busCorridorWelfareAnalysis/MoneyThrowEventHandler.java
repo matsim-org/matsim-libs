@@ -23,12 +23,11 @@
  */
 package playground.ikaddoura.busCorridor.busCorridorWelfareAnalysis;
 
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.events.AgentMoneyEvent;
-import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
-import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 
 /**
  * @author Ihab
@@ -56,7 +55,7 @@ public class MoneyThrowEventHandler implements PersonEntersVehicleEventHandler {
 	public void handleEvent(PersonEntersVehicleEvent event) {
 		if (event.getPersonId().toString().contains("person") && event.getVehicleId().toString().contains("bus")){
 			this.fare = calculateFare(event, population);
-			AgentMoneyEvent moneyEvent = new AgentMoneyEvent(event.getTime(), event.getPersonId(), fare);
+			PersonMoneyEvent moneyEvent = new PersonMoneyEvent(event.getTime(), event.getPersonId(), fare);
 			this.events.processEvent(moneyEvent); //schickt das MoneyEvent an den EventManager
 		}
 	}

@@ -24,9 +24,9 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
-import org.matsim.core.api.experimental.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.handler.Wait2LinkEventHandler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;

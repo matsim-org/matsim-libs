@@ -29,13 +29,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.charts.XYLineChart;
@@ -46,8 +46,8 @@ import org.matsim.core.utils.charts.XYLineChart;
  *
  * @author yu
  */
-public class LegHisto implements AgentDepartureEventHandler,
-		AgentArrivalEventHandler, AgentStuckEventHandler {
+public class LegHisto implements PersonDepartureEventHandler,
+		PersonArrivalEventHandler, PersonStuckEventHandler {
 	private final Map<String, ModeData> data = new HashMap<String, ModeData>(
 			5, 0.85f);
 	private int binSize, nofBins;
@@ -109,7 +109,7 @@ public class LegHisto implements AgentDepartureEventHandler,
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		int index = getBinIndex(event.getTime());
 		if (event.getPersonId().toString().startsWith("pt"))
 			this.drvrModesData.countsArr[index]++;
@@ -120,7 +120,7 @@ public class LegHisto implements AgentDepartureEventHandler,
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		int index = getBinIndex(event.getTime());
 		if (event.getPersonId().toString().startsWith("pt"))
 			this.drvrModesData.countsDep[index]++;
@@ -131,7 +131,7 @@ public class LegHisto implements AgentDepartureEventHandler,
 	}
 
 	@Override
-	public void handleEvent(AgentStuckEvent event) {
+	public void handleEvent(PersonStuckEvent event) {
 		int index = getBinIndex(event.getTime());
 		if (event.getPersonId().toString().startsWith("pt"))
 			this.drvrModesData.countsStuck[index]++;

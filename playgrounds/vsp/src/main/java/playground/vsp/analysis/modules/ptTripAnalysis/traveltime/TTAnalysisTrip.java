@@ -23,10 +23,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.api.experimental.events.Event;
 
 import playground.vsp.analysis.modules.ptTripAnalysis.AbstractAnalysisTrip;
 

@@ -6,8 +6,8 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 
 
 public class PotsdamEventHandlerPersonUseBridge implements LinkLeaveEventHandler{

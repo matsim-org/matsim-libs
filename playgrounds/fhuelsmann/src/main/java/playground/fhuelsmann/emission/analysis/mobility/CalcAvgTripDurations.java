@@ -23,13 +23,13 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 
-public class CalcAvgTripDurations implements AgentDepartureEventHandler, AgentArrivalEventHandler {
+public class CalcAvgTripDurations implements PersonDepartureEventHandler, PersonArrivalEventHandler {
 
 	//TO DO: getRelevantPopulation between ZoneId x and all other zones, 
 	//calculate the aggregated travel time for all people traveling between zone x and all other zones 
@@ -44,11 +44,11 @@ public class CalcAvgTripDurations implements AgentDepartureEventHandler, AgentAr
 	private double travelTimeSum;
 	private int travelTimeCnt;
 
-	public void handleEvent(final AgentDepartureEvent event) {
+	public void handleEvent(final PersonDepartureEvent event) {
 		this.agentDepartures.put(event.getPersonId().toString(), event.getTime());
 	}
 
-	public void handleEvent(final AgentArrivalEvent event) {
+	public void handleEvent(final PersonArrivalEvent event) {
 		double departureTime = this.agentDepartures.get(event.getPersonId().toString());
 		double travelTime = event.getTime() - departureTime;
 		this.travelTimeSum+= travelTime;

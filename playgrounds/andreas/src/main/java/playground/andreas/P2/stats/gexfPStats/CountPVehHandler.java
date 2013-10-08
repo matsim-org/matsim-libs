@@ -25,8 +25,8 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 
 /**
  * Counts the number of paratransit vehicles per link

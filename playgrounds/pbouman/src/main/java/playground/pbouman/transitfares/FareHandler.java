@@ -7,21 +7,21 @@ import java.util.HashSet;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.AgentMoneyEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
-import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
-import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
-import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 
 import playground.pbouman.transitfares.FarePolicies.DiscountInterval;
@@ -230,7 +230,7 @@ public class FareHandler implements
 				factor = as.getSensitivity(p);
 			}
 			
-			AgentMoneyEvent ame =  new AgentMoneyEvent(24*3600, p, -(fare*factor));
+			PersonMoneyEvent ame =  new PersonMoneyEvent(24*3600, p, -(fare*factor));
 			rev += fare;
 			event.getControler().getEvents().processEvent(ame);
 		}

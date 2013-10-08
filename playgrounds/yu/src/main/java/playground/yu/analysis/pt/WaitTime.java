@@ -26,15 +26,15 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.utils.misc.Time;
 
 import playground.yu.utils.charts.TimeScatterChart;
@@ -47,7 +47,7 @@ import playground.yu.utils.io.SimpleWriter;
  * 
  */
 public class WaitTime implements PersonEntersVehicleEventHandler,
-		AgentDepartureEventHandler, AgentArrivalEventHandler {
+		PersonDepartureEventHandler, PersonArrivalEventHandler {
 	/** saves the first departure times of every agent/person */
 	private final Map<Id, Double> firstDepartures = new HashMap<Id, Double>(),
 	/** saves the newest departure times of every agent/person */
@@ -92,7 +92,7 @@ public class WaitTime implements PersonEntersVehicleEventHandler,
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		Id perId = event.getPersonId();
 		double time/* [s] */= event.getTime();
 
@@ -104,7 +104,7 @@ public class WaitTime implements PersonEntersVehicleEventHandler,
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		arrivals.put(event.getPersonId()/* personId */, event.getTime()/* arrivalTime */);
 	}
 

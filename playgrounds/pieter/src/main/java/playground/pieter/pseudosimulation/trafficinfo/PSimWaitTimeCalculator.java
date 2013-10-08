@@ -1,10 +1,10 @@
 package playground.pieter.pseudosimulation.trafficinfo;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
 
 import playground.pieter.pseudosimulation.controler.listeners.MobSimSwitcher;
@@ -34,7 +34,7 @@ public class PSimWaitTimeCalculator extends WaitTimeStuckCalculator {
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		if (MobSimSwitcher.isQSimIteration)
 			super.handleEvent(event);
 	}
@@ -46,7 +46,7 @@ public class PSimWaitTimeCalculator extends WaitTimeStuckCalculator {
 	}
 
 	@Override
-	public void handleEvent(AgentStuckEvent event) {
+	public void handleEvent(PersonStuckEvent event) {
 		if (MobSimSwitcher.isQSimIteration)
 			super.handleEvent(event);
 	}

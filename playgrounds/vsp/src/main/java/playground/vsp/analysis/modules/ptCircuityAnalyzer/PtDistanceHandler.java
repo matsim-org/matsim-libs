@@ -31,20 +31,20 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
-import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
-import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
-import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
-import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
+import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.vehicles.Vehicles;
 
@@ -56,7 +56,7 @@ import org.matsim.vehicles.Vehicles;
 public class PtDistanceHandler implements ActivityStartEventHandler,
 	PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, 
 	LinkEnterEventHandler, VehicleArrivesAtFacilityEventHandler,
-	TransitDriverStartsEventHandler, AgentDepartureEventHandler {
+	TransitDriverStartsEventHandler, PersonDepartureEventHandler {
 	
 	//TODO: Find Coord for each vehicle before first departure:
 	/*
@@ -217,7 +217,7 @@ public class PtDistanceHandler implements ActivityStartEventHandler,
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		if(!transitDrivers.contains(event.getPersonId())) {
 			if(legMode.containsKey(event.getPersonId())) {
 				// ignore changes from pt to transit walk in order to separate transit_walk only legs

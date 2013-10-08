@@ -20,9 +20,9 @@
 package playground.andreas.P2.scoring.fare;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
-import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
-import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 
 /**

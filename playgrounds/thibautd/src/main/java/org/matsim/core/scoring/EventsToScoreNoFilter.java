@@ -23,21 +23,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentMoneyEvent;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.Event;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.TravelledEvent;
+import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.VspExperimentalConfigKey;
 import org.matsim.core.events.handler.BasicEventHandler;
 
@@ -105,24 +104,24 @@ public class EventsToScoreNoFilter implements BasicEventHandler {
 			eventsToLegs.handleEvent((LinkEnterEvent) event) ;
 		} else if ( event instanceof LinkLeaveEvent ) {
 			eventsToLegs.handleEvent((LinkLeaveEvent) event ) ;
-		} else if ( event instanceof AgentDepartureEvent ) {
-			eventsToLegs.handleEvent((AgentDepartureEvent) event) ;
-		} else if ( event instanceof AgentArrivalEvent ) {
-			eventsToLegs.handleEvent((AgentArrivalEvent) event ) ;
+		} else if ( event instanceof PersonDepartureEvent ) {
+			eventsToLegs.handleEvent((PersonDepartureEvent) event) ;
+		} else if ( event instanceof PersonArrivalEvent ) {
+			eventsToLegs.handleEvent((PersonArrivalEvent) event ) ;
 		} else if ( event instanceof ActivityStartEvent ) {
 			eventsToActivities.handleEvent((ActivityStartEvent) event) ;
 		} else if ( event instanceof ActivityEndEvent ) {
 			eventsToActivities.handleEvent( (ActivityEndEvent) event ) ;
-		} else if ( event instanceof TravelledEvent ) {
-			eventsToLegs.handleEvent( (TravelledEvent) event ) ;
+		} else if ( event instanceof TeleportationArrivalEvent ) {
+			eventsToLegs.handleEvent( (TeleportationArrivalEvent) event ) ;
 		} 
 
 		for ( ScoringFunction sf : functionsMap.values() ) {
 			if (sf != null) {
-				if ( event instanceof AgentStuckEvent ) {
+				if ( event instanceof PersonStuckEvent ) {
 					sf.agentStuck( event.getTime() ) ;
-				} else if ( event instanceof AgentMoneyEvent ) {
-					sf.addMoney( ((AgentMoneyEvent)event).getAmount() ) ;
+				} else if ( event instanceof PersonMoneyEvent ) {
+					sf.addMoney( ((PersonMoneyEvent)event).getAmount() ) ;
 				} else {
 					sf.handleEvent( event ) ;
 				}

@@ -23,9 +23,9 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.Event;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.handler.EventHandler;
 
@@ -35,16 +35,16 @@ import playground.vsp.analysis.modules.AbstractAnalyisModule;
  * @author droeder
  *
  */
-public class GetStuckEvents extends AbstractAnalyisModule implements AgentStuckEventHandler{
+public class GetStuckEvents extends AbstractAnalyisModule implements PersonStuckEventHandler{
 	
-	private Collection<AgentStuckEvent> stuckEvents;
+	private Collection<PersonStuckEvent> stuckEvents;
 
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger.getLogger(GetStuckEvents.class);
 
 	public GetStuckEvents() {
 		super(GetStuckEvents.class.getSimpleName());
-		this.stuckEvents = new ArrayList<AgentStuckEvent>();
+		this.stuckEvents = new ArrayList<PersonStuckEvent>();
 	}
 
 	@Override
@@ -53,14 +53,14 @@ public class GetStuckEvents extends AbstractAnalyisModule implements AgentStuckE
 	}
 
 	@Override
-	public void handleEvent(AgentStuckEvent event) {
+	public void handleEvent(PersonStuckEvent event) {
 		this.stuckEvents.add(event);
 	}
 
 	/**
 	 * @return
 	 */
-	public Collection<AgentStuckEvent> getEvents() {
+	public Collection<PersonStuckEvent> getEvents() {
 		return this.stuckEvents;
 	}
 

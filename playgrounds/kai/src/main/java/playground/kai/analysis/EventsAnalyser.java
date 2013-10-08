@@ -25,25 +25,25 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 
 class EventsAnalyser {
 	
-	class MyEventHandler1 implements AgentDepartureEventHandler, AgentArrivalEventHandler {
+	class MyEventHandler1 implements PersonDepartureEventHandler, PersonArrivalEventHandler {
 		
 		MyEventHandler1() {
 		}
 		
-		private Map<Id,AgentDepartureEvent> departureMap = new HashMap<Id,AgentDepartureEvent>() ;
+		private Map<Id,PersonDepartureEvent> departureMap = new HashMap<Id,PersonDepartureEvent>() ;
 
 		@Override
-		public void handleEvent(AgentDepartureEvent event) {
+		public void handleEvent(PersonDepartureEvent event) {
 			departureMap.put( event.getPersonId(), event ) ;
 		}
 
@@ -54,11 +54,11 @@ class EventsAnalyser {
 		private double cntPt = 0. ;
 		
 		@Override
-		public void handleEvent(AgentArrivalEvent arEvent) {
+		public void handleEvent(PersonArrivalEvent arEvent) {
 			if ( !departureMap.containsKey( arEvent.getPersonId() )) {
 				Logger.getLogger(this.getClass()).warn("no correspnding departure event found; dropping arrival event") ;
 			} else {
-				AgentDepartureEvent dpEvent = departureMap.get( arEvent.getPersonId() ) ;
+				PersonDepartureEvent dpEvent = departureMap.get( arEvent.getPersonId() ) ;
 				double ttime = arEvent.getTime() - dpEvent.getTime();
 				String mode = arEvent.getLegMode() ;
 				if ( mode.equals("car") ) {

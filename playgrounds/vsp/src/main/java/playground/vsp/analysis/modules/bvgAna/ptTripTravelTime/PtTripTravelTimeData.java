@@ -24,10 +24,10 @@ import java.util.LinkedList;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.core.utils.collections.Tuple;
 
 /**
@@ -51,12 +51,12 @@ public class PtTripTravelTimeData {
 		this.startAct = startAct;
 	}
 
-	protected void handle(AgentDepartureEvent event) {
+	protected void handle(PersonDepartureEvent event) {
 		// preregister
 		this.type2TravelTimeMap.add(new Tuple<String, Double>(event.getLegMode(), new Double(event.getTime())));		
 	}
 
-	protected void handle(AgentArrivalEvent event) {		
+	protected void handle(PersonArrivalEvent event) {		
 		if(this.type2TravelTimeMap.getLast().getFirst().equalsIgnoreCase(event.getLegMode())){
 			// calculate leg travel time
 			Tuple<String, Double> lastEntry = this.type2TravelTimeMap.removeLast();

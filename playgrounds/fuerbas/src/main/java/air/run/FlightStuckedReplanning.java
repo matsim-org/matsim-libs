@@ -25,11 +25,11 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.controler.events.ReplanningEvent;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.ReplanningListener;
@@ -43,7 +43,7 @@ import org.matsim.core.router.TripRouter;
  * @author dgrether
  *
  */
-public class FlightStuckedReplanning implements ReplanningListener, AgentStuckEventHandler, StartupListener{
+public class FlightStuckedReplanning implements ReplanningListener, PersonStuckEventHandler, StartupListener{
 
 	private static final Logger log = Logger.getLogger(FlightStuckedReplanning.class);
 
@@ -78,7 +78,7 @@ public class FlightStuckedReplanning implements ReplanningListener, AgentStuckEv
 
 
 	@Override
-	public void handleEvent(AgentStuckEvent event) {
+	public void handleEvent(PersonStuckEvent event) {
 		this.stuckedPersonIds .add(event.getPersonId());
 	}
 

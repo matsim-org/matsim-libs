@@ -20,7 +20,6 @@ package playground.anhorni.surprice.analysis;
 
 import java.io.File;
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -29,7 +28,6 @@ import java.util.Map;
 import org.apache.commons.math.stat.Frequency;
 import org.apache.commons.math.util.ResizableDoubleArray;
 import org.apache.log4j.Logger;
-
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartUtilities;
 import org.jfree.chart.JFreeChart;
@@ -37,20 +35,18 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.data.statistics.HistogramDataset;
 import org.jfree.data.statistics.HistogramType;
 import org.jfree.data.xy.XYSeries;
-
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.utils.geometry.CoordUtils;
 
 import utils.Utils;
-
 import herbie.running.population.algorithms.AbstractClassifiedFrequencyAnalysis;
 
 /**
@@ -61,14 +57,14 @@ import herbie.running.population.algorithms.AbstractClassifiedFrequencyAnalysis;
  *
  * @author thibautd adapted by anhorni
  */
-public class ModeSharesEventHandler extends AbstractClassifiedFrequencyAnalysis implements AgentDepartureEventHandler, AgentArrivalEventHandler {
+public class ModeSharesEventHandler extends AbstractClassifiedFrequencyAnalysis implements PersonDepartureEventHandler, PersonArrivalEventHandler {
 	private static final Logger log = Logger.getLogger(ModeSharesEventHandler.class);
 
 	// use euclidean distance rather than network distance, as linkEvents
 	// are not generated for non-car modes.
 	private static final String ALL_MODES = "allAvailableModes";
 
-	private final Map<Id, AgentDepartureEvent> pendantDepartures = new HashMap<Id, AgentDepartureEvent>();
+	private final Map<Id, PersonDepartureEvent> pendantDepartures = new HashMap<Id, PersonDepartureEvent>();
 	private final Network network;
 	private boolean toReset = false;
 	private double maxXYForPlotting = 100000; // [m]
@@ -107,10 +103,10 @@ public class ModeSharesEventHandler extends AbstractClassifiedFrequencyAnalysis 
 	}
 
 	@Override
-	public void handleEvent(final AgentDepartureEvent event) {
+	public void handleEvent(final PersonDepartureEvent event) {
 		this.doReset();
 		// catch the previous value to check consistency of the process
-		AgentDepartureEvent old =
+		PersonDepartureEvent old =
 			this.pendantDepartures.put(event.getPersonId(), event);
 
 		if (old != null) {
@@ -120,9 +116,9 @@ public class ModeSharesEventHandler extends AbstractClassifiedFrequencyAnalysis 
 	}
 
 	@Override
-	public void handleEvent(final AgentArrivalEvent arrivalEvent) {
+	public void handleEvent(final PersonArrivalEvent arrivalEvent) {
 		this.doReset();
-		AgentDepartureEvent departureEvent = this.pendantDepartures.remove(arrivalEvent.getPersonId());
+		PersonDepartureEvent departureEvent = this.pendantDepartures.remove(arrivalEvent.getPersonId());
 		String mode = arrivalEvent.getLegMode();
 		Frequency frequency;
 		ResizableDoubleArray rawDataElement;
@@ -162,11 +158,11 @@ public class ModeSharesEventHandler extends AbstractClassifiedFrequencyAnalysis 
 		rawDataElement.addElement(xyVal);
 	}
 		
-	private double computeTimes(final AgentArrivalEvent arrivalEvent, final AgentDepartureEvent departureEvent) {
+	private double computeTimes(final PersonArrivalEvent arrivalEvent, final PersonDepartureEvent departureEvent) {
 		return (arrivalEvent.getTime() - departureEvent.getTime());
 	}
 	
-	private double computeDistances(final AgentArrivalEvent arrivalEvent, final AgentDepartureEvent departureEvent) {
+	private double computeDistances(final PersonArrivalEvent arrivalEvent, final PersonDepartureEvent departureEvent) {
 		Link departureLink;
 		Link arrivalLink;
 		double distance;

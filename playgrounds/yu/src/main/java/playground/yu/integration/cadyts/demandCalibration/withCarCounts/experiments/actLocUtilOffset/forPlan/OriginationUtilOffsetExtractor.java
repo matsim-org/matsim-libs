@@ -32,11 +32,11 @@ import java.util.Map.Entry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -58,7 +58,7 @@ import utilities.misc.DynamicData;
  */
 public class OriginationUtilOffsetExtractor extends
 		ActivityLocationUtilOffsetExtractor implements
-		AgentDepartureEventHandler {
+		PersonDepartureEventHandler {
 	private Map<Integer/* timeStep */, List<Tuple<Id/* agent */, Coord/* gridCenter */>>> departureTime_agent_locs = new HashMap<Integer, List<Tuple<Id, Coord>>>();
 
 	// /*
@@ -77,7 +77,7 @@ public class OriginationUtilOffsetExtractor extends
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		Id agentId = event.getPersonId();
 		Id linkId = event.getLinkId();
 		int timeStep = getTimeStep(event.getTime());

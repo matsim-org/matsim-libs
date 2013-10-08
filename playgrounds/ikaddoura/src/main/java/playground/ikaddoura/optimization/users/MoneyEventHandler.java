@@ -29,15 +29,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentMoneyEvent;
-import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 
 
 /**
  * @author Ihab
  *
  */
-public class MoneyEventHandler implements AgentMoneyEventHandler {
+public class MoneyEventHandler implements PersonMoneyEventHandler {
 
 	private double revenues;
 	private List<FareData> fareDataList = new ArrayList<FareData>();
@@ -51,7 +51,7 @@ public class MoneyEventHandler implements AgentMoneyEventHandler {
 	}
 
 	@Override
-	public void handleEvent(AgentMoneyEvent event) {
+	public void handleEvent(PersonMoneyEvent event) {
 		
 		this.revenues = this.revenues + (-1 * event.getAmount());
 		

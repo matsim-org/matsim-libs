@@ -10,12 +10,12 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
-import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
-import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
-import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
+import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
+import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.transitSchedule.api.Departure;

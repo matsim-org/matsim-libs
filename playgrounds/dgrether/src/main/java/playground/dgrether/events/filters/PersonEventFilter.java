@@ -21,15 +21,15 @@ package playground.dgrether.events.filters;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.Wait2LinkEvent;
-import org.matsim.core.api.experimental.events.Event;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 
 
 /**
@@ -59,12 +59,12 @@ public class PersonEventFilter implements EventFilter {
 			Wait2LinkEvent e = (Wait2LinkEvent) event;
 			Id personId = e.getPersonId();
 			this.personIds.contains(personId);
-		} else if (event instanceof AgentDepartureEvent) {
-			AgentDepartureEvent e = (AgentDepartureEvent) event;
+		} else if (event instanceof PersonDepartureEvent) {
+			PersonDepartureEvent e = (PersonDepartureEvent) event;
 			Id personId = e.getPersonId();
 			this.personIds.contains(personId);
-		} else if (event instanceof AgentArrivalEvent) {
-			AgentArrivalEvent e = (AgentArrivalEvent) event;
+		} else if (event instanceof PersonArrivalEvent) {
+			PersonArrivalEvent e = (PersonArrivalEvent) event;
 			Id personId = e.getPersonId();
 			this.personIds.contains(personId);
 		} else if (event instanceof ActivityStartEvent) {
@@ -75,8 +75,8 @@ public class PersonEventFilter implements EventFilter {
 			ActivityEndEvent e = (ActivityEndEvent) event;
 			Id personId = e.getPersonId();
 			this.personIds.contains(personId);
-		} else if (event instanceof AgentStuckEvent) {
-			AgentStuckEvent e = (AgentStuckEvent) event;
+		} else if (event instanceof PersonStuckEvent) {
+			PersonStuckEvent e = (PersonStuckEvent) event;
 			Id personId = e.getPersonId();
 			this.personIds.contains(personId);
 		} else {

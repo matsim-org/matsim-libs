@@ -27,8 +27,8 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
-import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
-import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
+import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
+import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.Vehicles;
 

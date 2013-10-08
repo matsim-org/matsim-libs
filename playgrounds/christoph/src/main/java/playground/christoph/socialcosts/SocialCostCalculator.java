@@ -31,20 +31,19 @@ import org.apache.commons.math.stat.descriptive.DescriptiveStatistics;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentMoneyEvent;
-import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.events.IterationStartsEvent;
@@ -68,7 +67,7 @@ import org.matsim.vehicles.Vehicle;
  */
 public class SocialCostCalculator implements TravelDisutility,
 		IterationStartsListener, IterationEndsListener, AfterMobsimListener,
-		AgentDepartureEventHandler, AgentArrivalEventHandler,
+		PersonDepartureEventHandler, PersonArrivalEventHandler,
 		LinkEnterEventHandler, LinkLeaveEventHandler {
 
 	private static Logger log = Logger.getLogger(SocialCostCalculator.class);
@@ -228,7 +227,7 @@ public class SocialCostCalculator implements TravelDisutility,
 	}
 
 	@Override
-	public void handleEvent(final AgentDepartureEvent event) {
+	public void handleEvent(final PersonDepartureEvent event) {
 		/*
 		 * If the TransportMode does not create any congestion (e.g. walk,
 		 * bike), it is ignored.
@@ -254,7 +253,7 @@ public class SocialCostCalculator implements TravelDisutility,
 	}
 
 	@Override
-	public void handleEvent(final AgentArrivalEvent event) {
+	public void handleEvent(final PersonArrivalEvent event) {
 		/*
 		 * Try to remove the Agent from the Active Set. If he was not
 		 * active, the performed Leg created no congestion and therefore
@@ -363,7 +362,7 @@ public class SocialCostCalculator implements TravelDisutility,
 			
 			if (socialCosts <= 0.0) continue;
 
-			AgentMoneyEvent e = new AgentMoneyEvent(0.5 * (linkTrip.enterTime + linkTrip.leaveTime), linkTrip.person_id, -socialCosts);
+			PersonMoneyEvent e = new PersonMoneyEvent(0.5 * (linkTrip.enterTime + linkTrip.leaveTime), linkTrip.person_id, -socialCosts);
 			this.events.processEvent(e);
 
 			totalSocialCosts = totalSocialCosts + socialCosts;

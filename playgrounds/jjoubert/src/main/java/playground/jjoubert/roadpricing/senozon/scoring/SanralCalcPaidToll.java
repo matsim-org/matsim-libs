@@ -24,15 +24,15 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.AgentMoneyEvent;
-import org.matsim.core.api.experimental.events.Wait2LinkEvent;
-import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.handler.Wait2LinkEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 
@@ -94,7 +94,7 @@ public class SanralCalcPaidToll implements LinkEnterEventHandler, Wait2LinkEvent
 	}
 
 	/**
-	 * Sends {@link AgentMoneyEvent}s for all agents that must pay a toll.
+	 * Sends {@link PersonMoneyEvent}s for all agents that must pay a toll.
 	 * This method should usually be called at the end before of an iteration.
 	 *
 	 * <strong>Important note: </strong>Do not call this method twice without
@@ -106,7 +106,7 @@ public class SanralCalcPaidToll implements LinkEnterEventHandler, Wait2LinkEvent
 	 */
 	public void sendUtilityEvents(final double time, final EventsManager events) {
 		for (Map.Entry<Id, AgentInfo> entries : this.agents.entrySet()) {
-			events.processEvent(new AgentMoneyEvent(time, entries.getKey(), -entries.getValue().toll));
+			events.processEvent(new PersonMoneyEvent(time, entries.getKey(), -entries.getValue().toll));
 		}
 	}
 

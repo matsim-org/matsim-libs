@@ -12,35 +12,35 @@ import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
-import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 import org.matsim.core.network.NetworkReaderMatsimV1;
 import org.matsim.core.population.MatsimPopulationReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.population.routes.GenericRoute;
 
 
-public class ChainsAnalyzer implements ActivityStartEventHandler, ActivityEndEventHandler, AgentDepartureEventHandler, AgentArrivalEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, AgentStuckEventHandler {
+public class ChainsAnalyzer implements ActivityStartEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, PersonStuckEventHandler {
 
 	//Constants
 	private static final NumberFormat numberFormat = new DecimalFormat("00.0");
@@ -132,7 +132,7 @@ public class ChainsAnalyzer implements ActivityStartEventHandler, ActivityEndEve
 			throw new RuntimeException("Activity end without person");
 	}
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		List<String> activityChain = activityChains.get(event.getPersonId());
 		if(activityChain==null) {
 			activityChain = new ArrayList<String>();
@@ -141,7 +141,7 @@ public class ChainsAnalyzer implements ActivityStartEventHandler, ActivityEndEve
 		activityChain.add("*"+event.getLegMode()+"("+event.getLinkId()+")");
 	}
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		List<String> activityChain = activityChains.get(event.getPersonId());
 		if(activityChain!=null) {
 			String lastLeg = activityChain.get(activityChain.size()-1);
@@ -183,7 +183,7 @@ public class ChainsAnalyzer implements ActivityStartEventHandler, ActivityEndEve
 			throw new RuntimeException("Enter vehicle without person");
 	}
 	@Override
-	public void handleEvent(AgentStuckEvent event) {
+	public void handleEvent(PersonStuckEvent event) {
 		List<String> activityChain = activityChains.get(event.getPersonId());
 		if(activityChain!=null)
 			activityChain.add("%%%("+numberFormat.format(event.getTime()/3600)+")");

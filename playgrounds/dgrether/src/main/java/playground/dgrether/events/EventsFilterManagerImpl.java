@@ -21,7 +21,7 @@ package playground.dgrether.events;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.matsim.core.api.experimental.events.Event;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.events.EventsManagerImpl;
 
 import playground.dgrether.events.filters.EventFilter;

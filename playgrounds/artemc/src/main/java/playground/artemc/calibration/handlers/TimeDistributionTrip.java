@@ -16,11 +16,11 @@ import java.util.TreeMap;
 import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.pt.PtConstants;
@@ -30,7 +30,7 @@ import org.matsim.pt.PtConstants;
  * @author sergioo
  *
  */
-public class TimeDistributionTrip implements AgentDepartureEventHandler, ActivityStartEventHandler {
+public class TimeDistributionTrip implements PersonDepartureEventHandler, ActivityStartEventHandler {
 
 	//Private classes
 	private class TravellerChain {
@@ -78,7 +78,7 @@ public class TimeDistributionTrip implements AgentDepartureEventHandler, Activit
 		}
 	}
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		if (pIdsToExclude.contains(event.getPersonId())) { return; }
 		TravellerChain chain = chains.get(event.getPersonId());
 		if(chain == null) {

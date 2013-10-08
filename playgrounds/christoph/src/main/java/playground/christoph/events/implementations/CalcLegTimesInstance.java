@@ -23,14 +23,14 @@ package playground.christoph.events.implementations;
 import java.util.concurrent.ConcurrentMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 
 import playground.christoph.events.EventHandlerInstance;
 
@@ -43,8 +43,8 @@ import playground.christoph.events.EventHandlerInstance;
  * Also calculates the average trip duration.
  * Trips ended because of vehicles being stuck are not counted.
  */
-public class CalcLegTimesInstance implements EventHandlerInstance, AgentDepartureEventHandler, 
-		AgentArrivalEventHandler, ActivityEndEventHandler, ActivityStartEventHandler {
+public class CalcLegTimesInstance implements EventHandlerInstance, PersonDepartureEventHandler, 
+		PersonArrivalEventHandler, ActivityEndEventHandler, ActivityStartEventHandler {
 
 	private final ConcurrentMap<Id, Double> agentDepartures;
 	private final ConcurrentMap<Id, Double> agentArrivals;
@@ -67,12 +67,12 @@ public class CalcLegTimesInstance implements EventHandlerInstance, AgentDepartur
 	}
 	
 	@Override
-	public void handleEvent(final AgentDepartureEvent event) {
+	public void handleEvent(final PersonDepartureEvent event) {
 		this.agentDepartures.put(event.getPersonId(), event.getTime());
 	}
 
 	@Override
-	public void handleEvent(final AgentArrivalEvent event) {
+	public void handleEvent(final PersonArrivalEvent event) {
 		this.agentArrivals.put(event.getPersonId(), event.getTime());
 	}
 

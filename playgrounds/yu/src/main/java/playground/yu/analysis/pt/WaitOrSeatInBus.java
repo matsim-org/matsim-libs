@@ -31,15 +31,15 @@ import java.util.TreeMap;
 
 import org.jfree.chart.plot.PlotOrientation;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
-import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 
@@ -51,7 +51,7 @@ import playground.yu.utils.io.SimpleWriter;
  * 
  */
 public class WaitOrSeatInBus implements PersonEntersVehicleEventHandler,
-		AgentDepartureEventHandler, VehicleDepartsAtFacilityEventHandler {
+		PersonDepartureEventHandler, VehicleDepartsAtFacilityEventHandler {
 	/** saves the waitTimes of every timeBin */
 	private Map<Integer, Double> wtobSums = new TreeMap<Integer, Double>(),
 			wibSums = new TreeMap<Integer, Double>();
@@ -142,7 +142,7 @@ public class WaitOrSeatInBus implements PersonEntersVehicleEventHandler,
 
 	}
 
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		Id perId = event.getPersonId();
 		double time/* [s] */= event.getTime();
 		if (!perId.toString().startsWith("pt"))

@@ -24,12 +24,12 @@
 package tryouts.examples;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 
 /**
  * @author thomas
@@ -58,14 +58,14 @@ public class MyEventHandler1 implements LinkEnterEventHandler,LinkLeaveEventHand
 		log.info("PersonId: " + event.getPersonId());
 	}
 
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		log.info("AgentArrivalEvent");
 		log.info("Time: " + event.getTime());
 		log.info("LinkId: " + event.getLinkId());
 		log.info("PersonId: " + event.getPersonId());
 	}
 
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		log.info("AgentDepartureEvent");
 		log.info("Time: " + event.getTime());
 		log.info("LinkId: " + event.getLinkId());

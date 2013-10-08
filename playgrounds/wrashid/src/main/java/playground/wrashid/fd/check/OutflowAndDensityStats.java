@@ -1,16 +1,16 @@
 package playground.wrashid.fd.check;
 
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.Wait2LinkEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -33,8 +33,8 @@ public class OutflowAndDensityStats {
 	}
 
 	static class CountNumberOfAgents implements LinkLeaveEventHandler,
-	LinkEnterEventHandler, AgentArrivalEventHandler,
-	Wait2LinkEventHandler, AgentDepartureEventHandler {
+	LinkEnterEventHandler, PersonArrivalEventHandler,
+	Wait2LinkEventHandler, PersonDepartureEventHandler {
 		int wait2Link;
 		int arrival;
 		int departure;
@@ -60,7 +60,7 @@ public class OutflowAndDensityStats {
 		}
 
 		@Override
-		public void handleEvent(AgentArrivalEvent event) {
+		public void handleEvent(PersonArrivalEvent event) {
 			arrival++;
 		}
 
@@ -75,7 +75,7 @@ public class OutflowAndDensityStats {
 		}
 
 		@Override
-		public void handleEvent(AgentDepartureEvent event) {
+		public void handleEvent(PersonDepartureEvent event) {
 			departure++;			
 		}
 		

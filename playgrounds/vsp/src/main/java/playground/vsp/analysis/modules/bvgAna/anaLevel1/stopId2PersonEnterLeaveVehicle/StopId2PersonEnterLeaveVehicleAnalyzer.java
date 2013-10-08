@@ -29,10 +29,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
-import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.scenario.ScenarioImpl;
 

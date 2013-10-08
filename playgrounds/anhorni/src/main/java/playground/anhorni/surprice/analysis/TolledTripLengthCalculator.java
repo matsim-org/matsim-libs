@@ -25,12 +25,12 @@ import java.util.TreeMap;
 
 import org.matsim.analysis.Bins;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
 import org.matsim.utils.objectattributes.ObjectAttributes;
@@ -39,7 +39,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
  * Calculates the distance of a trip which occurred on tolled links.
  * Requires roadpricing to be on.
  */
-public class TolledTripLengthCalculator implements LinkEnterEventHandler, AgentArrivalEventHandler {
+public class TolledTripLengthCalculator implements LinkEnterEventHandler, PersonArrivalEventHandler {
 	private double sumLength = 0.0;
 	private double sumLengthIncomeWeighted = 0.0;
 	private int cntTrips = 0;
@@ -91,7 +91,7 @@ public class TolledTripLengthCalculator implements LinkEnterEventHandler, AgentA
 	}
 
 	@Override
-	public void handleEvent(final AgentArrivalEvent event) {
+	public void handleEvent(final PersonArrivalEvent event) {
 		// at arrival of the agent ...
 		
 		// get the accumulated "tolled" length from the agent

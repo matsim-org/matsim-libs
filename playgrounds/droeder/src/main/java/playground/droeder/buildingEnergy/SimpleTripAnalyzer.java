@@ -28,18 +28,18 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.utils.geometry.CoordUtils;
@@ -56,9 +56,9 @@ import org.matsim.population.algorithms.AbstractPersonAlgorithm;
  */
 class SimpleTripAnalyzer extends AbstractPersonAlgorithm 
 								implements LinkLeaveEventHandler,
-										AgentArrivalEventHandler,
-										AgentDepartureEventHandler, 
-										AgentStuckEventHandler {
+										PersonArrivalEventHandler,
+										PersonDepartureEventHandler, 
+										PersonStuckEventHandler {
 
 	@SuppressWarnings("unused")
 	private static final Logger log = Logger
@@ -82,7 +82,7 @@ class SimpleTripAnalyzer extends AbstractPersonAlgorithm
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		Traveller t = this.traveller.get(event.getPersonId());
 		if(t == null){
 			t = new Traveller(event.getPersonId());
@@ -107,7 +107,7 @@ class SimpleTripAnalyzer extends AbstractPersonAlgorithm
 
 	
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		Traveller t = this.traveller.get(event.getPersonId());
 		if(t == null){
 			return;
@@ -116,7 +116,7 @@ class SimpleTripAnalyzer extends AbstractPersonAlgorithm
 	}
 	
 	@Override
-	public void handleEvent(AgentStuckEvent event) {
+	public void handleEvent(PersonStuckEvent event) {
 		Traveller t = this.traveller.get(event.getPersonId());
 		if(t == null){
 			return;

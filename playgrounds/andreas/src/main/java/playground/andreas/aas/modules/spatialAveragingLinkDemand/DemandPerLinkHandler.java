@@ -30,19 +30,19 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.collections.Tuple;
 
-public class DemandPerLinkHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandler,AgentDepartureEventHandler {
+public class DemandPerLinkHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler,PersonDepartureEventHandler {
 	private static final Logger logger = Logger.getLogger(DemandPerLinkHandler.class);
 
 	Map<Id, Tuple<Id, Double>> linkenter = new HashMap<Id, Tuple<Id, Double>>();
@@ -173,7 +173,7 @@ public class DemandPerLinkHandler implements LinkEnterEventHandler, LinkLeaveEve
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		if(!event.getLegMode().equals("car")){ // link travel time calculation not neccessary for other modes
 			return;
 		}
@@ -182,7 +182,7 @@ public class DemandPerLinkHandler implements LinkEnterEventHandler, LinkLeaveEve
 	}
 	
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		if(!event.getLegMode().equals("car")){ // link travel time calculation not neccessary for other modes
 			return;
 		}

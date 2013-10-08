@@ -30,17 +30,17 @@ import java.util.Map;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.Event;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.collections.QuadTree.Rect;
 import org.matsim.core.utils.collections.Tuple;
@@ -53,7 +53,7 @@ import playground.wdoering.grips.v2.analysis.data.Cell;
 import playground.wdoering.grips.v2.analysis.data.ColorationMode;
 import playground.wdoering.grips.v2.analysis.data.EventData;
 
-public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandler, AgentDepartureEventHandler, Runnable {
+public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler, PersonDepartureEventHandler, Runnable {
 
 	private HashMap<Integer, int[]> networkLinks = null;
 
@@ -180,7 +180,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		if (event.getPersonId().toString().contains("veh"))
 			return;
 
@@ -188,7 +188,7 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 		this.events.put(event.getPersonId(), event);
 
 		// get cell from person id
-		AgentDepartureEvent departure = (AgentDepartureEvent) this.events.get(event.getPersonId());
+		PersonDepartureEvent departure = (PersonDepartureEvent) this.events.get(event.getPersonId());
 		Link link = this.network.getLinks().get(departure.getLinkId());
 		Coord c = link.getCoord();
 		Cell cell = this.cellTree.get(c.getX(), c.getY());
@@ -200,13 +200,13 @@ public class EventHandler implements LinkEnterEventHandler, LinkLeaveEventHandle
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 
 		if (event.getPersonId().toString().contains("veh"))
 			return;
 
 		// get cell from person id
-		AgentDepartureEvent departure = (AgentDepartureEvent) this.events.get(event.getPersonId());
+		PersonDepartureEvent departure = (PersonDepartureEvent) this.events.get(event.getPersonId());
 		Link link = this.network.getLinks().get(departure.getLinkId());
 		Coord c = link.getCoord();
 		Cell cell = this.cellTree.get(c.getX(), c.getY());

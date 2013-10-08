@@ -9,11 +9,11 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -33,7 +33,7 @@ import playground.wdoering.oldstufffromgregor.XYVxVyEventsHandler;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 
-public class BottleneckTimeDiagram implements XYVxVyEventsHandler, DoubleValueStringKeyAtCoordinateEventHandler, AgentArrivalEventHandler, LinkEnterEventHandler{
+public class BottleneckTimeDiagram implements XYVxVyEventsHandler, DoubleValueStringKeyAtCoordinateEventHandler, PersonArrivalEventHandler, LinkEnterEventHandler{
 
 	private double eventTime = 0;
 	private double densEventTime = 0;
@@ -702,7 +702,7 @@ public class BottleneckTimeDiagram implements XYVxVyEventsHandler, DoubleValueSt
 
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event)
+	public void handleEvent(PersonArrivalEvent event)
 	{
 
 			

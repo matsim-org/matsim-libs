@@ -24,20 +24,20 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.LaneEnterEvent;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.Wait2LinkEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.events.handler.LaneEnterEventHandler;
-import org.matsim.core.events.handler.LaneLeaveEventHandler;
+import org.matsim.core.api.experimental.events.handler.LaneEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.LaneLeaveEventHandler;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.lanes.data.v20.LaneData20;
 import org.matsim.lanes.data.v20.LaneDefinitions20;
@@ -48,7 +48,7 @@ import org.matsim.lanes.data.v20.LaneDefinitions20;
  *
  */
 public class DgSensorManager implements LinkEnterEventHandler, LinkLeaveEventHandler, 
-	AgentArrivalEventHandler, Wait2LinkEventHandler, LaneEnterEventHandler, LaneLeaveEventHandler{
+	PersonArrivalEventHandler, Wait2LinkEventHandler, LaneEnterEventHandler, LaneLeaveEventHandler{
 
 	private static final Logger log = Logger.getLogger(DgSensorManager.class);
 	
@@ -183,7 +183,7 @@ public class DgSensorManager implements LinkEnterEventHandler, LinkLeaveEventHan
 	}
 	
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		if (this.linkIdSensorMap.containsKey(event.getLinkId())){
 			this.linkIdSensorMap.get(event.getLinkId()).handleEvent(event);
 		}

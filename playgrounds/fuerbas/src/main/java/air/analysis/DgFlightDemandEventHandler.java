@@ -25,13 +25,13 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.core.api.experimental.events.BoardingDeniedEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.BoardingDeniedEventHandler;
 
 import air.demand.FlightODRelation;
@@ -42,9 +42,9 @@ import air.demand.FlightODRelation;
  * @author dgrether
  *
  */
-public class DgFlightDemandEventHandler implements AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler, BoardingDeniedEventHandler{
+public class DgFlightDemandEventHandler implements PersonArrivalEventHandler, PersonDepartureEventHandler, PersonStuckEventHandler, BoardingDeniedEventHandler{
 
-	private Map<Id, AgentDepartureEvent> agent2DepartureEventMap;
+	private Map<Id, PersonDepartureEvent> agent2DepartureEventMap;
 	private SortedMap<String, SortedMap<String, FlightODRelation>> fromAirport2FlightOdRelMap;
 	private int totalStuck;
 	private int totalDirectFlights;
@@ -56,7 +56,7 @@ public class DgFlightDemandEventHandler implements AgentArrivalEventHandler, Age
 	
 	@Override
 	public void reset(int iteration) {
-		this.agent2DepartureEventMap = new HashMap<Id, AgentDepartureEvent>();
+		this.agent2DepartureEventMap = new HashMap<Id, PersonDepartureEvent>();
 		this.fromAirport2FlightOdRelMap = new TreeMap<String, SortedMap<String, FlightODRelation>>();
 		this.totalStuck = 0;
 		this.totalDirectFlights = 0;
@@ -65,10 +65,10 @@ public class DgFlightDemandEventHandler implements AgentArrivalEventHandler, Age
 
 	
 	@Override
-	public void handleEvent(AgentStuckEvent event) {
+	public void handleEvent(PersonStuckEvent event) {
 		if (event.getLegMode().compareToIgnoreCase("pt") == 0 && !event.getPersonId().toString().startsWith("pt_")){
 			this.totalStuck++;
-			AgentDepartureEvent departureEvent = this.agent2DepartureEventMap.get(event.getPersonId());
+			PersonDepartureEvent departureEvent = this.agent2DepartureEventMap.get(event.getPersonId());
 			String fromAirport = departureEvent.getLinkId().toString();
 			String toAirport = "stuck";
 			this.addFromToRelation(fromAirport, toAirport);
@@ -91,10 +91,10 @@ public class DgFlightDemandEventHandler implements AgentArrivalEventHandler, Age
 	}
 	
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		if (event.getLegMode().compareToIgnoreCase("pt") == 0 && !event.getPersonId().toString().startsWith("pt_")){
 			this.totalDirectFlights++;
-			AgentDepartureEvent departureEvent = this.agent2DepartureEventMap.get(event.getPersonId());
+			PersonDepartureEvent departureEvent = this.agent2DepartureEventMap.get(event.getPersonId());
 			String fromAirport = departureEvent.getLinkId().toString();
 			String toAirport = event.getLinkId().toString();
 			this.addFromToRelation(fromAirport, toAirport);
@@ -102,7 +102,7 @@ public class DgFlightDemandEventHandler implements AgentArrivalEventHandler, Age
 	}
 	
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		if (event.getLegMode().compareToIgnoreCase("pt") == 0 && !event.getPersonId().toString().startsWith("pt_")){
 			this.agent2DepartureEventMap.put(event.getPersonId(), event);
 		}

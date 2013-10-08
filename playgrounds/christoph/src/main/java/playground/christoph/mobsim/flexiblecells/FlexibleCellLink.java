@@ -25,10 +25,10 @@ import java.util.LinkedList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.Wait2LinkEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 
@@ -550,7 +550,7 @@ public class FlexibleCellLink {
 				VehicleCell vehicleCell = (VehicleCell) cell;
 				MobsimAgent mobsimAgent = vehicleCell.getMobsimAgent();
 				this.simEngine.getMobsim().getEventsManager().processEvent(
-						new AgentStuckEvent(now, mobsimAgent.getId(), link.getId(), mobsimAgent.getMode()));
+						new PersonStuckEvent(now, mobsimAgent.getId(), link.getId(), mobsimAgent.getMode()));
 				this.simEngine.getMobsim().getAgentCounter().incLost();
 				this.simEngine.getMobsim().getAgentCounter().decLiving();
 			}
@@ -559,7 +559,7 @@ public class FlexibleCellLink {
 		
 		for (MobsimAgent mobsimAgent : this.waitingAfterActivityAgents) {
 			this.simEngine.getMobsim().getEventsManager().processEvent(
-					new AgentStuckEvent(now, mobsimAgent.getId(), link.getId(), mobsimAgent.getMode()));
+					new PersonStuckEvent(now, mobsimAgent.getId(), link.getId(), mobsimAgent.getMode()));
 			this.simEngine.getMobsim().getAgentCounter().incLost();
 			this.simEngine.getMobsim().getAgentCounter().decLiving();
 		}

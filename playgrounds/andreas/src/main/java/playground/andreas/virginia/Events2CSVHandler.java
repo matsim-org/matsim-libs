@@ -26,7 +26,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.AgentWaitingForPtEventHandler;
-import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
+import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
 
 /**
  * 

@@ -27,11 +27,11 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -49,7 +49,7 @@ import org.matsim.core.utils.io.IOUtils;
  * <p/>
  * yyyy This is a prototype, which might replace the original class since it is more useful for some practical things.  kai, jul'11 
  */
-public class MyCalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEventHandler {
+public class MyCalcLegTimes implements PersonDepartureEventHandler, PersonArrivalEventHandler {
 
 	private Map<Id, Integer> agent2Time = new HashMap<Id, Integer>();
 	private Map<Id, Integer> agent2departureTime = new HashMap<Id, Integer>();
@@ -104,7 +104,7 @@ public class MyCalcLegTimes implements AgentDepartureEventHandler, AgentArrivalE
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		if (mode.equals(".both.") || mode.equals(event.getLegMode())) {
 			Integer time = agent2Time.get(event.getPersonId());
 			if (time == null) time = 0;
@@ -115,7 +115,7 @@ public class MyCalcLegTimes implements AgentDepartureEventHandler, AgentArrivalE
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		if (mode.equals(".both.") || mode.equals(event.getLegMode())) {
 			agent2departureTime.put(event.getPersonId(), (int) event.getTime());
 		}

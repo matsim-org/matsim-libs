@@ -25,12 +25,12 @@ import java.util.LinkedList;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.vsp.analysis.modules.ptTripAnalysis.AbstractAnalysisTrip;
@@ -131,13 +131,13 @@ public class DistAnalysisTrip extends AbstractAnalysisTrip implements DistAnalys
 	public void processAgentEvent(Event e) {
 		this.processedEvents++;
 		
-		if(e instanceof AgentDepartureEvent){
+		if(e instanceof PersonDepartureEvent){
 			this.start = actLocations.removeFirst();
-			if(((AgentDepartureEvent) e).getLegMode().equals(TransportMode.pt)){
+			if(((PersonDepartureEvent) e).getLegMode().equals(TransportMode.pt)){
 				this.lineCnt++;
 			}
-		}else if(e instanceof AgentArrivalEvent){
-			if(!((AgentArrivalEvent) e).getLegMode().equals(TransportMode.pt) && !((AgentArrivalEvent) e).getLegMode().equals(TransportMode.car)){
+		}else if(e instanceof PersonArrivalEvent){
+			if(!((PersonArrivalEvent) e).getLegMode().equals(TransportMode.pt) && !((PersonArrivalEvent) e).getLegMode().equals(TransportMode.car)){
 				this.legStartEnd.add(new Tuple<Coord, Coord>(start, actLocations.getFirst()));
 			}
 		}

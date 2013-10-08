@@ -28,12 +28,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -72,10 +72,10 @@ public class ExtractPassengerTravelTimeVsPtTravelTime {
 		handler.close();
 	}
 
-	private static class Handler implements AgentDepartureEventHandler , AgentArrivalEventHandler {
+	private static class Handler implements PersonDepartureEventHandler , PersonArrivalEventHandler {
 		private final Network network;
 		private final BufferedWriter writer;
-		private Map<Id, AgentDepartureEvent> passengerDepartures = new HashMap<Id, AgentDepartureEvent>();
+		private Map<Id, PersonDepartureEvent> passengerDepartures = new HashMap<Id, PersonDepartureEvent>();
 
 		public Handler(
 				final Network network,
@@ -95,16 +95,16 @@ public class ExtractPassengerTravelTimeVsPtTravelTime {
 		}
 
 		@Override
-		public void handleEvent(final AgentDepartureEvent event) {
+		public void handleEvent(final PersonDepartureEvent event) {
 			if (event.getLegMode().equals( JointActingTypes.PASSENGER )) {
 				passengerDepartures.put( event.getPersonId() , event );
 			}
 		}
 
 		@Override
-		public void handleEvent(final AgentArrivalEvent event) {
+		public void handleEvent(final PersonArrivalEvent event) {
 			if (event.getLegMode().equals( JointActingTypes.PASSENGER )) {
-				AgentDepartureEvent departureEvent = passengerDepartures.remove( event.getPersonId() );
+				PersonDepartureEvent departureEvent = passengerDepartures.remove( event.getPersonId() );
 				double dep = departureEvent.getTime();
 
 				double dist = calcDist( departureEvent , event );
@@ -120,8 +120,8 @@ public class ExtractPassengerTravelTimeVsPtTravelTime {
 		}
 
 		private double calcDist(
-				final AgentDepartureEvent departureEvent,
-				final AgentArrivalEvent arrivalEvent) {
+				final PersonDepartureEvent departureEvent,
+				final PersonArrivalEvent arrivalEvent) {
 			Coord o = network.getLinks().get( departureEvent.getLinkId() ).getCoord();
 			Coord d = network.getLinks().get( arrivalEvent.getLinkId() ).getCoord();
 

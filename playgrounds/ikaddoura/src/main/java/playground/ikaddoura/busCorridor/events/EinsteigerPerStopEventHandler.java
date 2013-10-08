@@ -28,10 +28,10 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
-import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
+import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 
 /**
  * @author Ihab

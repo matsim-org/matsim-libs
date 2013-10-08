@@ -20,12 +20,12 @@
 
 package playground.mrieser.modules.template;
 
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.controler.Controler;
@@ -105,9 +105,9 @@ public class Template implements MatsimModule {
 
 		// *** EventHandler *********************
 
-		AgentArrivalEventHandler eventHandler = new AgentArrivalEventHandler() {
+		PersonArrivalEventHandler eventHandler = new PersonArrivalEventHandler() {
 			@Override
-			public void handleEvent(final AgentArrivalEvent event) {
+			public void handleEvent(final PersonArrivalEvent event) {
 			}
 			@Override
 			public void reset(final int iteration) {

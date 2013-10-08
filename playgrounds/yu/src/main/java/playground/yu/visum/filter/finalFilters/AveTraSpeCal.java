@@ -21,9 +21,9 @@ package playground.yu.visum.filter.finalFilters;
 
 import java.util.List;
 
+import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.basic.v01.IdImpl;
 
 import playground.yu.visum.writer.UserDefAtt;

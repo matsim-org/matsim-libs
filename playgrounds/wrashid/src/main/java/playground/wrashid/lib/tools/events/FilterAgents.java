@@ -22,17 +22,17 @@ package playground.wrashid.lib.tools.events;
 import java.util.HashSet;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentMoneyEvent;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.Wait2LinkEvent;
-import org.matsim.core.api.experimental.events.Event;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -145,7 +145,7 @@ public class FilterAgents {
 			super.handleEvent(event);
 		}
 
-		public void handleEvent(AgentArrivalEvent event) {
+		public void handleEvent(PersonArrivalEvent event) {
 			Id personId = event.getPersonId();
 
 			if (filterPersonsSet.contains(personId)) {
@@ -155,7 +155,7 @@ public class FilterAgents {
 			super.handleEvent(event);
 		}
 
-		public void handleEvent(AgentDepartureEvent event) {
+		public void handleEvent(PersonDepartureEvent event) {
 			Id personId = event.getPersonId();
 
 			if (filterPersonsSet.contains(personId)) {
@@ -165,7 +165,7 @@ public class FilterAgents {
 			super.handleEvent(event);
 		}
 
-		public void handleEvent(AgentStuckEvent event) {
+		public void handleEvent(PersonStuckEvent event) {
 			Id personId = event.getPersonId();
 
 			if (keepAgentsInFilter) {
@@ -179,7 +179,7 @@ public class FilterAgents {
 			}
 		}
 
-		public void handleEvent(AgentMoneyEvent event) {
+		public void handleEvent(PersonMoneyEvent event) {
 			Id personId = event.getPersonId();
 
 			if (keepAgentsInFilter) {

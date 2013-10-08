@@ -20,8 +20,8 @@
 package playground.dgrether.signalsystems.otfvis;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -33,7 +33,7 @@ import playground.dgrether.DgPaths;
  * @author dgrether
  *
  */
-public class DenverControllerStarter implements AgentStuckEventHandler {
+public class DenverControllerStarter implements PersonStuckEventHandler {
 
   private static final Logger log = Logger
       .getLogger(DenverControllerStarter.class);
@@ -56,7 +56,7 @@ public class DenverControllerStarter implements AgentStuckEventHandler {
   }
   
   @Override
-  public void handleEvent(AgentStuckEvent event) {
+  public void handleEvent(PersonStuckEvent event) {
     log.error("got stuck event for agent: " + event.getPersonId() + " on Link " + event.getLinkId());
   }
 

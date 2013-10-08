@@ -25,11 +25,11 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.Event;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
@@ -85,8 +85,8 @@ public class PickUpDropOffFilter {
 		public void handleEvent(final Event event) {
 			if (event.getTime() > MAX_END_TIME) return;
 
-			if (event instanceof AgentDepartureEvent) {
-				AgentDepartureEvent departure = (AgentDepartureEvent) event;
+			if (event instanceof PersonDepartureEvent) {
+				PersonDepartureEvent departure = (PersonDepartureEvent) event;
 				// to avoid artefacts due to overlaping activities.
 				Id fakeId = new IdImpl(departure.getPersonId()+"-"+(count++));
 
@@ -105,8 +105,8 @@ public class PickUpDropOffFilter {
 								DEPARTURE) );
 				}
 			}
-			else if (event instanceof AgentArrivalEvent) {
-				AgentArrivalEvent arrival = (AgentArrivalEvent) event;
+			else if (event instanceof PersonArrivalEvent) {
+				PersonArrivalEvent arrival = (PersonArrivalEvent) event;
 				// to avoid artefacts due to overlaping activities.
 				Id fakeId = new IdImpl(arrival.getPersonId()+"-"+(count++));
 

@@ -28,9 +28,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.TreeSet;
 
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.Event;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.core.events.*;
 import org.matsim.core.events.algorithms.EventWriter;
 import org.matsim.core.events.handler.BasicEventHandler;

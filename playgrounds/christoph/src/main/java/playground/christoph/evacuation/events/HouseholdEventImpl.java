@@ -22,7 +22,7 @@ package playground.christoph.evacuation.events;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.Event;
+import org.matsim.api.core.v01.events.Event;
 
 /**
  * @author cdobler

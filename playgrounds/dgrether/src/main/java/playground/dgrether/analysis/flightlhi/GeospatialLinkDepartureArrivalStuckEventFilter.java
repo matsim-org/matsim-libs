@@ -23,11 +23,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.Event;
 
 import playground.dgrether.events.filters.EventFilter;
 
@@ -52,8 +52,8 @@ public class GeospatialLinkDepartureArrivalStuckEventFilter implements EventFilt
 
 	@Override
 	public boolean doProcessEvent(Event event) {
-		if (event instanceof AgentDepartureEvent){
-			AgentDepartureEvent e = (AgentDepartureEvent) event;
+		if (event instanceof PersonDepartureEvent){
+			PersonDepartureEvent e = (PersonDepartureEvent) event;
 			if (this.network.getLinks().containsKey(e.getLinkId())){
 				this.networkContainedLastDepartureByPersonId.put(e.getPersonId(), true);
 				return true;
@@ -63,15 +63,15 @@ public class GeospatialLinkDepartureArrivalStuckEventFilter implements EventFilt
 				return false;
 			}
 		}
-		else if (event instanceof AgentArrivalEvent) {
-			AgentArrivalEvent e = (AgentArrivalEvent) event;
+		else if (event instanceof PersonArrivalEvent) {
+			PersonArrivalEvent e = (PersonArrivalEvent) event;
 			if (this.networkContainedLastDepartureByPersonId.get(e.getPersonId())
 					&& this.network.getLinks().containsKey(e.getLinkId())) {
 				return true;
 			}
 		}
-		else if (event instanceof AgentStuckEvent){
-			AgentStuckEvent e = (AgentStuckEvent) event;
+		else if (event instanceof PersonStuckEvent){
+			PersonStuckEvent e = (PersonStuckEvent) event;
 			if (this.networkContainedLastDepartureByPersonId.get(e.getPersonId())
 					&& this.network.getLinks().containsKey(e.getLinkId())) {
 				return true;

@@ -23,17 +23,17 @@ package playground.anhorni.locationchoice.analysis.events;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.utils.geometry.CoordImpl;
 
-public class CalcLegDistances implements AgentDepartureEventHandler, AgentArrivalEventHandler {
+public class CalcLegDistances implements PersonDepartureEventHandler, PersonArrivalEventHandler {
 
 	private Population population = null;
 	private final TreeMap<Id, Double> agentDepartures = new TreeMap<Id, Double>();
@@ -48,7 +48,7 @@ public class CalcLegDistances implements AgentDepartureEventHandler, AgentArriva
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		this.agentDepartures.put(event.getPersonId(), event.getTime());
 	}
 
@@ -82,7 +82,7 @@ public class CalcLegDistances implements AgentDepartureEventHandler, AgentArriva
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		increaseAgentArrivalCount(event.getPersonId());
 		Double depTime = this.agentDepartures.remove(event.getPersonId());
 		Person agent = this.population.getPersons().get(event.getPersonId());

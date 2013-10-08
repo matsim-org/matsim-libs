@@ -29,15 +29,15 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.ObjectUtils;
-
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.Event;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
-import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+
 import playground.thibautd.utils.MapUtils;
 import playground.thibautd.utils.MapUtils.Factory;
 
@@ -227,20 +227,20 @@ public class BeingTogetherScoring {
 	// event handling
 	// /////////////////////////////////////////////////////////////////////////
 	public void handleEvent(final Event event) {
-		if (event instanceof AgentDepartureEvent) startMode( (AgentDepartureEvent) event );
-		if (event instanceof AgentArrivalEvent) endMode( (AgentArrivalEvent) event );
+		if (event instanceof PersonDepartureEvent) startMode( (PersonDepartureEvent) event );
+		if (event instanceof PersonArrivalEvent) endMode( (PersonArrivalEvent) event );
 		if (event instanceof ActivityStartEvent) startAct( (ActivityStartEvent) event );
 		if (event instanceof ActivityEndEvent) endAct( (ActivityEndEvent) event );
 		if (event instanceof PersonEntersVehicleEvent) enterVehicle( (PersonEntersVehicleEvent) event );
 		if (event instanceof PersonLeavesVehicleEvent) leaveVehicle( (PersonLeavesVehicleEvent) event );
 	}
 
-	private void startMode(final AgentDepartureEvent event) {
+	private void startMode(final PersonDepartureEvent event) {
 		if ( !isRelevant( event.getPersonId() ) ) return;
 		currentModeOfRelevantAgents.put( event.getPersonId() , event.getLegMode() );
 	}
 
-	private void endMode(final AgentArrivalEvent event) {
+	private void endMode(final PersonArrivalEvent event) {
 		// no need to check if "relevant agent" here
 		currentModeOfRelevantAgents.remove( event.getPersonId() );
 	}

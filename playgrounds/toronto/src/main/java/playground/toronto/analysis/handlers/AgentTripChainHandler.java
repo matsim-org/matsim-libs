@@ -11,18 +11,18 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
-import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 
@@ -49,7 +49,7 @@ import playground.toronto.mapping.Link2ZoneMap;
  *
  */
 public class AgentTripChainHandler implements TransitDriverStartsEventHandler, ActivityStartEventHandler, ActivityEndEventHandler,
-	AgentDepartureEventHandler, PersonEntersVehicleEventHandler, AgentArrivalEventHandler{
+	PersonDepartureEventHandler, PersonEntersVehicleEventHandler, PersonArrivalEventHandler{
 
 	private static final Logger log = Logger.getLogger(AgentTripChainHandler.class);
 	
@@ -267,7 +267,7 @@ public class AgentTripChainHandler implements TransitDriverStartsEventHandler, A
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		Id pid = event.getPersonId();
 		TripComponent tcc = this.componentsBuffer.get(pid);
 		if (tcc == null){
@@ -282,7 +282,7 @@ public class AgentTripChainHandler implements TransitDriverStartsEventHandler, A
 	}
 	
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		String mode = event.getLegMode();
 		Id pid = event.getPersonId();
 

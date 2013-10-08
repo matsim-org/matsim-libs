@@ -31,13 +31,13 @@ import java.util.Set;
 
 import org.apache.commons.math.stat.StatUtils;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -46,7 +46,7 @@ import org.matsim.core.controler.listener.IterationEndsListener;
 
 import playground.vsptelematics.common.ListUtils;
 
-public class RouteTTObserver implements AgentDepartureEventHandler, AgentArrivalEventHandler, LinkEnterEventHandler, IterationEndsListener, AfterMobsimListener {
+public class RouteTTObserver implements PersonDepartureEventHandler, PersonArrivalEventHandler, LinkEnterEventHandler, IterationEndsListener, AfterMobsimListener {
 
 	private Set<Id> route1;
 
@@ -75,7 +75,7 @@ public class RouteTTObserver implements AgentDepartureEventHandler, AgentArrival
 		this.reset(0);
 	}
 
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		departureTimes.put(event.getPersonId(), event.getTime());
 	}
 
@@ -86,7 +86,7 @@ public class RouteTTObserver implements AgentDepartureEventHandler, AgentArrival
 		departureTimes = new HashMap<Id, Double>();
 	}
 
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		double depTime = departureTimes.get(event.getPersonId());
 		if(depTime == 0)
 			throw new RuntimeException("Agent departure time not found!");

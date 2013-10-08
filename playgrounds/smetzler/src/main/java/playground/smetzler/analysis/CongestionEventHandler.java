@@ -28,20 +28,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 
 /**
  * @author Ihab, Simon
  *
  */
-public class CongestionEventHandler implements  LinkLeaveEventHandler, LinkEnterEventHandler, AgentDepartureEventHandler {
+public class CongestionEventHandler implements  LinkLeaveEventHandler, LinkEnterEventHandler, PersonDepartureEventHandler {
 
 	private final Network network;
 	private double pott_sec = 0;
@@ -102,7 +102,7 @@ public class CongestionEventHandler implements  LinkLeaveEventHandler, LinkEnter
 
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		this.personId2justDeparted.put(event.getPersonId(), true);
 	}
 

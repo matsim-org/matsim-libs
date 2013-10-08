@@ -29,16 +29,16 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.AgentMoneyEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 
 /**
  * @author Ihab
  *
  */
-public class MoneyDetailEventHandler implements AgentMoneyEventHandler, ActivityEndEventHandler {
+public class MoneyDetailEventHandler implements PersonMoneyEventHandler, ActivityEndEventHandler {
 	
 	List<Id> personIDsSecondTrip = new ArrayList<Id>();
 	
@@ -58,7 +58,7 @@ public class MoneyDetailEventHandler implements AgentMoneyEventHandler, Activity
 	}
 
 	@Override
-	public void handleEvent(AgentMoneyEvent event) {
+	public void handleEvent(PersonMoneyEvent event) {
 		
 		if (this.personIDsSecondTrip.contains(event.getPersonId())){
 			// second trip

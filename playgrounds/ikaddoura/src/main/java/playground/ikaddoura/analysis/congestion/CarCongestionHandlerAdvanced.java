@@ -31,22 +31,22 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 
 /**
  * @author Ihab
  *
  */
-public class CarCongestionHandlerAdvanced implements LinkLeaveEventHandler, LinkEnterEventHandler, AgentDepartureEventHandler, TransitDriverStartsEventHandler {
+public class CarCongestionHandlerAdvanced implements LinkLeaveEventHandler, LinkEnterEventHandler, PersonDepartureEventHandler, TransitDriverStartsEventHandler {
 
 	private final static Logger log = Logger.getLogger(CarCongestionHandlerAdvanced.class);
 	private final Network network;
@@ -133,7 +133,7 @@ public class CarCongestionHandlerAdvanced implements LinkLeaveEventHandler, Link
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 
 		if (event.getLegMode().toString().equals(TransportMode.car.toString())){
 			// car!

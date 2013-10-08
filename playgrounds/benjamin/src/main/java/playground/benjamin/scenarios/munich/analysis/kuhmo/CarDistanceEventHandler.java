@@ -25,13 +25,13 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
@@ -40,7 +40,7 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
  * @author benjamin
  *
  */
-public class CarDistanceEventHandler implements LinkLeaveEventHandler, AgentDepartureEventHandler, AgentArrivalEventHandler{
+public class CarDistanceEventHandler implements LinkLeaveEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler{
 	private final static Logger logger = Logger.getLogger(CarDistanceEventHandler.class);
 
 	private Map<Id, Double> personId2CarDistance;
@@ -91,7 +91,7 @@ public class CarDistanceEventHandler implements LinkLeaveEventHandler, AgentDepa
 	}
 	
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {		
+	public void handleEvent(PersonDepartureEvent event) {		
 		// the following is not neccessary any more...see below
 		personId2departureLinkId.put(event.getPersonId(), event.getLinkId());
 
@@ -121,7 +121,7 @@ public class CarDistanceEventHandler implements LinkLeaveEventHandler, AgentDepa
 	
 	// the following is not neccessary any more...see above
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		Id personId = event.getPersonId();
 		Id linkId = event.getLinkId();
 

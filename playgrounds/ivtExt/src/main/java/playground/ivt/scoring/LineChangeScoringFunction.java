@@ -20,10 +20,10 @@
 package playground.ivt.scoring;
 
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.Event;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.ArbitraryEventScoring;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.pt.PtConstants;
@@ -65,8 +65,8 @@ public class LineChangeScoringFunction implements ArbitraryEventScoring {
 			this.score += (event.getTime() - this.lastActivityEndTime) * (this.params.marginalUtilityOfWaiting_s - this.params.marginalUtilityOfTraveling_s) ;
 		}
 
-		if ( event instanceof AgentDepartureEvent ) {
-			this.currentLegIsPtLeg = TransportMode.pt.equals( ((AgentDepartureEvent)event).getLegMode() );
+		if ( event instanceof PersonDepartureEvent ) {
+			this.currentLegIsPtLeg = TransportMode.pt.equals( ((PersonDepartureEvent)event).getLegMode() );
 			if ( currentLegIsPtLeg ) {
 				if ( !this.nextStartPtLegIsFirstOfTrip ) {
 					this.score -= params.constant ;

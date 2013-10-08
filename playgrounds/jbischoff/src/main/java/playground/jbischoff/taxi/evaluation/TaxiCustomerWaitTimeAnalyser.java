@@ -34,10 +34,10 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 
 import playground.michalm.taxi.TaxiRequestCreator;
 /**
@@ -48,7 +48,7 @@ import playground.michalm.taxi.TaxiRequestCreator;
  *
  */
 public class TaxiCustomerWaitTimeAnalyser implements
-		AgentDepartureEventHandler, PersonEntersVehicleEventHandler {
+		PersonDepartureEventHandler, PersonEntersVehicleEventHandler {
 
 	private Map<Id,Double> taxicalltime;
 	private List<Double> totalWaitTime;
@@ -120,7 +120,7 @@ public class TaxiCustomerWaitTimeAnalyser implements
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		if (!event.getLegMode().equals(TaxiRequestCreator.MODE)) return;
 		this.taxicalltime.put(event.getPersonId(),event.getTime());
 		this.linkAg.put(event.getPersonId(), event.getLinkId());

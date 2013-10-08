@@ -25,8 +25,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.ControlerEvent;
 import org.matsim.core.controler.events.IterationEndsEvent;
@@ -51,7 +51,7 @@ import org.matsim.core.utils.charts.XYLineChart;
  * @author thibautd
  */
 public class ModeAnalysis implements
-			AgentArrivalEventHandler, ShutdownListener, StartupListener, IterationEndsListener {
+			PersonArrivalEventHandler, ShutdownListener, StartupListener, IterationEndsListener {
 	private static final Logger log =
 		Logger.getLogger(ModeAnalysis.class);
 
@@ -91,7 +91,7 @@ public class ModeAnalysis implements
 	}
 
 	@Override
-	public void handleEvent(final AgentArrivalEvent event) {
+	public void handleEvent(final PersonArrivalEvent event) {
 		this.handleMode(event.getLegMode());
 	}
 

@@ -24,10 +24,10 @@ import java.util.TreeMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 
 import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverIdAnalyzer;
 
@@ -37,7 +37,7 @@ import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverIdAnalyzer;
  * @author ikaddoura, aneumann
  *
  */
-public class PersonId2DelayAtStopHandler implements AgentDepartureEventHandler, PersonEntersVehicleEventHandler{
+public class PersonId2DelayAtStopHandler implements PersonDepartureEventHandler, PersonEntersVehicleEventHandler{
 	private final Logger log = Logger.getLogger(PersonId2DelayAtStopHandler.class);
 	private PtDriverIdAnalyzer ptDriverIdAnalyzer;
 	
@@ -48,7 +48,7 @@ public class PersonId2DelayAtStopHandler implements AgentDepartureEventHandler, 
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 
 		if(this.ptDriverIdAnalyzer.isPtDriver(event.getPersonId())){
 			// pt driver

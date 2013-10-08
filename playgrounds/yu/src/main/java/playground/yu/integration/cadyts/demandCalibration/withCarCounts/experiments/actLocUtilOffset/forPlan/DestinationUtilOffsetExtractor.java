@@ -32,11 +32,11 @@ import java.util.Map.Entry;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -57,7 +57,7 @@ import utilities.misc.DynamicData;
  *
  */
 public class DestinationUtilOffsetExtractor extends
-		ActivityLocationUtilOffsetExtractor implements AgentArrivalEventHandler {
+		ActivityLocationUtilOffsetExtractor implements PersonArrivalEventHandler {
 	private Map<Integer/* timeStep */, List<Tuple<Id/* agent */, Coord/* gridCenter */>>> arrivingTime_agent_locs = new HashMap<Integer, List<Tuple<Id, Coord>>>();
 
 	public DestinationUtilOffsetExtractor(Network net, Counts counts,
@@ -72,7 +72,7 @@ public class DestinationUtilOffsetExtractor extends
 	// }
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		Id agentId = event.getPersonId();
 		Id linkId = event.getLinkId();
 		int timeStep = getTimeStep(event.getTime());

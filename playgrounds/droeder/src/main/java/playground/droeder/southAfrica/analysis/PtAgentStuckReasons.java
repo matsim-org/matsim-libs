@@ -29,21 +29,21 @@ import java.util.Map.Entry;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
-import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentWaitingForPtEventHandler;
+import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
-import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.pt.routes.ExperimentalTransitRoute;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -134,7 +134,7 @@ class PtAgentStuckReasons extends AbstractAnalyisModule {
 												AgentWaitingForPtEventHandler, TransitDriverStartsEventHandler,
 												PersonEntersVehicleEventHandler,
 												VehicleArrivesAtFacilityEventHandler,
-												AgentStuckEventHandler
+												PersonStuckEventHandler
 												 {
 
 		private Map<Id, WaitingPerson> personsWaiting;
@@ -224,7 +224,7 @@ class PtAgentStuckReasons extends AbstractAnalyisModule {
 		
 
 		@Override
-		public void handleEvent(AgentStuckEvent event) {
+		public void handleEvent(PersonStuckEvent event) {
 			if(this.personsWaiting.containsKey(event.getPersonId())){
 				this.stuck.put(event.getPersonId(), this.personsWaiting.remove(event.getPersonId()));
 			}

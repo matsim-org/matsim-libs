@@ -5,22 +5,22 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.utils.collections.QuadTree;
 
 
 
 
 public class DepartureArrivalEventHandler implements
-		AgentDepartureEventHandler, AgentArrivalEventHandler {
+		PersonDepartureEventHandler, PersonArrivalEventHandler {
 
-	private final Map<Id,AgentDepartureEvent> events = new HashMap<Id, AgentDepartureEvent>();
+	private final Map<Id,PersonDepartureEvent> events = new HashMap<Id, PersonDepartureEvent>();
 	
 	private final double CELL_SIZE = 250;	
 	
@@ -91,8 +91,8 @@ public class DepartureArrivalEventHandler implements
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
-		AgentDepartureEvent departure = this.events.get(event.getPersonId());
+	public void handleEvent(PersonArrivalEvent event) {
+		PersonDepartureEvent departure = this.events.get(event.getPersonId());
 	
 		Link link = this.network.getLinks().get(departure.getLinkId());
 		
@@ -111,7 +111,7 @@ public class DepartureArrivalEventHandler implements
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		this.events.put(event.getPersonId(), event);
 	}
 	

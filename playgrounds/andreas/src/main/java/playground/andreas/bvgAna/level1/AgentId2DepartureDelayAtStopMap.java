@@ -26,10 +26,10 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 
 /**
  * Collects the <code>AgentDepartureEventHandler</code> and the corresponding <code>PersonEntersVehicleEventHandler</code> for a given set of agent ids.
@@ -37,7 +37,7 @@ import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
  * @author aneumann
  *
  */
-public class AgentId2DepartureDelayAtStopMap implements AgentDepartureEventHandler, PersonEntersVehicleEventHandler{
+public class AgentId2DepartureDelayAtStopMap implements PersonDepartureEventHandler, PersonEntersVehicleEventHandler{
 
 	private final Logger log = Logger.getLogger(AgentId2DepartureDelayAtStopMap.class);
 	private final Level logLevel = Level.OFF;
@@ -51,7 +51,7 @@ public class AgentId2DepartureDelayAtStopMap implements AgentDepartureEventHandl
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 
 		if(this.agentIds.contains(event.getPersonId())){
 

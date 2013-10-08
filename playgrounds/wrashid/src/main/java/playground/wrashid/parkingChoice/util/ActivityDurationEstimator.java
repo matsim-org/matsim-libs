@@ -4,21 +4,21 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.ActivityImpl;
 
 
-public class ActivityDurationEstimator implements ActivityStartEventHandler, AgentDepartureEventHandler {
+public class ActivityDurationEstimator implements ActivityStartEventHandler, PersonDepartureEventHandler {
 
 	private final Controler controler;
 	private final LinkedList<Double> activityDurationEstimations = new LinkedList<Double>();
@@ -135,7 +135,7 @@ public class ActivityDurationEstimator implements ActivityStartEventHandler, Age
 	}
 
 	@Override
-	public void handleEvent(final AgentDepartureEvent event) {
+	public void handleEvent(final PersonDepartureEvent event) {
 		if (event.getPersonId().equals(this.selectedPersonId)) {
 			if (this.actDurationEstimationContainer.endTimeOfFirstAct == null) {
 				this.actDurationEstimationContainer.endTimeOfFirstAct = event.getTime();

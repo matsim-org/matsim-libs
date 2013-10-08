@@ -6,15 +6,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
+import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.utils.collections.Tuple;
 
-public class MissedServices implements VehicleArrivesAtFacilityEventHandler, PersonEntersVehicleEventHandler, AgentArrivalEventHandler {
+public class MissedServices implements VehicleArrivesAtFacilityEventHandler, PersonEntersVehicleEventHandler, PersonArrivalEventHandler {
 
 	private class PersonInfo {
 	
@@ -46,7 +46,7 @@ public class MissedServices implements VehicleArrivesAtFacilityEventHandler, Per
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		// TODO Auto-generated method stub
 		
 	}

@@ -23,11 +23,11 @@ import java.util.Collections;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.Event;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.basic.v01.IdImpl;
 
 /**
@@ -40,8 +40,8 @@ public class Trip {
 	private final Id tripId;
 	private final int tripNumber;
 	private final ActivityEndEvent originActivityEnd;
-	private final AgentDepartureEvent departure;
-	private final AgentArrivalEvent arrival;
+	private final PersonDepartureEvent departure;
+	private final PersonArrivalEvent arrival;
 	private final ActivityStartEvent destinationActivityStart;
 	private final List<Event> routeEvents;
 
@@ -51,8 +51,8 @@ public class Trip {
 	public Trip(
 			final int tripNumber,
 			final ActivityEndEvent actEnd,
-			final AgentDepartureEvent departure,
-			final AgentArrivalEvent arrival,
+			final PersonDepartureEvent departure,
+			final PersonArrivalEvent arrival,
 			final ActivityStartEvent actStart,
 			final List<Event> routeEvents2) {
 		this.tripId = new IdImpl(idCount++);
@@ -118,7 +118,7 @@ public class Trip {
 	 *
 	 * @return The departure event.
 	 */
-	public AgentDepartureEvent getDeparture() {
+	public PersonDepartureEvent getDeparture() {
 		return this.departure;
 	}
 
@@ -127,7 +127,7 @@ public class Trip {
 	 *
 	 * @return The arrival time.
 	 */
-	public AgentArrivalEvent getArrival() {
+	public PersonArrivalEvent getArrival() {
 		return this.arrival;
 	}
 

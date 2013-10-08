@@ -30,30 +30,30 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentMoneyEvent;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
-import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
-import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentWaitingForPtEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
-import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 
 /**
  * @author Ihab
  *
  */
-public class ExtCostEventHandler implements LinkEnterEventHandler, AgentWaitingForPtEventHandler, AgentMoneyEventHandler, ActivityEndEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, TransitDriverStartsEventHandler, AgentDepartureEventHandler, AgentArrivalEventHandler {
+public class ExtCostEventHandler implements LinkEnterEventHandler, AgentWaitingForPtEventHandler, PersonMoneyEventHandler, ActivityEndEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, TransitDriverStartsEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler {
 	
 	private final List<Id> ptDriverIDs = new ArrayList<Id>();
 	private final List<Id> ptVehicleIDs = new ArrayList<Id>();
@@ -108,7 +108,7 @@ public class ExtCostEventHandler implements LinkEnterEventHandler, AgentWaitingF
 	}
 
 	@Override
-	public void handleEvent(AgentMoneyEvent event) {
+	public void handleEvent(PersonMoneyEvent event) {
 		
 		if (this.personIDsSecondTrip.contains(event.getPersonId())){
 			// second trip
@@ -215,7 +215,7 @@ public class ExtCostEventHandler implements LinkEnterEventHandler, AgentWaitingF
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		if (event.getLegMode().equals(TransportMode.pt)){
 			if (this.personIDsSecondTrip.contains(event.getPersonId())){
 				// second trip
@@ -231,7 +231,7 @@ public class ExtCostEventHandler implements LinkEnterEventHandler, AgentWaitingF
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		if (event.getLegMode().equals(TransportMode.pt)){
 			if (this.personIDsSecondTrip.contains(event.getPersonId())){
 				// second trip

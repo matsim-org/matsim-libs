@@ -24,15 +24,15 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 
 
 //Done.
-public class CaptureDurationOfLastParkingOfDay implements AgentDepartureEventHandler, AgentArrivalEventHandler {
+public class CaptureDurationOfLastParkingOfDay implements PersonDepartureEventHandler, PersonArrivalEventHandler {
 
 	private Map<Id, Double> firstDepartureTimeOfDay = new HashMap<Id, Double>();
 	private Map<Id, Double> lastArrivalTimeOfDay = new HashMap<Id, Double>();
@@ -48,14 +48,14 @@ public class CaptureDurationOfLastParkingOfDay implements AgentDepartureEventHan
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		if (event.getLegMode().equals(TransportMode.car)) {
 			lastArrivalTimeOfDay.put(event.getPersonId(), event.getTime());
 		}
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		if (!firstDepartureTimeOfDay.containsKey(event.getPersonId())) {
 			if (event.getLegMode().equals(TransportMode.car)) {
 				firstDepartureTimeOfDay.put(event.getPersonId(), event.getTime());

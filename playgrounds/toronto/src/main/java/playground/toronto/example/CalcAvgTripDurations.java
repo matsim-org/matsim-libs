@@ -23,17 +23,17 @@ package playground.toronto.example;
 import java.util.Map;
 import java.util.TreeMap;
 
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 
 /**
  * Calculates the average trip durations per hour
  *
  * @author mrieser
  */
-public class CalcAvgTripDurations implements AgentDepartureEventHandler, AgentArrivalEventHandler {
+public class CalcAvgTripDurations implements PersonDepartureEventHandler, PersonArrivalEventHandler {
 
 	private final static int NUM_OF_HOURS = 24;
 
@@ -45,11 +45,11 @@ public class CalcAvgTripDurations implements AgentDepartureEventHandler, AgentAr
 	private double[] travelTimeSum = new double[NUM_OF_HOURS];
 	private int[] travelTimeCnt = new int[NUM_OF_HOURS];
 
-	public void handleEvent(final AgentDepartureEvent event) {
+	public void handleEvent(final PersonDepartureEvent event) {
 		this.agentDepartures.put(event.getPersonId().toString(), event.getTime());
 	}
 
-	public void handleEvent(final AgentArrivalEvent event) {
+	public void handleEvent(final PersonArrivalEvent event) {
 		double departureTime = this.agentDepartures.get(event.getPersonId().toString());
 		double travelTime = event.getTime() - departureTime;
 		int hour = (int) (departureTime / 3600);

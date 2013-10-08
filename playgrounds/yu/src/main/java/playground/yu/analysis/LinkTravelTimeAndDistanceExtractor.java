@@ -24,14 +24,14 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -40,7 +40,7 @@ import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
 public class LinkTravelTimeAndDistanceExtractor implements
-		LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandler {
+		LinkEnterEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler {
 	private final Map<Id/* person */, LinkEnterEvent> enteredPersons = new HashMap<Id, LinkEnterEvent>();
 	private final Network network;
 	private int cnt = 0;
@@ -98,7 +98,7 @@ public class LinkTravelTimeAndDistanceExtractor implements
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		Id personId = event.getPersonId();
 		if (enteredPersons.containsKey(personId)) {
 			enteredPersons.remove(personId);

@@ -9,9 +9,9 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.core.api.experimental.events.EventsFactory;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
-import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
 import org.matsim.core.basic.v01.IdImpl;
 
 public class VehId2PersonEnterLeaveVehicleMapTest {

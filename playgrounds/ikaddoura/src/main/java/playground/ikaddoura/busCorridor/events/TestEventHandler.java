@@ -24,17 +24,16 @@
 package playground.ikaddoura.busCorridor.events;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.AgentMoneyEvent;
-import org.matsim.core.api.experimental.events.AgentMoneyEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
-import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
+import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.utils.misc.Time;
 
 /**
@@ -42,7 +41,7 @@ import org.matsim.core.utils.misc.Time;
  *
  */
 
-public class TestEventHandler implements LinkLeaveEventHandler, LinkEnterEventHandler, AgentMoneyEventHandler, PersonEntersVehicleEventHandler, VehicleDepartsAtFacilityEventHandler {
+public class TestEventHandler implements LinkLeaveEventHandler, LinkEnterEventHandler, PersonMoneyEventHandler, PersonEntersVehicleEventHandler, VehicleDepartsAtFacilityEventHandler {
 	
 	Scenario scenario;
 	
@@ -72,7 +71,7 @@ public class TestEventHandler implements LinkLeaveEventHandler, LinkEnterEventHa
 	}
 
 	@Override
-	public void handleEvent(AgentMoneyEvent event) {
+	public void handleEvent(PersonMoneyEvent event) {
 		System.out.println("Person "+event.getPersonId()+" - Amount: "+event.getAmount());
 	}
 

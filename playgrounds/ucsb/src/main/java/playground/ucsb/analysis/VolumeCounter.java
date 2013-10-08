@@ -32,9 +32,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.io.IOUtils;
 

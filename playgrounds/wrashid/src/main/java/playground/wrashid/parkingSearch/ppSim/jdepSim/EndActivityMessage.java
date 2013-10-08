@@ -22,18 +22,18 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.Wait2LinkEvent;
-import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -84,7 +84,7 @@ public class EndActivityMessage extends Message{
 			
 			
 				if (leg.getMode().equalsIgnoreCase(TransportMode.car)){
-						event = new AgentDepartureEvent(getMessageArrivalTime(), personId, leg.getRoute().getStartLinkId() , leg.getMode());
+						event = new PersonDepartureEvent(getMessageArrivalTime(), personId, leg.getRoute().getStartLinkId() , leg.getMode());
 						eventsManager.processEvent(event);
 						
 						List<Id> linkIds = ((LinkNetworkRouteImpl)leg.getRoute()).getLinkIds();

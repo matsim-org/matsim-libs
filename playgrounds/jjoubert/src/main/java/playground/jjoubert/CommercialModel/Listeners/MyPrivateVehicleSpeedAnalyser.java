@@ -25,19 +25,19 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 
 import playground.jjoubert.CommercialTraffic.SAZone;
 
 public class MyPrivateVehicleSpeedAnalyser implements LinkEnterEventHandler, 
 													  LinkLeaveEventHandler, 
-													  AgentArrivalEventHandler{
+													  PersonArrivalEventHandler{
 	private Map<Id, SAZone> map;
 	private Map<Id, ArrayList<ArrayList<Double>>> linkSpeeds;
 	private Map<Id, Double> eventMap;
@@ -114,7 +114,7 @@ public class MyPrivateVehicleSpeedAnalyser implements LinkEnterEventHandler,
 	
 	
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		eventMap.remove(event.getPersonId());		
 	}
 

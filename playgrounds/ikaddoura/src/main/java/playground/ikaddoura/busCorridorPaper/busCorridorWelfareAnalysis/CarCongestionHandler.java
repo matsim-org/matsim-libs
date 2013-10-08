@@ -28,20 +28,20 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 
 /**
  * @author Ihab
  *
  */
-public class CarCongestionHandler implements LinkLeaveEventHandler, LinkEnterEventHandler, AgentDepartureEventHandler {
+public class CarCongestionHandler implements LinkLeaveEventHandler, LinkEnterEventHandler, PersonDepartureEventHandler {
 
 	private final static Logger log = Logger.getLogger(CarCongestionHandler.class);
 	private final Network network;
@@ -121,7 +121,7 @@ public class CarCongestionHandler implements LinkLeaveEventHandler, LinkEnterEve
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 
 		if (event.getPersonId().toString().contains("person")){
 			// a car is departing

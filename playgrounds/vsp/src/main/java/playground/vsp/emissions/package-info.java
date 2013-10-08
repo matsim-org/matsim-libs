@@ -67,7 +67,7 @@ package playground.vsp.emissions;
  * maps to associate the emissions with corresponding vehicle types, speed, parking time, ... <br/>
  *
  * <h3>Events</h3>
- * This class contains extensions of {@link org.matsim.Event.matsim.core.api.experimental.events.Event Event}
+ * This class contains extensions of {@link org.matsim.api.core.v01.events.Event.matsim.core.api.experimental.events.Event Event}
  * to handle different types of emissions as events. <code> ColdEmissionAnalysisModule</code>
  * calculates emissions after a cold start, <code> WarmEmissionAnalysisModule</code> calculates
  * warm emissions.

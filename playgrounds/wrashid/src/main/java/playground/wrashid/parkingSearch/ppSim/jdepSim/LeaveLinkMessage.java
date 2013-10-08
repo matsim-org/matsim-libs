@@ -21,12 +21,12 @@ package playground.wrashid.parkingSearch.ppSim.jdepSim;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.Event;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
@@ -54,7 +54,7 @@ public class LeaveLinkMessage extends Message{
 		boolean endOfLegReached = currentLinkIndex==linkIds.size()-1;
 		
 		if (endOfLegReached){
-			event = new AgentArrivalEvent(getMessageArrivalTime(),person.getId(),linkId , leg.getMode());
+			event = new PersonArrivalEvent(getMessageArrivalTime(),person.getId(),linkId , leg.getMode());
 			eventsManager.processEvent(event);
 			
 			ActivityImpl act= (ActivityImpl) person.getSelectedPlan().getPlanElements().get(currentLegIndex++);

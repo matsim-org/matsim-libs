@@ -27,9 +27,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.Event;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -96,15 +96,15 @@ public class CreateDummyPositionData implements BasicEventHandler {
 	public void handleEvent(Event event) {
 		
 		// check whether the agent's mode is walk2d
-		if (event instanceof AgentDepartureEvent) {
-			AgentDepartureEvent agentDepartureEvent = (AgentDepartureEvent) event;
+		if (event instanceof PersonDepartureEvent) {
+			PersonDepartureEvent agentDepartureEvent = (PersonDepartureEvent) event;
 			if (agentDepartureEvent.getLegMode().equals("walk2d")) observedAgents.add(agentDepartureEvent.getPersonId());
 			else return;
 		}
 		
 		// if an agent arrives check whether its mode was walk2d
-		else if (event instanceof AgentArrivalEvent) {
-			AgentArrivalEvent agentArrivalEvent = (AgentArrivalEvent) event;
+		else if (event instanceof PersonArrivalEvent) {
+			PersonArrivalEvent agentArrivalEvent = (PersonArrivalEvent) event;
 			if (observedAgents.contains(agentArrivalEvent.getPersonId())) {
 				observedAgents.remove(agentArrivalEvent.getPersonId());
 

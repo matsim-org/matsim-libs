@@ -28,21 +28,21 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
-import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
-import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
-import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 
 import playground.vsp.analysis.modules.ptTripAnalysis.AbstractAnalysisTrip;
 import playground.vsp.analysis.modules.ptTripAnalysis.AnalysisTripSetStorage;
@@ -55,7 +55,7 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 public class DistAnalysisHandler implements LinkEnterEventHandler, TransitDriverStartsEventHandler,
 												PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
-												AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler{
+												PersonArrivalEventHandler, PersonDepartureEventHandler, PersonStuckEventHandler{
 	
 	private static final Logger log = Logger
 			.getLogger(DistAnalysisHandler.class);
@@ -116,7 +116,7 @@ public class DistAnalysisHandler implements LinkEnterEventHandler, TransitDriver
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent e) {
+	public void handleEvent(PersonDepartureEvent e) {
 		if(this.persons.containsKey(e.getPersonId())){
 			if(this.persons.get(e.getPersonId()).processAgentEvent(e)){
 				//if the trip is finished, add to tripStorage
@@ -126,7 +126,7 @@ public class DistAnalysisHandler implements LinkEnterEventHandler, TransitDriver
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent e) {
+	public void handleEvent(PersonArrivalEvent e) {
 		if(this.persons.containsKey(e.getPersonId())){
 			if(this.persons.get(e.getPersonId()).processAgentEvent(e)){
 				//if the trip is finished, add to tripStorage
@@ -172,7 +172,7 @@ public class DistAnalysisHandler implements LinkEnterEventHandler, TransitDriver
 	
 	private boolean stuck = false;
 	@Override
-	public void handleEvent(AgentStuckEvent e) {
+	public void handleEvent(PersonStuckEvent e) {
 		if(!stuck){
 			this.stuck = true;
 			log.error("Message thrown only once!!! StuckEvent for Agent: " + e.getPersonId());

@@ -25,19 +25,19 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.Event;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 
 /**
  * @author illenberger
  * 
  */
-public class TrajectoryEventsBuilder implements AgentDepartureEventHandler, AgentArrivalEventHandler {
+public class TrajectoryEventsBuilder implements PersonDepartureEventHandler, PersonArrivalEventHandler {
 
 	private Map<Id, PersonData> personData;
 
@@ -72,12 +72,12 @@ public class TrajectoryEventsBuilder implements AgentDepartureEventHandler, Agen
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		addElement(event, event.getPersonId());
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		addElement(event, event.getPersonId());
 	}
 

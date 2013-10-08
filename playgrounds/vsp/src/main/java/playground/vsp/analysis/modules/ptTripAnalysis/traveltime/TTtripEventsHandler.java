@@ -29,21 +29,21 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.Event;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
-import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
-import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 
 import playground.vsp.analysis.modules.ptTripAnalysis.AbstractAnalysisTrip;
 import playground.vsp.analysis.modules.ptTripAnalysis.AnalysisTripSetStorage;
@@ -54,9 +54,9 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author droeder
  *
  */
-public class TTtripEventsHandler  implements AgentDepartureEventHandler, 
-										AgentArrivalEventHandler, ActivityEndEventHandler, 
-										ActivityStartEventHandler, AgentStuckEventHandler, 
+public class TTtripEventsHandler  implements PersonDepartureEventHandler, 
+										PersonArrivalEventHandler, ActivityEndEventHandler, 
+										ActivityStartEventHandler, PersonStuckEventHandler, 
 										PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler{
 	
 	private static final Logger log = Logger
@@ -91,7 +91,7 @@ public class TTtripEventsHandler  implements AgentDepartureEventHandler,
 	}
 	
 	@Override
-	public void handleEvent(AgentStuckEvent e) {
+	public void handleEvent(PersonStuckEvent e) {
 		if(!stuck){
 			log.warn("Found StuckEvent for Agent " + e.getPersonId() + "! Probably not all Trips from PlansFile are processed! Message thrown only once");
 			stuck = true;
@@ -118,7 +118,7 @@ public class TTtripEventsHandler  implements AgentDepartureEventHandler,
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent e) {
+	public void handleEvent(PersonArrivalEvent e) {
 		if(this.id2Trips.containsKey(e.getPersonId())){
 			if(((TTAnalysisTrip) this.id2Trips.get(e.getPersonId()).getFirst()).handleEvent(e)){
 				this.addTrip2TripSet(e.getPersonId());
@@ -127,7 +127,7 @@ public class TTtripEventsHandler  implements AgentDepartureEventHandler,
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent e) {
+	public void handleEvent(PersonDepartureEvent e) {
 		if(this.id2Trips.containsKey(e.getPersonId())){
 			if(((TTAnalysisTrip) this.id2Trips.get(e.getPersonId()).getFirst()).handleEvent(e)){
 				this.addTrip2TripSet(e.getPersonId());

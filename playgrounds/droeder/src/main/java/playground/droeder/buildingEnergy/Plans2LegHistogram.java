@@ -25,10 +25,10 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.analysis.LegHistogram;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.population.LegImpl;
@@ -72,9 +72,9 @@ public abstract class Plans2LegHistogram {
 				List<PlanElement> pe = person.getSelectedPlan().getPlanElements();
 				for(int i = 1; i < pe.size(); i += 2){
 					LegImpl l = (LegImpl) pe.get(i);
-					histo.handleEvent(new AgentDepartureEvent(l.getDepartureTime(), null, null, l.getMode()));
+					histo.handleEvent(new PersonDepartureEvent(l.getDepartureTime(), null, null, l.getMode()));
 					double arrivaltime = (l.getArrivalTime() == Double.NaN) ? l.getDepartureTime() + l.getTravelTime() : l.getArrivalTime();
-					histo.handleEvent(new AgentArrivalEvent(arrivaltime, null, null, l.getMode()));
+					histo.handleEvent(new PersonArrivalEvent(arrivaltime, null, null, l.getMode()));
 				}
 			}
 		});

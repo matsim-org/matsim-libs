@@ -20,11 +20,11 @@
 
 package playground.kai.analysis;
 
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -32,7 +32,7 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 
 class EventsReduce {
 	
-	class MyEventHandler1 implements AgentDepartureEventHandler, AgentArrivalEventHandler {
+	class MyEventHandler1 implements PersonDepartureEventHandler, PersonArrivalEventHandler {
 		
 		final EventsManager evOut ;
 		MyEventHandler1( EventsManager evOut ) {
@@ -40,12 +40,12 @@ class EventsReduce {
 		}
 
 		@Override
-		public void handleEvent(AgentDepartureEvent event) {
+		public void handleEvent(PersonDepartureEvent event) {
 			this.evOut.processEvent(event) ;
 		}
 
 		@Override
-		public void handleEvent(AgentArrivalEvent event) {
+		public void handleEvent(PersonArrivalEvent event) {
 			this.evOut.processEvent(event) ;
 		}
 

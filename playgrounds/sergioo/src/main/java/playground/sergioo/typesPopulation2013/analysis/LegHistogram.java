@@ -41,13 +41,13 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.utils.misc.Time;
 
 import playground.sergioo.typesPopulation2013.population.PersonImplPops;
@@ -58,7 +58,7 @@ import playground.sergioo.typesPopulation2013.population.PersonImplPops;
  * Counts the number of vehicles departed, arrived or got stuck per time bin
  * based on events.
  */
-public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEventHandler, AgentStuckEventHandler {
+public class LegHistogram implements PersonDepartureEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler {
 
 	private int iteration = 0;
 	private final int binSize;
@@ -95,7 +95,7 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 	/* Implementation of EventHandler-Interfaces */
 
 	@Override
-	public void handleEvent(final AgentDepartureEvent event) {
+	public void handleEvent(final PersonDepartureEvent event) {
 		if(((PersonImplPops)population.getPersons().get(event.getPersonId()))!= null && ((PersonImplPops)population.getPersons().get(event.getPersonId())).getPopulationId().equals(popId)) {
 			int index = getBinIndex(event.getTime());
 			this.allModesData.countsDep[index]++;
@@ -107,7 +107,7 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 	}
 
 	@Override
-	public void handleEvent(final AgentArrivalEvent event) {
+	public void handleEvent(final PersonArrivalEvent event) {
 		if(((PersonImplPops)population.getPersons().get(event.getPersonId()))!= null && ((PersonImplPops)population.getPersons().get(event.getPersonId())).getPopulationId().equals(popId)) {
 			int index = getBinIndex(event.getTime());
 			this.allModesData.countsArr[index]++;
@@ -119,7 +119,7 @@ public class LegHistogram implements AgentDepartureEventHandler, AgentArrivalEve
 	}
 
 	@Override
-	public void handleEvent(final AgentStuckEvent event) {
+	public void handleEvent(final PersonStuckEvent event) {
 		if(((PersonImplPops)population.getPersons().get(event.getPersonId()))!= null && ((PersonImplPops)population.getPersons().get(event.getPersonId())).getPopulationId().equals(popId)) {
 			int index = getBinIndex(event.getTime());
 			this.allModesData.countsStuck[index]++;

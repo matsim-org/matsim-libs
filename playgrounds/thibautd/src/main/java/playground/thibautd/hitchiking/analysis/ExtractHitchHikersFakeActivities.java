@@ -19,13 +19,13 @@
  * *********************************************************************** */
 package playground.thibautd.hitchiking.analysis;
 
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.Event;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -60,7 +60,7 @@ public class ExtractHitchHikersFakeActivities {
 		handler.writer.closeFile();
 	}
 
-	private static class Handler implements BasicEventHandler, AgentArrivalEventHandler {
+	private static class Handler implements BasicEventHandler, PersonArrivalEventHandler {
 		private final EventWriterXML writer;
 		private final EventsFactory factory = new EventsFactory();
 
@@ -74,7 +74,7 @@ public class ExtractHitchHikersFakeActivities {
 		}
 
 		@Override
-		public void handleEvent(final AgentArrivalEvent event) {
+		public void handleEvent(final PersonArrivalEvent event) {
 			if (event.getLegMode().equals( HitchHikingConstants.PASSENGER_MODE )) {
 				writer.handleEvent(
 						factory.createActivityStartEvent(

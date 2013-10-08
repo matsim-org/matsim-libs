@@ -32,12 +32,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
@@ -54,8 +54,8 @@ import playground.christoph.evacuation.mobsim.decisionmodel.EvacuationDecisionMo
  * 
  * @author cdobler
  */
-public class AgentsReturnHomeCounter implements AgentDepartureEventHandler, ActivityStartEventHandler,
-		AgentStuckEventHandler, MobsimInitializedListener, IterationEndsListener {
+public class AgentsReturnHomeCounter implements PersonDepartureEventHandler, ActivityStartEventHandler,
+		PersonStuckEventHandler, MobsimInitializedListener, IterationEndsListener {
 
 	private static final Logger log = Logger.getLogger(AgentsReturnHomeCounter.class);
 
@@ -102,13 +102,13 @@ public class AgentsReturnHomeCounter implements AgentDepartureEventHandler, Acti
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		this.lastTransportModes.put(event.getPersonId(), event.getLegMode());
 		this.activityInfos.remove(event.getPersonId());
 	}
 
 	@Override
-	public void handleEvent(AgentStuckEvent event) {
+	public void handleEvent(PersonStuckEvent event) {
 		this.lastTransportModes.remove(event.getPersonId());
 		this.activityInfos.remove(event.getPersonId());
 	}

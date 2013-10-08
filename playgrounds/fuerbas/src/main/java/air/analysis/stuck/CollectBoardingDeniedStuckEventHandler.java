@@ -26,11 +26,11 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.core.api.experimental.events.BoardingDeniedEvent;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.events.handler.BoardingDeniedEventHandler;
 
 
@@ -39,17 +39,17 @@ import org.matsim.core.api.experimental.events.handler.BoardingDeniedEventHandle
  * @author dgrether
  *
  */
-public class CollectBoardingDeniedStuckEventHandler implements AgentDepartureEventHandler, AgentStuckEventHandler, BoardingDeniedEventHandler{
+public class CollectBoardingDeniedStuckEventHandler implements PersonDepartureEventHandler, PersonStuckEventHandler, BoardingDeniedEventHandler{
 	
 	private static final Logger log = Logger.getLogger(CollectBoardingDeniedStuckEventHandler.class);
 	
 	final static class PersonEvents {
 		List<BoardingDeniedEvent> boardingDeniedEvents = new ArrayList<BoardingDeniedEvent>();
-		AgentStuckEvent stuckEvent = null;
+		PersonStuckEvent stuckEvent = null;
 	}
 
 	
-	private Map<Id, AgentDepartureEvent> agent2DepartureEventMap;
+	private Map<Id, PersonDepartureEvent> agent2DepartureEventMap;
 	private Map<Id, PersonEvents> personStats;
 	
 	public CollectBoardingDeniedStuckEventHandler(){
@@ -59,7 +59,7 @@ public class CollectBoardingDeniedStuckEventHandler implements AgentDepartureEve
 	@Override
 	public void reset(int iteration) {
 		this.personStats = new HashMap<Id, PersonEvents>();
-		this.agent2DepartureEventMap = new HashMap<Id, AgentDepartureEvent>();
+		this.agent2DepartureEventMap = new HashMap<Id, PersonDepartureEvent>();
 	}
 
 	
@@ -73,7 +73,7 @@ public class CollectBoardingDeniedStuckEventHandler implements AgentDepartureEve
 	}
 	
 	@Override
-	public void handleEvent(AgentStuckEvent event) {
+	public void handleEvent(PersonStuckEvent event) {
 		if (event.getLegMode().compareToIgnoreCase("pt") == 0 && !event.getPersonId().toString().startsWith("pt_")){
 			if (! this.personStats.containsKey(event.getPersonId())){
 				this.personStats.put(event.getPersonId(), new PersonEvents());
@@ -83,7 +83,7 @@ public class CollectBoardingDeniedStuckEventHandler implements AgentDepartureEve
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		if (event.getLegMode().compareToIgnoreCase("pt") == 0 && !event.getPersonId().toString().startsWith("pt_")){
 			this.agent2DepartureEventMap.put(event.getPersonId(), event);
 		}

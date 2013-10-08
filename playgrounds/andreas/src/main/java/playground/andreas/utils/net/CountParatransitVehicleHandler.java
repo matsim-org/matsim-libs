@@ -4,8 +4,8 @@ import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 
 public class CountParatransitVehicleHandler implements LinkEnterEventHandler{
 	

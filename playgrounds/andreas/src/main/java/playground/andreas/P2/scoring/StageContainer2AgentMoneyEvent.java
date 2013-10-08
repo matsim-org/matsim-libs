@@ -25,8 +25,7 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentMoneyEvent;
-import org.matsim.core.api.experimental.events.AgentMoneyEvent;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -37,7 +36,7 @@ import playground.andreas.P2.scoring.fare.StageContainerHandler;
 import playground.andreas.P2.scoring.fare.TicketMachine;
 
 /**
- * Collects {@link StageContainer} and creates {@link AgentMoneyEvent}.
+ * Collects {@link StageContainer} and creates {@link PersonMoneyEvent}.
  * 
  * @author aneumann
  *
@@ -64,7 +63,7 @@ public class StageContainer2AgentMoneyEvent implements StageContainerHandler, Af
 			for (StageContainer stageContainer : agentId2stageContainersEntry.getValue()) {
 				totalFareOfAgent += this.ticketMachine.getFare(stageContainer);
 			}
-			this.eventsManager.processEvent(new AgentMoneyEvent(this.mobsimShutdownTime, agentId2stageContainersEntry.getKey(), totalFareOfAgent));
+			this.eventsManager.processEvent(new PersonMoneyEvent(this.mobsimShutdownTime, agentId2stageContainersEntry.getKey(), totalFareOfAgent));
 		}
 	}
 

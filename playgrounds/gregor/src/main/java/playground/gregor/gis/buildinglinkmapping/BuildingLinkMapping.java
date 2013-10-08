@@ -27,12 +27,12 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.contrib.evacuation.base.Building;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -49,7 +49,7 @@ import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.MultiPolygon;
 
-public class BuildingLinkMapping implements AgentDepartureEventHandler, AgentArrivalEventHandler {
+public class BuildingLinkMapping implements PersonDepartureEventHandler, PersonArrivalEventHandler {
 
 	//private final Map<Id,LinkInfo> lis = new HashMap<Id,LinkInfo>();
 
@@ -283,7 +283,7 @@ public class BuildingLinkMapping implements AgentDepartureEventHandler, AgentArr
 
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		AgentInfo ai = this.ais.get(event.getPersonId());
 		ai.arr = event.getTime();
 
@@ -291,7 +291,7 @@ public class BuildingLinkMapping implements AgentDepartureEventHandler, AgentArr
 
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		AgentInfo ai = new AgentInfo();
 		ai.dep = event.getTime();
 		ai.linkId = event.getLinkId();

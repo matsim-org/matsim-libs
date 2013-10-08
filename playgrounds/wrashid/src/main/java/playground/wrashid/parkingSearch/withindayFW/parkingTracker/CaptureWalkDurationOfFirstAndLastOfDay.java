@@ -24,19 +24,19 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.parking.lib.GeneralLib;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.mobsim.qsim.agents.ExperimentalBasicWithindayAgent;
 
 import playground.wrashid.parkingSearch.withindayFW.util.ParallelSafePlanElementAccessLib;
 
 //Done.
-public class CaptureWalkDurationOfFirstAndLastOfDay implements AgentDepartureEventHandler, AgentArrivalEventHandler {
+public class CaptureWalkDurationOfFirstAndLastOfDay implements PersonDepartureEventHandler, PersonArrivalEventHandler {
 
 	private final Map<Id, Double> firstParkWalkOfDayTmp;
 	private final Map<Id, Double> lastParkWalkOfDayTmp;
@@ -64,7 +64,7 @@ public class CaptureWalkDurationOfFirstAndLastOfDay implements AgentDepartureEve
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		Id personId = event.getPersonId();
 		ExperimentalBasicWithindayAgent agent = this.agents.get(personId);
 		int planElementIndex = ParallelSafePlanElementAccessLib.getCurrentExpectedLegIndex(agent);
@@ -101,7 +101,7 @@ public class CaptureWalkDurationOfFirstAndLastOfDay implements AgentDepartureEve
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		Id personId = event.getPersonId();
 		ExperimentalBasicWithindayAgent agent = this.agents.get(event.getPersonId());
 		int planElementIndex = ParallelSafePlanElementAccessLib.getCurrentExpectedLegIndex(agent);

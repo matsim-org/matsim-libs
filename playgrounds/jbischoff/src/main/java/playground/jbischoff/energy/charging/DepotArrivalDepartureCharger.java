@@ -12,14 +12,12 @@ import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.contrib.transEnergySim.vehicles.api.BatteryElectricVehicle;
 import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-
 import org.matsim.core.basic.v01.IdImpl;
 
 import playground.jbischoff.energy.log.ChargeLogRow;
@@ -27,8 +25,8 @@ import playground.jbischoff.energy.log.ChargerLog;
 import playground.jbischoff.energy.log.SoCLog;
 import playground.jbischoff.energy.log.SocLogRow;
 
-public class DepotArrivalDepartureCharger implements AgentArrivalEventHandler,
-		AgentDepartureEventHandler {
+public class DepotArrivalDepartureCharger implements PersonArrivalEventHandler,
+		PersonDepartureEventHandler {
 
 	private Map<Id,Integer> depotLocations;
 	private Map<Id,Integer> currentChargerOccupation;
@@ -77,7 +75,7 @@ public class DepotArrivalDepartureCharger implements AgentArrivalEventHandler,
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		if (!isMonitoredVehicle(event.getPersonId()))
 			return;
 		if (!isBatteryElectricVehicle(event.getPersonId()))
@@ -109,7 +107,7 @@ public class DepotArrivalDepartureCharger implements AgentArrivalEventHandler,
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		if (!isMonitoredVehicle(event.getPersonId()))
 			return;
 		if (!isBatteryElectricVehicle(event.getPersonId()))

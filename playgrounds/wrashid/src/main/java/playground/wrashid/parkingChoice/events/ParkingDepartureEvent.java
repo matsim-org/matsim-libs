@@ -1,12 +1,12 @@
 package playground.wrashid.parkingChoice.events;
 
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
 
 import playground.wrashid.parkingChoice.infrastructure.api.Parking;
 
 public class ParkingDepartureEvent {
 
-	public AgentDepartureEvent getAgentDepartureEvent() {
+	public PersonDepartureEvent getAgentDepartureEvent() {
 		return agentDepartureEvent;
 	}
 
@@ -14,10 +14,10 @@ public class ParkingDepartureEvent {
 		return parking;
 	}
 
-	private AgentDepartureEvent agentDepartureEvent;
+	private PersonDepartureEvent agentDepartureEvent;
 	private Parking parking;
 
-	public ParkingDepartureEvent(final AgentDepartureEvent agentDepartureEvent, final Parking parking) {
+	public ParkingDepartureEvent(final PersonDepartureEvent agentDepartureEvent, final Parking parking) {
 		this.agentDepartureEvent=agentDepartureEvent;
 		this.parking=parking;
 	}

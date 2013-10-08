@@ -32,21 +32,21 @@ import java.util.TreeMap;
 
 import org.jfree.util.Log;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
 
 /**
  * @author Ihab
  *
  */
-public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, AgentDepartureEventHandler, AgentArrivalEventHandler, VehicleArrivesAtFacilityEventHandler {
+public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler, VehicleArrivesAtFacilityEventHandler {
 	private final List <Double> waitingTimes = new ArrayList<Double>();
 	private final List <Double> waitingTimesMissed = new ArrayList<Double>();
 	private final List <Double> waitingTimesNotMissed = new ArrayList<Double>();
@@ -186,7 +186,7 @@ public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, Agen
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		Id personId = event.getPersonId();
 		
 		if (event.getLegMode().toString().equals("pt")){
@@ -198,7 +198,7 @@ public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, Agen
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		Id personId = event.getPersonId();
 		
 		if (event.getLegMode().toString().equals("pt")){

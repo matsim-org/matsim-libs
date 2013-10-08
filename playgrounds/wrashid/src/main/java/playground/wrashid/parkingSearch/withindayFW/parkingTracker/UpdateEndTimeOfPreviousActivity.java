@@ -22,8 +22,8 @@ package playground.wrashid.parkingSearch.withindayFW.parkingTracker;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 
 public class UpdateEndTimeOfPreviousActivity implements ActivityEndEventHandler {
 

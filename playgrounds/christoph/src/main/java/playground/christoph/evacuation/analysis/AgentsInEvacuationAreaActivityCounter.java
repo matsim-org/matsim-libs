@@ -28,15 +28,15 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.controler.events.IterationEndsEvent;
 import org.matsim.core.controler.listener.IterationEndsListener;
@@ -52,7 +52,7 @@ import playground.christoph.evacuation.mobsim.decisionmodel.EvacuationDecisionMo
  * @author cdobler
  */
 public class AgentsInEvacuationAreaActivityCounter implements ActivityStartEventHandler, ActivityEndEventHandler,
-		AgentStuckEventHandler, IterationEndsListener, MobsimInitializedListener {
+		PersonStuckEventHandler, IterationEndsListener, MobsimInitializedListener {
 
 	private static final Logger log = Logger.getLogger(AgentsInEvacuationAreaActivityCounter.class);
 
@@ -158,7 +158,7 @@ public class AgentsInEvacuationAreaActivityCounter implements ActivityStartEvent
 	}
 
 	@Override
-	public void handleEvent(AgentStuckEvent event) {
+	public void handleEvent(PersonStuckEvent event) {
 		updateBinData(event.getTime());
 	}
 

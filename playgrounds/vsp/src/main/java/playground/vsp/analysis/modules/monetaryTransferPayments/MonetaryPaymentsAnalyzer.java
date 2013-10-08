@@ -37,7 +37,7 @@ import playground.vsp.analysis.modules.AbstractAnalyisModule;
 
 /**
  * This module calculates the transfer payments for each agent and the sum of all transfer payments.
- * A transfer payment can be a toll, a fare or any other {@link AgentMoneyEvent}.
+ * A transfer payment can be a toll, a fare or any other {@link PersonMoneyEvent}.
  * The sum of all transfer payments normally can be interpreted as the operator revenue.
  * 
  * @author ikaddoura

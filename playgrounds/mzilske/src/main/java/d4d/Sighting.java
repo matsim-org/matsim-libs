@@ -4,7 +4,7 @@ import java.util.Comparator;
 import java.util.Date;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.Event;
+import org.matsim.api.core.v01.events.Event;
 
 public class Sighting extends Event {
 

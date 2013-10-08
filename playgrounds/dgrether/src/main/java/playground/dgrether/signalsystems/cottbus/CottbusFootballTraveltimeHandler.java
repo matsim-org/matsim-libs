@@ -24,14 +24,14 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 
 import playground.dgrether.signalsystems.cottbus.footballdemand.CottbusFootballStrings;
 
@@ -40,7 +40,7 @@ import playground.dgrether.signalsystems.cottbus.footballdemand.CottbusFootballS
  * 
  */
 public class CottbusFootballTraveltimeHandler implements LinkEnterEventHandler,
-		LinkLeaveEventHandler, AgentArrivalEventHandler, AgentDepartureEventHandler {
+		LinkLeaveEventHandler, PersonArrivalEventHandler, PersonDepartureEventHandler {
 
 	private Map<Id, Double> arrivaltimesSPN2FB;
 	private Map<Id, Double> arrivaltimesCB2FB;
@@ -75,7 +75,7 @@ public class CottbusFootballTraveltimeHandler implements LinkEnterEventHandler,
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		Double agentTt = this.personId2TravelTimeMap.get(event.getPersonId());
 		this.personId2TravelTimeMap.put(event.getPersonId(), agentTt + event.getTime());
 
@@ -100,7 +100,7 @@ public class CottbusFootballTraveltimeHandler implements LinkEnterEventHandler,
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		Double agentTt = this.personId2TravelTimeMap.get(event.getPersonId());
 		if (agentTt == null) {
 			this.personId2TravelTimeMap.put(event.getPersonId(), 0 - event.getTime());

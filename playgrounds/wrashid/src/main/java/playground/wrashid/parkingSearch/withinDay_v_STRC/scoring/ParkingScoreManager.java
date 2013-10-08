@@ -32,26 +32,26 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.contrib.parking.lib.obj.Pair;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.TravelledEvent;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
+import org.matsim.core.api.experimental.events.handler.TeleportationArrivalEventHandler;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
-import org.matsim.core.events.handler.TravelledEventHandler;
 import org.matsim.core.scoring.EventsToActivities;
 import org.matsim.core.scoring.EventsToActivities.ActivityHandler;
 import org.matsim.core.scoring.EventsToLegs;
@@ -71,7 +71,7 @@ import playground.wrashid.parkingSearch.withindayFW.util.GlobalParkingSearchPara
 import playground.wrashid.parkingSearch.withindayFW.utility.ParkingPersonalBetas;
 
 public class ParkingScoreManager extends ParkingAgentsTracker_v2 implements ActivityHandler, LegHandler, 
-		AfterMobsimListener, AgentStuckEventHandler, LinkLeaveEventHandler, TravelledEventHandler, ParkingSearchEventHandler {
+		AfterMobsimListener, PersonStuckEventHandler, LinkLeaveEventHandler, TeleportationArrivalEventHandler, ParkingSearchEventHandler {
 
 	private static final Logger log = Logger.getLogger(ParkingScoreManager.class);
 	
@@ -153,14 +153,14 @@ public class ParkingScoreManager extends ParkingAgentsTracker_v2 implements Acti
 	}
 
     @Override
-    public void handleEvent(AgentArrivalEvent event) {
+    public void handleEvent(PersonArrivalEvent event) {
     	super.handleEvent(event);
     	
     	this.eventsToLegs.handleEvent(event);
     }
 
     @Override
-    public void handleEvent(AgentDepartureEvent event) {
+    public void handleEvent(PersonDepartureEvent event) {
     	super.handleEvent(event);
     	
     	this.eventsToLegs.handleEvent(event);
@@ -180,7 +180,7 @@ public class ParkingScoreManager extends ParkingAgentsTracker_v2 implements Acti
     }
 
     @Override
-    public void handleEvent(TravelledEvent event) {
+    public void handleEvent(TeleportationArrivalEvent event) {
     	
     	this.eventsToLegs.handleEvent(event);
     }
@@ -459,7 +459,7 @@ public class ParkingScoreManager extends ParkingAgentsTracker_v2 implements Acti
 	}
 
 	@Override
-	public void handleEvent(AgentStuckEvent event) {
+	public void handleEvent(PersonStuckEvent event) {
 		this.stuckAgents.add(event.getPersonId());
 	}
 

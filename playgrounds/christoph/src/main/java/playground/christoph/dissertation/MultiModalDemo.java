@@ -38,6 +38,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
@@ -55,10 +59,6 @@ import org.matsim.contrib.multimodal.MultiModalControlerListener;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.contrib.multimodal.router.util.BikeTravelTimeFactory;
 import org.matsim.contrib.multimodal.router.util.WalkTravelTimeFactory;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.Module;
@@ -705,7 +705,7 @@ public class MultiModalDemo {
 		}
 	}
 	
-	private static class TravelTimeAnalyzer implements AgentDepartureEventHandler, AgentArrivalEventHandler, IterationEndsListener {
+	private static class TravelTimeAnalyzer implements PersonDepartureEventHandler, PersonArrivalEventHandler, IterationEndsListener {
 
 		/*package*/ final Scenario scenario;
 		
@@ -729,7 +729,7 @@ public class MultiModalDemo {
 		}
 
 		@Override
-		public void handleEvent(AgentDepartureEvent event) {
+		public void handleEvent(PersonDepartureEvent event) {
 			Map<Id, Double> map = departures.get(event.getLegMode());
 			if (map == null) {
 				map = new HashMap<Id, Double>();
@@ -741,7 +741,7 @@ public class MultiModalDemo {
 		}
 		
 		@Override
-		public void handleEvent(AgentArrivalEvent event) {
+		public void handleEvent(PersonArrivalEvent event) {
 			Map<Id, Double> map = arrivals.get(event.getLegMode());
 			if (map == null) {
 				map = new HashMap<Id, Double>();

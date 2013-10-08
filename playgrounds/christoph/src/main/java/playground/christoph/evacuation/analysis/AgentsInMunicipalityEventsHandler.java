@@ -46,20 +46,20 @@ import org.jfree.data.xy.XYSeries;
 import org.jfree.data.xy.XYSeriesCollection;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.Event;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.gbl.Gbl;
@@ -72,7 +72,7 @@ import playground.christoph.evacuation.controler.EvacuationConstants;
 import com.vividsolutions.jts.geom.Geometry;
 
 public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler, LinkLeaveEventHandler, 
-	ActivityStartEventHandler, ActivityEndEventHandler, AgentStuckEventHandler {
+	ActivityStartEventHandler, ActivityEndEventHandler, PersonStuckEventHandler {
 	
 	final private static Logger log = Logger.getLogger(AgentsInMunicipalityEventsHandler.class);
 	
@@ -261,7 +261,7 @@ public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler,
 	}
 
 	@Override
-	public void handleEvent(AgentStuckEvent event) {
+	public void handleEvent(PersonStuckEvent event) {
 		// collect agents that got stuck
 		if (insideAgents.remove(event.getPersonId())) {
 			if (residentAgents.contains(event.getPersonId())) {

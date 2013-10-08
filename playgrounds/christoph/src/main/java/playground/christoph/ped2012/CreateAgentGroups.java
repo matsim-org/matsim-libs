@@ -28,12 +28,12 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.Event;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -99,8 +99,8 @@ public class CreateAgentGroups implements BasicEventHandler {
 	@Override
 	public void handleEvent(Event event) {
 		
-		if (event instanceof AgentDepartureEvent) {
-			AgentDepartureEvent agentDepartureEvent = (AgentDepartureEvent) event;
+		if (event instanceof PersonDepartureEvent) {
+			PersonDepartureEvent agentDepartureEvent = (PersonDepartureEvent) event;
 			Id personId = agentDepartureEvent.getPersonId();
 			String mode = agentDepartureEvent.getLegMode();
 			
@@ -145,8 +145,8 @@ public class CreateAgentGroups implements BasicEventHandler {
 		}
 		
 		// create xy data for link trips of observed agents
-		else if (event instanceof AgentArrivalEvent) {
-			AgentArrivalEvent agentArrivalEvent = (AgentArrivalEvent) event;
+		else if (event instanceof PersonArrivalEvent) {
+			PersonArrivalEvent agentArrivalEvent = (PersonArrivalEvent) event;
 			Id personId = agentArrivalEvent.getPersonId();
 			String mode = observedAgents.remove(personId);
 			

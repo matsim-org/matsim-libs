@@ -8,9 +8,9 @@ import java.util.TreeSet;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.basic.v01.IdImpl;
 
@@ -37,10 +37,10 @@ public class AgentId2PtTripTravelTimeMapDataTest {
 
 		EventsFactory ef = new EventsFactory();
         ActivityEndEvent event = ef.createActivityEndEvent(1.2*3600, agentId1, linkId1, facilId1, "w");	
-        AgentDepartureEvent event3 = ef.createAgentDepartureEvent(1.2*3600, agentId1, linkId2, "pt");        
-        AgentArrivalEvent event4 = ef.createAgentArrivalEvent(1.9*3600, agentId1, linkId3, "pt");
-        AgentDepartureEvent event5 = ef.createAgentDepartureEvent(2.1*3600, agentId1, linkId3, "pt");        
-        AgentArrivalEvent event6 = ef.createAgentArrivalEvent(2.5*3600, agentId1, linkId2, "pt");
+        PersonDepartureEvent event3 = ef.createAgentDepartureEvent(1.2*3600, agentId1, linkId2, "pt");        
+        PersonArrivalEvent event4 = ef.createAgentArrivalEvent(1.9*3600, agentId1, linkId3, "pt");
+        PersonDepartureEvent event5 = ef.createAgentDepartureEvent(2.1*3600, agentId1, linkId3, "pt");        
+        PersonArrivalEvent event6 = ef.createAgentArrivalEvent(2.5*3600, agentId1, linkId2, "pt");
 		
 		AgentId2PtTripTravelTimeMapData test = new AgentId2PtTripTravelTimeMapData(event);
 		

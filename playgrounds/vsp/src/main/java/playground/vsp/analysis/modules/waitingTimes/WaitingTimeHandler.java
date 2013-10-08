@@ -30,14 +30,14 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
-import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
-import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
+import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
 
 import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverIdAnalyzer;
 
@@ -46,7 +46,7 @@ import playground.vsp.analysis.modules.ptDriverPrefix.PtDriverIdAnalyzer;
  * @author ikaddoura
  *
  */
-public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, AgentDepartureEventHandler, VehicleArrivesAtFacilityEventHandler, TransitDriverStartsEventHandler {
+public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, PersonDepartureEventHandler, VehicleArrivesAtFacilityEventHandler, TransitDriverStartsEventHandler {
 	private PtDriverIdAnalyzer ptDriverIdAna;
 	private List<Id> vehicleIDs = new ArrayList<Id>();
 
@@ -127,7 +127,7 @@ public class WaitingTimeHandler implements PersonEntersVehicleEventHandler, Agen
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		Id personId = event.getPersonId();
 		if (this.ptDriverIdAna.isPtDriver(personId)){
 			// pt driver

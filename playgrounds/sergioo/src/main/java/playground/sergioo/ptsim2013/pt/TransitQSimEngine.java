@@ -30,8 +30,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.mobsim.framework.AgentSource;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
@@ -118,7 +118,7 @@ public class TransitQSimEngine implements  DepartureHandler, MobsimEngine, Agent
 		for (Entry<Id, List<PTPassengerAgent>> agentsAtStop : this.agentTracker.getAgentsAtStop().entrySet()) {
 			TransitStopFacility stop = this.schedule.getFacilities().get(agentsAtStop.getKey());
 			for (PTPassengerAgent agent : agentsAtStop.getValue()) {
-				this.qSim.getEventsManager().processEvent(new AgentStuckEvent( now, agent.getId(), stop.getLinkId(), ((MobsimAgent)agent).getMode()));
+				this.qSim.getEventsManager().processEvent(new PersonStuckEvent( now, agent.getId(), stop.getLinkId(), ((MobsimAgent)agent).getMode()));
 				this.qSim.getAgentCounter().decLiving();
 				this.qSim.getAgentCounter().incLost();
 			}

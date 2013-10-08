@@ -26,8 +26,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
@@ -51,7 +51,7 @@ import playground.thibautd.hitchiking.HitchHikingConstants;
  * once the EventsManager is initialized. 
  * @author thibautd
  */
-public class FrequentationSpotWeighter implements SpotWeighter, AgentDepartureEventHandler, StartupListener {
+public class FrequentationSpotWeighter implements SpotWeighter, PersonDepartureEventHandler, StartupListener {
 	private static final Logger log =
 		Logger.getLogger(FrequentationSpotWeighter.class);
 
@@ -157,7 +157,7 @@ public class FrequentationSpotWeighter implements SpotWeighter, AgentDepartureEv
 	}
 
 	@Override
-	public void handleEvent(final AgentDepartureEvent event) {
+	public void handleEvent(final PersonDepartureEvent event) {
 		final String mode = event.getLegMode();
 
 		// XXX: what is the time of the departure event for passengers?

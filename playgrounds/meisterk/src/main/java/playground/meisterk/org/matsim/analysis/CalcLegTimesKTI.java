@@ -27,12 +27,12 @@ import org.apache.commons.math.stat.Frequency;
 import org.apache.commons.math.stat.StatUtils;
 import org.apache.commons.math.util.ResizableDoubleArray;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 
 import playground.meisterk.org.matsim.population.algorithms.AbstractClassifiedFrequencyAnalysis;
 
@@ -42,7 +42,7 @@ import playground.meisterk.org.matsim.population.algorithms.AbstractClassifiedFr
  * @author meisterk
  *
  */
-public class CalcLegTimesKTI extends AbstractClassifiedFrequencyAnalysis implements AgentDepartureEventHandler, AgentArrivalEventHandler {
+public class CalcLegTimesKTI extends AbstractClassifiedFrequencyAnalysis implements PersonDepartureEventHandler, PersonArrivalEventHandler {
 
 	private Population population = null;
 	private final TreeMap<Id, Double> agentDepartures = new TreeMap<Id, Double>();
@@ -53,7 +53,7 @@ public class CalcLegTimesKTI extends AbstractClassifiedFrequencyAnalysis impleme
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		this.agentDepartures.put(event.getPersonId(), event.getTime());
 	}
 
@@ -64,7 +64,7 @@ public class CalcLegTimesKTI extends AbstractClassifiedFrequencyAnalysis impleme
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		Double depTime = this.agentDepartures.remove(event.getPersonId());
 		Person agent = this.population.getPersons().get(event.getPersonId());
 		if (depTime != null && agent != null) {

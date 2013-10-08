@@ -27,10 +27,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.Event;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.utils.io.IOUtils;
@@ -80,8 +80,8 @@ public class HitchHikingDistancesEventHandler implements BasicEventHandler {
 		else if (event instanceof LinkEnterEvent) {
 			handleLinkEvent( (LinkEnterEvent) event );
 		}
-		else if (event instanceof AgentArrivalEvent) {
-			handleArrivalEvent( (AgentArrivalEvent) event );
+		else if (event instanceof PersonArrivalEvent) {
+			handleArrivalEvent( (PersonArrivalEvent) event );
 		}
 	}
 
@@ -106,7 +106,7 @@ public class HitchHikingDistancesEventHandler implements BasicEventHandler {
 		dist.distance += network.getLinks().get( event.getLinkId() ).getLength();
 	}
 
-	private void handleArrivalEvent(final AgentArrivalEvent event) {
+	private void handleArrivalEvent(final PersonArrivalEvent event) {
 		Distance dist = tripDistances.remove( event.getPersonId() );
 		if (dist == null) return;
 

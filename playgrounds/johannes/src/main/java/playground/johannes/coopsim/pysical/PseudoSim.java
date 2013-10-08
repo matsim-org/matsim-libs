@@ -27,16 +27,16 @@ import java.util.Queue;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.util.TravelTime;
@@ -93,7 +93,7 @@ public class PseudoSim {
 					/*
 					 * Send arrival and activity start events.
 					 */
-					AgentArrivalEvent arrivalEvent = new AgentArrivalEvent(arrivalTime, plan.getPerson().getId(),
+					PersonArrivalEvent arrivalEvent = new PersonArrivalEvent(arrivalTime, plan.getPerson().getId(),
 							act.getLinkId(), TransportMode.car);
 					eventQueue.add(arrivalEvent);
 					ActivityStartEvent startEvent = new ActivityStartEvent(arrivalTime, plan.getPerson().getId(),
@@ -109,7 +109,7 @@ public class PseudoSim {
 					ActivityEndEvent endEvent = new ActivityEndEvent(actEndTime, plan.getPerson().getId(),
 							act.getLinkId(), act.getFacilityId(), act.getType());
 					eventQueue.add(endEvent);
-					AgentDepartureEvent deparutreEvent = new AgentDepartureEvent(actEndTime, plan.getPerson()
+					PersonDepartureEvent deparutreEvent = new PersonDepartureEvent(actEndTime, plan.getPerson()
 							.getId(), act.getLinkId(), TransportMode.car);
 					eventQueue.add(deparutreEvent);
 				}

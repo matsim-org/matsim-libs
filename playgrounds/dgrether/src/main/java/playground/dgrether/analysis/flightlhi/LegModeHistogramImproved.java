@@ -23,12 +23,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 
 import playground.dgrether.analysis.categoryhistogram.CategoryHistogram;
 
@@ -39,13 +39,13 @@ import playground.dgrether.analysis.categoryhistogram.CategoryHistogram;
  * 
  */
 public class LegModeHistogramImproved implements
-		AgentDepartureEventHandler, AgentArrivalEventHandler, AgentStuckEventHandler {
+		PersonDepartureEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler {
 
 	public static final String all = "all";
 	
 	private CategoryHistogram histogram;
 
-	private Map<Id, AgentDepartureEvent> departureEventsByPersonId;
+	private Map<Id, PersonDepartureEvent> departureEventsByPersonId;
 	
 	public LegModeHistogramImproved() {
 		this(5 * 60);
@@ -61,7 +61,7 @@ public class LegModeHistogramImproved implements
 	 */
 	public LegModeHistogramImproved(final int binSize) {
 		this.histogram = new CategoryHistogram(binSize);
-		this.departureEventsByPersonId = new HashMap<Id, AgentDepartureEvent>();
+		this.departureEventsByPersonId = new HashMap<Id, PersonDepartureEvent>();
 		reset(0);
 	}
 
@@ -72,7 +72,7 @@ public class LegModeHistogramImproved implements
 	}
 
 	@Override
-	public void handleEvent(final AgentDepartureEvent event) {
+	public void handleEvent(final PersonDepartureEvent event) {
 		this.departureEventsByPersonId.put(event.getPersonId(), event);
 	}
 	
@@ -82,8 +82,8 @@ public class LegModeHistogramImproved implements
 	}
 	
 	@Override
-	public void handleEvent(final AgentArrivalEvent event) {
-		AgentDepartureEvent e = this.departureEventsByPersonId.get(event.getPersonId());
+	public void handleEvent(final PersonArrivalEvent event) {
+		PersonDepartureEvent e = this.departureEventsByPersonId.get(event.getPersonId());
 		if (e != null) {
 			this.processDeparture(e.getTime(), e.getLegMode());
 			this.histogram.decrease(event.getTime(), 1, all);
@@ -92,8 +92,8 @@ public class LegModeHistogramImproved implements
 	}
 
 	@Override
-	public void handleEvent(final AgentStuckEvent event) {
-		AgentDepartureEvent e = this.departureEventsByPersonId.get(event.getPersonId());
+	public void handleEvent(final PersonStuckEvent event) {
+		PersonDepartureEvent e = this.departureEventsByPersonId.get(event.getPersonId());
 		if (e != null) {
 			this.processDeparture(e.getTime(), e.getLegMode());
 			this.histogram.abort(event.getTime(), 1, all);

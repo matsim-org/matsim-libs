@@ -5,20 +5,20 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.Wait2LinkEvent;
-import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.jdeqsim.SimulationParameters;
 import org.matsim.core.population.ActivityImpl;
@@ -110,7 +110,7 @@ public class PPSim implements Mobsim{
 		double time=departureTime;
 		
 		if (leg.getMode().equalsIgnoreCase(TransportMode.car)){
-			Event event = new AgentDepartureEvent(time, personId, leg.getRoute().getStartLinkId() , leg.getMode());
+			Event event = new PersonDepartureEvent(time, personId, leg.getRoute().getStartLinkId() , leg.getMode());
 			eventsManager.processEvent(event);
 			
 			List<Id> linkIds = ((LinkNetworkRouteImpl)leg.getRoute()).getLinkIds();
@@ -133,10 +133,10 @@ public class PPSim implements Mobsim{
 			event=new LinkEnterEvent(time,personId,endLinkId,personId);
 			eventsManager.processEvent(event);
 			time+=getTravelTime(time, endLinkId);
-			event = new AgentArrivalEvent(time, personId, endLinkId , leg.getMode());
+			event = new PersonArrivalEvent(time, personId, endLinkId , leg.getMode());
 			eventsManager.processEvent(event);
 		} else {
-			Event event = new AgentDepartureEvent(time, personId, leg.getRoute().getStartLinkId() , leg.getMode());
+			Event event = new PersonDepartureEvent(time, personId, leg.getRoute().getStartLinkId() , leg.getMode());
 			eventsManager.processEvent(event);
 			
 			time+=leg.getTravelTime();
@@ -144,7 +144,7 @@ public class PPSim implements Mobsim{
 			// bzw. non relevant for parking search.
 			
 			Id endLinkId = leg.getRoute().getEndLinkId();
-			event = new AgentArrivalEvent(time, personId, endLinkId , leg.getMode());
+			event = new PersonArrivalEvent(time, personId, endLinkId , leg.getMode());
 			eventsManager.processEvent(event);
 		}
 		

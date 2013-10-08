@@ -35,12 +35,12 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
@@ -203,7 +203,7 @@ public class CalcLinksAvgSpeed extends CalcNetAvgSpeed {
 	}
 
 	@Override
-	public void handleEvent(final AgentArrivalEvent arrival) {
+	public void handleEvent(final PersonArrivalEvent arrival) {
 		SpeedCounter sc = speedCounters.get(arrival.getLinkId().toString());
 		if (sc != null) {
 			sc.removeTmpEnterTime(arrival.getPersonId().toString());

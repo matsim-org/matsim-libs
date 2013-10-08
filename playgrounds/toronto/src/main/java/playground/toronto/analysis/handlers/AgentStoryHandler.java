@@ -3,24 +3,24 @@ package playground.toronto.analysis.handlers;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
-import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
-import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.core.utils.misc.Time;
 
 public class AgentStoryHandler implements TransitDriverStartsEventHandler, ActivityEndEventHandler, ActivityStartEventHandler, 
-	AgentDepartureEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, AgentArrivalEventHandler{
+	PersonDepartureEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, PersonArrivalEventHandler{
 
 	private final Id pid;
 	private String story;
@@ -48,7 +48,7 @@ public class AgentStoryHandler implements TransitDriverStartsEventHandler, Activ
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		if (event.getPersonId().equals(this.pid)){
 			this.story += "\n" + Time.writeTime(event.getTime()) + ": AgentArrivalEvent [mode='" +
 					event.getLegMode() + "',link='" + event.getLinkId().toString() + "']";
@@ -56,7 +56,7 @@ public class AgentStoryHandler implements TransitDriverStartsEventHandler, Activ
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		if (event.getPersonId().equals(this.pid)){
 			this.story += "\n" + Time.writeTime(event.getTime()) + ": AgentDepartureEvent [mode='" +
 					event.getLegMode() + "',link='" + event.getLinkId() + "']";
@@ -80,7 +80,7 @@ public class AgentStoryHandler implements TransitDriverStartsEventHandler, Activ
 	}
 	@Override
 	public void handleEvent(
-			org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent event) {
+			org.matsim.api.core.v01.events.PersonLeavesVehicleEvent event) {
 		if (event.getPersonId().equals(this.pid)){
 			Id lineId = this.vehicleLineMap.get(event.getVehicleId());
 			if (lineId != null){

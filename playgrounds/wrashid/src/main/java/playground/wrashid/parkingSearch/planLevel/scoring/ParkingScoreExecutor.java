@@ -23,8 +23,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.population.ActivityImpl;
 
@@ -63,7 +63,7 @@ public class ParkingScoreExecutor {
 			event.getControler()
 					.getEvents()
 					.processEvent(
-							new AgentMoneyEvent(0.0, person.getId(), score));
+							new PersonMoneyEvent(0.0, person.getId(), score));
 
 			updateParkingScoreSumInPersonGroupsForPerson(event.getIteration(), person.getId(), score);
 		}

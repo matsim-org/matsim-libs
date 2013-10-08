@@ -20,10 +20,10 @@
 
 package playground.christoph.oldenburg;
 
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 
-public class EvacuationTimeAnalyzer implements AgentArrivalEventHandler {
+public class EvacuationTimeAnalyzer implements PersonArrivalEventHandler {
 
 	/*package*/ double longestEvacuationTime = 0.0;
 	/*package*/ double sumEvacuationTimes = 0.0;
@@ -35,7 +35,7 @@ public class EvacuationTimeAnalyzer implements AgentArrivalEventHandler {
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		double evacuationTime = event.getTime() - DemoConfig.evacuationTime;
 		
 		longestEvacuationTime = evacuationTime;

@@ -27,13 +27,13 @@ import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -48,8 +48,8 @@ import org.matsim.core.utils.io.IOUtils;
  * @author yu
  *
  */
-public class CarDepartureCounter implements AgentDepartureEventHandler,
-		AgentArrivalEventHandler {
+public class CarDepartureCounter implements PersonDepartureEventHandler,
+		PersonArrivalEventHandler {
 	private final Population ppl;
 
 	private int cdc = 0, cac = 0;
@@ -103,7 +103,7 @@ public class CarDepartureCounter implements AgentDepartureEventHandler,
 		System.exit(0);
 	}
 
-	public void handleEvent(final AgentDepartureEvent event) {
+	public void handleEvent(final PersonDepartureEvent event) {
 		Person p = this.ppl.getPersons().get(event.getPersonId());
 		if (PlanModeJudger.useCar(p.getSelectedPlan()))
 			this.cdc++;
@@ -118,7 +118,7 @@ public class CarDepartureCounter implements AgentDepartureEventHandler,
 		return this.cdc;
 	}
 
-	public void handleEvent(final AgentArrivalEvent event) {
+	public void handleEvent(final PersonArrivalEvent event) {
 		Person p = this.ppl.getPersons().get(event.getPersonId());
 		if (PlanModeJudger.useCar(p.getSelectedPlan()))
 			this.cac++;

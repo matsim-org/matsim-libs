@@ -24,13 +24,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.network.NetworkImpl;
 
 /**
@@ -38,7 +38,7 @@ import org.matsim.core.network.NetworkImpl;
  *
  * @author mrieser
  */
-public class CalcAvgTripLengthPerHour implements AgentDepartureEventHandler, AgentArrivalEventHandler, LinkEnterEventHandler {
+public class CalcAvgTripLengthPerHour implements PersonDepartureEventHandler, PersonArrivalEventHandler, LinkEnterEventHandler {
 
 	private final static int NUM_OF_HOURS = 30;
 
@@ -54,12 +54,12 @@ public class CalcAvgTripLengthPerHour implements AgentDepartureEventHandler, Age
 		this.network = network;
 	}
 
-	public void handleEvent(final AgentDepartureEvent event) {
+	public void handleEvent(final PersonDepartureEvent event) {
 		this.travelStartPerAgent.put(event.getPersonId(), event.getTime());
 		this.travelDistancePerAgent.put(event.getPersonId(), 0.0);
 	}
 
-	public void handleEvent(final AgentArrivalEvent event) {
+	public void handleEvent(final PersonArrivalEvent event) {
 		Double distance = this.travelDistancePerAgent.remove(event.getPersonId());
 
 		if (distance > 0.0) {

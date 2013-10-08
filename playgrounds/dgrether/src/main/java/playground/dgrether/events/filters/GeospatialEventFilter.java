@@ -23,15 +23,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.Wait2LinkEvent;
-import org.matsim.core.api.experimental.events.Event;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.utils.collections.Tuple;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -88,12 +88,12 @@ public class GeospatialEventFilter implements EventFilter {
 			Wait2LinkEvent e = (Wait2LinkEvent) event;
 			Id linkId = e.getLinkId();
 			return containsLink(linkId);
-		} else if (event instanceof AgentDepartureEvent) {
-			AgentDepartureEvent e = (AgentDepartureEvent) event;
+		} else if (event instanceof PersonDepartureEvent) {
+			PersonDepartureEvent e = (PersonDepartureEvent) event;
 			Id linkId = e.getLinkId();
 			return containsLink(linkId);
-		} else if (event instanceof AgentArrivalEvent) {
-			AgentArrivalEvent e = (AgentArrivalEvent) event;
+		} else if (event instanceof PersonArrivalEvent) {
+			PersonArrivalEvent e = (PersonArrivalEvent) event;
 			Id linkId = e.getLinkId();
 			return containsLink(linkId);
 		} else if (event instanceof ActivityStartEvent) {

@@ -26,12 +26,12 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.pt.PtConstants;
 
@@ -41,7 +41,7 @@ import org.matsim.pt.PtConstants;
  * @author thibautd
  */
 public class TripsRecordsEventsHandler implements
-		AgentDepartureEventHandler, AgentArrivalEventHandler, ActivityStartEventHandler {
+		PersonDepartureEventHandler, PersonArrivalEventHandler, ActivityStartEventHandler {
 	private final Map<Id, RecordBuilder> personInfo = new HashMap<Id, RecordBuilder>();
 	private final Map<Id, TripCounter> personCounters = new HashMap<Id, TripCounter>();
 	private List<Record> records = new ArrayList<Record>();
@@ -61,7 +61,7 @@ public class TripsRecordsEventsHandler implements
 	}
 
 	@Override
-	public void handleEvent(final AgentArrivalEvent event) {
+	public void handleEvent(final PersonArrivalEvent event) {
 		RecordBuilder builder = personInfo.get( event.getPersonId() );
 		
 		builder.setArrivalTime( event.getTime() );
@@ -69,7 +69,7 @@ public class TripsRecordsEventsHandler implements
 	}
 
 	@Override
-	public void handleEvent(final AgentDepartureEvent event) {
+	public void handleEvent(final PersonDepartureEvent event) {
 		RecordBuilder builder = personInfo.get( event.getPersonId() );
 
 		if (builder == null) {

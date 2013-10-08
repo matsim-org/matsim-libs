@@ -28,12 +28,12 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 
-public class AnalyzeTravelTimes implements AgentArrivalEventHandler, AgentDepartureEventHandler {
+public class AnalyzeTravelTimes implements PersonArrivalEventHandler, PersonDepartureEventHandler {
 
 	private static final Logger log = Logger.getLogger(AnalyzeTravelTimes.class);
 		
@@ -53,11 +53,11 @@ public class AnalyzeTravelTimes implements AgentArrivalEventHandler, AgentDepart
 		this.numPersons = populationSize;
 	}
 
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		activeTrips.put(event.getPersonId(), event.getTime());
 	}
 
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		double travelTime = event.getTime() - activeTrips.remove(event.getPersonId());
 		
 		if (replannedPersons.contains(event.getPersonId())) replannedTrips.add(travelTime);

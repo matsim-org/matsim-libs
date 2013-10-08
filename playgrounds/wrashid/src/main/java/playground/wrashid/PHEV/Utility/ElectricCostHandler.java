@@ -6,25 +6,25 @@ import java.io.OutputStreamWriter;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentMoneyEvent;
-import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 
 //TODO: write tests for this class
 
 public class ElectricCostHandler implements LinkLeaveEventHandler,
 		LinkEnterEventHandler, ActivityStartEventHandler, ActivityEndEventHandler,
-		AgentMoneyEventHandler {
+		PersonMoneyEventHandler {
 	// key: agentId
 	// value: energyState
 	private HashMap<String, EnergyApplicatonSpecificState> energyLevel = new HashMap<String, EnergyApplicatonSpecificState>();
@@ -138,7 +138,7 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 
 		// if energy level is below zero: give huge penalty to agent
 		if (state.energyLevel <= 0) {
-			events.processEvent(new AgentMoneyEvent(event.getTime(), event.getPersonId(),
+			events.processEvent(new PersonMoneyEvent(event.getTime(), event.getPersonId(),
 					penaltyForRunningOutOfElectricEnergy));
 		}
 		recordSOCOfVehicle(event.getPersonId(), event.getTime());
@@ -250,7 +250,7 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 			// System.out.println("noooo:"+costOfEnergy);
 		}
 
-		events.processEvent(new AgentMoneyEvent(event.getTime(), event.getPersonId(),
+		events.processEvent(new PersonMoneyEvent(event.getTime(), event.getPersonId(),
 				costOfEnergy));
 
 		state.energyLevel += energyCharged;
@@ -285,7 +285,7 @@ public class ElectricCostHandler implements LinkLeaveEventHandler,
 
 	}
 
-	public void handleEvent(AgentMoneyEvent event) {
+	public void handleEvent(PersonMoneyEvent event) {
 		// System.out.println("money:"+event.amount);
 	}
 

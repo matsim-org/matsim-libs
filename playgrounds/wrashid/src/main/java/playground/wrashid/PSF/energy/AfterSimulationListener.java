@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentMoneyEvent;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 
@@ -73,7 +73,7 @@ public class AfterSimulationListener implements AfterMobsimListener {
 
 				// add price to score.
 				ParametersPSF.getEvents().processEvent(
-						new AgentMoneyEvent(chargingStartTime, personId, negativeUtilitiesForCharging));
+						new PersonMoneyEvent(chargingStartTime, personId, negativeUtilitiesForCharging));
 
 				if (ParametersPSF.getMainChargingPriceScalingFactor() == -1.0) {
 					log.fatal("charging price scaling factor used, but not initialized (e.g. in config file)");

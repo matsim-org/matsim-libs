@@ -41,12 +41,12 @@ import org.apache.commons.math.MathException;
 import org.apache.commons.math.distribution.NormalDistributionImpl;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -263,7 +263,7 @@ public class PTQLink2 implements NetsimLink {
 				
 				
 				this.network.simEngine.getMobsim().getEventsManager().processEvent(
-						new AgentStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
+						new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
 				this.network.simEngine.getMobsim().getAgentCounter().incLost();
 				this.network.simEngine.getMobsim().getAgentCounter().decLiving();
 			}
@@ -275,7 +275,7 @@ public class PTQLink2 implements NetsimLink {
 				MobsimAgent mobsimAgent = (MobsimAgent) passenger;
 				
 				this.network.simEngine.getMobsim().getEventsManager().processEvent(
-						new AgentStuckEvent(now, mobsimAgent.getId(), veh.getCurrentLink().getId(), mobsimAgent.getMode()));
+						new PersonStuckEvent(now, mobsimAgent.getId(), veh.getCurrentLink().getId(), mobsimAgent.getMode()));
 				this.network.simEngine.getMobsim().getAgentCounter().incLost();
 				this.network.simEngine.getMobsim().getAgentCounter().decLiving();
 			}
@@ -286,7 +286,7 @@ public class PTQLink2 implements NetsimLink {
 			else stuckAgents.add(driver.getId());
 			
 			this.network.simEngine.getMobsim().getEventsManager().processEvent(
-					new AgentStuckEvent(now, driver.getId(), driver.getCurrentLinkId(), driver.getMode()));
+					new PersonStuckEvent(now, driver.getId(), driver.getCurrentLinkId(), driver.getMode()));
 			this.network.simEngine.getMobsim().getAgentCounter().incLost();
 			this.network.simEngine.getMobsim().getAgentCounter().decLiving();
 		}
@@ -299,7 +299,7 @@ public class PTQLink2 implements NetsimLink {
 				stuckAgents.add(driver.getId());
 				
 				this.network.simEngine.getMobsim().getEventsManager().processEvent(
-						new AgentStuckEvent(now, driver.getId(), driver.getCurrentLinkId(), driver.getMode()));
+						new PersonStuckEvent(now, driver.getId(), driver.getCurrentLinkId(), driver.getMode()));
 				this.network.simEngine.getMobsim().getAgentCounter().incLost();
 				this.network.simEngine.getMobsim().getAgentCounter().decLiving();
 			}
@@ -311,7 +311,7 @@ public class PTQLink2 implements NetsimLink {
 				else stuckAgents.add(passenger.getId());
 				
 				this.network.simEngine.getMobsim().getEventsManager().processEvent(
-						new AgentStuckEvent(now, passenger.getId(), passenger.getCurrentLinkId(), passenger.getMode()));
+						new PersonStuckEvent(now, passenger.getId(), passenger.getCurrentLinkId(), passenger.getMode()));
 				this.network.simEngine.getMobsim().getAgentCounter().incLost();
 				this.network.simEngine.getMobsim().getAgentCounter().decLiving();				
 			}
@@ -323,7 +323,7 @@ public class PTQLink2 implements NetsimLink {
 			else stuckAgents.add(veh.getDriver().getId());
 			
 			this.network.simEngine.getMobsim().getEventsManager().processEvent(
-					new AgentStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
+					new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
 			this.network.simEngine.getMobsim().getAgentCounter().incLost();
 			this.network.simEngine.getMobsim().getAgentCounter().decLiving();
 		}
@@ -331,7 +331,7 @@ public class PTQLink2 implements NetsimLink {
 
 		for (QVehicle veh : this.vehQueue) {
 			this.network.simEngine.getMobsim().getEventsManager().processEvent(
-					new AgentStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
+					new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
 			this.network.simEngine.getMobsim().getAgentCounter().incLost();
 			this.network.simEngine.getMobsim().getAgentCounter().decLiving();
 		}
@@ -340,7 +340,7 @@ public class PTQLink2 implements NetsimLink {
 
 		for (QVehicle veh : this.buffer) {
 			this.network.simEngine.getMobsim().getEventsManager().processEvent(
-					new AgentStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
+					new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
 			this.network.simEngine.getMobsim().getAgentCounter().incLost();
 			this.network.simEngine.getMobsim().getAgentCounter().decLiving();
 		}

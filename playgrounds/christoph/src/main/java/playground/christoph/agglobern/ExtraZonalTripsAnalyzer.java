@@ -31,13 +31,13 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.facilities.Facility;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -61,7 +61,7 @@ import com.vividsolutions.jts.geom.Point;
  * listed in zonesArray.
  */
 public class ExtraZonalTripsAnalyzer implements ActivityStartEventHandler, ActivityEndEventHandler,
-	AgentDepartureEventHandler {
+	PersonDepartureEventHandler {
 
 	private static final Logger log = Logger.getLogger(ExtraZonalTripsAnalyzer.class);
 	
@@ -82,7 +82,7 @@ public class ExtraZonalTripsAnalyzer implements ActivityStartEventHandler, Activ
 			226, 227, 228, 229, 230, 231, 241, 242, 243, 244, 245, 246, 247, 248, 249, 250, 251, 261};
 	
 	private final Map<Id, ActivityEndEvent> previousActivityEndEvents = new HashMap<Id, ActivityEndEvent>();
-	private final Map<Id, AgentDepartureEvent> previousDepartureEvents = new HashMap<Id, AgentDepartureEvent>();
+	private final Map<Id, PersonDepartureEvent> previousDepartureEvents = new HashMap<Id, PersonDepartureEvent>();
 	private final Map<Id, Integer> facilityMunicipalities = new HashMap<Id, Integer>();
 	private final Map<Id, Coord> facilityCoords = new HashMap<Id, Coord>();
 	private final Map<Integer, SimpleFeature> municipalities = new HashMap<Integer, SimpleFeature>();
@@ -183,7 +183,7 @@ public class ExtraZonalTripsAnalyzer implements ActivityStartEventHandler, Activ
 	}
 	
 	private void writeFileRow(BufferedWriter bw, ActivityEndEvent endEvent, 
-			AgentDepartureEvent departureEvent, ActivityStartEvent startEvent) throws Exception {
+			PersonDepartureEvent departureEvent, ActivityStartEvent startEvent) throws Exception {
 		
 		Coord fromCoord = facilityCoords.get(endEvent.getFacilityId());
 		Coord toCoord = facilityCoords.get(startEvent.getFacilityId());		
@@ -231,7 +231,7 @@ public class ExtraZonalTripsAnalyzer implements ActivityStartEventHandler, Activ
 	@Override
 	public void handleEvent(ActivityStartEvent event) {
 		
-		AgentDepartureEvent previousDepartureEvent = previousDepartureEvents.remove(event.getPersonId());
+		PersonDepartureEvent previousDepartureEvent = previousDepartureEvents.remove(event.getPersonId());
 		
 		boolean relevantTrip = false;
 		
@@ -268,7 +268,7 @@ public class ExtraZonalTripsAnalyzer implements ActivityStartEventHandler, Activ
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		previousDepartureEvents.put(event.getPersonId(), event);
 	}
 }

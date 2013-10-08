@@ -25,8 +25,8 @@ import java.util.Collection;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
 import org.matsim.signalsystems.mobsim.SignalizeableItem;

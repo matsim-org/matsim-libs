@@ -23,18 +23,18 @@ package playground.anhorni.locationchoice.analysis.events;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 
 import playground.anhorni.utils.Utils;
 
-public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEventHandler {
+public class CalcLegTimes implements PersonDepartureEventHandler, PersonArrivalEventHandler {
 
 	private Population population = null;
 	private final TreeMap<Id, Double> agentDepartures = new TreeMap<Id, Double>();
@@ -49,7 +49,7 @@ public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEve
 		this.wayThere = wayThere;
 	}
 
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		this.agentDepartures.put(event.getPersonId(), event.getTime());
 	}
 
@@ -74,7 +74,7 @@ public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEve
 		return (Activity) plan.getPlanElements().get(count*2);
 	}
 	
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		increaseAgentArrivalCount(event.getPersonId());
 		Double depTime = this.agentDepartures.remove(event.getPersonId());
 		Person agent = this.population.getPersons().get(event.getPersonId());

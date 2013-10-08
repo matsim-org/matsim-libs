@@ -28,17 +28,17 @@ import java.util.Map;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
-public class IADrivingWriter implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandler {
+public class IADrivingWriter implements LinkEnterEventHandler, LinkLeaveEventHandler, PersonArrivalEventHandler {
 
 	private final static Logger log = Logger.getLogger(IADrivingWriter.class);
 
@@ -102,7 +102,7 @@ public class IADrivingWriter implements LinkEnterEventHandler, LinkLeaveEventHan
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		Double enterTime = this.linkEnterTimes.remove(event.getPersonId());
 		if (enterTime != null) {
 			Link link = this.network.getLinks().get(event.getLinkId());

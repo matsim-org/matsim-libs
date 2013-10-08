@@ -23,20 +23,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
+
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 
 
-public class TravelTimeEventHandler implements AgentDepartureEventHandler, AgentArrivalEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler {
-	private final Map<Id, AgentDepartureEvent> pendantDepartureEvent = new HashMap<Id, AgentDepartureEvent>();
+public class TravelTimeEventHandler implements PersonDepartureEventHandler, PersonArrivalEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler {
+	private final Map<Id, PersonDepartureEvent> pendantDepartureEvent = new HashMap<Id, PersonDepartureEvent>();
 	private final Map<Id, LinkEnterEvent> pendantLinkEnterEvent = new HashMap<Id, LinkEnterEvent>();
 	
 	private List<Double> netTTs = new Vector<Double>();
@@ -49,13 +50,13 @@ public class TravelTimeEventHandler implements AgentDepartureEventHandler, Agent
 	}
 	
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		double netTT = event.getTime() - this.pendantDepartureEvent.get(event.getPersonId()).getTime();
 		this.netTTs.add(netTT);
 	}
 
 	@Override
-	public void handleEvent(final AgentDepartureEvent event) {
+	public void handleEvent(final PersonDepartureEvent event) {
 		this.pendantDepartureEvent.put(event.getPersonId(), event);
 	}
 	

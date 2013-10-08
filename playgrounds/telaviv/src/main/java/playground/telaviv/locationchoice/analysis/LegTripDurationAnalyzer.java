@@ -35,12 +35,12 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
@@ -53,7 +53,7 @@ import org.matsim.core.utils.misc.RouteUtils;
 
 import playground.telaviv.locationchoice.ExtendedLocationChoicePlanModule;
 
-public class LegTripDurationAnalyzer implements AgentDepartureEventHandler, AgentArrivalEventHandler {
+public class LegTripDurationAnalyzer implements PersonDepartureEventHandler, PersonArrivalEventHandler {
 
 	private static final Logger log = Logger.getLogger(LegTripDurationAnalyzer.class);
 	
@@ -225,7 +225,7 @@ public class LegTripDurationAnalyzer implements AgentDepartureEventHandler, Agen
 	}
 		
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		
 		if (legCounter.containsKey(event.getPersonId())) {
 			int count = legCounter.get(event.getPersonId());
@@ -239,7 +239,7 @@ public class LegTripDurationAnalyzer implements AgentDepartureEventHandler, Agen
 	}
 	
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		
 		List<Integer> shoppingIndices = null;
 		List<Integer> otherIndices = null;

@@ -26,7 +26,7 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestUtils;
 

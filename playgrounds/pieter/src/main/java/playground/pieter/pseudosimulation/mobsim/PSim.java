@@ -20,24 +20,24 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.Wait2LinkEvent;
-import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
-import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
-import org.matsim.core.api.experimental.events.TravelledEvent;
+import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.config.groups.PlansCalcRouteConfigGroup;
@@ -219,7 +219,7 @@ public class PSim implements Mobsim {
 							TransitWalkTimeAndDistance tnd = new TransitWalkTimeAndDistance(act.getCoord(),
 									prevAct.getCoord());
 							travelTime = tnd.time;
-							eventQueue.add(new TravelledEvent(prevEndTime + tnd.time, personId, tnd.distance));
+							eventQueue.add(new TeleportationArrivalEvent(prevEndTime + tnd.time, personId, tnd.distance));
 						} else if (prevLeg.getMode().equals(TransportMode.pt)) {
 							if (controler.getConfig().scenario().isUseTransit()) {
 								ExperimentalTransitRoute route = (ExperimentalTransitRoute) prevLeg.getRoute();
@@ -235,7 +235,7 @@ public class PSim implements Mobsim {
 								travelTime += findTransitTravelTime(route, prevEndTime + travelTime);
 								eventQueue.add(new PersonLeavesVehicleEvent(prevEndTime + travelTime, personId,
 										dummyVehicleId));
-								eventQueue.add(new TravelledEvent(prevEndTime + travelTime, personId, Double.NaN));
+								eventQueue.add(new TeleportationArrivalEvent(prevEndTime + travelTime, personId, Double.NaN));
 							} else {
 								try {
 									GenericRoute route = (GenericRoute) prevLeg.getRoute();
@@ -274,7 +274,7 @@ public class PSim implements Mobsim {
 						/*
 						 * Send arrival and activity start events.
 						 */
-						AgentArrivalEvent arrivalEvent = new AgentArrivalEvent(arrivalTime, personId, act.getLinkId(),
+						PersonArrivalEvent arrivalEvent = new PersonArrivalEvent(arrivalTime, personId, act.getLinkId(),
 								prevLeg.getMode());
 						eventQueue.add(arrivalEvent);
 						ActivityStartEvent startEvent = new ActivityStartEvent(arrivalTime, personId, act.getLinkId(),
@@ -291,7 +291,7 @@ public class PSim implements Mobsim {
 						ActivityEndEvent endEvent = new ActivityEndEvent(actEndTime, personId, act.getLinkId(),
 								act.getFacilityId(), act.getType());
 						eventQueue.add(endEvent);
-						AgentDepartureEvent departureEvent = new AgentDepartureEvent(actEndTime, personId,
+						PersonDepartureEvent departureEvent = new PersonDepartureEvent(actEndTime, personId,
 								act.getLinkId(), nextLeg.getMode());
 
 						eventQueue.add(departureEvent);

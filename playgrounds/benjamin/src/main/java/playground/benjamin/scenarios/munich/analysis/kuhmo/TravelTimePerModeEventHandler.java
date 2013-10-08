@@ -24,10 +24,10 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 
 import playground.benjamin.scenarios.munich.analysis.filter.PersonFilter;
 import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
@@ -36,7 +36,7 @@ import playground.benjamin.scenarios.munich.analysis.filter.UserGroup;
  * @author benjamin
  *
  */
-public class TravelTimePerModeEventHandler implements AgentArrivalEventHandler, AgentDepartureEventHandler{
+public class TravelTimePerModeEventHandler implements PersonArrivalEventHandler, PersonDepartureEventHandler{
 	private static final Logger logger = Logger.getLogger(TravelTimePerModeEventHandler.class);
 
 	Map<String, Map<Id, Double>> mode2personId2DepartureTime;
@@ -62,7 +62,7 @@ public class TravelTimePerModeEventHandler implements AgentArrivalEventHandler, 
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		Map<Id, Double> personId2DepartureTime;
 
 		String legMode = event.getLegMode();
@@ -108,7 +108,7 @@ public class TravelTimePerModeEventHandler implements AgentArrivalEventHandler, 
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		Map<Id, Double> personId2DepartureTime;
 		Map<Id, Double> personId2TravelTime;
 

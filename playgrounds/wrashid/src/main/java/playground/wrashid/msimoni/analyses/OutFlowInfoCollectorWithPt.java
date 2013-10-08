@@ -24,16 +24,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 
 public class OutFlowInfoCollectorWithPt extends AbstractFlowAccumulator implements LinkLeaveEventHandler,
-		LinkEnterEventHandler, AgentArrivalEventHandler {
+		LinkEnterEventHandler, PersonArrivalEventHandler {
 
 	private int binSizeInSeconds; // set the length of interval
 	public HashMap<Id, int[]> linkOutFlow; // define
@@ -119,7 +119,7 @@ public class OutFlowInfoCollectorWithPt extends AbstractFlowAccumulator implemen
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		if (lastEnteredLink.containsKey(event.getPersonId())
 				&& lastEnteredLink.get(event.getPersonId()) != null) {
 			if (lastEnteredLink.get(event.getPersonId()).equals(

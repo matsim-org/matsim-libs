@@ -31,8 +31,8 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 
 public class LinkLeaveCountsHandler implements LinkLeaveEventHandler {
 	private static final Logger logger = Logger.getLogger(LinkLeaveCountsHandler.class);

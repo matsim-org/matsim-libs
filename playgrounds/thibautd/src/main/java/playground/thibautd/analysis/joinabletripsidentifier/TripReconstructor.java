@@ -29,21 +29,21 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.Event;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.utils.collections.QuadTree;
 
 /**
@@ -53,8 +53,8 @@ import org.matsim.core.utils.collections.QuadTree;
 public class TripReconstructor implements 
 		LinkLeaveEventHandler,
 		LinkEnterEventHandler,
-		AgentDepartureEventHandler,
-		AgentArrivalEventHandler,
+		PersonDepartureEventHandler,
+		PersonArrivalEventHandler,
 		ActivityEndEventHandler,
 		ActivityStartEventHandler {
 	private static final Log log =
@@ -153,13 +153,13 @@ public class TripReconstructor implements
 	}
 
 	@Override
-	public void handleEvent(final AgentArrivalEvent event) {
+	public void handleEvent(final PersonArrivalEvent event) {
 		if (isPtEvent(event.getPersonId())) return;
 		this.agentsData.get( event.getPersonId() ).handleEvent( event );
 	}
 
 	@Override
-	public void handleEvent(final AgentDepartureEvent event) {
+	public void handleEvent(final PersonDepartureEvent event) {
 		if (isPtEvent(event.getPersonId())) return;
 		this.agentsData.get( event.getPersonId() ).handleEvent(event);
 	}
@@ -218,8 +218,8 @@ class TripData {
 	private final Id agentId;
 	private final int tripCount;
 	private ActivityEndEvent origin = null;
-	private AgentDepartureEvent departure = null;
-	private AgentArrivalEvent arrival = null;
+	private PersonDepartureEvent departure = null;
+	private PersonArrivalEvent arrival = null;
 	private ActivityStartEvent destination = null;
 	private final List<Event> routeEvents = new ArrayList<Event>();
 
@@ -243,7 +243,7 @@ class TripData {
 	// ////////////////////////////////////////////////////////////////////////
 	// public methods
 	// ////////////////////////////////////////////////////////////////////////
-	public void handleEvent(final AgentDepartureEvent event) {
+	public void handleEvent(final PersonDepartureEvent event) {
 		this.departure = event;
 	}
 
@@ -255,7 +255,7 @@ class TripData {
 		this.routeEvents.add(event);
 	}
 	
-	public void handleEvent(final AgentArrivalEvent event) {
+	public void handleEvent(final PersonArrivalEvent event) {
 		this.arrival = event;
 	}
 

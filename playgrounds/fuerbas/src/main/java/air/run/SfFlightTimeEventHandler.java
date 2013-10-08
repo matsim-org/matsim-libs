@@ -24,13 +24,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 
-public class SfFlightTimeEventHandler implements AgentArrivalEventHandler,
-		AgentDepartureEventHandler {
+public class SfFlightTimeEventHandler implements PersonArrivalEventHandler,
+		PersonDepartureEventHandler {
 	
 	public Map<Id, Double> arrivalTime;
 	public Map<Id, Double> departureTime;
@@ -44,14 +44,14 @@ public class SfFlightTimeEventHandler implements AgentArrivalEventHandler,
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		this.arrivalTime.put(event.getPersonId(), event.getTime());
 		this.flightTime.put(event.getPersonId(), event.getTime()-this.departureTime.get(event.getPersonId()));
 	}
 
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		this.departureTime.put(event.getPersonId(), event.getTime());
 	}
 

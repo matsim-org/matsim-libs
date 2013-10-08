@@ -28,15 +28,15 @@ import java.util.TreeMap;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
-import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
-import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
+import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.utils.collections.Tuple;
 
 import playground.andreas.bvgAna.level0.AgentId2PlannedDepartureTimeMap;
@@ -57,7 +57,7 @@ import playground.andreas.bvgAna.level2.VehiclePlannedRealizedMissedDepartures;
  * @author aneumann
  *
  */
-public class AgentId2StopDifferenceMap implements TransitDriverStartsEventHandler, VehicleDepartsAtFacilityEventHandler, AgentDepartureEventHandler, PersonEntersVehicleEventHandler {
+public class AgentId2StopDifferenceMap implements TransitDriverStartsEventHandler, VehicleDepartsAtFacilityEventHandler, PersonDepartureEventHandler, PersonEntersVehicleEventHandler {
 
 	private final Logger log = Logger.getLogger(AgentId2StopDifferenceMap.class);
 	private final Level logLevel = Level.OFF;
@@ -190,7 +190,7 @@ public class AgentId2StopDifferenceMap implements TransitDriverStartsEventHandle
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		this.agentDelayHandler.handleEvent(event);
 	}
 

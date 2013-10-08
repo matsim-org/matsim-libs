@@ -7,7 +7,7 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.api.experimental.events.TravelledEvent;
+import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.agents.TransitAgent;
@@ -159,7 +159,7 @@ public class PassivePlannerDriverAgent implements MobsimDriverAgent, HasBasePers
 	public void notifyArrivalOnLinkByNonNetworkMode(Id linkId) {
 		Link startLink = simulation.getScenario().getNetwork().getLinks().get(((Leg)getCurrentPlanElement()).getRoute().getStartLinkId());
 		Link endLink = simulation.getScenario().getNetwork().getLinks().get(((Leg)getCurrentPlanElement()).getRoute().getEndLinkId());
-		simulation.getEventsManager().processEvent(new TravelledEvent(simulation.getSimTimer().getTimeOfDay(), getId(), CoordUtils.calcDistance(startLink.getCoord(), endLink.getCoord())));
+		simulation.getEventsManager().processEvent(new TeleportationArrivalEvent(simulation.getSimTimer().getTimeOfDay(), getId(), CoordUtils.calcDistance(startLink.getCoord(), endLink.getCoord())));
 	}
 	@Override
 	public Id getCurrentLinkId() {

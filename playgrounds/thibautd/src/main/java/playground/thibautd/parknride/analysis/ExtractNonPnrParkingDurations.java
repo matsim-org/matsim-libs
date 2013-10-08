@@ -30,14 +30,14 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
@@ -71,7 +71,7 @@ public class ExtractNonPnrParkingDurations {
 		handler.close();
 	}
 
-	private static class Handler implements AgentArrivalEventHandler, AgentDepartureEventHandler, ActivityStartEventHandler {
+	private static class Handler implements PersonArrivalEventHandler, PersonDepartureEventHandler, ActivityStartEventHandler {
 		private final Network network;
 		private final BufferedWriter writer;
 		private final List<Id> justParkedAgents = new ArrayList<Id>();
@@ -97,7 +97,7 @@ public class ExtractNonPnrParkingDurations {
 		}
 
 		@Override
-		public void handleEvent(final AgentArrivalEvent event) {
+		public void handleEvent(final PersonArrivalEvent event) {
 			if (event.getLegMode().equals( TransportMode.car )) {
 				justParkedAgents.add( event.getPersonId() );
 			}
@@ -111,7 +111,7 @@ public class ExtractNonPnrParkingDurations {
 		}
 
 		@Override
-		public void handleEvent(final AgentDepartureEvent event) {
+		public void handleEvent(final PersonDepartureEvent event) {
 			if ( !event.getLegMode().equals( TransportMode.car ) ) return;
 
 			Double startOfParking = payedParkingStarts.remove( event.getPersonId() );

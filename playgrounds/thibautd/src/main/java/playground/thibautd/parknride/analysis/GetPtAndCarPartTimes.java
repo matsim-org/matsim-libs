@@ -26,13 +26,13 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.utils.io.IOUtils;
@@ -57,7 +57,7 @@ public class GetPtAndCarPartTimes {
 		analyser.close();
 	}
 
-	private static class EventAnalyser implements AgentDepartureEventHandler, AgentArrivalEventHandler, ActivityStartEventHandler {
+	private static class EventAnalyser implements PersonDepartureEventHandler, PersonArrivalEventHandler, ActivityStartEventHandler {
 		private Map<Id, Trip> trips = new HashMap<Id, Trip>();
 
 		private final BufferedWriter writer;
@@ -78,7 +78,7 @@ public class GetPtAndCarPartTimes {
 		}
 
 		@Override
-		public void handleEvent(final AgentDepartureEvent event) {
+		public void handleEvent(final PersonDepartureEvent event) {
 			Trip trip = trips.get( event.getPersonId() );
 
 			if (trip == null) {
@@ -115,7 +115,7 @@ public class GetPtAndCarPartTimes {
 		}
 
 		@Override
-		public void handleEvent(final AgentArrivalEvent event) {
+		public void handleEvent(final PersonArrivalEvent event) {
 			Trip trip = trips.get( event.getPersonId() );
 
 			if ( trip != null ) {

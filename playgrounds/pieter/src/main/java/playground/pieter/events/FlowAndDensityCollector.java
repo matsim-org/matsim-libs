@@ -28,19 +28,19 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.Wait2LinkEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.Wait2LinkEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
-import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
+import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
+import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
 
 /**
  * @author fouriep, wrashid
@@ -48,7 +48,7 @@ import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
  *         track the average density and flow inside a link
  * 
  */
-public class FlowAndDensityCollector implements LinkLeaveEventHandler, LinkEnterEventHandler, AgentArrivalEventHandler, Wait2LinkEventHandler {
+public class FlowAndDensityCollector implements LinkLeaveEventHandler, LinkEnterEventHandler, PersonArrivalEventHandler, Wait2LinkEventHandler {
 	private int binSizeInSeconds; // set the length of interval
 	private HashMap<Id, int[]> linkOutFlow; // define
 	private HashMap<Id, int[]> linkInFlow;
@@ -185,7 +185,7 @@ public class FlowAndDensityCollector implements LinkLeaveEventHandler, LinkEnter
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		if (lastEnteredLink.containsKey(event.getPersonId()) && lastEnteredLink.get(event.getPersonId()) != null) {
 			if (lastEnteredLink.get(event.getPersonId()).equals(event.getLinkId())) {
 				linkLeave(event.getLinkId(), event.getTime());

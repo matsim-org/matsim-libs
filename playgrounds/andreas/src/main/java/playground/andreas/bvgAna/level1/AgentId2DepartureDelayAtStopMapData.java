@@ -22,8 +22,8 @@ package playground.andreas.bvgAna.level1;
 import java.util.ArrayList;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 
 /**
  * Simple data container to store departure time and agent enters vehicle time for each agent at different stops.
@@ -66,7 +66,7 @@ public class AgentId2DepartureDelayAtStopMapData {
 		return "Person: " + this.personId + ", # left pt interaction: " + this.agentDepartsPTInteraction.size() + ", # vehicle entered: " + this.agentEntersVehicle.size();
 	}
 
-	public void addAgentDepartureEvent(AgentDepartureEvent event) {
+	public void addAgentDepartureEvent(PersonDepartureEvent event) {
 		this.agentDepartsPTInteraction.add(new Double(event.getTime()));		
 	}
 

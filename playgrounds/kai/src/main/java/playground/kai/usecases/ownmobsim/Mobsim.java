@@ -4,15 +4,15 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 
 public class Mobsim {
 	private static final Logger log = Logger.getLogger(Mobsim.class);
@@ -42,7 +42,7 @@ public class Mobsim {
 		ActivityEndEvent aee = eb.createActivityEndEvent( time, agentId, linkId, facilityId, "actType" ) ;
 		ev.processEvent( aee ) ;
 
-		AgentDepartureEvent ade = eb.createAgentDepartureEvent( time, agentId, linkId, legMode ) ;
+		PersonDepartureEvent ade = eb.createAgentDepartureEvent( time, agentId, linkId, legMode ) ;
 
 		Wait2LinkEvent aw2le = eb.createAgentWait2LinkEvent(time,agentId,linkId, null) ;
 
@@ -50,7 +50,7 @@ public class Mobsim {
 
 		LinkEnterEvent lee = eb.createLinkEnterEvent( time, agentId, linkId, null ) ;
 
-		AgentArrivalEvent aae = eb.createAgentArrivalEvent( time, agentId, linkId, legMode ) ;
+		PersonArrivalEvent aae = eb.createAgentArrivalEvent( time, agentId, linkId, legMode ) ;
 
 		ActivityStartEvent ase = eb.createActivityStartEvent( time, agentId, linkId, facilityId, "acttype" ) ;
 

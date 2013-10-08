@@ -25,22 +25,23 @@ package playground.ikaddoura.busCorridorPaper.busCorridorWelfareAnalysis;
 
 import java.util.HashMap;
 import java.util.Map;
+
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.pt.PtConstants;
 
 /**
  * @author Ihab
  *
  */
-public class PtLegHandler implements PersonEntersVehicleEventHandler, AgentDepartureEventHandler, AgentArrivalEventHandler, ActivityEndEventHandler {
+public class PtLegHandler implements PersonEntersVehicleEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler, ActivityEndEventHandler {
 	private final Map <Id, Double> personId2WaitingTime = new HashMap<Id, Double>();
 	private final Map <Id, Double> personId2PersonEntersVehicleTime = new HashMap<Id, Double>();
 	private final Map <Id, Double> personId2AgentDepartureTime = new HashMap<Id, Double>();
@@ -85,7 +86,7 @@ public class PtLegHandler implements PersonEntersVehicleEventHandler, AgentDepar
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		Id personId = event.getPersonId();
 		
 		if (event.getLegMode().toString().equals("pt")){
@@ -97,7 +98,7 @@ public class PtLegHandler implements PersonEntersVehicleEventHandler, AgentDepar
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		Id personId = event.getPersonId();
 		
 		if (event.getLegMode().toString().equals("pt")){

@@ -2,12 +2,12 @@ package playground.jbischoff.matsimha2;
 
 import java.util.Random;
 
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.replanning.PlanStrategyModule;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.replanning.ReplanningContext;
 
 public class ChangeActivityTimesEasy implements PlanStrategyModule, ActivityEndEventHandler {

@@ -26,16 +26,16 @@ import java.io.IOException;
 import java.util.TreeMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 
-public class BurgdorfAnalyzer implements AgentDepartureEventHandler, LinkLeaveEventHandler {
+public class BurgdorfAnalyzer implements PersonDepartureEventHandler, LinkLeaveEventHandler {
 	
 	private final TreeMap<Double,Integer> bahnhof = new TreeMap<Double, Integer>();
 	private final TreeMap<Double,Integer> festplatz = new TreeMap<Double, Integer>();
@@ -71,7 +71,7 @@ public class BurgdorfAnalyzer implements AgentDepartureEventHandler, LinkLeaveEv
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		if (this.time < event.getTime() ) {
 			update(event.getTime());
 		}	

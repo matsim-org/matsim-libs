@@ -31,12 +31,12 @@ import java.util.TreeMap;
 import java.util.Vector;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 
 import playground.yu.utils.container.CollectionMath;
 
@@ -48,8 +48,8 @@ import playground.yu.utils.container.CollectionMath;
  * @author yu
  *
  */
-public class RouteTravelTimeMeasure implements AgentDepartureEventHandler,
-		AgentArrivalEventHandler, LinkEnterEventHandler {
+public class RouteTravelTimeMeasure implements PersonDepartureEventHandler,
+		PersonArrivalEventHandler, LinkEnterEventHandler {
 
 	private Map<String/* route "ID" */, List<Double>/* travelTimes */> routeTimes = new HashMap<String, List<Double>>();
 	private Map<Id/* agent Id */, StringBuffer/* route ID in future */> agentRouteIdCreator/* temporary */= new HashMap<Id, StringBuffer>();
@@ -76,7 +76,7 @@ public class RouteTravelTimeMeasure implements AgentDepartureEventHandler,
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		// creates route Id
 		Id agentId = event.getPersonId();
 		Id linkId = event.getLinkId();
@@ -107,7 +107,7 @@ public class RouteTravelTimeMeasure implements AgentDepartureEventHandler,
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		Id agentId = event.getPersonId();
 		if (agentRouteIdCreator.containsKey(agentId)) {
 			throw new RuntimeException("The LAST record of agent\t" + agentId

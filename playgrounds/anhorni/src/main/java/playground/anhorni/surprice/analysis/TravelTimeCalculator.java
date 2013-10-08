@@ -26,15 +26,15 @@ import java.util.TreeMap;
 
 import org.matsim.analysis.Bins;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
-public class TravelTimeCalculator implements AgentDepartureEventHandler, AgentArrivalEventHandler, 
+public class TravelTimeCalculator implements PersonDepartureEventHandler, PersonArrivalEventHandler, 
 	ActivityStartEventHandler {
 
 	private final Map<Id, Double> agentDepartures = new HashMap<Id, Double>();
@@ -57,7 +57,7 @@ public class TravelTimeCalculator implements AgentDepartureEventHandler, AgentAr
 	}
 	
 	@Override
-	public void handleEvent(final AgentDepartureEvent event) {
+	public void handleEvent(final PersonDepartureEvent event) {
 		this.agentDepartures.put(event.getPersonId(), event.getTime());
 		
 		if (this.ttPerAgent.get(event.getPersonId()) == null) {
@@ -66,7 +66,7 @@ public class TravelTimeCalculator implements AgentDepartureEventHandler, AgentAr
 	}
 
 	@Override
-	public void handleEvent(final AgentArrivalEvent event) {
+	public void handleEvent(final PersonArrivalEvent event) {
 		this.agentArrivals.put(event.getPersonId(), event.getTime());
 		this.agentArrivalsMode.put(event.getPersonId(), event.getLegMode());
 	}

@@ -29,14 +29,14 @@ import java.util.Set;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
@@ -110,8 +110,8 @@ public class EventsToXYData implements BasicEventHandler {
 	public void handleEvent(Event event) {
 		
 		// check whether the agent's mode is walk2d
-		if (event instanceof AgentDepartureEvent) {
-			AgentDepartureEvent agentDepartureEvent = (AgentDepartureEvent) event;
+		if (event instanceof PersonDepartureEvent) {
+			PersonDepartureEvent agentDepartureEvent = (PersonDepartureEvent) event;
 			if (observedModes.contains(agentDepartureEvent.getLegMode())) {
 				observedAgents.put(agentDepartureEvent.getPersonId(), agentDepartureEvent.getLegMode());
 				
@@ -151,8 +151,8 @@ public class EventsToXYData implements BasicEventHandler {
 		}
 		
 		// create xy data for link trips of observed agents
-		else if (event instanceof AgentArrivalEvent) {
-			AgentArrivalEvent agentArrivalEvent = (AgentArrivalEvent) event;
+		else if (event instanceof PersonArrivalEvent) {
+			PersonArrivalEvent agentArrivalEvent = (PersonArrivalEvent) event;
 			Id personId = agentArrivalEvent.getPersonId();
 			LinkEnterEvent linkEnterEvent = linkEnterEvents.remove(personId);
 			

@@ -26,13 +26,13 @@ package playground.yu.analysis;
 import java.util.HashMap;
 
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
@@ -62,8 +62,8 @@ import playground.yu.utils.io.SimpleWriter;
  * @author ychen
  * 
  */
-public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
-		AgentArrivalEventHandler, Analysis {
+public class LegTravelTimeModalSplit implements PersonDepartureEventHandler,
+		PersonArrivalEventHandler, Analysis {
 
 	protected final Population plans;
 
@@ -120,7 +120,7 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 	}
 
 	@Override
-	public void handleEvent(final AgentDepartureEvent event) {
+	public void handleEvent(final PersonDepartureEvent event) {
 		if (toll != null) {
 			// only inhabitant from Kanton
 			if (TollTools.isInRange(((PlanImpl) plans.getPersons().get(
@@ -140,7 +140,7 @@ public class LegTravelTimeModalSplit implements AgentDepartureEventHandler,
 	}
 
 	@Override
-	public void handleEvent(final AgentArrivalEvent event) {
+	public void handleEvent(final PersonArrivalEvent event) {
 		double arrTime = event.getTime();
 		String agentId = event.getPersonId().toString();
 		if (toll == null) {

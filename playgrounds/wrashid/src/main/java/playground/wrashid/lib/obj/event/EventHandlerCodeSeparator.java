@@ -21,35 +21,35 @@ package playground.wrashid.lib.obj.event;
 
 import java.util.LinkedList;
 
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.contrib.parking.lib.DebugLib;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.events.handler.EventHandler;
 
 
 public class EventHandlerCodeSeparator implements ActivityStartEventHandler, ActivityEndEventHandler, LinkEnterEventHandler,
-		AgentArrivalEventHandler, AgentDepartureEventHandler {
+		PersonArrivalEventHandler, PersonDepartureEventHandler {
 
 	private LinkedList<ActivityStartEventHandler> activityStartEventHandlers;
 	private LinkedList<ActivityEndEventHandler> activityEndEventHandlers;
 	private LinkedList<LinkEnterEventHandler> linkEnterEventHandlers;
-	private LinkedList<AgentArrivalEventHandler> arrivalEventHandlers;
-	private LinkedList<AgentDepartureEventHandler> departureEventHandlers;
+	private LinkedList<PersonArrivalEventHandler> arrivalEventHandlers;
+	private LinkedList<PersonDepartureEventHandler> departureEventHandlers;
 
 	public EventHandlerCodeSeparator() {
 		activityStartEventHandlers = new LinkedList<ActivityStartEventHandler>();
 		activityEndEventHandlers = new LinkedList<ActivityEndEventHandler>();
 		linkEnterEventHandlers = new LinkedList<LinkEnterEventHandler>();
-		arrivalEventHandlers = new LinkedList<AgentArrivalEventHandler>();
-		departureEventHandlers = new LinkedList<AgentDepartureEventHandler>();
+		arrivalEventHandlers = new LinkedList<PersonArrivalEventHandler>();
+		departureEventHandlers = new LinkedList<PersonDepartureEventHandler>();
 	}
 
 	public void addHandler(EventHandler eventHandler) {
@@ -65,12 +65,12 @@ public class EventHandlerCodeSeparator implements ActivityStartEventHandler, Act
 			linkEnterEventHandlers.add((LinkEnterEventHandler) eventHandler);
 		}
 		
-		if (eventHandler instanceof AgentArrivalEventHandler) {
-			arrivalEventHandlers.add((AgentArrivalEventHandler) eventHandler);
+		if (eventHandler instanceof PersonArrivalEventHandler) {
+			arrivalEventHandlers.add((PersonArrivalEventHandler) eventHandler);
 		}
 		
-		if (eventHandler instanceof AgentDepartureEventHandler) {
-			departureEventHandlers.add((AgentDepartureEventHandler) eventHandler);
+		if (eventHandler instanceof PersonDepartureEventHandler) {
+			departureEventHandlers.add((PersonDepartureEventHandler) eventHandler);
 		} 
 		
 		
@@ -114,15 +114,15 @@ public class EventHandlerCodeSeparator implements ActivityStartEventHandler, Act
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
-		for (AgentDepartureEventHandler eventHandler : departureEventHandlers) {
+	public void handleEvent(PersonDepartureEvent event) {
+		for (PersonDepartureEventHandler eventHandler : departureEventHandlers) {
 			eventHandler.handleEvent(event);
 		}
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
-		for (AgentArrivalEventHandler eventHandler : arrivalEventHandlers) {
+	public void handleEvent(PersonArrivalEvent event) {
+		for (PersonArrivalEventHandler eventHandler : arrivalEventHandlers) {
 			eventHandler.handleEvent(event);
 		}
 	}

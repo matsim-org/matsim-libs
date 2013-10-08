@@ -26,8 +26,8 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
-import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
-import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
+import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
+import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
 
 /**
  * Tracks at which facility a vehicle is currently located. If a vehicle departs at a facility,

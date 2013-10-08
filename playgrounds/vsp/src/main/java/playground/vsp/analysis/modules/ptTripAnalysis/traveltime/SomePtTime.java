@@ -24,11 +24,11 @@ import java.util.List;
 
 import org.jfree.util.Log;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.Event;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
-import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.core.utils.collections.Tuple;
 
 /**
@@ -108,9 +108,9 @@ class AccesWalk extends SomePtTime {
 
 	@Override
 	protected boolean handle(Event e) {
-		if (e instanceof AgentDepartureEvent) {
+		if (e instanceof PersonDepartureEvent) {
 			return true;
-		} else if (e instanceof AgentArrivalEvent) {
+		} else if (e instanceof PersonArrivalEvent) {
 			this.finish();
 			return true;
 		} else {
@@ -127,7 +127,7 @@ class AccesWait extends SomePtTime {
 
 	@Override
 	protected boolean handle(Event e) {
-		if (e instanceof AgentArrivalEvent) {
+		if (e instanceof PersonArrivalEvent) {
 			return true;
 		} else if (e instanceof PersonEntersVehicleEvent) {
 			this.finish();
@@ -191,18 +191,18 @@ class SwitchWalk extends SomePtTime {
 
 	@Override
 	protected boolean handle(Event e) {
-		if (e instanceof AgentDepartureEvent && !first) {
-			if (((AgentDepartureEvent) e).getLegMode().equals(
+		if (e instanceof PersonDepartureEvent && !first) {
+			if (((PersonDepartureEvent) e).getLegMode().equals(
 					TransportMode.transit_walk)) {
 				return true;
 			}
-		} else if (e instanceof AgentArrivalEvent) {
+		} else if (e instanceof PersonArrivalEvent) {
 			// the first "SwitchWalk" is the AccesWalk
 			if (first) {
 				first = false;
 				return false;
 			} else {
-				if (((AgentArrivalEvent) e).getLegMode().equals(TransportMode.transit_walk)) {
+				if (((PersonArrivalEvent) e).getLegMode().equals(TransportMode.transit_walk)) {
 					return true;
 				}
 			}

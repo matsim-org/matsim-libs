@@ -14,19 +14,19 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
-import org.matsim.core.api.experimental.events.handler.Wait2LinkEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
@@ -37,7 +37,7 @@ import org.matsim.core.utils.charts.XYScatterChart;
 import org.matsim.core.config.ConfigUtils;
 import org.xml.sax.SAXException;
 
-public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEventHandler, Wait2LinkEventHandler, AgentArrivalEventHandler, AgentStuckEventHandler {
+public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEventHandler, Wait2LinkEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler {
 	
 	public static double TIME_INTERVAL;
 	public final static long millisSingapore = 27000000;
@@ -604,7 +604,7 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 		exitLink(event.getTime(), event.getLinkId(), event.getPersonId());
 	}
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		beginActivityLink(event.getTime(), event.getLinkId(), event.getPersonId());
 	}
 	@Override
@@ -612,7 +612,7 @@ public class TimeSpaceDistribution implements LinkEnterEventHandler, LinkLeaveEv
 		finishActivityLink(event.getTime(), event.getLinkId(), event.getPersonId());
 	}
 	@Override
-	public void handleEvent(AgentStuckEvent event) {
+	public void handleEvent(PersonStuckEvent event) {
 		System.out.println("stuck");
 	}
 	public void enterLink(double time, Id linkId, Id personId) {

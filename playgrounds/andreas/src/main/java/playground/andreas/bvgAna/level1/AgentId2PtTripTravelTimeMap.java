@@ -27,14 +27,14 @@ import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.pt.PtConstants;
 
 /**
@@ -44,7 +44,7 @@ import org.matsim.pt.PtConstants;
  * @author aneumann
  *
  */
-public class AgentId2PtTripTravelTimeMap implements ActivityStartEventHandler, ActivityEndEventHandler, AgentDepartureEventHandler, AgentArrivalEventHandler{
+public class AgentId2PtTripTravelTimeMap implements ActivityStartEventHandler, ActivityEndEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler{
 	
 	private final Logger log = Logger.getLogger(AgentId2PtTripTravelTimeMap.class);
 	private final Level logLevel = Level.DEBUG;
@@ -88,7 +88,7 @@ public class AgentId2PtTripTravelTimeMap implements ActivityStartEventHandler, A
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		if(this.agentIds.contains(event.getPersonId())){
 			if(event.getLegMode().equalsIgnoreCase(TransportMode.transit_walk) || event.getLegMode().equalsIgnoreCase(TransportMode.pt)){
 				this.tempList.get(event.getPersonId()).handle(event);
@@ -100,7 +100,7 @@ public class AgentId2PtTripTravelTimeMap implements ActivityStartEventHandler, A
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		if(this.agentIds.contains(event.getPersonId())){
 			if(event.getLegMode().equalsIgnoreCase(TransportMode.transit_walk) || event.getLegMode().equalsIgnoreCase(TransportMode.pt)){
 				this.tempList.get(event.getPersonId()).handle(event);

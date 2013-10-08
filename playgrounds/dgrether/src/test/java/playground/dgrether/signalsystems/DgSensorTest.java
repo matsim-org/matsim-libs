@@ -24,14 +24,14 @@ import junit.framework.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.Wait2LinkEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -100,7 +100,7 @@ public class DgSensorTest {
 		numberOfCars = sensor.getNumberOfCarsOnLink();
 		Assert.assertEquals(1, numberOfCars);
 		
-		AgentArrivalEvent arrivalEvent = new AgentArrivalEvent(110.0, id2, id1, "car");
+		PersonArrivalEvent arrivalEvent = new PersonArrivalEvent(110.0, id2, id1, "car");
 		sensor.handleEvent(arrivalEvent);
 		numberOfCars = sensor.getNumberOfCarsOnLink();
 		Assert.assertEquals(0, numberOfCars);
@@ -165,7 +165,7 @@ public class DgSensorTest {
 		numberOfCarsInDistance = sensor.getNumberOfCarsInDistance(100.0, 100.0);
 		Assert.assertEquals(1, numberOfCarsInDistance);
 		
-		AgentArrivalEvent arrivalEvent = new AgentArrivalEvent(101.0, id2, id1, "car");
+		PersonArrivalEvent arrivalEvent = new PersonArrivalEvent(101.0, id2, id1, "car");
 		sensor.handleEvent(arrivalEvent);
 
 		numberOfCarsInDistance = sensor.getNumberOfCarsInDistance(100.0, 101.0);

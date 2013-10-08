@@ -21,10 +21,10 @@ package playground.benjamin.spacetimegeo;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentMoneyEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.listener.IterationStartsListener;
@@ -33,7 +33,7 @@ import org.matsim.core.controler.listener.IterationStartsListener;
  * @author benjamin
  *
  */
-public class LinkLeaveCountHandler implements IterationStartsListener, LinkLeaveEventHandler, AgentMoneyEventHandler {
+public class LinkLeaveCountHandler implements IterationStartsListener, LinkLeaveEventHandler, PersonMoneyEventHandler {
 	private static Logger logger = Logger.getLogger(LinkLeaveCountHandler.class);
 	
 	int iterationNo;
@@ -85,7 +85,7 @@ public class LinkLeaveCountHandler implements IterationStartsListener, LinkLeave
 	}
 
 	@Override
-	public void handleEvent(AgentMoneyEvent event) {
+	public void handleEvent(PersonMoneyEvent event) {
 		tollPaid += event.getAmount();
 		logger.info("The agent is paying " + event.getAmount());
 	}

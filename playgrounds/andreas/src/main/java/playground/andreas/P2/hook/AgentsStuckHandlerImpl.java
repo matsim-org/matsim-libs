@@ -24,15 +24,15 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 
 /**
- * Collects all {@link AgentStuckEvent} and returns a set of the ids of the agents
+ * Collects all {@link PersonStuckEvent} and returns a set of the ids of the agents
  *
  * @author aneumann
  */
-public class AgentsStuckHandlerImpl implements AgentStuckEventHandler{
+public class AgentsStuckHandlerImpl implements PersonStuckEventHandler{
 
 	private static final Logger log = Logger.getLogger(AgentsStuckHandlerImpl.class);
 
@@ -49,7 +49,7 @@ public class AgentsStuckHandlerImpl implements AgentStuckEventHandler{
 	}
 
 	@Override
-	public void handleEvent(AgentStuckEvent event) {
+	public void handleEvent(PersonStuckEvent event) {
 		this.agentsStuck.add(event.getPersonId());		
 	}
 

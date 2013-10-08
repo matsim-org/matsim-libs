@@ -10,8 +10,8 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentMoneyEvent;
-import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
@@ -22,7 +22,7 @@ import playground.southafrica.gauteng.roadpricingscheme.SanralTollFactor.Type;
  * @author nagel
  *
  */
-public class GautengTollStatistics implements EventHandler, AgentMoneyEventHandler {
+public class GautengTollStatistics implements EventHandler, PersonMoneyEventHandler {
 
 	private Map<Id,Double> personMoneyMap = new HashMap<Id,Double>() ;
 	private Map<Id,Double> personCountMap = new HashMap<Id,Double>() ;
@@ -40,7 +40,7 @@ public class GautengTollStatistics implements EventHandler, AgentMoneyEventHandl
 	}
 
 	@Override
-	public void handleEvent(AgentMoneyEvent event) {
+	public void handleEvent(PersonMoneyEvent event) {
 		if ( event.getAmount()==0. ) {
 			return ;
 		}
