@@ -25,86 +25,88 @@ import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
 import org.matsim.signalsystems.model.SignalGroupState;
 
 /**
+ * Collection of static helper methods to create events.
+ * Can be used in place of direct constructor calls.
+ * 
  * @author dgrether
- *
  */
 public class EventsFactory {
 
-	public ActivityEndEvent createActivityEndEvent(double time, Id agentId, Id linkId, Id facilityId, String acttype) {
+	public static ActivityEndEvent createActivityEndEvent(double time, Id agentId, Id linkId, Id facilityId, String acttype) {
 		return new ActivityEndEvent(time, agentId, linkId, facilityId, acttype);
 	}
 
-	public ActivityStartEvent createActivityStartEvent(double time, Id agentId, Id linkId, Id facilityId, String acttype) {
+	public static ActivityStartEvent createActivityStartEvent(double time, Id agentId, Id linkId, Id facilityId, String acttype) {
 		return new ActivityStartEvent(time, agentId, linkId, facilityId, acttype);
 	}
 
-	public AgentArrivalEvent createAgentArrivalEvent(double time, Id agentId, Id linkId, final String legMode) {
+	public static AgentArrivalEvent createAgentArrivalEvent(double time, Id agentId, Id linkId, final String legMode) {
 		return new AgentArrivalEvent(time, agentId, linkId, legMode);
 	}
 
-	public AgentDepartureEvent createAgentDepartureEvent(double time, Id agentId, Id linkId, final String legMode) {
+	public static AgentDepartureEvent createAgentDepartureEvent(double time, Id agentId, Id linkId, final String legMode) {
 		return new AgentDepartureEvent(time, agentId, linkId, legMode);
 	}
 
-	public AgentMoneyEvent createAgentMoneyEvent(double time, Id agentId, double amountMoney) {
+	public static AgentMoneyEvent createAgentMoneyEvent(double time, Id agentId, double amountMoney) {
 		return new AgentMoneyEvent(time, agentId, amountMoney);
 	}
 
-	public AgentStuckEvent createAgentStuckEvent(double time, Id agentId, Id linkId, final String legMode) {
+	public static AgentStuckEvent createAgentStuckEvent(double time, Id agentId, Id linkId, final String legMode) {
 		return new AgentStuckEvent(time, agentId, linkId, legMode);
 	}
 
-	public AgentWait2LinkEvent createAgentWait2LinkEvent(double time, Id agentId, Id linkId, Id vehicleId) {
+	public static AgentWait2LinkEvent createAgentWait2LinkEvent(double time, Id agentId, Id linkId, Id vehicleId) {
 		return new AgentWait2LinkEvent(time, agentId, linkId, vehicleId);
 	}
 
-	public LinkEnterEvent createLinkEnterEvent(double time, Id agentId, Id linkId, Id vehicleId) {
+	public static LinkEnterEvent createLinkEnterEvent(double time, Id agentId, Id linkId, Id vehicleId) {
 		return new LinkEnterEvent(time, agentId, linkId, vehicleId);
 	}
 
-	public LinkLeaveEvent createLinkLeaveEvent(double time, Id agentId, Id linkId, Id vehicleId) {
+	public static LinkLeaveEvent createLinkLeaveEvent(double time, Id agentId, Id linkId, Id vehicleId) {
 		return new LinkLeaveEvent(time, agentId, linkId, vehicleId);
 	}
 
-	public PersonEntersVehicleEvent createPersonEntersVehicleEvent(final double time, final Id personId, final Id vehicleId) {
+	public static PersonEntersVehicleEvent createPersonEntersVehicleEvent(final double time, final Id personId, final Id vehicleId) {
 		PersonEntersVehicleEvent e = new PersonEntersVehicleEvent(time, personId, vehicleId);
 		return e;
 	}
 
-	public PersonLeavesVehicleEvent createPersonLeavesVehicleEvent(final double time, final Id personId, final Id vehicleId) {
+	public static PersonLeavesVehicleEvent createPersonLeavesVehicleEvent(final double time, final Id personId, final Id vehicleId) {
 		PersonLeavesVehicleEvent e = new PersonLeavesVehicleEvent(time, personId, vehicleId);
 		return e;
 	}
 
-	public VehicleArrivesAtFacilityEvent createVehicleArrivesAtFacilityEvent(final double time, final Id vehicleId, final Id facilityId, final double delay) {
+	public static VehicleArrivesAtFacilityEvent createVehicleArrivesAtFacilityEvent(final double time, final Id vehicleId, final Id facilityId, final double delay) {
 		return new VehicleArrivesAtFacilityEvent(time, vehicleId, facilityId, delay);
 	}
 
-	public VehicleDepartsAtFacilityEvent createVehicleDepartsAtFacilityEvent(final double time, final Id vehicleId, final Id facilityId, final double delay) {
+	public static VehicleDepartsAtFacilityEvent createVehicleDepartsAtFacilityEvent(final double time, final Id vehicleId, final Id facilityId, final double delay) {
 		return new VehicleDepartsAtFacilityEvent(time, vehicleId, facilityId, delay);
 	}
 
-	public TransitDriverStartsEvent createTransitDriverStartsEvent(final double time, final Id driverId, final Id vehicleId, final Id transitLineId, final Id transitRouteId, final Id departureId) {
+	public static TransitDriverStartsEvent createTransitDriverStartsEvent(final double time, final Id driverId, final Id vehicleId, final Id transitLineId, final Id transitRouteId, final Id departureId) {
 		return new TransitDriverStartsEvent(time, driverId, vehicleId, transitLineId, transitRouteId, departureId);
 	}
 	
-	public SignalGroupStateChangedEvent createSignalGroupStateChangedEvent(double time, final Id systemId, final Id groupId, SignalGroupState newState){
+	public static SignalGroupStateChangedEvent createSignalGroupStateChangedEvent(double time, final Id systemId, final Id groupId, SignalGroupState newState){
 		return new SignalGroupStateChangedEvent(time, systemId, groupId, newState);
 	}
 
-	public LinkChangeFlowCapacityEvent createLinkChangeFlowCapacityEvent(double time, Id linkId, ChangeValue changeValue) {
+	public static LinkChangeFlowCapacityEvent createLinkChangeFlowCapacityEvent(double time, Id linkId, ChangeValue changeValue) {
 		return new LinkChangeFlowCapacityEvent(time, linkId, changeValue);
 	}
 
-	public LinkChangeFreespeedEvent createLinkChangeFreespeedEvent(double time, Id linkId, ChangeValue changeValue) {
+	public static LinkChangeFreespeedEvent createLinkChangeFreespeedEvent(double time, Id linkId, ChangeValue changeValue) {
 		return new LinkChangeFreespeedEvent(time, linkId, changeValue);
 	}
 
-	public LinkChangeLanesEvent createLinkChangeLanesEvent(double time, Id linkId, ChangeValue changeValue) {
+	public static LinkChangeLanesEvent createLinkChangeLanesEvent(double time, Id linkId, ChangeValue changeValue) {
 		return new LinkChangeLanesEvent(time, linkId, changeValue);
 	}
 
-	public GenericEvent createGenericEvent(String type, double time) {
+	public static GenericEvent createGenericEvent(String type, double time) {
 		return new GenericEvent( type, time ) ;
 	}
 
