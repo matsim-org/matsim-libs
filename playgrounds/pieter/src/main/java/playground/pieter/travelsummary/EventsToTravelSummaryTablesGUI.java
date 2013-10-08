@@ -1,4 +1,4 @@
-package playground.pieter.events;
+package playground.pieter.travelsummary;
 
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
@@ -421,17 +421,11 @@ public class EventsToTravelSummaryTablesGUI extends JFrame {
 				.getText());
 
 		try {
-			if (postgresPropertiesComponent.getText().equals("")) {
+			
 				test.writeSimulationResultsToCSV(schemaNameComponent.getText(),
 						tableSuffixComponent.getText());
 
-			} else {
-
-				test.writeSimulationResultsToSQL(new File(
-						postgresPropertiesComponent.getText()),
-						eventsFileComponent.getText(), tableSuffixComponent
-								.getText());
-			}
+	
 		} catch (InstantiationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

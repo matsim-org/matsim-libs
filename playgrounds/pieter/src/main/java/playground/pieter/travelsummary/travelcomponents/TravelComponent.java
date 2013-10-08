@@ -1,4 +1,4 @@
-package playground.pieter.singapore.utils.postgresql.travelcomponents;
+package playground.pieter.travelsummary.travelcomponents;
 
 import java.util.LinkedList;
 import java.util.NoSuchElementException;

@@ -1,4 +1,4 @@
-package playground.pieter.singapore.utils.postgresql.travelcomponents;
+package playground.pieter.travelsummary.travelcomponents;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;

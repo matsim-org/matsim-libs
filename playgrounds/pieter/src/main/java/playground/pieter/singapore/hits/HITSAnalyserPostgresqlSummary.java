@@ -82,17 +82,16 @@ import org.matsim.vehicles.Vehicle;
 
 import others.sergioo.util.dataBase.DataBaseAdmin;
 import others.sergioo.util.dataBase.NoConnectionException;
-
 import playground.pieter.singapore.utils.postgresql.PostgresType;
 import playground.pieter.singapore.utils.postgresql.PostgresqlCSVWriter;
 import playground.pieter.singapore.utils.postgresql.PostgresqlColumnDefinition;
-import playground.pieter.singapore.utils.postgresql.travelcomponents.Activity;
-import playground.pieter.singapore.utils.postgresql.travelcomponents.Journey;
-import playground.pieter.singapore.utils.postgresql.travelcomponents.Transfer;
-import playground.pieter.singapore.utils.postgresql.travelcomponents.TravellerChain;
-import playground.pieter.singapore.utils.postgresql.travelcomponents.Trip;
-import playground.pieter.singapore.utils.postgresql.travelcomponents.Wait;
-import playground.pieter.singapore.utils.postgresql.travelcomponents.Walk;
+import playground.pieter.travelsummary.travelcomponents.Activity;
+import playground.pieter.travelsummary.travelcomponents.Journey;
+import playground.pieter.travelsummary.travelcomponents.Transfer;
+import playground.pieter.travelsummary.travelcomponents.TravellerChain;
+import playground.pieter.travelsummary.travelcomponents.Trip;
+import playground.pieter.travelsummary.travelcomponents.Wait;
+import playground.pieter.travelsummary.travelcomponents.Walk;
 import playground.sergioo.hitsRouter2013.MultiNodeDijkstra;
 import playground.sergioo.hitsRouter2013.TransitRouterVariableImpl;
 import playground.sergioo.singapore2012.transitRouterVariable.TransitRouterNetworkTravelTimeAndDisutilityWW;

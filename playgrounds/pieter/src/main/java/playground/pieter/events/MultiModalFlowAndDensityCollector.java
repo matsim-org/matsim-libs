@@ -50,9 +50,9 @@ import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityE
 import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 
-import playground.pieter.singapore.utils.postgresql.travelcomponents.Journey;
-import playground.pieter.singapore.utils.postgresql.travelcomponents.TravellerChain;
-import playground.pieter.singapore.utils.postgresql.travelcomponents.Trip;
+import playground.pieter.travelsummary.travelcomponents.Journey;
+import playground.pieter.travelsummary.travelcomponents.TravellerChain;
+import playground.pieter.travelsummary.travelcomponents.Trip;
 
 /**
  * @author fouriep, with liberal dollops of code lifted from wrashid's playground :) 
