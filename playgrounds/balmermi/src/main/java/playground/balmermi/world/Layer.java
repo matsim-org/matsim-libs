@@ -25,11 +25,9 @@ import java.util.Map;
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.BasicLocations;
 
-public interface Layer extends BasicLocations {
+public interface Layer {
 
-	@Override
 	public abstract BasicLocation getLocation(final Id location_id);
 
 	public abstract Map<Id, BasicLocation> getLocations();

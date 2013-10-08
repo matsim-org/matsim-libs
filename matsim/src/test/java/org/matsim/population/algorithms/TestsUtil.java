@@ -40,7 +40,7 @@ public class TestsUtil {
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
 		String[] locationIdSequence = facString.split(" ");
 		for (int aa=0; aa < locationIdSequence.length; aa++) {
-			BasicLocation location = layer.getLocation(new IdImpl(locationIdSequence[aa]));
+			BasicLocation location = layer.getFacilities().get(new IdImpl(locationIdSequence[aa]));
 			ActivityImpl act;
 			act = plan.createAndAddActivity("actAtFacility" + locationIdSequence[aa]);
 			act.setFacilityId(location.getId());
@@ -56,7 +56,7 @@ public class TestsUtil {
 		PlanImpl plan = new org.matsim.core.population.PlanImpl(person);
 		String[] locationIdSequence = linkString.split(" ");
 		for (int aa=0; aa < locationIdSequence.length; aa++) {
-			BasicLocation location = layer.getLocation(new IdImpl(locationIdSequence[aa]));
+			BasicLocation location = layer.getLinks().get(new IdImpl(locationIdSequence[aa]));
 			ActivityImpl act;
 			act = plan.createAndAddActivity("actOnLink" + locationIdSequence[aa], location.getId());
 			act.setEndTime(10*3600);

@@ -29,7 +29,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.BasicLocation;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.BasicLocations;
 import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacilitiesFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
@@ -39,7 +38,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
  * Maintainer: mrieser / Senozon AG
  * @author balmermi
  */
-public class ActivityFacilitiesImpl implements ActivityFacilities, BasicLocations {
+public class ActivityFacilitiesImpl implements ActivityFacilities {
 
 	//////////////////////////////////////////////////////////////////////
 	// member variables
@@ -117,11 +116,6 @@ public class ActivityFacilitiesImpl implements ActivityFacilities, BasicLocation
 
 	public final void printFacilitiesCount() {
 		log.info("    facility # " + this.counter);
-	}
-
-	@Override
-	public BasicLocation getLocation(Id locationId) {
-		return getFacilities().get(locationId);
 	}
 
 	@Override

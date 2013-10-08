@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.api.experimental.BasicLocations;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.core.utils.misc.NetworkUtils;
 
@@ -50,7 +49,7 @@ import org.matsim.core.utils.misc.NetworkUtils;
  * @author nagel
  * @author mrieser
  */
-public final class NetworkImpl implements Network, BasicLocations {
+public final class NetworkImpl implements Network {
 
 	private final static Logger log = Logger.getLogger(NetworkImpl.class);
 
@@ -533,11 +532,6 @@ public final class NetworkImpl implements Network, BasicLocations {
 
 	public void setFactory(final NetworkFactoryImpl networkFactory) {
 		this.factory = networkFactory;
-	}
-
-	@Override
-	public BasicLocation getLocation(Id locationId) {
-		return getLinks().get(locationId);
 	}
 
 	public Node createAndAddNode(final Id id, final Coord coord) {
