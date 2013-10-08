@@ -33,8 +33,9 @@ import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.framework.Mobsim;
 
 import playground.wrashid.parkingSearch.ppSim.PPSim;
+import playground.wrashid.parkingSearch.ppSim.ttmatrix.DummyTTMatrix;
 
-public class MainJDEPSim {
+public class MainJDEPSimEquil {
 
 	/**
 	 * @param args
@@ -58,12 +59,14 @@ public class MainJDEPSim {
 		eventsWriter.init("events.xml");
 		
 
-		//Mobsim sim = new JDEPSim(scenario, eventsManager);
-		Mobsim sim = new PPSim(scenario, eventsManager);
+		Mobsim sim = new JDEPSim(scenario, eventsManager);
+		//Mobsim sim = new PPSim(scenario, eventsManager);
 		
+		Message.ttMatrix=new DummyTTMatrix();
 		sim.run();
 		eventsManager.finishProcessing();
 		lh.writeGraphic("legHistogram.png");
+		lh.write("legHistogram.txt");
 		eventsWriter.reset(0);
 
 	}

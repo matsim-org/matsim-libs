@@ -36,7 +36,16 @@ public class TTMatrixFromStoredTable extends TTMatrix {
 	}
 
 	public TTMatrixFromStoredTable(String ttMatrixFile, String networkFile){
-		network = GeneralLib.readNetwork(networkFile);
+		this.network = GeneralLib.readNetwork(networkFile);
+		readMatrix(ttMatrixFile);
+	}
+	
+	public TTMatrixFromStoredTable(String ttMatrixFile, Network network){
+		this.network = network;
+		readMatrix(ttMatrixFile);
+	}
+
+	private void readMatrix(String ttMatrixFile) {
 		StringMatrix sm=GeneralLib.readStringMatrix(ttMatrixFile);
 		
 		for (int i=0;i<sm.getNumberOfColumnsInRow(0);i++){

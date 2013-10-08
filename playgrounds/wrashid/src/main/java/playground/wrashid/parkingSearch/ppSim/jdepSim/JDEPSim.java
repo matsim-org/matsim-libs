@@ -32,7 +32,7 @@ public class JDEPSim implements Mobsim{
 	public void run() {
 		Message.messageQueue=new MessageQueue();
 		Message.eventsManager=eventsManager;
-		Message.ttMatrix=new DummyTTMatrix();
+		
 		
 		for (Person p:sc.getPopulation().getPersons().values()){
 			new AgentEventMessage(p);

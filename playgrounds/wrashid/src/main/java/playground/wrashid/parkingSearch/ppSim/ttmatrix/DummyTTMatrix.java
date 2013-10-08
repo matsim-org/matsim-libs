@@ -24,7 +24,7 @@ public class DummyTTMatrix extends TTMatrix{
 
 	@Override
 	public double getTravelTime(double time, Id linkId) {
-		return 1.0;
+		return 1000.0;
 	}
 
 }

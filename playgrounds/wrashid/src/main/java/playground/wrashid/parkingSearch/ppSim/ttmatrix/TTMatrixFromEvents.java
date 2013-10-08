@@ -52,7 +52,7 @@ public class TTMatrixFromEvents extends TTMatrix {
 
 	
 
-	private static class TTMatrixTimesHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
+	private class TTMatrixTimesHandler implements LinkEnterEventHandler, LinkLeaveEventHandler {
 
 		private HashMap<Id, double[]> linkTravelTimes;
 		private HashMap<Id, int[]> numberOfSamples;
