@@ -58,8 +58,6 @@ import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.OsmNetworkReader;
 import org.matsim.core.utils.misc.ArgumentParser;
 
-import playground.mrieser.core.mobsim.usecases.OptimizedCarSimFactory;
-
 /**
  * New version of the MATSim Benchmark. Given a network, it automatically generates
  * agents for it and runs 10 iterations on it.
@@ -201,13 +199,6 @@ public class BenchmarkV2 {
 		}
 
 		Controler ctrl = new Controler(this.scenario);
-		if ("newsim".equals(mobsim)) {
-			System.out.println("using newsim mobsim-factory");
-			OptimizedCarSimFactory factory = new OptimizedCarSimFactory(nOfThreadsSim);
-			factory.setMobsimStopTime(30.0 * 3600);
-			factory.setPopulationWeight(1.0 / flowFactor);
-			ctrl.setMobsimFactory(factory);
-		}
 		ctrl.setCreateGraphs(false);
 		ctrl.run();
 	}
