@@ -74,7 +74,7 @@ public class TripStats extends CSWriter{
 			out.close();
 						
 		} catch (final IOException e) {
-				Gbl.errorMsg(e);
+				throw new RuntimeException(e);
 		}	
 	}
 

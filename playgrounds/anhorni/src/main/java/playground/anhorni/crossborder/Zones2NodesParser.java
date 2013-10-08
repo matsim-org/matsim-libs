@@ -82,7 +82,7 @@ public class Zones2NodesParser {
 			}
 			buffered_reader.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		System.out.println(" # lines = " + line_cnt);
 	}

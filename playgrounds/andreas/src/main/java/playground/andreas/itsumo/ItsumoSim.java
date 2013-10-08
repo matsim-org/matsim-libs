@@ -174,7 +174,7 @@ public class ItsumoSim extends ExternalMobsim {
 			out.write("</config>"); out.newLine();
 			out.flush();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 
 	}

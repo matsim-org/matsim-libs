@@ -224,9 +224,9 @@ public class SimStepParallelEventsManagerImpl implements EventsManager {
 			this.processEvent(new LastEventOfSimStep(time));
 			simStepEndBarrier.await();
 		} catch (InterruptedException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		} catch (BrokenBarrierException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 	
@@ -326,9 +326,9 @@ public class SimStepParallelEventsManagerImpl implements EventsManager {
 				}
 				iterationEndBarrier.await();
 			} catch (InterruptedException e) {
-				Gbl.errorMsg(e);
+				throw new RuntimeException(e);
 			} catch (BrokenBarrierException e) {
-				Gbl.errorMsg(e);
+				throw new RuntimeException(e);
 			}
 			Gbl.printCurrentThreadCpuTime();
 		}

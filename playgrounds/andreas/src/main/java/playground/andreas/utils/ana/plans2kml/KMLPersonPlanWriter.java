@@ -44,7 +44,6 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRouteImpl;
@@ -155,8 +154,7 @@ public class KMLPersonPlanWriter {
 			}
 
 		} catch (IOException e) {
-			Gbl.errorMsg("Cannot create kmz or logo because of: " + e.getMessage());
-			e.printStackTrace();
+			log.error("Cannot create kmz or logo.", e);
 		}
 		writer.writeMainKml(mainKml);
 		writer.close();

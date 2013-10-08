@@ -91,8 +91,8 @@ public class MZ2010EtappenParser {
 				else if(mode.equals("17")){modeInt = 1;}
 				else if(mode.equals("18") || mode.equals("20")){modeInt = 17;}
 				else if(mode.equals("19")){modeInt = 16;}
-				else if(mode.equals("-99")){modeInt = 99;}
-				else Gbl.errorMsg("This should never happen!  Mode: " +  mode + " doesn't exist");
+				else if(mode.equals("-99")){modeInt = 99;} else
+					throw new RuntimeException("This should never happen!  Mode: " +  mode + " doesn't exist");
 				
 				//car type
 				String carType = entries[8].trim();
@@ -103,8 +103,8 @@ public class MZ2010EtappenParser {
 				else if(carType.equals("5")){carType = "other";}
 				else if(carType.equals("-97")){carType = "not car mode!";}
 				else if(carType.equals("-98")){carType = MZConstants.UNSPECIFIED;}
-				else if(carType.equals("-99")){carType = MZConstants.NOT_KNOWN;}
-				else Gbl.errorMsg("This should never happen!  Mode: " +  mode + " doesn't exist");
+				else if(carType.equals("-99")){carType = MZConstants.NOT_KNOWN;} else
+					throw new RuntimeException("This should never happen!  Mode: " +  mode + " doesn't exist");
 				
 				//start coordinate - WGS84 (29,30) & CH1903 (31,32)
 				Coord start_coord = new CoordImpl(entries[31].trim(),entries[32].trim());

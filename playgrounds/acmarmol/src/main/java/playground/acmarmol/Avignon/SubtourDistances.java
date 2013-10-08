@@ -11,9 +11,7 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.NetworkRoute;
-import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.misc.RouteUtils;
 
 public abstract class SubtourDistances {
@@ -93,7 +91,7 @@ public abstract class SubtourDistances {
 					else if(actSequence.contains("l")){
 						return "toLeisure";
 					}
-					else{Gbl.errorMsg("error handling activity sequence: " + actSequence); return null;}
+					else{throw new RuntimeException("error handling activity sequence: " + actSequence); }
 					//subtours H-H assigned to distance to work for completeness
 		
 		}else{

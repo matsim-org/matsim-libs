@@ -195,7 +195,7 @@ public class Verification {
 			this.writeTripsPerActivityType();
 		}
 		catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 	

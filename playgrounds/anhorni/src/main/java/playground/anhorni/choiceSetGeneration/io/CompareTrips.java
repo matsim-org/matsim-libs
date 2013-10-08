@@ -144,10 +144,10 @@ public class CompareTrips {
 				out.close();
 				
 			} catch (final IOException e) {
-				Gbl.errorMsg(e);
+				throw new RuntimeException(e);
 			}
 		} catch (IOException e) {
-				Gbl.errorMsg(e);
+				throw new RuntimeException(e);
 		}
 	}
 	
@@ -190,7 +190,7 @@ public class CompareTrips {
 				this.mzTrips.put(id, mzTrip);
 			}
 		} catch (IOException e) {
-				Gbl.errorMsg(e);
+				throw new RuntimeException(e);
 		}
 	}
 	
@@ -209,7 +209,7 @@ public class CompareTrips {
 				nelsonChoiceSetIds.add(id);
 			}
 		} catch (IOException e) {
-				Gbl.errorMsg(e);
+				throw new RuntimeException(e);
 		}
 		return nelsonChoiceSetIds;
 	}

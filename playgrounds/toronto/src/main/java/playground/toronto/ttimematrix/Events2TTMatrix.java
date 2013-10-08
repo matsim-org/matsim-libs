@@ -67,7 +67,7 @@ public class Events2TTMatrix {
 				l2zMapping.put(lid,zid);
 			}
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		return l2zMapping;
 	}

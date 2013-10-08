@@ -64,7 +64,7 @@ public class Analysis {
 				linkSet.add(linkId);
 			}
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 
 		return linkSet;

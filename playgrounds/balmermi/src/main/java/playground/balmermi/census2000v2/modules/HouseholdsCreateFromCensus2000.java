@@ -70,9 +70,9 @@ public class HouseholdsCreateFromCensus2000 {
 
 	private final void setAttributes(Household hh, String[] entries, int line_cnt) {
 		int hhtpz = Integer.parseInt(entries[CAtts.I_HHTPZ]);
-		if (!hh.setHHTPZ(hhtpz)) { Gbl.errorMsg("Line "+line_cnt+": Household id="+hh.getId()+" something is wrong!");  }
+		if (!hh.setHHTPZ(hhtpz)) { throw new RuntimeException("Line "+line_cnt+": Household id="+hh.getId()+" something is wrong!");  }
 		int hhtpw = Integer.parseInt(entries[CAtts.I_HHTPW]);
-		if (!hh.setHHTPW(hhtpw)) { Gbl.errorMsg("Line "+line_cnt+": Household id="+hh.getId()+" something is wrong!");  }
+		if (!hh.setHHTPW(hhtpw)) { throw new RuntimeException("Line "+line_cnt+": Household id="+hh.getId()+" something is wrong!");  }
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -106,7 +106,7 @@ public class HouseholdsCreateFromCensus2000 {
 				Id f_id = new IdImpl(entries[CAtts.I_GEBAEUDE_ID]);
 				ActivityFacilityImpl f = (ActivityFacilityImpl) this.facilities.getFacilities().get(f_id);
 				if (f == null) { throw new RuntimeException("Line "+line_cnt+": Facility id="+f_id+" does not exist!"); }
-				if (f.getActivityOptions().get(CAtts.ACT_HOME) == null) { Gbl.errorMsg("Line "+line_cnt+": Facility id="+f_id+" exists but does not have 'home' activity type assigned!"); }
+				if (f.getActivityOptions().get(CAtts.ACT_HOME) == null) { throw new RuntimeException("Line "+line_cnt+": Facility id="+f_id+" exists but does not have 'home' activity type assigned!"); }
 
 				// check for existing municipality
 				Municipality muni = this.municipalities.getMunicipality(Integer.parseInt(zone_id.toString()));
@@ -131,7 +131,7 @@ public class HouseholdsCreateFromCensus2000 {
 				else {
 					// check for muni and facility consistency of existing household
 					if ((!hh.getMunicipality().equals(muni)) || (!hh.getFacility().equals(f))) {
-						Gbl.errorMsg("Line "+line_cnt+": municipality id="+muni.getId()+" or facility id="+f_id+" are different to the existing household!");
+						throw new RuntimeException("Line "+line_cnt+": municipality id="+muni.getId()+" or facility id="+f_id+" are different to the existing household!");
 					}
 					// set attributes
 					this.setAttributes(hh,entries,line_cnt);
@@ -149,7 +149,7 @@ public class HouseholdsCreateFromCensus2000 {
 			log.info("    min household id="+min_hh_id);
 			log.info("    max household id="+max_hh_id);
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		log.info("    done.");
 	}

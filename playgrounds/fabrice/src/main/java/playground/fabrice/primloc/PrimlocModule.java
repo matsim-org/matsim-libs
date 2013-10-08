@@ -203,7 +203,7 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 
 	public void setAggregationLayer( Layer zoneLayer ){
 		if( ! (zoneLayer instanceof ZoneLayer) )
-			Gbl.errorMsg( new Exception("PrimLocChoice_MATSIM needs a Zone Layer") );
+			throw new RuntimeException(new Exception("PrimLocChoice_MATSIM needs a Zone Layer"));
 		this.zoneLayer = zoneLayer;
 	}
 
@@ -240,10 +240,10 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 		if( zoneLayer == null ){
 			String layerName = cfg.findParam( module_name, "aggregation layer");
 			if( layerName == null )
-				Gbl.errorMsg( new Exception("PrimLocChoice_MATSIM needs an aggregation layer" ) );
+				throw new RuntimeException(new Exception("PrimLocChoice_MATSIM needs an aggregation layer" ));
 			zoneLayer = world.getLayer( layerName );
 			if( ! (zoneLayer instanceof ZoneLayer) )
-				Gbl.errorMsg( new Exception("PrimLocChoice_MATSIM needs a Zone Layer") );
+				throw new RuntimeException(new Exception("PrimLocChoice_MATSIM needs a Zone Layer"));
 		}
 
 		// We store the zones in a given way so that
@@ -267,10 +267,10 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 			if( Boolean.parseBoolean( distParam ) )
 				setEuclideanDistanceImpedances();
 			else if( travelCostAggregator == null )
-				Gbl.errorMsg( new Exception("PrimLocChoice_MATSIM needs a Travel costs aggregator or euclidean distance costs enabled") );
+				throw new RuntimeException(new Exception("PrimLocChoice_MATSIM needs a Travel costs aggregator or euclidean distance costs enabled"));
 		}
 		else if( travelCostAggregator == null )
-				Gbl.errorMsg( new Exception("PrimLocChoice_MATSIM needs a Travel costs aggregator or euclidean distance costs enabled") );
+			throw new RuntimeException(new Exception("PrimLocChoice_MATSIM needs a Travel costs aggregator or euclidean distance costs enabled"));
 
 
 		// The following is optional but will allow to calibrate against
@@ -368,7 +368,7 @@ public class PrimlocModule extends AbstractPersonAlgorithm {
 			core.cij.set(i, i, (CoordUtils.calcDistance(zones[i].getMax(), zones[i].getMin()))/2 );
 
 			if( core.cij.get( i, i ) == 0.0 )
-				Gbl.errorMsg( new Exception("PrimLocChoice_core requires Cii>0 for intrazonal travel costs"));
+				throw new RuntimeException(new Exception("PrimLocChoice_core requires Cii>0 for intrazonal travel costs"));
 
 		}
 	}

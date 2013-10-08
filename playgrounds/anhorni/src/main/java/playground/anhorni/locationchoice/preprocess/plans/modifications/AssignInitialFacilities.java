@@ -49,7 +49,7 @@ public class AssignInitialFacilities {
 			counter.incCounter();
 
 			if (person.getPlans().size() != 1) {
-				Gbl.errorMsg("pid = " + person.getId() + " : There must be exactly one plan.");
+				throw new RuntimeException("pid = " + person.getId() + " : There must be exactly one plan.");
 			}
 			PlanImpl plan = (PlanImpl)person.getSelectedPlan();
 			if (type.startsWith("shop")) {

@@ -91,9 +91,9 @@ class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 
 			this.endBarrier.await();
 		} catch (InterruptedException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		} catch (BrokenBarrierException e) {
-	      	Gbl.errorMsg(e);
+	      	throw new RuntimeException(e);
 		}
 		
 		this.printSimLog(time);
@@ -133,9 +133,9 @@ class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 		try {
 			this.startBarrier.await();
 		} catch (InterruptedException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		} catch (BrokenBarrierException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 
 		// wait until each thread is finished
@@ -144,7 +144,7 @@ class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 				thread.join();
 			}
 		} catch (InterruptedException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		
 		super.afterSim();

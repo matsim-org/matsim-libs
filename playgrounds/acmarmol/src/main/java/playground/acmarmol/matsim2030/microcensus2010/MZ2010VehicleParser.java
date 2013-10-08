@@ -91,8 +91,8 @@ public class MZ2010VehicleParser {
 			//type
 			String type = entries[3].trim();
 			if(type.equals("1")){type = MZConstants.CAR;}
-			else if(type.equals("2")){type = MZConstants.MOTORCYCLE;}
-			else Gbl.errorMsg("This should never happen!  Vehicle type: " + type+ " doesn't exist");
+			else if(type.equals("2")){type = MZConstants.MOTORCYCLE;} else
+				throw new RuntimeException("This should never happen!  Vehicle type: " + type+ " doesn't exist");
 			vehiclesAttributes.putAttribute(hhnr.concat(fznr), MZConstants.TYPE, type);
 			
 			//type of fuel
@@ -103,8 +103,8 @@ public class MZ2010VehicleParser {
 			else if(fuel.equals("4")){fuel = MZConstants.OTHER;}
 			else if(fuel.equals("-98")){fuel = MZConstants.UNSPECIFIED;}
 			else if(fuel.equals("-97")){fuel = MZConstants.NOT_KNOWN;}
-			else if(fuel.equals("-99")){fuel = MZConstants.JUST_FOR_CAR;}
-			else Gbl.errorMsg("This should never happen!  Fuel type: " + fuel+ " doesn't exist");
+			else if(fuel.equals("-99")){fuel = MZConstants.JUST_FOR_CAR;} else
+				throw new RuntimeException("This should never happen!  Fuel type: " + fuel+ " doesn't exist");
 			vehiclesAttributes.putAttribute(hhnr.concat(fznr), MZConstants.FUEL_TYPE, fuel);
 			
 			//year of registration
@@ -129,8 +129,8 @@ public class MZ2010VehicleParser {
 			else if(month.equals("12")){month = MZConstants.DECEMBER;}
 			else if(month.equals("-98")){month = MZConstants.UNSPECIFIED;} 
 			else if(month.equals("-97")){month = MZConstants.NOT_KNOWN;}
-			else if(month.equals("-99")){month = "NichtÜberMofis";} // -review
-			else Gbl.errorMsg("This should never happen!  Month: " + month+ " doesn't exist");
+			else if(month.equals("-99")){month = "NichtÜberMofis";} else
+				throw new RuntimeException("This should never happen!  Month: " + month+ " doesn't exist");
 			vehiclesAttributes.putAttribute(hhnr.concat(fznr), MZConstants.MONTH_REGISTRATION, month);
 			
 						
@@ -142,7 +142,7 @@ public class MZ2010VehicleParser {
 			//filling vehicles data into matsim households
 			IdImpl hhid = new IdImpl(hhnr);
 			if(!this.households.getHouseholds().containsKey(hhid)){
-				Gbl.errorMsg("This should never happen!  Household hhnr: " + hhnr+ " doesn't exist");
+				throw new RuntimeException("This should never happen!  Household hhnr: " + hhnr+ " doesn't exist");
 			}		
 			this.households.getHouseholds().get(hhid).getVehicleIds().add(new IdImpl(hhnr.concat(fznr)));  // id = hhnr + fznr??
 			

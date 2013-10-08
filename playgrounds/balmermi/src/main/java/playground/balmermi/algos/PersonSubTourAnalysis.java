@@ -89,7 +89,7 @@ public class PersonSubTourAnalysis extends AbstractPersonAlgorithm implements Pl
 		else if (mode.equals(TransportMode.car)) { idx = CAR; }
 		else if (mode.equals(TransportMode.pt)) { idx = PT; }
 		else if (mode.equals("undefined")) { idx = UNDEF; }
-		else { Gbl.errorMsg("pid=" + plan.getPerson().getId() + ": mode=" + mode + " unknown!"); }
+		else { throw new RuntimeException("pid=" + plan.getPerson().getId() + ": mode=" + mode + " unknown!"); }
 
 		// calculate the SubTour distance (in 1 km time bins)
 		double d = 0.0;
@@ -175,7 +175,7 @@ public class PersonSubTourAnalysis extends AbstractPersonAlgorithm implements Pl
 	@Override
 	public void run(Person person) {
 		Plan plan = person.getSelectedPlan();
-		if (plan == null) { Gbl.errorMsg("Person id=" + person.getId() + "does not have a selected plan."); }
+		if (plan == null) { throw new RuntimeException("Person id=" + person.getId() + "does not have a selected plan."); }
 		this.run(plan);
 	}
 

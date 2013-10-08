@@ -74,7 +74,7 @@ public class NetworkSimplifier {
 	public void run(final Network network) {
 
 		if(this.nodeTopoToMerge.size() == 0){
-			Gbl.errorMsg("No types of node specified. Please use setNodesToMerge to specify which nodes should be merged");
+			throw new RuntimeException("No types of node specified. Please use setNodesToMerge to specify which nodes should be merged");
 		}
 
 		log.info("running " + this.getClass().getName() + " algorithm...");

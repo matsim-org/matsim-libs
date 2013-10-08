@@ -125,9 +125,9 @@ public class HouseholdVehicleAssignmentReader {
 		    isr.close();
 		    fis.close();
 		} catch (FileNotFoundException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}			
 
 	    log.info("Total parsed lines: " + lineCounter.getCounter());

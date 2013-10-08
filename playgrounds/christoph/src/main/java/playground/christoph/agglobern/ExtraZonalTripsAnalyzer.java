@@ -263,7 +263,7 @@ public class ExtraZonalTripsAnalyzer implements ActivityStartEventHandler, Activ
 				}
 			}			
 		} catch (Exception e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 

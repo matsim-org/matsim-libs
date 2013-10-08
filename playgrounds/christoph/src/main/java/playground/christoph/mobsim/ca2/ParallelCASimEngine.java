@@ -89,9 +89,9 @@ class ParallelCASimEngine extends CASimEngine {
 
 			this.endBarrier.await();
 		} catch (InterruptedException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		} catch (BrokenBarrierException e) {
-	      	Gbl.errorMsg(e);
+	      	throw new RuntimeException(e);
 		}
 		
 		this.printSimLog(time);
@@ -126,9 +126,9 @@ class ParallelCASimEngine extends CASimEngine {
 		try {
 			this.startBarrier.await();
 		} catch (InterruptedException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		} catch (BrokenBarrierException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 
 		// wait until each thread is finished
@@ -137,7 +137,7 @@ class ParallelCASimEngine extends CASimEngine {
 				thread.join();
 			}
 		} catch (InterruptedException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		
 		super.afterSim();

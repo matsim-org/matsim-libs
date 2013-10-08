@@ -88,7 +88,7 @@ public class CreateDummyPositionData implements BasicEventHandler {
 			bufferedWriter.flush();
 			bufferedWriter.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -124,7 +124,7 @@ public class CreateDummyPositionData implements BasicEventHandler {
 					bufferedWriter.write(String.valueOf(0.0));	// vxy
 					bufferedWriter.write(newLine);
 				} catch (IOException e) {
-					Gbl.errorMsg(e);
+					throw new RuntimeException(e);
 				}
 			}
 		}

@@ -147,7 +147,7 @@ public class LogLinkTravelTime implements MobsimBeforeSimStepListener, BeforeMob
 			counter.printCounter();
 			log.info("done.");
 		} catch (IOException e1) {
-			Gbl.errorMsg(e1);
+			throw new RuntimeException(e1);
 		}
 	}
 	

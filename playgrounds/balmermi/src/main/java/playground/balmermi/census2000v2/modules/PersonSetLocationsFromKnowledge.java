@@ -66,16 +66,16 @@ public class PersonSetLocationsFromKnowledge extends AbstractPersonAlgorithm {
 	@Override
 	public void run(final Person person) {
 		// plan
-		if (person.getPlans().size() != 1) { Gbl.errorMsg("pid="+person.getId()+": There must be exactly one plan."); }
+		if (person.getPlans().size() != 1) { throw new RuntimeException("pid="+person.getId()+": There must be exactly one plan."); }
 		Plan plan = person.getSelectedPlan();
-		if (plan == null) { Gbl.errorMsg("pid="+person.getId()+": no plan exists."); }
+		if (plan == null) { throw new RuntimeException("pid="+person.getId()+": no plan exists."); }
 
 		// knowledge
 		KnowledgeImpl k = this.knowledges.getKnowledgesByPersonId().get(person.getId());
-		if (k == null) { Gbl.errorMsg("pid="+person.getId()+": no knowledge exists."); }
+		if (k == null) { throw new RuntimeException("pid="+person.getId()+": no knowledge exists."); }
 
 		// home act
-		if (k.getActivities(CAtts.ACT_HOME).size() != 1) { Gbl.errorMsg("pid="+person.getId()+": There must be only one '"+CAtts.ACT_HOME+"' in the knowledge."); }
+		if (k.getActivities(CAtts.ACT_HOME).size() != 1) { throw new RuntimeException("pid="+person.getId()+": There must be only one '"+CAtts.ACT_HOME+"' in the knowledge."); }
 		ActivityOptionImpl home_act = k.getActivities(CAtts.ACT_HOME).get(0);
 
 		// work acts
@@ -108,7 +108,7 @@ public class PersonSetLocationsFromKnowledge extends AbstractPersonAlgorithm {
 					prev_educ = null;
 				}
 				else if (act.getType().startsWith("w")) {
-					if (work_acts.isEmpty()) { Gbl.errorMsg("pid="+person.getId()+": plan contains 'w' act but no location known!"); }
+					if (work_acts.isEmpty()) { throw new RuntimeException("pid="+person.getId()+": plan contains 'w' act but no location known!"); }
 					ActivityOptionImpl work_act = null;
 					if (prev_work != null) {
 						ArrayList<ActivityOptionImpl> rest = new ArrayList<ActivityOptionImpl>(work_acts);
@@ -129,7 +129,7 @@ public class PersonSetLocationsFromKnowledge extends AbstractPersonAlgorithm {
 					prev_educ = null;
 				}
 				else if (act.getType().startsWith("e")) {
-					if (educ_acts.isEmpty()) { Gbl.errorMsg("pid="+person.getId()+": plan contains 'e' act but no location known!"); }
+					if (educ_acts.isEmpty()) { throw new RuntimeException("pid="+person.getId()+": plan contains 'e' act but no location known!"); }
 					ActivityOptionImpl educ_act = null;
 					if (prev_educ != null) {
 						ArrayList<ActivityOptionImpl> rest = new ArrayList<ActivityOptionImpl>(educ_acts);

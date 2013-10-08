@@ -52,17 +52,17 @@ public class Lane implements Comparable<Lane> {
 	//////////////////////////////////////////////////////////////////////
 
 	public final void addToLane(Lane tolane) {
-		if (this.tolanes.containsKey(tolane.nr)) { Gbl.errorMsg("Intersection_id=" + this.intersection.id + ", lane_nr=" + this.nr + ": tolane_nr=" + tolane.nr + " already exists!"); }
+		if (this.tolanes.containsKey(tolane.nr)) { throw new RuntimeException("Intersection_id=" + this.intersection.id + ", lane_nr=" + this.nr + ": tolane_nr=" + tolane.nr + " already exists!"); }
 		this.tolanes.put(tolane.nr,tolane);
 	}
 
 	public final void addLSA(LSA lsa) {
-		if (this.lsas.containsKey(lsa.nr)) { Gbl.errorMsg("Intersection_id=" + this.intersection.id + ", lane_nr=" + this.nr + ": lsa_nr=" + lsa.nr + " already exists!"); }
+		if (this.lsas.containsKey(lsa.nr)) { throw new RuntimeException("Intersection_id=" + this.intersection.id + ", lane_nr=" + this.nr + ": lsa_nr=" + lsa.nr + " already exists!"); }
 		this.lsas.put(lsa.nr,lsa);
 	}
 
 	public final void addLink(Link link) {
-		if (this.links.containsKey(link.getId())) { Gbl.errorMsg("Intersection_id=" + this.intersection.id + ", lane_nr=" + this.nr + ": link_id=" + link.getId().toString() + " already exists!"); }
+		if (this.links.containsKey(link.getId())) { throw new RuntimeException("Intersection_id=" + this.intersection.id + ", lane_nr=" + this.nr + ": link_id=" + link.getId().toString() + " already exists!"); }
 		this.links.put(link.getId(),link);
 	}
 

@@ -52,7 +52,7 @@ public class LSA implements Comparable<LSA> {
 	//////////////////////////////////////////////////////////////////////
 	
 	public final void addLane(Lane lane) {
-		if (this.lanes.containsKey(lane.nr)) { Gbl.errorMsg("Intersection_id=" + this.intersection.id + ", lsa_nr=" + this.nr + ": lane_nr=" + lane.nr + " already exists!"); }
+		if (this.lanes.containsKey(lane.nr)) { throw new RuntimeException("Intersection_id=" + this.intersection.id + ", lsa_nr=" + this.nr + ": lane_nr=" + lane.nr + " already exists!"); }
 		this.lanes.put(lane.nr,lane);
 	}
 

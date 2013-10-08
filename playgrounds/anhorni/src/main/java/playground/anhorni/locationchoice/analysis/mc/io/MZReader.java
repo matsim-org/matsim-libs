@@ -116,7 +116,7 @@ public class MZReader {
 				this.mzTrips.add(mzTrip);	
 			}
 		} catch (IOException e) {
-				Gbl.errorMsg(e);
+				throw new RuntimeException(e);
 		}
 		return this.mzTrips;
 	}

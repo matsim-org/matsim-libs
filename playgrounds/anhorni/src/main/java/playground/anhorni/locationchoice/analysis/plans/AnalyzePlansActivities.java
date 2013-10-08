@@ -222,7 +222,7 @@ public class AnalyzePlansActivities {
 			out.close();
 		}
 		catch (final IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 }

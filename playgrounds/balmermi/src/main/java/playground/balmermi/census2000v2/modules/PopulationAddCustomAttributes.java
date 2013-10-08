@@ -91,7 +91,7 @@ public class PopulationAddCustomAttributes {
 			br.close();
 			fr.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		log.info("    done.");
 	}

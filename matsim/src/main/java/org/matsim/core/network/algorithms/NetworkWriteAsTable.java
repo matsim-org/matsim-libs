@@ -131,7 +131,7 @@ public class NetworkWriteAsTable implements NetworkRunnable {
 			out_et.flush();
 			out_et.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 }

@@ -95,7 +95,7 @@ public class CemdapStopsParser {
 		case 20: return "leis";
 		case 21: return "leis";
 		default:
-			Gbl.errorMsg(new IllegalArgumentException("actTypeNo="+actTypeNo+" not allowed."));
+				log.error(new IllegalArgumentException("actTypeNo="+actTypeNo+" not allowed."));
 			return null;
 		}
 	}
@@ -246,7 +246,7 @@ public class CemdapStopsParser {
 
 			}
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		log.info(lineCount+" lines parsed.");
 		log.info(population.getPersons().size()+" persons stored.");

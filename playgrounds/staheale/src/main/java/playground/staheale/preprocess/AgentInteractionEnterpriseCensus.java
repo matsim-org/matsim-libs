@@ -27,6 +27,7 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
+
 //import org.apache.log4j.Logger;
 import org.matsim.core.gbl.Gbl;
 
@@ -135,7 +136,7 @@ public class AgentInteractionEnterpriseCensus {
 			first = this.getHectareAttributeIdentifierIndex(ProductionSector.SECTOR3.getFirst());
 			last = this.getHectareAttributeIdentifierIndex(ProductionSector.SECTOR3.getLast());
 		} else {
-			Gbl.errorMsg("Invalid economy sector id.");
+			throw new RuntimeException("Invalid economy sector id.");
 		}
 
 		for (int i = first; i <= last; i++) {

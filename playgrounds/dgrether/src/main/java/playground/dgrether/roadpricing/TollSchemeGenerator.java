@@ -43,7 +43,6 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.NetworkImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
@@ -356,8 +355,7 @@ public class TollSchemeGenerator {
 			// polygonFolder.addFeature(feature)
 
 		} catch (IOException e) {
-			Gbl.errorMsg("Cannot create kmz or logo cause: " + e.getMessage());
-			e.printStackTrace();
+			log.error("Cannot create kmz or logo.", e);
 		}
 		writer.writeMainKml(mainKml);
 		writer.close();

@@ -94,8 +94,8 @@ public class MZ2005EtappenParser {
 				else if(mode.equals("17")){modeInt = 1;}
 				else if(mode.equals("18") || mode.equals("20")){modeInt = 17;}
 				else if(mode.equals("19")){modeInt = 16;}
-				else if(mode.equals("-99")){modeInt = 99;}
-				else Gbl.errorMsg("This should never happen!  Mode: " +  mode + " doesn't exist");
+				else if(mode.equals("-99")){modeInt = 99;} else
+					throw new RuntimeException("This should never happen!  Mode: " +  mode + " doesn't exist");
 				
 //				//car type
 				String carType = "";

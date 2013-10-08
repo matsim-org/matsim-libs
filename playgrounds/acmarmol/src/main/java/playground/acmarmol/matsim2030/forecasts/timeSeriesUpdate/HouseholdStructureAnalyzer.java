@@ -304,7 +304,7 @@ public class HouseholdStructureAnalyzer {
 			
 		
 			if(age<15){
-				Gbl.errorMsg("Head of household has age < 15!");
+				throw new RuntimeException("Head of household has age < 15!");
 			}else if(age<25){
 				counters[0]+=hh_weight;
 			}else if(age<30){
@@ -384,14 +384,14 @@ public class HouseholdStructureAnalyzer {
 			
 	
 			if(members.size()!=1)
-				Gbl.errorMsg("Error - single households has more than one member!");
+				throw new RuntimeException("Error - single households has more than one member!");
 			
 			Id person_id = members.get(0);
 			
 			int age = Integer.parseInt((String)microcensus.getHouseholdPersonsAttributes().getAttribute(person_id.toString(), MZConstants.AGE));
 			
 			if(age<15){
-				Gbl.errorMsg("Single person in household has age < 15!");
+				throw new RuntimeException("Single person in household has age < 15!");
 			}else if(age<20){
 				counters[0]+=hh_weight;
 			}else if(age<25){
@@ -494,7 +494,7 @@ private void printAgeRangeForMonoparentalHouseholds() throws IOException {
 			
 		
 			if(age<15){
-				Gbl.errorMsg("Head of household has age < 15!");
+				throw new RuntimeException("Head of household has age < 15!");
 			}else if(age<20){
 				counters[0]+=hh_weight;
 			}else if(age<25){
@@ -578,7 +578,7 @@ private void printAgeRangeForCouplelHouseholds() throws IOException {
 		
 	
 		if(age<15){
-			Gbl.errorMsg("Head of household has age < 15!");
+			throw new RuntimeException("Head of household has age < 15!");
 		}else if(age<20){
 			counters[0]+=hh_weight;
 		}else if(age<25){
@@ -862,7 +862,7 @@ private void printAgeRangeForCouplelHouseholds() throws IOException {
 	private int getCoupleAgeDifference(List<Id> heads) {
 		
 		if(heads.size()!=2)
-			Gbl.errorMsg("Couple household with more/less than 2 heads!");
+			throw new RuntimeException("Couple household with more/less than 2 heads!");
 		
 		boolean male = false;
 		boolean female = false;
@@ -1075,7 +1075,7 @@ private void printMotherBirthAges() throws IOException {
 			
 		
 			if(age<15){
-				Gbl.errorMsg("Head of household has age < 15!");
+				throw new RuntimeException("Head of household has age < 15!");
 			}else if(age<25){
 				counters[0]+=hh_weight;
 			}else if(age<30){

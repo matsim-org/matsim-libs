@@ -154,7 +154,7 @@ class OnlineWriter {
 				this.out.flush();
 			}
 			catch (IOException e) {
-				Gbl.errorMsg(e);
+				throw new RuntimeException(e);
 			}
 		}
 	}
@@ -168,7 +168,7 @@ class OnlineWriter {
 				this.fileOpened=false;
 			}
 			catch (IOException e) {
-				Gbl.errorMsg(e);
+				throw new RuntimeException(e);
 			}
 		}
 	}

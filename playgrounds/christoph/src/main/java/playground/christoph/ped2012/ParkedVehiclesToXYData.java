@@ -95,7 +95,7 @@ public class ParkedVehiclesToXYData implements BasicEventHandler {
 			bufferedWriter.flush();
 			bufferedWriter.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 	
@@ -171,7 +171,7 @@ public class ParkedVehiclesToXYData implements BasicEventHandler {
 			bufferedWriter.write("y");
 			bufferedWriter.write(newLine);
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 	
@@ -186,7 +186,7 @@ public class ParkedVehiclesToXYData implements BasicEventHandler {
 			bufferedWriter.write(String.valueOf(y));	// y
 			bufferedWriter.write(newLine);			
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 }

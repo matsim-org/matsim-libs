@@ -82,7 +82,7 @@ public class SocialCostWriter {
 			out.flush();
 			out.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 	

@@ -117,12 +117,12 @@ public class RerunRSampler {
 				map.put(new IdImpl(sa[0]), count);
 			}
 		} catch (IOException e) {
-			Gbl.errorMsg("Couldn't read from BufferedReader " + file);
+			throw new RuntimeException("Couldn't read from BufferedReader " + file);
 		} finally{
 			try {
 				br.close();
 			} catch (IOException e) {
-				Gbl.errorMsg("Couldn't close Bufferedreader for " + file);
+				throw new RuntimeException("Couldn't close Bufferedreader for " + file);
 			}
 		}
 		return map;

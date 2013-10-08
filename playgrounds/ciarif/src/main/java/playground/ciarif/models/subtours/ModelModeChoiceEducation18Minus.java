@@ -81,7 +81,7 @@ public class ModelModeChoiceEducation18Minus extends ModelModeChoice {
 		else if (udeg == 3) { util += B1_T3 * 1.0; }
 		else if (udeg == 4) { util += B1_T4 * 1.0; }
 		else if (udeg == 5) { util += B1_T5 * 1.0; }
-		else { Gbl.errorMsg("This should never happen!"); }
+		else { throw new RuntimeException("This should never happen!"); }
 		//System.out.println("Util pt = " + util);
 		return util;
 	}

@@ -86,10 +86,10 @@ public class PersonAssignPrimaryActivities extends AbstractPersonAlgorithm imple
 	public void run(final Plan plan) {
 		KnowledgeImpl k = this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId());
 		if (k == null) {
-			Gbl.errorMsg("pid="+plan.getPerson().getId()+": no knowledge defined!");
+			throw new RuntimeException("pid="+plan.getPerson().getId()+": no knowledge defined!");
 		}
 		if (!k.setPrimaryFlag(true)) {
-			Gbl.errorMsg("pid="+plan.getPerson().getId()+": no activities defined!");
+			throw new RuntimeException("pid="+plan.getPerson().getId()+": no activities defined!");
 		}
 
 		ArrayList<ActivityOptionImpl> prim_acts = k.getActivities(true);
@@ -98,7 +98,7 @@ public class PersonAssignPrimaryActivities extends AbstractPersonAlgorithm imple
 			String curr_type = act.getType();
 			ActivityOption a = this.facilities.getFacilities().get( act.getFacilityId() ).getActivityOptions().get( curr_type );
 			if (a == null) {
-				Gbl.errorMsg("pid="+plan.getPerson().getId()+": Inconsistency with f_id="+act.getFacilityId()+"!");
+				throw new RuntimeException("pid="+plan.getPerson().getId()+": Inconsistency with f_id="+act.getFacilityId()+"!");
 			}
 			if (!prim_acts.contains(a)) {
 				k.addActivityOption(a, false);

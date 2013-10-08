@@ -435,12 +435,12 @@ public class AccessibilityCalculator {
 			}
 			counter.printCounter();
 		} catch (IOException e) {
-			Gbl.errorMsg("Could not write to BufferedWriter " + bwName);
+			throw new RuntimeException("Could not write to BufferedWriter " + bwName);
 		} finally{
 			try {
 				bw.close();
 			} catch (IOException e) {
-				Gbl.errorMsg("Could not close BufferedWriter " + bwName);
+				throw new RuntimeException("Could not close BufferedWriter " + bwName);
 			}
 		}
 		
@@ -479,12 +479,12 @@ public class AccessibilityCalculator {
 				}
 			}
 		} catch (IOException e) {
-			Gbl.errorMsg("Could not write to BufferedWriter " + bwName);
+			throw new RuntimeException("Could not write to BufferedWriter " + bwName);
 		} finally{
 			try {
 				bw.close();
 			} catch (IOException e) {
-				Gbl.errorMsg("Could not close BufferedWriter " + bwName);
+				throw new RuntimeException("Could not close BufferedWriter " + bwName);
 			}
 		}
 	}	

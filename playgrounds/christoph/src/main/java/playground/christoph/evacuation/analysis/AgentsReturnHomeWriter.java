@@ -74,7 +74,7 @@ public class AgentsReturnHomeWriter {
 			writer.flush();
 			writer.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 	
@@ -115,7 +115,7 @@ public class AgentsReturnHomeWriter {
 			bufferedWriter.flush();
 			bufferedWriter.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 

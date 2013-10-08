@@ -171,7 +171,7 @@ public class PersonZoneSummary extends AbstractPersonAlgorithm implements PlanAl
 				else if (E.equals(act.getType())) { e = 1; }
 				else if (S.equals(act.getType())) { s = 1; }
 				else if (L.equals(act.getType())) { l = 1; }
-				else { Gbl.errorMsg("Act type=" + act.getType() + " not known!"); }
+				else { throw new RuntimeException("Act type=" + act.getType() + " not known!"); }
 			}
 		}
 		int index = w*2*2*2 + e*2*2 + s*2 + l;
@@ -243,7 +243,7 @@ public class PersonZoneSummary extends AbstractPersonAlgorithm implements PlanAl
 
 		if (M.equals(person.getSex())) { vals[1]++; }
 		else if (F.equals(person.getSex())) { vals[2]++; }
-		else { Gbl.errorMsg("Person id=" + person.getId() + ": Attribute 'sex' is wrong!"); }
+		else { throw new RuntimeException("Person id=" + person.getId() + ": Attribute 'sex' is wrong!"); }
 
 		if (person.getAge() < 6) { vals[3]++; }
 		else if (person.getAge() < 8) { vals[4]++; }
@@ -254,12 +254,12 @@ public class PersonZoneSummary extends AbstractPersonAlgorithm implements PlanAl
 
 		if (YES.equals(person.getLicense())) { vals[9]++; }
 		else if (NO.equals(person.getLicense())) { vals[10]++; }
-		else { Gbl.errorMsg("Person id=" + person.getId() + ": Attribute 'license' is wrong!"); }
+		else { throw new RuntimeException("Person id=" + person.getId() + ": Attribute 'license' is wrong!"); }
 
 		if (NEVER.equals(person.getCarAvail())) { vals[11]++; }
 		else if (SOMETIMES.equals(person.getCarAvail())) { vals[12]++; }
 		else if (ALWAYS.equals(person.getCarAvail())) { vals[13]++; }
-		else { Gbl.errorMsg("Person id=" + person.getId() + ": Attribute 'car_avail' is wrong!"); }
+		else { throw new RuntimeException("Person id=" + person.getId() + ": Attribute 'car_avail' is wrong!"); }
 
 		if (person.isEmployed()) { vals[14]++; }
 		else { vals[15]++; }
@@ -268,7 +268,7 @@ public class PersonZoneSummary extends AbstractPersonAlgorithm implements PlanAl
 		else { vals[17]++; }
 
 		int index = this.calcChainIndex(person.getSelectedPlan(),18); // returns 18-33
-		if ((index < 18) || (33 < index)) { Gbl.errorMsg("Person id=" + person.getId() + ": returning wrong index!"); }
+		if ((index < 18) || (33 < index)) { throw new RuntimeException("Person id=" + person.getId() + ": returning wrong index!"); }
 		vals[index]++;
 
 		vals[34] += this.countActs(person.getSelectedPlan());
@@ -277,7 +277,7 @@ public class PersonZoneSummary extends AbstractPersonAlgorithm implements PlanAl
 		for (int i=0; i<cnts.length; i++) { vals[35+i] += cnts[i]; }
 
 		index = this.calcPlanIndex(person.getSelectedPlan(),40); // returns 40-44
-		if ((index < 40) || (45 < index)) { Gbl.errorMsg("Person id=" + person.getId() + ": returning wrong index!"); }
+		if ((index < 40) || (45 < index)) { throw new RuntimeException("Person id=" + person.getId() + ": returning wrong index!"); }
 		vals[index]++;
 
 		String mode = ((LegImpl)person.getSelectedPlan().getPlanElements().get(1)).getMode();
@@ -286,7 +286,7 @@ public class PersonZoneSummary extends AbstractPersonAlgorithm implements PlanAl
 		else if (CAR.equals(mode)) { vals[47]++; }
 		else if (PT.equals(mode)) { vals[48]++; }
 		else if (UNDEF.equals(mode)) { vals[49]++; }
-		else { Gbl.errorMsg("mode=" + mode + " not known!"); }
+		else { throw new RuntimeException("mode=" + mode + " not known!"); }
 	}
 
 	@Override

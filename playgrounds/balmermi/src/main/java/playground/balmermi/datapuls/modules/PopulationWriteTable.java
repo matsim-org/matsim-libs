@@ -81,7 +81,7 @@ public class PopulationWriteTable {
 			}
 			out.close();
 		} catch (Exception e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		log.info("done.");
 	}

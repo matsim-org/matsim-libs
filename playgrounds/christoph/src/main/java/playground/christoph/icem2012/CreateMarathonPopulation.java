@@ -531,7 +531,7 @@ public class CreateMarathonPopulation {
 			ShapeFileWriter.writeGeometries(fts, barriersShapeOutFile);
 			log.info("done");
 		} catch (Exception e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 	
@@ -562,7 +562,7 @@ public class CreateMarathonPopulation {
 			ShapeFileWriter.writeGeometries(fts, trackShapeOutFile);
 			log.info("done");
 		} catch (Exception e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 	
@@ -592,7 +592,7 @@ public class CreateMarathonPopulation {
 			ShapeFileWriter.writeGeometries(fts, trackRelatedShapeOutFile);
 			log.info("done");
 		} catch (Exception e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 	

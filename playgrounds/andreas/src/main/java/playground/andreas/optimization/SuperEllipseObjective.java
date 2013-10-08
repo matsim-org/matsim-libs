@@ -223,7 +223,7 @@ public class SuperEllipseObjective implements Objective {
 
 	public final void setInitParamPoint(ParamPoint p, int i) {
 		if ((0 > i) || (i > DIMENSION)) {
-			Gbl.errorMsg("index " + i + " not allowed!");
+			throw new RuntimeException("index " + i + " not allowed!");
 		}
 		this.initPPoints[i] = p;
 	}

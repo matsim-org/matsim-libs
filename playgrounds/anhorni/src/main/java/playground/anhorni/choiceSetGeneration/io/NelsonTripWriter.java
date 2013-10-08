@@ -67,7 +67,7 @@ public void write(String outdir, String name, List<ChoiceSet> choiceSets)  {
 			out.close();
 						
 		} catch (final IOException e) {
-				Gbl.errorMsg(e);
+				throw new RuntimeException(e);
 		}	
 	}
 	

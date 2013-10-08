@@ -198,7 +198,7 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 	//////////////////////////////////////////////////////////////////////
 
 	private final Zone getPrimActZone(final ArrayList<Entry> from_loc_entries) {
-		if (from_loc_entries.isEmpty()) { Gbl.errorMsg("From Loc Entries are empty! This should not happen!"); }
+		if (from_loc_entries.isEmpty()) { throw new RuntimeException("From Loc Entries are empty! This should not happen!"); }
 
 		int[] dist_sum = new int[from_loc_entries.size()];
 		dist_sum[0] = (int) from_loc_entries.get(0).getValue();
@@ -214,12 +214,11 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 //				return (Zone)from_loc_entries.get(i).getToLocation(); // this returns now an Id which cannot be casted to Zone
 			}
 		}
-		Gbl.errorMsg("It should never reach this line!");
-		return null;
+		throw new RuntimeException("It should never reach this line!");
 	}
 
 	private final ActivityFacility getPrimActFacility(final ArrayList<ActivityFacility> facs, final String act_type) {
-		if (facs.isEmpty()) { Gbl.errorMsg("facs are empty! This should not happen!"); }
+		if (facs.isEmpty()) { throw new RuntimeException("facs are empty! This should not happen!"); }
 
 		int[] dist_sum = new int[facs.size()];
 		ActivityOptionImpl activityOption = (ActivityOptionImpl) facs.get(0).getActivityOptions().get(act_type);
@@ -244,8 +243,7 @@ public class PersonSetPrimLoc extends AbstractPersonAlgorithm implements PlanAlg
 				return facs.get(i);
 			}
 		}
-		Gbl.errorMsg("It should never reach this line!");
-		return null;
+		throw new RuntimeException("It should never reach this line!");
 	}
 
 	//////////////////////////////////////////////////////////////////////

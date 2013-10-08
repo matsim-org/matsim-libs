@@ -233,7 +233,7 @@ public class PTNetFitObjectiveN implements Objective{
 	@Override
 	public void setInitParamPoint(ParamPoint p, int i) {
 		if ((0 > i) || (i > this.DIMENSION)) {
-			Gbl.errorMsg("index " + i + " not allowed!");
+			throw new RuntimeException("index " + i + " not allowed!");
 		}
 		this.initPPoints[i] = p;		
 	}

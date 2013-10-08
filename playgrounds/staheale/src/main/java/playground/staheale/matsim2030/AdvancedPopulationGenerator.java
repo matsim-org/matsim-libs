@@ -255,7 +255,7 @@ public class AdvancedPopulationGenerator {
 						}
 
 						if (random_mz_p == null) {
-							Gbl.errorMsg("That should not happen!");
+							throw new RuntimeException("That should not happen!");
 						}
 					}
 					// search for a random mz person until effective date is not on the weekend

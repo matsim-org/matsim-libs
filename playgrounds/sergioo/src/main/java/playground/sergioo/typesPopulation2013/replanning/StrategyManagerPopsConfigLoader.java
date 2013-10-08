@@ -92,7 +92,7 @@ public final class StrategyManagerPopsConfigLoader {
 				PlanStrategy strategy = loadStrategy(controler, moduleName, settings, planStrategyFactoryRegister);
 	
 				if (strategy == null) {
-					Gbl.errorMsg("Could not initialize strategy named " + moduleName);
+					throw new RuntimeException("Could not initialize strategy named " + moduleName);
 				}
 	
 				manager.addStrategy(strategy, rate, new IdImpl(populationId));

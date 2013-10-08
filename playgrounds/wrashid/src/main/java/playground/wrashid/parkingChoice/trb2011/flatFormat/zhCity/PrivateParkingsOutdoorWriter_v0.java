@@ -61,7 +61,7 @@ public class PrivateParkingsOutdoorWriter_v0 extends MatsimXmlWriter {
 			this.writer.close();
 		}
 		catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 	

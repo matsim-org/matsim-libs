@@ -293,7 +293,7 @@ public Link findAdjacentLinks(Link link, String[] attributes){
 						if(!link.getAllowedModes().equals(l.getAllowedModes())){match=false;}
 					}else if(attribute.equals("length")){
 						if(link.getLength() != l.getLength()){match=false;}
-					}else{Gbl.errorMsg("Error: no attribute: "+ attribute + " on class link");
+					}else{throw new RuntimeException("Error: no attribute: "+ attribute + " on class link");
 					}
 								
 				}		

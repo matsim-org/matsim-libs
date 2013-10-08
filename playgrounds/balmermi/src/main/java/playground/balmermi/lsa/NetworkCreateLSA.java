@@ -84,14 +84,14 @@ public class NetworkCreateLSA {
 
 				Integer knotennr  = new Integer(entries[0].trim());
 				String knotenbez = entries[1].trim();
-				if (this.intersections.containsKey(knotennr)) { Gbl.errorMsg("Intersection id = " + knotennr + " aleady exists!"); }
+				if (this.intersections.containsKey(knotennr)) { throw new RuntimeException("Intersection id = " + knotennr + " aleady exists!"); }
 				Intersection intersec = new Intersection(knotennr,knotenbez);
 				this.intersections.put(knotennr,intersec);
 			}
 			buffered_reader.close();
 			file_reader.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		System.out.println("  " + this.intersections.size() + " intersections read and stored.");
 	}
@@ -114,7 +114,7 @@ public class NetworkCreateLSA {
 
 				Integer knotennr  = new Integer(entries[0].trim());
 				Integer lsanr = new Integer(entries[1].trim());
-				if (!this.intersections.containsKey(knotennr)) { Gbl.errorMsg("Intersection id = " + knotennr + " does not exist!"); }
+				if (!this.intersections.containsKey(knotennr)) { throw new RuntimeException("Intersection id = " + knotennr + " does not exist!"); }
 				Intersection intersec = this.intersections.get(knotennr);
 				LSA lsa = new LSA(lsanr,intersec);
 				intersec.addLSA(lsa);
@@ -123,7 +123,7 @@ public class NetworkCreateLSA {
 			buffered_reader.close();
 			file_reader.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		System.out.println("  " + lsa_cnt + " LSA's read and assigned to the intersections.");
 	}
@@ -146,7 +146,7 @@ public class NetworkCreateLSA {
 
 				Integer knotennr  = new Integer(entries[0].trim());
 				Integer lnr = new Integer(entries[1].trim());
-				if (!this.intersections.containsKey(knotennr)) { Gbl.errorMsg("Intersection id = " + knotennr + " does not exist!"); }
+				if (!this.intersections.containsKey(knotennr)) { throw new RuntimeException("Intersection id = " + knotennr + " does not exist!"); }
 				Intersection intersec = this.intersections.get(knotennr);
 				Lane l = new Lane(lnr,intersec);
 				intersec.addLane(l);
@@ -155,7 +155,7 @@ public class NetworkCreateLSA {
 			buffered_reader.close();
 			file_reader.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		System.out.println("  " + l_cnt + " Lanes read and assigned to the intersections.");
 	}
@@ -179,19 +179,19 @@ public class NetworkCreateLSA {
 				Integer knotennr  = new Integer(entries[0].trim());
 				Integer flnr = new Integer(entries[1].trim());
 				Integer tlnr = new Integer(entries[2].trim());
-				if (!this.intersections.containsKey(knotennr)) { Gbl.errorMsg("Intersection id = " + knotennr + " does not exist!"); }
+				if (!this.intersections.containsKey(knotennr)) { throw new RuntimeException("Intersection id = " + knotennr + " does not exist!"); }
 				Intersection intersec = this.intersections.get(knotennr);
 				Lane fl = intersec.lanes.get(flnr);
-				if (fl == null) { Gbl.errorMsg("Intersec_id=" + knotennr + ": lane_nr=" + flnr + " does not exist!"); }
+				if (fl == null) { throw new RuntimeException("Intersec_id=" + knotennr + ": lane_nr=" + flnr + " does not exist!"); }
 				Lane tl = intersec.lanes.get(tlnr);
-				if (tl == null) { Gbl.errorMsg("Intersec_id=" + knotennr + ": lane_nr=" + tlnr + " does not exist!"); }
+				if (tl == null) { throw new RuntimeException("Intersec_id=" + knotennr + ": lane_nr=" + tlnr + " does not exist!"); }
 				fl.addToLane(tl);
 				map_cnt++;
 			}
 			buffered_reader.close();
 			file_reader.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		System.out.println("  " + map_cnt + " fromlane-tolane mappings read and assigned to the fromlane.");
 	}
@@ -215,12 +215,12 @@ public class NetworkCreateLSA {
 				Integer knotennr  = new Integer(entries[0].trim());
 				Integer lsanr = new Integer(entries[1].trim());
 				Integer lnr = new Integer(entries[2].trim());
-				if (!this.intersections.containsKey(knotennr)) { Gbl.errorMsg("Intersection id = " + knotennr + " does not exist!"); }
+				if (!this.intersections.containsKey(knotennr)) { throw new RuntimeException("Intersection id = " + knotennr + " does not exist!"); }
 				Intersection intersec = this.intersections.get(knotennr);
 				LSA lsa = intersec.lsas.get(lsanr);
-				if (lsa == null) { Gbl.errorMsg("Intersec_id=" + knotennr + ": lsa_nr=" + lsanr + " does not exist!"); }
+				if (lsa == null) { throw new RuntimeException("Intersec_id=" + knotennr + ": lsa_nr=" + lsanr + " does not exist!"); }
 				Lane l = intersec.lanes.get(lnr);
-				if (l == null) { Gbl.errorMsg("Intersec_id=" + knotennr + ": lane_nr=" + lnr + " does not exist!"); }
+				if (l == null) { throw new RuntimeException("Intersec_id=" + knotennr + ": lane_nr=" + lnr + " does not exist!"); }
 				lsa.addLane(l);
 				l.addLSA(lsa);
 				map_cnt++;
@@ -228,7 +228,7 @@ public class NetworkCreateLSA {
 			buffered_reader.close();
 			file_reader.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		System.out.println("  " + map_cnt + " LSA-lane mappings read and assigned to the LSA and to the lane.");
 	}
@@ -236,7 +236,7 @@ public class NetworkCreateLSA {
 	//////////////////////////////////////////////////////////////////////
 
 	public final void readLaneLinkMapping(String inputfile, int net_idx) {
-		if ((net_idx < 2) || (5 < net_idx)) { Gbl.errorMsg("Index must be in range [2,5]"); }
+		if ((net_idx < 2) || (5 < net_idx)) { throw new RuntimeException("Index must be in range [2,5]"); }
 		int map_cnt = 0;
 		int ignored = 0;
 		Id ignore_flag = new IdImpl("-");
@@ -256,12 +256,12 @@ public class NetworkCreateLSA {
 				Integer lnr = new Integer(entries[1].trim());
 				Id linkid = new IdImpl(entries[net_idx].trim());
 				if (!linkid.equals(ignore_flag)) {
-					if (!this.intersections.containsKey(knotennr)) { Gbl.errorMsg("Intersection id = " + knotennr + " does not exist!"); }
+					if (!this.intersections.containsKey(knotennr)) { throw new RuntimeException("Intersection id = " + knotennr + " does not exist!"); }
 					Intersection intersec = this.intersections.get(knotennr);
 					Lane l = intersec.lanes.get(lnr);
-					if (l == null) { Gbl.errorMsg("Intersec_id=" + knotennr + ": lane_nr=" + lnr + " does not exist!"); }
+					if (l == null) { throw new RuntimeException("Intersec_id=" + knotennr + ": lane_nr=" + lnr + " does not exist!"); }
 					Link link = this.network.getLinks().get(linkid);
-					if (link == null) { Gbl.errorMsg("Intersec_id=" + knotennr + ": link_nr=" + linkid.toString() + " does not exist!"); }
+					if (link == null) { throw new RuntimeException("Intersec_id=" + knotennr + ": link_nr=" + linkid.toString() + " does not exist!"); }
 					l.addLink(link);
 
 					if (!this.lsalinklist.containsKey(linkid)) {
@@ -279,7 +279,7 @@ public class NetworkCreateLSA {
 			buffered_reader.close();
 			file_reader.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		System.out.println("  " + map_cnt + " lane-link mappings read and assigned to the lane. (" + ignored + " entries ignored)");
 	}
@@ -337,7 +337,7 @@ public class NetworkCreateLSA {
 			buffered_reader.close();
 			file_reader.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -407,7 +407,7 @@ public class NetworkCreateLSA {
 						}
 						if (isnan_cnt > 0) { System.out.println("isnan_cnt="+isnan_cnt); }
 						gtf = gtf/(lsas.size()-isnan_cnt);
-						if (Double.isNaN(gtf)) { Gbl.errorMsg("THAT SHOULD NOT HAPPEN!"); }
+						if (Double.isNaN(gtf)) { throw new RuntimeException("THAT SHOULD NOT HAPPEN!"); }
 						out.write("\t\t<gtf time=\"" + Time.writeTime(h*3600) + "\" val=\"" + gtf + "\"/>\n");
 					}
 					out.write("\t</linkgtfs>\n");

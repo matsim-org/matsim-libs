@@ -78,7 +78,7 @@ class FinalWriter {
 			this.out.flush();
 		}
 		catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -90,7 +90,7 @@ class FinalWriter {
 				this.out.close();
 			}
 			catch (IOException e) {
-				Gbl.errorMsg(e);
+				throw new RuntimeException(e);
 			}
 		}
 	}

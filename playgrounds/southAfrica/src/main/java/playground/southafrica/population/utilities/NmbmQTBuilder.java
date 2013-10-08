@@ -129,7 +129,7 @@ public class NmbmQTBuilder {
 		try {
 			nqtb.buildPopulation(populationFile);
 		} catch (FileNotFoundException e) {
-			Gbl.errorMsg("Could not find the population input file.");
+			throw new RuntimeException("Could not find the population input file.");
 		}
 		
 		nqtb.writePopulation(outputFolder, networkFile);
@@ -635,12 +635,12 @@ public class NmbmQTBuilder {
 				bw.write(String.format("%.0f\n", d));
 			}
 		} catch (IOException e) {
-			Gbl.errorMsg("Could not write to " + bufferedWriterName);
+			throw new RuntimeException("Could not write to " + bufferedWriterName);
 		} finally{
 			try {
 				bw.close();
 			} catch (IOException e) {
-				Gbl.errorMsg("Could not close BufferedWriter for " + bufferedWriterName);
+				throw new RuntimeException("Could not close BufferedWriter for " + bufferedWriterName);
 			}
 		}
 	}

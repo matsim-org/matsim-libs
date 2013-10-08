@@ -67,14 +67,14 @@ public class PersonAssignPrimaryActivities extends AbstractPersonAlgorithm imple
 
 	public void run(Plan plan) {
 		KnowledgeImpl k = this.knowledges.getKnowledgesByPersonId().get(plan.getPerson().getId());
-		if (k == null) { Gbl.errorMsg("pid="+plan.getPerson().getId()+": no knowledge defined!"); }
-		if (!k.setPrimaryFlag(true)) { Gbl.errorMsg("pid="+plan.getPerson().getId()+": no activities defined!"); }
+		if (k == null) { throw new RuntimeException("pid="+plan.getPerson().getId()+": no knowledge defined!"); }
+		if (!k.setPrimaryFlag(true)) { throw new RuntimeException("pid="+plan.getPerson().getId()+": no activities defined!"); }
 		ArrayList<ActivityOptionImpl> prim_acts = k.getActivities(true);
 		for (int i=0; i<plan.getPlanElements().size(); i=i+2) {
 			ActivityImpl act = (ActivityImpl)plan.getPlanElements().get(i);
 			String curr_type = act.getType();
 			ActivityOption a = this.facilities.getFacilities().get(act.getFacilityId()).getActivityOptions().get(curr_type);
-			if (a == null) { Gbl.errorMsg("pid="+plan.getPerson().getId()+": Inconsistency with f_id="+act.getFacilityId()+"!"); }
+			if (a == null) { throw new RuntimeException("pid="+plan.getPerson().getId()+": Inconsistency with f_id="+act.getFacilityId()+"!"); }
 			if (!prim_acts.contains(a)) { k.addActivityOption((ActivityOptionImpl) a,false); }
 		}
 	}

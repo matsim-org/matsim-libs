@@ -78,7 +78,7 @@ public class FacilityLoadReader {
 			bufferedReader.close();
 			fileReader.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		log.info("Number of facility loads: " + this.facilityLoads.size());
 	}

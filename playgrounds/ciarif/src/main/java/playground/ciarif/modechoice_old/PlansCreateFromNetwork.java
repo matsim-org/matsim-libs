@@ -57,7 +57,7 @@ public class PlansCreateFromNetwork {
 			plans.setName("created by '" + this.getClass().getName());
 		}
 		if (!plans.getPersons().isEmpty()) {
-			Gbl.errorMsg("[plans=" + plans + " is not empty]");
+			throw new RuntimeException("[plans=" + plans + " is not empty]");
 		}
 
 		int network_capacity = this.network_summary.getNetworkCapacity();

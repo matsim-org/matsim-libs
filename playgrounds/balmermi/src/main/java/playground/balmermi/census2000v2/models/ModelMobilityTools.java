@@ -20,7 +20,6 @@
 
 package playground.balmermi.census2000v2.models;
 
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 
 
@@ -148,7 +147,7 @@ public class ModelMobilityTools {
 	//////////////////////////////////////////////////////////////////////
 
 	public final boolean setAge(int age) {
-		if (age < 0) { Gbl.errorMsg("age="+age+" not allowed."); }
+		if (age < 0) { throw new RuntimeException("age="+age+" not allowed."); }
 		this.age = age;
 		return true;
 	}
@@ -166,25 +165,25 @@ public class ModelMobilityTools {
 	}
 
 	public final boolean setHHDimension(int nump) {
-		if (nump <= 0) { Gbl.errorMsg("nump="+nump+" not allowed."); }
+		if (nump <= 0) { throw new RuntimeException("nump="+nump+" not allowed."); }
 		this.nump = nump;
 		return true;
 	}
 
 	public final boolean setHHKids(int numk) {
-		if (numk < 0) { Gbl.errorMsg("numk="+numk+" not allowed."); }
+		if (numk < 0) { throw new RuntimeException("numk="+numk+" not allowed."); }
 		this.numk = numk;
 		return true;
 	}
 
 	public final boolean setIncome(double inc) {
-		if (inc <= 0) { Gbl.errorMsg("inc="+inc+" not allowed."); }
+		if (inc <= 0) { throw new RuntimeException("inc="+inc+" not allowed."); }
 		this.inc = inc;
 		return true;
 	}
 
 	public final boolean setUrbanDegree(int udeg) {
-		if ((udeg < 1) || (5 < udeg)) { Gbl.errorMsg("udeg="+udeg+" not allowed."); }
+		if ((udeg < 1) || (5 < udeg)) { throw new RuntimeException("udeg="+udeg+" not allowed."); }
 		this.udeg = udeg;
 		return true;
 	}
@@ -196,19 +195,19 @@ public class ModelMobilityTools {
 	}
 
 	public final boolean setDistanceHome2Work(double distance) {
-		if (distance < 0.0) { Gbl.errorMsg("distance="+distance+" not allowed."); }
+		if (distance < 0.0) { throw new RuntimeException("distance="+distance+" not allowed."); }
 		this.disthw = distance;
 		return true;
 	}
 
 	public final boolean setFuelCost(double fuelcost) {
-		if (fuelcost <= 0.0) { Gbl.errorMsg("fuelcost="+fuelcost+" not allowed."); }
+		if (fuelcost <= 0.0) { throw new RuntimeException("fuelcost="+fuelcost+" not allowed."); }
 		this.fuelcost = fuelcost;
 		return true;
 	}
 		
 	public final boolean setLanguage(int language) {
-		if ((language < 1) || (3 < language)) { Gbl.errorMsg("language="+language+" not allowed."); }
+		if ((language < 1) || (3 < language)) { throw new RuntimeException("language="+language+" not allowed."); }
 		this.language = language;
 		return true;
 	}
@@ -260,8 +259,7 @@ public class ModelMobilityTools {
 		System.out.println("language="+language);
 		for (int i = 0; i<utils.length; i++) { System.out.println("utils["+i+"]="+utils[i]); }
 		for (int i = 0; i<probs.length; i++) { System.out.println("probs["+i+"]="+probs[i]); }
-		Gbl.errorMsg("It should never reach this line!");
-		return -1;
+		throw new RuntimeException("It should never reach this line!");
 	}
 	
 	//////////////////////////////////////////////////////////////////////
@@ -314,11 +312,11 @@ public class ModelMobilityTools {
 		else if (udeg == 3) { util += B1_T3 * 1.0; }
 		else if (udeg == 4) { util += B1_T4 * 1.0; }
 		else if (udeg == 5) { util += B1_T5 * 1.0; }
-		else { Gbl.errorMsg("This should never happen!"); }
+		else { throw new RuntimeException("This should never happen!"); }
 		if (language == 1) {/*reference*/}
 		else if (language == 2) {util += B1_FRENCH * 1.0;}
 		else if (language == 3) {util += B1_ITALIAN * 1.0;}
-		else { Gbl.errorMsg("This should never happen!"); }
+		else { throw new RuntimeException("This should never happen!"); }
 		return util;
 	}
 	
@@ -351,11 +349,11 @@ public class ModelMobilityTools {
 		else if (udeg == 3) { util += B2_T3 * 1.0; }
 		else if (udeg == 4) { util += B2_T4 * 1.0; }
 		else if (udeg == 5) { util += B2_T5 * 1.0; }
-		else { Gbl.errorMsg("This should never happen!"); }
+		else { throw new RuntimeException("This should never happen!"); }
 		if (language == 1) {/*reference*/}
 		else if (language == 2) {util += B2_FRENCH * 1.0;}
 		else if (language == 3) {util += B2_ITALIAN * 1.0;}
-		else { Gbl.errorMsg("This should never happen!"); }
+		else { throw new RuntimeException("This should never happen!"); }
 		return util;
 	}
 
@@ -388,7 +386,7 @@ public class ModelMobilityTools {
 		else if (udeg == 3) { util += B3_T3 * 1.0; }
 		else if (udeg == 4) { util += B3_T4 * 1.0; }
 		else if (udeg == 5) { util += B3_T5 * 1.0; }
-		else { Gbl.errorMsg("This should never happen!"); }
+		else { throw new RuntimeException("This should never happen!"); }
 		return util;
 	}
 	
@@ -421,11 +419,11 @@ public class ModelMobilityTools {
 		else if (udeg == 3) { util += B4_T3 * 1.0; }
 		else if (udeg == 4) { util += B4_T4 * 1.0; }
 		else if (udeg == 5) { util += B4_T5 * 1.0; }
-		else { Gbl.errorMsg("This should never happen!"); }
+		else { throw new RuntimeException("This should never happen!"); }
 		if (language == 1) {/*reference*/}
 		else if (language == 2) {util += B4_FRENCH * 1.0;}
 		else if (language == 3) {util += B4_ITALIAN * 1.0;}
-		else { Gbl.errorMsg("This should never happen!"); }
+		else { throw new RuntimeException("This should never happen!"); }
 		return util;
 	}
 	
@@ -458,11 +456,11 @@ public class ModelMobilityTools {
 		else if (udeg == 3) { util += B5_T3 * 1.0; }
 		else if (udeg == 4) { util += B5_T4 * 1.0; }
 		else if (udeg == 5) { util += B5_T5 * 1.0; }
-		else { Gbl.errorMsg("This should never happen!"); }
+		else { throw new RuntimeException("This should never happen!"); }
 		if (language == 1) {/*reference*/}
 		else if (language == 2) {util += B5_FRENCH * 1.0;}
 		else if (language == 3) {util += B5_ITALIAN * 1.0;}
-		else { Gbl.errorMsg("This should never happen!"); }
+		else { throw new RuntimeException("This should never happen!"); }
 		return util;
 	}
 }

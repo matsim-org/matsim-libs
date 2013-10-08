@@ -154,7 +154,7 @@ public class ActivityScoringFunction extends org.matsim.core.scoring.functions.C
 				logger.error("Agent wants to perform an activity whose type is not available in the planned facility.");
 				logger.error("facility id: " + act.getFacilityId());
 				logger.error("activity type: " + act.getType());
-				Gbl.errorMsg("Agent wants to perform an activity whose type is not available in the planned facility.");
+				throw new RuntimeException("Agent wants to perform an activity whose type is not available in the planned facility.");
 			}
 
 			// calculate effective activity duration bounded by opening times

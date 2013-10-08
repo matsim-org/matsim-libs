@@ -92,7 +92,7 @@ public class NetworkCalibrationWithCounts {
 			fw.close();
 			System.out.println(maxval);
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 

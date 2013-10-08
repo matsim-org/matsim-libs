@@ -72,7 +72,7 @@ public class AgentsInEvacuationAreaWriter {
 			absoluteWriter.close();
 			relativeWriter.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 	
@@ -144,7 +144,7 @@ public class AgentsInEvacuationAreaWriter {
 			bufferedWriter.flush();
 			bufferedWriter.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 

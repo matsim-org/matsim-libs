@@ -60,7 +60,7 @@ public class MZDistanceDistrReader {
 				}
 			}
 		} catch (IOException e) {
-				Gbl.errorMsg(e);
+				throw new RuntimeException(e);
 		}
 		distanceBins.finish(numberOfLeisureActs);
 	}

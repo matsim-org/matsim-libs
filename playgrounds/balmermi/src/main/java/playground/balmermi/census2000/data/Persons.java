@@ -29,8 +29,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Random;
 
-import org.matsim.core.gbl.Gbl;
-
 public class Persons {
 
 	//////////////////////////////////////////////////////////////////////
@@ -66,8 +64,7 @@ public class Persons {
 		if ((11 <= ams) && (ams <= 14)) { return true; }
 		else if ((ams == 20) || ((31 <= ams) && (ams <= 35)) || (ams == 4) || (ams == 40)) { return false; }
 		else {
-			Gbl.errorMsg("wrong value of AMS param!");
-			return false;
+			throw new RuntimeException("wrong value of AMS param!");
 		}
 	}
 	
@@ -128,7 +125,7 @@ public class Persons {
 					MyPerson p = new MyPerson(p_id,hh);
 					boolean is_new = hh.addPerson(p);
 					if (!is_new) {
-						Gbl.errorMsg("Line " + line_cnt + ", p_id: " + p_id + " already exists in household id=" + hh.hh_id);
+						throw new RuntimeException("Line " + line_cnt + ", p_id: " + p_id + " already exists in household id=" + hh.hh_id);
 					}
 					this.persons.put(p_id,p);
 
@@ -170,7 +167,7 @@ public class Persons {
 			}	
 			buffered_reader.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		System.out.println("    # persons = " + this.persons.size());
 		System.out.println("    # persons ignored = " + p_ignore_cnt);

@@ -1,10 +1,7 @@
 package playground.acmarmol.matsim2030.forecasts.timeSeriesUpdate.loaders.etappes;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.TreeMap;
-
-import org.matsim.core.gbl.Gbl;
 
 import playground.acmarmol.matsim2030.forecasts.timeSeriesUpdate.loaders.etappes.etappenParsers.MZ2000EtappenParser;
 import playground.acmarmol.matsim2030.forecasts.timeSeriesUpdate.loaders.etappes.etappenParsers.MZ2005EtappenParser;
@@ -59,8 +56,7 @@ public class EtappenLoader {
 			return etappes2000;
 			
 		}else{
-			Gbl.errorMsg("Etappen Loader cannot load data from year " + year);
-			return null;
+			throw new RuntimeException("Etappen Loader cannot load data from year " + year);
 		}
 
 	}

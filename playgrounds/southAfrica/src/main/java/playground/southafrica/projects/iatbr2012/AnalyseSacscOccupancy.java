@@ -143,12 +143,12 @@ public class AnalyseSacscOccupancy {
 				}
 			}
 		} catch (IOException e) {
-			Gbl.errorMsg("Could not write to BufferedWriter " + args[5]);
+			throw new RuntimeException("Could not write to BufferedWriter " + args[5]);
 		} finally{
 			try {
 				bw.close();
 			} catch (IOException e) {
-				Gbl.errorMsg("Could not close BufferedWriter " + args[5]);
+				throw new RuntimeException("Could not close BufferedWriter " + args[5]);
 			}
 		}
 		

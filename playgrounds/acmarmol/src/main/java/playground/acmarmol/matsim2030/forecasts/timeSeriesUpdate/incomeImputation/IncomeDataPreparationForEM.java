@@ -1,27 +1,39 @@
+/* *********************************************************************** *
+ * project: org.matsim.*
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ * copyright       : (C) 2013 by the members listed in the COPYING,        *
+ *                   LICENSE and WARRANTY file.                            *
+ * email           : info at matsim dot org                                *
+ *                                                                         *
+ * *********************************************************************** *
+ *                                                                         *
+ *   This program is free software; you can redistribute it and/or modify  *
+ *   it under the terms of the GNU General Public License as published by  *
+ *   the Free Software Foundation; either version 2 of the License, or     *
+ *   (at your option) any later version.                                   *
+ *   See also COPYING, LICENSE and WARRANTY file                           *
+ *                                                                         *
+ * *********************************************************************** */
+
 package playground.acmarmol.matsim2030.forecasts.timeSeriesUpdate.incomeImputation;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
 
-import org.matsim.api.core.v01.Scenario;
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
-import org.matsim.utils.objectattributes.ObjectAttributes;
-import org.matsim.utils.objectattributes.ObjectAttributesXmlReader;
 
 import playground.acmarmol.matsim2030.forecasts.timeSeriesUpdate.Microcensus;
 import playground.acmarmol.matsim2030.microcensus2010.MZConstants;
-import playground.acmarmol.matsim2030.microcensus2010.objectAttributesConverters.CoordConverter;
 import playground.acmarmol.utils.MyCollectionUtils;
 
 public class IncomeDataPreparationForEM {
+
+	private final static Logger log = Logger.getLogger(IncomeDataPreparationForEM.class);
 	
 	private Microcensus microcensus;
 	private BufferedWriter out;
@@ -193,8 +205,7 @@ public class IncomeDataPreparationForEM {
 		else if(kanton.equals(MZConstants.GENEVE)){return 25;}
 		else if(kanton.equals(MZConstants.JURA)){return 26;}
 		else{
-			Gbl.errorMsg("canton: " + kanton + " not known!");
-			return 0;
+			throw new RuntimeException("canton: " + kanton + " not known!");
 		}
 		
 	}
@@ -220,19 +231,19 @@ public class IncomeDataPreparationForEM {
 			return 11.5;
 		}else if(last_education.equals(MZConstants.EDUCATION_BERUFSLEHRE)
 				|| last_education.equals(MZConstants.EDUCATION_VOLLZEITBERUFSLEHRE)
-				|| last_education.equals(MZConstants.EDUCATION_MATURITÄTSCHULE)){
+				|| last_education.equals(MZConstants.EDUCATION_MATURITAETSCHULE)){
 			return 12;
 		}else if(last_education.equals(MZConstants.EDUCATION_THREE_FOUR_YEARS_BERUFSLEHRE)
 				|| last_education.equals(MZConstants.EDUCATION_THREE_FOUR_YEARS_VOLLZEITBERUFSLEHRE)
-				|| last_education.equals(MZConstants.EDUCATION_LEHRKRÄFTE)){
+				|| last_education.equals(MZConstants.EDUCATION_LEHRKRAEFTE)){
 			return 12.5;
-		}else if(last_education.equals(MZConstants.EDUCATION_HÖHERE_BERUFSAUSBILDUNG)
-				|| last_education.equals(MZConstants.EDUCATION_TECHNIKERSCHLE_HÖHEREFACHSSCHULE_FACHHOSCHSCHULE)){
+		}else if(last_education.equals(MZConstants.EDUCATION_HOEHERE_BERUFSAUSBILDUNG)
+				|| last_education.equals(MZConstants.EDUCATION_TECHNIKERSCHLE_HOEHEREFACHSSCHULE_FACHHOSCHSCHULE)){
 			return 15.5;
-		}else if(last_education.equals(MZConstants.EDUCATION_UNIVERSITÄT)){
+		}else if(last_education.equals(MZConstants.EDUCATION_UNIVERSITAET)){
 			return 16.5;
 		}else{
-			Gbl.errorMsg("Last education: "+ last_education + " doesn't exist");
+			log.error("Last education: "+ last_education + " doesn't exist");
 		}
 		return 0;
 	}

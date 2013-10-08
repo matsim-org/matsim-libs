@@ -152,7 +152,7 @@ class ScoringFunctionsForPopulation implements ActivityHandler, LegHandler {
 			}
 			out.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 

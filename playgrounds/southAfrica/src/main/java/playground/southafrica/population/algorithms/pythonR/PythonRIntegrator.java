@@ -126,7 +126,7 @@ public class PythonRIntegrator {
 	public PythonRIntegrator(String baseFolder) {
 		File folder = new File(baseFolder);
 		if(!folder.exists() || !folder.isDirectory()){
-			Gbl.errorMsg("The base folder is invalid. ABORTING");
+			throw new RuntimeException("The base folder is invalid. ABORTING");
 		}
 		this.baseFolder = baseFolder;
 
@@ -135,7 +135,7 @@ public class PythonRIntegrator {
 		File of = new File(baseFolder + "output_" + ds.toString() + "/");
 		boolean createdOutputFolder = of.mkdirs();
 		if(!createdOutputFolder){
-			Gbl.errorMsg("Could not create output folder ... ABORTING.");
+			throw new RuntimeException("Could not create output folder ... ABORTING.");
 		}
 		this.outputFolder = of.getAbsolutePath() + "/";
 		this.controlTotalsMap = parseControlTotals(this.baseFolder + "template/controlTotals.csv");
@@ -293,12 +293,12 @@ public class PythonRIntegrator {
 			bw.write(String.format("3\t2\t%s\n", sa[8]));
 			bw.write(String.format("4\t2\t%s", sa[9]));
 		} catch (IOException e) {
-			Gbl.errorMsg("Could not write to BufferedWriter for individual control totals for zone " + zone);
+			throw new RuntimeException("Could not write to BufferedWriter for individual control totals for zone " + zone);
 		} finally{
 			try {
 				bw.close();
 			} catch (IOException e) {
-				Gbl.errorMsg("Could not close BufferedWriter for individual control totals for zone " + zone);
+				throw new RuntimeException("Could not close BufferedWriter for individual control totals for zone " + zone);
 			}
 		}
 
@@ -314,12 +314,12 @@ public class PythonRIntegrator {
 			bw.write(String.format("11\t%s\n", sa[15]));
 			bw.write(String.format("12\t%s", sa[16]));
 		} catch (IOException e) {
-			Gbl.errorMsg("Could not write to BufferedWriter for group control totals for zone " + zone);
+			throw new RuntimeException("Could not write to BufferedWriter for group control totals for zone " + zone);
 		} finally{
 			try {
 				bw.close();
 			} catch (IOException e) {
-				Gbl.errorMsg("Could not close BufferedWriter for group control totals for zone " + zone);
+				throw new RuntimeException("Could not close BufferedWriter for group control totals for zone " + zone);
 			}
 		}
 	}
@@ -386,18 +386,18 @@ public class PythonRIntegrator {
 					try {
 						br.close();
 					} catch (IOException e) {
-						Gbl.errorMsg("Could not close BufferedReader for " + f.getAbsolutePath());
+						throw new RuntimeException("Could not close BufferedReader for " + f.getAbsolutePath());
 					}
 				}
 				f.delete();
 			}
 		} catch (IOException e) {
-			Gbl.errorMsg("Could not write to BufferedWriter for aggregate output.");
+			throw new RuntimeException("Could not write to BufferedWriter for aggregate output.");
 		} finally{
 			try {
 				bw.close();
 			} catch (IOException e) {
-				Gbl.errorMsg("Could not close BufferedWriter for aggregate output.");
+				throw new RuntimeException("Could not close BufferedWriter for aggregate output.");
 			}
 		}
 	}
@@ -428,12 +428,12 @@ public class PythonRIntegrator {
 				}
 			}
 		} catch (IOException e) {
-			Gbl.errorMsg("Could not read from BufferedReader for " + filename);
+			throw new RuntimeException("Could not read from BufferedReader for " + filename);
 		} finally{
 			try {
 				br.close();
 			} catch (IOException e) {
-				Gbl.errorMsg("Could not close BufferedReader for " + filename);
+				throw new RuntimeException("Could not close BufferedReader for " + filename);
 			}
 		}
 		LOG.info("Done parsing control totals (" + map.size() + " found)");

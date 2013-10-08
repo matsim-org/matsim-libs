@@ -96,8 +96,8 @@ public class Etappe {
 		else if(modeInteger == 15){mode = MZConstants.WALK;}
 		else if(modeInteger == 16){mode = MZConstants.SKATEBOARD;}
 		else if(modeInteger == 17){mode = MZConstants.OTHER;}
-		else if(modeInteger == 99){mode = MZConstants.PSEUDOETAPPE;}
-		else Gbl.errorMsg("This should never happen!  Mode: " +  mode + " doesn't exist");
+		else if(modeInteger == 99){mode = MZConstants.PSEUDOETAPPE;} else
+			throw new RuntimeException("This should never happen!  Mode: " +  mode + " doesn't exist");
 		
 		return mode;
 		

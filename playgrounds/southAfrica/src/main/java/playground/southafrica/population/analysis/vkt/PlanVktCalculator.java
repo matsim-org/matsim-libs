@@ -76,7 +76,7 @@ public class PlanVktCalculator {
 		try {
 			roadTypeMap = rtp.parseRoadType(osmFile);
 		} catch (FileNotFoundException e) {
-			Gbl.errorMsg("Couldn't find the OSM file " + osmFile);
+			throw new RuntimeException("Couldn't find the OSM file " + osmFile);
 		}
 		
 		/* Read and update the network. */
@@ -207,19 +207,19 @@ public class PlanVktCalculator {
 					try {
 						br.close();
 					} catch (IOException e) {
-						Gbl.errorMsg("Could not close BufferedReader " + outputFile);
+						throw new RuntimeException("Could not close BufferedReader " + outputFile);
 					}
 					f.delete();
 					counter.incCounter();
 				}
 			}
 		} catch (IOException e) {
-			Gbl.errorMsg("Could not write to " + outputFile);			
+			throw new RuntimeException("Could not write to " + outputFile);			
 		} finally{
 			try {
 				bw.close();
 			} catch (IOException e) {
-				Gbl.errorMsg("Could not close BufferedWriter " + outputFile);
+				throw new RuntimeException("Could not close BufferedWriter " + outputFile);
 			}
 		}
 		counter.printCounter();

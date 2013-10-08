@@ -182,8 +182,8 @@ public class RouteSetGenerator {
 	//////////////////////////////////////////////////////////////////////
 
 	public final LinkedList<NetworkRoute> calcRouteSet(final NodeImpl o, final NodeImpl d, final int k, final int time, final int var_factor, final float localRoute_factor) {
-		if (o.getId().equals(d.getId())) { Gbl.errorMsg("O == D not alloed!"); }
-		if (k < 1) { Gbl.errorMsg("k < 1 not allowed!"); }
+		if (o.getId().equals(d.getId())) { throw new RuntimeException("O == D not alloed!"); }
+		if (k < 1) { throw new RuntimeException("k < 1 not allowed!"); }
 
 		LinkedList<NetworkRoute> routes = new LinkedList<NetworkRoute>(); // resulting k least cost routes
 		LinkedList<NetworkRoute> localRoutes = new LinkedList<NetworkRoute>(); // routes containing only local streets

@@ -154,7 +154,7 @@ import org.xml.sax.Attributes;
 		} else if (ROUTE.equals(name)) {
 			startRoute(atts);
 		} else {
-			Gbl.errorMsg(this + "[tag=" + name + " not known or not supported]");
+			throw new RuntimeException(this + "[tag=" + name + " not known or not supported]");
 		}
 	}
 
@@ -259,7 +259,7 @@ import org.xml.sax.Attributes;
 			log.info("Attribute type in <location> is deprecated!");
 		}
 		if (id == null) {
-			Gbl.errorMsg("NEW: location must have an id!");
+			throw new RuntimeException("NEW: location must have an id!");
 		}
 		if ((x != null) || (y != null)) {
 			log.info("NEW: coords in <location> will be ignored!");
@@ -270,11 +270,11 @@ import org.xml.sax.Attributes;
 
 		ActivityFacility currfacility = this.facilities.getFacilities().get(this.scenario.createId(id));
 		if (currfacility == null) {
-			Gbl.errorMsg("facility id=" + id + " does not exist!");
+			throw new RuntimeException("facility id=" + id + " does not exist!");
 		}
 		this.curractivity = currfacility.getActivityOptions().get(this.curracttype);
 		if (this.curractivity == null) {
-			Gbl.errorMsg("facility id=" + id + ": Activity of type=" + this.curracttype + " does not exist!");
+			throw new RuntimeException("facility id=" + id + ": Activity of type=" + this.curracttype + " does not exist!");
 		}
 		this.currknowledge.addActivityOption(this.curractivity, isPrimary);
 	}

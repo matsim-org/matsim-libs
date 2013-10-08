@@ -114,7 +114,7 @@ public class CountsCompareAnalysis {
 			bufferedReader.close();
 			fileReader.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 	
@@ -147,7 +147,7 @@ public class CountsCompareAnalysis {
 			bufferedReader.close();
 			fileReader.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 }

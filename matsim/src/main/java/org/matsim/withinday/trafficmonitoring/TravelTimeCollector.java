@@ -341,9 +341,9 @@ public class TravelTimeCollector implements TravelTime,
 		try {
 			this.startBarrier.await();
 		} catch (InterruptedException ex) {
-			Gbl.errorMsg(ex);
+			throw new RuntimeException(ex);
 		} catch (BrokenBarrierException ex) {
-			Gbl.errorMsg(ex);
+			throw new RuntimeException(ex);
 		}
 	}
 	
@@ -433,9 +433,9 @@ public class TravelTimeCollector implements TravelTime,
 
 			this.endBarrier.await();
 		} catch (InterruptedException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		} catch (BrokenBarrierException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -479,9 +479,9 @@ public class TravelTimeCollector implements TravelTime,
 		try {
 			this.endBarrier.await();
 		} catch (InterruptedException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		} catch (BrokenBarrierException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -571,9 +571,9 @@ public class TravelTimeCollector implements TravelTime,
 					}
 
 				} catch (InterruptedException e) {
-					Gbl.errorMsg(e);
+					throw new RuntimeException(e);
 				} catch (BrokenBarrierException e) {
-					Gbl.errorMsg(e);
+					throw new RuntimeException(e);
 				}
 			}
 		} // run()

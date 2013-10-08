@@ -41,14 +41,14 @@ public class PythonRIntegratorRunnable implements Runnable {
 				}
 			}
 		} catch (NumberFormatException e) {
-			Gbl.errorMsg("NumberFormatException reading group control totals for zone " + zone);
+			throw new RuntimeException("NumberFormatException reading group control totals for zone " + zone);
 		} catch (IOException e) {
-			Gbl.errorMsg("Could not read group control totals for zone " + zone);
+			throw new RuntimeException("Could not read group control totals for zone " + zone);
 		} finally{
 			try {
 				br.close();
 			} catch (IOException e) {
-				Gbl.errorMsg("Could not close the BufferedReader for zone " + zone);
+				throw new RuntimeException("Could not close the BufferedReader for zone " + zone);
 			}
 		}
 		
@@ -74,7 +74,7 @@ public class PythonRIntegratorRunnable implements Runnable {
 				}  	
 //				log.info("  |______________________________");
 			} catch (IOException e) {
-				Gbl.errorMsg("Could not run python for zone " + zone);
+				throw new RuntimeException("Could not run python for zone " + zone);
 			} 
 //			finally{
 //				pProcess.destroy();
@@ -103,7 +103,7 @@ public class PythonRIntegratorRunnable implements Runnable {
 					}  	
 //				log.info("  |______________________________");
 				} catch (IOException e) {
-					Gbl.errorMsg("Could not run R for zone " + zone);
+					throw new RuntimeException("Could not run R for zone " + zone);
 				}
 //				finally{
 //					rProcess.destroy();

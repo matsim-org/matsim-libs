@@ -115,7 +115,7 @@ public class ModFileWriter {
 			log.info("Output file writen to :" + outputFile);
 						
 		} catch (final IOException e) {
-				Gbl.errorMsg(e);
+				throw new RuntimeException(e);
 		}		
 	}
 	
@@ -130,7 +130,7 @@ public class ModFileWriter {
 			fileReader.close();
 		
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		return entries[0];		
 	}
@@ -149,7 +149,7 @@ public class ModFileWriter {
 			fileReader.close();
 		
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		return entries;		
 	}

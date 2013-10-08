@@ -87,14 +87,14 @@ public class NetworkAnalyseRouteSet {
 				// index:   0        1
 
 				Id nodeid = new IdImpl(entries[0].trim());
-				if (!network.getNodes().containsKey(nodeid)) { Gbl.errorMsg("Node id=" + nodeid + " does not exist in the network!"); }
+				if (!network.getNodes().containsKey(nodeid)) { throw new RuntimeException("Node id=" + nodeid + " does not exist in the network!"); }
 				Double height = new Double(entries[1].trim());
-				if (this.node_heights.put(nodeid,height) != null) { Gbl.errorMsg("Node id=" + nodeid + " already has a height assigned!"); }
+				if (this.node_heights.put(nodeid,height) != null) { throw new RuntimeException("Node id=" + nodeid + " already has a height assigned!"); }
 			}
 			buffered_reader.close();
 			file_reader.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		System.out.println("      => # nodes  : " + network.getNodes().size());
 		System.out.println("      => # heights: " + this.node_heights.size());
@@ -115,7 +115,7 @@ public class NetworkAnalyseRouteSet {
 				// index:   0    1         2       3       4     5       6      7      8        9       10      11
 
 				Id linkid = new IdImpl(entries[0].trim());
-				if (!network.getLinks().containsKey(linkid)) { Gbl.errorMsg("Link id=" + linkid + " does not exist in the network!"); }
+				if (!network.getLinks().containsKey(linkid)) { throw new RuntimeException("Link id=" + linkid + " does not exist in the network!"); }
 				this.link_atts.put(linkid,new double[9]);
 				double[] atts = this.link_atts.get(linkid);
 				for (int i=0; i<atts.length; i++) {
@@ -126,7 +126,7 @@ public class NetworkAnalyseRouteSet {
 			buffered_reader.close();
 			file_reader.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		System.out.println("      => # links  : " + network.getLinks().size());
 		System.out.println("      => # Atts   : " + this.link_atts.size());
@@ -148,7 +148,7 @@ public class NetworkAnalyseRouteSet {
 
 				ArrayList<Node> node_routes = new ArrayList<Node>();
 				Node node = network.getNodes().get(new IdImpl(entries[1].trim()));
-				if (node == null) { Gbl.errorMsg("Node id=" + entries[1].trim() + " does not exist!"); }
+				if (node == null) { throw new RuntimeException("Node id=" + entries[1].trim() + " does not exist!"); }
 				node_routes.add(node);
 
 				int idx = 3;
@@ -158,17 +158,17 @@ public class NetworkAnalyseRouteSet {
 					idx++;
 				}
 				Node last = network.getNodes().get(new IdImpl(entries[2].trim()));
-				if (last == null) { Gbl.errorMsg("Node id=" + entries[1].trim() + " does not exist!"); }
+				if (last == null) { throw new RuntimeException("Node id=" + entries[1].trim() + " does not exist!"); }
 				if (!last.getId().equals(node_routes.get(node_routes.size()-1).getId())) {
-					Gbl.errorMsg("Last node does not fit!");
+					throw new RuntimeException("Last node does not fit!");
 				}
 				Id routeid = new IdImpl(entries[0].trim());
-				if (this.routes.put(routeid,node_routes) != null) { Gbl.errorMsg("Route id=" + routeid + " already exists!"); }
+				if (this.routes.put(routeid,node_routes) != null) { throw new RuntimeException("Route id=" + routeid + " already exists!"); }
 			}
 			buffered_reader.close();
 			file_reader.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		System.out.println("      => # routes: " + this.routes.size());
 	}
@@ -205,7 +205,7 @@ public class NetworkAnalyseRouteSet {
 			Node to = route.get(i);
 			Link link = null;
 			for (Link l : from.getOutLinks().values()) { if (l.getToNode().getId().equals(to.getId())) { link = l; } }
-			if (link == null) { Gbl.errorMsg("Something is wrong!"); }
+			if (link == null) { throw new RuntimeException("Something is wrong!"); }
 			double[] atts = this.link_atts.get(link.getId());
 
 			length += atts[LAENGE];
@@ -234,7 +234,7 @@ public class NetworkAnalyseRouteSet {
 			else if (atts[DTVKAT] == 3.0) { dtvkat3_frac += atts[LAENGE]; }
 			else if (atts[DTVKAT] == 4.0) { dtvkat4_frac += atts[LAENGE]; }
 			else if (atts[DTVKAT] == 5.0) { dtvkat5_frac += atts[LAENGE]; }
-			else { Gbl.errorMsg("dtvkat=" + atts[DTVKAT] + " not allowed!"); }
+			else { throw new RuntimeException("dtvkat=" + atts[DTVKAT] + " not allowed!"); }
 
 			natbel_av += atts[NATBEL]* atts[LAENGE];
 			vweg_av += atts[VWEG]* atts[LAENGE];
@@ -352,7 +352,7 @@ public class NetworkAnalyseRouteSet {
 			else if (atts[DTVKAT] == 3.0) { dtvkat3_frac += atts[LAENGE]; }
 			else if (atts[DTVKAT] == 4.0) { dtvkat4_frac += atts[LAENGE]; }
 			else if (atts[DTVKAT] == 5.0) { dtvkat5_frac += atts[LAENGE]; }
-			else { Gbl.errorMsg("dtvkat=" + atts[DTVKAT] + " not allowed!"); }
+			else { throw new RuntimeException("dtvkat=" + atts[DTVKAT] + " not allowed!"); }
 
 			natbel_av += atts[NATBEL]* atts[LAENGE];
 			vweg_av += atts[VWEG]* atts[LAENGE];

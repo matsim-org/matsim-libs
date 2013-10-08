@@ -97,7 +97,7 @@ public class ModelModeChoiceWork extends ModelModeChoice {
 		else if (udeg == 3) { util += B_T3_c_Work * 1.0; }
 		else if (udeg == 4) { util += B_T4_c_Work * 1.0; }
 		else if (udeg == 5) { util += B_T5_c_Work * 1.0; }
-		else { Gbl.errorMsg("This should never happen!"); }
+		else { throw new RuntimeException("This should never happen!"); }
 		return util;
 	}
 
@@ -113,7 +113,7 @@ public class ModelModeChoiceWork extends ModelModeChoice {
 		else if (udeg == 3) { util += B_T3_pt_Work * 1.0; }
 		else if (udeg == 4) { util += B_T4_pt_Work * 1.0; }
 		else if (udeg == 5) { util += B_T5_pt_Work * 1.0; }
-		else { Gbl.errorMsg("This should never happen!"); }
+		else { throw new RuntimeException("This should never happen!"); }
 		return util;
 	}
 

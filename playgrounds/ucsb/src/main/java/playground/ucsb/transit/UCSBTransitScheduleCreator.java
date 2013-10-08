@@ -242,14 +242,14 @@ public class UCSBTransitScheduleCreator {
 			if (!(ptModeType.equals("1CR") || ptModeType.equals("2LR") ||
 			      ptModeType.equals("3EX") || ptModeType.equals("4RB") ||
 			      ptModeType.equals("5LB") || ptModeType.equals("6TW"))) {
-				Gbl.errorMsg("fCnt "+fCnt+": ptType="+ptModeType+" is neither 1CR, 2LR, 3EX, 4RB, 5LB nor 6TW!");
+				throw new RuntimeException("fCnt "+fCnt+": ptType="+ptModeType+" is neither 1CR, 2LR, 3EX, 4RB, 5LB nor 6TW!");
 			}
 
 			PtLine ptLine = ptLines.get(ilinId);
 			if (ptLine == null) { ptStopsIgnoredCnt++; ilinIgnored.add(ilinId); continue; }
 			for (PtRoute ptRoute : ptLine.ptRoutes) {
 				if ((ptRoute.modeType != null) && (!ptRoute.modeType.equals(ptModeType))) {
-					Gbl.errorMsg("fCnt "+fCnt+"; ilin="+ptLine.ilin+": route contains modeType="+ptRoute.modeType+" that does not fit with ptModeType="+ptModeType+".");
+					throw new RuntimeException("fCnt "+fCnt+"; ilin="+ptLine.ilin+": route contains modeType="+ptRoute.modeType+" that does not fit with ptModeType="+ptModeType+".");
 				}
 				ptRoute.modeType = ptModeType;
 				PtPoint ptPoint = ptRoute.ptPoints.get(distId);
@@ -362,7 +362,7 @@ public class UCSBTransitScheduleCreator {
 			}
 		}
 		catch (Exception e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		log.info(lineCnt+" lines parsed.");
 		log.info(ptLines.size() + " pt lines stored.");

@@ -123,7 +123,7 @@ public class PrivateParkingsIndoorWriter_v0 extends MatsimXmlWriter {
 			this.writer.close();
 		}
 		catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 	

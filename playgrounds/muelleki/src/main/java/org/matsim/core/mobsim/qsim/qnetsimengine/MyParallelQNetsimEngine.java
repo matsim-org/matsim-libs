@@ -90,7 +90,7 @@ public class MyParallelQNetsimEngine extends QNetsimEngine {
 
 			nodeReActivator.run();
 		} catch (InterruptedException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 

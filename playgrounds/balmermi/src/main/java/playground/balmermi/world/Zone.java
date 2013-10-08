@@ -22,7 +22,6 @@ package playground.balmermi.world;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordUtils;
 
@@ -132,8 +131,7 @@ public class Zone extends AbstractLocation {
 			CoordImpl refPt = new CoordImpl(maxX, minY);
 			return CoordUtils.calcDistance(refPt, coord);
 		} else {
-			Gbl.errorMsg("This should never happen!");
-			return Double.NaN;
+			throw new RuntimeException("This should never happen!");
 		}
 	}
 

@@ -140,11 +140,11 @@ public class ConvertThurgau2Plans {
 		else if (purpose == 8) { acttype = LEISURE; }	// Leisure
 		else if (purpose == 9) { acttype = LEISURE; }	// Other
 		else if (purpose == 10) { acttype = HOME; }		// Home
-		else { Gbl.errorMsg("pid=" + pid + ": purpose=" + purpose + " not known!"); }
+		else { throw new RuntimeException("pid=" + pid + ": purpose=" + purpose + " not known!"); }
 		
 		// trip mode type --------------------------------------------------------------				
 		if (entrs[29].trim().equals("")) {
-			Gbl.errorMsg("no mode for pid = " + pid + " trip id = " + entrs[0].trim() + " " + entrs[30].trim());
+			throw new RuntimeException("no mode for pid = " + pid + " trip id = " + entrs[0].trim() + " " + entrs[30].trim());
 		}				
 		int m = Integer.parseInt(entrs[29].trim());
 		String mode = null;
@@ -158,7 +158,7 @@ public class ConvertThurgau2Plans {
 		else if (m == 7) { mode = TransportMode.walk; }	// Walking
 		else if (m == 8) { mode = TransportMode.car; }			// Other
 		else {
-			Gbl.errorMsg("pid = " + pid + ": m = " + m + " not known!");
+			throw new RuntimeException("pid = " + pid + ": m = " + m + " not known!");
 		}
 		
 		// STARTING ALL PLANS WITH CAR NOW DUE TO INCONSISTENCIES! -> needs to be captured by replanning
@@ -199,7 +199,7 @@ public class ConvertThurgau2Plans {
 			population.setName("created by '" + this.getClass().getName() + "'");
 		}
 		if (!population.getPersons().isEmpty()) {
-			Gbl.errorMsg("[population=" + population + " is not empty]");
+			throw new RuntimeException("[population=" + population + " is not empty]");
 		}
 		Map<Id,String> person_strings = new TreeMap<Id, String>();
 		int id = Integer.MIN_VALUE;
@@ -223,7 +223,7 @@ public class ConvertThurgau2Plans {
 			else {
 				if (prev_id != Integer.MIN_VALUE) {
 					if (person_strings.put(prev_pid, person_string) != null) {
-						Gbl.errorMsg("Person id=" + prev_pid + " already parsed!");
+						throw new RuntimeException("Person id=" + prev_pid + " already parsed!");
 					}
 				}
 				person_string = curr_line + "\n";
@@ -232,7 +232,7 @@ public class ConvertThurgau2Plans {
 			}
 		}
 		if (person_strings.put(prev_pid, person_string) != null) {
-			Gbl.errorMsg("Person id=" + prev_pid + " already parsed!");
+			throw new RuntimeException("Person id=" + prev_pid + " already parsed!");
 		}
 		br.close();
 		fr.close();
@@ -309,7 +309,7 @@ public class ConvertThurgau2Plans {
 				gender = MALE;
 			}
 			else { 
-				Gbl.errorMsg("pid=" + id + ": g=" + g + " not known!");
+				throw new RuntimeException("pid=" + id + ": g=" + g + " not known!");
 			}
 //			String houseHoldIncomeString = entrs[95].trim();
 //			int householdIncome = -99;

@@ -157,7 +157,7 @@ public class KMLPersonWriter {
 				}
 			}
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		writer.writeMainKml(mainKml);
 		writer.close();

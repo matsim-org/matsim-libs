@@ -194,7 +194,7 @@ public class PTCountsNetworkSimplifier {
 		int nextMessageAt = 2;
 
 		if(this.nodeTypesToMerge.size() == 0){
-			Gbl.errorMsg("No types of node specified. Please use setNodesToMerge to specify which nodes should be merged");
+			throw new RuntimeException("No types of node specified. Please use setNodesToMerge to specify which nodes should be merged");
 		}
 
 		log.info("running " + this.getClass().getName() + " algorithm...");

@@ -269,9 +269,9 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener,
 					}
 				}		
 			} catch (InterruptedException ex) {
-				Gbl.errorMsg(ex);
+				throw new RuntimeException(ex);
 			} catch (BrokenBarrierException ex) {
-				Gbl.errorMsg(ex);
+				throw new RuntimeException(ex);
 			}	
 		}
 	}
@@ -326,7 +326,7 @@ public class SelectHouseholdMeetingPoint implements MobsimBeforeSimStepListener,
 			try {
 				for (Thread thread : threads) thread.join();
 			} catch (InterruptedException e) {
-				Gbl.errorMsg(e);
+				throw new RuntimeException(e);
 			}
 	}
 	

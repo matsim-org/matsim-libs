@@ -130,7 +130,7 @@ public class EnterpriseCensus {
 			first = this.getHectareAttributeIdentifierIndex(ProductionSector.SECTOR3.getFirst());
 			last = this.getHectareAttributeIdentifierIndex(ProductionSector.SECTOR3.getLast());
 		} else {
-			Gbl.errorMsg("Invalid economy sector id.");
+			throw new RuntimeException("Invalid economy sector id.");
 		}
 
 		for (int i = first; i <= last; i++) {

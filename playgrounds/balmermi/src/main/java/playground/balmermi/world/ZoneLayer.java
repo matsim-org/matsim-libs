@@ -38,7 +38,7 @@ public class ZoneLayer extends LayerImpl {
 	public final Zone createZone(final Id id, final String center_x, final String center_y,
 	                             final String min_x, final String min_y, final String max_x, final String max_y) {
 		Id i = id;
-		if (this.getLocations().containsKey(i)) { Gbl.errorMsg(this.toString() + "[zone id=" + id + " already exists]"); }
+		if (this.getLocations().containsKey(i)) { throw new RuntimeException(this.toString() + "[zone id=" + id + " already exists]"); }
 		Coord center = null;
 		Coord min = null;
 		Coord max = null;

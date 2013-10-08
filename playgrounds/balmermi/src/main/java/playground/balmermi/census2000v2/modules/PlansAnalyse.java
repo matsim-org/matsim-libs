@@ -99,10 +99,10 @@ public class PlansAnalyse {
 			else if (p.getCarAvail().equals(NEVER)) { idx += 0; }
 			else if (p.getCarAvail().equals(SOMETIMES)) { idx += 1; }
 			else if (p.getCarAvail().equals(ALWAYS)) { idx += 2; }
-			else { Gbl.errorMsg("pid="+p.getId()+": Haeh?"); }
+			else { throw new RuntimeException("pid="+p.getId()+": Haeh?"); }
 			mt_cnt[idx]++;
 			// act types
-			if (p.getPlans().size() != 1) { Gbl.errorMsg("pid="+p.getId()+": There must be exactly one plan per person!"); }
+			if (p.getPlans().size() != 1) { throw new RuntimeException("pid="+p.getId()+": There must be exactly one plan per person!"); }
 			Plan plan = p.getPlans().get(0);
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Activity) {
@@ -112,7 +112,7 @@ public class PlansAnalyse {
 					else if (a.getType().substring(0,1).equals(E)) { at_cnt[2]++; }
 					else if (a.getType().substring(0,1).equals(S)) { at_cnt[3]++; }
 					else if (a.getType().substring(0,1).equals(L)) { at_cnt[4]++; }
-					else { Gbl.errorMsg("pid="+p.getId()+": Haeh?"); }
+					else { throw new RuntimeException("pid="+p.getId()+": Haeh?"); }
 					a_cnt++;
 				}
 			}
@@ -126,7 +126,7 @@ public class PlansAnalyse {
 					else if (l.getMode().equals(TransportMode.pt))   { mtype_cnt[1]++; }
 					else if (l.getMode().equals(TransportMode.bike)) { mtype_cnt[2]++; }
 					else if (l.getMode().equals(TransportMode.walk)) { mtype_cnt[3]++; }
-					else { Gbl.errorMsg("pid="+p.getId()+": Haeh?"); }
+					else { throw new RuntimeException("pid="+p.getId()+": Haeh?"); }
 					leg_cnt++;
 				}
 			}

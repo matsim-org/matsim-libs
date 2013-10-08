@@ -32,7 +32,6 @@ import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityOption;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.OpeningTime;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.collections.QuadTree;
@@ -202,7 +201,7 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 			act_types.addAll( CAtts.ACTS_LEISURE );
 		}
 		else {
-			Gbl.errorMsg("act_type="+act_type+" not allowed!");
+			throw new RuntimeException("act_type="+act_type+" not allowed!");
 		}
 		
 		ArrayList<ActivityOption> acts = new ArrayList<ActivityOption>();
@@ -219,8 +218,7 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 				return acts.get(i);
 			}
 		}
-		Gbl.errorMsg("It should never reach this line!");
-		return null;
+		throw new RuntimeException("It should never reach this line!");
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -233,8 +231,7 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 			return this.leisActQuadTree;
 		}
 		else {
-			Gbl.errorMsg("act_type=" + act_type + " not allowed!");
-			return null;
+			throw new RuntimeException("act_type=" + act_type + " not allowed!");
 		}
 	}
 
@@ -251,9 +248,9 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 					radius);
 		if (acts.isEmpty()) {
 			if (radius > 200000.0) {
-				Gbl.errorMsg("radius>200'000 meters and still no facility found "+
-						"for acttype="+act_type+
-						" and coord="+coord);
+				throw new RuntimeException("radius>200'000 meters and still no facility found "+
+				"for acttype="+act_type+
+				" and coord="+coord);
 			}
 			return this.getActivity(coord , 2.0 * radius , act_type);
 		}
@@ -277,9 +274,9 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 					radius));
 		if (acts.isEmpty()) {
 			if (radius > 200000.0) {
-				Gbl.errorMsg("radius>200'000 meters and still no facility found "+
-						"for acttype="+act_type+
-						" and coords={ "+coord1+" ; "+coord2+" }");
+				throw new RuntimeException("radius>200'000 meters and still no facility found "+
+				"for acttype="+act_type+
+				" and coords={ "+coord1+" ; "+coord2+" }");
 			}
 			return this.getActivity( coord1 , coord2 , 2.0 * radius , act_type);
 		}
@@ -333,7 +330,7 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 	@Override
 	public void run(final Person person) {
 		if (person.getPlans().size() != 1) {
-			Gbl.errorMsg("pid="+person.getId()+": There must be exactly one plan.");
+			throw new RuntimeException("pid="+person.getId()+": There must be exactly one plan.");
 		}
 		Plan plan = person.getSelectedPlan();
 		this.run(plan);
@@ -363,7 +360,7 @@ public class PersonAssignShopLeisureLocations extends AbstractPersonAlgorithm im
 					}
 				}
 				if ( (start == null) || (end == null) ) {
-					Gbl.errorMsg("That should not happen!");
+					throw new RuntimeException("That should not happen!");
 				}
 				this.assignRemainingLocations( act , start , end );
 			}

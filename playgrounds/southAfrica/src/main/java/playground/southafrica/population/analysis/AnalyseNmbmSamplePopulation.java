@@ -169,12 +169,12 @@ public class AnalyseNmbmSamplePopulation {
 					bw.write(String.format("%.0f,%.0f\n", c.getX(), c.getY() ) ) ;
 				}				
 			} catch (IOException e) {
-				Gbl.errorMsg("Could not write to BufferedWriter.");
+				throw new RuntimeException("Could not write to BufferedWriter.");
 			} finally{
 				try {
 					bw.close();
 				} catch (IOException e) {
-					Gbl.errorMsg("Could not close BufferedWriter.");
+					throw new RuntimeException("Could not close BufferedWriter.");
 				}
 			}
 		}

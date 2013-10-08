@@ -121,8 +121,8 @@ public class MZ1994WegeParser {
 			else if(mode.equals("6")){mode =  MZConstants.TRAIN;}
 			else if(mode.equals("7")){mode =  MZConstants.POSTAUTO;}
 			else if(mode.equals("8")){mode =  MZConstants.BUS_TRAM;}
-			else if(mode.equals("9")){mode =  MZConstants.OTHER;}
-			else Gbl.errorMsg("This should never happen!  Mode: " +  mode + " doesn't exist");
+			else if(mode.equals("9")){mode =  MZConstants.OTHER;} else
+				throw new RuntimeException("This should never happen!  Mode: " +  mode + " doesn't exist");
 			wegeAttributes.putAttribute(wid.toString(), MZConstants.PRINCIPAL_MODE, mode);
 			
 			//start coordinate - CH1903 (18,19)
@@ -175,7 +175,7 @@ public class MZ1994WegeParser {
 				// time consistency check N°1
 				if(arrival<departure){
 					if(!time_err_pids.contains(pid)){time_err_pids.add(pid);}
-					Gbl.errorMsg("This should never happen!  Arrival ("+arrival+") before departure ("+departure+")!- hhnr: " +hhnr+ " zielpnr: "+zielpnr+" wegnr: "+wegnr);
+					throw new RuntimeException("This should never happen!  Arrival ("+arrival+") before departure ("+departure+")!- hhnr: " +hhnr+ " zielpnr: "+zielpnr+" wegnr: "+wegnr);
 				}
 			
 			//bee-line distance (km => m)
@@ -198,8 +198,8 @@ public class MZ1994WegeParser {
 				else if(wzweck1.equals("3")){purpose =  MZConstants.SHOPPING;}
 				else if(wzweck1.equals("4")){purpose =  MZConstants.LEISURE;}
 				else if(wzweck1.equals("5")){purpose =  MZConstants.BUSINESS;}
-				else if(wzweck1.equals("9")){purpose=  MZConstants.NO_ANSWER;}
-				else Gbl.errorMsg("This should never happen!  Purpose wzweck1: " +  wzweck1 + " doesn't exist");
+				else if(wzweck1.equals("9")){purpose=  MZConstants.NO_ANSWER;} else
+					throw new RuntimeException("This should never happen!  Purpose wzweck1: " +  wzweck1 + " doesn't exist");
 			}else{
 				purpose = MZConstants.HOME;
 			}

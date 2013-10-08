@@ -24,7 +24,6 @@ import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeMap;
 
-
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Activity;
@@ -257,7 +256,7 @@ public class AgentInteractionScoringFunction extends CharyparNagelActivityScorin
 					double penaltyUnderarousal = (lowerMarginalUtility*loadTemp * dur);
 					if (penaltyUnderarousal>0){
 						log.info("positive penaltyUnderarousal of " +penaltyUnderarousal+ ", load = " +load+ ", dur = "+dur+" beta = "+lowerMarginalUtility+", " +offsetStart+ ", " +offsetEnd+", " +activityStart+ ", " +activityEnd+ ", "+timeBinEnd);
-						Gbl.errorMsg("Positive penaltyUpperarousal is computed. Aborting...");
+						throw new RuntimeException("Positive penaltyUpperarousal is computed. Aborting...");
 					}
 					tmpScore += penaltyUnderarousal;
 					//	log.info("lowerMarginalUtility is " +lowerMarginalUtility);
@@ -269,7 +268,7 @@ public class AgentInteractionScoringFunction extends CharyparNagelActivityScorin
 					double penaltyUpperarousal = (upperMarginalUtility*load * dur);
 					if (penaltyUpperarousal>0){
 						log.info("positive penaltyUpperarousal of " +penaltyUpperarousal+ ", load = " +load+ ", dur = "+dur+" beta = "+upperMarginalUtility+", " +offsetStart+ ", " +offsetEnd+", " +activityStart+ ", " +activityEnd+ ", "+timeBinEnd);
-						Gbl.errorMsg("Positive penaltyUpperarousal is computed. Aborting...");
+						throw new RuntimeException("Positive penaltyUpperarousal is computed. Aborting...");
 
 					}
 					tmpScore += penaltyUpperarousal;		

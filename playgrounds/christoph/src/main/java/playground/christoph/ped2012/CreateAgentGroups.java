@@ -176,7 +176,7 @@ public class CreateAgentGroups implements BasicEventHandler {
 			}
 			
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 	

@@ -95,7 +95,7 @@ public class MZ2000HouseholdPersonParser {
 			if(gender.equals("1")){gender=MZConstants.MALE;}
 			else if(gender.equals("2")){gender=MZConstants.FEMALE;}
 			else{
-				Gbl.errorMsg("Unknown gender: "+ gender);
+				throw new RuntimeException("Unknown gender: "+ gender);
 			}
 			this.householdpersonsAttributes.putAttribute(zid, MZConstants.GENDER, gender);
 			
@@ -115,7 +115,7 @@ public class MZ2000HouseholdPersonParser {
 			
 			IdImpl hhid = new IdImpl(hhnr);
 			if(!this.households.getHouseholds().containsKey(hhid)){
-				Gbl.errorMsg("This should never happen!  Household hhnr: " + hhnr+ " doesn't exist");
+				throw new RuntimeException("This should never happen!  Household hhnr: " + hhnr+ " doesn't exist");
 			}		
 			this.households.getHouseholds().get(hhid).getMemberIds().add(new IdImpl(zid));  // id = hhnr + hpnr??
 			

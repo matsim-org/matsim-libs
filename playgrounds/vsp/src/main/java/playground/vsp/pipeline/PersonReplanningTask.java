@@ -67,7 +67,7 @@ public class PersonReplanningTask implements ScenarioSinkSource {
 			PlanStrategyImpl strategy = loadStrategy(classname, settings, network, scenario, travelTimeCalc.getTravelTimeCalculator(), travelCostCalc.getTravelCostCalculator(), routeFactory);
 
 			if (strategy == null) {
-				Gbl.errorMsg("Could not initialize strategy named " + classname);
+				throw new RuntimeException("Could not initialize strategy named " + classname);
 			}
 
 			if (settings.getDisableAfter() >= 0) {

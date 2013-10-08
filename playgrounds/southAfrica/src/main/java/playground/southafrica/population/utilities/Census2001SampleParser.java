@@ -268,7 +268,7 @@ public class Census2001SampleParser {
 	
 	public void buildPopulation(){
 		if(householdMap.size() == 0 || personMap.size() == 0){
-			Gbl.errorMsg("Either the househols or persons are of size ZERO!");
+			throw new RuntimeException("Either the househols or persons are of size ZERO!");
 		}
 		
 		LOG.info("Checking that each person has an associated household in the map...");
@@ -393,7 +393,7 @@ public class Census2001SampleParser {
 	 */
 	public void writeHouseholds(String outputfolder){
 		if(this.households == null || this.householdAttributes == null){
-			Gbl.errorMsg("Either no households or household attributes to write.");
+			throw new RuntimeException("Either no households or household attributes to write.");
 		} else{
 			LOG.info("Writing households to file...");
 			HouseholdsWriterV10 hw = new HouseholdsWriterV10(this.households);
@@ -414,7 +414,7 @@ public class Census2001SampleParser {
 	 */
 	public void writePopulation(String outputfolder){
 		if(this.sc.getPopulation().getPersons().size() == 0 || this.personAttributes == null){
-			Gbl.errorMsg("Either no persons or person attributes to write.");
+			throw new RuntimeException("Either no persons or person attributes to write.");
 		} else{
 			LOG.info("Writing population to file...");
 			PopulationWriter pw = new PopulationWriter(this.sc.getPopulation(), this.sc.getNetwork());

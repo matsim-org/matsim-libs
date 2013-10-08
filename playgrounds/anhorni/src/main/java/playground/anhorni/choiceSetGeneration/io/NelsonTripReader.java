@@ -116,7 +116,7 @@ public class NelsonTripReader {
 			fileReader.close();
 		
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 	
@@ -158,7 +158,7 @@ public class NelsonTripReader {
 				this.mzTrips.put(id, mzTrip);
 			}
 		} catch (IOException e) {
-				Gbl.errorMsg(e);
+				throw new RuntimeException(e);
 		}
 	}
 

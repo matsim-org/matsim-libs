@@ -105,11 +105,11 @@ public class FacilitiesCreateBuildingsFromCensus2000 {
 				// check for existing municipality
 				Id zone_id = new IdImpl(entries[CAtts.I_ZGDE]);
 				BasicLocation zone = this.municipalities.getLocation(zone_id);
-				if (zone == null) { Gbl.errorMsg("Line "+line_cnt+": Zone id="+zone_id+" does not exist!"); }
+				if (zone == null) { throw new RuntimeException("Line "+line_cnt+": Zone id="+zone_id+" does not exist!"); }
 
 				// check for facility id
 				Id f_id = new IdImpl(entries[CAtts.I_GEBAEUDE_ID]);
-				if (Integer.parseInt(f_id.toString()) >= min_id_given) { Gbl.errorMsg("Line "+line_cnt+": f_id="+f_id+" must be less then min_id="+min_id_given+"!"); }
+				if (Integer.parseInt(f_id.toString()) >= min_id_given) { throw new RuntimeException("Line "+line_cnt+": f_id="+f_id+" must be less then min_id="+min_id_given+"!"); }
 
 				// home facility creation
 				Coord coord = new CoordImpl(entries[CAtts.I_XACH],entries[CAtts.I_YACH]);
@@ -130,7 +130,7 @@ public class FacilitiesCreateBuildingsFromCensus2000 {
 				else {
 					// check for coordinate consistency of existing home facility
 					if ((coord.getX() != f.getCoord().getX()) || coord.getY() != f.getCoord().getY()) {
-						Gbl.errorMsg("Line "+line_cnt+": facility id="+f_id+" already exists and has another coordinate!");
+						throw new RuntimeException("Line "+line_cnt+": facility id="+f_id+" already exists and has another coordinate!");
 					}
 
 					// add 1 to capacity
@@ -154,7 +154,7 @@ public class FacilitiesCreateBuildingsFromCensus2000 {
 			log.info("    max home facility id="+max_f_id);
 			log.info("      # facilities = " + facilities.getFacilities().size());
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		log.info("    done.");
 	}

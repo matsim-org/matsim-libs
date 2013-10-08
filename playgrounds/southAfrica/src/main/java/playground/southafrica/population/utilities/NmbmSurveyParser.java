@@ -632,7 +632,7 @@ public class NmbmSurveyParser {
 		try {
 			this.zones.readMultizoneShapefile(filename, 1);
 		} catch (IOException e) {
-			Gbl.errorMsg("Could not parse shapefile.");
+			throw new RuntimeException("Could not parse shapefile.");
 		}
 	}
 	

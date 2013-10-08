@@ -22,6 +22,7 @@ package playground.staheale.analysis;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -160,7 +161,7 @@ public class AnalyseFacilities {
 			out.flush();
 			out.close();
 		} catch (final IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 
 

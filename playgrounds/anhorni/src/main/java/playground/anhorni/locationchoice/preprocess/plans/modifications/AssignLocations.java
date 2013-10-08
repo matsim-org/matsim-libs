@@ -55,7 +55,7 @@ public class AssignLocations {
 		Collection<ActivityFacility> locs = this.actTree.get(x, y, radius);
 		if (locs.isEmpty()) {
 			if (radius > 200000.0) {
-				Gbl.errorMsg("radius>200'000 meters and still no facility found!");
+				throw new RuntimeException("radius>200'000 meters and still no facility found!");
 			}
 			return this.getFacilities(x, y, 2.0 * radius);
 		}
@@ -103,7 +103,7 @@ public class AssignLocations {
 			Person person = person_it.next();
 
 			if (person.getPlans().size() != 1) {
-				Gbl.errorMsg("pid = "+person.getId()+" : There must be exactly one plan.");
+				throw new RuntimeException("pid = "+person.getId()+" : There must be exactly one plan.");
 			}
 			Plan plan = person.getSelectedPlan();
 			this.run(plan, type);
@@ -134,7 +134,7 @@ public class AssignLocations {
 					}
 				}
 				if ((start == null) || (end == null)) {
-					Gbl.errorMsg("That should not happen!");
+					throw new RuntimeException("That should not happen!");
 				}
 				this.assignLocation(act, start, end);
 			}

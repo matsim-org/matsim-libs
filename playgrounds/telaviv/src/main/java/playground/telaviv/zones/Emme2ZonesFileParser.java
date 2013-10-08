@@ -121,9 +121,9 @@ public class Emme2ZonesFileParser {
 			
 			br.close();
     	} catch (FileNotFoundException e)  {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		
 		return zones;

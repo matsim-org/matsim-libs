@@ -97,7 +97,7 @@ public class CountsCreatorV2 {
 				originalNodes = scenario.getNetwork().getNodes();
 				buildNodesQuadTree();
 			} catch (Exception e) {
-				Gbl.errorMsg(e);
+				throw new RuntimeException(e);
 			}
 		}
 

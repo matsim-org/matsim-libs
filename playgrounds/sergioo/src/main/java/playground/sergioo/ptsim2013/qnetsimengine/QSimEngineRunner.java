@@ -173,9 +173,9 @@ public class QSimEngineRunner extends NetElementActivator implements Runnable {
 				 */
 				endBarrier.await();
 			} catch (InterruptedException e) {
-				Gbl.errorMsg(e);
+				throw new RuntimeException(e);
 			} catch (BrokenBarrierException e) {
-            	Gbl.errorMsg(e);
+            	throw new RuntimeException(e);
             }
 		}
 	}	// run()

@@ -142,7 +142,7 @@ public class CreateStayHomePlan {
 
 			}
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		log.info(lineCount+" lines parsed.");
 		log.info(population.getPersons().size()+" persons stored.");

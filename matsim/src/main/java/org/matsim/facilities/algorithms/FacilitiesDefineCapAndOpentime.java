@@ -51,7 +51,7 @@ public class FacilitiesDefineCapAndOpentime {
 		super();
 		this.nof_persons = nof_persons;
 		if (nof_persons <= 0) {
-			Gbl.errorMsg("[nof_persons=" + nof_persons + " not allowed]");
+			throw new RuntimeException("[nof_persons=" + nof_persons + " not allowed]");
 		}
 	}
 
@@ -73,7 +73,7 @@ public class FacilitiesDefineCapAndOpentime {
 				else if (at.equals("education")) { educ_cnt++; }
 				else if (at.equals("shop")) { shop_cnt++; }
 				else if (at.equals("leisure")) { leis_cnt++; }
-				else { Gbl.errorMsg("[something is wrong!]"); }
+				else { throw new RuntimeException("[something is wrong!]"); }
 			}
 		}
 		System.out.println("      home_cnt = " + home_cnt);
@@ -110,7 +110,7 @@ public class FacilitiesDefineCapAndOpentime {
 					a.addOpeningTime(new OpeningTimeImpl(DayType.wkday, TIME_1700, TIME_2400));
 					a.addOpeningTime(new OpeningTimeImpl(DayType.wkend, TIME_2000, TIME_2400));
 				}
-				else { Gbl.errorMsg("[something is wrong!]"); }
+				else { throw new RuntimeException("[something is wrong!]"); }
 			}
 		}
 

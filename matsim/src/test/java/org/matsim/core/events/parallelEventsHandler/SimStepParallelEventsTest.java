@@ -251,7 +251,7 @@ public class SimStepParallelEventsTest extends MatsimTestCase {
 			try {
 				Thread.sleep(500);
 			} catch (InterruptedException e) {
-				Gbl.errorMsg(e);
+				throw new RuntimeException(e);
 			}
 			
 			for (int i = 0; i < 100; i++) {

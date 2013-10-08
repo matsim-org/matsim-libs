@@ -22,6 +22,7 @@ package playground.anhorni.counts;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+
 import org.matsim.core.gbl.Gbl;
 
 public class CountsCompareReader {
@@ -49,7 +50,7 @@ public class CountsCompareReader {
 			bufferedReader.close();
 			fileReader.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		return networkName;
 	}
@@ -78,7 +79,7 @@ public class CountsCompareReader {
 			bufferedReader.close();
 			fileReader.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 }

@@ -107,9 +107,9 @@ class PTParallelQNetsimEngine extends PTQNetsimEngine {
 		try {
 			this.startBarrier.await();
 		} catch (InterruptedException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		} catch (BrokenBarrierException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 
 		super.afterSim();
@@ -137,9 +137,9 @@ class PTParallelQNetsimEngine extends PTQNetsimEngine {
 
 			this.endBarrier.await();
 		} catch (InterruptedException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		} catch (BrokenBarrierException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 

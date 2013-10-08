@@ -72,7 +72,7 @@ public class PlansFilterPersons {
 		}
 		for (Person p : persons) {
 			Object o = p.getCustomAttributes().get(CAtts.HH_Z);
-			if (o == null) { Gbl.errorMsg("pid="+p.getId()+": no hh_z. That must not happen!"); }
+			if (o == null) { throw new RuntimeException("pid="+p.getId()+": no hh_z. That must not happen!"); }
 			((Household)o).removePersonZ(p.getId());
 		}
 		log.info("      "+persons.size()+" persons without '"+CAtts.HH_W+"' household.");
@@ -90,25 +90,25 @@ public class PlansFilterPersons {
 					ActivityOptionImpl a0 = this.knowledges.getKnowledgesByPersonId().get(p.getId()).getActivities(CAtts.ACT_HOME).get(0);
 					ActivityOptionImpl a1 = this.knowledges.getKnowledgesByPersonId().get(p.getId()).getActivities(CAtts.ACT_HOME).get(1);
 					if (a0.getFacility().getId().equals(f.getId())) {
-						if (!this.knowledges.getKnowledgesByPersonId().get(p.getId()).removeActivity(a0)) { Gbl.errorMsg("pid="+p.getId()+": That must not happen!"); }
+						if (!this.knowledges.getKnowledgesByPersonId().get(p.getId()).removeActivity(a0)) { throw new RuntimeException("pid="+p.getId()+": That must not happen!"); }
 					}
 					else if (a1.getFacility().getId().equals(f.getId())) {
-						if (!this.knowledges.getKnowledgesByPersonId().get(p.getId()).removeActivity(a1)) { Gbl.errorMsg("pid="+p.getId()+": That must not happen!"); }
+						if (!this.knowledges.getKnowledgesByPersonId().get(p.getId()).removeActivity(a1)) { throw new RuntimeException("pid="+p.getId()+": That must not happen!"); }
 					}
 					else {
-						Gbl.errorMsg("pid="+p.getId()+": That must not happen!");
+						throw new RuntimeException("pid="+p.getId()+": That must not happen!");
 					}
 				}
 			}
 			// checks
 			if (p.getCustomAttributes().get(CAtts.HH_Z) != null) {
-					Gbl.errorMsg("pid="+p.getId()+": Still containing hh_z!");
+					throw new RuntimeException("pid="+p.getId()+": Still containing hh_z!");
 				}
 			if (p.getCustomAttributes().get(CAtts.HH_W) == null) {
-				Gbl.errorMsg("pid="+p.getId()+": No hh_w!");
+				throw new RuntimeException("pid="+p.getId()+": No hh_w!");
 			}
 			if (this.knowledges.getKnowledgesByPersonId().get(p.getId()).getActivities(CAtts.ACT_HOME).size() != 1) {
-				Gbl.errorMsg("pid="+p.getId()+": "+ this.knowledges.getKnowledgesByPersonId().get(p.getId()).getActivities(CAtts.ACT_HOME).size() + " home acts!");
+				throw new RuntimeException("pid="+p.getId()+": "+ this.knowledges.getKnowledgesByPersonId().get(p.getId()).getActivities(CAtts.ACT_HOME).size() + " home acts!");
 			}
 		}
 

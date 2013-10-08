@@ -56,7 +56,7 @@ public abstract class AbstractLocation implements BasicLocation {
 		this.id = id;
 		this.center = center;
 		if (this.center == null) {
-			Gbl.errorMsg("Location id=" + id + " instanciate without coordinate!");
+			throw new RuntimeException("Location id=" + id + " instanciate without coordinate!");
 		}
 	}
 

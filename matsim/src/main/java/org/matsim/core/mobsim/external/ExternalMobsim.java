@@ -181,7 +181,7 @@ public class ExternalMobsim implements Mobsim {
 		int timeout = this.scenario.getConfig().simulation().getExternalTimeOut();
 		int exitcode = ExeRunner.run(cmd, logfileName, timeout);
 		if (exitcode != 0) {
-			Gbl.errorMsg("There was a problem running the external mobsim. exit code: " + exitcode);
+			throw new RuntimeException("There was a problem running the external mobsim. exit code: " + exitcode);
 		}
 	}
 

@@ -85,7 +85,7 @@ public class CountsWriter extends MatsimXmlWriter implements MatsimWriter {
 			close();
 		}
 		catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 

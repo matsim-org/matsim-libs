@@ -51,7 +51,7 @@ public class ParamPoint {
 	public static ParamPoint add(ParamPoint p1, ParamPoint p2) {
 		int dimension = p1.getDimension();
 		if (p2.getDimension() != dimension) {
-			Gbl.errorMsg("p1 and p2 have different dimensions.");
+			throw new RuntimeException("p1 and p2 have different dimensions.");
 		}
 		ParamPoint result = new ParamPoint(dimension);
 		for (int i = 0; i < dimension; i++) {
@@ -64,7 +64,7 @@ public class ParamPoint {
 	public static ParamPoint subtract(ParamPoint p1, ParamPoint p2) {
 		int dimension = p1.getDimension();
 		if (p2.getDimension() != dimension) {
-			Gbl.errorMsg("p1 and p2 have different dimensions.");
+			throw new RuntimeException("p1 and p2 have different dimensions.");
 		}
 		ParamPoint result = new ParamPoint(dimension);
 		for (int i = 0; i < dimension; i++) {

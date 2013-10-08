@@ -142,7 +142,7 @@ public class RetailersParallelLocationListener implements StartupListener, Befor
 				}
 			} 
 			catch (IOException e) {
-				Gbl.errorMsg(e);
+				throw new RuntimeException(e);
 			}
 		}
 		

@@ -597,7 +597,7 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 			bw.flush();
 			bw.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		
 		fileName = event.getControler().getControlerIO().getIterationFilename(event.getIteration(), "agentsLeftEvacuationAreaByModeDetailed.txt");
@@ -628,7 +628,7 @@ public class AgentsInEvacuationAreaCounter implements LinkEnterEventHandler,
 			bw.flush();
 			bw.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		
 		/*

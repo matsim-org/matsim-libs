@@ -5,22 +5,16 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.collections.Tuple;
@@ -258,11 +252,8 @@ public class MZ2010SampleDataCreator {
 			return 3;
 			
 		}else{
-			Gbl.errorMsg("No mode type classification defined for mode: "+ mode);
+			throw new RuntimeException("No mode type classification defined for mode: "+ mode);
 		}
-		
-		
-		return -1;
 	}
 
 	private int getCohort(String alter) {
@@ -306,10 +297,8 @@ public class MZ2010SampleDataCreator {
 		}else if(code.equals("6621")){//geneve
 			return 9;
 		}else{
-			Gbl.errorMsg("no grossezentren for gemeinde code: "+ code);
+			throw new RuntimeException("no grossezentren for gemeinde code: "+ code);
 		}
-		return 0;
-		
 	}
 
 	private String[] getTravelTimes(String[] HH_GEM) {
@@ -487,7 +476,7 @@ public class MZ2010SampleDataCreator {
 		}else if(eink_imp.equals("9")){
 			income = 17000;
 		}else{
-			Gbl.errorMsg("not know code for Eink_imp = "+ eink_imp);
+			throw new RuntimeException("not know code for Eink_imp = "+ eink_imp);
 		}
 		
 		return income;

@@ -229,7 +229,7 @@ public class TripsAnalyzer implements PersonDepartureEventHandler, PersonArrival
 			this.tripsWriter.flush();
 			this.durationWriter.flush();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		
 		if (this.createGraphs && event.getIteration() != this.minIteration) {
@@ -290,7 +290,7 @@ public class TripsAnalyzer implements PersonDepartureEventHandler, PersonArrival
 			this.tripsWriter.close();
 			this.durationWriter.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 

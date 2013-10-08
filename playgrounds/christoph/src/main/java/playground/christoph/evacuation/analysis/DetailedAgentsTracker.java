@@ -1200,7 +1200,7 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 			writer.flush();
 			writer.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		
 		/*
@@ -1363,7 +1363,7 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 			writer.flush();
 			writer.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		
 		/*
@@ -1560,7 +1560,7 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 			writer.flush();
 			writer.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		
 		/*
@@ -1803,7 +1803,7 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 			writer.flush();
 			writer.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 
 	}

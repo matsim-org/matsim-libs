@@ -59,7 +59,7 @@ public class PlansCreatePopulation {
 			plans.setName("created by '" + this.getClass().getName() + "'");
 		}
 		if (!plans.getPersons().isEmpty()) {
-			Gbl.errorMsg("[plans=" + plans + " is not empty]");
+			throw new RuntimeException("[plans=" + plans + " is not empty]");
 		}
 
 		Iterator<Integer> pid_it = this.persons.getPersons().keySet().iterator();

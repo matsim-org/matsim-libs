@@ -122,7 +122,7 @@ public class NetworkAddEmmeManeuverRestrictions {
 			log.info("    "+illegalManeuvers.size()+" nodes contains maneuver restrictions.");
 			log.info("    "+mnCnt+" maneuver restrictions in total.");
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		log.info("  done.");
 		return illegalManeuvers;

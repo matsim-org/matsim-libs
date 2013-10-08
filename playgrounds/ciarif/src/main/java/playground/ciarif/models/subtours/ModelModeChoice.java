@@ -23,7 +23,6 @@ package playground.ciarif.models.subtours;
 import java.util.TreeSet;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 
 public abstract class ModelModeChoice {
@@ -189,8 +188,7 @@ public abstract class ModelModeChoice {
 			prob_sum += probs[i];
 			if (r < prob_sum) { return i; }
 		}
-		Gbl.errorMsg("It should never reach this line!");
-		return -1;
+		throw new RuntimeException("It should never reach this line!");
 	}
 
 	//////////////////////////////////////////////////////////////////////

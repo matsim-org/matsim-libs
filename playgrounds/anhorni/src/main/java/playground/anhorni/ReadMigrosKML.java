@@ -135,7 +135,7 @@ public class ReadMigrosKML {
 		        Exception x = e.getException ();
 		        ((x == null) ? e : x).printStackTrace ();
 	        } catch (final IOException e) {
-				Gbl.errorMsg(e);
+				throw new RuntimeException(e);
 	        }catch (Throwable t) {
 		      	t.printStackTrace ();
 		      }

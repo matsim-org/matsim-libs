@@ -28,7 +28,6 @@ import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.collections.Tuple;
@@ -73,7 +72,7 @@ public class MicroCensus {
 
 		private final void setWeight(double weight, int index) {
 			Tuple<Double,Person> t = list.remove(index);
-			if (t == null) { Gbl.errorMsg("No tuple at index "+ index); }
+			if (t == null) { throw new RuntimeException("No tuple at index "+ index); }
 			Tuple<Double,Person> t_new = new Tuple<Double, Person>(weight,t.getSecond());
 			list.add(index,t_new);
 		}
@@ -97,8 +96,7 @@ public class MicroCensus {
 				weight_sum += list.get(i).getFirst();
 				if (r < weight_sum) { return list.get(i).getSecond(); }
 			}
-			Gbl.errorMsg("It should never reach this line!");
-			return null;
+			throw new RuntimeException("It should never reach this line!");
 		}
 	}
 
@@ -136,7 +134,7 @@ public class MicroCensus {
 		else if (i == 2) { age = 17; }
 		else if (i == 3) { age = 65; }
 		else if (i == 4) { age = 66; }
-		else { Gbl.errorMsg("index="+index+" not allowed!"); }
+		else { throw new RuntimeException("index="+index+" not allowed!"); }
 		return "e("+has_educ+");w("+has_work+");lic("+lic+");sex("+sex+");age("+age+")";
 	}
 

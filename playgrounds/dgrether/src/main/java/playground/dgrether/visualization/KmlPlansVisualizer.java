@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -113,8 +112,7 @@ public class KmlPlansVisualizer {
 			FolderType plansFolder = plansWriter.getPlansFolder(planSet);
 			this.mainFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder(plansFolder));
 		} catch (IOException e) {
-			Gbl.errorMsg("Cannot create kmz or logo cause: " + e.getMessage());
-			e.printStackTrace();
+			log.error("Cannot create kmz or logo.", e);
 		}
 		this.writer.writeMainKml(this.mainKml);
 		this.writer.close();

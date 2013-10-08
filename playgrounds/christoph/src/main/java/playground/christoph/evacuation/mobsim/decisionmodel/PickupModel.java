@@ -187,7 +187,7 @@ public class PickupModel implements PersonDecisionModel {
 			modelWriter.flush();
 			modelWriter.close();			
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -218,7 +218,7 @@ public class PickupModel implements PersonDecisionModel {
 			modelReader.close();
 			
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}	
 	}
 	

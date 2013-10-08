@@ -31,6 +31,7 @@ import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
+
 import org.apache.log4j.Logger;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
@@ -160,7 +161,7 @@ public class FacilitiesCreation {
 				attributeIds_it = this.myCensus.getHectareAttributeIdentifiersBySector(sector).iterator();
 
 				if (numSectorFTE == Integer.MAX_VALUE) {
-					Gbl.errorMsg("numFTE was not correctly set.");
+					throw new RuntimeException("numFTE was not correctly set.");
 				}
 
 				// create temporary facilities with minimum number of FTEs
@@ -180,7 +181,7 @@ public class FacilitiesCreation {
 						numSectorFTE -= minFTEs;
 						// the number of distributed FTEs should not exceed the number of available ones
 						if (numSectorFTE < 0) {
-							Gbl.errorMsg("numFTE exceeded.");
+							throw new RuntimeException("numFTE exceeded.");
 						}
 					}
 
@@ -205,7 +206,7 @@ public class FacilitiesCreation {
 					numSectorFTE -= additionalFTEs;
 					// again, the number of distributed FTEs should not exceed the number of available ones
 					if (numSectorFTE < 0) {
-						Gbl.errorMsg("numSectorFTE exceeded (numSectorFTE = " + Integer.toString(numSectorFTE) + ").");
+						throw new RuntimeException("numSectorFTE exceeded (numSectorFTE = " + Integer.toString(numSectorFTE) + ").");
 					}
 
 				}

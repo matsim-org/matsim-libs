@@ -65,7 +65,7 @@ public class TripAnalyzer {
 			out.close();
 		}
 		catch (final IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 
 		for (Bins bins : this.binnedDistributions.values()) {

@@ -21,15 +21,10 @@ package playground.acmarmol.matsim2030.microcensus2010;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.util.HashSet;
-import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.households.Households;
@@ -103,8 +98,8 @@ public class MZ2010ZielPersonParser {
 		//person gender
 		String gender = entries[190];
 		if(gender.equals("1")){gender = MZConstants.MALE;}
-		else if(gender.equals("2")){gender = MZConstants.FEMALE;}
-		else Gbl.errorMsg("This should never happen!  Gender: " + gender+ " doesn't exist");
+		else if(gender.equals("2")){gender = MZConstants.FEMALE;} else
+			throw new RuntimeException("This should never happen!  Gender: " + gender+ " doesn't exist");
 		populationAttributes.putAttribute(hhnr.concat(zielpnr), MZConstants.GENDER, gender);
 		
 		//day of week
@@ -115,8 +110,8 @@ public class MZ2010ZielPersonParser {
 		else if(dow.equals("4")){dow = MZConstants.THURSDAY;}
 		else if(dow.equals("5")){dow = MZConstants.FRIDAY;}
 		else if(dow.equals("6")){dow = MZConstants.SATURDAY;}
-		else if(dow.equals("7")){dow = MZConstants.SUNDAY;}
-				else Gbl.errorMsg("This should never happen!  Day of week: " + dow + " doesn't exist");
+		else if(dow.equals("7")){dow = MZConstants.SUNDAY;} else
+			throw new RuntimeException("This should never happen!  Day of week: " + dow + " doesn't exist");
 		populationAttributes.putAttribute(hhnr.concat(zielpnr), MZConstants.DAY_OF_WEEK, dow);
 		
 		
@@ -143,8 +138,8 @@ public class MZ2010ZielPersonParser {
 		else if(employment_status.equals("8")){employment_status = MZConstants.DISABLED;}
 		else if(employment_status.equals("9")){employment_status = MZConstants.HOUSEWIFE_HOUSEHUSBAND;}
 		else if(employment_status.equals("10")){employment_status = MZConstants.OTHER_INACTIVE;}
-		else if(employment_status.equals(" ")){employment_status = MZConstants.UNSPECIFIED;}
-		else Gbl.errorMsg("This should ne ver happen! Employment Status: " + employment_status + " doesn't exist");
+		else if(employment_status.equals(" ")){employment_status = MZConstants.UNSPECIFIED;} else
+			throw new RuntimeException("This should ne ver happen! Employment Status: " + employment_status + " doesn't exist");
 		populationAttributes.putAttribute(hhnr.concat(zielpnr), MZConstants.EMPLOYMENT_STATUS, employment_status);
 		
 		//level of employment
@@ -155,8 +150,8 @@ public class MZ2010ZielPersonParser {
 		else if(level_employment.equals("4")){level_employment = "less than 50%";}
 		else if(level_employment.equals("99")){level_employment = "part-time unspecified";}
 		else if(level_employment.equals("999")){level_employment = MZConstants.UNEMPLOYED;}
-		else if(level_employment.equals(" ")){level_employment = MZConstants.UNSPECIFIED;}
-		else Gbl.errorMsg("This should never happen! Level of Employment: " + level_employment + " doesn't exist");
+		else if(level_employment.equals(" ")){level_employment = MZConstants.UNSPECIFIED;} else
+			throw new RuntimeException("This should never happen! Level of Employment: " + level_employment + " doesn't exist");
 		populationAttributes.putAttribute(hhnr.concat(zielpnr), MZConstants.LEVEL_EMPLOYMENT, level_employment);
 		
 		//other activity 1:
@@ -170,7 +165,7 @@ public class MZ2010ZielPersonParser {
 		else if(other_activity.equals("35")){other_activity = MZConstants.DISABLED;}
 		else if(other_activity.equals("36")){other_activity = MZConstants.OTHER;}
 		else if(other_activity.equals("-99")){other_activity = MZConstants.UNEMPLOYED;}
-		else{ Gbl.errorMsg("No other activity know for : " + other_activity);}
+		else{ throw new RuntimeException("No other activity know for : " + other_activity);}
 		populationAttributes.putAttribute(hhnr.concat(zielpnr), MZConstants.OTHER_ACTIVITY1, other_activity);
 		
 		
@@ -185,7 +180,7 @@ public class MZ2010ZielPersonParser {
 		else if(other_activity.equals("35")){other_activity = MZConstants.DISABLED;}
 		else if(other_activity.equals("36")){other_activity = MZConstants.OTHER;}
 		else if(other_activity.equals("-99")){other_activity = MZConstants.UNEMPLOYED_NO_OTHER;}
-		else{ Gbl.errorMsg("No other activity know for : " + other_activity);}
+		else{ throw new RuntimeException("No other activity know for : " + other_activity);}
 		populationAttributes.putAttribute(hhnr.concat(zielpnr), MZConstants.OTHER_ACTIVITY2, other_activity);
 		
 		//other activity 3:
@@ -199,7 +194,7 @@ public class MZ2010ZielPersonParser {
 		else if(other_activity.equals("35")){other_activity = MZConstants.DISABLED;}
 		else if(other_activity.equals("36")){other_activity = MZConstants.OTHER;}
 		else if(other_activity.equals("-99")){other_activity = MZConstants.UNEMPLOYED_NO_OTHER;}
-		else{ Gbl.errorMsg("No other activity know for : " + other_activity);}
+		else{ throw new RuntimeException("No other activity know for : " + other_activity);}
 		populationAttributes.putAttribute(hhnr.concat(zielpnr), MZConstants.OTHER_ACTIVITY3, other_activity);
 		
 		
@@ -246,8 +241,8 @@ public class MZ2010ZielPersonParser {
 		else if(car_av.equals("3")){car_av = MZConstants.NEVER;}
 		else if(car_av.equals("-99")){car_av = "???";}// -review
 		else if(car_av.equals("-98")){car_av = MZConstants.NO_ANSWER;}
-		else if(car_av.equals("-97")){car_av = MZConstants.UNSPECIFIED;}
-		else Gbl.errorMsg("This should never happen!  Car availability: " + car_av+ " doesn't exist");
+		else if(car_av.equals("-97")){car_av = MZConstants.UNSPECIFIED;} else
+			throw new RuntimeException("This should never happen!  Car availability: " + car_av+ " doesn't exist");
 		populationAttributes.putAttribute(hhnr.concat(zielpnr), MZConstants.CAR_AVAILABILITY, car_av);
 		
 		//motorcycle availability
@@ -257,8 +252,8 @@ public class MZ2010ZielPersonParser {
 		else if(mcycle_av.equals("3")){mcycle_av = MZConstants.NEVER;}
 		else if(mcycle_av.equals("-99")){mcycle_av = "???";}// -review
 		else if(mcycle_av.equals("-98")){mcycle_av = MZConstants.NO_ANSWER;}
-		else if(mcycle_av.equals("-97")){mcycle_av = MZConstants.UNSPECIFIED;}
-		else Gbl.errorMsg("This should never happen!  Motorcycle availability: " + mcycle_av+ " doesn't exist");
+		else if(mcycle_av.equals("-97")){mcycle_av = MZConstants.UNSPECIFIED;} else
+			throw new RuntimeException("This should never happen!  Motorcycle availability: " + mcycle_av+ " doesn't exist");
 		populationAttributes.putAttribute(hhnr.concat(zielpnr), MZConstants.MOTORCYCLE_AVAILABILITY, mcycle_av);
 		
 		//small motorcycle availability
@@ -268,8 +263,8 @@ public class MZ2010ZielPersonParser {
 		else if(smcycle_av.equals("3")){smcycle_av = MZConstants.NEVER;}
 		else if(smcycle_av.equals("-99")){smcycle_av = "age less than 16";}
 		else if(smcycle_av.equals("-98")){smcycle_av = MZConstants.NO_ANSWER;}
-		else if(smcycle_av.equals("-97")){smcycle_av = MZConstants.UNSPECIFIED;}
-		else Gbl.errorMsg("This should never happen!  Small motorcycle availability: " + smcycle_av+ " doesn't exist");
+		else if(smcycle_av.equals("-97")){smcycle_av = MZConstants.UNSPECIFIED;} else
+			throw new RuntimeException("This should never happen!  Small motorcycle availability: " + smcycle_av+ " doesn't exist");
 		populationAttributes.putAttribute(hhnr.concat(zielpnr), MZConstants.SMALL_MOTORCYCLE_AVAILABILITY, smcycle_av);
 		
 		
@@ -280,8 +275,8 @@ public class MZ2010ZielPersonParser {
 		else if(mofa_av.equals("3")){mofa_av = MZConstants.NEVER;}
 		else if(mofa_av.equals("-99")){mofa_av = "age less than 14";}
 		else if(mofa_av.equals("-98")){mofa_av = MZConstants.NO_ANSWER;}
-		else if(mofa_av.equals("-97")){mofa_av = MZConstants.UNSPECIFIED;}
-		else Gbl.errorMsg("This should never happen!  Mofa availability: " + mofa_av+ " doesn't exist");
+		else if(mofa_av.equals("-97")){mofa_av = MZConstants.UNSPECIFIED;} else
+			throw new RuntimeException("This should never happen!  Mofa availability: " + mofa_av+ " doesn't exist");
 		populationAttributes.putAttribute(hhnr.concat(zielpnr), MZConstants.MOFA_AVAILABILITY, mofa_av);
 		
 		//Bicycle availability
@@ -291,8 +286,8 @@ public class MZ2010ZielPersonParser {
 		else if(bike_av.equals("3")){bike_av = MZConstants.NEVER;}
 		else if(bike_av.equals("-99")){bike_av = MZConstants.UNSPECIFIED;}// -review
 		else if(bike_av.equals("-98")){bike_av = MZConstants.NO_ANSWER;}
-		else if(bike_av.equals("-97")){bike_av = MZConstants.UNSPECIFIED;}
-		else Gbl.errorMsg("This should never happen!  Bike availability: " + bike_av+ " doesn't exist");
+		else if(bike_av.equals("-97")){bike_av = MZConstants.UNSPECIFIED;} else
+			throw new RuntimeException("This should never happen!  Bike availability: " + bike_av+ " doesn't exist");
 		populationAttributes.putAttribute(hhnr.concat(zielpnr), MZConstants.BICYCLE_AVAILABILITY, bike_av);
 		
 		//car-sharing membership
@@ -301,8 +296,8 @@ public class MZ2010ZielPersonParser {
 		else if(sharing.equals("2")){sharing  = MZConstants.NO;}
 		else if(sharing.equals("-99")){sharing = "???";}// -review
 		else if(sharing.equals("-98")){sharing = MZConstants.NO_ANSWER;}
-		else if(sharing.equals("-97")){sharing = MZConstants.NOT_KNOWN;}	
-		else Gbl.errorMsg("This should never happen!  Car sharing membership: " + sharing + " doesn't exist");
+		else if(sharing.equals("-97")){sharing = MZConstants.NOT_KNOWN;} else
+			throw new RuntimeException("This should never happen!  Car sharing membership: " + sharing + " doesn't exist");
 		populationAttributes.putAttribute(hhnr.concat(zielpnr), MZConstants.CAR_SHARING_MEMBERSHIP, sharing);
 		
 		//HalbTax
@@ -310,8 +305,8 @@ public class MZ2010ZielPersonParser {
 		if(halbtax.equals("1")){halbtax = MZConstants.YES;}
 		else if(halbtax.equals("2")){halbtax = MZConstants.NO;}
 		else if(halbtax.equals("-98")){halbtax = MZConstants.NO_ANSWER;}
-		else if(halbtax.equals("-97")){halbtax = MZConstants.NOT_KNOWN;}
-		else Gbl.errorMsg("This should never happen!  Halbtax: " + halbtax+ " doesn't exist");
+		else if(halbtax.equals("-97")){halbtax = MZConstants.NOT_KNOWN;} else
+			throw new RuntimeException("This should never happen!  Halbtax: " + halbtax+ " doesn't exist");
 		populationAttributes.putAttribute(hhnr.concat(zielpnr), MZConstants.ABBO_HT, halbtax);
 		
 		//GA first class
@@ -319,8 +314,8 @@ public class MZ2010ZielPersonParser {
 		if(gaFirstClass.equals("1")){gaFirstClass = MZConstants.YES;} 
 		else if(gaFirstClass.equals("2")){gaFirstClass = MZConstants.NO;}
 		else if(gaFirstClass.equals("-98")){gaFirstClass = MZConstants.NO_ANSWER;}
-		else if(gaFirstClass.equals("-97")){gaFirstClass = MZConstants.NOT_KNOWN;}
-		else Gbl.errorMsg("This should never happen!  GA First Class: " + gaFirstClass+ " doesn't exist");
+		else if(gaFirstClass.equals("-97")){gaFirstClass = MZConstants.NOT_KNOWN;} else
+			throw new RuntimeException("This should never happen!  GA First Class: " + gaFirstClass+ " doesn't exist");
 		populationAttributes.putAttribute(hhnr.concat(zielpnr), MZConstants.ABBO_GA1, gaFirstClass);
 		
 		//GA second class
@@ -328,8 +323,8 @@ public class MZ2010ZielPersonParser {
 		if(gaSecondClass.equals("1")){gaSecondClass = MZConstants.YES;}
 		else if(gaSecondClass.equals("2")){gaSecondClass = MZConstants.NO;}
 		else if(gaSecondClass.equals("-98")){gaSecondClass = MZConstants.NO_ANSWER;}
-		else if(gaSecondClass.equals("-97")){gaSecondClass = MZConstants.NOT_KNOWN;}
-		else Gbl.errorMsg("This should never happen!  GA Second Class: " + gaSecondClass+ " doesn't exist");
+		else if(gaSecondClass.equals("-97")){gaSecondClass = MZConstants.NOT_KNOWN;} else
+			throw new RuntimeException("This should never happen!  GA Second Class: " + gaSecondClass+ " doesn't exist");
 		populationAttributes.putAttribute(hhnr.concat(zielpnr), MZConstants.ABBO_GA2, gaSecondClass);
 		
 		
@@ -338,8 +333,8 @@ public class MZ2010ZielPersonParser {
 		if(verbund.equals("1")){verbund = MZConstants.YES;}
 		else if(verbund.equals("2")){verbund = MZConstants.NO;}
 		else if(verbund.equals("-98")){verbund = MZConstants.NO_ANSWER;}
-		else if(verbund.equals("-97")){verbund = MZConstants.NOT_KNOWN;}
-		else Gbl.errorMsg("This should never happen!  Verbund abonnement: " + verbund+ " doesn't exist");
+		else if(verbund.equals("-97")){verbund = MZConstants.NOT_KNOWN;} else
+			throw new RuntimeException("This should never happen!  Verbund abonnement: " + verbund+ " doesn't exist");
 		populationAttributes.putAttribute(hhnr.concat(zielpnr), MZConstants.ABBO_VERBUND, verbund);
 		
 		//strecken abonnement
@@ -347,8 +342,8 @@ public class MZ2010ZielPersonParser {
 		if(strecken.equals("1")){strecken = MZConstants.YES;}
 		else if(strecken.equals("2")){strecken = MZConstants.NO;}
 		else if(strecken.equals("-98")){strecken = MZConstants.NO_ANSWER;}
-		else if(strecken.equals("-97")){strecken = MZConstants.NOT_KNOWN;}
-		else Gbl.errorMsg("This should never happen!  GA Second Class: " + strecken+ " doesn't exist");
+		else if(strecken.equals("-97")){strecken = MZConstants.NOT_KNOWN;} else
+			throw new RuntimeException("This should never happen!  GA Second Class: " + strecken+ " doesn't exist");
 		populationAttributes.putAttribute(hhnr.concat(zielpnr), MZConstants.ABBO_STRECKEN, strecken);
 		
 		
@@ -358,8 +353,8 @@ public class MZ2010ZielPersonParser {
 		else if(gleis7.equals("2")){gleis7 = MZConstants.NO;}
 		else if(gleis7.equals("-99")){gleis7 = "not in age";}
 		else if(gleis7.equals("-98")){gleis7 = MZConstants.NO_ANSWER;}
-		else if(gleis7.equals("-97")){gleis7 = MZConstants.NOT_KNOWN;}
-		else Gbl.errorMsg("This should never happen!  Gleis 7: " + gleis7+ " doesn't exist");
+		else if(gleis7.equals("-97")){gleis7 = MZConstants.NOT_KNOWN;} else
+			throw new RuntimeException("This should never happen!  Gleis 7: " + gleis7+ " doesn't exist");
 		populationAttributes.putAttribute(hhnr.concat(zielpnr), MZConstants.ABBO_GLEIS7, gleis7);
 		
 		//last education
@@ -373,17 +368,17 @@ public class MZ2010ZielPersonParser {
 		else if(education.equals("7")){education = MZConstants.EDUCATION_TWO_THREE_YEARS_AUSBILDUNG;}
 		else if(education.equals("8")){education = MZConstants.EDUCATION_THREE_FOUR_YEARS_BERUFSLEHRE;}
 		else if(education.equals("9")){education = MZConstants.EDUCATION_THREE_FOUR_YEARS_VOLLZEITBERUFSLEHRE;}
-		else if(education.equals("10")){education = MZConstants.EDUCATION_LEHRKRÄFTE;}
-		else if(education.equals("11")){education = MZConstants.EDUCATION_MATURITÄTSCHULE;}
+		else if(education.equals("10")){education = MZConstants.EDUCATION_LEHRKRAEFTE;}
+		else if(education.equals("11")){education = MZConstants.EDUCATION_MATURITAETSCHULE;}
 		else if(education.equals("12")){education = MZConstants.EDUCATION_BERUFSLEHRE;}
-		else if(education.equals("13")){education = MZConstants.EDUCATION_HÖHERE_BERUFSAUSBILDUNG;}
-		else if(education.equals("14")){education = MZConstants.EDUCATION_TECHNIKERSCHLE_HÖHEREFACHSSCHULE_FACHHOSCHSCHULE;}
-		else if(education.equals("15")){education = MZConstants.EDUCATION_TECHNIKERSCHLE_HÖHEREFACHSSCHULE_FACHHOSCHSCHULE;}
-		else if(education.equals("16")){education = MZConstants.EDUCATION_TECHNIKERSCHLE_HÖHEREFACHSSCHULE_FACHHOSCHSCHULE;}
-		else if(education.equals("17")){education = MZConstants.EDUCATION_UNIVERSITÄT;}
+		else if(education.equals("13")){education = MZConstants.EDUCATION_HOEHERE_BERUFSAUSBILDUNG;}
+		else if(education.equals("14")){education = MZConstants.EDUCATION_TECHNIKERSCHLE_HOEHEREFACHSSCHULE_FACHHOSCHSCHULE;}
+		else if(education.equals("15")){education = MZConstants.EDUCATION_TECHNIKERSCHLE_HOEHEREFACHSSCHULE_FACHHOSCHSCHULE;}
+		else if(education.equals("16")){education = MZConstants.EDUCATION_TECHNIKERSCHLE_HOEHEREFACHSSCHULE_FACHHOSCHSCHULE;}
+		else if(education.equals("17")){education = MZConstants.EDUCATION_UNIVERSITAET;}
 		else if(education.equals("-98") || education.equals(" ")){education = MZConstants.NO_ANSWER;}
-		else if(education.equals("-97")){education = MZConstants.NOT_KNOWN;}
-		else Gbl.errorMsg("Last education: " + education+ " doesn't exist");
+		else if(education.equals("-97")){education = MZConstants.NOT_KNOWN;} else
+			throw new RuntimeException("Last education: " + education+ " doesn't exist");
 		populationAttributes.putAttribute(hhnr.concat(zielpnr), MZConstants.LAST_EDUCATION, education);
 		
 		

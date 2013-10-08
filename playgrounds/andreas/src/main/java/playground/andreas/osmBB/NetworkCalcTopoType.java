@@ -21,11 +21,10 @@ package playground.andreas.osmBB;
 
 import java.util.HashMap;
 
-import org.matsim.core.gbl.Gbl;
-import org.matsim.core.utils.misc.NetworkUtils;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
+import org.matsim.core.utils.misc.NetworkUtils;
 
 public class NetworkCalcTopoType extends org.matsim.core.network.algorithms.NetworkCalcTopoType{
 
@@ -41,7 +40,7 @@ public class NetworkCalcTopoType extends org.matsim.core.network.algorithms.Netw
 			else if ((node.getOutLinks().size() == 1) && (node.getInLinks().size() == 2)) { return END1WAY.intValue(); }
 			// The following case is not covered by the paper, but quite common, e.g. parallel roads connecting the same nodes.
 			else if ((node.getOutLinks().size() >= 1) && (node.getInLinks().size() >= 1)) { return INTERSECTION.intValue(); }
-			else { Gbl.errorMsg("Node=" + node.toString() + " cannot be assigned to a topo type!"); return -1;}
+			else { throw new RuntimeException("Node=" + node.toString() + " cannot be assigned to a topo type!"); }
 		}
 		else { // more than two neighbour nodes and no sink or source
 			return INTERSECTION.intValue();

@@ -257,7 +257,7 @@ public class FacilitiesOccupancyCalculator implements StartupListener, BeforeMob
 			//				}
 			out_summary.close();
 		} catch (final IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 

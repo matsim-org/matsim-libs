@@ -93,7 +93,7 @@ public class PTNetworkSimplifier {
 		this.network = TransitScheduleCleaner.tagTransitLinksInNetwork(this.transitSchedule, this.network);
 
 		if(this.nodeTypesToMerge.size() == 0){
-			Gbl.errorMsg("No types of node specified. Please use setNodesToMerge to specify which nodes should be merged");
+			throw new RuntimeException("No types of node specified. Please use setNodesToMerge to specify which nodes should be merged");
 		}
 
 		log.info("running " + this.getClass().getName() + " algorithm...");

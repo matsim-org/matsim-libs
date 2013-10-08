@@ -39,7 +39,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -152,8 +151,7 @@ public class KMLActsWriter {
 			}
 
 		} catch (IOException e) {
-			Gbl.errorMsg("Cannot create kmz or logo because of: " + e.getMessage());
-			e.printStackTrace();
+			log.error("Cannot create kmz or logo.", e);
 		}
 		writer.writeMainKml(mainKml);
 		writer.close();

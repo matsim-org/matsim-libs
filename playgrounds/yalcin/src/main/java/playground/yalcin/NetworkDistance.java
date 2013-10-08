@@ -30,13 +30,13 @@ import net.opengis.kml._2.KmlType;
 import net.opengis.kml._2.ObjectFactory;
 import net.opengis.kml._2.ScreenOverlayType;
 
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkImpl;
@@ -62,6 +62,8 @@ import org.matsim.vis.kml.MatsimKMLLogo;
 
 public class NetworkDistance {
 
+	private final static Logger log = Logger.getLogger(NetworkDistance.class);
+	
 	private final static String bikeCoordsFilename = "../mystudies/yalcin/BikeCoordinates.txt";
 	private final static String networkFilename = "../mystudies/yalcin/berlin_wipnet.xml";
 	private final static String bikeDistancesFilename = "../mystudies/yalcin/bikeDistances.txt";
@@ -96,8 +98,7 @@ public class NetworkDistance {
 			FolderType networkFolder = netWriter.getNetworkFolder();
 			mainFolder.getAbstractFeatureGroup().add(kmlObjectFactory.createFolder(networkFolder));
 		} catch (IOException e) {
-			Gbl.errorMsg("Cannot create kmz or logo because of: " + e.getMessage());
-			e.printStackTrace();
+			log.error("Cannot create kmz or logo.", e);
 		}
 		writer.writeMainKml(mainKml);
 		writer.close();

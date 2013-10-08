@@ -154,7 +154,7 @@ public class ChoiceSetWriterSimple extends CSWriter {
 			out.close();
 						
 		} catch (final IOException e) {
-				Gbl.errorMsg(e);
+				throw new RuntimeException(e);
 		}
 	}
 	
@@ -221,7 +221,7 @@ public class ChoiceSetWriterSimple extends CSWriter {
 			out_alternatives.close();
 						
 		} catch (final IOException e) {
-				Gbl.errorMsg(e);
+				throw new RuntimeException(e);
 		}	
 	}
 	

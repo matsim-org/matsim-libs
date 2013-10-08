@@ -98,7 +98,7 @@ public class FacilitiesAnalysis {
 		for (String actOptType : actOptTypes) {
 			if (!actOptType.startsWith("B")) { // Ignoring NOGA types
 				try { writeFacilitiesFile(facilities,actOptType,outdir); }
-				catch (Exception e) { Gbl.errorMsg(e); }
+				catch (Exception e) { throw new RuntimeException(e); }
 			}
 		}
 		log.info("done.");

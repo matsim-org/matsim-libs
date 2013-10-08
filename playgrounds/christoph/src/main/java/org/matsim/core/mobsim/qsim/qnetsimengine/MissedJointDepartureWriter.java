@@ -63,7 +63,7 @@ public class MissedJointDepartureWriter implements AfterMobsimListener {
 			bufferedWriter.flush();
 			bufferedWriter.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 }

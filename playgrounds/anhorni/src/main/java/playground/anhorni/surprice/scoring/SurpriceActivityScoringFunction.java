@@ -22,6 +22,7 @@ package playground.anhorni.surprice.scoring;
 import java.util.Iterator;
 import java.util.Set;
 
+
 //import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
@@ -168,7 +169,7 @@ public class SurpriceActivityScoringFunction extends CharyparNagelActivityScorin
 			}
 		}
 		if (!foundAct) {
-			Gbl.errorMsg("No suitable facility activity type found. Aborting...");
+			throw new RuntimeException("No suitable facility activity type found. Aborting...");
 		}
 		return openInterval;
 	}

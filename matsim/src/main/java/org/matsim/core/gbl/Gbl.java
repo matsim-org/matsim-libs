@@ -101,14 +101,6 @@ public abstract class Gbl {
 		}
 	}
 
-	public static final void errorMsg(final Exception e) {
-		throw new RuntimeException(e);
-	}
-
-	public static final void errorMsg(final String msg) {
-		throw new RuntimeException(msg);
-	}
-
 	//////////////////////////////////////////////////////////////////////
 	// time measurement
 	//////////////////////////////////////////////////////////////////////

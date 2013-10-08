@@ -97,7 +97,7 @@ import org.xml.sax.Attributes;
 		} else if (DEMAND.equals(name)) {
 			log.info("The tag <demand> is not supported");
 		} else if (!SEGMENT.equals(name) && !MODEL.equals(name) && !PARAM.equals(name) && !PLANS.equals(name)) {
-			Gbl.errorMsg(this + "[tag=" + name + " not known or not supported]");
+			throw new RuntimeException(this + "[tag=" + name + " not known or not supported]");
 		}
 	}
 

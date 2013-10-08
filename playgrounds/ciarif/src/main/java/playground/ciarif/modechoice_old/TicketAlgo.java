@@ -78,7 +78,7 @@ public class TicketAlgo extends AbstractPersonAlgorithm {
 				}
 			}
 			else {
-				Gbl.errorMsg("do not know car avail = " + person.getCarAvail());
+				throw new RuntimeException("do not know car avail = " + person.getCarAvail());
 			}
 		}
 		else if (person.isEmployed()) {
@@ -104,7 +104,7 @@ public class TicketAlgo extends AbstractPersonAlgorithm {
 				}
 			}
 			else {
-				Gbl.errorMsg("do not know car avail = " + person.getCarAvail());
+				throw new RuntimeException("do not know car avail = " + person.getCarAvail());
 			}
 		}
 	}

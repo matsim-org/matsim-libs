@@ -86,8 +86,7 @@ public class UCSBStopsParser {
 		case 6: return TransportMode.ride; // school bus (for child)
 		case 7: return SCAGShp2Links.HOV;  // shared ride driver (drive by car with passenger)
 		default:
-			Gbl.errorMsg(new IllegalArgumentException("modeNo="+modeNo+" not allowed."));
-			return null;
+				throw new RuntimeException(new IllegalArgumentException("modeNo="+modeNo+" not allowed."));
 		}
 	}
 	
@@ -146,8 +145,7 @@ public class UCSBStopsParser {
 		case 20: return "leis";
 		case 21: return "leis";
 		default:
-			Gbl.errorMsg(new IllegalArgumentException("actTypeNo="+actTypeNo+" not allowed."));
-			return null;
+				throw new RuntimeException(new IllegalArgumentException("actTypeNo="+actTypeNo+" not allowed."));
 		}
 	}
 	
@@ -244,7 +242,7 @@ public class UCSBStopsParser {
 
 			}
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		log.info(line_cnt+" lines parsed.");
 		log.info(population.getPersons().size()+" persons stored.");

@@ -102,7 +102,7 @@ import org.xml.sax.Attributes;
 			startRoute(atts);
 		}
 		else {
-			Gbl.errorMsg(this + "[tag=" + name + " not known or not supported]");
+			throw new RuntimeException(this + "[tag=" + name + " not known or not supported]");
 		}
 	}
 

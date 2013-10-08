@@ -146,7 +146,7 @@ public class FacilitiesLoadCalculator implements StartupListener, BeforeMobsimLi
 				}
 				out_summary.close();
 			} catch (final IOException e) {
-				Gbl.errorMsg(e);
+				throw new RuntimeException(e);
 			}
 	}
 

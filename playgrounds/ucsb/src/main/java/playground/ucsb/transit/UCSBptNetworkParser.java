@@ -96,7 +96,7 @@ public class UCSBptNetworkParser {
 				transitSchedule.addStopFacility(transitStopFacility);
 				transitStopFacility.setName((String)nodeObjectAttributes.getAttribute(node.getId().toString(),DESC_NAME));
 
-				if (node.getInLinks().size() != 1) { Gbl.errorMsg("node id="+node.getId()+": number of inLinks="+node.getInLinks().size()+" should not happen!"); }
+				if (node.getInLinks().size() != 1) { throw new RuntimeException("node id="+node.getId()+": number of inLinks="+node.getInLinks().size()+" should not happen!"); }
 				transitStopFacility.setLinkId(node.getInLinks().values().iterator().next().getId());
 			}
 		}
@@ -183,14 +183,14 @@ public class UCSBptNetworkParser {
 			handleIlinTripDistBlocks(transitSchedule,ilinTripDistBlocks);
 			
 		} catch (Exception e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		log.info(lineCnt+" lines parsed");
 	}
 	
 	private final void checkIlinTripDistBlocks(List<IlinTripDistBlock> ilinTripDistBlocks) {
-		if (ilinTripDistBlocks == null) { Gbl.errorMsg("ilinTripDistBlocks == null!"); }
-		if (ilinTripDistBlocks.isEmpty()) { Gbl.errorMsg("ilinTripDistBlocks is empty!"); }
+		if (ilinTripDistBlocks == null) { throw new RuntimeException("ilinTripDistBlocks == null!"); }
+		if (ilinTripDistBlocks.isEmpty()) { throw new RuntimeException("ilinTripDistBlocks is empty!"); }
 		
 		int maxTimeEntries = ilinTripDistBlocks.get(0).depTimes.size();
 		boolean isBalanced = true;
@@ -272,7 +272,7 @@ public class UCSBptNetworkParser {
 			int ilinId = Integer.parseInt(f.getAttribute(ILIN_NAME).toString().trim());
 			int distId = Integer.parseInt(f.getAttribute(DIST_NAME).toString().trim());
 			Id nodeId = new IdImpl(ilinId+"-"+distId);
-			if (!nodeIds.add(nodeId)) { Gbl.errorMsg("fCnt "+fCnt+": nodeId="+nodeId+" already created before!"); }
+			if (!nodeIds.add(nodeId)) { throw new RuntimeException("fCnt "+fCnt+": nodeId="+nodeId+" already created before!"); }
 
 			// node type and switch to sister route flag 
 			String nodeFlag = f.getAttribute(NODEFLAG_NAME).toString().trim();
@@ -284,16 +284,16 @@ public class UCSBptNetworkParser {
 				if (nodeFlag.startsWith("T")) { ptNodeType = "timePoint"; }
 				else if (nodeFlag.startsWith("B")) { ptNodeType = "stopAndTimePoint"; }
 				else if (nodeFlag.startsWith("S")) { ptNodeType = "stopPoint"; }
-				else  { Gbl.errorMsg("fCnt "+fCnt+": nodeFlag='"+nodeFlag+"' (length=1) is neither T, B nor S"); }
+				else  { throw new RuntimeException("fCnt "+fCnt+": nodeFlag='"+nodeFlag+"' (length=1) is neither T, B nor S"); }
 			} else if (nodeFlag.length() == 2) {
 				if (nodeFlag.startsWith("T")) { ptNodeType = "timePoint"; }
 				else if (nodeFlag.startsWith("B")) { ptNodeType = "stopAndTimePoint"; }
 				else if (nodeFlag.startsWith("S")) { ptNodeType = "stopPoint"; }
-				else  { Gbl.errorMsg("fCnt "+fCnt+": nodeFlag='"+nodeFlag+"' (length=2) is neither T, B nor S"); }
+				else  { throw new RuntimeException("fCnt "+fCnt+": nodeFlag='"+nodeFlag+"' (length=2) is neither T, B nor S"); }
 				if (nodeFlag.substring(1).equals("S")) { switchToSisterRoute = true; }
-				else { Gbl.errorMsg("fCnt "+fCnt+": nodeFlag='"+nodeFlag+"' (length=2) is not S"); }
+				else { throw new RuntimeException("fCnt "+fCnt+": nodeFlag='"+nodeFlag+"' (length=2) is not S"); }
 			} else {
-				Gbl.errorMsg("fCnt "+fCnt+": nodeFlag='"+nodeFlag+"' does not contain the correct amount of characters!");
+				throw new RuntimeException("fCnt "+fCnt+": nodeFlag='"+nodeFlag+"' does not contain the correct amount of characters!");
 			}
 
 							
@@ -306,19 +306,19 @@ public class UCSBptNetworkParser {
 
 			// parent routeName -> carrier code | line number | alt number { } direction
 			String routeName = f.getAttribute(ROUTE_NAME).toString().trim();
-			if (routeName.length() != 7) { Gbl.errorMsg("fCnt "+fCnt+": routeName="+routeName+" does not have 7 characters!"); }
+			if (routeName.length() != 7) { throw new RuntimeException("fCnt "+fCnt+": routeName="+routeName+" does not have 7 characters!"); }
 			String carrierCode = routeName.substring(0,2);
 			String lineNr = routeName.substring(2,5);
 			String alt = routeName.substring(5,6).trim(); // either a number or empty string
 			String direction = routeName.substring(6);
 			if (!(direction.equals("R") || direction.equals("E") || direction.equals("W") || direction.equals("N") || direction.equals("S"))) {
-				Gbl.errorMsg("fCnt "+fCnt+": routeName="+routeName+" last character is not R, E, W, N nor S!");
+				throw new RuntimeException("fCnt "+fCnt+": routeName="+routeName+" last character is not R, E, W, N nor S!");
 			}
 			
 			// mode
 			String ptModeType = f.getAttribute(MODE_NAME).toString().trim();
 			if (!(ptModeType.equals("1CR") || ptModeType.equals("2LR") || ptModeType.equals("3EX") || ptModeType.equals("4RB") || ptModeType.equals("5LB") || ptModeType.equals("6TW"))) {
-				Gbl.errorMsg("fCnt "+fCnt+": ptType="+ptModeType+" is neither 1CR, 2LR, 3EX, 4RB, 5LB nor 6TW!");
+				throw new RuntimeException("fCnt "+fCnt+": ptType="+ptModeType+" is neither 1CR, 2LR, 3EX, 4RB, 5LB nor 6TW!");
 			}
 			
 			// create only nodes where pt stops

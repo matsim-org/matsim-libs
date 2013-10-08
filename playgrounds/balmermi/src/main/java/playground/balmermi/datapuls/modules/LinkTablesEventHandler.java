@@ -96,7 +96,7 @@ public class LinkTablesEventHandler implements LinkLeaveEventHandler, ActivityEn
 			out.write(event.getLinkId().toString()+"\t"+p.getId()+"\t");
 			out.write(fromAct.getType()+"\t"+fromAct.getFacilityId()+"\t");
 			out.write(toAct.getType()+"\t"+toAct.getFacilityId()+"\n");
-		} catch (Exception e) { Gbl.errorMsg(e); }
+		} catch (Exception e) { throw new RuntimeException(e); }
 	}
 
 	public void handleEvent(ActivityEndEvent event) {

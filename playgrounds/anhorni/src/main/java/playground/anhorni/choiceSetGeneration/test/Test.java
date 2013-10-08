@@ -53,7 +53,7 @@ import org.matsim.core.gbl.Gbl;
 				fileReader.close();
 
 			} catch (IOException e) {
-				Gbl.errorMsg(e);
+				throw new RuntimeException(e);
 			}
 		}
 

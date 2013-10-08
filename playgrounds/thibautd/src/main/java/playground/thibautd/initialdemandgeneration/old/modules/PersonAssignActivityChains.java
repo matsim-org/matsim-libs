@@ -111,7 +111,7 @@ public class PersonAssignActivityChains extends AbstractPersonAlgorithm {
 			mz_p = microcensus.getRandomWeightedMZPerson(person.getAge(), person.getSex() ,person.getLicense(), has_work, false);
 			log.warn("=> Assigning same demographics except that person is handled as not having education. Note that it may produce significant bias for week days.");
 			if (mz_p == null) {
-				Gbl.errorMsg("No corresponding MZ record found for person "+person.getId());
+				throw new RuntimeException("No corresponding MZ record found for person "+person.getId());
 			}
 		}
 

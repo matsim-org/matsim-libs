@@ -24,17 +24,17 @@ import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+
+import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PlanImpl;
-import org.matsim.core.population.routes.GenericRouteImpl;
 import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
@@ -49,6 +49,7 @@ import org.matsim.utils.objectattributes.ObjectAttributes;
 
 public class MZ2010WegeParser {
 
+	private final static Logger log = Logger.getLogger(MZ2010WegeParser.class);
 
 	//////////////////////////////////////////////////////////////////////
 //member variables
@@ -124,8 +125,8 @@ public class MZ2010WegeParser {
 			else if(mode.equals("15")){mode =  MZConstants.WALK;}
 			else if(mode.equals("16")){mode =  MZConstants.SKATEBOARD;}
 			else if(mode.equals("17")){mode =  MZConstants.OTHER;}
-			else if(mode.equals("-99")){mode =  MZConstants.PSEUDOETAPPE;}
-			else Gbl.errorMsg("This should never happen!  Mode: " +  mode + " doesn't exist");
+			else if(mode.equals("-99")){mode =  MZConstants.PSEUDOETAPPE;} else
+				throw new RuntimeException("This should never happen!  Mode: " +  mode + " doesn't exist");
 			wegeAttributes.putAttribute(wid.toString(), MZConstants.PRINCIPAL_MODE, mode);
 			
 			//start coordinate - WGS84 (22,23) & CH1903 (24,25)
@@ -190,11 +191,11 @@ public class MZ2010WegeParser {
 			else if(wzweck1.equals("11")){purpose=  MZConstants.FOREIGN_PROPERTY;}
 			else if(wzweck1.equals("12")){purpose =  MZConstants.OTHER;}
 			//else if(wzweck1.equals("13")){purpose = "border crossing";}
-			else if(wzweck1.equals("-99")){purpose = MZConstants.PSEUDOETAPPE;}
-			else Gbl.errorMsg("This should never happen!  Purpose wzweck1: " +  wzweck1 + " doesn't exist");
+			else if(wzweck1.equals("-99")){purpose = MZConstants.PSEUDOETAPPE;} else
+				throw new RuntimeException("This should never happen!  Purpose wzweck1: " +  wzweck1 + " doesn't exist");
 			}else if(wzweck2.equals("2") || wzweck2.equals("3") ){// Nachhauseweg or Weg von zu Hause nach Hause
-				purpose =  MZConstants.HOME;	}
-			else Gbl.errorMsg("This should never happen!  Purpose wzweck2: " +  wzweck2 + " doesn't exist");
+				purpose =  MZConstants.HOME;	} else
+				throw new RuntimeException("This should never happen!  Purpose wzweck2: " +  wzweck2 + " doesn't exist");
 			
 		
 			// creating/getting plan
@@ -226,14 +227,14 @@ public class MZ2010WegeParser {
 			
 				// coordinate consistency check
 				if ((from_act.getCoord().getX() != start_coord.getX()) || (from_act.getCoord().getY() != start_coord.getY())) {
-					Gbl.errorMsg("This should never happen!   pid=" + person.getId() + ": previous destination not equal to the current origin (dist=" + ((CoordImpl) from_act.getCoord()).calcDistance(start_coord) + ")");
+					log.error("This should never happen!   pid=" + person.getId() + ": previous destination not equal to the current origin (dist=" + ((CoordImpl) from_act.getCoord()).calcDistance(start_coord) + ")");
 						coord_err_pids.add(pid);
 				}
 				
 				// time consistency check N°2
 				if (previous_leg.getArrivalTime() > leg.getDepartureTime()) {
 					if(!time_err_pids.contains(pid)){time_err_pids.add(pid);}
-					Gbl.errorMsg("This should never happen!   pid=" + person.getId() + ": activity end time "+ leg.getDepartureTime() + " greater than start time " + previous_leg.getArrivalTime());
+					throw new RuntimeException("This should never happen!   pid=" + person.getId() + ": activity end time "+ leg.getDepartureTime() + " greater than start time " + previous_leg.getArrivalTime());
 				}
 			
 				

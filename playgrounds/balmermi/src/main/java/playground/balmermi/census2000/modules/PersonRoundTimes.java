@@ -107,7 +107,7 @@ public class PersonRoundTimes extends AbstractPersonAlgorithm implements PlanAlg
 			System.out.println("      done. (plan_dur=" + plan_dur + ", home_dur=" + home_dur + ")");
 		}
 
-		if (home_dur <= 0.0) { Gbl.errorMsg("This should not happen!"); }
+		if (home_dur <= 0.0) { throw new RuntimeException("This should not happen!"); }
 		
 		// setting durations and types
 		index = 0;

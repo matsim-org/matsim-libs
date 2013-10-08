@@ -76,7 +76,7 @@ public class FileRetailerReader {
 			log.warn(notFoundFacilities + " facilities have not been found");
 		} 
 		catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		return this.retailers;
 	}
@@ -98,7 +98,7 @@ public class FileRetailerReader {
 			}
 		} 
 		catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		return this.retailersFacilities;
 	}

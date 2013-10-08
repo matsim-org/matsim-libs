@@ -133,7 +133,7 @@ public class ActivityScoringFunction extends org.matsim.core.scoring.functions.C
 					log.error("facility id: " + act.getFacilityId());
 					log.error("activity type: " + act.getType());
 					log.error("link id: " + act.getLinkId());
-					Gbl.errorMsg("Agent wants to perform an activity whose type is not available in the planned facility.");
+					throw new RuntimeException("Agent wants to perform an activity whose type is not available in the planned facility.");
 				}
 			}
 			// if no associated activity option exists, or if the activity option does not contain an <opentimes> element,

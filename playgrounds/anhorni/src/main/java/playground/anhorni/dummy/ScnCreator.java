@@ -238,7 +238,7 @@ public class ScnCreator {
 			out.flush();
 			out.close();
 		}catch (final IOException e) {
-					Gbl.errorMsg(e);
+					throw new RuntimeException(e);
 		}
 		log.info("Census population written");
 	}
@@ -294,7 +294,7 @@ public class ScnCreator {
 			out.flush();
 			out.close();
 		}catch (final IOException e) {
-					Gbl.errorMsg(e);
+					throw new RuntimeException(e);
 		}
 		log.info("Number of PUS persons after sampling: " + sampledPersons.size());
 		return sampledPersons;
@@ -341,7 +341,7 @@ public class ScnCreator {
 			out.flush();
 			out.close();
 		}catch (final IOException e) {
-					Gbl.errorMsg(e);
+					throw new RuntimeException(e);
 		}
 	}
 	
@@ -379,7 +379,7 @@ public class ScnCreator {
 			out.flush();
 			out.close();
 		}catch (final IOException e) {
-					Gbl.errorMsg(e);
+					throw new RuntimeException(e);
 		}
 	}
 }

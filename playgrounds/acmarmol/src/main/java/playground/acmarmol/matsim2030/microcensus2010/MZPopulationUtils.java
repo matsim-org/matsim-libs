@@ -86,7 +86,7 @@ public class MZPopulationUtils {
 	public static void removePlans(final Population population, final Set<Id> ids) {
 		for (Id id : ids) {
 			Person p = population.getPersons().remove(id);
-			if (p == null) { Gbl.errorMsg("pid="+id+": id not found in the plans DB!"); }
+			if (p == null) { throw new RuntimeException("pid="+id+": id not found in the plans DB!"); }
 		}
 	}
 
@@ -292,7 +292,7 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 		}else if(!sland.equals(COUNTRY) &&  zland.equals(COUNTRY)){
 			handleTripEnteringCountry(population, wid, COUNTRY, wegeAttributes, toAdd, toRemove);
 			overnight_pids.remove(new IdImpl(wid.toString().substring(0, wid.toString().indexOf('-')).trim()));
-		}else{Gbl.errorMsg("This should never happen! Wege "+ wid+ " doesn't cross the border");}
+		}else{throw new RuntimeException("This should never happen! Wege "+ wid+ " doesn't cross the border");}
 		
 		
 	 }//end loop for all wids
@@ -527,7 +527,7 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 						
 			while(cont){
 				if(etappen > (Integer) wegeAttributes.getAttribute(wid.toString(), MZConstants.NUMBER_STAGES)){
-					Gbl.errorMsg("This should never happen!  Wege id ("+wid+") doesn't cross border!");
+					throw new RuntimeException("This should never happen!  Wege id ("+wid+") doesn't cross border!");
 					}
 			
 				Etappe etappe = (Etappe) wegeAttributes.getAttribute(wid.toString(), MZConstants.STAGE.concat(String.valueOf(etappen)));
@@ -797,7 +797,7 @@ public static Set<Id> identifyPlansWithUndefinedNegCoords(final Population popul
 						
 						else if(type.contains(MZConstants.HOME)) {actChain.append("H");}
 						
-						else{Gbl.errorMsg("This should never happen! Type: " + type + " doesn't exist " + person.getId());}
+						else{throw new RuntimeException("This should never happen! Type: " + type + " doesn't exist " + person.getId());}
 					}
 					
 					

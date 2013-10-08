@@ -33,6 +33,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.utils.geometry.CoordUtils;
 import org.matsim.core.utils.io.IOUtils;
+
 import playground.anhorni.csestimation.EstimationPerson;
 import playground.anhorni.csestimation.ShopLocation;
 import playground.anhorni.csestimation.ShoppingTrip;
@@ -152,7 +153,7 @@ public class ChoiceSetWriter {
 			log.info("cs file writen to: " + outfile);
 						
 		} catch (final IOException e) {
-				Gbl.errorMsg(e);
+				throw new RuntimeException(e);
 		}
 	}
 		

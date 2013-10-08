@@ -73,7 +73,7 @@ public class ModelLicenseOwnershipV3 {
 	//////////////////////////////////////////////////////////////////////
 
 	public final boolean setAge(int age) {
-		if (age < 0) { Gbl.errorMsg("age="+age+" not allowed."); }
+		if (age < 0) { throw new RuntimeException("age="+age+" not allowed."); }
 		this.age = age;
 		return true;
 	}
@@ -91,25 +91,25 @@ public class ModelLicenseOwnershipV3 {
 	}
 
 	public final boolean setHHDimension(int nump) {
-		if (nump <= 0) { Gbl.errorMsg("nump="+nump+" not allowed."); }
+		if (nump <= 0) { throw new RuntimeException("nump="+nump+" not allowed."); }
 		this.nump = nump;
 		return true;
 	}
 
 	public final boolean setHHKids(int numk) {
-		if (numk < 0) { Gbl.errorMsg("numk="+numk+" not allowed."); }
+		if (numk < 0) { throw new RuntimeException("numk="+numk+" not allowed."); }
 		this.numk = numk;
 		return true;
 	}
 
 	public final boolean setIncome(double inc) {
-		if (inc <= 0) { Gbl.errorMsg("inc="+inc+" not allowed."); }
+		if (inc <= 0) { throw new RuntimeException("inc="+inc+" not allowed."); }
 		this.inc = inc;
 		return true;
 	}
 
 	public final boolean setUrbanDegree(int udeg) {
-		if ((udeg < 1) || (5 < udeg)) { Gbl.errorMsg("udeg="+udeg+" not allowed."); }
+		if ((udeg < 1) || (5 < udeg)) { throw new RuntimeException("udeg="+udeg+" not allowed."); }
 		this.udeg = udeg;
 		return true;
 	}
@@ -164,7 +164,7 @@ public class ModelLicenseOwnershipV3 {
 		else if (udeg == 3) { no_util += B_MUN_TYPE3 * 1.0; }
 		else if (udeg == 4) { no_util += B_MUN_TYPE4 * 1.0; }
 		else if (udeg == 5) { no_util += B_MUN_TYPE5 * 1.0; }
-		else { Gbl.errorMsg("This should never happen!"); }
+		else { throw new RuntimeException("This should never happen!"); }
 		return no_util;
 	}
 }

@@ -105,7 +105,7 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 		if (mainpurpose == 0) {model = new ModelModeChoiceWork();}
 		else if (mainpurpose == 1) {model = new ModelModeChoiceEducation();}
 		else if (mainpurpose == 2) {model = new ModelModeChoiceShopLeisure();}
-		else { Gbl.errorMsg("This should never happen!"); }
+		else { throw new RuntimeException("This should never happen!"); }
 
 		// generating a random bike ownership (see STRC2007 paper Ciari for more details)
 		boolean has_bike = true;
@@ -131,7 +131,7 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 		else if (modechoice == 2) { mode = TransportMode.car; }
 		else if (modechoice == 3) { mode = TransportMode.pt; }
 		else if (modechoice == 4) { mode = "undefined"; }
-		else { Gbl.errorMsg("Mode choice returns undefined value!"); }
+		else { throw new RuntimeException("Mode choice returns undefined value!"); }
 
 		// setting mode to plan
 		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {

@@ -96,7 +96,7 @@ public class PersonAssignMobilitiyToolModel extends AbstractPersonAlgorithm impl
 		// nump
 		int nump = (Integer)p.getCustomAttributes().get(CAtts.P_APERW);
 		if (nump < 1) { nump = (Integer)p.getCustomAttributes().get(CAtts.P_WKATA); }
-		if (nump < 1) { Gbl.errorMsg("pid"+p.getId()+": neither '"+CAtts.P_APERW+"' nor '"+CAtts.P_WKATA+"' defined!"); }
+		if (nump < 1) { throw new RuntimeException("pid"+p.getId()+": neither '"+CAtts.P_APERW+"' nor '"+CAtts.P_WKATA+"' defined!"); }
 		
 		if (nump > MAXNUMP) { nump = MAXNUMP; }
 		model.setHHDimension(nump);

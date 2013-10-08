@@ -128,7 +128,7 @@ public class TravelTimesWriter implements IterationEndsListener {
 			timesWriter.flush();
 			timesWriter.close();			
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -143,7 +143,7 @@ public class TravelTimesWriter implements IterationEndsListener {
 			timesWriter.flush();
 			timesWriter.close();			
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 	
@@ -183,7 +183,7 @@ public class TravelTimesWriter implements IterationEndsListener {
 			Collection<SimpleFeature> ft = generateSHPFileData(crs, this.network, true, ignoreExitLinks);
 			ShapeFileWriter.writeGeometries(ft, file);			
 		} catch (Exception e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -192,7 +192,7 @@ public class TravelTimesWriter implements IterationEndsListener {
 			Collection<SimpleFeature> ft = generateSHPFileData(crs, this.network, false, ignoreExitLinks);
 			ShapeFileWriter.writeGeometries(ft, file);			
 		} catch (Exception e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 	

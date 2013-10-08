@@ -107,8 +107,8 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 			}
 		}
 		double distance = 0.0;
-		if ((home_coord == null) || (home_coord.equals(ZERO))) { Gbl.errorMsg("No home coord defined!"); }
-		if ((work_coord != null) && (work_coord.equals(ZERO))) { Gbl.errorMsg("Weird work coord defined!!!"); }
+		if ((home_coord == null) || (home_coord.equals(ZERO))) { throw new RuntimeException("No home coord defined!"); }
+		if ((work_coord != null) && (work_coord.equals(ZERO))) { throw new RuntimeException("Weird work coord defined!!!"); }
 		if (work_coord != null) {
 			distance = CoordUtils.calcDistance(work_coord, home_coord);
 		}
@@ -120,7 +120,7 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 			else if (mainpurpose == 1) {model = new ModelModeChoiceEducation18Plus();}
 			else if (mainpurpose == 2) {model = new ModelModeChoiceShop18Plus();}
 			else if (mainpurpose == 3) {model = new ModelModeChoiceLeisure18Plus();}
-			else { Gbl.errorMsg("This should never happen!"); }
+			else { throw new RuntimeException("This should never happen!"); }
 		else
 			if (mainpurpose == 1) {model = new ModelModeChoiceEducation18Minus ();}
 			else {model = new ModelModeChoiceOther18Minus ();}
@@ -150,7 +150,7 @@ public class PersonModeChoiceModel extends AbstractPersonAlgorithm implements Pl
 		else if (modechoice == 2) { mode = TransportMode.car; }
 		else if (modechoice == 3) { mode = TransportMode.pt; }
 		else if (modechoice == 4) { mode = TransportMode.ride; }
-		else { Gbl.errorMsg("Mode choice returns undefined value!"); }
+		else { throw new RuntimeException("Mode choice returns undefined value!"); }
 
 		// setting mode to plan
 		for (PlanElement pe : person.getSelectedPlan().getPlanElements()) {

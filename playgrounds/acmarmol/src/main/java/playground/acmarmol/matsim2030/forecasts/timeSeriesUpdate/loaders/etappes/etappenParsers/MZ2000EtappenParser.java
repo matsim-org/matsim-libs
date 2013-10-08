@@ -91,8 +91,8 @@ public class MZ2000EtappenParser {
 				else if(mode.equals("14")){modeInt = 10;}
 				else if(mode.equals("15")){modeInt = 4;}
 				else if(mode.equals("16")){modeInt = 1;}
-				else if(mode.equals("17") || mode.equals("90") || mode.equals("99")){modeInt = 17;}
-				else Gbl.errorMsg("This should never happen!  Mode: " +  mode + " doesn't exist");
+				else if(mode.equals("17") || mode.equals("90") || mode.equals("99")){modeInt = 17;} else
+					throw new RuntimeException("This should never happen!  Mode: " +  mode + " doesn't exist");
 				
 				if(mode.equals("1")){mode =  MZConstants.WALK;}
 				else if(mode.equals("2")){mode =  MZConstants.BICYCLE;}
@@ -113,8 +113,8 @@ public class MZ2000EtappenParser {
 				else if(mode.equals("16")){mode =  MZConstants.PLANE;}
 				else if(mode.equals("17")){mode =  MZConstants.CABLE_CAR;}
 				else if(mode.equals("90")){mode =  MZConstants.OTHER;}
-				else if(mode.equals("99")){mode =  MZConstants.NO_ANSWER;}
-				else Gbl.errorMsg("This should never happen!  Mode: " +  mode + " doesn't exist");
+				else if(mode.equals("99")){mode =  MZConstants.NO_ANSWER;} else
+					throw new RuntimeException("This should never happen!  Mode: " +  mode + " doesn't exist");
 				
 
 				
@@ -134,8 +134,8 @@ public class MZ2000EtappenParser {
 				else if(wzweck1.equals("6")){purpose =  MZConstants.LEISURE;}
 				else if(wzweck1.equals("7")){purpose =  MZConstants.ERRANDS;}
 				else if(wzweck1.equals("8")){purpose = MZConstants.ACCOMPANYING_NOT_CHILDREN;}
-				else if(wzweck1.equals("9")){purpose = MZConstants.NO_ANSWER;}
-				else Gbl.errorMsg("This should never happen!  Purpose wzweck1: " +  wzweck1 + " doesn't exist");
+				else if(wzweck1.equals("9")){purpose = MZConstants.NO_ANSWER;} else
+					throw new RuntimeException("This should never happen!  Purpose wzweck1: " +  wzweck1 + " doesn't exist");
 				
 				//distance (no missing values)
 				String distance = entries[16].trim();

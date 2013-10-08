@@ -96,17 +96,17 @@ public class SCAGShp2Links implements NetworkRunnable {
 			
 			// link id
 			Object id = f.getAttribute(ID);
-			if (id == null) { Gbl.errorMsg("fCnt "+fCnt+": "+ID+" not found in feature."); }
+			if (id == null) { throw new RuntimeException("fCnt "+fCnt+": "+ID+" not found in feature."); }
 			Id linkId = new IdImpl(id.toString().trim());
 			
 			// from Node
 			Object fromNodeid = f.getAttribute(FROM_ID);
-			if (fromNodeid == null) { Gbl.errorMsg("fCnt "+fCnt+": "+FROM_ID+" not found in feature."); }
+			if (fromNodeid == null) { throw new RuntimeException("fCnt "+fCnt+": "+FROM_ID+" not found in feature."); }
 			Node fromNode = network.getNodes().get(new IdImpl(fromNodeid.toString().trim()));
 			
 			// to Node
 			Object toNodeid = f.getAttribute(TOID_ID);
-			if (toNodeid == null) { Gbl.errorMsg("fCnt "+fCnt+": "+TOID_ID+" not found in feature."); }
+			if (toNodeid == null) { throw new RuntimeException("fCnt "+fCnt+": "+TOID_ID+" not found in feature."); }
 			Node toNode = network.getNodes().get(new IdImpl(toNodeid.toString().trim()));
 			
 			// ignore, if incident nodes do not exist (connector link)
@@ -185,7 +185,7 @@ public class SCAGShp2Links implements NetworkRunnable {
 				linkObjectAttributes.putAttribute(link.getId().toString(),LINK_TYPE,typeTF);
 				cleanUp(link);
 			}
-			if ((direction < -1) || (direction > 1)) { Gbl.errorMsg("fCnt "+fCnt+": "+DIR+"="+direction+" of linkId="+linkId+" not known."); }
+			if ((direction < -1) || (direction > 1)) { throw new RuntimeException("fCnt "+fCnt+": "+DIR+"="+direction+" of linkId="+linkId+" not known."); }
 		}
 		log.info("done. (creating links)");
 		

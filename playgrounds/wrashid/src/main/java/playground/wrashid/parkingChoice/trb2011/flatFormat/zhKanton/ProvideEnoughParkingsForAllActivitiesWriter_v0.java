@@ -152,7 +152,7 @@ public class ProvideEnoughParkingsForAllActivitiesWriter_v0 extends MatsimXmlWri
 			this.writer.close();
 		}
 		catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 	

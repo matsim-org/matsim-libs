@@ -850,7 +850,7 @@ public class MultiModalDemo {
 				writer.flush();
 				writer.close();
 			} catch (IOException e) {
-				Gbl.errorMsg(e);
+				throw new RuntimeException(e);
 			}
 		}			
 	}

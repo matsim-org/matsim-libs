@@ -129,7 +129,7 @@ public class DistanceFuzzyFactorProviderFactory {
 				thread.join();
 			}
 		} catch (InterruptedException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		
 		counter.printCounter();

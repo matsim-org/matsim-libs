@@ -70,7 +70,7 @@ public class SCAGShp2Nodes implements NetworkRunnable {
 			
 			// node id
 			Object id = f.getAttribute(ID_NAME);
-			if (id == null) { Gbl.errorMsg("fCnt "+fCnt+": "+ID_NAME+" not found in feature."); }
+			if (id == null) { throw new RuntimeException("fCnt "+fCnt+": "+ID_NAME+" not found in feature."); }
 			Id nodeId = new IdImpl(id.toString().trim());
 
 			// ignore node if it is a zone centroid

@@ -146,7 +146,7 @@ public class ProvincialPopulationExtractor {
 	 */
 	public void writeHouseholds(String outputfolder){
 		if(this.households == null || this.householdAttributes == null){
-			Gbl.errorMsg("Either no households or household attributes to write.");
+			throw new RuntimeException("Either no households or household attributes to write.");
 		} else{
 			LOG.info("Writing households to file... (" + this.households.getHouseholds().size() + ")");
 			HouseholdsWriterV10 hw = new HouseholdsWriterV10(this.households);
@@ -167,7 +167,7 @@ public class ProvincialPopulationExtractor {
 	 */
 	public void writePopulation(String outputfolder){
 		if(this.sc.getPopulation().getPersons().size() == 0 || this.personAttributes == null){
-			Gbl.errorMsg("Either no persons or person attributes to write.");
+			throw new RuntimeException("Either no persons or person attributes to write.");
 		} else{
 			LOG.info("Writing population to file... (" + this.sc.getPopulation().getPersons().size() + ")");
 			PopulationWriter pw = new PopulationWriter(this.sc.getPopulation(), this.sc.getNetwork());

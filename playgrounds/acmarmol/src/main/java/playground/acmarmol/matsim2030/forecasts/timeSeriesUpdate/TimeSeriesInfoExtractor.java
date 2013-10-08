@@ -3,33 +3,22 @@ package playground.acmarmol.matsim2030.forecasts.timeSeriesUpdate;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
-import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.config.Config;
-import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.population.PopulationWriter;
-import org.matsim.core.scenario.ScenarioImpl;
-import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.households.Household;
@@ -39,7 +28,6 @@ import playground.acmarmol.matsim2030.forecasts.timeSeriesUpdate.loaders.etappes
 import playground.acmarmol.matsim2030.forecasts.timeSeriesUpdate.loaders.weges.Wege;
 import playground.acmarmol.matsim2030.forecasts.timeSeriesUpdate.loaders.weges.WegeLoader;
 import playground.acmarmol.matsim2030.microcensus2010.MZConstants;
-import playground.acmarmol.matsim2030.microcensus2010.objectAttributesConverters.CoordConverter;
 
 public class TimeSeriesInfoExtractor {
 	
@@ -1412,8 +1400,7 @@ public class TimeSeriesInfoExtractor {
 		else if(type.contains(MZConstants.HOME))
 			return 6;
 		else{
-			Gbl.errorMsg("No type known for: " + type);
-			return -1;
+			throw new RuntimeException("No type known for: " + type);
 		}
 	
 	}
@@ -3262,7 +3249,7 @@ public class TimeSeriesInfoExtractor {
 				ids_gender[0].add(id);
 			}else if(((PersonImpl)microcensus.getPopulation().getPersons().get(id)).getSex().equals("f")){
 				ids_gender[1].add(id);
-			}else{Gbl.errorMsg("This should neber happen!: Gender "+ ((PersonImpl)microcensus.getPopulation().getPersons().get(id)).getSex() +" unknown!");}
+			}else{throw new RuntimeException("This should neber happen!: Gender "+ ((PersonImpl)microcensus.getPopulation().getPersons().get(id)).getSex() +" unknown!");}
 			
 		}
 		

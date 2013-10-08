@@ -99,7 +99,7 @@ public class CharyparNagelOpenTimesActivityScoring extends CharyparNagelActivity
 		}
 
 		if (!foundAct) {
-			Gbl.errorMsg("No suitable facility activity type found. Aborting...");
+			throw new RuntimeException("No suitable facility activity type found. Aborting...");
 		}
 
 		return openInterval;

@@ -83,7 +83,7 @@ public class ActivityOptionImpl implements ActivityOption {
 						new_o_set.add(opentime);
 					}
 					else {
-						Gbl.errorMsg("[Something is wrong]");
+						throw new RuntimeException("[Something is wrong]");
 					}
 				}
 			}

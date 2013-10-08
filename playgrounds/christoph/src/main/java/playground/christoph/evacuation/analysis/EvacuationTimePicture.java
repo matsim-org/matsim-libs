@@ -231,7 +231,7 @@ public class EvacuationTimePicture implements PersonDepartureEventHandler, Perso
 			kmzWriter.writeMainKml(mainKml);
 			kmzWriter.close();
 		} catch(IOException e) { 
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 	
@@ -298,7 +298,7 @@ public class EvacuationTimePicture implements PersonDepartureEventHandler, Perso
 			fos.close();
 			
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}		
 	}
 	

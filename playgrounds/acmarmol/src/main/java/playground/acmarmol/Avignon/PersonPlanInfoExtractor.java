@@ -4,6 +4,7 @@ import java.text.DecimalFormat;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Set;
+
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
@@ -152,7 +153,7 @@ public class PersonPlanInfoExtractor extends AbstractPersonAlgorithm{
 				this.leisureCoords.add(coord);
 				}
 		}
-		else{Gbl.errorMsg("This should never happen!: activity type " + activity.getType() +" not known!");}
+		else{throw new RuntimeException("This should never happen!: activity type " + activity.getType() +" not known!");}
 	}
 	
 	private void processLeg(PlanElement element) {

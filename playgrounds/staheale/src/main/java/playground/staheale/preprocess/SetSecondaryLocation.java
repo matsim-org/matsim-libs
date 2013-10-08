@@ -18,7 +18,6 @@ import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.facilities.ActivityFacilityImpl;
 import org.matsim.core.facilities.ActivityOptionImpl;
 import org.matsim.core.facilities.MatsimFacilitiesReader;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.MatsimPopulationReader;
@@ -123,7 +122,7 @@ public class SetSecondaryLocation  {
 						}
 						else if (H.equals(act.getType())) {
 							if (act.getCoord() == null) {
-								Gbl.errorMsg("Person id=" + p.getId() + " has no home coord!");
+								throw new RuntimeException("Person id=" + p.getId() + " has no home coord!");
 							}
 							home_coord = act.getCoord();
 						}
@@ -305,14 +304,14 @@ public class SetSecondaryLocation  {
 		if (E.equals(act_type)) { return educationQuadTree; }
 		else if (S.equals(act_type)) { return shopQuadTree; }
 		else if (L.equals(act_type)) { return leisureQuadTree; }
-		else { Gbl.errorMsg("act_type=" + act_type + " not allowed!"); return null; }
+		else { throw new RuntimeException("act_type=" + act_type + " not allowed!"); }
 	}
 
 	private final String getFacilityActType(String act_type) {
 		if (E.equals(act_type)) { return EDUCATION; }
 		else if (S.equals(act_type)) { return SHOP; }
 		else if (L.equals(act_type)) { return LEISURE; }
-		else { Gbl.errorMsg("act_type=" + act_type + " not allowed!"); return null; }
+		else { throw new RuntimeException("act_type=" + act_type + " not allowed!"); }
 	}
 
 	private final ActivityFacilityImpl getFacility(Collection<ActivityFacilityImpl> fs, String act_type) {
@@ -349,14 +348,13 @@ public class SetSecondaryLocation  {
 				return f;
 			}
 		}
-		Gbl.errorMsg("It should never reach this line!");
-		return null;
+		throw new RuntimeException("It should never reach this line!");
 	}
 
 	private final ActivityFacilityImpl getFacility(Coord coord, double radius, String act_type) {
 		Collection<ActivityFacilityImpl> fs = getFacilities(act_type).get(coord.getX(),coord.getY(),radius);
 		if (fs.isEmpty()) {
-			if (radius > 200000) { Gbl.errorMsg("radius>200'000 meters and still no facility found!"); }
+			if (radius > 200000) { throw new RuntimeException("radius>200'000 meters and still no facility found!"); }
 			return getFacility(coord,2.0*radius,act_type);
 		}
 		return getFacility(fs,act_type);
@@ -366,7 +364,7 @@ public class SetSecondaryLocation  {
 		Collection<ActivityFacilityImpl> fs = getFacilities(act_type).get(coord1.getX(),coord1.getY(),radius);
 		fs.addAll(getFacilities(act_type).get(coord2.getX(),coord2.getY(),radius));
 		if (fs.isEmpty()) {
-			if (radius > 200000) { Gbl.errorMsg("radius>200'000 meters and still no facility found!"); }
+			if (radius > 200000) { throw new RuntimeException("radius>200'000 meters and still no facility found!"); }
 			return getFacility(coord1,coord2,2.0*radius,act_type);
 		}
 		return getFacility(fs,act_type);

@@ -161,7 +161,7 @@ public class StrategyManager implements MatsimManager {
 			if (strategy != null) {
 				strategy.run(person);
 			} else {
-				Gbl.errorMsg("No strategy found!");
+				throw new RuntimeException("No strategy found!");
 			}
 
 			afterStrategyRunHook( person, strategy ) ;

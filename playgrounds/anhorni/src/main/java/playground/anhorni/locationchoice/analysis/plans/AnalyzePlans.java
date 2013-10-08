@@ -172,7 +172,7 @@ public class AnalyzePlans {
 			out.close();
 		}
 		catch (final IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -229,7 +229,7 @@ public class AnalyzePlans {
 			out.close();
 		}
 		catch (final IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -271,7 +271,7 @@ public class AnalyzePlans {
 			outSummary.close();
 			}
 			catch (final IOException e) {
-				Gbl.errorMsg(e);
+				throw new RuntimeException(e);
 			}
 		}
 
@@ -306,7 +306,7 @@ public class AnalyzePlans {
 			out.close();
 		}
 		catch (final IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -354,7 +354,7 @@ public class AnalyzePlans {
 			out.close();
 		}
 		catch (final IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 

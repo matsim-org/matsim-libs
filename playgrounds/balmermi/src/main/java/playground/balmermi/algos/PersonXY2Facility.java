@@ -32,7 +32,6 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.facilities.ActivityFacilitiesImpl;
 import org.matsim.core.facilities.ActivityFacilityImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.utils.collections.QuadTree;
 import org.matsim.population.algorithms.AbstractPersonAlgorithm;
@@ -132,7 +131,7 @@ public class PersonXY2Facility extends AbstractPersonAlgorithm implements PlanAl
 		else if (act_type.startsWith(H)) { return HOMES; }
 		else if (act_type.startsWith(W)) { return WORKS; }
 		else if (act_type.startsWith(T)) { return TTAS; }
-		else { Gbl.errorMsg("act_type=" + act_type + " not allowed!"); return null; }
+		else { throw new RuntimeException("act_type=" + act_type + " not allowed!"); }
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -141,7 +140,7 @@ public class PersonXY2Facility extends AbstractPersonAlgorithm implements PlanAl
 
 	@Override
 	public void run(Person person) {
-		if (person.getPlans().isEmpty()) { Gbl.errorMsg("Each person must have at least one plan!"); }
+		if (person.getPlans().isEmpty()) { throw new RuntimeException("Each person must have at least one plan!"); }
 		for (Plan plan : person.getPlans()) { this.run(plan); }
 	}
 

@@ -178,7 +178,7 @@ public class PersonSummary extends AbstractPersonAlgorithm implements PlanAlgori
 			else if (CAR.equals(trip_mode)) { trip_row = 2; }
 			else if (PT.equals(trip_mode)) { trip_row = 3; }
 			else if (UNDEF.equals(trip_mode)) { trip_row = 4; }
-			else { Gbl.errorMsg("mode=" + trip_mode + " not known!"); }
+			else { throw new RuntimeException("mode=" + trip_mode + " not known!"); }
 
 			// get col (trip dist)
 			double trip_dist = CoordUtils.calcDistance(prev_act.getCoord(), next_act.getCoord());

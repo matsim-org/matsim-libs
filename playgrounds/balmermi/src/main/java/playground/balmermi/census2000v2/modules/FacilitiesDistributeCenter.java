@@ -60,8 +60,8 @@ public class FacilitiesDistributeCenter {
 		
 		for (ActivityFacility f : facilities.getFacilities().values()) {
 			Coord c = f.getCoord();
-			if (c.getX()%100 != 0) { Gbl.errorMsg("f_id="+f.getId()+" xccord is not a heactar!"); }
-			if (c.getY()%100 != 0) { Gbl.errorMsg("f_id="+f.getId()+" xccord is not a heactar!"); }
+			if (c.getX()%100 != 0) { throw new RuntimeException("f_id="+f.getId()+" xccord is not a heactar!"); }
+			if (c.getY()%100 != 0) { throw new RuntimeException("f_id="+f.getId()+" xccord is not a heactar!"); }
 			c.setX(c.getX()+MatsimRandom.getRandom().nextDouble()*100.0);
 			c.setY(c.getY()+MatsimRandom.getRandom().nextDouble()*100.0);
 		}

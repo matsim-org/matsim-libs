@@ -62,7 +62,7 @@ public class ZPReader {
 			}
 				
 		} catch (IOException e) {
-				Gbl.errorMsg(e);
+				throw new RuntimeException(e);
 		}
 		return this.mzFilteredTargetPersons;
 	}

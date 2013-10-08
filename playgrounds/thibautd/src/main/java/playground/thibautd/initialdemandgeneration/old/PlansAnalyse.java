@@ -97,7 +97,7 @@ public class PlansAnalyse {
 			// else { Gbl.errorMsg("pid="+p.getId()+": Haeh?"); }
 			mt_cnt[idx]++;
 			// act types
-			if (p.getPlans().size() != 1) { Gbl.errorMsg("pid="+p.getId()+": There must be exactly one plan per person!"); }
+			if (p.getPlans().size() != 1) { throw new RuntimeException("pid="+p.getId()+": There must be exactly one plan per person!"); }
 			Plan plan = p.getPlans().get(0);
 			for (PlanElement pe : plan.getPlanElements()) {
 				if (pe instanceof Activity) {

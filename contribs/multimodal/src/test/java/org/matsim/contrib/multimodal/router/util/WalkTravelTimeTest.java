@@ -216,7 +216,7 @@ public class WalkTravelTimeTest extends MatsimTestCase {
 			t3.join();
 			t4.join();
 		} catch (InterruptedException e) { 
-			Gbl.errorMsg(e); 
+			throw new RuntimeException(e); 
 		}
 		
 		log.info("done");

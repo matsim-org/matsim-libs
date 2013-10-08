@@ -69,7 +69,7 @@ public class NetworkParseETNet {
 			buffered_reader.close();
 			file_reader.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -96,7 +96,7 @@ public class NetworkParseETNet {
 			buffered_reader.close();
 			file_reader.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -107,8 +107,8 @@ public class NetworkParseETNet {
 	public void run(final NetworkImpl network) {
 		System.out.println("    running " + this.getClass().getName() + " algorithm...");
 
-		if (!network.getNodes().isEmpty()) { Gbl.errorMsg("links already exist."); }
-		if (!network.getLinks().isEmpty()) { Gbl.errorMsg("links already exist."); }
+		if (!network.getNodes().isEmpty()) { throw new RuntimeException("links already exist."); }
+		if (!network.getLinks().isEmpty()) { throw new RuntimeException("links already exist."); }
 
 		network.setName("created by '"+this.getClass().getName()+"'");
 		network.setCapacityPeriod(Time.parseTime("01:00:00"));

@@ -177,7 +177,7 @@ import cadyts.demand.PlanBuilder;
 		Collection<Id> personsInVehicle = this.personsFromVehId.get(vehId);
 
 		if (personsInVehicle == null) {
-			Gbl.errorMsg("should not be possible: person should enter before leaving, and then construct the container");
+			throw new RuntimeException("should not be possible: person should enter before leaving, and then construct the container");
 		}
 
 		// remove the person from the personsContainer:

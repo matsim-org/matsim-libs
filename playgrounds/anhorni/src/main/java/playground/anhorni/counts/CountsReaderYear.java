@@ -49,7 +49,7 @@ public class CountsReaderYear {
 			bufferedReader.close();
 			fileReader.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		this.readFiles(paths);
 	}
@@ -119,7 +119,7 @@ public class CountsReaderYear {
 				fileReader.close();
 			}
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 	

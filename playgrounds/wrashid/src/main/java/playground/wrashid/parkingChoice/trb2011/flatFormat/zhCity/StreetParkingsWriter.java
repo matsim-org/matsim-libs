@@ -53,7 +53,7 @@ public class StreetParkingsWriter extends MatsimXmlWriter {
 			this.writer.close();
 		}
 		catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 	

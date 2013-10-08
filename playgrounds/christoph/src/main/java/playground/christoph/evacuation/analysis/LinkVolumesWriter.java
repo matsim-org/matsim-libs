@@ -173,7 +173,7 @@ public class LinkVolumesWriter implements IterationEndsListener {
 				writer.close();
 			}
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -203,7 +203,7 @@ public class LinkVolumesWriter implements IterationEndsListener {
 				writer.close();
 			}
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 	
@@ -278,7 +278,7 @@ public class LinkVolumesWriter implements IterationEndsListener {
 				ShapeFileWriter.writeGeometries(ft, file + "_" + mode + ".shp");
 			}
 		} catch (Exception e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -299,7 +299,7 @@ public class LinkVolumesWriter implements IterationEndsListener {
 				ShapeFileWriter.writeGeometries(ft, file + "_" + mode + ".shp");
 			}
 		} catch (Exception e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 

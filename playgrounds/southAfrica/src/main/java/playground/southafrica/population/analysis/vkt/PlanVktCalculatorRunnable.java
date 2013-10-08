@@ -90,12 +90,12 @@ public class PlanVktCalculatorRunnable implements Runnable {
 			bw.write(String.format("%.2f", typeVkmTotal.get(RoadType.OTHER)));
 			bw.newLine();
 		} catch (IOException e) {
-			Gbl.errorMsg("Could not write to BufferedWriter " + filename);
+			throw new RuntimeException("Could not write to BufferedWriter " + filename);
 		} finally{
 			try {
 				bw.close();
 			} catch (IOException e) {
-				Gbl.errorMsg("Could not close BufferedWriter " + filename);
+				throw new RuntimeException("Could not close BufferedWriter " + filename);
 			}
 		}			
 		this.plan = null;

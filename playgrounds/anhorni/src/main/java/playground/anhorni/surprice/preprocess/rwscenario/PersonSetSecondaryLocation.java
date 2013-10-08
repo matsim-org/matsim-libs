@@ -209,7 +209,7 @@ public class PersonSetSecondaryLocation extends AbstractPersonAlgorithm implemen
 		else if (S.equals(act_type)) { return this.shopFacQuadTree; }
 		else if (L.equals(act_type)) { return this.leisFacQuadTree; }
 		else if (B.equals(act_type)) { return this.businessFacQuadTree; }
-		else { Gbl.errorMsg("act_type=" + act_type + " not allowed!"); return null; }
+		else { throw new RuntimeException("act_type=" + act_type + " not allowed!"); }
 	}
 
 	private final String getFacilityActType(String act_type) {
@@ -217,7 +217,7 @@ public class PersonSetSecondaryLocation extends AbstractPersonAlgorithm implemen
 		else if (S.equals(act_type)) { return SHOP; }
 		else if (L.equals(act_type)) { return LEISURE; }
 		else if (B.equals(act_type)) { return BUSINESS; }
-		else { Gbl.errorMsg("act_type=" + act_type + " not allowed!"); return null; }
+		else { throw new RuntimeException("act_type=" + act_type + " not allowed!"); }
 	}
 
 	private final ActivityFacility getFacility(Collection<ActivityFacility> fs, String act_type) {
@@ -254,14 +254,13 @@ public class PersonSetSecondaryLocation extends AbstractPersonAlgorithm implemen
 				return f;
 			}
 		}
-		Gbl.errorMsg("It should never reach this line!");
-		return null;
+		throw new RuntimeException("It should never reach this line!");
 	}
 
 	private final ActivityFacility getFacility(Coord coord, double radius, String act_type) {
 		Collection<ActivityFacility> fs = this.getFacilities(act_type).get(coord.getX(),coord.getY(),radius);
 		if (fs.isEmpty()) {
-			if (radius > 200000) { Gbl.errorMsg("radius>200'000 meters and still no facility found!"); }
+			if (radius > 200000) { throw new RuntimeException("radius>200'000 meters and still no facility found!"); }
 			return this.getFacility(coord,2.0*radius,act_type);
 		}
 		return this.getFacility(fs,act_type);
@@ -271,7 +270,7 @@ public class PersonSetSecondaryLocation extends AbstractPersonAlgorithm implemen
 		Collection<ActivityFacility> fs = this.getFacilities(act_type).get(coord1.getX(),coord1.getY(),radius);
 		fs.addAll(this.getFacilities(act_type).get(coord2.getX(),coord2.getY(),radius));
 		if (fs.isEmpty()) {
-			if (radius > 200000) { Gbl.errorMsg(act_type + " radius>200'000 meters and still no facility found!"); 
+			if (radius > 200000) { throw new RuntimeException(act_type + " radius>200'000 meters and still no facility found!"); 
 			}
 			return this.getFacility(coord1,coord2,2.0*radius,act_type);
 		}
@@ -292,10 +291,10 @@ public class PersonSetSecondaryLocation extends AbstractPersonAlgorithm implemen
 				ActivityImpl act = (ActivityImpl) pe;
 				if (H.equals(act.getType())) {
 					if (act.getCoord() == null) {
-						Gbl.errorMsg("Person id=" + person.getId() + " has no home coord!");
+						throw new RuntimeException("Person id=" + person.getId() + " has no home coord!");
 					}
 					if (act.getCoord().equals(ZERO)) {
-						Gbl.errorMsg("Person id=" + person.getId() + " has a ZERO home coord!");
+						throw new RuntimeException("Person id=" + person.getId() + " has a ZERO home coord!");
 					}
 					home_coord = act.getCoord();
 				} else {

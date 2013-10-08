@@ -113,7 +113,7 @@ public class PopulationWriter extends MatsimXmlWriter implements MatsimWriter, P
 			this.handler.writeSeparator(this.writer);
 		}
 		catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -126,7 +126,7 @@ public class PopulationWriter extends MatsimXmlWriter implements MatsimWriter, P
 			counter.incCounter();
 		}
 		catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 
@@ -144,7 +144,7 @@ public class PopulationWriter extends MatsimXmlWriter implements MatsimWriter, P
 				this.writer.close();
 			}
 			catch (IOException e) {
-				Gbl.errorMsg(e);
+				throw new RuntimeException(e);
 			}
 		}
 	}

@@ -110,7 +110,7 @@ public class FMAParser extends Parser {
 			onlineWriter.endWrite();
 			buffered_reader.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		this.verification.setXTripsPerHour(type, startTime, 
 				recentlyAddedNumberOfPersons);
@@ -160,7 +160,7 @@ public class FMAParser extends Parser {
 			}
 			buffered_reader.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		this.verification.addXDifference(actType, difference);
 		return recentlyAddedNumberOfPersons;

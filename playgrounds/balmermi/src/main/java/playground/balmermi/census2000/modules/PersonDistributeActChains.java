@@ -211,7 +211,7 @@ public class PersonDistributeActChains extends AbstractPersonAlgorithm implement
 			else if (val == 4) { type = E; }
 			else if (val == 2) { type = S; }
 			else if (val == 1) { type = L; }
-			else { Gbl.errorMsg("THIS SHOULD NEVER HAPPEN!"); }
+			else { throw new RuntimeException("THIS SHOULD NEVER HAPPEN!"); }
 
 			boolean primary = this.isPrimary(bitcode,val);
 
@@ -221,7 +221,7 @@ public class PersonDistributeActChains extends AbstractPersonAlgorithm implement
 					ActivityImpl a = plan.createAndAddActivity(type, new CoordImpl(0.0,0.0));
 					a.setStartTime(start_time);
 				}
-				catch (Exception e) { Gbl.errorMsg(e); }
+				catch (Exception e) { throw new RuntimeException(e); }
 			}
 			else {
 				int start_time = time_sum;
@@ -238,7 +238,7 @@ public class PersonDistributeActChains extends AbstractPersonAlgorithm implement
 					l.setTravelTime(0);
 					l.setDepartureTime(end_time);
 				}
-				catch (Exception e) { Gbl.errorMsg(e); }
+				catch (Exception e) { throw new RuntimeException(e); }
 			}
 		}
 	}

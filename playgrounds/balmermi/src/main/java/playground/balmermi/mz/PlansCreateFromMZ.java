@@ -116,7 +116,7 @@ public class PlansCreateFromMZ {
 				// 11       12         13    14       15     16                17   18      19       20   21
 
 				// pid check
-				if (!pid.toString().equals(entries[0].trim())) { Gbl.errorMsg("That must not happen!"); }
+				if (!pid.toString().equals(entries[0].trim())) { throw new RuntimeException("That must not happen!"); }
 
 				// departure time (min => sec.)
 				int departure = Integer.parseInt(entries[3].trim())*60;
@@ -150,7 +150,7 @@ public class PlansCreateFromMZ {
 				else if (purpose == 3) { acttype = SHOP; }
 				else if (purpose == 4) { acttype = LEIS; }
 				else if (purpose == 5) { acttype = LEIS; } // TODO: check
-				else { Gbl.errorMsg("pid=" + pid + ": purpose=" + purpose + " not known!"); }
+				else { throw new RuntimeException("pid=" + pid + ": purpose=" + purpose + " not known!"); }
 
 				// trip mode type
 				int m = Integer.parseInt(entries[12].trim());
@@ -161,7 +161,7 @@ public class PlansCreateFromMZ {
 				else if (m == 4) { mode = TransportMode.pt; }
 				else if (m == 5) { mode = TransportMode.ride; }
 				else if (m == 6) { mode = "undefined"; }
-				else { Gbl.errorMsg("pid=" + pid + ": m=" + m + " not known!"); }
+				else { throw new RuntimeException("pid=" + pid + ": m=" + m + " not known!"); }
 
 				// micro census person weight
 				double weight = Double.parseDouble(entries[16].trim());
@@ -174,18 +174,18 @@ public class PlansCreateFromMZ {
 				String gender = null;
 				if (g == 0) { gender = FEMALE; }
 				else if (g == 1) { gender = MALE; }
-				else { Gbl.errorMsg("pid=" + pid + ": g=" + g + " not known!"); }
+				else { throw new RuntimeException("pid=" + pid + ": g=" + g + " not known!"); }
 
 				// driving license
 				int lic = Integer.parseInt(entries[19].trim());
 				String licence = null;
 				if (lic == 0) { licence = NO; }
 				else if (lic == 1) { licence = YES; }
-				else { Gbl.errorMsg("pid=" + pid + ": lic=" + lic + " not known!"); }
+				else { throw new RuntimeException("pid=" + pid + ": lic=" + lic + " not known!"); }
 
 				// day of week
 				int dow = Integer.parseInt(entries[20].trim());
-				if ((dow < 1) || (dow > 7)) { Gbl.errorMsg("pid=" + pid + ": dow=" + dow + " not known!"); }
+				if ((dow < 1) || (dow > 7)) { throw new RuntimeException("pid=" + pid + ": dow=" + dow + " not known!"); }
 				if (!((this.dow_min<=dow) && (dow<=this.dow_max))) { pids_dow.add(pid); }
 
 				// distance (km => m)
@@ -254,7 +254,7 @@ public class PlansCreateFromMZ {
 				}
 			}
 			// replacing the person string with the new data
-			if (person_strings.put(pid,person_string_new) == null) { Gbl.errorMsg("That must not happen!"); }
+			if (person_strings.put(pid,person_string_new) == null) { throw new RuntimeException("That must not happen!"); }
 		}
 
 		System.out.println("        removing "+pids_dow.size()+" persons not part of the days = ["+this.dow_min+","+this.dow_max+"]...");
@@ -270,9 +270,9 @@ public class PlansCreateFromMZ {
 	private final void removePlans(final Population plans, final Map<Id,String> person_strings, final Set<Id> ids) {
 		for (Id id : ids) {
 			Person p = plans.getPersons().remove(id);
-			if (p == null) { Gbl.errorMsg("pid="+id+": id not found in the plans DB!"); }
+			if (p == null) { throw new RuntimeException("pid="+id+": id not found in the plans DB!"); }
 			String p_str = person_strings.remove(id);
-			if (p_str == null) { Gbl.errorMsg("pid="+id+": id not found in the person_strings DB!"); }
+			if (p_str == null) { throw new RuntimeException("pid="+id+": id not found in the person_strings DB!"); }
 		}
 	}
 
@@ -399,9 +399,9 @@ public class PlansCreateFromMZ {
 							if (!act2.getType().equals(HOME) && !act2.getType().equals(WORK) && !act2.getType().equals(EDUC) && !act2.getType().equals(SHOP)) { act2.setType(LEIS); }
 						}
 						else if (curr_act.getType().equals(OTHR)) {
-							Gbl.errorMsg("pid="+p.getId()+", act_type="+OTHR+": Act type not allowed here!");
+							throw new RuntimeException("pid="+p.getId()+", act_type="+OTHR+": Act type not allowed here!");
 						}
-						else { Gbl.errorMsg("That must not happen!"); }
+						else { throw new RuntimeException("That must not happen!"); }
 						cnt_difftypes++;
 					}
 					else {
@@ -511,7 +511,7 @@ public class PlansCreateFromMZ {
 		System.out.println("    running " + this.getClass().getName() + " module...");
 
 		if (plans.getName() == null) { plans.setName("created by '" + this.getClass().getName() + "'"); }
-		if (!plans.getPersons().isEmpty()) { Gbl.errorMsg("[plans=" + plans + " is not empty]"); }
+		if (!plans.getPersons().isEmpty()) { throw new RuntimeException("[plans=" + plans + " is not empty]"); }
 
 		Map<Id,String> person_strings = new TreeMap<Id,String>();
 		int id = Integer.MIN_VALUE;
@@ -540,7 +540,7 @@ public class PlansCreateFromMZ {
 			if (id == prev_id) { person_string = person_string + curr_line + "\n"; }
 			else {
 				if (prev_id != Integer.MIN_VALUE) {
-					if (person_strings.put(prev_pid,person_string) != null) { Gbl.errorMsg("Person id="+prev_pid+" already parsed!"); }
+					if (person_strings.put(prev_pid,person_string) != null) { throw new RuntimeException("Person id="+prev_pid+" already parsed!"); }
 				}
 				person_string = curr_line + "\n";
 				prev_id = id;
@@ -548,7 +548,7 @@ public class PlansCreateFromMZ {
 			}
 			line_nr++;
 		}
-		if (person_strings.put(prev_pid,person_string) != null) { Gbl.errorMsg("Person id="+prev_pid+" already parsed!"); }
+		if (person_strings.put(prev_pid,person_string) != null) { throw new RuntimeException("Person id="+prev_pid+" already parsed!"); }
 		br.close();
 		fr.close();
 		System.out.println("      done.");

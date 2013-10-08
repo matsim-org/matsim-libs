@@ -116,7 +116,7 @@ public class ChoiceSetWriter {
 			out.close();
 			log.info("Choice sets written");
 		}catch (final IOException e) {
-					Gbl.errorMsg(e);
+					throw new RuntimeException(e);
 		}
 	}
 							

@@ -108,7 +108,7 @@ public class Municipalities {
 			}
 			buffered_reader.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		System.out.println("    # municipalities     = " + this.municipalities.size());
 		System.out.println("    # municipality zones = " + municipalityLayer.getLocations().size());

@@ -227,7 +227,7 @@ public class RunDemo {
 					this.out.close();
 					this.out = null;
 				} catch (IOException e) {
-					Gbl.errorMsg(e);
+					throw new RuntimeException(e);
 				}
 		}
 
@@ -249,7 +249,7 @@ public class RunDemo {
 				eventVXY.append("\n");
 				this.out.write(eventVXY.toString());
 			} catch (IOException e) {
-				Gbl.errorMsg(e);
+				throw new RuntimeException(e);
 			}
 		}
 

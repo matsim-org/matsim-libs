@@ -58,7 +58,7 @@ public class WorldReaderMatsimV2 extends MatsimXmlParser {
 		} else if (ZONE.equals(name)) {
 			startZone(atts);
 		} else if (!WORLD.equals(name) && !MAPPING.equals(name) && !REF.equals(name)) {
-			Gbl.errorMsg(this + "[tag=" + name + " not known or not supported]");
+			throw new RuntimeException(this + "[tag=" + name + " not known or not supported]");
 		}
 	}
 

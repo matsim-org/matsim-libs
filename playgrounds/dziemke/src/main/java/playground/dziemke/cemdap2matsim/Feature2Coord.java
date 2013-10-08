@@ -52,9 +52,9 @@ public class Feature2Coord {
 				if (pe instanceof Activity) {
 					Activity activity = (Activity)pe;
 					String zoneId = (String)personObjectAttributes.getAttribute(person.getId().toString(),UCSBStopsParser.ZONE+actIndex);
-					if (zoneId == null) { Gbl.errorMsg("pid="+person.getId()+": object attribute '"+UCSBStopsParser.ZONE+actIndex+"' not found."); }
+					if (zoneId == null) { throw new RuntimeException("pid="+person.getId()+": object attribute '"+UCSBStopsParser.ZONE+actIndex+"' not found."); }
 					SimpleFeature zone = features.get(zoneId);
-					if (zone == null) { Gbl.errorMsg("zone with id="+zoneId+" not found."); }
+					if (zone == null) { throw new RuntimeException("zone with id="+zoneId+" not found."); }
 					
 					if (activity.getType().startsWith("home")) {
 						if (homeCoord == null) { homeCoord = UCSBUtils.getRandomCoordinate(zone); }

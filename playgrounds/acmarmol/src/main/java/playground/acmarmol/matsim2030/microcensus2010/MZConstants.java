@@ -204,17 +204,17 @@ public class MZConstants{
 		public static final String EDUCATION_MANDATORY_SCHOOL = "just finished mandatory school";
 		public static final String EDUCATION_BERUFSLEHRE = "berufslehre";
 		public static final String EDUCATION_VOLLZEITBERUFSLEHRE = "vollzeitberuflehre";
-		public static final String EDUCATION_MATURITÄTSCHULE = "maturitätschule";
-		public static final String EDUCATION_HÖHERE_BERUFSAUSBILDUNG = "höhere berufsausbildung";
-		public static final String EDUCATION_TECHNIKERSCHLE_HÖHEREFACHSSCHULE_FACHHOSCHSCHULE = "technikerschule, höhere fachschule, fachhochschule";
-		public static final String EDUCATION_UNIVERSITÄT = "universität";
+		public static final String EDUCATION_MATURITAETSCHULE = "maturitätschule";
+		public static final String EDUCATION_HOEHERE_BERUFSAUSBILDUNG = "höhere berufsausbildung";
+		public static final String EDUCATION_TECHNIKERSCHLE_HOEHEREFACHSSCHULE_FACHHOSCHSCHULE = "technikerschule, höhere fachschule, fachhochschule";
+		public static final String EDUCATION_UNIVERSITAET = "universität";
 		public static final String EDUCATION_ONE_YEAR_AUSBILDUNG = "1-jährige Ausbildung";
 		public static final String EDUCATION_TWO_YEAR_BERUFLICHE_GRUNDBILDUNG = "2-jährige berufliche Grundbildung";
 		public static final String EDUCATION_TWO_YEAR_VOLLZEITBERUFSLEHRE = "2-jährige Vollzeitberufsschule, Handelsschule";
 		public static final String EDUCATION_TWO_THREE_YEARS_AUSBILDUNG = "2-3 jährige Ausbildung";
 		public static final String EDUCATION_THREE_FOUR_YEARS_BERUFSLEHRE = "3-4 jährige Berufslehre";
 		public static final String EDUCATION_THREE_FOUR_YEARS_VOLLZEITBERUFSLEHRE = "3-4 jährige Vollzeitberufsschule";
-		public static final String EDUCATION_LEHRKRÄFTE = "Lehrkräfte-Seminar (ehem. Lehrerseminar)";
+		public static final String EDUCATION_LEHRKRAEFTE = "Lehrkräfte-Seminar (ehem. Lehrerseminar)";
 
 	//cantons
 		public static final String ZURICH = "zürich";

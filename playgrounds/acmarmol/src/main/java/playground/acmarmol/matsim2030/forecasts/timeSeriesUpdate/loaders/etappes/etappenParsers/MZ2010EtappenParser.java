@@ -97,8 +97,8 @@ public class MZ2010EtappenParser {
 				else if(mode.equals("18")){mode =  MZConstants.CABLE_CAR;}
 				else if(mode.equals("19")){mode =  MZConstants.SKATEBOARD;}
 				else if(mode.equals("20")){mode =  MZConstants.OTHER;}
-				else if(mode.equals("-99")){mode =  MZConstants.PSEUDOETAPPE;}
-				else Gbl.errorMsg("This should never happen!  Mode: " +  mode + " doesn't exist");
+				else if(mode.equals("-99")){mode =  MZConstants.PSEUDOETAPPE;} else
+					throw new RuntimeException("This should never happen!  Mode: " +  mode + " doesn't exist");
 				
 				//total people in car
 				String total_people = entries[10].trim();
@@ -119,8 +119,8 @@ public class MZ2010EtappenParser {
 				else if(wzweck1.equals("11")){purpose=  MZConstants.FOREIGN_PROPERTY;}
 				else if(wzweck1.equals("12")){purpose =  MZConstants.OTHER;}
 				else if(wzweck1.equals("13")){purpose = MZConstants.BORDER_CROSSING;}
-				else if(wzweck1.equals("-99")){purpose = MZConstants.PSEUDOETAPPE;}
-				else Gbl.errorMsg("This should never happen!  Purpose wzweck1: " +  wzweck1 + " doesn't exist");
+				else if(wzweck1.equals("-99")){purpose = MZConstants.PSEUDOETAPPE;} else
+					throw new RuntimeException("This should never happen!  Purpose wzweck1: " +  wzweck1 + " doesn't exist");
 				
 				//distance
 				boolean skip = false;//skip etappe if no distance can be estimated <1%

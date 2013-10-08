@@ -109,7 +109,7 @@ public class UCSBSingleTripsConverter {
 							else if (timeSlide.equals("MD")) { endTime = 11*3600+UCSBUtils.r.nextDouble()*3*3600; }
 							else if (timeSlide.equals("PM")) { endTime = 14*3600+UCSBUtils.r.nextDouble()*6*3600; }
 							else if (timeSlide.equals("NT")) { endTime = 20*3600+UCSBUtils.r.nextDouble()*3*3600; }
-							else { Gbl.errorMsg("line "+lineCnt+": timeSlide="+timeSlide+" not known."); }
+							else { throw new RuntimeException("line "+lineCnt+": timeSlide="+timeSlide+" not known."); }
 							activity.setEndTime(endTime);
 							plan.addActivity(activity);
 							Leg leg = population.getFactory().createLeg(TransportMode.car);
@@ -133,7 +133,7 @@ public class UCSBSingleTripsConverter {
 			log.info(ommitCnt+" persons omitted (because of unknown TAZ id).");
 			log.info(population.getPersons().size()+" persons in the database.");
 		} catch (Exception e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		log.info("done. (create)");
 	}

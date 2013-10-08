@@ -20,7 +20,6 @@
 
 package playground.balmermi.census2000.models;
 
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 
 
@@ -235,8 +234,7 @@ public class ModelMobiliyTools {
 			prob_sum += probs[i];
 			if (r < prob_sum) { return i; }
 		}
-		Gbl.errorMsg("It should never reach this line!");
-		return -1;
+		throw new RuntimeException("It should never reach this line!");
 	}
 	
 	//////////////////////////////////////////////////////////////////////
@@ -287,7 +285,7 @@ public class ModelMobiliyTools {
 		else if (udeg == 3) { util += B2_T3 * 1.0; }
 		else if (udeg == 4) { util += B2_T4 * 1.0; }
 		else if (udeg == 5) { util += B2_T5 * 1.0; }
-		else { Gbl.errorMsg("This should never happen!"); }
+		else { throw new RuntimeException("This should never happen!"); }
 		return util;
 	}
 
@@ -315,7 +313,7 @@ public class ModelMobiliyTools {
 		else if (udeg == 3) { util += B1_T3 * 1.0; }
 		else if (udeg == 4) { util += B1_T4 * 1.0; }
 		else if (udeg == 5) { util += B1_T5 * 1.0; }
-		else { Gbl.errorMsg("This should never happen!"); }
+		else { throw new RuntimeException("This should never happen!"); }
 		return util;
 	}
 	
@@ -342,7 +340,7 @@ public class ModelMobiliyTools {
 		else if (udeg == 3) { util += B3_T3 * 1.0; }
 		else if (udeg == 4) { util += B3_T4 * 1.0; }
 		else if (udeg == 5) { util += B3_T5 * 1.0; }
-		else { Gbl.errorMsg("This should never happen!"); }
+		else { throw new RuntimeException("This should never happen!"); }
 		return util;
 	}
 	
@@ -370,7 +368,7 @@ public class ModelMobiliyTools {
 		else if (udeg == 3) { util += B4_T3 * 1.0; }
 		else if (udeg == 4) { util += B4_T4 * 1.0; }
 		else if (udeg == 5) { util += B4_T5 * 1.0; }
-		else { Gbl.errorMsg("This should never happen!"); }
+		else { throw new RuntimeException("This should never happen!"); }
 		return util;
 	}
 	
@@ -398,7 +396,7 @@ public class ModelMobiliyTools {
 		else if (udeg == 3) { util += B5_T3 * 1.0; }
 		else if (udeg == 4) { util += B5_T4 * 1.0; }
 		else if (udeg == 5) { util += B5_T5 * 1.0; }
-		else { Gbl.errorMsg("This should never happen!"); }
+		else { throw new RuntimeException("This should never happen!"); }
 		return util;
 	}
 }

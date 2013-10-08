@@ -208,7 +208,7 @@ public class CompareSelectedPlansTable {
 					relativeDiffs);
 			chart.saveAsPng(outfile + "s0-s1.png", 1024, 768);
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 

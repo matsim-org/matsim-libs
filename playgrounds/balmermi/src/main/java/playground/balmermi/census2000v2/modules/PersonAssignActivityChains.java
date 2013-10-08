@@ -82,7 +82,7 @@ public class PersonAssignActivityChains extends AbstractPersonAlgorithm implemen
 			mz_p = microcensus.getRandomWeightedMZPerson(person.getAge(),"f",person.getLicense(), has_work, has_educ);
 			log.warn("=> Assigning same demographics except that person is handled as a female. NOTE: Works only for CH-Microcensus 2005.");
 			if (mz_p == null) {
-				Gbl.errorMsg("In CH-Microcensus 2005: That should not happen!");
+				throw new RuntimeException("In CH-Microcensus 2005: That should not happen!");
 			}
 		}
 		person.addPlan(mz_p.getSelectedPlan());

@@ -193,7 +193,7 @@ public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler,
 		    	printStatistics();
 		    	
 			    } catch (IOException e) {
-				Gbl.errorMsg(e);
+				throw new RuntimeException(e);
 			}
 	}
 	
@@ -213,7 +213,7 @@ public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler,
 		    	writeGraphic(outputFile + ".png", getGraphic());
 		    	
 			    } catch (IOException e) {
-				Gbl.errorMsg(e);
+				throw new RuntimeException(e);
 			}
 	}
 	
@@ -366,7 +366,7 @@ public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler,
 	    	gzos.close();
 	    	fos.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 	
@@ -394,7 +394,7 @@ public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler,
 				plotData.add(pd);
 			}
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 	
@@ -402,7 +402,7 @@ public class AgentsInMunicipalityEventsHandler implements LinkEnterEventHandler,
 		try {
 			ChartUtilities.saveChartAsPNG(new File(filename), chart, 1024, 768);
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 	

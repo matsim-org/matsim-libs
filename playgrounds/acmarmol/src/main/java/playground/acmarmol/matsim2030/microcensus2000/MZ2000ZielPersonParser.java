@@ -21,17 +21,10 @@ package playground.acmarmol.matsim2030.microcensus2000;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
-import java.util.HashSet;
-import java.util.Set;
 
-import org.matsim.api.core.v01.Coord;
-import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.api.core.v01.replanning.PlanStrategyModule;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.PersonImpl;
-import org.matsim.core.utils.geometry.CoordImpl;
 import org.matsim.households.Households;
 import org.matsim.utils.objectattributes.ObjectAttributes;
 
@@ -108,8 +101,8 @@ public class MZ2000ZielPersonParser {
 		//person gender
 		String gender = entries[11];
 		if(gender.equals("1")){gender = MZConstants.MALE;}
-		else if(gender.equals("2")){gender = MZConstants.FEMALE;}
-		else Gbl.errorMsg("This should never happen!  Gender: " + gender+ " doesn't exist");
+		else if(gender.equals("2")){gender = MZConstants.FEMALE;} else
+			throw new RuntimeException("This should never happen!  Gender: " + gender+ " doesn't exist");
 		populationAttributes.putAttribute(intnr, MZConstants.GENDER, gender);
 		
 		//day of week
@@ -120,8 +113,8 @@ public class MZ2000ZielPersonParser {
 		else if(dow.equals("4")){dow = MZConstants.THURSDAY;}
 		else if(dow.equals("5")){dow = MZConstants.FRIDAY;}
 		else if(dow.equals("6")){dow = MZConstants.SATURDAY;}
-		else if(dow.equals("7")){dow = MZConstants.SUNDAY;}
-				else Gbl.errorMsg("This should never happen!  Day of week: " + dow + " doesn't exist");
+		else if(dow.equals("7")){dow = MZConstants.SUNDAY;} else
+			throw new RuntimeException("This should never happen!  Day of week: " + dow + " doesn't exist");
 		populationAttributes.putAttribute(intnr, MZConstants.DAY_OF_WEEK, dow);
 		
 		
@@ -199,8 +192,8 @@ public class MZ2000ZielPersonParser {
 		else if(car_av.equals("2")){car_av =MZConstants.ARRANGEMENT;}
 		else if(car_av.equals("3")){car_av = MZConstants.NEVER;}
 		else if(car_av.equals("-2") | car_av.equals(" ")){car_av = MZConstants.NO_ANSWER;}
-		else if(car_av.equals("-1")){car_av = MZConstants.NOT_KNOWN;}//
-		else Gbl.errorMsg("This should never happen!  Car availability: " + car_av+ " doesn't exist");
+		else if(car_av.equals("-1")){car_av = MZConstants.NOT_KNOWN;} else
+			throw new RuntimeException("This should never happen!  Car availability: " + car_av+ " doesn't exist");
 		populationAttributes.putAttribute(intnr, MZConstants.CAR_AVAILABILITY, car_av);
 		
 		//motorcycle availability
@@ -209,8 +202,8 @@ public class MZ2000ZielPersonParser {
 		else if(mcycle_av.equals("2")){mcycle_av = MZConstants.ARRANGEMENT;}
 		else if(mcycle_av.equals("3")){mcycle_av = MZConstants.NEVER;}
 		else if(mcycle_av.equals("-2") | mcycle_av.equals(" ")){mcycle_av = MZConstants.NO_ANSWER;}
-		else if(mcycle_av.equals("-1")){mcycle_av = MZConstants.NOT_KNOWN;}
-		else Gbl.errorMsg("This should never happen!  Motorcycle availability: " + mcycle_av+ " doesn't exist");
+		else if(mcycle_av.equals("-1")){mcycle_av = MZConstants.NOT_KNOWN;} else
+			throw new RuntimeException("This should never happen!  Motorcycle availability: " + mcycle_av+ " doesn't exist");
 		populationAttributes.putAttribute(intnr, MZConstants.MOTORCYCLE_AVAILABILITY, mcycle_av);
 		
 //		//small motorcycle availability
@@ -230,8 +223,8 @@ public class MZ2000ZielPersonParser {
 		else if(mofa_av.equals("2")){mofa_av = MZConstants.ARRANGEMENT;}
 		else if(mofa_av.equals("3")){mofa_av = MZConstants.NEVER;}
 		else if(mofa_av.equals("-2") | mofa_av.equals(" ")){mofa_av = MZConstants.NO_ANSWER;}
-		else if(mofa_av.equals("--1")){mofa_av = MZConstants.NOT_KNOWN;}
-		else Gbl.errorMsg("This should never happen!  Mofa availability: " + mofa_av+ " doesn't exist");
+		else if(mofa_av.equals("--1")){mofa_av = MZConstants.NOT_KNOWN;} else
+			throw new RuntimeException("This should never happen!  Mofa availability: " + mofa_av+ " doesn't exist");
 		populationAttributes.putAttribute(intnr, MZConstants.MOFA_AVAILABILITY, mofa_av);
 		
 		//Bicycle availability
@@ -240,8 +233,8 @@ public class MZ2000ZielPersonParser {
 		else if(bike_av.equals("2")){bike_av = MZConstants.ARRANGEMENT;}
 		else if(bike_av.equals("3")){bike_av = MZConstants.NEVER;}
 		else if(bike_av.equals("-2") | bike_av.equals(" ")){bike_av = MZConstants.NO_ANSWER;}
-		else if(bike_av.equals("-1")){bike_av = MZConstants.NOT_KNOWN;}// -review
-		else Gbl.errorMsg("This should never happen!  Bike availability: " + bike_av+ " doesn't exist");
+		else if(bike_av.equals("-1")){bike_av = MZConstants.NOT_KNOWN;} else
+			throw new RuntimeException("This should never happen!  Bike availability: " + bike_av+ " doesn't exist");
 		populationAttributes.putAttribute(intnr, MZConstants.BICYCLE_AVAILABILITY, bike_av);
 		
 //		//car-sharing membership
@@ -306,13 +299,13 @@ public class MZ2000ZielPersonParser {
 		else if(education.equals("1")){education = MZConstants.EDUCATION_MANDATORY_SCHOOL;}
 		else if(education.equals("2")){education = MZConstants.EDUCATION_BERUFSLEHRE;}
 		else if(education.equals("3")){education = MZConstants.EDUCATION_VOLLZEITBERUFSLEHRE;}
-		else if(education.equals("4")){education = MZConstants.EDUCATION_MATURITÄTSCHULE;}
-		else if(education.equals("5")){education = MZConstants.EDUCATION_HÖHERE_BERUFSAUSBILDUNG;}
-		else if(education.equals("6")){education = MZConstants.EDUCATION_TECHNIKERSCHLE_HÖHEREFACHSSCHULE_FACHHOSCHSCHULE;}
-		else if(education.equals("7")){education = MZConstants.EDUCATION_UNIVERSITÄT;}
+		else if(education.equals("4")){education = MZConstants.EDUCATION_MATURITAETSCHULE;}
+		else if(education.equals("5")){education = MZConstants.EDUCATION_HOEHERE_BERUFSAUSBILDUNG;}
+		else if(education.equals("6")){education = MZConstants.EDUCATION_TECHNIKERSCHLE_HOEHEREFACHSSCHULE_FACHHOSCHSCHULE;}
+		else if(education.equals("7")){education = MZConstants.EDUCATION_UNIVERSITAET;}
 		else if(education.equals("-2")){education = MZConstants.NO_ANSWER;}
-		else if(education.equals("-1")){education = MZConstants.NO_ANSWER;}
-		else Gbl.errorMsg("Last education: " + education+ " doesn't exist");
+		else if(education.equals("-1")){education = MZConstants.NO_ANSWER;} else
+			throw new RuntimeException("Last education: " + education+ " doesn't exist");
 		populationAttributes.putAttribute(intnr, MZConstants.LAST_EDUCATION, education);
 		
 		

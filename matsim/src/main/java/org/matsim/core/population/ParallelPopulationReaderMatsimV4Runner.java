@@ -89,7 +89,7 @@ public class ParallelPopulationReaderMatsimV4Runner extends PopulationReaderMats
 					}
 				}
 			} catch (InterruptedException e) {
-				Gbl.errorMsg(e);
+				throw new RuntimeException(e);
 			}
 		}
 	}

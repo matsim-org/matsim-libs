@@ -90,7 +90,7 @@ public class MZ1989HouseholdPersonParser {
 			//filling person data into matsim households
 
 			if(!this.households.getHouseholds().containsKey(hhid)){
-				Gbl.errorMsg("This should never happen!  Household hhnr: " + hhnr+ " doesn't exist");
+				throw new RuntimeException("This should never happen!  Household hhnr: " + hhnr+ " doesn't exist");
 			}		
 			this.households.getHouseholds().get(hhid).getMemberIds().add(new IdImpl(zid));  // id = hhnr + hpnr??
 			

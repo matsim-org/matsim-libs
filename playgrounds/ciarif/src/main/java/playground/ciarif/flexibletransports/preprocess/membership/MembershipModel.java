@@ -2,7 +2,6 @@ package playground.ciarif.flexibletransports.preprocess.membership;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 
 import playground.ciarif.flexibletransports.data.FlexTransPersonImpl;
@@ -51,8 +50,7 @@ public class MembershipModel {
 	prob_sum += probs[i];
 	if (r < prob_sum) { return i; }
 	}
-	Gbl.errorMsg("It should never reach this line!");
-	return -1;
+	throw new RuntimeException("It should never reach this line!");
 	}
 	
 	//////////////////////////////////////////////////////////////////////

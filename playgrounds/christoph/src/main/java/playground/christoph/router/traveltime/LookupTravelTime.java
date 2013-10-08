@@ -102,9 +102,9 @@ public class LookupTravelTime implements TravelTime, MobsimBeforeSimStepListener
 
 			this.endBarrier.await();
 		} catch (InterruptedException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		} catch (BrokenBarrierException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 	
@@ -152,9 +152,9 @@ public class LookupTravelTime implements TravelTime, MobsimBeforeSimStepListener
 		try {
 			this.endBarrier.await();
 		} catch (InterruptedException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		} catch (BrokenBarrierException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 	
@@ -206,9 +206,9 @@ public class LookupTravelTime implements TravelTime, MobsimBeforeSimStepListener
 						link.setLinkTravelTime(travelTime.getLinkTravelTime(link, time, null, null));
 					}
 				} catch (InterruptedException e) {
-					Gbl.errorMsg(e);
+					throw new RuntimeException(e);
 				} catch (BrokenBarrierException e) {
-					Gbl.errorMsg(e);
+					throw new RuntimeException(e);
 				}
 			}
 		} // run()

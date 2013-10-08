@@ -31,7 +31,6 @@ import net.opengis.kml._2.ScreenOverlayType;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.network.KmlNetworkWriter;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -96,8 +95,7 @@ public class KmlNetworkVisualizer {
 			FolderType networkFolder = netWriter.getNetworkFolder();
 			this.mainFolder.getAbstractFeatureGroup().add(this.kmlObjectFactory.createFolder(networkFolder));
 		} catch (IOException e) {
-			Gbl.errorMsg("Cannot create kmz or logo cause: " + e.getMessage());
-			e.printStackTrace();
+			log.error("Cannot create kmz or logo", e);
 		}
 		this.writer.writeMainKml(this.mainKml);
 		this.writer.close();

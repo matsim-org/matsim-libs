@@ -84,7 +84,7 @@ public class MatricesWriter extends MatsimXmlWriter implements MatsimWriter {
 			close();
 		}
 		catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 

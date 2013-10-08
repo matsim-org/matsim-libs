@@ -264,8 +264,8 @@ public class DCActivityScoringFunction extends CharyparNagelActivityScoring {
 			}
 		}
 		if (!foundAct) {
-			Gbl.errorMsg("No suitable facility activity type found for activity " + act.getType() + 
-					" and facility " + facility.getId() + ". Aborting...");
+			throw new RuntimeException("No suitable facility activity type found for activity " + act.getType() + 
+			" and facility " + facility.getId() + ". Aborting...");
 		}
 		return openInterval;
 	}

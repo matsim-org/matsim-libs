@@ -95,8 +95,8 @@ public class MZ2010WegeParser {
 				else if(mode.equals("15")){mode =  MZConstants.WALK;}
 				else if(mode.equals("16")){mode =  MZConstants.SKATEBOARD;}
 				else if(mode.equals("17")){mode =  MZConstants.OTHER;}
-				else if(mode.equals("-99")){mode =  MZConstants.PSEUDOETAPPE;}
-				else Gbl.errorMsg("This should never happen!  Mode: " +  mode + " doesn't exist");
+				else if(mode.equals("-99")){mode =  MZConstants.PSEUDOETAPPE;} else
+					throw new RuntimeException("This should never happen!  Mode: " +  mode + " doesn't exist");
 
 				
 				//purpose
@@ -121,11 +121,11 @@ public class MZ2010WegeParser {
 				else if(wzweck1.equals("11")){purpose=  MZConstants.FOREIGN_PROPERTY;}
 				else if(wzweck1.equals("12")){purpose =  MZConstants.OTHER;}
 				//else if(wzweck1.equals("13")){purpose = "border crossing";}
-				else if(wzweck1.equals("-99")){purpose = MZConstants.PSEUDOETAPPE;}
-				else Gbl.errorMsg("This should never happen!  Purpose wzweck1: " +  wzweck1 + " doesn't exist");
+				else if(wzweck1.equals("-99")){purpose = MZConstants.PSEUDOETAPPE;} else
+					throw new RuntimeException("This should never happen!  Purpose wzweck1: " +  wzweck1 + " doesn't exist");
 				}else if(wzweck2.equals("2") || wzweck2.equals("3") ){// Nachhauseweg or Weg von zu Hause nach Hause
-					purpose =  MZConstants.HOME;	}
-				else Gbl.errorMsg("This should never happen!  Purpose wzweck2: " +  wzweck2 + " doesn't exist");
+					purpose =  MZConstants.HOME;	} else
+					throw new RuntimeException("This should never happen!  Purpose wzweck2: " +  wzweck2 + " doesn't exist");
 				
 				//distance
 				//bee-line distance (km)

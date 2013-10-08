@@ -132,12 +132,12 @@ public class Households {
 						}
 					} else {
 						if (hh_cat != hh.hh_cat) {
-							Gbl.errorMsg("Line " + line_cnt + ", hh_cat: " + hh_cat + " != " + hh.hh_cat);
+							throw new RuntimeException("Line " + line_cnt + ", hh_cat: " + hh_cat + " != " + hh.hh_cat);
 						}
 						double x = Double.parseDouble(entries[11].trim());
 						double y = Double.parseDouble(entries[12].trim());
 						if ((x != hh.coord.getX()) || (y != hh.coord.getY())) {
-							Gbl.errorMsg("Line " + line_cnt + ", coord: Household coordinate not equals!");
+							throw new RuntimeException("Line " + line_cnt + ", coord: Household coordinate not equals!");
 						}
 					}
 				}
@@ -149,7 +149,7 @@ public class Households {
 			}
 			buffered_reader.close();
 		} catch (IOException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 		System.out.println("    # Households = " + this.households.size());
 		System.out.println("    # Households ignored = " + hh_ignore_cnt);

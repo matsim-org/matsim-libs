@@ -87,8 +87,8 @@ public class MZ2000WegeParser {
 				else if(wzweck1.equals("6")){purpose =  MZConstants.LEISURE;}
 				else if(wzweck1.equals("7")){purpose =  MZConstants.ERRANDS;}
 				else if(wzweck1.equals("8")){purpose = MZConstants.ACCOMPANYING;}
-				else if(wzweck1.equals("9")){purpose=  MZConstants.NO_ANSWER;}
-				else Gbl.errorMsg("This should never happen!  Purpose wzweck1: " +  wzweck1 + " doesn't exist");
+				else if(wzweck1.equals("9")){purpose=  MZConstants.NO_ANSWER;} else
+					throw new RuntimeException("This should never happen!  Purpose wzweck1: " +  wzweck1 + " doesn't exist");
 				
 				//distance (no missing values)
 				String distance = entries[5].trim();

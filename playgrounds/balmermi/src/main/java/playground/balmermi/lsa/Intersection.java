@@ -49,12 +49,12 @@ public class Intersection implements Comparable<Intersection>  {
 	//////////////////////////////////////////////////////////////////////
 
 	public final void addLSA(LSA lsa) {
-		if (this.lsas.containsKey(lsa.nr)) { Gbl.errorMsg("Intersection_id=" + this.id + ": LSA_nr=" + lsa.nr + " already exists!"); }
+		if (this.lsas.containsKey(lsa.nr)) { throw new RuntimeException("Intersection_id=" + this.id + ": LSA_nr=" + lsa.nr + " already exists!"); }
 		this.lsas.put(lsa.nr,lsa);
 	}
 	
 	public final void addLane(Lane lane) {
-		if (this.lanes.containsKey(lane.nr)) { Gbl.errorMsg("Intersection_id=" + this.id + ": lane_nr=" + lane.nr + " already exists!"); }
+		if (this.lanes.containsKey(lane.nr)) { throw new RuntimeException("Intersection_id=" + this.id + ": lane_nr=" + lane.nr + " already exists!"); }
 		this.lanes.put(lane.nr,lane);
 	}
 	

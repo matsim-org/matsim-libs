@@ -78,12 +78,12 @@ public class IpfWriter {
 				}
 			}
 		} catch (IOException e) {
-			Gbl.errorMsg("Could not write to BufferedWriter " + outputFile);
+			throw new RuntimeException("Could not write to BufferedWriter " + outputFile);
 		} finally{
 			try {
 				bw.close();
 			} catch (IOException e) {
-				Gbl.errorMsg("Could not close BufferedWriter for " + outputFile);
+				throw new RuntimeException("Could not close BufferedWriter for " + outputFile);
 			}
 		}
 		Header.printFooter();

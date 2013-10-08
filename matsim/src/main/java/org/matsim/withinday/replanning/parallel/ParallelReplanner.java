@@ -156,9 +156,9 @@ public abstract class ParallelReplanner<T extends WithinDayReplannerFactory<? ex
 		try {
 			this.timeStepEndBarrier.await();
 		} catch (InterruptedException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		} catch (BrokenBarrierException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 	
@@ -191,9 +191,9 @@ public abstract class ParallelReplanner<T extends WithinDayReplannerFactory<? ex
 			this.timeStepEndBarrier.await();
 
 		} catch (InterruptedException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		} catch (BrokenBarrierException e) {
-	      	Gbl.errorMsg(e);
+	      	throw new RuntimeException(e);
 		}
 	}
 
@@ -233,9 +233,9 @@ public abstract class ParallelReplanner<T extends WithinDayReplannerFactory<? ex
 		try {
 			this.timeStepStartBarrier.await();
 		} catch (InterruptedException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		} catch (BrokenBarrierException e) {
-			Gbl.errorMsg(e);
+			throw new RuntimeException(e);
 		}
 	}
 	

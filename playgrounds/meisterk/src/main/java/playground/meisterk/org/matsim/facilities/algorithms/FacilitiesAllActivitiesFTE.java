@@ -156,7 +156,7 @@ public class FacilitiesAllActivitiesFTE {
 				attributeIds_it = this.myCensus.getHectareAttributeIdentifiersBySector(sector).iterator();
 
 				if (numSectorFTE == Integer.MAX_VALUE) {
-					Gbl.errorMsg("numFTE was not correctly set.");
+					throw new RuntimeException("numFTE was not correctly set.");
 				}
 
 				// create temporary facilities with minimum number of FTEs
@@ -176,7 +176,7 @@ public class FacilitiesAllActivitiesFTE {
 						numSectorFTE -= minFTEs;
 						// the number of distributed FTEs should not exceed the number of available ones
 						if (numSectorFTE < 0) {
-							Gbl.errorMsg("numFTE exceeded.");
+							throw new RuntimeException("numFTE exceeded.");
 						}
 					}
 
@@ -201,7 +201,7 @@ public class FacilitiesAllActivitiesFTE {
 					numSectorFTE -= additionalFTEs;
 					// again, the number of distributed FTEs should not exceed the number of available ones
 					if (numSectorFTE < 0) {
-						Gbl.errorMsg("numSectorFTE exceeded (numSectorFTE = " + Integer.toString(numSectorFTE) + ").");
+						throw new RuntimeException("numSectorFTE exceeded (numSectorFTE = " + Integer.toString(numSectorFTE) + ").");
 					}
 
 				}

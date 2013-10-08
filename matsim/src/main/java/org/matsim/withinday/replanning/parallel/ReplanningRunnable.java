@@ -220,9 +220,9 @@ public abstract class ReplanningRunnable implements Runnable {
 				
 				doReplanning();
 			} catch (InterruptedException e) {
-				Gbl.errorMsg(e);
+				throw new RuntimeException(e);
 			} catch (BrokenBarrierException e) {
-            	Gbl.errorMsg(e);
+            	throw new RuntimeException(e);
             }
 
 		}	// while Simulation Running

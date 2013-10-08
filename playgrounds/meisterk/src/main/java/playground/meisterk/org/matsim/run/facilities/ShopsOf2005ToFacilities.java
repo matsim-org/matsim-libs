@@ -832,7 +832,7 @@ public class ShopsOf2005ToFacilities {
 
 					}
 				} else {
-					Gbl.errorMsg("openNumbers[] and closeNumbers[] have different size. Aborting...");
+					throw new RuntimeException("openNumbers[] and closeNumbers[] have different size. Aborting...");
 				}
 
 				System.out.flush();
