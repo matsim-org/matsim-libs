@@ -23,7 +23,6 @@
 package playground.ikaddoura.internalizationPt;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -57,8 +56,6 @@ import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordImpl;
-import org.matsim.pt.Umlauf;
-import org.matsim.pt.transitSchedule.TransitScheduleFactoryImpl;
 import org.matsim.pt.transitSchedule.api.Departure;
 import org.matsim.pt.transitSchedule.api.TransitLine;
 import org.matsim.pt.transitSchedule.api.TransitRoute;
@@ -69,12 +66,8 @@ import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.testcases.MatsimTestUtils;
 import org.matsim.vehicles.Vehicle;
 import org.matsim.vehicles.VehicleCapacity;
-import org.matsim.vehicles.VehicleCapacityImpl;
-import org.matsim.vehicles.VehicleReaderV1;
 import org.matsim.vehicles.VehicleType;
-import org.matsim.vehicles.VehiclesFactory;
 import org.matsim.vehicles.VehicleType.DoorOperationMode;
-import org.matsim.vehicles.VehicleUtils;
 import org.matsim.vehicles.Vehicles;
 
 public class MarginalCostPricingPtHandlerTest  {
@@ -693,7 +686,6 @@ public class MarginalCostPricingPtHandlerTest  {
 	//agent 2 waits less than the delay of the bus (2.0<6.0 sec) --> consideration of AffectedAgentsUnits
 	//It is important to define a bus in the schedule which leaves later on,
 	//even if agent 2 will nevertheless get the first bus.
-	@Ignore
 	@Test
 	public final void testWaitingDelay03(){
 		
@@ -758,7 +750,7 @@ public class MarginalCostPricingPtHandlerTest  {
 			TransferDelayWaitingEvent wde7 = waitingDelayEvents.get(6);
 			TransferDelayWaitingEvent wde8 = waitingDelayEvents.get(7);
 			
-			Assert.assertEquals("affected Agents", 0.3333333333333333, wde1.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("affected Agents", 0.5, wde1.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
 			Assert.assertEquals("causing Agent", testAgent1.toString(), wde1.getCausingAgent().toString());
 			Assert.assertEquals("delay", 1.0, wde1.getDelay(), MatsimTestUtils.EPSILON);
 			
@@ -766,7 +758,7 @@ public class MarginalCostPricingPtHandlerTest  {
 			Assert.assertEquals("causing Agent", testAgent2.toString(), wde2.getCausingAgent().toString());
 			Assert.assertEquals("delay", 1.0, wde2.getDelay(), MatsimTestUtils.EPSILON);
 			
-			Assert.assertEquals("affected Agents", 0.3333333333333333, wde3.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("affected Agents", 0.5, wde3.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
 			Assert.assertEquals("causing Agent", testAgent1.toString(), wde3.getCausingAgent().toString());
 			Assert.assertEquals("delay", 0.75, wde3.getDelay(), MatsimTestUtils.EPSILON);
 			
@@ -774,11 +766,11 @@ public class MarginalCostPricingPtHandlerTest  {
 			Assert.assertEquals("causing Agent", testAgent2.toString(), wde4.getCausingAgent().toString());
 			Assert.assertEquals("delay", 0.75, wde4.getDelay(), MatsimTestUtils.EPSILON);
 			
-			Assert.assertEquals("affected Agents", 0.3333333333333333, wde5.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("affected Agents", 0.5, wde5.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
 			Assert.assertEquals("causing Agent", testAgent1.toString(), wde5.getCausingAgent().toString());
 			Assert.assertEquals("delay", 2.0, wde5.getDelay(), MatsimTestUtils.EPSILON);
 			
-			Assert.assertEquals("affected Agents", 0.3333333333333333, wde6.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("affected Agents", 0.5, wde6.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
 			Assert.assertEquals("causing Agent", testAgent1.toString(), wde6.getCausingAgent().toString());
 			Assert.assertEquals("delay", 2.0, wde6.getDelay(), MatsimTestUtils.EPSILON);
 			
@@ -866,7 +858,7 @@ public class MarginalCostPricingPtHandlerTest  {
 			TransferDelayWaitingEvent wde7 = waitingDelayEvents.get(6);
 			TransferDelayWaitingEvent wde8 = waitingDelayEvents.get(7);
 				
-			Assert.assertEquals("affected Agents", 0.25806451612903225, wde1.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("affected Agents", 0.42105263157894735, wde1.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
 			Assert.assertEquals("causing Agent", testAgent1.toString(), wde1.getCausingAgent().toString());
 			Assert.assertEquals("delay", 1.0, wde1.getDelay(), MatsimTestUtils.EPSILON);
 				
@@ -874,7 +866,7 @@ public class MarginalCostPricingPtHandlerTest  {
 			Assert.assertEquals("causing Agent", testAgent2.toString(), wde2.getCausingAgent().toString());
 			Assert.assertEquals("delay", 1.0, wde2.getDelay(), MatsimTestUtils.EPSILON);
 				
-			Assert.assertEquals("affected Agents", 0.25806451612903225, wde3.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("affected Agents", 0.42105263157894735, wde3.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
 			Assert.assertEquals("causing Agent", testAgent1.toString(), wde3.getCausingAgent().toString());
 			Assert.assertEquals("delay", 0.75, wde3.getDelay(), MatsimTestUtils.EPSILON);
 				
@@ -882,7 +874,7 @@ public class MarginalCostPricingPtHandlerTest  {
 			Assert.assertEquals("causing Agent", testAgent2.toString(), wde4.getCausingAgent().toString());
 			Assert.assertEquals("delay", 0.75, wde4.getDelay(), MatsimTestUtils.EPSILON);
 				
-			Assert.assertEquals("affected Agents", 0.25806451612903225, wde5.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
+			Assert.assertEquals("affected Agents", 0.42105263157894735, wde5.getAffectedAgentUnits(), MatsimTestUtils.EPSILON);
 			Assert.assertEquals("causing Agent", testAgent1.toString(), wde5.getCausingAgent().toString());
 			Assert.assertEquals("delay", 2.0, wde5.getDelay(), MatsimTestUtils.EPSILON);
 				
@@ -1881,12 +1873,12 @@ public class MarginalCostPricingPtHandlerTest  {
 		PopulationFactoryImpl popFactory = new PopulationFactoryImpl(scenario);
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
-		Coord coord1 = new CoordImpl (499.0 , 0.0);
-		Coord coord2 = new CoordImpl (999.0 , 0.0);
-		Coord coord3 = new CoordImpl (1499.0 , 0.0);
-		Coord coord4 = new CoordImpl (1999.0 , 0.0);
-		Coord coord5 = new CoordImpl (2499.0 , 0.0);
-		Coord coord6 = new CoordImpl (2999.0 , 0.0);
+		Coord coord1 = new CoordImpl (500.0 , 0.0);
+		Coord coord2 = new CoordImpl (1000.0 , 0.0);
+		Coord coord3 = new CoordImpl (1500.0 , 0.0);
+		Coord coord4 = new CoordImpl (2000.0 , 0.0);
+		Coord coord5 = new CoordImpl (2500.0 , 0.0);
+		Coord coord6 = new CoordImpl (3000.0 , 0.0);
 		
 		Activity lastActLink2 = popFactory.createActivityFromCoord("w", coord2);
 		Activity lastActLink3 = popFactory.createActivityFromCoord("w", coord3);
@@ -2011,7 +2003,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan1.addActivity(act1);
 //		Leg leg1 = popFactory.createLeg("pt");
 		plan1.addLeg(leg_1_6);
-//		lastActLinky.getCoord().setXY(2999.0, 0.0);
+//		lastActLinky.getCoord().setXY(3000.0, 0.0);
 		lastActLink6.setType("w");
 		plan1.addActivity(lastActLink6);
 		person1.addPlan(plan1);
@@ -2023,7 +2015,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan2.addActivity(act2);
 //		Leg leg1 = popFactory.createLeg("pt");
 		plan2.addLeg(leg_2_3);
-//		lastActLinky.getCoord().setXY(1499.0, 0.0);
+//		lastActLinky.getCoord().setXY(1500.0, 0.0);
 		lastActLink3.setType("w");
 		plan2.addActivity(lastActLink3);
 		person2.addPlan(plan2);
@@ -2140,7 +2132,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		type.setEgressTime(0.75);
 		type.setDoorOperationMode(DoorOperationMode.serial);
 		
-		type.setMaximumVelocity(8.33);
+		type.setMaximumVelocity(8.4);
 		type.setPcuEquivalents(7.5);
 		
 		veh.getVehicleTypes().put(vehTypeId1, type); 
@@ -2155,12 +2147,12 @@ public class MarginalCostPricingPtHandlerTest  {
 		PopulationFactoryImpl popFactory = new PopulationFactoryImpl(scenario);
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
-		Coord coord1 = new CoordImpl (499.0 , 0.0);
-		Coord coord2 = new CoordImpl (999.0 , 0.0);
-		Coord coord3 = new CoordImpl (1499.0 , 0.0);
-		Coord coord4 = new CoordImpl (1999.0 , 0.0);
-		Coord coord5 = new CoordImpl (2499.0 , 0.0);
-		Coord coord6 = new CoordImpl (2999.0 , 0.0);
+		Coord coord1 = new CoordImpl (500.0 , 0.0);
+		Coord coord2 = new CoordImpl (1000.0 , 0.0);
+		Coord coord3 = new CoordImpl (1500.0 , 0.0);
+		Coord coord4 = new CoordImpl (2000.0 , 0.0);
+		Coord coord5 = new CoordImpl (2500.0 , 0.0);
+		Coord coord6 = new CoordImpl (3000.0 , 0.0);
 		
 		Activity lastActLink2 = popFactory.createActivityFromCoord("w", coord2);
 		Activity lastActLink3 = popFactory.createActivityFromCoord("w", coord3);
@@ -2197,7 +2189,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan1.addActivity(act1);
 //		Leg leg1 = popFactory.createLeg("pt");
 		plan1.addLeg(leg_1_6);
-//		lastActLink6.getCoord().setXY(2999.0, 0.0);
+//		lastActLink6.getCoord().setXY(3000.0, 0.0);
 		lastActLink6.setType("w");
 		plan1.addActivity(lastActLink6);
 		person1.addPlan(plan1);
@@ -2209,7 +2201,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan2.addActivity(act2);
 //		Leg leg2 = popFactory.createLeg("pt");
 		plan2.addLeg(leg_2_3);
-//		lastActLink3.getCoord().setXY(1499.0, 0.0);
+//		lastActLink3.getCoord().setXY(1500.0, 0.0);
 		lastActLink3.setType("w");
 		plan2.addActivity(lastActLink3);
 		person2.addPlan(plan2);
@@ -2221,7 +2213,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan3.addActivity(act3);
 //		Leg leg3 = popFactory.createLeg("pt");
 		plan3.addLeg(leg_3_4);
-//		lastActLink4.getCoord().setXY(1999.0, 0.0);
+//		lastActLink4.getCoord().setXY(2000.0, 0.0);
 		lastActLink4.setType("w");
 		plan3.addActivity(lastActLink4);
 		person3.addPlan(plan3);
@@ -2340,7 +2332,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		type.setEgressTime(0.75);
 		type.setDoorOperationMode(DoorOperationMode.serial);
 		
-		type.setMaximumVelocity(8.33);
+		type.setMaximumVelocity(8.4);
 		type.setPcuEquivalents(7.5);
 		
 		veh.getVehicleTypes().put(vehTypeId1, type); 
@@ -2356,12 +2348,12 @@ public class MarginalCostPricingPtHandlerTest  {
 		PopulationFactoryImpl popFactory = new PopulationFactoryImpl(scenario);
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
-		Coord coord1 = new CoordImpl (499.0 , 0.0);
-		Coord coord2 = new CoordImpl (999.0 , 0.0);
-		Coord coord3 = new CoordImpl (1499.0 , 0.0);
-		Coord coord4 = new CoordImpl (1999.0 , 0.0);
-		Coord coord5 = new CoordImpl (2499.0 , 0.0);
-		Coord coord6 = new CoordImpl (2999.0 , 0.0);
+		Coord coord1 = new CoordImpl (500.0 , 0.0);
+		Coord coord2 = new CoordImpl (1000.0 , 0.0);
+		Coord coord3 = new CoordImpl (1500.0 , 0.0);
+		Coord coord4 = new CoordImpl (2000.0 , 0.0);
+		Coord coord5 = new CoordImpl (2500.0 , 0.0);
+		Coord coord6 = new CoordImpl (3000.0 , 0.0);
 		
 		Activity lastActLink2 = popFactory.createActivityFromCoord("w", coord2);
 		Activity lastActLink3 = popFactory.createActivityFromCoord("w", coord3);
@@ -2486,7 +2478,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan1.addActivity(act1);
 //		Leg leg1 = popFactory.createLeg("pt");
 		plan1.addLeg(leg_1_3);
-//		lastActLink3.getCoord().setXY(1499.0, 0.0);
+//		lastActLink3.getCoord().setXY(1500.0, 0.0);
 		lastActLink3.setType("w");
 		plan1.addActivity(lastActLink3);
 		person1.addPlan(plan1);
@@ -2498,7 +2490,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan2.addActivity(act2);
 //		Leg leg2 = popFactory.createLeg("pt");
 		plan2.addLeg(leg_1_3);
-//		lastActLink3.getCoord().setXY(1499.0, 0.0);
+//		lastActLink3.getCoord().setXY(1500.0, 0.0);
 		lastActLink3.setType("w");
 		plan2.addActivity(lastActLink3);
 		person2.addPlan(plan2);
@@ -2510,7 +2502,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan3.addActivity(act3);
 //		Leg leg3 = popFactory.createLeg("pt");
 		plan3.addLeg(leg_2_6);
-//		lastActLink6.getCoord().setXY(2999.0, 0.0);
+//		lastActLink6.getCoord().setXY(3000.0, 0.0);
 		lastActLink6.setType("w");
 		plan3.addActivity(lastActLink6);
 		person3.addPlan(plan3);
@@ -2522,7 +2514,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan4.addActivity(act4);
 //		Leg leg4 = popFactory.createLeg("pt");
 		plan4.addLeg(leg_4_5);
-//		lastActLink5.getCoord().setXY(2499.0, 0.0);
+//		lastActLink5.getCoord().setXY(2500.0, 0.0);
 		lastActLink5.setType("w");
 		plan4.addActivity(lastActLink5);
 		person4.addPlan(plan4);
@@ -2534,7 +2526,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan5.addActivity(act5);
 //		Leg leg5 = popFactory.createLeg("pt");
 		plan5.addLeg(leg_4_6);
-//		lastActLink6.getCoord().setXY(2999.0, 0.0);
+//		lastActLink6.getCoord().setXY(3000.0, 0.0);
 		lastActLink6.setType("w");
 		plan5.addActivity(lastActLink6);
 		person5.addPlan(plan5);
@@ -2655,7 +2647,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		type.setEgressTime(0.75);
 		type.setDoorOperationMode(DoorOperationMode.serial);
 		
-		type.setMaximumVelocity(8.33);
+		type.setMaximumVelocity(8.4);
 		type.setPcuEquivalents(7.5);
 		
 		veh.getVehicleTypes().put(vehTypeId1, type); 
@@ -2670,12 +2662,12 @@ public class MarginalCostPricingPtHandlerTest  {
 		PopulationFactoryImpl popFactory = new PopulationFactoryImpl(scenario);
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
-		Coord coord1 = new CoordImpl (499.0 , 0.0);
-		Coord coord2 = new CoordImpl (999.0 , 0.0);
-		Coord coord3 = new CoordImpl (1499.0 , 0.0);
-		Coord coord4 = new CoordImpl (1999.0 , 0.0);
-		Coord coord5 = new CoordImpl (2499.0 , 0.0);
-		Coord coord6 = new CoordImpl (2999.0 , 0.0);
+		Coord coord1 = new CoordImpl (500.0 , 0.0);
+		Coord coord2 = new CoordImpl (1000.0 , 0.0);
+		Coord coord3 = new CoordImpl (1500.0 , 0.0);
+		Coord coord4 = new CoordImpl (2000.0 , 0.0);
+		Coord coord5 = new CoordImpl (2500.0 , 0.0);
+		Coord coord6 = new CoordImpl (3000.0 , 0.0);
 		
 		Activity lastActLink2 = popFactory.createActivityFromCoord("w", coord2);
 		Activity lastActLink3 = popFactory.createActivityFromCoord("w", coord3);
@@ -2800,7 +2792,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan1.addActivity(act1);
 	//	Leg leg1 = popFactory.createLeg("pt");
 		plan1.addLeg(leg_2_6);
-	//	lastActLink6.getCoord().setXY(2999.0, 0.0);
+	//	lastActLink6.getCoord().setXY(3000.0, 0.0);
 		lastActLink6.setType("w");
 		plan1.addActivity(lastActLink6);
 		person1.addPlan(plan1);
@@ -2812,7 +2804,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan2.addActivity(act2);
 	//	Leg leg2 = popFactory.createLeg("pt");
 		plan2.addLeg(leg_3_4);
-	//	lastActLink4.getCoord().setXY(1999.0, 0.0);
+	//	lastActLink4.getCoord().setXY(2000.0, 0.0);
 		lastActLink4.setType("w");
 		plan2.addActivity(lastActLink4);
 		person2.addPlan(plan2);
@@ -2930,7 +2922,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		type.setEgressTime(0.75);
 		type.setDoorOperationMode(DoorOperationMode.serial);
 		
-		type.setMaximumVelocity(8.33);
+		type.setMaximumVelocity(8.4);
 		type.setPcuEquivalents(7.5);
 		
 		veh.getVehicleTypes().put(vehTypeId1, type); 
@@ -2945,12 +2937,12 @@ public class MarginalCostPricingPtHandlerTest  {
 		PopulationFactoryImpl popFactory = new PopulationFactoryImpl(scenario);
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
-		Coord coord1 = new CoordImpl (499.0 , 0.0);
-		Coord coord2 = new CoordImpl (999.0 , 0.0);
-		Coord coord3 = new CoordImpl (1499.0 , 0.0);
-		Coord coord4 = new CoordImpl (1999.0 , 0.0);
-		Coord coord5 = new CoordImpl (2499.0 , 0.0);
-		Coord coord6 = new CoordImpl (2999.0 , 0.0);
+		Coord coord1 = new CoordImpl (500.0 , 0.0);
+		Coord coord2 = new CoordImpl (1000.0 , 0.0);
+		Coord coord3 = new CoordImpl (1500.0 , 0.0);
+		Coord coord4 = new CoordImpl (2000.0 , 0.0);
+		Coord coord5 = new CoordImpl (2500.0 , 0.0);
+		Coord coord6 = new CoordImpl (3000.0 , 0.0);
 		
 		Activity lastActLink2 = popFactory.createActivityFromCoord("w", coord2);
 		Activity lastActLink3 = popFactory.createActivityFromCoord("w", coord3);
@@ -3075,7 +3067,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan1.addActivity(act1);
 	//	Leg leg1 = popFactory.createLeg("pt");
 		plan1.addLeg(leg_2_4);
-	//	lastActLink4.getCoord().setXY(1999.0, 0.0);
+	//	lastActLink4.getCoord().setXY(2000.0, 0.0);
 		lastActLink4.setType("w");
 		plan1.addActivity(lastActLink4);
 		person1.addPlan(plan1);
@@ -3087,7 +3079,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan2.addActivity(act2);
 	//	Leg leg2 = popFactory.createLeg("pt");
 		plan2.addLeg(leg_3_5);
-	//	lastActLink5.getCoord().setXY(2499.0, 0.0);
+	//	lastActLink5.getCoord().setXY(2500.0, 0.0);
 		lastActLink5.setType("w");
 		plan2.addActivity(lastActLink5);
 		person2.addPlan(plan2);
@@ -3205,7 +3197,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		type.setEgressTime(0.75);
 		type.setDoorOperationMode(DoorOperationMode.serial);
 		
-		type.setMaximumVelocity(8.33);
+		type.setMaximumVelocity(8.4);
 		type.setPcuEquivalents(7.5);
 		
 		veh.getVehicleTypes().put(vehTypeId1, type); 
@@ -3220,12 +3212,12 @@ public class MarginalCostPricingPtHandlerTest  {
 		PopulationFactoryImpl popFactory = new PopulationFactoryImpl(scenario);
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
-		Coord coord1 = new CoordImpl (499.0 , 0.0);
-		Coord coord2 = new CoordImpl (999.0 , 0.0);
-		Coord coord3 = new CoordImpl (1499.0 , 0.0);
-		Coord coord4 = new CoordImpl (1999.0 , 0.0);
-		Coord coord5 = new CoordImpl (2499.0 , 0.0);
-		Coord coord6 = new CoordImpl (2999.0 , 0.0);
+		Coord coord1 = new CoordImpl (500.0 , 0.0);
+		Coord coord2 = new CoordImpl (1000.0 , 0.0);
+		Coord coord3 = new CoordImpl (1500.0 , 0.0);
+		Coord coord4 = new CoordImpl (2000.0 , 0.0);
+		Coord coord5 = new CoordImpl (2500.0 , 0.0);
+		Coord coord6 = new CoordImpl (3000.0 , 0.0);
 		
 		Activity lastActLink2 = popFactory.createActivityFromCoord("w", coord2);
 		Activity lastActLink3 = popFactory.createActivityFromCoord("w", coord3);
@@ -3350,7 +3342,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan1.addActivity(act1);
 	//	Leg leg1 = popFactory.createLeg("pt");
 		plan1.addLeg(leg_2_3);
-	//	lastActLink3.getCoord().setXY(1499.0, 0.0);
+	//	lastActLink3.getCoord().setXY(1500.0, 0.0);
 		lastActLink3.setType("w");
 		plan1.addActivity(lastActLink3);
 		person1.addPlan(plan1);
@@ -3362,7 +3354,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan2.addActivity(act2);
 	//	Leg leg2 = popFactory.createLeg("pt");
 		plan2.addLeg(leg_4_6);
-	//	lastActLink6.getCoord().setXY(2999.0, 0.0);
+	//	lastActLink6.getCoord().setXY(3000.0, 0.0);
 		lastActLink6.setType("w");
 		plan2.addActivity(lastActLink6);
 		person2.addPlan(plan2);
@@ -3488,7 +3480,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		type.setEgressTime(0.75);
 		type.setDoorOperationMode(DoorOperationMode.serial);
 		
-		type.setMaximumVelocity(8.33);
+		type.setMaximumVelocity(8.4);
 		type.setPcuEquivalents(7.5);
 		
 		veh.getVehicleTypes().put(vehTypeId1, type); 
@@ -3506,12 +3498,12 @@ public class MarginalCostPricingPtHandlerTest  {
 		PopulationFactoryImpl popFactory = new PopulationFactoryImpl(scenario);
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
-		Coord coord1 = new CoordImpl (499.0 , 0.0);
-		Coord coord2 = new CoordImpl (999.0 , 0.0);
-		Coord coord3 = new CoordImpl (1499.0 , 0.0);
-		Coord coord4 = new CoordImpl (1999.0 , 0.0);
-		Coord coord5 = new CoordImpl (2499.0 , 0.0);
-		Coord coord6 = new CoordImpl (2999.0 , 0.0);
+		Coord coord1 = new CoordImpl (500.0 , 0.0);
+		Coord coord2 = new CoordImpl (1000.0 , 0.0);
+		Coord coord3 = new CoordImpl (1500.0 , 0.0);
+		Coord coord4 = new CoordImpl (2000.0 , 0.0);
+		Coord coord5 = new CoordImpl (2500.0 , 0.0);
+		Coord coord6 = new CoordImpl (3000.0 , 0.0);
 		
 		Activity lastActLink2 = popFactory.createActivityFromCoord("w", coord2);
 		Activity lastActLink3 = popFactory.createActivityFromCoord("w", coord3);
@@ -3636,7 +3628,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan1.addActivity(act1);
 	//	Leg leg1 = popFactory.createLeg("pt");
 		plan1.addLeg(leg_2_4);
-	//	lastActLink4.getCoord().setXY(1999.0, 0.0);
+	//	lastActLink4.getCoord().setXY(2000.0, 0.0);
 		lastActLink4.setType("w");
 		plan1.addActivity(lastActLink4);
 		person1.addPlan(plan1);
@@ -3648,7 +3640,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan2.addActivity(act2);
 	//	Leg leg2 = popFactory.createLeg("pt");
 		plan2.addLeg(leg_4_6);
-	//	lastActLink6.getCoord().setXY(2999.0, 0.0);
+	//	lastActLink6.getCoord().setXY(3000.0, 0.0);
 		lastActLink6.setType("w");
 		plan2.addActivity(lastActLink6);
 		person2.addPlan(plan2);
@@ -3774,7 +3766,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		type.setEgressTime(0.75);
 		type.setDoorOperationMode(DoorOperationMode.serial);
 		
-		type.setMaximumVelocity(8.33);
+		type.setMaximumVelocity(8.4);
 		type.setPcuEquivalents(7.5);
 		
 		veh.getVehicleTypes().put(vehTypeId1, type); 
@@ -3792,12 +3784,12 @@ public class MarginalCostPricingPtHandlerTest  {
 		PopulationFactoryImpl popFactory = new PopulationFactoryImpl(scenario);
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
-		Coord coord1 = new CoordImpl (499.0 , 0.0);
-		Coord coord2 = new CoordImpl (999.0 , 0.0);
-		Coord coord3 = new CoordImpl (1499.0 , 0.0);
-		Coord coord4 = new CoordImpl (1999.0 , 0.0);
-		Coord coord5 = new CoordImpl (2499.0 , 0.0);
-		Coord coord6 = new CoordImpl (2999.0 , 0.0);
+		Coord coord1 = new CoordImpl (500.0 , 0.0);
+		Coord coord2 = new CoordImpl (1000.0 , 0.0);
+		Coord coord3 = new CoordImpl (1500.0 , 0.0);
+		Coord coord4 = new CoordImpl (2000.0 , 0.0);
+		Coord coord5 = new CoordImpl (2500.0 , 0.0);
+		Coord coord6 = new CoordImpl (3000.0 , 0.0);
 		
 		Activity lastActLink2 = popFactory.createActivityFromCoord("w", coord2);
 		Activity lastActLink3 = popFactory.createActivityFromCoord("w", coord3);
@@ -3922,7 +3914,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan1.addActivity(act1);
 	//	Leg leg1 = popFactory.createLeg("pt");
 		plan1.addLeg(leg_2_3);
-	//	lastActLink3.getCoord().setXY(1499.0, 0.0);
+	//	lastActLink3.getCoord().setXY(1500.0, 0.0);
 		lastActLink3.setType("w");
 		plan1.addActivity(lastActLink3);
 		person1.addPlan(plan1);
@@ -3934,7 +3926,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan2.addActivity(act2);
 	//	Leg leg2 = popFactory.createLeg("pt");
 		plan2.addLeg(leg_2_3);
-	//	lastActLink3.getCoord().setXY(1499.0, 0.0);
+	//	lastActLink3.getCoord().setXY(1500.0, 0.0);
 		lastActLink3.setType("w");
 		plan2.addActivity(lastActLink3);
 		person2.addPlan(plan2);
@@ -3946,7 +3938,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan3.addActivity(act3);
 	//	Leg leg3 = popFactory.createLeg("pt");
 		plan3.addLeg(leg_4_5);
-	//	lastActLink5.getCoord().setXY(2499.0, 0.0);
+	//	lastActLink5.getCoord().setXY(2500.0, 0.0);
 		lastActLink5.setType("w");
 		plan3.addActivity(lastActLink5);
 		person3.addPlan(plan3);
@@ -4065,7 +4057,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		type.setEgressTime(0.75);
 		type.setDoorOperationMode(DoorOperationMode.serial);
 		
-		type.setMaximumVelocity(8.33);
+		type.setMaximumVelocity(8.4);
 		type.setPcuEquivalents(7.5);
 		
 		veh.getVehicleTypes().put(vehTypeId1, type); 
@@ -4210,7 +4202,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan1.addActivity(act1);
 	//	Leg leg1 = popFactory.createLeg("pt");
 		plan1.addLeg(leg_2_3);
-	//	lastActLink3.getCoord().setXY(1499.0, 0.0);
+	//	lastActLink3.getCoord().setXY(1500.0, 0.0);
 		lastActLink3.setType("w");
 		plan1.addActivity(lastActLink3);
 		person1.addPlan(plan1);
@@ -4222,7 +4214,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan2.addActivity(act2);
 	//	Leg leg2 = popFactory.createLeg("pt");
 		plan2.addLeg(leg_4_5);
-	//	lastActLink5.getCoord().setXY(2499.0, 0.0);
+	//	lastActLink5.getCoord().setXY(2500.0, 0.0);
 		lastActLink5.setType("w");
 		plan2.addActivity(lastActLink5);
 		person2.addPlan(plan2);
@@ -4234,7 +4226,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan3.addActivity(act3);
 	//	Leg leg3 = popFactory.createLeg("pt");
 		plan3.addLeg(leg_4_5);
-	//	lastActLink5.getCoord().setXY(2499.0, 0.0);
+	//	lastActLink5.getCoord().setXY(2500.0, 0.0);
 		lastActLink5.setType("w");
 		plan3.addActivity(lastActLink5);
 		person3.addPlan(plan3);
@@ -4353,7 +4345,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		type.setEgressTime(0.75);
 		type.setDoorOperationMode(DoorOperationMode.serial);
 		
-		type.setMaximumVelocity(8.33);
+		type.setMaximumVelocity(8.4);
 		type.setPcuEquivalents(7.5);
 		
 		veh.getVehicleTypes().put(vehTypeId1, type); 
@@ -4372,18 +4364,18 @@ public class MarginalCostPricingPtHandlerTest  {
 		//for simulating the outward journey and return journey
 		//and the operation over several trips of a car
 		
-		Coord coord1 = new CoordImpl (499.0 , 0.0);
-		Coord coord2 = new CoordImpl (999.0 , 0.0);
-		Coord coord3 = new CoordImpl (1499.0 , 0.0);
-		Coord coord4 = new CoordImpl (1999.0 , 0.0);
-		Coord coord5 = new CoordImpl (2499.0 , 0.0);
-		Coord coord6 = new CoordImpl (2999.0 , 0.0);
-		Coord coord1back = new CoordImpl (501.0 , 0.0);
-		Coord coord2back = new CoordImpl (1001.0 , 0.0);
-		Coord coord3back = new CoordImpl (1501.0 , 0.0);
-		Coord coord4back = new CoordImpl (2001.0 , 0.0);
-		Coord coord5back = new CoordImpl (2501.0 , 0.0);
-		Coord coord6back = new CoordImpl (3001.0 , 0.0);
+		Coord coord1 = new CoordImpl (500.0 , 0.0);
+		Coord coord2 = new CoordImpl (1000.0 , 0.0);
+		Coord coord3 = new CoordImpl (1500.0 , 0.0);
+		Coord coord4 = new CoordImpl (2000.0 , 0.0);
+		Coord coord5 = new CoordImpl (2500.0 , 0.0);
+		Coord coord6 = new CoordImpl (3000.0 , 0.0);
+		Coord coord1back = new CoordImpl (500.0 , 0.0);
+		Coord coord2back = new CoordImpl (1000.0 , 0.0);
+		Coord coord3back = new CoordImpl (1500.0 , 0.0);
+		Coord coord4back = new CoordImpl (2000.0 , 0.0);
+		Coord coord5back = new CoordImpl (2500.0 , 0.0);
+		Coord coord6back = new CoordImpl (3000.0 , 0.0);
 		
 		Activity lastActLink2 = popFactory.createActivityFromCoord("w", coord2);
 		Activity lastActLink3 = popFactory.createActivityFromCoord("w", coord3);
@@ -4521,7 +4513,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan1.addActivity(act1);
 	//	Leg leg1 = popFactory.createLeg("pt");
 		plan1.addLeg(leg_2_5);
-	//	lastActLink5.getCoord().setXY(2499.0, 0.0);
+	//	lastActLink5.getCoord().setXY(2500.0, 0.0);
 		lastActLink5.setType("w");
 		plan1.addActivity(lastActLink5);
 		person1.addPlan(plan1);
@@ -4533,7 +4525,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan2.addActivity(act2);
 	//	Leg leg2 = popFactory.createLeg("pt");
 		plan2.addLeg(leg_5_2);
-	//	lastActLink2back.getCoord().setXY(1001.0, 0.0);
+	//	lastActLink2back.getCoord().setXY(1000.0, 0.0);
 		lastActLink2back.setType("w");
 		plan2.addActivity(lastActLink2back);
 		person2.addPlan(plan2);
@@ -4545,7 +4537,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan3.addActivity(act3);
 	//	Leg leg3 = popFactory.createLeg("pt");
 		plan3.addLeg(leg_2_5);
-	//	lastActLink5.getCoord().setXY(2499.0, 0.0);
+	//	lastActLink5.getCoord().setXY(2500.0, 0.0);
 		lastActLink5.setType("w");
 		plan3.addActivity(lastActLink5);
 		person3.addPlan(plan3);
@@ -4755,7 +4747,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		type.setEgressTime(0.75);
 		type.setDoorOperationMode(DoorOperationMode.serial);
 		
-		type.setMaximumVelocity(8.33);
+		type.setMaximumVelocity(8.4);
 		type.setPcuEquivalents(7.5);
 		
 		veh.getVehicleTypes().put(vehTypeId1, type); 
@@ -4776,12 +4768,12 @@ public class MarginalCostPricingPtHandlerTest  {
 		PopulationFactoryImpl popFactory = new PopulationFactoryImpl(scenario);
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
-		Coord coord1 = new CoordImpl (499.0 , 0.0);
-		Coord coord2 = new CoordImpl (999.0 , 0.0);
-		Coord coord3 = new CoordImpl (1499.0 , 0.0);
-		Coord coord4 = new CoordImpl (1999.0 , 0.0);
-		Coord coord5 = new CoordImpl (2499.0 , 0.0);
-		Coord coord6 = new CoordImpl (2999.0 , 0.0);
+		Coord coord1 = new CoordImpl (500.0 , 0.0);
+		Coord coord2 = new CoordImpl (1000.0 , 0.0);
+		Coord coord3 = new CoordImpl (1500.0 , 0.0);
+		Coord coord4 = new CoordImpl (2000.0 , 0.0);
+		Coord coord5 = new CoordImpl (2500.0 , 0.0);
+		Coord coord6 = new CoordImpl (3000.0 , 0.0);
 		
 		Activity lastActLink2 = popFactory.createActivityFromCoord("w", coord2);
 		Activity lastActLink3 = popFactory.createActivityFromCoord("w", coord3);
@@ -4906,7 +4898,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan1.addActivity(act1);
 	//	Leg leg1 = popFactory.createLeg("pt");
 		plan1.addLeg(leg_1_6);
-	//	lastActLink6.getCoord().setXY(2999.0, 0.0);
+	//	lastActLink6.getCoord().setXY(3000.0, 0.0);
 		lastActLink6.setType("w");
 		plan1.addActivity(lastActLink6);
 		person1.addPlan(plan1);
@@ -4918,7 +4910,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan2.addActivity(act2);
 	//	Leg leg2 = popFactory.createLeg("pt");
 		plan2.addLeg(leg_1_6);
-	//	lastActLink6.getCoord().setXY(2999.0, 0.0);
+	//	lastActLink6.getCoord().setXY(3000.0, 0.0);
 		lastActLink6.setType("w");
 		plan2.addActivity(lastActLink6);
 		person2.addPlan(plan2);
@@ -4930,7 +4922,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan3.addActivity(act3);
 	//	Leg leg3 = popFactory.createLeg("pt");
 		plan3.addLeg(leg_2_6);
-	//	lastActLink6.getCoord().setXY(2999.0, 0.0);
+	//	lastActLink6.getCoord().setXY(3000.0, 0.0);
 		lastActLink6.setType("w");
 		plan3.addActivity(lastActLink6);
 		person3.addPlan(plan3);
@@ -5065,7 +5057,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		type.setEgressTime(0.75);
 		type.setDoorOperationMode(DoorOperationMode.serial);
 		
-		type.setMaximumVelocity(8.33);
+		type.setMaximumVelocity(8.4);
 		type.setPcuEquivalents(7.5);
 		
 		veh.getVehicleTypes().put(vehTypeId1, type); 
@@ -5086,12 +5078,12 @@ public class MarginalCostPricingPtHandlerTest  {
 		PopulationFactoryImpl popFactory = new PopulationFactoryImpl(scenario);
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
-		Coord coord1 = new CoordImpl (499.0 , 0.0);
-		Coord coord2 = new CoordImpl (999.0 , 0.0);
-		Coord coord3 = new CoordImpl (1499.0 , 0.0);
-		Coord coord4 = new CoordImpl (1999.0 , 0.0);
-		Coord coord5 = new CoordImpl (2499.0 , 0.0);
-		Coord coord6 = new CoordImpl (2999.0 , 0.0);
+		Coord coord1 = new CoordImpl (500.0 , 0.0);
+		Coord coord2 = new CoordImpl (1000.0 , 0.0);
+		Coord coord3 = new CoordImpl (1500.0 , 0.0);
+		Coord coord4 = new CoordImpl (2000.0 , 0.0);
+		Coord coord5 = new CoordImpl (2500.0 , 0.0);
+		Coord coord6 = new CoordImpl (3000.0 , 0.0);
 		
 		Activity lastActLink2 = popFactory.createActivityFromCoord("w", coord2);
 		Activity lastActLink3 = popFactory.createActivityFromCoord("w", coord3);
@@ -5216,7 +5208,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan1.addActivity(act1);
 	//	Leg leg1 = popFactory.createLeg("pt");
 		plan1.addLeg(leg_1_6);
-	//	lastActLink6.getCoord().setXY(2999.0, 0.0);
+	//	lastActLink6.getCoord().setXY(3000.0, 0.0);
 		lastActLink6.setType("w");
 		plan1.addActivity(lastActLink6);
 		person1.addPlan(plan1);
@@ -5228,7 +5220,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan2.addActivity(act2);
 	//	Leg leg2 = popFactory.createLeg("pt");
 		plan2.addLeg(leg_2_6);
-	//	lastActLink6.getCoord().setXY(2999.0, 0.0);
+	//	lastActLink6.getCoord().setXY(3000.0, 0.0);
 		lastActLink6.setType("w");
 		plan2.addActivity(lastActLink6);
 		person2.addPlan(plan2);
@@ -5240,7 +5232,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan3.addActivity(act3);
 	//	Leg leg3 = popFactory.createLeg("pt");
 		plan3.addLeg(leg_2_6);
-	//	lastActLink6.getCoord().setXY(2999.0, 0.0);
+	//	lastActLink6.getCoord().setXY(3000.0, 0.0);
 		lastActLink6.setType("w");
 		plan3.addActivity(lastActLink6);
 		person3.addPlan(plan3);
@@ -5375,7 +5367,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		type.setEgressTime(0.75);
 		type.setDoorOperationMode(DoorOperationMode.serial);
 		
-		type.setMaximumVelocity(8.33);
+		type.setMaximumVelocity(8.);
 		type.setPcuEquivalents(7.5);
 		
 		veh.getVehicleTypes().put(vehTypeId1, type); 
@@ -5396,12 +5388,12 @@ public class MarginalCostPricingPtHandlerTest  {
 		PopulationFactoryImpl popFactory = new PopulationFactoryImpl(scenario);
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
-		Coord coord1 = new CoordImpl (499.0 , 0.0);
-		Coord coord2 = new CoordImpl (999.0 , 0.0);
-		Coord coord3 = new CoordImpl (1499.0 , 0.0);
-		Coord coord4 = new CoordImpl (1999.0 , 0.0);
-		Coord coord5 = new CoordImpl (2499.0 , 0.0);
-		Coord coord6 = new CoordImpl (2999.0 , 0.0);
+		Coord coord1 = new CoordImpl (500.0 , 0.0);
+		Coord coord2 = new CoordImpl (1000.0 , 0.0);
+		Coord coord3 = new CoordImpl (1500.0 , 0.0);
+		Coord coord4 = new CoordImpl (2000.0 , 0.0);
+		Coord coord5 = new CoordImpl (2500.0 , 0.0);
+		Coord coord6 = new CoordImpl (3000.0 , 0.0);
 		
 		Activity lastActLink2 = popFactory.createActivityFromCoord("w", coord2);
 		Activity lastActLink3 = popFactory.createActivityFromCoord("w", coord3);
@@ -5526,7 +5518,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan1.addActivity(act1);
 	//	Leg leg1 = popFactory.createLeg("pt");
 		plan1.addLeg(leg_1_6);
-	//	lastActLink6.getCoord().setXY(2999.0, 0.0);
+	//	lastActLink6.getCoord().setXY(3000.0, 0.0);
 		lastActLink6.setType("w");
 		plan1.addActivity(lastActLink6);
 		person1.addPlan(plan1);
@@ -5538,7 +5530,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan2.addActivity(act2);
 	//	Leg leg2 = popFactory.createLeg("pt");
 		plan2.addLeg(leg_1_6);
-	//	lastActLink6.getCoord().setXY(2999.0, 0.0);
+	//	lastActLink6.getCoord().setXY(3000.0, 0.0);
 		lastActLink6.setType("w");
 		plan2.addActivity(lastActLink6);
 		person2.addPlan(plan2);
@@ -5550,7 +5542,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan3.addActivity(act3);
 	//	Leg leg3 = popFactory.createLeg("pt");
 		plan3.addLeg(leg_1_6);
-	//	lastActLink6.getCoord().setXY(2999.0, 0.0);
+	//	lastActLink6.getCoord().setXY(3000.0, 0.0);
 		lastActLink6.setType("w");
 		plan3.addActivity(lastActLink6);
 		person3.addPlan(plan3);
@@ -5562,7 +5554,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan4.addActivity(act4);
 	//	Leg leg4 = popFactory.createLeg("pt");
 		plan4.addLeg(leg_1_6);
-	//	lastActLink6.getCoord().setXY(2999.0, 0.0);
+	//	lastActLink6.getCoord().setXY(3000.0, 0.0);
 		lastActLink6.setType("w");
 		plan4.addActivity(lastActLink6);
 		person4.addPlan(plan4);
@@ -5574,7 +5566,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan5.addActivity(act5);
 	//	Leg leg5 = popFactory.createLeg("pt");
 		plan5.addLeg(leg_2_6);
-	//	lastActLink6.getCoord().setXY(2999.0, 0.0);
+	//	lastActLink6.getCoord().setXY(3000.0, 0.0);
 		lastActLink6.setType("w");
 		plan5.addActivity(lastActLink6);
 		person5.addPlan(plan5);
@@ -5711,7 +5703,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		type.setEgressTime(0.75);
 		type.setDoorOperationMode(DoorOperationMode.serial);
 		
-		type.setMaximumVelocity(8.33);
+		type.setMaximumVelocity(8.4);
 		type.setPcuEquivalents(7.5);
 		
 		veh.getVehicleTypes().put(vehTypeId1, type); 
@@ -5732,12 +5724,12 @@ public class MarginalCostPricingPtHandlerTest  {
 		PopulationFactoryImpl popFactory = new PopulationFactoryImpl(scenario);
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
-		Coord coord1 = new CoordImpl (499.0 , 0.0);
-		Coord coord2 = new CoordImpl (999.0 , 0.0);
-		Coord coord3 = new CoordImpl (1499.0 , 0.0);
-		Coord coord4 = new CoordImpl (1999.0 , 0.0);
-		Coord coord5 = new CoordImpl (2499.0 , 0.0);
-		Coord coord6 = new CoordImpl (2999.0 , 0.0);
+		Coord coord1 = new CoordImpl (500.0 , 0.0);
+		Coord coord2 = new CoordImpl (1000.0 , 0.0);
+		Coord coord3 = new CoordImpl (1500.0 , 0.0);
+		Coord coord4 = new CoordImpl (2000.0 , 0.0);
+		Coord coord5 = new CoordImpl (2500.0 , 0.0);
+		Coord coord6 = new CoordImpl (3000.0 , 0.0);
 		
 		Activity lastActLink2 = popFactory.createActivityFromCoord("w", coord2);
 		Activity lastActLink3 = popFactory.createActivityFromCoord("w", coord3);
@@ -5862,7 +5854,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan1.addActivity(act1);
 	//	Leg leg1 = popFactory.createLeg("pt");
 		plan1.addLeg(leg_1_2);
-	//	lastActLink2.getCoord().setXY(999.0, 0.0);
+	//	lastActLink2.getCoord().setXY(1000.0, 0.0);
 		lastActLink2.setType("w");
 		plan1.addActivity(lastActLink2);
 		person1.addPlan(plan1);
@@ -5874,7 +5866,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan2.addActivity(act2);
 	//	Leg leg2 = popFactory.createLeg("pt");
 		plan2.addLeg(leg_1_2);
-	//	lastActLink2.getCoord().setXY(999.0, 0.0);
+	//	lastActLink2.getCoord().setXY(1000.0, 0.0);
 		lastActLink2.setType("w");
 		plan2.addActivity(lastActLink2);
 		person2.addPlan(plan2);
@@ -5886,7 +5878,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan3.addActivity(act3);
 	//	Leg leg3 = popFactory.createLeg("pt");
 		plan3.addLeg(leg_2_6);
-	//	lastActLink6.getCoord().setXY(2999.0, 0.0);
+	//	lastActLink6.getCoord().setXY(3000.0, 0.0);
 		lastActLink6.setType("w");
 		plan3.addActivity(lastActLink6);
 		person3.addPlan(plan3);
@@ -5898,7 +5890,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan4.addActivity(act4);
 	//	Leg leg4 = popFactory.createLeg("pt");
 		plan4.addLeg(leg_2_6);
-	//	lastActLink6.getCoord().setXY(2999.0, 0.0);
+	//	lastActLink6.getCoord().setXY(3000.0, 0.0);
 		lastActLink6.setType("w");
 		plan4.addActivity(lastActLink6);
 		person4.addPlan(plan4);
@@ -6034,7 +6026,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		type.setEgressTime(0.75);
 		type.setDoorOperationMode(DoorOperationMode.serial);
 		
-		type.setMaximumVelocity(8.33);
+		type.setMaximumVelocity(8.4);
 		type.setPcuEquivalents(7.5);
 		
 		veh.getVehicleTypes().put(vehTypeId1, type); 
@@ -6055,12 +6047,12 @@ public class MarginalCostPricingPtHandlerTest  {
 		PopulationFactoryImpl popFactory = new PopulationFactoryImpl(scenario);
 		LinkNetworkRouteFactory routeFactory = new LinkNetworkRouteFactory();
 		
-		Coord coord1 = new CoordImpl (499.0 , 0.0);
-		Coord coord2 = new CoordImpl (999.0 , 0.0);
-		Coord coord3 = new CoordImpl (1499.0 , 0.0);
-		Coord coord4 = new CoordImpl (1999.0 , 0.0);
-		Coord coord5 = new CoordImpl (2499.0 , 0.0);
-		Coord coord6 = new CoordImpl (2999.0 , 0.0);
+		Coord coord1 = new CoordImpl (500.0 , 0.0);
+		Coord coord2 = new CoordImpl (1000.0 , 0.0);
+		Coord coord3 = new CoordImpl (1500.0 , 0.0);
+		Coord coord4 = new CoordImpl (2000.0 , 0.0);
+		Coord coord5 = new CoordImpl (2500.0 , 0.0);
+		Coord coord6 = new CoordImpl (3000.0 , 0.0);
 		
 		Activity lastActLink2 = popFactory.createActivityFromCoord("w", coord2);
 		Activity lastActLink3 = popFactory.createActivityFromCoord("w", coord3);
@@ -6185,7 +6177,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan1.addActivity(act1);
 	//	Leg leg1 = popFactory.createLeg("pt");
 		plan1.addLeg(leg_1_2);
-	//	lastActLink2.getCoord().setXY(999.0, 0.0);
+	//	lastActLink2.getCoord().setXY(1000.0, 0.0);
 		lastActLink2.setType("w");
 		plan1.addActivity(lastActLink2);
 		person1.addPlan(plan1);
@@ -6197,7 +6189,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan2.addActivity(act2);
 	//	Leg leg2 = popFactory.createLeg("pt");
 		plan2.addLeg(leg_1_2);
-	//	lastActLink2.getCoord().setXY(999.0, 0.0);
+	//	lastActLink2.getCoord().setXY(1000.0, 0.0);
 		lastActLink2.setType("w");
 		plan2.addActivity(lastActLink2);
 		person2.addPlan(plan2);
@@ -6209,7 +6201,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan3.addActivity(act3);
 	//	Leg leg3 = popFactory.createLeg("pt");
 		plan3.addLeg(leg_2_6);
-	//	lastActLink6.getCoord().setXY(2999.0, 0.0);
+	//	lastActLink6.getCoord().setXY(3000.0, 0.0);
 		lastActLink6.setType("w");
 		plan3.addActivity(lastActLink6);
 		person3.addPlan(plan3);
@@ -6221,7 +6213,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan4.addActivity(act4);
 	//	Leg leg4 = popFactory.createLeg("pt");
 		plan4.addLeg(leg_2_6);
-	//	lastActLink6.getCoord().setXY(2999.0, 0.0);
+	//	lastActLink6.getCoord().setXY(3000.0, 0.0);
 		lastActLink6.setType("w");
 		plan4.addActivity(lastActLink6);
 		person4.addPlan(plan4);
@@ -6233,7 +6225,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		plan5.addActivity(act5);
 	//	Leg leg5 = popFactory.createLeg("pt");
 		plan5.addLeg(leg_3_6);
-	//	lastActLink6.getCoord().setXY(2999.0, 0.0);
+	//	lastActLink6.getCoord().setXY(3000.0, 0.0);
 		lastActLink6.setType("w");
 		plan5.addActivity(lastActLink6);
 		person5.addPlan(plan5);
@@ -6370,7 +6362,7 @@ public class MarginalCostPricingPtHandlerTest  {
 		type.setEgressTime(0.75);
 		type.setDoorOperationMode(DoorOperationMode.serial);
 		
-		type.setMaximumVelocity(8.33);
+		type.setMaximumVelocity(8.4);
 		type.setPcuEquivalents(7.5);
 		
 		veh.getVehicleTypes().put(vehTypeId1, type); 
@@ -6386,8 +6378,3 @@ public class MarginalCostPricingPtHandlerTest  {
 	}
 
 }
-
-
-
-
-
