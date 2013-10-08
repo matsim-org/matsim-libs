@@ -343,11 +343,6 @@
 			</exclusions>
 		</dependency>
 		<dependency>
-			<groupId>jgap</groupId>
-			<artifactId>jgap</artifactId>
-			<version>3.4.1</version>
-		</dependency>
-		<dependency>
 			<groupId>kml</groupId>
 			<artifactId>kml</artifactId>
 			<version>2.2.0</version>
@@ -382,7 +377,7 @@
 		<dependency>
 			<groupId>org.geotools</groupId>
 			<artifactId>gt-main</artifactId>
-			<version>2.7.3</version>
+			<version>${geotools.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.geotools</groupId>
@@ -421,12 +416,6 @@
 			<artifactId>xercesImpl</artifactId>
 			<version>2.7.1</version>
 		</dependency>
-<!-- 		<dependency>
-			<groupId>com.vividsolutions</groupId>
-			<artifactId>jts</artifactId>
-			<version>1.7.1</version>
-			<scope>compile</scope>
-		</dependency> -->
 		<dependency>
 			<groupId>com.googlecode.java-diff-utils</groupId>
 			<artifactId>diffutils</artifactId>
