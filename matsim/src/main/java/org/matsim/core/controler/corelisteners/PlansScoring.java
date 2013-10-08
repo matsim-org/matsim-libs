@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * PlansScoring.java.java
+ * PlansScoring.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -83,7 +83,7 @@ public class PlansScoring implements ScoringListener, IterationStartsListener, I
 	public void notifyIterationEnds(final IterationEndsEvent event) {
 		this.events.removeHandler(this.eventsToScore);
 		if(sc.getConfig().planCalcScore().isWriteExperiencedPlans()) {
-			this.eventsToScore.writeExperiencedPlans(controlerIO.getIterationFilename(event.getIteration(), "experienced_plans.xml"));
+			this.eventsToScore.writeExperiencedPlans(controlerIO.getIterationFilename(event.getIteration(), "experienced_plans"));
 		}
 		this.travelDistanceStats.addIteration(event.getIteration(), eventsToScore.getAgentRecords());
 	}

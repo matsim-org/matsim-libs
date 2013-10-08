@@ -23,7 +23,7 @@ public class Events2Score {
 		new MatsimEventsReader(eventsManager).readFile("/Users/zilske/matsim-without-history/playgrounds/trunk/mzilske/output2freespeed/ITERS/it.180/180.events.xml.gz");
 		// new MatsimEventsReader(eventsManager).readFile("/Users/zilske/matsim-without-history/playgrounds/trunk/mzilske/output2freespeed/ITERS/it.180/my_guy.xml");
 		events2Score.finish();
-		events2Score.writeExperiencedPlans("/Users/zilske/matsim-without-history/playgrounds/trunk/mzilske/output2freespeed/scored-plans.xml");
+		events2Score.writeExperiencedPlans("/Users/zilske/matsim-without-history/playgrounds/trunk/mzilske/output2freespeed/scored-plans");
 	}
 
 }
