@@ -23,8 +23,11 @@ package org.matsim.core.router;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.router.priorityqueue.BinaryMinHeap;
 import org.matsim.core.router.util.AStarNodeData;
 import org.matsim.core.router.util.AStarNodeDataFactory;
+import org.matsim.core.router.util.ArrayRoutingNetwork;
+import org.matsim.core.router.util.ArrayRoutingNetworkNode;
 import org.matsim.core.router.util.PreProcessLandmarks;
 import org.matsim.core.router.util.RoutingNetwork;
 import org.matsim.core.router.util.RoutingNetworkNode;
@@ -48,16 +51,6 @@ public class FastAStarLandmarks extends AStarLandmarks {
 
 	private final RoutingNetwork routingNetwork;
 	private final FastRouterDelegate fastRouter;
-
-//	public FastAStarLandmarks(final Network network, final PreProcessLandmarks preProcessData,
-//			final TravelDisutility costFunction, final TravelTime timeFunction) {
-//		this(network, preProcessData, costFunction, timeFunction, 1);
-//	}
-
-//	public FastAStarLandmarks(final Network network, final PreProcessLandmarks preProcessData,
-//			final TravelTime timeFunction) {
-//		this(network, preProcessData, preProcessData.getCostFunction(), timeFunction, 1);
-//	}
 
 	public FastAStarLandmarks(final Network network, final PreProcessLandmarks preProcessData,
 			final TravelDisutility costFunction, final TravelTime timeFunction, final double overdoFactor,
@@ -90,6 +83,16 @@ public class FastAStarLandmarks extends AStarLandmarks {
 		}
 		
 		return super.calcLeastCostPath(routingNetworkFromNode, routingNetworkToNode, startTime, person, vehicle);
+	}
+	
+	@Override
+	/*package*/ RouterPriorityQueue<? extends Node> createRouterPriorityQueue() {
+		if (this.routingNetwork instanceof ArrayRoutingNetwork) {
+			int maxSize = this.routingNetwork.getNodes().size();
+			return new BinaryMinHeap<ArrayRoutingNetworkNode>(maxSize);
+		} else {
+			return super.createRouterPriorityQueue();
+		}
 	}
 	
 	/*

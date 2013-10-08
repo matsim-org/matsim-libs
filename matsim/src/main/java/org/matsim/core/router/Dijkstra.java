@@ -30,12 +30,11 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.router.priorityqueue.WrappedBinaryMinHeap;
 import org.matsim.core.router.util.DijkstraNodeData;
 import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.TravelDisutility;
 import org.matsim.core.router.util.TravelTime;
-import org.matsim.core.router.util.LeastCostPathCalculator.Path;
-import org.matsim.core.utils.collections.PseudoRemovePriorityQueue;
 import org.matsim.core.utils.collections.RouterPriorityQueue;
 import org.matsim.core.utils.misc.Time;
 import org.matsim.vehicles.Vehicle;
@@ -238,7 +237,7 @@ public class Dijkstra implements IntermodalLeastCostPathCalculator {
 	 * Allow replacing the RouterPriorityQueue.
 	 */
 	/*package*/ RouterPriorityQueue<? extends Node> createRouterPriorityQueue() {
-		return new PseudoRemovePriorityQueue<Node>(500);
+		return new WrappedBinaryMinHeap<Node>(this.network.getNodes().size());
 	}
 	
 	/**

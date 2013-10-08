@@ -23,6 +23,9 @@ package org.matsim.core.router;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.router.priorityqueue.BinaryMinHeap;
+import org.matsim.core.router.util.ArrayRoutingNetwork;
+import org.matsim.core.router.util.ArrayRoutingNetworkNode;
 import org.matsim.core.router.util.DijkstraNodeData;
 import org.matsim.core.router.util.DijkstraNodeDataFactory;
 import org.matsim.core.router.util.PreProcessDijkstra;
@@ -78,6 +81,16 @@ public class FastDijkstra extends Dijkstra {
 		RoutingNetworkNode routingNetworkToNode = routingNetwork.getNodes().get(toNode.getId());
 
 		return super.calcLeastCostPath(routingNetworkFromNode, routingNetworkToNode, startTime, person, vehicle);
+	}
+	
+	@Override
+	/*package*/ RouterPriorityQueue<? extends Node> createRouterPriorityQueue() {
+		if (this.routingNetwork instanceof ArrayRoutingNetwork) {
+			int maxSize = this.routingNetwork.getNodes().size();
+			return new BinaryMinHeap<ArrayRoutingNetworkNode>(maxSize);
+		} else {
+			return super.createRouterPriorityQueue();
+		}
 	}
 	
 	/*

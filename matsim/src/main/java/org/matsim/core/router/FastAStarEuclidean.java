@@ -23,8 +23,11 @@ package org.matsim.core.router;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
+import org.matsim.core.router.priorityqueue.BinaryMinHeap;
 import org.matsim.core.router.util.AStarNodeData;
 import org.matsim.core.router.util.AStarNodeDataFactory;
+import org.matsim.core.router.util.ArrayRoutingNetwork;
+import org.matsim.core.router.util.ArrayRoutingNetworkNode;
 import org.matsim.core.router.util.PreProcessDijkstra;
 import org.matsim.core.router.util.PreProcessEuclidean;
 import org.matsim.core.router.util.RoutingNetwork;
@@ -50,16 +53,6 @@ public class FastAStarEuclidean extends AStarEuclidean {
 	private final RoutingNetwork routingNetwork;
 	private final FastRouterDelegate fastRouter;
 	
-//	public FastAStarEuclidean(final Network network, final PreProcessEuclidean preProcessData,
-//			final TravelTime timeFunction) {
-//		this(network, preProcessData, timeFunction, 1);
-//	}
-
-//	public FastAStarEuclidean(final Network network, final PreProcessEuclidean preProcessData,
-//			final TravelTime timeFunction, final double overdoFactor) {
-//		this(network, preProcessData, preProcessData.getCostFunction(), timeFunction, overdoFactor);
-//	}
-
 	public FastAStarEuclidean(final Network network,
 			final PreProcessEuclidean preProcessData,
 			final TravelDisutility costFunction, final TravelTime timeFunction, final double overdoFactor,
@@ -86,6 +79,16 @@ public class FastAStarEuclidean extends AStarEuclidean {
 		RoutingNetworkNode routingNetworkToNode = routingNetwork.getNodes().get(toNode.getId());
 
 		return super.calcLeastCostPath(routingNetworkFromNode, routingNetworkToNode, startTime, person, vehicle);
+	}
+	
+	@Override
+	/*package*/ RouterPriorityQueue<? extends Node> createRouterPriorityQueue() {
+		if (this.routingNetwork instanceof ArrayRoutingNetwork) {
+			int maxSize = this.routingNetwork.getNodes().size();
+			return new BinaryMinHeap<ArrayRoutingNetworkNode>(maxSize);
+		} else {
+			return super.createRouterPriorityQueue();
+		}
 	}
 	
 	/*
