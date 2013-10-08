@@ -19,25 +19,13 @@
 
 package org.matsim.contrib.transEnergySim.controllers;
 
-import java.util.HashMap;
 import java.util.LinkedList;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.network.Network;
-import org.matsim.contrib.transEnergySim.chargingInfrastructure.road.InductiveStreetCharger;
-import org.matsim.contrib.transEnergySim.vehicles.api.Vehicle;
-import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionModel;
-import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.EnergyConsumptionTracker;
-import org.matsim.contrib.transEnergySim.vehicles.energyConsumption.galus.EnergyConsumptionModelGalus;
-import org.matsim.contrib.transEnergySim.vehicles.impl.InductivelyChargableBatteryElectricVehicle;
-import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
 import org.matsim.core.events.handler.EventHandler;
-
-import com.sun.tools.xjc.reader.internalizer.DOMForest.Handler;
 
 /**
  * @author wrashid

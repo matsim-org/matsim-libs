@@ -9,12 +9,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
-import com.sun.xml.bind.v2.runtime.unmarshaller.XsiNilLoader.Array;
-
 public class HITSData implements Serializable{
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	private ArrayList<HITSHousehold> households;
 	private ArrayList<HITSPerson> persons;
