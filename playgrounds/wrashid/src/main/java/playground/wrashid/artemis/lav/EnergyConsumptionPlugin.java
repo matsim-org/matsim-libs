@@ -30,11 +30,11 @@ import org.matsim.contrib.parking.lib.DebugLib;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.contrib.parking.lib.obj.DoubleValueHashMap;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.core.api.experimental.events.handler.Wait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 
@@ -50,7 +50,7 @@ import playground.wrashid.lib.obj.LinkedListValueHashMap;
  * @author wrashid
  * 
  */
-public class EnergyConsumptionPlugin implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentWait2LinkEventHandler,
+public class EnergyConsumptionPlugin implements LinkEnterEventHandler, LinkLeaveEventHandler, Wait2LinkEventHandler,
 		AgentArrivalEventHandler {
 
 	private EnergyConsumptionModelLAV_v1 energyConsumptionModel;
@@ -116,7 +116,7 @@ public class EnergyConsumptionPlugin implements LinkEnterEventHandler, LinkLeave
 	}
 
 	@Override
-	public void handleEvent(AgentWait2LinkEvent event) {
+	public void handleEvent(Wait2LinkEvent event) {
 		logLinkEnteranceTime(event.getPersonId(), event.getTime());
 	}
 

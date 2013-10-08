@@ -20,7 +20,7 @@ import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
@@ -28,7 +28,7 @@ import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.core.api.experimental.events.handler.Wait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.EventsManagerImpl;
@@ -147,9 +147,9 @@ public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 						// not applicable
 						if (((NetworkRoute) leg.getRoute()).getLinkIds().size() > 0) {
 							// the first LinkEnterEvent is a AgentWait2LinkEvent
-							assertTrue(list.get(index) instanceof AgentWait2LinkEvent);
+							assertTrue(list.get(index) instanceof Wait2LinkEvent);
 							assertTrue(act.getLinkId().toString().equalsIgnoreCase(
-									((AgentWait2LinkEvent) list.get(index)).getLinkId().toString()));
+									((Wait2LinkEvent) list.get(index)).getLinkId().toString()));
 							index++;
 
 							assertTrue(list.get(index) instanceof LinkLeaveEvent);
@@ -215,13 +215,13 @@ public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 	}
 
 
-	private class PersonEventCollector implements ActivityStartEventHandler, ActivityEndEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, AgentDepartureEventHandler, AgentArrivalEventHandler, AgentWait2LinkEventHandler {
+	private class PersonEventCollector implements ActivityStartEventHandler, ActivityEndEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, AgentDepartureEventHandler, AgentArrivalEventHandler, Wait2LinkEventHandler {
 
 		public void reset(int iteration) {
 		}
 
 		@Override
-		public void handleEvent(AgentWait2LinkEvent event) {
+		public void handleEvent(Wait2LinkEvent event) {
 			if (!eventsByPerson.containsKey(event.getPersonId())) {
 				eventsByPerson.put(event.getPersonId(), new LinkedList<Event>());
 			}

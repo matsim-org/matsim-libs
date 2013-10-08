@@ -5,11 +5,11 @@ import java.util.HashSet;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.core.api.experimental.events.handler.Wait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 
@@ -17,7 +17,7 @@ import playground.wrashid.lib.obj.TwoKeyHashMapsWithDouble;
 
 public abstract class AbstractDualSimHandler implements LinkLeaveEventHandler,
 		LinkEnterEventHandler, AgentArrivalEventHandler,
-		AgentWait2LinkEventHandler {
+		Wait2LinkEventHandler {
 
 	public abstract boolean isJDEQSim();
 
@@ -70,7 +70,7 @@ public abstract class AbstractDualSimHandler implements LinkLeaveEventHandler,
 	}
 
 	@Override
-	public void handleEvent(AgentWait2LinkEvent event) {
+	public void handleEvent(Wait2LinkEvent event) {
 		if (isJDEQSim()) {
 			agentsTravellingOnLinks.add(event.getPersonId());
 			linkEnterTime.put(event.getLinkId(), event.getPersonId(),

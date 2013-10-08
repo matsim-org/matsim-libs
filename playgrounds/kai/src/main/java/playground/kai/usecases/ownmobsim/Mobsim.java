@@ -8,7 +8,7 @@ import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
@@ -44,7 +44,7 @@ public class Mobsim {
 
 		AgentDepartureEvent ade = eb.createAgentDepartureEvent( time, agentId, linkId, legMode ) ;
 
-		AgentWait2LinkEvent aw2le = eb.createAgentWait2LinkEvent(time,agentId,linkId, null) ;
+		Wait2LinkEvent aw2le = eb.createAgentWait2LinkEvent(time,agentId,linkId, null) ;
 
 		LinkLeaveEvent lle = eb.createLinkLeaveEvent( time, agentId, linkId, null ) ;
 

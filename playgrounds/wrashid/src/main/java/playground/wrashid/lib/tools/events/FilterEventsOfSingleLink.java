@@ -9,14 +9,14 @@ import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.core.api.experimental.events.handler.Wait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
@@ -46,7 +46,7 @@ public class FilterEventsOfSingleLink {
 
 	}
 	
-	private static class EventsFilter implements AgentDepartureEventHandler, AgentArrivalEventHandler,AgentWait2LinkEventHandler,LinkEnterEventHandler,LinkLeaveEventHandler {
+	private static class EventsFilter implements AgentDepartureEventHandler, AgentArrivalEventHandler,Wait2LinkEventHandler,LinkEnterEventHandler,LinkLeaveEventHandler {
 		private Id filterLinkId;
 		private EventWriterXML eventWriter;
 
@@ -86,7 +86,7 @@ public class FilterEventsOfSingleLink {
 		}
 
 		@Override
-		public void handleEvent(AgentWait2LinkEvent event) {
+		public void handleEvent(Wait2LinkEvent event) {
 			if (event.getLinkId().toString().equalsIgnoreCase(filterLinkId.toString())){
 				eventWriter.handleEvent(event);
 			}			

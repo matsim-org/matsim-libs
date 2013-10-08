@@ -31,7 +31,7 @@ import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
@@ -42,7 +42,7 @@ import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.core.api.experimental.events.handler.Wait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
@@ -60,7 +60,7 @@ import org.matsim.vis.otfvis.opengl.drawer.OTFOGLDrawer;
  * @author michaz
  *
  */
-public class QueryAgentEvents extends AbstractQuery implements AgentDepartureEventHandler, AgentArrivalEventHandler, ActivityStartEventHandler, ActivityEndEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, AgentWait2LinkEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
+public class QueryAgentEvents extends AbstractQuery implements AgentDepartureEventHandler, AgentArrivalEventHandler, ActivityStartEventHandler, ActivityEndEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, Wait2LinkEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler {
 
 	private static transient Logger logger = Logger.getLogger(QueryAgentEvents.class);
 	
@@ -153,7 +153,7 @@ public class QueryAgentEvents extends AbstractQuery implements AgentDepartureEve
 	}
 
 	@Override
-	public void handleEvent(AgentWait2LinkEvent event) {
+	public void handleEvent(Wait2LinkEvent event) {
 		if(event.getPersonId().equals(this.agentId)){
 			queue.add(event);
 		}

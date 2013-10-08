@@ -26,7 +26,7 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
@@ -125,8 +125,8 @@ public class TransportModeFilter implements BasicEventHandler {
 		} 
 		
 		// skip agent wait 2 link events from not observed agents
-		else if (event instanceof AgentWait2LinkEvent) {
-			AgentWait2LinkEvent agentWait2LinkEvent = (AgentWait2LinkEvent) event;
+		else if (event instanceof Wait2LinkEvent) {
+			Wait2LinkEvent agentWait2LinkEvent = (Wait2LinkEvent) event;
 			if (!observedAgents.contains(agentWait2LinkEvent.getPersonId())) return;
 		}
 		// skip all other events

@@ -26,7 +26,7 @@ import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
@@ -55,8 +55,8 @@ public class PersonEventFilter implements EventFilter {
 			LinkLeaveEvent e = (LinkLeaveEvent) event;
 			Id personId = e.getPersonId();
 			this.personIds.contains(personId);
-		} else if (event instanceof AgentWait2LinkEvent) {
-			AgentWait2LinkEvent e = (AgentWait2LinkEvent) event;
+		} else if (event instanceof Wait2LinkEvent) {
+			Wait2LinkEvent e = (Wait2LinkEvent) event;
 			Id personId = e.getPersonId();
 			this.personIds.contains(personId);
 		} else if (event instanceof AgentDepartureEvent) {

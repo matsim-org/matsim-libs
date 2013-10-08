@@ -34,7 +34,7 @@ import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.gbl.MatsimRandom;
@@ -255,7 +255,7 @@ public class CALink {
 		this.activateLink();
 
 		this.simEngine.getMobsim().getEventsManager().processEvent(
-				new AgentWait2LinkEvent(now, mobsimAgent.getId(), link.getId(), null));
+				new Wait2LinkEvent(now, mobsimAgent.getId(), link.getId(), null));
 	}
 
 	protected boolean moveLink(double now) {

@@ -30,7 +30,7 @@ import java.util.Stack;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
@@ -317,7 +317,7 @@ public class QLinkLanesImpl extends AbstractQLink {
 			}
 			movedAtLeastOne = true;
 			this.network.simEngine.getMobsim().getEventsManager().processEvent(
-					new AgentWait2LinkEvent(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId()));
+					new Wait2LinkEvent(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId()));
 //			boolean handled = this.firstLane.addTransitToStopQueue(now, veh);
 			boolean handled = false ;
 			if (!handled) {

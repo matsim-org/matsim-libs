@@ -24,7 +24,7 @@ import java.util.LinkedList;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
@@ -32,7 +32,7 @@ import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.core.api.experimental.events.handler.Wait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.handler.EventHandler;
@@ -40,7 +40,7 @@ import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
 import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
 
 public class EventHandlerGroup implements ActivityStartEventHandler, AgentArrivalEventHandler,
-AgentDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, AgentWait2LinkEventHandler {
+AgentDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler, Wait2LinkEventHandler {
 
 	protected LinkedList<EventHandler> handler = new LinkedList<EventHandler>();
 
@@ -120,10 +120,10 @@ AgentDepartureEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, Person
 	}
 
 	@Override
-	public void handleEvent(AgentWait2LinkEvent event) {
+	public void handleEvent(Wait2LinkEvent event) {
 		for (EventHandler h : handler) {
-			if (h instanceof AgentWait2LinkEventHandler) {
-				((AgentWait2LinkEventHandler) h).handleEvent(event);
+			if (h instanceof Wait2LinkEventHandler) {
+				((Wait2LinkEventHandler) h).handleEvent(event);
 			}
 		}		
 	}

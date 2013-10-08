@@ -5,10 +5,10 @@ import java.util.HashMap;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.core.api.experimental.events.handler.Wait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.controler.Controler;
@@ -20,7 +20,7 @@ import org.matsim.core.controler.Controler;
  * => we need to assign a different such curve to each agent (we need to put this attribute to the agent)
  * 
  */
-public class LogEnergyConsumption implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentWait2LinkEventHandler {
+public class LogEnergyConsumption implements LinkEnterEventHandler, LinkLeaveEventHandler, Wait2LinkEventHandler {
 
 	private static final Logger log = Logger.getLogger(LogEnergyConsumption.class);
 	Controler controler;
@@ -78,7 +78,7 @@ public class LogEnergyConsumption implements LinkEnterEventHandler, LinkLeaveEve
 	 * 
 	 * @see org.matsim.core.events.handler.AgentWait2LinkEventHandler#handleEvent(org.matsim.core.events.AgentWait2LinkEvent)
 	 */
-	public void handleEvent(AgentWait2LinkEvent event) {
+	public void handleEvent(Wait2LinkEvent event) {
 		Id personId = event.getPersonId();
 		if (!energyConsumption.containsKey(personId)) {
 			energyConsumption.put(personId, new EnergyConsumption());

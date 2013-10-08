@@ -7,7 +7,7 @@ import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
@@ -33,7 +33,7 @@ public class EquilPlans1Test extends AbstractJDEQSimTest {
 			assertEquals(21600, list.get(index).getTime(), 0.9);
 			assertTrue(list.get(index++) instanceof ActivityEndEvent);
 			assertTrue(list.get(index++) instanceof AgentDepartureEvent);
-			assertTrue(list.get(index++) instanceof AgentWait2LinkEvent);
+			assertTrue(list.get(index++) instanceof Wait2LinkEvent);
 			assertTrue(list.get(index++) instanceof LinkLeaveEvent);
 			assertTrue(list.get(index++) instanceof LinkEnterEvent);
 			assertTrue(list.get(index++) instanceof LinkLeaveEvent);
@@ -48,7 +48,7 @@ public class EquilPlans1Test extends AbstractJDEQSimTest {
 			assertTrue(list.get(index++) instanceof ActivityStartEvent);
 			assertTrue(list.get(index++) instanceof ActivityEndEvent);
 			assertTrue(list.get(index++) instanceof AgentDepartureEvent);
-			assertTrue(list.get(index++) instanceof AgentWait2LinkEvent);
+			assertTrue(list.get(index++) instanceof Wait2LinkEvent);
 			assertTrue(list.get(index++) instanceof LinkLeaveEvent);
 			assertTrue(list.get(index++) instanceof LinkEnterEvent);
 			assertTrue(list.get(index++) instanceof LinkLeaveEvent);

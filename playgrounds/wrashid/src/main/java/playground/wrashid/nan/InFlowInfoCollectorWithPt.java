@@ -24,13 +24,13 @@ import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.core.api.experimental.events.handler.Wait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 
 public class InFlowInfoCollectorWithPt implements LinkEnterEventHandler,
-		AgentWait2LinkEventHandler {
+		Wait2LinkEventHandler {
 
 	private int binSizeInSeconds; // set the length of interval
 
@@ -103,7 +103,7 @@ public class InFlowInfoCollectorWithPt implements LinkEnterEventHandler,
 	}
 
 	@Override
-	public void handleEvent(AgentWait2LinkEvent event) {
+	public void handleEvent(Wait2LinkEvent event) {
 		enterLink(event.getLinkId(), event.getTime());		
 	}
 

@@ -49,7 +49,7 @@ import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.GenericEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
@@ -59,7 +59,7 @@ import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.core.api.experimental.events.handler.Wait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.GenericEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.facilities.Facility;
@@ -94,7 +94,7 @@ import playground.christoph.evacuation.mobsim.decisiondata.HouseholdDecisionData
 import playground.christoph.evacuation.mobsim.decisionmodel.EvacuationDecisionModel.EvacuationDecision;
 
 public class DetailedAgentsTracker implements GenericEventHandler, PersonInformationEventHandler,
-		AgentDepartureEventHandler, AgentArrivalEventHandler, AgentWait2LinkEventHandler, LinkEnterEventHandler,
+		AgentDepartureEventHandler, AgentArrivalEventHandler, Wait2LinkEventHandler, LinkEnterEventHandler,
 		ActivityStartEventHandler, ActivityEndEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
 		AgentStuckEventHandler, MobsimInitializedListener, IterationEndsListener {
 
@@ -295,7 +295,7 @@ public class DetailedAgentsTracker implements GenericEventHandler, PersonInforma
 	}
 	
 	@Override
-	public void handleEvent(AgentWait2LinkEvent event) {
+	public void handleEvent(Wait2LinkEvent event) {
 		if (this.enrouteDrivers.contains(event.getPersonId())) {
 			vehiclePositions.put(event.getVehicleId(), event.getLinkId());
 			if (event.getVehicleId() == null) log.warn("null vehicleId was found!");			

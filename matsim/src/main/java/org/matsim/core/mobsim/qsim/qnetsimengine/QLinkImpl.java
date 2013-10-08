@@ -29,7 +29,7 @@ import java.util.ListIterator;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.mobsim.qsim.pt.TransitDriverAgent;
@@ -178,7 +178,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 			}
 
 			this.network.simEngine.getMobsim().getEventsManager().processEvent(
-					new AgentWait2LinkEvent(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId())
+					new Wait2LinkEvent(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId())
 					);
 
 			if ( this.addTransitToStopQueue(now, veh) ) {

@@ -31,16 +31,16 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.core.api.experimental.events.handler.Wait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 
 public class WaitToLinkCalculator implements AgentDepartureEventHandler,
-		AgentWait2LinkEventHandler, LinkLeaveEventHandler, AfterMobsimListener {
+		Wait2LinkEventHandler, LinkLeaveEventHandler, AfterMobsimListener {
 
 	private final Set<Id> carAgents = new HashSet<Id>();
 	private final Map<Id, Double> waitToLinkEventTimes = new HashMap<Id, Double>();
@@ -78,7 +78,7 @@ public class WaitToLinkCalculator implements AgentDepartureEventHandler,
 	}
 
 	@Override
-	public void handleEvent(AgentWait2LinkEvent event) {
+	public void handleEvent(Wait2LinkEvent event) {
 		if (carAgents.contains(event.getPersonId())) waitToLinkEventTimes.put(event.getPersonId(), event.getTime());
 	}
 

@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.config.ConfigUtils;
@@ -105,7 +105,7 @@ public class DgSensorTest {
 		numberOfCars = sensor.getNumberOfCarsOnLink();
 		Assert.assertEquals(0, numberOfCars);
 		
-		AgentWait2LinkEvent wait2LinkEvent = new AgentWait2LinkEvent(120.0, id2, id1, null);
+		Wait2LinkEvent wait2LinkEvent = new Wait2LinkEvent(120.0, id2, id1, null);
 		sensor.handleEvent(wait2LinkEvent);
 		numberOfCars = sensor.getNumberOfCarsOnLink();
 		Assert.assertEquals(1, numberOfCars);
@@ -171,7 +171,7 @@ public class DgSensorTest {
 		numberOfCarsInDistance = sensor.getNumberOfCarsInDistance(100.0, 101.0);
 		Assert.assertEquals(0, numberOfCarsInDistance);
 		
-		AgentWait2LinkEvent wait2LinkEvent = new AgentWait2LinkEvent(120.0, id2, id1, null);
+		Wait2LinkEvent wait2LinkEvent = new Wait2LinkEvent(120.0, id2, id1, null);
 		sensor.handleEvent(wait2LinkEvent);
 
 		numberOfCarsInDistance = sensor.getNumberOfCarsInDistance(100.0, 120.0);

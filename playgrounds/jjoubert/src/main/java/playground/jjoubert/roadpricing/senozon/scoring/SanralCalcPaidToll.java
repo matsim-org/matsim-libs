@@ -27,11 +27,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.core.api.experimental.events.handler.Wait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.roadpricing.RoadPricingScheme;
 import org.matsim.roadpricing.RoadPricingSchemeImpl.Cost;
@@ -45,7 +45,7 @@ import playground.jjoubert.roadpricing.senozon.SanralTollFactor;
  *
  * @author mrieser
  */
-public class SanralCalcPaidToll implements LinkEnterEventHandler, AgentWait2LinkEventHandler {
+public class SanralCalcPaidToll implements LinkEnterEventHandler, Wait2LinkEventHandler {
 
 	static class AgentInfo {
 		public double toll = 0.0;
@@ -80,7 +80,7 @@ public class SanralCalcPaidToll implements LinkEnterEventHandler, AgentWait2Link
 	}
 
 	@Override
-	public void handleEvent(final AgentWait2LinkEvent event) {
+	public void handleEvent(final Wait2LinkEvent event) {
 		Link link = this.network.getLinks().get(event.getLinkId());
 		if (handler instanceof DistanceTollBehaviour) {
 			/* we do not handle wait2link-events for these tolls, because the agent

@@ -29,7 +29,7 @@ import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
 import org.matsim.core.api.experimental.events.BoardingDeniedEvent;
 import org.matsim.core.api.experimental.events.Event;
@@ -126,11 +126,11 @@ public class EventsReaderXMLv1 extends MatsimXmlParser {
 			this.events.processEvent(this.builder.createAgentDepartureEvent(time,
 					new IdImpl(atts.getValue(AgentDepartureEvent.ATTRIBUTE_PERSON)),
 					new IdImpl(atts.getValue(AgentDepartureEvent.ATTRIBUTE_LINK)), mode));
-		} else if (AgentWait2LinkEvent.EVENT_TYPE.equals(eventType)) {
+		} else if (Wait2LinkEvent.EVENT_TYPE.equals(eventType)) {
 			this.events.processEvent(this.builder.createAgentWait2LinkEvent(time,
-					new IdImpl(atts.getValue(AgentWait2LinkEvent.ATTRIBUTE_PERSON)),
-					new IdImpl(atts.getValue(AgentWait2LinkEvent.ATTRIBUTE_LINK)), 
-					atts.getValue(AgentWait2LinkEvent.ATTRIBUTE_VEHICLE) == null ? null : new IdImpl(atts.getValue(AgentWait2LinkEvent.ATTRIBUTE_VEHICLE))));
+					new IdImpl(atts.getValue(Wait2LinkEvent.ATTRIBUTE_PERSON)),
+					new IdImpl(atts.getValue(Wait2LinkEvent.ATTRIBUTE_LINK)), 
+					atts.getValue(Wait2LinkEvent.ATTRIBUTE_VEHICLE) == null ? null : new IdImpl(atts.getValue(Wait2LinkEvent.ATTRIBUTE_VEHICLE))));
 		} else if (AgentStuckEvent.EVENT_TYPE.equals(eventType)) {
 			String legMode = atts.getValue(AgentStuckEvent.ATTRIBUTE_LEGMODE);
 			String mode = legMode == null ? null : legMode.intern();

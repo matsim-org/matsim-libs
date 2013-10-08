@@ -17,7 +17,7 @@ import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
@@ -170,7 +170,7 @@ public class SampleEvents {
 			}
 		}
 
-		public void handleEvent(AgentWait2LinkEvent event) {
+		public void handleEvent(Wait2LinkEvent event) {
 			Id personId = event.getPersonId();
 
 			if (ignorePersonsSet.contains(personId)) {

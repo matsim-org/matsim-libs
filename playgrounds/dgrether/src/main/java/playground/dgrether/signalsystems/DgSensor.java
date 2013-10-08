@@ -26,7 +26,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 
@@ -117,7 +117,7 @@ public class DgSensor {
 		}
 	}
 	
-	public void handleEvent(AgentWait2LinkEvent event) {
+	public void handleEvent(Wait2LinkEvent event) {
 		this.agentsOnLink++;
 		if (this.doDistanceMonitoring){
 			if (! this.personIdArrivalEventMap.containsKey(event.getPersonId())){ // the person leaves his first act on this link --> add a car locator

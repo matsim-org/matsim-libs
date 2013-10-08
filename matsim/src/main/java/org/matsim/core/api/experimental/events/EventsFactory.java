@@ -56,8 +56,8 @@ public class EventsFactory {
 		return new AgentStuckEvent(time, agentId, linkId, legMode);
 	}
 
-	public static AgentWait2LinkEvent createAgentWait2LinkEvent(double time, Id agentId, Id linkId, Id vehicleId) {
-		return new AgentWait2LinkEvent(time, agentId, linkId, vehicleId);
+	public static Wait2LinkEvent createAgentWait2LinkEvent(double time, Id agentId, Id linkId, Id vehicleId) {
+		return new Wait2LinkEvent(time, agentId, linkId, vehicleId);
 	}
 
 	public static LinkEnterEvent createLinkEnterEvent(double time, Id agentId, Id linkId, Id vehicleId) {

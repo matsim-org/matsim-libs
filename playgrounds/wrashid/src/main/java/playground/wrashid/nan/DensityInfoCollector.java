@@ -24,14 +24,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.core.api.experimental.events.handler.Wait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 
-public class DensityInfoCollector implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentWait2LinkEventHandler{
+public class DensityInfoCollector implements LinkEnterEventHandler, LinkLeaveEventHandler, Wait2LinkEventHandler{
 
 	
 	public static void main(String[] args) {
@@ -86,7 +86,7 @@ public class DensityInfoCollector implements LinkEnterEventHandler, LinkLeaveEve
 	}
 
 	@Override
-	public void handleEvent(AgentWait2LinkEvent event) {
+	public void handleEvent(Wait2LinkEvent event) {
 		// TODO Auto-generated method stub
 		
 	}

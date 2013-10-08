@@ -27,7 +27,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -307,7 +307,7 @@ public class FlexibleCellLink {
 		this.activateLink();
 
 		this.simEngine.getMobsim().getEventsManager().processEvent(
-				new AgentWait2LinkEvent(now, mobsimAgent.getId(), link.getId(), null));
+				new Wait2LinkEvent(now, mobsimAgent.getId(), link.getId(), null));
 	}
 	
 	protected boolean moveLink(double now) {

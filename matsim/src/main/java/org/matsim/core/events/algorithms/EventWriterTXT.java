@@ -30,7 +30,7 @@ import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
@@ -39,14 +39,14 @@ import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.core.api.experimental.events.handler.Wait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
 public class EventWriterTXT implements EventWriter, ActivityEndEventHandler, ActivityStartEventHandler, AgentArrivalEventHandler, 
 		AgentDepartureEventHandler, AgentStuckEventHandler, AgentMoneyEventHandler, 
-		AgentWait2LinkEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler {
+		Wait2LinkEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler {
 	
 	/* Implement all the different event handlers by its own. Future event types will no longer be
 	 * suitable to be written to a TXT-format file, but will have additional attributes that need to be
@@ -177,8 +177,8 @@ public class EventWriterTXT implements EventWriter, ActivityEndEventHandler, Act
 	}
 
 	@Override
-	public void handleEvent(AgentWait2LinkEvent event) {
-		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 4, AgentWait2LinkEvent.EVENT_TYPE);
+	public void handleEvent(Wait2LinkEvent event) {
+		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 4, Wait2LinkEvent.EVENT_TYPE);
 	}
 
 	@Override

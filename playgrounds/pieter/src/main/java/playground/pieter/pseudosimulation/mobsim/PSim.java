@@ -30,7 +30,7 @@ import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
@@ -359,7 +359,7 @@ public class PSim implements Mobsim {
 			if (route.getStartLinkId() != route.getEndLinkId()) {
 				Id startLink = route.getStartLinkId();
 				double linkEnterTime = startTime;
-				AgentWait2LinkEvent wait2Link = new AgentWait2LinkEvent(linkEnterTime, agentId, startLink, agentId);
+				Wait2LinkEvent wait2Link = new Wait2LinkEvent(linkEnterTime, agentId, startLink, agentId);
 				LinkEnterEvent linkEnterEvent = null;
 				LinkLeaveEvent linkLeaveEvent = new LinkLeaveEvent(++linkEnterTime, agentId, startLink, agentId);
 				eventQueue.add(wait2Link);

@@ -5,18 +5,18 @@ import java.util.Map;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.core.api.experimental.events.handler.Wait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.network.LinkImpl;
 
 //public class InFlowInfoCollectorWithPt implements AgentWait2LinkEventHandler {
 public class InFlowInfoCollectorWithPt implements LinkEnterEventHandler
-,AgentWait2LinkEventHandler 
+,Wait2LinkEventHandler 
 	{
 	private int binSizeInSeconds; // set the length of interval
 	public HashMap<Id, int[]> linkInFlow;
@@ -34,7 +34,7 @@ public class InFlowInfoCollectorWithPt implements LinkEnterEventHandler
 	public void reset(int iteration) {linkInFlow = new HashMap<Id, int[]>();} // reset the variables (private ones)
 	
 	public void handleEvent(LinkEnterEvent event) {enterLink(event.getLinkId(), event.getTime());}
-   public void handleEvent(AgentWait2LinkEvent event) {enterLink(event.getLinkId(), event.getTime());}
+   public void handleEvent(Wait2LinkEvent event) {enterLink(event.getLinkId(), event.getTime());}
     
 	private void enterLink(Id linkId, double time) {
 		if (!filteredEquilNetLinks.containsKey(linkId)) {return;} // if the link is not in the link set, then exit the method

@@ -36,7 +36,7 @@ import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsFactory;
@@ -54,7 +54,7 @@ import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.core.api.experimental.events.handler.Wait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentWaitingForPtEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
@@ -295,8 +295,8 @@ public class EventsManagerImpl implements EventsManager {
 		} else if (klass == LinkEnterEvent.class) {
 			((LinkEnterEventHandler)handler).handleEvent((LinkEnterEvent)ev);
 			return true;
-		} else if (klass == AgentWait2LinkEvent.class) {
-			((AgentWait2LinkEventHandler)handler).handleEvent((AgentWait2LinkEvent)ev);
+		} else if (klass == Wait2LinkEvent.class) {
+			((Wait2LinkEventHandler)handler).handleEvent((Wait2LinkEvent)ev);
 			return true;
 		} else if (klass == AgentArrivalEvent.class) {
 			((AgentArrivalEventHandler)handler).handleEvent((AgentArrivalEvent)ev);

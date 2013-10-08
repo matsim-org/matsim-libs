@@ -29,7 +29,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.internal.MatsimNetworkObject;
@@ -348,7 +348,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 			}
 
 			QueueSimulation.getEvents().processEvent(
-					new AgentWait2LinkEvent(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId()));
+					new Wait2LinkEvent(now, veh.getDriver().getId(), this.getLink().getId(), veh.getId()));
 			addToBuffer(veh, now);
 		}
 	}

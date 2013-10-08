@@ -45,7 +45,7 @@ import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
@@ -573,7 +573,7 @@ public class QueueSimulationTest extends TestCase {
 		assertEquals("wrong number of events.", 13, allEvents.size());
 		assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(0).getClass());
 		assertEquals("wrong type of event.", AgentDepartureEvent.class, allEvents.get(1).getClass());
-		assertEquals("wrong type of event.", AgentWait2LinkEvent.class, allEvents.get(2).getClass());
+		assertEquals("wrong type of event.", Wait2LinkEvent.class, allEvents.get(2).getClass());
 		assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(3).getClass()); // link1
 		assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(4).getClass()); // link2
 		assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(5).getClass());
@@ -631,7 +631,7 @@ public class QueueSimulationTest extends TestCase {
 		assertEquals("wrong number of events.", 17, allEvents.size());
 		assertEquals("wrong type of event.", ActivityEndEvent.class, allEvents.get(0).getClass());
 		assertEquals("wrong type of event.", AgentDepartureEvent.class, allEvents.get(1).getClass());
-		assertEquals("wrong type of event.", AgentWait2LinkEvent.class, allEvents.get(2).getClass());
+		assertEquals("wrong type of event.", Wait2LinkEvent.class, allEvents.get(2).getClass());
 		assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(3).getClass()); // link1
 		assertEquals("wrong type of event.", LinkEnterEvent.class, allEvents.get(4).getClass()); // link2
 		assertEquals("wrong type of event.", LinkLeaveEvent.class, allEvents.get(5).getClass());

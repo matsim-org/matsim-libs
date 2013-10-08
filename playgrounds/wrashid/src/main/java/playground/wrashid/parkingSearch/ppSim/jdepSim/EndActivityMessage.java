@@ -29,7 +29,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
@@ -90,7 +90,7 @@ public class EndActivityMessage extends Message{
 						List<Id> linkIds = ((LinkNetworkRouteImpl)leg.getRoute()).getLinkIds();
 				
 						if (linkIds.size()>2){
-							event=new AgentWait2LinkEvent(getMessageArrivalTime(), personId,leg.getRoute().getStartLinkId(),personId);
+							event=new Wait2LinkEvent(getMessageArrivalTime(), personId,leg.getRoute().getStartLinkId(),personId);
 							eventsManager.processEvent(event);
 							int linkIndex = 1;
 							Id linkId = linkIds.get(linkIndex);

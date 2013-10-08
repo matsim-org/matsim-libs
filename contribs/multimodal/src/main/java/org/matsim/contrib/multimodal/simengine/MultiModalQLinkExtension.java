@@ -31,7 +31,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.mobsim.framework.HasPerson;
@@ -104,7 +104,7 @@ public class MultiModalQLinkExtension {
 		this.activateLink();
 
 		this.simEngine.getMobsim().getEventsManager().processEvent(
-				new AgentWait2LinkEvent(now, mobsimAgent.getId(), qLink.getId(), null));
+				new Wait2LinkEvent(now, mobsimAgent.getId(), qLink.getId(), null));
 	}
 
 	protected boolean moveLink(double now) {

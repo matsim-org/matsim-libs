@@ -27,13 +27,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.LaneEnterEvent;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.core.api.experimental.events.handler.Wait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.handler.LaneEnterEventHandler;
@@ -48,7 +48,7 @@ import org.matsim.lanes.data.v20.LaneDefinitions20;
  *
  */
 public class DgSensorManager implements LinkEnterEventHandler, LinkLeaveEventHandler, 
-	AgentArrivalEventHandler, AgentWait2LinkEventHandler, LaneEnterEventHandler, LaneLeaveEventHandler{
+	AgentArrivalEventHandler, Wait2LinkEventHandler, LaneEnterEventHandler, LaneLeaveEventHandler{
 
 	private static final Logger log = Logger.getLogger(DgSensorManager.class);
 	
@@ -190,7 +190,7 @@ public class DgSensorManager implements LinkEnterEventHandler, LinkLeaveEventHan
 	}
 	
 	@Override
-	public void handleEvent(AgentWait2LinkEvent event) {
+	public void handleEvent(Wait2LinkEvent event) {
 		if (this.linkIdSensorMap.containsKey(event.getLinkId())){
 			this.linkIdSensorMap.get(event.getLinkId()).handleEvent(event);		
 		}

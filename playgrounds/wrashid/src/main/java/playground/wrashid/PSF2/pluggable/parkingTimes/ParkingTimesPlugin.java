@@ -29,13 +29,13 @@ import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
 import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.core.api.experimental.events.handler.Wait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.AfterMobsimEvent;
@@ -56,7 +56,7 @@ import playground.wrashid.lib.obj.LinkedListValueHashMap;
  * 
  */
 
-public class ParkingTimesPlugin implements AgentWait2LinkEventHandler, AgentArrivalEventHandler, LinkEnterEventHandler,
+public class ParkingTimesPlugin implements Wait2LinkEventHandler, AgentArrivalEventHandler, LinkEnterEventHandler,
 		ActivityStartEventHandler {
 
 	// agent Id, linked list of parkingInterval
@@ -145,7 +145,7 @@ public class ParkingTimesPlugin implements AgentWait2LinkEventHandler, AgentArri
 				&& lastLinkEntered.get(personId).equals(linkId);
 	}
 
-	private void updateDepartureTimeInfo(AgentWait2LinkEvent event) {
+	private void updateDepartureTimeInfo(Wait2LinkEvent event) {
 
 		if (parkingTimeIntervals.get(event.getPersonId()).size()==0){
 			System.out.println();
@@ -177,7 +177,7 @@ public class ParkingTimesPlugin implements AgentWait2LinkEventHandler, AgentArri
 	}
 
 	@Override
-	public void handleEvent(AgentWait2LinkEvent event) {
+	public void handleEvent(Wait2LinkEvent event) {
 		if (leavingFirstParking(event.getPersonId())) {
 			initializeParkingTimeIntervalsForPerson(event.getPersonId(), event.getLinkId());
 		}

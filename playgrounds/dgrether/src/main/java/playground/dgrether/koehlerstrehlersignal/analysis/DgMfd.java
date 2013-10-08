@@ -33,12 +33,12 @@ import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.core.api.experimental.events.handler.Wait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 
@@ -47,7 +47,7 @@ import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
  * 
  * @author dgrether
  */
-public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandler, AgentStuckEventHandler, AgentWait2LinkEventHandler {
+public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, AgentArrivalEventHandler, AgentStuckEventHandler, Wait2LinkEventHandler {
 	
 	private static final Logger log = Logger.getLogger(DgMfd.class);
 	
@@ -95,7 +95,7 @@ public class DgMfd implements LinkEnterEventHandler, LinkLeaveEventHandler, Agen
 	}
 	
 	@Override
-	public void handleEvent(AgentWait2LinkEvent event) {
+	public void handleEvent(Wait2LinkEvent event) {
 		if (this.network.getLinks().containsKey(event.getLinkId())){
 			this.firstTimeSeenMap.put(event.getPersonId(), event.getTime());
 		}

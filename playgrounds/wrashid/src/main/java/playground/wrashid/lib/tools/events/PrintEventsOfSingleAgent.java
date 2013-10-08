@@ -7,7 +7,7 @@ import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
@@ -17,7 +17,7 @@ import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.core.api.experimental.events.handler.Wait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
@@ -44,7 +44,7 @@ public class PrintEventsOfSingleAgent {
 	
 	private static class SingleAgentEventsPrinter implements ActivityEndEventHandler, ActivityStartEventHandler, AgentArrivalEventHandler, 
 	AgentDepartureEventHandler, AgentStuckEventHandler, AgentMoneyEventHandler, 
-	AgentWait2LinkEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler{
+	Wait2LinkEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler{
 
 		private final Id filterEventsForAgentId;
 
@@ -74,7 +74,7 @@ public class PrintEventsOfSingleAgent {
 		}
 
 		@Override
-		public void handleEvent(AgentWait2LinkEvent event) {
+		public void handleEvent(Wait2LinkEvent event) {
 			if (event.getPersonId().equals(filterEventsForAgentId)){
 				System.out.println(event.toString());
 			}

@@ -30,13 +30,13 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.core.api.experimental.events.handler.Wait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
@@ -48,7 +48,7 @@ import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
  *         track the average density and flow inside a link
  * 
  */
-public class FlowAndDensityCollector implements LinkLeaveEventHandler, LinkEnterEventHandler, AgentArrivalEventHandler, AgentWait2LinkEventHandler {
+public class FlowAndDensityCollector implements LinkLeaveEventHandler, LinkEnterEventHandler, AgentArrivalEventHandler, Wait2LinkEventHandler {
 	private int binSizeInSeconds; // set the length of interval
 	private HashMap<Id, int[]> linkOutFlow; // define
 	private HashMap<Id, int[]> linkInFlow;
@@ -108,7 +108,7 @@ public class FlowAndDensityCollector implements LinkLeaveEventHandler, LinkEnter
 
 	}
 
-	public void handleEvent(AgentWait2LinkEvent event) {
+	public void handleEvent(Wait2LinkEvent event) {
 		enterLink(event.getLinkId(), event.getTime());
 	}
 

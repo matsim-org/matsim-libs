@@ -14,7 +14,7 @@ import org.matsim.core.api.experimental.events.ActivityEndEvent;
 import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
@@ -116,7 +116,7 @@ public class PPSim implements Mobsim{
 			List<Id> linkIds = ((LinkNetworkRouteImpl)leg.getRoute()).getLinkIds();
 			
 			if (linkIds.size()>2){
-				event=new AgentWait2LinkEvent(time,personId,leg.getRoute().getStartLinkId(),personId);
+				event=new Wait2LinkEvent(time,personId,leg.getRoute().getStartLinkId(),personId);
 				eventsManager.processEvent(event);
 				
 				for (int i=1;i<linkIds.size()-1;i++){

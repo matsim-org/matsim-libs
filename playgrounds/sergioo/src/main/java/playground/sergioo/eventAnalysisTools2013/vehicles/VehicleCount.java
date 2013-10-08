@@ -21,12 +21,12 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.core.api.experimental.events.handler.Wait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
@@ -34,7 +34,7 @@ import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 
-public class VehicleCount implements AgentWait2LinkEventHandler, AgentArrivalEventHandler  {
+public class VehicleCount implements Wait2LinkEventHandler, AgentArrivalEventHandler  {
 
 	/*private static Map<Id, Integer>[] numCars;
 	private static Map<Id, Integer>[] numCarsCh;
@@ -186,7 +186,7 @@ public class VehicleCount implements AgentWait2LinkEventHandler, AgentArrivalEve
 	}
 	
 	@Override
-	public void handleEvent(AgentWait2LinkEvent event) {
+	public void handleEvent(Wait2LinkEvent event) {
 		int slot = (int)event.getTime()/timeInterval;
 		if(slot==numCars.length)
 			slot--;

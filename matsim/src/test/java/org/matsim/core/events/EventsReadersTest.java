@@ -29,7 +29,7 @@ import org.matsim.core.api.experimental.events.ActivityStartEvent;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
@@ -38,7 +38,7 @@ import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.core.api.experimental.events.handler.Wait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
@@ -48,7 +48,7 @@ import org.xml.sax.SAXException;
 public class EventsReadersTest extends MatsimTestCase {
 
 
-	static class TestHandler implements ActivityEndEventHandler, AgentDepartureEventHandler, AgentWait2LinkEventHandler,
+	static class TestHandler implements ActivityEndEventHandler, AgentDepartureEventHandler, Wait2LinkEventHandler,
 			LinkLeaveEventHandler, LinkEnterEventHandler, AgentArrivalEventHandler, ActivityStartEventHandler,
 			AgentStuckEventHandler {
 
@@ -74,7 +74,7 @@ public class EventsReadersTest extends MatsimTestCase {
 			assertEquals("3", event.getLinkId().toString());
 		}
 
-		public void handleEvent(final AgentWait2LinkEvent event) {
+		public void handleEvent(final Wait2LinkEvent event) {
 			this.eventCounter++;
 			assertEquals("expected wait2link-Event to be event #3", 3, this.eventCounter);
 			assertEquals(21630.0, event.getTime(), 0.0);

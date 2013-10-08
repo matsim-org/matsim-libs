@@ -26,7 +26,7 @@ import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.AgentDepartureEvent;
 import org.matsim.core.api.experimental.events.AgentMoneyEvent;
 import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.LaneEnterEvent;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
@@ -43,7 +43,7 @@ import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.core.api.experimental.events.handler.Wait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.handler.LaneEnterEventHandler;
@@ -64,7 +64,7 @@ public class LogOutputEventHandler implements LinkEnterEventHandler, LinkLeaveEv
 	ActivityStartEventHandler, ActivityEndEventHandler, 
 	AgentDepartureEventHandler, AgentArrivalEventHandler, 
 	AgentMoneyEventHandler, AgentStuckEventHandler, 
-	AgentWait2LinkEventHandler,
+	Wait2LinkEventHandler,
 	LaneEnterEventHandler, LaneLeaveEventHandler,
 	SignalGroupStateChangedEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
 	VehicleArrivesAtFacilityEventHandler, VehicleDepartsAtFacilityEventHandler{
@@ -109,7 +109,7 @@ public class LogOutputEventHandler implements LinkEnterEventHandler, LinkLeaveEv
 //		log.info("PersonEvent at " + Time.writeTime(event.getTime()) + " person id "  + event.getPersonId());
 	}
 
-	public void handleEvent(AgentWait2LinkEvent event) {
+	public void handleEvent(Wait2LinkEvent event) {
 		log.info("AgentWait2LinkEvent at " + Time.writeTime(event.getTime()) + " person id " + event.getPersonId() + " link id " + event.getLinkId());
 	}
 

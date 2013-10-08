@@ -31,7 +31,7 @@ import java.util.TreeMap;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentWait2LinkEvent;
+import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.LinkEnterEvent;
 import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
@@ -40,7 +40,7 @@ import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentWait2LinkEventHandler;
+import org.matsim.core.api.experimental.events.handler.Wait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
@@ -66,7 +66,7 @@ import playground.pieter.singapore.utils.postgresql.travelcomponents.Trip;
  */
 public class MultiModalFlowAndDensityCollector implements LinkLeaveEventHandler, LinkEnterEventHandler,
 		AgentArrivalEventHandler, PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
-		AgentWait2LinkEventHandler, TransitDriverStartsEventHandler {
+		Wait2LinkEventHandler, TransitDriverStartsEventHandler {
 	private class PTVehicle {
 
 		// Attributes
@@ -243,7 +243,7 @@ public class MultiModalFlowAndDensityCollector implements LinkLeaveEventHandler,
 
 	}
 
-	public void handleEvent(AgentWait2LinkEvent event) {
+	public void handleEvent(Wait2LinkEvent event) {
 		Id vehId = transitDriverIdToVehicleId.get(event.getPersonId());
 		if (vehId != null)
 			ptVehicles.get(vehId).setLastLinkId(event.getLinkId());
