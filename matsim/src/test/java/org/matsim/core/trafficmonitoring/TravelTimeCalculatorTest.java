@@ -34,15 +34,15 @@ import org.junit.Ignore;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -403,7 +403,7 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 
 		Id agId1 = new IdImpl(1510);
 		
-		ttc.handleEvent(new AgentDepartureEvent(100, agId1, link1.getId(), TransportMode.car));
+		ttc.handleEvent(new PersonDepartureEvent(100, agId1, link1.getId(), TransportMode.car));
 		ttc.handleEvent(new LinkEnterEvent(100, agId1, link1.getId(), null));
 		ttc.handleEvent(new LinkLeaveEvent(200, agId1, link1.getId(), null));
 
@@ -433,9 +433,9 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		Id agId1 = new IdImpl(1510);
 		Id agId2 = new IdImpl(1511);
 		
-		ttc.handleEvent(new AgentDepartureEvent(100, agId1, link1.getId(), TransportMode.car));
+		ttc.handleEvent(new PersonDepartureEvent(100, agId1, link1.getId(), TransportMode.car));
 		ttc.handleEvent(new LinkEnterEvent(100, agId1, link1.getId(), null));
-		ttc.handleEvent(new AgentDepartureEvent(110, agId2, link1.getId(), TransportMode.walk));
+		ttc.handleEvent(new PersonDepartureEvent(110, agId2, link1.getId(), TransportMode.walk));
 		ttc.handleEvent(new LinkEnterEvent(110, agId2, link1.getId(), null));
 		ttc.handleEvent(new LinkLeaveEvent(200, agId1, link1.getId(), null));
 		ttc.handleEvent(new LinkLeaveEvent(410, agId2, link1.getId(), null));
@@ -466,9 +466,9 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		Id agId1 = new IdImpl(1510);
 		Id agId2 = new IdImpl(1511);
 		
-		ttc.handleEvent(new AgentDepartureEvent(100, agId1, link1.getId(), TransportMode.car));
+		ttc.handleEvent(new PersonDepartureEvent(100, agId1, link1.getId(), TransportMode.car));
 		ttc.handleEvent(new LinkEnterEvent(100, agId1, link1.getId(), null));
-		ttc.handleEvent(new AgentDepartureEvent(110, agId2, link1.getId(), TransportMode.walk));
+		ttc.handleEvent(new PersonDepartureEvent(110, agId2, link1.getId(), TransportMode.walk));
 		ttc.handleEvent(new LinkEnterEvent(110, agId2, link1.getId(), null));
 		ttc.handleEvent(new LinkLeaveEvent(200, agId1, link1.getId(), null));
 		ttc.handleEvent(new LinkLeaveEvent(410, agId2, link1.getId(), null));
@@ -498,9 +498,9 @@ public class TravelTimeCalculatorTest extends MatsimTestCase {
 		Id agId1 = new IdImpl(1510);
 		Id agId2 = new IdImpl(1511);
 		
-		ttc.handleEvent(new AgentDepartureEvent(100, agId1, link1.getId(), TransportMode.car));
+		ttc.handleEvent(new PersonDepartureEvent(100, agId1, link1.getId(), TransportMode.car));
 		ttc.handleEvent(new LinkEnterEvent(100, agId1, link1.getId(), null));
-		ttc.handleEvent(new AgentDepartureEvent(110, agId2, link1.getId(), TransportMode.walk));
+		ttc.handleEvent(new PersonDepartureEvent(110, agId2, link1.getId(), TransportMode.walk));
 		ttc.handleEvent(new LinkEnterEvent(110, agId2, link1.getId(), null));
 		ttc.handleEvent(new LinkLeaveEvent(200, agId1, link1.getId(), null));
 		ttc.handleEvent(new LinkLeaveEvent(410, agId2, link1.getId(), null));

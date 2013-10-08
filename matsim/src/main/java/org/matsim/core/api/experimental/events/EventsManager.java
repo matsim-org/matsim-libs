@@ -19,11 +19,17 @@
 
 package org.matsim.core.api.experimental.events;
 
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.mobsim.framework.Steppable;
 
+/**
+ * This should be split into two interfaces:
+ * an API (add/removeHandler) and an SPI (Service Provider Interface)
+ */
 public interface EventsManager {
 
+	@Deprecated
 	public EventsFactory getFactory();
 
 	public void processEvent(final Event event);

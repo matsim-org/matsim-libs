@@ -24,19 +24,19 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 
 /**
  * Returns an agent's current transport mode or null if the agent is performing an activity. 
  * 
  * @author cdobler
  */
-public class TransportModeProvider implements AgentArrivalEventHandler, AgentDepartureEventHandler, AgentStuckEventHandler {
+public class TransportModeProvider implements PersonArrivalEventHandler, PersonDepartureEventHandler, PersonStuckEventHandler {
 
 	private final Map<Id, String> transportModes = new ConcurrentHashMap<Id, String>();
 	
@@ -50,17 +50,17 @@ public class TransportModeProvider implements AgentArrivalEventHandler, AgentDep
 	}
 
 	@Override
-	public void handleEvent(AgentStuckEvent event) {
+	public void handleEvent(PersonStuckEvent event) {
 		this.transportModes.remove(event.getPersonId());
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		this.transportModes.put(event.getPersonId(), event.getLegMode());
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		this.transportModes.remove(event.getPersonId());
 	}
 

@@ -28,12 +28,12 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.withinday.trafficmonitoring.EarliestLinkExitTimeProvider;
@@ -59,7 +59,7 @@ import org.matsim.withinday.trafficmonitoring.EarliestLinkExitTimeProvider;
  * 
  * @author cdobler
  */
-public class LinkReplanningMap implements AgentStuckEventHandler, ActivityStartEventHandler, ActivityEndEventHandler, 
+public class LinkReplanningMap implements PersonStuckEventHandler, ActivityStartEventHandler, ActivityEndEventHandler, 
 		MobsimAfterSimStepListener {
 
 	private static final Logger log = Logger.getLogger(LinkReplanningMap.class);
@@ -87,7 +87,7 @@ public class LinkReplanningMap implements AgentStuckEventHandler, ActivityStartE
 	}
 
 	@Override
-	public void handleEvent(AgentStuckEvent event) {
+	public void handleEvent(PersonStuckEvent event) {
 		this.legJustStartedAgents.remove(event.getPersonId());
 	}
 	

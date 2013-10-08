@@ -28,19 +28,19 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentMoneyEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.TravelledEvent;
+import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -123,7 +123,7 @@ public class CharyparNagelScoringFunctionTest {
 	}
 
 	private void handleLeg(EventsToScore eventsToScore, Fixture f, Leg leg) {
-		eventsToScore.handleEvent(new AgentDepartureEvent(leg.getDepartureTime(), f.person.getId(), leg.getRoute().getStartLinkId(), leg.getMode()));
+		eventsToScore.handleEvent(new PersonDepartureEvent(leg.getDepartureTime(), f.person.getId(), leg.getRoute().getStartLinkId(), leg.getMode()));
 		if (leg.getRoute() instanceof NetworkRoute) {
 			NetworkRoute networkRoute = (NetworkRoute) leg.getRoute();
 			eventsToScore.handleEvent(new LinkLeaveEvent(leg.getDepartureTime(), f.person.getId(), leg.getRoute().getStartLinkId(), networkRoute.getVehicleId()));
@@ -133,9 +133,9 @@ public class CharyparNagelScoringFunctionTest {
 			}
 			eventsToScore.handleEvent(new LinkEnterEvent(leg.getDepartureTime() + leg.getTravelTime(), f.person.getId(), leg.getRoute().getEndLinkId(), null));
 		} else {
-			eventsToScore.handleEvent(new TravelledEvent(leg.getDepartureTime() + leg.getTravelTime(), f.person.getId(), leg.getRoute().getDistance()));
+			eventsToScore.handleEvent(new TeleportationArrivalEvent(leg.getDepartureTime() + leg.getTravelTime(), f.person.getId(), leg.getRoute().getDistance()));
 		}
-		eventsToScore.handleEvent(new AgentArrivalEvent(leg.getDepartureTime() + leg.getTravelTime(), f.person.getId(), leg.getRoute().getEndLinkId(), leg.getMode()));
+		eventsToScore.handleEvent(new PersonArrivalEvent(leg.getDepartureTime() + leg.getTravelTime(), f.person.getId(), leg.getRoute().getEndLinkId(), leg.getMode()));
 	}
 
 	private void handleActivity(EventsToScore eventsToScore, Fixture f, Activity activity) {
@@ -562,7 +562,7 @@ public class CharyparNagelScoringFunctionTest {
 	}
 
 	/**
-	 * Tests if the scoring function correctly handles {@link AgentMoneyEvent}.
+	 * Tests if the scoring function correctly handles {@link PersonMoneyEvent}.
 	 * It generates one person with one plan having two activities (home, work)
 	 * and a car-leg in between. It then tests the scoring function by calling
 	 * several methods on an instance of the scoring function with the

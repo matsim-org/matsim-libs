@@ -26,7 +26,7 @@ import java.io.OutputStreamWriter;
 import java.io.PrintStream;
 import java.util.Map;
 
-import org.matsim.core.api.experimental.events.Event;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.utils.io.IOUtils;
 

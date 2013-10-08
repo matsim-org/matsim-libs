@@ -19,9 +19,9 @@
 
 package org.matsim.core.mobsim.jdeqsim;
 
-import org.matsim.core.api.experimental.events.Wait2LinkEvent;
-import org.matsim.core.api.experimental.events.Event;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 
 /**
  * The micro-simulation internal handler for entering a road.

@@ -23,9 +23,13 @@ package org.matsim.core.api.experimental.events;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.Event;
 
 /**
  * @author mrieser
+ * 
+ * Should be replaced by some more generic VehicleDepartsEvent
+ * which supports both links and facilities.
  */
 public class VehicleDepartsAtFacilityEvent extends Event {
 
@@ -46,6 +50,7 @@ public class VehicleDepartsAtFacilityEvent extends Event {
 		this.delay = delay;
 	}
 	
+	@Deprecated
 	public double getDelay() {
 		return this.delay;
 	}

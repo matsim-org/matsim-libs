@@ -29,9 +29,9 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.CountsConfigGroup;
@@ -419,12 +419,12 @@ public class CountControlerListenerTest {
 			Id linkId = new IdImpl("100");
 			for (int i = 0; i < 100; i++) {
 				Id agentId = new IdImpl(i);
-				this.eventsManager.processEvent(new AgentDepartureEvent(60.0, agentId, linkId, TransportMode.car));
+				this.eventsManager.processEvent(new PersonDepartureEvent(60.0, agentId, linkId, TransportMode.car));
 				this.eventsManager.processEvent(new LinkLeaveEvent(60.0, agentId, linkId, null));
 			}
 			for (int i = 100; i < 150; i++) {
 				Id agentId = new IdImpl(i);
-				this.eventsManager.processEvent(new AgentDepartureEvent(60.0, agentId, linkId, TransportMode.walk));
+				this.eventsManager.processEvent(new PersonDepartureEvent(60.0, agentId, linkId, TransportMode.walk));
 				this.eventsManager.processEvent(new LinkLeaveEvent(60.0, agentId, linkId, null));
 			}
 		}

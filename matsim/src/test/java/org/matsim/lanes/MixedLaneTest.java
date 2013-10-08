@@ -23,16 +23,16 @@ import junit.framework.Assert;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.LaneEnterEvent;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.LaneEnterEventHandler;
+import org.matsim.core.api.experimental.events.handler.LaneLeaveEventHandler;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.events.handler.LaneEnterEventHandler;
-import org.matsim.core.events.handler.LaneLeaveEventHandler;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
 import org.matsim.lanes.data.v20.LaneData20;
@@ -233,7 +233,7 @@ public class MixedLaneTest {
 	
 	
 	private static class MixedLanesEventsHandler implements LaneEnterEventHandler, LinkEnterEventHandler, 
-		LaneLeaveEventHandler, AgentDepartureEventHandler {
+		LaneLeaveEventHandler, PersonDepartureEventHandler {
 
 		LaneEnterEvent lane1olEnterEvent = null;
 		LaneLeaveEvent lane1olLeaveEvent = null;
@@ -242,7 +242,7 @@ public class MixedLaneTest {
 		LinkEnterEvent link2Event = null;
 		LinkEnterEvent link3Event = null;
 		LinkEnterEvent link1EnterEvent = null;
-		AgentDepartureEvent agentDepartureEvent = null;
+		PersonDepartureEvent agentDepartureEvent = null;
 		private MixedLaneTestFixture fixture;
 
 		public MixedLanesEventsHandler(MixedLaneTestFixture fixture) {
@@ -252,7 +252,7 @@ public class MixedLaneTest {
 		public void reset(int iteration) {}
 
 		@Override
-		public void handleEvent(AgentDepartureEvent event) {
+		public void handleEvent(PersonDepartureEvent event) {
 			agentDepartureEvent = event;
 		}
 		

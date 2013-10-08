@@ -25,11 +25,11 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.LaneEnterEvent;
 import org.matsim.core.api.experimental.events.LaneLeaveEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -531,7 +531,7 @@ class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem {
 
 		for (QVehicle veh : vehQueue) {
 			qLink.network.simEngine.getMobsim().getEventsManager().processEvent(
-					new AgentStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
+					new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
 			qLink.network.simEngine.getMobsim().getAgentCounter().incLost();
 			qLink.network.simEngine.getMobsim().getAgentCounter().decLiving();
 		}
@@ -539,7 +539,7 @@ class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem {
 
 		for (QVehicle veh : buffer) {
 			qLink.network.simEngine.getMobsim().getEventsManager().processEvent(
-					new AgentStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
+					new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
 			qLink.network.simEngine.getMobsim().getAgentCounter().incLost();
 			qLink.network.simEngine.getMobsim().getAgentCounter().decLiving();
 		}

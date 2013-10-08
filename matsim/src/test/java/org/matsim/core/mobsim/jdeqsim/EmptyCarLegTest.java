@@ -3,11 +3,11 @@ package org.matsim.core.mobsim.jdeqsim;
 import java.util.List;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.Event;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 
 public class EmptyCarLegTest extends AbstractJDEQSimTest {
@@ -31,9 +31,9 @@ public class EmptyCarLegTest extends AbstractJDEQSimTest {
 			// empty car leg or mode!=car
 			assertEquals(21600.0, list.get(0).getTime());
 			assertTrue(list.get(0) instanceof ActivityEndEvent);
-			assertTrue(list.get(1) instanceof AgentDepartureEvent);
+			assertTrue(list.get(1) instanceof PersonDepartureEvent);
 			assertEquals(21600.0, list.get(1).getTime());
-			assertTrue(list.get(2) instanceof AgentArrivalEvent);
+			assertTrue(list.get(2) instanceof PersonArrivalEvent);
 			assertEquals(21600.0, list.get(2).getTime());
 			assertTrue(list.get(3) instanceof ActivityStartEvent);
 			assertEquals(21600.0, list.get(3).getTime());

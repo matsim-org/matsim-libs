@@ -22,13 +22,13 @@ package org.matsim.core.scoring.functions;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.Event;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scoring.ScoringFunctionAccumulator.ArbitraryEventScoring;
@@ -197,8 +197,8 @@ public class CharyparNagelLegScoring implements LegScoring, ArbitraryEventScorin
 			this.score += (event.getTime() - this.lastActivityEndTime) * (this.params.marginalUtilityOfWaitingPt_s - this.params.marginalUtilityOfTravelingPT_s) ;
 		}
 
-		if ( event instanceof AgentDepartureEvent ) {
-			this.currentLegIsPtLeg = TransportMode.pt.equals( ((AgentDepartureEvent)event).getLegMode() );
+		if ( event instanceof PersonDepartureEvent ) {
+			this.currentLegIsPtLeg = TransportMode.pt.equals( ((PersonDepartureEvent)event).getLegMode() );
 			if ( currentLegIsPtLeg ) {
 				if ( !this.nextStartPtLegIsFirstOfTrip ) {
 					this.score -= params.constantPt ;

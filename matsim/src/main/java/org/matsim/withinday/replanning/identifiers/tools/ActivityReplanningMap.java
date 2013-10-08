@@ -33,12 +33,12 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
@@ -55,7 +55,7 @@ import org.matsim.withinday.mobsim.MobsimDataProvider;
  * When an ActivityStartEvent is thrown the Replanning Time is set to
  * the scheduled departure Time of the Activity.
  */
-public class ActivityReplanningMap implements AgentStuckEventHandler,
+public class ActivityReplanningMap implements PersonStuckEventHandler,
 		ActivityStartEventHandler, ActivityEndEventHandler, ReplanningEventHandler,
 		MobsimInitializedListener, MobsimAfterSimStepListener {
 
@@ -180,7 +180,7 @@ public class ActivityReplanningMap implements AgentStuckEventHandler,
 	 * if they are performing an activity.
 	 */
 	@Override
-	public void handleEvent(AgentStuckEvent event) {
+	public void handleEvent(PersonStuckEvent event) {
 	}
 	
 	@Override

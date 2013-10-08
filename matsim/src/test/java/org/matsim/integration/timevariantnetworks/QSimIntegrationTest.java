@@ -27,16 +27,16 @@ import junit.framework.Assert;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.QSimConfigGroup;
@@ -233,10 +233,10 @@ public class QSimIntegrationTest extends MatsimTestCase {
 			}
 		});
 		
-		events.addHandler(new AgentStuckEventHandler() {
+		events.addHandler(new PersonStuckEventHandler() {
 			public void reset(int iteration) {}
 			
-			public void handleEvent(AgentStuckEvent event) {
+			public void handleEvent(PersonStuckEvent event) {
 				Assert.assertEquals(id2, event.getLinkId());
 				Assert.assertEquals(simEndTime, event.getTime());
 				Assert.assertEquals(personId, event.getPersonId());

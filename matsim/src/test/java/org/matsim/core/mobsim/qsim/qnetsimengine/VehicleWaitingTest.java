@@ -26,11 +26,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-
 import org.junit.Assert;
 import org.junit.Test;
-
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.NetworkFactory;
 import org.matsim.api.core.v01.network.Node;
@@ -41,9 +41,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
@@ -175,12 +173,12 @@ public class VehicleWaitingTest {
 
 		final Map<Id, Integer> arrivalCounts = new HashMap<Id, Integer>();
 		final EventsManager events = EventsUtils.createEventsManager();
-		events.addHandler( new AgentArrivalEventHandler() {
+		events.addHandler( new PersonArrivalEventHandler() {
 			@Override
 			public void reset(int iteration) {}
 
 			@Override
-			public void handleEvent(final AgentArrivalEvent event) {
+			public void handleEvent(final PersonArrivalEvent event) {
 				final Integer count = arrivalCounts.get( event.getPersonId() );
 				arrivalCounts.put(
 					event.getPersonId(),

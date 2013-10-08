@@ -30,41 +30,41 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.log4j.Logger;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentMoneyEvent;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonEntersVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonLeavesVehicleEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.TransitDriverStartsEventHandler;
+import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
-import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
-import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
-import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
-import org.matsim.core.api.experimental.events.handler.Wait2LinkEventHandler;
 import org.matsim.core.api.experimental.events.handler.AgentWaitingForPtEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.core.api.experimental.events.handler.VehicleArrivesAtFacilityEventHandler;
+import org.matsim.core.api.experimental.events.handler.VehicleDepartsAtFacilityEventHandler;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.events.handler.EventHandler;
-import org.matsim.core.events.handler.PersonEntersVehicleEventHandler;
-import org.matsim.core.events.handler.PersonLeavesVehicleEventHandler;
-import org.matsim.core.events.handler.TransitDriverStartsEventHandler;
-import org.matsim.core.events.handler.VehicleArrivesAtFacilityEventHandler;
-import org.matsim.core.events.handler.VehicleDepartsAtFacilityEventHandler;
 
 /**
  * EventHandling
@@ -298,11 +298,11 @@ public class EventsManagerImpl implements EventsManager {
 		} else if (klass == Wait2LinkEvent.class) {
 			((Wait2LinkEventHandler)handler).handleEvent((Wait2LinkEvent)ev);
 			return true;
-		} else if (klass == AgentArrivalEvent.class) {
-			((AgentArrivalEventHandler)handler).handleEvent((AgentArrivalEvent)ev);
+		} else if (klass == PersonArrivalEvent.class) {
+			((PersonArrivalEventHandler)handler).handleEvent((PersonArrivalEvent)ev);
 			return true;
-		} else if (klass == AgentDepartureEvent.class) {
-			((AgentDepartureEventHandler)handler).handleEvent((AgentDepartureEvent)ev);
+		} else if (klass == PersonDepartureEvent.class) {
+			((PersonDepartureEventHandler)handler).handleEvent((PersonDepartureEvent)ev);
 			return true;
 		} else if (klass == ActivityEndEvent.class) {
 			((ActivityEndEventHandler)handler).handleEvent((ActivityEndEvent)ev);
@@ -313,11 +313,11 @@ public class EventsManagerImpl implements EventsManager {
 		} else if (klass == TransitDriverStartsEvent.class) {
 			((TransitDriverStartsEventHandler) handler).handleEvent((TransitDriverStartsEvent) ev);
 			return true;
-		} else if (klass == AgentStuckEvent.class) {
-			((AgentStuckEventHandler)handler).handleEvent((AgentStuckEvent)ev);
+		} else if (klass == PersonStuckEvent.class) {
+			((PersonStuckEventHandler)handler).handleEvent((PersonStuckEvent)ev);
 			return true;
-		} else if (klass == AgentMoneyEvent.class) {
-			((AgentMoneyEventHandler)handler).handleEvent((AgentMoneyEvent)ev);
+		} else if (klass == PersonMoneyEvent.class) {
+			((PersonMoneyEventHandler)handler).handleEvent((PersonMoneyEvent)ev);
 			return true;
 		} else if (klass == AgentWaitingForPtEvent.class) {
 			((AgentWaitingForPtEventHandler)handler).handleEvent((AgentWaitingForPtEvent)ev);

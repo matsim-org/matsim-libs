@@ -22,7 +22,7 @@ package org.matsim.core.events;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestUtils;
 

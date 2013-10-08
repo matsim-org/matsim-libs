@@ -20,12 +20,12 @@
 
 package org.matsim.core.scoring;
 
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.events.AgentMoneyEvent;
-import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -57,7 +57,7 @@ public class EventsToScoreTest extends MatsimTestCase {
 		EventsManager events = EventsUtils.createEventsManager();
 		events.addHandler(e2s);
 
-		events.processEvent(new AgentMoneyEvent(3600.0, person.getId(), 3.4));
+		events.processEvent(new PersonMoneyEvent(3600.0, person.getId(), 3.4));
 
 		assertEquals("exactly one instance should have been requested.", 1, sfFactory.counter);
 		assertEquals(0, sfFactory.sf.cntEndAct);
@@ -92,7 +92,7 @@ public class EventsToScoreTest extends MatsimTestCase {
 			events.resetHandlers(mockIteration) ;
 
 			// generating a money event with amount mockIteration-98 (i.e. 1, 2, 3, 4):
-			events.processEvent(new AgentMoneyEvent(3600.0, person.getId(), mockIteration-98 ));
+			events.processEvent(new PersonMoneyEvent(3600.0, person.getId(), mockIteration-98 ));
 			
 			e2s.finish() ;
 			

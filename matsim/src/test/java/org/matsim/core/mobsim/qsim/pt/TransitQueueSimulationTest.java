@@ -32,6 +32,17 @@ import org.apache.log4j.Logger;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -42,20 +53,9 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.AgentWaitingForPtEvent;
-import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.PersonEntersVehicleEvent;
-import org.matsim.core.api.experimental.events.PersonLeavesVehicleEvent;
-import org.matsim.core.api.experimental.events.TransitDriverStartsEvent;
-import org.matsim.core.api.experimental.events.TravelledEvent;
+import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.basic.v01.IdImpl;
@@ -849,17 +849,17 @@ public class TransitQueueSimulationTest {
         int idx = -1;
         assertTrue(allEvents.get(++idx) instanceof ActivityEndEvent);
         assertEquals("h", ((ActivityEndEvent) allEvents.get(0)).getActType());
-        assertTrue(allEvents.get(++idx) instanceof AgentDepartureEvent);
-        assertTrue(allEvents.get(++idx) instanceof TravelledEvent);
-        assertTrue(allEvents.get(++idx) instanceof AgentArrivalEvent);
+        assertTrue(allEvents.get(++idx) instanceof PersonDepartureEvent);
+        assertTrue(allEvents.get(++idx) instanceof TeleportationArrivalEvent);
+        assertTrue(allEvents.get(++idx) instanceof PersonArrivalEvent);
         assertTrue(allEvents.get(++idx) instanceof ActivityStartEvent);
         assertEquals(PtConstants.TRANSIT_ACTIVITY_TYPE, ((ActivityStartEvent) allEvents.get(idx)).getActType());
         assertTrue(allEvents.get(++idx) instanceof ActivityEndEvent); // zero activity duration, waiting at stop is considered as leg
         assertEquals(PtConstants.TRANSIT_ACTIVITY_TYPE, ((ActivityEndEvent) allEvents.get(idx)).getActType());
-        assertTrue(allEvents.get(++idx) instanceof AgentDepartureEvent);
+        assertTrue(allEvents.get(++idx) instanceof PersonDepartureEvent);
         assertTrue(allEvents.get(++idx) instanceof AgentWaitingForPtEvent);
         assertTrue(allEvents.get(++idx) instanceof TransitDriverStartsEvent);
-        assertTrue(allEvents.get(++idx) instanceof AgentDepartureEvent); // pt-driver
+        assertTrue(allEvents.get(++idx) instanceof PersonDepartureEvent); // pt-driver
         assertTrue(allEvents.get(++idx) instanceof PersonEntersVehicleEvent); // pt-driver
         assertTrue(allEvents.get(++idx) instanceof Wait2LinkEvent); // pt-vehicle
         assertTrue(allEvents.get(++idx) instanceof VehicleArrivesAtFacilityEvent);
@@ -869,19 +869,19 @@ public class TransitQueueSimulationTest {
         assertTrue(allEvents.get(++idx) instanceof LinkEnterEvent); // pt-vehicle
         assertTrue(allEvents.get(++idx) instanceof VehicleArrivesAtFacilityEvent); // pt-vehicle
         assertTrue(allEvents.get(++idx) instanceof PersonLeavesVehicleEvent);
-        assertTrue(allEvents.get(++idx) instanceof TravelledEvent);
-        assertTrue(allEvents.get(++idx) instanceof AgentArrivalEvent);
+        assertTrue(allEvents.get(++idx) instanceof TeleportationArrivalEvent);
+        assertTrue(allEvents.get(++idx) instanceof PersonArrivalEvent);
         assertTrue(allEvents.get(++idx) instanceof ActivityStartEvent);
         assertEquals(PtConstants.TRANSIT_ACTIVITY_TYPE, ((ActivityStartEvent) allEvents.get(idx)).getActType());
         assertTrue(allEvents.get(++idx) instanceof ActivityEndEvent); // zero activity duration, waiting at stop is considered as leg
         assertEquals(PtConstants.TRANSIT_ACTIVITY_TYPE, ((ActivityEndEvent) allEvents.get(idx)).getActType());
-        assertTrue(allEvents.get(++idx) instanceof AgentDepartureEvent); // walk
-        assertTrue(allEvents.get(++idx) instanceof TravelledEvent);
-        assertTrue(allEvents.get(++idx) instanceof AgentArrivalEvent);
+        assertTrue(allEvents.get(++idx) instanceof PersonDepartureEvent); // walk
+        assertTrue(allEvents.get(++idx) instanceof TeleportationArrivalEvent);
+        assertTrue(allEvents.get(++idx) instanceof PersonArrivalEvent);
         assertTrue(allEvents.get(++idx) instanceof ActivityStartEvent);
         assertEquals("w", ((ActivityStartEvent) allEvents.get(idx)).getActType());
         assertTrue(allEvents.get(++idx) instanceof VehicleDepartsAtFacilityEvent);
         assertTrue(allEvents.get(++idx) instanceof PersonLeavesVehicleEvent); // pt-driver
-        assertTrue(allEvents.get(++idx) instanceof AgentArrivalEvent); // pt-driver
+        assertTrue(allEvents.get(++idx) instanceof PersonArrivalEvent); // pt-driver
     }
 }

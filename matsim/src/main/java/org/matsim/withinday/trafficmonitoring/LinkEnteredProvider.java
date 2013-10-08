@@ -25,12 +25,12 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 
@@ -44,7 +44,7 @@ import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
  * 
  * @author cdobler
  */
-public class LinkEnteredProvider implements LinkEnterEventHandler, AgentArrivalEventHandler, AgentStuckEventHandler,
+public class LinkEnteredProvider implements LinkEnterEventHandler, PersonArrivalEventHandler, PersonStuckEventHandler,
 		MobsimAfterSimStepListener {
 
 	private Map<Id, Id> linkEnteredAgents = new ConcurrentHashMap<Id, Id>();	// <agentId, linkId>
@@ -61,7 +61,7 @@ public class LinkEnteredProvider implements LinkEnterEventHandler, AgentArrivalE
 	}
 
 	@Override
-	public void handleEvent(AgentStuckEvent event) {
+	public void handleEvent(PersonStuckEvent event) {
 		this.linkEnteredAgents.remove(event.getPersonId());
 	}
 
@@ -70,7 +70,7 @@ public class LinkEnteredProvider implements LinkEnterEventHandler, AgentArrivalE
 	 * in the same time step. If not, this could be removed. 
 	 */
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		this.linkEnteredAgents.remove(event.getPersonId());
 	}
 

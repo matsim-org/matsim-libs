@@ -24,8 +24,6 @@ import java.util.Collection;
 import java.util.PriorityQueue;
 
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.EventsFactory;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
@@ -71,20 +69,6 @@ public class NetworkChangeEventsEngine implements MobsimEngine {
 			NetworkChangeEvent event = this.networkChangeEventsQueue.poll();
 			for (Link link : event.getLinks()) {
 				this.mobsim.getNetsimNetwork().getNetsimLink(link.getId()).recalcTimeVariantAttributes(time);
-
-				EventsManager eventsManager = this.mobsim.getEventsManager();
-				EventsFactory eventsFactory = eventsManager.getFactory();
-
-				if (event.getFlowCapacityChange() != null) {
-					eventsManager.processEvent(eventsFactory.createLinkChangeFlowCapacityEvent(time, link.getId(), event.getFlowCapacityChange()));					
-				}
-				if (event.getFreespeedChange() != null) {
-					eventsManager.processEvent(eventsFactory.createLinkChangeFreespeedEvent(time, link.getId(), event.getFreespeedChange()));					
-				}
-				if (event.getLanesChange() != null) {
-					eventsManager.processEvent(eventsFactory.createLinkChangeLanesEvent(time, link.getId(), event.getLanesChange()));					
-				}
-
 			}
 		}
 	}

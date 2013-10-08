@@ -24,28 +24,28 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.AgentMoneyEvent;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.Wait2LinkEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentMoneyEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentStuckEventHandler;
-import org.matsim.core.api.experimental.events.handler.Wait2LinkEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonMoneyEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.core.utils.io.IOUtils;
 
-public class EventWriterTXT implements EventWriter, ActivityEndEventHandler, ActivityStartEventHandler, AgentArrivalEventHandler, 
-		AgentDepartureEventHandler, AgentStuckEventHandler, AgentMoneyEventHandler, 
+public class EventWriterTXT implements EventWriter, ActivityEndEventHandler, ActivityStartEventHandler, PersonArrivalEventHandler, 
+		PersonDepartureEventHandler, PersonStuckEventHandler, PersonMoneyEventHandler, 
 		Wait2LinkEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler {
 	
 	/* Implement all the different event handlers by its own. Future event types will no longer be
@@ -157,23 +157,23 @@ public class EventWriterTXT implements EventWriter, ActivityEndEventHandler, Act
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
-		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 0, AgentArrivalEvent.EVENT_TYPE);
+	public void handleEvent(PersonArrivalEvent event) {
+		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 0, PersonArrivalEvent.EVENT_TYPE);
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
-		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 6, AgentDepartureEvent.EVENT_TYPE);
+	public void handleEvent(PersonDepartureEvent event) {
+		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 6, PersonDepartureEvent.EVENT_TYPE);
 	}
 	
 	@Override
-	public void handleEvent(AgentStuckEvent event) {
-		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 3, AgentStuckEvent.EVENT_TYPE);
+	public void handleEvent(PersonStuckEvent event) {
+		writeLine(event.getTime(), event.getPersonId(), event.getLinkId(), 3, PersonStuckEvent.EVENT_TYPE);
 	}
 
 	@Override
-	public void handleEvent(AgentMoneyEvent event) {
-		writeLine(event.getTime(), event.getPersonId(), null, 9, AgentMoneyEvent.EVENT_TYPE + "\t" + event.getAmount());
+	public void handleEvent(PersonMoneyEvent event) {
+		writeLine(event.getTime(), event.getPersonId(), null, 9, PersonMoneyEvent.EVENT_TYPE + "\t" + event.getAmount());
 	}
 
 	@Override

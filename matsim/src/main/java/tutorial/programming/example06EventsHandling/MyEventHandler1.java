@@ -1,21 +1,21 @@
 package tutorial.programming.example06EventsHandling;
 
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 /**
  * This event handler prints some event information to the console.
  * @author dgrether
  *
  */
 public class MyEventHandler1 implements LinkEnterEventHandler,
-	LinkLeaveEventHandler, AgentArrivalEventHandler,
-	AgentDepartureEventHandler{
+	LinkLeaveEventHandler, PersonArrivalEventHandler,
+	PersonDepartureEventHandler{
 
 	@Override
 	public void reset(int iteration) {
@@ -40,7 +40,7 @@ public class MyEventHandler1 implements LinkEnterEventHandler,
 	}
 
 	@Override
-	public void handleEvent(AgentArrivalEvent event) {
+	public void handleEvent(PersonArrivalEvent event) {
 		System.out.println("AgentArrivalEvent");
 		System.out.println("Time: " + event.getTime());
 		System.out.println("LinkId: " + event.getLinkId());
@@ -48,7 +48,7 @@ public class MyEventHandler1 implements LinkEnterEventHandler,
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		System.out.println("AgentDepartureEvent");
 		System.out.println("Time: " + event.getTime());
 		System.out.println("LinkId: " + event.getLinkId());

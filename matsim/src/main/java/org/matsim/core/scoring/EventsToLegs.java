@@ -25,17 +25,17 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.TravelledEvent;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
-import org.matsim.core.events.handler.TravelledEventHandler;
+import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
+import org.matsim.core.api.experimental.events.handler.TeleportationArrivalEventHandler;
 import org.matsim.core.population.LegImpl;
 import org.matsim.core.population.routes.GenericRoute;
 import org.matsim.core.population.routes.GenericRouteImpl;
@@ -57,7 +57,7 @@ import org.matsim.core.utils.misc.RouteUtils;
  * @author michaz
  *
  */
-public final class EventsToLegs implements AgentDepartureEventHandler, AgentArrivalEventHandler, LinkLeaveEventHandler, LinkEnterEventHandler, TravelledEventHandler {
+public final class EventsToLegs implements PersonDepartureEventHandler, PersonArrivalEventHandler, LinkLeaveEventHandler, LinkEnterEventHandler, TeleportationArrivalEventHandler {
 	// made this, for the time being, final.  This is currently not pluggable at this level.  If you need such
 	// functionality, please talk to Michael Zilske. kai & dominik, dec'12
 	
@@ -67,11 +67,11 @@ public final class EventsToLegs implements AgentDepartureEventHandler, AgentArri
 	
     private Map<Id, LegImpl> legs = new HashMap<Id, LegImpl>();
     private Map<Id, List<Id>> routes = new HashMap<Id, List<Id>>();
-    private Map<Id, TravelledEvent> routelessTravels = new HashMap<Id, TravelledEvent>();
+    private Map<Id, TeleportationArrivalEvent> routelessTravels = new HashMap<Id, TeleportationArrivalEvent>();
     private LegHandler legHandler;
 
     @Override
-    public void handleEvent(AgentArrivalEvent event) {
+    public void handleEvent(PersonArrivalEvent event) {
         LegImpl leg = legs.get(event.getPersonId());
         leg.setArrivalTime(event.getTime());
         double travelTime = leg.getArrivalTime() - leg.getDepartureTime();
@@ -85,7 +85,7 @@ public final class EventsToLegs implements AgentDepartureEventHandler, AgentArri
             routes.remove(event.getPersonId());
         } else {
             GenericRoute genericRoute = new GenericRouteImpl(route.get(0), event.getLinkId());
-            TravelledEvent travelEvent = routelessTravels.get(event.getPersonId());
+            TeleportationArrivalEvent travelEvent = routelessTravels.get(event.getPersonId());
             if (travelEvent != null) {
                 genericRoute.setDistance(travelEvent.getDistance());
             } else {
@@ -98,7 +98,7 @@ public final class EventsToLegs implements AgentDepartureEventHandler, AgentArri
     }
 
     @Override
-    public void handleEvent(AgentDepartureEvent event) {
+    public void handleEvent(PersonDepartureEvent event) {
         LegImpl leg = new LegImpl(event.getLegMode());
         leg.setDepartureTime(event.getTime());
         legs.put(event.getPersonId(), leg);
@@ -129,7 +129,7 @@ public final class EventsToLegs implements AgentDepartureEventHandler, AgentArri
     }
 
     @Override
-    public void handleEvent(TravelledEvent travelEvent) {
+    public void handleEvent(TeleportationArrivalEvent travelEvent) {
         routelessTravels.put(travelEvent.getPersonId(), travelEvent);
     }
 

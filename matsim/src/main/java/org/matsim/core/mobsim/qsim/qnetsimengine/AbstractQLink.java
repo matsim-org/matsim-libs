@@ -36,8 +36,8 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimAgent.State;
@@ -174,7 +174,7 @@ abstract class AbstractQLink extends QLinkInternalI {
 				
 				
 				this.network.simEngine.getMobsim().getEventsManager().processEvent(
-						new AgentStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
+						new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
 				this.network.simEngine.getMobsim().getAgentCounter().incLost();
 				this.network.simEngine.getMobsim().getAgentCounter().decLiving();
 			}
@@ -186,7 +186,7 @@ abstract class AbstractQLink extends QLinkInternalI {
 				MobsimAgent mobsimAgent = (MobsimAgent) passenger;
 				
 				this.network.simEngine.getMobsim().getEventsManager().processEvent(
-						new AgentStuckEvent(now, mobsimAgent.getId(), veh.getCurrentLink().getId(), mobsimAgent.getMode()));
+						new PersonStuckEvent(now, mobsimAgent.getId(), veh.getCurrentLink().getId(), mobsimAgent.getMode()));
 				this.network.simEngine.getMobsim().getAgentCounter().incLost();
 				this.network.simEngine.getMobsim().getAgentCounter().decLiving();
 			}
@@ -197,7 +197,7 @@ abstract class AbstractQLink extends QLinkInternalI {
 			else stuckAgents.add(driver.getId());
 			
 			this.network.simEngine.getMobsim().getEventsManager().processEvent(
-					new AgentStuckEvent(now, driver.getId(), driver.getCurrentLinkId(), driver.getMode()));
+					new PersonStuckEvent(now, driver.getId(), driver.getCurrentLinkId(), driver.getMode()));
 			this.network.simEngine.getMobsim().getAgentCounter().incLost();
 			this.network.simEngine.getMobsim().getAgentCounter().decLiving();
 		}
@@ -210,7 +210,7 @@ abstract class AbstractQLink extends QLinkInternalI {
 				stuckAgents.add(driver.getId());
 				
 				this.network.simEngine.getMobsim().getEventsManager().processEvent(
-						new AgentStuckEvent(now, driver.getId(), driver.getCurrentLinkId(), driver.getMode()));
+						new PersonStuckEvent(now, driver.getId(), driver.getCurrentLinkId(), driver.getMode()));
 				this.network.simEngine.getMobsim().getAgentCounter().incLost();
 				this.network.simEngine.getMobsim().getAgentCounter().decLiving();
 			}
@@ -222,7 +222,7 @@ abstract class AbstractQLink extends QLinkInternalI {
 				else stuckAgents.add(passenger.getId());
 				
 				this.network.simEngine.getMobsim().getEventsManager().processEvent(
-						new AgentStuckEvent(now, passenger.getId(), passenger.getCurrentLinkId(), passenger.getMode()));
+						new PersonStuckEvent(now, passenger.getId(), passenger.getCurrentLinkId(), passenger.getMode()));
 				this.network.simEngine.getMobsim().getAgentCounter().incLost();
 				this.network.simEngine.getMobsim().getAgentCounter().decLiving();				
 			}
@@ -234,7 +234,7 @@ abstract class AbstractQLink extends QLinkInternalI {
 			else stuckAgents.add(veh.getDriver().getId());
 			
 			this.network.simEngine.getMobsim().getEventsManager().processEvent(
-					new AgentStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
+					new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
 			this.network.simEngine.getMobsim().getAgentCounter().incLost();
 			this.network.simEngine.getMobsim().getAgentCounter().decLiving();
 		}

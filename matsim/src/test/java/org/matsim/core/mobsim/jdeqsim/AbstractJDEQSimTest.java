@@ -10,27 +10,27 @@ import java.util.Map.Entry;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.Wait2LinkEventHandler;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.Wait2LinkEvent;
-import org.matsim.core.api.experimental.events.Event;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.Wait2LinkEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkEnterEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.mobsim.jdeqsim.util.CppEventFileParser;
 import org.matsim.core.mobsim.jdeqsim.util.EventLibrary;
@@ -116,9 +116,9 @@ public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 						}
 
 						// each leg ends with arrival on act link
-						assertTrue(list.get(index) instanceof AgentArrivalEvent);
+						assertTrue(list.get(index) instanceof PersonArrivalEvent);
 						assertTrue(act.getLinkId().toString().equalsIgnoreCase(
-								((AgentArrivalEvent) list.get(index)).getLinkId().toString()));
+								((PersonArrivalEvent) list.get(index)).getLinkId().toString()));
 						index++;
 
 						// each leg ends with arrival on act link
@@ -135,9 +135,9 @@ public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 					index++;
 
 					// each leg starts with departure on act link
-					assertTrue(list.get(index) instanceof AgentDepartureEvent);
+					assertTrue(list.get(index) instanceof PersonDepartureEvent);
 					assertTrue(act.getLinkId().toString().equalsIgnoreCase(
-							((AgentDepartureEvent) list.get(index)).getLinkId().toString()));
+							((PersonDepartureEvent) list.get(index)).getLinkId().toString()));
 					index++;
 
 					// each CAR leg must enter/leave act link
@@ -215,7 +215,7 @@ public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 	}
 
 
-	private class PersonEventCollector implements ActivityStartEventHandler, ActivityEndEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, AgentDepartureEventHandler, AgentArrivalEventHandler, Wait2LinkEventHandler {
+	private class PersonEventCollector implements ActivityStartEventHandler, ActivityEndEventHandler, LinkEnterEventHandler, LinkLeaveEventHandler, PersonDepartureEventHandler, PersonArrivalEventHandler, Wait2LinkEventHandler {
 
 		public void reset(int iteration) {
 		}
@@ -230,7 +230,7 @@ public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 		}
 
 		@Override
-		public void handleEvent(AgentArrivalEvent event) {
+		public void handleEvent(PersonArrivalEvent event) {
 			if (!eventsByPerson.containsKey(event.getPersonId())) {
 				eventsByPerson.put(event.getPersonId(), new LinkedList<Event>());
 			}
@@ -239,7 +239,7 @@ public abstract class AbstractJDEQSimTest extends MatsimTestCase {
 		}
 
 		@Override
-		public void handleEvent(AgentDepartureEvent event) {
+		public void handleEvent(PersonDepartureEvent event) {
 			if (!eventsByPerson.containsKey(event.getPersonId())) {
 				eventsByPerson.put(event.getPersonId(), new LinkedList<Event>());
 			}

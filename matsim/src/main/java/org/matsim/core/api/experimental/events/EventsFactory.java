@@ -21,7 +21,19 @@
 package org.matsim.core.api.experimental.events;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.network.NetworkChangeEvent.ChangeValue;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.GenericEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.signalsystems.model.SignalGroupState;
 
 /**
@@ -40,20 +52,20 @@ public class EventsFactory {
 		return new ActivityStartEvent(time, agentId, linkId, facilityId, acttype);
 	}
 
-	public static AgentArrivalEvent createAgentArrivalEvent(double time, Id agentId, Id linkId, final String legMode) {
-		return new AgentArrivalEvent(time, agentId, linkId, legMode);
+	public static PersonArrivalEvent createAgentArrivalEvent(double time, Id agentId, Id linkId, final String legMode) {
+		return new PersonArrivalEvent(time, agentId, linkId, legMode);
 	}
 
-	public static AgentDepartureEvent createAgentDepartureEvent(double time, Id agentId, Id linkId, final String legMode) {
-		return new AgentDepartureEvent(time, agentId, linkId, legMode);
+	public static PersonDepartureEvent createAgentDepartureEvent(double time, Id agentId, Id linkId, final String legMode) {
+		return new PersonDepartureEvent(time, agentId, linkId, legMode);
 	}
 
-	public static AgentMoneyEvent createAgentMoneyEvent(double time, Id agentId, double amountMoney) {
-		return new AgentMoneyEvent(time, agentId, amountMoney);
+	public static PersonMoneyEvent createAgentMoneyEvent(double time, Id agentId, double amountMoney) {
+		return new PersonMoneyEvent(time, agentId, amountMoney);
 	}
 
-	public static AgentStuckEvent createAgentStuckEvent(double time, Id agentId, Id linkId, final String legMode) {
-		return new AgentStuckEvent(time, agentId, linkId, legMode);
+	public static PersonStuckEvent createAgentStuckEvent(double time, Id agentId, Id linkId, final String legMode) {
+		return new PersonStuckEvent(time, agentId, linkId, legMode);
 	}
 
 	public static Wait2LinkEvent createAgentWait2LinkEvent(double time, Id agentId, Id linkId, Id vehicleId) {
@@ -92,18 +104,6 @@ public class EventsFactory {
 	
 	public static SignalGroupStateChangedEvent createSignalGroupStateChangedEvent(double time, final Id systemId, final Id groupId, SignalGroupState newState){
 		return new SignalGroupStateChangedEvent(time, systemId, groupId, newState);
-	}
-
-	public static LinkChangeFlowCapacityEvent createLinkChangeFlowCapacityEvent(double time, Id linkId, ChangeValue changeValue) {
-		return new LinkChangeFlowCapacityEvent(time, linkId, changeValue);
-	}
-
-	public static LinkChangeFreespeedEvent createLinkChangeFreespeedEvent(double time, Id linkId, ChangeValue changeValue) {
-		return new LinkChangeFreespeedEvent(time, linkId, changeValue);
-	}
-
-	public static LinkChangeLanesEvent createLinkChangeLanesEvent(double time, Id linkId, ChangeValue changeValue) {
-		return new LinkChangeLanesEvent(time, linkId, changeValue);
 	}
 
 	public static GenericEvent createGenericEvent(String type, double time) {

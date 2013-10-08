@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.Event;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.Event;
 
 /**
  * This class is used to calculate statistical values (used among others in some
@@ -25,13 +25,13 @@ public class EventLibrary {
 		double startLegTime = 0;
 
 		for (int i = 0; i < events.size(); i++) {
-			if (events.get(i) instanceof AgentDepartureEvent) {
-				if (Integer.parseInt(((AgentDepartureEvent) events.get(i))
+			if (events.get(i) instanceof PersonDepartureEvent) {
+				if (Integer.parseInt(((PersonDepartureEvent) events.get(i))
 						.getPersonId().toString()) == agentId) {
 					startLegTime = events.get(i).getTime();
 				}
-			} else if (events.get(i) instanceof AgentArrivalEvent) {
-				if (Integer.parseInt(((AgentArrivalEvent) events.get(i))
+			} else if (events.get(i) instanceof PersonArrivalEvent) {
+				if (Integer.parseInt(((PersonArrivalEvent) events.get(i))
 						.getPersonId().toString()) == agentId) {
 					travelTime += events.get(i).getTime() - startLegTime;
 				}
@@ -53,20 +53,20 @@ public class EventLibrary {
 		Event currentEvent = null;
 		for (int i = 0; i < events.size(); i++) {
 			currentEvent = events.get(i);
-			if (currentEvent instanceof AgentDepartureEvent) {
+			if (currentEvent instanceof PersonDepartureEvent) {
 				if (currentEvent.getTime() < 0) {
 					// the problem is, that some agent departure events are
 					// negative.
 					// this solves this problem
 					startingTime
-							.put(((AgentDepartureEvent) currentEvent).getPersonId().toString(), 0.0);
+							.put(((PersonDepartureEvent) currentEvent).getPersonId().toString(), 0.0);
 				} else {
-					startingTime.put(((AgentDepartureEvent) currentEvent).getPersonId().toString(),
+					startingTime.put(((PersonDepartureEvent) currentEvent).getPersonId().toString(),
 							currentEvent.getTime());
 				}
-			} else if (currentEvent instanceof AgentArrivalEvent) {
+			} else if (currentEvent instanceof PersonArrivalEvent) {
 				travelTime += currentEvent.getTime()
-						- startingTime.get(((AgentArrivalEvent) currentEvent).getPersonId()
+						- startingTime.get(((PersonArrivalEvent) currentEvent).getPersonId()
 								.toString());
 			}
 		}

@@ -29,7 +29,8 @@ package org.matsim.core.events.handler;
  *
  */
 public interface EventHandler {
-	/** resets the handler to it's initial condition
+	/** Gives the event handler the possibility to clean up its internal state. 
+	 * Within a Controler-Simulation, this is called before the mobsim starts.
 	 *  
 	 * @param iteration the up-coming iteration from which up-coming events will be from.
 	 */

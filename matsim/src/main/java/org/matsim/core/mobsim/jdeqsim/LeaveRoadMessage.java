@@ -19,8 +19,8 @@
 
 package org.matsim.core.mobsim.jdeqsim;
 
-import org.matsim.core.api.experimental.events.Event;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
 
 /**
  * The micro-simulation internal handler for leaving a road.

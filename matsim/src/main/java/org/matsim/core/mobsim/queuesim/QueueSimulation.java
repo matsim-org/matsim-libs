@@ -30,10 +30,10 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Population;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
@@ -238,7 +238,7 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 
 		for (Tuple<Double, MobsimAgent> entry : this.teleportationList) {
 			MobsimAgent agent = entry.getSecond();
-			events.processEvent(new AgentStuckEvent(now, agent.getId(), agent.getDestinationLinkId(), agent.getMode()));
+			events.processEvent(new PersonStuckEvent(now, agent.getId(), agent.getDestinationLinkId(), agent.getMode()));
 		}
 		this.teleportationList.clear();
 

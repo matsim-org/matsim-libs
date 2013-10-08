@@ -28,9 +28,9 @@ import java.util.Random;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
 import org.matsim.core.api.internal.MatsimComparator;
 import org.matsim.core.api.internal.MatsimNetworkObject;
 import org.matsim.core.config.Config;
@@ -133,7 +133,7 @@ class QueueNode implements MatsimNetworkObject {
 					this.queueNetwork.getMobsim().getAgentCounter().decLiving();
 					this.queueNetwork.getMobsim().getAgentCounter().incLost();
 					QueueSimulation.getEvents().processEvent(
-							new AgentStuckEvent(now, veh.getDriver().getId(), currentLink.getId(), veh.getDriver().getMode()));
+							new PersonStuckEvent(now, veh.getDriver().getId(), currentLink.getId(), veh.getDriver().getMode()));
 				} else {
 					link.popFirstFromBuffer();
 					veh.getDriver().notifyMoveOverNode(nextLinkId);

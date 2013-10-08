@@ -24,18 +24,18 @@ import java.util.HashMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 
 /**
  * Computes average departure delay on a link in a given time slot.
  *
  * @author meisterk
  */
-public class DepartureDelayAverageCalculator implements AgentDepartureEventHandler, LinkLeaveEventHandler {
+public class DepartureDelayAverageCalculator implements PersonDepartureEventHandler, LinkLeaveEventHandler {
 
 	private Network network;
 	private int timeBinSize;
@@ -131,7 +131,7 @@ public class DepartureDelayAverageCalculator implements AgentDepartureEventHandl
 	}
 
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		DepartureEvent depEvent = new DepartureEvent(event.getPersonId());
 		this.departureEventsTimes.put(depEvent, event.getTime());
 	}

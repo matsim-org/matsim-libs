@@ -20,7 +20,7 @@
 
 package org.matsim.core.events;
 
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
 

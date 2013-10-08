@@ -27,11 +27,11 @@ import java.util.Queue;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.api.experimental.events.AgentStuckEvent;
-import org.matsim.core.api.experimental.events.Wait2LinkEvent;
-import org.matsim.core.api.experimental.events.LinkEnterEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
 import org.matsim.core.api.internal.MatsimNetworkObject;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.network.LinkImpl;
@@ -209,7 +209,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 
 		for (QueueVehicle veh : this.waitingList) {
 			QueueSimulation.getEvents().processEvent(
-					new AgentStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh
+					new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh
 							.getDriver().getMode()));
 		}
 
@@ -225,7 +225,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 
 		for (QueueVehicle veh : this.vehQueue) {
 			QueueSimulation.getEvents().processEvent(
-					new AgentStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh
+					new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh
 							.getDriver().getMode()));
 		}
 
@@ -241,7 +241,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 
 		for (QueueVehicle veh : this.buffer) {
 			QueueSimulation.getEvents().processEvent(
-					new AgentStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
+					new PersonStuckEvent(now, veh.getDriver().getId(), veh.getCurrentLink().getId(), veh.getDriver().getMode()));
 		}
 
 		// QueueAgentCounter.staticDecLiving(this.buffer.size());

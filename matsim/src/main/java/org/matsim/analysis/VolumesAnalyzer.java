@@ -27,18 +27,18 @@ import java.util.TreeSet;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.LinkLeaveEvent;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
-import org.matsim.core.api.experimental.events.handler.LinkLeaveEventHandler;
 
 /**
  * Counts the number of vehicles leaving a link, aggregated into time bins of a specified size.
  *
  * @author mrieser
  */
-public class VolumesAnalyzer implements LinkLeaveEventHandler, AgentDepartureEventHandler {
+public class VolumesAnalyzer implements LinkLeaveEventHandler, PersonDepartureEventHandler {
 
 	private final static Logger log = Logger.getLogger(VolumesAnalyzer.class);
 	private final int timeBinSize;
@@ -72,7 +72,7 @@ public class VolumesAnalyzer implements LinkLeaveEventHandler, AgentDepartureEve
 	}
 	
 	@Override
-	public void handleEvent(AgentDepartureEvent event) {
+	public void handleEvent(PersonDepartureEvent event) {
 		if (observeModes) {
 			enRouteModes.put(event.getPersonId(), event.getLegMode());
 		}

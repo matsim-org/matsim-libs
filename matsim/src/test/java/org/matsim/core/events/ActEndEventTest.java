@@ -20,7 +20,7 @@
 
 package org.matsim.core.events;
 
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestCase;
 

@@ -23,9 +23,9 @@ package org.matsim.core.scoring;
 import java.util.ArrayList;
 
 import org.apache.log4j.Logger;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.api.experimental.events.Event;
 import org.matsim.core.utils.misc.Time;
 
 /**

@@ -28,14 +28,14 @@ import java.util.TreeMap;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.ActivityEndEvent;
-import org.matsim.core.api.experimental.events.ActivityStartEvent;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.AgentDepartureEvent;
-import org.matsim.core.api.experimental.events.handler.ActivityEndEventHandler;
-import org.matsim.core.api.experimental.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentArrivalEventHandler;
-import org.matsim.core.api.experimental.events.handler.AgentDepartureEventHandler;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
+import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
 import org.matsim.core.utils.io.IOUtils;
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.core.utils.misc.Time;
@@ -48,7 +48,7 @@ import org.matsim.core.utils.misc.Time;
  * Also calculates the average trip duration.
  * Trips ended because of vehicles being stuck are not counted.
  */
-public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEventHandler, 
+public class CalcLegTimes implements PersonDepartureEventHandler, PersonArrivalEventHandler, 
 	ActivityEndEventHandler, ActivityStartEventHandler {
 
 	private final static Logger log = Logger.getLogger(CalcLegTimes.class);
@@ -69,12 +69,12 @@ public class CalcLegTimes implements AgentDepartureEventHandler, AgentArrivalEve
 	}
 	
 	@Override
-	public void handleEvent(final AgentDepartureEvent event) {
+	public void handleEvent(final PersonDepartureEvent event) {
 		this.agentDepartures.put(event.getPersonId(), event.getTime());
 	}
 
 	@Override
-	public void handleEvent(final AgentArrivalEvent event) {
+	public void handleEvent(final PersonArrivalEvent event) {
 		this.agentArrivals.put(event.getPersonId(), event.getTime());
 	}
 

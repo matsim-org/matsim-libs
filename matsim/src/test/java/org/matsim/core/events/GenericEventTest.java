@@ -20,8 +20,8 @@
 package org.matsim.core.events;
 
 
+import org.matsim.api.core.v01.events.GenericEvent;
 import org.matsim.core.api.experimental.events.EventsFactory;
-import org.matsim.core.api.experimental.events.GenericEvent;
 import org.matsim.testcases.MatsimTestCase;
 
 /**

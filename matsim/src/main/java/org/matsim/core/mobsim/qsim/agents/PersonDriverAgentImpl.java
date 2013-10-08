@@ -24,6 +24,7 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -31,8 +32,7 @@ import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
-import org.matsim.core.api.experimental.events.AgentArrivalEvent;
-import org.matsim.core.api.experimental.events.TravelledEvent;
+import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.config.groups.VspExperimentalConfigGroup.ActivityDurationInterpretation;
 import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.framework.HasPerson;
@@ -120,7 +120,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 
 	@Override
 	public final void endLegAndComputeNextState(final double now) {
-		this.simulation.getEventsManager().processEvent(new AgentArrivalEvent(
+		this.simulation.getEventsManager().processEvent(new PersonArrivalEvent(
 						now, this.getPerson().getId(), this.getDestinationLinkId(), currentLeg.getMode()));
 		if( (!(this.currentLinkId == null && this.cachedDestinationLinkId == null)) 
 				&& !this.currentLinkId.equals(this.cachedDestinationLinkId)) {
@@ -144,7 +144,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 	public final void notifyArrivalOnLinkByNonNetworkMode(final Id linkId) {
 		this.currentLinkId = linkId;
 		double distance = ((Leg) getCurrentPlanElement()).getRoute().getDistance();
-		this.simulation.getEventsManager().processEvent(new TravelledEvent(this.simulation.getSimTimer().getTimeOfDay(), person.getId(), distance));
+		this.simulation.getEventsManager().processEvent(new TeleportationArrivalEvent(this.simulation.getSimTimer().getTimeOfDay(), person.getId(), distance));
 	}
 
 	@Override
