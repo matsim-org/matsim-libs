@@ -19,6 +19,13 @@
  * *********************************************************************** */
 package playground.thibautd.config;
 
+import static playground.thibautd.config.NonFlatConfigXmlNames.MODULE;
+import static playground.thibautd.config.NonFlatConfigXmlNames.NAME;
+import static playground.thibautd.config.NonFlatConfigXmlNames.PARAMETER;
+import static playground.thibautd.config.NonFlatConfigXmlNames.PARAMETER_SET;
+import static playground.thibautd.config.NonFlatConfigXmlNames.TYPE;
+import static playground.thibautd.config.NonFlatConfigXmlNames.VALUE;
+
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Stack;
@@ -27,8 +34,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
 import org.matsim.core.utils.io.MatsimXmlParser;
 import org.xml.sax.Attributes;
-
-import static playground.thibautd.config.NonFlatConfigXmlNames.*;
 
 /**
  * @author thibautd

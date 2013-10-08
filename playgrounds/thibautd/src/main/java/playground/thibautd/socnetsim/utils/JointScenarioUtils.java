@@ -22,9 +22,8 @@ package playground.thibautd.socnetsim.utils;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-
-import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.population.PersonImpl;

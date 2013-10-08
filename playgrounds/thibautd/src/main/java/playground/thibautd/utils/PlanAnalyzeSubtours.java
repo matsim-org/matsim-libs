@@ -30,6 +30,7 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.population.PlanImpl;
+import org.matsim.core.router.TripStructureUtils;
 
 /**
  * Analyses plans for subtours. See documentation <a href="http://matsim.org/node/266">here</a>.

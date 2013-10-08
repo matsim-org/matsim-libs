@@ -19,13 +19,16 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.cliques.population;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.Identifiable;
-
-import static playground.thibautd.socnetsim.cliques.population.CliquesSchemaNames.*;
+import static playground.thibautd.socnetsim.cliques.population.CliquesSchemaNames.CLIQUE;
+import static playground.thibautd.socnetsim.cliques.population.CliquesSchemaNames.CLIQUES;
+import static playground.thibautd.socnetsim.cliques.population.CliquesSchemaNames.CLIQUE_ID;
+import static playground.thibautd.socnetsim.cliques.population.CliquesSchemaNames.MEMBER;
+import static playground.thibautd.socnetsim.cliques.population.CliquesSchemaNames.MEMBER_ID;
 
 import java.util.Collections;
 
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Identifiable;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 

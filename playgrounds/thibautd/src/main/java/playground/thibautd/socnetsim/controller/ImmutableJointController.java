@@ -20,7 +20,6 @@
 package playground.thibautd.socnetsim.controller;
 
 import java.io.File;
-
 import java.util.Collection;
 
 import org.matsim.core.controler.AbstractController;

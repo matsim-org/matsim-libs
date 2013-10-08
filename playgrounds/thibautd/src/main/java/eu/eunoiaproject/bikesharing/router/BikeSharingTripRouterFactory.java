@@ -21,8 +21,8 @@ package eu.eunoiaproject.bikesharing.router;
 
 import java.util.List;
 
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.router.DefaultTripRouterFactoryImpl;

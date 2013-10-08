@@ -19,9 +19,9 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.population;
 
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.population.Plan;

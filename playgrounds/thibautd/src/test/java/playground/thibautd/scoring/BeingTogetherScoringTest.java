@@ -92,14 +92,14 @@ public class BeingTogetherScoringTest {
 					Collections.singleton( alter ) );
 
 		testee.handleEvent(
-				new ActivityEndEvent((double) 10, ego, linkId, null, type) );
+				new ActivityEndEvent(10, ego, linkId, null, type) );
 		testee.handleEvent(
-				new ActivityStartEvent((double) 10, ego, linkId, null, type) );
+				new ActivityStartEvent(10, ego, linkId, null, type) );
 
 		testee.handleEvent(
-				new ActivityEndEvent((double) 100, alter, linkId, null, type) );
+				new ActivityEndEvent(100, alter, linkId, null, type) );
 		testee.handleEvent(
-				new ActivityStartEvent((double) 100, alter, linkId, null, type) );
+				new ActivityStartEvent(100, alter, linkId, null, type) );
 
 		Assert.assertEquals(
 				"unexpected overlap",
@@ -123,14 +123,14 @@ public class BeingTogetherScoringTest {
 					Collections.singleton( alter ) );
 
 		testee.handleEvent(
-				new ActivityEndEvent((double) 10, ego, linkId, null, type) );
+				new ActivityEndEvent(10, ego, linkId, null, type) );
 		testee.handleEvent(
-				new ActivityStartEvent((double) 10, ego, linkId, null, type) );
+				new ActivityStartEvent(10, ego, linkId, null, type) );
 
 		testee.handleEvent(
-				new ActivityEndEvent((double) (26 * 3600), alter, linkId, null, type) );
+				new ActivityEndEvent(26 * 3600, alter, linkId, null, type) );
 		testee.handleEvent(
-				new ActivityStartEvent((double) (26 * 3600), alter, linkId, null, type) );
+				new ActivityStartEvent(26 * 3600, alter, linkId, null, type) );
 
 		Assert.assertEquals(
 				"unexpected overlap",
@@ -155,13 +155,13 @@ public class BeingTogetherScoringTest {
 					Collections.singleton( alter ) );
 
 		testee.handleEvent(
-				new ActivityStartEvent((double) 0, ego, linkId, null, type) );
+				new ActivityStartEvent(0, ego, linkId, null, type) );
 		testee.handleEvent(
-				new ActivityStartEvent((double) 0, alter, linkId, null, type2) );
+				new ActivityStartEvent(0, alter, linkId, null, type2) );
 		testee.handleEvent(
-				new ActivityEndEvent((double) 100, ego, linkId, null, type) );
+				new ActivityEndEvent(100, ego, linkId, null, type) );
 		testee.handleEvent(
-				new ActivityEndEvent((double) 100, alter, linkId, null, type2) );
+				new ActivityEndEvent(100, alter, linkId, null, type2) );
 
 		Assert.assertEquals(
 				"unexpected overlap",
@@ -187,13 +187,13 @@ public class BeingTogetherScoringTest {
 					Collections.singleton( alter ) );
 
 		testee.handleEvent(
-				new ActivityStartEvent((double) 0, ego, linkId, null, type) );
+				new ActivityStartEvent(0, ego, linkId, null, type) );
 		testee.handleEvent(
-				new ActivityStartEvent((double) 0, alter, linkId2, null, type) );
+				new ActivityStartEvent(0, alter, linkId2, null, type) );
 		testee.handleEvent(
-				new ActivityEndEvent((double) 100, ego, linkId, null, type) );
+				new ActivityEndEvent(100, ego, linkId, null, type) );
 		testee.handleEvent(
-				new ActivityEndEvent((double) 100, alter, linkId2, null, type) );
+				new ActivityEndEvent(100, alter, linkId2, null, type) );
 
 		Assert.assertEquals(
 				"unexpected overlap",
@@ -220,13 +220,13 @@ public class BeingTogetherScoringTest {
 					Collections.singleton( alter ) );
 
 		testee.handleEvent(
-				new ActivityStartEvent((double) 0, ego, linkId, null, type) );
+				new ActivityStartEvent(0, ego, linkId, null, type) );
 		testee.handleEvent(
-				new ActivityStartEvent((double) 0, alter, linkId, null, type) );
+				new ActivityStartEvent(0, alter, linkId, null, type) );
 		testee.handleEvent(
-				new ActivityEndEvent((double) 100, ego, linkId, null, type) );
+				new ActivityEndEvent(100, ego, linkId, null, type) );
 		testee.handleEvent(
-				new ActivityEndEvent((double) 100, alter, linkId, null, type) );
+				new ActivityEndEvent(100, alter, linkId, null, type) );
 
 		Assert.assertEquals(
 				"unexpected overlap",
@@ -255,19 +255,19 @@ public class BeingTogetherScoringTest {
 
 		// ego: go from 1 to 2 and do not complete
 		testee.handleEvent(
-				new ActivityEndEvent((double) 10, ego, linkId, null, type1) );
+				new ActivityEndEvent(10, ego, linkId, null, type1) );
 		testee.handleEvent(
-				new ActivityStartEvent((double) 10, ego, linkId, null, type2) );
+				new ActivityStartEvent(10, ego, linkId, null, type2) );
 
 		// alter: 1 to 2 back to 1.
 		testee.handleEvent(
-				new ActivityEndEvent((double) 20, alter, linkId, null, type1) );
+				new ActivityEndEvent(20, alter, linkId, null, type1) );
 		testee.handleEvent(
-				new ActivityStartEvent((double) 20, alter, linkId, null, type2) );
+				new ActivityStartEvent(20, alter, linkId, null, type2) );
 		testee.handleEvent(
-				new ActivityEndEvent((double) 30, alter, linkId, null, type2) );
+				new ActivityEndEvent(30, alter, linkId, null, type2) );
 		testee.handleEvent(
-				new ActivityStartEvent((double) 30, alter, linkId, null, type1) );
+				new ActivityStartEvent(30, alter, linkId, null, type1) );
 
 		// Two behaviors would be valid:
 		// - no overlap (consider undefined)
@@ -300,13 +300,13 @@ public class BeingTogetherScoringTest {
 					Collections.singleton( alter ) );
 
 		testee.handleEvent(
-				new ActivityStartEvent((double) 0, ego, linkId, null, type) );
+				new ActivityStartEvent(0, ego, linkId, null, type) );
 		testee.handleEvent(
-				new ActivityStartEvent((double) 0, other, linkId, null, type) );
+				new ActivityStartEvent(0, other, linkId, null, type) );
 		testee.handleEvent(
-				new ActivityEndEvent((double) 100, ego, linkId, null, type) );
+				new ActivityEndEvent(100, ego, linkId, null, type) );
 		testee.handleEvent(
-				new ActivityEndEvent((double) 100, other, linkId, null, type) );
+				new ActivityEndEvent(100, other, linkId, null, type) );
 
 		Assert.assertEquals(
 				"unexpected overlap",
@@ -411,11 +411,11 @@ public class BeingTogetherScoringTest {
 						ego,
 						Collections.singleton( alter ) );
 			testee.handleEvent(
-					new PersonDepartureEvent((double) 0, new IdImpl( 1 ), ego, "mode") );
+					new PersonDepartureEvent(0, new IdImpl( 1 ), ego, "mode") );
 			testee.handleEvent(
 					new PersonEntersVehicleEvent(os.startEgo, ego, vehId) );
 			testee.handleEvent(
-					new PersonDepartureEvent((double) 0, new IdImpl( 1 ), alter, "mode") );
+					new PersonDepartureEvent(0, new IdImpl( 1 ), alter, "mode") );
 			testee.handleEvent(
 					new PersonEntersVehicleEvent(os.startAlter, alter, vehId) );
 			testee.handleEvent(

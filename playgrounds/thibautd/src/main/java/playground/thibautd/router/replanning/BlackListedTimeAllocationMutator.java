@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Random;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.ActivityImpl;

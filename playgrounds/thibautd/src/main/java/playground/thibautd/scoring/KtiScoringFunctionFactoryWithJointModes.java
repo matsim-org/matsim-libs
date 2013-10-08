@@ -19,9 +19,9 @@
  * *********************************************************************** */
 package playground.thibautd.scoring;
 
+import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
 import org.matsim.core.router.EmptyStageActivityTypes;
 import org.matsim.core.router.StageActivityTypes;
@@ -36,7 +36,6 @@ import playground.ivt.kticompatibility.KtiLikeActivitiesScoringFunctionFactory;
 import playground.ivt.kticompatibility.KtiLikeScoringConfigGroup;
 import playground.ivt.scoring.ElementalCharyparNagelLegScoringFunction;
 import playground.ivt.scoring.ElementalCharyparNagelLegScoringFunction.LegScoringParameters;
-
 import playground.thibautd.socnetsim.population.JointActingTypes;
 
 /**

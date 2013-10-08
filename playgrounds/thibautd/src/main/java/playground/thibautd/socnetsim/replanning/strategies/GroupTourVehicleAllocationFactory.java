@@ -26,8 +26,8 @@ import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactory;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils;
 import playground.thibautd.socnetsim.replanning.IndividualBasedGroupStrategyModule;
-import playground.thibautd.socnetsim.sharedvehicles.replanning.AllocateVehicleToSubtourModule;
 import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;
+import playground.thibautd.socnetsim.sharedvehicles.replanning.AllocateVehicleToSubtourModule;
 
 /**
  * @author thibautd

@@ -50,7 +50,6 @@ import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.StageActivityTypes;
 import org.matsim.core.router.StageActivityTypesImpl;
 
-import playground.thibautd.socnetsim.cliques.replanning.modules.jointtripinsertor.JointTripRemoverAlgorithm;
 import playground.thibautd.socnetsim.population.DriverRoute;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlan;

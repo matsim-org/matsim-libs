@@ -50,8 +50,8 @@ import playground.thibautd.socnetsim.population.PassengerRoute;
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
 import playground.thibautd.socnetsim.utils.JointMainModeIdentifier;
 import playground.thibautd.socnetsim.utils.JointPlanUtils;
-import playground.thibautd.socnetsim.utils.JointPlanUtils.JointTrip;
 import playground.thibautd.socnetsim.utils.JointPlanUtils.JointTravelStructure;
+import playground.thibautd.socnetsim.utils.JointPlanUtils.JointTrip;
 
 /**
  * An algorithm which creates joint trips from nothing,

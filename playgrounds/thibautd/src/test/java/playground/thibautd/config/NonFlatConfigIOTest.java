@@ -25,7 +25,6 @@ import java.util.Iterator;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.Module;

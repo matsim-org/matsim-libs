@@ -21,9 +21,10 @@ package playground.thibautd.socnetsim.run;
 
 import java.util.Collection;
 
-import org.matsim.core.config.experimental.ReflectiveModule.StringGetter;
-import org.matsim.core.config.experimental.ReflectiveModule.StringSetter; 
 import org.matsim.core.config.Module;
+import org.matsim.core.config.experimental.ReflectiveModule.StringGetter;
+import org.matsim.core.config.experimental.ReflectiveModule.StringSetter;
+
 import playground.thibautd.config.ReflectiveNonFlatModule;
 
 /**

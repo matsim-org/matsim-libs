@@ -44,7 +44,6 @@ import org.matsim.core.scenario.ScenarioUtils;
 
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.population.JointPlanFactory;
-import playground.thibautd.socnetsim.replanning.grouping.GroupPlans;
 
 /**
  * @author thibautd

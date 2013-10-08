@@ -21,9 +21,9 @@ package playground.thibautd.parknride.herbiespecific;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
-import org.junit.Ignore;
 import herbie.running.config.HerbieConfigGroup;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Coord;

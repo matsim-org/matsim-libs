@@ -21,7 +21,6 @@ package playground.thibautd.utils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-
 import java.util.Map;
 
 import org.jdom.Document;
@@ -29,7 +28,6 @@ import org.jdom.Element;
 import org.jdom.JDOMException;
 import org.jdom.input.SAXBuilder;
 import org.jdom.output.XMLOutputter;
-
 import org.matsim.core.utils.io.UncheckedIOException;
 import org.matsim.population.Desires;
 import org.matsim.utils.objectattributes.AttributeConverter;

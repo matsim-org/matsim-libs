@@ -19,20 +19,10 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.cliques.replanning.modules.jointtripinsertor;
 
-import java.util.HashSet;
-
-import org.matsim.core.router.CompositeStageActivityTypes;
-import org.matsim.core.router.MainModeIdentifier;
-import org.matsim.core.router.StageActivityTypes;
-import org.matsim.core.router.TripRouter;
-import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.router.TripStructureUtils.Trip;
-
-import playground.thibautd.socnetsim.utils.JointPlanUtils;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -46,11 +36,18 @@ import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
+import org.matsim.core.router.CompositeStageActivityTypes;
+import org.matsim.core.router.MainModeIdentifier;
+import org.matsim.core.router.StageActivityTypes;
+import org.matsim.core.router.TripRouter;
+import org.matsim.core.router.TripStructureUtils;
+import org.matsim.core.router.TripStructureUtils.Trip;
 
 import playground.thibautd.socnetsim.population.DriverRoute;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
+import playground.thibautd.socnetsim.utils.JointPlanUtils;
 import playground.thibautd.socnetsim.utils.JointPlanUtils.JointTravelStructure;
 import playground.thibautd.socnetsim.utils.JointPlanUtils.JointTrip;
 

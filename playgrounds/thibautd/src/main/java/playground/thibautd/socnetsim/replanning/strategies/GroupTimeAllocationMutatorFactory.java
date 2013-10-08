@@ -20,7 +20,6 @@
 package playground.thibautd.socnetsim.replanning.strategies;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.core.config.Config;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.replanning.modules.AbstractMultithreadedModule;

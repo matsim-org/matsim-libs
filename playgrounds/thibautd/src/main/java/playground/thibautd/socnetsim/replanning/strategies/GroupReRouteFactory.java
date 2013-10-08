@@ -19,11 +19,13 @@
  * *********************************************************************** */
 package playground.thibautd.socnetsim.replanning.strategies;
 
+import static playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils.createRandomSelectingStrategy;
+import static playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils.createReRouteModule;
+import static playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils.createRecomposeJointPlansModule;
+import static playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils.createSynchronizerModule;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactory;
-
-import static playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactoryUtils.*;
 /**
  * @author thibautd
  */

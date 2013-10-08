@@ -24,9 +24,9 @@ import org.matsim.core.gbl.MatsimRandom;
 import playground.thibautd.socnetsim.controller.ControllerRegistry;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategy;
 import playground.thibautd.socnetsim.replanning.GroupPlanStrategyFactory;
-import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
 import playground.thibautd.socnetsim.replanning.selectors.LogitWeight;
 import playground.thibautd.socnetsim.replanning.selectors.ParetoWeight;
+import playground.thibautd.socnetsim.replanning.selectors.highestweightselection.HighestWeightSelector;
 
 /**
  * @author thibautd

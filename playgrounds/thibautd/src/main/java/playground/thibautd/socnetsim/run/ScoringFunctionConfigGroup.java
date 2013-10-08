@@ -20,6 +20,7 @@
 package playground.thibautd.socnetsim.run;
 
 import org.matsim.core.config.experimental.ReflectiveModule;
+
 import playground.thibautd.scoring.BeingTogetherScoring;
 
 class ScoringFunctionConfigGroup extends ReflectiveModule {

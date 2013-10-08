@@ -24,8 +24,8 @@ import java.util.Arrays;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.Module;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.scenario.ScenarioUtils;
 
 import eu.eunoiaproject.bikesharing.BikeSharingConstants;

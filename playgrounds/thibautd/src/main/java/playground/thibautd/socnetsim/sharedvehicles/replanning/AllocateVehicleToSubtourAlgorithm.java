@@ -31,8 +31,8 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.router.TripRouter;
 import org.matsim.core.router.TripStructureUtils;
-import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.core.router.TripStructureUtils.Subtour;
+import org.matsim.core.router.TripStructureUtils.Trip;
 import org.matsim.population.algorithms.PlanAlgorithm;
 
 import playground.thibautd.socnetsim.sharedvehicles.VehicleRessources;

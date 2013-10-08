@@ -43,9 +43,6 @@ import org.matsim.core.router.MainModeIdentifierImpl;
 import org.matsim.core.router.TripRouter;
 
 import playground.thibautd.socnetsim.cliques.config.JointTripInsertorConfigGroup;
-import playground.thibautd.socnetsim.cliques.replanning.modules.jointtripinsertor.JointTripInsertorAlgorithm;
-import playground.thibautd.socnetsim.cliques.replanning.modules.jointtripinsertor.JointTripInsertorAndRemoverAlgorithm;
-import playground.thibautd.socnetsim.cliques.replanning.modules.jointtripinsertor.JointTripRemoverAlgorithm;
 import playground.thibautd.socnetsim.population.DriverRoute;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlan;

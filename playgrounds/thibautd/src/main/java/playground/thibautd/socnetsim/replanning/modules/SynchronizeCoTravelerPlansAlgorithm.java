@@ -22,7 +22,6 @@ package playground.thibautd.socnetsim.replanning.modules;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -34,9 +33,9 @@ import org.matsim.core.utils.misc.Time;
 import playground.thibautd.socnetsim.population.JointActingTypes;
 import playground.thibautd.socnetsim.population.JointPlan;
 import playground.thibautd.socnetsim.replanning.GenericPlanAlgorithm;
+import playground.thibautd.socnetsim.utils.JointPlanUtils;
 import playground.thibautd.socnetsim.utils.JointPlanUtils.JointTravelStructure;
 import playground.thibautd.socnetsim.utils.JointPlanUtils.JointTrip;
-import playground.thibautd.socnetsim.utils.JointPlanUtils;
 
 /**
  * An algorithm which attempts to synchronize the plans of passengers

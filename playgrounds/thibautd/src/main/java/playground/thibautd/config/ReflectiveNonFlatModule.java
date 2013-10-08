@@ -21,14 +21,12 @@ package playground.thibautd.config;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.core.config.experimental.ReflectiveModule.StringGetter;
 import org.matsim.core.config.experimental.ReflectiveModule.StringSetter;
 

@@ -19,8 +19,14 @@
  * *********************************************************************** */
 package playground.thibautd.config;
 
-import java.io.IOException;
+import static playground.thibautd.config.NonFlatConfigXmlNames.CONFIG;
+import static playground.thibautd.config.NonFlatConfigXmlNames.MODULE;
+import static playground.thibautd.config.NonFlatConfigXmlNames.NAME;
+import static playground.thibautd.config.NonFlatConfigXmlNames.PARAMETER;
+import static playground.thibautd.config.NonFlatConfigXmlNames.PARAMETER_SET;
+import static playground.thibautd.config.NonFlatConfigXmlNames.TYPE;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Map;
@@ -30,8 +36,6 @@ import org.matsim.core.config.Module;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.io.MatsimXmlWriter;
 import org.matsim.core.utils.io.UncheckedIOException;
-
-import static playground.thibautd.config.NonFlatConfigXmlNames.*;
 
 /**
  * @author thibautd

@@ -20,7 +20,6 @@
 package playground.thibautd.socnetsim.controller;
 
 import org.apache.log4j.Logger;
-
 import org.matsim.analysis.CalcLegTimes;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
