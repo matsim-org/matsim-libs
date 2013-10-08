@@ -42,7 +42,7 @@ import java.lang.reflect.Field;
 import java.sql.SQLException;
 import java.util.Properties;
 
-public class EventsToTravelSummaryRelationalTablesGUI extends JFrame {
+public class EventsToTravelSummaryTablesGUI extends JFrame {
 
 	private JPanel contentPane;
 	private JTextField schemaNameComponent;
@@ -61,7 +61,7 @@ public class EventsToTravelSummaryRelationalTablesGUI extends JFrame {
 	private String tableSuffix = "_ezlinksim";
 	private String schemaName = "u_fouriep";
 	private String postgresProperties = "data/matsim2postgres.properties";
-	private EventsToTravelSummaryRelationalTablesGUI self = this;
+	private EventsToTravelSummaryTablesGUI self = this;
 	private String defaultpath = "";
 
 	/**
@@ -71,7 +71,7 @@ public class EventsToTravelSummaryRelationalTablesGUI extends JFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					EventsToTravelSummaryRelationalTablesGUI frame = new EventsToTravelSummaryRelationalTablesGUI();
+					EventsToTravelSummaryTablesGUI frame = new EventsToTravelSummaryTablesGUI();
 					frame.setVisible(true);
 					frame.loadDefaultProperties(new File(
 							"eventsToSQL.properties"));
@@ -85,7 +85,7 @@ public class EventsToTravelSummaryRelationalTablesGUI extends JFrame {
 	/**
 	 * Create the frame.
 	 */
-	public EventsToTravelSummaryRelationalTablesGUI() {
+	public EventsToTravelSummaryTablesGUI() {
 		setTitle("Events to PostgreSQL tables");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setBounds(100, 100, 764, 300);
@@ -398,7 +398,7 @@ public class EventsToTravelSummaryRelationalTablesGUI extends JFrame {
 				.getText());
 
 		EventsManager eventsManager = EventsUtils.createEventsManager();
-		EventsToPlanElements test;
+		EventsToTravelSummaryTables test;
 		// if(linkTrafficComponent.isSelected()){
 		// test = new EventsToPlanElements(
 		// scenario.getTransitSchedule(), scenario.getNetwork(),
@@ -406,12 +406,12 @@ public class EventsToTravelSummaryRelationalTablesGUI extends JFrame {
 		// ,tableSuffixComponent.getText());
 		// }else{
 		if (isTransit) {
-			test = new EventsToPlanElements(scenario.getTransitSchedule(),
+			test = new EventsToTravelSummaryTables(scenario.getTransitSchedule(),
 					scenario.getNetwork(), scenario.getConfig(), tableSuffix,
 					schemaNameComponent.getText());
 
 		} else {
-			test = new EventsToPlanElements(scenario.getNetwork(),
+			test = new EventsToTravelSummaryTables(scenario.getNetwork(),
 					scenario.getConfig(), tableSuffix,
 					schemaNameComponent.getText());
 		}

@@ -127,10 +127,10 @@
 		<param name="Module_2" value="ReRoute" />
 
 		<param name="ModuleProbability_3" value="0.04" />
-		<param name="Module_3" value="TransitTimeAllocationMutator" />
+		<param name="Module_3" value="TimeAllocationMutator" />
 
 		<param name="ModuleProbability_4" value="0.02" />
-		<param name="Module_4" value="TransitChangeLegMode" />
+		<param name="Module_4" value="ChangeLegMode" />
 	</module>
 
 	<module name="transit">

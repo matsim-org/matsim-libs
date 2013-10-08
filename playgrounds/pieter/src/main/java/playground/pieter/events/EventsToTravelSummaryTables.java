@@ -76,7 +76,7 @@ import playground.pieter.singapore.utils.postgresql.travelcomponents.*;
  *         modes.
  */
 
-public class EventsToPlanElements implements TransitDriverStartsEventHandler,
+public class EventsToTravelSummaryTables implements TransitDriverStartsEventHandler,
 		PersonEntersVehicleEventHandler, PersonLeavesVehicleEventHandler,
 		PersonDepartureEventHandler, PersonArrivalEventHandler,
 		ActivityStartEventHandler, ActivityEndEventHandler,
@@ -144,7 +144,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 	private HashSet<Id> transitDriverIds = new HashSet<Id>();
 	private boolean isTransitScenario = false;
 
-	public EventsToPlanElements(TransitSchedule transitSchedule,
+	public EventsToTravelSummaryTables(TransitSchedule transitSchedule,
 			Network network, Config config, String suffix, String schemaName) {
 		this.transitSchedule = transitSchedule;
 		this.isTransitScenario = true;
@@ -155,7 +155,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 //		new VehicleReaderV1(vehicles).readFile(transitVehiclesfile);
 //		transitVehicleIds.addAll(vehicles.getVehicles().keySet());
 	}
-	public EventsToPlanElements(
+	public EventsToTravelSummaryTables(
 			Network network, Config config, String suffix, String schemaName) {
 		this.network = network;
 		this.walkSpeed = new TransitRouterConfig(config).getBeelineWalkSpeed();
@@ -163,7 +163,7 @@ public class EventsToPlanElements implements TransitDriverStartsEventHandler,
 	}
 
 	
-	public EventsToPlanElements(TransitSchedule transitSchedule,
+	public EventsToTravelSummaryTables(TransitSchedule transitSchedule,
 			Network network, Config config, File connectionProperties,
 			String suffix, String schemaName) {
 //		this(transitSchedule, network, config, suffix, transitVehiclesfile);
