@@ -172,7 +172,7 @@ public final class QSim implements VisMobsim, Netsim {
 		log.info("Using QSim...");
 		this.listenerManager = new MobsimListenerManager(this);
 		this.agentCounter = new AgentCounter();
-		this.simTimer = new MobsimTimer(sc.getConfig().getQSimConfigGroup().getTimeStepSize());
+		this.simTimer = new MobsimTimer(sc.getConfig().qsim().getTimeStepSize());
 	}
 
 	// ============================================================================================================================
@@ -340,7 +340,7 @@ public final class QSim implements VisMobsim, Netsim {
 	// ############################################################################################################################
 
 	private void initSimTimer() {
-		QSimConfigGroup qSimConfigGroup = this.scenario.getConfig().getQSimConfigGroup();
+		QSimConfigGroup qSimConfigGroup = this.scenario.getConfig().qsim();
 		Double configuredStartTime = qSimConfigGroup.getStartTime();
 		this.stopTime = qSimConfigGroup.getEndTime();
 		if (configuredStartTime == Time.UNDEFINED_TIME) {

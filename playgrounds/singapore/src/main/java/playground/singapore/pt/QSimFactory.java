@@ -35,7 +35,6 @@ import org.matsim.core.mobsim.qsim.agents.PopulationAgentSource;
 import org.matsim.core.mobsim.qsim.agents.TransitAgentFactory;
 import org.matsim.core.mobsim.qsim.changeeventsengine.NetworkChangeEventsEngine;
 import org.matsim.core.mobsim.qsim.interfaces.Netsim;
-import org.matsim.core.mobsim.qsim.pt.ComplexTransitStopHandlerFactory;
 import org.matsim.core.mobsim.qsim.pt.TransitQSimEngine;
 import org.matsim.core.mobsim.qsim.qnetsimengine.DefaultQSimEngineFactory;
 import org.matsim.core.mobsim.qsim.qnetsimengine.ParallelQNetsimEngineFactory;
@@ -61,7 +60,7 @@ public class QSimFactory implements MobsimFactory {
 	@Override
 	public Netsim createMobsim(Scenario sc, EventsManager eventsManager) {
 
-		QSimConfigGroup conf = sc.getConfig().getQSimConfigGroup();
+		QSimConfigGroup conf = sc.getConfig().qsim();
 		if (conf == null) {
 			throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
 		}

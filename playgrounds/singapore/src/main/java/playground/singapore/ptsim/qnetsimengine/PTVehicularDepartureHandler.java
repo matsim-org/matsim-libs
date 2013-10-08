@@ -51,7 +51,7 @@ class PTVehicularDepartureHandler implements DepartureHandler {
 	PTVehicularDepartureHandler(PTQNetsimEngine qNetsimEngine, VehicleBehavior vehicleBehavior) {
 		this.qNetsimEngine = qNetsimEngine;
 		this.vehicleBehavior = vehicleBehavior;
-		this.transportModes = qNetsimEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().getMainModes() ;
+		this.transportModes = qNetsimEngine.getMobsim().getScenario().getConfig().qsim().getMainModes() ;
 	}
 
 	@Override

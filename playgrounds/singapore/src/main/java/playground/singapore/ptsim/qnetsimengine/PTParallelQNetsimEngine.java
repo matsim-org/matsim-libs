@@ -27,7 +27,6 @@ import java.util.concurrent.CyclicBarrier;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.network.Link;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.mobsim.qsim.qnetsimengine.NetsimLink;
 
 import playground.singapore.ptsim.QSim;
@@ -68,7 +67,7 @@ class PTParallelQNetsimEngine extends PTQNetsimEngine {
 		super(sim, netsimNetworkFactory);
 		// (DepartureHander does not need to be added here since it is added in the "super" c'tor)
 
-		this.numOfThreads = this.getMobsim().getScenario().getConfig().getQSimConfigGroup().getNumberOfThreads();
+		this.numOfThreads = this.getMobsim().getScenario().getConfig().qsim().getNumberOfThreads();
 	}
 
 	@Override

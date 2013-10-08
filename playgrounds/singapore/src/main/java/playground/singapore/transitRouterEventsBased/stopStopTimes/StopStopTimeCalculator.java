@@ -3,8 +3,8 @@ package playground.singapore.transitRouterEventsBased.stopStopTimes;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
@@ -28,7 +28,7 @@ public class StopStopTimeCalculator implements VehicleArrivesAtFacilityEventHand
 	
 	//Constructors
 	public StopStopTimeCalculator(final TransitSchedule transitSchedule, final Config config) {
-		this(transitSchedule, config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config.getQSimConfigGroup().getEndTime()-config.getQSimConfigGroup().getStartTime()));
+		this(transitSchedule, config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config.qsim().getEndTime()-config.qsim().getStartTime()));
 	}
 	public StopStopTimeCalculator(final TransitSchedule transitSchedule, final int timeSlot, final int totalTime) {
 		this.timeSlot = timeSlot;

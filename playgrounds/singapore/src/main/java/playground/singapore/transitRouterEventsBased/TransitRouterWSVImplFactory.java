@@ -55,7 +55,7 @@ public class TransitRouterWSVImplFactory implements TransitRouterFactory {
 	}
 	@Override
 	public TransitRouter createTransitRouter() {
-		return new TransitRouterVariableImpl(config, new TransitRouterNetworkTravelTimeAndDisutilityWSV(config, routerNetwork, waitTime, stopStopTime, vehicleOccupancy, scenario.getConfig().travelTimeCalculator(), scenario.getConfig().getQSimConfigGroup(), new PreparedTransitSchedule(scenario.getTransitSchedule())), routerNetwork);
+		return new TransitRouterVariableImpl(config, new TransitRouterNetworkTravelTimeAndDisutilityWSV(config, routerNetwork, waitTime, stopStopTime, vehicleOccupancy, scenario.getConfig().travelTimeCalculator(), scenario.getConfig().qsim(), new PreparedTransitSchedule(scenario.getTransitSchedule())), routerNetwork);
 	}
 
 }

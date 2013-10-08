@@ -130,10 +130,10 @@ public class PTQNetsimEngine extends NetElementActivator implements MobsimEngine
 	public PTQNetsimEngine(final QSim sim, NetsimNetworkFactory<QNode, PTQLink> netsimNetworkFactory) {
 		this.qsim = sim;
 
-		this.stucktimeCache = sim.getScenario().getConfig().getQSimConfigGroup().getStuckTime();
+		this.stucktimeCache = sim.getScenario().getConfig().qsim().getStuckTime();
 
 		// configuring the car departure hander (including the vehicle behavior)
-		QSimConfigGroup qSimConfigGroup = this.qsim.getScenario().getConfig().getQSimConfigGroup();
+		QSimConfigGroup qSimConfigGroup = this.qsim.getScenario().getConfig().qsim();
 		VehicleBehavior vehicleBehavior;
 		if (qSimConfigGroup.getVehicleBehavior().equals(QSimConfigGroup.VEHICLE_BEHAVIOR_EXCEPTION)) {
 			vehicleBehavior = VehicleBehavior.EXCEPTION;
@@ -147,13 +147,13 @@ public class PTQNetsimEngine extends NetElementActivator implements MobsimEngine
 		dpHandler = new PTVehicularDepartureHandler(this, vehicleBehavior);
 
 		// yyyyyy I am quite sceptic if the following should stay since it does not work.  kai, feb'11
-		if ( "queue".equals( sim.getScenario().getConfig().getQSimConfigGroup().getTrafficDynamics() ) ) {
+		if ( "queue".equals( sim.getScenario().getConfig().qsim().getTrafficDynamics() ) ) {
 			PTQLink.HOLES=false ;
-		} else if ( "withHolesExperimental".equals( sim.getScenario().getConfig().getQSimConfigGroup().getTrafficDynamics() ) ) {
+		} else if ( "withHolesExperimental".equals( sim.getScenario().getConfig().qsim().getTrafficDynamics() ) ) {
 			PTQLink.HOLES = true ;
 		} else {
 			throw new RuntimeException("trafficDynamics defined in config that does not exist: "
-					+ sim.getScenario().getConfig().getQSimConfigGroup().getTrafficDynamics() ) ;
+					+ sim.getScenario().getConfig().qsim().getTrafficDynamics() ) ;
 		}
 
 		// the following is so confused because I can't separate it out, the reason being that ctor calls need to be the 
