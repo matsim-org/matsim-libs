@@ -52,7 +52,7 @@ public class BiDirPedsCA {
 
 	private static final double MAX_TIME = 1000;
 
-	private static final double WARMUP_TIME = 200;
+	private static final double WARMUP_TIME = 100;
 
 	private static final boolean VISUALIZE = false;
 
@@ -63,10 +63,10 @@ public class BiDirPedsCA {
 	public void run() {
 
 		int idx1 = 0;
-		for (double rho1 = 0; rho1 <= 1; rho1 += 0.01) {
+		for (double rho1 = 0; rho1 <= 1; rho1 += 0.005) {
 			idx1++;
 			int idx2 = 0;
-			for (double rho2 = 0; rho2 <= 1; rho2 += 0.01) {
+			for (double rho2 = 0; rho2 <= 1; rho2 += 0.005) {
 				idx2++;
 				double rho = rho1+rho2;
 				if (rho > 1) {
@@ -248,8 +248,11 @@ public class BiDirPedsCA {
 				if (msaTTLR == 0) {
 					vLR = 0;
 				}
-
-				System.out.println(rrho + "," + rrho1 + " " + rrho2 +  " " + v + " " + rrho*v + " " + vLR + " " + rrho1*vLR + " " + vRL + " " + rrho2*vRL + " " + idx1 + " " + idx2);
+				
+				double RLFlow = rrho2*vRL;
+				double LRFlow = rrho1*vLR;
+				double totalFlow = RLFlow + LRFlow;
+				System.out.println(rrho + "," + rrho1 + " " + rrho2 +  " " + v + " " + totalFlow + " " + vLR + " " + rrho1*vLR + " " + vRL + " " + rrho2*vRL + " " + idx1 + " " + idx2);
 
 			}
 		}
