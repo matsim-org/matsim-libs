@@ -27,6 +27,7 @@ import java.util.Set;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -280,8 +281,7 @@ public class PassengerDepartureHandler implements DepartureHandler {
 				leavingPassenger.notifyArrivalOnLinkByNonNetworkMode(vehicle.getCurrentLink().getId());
 				
 				qNetsimEngine.getMobsim().getEventsManager().processEvent(
-						qNetsimEngine.getMobsim().getEventsManager().getFactory().
-						createPersonLeavesVehicleEvent(now, leavingPassenger.getId(), vehicle.getId()));
+						new PersonLeavesVehicleEvent(now, leavingPassenger.getId(), vehicle.getId()));
 				leavingPassenger.endLegAndComputeNextState(now);
 				this.qNetsimEngine.internalInterface.arrangeNextAgentState(leavingPassenger);
 			}

@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PassengerAgent;
@@ -89,10 +90,10 @@ public class PassengerQNetsimEngine extends QNetsimEngine {
 				
 				// remove passenger from vehicle and teleport it to the vehicle's position
 				veh.removePassenger(passenger);
-				((PassengerAgent) passenger).setVehicle(null);
+				passenger.setVehicle(null);
 				mobsimAgent.notifyArrivalOnLinkByNonNetworkMode(veh.getCurrentLink().getId());
 				
-				eventsManager.processEvent(eventsManager.getFactory().createPersonLeavesVehicleEvent(now, mobsimAgent.getId(), veh.getId()));
+				eventsManager.processEvent(new PersonLeavesVehicleEvent(now, mobsimAgent.getId(), veh.getId()));
 				mobsimAgent.endLegAndComputeNextState(now);
 				this.internalInterface.arrangeNextAgentState(mobsimAgent);				
 			}

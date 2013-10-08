@@ -22,7 +22,8 @@ package playground.mrieser.pt.analysis;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.EventsFactory;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.core.basic.v01.IdImpl;
 
 public class TransitLoadByTimeTest {
@@ -34,20 +35,18 @@ public class TransitLoadByTimeTest {
 		Id vehicleIdDep1 = id[0];
 		Id vehicleIdDep2 = id[3];
 
-		EventsFactory ef = new EventsFactory();
-
 		TransitLoadByTime tl = new TransitLoadByTime();
-		tl.handleEvent(ef.createPersonEntersVehicleEvent(7.0*3600-5, id[0], vehicleIdDep1));
+		tl.handleEvent(new PersonEntersVehicleEvent(7.0*3600-5, id[0], vehicleIdDep1));
 
-		tl.handleEvent(ef.createPersonLeavesVehicleEvent(7.1*3600-5, id[0], vehicleIdDep1));
-		tl.handleEvent(ef.createPersonEntersVehicleEvent(7.1*3600, id[1], vehicleIdDep1));
-		tl.handleEvent(ef.createPersonEntersVehicleEvent(7.1*3600+5, id[2], vehicleIdDep1));
+		tl.handleEvent(new PersonLeavesVehicleEvent(7.1*3600-5, id[0], vehicleIdDep1));
+		tl.handleEvent(new PersonEntersVehicleEvent(7.1*3600, id[1], vehicleIdDep1));
+		tl.handleEvent(new PersonEntersVehicleEvent(7.1*3600+5, id[2], vehicleIdDep1));
 
-		tl.handleEvent(ef.createPersonLeavesVehicleEvent(7.2*3600-5, id[2], vehicleIdDep1));
-		tl.handleEvent(ef.createPersonEntersVehicleEvent(7.2*3600, id[3], vehicleIdDep1));
+		tl.handleEvent(new PersonLeavesVehicleEvent(7.2*3600-5, id[2], vehicleIdDep1));
+		tl.handleEvent(new PersonEntersVehicleEvent(7.2*3600, id[3], vehicleIdDep1));
 
-		tl.handleEvent(ef.createPersonLeavesVehicleEvent(7.3*3600-5, id[1], vehicleIdDep1));
-		tl.handleEvent(ef.createPersonLeavesVehicleEvent(7.3*3600, id[3], vehicleIdDep1));
+		tl.handleEvent(new PersonLeavesVehicleEvent(7.3*3600-5, id[1], vehicleIdDep1));
+		tl.handleEvent(new PersonLeavesVehicleEvent(7.3*3600, id[3], vehicleIdDep1));
 
 		Assert.assertEquals(0, tl.getVehicleLoad(vehicleIdDep1, 7.0*3600 - 10));
 		Assert.assertEquals(1, tl.getVehicleLoad(vehicleIdDep1, 7.0*3600 - 5));

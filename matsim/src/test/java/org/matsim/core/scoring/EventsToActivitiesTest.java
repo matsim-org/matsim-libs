@@ -22,10 +22,10 @@ package org.matsim.core.scoring;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.population.Activity;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scoring.EventsToActivities.ActivityHandler;
 import org.matsim.core.utils.misc.Time;
 
@@ -33,13 +33,12 @@ public class EventsToActivitiesTest {
 
 	@Test
 	public void testCreatesActivty() {
-		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EventsToActivities testee = new EventsToActivities();
 		MockActivityHandler ah = new MockActivityHandler();
 		testee.setActivityHandler(ah);
 		testee.reset(0);
-		testee.handleEvent(eventsManager.getFactory().createActivityStartEvent(10.0, new IdImpl("1"), new IdImpl("l1"), new IdImpl("f1"), "work"));
-		testee.handleEvent(eventsManager.getFactory().createActivityEndEvent(30.0, new IdImpl("1"), new IdImpl("l1"), new IdImpl("f1"), "work"));
+		testee.handleEvent(new ActivityStartEvent(10.0, new IdImpl("1"), new IdImpl("l1"), new IdImpl("f1"), "work"));
+		testee.handleEvent(new ActivityEndEvent(30.0, new IdImpl("1"), new IdImpl("l1"), new IdImpl("f1"), "work"));
 		Assert.assertNotNull(ah.handledActivity);
 		Assert.assertEquals(10.0, ah.handledActivity.getStartTime(), 1e-8);
 		Assert.assertEquals(30.0, ah.handledActivity.getEndTime(), 1e-8);
@@ -47,17 +46,16 @@ public class EventsToActivitiesTest {
 
 	@Test
 	public void testCreateNightActivity() {
-		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EventsToActivities testee = new EventsToActivities();
 		MockActivityHandler ah = new MockActivityHandler();
 		testee.setActivityHandler(ah);
 		testee.reset(0);
-		testee.handleEvent(eventsManager.getFactory().createActivityEndEvent(10.0, new IdImpl("1"), new IdImpl("l1"), new IdImpl("f1"), "home"));
+		testee.handleEvent(new ActivityEndEvent(10.0, new IdImpl("1"), new IdImpl("l1"), new IdImpl("f1"), "home"));
 		Assert.assertNotNull(ah.handledActivity);
 		Assert.assertEquals(Time.UNDEFINED_TIME, ah.handledActivity.getStartTime(), 1e-8);
 		Assert.assertEquals(10.0, ah.handledActivity.getEndTime(), 1e-8);
 		ah.reset();
-		testee.handleEvent(eventsManager.getFactory().createActivityStartEvent(90.0, new IdImpl("1"), new IdImpl("l1"), new IdImpl("f1"), "home"));
+		testee.handleEvent(new ActivityStartEvent(90.0, new IdImpl("1"), new IdImpl("l1"), new IdImpl("f1"), "home"));
 		testee.finish();
 		Assert.assertNotNull(ah.handledActivity);
 		Assert.assertEquals(Time.UNDEFINED_TIME, ah.handledActivity.getEndTime(), 1e-8);
@@ -66,12 +64,11 @@ public class EventsToActivitiesTest {
 	
 	@Test
 	public void testDontCreateNightActivityIfNoneIsBeingPerformedWhenSimulationEnds() {
-		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EventsToActivities testee = new EventsToActivities();
 		MockActivityHandler ah = new MockActivityHandler();
 		testee.setActivityHandler(ah);
 		testee.reset(0);
-		testee.handleEvent(eventsManager.getFactory().createActivityEndEvent(10.0, new IdImpl("1"), new IdImpl("l1"), new IdImpl("f1"), "home"));
+		testee.handleEvent(new ActivityEndEvent(10.0, new IdImpl("1"), new IdImpl("l1"), new IdImpl("f1"), "home"));
 		Assert.assertNotNull(ah.handledActivity);
 		Assert.assertEquals(Time.UNDEFINED_TIME, ah.handledActivity.getStartTime(), 1e-8);
 		Assert.assertEquals(10.0, ah.handledActivity.getEndTime(), 1e-8);

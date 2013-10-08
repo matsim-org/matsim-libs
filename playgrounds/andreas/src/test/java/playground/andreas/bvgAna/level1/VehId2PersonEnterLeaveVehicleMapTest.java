@@ -11,7 +11,6 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
-import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.basic.v01.IdImpl;
 
 public class VehId2PersonEnterLeaveVehicleMapTest {
@@ -40,12 +39,10 @@ public class VehId2PersonEnterLeaveVehicleMapTest {
 
 //	    create events
 	    
-	    EventsFactory ef = new EventsFactory();
-	    
-	    PersonEntersVehicleEvent event1 = ef.createPersonEntersVehicleEvent(2., persId1, vehId1);
-	    PersonEntersVehicleEvent event2 = ef.createPersonEntersVehicleEvent(2.1, persId2, vehId1);  
-	    PersonLeavesVehicleEvent event3 = ef.createPersonLeavesVehicleEvent(2.2, persId3, vehId2);
-	    PersonLeavesVehicleEvent event4 = ef.createPersonLeavesVehicleEvent(2.3, persId4, vehId2);
+	    PersonEntersVehicleEvent event1 = new PersonEntersVehicleEvent(2., persId1, vehId1);
+	    PersonEntersVehicleEvent event2 = new PersonEntersVehicleEvent(2.1, persId2, vehId1);  
+	    PersonLeavesVehicleEvent event3 = new PersonLeavesVehicleEvent(2.2, persId3, vehId2);
+	    PersonLeavesVehicleEvent event4 = new PersonLeavesVehicleEvent(2.3, persId4, vehId2);
 	    
 //	    create instance of class to be tested
 	    

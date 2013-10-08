@@ -25,7 +25,6 @@ import java.util.Stack;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsReaderXMLv1;
@@ -46,12 +45,10 @@ public class EmissionEventsReader extends MatsimXmlParser{
 	private static final String EVENT = "event";
 
 	private final EventsManager eventsManager;
-	private final EventsFactory builder;
 
 	public EmissionEventsReader(EventsManager events) {
 		super();
 		this.eventsManager = events;
-		this.builder = events.getFactory();
 		setValidating(false); // events-files have no DTD, thus they cannot validate
 	}
 

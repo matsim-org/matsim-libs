@@ -27,7 +27,13 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.core.api.experimental.events.EventsFactory;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
+import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.internal.MatsimSomeReader;
 import org.matsim.core.basic.v01.IdImpl;
@@ -37,12 +43,10 @@ import org.matsim.core.utils.misc.StringUtils;
 public class EventsReaderTXTv1 implements MatsimSomeReader {
 
     private final EventsManager events;
-	private EventsFactory builder;
 
 	public EventsReaderTXTv1(final EventsManager events) {
 		super();
 		this.events = events;
-		this.builder = events.getFactory();
 	}
 
 	public void readFile(final String filename) {
@@ -72,39 +76,39 @@ public class EventsReaderTXTv1 implements MatsimSomeReader {
 
 		switch (flag) {
 			case 2:
-				data = this.builder.createLinkLeaveEvent(time, agentId, linkId, null);
+				data = new LinkLeaveEvent(time, agentId, linkId, null);
 				break;
 			case 5:
-				data = this.builder.createLinkEnterEvent(time, agentId, linkId, null);
+				data = new LinkEnterEvent(time, agentId, linkId, null);
 				break;
 			case 3:
-				data = this.builder.createAgentStuckEvent(time, agentId, linkId, null);
+				data = new PersonStuckEvent(time, agentId, linkId, null);
 				break;
 			case 4:
-				data = this.builder.createAgentWait2LinkEvent(time, agentId, linkId, null);
+				data = new Wait2LinkEvent(time, agentId, linkId, null);
 				break;
 			case 6:
-				data = this.builder.createAgentDepartureEvent(time, agentId, linkId, null);
+				data = new PersonDepartureEvent(time, agentId, linkId, null);
 				break;
 			case 0:
-				data = this.builder.createAgentArrivalEvent(time, agentId, linkId, null);
+				data = new PersonArrivalEvent(time, agentId, linkId, null);
 				break;
 			case 7:
 				if ("".equals(acttype) && (desc != null)) {
 					data = new ActivityStartEvent(time, agentId, linkId, null, desc.replace("actstart ", ""));
 				} else {
-					data = this.builder.createActivityStartEvent(time, agentId, linkId, null, acttype);
+					data = new ActivityStartEvent(time, agentId, linkId, null, acttype);
 				}
 				break;
 			case 8:
 				if ("".equals(acttype) && (desc != null)) {
 					data = new ActivityEndEvent(time, agentId, linkId, null, desc.replace("actend ", ""));
 				} else {
-					data = this.builder.createActivityEndEvent(time, agentId, linkId, null, acttype);
+					data = new ActivityEndEvent(time, agentId, linkId, null, acttype);
 				}
 				break;
 			case 9:
-				data = this.builder.createAgentMoneyEvent(time, agentId, Double.parseDouble(desc.replace("agentMoney\t", "")));
+				data = new PersonMoneyEvent(time, agentId, Double.parseDouble(desc.replace("agentMoney\t", "")));
 				break;
 			default:
 				throw new RuntimeException("Type of events with flag = " + flag + " is not known!");

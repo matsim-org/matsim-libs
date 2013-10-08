@@ -2,6 +2,9 @@ package playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.agent
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -68,7 +71,7 @@ public class PassivePlannerDriverAgent implements MobsimDriverAgent, HasBasePers
 	@Override
 	public void endActivityAndComputeNextState(double now) {
 		Activity prevAct = (Activity)getCurrentPlanElement();
-		simulation.getEventsManager().processEvent(simulation.getEventsManager().getFactory().createActivityEndEvent(now, getId(), prevAct.getLinkId(), prevAct.getFacilityId(), prevAct.getType()));
+		simulation.getEventsManager().processEvent(new ActivityEndEvent(now, getId(), prevAct.getLinkId(), prevAct.getFacilityId(), prevAct.getType()));
 		planner.setPlanElementIndex(planner.getPlanElementIndex()+1);
 		if(planner.getPlanElementIndex()>=basePerson.getSelectedPlan().getPlanElements().size()) {
 			log.error("Agent "+getId()+" has not more elements after the activity "+prevAct.getType()+" at "+now+" seconds.");
@@ -86,7 +89,7 @@ public class PassivePlannerDriverAgent implements MobsimDriverAgent, HasBasePers
 	@Override
 	public void endLegAndComputeNextState(double now) {
 		Leg prevLeg = (Leg)getCurrentPlanElement();
-		this.simulation.getEventsManager().processEvent(this.simulation.getEventsManager().getFactory().createAgentArrivalEvent(now, getId(), getDestinationLinkId(), prevLeg.getMode()));
+		this.simulation.getEventsManager().processEvent(new PersonArrivalEvent(now, getId(), getDestinationLinkId(), prevLeg.getMode()));
 		planner.setPlanElementIndex(planner.getPlanElementIndex()+1);
 		if(planner.getPlanElementIndex()>=basePerson.getSelectedPlan().getPlanElements().size()) {
 			log.error("Agent "+getId()+" has not more elements after the leg "+prevLeg.getMode()+" at "+now+" seconds.");
@@ -106,7 +109,7 @@ public class PassivePlannerDriverAgent implements MobsimDriverAgent, HasBasePers
 	}
 	private void initializeActivity(Activity act, double now) {
 		this.state = MobsimAgent.State.ACTIVITY;
-		this.simulation.getEventsManager().processEvent(this.simulation.getEventsManager().getFactory().createActivityStartEvent(now, this.getId(),  act.getLinkId(), act.getFacilityId(), act.getType()));
+		this.simulation.getEventsManager().processEvent(new ActivityStartEvent(now, this.getId(), act.getLinkId(), act.getFacilityId(), act.getType()));
 		activityEndTime = calculateDepartureTime(act, now);
 	}
 	private void initializeLeg(Leg leg, double now) {

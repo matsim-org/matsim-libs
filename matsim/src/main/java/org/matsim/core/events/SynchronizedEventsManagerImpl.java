@@ -21,7 +21,6 @@
 package org.matsim.core.events;
 
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.handler.EventHandler;
 
@@ -49,11 +48,6 @@ public class SynchronizedEventsManagerImpl implements EventsManager {
 	@Override
 	public void addHandler(EventHandler handler) {
 		this.delegate.addHandler(handler);
-	}
-
-	@Override
-	public synchronized EventsFactory getFactory() {
-		return this.delegate.getFactory();
 	}
 
 	@Override

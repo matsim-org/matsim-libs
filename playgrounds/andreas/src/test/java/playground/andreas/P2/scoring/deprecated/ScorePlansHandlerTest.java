@@ -23,8 +23,11 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -38,7 +41,6 @@ public class ScorePlansHandlerTest {
 	@Test
     public final void testScoreContainer() {
 		Network net = PScenarioHelper.createTestNetwork().getNetwork();
-		EventsFactory eF = new EventsFactory();
 		PConfigGroup pC = new PConfigGroup();
 		pC.addParam("costPerVehicleAndDay", "40.0");
 		pC.addParam("earningsPerKilometerAndPassenger", "0.20");
@@ -56,27 +58,27 @@ public class ScorePlansHandlerTest {
 		
 		ScoreContainer sC;
 		
-		handler.handleEvent(eF.createTransitDriverStartsEvent(0.0, driverId, vehicleId, transitLineId, transitRouteId, departureId));
+		handler.handleEvent(new TransitDriverStartsEvent(0.0, driverId, vehicleId, transitLineId, transitRouteId, departureId));
 		sC = handler.getDriverId2ScoreMap().get(vehicleId);
 		Assert.assertEquals("revenue with zero trips served", -40.0, sC.getTotalRevenue(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("trips served", 0, sC.getTripsServed(), MatsimTestUtils.EPSILON);
 		
-		handler.handleEvent(eF.createLinkEnterEvent(0.0, driverId, new IdImpl("1112"), vehicleId));
+		handler.handleEvent(new LinkEnterEvent(0.0, driverId, new IdImpl("1112"), vehicleId));
 		sC = handler.getDriverId2ScoreMap().get(vehicleId);
 		Assert.assertEquals("revenue with zero trips served", -40.36, sC.getTotalRevenue(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("trips served", 0, sC.getTripsServed(), MatsimTestUtils.EPSILON);
 		
-		handler.handleEvent(eF.createPersonEntersVehicleEvent(0.0, personId, vehicleId));
+		handler.handleEvent(new PersonEntersVehicleEvent(0.0, personId, vehicleId));
 		sC = handler.getDriverId2ScoreMap().get(vehicleId);
 		Assert.assertEquals("revenue with zero trips served", -40.36, sC.getTotalRevenue(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("trips served", 0, sC.getTripsServed(), MatsimTestUtils.EPSILON);
 		
-		handler.handleEvent(eF.createLinkEnterEvent(0.0, driverId, new IdImpl("1211"), vehicleId));
+		handler.handleEvent(new LinkEnterEvent(0.0, driverId, new IdImpl("1211"), vehicleId));
 		sC = handler.getDriverId2ScoreMap().get(vehicleId);
 		Assert.assertEquals("revenue with zero trips served", -40.72, sC.getTotalRevenue(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("trips served", 0, sC.getTripsServed(), MatsimTestUtils.EPSILON);
 		
-		handler.handleEvent(eF.createPersonLeavesVehicleEvent(0.0, personId, vehicleId));
+		handler.handleEvent(new PersonLeavesVehicleEvent(0.0, personId, vehicleId));
 		sC = handler.getDriverId2ScoreMap().get(vehicleId);
 		Assert.assertEquals("revenue with zero trips served", -40.72, sC.getTotalRevenue(), MatsimTestUtils.EPSILON);
 		Assert.assertEquals("trips served", 0, sC.getTripsServed(), MatsimTestUtils.EPSILON);

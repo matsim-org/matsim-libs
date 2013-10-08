@@ -23,11 +23,13 @@ import java.util.Collections;
 
 import org.junit.Assert;
 import org.junit.Test;
-
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.EventsFactory;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventsUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
 import playground.thibautd.scoring.BeingTogetherScoring.AcceptAllFilter;
@@ -46,7 +48,6 @@ public class BeingTogetherScoringTest {
 		final Id linkId = new IdImpl( 1 );
 		final String type = "type";
 		
-		final EventsFactory fact = EventsUtils.createEventsManager().getFactory();
 		for ( OverlapSpec os : new OverlapSpec[]{
 				new OverlapSpec( 0 , 10 , 20 , 30 ),
 				new OverlapSpec( 0 , 10 , 10 , 30 ),
@@ -60,33 +61,13 @@ public class BeingTogetherScoringTest {
 						ego,
 						Collections.singleton( alter ) );
 			testee.handleEvent(
-					fact.createActivityStartEvent(
-						os.startEgo,
-						ego,
-						linkId,
-						null,
-						type) );
+					new ActivityStartEvent(os.startEgo, ego, linkId, null, type) );
 			testee.handleEvent(
-					fact.createActivityStartEvent(
-						os.startAlter,
-						alter,
-						linkId,
-						null,
-						type) );
+					new ActivityStartEvent(os.startAlter, alter, linkId, null, type) );
 			testee.handleEvent(
-					fact.createActivityEndEvent(
-						os.endEgo,
-						ego,
-						linkId,
-						null,
-						type) );
+					new ActivityEndEvent(os.endEgo, ego, linkId, null, type) );
 			testee.handleEvent(
-					fact.createActivityEndEvent(
-						os.endAlter,
-						alter,
-						linkId,
-						null,
-						type) );
+					new ActivityEndEvent(os.endAlter, alter, linkId, null, type) );
 
 			Assert.assertEquals(
 					"unexpected overlap for "+os,
@@ -104,8 +85,6 @@ public class BeingTogetherScoringTest {
 		final Id linkId = new IdImpl( 1 );
 		final String type = "type";
 
-		final EventsFactory fact = EventsUtils.createEventsManager().getFactory();
-
 		final BeingTogetherScoring testee =
 			new BeingTogetherScoring(
 					1,
@@ -113,34 +92,14 @@ public class BeingTogetherScoringTest {
 					Collections.singleton( alter ) );
 
 		testee.handleEvent(
-				fact.createActivityEndEvent(
-					10,
-					ego,
-					linkId,
-					null,
-					type) );
+				new ActivityEndEvent((double) 10, ego, linkId, null, type) );
 		testee.handleEvent(
-				fact.createActivityStartEvent(
-					10,
-					ego,
-					linkId,
-					null,
-					type) );
+				new ActivityStartEvent((double) 10, ego, linkId, null, type) );
 
 		testee.handleEvent(
-				fact.createActivityEndEvent(
-					100,
-					alter,
-					linkId,
-					null,
-					type) );
+				new ActivityEndEvent((double) 100, alter, linkId, null, type) );
 		testee.handleEvent(
-				fact.createActivityStartEvent(
-					100,
-					alter,
-					linkId,
-					null,
-					type) );
+				new ActivityStartEvent((double) 100, alter, linkId, null, type) );
 
 		Assert.assertEquals(
 				"unexpected overlap",
@@ -157,8 +116,6 @@ public class BeingTogetherScoringTest {
 		final Id linkId = new IdImpl( 1 );
 		final String type = "type";
 
-		final EventsFactory fact = EventsUtils.createEventsManager().getFactory();
-
 		final BeingTogetherScoring testee =
 			new BeingTogetherScoring(
 					1,
@@ -166,34 +123,14 @@ public class BeingTogetherScoringTest {
 					Collections.singleton( alter ) );
 
 		testee.handleEvent(
-				fact.createActivityEndEvent(
-					10,
-					ego,
-					linkId,
-					null,
-					type) );
+				new ActivityEndEvent((double) 10, ego, linkId, null, type) );
 		testee.handleEvent(
-				fact.createActivityStartEvent(
-					10,
-					ego,
-					linkId,
-					null,
-					type) );
+				new ActivityStartEvent((double) 10, ego, linkId, null, type) );
 
 		testee.handleEvent(
-				fact.createActivityEndEvent(
-					26 * 3600,
-					alter,
-					linkId,
-					null,
-					type) );
+				new ActivityEndEvent((double) (26 * 3600), alter, linkId, null, type) );
 		testee.handleEvent(
-				fact.createActivityStartEvent(
-					26 * 3600,
-					alter,
-					linkId,
-					null,
-					type) );
+				new ActivityStartEvent((double) (26 * 3600), alter, linkId, null, type) );
 
 		Assert.assertEquals(
 				"unexpected overlap",
@@ -211,8 +148,6 @@ public class BeingTogetherScoringTest {
 		final String type = "type";
 		final String type2 = "type2";
 
-		final EventsFactory fact = EventsUtils.createEventsManager().getFactory();
-
 		final BeingTogetherScoring testee =
 			new BeingTogetherScoring(
 					1,
@@ -220,33 +155,13 @@ public class BeingTogetherScoringTest {
 					Collections.singleton( alter ) );
 
 		testee.handleEvent(
-				fact.createActivityStartEvent(
-					0,
-					ego,
-					linkId,
-					null,
-					type) );
+				new ActivityStartEvent((double) 0, ego, linkId, null, type) );
 		testee.handleEvent(
-				fact.createActivityStartEvent(
-					0,
-					alter,
-					linkId,
-					null,
-					type2) );
+				new ActivityStartEvent((double) 0, alter, linkId, null, type2) );
 		testee.handleEvent(
-				fact.createActivityEndEvent(
-					100,
-					ego,
-					linkId,
-					null,
-					type) );
+				new ActivityEndEvent((double) 100, ego, linkId, null, type) );
 		testee.handleEvent(
-				fact.createActivityEndEvent(
-					100,
-					alter,
-					linkId,
-					null,
-					type2) );
+				new ActivityEndEvent((double) 100, alter, linkId, null, type2) );
 
 		Assert.assertEquals(
 				"unexpected overlap",
@@ -265,8 +180,6 @@ public class BeingTogetherScoringTest {
 		final Id linkId2 = new IdImpl( 2 );
 		final String type = "type";
 
-		final EventsFactory fact = EventsUtils.createEventsManager().getFactory();
-
 		final BeingTogetherScoring testee =
 			new BeingTogetherScoring(
 					1,
@@ -274,33 +187,13 @@ public class BeingTogetherScoringTest {
 					Collections.singleton( alter ) );
 
 		testee.handleEvent(
-				fact.createActivityStartEvent(
-					0,
-					ego,
-					linkId,
-					null,
-					type) );
+				new ActivityStartEvent((double) 0, ego, linkId, null, type) );
 		testee.handleEvent(
-				fact.createActivityStartEvent(
-					0,
-					alter,
-					linkId2,
-					null,
-					type) );
+				new ActivityStartEvent((double) 0, alter, linkId2, null, type) );
 		testee.handleEvent(
-				fact.createActivityEndEvent(
-					100,
-					ego,
-					linkId,
-					null,
-					type) );
+				new ActivityEndEvent((double) 100, ego, linkId, null, type) );
 		testee.handleEvent(
-				fact.createActivityEndEvent(
-					100,
-					alter,
-					linkId2,
-					null,
-					type) );
+				new ActivityEndEvent((double) 100, alter, linkId2, null, type) );
 
 		Assert.assertEquals(
 				"unexpected overlap",
@@ -318,8 +211,6 @@ public class BeingTogetherScoringTest {
 		final Id linkId = new IdImpl( 1 );
 		final String type = "type";
 
-		final EventsFactory fact = EventsUtils.createEventsManager().getFactory();
-
 		final BeingTogetherScoring testee =
 			new BeingTogetherScoring(
 					new RejectAllFilter(),
@@ -329,33 +220,13 @@ public class BeingTogetherScoringTest {
 					Collections.singleton( alter ) );
 
 		testee.handleEvent(
-				fact.createActivityStartEvent(
-					0,
-					ego,
-					linkId,
-					null,
-					type) );
+				new ActivityStartEvent((double) 0, ego, linkId, null, type) );
 		testee.handleEvent(
-				fact.createActivityStartEvent(
-					0,
-					alter,
-					linkId,
-					null,
-					type) );
+				new ActivityStartEvent((double) 0, alter, linkId, null, type) );
 		testee.handleEvent(
-				fact.createActivityEndEvent(
-					100,
-					ego,
-					linkId,
-					null,
-					type) );
+				new ActivityEndEvent((double) 100, ego, linkId, null, type) );
 		testee.handleEvent(
-				fact.createActivityEndEvent(
-					100,
-					alter,
-					linkId,
-					null,
-					type) );
+				new ActivityEndEvent((double) 100, alter, linkId, null, type) );
 
 		Assert.assertEquals(
 				"unexpected overlap",
@@ -374,8 +245,6 @@ public class BeingTogetherScoringTest {
 		final String type1 = "type1";
 		final String type2 = "type2";
 
-		final EventsFactory fact = EventsUtils.createEventsManager().getFactory();
-
 		final BeingTogetherScoring testee =
 			new BeingTogetherScoring(
 					new AcceptAllFilter(),
@@ -386,49 +255,19 @@ public class BeingTogetherScoringTest {
 
 		// ego: go from 1 to 2 and do not complete
 		testee.handleEvent(
-				fact.createActivityEndEvent(
-					10,
-					ego,
-					linkId,
-					null,
-					type1) );
+				new ActivityEndEvent((double) 10, ego, linkId, null, type1) );
 		testee.handleEvent(
-				fact.createActivityStartEvent(
-					10,
-					ego,
-					linkId,
-					null,
-					type2) );
+				new ActivityStartEvent((double) 10, ego, linkId, null, type2) );
 
 		// alter: 1 to 2 back to 1.
 		testee.handleEvent(
-				fact.createActivityEndEvent(
-					20,
-					alter,
-					linkId,
-					null,
-					type1) );
+				new ActivityEndEvent((double) 20, alter, linkId, null, type1) );
 		testee.handleEvent(
-				fact.createActivityStartEvent(
-					20,
-					alter,
-					linkId,
-					null,
-					type2) );
+				new ActivityStartEvent((double) 20, alter, linkId, null, type2) );
 		testee.handleEvent(
-				fact.createActivityEndEvent(
-					30,
-					alter,
-					linkId,
-					null,
-					type2) );
+				new ActivityEndEvent((double) 30, alter, linkId, null, type2) );
 		testee.handleEvent(
-				fact.createActivityStartEvent(
-					30,
-					alter,
-					linkId,
-					null,
-					type1) );
+				new ActivityStartEvent((double) 30, alter, linkId, null, type1) );
 
 		// Two behaviors would be valid:
 		// - no overlap (consider undefined)
@@ -452,8 +291,6 @@ public class BeingTogetherScoringTest {
 		final Id linkId = new IdImpl( 1 );
 		final String type = "type";
 
-		final EventsFactory fact = EventsUtils.createEventsManager().getFactory();
-
 		final BeingTogetherScoring testee =
 			new BeingTogetherScoring(
 					new RejectAllFilter(),
@@ -463,33 +300,13 @@ public class BeingTogetherScoringTest {
 					Collections.singleton( alter ) );
 
 		testee.handleEvent(
-				fact.createActivityStartEvent(
-					0,
-					ego,
-					linkId,
-					null,
-					type) );
+				new ActivityStartEvent((double) 0, ego, linkId, null, type) );
 		testee.handleEvent(
-				fact.createActivityStartEvent(
-					0,
-					other,
-					linkId,
-					null,
-					type) );
+				new ActivityStartEvent((double) 0, other, linkId, null, type) );
 		testee.handleEvent(
-				fact.createActivityEndEvent(
-					100,
-					ego,
-					linkId,
-					null,
-					type) );
+				new ActivityEndEvent((double) 100, ego, linkId, null, type) );
 		testee.handleEvent(
-				fact.createActivityEndEvent(
-					100,
-					other,
-					linkId,
-					null,
-					type) );
+				new ActivityEndEvent((double) 100, other, linkId, null, type) );
 
 		Assert.assertEquals(
 				"unexpected overlap",
@@ -506,7 +323,6 @@ public class BeingTogetherScoringTest {
 		
 		final Id vehId = new IdImpl( 1 );
 		
-		final EventsFactory fact = EventsUtils.createEventsManager().getFactory();
 		for ( OverlapSpec os : new OverlapSpec[]{
 				new OverlapSpec( 0 , 10 , 20 , 30 ),
 				new OverlapSpec( 0 , 10 , 10 , 30 ),
@@ -520,25 +336,13 @@ public class BeingTogetherScoringTest {
 						ego,
 						Collections.singleton( alter ) );
 			testee.handleEvent(
-					fact.createPersonEntersVehicleEvent(
-						os.startEgo,
-						ego,
-						vehId ) );
+					new PersonEntersVehicleEvent(os.startEgo, ego, vehId) );
 			testee.handleEvent(
-					fact.createPersonEntersVehicleEvent(
-						os.startAlter,
-						alter,
-						vehId ) );
+					new PersonEntersVehicleEvent(os.startAlter, alter, vehId) );
 			testee.handleEvent(
-					fact.createPersonLeavesVehicleEvent(
-						os.endEgo,
-						ego,
-						vehId ) );
+					new PersonLeavesVehicleEvent(os.endEgo, ego, vehId) );
 			testee.handleEvent(
-					fact.createPersonLeavesVehicleEvent(
-						os.endAlter,
-						alter,
-						vehId) );
+					new PersonLeavesVehicleEvent(os.endAlter, alter, vehId) );
 
 			Assert.assertEquals(
 					"unexpected overlap for "+os,
@@ -556,7 +360,6 @@ public class BeingTogetherScoringTest {
 		final Id vehId = new IdImpl( 1 );
 		final Id vehId2 = new IdImpl( 2 );
 		
-		final EventsFactory fact = EventsUtils.createEventsManager().getFactory();
 		for ( OverlapSpec os : new OverlapSpec[]{
 				new OverlapSpec( 0 , 10 , 20 , 30 ),
 				new OverlapSpec( 0 , 10 , 10 , 30 ),
@@ -570,25 +373,13 @@ public class BeingTogetherScoringTest {
 						ego,
 						Collections.singleton( alter ) );
 			testee.handleEvent(
-					fact.createPersonEntersVehicleEvent(
-						os.startEgo,
-						ego,
-						vehId ) );
+					new PersonEntersVehicleEvent(os.startEgo, ego, vehId) );
 			testee.handleEvent(
-					fact.createPersonEntersVehicleEvent(
-						os.startAlter,
-						alter,
-						vehId2 ) );
+					new PersonEntersVehicleEvent(os.startAlter, alter, vehId2) );
 			testee.handleEvent(
-					fact.createPersonLeavesVehicleEvent(
-						os.endEgo,
-						ego,
-						vehId ) );
+					new PersonLeavesVehicleEvent(os.endEgo, ego, vehId) );
 			testee.handleEvent(
-					fact.createPersonLeavesVehicleEvent(
-						os.endAlter,
-						alter,
-						vehId2) );
+					new PersonLeavesVehicleEvent(os.endAlter, alter, vehId2) );
 
 			Assert.assertEquals(
 					"unexpected overlap for "+os,
@@ -605,7 +396,6 @@ public class BeingTogetherScoringTest {
 		
 		final Id vehId = new IdImpl( 1 );
 		
-		final EventsFactory fact = EventsUtils.createEventsManager().getFactory();
 		for ( OverlapSpec os : new OverlapSpec[]{
 				new OverlapSpec( 0 , 10 , 20 , 30 ),
 				new OverlapSpec( 0 , 10 , 10 , 30 ),
@@ -621,37 +411,17 @@ public class BeingTogetherScoringTest {
 						ego,
 						Collections.singleton( alter ) );
 			testee.handleEvent(
-					fact.createAgentDepartureEvent(
-						0,
-						new IdImpl( 1 ),
-						ego,
-						"mode" ) );
+					new PersonDepartureEvent((double) 0, new IdImpl( 1 ), ego, "mode") );
 			testee.handleEvent(
-					fact.createPersonEntersVehicleEvent(
-						os.startEgo,
-						ego,
-						vehId ) );
+					new PersonEntersVehicleEvent(os.startEgo, ego, vehId) );
 			testee.handleEvent(
-					fact.createAgentDepartureEvent(
-						0,
-						new IdImpl( 1 ),
-						alter,
-						"mode" ) );
+					new PersonDepartureEvent((double) 0, new IdImpl( 1 ), alter, "mode") );
 			testee.handleEvent(
-					fact.createPersonEntersVehicleEvent(
-						os.startAlter,
-						alter,
-						vehId ) );
+					new PersonEntersVehicleEvent(os.startAlter, alter, vehId) );
 			testee.handleEvent(
-					fact.createPersonLeavesVehicleEvent(
-						os.endEgo,
-						ego,
-						vehId ) );
+					new PersonLeavesVehicleEvent(os.endEgo, ego, vehId) );
 			testee.handleEvent(
-					fact.createPersonLeavesVehicleEvent(
-						os.endAlter,
-						alter,
-						vehId) );
+					new PersonLeavesVehicleEvent(os.endAlter, alter, vehId) );
 
 			Assert.assertEquals(
 					"unexpected overlap for "+os,
@@ -672,7 +442,6 @@ public class BeingTogetherScoringTest {
 		final double startWindow = 10;
 		final double endWindow = 30;
 		
-		final EventsFactory fact = EventsUtils.createEventsManager().getFactory();
 		for ( OverlapSpec os : new OverlapSpec[]{
 				new OverlapSpec( 0 , 10 , 20 , 30 ),
 				new OverlapSpec( 0 , 10 , 10 , 30 ),
@@ -688,33 +457,13 @@ public class BeingTogetherScoringTest {
 						ego,
 						Collections.singleton( alter ) );
 			testee.handleEvent(
-					fact.createActivityStartEvent(
-						os.startEgo,
-						ego,
-						linkId,
-						null,
-						type) );
+					new ActivityStartEvent(os.startEgo, ego, linkId, null, type) );
 			testee.handleEvent(
-					fact.createActivityStartEvent(
-						os.startAlter,
-						alter,
-						linkId,
-						null,
-						type) );
+					new ActivityStartEvent(os.startAlter, alter, linkId, null, type) );
 			testee.handleEvent(
-					fact.createActivityEndEvent(
-						os.endEgo,
-						ego,
-						linkId,
-						null,
-						type) );
+					new ActivityEndEvent(os.endEgo, ego, linkId, null, type) );
 			testee.handleEvent(
-					fact.createActivityEndEvent(
-						os.endAlter,
-						alter,
-						linkId,
-						null,
-						type) );
+					new ActivityEndEvent(os.endAlter, alter, linkId, null, type) );
 
 			Assert.assertEquals(
 					"unexpected overlap for "+os,

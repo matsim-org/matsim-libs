@@ -24,7 +24,10 @@ import java.util.Map;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.EventsFactory;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
+import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.pt.PtConstants;
 
@@ -39,33 +42,31 @@ public class TransitStopLoadByTimeTest {
 		Id agentId1 = id[0];
 		Id vehicleIdDep1 = id[0];
 
-		EventsFactory ef = new EventsFactory();
-
 		TransitStopLoadByTime tl = new TransitStopLoadByTime();
-		tl.handleEvent(ef.createActivityEndEvent(100, id[0], id[0], null, "home"));
+		tl.handleEvent(new ActivityEndEvent((double) 100, id[0], id[0], null, "home"));
 		// departure - walk
 		// arrival - walk
 		// act start - pt interaction
-		tl.handleEvent(ef.createActivityEndEvent(110, agentId1, id[0], null, PtConstants.TRANSIT_ACTIVITY_TYPE));
-		tl.handleEvent(ef.createVehicleArrivesAtFacilityEvent(130, vehicleIdDep1, stopId1, 0));
-		tl.handleEvent(ef.createPersonEntersVehicleEvent(135, agentId1, vehicleIdDep1));
-		tl.handleEvent(ef.createVehicleDepartsAtFacilityEvent(140, vehicleIdDep1, stopId1, 0));
+		tl.handleEvent(new ActivityEndEvent((double) 110, agentId1, id[0], null, PtConstants.TRANSIT_ACTIVITY_TYPE));
+		tl.handleEvent(new VehicleArrivesAtFacilityEvent((double) 130, vehicleIdDep1, stopId1, (double) 0));
+		tl.handleEvent(new PersonEntersVehicleEvent((double) 135, agentId1, vehicleIdDep1));
+		tl.handleEvent(new VehicleDepartsAtFacilityEvent((double) 140, vehicleIdDep1, stopId1, (double) 0));
 
-		tl.handleEvent(ef.createVehicleArrivesAtFacilityEvent(200, vehicleIdDep1, stopId2, 0));
+		tl.handleEvent(new VehicleArrivesAtFacilityEvent((double) 200, vehicleIdDep1, stopId2, (double) 0));
 		// personLeavesVehicle
 		// act start - pt interaction
-		tl.handleEvent(ef.createActivityEndEvent(210, agentId1, id[0], null, PtConstants.TRANSIT_ACTIVITY_TYPE));
+		tl.handleEvent(new ActivityEndEvent((double) 210, agentId1, id[0], null, PtConstants.TRANSIT_ACTIVITY_TYPE));
 		// departure - walk
 		// arrival - walk
 		// act start - work
-		tl.handleEvent(ef.createActivityEndEvent(500, agentId1, id[0], null, "work"));
+		tl.handleEvent(new ActivityEndEvent((double) 500, agentId1, id[0], null, "work"));
 		// departure - walk
 		// arrival - walk
 		// act start - pt interaction
-		tl.handleEvent(ef.createActivityEndEvent(530, agentId1, id[0], null, PtConstants.TRANSIT_ACTIVITY_TYPE));
-		tl.handleEvent(ef.createVehicleArrivesAtFacilityEvent(550, vehicleIdDep1, stopId2, 0));
-		tl.handleEvent(ef.createPersonEntersVehicleEvent(555, agentId1, vehicleIdDep1));
-		tl.handleEvent(ef.createVehicleDepartsAtFacilityEvent(570, vehicleIdDep1, stopId2, 0));
+		tl.handleEvent(new ActivityEndEvent((double) 530, agentId1, id[0], null, PtConstants.TRANSIT_ACTIVITY_TYPE));
+		tl.handleEvent(new VehicleArrivesAtFacilityEvent((double) 550, vehicleIdDep1, stopId2, (double) 0));
+		tl.handleEvent(new PersonEntersVehicleEvent((double) 555, agentId1, vehicleIdDep1));
+		tl.handleEvent(new VehicleDepartsAtFacilityEvent((double) 570, vehicleIdDep1, stopId2, (double) 0));
 
 		Assert.assertEquals(0, tl.getStopFacilityLoad(stopId1,  90));
 		Assert.assertEquals(0, tl.getStopFacilityLoad(stopId1, 100));
@@ -108,18 +109,16 @@ public class TransitStopLoadByTimeTest {
 		Id vehicleIdDep1 = id[0];
 		Id vehicleIdDep2 = id[1];
 
-		EventsFactory ef = new EventsFactory();
-
 		TransitStopLoadByTime tl = new TransitStopLoadByTime();
-		tl.handleEvent(ef.createActivityEndEvent(110, agentId1, id[0], null, PtConstants.TRANSIT_ACTIVITY_TYPE));
-		tl.handleEvent(ef.createActivityEndEvent(120, agentId2, id[0], null, PtConstants.TRANSIT_ACTIVITY_TYPE));
-		tl.handleEvent(ef.createVehicleArrivesAtFacilityEvent(130, vehicleIdDep2, stopId1, 0));
-		tl.handleEvent(ef.createPersonEntersVehicleEvent(135, agentId2, vehicleIdDep2));
-		tl.handleEvent(ef.createVehicleDepartsAtFacilityEvent(140, vehicleIdDep2, stopId1, 0));
+		tl.handleEvent(new ActivityEndEvent((double) 110, agentId1, id[0], null, PtConstants.TRANSIT_ACTIVITY_TYPE));
+		tl.handleEvent(new ActivityEndEvent((double) 120, agentId2, id[0], null, PtConstants.TRANSIT_ACTIVITY_TYPE));
+		tl.handleEvent(new VehicleArrivesAtFacilityEvent((double) 130, vehicleIdDep2, stopId1, (double) 0));
+		tl.handleEvent(new PersonEntersVehicleEvent((double) 135, agentId2, vehicleIdDep2));
+		tl.handleEvent(new VehicleDepartsAtFacilityEvent((double) 140, vehicleIdDep2, stopId1, (double) 0));
 
-		tl.handleEvent(ef.createVehicleArrivesAtFacilityEvent(150, vehicleIdDep1, stopId1, 0));
-		tl.handleEvent(ef.createPersonEntersVehicleEvent(155, agentId1, vehicleIdDep1));
-		tl.handleEvent(ef.createVehicleDepartsAtFacilityEvent(160, vehicleIdDep1, stopId1, 0));
+		tl.handleEvent(new VehicleArrivesAtFacilityEvent((double) 150, vehicleIdDep1, stopId1, (double) 0));
+		tl.handleEvent(new PersonEntersVehicleEvent((double) 155, agentId1, vehicleIdDep1));
+		tl.handleEvent(new VehicleDepartsAtFacilityEvent((double) 160, vehicleIdDep1, stopId1, (double) 0));
 
 		Assert.assertEquals(0, tl.getStopFacilityLoad(stopId1,  90));
 		Assert.assertEquals(0, tl.getStopFacilityLoad(stopId1, 100));
@@ -142,18 +141,16 @@ public class TransitStopLoadByTimeTest {
 		Id vehicleIdDep1 = id[0];
 		Id vehicleIdDep2 = id[1];
 
-		EventsFactory ef = new EventsFactory();
-
 		TransitStopLoadByTime tl = new TransitStopLoadByTime();
-		tl.handleEvent(ef.createActivityEndEvent(110, agentId1, id[0], null, PtConstants.TRANSIT_ACTIVITY_TYPE));
-		tl.handleEvent(ef.createActivityEndEvent(120, agentId2, id[0], null, PtConstants.TRANSIT_ACTIVITY_TYPE));
-		tl.handleEvent(ef.createVehicleArrivesAtFacilityEvent(130, vehicleIdDep2, stopId1, 0));
-		tl.handleEvent(ef.createPersonEntersVehicleEvent(135, agentId2, vehicleIdDep2));
-		tl.handleEvent(ef.createVehicleDepartsAtFacilityEvent(140, vehicleIdDep2, stopId1, 0));
+		tl.handleEvent(new ActivityEndEvent((double) 110, agentId1, id[0], null, PtConstants.TRANSIT_ACTIVITY_TYPE));
+		tl.handleEvent(new ActivityEndEvent((double) 120, agentId2, id[0], null, PtConstants.TRANSIT_ACTIVITY_TYPE));
+		tl.handleEvent(new VehicleArrivesAtFacilityEvent((double) 130, vehicleIdDep2, stopId1, (double) 0));
+		tl.handleEvent(new PersonEntersVehicleEvent((double) 135, agentId2, vehicleIdDep2));
+		tl.handleEvent(new VehicleDepartsAtFacilityEvent((double) 140, vehicleIdDep2, stopId1, (double) 0));
 
-		tl.handleEvent(ef.createVehicleArrivesAtFacilityEvent(150, vehicleIdDep1, stopId1, 0));
-		tl.handleEvent(ef.createPersonEntersVehicleEvent(155, agentId1, vehicleIdDep1));
-		tl.handleEvent(ef.createVehicleDepartsAtFacilityEvent(160, vehicleIdDep1, stopId1, 0));
+		tl.handleEvent(new VehicleArrivesAtFacilityEvent((double) 150, vehicleIdDep1, stopId1, (double) 0));
+		tl.handleEvent(new PersonEntersVehicleEvent((double) 155, agentId1, vehicleIdDep1));
+		tl.handleEvent(new VehicleDepartsAtFacilityEvent((double) 160, vehicleIdDep1, stopId1, (double) 0));
 
 		Map<Double, Integer> map = tl.getStopFacilityLoad(stopId1);
 

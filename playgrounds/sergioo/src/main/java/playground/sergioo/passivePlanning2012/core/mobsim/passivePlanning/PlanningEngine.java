@@ -4,6 +4,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
@@ -49,9 +50,7 @@ public class PlanningEngine implements MobsimEngine, DepartureHandler {
 		for (PassivePlannerDriverAgent planningAgent:planningAgents) {
 			EventsManager eventsManager = internalInterface.getMobsim()
 					.getEventsManager();
-			eventsManager.processEvent(eventsManager.getFactory()
-					.createAgentStuckEvent(now, planningAgent.getId(),
-							planningAgent.getDestinationLinkId(), "Planning"));
+			eventsManager.processEvent(new PersonStuckEvent(now, planningAgent.getId(), planningAgent.getDestinationLinkId(), "Planning"));
 		}
 		planningAgents.clear();
 	}

@@ -22,6 +22,7 @@ package playground.sergioo.ptsim2013.pt;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
@@ -88,8 +89,7 @@ public class TransitDriver extends AbstractTransitDriver {
 	@Override
 	public void endLegAndComputeNextState(final double now) {
 		this.getSimulation().getEventsManager().processEvent(
-				this.getSimulation().getEventsManager().getFactory().createAgentArrivalEvent(
-						now, this.getId(), this.getDestinationLinkId(), this.getCurrentLeg().getMode()));
+				new PersonArrivalEvent(now, this.getId(), this.getDestinationLinkId(), this.getCurrentLeg().getMode()));
 		this.state = MobsimAgent.State.ACTIVITY ;
 		this.departureTime = Double.POSITIVE_INFINITY ;
 	}

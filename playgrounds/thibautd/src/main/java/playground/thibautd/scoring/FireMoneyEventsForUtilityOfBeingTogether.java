@@ -27,11 +27,12 @@ import java.util.Set;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.events.handler.ActivityEndEventHandler;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
@@ -44,8 +45,8 @@ import org.matsim.core.controler.events.AfterMobsimEvent;
 import org.matsim.core.controler.listener.AfterMobsimListener;
 import org.matsim.core.utils.misc.Time;
 
-import playground.thibautd.scoring.BeingTogetherScoring.PersonOverlapScorer;
 import playground.thibautd.scoring.BeingTogetherScoring.Filter;
+import playground.thibautd.scoring.BeingTogetherScoring.PersonOverlapScorer;
 import playground.thibautd.socnetsim.population.SocialNetwork;
 import playground.thibautd.utils.GenericFactory;
 import playground.thibautd.utils.MapUtils;
@@ -156,10 +157,7 @@ public class FireMoneyEventsForUtilityOfBeingTogether implements
 			final BeingTogetherScoring scoring = e.getValue();
 
 			events.processEvent(
-					events.getFactory().createAgentMoneyEvent(
-						Time.MIDNIGHT,
-						id,
-						scoring.getScore() / marginalUtilityOfMoney ) );
+					new PersonMoneyEvent(Time.MIDNIGHT, id, scoring.getScore() / marginalUtilityOfMoney) );
 		}
 	}
 }

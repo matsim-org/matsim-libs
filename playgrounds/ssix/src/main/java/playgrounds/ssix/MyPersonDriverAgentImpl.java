@@ -24,6 +24,9 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
@@ -112,8 +115,7 @@ public class MyPersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Pl
 	public final void endActivityAndComputeNextState(final double now) {
 		Activity act = (Activity) this.getPlanElements().get(this.currentPlanElementIndex);
 		this.simulation.getEventsManager().processEvent(
-				this.simulation.getEventsManager().getFactory().createActivityEndEvent(
-						now, this.getPerson().getId(), act.getLinkId(), act.getFacilityId(), act.getType()));
+				new ActivityEndEvent(now, this.getPerson().getId(), act.getLinkId(), act.getFacilityId(), act.getType()));
 		advancePlan();
 	}
 
@@ -122,8 +124,7 @@ public class MyPersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Pl
 	@Override
 	public final void endLegAndComputeNextState(final double now) {
 		this.simulation.getEventsManager().processEvent(
-				this.simulation.getEventsManager().getFactory().createAgentArrivalEvent(
-						now, this.getPerson().getId(), this.getDestinationLinkId(), currentLeg.getMode()));
+				new PersonArrivalEvent(now, this.getPerson().getId(), this.getDestinationLinkId(), currentLeg.getMode()));
 		if(!this.currentLinkId.equals(this.cachedDestinationLinkId)) {
 			log.error("The agent " + this.getPerson().getId() + " has destination link " + this.cachedDestinationLinkId
 					+ ", but arrived on link " + this.currentLinkId + ". Removing the agent from the simulation.");
@@ -262,12 +263,11 @@ public class MyPersonDriverAgentImpl implements MobsimDriverAgent, HasPerson, Pl
 	}
 	
 	private void initializeActivity(Activity act) {
-		this.state = MobsimAgent.State.ACTIVITY ;
+		this.state = MobsimAgent.State.ACTIVITY;
 
-		double now = this.getMobsim().getSimTimer().getTimeOfDay() ;
+		double now = this.getMobsim().getSimTimer().getTimeOfDay();
 		this.simulation.getEventsManager().processEvent(
-				this.simulation.getEventsManager().getFactory().createActivityStartEvent(
-						now, this.getId(),  this.currentLinkId, act.getFacilityId(), act.getType()));
+				new ActivityStartEvent(now, this.getId(), this.currentLinkId, act.getFacilityId(), act.getType()));
 		/* schedule a departure if either duration or endtime is set of the activity.
 		 * Otherwise, the agent will just stay at this activity for ever...
 		 */

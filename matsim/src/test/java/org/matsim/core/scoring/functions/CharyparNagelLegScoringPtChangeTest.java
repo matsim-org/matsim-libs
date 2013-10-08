@@ -23,11 +23,16 @@ import java.util.Random;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
@@ -63,42 +68,23 @@ public class CharyparNagelLegScoringPtChangeTest {
 
 		// "simulate"
 		final EventsManager events = EventsUtils.createEventsManager();
-		final Event endFirstAct =  events.getFactory().createActivityEndEvent(
-				leg.getDepartureTime(),
-				new IdImpl( 1 ),
-				new IdImpl( 1 ),
-				new IdImpl( 1 ),
-				"start");
+		final Event endFirstAct =  new ActivityEndEvent(leg.getDepartureTime(), new IdImpl( 1 ), new IdImpl( 1 ), new IdImpl( 1 ), "start");
 		scoring1.handleEvent( endFirstAct );
 		scoring2.handleEvent( endFirstAct );
 
-		final Event departure = events.getFactory().createAgentDepartureEvent(
-				leg.getDepartureTime(),
-				new IdImpl( 1 ),
-				new IdImpl( 1 ),
-				leg.getMode() );
+		final Event departure = new PersonDepartureEvent(leg.getDepartureTime(), new IdImpl( 1 ), new IdImpl( 1 ), leg.getMode());
 		scoring1.handleEvent( departure );
 		scoring2.handleEvent( departure );
 
-		final Event enterVehicle = events.getFactory().createPersonEntersVehicleEvent(
-				leg.getDepartureTime() + 100,
-				new IdImpl( 1 ),
-				new IdImpl( 1 ));
+		final Event enterVehicle = new PersonEntersVehicleEvent(leg.getDepartureTime() + 100, new IdImpl( 1 ), new IdImpl( 1 ));
 		scoring1.handleEvent( enterVehicle );
 		scoring2.handleEvent( enterVehicle );
 
-		final Event leaveVehicle = events.getFactory().createPersonLeavesVehicleEvent(
-				leg.getDepartureTime() + leg.getTravelTime(),
-				new IdImpl( 1 ),
-				new IdImpl( 1 ));
+		final Event leaveVehicle = new PersonLeavesVehicleEvent(leg.getDepartureTime() + leg.getTravelTime(), new IdImpl( 1 ), new IdImpl( 1 ));
 		scoring1.handleEvent( leaveVehicle );
 		scoring2.handleEvent( leaveVehicle );
 
-		final Event arrival = events.getFactory().createAgentArrivalEvent(
-				leg.getDepartureTime() + leg.getTravelTime(),
-				new IdImpl( 1 ),
-				new IdImpl( 1 ),
-				leg.getMode() );
+		final Event arrival = new PersonArrivalEvent(leg.getDepartureTime() + leg.getTravelTime(), new IdImpl( 1 ), new IdImpl( 1 ), leg.getMode());
 		scoring1.handleEvent( arrival );
 		scoring2.handleEvent( arrival );
 

@@ -22,24 +22,25 @@ package org.matsim.core.scoring;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.population.Leg;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.TeleportationArrivalEvent;
 import org.matsim.core.basic.v01.IdImpl;
-import org.matsim.core.events.EventsUtils;
 import org.matsim.core.scoring.EventsToLegs.LegHandler;
 
 public class EventsToLegsTest {
 
 	@Test
 	public void testCreatesLeg() {
-		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EventsToLegs eventsToLegs = new EventsToLegs();
 		RememberingLegHandler lh = new RememberingLegHandler();
 		eventsToLegs.setLegHandler(lh);
-		eventsToLegs.handleEvent(eventsManager.getFactory().createAgentDepartureEvent(10.0, new IdImpl("1"), new IdImpl("l1"), "walk"));
+		eventsToLegs.handleEvent(new PersonDepartureEvent(10.0, new IdImpl("1"), new IdImpl("l1"), "walk"));
 		eventsToLegs.handleEvent(new TeleportationArrivalEvent(30.0, new IdImpl("1"), 50.0));
-		eventsToLegs.handleEvent(eventsManager.getFactory().createAgentArrivalEvent(30.0, new IdImpl("1"), new IdImpl("l2"), "walk"));
+		eventsToLegs.handleEvent(new PersonArrivalEvent(30.0, new IdImpl("1"), new IdImpl("l2"), "walk"));
 		Assert.assertNotNull(lh.handledLeg);
 		Assert.assertEquals(10.0, lh.handledLeg.getDepartureTime(), 1e-9);
 		Assert.assertEquals(20.0, lh.handledLeg.getTravelTime(), 1e-9);
@@ -48,17 +49,16 @@ public class EventsToLegsTest {
 
 	@Test
 	public void testCreatesLegWithRoute() {
-		EventsManager eventsManager = EventsUtils.createEventsManager();
 		EventsToLegs eventsToLegs = new EventsToLegs();
 		RememberingLegHandler lh = new RememberingLegHandler();
 		eventsToLegs.setLegHandler(lh);
 		IdImpl agentId = new IdImpl("1");
-		eventsToLegs.handleEvent(eventsManager.getFactory().createAgentDepartureEvent(10.0, agentId, new IdImpl("l1"), "car"));
-		eventsToLegs.handleEvent(eventsManager.getFactory().createLinkLeaveEvent(10.0, agentId, new IdImpl("l1"), null));
-		eventsToLegs.handleEvent(eventsManager.getFactory().createLinkEnterEvent(11.0, agentId, new IdImpl("l2"), null));
-		eventsToLegs.handleEvent(eventsManager.getFactory().createLinkLeaveEvent(15.0, agentId, new IdImpl("l2"), null));
-		eventsToLegs.handleEvent(eventsManager.getFactory().createLinkEnterEvent(16.0, agentId, new IdImpl("l3"), null));
-		eventsToLegs.handleEvent(eventsManager.getFactory().createAgentArrivalEvent(30.0, agentId, new IdImpl("l3"), "car"));
+		eventsToLegs.handleEvent(new PersonDepartureEvent(10.0, agentId, new IdImpl("l1"), "car"));
+		eventsToLegs.handleEvent(new LinkLeaveEvent(10.0, agentId, new IdImpl("l1"), null));
+		eventsToLegs.handleEvent(new LinkEnterEvent(11.0, agentId, new IdImpl("l2"), null));
+		eventsToLegs.handleEvent(new LinkLeaveEvent(15.0, agentId, new IdImpl("l2"), null));
+		eventsToLegs.handleEvent(new LinkEnterEvent(16.0, agentId, new IdImpl("l3"), null));
+		eventsToLegs.handleEvent(new PersonArrivalEvent(30.0, agentId, new IdImpl("l3"), "car"));
 		Assert.assertNotNull(lh.handledLeg);
 		Assert.assertEquals(10.0,lh.handledLeg.getDepartureTime(), 1e-9);
 		Assert.assertEquals(20.0,lh.handledLeg.getTravelTime(), 1e-9);

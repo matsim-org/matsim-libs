@@ -1,7 +1,6 @@
 package playground.andreas.bvgAna.level1;
 
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
 
 import junit.framework.Assert;
@@ -9,7 +8,6 @@ import junit.framework.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
-import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.basic.v01.IdImpl;
 
@@ -42,12 +40,10 @@ public class StopId2RouteId2DelayAtStopMapTest {
 	    
 //	    create events
 	    
-	    EventsFactory ef = new EventsFactory();
-	    
-	    VehicleDepartsAtFacilityEvent event1 = ef.createVehicleDepartsAtFacilityEvent(2., vehId1, facilityId1, 0.5);
-	    VehicleDepartsAtFacilityEvent event2 = ef.createVehicleDepartsAtFacilityEvent(2.7, vehId2, facilityId2, 0.7);
-	    TransitDriverStartsEvent event3 = ef.createTransitDriverStartsEvent(2.8, driverId1, vehId1, transitLineId1, transitRouteId1, departureId1);
-	    TransitDriverStartsEvent event4 = ef.createTransitDriverStartsEvent(2.3, driverId2, vehId2, transitLineId2, transitRouteId2, departureId2);
+	    VehicleDepartsAtFacilityEvent event1 = new VehicleDepartsAtFacilityEvent(2., vehId1, facilityId1, 0.5);
+	    VehicleDepartsAtFacilityEvent event2 = new VehicleDepartsAtFacilityEvent(2.7, vehId2, facilityId2, 0.7);
+	    TransitDriverStartsEvent event3 = new TransitDriverStartsEvent(2.8, driverId1, vehId1, transitLineId1, transitRouteId1, departureId1);
+	    TransitDriverStartsEvent event4 = new TransitDriverStartsEvent(2.3, driverId2, vehId2, transitLineId2, transitRouteId2, departureId2);
 	    
 	    StopId2RouteId2DelayAtStopMap test = new StopId2RouteId2DelayAtStopMap();
 	    

@@ -10,7 +10,6 @@ import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
-import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.basic.v01.IdImpl;
 
 
@@ -38,16 +37,14 @@ public class PersonEnterLeaveVehicle2ActivityHandlerTest {
 		
 //		steht aus
 	    
-	    EventsFactory ef = new EventsFactory(); 
-	    
-	    ActivityEndEvent event0 = ef.createActivityEndEvent(1.0, agentId1, linkId1, facilityId1, "w");
-	    PersonEntersVehicleEvent event1 = ef.createPersonEntersVehicleEvent(1.0, personId1, vehicleId1);
-	    PersonLeavesVehicleEvent event2 = ef.createPersonLeavesVehicleEvent(1.5, personId1, vehicleId1);
-	    ActivityStartEvent event3 = ef.createActivityStartEvent(1.5, agentId1, linkId1, facilityId1, "h");
-	    ActivityEndEvent event4 = ef.createActivityEndEvent(2.5, agentId2, linkId1, facilityId1, "h");
-	    PersonEntersVehicleEvent event5 = ef.createPersonEntersVehicleEvent(2.5, personId2, vehicleId1);
-	    PersonLeavesVehicleEvent event6 = ef.createPersonLeavesVehicleEvent(2.9, personId2, vehicleId1);
-	    ActivityStartEvent event7 = ef.createActivityStartEvent(2.9, agentId2, linkId1, facilityId1, "w");
+	    ActivityEndEvent event0 = new ActivityEndEvent(1.0, agentId1, linkId1, facilityId1, "w");
+	    PersonEntersVehicleEvent event1 = new PersonEntersVehicleEvent(1.0, personId1, vehicleId1);
+	    PersonLeavesVehicleEvent event2 = new PersonLeavesVehicleEvent(1.5, personId1, vehicleId1);
+	    ActivityStartEvent event3 = new ActivityStartEvent(1.5, agentId1, linkId1, facilityId1, "h");
+	    ActivityEndEvent event4 = new ActivityEndEvent(2.5, agentId2, linkId1, facilityId1, "h");
+	    PersonEntersVehicleEvent event5 = new PersonEntersVehicleEvent(2.5, personId2, vehicleId1);
+	    PersonLeavesVehicleEvent event6 = new PersonLeavesVehicleEvent(2.9, personId2, vehicleId1);
+	    ActivityStartEvent event7 = new ActivityStartEvent(2.9, agentId2, linkId1, facilityId1, "w");
 
 	    
 	    PersonEnterLeaveVehicle2ActivityHandler test = new PersonEnterLeaveVehicle2ActivityHandler(idSet);

@@ -19,9 +19,14 @@
 
 package org.matsim.contrib.dynagent;
 
-import org.matsim.api.core.v01.*;
+import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.mobsim.framework.*;
+import org.matsim.core.mobsim.framework.MobsimAgent;
+import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimVehicle;
 import org.matsim.core.utils.misc.Time;
@@ -125,8 +130,7 @@ public class DynAgent
             activityEndTime = dynActivity.getEndTime();
             state = MobsimAgent.State.ACTIVITY;
 
-            eventsManager.processEvent(eventsManager.getFactory().createActivityStartEvent(now, id,
-                    currentLinkId, null, dynActivity.getActivityType()));
+            eventsManager.processEvent(new ActivityStartEvent(now, id, currentLinkId, null, dynActivity.getActivityType()));
         }
         else {
             dynLeg = (DynLeg)nextDynAction;
@@ -138,8 +142,7 @@ public class DynAgent
     @Override
     public void endActivityAndComputeNextState(double now)
     {
-        eventsManager.processEvent(eventsManager.getFactory().createActivityEndEvent(now, id,
-                currentLinkId, null, dynActivity.getActivityType()));
+				eventsManager.processEvent(new ActivityEndEvent(now, id, currentLinkId, null, dynActivity.getActivityType()));
 
         computeNextAction(dynActivity, now);
     }
@@ -148,8 +151,7 @@ public class DynAgent
     @Override
     public void endLegAndComputeNextState(double now)
     {
-        eventsManager.processEvent(eventsManager.getFactory().createAgentArrivalEvent(now, id,
-                currentLinkId, TransportMode.car));
+				eventsManager.processEvent(new PersonArrivalEvent(now, id, currentLinkId, TransportMode.car));
 
         computeNextAction(dynLeg, now);
     }

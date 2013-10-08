@@ -13,6 +13,7 @@ import java.util.Set;
 
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -182,7 +183,7 @@ public class BushwhackingEngine implements DepartureHandler, MobsimEngine, VisDa
 		for (Tuple<Double, MobsimAgent> entry : teleportationList) {
 			MobsimAgent agent = entry.getSecond();
 			EventsManager eventsManager = internalInterface.getMobsim().getEventsManager();
-			eventsManager.processEvent(eventsManager.getFactory().createAgentStuckEvent(now, agent.getId(), agent.getDestinationLinkId(), agent.getMode()));
+			eventsManager.processEvent(new PersonStuckEvent(now, agent.getId(), agent.getDestinationLinkId(), agent.getMode()));
 		}
 		teleportationList.clear();
 	}

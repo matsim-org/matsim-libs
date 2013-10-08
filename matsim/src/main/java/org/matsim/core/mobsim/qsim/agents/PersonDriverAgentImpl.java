@@ -24,6 +24,8 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.population.Activity;
@@ -111,8 +113,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 	public final void endActivityAndComputeNextState(final double now) {
 		Activity act = (Activity) this.getPlanElements().get(this.currentPlanElementIndex);
 		this.simulation.getEventsManager().processEvent(
-				this.simulation.getEventsManager().getFactory().createActivityEndEvent(
-						now, this.getPerson().getId(), act.getLinkId(), act.getFacilityId(), act.getType()));
+				new ActivityEndEvent(now, this.getPerson().getId(), act.getLinkId(), act.getFacilityId(), act.getType()));
 		advancePlan();
 	}
 
@@ -275,8 +276,7 @@ public class PersonDriverAgentImpl implements MobsimDriverAgent, MobsimPassenger
 
 		double now = this.getMobsim().getSimTimer().getTimeOfDay() ;
 		this.simulation.getEventsManager().processEvent(
-				this.simulation.getEventsManager().getFactory().createActivityStartEvent(
-						now, this.getId(),  this.currentLinkId, act.getFacilityId(), act.getType()));
+				new ActivityStartEvent(now, this.getId(), this.currentLinkId, act.getFacilityId(), act.getType()));
 		/* schedule a departure if either duration or endtime is set of the activity.
 		 * Otherwise, the agent will just stay at this activity for ever...
 		 */

@@ -23,6 +23,7 @@ import java.util.Iterator;
 import java.util.ListIterator;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
@@ -122,8 +123,7 @@ public class UmlaufDriver extends AbstractTransitDriver {
 	@Override
 	public void endLegAndComputeNextState(final double now) {
 		this.getSimulation().getEventsManager().processEvent(
-				this.getSimulation().getEventsManager().getFactory().createAgentArrivalEvent(
-						now, this.getId(), this.getDestinationLinkId(), this.getCurrentLeg().getMode()));
+				new PersonArrivalEvent(now, this.getId(), this.getDestinationLinkId(), this.getCurrentLeg().getMode()));
 		this.currentPlanElement = iPlanElement.next();
 		if (this.iUmlaufStueck.hasNext()) {
 			setNextLeg();

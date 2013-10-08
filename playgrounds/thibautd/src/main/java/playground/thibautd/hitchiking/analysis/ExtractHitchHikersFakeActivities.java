@@ -21,10 +21,9 @@ package playground.thibautd.hitchiking.analysis;
 
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
-import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
@@ -62,7 +61,6 @@ public class ExtractHitchHikersFakeActivities {
 
 	private static class Handler implements BasicEventHandler, PersonArrivalEventHandler {
 		private final EventWriterXML writer;
-		private final EventsFactory factory = new EventsFactory();
 
 		public Handler(final String outFile) {
 			writer = new EventWriterXML( outFile );
@@ -77,19 +75,9 @@ public class ExtractHitchHikersFakeActivities {
 		public void handleEvent(final PersonArrivalEvent event) {
 			if (event.getLegMode().equals( HitchHikingConstants.PASSENGER_MODE )) {
 				writer.handleEvent(
-						factory.createActivityStartEvent(
-							event.getTime(),
-							event.getPersonId(),
-							event.getLinkId(),
-							null,
-							ARR_ACT_TYPE));
+						new ActivityStartEvent(event.getTime(), event.getPersonId(), event.getLinkId(), null, ARR_ACT_TYPE));
 				writer.handleEvent(
-						factory.createActivityEndEvent(
-							event.getTime() + DUR,
-							event.getPersonId(),
-							event.getLinkId(),
-							null,
-							ARR_ACT_TYPE));
+						new ActivityEndEvent(event.getTime() + DUR, event.getPersonId(), event.getLinkId(), null, ARR_ACT_TYPE));
 			}
 		}
 
@@ -97,36 +85,16 @@ public class ExtractHitchHikersFakeActivities {
 		public void handleEvent(final Event event) {
 			if (event.getAttributes().get( Event.ATTRIBUTE_TYPE ).equals( "passengerStartsWaiting" )) {
 				writer.handleEvent(
-						factory.createActivityStartEvent(
-							event.getTime(),
-							new IdImpl( event.getAttributes().get( ActivityStartEvent.ATTRIBUTE_PERSON ) ),
-							new IdImpl( event.getAttributes().get( "link" ) ),
-							null,
-							WAIT_ACT_TYPE));
+						new ActivityStartEvent(event.getTime(), new IdImpl( event.getAttributes().get( ActivityStartEvent.ATTRIBUTE_PERSON ) ), new IdImpl( event.getAttributes().get( "link" ) ), null, WAIT_ACT_TYPE));
 			}
 			else if (event.getAttributes().get( Event.ATTRIBUTE_TYPE ).equals( "passengerEndsWaiting" )) {
 				writer.handleEvent(
-						factory.createActivityEndEvent(
-							event.getTime(),
-							new IdImpl( event.getAttributes().get( ActivityEndEvent.ATTRIBUTE_PERSON ) ),
-							new IdImpl( event.getAttributes().get( "link" ) ),
-							null,
-							WAIT_ACT_TYPE));
+						new ActivityEndEvent(event.getTime(), new IdImpl( event.getAttributes().get( ActivityEndEvent.ATTRIBUTE_PERSON ) ), new IdImpl( event.getAttributes().get( "link" ) ), null, WAIT_ACT_TYPE));
 
 				writer.handleEvent(
-						factory.createActivityStartEvent(
-							event.getTime(),
-							new IdImpl( event.getAttributes().get( ActivityStartEvent.ATTRIBUTE_PERSON ) ),
-							new IdImpl( event.getAttributes().get( "link" ) ),
-							null,
-							DEP_ACT_TYPE));
+						new ActivityStartEvent(event.getTime(), new IdImpl( event.getAttributes().get( ActivityStartEvent.ATTRIBUTE_PERSON ) ), new IdImpl( event.getAttributes().get( "link" ) ), null, DEP_ACT_TYPE));
 				writer.handleEvent(
-						factory.createActivityEndEvent(
-							event.getTime() + DUR,
-							new IdImpl( event.getAttributes().get( ActivityEndEvent.ATTRIBUTE_PERSON ) ),
-							new IdImpl( event.getAttributes().get( "link" ) ),
-							null,
-							DEP_ACT_TYPE));
+						new ActivityEndEvent(event.getTime() + DUR, new IdImpl( event.getAttributes().get( ActivityEndEvent.ATTRIBUTE_PERSON ) ), new IdImpl( event.getAttributes().get( "link" ) ), null, DEP_ACT_TYPE));
 			}		
 		}
 	}

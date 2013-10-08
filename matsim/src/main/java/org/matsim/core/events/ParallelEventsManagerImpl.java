@@ -25,7 +25,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.handler.EventHandler;
 
@@ -78,7 +77,6 @@ public class ParallelEventsManagerImpl implements EventsManager {
 	// for small simulations, the default value is ok and it even works
 	// quite well for larger simulations with 10 million events
 	private int preInputBufferMaxLength = 100000;
-	private final EventsFactory builder = new EventsFactory();
 
 	/**
 	 * @param numberOfThreads
@@ -231,12 +229,6 @@ public class ParallelEventsManagerImpl implements EventsManager {
 		}
 
 	}
-
-	@Override
-	public EventsFactory getFactory() {
-		return this.builder;
-	}
-
 
 	@Override
 	public void afterSimStep(double time) {

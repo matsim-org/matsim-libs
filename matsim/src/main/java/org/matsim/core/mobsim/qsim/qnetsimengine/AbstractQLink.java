@@ -36,6 +36,7 @@ import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -293,7 +294,7 @@ abstract class AbstractQLink extends QLinkInternalI {
 		if (driver == null) throw new RuntimeException("Vehicle cannot depart without a driver!");
 		
 		EventsManager eventsManager = network.simEngine.getMobsim().getEventsManager();
-		eventsManager.processEvent(eventsManager.getFactory().createPersonEntersVehicleEvent(now, driver.getId(), vehicle.getId()));
+		eventsManager.processEvent(new PersonEntersVehicleEvent(now, driver.getId(), vehicle.getId()));
 		this.addDepartingVehicle(vehicle);
 	}
 
@@ -321,7 +322,7 @@ abstract class AbstractQLink extends QLinkInternalI {
 			
 			((PassengerAgent) passenger).setVehicle(vehicle);
 			EventsManager eventsManager = network.simEngine.getMobsim().getEventsManager();
-			eventsManager.processEvent(eventsManager.getFactory().createPersonEntersVehicleEvent(now, passenger.getId(), vehicle.getId()));
+			eventsManager.processEvent(new PersonEntersVehicleEvent(now, passenger.getId(), vehicle.getId()));
 			// TODO: allow setting passenger's currentLinkId to null
 			
 			return true;

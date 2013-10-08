@@ -32,6 +32,7 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
@@ -353,7 +354,7 @@ public class PTQNetsimEngine extends NetElementActivator implements MobsimEngine
 	void letVehicleArrive(QVehicle veh) {
 		double now = qsim.getSimTimer().getTimeOfDay();
 		MobsimDriverAgent driver = veh.getDriver();
-		qsim.getEventsManager().processEvent(qsim.getEventsManager().getFactory().createPersonLeavesVehicleEvent(now, driver.getId(), veh.getId()));
+		qsim.getEventsManager().processEvent(new PersonLeavesVehicleEvent(now, driver.getId(), veh.getId()));
 		// reset vehicles driver
 		veh.setDriver(null);
 		driver.endLegAndComputeNextState(now);

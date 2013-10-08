@@ -28,11 +28,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
@@ -109,8 +109,7 @@ public class CreateAgentGroups implements BasicEventHandler {
 				
 				// clone event but change agent's id
 				Id agentGroupId = new IdImpl(personId.toString() + "_" + mode);
-				event = this.eventsManager.getFactory().createAgentDepartureEvent(event.getTime(), agentGroupId, 
-						agentDepartureEvent.getLinkId(), mode);
+				event = new PersonDepartureEvent(event.getTime(), agentGroupId, agentDepartureEvent.getLinkId(), mode);
 				
 				// register agent in its group
 				this.groups.get(agentDepartureEvent.getLegMode()).add(agentDepartureEvent.getPersonId());
@@ -125,8 +124,7 @@ public class CreateAgentGroups implements BasicEventHandler {
 			if (mode != null) {
 				// clone event but change agent's id
 				Id agentGroupId = new IdImpl(personId.toString() + "_" + mode);
-				event = this.eventsManager.getFactory().createLinkEnterEvent(event.getTime(), agentGroupId, linkEnterEvent.getLinkId(), 
-						linkEnterEvent.getVehicleId());
+				event = new LinkEnterEvent(event.getTime(), agentGroupId, linkEnterEvent.getLinkId(), linkEnterEvent.getVehicleId());
 			} else return;
 		}
 		
@@ -139,8 +137,7 @@ public class CreateAgentGroups implements BasicEventHandler {
 			if (mode != null) {
 				// clone event but change agent's id
 				Id agentGroupId = new IdImpl(personId.toString() + "_" + mode);
-				event = this.eventsManager.getFactory().createLinkLeaveEvent(event.getTime(), agentGroupId, linkLeaveEvent.getLinkId(), 
-						linkLeaveEvent.getVehicleId());
+				event = new LinkLeaveEvent(event.getTime(), agentGroupId, linkLeaveEvent.getLinkId(), linkLeaveEvent.getVehicleId());
 			} else return;
 		}
 		
@@ -153,8 +150,7 @@ public class CreateAgentGroups implements BasicEventHandler {
 			if (mode != null) {
 				// clone event but change agent's id
 				Id agentGroupId = new IdImpl(personId.toString() + "_" + mode);
-				event = this.eventsManager.getFactory().createAgentArrivalEvent(event.getTime(), agentGroupId, 
-						agentArrivalEvent.getLinkId(), mode);
+				event = new PersonArrivalEvent(event.getTime(), agentGroupId, agentArrivalEvent.getLinkId(), mode);
 			} else return;
 		}
 		

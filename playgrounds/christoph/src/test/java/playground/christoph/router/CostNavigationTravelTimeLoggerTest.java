@@ -21,6 +21,8 @@
 package playground.christoph.router;
 
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Person;
@@ -60,9 +62,9 @@ public class CostNavigationTravelTimeLoggerTest extends MatsimTestCase {
 		assertEquals(1, logger.getNotFollowedAndNotAccepted(person.getId()));
 		
 		// accept a link and set a travel time that is accepted
-		eventsManager.processEvent(eventsManager.getFactory().createLinkEnterEvent(0.0, person.getId(), link.getId(), null));
+		eventsManager.processEvent(new LinkEnterEvent(0.0, person.getId(), link.getId(), null));
 		logger.setFollowed(person.getId(), true);
-		eventsManager.processEvent(eventsManager.getFactory().createLinkLeaveEvent(100.0, person.getId(), link.getId(), null));
+		eventsManager.processEvent(new LinkLeaveEvent(100.0, person.getId(), link.getId(), null));
 		assertEquals(0.6, logger.getTrust(person.getId()));
 		assertEquals(2, logger.getFollowedAndAccepted(person.getId()));
 		assertEquals(1, logger.getFollowedAndNotAccepted(person.getId()));
@@ -70,10 +72,10 @@ public class CostNavigationTravelTimeLoggerTest extends MatsimTestCase {
 		assertEquals(1, logger.getNotFollowedAndNotAccepted(person.getId()));
 		
 		// decline a link and set a travel time that is accepted
-		eventsManager.processEvent(eventsManager.getFactory().createLinkEnterEvent(100.0, person.getId(), link.getId(), null));
+		eventsManager.processEvent(new LinkEnterEvent(100.0, person.getId(), link.getId(), null));
 		logger.setFollowed(person.getId(), false);
 		logger.setExpectedAlternativeTravelTime(person.getId(), 10.0);
-		eventsManager.processEvent(eventsManager.getFactory().createLinkLeaveEvent(200.0, person.getId(), link.getId(), null));
+		eventsManager.processEvent(new LinkLeaveEvent(200.0, person.getId(), link.getId(), null));
 //		assertEquals(0.6, logger.getTrust(person.getId()));
 		assertEquals(2, logger.getFollowedAndAccepted(person.getId()));
 		assertEquals(1, logger.getFollowedAndNotAccepted(person.getId()));
@@ -81,10 +83,10 @@ public class CostNavigationTravelTimeLoggerTest extends MatsimTestCase {
 		assertEquals(1, logger.getNotFollowedAndNotAccepted(person.getId()));
 		
 		// decline a link and set a travel time that is not accepted
-		eventsManager.processEvent(eventsManager.getFactory().createLinkEnterEvent(100.0, person.getId(), link.getId(), null));
+		eventsManager.processEvent(new LinkEnterEvent(100.0, person.getId(), link.getId(), null));
 		logger.setFollowed(person.getId(), false);
 		logger.setExpectedAlternativeTravelTime(person.getId(), 100.0);
-		eventsManager.processEvent(eventsManager.getFactory().createLinkLeaveEvent(200.0, person.getId(), link.getId(), null));
+		eventsManager.processEvent(new LinkLeaveEvent(200.0, person.getId(), link.getId(), null));
 //		assertEquals(0.6, logger.getTrust(person.getId()));
 		assertEquals(2, logger.getFollowedAndAccepted(person.getId()));
 		assertEquals(1, logger.getFollowedAndNotAccepted(person.getId()));

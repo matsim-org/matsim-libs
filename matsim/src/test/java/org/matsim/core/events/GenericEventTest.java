@@ -21,7 +21,6 @@ package org.matsim.core.events;
 
 
 import org.matsim.api.core.v01.events.GenericEvent;
-import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.testcases.MatsimTestCase;
 
 /**
@@ -34,10 +33,9 @@ public class GenericEventTest extends MatsimTestCase {
 		final String TYPE = "GenericEvent";
 		final String KEY1 = "k1";
 		final String VALUE1 = "v1";
-		final EventsFactory factory= new EventsFactory();
 		final double time = 3601;
 		
-		GenericEvent writeEvent = factory.createGenericEvent(TYPE, time);
+		GenericEvent writeEvent = new GenericEvent(TYPE, time);
 		writeEvent.getAttributes().put(KEY1, VALUE1);
 		
 		GenericEvent readEvent = XmlEventsTester.testWriteReadXml(getOutputDirectory() + "events.xml", writeEvent);

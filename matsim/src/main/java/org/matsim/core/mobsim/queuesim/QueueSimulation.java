@@ -30,6 +30,7 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Person;
@@ -246,9 +247,7 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 			if ( agent.getActivityEndTime()!=Double.POSITIVE_INFINITY 
 					&& agent.getActivityEndTime()!=Time.UNDEFINED_TIME ) {
 				if (agent.getDestinationLinkId() != null) {
-					events.processEvent(events.getFactory()
-							.createAgentStuckEvent(now, agent.getId(),
-									agent.getDestinationLinkId(), null));
+					events.processEvent(new PersonStuckEvent(now, agent.getId(), agent.getDestinationLinkId(), null));
 				}
 			}
 		}
@@ -382,7 +381,7 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 		double now = this.getSimTimer().getTimeOfDay() ;
 		String mode = agent.getMode();
 		Id linkId = agent.getCurrentLinkId() ;
-		events.processEvent( events.getFactory().createAgentDepartureEvent( now, agent.getId(), linkId, mode ) ) ;
+		events.processEvent( new PersonDepartureEvent(now, agent.getId(), linkId, mode) ) ;
 		if (mode.equals(TransportMode.car)) {
 			if ( !(agent instanceof MobsimDriverAgent) ) {
 				throw new IllegalStateException("PersonAgent that is not a DriverAgent cannot have car as mode") ;

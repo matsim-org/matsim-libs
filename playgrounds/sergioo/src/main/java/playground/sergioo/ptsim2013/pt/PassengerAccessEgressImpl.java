@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.core.api.experimental.events.BoardingDeniedEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -161,8 +162,7 @@ class PassengerAccessEgressImpl implements PassengerAccessEgress {
 			}
 			MobsimDriverAgent agent = (MobsimDriverAgent) passenger;
 			EventsManager events = this.internalInterface.getMobsim().getEventsManager();
-			events.processEvent(events.getFactory().createPersonEntersVehicleEvent(time,
-					agent.getId(), vehicle.getVehicle().getId()));
+			events.processEvent(new PersonEntersVehicleEvent(time, agent.getId(), vehicle.getVehicle().getId()));
 		}
 		return handled;
 	}

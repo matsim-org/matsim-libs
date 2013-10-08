@@ -28,17 +28,19 @@ import java.util.PriorityQueue;
 import java.util.Queue;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.framework.PlanAgent;
+import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.mobsim.qsim.comparators.TeleportationArrivalTimeComparator;
 import org.matsim.core.mobsim.qsim.interfaces.DepartureHandler;
 import org.matsim.core.mobsim.qsim.interfaces.MobsimEngine;
-import org.matsim.core.mobsim.qsim.InternalInterface;
 import org.matsim.core.utils.collections.Tuple;
 import org.matsim.core.utils.misc.Time;
 
+import playground.thibautd.utils.MapUtils;
 import eu.eunoiaproject.bikesharing.BikeSharingConstants;
 import eu.eunoiaproject.bikesharing.events.AgentStartsWaitingForBikeEvent;
 import eu.eunoiaproject.bikesharing.events.AgentStartsWaitingForFreeBikeSlotEvent;
@@ -46,8 +48,6 @@ import eu.eunoiaproject.bikesharing.events.AgentStopsWaitingForBikeEvent;
 import eu.eunoiaproject.bikesharing.events.AgentStopsWaitingForFreeBikeSlotEvent;
 import eu.eunoiaproject.bikesharing.qsim.BikeSharingManager.BikeSharingManagerListener;
 import eu.eunoiaproject.bikesharing.scenario.BikeSharingRoute;
-
-import playground.thibautd.utils.MapUtils;
 
 /**
  * @author thibautd
@@ -168,32 +168,20 @@ public class BikeSharingEngine implements DepartureHandler, MobsimEngine {
 
 		for ( MobsimAgent travelingAgent : arrivalQueue.retrieveAgentsForArrivalTime( Double.POSITIVE_INFINITY ) ) {
 			eventsManager.processEvent(
-					eventsManager.getFactory().createAgentStuckEvent(
-						now,
-						travelingAgent.getId(),
-						travelingAgent.getDestinationLinkId(),
-						travelingAgent.getMode()));
+					new PersonStuckEvent(now, travelingAgent.getId(), travelingAgent.getDestinationLinkId(), travelingAgent.getMode()));
 		}
 
 		for ( Collection<MobsimAgent> queue : agentsWaitingForDeparturePerStation.values() ) {
 			for ( MobsimAgent waitingAgent : queue ) {
 				eventsManager.processEvent(
-						eventsManager.getFactory().createAgentStuckEvent(
-							now,
-							waitingAgent.getId(),
-							waitingAgent.getDestinationLinkId(),
-							waitingAgent.getMode()));
+						new PersonStuckEvent(now, waitingAgent.getId(), waitingAgent.getDestinationLinkId(), waitingAgent.getMode()));
 			}
 		}
 
 		for ( Collection<MobsimAgent> queue : agentsWaitingForArrivalPerStation.values() ) {
 			for ( MobsimAgent waitingAgent : queue ) {
 				eventsManager.processEvent(
-						eventsManager.getFactory().createAgentStuckEvent(
-							now,
-							waitingAgent.getId(),
-							waitingAgent.getDestinationLinkId(),
-							waitingAgent.getMode()));
+						new PersonStuckEvent(now, waitingAgent.getId(), waitingAgent.getDestinationLinkId(), waitingAgent.getMode()));
 			}
 		}
 	}

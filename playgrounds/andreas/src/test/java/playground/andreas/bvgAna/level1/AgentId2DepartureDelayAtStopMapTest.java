@@ -10,7 +10,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.basic.v01.IdImpl;
 
 public class AgentId2DepartureDelayAtStopMapTest {
@@ -35,19 +34,18 @@ public class AgentId2DepartureDelayAtStopMapTest {
         Id linkId3 = ida[13];
 
         
-        EventsFactory ef = new EventsFactory();
         AgentId2DepartureDelayAtStopMap handler = new AgentId2DepartureDelayAtStopMap(idSet);
         
 //        create Events
         
-        PersonDepartureEvent event3 = ef.createAgentDepartureEvent(2.9*3600, persId1, linkId3, TransportMode.pt);
+        PersonDepartureEvent event3 = new PersonDepartureEvent(2.9*3600, persId1, linkId3, TransportMode.pt);
 		handler.handleEvent(event3);
-		PersonDepartureEvent event4 = ef.createAgentDepartureEvent(2.1*3600, persId2, linkId1, TransportMode.pt);
+		PersonDepartureEvent event4 = new PersonDepartureEvent(2.1*3600, persId2, linkId1, TransportMode.pt);
 		handler.handleEvent(event4);
         
-        PersonEntersVehicleEvent event1 = ef.createPersonEntersVehicleEvent(2.9*3600, persId1, vehId1);
+        PersonEntersVehicleEvent event1 = new PersonEntersVehicleEvent(2.9*3600, persId1, vehId1);
         handler.handleEvent(event1);
-        PersonEntersVehicleEvent event2 = ef.createPersonEntersVehicleEvent(2.1*3600, persId2, vehId2);
+        PersonEntersVehicleEvent event2 = new PersonEntersVehicleEvent(2.1*3600, persId2, vehId2);
         handler.handleEvent(event2);
         
 //        run tests

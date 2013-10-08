@@ -25,7 +25,9 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.EventsFactory;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -42,7 +44,6 @@ public class TimeReduceDemandTest {
 	@Test
     public final void testRun() {
 	
-		EventsFactory eF = new EventsFactory();
 		PConfigGroup pC = new PConfigGroup();
 		
 		Cooperative coop = PScenarioHelper.createTestCooperative(utils.getOutputDirectory());
@@ -82,14 +83,14 @@ public class TimeReduceDemandTest {
 		Assert.assertEquals("Compare end time", 30000.0, coop.getBestPlan().getEndTime(), MatsimTestUtils.EPSILON);
 		Assert.assertNull("Test plan should be null", testPlan);
 		
-		strat.handleEvent(eF.createTransitDriverStartsEvent(18000.0, new IdImpl("d1"), veh1, new IdImpl("line1"), new IdImpl("route1"), new IdImpl("dep1")));
-		strat.handleEvent(eF.createTransitDriverStartsEvent(18000.0, new IdImpl("d2"), veh2, new IdImpl("line2"), new IdImpl("route2"), new IdImpl("dep2")));
-		strat.handleEvent(eF.createPersonEntersVehicleEvent(20000.0, new IdImpl("p1"), veh1));
-		strat.handleEvent(eF.createPersonEntersVehicleEvent(15000.0, new IdImpl("p1"), veh2));
-		strat.handleEvent(eF.createTransitDriverStartsEvent(22500.0, new IdImpl("d2"), veh1, new IdImpl("line1"), new IdImpl("route1"), new IdImpl("dep2")));
-		strat.handleEvent(eF.createPersonLeavesVehicleEvent(23000.0, new IdImpl("p1"), veh1));
-		strat.handleEvent(eF.createPersonLeavesVehicleEvent(17000.0, new IdImpl("p1"), veh2));
-		strat.handleEvent(eF.createTransitDriverStartsEvent(25000.0, new IdImpl("d3"), veh1, new IdImpl("line1"), new IdImpl("route1"), new IdImpl("dep3")));
+		strat.handleEvent(new TransitDriverStartsEvent(18000.0, new IdImpl("d1"), veh1, new IdImpl("line1"), new IdImpl("route1"), new IdImpl("dep1")));
+		strat.handleEvent(new TransitDriverStartsEvent(18000.0, new IdImpl("d2"), veh2, new IdImpl("line2"), new IdImpl("route2"), new IdImpl("dep2")));
+		strat.handleEvent(new PersonEntersVehicleEvent(20000.0, new IdImpl("p1"), veh1));
+		strat.handleEvent(new PersonEntersVehicleEvent(15000.0, new IdImpl("p1"), veh2));
+		strat.handleEvent(new TransitDriverStartsEvent(22500.0, new IdImpl("d2"), veh1, new IdImpl("line1"), new IdImpl("route1"), new IdImpl("dep2")));
+		strat.handleEvent(new PersonLeavesVehicleEvent(23000.0, new IdImpl("p1"), veh1));
+		strat.handleEvent(new PersonLeavesVehicleEvent(17000.0, new IdImpl("p1"), veh2));
+		strat.handleEvent(new TransitDriverStartsEvent(25000.0, new IdImpl("d3"), veh1, new IdImpl("line1"), new IdImpl("route1"), new IdImpl("dep3")));
 		
 		// should be able to replan
 		testPlan = strat.run(coop);
@@ -105,13 +106,13 @@ public class TimeReduceDemandTest {
 		
 		strat.reset(0);
 		coop.getBestPlan().setNVehicles(2);
-		strat.handleEvent(eF.createTransitDriverStartsEvent(21350.0, new IdImpl("d1"), veh1, new IdImpl("line1"), new IdImpl("route1"), new IdImpl("dep1")));
-		strat.handleEvent(eF.createPersonEntersVehicleEvent(22123.0, new IdImpl("p1"), veh1));
+		strat.handleEvent(new TransitDriverStartsEvent(21350.0, new IdImpl("d1"), veh1, new IdImpl("line1"), new IdImpl("route1"), new IdImpl("dep1")));
+		strat.handleEvent(new PersonEntersVehicleEvent(22123.0, new IdImpl("p1"), veh1));
 		
-		strat.handleEvent(eF.createTransitDriverStartsEvent(22899.0, new IdImpl("d2"), veh1, new IdImpl("line1"), new IdImpl("route1"), new IdImpl("dep2")));
-		strat.handleEvent(eF.createPersonLeavesVehicleEvent(23222.0, new IdImpl("p1"), veh1));
+		strat.handleEvent(new TransitDriverStartsEvent(22899.0, new IdImpl("d2"), veh1, new IdImpl("line1"), new IdImpl("route1"), new IdImpl("dep2")));
+		strat.handleEvent(new PersonLeavesVehicleEvent(23222.0, new IdImpl("p1"), veh1));
 		
-		strat.handleEvent(eF.createTransitDriverStartsEvent(24999.0, new IdImpl("d3"), veh1, new IdImpl("line1"), new IdImpl("route1"), new IdImpl("dep3")));
+		strat.handleEvent(new TransitDriverStartsEvent(24999.0, new IdImpl("d3"), veh1, new IdImpl("line1"), new IdImpl("route1"), new IdImpl("dep3")));
 		
 		// should be able to replan
 		testPlan = strat.run(coop);

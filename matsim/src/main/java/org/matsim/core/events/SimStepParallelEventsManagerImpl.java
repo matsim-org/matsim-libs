@@ -32,7 +32,6 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.handler.EventHandler;
 import org.matsim.core.gbl.Gbl;
@@ -108,11 +107,6 @@ public class SimStepParallelEventsManagerImpl implements EventsManager {
 		delegate.removeHandler(handler);
 		
 		for (EventsManager eventsManager : eventsManagers) eventsManager.removeHandler(handler);
-	}
-	
-	@Override
-	public EventsFactory getFactory() {
-		return delegate.getFactory();
 	}
 	
 	@Override

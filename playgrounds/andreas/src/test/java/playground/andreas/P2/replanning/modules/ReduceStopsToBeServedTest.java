@@ -27,7 +27,10 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.EventsFactory;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
+import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -44,7 +47,6 @@ public class ReduceStopsToBeServedTest {
 	@Test
     public final void testRun() {
 	
-		EventsFactory eF = new EventsFactory();
 		PConfigGroup pC = new PConfigGroup();
 		
 		Cooperative coop = PScenarioHelper.createCoop2111to1314to4443();
@@ -65,8 +67,8 @@ public class ReduceStopsToBeServedTest {
 		Id veh1 = new IdImpl(pC.getPIdentifier() + 1 + "-" + 1);
 		Id lineId = coop.getId();
 		
-		strat.handleEvent(eF.createTransitDriverStartsEvent(18000.0, new IdImpl("d1"), veh1, lineId, new IdImpl("route1"), new IdImpl("dep1")));
-		strat.handleEvent(eF.createVehicleArrivesAtFacilityEvent(18000.0, veh1, stopId1, 0.0));
+		strat.handleEvent(new TransitDriverStartsEvent(18000.0, new IdImpl("d1"), veh1, lineId, new IdImpl("route1"), new IdImpl("dep1")));
+		strat.handleEvent(new VehicleArrivesAtFacilityEvent(18000.0, veh1, stopId1, 0.0));
 		
 
 		PPlan testPlan = null;
@@ -103,16 +105,16 @@ public class ReduceStopsToBeServedTest {
 		for (int i = 0; i < 100; i++) {
 			Id personId = new IdImpl(i);
 			personIds.add(personId);
-			strat.handleEvent(eF.createPersonEntersVehicleEvent(18000.0, personId, veh1));
+			strat.handleEvent(new PersonEntersVehicleEvent(18000.0, personId, veh1));
 		}
 		
 		Assert.assertEquals("Number of test persons", 100, personIds.size(), MatsimTestUtils.EPSILON);
 		
-		strat.handleEvent(eF.createVehicleArrivesAtFacilityEvent(18050.0, veh1, stopId2, 0.0));
-		strat.handleEvent(eF.createVehicleArrivesAtFacilityEvent(18100.0, veh1, stopId3, 0.0));
+		strat.handleEvent(new VehicleArrivesAtFacilityEvent(18050.0, veh1, stopId2, 0.0));
+		strat.handleEvent(new VehicleArrivesAtFacilityEvent(18100.0, veh1, stopId3, 0.0));
 		
 		for (Id personId : personIds) {
-			strat.handleEvent(eF.createPersonLeavesVehicleEvent(18100.0, personId, veh1));
+			strat.handleEvent(new PersonLeavesVehicleEvent(18100.0, personId, veh1));
 		}
 				
 		

@@ -30,6 +30,8 @@ import java.util.List;
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.gbl.Gbl;
@@ -293,9 +295,7 @@ public final class QSim implements VisMobsim, Netsim {
 			this.arrangeAgentDeparture(agent) ; 
 			break ;
 		case ABORT:
-			this.events.processEvent( this.events.getFactory().createAgentStuckEvent(
-					this.simTimer.getTimeOfDay(), agent.getId(), agent.getCurrentLinkId(), agent.getMode()
-					)) ;
+			this.events.processEvent( new PersonStuckEvent(this.simTimer.getTimeOfDay(), agent.getId(), agent.getCurrentLinkId(), agent.getMode())) ;
 
 			this.agents.remove(agent) ;
 			this.agentCounter.decLiving();
@@ -325,8 +325,7 @@ public final class QSim implements VisMobsim, Netsim {
 		double now = this.getSimTimer().getTimeOfDay();
 		String mode = agent.getMode();
 		Id linkId = agent.getCurrentLinkId();
-		events.processEvent(events.getFactory().createAgentDepartureEvent(now,
-				agent.getId(), linkId, mode));
+		events.processEvent(new PersonDepartureEvent(now, agent.getId(), linkId, mode));
 
 		for (DepartureHandler departureHandler : this.departureHandlers) {
 			if (departureHandler.handleDeparture(now, agent, linkId)) {

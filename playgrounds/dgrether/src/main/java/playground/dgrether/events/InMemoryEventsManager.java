@@ -24,7 +24,6 @@ import java.util.List;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.events.handler.EventHandler;
@@ -47,11 +46,6 @@ public class InMemoryEventsManager implements EventsManager {
 		return this.events;
 	}
 	
-	@Override
-	public EventsFactory getFactory() {
-		return delegate.getFactory();
-	}
-
 	@Override
 	public void processEvent(Event event) {
 		this.counter++;

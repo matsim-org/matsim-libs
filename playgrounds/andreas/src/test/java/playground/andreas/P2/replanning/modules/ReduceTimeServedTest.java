@@ -27,7 +27,9 @@ import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.EventsFactory;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
+import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -44,7 +46,6 @@ public class ReduceTimeServedTest {
 	@Test
     public final void testRun() {
 	
-		EventsFactory eF = new EventsFactory();
 		PConfigGroup pC = new PConfigGroup();
 		
 		Cooperative coop = PScenarioHelper.createCoop2111to1314to4443();
@@ -63,7 +64,7 @@ public class ReduceTimeServedTest {
 		Id veh1 = new IdImpl(pC.getPIdentifier() + 1 + "-" + 1);
 		Id lineId = coop.getId();
 		
-		strat.handleEvent(eF.createTransitDriverStartsEvent(18000.0, new IdImpl("d1"), veh1, lineId, new IdImpl("route1"), new IdImpl("dep1")));
+		strat.handleEvent(new TransitDriverStartsEvent(18000.0, new IdImpl("d1"), veh1, lineId, new IdImpl("route1"), new IdImpl("dep1")));
 
 		PPlan testPlan = null;
 		Assert.assertEquals("Compare number of vehicles", 1.0, coop.getBestPlan().getNVehicles(), MatsimTestUtils.EPSILON);
@@ -96,13 +97,13 @@ public class ReduceTimeServedTest {
 		for (int i = 0; i < 100; i++) {
 			Id personId = new IdImpl(i);
 			personIds.add(personId);
-			strat.handleEvent(eF.createPersonEntersVehicleEvent(12 * 3600.0, personId, veh1));
+			strat.handleEvent(new PersonEntersVehicleEvent(12 * 3600.0, personId, veh1));
 		}
 		
 		Assert.assertEquals("Number of test persons", 100, personIds.size(), MatsimTestUtils.EPSILON);
 		
 		for (Id personId : personIds) {
-			strat.handleEvent(eF.createPersonLeavesVehicleEvent(15 * 3600.0, personId, veh1));
+			strat.handleEvent(new PersonLeavesVehicleEvent(15 * 3600.0, personId, veh1));
 		}
 				
 		
@@ -120,8 +121,8 @@ public class ReduceTimeServedTest {
 		
 		// add a few other plans
 		for (int i = 0; i < 10; i++) {
-			strat.handleEvent(eF.createPersonEntersVehicleEvent(10 * 3600.0, new IdImpl("11" + i), veh1));
-			strat.handleEvent(eF.createPersonLeavesVehicleEvent(18 * 3600.0, new IdImpl("11" + i), veh1));			
+			strat.handleEvent(new PersonEntersVehicleEvent(10 * 3600.0, new IdImpl("11" + i), veh1));
+			strat.handleEvent(new PersonLeavesVehicleEvent(18 * 3600.0, new IdImpl("11" + i), veh1));			
 		}
 		
 		// should be able to replan, but with same result
@@ -137,8 +138,8 @@ public class ReduceTimeServedTest {
 		
 		// add a lot of new plans
 		for (int i = 0; i < 100; i++) {
-			strat.handleEvent(eF.createPersonEntersVehicleEvent(9 * 3600.0, new IdImpl("12" + i), veh1));
-			strat.handleEvent(eF.createPersonLeavesVehicleEvent(13 * 3600.0, new IdImpl("12" + i), veh1));			
+			strat.handleEvent(new PersonEntersVehicleEvent(9 * 3600.0, new IdImpl("12" + i), veh1));
+			strat.handleEvent(new PersonLeavesVehicleEvent(13 * 3600.0, new IdImpl("12" + i), veh1));			
 		}
 		
 		// should be able to replan, but with an earlier start time

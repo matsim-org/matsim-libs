@@ -20,7 +20,6 @@
 package playground.wdoering.oldstufffromgregor;
 
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.basic.v01.IdImpl;
 
 /**
@@ -29,16 +28,8 @@ import org.matsim.core.basic.v01.IdImpl;
  */
 public class XYVxVyEventsFactoryImpl {
 
-	private final EventsFactory factory;
-
-	public XYVxVyEventsFactoryImpl(EventsFactory factory) {
-		this.factory = factory;
+	public XYVxVyEventsFactoryImpl() {
 	}
-
-	public EventsFactory getFactory() {
-		return this.factory;
-	}
-
 
 	/**
 	 * 

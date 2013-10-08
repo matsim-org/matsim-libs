@@ -6,12 +6,11 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
-import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 
 public class Mobsim {
@@ -31,7 +30,6 @@ public class Mobsim {
 		// getting the plans info should be w/o problems
 
 		// the following tests the events generation
-		EventsFactory eb = this.ev.getFactory();
 
 		Id agentId = sc.createId("agentId");
 		Id linkId = sc.createId("linkId");
@@ -39,20 +37,20 @@ public class Mobsim {
 		String legMode = TransportMode.car;
 		double time = 1. ;
 
-		ActivityEndEvent aee = eb.createActivityEndEvent( time, agentId, linkId, facilityId, "actType" ) ;
+		ActivityEndEvent aee = new ActivityEndEvent(time, agentId, linkId, facilityId, "actType") ;
 		ev.processEvent( aee ) ;
 
-		PersonDepartureEvent ade = eb.createAgentDepartureEvent( time, agentId, linkId, legMode ) ;
+		PersonDepartureEvent ade = new PersonDepartureEvent(time, agentId, linkId, legMode) ;
 
-		Wait2LinkEvent aw2le = eb.createAgentWait2LinkEvent(time,agentId,linkId, null) ;
+		Wait2LinkEvent aw2le = new Wait2LinkEvent(time, agentId, linkId, null) ;
 
-		LinkLeaveEvent lle = eb.createLinkLeaveEvent( time, agentId, linkId, null ) ;
+		LinkLeaveEvent lle = new LinkLeaveEvent(time, agentId, linkId, null) ;
 
-		LinkEnterEvent lee = eb.createLinkEnterEvent( time, agentId, linkId, null ) ;
+		LinkEnterEvent lee = new LinkEnterEvent(time, agentId, linkId, null) ;
 
-		PersonArrivalEvent aae = eb.createAgentArrivalEvent( time, agentId, linkId, legMode ) ;
+		PersonArrivalEvent aae = new PersonArrivalEvent(time, agentId, linkId, legMode) ;
 
-		ActivityStartEvent ase = eb.createActivityStartEvent( time, agentId, linkId, facilityId, "acttype" ) ;
+		ActivityStartEvent ase = new ActivityStartEvent(time, agentId, linkId, facilityId, "acttype") ;
 
 		// TODO: None of this is behind interfaces.  Needed if we want to accept "external" mobsims.  Do we want that?
 		// If so, we would need to be sure that we want to maintain the create methods.

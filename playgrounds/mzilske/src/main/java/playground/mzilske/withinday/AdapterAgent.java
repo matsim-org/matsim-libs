@@ -4,6 +4,9 @@ import java.util.List;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
+import org.matsim.api.core.v01.events.ActivityStartEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
@@ -95,7 +98,7 @@ public class AdapterAgent implements MobsimDriverPassengerAgent, MobsimBeforeSim
 				@Override
 				public void startDoing(ActivityBehavior activityBehavior) {
 					AdapterAgent.this.activityBehavior = activityBehavior;
-					eventsManager.processEvent(eventsManager.getFactory().createActivityStartEvent(now, id, currentLinkId, null, activityBehavior.getActivityType()));
+					eventsManager.processEvent(new ActivityStartEvent(now, id, currentLinkId, null, activityBehavior.getActivityType()));
 					
 //					simulation.arrangeActivityStart(AdapterAgent.this);
 					AdapterAgent.this.state = MobsimAgent.State.ACTIVITY ;
@@ -193,7 +196,7 @@ public class AdapterAgent implements MobsimDriverPassengerAgent, MobsimBeforeSim
 		@Override
 		public void stopActivity() {
 			System.out.println("I want to stop my activity.");
-			eventsManager.processEvent(eventsManager.getFactory().createActivityEndEvent(now, id, currentLinkId, null, activityBehavior.getActivityType()));
+			eventsManager.processEvent(new ActivityEndEvent(now, id, currentLinkId, null, activityBehavior.getActivityType()));
 			AdapterAgent.this.activityEndTime = now ;
 			simulation.rescheduleActivityEnd(AdapterAgent.this);
 
@@ -287,7 +290,7 @@ public class AdapterAgent implements MobsimDriverPassengerAgent, MobsimBeforeSim
 		// In part also because the user of the agent arrival event is probably the agent programmer, not the framework
 		// programmer.  Given that this was also the structure that I found, I decided to leave it that way.  kai, jun'11
 
-		eventsManager.processEvent(eventsManager.getFactory().createAgentArrivalEvent(now, id, currentLinkId, this.mode));
+		eventsManager.processEvent(new PersonArrivalEvent(now, id, currentLinkId, this.mode));
 		teleportationBehavior = null;
 		drivingBehavior = null;
 	}

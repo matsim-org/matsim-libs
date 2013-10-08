@@ -21,7 +21,6 @@
 package playground.vsp.emissions;
 
 import org.matsim.api.core.v01.events.Event;
-import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.handler.EventHandler;
 
@@ -32,11 +31,6 @@ import org.matsim.core.events.handler.EventHandler;
  */
 public class HandlerToTestEmissionAnalysisModules implements EventsManager {
 	static Double sumOverAll=0.0;
-
-	@Override
-	public EventsFactory getFactory() {
-		return null;
-	}
 
 	@Override
 	public void processEvent(Event event) {	

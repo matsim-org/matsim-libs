@@ -29,9 +29,6 @@ import org.matsim.core.mobsim.framework.Steppable;
  */
 public interface EventsManager {
 
-	@Deprecated
-	public EventsFactory getFactory();
-
 	public void processEvent(final Event event);
 
 	public void addHandler(final EventHandler handler);

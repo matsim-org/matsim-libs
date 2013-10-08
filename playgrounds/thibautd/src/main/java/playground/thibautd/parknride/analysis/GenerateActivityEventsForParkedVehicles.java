@@ -25,9 +25,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
 import org.matsim.api.core.v01.events.handler.ActivityStartEventHandler;
-import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.events.EventsUtils;
@@ -68,7 +68,6 @@ public class GenerateActivityEventsForParkedVehicles {
 	private static class EventsInterpreter implements ActivityStartEventHandler {
 		private final List<Id> parkedAgents = new ArrayList<Id>();
 		private final BasicEventHandler eventWriter;
-		private final EventsFactory factory = new EventsFactory();
 		private final boolean useTime;
 		// via does strange things if an agent is at several places at the same time.
 		// THis happend if time info is dropped to get daily parking occupation
@@ -92,14 +91,9 @@ public class GenerateActivityEventsForParkedVehicles {
 					Integer c = counts.get( event.getPersonId() );
 
 					eventWriter.handleEvent(
-							factory.createActivityEndEvent(
-								useTime ? event.getTime() : 100,
-								useTime ?
-									event.getPersonId() :
-									new IdImpl( event.getPersonId()+"->"+c ),
-								event.getLinkId(),
-								event.getFacilityId(),
-								ACTIVITY_TYPE ) );
+							new ActivityEndEvent(useTime ? event.getTime() : 100, useTime ?
+							event.getPersonId() :
+							new IdImpl( event.getPersonId()+"->"+c ), event.getLinkId(), event.getFacilityId(), ACTIVITY_TYPE) );
 				}
 				else {
 					// the agent was not parked
@@ -108,14 +102,9 @@ public class GenerateActivityEventsForParkedVehicles {
 					counts.put( event.getPersonId() , c );
 
 					eventWriter.handleEvent(
-							factory.createActivityStartEvent(
-								useTime ? event.getTime() : 0,
-								useTime ?
-									event.getPersonId() :
-									new IdImpl( event.getPersonId()+"->"+c ),
-								event.getLinkId(),
-								event.getFacilityId(),
-								ACTIVITY_TYPE ) );
+							new ActivityStartEvent(useTime ? event.getTime() : 0, useTime ?
+							event.getPersonId() :
+							new IdImpl( event.getPersonId()+"->"+c ), event.getLinkId(), event.getFacilityId(), ACTIVITY_TYPE) );
 					parkedAgents.add( event.getPersonId() );
 
 				}

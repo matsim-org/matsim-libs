@@ -10,7 +10,6 @@ import junit.framework.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
-import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.basic.v01.IdImpl;
 
@@ -55,19 +54,17 @@ public class VehId2DelayAtStopMapTest {
 
 //        create events
         
-        EventsFactory ef = new EventsFactory();
+        VehicleDepartsAtFacilityEvent event1 = new VehicleDepartsAtFacilityEvent(2.3*3600, vehId1, facilId1, 2.3);
+        TransitDriverStartsEvent event2 = new TransitDriverStartsEvent(2.6*3600, driverId1, vehId1, transitLineId1, transitRouteId1, departureId1);
         
-        VehicleDepartsAtFacilityEvent event1 = ef.createVehicleDepartsAtFacilityEvent(2.3*3600, vehId1, facilId1, 2.3);
-        TransitDriverStartsEvent event2 = ef.createTransitDriverStartsEvent(2.6*3600, driverId1, vehId1, transitLineId1, transitRouteId1, departureId1);
+        VehicleDepartsAtFacilityEvent event3 = new VehicleDepartsAtFacilityEvent(2.8*3600, vehId2, facilId2, 2.5);
+        TransitDriverStartsEvent event4 = new TransitDriverStartsEvent(2.3*3600, driverId2, vehId2, transitLineId2, transitRouteId2, departureId2);
         
-        VehicleDepartsAtFacilityEvent event3 = ef.createVehicleDepartsAtFacilityEvent(2.8*3600, vehId2, facilId2, 2.5);
-        TransitDriverStartsEvent event4 = ef.createTransitDriverStartsEvent(2.3*3600, driverId2, vehId2, transitLineId2, transitRouteId2, departureId2);
+        VehicleDepartsAtFacilityEvent event5 = new VehicleDepartsAtFacilityEvent(2.1*3600, vehId1, facilId3, 2.4);
+        TransitDriverStartsEvent event6 = new TransitDriverStartsEvent(2.2*3600, driverId3, vehId1, transitLineId3, transitRouteId3, departureId3);
         
-        VehicleDepartsAtFacilityEvent event5 = ef.createVehicleDepartsAtFacilityEvent(2.1*3600, vehId1, facilId3, 2.4);
-        TransitDriverStartsEvent event6 = ef.createTransitDriverStartsEvent(2.2*3600, driverId3, vehId1, transitLineId3, transitRouteId3, departureId3);
-        
-        VehicleDepartsAtFacilityEvent event7 = ef.createVehicleDepartsAtFacilityEvent(2.6*3600, vehId2, facilId4, 2.1);
-        TransitDriverStartsEvent event8 = ef.createTransitDriverStartsEvent(2.1*3600, driverId4, vehId2, transitLineId4, transitRouteId4, departureId4);
+        VehicleDepartsAtFacilityEvent event7 = new VehicleDepartsAtFacilityEvent(2.6*3600, vehId2, facilId4, 2.1);
+        TransitDriverStartsEvent event8 = new TransitDriverStartsEvent(2.1*3600, driverId4, vehId2, transitLineId4, transitRouteId4, departureId4);
        
 //		create instance of class to be tested
         

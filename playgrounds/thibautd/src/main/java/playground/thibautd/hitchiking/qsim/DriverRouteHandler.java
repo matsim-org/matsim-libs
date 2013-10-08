@@ -28,6 +28,8 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Coord;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonMoneyEvent;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -182,8 +184,7 @@ public class DriverRouteHandler implements HitchHikingHandler {
 		}
 		else {
 			events.processEvent(
-					events.getFactory().createAgentArrivalEvent(
-							now, agent.getId(), currentDestination, HitchHikingConstants.DRIVER_MODE));
+					new PersonArrivalEvent(now, agent.getId(), currentDestination, HitchHikingConstants.DRIVER_MODE));
 
 			return true;
 		}
@@ -199,8 +200,7 @@ public class DriverRouteHandler implements HitchHikingHandler {
 	private boolean performPickUp() {
 		final Id pickUpLink =  route.getPickUpLinkId();
 		events.processEvent(
-				events.getFactory().createAgentArrivalEvent(
-						now, agent.getId(), pickUpLink, TransportMode.car));
+				new PersonArrivalEvent(now, agent.getId(), pickUpLink, TransportMode.car));
 
 		Tuple<Id, Collection<MobsimAgent>> destAndPassengers =
 			queuesManager.getPassengersFromFirstNonEmptyQueue(
@@ -233,17 +233,11 @@ public class DriverRouteHandler implements HitchHikingHandler {
 							pickUpLink));
 				if (log.isTraceEnabled()) log.trace( "passenger "+p.getId()+" gets bonus "+malusPerPerson );
 				events.processEvent(
-						events.getFactory().createAgentMoneyEvent(
-							now,
-							p.getId(),
-							malusPerPerson));
+						new PersonMoneyEvent(now, p.getId(), malusPerPerson));
 			}
 			if (log.isTraceEnabled()) log.trace( "driver "+agent.getId()+" gets bonus "+malusPerPerson );
 			events.processEvent(
-					events.getFactory().createAgentMoneyEvent(
-						now,
-						agent.getId(),
-						malusPerPerson));
+					new PersonMoneyEvent(now, agent.getId(), malusPerPerson));
 		}
 		else {
 			passengers = null;

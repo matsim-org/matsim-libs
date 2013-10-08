@@ -24,6 +24,8 @@ import java.util.Collection;
 import java.util.List;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
+import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
@@ -95,10 +97,7 @@ class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, Pa
 				((MobsimAgent) p).notifyArrivalOnLinkByNonNetworkMode( delegate.getCurrentLinkId() );
 				((MobsimAgent) p).endLegAndComputeNextState( now );
 				events.processEvent(
-						events.getFactory().createPersonLeavesVehicleEvent(
-							now,
-							p.getId(),
-							vehicle.getId()));
+						new PersonLeavesVehicleEvent(now, p.getId(), vehicle.getId()));
 				internalInterface.arrangeNextAgentState( (MobsimAgent) p );
 			}
 		}
@@ -131,10 +130,7 @@ class PassengerUnboardingDriverAgent implements MobsimDriverAgent, PlanAgent, Pa
 			}
 
 			events.processEvent(
-					events.getFactory().createPersonEntersVehicleEvent(
-						internalInterface.getMobsim().getSimTimer().getTimeOfDay(),
-						passenger.getId(),
-						vehicle.getId()));
+					new PersonEntersVehicleEvent(internalInterface.getMobsim().getSimTimer().getTimeOfDay(), passenger.getId(), vehicle.getId()));
 		}
 		passengersToBoard.clear();
 

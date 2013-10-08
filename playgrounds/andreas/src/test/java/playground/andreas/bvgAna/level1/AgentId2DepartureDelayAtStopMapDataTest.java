@@ -9,7 +9,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
-import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.basic.v01.IdImpl;
 
 public class AgentId2DepartureDelayAtStopMapDataTest {
@@ -32,14 +31,12 @@ public class AgentId2DepartureDelayAtStopMapDataTest {
         Id persId1 = ida[0];
         Id linkId3 = ida[13];
 
-        
-        EventsFactory ef = new EventsFactory();
         AgentId2DepartureDelayAtStopMapData data = new AgentId2DepartureDelayAtStopMapData(persId1);
         
 //        create Events
         
-        PersonDepartureEvent event3 = ef.createAgentDepartureEvent(2.9*3600, persId1, linkId3, TransportMode.pt);
-        PersonEntersVehicleEvent event1 = ef.createPersonEntersVehicleEvent(2.9*3600, persId1, vehId1);
+        PersonDepartureEvent event3 = new PersonDepartureEvent(2.9*3600, persId1, linkId3, TransportMode.pt);
+        PersonEntersVehicleEvent event1 = new PersonEntersVehicleEvent(2.9*3600, persId1, vehId1);
         
         data.addAgentDepartureEvent(event3);
         data.addPersonEntersVehicleEvent(event1);

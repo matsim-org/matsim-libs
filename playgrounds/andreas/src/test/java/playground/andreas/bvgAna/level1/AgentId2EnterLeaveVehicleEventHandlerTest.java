@@ -8,7 +8,6 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
-import org.matsim.core.api.experimental.events.EventsFactory;
 import org.matsim.core.basic.v01.IdImpl;
 
 public class AgentId2EnterLeaveVehicleEventHandlerTest {
@@ -36,23 +35,22 @@ public class AgentId2EnterLeaveVehicleEventHandlerTest {
         Id persId2 = ida[5];
         Id persId3 = ida[8];
         
-        EventsFactory ef = new EventsFactory();
         AgentId2EnterLeaveVehicleEventHandler handler = new AgentId2EnterLeaveVehicleEventHandler(idSet);
         
 //        create Events
         
-        PersonEntersVehicleEvent event1 = ef.createPersonEntersVehicleEvent(3.0*3600, persId1, vehId1);
+        PersonEntersVehicleEvent event1 = new PersonEntersVehicleEvent(3.0*3600, persId1, vehId1);
         handler.handleEvent(event1);
-        PersonEntersVehicleEvent event2 = ef.createPersonEntersVehicleEvent(3.7*3600, persId2, vehId3);
+        PersonEntersVehicleEvent event2 = new PersonEntersVehicleEvent(3.7*3600, persId2, vehId3);
         handler.handleEvent(event2);
-        PersonEntersVehicleEvent event3 = ef.createPersonEntersVehicleEvent(3.2*3600, persId3, vehId2);
+        PersonEntersVehicleEvent event3 = new PersonEntersVehicleEvent(3.2*3600, persId3, vehId2);
         handler.handleEvent(event3);
         
-        PersonLeavesVehicleEvent event4 = ef.createPersonLeavesVehicleEvent(4.0*3600, persId1, vehId2);
+        PersonLeavesVehicleEvent event4 = new PersonLeavesVehicleEvent(4.0*3600, persId1, vehId2);
         handler.handleEvent(event4);
-        PersonLeavesVehicleEvent event5 = ef.createPersonLeavesVehicleEvent(4.7*3600, persId2, vehId3);
+        PersonLeavesVehicleEvent event5 = new PersonLeavesVehicleEvent(4.7*3600, persId2, vehId3);
         handler.handleEvent(event5);
-        PersonLeavesVehicleEvent event6 = ef.createPersonLeavesVehicleEvent(4.2*3600, persId3, vehId1);
+        PersonLeavesVehicleEvent event6 = new PersonLeavesVehicleEvent(4.2*3600, persId3, vehId1);
         handler.handleEvent(event6);
         
 //        run tests

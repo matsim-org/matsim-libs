@@ -25,6 +25,7 @@ import java.util.Queue;
 import java.util.concurrent.PriorityBlockingQueue;
 
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.InternalInterface;
@@ -108,7 +109,7 @@ public class ActivityEngine implements MobsimEngine, ActivityHandler {
 				// since we are at an activity, it is not plausible to assume that the agents know mode or destination 
 				// link id.  Thus generating the event with ``null'' in the corresponding entries.  kai, mar'12
 				EventsManager eventsManager = internalInterface.getMobsim().getEventsManager();
-				eventsManager.processEvent(eventsManager.getFactory().createAgentStuckEvent(now, entry.agent.getId(),null, null));
+				eventsManager.processEvent(new PersonStuckEvent(now, entry.agent.getId(), null, null));
 			}
 		}
 		activityEndsList.clear();
