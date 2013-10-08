@@ -10,12 +10,13 @@ import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 
 import playground.sergioo.passivePlanning2012.api.population.BasePerson;
 import playground.sergioo.passivePlanning2012.core.mobsim.passivePlanning.agents.PassivePlannerDriverAgent;
+import playground.sergioo.passivePlanning2012.core.population.agenda.Agenda;
 import playground.sergioo.passivePlanning2012.population.parallelPassivePlanning.PassivePlannerManager;
 
 public class PassivePlannerAgendaAgent extends PassivePlannerDriverAgent  {
 
 	//Constructors
-	public PassivePlannerAgendaAgent(final BasePerson basePerson, final Netsim simulation, final PassivePlannerManager passivePlannerManager, Set<String> modes) {
+	public PassivePlannerAgendaAgent(final BasePerson basePerson, final Netsim simulation, final PassivePlannerManager passivePlannerManager, Set<String> modes, Agenda agenda) {
 		super(basePerson, simulation, passivePlannerManager);
 		boolean carAvailability = false;
 		Collection<String> mainModes = simulation.getScenario().getConfig().getQSimConfigGroup().getMainModes();
@@ -23,7 +24,7 @@ public class PassivePlannerAgendaAgent extends PassivePlannerDriverAgent  {
 			if(planElement instanceof Leg)
 				if(mainModes.contains(((Leg)planElement).getMode()))
 					carAvailability = true;
-		planner = new SinglePlannerAgendaAgent(simulation.getScenario(), carAvailability, modes, basePerson.getBasePlan(), this);
+		planner = new SinglePlannerAgendaAgent(simulation.getScenario(), carAvailability, modes, basePerson.getBasePlan(), this, agenda);
 		planner.setPlanElementIndex(0);
 	}
 	

@@ -45,7 +45,7 @@ public class Agenda {
 		public Distribution getDuration() {
 			return duration;
 		}
-		public void substractCurrentPerformedTime(double duration2) {
+		public void substractCurrentPerformedTime(double currentPerformedTime) {
 			this.currentPerformedTime -= currentPerformedTime;
 		}
 		

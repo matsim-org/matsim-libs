@@ -36,7 +36,8 @@ public class StationsPainter extends Painter {
 			double angle = Math.PI/2, diff=2*Math.PI/point.getValue().length;
 			double sum = 0;
 			for(int i=0; i<point.getValue().length; i++) {
-				paintCircularRegion(g2, layersPanel, point.getKey(), (int)Math.sqrt(point.getValue()[i]*scale), angle+Math.PI/6, angle+diff-Math.PI/6, colors[i]);
+				//paintCircularRegion(g2, layersPanel, point.getKey(), (int)Math.sqrt(point.getValue()[i]*scale), angle+Math.PI/6, angle+diff-Math.PI/6, colors[i]);
+				paintAngledBar(g2, layersPanel, point.getKey(), 15, (int)Math.sqrt(point.getValue()[i]*scale), angle, angle+diff, colors[i], true);
 				angle += diff;
 				sum += point.getValue()[i]<0?0:point.getValue()[i]*scale;
 			}

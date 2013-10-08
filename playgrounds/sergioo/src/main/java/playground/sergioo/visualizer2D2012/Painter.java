@@ -10,6 +10,7 @@ import java.awt.Stroke;
 import java.awt.geom.Ellipse2D;
 import java.text.NumberFormat;
 
+import org.jfree.ui.Drawable;
 import org.matsim.api.core.v01.Coord;
 
 
@@ -84,6 +85,28 @@ public abstract class Painter {
 		g2.setColor(new Color(color.getRed()/2,color.getGreen()/2,color.getBlue()/2));
 		g2.draw(region);
 	}
+	protected void paintAngledBar(Graphics2D g2, LayersPanel layersPanel, Coord coord, int width, int size, double initialAngle, double finalAngle, Color color, boolean withCenter) {
+		int[] screenPoint = layersPanel.getScreenXY(new double[]{coord.getX(), coord.getY()});
+		g2.setColor(color);
+		if(initialAngle>finalAngle) {
+			double angle = initialAngle;
+			initialAngle = finalAngle;
+			finalAngle = angle;
+		}
+		double cAngle = (finalAngle+initialAngle)/2;
+		double d = width/(2*Math.sin((finalAngle-initialAngle)/2));
+		int[][] points;
+		if(withCenter)
+			points = new int[][]{{screenPoint[0], screenPoint[0]+(int)(d*Math.cos(initialAngle)), screenPoint[0]+(int)(d*Math.cos(initialAngle)+size*Math.cos(cAngle)), screenPoint[0]+(int)(d*Math.cos(finalAngle)+size*Math.cos(cAngle)), screenPoint[0]+(int)(d*Math.cos(finalAngle))},
+					{screenPoint[1], screenPoint[1]+(int)(d*Math.sin(initialAngle)), screenPoint[1]+(int)(d*Math.sin(initialAngle)+size*Math.sin(cAngle)), screenPoint[1]+(int)(d*Math.sin(finalAngle)+size*Math.sin(cAngle)), screenPoint[1]+(int)(d*Math.sin(finalAngle))}};
+		else
+			points = new int[][]{{screenPoint[0]+(int)(d*Math.cos(initialAngle)), screenPoint[0]+(int)(d*Math.cos(initialAngle)+size*Math.cos(cAngle)), screenPoint[0]+(int)(d*Math.cos(finalAngle)+size*Math.cos(cAngle)), screenPoint[0]+(int)(d*Math.cos(finalAngle))},
+					{screenPoint[1]+(int)(d*Math.sin(initialAngle)), screenPoint[1]+(int)(d*Math.sin(initialAngle)+size*Math.sin(cAngle)), screenPoint[1]+(int)(d*Math.sin(finalAngle)+size*Math.sin(cAngle)), screenPoint[1]+(int)(d*Math.sin(finalAngle))}};
+		Shape polygon = new Polygon(points[0], points[1], points[0].length);
+		g2.fill(polygon);
+		color  = new Color(color.getRed()/2,color.getGreen()/2,color.getBlue()/2);
+		g2.draw(polygon);
+	}
 	protected void paintCross(Graphics2D g2, LayersPanel layersPanel, Coord coord, double pointSize, Color color) {
 		Stroke stroke= g2.getStroke();
 		g2.setColor(color);
@@ -115,6 +138,15 @@ public abstract class Painter {
 			polygon.addPoint(screenPoint[0], screenPoint[1]);
 		}
 		g2.fill(polygon);
+	}
+	protected void paintPolygonBorder(Graphics2D g2, LayersPanel layersPanel, double[][] points, Color color) {
+		g2.setColor(color);
+		Polygon polygon = new Polygon();
+		for(double[] point:points) {
+			int[] screenPoint = layersPanel.getScreenXY(point);
+			polygon.addPoint(screenPoint[0], screenPoint[1]);
+		}
+		g2.draw(polygon);
 	}
 	protected void paintVertical3DScale(Graphics2D g2, LayersPanel layersPanel,	double startHeight, double endHeight, double startValue, double endValue, int divisions, double baseSize, Font font, NumberFormat format, Stroke stroke, Color color) {
 		double[] base = new double[]{layersPanel.getCamera().getCenter()[0], layersPanel.getCamera().getCenter()[1], startHeight};

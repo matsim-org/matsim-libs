@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -63,7 +64,21 @@ public abstract class PlaceSharer {
 		public Id getFacilityId() {
 			return facilityId;
 		}
-
+		
+		
+		public Set<double[]> getTimes(String activityType) {
+			Set<double[]> times = new HashSet<double[]>();
+			for(Entry<Period, Set<String>> timeType: timeTypes.entrySet())
+				if(timeType.getValue().contains(activityType))
+					times.add(new double[]{timeType.getKey().startTime, timeType.getKey().endTime});
+			return times;
+		}
+		public Set<String> getActivityTypes() {
+			Set<String> activities = new HashSet<String>();
+			for(Set<String> timeType: timeTypes.values())
+				activities.addAll(timeType);
+			return activities;
+		}
 		public Set<String> getActivityTypes(double time) {
 			return timeTypes.get(Period.getPeriod(time));
 		}
