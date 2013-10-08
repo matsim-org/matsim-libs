@@ -45,7 +45,6 @@ import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.network.NetworkWriter;
@@ -164,12 +163,11 @@ public class BenchmarkV2 {
 		c.controler().setRoutingAlgorithmType(RoutingAlgorithmType.AStarLandmarks);
 
 		if ("qsim".equals(mobsim)) {
-			c.addQSimConfigGroup(new QSimConfigGroup());
 	//		c.getQSimConfigGroup().setSnapshotStyle("queue");
-			c.getQSimConfigGroup().setEndTime(30.0*3600);
-			c.getQSimConfigGroup().setFlowCapFactor(flowFactor);
+			c.qsim().setEndTime(30.0*3600);
+			c.qsim().setFlowCapFactor(flowFactor);
 			if (nOfThreadsSim > 0) {
-				c.getQSimConfigGroup().setNumberOfThreads(nOfThreadsSim);
+				c.qsim().setNumberOfThreads(nOfThreadsSim);
 			}
 		}
 

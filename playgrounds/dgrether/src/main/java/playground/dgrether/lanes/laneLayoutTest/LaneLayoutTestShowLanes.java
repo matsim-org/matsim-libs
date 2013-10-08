@@ -24,7 +24,6 @@ import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
@@ -50,11 +49,10 @@ public class LaneLayoutTestShowLanes {
 		config.network().setLaneDefinitionsFile(LaneLayoutTestFileNames.LANEDEFINITIONSV2);
 		config.plans().setInputFile(LaneLayoutTestFileNames.POPULATION);
 		config.scenario().setUseLanes(true);
-		config.addQSimConfigGroup(new QSimConfigGroup());
 //		config.otfVis().setLinkWidth(150.0f);
 		config.otfVis().setDrawLinkIds(true);
-		config.getQSimConfigGroup().setNodeOffset(30);
-		config.getQSimConfigGroup().setSnapshotStyle("queue");
+		config.qsim().setNodeOffset(30);
+		config.qsim().setSnapshotStyle("queue");
 
 		Scenario sc = ScenarioUtils.loadScenario(config);
 		EventsManager events = EventsUtils.createEventsManager();

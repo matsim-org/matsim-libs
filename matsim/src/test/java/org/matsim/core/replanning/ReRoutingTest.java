@@ -31,6 +31,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
+import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.io.IOUtils;
@@ -50,9 +51,9 @@ public class ReRoutingTest extends MatsimTestCase {
 	
 	private Scenario loadScenario() {
 		Config config = loadConfig(getClassInputDirectory() + "config.xml");
-		config.simulation().setTimeStepSize(10.0);
-		config.simulation().setStuckTime(100.0);
-		config.simulation().setRemoveStuckVehicles(true);
+		((SimulationConfigGroup) config.getModule("simulation")).setTimeStepSize(10.0);
+		((SimulationConfigGroup) config.getModule("simulation")).setStuckTime(100.0);
+		((SimulationConfigGroup) config.getModule("simulation")).setRemoveStuckVehicles(true);
 		config.controler().setEventsFileFormats(EnumSet.of(EventsFileFormat.txt));
 
 		/*

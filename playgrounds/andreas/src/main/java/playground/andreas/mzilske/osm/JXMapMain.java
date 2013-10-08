@@ -24,7 +24,6 @@ import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
@@ -40,7 +39,6 @@ public class JXMapMain {
 		Config config = ConfigUtils.createConfig();
 		config.otfVis().setMaximumZoom(17);
 		config.global().setCoordinateSystem("EPSG:32710");
-		config.addQSimConfigGroup(new QSimConfigGroup());
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario).readFile(filename);
 		EventsManager events = EventsUtils.createEventsManager();

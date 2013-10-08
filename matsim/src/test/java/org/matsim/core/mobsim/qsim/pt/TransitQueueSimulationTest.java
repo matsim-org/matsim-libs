@@ -34,11 +34,11 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
@@ -61,7 +61,6 @@ import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.BasicEventHandler;
@@ -120,8 +119,7 @@ public class TransitQueueSimulationTest {
         ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
         scenario.getConfig().scenario().setUseVehicles(true);
         scenario.getConfig().scenario().setUseTransit(true);
-        scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
-        scenario.getConfig().getQSimConfigGroup().setEndTime(8.0*3600);
+        scenario.getConfig().qsim().setEndTime(8.0*3600);
 
         // setup: network
         Network network = scenario.getNetwork();
@@ -217,9 +215,9 @@ public class TransitQueueSimulationTest {
             schedule.addTransitLine(line);
         }
 
-        scenario.getConfig().addSimulationConfigGroup(new SimulationConfigGroup() ) ;
-        scenario.getConfig().simulation().setEndTime(1.0*3600); // prevent running the actual simulation
-        scenario.getConfig().getQSimConfigGroup().setEndTime(1.0*3600); // prevent running the actual simulation
+        scenario.getConfig().addModule( new SimulationConfigGroup() );
+        ((SimulationConfigGroup) scenario.getConfig().getModule(SimulationConfigGroup.GROUP_NAME)).setEndTime(1.0*3600); // prevent running the actual simulation
+        scenario.getConfig().qsim().setEndTime(1.0*3600); // prevent running the actual simulation
         // (the previous line was not there when I found this. kai, dec'11)
         
         QSim sim = (QSim) new QSimFactory().createMobsim(scenario, EventsUtils.createEventsManager());
@@ -249,8 +247,7 @@ public class TransitQueueSimulationTest {
         ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
         scenario.getConfig().scenario().setUseVehicles(true);
         scenario.getConfig().scenario().setUseTransit(true);
-        scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
-
+        
         // setup: network
         Network network = scenario.getNetwork();
         Node node1 = network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(   0, 0));
@@ -282,7 +279,7 @@ public class TransitQueueSimulationTest {
 
         homeAct.setEndTime(7.0*3600 - 10.0);
         // as no transit line runs, make sure to stop the simulation manually.
-        scenario.getConfig().getQSimConfigGroup().setEndTime(7.0*3600);
+        scenario.getConfig().qsim().setEndTime(7.0*3600);
 
         Leg leg = pb.createLeg(TransportMode.pt);
         leg.setRoute(new ExperimentalTransitRoute(stop1, line, null, stop2));
@@ -330,8 +327,7 @@ public class TransitQueueSimulationTest {
         ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
         scenario.getConfig().scenario().setUseVehicles(true);
         scenario.getConfig().scenario().setUseTransit(true);
-        scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
-
+   
         // setup: network
         Network network = scenario.getNetwork();
         Node node1 = network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(   0, 0));
@@ -369,7 +365,7 @@ public class TransitQueueSimulationTest {
 
         homeAct.setEndTime(7.0*3600 - 10.0);
         // as no transit line runs, make sure to stop the simulation manually.
-        scenario.getConfig().getQSimConfigGroup().setEndTime(7.0*3600);
+        scenario.getConfig().qsim().setEndTime(7.0*3600);
 
         Leg leg = pb.createLeg(TransportMode.pt);
         leg.setRoute(new ExperimentalTransitRoute(stop1, line, null, stop2));
@@ -397,8 +393,7 @@ public class TransitQueueSimulationTest {
         ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
         scenario.getConfig().scenario().setUseVehicles(true);
         scenario.getConfig().scenario().setUseTransit(true);
-        scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
-        scenario.getConfig().getQSimConfigGroup().setEndTime(8.0*3600);
+        scenario.getConfig().qsim().setEndTime(8.0*3600);
 
         // setup: network
         Network network = scenario.getNetwork();
@@ -659,8 +654,7 @@ public class TransitQueueSimulationTest {
     public void testStartAndEndTime() {
         ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
         Config config = scenario.getConfig();
-        config.addQSimConfigGroup(new QSimConfigGroup());
-
+      
         // build simple network with 2 links
         NetworkImpl network = (NetworkImpl) scenario.getNetwork();
         NodeImpl node1 = network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(0.0, 0.0));
@@ -719,8 +713,8 @@ public class TransitQueueSimulationTest {
         collector.reset(0);
 
         // second test with special start/end times
-        config.getQSimConfigGroup().setStartTime(depTime + 20.0);
-        config.getQSimConfigGroup().setEndTime(depTime + 90.0);
+        config.qsim().setStartTime(depTime + 20.0);
+        config.qsim().setEndTime(depTime + 90.0);
         sim = (QSim) new QSimFactory().createMobsim(scenario, events);
         sim.run();
         assertEquals(depTime + 20.0, collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
@@ -750,8 +744,7 @@ public class TransitQueueSimulationTest {
     public void testEvents() {
         ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
         Config config = scenario.getConfig();
-        scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
-
+     
         // build simple network with 2 links
         NetworkImpl network = (NetworkImpl) scenario.getNetwork();
         NodeImpl node1 = network.getFactory().createNode(scenario.createId("1"), scenario.createCoord(0.0, 0.0));

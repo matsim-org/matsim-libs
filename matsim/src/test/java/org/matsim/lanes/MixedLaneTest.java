@@ -120,8 +120,8 @@ public class MixedLaneTest {
 	@Test
 	public void test1PersonsStartingOnLaneCapacityRestriction(){
 		fixture.create1PersonFromLink1Population();
-		fixture.sc.getConfig().getQSimConfigGroup().setStartTime(3500.0);
-		fixture.sc.getConfig().getQSimConfigGroup().setEndTime(7200.0);
+		fixture.sc.getConfig().qsim().setStartTime(3500.0);
+		fixture.sc.getConfig().qsim().setEndTime(7200.0);
 		LaneDefinitions20 lanes = fixture.sc.getScenarioElement(LaneDefinitions20.class);
 		LaneData20 lane1 = lanes.getLanesToLinkAssignments().get(fixture.id1).getLanes().get(fixture.id1);
 		lane1.setCapacityVehiclesPerHour(1800.0);

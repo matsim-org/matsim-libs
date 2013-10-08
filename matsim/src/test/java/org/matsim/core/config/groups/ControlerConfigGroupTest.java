@@ -92,10 +92,6 @@ public class ControlerConfigGroupTest {
 	public void testMobsim() {
 		ControlerConfigGroup cg = new ControlerConfigGroup();
 		// test initial value
-		Assert.assertNull(cg.getMobsim());
-		Assert.assertNull(cg.getValue(ControlerConfigGroup.MOBSIM));
-		// test setting with setMobsim
-		cg.setMobsim("qsim");
 		Assert.assertEquals("qsim", cg.getMobsim());
 		Assert.assertEquals("qsim", cg.getValue(ControlerConfigGroup.MOBSIM));
 		// test setting to null

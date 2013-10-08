@@ -840,8 +840,8 @@ public class QueueSimulationTest extends TestCase {
 		collector.reset(0);
 
 		// second test with special start/end times
-		config.simulation().setStartTime(8.0*3600);
-		config.simulation().setEndTime(11.0*3600);
+		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setStartTime(8.0*3600);
+		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setEndTime(11.0*3600);
 		sim = new QueueSimulation(scenario, events);
 		sim.run();
 		assertEquals(8.0*3600, collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
@@ -932,7 +932,7 @@ public class QueueSimulationTest extends TestCase {
 
 		// run the simulation
 		QueueSimulation sim = new QueueSimulation(scenario, events);
-		config.simulation().setEndTime(simEndTime);
+		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setEndTime(simEndTime);
 		sim.run();
 		assertEquals(simEndTime, collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
 		// besides this, the important thing is that no (Runtime)Exception is thrown during this test
@@ -1008,10 +1008,10 @@ public class QueueSimulationTest extends TestCase {
 		public Fixture() {
 			this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			this.config = scenario.getConfig();
-			this.config.addSimulationConfigGroup(new SimulationConfigGroup()) ;
-			this.config.simulation().setFlowCapFactor(1.0);
-			this.config.simulation().setStorageCapFactor(1.0);
-			this.config.simulation().setStuckTime(1.0) ;
+			this.config.addModule( new SimulationConfigGroup() );
+			((SimulationConfigGroup) this.config.getModule(SimulationConfigGroup.GROUP_NAME)).setFlowCapFactor(1.0);
+			((SimulationConfigGroup) this.config.getModule(SimulationConfigGroup.GROUP_NAME)).setStorageCapFactor(1.0);
+			((SimulationConfigGroup) this.config.getModule(SimulationConfigGroup.GROUP_NAME)).setStuckTime(1.0) ;
 
 			/* build network */
 			this.network = scenario.getNetwork();

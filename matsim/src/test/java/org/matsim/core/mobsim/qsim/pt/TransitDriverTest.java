@@ -174,7 +174,6 @@ public class TransitDriverTest {
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		QSim tqsim = (QSim) new QSimFactory().createMobsim(scenario, events);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
 		tqsim.addMobsimEngine(trEngine);
@@ -189,7 +188,6 @@ public class TransitDriverTest {
 		queueVehicle.setStopHandler(new SimpleTransitStopHandler());
 		driver.setVehicle(queueVehicle);
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 
 		assertEquals(stop1, driver.getNextTransitStop());
 		assertEquals(0, driver.handleTransitStop(stop1, 60), MatsimTestCase.EPSILON);
@@ -222,10 +220,8 @@ public class TransitDriverTest {
 
 		final Config config = ConfigUtils.createConfig() ;
 		config.vspExperimental().addParam(VspExperimentalConfigKey.isGeneratingBoardingDeniedEvent, "true") ;
-//		config.scenario().setUseTransit(true) ;
 		
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(config);
-		sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 
 		final EventHandlerForTesting handler = new EventHandlerForTesting();
 		events.addHandler(handler);
@@ -322,7 +318,6 @@ public class TransitDriverTest {
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		QSim tqsim = (QSim) new QSimFactory().createMobsim(sc, events);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim);
 		tqsim.addMobsimEngine(trEngine);
@@ -383,7 +378,6 @@ public class TransitDriverTest {
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		QSim tqsim = (QSim) new QSimFactory().createMobsim(sc, events);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
 		tqsim.addMobsimEngine(trEngine);
@@ -433,7 +427,6 @@ public class TransitDriverTest {
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), departureTime);
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		QSim tqsim = (QSim) new QSimFactory().createMobsim(sc, events);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim);
 		tqsim.addMobsimEngine(trEngine);
@@ -482,7 +475,6 @@ public class TransitDriverTest {
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		QSim tqsim = (QSim) new QSimFactory().createMobsim(sc, events);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
 		tqsim.addMobsimEngine(trEngine);
@@ -539,7 +531,6 @@ public class TransitDriverTest {
 		Departure dep = builder.createDeparture(new IdImpl("L1.1"), 9876.0);
 		TransitStopAgentTracker tracker = new TransitStopAgentTracker(events);
 		ScenarioImpl sc = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		QSim tqsim = (QSim) new QSimFactory().createMobsim(sc, events);
 		TransitQSimEngine trEngine = new TransitQSimEngine(tqsim) ;
 		tqsim.addMobsimEngine(trEngine);

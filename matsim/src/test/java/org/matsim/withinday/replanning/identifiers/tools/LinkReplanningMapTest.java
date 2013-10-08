@@ -46,11 +46,10 @@ public class LinkReplanningMapTest extends MatsimTestCase {
 
 		// load config and use ParallelQSim with 2 Threads
 		Config config = loadConfig("test/scenarios/equil/config.xml");
-		QSimConfigGroup qSimConfig = new QSimConfigGroup();
+		QSimConfigGroup qSimConfig = config.qsim();
 		qSimConfig.setNumberOfThreads(2);
 		qSimConfig.setFlowCapFactor(100.0);	// ensure that agents don't have to wait at an intersection
 		qSimConfig.setStorageCapFactor(100.0);	// ensure that agents don't have to wait at an intersection
-		config.addQSimConfigGroup(qSimConfig);
 		config.controler().setMobsim("qsim");
 		config.controler().setLastIteration(0);
 

@@ -39,7 +39,7 @@ public class T5_LiveVisTeleport {
 	public static void main(String[] args) {
 		Config config = ConfigUtils.loadConfig(configFile);
 		List<String> emptyList = Collections.emptyList();
-		config.getQSimConfigGroup().setMainModes(emptyList);
+		config.qsim().setMainModes(emptyList);
 		config.otfVis().setShowTeleportedAgents(true);
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		OTFVis.playScenario(scenario);

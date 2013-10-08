@@ -32,7 +32,7 @@ public class CASimEngineFactory implements MatsimFactory {
 		
 		CASimEngine simEngine;
 		
-		int numOfThreads = sim.getScenario().getConfig().getQSimConfigGroup().getNumberOfThreads(); 
+		int numOfThreads = sim.getScenario().getConfig().qsim().getNumberOfThreads(); 
 		if (numOfThreads > 1) {
 			simEngine = new ParallelCASimEngine(sim, spatialResolution);
 			log.info("Using ParallelCASimEngine with " + numOfThreads + " threads.");

@@ -49,12 +49,10 @@ public class PotsdamRun implements Runnable {
 		config.strategy().addStrategySettings(expBeta);
 		config.strategy().addStrategySettings(stratSets);
 		
-		QSimConfigGroup tmp = new QSimConfigGroup();
+		QSimConfigGroup tmp = config.qsim();
 		tmp.setFlowCapFactor(100);
 		tmp.setStorageCapFactor(100);
 		tmp.setRemoveStuckVehicles(false);
-		tmp.setEndTime(24*60*60);
-		config.addQSimConfigGroup(tmp);
 		
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		

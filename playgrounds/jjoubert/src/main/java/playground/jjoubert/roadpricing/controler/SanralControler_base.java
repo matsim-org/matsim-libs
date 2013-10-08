@@ -3,6 +3,7 @@ package playground.jjoubert.roadpricing.controler;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.controler.Controler;
 
 import playground.jjoubert.Utilities.matsim2urbansim.controler.MyBasicConfig;
@@ -27,9 +28,9 @@ public class SanralControler_base {
 		config.global().setCoordinateSystem("WGS84_UTM35S");
 		config.global().setNumberOfThreads(15);
 		// Simulation.
-		config.simulation().setFlowCapFactor(0.1);
-		config.simulation().setStorageCapFactor(0.28);
-		config.simulation().setSnapshotPeriod(900);
+		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setFlowCapFactor(0.1);
+		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setStorageCapFactor(0.28);
+		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setSnapshotPeriod(900);
 		// Network.
 		config.network().setInputFile(root + "network/gautengNetwork_CleanV0.xml.gz");
 		config.network();

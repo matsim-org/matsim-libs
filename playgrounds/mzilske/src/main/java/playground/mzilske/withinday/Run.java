@@ -10,7 +10,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.MobsimAgent;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
@@ -72,11 +71,7 @@ public class Run {
 
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig();
-		QSimConfigGroup qSimConfigGroup = new QSimConfigGroup();
-//		qSimConfigGroup.setSnapshotFormat("otfvis");
-//		qSimConfigGroup.setSnapshotPeriod(1);
-		config.addQSimConfigGroup(qSimConfigGroup);
-		qSimConfigGroup.setEndTime(8*60*60);
+		config.qsim().setEndTime(8*60*60);
 		
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		GridCreator gridCreator = new GridCreator(scenario);

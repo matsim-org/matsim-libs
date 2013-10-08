@@ -58,7 +58,7 @@ public class Controler_eThekwini_Census {
 		/*
 		 * Add the multi-thread queue simulation.
 		 */
-		config.getQSimConfigGroup().setNumberOfThreads(numberOfThreadsQSim);
+		config.qsim().setNumberOfThreads(numberOfThreadsQSim);
 
 		Controler c = new Controler(config);
 		c.setCreateGraphs(true);

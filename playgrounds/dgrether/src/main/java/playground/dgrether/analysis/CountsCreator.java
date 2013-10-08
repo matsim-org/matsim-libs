@@ -27,6 +27,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -59,8 +60,8 @@ public class CountsCreator {
 	public CountsCreator(String networkPath) {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config config = scenario.getConfig();
-		config.simulation().setFlowCapFactor(0.13);
-		config.simulation().setStorageCapFactor(0.13);
+		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setFlowCapFactor(0.13);
+		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setStorageCapFactor(0.13);
 		this.network = scenario.getNetwork();
 		loadNetwork(networkPath, scenario);
 		log.info("  creating routes...");

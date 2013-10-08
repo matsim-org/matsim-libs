@@ -339,11 +339,10 @@ public class SingleCrossingScenario {
 		config.network().setInputFile(network);
 		config.scenario().setUseLanes(false);
 		config.scenario().setUseSignalSystems(true);
-		QSimConfigGroup qsim = new QSimConfigGroup();
+		QSimConfigGroup qsim = config.qsim();
 		qsim.setSnapshotStyle("queue");
 		qsim.setStuckTime(1000.0);
-		config.addQSimConfigGroup(qsim);
-		config.getQSimConfigGroup().setNodeOffset(20.0);
+		config.qsim().setNodeOffset(20.0);
 		config.otfVis().setShowTeleportedAgents(true);
 		config.otfVis().setDrawNonMovingItems(true);
 		return config;

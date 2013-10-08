@@ -217,7 +217,7 @@ public class PTQLink implements NetsimLink {
 		this.network = network;
 		this.netElementActivator = network.simEngine;
 		this.insertingWaitingVehiclesBeforeDrivingVehicles = 
-				network.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().isInsertingWaitingVehiclesBeforeDrivingVehicles() ;
+				network.simEngine.getMobsim().getScenario().getConfig().qsim().isInsertingWaitingVehiclesBeforeDrivingVehicles() ;
 		this.toQueueNode = toNode;
 		this.vehQueue = vehicleQueue;
 		this.length = this.getLink().getLength();
@@ -747,13 +747,13 @@ public class PTQLink implements NetsimLink {
 		// we need the flow capacity per sim-tick and multiplied with flowCapFactor
 		this.flowCapacityPerTimeStep = this.flowCapacityPerTimeStep
 				* network.simEngine.getMobsim().getSimTimer().getSimTimestepSize()
-				* network.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().getFlowCapFactor();
+				* network.simEngine.getMobsim().getScenario().getConfig().qsim().getFlowCapFactor();
 		this.inverseFlowCapacityPerTimeStep = 1.0 / this.flowCapacityPerTimeStep;
 		this.flowCapacityPerTimeStepFractionalPart = this.flowCapacityPerTimeStep - (int) this.flowCapacityPerTimeStep;
 	}
 
 	private void calculateStorageCapacity(final double time) {
-		double storageCapFactor = network.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().getStorageCapFactor();
+		double storageCapFactor = network.simEngine.getMobsim().getScenario().getConfig().qsim().getStorageCapFactor();
 		this.bufferStorageCapacity = (int) Math.ceil(this.flowCapacityPerTimeStep);
 
 		double numberOfLanes = this.getLink().getNumberOfLanes(time);

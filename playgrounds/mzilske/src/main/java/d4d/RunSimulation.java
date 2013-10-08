@@ -148,7 +148,6 @@ public class RunSimulation {
 		
 		config.planCalcScore().setWriteExperiencedPlans(true);
 		
-		config.addQSimConfigGroup(new QSimConfigGroup());
 	//	config.controler().setLastIteration(180);
 		config.controler().setLastIteration(1);
 		config.controler().setMobsim(MobsimType.qsim.toString());
@@ -157,12 +156,12 @@ public class RunSimulation {
 		config.global().setCoordinateSystem("EPSG:3395");
 		config.global().setNumberOfThreads(8);
 		// config.controler().setWriteSnapshotsInterval(5);
-		config.getQSimConfigGroup().setStorageCapFactor(0.01);
-		config.getQSimConfigGroup().setFlowCapFactor(0.01);
-		config.getQSimConfigGroup().setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE);
-		config.getQSimConfigGroup().setRemoveStuckVehicles(false);
-		config.getQSimConfigGroup().setNumberOfThreads(2);
-		config.getQSimConfigGroup().setEndTime(30*60*60);
+		config.qsim().setStorageCapFactor(0.01);
+		config.qsim().setFlowCapFactor(0.01);
+		config.qsim().setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE);
+		config.qsim().setRemoveStuckVehicles(false);
+		config.qsim().setNumberOfThreads(2);
+		config.qsim().setEndTime(30*60*60);
 	
 		
 //		config.plansCalcRoute().setTeleportedModeSpeed("other", 30.0 / 3.6); //  km/h beeline

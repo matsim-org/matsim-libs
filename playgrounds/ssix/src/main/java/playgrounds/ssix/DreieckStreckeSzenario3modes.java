@@ -229,11 +229,10 @@ public class DreieckStreckeSzenario3modes {
 		this.networkCapacity = networkCapacity;
 
 		Config config = ConfigUtils.createConfig();
-		config.addQSimConfigGroup(new QSimConfigGroup());
-		config.getQSimConfigGroup().setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE) ;
-		config.getQSimConfigGroup().setMainModes(Arrays.asList("fast","med","truck"));
-		config.getQSimConfigGroup().setStuckTime(100*3600.);//allows to overcome maximal density regime
-		config.getQSimConfigGroup().setEndTime(14*3600);//allows to set agents to abort after getting the wanted data.
+		config.qsim().setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE) ;
+		config.qsim().setMainModes(Arrays.asList("fast","med","truck"));
+		config.qsim().setStuckTime(100*3600.);//allows to overcome maximal density regime
+		config.qsim().setEndTime(14*3600);//allows to set agents to abort after getting the wanted data.
 									//TODO: is for actual network configurations correct, needs dependency on bigger network length 
 		
 		config.vspExperimental().addParam("vspDefaultsCheckingLevel", VspExperimentalConfigGroup.ABORT) ;
@@ -608,7 +607,7 @@ public class DreieckStreckeSzenario3modes {
 	
 	private QSim createModifiedQSim(Scenario sc, EventsManager events){
 		//From QSimFactory inspired code
-		QSimConfigGroup conf = sc.getConfig().getQSimConfigGroup();
+		QSimConfigGroup conf = sc.getConfig().qsim();
         if (conf == null) {
             throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
         }

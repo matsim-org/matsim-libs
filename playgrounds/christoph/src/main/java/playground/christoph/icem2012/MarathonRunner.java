@@ -436,7 +436,7 @@ public final class MarathonRunner implements StartupListener,
 		transportModes.add("walk2d");
 		
 		// Create and add an AgentsInEvacuationAreaCounter
-		double scaleFactor = 1 / this.scenario.getConfig().getQSimConfigGroup().getFlowCapFactor();
+		double scaleFactor = 1 / this.scenario.getConfig().qsim().getFlowCapFactor();
 		agentsInEvacuationAreaCounter = new AgentsInEvacuationAreaCounter(this.scenario, transportModes, coordAnalyzer.createInstance(), 
 				decisionDataProvider, scaleFactor);
 

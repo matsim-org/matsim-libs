@@ -29,7 +29,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -55,7 +54,7 @@ import org.xml.sax.SAXException;
 public class ScenarioPlayer {
 
 	public static void play(final Scenario scenario, final EventsManager events) {
-		scenario.getConfig().getQSimConfigGroup().setSnapshotStyle("queue");
+		scenario.getConfig().qsim().setSnapshotStyle("queue");
 		final QSim sim = (QSim) new QSimFactory().createMobsim(scenario, events);
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, sim);
 		OTFClientLive.run(scenario.getConfig(), server);
@@ -70,8 +69,7 @@ public class ScenarioPlayer {
 	 */
 	public static void main(final String[] args) throws SAXException, ParserConfigurationException, IOException {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
-		scenario.getConfig().getQSimConfigGroup().setSnapshotPeriod(0.0);
+		scenario.getConfig().qsim().setSnapshotPeriod(0.0);
 		scenario.getConfig().scenario().setUseTransit(true);
 		scenario.getConfig().scenario().setUseVehicles(true);
 		

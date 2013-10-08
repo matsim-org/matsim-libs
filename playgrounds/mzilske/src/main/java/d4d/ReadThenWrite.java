@@ -3,7 +3,6 @@ package d4d;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.PopulationReaderMatsimV5;
 import org.matsim.core.population.PopulationWriter;
@@ -13,7 +12,6 @@ public class ReadThenWrite {
 
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig();
-		config.addQSimConfigGroup(new QSimConfigGroup());
 		config.controler().setLastIteration(0);
 		config.global().setCoordinateSystem("EPSG:3395");
 		config.otfVis().setShowTeleportedAgents(true);

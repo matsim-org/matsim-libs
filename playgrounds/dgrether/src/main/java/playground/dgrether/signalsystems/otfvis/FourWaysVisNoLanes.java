@@ -22,7 +22,6 @@ package playground.dgrether.signalsystems.otfvis;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
@@ -51,10 +50,9 @@ public class FourWaysVisNoLanes {
     ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
     scenario.getConfig().network().setInputFile(netFile);
     scenario.getConfig().plans().setInputFile(popFile);
-    scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
-    scenario.getConfig().getQSimConfigGroup().setSnapshotStyle("queue");
+    scenario.getConfig().qsim().setSnapshotStyle("queue");
 //    scenario.getConfig().getQSimConfigGroup().setSnapshotStyle("equiDist");
-    scenario.getConfig().getQSimConfigGroup().setStuckTime(100.0);
+    scenario.getConfig().qsim().setStuckTime(100.0);
     
     
     ScenarioLoaderImpl loader = new ScenarioLoaderImpl(scenario);

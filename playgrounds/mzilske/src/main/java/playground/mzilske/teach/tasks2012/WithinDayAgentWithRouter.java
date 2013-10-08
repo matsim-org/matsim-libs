@@ -7,7 +7,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -156,7 +155,6 @@ public class WithinDayAgentWithRouter {
 
 	public static void main(String[] args) {
 		Config config = ConfigUtils.loadConfig("examples/equil/config.xml");
-		config.addQSimConfigGroup(new QSimConfigGroup());
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(1);
 		Scenario scenario = ScenarioUtils.loadScenario(config);

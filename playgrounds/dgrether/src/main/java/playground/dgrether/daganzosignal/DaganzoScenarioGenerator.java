@@ -37,7 +37,6 @@ import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.LegImpl;
@@ -407,10 +406,9 @@ public class DaganzoScenarioGenerator {
 		config.controler().setEventsFileFormats(set);
 
 		// configure simulation and snapshot writing
-		config.addQSimConfigGroup(new QSimConfigGroup());
 		if (this.doOtfOutput){
 			config.controler().setSnapshotFormat(Arrays.asList("otfvis"));
-			config.getQSimConfigGroup().setSnapshotPeriod(10.0);
+			config.qsim().setSnapshotPeriod(10.0);
 //			config.getQSimConfigGroup().setSnapshotStyle("queue");
 		}
 

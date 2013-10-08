@@ -41,12 +41,9 @@ public class WithinDayQSimFactoryTest extends MatsimTestCase {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		WithinDayEngine replanningManager = new WithinDayEngine(eventsManager);
-		
-		QSimConfigGroup qSimConfig = new QSimConfigGroup();
-		scenario.getConfig().addQSimConfigGroup(qSimConfig);
-				
+						
 		QSim sim = null;
-		
+		QSimConfigGroup qSimConfig = scenario.getConfig().qsim();
 		// number of threads is 1, therefore we expect a non-parallel WithinDayQSim
 		qSimConfig.setNumberOfThreads(1);
 		sim = new WithinDayQSimFactory(replanningManager).createMobsim(scenario, eventsManager);

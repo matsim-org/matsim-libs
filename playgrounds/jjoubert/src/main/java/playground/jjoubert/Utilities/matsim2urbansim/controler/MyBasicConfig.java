@@ -27,6 +27,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup.RoutingAlgorithmType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 
 public class MyBasicConfig {
@@ -57,11 +58,11 @@ public class MyBasicConfig {
 		config.controler().setOutputDirectory("./output/");
 
 		// Simulation.
-		config.simulation().setStartTime(0);
-		config.simulation().setEndTime(86400);
-		config.simulation().setSnapshotPeriod(0);
-		config.simulation().setFlowCapFactor(1.0);
-		config.simulation().setStorageCapFactor(1.0);
+		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setStartTime(0);
+		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setEndTime(86400);
+		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setSnapshotPeriod(0);
+		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setFlowCapFactor(1.0);
+		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setStorageCapFactor(1.0);
 
 		// PlanCalcScore
 		config.planCalcScore().setLearningRate(1.0);
@@ -108,10 +109,9 @@ public class MyBasicConfig {
 
 		
 		// Parallel QSim
-		QSimConfigGroup qsim = new QSimConfigGroup();
+		QSimConfigGroup qsim = config.qsim();
 		qsim.setNumberOfThreads(2);
 		qsim.setSnapshotPeriod(900);
-		config.addQSimConfigGroup(qsim);
 	}
 	
 	public Config getConfig(){

@@ -33,7 +33,7 @@ import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.core.utils.misc.Time;
 
 public class QSimConfigGroup extends Module implements MobsimConfigGroupI {
-
+	
 	private final static Logger log = Logger.getLogger(QSimConfigGroup.class);
 
 	public static final String GROUP_NAME = "qsim";

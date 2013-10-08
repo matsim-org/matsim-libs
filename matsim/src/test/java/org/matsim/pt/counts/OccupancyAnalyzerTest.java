@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
@@ -152,8 +151,7 @@ public class OccupancyAnalyzerTest {
 			this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			this.scenario.getConfig().scenario().setUseTransit(true);
 			this.scenario.getConfig().scenario().setUseVehicles(true);
-			this.scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
-			this.scenario.getConfig().getQSimConfigGroup().setEndTime(8.0*3600);
+			this.scenario.getConfig().qsim().setEndTime(8.0*3600);
 
 			// setup: network
 			Network network = this.scenario.getNetwork();

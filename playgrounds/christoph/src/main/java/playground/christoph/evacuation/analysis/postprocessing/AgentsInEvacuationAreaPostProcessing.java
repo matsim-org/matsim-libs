@@ -185,7 +185,7 @@ public class AgentsInEvacuationAreaPostProcessing {
 		eventsManager.addHandler(afterSimStepEventsCreator);
 		
 		// Initialize AgentsInEvacuationAreaCounter
-		double scaleFactor = 1 / config.getQSimConfigGroup().getFlowCapFactor();
+		double scaleFactor = 1 / config.qsim().getFlowCapFactor();
 		AgentsInEvacuationAreaCounter agentsInEvacuationAreaCounter = new AgentsInEvacuationAreaCounter(scenario, transportModes, 
 				coordAnalyzer.createInstance(), decisionDataProvider, scaleFactor);
 		controlerListeners.add(agentsInEvacuationAreaCounter);

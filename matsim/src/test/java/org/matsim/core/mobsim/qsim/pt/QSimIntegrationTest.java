@@ -28,10 +28,10 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.TransitDriverStartsEvent;
@@ -42,7 +42,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.events.VehicleArrivesAtFacilityEvent;
 import org.matsim.core.api.experimental.events.VehicleDepartsAtFacilityEvent;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
@@ -349,8 +348,7 @@ public class QSimIntegrationTest {
 			this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			this.scenario.getConfig().scenario().setUseTransit(true);
 			this.scenario.getConfig().scenario().setUseVehicles(true);
-			this.scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
-			this.scenario.getConfig().getQSimConfigGroup().setEndTime(8.0*3600);
+			this.scenario.getConfig().qsim().setEndTime(8.0*3600);
 
 			// setup: network
 			Network network = this.scenario.getNetwork();

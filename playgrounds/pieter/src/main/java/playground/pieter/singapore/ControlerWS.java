@@ -53,15 +53,15 @@ public class ControlerWS {
 				controler.getScenario().getTransitSchedule(),
 				controler.getConfig().travelTimeCalculator()
 						.getTraveltimeBinSize(),
-				(int) (controler.getConfig().getQSimConfigGroup().getEndTime() - controler
-						.getConfig().getQSimConfigGroup().getStartTime()));
+				(int) (controler.getConfig().qsim().getEndTime() - controler
+						.getConfig().qsim().getStartTime()));
 		controler.getEvents().addHandler(waitTimeCalculator);
 		StopStopTimeCalculator stopStopTimeCalculator = new StopStopTimeCalculator(
 				controler.getScenario().getTransitSchedule(),
 				controler.getConfig().travelTimeCalculator()
 						.getTraveltimeBinSize(), (int) (controler.getConfig()
-						.getQSimConfigGroup().getEndTime() - controler
-						.getConfig().getQSimConfigGroup().getStartTime()));
+						.qsim().getEndTime() - controler
+						.getConfig().qsim().getStartTime()));
 		controler.getEvents().addHandler(stopStopTimeCalculator);
 		TransitRouterConfig transitRouterConfig = new TransitRouterConfig(
 				controler.getScenario().getConfig().planCalcScore(), controler

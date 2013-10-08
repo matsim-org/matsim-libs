@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.OutputDirectoryLogging;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.population.ActivityImpl;
@@ -109,7 +108,6 @@ public class RunCliquesWithModularStrategies {
 	public static Scenario createScenario(final String configFile) {
 		final Config config = JointScenarioUtils.createConfig();
 		// needed for reading a non-flat format (other solution would be to put this in reader)
-		config.addQSimConfigGroup( new QSimConfigGroup() );
 		final GroupReplanningConfigGroup weights = new GroupReplanningConfigGroup();
 		config.addModule( weights );
 		config.addModule( new ScoringFunctionConfigGroup() );

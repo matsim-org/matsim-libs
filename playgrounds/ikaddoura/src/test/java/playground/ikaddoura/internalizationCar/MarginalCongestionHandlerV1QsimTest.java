@@ -429,11 +429,10 @@ public class MarginalCongestionHandlerV1QsimTest {
 		// (0)-----link1-----(1)-----link2-----(2)-----link3-----(3)-----link4-----(4)
 		
 		Config config = testUtils.loadConfig(null);
-		QSimConfigGroup qSimConfigGroup = new QSimConfigGroup();
+		QSimConfigGroup qSimConfigGroup = config.qsim();
 		qSimConfigGroup.setFlowCapFactor(1.0);
 		qSimConfigGroup.setStorageCapFactor(1.0);
 		qSimConfigGroup.setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
-		config.addQSimConfigGroup(qSimConfigGroup);
 		Scenario scenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
 	
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
@@ -502,11 +501,10 @@ public class MarginalCongestionHandlerV1QsimTest {
 		// (0)-----link1-----(1)-----link2-----(2)-----link3-----(3)-----link4-----(4)
 		
 		Config config = testUtils.loadConfig(null);
-		QSimConfigGroup qSimConfigGroup = new QSimConfigGroup();
+		QSimConfigGroup qSimConfigGroup = config.qsim();
 		qSimConfigGroup.setFlowCapFactor(1.0);
 		qSimConfigGroup.setStorageCapFactor(1.0);
 		qSimConfigGroup.setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
-		config.addQSimConfigGroup(qSimConfigGroup);
 		Scenario scenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
 	
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();

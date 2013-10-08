@@ -27,19 +27,18 @@ import junit.framework.Assert;
 
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
+import org.matsim.api.core.v01.events.handler.PersonStuckEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
@@ -73,7 +72,6 @@ public class QSimIntegrationTest extends MatsimTestCase {
 	public void testFreespeed() {
 		Config config = loadConfig(null);
 		config.network().setTimeVariantNetwork(true);
-		config.addQSimConfigGroup(new QSimConfigGroup());
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 
 		NetworkImpl network = createNetwork(scenario);
@@ -119,7 +117,6 @@ public class QSimIntegrationTest extends MatsimTestCase {
 
 		Config config = loadConfig(null);
 		config.network().setTimeVariantNetwork(true);
-		config.addQSimConfigGroup(new QSimConfigGroup());
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 
 		NetworkImpl network = createNetwork(scenario);
@@ -185,10 +182,9 @@ public class QSimIntegrationTest extends MatsimTestCase {
 
 		Config config = loadConfig(null);
 		config.network().setTimeVariantNetwork(true);
-		config.addQSimConfigGroup(new QSimConfigGroup());
-		config.getQSimConfigGroup().setStartTime(0.0);
+		config.qsim().setStartTime(0.0);
 		final double simEndTime = 7200.0;
-		config.getQSimConfigGroup().setEndTime(simEndTime);
+		config.qsim().setEndTime(simEndTime);
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(config);
 
 		NetworkImpl network = createNetwork(scenario);

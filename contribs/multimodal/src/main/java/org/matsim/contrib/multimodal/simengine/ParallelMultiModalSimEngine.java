@@ -44,7 +44,7 @@ class ParallelMultiModalSimEngine extends MultiModalSimEngine {
 	// use the factory
 	/*package*/ ParallelMultiModalSimEngine(Netsim sim, Map<String, TravelTime> multiModalTravelTimes) {
 		super(sim, multiModalTravelTimes);
-		this.numOfThreads = this.getMobsim().getScenario().getConfig().getQSimConfigGroup().getNumberOfThreads();
+		this.numOfThreads = this.getMobsim().getScenario().getConfig().qsim().getNumberOfThreads();
 	}
 	
 	@Override

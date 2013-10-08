@@ -65,7 +65,7 @@ public class Sim2DRunner implements IterationStartsListener{
 		sim2dsc.connect(sc);
 		
 //		c.getQSimConfigGroup().setEndTime(30*3600);
-		c.getQSimConfigGroup().setEndTime(1*60);
+		c.qsim().setEndTime(1*60);
 
 		//offsets needed to convert to doubles later in program
 		double minX = Double.POSITIVE_INFINITY;

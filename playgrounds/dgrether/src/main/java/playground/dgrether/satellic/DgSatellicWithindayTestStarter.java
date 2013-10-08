@@ -24,7 +24,6 @@ import java.util.Arrays;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.MatsimConfigReader;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.BeforeMobsimEvent;
 import org.matsim.core.controler.listener.BeforeMobsimListener;
@@ -44,10 +43,9 @@ public class DgSatellicWithindayTestStarter {
 		confReader.readFile(configfile);
 
 		config.controler().setLastIteration(0);
-		config.addQSimConfigGroup(new QSimConfigGroup());
 		config.controler().setSnapshotFormat(Arrays.asList("otfvis"));
-		config.getQSimConfigGroup().setSnapshotPeriod(10.0);
-		config.getQSimConfigGroup().setSnapshotStyle("queue");
+		config.qsim().setSnapshotPeriod(10.0);
+		config.qsim().setSnapshotStyle("queue");
 		
 		
 		Controler controler = new Controler(config);

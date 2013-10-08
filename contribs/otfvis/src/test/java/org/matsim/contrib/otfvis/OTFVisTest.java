@@ -32,6 +32,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.SnapshotWriterFactoryRegister;
 import org.matsim.core.controler.SnapshotWriterRegistrar;
@@ -70,8 +71,8 @@ public class OTFVisTest extends MatsimTestCase {
 		config.controler().setWriteEventsInterval(0);
 		config.controler().setWritePlansInterval(0);
 		config.controler().setSnapshotFormat(Arrays.asList("otfvis"));
-		config.simulation().setSnapshotPeriod(600);
-		config.simulation().setSnapshotStyle("equiDist");
+		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setSnapshotPeriod(600);
+		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setSnapshotStyle("equiDist");
 
 		final Controler controler = new Controler(config);
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
@@ -93,10 +94,9 @@ public class OTFVisTest extends MatsimTestCase {
 		config.controler().setWritePlansInterval(0);
 		config.controler().setMobsim("qsim");
 		config.controler().setSnapshotFormat(Arrays.asList("otfvis"));
-		QSimConfigGroup qSimConfigGroup = new QSimConfigGroup();
+		QSimConfigGroup qSimConfigGroup = config.qsim();
 		qSimConfigGroup.setSnapshotPeriod(600);
 		qSimConfigGroup.setSnapshotStyle("equiDist");
-		config.addQSimConfigGroup(qSimConfigGroup);
 
 		final Controler controler = new Controler(config);
 		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());

@@ -762,11 +762,8 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 	private void initQSim(){
 		log.info("Setting QSimConfigGroup to config...");
 		
-		QSimConfigGroup qsimCG = config.getQSimConfigGroup();
-		if( qsimCG == null){		
-			qsimCG = new QSimConfigGroup();
-			config.addQSimConfigGroup( qsimCG );
-		}
+		QSimConfigGroup qsimCG = config.qsim();
+
 		
 		// setting number of threads
 		qsimCG.setNumberOfThreads(Runtime.getRuntime().availableProcessors());
@@ -802,10 +799,10 @@ public class MATSim4UrbanSimConfigurationConverterV4 {
 		
 		log.info("QSimConfigGroup settings:");
 		log.info("Number of Threads: " + qsimCG.getNumberOfThreads());
-		log.info("FlowCapFactor (= population sampling rate): "+ config.getQSimConfigGroup().getFlowCapFactor());
-		log.warn("StorageCapFactor: " + config.getQSimConfigGroup().getStorageCapFactor() + " (with correction factor = " + storageCapCorrectionFactor + ")" );
+		log.info("FlowCapFactor (= population sampling rate): "+ config.qsim().getFlowCapFactor());
+		log.warn("StorageCapFactor: " + config.qsim().getStorageCapFactor() + " (with correction factor = " + storageCapCorrectionFactor + ")" );
 		log.info("RemoveStuckVehicles: " + (removeStuckVehicles?"True":"False") );
-		log.info("StuckTime: " + config.getQSimConfigGroup().getStuckTime());
+		log.info("StuckTime: " + config.qsim().getStuckTime());
 		log.info("End Time: " + qsimCG.getEndTime());
 		log.info("... done!");
 	}

@@ -29,6 +29,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
+import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.events.algorithms.SnapshotGenerator;
@@ -118,7 +119,7 @@ public class Events2Snapshot {
 		MatsimRandom.reset(this.config.global().getRandomSeed());
 		scenario = ScenarioUtils.createScenario(this.config);
 
-		if (this.config.simulation().getSnapshotPeriod() <= 0.0) {
+		if (((SimulationConfigGroup) this.config.getModule(SimulationConfigGroup.GROUP_NAME)).getSnapshotPeriod() <= 0.0) {
 			System.out.println("The snapshotPeriod must be larger than 0 seconds.");
 			return;
 		}
@@ -153,7 +154,7 @@ public class Events2Snapshot {
 		this.eventsfile = eventsFile.getAbsolutePath();
 		this.config = config;
 
-		if (this.config.getQSimConfigGroup().getSnapshotPeriod() <= 0.0) {
+		if (this.config.qsim().getSnapshotPeriod() <= 0.0) {
 			System.out.println("The snapshotPeriod must be larger than 0 seconds.");
 			return;
 		}
@@ -189,8 +190,8 @@ public class Events2Snapshot {
 		this.events = EventsUtils.createEventsManager();
 
 		// create SnapshotGenerator
-		this.visualizer = new SnapshotGenerator(this.network, this.config.getQSimConfigGroup().getSnapshotPeriod(), 
-				this.config.getQSimConfigGroup());
+		this.visualizer = new SnapshotGenerator(this.network, this.config.qsim().getSnapshotPeriod(), 
+				this.config.qsim());
 		this.events.addHandler(this.visualizer);
 	}
 

@@ -56,7 +56,6 @@ public class EquilWithCarrierWithPassTest extends MatsimTestCase {
 		config.controler().setLastIteration(2);
 		config.network().setInputFile(NETWORK_FILENAME);
 		config.plans().setInputFile(PLANS_FILENAME);
-		config.addQSimConfigGroup(new QSimConfigGroup());
 		StrategySettings bestScore = new StrategySettings(new IdImpl("1"));
 		bestScore.setModuleName("BestScore");
 		bestScore.setProbability(1.0);

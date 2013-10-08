@@ -25,6 +25,7 @@ import java.util.EnumSet;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
+import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -58,7 +59,7 @@ public class EquilnetDemo {
 		config.planCalcScore().addParam("activityMinimalDuration_1", "06:00:00");
 		config.planCalcScore().addParam("activityOpeningTime_1", "07:00:00");
 
-		config.simulation().setEndTime(30.0*3600);
+		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setEndTime(30.0*3600);
 
 		config.strategy().addParam("maxAgentPlanMemorySize", "5");
 

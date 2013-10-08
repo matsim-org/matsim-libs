@@ -157,12 +157,11 @@ public class ScenarioGenerator {
 		sc.getConfig().planCalcScore().setPerforming_utils_hr(0.);
 
 
-		QSimConfigGroup qsim = new QSimConfigGroup();
+		QSimConfigGroup qsim = sc.getConfig().qsim();
 		qsim.setEndTime(4*3600);
 		//		qsim.setMainModes(Arrays.asList(new String[]{"walk"}));
 		//		Collection<String> modes =  qsim.getMainMode();
 		//		modes.add("walk");
-		c.addModule(qsim);
 		c.controler().setMobsim("hybridQ2D");
 
 		c.global().setCoordinateSystem("EPSG:3395");

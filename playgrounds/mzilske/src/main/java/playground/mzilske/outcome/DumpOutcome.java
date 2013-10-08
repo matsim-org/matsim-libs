@@ -41,7 +41,7 @@ public class DumpOutcome {
 		System.out.println(avg / scenario.getPopulation().getPersons().size());
 		
 		for (Link link : scenario.getNetwork().getLinks().values()) {
-			double cap = ((LinkImpl) link).getFlowCapacity() * config.getQSimConfigGroup().getFlowCapFactor();
+			double cap = ((LinkImpl) link).getFlowCapacity() * config.qsim().getFlowCapFactor();
 		}
 		
 	}

@@ -25,6 +25,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.events.MobsimBeforeCleanupEvent;
 import org.matsim.core.mobsim.framework.events.MobsimInitializedEvent;
@@ -48,10 +49,10 @@ public class SnapshotWriterManager implements MobsimBeforeCleanupListener, Mobsi
 
 	// yuck
 	private int findSnapshotPeriod(Config config) {
-		if (config.getQSimConfigGroup() != null) {
-			return (int) config.getQSimConfigGroup().getSnapshotPeriod();
-		} else if (config.simulation() != null) {
-			return (int) config.simulation().getSnapshotPeriod();
+		if (config.qsim() != null) {
+			return (int) config.qsim().getSnapshotPeriod();
+		} else if ((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME) != null) {
+			return (int) ((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).getSnapshotPeriod();
 		} else {
 			return 1;
 		}

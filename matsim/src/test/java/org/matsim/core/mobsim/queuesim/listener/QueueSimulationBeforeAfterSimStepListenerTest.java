@@ -22,24 +22,27 @@ package org.matsim.core.mobsim.queuesim.listener;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
+import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.framework.ObservableMobsim;
 import org.matsim.core.mobsim.framework.events.MobsimAfterSimStepEvent;
 import org.matsim.core.mobsim.framework.listeners.MobsimAfterSimStepListener;
 import org.matsim.core.mobsim.queuesim.QueueSimulation;
-import org.matsim.core.scenario.ScenarioLoaderImpl;
+import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.testcases.MatsimTestCase;
 
 public class QueueSimulationBeforeAfterSimStepListenerTest extends MatsimTestCase {
 
 	public void testEventIsFired() {
 		Config config = loadConfig("test/scenarios/equil/config.xml");
-		config.simulation().setStartTime(6.0 * 3600);
-		config.simulation().setEndTime(6.0 * 3600 + 10);
-		Scenario scenario = new ScenarioLoaderImpl(config).loadScenario();
-		ObservableMobsim qsim = new QueueSimulation(scenario, EventsUtils.createEventsManager());
+		config.controler().setMobsim(MobsimType.queueSimulation.toString());
+		SimulationConfigGroup configGroup = new SimulationConfigGroup();
+		configGroup.setStartTime(6.0 * 3600);
+		configGroup.setEndTime(6.0 * 3600 + 10);
+		config.addModule(configGroup);
+		Scenario scenario = ScenarioUtils.loadScenario(config);
+		QueueSimulation qsim = new QueueSimulation(scenario, EventsUtils.createEventsManager());
 
 		MockQueueSimStepListener mockListener = new MockQueueSimStepListener(1.0);
 		qsim.addQueueSimulationListeners(mockListener);
@@ -50,10 +53,10 @@ public class QueueSimulationBeforeAfterSimStepListenerTest extends MatsimTestCas
 		assertEquals("wrong number of invocations.", 11, beforeStepMockListener.getCount());
 
 		// redo the test with different settings
-		config.simulation().setEndTime(6.0 * 3600 + 50);
-		config.simulation().setTimeStepSize(10.0);
+		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setEndTime(6.0 * 3600 + 50);
+		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setTimeStepSize(10.0);
 
-		scenario = new ScenarioLoaderImpl(config).loadScenario();
+		scenario = ScenarioUtils.loadScenario(config);
 		qsim = new QueueSimulation(scenario, EventsUtils.createEventsManager());
 
 		mockListener = new MockQueueSimStepListener(10.0);

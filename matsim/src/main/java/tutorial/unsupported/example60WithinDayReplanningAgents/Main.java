@@ -49,11 +49,10 @@ public class Main {
 		Config config = ConfigUtils.createConfig() ;
 		
 		// set some config stuff:
-		config.addQSimConfigGroup(new QSimConfigGroup() ) ;
 		config.network().setInputFile("../../../matsim/trunk/examples/siouxfalls/network-wo-dummy-node.xml") ; 
 		config.controler().setLastIteration(0) ;
-		config.getQSimConfigGroup().setEndTime(26.*3600) ;
-		config.getQSimConfigGroup().setSnapshotStyle( QSimConfigGroup.SNAPSHOT_AS_QUEUE ) ;
+		config.qsim().setEndTime(26.*3600) ;
+		config.qsim().setSnapshotStyle( QSimConfigGroup.SNAPSHOT_AS_QUEUE ) ;
 		
 		// base the controler on that:
 		Controler ctrl = new Controler( config ) ;

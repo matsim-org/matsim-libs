@@ -12,7 +12,6 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.replanning.PlanStrategy;
@@ -33,14 +32,8 @@ public class CadytsTrial {
 		config.controler().setOutputDirectory("output") ;
 		config.controler().setWriteEventsInterval(1) ;
 		config.controler().setMobsim(MobsimType.qsim.toString()) ;
-		// ---
-		QSimConfigGroup qsimConfigGroup = new QSimConfigGroup() ;
-		config.addQSimConfigGroup(qsimConfigGroup) ;
-//		
-//		config.getQSimConfigGroup().setFlowCapFactor(0.02) ;
-//		config.getQSimConfigGroup().setStorageCapFactor(0.06) ;
-		config.getQSimConfigGroup().setStuckTime(10.) ;
-		config.getQSimConfigGroup().setRemoveStuckVehicles(false) ; 
+		config.qsim().setStuckTime(10.) ;
+		config.qsim().setRemoveStuckVehicles(false) ; 
 		Set<String> modes = new HashSet<String>() ;
 		modes.add("car");
 		config.transit().setTransitModes(modes) ;

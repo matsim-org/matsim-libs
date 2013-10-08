@@ -72,9 +72,9 @@ public class PrepareBackgroundPopulation {
 		config.counts().setWriteCountsInterval(1);
 		config.counts().setCountsScaleFactor(1.0);
 		config.counts().setCountsFileName(countsFile);
-		config.getQSimConfigGroup().setNumberOfThreads(8);
-		config.getQSimConfigGroup().setFlowCapFactor(1.0);
-		config.getQSimConfigGroup().setStorageCapFactor(1.0);
+		config.qsim().setNumberOfThreads(8);
+		config.qsim().setFlowCapFactor(1.0);
+		config.qsim().setStorageCapFactor(1.0);
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		

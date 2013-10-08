@@ -61,7 +61,7 @@ public class DgGershensonRoederLiveVisStarter {
 		events.addHandler(sensorManager);
 		for (SignalSystem ss : signalManager.getSignalSystems().values()){
 			if (ss.getSignalController() instanceof DgRoederGershensonController){
-				((DgRoederGershensonController)ss.getSignalController()).setStorageCapFactor(scenario.getConfig().getQSimConfigGroup().getStorageCapFactor());
+				((DgRoederGershensonController)ss.getSignalController()).setStorageCapFactor(scenario.getConfig().qsim().getStorageCapFactor());
 				((DgRoederGershensonController)ss.getSignalController()).initSignalGroupMetadata(scenario.getNetwork(), scenario.getScenarioElement(LaneDefinitions20.class));
 				((DgRoederGershensonController)ss.getSignalController()).registerAndInitializeSensorManager(sensorManager);
 			}

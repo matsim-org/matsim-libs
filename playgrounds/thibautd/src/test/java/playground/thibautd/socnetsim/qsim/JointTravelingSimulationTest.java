@@ -190,9 +190,8 @@ public class JointTravelingSimulationTest {
 			final boolean insertDummyActivities,
 			final Random random) {
 		final Config config = ConfigUtils.createConfig();
-		final QSimConfigGroup qsimConf = new QSimConfigGroup();
+		final QSimConfigGroup qsimConf = config.qsim();
 		qsimConf.setEndTime( 30 * 3600 );
-		config.addQSimConfigGroup( qsimConf );
 		final Scenario sc = ScenarioUtils.createScenario( config );
 
 		createNetwork( sc.getNetwork() );

@@ -55,10 +55,7 @@ public class DefaultPlanbasedSignalControlTest {
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(0);
 		config.controler().setOutputDirectory(utils.getOutputDirectory());
-		//qsim
-		config.controler().setMobsim("qsim");
-		QSimConfigGroup qsimConfig = new QSimConfigGroup();
-		config.addQSimConfigGroup(qsimConfig);
+		QSimConfigGroup qsimConfig = config.qsim();
 		qsimConfig.setStartTime(0.0);
 		qsimConfig.setEndTime(400.0);
 		qsimConfig.setSimStarttimeInterpretation(QSimConfigGroup.ONLY_USE_STARTTIME);

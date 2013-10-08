@@ -20,6 +20,7 @@
 package org.matsim.core.mobsim.jdeqsim;
 
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
 import org.matsim.core.controler.Controler;
 import org.matsim.testcases.MatsimTestCase;
 
@@ -29,7 +30,7 @@ public class ConfigParameterTest extends MatsimTestCase {
 
 
 		Config config = super.loadConfig(this.getPackageInputDirectory() + "config.xml");
-//		config.controler().setLastIteration(-1); // we don't really want to run the simulation
+		config.controler().setMobsim(MobsimType.JDEQSim.toString());
 		Controler controler = new Controler(config);
 		controler.getConfig().controler().setWriteEventsInterval(0);
 		controler.run();

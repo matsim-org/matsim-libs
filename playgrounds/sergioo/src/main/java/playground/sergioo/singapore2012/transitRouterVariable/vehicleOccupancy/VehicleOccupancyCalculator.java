@@ -31,7 +31,7 @@ public class VehicleOccupancyCalculator implements VehicleDepartsAtFacilityEvent
 	
 	//Constructors
 	public VehicleOccupancyCalculator(final TransitSchedule transitSchedule, final Vehicles vehicles, final Config config) {
-		this(transitSchedule, vehicles, config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config.getQSimConfigGroup().getEndTime()-config.getQSimConfigGroup().getStartTime()));
+		this(transitSchedule, vehicles, config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config.qsim().getEndTime()-config.qsim().getStartTime()));
 	}
 	public VehicleOccupancyCalculator(final TransitSchedule transitSchedule, final Vehicles vehicles, final int timeSlot, final int totalTime) {
 		this.timeSlot = timeSlot;

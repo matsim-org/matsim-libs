@@ -230,13 +230,13 @@ class QueueWithBuffer extends QLaneInternalI implements SignalizeableItem {
 		// we need the flow capacity per sim-tick and multiplied with flowCapFactor
 		flowCapacityPerTimeStep = flowCapacityPerTimeStep
 				* network.simEngine.getMobsim().getSimTimer().getSimTimestepSize()
-				* network.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().getFlowCapFactor();
+				* network.simEngine.getMobsim().getScenario().getConfig().qsim().getFlowCapFactor();
 		inverseFlowCapacityPerTimeStep = 1.0 / flowCapacityPerTimeStep;
 		flowCapacityPerTimeStepFractionalPart = flowCapacityPerTimeStep - (int) flowCapacityPerTimeStep;
 	}
 
 	private final void calculateStorageCapacity(final double time) {
-		double storageCapFactor = network.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().getStorageCapFactor();
+		double storageCapFactor = network.simEngine.getMobsim().getScenario().getConfig().qsim().getStorageCapFactor();
 		bufferStorageCapacity = (int) Math.ceil(flowCapacityPerTimeStep);
 
 		// first guess at storageCapacity:

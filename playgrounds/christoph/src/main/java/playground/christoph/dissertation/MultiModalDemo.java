@@ -146,7 +146,7 @@ public class MultiModalDemo {
 		// create and initialze config
 		Config config = ConfigUtils.createConfig();
 		
-		QSimConfigGroup qSimConfigGroup = new QSimConfigGroup();
+		QSimConfigGroup qSimConfigGroup = config.qsim();
 		qSimConfigGroup.setNumberOfThreads(1);
 		qSimConfigGroup.setStartTime(0.0);
 		qSimConfigGroup.setEndTime(3*86400.0);
@@ -155,7 +155,6 @@ public class MultiModalDemo {
 		qSimConfigGroup.setStorageCapFactor(1.0);
 		qSimConfigGroup.setVehicleBehavior(QSimConfigGroup.VEHICLE_BEHAVIOR_EXCEPTION);
 		qSimConfigGroup.setStuckTime(25.0);
-		config.addQSimConfigGroup(qSimConfigGroup);
 		
 		config.travelTimeCalculator().setTraveltimeBinSize(300);
 		config.travelTimeCalculator().setFilterModes(true);

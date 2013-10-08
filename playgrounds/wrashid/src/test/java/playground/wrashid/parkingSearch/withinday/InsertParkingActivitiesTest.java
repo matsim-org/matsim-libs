@@ -41,7 +41,6 @@ import org.matsim.core.api.experimental.facilities.ActivityFacilities;
 import org.matsim.core.api.experimental.facilities.ActivityFacilitiesFactory;
 import org.matsim.core.api.experimental.facilities.ActivityFacility;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.framework.AgentSource;
@@ -170,7 +169,6 @@ public class InsertParkingActivitiesTest extends MatsimTestCase {
 			facilityCapacities.incrementBy(parkingFacility.getId(), 10);
 		}
 
-		sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		QSim qSim = new QSim(sc, eventsManager);
 		QNetsimEngineFactory netsimEngFactory = new DefaultQSimEngineFactory();

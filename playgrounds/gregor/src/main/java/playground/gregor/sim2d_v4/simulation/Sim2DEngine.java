@@ -74,7 +74,7 @@ public class Sim2DEngine implements MobsimEngine {
 
 
 		this.sim2DStepSize = sim2dc.getTimeStepSize();
-		this.qSimStepSize = this.scenario.getConfig().getQSimConfigGroup().getTimeStepSize();
+		this.qSimStepSize = this.scenario.getConfig().qsim().getTimeStepSize();
 		double factor =  this.qSimStepSize / this.sim2DStepSize;
 		if (factor != Math.round(factor)) {
 			throw new RuntimeException("QSim time step size has to be a multiple of sim2d time step size");

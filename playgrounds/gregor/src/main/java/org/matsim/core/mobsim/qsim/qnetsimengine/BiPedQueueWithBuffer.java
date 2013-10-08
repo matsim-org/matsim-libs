@@ -129,7 +129,7 @@ SignalizeableItem {
 	}
 
 	private void calculateStorageCapacity(final double time) {
-		double storageCapFactor = this.network.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().getStorageCapFactor();
+		double storageCapFactor = this.network.simEngine.getMobsim().getScenario().getConfig().qsim().getStorageCapFactor();
 		this.bufferStorageCapacity = (int) Math.ceil(this.flowCapacityPerTimeStep);
 
 		double numberOfLanes = this.link.getLink().getNumberOfLanes(time);
@@ -219,7 +219,7 @@ SignalizeableItem {
 		// we need the flow capacity per sim-tick and multiplied with flowCapFactor
 		this.flowCapacityPerTimeStep = this.flowCapacityPerTimeStep
 				* this.network.simEngine.getMobsim().getSimTimer().getSimTimestepSize()
-				* this.network.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().getFlowCapFactor();
+				* this.network.simEngine.getMobsim().getScenario().getConfig().qsim().getFlowCapFactor();
 		this.flowCapacityPerTimeStepFractionalPart = this.flowCapacityPerTimeStep - (int) this.flowCapacityPerTimeStep;
 		this.inverseFlowCapacityPerTimeStep = 1.0 / this.flowCapacityPerTimeStep;
 	}

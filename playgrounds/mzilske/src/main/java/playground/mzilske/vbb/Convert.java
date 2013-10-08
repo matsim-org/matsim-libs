@@ -6,13 +6,11 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.OTFVisConfigGroup.ColoringScheme;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.network.NetworkWriter;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.CoordinateTransformation;
 import org.matsim.pt.transitSchedule.api.TransitScheduleWriter;
-import org.matsim.pt.transitSchedule.api.TransitStopFacility;
 import org.matsim.vehicles.VehicleWriterV1;
 
 public class Convert {
@@ -30,10 +28,9 @@ public class Convert {
 		// new NetworkCleaner().run(scenario.getNetwork());
 		System.out.println("Scenario has " + scenario.getNetwork().getLinks().size() + " links.");
 		scenario.getConfig().controler().setMobsim("qsim");
-		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
-		scenario.getConfig().getQSimConfigGroup().setSnapshotStyle("queue");
-		scenario.getConfig().getQSimConfigGroup().setSnapshotPeriod(1);
-		scenario.getConfig().getQSimConfigGroup().setRemoveStuckVehicles(false);
+		scenario.getConfig().qsim().setSnapshotStyle("queue");
+		scenario.getConfig().qsim().setSnapshotPeriod(1);
+		scenario.getConfig().qsim().setRemoveStuckVehicles(false);
 		scenario.getConfig().otfVis().setColoringScheme(ColoringScheme.gtfs);
 		scenario.getConfig().otfVis().setDrawTransitFacilities(false);
 		scenario.getConfig().transitRouter().setMaxBeelineWalkConnectionDistance(1.0);

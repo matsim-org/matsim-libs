@@ -52,6 +52,12 @@ public class ZoneTrackerTest {
 			public Id resolveLinkToZone(Id linkId) {
 				return linkId;
 			}
+
+			@Override
+			public Id chooseLinkInZone(String zoneId) {
+				// TODO Auto-generated method stub
+				return null;
+			}
 			
 		}, initialZones );
 		zoneEvents.addHandler(new TestHandler());
@@ -88,6 +94,12 @@ public class ZoneTrackerTest {
 				} else {
 					return null;
 				}
+			}
+
+			@Override
+			public Id chooseLinkInZone(String zoneId) {
+				// TODO Auto-generated method stub
+				return null;
 			}
 			
 		}, initialZones );

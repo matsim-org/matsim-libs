@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.SignalSystemsConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
@@ -79,7 +78,6 @@ public class TravelTimeFourWaysTest {
 		signalsConfig.setSignalControlFile(signalControlFile);
 		signalsConfig.setUseAmbertimes(true);
 		signalsConfig.setAmberTimesFile(amberTimesFile);
-		conf.addQSimConfigGroup(new QSimConfigGroup());
 
 		return scenario;
 	}

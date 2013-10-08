@@ -19,7 +19,7 @@ public class PassivePlannerAgendaAgent extends PassivePlannerDriverAgent  {
 	public PassivePlannerAgendaAgent(final BasePerson basePerson, final Netsim simulation, final PassivePlannerManager passivePlannerManager, Set<String> modes, Agenda agenda) {
 		super(basePerson, simulation, passivePlannerManager);
 		boolean carAvailability = false;
-		Collection<String> mainModes = simulation.getScenario().getConfig().getQSimConfigGroup().getMainModes();
+		Collection<String> mainModes = simulation.getScenario().getConfig().qsim().getMainModes();
 		for(PlanElement planElement:basePerson.getBasePlan().getPlanElements())
 			if(planElement instanceof Leg)
 				if(mainModes.contains(((Leg)planElement).getMode()))

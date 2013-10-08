@@ -29,6 +29,8 @@ import org.apache.log4j.Logger;
 import org.junit.Assert;
 import org.junit.Test;
 import org.matsim.api.core.v01.Id;
+import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.network.Link;
@@ -39,16 +41,14 @@ import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
-import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
-import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
+import org.matsim.core.mobsim.qsim.interfaces.Netsim;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -89,12 +89,11 @@ public class VehicleWaitingTest {
 
 	private static void testVehicleWaitingDoesntFail(final int nLaps, final boolean insertActivities) {
 		final Config config = ConfigUtils.createConfig();
-		config.addQSimConfigGroup( new QSimConfigGroup() );
 		// test behavior when agents wait for the car
-		config.getQSimConfigGroup().setVehicleBehavior( QSimConfigGroup.VEHICLE_BEHAVIOR_WAIT );
+		config.qsim().setVehicleBehavior( QSimConfigGroup.VEHICLE_BEHAVIOR_WAIT );
 		// fail if the simualtion hangs forever (for instance, if some agents
 		// just vanish as in MATSIM-71)
-		config.getQSimConfigGroup().setEndTime( 48 * 3600 );
+		config.qsim().setEndTime( 48 * 3600 );
 
 		final Scenario sc = ScenarioUtils.createScenario( config );
 		

@@ -23,7 +23,6 @@ import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
@@ -50,7 +49,6 @@ public class FourWaysVisNetworkOnly {
 //		OTFVis.playNetwork(netArray);
 		//this is hack
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.loadScenario(config);
-    scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 //		PopulationImpl population = scenario.getPopulation();
 		EventsManager events = EventsUtils.createEventsManager();
 		

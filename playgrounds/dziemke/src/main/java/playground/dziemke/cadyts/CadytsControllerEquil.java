@@ -50,10 +50,10 @@ public class CadytsControllerEquil {
 		config.plans().setInputFile(inputPlansFile);
 		
 		//simulation
-		config.addSimulationConfigGroup(new SimulationConfigGroup());
-		config.simulation().setStartTime(0);
-		config.simulation().setEndTime(0);
-		config.simulation().setSnapshotPeriod(60);
+		config.addModule( new SimulationConfigGroup() );
+		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setStartTime(0);
+		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setEndTime(0);
+		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setSnapshotPeriod(60);
 		//config.simulation().setFlowCapFactor(0.01);
 		//config.simulation().setStorageCapFactor(0.02);
 		

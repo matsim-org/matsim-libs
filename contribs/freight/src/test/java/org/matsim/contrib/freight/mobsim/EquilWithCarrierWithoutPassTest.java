@@ -54,19 +54,7 @@ public class EquilWithCarrierWithoutPassTest extends MatsimTestCase {
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(2);
 		config.network().setInputFile(NETWORK_FILENAME);
-//		config.plans().setInputFile(PLANS_FILENAME);
-		config.addQSimConfigGroup(new QSimConfigGroup());
-//		StrategySettings bestScore = new StrategySettings(new IdImpl("1"));
-//		bestScore.setModuleName("BestScore");
-//		bestScore.setProbability(0.9);
-//		StrategySettings reRoute = new StrategySettings(new IdImpl("2"));
-//		reRoute.setModuleName("ReRoute");
-//		reRoute.setProbability(0.1);
-//		reRoute.setDisableAfter(300);
-//		config.strategy().setMaxAgentPlanMemorySize(5);
-//		config.strategy().addStrategySettings(bestScore);
-//		config.strategy().addStrategySettings(reRoute);
-//		
+
 		controler = new Controler(config);
 		controler.getConfig().controler().setWriteEventsInterval(1);
 		controler.setCreateGraphs(false);

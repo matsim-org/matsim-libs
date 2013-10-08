@@ -249,7 +249,7 @@ public class PassivePlannerDriverAgent implements MobsimDriverAgent, HasBasePers
 		return basePerson;
 	}
 	public double getWeight() {
-		return 1/simulation.getScenario().getConfig().getQSimConfigGroup().getFlowCapFactor();
+		return 1/simulation.getScenario().getConfig().qsim().getFlowCapFactor();
 	}
 	public void advanceToNextActivity(double now) {
 		//this.simulation.getEventsManager().processEvent(this.simulation.getEventsManager().getFactory().createAgentArrivalEvent(now, getId(), getDestinationLinkId(), "empty"));

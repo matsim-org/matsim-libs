@@ -48,7 +48,7 @@ public class ControlerW {
 		ConfigUtils.loadConfig(config, args[0]);
 		Controler controler = new Controler(ScenarioUtils.loadScenario(config));
 		if(args.length>1) {
-			StopStopTimeCalculator stopStopTimeCalculatorEvents = new StopStopTimeCalculator(controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().getQSimConfigGroup().getEndTime()-controler.getConfig().getQSimConfigGroup().getStartTime()));
+			StopStopTimeCalculator stopStopTimeCalculatorEvents = new StopStopTimeCalculator(controler.getScenario().getTransitSchedule(), controler.getConfig().travelTimeCalculator().getTraveltimeBinSize(), (int) (controler.getConfig().qsim().getEndTime()-controler.getConfig().qsim().getStartTime()));
 			EventsManager eventsManager = EventsUtils.createEventsManager(controler.getConfig());
 			eventsManager.addHandler(stopStopTimeCalculatorEvents);
 			(new MatsimEventsReader(eventsManager)).readFile(args[1]);

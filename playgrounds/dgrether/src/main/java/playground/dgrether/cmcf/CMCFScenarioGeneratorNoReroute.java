@@ -133,7 +133,7 @@ public class CMCFScenarioGeneratorNoReroute {
 
 		// configure simulation and snapshot writing
 		this.config.controler().setSnapshotFormat(Arrays.asList("otfvis"));
-		this.config.getQSimConfigGroup().setSnapshotPeriod(60.0);
+		this.config.qsim().setSnapshotPeriod(60.0);
 		// configure strategies for replanning
 		this.config.strategy().setMaxAgentPlanMemorySize(4);
 		StrategyConfigGroup.StrategySettings selectExp = new StrategyConfigGroup.StrategySettings(

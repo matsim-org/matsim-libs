@@ -534,7 +534,7 @@ public class EvacuationControler extends WithinDayController implements
 		
 		// Create and add an AgentsInEvacuationAreaCounter.
 		if (EvacuationConfig.countAgentsInEvacuationArea) {
-			double scaleFactor = 1 / this.config.getQSimConfigGroup().getFlowCapFactor();
+			double scaleFactor = 1 / this.config.qsim().getFlowCapFactor();
 			agentsInEvacuationAreaCounter = new AgentsInEvacuationAreaCounter(this.scenarioData, analyzedModes, coordAnalyzer.createInstance(), 
 					this.decisionDataProvider, scaleFactor);
 			this.addControlerListener(agentsInEvacuationAreaCounter);

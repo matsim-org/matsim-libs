@@ -44,7 +44,6 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsManagerImpl;
 import org.matsim.core.mobsim.qsim.ActivityEngine;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -192,10 +191,7 @@ public class LinkSpeedCalculatorIntegrationTest {
 			for (int i = 0; i < ids.length; i++) {
 				ids[i] = this.scenario.createId(Integer.toString(i));
 			}
-
-			/* config */
-			this.scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
-			
+	
 			/* create Network */
 			Network network = this.scenario.getNetwork();
 			NetworkFactory nf = network.getFactory();

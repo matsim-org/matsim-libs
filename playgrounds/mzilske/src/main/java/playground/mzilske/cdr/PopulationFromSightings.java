@@ -32,6 +32,8 @@ import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner.PersonAlgorithmProvider;
 import org.matsim.population.algorithms.PersonAlgorithm;
 
+import playground.mzilske.cdr.ZoneTracker.LinkToZoneResolver;
+
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
@@ -44,7 +46,7 @@ public class PopulationFromSightings {
 
 	private static Random rnd = MatsimRandom.getRandom();
 	
-	public static void readSampleWithOneRandomPointForEachSightingInNewCell(Scenario scenario, Zones zones, final Map<Id, List<Sighting>> sightings) throws FileNotFoundException {
+	public static void readSampleWithOneRandomPointForEachSightingInNewCell(Scenario scenario, LinkToZoneResolver zones, final Map<Id, List<Sighting>> sightings) throws FileNotFoundException {
 		Map<Activity, String> cellsOfSightings;
 		cellsOfSightings = new HashMap<Activity, String>();
 		for (Entry<Id, List<Sighting>> sightingsPerPerson : sightings.entrySet()) {
@@ -75,19 +77,14 @@ public class PopulationFromSightings {
 		}
 	}
 
-//	public static Activity createActivityInZone(Scenario scenario, Zones zones, String zoneId) {
-//		CellTower cellTower = zones.cellTowers.get(zoneId);
-//		Geometry cell = cellTower.cell;
-//		Point p = getRandomPointInFeature(rnd, cell);
-//		Coord coord = new CoordImpl(p.getX(), p.getY());
-//		Activity activity = scenario.getPopulation().getFactory().createActivityFromCoord("sighting", coord);
-//		return activity;
-//	}
+
 	
-	public static Activity createActivityInZone(Scenario scenario, Zones zones, String zoneId) {
-		Activity activity = scenario.getPopulation().getFactory().createActivityFromLinkId("sighting", new IdImpl(zoneId));
+	public static Activity createActivityInZone(Scenario scenario, LinkToZoneResolver zones, String zoneId) {
+		Activity activity = scenario.getPopulation().getFactory().createActivityFromLinkId("sighting", zones.chooseLinkInZone(zoneId));
 		return activity;
 	}
+
+	
 	
 	public static void preparePopulation(final ScenarioImpl scenario, final Zones zones, final Map<Id, List<Sighting>> allSightings) {
 		ParallelPersonAlgorithmRunner.run(scenario.getPopulation(), 8, new org.matsim.population.algorithms.XY2Links(scenario));

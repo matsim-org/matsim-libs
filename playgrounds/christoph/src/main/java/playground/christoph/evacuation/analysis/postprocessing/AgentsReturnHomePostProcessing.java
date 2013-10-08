@@ -183,7 +183,7 @@ public class AgentsReturnHomePostProcessing {
 		eventsManager.addHandler(afterSimStepEventsCreator);
 		
 		// Initialize AgentsReturnHomeCounter
-		double scaleFactor = 1 / config.getQSimConfigGroup().getFlowCapFactor();
+		double scaleFactor = 1 / config.qsim().getFlowCapFactor();
 		AgentsReturnHomeCounter agentsReturnHomeCounter = new AgentsReturnHomeCounter(scenario, analyzedModes, coordAnalyzer.createInstance(),
 				decisionDataProvider, scaleFactor);
 		controlerListeners.add(agentsReturnHomeCounter);

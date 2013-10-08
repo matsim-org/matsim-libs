@@ -394,13 +394,13 @@ public class MATSim4UrbanSimConfigurationConverter {
 		simulation.setRemoveStuckVehicles( removeStuckVehicles );
 		simulation.setStuckTime(10.);
 		
-		scenario.getConfig().addSimulationConfigGroup( simulation );
+		scenario.getConfig().addModule( simulation );
 		
 		log.info("SimulationConfigGroup settings:");
-		log.info("FlowCapFactor (= population sampling rate): "+ scenario.getConfig().simulation().getFlowCapFactor());
-		log.warn("StorageCapFactor: " + scenario.getConfig().simulation().getStorageCapFactor() + " (with fetch factor = " + fetchFactor + ")" );
+		log.info("FlowCapFactor (= population sampling rate): "+ ((SimulationConfigGroup) scenario.getConfig().getModule(SimulationConfigGroup.GROUP_NAME)).getFlowCapFactor());
+		log.warn("StorageCapFactor: " + ((SimulationConfigGroup) scenario.getConfig().getModule(SimulationConfigGroup.GROUP_NAME)).getStorageCapFactor() + " (with fetch factor = " + fetchFactor + ")" );
 		log.info("RemoveStuckVehicles: " + (removeStuckVehicles?"True":"False") );
-		log.info("StuckTime: " + scenario.getConfig().simulation().getStuckTime());
+		log.info("StuckTime: " + ((SimulationConfigGroup) scenario.getConfig().getModule(SimulationConfigGroup.GROUP_NAME)).getStuckTime());
 		log.info("... done!");
 	}
 	

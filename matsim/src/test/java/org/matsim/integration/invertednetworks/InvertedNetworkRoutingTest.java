@@ -236,11 +236,10 @@ public class InvertedNetworkRoutingTest {
 			config.travelTimeCalculator().setCalculateLinkToLinkTravelTimes(true);
 			config.controler().setMobsim("qsim");
 			config.global().setNumberOfThreads(1);
-			config.addQSimConfigGroup(new QSimConfigGroup());
-			config.getQSimConfigGroup().setRemoveStuckVehicles(false);
-			config.getQSimConfigGroup().setStuckTime(10000.0);
-			config.getQSimConfigGroup().setStartTime(0.0);
-			config.getQSimConfigGroup().setSimStarttimeInterpretation(QSimConfigGroup.ONLY_USE_STARTTIME);
+			config.qsim().setRemoveStuckVehicles(false);
+			config.qsim().setStuckTime(10000.0);
+			config.qsim().setStartTime(0.0);
+			config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.ONLY_USE_STARTTIME);
 			StrategySettings stratSets = new StrategySettings(new IdImpl(1));
 			stratSets.setModuleName(PlanStrategyRegistrar.Names.ReRoute.toString());
 			stratSets.setProbability(1.0);

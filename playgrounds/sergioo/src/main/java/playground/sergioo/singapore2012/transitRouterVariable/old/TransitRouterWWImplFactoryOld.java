@@ -51,7 +51,7 @@ public class TransitRouterWWImplFactoryOld implements TransitRouterFactory, Afte
 	}
 	@Override
 	public TransitRouter createTransitRouter() {
-		transitRouterNetworkTravelTimeAndDisutilityWW = new TransitRouterNetworkTravelTimeAndDisutilityWWOld(config, network, routerNetwork, controler.getLinkTravelTimes(), waitTime, controler.getConfig().travelTimeCalculator(), controler.getConfig().getQSimConfigGroup(), new PreparedTransitSchedule(controler.getScenario().getTransitSchedule()));
+		transitRouterNetworkTravelTimeAndDisutilityWW = new TransitRouterNetworkTravelTimeAndDisutilityWWOld(config, network, routerNetwork, controler.getLinkTravelTimes(), waitTime, controler.getConfig().travelTimeCalculator(), controler.getConfig().qsim(), new PreparedTransitSchedule(controler.getScenario().getTransitSchedule()));
 		return new TransitRouterVariableImpl(config, transitRouterNetworkTravelTimeAndDisutilityWW, routerNetwork, network);
 	}
 	@Override

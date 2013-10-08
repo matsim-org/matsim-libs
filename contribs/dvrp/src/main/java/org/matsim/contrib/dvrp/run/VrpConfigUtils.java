@@ -55,13 +55,7 @@ public class VrpConfigUtils
      */
     private static void updateQSimConfigGroup(Config config)
     {
-        QSimConfigGroup qSimConfig = config.getQSimConfigGroup();
-
-        if (qSimConfig == null) {
-            qSimConfig = new QSimConfigGroup();
-            config.addQSimConfigGroup(qSimConfig);
-        }
-
+        QSimConfigGroup qSimConfig = config.qsim();
         qSimConfig.setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
         qSimConfig.setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE);
         qSimConfig.setRemoveStuckVehicles(false);

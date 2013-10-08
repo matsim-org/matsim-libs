@@ -25,15 +25,15 @@ import java.util.Set;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.ControlerConfigGroup;
+import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.NetworkConfigGroup;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup;
+import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.PlansConfigGroup;
 import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
-import org.matsim.core.config.groups.VspExperimentalConfigGroup;
-import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
-import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
+import org.matsim.core.config.groups.VspExperimentalConfigGroup;
 import org.matsim.core.controler.Controler;
 
 /**
@@ -82,7 +82,7 @@ public class RunEmissionToolOnline {
 //		ccg.setRunId("321");
 		
 	// qsimConfigGroup
-		QSimConfigGroup qcg = new QSimConfigGroup();
+		QSimConfigGroup qcg = controler.getConfig().qsim();
 		qcg.setStartTime(0 * 3600.);
 		qcg.setEndTime(30 * 3600.);
 		qcg.setFlowCapFactor(0.1);
@@ -92,7 +92,6 @@ public class RunEmissionToolOnline {
 		qcg.setNumberOfThreads(1);
 		qcg.setRemoveStuckVehicles(false);
 		qcg.setStuckTime(10.0);
-		controler.getConfig().addQSimConfigGroup(qcg);
 		
 	// planCalcScoreConfigGroup
 		PlanCalcScoreConfigGroup pcs = controler.getConfig().planCalcScore();

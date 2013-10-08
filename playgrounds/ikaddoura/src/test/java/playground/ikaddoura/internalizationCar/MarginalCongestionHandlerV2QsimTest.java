@@ -33,10 +33,6 @@ import org.junit.Test;
 import org.junit.runners.model.FrameworkMethod;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.events.LinkEnterEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
-import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
@@ -1454,13 +1450,12 @@ public class MarginalCongestionHandlerV2QsimTest {
 		//    -----link1----   ----link2----   ----link3----   ----link4----   
 		
 		Config config = testUtils.loadConfig(null);
-		QSimConfigGroup qSimConfigGroup = new QSimConfigGroup();
+		QSimConfigGroup qSimConfigGroup = config.qsim();
 		qSimConfigGroup.setFlowCapFactor(1.0);
 		qSimConfigGroup.setStorageCapFactor(1.0);
 		qSimConfigGroup.setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
 		qSimConfigGroup.setRemoveStuckVehicles(true);
 		qSimConfigGroup.setStuckTime(100.0);
-		config.addQSimConfigGroup(qSimConfigGroup);
 		Scenario scenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
 	
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
@@ -1560,13 +1555,12 @@ public class MarginalCongestionHandlerV2QsimTest {
 		// (0)-----link1-----(1)-----link2-----(2)-----link3-----(3)-----link4-----(4)
 		
 		Config config = testUtils.loadConfig(null);
-		QSimConfigGroup qSimConfigGroup = new QSimConfigGroup();
+		QSimConfigGroup qSimConfigGroup = config.qsim();
 		qSimConfigGroup.setFlowCapFactor(1.0);
 		qSimConfigGroup.setStorageCapFactor(1.0);
 		qSimConfigGroup.setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
 		qSimConfigGroup.setRemoveStuckVehicles(true);
 		qSimConfigGroup.setStuckTime(100.0);
-		config.addQSimConfigGroup(qSimConfigGroup);
 		Scenario scenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
 	
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
@@ -1635,13 +1629,12 @@ public class MarginalCongestionHandlerV2QsimTest {
 		// (0)-----link1-----(1)-----link2-----(2)-----link3-----(3)-----link4-----(4)
 		
 		Config config = testUtils.loadConfig(null);
-		QSimConfigGroup qSimConfigGroup = new QSimConfigGroup();
+		QSimConfigGroup qSimConfigGroup = config.qsim();
 		qSimConfigGroup.setFlowCapFactor(1.0);
 		qSimConfigGroup.setStorageCapFactor(1.0);
 		qSimConfigGroup.setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
 		qSimConfigGroup.setRemoveStuckVehicles(true);
 		qSimConfigGroup.setStuckTime(100.0);
-		config.addQSimConfigGroup(qSimConfigGroup);
 		Scenario scenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
 	
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
@@ -1719,13 +1712,12 @@ public class MarginalCongestionHandlerV2QsimTest {
 		// (0)-----link1-----(1)-----link2-----(2)-----link3-----(3)-----link4-----(4)
 		
 		Config config = testUtils.loadConfig(null);
-		QSimConfigGroup qSimConfigGroup = new QSimConfigGroup();
+		QSimConfigGroup qSimConfigGroup = config.qsim();
 		qSimConfigGroup.setFlowCapFactor(1.0);
 		qSimConfigGroup.setStorageCapFactor(1.0);
 		qSimConfigGroup.setInsertingWaitingVehiclesBeforeDrivingVehicles(true);
 		qSimConfigGroup.setRemoveStuckVehicles(true);
 		qSimConfigGroup.setStuckTime(100.0);
-		config.addQSimConfigGroup(qSimConfigGroup);
 		Scenario scenario = (ScenarioImpl)(ScenarioUtils.createScenario(config));
 	
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();

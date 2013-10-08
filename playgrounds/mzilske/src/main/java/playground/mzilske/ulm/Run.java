@@ -7,16 +7,12 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.OTFVisConfigGroup.ColoringScheme;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
-import org.matsim.core.population.PopulationImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.core.utils.geometry.transformations.TransformationFactory;
-import org.matsim.pt.router.TransitRouter;
-import org.matsim.pt.router.TransitRouterFactory;
 import org.matsim.pt.transitSchedule.api.TransitScheduleReader;
 import org.matsim.vehicles.VehicleReaderV1;
 
@@ -53,12 +49,11 @@ public class Run {
 		config.scenario().setUseTransit(true);
 		config.controler().setMobsim("qsim");
 		config.controler().setLastIteration(1);
-		config.addQSimConfigGroup(new QSimConfigGroup());
-		config.getQSimConfigGroup().setSnapshotStyle("queue");
-		config.getQSimConfigGroup().setSnapshotPeriod(1);
-		config.getQSimConfigGroup().setRemoveStuckVehicles(false);
+		config.qsim().setSnapshotStyle("queue");
+		config.qsim().setSnapshotPeriod(1);
+		config.qsim().setRemoveStuckVehicles(false);
 
-		config.getQSimConfigGroup().setEndTime(35*60*60);
+		config.qsim().setEndTime(35*60*60);
 		config.otfVis().setColoringScheme(ColoringScheme.gtfs);
 		config.otfVis().setDrawTransitFacilities(false);
 		config.transitRouter().setMaxBeelineWalkConnectionDistance(1.0);
@@ -92,7 +87,8 @@ public class Run {
 		config.global().setNumberOfThreads(8);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 
-		new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
+		// new MatsimNetworkReader(scenario).readFile(config.network().getInputFile());
+		new MatsimNetworkReader(scenario).readFile("/Users/michaelzilske/gtfs-ulm/network.xml");
 		new VehicleReaderV1(((ScenarioImpl) scenario).getVehicles()).readFile(config.transit().getVehiclesFile());
 		new TransitScheduleReader(scenario).readFile(config.transit().getTransitScheduleFile());
 		new AltPopulationReaderMatsimV5(scenario).readFile(config.plans().getInputFile());

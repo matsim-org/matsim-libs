@@ -31,7 +31,6 @@ import org.matsim.contrib.accessibility.config.AccessibilityConfigGroup;
 import org.matsim.contrib.accessibility.config.M4UAccessibilityConfigUtils;
 import org.matsim.contrib.matsim4urbansim.config.modules.M4UControlerConfigModuleV3;
 import org.matsim.contrib.matsim4urbansim.config.modules.UrbanSimParameterConfigModuleV3;
-import org.matsim.contrib.matsim4urbansim.constants.InternalConstants;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.Matsim4UrbansimConfigType;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.Matsim4UrbansimType;
 import org.matsim.contrib.matsim4urbansim.matsim4urbansim.jaxbconfigv3.MatsimConfigType;
@@ -311,11 +310,7 @@ public class M4UConfigUtils {
 	static void initQSim(Matsim4UrbansimType matsim4urbansimConfigPart2 , Config config){
 		log.info("Setting QSimConfigGroup to config...");
 
-		QSimConfigGroup qsimCG = config.getQSimConfigGroup();
-		if( qsimCG == null){		
-			qsimCG = new QSimConfigGroup();
-			config.addQSimConfigGroup( qsimCG );
-		}
+		QSimConfigGroup qsimCG = config.qsim();
 
 		double popSampling = matsim4urbansimConfigPart2.getPopulationSamplingRate();
 		// Adapting the storageCapFactor has the following reason:

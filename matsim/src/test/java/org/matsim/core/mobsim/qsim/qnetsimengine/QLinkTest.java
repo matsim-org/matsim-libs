@@ -25,8 +25,8 @@ import java.util.List;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.Event;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Node;
 import org.matsim.api.core.v01.population.Activity;
@@ -35,7 +35,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
@@ -86,7 +85,6 @@ public class QLinkTest extends MatsimTestCase {
 		PersonImpl p = new PersonImpl(new IdImpl("1"));
 		p.addPlan(new PlanImpl());
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		v.setDriver(createAndInsertPersonDriverAgentImpl(p, f.sim));
 
 		f.qlink1.addFromUpstream(v);
@@ -252,8 +250,7 @@ public class QLinkTest extends MatsimTestCase {
 	public void testBuffer() {
 		Config conf = super.loadConfig(null);
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(conf);
-		conf.addQSimConfigGroup(new QSimConfigGroup());
-
+		
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		network.setCapacityPeriod(1.0);
 		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
@@ -388,9 +385,8 @@ public class QLinkTest extends MatsimTestCase {
 
 	public void testStuckEvents() {
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
-		scenario.getConfig().getQSimConfigGroup().setStuckTime(100);
-		scenario.getConfig().getQSimConfigGroup().setRemoveStuckVehicles(true);
+		scenario.getConfig().qsim().setStuckTime(100);
+		scenario.getConfig().qsim().setRemoveStuckVehicles(true);
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		network.setCapacityPeriod(3600.0);
 		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));
@@ -455,9 +451,8 @@ public class QLinkTest extends MatsimTestCase {
 
 		/*package*/ Fixture() {
 			this.scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-			this.scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
-			this.scenario.getConfig().getQSimConfigGroup().setStuckTime(100);
-			this.scenario.getConfig().getQSimConfigGroup().setRemoveStuckVehicles(true);
+			this.scenario.getConfig().qsim().setStuckTime(100);
+			this.scenario.getConfig().qsim().setRemoveStuckVehicles(true);
 			NetworkImpl network = (NetworkImpl) this.scenario.getNetwork();
 			network.setCapacityPeriod(3600.0);
 			Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(0, 0));

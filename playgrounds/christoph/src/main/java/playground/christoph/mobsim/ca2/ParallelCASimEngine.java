@@ -42,7 +42,7 @@ class ParallelCASimEngine extends CASimEngine {
 	// use the factory
 	/*package*/ ParallelCASimEngine(Netsim sim, double spatialResolution) {
 		super(sim, spatialResolution);
-		this.numOfThreads = this.getMobsim().getScenario().getConfig().getQSimConfigGroup().getNumberOfThreads();
+		this.numOfThreads = this.getMobsim().getScenario().getConfig().qsim().getNumberOfThreads();
 	}
 	
 	@Override

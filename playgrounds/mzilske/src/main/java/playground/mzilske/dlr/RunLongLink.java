@@ -136,10 +136,9 @@ public class RunLongLink {
 
 	private void run(double p) {
 		Config config = ConfigUtils.createConfig();
-		QSimConfigGroup qSimConfigGroup = new QSimConfigGroup();
+		QSimConfigGroup qSimConfigGroup = config.qsim();
 		qSimConfigGroup.setMainModes(Arrays.asList("fast", "med", "truck"));
 		qSimConfigGroup.setSnapshotStyle("queue");
-		config.addQSimConfigGroup(qSimConfigGroup);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		((NetworkImpl) scenario.getNetwork()).setCapacityPeriod(1.0);
 		makeLinks(scenario.getNetwork());

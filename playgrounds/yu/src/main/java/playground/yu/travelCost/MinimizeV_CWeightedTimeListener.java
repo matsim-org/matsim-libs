@@ -141,7 +141,7 @@ public class MinimizeV_CWeightedTimeListener implements IterationStartsListener 
 			ctl
 					.setTravelDisutilityFactory(new MinimizeV_CWeightedTimeTravelCostCalculatorFactoryImpl(
 							ctl.getVolumes(), ctl.getConfig()
-									.getQSimConfigGroup().getFlowCapFactor(),
+									.qsim().getFlowCapFactor(),
 							ctl.getNetwork().getCapacityPeriod()));
 		}
 	}

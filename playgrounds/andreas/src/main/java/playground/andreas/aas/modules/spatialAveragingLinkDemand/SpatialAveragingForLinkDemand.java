@@ -86,7 +86,7 @@ public class SpatialAveragingForLinkDemand extends AbstractAnalyisModule{
 	
 	@Override
 	public void preProcessData() {
-		this.simulationEndTime = this.scenario.getConfig().getQSimConfigGroup().getEndTime();
+		this.simulationEndTime = this.scenario.getConfig().qsim().getEndTime();
 		log.info("Simulation end time is: " + this.simulationEndTime / 3600 + " hours.");
 		log.info("Aggregating emissions for " + (int) (this.simulationEndTime / 3600 / this.noOfTimeBins) + " hour time bins.");
 		

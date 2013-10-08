@@ -51,7 +51,7 @@ public class StageContainer2AgentMoneyEvent implements StageContainerHandler, Af
 	public StageContainer2AgentMoneyEvent(Controler controler, TicketMachine ticketMachine) {
 		controler.addControlerListener(this);
 		this.eventsManager = controler.getEvents();
-		this.mobsimShutdownTime = controler.getConfig().getQSimConfigGroup().getEndTime();
+		this.mobsimShutdownTime = controler.getConfig().qsim().getEndTime();
 		this.ticketMachine = ticketMachine;
 	}
 

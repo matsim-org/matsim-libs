@@ -23,12 +23,11 @@ import java.util.Arrays;
 
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 
 import playground.dgrether.DgPaths;
 
@@ -63,11 +62,10 @@ public class FourWaysVisMviTest {
     a.setTypicalDuration(8.0 * 3600.0);
     conf.planCalcScore().addActivityParams(a);
     
-    conf.addQSimConfigGroup(new QSimConfigGroup());
     conf.controler().setSnapshotFormat(Arrays.asList("otfvis"));
-    conf.getQSimConfigGroup().setSnapshotPeriod(15.0);
-    conf.getQSimConfigGroup().setSnapshotStyle("queue");
-    conf.getQSimConfigGroup().setStuckTime(100.0);
+    conf.qsim().setSnapshotPeriod(15.0);
+    conf.qsim().setSnapshotStyle("queue");
+    conf.qsim().setStuckTime(100.0);
     
     conf.network().setLaneDefinitionsFile(lanesFile);
     conf.scenario().setUseLanes(true);

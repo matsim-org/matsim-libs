@@ -35,7 +35,6 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
@@ -91,11 +90,10 @@ public class BlockingStopDemo {
 
 	private void prepareConfig() {
 		Config config = this.scenario.getConfig();
-		config.addQSimConfigGroup(new QSimConfigGroup());
 		config.scenario().setUseVehicles(true);
 		config.scenario().setUseTransit(true);
-		config.getQSimConfigGroup().setSnapshotStyle("queue");
-		config.getQSimConfigGroup().setEndTime(24.0*3600);
+		config.qsim().setSnapshotStyle("queue");
+		config.qsim().setEndTime(24.0*3600);
 	}
 
 	private void createNetwork() {

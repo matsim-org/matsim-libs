@@ -575,14 +575,13 @@ public class PoznanNetwork
     {
         // general setup
         Config config = ConfigUtils.createConfig();
-        config.addQSimConfigGroup(new QSimConfigGroup());
-        config.getQSimConfigGroup().setSimStarttimeInterpretation(QSimConfigGroup.ONLY_USE_STARTTIME);
-        config.getQSimConfigGroup().setStartTime(0.0);
-        config.getQSimConfigGroup().setSnapshotStyle("queue");
+        config.qsim().setSimStarttimeInterpretation(QSimConfigGroup.ONLY_USE_STARTTIME);
+        config.qsim().setStartTime(0.0);
+        config.qsim().setSnapshotStyle("queue");
         config.scenario().setUseLanes(true);
         config.scenario().setUseSignalSystems(true);
         config.otfVis().setAgentSize(70.0f);
-        config.getQSimConfigGroup().setNodeOffset(30);
+        config.qsim().setNodeOffset(30);
         config.signalSystems().setUseAmbertimes(true);
         scenario = (ScenarioImpl)ScenarioUtils.createScenario(config);
 

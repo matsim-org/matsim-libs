@@ -30,12 +30,12 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
+import org.matsim.api.core.v01.events.LinkLeaveEvent;
 import org.matsim.api.core.v01.events.PersonArrivalEvent;
 import org.matsim.api.core.v01.events.PersonDepartureEvent;
-import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.network.Node;
@@ -49,7 +49,6 @@ import org.matsim.contrib.multimodal.tools.PrepareMultiModalScenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.population.PersonImpl;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -78,8 +77,7 @@ public class MultiModalControlerListenerTest {
 		
 		Config config = ConfigUtils.createConfig();
 		
-		config.addQSimConfigGroup(new QSimConfigGroup());
-		config.getQSimConfigGroup().setEndTime(24*3600);
+		config.qsim().setEndTime(24*3600);
 		
 		config.controler().setLastIteration(0);
 
@@ -188,8 +186,8 @@ public class MultiModalControlerListenerTest {
 		Config config = ConfigUtils.loadConfig(inputDir + "config_berlin_multimodal.xml", new MultiModalConfigGroup());
 		config.controler().setOutputDirectory(this.utils.getOutputDirectory());
 
-		config.getQSimConfigGroup().setRemoveStuckVehicles(true);
-		config.getQSimConfigGroup().setStuckTime(100.0);
+		config.qsim().setRemoveStuckVehicles(true);
+		config.qsim().setStuckTime(100.0);
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 

@@ -33,7 +33,7 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
@@ -42,7 +42,6 @@ import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioImpl;
 import org.matsim.core.scenario.ScenarioLoaderImpl;
 import org.matsim.core.scenario.ScenarioUtils;
-import org.matsim.core.config.ConfigUtils;
 import org.matsim.vis.otfvis.OTFClientLive;
 import org.matsim.vis.otfvis.OnTheFlyServer;
 
@@ -65,7 +64,6 @@ public class DgTeleportationVisEquil {
 		EventsManager events = (EventsManager) EventsUtils.createEventsManager();
 		events.addHandler(new LogOutputEventHandler());
 		scenario.getConfig().otfVis().setShowTeleportedAgents(true);
-		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		QSim otfVisQSim = (QSim) new QSimFactory().createMobsim(scenario, events);
 		// client.setVisualizeTeleportedAgents(true);
 		OnTheFlyServer server = OTFVis.startServerAndRegisterWithQSim(scenario.getConfig(), scenario, events, otfVisQSim);

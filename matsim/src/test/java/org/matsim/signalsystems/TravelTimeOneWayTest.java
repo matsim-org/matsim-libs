@@ -31,7 +31,6 @@ import org.matsim.api.core.v01.events.handler.LinkEnterEventHandler;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.SignalSystemsConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -79,9 +78,8 @@ public class TravelTimeOneWayTest {
 		else {
 			signalSystemsFile = testUtils.getClassInputDirectory() + "testSignalSystemsNoLanes_v2.0.xml";
 		}
-		conf.addQSimConfigGroup(new QSimConfigGroup());
-		conf.getQSimConfigGroup().setStuckTime(1000);
-		conf.getQSimConfigGroup().setRemoveStuckVehicles(false);
+		conf.qsim().setStuckTime(1000);
+		conf.qsim().setRemoveStuckVehicles(false);
 		conf.scenario().setUseSignalSystems(true);
 
 		SignalSystemsConfigGroup signalsConfig = conf.signalSystems();

@@ -36,6 +36,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.Module;
+import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.MatsimEventsReader;
 import org.matsim.core.gbl.Gbl;
@@ -178,7 +179,7 @@ public class ExternalMobsim implements Mobsim {
 		log.info("running command: " + cmd);
 		Gbl.printMemoryUsage();
 		String logfileName = this.controlerIO.getIterationFilename(this.getIterationNumber(), "mobsim.log");
-		int timeout = this.scenario.getConfig().simulation().getExternalTimeOut();
+		int timeout = ((SimulationConfigGroup) this.scenario.getConfig().getModule(SimulationConfigGroup.GROUP_NAME)).getExternalTimeOut();
 		int exitcode = ExeRunner.run(cmd, logfileName, timeout);
 		if (exitcode != 0) {
 			throw new RuntimeException("There was a problem running the external mobsim. exit code: " + exitcode);

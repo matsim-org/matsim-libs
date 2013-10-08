@@ -26,7 +26,6 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
 import org.matsim.core.mobsim.framework.Mobsim;
 import org.matsim.core.mobsim.framework.MobsimFactory;
@@ -49,7 +48,6 @@ public class ControlerMobsimIntegrationTest {
 		cfg.controler().setLastIteration(0);
 		cfg.controler().setMobsim("qsim");
 		cfg.controler().setWritePlansInterval(0);
-		cfg.addQSimConfigGroup(new QSimConfigGroup());
 		FakeControler c = new FakeControler(cfg);
 		c.setCreateGraphs(false);
 		c.setDumpDataAtEnd(false);
@@ -64,8 +62,7 @@ public class ControlerMobsimIntegrationTest {
 		cfg.controler().setLastIteration(0);
 		cfg.controler().setMobsim("qsim");
 		cfg.controler().setWritePlansInterval(0);
-		cfg.addQSimConfigGroup(new QSimConfigGroup());
-		cfg.getQSimConfigGroup().setNumberOfThreads(3);
+		cfg.qsim().setNumberOfThreads(3);
 		FakeControler c = new FakeControler(cfg);
 		c.setCreateGraphs(false);
 		c.setDumpDataAtEnd(false);
@@ -101,24 +98,6 @@ public class ControlerMobsimIntegrationTest {
 		c.run();
 		Assert.assertTrue("sim is of wrong type " + c.sim.getClass().getCanonicalName(), c.sim instanceof JDEQSimulation);
 	}
-
-//	@Test
-//	public void testRunMobsim_multimodalQSim() {
-//		Config cfg = this.utils.loadConfig("test/scenarios/equil/config_plans1.xml");
-//		cfg.controler().setLastIteration(0);
-//		cfg.controler().setMobsim("qsim");
-//		cfg.controler().setWritePlansInterval(0);
-//		cfg.addQSimConfigGroup(new QSimConfigGroup());
-//		cfg.multiModal().setMultiModalSimulationEnabled(true);
-//		FakeControler c = new FakeControler(cfg);
-//		c.setCreateGraphs(false);
-//		c.setDumpDataAtEnd(false);
-//		c.getConfig().controler().setWriteEventsInterval(0);
-//		c.run();
-//		System.out.println(c.sim.getClass().getCanonicalName());
-//		Assert.assertTrue(c.sim instanceof QSim);
-//		Assert.assertNotNull(((QSim) c.sim).getMultiModalSimEngine());
-//	}
 
 	@Test
 	public void testRunMobsim_customMobsim() {

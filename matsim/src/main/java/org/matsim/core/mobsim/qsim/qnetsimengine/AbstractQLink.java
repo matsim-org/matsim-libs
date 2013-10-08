@@ -111,7 +111,7 @@ abstract class AbstractQLink extends QLinkInternalI {
 		this.network = network;
 		this.netElementActivator = network.simEngine;
 		this.insertingWaitingVehiclesBeforeDrivingVehicles = 
-				network.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().isInsertingWaitingVehiclesBeforeDrivingVehicles() ;
+				network.simEngine.getMobsim().getScenario().getConfig().qsim().isInsertingWaitingVehiclesBeforeDrivingVehicles() ;
 	}
 
 	abstract void activateLink();

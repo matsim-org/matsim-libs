@@ -59,7 +59,7 @@ public class TransitControler {
 //		config.otfVis().setColoringScheme( OTFVisConfigGroup.COLORING_BVG ) ;
 		}
 
-		config.getQSimConfigGroup().setVehicleBehavior( QSimConfigGroup.VEHICLE_BEHAVIOR_TELEPORT ) ;
+		config.qsim().setVehicleBehavior( QSimConfigGroup.VEHICLE_BEHAVIOR_TELEPORT ) ;
 		
 //		config.otfVis().setShowTeleportedAgents(true) ;
 		

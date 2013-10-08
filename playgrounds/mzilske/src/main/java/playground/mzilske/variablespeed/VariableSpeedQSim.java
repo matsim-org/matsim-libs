@@ -24,7 +24,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.QNetsimEngineFactory;
 final class VariableSpeedQSim implements MobsimFactory {
 	@Override
 	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-		QSimConfigGroup conf = sc.getConfig().getQSimConfigGroup();
+		QSimConfigGroup conf = sc.getConfig().qsim();
 
 
 		// Get number of parallel Threads

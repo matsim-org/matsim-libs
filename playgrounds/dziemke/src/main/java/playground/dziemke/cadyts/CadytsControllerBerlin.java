@@ -70,12 +70,12 @@ public class CadytsControllerBerlin {
 		config.plans().setInputFile(inputPlansFile);			
 		
 		// simulation
-		config.addSimulationConfigGroup(new SimulationConfigGroup());
+		config.addModule( new SimulationConfigGroup() );
 		//config.simulation().setStartTime(0);
 		//config.simulation().setEndTime(0);
 		//config.simulation().setSnapshotPeriod(60);
-		config.simulation().setFlowCapFactor(0.01);
-		config.simulation().setStorageCapFactor(0.02);
+		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setFlowCapFactor(0.01);
+		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setStorageCapFactor(0.02);
 						
 		// counts
 		String countsFileName = "D:/Workspace/berlin/counts/iv_counts/vmz_di-do.xml";

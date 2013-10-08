@@ -27,7 +27,6 @@ package playground.cottbus;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -47,7 +46,6 @@ public class CottbusController {
 		// configuration that describes current scenario
 		
 		Controler controler = new Controler(config);
-		controler.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		controler.setOverwriteFiles(true);
 		// effects output-folder
 		controler.run();
@@ -59,7 +57,6 @@ public class CottbusController {
 		// visualization via OTFVis
 		ScenarioLoaderImpl scl = ScenarioLoaderImpl.createScenarioLoaderImplAndResetRandomSeed(config);
 		Scenario sc = scl.loadScenario();
-		sc.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		EventsManager e = (EventsManager) EventsUtils.createEventsManager();
 		QSim otfVisQSim = (QSim) new QSimFactory().createMobsim(sc, e);
 		

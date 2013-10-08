@@ -20,7 +20,7 @@ public class PassivePlannerSocialAgent extends PassivePlannerDriverAgent  {
 	public PassivePlannerSocialAgent(final BasePerson basePerson, final Netsim simulation, final PassivePlannerManager passivePlannerManager, final Household household, Set<String> modes) {
 		super(basePerson, simulation, passivePlannerManager);
 		boolean carAvailability = false;
-		Collection<String> mainModes = simulation.getScenario().getConfig().getQSimConfigGroup().getMainModes();
+		Collection<String> mainModes = simulation.getScenario().getConfig().qsim().getMainModes();
 		for(PlanElement planElement:basePerson.getBasePlan().getPlanElements())
 			if(planElement instanceof Leg)
 				if(mainModes.contains(((Leg)planElement).getMode()))

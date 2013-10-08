@@ -406,15 +406,13 @@ public class CadytsCarIntegrationTest {
 		config.controler().setWriteEventsInterval(1) ;
 		config.controler().setMobsim(MobsimType.qsim.toString()) ;
 		// ---
-		QSimConfigGroup qsimConfigGroup = new QSimConfigGroup() ;
-		config.addQSimConfigGroup(qsimConfigGroup) ;
 		
 		// config.getQSimConfigGroup().setFlowCapFactor(0.02) ;
-		config.getQSimConfigGroup().setFlowCapFactor(1.) ;
+		config.qsim().setFlowCapFactor(1.) ;
 		// config.getQSimConfigGroup().setStorageCapFactor(0.06) ;
-		config.getQSimConfigGroup().setStorageCapFactor(1.) ;
-		config.getQSimConfigGroup().setStuckTime(10.) ;
-		config.getQSimConfigGroup().setRemoveStuckVehicles(false) ; // ??
+		config.qsim().setStorageCapFactor(1.) ;
+		config.qsim().setStuckTime(10.) ;
+		config.qsim().setRemoveStuckVehicles(false) ; // ??
 		// ---
 //		config.transit().setTransitScheduleFile(inputDir + "transitSchedule1bus.xml") ;
 //		config.transit().setVehiclesFile(inputDir + "vehicles.xml") ;

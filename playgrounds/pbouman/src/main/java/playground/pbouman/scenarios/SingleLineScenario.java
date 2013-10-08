@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.population.ActivityImpl;
 import org.matsim.core.population.routes.NetworkRoute;
@@ -82,7 +81,6 @@ public class SingleLineScenario
 		HashSet<String> transitModes = new HashSet<String>();
 		transitModes.add("pt");
 		config.transit().setTransitModes(transitModes);
-		config.addQSimConfigGroup(new QSimConfigGroup());
 		ScenarioImpl scen = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		
 		/* ************** *

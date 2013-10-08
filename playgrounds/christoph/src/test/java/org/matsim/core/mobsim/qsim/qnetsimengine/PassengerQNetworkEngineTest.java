@@ -1037,9 +1037,8 @@ public class PassengerQNetworkEngineTest extends MatsimTestCase {
 	
 	private static Scenario makeScenario() {
 		Config config = ConfigUtils.createConfig();
-		QSimConfigGroup qSimConfigGroup = new QSimConfigGroup();
+		QSimConfigGroup qSimConfigGroup = config.qsim();
 		qSimConfigGroup.setEndTime(7200.0);	// stop simulation after 2 hours to prevent dead locks
-		config.addQSimConfigGroup(qSimConfigGroup);
 		Scenario scenario = ScenarioUtils.createScenario(config);
 		((NetworkImpl) scenario.getNetwork()).setCapacityPeriod(1.0);
 		return scenario;

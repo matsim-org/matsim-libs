@@ -91,7 +91,7 @@ public class FreightQSimFactory implements MobsimFactory {
 
 	@Override
 	public Mobsim createMobsim(Scenario sc, EventsManager eventsManager) {
-		QSimConfigGroup conf = sc.getConfig().getQSimConfigGroup();
+		QSimConfigGroup conf = sc.getConfig().qsim();
 		if (conf == null) {
 			throw new NullPointerException(
 					"There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");

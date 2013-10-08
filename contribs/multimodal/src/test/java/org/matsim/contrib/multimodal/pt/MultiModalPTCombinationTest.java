@@ -30,25 +30,22 @@ import org.junit.Test;
 import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
+import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonArrivalEventHandler;
 import org.matsim.api.core.v01.events.handler.PersonDepartureEventHandler;
-import org.matsim.api.core.v01.events.handler.LinkLeaveEventHandler;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Plan;
 import org.matsim.contrib.multimodal.MultiModalControlerListener;
 import org.matsim.contrib.multimodal.config.MultiModalConfigGroup;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.events.handler.BasicEventHandler;
-import org.matsim.core.population.routes.NetworkRoute;
 import org.matsim.core.utils.collections.CollectionUtils;
 import org.matsim.testcases.MatsimTestUtils;
 
@@ -73,8 +70,7 @@ public class MultiModalPTCombinationTest {
 		mmcg.setSimulatedModes(TransportMode.walk + "," + TransportMode.transit_walk);
 		config.addModule(mmcg);
 		
-		config.addQSimConfigGroup(new QSimConfigGroup());
-		config.getQSimConfigGroup().setEndTime(24*3600);
+		config.qsim().setEndTime(24*3600);
 		
 		config.controler().setLastIteration(0);
 

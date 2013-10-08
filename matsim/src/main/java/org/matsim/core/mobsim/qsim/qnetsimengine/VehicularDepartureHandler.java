@@ -50,7 +50,7 @@ class VehicularDepartureHandler implements DepartureHandler {
 	VehicularDepartureHandler(QNetsimEngine qNetsimEngine, VehicleBehavior vehicleBehavior) {
 		this.qNetsimEngine = qNetsimEngine;
 		this.vehicleBehavior = vehicleBehavior;
-		this.transportModes = qNetsimEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().getMainModes();
+		this.transportModes = qNetsimEngine.getMobsim().getScenario().getConfig().qsim().getMainModes();
 	}
 
 	@Override

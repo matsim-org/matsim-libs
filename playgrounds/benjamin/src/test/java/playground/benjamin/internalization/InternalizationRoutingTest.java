@@ -208,14 +208,13 @@ public class InternalizationRoutingTest extends MatsimTestCase{
 		ccg.setRoutingAlgorithmType(RoutingAlgorithmType.Dijkstra);
 
 		// qsimConfigGroup
-		QSimConfigGroup qcg = new QSimConfigGroup();
+		QSimConfigGroup qcg = config.qsim();
 		qcg.setStartTime(0 * 3600.);
 		qcg.setEndTime(24 * 3600.);
 		qcg.setFlowCapFactor(1);
 		qcg.setStorageCapFactor(1);
 		qcg.setNumberOfThreads(1);
 		qcg.setRemoveStuckVehicles(false);
-		controler.getConfig().addQSimConfigGroup(qcg);
 
 		// planCalcScoreConfigGroup
 		PlanCalcScoreConfigGroup pcs = controler.getConfig().planCalcScore();

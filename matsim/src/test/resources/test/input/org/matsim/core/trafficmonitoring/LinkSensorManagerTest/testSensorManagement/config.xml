@@ -20,7 +20,7 @@
 		<param name="lastIteration" value="2" />
 	</module>
 
-	<module name="simulation">
+	<module name="qsim">
 		<param name="startTime" value="05:55:00" />
 		<param name="endTime" value="12:00:00" />
 	</module>

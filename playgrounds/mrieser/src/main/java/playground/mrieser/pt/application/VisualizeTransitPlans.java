@@ -39,6 +39,7 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.ConfigWriter;
+import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
@@ -158,7 +159,7 @@ public class VisualizeTransitPlans {
 		visConfig.addCoreModules();
 		visConfig.network().setInputFile("vis.network.xml");
 		visConfig.plans().setInputFile("vis.plans.xml");
-		visConfig.simulation().setSnapshotStyle("queue");
+		((SimulationConfigGroup) visConfig.getModule(SimulationConfigGroup.GROUP_NAME)).setSnapshotStyle("queue");
 		new ConfigWriter(visConfig).write("vis.config.xml");
 
 	}

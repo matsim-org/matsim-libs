@@ -68,7 +68,7 @@ public class QNode implements NetsimNode {
 		this.inLinksArrayCache = new QLinkInternalI[nofInLinks];
 		this.tempLinks = new QLinkInternalI[nofInLinks];
 		this.random = MatsimRandom.getRandom();
-		if (network.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().getNumberOfThreads() > 1) {
+		if (network.simEngine.getMobsim().getScenario().getConfig().qsim().getNumberOfThreads() > 1) {
 			// This could just as well be the "normal" case. The second alternative
 			// is just there so some scenarios / test cases stay
 			// "event-file-compatible". Consider removing the second alternative.
@@ -253,7 +253,7 @@ public class QNode implements NetsimNode {
 			 * of if there is space on the next link or not.. optionally we let them
 			 * die here, we have a config setting for that!
 			 */
-			if (network.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().isRemoveStuckVehicles()) {
+			if (network.simEngine.getMobsim().getScenario().getConfig().qsim().isRemoveStuckVehicles()) {
 				moveVehicleFromInlinkToAbort(veh, fromLaneBuffer, now);
 				return false ;
 			} else {

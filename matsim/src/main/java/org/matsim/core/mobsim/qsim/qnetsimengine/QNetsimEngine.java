@@ -96,10 +96,10 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 	public QNetsimEngine(final QSim sim, NetsimNetworkFactory<QNode, ? extends QLinkInternalI> netsimNetworkFactory ) {
 		this.qsim = sim;
 
-		this.stucktimeCache = sim.getScenario().getConfig().getQSimConfigGroup().getStuckTime();
+		this.stucktimeCache = sim.getScenario().getConfig().qsim().getStuckTime();
 
 		// configuring the car departure hander (including the vehicle behavior)
-		QSimConfigGroup qSimConfigGroup = this.qsim.getScenario().getConfig().getQSimConfigGroup();
+		QSimConfigGroup qSimConfigGroup = this.qsim.getScenario().getConfig().qsim();
 		VehicleBehavior vehicleBehavior;
 		if (qSimConfigGroup.getVehicleBehavior().equals(QSimConfigGroup.VEHICLE_BEHAVIOR_EXCEPTION)) {
 			vehicleBehavior = VehicleBehavior.EXCEPTION;
@@ -113,13 +113,13 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 		dpHandler = new VehicularDepartureHandler(this, vehicleBehavior);
 
 		// yyyyyy I am quite sceptic if the following should stay since it does not work.  kai, feb'11
-		if ( "queue".equals( sim.getScenario().getConfig().getQSimConfigGroup().getTrafficDynamics() ) ) {
+		if ( "queue".equals( sim.getScenario().getConfig().qsim().getTrafficDynamics() ) ) {
 			QueueWithBuffer.HOLES=false ;
-		} else if ( "withHolesExperimental".equals( sim.getScenario().getConfig().getQSimConfigGroup().getTrafficDynamics() ) ) {
+		} else if ( "withHolesExperimental".equals( sim.getScenario().getConfig().qsim().getTrafficDynamics() ) ) {
 			QueueWithBuffer.HOLES = true ;
 		} else {
 			throw new RuntimeException("trafficDynamics defined in config that does not exist: "
-					+ sim.getScenario().getConfig().getQSimConfigGroup().getTrafficDynamics() ) ;
+					+ sim.getScenario().getConfig().qsim().getTrafficDynamics() ) ;
 		}
 
 		// the following is so confused because I can't separate it out, the reason being that ctor calls need to be the 
@@ -139,7 +139,7 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 		} else {
 			network = new QNetwork(sim.getScenario().getNetwork(), new DefaultQNetworkFactory());
 		}
-		network.getLinkWidthCalculator().setLinkWidth(sim.getScenario().getConfig().getQSimConfigGroup().getLinkWidth());
+		network.getLinkWidthCalculator().setLinkWidth(sim.getScenario().getConfig().qsim().getLinkWidth());
 		network.initialize(this);
 
 		this.positionInfoBuilder = this.createAgentSnapshotInfoBuilder( sim.getScenario() );
@@ -152,7 +152,7 @@ public class QNetsimEngine extends NetElementActivator implements MobsimEngine {
 	}
 
 	private AgentSnapshotInfoBuilder createAgentSnapshotInfoBuilder(Scenario scenario){
-		String  snapshotStyle = scenario.getConfig().getQSimConfigGroup().getSnapshotStyle();
+		String  snapshotStyle = scenario.getConfig().qsim().getSnapshotStyle();
 		if ("queue".equalsIgnoreCase(snapshotStyle)){
 			return new QueueAgentSnapshotInfoBuilder(scenario, this.network.getAgentSnapshotInfoFactory());
 		}

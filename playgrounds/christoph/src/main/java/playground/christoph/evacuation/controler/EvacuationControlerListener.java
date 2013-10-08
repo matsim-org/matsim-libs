@@ -329,7 +329,7 @@ public class EvacuationControlerListener implements StartupListener {
 		
 		// Create and add an AgentsInEvacuationAreaCounter.
 		if (EvacuationConfig.countAgentsInEvacuationArea) {
-			double scaleFactor = 1 / scenario.getConfig().getQSimConfigGroup().getFlowCapFactor();
+			double scaleFactor = 1 / scenario.getConfig().qsim().getFlowCapFactor();
 			
 			agentsInEvacuationAreaCounter = new AgentsInEvacuationAreaCounter(scenario, analyzedModes, this.coordAnalyzer.createInstance(), 
 					this.decisionModelRunner.getDecisionDataProvider(), scaleFactor);
@@ -360,7 +360,7 @@ public class EvacuationControlerListener implements StartupListener {
 		int maxTime = 36 * 3600;
 		VolumesAnalyzer volumesAnalyzer = new PassengerVolumesAnalyzer(timeSlice, maxTime, scenario.getNetwork());
 		controler.getEvents().addHandler(volumesAnalyzer);
-		double scaleFactor = 1 / scenario.getConfig().getQSimConfigGroup().getFlowCapFactor();
+		double scaleFactor = 1 / scenario.getConfig().qsim().getFlowCapFactor();
 		this.linkVolumesWriter = new LinkVolumesWriter(volumesAnalyzer, scenario.getNetwork(), timeSlice, maxTime, scaleFactor, true);
 		this.fixedOrderControlerListener.addControlerListener(this.linkVolumesWriter);
 	}

@@ -42,7 +42,7 @@ class ParallelFlexibleCellSimEngine extends FlexibleCellSimEngine {
 	// use the factory
 	/*package*/ ParallelFlexibleCellSimEngine(Netsim sim) {
 		super(sim);
-		this.numOfThreads = this.getMobsim().getScenario().getConfig().getQSimConfigGroup().getNumberOfThreads();
+		this.numOfThreads = this.getMobsim().getScenario().getConfig().qsim().getNumberOfThreads();
 	}
 	
 	@Override

@@ -25,7 +25,6 @@ import org.matsim.api.core.v01.Id;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.pt.transitSchedule.TransitScheduleImpl;
 import org.matsim.pt.transitSchedule.api.TransitSchedule;
@@ -44,7 +43,6 @@ protected static TransitScheduleImpl getCadytsSchedule (final TransitSchedule sc
 			Config cadytsConfig = ConfigUtils.createConfig();
 			cadytsConfig.scenario().setUseTransit(true);
 			cadytsConfig.scenario().setUseVehicles(true);
-			cadytsConfig.addQSimConfigGroup(new QSimConfigGroup());
 			Scenario cadytsScn = ScenarioUtils.createScenario(cadytsConfig);
 			cadytsSchedule = (TransitScheduleImpl) cadytsScn.getTransitSchedule();
 			TransitScheduleFactory sBuilder = cadytsSchedule.getFactory();

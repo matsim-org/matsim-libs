@@ -19,6 +19,7 @@ import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigWriter;
 import org.matsim.core.config.MatsimConfigReader;
 import org.matsim.core.config.groups.QSimConfigGroup;
+import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.OutputDirectoryHierarchy;
 import org.matsim.core.events.EventsUtils;
@@ -128,17 +129,17 @@ public class BkVisLiveFromLastIteration {
 		log.info("\n\n" + writer.getBuffer().toString());
 		log.info("Complete config dump done.");
 
-		if (config.getQSimConfigGroup() == null) {
-			config.addQSimConfigGroup(new QSimConfigGroup());
-			config.getQSimConfigGroup().setFlowCapFactor(config.simulation().getFlowCapFactor());
-			config.getQSimConfigGroup().setStorageCapFactor(config.simulation().getStorageCapFactor());
-			config.getQSimConfigGroup().setRemoveStuckVehicles(
-					config.simulation().isRemoveStuckVehicles());
-			config.getQSimConfigGroup().setStuckTime(config.simulation().getStuckTime());
-			config.getQSimConfigGroup().setSnapshotStyle(config.simulation().getSnapshotStyle());
-		}
+//		if (config.qsim() == null) {
+//			config.setQSimConfigGroup(new QSimConfigGroup());
+//			config.qsim().setFlowCapFactor(((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).getFlowCapFactor());
+//			config.qsim().setStorageCapFactor(((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).getStorageCapFactor());
+//			config.qsim().setRemoveStuckVehicles(
+//					((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).isRemoveStuckVehicles());
+//			config.qsim().setStuckTime(((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).getStuckTime());
+//			config.qsim().setSnapshotStyle(((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).getSnapshotStyle());
+//		}
 		// disable snapshot writing as the snapshot should not be overwritten
-		config.getQSimConfigGroup().setSnapshotPeriod(0.0);
+		config.qsim().setSnapshotPeriod(0.0);
 
 		ScenarioLoaderImpl loader = new ScenarioLoaderImpl(config);
 		Scenario sc = loader.loadScenario();

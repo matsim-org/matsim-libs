@@ -20,6 +20,7 @@
 
 package playground.yu.bottleneck;
 
+import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.IterationStartsEvent;
 import org.matsim.core.controler.events.ShutdownEvent;
@@ -59,12 +60,12 @@ public class BottleneckControler extends Controler {
 
 		public void notifyIterationStarts(final IterationStartsEvent event) {
 			if (event.getIteration() == 0) {
-				event.getControler().getConfig().simulation().setSnapshotPeriod(0);
+				((SimulationConfigGroup) event.getControler().getConfig().getModule(SimulationConfigGroup.GROUP_NAME)).setSnapshotPeriod(0);
 			}
 			if (event.getIteration() == 1000) {
 				event.getControler().getEvents().addHandler(this.timeWriter);
 				event.getControler().getEvents().addHandler(this.bTV);
-				event.getControler().getConfig().simulation().setSnapshotPeriod(60);
+				((SimulationConfigGroup) event.getControler().getConfig().getModule(SimulationConfigGroup.GROUP_NAME)).setSnapshotPeriod(60);
 			}
 		}
 

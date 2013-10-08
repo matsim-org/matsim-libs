@@ -45,7 +45,6 @@ import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.RoadPricingConfigGroup;
 import org.matsim.core.config.groups.ScenarioConfigGroup;
 import org.matsim.core.config.groups.SignalSystemsConfigGroup;
-import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup;
 import org.matsim.core.config.groups.SubtourModeChoiceConfigGroup;
 import org.matsim.core.config.groups.TimeAllocationMutatorConfigGroup;
@@ -92,7 +91,6 @@ public class Config {
 	private RoadPricingConfigGroup roadpricing = null;
 	private ScenarioConfigGroup scenarioConfigGroup = null;
 	private SignalSystemsConfigGroup signalSystemConfigGroup = null;
-	private SimulationConfigGroup simulation = null;
 	private StrategyConfigGroup strategy = null;
 	private TransitConfigGroup transit = null;
 	private TransitRouterConfigGroup transitRouter = null;
@@ -134,8 +132,8 @@ public class Config {
 		this.controler = new ControlerConfigGroup();
 		this.modules.put(ControlerConfigGroup.GROUP_NAME, this.controler);
 
-//		this.simulation = new SimulationConfigGroup();
-//		this.modules.put(SimulationConfigGroup.GROUP_NAME, this.simulation);
+		this.qSimConfigGroup = new QSimConfigGroup();
+		this.modules.put(QSimConfigGroup.GROUP_NAME, this.qSimConfigGroup);
 
 		this.counts = new CountsConfigGroup();
 		this.modules.put(CountsConfigGroup.GROUP_NAME, this.counts);
@@ -424,10 +422,6 @@ public class Config {
 		return this.controler;
 	}
 
-	public final SimulationConfigGroup simulation() {
-		return this.simulation;
-	}
-
 	public final CountsConfigGroup counts() {
 		return this.counts;
 	}
@@ -488,7 +482,7 @@ public class Config {
 		return this.otfVis;
 	}
 
-    public QSimConfigGroup getQSimConfigGroup() {
+    public QSimConfigGroup qsim() {
 		return this.qSimConfigGroup;
 	}
 
@@ -520,20 +514,9 @@ public class Config {
 		return this.subtourModeChoice;
 	}
 
-	// typed adders:
-	// (config groups that are not core config groups are, in principle, not typed.  This is a way around that.)
-
-	public void addSimulationConfigGroup( final SimulationConfigGroup tmp ) {
-		this.simulation = tmp;
-		this.addModule( tmp );
-	}
-
-	public void addQSimConfigGroup(final QSimConfigGroup qSimConfigGroup) {
-//		log.warn("setting QSimConfigGroup in Config.  This will silently overwrite any pre-existing entry.");
-//		log.warn("Might be better to modify the code to use the existing create/add/removeModule mechanics. kai, oct'10");
+	@Deprecated
+	public void setQSimConfigGroup(final QSimConfigGroup qSimConfigGroup) {
 		this.qSimConfigGroup = qSimConfigGroup;
-//		this.modules.put(QSimConfigGroup.GROUP_NAME, qSimConfigGroup);
-		this.addModule(qSimConfigGroup);
 	}
 
 	// other:

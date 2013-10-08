@@ -234,11 +234,10 @@ public class DreieckNmodes {
 		
 		//Initializing scenario Config file
 		Config config = ConfigUtils.createConfig();
-		config.addQSimConfigGroup(new QSimConfigGroup());
-		config.getQSimConfigGroup().setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE) ;
-		config.getQSimConfigGroup().setMainModes(Arrays.asList(NAMES));
-		config.getQSimConfigGroup().setStuckTime(100*3600.);//allows to overcome maximal density regime
-		config.getQSimConfigGroup().setEndTime(14*3600);//allows to set agents to abort after getting the wanted data.
+		config.qsim().setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE) ;
+		config.qsim().setMainModes(Arrays.asList(NAMES));
+		config.qsim().setStuckTime(100*3600.);//allows to overcome maximal density regime
+		config.qsim().setEndTime(14*3600);//allows to set agents to abort after getting the wanted data.
 		//todo: is for actual network configurations correct, needs dependency on bigger network length 
 		config.vspExperimental().addParam("vspDefaultsCheckingLevel", VspExperimentalConfigGroup.ABORT) ;
 		// this may lead to abort during execution.  In such cases, please fix the configuration.  if necessary, talk
@@ -490,7 +489,7 @@ public class DreieckNmodes {
 	
 	private Netsim createModifiedQSim(Scenario sc, EventsManager events) {
 		//From QSimFactory inspired code
-		QSimConfigGroup conf = sc.getConfig().getQSimConfigGroup();
+		QSimConfigGroup conf = sc.getConfig().qsim();
         if (conf == null) {
             throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
         }

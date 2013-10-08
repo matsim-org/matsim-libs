@@ -32,7 +32,7 @@ public class FlexibleCellSimEngineFactory implements MatsimFactory {
 		
 		FlexibleCellSimEngine simEngine;
 		
-		int numOfThreads = sim.getScenario().getConfig().getQSimConfigGroup().getNumberOfThreads(); 
+		int numOfThreads = sim.getScenario().getConfig().qsim().getNumberOfThreads(); 
 		if (numOfThreads > 1) {
 			simEngine = new ParallelFlexibleCellSimEngine(sim);
 			log.info("Using ParallelCASimEngine with " + numOfThreads + " threads.");

@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
@@ -56,7 +55,6 @@ public class PopulationAgentSourceWithVehiclesTest {
 	@Test
 	public void testFailsIfOnlySomeRoutesHaveAVehicle() throws Exception {
 		final Config config = ConfigUtils.createConfig();
-		config.addQSimConfigGroup( new QSimConfigGroup() );
 		final Scenario scenario = ScenarioUtils.createScenario( config );
 
 		final Id node1 = new IdImpl( "node1" );
@@ -131,7 +129,6 @@ public class PopulationAgentSourceWithVehiclesTest {
 
 	public void testNoFail(final boolean vehicles) throws Exception {
 		final Config config = ConfigUtils.createConfig();
-		config.addQSimConfigGroup( new QSimConfigGroup() );
 		final Scenario scenario = ScenarioUtils.createScenario( config );
 
 		final Id node1 = new IdImpl( "node1" );

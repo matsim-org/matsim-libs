@@ -382,7 +382,7 @@ public class QLinkImpl extends AbstractQLink implements SignalizeableItem {
 		private VisLinkWLanes otfLink = null;
 
 		private VisDataImpl() {
-			double nodeOffset = QLinkImpl.this.network.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().getNodeOffset(); 
+			double nodeOffset = QLinkImpl.this.network.simEngine.getMobsim().getScenario().getConfig().qsim().getNodeOffset(); 
 			if (nodeOffset != 0.0) {
 				nodeOffset = nodeOffset +2.0; // +2.0: eventually we need a bit space for the signal
 				laneModelBuilder = new VisLaneModelBuilder();

@@ -71,7 +71,7 @@ public class ControlerConfigGroup extends Module {
 	private int writeEventsInterval=10;
 	private int writePlansInterval=10;
 	private Set<String> snapshotFormat = Collections.emptySet();
-	private String mobsim = null;
+	private String mobsim = MobsimType.qsim.toString();
 	private int writeSnapshotsInterval = 1;
 	private boolean createGraphs = true;
 

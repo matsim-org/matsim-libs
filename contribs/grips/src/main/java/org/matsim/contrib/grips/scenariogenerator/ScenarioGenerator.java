@@ -121,15 +121,14 @@ public class ScenarioGenerator {
 
 		}
 
-		this.c.addSimulationConfigGroup(new SimulationConfigGroup());
+		this.c.addModule( new SimulationConfigGroup() );
 		this.c.global().setCoordinateSystem("EPSG:3395");
 		this.c.controler().setOutputDirectory(getGripsConfig(this.c).getOutputDir()+"/output");
 		this.c.controler().setMobsim("qsim");
 		
 		
-		QSimConfigGroup qsim = new QSimConfigGroup();
+		QSimConfigGroup qsim = this.c.qsim();
 		qsim.setEndTime(30*3600);
-		this.c.addModule(qsim);
 		
 		this.c.timeAllocationMutator().setMutationRange(0.);
 
@@ -177,7 +176,7 @@ public class ScenarioGenerator {
 
 
 
-		this.c.simulation().setRemoveStuckVehicles(false);
+		((SimulationConfigGroup) this.c.getModule(SimulationConfigGroup.GROUP_NAME)).setRemoveStuckVehicles(false);
 
 		this.c.travelTimeCalculator().setTraveltimeBinSize(120);
 		this.c.travelTimeCalculator().setTravelTimeCalculatorType("TravelTimeCalculatorHashMap");
@@ -226,8 +225,8 @@ public class ScenarioGenerator {
 		new PopulationWriter(sc.getPopulation(), sc.getNetwork(), gcm.getSampleSize()).write(outputPopulationFile);
 		sc.getConfig().plans().setInputFile(outputPopulationFile);
 
-		sc.getConfig().simulation().setStorageCapFactor(gcm.getSampleSize());
-		sc.getConfig().simulation().setFlowCapFactor(gcm.getSampleSize());
+		((SimulationConfigGroup) sc.getConfig().getModule(SimulationConfigGroup.GROUP_NAME)).setStorageCapFactor(gcm.getSampleSize());
+		((SimulationConfigGroup) sc.getConfig().getModule(SimulationConfigGroup.GROUP_NAME)).setFlowCapFactor(gcm.getSampleSize());
 
 		ActivityParams pre = new ActivityParams("pre-evac");
 		pre.setTypicalDuration(49); // needs to be geq 49, otherwise when running a simulation one gets "java.lang.RuntimeException: zeroUtilityDuration of type pre-evac must be greater than 0.0. Did you forget to specify the typicalDuration?"

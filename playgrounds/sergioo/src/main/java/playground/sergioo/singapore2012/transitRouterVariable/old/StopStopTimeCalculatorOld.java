@@ -35,7 +35,7 @@ public class StopStopTimeCalculatorOld implements VehicleDepartsAtFacilityEventH
 	
 	//Constructors
 	public StopStopTimeCalculatorOld(final TransitSchedule transitSchedule, final Config config) {
-		this(transitSchedule, config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config.getQSimConfigGroup().getEndTime()-config.getQSimConfigGroup().getStartTime()));
+		this(transitSchedule, config.travelTimeCalculator().getTraveltimeBinSize(), (int) (config.qsim().getEndTime()-config.qsim().getStartTime()));
 	}
 	public StopStopTimeCalculatorOld(final TransitSchedule transitSchedule, final int timeSlot, final int totalTime) {
 		this.timeSlot = timeSlot;

@@ -180,13 +180,6 @@ public class OTFVis {
 		new ConfigWriter(config).writeStream(new PrintWriter(writer));
 		log.info("\n\n" + writer.getBuffer().toString());
 		log.info("Complete config dump done.");
-		if (config.getQSimConfigGroup() == null){
-			log.error("Cannot play live config without config module for QSim (in Java QSimConfigGroup). " +
-					"Fixing this by adding default config module for QSim. " +
-					"Please check if default values fit your needs, otherwise correct them in " +
-					"the config given as parameter to get a valid visualization!");
-			config.addQSimConfigGroup(new QSimConfigGroup());
-		}
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 		playScenario(scenario);
 	}
@@ -263,7 +256,6 @@ public class OTFVis {
 			snapshotPeriod = Integer.parseInt(args[4]);
 		}
 		Scenario scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		new MatsimNetworkReader(scenario).readFile(networkFile);
 		OTFEvent2MVI.convert(scenario, eventFile, mviFile, snapshotPeriod);
 	}

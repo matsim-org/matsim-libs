@@ -27,7 +27,6 @@ import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.SignalSystemsConfigGroup;
 import org.matsim.core.config.groups.StrategyConfigGroup.StrategySettings;
 import org.matsim.core.scenario.ScenarioUtils;
@@ -77,9 +76,8 @@ public class Fixture {
 		conf.scenario().setUseLanes(true);
 		conf.scenario().setUseSignalSystems(true);
 		//as signals are configured below we don't need signals on
-		conf.addQSimConfigGroup(new QSimConfigGroup());
-		conf.getQSimConfigGroup().setStuckTime(1000);
-		conf.getQSimConfigGroup().setStartTime(0.0);
+		conf.qsim().setStuckTime(1000);
+		conf.qsim().setStartTime(0.0);
 		SignalSystemsConfigGroup signalsConfig = conf.signalSystems();
 		this.setSignalSystemConfigValues(signalsConfig, testUtils);
 		Scenario scenario = ScenarioUtils.loadScenario(conf);

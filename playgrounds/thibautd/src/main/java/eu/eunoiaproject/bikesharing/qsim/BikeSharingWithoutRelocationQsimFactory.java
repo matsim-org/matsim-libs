@@ -53,7 +53,7 @@ public class BikeSharingWithoutRelocationQsimFactory implements MobsimFactory {
 	public Mobsim createMobsim(
 			final Scenario sc,
 			final EventsManager eventsManager) {
-		final QSimConfigGroup conf = sc.getConfig().getQSimConfigGroup();
+		final QSimConfigGroup conf = sc.getConfig().qsim();
 		if (conf == null) {
 			throw new NullPointerException("There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
 		}

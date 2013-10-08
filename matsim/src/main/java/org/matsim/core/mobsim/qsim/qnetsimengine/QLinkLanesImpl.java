@@ -442,7 +442,7 @@ public class QLinkLanesImpl extends AbstractQLink {
 		private VisLinkWLanes otfLink;
 
 		VisDataImpl(){
-			double nodeOffset = QLinkLanesImpl.this.network.simEngine.getMobsim().getScenario().getConfig().getQSimConfigGroup().getNodeOffset();
+			double nodeOffset = QLinkLanesImpl.this.network.simEngine.getMobsim().getScenario().getConfig().qsim().getNodeOffset();
 			if (nodeOffset != 0){
 				 nodeOffset = nodeOffset +2.0; // +2.0: eventually we need a bit space for the signal
 			}

@@ -3,18 +3,12 @@ package d4d;
 import java.util.Arrays;
 
 import org.matsim.api.core.v01.Scenario;
-import org.matsim.api.core.v01.population.Activity;
-import org.matsim.api.core.v01.population.Leg;
 import org.matsim.api.core.v01.population.Person;
-import org.matsim.api.core.v01.population.Plan;
-import org.matsim.api.core.v01.population.PlanElement;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.ControlerConfigGroup.MobsimType;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
-import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.scenario.ScenarioUtils;
 import org.matsim.population.algorithms.ParallelPersonAlgorithmRunner;
@@ -24,7 +18,6 @@ public class RunFreeSpeedSimulation {
 	
 	public static void main(String[] args) {
 		Config config = ConfigUtils.createConfig();
-		config.addQSimConfigGroup(new QSimConfigGroup());
 		config.controler().setLastIteration(0);
 		config.controler().setOutputDirectory("./freespeed-output");
 		config.controler().setMobsim(MobsimType.JDEQSim.toString());

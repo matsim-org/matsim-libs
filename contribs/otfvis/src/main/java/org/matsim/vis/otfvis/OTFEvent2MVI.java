@@ -31,7 +31,7 @@ public class OTFEvent2MVI {
 	public static void convert(Scenario scenario, String eventFileName, String outFileName, double interval_s) {
 		OTFFileWriter otfFileWriter = new OTFFileWriter(scenario, outFileName);
 		EventsManager events = EventsUtils.createEventsManager();
-		SnapshotGenerator visualizer = new SnapshotGenerator(scenario.getNetwork(), interval_s, scenario.getConfig().getQSimConfigGroup());
+		SnapshotGenerator visualizer = new SnapshotGenerator(scenario.getNetwork(), interval_s, scenario.getConfig().qsim());
 		visualizer.addSnapshotWriter(otfFileWriter);
 		events.addHandler(visualizer);
 		new MatsimEventsReader(events).readFile(eventFileName);

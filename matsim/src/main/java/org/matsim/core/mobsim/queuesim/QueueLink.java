@@ -27,12 +27,13 @@ import java.util.Queue;
 
 import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Id;
-import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonStuckEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.core.api.internal.MatsimNetworkObject;
+import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.mobsim.framework.MobsimDriverAgent;
 import org.matsim.core.network.LinkImpl;
 import org.matsim.core.network.NetworkImpl;
@@ -376,7 +377,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 			this.simulatedFlowCapacity = this.simulatedFlowCapacity
 					* this.queueNetwork.getMobsim().getSimTimer().getSimTimestepSize()
 					//				* Gbl.getConfig().simulation().getFlowCapFactor();
-					* this.queueNetwork.getMobsim().getScenario().getConfig().simulation().getFlowCapFactor();
+					* ((SimulationConfigGroup) this.queueNetwork.getMobsim().getScenario().getConfig().getModule("simulation")).getFlowCapFactor();
 		} // else there is no qsim i.e. it is a test case.  kai, jun'10
 		this.inverseSimulatedFlowCapacity = 1.0 / this.simulatedFlowCapacity;
 		this.flowCapFraction = this.simulatedFlowCapacity
@@ -384,7 +385,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 	}
 
 	private void calculateStorageCapacity(final double time) {
-		double storageCapFactor = this.queueNetwork.getMobsim().getScenario().getConfig().simulation().getStorageCapFactor();
+		double storageCapFactor = ((SimulationConfigGroup) this.queueNetwork.getMobsim().getScenario().getConfig().getModule("simulation")).getStorageCapFactor();
 		this.bufferStorageCapacity = (int) Math
 				.ceil(this.simulatedFlowCapacity);
 
@@ -573,7 +574,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 		@Override
 		public Collection<AgentSnapshotInfo> getAgentSnapshotInfo(
 				final Collection<AgentSnapshotInfo> positions) {
-			String snapshotStyle = simEngine.getConfig().simulation()
+			String snapshotStyle = ((SimulationConfigGroup) queueNetwork.getMobsim().getScenario().getConfig().getModule("simulation"))
 					.getSnapshotStyle();
 			if ("queue".equals(snapshotStyle)) {
 				getVehiclePositionsQueue(positions);
@@ -667,7 +668,7 @@ class QueueLink implements VisLink, MatsimNetworkObject {
 
 			Link link = QueueLink.this.getLink();
 			double queueEnd = getInitialQueueEnd();
-			double storageCapFactor = simEngine.getConfig().simulation()
+			double storageCapFactor = ((SimulationConfigGroup) queueNetwork.getMobsim().getScenario().getConfig().getModule("simulation"))
 					.getStorageCapFactor();
 			double cellSize = ((NetworkImpl) QueueLink.this.getQueueNetwork()
 					.getNetwork()).getEffectiveCellSize();

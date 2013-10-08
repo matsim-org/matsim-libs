@@ -39,11 +39,11 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.TransportMode;
 import org.matsim.api.core.v01.events.ActivityEndEvent;
 import org.matsim.api.core.v01.events.ActivityStartEvent;
-import org.matsim.api.core.v01.events.PersonArrivalEvent;
-import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.Event;
 import org.matsim.api.core.v01.events.LinkEnterEvent;
 import org.matsim.api.core.v01.events.LinkLeaveEvent;
+import org.matsim.api.core.v01.events.PersonArrivalEvent;
+import org.matsim.api.core.v01.events.PersonDepartureEvent;
 import org.matsim.api.core.v01.events.PersonEntersVehicleEvent;
 import org.matsim.api.core.v01.events.PersonLeavesVehicleEvent;
 import org.matsim.api.core.v01.events.Wait2LinkEvent;
@@ -695,8 +695,8 @@ public class QSimTest {
 	@Test
 	public void testWaitingForCar() {
 		Fixture f = new Fixture();
-		f.scenario.getConfig().getQSimConfigGroup().setVehicleBehavior(QSimConfigGroup.VEHICLE_BEHAVIOR_WAIT);
-		f.scenario.getConfig().getQSimConfigGroup().setEndTime(24.0 * 60.0 * 60.0);
+		f.scenario.getConfig().qsim().setVehicleBehavior(QSimConfigGroup.VEHICLE_BEHAVIOR_WAIT);
+		f.scenario.getConfig().qsim().setEndTime(24.0 * 60.0 * 60.0);
 		PersonImpl person = new PersonImpl(new IdImpl(1));
 		PlanImpl plan = person.createAndAddPlan(true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
@@ -784,7 +784,7 @@ public class QSimTest {
 	@Test
 	public void testVehicleTeleportationFalse() {
 		Fixture f = new Fixture();
-		f.scenario.getConfig().getQSimConfigGroup().setVehicleBehavior(QSimConfigGroup.VEHICLE_BEHAVIOR_EXCEPTION);
+		f.scenario.getConfig().qsim().setVehicleBehavior(QSimConfigGroup.VEHICLE_BEHAVIOR_EXCEPTION);
 		PersonImpl person = new PersonImpl(new IdImpl(1));
 		PlanImpl plan = person.createAndAddPlan(true);
 		ActivityImpl a1 = plan.createAndAddActivity("h", f.link1.getId());
@@ -1134,7 +1134,6 @@ public class QSimTest {
 	public void testStartAndEndTime() {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
 		Config config = scenario.getConfig();
-		config.addQSimConfigGroup(new QSimConfigGroup());
 
 		// build simple network with 1 link
 		Network network = scenario.getNetwork();
@@ -1177,8 +1176,8 @@ public class QSimTest {
 		collector.reset(0);
 
 		// second test with special start/end times
-		config.getQSimConfigGroup().setStartTime(8.0*3600);
-		config.getQSimConfigGroup().setEndTime(11.0*3600);
+		config.qsim().setStartTime(8.0*3600);
+		config.qsim().setEndTime(11.0*3600);
 		sim = createQSim(scenario, events);
 		sim.run();
 		Assert.assertEquals(8.0*3600, collector.firstEvent.getTime(), MatsimTestCase.EPSILON);
@@ -1269,8 +1268,7 @@ public class QSimTest {
 		events.addHandler(collector);
 
 		// run the simulation
-		config.addQSimConfigGroup(new QSimConfigGroup());
-		config.getQSimConfigGroup().setEndTime(simEndTime);
+		config.qsim().setEndTime(simEndTime);
 		QSim sim = createQSim(scenario, events);
 		sim.run();
 		Assert.assertEquals(simEndTime, collector.lastEvent.getTime(), MatsimTestCase.EPSILON);
@@ -1347,9 +1345,8 @@ public class QSimTest {
 		public Fixture() {
 			this.scenario = ScenarioUtils.createScenario(ConfigUtils.createConfig());
 			this.config = scenario.getConfig();
-			this.config.addQSimConfigGroup(new QSimConfigGroup());
-			this.config.getQSimConfigGroup().setFlowCapFactor(1.0);
-			this.config.getQSimConfigGroup().setStorageCapFactor(1.0);
+			this.config.qsim().setFlowCapFactor(1.0);
+			this.config.qsim().setStorageCapFactor(1.0);
 
 			/* build network */
 			this.network = (NetworkImpl) this.scenario.getNetwork();

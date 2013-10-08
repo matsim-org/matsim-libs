@@ -42,7 +42,6 @@ import org.matsim.api.core.v01.population.Route;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.handler.BasicEventHandler;
 import org.matsim.core.mobsim.framework.MobsimAgent;
@@ -131,7 +130,6 @@ public class RunDemo {
 		
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 		eventsManager.addHandler(new EventsPrinter());
-		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		QSim sim = new QSim(scenario, eventsManager);
 		
 		ca.init(createAgents(scenario, sim, ca.getNetsimNetwork()));

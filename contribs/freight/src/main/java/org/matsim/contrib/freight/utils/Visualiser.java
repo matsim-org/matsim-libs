@@ -43,8 +43,6 @@ public class Visualiser {
 	public void makeMVI(Carriers carriers, String outfile, double snapshotInterval){
 		OTFFileWriter otfFileWriter = new OTFFileWriter(scenario, outfile);
 		
-		QSimConfigGroup qSimConfigGroup = new QSimConfigGroup();
-		config.addQSimConfigGroup(qSimConfigGroup);
 		CarrierAgentTracker carrierAgentTracker = new CarrierAgentTracker(carriers, scenario.getNetwork(), new CarrierScoringFunctionFactory() {
 			
 			@Override
@@ -60,7 +58,7 @@ public class Visualiser {
 		EventsManager events = EventsUtils.createEventsManager();
 		Mobsim mobsim = mobsimFactory.createMobsim(scenario, events);
 		
-		SnapshotGenerator visualizer = new SnapshotGenerator(scenario.getNetwork(), snapshotInterval, scenario.getConfig().getQSimConfigGroup());
+		SnapshotGenerator visualizer = new SnapshotGenerator(scenario.getNetwork(), snapshotInterval, scenario.getConfig().qsim());
 		visualizer.addSnapshotWriter(otfFileWriter);
 		events.addHandler(visualizer);
 		
@@ -71,8 +69,6 @@ public class Visualiser {
 	}
 	
 	private void sim(Carriers carriers) {
-		QSimConfigGroup qSimConfigGroup = new QSimConfigGroup();
-		config.addQSimConfigGroup(qSimConfigGroup);
 		CarrierAgentTracker carrierAgentTracker = new CarrierAgentTracker(carriers, scenario.getNetwork(), new CarrierScoringFunctionFactory() {
 			
 			@Override

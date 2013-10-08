@@ -66,16 +66,16 @@ public class PSimControler extends Controler{
 					this.getScenario().getTransitSchedule(),
 					this.getConfig().travelTimeCalculator()
 							.getTraveltimeBinSize(),
-					(int) (this.getConfig().getQSimConfigGroup().getEndTime() - this
-							.getConfig().getQSimConfigGroup().getStartTime()));
+					(int) (this.getConfig().qsim().getEndTime() - this
+							.getConfig().qsim().getStartTime()));
 			this.getEvents().addHandler(waitTimeCalculator);
 			this.stopStopTimeCalculator = new PSimStopStopTimeCalculator(
 					this.getScenario().getTransitSchedule(),
 					 this
 							.getConfig().travelTimeCalculator()
 							.getTraveltimeBinSize(), (int) (this.getConfig()
-							.getQSimConfigGroup().getEndTime() - this
-							.getConfig().getQSimConfigGroup().getStartTime()));
+							.qsim().getEndTime() - this
+							.getConfig().qsim().getStartTime()));
 			this.getEvents().addHandler(stopStopTimeCalculator);
 		}
 	}

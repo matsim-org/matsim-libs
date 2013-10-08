@@ -101,7 +101,7 @@ public class ScenarioGeneratorPT extends ScenarioGenerator {
 		this.c.scenario().setUseTransit(true);
 		this.c.scenario().setUseVehicles(true);
 		
-		this.c.addSimulationConfigGroup(new SimulationConfigGroup());
+		this.c.addModule( new SimulationConfigGroup() );
 		this.c.global().setCoordinateSystem("EPSG:3395");
 		this.c.controler().setOutputDirectory(getGripsConfig(this.c).getOutputDir()+"/output");
 		this.sc = ScenarioUtils.createScenario(this.c);
@@ -132,9 +132,8 @@ public class ScenarioGeneratorPT extends ScenarioGenerator {
 
 		
 		
-		QSimConfigGroup qsim = new QSimConfigGroup();
+		QSimConfigGroup qsim = this.c.qsim();
 		qsim.setEndTime(4*3600);
-		this.c.addModule(qsim);
 		
 //		Sim2DConfigGroup s2d = new Sim2DConfigGroup();
 //		s2d.setFloorShapeFile("/Users/laemmel/devel/pt_evac_demo/input/floorplan.shp");
@@ -334,8 +333,8 @@ public class ScenarioGeneratorPT extends ScenarioGenerator {
 		new PopulationWriter(sc.getPopulation(), sc.getNetwork(), gcm.getSampleSize()).write(outputPopulationFile);
 		sc.getConfig().plans().setInputFile(outputPopulationFile);
 
-		sc.getConfig().simulation().setStorageCapFactor(gcm.getSampleSize());
-		sc.getConfig().simulation().setFlowCapFactor(gcm.getSampleSize());
+		((SimulationConfigGroup) sc.getConfig().getModule(SimulationConfigGroup.GROUP_NAME)).setStorageCapFactor(gcm.getSampleSize());
+		((SimulationConfigGroup) sc.getConfig().getModule(SimulationConfigGroup.GROUP_NAME)).setFlowCapFactor(gcm.getSampleSize());
 
 		ActivityParams pre = new ActivityParams("pre-evac");
 		pre.setTypicalDuration(49); // needs to be geq 49, otherwise when running a simulation one gets "java.lang.RuntimeException: zeroUtilityDuration of type pre-evac must be greater than 0.0. Did you forget to specify the typicalDuration?"

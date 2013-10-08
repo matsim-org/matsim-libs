@@ -68,7 +68,7 @@ class PTParallelQNetsimEngine extends PTQNetsimEngine {
 		super(sim, netsimNetworkFactory);
 		// (DepartureHander does not need to be added here since it is added in the "super" c'tor)
 
-		this.numOfThreads = this.getMobsim().getScenario().getConfig().getQSimConfigGroup().getNumberOfThreads();
+		this.numOfThreads = this.getMobsim().getScenario().getConfig().qsim().getNumberOfThreads();
 	}
 
 	@Override

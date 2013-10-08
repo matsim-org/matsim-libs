@@ -9,7 +9,6 @@ import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
@@ -54,13 +53,7 @@ public class DgOTFVis {
 	
 	
 	public void playScenario(Scenario scenario) {
-		if (scenario.getConfig().getQSimConfigGroup() == null){
-			log.error("Cannot play live config without config module for QSim (in Java QSimConfigGroup). " +
-					"Fixing this by adding default config module for QSim. " +
-					"Please check if default values fit your needs, otherwise correct them in " +
-					"the config given as parameter to get a valid visualization!");
-			scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
-		}
+
 		EventsManager events = EventsUtils.createEventsManager();
 //		events.addHandler(new LogOutputEventHandler());
 		QSim qSim = (QSim) new QSimFactory().createMobsim(scenario, events);

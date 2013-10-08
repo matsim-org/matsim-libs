@@ -357,9 +357,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		config.controler().setFirstIteration(0);
 		config.controler().setLastIteration(1);
 		config.controler().setMobsim("qsim");
-
-		config.addQSimConfigGroup(new QSimConfigGroup()) ;
-		config.getQSimConfigGroup().setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE) ;
+		config.qsim().setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE) ;
 
 		config.locationchoice().setAlgorithm(Algotype.random);
 		config.locationchoice().setFlexibleTypes("work");
@@ -377,7 +375,7 @@ public class LocationChoiceIntegrationTest extends MatsimTestCase {
 		config.strategy().addStrategySettings(strategySettings);
 
 		config.otfVis().setEffectiveLaneWidth(1.) ;
-		config.getQSimConfigGroup().setLinkWidth((float)1.) ;
+		config.qsim().setLinkWidth((float)1.) ;
 		config.otfVis().setShowTeleportedAgents(true) ;
 		config.otfVis().setDrawNonMovingItems(true) ;
 

@@ -69,9 +69,8 @@ public class Sim2DRunnerTest extends MatsimTestCase{
 		c.planCalcScore().setPerforming_utils_hr(0.);
 		
 		
-		QSimConfigGroup qsim = new QSimConfigGroup();
+		QSimConfigGroup qsim = c.qsim();
 		qsim.setEndTime(300);
-		c.addModule(qsim);
 		c.controler().setMobsim("hybridQ2D");
 		
 		c.global().setCoordinateSystem("EPSG:3395");

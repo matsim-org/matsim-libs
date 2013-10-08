@@ -35,8 +35,8 @@ public class TestTestMain {
 		fixture.create2PersonPopulation();
 		Scenario scenario = fixture.sc;
 		scenario.getConfig().otfVis().setScaleQuadTreeRect(true);
-		scenario.getConfig().getQSimConfigGroup().setNodeOffset(10.0);
-		scenario.getConfig().getQSimConfigGroup().setSnapshotStyle("queue");
+		scenario.getConfig().qsim().setNodeOffset(10.0);
+		scenario.getConfig().qsim().setSnapshotStyle("queue");
 		OTFVis.playScenario(scenario);
 	}
 

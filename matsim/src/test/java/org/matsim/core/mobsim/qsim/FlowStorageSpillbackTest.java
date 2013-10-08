@@ -44,7 +44,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.DefaultAgentFactory;
@@ -226,8 +225,6 @@ public class FlowStorageSpillbackTest {
 		// (0)-----link1-----(1)-----link2-----(2)-----link3-----(3)-----link4-----(4)
 		
 		Config config = testUtils.loadConfig(null);
-		QSimConfigGroup qSimConfigGroup = new QSimConfigGroup();
-		config.addQSimConfigGroup(qSimConfigGroup);
 		Scenario scenario = (ScenarioUtils.createScenario(config));
 	
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();

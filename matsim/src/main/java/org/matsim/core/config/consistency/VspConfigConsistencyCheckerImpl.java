@@ -67,7 +67,7 @@ public class VspConfigConsistencyCheckerImpl implements ConfigConsistencyChecker
 			log.error("found marginal utility of waiting != 0.  vsp default is setting this to 0. " ) ;
 		}
 		
-		if ( config.getQSimConfigGroup()!=null && config.getQSimConfigGroup().isRemoveStuckVehicles() ) {
+		if ( config.qsim()!=null && config.qsim().isRemoveStuckVehicles() ) {
 			problem = true ;
 			System.out.flush() ;
 			log.warn("found that the qsim is removing stuck vehicles.  vsp default is setting this to false.");

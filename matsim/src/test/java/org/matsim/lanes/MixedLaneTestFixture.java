@@ -36,7 +36,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.network.NetworkFactoryImpl;
 import org.matsim.core.population.routes.LinkNetworkRouteImpl;
 import org.matsim.core.scenario.ScenarioImpl;
@@ -62,8 +61,6 @@ public class MixedLaneTestFixture {
 	public MixedLaneTestFixture(){
 		Config config = ConfigUtils.createConfig();
 		config.scenario().setUseLanes(true);
-		config.controler().setMobsim("qsim");
-		config .addQSimConfigGroup(new QSimConfigGroup());
 
 		sc = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		id0 = sc.createId("0");

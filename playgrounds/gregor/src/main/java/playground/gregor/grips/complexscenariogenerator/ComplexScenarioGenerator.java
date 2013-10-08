@@ -24,6 +24,7 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.contrib.grips.model.config.GripsConfigModule;
 import org.matsim.contrib.grips.scenariogenerator.ScenarioGenerator;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
+import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.population.PopulationWriter;
 
 public class ComplexScenarioGenerator extends ScenarioGenerator {
@@ -81,8 +82,8 @@ public class ComplexScenarioGenerator extends ScenarioGenerator {
 		new PopulationWriter(sc.getPopulation(), sc.getNetwork(), gcm.getSampleSize()).write(outputPopulationFile);
 		sc.getConfig().plans().setInputFile(outputPopulationFile);
 
-		sc.getConfig().simulation().setStorageCapFactor(gcm.getSampleSize());
-		sc.getConfig().simulation().setFlowCapFactor(gcm.getSampleSize());
+		((SimulationConfigGroup) sc.getConfig().getModule(SimulationConfigGroup.GROUP_NAME)).setStorageCapFactor(gcm.getSampleSize());
+		((SimulationConfigGroup) sc.getConfig().getModule(SimulationConfigGroup.GROUP_NAME)).setFlowCapFactor(gcm.getSampleSize());
 
 		ActivityParams pre = new ActivityParams("pre-evac");
 		pre.setTypicalDuration(49); // needs to be geq 49, otherwise when running a simulation one gets "java.lang.RuntimeException: zeroUtilityDuration of type pre-evac must be greater than 0.0. Did you forget to specify the typicalDuration?"

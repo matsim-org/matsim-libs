@@ -24,7 +24,6 @@ import org.apache.log4j.Logger;
 import org.matsim.api.core.v01.Scenario;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.config.groups.SimulationConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterTXT;
@@ -57,12 +56,12 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 
 		MatsimRandom.reset(7411L);
 
-		config.addSimulationConfigGroup(new SimulationConfigGroup()) ;
-		config.simulation().setTimeStepSize(10.0);
-		config.simulation().setFlowCapFactor(0.01);
-		config.simulation().setStorageCapFactor(0.04);
-		config.simulation().setRemoveStuckVehicles(false);
-		config.simulation().setStuckTime(10.0);
+		config.addModule( new SimulationConfigGroup() );
+		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setTimeStepSize(10.0);
+		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setFlowCapFactor(0.01);
+		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setStorageCapFactor(0.04);
+		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setRemoveStuckVehicles(false);
+		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setStuckTime(10.0);
 		config.planCalcScore().setLearningRate(1.0);
 
 		Scenario scenario = ScenarioUtils.createScenario(config);
@@ -95,12 +94,11 @@ public class OnePercentBerlin10sTest extends MatsimTestCase {
 
 		MatsimRandom.reset(7411L);
 
-		config.addQSimConfigGroup(new QSimConfigGroup()) ;
-		config.getQSimConfigGroup().setTimeStepSize(10.0);
-		config.getQSimConfigGroup().setFlowCapFactor(0.01);
-		config.getQSimConfigGroup().setStorageCapFactor(0.04);
-		config.getQSimConfigGroup().setRemoveStuckVehicles(false);
-		config.getQSimConfigGroup().setStuckTime(10.0);
+		config.qsim().setTimeStepSize(10.0);
+		config.qsim().setFlowCapFactor(0.01);
+		config.qsim().setStorageCapFactor(0.04);
+		config.qsim().setRemoveStuckVehicles(false);
+		config.qsim().setStuckTime(10.0);
 		config.planCalcScore().setLearningRate(1.0);
 
 		Scenario scenario = ScenarioUtils.createScenario(config);

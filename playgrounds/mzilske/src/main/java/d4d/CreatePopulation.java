@@ -60,6 +60,7 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
 
 import playground.mzilske.cdr.CellTower;
+import playground.mzilske.cdr.CellularCoverageLinkToZoneResolver;
 import playground.mzilske.cdr.PopulationFromSightings;
 import playground.mzilske.cdr.Zones;
 
@@ -89,7 +90,7 @@ public class CreatePopulation {
 		
 		
 		zones.buildCells();
-		PopulationFromSightings.readSampleWithOneRandomPointForEachSightingInNewCell(scenario, zones, allSightings);
+		PopulationFromSightings.readSampleWithOneRandomPointForEachSightingInNewCell(scenario, new CellularCoverageLinkToZoneResolver(zones, scenario.getNetwork()), allSightings);
 
 
 

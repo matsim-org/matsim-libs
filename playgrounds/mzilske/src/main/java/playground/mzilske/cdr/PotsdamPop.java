@@ -211,14 +211,14 @@ public class PotsdamPop implements Runnable {
 	private Activity createWork(Coord workLocation) {
 		Activity activity = population.getFactory().createActivityFromCoord("work", workLocation);
 		activity.setEndTime(17.5*60*60);
-//		activity.setEndTime(calculateNormallyDistributedTime(19*60*60));
+		activity.setEndTime(calculateNormallyDistributedTime(19*60*60));
 		return activity;
 	}
 
 	private Activity createHome(Coord homeLocation) {
 		Activity activity = population.getFactory().createActivityFromCoord("home", homeLocation);
 		activity.setEndTime(9.5*60*60);
-//		activity.setEndTime(calculateNormallyDistributedTime(7*60*60));
+		activity.setEndTime(calculateNormallyDistributedTime(7*60*60));
 		return activity;
 	}
 

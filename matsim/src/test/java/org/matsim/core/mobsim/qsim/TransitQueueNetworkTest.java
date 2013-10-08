@@ -39,7 +39,6 @@ import org.matsim.api.core.v01.population.Population;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.agents.AgentFactory;
 import org.matsim.core.mobsim.qsim.agents.PersonDriverAgentImpl;
@@ -986,7 +985,6 @@ public class TransitQueueNetworkTest extends TestCase {
             // setup: config
             ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
             scenario.getConfig().scenario().setUseTransit(true);
-            scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
             Id id1 = scenario.createId("1");
             Id id2 = scenario.createId("2");
             Id id3 = scenario.createId("3");

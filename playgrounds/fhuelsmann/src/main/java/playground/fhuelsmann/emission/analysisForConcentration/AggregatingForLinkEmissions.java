@@ -534,7 +534,7 @@ public class AggregatingForLinkEmissions {
 		config.addCoreModules();
 		MatsimConfigReader configReader = new MatsimConfigReader(config);
 		configReader.readFile(configfile);
-		Double endTime = config.getQSimConfigGroup().getEndTime();
+		Double endTime = config.qsim().getEndTime();
 		logger.info("Simulation end time is: " + endTime / 3600 + " hours.");
 		logger.info("Aggregating emissions for " + (int) (endTime / 3600 / noOfTimeBins) + " hour time bins.");
 		return endTime;

@@ -295,7 +295,7 @@ public class MyController extends AbstractController {
 	}
 
 	private void runQSim() {
-		QSimConfigGroup conf = scenario.getConfig().getQSimConfigGroup();
+		QSimConfigGroup conf = scenario.getConfig().qsim();
 		if (conf == null) {
 			throw new NullPointerException(
 					"There is no configuration set for the QSim. Please add the module 'qsim' to your config file.");
@@ -346,19 +346,18 @@ public class MyController extends AbstractController {
 
 	public void run() throws FileNotFoundException {
 		config = ConfigUtils.createConfig();
-		config.addQSimConfigGroup(new QSimConfigGroup());
 
 		config.controler().setLastIteration(500);
 		config.global().setCoordinateSystem("EPSG:3395");
 		config.global().setNumberOfThreads(8);
 		config.otfVis().setShowTeleportedAgents(false);
 		config.controler().setWriteSnapshotsInterval(5);
-		config.getQSimConfigGroup().setStorageCapFactor(0.01);
-		config.getQSimConfigGroup().setFlowCapFactor(0.01);
-		config.getQSimConfigGroup().setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE);
-		config.getQSimConfigGroup().setRemoveStuckVehicles(false);
-		config.getQSimConfigGroup().setNumberOfThreads(8);
-		config.getQSimConfigGroup().setEndTime(27*60*60);
+		config.qsim().setStorageCapFactor(0.01);
+		config.qsim().setFlowCapFactor(0.01);
+		config.qsim().setSnapshotStyle(QSimConfigGroup.SNAPSHOT_AS_QUEUE);
+		config.qsim().setRemoveStuckVehicles(false);
+		config.qsim().setNumberOfThreads(8);
+		config.qsim().setEndTime(27*60*60);
 		config.plansCalcRoute().setTeleportedModeSpeed("other", 1.38889); // 5 km/h beeline
 		config.controler().setWriteEventsInterval(0);
 		ActivityParams sighting = new ActivityParams("sighting");

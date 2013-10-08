@@ -531,35 +531,15 @@ public class Controler extends AbstractController {
 			Mobsim simulation = this.thisMobsimFactory.createMobsim(this.getScenario(), this.getEvents());
 			enrichSimulation(simulation);
 			return simulation;
-		} else if (this.config.simulation() != null && this.config.simulation().getExternalExe() != null ) {
+		} else if ((SimulationConfigGroup) this.config.getModule(SimulationConfigGroup.GROUP_NAME) != null && ((SimulationConfigGroup) this.config.getModule(SimulationConfigGroup.GROUP_NAME)).getExternalExe() != null ) {
 			ExternalMobsim simulation = new ExternalMobsim(this.scenarioData, this.events);
 			simulation.setControlerIO(this.getControlerIO());
 			simulation.setIterationNumber(this.thisIteration);
 			return simulation;
-		} else if (this.config.controler().getMobsim() != null) {
+		} else {
 			String mobsim = this.config.controler().getMobsim();
 			MobsimFactory f = this.mobsimFactoryRegister.getInstance(mobsim);
 			Mobsim simulation = f.createMobsim(this.getScenario(), this.getEvents());
-			enrichSimulation(simulation);
-			return simulation;
-		} else {
-			log.warn("Please specify which mobsim should be used in the configuration (see module 'controler', parameter 'mobsim'). " +
-					"Now trying to detect which mobsim to use from other parameters...");
-			MobsimFactory mobsimFactory;
-			if (config.getModule(QSimConfigGroup.GROUP_NAME) != null) {
-				mobsimFactory = new QSimFactory();
-			} else if (config.getModule("JDEQSim") != null) {
-				mobsimFactory = new JDEQSimulationFactory();
-			} else if (config.getModule(SimulationConfigGroup.GROUP_NAME) != null) {
-				mobsimFactory = new QueueSimulationFactory();
-			} else {
-				log.warn("There is no configuration for a mobility simulation in the config. The Controler "
-						+ "uses the default `Simulation'.  Add a (possibly empty) `Simulation' module to your config file "
-						+ "to avoid this warning");
-				config.addSimulationConfigGroup(new SimulationConfigGroup());
-				mobsimFactory = new QueueSimulationFactory();
-			}
-			Mobsim simulation = mobsimFactory.createMobsim(this.getScenario(), this.getEvents());
 			enrichSimulation(simulation);
 			return simulation;
 		}

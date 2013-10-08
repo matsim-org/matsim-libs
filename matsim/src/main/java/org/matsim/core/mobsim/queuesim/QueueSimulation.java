@@ -120,14 +120,14 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 			log.warn("Started QueueSimulation without a `simulation' config module.  Presumably due to removing " +
 					"`simulation' from the core modules in nov/dec'10.  Add simulation config module before calling QueueSimulation " +
 					"creational method to avoid this warning.  kai, dec'10");
-			this.config.addSimulationConfigGroup(new SimulationConfigGroup()) ;
+			this.config.addModule(new SimulationConfigGroup()) ;
 		}
 
 		this.listenerManager = new MobsimListenerManager(this);
 
 		this.agentCounter.reset();
 
-		simTimer = new MobsimTimer(this.config.simulation().getTimeStepSize()) ;
+		simTimer = new MobsimTimer(((SimulationConfigGroup) getScenario().getConfig().getModule("simulation")).getTimeStepSize()) ;
 
 		QueueSimulation.events = events;
 		this.population = scenario.getPopulation();
@@ -198,10 +198,10 @@ public final class QueueSimulation implements VisMobsim, Netsim {
 		}
 
 		// Initialize Snapshot file
-		this.snapshotPeriod = (int) this.config.simulation().getSnapshotPeriod();
+		this.snapshotPeriod = (int) ((SimulationConfigGroup) getScenario().getConfig().getModule("simulation")).getSnapshotPeriod();
 
-		double startTime = this.config.simulation().getStartTime();
-		this.stopTime = this.config.simulation().getEndTime();
+		double startTime = ((SimulationConfigGroup) getScenario().getConfig().getModule("simulation")).getStartTime();
+		this.stopTime = ((SimulationConfigGroup) getScenario().getConfig().getModule("simulation")).getEndTime();
 
 		if (startTime == Time.UNDEFINED_TIME) startTime = 0.0;
 		if ((this.stopTime == Time.UNDEFINED_TIME) || (this.stopTime == 0)) this.stopTime = Double.MAX_VALUE;

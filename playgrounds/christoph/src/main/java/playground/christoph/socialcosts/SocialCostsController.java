@@ -82,9 +82,9 @@ public class SocialCostsController {
 		config.plans().setInputFile("../../matsim/examples/evacuation-tutorial/siouxfalls_plans.xml.gz");
 		config.controler().setOutputDirectory("../../matsim/examples/evacuation-tutorial/output");
 		config.controler().setLastIteration(50);
-		config.getQSimConfigGroup().setStuckTime(10);
-		config.getQSimConfigGroup().setFlowCapFactor(0.15);
-		config.getQSimConfigGroup().setStorageCapFactor(0.5);
+		config.qsim().setStuckTime(10);
+		config.qsim().setFlowCapFactor(0.15);
+		config.qsim().setStorageCapFactor(0.5);
 		
 		Scenario scenario = ScenarioUtils.loadScenario(config);
 

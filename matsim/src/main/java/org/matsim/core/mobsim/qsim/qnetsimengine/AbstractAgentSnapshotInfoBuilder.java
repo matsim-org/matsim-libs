@@ -53,7 +53,7 @@ abstract class AbstractAgentSnapshotInfoBuilder implements AgentSnapshotInfoBuil
 	private final AgentSnapshotInfoFactory snapshotInfoFactory;
 	
 	AbstractAgentSnapshotInfoBuilder( Scenario sc, final AgentSnapshotInfoFactory agentSnapshotInfoFactory ){
-		this.storageCapacityFactor = sc.getConfig().getQSimConfigGroup().getStorageCapFactor();
+		this.storageCapacityFactor = sc.getConfig().qsim().getStorageCapFactor();
 		this.cellSize = ((NetworkImpl) sc.getNetwork()).getEffectiveCellSize() ;
 		this.snapshotInfoFactory = agentSnapshotInfoFactory;
 	}

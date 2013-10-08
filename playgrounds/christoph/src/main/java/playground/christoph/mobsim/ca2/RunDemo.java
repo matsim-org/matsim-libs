@@ -44,12 +44,10 @@ import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.api.experimental.network.NetworkWriter;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriter;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.events.handler.BasicEventHandler;
-import org.matsim.core.gbl.Gbl;
 import org.matsim.core.gbl.MatsimRandom;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
@@ -165,10 +163,9 @@ public class RunDemo {
 		eventsManager.addHandler(new EventWriterXML(path + "events.xml"));
 		eventsManager.addHandler(new EventsWriterVXY(path + "eventsVXY.txt"));
 		
-		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
-		scenario.getConfig().getQSimConfigGroup().setTimeStepSize(timeStep);
-		scenario.getConfig().getQSimConfigGroup().setStartTime(startTime);
-		scenario.getConfig().getQSimConfigGroup().setEndTime(endTime);
+		scenario.getConfig().qsim().setTimeStepSize(timeStep);
+		scenario.getConfig().qsim().setStartTime(startTime);
+		scenario.getConfig().qsim().setEndTime(endTime);
 		
 		QSim qSim = (QSim) new QSimFactory().createMobsim(scenario, eventsManager);
 		CASimEngine caEngine = new CASimEngineFactory().createCASimEngine(qSim, spatialResolution);

@@ -15,6 +15,7 @@ import org.matsim.api.core.v01.network.Network;
 import org.matsim.api.core.v01.population.Activity;
 import org.matsim.api.core.v01.population.Person;
 import org.matsim.core.api.experimental.events.EventsManager;
+import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
 import org.matsim.core.config.ConfigUtils;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
@@ -31,23 +32,6 @@ import playground.mzilske.cdr.ZoneTracker.LinkToZoneResolver;
 import d4d.Sighting;
 
 public class PotsdamCompare {
-
-	private static final class CellularCoverageLinkToZoneResolver implements
-			LinkToZoneResolver {
-		private final Zones cellularCoverage;
-		private final Network network;
-
-		private CellularCoverageLinkToZoneResolver(Zones cellularCoverage,
-				Network network) {
-			this.cellularCoverage = cellularCoverage;
-			this.network = network;
-		}
-
-		@Override
-		public Id resolveLinkToZone(Id linkId) {
-			return cellularCoverage.locate(network.getLinks().get(linkId).getCoord());
-		}
-	}
 
 	private static final int TIME_BIN_SIZE = 60*60;
 	private static final int MAX_TIME = 24 * TIME_BIN_SIZE - 1;
@@ -74,7 +58,11 @@ public class PotsdamCompare {
 
 			@Override
 			public Id resolveLinkToZone(Id linkId) {
-				return linkId;
+				return linkId;	
+			}
+			
+			public IdImpl chooseLinkInZone(String zoneId) {
+				return new IdImpl(zoneId);
 			}
 			
 		};
@@ -109,7 +97,7 @@ public class PotsdamCompare {
 
 		List<Sighting> sightings = callProcess.getSightings();
 
-		VolumesAnalyzer volumesAnalyzer2 = runSimulationFromSightings(cellularCoverage, sightings);
+		VolumesAnalyzer volumesAnalyzer2 = runSimulationFromSightings(linkToZoneResolver, cellularCoverage, sightings);
 		
 
 		dumpVolumesCompareAllDay(network, volumesAnalyzer1, volumesAnalyzer2);
@@ -151,7 +139,7 @@ public class PotsdamCompare {
 		System.out.println(Math.sqrt(squares));
 	}
 
-	public static VolumesAnalyzer runSimulationFromSightings(final Zones cellularCoverage,
+	public static VolumesAnalyzer runSimulationFromSightings(final LinkToZoneResolver linkToZoneResolver, Zones zones,
 			List<Sighting> sightings) throws FileNotFoundException {
 		Config config = ConfigUtils.createConfig();
 		ActivityParams sightingParam = new ActivityParams("sighting");
@@ -165,12 +153,10 @@ public class PotsdamCompare {
 		config.planCalcScore().setConstantCar(0);
 		config.planCalcScore().setMonetaryDistanceCostRateCar(0);
 		config.controler().setLastIteration(0);
-		QSimConfigGroup tmp = new QSimConfigGroup();
+		QSimConfigGroup tmp = config.qsim();
 		tmp.setFlowCapFactor(100);
 		tmp.setStorageCapFactor(100);
 		tmp.setRemoveStuckVehicles(false);
-		tmp.setEndTime(24*60*60);
-		config.addQSimConfigGroup(tmp);
 		final ScenarioImpl scenario2 = (ScenarioImpl) ScenarioUtils.createScenario(config);
 		new MatsimNetworkReader(scenario2).readFile("input/potsdam/network.xml");
 
@@ -192,10 +178,10 @@ public class PotsdamCompare {
 		}
 
 
-		cellularCoverage.buildCells();
+		zones.buildCells();
 
-		PopulationFromSightings.readSampleWithOneRandomPointForEachSightingInNewCell(scenario2, cellularCoverage, allSightings);
-		PopulationFromSightings.preparePopulation(scenario2, cellularCoverage, allSightings);
+		PopulationFromSightings.readSampleWithOneRandomPointForEachSightingInNewCell(scenario2, linkToZoneResolver, allSightings);
+		PopulationFromSightings.preparePopulation(scenario2, zones, allSightings);
 
 		Controler controler = new Controler(scenario2);
 		controler.setOverwriteFiles(true);

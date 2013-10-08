@@ -93,15 +93,15 @@ public class MarginalCongestionHandlerV1 implements
 			throw new RuntimeException("Expecting a capacity period of 1h. Aborting...");
 		}
 		
-		if (this.scenario.getConfig().getQSimConfigGroup().getFlowCapFactor() != 1.0) {
+		if (this.scenario.getConfig().qsim().getFlowCapFactor() != 1.0) {
 			log.warn("Flow capacity factor unequal 1.0 not tested.");
 		}
 		
-		if (this.scenario.getConfig().getQSimConfigGroup().getStorageCapFactor() != 1.0) {
+		if (this.scenario.getConfig().qsim().getStorageCapFactor() != 1.0) {
 			log.warn("Storage capacity factor unequal 1.0 not tested.");
 		}
 		
-		if (this.scenario.getConfig().getQSimConfigGroup().isInsertingWaitingVehiclesBeforeDrivingVehicles() != true) {
+		if (this.scenario.getConfig().qsim().isInsertingWaitingVehiclesBeforeDrivingVehicles() != true) {
 			throw new RuntimeException("Expecting the qSim to insert waiting vehicles before driving vehicles. Aborting...");
 		}
 	}
@@ -441,11 +441,11 @@ public class MarginalCongestionHandlerV1 implements
 		linkInfo.setLinkId(link.getId());
 		linkInfo.setFreeTravelTime(Math.ceil(link.getLength() / link.getFreespeed()));
 		
-		double flowCapacity_hour = link.getCapacity() * this.scenario.getConfig().getQSimConfigGroup().getFlowCapFactor();
+		double flowCapacity_hour = link.getCapacity() * this.scenario.getConfig().qsim().getFlowCapFactor();
 		double marginalDelay_sec = Math.floor((1 / (flowCapacity_hour / this.scenario.getNetwork().getCapacityPeriod()) ) );
 		linkInfo.setMarginalDelayPerLeavingVehicle(marginalDelay_sec);
 		
-		int storageCapacity_cars = (int) (Math.ceil((link.getLength() * link.getNumberOfLanes()) / network.getEffectiveCellSize()) * this.scenario.getConfig().getQSimConfigGroup().getStorageCapFactor() );
+		int storageCapacity_cars = (int) (Math.ceil((link.getLength() * link.getNumberOfLanes()) / network.getEffectiveCellSize()) * this.scenario.getConfig().qsim().getStorageCapFactor() );
 		linkInfo.setStorageCapacity_cars(storageCapacity_cars);
 		
 		this.linkId2congestionInfo.put(link.getId(), linkInfo);

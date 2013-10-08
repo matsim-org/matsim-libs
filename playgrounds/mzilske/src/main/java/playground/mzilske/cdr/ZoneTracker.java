@@ -16,6 +16,8 @@ public class ZoneTracker implements LinkEnterEventHandler {
 	public interface LinkToZoneResolver {
 		
 		public Id resolveLinkToZone(Id linkId);
+
+		public Id chooseLinkInZone(String zoneId);
 		
 	}
 	

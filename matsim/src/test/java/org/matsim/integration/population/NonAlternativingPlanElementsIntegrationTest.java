@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.Config;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.network.MatsimNetworkReader;
 import org.matsim.core.population.ActivityImpl;
@@ -116,7 +115,6 @@ public class NonAlternativingPlanElementsIntegrationTest {
 	public void test_Controler_QSim_Routechoice_acts() {
 		Config config = this.utils.loadConfig("test/scenarios/equil/config.xml");
 		config.controler().setMobsim("qsim");
-		config.addQSimConfigGroup(new QSimConfigGroup());
 		config.controler().setLastIteration(10);
 		config.strategy().addParam("Module_2", "ReRoute");
 		config.strategy().addParam("ModuleProbability_2", "1.0");
@@ -143,7 +141,6 @@ public class NonAlternativingPlanElementsIntegrationTest {
 	public void test_Controler_QSim_Routechoice_legs() {
 		Config config = this.utils.loadConfig("test/scenarios/equil/config.xml");
 		config.controler().setMobsim("qsim");
-		config.addQSimConfigGroup(new QSimConfigGroup());
 		config.controler().setLastIteration(10);
 		config.strategy().addParam("Module_2", "ReRoute");
 		config.strategy().addParam("ModuleProbability_2", "1.0");

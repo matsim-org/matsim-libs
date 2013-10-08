@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.population.Plan;
 import org.matsim.api.core.v01.population.PopulationFactory;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.mobsim.qsim.QSim;
 import org.matsim.core.mobsim.qsim.QSimFactory;
@@ -59,7 +58,6 @@ public class TransitAgentTest extends TestCase {
 
 	public void testAcceptLineRoute() {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(   0, 0));
@@ -103,7 +101,6 @@ public class TransitAgentTest extends TestCase {
 
 	public void testArriveAtStop() {
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		
 		NetworkImpl network = (NetworkImpl) scenario.getNetwork();
 		Node node1 = network.createAndAddNode(new IdImpl("1"), new CoordImpl(   0, 0));

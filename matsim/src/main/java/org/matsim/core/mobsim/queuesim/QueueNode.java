@@ -34,6 +34,7 @@ import org.matsim.api.core.v01.network.Node;
 import org.matsim.core.api.internal.MatsimComparator;
 import org.matsim.core.api.internal.MatsimNetworkObject;
 import org.matsim.core.config.Config;
+import org.matsim.core.config.groups.SimulationConfigGroup;
 
 /**
  * Represents a node in the QueueSimulation.
@@ -120,15 +121,14 @@ class QueueNode implements MatsimNetworkObject {
 			// check if veh is stuck!
 			QueueSimulation qSim = this.queueNetwork.getMobsim() ;
 			Scenario sc = qSim.getScenario() ;
-			Config config = sc.getConfig() ;
-
+		
 			//			if ((now - link.bufferLastMovedTime) > AbstractSimulation.getStuckTime()) {
-			if ((now - link.bufferLastMovedTime) > config.simulation().getStuckTime() ) {
+			if ((now - link.bufferLastMovedTime) > ((SimulationConfigGroup) this.queueNetwork.getMobsim().getScenario().getConfig().getModule("simulation")).getStuckTime() ) {
 				/* We just push the vehicle further after stucktime is over, regardless
 				 * of if there is space on the next link or not.. optionally we let them
 				 * die here, we have a config setting for that!
 				 */
-				if (config.simulation().isRemoveStuckVehicles()) {
+				if (((SimulationConfigGroup) this.queueNetwork.getMobsim().getScenario().getConfig().getModule("simulation")).isRemoveStuckVehicles()) {
 					link.popFirstFromBuffer();
 					this.queueNetwork.getMobsim().getAgentCounter().decLiving();
 					this.queueNetwork.getMobsim().getAgentCounter().incLost();

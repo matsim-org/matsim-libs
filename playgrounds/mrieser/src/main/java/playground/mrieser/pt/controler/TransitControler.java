@@ -27,7 +27,6 @@ import org.matsim.api.core.v01.TransportMode;
 import org.matsim.core.config.Module;
 import org.matsim.core.config.groups.ControlerConfigGroup.EventsFileFormat;
 import org.matsim.core.config.groups.PlanCalcScoreConfigGroup.ActivityParams;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.controler.Controler;
 import org.matsim.core.controler.events.StartupEvent;
 import org.matsim.core.controler.listener.StartupListener;
@@ -85,9 +84,6 @@ public class TransitControler extends Controler {
 			this.transitConfig.addParam("transitScheduleFile", oldModule.getValue("transitScheduleFile"));
 			this.transitConfig.addParam("vehiclesFile", oldModule.getValue("vehiclesFile"));
 			this.transitConfig.addParam("transitModes", oldModule.getValue("transitModes"));
-		}
-		if (this.config.getQSimConfigGroup() == null) {
-		  this.config.addQSimConfigGroup(new QSimConfigGroup());
 		}
 		this.config.scenario().setUseTransit(true);
 		this.config.scenario().setUseVehicles(true);

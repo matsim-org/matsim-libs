@@ -32,7 +32,6 @@ import org.matsim.contrib.otfvis.OTFVis;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.basic.v01.IdImpl;
 import org.matsim.core.config.ConfigUtils;
-import org.matsim.core.config.groups.QSimConfigGroup;
 import org.matsim.core.events.EventsUtils;
 import org.matsim.core.events.algorithms.EventWriterXML;
 import org.matsim.core.mobsim.qsim.QSim;
@@ -68,10 +67,9 @@ public class PseudoNetworkDemo {
 		}
 
 		ScenarioImpl scenario = (ScenarioImpl) ScenarioUtils.createScenario(ConfigUtils.createConfig());
-		scenario.getConfig().addQSimConfigGroup(new QSimConfigGroup());
 		scenario.getConfig().scenario().setUseVehicles(true);
 		scenario.getConfig().scenario().setUseTransit(true);
-		scenario.getConfig().getQSimConfigGroup().setSnapshotStyle("queue");
+		scenario.getConfig().qsim().setSnapshotStyle("queue");
 
 		Network network = scenario.getNetwork();
 //		network.setCapacityPeriod(3600.0);
