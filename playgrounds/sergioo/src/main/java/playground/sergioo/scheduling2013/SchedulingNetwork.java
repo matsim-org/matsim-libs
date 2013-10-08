@@ -38,7 +38,6 @@ import playground.sergioo.passivePlanning2012.core.population.PlaceSharer;
 import playground.sergioo.passivePlanning2012.core.population.PlaceSharer.KnownPlace;
 import playground.sergioo.passivePlanning2012.core.population.agenda.Agenda;
 import playground.sergioo.passivePlanning2012.core.population.agenda.Agenda.AgendaElement;
-import playground.sergioo.scheduling2013.gui.MainApplet;
 
 public class SchedulingNetwork implements Network {
 
@@ -576,11 +575,11 @@ public class SchedulingNetwork implements Network {
 		JFrame frame = new JFrame();
         frame.setUndecorated(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        MainApplet mainApplet = new MainApplet(facilities, placeSharer, network, scenario.getNetwork(), path);
+        /*MainApplet mainApplet = new MainApplet(facilities, placeSharer, network, scenario.getNetwork(), path);
         frame.add(mainApplet);
         mainApplet.init();
         frame.setSize(Toolkit.getDefaultToolkit().getScreenSize());
-		frame.setVisible(true);
+		frame.setVisible(true);*/
 	}
 	
 }
