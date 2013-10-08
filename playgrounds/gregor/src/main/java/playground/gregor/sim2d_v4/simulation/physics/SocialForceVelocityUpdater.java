@@ -23,14 +23,13 @@ package playground.gregor.sim2d_v4.simulation.physics;
 import java.util.List;
 
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.utils.collections.Tuple;
 
 import playground.gregor.sim2d_v4.cgal.CGAL;
 import playground.gregor.sim2d_v4.scenario.Sim2DConfig;
 import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection.Segment;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.DesiredDirectionCalculator;
-import playground.gregor.sim2d_v4.simulation.physics.algorithms.Neighbors;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.Obstacles;
+import playground.gregor.sim2d_v4.simulation.physics.algorithms.VDNeighbors;
 
 /**
  * Social force model according to: D. Helbing, I. Farkas, T. Vicsek,
@@ -56,14 +55,14 @@ public class SocialForceVelocityUpdater implements VelocityUpdater {
 	private final double CUTOFF_DIST = 20f;
 
 
-	private final Neighbors ncalc;
+	private final VDNeighbors ncalc;
 	private final Obstacles ocalc = new Obstacles();
 	private DesiredDirectionCalculator dd;
 
 	private final double dT;
 	private final Sim2DAgent agent;
 	
-	public SocialForceVelocityUpdater(DesiredDirectionCalculator dd, Neighbors ncalc, Sim2DConfig conf, Sim2DAgent agent) {
+	public SocialForceVelocityUpdater(DesiredDirectionCalculator dd, VDNeighbors ncalc, Sim2DConfig conf, Sim2DAgent agent) {
 		this.ncalc = ncalc;
 		this.dd = dd;
 		this.agent = agent;
@@ -77,7 +76,8 @@ public class SocialForceVelocityUpdater implements VelocityUpdater {
 	public void updateVelocity(double time) {
 
 		
-		List<Tuple<Double, Sim2DAgent>> neighbors = this.ncalc.getNeighbors(time);
+//		List<Tuple<Double, Sim2DAgent>> neighbors = this.ncalc.getNeighbors(time);
+		List<Sim2DAgent> neighbors = this.ncalc.getNeighbors();
 		List<Segment> obstacles = this.ocalc.computeObstacles(this.agent);
 
 		double v0 = this.agent.getV0();
@@ -99,8 +99,7 @@ public class SocialForceVelocityUpdater implements VelocityUpdater {
 		
 		double[] pos = this.agent.getPos();
 
-		for (Tuple<Double, Sim2DAgent> t : neighbors) {
-			Sim2DAgent neighbor = t.getSecond();
+		for (Sim2DAgent neighbor : neighbors) {
 			double[] nPos = neighbor.getPos();
 			double nx = pos[0] - nPos[0];
 			double ny = pos[1] - nPos[1];

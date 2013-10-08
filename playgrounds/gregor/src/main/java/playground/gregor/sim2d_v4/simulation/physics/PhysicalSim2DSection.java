@@ -33,11 +33,11 @@ import org.matsim.core.gbl.Gbl;
 
 import playground.gregor.sim2d_v4.cgal.CGAL;
 import playground.gregor.sim2d_v4.cgal.TwoDTree;
-import playground.gregor.sim2d_v4.cgal.VoronoiDensity.VoronoiCell;
 import playground.gregor.sim2d_v4.events.Sim2DAgentDestructEvent;
 import playground.gregor.sim2d_v4.scenario.Section;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.PhysicalSim2DSectionVoronoiDensity;
+import playground.gregor.sim2d_v4.simulation.physics.algorithms.PhysicalSim2DSectionVoronoiDensity.Cell;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
@@ -72,9 +72,8 @@ public class PhysicalSim2DSection {
 
 	private int numOpenings;
 
-	private List<VoronoiCell> cells;
 
-	private final PhysicalSim2DSectionVoronoiDensity densityMap;
+	protected final PhysicalSim2DSectionVoronoiDensity densityMap;
 
 
 	//	private VisDebugger debugger;
@@ -100,10 +99,10 @@ public class PhysicalSim2DSection {
 	}
 
 	public void updateAgents(double time) {
-		this.agentTwoDTree.clear();
+//		this.agentTwoDTree.clear();
 		this.agents.addAll(this.inBuffer);
 		this.inBuffer.clear();
-		this.agentTwoDTree.buildTwoDTree(this.agents);
+//		this.agentTwoDTree.buildTwoDTree(this.agents);
 		this.densityMap.buildDensityMap();
 		Iterator<Sim2DAgent> it = this.agents.iterator();
 //
@@ -117,19 +116,29 @@ public class PhysicalSim2DSection {
 //			VoronoiDensity vd = new VoronoiDensity(0.01, -5, -4, 45, 4);
 //			this.cells = vd.computeVoronoiDensityFast(x, y);
 //		}
-//		int idx = 0;
+		int idx = 0;
 		while (it.hasNext()) {
 			Sim2DAgent agent = it.next();
 
-//			VoronoiCell cell = this.cells.get(idx);
-//			idx++;
-//
-//			if (cell.area < 20 && cell.area > 0) {
-//				double rho = 1/cell.area+0.1;
-//				double freeSpeed = Math.max(0.001, 1.34 * (1 - Math.exp(-1.913*(1/rho-1/5.4))));
-//
-//				agent.setDesiredSpeed(freeSpeed);
-//			}
+			//proof of concept! needs to be revised and implemented at a different location [GL August '13]
+			Cell cell = this.densityMap.getCell(idx);
+			idx++;
+			
+			double area = cell.area;
+			for (Integer n : cell.neighbors) {
+				area += this.densityMap.getCell(n).area;
+			}
+			area /= (cell.neighbors.size() + 1);
+			
+			if (area < 10 && area > 0) {
+				double rho = 1/area;//+0.1;
+				double freeSpeed = Math.max(0.001, 1.34 * (1 - Math.exp(-1.913*(1/rho-1/5.4))));
+
+				agent.setDesiredSpeed(freeSpeed);
+			} else {
+				agent.setDesiredSpeed(1.34);
+			}
+//			agent.setVoronoiCell(cell);  
 
 
 			updateAgent(agent, time);
@@ -362,6 +371,11 @@ public class PhysicalSim2DSection {
 			}
 			return false;
 		}
+		
+		@Override
+		public String toString() {
+			return this.x0+":"+this.y0 +"  " +this.x1+":"+this.y1;
+		}
 	}
 
 
@@ -404,5 +418,8 @@ public class PhysicalSim2DSection {
 		return this.sim2dsc;
 	}
 
+	public PhysicalSim2DSectionVoronoiDensity getVD() {
+		return this.densityMap;
+	}
 
 }

@@ -33,7 +33,7 @@ public class InfoBox implements ClockedVisDebuggerAdditionalDrawer, VisDebuggerO
 
 	private double last = 0;
 	private double speedup = 1;
-	private int nrAgents;
+	private int nrAgents = 0;
 	
 	public InfoBox(EventBasedVisDebuggerEngine dbg, Scenario sc) {
 		this.dbg = dbg;
@@ -75,7 +75,7 @@ public class InfoBox implements ClockedVisDebuggerAdditionalDrawer, VisDebuggerO
 //		double sph = this.speedup > .98 ? Math.round(this.speedup) : this.speedup;
 //		String tt = Integer.toString(ttt);
 //		String dec = Integer.toString((int)((this.speedup-ttt)*100));
-//		p.text("# 2D agents: " + this.nrAgents , x, y+ts+ts/2);
+		p.text("# 2D agents: " + this.nrAgents , x, y+ts+ts/2);
 //		p.text("fps: " + (int)(p.frameRate+.5) , x, y+ts+ts/2 + ts + ts/2);
 
 	}

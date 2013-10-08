@@ -34,7 +34,6 @@ import org.matsim.api.core.v01.Scenario;
 import org.matsim.api.core.v01.network.Link;
 import org.matsim.api.core.v01.network.Network;
 import org.matsim.core.gbl.MatsimRandom;
-import org.matsim.core.utils.collections.Tuple;
 
 import playground.gregor.sim2d_v4.events.Sim2DAgentConstructEvent;
 import playground.gregor.sim2d_v4.events.Sim2DAgentConstructEventHandler;
@@ -42,6 +41,8 @@ import playground.gregor.sim2d_v4.events.Sim2DAgentDestructEvent;
 import playground.gregor.sim2d_v4.events.Sim2DAgentDestructEventHandler;
 import playground.gregor.sim2d_v4.events.XYVxVyEventImpl;
 import playground.gregor.sim2d_v4.events.XYVxVyEventsHandler;
+import playground.gregor.sim2d_v4.events.debug.CircleEvent;
+import playground.gregor.sim2d_v4.events.debug.CircleEventHandler;
 import playground.gregor.sim2d_v4.events.debug.ForceReDrawEvent;
 import playground.gregor.sim2d_v4.events.debug.ForceReDrawEventHandler;
 import playground.gregor.sim2d_v4.events.debug.LineEvent;
@@ -58,7 +59,7 @@ import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Polygon;
 
-public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAgentConstructEventHandler, Sim2DAgentDestructEventHandler, NeighborsEventHandler, LineEventHandler, ForceReDrawEventHandler, RectEventHandler{
+public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAgentConstructEventHandler, Sim2DAgentDestructEventHandler, NeighborsEventHandler, LineEventHandler, ForceReDrawEventHandler, RectEventHandler, CircleEventHandler{
 
 	double time;
 	private final EventsBasedVisDebugger vis;
@@ -135,7 +136,7 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 					MatsimRandom.getRandom().setSeed((int)(100*x[0])+coords.length);
 					int offset = MatsimRandom.getRandom().nextInt(10)*15;
 //					offset += 96;
-					this.vis.addPolygonStatic(x, y, 255-offset, 255-offset, 255-offset, 0, 0);
+					this.vis.addPolygonStatic(x, y, 255-offset, 255-offset, 255-offset, 255, 0);
 
 					this.vis.addTextStatic(p.getCentroid().getX(), p.getCentroid().getY(), sec.getId().toString(), 100);
 				}
@@ -186,7 +187,7 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 		
 		this.nrAgents++;
 		
-		this.vis.addLine(event.getX(), event.getY(), event.getX()+event.getVX(), event.getY()+event.getVY(), 0, 0, 0, 255, 25);
+		this.vis.addLine(event.getX(), event.getY(), event.getX()+event.getVX(), event.getY()+event.getVY(), 0, 0, 0, 255, 50);
 		double dx = event.getVY();
 		double dy = -event.getVX();
 		double length = Math.sqrt(dx*dx+dy*dy);
@@ -199,12 +200,18 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 		double y1 = y0 - dx*al -dy*al/4;
 		double x2 = x0 + dy*al +dx*al/4;
 		double y2 = y0 - dx*al +dy*al/4;
-		this.vis.addTriangle(x0, y0, x1, y1, x2, y2, 0, 0, 0, 255, 25, true);
+		this.vis.addTriangle(x0, y0, x1, y1, x2, y2, 0, 0, 0, 255, 50, true);
 		
 		CircleProperty cp = this.circleProperties.get(event.getPersonId());
 		
 		this.vis.addCircle(event.getX(),event.getY(),cp.rr,cp.r,cp.g,cp.b,cp.a,cp.minScale,cp.fill);
 		this.vis.addText(event.getX(),event.getY(), event.getPersonId().toString(), 200);
+		
+	}
+	
+	@Override
+	public void handleEvent(CircleEvent event) {
+//		this.vis.addCircle(event.getX(), event.getY(), .18f, 0, 128, 128, 255, 0, true);
 		
 	}
 
@@ -306,10 +313,9 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 
 	@Override
 	public void handleEvent(NeighborsEvent event) {
-		List<Tuple<Double, Sim2DAgent>> n = event.getNeighbors();
+		List<Sim2DAgent> n = event.getNeighbors();
 		Sim2DAgent a = event.getAgent();
-		for (Tuple<Double, Sim2DAgent> o : n) {
-			Sim2DAgent neighbor = o.getSecond();
+		for (Sim2DAgent neighbor : n) {
 			double x0 = a.getPos()[0];
 			double y0 = a.getPos()[1];
 			double x1 = neighbor.getPos()[0];
@@ -383,6 +389,8 @@ public class EventBasedVisDebuggerEngine implements XYVxVyEventsHandler, Sim2DAg
 	public int getNrAgents() {
 		return this.nrAgents;
 	}
+
+
 
 
 

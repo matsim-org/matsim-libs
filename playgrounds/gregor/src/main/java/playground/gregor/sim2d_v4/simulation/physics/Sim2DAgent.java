@@ -32,6 +32,7 @@ import org.matsim.core.mobsim.qsim.qnetsimengine.Sim2DQTransitionLink;
 import playground.gregor.sim2d_v4.cgal.TwoDObject;
 import playground.gregor.sim2d_v4.events.XYVxVyEventImpl;
 import playground.gregor.sim2d_v4.simulation.physics.algorithms.LinkSwitcher;
+import playground.gregor.sim2d_v4.simulation.physics.algorithms.PhysicalSim2DSectionVoronoiDensity.Cell;
 
 
 public class Sim2DAgent implements TwoDObject {
@@ -74,6 +75,8 @@ public class Sim2DAgent implements TwoDObject {
 	private boolean emitPosEvents = true;
 
 	/*package*/ int ttl; //workaround - think about this [gl August '13]
+
+	private Cell voronoiCell;
 	
 	public Sim2DAgent(Scenario sc, QVehicle veh, double spawnX, double spawnY, LinkSwitcher ls, PhysicalSim2DEnvironment pEnv) {
 		this.pos[0] = spawnX;
@@ -241,5 +244,14 @@ public class Sim2DAgent implements TwoDObject {
 
 	public double getActualSpeed() {
 		return Math.sqrt(this.v[0]*this.v[0]+this.v[1]*this.v[1]);
+	}
+
+	public void setVoronoiCell(Cell cell) {
+		this.voronoiCell = cell;
+		
+	}
+	
+	public Cell getVoronoiCell() {
+		return this.voronoiCell;
 	}
 }

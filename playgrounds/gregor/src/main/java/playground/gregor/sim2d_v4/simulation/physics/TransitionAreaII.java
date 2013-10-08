@@ -33,6 +33,7 @@ import playground.gregor.sim2d_v4.events.debug.ForceReDrawEvent;
 import playground.gregor.sim2d_v4.events.debug.LineEvent;
 import playground.gregor.sim2d_v4.scenario.Section;
 import playground.gregor.sim2d_v4.scenario.Sim2DScenario;
+import playground.gregor.sim2d_v4.simulation.physics.algorithms.PhysicalSim2DSectionVoronoiDensity.Cell;
 import be.humphreys.simplevoronoi.GraphEdge;
 import be.humphreys.simplevoronoi.Voronoi;
 
@@ -179,17 +180,39 @@ public class TransitionAreaII extends PhysicalSim2DSection  implements Transitio
 	 */
 	@Override
 	public void updateAgents(double time) {
-		this.agentTwoDTree.clear();
+//		this.agentTwoDTree.clear();
 		this.agents.addAll(this.inBuffer);
 		this.inBuffer.clear();
 
 		handleTransitionBuffer(time);
 
 
-		this.agentTwoDTree.buildTwoDTree(this.agents);
+//		this.agentTwoDTree.buildTwoDTree(this.agents);
+		this.densityMap.buildDensityMap();
 		Iterator<Sim2DAgent> it = this.agents.iterator();
+		
+		int idx = 0;
 		while (it.hasNext()) {
 			Sim2DAgent agent = it.next();
+			
+			//proof of concept! needs to be revised and implemented at a different location [GL August '13]
+			Cell cell = this.densityMap.getCell(idx);
+			idx++;
+			
+			double area = cell.area;
+			for (Integer n : cell.neighbors) {
+				area += this.densityMap.getCell(n).area;
+			}
+			area /= (cell.neighbors.size() + 1);
+			
+			if (area < 10 && area > 0) {
+				double rho = 1/area;//+0.1;
+				double freeSpeed = Math.max(0.001, 1.34 * (1 - Math.exp(-1.913*(1/rho-1/5.4))));
+
+				agent.setDesiredSpeed(freeSpeed);
+			} else {
+				agent.setDesiredSpeed(1.34);
+			}
 			updateAgent(agent, time);
 		}
 

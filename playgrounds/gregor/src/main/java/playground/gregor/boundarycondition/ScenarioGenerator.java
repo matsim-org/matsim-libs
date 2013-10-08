@@ -187,7 +187,7 @@ public class ScenarioGenerator {
 	private static void createNetworkChangeEvents(Scenario sc) {
 		Collection<NetworkChangeEvent> events = new LinkedList<NetworkChangeEvent>();
 		NetworkChangeEventFactoryImpl fac = new NetworkChangeEventFactoryImpl();
-		double incr = (4*SEPC_FLOW)/20;
+		double incr = (4*SEPC_FLOW)/10;
 		double flowCap = incr;
 
 
@@ -239,16 +239,20 @@ public class ScenarioGenerator {
 			ee1.addLink(sc.getNetwork().getLinks().get(new IdImpl("l2")));
 			//			ee.addLink(sc.getNetwork().getLinks().get(new IdImpl("l6")));
 			//			ee.addLink(sc.getNetwork().getLinks().get(new IdImpl("t_l6")));
-			if (time < 70*60) {
+			if (time < 35*60) {
 				ChangeValue ccv1 = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE,0.95*flowCap);
 
 				ee1.setFlowCapacityChange(ccv1);
-			} else if (time < 74*60){
+			} else if (time < 39*60){
 				ChangeValue ccv1 = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE,0.7*flowCap);
 
 				ee1.setFlowCapacityChange(ccv1);
-			}else {
+			}else if (time < 43*60){
 				ChangeValue ccv1 = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE,0.001*flowCap);
+
+				ee1.setFlowCapacityChange(ccv1);
+			} else {
+				ChangeValue ccv1 = new NetworkChangeEvent.ChangeValue(NetworkChangeEvent.ChangeType.ABSOLUTE,0.7*flowCap);
 
 				ee1.setFlowCapacityChange(ccv1);
 			}

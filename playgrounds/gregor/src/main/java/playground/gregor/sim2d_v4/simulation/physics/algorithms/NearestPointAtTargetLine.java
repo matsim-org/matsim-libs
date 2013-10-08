@@ -36,7 +36,7 @@ public class NearestPointAtTargetLine implements DesiredDirectionCalculator {
 		this.agent = agent;
 		this.ls = ls;
 	}
-	
+
 	@Override
 	public double[] computeDesiredDirection() {
 		final double [] pos = this.agent.getPos();
@@ -44,12 +44,14 @@ public class NearestPointAtTargetLine implements DesiredDirectionCalculator {
 		LinkInfo li = this.ls.getLinkInfo(id);
 		Segment fl = li.targetLine;
 		double r = CGAL.vectorCoefOfPerpendicularProjection(pos[0], pos[1], fl.x0, fl.y0, fl.x1, fl.y1);
-		
+
 		double dx, dy;
-		
+
+
+
 		if (r >= 0 && r <= 1) {
-//			tx = fl.x0 + r * (fl.x1-fl.x0);
-//			ty = fl.y0 + r * (fl.y1-fl.y0);
+			//			tx = fl.x0 + r * (fl.x1-fl.x0);
+			//			ty = fl.y0 + r * (fl.y1-fl.y0);
 			dx = li.dx;
 			dy = li.dy;
 		} else if (r <= 0) {
@@ -69,9 +71,23 @@ public class NearestPointAtTargetLine implements DesiredDirectionCalculator {
 			dx /= l;
 			dy /= l;
 		}
-		
-		
-		
+
+
+//		//for testing only [GL August '13]
+//		Cell c = this.agent.getVoronoiCell();
+//		if (c != null) {
+//			double dcx = c.cx - pos[0];
+//			double dcy = c.cy - pos[1];
+//			if (Double.isNaN(dcx) || Double.isNaN(dcy) || Math.abs(dcx) > 2 || Math.abs(dcy) > 2) {
+//				
+//			} else {
+//				dx += .5*dcx;
+//				dy += .5*dcy;
+////				System.out.println("corrected");
+//			}
+//		}
+
+
 		return new double []{dx,dy};
 	}
 

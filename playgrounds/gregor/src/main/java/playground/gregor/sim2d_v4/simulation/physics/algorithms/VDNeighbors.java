@@ -1,6 +1,6 @@
 /* *********************************************************************** *
  * project: org.matsim.*
- * Neighbors.java
+ * VDNeighbors.java
  *                                                                         *
  * *********************************************************************** *
  *                                                                         *
@@ -18,49 +18,45 @@
  *                                                                         *
  * *********************************************************************** */
 
-package playground.gregor.sim2d_v4.events.debug;
+package playground.gregor.sim2d_v4.simulation.physics.algorithms;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import org.matsim.api.core.v01.Id;
-import org.matsim.core.api.experimental.events.Event;
+import org.matsim.core.basic.v01.IdImpl;
 
+import playground.gregor.sim2d_v4.events.debug.NeighborsEvent;
+import playground.gregor.sim2d_v4.simulation.physics.PhysicalSim2DSection;
 import playground.gregor.sim2d_v4.simulation.physics.Sim2DAgent;
+import playground.gregor.sim2d_v4.simulation.physics.algorithms.PhysicalSim2DSectionVoronoiDensity.Cell;
 
-public class NeighborsEvent extends Event {
+public class VDNeighbors {
 
-	public static final String ATTRIBUTE_PERSON = "person";
-	public static final String EVENT_TYPE = "SIM2D_DEBUG_Neighbors";
-	private final Id id;
-	private final List<Sim2DAgent> n;
-	private final Sim2DAgent a;
-	
-	public NeighborsEvent(double time, Id id, List<Sim2DAgent> ret, Sim2DAgent a) {
-		super(time);
-		this.id = id;
-		this.n = ret;
-		this.a = a;
+	private final Sim2DAgent agent;
+
+	public VDNeighbors(Sim2DAgent agent) {
+		this.agent = agent;
 	}
 
-	@Override
-	public Map<String, String> getAttributes() {
-		Map<String, String> attr = super.getAttributes();
-		attr.put(ATTRIBUTE_PERSON, this.id.toString());
-		return attr;
-	}
-	
-	@Override
-	public String getEventType() {
-		return EVENT_TYPE;
-	}
-	
 	public List<Sim2DAgent> getNeighbors() {
-		return this.n;
-	}
-	
-	public Sim2DAgent getAgent() {
-		return this.a;
-	}
+		List<Sim2DAgent> ret = new ArrayList<Sim2DAgent>();
+		PhysicalSim2DSection psec = this.agent.getPSec();
+		PhysicalSim2DSectionVoronoiDensity vd = psec.getVD();
+		Cell cell = vd.getCell(this.agent);
+		if (cell == null) {
+			return ret;
+		}
+		for (int n : cell.neighbors) {
+			ret.add(vd.getCell(n).agent);
+		}
 
+		//		if (this.agent.getId().equals(new IdImpl("b7301"))) {
+		//			
+		//		}
+		if (this.agent.getId().equals(new IdImpl("b6575"))) {
+			this.agent.getPSec().getPhysicalEnvironment().getEventsManager().processEvent(new NeighborsEvent(0, this.agent.getId(), ret, this.agent));
+		}
+
+		return ret;
+	}
 }
