@@ -211,15 +211,12 @@ public class AgentEventMessage extends Message {
 					messageQueue.schedule(this);
 				}
 			} else {
-				// TODO: use proper mode travel time here
-				// or read from plan, if it is already there...
 				
 				event = new PersonDepartureEvent(getMessageArrivalTime(), personId, leg.getRoute().getStartLinkId(), leg.getMode());
 				eventsManager.processEvent(event);
 				
 				planElementIndex++;
-				double modeTravelTime=0;
-				setMessageArrivalTime(getMessageArrivalTime()+modeTravelTime);
+				setMessageArrivalTime(getMessageArrivalTime()+leg.getTravelTime());
 				messageQueue.schedule(this);
 				
 			}

@@ -20,6 +20,13 @@ import org.matsim.core.events.EventsReaderXMLv1;
 import org.matsim.core.events.EventsUtils;
 
 // TODO: create test based on existing events file
+
+// TODO: this approach could be improved: if too short bin size is used, it will allow cars to move with max. speed of road,
+//which is not always correct, because if no car entered the road in a time bin, this does not mean the road itself is free. 
+
+// also could create problems with long inflow roads (where tt longer than bin size, e.g. 1min)
+
+// but probably 1min bin size should produce quite good results (which has been confirmed from berlin scenario)
 public class TTMatrixFromEvents extends TTMatrix {
 
 	public static void main(String[] args) {
@@ -75,7 +82,16 @@ public class TTMatrixFromEvents extends TTMatrix {
 				
 				for (int i=0;i<ds.length;i++){
 					if (ds[i]==0){
-						ds[i]=link.getLength() / link.getFreespeed();
+						if (i>0 && i<ds.length-1){
+							if (ds[i+1]==0){
+								double freeSpeedTravelTime=link.getLength() / link.getFreespeed();
+								ds[i]=(ds[i-1]+freeSpeedTravelTime)/2;
+							} else {
+								ds[i]=(ds[i-1]+ds[i+1])/2;;
+							}
+						} else {
+							ds[i]=link.getLength() / link.getFreespeed();
+						}
 					} else {
 						ds[i]/=numberOfSamples.get(linkId)[i];
 					}

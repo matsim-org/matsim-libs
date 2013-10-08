@@ -38,9 +38,9 @@ public class MainJDEPSimBerlin {
 	public static void main(String[] args) {
 		// Todo change these three paths and try run.
 
-		//String plansFile = "c:/data/parkingSearch/psim/berlin/output_plans.xml.gz";
+		String plansFile = "c:/data/parkingSearch/psim/berlin/output_plans.xml.gz";
 		
-		String plansFile = "c:/data/parkingSearch/psim/berlin/ITERS/it.50/50.plans.xml/plan_100009.xml";
+	//	String plansFile = "c:/data/parkingSearch/psim/berlin/ITERS/it.50/50.plans.xml/plan_100009.xml";
 		
 		String networkFile = "c:/data/parkingSearch/psim/berlin/output_network.xml.gz";
 		String facilititiesPath = "c:/data/parkingSearch/psim/berlin/output_facilities.xml.gz";
@@ -63,7 +63,11 @@ public class MainJDEPSimBerlin {
 		Message.ttMatrix = new TTMatrixFromStoredTable("C:/data/parkingSearch/psim/berlin/ITERS/it.50/50.60secBin.ttMatrix.txt", scenario.getNetwork());
 		sim.run();
 		eventsManager.finishProcessing();
-		lh.writeGraphic(outputFolder + "legHistogram.car.png",TransportMode.car);
+		lh.writeGraphic(outputFolder + "legHistogram_all.png");
+		lh.writeGraphic(outputFolder + "legHistogram_car.png",TransportMode.car);
+		lh.writeGraphic(outputFolder + "legHistogram_pt.png",TransportMode.pt);
+		lh.writeGraphic(outputFolder + "legHistogram_ride.png",TransportMode.ride);
+		lh.writeGraphic(outputFolder + "legHistogram_walk.png",TransportMode.walk);
 	//	lh.write(outputFolder + "legHistogram.txt");
 		eventsWriter.reset(0);
 	}

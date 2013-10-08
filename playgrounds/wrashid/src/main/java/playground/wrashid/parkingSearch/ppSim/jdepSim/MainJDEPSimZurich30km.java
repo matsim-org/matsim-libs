@@ -20,6 +20,7 @@ package playground.wrashid.parkingSearch.ppSim.jdepSim;
 
 import org.matsim.analysis.LegHistogram;
 import org.matsim.api.core.v01.Scenario;
+import org.matsim.api.core.v01.TransportMode;
 import org.matsim.contrib.parking.lib.GeneralLib;
 import org.matsim.core.api.experimental.events.EventsManager;
 import org.matsim.core.events.EventsUtils;
@@ -43,16 +44,17 @@ public class MainJDEPSimZurich30km {
 		String networkFile = "c:/data/parkingSearch/zurich/ktiRun24/output_network.xml.gz";
 		String facilititiesPath = "c:/data/parkingSearch/zurich/ktiRun24/output_facilities.xml.gz";
 		Scenario scenario = GeneralLib.readScenario(plansFile, networkFile, facilititiesPath);
-
+		String outputFolder="C:/data/parkingSearch/psim/zurich/output/";
+		
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 
-		EventWriterXML eventsWriter = new EventWriterXML("events.xml");
+		EventWriterXML eventsWriter = new EventWriterXML(outputFolder + "events.xml");
 		eventsManager.addHandler(eventsWriter);
 		LegHistogram lh = new LegHistogram(300);
 		eventsManager.addHandler(lh);
 
 		eventsManager.resetHandlers(0);
-		eventsWriter.init("events.xml.gz");
+		eventsWriter.init(outputFolder + "events.xml.gz");
 
 		Mobsim sim = new JDEPSim(scenario, eventsManager);
 		// Mobsim sim = new PPSim(scenario, eventsManager);
@@ -60,8 +62,11 @@ public class MainJDEPSimZurich30km {
 		Message.ttMatrix = new TTMatrixFromStoredTable("c:/tmp2/table3.txt", scenario.getNetwork());
 		sim.run();
 		eventsManager.finishProcessing();
-		lh.writeGraphic("legHistogram.png");
-		lh.write("legHistogram.txt");
+		lh.writeGraphic(outputFolder + "legHistogram_all.png");
+		lh.writeGraphic(outputFolder + "legHistogram_car.png",TransportMode.car);
+		lh.writeGraphic(outputFolder + "legHistogram_pt.png",TransportMode.pt);
+		lh.writeGraphic(outputFolder + "legHistogram_ride.png",TransportMode.ride);
+		lh.writeGraphic(outputFolder + "legHistogram_walk.png",TransportMode.walk);
 		eventsWriter.reset(0);
 	}
 
