@@ -65,28 +65,6 @@ public class OTFVisTest extends MatsimTestCase {
 	}
 
 	@Test
-	public void testOTFVisSnapshotWriterOnQueueSimulation() {
-		final Config config = ConfigUtils.loadConfig("test/scenarios/equil/config_plans1.xml");
-		config.controler().setLastIteration(2);
-		config.controler().setWriteEventsInterval(0);
-		config.controler().setWritePlansInterval(0);
-		config.controler().setSnapshotFormat(Arrays.asList("otfvis"));
-		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setSnapshotPeriod(600);
-		((SimulationConfigGroup) config.getModule(SimulationConfigGroup.GROUP_NAME)).setSnapshotStyle("equiDist");
-
-		final Controler controler = new Controler(config);
-		controler.addSnapshotWriterFactory("otfvis", new OTFFileWriterFactory());
-		controler.setOverwriteFiles(true);
-		controler.setCreateGraphs(false);
-		controler.setDumpDataAtEnd(false);
-		controler.run();
-
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(0, "otfvis.mvi")).exists());
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(1, "otfvis.mvi")).exists());
-		assertTrue(new File(controler.getControlerIO().getIterationFilename(2, "otfvis.mvi")).exists());
-	}
-
-	@Test
 	public void testOTFVisSnapshotWriterOnQSim() {
 		final Config config = ConfigUtils.loadConfig("test/scenarios/equil/config_plans1.xml");
 		config.controler().setLastIteration(2);
