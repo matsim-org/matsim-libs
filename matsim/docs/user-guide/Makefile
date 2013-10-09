@@ -8,7 +8,7 @@ pdf:
 # pdf-full is used by the build server to build the complete pdf from a clean checkout
 pdf-full:
 	pdflatex -interaction=nonstopmode ${NAME}
-	bibtex -min-crossrefs=99 ${NAME}
+	-bibtex -min-crossrefs=99 ${NAME}
 	pdflatex -interaction=nonstopmode ${NAME}
 	pdflatex -interaction=nonstopmode ${NAME}
 
