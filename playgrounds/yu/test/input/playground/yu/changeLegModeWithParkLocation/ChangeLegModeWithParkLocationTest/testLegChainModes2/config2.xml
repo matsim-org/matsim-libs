@@ -31,7 +31,7 @@
 		<param name="lastIteration" value="10" />
 	</module>
 
-	<module name="simulation">
+	<module name="qsim">
 		<!-- "start/endTime" of MobSim (00:00:00 == take earliest activity time/ run as long as active vehicles exist) -->
 		<param name="startTime" value="00:00:00" />
 		<param name="endTime" value="00:00:00" />
