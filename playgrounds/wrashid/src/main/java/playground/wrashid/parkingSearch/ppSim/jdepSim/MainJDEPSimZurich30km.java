@@ -48,7 +48,7 @@ public class MainJDEPSimZurich30km {
 		
 		EventsManager eventsManager = EventsUtils.createEventsManager();
 
-		EventWriterXML eventsWriter = new EventWriterXML(outputFolder + "events.xml");
+		EventWriterXML eventsWriter = new EventWriterXML(outputFolder + "events.xml.gz");
 		eventsManager.addHandler(eventsWriter);
 		LegHistogram lh = new LegHistogram(300);
 		eventsManager.addHandler(lh);
@@ -59,7 +59,7 @@ public class MainJDEPSimZurich30km {
 		Mobsim sim = new JDEPSim(scenario, eventsManager);
 		// Mobsim sim = new PPSim(scenario, eventsManager);
 
-		Message.ttMatrix = new TTMatrixFromStoredTable("c:/tmp2/table3.txt", scenario.getNetwork());
+		Message.ttMatrix = new TTMatrixFromStoredTable("C:/data/parkingSearch/psim/zurich/inputs/it.50.300secBin.ttMatrix.txt", scenario.getNetwork());
 		sim.run();
 		eventsManager.finishProcessing();
 		lh.writeGraphic(outputFolder + "legHistogram_all.png");
