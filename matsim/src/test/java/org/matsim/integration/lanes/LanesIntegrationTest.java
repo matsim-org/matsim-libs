@@ -77,12 +77,12 @@ public class LanesIntegrationTest {
 		
 		/**
 		 * The lanes attached to link 23 should distribute the 3600 veh/h capacity 
-		 * to link 34 with 600 veh/h (approx. 16 %) 
-		 * to link 35 with 1200 veh/h (approx. 33 %) 
+		 * to link 34 with 600 veh/h (approx. 16.6 %) 
+		 * to link 35 with 1200 veh/h (approx. 33.3 %) 
 		 * to link 36 with 1800 veh/h to link 36 (approx. 50 %).
 		 */
-		Assert.assertTrue("", (15.0 < listener.percent34 && listener.percent34 < 17.0));
-		Assert.assertTrue("", (32.0 < listener.percent35 && listener.percent35 < 34.0));
+		Assert.assertTrue("", (15.5 < listener.percent34 && listener.percent34 < 17.5));
+		Assert.assertTrue("", (32.5 < listener.percent35 && listener.percent35 < 34.5));
 		Assert.assertTrue("", (49.0 < listener.percent36 && listener.percent36 < 51.0));
 	}
 
