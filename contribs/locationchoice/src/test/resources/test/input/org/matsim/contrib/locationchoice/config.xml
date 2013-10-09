@@ -36,7 +36,7 @@
 		<param name="inputFacilitiesFile" value="test/scenarios/equil/facilities.xml" />
 	</module>	
 	
-	<module name="simulation">
+	<module name="qsim">
 		<param name="startTime" value="00:00:00" />
 		<param name="endTime" value="07:00:00" />
 	</module>
